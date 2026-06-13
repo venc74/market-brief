@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Бриф · 12.06.2026, петък</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b1220;          /* дълбоко мастилено синьо — небе преди отваряне */
+    --panel: #111a2e;
+    --panel-2: #16203a;
+    --line: #233252;
+    --text: #d9e1f2;
+    --muted: #8593b3;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --regime: #34d399; --regime-dim: rgba(52,211,153,.12);
+    
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink); color: var(--text);
+    font-family: "IBM Plex Sans", sans-serif; font-size: 15px; line-height: 1.55;
+  }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Хедър: режимът Е дизайнът ── */
+  header {
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--regime-dim), transparent 70%);
+    padding: 36px 0 28px;
+  }
+  .header-inner { max-width: 1080px; margin: 0 auto; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .masthead h1 { font-family: "Spectral", serif; font-size: 26px; font-weight: 700; letter-spacing: .3px; }
+  .masthead .date { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .regime-badge {
+    font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600;
+    color: var(--regime); border: 2px solid var(--regime); border-radius: 6px;
+    padding: 10px 22px; letter-spacing: 2px; text-transform: uppercase;
+    box-shadow: 0 0 28px var(--regime-dim);
+  }
+  .regime-reason { color: var(--muted); font-size: 13px; text-align: right; max-width: 360px; margin-top: 6px; }
+
+  section { margin-top: 44px; }
+  h2 {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 20px;
+  }
+  h2::before { content: "// "; color: var(--regime); }
+
+  /* ── Термометър ── */
+  .thermo { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .t-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; border-top: 3px solid var(--line);
+  }
+  .t-card.green { border-top-color: var(--green); }
+  .t-card.yellow { border-top-color: var(--yellow); }
+  .t-card.red { border-top-color: var(--red); }
+  .t-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .t-val { font-family: "IBM Plex Mono", monospace; font-size: 21px; font-weight: 600; margin-top: 6px; }
+  .t-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .prose { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--regime);
+    border-radius: 8px; padding: 20px 24px; font-size: 15.5px; }
+
+  /* ── Сектори ── */
+  .sectors { display: grid; gap: 12px; }
+  .sector-row { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; }
+  .sector-name { font-weight: 600; }
+  .sector-etf { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--regime); }
+  .sector-chain { font-size: 14px; color: var(--text); }
+  .sector-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Action карти ── */
+  .stock-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    margin-bottom: 22px; overflow: hidden; }
+  .stock-head { padding: 18px 24px; display: flex; justify-content: space-between;
+    align-items: baseline; flex-wrap: wrap; gap: 8px;
+    background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .ticker { font-family: "IBM Plex Mono", monospace; font-size: 24px; font-weight: 600; color: var(--regime); }
+  .company { color: var(--muted); font-size: 14px; margin-left: 10px; }
+  .price-tag { font-family: "IBM Plex Mono", monospace; font-size: 18px; }
+  .stock-body { padding: 20px 24px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .stock-body, .sector-row { grid-template-columns: 1fr; } }
+  .block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--muted); margin: 14px 0 6px; }
+  .block h3:first-child { margin-top: 0; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px;
+    font-size: 13.5px; padding: 3px 0; border-bottom: 1px dotted var(--line); }
+  .kv b { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-align: right; }
+  .why { font-size: 14.5px; }
+  ul.tight { padding-left: 18px; font-size: 13.5px; }
+  ul.tight li { margin: 4px 0; }
+  .plan { background: var(--regime-dim); border: 1px solid var(--regime);
+    border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .plan .kv { border-bottom-color: rgba(255,255,255,.08); }
+  .warn { color: var(--yellow); font-size: 13px; }
+
+  /* ── Watchlist ── */
+  .watch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .watch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .watch-card .ticker { font-size: 17px; color: var(--yellow); }
+  .watch-card p { font-size: 13px; margin-top: 8px; color: var(--text); }
+  .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
+    border-top: 1px dotted var(--line); padding-top: 8px; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px;
+    font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: no-preference) {
+    .regime-badge { animation: pulse 4s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 44px var(--regime-dim); } }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="masthead">
+      <h1>Персонален AI Инвестиционен Бриф</h1>
+      <div class="date mono">12.06.2026, петък · генериран 19:38 CET · 90 мин преди US pre-market</div>
+    </div>
+    <div>
+      <div class="regime-badge">Offensive</div>
+      <div class="regime-reason">5/6 индикатора зелени, нула червени</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Пазарен термометър</h2>
+  <div class="thermo">
+    
+    <div class="t-card green">
+      <div class="t-name">SPY тренд</div>
+      <div class="t-val">612.4</div>
+      <div class="t-label">SPY 612 | над 50DMA, над 200DMA</div>
+    </div>
+    
+    <div class="t-card green">
+      <div class="t-name">VIX</div>
+      <div class="t-val">14.2</div>
+      <div class="t-label">VIX 14.2 (risk-on)</div>
+    </div>
+    
+    <div class="t-card yellow">
+      <div class="t-name">NAAIM</div>
+      <div class="t-val">78.0</div>
+      <div class="t-label">NAAIM 78</div>
+    </div>
+    
+    <div class="t-card yellow">
+      <div class="t-name">Put/Call (SPY)</div>
+      <div class="t-val">0.92</div>
+      <div class="t-label">P/C 0.92</div>
+    </div>
+    
+    <div class="t-card green">
+      <div class="t-name">2Y/10Y спред</div>
+      <div class="t-val">0.45</div>
+      <div class="t-label">0.45% (нормален, steepening)</div>
+    </div>
+    
+    <div class="t-card green">
+      <div class="t-name">Fed Net Liquidity</div>
+      <div class="t-val">6240.0</div>
+      <div class="t-label">$6240 млрд (↑)</div>
+    </div>
+    
+  </div>
+</section>
+
+<section>
+  <h2>Макро бриф</h2>
+  <div class="prose">Fed задържа лихвите, но dot plot показа две намаления до края на годината — пазарът цени първото за септември. DXY отслабна 1.2% за седмицата, което е директен tailwind за суровини и emerging markets. Петролът се стабилизира над $78 след новите танкерни ограничения в Червено море. Net Liquidity расте трета поредна седмица — исторически това е средата, в която breakout-ите работят.
+  <br><br><span style="color:var(--muted)">Offensive е оправдан: ликвидността расте, VIX е под 15, RS лидерството е ясно.</span>
+  </div>
+</section>
+
+<section>
+  <h2>Секторна карта · следващите 2–6 седмици</h2>
+  <div class="sectors">
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Полупроводници</div>
+        <div class="sector-etf">SMH</div>
+      </div>
+      <div>
+        <div class="sector-chain">AI capex цикълът се разширява от hyperscalers към суверенни AI проекти → поръчки за advanced packaging → SMH RS на нов 6-месечен връх.</div>
+        <div class="sector-meta">Хоризонт: 4-6 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Енергетика</div>
+        <div class="sector-etf">XLE</div>
+      </div>
+      <div>
+        <div class="sector-chain">Танкерни ограничения в Червено море → по-дълги маршрути → по-висок freight + premium за физически барел → рафинерии и E&P с margin expansion.</div>
+        <div class="sector-meta">Хоризонт: 2-4 седмици</div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<section>
+  <h2>Action · 3 тикъра</h2>
+  
+  
+  <div class="stock-card">
+    <div class="stock-head">
+      <div><span class="ticker">AVGT</span><span class="company">AVGT Corp · Technology</span></div>
+      <div class="price-tag">$142.3 <span style="color:var(--muted);font-size:13px">pivot $145.0 (-1.86%)</span></div>
+    </div>
+    <div class="stock-body">
+      <div class="block">
+        <h3>Защо точно сега</h3>
+        <div class="why">AI capex верига → advanced packaging поръчки → тази компания е с 60% пазарен дял в нишата. RS Line на нов връх потвърждава институционално акумулиране.</div>
+        <h3>Бизнес</h3>
+        <div class="why">Производител на тестово оборудване за полупроводници. Доминира нишата на high-bandwidth memory тестване.</div>
+        <h3>Катализатори · 4–8 седмици</h3>
+        <ul class="tight"><li>Earnings 28 юли — guidance ревизия нагоре е вероятна</li><li>Нов контракт със суверенен AI проект (слухове, потвърждение до 4 седмици)</li></ul>
+        <h3>Рискове</h3>
+        <ul class="tight"><li>Export ограничения към Китай — 18% от приходите</li><li>Extended пазар: пробив без обем би бил fakeout</li></ul>
+        
+        <h3>Short Interest</h3>
+        <div class="why" style="font-size:13.5px">Нисък short interest (4.2%) — без squeeze динамика, но и без активна опозиция.</div>
+        <h3>Опции</h3>
+        <div class="kv"><span>IV / IVR</span><b>38.5% / 22.0 (partial (14 дни история))</b></div>
+        <div class="kv"><span>P/C ratio</span><b>0.64</b></div>
+        <div class="kv"><span>Стратегия</span><b>long call / bull call spread</b></div>
+        <div class="why" style="font-size:13px;color:var(--muted);margin-top:6px">IVR 22 е нисък — premium-ът е евтин, опциите дават по-добър leverage.</div>
+      </div>
+      <div class="block">
+        <h3>Техническа картина</h3>
+        <div class="kv"><span>Формация</span><b>flat base (11.2%)</b></div>
+        <div class="kv"><span>Weinstein Stage</span><b>2</b></div>
+        <div class="kv"><span>RS Line</span><b>нов максимум</b></div>
+        <div class="kv"><span>50DMA / 200DMA</span><b>$134.2 / $118.5</b></div>
+        <div class="kv"><span>Обем (vs 50d avg)</span><b>1.8x ✓ пробивен</b></div>
+        <h3>Фундамент</h3>
+        <div class="kv"><span>EPS ръст YoY</span><b>41.0%</b></div>
+        <div class="kv"><span>Revenue ръст YoY</span><b>28.5%</b></div>
+        <div class="kv"><span>ROE</span><b>24.3%</b></div>
+        <div class="kv"><span>P/E / Fwd P/E</span><b>31.2 / 24.8</b></div>
+        <div class="kv"><span>Inst. ownership</span><b>82.4%</b></div>
+        <h3>Earnings</h3>
+        <div class="kv"><span>Следващ отчет</span><b>2026-07-28 (46д)</b></div>
+        <div class="kv"><span>Препоръка</span><b>преди earnings — 46 дни буфер е достатъчен</b></div>
+        <div class="plan">
+          <h3 style="color:var(--regime)">План · риск $1000</h3>
+          <div class="kv"><span>Entry</span><b>$142.1 – $147.9</b></div>
+          <div class="kv"><span>Stop (под 50DMA)</span><b>$132.86</b></div>
+          <div class="kv"><span>Брой акции</span><b>82</b></div>
+          <div class="kv"><span>Инвестиция</span><b>$11,890 (11.9%)</b></div>
+          <div class="kv"><span>Цел 1 (2:1)</span><b>$169.28</b></div>
+          <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">trailing stop под 10DMA след достигане на $169.28</b></div>
+          <div class="kv"><span>Хоризонт</span><b>4–8 седмици</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="stock-card">
+    <div class="stock-head">
+      <div><span class="ticker">ENRX</span><span class="company">ENRX Corp · Energy</span></div>
+      <div class="price-tag">$58.2 <span style="color:var(--muted);font-size:13px">pivot $59.0 (-1.36%)</span></div>
+    </div>
+    <div class="stock-body">
+      <div class="block">
+        <h3>Защо точно сега</h3>
+        <div class="why">AI capex верига → advanced packaging поръчки → тази компания е с 60% пазарен дял в нишата. RS Line на нов връх потвърждава институционално акумулиране.</div>
+        <h3>Бизнес</h3>
+        <div class="why">Производител на тестово оборудване за полупроводници. Доминира нишата на high-bandwidth memory тестване.</div>
+        <h3>Катализатори · 4–8 седмици</h3>
+        <ul class="tight"><li>Earnings 28 юли — guidance ревизия нагоре е вероятна</li><li>Нов контракт със суверенен AI проект (слухове, потвърждение до 4 седмици)</li></ul>
+        <h3>Рискове</h3>
+        <ul class="tight"><li>Export ограничения към Китай — 18% от приходите</li><li>Extended пазар: пробив без обем би бил fakeout</li></ul>
+        
+        <h3>Short Interest</h3>
+        <div class="why" style="font-size:13.5px">Нисък short interest (4.2%) — без squeeze динамика, но и без активна опозиция.</div>
+        <h3>Опции</h3>
+        <div class="kv"><span>IV / IVR</span><b>38.5% / 22.0 (partial (14 дни история))</b></div>
+        <div class="kv"><span>P/C ratio</span><b>0.64</b></div>
+        <div class="kv"><span>Стратегия</span><b>long call / bull call spread</b></div>
+        <div class="why" style="font-size:13px;color:var(--muted);margin-top:6px">IVR 22 е нисък — premium-ът е евтин, опциите дават по-добър leverage.</div>
+      </div>
+      <div class="block">
+        <h3>Техническа картина</h3>
+        <div class="kv"><span>Формация</span><b>cup with handle (11.2%)</b></div>
+        <div class="kv"><span>Weinstein Stage</span><b>2</b></div>
+        <div class="kv"><span>RS Line</span><b>нов максимум</b></div>
+        <div class="kv"><span>50DMA / 200DMA</span><b>$54.3 / $47.8</b></div>
+        <div class="kv"><span>Обем (vs 50d avg)</span><b>1.8x ✓ пробивен</b></div>
+        <h3>Фундамент</h3>
+        <div class="kv"><span>EPS ръст YoY</span><b>41.0%</b></div>
+        <div class="kv"><span>Revenue ръст YoY</span><b>28.5%</b></div>
+        <div class="kv"><span>ROE</span><b>24.3%</b></div>
+        <div class="kv"><span>P/E / Fwd P/E</span><b>31.2 / 24.8</b></div>
+        <div class="kv"><span>Inst. ownership</span><b>82.4%</b></div>
+        <h3>Earnings</h3>
+        <div class="kv"><span>Следващ отчет</span><b>2026-07-28 (46д)</b></div>
+        <div class="kv"><span>Препоръка</span><b>преди earnings — 46 дни буфер е достатъчен</b></div>
+        <div class="plan">
+          <h3 style="color:var(--regime)">План · риск $1000</h3>
+          <div class="kv"><span>Entry</span><b>$57.82 – $60.18</b></div>
+          <div class="kv"><span>Stop (под 50DMA)</span><b>$53.76</b></div>
+          <div class="kv"><span>Брой акции</span><b>190</b></div>
+          <div class="kv"><span>Инвестиция</span><b>$11,210 (11.2%)</b></div>
+          <div class="kv"><span>Цел 1 (2:1)</span><b>$69.48</b></div>
+          <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">trailing stop под 10DMA след достигане на $69.48</b></div>
+          <div class="kv"><span>Хоризонт</span><b>4–8 седмици</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="stock-card">
+    <div class="stock-head">
+      <div><span class="ticker">TECB</span><span class="company">TECB Corp · Technology</span></div>
+      <div class="price-tag">$88.0 <span style="color:var(--muted);font-size:13px">pivot $89.5 (-1.86%)</span></div>
+    </div>
+    <div class="stock-body">
+      <div class="block">
+        <h3>Защо точно сега</h3>
+        <div class="why">AI capex верига → advanced packaging поръчки → тази компания е с 60% пазарен дял в нишата. RS Line на нов връх потвърждава институционално акумулиране.</div>
+        <h3>Бизнес</h3>
+        <div class="why">Производител на тестово оборудване за полупроводници. Доминира нишата на high-bandwidth memory тестване.</div>
+        <h3>Катализатори · 4–8 седмици</h3>
+        <ul class="tight"><li>Earnings 28 юли — guidance ревизия нагоре е вероятна</li><li>Нов контракт със суверенен AI проект (слухове, потвърждение до 4 седмици)</li></ul>
+        <h3>Рискове</h3>
+        <ul class="tight"><li>Export ограничения към Китай — 18% от приходите</li><li>Extended пазар: пробив без обем би бил fakeout</li></ul>
+        
+        <h3>Short Interest</h3>
+        <div class="why" style="font-size:13.5px">Нисък short interest (4.2%) — без squeeze динамика, но и без активна опозиция.</div>
+        <h3>Опции</h3>
+        <div class="kv"><span>IV / IVR</span><b>38.5% / 22.0 (partial (14 дни история))</b></div>
+        <div class="kv"><span>P/C ratio</span><b>0.64</b></div>
+        <div class="kv"><span>Стратегия</span><b>long call / bull call spread</b></div>
+        <div class="why" style="font-size:13px;color:var(--muted);margin-top:6px">IVR 22 е нисък — premium-ът е евтин, опциите дават по-добър leverage.</div>
+      </div>
+      <div class="block">
+        <h3>Техническа картина</h3>
+        <div class="kv"><span>Формация</span><b>flat base (11.2%)</b></div>
+        <div class="kv"><span>Weinstein Stage</span><b>2</b></div>
+        <div class="kv"><span>RS Line</span><b>нов максимум</b></div>
+        <div class="kv"><span>50DMA / 200DMA</span><b>$83.1 / $72.0</b></div>
+        <div class="kv"><span>Обем (vs 50d avg)</span><b>1.8x ✓ пробивен</b></div>
+        <h3>Фундамент</h3>
+        <div class="kv"><span>EPS ръст YoY</span><b>41.0%</b></div>
+        <div class="kv"><span>Revenue ръст YoY</span><b>28.5%</b></div>
+        <div class="kv"><span>ROE</span><b>24.3%</b></div>
+        <div class="kv"><span>P/E / Fwd P/E</span><b>31.2 / 24.8</b></div>
+        <div class="kv"><span>Inst. ownership</span><b>82.4%</b></div>
+        <h3>Earnings</h3>
+        <div class="kv"><span>Следващ отчет</span><b>2026-07-28 (46д)</b></div>
+        <div class="kv"><span>Препоръка</span><b>преди earnings — 46 дни буфер е достатъчен</b></div>
+        <div class="plan">
+          <h3 style="color:var(--regime)">План · риск $1000</h3>
+          <div class="kv"><span>Entry</span><b>$87.71 – $91.29</b></div>
+          <div class="kv"><span>Stop (под 50DMA)</span><b>$82.27</b></div>
+          <div class="kv"><span>Брой акции</span><b>138</b></div>
+          <div class="kv"><span>Инвестиция</span><b>$12,351 (12.4%)</b></div>
+          <div class="kv"><span>Цел 1 (2:1)</span><b>$103.96</b></div>
+          <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">trailing stop под 10DMA след достигане на $103.96</b></div>
+          <div class="kv"><span>Хоризонт</span><b>4–8 седмици</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<section>
+  <h2>Watchlist · 2</h2>
+  <div class="watch-grid">
+    
+    <div class="watch-card">
+      <span class="ticker">TECC</span>
+      <span class="company">TECC Corp</span>
+      <p>AI capex верига → advanced packaging поръчки → тази компания е с 60% пазарен дял в нишата. RS Line на нов връх потвърждава институционално акумулиране.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Вече 2 Action от Technology.
+        · зона $31.16–$32.44</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">WTCH</span>
+      <span class="company">WTCH Corp</span>
+      <p>AI capex верига → advanced packaging поръчки → тази компания е с 60% пазарен дял в нишата. RS Line на нов връх потвърждава институционално акумулиране.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Пробив над $145 с 1.5x обем
+        · зона $74.48–$77.52</div>
+    </div>
+    
+  </div>
+</section>
+
+<footer>
+  Само за информационни цели. Не представлява финансов съвет, инвестиционна препоръка
+  или предложение за покупка/продажба на ценни книжа. Данните идват от публични API-та
+  и могат да съдържат грешки или закъснения. Всяко инвестиционно решение е лична отговорност.
+  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v1.0
+</footer>
+
+</div>
+</body>
+</html>
