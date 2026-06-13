@@ -1,0 +1,69 @@
+name: Daily Investment Brief
+
+# 07:30 Europe/Berlin = 06:30 UTC през зимата (CET) и 05:30 UTC през лятото (CEST).
+# GitHub cron работи само в UTC и не знае за DST, затова пускаме И ДВАТА слота,
+# а guard стъпката проверява локалното време и убива грешния.
+on:
+  schedule:
+    - cron: "30 5 * * 1-5"   # 07:30 CEST (лято)
+    - cron: "30 6 * * 1-5"   # 07:30 CET (зима)
+  workflow_dispatch: {}       # ръчно пускане за тест
+
+permissions:
+  contents: write             # за commit на docs/ и data/
+
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: DST guard — пускай само ако в Берлин е 07:3x
+        id: guard
+        run: |
+          HOUR=$(TZ="Europe/Berlin" date +%H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$HOUR" = "07" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Локално време в Берлин: $(TZ='Europe/Berlin' date) — грешният cron слот, излизам."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.guard.outputs.run == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.run == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        if: steps.guard.outputs.run == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Run the brief
+        if: steps.guard.outputs.run == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+          PORTFOLIO_SIZE: ${{ vars.PORTFOLIO_SIZE }}
+          RISK_PER_TRADE_PCT: ${{ vars.RISK_PER_TRADE_PCT }}
+        run: python src/main.py
+
+      - name: Commit dashboard + data
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          git config user.name "brief-bot"
+          git config user.email "actions@github.com"
+          git add docs/ data/
+          git diff --cached --quiet || git commit -m "brief: $(date +%F)"
+          git push
