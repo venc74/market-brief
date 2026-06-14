@@ -1,0 +1,1728 @@
+{
+ "date": "2026-06-14",
+ "macro": {
+  "date": "2026-06-14",
+  "net_liquidity": {
+   "value": -821397.1,
+   "prev": -831857.3,
+   "trend": "up",
+   "components": {
+    "fed_balance_bn": 6725.4,
+    "rrp_bn": 0.5,
+    "tga_bn": 828122.0
+   }
+  },
+  "spread_2s10s": {
+   "value": 0.39,
+   "prev_week": 0.38,
+   "status": "normal",
+   "direction": "steepening"
+  },
+  "global_signals": {
+   "DXY": {
+    "value": 99.75,
+    "chg_5d_pct": 0.22
+   },
+   "VIX": {
+    "value": 17.68,
+    "chg_5d_pct": 10.16
+   },
+   "Gold": {
+    "value": 4238.8,
+    "chg_5d_pct": -4.46
+   },
+   "Oil_WTI": {
+    "value": 84.88,
+    "chg_5d_pct": -11.6
+   },
+   "Copper": {
+    "value": 6.45,
+    "chg_5d_pct": -0.56
+   },
+   "US10Y": {
+    "value": 4.49,
+    "chg_5d_pct": 0.27
+   }
+  },
+  "headlines": []
+ },
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 741.75,
+    "ma50": 722.8,
+    "ma200": 684.07,
+    "above_50dma": true,
+    "above_200dma": true,
+    "status": "green",
+    "label": "SPY 742 | над 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 17.68,
+    "chg_5d": 1.63,
+    "status": "green",
+    "label": "VIX 17.7 (risk-on)"
+   },
+   {
+    "name": "NAAIM",
+    "value": null,
+    "status": "yellow",
+    "label": "NAAIM: няма данни"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 0.83,
+    "status": "yellow",
+    "label": "P/C 0.83"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.39,
+    "status": "green",
+    "label": "0.39% (нормален, steepening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": -821397.1,
+    "status": "green",
+    "label": "$-821397.1 млрд (↑)"
+   }
+  ],
+  "regime": "Offensive",
+  "regime_reason": "4/6 индикатора зелени, нула червени",
+  "sizing_factor": 1.0
+ },
+ "rotation": [
+  {
+   "etf": "SMH",
+   "sector": "Полупроводници",
+   "rs_chg_4w_pct": 8.12,
+   "rs_chg_12w_pct": 41.57,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 7.2,
+   "leading": true
+  },
+  {
+   "etf": "XLV",
+   "sector": "Здравеопазване",
+   "rs_chg_4w_pct": 5.8,
+   "rs_chg_12w_pct": -8.01,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.9,
+   "leading": false
+  },
+  {
+   "etf": "ITA",
+   "sector": "Отбрана",
+   "rs_chg_4w_pct": 5.06,
+   "rs_chg_12w_pct": -9.61,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.16,
+   "leading": false
+  },
+  {
+   "etf": "XLF",
+   "sector": "Финанси",
+   "rs_chg_4w_pct": 4.9,
+   "rs_chg_12w_pct": -2.18,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.0,
+   "leading": false
+  },
+  {
+   "etf": "XLRE",
+   "sector": "Недвижими имоти",
+   "rs_chg_4w_pct": 4.2,
+   "rs_chg_12w_pct": -3.53,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 3.3,
+   "leading": false
+  },
+  {
+   "etf": "XLK",
+   "sector": "Технологии",
+   "rs_chg_4w_pct": 3.84,
+   "rs_chg_12w_pct": 19.93,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.95,
+   "leading": true
+  },
+  {
+   "etf": "XLB",
+   "sector": "Материали",
+   "rs_chg_4w_pct": 1.86,
+   "rs_chg_12w_pct": -4.56,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.99,
+   "leading": false
+  },
+  {
+   "etf": "XLP",
+   "sector": "Потребителски (защитни)",
+   "rs_chg_4w_pct": 1.86,
+   "rs_chg_12w_pct": -8.65,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.99,
+   "leading": false
+  },
+  {
+   "etf": "XLI",
+   "sector": "Индустрия",
+   "rs_chg_4w_pct": 1.83,
+   "rs_chg_12w_pct": -4.3,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.96,
+   "leading": false
+  },
+  {
+   "etf": "XBI",
+   "sector": "Биотех",
+   "rs_chg_4w_pct": 0.07,
+   "rs_chg_12w_pct": -2.88,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.79,
+   "leading": false
+  },
+  {
+   "etf": "XLU",
+   "sector": "Комунални услуги",
+   "rs_chg_4w_pct": 0.03,
+   "rs_chg_12w_pct": -14.65,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.82,
+   "leading": false
+  },
+  {
+   "etf": "XLE",
+   "sector": "Енергетика",
+   "rs_chg_4w_pct": -0.04,
+   "rs_chg_12w_pct": -10.01,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.9,
+   "leading": false
+  },
+  {
+   "etf": "XLY",
+   "sector": "Потребителски (циклични)",
+   "rs_chg_4w_pct": -0.89,
+   "rs_chg_12w_pct": -6.33,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -1.74,
+   "leading": false
+  },
+  {
+   "etf": "TAN",
+   "sector": "Соларна",
+   "rs_chg_4w_pct": -2.12,
+   "rs_chg_12w_pct": -0.1,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -2.96,
+   "leading": false
+  },
+  {
+   "etf": "XLC",
+   "sector": "Комуникации",
+   "rs_chg_4w_pct": -3.84,
+   "rs_chg_12w_pct": -12.64,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -4.66,
+   "leading": false
+  },
+  {
+   "etf": "URA",
+   "sector": "Уран/ядрена",
+   "rs_chg_4w_pct": -12.54,
+   "rs_chg_12w_pct": -18.03,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -13.3,
+   "leading": false
+  },
+  {
+   "etf": "GDX",
+   "sector": "Златодобив",
+   "rs_chg_4w_pct": -14.08,
+   "rs_chg_12w_pct": -23.73,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -14.82,
+   "leading": false
+  }
+ ],
+ "ai_macro": {
+  "macro_brief": "SPY затвърждава позиция над 50DMA и 200DMA при 741.75 — структурно бичи. Fed Net Liquidity се е вдигнала с ~10.5 млрд за седмицата (от -831.9 до -821.4 млрд), което захранва risk assets. VIX е 17.68 — нарасна 10% за 5 дни, но остава в зона, която не блокира офанзивно позициониране. Петролът е паднал с 11.6% за 5 дни — рязка дефлация на входните разходи, директен попътен вятър за маржовете на компании с висок енергиен разход. Златото е спаднало с 4.46% — ротация от защитни активи към risk-on, потвърдена и от 2s10s steepening (0.38→0.39). DXY е почти неутрален (+0.22%) — без валутно смущение за мултинационалните.",
+  "sector_logic": [
+   {
+    "sector": "Полупроводници",
+    "etf": "SMH",
+    "chain": "Fed ликвидност нагоре → по-ниска дисконтова ставка за дългосрочни парични потоци → re-rating на капиталоемки growth компании → SMH като концентриран носител на AI capex цикъл с 12W RS +41.57% показва институционален акумулация, не тактически скок. Допълнително: спад на петрола намалява операционните разходи на fab мощностите. Резултат: SMH е водещ сектор с двойно потвърждение — ликвидност + реален марж.",
+    "horizon_weeks": 6
+   },
+   {
+    "sector": "Технологии",
+    "etf": "XLK",
+    "chain": "Steepening крива (2s10s +0.01 до 0.39) при стабилен DXY → финансиращите условия се нормализират без долларов натиск → мегакап tech с доминиращ FCF профит е директен бенефициент на по-ниски дисконтови ставки на дългия край. 12W RS +19.93% показва устойчива институционална ротация в сектора. Спадът на Gold (-4.46%) потвърждава изход от hedge позиции към productive assets — голяма część от тези потоци влизат в XLK компоненти.",
+    "horizon_weeks": 5
+   },
+   {
+    "sector": "Финанси",
+    "etf": "XLF",
+    "chain": "2s10s спредът steepens към 0.39% → net interest margin (NIM) на банките се разширява механично — банките вземат краткосрочно евтино, отпускат дългосрочно по-скъпо. Петролът пада рязко → намален кредитен риск в енергийния портфейл на банките → по-ниски провизии. VIX под 20 → trading desks генерират нормален P&L без форсирано de-risking. 4W RS +4.9% е реален, не шум.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Здравеопазване",
+    "etf": "XLV",
+    "chain": "Петролът пада с 11.6% → производствените и дистрибуционните разходи на фарма и medtech падат директно (пластмаси, логистика, дистрибуция). Едновременно VIX нараства умерено → fund managers добавят XLV като partial defensive hedge в офанзивно портфолио — секторът поглъща и двата потока. 4W RS +5.8% при 12W RS -8.01% означава, че разгръщането е ранно и не е претрупано. Добро съотношение риск/награда за swing позиция.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Отбрана",
+    "etf": "ITA",
+    "chain": "Геополитическата премия остава структурно висока (бюджетни ангажименти на NATO+) — независимо от липса на headlines в данните, бюджетните потоци са multi-year и не се движат от sedмични новини. Петролът пада → авиационното гориво поевтинява → операционните разходи на defense contractors намаляват при фиксирани договорни приходи → марж expansion. 4W RS +5.06% при 12W RS -9.61% е класически ранен reversal setup — институциите купуват slippage след 12-седмичен underperformance.",
+    "horizon_weeks": 5
+   }
+  ],
+  "regime_comment": "Offensive е правилен: SPY е над двете MA без колебание, Fed ликвидността се движи нагоре (реален паричен попътен вятър), 2s10s е положителен и steepening (не рецесионна инверсия), VIX е 17.68 — нараснал за седмицата, но все още в зоната, която не задейства de-risking протоколи. Петролът пада рязко — това е негативен сигнал за глобалното търсене в commodity space, но за equity пазара е marж tailwind. Нито един индикатор не е червен. P/C 0.83 е леко elevated, което означава, че хеджовете са на масата — при продължаване нагоре тези hedge positions се unwinden и захранват допълнително rally. Sizing factor 1.0 е адекватен."
+ },
+ "action": [
+  {
+   "ticker": "AIZ",
+   "price": 260.99,
+   "pivot": 261.1,
+   "pct_from_pivot": -0.04,
+   "base_type": "cup with handle",
+   "base_depth_pct": 19.1,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 239.06,
+   "ma200": 226.02,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 422306,
+   "last_volume": 251200,
+   "volume_ratio": 0.59,
+   "breakout_volume": false,
+   "base_low": 211.14,
+   "company": "Assurant, Inc.",
+   "sector": "Financial Services",
+   "industry": "Insurance - Property & Casualty",
+   "business_summary": "Assurant, Inc. provides protection services to connected devices, homes, and automobiles in North America, Latin America, Europe, and the Asia Pacific. It operates through Global Lifestyle and Global Housing segments. The Global Lifestyle segment offers mobile device solutions, and extended service contracts and related services for consumer electronics and appliances, and credit and other insurance products; and vehicle protection, commercial equipment protection, and other related services. The Global Housing segment provides lender-placed homeowners, manufactured housing, and flood insuranc",
+   "market_cap": 12931436544,
+   "eps_growth_yoy": 87.0,
+   "revenue_growth_yoy": 11.3,
+   "roe": 18.0,
+   "pe": 13.370389,
+   "forward_pe": 11.615667,
+   "debt_to_equity": 37.61,
+   "inst_ownership_pct": 97.6,
+   "analyst_target": 280.5,
+   "short_pct_float": 2.93,
+   "shares_short": 1095155,
+   "short_ratio_dtc": 2.32,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-04",
+    "days_to_earnings": 51,
+    "in_blackout": false,
+    "eps_estimate": 21.04465
+   },
+   "options": {
+    "iv": 26.5,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 3.25,
+    "oi_near_money": [
+     {
+      "strike": 250.0,
+      "call_oi": 186
+     },
+     {
+      "strike": 260.0,
+      "call_oi": 150
+     },
+     {
+      "strike": 270.0,
+      "call_oi": 7
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 2.93,
+    "days_to_cover": 2.32,
+    "interpretation": "Нисък short interest (2.93%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 350000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "AIZ",
+    "why_now": "XLF сектор с steepening крива → застрахователите като Assurant се възползват от по-висока доходност на инвестиционния им портфейл (float), докато NIM логиката е директна. Петролът пада → по-ниски claims в автомобилното застраховане и по-ниски дистрибуционни разходи. Cup with handle на 0.04% от pivot с rs_status near_high — почти перфектен технически setup. EPS ръст 87% YoY е изключителен за застраховател.",
+    "business_bg": "Assurant предоставя застрахователни и защитни услуги за свързани устройства (мобилни телефони), домове и автомобили в Северна Америка, Латинска Америка, Европа и Азия. Оперира чрез два сегмента: Global Lifestyle (мобилни устройства, потребителска електроника, автомобили) и Global Housing (застраховане на жилища). Компанията е лидер в speciality insurance с устойчив recurring revenue модел.",
+    "catalysts": [
+     "Breakout над pivot 261.10 с институционален обем — акцията е на 0.04% от pivot",
+     "Следващи earnings на 04.08.2026 дават 51 дни runway без earnings риск",
+     "Steepening 2s10s крива подобрява инвестиционния доход от float портфейла",
+     "EPS estimate 21.04 за следващото тримесечие при P/E 13.4 — валуацията е аномално ниска за 87% EPS ръст"
+    ],
+    "risks": [
+     "Volume ratio 0.59 — пробивът трябва да дойде с минимум 1.5x среден обем иначе е false breakout",
+     "Analyst target 280.50 дава само 7.5% upside — ограничен потенциал спрямо риска",
+     "Застрахователният сектор е чувствителен към катастрофични събития (hurricane season) — Q3 риск",
+     "Институционалното ownership 97.6% означава малко допълнително buying power — акцията е вече широко притежавана"
+    ],
+    "earnings_call": "след earnings — следващите earnings са на 04.08.2026 (51 дни), достатъчно runway за swing trade без earnings риск.",
+    "classification": "Action"
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     255.88,
+     266.32
+    ],
+    "entry_mid": 261.1,
+    "stop_loss": 236.67,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 24.43,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 40,
+    "total_investment": 10444.0,
+    "pct_of_portfolio": 10.4,
+    "target_1": 309.96,
+    "target_2": "trailing stop под 10DMA след достигане на $309.96",
+    "reward_risk": 2.0,
+    "time_horizon": "4–8 седмици"
+   }
+  },
+  {
+   "ticker": "LNTH",
+   "price": 104.52,
+   "pivot": 104.57,
+   "pct_from_pivot": -0.05,
+   "base_type": "deep base",
+   "base_depth_pct": 30.1,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 90.56,
+   "ma200": 69.89,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 919080,
+   "last_volume": 687500,
+   "volume_ratio": 0.75,
+   "breakout_volume": false,
+   "base_low": 73.09,
+   "company": "Lantheus Holdings, Inc.",
+   "sector": "Healthcare",
+   "industry": "Drug Manufacturers - Specialty & Generic",
+   "business_summary": "Lantheus Holdings, Inc. develops, manufactures, and commercializes diagnostic and therapeutic products that assist clinicians in diagnosis and treatment of heart, cancer, and other diseases worldwide. The company offers DEFINITY, an injectable ultrasound enhancing agent used in echocardiography exams; TechneLite, a technetium generator for nuclear medicine procedures; Xenon-133, a radiopharmaceutical gas to assess pulmonary function; Neurolite, an injectable imaging agent to identify the area within the brain where blood flow has been blocked or reduced due to stroke; Cardiolite, an injectable",
+   "market_cap": 6804887040,
+   "eps_growth_yoy": 62.3,
+   "revenue_growth_yoy": 1.2,
+   "roe": 23.5,
+   "pe": 24.945107,
+   "forward_pe": 16.34044,
+   "debt_to_equity": 51.617,
+   "inst_ownership_pct": 115.6,
+   "analyst_target": 105.23077,
+   "short_pct_float": 11.2,
+   "shares_short": 5477695,
+   "short_ratio_dtc": 4.75,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-05",
+    "days_to_earnings": 52,
+    "in_blackout": false,
+    "eps_estimate": 5.33316
+   },
+   "options": {
+    "iv": 56.9,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 0.53,
+    "oi_near_money": [
+     {
+      "strike": 100.0,
+      "call_oi": 75
+     },
+     {
+      "strike": 105.0,
+      "call_oi": 20
+     },
+     {
+      "strike": 110.0,
+      "call_oi": 19
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 11.2,
+    "days_to_cover": 4.75,
+    "interpretation": "Умерен short interest (11.2%) — гориво при пробив с обем.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.38,
+    "available_shares": 550000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "LNTH",
+    "why_now": "XLV сектор — петролът пада директно намалява производствените разходи на radiopharmaceuticals (пластмаси, логистика). Deep base 30.1% с rs_status near_high на 0.05% от pivot — акцията е изградила дълга база и е готова. EPS ръст 62.3% YoY, ROE 23.5%, институционално ownership 115.6% (short covering + акумулация). Умерен short interest 11.2% е допълнително гориво при пробив.",
+    "business_bg": "Lantheus Holdings разработва, произвежда и комерсиализира диагностични и терапевтични продукти за сърдечни заболявания, рак и други болести. Флагманският им продукт DEFINITY е ехокардиографски агент, а компанията е лидер в ядрената медицина и radiopharmaceuticals. Моделът е нишов с висок barrier to entry и регулаторна защита.",
+    "catalysts": [
+     "Пробив над pivot 104.57 при 0.05% разстояние — акцията е технически готова",
+     "Short interest 11.2% осигурява short squeeze ускорение при breakout с обем",
+     "Earnings на 05.08.2026 (52 дни) — достатъчно runway; forward P/E 16.3 е атрактивен при 62% EPS ръст",
+     "Нарастваща употреба на PYLARIFY (PSMA imaging) в онкологията като secular growth driver"
+    ],
+    "risks": [
+     "IV rank 100 — опциите са изключително скъпи, което прави options стратегии неефективни",
+     "Revenue ръст само 1.2% YoY — EPS ръстът е от margin expansion, не от топ-лайн, което е по-крехко",
+     "Analyst target 105.23 е почти на pivot нивото — консенсусът не вижда голям upside отгоре",
+     "Deep base 30.1% може да означава структурна слабост; нужен е убедителен обем при пробива"
+    ],
+    "earnings_call": "след earnings — следващите earnings са на 05.08.2026 (52 дни), достатъчно runway за swing trade.",
+    "classification": "Action"
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     102.48,
+     106.66
+    ],
+    "entry_mid": 104.57,
+    "stop_loss": 89.65,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 14.92,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 67,
+    "total_investment": 7006.0,
+    "pct_of_portfolio": 7.0,
+    "target_1": 134.41,
+    "target_2": "trailing stop под 10DMA след достигане на $134.41",
+    "reward_risk": 2.0,
+    "time_horizon": "8–12 седмици"
+   }
+  },
+  {
+   "ticker": "AMG",
+   "price": 354.62,
+   "pivot": 355.55,
+   "pct_from_pivot": -0.26,
+   "base_type": "cup with handle",
+   "base_depth_pct": 25.3,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 302.49,
+   "ma200": 279.81,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 348862,
+   "last_volume": 371500,
+   "volume_ratio": 1.06,
+   "breakout_volume": false,
+   "base_low": 265.5,
+   "company": "Affiliated Managers Group, Inc.",
+   "sector": "Financial Services",
+   "industry": "Asset Management",
+   "business_summary": "Affiliated Managers Group, Inc., through its affiliates, operates as an investment management company providing investment management services to mutual funds, institutional clients,retails and high net worth individuals in the United States. It provides advisory or sub-advisory services to mutual funds. These funds are distributed to retail, high net worth and institutional clients directly and through intermediaries, including independent investment advisors, retirement plan sponsors, broker-dealers, major fund marketplaces, and bank trust departments. The company also offers investment prod",
+   "market_cap": 9366253568,
+   "eps_growth_yoy": 52.5,
+   "revenue_growth_yoy": 9.7,
+   "roe": 21.8,
+   "pe": 14.55747,
+   "forward_pe": 9.0349,
+   "debt_to_equity": 73.417,
+   "inst_ownership_pct": 98.8,
+   "analyst_target": 381.0,
+   "short_pct_float": 5.2,
+   "shares_short": 1027745,
+   "short_ratio_dtc": 3.21,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-30",
+    "days_to_earnings": 46,
+    "in_blackout": false,
+    "eps_estimate": 34.86718
+   },
+   "options": {
+    "iv": 42.1,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 0.35,
+    "oi_near_money": [
+     {
+      "strike": 330.0,
+      "call_oi": 11
+     },
+     {
+      "strike": 340.0,
+      "call_oi": 289
+     },
+     {
+      "strike": 360.0,
+      "call_oi": 2
+     },
+     {
+      "strike": 370.0,
+      "call_oi": 2
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 5.2,
+    "days_to_cover": 3.21,
+    "interpretation": "Нисък short interest (5.2%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 550000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "AMG",
+    "why_now": "XLF сектор, asset management — steepening крива и VIX под 20 са директно позитивни за AMG: AUM расте при рали на пазарите, fee income се увеличава, а по-ниски дисконтови ставки re-rate-ват asset managers с висок FCF. Cup with handle на 0.26% от pivot, volume ratio 1.06 (близо до нормален). Forward P/E 9.0 при 52.5% EPS ръст е аномално евтино — очевиден value + momentum setup.",
+    "business_bg": "Affiliated Managers Group е инвестиционна холдингова компания, която притежава дялове в независими asset management фирми. Управлява активи за институционални клиенти, mutual funds и high net worth индивиди. Бизнес моделът е базиран на revenue sharing с партньорски boutique мениджъри без директна конкуренция с тях.",
+    "catalysts": [
+     "Пробив над pivot 355.55 при умерен обем — само 0.26% разстояние",
+     "Earnings на 30.07.2026 (46 дни) — достатъчно runway; EPS estimate 34.87 при forward P/E 9.0 е extreme value",
+     "Рали на equity пазарите увеличава AUM и fee revenue директно",
+     "Analyst target 381.00 дава 7.5% upside от pivot — реалистичен swing target"
+    ],
+    "risks": [
+     "Earnings на 30.07 (46 дни) — ако trade-ът закъснее, може да влезе в blackout зона",
+     "Asset management е процикличен — всяка market correction удря AUM и fee income едновременно",
+     "Volume ratio 1.06 е близо до нормален, но не показва активна акумулация — нужен е по-силен обем при пробив",
+     "Офанзивен режим може да ротира към по-директни growth plays, изоставяйки value-ориентирания AMG"
+    ],
+    "earnings_call": "след earnings — earnings на 30.07.2026 (46 дни) дават достатъчно runway, но трейдърът трябва да мониторира за ранен exit ако позицията не работи до ~20.07.",
+    "classification": "Action"
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     348.44,
+     362.66
+    ],
+    "entry_mid": 355.55,
+    "stop_loss": 299.47,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 56.08,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 17,
+    "total_investment": 6044.0,
+    "pct_of_portfolio": 6.0,
+    "target_1": 467.71,
+    "target_2": "trailing stop под 10DMA след достигане на $467.71",
+    "reward_risk": 2.0,
+    "time_horizon": "8–12 седмици"
+   }
+  }
+ ],
+ "watchlist": [
+  {
+   "ticker": "MNST",
+   "price": 92.83,
+   "pivot": 93.08,
+   "pct_from_pivot": -0.27,
+   "base_type": "cup with handle",
+   "base_depth_pct": 23.4,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 82.02,
+   "ma200": 75.54,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 5234388,
+   "last_volume": 4619600,
+   "volume_ratio": 0.88,
+   "breakout_volume": false,
+   "base_low": 71.32,
+   "company": "Monster Beverage Corporation",
+   "sector": "Consumer Defensive",
+   "industry": "Beverages - Non-Alcoholic",
+   "business_summary": "Monster Beverage Corporation, through its subsidiaries, engages in development, marketing, sale, and distribution of energy drink beverages and concentrates in the United States and internationally. The company operates through four segments: Monster Energy Drinks, Strategic Brands, Alcohol Brands, and Other. It offers carbonated non-carbonated energy drinks, ready-to-drink iced teas, lemonades, juice cocktails, single-serve juices and fruit beverages, ready-to-drink dairy and coffee drinks, energy drinks, sports drinks and single-serve still waters, and sodas that are considered natural, spar",
+   "market_cap": 90788495360,
+   "eps_growth_yoy": 28.6,
+   "revenue_growth_yoy": 26.9,
+   "roe": 26.7,
+   "pe": 44.845413,
+   "forward_pe": 35.874805,
+   "debt_to_equity": 1.082,
+   "inst_ownership_pct": 70.9,
+   "analyst_target": 89.69333,
+   "short_pct_float": 3.0,
+   "shares_short": 21005240,
+   "short_ratio_dtc": 3.73,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-06",
+    "days_to_earnings": 53,
+    "in_blackout": false,
+    "eps_estimate": 2.29131
+   },
+   "options": {
+    "iv": 25.5,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 1.04,
+    "oi_near_money": [
+     {
+      "strike": 87.5,
+      "call_oi": 178
+     },
+     {
+      "strike": 90.0,
+      "call_oi": 409
+     },
+     {
+      "strike": 92.5,
+      "call_oi": 412
+     },
+     {
+      "strike": 95.0,
+      "call_oi": 474
+     },
+     {
+      "strike": 97.5,
+      "call_oi": 71
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.0,
+    "days_to_cover": 3.73,
+    "interpretation": "Нисък short interest (3.0%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 10000000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "MNST",
+    "why_now": "Секторът е Consumer Defensive — директна макро връзка с активната секторна логика липсва (не е в топ 5 сектора). Setup-ът е чисто технически: cup with handle на 0.27% от pivot, rs_status near_high, EPS ръст 28.6%, revenue ръст 26.9%, ROE 26.7%. Проблемът: analyst target 89.69 е ПОД текущата цена 92.83 — консенсусът е мечи. Офанзивен режим не фаворизира defensive сектори.",
+    "business_bg": "Monster Beverage Corporation разработва, маркетира и дистрибутира енергийни напитки и концентрати в САЩ и международно. Оперира под брандовете Monster Energy, Strategic Brands и Alcohol Brands. Компанията има партньорство с Coca-Cola за дистрибуция, което осигурява глобален reach.",
+    "catalysts": [
+     "Технически пробив над 93.08 при акумулация на обем",
+     "Earnings на 06.08.2026 (53 дни) — дълъг runway без earnings риск",
+     "Нови продуктови лансирания в alcohol segment могат да разширят TAM",
+     "Ниска корелация с macro волатилност като defensive name"
+    ],
+    "risks": [
+     "Analyst target 89.69 е под текущата цена — Wall Street консенсусът е негативен",
+     "P/E 44.8 / Forward P/E 35.9 — скъп за defensive сектор без macro tailwind",
+     "Офанзивен пазарен режим ротира капитал КЪМ growth/cyclicals, ИЗВЪН defensives",
+     "Volume ratio 0.88 — нямато подкрепа от институционална акумулация"
+    ],
+    "earnings_call": "след earnings — 53 дни runway, но setup-ът е слаб поради сектора и analyst target.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Пробив над 93.08 с обем минимум 1.5x среднодневен И analyst upgrades повишаващи target над 100.00. Без тези условия — пропусни."
+   }
+  },
+  {
+   "ticker": "VLY",
+   "price": 14.63,
+   "pivot": 14.7,
+   "pct_from_pivot": -0.48,
+   "base_type": "cup with handle",
+   "base_depth_pct": 20.2,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 13.43,
+   "ma200": 11.93,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 6072360,
+   "last_volume": 8041600,
+   "volume_ratio": 1.32,
+   "breakout_volume": false,
+   "base_low": 11.73,
+   "company": "Valley National Bancorp",
+   "sector": "Financial Services",
+   "industry": "Banks - Regional",
+   "business_summary": "Valley National Bancorp operates as the holding company for Valley National Bank that provides various commercial, private banking, retail, insurance, and wealth management financial services products. The company operates through Consumer Banking, Commercial Banking, and Treasury and Corporate other segments. It offers non-interest bearing, savings, NOW, money market, and time deposit accounts; commercial and industrial, commercial real estate, construction, residential mortgage, and automobile loans; loans secured by the cash surrender value of life insurance; home equity loans and lines of ",
+   "market_cap": 8106943488,
+   "eps_growth_yoy": 54.6,
+   "revenue_growth_yoy": 23.8,
+   "roe": 8.6,
+   "pe": 13.180181,
+   "forward_pe": 9.510004,
+   "debt_to_equity": null,
+   "inst_ownership_pct": 90.0,
+   "analyst_target": 15.75,
+   "short_pct_float": 9.12,
+   "shares_short": 37485141,
+   "short_ratio_dtc": 7.13,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-04-23",
+    "days_to_earnings": -52,
+    "in_blackout": false,
+    "eps_estimate": 1.28842
+   },
+   "options": {
+    "iv": 30.4,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 0.09,
+    "oi_near_money": [
+     {
+      "strike": 14.0,
+      "call_oi": 316
+     },
+     {
+      "strike": 15.0,
+      "call_oi": 31
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 9.12,
+    "days_to_cover": 7.13,
+    "interpretation": "Умерен short interest (9.12%) — гориво при пробив с обем.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.4,
+    "available_shares": 4100000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "VLY",
+    "why_now": "XLF сектор — steepening крива е директен tailwind за регионални банки като VLY: NIM expansion е механичен при 2s10s 0.39. EPS ръст 54.6%, revenue ръст 23.8% са силни. Проблем: days_to_earnings е -52 (отрицателна стойност — earnings вече са минали или датата е некоректна), което прави timing неясен. ROE 8.6% е ниско за банков сектор. Base depth 20.2% е приемлива.",
+    "business_bg": "Valley National Bancorp е банков холдинг, предоставящ комерсиални, частни и retail banking услуги. Оперира в Northeastern и Southeastern САЩ с фокус върху commercial real estate и commercial & industrial кредити. Предлага и wealth management и застрахователни услуги.",
+    "catalysts": [
+     "Steepening yield крива директно разширява NIM — основен revenue driver",
+     "Спадът на петрола намалява кредитния риск в енергийния портфейл",
+     "Volume ratio 1.32 е най-висок в листата — има реален buying interest",
+     "Cup with handle на 0.48% от pivot с near_high RS"
+    ],
+    "risks": [
+     "ROE 8.6% е слаб за банков сектор — капиталовата ефективност е под средната",
+     "Commercial real estate exposure е рисков при по-дълго high rate environment",
+     "Short interest 9.12% при регионална банка може да отразява фундаментален скептицизъм",
+     "Earnings дата -52 дни е некоректна/объркваща — неясен earnings риск timeline"
+    ],
+    "earnings_call": "не сега — earnings датата показва -52 дни (вероятно вече отчетени), което прави earnings timing неясен и изисква верификация преди влизане.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Верифицирай следващата earnings дата. При потвърден пробив над 14.70 с обем 1.5x+ среднодневен и ясен earnings calendar — може да се активира. ROE под 10% е ограничение."
+   }
+  },
+  {
+   "ticker": "ROK",
+   "price": 459.34,
+   "pivot": 468.11,
+   "pct_from_pivot": -1.87,
+   "base_type": "cup with handle",
+   "base_depth_pct": 25.8,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 427.46,
+   "ma200": 388.62,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 724276,
+   "last_volume": 528700,
+   "volume_ratio": 0.73,
+   "breakout_volume": false,
+   "base_low": 347.44,
+   "company": "Rockwell Automation, Inc.",
+   "sector": "Industrials",
+   "industry": "Specialty Industrial Machinery",
+   "business_summary": "Rockwell Automation, Inc., together with its subsidiaries, provides industrial automation and digital transformation solutions in North America, Europe, the Middle East, Africa, the Asia Pacific, and Latin America. It operates in three segments: Intelligent Devices, Software & Control, and Lifecycle Services. The company offers drives, motion, advanced material handling, safety, sensing, industrial components, hardware, software, and configured-to-order products; and control and visualization software and hardware, digital twin, simulation and information software, network and security infrast",
+   "market_cap": 51112574976,
+   "eps_growth_yoy": 38.9,
+   "revenue_growth_yoy": 11.9,
+   "roe": 27.2,
+   "pe": 47.600002,
+   "forward_pe": 31.631348,
+   "debt_to_equity": 113.367,
+   "inst_ownership_pct": 91.1,
+   "analyst_target": 463.66193,
+   "short_pct_float": 3.38,
+   "shares_short": 3297203,
+   "short_ratio_dtc": 3.99,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-06",
+    "days_to_earnings": 53,
+    "in_blackout": false,
+    "eps_estimate": 12.98299
+   },
+   "options": {
+    "iv": 36.9,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 5.79,
+    "oi_near_money": [
+     {
+      "strike": 430.0,
+      "call_oi": 40
+     },
+     {
+      "strike": 440.0,
+      "call_oi": 24
+     },
+     {
+      "strike": 450.0,
+      "call_oi": 254
+     },
+     {
+      "strike": 460.0,
+      "call_oi": 63
+     },
+     {
+      "strike": 470.0,
+      "call_oi": 42
+     },
+     {
+      "strike": 480.0,
+      "call_oi": 28
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.38,
+    "days_to_cover": 3.99,
+    "interpretation": "Нисък short interest (3.38%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 950000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "ROK",
+    "why_now": "Industrials сектор — не е в активната секторна логика. Setup-ът е чисто технически: cup with handle, но акцията е 1.87% ПОД pivot 468.11 — не е на прага на пробив. Analyst target 463.66 е ПОД pivot-а — консенсусът не вижда breakout потенциал. EPS ръст 38.9% и ROE 27.2% са силни фундаменти, но timing е лош.",
+    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация глобално. Оперира в три сегмента: Intelligent Devices, Software & Control и Lifecycle Services. Основните пазари са производство, oil & gas, automotive и food & beverage индустрии.",
+    "catalysts": [
+     "AI-driven factory automation secular growth story",
+     "Earnings на 06.08.2026 (53 дни) — дълъг runway",
+     "Reshoring/nearshoring trend в американското производство",
+     "Software & Control сегментът носи по-висок margin и recurring revenue"
+    ],
+    "risks": [
+     "Analyst target 463.66 е ПОД текущия pivot 468.11 — няма консенсусна подкрепа за breakout",
+     "1.87% под pivot — не е на прага на пробив, нужен е допълнителен catalyst",
+     "Industrials не е в активната секторна логика при текущия режим",
+     "P/E 47.6 е висок за industrial company при risk-off сценарий"
+    ],
+    "earnings_call": "след earnings — 53 дни runway, но setup-ът е слаб поради дистанцията от pivot и analyst target.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Затваряне над 468.11 с обем минимум 40% над средния И analyst target upgrade над 490. Без тези условия setup-ът не оправдава риска."
+   }
+  },
+  {
+   "ticker": "MUSA",
+   "price": 622.53,
+   "pivot": 636.05,
+   "pct_from_pivot": -2.13,
+   "base_type": "cup with handle",
+   "base_depth_pct": 28.5,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 542.49,
+   "ma200": 436.87,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 330644,
+   "last_volume": 263100,
+   "volume_ratio": 0.8,
+   "breakout_volume": false,
+   "base_low": 454.87,
+   "company": "Murphy USA Inc.",
+   "sector": "Consumer Cyclical",
+   "industry": "Specialty Retail",
+   "business_summary": "Murphy USA Inc., together with subsidiaries, engages in marketing of retail motor fuel products and convenience merchandise. The company operates retail stores under the Murphy USA, Murphy Express, and QuickChek brands, as well as operates non-fuel convenience stores. It operates retail gasoline stores principally in the Southeast, Southwest, and Midwest areas of the United States. Murphy USA Inc. was founded in 1996 and is headquartered in El Dorado, Arkansas.",
+   "market_cap": 11498555392,
+   "eps_growth_yoy": 156.2,
+   "revenue_growth_yoy": 7.1,
+   "roe": 80.3,
+   "pe": 21.645689,
+   "forward_pe": 21.23073,
+   "debt_to_equity": 412.267,
+   "inst_ownership_pct": 89.0,
+   "analyst_target": 566.8889,
+   "short_pct_float": 6.39,
+   "shares_short": 1143787,
+   "short_ratio_dtc": 3.46,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-29",
+    "days_to_earnings": 45,
+    "in_blackout": false,
+    "eps_estimate": 32.12857
+   },
+   "options": {
+    "iv": 65.5,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 2.4,
+    "oi_near_money": [
+     {
+      "strike": 580.0,
+      "call_oi": 14
+     },
+     {
+      "strike": 600.0,
+      "call_oi": 46
+     },
+     {
+      "strike": 610.0,
+      "call_oi": 2
+     },
+     {
+      "strike": 620.0,
+      "call_oi": 20
+     },
+     {
+      "strike": 640.0,
+      "call_oi": 7
+     },
+     {
+      "strike": 660.0,
+      "call_oi": 6
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 6.39,
+    "days_to_cover": 3.46,
+    "interpretation": "Нисък short interest (6.39%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.27,
+    "available_shares": 150000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "MUSA",
+    "why_now": "Consumer Cyclical, specialty retail на бензинови станции — петролът пада с 11.6%, което ДИРЕКТНО наранява MUSA: по-ниски pump цени = по-ниски fuel revenue (основен revenue driver). Парадоксално — бизнес моделът е зависим от fuel volume и margin, не от fuel price decline per se, но investor sentiment е негативен при спад на петрола. EPS ръст 156.2% е изключителен, но analyst target 566.89 е под текущата цена 622.53.",
+    "business_bg": "Murphy USA е оператор на retail бензинови станции и convenience stores предимно в Southeastern, Southwestern и Midwestern САЩ. Оперира под брандовете Murphy USA, Murphy Express и QuickChek. Бизнесът е комбинация от fuel retail и convenience merchandise с нарастващ дял на non-fuel приходи.",
+    "catalysts": [
+     "EPS ръст 156.2% YoY — изключителен momentum при earnings на 29.07.2026 (45 дни)",
+     "ROE 80.3% — изключителна капиталова ефективност с активен buyback програм",
+     "Convenience store сегментът расте независимо от fuel цени",
+     "P/E 21.6 е разумен за 156% EPS ръст компания"
+    ],
+    "risks": [
+     "Analyst target 566.89 е ЗНАЧИТЕЛНО под текущата цена 622.53 — консенсусът е мечи",
+     "2.13% под pivot 636.05 — не е близо до пробив зона",
+     "Петролният спад намалява fuel margin и инвеститорския sentiment към fuel retailers",
+     "IV rank 100 с IV 65.5 — опциите са изключително скъпи"
+    ],
+    "earnings_call": "преди earnings — earnings на 29.07.2026 само 45 дни, акцията е 2.13% под pivot, analyst target е под цената. Влизане сега означава earnings риск без технически потвърждение.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Изчакай earnings на 29.07 и реакцията след тях. При pozitiven earnings surprise и пробив над 636.05 с обем 1.5x+ — активирай. Analyst target трябва да бъде ревизиран нагоре."
+   }
+  },
+  {
+   "ticker": "IBKR",
+   "price": 90.81,
+   "pivot": 93.1,
+   "pct_from_pivot": -2.46,
+   "base_type": "deep base",
+   "base_depth_pct": 31.7,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 81.41,
+   "ma200": 71.42,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 4904586,
+   "last_volume": 4181500,
+   "volume_ratio": 0.85,
+   "breakout_volume": false,
+   "base_low": 63.63,
+   "company": "Interactive Brokers Group, Inc.",
+   "sector": "Financial Services",
+   "industry": "Capital Markets",
+   "business_summary": "Interactive Brokers Group, Inc. operates as an automated electronic broker in the United States and internationally. The company engages in the execution, clearance, and settlement of trades in stocks, options, futures, foreign exchange instruments, bonds, precious metals, and cryptocurrencies; and the company provides custody, prime brokerage, securities, and margin lending services. It also offers custody and service accounts for hedge and mutual funds, ETFs, registered investment advisors, proprietary trading groups, introducing brokers, and individual investors. In addition, the company pr",
+   "market_cap": 154033930240,
+   "eps_growth_yoy": 25.4,
+   "revenue_growth_yoy": 16.8,
+   "roe": 23.6,
+   "pe": 38.97425,
+   "forward_pe": 31.565006,
+   "debt_to_equity": 152.192,
+   "inst_ownership_pct": 89.7,
+   "analyst_target": 88.27273,
+   "short_pct_float": 3.48,
+   "shares_short": 13334420,
+   "short_ratio_dtc": 2.6,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-14",
+    "days_to_earnings": 30,
+    "in_blackout": false,
+    "eps_estimate": 2.51267
+   },
+   "options": {
+    "iv": 42.7,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 1.44,
+    "oi_near_money": [
+     {
+      "strike": 85.0,
+      "call_oi": 5
+     },
+     {
+      "strike": 86.0,
+      "call_oi": 11
+     },
+     {
+      "strike": 87.0,
+      "call_oi": 20
+     },
+     {
+      "strike": 88.0,
+      "call_oi": 18
+     },
+     {
+      "strike": 89.0,
+      "call_oi": 22
+     },
+     {
+      "strike": 90.0,
+      "call_oi": 15
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.48,
+    "days_to_cover": 2.6,
+    "interpretation": "Нисък short interest (3.48%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.27,
+    "available_shares": 4100000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "IBKR",
+    "why_now": "XLF сектор, capital markets — VIX под 20 и нормализиране на trading условията са директно pozitiver за IBKR trading desk revenue. RS status е new_high (единственият в листата) — истинска относителна сила. Проблемът: 2.46% под pivot 93.10, deep base 31.7% и analyst target 88.27 е ПОД текущата цена. Earnings на 14.07.2026 само 30 дни — влизане сега е earnings рулетка.",
+    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, предоставящ execution, clearing и settlement на акции, опции, фючърси, forex, облигации и криптовалути. Обслужва hedge funds, RIA-та, introducing brokers и индивидуални инвеститори глобално. Известен с изключително ниски комисиони и технологично превъзходство.",
+    "catalysts": [
+     "RS status new_high е силен институционален сигнал — относителна сила спрямо пазара",
+     "Нарастващ брой retail и institutional клиенти на платформата (global expansion)",
+     "VIX нормализиране увеличава trading volume и commissions",
+     "EPS ръст 25.4%, ROE 23.6% са солидни фундаменти"
+    ],
+    "risks": [
+     "Earnings на 14.07.2026 само 30 дни — автоматичен Watchlist по правилата",
+     "Analyst target 88.27 е ПОД текущата цена 90.81 — консенсусът не подкрепя upside",
+     "2.46% под pivot при deep base 31.7% — значителна дистанция до breakout зона",
+     "P/E 39 е висок за financial services при риск от VIX spike"
+    ],
+    "earnings_call": "не сега — earnings на 14.07.2026 са само 30 дни, което е в рамките на earnings blackout правилото. Автоматично Watchlist.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Изчакай earnings на 14.07 и реакцията след тях. При pozitiven surprise и пробив над 93.10 с обем 1.5x+ и analyst target upgrade над 95 — активирай позиция."
+   }
+  },
+  {
+   "ticker": "CAT",
+   "price": 910.57,
+   "pivot": 946.83,
+   "pct_from_pivot": -3.83,
+   "base_type": "cup with handle",
+   "base_depth_pct": 29.6,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 854.89,
+   "ma200": 657.96,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2532352,
+   "last_volume": 2096400,
+   "volume_ratio": 0.83,
+   "breakout_volume": false,
+   "base_low": 666.16,
+   "company": "Caterpillar Inc.",
+   "sector": "Industrials",
+   "industry": "Farm & Heavy Construction Machinery",
+   "business_summary": "Caterpillar Inc. provides construction and mining equipment, off-highway diesel and natural gas engines, industrial gas turbines, and diesel-electric locomotives in the United States and internationally. The Construction Industries segment offers asphalt pavers, cold planers, compactors, forestry machines, material handlers, motor graders, pipelayers, road reclaimers, telehandlers, track-type tractors, and track and wheel excavators; backhoe, compact track, skid steer, track-type, and wheel loaders; and related parts and work tools. Its Resource Industries segment provides electric rope and hy",
+   "market_cap": 419401236480,
+   "eps_growth_yoy": 27.3,
+   "revenue_growth_yoy": 22.2,
+   "roe": 51.3,
+   "pe": 45.256958,
+   "forward_pe": 30.25246,
+   "debt_to_equity": 230.793,
+   "inst_ownership_pct": 72.9,
+   "analyst_target": 944.1019,
+   "short_pct_float": 1.96,
+   "shares_short": 8103454,
+   "short_ratio_dtc": 2.95,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-04",
+    "days_to_earnings": 51,
+    "in_blackout": false,
+    "eps_estimate": 24.59182
+   },
+   "options": {
+    "iv": 42.2,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 0.99,
+    "oi_near_money": [
+     {
+      "strike": 850.0,
+      "call_oi": 2
+     },
+     {
+      "strike": 860.0,
+      "call_oi": 18
+     },
+     {
+      "strike": 865.0,
+      "call_oi": 12
+     },
+     {
+      "strike": 885.0,
+      "call_oi": 5
+     },
+     {
+      "strike": 890.0,
+      "call_oi": 2
+     },
+     {
+      "strike": 895.0,
+      "call_oi": 30
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 1.96,
+    "days_to_cover": 2.95,
+    "interpretation": "Нисък short interest (1.96%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.39,
+    "available_shares": 3500000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "CAT",
+    "why_now": "Industrials сектор — не е в активната секторна логика. Акцията е 3.83% под pivot 946.83 — далеч от breakout зона. Analyst target 944.10 е практически на pivot нивото — консенсусът не вижда значителен upside след пробива. EPS ръст 27.3%, revenue ръст 22.2% и ROE 51.3% са excellent фундаменти, но timing е лош при офанзивен режим фаворизиращ tech/semis.",
+    "business_bg": "Caterpillar е световен лидер в производството на строителна и минна техника, промишлени двигатели и локомотиви. Оперира в три сегмента: Construction Industries, Resource Industries и Energy & Transportation. Приходите са глобално диверсифицирани с голяма cyclical exposure към infrastructure spending и commodity cycles.",
+    "catalysts": [
+     "Infrastructure spending в САЩ (IIJA funds) осигурява secular demand",
+     "Earnings на 04.08.2026 (51 дни) — достатъчен runway",
+     "Глобален commodity и mining capex цикъл при стабилизиране на петрола",
+     "ROE 51.3% и силен FCF generation поддържат buybacks и дивидент"
+    ],
+    "risks": [
+     "3.83% под pivot — най-далеч от breakout сред всички кандидати",
+     "Analyst target 944.10 е само 3.7% над pivot — минимален reward",
+     "Trade war/tariff риск при CAT global supply chain е директна заплаха",
+     "Industrials не е в активната секторна логика — капиталови потоци са насочени другаде"
+    ],
+    "earnings_call": "след earnings — 51 дни runway, но setup-ът е слаб поради дистанцията от pivot и sector positioning.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Затваряне над 946.83 с обем минимум 50% над средния. Нужен е macro catalyst (infrastructure announcement или China stimulus) за да оправдае entry. При липса — пропусни в полза на SMH/XLK имена."
+   }
+  }
+ ],
+ "theses": [
+  {
+   "name": "Финанси при стръмна крива",
+   "tickers": [
+    "JPM",
+    "BAC"
+   ],
+   "status": "active",
+   "chain": "Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.",
+   "trigger_reason": "2s10s спредът се разкривява (0.39%)."
+  },
+  {
+   "name": "Ядрена енергия",
+   "tickers": [
+    "VST",
+    "CEG",
+    "OKLO",
+    "CCJ",
+    "DNN",
+    "NNE"
+   ],
+   "status": "structural",
+   "chain": "AI data center-ите гладуват за стабилна базова мощност 24/7 → ядрената е единственият въглеродно-неутрален източник, който я дава → дългосрочно търсене на уран и реакторни оператори.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Полупроводници и AI инфраструктура",
+   "tickers": [
+    "AVGO",
+    "AMAT",
+    "MCHP"
+   ],
+   "status": "structural",
+   "chain": "AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Въглища и LNG",
+   "tickers": [
+    "BTU",
+    "HCC",
+    "AMR",
+    "CEIX",
+    "TELL",
+    "LNG"
+   ],
+   "status": "watch",
+   "chain": "Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Отбрана и дронове",
+   "tickers": [
+    "LMT",
+    "RTX",
+    "NOC",
+    "SWMR"
+   ],
+   "status": "watch",
+   "chain": "Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Крипто регулация (CLARITY Act)",
+   "tickers": [
+    "CRCL",
+    "COIN",
+    "HOOD",
+    "BLSH"
+   ],
+   "status": "watch",
+   "chain": "Ясна законодателна рамка (CLARITY Act) → институциите получават регулаторна сигурност → приток на капитал към регулирани крипто борси и custody → борсите и брокерите печелят на обем.",
+   "trigger_reason": ""
+  }
+ ],
+ "unusual_options": [],
+ "splits": [
+  {
+   "ticker": "DREAML",
+   "date": "Jun 15, 20",
+   "ratio": "Jun 15, 2026"
+  },
+  {
+   "ticker": "ALPHAM",
+   "date": "Jun 15, 20",
+   "ratio": "Jun 15, 2026"
+  },
+  {
+   "ticker": "AVAXON",
+   "date": "Jun 15, 20",
+   "ratio": "Jun 15, 2026"
+  },
+  {
+   "ticker": "SMARTP",
+   "date": "Jun 16, 20",
+   "ratio": "Jun 16, 2026"
+  },
+  {
+   "ticker": "FANHUA",
+   "date": "Jun 16, 20",
+   "ratio": "Jun 16, 2026"
+  },
+  {
+   "ticker": "WORLDL",
+   "date": "Jun 17, 20",
+   "ratio": "Jun 17, 2026"
+  },
+  {
+   "ticker": "UPLAND",
+   "date": "Jun 17, 20",
+   "ratio": "Jun 17, 2026"
+  },
+  {
+   "ticker": "CHINOC",
+   "date": "Jun 18, 20",
+   "ratio": "Jun 18, 2026"
+  },
+  {
+   "ticker": "COHENS",
+   "date": "Jun 18, 20",
+   "ratio": "Jun 18, 2026"
+  },
+  {
+   "ticker": "AJISCO",
+   "date": "Jun 19, 20",
+   "ratio": "Jun 19, 2026"
+  },
+  {
+   "ticker": "POMDOC",
+   "date": "Jun 22, 20",
+   "ratio": "Jun 22, 2026"
+  },
+  {
+   "ticker": "BASELM",
+   "date": "Jun 22, 20",
+   "ratio": "Jun 22, 2026"
+  },
+  {
+   "ticker": "ORIENT",
+   "date": "Jun 22, 20",
+   "ratio": "Jun 22, 2026"
+  },
+  {
+   "ticker": "SIEMEN",
+   "date": "Jun 23, 20",
+   "ratio": "Jun 23, 2026"
+  },
+  {
+   "ticker": "JINXIN",
+   "date": "Jun 23, 20",
+   "ratio": "Jun 23, 2026"
+  },
+  {
+   "ticker": "DUPONT",
+   "date": "Jun 24, 20",
+   "ratio": "Jun 24, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "GRANIT",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "PTBAKR",
+   "date": "Jun 25, 20",
+   "ratio": "Jun 25, 2026"
+  },
+  {
+   "ticker": "HONEYW",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "FURUKA",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "SUMITO",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "SUMITO",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "KAOCOR",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "FOODLI",
+   "date": "Jun 29, 20",
+   "ratio": "Jun 29, 2026"
+  },
+  {
+   "ticker": "EOSENE",
+   "date": "Jul 01, 20",
+   "ratio": "Jul 01, 2026"
+  },
+  {
+   "ticker": "MUELLE",
+   "date": "Jul 01, 20",
+   "ratio": "Jul 01, 2026"
+  },
+  {
+   "ticker": "YXT.CO",
+   "date": "Jul 01, 20",
+   "ratio": "Jul 01, 2026"
+  },
+  {
+   "ticker": "CROWDS",
+   "date": "Jul 02, 20",
+   "ratio": "Jul 02, 2026"
+  },
+  {
+   "ticker": "JIANZH",
+   "date": "Jul 06, 20",
+   "ratio": "Jul 06, 2026"
+  },
+  {
+   "ticker": "MARUBE",
+   "date": "Jul 08, 20",
+   "ratio": "Jul 08, 2026"
+  },
+  {
+   "ticker": "COMPAG",
+   "date": "Jul 09, 20",
+   "ratio": "Jul 09, 2026"
+  },
+  {
+   "ticker": "LIONGR",
+   "date": "Jul 09, 20",
+   "ratio": "Jul 09, 2026"
+  },
+  {
+   "ticker": "STELLA",
+   "date": "Jul 14, 20",
+   "ratio": "Jul 14, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "DIREXI",
+   "date": "Jul 15, 20",
+   "ratio": "Jul 15, 2026"
+  },
+  {
+   "ticker": "STONEX",
+   "date": "Jul 20, 20",
+   "ratio": "Jul 20, 2026"
+  },
+  {
+   "ticker": "BNYMEL",
+   "date": "Jul 20, 20",
+   "ratio": "Jul 20, 2026"
+  }
+ ],
+ "naaim_history": {
+  "points": [],
+  "low_zone": 30,
+  "high_zone": 90,
+  "current": null
+ },
+ "superinvestor_moves": [],
+ "magic_formula_top": [
+  {
+   "ticker": "ADBE",
+   "earnings_yield": 0.1021,
+   "roc": 0.1958,
+   "name": "Adobe Inc.",
+   "mf_rank": 14
+  },
+  {
+   "ticker": "BMY",
+   "earnings_yield": 0.1049,
+   "roc": 0.1069,
+   "name": "Bristol-Myers Squibb Company",
+   "mf_rank": 28
+  },
+  {
+   "ticker": "META",
+   "earnings_yield": 0.0604,
+   "roc": 0.164,
+   "name": "Meta Platforms, Inc.",
+   "mf_rank": 32
+  },
+  {
+   "ticker": "MRK",
+   "earnings_yield": 0.0752,
+   "roc": 0.1258,
+   "name": "Merck & Company, Inc.",
+   "mf_rank": 33
+  },
+  {
+   "ticker": "LOW",
+   "earnings_yield": 0.0591,
+   "roc": 0.1279,
+   "name": "Lowe's Companies, Inc.",
+   "mf_rank": 39
+  },
+  {
+   "ticker": "MA",
+   "earnings_yield": 0.0465,
+   "roc": 0.2503,
+   "name": "Mastercard Incorporated",
+   "mf_rank": 44
+  },
+  {
+   "ticker": "PEP",
+   "earnings_yield": 0.0677,
+   "roc": 0.0909,
+   "name": "Pepsico, Inc.",
+   "mf_rank": 44
+  },
+  {
+   "ticker": "MSFT",
+   "earnings_yield": 0.05,
+   "roc": 0.1481,
+   "name": "Microsoft Corporation",
+   "mf_rank": 45
+  },
+  {
+   "ticker": "V",
+   "earnings_yield": 0.0469,
+   "roc": 0.1919,
+   "name": "Visa Inc.",
+   "mf_rank": 47
+  },
+  {
+   "ticker": "HD",
+   "earnings_yield": 0.051,
+   "roc": 0.1252,
+   "name": "Home Depot, Inc. (The)",
+   "mf_rank": 50
+  }
+ ],
+ "news": [
+  {
+   "headline": "Trump: US и Иран ще подпишат мирна сделка в неделя",
+   "why": "Потенциален край на конфликта би свалил петролните премии и рязко би намалил геополитическия риск в региона."
+  },
+  {
+   "headline": "Китай пуска дигитална платежна система срещу долара с подкрепата на централни банки на Хонконг, Тайланд, ОАЕ и Саудитска Арабия",
+   "why": "Директна заплаха за доларовата хегемония с дългосрочни последици за USD и Treasuries."
+  },
+  {
+   "headline": "SpaceX дебютира на Nasdaq с пазарна капитализация от $2 трилиона",
+   "why": "Историческото IPO абсорбира огромен капитал и поставя летвата за оценките в AI/tech сектора."
+  },
+  {
+   "headline": "AI race: SpaceX, Anthropic и Alphabet привличат рекордни инвестиции",
+   "why": "Готовността на инвеститорите да абсорбират масивна нова емисия сигнализира за висок апетит към риск в tech сектора."
+  },
+  {
+   "headline": "Фармацевтите се надпреварват за дял от пазара на ново поколение затлъстяване медикаменти",
+   "why": "Секторна ротация в healthcare — компаниите, успеели да влязат на пазара след Novo Nordisk и Eli Lilly, могат да донесат значителни движения в акциите."
+  },
+  {
+   "headline": "ОАЕ отрича доклади за трансфер на средства към Иран",
+   "why": "Противоречивите сигнали около сделката с Иран поддържат волатилността в петрола и регионалните активи."
+  },
+  {
+   "headline": "Макрон и Тръмп тестват отношенията си на G7 в Евиан",
+   "why": "G7 срещата може да доведе до съгласувани позиции по тарифи и търговска политика с директно пазарно въздействие."
+  },
+  {
+   "headline": "Швейцария гласува за ограничаване на населението на 10 милиона",
+   "why": "Резултатът може да застраши споразумението за свободно движение с ЕС и да засегне CHF и швейцарските активи."
+  }
+ ]
+}
