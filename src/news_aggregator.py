@@ -106,10 +106,35 @@ def _fetch_nitter(handle: str, limit: int = 8) -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────
 # Събиране
 # ──────────────────────────────────────────────────────────────────────────
+def _scrape_headlines(name: str, url: str, limit: int = 12) -> list[dict]:
+    """Fallback: вади заглавия директно от страницата с BeautifulSoup (когато RSS падне)."""
+    out = []
+    try:
+        from bs4 import BeautifulSoup
+        html = requests.get(url, timeout=15, headers=_UA).text
+        soup = BeautifulSoup(html, "html.parser")
+        seen = set()
+        # заглавията почти винаги са в <h1>/<h2>/<h3> или линкове с дълъг текст
+        for tag in soup.select("h1, h2, h3, a"):
+            txt = tag.get_text(" ", strip=True)
+            if 35 <= len(txt) <= 200 and txt.lower() not in seen:
+                seen.add(txt.lower())
+                out.append({"source": name, "title": txt, "summary": ""})
+            if len(out) >= limit:
+                break
+    except Exception as ex:
+        print(f"[news] scrape {name} failed: {ex}")
+    return out
+
+
 def gather_raw(hours: int = 24) -> list[dict]:
     items: list[dict] = []
     for src, url in config.NEWS_RSS_FEEDS.items():
         items += _fetch_rss(url, src, hours)
+    # Fallback: ако RSS-ите върнаха твърде малко, scrape-ваме страниците директно
+    if len(items) < 5:
+        for name, url in config.NEWS_SCRAPE_FALLBACK.items():
+            items += _scrape_headlines(name, url)
     if config.NEWS_ENABLE_NITTER:
         for handle in config.NITTER_HANDLES:
             items += _fetch_nitter(handle)

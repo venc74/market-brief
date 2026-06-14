@@ -181,20 +181,23 @@ DATAROMA_MANAGERS = {
 
 # ── news_aggregator + Tradier (нов модул + поправка) ──────────────────────
 ENABLE_NEWS = os.getenv("ENABLE_NEWS", "1") == "1"
+# Актуални RSS емисии (Reuters/CNBC смениха структурата си)
 NEWS_RSS_FEEDS = {
     "Reuters Business": "https://feeds.reuters.com/reuters/businessNews",
-    "Reuters World":    "https://feeds.reuters.com/Reuters/worldNews",
+    "CNBC":             "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
     "Financial Times":  "https://www.ft.com/rss/home",
-    "CNBC":             "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    "AP Business":      "https://feeds.apnews.com/rss/apf-business",
 }
-NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "1") == "1"
+# nitter е нестабилен — изключен по подразбиране (Поправка 4)
+NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
 NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]
-# nitter инстанциите падат често — няколко за устойчивост (редактируем списък)
-NITTER_INSTANCES = [
-    "https://nitter.net",
-    "https://nitter.poast.org",
-    "https://nitter.privacydev.net",
-]
+NITTER_INSTANCES = ["https://nitter.net", "https://nitter.poast.org"]
+# Fallback: ако RSS върне нищо, scrape-ваме заглавия директно от тези страници (BeautifulSoup)
+NEWS_SCRAPE_FALLBACK = {
+    "Reuters":          "https://www.reuters.com/markets/",
+    "CNBC":             "https://www.cnbc.com/world/?region=world",
+    "AP Business":      "https://apnews.com/hub/business",
+}
 
 # ── Tradier (primary source за unusual options; Market Chameleon = fallback) ─
 TRADIER_API_KEY = os.getenv("TRADIER_API_KEY", "")
@@ -208,3 +211,23 @@ UNUSUAL_OPTIONS_UNIVERSE = [
     "F", "BAC", "INTC", "MU", "CRM", "NFLX", "DIS",
 ]
 UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  # vol/OI праг
+
+# ── Splits филтри (Поправка 1) ────────────────────────────────────────────
+SPLITS_MIN_PRICE = float(os.getenv("SPLITS_MIN_PRICE", 10))          # > $10
+SPLITS_MIN_MARKET_CAP = float(os.getenv("SPLITS_MIN_MARKET_CAP", 500_000_000))  # > $500M
+
+# ── Unusual options (Поправка 2): yfinance primary ────────────────────────
+# Сканирането на опционни вериги е бавно — лимитираме броя тикъри на ден.
+UNUSUAL_OPTIONS_SCAN_LIMIT = int(os.getenv("UNUSUAL_OPTIONS_SCAN_LIMIT", 60))
+
+# ── SEC EDGAR 13F (Поправка 3): primary за Superinvestor Positions ─────────
+# EDGAR изисква descriptive User-Agent с контакт — смени с твой имейл при нужда.
+EDGAR_UA = os.getenv("EDGAR_UA", "market-brief venc74 contact@example.com")
+# CIK номера на топ мениджърите (подадени от теб). Ключ = CIK, стойност = име.
+DATAROMA_CIK = {
+    "0001067983": "Уорън Бъфет · Berkshire Hathaway",
+    "0001649339": "Майкъл Бъри · Scion Asset Management",
+    "0001336528": "Бил Акман · Pershing Square",
+    "0001061219": "Сет Кларман · Baupost Group",
+    "0001536411": "Стенли Дракенмилър · Duquesne Family Office",
+}

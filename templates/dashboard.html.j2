@@ -153,6 +153,10 @@
   .signal-chip .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .signal-chip .in-screen { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
     color: var(--regime); margin-top: 4px; }
+  .split-tag { font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .split-tag.fwd { color: var(--green); background: rgba(52,211,153,.12); }
+  .split-tag.rev { color: var(--red); background: rgba(248,113,113,.12); }
 
   /* ── v2: Superinvestor Moves ── */
   .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -447,12 +451,20 @@
 
 {% if splits %}
 <section>
-  <h2>Предстоящи сплитове · този месец</h2>
+  <h2>Сплитове · тази седмица</h2>
   <div class="signal-grid">
     {% for s in splits %}
-    <div class="signal-chip">
-      <div class="sym">{{ s.ticker }}</div>
-      <div class="note">{{ s.ratio or "—" }}{% if s.date %} · {{ s.date }}{% endif %}</div>
+    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="sym">{{ s.ticker }}
+        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
+        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
+      </div>
+      <div class="note">
+        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
+        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
+        {% if s.date_human %} · {{ s.date_human }}{% endif %}
+      </div>
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company[:34] }}</div>{% endif %}
       {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
     </div>
     {% endfor %}
@@ -470,7 +482,8 @@
         <span class="si-sym">{{ s.ticker }}</span>
         <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
       </div>
-      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
       {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
     {% endfor %}
@@ -528,7 +541,7 @@
   Само за информационни цели. Не представлява финансов съвет, инвестиционна препоръка
   или предложение за покупка/продажба на ценни книжа. Данните идват от публични API-та
   и могат да съдържат грешки или закъснения. Всяко инвестиционно решение е лична отговорност.
-  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v1.0
+  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v2.0
 </footer>
 
 </div>
@@ -632,18 +645,19 @@
   }
 
   function render(sym, data) {
-    var series = data.daily || data.data || [];
+    var series = data.daily || data.data || data.feed || (Array.isArray(data) ? data : []);
     if (!series.length) { msg.textContent = "Няма borrow данни за " + sym + "."; return; }
+    function F(o){ return o.fee != null ? o.fee : (o.rate != null ? o.rate : null); }
+    function A(o){ return o.available != null ? o.available : (o.quantity != null ? o.quantity : o.availableShares); }
     var latest = series[series.length - 1];
-    var fee = latest.fee, avail = latest.available;
-    var fees = series.slice(-5).map(function (s) { return s.fee; }).filter(function (x) { return x != null; });
+    var fee = F(latest), avail = A(latest);
+    var fees = series.slice(-5).map(F).filter(function (x) { return x != null; });
     var trend = fees.length < 2 ? "—" :
       fees[fees.length - 1] > fees[0] ? "покачващ ▲" :
       fees[fees.length - 1] < fees[0] ? "падащ ▼" : "стабилен";
-    var feeKlass = fee >= 50 ? "hot" : fee >= 20 ? "hot" : "ok";
-    // мини история на обема/наличието (последни ~10 записа)
+    var feeKlass = fee >= 20 ? "hot" : "ok";
     var hist = series.slice(-10).map(function (s) {
-      return (s.available != null ? Number(s.available).toLocaleString("de-DE") : "—"); }).join(" · ");
+      var a = A(s); return (a != null ? Number(a).toLocaleString("de-DE") : "—"); }).join(" · ");
 
     out.innerHTML =
       '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;margin-bottom:4px">' + sym + '</div>' +

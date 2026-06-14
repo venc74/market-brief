@@ -103,7 +103,7 @@ def run() -> dict:
 
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
     unusual_today = unusual_options.fetch_unusual_options(10) if config.ENABLE_UNUSUAL_OPTIONS else []
-    splits_month = splits_calendar.fetch_upcoming_splits(30) if config.ENABLE_SPLITS_CALENDAR else []
+    splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
     naaim_hist = naaim_history()
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
     # самостоятелен Magic Formula топ 10 (независим от CANSLIM) за dashboard секция
