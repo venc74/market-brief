@@ -152,6 +152,10 @@
   .signal-chip .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .signal-chip .in-screen { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
     color: var(--regime); margin-top: 4px; }
+  .split-tag { font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .split-tag.fwd { color: var(--green); background: rgba(52,211,153,.12); }
+  .split-tag.rev { color: var(--red); background: rgba(248,113,113,.12); }
 
   /* ── v2: Superinvestor Moves ── */
   .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -236,7 +240,7 @@
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
-      <div class="date mono">14.06.2026, неделя · генериран 08:22 CET · 90 мин преди US pre-market</div>
+      <div class="date mono">14.06.2026, неделя · генериран 12:25 CET · 90 мин преди US pre-market</div>
     </div>
     <div>
       <div class="regime-badge">Offensive</div>
@@ -349,8 +353,8 @@
 
 <section>
   <h2>Макро бриф</h2>
-  <div class="prose">SPY затвърждава позиция над 50DMA и 200DMA при 741.75 — структурно бичи. Fed Net Liquidity се е вдигнала с ~10.5 млрд за седмицата (от -831.9 до -821.4 млрд), което захранва risk assets. VIX е 17.68 — нарасна 10% за 5 дни, но остава в зона, която не блокира офанзивно позициониране. Петролът е паднал с 11.6% за 5 дни — рязка дефлация на входните разходи, директен попътен вятър за маржовете на компании с висок енергиен разход. Златото е спаднало с 4.46% — ротация от защитни активи към risk-on, потвърдена и от 2s10s steepening (0.38→0.39). DXY е почти неутрален (+0.22%) — без валутно смущение за мултинационалните.
-  <br><br><span style="color:var(--muted)">Offensive е правилен: SPY е над двете MA без колебание, Fed ликвидността се движи нагоре (реален паричен попътен вятър), 2s10s е положителен и steepening (не рецесионна инверсия), VIX е 17.68 — нараснал за седмицата, но все още в зоната, която не задейства de-risking протоколи. Петролът пада рязко — това е негативен сигнал за глобалното търсене в commodity space, но за equity пазара е marж tailwind. Нито един индикатор не е червен. P/C 0.83 е леко elevated, което означава, че хеджовете са на масата — при продължаване нагоре тези hedge positions се unwinden и захранват допълнително rally. Sizing factor 1.0 е адекватен.</span>
+  <div class="prose">Fed Net Liquidity се е вдигнала с ~10.5 млрд спрямо предходната стойност — TGA се е свил, което освобождава кеш към банковата система и директно поддържа risk assets. SPY е на 741.75 — над 50DMA (722.8) и над 200DMA (684.07), тренд структурно интактен. VIX е на 17.68 с +10.16% за 5 дни — притеснителен spike, но нивото остава в risk-on зона под 20; пазарът абсорбира напрежението без дефанзивен shift. Gold -4.46% и WTI -11.6% за 5 дни сигнализират разгъване на геополитическа/инфлационна премия — commodities се продават, капиталът мигрира към equity growth. 2s10s spread 0.39% и steepening — финансовите посредници получават разширяващ се margin, банковият сектор е функционален. Днешната сесия стартира с ликвидна подкрепа, изчистена геополитическа рискова премия и ясна секторна концентрация в tech/semis.
+  <br><br><span style="color:var(--muted)">Offensive режимът е правилен защото структурата е: SPY над и двете MA (50 и 200DMA) — trend following системите са дълги; Fed Net Liquidity ↑ — ликвидният гориво е налично; 2s10s steepening при 0.39% — financial plumbing функционира; VIX 17.68 — под 20, risk-on прагът. Нито един индикатор не е в червено. Put/Call 0.83 и NAAIM липсващи дават yellow — те сигнализират да не се прекалява с leverage, не да се преминава в defensive. Gold и oil sell-off изчистват инфлационна/геополитическа премия без да увредят equity структурата — напротив, те освобождават capital toward risk assets. Sizing factor 1.0 е коректен: full exposure в водещите сектори (SMH, XLK), без pyramid-ing до confirmation на VIX нормализация под 16.</span>
   </div>
 </section>
 
@@ -364,7 +368,7 @@
         <div class="sector-etf">SMH</div>
       </div>
       <div>
-        <div class="sector-chain">Fed ликвидност нагоре → по-ниска дисконтова ставка за дългосрочни парични потоци → re-rating на капиталоемки growth компании → SMH като концентриран носител на AI capex цикъл с 12W RS +41.57% показва институционален акумулация, не тактически скок. Допълнително: спад на петрола намалява операционните разходи на fab мощностите. Резултат: SMH е водещ сектор с двойно потвърждение — ликвидност + реален марж.</div>
+        <div class="sector-chain">WTI -11.6% за 5 дни → производствените разходи и транспортните cost inputs за chipmakers падат → margin expansion очакване → плюс Fed Net Liquidity ↑ освобождава кеш към финансиране на capex-heavy tech компании → AI capex цикълът остава непрекъснат → SMH с RS +8.12% за 4 седмици и +41.57% за 12 седмици показва институционален акумулационен импулс, не моментен spike. Комбинацията от macro tailwind (cheaper energy inputs) + ликвидна подкрепа + структурен AI demand = strongest confluence в пазара.</div>
         <div class="sector-meta">Хоризонт: 6 седмици</div>
       </div>
     </div>
@@ -375,7 +379,7 @@
         <div class="sector-etf">XLK</div>
       </div>
       <div>
-        <div class="sector-chain">Steepening крива (2s10s +0.01 до 0.39) при стабилен DXY → финансиращите условия се нормализират без долларов натиск → мегакап tech с доминиращ FCF профит е директен бенефициент на по-ниски дисконтови ставки на дългия край. 12W RS +19.93% показва устойчива институционална ротация в сектора. Спадът на Gold (-4.46%) потвърждава изход от hedge позиции към productive assets — голяма część от тези потоци влизат в XLK компоненти.</div>
+        <div class="sector-chain">Fed Net Liquidity ↑ → дюрацията на growth активите се поддържа при 10Y yield 4.49% без допълнително натискане нагоре (само +0.27% за 5 дни — стабилизация) → discount rate risk намален → XLK RS +3.84% за 4 седмици и +19.93% за 12 седмици показва sustained institutional rotation in. DXY +0.22% за 5 дни е минимален, не е достатъчен да притисне multinational tech margins значимо. Gold и oil sell-off отвежда capital flows директно в large-cap tech като perceived growth/quality play.</div>
         <div class="sector-meta">Хоризонт: 5 седмици</div>
       </div>
     </div>
@@ -386,7 +390,7 @@
         <div class="sector-etf">XLF</div>
       </div>
       <div>
-        <div class="sector-chain">2s10s спредът steepens към 0.39% → net interest margin (NIM) на банките се разширява механично — банките вземат краткосрочно евтино, отпускат дългосрочно по-скъпо. Петролът пада рязко → намален кредитен риск в енергийния портфейл на банките → по-ниски провизии. VIX под 20 → trading desks генерират нормален P&L без форсирано de-risking. 4W RS +4.9% е реален, не шум.</div>
+        <div class="sector-chain">2s10s spread 0.39% и steepening → NIM (net interest margin) на банките се разширява → earnings revision tailwind за XLF. Fed Net Liquidity ↑ → банковата система получава excess reserves → кредитни условия се разхлабват → loan growth поддръжка. VIX 17.68 — не достатъчно висок за credit stress сценарий. XLF RS +4.9% за 4 седмици при 12W RS -2.18% означава freshротация след period на underperformance — early-stage re-entry момент, не crowded trade.</div>
         <div class="sector-meta">Хоризонт: 4 седмици</div>
       </div>
     </div>
@@ -397,7 +401,7 @@
         <div class="sector-etf">XLV</div>
       </div>
       <div>
-        <div class="sector-chain">Петролът пада с 11.6% → производствените и дистрибуционните разходи на фарма и medtech падат директно (пластмаси, логистика, дистрибуция). Едновременно VIX нараства умерено → fund managers добавят XLV като partial defensive hedge в офанзивно портфолио — секторът поглъща и двата потока. 4W RS +5.8% при 12W RS -8.01% означава, че разгръщането е ранно и не е претрупано. Добро съотношение риск/награда за swing позиция.</div>
+        <div class="sector-chain">VIX spike +10.16% за 5 дни → институционалните играчи частично хеджират equity exposure с defensive quality — healthcare предлага earning visibility независимо от macro cycle. Gold -4.46% показва, че pure defensive (hard assets) се изоставя, но XLV като defensive equity с growth характеристики поема частичен flow. RS +5.8% за 4 седмици при 12W RS -8.01% — V-shape RS recovery, потенциален Stage 1→2 transition по Weinstein, заслужава наблюдение за Stage 2 breakout confirmation.</div>
         <div class="sector-meta">Хоризонт: 4 седмици</div>
       </div>
     </div>
@@ -408,8 +412,8 @@
         <div class="sector-etf">ITA</div>
       </div>
       <div>
-        <div class="sector-chain">Геополитическата премия остава структурно висока (бюджетни ангажименти на NATO+) — независимо от липса на headlines в данните, бюджетните потоци са multi-year и не се движат от sedмични новини. Петролът пада → авиационното гориво поевтинява → операционните разходи на defense contractors намаляват при фиксирани договорни приходи → марж expansion. 4W RS +5.06% при 12W RS -9.61% е класически ранен reversal setup — институциите купуват slippage след 12-седмичен underperformance.</div>
-        <div class="sector-meta">Хоризонт: 5 седмици</div>
+        <div class="sector-chain">Геополитическата рискова премия в Gold и Oil спада (Gold -4.46%, WTI -11.6%) — de-escalation сигнал или narrative shift. Парадоксално ITA RS +5.06% за 4 седмици — пазарът pricing defense budget continuity (структурен NATO/EU rearmament cycle) независимо от краткосрочен geopolitical sentiment. Механизмът: US и EU fiscal commitments към defense spending са multi-year, не spot-геополитика → ITA има revenue visibility що не зависи от oil price или daily headlines. 12W RS -9.61% показва, че 4W move е counter-trend bounce — позицията изисква потвърждение с RS breakout над 6M high преди full commitment.</div>
+        <div class="sector-meta">Хоризонт: 3 седмици</div>
       </div>
     </div>
     
@@ -499,13 +503,13 @@
     <div class="stock-body">
       <div class="block">
         <h3>Защо точно сега</h3>
-        <div class="why">XLF сектор с steepening крива → застрахователите като Assurant се възползват от по-висока доходност на инвестиционния им портфейл (float), докато NIM логиката е директна. Петролът пада → по-ниски claims в автомобилното застраховане и по-ниски дистрибуционни разходи. Cup with handle на 0.04% от pivot с rs_status near_high — почти перфектен технически setup. EPS ръст 87% YoY е изключителен за застраховател.</div>
+        <div class="why">XLF секторна логика: 2s10s steepening → NIM expansion tailwind засяга целия финансов сектор. AIZ е Property & Casualty Insurance — директна връзка е по-слаба от банките, но rising rate среда подобрява инвестиционния портфейл на застрахователите (float yield). Базата cup with handle е почти завършена, цената е на 0.04% под pivot — практически на ниво. EPS +87% YoY е изключителен. Forward P/E 11.6 при тези ръстове е компресиран. Setup-ът е комбинация от макро tailwind (financials rotation) + чист технически setup при pivot.</div>
         <h3>Бизнес</h3>
-        <div class="why">Assurant предоставя застрахователни и защитни услуги за свързани устройства (мобилни телефони), домове и автомобили в Северна Америка, Латинска Америка, Европа и Азия. Оперира чрез два сегмента: Global Lifestyle (мобилни устройства, потребителска електроника, автомобили) и Global Housing (застраховане на жилища). Компанията е лидер в speciality insurance с устойчив recurring revenue модел.</div>
+        <div class="why">Assurant предоставя защитни услуги за свързани устройства, домове и автомобили в Северна Америка, Латинска Америка, Европа и Азиатско-Тихоокеанския регион. Оперира в два сегмента: Global Lifestyle (мобилни устройства, потребителска електроника, автомобилна защита) и Global Housing (ипотечно и наводнително застраховане). Бизнесът е embedded insurance — партньорства с телекоми, автодилъри и банки.</div>
         <h3>Катализатори · 4–8 седмици</h3>
-        <ul class="tight"><li>Breakout над pivot 261.10 с институционален обем — акцията е на 0.04% от pivot</li><li>Следващи earnings на 04.08.2026 дават 51 дни runway без earnings риск</li><li>Steepening 2s10s крива подобрява инвестиционния доход от float портфейла</li><li>EPS estimate 21.04 за следващото тримесечие при P/E 13.4 — валуацията е аномално ниска за 87% EPS ръст</li></ul>
+        <ul class="tight"><li>Breakout над pivot $261.10 с институционален обем потвърждава Stage 2 continuation</li><li>Следващи earnings на 04.08.2026 — над 51 дни до тогава, достатъчно прозорец за swing</li><li>XLF секторна ротация при продължаваща 2s10s steepening подкрепя re-rating на financials</li><li>Forward P/E 11.6 при EPS +87% YoY — value compression catalyst ако институциите осъзнаят gap-а</li></ul>
         <h3>Рискове</h3>
-        <ul class="tight"><li>Volume ratio 0.59 — пробивът трябва да дойде с минимум 1.5x среден обем иначе е false breakout</li><li>Analyst target 280.50 дава само 7.5% upside — ограничен потенциал спрямо риска</li><li>Застрахователният сектор е чувствителен към катастрофични събития (hurricane season) — Q3 риск</li><li>Институционалното ownership 97.6% означава малко допълнително buying power — акцията е вече широко притежавана</li></ul>
+        <ul class="tight"><li>Обемът е нисък (0.59 ratio) — пробивът без volume surge е фалшив сигнал; изисква се изчакване на volume confirmation</li><li>Insurance sector чувствителен към catastrophe events — неочакван природен катаклизъм обръща trade-а незабавно</li><li>Analyst target $280.5 дава само ~7.5% upside от текущата цена — ограничен R:R ако пазарът вече е ценирал re-rating</li><li>Macro reverse: ако 10Y yield пробие 4.75%+ агресивно, финансовите се преоценяват надолу</li></ul>
         
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">Нисък short interest (2.93%) — без squeeze динамика, но и без активна опозиция.</div>
@@ -531,7 +535,7 @@
         <div class="kv"><span>Inst. ownership</span><b>97.6%</b></div>
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>2026-08-04 (51д)</b></div>
-        <div class="kv"><span>Препоръка</span><b>след earnings — следващите earnings са на 04.08.2026 (51 дни), достатъчно runway за swing trade без earnings риск.</b></div>
+        <div class="kv"><span>Препоръка</span><b>след earnings — следващите earnings са на 04.08.2026 (51 дни), достатъчно място за пълен swing цикъл без earnings risk.</b></div>
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск $1000</h3>
           <div class="kv"><span>Entry</span><b>$255.88 – $266.32</b></div>
@@ -557,13 +561,13 @@
     <div class="stock-body">
       <div class="block">
         <h3>Защо точно сега</h3>
-        <div class="why">XLV сектор — петролът пада директно намалява производствените разходи на radiopharmaceuticals (пластмаси, логистика). Deep base 30.1% с rs_status near_high на 0.05% от pivot — акцията е изградила дълга база и е готова. EPS ръст 62.3% YoY, ROE 23.5%, институционално ownership 115.6% (short covering + акумулация). Умерен short interest 11.2% е допълнително гориво при пробив.</div>
+        <div class="why">XLV секторна логика: VIX +10.16% за 5 дни → частичен defensive rotation в healthcare. LNTH е radiopharmaceuticals — нишов растежен сегмент с структурен tailwind от oncology diagnostics adoption (PYLARIFY за простатен рак). EPS +62.3% YoY, ROE 23.5%, inst_ownership 115.6% (short squeeze компонент при 11.2% short interest). Base е 'deep base' с 30.1% depth — по-рискова конструкция, но RS е near_high. Macro: XLV RS V-shape recovery + defensive rotation = timing confluence. Предупреждение: deep base изисква по-внимателно управление на позицията.</div>
         <h3>Бизнес</h3>
-        <div class="why">Lantheus Holdings разработва, произвежда и комерсиализира диагностични и терапевтични продукти за сърдечни заболявания, рак и други болести. Флагманският им продукт DEFINITY е ехокардиографски агент, а компанията е лидер в ядрената медицина и radiopharmaceuticals. Моделът е нишов с висок barrier to entry и регулаторна защита.</div>
+        <div class="why">Lantheus Holdings разработва, произвежда и комерсиализира диагностични и терапевтични радиофармацевтични продукти. Водещият продукт PYLARIFY е PET imaging агент за простатен рак — бързо нарастващ пазар. Компанията е лидер в ядрената медицина с продукти като DEFINITY (ехокардиография) и TechneLite (технеций генератор).</div>
         <h3>Катализатори · 4–8 седмици</h3>
-        <ul class="tight"><li>Пробив над pivot 104.57 при 0.05% разстояние — акцията е технически готова</li><li>Short interest 11.2% осигурява short squeeze ускорение при breakout с обем</li><li>Earnings на 05.08.2026 (52 дни) — достатъчно runway; forward P/E 16.3 е атрактивен при 62% EPS ръст</li><li>Нарастваща употреба на PYLARIFY (PSMA imaging) в онкологията като secular growth driver</li></ul>
+        <ul class="tight"><li>Breakout над pivot $104.57 при обем ще активира 11.2% short interest като гориво за extended move</li><li>Продължаващ adoption на PYLARIFY — PET scan капацитетът в САЩ се разширява, директен revenue driver</li><li>XLV defensive rotation при VIX persistence над 17 довежда институционален flow в quality healthcare</li><li>Earnings на 05.08.2026 (52 дни) — достатъчен прозорец; forward P/E 16.3 при тези ръстове е атрактивен</li></ul>
         <h3>Рискове</h3>
-        <ul class="tight"><li>IV rank 100 — опциите са изключително скъпи, което прави options стратегии неефективни</li><li>Revenue ръст само 1.2% YoY — EPS ръстът е от margin expansion, не от топ-лайн, което е по-крехко</li><li>Analyst target 105.23 е почти на pivot нивото — консенсусът не вижда голям upside отгоре</li><li>Deep base 30.1% може да означава структурна слабост; нужен е убедителен обем при пробива</li></ul>
+        <ul class="tight"><li>Deep base 30.1% е сериозен структурен предупредителен знак — акции с толкова дълбоки бази имат по-висок failure rate при breakout</li><li>Analyst target $105.23 е практически на pivot нивото — консенсусът не вижда значим upside, което ограничава institutional buying pressure</li><li>Revenue growth само +1.2% YoY — EPS ръстът идва от margin expansion/buybacks, не от top-line acceleration; уязвимост при pricing pressure</li><li>IV Rank 100% — опциите са изключително скъпи; ако се избира акция вместо CSP, gap риск при news е по-голям</li></ul>
         
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">Умерен short interest (11.2%) — гориво при пробив с обем.</div>
@@ -589,7 +593,7 @@
         <div class="kv"><span>Inst. ownership</span><b>115.6%</b></div>
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>2026-08-05 (52д)</b></div>
-        <div class="kv"><span>Препоръка</span><b>след earnings — следващите earnings са на 05.08.2026 (52 дни), достатъчно runway за swing trade.</b></div>
+        <div class="kv"><span>Препоръка</span><b>след earnings — 52 дни до 05.08.2026, пълен swing прозорец без binary earnings event.</b></div>
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск $1000</h3>
           <div class="kv"><span>Entry</span><b>$102.48 – $106.66</b></div>
@@ -615,13 +619,13 @@
     <div class="stock-body">
       <div class="block">
         <h3>Защо точно сега</h3>
-        <div class="why">XLF сектор, asset management — steepening крива и VIX под 20 са директно позитивни за AMG: AUM расте при рали на пазарите, fee income се увеличава, а по-ниски дисконтови ставки re-rate-ват asset managers с висок FCF. Cup with handle на 0.26% от pivot, volume ratio 1.06 (близо до нормален). Forward P/E 9.0 при 52.5% EPS ръст е аномално евтино — очевиден value + momentum setup.</div>
+        <div class="why">XLF секторна логика: asset management е директен бенефициент на Fed Net Liquidity ↑ — AUM-базираните такси растат с equity market levels, а по-добрата ликвидност привлича flows към managed funds. EPS +52.5% YoY, forward P/E 9.0 е изключително компресиран за тези ръстове — дискаунт спрямо peers. Cup with handle с 25.3% depth, RS near_high, volume ratio 1.06 — леко над 1.0, единственият кандидат с обем близо до нормален. Offensive режим + финансова ротация = правилен контекст.</div>
         <h3>Бизнес</h3>
-        <div class="why">Affiliated Managers Group е инвестиционна холдингова компания, която притежава дялове в независими asset management фирми. Управлява активи за институционални клиенти, mutual funds и high net worth индивиди. Бизнес моделът е базиран на revenue sharing с партньорски boutique мениджъри без директна конкуренция с тях.</div>
+        <div class="why">Affiliated Managers Group е инвестиционен холдинг, който придобива дялове в независими asset management фирми. Управлява активи за institutional клиенти, mutual funds и high-net-worth individuals. Бизнес моделът е unique — AMG не управлява директно, а участва в икономиката на affiliate мениджърите.</div>
         <h3>Катализатори · 4–8 седмици</h3>
-        <ul class="tight"><li>Пробив над pivot 355.55 при умерен обем — само 0.26% разстояние</li><li>Earnings на 30.07.2026 (46 дни) — достатъчно runway; EPS estimate 34.87 при forward P/E 9.0 е extreme value</li><li>Рали на equity пазарите увеличава AUM и fee revenue директно</li><li>Analyst target 381.00 дава 7.5% upside от pivot — реалистичен swing target</li></ul>
+        <ul class="tight"><li>Earnings на 30.07.2026 (46 дни) — в рамките на swing прозореца; forward P/E 9.0 предполага earnings beat = значим re-rating потенциал</li><li>Fed Net Liquidity ↑ → AUM flows нагоре → fee revenue expansion за следващото тримесечие</li><li>Analyst target $381 дава ~7.4% upside от pivot — разумен R:R при tight stop</li><li>2s10s steepening подобрява fixed income AUM performance → affiliate мениджърите с bond стратегии генерират по-добри returns → performance fees</li></ul>
         <h3>Рискове</h3>
-        <ul class="tight"><li>Earnings на 30.07 (46 дни) — ако trade-ът закъснее, може да влезе в blackout зона</li><li>Asset management е процикличен — всяка market correction удря AUM и fee income едновременно</li><li>Volume ratio 1.06 е близо до нормален, но не показва активна акумулация — нужен е по-силен обем при пробив</li><li>Офанзивен режим може да ротира към по-директни growth plays, изоставяйки value-ориентирания AMG</li></ul>
+        <ul class="tight"><li>Earnings на 30.07 са 46 дни — trade трябва да се управлява активно при приближаване към blackout период</li><li>Base depth 25.3% — по-дълбока база увеличава вероятността от re-test на pivot след initial breakout</li><li>Пазарна корекция >5% би намалила AUM директно → fee compression → earnings miss риск</li><li>Volume ratio 1.06 е леко над 1.0 но breakout_volume е false — все още липсва institutional conviction breakout</li></ul>
         
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">Нисък short interest (5.2%) — без squeeze динамика, но и без активна опозиция.</div>
@@ -647,7 +651,7 @@
         <div class="kv"><span>Inst. ownership</span><b>98.8%</b></div>
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>2026-07-30 (46д)</b></div>
-        <div class="kv"><span>Препоръка</span><b>след earnings — earnings на 30.07.2026 (46 дни) дават достатъчно runway, но трейдърът трябва да мониторира за ранен exit ако позицията не работи до ~20.07.</b></div>
+        <div class="kv"><span>Препоръка</span><b>преди earnings — earnings на 30.07.2026, 46 дни. Планирай изход или размер редукция ~5 работни дни преди датата за избягване на binary risk.</b></div>
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск $1000</h3>
           <div class="kv"><span>Entry</span><b>$348.44 – $362.66</b></div>
@@ -672,8 +676,8 @@
       <span class="ticker">MNST</span>
       <span class="company">Monster Beverage Corporation</span>
       
-      <p>Секторът е Consumer Defensive — директна макро връзка с активната секторна логика липсва (не е в топ 5 сектора). Setup-ът е чисто технически: cup with handle на 0.27% от pivot, rs_status near_high, EPS ръст 28.6%, revenue ръст 26.9%, ROE 26.7%. Проблемът: analyst target 89.69 е ПОД текущата цена 92.83 — консенсусът е мечи. Офанзивен режим не фаворизира defensive сектори.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Пробив над 93.08 с обем минимум 1.5x среднодневен И analyst upgrades повишаващи target над 100.00. Без тези условия — пропусни.
+      <p>Няма директна макро верига към активните сектори (Semiconductors, Tech, Financials, Healthcare, Defense) — Consumer Defensive не е в активната секторна логика при Offensive пазарен режим. Setup-ът е чисто технически: cup with handle, RS near_high, EPS +28.6%, revenue +26.9% — силни фундаменти. Но analyst target $89.69 е под текущата цена ($92.83) — консенсусът е bearish спрямо пазарната цена. Offensive режим не благоприятства defensive consumer. Слаб setup за текущия режим.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) пазарен режим shift към Defensive или Mixed, ИЛИ (2) breakout над $93.08 с обем >1.5x средния AND analyst target revision нагоре над $95+. При текущия Offensive режим приоритетът е другаде.
         · зона $91.22–$94.94</div>
     </div>
     
@@ -681,8 +685,8 @@
       <span class="ticker">VLY</span>
       <span class="company">Valley National Bancorp</span>
       
-      <p>XLF сектор — steepening крива е директен tailwind за регионални банки като VLY: NIM expansion е механичен при 2s10s 0.39. EPS ръст 54.6%, revenue ръст 23.8% са силни. Проблем: days_to_earnings е -52 (отрицателна стойност — earnings вече са минали или датата е некоректна), което прави timing неясен. ROE 8.6% е ниско за банков сектор. Base depth 20.2% е приемлива.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Верифицирай следващата earnings дата. При потвърден пробив над 14.70 с обем 1.5x+ среднодневен и ясен earnings calendar — може да се активира. ROE под 10% е ограничение.
+      <p>XLF секторна логика: регионална банка директно бенефицира от 2s10s steepening (NIM expansion) и Fed Net Liquidity ↑ (excess reserves → loan growth). EPS +54.6%, revenue +23.8% YoY са солидни. Cup with handle, RS near_high. Проблем: earnings дата показва days_to_earnings = -52 (вече са минали?), което означава скорошно reporting — неясен timing. ROE 8.6% е слабо за банков сектор. Short interest 9.12% дава squeeze потенциал.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) потвърждение на следващата earnings дата и дистанция >20 работни дни, (2) breakout над $14.70 с обем >1.4x средния, (3) ROE trend improvement в следващото reporting. Влизай само след volume-confirmed breakout.
         · зона $14.41–$14.99</div>
     </div>
     
@@ -690,8 +694,8 @@
       <span class="ticker">ROK</span>
       <span class="company">Rockwell Automation, Inc.</span>
       
-      <p>Industrials сектор — не е в активната секторна логика. Setup-ът е чисто технически: cup with handle, но акцията е 1.87% ПОД pivot 468.11 — не е на прага на пробив. Analyst target 463.66 е ПОД pivot-а — консенсусът не вижда breakout потенциал. EPS ръст 38.9% и ROE 27.2% са силни фундаменти, но timing е лош.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Затваряне над 468.11 с обем минимум 40% над средния И analyst target upgrade над 490. Без тези условия setup-ът не оправдава риска.
+      <p>Industrials не е в активната секторна логика при текущия Offensive режим. ROK е industrial automation — може да се свърже с AI capex cycle (smart manufacturing), но тази верига е indirect. Техническият setup е слаб: цената е 1.87% под pivot, volume ratio 0.73, breakout_volume false. Analyst target $463.66 е под pivot $468.11 — консенсусът е под точката на влизане. Setup-ът не оправдава риска.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) analyst target revision над $480+, (2) Industrials влезе в активната секторна логика, (3) breakout над $468.11 с обем >1.5x средния AND volume ratio подобрен над 1.0 в base.
         · зона $458.75–$477.47</div>
     </div>
     
@@ -699,8 +703,8 @@
       <span class="ticker">MUSA</span>
       <span class="company">Murphy USA Inc.</span>
       
-      <p>Consumer Cyclical, specialty retail на бензинови станции — петролът пада с 11.6%, което ДИРЕКТНО наранява MUSA: по-ниски pump цени = по-ниски fuel revenue (основен revenue driver). Парадоксално — бизнес моделът е зависим от fuel volume и margin, не от fuel price decline per se, но investor sentiment е негативен при спад на петрола. EPS ръст 156.2% е изключителен, но analyst target 566.89 е под текущата цена 622.53.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Изчакай earnings на 29.07 и реакцията след тях. При pozitiven earnings surprise и пробив над 636.05 с обем 1.5x+ — активирай. Analyst target трябва да бъде ревизиран нагоре.
+      <p>WTI -11.6% за 5 дни е директен НЕГАТИВЕН catalyst за Murphy USA — fuel retailer с газостанции. При по-ниски бензинови цени, retail fuel margins могат да се компресират или consumers купуват по-малко gallons стойностно (дори при same volume). EPS +156.2% YoY е изключителен, но analyst target $566.89 е значително под текущата цена $622.53 — пазарът е надминал консенсуса. Цената е 2.13% под pivot, обемът е нисък. Macro headwind + слаб технически setup + overpriced спрямо консенсус = clear pass.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) WTI стабилизация и retail margin recovery evidence, (2) analyst target revision над $640+, (3) breakout над $636.05 с обем >1.5x средния. При текущия WTI headwind позицията е неоправдана.
         · зона $623.33–$648.77</div>
     </div>
     
@@ -708,8 +712,8 @@
       <span class="ticker">IBKR</span>
       <span class="company">Interactive Brokers Group, Inc.</span>
       
-      <p>XLF сектор, capital markets — VIX под 20 и нормализиране на trading условията са директно pozitiver за IBKR trading desk revenue. RS status е new_high (единственият в листата) — истинска относителна сила. Проблемът: 2.46% под pivot 93.10, deep base 31.7% и analyst target 88.27 е ПОД текущата цена. Earnings на 14.07.2026 само 30 дни — влизане сега е earnings рулетка.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Изчакай earnings на 14.07 и реакцията след тях. При pozitiven surprise и пробив над 93.10 с обем 1.5x+ и analyst target upgrade над 95 — активирай позиция.
+      <p>XLF секторна логика: capital markets broker директно бенефицира от Offensive пазарен режим (по-висок trading volume), Fed Net Liquidity ↑ (margin lending growth) и VIX 17.68 (умерена volatility = активно trading). RS е new_high — най-силният RS сигнал в листата. Фундаментите са солидни (EPS +25.4%, ROE 23.6%). Проблем: deep base 31.7%, цената е 2.46% под pivot, analyst target $88.27 е под текущата цена $90.81 — консенсусът е bearish. Earnings на 14.07 са само 30 дни (~21 работни дни) — граничен случай за blackout.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) breakout над $93.10 с обем >1.5x средния в рамките на следващите 10 работни дни (преди blackout), (2) само при volume confirmation — deep base с RS new_high може да explode нагоре. Ако breakout не дойде до 01.07, пропускай заради earnings proximity.
         · зона $91.24–$94.96</div>
     </div>
     
@@ -717,8 +721,8 @@
       <span class="ticker">CAT</span>
       <span class="company">Caterpillar Inc.</span>
       
-      <p>Industrials сектор — не е в активната секторна логика. Акцията е 3.83% под pivot 946.83 — далеч от breakout зона. Analyst target 944.10 е практически на pivot нивото — консенсусът не вижда значителен upside след пробива. EPS ръст 27.3%, revenue ръст 22.2% и ROE 51.3% са excellent фундаменти, но timing е лош при офанзивен режим фаворизиращ tech/semis.</p>
-      <div class="watch-trigger"><b>Trigger:</b> Затваряне над 946.83 с обем минимум 50% над средния. Нужен е macro catalyst (infrastructure announcement или China stimulus) за да оправдае entry. При липса — пропусни в полза на SMH/XLK имена.
+      <p>Industrials не е в активната секторна логика. CAT е тясно свързан с global construction и mining capex — macro tailwinds са mixed: WTI -11.6% намалява energy sector capex (mining equipment demand), DXY +0.22% е минимален headwind за exports. Техническият setup е слаб: 3.83% под pivot е значително разстояние, volume ratio 0.83, breakout_volume false. Analyst target $944.10 е под pivot $946.83 — същият проблем като при ROK. EPS и revenue ръстовете са солидни, но контекстът не е правилен.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Изчакай: (1) Industrials влезе в активната секторна логика, (2) analyst target revision над $960+, (3) цена консолидира близо до pivot и breakout с обем >1.5x средния. Текущото разстояние от pivot и sectoral misalignment изключват Action при сегашния режим.
         · зона $927.89–$965.77</div>
     </div>
     
@@ -830,306 +834,656 @@
 
 
 <section>
-  <h2>Предстоящи сплитове · този месец</h2>
+  <h2>Сплитове · тази седмица</h2>
   <div class="signal-grid">
     
-    <div class="signal-chip">
-      <div class="sym">DREAML</div>
-      <div class="note">Jun 15, 2026 · Jun 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DREAML
+        
+      </div>
+      <div class="note">
+        <b>Jun 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">ALPHAM</div>
-      <div class="note">Jun 15, 2026 · Jun 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">ALPHAM
+        
+      </div>
+      <div class="note">
+        <b>Jun 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">AVAXON</div>
-      <div class="note">Jun 15, 2026 · Jun 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">AVAXON
+        
+      </div>
+      <div class="note">
+        <b>Jun 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">SMARTP</div>
-      <div class="note">Jun 16, 2026 · Jun 16, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">SMARTP
+        
+      </div>
+      <div class="note">
+        <b>Jun 16, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">FANHUA</div>
-      <div class="note">Jun 16, 2026 · Jun 16, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">FANHUA
+        
+      </div>
+      <div class="note">
+        <b>Jun 16, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">WORLDL</div>
-      <div class="note">Jun 17, 2026 · Jun 17, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">WORLDL
+        
+      </div>
+      <div class="note">
+        <b>Jun 17, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">UPLAND</div>
-      <div class="note">Jun 17, 2026 · Jun 17, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">UPLAND
+        
+      </div>
+      <div class="note">
+        <b>Jun 17, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">CHINOC</div>
-      <div class="note">Jun 18, 2026 · Jun 18, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">CHINOC
+        
+      </div>
+      <div class="note">
+        <b>Jun 18, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">COHENS</div>
-      <div class="note">Jun 18, 2026 · Jun 18, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">COHENS
+        
+      </div>
+      <div class="note">
+        <b>Jun 18, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">AJISCO</div>
-      <div class="note">Jun 19, 2026 · Jun 19, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">AJISCO
+        
+      </div>
+      <div class="note">
+        <b>Jun 19, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">POMDOC</div>
-      <div class="note">Jun 22, 2026 · Jun 22, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">POMDOC
+        
+      </div>
+      <div class="note">
+        <b>Jun 22, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">BASELM</div>
-      <div class="note">Jun 22, 2026 · Jun 22, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">BASELM
+        
+      </div>
+      <div class="note">
+        <b>Jun 22, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">ORIENT</div>
-      <div class="note">Jun 22, 2026 · Jun 22, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">ORIENT
+        
+      </div>
+      <div class="note">
+        <b>Jun 22, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">SIEMEN</div>
-      <div class="note">Jun 23, 2026 · Jun 23, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">SIEMEN
+        
+      </div>
+      <div class="note">
+        <b>Jun 23, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">JINXIN</div>
-      <div class="note">Jun 23, 2026 · Jun 23, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">JINXIN
+        
+      </div>
+      <div class="note">
+        <b>Jun 23, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DUPONT</div>
-      <div class="note">Jun 24, 2026 · Jun 24, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DUPONT
+        
+      </div>
+      <div class="note">
+        <b>Jun 24, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">GRANIT</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">GRANIT
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">PTBAKR</div>
-      <div class="note">Jun 25, 2026 · Jun 25, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">PTBAKR
+        
+      </div>
+      <div class="note">
+        <b>Jun 25, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">HONEYW</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">HONEYW
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">FURUKA</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">FURUKA
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">SUMITO</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">SUMITO
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">SUMITO</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">SUMITO
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">KAOCOR</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">KAOCOR
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">FOODLI</div>
-      <div class="note">Jun 29, 2026 · Jun 29, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">FOODLI
+        
+      </div>
+      <div class="note">
+        <b>Jun 29, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">EOSENE</div>
-      <div class="note">Jul 01, 2026 · Jul 01, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">EOSENE
+        
+      </div>
+      <div class="note">
+        <b>Jul 01, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">MUELLE</div>
-      <div class="note">Jul 01, 2026 · Jul 01, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">MUELLE
+        
+      </div>
+      <div class="note">
+        <b>Jul 01, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">YXT.CO</div>
-      <div class="note">Jul 01, 2026 · Jul 01, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">YXT.CO
+        
+      </div>
+      <div class="note">
+        <b>Jul 01, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">CROWDS</div>
-      <div class="note">Jul 02, 2026 · Jul 02, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">CROWDS
+        
+      </div>
+      <div class="note">
+        <b>Jul 02, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">JIANZH</div>
-      <div class="note">Jul 06, 2026 · Jul 06, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">JIANZH
+        
+      </div>
+      <div class="note">
+        <b>Jul 06, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">MARUBE</div>
-      <div class="note">Jul 08, 2026 · Jul 08, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">MARUBE
+        
+      </div>
+      <div class="note">
+        <b>Jul 08, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">COMPAG</div>
-      <div class="note">Jul 09, 2026 · Jul 09, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">COMPAG
+        
+      </div>
+      <div class="note">
+        <b>Jul 09, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">LIONGR</div>
-      <div class="note">Jul 09, 2026 · Jul 09, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">LIONGR
+        
+      </div>
+      <div class="note">
+        <b>Jul 09, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">STELLA</div>
-      <div class="note">Jul 14, 2026 · Jul 14, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">STELLA
+        
+      </div>
+      <div class="note">
+        <b>Jul 14, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">DIREXI</div>
-      <div class="note">Jul 15, 2026 · Jul 15, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">DIREXI
+        
+      </div>
+      <div class="note">
+        <b>Jul 15, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">STONEX</div>
-      <div class="note">Jul 20, 2026 · Jul 20, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">STONEX
+        
+      </div>
+      <div class="note">
+        <b>Jul 20, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
-    <div class="signal-chip">
-      <div class="sym">BNYMEL</div>
-      <div class="note">Jul 20, 2026 · Jul 20, 20</div>
+    <div class="signal-chip ">
+      <div class="sym">BNYMEL
+        
+      </div>
+      <div class="note">
+        <b>Jul 20, 2026</b>
+        
+        
+      </div>
+      
       
     </div>
     
@@ -1137,6 +1491,67 @@
 </section>
 
 
+
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  <div class="si-grid">
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AXP</span>
+        <span><span class="si-val">$45.1 млрд</span> <span class="si-action">13F</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">AMERICAN EXPRESS CO</div>
+      <div class="si-mgr">3 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">KO</span>
+        <span><span class="si-val">$21.5 млрд</span> <span class="si-action">13F</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">COCA COLA CO</div>
+      <div class="si-mgr">10 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AAPL</span>
+        <span><span class="si-val">$20.5 млрд</span> <span class="si-action">13F</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLE INC</div>
+      <div class="si-mgr">12 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">OCCIDENTAL PET</span>
+        <span><span class="si-val">$17.2 млрд</span> <span class="si-action">13F</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">OCCIDENTAL PETE CORP</div>
+      <div class="si-mgr">Уорън Бъфет · Berkshire Hathaway · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">BANK AMERICA C</span>
+        <span><span class="si-val">$15.2 млрд</span> <span class="si-action">13F</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">BANK AMERICA CORP</div>
+      <div class="si-mgr">9 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-05-15</div>
+      
+    </div>
+    
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
+    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  </div>
+</section>
 
 
 
@@ -1171,7 +1586,7 @@
   Само за информационни цели. Не представлява финансов съвет, инвестиционна препоръка
   или предложение за покупка/продажба на ценни книжа. Данните идват от публични API-та
   и могат да съдържат грешки или закъснения. Всяко инвестиционно решение е лична отговорност.
-  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v1.0
+  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v2.0
 </footer>
 
 </div>
@@ -1275,18 +1690,19 @@
   }
 
   function render(sym, data) {
-    var series = data.daily || data.data || [];
+    var series = data.daily || data.data || data.feed || (Array.isArray(data) ? data : []);
     if (!series.length) { msg.textContent = "Няма borrow данни за " + sym + "."; return; }
+    function F(o){ return o.fee != null ? o.fee : (o.rate != null ? o.rate : null); }
+    function A(o){ return o.available != null ? o.available : (o.quantity != null ? o.quantity : o.availableShares); }
     var latest = series[series.length - 1];
-    var fee = latest.fee, avail = latest.available;
-    var fees = series.slice(-5).map(function (s) { return s.fee; }).filter(function (x) { return x != null; });
+    var fee = F(latest), avail = A(latest);
+    var fees = series.slice(-5).map(F).filter(function (x) { return x != null; });
     var trend = fees.length < 2 ? "—" :
       fees[fees.length - 1] > fees[0] ? "покачващ ▲" :
       fees[fees.length - 1] < fees[0] ? "падащ ▼" : "стабилен";
-    var feeKlass = fee >= 50 ? "hot" : fee >= 20 ? "hot" : "ok";
-    // мини история на обема/наличието (последни ~10 записа)
+    var feeKlass = fee >= 20 ? "hot" : "ok";
     var hist = series.slice(-10).map(function (s) {
-      return (s.available != null ? Number(s.available).toLocaleString("de-DE") : "—"); }).join(" · ");
+      var a = A(s); return (a != null ? Number(a).toLocaleString("de-DE") : "—"); }).join(" · ");
 
     out.innerHTML =
       '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;margin-bottom:4px">' + sym + '</div>' +

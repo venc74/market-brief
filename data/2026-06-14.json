@@ -250,40 +250,40 @@
   }
  ],
  "ai_macro": {
-  "macro_brief": "SPY затвърждава позиция над 50DMA и 200DMA при 741.75 — структурно бичи. Fed Net Liquidity се е вдигнала с ~10.5 млрд за седмицата (от -831.9 до -821.4 млрд), което захранва risk assets. VIX е 17.68 — нарасна 10% за 5 дни, но остава в зона, която не блокира офанзивно позициониране. Петролът е паднал с 11.6% за 5 дни — рязка дефлация на входните разходи, директен попътен вятър за маржовете на компании с висок енергиен разход. Златото е спаднало с 4.46% — ротация от защитни активи към risk-on, потвърдена и от 2s10s steepening (0.38→0.39). DXY е почти неутрален (+0.22%) — без валутно смущение за мултинационалните.",
+  "macro_brief": "Fed Net Liquidity се е вдигнала с ~10.5 млрд спрямо предходната стойност — TGA се е свил, което освобождава кеш към банковата система и директно поддържа risk assets. SPY е на 741.75 — над 50DMA (722.8) и над 200DMA (684.07), тренд структурно интактен. VIX е на 17.68 с +10.16% за 5 дни — притеснителен spike, но нивото остава в risk-on зона под 20; пазарът абсорбира напрежението без дефанзивен shift. Gold -4.46% и WTI -11.6% за 5 дни сигнализират разгъване на геополитическа/инфлационна премия — commodities се продават, капиталът мигрира към equity growth. 2s10s spread 0.39% и steepening — финансовите посредници получават разширяващ се margin, банковият сектор е функционален. Днешната сесия стартира с ликвидна подкрепа, изчистена геополитическа рискова премия и ясна секторна концентрация в tech/semis.",
   "sector_logic": [
    {
     "sector": "Полупроводници",
     "etf": "SMH",
-    "chain": "Fed ликвидност нагоре → по-ниска дисконтова ставка за дългосрочни парични потоци → re-rating на капиталоемки growth компании → SMH като концентриран носител на AI capex цикъл с 12W RS +41.57% показва институционален акумулация, не тактически скок. Допълнително: спад на петрола намалява операционните разходи на fab мощностите. Резултат: SMH е водещ сектор с двойно потвърждение — ликвидност + реален марж.",
+    "chain": "WTI -11.6% за 5 дни → производствените разходи и транспортните cost inputs за chipmakers падат → margin expansion очакване → плюс Fed Net Liquidity ↑ освобождава кеш към финансиране на capex-heavy tech компании → AI capex цикълът остава непрекъснат → SMH с RS +8.12% за 4 седмици и +41.57% за 12 седмици показва институционален акумулационен импулс, не моментен spike. Комбинацията от macro tailwind (cheaper energy inputs) + ликвидна подкрепа + структурен AI demand = strongest confluence в пазара.",
     "horizon_weeks": 6
    },
    {
     "sector": "Технологии",
     "etf": "XLK",
-    "chain": "Steepening крива (2s10s +0.01 до 0.39) при стабилен DXY → финансиращите условия се нормализират без долларов натиск → мегакап tech с доминиращ FCF профит е директен бенефициент на по-ниски дисконтови ставки на дългия край. 12W RS +19.93% показва устойчива институционална ротация в сектора. Спадът на Gold (-4.46%) потвърждава изход от hedge позиции към productive assets — голяма część от тези потоци влизат в XLK компоненти.",
+    "chain": "Fed Net Liquidity ↑ → дюрацията на growth активите се поддържа при 10Y yield 4.49% без допълнително натискане нагоре (само +0.27% за 5 дни — стабилизация) → discount rate risk намален → XLK RS +3.84% за 4 седмици и +19.93% за 12 седмици показва sustained institutional rotation in. DXY +0.22% за 5 дни е минимален, не е достатъчен да притисне multinational tech margins значимо. Gold и oil sell-off отвежда capital flows директно в large-cap tech като perceived growth/quality play.",
     "horizon_weeks": 5
    },
    {
     "sector": "Финанси",
     "etf": "XLF",
-    "chain": "2s10s спредът steepens към 0.39% → net interest margin (NIM) на банките се разширява механично — банките вземат краткосрочно евтино, отпускат дългосрочно по-скъпо. Петролът пада рязко → намален кредитен риск в енергийния портфейл на банките → по-ниски провизии. VIX под 20 → trading desks генерират нормален P&L без форсирано de-risking. 4W RS +4.9% е реален, не шум.",
+    "chain": "2s10s spread 0.39% и steepening → NIM (net interest margin) на банките се разширява → earnings revision tailwind за XLF. Fed Net Liquidity ↑ → банковата система получава excess reserves → кредитни условия се разхлабват → loan growth поддръжка. VIX 17.68 — не достатъчно висок за credit stress сценарий. XLF RS +4.9% за 4 седмици при 12W RS -2.18% означава freshротация след period на underperformance — early-stage re-entry момент, не crowded trade.",
     "horizon_weeks": 4
    },
    {
     "sector": "Здравеопазване",
     "etf": "XLV",
-    "chain": "Петролът пада с 11.6% → производствените и дистрибуционните разходи на фарма и medtech падат директно (пластмаси, логистика, дистрибуция). Едновременно VIX нараства умерено → fund managers добавят XLV като partial defensive hedge в офанзивно портфолио — секторът поглъща и двата потока. 4W RS +5.8% при 12W RS -8.01% означава, че разгръщането е ранно и не е претрупано. Добро съотношение риск/награда за swing позиция.",
+    "chain": "VIX spike +10.16% за 5 дни → институционалните играчи частично хеджират equity exposure с defensive quality — healthcare предлага earning visibility независимо от macro cycle. Gold -4.46% показва, че pure defensive (hard assets) се изоставя, но XLV като defensive equity с growth характеристики поема частичен flow. RS +5.8% за 4 седмици при 12W RS -8.01% — V-shape RS recovery, потенциален Stage 1→2 transition по Weinstein, заслужава наблюдение за Stage 2 breakout confirmation.",
     "horizon_weeks": 4
    },
    {
     "sector": "Отбрана",
     "etf": "ITA",
-    "chain": "Геополитическата премия остава структурно висока (бюджетни ангажименти на NATO+) — независимо от липса на headlines в данните, бюджетните потоци са multi-year и не се движат от sedмични новини. Петролът пада → авиационното гориво поевтинява → операционните разходи на defense contractors намаляват при фиксирани договорни приходи → марж expansion. 4W RS +5.06% при 12W RS -9.61% е класически ранен reversal setup — институциите купуват slippage след 12-седмичен underperformance.",
-    "horizon_weeks": 5
+    "chain": "Геополитическата рискова премия в Gold и Oil спада (Gold -4.46%, WTI -11.6%) — de-escalation сигнал или narrative shift. Парадоксално ITA RS +5.06% за 4 седмици — пазарът pricing defense budget continuity (структурен NATO/EU rearmament cycle) независимо от краткосрочен geopolitical sentiment. Механизмът: US и EU fiscal commitments към defense spending са multi-year, не spot-геополитика → ITA има revenue visibility що не зависи от oil price или daily headlines. 12W RS -9.61% показва, че 4W move е counter-trend bounce — позицията изисква потвърждение с RS breakout над 6M high преди full commitment.",
+    "horizon_weeks": 3
    }
   ],
-  "regime_comment": "Offensive е правилен: SPY е над двете MA без колебание, Fed ликвидността се движи нагоре (реален паричен попътен вятър), 2s10s е положителен и steepening (не рецесионна инверсия), VIX е 17.68 — нараснал за седмицата, но все още в зоната, която не задейства de-risking протоколи. Петролът пада рязко — това е негативен сигнал за глобалното търсене в commodity space, но за equity пазара е marж tailwind. Нито един индикатор не е червен. P/C 0.83 е леко elevated, което означава, че хеджовете са на масата — при продължаване нагоре тези hedge positions се unwinden и захранват допълнително rally. Sizing factor 1.0 е адекватен."
+  "regime_comment": "Offensive режимът е правилен защото структурата е: SPY над и двете MA (50 и 200DMA) — trend following системите са дълги; Fed Net Liquidity ↑ — ликвидният гориво е налично; 2s10s steepening при 0.39% — financial plumbing функционира; VIX 17.68 — под 20, risk-on прагът. Нито един индикатор не е в червено. Put/Call 0.83 и NAAIM липсващи дават yellow — те сигнализират да не се прекалява с leverage, не да се преминава в defensive. Gold и oil sell-off изчистват инфлационна/геополитическа премия без да увредят equity структурата — напротив, те освобождават capital toward risk assets. Sizing factor 1.0 е коректен: full exposure в водещите сектори (SMH, XLK), без pyramid-ing до confirmation на VIX нормализация под 16."
  },
  "action": [
   {
@@ -365,22 +365,23 @@
    "markers": [],
    "ai": {
     "ticker": "AIZ",
-    "why_now": "XLF сектор с steepening крива → застрахователите като Assurant се възползват от по-висока доходност на инвестиционния им портфейл (float), докато NIM логиката е директна. Петролът пада → по-ниски claims в автомобилното застраховане и по-ниски дистрибуционни разходи. Cup with handle на 0.04% от pivot с rs_status near_high — почти перфектен технически setup. EPS ръст 87% YoY е изключителен за застраховател.",
-    "business_bg": "Assurant предоставя застрахователни и защитни услуги за свързани устройства (мобилни телефони), домове и автомобили в Северна Америка, Латинска Америка, Европа и Азия. Оперира чрез два сегмента: Global Lifestyle (мобилни устройства, потребителска електроника, автомобили) и Global Housing (застраховане на жилища). Компанията е лидер в speciality insurance с устойчив recurring revenue модел.",
+    "why_now": "XLF секторна логика: 2s10s steepening → NIM expansion tailwind засяга целия финансов сектор. AIZ е Property & Casualty Insurance — директна връзка е по-слаба от банките, но rising rate среда подобрява инвестиционния портфейл на застрахователите (float yield). Базата cup with handle е почти завършена, цената е на 0.04% под pivot — практически на ниво. EPS +87% YoY е изключителен. Forward P/E 11.6 при тези ръстове е компресиран. Setup-ът е комбинация от макро tailwind (financials rotation) + чист технически setup при pivot.",
+    "business_bg": "Assurant предоставя защитни услуги за свързани устройства, домове и автомобили в Северна Америка, Латинска Америка, Европа и Азиатско-Тихоокеанския регион. Оперира в два сегмента: Global Lifestyle (мобилни устройства, потребителска електроника, автомобилна защита) и Global Housing (ипотечно и наводнително застраховане). Бизнесът е embedded insurance — партньорства с телекоми, автодилъри и банки.",
     "catalysts": [
-     "Breakout над pivot 261.10 с институционален обем — акцията е на 0.04% от pivot",
-     "Следващи earnings на 04.08.2026 дават 51 дни runway без earnings риск",
-     "Steepening 2s10s крива подобрява инвестиционния доход от float портфейла",
-     "EPS estimate 21.04 за следващото тримесечие при P/E 13.4 — валуацията е аномално ниска за 87% EPS ръст"
+     "Breakout над pivot $261.10 с институционален обем потвърждава Stage 2 continuation",
+     "Следващи earnings на 04.08.2026 — над 51 дни до тогава, достатъчно прозорец за swing",
+     "XLF секторна ротация при продължаваща 2s10s steepening подкрепя re-rating на financials",
+     "Forward P/E 11.6 при EPS +87% YoY — value compression catalyst ако институциите осъзнаят gap-а"
     ],
     "risks": [
-     "Volume ratio 0.59 — пробивът трябва да дойде с минимум 1.5x среден обем иначе е false breakout",
-     "Analyst target 280.50 дава само 7.5% upside — ограничен потенциал спрямо риска",
-     "Застрахователният сектор е чувствителен към катастрофични събития (hurricane season) — Q3 риск",
-     "Институционалното ownership 97.6% означава малко допълнително buying power — акцията е вече широко притежавана"
+     "Обемът е нисък (0.59 ratio) — пробивът без volume surge е фалшив сигнал; изисква се изчакване на volume confirmation",
+     "Insurance sector чувствителен към catastrophe events — неочакван природен катаклизъм обръща trade-а незабавно",
+     "Analyst target $280.5 дава само ~7.5% upside от текущата цена — ограничен R:R ако пазарът вече е ценирал re-rating",
+     "Macro reverse: ако 10Y yield пробие 4.75%+ агресивно, финансовите се преоценяват надолу"
     ],
-    "earnings_call": "след earnings — следващите earnings са на 04.08.2026 (51 дни), достатъчно runway за swing trade без earnings риск.",
-    "classification": "Action"
+    "earnings_call": "след earnings — следващите earnings са на 04.08.2026 (51 дни), достатъчно място за пълен swing цикъл без earnings risk.",
+    "classification": "Action",
+    "watchlist_trigger": null
    },
    "plan": {
     "valid": true,
@@ -482,22 +483,23 @@
    "markers": [],
    "ai": {
     "ticker": "LNTH",
-    "why_now": "XLV сектор — петролът пада директно намалява производствените разходи на radiopharmaceuticals (пластмаси, логистика). Deep base 30.1% с rs_status near_high на 0.05% от pivot — акцията е изградила дълга база и е готова. EPS ръст 62.3% YoY, ROE 23.5%, институционално ownership 115.6% (short covering + акумулация). Умерен short interest 11.2% е допълнително гориво при пробив.",
-    "business_bg": "Lantheus Holdings разработва, произвежда и комерсиализира диагностични и терапевтични продукти за сърдечни заболявания, рак и други болести. Флагманският им продукт DEFINITY е ехокардиографски агент, а компанията е лидер в ядрената медицина и radiopharmaceuticals. Моделът е нишов с висок barrier to entry и регулаторна защита.",
+    "why_now": "XLV секторна логика: VIX +10.16% за 5 дни → частичен defensive rotation в healthcare. LNTH е radiopharmaceuticals — нишов растежен сегмент с структурен tailwind от oncology diagnostics adoption (PYLARIFY за простатен рак). EPS +62.3% YoY, ROE 23.5%, inst_ownership 115.6% (short squeeze компонент при 11.2% short interest). Base е 'deep base' с 30.1% depth — по-рискова конструкция, но RS е near_high. Macro: XLV RS V-shape recovery + defensive rotation = timing confluence. Предупреждение: deep base изисква по-внимателно управление на позицията.",
+    "business_bg": "Lantheus Holdings разработва, произвежда и комерсиализира диагностични и терапевтични радиофармацевтични продукти. Водещият продукт PYLARIFY е PET imaging агент за простатен рак — бързо нарастващ пазар. Компанията е лидер в ядрената медицина с продукти като DEFINITY (ехокардиография) и TechneLite (технеций генератор).",
     "catalysts": [
-     "Пробив над pivot 104.57 при 0.05% разстояние — акцията е технически готова",
-     "Short interest 11.2% осигурява short squeeze ускорение при breakout с обем",
-     "Earnings на 05.08.2026 (52 дни) — достатъчно runway; forward P/E 16.3 е атрактивен при 62% EPS ръст",
-     "Нарастваща употреба на PYLARIFY (PSMA imaging) в онкологията като secular growth driver"
+     "Breakout над pivot $104.57 при обем ще активира 11.2% short interest като гориво за extended move",
+     "Продължаващ adoption на PYLARIFY — PET scan капацитетът в САЩ се разширява, директен revenue driver",
+     "XLV defensive rotation при VIX persistence над 17 довежда институционален flow в quality healthcare",
+     "Earnings на 05.08.2026 (52 дни) — достатъчен прозорец; forward P/E 16.3 при тези ръстове е атрактивен"
     ],
     "risks": [
-     "IV rank 100 — опциите са изключително скъпи, което прави options стратегии неефективни",
-     "Revenue ръст само 1.2% YoY — EPS ръстът е от margin expansion, не от топ-лайн, което е по-крехко",
-     "Analyst target 105.23 е почти на pivot нивото — консенсусът не вижда голям upside отгоре",
-     "Deep base 30.1% може да означава структурна слабост; нужен е убедителен обем при пробива"
+     "Deep base 30.1% е сериозен структурен предупредителен знак — акции с толкова дълбоки бази имат по-висок failure rate при breakout",
+     "Analyst target $105.23 е практически на pivot нивото — консенсусът не вижда значим upside, което ограничава institutional buying pressure",
+     "Revenue growth само +1.2% YoY — EPS ръстът идва от margin expansion/buybacks, не от top-line acceleration; уязвимост при pricing pressure",
+     "IV Rank 100% — опциите са изключително скъпи; ако се избира акция вместо CSP, gap риск при news е по-голям"
     ],
-    "earnings_call": "след earnings — следващите earnings са на 05.08.2026 (52 дни), достатъчно runway за swing trade.",
-    "classification": "Action"
+    "earnings_call": "след earnings — 52 дни до 05.08.2026, пълен swing прозорец без binary earnings event.",
+    "classification": "Action",
+    "watchlist_trigger": null
    },
    "plan": {
     "valid": true,
@@ -603,22 +605,23 @@
    "markers": [],
    "ai": {
     "ticker": "AMG",
-    "why_now": "XLF сектор, asset management — steepening крива и VIX под 20 са директно позитивни за AMG: AUM расте при рали на пазарите, fee income се увеличава, а по-ниски дисконтови ставки re-rate-ват asset managers с висок FCF. Cup with handle на 0.26% от pivot, volume ratio 1.06 (близо до нормален). Forward P/E 9.0 при 52.5% EPS ръст е аномално евтино — очевиден value + momentum setup.",
-    "business_bg": "Affiliated Managers Group е инвестиционна холдингова компания, която притежава дялове в независими asset management фирми. Управлява активи за институционални клиенти, mutual funds и high net worth индивиди. Бизнес моделът е базиран на revenue sharing с партньорски boutique мениджъри без директна конкуренция с тях.",
+    "why_now": "XLF секторна логика: asset management е директен бенефициент на Fed Net Liquidity ↑ — AUM-базираните такси растат с equity market levels, а по-добрата ликвидност привлича flows към managed funds. EPS +52.5% YoY, forward P/E 9.0 е изключително компресиран за тези ръстове — дискаунт спрямо peers. Cup with handle с 25.3% depth, RS near_high, volume ratio 1.06 — леко над 1.0, единственият кандидат с обем близо до нормален. Offensive режим + финансова ротация = правилен контекст.",
+    "business_bg": "Affiliated Managers Group е инвестиционен холдинг, който придобива дялове в независими asset management фирми. Управлява активи за institutional клиенти, mutual funds и high-net-worth individuals. Бизнес моделът е unique — AMG не управлява директно, а участва в икономиката на affiliate мениджърите.",
     "catalysts": [
-     "Пробив над pivot 355.55 при умерен обем — само 0.26% разстояние",
-     "Earnings на 30.07.2026 (46 дни) — достатъчно runway; EPS estimate 34.87 при forward P/E 9.0 е extreme value",
-     "Рали на equity пазарите увеличава AUM и fee revenue директно",
-     "Analyst target 381.00 дава 7.5% upside от pivot — реалистичен swing target"
+     "Earnings на 30.07.2026 (46 дни) — в рамките на swing прозореца; forward P/E 9.0 предполага earnings beat = значим re-rating потенциал",
+     "Fed Net Liquidity ↑ → AUM flows нагоре → fee revenue expansion за следващото тримесечие",
+     "Analyst target $381 дава ~7.4% upside от pivot — разумен R:R при tight stop",
+     "2s10s steepening подобрява fixed income AUM performance → affiliate мениджърите с bond стратегии генерират по-добри returns → performance fees"
     ],
     "risks": [
-     "Earnings на 30.07 (46 дни) — ако trade-ът закъснее, може да влезе в blackout зона",
-     "Asset management е процикличен — всяка market correction удря AUM и fee income едновременно",
-     "Volume ratio 1.06 е близо до нормален, но не показва активна акумулация — нужен е по-силен обем при пробив",
-     "Офанзивен режим може да ротира към по-директни growth plays, изоставяйки value-ориентирания AMG"
+     "Earnings на 30.07 са 46 дни — trade трябва да се управлява активно при приближаване към blackout период",
+     "Base depth 25.3% — по-дълбока база увеличава вероятността от re-test на pivot след initial breakout",
+     "Пазарна корекция >5% би намалила AUM директно → fee compression → earnings miss риск",
+     "Volume ratio 1.06 е леко над 1.0 но breakout_volume е false — все още липсва institutional conviction breakout"
     ],
-    "earnings_call": "след earnings — earnings на 30.07.2026 (46 дни) дават достатъчно runway, но трейдърът трябва да мониторира за ранен exit ако позицията не работи до ~20.07.",
-    "classification": "Action"
+    "earnings_call": "преди earnings — earnings на 30.07.2026, 46 дни. Планирай изход или размер редукция ~5 работни дни преди датата за избягване на binary risk.",
+    "classification": "Action",
+    "watchlist_trigger": null
    },
    "plan": {
     "valid": true,
@@ -730,23 +733,22 @@
    "markers": [],
    "ai": {
     "ticker": "MNST",
-    "why_now": "Секторът е Consumer Defensive — директна макро връзка с активната секторна логика липсва (не е в топ 5 сектора). Setup-ът е чисто технически: cup with handle на 0.27% от pivot, rs_status near_high, EPS ръст 28.6%, revenue ръст 26.9%, ROE 26.7%. Проблемът: analyst target 89.69 е ПОД текущата цена 92.83 — консенсусът е мечи. Офанзивен режим не фаворизира defensive сектори.",
-    "business_bg": "Monster Beverage Corporation разработва, маркетира и дистрибутира енергийни напитки и концентрати в САЩ и международно. Оперира под брандовете Monster Energy, Strategic Brands и Alcohol Brands. Компанията има партньорство с Coca-Cola за дистрибуция, което осигурява глобален reach.",
+    "why_now": "Няма директна макро верига към активните сектори (Semiconductors, Tech, Financials, Healthcare, Defense) — Consumer Defensive не е в активната секторна логика при Offensive пазарен режим. Setup-ът е чисто технически: cup with handle, RS near_high, EPS +28.6%, revenue +26.9% — силни фундаменти. Но analyst target $89.69 е под текущата цена ($92.83) — консенсусът е bearish спрямо пазарната цена. Offensive режим не благоприятства defensive consumer. Слаб setup за текущия режим.",
+    "business_bg": "Monster Beverage Corporation разработва и продава енергийни напитки под бранда Monster Energy в глобален мащаб. Дистрибуцията минава основно през Coca-Cola системата след стратегическото партньорство от 2015г. Компанията оперира и в alcohol beverages сегмент като диверсификация.",
     "catalysts": [
-     "Технически пробив над 93.08 при акумулация на обем",
-     "Earnings на 06.08.2026 (53 дни) — дълъг runway без earnings риск",
-     "Нови продуктови лансирания в alcohol segment могат да разширят TAM",
-     "Ниска корелация с macro волатилност като defensive name"
+     "Cup with handle завършена форма — технически breakout потенциал при обем",
+     "Revenue +26.9% YoY показва реален top-line momentum независимо от macro среда",
+     "International expansion с Coca-Cola дистрибуция — структурен growth driver"
     ],
     "risks": [
-     "Analyst target 89.69 е под текущата цена — Wall Street консенсусът е негативен",
-     "P/E 44.8 / Forward P/E 35.9 — скъп за defensive сектор без macro tailwind",
-     "Офанзивен пазарен режим ротира капитал КЪМ growth/cyclicals, ИЗВЪН defensives",
-     "Volume ratio 0.88 — нямато подкрепа от институционална акумулация"
+     "Analyst target $89.69 е под текущата цена — консенсусът не вижда upside, риск от mean reversion",
+     "Consumer Defensive не е в активната секторна ротация при Offensive режим — capital flows отиват другаде",
+     "Forward P/E 35.9 е premium оценка при забавящ се EPS ръст YoY — компресия риск",
+     "Volume ratio 0.88 и breakout_volume false — липсва институционален интерес в момента"
     ],
-    "earnings_call": "след earnings — 53 дни runway, но setup-ът е слаб поради сектора и analyst target.",
+    "earnings_call": "след earnings — earnings на 06.08.2026 (53 дни), но trade не е препоръчан при текущия режим.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Пробив над 93.08 с обем минимум 1.5x среднодневен И analyst upgrades повишаващи target над 100.00. Без тези условия — пропусни."
+    "watchlist_trigger": "Изчакай: (1) пазарен режим shift към Defensive или Mixed, ИЛИ (2) breakout над $93.08 с обем >1.5x средния AND analyst target revision нагоре над $95+. При текущия Offensive режим приоритетът е другаде."
    }
   },
   {
@@ -824,23 +826,23 @@
    "markers": [],
    "ai": {
     "ticker": "VLY",
-    "why_now": "XLF сектор — steepening крива е директен tailwind за регионални банки като VLY: NIM expansion е механичен при 2s10s 0.39. EPS ръст 54.6%, revenue ръст 23.8% са силни. Проблем: days_to_earnings е -52 (отрицателна стойност — earnings вече са минали или датата е некоректна), което прави timing неясен. ROE 8.6% е ниско за банков сектор. Base depth 20.2% е приемлива.",
-    "business_bg": "Valley National Bancorp е банков холдинг, предоставящ комерсиални, частни и retail banking услуги. Оперира в Northeastern и Southeastern САЩ с фокус върху commercial real estate и commercial & industrial кредити. Предлага и wealth management и застрахователни услуги.",
+    "why_now": "XLF секторна логика: регионална банка директно бенефицира от 2s10s steepening (NIM expansion) и Fed Net Liquidity ↑ (excess reserves → loan growth). EPS +54.6%, revenue +23.8% YoY са солидни. Cup with handle, RS near_high. Проблем: earnings дата показва days_to_earnings = -52 (вече са минали?), което означава скорошно reporting — неясен timing. ROE 8.6% е слабо за банков сектор. Short interest 9.12% дава squeeze потенциал.",
+    "business_bg": "Valley National Bancorp е holding компания за Valley National Bank, предоставяща commercial banking, private banking, retail и wealth management услуги. Операциите са концентрирани в Northeast и Southeast САЩ. Предлага стандартна банкова гама: депозити, ипотеки, commercial real estate и auto loans.",
     "catalysts": [
-     "Steepening yield крива директно разширява NIM — основен revenue driver",
-     "Спадът на петрола намалява кредитния риск в енергийния портфейл",
-     "Volume ratio 1.32 е най-висок в листата — има реален buying interest",
-     "Cup with handle на 0.48% от pivot с near_high RS"
+     "2s10s steepening директно разширява NIM — ключов earnings driver за Q2/Q3 2026",
+     "Short interest 9.12% при volume ratio 1.32 — breakout може да trigger short covering",
+     "Регионалните банки исторически outperform при Fed liquidity expansion цикли",
+     "Forward P/E 9.5 е дълбок дискаунт спрямо сектора — re-rating потенциал"
     ],
     "risks": [
-     "ROE 8.6% е слаб за банков сектор — капиталовата ефективност е под средната",
-     "Commercial real estate exposure е рисков при по-дълго high rate environment",
-     "Short interest 9.12% при регионална банка може да отразява фундаментален скептицизъм",
-     "Earnings дата -52 дни е некоректна/объркваща — неясен earnings риск timeline"
+     "ROE 8.6% е значително под средното за сектора — структурна слабост в капиталова ефективност",
+     "Earnings timing е неясен (days_to_earnings = -52) — ако са минали скоро, следващите са далеч; ако предстоят, binary risk",
+     "Commercial real estate exposure на регионалните банки остава системен риск при credit stress",
+     "Analyst target $15.75 дава само ~7.7% от pivot — ограничен upside при реален R:R анализ"
     ],
-    "earnings_call": "не сега — earnings датата показва -52 дни (вероятно вече отчетени), което прави earnings timing неясен и изисква верификация преди влизане.",
+    "earnings_call": "не сега — earnings timing е неясен (отрицателни days_to_earnings), изисква се проверка на точната дата преди влизане в позиция.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Верифицирай следващата earnings дата. При потвърден пробив над 14.70 с обем 1.5x+ среднодневен и ясен earnings calendar — може да се активира. ROE под 10% е ограничение."
+    "watchlist_trigger": "Изчакай: (1) потвърждение на следващата earnings дата и дистанция >20 работни дни, (2) breakout над $14.70 с обем >1.4x средния, (3) ROE trend improvement в следващото reporting. Влизай само след volume-confirmed breakout."
    }
   },
   {
@@ -934,23 +936,22 @@
    "markers": [],
    "ai": {
     "ticker": "ROK",
-    "why_now": "Industrials сектор — не е в активната секторна логика. Setup-ът е чисто технически: cup with handle, но акцията е 1.87% ПОД pivot 468.11 — не е на прага на пробив. Analyst target 463.66 е ПОД pivot-а — консенсусът не вижда breakout потенциал. EPS ръст 38.9% и ROE 27.2% са силни фундаменти, но timing е лош.",
-    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация глобално. Оперира в три сегмента: Intelligent Devices, Software & Control и Lifecycle Services. Основните пазари са производство, oil & gas, automotive и food & beverage индустрии.",
+    "why_now": "Industrials не е в активната секторна логика при текущия Offensive режим. ROK е industrial automation — може да се свърже с AI capex cycle (smart manufacturing), но тази верига е indirect. Техническият setup е слаб: цената е 1.87% под pivot, volume ratio 0.73, breakout_volume false. Analyst target $463.66 е под pivot $468.11 — консенсусът е под точката на влизане. Setup-ът не оправдава риска.",
+    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация в глобален мащаб. Оперира в три сегмента: Intelligent Devices, Software & Control и Lifecycle Services. Клиентите са производствени предприятия в automotive, food & beverage, life sciences и energy сектори.",
     "catalysts": [
-     "AI-driven factory automation secular growth story",
-     "Earnings на 06.08.2026 (53 дни) — дълъг runway",
-     "Reshoring/nearshoring trend в американското производство",
-     "Software & Control сегментът носи по-висок margin и recurring revenue"
+     "AI-driven smart manufacturing adoption — long-term structural tailwind за industrial automation",
+     "EPS +38.9% YoY показва оперативен leverage при recovering industrial capex цикъл",
+     "Earnings на 06.08.2026 (53 дни) — ако Q3 guidance е силен, може да trigger re-rating"
     ],
     "risks": [
-     "Analyst target 463.66 е ПОД текущия pivot 468.11 — няма консенсусна подкрепа за breakout",
-     "1.87% под pivot — не е на прага на пробив, нужен е допълнителен catalyst",
-     "Industrials не е в активната секторна логика при текущия режим",
-     "P/E 47.6 е висок за industrial company при risk-off сценарий"
+     "Analyst target $463.66 е под pivot $468.11 — купуваш breakout където консенсусът очаква продажба",
+     "Industrials не е в активната секторна ротация — capital flows отиват в Semi, Tech, Financials",
+     "Forward P/E 31.6 при industrial компания е premium, изискващ перфектно execution",
+     "1.87% под pivot с нисък обем — вероятен re-test на по-ниски нива преди евентуален breakout"
     ],
-    "earnings_call": "след earnings — 53 дни runway, но setup-ът е слаб поради дистанцията от pivot и analyst target.",
+    "earnings_call": "след earnings — 53 дни до 06.08.2026, но setup не е препоръчан при текущия режим.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Затваряне над 468.11 с обем минимум 40% над средния И analyst target upgrade над 490. Без тези условия setup-ът не оправдава риска."
+    "watchlist_trigger": "Изчакай: (1) analyst target revision над $480+, (2) Industrials влезе в активната секторна логика, (3) breakout над $468.11 с обем >1.5x средния AND volume ratio подобрен над 1.0 в base."
    }
   },
   {
@@ -1044,23 +1045,21 @@
    "markers": [],
    "ai": {
     "ticker": "MUSA",
-    "why_now": "Consumer Cyclical, specialty retail на бензинови станции — петролът пада с 11.6%, което ДИРЕКТНО наранява MUSA: по-ниски pump цени = по-ниски fuel revenue (основен revenue driver). Парадоксално — бизнес моделът е зависим от fuel volume и margin, не от fuel price decline per se, но investor sentiment е негативен при спад на петрола. EPS ръст 156.2% е изключителен, но analyst target 566.89 е под текущата цена 622.53.",
-    "business_bg": "Murphy USA е оператор на retail бензинови станции и convenience stores предимно в Southeastern, Southwestern и Midwestern САЩ. Оперира под брандовете Murphy USA, Murphy Express и QuickChek. Бизнесът е комбинация от fuel retail и convenience merchandise с нарастващ дял на non-fuel приходи.",
+    "why_now": "WTI -11.6% за 5 дни е директен НЕГАТИВЕН catalyst за Murphy USA — fuel retailer с газостанции. При по-ниски бензинови цени, retail fuel margins могат да се компресират или consumers купуват по-малко gallons стойностно (дори при same volume). EPS +156.2% YoY е изключителен, но analyst target $566.89 е значително под текущата цена $622.53 — пазарът е надминал консенсуса. Цената е 2.13% под pivot, обемът е нисък. Macro headwind + слаб технически setup + overpriced спрямо консенсус = clear pass.",
+    "business_bg": "Murphy USA оперира верига от бензиностанции и convenience stores предимно в Southeast, Southwest и Midwest САЩ под брандовете Murphy USA, Murphy Express и QuickChek. Бизнесът е тясно свързан с retail fuel margins и convenience merchandise sales. Основният revenue driver е fuel volume при Walmart-adjacent локации.",
     "catalysts": [
-     "EPS ръст 156.2% YoY — изключителен momentum при earnings на 29.07.2026 (45 дни)",
-     "ROE 80.3% — изключителна капиталова ефективност с активен buyback програм",
-     "Convenience store сегментът расте независимо от fuel цени",
-     "P/E 21.6 е разумен за 156% EPS ръст компания"
+     "EPS +156.2% YoY показва значително оперативно подобрение — momentum може да продължи",
+     "ROE 80.3% е изключително висок — капитал-ефективен бизнес модел с buyback потенциал"
     ],
     "risks": [
-     "Analyst target 566.89 е ЗНАЧИТЕЛНО под текущата цена 622.53 — консенсусът е мечи",
-     "2.13% под pivot 636.05 — не е близо до пробив зона",
-     "Петролният спад намалява fuel margin и инвеститорския sentiment към fuel retailers",
-     "IV rank 100 с IV 65.5 — опциите са изключително скъпи"
+     "WTI -11.6% за 5 дни директно притиска retail fuel margins — core business headwind",
+     "Analyst target $566.89 е ~9% под текущата цена — значителен downside риск от mean reversion към консенсус",
+     "Consumer Cyclical не е в активната секторна логика при Offensive режим",
+     "Base depth 28.5% + 2.13% под pivot + нисък обем = слаб технически setup без trigger"
     ],
-    "earnings_call": "преди earnings — earnings на 29.07.2026 само 45 дни, акцията е 2.13% под pivot, analyst target е под цената. Влизане сега означава earnings риск без технически потвърждение.",
+    "earnings_call": "след earnings — earnings на 29.07.2026 (45 дни), но trade не е препоръчан.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай earnings на 29.07 и реакцията след тях. При pozitiven earnings surprise и пробив над 636.05 с обем 1.5x+ — активирай. Analyst target трябва да бъде ревизиран нагоре."
+    "watchlist_trigger": "Изчакай: (1) WTI стабилизация и retail margin recovery evidence, (2) analyst target revision над $640+, (3) breakout над $636.05 с обем >1.5x средния. При текущия WTI headwind позицията е неоправдана."
    }
   },
   {
@@ -1154,23 +1153,23 @@
    "markers": [],
    "ai": {
     "ticker": "IBKR",
-    "why_now": "XLF сектор, capital markets — VIX под 20 и нормализиране на trading условията са директно pozitiver за IBKR trading desk revenue. RS status е new_high (единственият в листата) — истинска относителна сила. Проблемът: 2.46% под pivot 93.10, deep base 31.7% и analyst target 88.27 е ПОД текущата цена. Earnings на 14.07.2026 само 30 дни — влизане сега е earnings рулетка.",
-    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, предоставящ execution, clearing и settlement на акции, опции, фючърси, forex, облигации и криптовалути. Обслужва hedge funds, RIA-та, introducing brokers и индивидуални инвеститори глобално. Известен с изключително ниски комисиони и технологично превъзходство.",
+    "why_now": "XLF секторна логика: capital markets broker директно бенефицира от Offensive пазарен режим (по-висок trading volume), Fed Net Liquidity ↑ (margin lending growth) и VIX 17.68 (умерена volatility = активно trading). RS е new_high — най-силният RS сигнал в листата. Фундаментите са солидни (EPS +25.4%, ROE 23.6%). Проблем: deep base 31.7%, цената е 2.46% под pivot, analyst target $88.27 е под текущата цена $90.81 — консенсусът е bearish. Earnings на 14.07 са само 30 дни (~21 работни дни) — граничен случай за blackout.",
+    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, предоставящ execution, clearing и settlement на акции, опции, фючърси, forex, облигации и криптовалути в глобален мащаб. Обслужва hedge funds, RIAs, proprietary trading groups и retail инвеститори. Известен с ниски комисионни и технологично превъзхождаща платформа.",
     "catalysts": [
-     "RS status new_high е силен институционален сигнал — относителна сила спрямо пазара",
-     "Нарастващ брой retail и institutional клиенти на платформата (global expansion)",
-     "VIX нормализиране увеличава trading volume и commissions",
-     "EPS ръст 25.4%, ROE 23.6% са солидни фундаменти"
+     "RS new_high е най-силният технически сигнал — институциите вече rotират в акцията",
+     "Offensive пазарен режим директно увеличава trading volumes → commission revenue",
+     "VIX 17.68 е optimal range за брокери — достатъчна volatility за active trading без fear-driven paralysis",
+     "Fed Net Liquidity ↑ → margin lending book expansion → net interest income growth"
     ],
     "risks": [
-     "Earnings на 14.07.2026 само 30 дни — автоматичен Watchlist по правилата",
-     "Analyst target 88.27 е ПОД текущата цена 90.81 — консенсусът не подкрепя upside",
-     "2.46% под pivot при deep base 31.7% — значителна дистанция до breakout зона",
-     "P/E 39 е висок за financial services при риск от VIX spike"
+     "Earnings на 14.07.2026 (30 дни, ~21 работни дни) — приближаване към blackout; binary earnings risk ако trade се задържи",
+     "Analyst target $88.27 е под текущата цена — пазарът е над консенсуса, downside revision риск",
+     "Deep base 31.7% + 2.46% под pivot — значително разстояние до trigger; може да не достигне pivot преди earnings",
+     "Flash crash или market structure event (черен лебед за брокери) е tail risk с immediate impact"
     ],
-    "earnings_call": "не сега — earnings на 14.07.2026 са само 30 дни, което е в рамките на earnings blackout правилото. Автоматично Watchlist.",
+    "earnings_call": "преди earnings — earnings на 14.07.2026, само 30 дни. Ако влизаш, планирай изход НЕ по-късно от 07.07 (5 работни дни преди). Краткият прозорец намалява привлекателността на trade-а.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай earnings на 14.07 и реакцията след тях. При pozitiven surprise и пробив над 93.10 с обем 1.5x+ и analyst target upgrade над 95 — активирай позиция."
+    "watchlist_trigger": "Изчакай: (1) breakout над $93.10 с обем >1.5x средния в рамките на следващите 10 работни дни (преди blackout), (2) само при volume confirmation — deep base с RS new_high може да explode нагоре. Ако breakout не дойде до 01.07, пропускай заради earnings proximity."
    }
   },
   {
@@ -1264,23 +1263,22 @@
    "markers": [],
    "ai": {
     "ticker": "CAT",
-    "why_now": "Industrials сектор — не е в активната секторна логика. Акцията е 3.83% под pivot 946.83 — далеч от breakout зона. Analyst target 944.10 е практически на pivot нивото — консенсусът не вижда значителен upside след пробива. EPS ръст 27.3%, revenue ръст 22.2% и ROE 51.3% са excellent фундаменти, но timing е лош при офанзивен режим фаворизиращ tech/semis.",
-    "business_bg": "Caterpillar е световен лидер в производството на строителна и минна техника, промишлени двигатели и локомотиви. Оперира в три сегмента: Construction Industries, Resource Industries и Energy & Transportation. Приходите са глобално диверсифицирани с голяма cyclical exposure към infrastructure spending и commodity cycles.",
+    "why_now": "Industrials не е в активната секторна логика. CAT е тясно свързан с global construction и mining capex — macro tailwinds са mixed: WTI -11.6% намалява energy sector capex (mining equipment demand), DXY +0.22% е минимален headwind за exports. Техническият setup е слаб: 3.83% под pivot е значително разстояние, volume ratio 0.83, breakout_volume false. Analyst target $944.10 е под pivot $946.83 — същият проблем като при ROK. EPS и revenue ръстовете са солидни, но контекстът не е правилен.",
+    "business_bg": "Caterpillar е глобален лидер в производството на строителна и минна техника, индустриални двигатели и дизел-електрически локомотиви. Оперира в три сегмента: Construction Industries, Resource Industries и Energy & Transportation. Приходите са диверсифицирани географски с over 50% извън САЩ.",
     "catalysts": [
-     "Infrastructure spending в САЩ (IIJA funds) осигурява secular demand",
-     "Earnings на 04.08.2026 (51 дни) — достатъчен runway",
-     "Глобален commodity и mining capex цикъл при стабилизиране на петрола",
-     "ROE 51.3% и силен FCF generation поддържат buybacks и дивидент"
+     "Infrastructure spending в САЩ (IIJA funding) — multi-year structural demand",
+     "EPS +27.3% и Revenue +22.2% YoY показват силен operational momentum",
+     "Earnings на 04.08.2026 (51 дни) — Q2 beat може да trigger breakout attempt"
     ],
     "risks": [
-     "3.83% под pivot — най-далеч от breakout сред всички кандидати",
-     "Analyst target 944.10 е само 3.7% над pivot — минимален reward",
-     "Trade war/tariff риск при CAT global supply chain е директна заплаха",
-     "Industrials не е в активната секторна логика — капиталови потоци са насочени другаде"
+     "Analyst target $944.10 е под pivot $946.83 — влизането в breakout е над консенсусния target",
+     "WTI -11.6% намалява mining sector capex планове → Equipment order slowdown риск",
+     "3.83% под pivot е значително — изисква 4%+ рали само за да достигне entry точката",
+     "China slowdown риск — значителна exposure към Asia Pacific construction market"
     ],
-    "earnings_call": "след earnings — 51 дни runway, но setup-ът е слаб поради дистанцията от pivot и sector positioning.",
+    "earnings_call": "след earnings — 51 дни до 04.08.2026, но setup не е препоръчан при текущия режим и технически позиционирания.",
     "classification": "Watchlist",
-    "watchlist_trigger": "Затваряне над 946.83 с обем минимум 50% над средния. Нужен е macro catalyst (infrastructure announcement или China stimulus) за да оправдае entry. При липса — пропусни в полза на SMH/XLK имена."
+    "watchlist_trigger": "Изчакай: (1) Industrials влезе в активната секторна логика, (2) analyst target revision над $960+, (3) цена консолидира близо до pivot и breakout с обем >1.5x средния. Текущото разстояние от pivot и sectoral misalignment изключват Action при сегашния режим."
    }
   }
  ],
@@ -1618,7 +1616,1428 @@
   "high_zone": 90,
   "current": null
  },
- "superinvestor_moves": [],
+ "superinvestor_moves": [
+  {
+   "ticker": "AXP",
+   "company": "AMERICAN EXPRESS CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 45087984892.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "KO",
+   "company": "COCA COLA CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 21501063540.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 10
+  },
+  {
+   "ticker": "AAPL",
+   "company": "APPLE INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 20471924668.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 12
+  },
+  {
+   "ticker": "OCCIDENTAL PET",
+   "company": "OCCIDENTAL PETE CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 17221193015.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BANK AMERICA C",
+   "company": "BANK AMERICA CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 15151500000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 9
+  },
+  {
+   "ticker": "CHEVRON CORPOR",
+   "company": "CHEVRON CORPORATION",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 12052286868.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 4
+  },
+  {
+   "ticker": "GGLBP",
+   "company": "ALPHABET INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 11871367661.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway",
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 7
+  },
+  {
+   "ticker": "CHUBB LTD SWIT",
+   "company": "CHUBB LTD SWITZ",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 11162836215.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "KHC",
+   "company": "KRAFT HEINZ CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 7323527057.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MOODYS CORP",
+   "company": "MOODYS CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 5507110938.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "DAL",
+   "company": "DELTA AIR LINES INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2646532635.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SIRIUSXM HOLDI",
+   "company": "SIRIUSXM HOLDINGS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2511616999.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "BROOKFIELD COR",
+   "company": "BROOKFIELD CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2415946008.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AMZN",
+   "company": "AMAZON COM INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2385104083.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square",
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "DVA",
+   "company": "DAVITA INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2324865095.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "UBER",
+   "company": "UBER TECHNOLOGIES INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2154934398.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MSFT",
+   "company": "MICROSOFT CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2092970053.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "VERISIGN INC",
+   "company": "VERISIGN INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1991085480.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "KR",
+   "company": "KROGER CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1972335334.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 5
+  },
+  {
+   "ticker": "RESTAURANT BRA",
+   "company": "RESTAURANT BRANDS INTL INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1673501194.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square",
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "META",
+   "company": "META PLATFORMS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1522358404.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HHH",
+   "company": "HOWARD HUGHES HOLDINGS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1192581569.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NEW YORK TIMES",
+   "company": "NEW YORK TIMES CO MTN BE",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1150997376.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "PLTR",
+   "company": "PALANTIR TECHNOLOGIES INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 912100000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LENNAR CORP",
+   "company": "LENNAR CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 877052911.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "NUE",
+   "company": "NUCOR CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 660686383.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NTRA",
+   "company": "Natera Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 612691000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CAPITAL ONE FI",
+   "company": "CAPITAL ONE FINL CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 560750962.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "LLYVK",
+   "company": "LIBERTY LIVE HOLDINGS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 518318636.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 8
+  },
+  {
+   "ticker": "ALLY FINL INC",
+   "company": "ALLY FINL INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 498992850.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 6
+  },
+  {
+   "ticker": "LOUISIANA PAC ",
+   "company": "LOUISIANA PAC CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 316092130.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "INSM",
+   "company": "Insmed Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 188717000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NVIDIA CORPORA",
+   "company": "NVIDIA CORPORATION",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 186580000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": false,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TAIWAN SEMICON",
+   "company": "Taiwan Semiconductor Manufac",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 167380000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES INC",
+   "company": "Ishares Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 162313000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "INVESCO EXCHAN",
+   "company": "Invesco Exchange Traded Fd T",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 157566000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PFE",
+   "company": "PFIZER INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 152880000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "YPF",
+   "company": "Ypf Sociedad Anonima",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 149566000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TBBB",
+   "company": "Bbb Foods Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 109972000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SEAPORT ENTMT ",
+   "company": "SEAPORT ENTMT GROUP INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 107910794.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AA",
+   "company": "Alcoa Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 99057000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NEWAMSTERDAM P",
+   "company": "Newamsterdam Pharma Company",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 98275000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STZ",
+   "company": "CONSTELLATION BRANDS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 94933500.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SE",
+   "company": "Sea Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 91083000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STMICROELECTRO",
+   "company": "Stmicroelectronics N V",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 90275000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WWD",
+   "company": "Woodward Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 75648000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NVR",
+   "company": "NVR INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 73226191.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TEVA PHARMACEU",
+   "company": "Teva Pharmaceutical Inds Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 71604000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ROKU",
+   "company": "Roku Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 70983000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HERTZ GLOBAL H",
+   "company": "HERTZ GLOBAL HLDGS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 70261595.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HAL",
+   "company": "HALLIBURTON CO",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 61500000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AVGO",
+   "company": "Broadcom Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 60650000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STATE STR SPDR",
+   "company": "State Str Spdr S&P 500 Etf T",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 58531000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CPNG",
+   "company": "Coupang Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 50362000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "OPCH",
+   "company": "Option Care Health Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 50301000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CRH PLC",
+   "company": "Crh Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 39689000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "FIGURE TECHNOL",
+   "company": "Figure Technology Solutio",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 39057000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "GLOBAL X FDS",
+   "company": "Global X Fds",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 36152000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CAI",
+   "company": "Caris Life Sciences Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 33873000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "RVMDW",
+   "company": "Revolution Medicines Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 30717000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "M",
+   "company": "MACYS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 30067914.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "LSCC",
+   "company": "Lattice Semiconductor Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 29974000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SNDK",
+   "company": "Sandisk Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 24241000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "UNITED AIRLS H",
+   "company": "United Airls Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 24168000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MOH",
+   "company": "MOLINA HEALTHCARE INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 23920000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HUM",
+   "company": "Humana Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 23842000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WABTEC",
+   "company": "Wabtec",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 23715000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TWLO",
+   "company": "Twilio Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 22869000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JBL",
+   "company": "Jabil Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 21835000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SCCO",
+   "company": "Southern Copper Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20964000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES S&P GS",
+   "company": "Ishares S&P Gsci Commodity-",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20737000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LIN",
+   "company": "Linde Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20425000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SEAGATE TECHNO",
+   "company": "Seagate Technology Hldngs Pl",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19862000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES TR",
+   "company": "Ishares Tr",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19592000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CLEVELAND-CLIF",
+   "company": "Cleveland-Cliffs Inc New",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19549000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NUVB",
+   "company": "Nuvation Bio Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19476000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BE",
+   "company": "Bloom Energy Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 18470000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "INTC",
+   "company": "Intel Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 18155000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JEFFERIES FINA",
+   "company": "JEFFERIES FINANCIAL GROUP IN",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 17892939.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LULU",
+   "company": "LULULEMON ATHLETICA INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 17793000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BELITE BIO INC",
+   "company": "Belite Bio Inc Sponsored",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16917000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PTGX",
+   "company": "Protagonist Therapeutics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16832000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "U",
+   "company": "Unity Software Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16209000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ARM HOLDINGS P",
+   "company": "Arm Holdings Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16142000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "OLMA",
+   "company": "Olema Pharmaceuticals Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 14714000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "Q",
+   "company": "Qnity Electronics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 14498000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ADMA",
+   "company": "Adma Biologics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 13926000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "XENE",
+   "company": "Xenon Pharmaceuticals Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 13875000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SLMBP",
+   "company": "SLM CORP",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 13287895.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BRKRP",
+   "company": "BRUKER CORP",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 13137181.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JBS",
+   "company": "Jbs N.V.",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 11780000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "DAKTRONICS INC",
+   "company": "Daktronics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 11000000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NET",
+   "company": "Cloudflare Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10840000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LYB",
+   "company": "Lyondellbasell Industries Nv",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10588000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "VSOGF",
+   "company": "Vista Energy S.A.B. De C.V.",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10166000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TWST",
+   "company": "Twist Bioscience Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9789000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "COHR",
+   "company": "Coherent Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9624000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CLS",
+   "company": "Celestica Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9373000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STUBHUB HLDGS ",
+   "company": "Stubhub Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 8531000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "DBV TECHNOLOGI",
+   "company": "Dbv Technologies S A Sponsored",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 8008000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MU",
+   "company": "Micron Technology Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 7905000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SATS",
+   "company": "Echostar Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 7114000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ALMONTY INDS I",
+   "company": "Almonty Inds Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 6804000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PCTTW",
+   "company": "Purecycle Technologies Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4999000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LUMENTUM HLDGS",
+   "company": "Lumentum Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4893000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MELI",
+   "company": "Mercadolibre  Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4782000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SOLSTICE ADVAN",
+   "company": "Solstice Advanced Matls Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4762000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WESTLAKE CORPO",
+   "company": "Westlake Corporation",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 2476000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WVE",
+   "company": "Wave Life Sciences Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 1254000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  }
+ ],
  "magic_formula_top": [
   {
    "ticker": "ADBE",
