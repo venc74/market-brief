@@ -1,0 +1,35 @@
+{
+ "date": "2026-06-14",
+ "rows": [
+  {
+   "ticker": "AIQUY",
+   "company": "Air Liquide S.A ADR",
+   "date": "2026-06-09",
+   "ratio": "10%",
+   "split_type": null,
+   "date_human": "Jun 09, 2026",
+   "price": 39.03,
+   "market_cap": 124211069378.42178
+  },
+  {
+   "ticker": "HBIA",
+   "company": "Hills Bancorporation",
+   "date": "2026-06-09",
+   "ratio": "2:1",
+   "split_type": "normal",
+   "date_human": "Jun 09, 2026",
+   "price": 99.01,
+   "market_cap": 1730270678.492157
+  },
+  {
+   "ticker": "KLAC",
+   "company": "KLA Corporation",
+   "date": "2026-06-12",
+   "ratio": "10:1",
+   "split_type": "normal",
+   "date_human": "Jun 12, 2026",
+   "price": 254.54,
+   "market_cap": 332499283183.2417
+  }
+ ]
+}
