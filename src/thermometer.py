@@ -160,3 +160,39 @@ if __name__ == "__main__":
     from macro_layer import collect_macro_layer
     print(json.dumps(build_thermometer(collect_macro_layer()),
                      indent=2, ensure_ascii=False, default=str))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# v2 НАДСТРОЙКА · Секция 6 — NAAIM исторически прозорец (52 седмици)
+# naaim_exposure() по-горе чете само последната стойност. Тук връщаме цялата
+# поредица за chart в dashboard-а, с маркери за зоните <30 (дъно) и >90 (опасно).
+# Additive — съществуващите функции не са пипани.
+# ══════════════════════════════════════════════════════════════════════════
+def naaim_history(weeks: int | None = None) -> dict:
+    """
+    Връща {points: [{date, value}], low_zone: 30, high_zone: 90, current}.
+    Контрарианска логика: <30 = buy zone, >90 = caution. Празно при провал.
+    """
+    weeks = weeks or config.NAAIM_HISTORY_WEEKS
+    url = "https://naaim.org/wp-content/uploads/data/USE_Data_since_Inception.csv"
+    out = {"points": [], "low_zone": 30, "high_zone": 90, "current": None}
+    try:
+        r = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        r.raise_for_status()
+        import csv
+        rows = list(csv.reader(io.StringIO(r.text)))
+        pts = []
+        for row in rows:
+            if len(row) >= 2:
+                try:
+                    val = float(row[1])
+                except ValueError:
+                    continue
+                pts.append({"date": row[0].strip(), "value": round(val, 1)})
+        pts = pts[-weeks:]
+        out["points"] = pts
+        if pts:
+            out["current"] = pts[-1]["value"]
+    except Exception as e:
+        print(f"[thermo] NAAIM history failed: {e}")
+    return out

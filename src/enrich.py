@@ -15,6 +15,9 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
+# v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
+from src import magic_formula, borrow_data, unusual_options, splits_calendar, dataroma
+
 
 # ──────────────────────────────────────────────────────────────────────────
 # Earnings (Секция 3.2 + правило за blackout от Секция 8)
@@ -174,10 +177,108 @@ def short_interest_view(row: dict) -> dict:
     return {"short_pct_float": spf, "days_to_cover": dtc, "interpretation": interp}
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# v2 надстройка — глобални cross-check множества (строят се веднъж на пускане)
+# ──────────────────────────────────────────────────────────────────────────
+def _build_crosscheck_sets() -> dict:
+    """
+    Тегли веднъж скъпите/глобални източници. Всеки е обвит в toggle + try/except
+    за graceful degradation (Секция 7): провал на един източник не убива брифа.
+    """
+    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}}
+    if config.ENABLE_MAGIC_FORMULA:
+        try:
+            sets["mf"] = magic_formula.top_set()
+        except Exception as e:
+            print(f"[enrich] magic_formula skipped: {e}")
+    if config.ENABLE_UNUSUAL_OPTIONS:
+        try:
+            sets["uov"] = unusual_options.unusual_set()
+        except Exception as e:
+            print(f"[enrich] unusual_options skipped: {e}")
+    if config.ENABLE_SPLITS_CALENDAR:
+        try:
+            sets["splits"] = splits_calendar.splits_map()
+        except Exception as e:
+            print(f"[enrich] splits_calendar skipped: {e}")
+    if config.ENABLE_DATAROMA:
+        try:
+            sets["si"] = dataroma.superinvestor_map()
+        except Exception as e:
+            print(f"[enrich] dataroma skipped: {e}")
+    return sets
+
+
+def _apply_markers(row: dict, sets: dict) -> None:
+    """Слага визуалните convergence маркери MF✓ / UOV✓ / SPLIT✓ върху картата."""
+    sym = row["ticker"]
+    markers = row.setdefault("markers", [])
+
+    if sym in sets["mf"]:
+        markers.append({"tag": "MF✓", "title": "Magic Formula топ — потвърждение от втори независим метод (Greenblatt)."})
+
+    uov = sets["uov"].get(sym)
+    if uov:
+        bias = uov.get("call_put_bias")
+        suffix = " (calls)" if bias == "calls" else " (puts)" if bias == "puts" else ""
+        markers.append({"tag": f"UOV✓{suffix}", "title": uov.get("note", "Необичаен опционен обем днес.")})
+
+    sp = sets["splits"].get(sym)
+    if sp:
+        ratio = f" {sp['ratio']}" if sp.get("ratio") else ""
+        markers.append({"tag": "SPLIT✓", "title": f"Предстоящ сплит{ratio} на {sp.get('date', '—')}."})
+        # запазваме детайла; инжектира се в катализаторите СЛЕД AI merge (виж main.py)
+        row["_split_catalyst"] = (
+            f"Предстоящ stock split{ratio} ({sp.get('date', 'скоро')}) — момент на momentum.")
+
+    si = sets["si"].get(sym)
+    if si:
+        who = ", ".join(dict.fromkeys(si.get("managers", [])))  # уникални, запазен ред
+        val = f" · ${si['value']:,.0f}" if si.get("value") else ""
+        n = si.get("count", 1)
+        tag = "SI✓" if n == 1 else f"SI✓×{n}"
+        markers.append({"tag": tag,
+                        "title": f"Superinvestor покупка ({si.get('action', 'Buy')}){val}: {who}"})
+
+
+def inject_split_catalysts(candidates: list[dict]) -> list[dict]:
+    """
+    Извиква се в main.py СЛЕД ai_brief.merge_narratives — добавя споменаване на
+    предстоящ сплит в катализаторите на картата (Секция 3.4). Отделено от
+    _apply_markers, защото при enrich() ключът 'ai' още не съществува.
+    """
+    for row in candidates:
+        mention = row.pop("_split_catalyst", None)
+        if mention and isinstance(row.get("ai"), dict):
+            row["ai"].setdefault("catalysts", [])
+            if mention not in row["ai"]["catalysts"]:
+                row["ai"]["catalysts"].append(mention)
+    return candidates
+
+
 def enrich(candidates: list[dict]) -> list[dict]:
+    sets = _build_crosscheck_sets()
+
     for row in candidates:
         sym = row["ticker"]
         row["earnings"] = earnings_info(sym)
         row["options"] = options_info(sym, row["price"])
         row["short_view"] = short_interest_view(row)
+
+        # 3.2 borrow rate → влиза в short_view секцията
+        if config.ENABLE_BORROW_DATA:
+            try:
+                borrow = borrow_data.borrow_info(sym)
+            except Exception as e:
+                print(f"[enrich] borrow {sym}: {e}")
+                borrow = {"available": False}
+            row["borrow"] = borrow
+            if borrow.get("available") and borrow.get("interpretation"):
+                row["short_view"]["borrow"] = borrow["interpretation"]
+        else:
+            row["borrow"] = {"available": False}
+
+        # 3.1 / 3.3 / 3.4 convergence маркери
+        _apply_markers(row, sets)
+
     return candidates

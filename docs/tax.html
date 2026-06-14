@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Данъчен калкулатор · реализирани печалби (DE / BG)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b1220; --panel: #111a2e; --panel-2: #16203a; --line: #233252;
+    --text: #d9e1f2; --muted: #8593b3;
+    --de: #60a5fa;       /* Германия — синьо */
+    --bg: #34d399;       /* България — зелено */
+    --gain: #34d399; --loss: #f87171; --warn: #fbbf24;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--ink); color: var(--text);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 15px; line-height: 1.55; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 80px; }
+
+  header { border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(96,165,250,.10), transparent 70%); padding: 36px 0 26px; }
+  .header-inner { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  h1 { font-family: "Spectral", serif; font-size: 27px; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 13.5px; margin-top: 6px; max-width: 640px; }
+  .privacy { display: inline-block; margin-top: 12px; font-size: 12px; color: var(--bg);
+    border: 1px solid rgba(52,211,153,.4); border-radius: 4px; padding: 4px 10px; }
+
+  section { margin-top: 36px; }
+  h2 { font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 18px; }
+  h2::before { content: "// "; color: var(--de); }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .row + .row { margin-top: 14px; }
+
+  button, .btn { background: var(--de); color: var(--ink); border: none; border-radius: 6px;
+    padding: 10px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif; }
+  button:hover { filter: brightness(1.08); }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button.ghost:hover { border-color: var(--de); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  input[type="number"], input[type="text"], select {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 6px; padding: 8px 10px; font-family: "IBM Plex Mono", monospace;
+    font-size: 14px; color-scheme: dark; }
+  label { font-size: 13px; color: var(--muted); }
+  label.inline { display: inline-flex; align-items: center; gap: 7px; color: var(--text); cursor: pointer; }
+  input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--de); }
+
+  .drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 28px; text-align: center;
+    color: var(--muted); transition: border-color .15s, background .15s; cursor: pointer; }
+  .drop.hot { border-color: var(--de); background: rgba(96,165,250,.07); color: var(--text); }
+  .drop b { color: var(--text); }
+  .small { font-size: 12.5px; color: var(--muted); }
+  .mt8 { margin-top: 8px; } .mt16 { margin-top: 16px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .gain { color: var(--gain); } .loss { color: var(--loss); }
+  .tbl-scroll { overflow-x: auto; }
+  tr.err td { color: var(--loss); }
+
+  /* Двойната присъда — сигнатурата на инструмента */
+  .verdicts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .verdicts { grid-template-columns: 1fr; } }
+  .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .verdict .top { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex;
+    justify-content: space-between; align-items: baseline; }
+  .verdict.de .top { background: rgba(96,165,250,.10); }
+  .verdict.bg .top { background: rgba(52,211,153,.10); }
+  .verdict .flag { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase; }
+  .verdict.de .flag { color: var(--de); } .verdict.bg .flag { color: var(--bg); }
+  .verdict .net { font-family: "IBM Plex Mono", monospace; font-size: 26px; font-weight: 600; }
+  .verdict .body { padding: 16px 20px; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; padding: 5px 0;
+    border-bottom: 1px dotted var(--line); font-size: 13.5px; }
+  .kv:last-child { border-bottom: none; }
+  .kv b { font-family: "IBM Plex Mono", monospace; font-weight: 500; }
+  .kv.total { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); border-bottom: none; font-size: 15px; }
+
+  /* Freistellungsauftrag — gauge */
+  .gauge { height: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .gauge > span { display: block; height: 100%; background: linear-gradient(90deg, var(--bg), var(--de)); width: 0; transition: width .3s; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 18px; font-size: 12px; color: var(--muted); }
+  a { color: var(--de); }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    header, .no-print, .drop, footer a { display: none !important; }
+    .card, .verdict { border-color: #ccc; background: #fff; }
+    h2 { color: #444; } .mono, .num { color: #111; }
+    .verdict.de .top { background: #eef4ff; } .verdict.bg .top { background: #ecfdf5; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Данъчен калкулатор · реализирани печалби</h1>
+    <div class="sub">Импортирай сделките си като CSV, изчисли реализирана печалба/загуба по FIFO
+      и виж две данъчни присъди едновременно — германска (Abgeltungsteuer) и българска. ECB курсове
+      се теглят автоматично по датата на сделката.</div>
+    <span class="privacy">🔒 Всичко се смята в браузъра. Сделките ти не напускат устройството.</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 1. ИМПОРТ -->
+  <section>
+    <h2>1 · Импорт на сделки</h2>
+    <div class="card">
+      <div id="drop" class="drop">
+        <b>Пусни CSV тук</b> или кликни да избереш файл.<br>
+        <span class="small">Колони: <span class="mono">date, ticker, action, shares, price, currency, exchange_rate, eu_exempt</span></span>
+        <input type="file" id="file" accept=".csv,text/csv" hidden>
+      </div>
+      <div class="row mt16 no-print">
+        <button id="sample" class="ghost">Зареди примерни данни</button>
+        <button id="fetch-all" class="ghost" disabled>Изтегли липсващите ECB курсове</button>
+        <span class="small" id="parse-msg"></span>
+      </div>
+      <div class="small mt16">
+        <b>Формат на колоните:</b>
+        <span class="mono">action</span> = buy / sell / dividend ·
+        <span class="mono">currency</span> = USD / EUR / … ·
+        <span class="mono">exchange_rate</span> = EUR за 1 единица валута (празно → авто от ECB) ·
+        <span class="mono">eu_exempt</span> = true за EU/EEA регулиран пазар (0% BG).
+      </div>
+    </div>
+
+    <div id="trades-wrap" class="card mt16" hidden>
+      <div class="tbl-scroll">
+        <table id="trades-table">
+          <thead><tr>
+            <th>Дата</th><th>Тикър</th><th>Действие</th><th class="num">Бр.</th>
+            <th class="num">Цена</th><th>Вал.</th><th class="num">FX (EUR)</th>
+            <th class="num">EUR ст-ст</th><th>EU</th><th class="no-print"></th>
+          </tr></thead>
+          <tbody id="trades-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. НАСТРОЙКИ -->
+  <section>
+    <h2>2 · Данъчни настройки</h2>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="freibetrag">Freistellungsauftrag (€/година)</label><br>
+          <input type="number" id="freibetrag" value="1000" min="0" step="1" style="width:120px" class="mt8">
+        </div>
+        <div>
+          <label class="inline mt8"><input type="checkbox" id="kirche"> Kirchensteuer</label><br>
+          <select id="kirche-rate" class="mt8" disabled>
+            <option value="0.09">9% (повечето провинции)</option>
+            <option value="0.08">8% (Bayern / Baden-Württemberg)</option>
+          </select>
+        </div>
+        <div>
+          <label for="year">Данъчна година (филтър)</label><br>
+          <select id="year" class="mt8"><option value="">всички</option></select>
+        </div>
+      </div>
+      <div class="small mt16">
+        Германия: Abgeltungsteuer 25% + Solidaritätszuschlag 5,5% = <b>26,375%</b> ефективно (без църковен данък).
+        Печалбите и загубите от акции се нетират за годината; данък се дължи само над необлагаемия минимум.
+        България: <b>10%</b> за non-EU акции, <b>0%</b> за EU/EEA регулиран пазар (<span class="mono">eu_exempt=true</span>),
+        <b>5%</b> за дивиденти.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. ПРИСЪДА -->
+  <section id="result-section" hidden>
+    <h2>3 · Двойна данъчна присъда</h2>
+    <div class="verdicts">
+      <div class="verdict de">
+        <div class="top"><span class="flag">🇩🇪 Германия</span><span class="net mono" id="de-net">—</span></div>
+        <div class="body">
+          <div class="kv"><span>Реализирана печалба (нетна)</span><b id="de-gain">—</b></div>
+          <div class="kv"><span>Дивиденти</span><b id="de-div">—</b></div>
+          <div class="kv"><span>Необлагаем минимум използван</span><b id="de-frei">—</b></div>
+          <div class="gauge"><span id="de-gauge"></span></div>
+          <div class="kv mt16"><span>Облагаема основа</span><b id="de-base">—</b></div>
+          <div class="kv"><span>Abgeltungsteuer (25%)</span><b id="de-kapest">—</b></div>
+          <div class="kv"><span>Solidaritätszuschlag</span><b id="de-soli">—</b></div>
+          <div class="kv"><span>Kirchensteuer</span><b id="de-kirche">—</b></div>
+          <div class="kv total"><span>Дължим данък</span><b class="loss" id="de-tax">—</b></div>
+        </div>
+      </div>
+      <div class="verdict bg">
+        <div class="top"><span class="flag">🇧🇬 България</span><span class="net mono" id="bg-net">—</span></div>
+        <div class="body">
+          <div class="kv"><span>Печалба non-EU (10%)</span><b id="bg-noneu">—</b></div>
+          <div class="kv"><span>Печалба EU/EEA (0%)</span><b id="bg-eu">—</b></div>
+          <div class="kv"><span>Дивиденти (5%)</span><b id="bg-div">—</b></div>
+          <div class="kv mt16"><span>Данък върху печалби</span><b id="bg-cgt">—</b></div>
+          <div class="kv"><span>Данък върху дивиденти</span><b id="bg-divtax">—</b></div>
+          <div class="kv total"><span>Дължим данък</span><b class="loss" id="bg-tax">—</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt16 no-print">
+      <button id="export-csv" class="ghost">Свали CSV отчет</button>
+      <button id="print">Печат / PDF</button>
+    </div>
+  </section>
+
+  <!-- 4. РАЗБИВКИ -->
+  <section id="breakdown-section" hidden>
+    <h2>4 · Разбивка по тикър</h2>
+    <div class="card tbl-scroll">
+      <table><thead><tr>
+        <th>Тикър</th><th class="num">Реализирана P/L (EUR)</th><th class="num">Дивиденти (EUR)</th>
+        <th>EU/EEA</th><th class="num">Продадени лотове</th>
+      </tr></thead><tbody id="by-ticker"></tbody></table>
+    </div>
+    <h2 class="mt16" style="margin-top:32px">Разбивка по месец</h2>
+    <div class="card tbl-scroll">
+      <table><thead><tr>
+        <th>Месец</th><th class="num">Реализирана P/L (EUR)</th><th class="num">Дивиденти (EUR)</th>
+      </tr></thead><tbody id="by-month"></tbody></table>
+    </div>
+
+    <h2 class="mt16" style="margin-top:32px">Реализирани продажби (FIFO)</h2>
+    <div class="card tbl-scroll">
+      <table><thead><tr>
+        <th>Дата</th><th>Тикър</th><th class="num">Бр.</th><th class="num">Купено @ (EUR)</th>
+        <th class="num">Продадено @ (EUR)</th><th class="num">P/L (EUR)</th>
+      </tr></thead><tbody id="realized"></tbody></table>
+    </div>
+  </section>
+
+  <footer>
+    Само за информационни цели — не е данъчна консултация. Изчисленията са опростени (нетиране на
+    печалби/загуби от акции за годината, без пренос на загуби между години, без отчитане на
+    Teilfreistellung за фондове). За официална декларация се консултирай със счетоводител.
+    ECB курсове: <a href="https://www.frankfurter.app" target="_blank" rel="noopener">frankfurter.app</a>.
+  </footer>
+</div>
+
+<script>
+"use strict";
+// ════════════════════════════════════════════════════════════════════════
+// Състояние
+// ════════════════════════════════════════════════════════════════════════
+var TRADES = [];   // {date, ticker, action, shares, price, currency, exchange_rate, eu_exempt, _err}
+var RESULT = null; // последното изчисление (за експорт)
+
+var $ = function (id) { return document.getElementById(id); };
+var fmt = function (n) { return (n == null || isNaN(n)) ? "—" :
+  n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; };
+var cls = function (n) { return n > 0 ? "gain" : n < 0 ? "loss" : ""; };
+
+// Малък persist на настройките (по желание, не на сделките)
+try {
+  var s = JSON.parse(localStorage.getItem("tax_settings") || "{}");
+  if (s.freibetrag != null) $("freibetrag").value = s.freibetrag;
+  if (s.kirche) { $("kirche").checked = true; $("kirche-rate").disabled = false; }
+  if (s.kircheRate) $("kirche-rate").value = s.kircheRate;
+} catch (e) {}
+function saveSettings() {
+  try {
+    localStorage.setItem("tax_settings", JSON.stringify({
+      freibetrag: $("freibetrag").value, kirche: $("kirche").checked, kircheRate: $("kirche-rate").value }));
+  } catch (e) {}
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// CSV парсване (поддържа кавички и запетаи в полета)
+// ════════════════════════════════════════════════════════════════════════
+function parseCSV(text) {
+  var rows = [], row = [], field = "", inQ = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (field !== "" || row.length) { row.push(field); rows.push(row); row = []; field = ""; }
+        if (c === "\r" && text[i + 1] === "\n") i++;
+      } else field += c;
+    }
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function loadTradesFromCSV(text) {
+  var rows = parseCSV(text).filter(function (r) { return r.some(function (c) { return c.trim() !== ""; }); });
+  if (!rows.length) { $("parse-msg").textContent = "Празен файл."; return; }
+  var header = rows[0].map(function (h) { return h.trim().toLowerCase(); });
+  var idx = {};
+  ["date", "ticker", "action", "shares", "price", "currency", "exchange_rate", "eu_exempt"].forEach(function (k) {
+    idx[k] = header.indexOf(k);
+  });
+  if (idx.date < 0 || idx.ticker < 0 || idx.action < 0) {
+    $("parse-msg").textContent = "Липсват задължителни колони (date, ticker, action).";
+    return;
+  }
+  TRADES = rows.slice(1).map(function (r) {
+    var get = function (k) { return idx[k] >= 0 ? (r[idx[k]] || "").trim() : ""; };
+    var t = {
+      date: get("date"),
+      ticker: get("ticker").toUpperCase(),
+      action: get("action").toLowerCase(),
+      shares: parseFloat(get("shares")) || 0,
+      price: parseFloat(get("price")) || 0,
+      currency: (get("currency") || "EUR").toUpperCase(),
+      exchange_rate: get("exchange_rate") === "" ? null : parseFloat(get("exchange_rate")),
+      eu_exempt: /^(true|1|да|yes)$/i.test(get("eu_exempt")),
+      _err: null,
+    };
+    if (t.currency === "EUR" && t.exchange_rate == null) t.exchange_rate = 1;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(t.date)) t._err = "невалидна дата (очаквам ГГГГ-ММ-ДД)";
+    if (["buy", "sell", "dividend"].indexOf(t.action) < 0) t._err = "action трябва да е buy/sell/dividend";
+    return t;
+  });
+  $("parse-msg").textContent = TRADES.length + " сделки заредени.";
+  renderTrades();
+  populateYears();
+  $("fetch-all").disabled = false;
+  compute();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ECB курс по дата (frankfurter.app) — авто, без ръчно въвеждане
+// ════════════════════════════════════════════════════════════════════════
+function fetchRate(trade) {
+  if (trade.currency === "EUR") { trade.exchange_rate = 1; return Promise.resolve(1); }
+  var url = "https://api.frankfurter.app/" + trade.date + "?from=" + trade.currency + "&to=EUR";
+  return fetch(url).then(function (r) {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }).then(function (j) {
+    var rate = j && j.rates && j.rates.EUR;
+    if (!rate) throw new Error("няма курс");
+    trade.exchange_rate = rate;
+    return rate;
+  });
+}
+
+function fetchAllRates() {
+  var missing = TRADES.filter(function (t) { return t.exchange_rate == null && !t._err; });
+  if (!missing.length) { $("parse-msg").textContent = "Всички курсове са налични."; return; }
+  $("fetch-all").disabled = true;
+  $("parse-msg").textContent = "Тегля " + missing.length + " ECB курса…";
+  // последователно, за да не заливаме API-то
+  var i = 0;
+  (function next() {
+    if (i >= missing.length) {
+      $("parse-msg").textContent = "ECB курсове изтеглени.";
+      $("fetch-all").disabled = false; renderTrades(); compute(); return;
+    }
+    fetchRate(missing[i]).catch(function (e) { missing[i]._err = "ECB курс неуспешен: " + e.message; })
+      .then(function () { i++; next(); });
+  })();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// Рендер на таблицата със сделки (с per-row Fetch ECB бутон)
+// ════════════════════════════════════════════════════════════════════════
+function eurValue(t) {
+  if (t.exchange_rate == null) return null;
+  return t.shares * t.price * t.exchange_rate;
+}
+function renderTrades() {
+  $("trades-wrap").hidden = TRADES.length === 0;
+  var body = $("trades-body"); body.innerHTML = "";
+  TRADES.forEach(function (t, i) {
+    var tr = document.createElement("tr");
+    if (t._err) tr.className = "err";
+    var ev = eurValue(t);
+    var fetchBtn = (t.currency !== "EUR" && t.exchange_rate == null)
+      ? '<button class="ghost" data-fetch="' + i + '" style="padding:4px 10px;font-size:12px">ECB курс</button>' : "";
+    tr.innerHTML =
+      "<td class='mono'>" + t.date + "</td>" +
+      "<td class='mono'>" + t.ticker + "</td>" +
+      "<td>" + t.action + "</td>" +
+      "<td class='num'>" + t.shares + "</td>" +
+      "<td class='num'>" + t.price.toFixed(2) + "</td>" +
+      "<td>" + t.currency + "</td>" +
+      "<td class='num'>" + (t.exchange_rate != null ? t.exchange_rate.toFixed(4) : "—") + "</td>" +
+      "<td class='num'>" + (ev != null ? fmt(ev) : "—") + "</td>" +
+      "<td>" + (t.eu_exempt ? "✓" : "") + "</td>" +
+      "<td class='no-print'>" + (t._err ? t._err : fetchBtn) + "</td>";
+    body.appendChild(tr);
+  });
+  body.querySelectorAll("[data-fetch]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var t = TRADES[+b.dataset.fetch];
+      b.disabled = true; b.textContent = "…";
+      fetchRate(t).then(function () { renderTrades(); compute(); })
+        .catch(function (e) { t._err = "ECB неуспешен"; renderTrades(); });
+    });
+  });
+}
+
+function populateYears() {
+  var years = {};
+  TRADES.forEach(function (t) { if (/^\d{4}/.test(t.date)) years[t.date.slice(0, 4)] = 1; });
+  var sel = $("year"); var cur = sel.value;
+  sel.innerHTML = '<option value="">всички</option>';
+  Object.keys(years).sort().forEach(function (y) {
+    var o = document.createElement("option"); o.value = y; o.textContent = y; sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// FIFO + данъчна логика
+// ════════════════════════════════════════════════════════════════════════
+function compute() {
+  var yearFilter = $("year").value;
+  var usable = TRADES.filter(function (t) {
+    return !t._err && t.exchange_rate != null && (!yearFilter || t.date.slice(0, 4) === yearFilter);
+  });
+  // сортиране по дата за коректен FIFO
+  usable = usable.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+
+  var lots = {};         // ticker -> [{shares, costEur, date}]
+  var realized = [];     // {date, ticker, shares, buyEur, sellEur, pl, eu_exempt}
+  var dividends = [];    // {date, ticker, amountEur, eu_exempt}
+
+  usable.forEach(function (t) {
+    var pxEur = t.price * t.exchange_rate;
+    if (t.action === "buy") {
+      (lots[t.ticker] = lots[t.ticker] || []).push({ shares: t.shares, costEur: pxEur, date: t.date });
+    } else if (t.action === "dividend") {
+      dividends.push({ date: t.date, ticker: t.ticker, amountEur: t.shares * pxEur, eu_exempt: t.eu_exempt });
+    } else if (t.action === "sell") {
+      var remaining = t.shares;
+      var q = lots[t.ticker] || [];
+      while (remaining > 0 && q.length) {
+        var lot = q[0];
+        var matched = Math.min(remaining, lot.shares);
+        var pl = (pxEur - lot.costEur) * matched;
+        realized.push({ date: t.date, ticker: t.ticker, shares: matched,
+          buyEur: lot.costEur, sellEur: pxEur, pl: pl, eu_exempt: t.eu_exempt });
+        lot.shares -= matched; remaining -= matched;
+        if (lot.shares <= 1e-9) q.shift();
+      }
+      if (remaining > 1e-6) {
+        // продажба без налична позиция (липсва buy в данните) — третираме базата като 0
+        realized.push({ date: t.date, ticker: t.ticker, shares: remaining,
+          buyEur: 0, sellEur: pxEur, pl: pxEur * remaining, eu_exempt: t.eu_exempt, _orphan: true });
+      }
+    }
+  });
+
+  // агрегати
+  var totalPL = realized.reduce(function (s, r) { return s + r.pl; }, 0);
+  var plEU = realized.filter(function (r) { return r.eu_exempt; }).reduce(function (s, r) { return s + r.pl; }, 0);
+  var plNonEU = totalPL - plEU;
+  var divTotal = dividends.reduce(function (s, d) { return s + d.amountEur; }, 0);
+
+  // ── Германия ──────────────────────────────────────────────────────────
+  var frei = Math.max(0, parseFloat($("freibetrag").value) || 0);
+  var deIncome = totalPL + divTotal;                 // акции + дивиденти в общия Topf
+  var freiUsed = Math.min(Math.max(deIncome, 0), frei);
+  var deBase = Math.max(0, deIncome - frei);
+  var ki = $("kirche").checked ? parseFloat($("kirche-rate").value) : 0;
+  // точна формула с приспадане на църковния данък
+  var kapest = deBase * 0.25 / (1 + 0.25 * ki);
+  var soli = 0.055 * kapest;
+  var kirche = ki * kapest;
+  var deTax = kapest + soli + kirche;
+  var deNet = deIncome - deTax;
+
+  // ── България ──────────────────────────────────────────────────────────
+  var bgGainNonEU = Math.max(0, plNonEU);            // печалбите се облагат, загубите не дават кредит тук
+  var bgCGT = bgGainNonEU * 0.10;
+  var bgDivTax = Math.max(0, divTotal) * 0.05;
+  var bgTax = bgCGT + bgDivTax;
+  var bgNet = (totalPL + divTotal) - bgTax;
+
+  RESULT = { usable: usable, realized: realized, dividends: dividends,
+    totalPL: totalPL, plEU: plEU, plNonEU: plNonEU, divTotal: divTotal,
+    de: { income: deIncome, frei: frei, freiUsed: freiUsed, base: deBase,
+          kapest: kapest, soli: soli, kirche: kirche, tax: deTax, net: deNet, ki: ki },
+    bg: { gainNonEU: bgGainNonEU, gainEU: Math.max(0, plEU), cgt: bgCGT,
+          divTax: bgDivTax, tax: bgTax, net: bgNet } };
+
+  renderResult();
+  renderBreakdowns();
+}
+
+function setText(id, val, klass) {
+  var el = $(id); el.textContent = val;
+  el.className = el.className.replace(/\b(gain|loss)\b/g, "").trim();
+  if (klass) el.classList.add(klass);
+}
+
+function renderResult() {
+  if (!TRADES.length) return;
+  $("result-section").hidden = false;
+  var de = RESULT.de, bg = RESULT.bg;
+
+  setText("de-net", fmt(de.net), cls(de.net));
+  setText("de-gain", fmt(RESULT.totalPL), cls(RESULT.totalPL));
+  setText("de-div", fmt(RESULT.divTotal));
+  setText("de-frei", fmt(de.freiUsed) + " / " + fmt(de.frei));
+  $("de-gauge").style.width = (de.frei > 0 ? Math.min(100, de.freiUsed / de.frei * 100) : 0) + "%";
+  setText("de-base", fmt(de.base));
+  setText("de-kapest", fmt(de.kapest));
+  setText("de-soli", fmt(de.soli));
+  setText("de-kirche", de.ki ? fmt(de.kirche) : "—");
+  setText("de-tax", fmt(de.tax), "loss");
+
+  setText("bg-net", fmt(bg.net), cls(bg.net));
+  setText("bg-noneu", fmt(RESULT.plNonEU), cls(RESULT.plNonEU));
+  setText("bg-eu", fmt(RESULT.plEU) + " · 0%");
+  setText("bg-div", fmt(RESULT.divTotal));
+  setText("bg-cgt", fmt(bg.cgt), "loss");
+  setText("bg-divtax", fmt(bg.divTax), "loss");
+  setText("bg-tax", fmt(bg.tax), "loss");
+}
+
+function renderBreakdowns() {
+  if (!RESULT.realized.length && !RESULT.dividends.length) { $("breakdown-section").hidden = true; return; }
+  $("breakdown-section").hidden = false;
+
+  // по тикър
+  var byT = {};
+  RESULT.realized.forEach(function (r) {
+    var o = byT[r.ticker] = byT[r.ticker] || { pl: 0, div: 0, eu: r.eu_exempt, lots: 0 };
+    o.pl += r.pl; o.lots++; o.eu = o.eu || r.eu_exempt;
+  });
+  RESULT.dividends.forEach(function (d) {
+    var o = byT[d.ticker] = byT[d.ticker] || { pl: 0, div: 0, eu: d.eu_exempt, lots: 0 };
+    o.div += d.amountEur;
+  });
+  var tbT = $("by-ticker"); tbT.innerHTML = "";
+  Object.keys(byT).sort().forEach(function (k) {
+    var o = byT[k];
+    tbT.innerHTML += "<tr><td class='mono'>" + k + "</td>" +
+      "<td class='num " + cls(o.pl) + "'>" + fmt(o.pl) + "</td>" +
+      "<td class='num'>" + fmt(o.div) + "</td>" +
+      "<td>" + (o.eu ? "✓" : "") + "</td>" +
+      "<td class='num'>" + o.lots + "</td></tr>";
+  });
+
+  // по месец
+  var byM = {};
+  RESULT.realized.forEach(function (r) { var m = r.date.slice(0, 7); (byM[m] = byM[m] || { pl: 0, div: 0 }).pl += r.pl; });
+  RESULT.dividends.forEach(function (d) { var m = d.date.slice(0, 7); (byM[m] = byM[m] || { pl: 0, div: 0 }).div += d.amountEur; });
+  var tbM = $("by-month"); tbM.innerHTML = "";
+  Object.keys(byM).sort().forEach(function (m) {
+    var o = byM[m];
+    tbM.innerHTML += "<tr><td class='mono'>" + m + "</td>" +
+      "<td class='num " + cls(o.pl) + "'>" + fmt(o.pl) + "</td>" +
+      "<td class='num'>" + fmt(o.div) + "</td></tr>";
+  });
+
+  // реализирани продажби
+  var tbR = $("realized"); tbR.innerHTML = "";
+  RESULT.realized.forEach(function (r) {
+    tbR.innerHTML += "<tr><td class='mono'>" + r.date + "</td>" +
+      "<td class='mono'>" + r.ticker + (r._orphan ? " ⚠" : "") + "</td>" +
+      "<td class='num'>" + r.shares + "</td>" +
+      "<td class='num'>" + r.buyEur.toFixed(2) + "</td>" +
+      "<td class='num'>" + r.sellEur.toFixed(2) + "</td>" +
+      "<td class='num " + cls(r.pl) + "'>" + fmt(r.pl) + "</td></tr>";
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// Експорт
+// ════════════════════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!RESULT) return;
+  var L = [];
+  L.push("Отчет реализирани печалби;генериран;" + new Date().toISOString().slice(0, 10));
+  L.push("");
+  L.push("ОБОБЩЕНИЕ;EUR");
+  L.push("Реализирана печалба (нетна);" + RESULT.totalPL.toFixed(2));
+  L.push("в т.ч. EU/EEA;" + RESULT.plEU.toFixed(2));
+  L.push("в т.ч. non-EU;" + RESULT.plNonEU.toFixed(2));
+  L.push("Дивиденти;" + RESULT.divTotal.toFixed(2));
+  L.push("");
+  L.push("ГЕРМАНИЯ;EUR");
+  L.push("Облагаема основа;" + RESULT.de.base.toFixed(2));
+  L.push("Abgeltungsteuer;" + RESULT.de.kapest.toFixed(2));
+  L.push("Soli;" + RESULT.de.soli.toFixed(2));
+  L.push("Kirchensteuer;" + RESULT.de.kirche.toFixed(2));
+  L.push("Дължим данък DE;" + RESULT.de.tax.toFixed(2));
+  L.push("Нетно след данък DE;" + RESULT.de.net.toFixed(2));
+  L.push("");
+  L.push("БЪЛГАРИЯ;EUR");
+  L.push("Данък печалби (10% non-EU);" + RESULT.bg.cgt.toFixed(2));
+  L.push("Данък дивиденти (5%);" + RESULT.bg.divTax.toFixed(2));
+  L.push("Дължим данък BG;" + RESULT.bg.tax.toFixed(2));
+  L.push("Нетно след данък BG;" + RESULT.bg.net.toFixed(2));
+  L.push("");
+  L.push("РЕАЛИЗИРАНИ ПРОДАЖБИ");
+  L.push("дата;тикър;брой;купено_EUR;продадено_EUR;PL_EUR");
+  RESULT.realized.forEach(function (r) {
+    L.push([r.date, r.ticker, r.shares, r.buyEur.toFixed(2), r.sellEur.toFixed(2), r.pl.toFixed(2)].join(";"));
+  });
+  var blob = new Blob(["\ufeff" + L.join("\n")], { type: "text/csv;charset=utf-8" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "danachen-otchet-" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// Примерни данни
+// ════════════════════════════════════════════════════════════════════════
+var SAMPLE = [
+  "date,ticker,action,shares,price,currency,exchange_rate,eu_exempt",
+  "2026-01-15,AAPL,buy,10,185.50,USD,0.92,false",
+  "2026-02-03,AAPL,buy,10,178.20,USD,0.88,false",
+  "2026-03-20,AAPL,sell,15,210.00,USD,0.91,false",
+  "2026-02-10,SAP,buy,20,145.00,EUR,1,true",
+  "2026-04-12,SAP,sell,20,162.50,EUR,1,true",
+  "2026-03-01,MSFT,dividend,30,0.83,USD,0.90,false",
+  "2026-05-05,BTU,buy,50,22.40,USD,0.89,false",
+  "2026-06-01,BTU,sell,50,19.10,USD,0.93,false",
+].join("\n");
+
+// ════════════════════════════════════════════════════════════════════════
+// Свързване на UI
+// ════════════════════════════════════════════════════════════════════════
+var drop = $("drop"), fileInput = $("file");
+drop.addEventListener("click", function () { fileInput.click(); });
+fileInput.addEventListener("change", function (e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader(); r.onload = function () { loadTradesFromCSV(r.result); }; r.readAsText(f);
+});
+["dragenter", "dragover"].forEach(function (ev) {
+  drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("hot"); });
+});
+["dragleave", "drop"].forEach(function (ev) {
+  drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("hot"); });
+});
+drop.addEventListener("drop", function (e) {
+  var f = e.dataTransfer.files[0]; if (!f) return;
+  var r = new FileReader(); r.onload = function () { loadTradesFromCSV(r.result); }; r.readAsText(f);
+});
+
+$("sample").addEventListener("click", function () { loadTradesFromCSV(SAMPLE); });
+$("fetch-all").addEventListener("click", fetchAllRates);
+$("export-csv").addEventListener("click", exportCSV);
+$("print").addEventListener("click", function () { window.print(); });
+$("kirche").addEventListener("change", function () {
+  $("kirche-rate").disabled = !this.checked; saveSettings(); compute();
+});
+["freibetrag", "kirche-rate", "year"].forEach(function (id) {
+  $(id).addEventListener("change", function () { saveSettings(); compute(); });
+});
+</script>
+</body>
+</html>

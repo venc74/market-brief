@@ -3,3 +3,9 @@ pandas>=2.0
 requests>=2.31
 jinja2>=3.1
 lxml>=5.0
+# v2 надстройка — по-устойчиво HTML парсване за новите скрейпъри
+# (pandas.read_html ползва lxml, но bs4+html5lib са fallback при счупен HTML)
+beautifulsoup4>=4.12
+html5lib>=1.1
+# news_aggregator — устойчив RSS/Atom парсър
+feedparser>=6.0

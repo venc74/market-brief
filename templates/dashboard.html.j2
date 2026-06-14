@@ -113,6 +113,116 @@
   .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
     border-top: 1px dotted var(--line); padding-top: 8px; }
 
+  /* ── v2: convergence маркери ── */
+  .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
+  .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
+    color: var(--regime); border: 1px solid var(--regime); cursor: help; }
+  .watch-card .markers { margin-left: 8px; }
+  .borrow { font-size: 13px; color: var(--text); margin-top: 6px;
+    padding-top: 6px; border-top: 1px dotted var(--line); }
+  .borrow b { color: var(--yellow); }
+
+  /* ── v2: thesis monitor ── */
+  .theses { display: grid; gap: 12px; }
+  .thesis { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; border-left: 3px solid var(--line); }
+  .thesis.active { border-left-color: var(--green); }
+  .thesis.structural { border-left-color: var(--regime); }
+  .thesis.watch { border-left-color: var(--muted); }
+  .thesis-head { display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; }
+  .thesis-name { font-weight: 600; font-size: 15px; }
+  .thesis-status { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
+  .thesis-status.active { color: var(--green); background: rgba(52,211,153,.12); }
+  .thesis-status.structural { color: var(--regime); background: var(--regime-dim); }
+  .thesis-status.watch { color: var(--muted); background: rgba(133,147,179,.12); }
+  .thesis-tickers { font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: var(--regime); margin-top: 6px; }
+  .thesis-chain { font-size: 13.5px; color: var(--text); margin-top: 8px; }
+  .thesis-trigger { font-size: 12.5px; color: var(--green); margin-top: 6px; }
+
+  /* ── v2: signal таблици (unusual options / splits) ── */
+  .signal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .signal-chip { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; }
+  .signal-chip .sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; }
+  .signal-chip.calls .sym { color: var(--green); }
+  .signal-chip.puts .sym { color: var(--red); }
+  .signal-chip .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .signal-chip .in-screen { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
+    color: var(--regime); margin-top: 4px; }
+
+  /* ── v2: Superinvestor Moves ── */
+  .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .si-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .si-card.in-screen { border-color: var(--regime); box-shadow: 0 0 0 1px var(--regime-dim); }
+  .si-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .si-sym { font-family: "IBM Plex Mono", monospace; font-size: 17px; font-weight: 600; color: var(--text); }
+  .si-val { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--green); }
+  .si-action { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
+  .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
+
+  /* ── news_aggregator: Значими новини ── */
+  .news-list { display: grid; gap: 10px; }
+  .news-item { display: flex; gap: 12px; align-items: flex-start;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+  .news-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--regime); margin-top: 8px; }
+  .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
+  .news-why { font-size: 13.5px; color: var(--muted); }
+
+  /* ── Magic Formula Top 10 ── */
+  .mf-table { width: 100%; border-collapse: collapse; }
+  .mf-table th, .mf-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .mf-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+  .mf-table td.n, .mf-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .mf-table .sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .mf-table tr.in-screen .sym { color: var(--green); }
+  .mf-rank { display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center;
+    border-radius: 50%; background: var(--regime-dim); color: var(--regime);
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+
+  /* ── iborrowdesk search box ── */
+  .borrow-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .borrow-search { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .borrow-search input { background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 6px; padding: 9px 12px; font-family: "IBM Plex Mono", monospace; font-size: 14px;
+    text-transform: uppercase; width: 140px; color-scheme: dark; }
+  .borrow-search button { background: var(--regime); color: var(--ink); border: none; border-radius: 6px;
+    padding: 9px 18px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: "IBM Plex Sans", sans-serif; }
+  .borrow-search button:hover { filter: brightness(1.08); }
+  #borrow-result { margin-top: 14px; font-size: 14px; }
+  #borrow-result .bd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 6px; }
+  #borrow-result .bd-cell { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+  #borrow-result .bd-cell .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  #borrow-result .bd-cell .val { font-family: "IBM Plex Mono", monospace; font-size: 17px; margin-top: 3px; }
+  #borrow-result .hot { color: var(--red); } #borrow-result .ok { color: var(--green); }
+  #borrow-msg { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+  /* ── v2: NAAIM 52-седмичен chart ── */
+  .naaim-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  .naaim-legend { display: flex; gap: 18px; font-size: 12px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+  .naaim-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
+  /* ── v2: исторически календар ── */
+  .calendar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
+  .calendar label { font-size: 13px; color: var(--muted); }
+  .calendar input[type="date"] { background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 14px; color-scheme: dark; }
+  .calendar button { background: var(--regime); color: var(--ink); border: none;
+    border-radius: 6px; padding: 9px 18px; font-weight: 600; font-size: 13px; cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif; }
+  .calendar button:hover { filter: brightness(1.08); }
+  .calendar .hint { font-size: 12px; color: var(--muted); }
+  #history-frame { width: 100%; border: 1px solid var(--line); border-radius: 8px;
+    margin-top: 16px; height: 0; transition: height .2s; background: var(--ink); }
+  #history-msg { font-size: 13px; color: var(--yellow); margin-top: 10px; }
+
   footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px;
     font-size: 12px; color: var(--muted); }
   @media (prefers-reduced-motion: no-preference) {
@@ -151,6 +261,21 @@
   </div>
 </section>
 
+{% if news %}
+<section>
+  <h2>Значими новини · последните 24ч</h2>
+  <div class="news-list">
+    {% for n in news %}
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">{{ n.headline }}</span>
+        {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 <section>
   <h2>Макро бриф</h2>
   <div class="prose">{{ macro_brief }}
@@ -176,13 +301,34 @@
   </div>
 </section>
 
+{% if theses %}
+<section>
+  <h2>Геополитически тези · мониторинг</h2>
+  <div class="theses">
+    {% for th in theses %}
+    <div class="thesis {{ th.status }}">
+      <div class="thesis-head">
+        <span class="thesis-name">{{ th.name }}</span>
+        <span class="thesis-status {{ th.status }}">{{ "активна" if th.status == "active" else "структурна" if th.status == "structural" else "наблюдава се" }}</span>
+      </div>
+      <div class="thesis-tickers">{{ th.tickers|join("  ·  ") }}</div>
+      <div class="thesis-chain">{{ th.chain }}</div>
+      {% if th.trigger_reason %}<div class="thesis-trigger">▲ Тригер активен: {{ th.trigger_reason }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 <section>
   <h2>Action · {{ action|length }} тикъра</h2>
   {% for st in action %}
   {% set p = st.plan %}
   <div class="stock-card">
     <div class="stock-head">
-      <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company }} · {{ st.sector }}</span></div>
+      <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company }} · {{ st.sector }}</span>
+        {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
+      </div>
       <div class="price-tag">${{ st.price }} <span style="color:var(--muted);font-size:13px">pivot ${{ st.pivot }} ({{ st.pct_from_pivot }}%)</span></div>
     </div>
     <div class="stock-body">
@@ -198,6 +344,7 @@
         {% if st.ai.warning %}<p class="warn">⚠ {{ st.ai.warning }}</p>{% endif %}
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">{{ st.short_view.interpretation }}</div>
+        {% if st.short_view.borrow %}<div class="borrow"><b>Borrow:</b> {{ st.short_view.borrow }}</div>{% endif %}
         <h3>Опции</h3>
         <div class="kv"><span>IV / IVR</span><b>{{ st.options.iv or "—" }}% / {{ st.options.iv_rank or "—" }}{% if st.options.iv_rank_quality %} ({{ st.options.iv_rank_quality }}){% endif %}</b></div>
         <div class="kv"><span>P/C ratio</span><b>{{ st.options.put_call_ratio or "—" }}</b></div>
@@ -245,12 +392,136 @@
     <div class="watch-card">
       <span class="ticker">{{ st.ticker }}</span>
       <span class="company">{{ st.company }}</span>
+      {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
       <p>{{ st.ai.why_now }}</p>
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}
         · зона ${{ (st.pivot * 0.98)|round(2) }}–${{ (st.pivot * 1.02)|round(2) }}</div>
     </div>
     {% endfor %}
   </div>
+</section>
+
+{% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
+
+{% if magic_formula_top %}
+<section>
+  <h2>Magic Formula Top 10 Today</h2>
+  <div class="card" style="padding:6px 4px">
+    <table class="mf-table">
+      <thead><tr><th class="n">#</th><th>Тикър</th><th>Компания</th>
+        <th class="n">Earnings Yield</th><th class="n">ROC</th></tr></thead>
+      <tbody>
+        {% for r in magic_formula_top[:10] %}
+        <tr class="{{ 'in-screen' if r.ticker in our_tickers else '' }}">
+          <td class="n"><span class="mf-rank">{{ loop.index }}</span></td>
+          <td class="sym">{{ r.ticker }}{% if r.ticker in our_tickers %} <span title="Magic Formula + CANSLIM" style="color:var(--regime)">MF✓</span>{% endif %}</td>
+          <td style="color:var(--muted)">{{ r.name }}</td>
+          <td class="n">{{ "%.1f%%"|format(r.earnings_yield * 100) }}</td>
+          <td class="n">{{ "%.1f%%"|format(r.roc * 100) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:10px">
+    Greenblatt: евтино (Earnings Yield = EBIT/EV) × качествено (ROC). Независим от CANSLIM —
+    зелено + <b>MF✓</b> означава съвпадение с нашия технически скрийнър (конвергенция стойност × моментум).
+  </div>
+</section>
+{% endif %}
+
+{% if unusual_options %}
+<section>
+  <h2>Unusual Options Yesterday</h2>
+  <div class="signal-grid">
+    {% for u in unusual_options %}
+    <div class="signal-chip {{ u.call_put_bias or '' }}">
+      <div class="sym">{{ u.ticker }}</div>
+      <div class="note">{{ u.note }}</div>
+      {% if u.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if splits %}
+<section>
+  <h2>Предстоящи сплитове · този месец</h2>
+  <div class="signal-grid">
+    {% for s in splits %}
+    <div class="signal-chip">
+      <div class="sym">{{ s.ticker }}</div>
+      <div class="note">{{ s.ratio or "—" }}{% if s.date %} · {{ s.date }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if superinvestor_moves %}
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  <div class="si-grid">
+    {% for s in superinvestor_moves[:5] %}
+    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
+      </div>
+      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
+    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  </div>
+</section>
+{% endif %}
+
+{% if naaim_history and naaim_history.points %}
+<section>
+  <h2>NAAIM Exposure · последните {{ naaim_history.points|length }} седмици</h2>
+  <div class="naaim-wrap">
+    <svg id="naaim-chart" viewBox="0 0 1000 240" preserveAspectRatio="none"
+         style="width:100%;height:200px" role="img" aria-label="NAAIM Exposure Index график"></svg>
+    <div class="naaim-legend">
+      <span><i style="background:rgba(52,211,153,.35)"></i>Под 30 — buy zone (контрариански оптимизъм)</span>
+      <span><i style="background:rgba(248,113,113,.35)"></i>Над 90 — caution (еуфория)</span>
+      <span>Текуща стойност: <b class="mono">{{ naaim_history.current }}</b></span>
+    </div>
+  </div>
+  <script type="application/json" id="naaim-data">{{ naaim_history|tojson }}</script>
+</section>
+{% endif %}
+
+<section>
+  <h2>Borrow Rate · търсене на тикър</h2>
+  <div class="borrow-box">
+    <div class="borrow-search">
+      <input type="text" id="borrow-input" placeholder="напр. GME" maxlength="6"
+             autocomplete="off" spellcheck="false">
+      <button id="borrow-btn" type="button">Провери</button>
+      <span class="small" style="color:var(--muted)">данни на живо от iborrowdesk (Interactive Brokers)</span>
+    </div>
+    <div id="borrow-result"></div>
+    <div id="borrow-msg"></div>
+  </div>
+</section>
+
+<section>
+  <h2>Исторически архив</h2>
+  <div class="calendar">
+    <label for="hist-date">Избери дата:</label>
+    <input type="date" id="hist-date">
+    <button id="hist-open" type="button">Отвори бриф</button>
+    <span class="hint" id="hist-avail">зареждам наличните дати…</span>
+  </div>
+  <div id="history-msg" hidden></div>
+  <iframe id="history-frame" title="Исторически бриф" hidden></iframe>
 </section>
 
 <footer>
@@ -261,5 +532,152 @@
 </footer>
 
 </div>
+<script>
+// ── NAAIM 52-седмичен chart (vanilla SVG, без външни библиотеки) ──────────
+(function () {
+  var el = document.getElementById("naaim-data");
+  var svg = document.getElementById("naaim-chart");
+  if (!el || !svg) return;
+  var data;
+  try { data = JSON.parse(el.textContent); } catch (e) { return; }
+  var pts = (data.points || []).filter(function (p) { return p.value != null; });
+  if (pts.length < 2) return;
+
+  var W = 1000, H = 240, padL = 34, padR = 10, padT = 10, padB = 22;
+  var minV = 0, maxV = 100;
+  var x = function (i) { return padL + (W - padL - padR) * i / (pts.length - 1); };
+  var y = function (v) { return padT + (H - padT - padB) * (1 - (v - minV) / (maxV - minV)); };
+  var css = getComputedStyle(document.documentElement);
+  var regime = css.getPropertyValue("--regime").trim() || "#fbbf24";
+  var line = css.getPropertyValue("--line").trim() || "#233252";
+  var muted = css.getPropertyValue("--muted").trim() || "#8593b3";
+  var NS = "http://www.w3.org/2000/svg";
+  function add(tag, attrs) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    svg.appendChild(n); return n;
+  }
+  // зони <30 (buy) и >90 (caution)
+  add("rect", { x: padL, y: y(30), width: W - padL - padR, height: y(0) - y(30), fill: "rgba(52,211,153,.16)" });
+  add("rect", { x: padL, y: y(100), width: W - padL - padR, height: y(90) - y(100), fill: "rgba(248,113,113,.16)" });
+  // мрежа + етикети 0/30/50/90/100
+  [0, 30, 50, 90, 100].forEach(function (v) {
+    add("line", { x1: padL, y1: y(v), x2: W - padR, y2: y(v), stroke: line, "stroke-width": 1 });
+    var t = add("text", { x: 4, y: y(v) + 4, fill: muted, "font-size": 11, "font-family": "monospace" });
+    t.textContent = v;
+  });
+  // линия
+  var d = pts.map(function (p, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.value).toFixed(1); }).join(" ");
+  add("path", { d: d, fill: "none", stroke: regime, "stroke-width": 2 });
+  // маркери за екстремни седмици
+  pts.forEach(function (p, i) {
+    if (p.value < 30 || p.value > 90) {
+      add("circle", { cx: x(i), cy: y(p.value), r: 3, fill: p.value < 30 ? "#34d399" : "#f87171" });
+    }
+  });
+})();
+
+// ── Исторически календар: отваря docs/archive/<date>.html в iframe ────────
+(function () {
+  var input = document.getElementById("hist-date");
+  var btn = document.getElementById("hist-open");
+  var avail = document.getElementById("hist-avail");
+  var frame = document.getElementById("history-frame");
+  var msg = document.getElementById("history-msg");
+  if (!input || !btn) return;
+
+  var dates = [];
+  fetch("data/index.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (list) {
+      dates = Array.isArray(list) ? list.sort() : [];
+      if (dates.length) {
+        input.min = dates[0];
+        input.max = dates[dates.length - 1];
+        input.value = dates[dates.length - 1];
+        avail.textContent = dates.length + " налични дни (" + dates[0] + " → " + dates[dates.length - 1] + ")";
+      } else {
+        avail.textContent = "няма архивирани брифове все още";
+      }
+    })
+    .catch(function () { avail.textContent = "архивът е недостъпен"; });
+
+  function open() {
+    var d = input.value;
+    msg.hidden = true; frame.hidden = true; frame.style.height = "0";
+    if (!d) return;
+    if (dates.length && dates.indexOf(d) === -1) {
+      msg.hidden = false;
+      msg.textContent = "Няма бриф за " + d + " (уикенд, празник или извън архива).";
+      return;
+    }
+    frame.src = "archive/" + d + ".html";
+    frame.hidden = false;
+    frame.style.height = "1400px";
+  }
+  btn.addEventListener("click", open);
+})();
+
+// ── iborrowdesk borrow-rate търсене (директно от браузъра, без backend) ───
+(function () {
+  var input = document.getElementById("borrow-input");
+  var btn = document.getElementById("borrow-btn");
+  var out = document.getElementById("borrow-result");
+  var msg = document.getElementById("borrow-msg");
+  if (!input || !btn) return;
+
+  function cell(lbl, val, klass) {
+    return '<div class="bd-cell"><div class="lbl">' + lbl + '</div>' +
+           '<div class="val ' + (klass || "") + '">' + val + '</div></div>';
+  }
+
+  function render(sym, data) {
+    var series = data.daily || data.data || [];
+    if (!series.length) { msg.textContent = "Няма borrow данни за " + sym + "."; return; }
+    var latest = series[series.length - 1];
+    var fee = latest.fee, avail = latest.available;
+    var fees = series.slice(-5).map(function (s) { return s.fee; }).filter(function (x) { return x != null; });
+    var trend = fees.length < 2 ? "—" :
+      fees[fees.length - 1] > fees[0] ? "покачващ ▲" :
+      fees[fees.length - 1] < fees[0] ? "падащ ▼" : "стабилен";
+    var feeKlass = fee >= 50 ? "hot" : fee >= 20 ? "hot" : "ok";
+    // мини история на обема/наличието (последни ~10 записа)
+    var hist = series.slice(-10).map(function (s) {
+      return (s.available != null ? Number(s.available).toLocaleString("de-DE") : "—"); }).join(" · ");
+
+    out.innerHTML =
+      '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;margin-bottom:4px">' + sym + '</div>' +
+      '<div class="bd-grid">' +
+        cell("Borrow Rate", (fee != null ? fee.toFixed(2) + "%" : "—"), feeKlass) +
+        cell("Налични акции", (avail != null ? Number(avail).toLocaleString("de-DE") : "—")) +
+        cell("Тренд на fee", trend) +
+      '</div>' +
+      '<div class="small" style="color:var(--muted);margin-top:10px">Налично (последни записи): ' + hist + '</div>';
+    msg.textContent = fee >= 20
+      ? "Висок borrow rate — акцията е трудна/скъпа за шортиране, натиск върху шортистите."
+      : "Нормален borrow rate — евтино за шортиране, без особен squeeze натиск.";
+  }
+
+  function lookup() {
+    var sym = (input.value || "").trim().toUpperCase();
+    out.innerHTML = ""; msg.textContent = "";
+    if (!sym) return;
+    msg.textContent = "Зареждам " + sym + "…";
+    var api = "https://iborrowdesk.com/api/ticker/" + encodeURIComponent(sym);
+    // директно; при CORS блокаж — fallback през публичен CORS reader (премахни ако не искаш трета страна)
+    fetch(api)
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) { render(sym, d); })
+      .catch(function () {
+        return fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(api))
+          .then(function (r) { return r.json(); })
+          .then(function (d) { render(sym, d); })
+          .catch(function (e) { msg.textContent = "Неуспех за " + sym + " (възможен CORS блокаж или невалиден тикър)."; });
+      });
+  }
+  btn.addEventListener("click", lookup);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") lookup(); });
+})();
+</script>
 </body>
 </html>

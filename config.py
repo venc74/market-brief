@@ -65,3 +65,146 @@ SECTOR_ETFS = {
     "ITA": "Отбрана", "GDX": "Златодобив", "URA": "Уран/ядрена", "TAN": "Соларна",
     "SMH": "Полупроводници", "XBI": "Биотех", "KOL_PROXY_BTU": "Въглища (proxy)",
 }
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# v2 НАДСТРОЙКА — нови настройки (additive, нищо отгоре не е пипано)
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── 3.1 Magic Formula Cross-Check ────────────────────────────────────────
+MAGIC_FORMULA_TOP_N = int(os.getenv("MAGIC_FORMULA_TOP_N", 50))
+# Независим референтен универс за Magic Formula (за да е cross-check-ът наистина
+# независим от CANSLIM). Ликвидни large/mid-cap имена през сектори. Редактируем.
+MAGIC_FORMULA_UNIVERSE = [
+    "AAPL", "MSFT", "GOOGL", "META", "NVDA", "AMD", "AVGO", "ORCL", "ADBE",
+    "CRM", "INTC", "QCOM", "TXN", "MU", "AMAT", "MCHP", "CSCO", "IBM",
+    "JPM", "BAC", "WFC", "GS", "MS", "C", "AXP", "V", "MA", "PYPL",
+    "UNH", "JNJ", "PFE", "MRK", "ABBV", "LLY", "TMO", "ABT", "BMY",
+    "XOM", "CVX", "COP", "SLB", "OXY", "BTU", "LNG",
+    "CAT", "DE", "HON", "GE", "LMT", "RTX", "NOC", "BA",
+    "WMT", "COST", "HD", "LOW", "TGT", "MCD", "SBUX", "NKE", "PG", "KO", "PEP",
+    "DIS", "NFLX", "CMCSA", "T", "VZ", "TMUS",
+    "CCJ", "VST", "CEG", "F", "GM", "UPS", "FDX",
+]
+
+# ── 5. Геополитически тематични кошници (thesis monitor) ──────────────────
+# status: "active" — макро тригер е налице; "structural" — дългосрочен попътен
+# вятър без нужда от тригер; "watch" — следи се ръчно (законодателство/събитие).
+THESIS_BASKETS = [
+    {
+        "name": "Въглища и LNG",
+        "tickers": ["BTU", "HCC", "AMR", "CEIX", "TELL", "LNG"],
+        "default_status": "watch",
+        "trigger": "oil_shock",
+        "chain": ("Петролен шок или напрежение в Близкия изток → скок в цената на "
+                  "енергията → въглищата и LNG поемат търсенето, което петролът не "
+                  "може → маржовете на тези производители се разширяват рязко."),
+    },
+    {
+        "name": "Ядрена енергия",
+        "tickers": ["VST", "CEG", "OKLO", "CCJ", "DNN", "NNE"],
+        "default_status": "structural",
+        "trigger": None,
+        "chain": ("AI data center-ите гладуват за стабилна базова мощност 24/7 → "
+                  "ядрената е единственият въглеродно-неутрален източник, който я "
+                  "дава → дългосрочно търсене на уран и реакторни оператори."),
+    },
+    {
+        "name": "Отбрана и дронове",
+        "tickers": ["LMT", "RTX", "NOC", "SWMR"],
+        "default_status": "watch",
+        "trigger": "geopolitical_stress",
+        "chain": ("Геополитическа ескалация → държавите вдигат отбранителни бюджети → "
+                  "поръчки с многогодишен backlog за големите изпълнители → предвидим "
+                  "приходен поток независим от икономическия цикъл."),
+    },
+    {
+        "name": "Крипто регулация (CLARITY Act)",
+        "tickers": ["CRCL", "COIN", "HOOD", "BLSH"],
+        "default_status": "watch",
+        "trigger": None,
+        "chain": ("Ясна законодателна рамка (CLARITY Act) → институциите получават "
+                  "регулаторна сигурност → приток на капитал към регулирани крипто "
+                  "борси и custody → борсите и брокерите печелят на обем."),
+    },
+    {
+        "name": "Полупроводници и AI инфраструктура",
+        "tickers": ["AVGO", "AMAT", "MCHP"],
+        "default_status": "structural",
+        "trigger": None,
+        "chain": ("AI build-out → търсене не само на GPU, а на цялата верига: mature-"
+                  "node чипове, оборудване за производство, liquid cooling, мрежи и "
+                  "захранване → вторичните доставчици печелят с по-малко конкуренция."),
+    },
+    {
+        "name": "Финанси при стръмна крива",
+        "tickers": ["JPM", "BAC"],
+        "default_status": "watch",
+        "trigger": "curve_steepening",
+        "chain": ("Кривата се разкривява (дълъг край нагоре) → банките заемат евтино "
+                  "на късо и кредитират скъпо на дълго → нетният лихвен марж се "
+                  "разширява → пряко по-висока доходност за банковия сектор."),
+    },
+]
+
+# ── 6. NAAIM исторически прозорец ─────────────────────────────────────────
+NAAIM_HISTORY_WEEKS = int(os.getenv("NAAIM_HISTORY_WEEKS", 52))
+
+# ── Toggle-и за новите скрейпъри (за лесно изключване при проблем) ─────────
+ENABLE_MAGIC_FORMULA = os.getenv("ENABLE_MAGIC_FORMULA", "1") == "1"
+ENABLE_BORROW_DATA = os.getenv("ENABLE_BORROW_DATA", "1") == "1"
+ENABLE_UNUSUAL_OPTIONS = os.getenv("ENABLE_UNUSUAL_OPTIONS", "1") == "1"
+ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
+
+
+# ── Dataroma · Superinvestor Moves ────────────────────────────────────────
+# Минимална стойност на позицията, за да се брои „значима" покупка.
+DATAROMA_MIN_VALUE = float(os.getenv("DATAROMA_MIN_VALUE", 10_000_000))   # $10M
+# Ако True: при fallback към allact.php (без стойности) се отхвърлят редовете
+# без известна стойност. По подразбиране False — по-добре да видиш хода.
+DATAROMA_STRICT_VALUE = os.getenv("DATAROMA_STRICT_VALUE", "0") == "1"
+ENABLE_DATAROMA = os.getenv("ENABLE_DATAROMA", "1") == "1"
+# Кодове на superinvestors от URL-а на dataroma (/m/holdings.php?m=КОД).
+# ⚠ ВЕРИФИЦИРАЙ ги на сайта — при грешен код мениджърът тихо се пропуска.
+# Редактируем: добавяй/махай свободно. Ключ = код, стойност = четимо име.
+DATAROMA_MANAGERS = {
+    "BRK":      "Уорън Бъфет · Berkshire Hathaway",
+    "SAM":      "Майкъл Бъри · Scion Asset Management",
+    "DFO":      "Стенли Дракенмилър · Duquesne Family Office",
+    "psc":      "Бил Акман · Pershing Square",
+    "BAUPOST":  "Сет Кларман · Baupost Group",
+    "GR":       "Дейвид Айнхорн · Greenlight Capital",
+    "AKRE":     "Чък Акре · Akre Capital",
+    "AM":       "Дейвид Тепър · Appaloosa",
+}
+
+
+# ── news_aggregator + Tradier (нов модул + поправка) ──────────────────────
+ENABLE_NEWS = os.getenv("ENABLE_NEWS", "1") == "1"
+NEWS_RSS_FEEDS = {
+    "Reuters Business": "https://feeds.reuters.com/reuters/businessNews",
+    "Reuters World":    "https://feeds.reuters.com/Reuters/worldNews",
+    "Financial Times":  "https://www.ft.com/rss/home",
+    "CNBC":             "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+}
+NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "1") == "1"
+NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]
+# nitter инстанциите падат често — няколко за устойчивост (редактируем списък)
+NITTER_INSTANCES = [
+    "https://nitter.net",
+    "https://nitter.poast.org",
+    "https://nitter.privacydev.net",
+]
+
+# ── Tradier (primary source за unusual options; Market Chameleon = fallback) ─
+TRADIER_API_KEY = os.getenv("TRADIER_API_KEY", "")
+TRADIER_BASE = os.getenv("TRADIER_BASE", "https://api.tradier.com/v1")
+
+# Универс за Tradier unusual-options сканиране (option volume vs open interest).
+# По-малък = по-бързо/по-малко API calls. Редактируем.
+UNUSUAL_OPTIONS_UNIVERSE = [
+    "NVDA", "AMD", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "TSLA", "AVGO",
+    "PLTR", "COIN", "MSTR", "SMCI", "MARA", "RIOT", "SOFI", "NIO", "BABA",
+    "F", "BAC", "INTC", "MU", "CRM", "NFLX", "DIS",
+]
+UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  # vol/OI праг

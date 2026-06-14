@@ -143,3 +143,58 @@ def collect_macro_layer() -> dict:
 if __name__ == "__main__":
     import json
     print(json.dumps(collect_macro_layer(), indent=2, ensure_ascii=False))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# v2 НАДСТРОЙКА · Секция 5 — Thesis Monitor
+# Проверява дали текущите макро условия активират тематичните кошници от
+# config.THESIS_BASKETS и обяснява верижната логика. Additive — не пипа
+# съществуващите функции по-горе.
+# ══════════════════════════════════════════════════════════════════════════
+def _trigger_fires(trigger: str | None, macro: dict) -> tuple[bool, str]:
+    """Връща (активиран ли е тригерът, кратко обяснение защо)."""
+    if trigger is None:
+        return False, ""
+    g = macro.get("global_signals", {})
+    oil = (g.get("Oil_WTI") or {}).get("chg_5d_pct")
+    gold = (g.get("Gold") or {}).get("chg_5d_pct")
+    vix = (g.get("VIX") or {}).get("value")
+    spread = macro.get("spread_2s10s", {})
+
+    if trigger == "oil_shock":
+        if oil is not None and oil >= 5:
+            return True, f"Петролът (WTI) +{oil:.1f}% за 5 дни — енергиен шок в развитие."
+        return False, ""
+    if trigger == "geopolitical_stress":
+        if vix is not None and vix >= 25 and (gold or 0) > 0:
+            return True, f"VIX {vix:.0f} + злато нагоре ({gold:+.1f}%) — бягство към сигурност."
+        return False, ""
+    if trigger == "curve_steepening":
+        if spread.get("direction") == "steepening":
+            return True, f"2s10s спредът се разкривява ({spread.get('value')}%)."
+        return False, ""
+    return False, ""
+
+
+def thesis_monitor(macro: dict) -> list[dict]:
+    """
+    Връща списък активни/структурни/наблюдавани тези с обяснение на веригата.
+    Подава се на секторния бриф и dashboard-а (нов раздел).
+    """
+    out = []
+    for b in config.THESIS_BASKETS:
+        status = b.get("default_status", "watch")
+        fired, why = _trigger_fires(b.get("trigger"), macro)
+        if fired:
+            status = "active"
+        out.append({
+            "name": b["name"],
+            "tickers": b["tickers"],
+            "status": status,          # active | structural | watch
+            "chain": b["chain"],
+            "trigger_reason": why,
+        })
+    # активните най-отгоре, после структурните, после наблюдаваните
+    order = {"active": 0, "structural": 1, "watch": 2}
+    out.sort(key=lambda t: order.get(t["status"], 3))
+    return out

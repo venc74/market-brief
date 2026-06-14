@@ -15,13 +15,14 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
-from src.macro_layer import collect_macro_layer
-from src.thermometer import build_thermometer
+from src.macro_layer import collect_macro_layer, thesis_monitor
+from src.thermometer import build_thermometer, naaim_history
 from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
-from src.enrich import enrich
+from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan
 from src import ai_brief
+from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -73,6 +74,9 @@ def run() -> dict:
     thermo = build_thermometer(macro)
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
 
+    # v2 · Секция 5 — кои геополитически тези са активни при текущото макро
+    theses = thesis_monitor(macro)
+
     print("[3/7] Слой 2: секторна ротация…")
     rotation = sector_rotation()
     leaders = leading_sectors(rotation)
@@ -85,13 +89,25 @@ def run() -> dict:
 
     print("[6/7] AI синтез (Claude API)…")
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo)
+    # Значими новини (RSS + nitter → Claude филтър) — преди останалия анализ
+    news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
     narratives = ai_brief.ticker_narratives(
         candidates, ai_macro.get("sector_logic", []), thermo["regime"])
     candidates = ai_brief.merge_narratives(candidates, narratives)
+    # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
+    candidates = inject_split_catalysts(candidates)
 
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
+
+    # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
+    unusual_today = unusual_options.fetch_unusual_options(10) if config.ENABLE_UNUSUAL_OPTIONS else []
+    splits_month = splits_calendar.fetch_upcoming_splits(30) if config.ENABLE_SPLITS_CALENDAR else []
+    naaim_hist = naaim_history()
+    superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
+    # самостоятелен Magic Formula топ 10 (независим от CANSLIM) за dashboard секция
+    magic_formula_top = magic_formula.build_ranked(top_n=10) if config.ENABLE_MAGIC_FORMULA else []
 
     brief = {
         "date": today,
@@ -101,6 +117,14 @@ def run() -> dict:
         "ai_macro": ai_macro,
         "action": action,
         "watchlist": watchlist,
+        # v2 нови блокове
+        "theses": theses,
+        "unusual_options": unusual_today,
+        "splits": splits_month,
+        "naaim_history": naaim_hist,
+        "superinvestor_moves": superinvestor_moves,
+        "magic_formula_top": magic_formula_top,
+        "news": news,
     }
 
     # исторически JSON за бъдещия backtest модул

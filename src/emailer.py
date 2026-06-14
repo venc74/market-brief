@@ -6,6 +6,7 @@ from __future__ import annotations
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.header import Header
 import requests
 
 import sys, pathlib
@@ -27,9 +28,11 @@ def _send_smtp(html: str, subject: str) -> bool:
         print("[email] GMAIL_USER / GMAIL_APP_PASSWORD липсват")
         return False
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
+    # кирилицата в Subject се енкодва по RFC2047, иначе темата излиза нечетима
+    msg["Subject"] = Header(subject, "utf-8")
     msg["From"] = config.GMAIL_USER
     msg["To"] = config.EMAIL_TO
+    # MIMEText с "utf-8" дава Content-Type: text/html; charset="utf-8"
     msg.attach(MIMEText(html, "html", "utf-8"))
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as s:
@@ -55,6 +58,8 @@ def _send_sendgrid(html: str, subject: str) -> bool:
             "from": {"email": config.GMAIL_USER or "brief@example.com",
                      "name": "AI Инвестиционен Бриф"},
             "subject": subject,
+            # SendGrid праща UTF-8 по подразбиране; charset идва от <meta> в HTML-а.
+            # (полето type очаква чист MIME type — "; charset" може да върне 400)
             "content": [{"type": "text/html", "value": html}],
         }, timeout=30)
         r.raise_for_status()
