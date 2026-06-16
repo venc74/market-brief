@@ -6,7 +6,7 @@ name: Daily Investment Brief
 on:
   schedule:
     - cron: "30 5 * * 1-5"   # 07:30 CEST (лято)
-    - cron: "30 6 * * 1-5"   # 07:30 CET (зима)
+
   workflow_dispatch: {}       # ръчно пускане за тест
 
 permissions:
@@ -23,14 +23,7 @@ jobs:
     steps:
       - name: DST guard — пускай само ако в Берлин е 07:3x
         id: guard
-        run: |
-          HOUR=$(TZ="Europe/Berlin" date +%H)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$HOUR" = "07" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Локално време в Берлин: $(TZ='Europe/Berlin' date) — грешният cron слот, излизам."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+       run: echo "run=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         if: steps.guard.outputs.run == 'true'
