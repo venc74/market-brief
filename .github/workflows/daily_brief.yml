@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: DST guard — пускай само ако в Берлин е 07:3x
         id: guard
-       run: echo "run=true" >> "$GITHUB_OUTPUT"
+        run: echo "run=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         if: steps.guard.outputs.run == 'true'
