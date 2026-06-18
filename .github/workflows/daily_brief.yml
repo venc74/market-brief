@@ -5,7 +5,7 @@ name: Daily Investment Brief
 # а guard стъпката проверява локалното време и убива грешния.
 on:
   schedule:
-    - cron: "30 5 * * 1-5"   # 07:30 CEST (лято)
+    
 
   workflow_dispatch: {}       # ръчно пускане за тест
 
