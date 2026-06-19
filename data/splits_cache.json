@@ -1,5 +1,5 @@
 {
- "date": "2026-06-18",
+ "date": "2026-06-19",
  "rows": [
   {
    "ticker": "FFMR",
@@ -9,7 +9,7 @@
    "split_type": "normal",
    "date_human": "Jun 16, 2026",
    "price": 34.02,
-   "market_cap": 708379578.9000001
+   "market_cap": 708379588.4317589
   }
  ]
 }
