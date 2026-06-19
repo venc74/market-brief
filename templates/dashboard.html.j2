@@ -256,11 +256,13 @@
   <h2>Пазарен термометър</h2>
   <div class="thermo">
     {% for ind in thermometer.indicators %}
+    {% if not ind.get('hide') %}
     <div class="t-card {{ ind.status }}">
       <div class="t-name">{{ ind.name }}</div>
       <div class="t-val">{{ ind.value if ind.value is not none else "—" }}</div>
       <div class="t-label">{{ ind.label }}</div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 </section>

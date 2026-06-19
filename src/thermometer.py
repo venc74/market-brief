@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 import io
+from functools import lru_cache
 import requests
 import yfinance as yf
 
@@ -47,38 +48,157 @@ def vix_level() -> dict:
     }
 
 
-def naaim_exposure() -> dict:
+# ── NAAIM източници (приоритет: Nasdaq Data Link → naaim.org CSV → scrape) ──
+NAAIM_NASDAQ_URL = "https://data.nasdaq.com/api/v3/datasets/NAAIM/NAAIM.json"
+NAAIM_CSV_URL = "https://naaim.org/wp-content/uploads/data/USE_Data_since_Inception.csv"
+NAAIM_PAGE_URL = "https://naaim.org/programs/naaim-exposure-index/"
+_NAAIM_HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+
+def _parse_date_safe(s: str):
+    """Връща (sort_key, оригинален_низ). sort_key=ISO низ ако се разпознае, иначе None."""
+    s = (s or "").strip()
+    from datetime import datetime
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%Y/%m/%d", "%d.%m.%Y", "%b %d, %Y"):
+        try:
+            return datetime.strptime(s, fmt).strftime("%Y-%m-%d"), s
+        except ValueError:
+            continue
+    return None, s
+
+
+def _naaim_from_nasdaq() -> list[dict]:
     """
-    NAAIM Exposure Index — публикува се седмично като CSV на naaim.org.
-    <30 = мениджърите са дефанзивни (contrarian bullish при дъна),
-    >90 = еуфория (предупреждение).
+    Primary: Nasdaq Data Link (Quandl) — публичен JSON, без API ключ за базов достъп.
+    Структура: dataset.column_names + dataset.data (newest-first по подразбиране).
+    Нормализираме до хронологичен ascending списък [{date, value}].
     """
-    url = "https://naaim.org/wp-content/uploads/data/USE_Data_since_Inception.csv"
-    try:
-        r = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
-        r.raise_for_status()
-        import csv
-        rows = list(csv.reader(io.StringIO(r.text)))
-        # последен ред с числова втора колона
-        for row in reversed(rows):
-            if len(row) >= 2:
+    r = requests.get(NAAIM_NASDAQ_URL, timeout=20, headers=_NAAIM_HEADERS)
+    r.raise_for_status()
+    ds = r.json().get("dataset", {})
+    cols = [str(c).lower() for c in ds.get("column_names", [])]
+    data = ds.get("data", [])
+    # колоната със средната експозиция: търсим "mean"/"average"/"naaim", иначе index 1
+    val_idx = next((i for i, c in enumerate(cols)
+                    if any(k in c for k in ("mean", "average", "naaim number"))), 1)
+    pts = []
+    for row in data:
+        if not row or len(row) <= val_idx:
+            continue
+        try:
+            val = float(row[val_idx])
+        except (TypeError, ValueError):
+            continue
+        sort_key, raw = _parse_date_safe(str(row[0]))
+        pts.append({"date": sort_key or raw, "value": round(val, 1), "_k": sort_key or raw})
+    pts.sort(key=lambda p: p["_k"])  # ISO дати → безопасно ascending
+    for p in pts:
+        p.pop("_k", None)
+    return pts
+
+
+def _naaim_from_csv() -> list[dict]:
+    """
+    Secondary: историческият CSV на naaim.org. Редовете са в хронологичен ред
+    (най-старият първи), затова НЕ пресортираме — пазим оригиналната подредба.
+    """
+    import csv
+    r = requests.get(NAAIM_CSV_URL, timeout=20, headers=_NAAIM_HEADERS)
+    r.raise_for_status()
+    rows = list(csv.reader(io.StringIO(r.text)))
+    pts = []
+    for row in rows:
+        if len(row) < 2:
+            continue
+        # първата клетка трябва да е дата; стойността = първата числова след нея
+        sort_key, raw = _parse_date_safe(row[0])
+        if sort_key is None:
+            continue  # заглавен/празен ред
+        for c in row[1:]:
+            try:
+                val = float(str(c).replace("%", "").replace(",", "").strip())
+            except ValueError:
+                continue
+            if -250 <= val <= 250:
+                pts.append({"date": raw, "value": round(val, 1)})
+                break
+    return pts
+
+
+def _naaim_from_scrape() -> list[dict]:
+    """
+    Tertiary fallback: директен scrape на programs страницата с BeautifulSoup.
+    Best-effort — вади двойки (дата, числова стойност) от таблиците. Ако датите
+    се разпознават, подреждаме ascending; иначе пазим DOM реда.
+    """
+    from bs4 import BeautifulSoup
+    r = requests.get(NAAIM_PAGE_URL, timeout=20, headers=_NAAIM_HEADERS)
+    r.raise_for_status()
+    soup = BeautifulSoup(r.text, "html.parser")
+    pts = []
+    for table in soup.find_all("table"):
+        for tr in table.find_all("tr"):
+            cells = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
+            if len(cells) < 2:
+                continue
+            sort_key, raw = _parse_date_safe(cells[0])
+            if sort_key is None:
+                continue  # първата клетка не е дата → пропускаме заглавни редове
+            for c in cells[1:]:
                 try:
-                    val = float(row[1])
-                    date = row[0]
-                    break
+                    val = float(c.replace("%", "").replace(",", "").strip())
                 except ValueError:
                     continue
-        else:
-            raise ValueError("no numeric rows")
-        status = "yellow"
-        if val > 90: status = "red"      # crowded long
-        elif val < 30: status = "green"  # песимизъм = гориво
-        return {"name": "NAAIM", "value": val, "as_of": date, "status": status,
-                "label": f"NAAIM {val:.0f}"}
-    except Exception as e:
-        print(f"[thermo] NAAIM failed: {e}")
+                if -250 <= val <= 250:  # NAAIM е приблизително в [-200, +200]
+                    pts.append({"date": raw, "value": round(val, 1), "_k": sort_key})
+                    break
+    pts.sort(key=lambda p: p["_k"])
+    for p in pts:
+        p.pop("_k", None)
+    return pts
+
+
+@lru_cache(maxsize=1)
+def _naaim_series() -> tuple:
+    """
+    Връща хронологичен ascending кортеж точки от първия успял източник.
+    Кешира се за процеса (lru_cache) → exposure + history теглят мрежата веднъж.
+    При пълен провал на трите → празен кортеж (→ graceful hide нагоре по веригата).
+    Връща tuple (immutable), за да е hashable/безопасен за кеширане; консумерите
+    го третират като последователност (slice/индексиране работят непроменено).
+    """
+    for name, fn in (("nasdaq", _naaim_from_nasdaq),
+                     ("naaim.org CSV", _naaim_from_csv),
+                     ("naaim.org scrape", _naaim_from_scrape)):
+        try:
+            pts = fn()
+            if pts:
+                return tuple(pts)
+            print(f"[thermo] NAAIM source '{name}' върна 0 точки — пробвам следващия")
+        except Exception as e:
+            print(f"[thermo] NAAIM source '{name}' failed: {e}")
+    return ()
+
+
+def naaim_exposure() -> dict:
+    """
+    NAAIM Exposure Index — седмичен барометър на експозицията на активните мениджъри.
+    <30 = дефанзивни (contrarian bullish при дъна), >90 = еуфория (предупреждение).
+    Източници по приоритет: Nasdaq Data Link → naaim.org CSV → scrape.
+    При провал и на трите картичката се скрива gracefully (hide=True), вместо
+    да показва "няма данни" текст.
+    """
+    pts = _naaim_series()
+    if not pts:
         return {"name": "NAAIM", "value": None, "status": "yellow",
-                "label": "NAAIM: няма данни"}
+                "hide": True, "label": ""}
+    last = pts[-1]
+    val, date = last["value"], last["date"]
+    status = "yellow"
+    if val > 90: status = "red"      # crowded long
+    elif val < 30: status = "green"  # песимизъм = гориво
+    return {"name": "NAAIM", "value": val, "as_of": date, "status": status,
+            "label": f"NAAIM {val:.0f}"}
 
 
 def market_put_call() -> dict:
@@ -172,27 +292,13 @@ def naaim_history(weeks: int | None = None) -> dict:
     """
     Връща {points: [{date, value}], low_zone: 30, high_zone: 90, current}.
     Контрарианска логика: <30 = buy zone, >90 = caution. Празно при провал.
+    Ползва същия многоизточников fetcher като naaim_exposure() (Nasdaq Data Link
+    → naaim.org CSV → scrape), затова e достатъчно да поправим source-а на едно място.
     """
     weeks = weeks or config.NAAIM_HISTORY_WEEKS
-    url = "https://naaim.org/wp-content/uploads/data/USE_Data_since_Inception.csv"
     out = {"points": [], "low_zone": 30, "high_zone": 90, "current": None}
-    try:
-        r = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
-        r.raise_for_status()
-        import csv
-        rows = list(csv.reader(io.StringIO(r.text)))
-        pts = []
-        for row in rows:
-            if len(row) >= 2:
-                try:
-                    val = float(row[1])
-                except ValueError:
-                    continue
-                pts.append({"date": row[0].strip(), "value": round(val, 1)})
-        pts = pts[-weeks:]
-        out["points"] = pts
-        if pts:
-            out["current"] = pts[-1]["value"]
-    except Exception as e:
-        print(f"[thermo] NAAIM history failed: {e}")
+    pts = _naaim_series()
+    if pts:
+        out["points"] = pts[-weeks:]
+        out["current"] = out["points"][-1]["value"]
     return out
