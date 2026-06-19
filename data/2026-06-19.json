@@ -20,8 +20,8 @@
   },
   "global_signals": {
    "DXY": {
-    "value": 100.75,
-    "chg_5d_pct": 0.7
+    "value": 100.72,
+    "chg_5d_pct": 0.67
    },
    "VIX": {
     "value": 16.78,
@@ -67,9 +67,10 @@
    },
    {
     "name": "NAAIM",
-    "value": null,
-    "status": "yellow",
-    "label": "NAAIM: няма данни"
+    "value": 92.8,
+    "as_of": "06/17/2026",
+    "status": "red",
+    "label": "NAAIM 93"
    },
    {
     "name": "Put/Call (SPY)",
@@ -90,8 +91,8 @@
     "label": "$-873976.8 млрд (↓)"
    }
   ],
-  "regime": "Offensive",
-  "regime_reason": "4 зелени / 1 червени",
+  "regime": "Defensive",
+  "regime_reason": "2 червени индикатора — намален риск",
   "sizing_factor": 1.0
  },
  "rotation": [
@@ -250,40 +251,40 @@
   }
  ],
  "ai_macro": {
-  "macro_brief": "SPY затвори на 747 — над 50DMA и 200DMA без видима съпротива, VIX се срина с 11% за 5 дни до 16.78, което е чисто risk-on позициониране. Oil WTI -16% за седмицата е масивен дефлационен импулс, който свива инфлационния натиск и намалява вероятността Fed да е агресивен — bond пазарът го потвърждава с US10Y на 4.49% (-1.43% за 5д). Gold -3.76% и спадащ петрол заедно означават ротация от defensive/commodity havens към growth активи — видно е директно в SMH +16.86% и XLK +8.07%. Единственото macro предупреждение е Fed Net Liquidity на -874 трлн (влошаване от -775 предишната седмица) — TGA е натрупан на 880 млрд и тази абсорбция на ликвидност може да натежи при следващ стрес, но засега equity пазарът го игнорира. Spread 2s10s flattening от 0.40% към 0.27% показва, че пазарът очаква по-ниски краткосрочни лихви относително — pro-growth сигнал за днешната сесия.",
+  "macro_brief": "SPY затвори на 747 — над двете движещи средни, VIX се срина с 11% за 5 дни до 16.8, което отваря пространство за продължение на рали. Въпреки това Fed Net Liquidity се влоши рязко: от -774 млрд на -873 млрд за седмица, тъй като TGA набъбна до 880 млрд — Treasury изтегля кеш от системата, свивайки банковите резерви. Oil WTI -16% за 5 дни сигнализира рязко охлаждане на рисковите premium в суровините и отслабва инфлационния наратив. Gold -3.8% потвърждава ротация от дефанзивни убежища към risk-on активи, докато DXY +0.67% добавя умерен валутен насрещен вятър за мултинационалите. 2s10s се сплеска от 0.40 на 0.27 за седмица — не инверсия, но бързото flattening предупреждава, че пазарът започва да преоценява растежния импулс. Днешната сесия: технологията и полупроводниците ще доминират price action, но всяка слабост в ликвидността може бързо да засили profit-taking при оverbought имена.",
   "sector_logic": [
    {
     "sector": "Полупроводници",
     "etf": "SMH",
-    "chain": "Oil -16% → инфлационен натиск спада → Fed пауза/cut expectations се засилват → дълги duration активи като semis получават валуационен tailwind → едновременно AI capex цикълът не се охлажда (Copper +0.12% = demand за данни/инфраструктура intact) → SMH е на 6-месечен RS high, +48.58% RS за 12 седмици, institutional momentum продължава да абсорбира предлагане → краткосрочно: моментумът е паrabolic, разумно е да се добавя само при retest на пробив, не при chase.",
+    "chain": "VIX колапс (-11.3% за 5д) → institutional risk appetite се отключва → капитал търси highest-beta лидери → SMH е секторът с най-силен 12-седмичен RS (+48.6% vs SPY) и RS на 6-месечен връх → AI capex cycle (NVDA, TSMC) поддържа фундамента → ниският Oil намалява производствените разходи за fab операции → резултат: SMH получава двоен попътен вятър от macro risk-on и sector-специфичен earnings momentum; хоризонтът е 4-8 седмици докато NAAIM >90 не тригерира корекция.",
     "horizon_weeks": 6
    },
    {
     "sector": "Технологии",
     "etf": "XLK",
-    "chain": "VIX -11% за 5д → implied vol compression → market makers delta hedge разпродават хеджове → cash влиза в mega-cap tech (основна тежест на XLK) → US10Y падащ доходност намалява дискаунт-рейт на DCF за high-growth tech имена → DXY +0.7% е леко headwind за мултинационалните приходи, но краткосрочно е недостатъчен да обърне тренда → XLK RS +22.74% за 12 седмици потвърждава, че институционалните пари са вече позиционирани тук.",
-    "horizon_weeks": 4
+    "chain": "Срив на Oil WTI (-16%) → инфлационните очаквания се свиват → US10Y пада (-1.4% за 5д, 4.49%) → по-ниски дисконтови ставки → duration-sensitive growth акции се преоценяват нагоре → XLK с 4-седмичен RS +7% и абсолютен ръст +8% потвърждава, че капиталовите потоци вече са влезли → SMH тегли XLK нагоре чрез секторно припокриване (AAPL, MSFT, NVDA). Рискът: DXY +0.67% натиска приходите на мегакапите с висока международна експозиция.",
+    "horizon_weeks": 5
    },
    {
     "sector": "Биотех",
     "etf": "XBI",
-    "chain": "Risk-on режим (VIX под 17) исторически отключва апетит към speculative biotech — XBI е high-beta, high-vol сектор, който underperform при страх и outperform при greed expansion → инфлацията под контрол (oil collapse) намалява натиска върху CMS/Medicare rate cuts и дава политическа room за по-добри drug pricing deals → XBI RS +5.78% за 4 седмици след дълъг период на underperformance (+1.33% за 12 седмици) — ранен stage recovery, не confirming trend → позициите трябва да са по-малки от semis/tech докато 12-седмичният RS не се обърне позитивно.",
-    "horizon_weeks": 3
+    "chain": "Risk-on mode (VIX под 17) → спекулативният капитал се завръща в small/mid-cap high-beta биотех → XBI 4-седмичен RS +5.8% и абсолютен +6.8% показва реална сила, не просто beta — 12-седмичният RS едва +1.3% означава, че секторът тепърва излиза от underperformance дъно, а не е overbought → ниският Oil косвено намалява производствените разходи за биохимикали → M&A сезонът (юни-септември) добавя premium очаквания. Хоризонтът е по-кратък — XBI е volatile и ще реагира остро при обрат в апетита.",
+    "horizon_weeks": 4
    },
    {
     "sector": "Отбрана",
     "etf": "ITA",
-    "chain": "Геополитическото напрежение (Близък изток, Украйна) поддържа бюджетни ангажименти на NATO членки → US бюджетен процес за FY2026 предполага оставане на elevated defense spend → ITA +6.05% RS за 4 седмици, но -6.91% за 12 седмици показва, че това е bounce в рамките на по-широка RS корекция, не нов leadership → DXY укрепване е неутрално за ITA (приходите са предимно USD-деноминирани) → подходящ за добавяне само ако RS линията пробие 6-месечния връх; засега е secondary позиция.",
-    "horizon_weeks": 4
+    "chain": "Геополитическото напрежение (Европа/Близкия изток) поддържа бюджетни ангажименти за NATO+ → ITA 4-седмичен RS +6% и абсолютен +7.1% показва реален капиталов приток → 12-седмичният RS е -6.9% — секторът изоставаше дълго, сегашният bounce е ротационен catch-up, не trend-следващ импулс → слабият Oil намалява fuel разходите за военна авиация, подобрявайки margins → DXY сила помага на Lockheed/RTX при international contracts деноминирани в USD. Внимание: ITA няма RS на 6м-връх, което го поставя в категория 'weakening' по Weinstein — позицията изисква по-плитък стоп.",
+    "horizon_weeks": 3
    },
    {
     "sector": "Индустрия",
     "etf": "XLI",
-    "chain": "Oil -16% е директен cost input relief за индустриалните компании (транспорт, производство, логистика) → намаляват операционни разходи → margin expansion при flat/growing revenues → Copper +0.12% = глобалното manufacturing demand не се срива, потвърждава soft-landing нарратив → XLI RS +4.91% за 4 седмици, но -2.79% за 12 седмици — същата структура като ITA: краткосрочен bounce без дългосрочно потвърждение → позиция само при продължаване на oil decline или позитивно PMI изненадване.",
+    "chain": "Нормализиран yield curve (2s10s +0.27%, не инвертиран) → банките по-свободно кредитират капиталови проекти → industrial capex продължава → XLI 4-седмичен RS +4.9% следва SMH/XLK с лаг (типична late-cycle ротация) → Oil срив -16% директно свива транспортните и производствените разходи за индустриалците → Copper стабилен (+0.12%) потвърждава, че глобалното търсене не колабира. Лимит: 12-седмичният RS е -2.8% — XLI е laggard в средносрочен план, подходящ само за тактически trade, не за trend-следване.",
     "horizon_weeks": 3
    }
   ],
-  "regime_comment": "Offensive режимът е коректен: SPY е над 50DMA и 200DMA без признаци на разпределение, VIX е на 16.78 и падащ (risk appetite отворен), Put/Call 1.12 е неутрален-до-мечи sentiment при бичи price action — исторически комбинацията означава, че хеджовете ще трябва да бъдат разпродадени при продължаващо движение нагоре. Yield curve нормализира (0.27% 2s10s), oil collapse свива стагфлационния риск. Единственият активен red flag — Fed Net Liquidity на рекордно негативни нива — не се трансмитира в credit spreads или equity волатилност към момента, поради което sizing_factor 1.0 е оправдан, но ликвидността трябва да бъде мониторирана всяка седмица — ако TGA продължи да расте или RRP остане на нула, системата трябва да понижи sizing при следващ знак на stress."
+  "regime_comment": "Defensive режимът е технически коректен въпреки зеления SPY и VIX: NAAIM 92.8 е в горния 10% перцентил исторически — при стойности над 90 forward returns за следващите 4 седмици статистически се влошават рязко, защото profesionalните мениджъри нямат свободен кеш за допълнителни покупки. Fed Net Liquidity -873 млрд (влошение от 99 млрд само за седмица) означава, че системната ликвидност се свива активно — TGA ръст сигнализира предстоящо Treasury емитиране, което ще абсорбира допълнителен кеш от дилърите. Комбинацията от максимално позициониране и намаляваща ликвидност е точно профилът, при който малък негативен катализатор генерира непропорционална разпродажба. Sizing_factor 1.0 (без редукция) е граничен — правилото е: нов капитал влиза само в breakout setup с обем потвърждение, без добавяне към вече отворени позиции."
  },
  "action": [
   {
@@ -377,23 +378,22 @@
    "markers": [],
    "ai": {
     "ticker": "ROK",
-    "why_now": "Oil -16% → директен input cost relief за индустриалните компании → margin expansion при Rockwell. Copper +0.12% потвърждава, че manufacturing demand не се срива, което е core addressable market за ROK (автоматизация на производството). XLI RS +4.91% за 4 седмици. ROK самостоятелно е на rs_status: new_high с cup with handle само -0.45% под pivot — най-близо до пробив в сектора. Volume ratio 1.58 с breakout_volume: true. EPS +38.9% YoY. Секторът е secondary в режима, но ROK-специфичните фундаменти и техническата близост до pivot компенсират.",
-    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация. Продуктите включват drives, motion control, safety системи и industrial software. Обслужва производствени предприятия в Северна Америка, Европа и Азия.",
+    "why_now": "Oil срив (-16%) директно свива производствените разходи за индустриалните клиенти на Rockwell → реактивира капиталовите им проекти → XLI ротация (4w RS +4.9%) носи попътен вятър. RS line на new_high, cup with handle почти на pivot (-0.45%), volume_ratio 1.58 с breakout обем. Setup-ът е технически зрял — най-близо до пробив от всички индустриални кандидати.",
+    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация. Компанията обхваща хардуер (задвижвания, сензори, безопасностни системи), контролен и визуализационен софтуер, и lifecycle услуги. Основните пазари са производство, хранително-вкусова промишленост, енергетика и авто сектора в Северна Америка и глобално.",
     "catalysts": [
-     "Пробив над pivot 475.92 с обем >1.5x среден — технически trigger",
-     "Earnings 2026-08-06: EPS estimate $12.99, потенциал за позитивна изненада след cost tailwind от Oil",
-     "Продължаващ Oil decline → допълнителен margin expansion за клиентите на ROK → по-бързи capex решения за автоматизация",
-     "Re-shoring нарратив в САЩ поддържа дългосрочен demand pipeline"
+     "Потенциален breakout над pivot 475.92 с обем — само 0.45% разстояние",
+     "Earnings на 06.08.2026 (48 дни) — достатъчен прозорец за развитие на trade без earnings риск",
+     "AI-driven industrial automation capex цикъл поддържа дългосрочното търсене",
+     "Oil срив намалява енергийните разходи на manufacturing клиентите → по-бързо решение за capex"
     ],
     "risks": [
-     "Пробивът пропада — цената се връща под 465 (base midpoint) → stop логика",
-     "Analyst target 465.00 е ПОД текущата цена — институционалният консенсус не подкрепя upside",
-     "Секторът XLI има -2.79% RS за 12 седмици — bounce без дългосрочно потвърждение",
-     "Earnings на 08-06 в рамките на 6-седмичния хоризонт — позицията влиза в earnings risk ако не се управлява"
+     "Пробивът пропадне и цената се върне под 200-DMA — XLI е laggard (12w RS -2.8%)",
+     "Defensive пазарен режим може да ограничи institutional risk appetite за late-cycle индустриали",
+     "ROE 27.2% е силен, но P/E 49 е агресивен за industrial sector при risk-off ротация",
+     "Analyst target 465 е ПОД текущата цена — Wall Street вижда limited upside"
     ],
-    "earnings_call": "преди earnings — earnings са след 48 дни, извън 5-дневния blackout; достатъчен прозорец за swing, но трябва план за управление преди 08-06.",
-    "classification": "Action",
-    "watchlist_trigger": null
+    "earnings_call": "след earnings — 48 дни до earnings дават пълен 6-седмичен прозорец без event риск",
+    "classification": "Action"
    },
    "plan": {
     "valid": true,
@@ -429,8 +429,8 @@
    "ma200": 668.62,
    "above_ma50": true,
    "above_ma200": true,
-   "avg_volume_50d": 2664922,
-   "last_volume": 6173700,
+   "avg_volume_50d": 2664948,
+   "last_volume": 6175000,
    "volume_ratio": 2.32,
    "breakout_volume": true,
    "base_low": 666.16,
@@ -507,23 +507,22 @@
    "markers": [],
    "ai": {
     "ticker": "CAT",
-    "why_now": "Oil -16% → cost relief за construction и mining операторите — core клиенти на CAT. Copper +0.12% директно сигнализира, че mining activity не се свива, което е Resource Industries сегментът на CAT. rs_status: new_high, deep base 33% с volume_ratio 2.32 — най-силният обем сигнал в индустриалния сектор. EPS +27.3% YoY, Revenue +22.2% YoY. ROE 51.3% е изключителен. Само -0.87% под pivot 994.49. Forward PE 32.75 е разумно за качеството.",
-    "business_bg": "Caterpillar произвежда строителна и минна техника, дизелови двигатели и локомотиви. Обслужва construction, mining, energy и transportation индустрии глобално. Счита се за barometer на глобалното infrastructure spending.",
+    "why_now": "Oil срив -16% е директен маржин тейлуинд за Caterpillar — горивото е значителен разход при тестове, доставки и операции на тежко оборудване. Revenue growth +22.2% и ROE 51.3% го правят качествен industrial лидер. Deep base (33%) с RS на new_high и volume_ratio 2.32 е най-силният обемен сигнал в групата. Само 0.87% от pivot 994.49.",
+    "business_bg": "Caterpillar е световен лидер в производството на строителна и минна техника, дизелови двигатели и локомотиви. Обслужва строителния, ресурсния и енергийния сектор с оборудване и свързани финансови услуги. Силното международно присъствие го прави барометър за глобалния industrial capex.",
     "catalysts": [
-     "Пробив над pivot 994.49 с обем — volume ratio вече 2.32x потвърждава institutional buying",
-     "Oil decline → mining/construction клиентите имат повече капитал за оборудване",
-     "Copper demand intact → mining capex не се охлажда → директни поръчки за CAT",
-     "Earnings 2026-08-04 (46 дни): EPS estimate $24.60, infrastructure cycle tailwind"
+     "Breakout над pivot 994.49 — само 0.87% разстояние при вече наличен breakout обем",
+     "Oil срив директно подобрява операционните маржини на mining/construction клиентите → ускорява поръчките",
+     "Earnings на 04.08.2026 (46 дни) — достатъчен прозорец",
+     "Нормализиран yield curve (2s10s +0.27%) стимулира банково кредитиране за капиталови проекти"
     ],
     "risks": [
-     "Deep base 33% — по-дълбоките бази имат по-висок failure rate при пробив",
-     "Analyst target 945.64 е под текущата цена 985.82 — street е bearish спрямо пазарната цена",
-     "DXY +0.7% е headwind за международните приходи (CAT е силно глобален бизнес)",
-     "Earning risk на 08-04 ако позицията се държи"
+     "Analyst target 945 е ~4% ПОД текущата цена — значима overvaluation по Street консенсус",
+     "Deep base 33% означава, че базата е образувана при сериозна дистрибуция — рискът от failed breakout е реален",
+     "DXY +0.67% натиска приходите от международни пазари при USD-деноминирани contracts",
+     "Defensive режим + XLI laggard статус (12w RS -2.8%) означава, че ротацията може да спре рано"
     ],
-    "earnings_call": "преди earnings — 46 дни до earnings, достатъчен swing прозорец; препоръчително частично reduce преди report.",
-    "classification": "Action",
-    "watchlist_trigger": null
+    "earnings_call": "след earnings — 46 дни осигуряват пълен trade прозорец преди event",
+    "classification": "Action"
    },
    "plan": {
     "valid": true,
@@ -559,8 +558,8 @@
    "ma200": 308.93,
    "above_ma50": true,
    "above_ma200": true,
-   "avg_volume_50d": 4310912,
-   "last_volume": 11868200,
+   "avg_volume_50d": 4310928,
+   "last_volume": 11869000,
    "volume_ratio": 2.75,
    "breakout_volume": true,
    "base_low": 302.27,
@@ -637,23 +636,22 @@
    "markers": [],
    "ai": {
     "ticker": "ADI",
-    "why_now": "Директна SMH/semiconductor верига: Fed пауза expectations + падащ US10Y → DCF re-rating на semis. ADI е analog semiconductor компания с exposure към industrial, automotive и communications. EPS +106.5% YoY е изключително — най-силен earnings momentum в листата. Volume ratio 2.75 е най-висок от всички кандидати. rs_status: near_high (не new_high — единствената слабост). Base depth 31.3% е дълбока, но обемът компенсира. -1.19% под pivot 439.70.",
-    "business_bg": "Analog Devices проектира и произвежда аналогови и смесено-сигнални интегрални схеми. Продуктите са ключови в industrial automation, automotive, healthcare и communications инфраструктура. Позиционирана в центъра на AI/data infrastructure edge computing веригата.",
+    "why_now": "VIX колапс (-11.3%) → institutional risk appetite → semiconductor sector (SMH 12w RS +48.6%) е primary бенефициент → ADI е аналогов полупроводников лидер с директна експозиция към AI/industrial automation end markets. EPS growth +106.5% YoY е изключителен. Volume_ratio 2.75 е най-висок в цялата листа. Cup with handle (deep, 31.3%) с RS near_high и breakout обем — чака финален тласък.",
+    "business_bg": "Analog Devices проектира и произвежда интегрални схеми за преобразуване на аналогови сигнали в дигитални данни. Продуктите намират приложение в автомобилния, комуникационния, индустриалния и потребителския сектор. Компанията е ключов доставчик за 5G инфраструктура, EV системи и промишлена автоматизация.",
     "catalysts": [
-     "SMH на 6-месечен RS high — секторният tailwind е силен и директен за ADI",
-     "Пробив над 439.70 с обем — volume ratio 2.75 вече показва demand",
-     "Fed cut expectations → duration re-rating на semis → ADI с forward PE 29.4 е reasonable",
-     "Earnings 2026-08-19 (61 дни): достатъчен прозорец, EPS estimate $12.34"
+     "SMH секторен тейлуинд — AI capex cycle директно увеличава търсенето на ADI data converters",
+     "EPS growth +106.5% и revenue +37.2% показват реален earnings momentum, не само оценъчна игра",
+     "Earnings на 19.08.2026 (61 дни) — максимален прозорец без earnings риск",
+     "US10Y пад → по-ниски дисконтови ставки преоценяват нагоре high-growth semiconductor имена"
     ],
     "risks": [
-     "rs_status е near_high, не new_high — RS линията не е пробила нов връх, което е слабост спрямо ROK/CAT",
-     "ROE 9.6% е нисък за semiconductor компания — капиталова ефективност под средното",
-     "Deep base 31.3% — висок failure rate",
-     "IV Rank 0.0 означава implied vol е на дъното — опции са скъпи спрямо реализираната vol ако IV се нормализира"
+     "ROE само 9.6% е слаб за semiconductor компания — намеква за dilution или marginal returns на капитала",
+     "Base depth 31.3% е deep — образувана при значителна дистрибуция",
+     "RS статус near_high (не new_high) — линията все още не е потвърдила нов максимум",
+     "IV rank 0 прави options стратегии скъпи относно историческата волатилност"
     ],
-    "earnings_call": "преди earnings — 61 дни, най-дълъг прозорец в листата; позволява пълен swing без earnings risk.",
-    "classification": "Action",
-    "watchlist_trigger": null
+    "earnings_call": "след earnings — 61 дни са максималният комфортен прозорец в листата",
+    "classification": "Action"
    },
    "plan": {
     "valid": true,
@@ -676,6 +674,125 @@
     "time_horizon": "4–8 седмици"
    }
   },
+  {
+   "ticker": "AIZ",
+   "price": 259.86,
+   "pivot": 265.66,
+   "pct_from_pivot": -2.18,
+   "base_type": "cup with handle",
+   "base_depth_pct": 20.5,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 242.39,
+   "ma200": 226.96,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 439696,
+   "last_volume": 863100,
+   "volume_ratio": 1.96,
+   "breakout_volume": true,
+   "base_low": 211.14,
+   "company": "Assurant, Inc.",
+   "sector": "Financial Services",
+   "industry": "Insurance - Property & Casualty",
+   "business_summary": "Assurant, Inc. provides protection services to connected devices, homes, and automobiles in North America, Latin America, Europe, and the Asia Pacific. It operates through Global Lifestyle and Global Housing segments. The Global Lifestyle segment offers mobile device solutions, and extended service contracts and related services for consumer electronics and appliances, and credit and other insurance products; and vehicle protection, commercial equipment protection, and other related services. The Global Housing segment provides lender-placed homeowners, manufactured housing, and flood insuranc",
+   "market_cap": 12875448320,
+   "eps_growth_yoy": 87.0,
+   "revenue_growth_yoy": 11.3,
+   "roe": 18.0,
+   "pe": 13.312499,
+   "forward_pe": 11.565375,
+   "debt_to_equity": 37.61,
+   "inst_ownership_pct": 97.6,
+   "analyst_target": 283.83334,
+   "short_pct_float": 2.93,
+   "shares_short": 1095155,
+   "short_ratio_dtc": 2.32,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-04",
+    "days_to_earnings": 46,
+    "in_blackout": false,
+    "eps_estimate": 21.04465
+   },
+   "options": {
+    "iv": 23.8,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (4 дни история)",
+    "put_call_ratio": 1.12,
+    "oi_near_money": [
+     {
+      "strike": 250.0,
+      "call_oi": 184
+     },
+     {
+      "strike": 260.0,
+      "call_oi": 154
+     },
+     {
+      "strike": 270.0,
+      "call_oi": 9
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 2.93,
+    "days_to_cover": 2.32,
+    "interpretation": "Нисък short interest (2.93%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 250000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "AIZ",
+    "why_now": "Чисто технически setup без силна macro верига — Insurance P&C не е сред активните секторни теми. Cup with handle (20.5% — най-плитката база в листата, идеална), RS near_high, volume_ratio 1.96, breakout обем, P/E 13.3 (cheapest в листата), forward P/E 11.6. EPS growth +87% YoY е изключителен. Defensive характер прави AIZ подходящ за настоящия пазарен режим.",
+    "business_bg": "Assurant предоставя застрахователни и защитни услуги за свързани устройства (мобилни телефони), домове и автомобили. Бизнесът включва lender-placed застраховки, extended service contracts за електроника и vehicle protection програми. Компанията работи в Северна и Латинска Америка, Европа и Азия.",
+    "catalysts": [
+     "Defensive пазарен режим благоприятства ниско-волатилни insurance имена с предвидими приходи",
+     "Earnings на 04.08.2026 (46 дни) — достатъчен прозорец",
+     "Analyst target 283.83 предполага ~9.2% upside — единственият кандидат с значим analyst upside",
+     "Плитка база (20.5%) с breakout обем — технически най-чистият setup в листата"
+    ],
+    "risks": [
+     "Няма активна macro tailwind верига — setup е чисто технически и fundamentals-driven",
+     "Revenue growth само +11.3% е скромен спрямо другите кандидати",
+     "IV rank 0 — опционните стратегии са скъпи спрямо историческото ниво",
+     "При risk-on продължение капиталът ротира към higher-beta имена, изоставяйки defensive insurance"
+    ],
+    "earnings_call": "след earnings — 46 дни осигуряват пълен trade прозорец",
+    "classification": "Action"
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     260.35,
+     270.97
+    ],
+    "entry_mid": 265.66,
+    "stop_loss": 239.97,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 25.69,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 38,
+    "total_investment": 10095.0,
+    "pct_of_portfolio": 10.1,
+    "target_1": 317.04,
+    "target_2": "trailing stop под 10DMA след достигане на $317.04",
+    "reward_risk": 2.0,
+    "time_horizon": "4–8 седмици"
+   }
+  }
+ ],
+ "watchlist": [
   {
    "ticker": "KEYS",
    "price": 363.67,
@@ -763,165 +880,25 @@
    "markers": [],
    "ai": {
     "ticker": "KEYS",
-    "why_now": "XLK/tech верига: VIX compression → cash в tech имена. KEYS прави electronic design and test solutions — директен beneficiary на 5G/wireless capex и data center buildout (AI инфраструктура). EPS +35.8% YoY, Revenue +31.5% YoY — силен двустранен растеж. Cup with handle base (по-надеждна от deep base). Volume ratio 1.84 с breakout_volume: true. -1.76% под pivot 370.17. Analyst target 383.08 е над pivot — street подкрепя upside.",
-    "business_bg": "Keysight Technologies предоставя електронни тест и measurement решения за wireless, data center, aerospace и defense пазари. Инструментите им са стандарт при разработка и валидация на 5G, 6G и AI hardware. Обслужва водещи tech и telecom компании глобално.",
+    "why_now": "VIX колапс + SMH тейлуинд: Keysight е основен доставчик на тест и измервателно оборудване за semiconductor производители и 5G/aerospace. Revenue growth +31.5% и EPS +35.8% показват реален demand pickup. Cup with handle с RS near_high, volume_ratio 1.84, breakout обем — 1.76% от pivot. Macro верига: VIX колапс → semiconductor capex → KEYS продава test solutions за всяка нова fab и chip design.",
+    "business_bg": "Keysight Technologies предоставя електронни дизайн и тест решения за комуникационни системи, аерокосмически, отбранителни и промишлени пазари. Компанията обслужва semiconductor производители, 5G оператори и дата центрове с хардуер, софтуер и услуги за валидация. Тест оборудването на KEYS е критична инфраструктура за всяка нова chip или wireless технология.",
     "catalysts": [
-     "AI hardware buildout → повишено търсене на test equipment за нови chip designs",
-     "5G/6G R&D spending от hyperscalers → директен revenue driver",
-     "Пробив над 370.17 с обем — cup with handle е класически надежден pattern",
-     "Earnings 2026-08-18 (60 дни): достатъчен прозорец без blackout риск"
+     "AI capex цикълът увеличава R&D разходите на semiconductor клиентите → директно търсене на KEYS test solutions",
+     "5G и data center buildout — Keysight е задължителен доставчик при нови network deployments",
+     "Earnings на 18.08.2026 (60 дни) — пълен прозорец",
+     "Analyst target 383 предполага ~5.3% upside от текущите нива"
     ],
     "risks": [
-     "rs_status: near_high — не е пробила RS нов връх, което означава relative performance все още под YTD peak",
-     "IV Rank: null — непълни опционни данни, затруднява хеджиране",
-     "DXY +0.7% headwind за международните приходи (KEYS е глобален бизнес)",
-     "Ако AI capex cycle се охлади (copper пада) — test equipment е discretionary capex, първи да се режат"
+     "RS near_high, не new_high — относителната сила все още не е потвърдена на нов максимум",
+     "P/E 58.6 е агресивен при defensive пазарен режим",
+     "IV rank null — липсващи данни за опционна стратегия",
+     "По-малка директна sector overlap с водещия SMH ETF в сравнение с чист semiconductor play"
     ],
-    "earnings_call": "преди earnings — 60 дни, чист прозорец за swing без earnings risk.",
-    "classification": "Action",
-    "watchlist_trigger": null
-   },
-   "plan": {
-    "valid": true,
-    "entry_range": [
-     362.77,
-     377.57
-    ],
-    "entry_mid": 370.17,
-    "stop_loss": 340.48,
-    "stop_basis": "под 50DMA",
-    "risk_per_share": 29.69,
-    "max_risk_usd": 1000.0,
-    "sizing_factor": 1.0,
-    "shares": 33,
-    "total_investment": 12216.0,
-    "pct_of_portfolio": 12.2,
-    "target_1": 429.55,
-    "target_2": "trailing stop под 10DMA след достигане на $429.55",
-    "reward_risk": 2.0,
-    "time_horizon": "4–8 седмици"
+    "earnings_call": "след earnings — 60 дни осигуряват комфортен swing прозорец",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Затваряне над pivot 370.17 с обем >1.5x среден дневен; или RS line потвърждава new_high"
    }
   },
-  {
-   "ticker": "AIZ",
-   "price": 259.86,
-   "pivot": 265.66,
-   "pct_from_pivot": -2.18,
-   "base_type": "cup with handle",
-   "base_depth_pct": 20.5,
-   "weinstein_stage": 2,
-   "rs_status": "near_high",
-   "ma50": 242.39,
-   "ma200": 226.96,
-   "above_ma50": true,
-   "above_ma200": true,
-   "avg_volume_50d": 439696,
-   "last_volume": 863100,
-   "volume_ratio": 1.96,
-   "breakout_volume": true,
-   "base_low": 211.14,
-   "company": "Assurant, Inc.",
-   "sector": "Financial Services",
-   "industry": "Insurance - Property & Casualty",
-   "business_summary": "Assurant, Inc. provides protection services to connected devices, homes, and automobiles in North America, Latin America, Europe, and the Asia Pacific. It operates through Global Lifestyle and Global Housing segments. The Global Lifestyle segment offers mobile device solutions, and extended service contracts and related services for consumer electronics and appliances, and credit and other insurance products; and vehicle protection, commercial equipment protection, and other related services. The Global Housing segment provides lender-placed homeowners, manufactured housing, and flood insuranc",
-   "market_cap": 12875448320,
-   "eps_growth_yoy": 87.0,
-   "revenue_growth_yoy": 11.3,
-   "roe": 18.0,
-   "pe": 13.312499,
-   "forward_pe": 11.565375,
-   "debt_to_equity": 37.61,
-   "inst_ownership_pct": 97.6,
-   "analyst_target": 283.83334,
-   "short_pct_float": 2.93,
-   "shares_short": 1095155,
-   "short_ratio_dtc": 2.32,
-   "macro_tailwind": false,
-   "earnings": {
-    "next_earnings": "2026-08-04",
-    "days_to_earnings": 46,
-    "in_blackout": false,
-    "eps_estimate": 21.04465
-   },
-   "options": {
-    "iv": 23.8,
-    "iv_rank": 0.0,
-    "iv_rank_quality": "partial (4 дни история)",
-    "put_call_ratio": 1.12,
-    "oi_near_money": [
-     {
-      "strike": 250.0,
-      "call_oi": 184
-     },
-     {
-      "strike": 260.0,
-      "call_oi": 154
-     },
-     {
-      "strike": 270.0,
-      "call_oi": 9
-     }
-    ],
-    "strategy": "long call / bull call spread",
-    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
-   },
-   "short_view": {
-    "short_pct_float": 2.93,
-    "days_to_cover": 2.32,
-    "interpretation": "Нисък short interest (2.93%) — без squeeze динамика, но и без активна опозиция.",
-    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
-   },
-   "borrow": {
-    "available": true,
-    "fee_rate": 0.28,
-    "available_shares": 250000,
-    "fee_trend": "покачващ",
-    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
-   },
-   "markers": [],
-   "ai": {
-    "ticker": "AIZ",
-    "why_now": "Setup-ът е предимно технически с частична макро поддръжка: VIX компресия и risk-on режим исторически са позитивни за финансовия сектор (по-нисък хедж demand). AIZ е insurance компания с cup with handle base depth само 20.5% — най-плитката база в листата, което е bull знак. EPS +87.0% YoY е изключително. PE 13.3 и Forward PE 11.6 са изключително ниски — defensive value качество в offensive режим. Analyst target 283.83 дава ~9.2% upside от текущата цена. Volume ratio 1.96 с breakout_volume: true.",
-    "business_bg": "Assurant предоставя специализирана застраховка и protection services за мобилни устройства, домове и автомобили. Работи с мобилни оператори, ипотечни компании и автодилъри глобално. Бизнес моделът е fee-based с recurring revenue, което го прави дефанзивен.",
-    "catalysts": [
-     "Пробив над pivot 265.66 — cup with handle с обем 1.96x",
-     "Earnings 2026-08-04 (46 дни): EPS estimate $21.04, track record на beats",
-     "Risk-on режим → финансовият сектор получава allocation при спад на VIX",
-     "Лихвени очаквания за Fed pause → insurance float yields остават elevated → benefit за AIZ"
-    ],
-    "risks": [
-     "Финансовият сектор не е в активната секторна логика — няма директна макро верига",
-     "IV Rank 0.0 — implied vol е на дъното, опции са скъпи за хеджиране",
-     "rs_status: near_high, не new_high — относителната сила не е на ново ниво",
-     "Hurricane/catastrophe season (юни-ноември) може да удари housing insurance segment"
-    ],
-    "earnings_call": "преди earnings — 46 дни, достатъчен прозорец; но препоръчително partial reduce преди 08-04.",
-    "classification": "Action",
-    "watchlist_trigger": null
-   },
-   "plan": {
-    "valid": true,
-    "entry_range": [
-     260.35,
-     270.97
-    ],
-    "entry_mid": 265.66,
-    "stop_loss": 239.97,
-    "stop_basis": "под 50DMA",
-    "risk_per_share": 25.69,
-    "max_risk_usd": 1000.0,
-    "sizing_factor": 1.0,
-    "shares": 38,
-    "total_investment": 10095.0,
-    "pct_of_portfolio": 10.1,
-    "target_1": 317.04,
-    "target_2": "trailing stop под 10DMA след достигане на $317.04",
-    "reward_risk": 2.0,
-    "time_horizon": "4–8 седмици"
-   }
-  }
- ],
- "watchlist": [
   {
    "ticker": "AMG",
    "price": 352.9,
@@ -1009,23 +986,23 @@
    "markers": [],
    "ai": {
     "ticker": "AMG",
-    "why_now": "Частично техническа, частично макро: risk-on и VIX compression са позитивни за asset management (AUM растат, fee revenues нагоре). EPS +52.5% YoY е силно. PE 14.47 и Forward PE 8.99 са изключително ниски. Analyst target 381 дава upside от pivot. Cup with handle pattern. Но -3.02% под pivot е по-далеч от идеалното, и финансовият сектор не е в активната секторна логика.",
-    "business_bg": "Affiliated Managers Group управлява мрежа от независими investment management компании. Моделът е партньорство с boutique asset managers, от което AMG получава дял от приходите. Обслужва institutional, retail и high net worth клиенти.",
+    "why_now": "Risk-on режим (VIX колапс) директно увеличава AUM на asset managers → AMG управлява affiliates, така че всеки market rally директно подобрява fee revenues. EPS +52.5%, forward P/E само 9.0 е изключително евтин. Cup with handle, RS near_high, volume_ratio 1.89, breakout обем. Но: 3.02% от pivot и earnings само след 41 дни (30.07.2026) стесняват прозореца.",
+    "business_bg": "Affiliated Managers Group управлява мрежа от независими asset management компании, предоставяйки инвестиционни услуги на институционални и retail клиенти. Бизнес моделът се базира на участие в приходите на affiliates без директно управление. AUM расте при bullish пазари, което директно увеличава fee-базираните приходи.",
     "catalysts": [
-     "Earnings 2026-07-30 (41 дни): EPS estimate $34.87 — близко, риск и катализатор едновременно",
-     "Risk-on AUM expansion → fee revenues нагоре",
-     "Ниски мултипли (Forward PE 8.99) привличат value-ориентирани институции",
-     "Пробив над 363.89 с обем при позитивен market breadth"
+     "VIX колапс → пазарен rally → по-висок AUM → директно нараства fee revenue за AMG affiliates",
+     "Forward P/E 9.0 предполага значителна mean-reversion възможност спрямо сектора",
+     "Analyst target 381 предполага ~8% upside",
+     "Earnings на 30.07.2026 (41 дни) — edge case, но прозорецът е достатъчен за 4-5 седмичен swing"
     ],
     "risks": [
-     "-3.02% под pivot е по-далеч отколкото е идеално за buy point",
-     "Earnings на 07-30 са само 41 дни — позицията влиза в earnings risk в рамките на хоризонта",
-     "Финансовият сектор не е в активната секторна логика",
-     "IV Rank 0.0 — скъпо хеджиране чрез опции"
+     "Earnings след само 41 дни — прозорецът е кратък и trade-ът може да се окаже earnings bet",
+     "Revenue growth само +9.7% е слаб — earnings ръстът идва от margin expansion, не revenue acceleration",
+     "RS near_high, не new_high — относителната сила не е напълно потвърдена",
+     "IV rank 0 прави call опции скъпи при ниска историческа волатилност"
     ],
-    "earnings_call": "преди earnings — 41 дни, технически извън blackout, но earnings са в рамките на swing хоризонта; трябва изричен план за управление.",
+    "earnings_call": "преди earnings — 41 дни са на ръба; препоръчително е trade-ът да се структурира с изход преди 25.07.2026",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай пробив над 363.89 с обем >1.5x среден И потвърждение от RS линия на нов high. Ако earnings (07-30) минат позитивно с guidance raise — re-evaluate за Action след report."
+    "watchlist_trigger": "Пробив над pivot 363.89 с обем >1.5x; след пробива — управлявай стоп плътно под базата предвид кратките 41 дни до earnings"
    }
   },
   {
@@ -1124,22 +1101,22 @@
    ],
    "ai": {
     "ticker": "WWD",
-    "why_now": "Aerospace & defense компания в ITA сектор, който е с -6.91% RS за 12 седмици — secondary bounce без trend потвърждение. Setup-ът е технически: cup with handle, volume ratio 2.29, но -3.42% под pivot е прекалено далеч. IV Rank 100 е червен флаг — implied vol е на максимума за годината, което сигнализира очакван event или повишена несигурност. Earnings само след 38 дни.",
-    "business_bg": "Woodward проектира и произвежда control solutions за aerospace и industrial пазари. Продуктите включват fuel systems, actuation systems и flight deck controls за turbine engines. Обслужва военни и граждански авиационни клиенти.",
+    "why_now": "Aerospace & Defense с частична macro верига — Oil срив намалява fuel разходите за военна авиация (директен маржин тейлуинд за WWD актуаторни и горивни системи). Cup with handle, обем 2.29x, но: 3.42% от pivot е значително разстояние, ITA-ят е в 'weakening' Weinstein категория (12w RS -6.9%), и analyst target 437 е под текущата цена от 430. IV rank 100 означава рекордно скъпи опции.",
+    "business_bg": "Woodward проектира и произвежда контролни системи за аерокосмическия и индустриалния сектор. В авиацията доставя горивни помпи, актуатори и системи за обръщане на тягата за турбинни двигатели. Индустриалният сегмент обхваща системи за управление на двигатели на природен газ и промишлени турбини.",
     "catalysts": [
-     "Геополитическо напрежение поддържа defense spending",
-     "Commercial aviation recovery поддържа aftermarket services",
-     "Earnings 2026-07-27 (38 дни) — потенциален catalyst ако beat"
+     "Oil срив намалява jet fuel разходите → airline клиентите на WWD увеличават maintenance поръчките",
+     "Defense бюджетни ангажименти NATO+ поддържат military aftermarket приходите",
+     "Earnings на 27.07.2026 (38 дни) — много кратък прозорец"
     ],
     "risks": [
-     "IV Rank 100 — implied vol е на годишен максимум, нещо е в цената; опасно да се купува тук",
-     "ITA RS -6.91% за 12 седмици — секторът е в RS downtrend",
-     "-3.42% под pivot е твърде далеч за правилен buy point",
-     "Earnings след само 38 дни — insider blackout риск и gap риск"
+     "Analyst target 437.09 е почти равен на текущата цена (430) — минимален upside по Street",
+     "ITA в Weinstein 'weakening' фаза — секторният тейлуинд е слаб",
+     "IV rank 100 — опционните стратегии са максимално скъпи; cash-secured put е единствената разумна алтернатива",
+     "Earnings след само 38 дни — прозорецът е недостатъчен за 6-седмичен swing"
     ],
-    "earnings_call": "не сега — earnings след 38 дни и IV Rank 100 означава пазарът вече е купил optionality; влизане сега е купуване на риск на максималната му цена.",
+    "earnings_call": "не сега — само 38 дни до earnings правят всяка позиция де факто earnings bet без достатъчен буфер",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай earnings (07-27) да минат и IV да се нормализира. Ако след report цената консолидира над 445.29 с намаляващ IV — re-evaluate. Също: ITA RS трябва да пробие 6-месечния peak."
+    "watchlist_trigger": "Изчакай след earnings на 27.07.2026; ако резултатите са позитивни и цената пробива 445.29 с обем, тогава вход"
    }
   },
   {
@@ -1155,8 +1132,8 @@
    "ma200": 72.05,
    "above_ma50": true,
    "above_ma200": true,
-   "avg_volume_50d": 5025392,
-   "last_volume": 7510100,
+   "avg_volume_50d": 5025414,
+   "last_volume": 7511200,
    "volume_ratio": 1.49,
    "breakout_volume": false,
    "base_low": 63.63,
@@ -1221,22 +1198,21 @@
    "markers": [],
    "ai": {
     "ticker": "IBKR",
-    "why_now": "Deep base 34.9% — най-дълбоката база в листата, висок failure rate. breakout_volume: false е критична слабост — без институционален обем при приближаване до pivot. Analyst target 88.27 е значително ПОД текущата цена 96.00 — street е bearish. Earnings след само 25 дни (07-14) — автоматично Watchlist по правилата.",
-    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, предлагащ execution и clearing на акции, опции, futures, forex и crypto. Обслужва hedge funds, registered advisors и retail клиенти глобално. Известен с ниски комисионни и технологична ефективност.",
+    "why_now": "Risk-on VIX колапс директно увеличава trading volumes → IBKR е volume-sensitive брокер, така че volatility normalization е double-edged: по-нисък VIX намалява options premium revenues, но увеличава equity trading activity. Deep base (34.9%) е сериозен red flag. Breakout обем ЛИПСВА при volume_ratio само 1.49 — слаб сигнал. Analyst target 88.27 е ~8% ПОД текущата цена — Wall Street е мечи.",
+    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, обслужващ търговия с акции, опции, фючърси, forex, облигации и криптовалути. Компанията предоставя prime brokerage услуги на хедж фондове, RIA и institutional клиенти. Силата на бизнеса е в технологичната ефективност и ниските комисиони при висок trading volume.",
     "catalysts": [
-     "VIX compression → повишена trading activity → commission revenues нагоре",
-     "Earnings 2026-07-14 (25 дни) — единственият краткосрочен catalyst",
-     "Risk-on режим → повече retail и institutional trading volume"
+     "Risk-on mode увеличава retail и institutional trading activity → комисионни приходи растат",
+     "Earnings на 14.07.2026 — само 25 дни! Изключително кратък прозорец"
     ],
     "risks": [
-     "Earnings след 25 дни — автоматично Watchlist по правилата",
-     "breakout_volume: false — липса на институционален buying pressure",
-     "Analyst target 88.27 е под текущата цена — street не вижда upside",
-     "Deep base 34.9% с висок structural failure rate"
+     "Analyst target 88.27 е 8% ПОД текущата цена — значима Street мечка",
+     "Breakout обем липсва — volume_ratio 1.49 без потвърждение е критичен недостатък",
+     "Deep base 34.9% — образувана при тежка дистрибуция",
+     "Earnings само след 25 дни — автоматично Watchlist по правилата"
     ],
-    "earnings_call": "не сега — earnings след само 25 дни (приблизително 5 работни седмици), прекалено близо за swing позиция.",
+    "earnings_call": "не сега — 25 дни до earnings, автоматично Watchlist; позиция преди earnings при тези условия е неприемлива",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай earnings (07-14) да минат с позитивен beat и guidance. Ако след report цената пробие 97.81 с обем >1.5x среден — re-evaluate за Action. Analyst target трябва да се ревизира нагоре."
+    "watchlist_trigger": "Изчакай earnings на 14.07.2026; при позитивна реакция и пробив над 97.81 с обем >1.5x — тогава вход. Analyst target под цената остава червен флаг."
    }
   },
   {
@@ -1318,23 +1294,21 @@
    "markers": [],
    "ai": {
     "ticker": "LNTH",
-    "why_now": "XBI/biotech верига: risk-on, VIX под 17, speculative biotech получава апетит. LNTH е radiopharmaceutical компания с EPS +62.3% YoY. Но: revenue growth само +1.2% YoY е тревожен знак — earnings beat може да е едноразов; breakout_volume: false; volume_ratio само 1.14 е най-слаб в листата; short interest 11.2% е умерен (squeeze potential, но и причина за слабост). -3.82% под pivot е далеч.",
-    "business_bg": "Lantheus Holdings разработва и комерсиализира диагностични и терапевтични radiopharmaceutical продукти. Флагманският продукт PYLARIFY е PET imaging agent за рак на простатата. Компанията се позиционира в нарастващия theranostics пазар.",
+    "why_now": "XBI биотех тейлуинд (VIX под 17 → спекулативен капитал в small/mid-cap biotech), но LNTH има сериозни слабости: revenue growth само +1.2% е почти flat — EPS growth +62.3% идва от margin compression reversal, не от реален топлайн momentum. Volume_ratio 1.14 без breakout обем е най-слабият сигнал в листата. Short interest 11.2% добавя риск при негативна новина. Analyst target 105.23 е почти равен на цената.",
+    "business_bg": "Lantheus Holdings разработва и комерциализира диагностични и терапевтични радиофармацевтични продукти. Флагманският продукт PYLARIFY е PET imaging агент за простатен рак, а DEFINITY се използва в ехокардиография. Компанията е нишов играч в ядрено-медицинската диагностика с ограничена конкуренция.",
     "catalysts": [
-     "PYLARIFY продажбен momentum — водещ продукт в растящ пазар",
-     "XBI recovery: rs_status near_high след дълъг underperformance",
-     "Short interest 11.2% — при позитивен катализатор squeeze е възможен",
-     "Earnings 2026-08-05 (47 дни): EPS estimate $5.33"
+     "XBI риск-он тейлуинд при VIX под 17",
+     "Earnings на 05.08.2026 (47 дни) — достатъчен прозорец"
     ],
     "risks": [
-     "Revenue growth само 1.2% YoY е fundamentally слабо — earnings beat е driven от margin, не от top-line",
-     "breakout_volume: false и volume_ratio 1.14 — липсва institutional conviction",
-     "XBI RS +1.33% за 12 седмици — секторът все още не е в confirming trend",
-     "Short interest 11.2% може да означава информирани short sellers виждат pipeline риск"
+     "Revenue growth само +1.2% — бизнесът не расте топлайн, което е фундаментален проблем за biotech оценка",
+     "Breakout обем липсва (volume_ratio 1.14) — setup не е потвърден",
+     "Short interest 11.2% — при негативна новина squeeze надолу е реален риск",
+     "Analyst target 105.23 предоставя само 1.3% upside — никакво reward/risk съотношение"
     ],
-    "earnings_call": "преди earnings — 47 дни, технически чист прозорец, но слабите fundamentals правят risk/reward неатрактивен.",
+    "earnings_call": "след earnings — прозорецът е достатъчен, но setup-ът е слаб независимо от това",
     "classification": "Watchlist",
-    "watchlist_trigger": "Изчакай пробив над 107.99 с обем >1.5x среден И volume_ratio да се подобри устойчиво над 1.5. Допълнително: XBI 12-седмичен RS трябва да се обърне позитивно. Revenue growth трябва да се ускори в следващия report."
+    "watchlist_trigger": "Пробив над pivot 107.99 с обем >1.5x среден дневен И revenue guidance revision нагоре — само тогава setup-ът получава фундаментално потвърждение"
    }
   }
  ],
@@ -1478,10 +1452,51 @@
   }
  ],
  "naaim_history": {
-  "points": [],
+  "points": [
+   {
+    "date": "04/15/2026",
+    "value": 79.5
+   },
+   {
+    "date": "04/22/2026",
+    "value": 94.2
+   },
+   {
+    "date": "04/29/2026",
+    "value": 93.8
+   },
+   {
+    "date": "05/06/2026",
+    "value": 96.7
+   },
+   {
+    "date": "05/13/2026",
+    "value": 77.3
+   },
+   {
+    "date": "05/20/2026",
+    "value": 82.0
+   },
+   {
+    "date": "05/27/2026",
+    "value": 98.4
+   },
+   {
+    "date": "06/03/2026",
+    "value": 86.8
+   },
+   {
+    "date": "06/10/2026",
+    "value": 79.3
+   },
+   {
+    "date": "06/17/2026",
+    "value": 92.8
+   }
+  ],
   "low_zone": 30,
   "high_zone": 90,
-  "current": null
+  "current": 92.8
  },
  "superinvestor_moves": [
   {
