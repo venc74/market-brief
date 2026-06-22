@@ -1,15 +1,15 @@
 {
- "date": "2026-06-19",
+ "date": "2026-06-22",
  "rows": [
   {
-   "ticker": "FFMR",
-   "company": "First Farmers Financial Corp",
-   "date": "2026-06-16",
-   "ratio": "2:1",
+   "ticker": "SMERY",
+   "company": "Siemens Energy AG",
+   "date": "2026-06-22",
+   "ratio": "5:1",
    "split_type": "normal",
-   "date_human": "Jun 16, 2026",
-   "price": 34.02,
-   "market_cap": 708379588.4317589
+   "date_human": "Jun 22, 2026",
+   "price": 195.48,
+   "market_cap": 166323874241.94275
   }
  ]
 }
