@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 import io
+import os
 from functools import lru_cache
 import requests
 import yfinance as yf
@@ -48,9 +49,10 @@ def vix_level() -> dict:
     }
 
 
-# ── NAAIM източници (приоритет: Nasdaq Data Link → naaim.org CSV → scrape) ──
+# ── NAAIM източници (приоритет: Nasdaq Data Link [API key] → naaim.org scrape) ──
+# naaim.org CSV (USE_Data_since_Inception.csv) е премахнат — върна 404 (файлът е
+# изтрит/преместен). Останаха два източника: оторизиран Nasdaq endpoint и scrape.
 NAAIM_NASDAQ_URL = "https://data.nasdaq.com/api/v3/datasets/NAAIM/NAAIM.json"
-NAAIM_CSV_URL = "https://naaim.org/wp-content/uploads/data/USE_Data_since_Inception.csv"
 NAAIM_PAGE_URL = "https://naaim.org/programs/naaim-exposure-index/"
 _NAAIM_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
@@ -69,11 +71,19 @@ def _parse_date_safe(s: str):
 
 def _naaim_from_nasdaq() -> list[dict]:
     """
-    Primary: Nasdaq Data Link (Quandl) — публичен JSON, без API ключ за базов достъп.
+    Primary: Nasdaq Data Link (Quandl) — изисква API ключ (anonymous достъп е спрян,
+    връща 403). Ключът идва от env var NASDAQ_API_KEY и се подава като query параметър.
+    Ако ключът липсва → чист skip (връщаме [] без да правим заявка), за да паднем
+    тихо към следващия източник, вместо да генерираме 403 грешка.
     Структура: dataset.column_names + dataset.data (newest-first по подразбиране).
     Нормализираме до хронологичен ascending списък [{date, value}].
     """
-    r = requests.get(NAAIM_NASDAQ_URL, timeout=20, headers=_NAAIM_HEADERS)
+    api_key = os.getenv("NASDAQ_API_KEY")
+    if not api_key:
+        print("[thermo] NAAIM: NASDAQ_API_KEY липсва — пропускам Nasdaq source")
+        return []
+    r = requests.get(NAAIM_NASDAQ_URL, timeout=20, headers=_NAAIM_HEADERS,
+                     params={"api_key": api_key})
     r.raise_for_status()
     ds = r.json().get("dataset", {})
     cols = [str(c).lower() for c in ds.get("column_names", [])]
@@ -97,46 +107,62 @@ def _naaim_from_nasdaq() -> list[dict]:
     return pts
 
 
-def _naaim_from_csv() -> list[dict]:
+def _looks_like_date(s) -> bool:
+    """Бърза проверка дали низ прилича на дата (за JSON евристиката)."""
+    if not isinstance(s, str):
+        return False
+    return _parse_date_safe(s)[0] is not None
+
+
+def _points_from_json_obj(obj, out: list[dict]) -> None:
     """
-    Secondary: историческият CSV на naaim.org. Редовете са в хронологичен ред
-    (най-старият първи), затова НЕ пресортираме — пазим оригиналната подредба.
+    Рекурсивно обхожда произволна JSON структура и събира двойки (дата, число)
+    които приличат на времева серия. Покрива честите chart формати:
+      • [{"date": "...", "value": N}, ...]  (Chart.js / WP плъгини)
+      • [{"x": "...", "y": N}, ...]         (Highcharts/plotly)
+      • [["YYYY-MM-DD", N], ...]            (двойки)
+    Стойностите се ограничават до [-250, 250] (NAAIM е приблизително [-200, 200]).
     """
-    import csv
-    r = requests.get(NAAIM_CSV_URL, timeout=20, headers=_NAAIM_HEADERS)
-    r.raise_for_status()
-    rows = list(csv.reader(io.StringIO(r.text)))
-    pts = []
-    for row in rows:
-        if len(row) < 2:
-            continue
-        # първата клетка трябва да е дата; стойността = първата числова след нея
-        sort_key, raw = _parse_date_safe(row[0])
-        if sort_key is None:
-            continue  # заглавен/празен ред
-        for c in row[1:]:
-            try:
-                val = float(str(c).replace("%", "").replace(",", "").strip())
-            except ValueError:
-                continue
-            if -250 <= val <= 250:
-                pts.append({"date": raw, "value": round(val, 1)})
-                break
-    return pts
+    if isinstance(obj, dict):
+        # dict с дата-подобен ключ + числова стойност
+        date_val = next((obj[k] for k in ("date", "Date", "x", "t", "time", "label")
+                         if k in obj and _looks_like_date(obj.get(k))), None)
+        if date_val is not None:
+            num = next((obj[k] for k in ("value", "y", "mean", "naaim", "close", "v")
+                        if isinstance(obj.get(k), (int, float))), None)
+            if num is not None and -250 <= num <= 250:
+                _, raw = _parse_date_safe(date_val)
+                out.append({"date": raw, "value": round(float(num), 1),
+                            "_k": _parse_date_safe(date_val)[0]})
+        for v in obj.values():
+            _points_from_json_obj(v, out)
+    elif isinstance(obj, list):
+        # двойка [date, number]
+        if (len(obj) == 2 and _looks_like_date(obj[0])
+                and isinstance(obj[1], (int, float)) and -250 <= obj[1] <= 250):
+            _, raw = _parse_date_safe(obj[0])
+            out.append({"date": raw, "value": round(float(obj[1]), 1),
+                        "_k": _parse_date_safe(obj[0])[0]})
+        for v in obj:
+            _points_from_json_obj(v, out)
 
 
 def _naaim_from_scrape() -> list[dict]:
     """
-    Tertiary fallback: директен scrape на programs страницата с BeautifulSoup.
-    Best-effort — вади двойки (дата, числова стойност) от таблиците. Ако датите
-    се разпознават, подреждаме ascending; иначе пазим DOM реда.
+    Fallback: scrape на programs страницата. Първо опитва HTML таблици; ако страницата
+    е JS-rendered SPA (без таблици / почти празно body), търси вграден JSON в
+    <script type="application/json"> (и подобни inline script блокове) като
+    алтернативен начин за извличане. Best-effort, подреждаме ascending по дата.
     """
     from bs4 import BeautifulSoup
     r = requests.get(NAAIM_PAGE_URL, timeout=20, headers=_NAAIM_HEADERS)
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
+
+    # — опит 1: класически HTML таблици —
     pts = []
-    for table in soup.find_all("table"):
+    tables = soup.find_all("table")
+    for table in tables:
         for tr in table.find_all("tr"):
             cells = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
             if len(cells) < 2:
@@ -152,10 +178,52 @@ def _naaim_from_scrape() -> list[dict]:
                 if -250 <= val <= 250:  # NAAIM е приблизително в [-200, +200]
                     pts.append({"date": raw, "value": round(val, 1), "_k": sort_key})
                     break
-    pts.sort(key=lambda p: p["_k"])
+
+    # — опит 2: SPA / JS-rendered страница → вграден JSON —
+    # Признаци за SPA: няма таблици с данни ИЛИ много малко видим текст спрямо script.
+    if not pts:
+        import json as _json
+        scripts = soup.find_all("script")
+        body_text = soup.get_text(" ", strip=True)
+        is_spa = (not tables) or (len(body_text) < 600 and len(scripts) > 3)
+        if is_spa or scripts:
+            for sc in scripts:
+                stype = (sc.get("type") or "").lower()
+                blob = sc.string or sc.get_text() or ""
+                blob = blob.strip()
+                if not blob:
+                    continue
+                # приоритет на декларираните JSON блокове, но опитваме и inline скриптове
+                candidates = []
+                if "json" in stype:
+                    candidates.append(blob)
+                else:
+                    # извличаме първия балансиран {…} или […] от inline script
+                    for opener, closer in (("[", "]"), ("{", "}")):
+                        i, j = blob.find(opener), blob.rfind(closer)
+                        if 0 <= i < j:
+                            candidates.append(blob[i:j + 1])
+                for cand in candidates:
+                    try:
+                        data = _json.loads(cand)
+                    except (ValueError, TypeError):
+                        continue
+                    _points_from_json_obj(data, pts)
+                if pts:
+                    break
+
+    # дедупликация по (date, value) + сортиране ascending
+    seen, uniq = set(), []
     for p in pts:
+        key = (p["date"], p["value"])
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(p)
+    uniq.sort(key=lambda p: p.get("_k") or p["date"])
+    for p in uniq:
         p.pop("_k", None)
-    return pts
+    return uniq
 
 
 @lru_cache(maxsize=1)
@@ -168,7 +236,6 @@ def _naaim_series() -> tuple:
     го третират като последователност (slice/индексиране работят непроменено).
     """
     for name, fn in (("nasdaq", _naaim_from_nasdaq),
-                     ("naaim.org CSV", _naaim_from_csv),
                      ("naaim.org scrape", _naaim_from_scrape)):
         try:
             pts = fn()
@@ -184,7 +251,7 @@ def naaim_exposure() -> dict:
     """
     NAAIM Exposure Index — седмичен барометър на експозицията на активните мениджъри.
     <30 = дефанзивни (contrarian bullish при дъна), >90 = еуфория (предупреждение).
-    Източници по приоритет: Nasdaq Data Link → naaim.org CSV → scrape.
+    Източници по приоритет: Nasdaq Data Link (API ключ) → naaim.org scrape.
     При провал и на трите картичката се скрива gracefully (hide=True), вместо
     да показва "няма данни" текст.
     """
