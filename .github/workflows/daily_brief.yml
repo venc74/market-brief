@@ -4,9 +4,7 @@ name: Daily Investment Brief
 # GitHub cron работи само в UTC и не знае за DST, затова пускаме И ДВАТА слота,
 # а guard стъпката проверява локалното време и убива грешния.
 on:
-  schedule:
-    - cron: "30 5 * * 1-5"   # 07:30 CEST (лято)   
-
+  
   workflow_dispatch: {}       # ръчно пускане за тест
 
 permissions:
