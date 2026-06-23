@@ -92,28 +92,16 @@ SYSTEM_TICKERS = """Ти си портфолио стратег за суинг 
 кажи го. Връщаш САМО валиден JSON."""
 
 
-def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
-                      regime: str) -> list[dict]:
+def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
+                              regime: str) -> str:
     """
-    За всеки кандидат Claude връща:
-    why_now (верижна логика макро→сектор→акция), business_bg (2-3 изречения),
-    catalysts (4-8 седмици), risks, earnings_call (преди/след/не сега),
-    classification (Action/Watchlist) + watchlist_trigger ако е Watchlist.
+    Изгражда user prompt-а за един batch кандидати. Логиката е идентична на
+    оригинала — само `slim` тук е подмножество (batch), не целият списък.
+    Глобалните Action лимити (MAX_ACTION_TICKERS / MAX_PER_SECTOR) остават в
+    prompt-а непроменени; реалното им налагане е в main.apply_hard_rules СЛЕД
+    merge, така че batch-ването не нарушава глобалния cap (кодът има последната дума).
     """
-    slim = []
-    for c in candidates:
-        slim.append({k: c.get(k) for k in (
-            "ticker", "company", "sector", "industry", "business_summary",
-            "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
-            "rs_status", "volume_ratio", "breakout_volume",
-            "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
-            "inst_ownership_pct", "analyst_target")})
-        slim[-1]["earnings"] = c.get("earnings")
-        slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
-        slim[-1]["options"] = {k: c.get("options", {}).get(k)
-                               for k in ("iv", "iv_rank", "strategy")}
-
-    user = f"""Пазарен режим: {regime}
+    return f"""Пазарен режим: {regime}
 Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False)}
 
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
@@ -136,8 +124,68 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
 изключителен setup, поле "warning").
 
 Връщай само JSON: {{"tickers": [...]}}"""
-    out = _parse_json(_call_claude(SYSTEM_TICKERS, user, max_tokens=8000))
-    return out.get("tickers", [])
+
+
+def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
+                          regime: str, tag: str) -> list[dict]:
+    """
+    Един batch → едно Claude извикване → парснат JSON. 1 retry при API/JSON грешка
+    (преходни сривове). При провал и на двата опита: логва и връща [] (губим само
+    тикърите от ТОЗИ batch), без да чупи останалите batch-ове или pipeline-а.
+    """
+    user = _build_ticker_user_prompt(slim, sector_logic, regime)
+    for attempt in (1, 2):  # 1 опит + 1 retry
+        try:
+            out = _parse_json(_call_claude(SYSTEM_TICKERS, user,
+                                           max_tokens=config.AI_BATCH_MAX_TOKENS))
+            return out.get("tickers", [])
+        except Exception as e:
+            label = "опит" if attempt == 1 else "retry"
+            print(f"[ai] ticker batch {tag} {label} неуспешен: {type(e).__name__}: {e}")
+    print(f"[ai] ticker batch {tag} пропуснат след 2 опита — "
+          f"губим {len(slim)} тикъра: {[c.get('ticker') for c in slim]}")
+    return []
+
+
+def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
+                      regime: str) -> list[dict]:
+    """
+    За всеки кандидат Claude връща:
+    why_now (верижна логика макро→сектор→акция), business_bg (2-3 изречения),
+    catalysts (4-8 седмици), risks, earnings_call (преди/след/не сега),
+    classification (Action/Watchlist) + watchlist_trigger ако е Watchlist.
+
+    Извикванията са на batch-ове по config.AI_BATCH_SIZE тикъра — отделно API
+    извикване + отделно JSON парсване на batch, после обединяване. Така token
+    budget-ът е достатъчен независимо от броя финалисти (9, 14 или 50), и един
+    провален batch не сваля останалите (graceful degradation на batch ниво).
+    """
+    slim = []
+    for c in candidates:
+        slim.append({k: c.get(k) for k in (
+            "ticker", "company", "sector", "industry", "business_summary",
+            "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
+            "rs_status", "volume_ratio", "breakout_volume",
+            "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
+            "inst_ownership_pct", "analyst_target")})
+        slim[-1]["earnings"] = c.get("earnings")
+        slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
+        slim[-1]["options"] = {k: c.get("options", {}).get(k)
+                               for k in ("iv", "iv_rank", "strategy")}
+
+    if not slim:
+        return []
+
+    size = max(1, config.AI_BATCH_SIZE)
+    batches = [slim[i:i + size] for i in range(0, len(slim), size)]
+    n = len(batches)
+    print(f"[ai] ticker_narratives: {len(slim)} финалиста → {n} batch(ове) "
+          f"по ≤{size} (max_tokens={config.AI_BATCH_MAX_TOKENS}/batch)")
+
+    merged: list[dict] = []
+    for idx, batch in enumerate(batches, 1):
+        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}")
+    return merged
 
 
 def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dict]:
