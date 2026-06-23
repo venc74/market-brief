@@ -49,6 +49,14 @@ DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://USERNAME.github.io/ai-invest
 # ── Claude модел ──────────────────────────────────────────────────────────
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
 
+# ── AI batch синтез (ticker_narratives) ───────────────────────────────────
+# Per-ticker наративите се правят на batch-ове, а не в едно извикване, защото
+# фиксиран max_tokens никога не е safe за неизвестен брой финалисти — при много
+# кандидати JSON-ът се отрязва по средата (Unterminated string). Малки batch-ове
+# гарантират достатъчен token budget на batch, независимо от общия брой тикъри.
+AI_BATCH_SIZE = int(os.getenv("AI_BATCH_SIZE", 5))           # тикъри на API извикване
+AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 4000))  # budget на batch
+
 # ── Пътища ────────────────────────────────────────────────────────────────
 import pathlib
 ROOT = pathlib.Path(__file__).parent
