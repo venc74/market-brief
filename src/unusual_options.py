@@ -54,6 +54,17 @@ def _bias(call_vol: float, put_vol: float) -> tuple[str, str]:
     return "mixed", "Балансиран call/put обем."
 
 
+def _oi_label(ratio: float) -> str:
+    """Кратко обяснение какво означава vol/OI съотношението за непрофесионалист."""
+    if ratio < 1:
+        return "нормална активност"
+    if ratio < 2:
+        return "леко повишена активност"
+    if ratio < 4:
+        return "силно ново позициониране"
+    return "екстремна, необичайна активност"
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Универс: S&P500 + NDX (Wikipedia), с кеш и статичен fallback
 # ──────────────────────────────────────────────────────────────────────────
@@ -142,7 +153,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             bias, note = _bias(call_vol, put_vol)
             svr = _stock_vol_ratio(tk)
             extra = f" Обем на акцията {svr}× 20д средна." if svr else ""
-            oi_part = f" ≈ {ratio:.1f}× OI." if ratio is not None else "."
+            oi_part = f" ≈ {ratio:.1f}× OI ({_oi_label(ratio)})." if ratio is not None else "."
             rows.append({"ticker": sym, "call_put_bias": bias,
                          "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
                          "_ratio": round(ratio, 2) if ratio is not None else 0})
