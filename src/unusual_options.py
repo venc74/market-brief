@@ -134,13 +134,18 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             total_vol = call_vol + put_vol
             if total_vol < 1000:  # отсяваме неликвидни
                 continue
-            ratio = total_vol / max(total_oi, 1)
+            # total_oi може да е 0 при ранен сутрешен fetch (OI още не е обновен) —
+            # в този случай пропускаме vol/OI съотношението вместо да показваме
+            # подвеждащо число (обем делен на защитния delitel 1).
+            has_oi = total_oi > 0
+            ratio = (total_vol / total_oi) if has_oi else None
             bias, note = _bias(call_vol, put_vol)
             svr = _stock_vol_ratio(tk)
             extra = f" Обем на акцията {svr}× 20д средна." if svr else ""
+            oi_part = f" ≈ {ratio:.1f}× OI." if ratio is not None else "."
             rows.append({"ticker": sym, "call_put_bias": bias,
-                         "note": f"{note} Опц. обем {int(total_vol):,} ≈ {ratio:.1f}× OI.{extra}",
-                         "_ratio": round(ratio, 2)})
+                         "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
+                         "_ratio": round(ratio, 2) if ratio is not None else 0})
         except Exception as e:
             print(f"[unusual_options] yf {sym}: {e}")
             continue
