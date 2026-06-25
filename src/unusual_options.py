@@ -65,6 +65,17 @@ def _oi_label(ratio: float) -> str:
     return "екстремна, необичайна активност"
 
 
+def _stock_vol_label(svr: float) -> str:
+    """Кратко обяснение какво означава обема на акцията спрямо 20д средна."""
+    if svr < 1.0:
+        return "под нормалното"
+    if svr < 1.3:
+        return "нормално"
+    if svr < 2.0:
+        return "повишен интерес"
+    return "екстремен интерес"
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Универс: S&P500 + NDX (Wikipedia), с кеш и статичен fallback
 # ──────────────────────────────────────────────────────────────────────────
@@ -148,11 +159,13 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             # total_oi може да е 0 при ранен сутрешен fetch (OI още не е обновен) —
             # в този случай пропускаме vol/OI съотношението вместо да показваме
             # подвеждащо число (обем делен на защитния delitel 1).
-            has_oi = total_oi > 0
+            # total_oi може да е 0 (или близо до 0) при ранен сутрешен fetch —
+            # праг от 50 договора избягва абсурдни съотношения от почти-нулев OI.
+            has_oi = total_oi >= 50
             ratio = (total_vol / total_oi) if has_oi else None
             bias, note = _bias(call_vol, put_vol)
             svr = _stock_vol_ratio(tk)
-            extra = f" Обем на акцията {svr}× 20д средна." if svr else ""
+            extra = f" Обем на акцията {svr}× 20д средна ({_stock_vol_label(svr)})." if svr else ""
             oi_part = f" ≈ {ratio:.1f}× OI ({_oi_label(ratio)})." if ratio is not None else "."
             rows.append({"ticker": sym, "call_put_bias": bias,
                          "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
