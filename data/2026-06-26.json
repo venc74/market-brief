@@ -1,0 +1,3274 @@
+{
+ "date": "2026-06-26",
+ "macro": {
+  "date": "2026-06-26",
+  "net_liquidity": {
+   "value": -911966.1,
+   "prev": -823591.9,
+   "trend": "down",
+   "components": {
+    "fed_balance_bn": 6735.6,
+    "rrp_bn": 5.7,
+    "tga_bn": 918696.0
+   }
+  },
+  "spread_2s10s": {
+   "value": 0.31,
+   "prev_week": 0.29,
+   "status": "normal",
+   "direction": "steepening"
+  },
+  "global_signals": {
+   "DXY": {
+    "value": 101.39,
+    "chg_5d_pct": 1.77
+   },
+   "VIX": {
+    "value": 18.89,
+    "chg_5d_pct": 6.84
+   },
+   "Gold": {
+    "value": 4028.4,
+    "chg_5d_pct": -6.92
+   },
+   "Oil_WTI": {
+    "value": 70.43,
+    "chg_5d_pct": -12.78
+   },
+   "Copper": {
+    "value": 6.04,
+    "chg_5d_pct": -6.83
+   },
+   "US10Y": {
+    "value": 4.45,
+    "chg_5d_pct": -0.27
+   }
+  },
+  "headlines": []
+ },
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 734.3,
+    "ma50": 732.07,
+    "ma200": 686.41,
+    "above_50dma": true,
+    "above_200dma": true,
+    "status": "green",
+    "label": "SPY 734 | над 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 18.89,
+    "chg_5d": 1.21,
+    "status": "green",
+    "label": "VIX 18.9 (risk-on)"
+   },
+   {
+    "name": "NAAIM",
+    "value": 98.6,
+    "as_of": "06/24/2026",
+    "status": "red",
+    "label": "NAAIM 99"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 1.14,
+    "status": "green",
+    "label": "P/C 1.14"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.31,
+    "status": "green",
+    "label": "0.31% (нормален, steepening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": -911966.1,
+    "status": "red",
+    "label": "$-911966.1 млрд (↓)"
+   }
+  ],
+  "regime": "Defensive",
+  "regime_reason": "2 червени индикатора — намален риск",
+  "sizing_factor": 1.0
+ },
+ "rotation": [
+  {
+   "etf": "XBI",
+   "sector": "Биотех",
+   "rs_chg_4w_pct": 15.05,
+   "rs_chg_12w_pct": 7.31,
+   "rs_at_6m_high": true,
+   "abs_chg_4w_pct": 12.86,
+   "leading": true
+  },
+  {
+   "etf": "SMH",
+   "sector": "Полупроводници",
+   "rs_chg_4w_pct": 9.02,
+   "rs_chg_12w_pct": 46.54,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 6.95,
+   "leading": true
+  },
+  {
+   "etf": "XLI",
+   "sector": "Индустрия",
+   "rs_chg_4w_pct": 7.95,
+   "rs_chg_12w_pct": 0.29,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 5.89,
+   "leading": true
+  },
+  {
+   "etf": "XLV",
+   "sector": "Здравеопазване",
+   "rs_chg_4w_pct": 7.09,
+   "rs_chg_12w_pct": -6.02,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 5.06,
+   "leading": false
+  },
+  {
+   "etf": "XLF",
+   "sector": "Финанси",
+   "rs_chg_4w_pct": 6.33,
+   "rs_chg_12w_pct": -4.18,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.31,
+   "leading": false
+  },
+  {
+   "etf": "ITA",
+   "sector": "Отбрана",
+   "rs_chg_4w_pct": 5.06,
+   "rs_chg_12w_pct": -5.44,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 3.07,
+   "leading": false
+  },
+  {
+   "etf": "XLU",
+   "sector": "Комунални услуги",
+   "rs_chg_4w_pct": 4.2,
+   "rs_chg_12w_pct": -10.8,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.22,
+   "leading": false
+  },
+  {
+   "etf": "XLB",
+   "sector": "Материали",
+   "rs_chg_4w_pct": 3.64,
+   "rs_chg_12w_pct": -7.12,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 1.67,
+   "leading": false
+  },
+  {
+   "etf": "XLRE",
+   "sector": "Недвижими имоти",
+   "rs_chg_4w_pct": 2.74,
+   "rs_chg_12w_pct": -2.17,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.79,
+   "leading": false
+  },
+  {
+   "etf": "XLK",
+   "sector": "Технологии",
+   "rs_chg_4w_pct": 2.14,
+   "rs_chg_12w_pct": 22.21,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.2,
+   "leading": true
+  },
+  {
+   "etf": "XLP",
+   "sector": "Потребителски (защитни)",
+   "rs_chg_4w_pct": 1.87,
+   "rs_chg_12w_pct": -8.72,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.07,
+   "leading": false
+  },
+  {
+   "etf": "XLE",
+   "sector": "Енергетика",
+   "rs_chg_4w_pct": -2.55,
+   "rs_chg_12w_pct": -22.4,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -4.4,
+   "leading": false
+  },
+  {
+   "etf": "XLY",
+   "sector": "Потребителски (циклични)",
+   "rs_chg_4w_pct": -4.75,
+   "rs_chg_12w_pct": -8.55,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -6.56,
+   "leading": false
+  },
+  {
+   "etf": "XLC",
+   "sector": "Комуникации",
+   "rs_chg_4w_pct": -7.19,
+   "rs_chg_12w_pct": -14.75,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -8.95,
+   "leading": false
+  },
+  {
+   "etf": "GDX",
+   "sector": "Златодобив",
+   "rs_chg_4w_pct": -9.72,
+   "rs_chg_12w_pct": -19.52,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -11.43,
+   "leading": false
+  },
+  {
+   "etf": "URA",
+   "sector": "Уран/ядрена",
+   "rs_chg_4w_pct": -10.74,
+   "rs_chg_12w_pct": -17.59,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -12.44,
+   "leading": false
+  },
+  {
+   "etf": "TAN",
+   "sector": "Соларна",
+   "rs_chg_4w_pct": -16.34,
+   "rs_chg_12w_pct": -8.19,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -17.93,
+   "leading": false
+  }
+ ],
+ "ai_macro": {
+  "macro_brief": "DXY скочи +1.77% за 5 дни до 101.39, докато Gold падна -6.92%, Copper -6.83% и Oil WTI -12.78% — класическо de-risking с бягство към долара. Комодитите сигнализират спад на глобалното търсене или ликвидация на спекулативни позиции. Fed Net Liquidity се сви рязко от -823.6 млрд до -911.97 млрд — TGA нарасна до $918.7 млрд, което изтегля кеш от системата. SPY въпреки това държи над 50DMA и 200DMA, но NAAIM 98.6 означава, че активните мениджъри са почти изцяло вложени — малко купувачи остават на страни. За днешната сесия: повърхността изглежда спокойна (VIX 18.9, P/C 1.14), но ликвидностното свиване и пренаситеното позициониране правят пазара уязвим при негативен катализатор.",
+  "sector_logic": [
+   {
+    "sector": "Биотех",
+    "etf": "XBI",
+    "chain": "DXY силен → инвеститорите ротират от комодити и международни активи → кеш търси domestic growth с некорелирана с цикъла на суровините динамика → XBI е вътрешно-ориентиран, без commodity exposure → плюс след дълъг underperformance биотехът има компресиран мултипъл, привлекателен при risk-on микросредa → RS на 6-месечен връх потвърждава продължаваща institutional accumulation → 4W RS +15.05% при абсолютен ръст само +12.86% показва, че секторът outperforms дори докато пазарът расте — лидерска сила.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Полупроводници",
+    "etf": "SMH",
+    "chain": "AI capex цикъл не зависи от петрол или мед като demand driver → Oil -12.78% и Copper -6.83% отразяват страх от забавяне, но semiconductor demand е структурно свързан с data center buildout и sovereign AI инициативи → 12W RS +46.54% показва многомесечен тренд на institutional buying → краткосрочното охлаждане на 4W RS до +9.02% (от екстремни нива) е нормална консолидация в лидерски сектор, не reversal → DXY силата не е headwind за SMH, чиито приходи са диверсифицирани глобално и цените са в USD → секторът остава структурен лидер за swing позиции.",
+    "horizon_weeks": 6
+   },
+   {
+    "sector": "Индустрия",
+    "etf": "XLI",
+    "chain": "Кривата 2s10s steepening до 0.31% сигнализира нормализиране и очаквания за икономически растеж → industrial companies с дълги backlog-ове (aerospace, defense manufacturing, infrastructure) не са директно expozed на commodity spot цени — Oil падащ е margin tailwind за транспортно-интензивни компании → фискалните харчения (инфраструктура, reshoring) са domestic demand driver, независим от глобалния commodity цикъл → 4W RS +7.95% при 12W RS само +0.29% означава, че секторът тепърва набира RS momentum — ранна фаза на rotation, не late-stage chase.",
+    "horizon_weeks": 5
+   },
+   {
+    "sector": "Здравеопазване",
+    "etf": "XLV",
+    "chain": "NAAIM 98.6 сигнализира, че пазарът е overbought и мениджърите търсят defensive rotation в рамките на equity allocation → XLV е класически late-cycle defensive — приходите са нецикличи, незасегнати от DXY движение или commodity срив → 4W RS +7.09% при 12W RS -6.02% показва рязка смяна на посоката — институционалите се върнаха след дълъг период на underweight → Oil/Copper срив намалява транспортните и производствените разходи за фармацевтичните компании → XLV работи като буфер при евентуален equity drawdown при настоящото пренаситено позициониране.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Финанси",
+    "etf": "XLF",
+    "chain": "2s10s спред steepening от 0.29% до 0.31% директно разширява net interest margin на банките → по-стръмна крива означава, че банките вземат евтино краткосрочно и дават скъпо дългосрочно — core NIM expansion → DXY силен при стабилни US10Y (4.45%, -0.27% за 5d) показва, че дългосрочните лихви не падат рязко, което е благоприятно за loan book yields → 4W RS +6.33% при 12W RS -4.18% — същата ранна rotation структура като XLI, не late-stage → финансовият сектор е beneficiary от нормализиращата се крива, не от flat/inverted среда.",
+    "horizon_weeks": 4
+   }
+  ],
+  "regime_comment": "Defensive режимът е коректен въпреки зелените surface индикатори по три причини: (1) NAAIM 98.6 означава, че почти няма marginal buyer — при негативен news flow няма кой да купи дипа, само sellers; (2) Fed Net Liquidity -911.97 млрд с рязко влошаване за седмица ($88 млрд изтеглени чрез TGA натрупване) свива системната ликвидност, която исторически корелира с equity риск; (3) комодитният срив (Gold -6.92%, Oil -12.78%, Copper -6.83%) при покачващ се DXY не е neutral — или отразява реален demand shock, или масово de-leveraging, и двете са precursor за equity волатилност. Sizing factor 1.0 е разумен компромис — пазарната структура (SPY над двете MA) не изисква cash raise, но концентрацията на риск налага селективност и по-тесни стопове."
+ },
+ "action": [
+  {
+   "ticker": "WST",
+   "price": 346.56,
+   "pivot": 352.31,
+   "pct_from_pivot": -1.63,
+   "base_type": "deep base",
+   "base_depth_pct": 31.0,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 311.12,
+   "ma200": 273.09,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 873738,
+   "last_volume": 1615300,
+   "volume_ratio": 1.85,
+   "breakout_volume": true,
+   "base_low": 243.17,
+   "company": "West Pharmaceutical Services, Inc.",
+   "sector": "Healthcare",
+   "industry": "Medical Instruments & Supplies",
+   "business_summary": "West Pharmaceutical Services, Inc. designs, manufactures, and sells containment and delivery systems for injectable drugs and healthcare products in the Americas, Europe, the Middle East, Africa, and the Asia Pacific. It operates in two segments, Proprietary Products and Contract-Manufactured Products. The Proprietary Products segment offers stoppers and seals for injectable packaging systems; syringe and cartridge components, including custom solutions for the needs of injectable drug applications, as well as administration systems that enhance the safe delivery of drugs through advanced reco",
+   "market_cap": 24483629056,
+   "eps_growth_yoy": 54.6,
+   "revenue_growth_yoy": 21.0,
+   "roe": 19.1,
+   "pe": 46.269695,
+   "forward_pe": 36.2625,
+   "debt_to_equity": 10.734,
+   "inst_ownership_pct": 103.9,
+   "analyst_target": 358.7857,
+   "short_pct_float": 3.78,
+   "shares_short": 2288165,
+   "short_ratio_dtc": 3.43,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-23",
+    "days_to_earnings": 27,
+    "in_blackout": false,
+    "eps_estimate": 8.61042
+   },
+   "options": {
+    "iv": 6.6,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (3 дни история)",
+    "put_call_ratio": 0.21,
+    "oi_near_money": [
+     {
+      "strike": 340.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 350.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 360.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 370.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.78,
+    "days_to_cover": 3.43,
+    "interpretation": "Нисък short interest (3.78%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 1100000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "WST",
+    "why_now": "XLV е активна секторна логика в Defensive режим — healthcare defensive rotation. WST е директен beneficiary: медицински контейнери за инжекционни лекарства са нецикличен, регулаторно защитен бизнес. Силен EPS ръст (+54.6% YoY) потвърждава фундаментална сила. RS на нов връх с volume ratio 1.85 и breakout volume потвърждава институционален интерес. Само 1.63% под pivot — технически почти готов. Слабост: base depth 31% е дълбока (deep base), което изисква внимание при управление на риска.",
+    "business_bg": "West Pharmaceutical Services проектира и произвежда системи за съхранение и доставка на инжекционни лекарства — тапи, уплътнения и спринцовъчни компоненти. Компанията обслужва фармацевтичната индустрия глобално с продукти, критични за drug delivery. Бизнесът е нецикличен и регулаторно бариериран.",
+    "catalysts": [
+     "Пробив над pivot 352.31 с обем потвърждава институционален buy signal",
+     "Earnings на 23 юли 2026 — EPS estimate 8.61, при траен ръст може да е позитивен катализатор",
+     "Продължаваща defensive rotation в XLV при overbought пазар (NAAIM 98.6)",
+     "RS вече на нов връх — momentum привлича quantitative фондове"
+    ],
+    "risks": [
+     "Deep base (31%) — при пазарна слабост може да се върне към дъното на базата, широк потенциален drawdown",
+     "Earnings на 23 юли (27 дни) — ако се влезе сега, позицията носи earnings риск",
+     "Analyst target 358.79 е само +3.5% над pivot — ограничен upside според консенсуса",
+     "IV rank 100 при IV само 6.6% прави options скъпи спрямо очакваното движение"
+    ],
+    "earnings_call": "преди earnings — earnings на 27 юли са извън 5-дневния прозорец, но позицията ще носи earnings риск след влизане; препоръчително е намален размер или излизане преди 18 юли.",
+    "classification": "Action",
+    "watchlist_trigger": null
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     345.26,
+     359.36
+    ],
+    "entry_mid": 352.31,
+    "stop_loss": 308.01,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 44.3,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 22,
+    "total_investment": 7751.0,
+    "pct_of_portfolio": 7.8,
+    "target_1": 440.91,
+    "target_2": "trailing stop под 10DMA след достигане на $440.91",
+    "reward_risk": 2.0,
+    "time_horizon": "8–12 седмици"
+   }
+  },
+  {
+   "ticker": "VLY",
+   "price": 14.78,
+   "pivot": 14.94,
+   "pct_from_pivot": -1.07,
+   "base_type": "cup with handle",
+   "base_depth_pct": 20.9,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 13.57,
+   "ma200": 12.01,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 6232190,
+   "last_volume": 6195900,
+   "volume_ratio": 0.99,
+   "breakout_volume": false,
+   "base_low": 11.81,
+   "company": "Valley National Bancorp",
+   "sector": "Financial Services",
+   "industry": "Banks - Regional",
+   "business_summary": "Valley National Bancorp operates as the holding company for Valley National Bank that provides various commercial, private banking, retail, insurance, and wealth management financial services products. The company operates through Consumer Banking, Commercial Banking, and Treasury and Corporate other segments. It offers non-interest bearing, savings, NOW, money market, and time deposit accounts; commercial and industrial, commercial real estate, construction, residential mortgage, and automobile loans; loans secured by the cash surrender value of life insurance; home equity loans and lines of ",
+   "market_cap": 8190062592,
+   "eps_growth_yoy": 54.6,
+   "revenue_growth_yoy": 23.8,
+   "roe": 8.6,
+   "pe": 13.315315,
+   "forward_pe": 9.583525,
+   "debt_to_equity": null,
+   "inst_ownership_pct": 90.1,
+   "analyst_target": 15.75,
+   "short_pct_float": 9.67,
+   "shares_short": 39747816,
+   "short_ratio_dtc": 6.45,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-04-23",
+    "days_to_earnings": -64,
+    "in_blackout": false,
+    "eps_estimate": 1.28162
+   },
+   "options": {
+    "iv": 0.4,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (6 дни история)",
+    "put_call_ratio": 1.85,
+    "oi_near_money": [
+     {
+      "strike": 14.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 15.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 9.67,
+    "days_to_cover": 6.45,
+    "interpretation": "Умерен short interest (9.67%) — гориво при пробив с обем.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 4700000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "VLY",
+    "why_now": "2s10s steepening директно разширява NIM на регионалните банки → VLY е чист beneficiary от по-стръмна крива. DXY силен при стабилен US10Y е оптималната среда за loan book yields. RS на нов връх потвърждава institutional accumulation. Setup-ът е cup with handle само -1.07% под pivot — ранно позициониране преди пробив.",
+    "business_bg": "Valley National Bancorp е холдинг за Valley National Bank, предлагащ търговско, частно и retail банкиране в САЩ. Предлага депозити, ипотечни, автомобилни и търговски кредити, застраховане и wealth management. Оперира основно на пазарите в Ню Джърси, Ню Йорк, Флорида и Алабама.",
+    "catalysts": [
+     "Пробив над pivot 14.94 с обем потвърждава base completion",
+     "Продължаващо 2s10s steepening → повишен NIM при следващия earnings",
+     "Short interest 9.67% — при пробив с обем гориво от short covering",
+     "Forward P/E 9.58 — компресиран мултипъл привлича value-ориентирани институции при rotation в XLF"
+    ],
+    "risks": [
+     "Пробивът не идва с обем — volume_ratio 0.99 показва вяла активност в момента",
+     "2s10s се обръща обратно (re-flattening) → NIM thesis се руши",
+     "Кредитно качество: регионалните банки са уязвими при CRE deterioration",
+     "Analyst target 15.75 дава ограничен upside — само ~6.6% до консенсуса"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-04-23 (64 дни назад, вече отминали), следващият cycle е далеч, няма краткосрочен earnings риск.",
+    "classification": "Action",
+    "watchlist_trigger": null
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     14.64,
+     15.24
+    ],
+    "entry_mid": 14.94,
+    "stop_loss": 13.43,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 1.51,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 662,
+    "total_investment": 9890.0,
+    "pct_of_portfolio": 9.9,
+    "target_1": 17.96,
+    "target_2": "trailing stop под 10DMA след достигане на $17.96",
+    "reward_risk": 2.0,
+    "time_horizon": "8–12 седмици"
+   }
+  },
+  {
+   "ticker": "EXEL",
+   "price": 53.23,
+   "pivot": 53.93,
+   "pct_from_pivot": -1.3,
+   "base_type": "cup with handle",
+   "base_depth_pct": 23.0,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 49.09,
+   "ma200": 43.78,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2688778,
+   "last_volume": 2256200,
+   "volume_ratio": 0.84,
+   "breakout_volume": false,
+   "base_low": 41.53,
+   "company": "Exelixis, Inc.",
+   "sector": "Healthcare",
+   "industry": "Biotechnology",
+   "business_summary": "Exelixis, Inc., an oncology company, focuses on the discovery, development, and commercialization of new medicines for difficult-to-treat cancers in the United States. The company offers CABOMETYX tablets for the treatment of patients with advanced renal cell carcinoma who received prior anti-angiogenic therapy; and COMETRIQ capsules for the treatment of progressive and metastatic medullary thyroid cancer. Its CABOMETYX and COMETRIQ are derived from cabozantinib, an inhibitor of multiple tyrosine kinases, including MET, AXL, RET, and VEGF receptors. The company also offers COTELLIC, an inhibit",
+   "market_cap": 13379631104,
+   "eps_growth_yoy": 31.9,
+   "revenue_growth_yoy": 10.0,
+   "roe": 41.0,
+   "pe": 17.625828,
+   "forward_pe": 13.310528,
+   "debt_to_equity": 8.758,
+   "inst_ownership_pct": 107.5,
+   "analyst_target": 49.5,
+   "short_pct_float": 16.57,
+   "shares_short": 30635016,
+   "short_ratio_dtc": 13.08,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-04",
+    "days_to_earnings": 39,
+    "in_blackout": false,
+    "eps_estimate": 3.54091
+   },
+   "options": {
+    "iv": 1.6,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": 4.74,
+    "oi_near_money": [
+     {
+      "strike": 50.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 55.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции / bull call spread",
+    "strategy_reason": "IV 1.6% в средата на диапазона — акции по подразбиране; spread ако искаш дефиниран риск."
+   },
+   "short_view": {
+    "short_pct_float": 16.57,
+    "days_to_cover": 13.08,
+    "interpretation": "Висок short interest (16.57% от float, 13.08 дни за покриване) — реален squeeze потенциал при пробив, но и сигнал че умни пари залагат против.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 3700000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "EXEL",
+    "why_now": "XBI е на 6-месечен RS връх с institutional accumulation — EXEL е онкологична компания с реални приходи (ROE 41%, EPS +31.9% YoY), не спекулативен biotech. Макро веригата: DXY силен → domestic growth без commodity exposure → биотех като EXEL с продаден продукт (CABOMETYX) е prime кандидат. Short interest 16.57% от float с 13 дни за покриване е реален squeeze потенциал при пробив над 53.93.",
+    "business_bg": "Exelixis е онкологична компания, фокусирана върху разработване и комерсиализация на лекарства за трудно лечими ракови заболявания. Основният продукт CABOMETYX (cabozantinib) е одобрен за бъбречно-клетъчен карцином и хепатоцелуларен карцином. Компанията генерира стабилни приходи от продажби и роялти партньорства.",
+    "catalysts": [
+     "Пробив над pivot 53.93 с обем активира short squeeze при 16.57% short float",
+     "XBI RS на 6-месечен връх — секторен tailwind за ликвидни biotech имена",
+     "Pipeline updates: данни от COSMIC-312 и нови комбинационни trials в следващите седмици",
+     "Forward P/E 13.3 при ROE 41% — фундаментално подценен спрямо biotech peers"
+    ],
+    "risks": [
+     "Analyst target 49.50 е ПОД настоящата цена — Wall Street консенсусът е bearish, не bullish",
+     "Short interest е двупосочен сигнал: smart money може да е rights за bearish thesis (патентни cliff-ове, конкуренция)",
+     "RS статус near_high, не new_high — относителна сила не е на максимум",
+     "IV 1.6 (висока) — опциите са скъпи, bull call spread изисква внимателен strike selection"
+    ],
+    "earnings_call": "не сега — next earnings 2026-08-04 (39 дни), извън 5-дневния прозорец, но наближава; планирай изход преди earnings ако trade-ът работи.",
+    "classification": "Action",
+    "watchlist_trigger": null
+   },
+   "plan": {
+    "valid": true,
+    "entry_range": [
+     52.85,
+     55.01
+    ],
+    "entry_mid": 53.93,
+    "stop_loss": 48.6,
+    "stop_basis": "под 50DMA",
+    "risk_per_share": 5.33,
+    "max_risk_usd": 1000.0,
+    "sizing_factor": 1.0,
+    "shares": 187,
+    "total_investment": 10085.0,
+    "pct_of_portfolio": 10.1,
+    "target_1": 64.59,
+    "target_2": "trailing stop под 10DMA след достигане на $64.59",
+    "reward_risk": 2.0,
+    "time_horizon": "4–8 седмици"
+   }
+  }
+ ],
+ "watchlist": [
+  {
+   "ticker": "LNTH",
+   "price": 109.01,
+   "pivot": 109.02,
+   "pct_from_pivot": -0.01,
+   "base_type": "deep base",
+   "base_depth_pct": 33.0,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 94.69,
+   "ma200": 71.91,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 965422,
+   "last_volume": 1297700,
+   "volume_ratio": 1.34,
+   "breakout_volume": false,
+   "base_low": 73.09,
+   "company": "Lantheus Holdings, Inc.",
+   "sector": "Healthcare",
+   "industry": "Drug Manufacturers - Specialty & Generic",
+   "business_summary": "Lantheus Holdings, Inc. develops, manufactures, and commercializes diagnostic and therapeutic products that assist clinicians in diagnosis and treatment of heart, cancer, and other diseases worldwide. The company offers DEFINITY, an injectable ultrasound enhancing agent used in echocardiography exams; TechneLite, a technetium generator for nuclear medicine procedures; Xenon-133, a radiopharmaceutical gas to assess pulmonary function; Neurolite, an injectable imaging agent to identify the area within the brain where blood flow has been blocked or reduced due to stroke; Cardiolite, an injectable",
+   "market_cap": 7097213952,
+   "eps_growth_yoy": 62.3,
+   "revenue_growth_yoy": 1.2,
+   "roe": 23.5,
+   "pe": 26.016706,
+   "forward_pe": 17.042398,
+   "debt_to_equity": 51.617,
+   "inst_ownership_pct": 115.5,
+   "analyst_target": 105.23077,
+   "short_pct_float": 11.2,
+   "shares_short": 5477695,
+   "short_ratio_dtc": 4.75,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-05",
+    "days_to_earnings": 40,
+    "in_blackout": false,
+    "eps_estimate": 5.33316
+   },
+   "options": {
+    "iv": 0.8,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (8 дни история)",
+    "put_call_ratio": 0.0,
+    "oi_near_money": [
+     {
+      "strike": 110.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 11.2,
+    "days_to_cover": 4.75,
+    "interpretation": "Умерен short interest (11.2%) — гориво при пробив с обем.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 1300000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "LNTH",
+    "why_now": "XLV defensive rotation + Biotech (XBI) RS momentum — LNTH попада в пресечната точка на двете активни секторни логики. Radiopharmaceuticals са нишов, бързо растящ сегмент с некорелирана с commodity цикъла динамика. EPS +62.3% YoY е изключителен. Цената е буквално на pivot (0.01% под) — технически на ръба на breakout. Умерен short interest 11.2% добавя squeeze потенциал при пробив. Слабост: volume ratio само 1.34 и breakout volume = false означава, че пробивът още не е потвърден с убедителен обем.",
+    "business_bg": "Lantheus Holdings разработва и комерсиализира диагностични и терапевтични радиофармацевтични продукти. Флагманите включват DEFINITY (ехокардиография) и PYLARIFY (PET imaging при рак на простата). Компанията е лидер в бързо растящия сегмент на targeted radiotherapy.",
+    "catalysts": [
+     "Потвърден пробив над 109.02 с обем >1.5x среден — активира momentum buyers и short covering",
+     "Структурен ръст на PYLARIFY adoptionи нови labeling индикации разширяват addressable market",
+     "XBI RS на 6-месечен връх — секторен tailwind привлича допълнителни институционални потоци",
+     "Earnings на 5 август (40 дни) — достатъчно runway за swing trade преди риска"
+    ],
+    "risks": [
+     "Breakout без потвърден обем — фалшив пробив е реален сценарий при Defensive пазарен режим",
+     "Revenue growth само +1.2% YoY е тревожен дивергенс с EPS ръста — маржовете може да са достигнали пик",
+     "Analyst target 105.23 е под текущата цена — консенсусът не вижда upside отсега",
+     "Deep base 33% — при пазарна корекция акцията може да върне значителна част от ръста"
+    ],
+    "earnings_call": "преди earnings — 40 дни до earnings дават комфортен прозорец за swing trade с изход преди 1 август.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане само при затваряне над 109.02 с volume ratio ≥1.6x среден дневен обем. Analyst target под цената изисква независима техническа цел — следващото ниво на съпротива около 120-125."
+   }
+  },
+  {
+   "ticker": "WTS",
+   "price": 375.09,
+   "pivot": 375.31,
+   "pct_from_pivot": -0.06,
+   "base_type": "cup with handle",
+   "base_depth_pct": 24.5,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 310.41,
+   "ma200": 293.8,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 352184,
+   "last_volume": 369700,
+   "volume_ratio": 1.05,
+   "breakout_volume": false,
+   "base_low": 283.21,
+   "company": "Watts Water Technologies, Inc.",
+   "sector": "Industrials",
+   "industry": "Specialty Industrial Machinery",
+   "business_summary": "Watts Water Technologies, Inc., together with its subsidiaries, supplies products and solutions that manage and conserve the flow of fluids and energy into, through, and out of buildings in the commercial, industrial, and residential markets. The company offers residential and commercial flow control and protection products, including backflow preventers, water pressure regulators, temperature and pressure relief valves, thermostatic mixing valves, leak detection and protection products, commercial washroom solutions, hydration solutions, and emergency safety products and equipment for plumbin",
+   "market_cap": 12524589056,
+   "eps_growth_yoy": 34.6,
+   "revenue_growth_yoy": 21.4,
+   "roe": 18.9,
+   "pe": 34.3489,
+   "forward_pe": 28.82082,
+   "debt_to_equity": 14.549,
+   "inst_ownership_pct": 101.7,
+   "analyst_target": 333.1111,
+   "short_pct_float": 7.31,
+   "shares_short": 1502348,
+   "short_ratio_dtc": 4.39,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-05",
+    "days_to_earnings": 40,
+    "in_blackout": false,
+    "eps_estimate": 11.94449
+   },
+   "options": {
+    "iv": 0.8,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (2 дни история)",
+    "put_call_ratio": 0.09,
+    "oi_near_money": [
+     {
+      "strike": 350.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 360.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 370.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 380.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 390.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 400.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 7.31,
+    "days_to_cover": 4.39,
+    "interpretation": "Нисък short interest (7.31%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.4,
+    "available_shares": 300000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "WTS",
+    "why_now": "XLI е активна секторна логика — steepening крива + fiscal spending + reshoring. WTS прави системи за управление на течности в сгради — директен beneficiary от infrastructure buildout и reshoring (нови производствени мощности изискват plumbing/fluid management решения). EPS +34.6%, revenue +21.4% показват реален операционен импулс. Буквално на pivot (0.06% под). Слабост: volume ratio само 1.05 и breakout volume = false — пробивът е без убедителен обем.",
+    "business_bg": "Watts Water Technologies произвежда продукти за контрол и защита на потока на течности в жилищни, търговски и индустриални сгради — клапани, регулатори на налягане, системи за предотвратяване на обратен поток и leak detection. Компанията обслужва строителния и индустриален сектор глобално с фокус върху устойчивост и енергийна ефективност.",
+    "catalysts": [
+     "Инфраструктурни харчения и reshoring вълна в САЩ увеличават demand за building fluid systems",
+     "Падащите цени на петрола намаляват транспортните разходи — margin tailwind",
+     "Потвърден пробив над 375.31 с обем активира техническо momentum",
+     "Earnings на 5 август (40 дни) — runway за позиция преди earnings риск"
+    ],
+    "risks": [
+     "Analyst target 333.11 е 11% под текущата цена — силен консенсусен headwind, акцията е overvalued според анализаторите",
+     "Breakout без обем — lipsa на institutional conviction при пробива",
+     "Defensive пазарен режим може да ограничи appetite за Industrials въпреки секторната логика",
+     "IV rank 100 при IV 0.8% — options пазарът сигнализира скъпо покритие при очаквано малко движение"
+    ],
+    "earnings_call": "преди earnings — 40 дни до earnings позволяват swing trade, но analyst target под цената ограничава risk/reward.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане само при затваряне над 375.31 с volume ratio ≥1.5x AND разрешаване на analyst target дивергенса чрез revision нагоре. При настоящия консенсус risk/reward е неблагоприятен."
+   }
+  },
+  {
+   "ticker": "MNST",
+   "price": 95.83,
+   "pivot": 96.06,
+   "pct_from_pivot": -0.24,
+   "base_type": "cup with handle",
+   "base_depth_pct": 25.8,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 85.02,
+   "ma200": 76.77,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 5469484,
+   "last_volume": 5820200,
+   "volume_ratio": 1.06,
+   "breakout_volume": false,
+   "base_low": 71.32,
+   "company": "Monster Beverage Corporation",
+   "sector": "Consumer Defensive",
+   "industry": "Beverages - Non-Alcoholic",
+   "business_summary": "Monster Beverage Corporation, through its subsidiaries, engages in development, marketing, sale, and distribution of energy drink beverages and concentrates in the United States and internationally. The company operates through four segments: Monster Energy Drinks, Strategic Brands, Alcohol Brands, and Other. It offers carbonated non-carbonated energy drinks, ready-to-drink iced teas, lemonades, juice cocktails, single-serve juices and fruit beverages, ready-to-drink dairy and coffee drinks, energy drinks, sports drinks and single-serve still waters, and sodas that are considered natural, spar",
+   "market_cap": 93722517504,
+   "eps_growth_yoy": 28.6,
+   "revenue_growth_yoy": 26.9,
+   "roe": 26.7,
+   "pe": 46.29469,
+   "forward_pe": 37.034176,
+   "debt_to_equity": 1.082,
+   "inst_ownership_pct": 70.9,
+   "analyst_target": 89.69333,
+   "short_pct_float": 3.19,
+   "shares_short": 22338822,
+   "short_ratio_dtc": 4.1,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-06",
+    "days_to_earnings": 41,
+    "in_blackout": false,
+    "eps_estimate": 2.29131
+   },
+   "options": {
+    "iv": 1.6,
+    "iv_rank": 5.0,
+    "iv_rank_quality": "partial (7 дни история)",
+    "put_call_ratio": 4.41,
+    "oi_near_money": [
+     {
+      "strike": 92.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 95.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 97.5,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 5 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.19,
+    "days_to_cover": 4.1,
+    "interpretation": "Нисък short interest (3.19%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 9500000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "MNST",
+    "why_now": "Setup-ът е чисто технически — няма директна макро верига от активните сектори (Consumer Defensive не е в секторната логика). Cup with handle точно на pivot е качествен технически pattern. EPS +28.6%, revenue +26.9% и ROE 26.7% са солидни фундаментали. Слабост: volume ratio 1.06 и breakout volume = false при IV rank само 5 — пазарът не е развълнуван. Analyst target 89.69 е 6.4% под текущата цена — консенсусът е мечи.",
+    "business_bg": "Monster Beverage Corporation разработва, маркетира и дистрибутира енергийни напитки под марката Monster Energy, както и стратегически брандове и алкохолни напитки. Компанията оперира глобално чрез партньорство с Coca-Cola дистрибуторската мрежа. Бизнесът е defensive по природа — потребителски staple с ценова сила.",
+    "catalysts": [
+     "Cup with handle на нов RS връх — класически O'Neil setup при потвърден обем",
+     "Consumer defensive характер привлича капитал при overbought пазар търсещ protection",
+     "Международна експанзия и нови продуктови линии поддържат revenue momentum",
+     "Earnings на 6 август (41 дни) — достатъчно runway"
+    ],
+    "risks": [
+     "Analyst target 89.69 е 6.4% под цената — консенсусът вижда акцията като overvalued",
+     "Breakout без обем — слабо институционално conviction",
+     "Секторът не е в активната секторна логика — trade е срещу sectoral rotation тезата",
+     "Конкурентен натиск от Celsius, Red Bull и private label в key markets"
+    ],
+    "earnings_call": "преди earnings — 41 дни runway са достатъчни, но analyst target headwind прави trade-а с неблагоприятно R/R.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане само при затваряне над 96.06 с volume ratio ≥1.5x И analyst target revision нагоре над 100. При настоящия консенсус setup-ът не оправдава Action статус."
+   }
+  },
+  {
+   "ticker": "UMBF",
+   "price": 143.41,
+   "pivot": 144.79,
+   "pct_from_pivot": -0.95,
+   "base_type": "cup with handle",
+   "base_depth_pct": 25.0,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 129.21,
+   "ma200": 119.51,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 695380,
+   "last_volume": 702600,
+   "volume_ratio": 1.01,
+   "breakout_volume": false,
+   "base_low": 108.6,
+   "company": "UMB Financial Corporation",
+   "sector": "Financial Services",
+   "industry": "Banks - Regional",
+   "business_summary": "UMB Financial Corporation operates as a bank holding company that provides banking services and asset servicing in the United States and internationally. The company operates through three segments: Commercial Banking, Institutional Banking, and Personal Banking. The Commercial Banking segment provides commercial loans and credit cards; commercial real estate financing; letters of credit; loan syndication, and consultative services; various business solutions including asset-based lending, mezzanine debt, and minority equity investment; and treasury management service, such as depository servi",
+   "market_cap": 10896109568,
+   "eps_growth_yoy": 221.4,
+   "revenue_growth_yoy": 49.0,
+   "roe": 12.1,
+   "pe": 12.546806,
+   "forward_pe": 10.445141,
+   "debt_to_equity": null,
+   "inst_ownership_pct": 94.8,
+   "analyst_target": 147.58333,
+   "short_pct_float": 5.64,
+   "shares_short": 3613585,
+   "short_ratio_dtc": 5.9,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-28",
+    "days_to_earnings": 32,
+    "in_blackout": false,
+    "eps_estimate": 12.91689
+   },
+   "options": {
+    "iv": 27.3,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (3 дни история)",
+    "put_call_ratio": 0.38,
+    "oi_near_money": [
+     {
+      "strike": 135.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 140.0,
+      "call_oi": 17
+     },
+     {
+      "strike": 145.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 5.64,
+    "days_to_cover": 5.9,
+    "interpretation": "Нисък short interest (5.64%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 1200000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "UMBF",
+    "why_now": "XLF е активна секторна логика — steepening 2s10s крива до 0.31% директно разширява NIM за регионални банки. UMBF е регионална банка с EPS ръст +221.4% YoY и revenue +49% — изключителни числа, вероятно driven от Heartland Financial придобиването. Forward PE 10.4x е атрактивен. Cup with handle 0.95% под pivot. Слабост: volume ratio само 1.01 — пълна липса на обем conviction. ROE 12.1% е под средното за сектора.",
+    "business_bg": "UMB Financial Corporation е банков холдинг предоставящ commercial banking, institutional banking и personal banking услуги. Компанията оперира предимно в Midwest и Southwest на САЩ, с допълнителни asset servicing и fund administration бизнеси. Придобиването на Heartland Financial значително разшири мащаба.",
+    "catalysts": [
+     "Steepening yield крива директно разширява NIM — core banking profitability improves",
+     "Earnings на 28 юли (32 дни) — при силни Q2 резултати може да е positive catalyst",
+     "Завършване на Heartland интеграцията и cost synergies реализация",
+     "Rotation в XLF при нормализираща се крива привлича institutional flows"
+    ],
+    "risks": [
+     "Breakout без обем — volume ratio 1.01 е практически flat, нулева институционална conviction при пробива",
+     "Earnings на 32 дни — позицията носи earnings риск в swing window",
+     "EPS ръст +221% е вероятно acquisition-driven one-time effect, не органичен — устойчивостта е под въпрос",
+     "ROE 12.1% е под benchmark за quality bank — по-ниска капиталова ефективност от peers"
+    ],
+    "earnings_call": "преди earnings — 32 дни до earnings; при swing позиция трябва да се планира изход преди 25 юли или намален размер за earnings hold.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане само при затваряне над 144.79 с volume ratio ≥1.4x. Потвърждение на EPS sustainability (не само acquisition effect) чрез Q2 earnings преди re-entry с пълна позиция."
+   }
+  },
+  {
+   "ticker": "ROK",
+   "price": 479.39,
+   "pivot": 486.47,
+   "pct_from_pivot": -1.46,
+   "base_type": "cup with handle",
+   "base_depth_pct": 28.6,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 440.47,
+   "ma200": 393.72,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 739394,
+   "last_volume": 696400,
+   "volume_ratio": 0.94,
+   "breakout_volume": false,
+   "base_low": 347.44,
+   "company": "Rockwell Automation, Inc.",
+   "sector": "Industrials",
+   "industry": "Specialty Industrial Machinery",
+   "business_summary": "Rockwell Automation, Inc., together with its subsidiaries, provides industrial automation and digital transformation solutions in North America, Europe, the Middle East, Africa, the Asia Pacific, and Latin America. It operates in three segments: Intelligent Devices, Software & Control, and Lifecycle Services. The company offers drives, motion, advanced material handling, safety, sensing, industrial components, hardware, software, and configured-to-order products; and control and visualization software and hardware, digital twin, simulation and information software, network and security infrast",
+   "market_cap": 53343621120,
+   "eps_growth_yoy": 38.9,
+   "revenue_growth_yoy": 11.9,
+   "roe": 27.2,
+   "pe": 49.83264,
+   "forward_pe": 32.93346,
+   "debt_to_equity": 113.367,
+   "inst_ownership_pct": 91.0,
+   "analyst_target": 465.00778,
+   "short_pct_float": 3.57,
+   "shares_short": 3482944,
+   "short_ratio_dtc": 5.22,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-06",
+    "days_to_earnings": 41,
+    "in_blackout": false,
+    "eps_estimate": 12.99692
+   },
+   "options": {
+    "iv": 0.0,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (7 дни история)",
+    "put_call_ratio": 1.36,
+    "oi_near_money": [
+     {
+      "strike": 450.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 460.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 470.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 480.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 490.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 500.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.57,
+    "days_to_cover": 5.22,
+    "interpretation": "Нисък short interest (3.57%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 950000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "ROK",
+    "why_now": "XLI е в ранна RS rotation фаза (4W RS +7.95% vs 12W само +0.29%) — Rockwell Automation е prime beneficiary от reshoring и industrial automation secular trend. Oil падащ → margin tailwind за индустриалните клиенти на ROK. RS на нов връх при cup with handle -1.46% под pivot. Обаче: analyst target 465 е ПОД настоящата цена 479 — консенсусът не вижда upside. Setup-ът е технически силен, но фундаменталният headwind е реален.",
+    "business_bg": "Rockwell Automation предоставя решения за индустриална автоматизация и дигитална трансформация на производствени предприятия по целия свят. Оперира в три сегмента: Intelligent Devices, Software & Control и Lifecycle Services. Компанията е лидер в PLC, SCADA и industrial IoT пазара.",
+    "catalysts": [
+     "Reshoring и nearshoring на производство в САЩ → директен demand driver за automation solutions",
+     "AI-driven factory automation cycle — ROK е infrastructure play за smart manufacturing",
+     "Oil падащ намалява енергийните разходи на индустриалните клиенти → по-голям CAPEX бюджет за automation",
+     "RS нов връх при XLI ранна rotation — институционалите тепърва ротират"
+    ],
+    "risks": [
+     "Analyst consensus target 465 е под текущата цена 479 — Wall Street вижда overvaluation при P/E 49.8",
+     "Base depth 28.6% е по-дълбока от оптималното — по-дълбоките бази имат по-нисък success rate",
+     "Forward P/E 32.9 при revenue growth само 11.9% — мултиплът изисква ускоряване на растежа",
+     "Defensive пазарен режим: при equity pullback ROK като high-multiple industrial е уязвим"
+    ],
+    "earnings_call": "не сега — next earnings 2026-08-06 (41 дни), без непосредствен earnings риск за swing позиция.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Изчакай пробив над 486.47 с обем поне 1.5x средния + analyst upgrades или target revisions над 490. Ако консенсусът не се коригира нагоре, setup-ът остава технически без фундаментално потвърждение."
+   }
+  },
+  {
+   "ticker": "THG",
+   "price": 207.56,
+   "pivot": 213.05,
+   "pct_from_pivot": -2.58,
+   "base_type": "cup with handle",
+   "base_depth_pct": 20.9,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 189.38,
+   "ma200": 178.52,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 304060,
+   "last_volume": 259800,
+   "volume_ratio": 0.85,
+   "breakout_volume": false,
+   "base_low": 168.56,
+   "company": "The Hanover Insurance Group, Inc.",
+   "sector": "Financial Services",
+   "industry": "Insurance - Property & Casualty",
+   "business_summary": "The Hanover Insurance Group, Inc., through its subsidiaries, provides various property and casualty insurance products and services for individuals and businesses in the United States. It operates in four segments: Core Commercial, Specialty, Personal Lines, and Other. The company offers commercial multiple peril, commercial automobile, workers' compensation, and other core commercial coverage; and professional and executive lines, marine, and surety and other, as well as specialty property and casualty products comprising Hanover program business, excess and surplus business, Hanover specialt",
+   "market_cap": 7261857792,
+   "eps_growth_yoy": 45.7,
+   "revenue_growth_yoy": 6.1,
+   "roe": 21.7,
+   "pe": 10.47225,
+   "forward_pe": 11.163641,
+   "debt_to_equity": 23.633,
+   "inst_ownership_pct": 92.0,
+   "analyst_target": 206.375,
+   "short_pct_float": 3.58,
+   "shares_short": 1112102,
+   "short_ratio_dtc": 3.67,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-28",
+    "days_to_earnings": 32,
+    "in_blackout": false,
+    "eps_estimate": 18.59625
+   },
+   "options": {
+    "iv": 3.5,
+    "iv_rank": 100.0,
+    "iv_rank_quality": "partial (3 дни история)",
+    "put_call_ratio": 0.16,
+    "oi_near_money": [
+     {
+      "strike": 195.0,
+      "call_oi": 5
+     },
+     {
+      "strike": 200.0,
+      "call_oi": 5
+     },
+     {
+      "strike": 210.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "cash-secured put / акции",
+    "strategy_reason": "IVR 100 е висок — premium-ът е скъп. Продаването на CSP под pivot или директно акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.58,
+    "days_to_cover": 3.67,
+    "interpretation": "Нисък short interest (3.58%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 600000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "THG",
+    "why_now": "Чисто технически setup без силна макро верига към XLF логиката — THG е Property & Casualty застраховател, не банка, и не е директен NIM beneficiary. Cup with handle, EPS +45.7% YoY, ROE 21.7% са силни фундаментали. Обаче: analyst target 206.375 е ПОД настоящата цена 207.56. IV Rank 100 означава опциите са на исторически максимум — bull call spread е скъп. Пазарен режим Defensive е неутрален за P&C застраховането.",
+    "business_bg": "The Hanover Insurance Group предлага имуществено и злополучно застраховане за физически лица и бизнеси в САЩ. Оперира в четири сегмента: Core Commercial, Specialty, Personal Lines и Other. Разпределя продуктите си предимно чрез независими агенти и брокери.",
+    "catalysts": [
+     "Пробив над pivot 213.05 при аксептиране на cup with handle pattern",
+     "Hard market в P&C застраховането → premium pricing power продължава",
+     "EPS +45.7% YoY при P/E само 10.47 — исторически евтин спрямо earnings мощта",
+     "Defensive режим частично подкрепя нецикличния характер на застрахователния бизнес"
+    ],
+    "risks": [
+     "Analyst target 206.375 е под текущата цена — консенсусът не вижда upside от тук",
+     "IV Rank 100: опциите са изключително скъпи — лошо R/R за bull call spread",
+     "Катастрофични загуби (hurricanes, wildfires) могат рязко да обърнат earnings trajectory",
+     "Под pivot с обем 0.85 — без institutional buying conviction в момента"
+    ],
+    "earnings_call": "не сега — next earnings 2026-07-28 (32 дни), без непосредствен риск, но наближава.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Пробив над 213.05 с обем 1.5x+ средния И IV Rank спада под 70 (опциите поевтиняват) преди влизане с bull call spread. При акции — пробив с обем е достатъчен."
+   }
+  },
+  {
+   "ticker": "IRM",
+   "price": 131.06,
+   "pivot": 134.68,
+   "pct_from_pivot": -2.69,
+   "base_type": "cup with handle",
+   "base_depth_pct": 28.0,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 124.25,
+   "ma200": 102.84,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 1596468,
+   "last_volume": 2267700,
+   "volume_ratio": 1.42,
+   "breakout_volume": false,
+   "base_low": 96.94,
+   "company": "Iron Mountain Incorporated",
+   "sector": "Real Estate",
+   "industry": "REIT - Specialty",
+   "business_summary": "Iron Mountain Incorporated is trusted by more than 240,000 customers in 61 countries, including approximately 95% of the Fortune 1000, to help unlock value and intelligence from their assets through services that transcend the physical and digital worlds. Our broad range of solutions address their information management, digital transformation, information security, data center and asset lifecycle management needs. Iron Mountain Incorporated is based in Portsmouth, New Hampshire. Iron Mountain Incorporated was founded in 1951 and is incorporated in Delaware.",
+   "market_cap": 38993584128,
+   "eps_growth_yoy": 800.6,
+   "revenue_growth_yoy": 21.6,
+   "roe": 0,
+   "pe": 142.45651,
+   "forward_pe": 49.01803,
+   "debt_to_equity": null,
+   "inst_ownership_pct": 87.9,
+   "analyst_target": 131.54546,
+   "short_pct_float": 3.69,
+   "shares_short": 8070353,
+   "short_ratio_dtc": 6.4,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-04-30",
+    "days_to_earnings": -57,
+    "in_blackout": false,
+    "eps_estimate": 2.43322
+   },
+   "options": {
+    "iv": 3.1,
+    "iv_rank": 4.0,
+    "iv_rank_quality": "partial (4 дни история)",
+    "put_call_ratio": 0.21,
+    "oi_near_money": [
+     {
+      "strike": 128.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 129.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 130.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 133.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 134.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 135.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 4 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.69,
+    "days_to_cover": 6.4,
+    "interpretation": "Нисък short interest (3.69%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 4300000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "IRM",
+    "why_now": "Setup-ът е предимно технически — IRM е REIT, не директен XLF или XLI beneficiary. EPS +800% YoY изглежда впечатляващо, но при P/E 142.5 базата е REIT accounting (FFO vs GAAP earnings), не реален earnings качествен скок. Analyst target 131.54 е практически на текущата цена 131.06 — нулев upside по консенсус. Volume ratio 1.42 е позитивен сигнал. Data center narrative (AI/digital transformation) е реален secular driver.",
+    "business_bg": "Iron Mountain е специализиран REIT, предлагащ услуги за управление на физическа и дигитална информация на над 240,000 клиенти в 61 държави. Бизнесът включва физическо съхранение на документи, data centers и asset lifecycle management. Обслужва около 95% от компаниите в Fortune 1000.",
+    "catalysts": [
+     "AI/data center buildout — IRM разширява data center capacity, директно свързан с hyperscaler demand",
+     "Volume ratio 1.42 показва по-висока от средната активност — потенциално institutional позициониране",
+     "Дефанзивен режим: REIT с дългосрочни contracts и recession-resistant storage business",
+     "Пробив над 134.68 активира cup with handle technical target"
+    ],
+    "risks": [
+     "Analyst consensus target 131.54 ≈ текуща цена — Wall Street не вижда upside",
+     "P/E 142.5 е misleading при REIT (GAAP), но forward P/E 49 остава скъп за REIT сектор",
+     "Rising rates headwind: REITs са чувствителни към US10Y движения нагоре",
+     "Base depth 28% + 2.69% под pivot — по-дълъг път до пробив, повече риск в Defensive режим"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-04-30 (57 дни назад, вече отминали), следващият cycle е далеч.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Пробив над 134.68 с обем 1.5x+ средния И analyst target revision над 140. Без target upgrade консенсусът активно ограничава upside."
+   }
+  },
+  {
+   "ticker": "AIZ",
+   "price": 260.77,
+   "pivot": 268.67,
+   "pct_from_pivot": -2.94,
+   "base_type": "cup with handle",
+   "base_depth_pct": 20.9,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 245.73,
+   "ma200": 228.0,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 446390,
+   "last_volume": 385600,
+   "volume_ratio": 0.86,
+   "breakout_volume": false,
+   "base_low": 212.55,
+   "company": "Assurant, Inc.",
+   "sector": "Financial Services",
+   "industry": "Insurance - Property & Casualty",
+   "business_summary": "Assurant, Inc. provides protection services to connected devices, homes, and automobiles in North America, Latin America, Europe, and the Asia Pacific. It operates through Global Lifestyle and Global Housing segments. The Global Lifestyle segment offers mobile device solutions, and extended service contracts and related services for consumer electronics and appliances, and credit and other insurance products; and vehicle protection, commercial equipment protection, and other related services. The Global Housing segment provides lender-placed homeowners, manufactured housing, and flood insuranc",
+   "market_cap": 12920536064,
+   "eps_growth_yoy": 87.0,
+   "revenue_growth_yoy": 11.3,
+   "roe": 18.0,
+   "pe": 13.365966,
+   "forward_pe": 11.605876,
+   "debt_to_equity": 37.61,
+   "inst_ownership_pct": 97.6,
+   "analyst_target": 283.83334,
+   "short_pct_float": 3.81,
+   "shares_short": 1424545,
+   "short_ratio_dtc": 3.36,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-08-04",
+    "days_to_earnings": 39,
+    "in_blackout": false,
+    "eps_estimate": 21.04465
+   },
+   "options": {
+    "iv": 1.6,
+    "iv_rank": 3.0,
+    "iv_rank_quality": "partial (8 дни история)",
+    "put_call_ratio": 0.0,
+    "oi_near_money": [
+     {
+      "strike": 270.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 3 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 3.81,
+    "days_to_cover": 3.36,
+    "interpretation": "Нисък short interest (3.81%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 250000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "AIZ",
+    "why_now": "Макро връзката е частична — Insurance P&C не е директен бенефициент от XLF секторната логика (NIM expansion е банкова тема), но defensive режимът и институционалното търсене на нециклични приходи подкрепят P&C застрахователи. Setup-ът е доминиращо технически: cup with handle близо до pivot, RS near_high, силен EPS ръст YoY (+87%), ниска forward PE (11.6x) с висок институционален интерес (97.6%). DXY силата не е директен headwind — приходите са предимно USD-деноминирани в North America.",
+    "business_bg": "Assurant предоставя специализирани застрахователни и защитни услуги за мобилни устройства, автомобили и жилища в Северна Америка, Латинска Америка и Азия. Работи в два сегмента — Global Lifestyle (гаранции за електроника, авто, кредитно застраховане) и Global Housing (lender-placed homeowners и flood insurance). Бизнесът е нискоцикличен с повтарящи се приходи от дългосрочни партньорства.",
+    "catalysts": [
+     "Следващи earnings на 04.08.2026 — компанията излиза с резултати след ~39 дни, дава времеви прозорец за позиция преди обявяването.",
+     "Пробив над pivot 268.67 при повишен обем би потвърдил завършването на cup with handle базата.",
+     "Defensive rotation в рамките на equity allocation при overbought пазар (NAAIM 98.6) — P&C застрахователите са beneficiary от бягство към нециклични приходи.",
+     "Forward PE 11.6x е компресиран спрямо исторически норми — потенциал за multiple expansion при позитивен guidance revision."
+    ],
+    "risks": [
+     "Volume ratio 0.86 и breakout_volume: false — пробивът все още не е потвърден с институционален обем; фалшив пробив е реален риск.",
+     "Base depth 20.9% е умерена, но cup with handle при defensive режим може да се провали ако broad market направи drawdown от overbought нива.",
+     "Analyst target 283.83 е само ~8.8% над текущата цена — ограничен upside при текущото позициониране.",
+     "AIZ не е в директно таргетирания сектор (XLF логиката е NIM-ориентирана), което намалява секторния вятър зад гърба."
+    ],
+    "earnings_call": "преди earnings — следващите earnings са след 39 дни (04.08.2026), достатъчно далеч за swing позиция с планирано излизане преди blackout периода.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане при затваряне над pivot 268.67 с обем поне 1.3x средния дневен обем (потвърден breakout_volume). При липса на обемно потвърждение — изчакване."
+   }
+  },
+  {
+   "ticker": "WWD",
+   "price": 436.44,
+   "pivot": 450.92,
+   "pct_from_pivot": -3.21,
+   "base_type": "cup with handle",
+   "base_depth_pct": 24.3,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 374.91,
+   "ma200": 327.89,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 829364,
+   "last_volume": 437500,
+   "volume_ratio": 0.53,
+   "breakout_volume": false,
+   "base_low": 341.21,
+   "company": "Woodward, Inc.",
+   "sector": "Industrials",
+   "industry": "Aerospace & Defense",
+   "business_summary": "Woodward, Inc. designs, manufactures, and services control solutions for the aerospace and industrial markets worldwide. It operates through two segments, Aerospace and Industrial. The Aerospace segment offers fuel pumps, metering units, actuators, air valves, specialty valves, fuel nozzles, and thrust reverser actuation systems for turbine engines and nacelles, as well as flight deck controls, actuators, servocontrols, motors, and sensors for aircraft. This segment also provides aftermarket maintenance, repair and overhaul, and other services to commercial airlines, repair facilities, militar",
+   "market_cap": 26004342784,
+   "eps_growth_yoy": 23.0,
+   "revenue_growth_yoy": 23.4,
+   "roe": 21.1,
+   "pe": 52.330936,
+   "forward_pe": 40.553463,
+   "debt_to_equity": 46.155,
+   "inst_ownership_pct": 90.9,
+   "analyst_target": 437.0909,
+   "short_pct_float": 2.93,
+   "shares_short": 1555454,
+   "short_ratio_dtc": 2.12,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-07-27",
+    "days_to_earnings": 31,
+    "in_blackout": false,
+    "eps_estimate": 9.40443
+   },
+   "options": {
+    "iv": 0.0,
+    "iv_rank": 0.0,
+    "iv_rank_quality": "partial (6 дни история)",
+    "put_call_ratio": 1.46,
+    "oi_near_money": [
+     {
+      "strike": 410.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 420.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 430.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "long call / bull call spread",
+    "strategy_reason": "IVR 0 е нисък — опционният premium е евтин, купуването на опции дава по-добър leverage от акции."
+   },
+   "short_view": {
+    "short_pct_float": 2.93,
+    "days_to_cover": 2.12,
+    "interpretation": "Нисък short interest (2.93%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 500000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [
+    {
+     "tag": "SI✓",
+     "title": "Superinvestor покупка (13F) · $75,648,000: Стенли Дракенмилър · Duquesne Family Office"
+    }
+   ],
+   "ai": {
+    "ticker": "WWD",
+    "why_now": "Директна макро верига: XLI секторната логика (aerospace & defense с дълги backlog-ове, фискални харчения, reshoring) покрива точно Woodward — производител на контролни системи за авиационни двигатели и индустриални приложения. Oil падащ е margin tailwind за авиацията като краен клиент. 4W RS на XLI +7.95% при ранна ротация фаза прави сектора атрактивен. RS статус на WWD е new_high — акцията е по-силна от сектора. EPS ръст +23% и revenue ръст +23.4% потвърждават фундаментала.",
+    "business_bg": "Woodward проектира, произвежда и обслужва контролни системи за авиационната и индустриалната промишленост в световен мащаб. Aerospace сегментът включва горивни помпи, актуатори, клапани и тяго-контролни системи за турбинни двигатели, военна и гражданска авиация. Индустриалният сегмент обхваща системи за контрол на горивото за газови турбини и двигатели с вътрешно горене.",
+    "catalysts": [
+     "Earnings на 27.07.2026 (31 дни) — силен momentum в aerospace backlog може да доведе до guidance raise и gap-up.",
+     "RS на new_high сигнализира продължаваща institutional accumulation в лидерска позиция в XLI ротацията.",
+     "Падащите цени на петрола намаляват разходите на авиационните клиенти → потенциал за ускоряване на поръчките за MRO (Maintenance, Repair & Overhaul).",
+     "Пробив над pivot 450.92 би завършил cup with handle формацията и би активирал momentum buying от технически фондове."
+    ],
+    "risks": [
+     "Volume ratio 0.53 е критично нисък — акцията консолидира без институционален интерес; пробив без обем е висок риск за bull trap.",
+     "Options IV 0.0 / IV rank 0.0 — липсва опционна активност, което затруднява управлението на риска чрез bull call spread.",
+     "Forward PE 40.5x е агресивна оценка при defensive пазарен режим — при евентуален drawdown high-PE индустриални акции се продават първи.",
+     "Analyst target 437.09 е ПОД текущата цена 436.44 — консенсусът не вижда upside, което ограничава institutional buying от fundamental страна."
+    ],
+    "earnings_call": "преди earnings — earnings след 31 дни, извън 5-дневния blackout прозорец; позицията трябва да бъде управлявана с изход планиран ~1 седмица преди 27.07.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Влизане при затваряне над pivot 450.92 с обем поне 1.5x среден дневен (критично при текущия volume ratio 0.53). Analyst target под цената изисква лично price target преизчисляване преди влизане. Ако обемът не се появи при пробива — пропускане на trade-а."
+   }
+  }
+ ],
+ "theses": [
+  {
+   "name": "Финанси при стръмна крива",
+   "tickers": [
+    "JPM",
+    "BAC"
+   ],
+   "status": "active",
+   "chain": "Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.",
+   "trigger_reason": "2s10s спредът се разкривява (0.31%)."
+  },
+  {
+   "name": "Ядрена енергия",
+   "tickers": [
+    "VST",
+    "CEG",
+    "OKLO",
+    "CCJ",
+    "DNN",
+    "NNE"
+   ],
+   "status": "structural",
+   "chain": "AI data center-ите гладуват за стабилна базова мощност 24/7 → ядрената е единственият въглеродно-неутрален източник, който я дава → дългосрочно търсене на уран и реакторни оператори.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Полупроводници и AI инфраструктура",
+   "tickers": [
+    "AVGO",
+    "AMAT",
+    "MCHP"
+   ],
+   "status": "structural",
+   "chain": "AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Въглища и LNG",
+   "tickers": [
+    "BTU",
+    "HCC",
+    "AMR",
+    "CEIX",
+    "TELL",
+    "LNG"
+   ],
+   "status": "watch",
+   "chain": "Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Отбрана и дронове",
+   "tickers": [
+    "LMT",
+    "RTX",
+    "NOC",
+    "SWMR"
+   ],
+   "status": "watch",
+   "chain": "Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Крипто регулация (CLARITY Act)",
+   "tickers": [
+    "CRCL",
+    "COIN",
+    "HOOD",
+    "BLSH"
+   ],
+   "status": "watch",
+   "chain": "Ясна законодателна рамка (CLARITY Act) → институциите получават регулаторна сигурност → приток на капитал към регулирани крипто борси и custody → борсите и брокерите печелят на обем.",
+   "trigger_reason": ""
+  }
+ ],
+ "unusual_options": [
+  {
+   "ticker": "NVDA",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 1,760,072. Обем на акцията 0.89× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "AMD",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 229,240. Обем на акцията 0.87× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "AAPL",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 1,007,040. Обем на акцията 1.9× 20д средна (повишен интерес)."
+  },
+  {
+   "ticker": "MSFT",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 386,433. Обем на акцията 1.53× 20д средна (повишен интерес)."
+  },
+  {
+   "ticker": "META",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 194,943. Обем на акцията 0.89× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "GOOGL",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 146,540. Обем на акцията 1.21× 20д средна (нормално)."
+  },
+  {
+   "ticker": "AMZN",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 400,419. Обем на акцията 1.53× 20д средна (повишен интерес)."
+  },
+  {
+   "ticker": "TSLA",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 1,194,872. Обем на акцията 0.65× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "AVGO",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 78,322. Обем на акцията 0.62× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "PLTR",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 451,297. Обем на акцията 1.38× 20д средна (повишен интерес)."
+  }
+ ],
+ "splits": [
+  {
+   "ticker": "SMERY",
+   "company": "Siemens Energy AG",
+   "date": "2026-06-22",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Jun 22, 2026",
+   "price": 37.4,
+   "market_cap": 159108688520.4594
+  },
+  {
+   "ticker": "DD",
+   "company": "DuPont de Nemours, Inc.",
+   "date": "2026-06-24",
+   "ratio": "1:3",
+   "split_type": "reverse",
+   "date_human": "Jun 24, 2026",
+   "price": 137.8,
+   "market_cap": 18605673869.84651
+  }
+ ],
+ "naaim_history": {
+  "points": [
+   {
+    "date": "04/22/2026",
+    "value": 94.2
+   },
+   {
+    "date": "04/29/2026",
+    "value": 93.8
+   },
+   {
+    "date": "05/06/2026",
+    "value": 96.7
+   },
+   {
+    "date": "05/13/2026",
+    "value": 77.3
+   },
+   {
+    "date": "05/20/2026",
+    "value": 82.0
+   },
+   {
+    "date": "05/27/2026",
+    "value": 98.4
+   },
+   {
+    "date": "06/03/2026",
+    "value": 86.8
+   },
+   {
+    "date": "06/10/2026",
+    "value": 79.3
+   },
+   {
+    "date": "06/17/2026",
+    "value": 92.8
+   },
+   {
+    "date": "06/24/2026",
+    "value": 98.6
+   }
+  ],
+  "low_zone": 30,
+  "high_zone": 90,
+  "current": 98.6
+ },
+ "superinvestor_moves": [
+  {
+   "ticker": "AXP",
+   "company": "AMERICAN EXPRESS CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 45087984892.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "KO",
+   "company": "COCA COLA CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 21501063540.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 10
+  },
+  {
+   "ticker": "AAPL",
+   "company": "APPLE INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 20471924668.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 12
+  },
+  {
+   "ticker": "OCCIDENTAL PET",
+   "company": "OCCIDENTAL PETE CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 17221193015.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BANK AMERICA C",
+   "company": "BANK AMERICA CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 15151500000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 9
+  },
+  {
+   "ticker": "CHEVRON CORPOR",
+   "company": "CHEVRON CORPORATION",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 12052286868.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 4
+  },
+  {
+   "ticker": "GGLBP",
+   "company": "ALPHABET INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 11871367661.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway",
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 7
+  },
+  {
+   "ticker": "CHUBB LTD SWIT",
+   "company": "CHUBB LTD SWITZ",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 11162836215.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "KHC",
+   "company": "KRAFT HEINZ CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 7323527057.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MOODYS CORP",
+   "company": "MOODYS CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 5507110938.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "DAL",
+   "company": "DELTA AIR LINES INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2646532635.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SIRIUSXM HOLDI",
+   "company": "SIRIUSXM HOLDINGS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2511616999.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "BROOKFIELD COR",
+   "company": "BROOKFIELD CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2415946008.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AMZN",
+   "company": "AMAZON COM INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2385104083.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square",
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "DVA",
+   "company": "DAVITA INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 2324865095.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "UBER",
+   "company": "UBER TECHNOLOGIES INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2154934398.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MSFT",
+   "company": "MICROSOFT CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 2092970053.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "VERISIGN INC",
+   "company": "VERISIGN INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1991085480.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "KR",
+   "company": "KROGER CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1972335334.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 5
+  },
+  {
+   "ticker": "RESTAURANT BRA",
+   "company": "RESTAURANT BRANDS INTL INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1673501194.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square",
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "META",
+   "company": "META PLATFORMS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1522358404.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HHH",
+   "company": "HOWARD HUGHES HOLDINGS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 1192581569.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NEW YORK TIMES",
+   "company": "NEW YORK TIMES CO MTN BE",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 1150997376.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "PLTR",
+   "company": "PALANTIR TECHNOLOGIES INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 912100000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LENNAR CORP",
+   "company": "LENNAR CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 877052911.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "NUE",
+   "company": "NUCOR CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 660686383.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NTRA",
+   "company": "Natera Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 612691000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CAPITAL ONE FI",
+   "company": "CAPITAL ONE FINL CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 560750962.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 3
+  },
+  {
+   "ticker": "LLYVK",
+   "company": "LIBERTY LIVE HOLDINGS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 518318636.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 8
+  },
+  {
+   "ticker": "ALLY FINL INC",
+   "company": "ALLY FINL INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 498992850.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 6
+  },
+  {
+   "ticker": "LOUISIANA PAC ",
+   "company": "LOUISIANA PAC CORP",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 316092130.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "INSM",
+   "company": "Insmed Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 188717000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NVIDIA CORPORA",
+   "company": "NVIDIA CORPORATION",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 186580000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": false,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TAIWAN SEMICON",
+   "company": "Taiwan Semiconductor Manufac",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 167380000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES INC",
+   "company": "Ishares Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 162313000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "INVESCO EXCHAN",
+   "company": "Invesco Exchange Traded Fd T",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 157566000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PFE",
+   "company": "PFIZER INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 152880000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "YPF",
+   "company": "Ypf Sociedad Anonima",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 149566000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TBBB",
+   "company": "Bbb Foods Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 109972000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SEAPORT ENTMT ",
+   "company": "SEAPORT ENTMT GROUP INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 107910794.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AA",
+   "company": "Alcoa Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 99057000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NEWAMSTERDAM P",
+   "company": "Newamsterdam Pharma Company",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 98275000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STZ",
+   "company": "CONSTELLATION BRANDS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 94933500.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SE",
+   "company": "Sea Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 91083000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STMICROELECTRO",
+   "company": "Stmicroelectronics N V",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 90275000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WWD",
+   "company": "Woodward Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 75648000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NVR",
+   "company": "NVR INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 73226191.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TEVA PHARMACEU",
+   "company": "Teva Pharmaceutical Inds Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 71604000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ROKU",
+   "company": "Roku Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 70983000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HERTZ GLOBAL H",
+   "company": "HERTZ GLOBAL HLDGS INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "13F",
+   "value": 70261595.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HAL",
+   "company": "HALLIBURTON CO",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 61500000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AVGO",
+   "company": "Broadcom Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 60650000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STATE STR SPDR",
+   "company": "State Str Spdr S&P 500 Etf T",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 58531000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CPNG",
+   "company": "Coupang Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 50362000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "OPCH",
+   "company": "Option Care Health Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 50301000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CRH PLC",
+   "company": "Crh Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 39689000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "FIGURE TECHNOL",
+   "company": "Figure Technology Solutio",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 39057000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "GLOBAL X FDS",
+   "company": "Global X Fds",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 36152000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CAI",
+   "company": "Caris Life Sciences Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 33873000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "RVMDW",
+   "company": "Revolution Medicines Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 30717000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "M",
+   "company": "MACYS INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 30067914.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "LSCC",
+   "company": "Lattice Semiconductor Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 29974000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SNDK",
+   "company": "Sandisk Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 24241000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "UNITED AIRLS H",
+   "company": "United Airls Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 24168000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MOH",
+   "company": "MOLINA HEALTHCARE INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 23920000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "HUM",
+   "company": "Humana Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 23842000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WABTEC",
+   "company": "Wabtec",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 23715000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TWLO",
+   "company": "Twilio Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 22869000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JBL",
+   "company": "Jabil Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 21835000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SCCO",
+   "company": "Southern Copper Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20964000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES S&P GS",
+   "company": "Ishares S&P Gsci Commodity-",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20737000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LIN",
+   "company": "Linde Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 20425000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SEAGATE TECHNO",
+   "company": "Seagate Technology Hldngs Pl",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19862000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ISHARES TR",
+   "company": "Ishares Tr",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19592000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CLEVELAND-CLIF",
+   "company": "Cleveland-Cliffs Inc New",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19549000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NUVB",
+   "company": "Nuvation Bio Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 19476000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BE",
+   "company": "Bloom Energy Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 18470000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "INTC",
+   "company": "Intel Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 18155000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JEFFERIES FINA",
+   "company": "JEFFERIES FINANCIAL GROUP IN",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "13F",
+   "value": 17892939.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LULU",
+   "company": "LULULEMON ATHLETICA INC",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 17793000.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BELITE BIO INC",
+   "company": "Belite Bio Inc Sponsored",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16917000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PTGX",
+   "company": "Protagonist Therapeutics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16832000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "U",
+   "company": "Unity Software Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16209000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ARM HOLDINGS P",
+   "company": "Arm Holdings Plc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 16142000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "OLMA",
+   "company": "Olema Pharmaceuticals Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 14714000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "Q",
+   "company": "Qnity Electronics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 14498000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ADMA",
+   "company": "Adma Biologics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 13926000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "XENE",
+   "company": "Xenon Pharmaceuticals Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 13875000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SLMBP",
+   "company": "SLM CORP",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 13287895.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "BRKRP",
+   "company": "BRUKER CORP",
+   "manager": "Майкъл Бъри · Scion Asset Management",
+   "action": "13F",
+   "value": 13137181.0,
+   "period": "13F · 2025-11-03",
+   "_resolved": true,
+   "managers": [
+    "Майкъл Бъри · Scion Asset Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "JBS",
+   "company": "Jbs N.V.",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 11780000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "DAKTRONICS INC",
+   "company": "Daktronics Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 11000000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NET",
+   "company": "Cloudflare Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10840000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LYB",
+   "company": "Lyondellbasell Industries Nv",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10588000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "VSOGF",
+   "company": "Vista Energy S.A.B. De C.V.",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 10166000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "TWST",
+   "company": "Twist Bioscience Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9789000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "COHR",
+   "company": "Coherent Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9624000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "CLS",
+   "company": "Celestica Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 9373000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "STUBHUB HLDGS ",
+   "company": "Stubhub Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 8531000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "DBV TECHNOLOGI",
+   "company": "Dbv Technologies S A Sponsored",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 8008000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MU",
+   "company": "Micron Technology Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 7905000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SATS",
+   "company": "Echostar Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 7114000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "ALMONTY INDS I",
+   "company": "Almonty Inds Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 6804000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "PCTTW",
+   "company": "Purecycle Technologies Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4999000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "LUMENTUM HLDGS",
+   "company": "Lumentum Hldgs Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4893000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "MELI",
+   "company": "Mercadolibre  Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4782000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "SOLSTICE ADVAN",
+   "company": "Solstice Advanced Matls Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 4762000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WESTLAKE CORPO",
+   "company": "Westlake Corporation",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 2476000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "WVE",
+   "company": "Wave Life Sciences Ltd",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "action": "13F",
+   "value": 1254000.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Стенли Дракенмилър · Duquesne Family Office"
+   ],
+   "count": 1
+  }
+ ],
+ "magic_formula_top": [
+  {
+   "ticker": "ADBE",
+   "earnings_yield": 0.1136,
+   "roc": 0.1993,
+   "name": "Adobe Inc.",
+   "mf_rank": 11
+  },
+  {
+   "ticker": "BMY",
+   "earnings_yield": 0.1074,
+   "roc": 0.1069,
+   "name": "Bristol-Myers Squibb Company",
+   "mf_rank": 28
+  },
+  {
+   "ticker": "META",
+   "earnings_yield": 0.0631,
+   "roc": 0.164,
+   "name": "Meta Platforms, Inc.",
+   "mf_rank": 31
+  },
+  {
+   "ticker": "MRK",
+   "earnings_yield": 0.0719,
+   "roc": 0.1258,
+   "name": "Merck & Company, Inc.",
+   "mf_rank": 34
+  },
+  {
+   "ticker": "MSFT",
+   "earnings_yield": 0.0553,
+   "roc": 0.1481,
+   "name": "Microsoft Corporation",
+   "mf_rank": 42
+  },
+  {
+   "ticker": "LOW",
+   "earnings_yield": 0.0589,
+   "roc": 0.1279,
+   "name": "Lowe's Companies, Inc.",
+   "mf_rank": 42
+  },
+  {
+   "ticker": "PEP",
+   "earnings_yield": 0.0696,
+   "roc": 0.0909,
+   "name": "Pepsico, Inc.",
+   "mf_rank": 43
+  },
+  {
+   "ticker": "MA",
+   "earnings_yield": 0.0466,
+   "roc": 0.2503,
+   "name": "Mastercard Incorporated",
+   "mf_rank": 44
+  },
+  {
+   "ticker": "NFLX",
+   "earnings_yield": 0.05,
+   "roc": 0.154,
+   "name": "Netflix, Inc.",
+   "mf_rank": 47
+  },
+  {
+   "ticker": "V",
+   "earnings_yield": 0.0457,
+   "roc": 0.1919,
+   "name": "Visa Inc.",
+   "mf_rank": 49
+  }
+ ],
+ "news": [
+  {
+   "headline": "Global tech sell-off deepens as South Korea's Kospi sinks 8%, S&P 500 futures fall",
+   "why": "Широк технологичен разпродаж удря азиатските пазари и S&P 500 фючърсите, сигнализирайки риск-оф настроение в началото на сесията."
+  },
+  {
+   "headline": "SoftBank plunges 13%, SK Hynix slides 10% as Asia tech rout tracks declines in the U.S.",
+   "why": "Паническото бягство от AI-свързани акции в Азия засилва натиска върху Nasdaq и полупроводниковия сектор глобално."
+  },
+  {
+   "headline": "Kevin Warsh's tough talk on inflation reassures investors",
+   "why": "Новият председател на Fed изпраща хокишки сигнал, което натиска дългосрочните лихвени очаквания надолу и влияе върху rate-sensitive секторите."
+  },
+  {
+   "headline": "Chicago Fed President Goolsbee says inflation is too high; Williams sees price pressures easing",
+   "why": "Противоречивите сигнали от Fed членове увеличават несигурността около timing-а на следващото лихвено решение."
+  },
+  {
+   "headline": "Iran behind attack on cargo vessel near Oman in Strait of Hormuz",
+   "why": "Иранска атака в Хормузкия пролив заплашва ключов петролен транспортен коридор и може да дестабилизира енергийните пазари."
+  },
+  {
+   "headline": "Oil slides 2% as markets look past fresh Iran tensions and focus on supply outlook",
+   "why": "Петролът поевтинява въпреки геополитическия риск, което сигнализира, че пазарът залага на нарастващо предлагане над ескалация."
+  },
+  {
+   "headline": "ON Semiconductor strikes $7 billion deal for Synaptics in physical AI push",
+   "why": "Мащабно M&A в полупроводниковия сектор показва продължаваща консолидация и може да движи свързаните тикери интрадей."
+  },
+  {
+   "headline": "Small-caps are booming this year — best first half since 1991",
+   "why": "Силното представяне на small-caps сигнализира разширяване на пазарното рали отвъд mega-cap tech, което е ключово за ротационни стратегии."
+  }
+ ]
+}

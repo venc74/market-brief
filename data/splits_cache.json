@@ -1,5 +1,5 @@
 {
- "date": "2026-06-25",
+ "date": "2026-06-26",
  "rows": [
   {
    "ticker": "SMERY",
@@ -8,8 +8,8 @@
    "ratio": "5:1",
    "split_type": "normal",
    "date_human": "Jun 22, 2026",
-   "price": 36.35,
-   "market_cap": 154641720560.7906
+   "price": 37.4,
+   "market_cap": 159108688520.4594
   },
   {
    "ticker": "DD",
@@ -18,8 +18,8 @@
    "ratio": "1:3",
    "split_type": "reverse",
    "date_human": "Jun 24, 2026",
-   "price": 137.82,
-   "market_cap": 18608373708.0
+   "price": 137.8,
+   "market_cap": 18605673869.84651
   }
  ]
 }

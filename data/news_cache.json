@@ -1,37 +1,37 @@
 {
- "date": "2026-06-25",
+ "date": "2026-06-26",
  "news": [
   {
-   "headline": "Oil price back at prewar levels as Gulf flows pick up — Brent drops below $72.48",
-   "why": "Петролът изтрива всички военновременни премии, което директно натиска енергийния сектор надолу и облекчава инфлационния натиск глобално."
+   "headline": "Global tech sell-off deepens as South Korea's Kospi sinks 8%, S&P 500 futures fall",
+   "why": "Широк технологичен разпродаж удря азиатските пазари и S&P 500 фючърсите, сигнализирайки риск-оф настроение в началото на сесията."
   },
   {
-   "headline": "Iran declares new Hormuz route 'unacceptable and dangerous,' warns against ships transiting without approval",
-   "why": "Геополитическият риск около Ормузкия проток остава жив въпреки ценовия спад — всяка ескалация може моментално да обърне петролния тренд."
+   "headline": "SoftBank plunges 13%, SK Hynix slides 10% as Asia tech rout tracks declines in the U.S.",
+   "why": "Паническото бягство от AI-свързани акции в Азия засилва натиска върху Nasdaq и полупроводниковия сектор глобално."
   },
   {
-   "headline": "Insurers slash war premiums for Strait of Hormuz ships by more than half",
-   "why": "Пазарите на застраховане сигнализират, че рискът от прекъсване на доставките намалява, което потвърждава нормализирането на петролните потоци."
+   "headline": "Kevin Warsh's tough talk on inflation reassures investors",
+   "why": "Новият председател на Fed изпраща хокишки сигнал, което натиска дългосрочните лихвени очаквания надолу и влияе върху rate-sensitive секторите."
   },
   {
-   "headline": "Micron stock jumps 15% as revenue quadruples; posts 15-fold profit surge in boost for global AI stocks",
-   "why": "Изключителните резултати на Micron задават позитивен тон за целия полупроводников сектор и потвърждават AI supercycle тезата."
+   "headline": "Chicago Fed President Goolsbee says inflation is too high; Williams sees price pressures easing",
+   "why": "Противоречивите сигнали от Fed членове увеличават несигурността около timing-а на следващото лихвено решение."
   },
   {
-   "headline": "Chip supply to stay constrained 'beyond 2027,' Micron executives say",
-   "why": "Структурният дефицит на памет означава устойчиво ценово инициативно за $MU, $LRCX и свързаните semiconductor имена."
+   "headline": "Iran behind attack on cargo vessel near Oman in Strait of Hormuz",
+   "why": "Иранска атака в Хормузкия пролив заплашва ключов петролен транспортен коридор и може да дестабилизира енергийните пазари."
   },
   {
-   "headline": "SK Hynix surges 12% after Micron earnings; seeks to raise up to $29.4 billion in blockbuster Nasdaq listing",
-   "why": "Ефектът от Micron se пренася в азиатските chip акции и потенциалният IPO ще тества апетита за капитал в сектора."
+   "headline": "Oil slides 2% as markets look past fresh Iran tensions and focus on supply outlook",
+   "why": "Петролът поевтинява въпреки геополитическия риск, което сигнализира, че пазарът залага на нарастващо предлагане над ескалация."
   },
   {
-   "headline": "Trump demands 'loyalty' from NATO allies and slams lack of support in Iran war",
-   "why": "Нарастващото напрежение вътре в НАТО внася геополитическа несигурност, която може да засегне европейските отбранителни акции и еврото."
+   "headline": "ON Semiconductor strikes $7 billion deal for Synaptics in physical AI push",
+   "why": "Мащабно M&A в полупроводниковия сектор показва продължаваща консолидация и може да движи свързаните тикери интрадей."
   },
   {
-   "headline": "Fundstrat's Tom Lee joins Wall Street bulls calling for S&P 500 at 8,000",
-   "why": "Консенсусът за S&P 8000 укрепва bullish сентимента и може да привлече допълнителни FOMO потоци към широкия пазар."
+   "headline": "Small-caps are booming this year — best first half since 1991",
+   "why": "Силното представяне на small-caps сигнализира разширяване на пазарното рали отвъд mega-cap tech, което е ключово за ротационни стратегии."
   }
  ]
 }
