@@ -1,37 +1,37 @@
 {
- "date": "2026-06-26",
+ "date": "2026-06-29",
  "news": [
   {
-   "headline": "Global tech sell-off deepens as South Korea's Kospi sinks 8%, S&P 500 futures fall",
-   "why": "Широк технологичен разпродаж удря азиатските пазари и S&P 500 фючърсите, сигнализирайки риск-оф настроение в началото на сесията."
+   "headline": "U.S., Iran pause hostilities as Hormuz shipping resumes after weekend clashes",
+   "why": "Деескалацията намалява риска от петролна криза — натиск надолу върху цените на суровия петрол и енергийните акции след рязкото поскъпване."
   },
   {
-   "headline": "SoftBank plunges 13%, SK Hynix slides 10% as Asia tech rout tracks declines in the U.S.",
-   "why": "Паническото бягство от AI-свързани акции в Азия засилва натиска върху Nasdaq и полупроводниковия сектор глобално."
+   "headline": "Oil jumps back above $70 as fresh U.S.-Iran clashes reignite Middle East supply fears",
+   "why": "WTI над $70 сигнализира за повишена волатилност в енергийния сектор и инфлационен натиск, което усложнява позицията на Fed."
   },
   {
-   "headline": "Kevin Warsh's tough talk on inflation reassures investors",
-   "why": "Новият председател на Fed изпраща хокишки сигнал, което натиска дългосрочните лихвени очаквания надолу и влияе върху rate-sensitive секторите."
+   "headline": "Freight shipping costs surge as companies race to beat new Trump tariffs",
+   "why": "Поскъпването на фрахта до нива от кризата в Червено море през 2024 г. усилва инфлационните очаквания и притиска маржовете на вносозависимите компании."
   },
   {
-   "headline": "Chicago Fed President Goolsbee says inflation is too high; Williams sees price pressures easing",
-   "why": "Противоречивите сигнали от Fed членове увеличават несигурността около timing-а на следващото лихвено решение."
+   "headline": "Goldman Sachs says stick with Asia's winners, keep diversifying into commodities",
+   "why": "Препоръката на Goldman за ротация към азиатски акции и суровини дава посока за позиционирането на институционалния капитал тази седмица."
   },
   {
-   "headline": "Iran behind attack on cargo vessel near Oman in Strait of Hormuz",
-   "why": "Иранска атака в Хормузкия пролив заплашва ключов петролен транспортен коридор и може да дестабилизира енергийните пазари."
+   "headline": "China widens Japan export curbs, targeting drone makers, nuclear firms and defense institutes",
+   "why": "Ескалацията на търговската война между Китай и Япония удря технологичния и отбранителния сектор и повишава геополитическия риск в Азия."
   },
   {
-   "headline": "Oil slides 2% as markets look past fresh Iran tensions and focus on supply outlook",
-   "why": "Петролът поевтинява въпреки геополитическия риск, което сигнализира, че пазарът залага на нарастващо предлагане над ескалация."
+   "headline": "Samsung, SK Hynix shares fall as investors brace for reported $1.3 trillion spending plans",
+   "why": "Срив в акциите на водещи производители на чипове влияе на целия полупроводников сектор и ETF-и като SOXX."
   },
   {
-   "headline": "ON Semiconductor strikes $7 billion deal for Synaptics in physical AI push",
-   "why": "Мащабно M&A в полупроводниковия сектор показва продължаваща консолидация и може да движи свързаните тикери интрадей."
+   "headline": "AI fuels record $200bn M&A boom in US power sector",
+   "why": "Рекордното M&A активност в енергетиката, задвижена от AI търсенето, е структурен катализатор за Utilities и Infrastructure акциите."
   },
   {
-   "headline": "Small-caps are booming this year — best first half since 1991",
-   "why": "Силното представяне на small-caps сигнализира разширяване на пазарното рали отвъд mega-cap tech, което е ключово за ротационни стратегии."
+   "headline": "Putin says Russia faces fuel shortages as Ukrainian drones strike refineries",
+   "why": "Намаленото руско рафинерийно производство подкрепя по-високи цени на петрола и дизела на глобалния пазар."
   }
  ]
 }

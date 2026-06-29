@@ -1,25 +1,45 @@
 {
- "date": "2026-06-26",
+ "date": "2026-06-29",
  "rows": [
   {
-   "ticker": "SMERY",
-   "company": "Siemens Energy AG",
-   "date": "2026-06-22",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Jun 22, 2026",
-   "price": 37.4,
-   "market_cap": 159108688520.4594
+   "ticker": "HON",
+   "company": "Honeywell International Inc.",
+   "date": "2026-06-29",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Jun 29, 2026",
+   "price": 464.42,
+   "market_cap": 147140594785.04288
   },
   {
-   "ticker": "DD",
-   "company": "DuPont de Nemours, Inc.",
-   "date": "2026-06-24",
-   "ratio": "1:3",
-   "split_type": "reverse",
-   "date_human": "Jun 24, 2026",
-   "price": 137.8,
-   "market_cap": 18605673869.84651
+   "ticker": "MLI",
+   "company": "Mueller Industries, Inc.",
+   "date": "2026-07-01",
+   "ratio": "2:1",
+   "split_type": "normal",
+   "date_human": "Jul 01, 2026",
+   "price": 128.2,
+   "market_cap": 14175152249.165268
+  },
+  {
+   "ticker": "CRWD",
+   "company": "CrowdStrike Holdings, Inc.",
+   "date": "2026-07-02",
+   "ratio": "4:1",
+   "split_type": "normal",
+   "date_human": "Jul 02, 2026",
+   "price": 701.09,
+   "market_cap": 178472856490.25757
+  },
+  {
+   "ticker": "SMTOY",
+   "company": "Sumitomo Electric Industries Ltd. ADR",
+   "date": "2026-07-02",
+   "ratio": "8:1",
+   "split_type": "normal",
+   "date_human": "Jul 02, 2026",
+   "price": 77.35,
+   "market_cap": 241307204564.74686
   }
  ]
 }
