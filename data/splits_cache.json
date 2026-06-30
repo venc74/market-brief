@@ -1,5 +1,5 @@
 {
- "date": "2026-06-29",
+ "date": "2026-06-30",
  "rows": [
   {
    "ticker": "HON",
@@ -8,8 +8,8 @@
    "ratio": "1:2",
    "split_type": "reverse",
    "date_human": "Jun 29, 2026",
-   "price": 464.42,
-   "market_cap": 147140594785.04288
+   "price": 227.8,
+   "market_cap": 72173090140.2
   },
   {
    "ticker": "MLI",
@@ -18,8 +18,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Jul 01, 2026",
-   "price": 128.2,
-   "market_cap": 14175152249.165268
+   "price": 122.83,
+   "market_cap": 13581388394.789999
   },
   {
    "ticker": "CRWD",
@@ -28,8 +28,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Jul 02, 2026",
-   "price": 701.09,
-   "market_cap": 178472856490.25757
+   "price": 742.91,
+   "market_cap": 189118743589.74243
   },
   {
    "ticker": "SMTOY",
@@ -38,8 +38,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Jul 02, 2026",
-   "price": 77.35,
-   "market_cap": 241307204564.74686
+   "price": 75.27,
+   "market_cap": 234818275965.0
   }
  ]
 }
