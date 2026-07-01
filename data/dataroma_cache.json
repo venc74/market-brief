@@ -1,5 +1,5 @@
 {
- "date": "2026-06-30",
+ "date": "2026-07-01",
  "rows": [
   {
    "ticker": "AXP",
@@ -80,7 +80,7 @@
    "count": 4
   },
   {
-   "ticker": "GGLBP",
+   "ticker": "GOOGN",
    "company": "ALPHABET INC",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "13F",

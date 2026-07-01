@@ -1,5 +1,5 @@
 {
- "date": "2026-06-30",
+ "date": "2026-07-01",
  "rows": [
   {
    "ticker": "HON",
@@ -8,8 +8,18 @@
    "ratio": "1:2",
    "split_type": "reverse",
    "date_human": "Jun 29, 2026",
-   "price": 227.8,
-   "market_cap": 72173090140.2
+   "price": 223.9,
+   "market_cap": 70937464626.34415
+  },
+  {
+   "ticker": "MQ",
+   "company": "Marqeta, Inc.",
+   "date": "2026-07-01",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Jul 01, 2026",
+   "price": 16.22,
+   "market_cap": 1719442842.3703728
   },
   {
    "ticker": "MLI",
@@ -18,8 +28,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Jul 01, 2026",
-   "price": 122.83,
-   "market_cap": 13581388394.789999
+   "price": 61.47,
+   "market_cap": 13592445489.833473
   },
   {
    "ticker": "CRWD",
@@ -28,8 +38,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Jul 02, 2026",
-   "price": 742.91,
-   "market_cap": 189118743589.74243
+   "price": 763.14,
+   "market_cap": 194268596734.8
   },
   {
    "ticker": "SMTOY",
@@ -38,8 +48,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Jul 02, 2026",
-   "price": 75.27,
-   "market_cap": 234818275965.0
+   "price": 73.31,
+   "market_cap": 228703696528.59497
   }
  ]
 }
