@@ -1,37 +1,37 @@
 {
- "date": "2026-07-02",
+ "date": "2026-07-03",
  "news": [
   {
-   "headline": "Russia launches massive missile and drone strike on Ukraine; Poland scrambles jets, Finland restricts airspace",
-   "why": "Ескалацията повишава геополитическия риск и може да подтикне към defensive rotation към енергия, злато и отбранителни акции."
+   "headline": "U.S. job creation cools in June with payrolls growth of just 57,000; unemployment rate at 4.2%",
+   "why": "Силно разминаване с очакваните 115,000 нови работни места сигнализира за охлаждане на икономиката и повишава вероятността за по-ранни Fed cuts."
   },
   {
-   "headline": "Fed Chief Kevin Warsh: inflation 'too high', declines to hint at July rate decision",
-   "why": "Hawkish сигнал от новия председател на Fed държи rate-cut очакванията под натиск и е bearish за growth акции и облигации."
+   "headline": "Job seekers giving up: Labor force participation rate falls to lowest in 50 years, outside of Covid era",
+   "why": "Спадът на участието в работната сила изкривява unemployment rate надолу и усложнява Fed решенията за лихвени политики."
   },
   {
-   "headline": "U.S. opts not to renew USMCA, opening door for Canada and Mexico renegotiations",
-   "why": "Търговската несигурност с двамата най-големи партньори на САЩ е bearish за индустриалния и автомобилния сектор и може да засили USD волатилността."
+   "headline": "Dow jumps nearly 600 points to record close; Nasdaq slides as chip stocks suffer",
+   "why": "Ротацията от tech/chips към Dow компании показва важна секторна динамика, която може да продължи в следващите сесии."
   },
   {
-   "headline": "Oil falls over 1% as US-Iran talks ease Middle East tensions; Brent posts worst quarter since 2020",
-   "why": "Дипломатическата деескалация натиска петрола и е headwind за energy сектора, но tailwind за инфлационните очаквания надолу."
+   "headline": "Tesla stock sinks 7% despite strong deliveries report, posting worst day in nearly a year",
+   "why": "Sell-the-news реакция при TSLA въпреки добри данни за доставки предполага слабост в EV сектора и sentiment проблеми около Musk."
   },
   {
-   "headline": "Samsung Electronics and SK Hynix tumble over 7% as chip rout spreads from Wall Street",
-   "why": "Секторната разпродажба в semiconductors сигнализира продължаващ натиск върху NVDA, AMD и целия AI hardware trade."
+   "headline": "Surging Wall Street profit forecasts fuel fears of 'earnings bubble'",
+   "why": "Анализаторски очаквания за S&P 500 earnings растат с най-бързи темпове от Covid rebounds насам, което повдига въпроси за оценъчен риск."
   },
   {
-   "headline": "The dollar looks ready to break higher; Wall Street turns bullish on USD",
-   "why": "Силен долар е headwind за emerging markets, commodities и мултинационалните приходи — ключово за macro positioning."
+   "headline": "Oil up slightly ahead of long US weekend as peace efforts hold",
+   "why": "Умереният ръст на петрола на фона на US-Iran мирни усилия ограничава energy sector volatility, но геополитическият риск остава."
   },
   {
-   "headline": "OpenAI proposes 5% stake to Trump administration amid Washington pressure",
-   "why": "Правителствено участие в AI гигантите променя регулаторния пейзаж и може да засегне оценките на MSFT, GOOGL и останалите AI plays."
+   "headline": "Iran readies mega-funeral for slain supreme leader",
+   "why": "Смъртта на Khamenei е ключово геополитическо събитие — несигурността около наследника на властта в Иран може рязко да движи петрол и regional risk assets."
   },
   {
-   "headline": "BYD and Xiaomi shares surge on strong June delivery figures",
-   "why": "Силните данни за доставки подхранват оптимизъм за китайски EV сектор и може да рефлектира върху TSLA и глобалните auto peers."
+   "headline": "Nvidia offers start-ups chance to swap compute power for revenue share",
+   "why": "Новият бизнес модел на NVDA разширява AI ecosystem monetization и е важен сигнал за дългосрочния growth narrative на компанията."
   }
  ]
 }

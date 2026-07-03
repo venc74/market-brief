@@ -1,5 +1,5 @@
 {
- "date": "2026-07-02",
+ "date": "2026-07-03",
  "rows": [
   {
    "ticker": "HON",
@@ -8,8 +8,8 @@
    "ratio": "1:2",
    "split_type": "reverse",
    "date_human": "Jun 29, 2026",
-   "price": 221.75,
-   "market_cap": 70256289458.25
+   "price": 229.86,
+   "market_cap": 72825753045.11559
   },
   {
    "ticker": "MQ",
@@ -18,8 +18,8 @@
    "ratio": "1:4",
    "split_type": "reverse",
    "date_human": "Jul 01, 2026",
-   "price": 16.62,
-   "market_cap": 1761845929.74
+   "price": 17.41,
+   "market_cap": 1845591899.3945274
   },
   {
    "ticker": "MLI",
@@ -28,8 +28,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Jul 01, 2026",
-   "price": 57.42,
-   "market_cap": 12697929196.92
+   "price": 56.5,
+   "market_cap": 12492150000.0
   },
   {
    "ticker": "CRWD",
@@ -38,8 +38,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Jul 02, 2026",
-   "price": 193.18,
-   "market_cap": 196712416520.81543
+   "price": 193.98,
+   "market_cap": 197521930783.927
   }
  ]
 }
