@@ -1,45 +1,25 @@
 {
- "date": "2026-07-03",
+ "date": "2026-07-06",
  "rows": [
   {
-   "ticker": "HON",
-   "company": "Honeywell International Inc.",
-   "date": "2026-06-29",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Jun 29, 2026",
-   "price": 229.86,
-   "market_cap": 72825753045.11559
-  },
-  {
-   "ticker": "MQ",
-   "company": "Marqeta, Inc.",
-   "date": "2026-07-01",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Jul 01, 2026",
-   "price": 17.41,
-   "market_cap": 1845591899.3945274
-  },
-  {
-   "ticker": "MLI",
-   "company": "Mueller Industries, Inc.",
-   "date": "2026-07-01",
-   "ratio": "2:1",
+   "ticker": "FUWAY",
+   "company": "Furukawa Electric Co. Ltd. ADR",
+   "date": "2026-07-10",
+   "ratio": "10:1",
    "split_type": "normal",
-   "date_human": "Jul 01, 2026",
-   "price": 56.5,
-   "market_cap": 12492150000.0
+   "date_human": "Jul 10, 2026",
+   "price": 125.0,
+   "market_cap": 175874512500.0
   },
   {
-   "ticker": "CRWD",
-   "company": "CrowdStrike Holdings, Inc.",
-   "date": "2026-07-02",
+   "ticker": "SSUMY",
+   "company": "Sumitomo Corporation ADR",
+   "date": "2026-07-10",
    "ratio": "4:1",
    "split_type": "normal",
-   "date_human": "Jul 02, 2026",
-   "price": 193.98,
-   "market_cap": 197521930783.927
+   "date_human": "Jul 10, 2026",
+   "price": 39.36,
+   "market_cap": 187354003117.75964
   }
  ]
 }

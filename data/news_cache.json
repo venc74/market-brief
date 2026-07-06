@@ -1,37 +1,37 @@
 {
- "date": "2026-07-03",
+ "date": "2026-07-06",
  "news": [
   {
-   "headline": "U.S. job creation cools in June with payrolls growth of just 57,000; unemployment rate at 4.2%",
-   "why": "Силно разминаване с очакваните 115,000 нови работни места сигнализира за охлаждане на икономиката и повишава вероятността за по-ранни Fed cuts."
+   "headline": "Oil slips after OPEC+ agrees to raise output targets",
+   "why": "OPEC+ увеличава добива от август, което натиска петрола надолу и засяга енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "Job seekers giving up: Labor force participation rate falls to lowest in 50 years, outside of Covid era",
-   "why": "Спадът на участието в работната сила изкривява unemployment rate надолу и усложнява Fed решенията за лихвени политики."
+   "headline": "Gold holds near two-week high on easing Fed rate-hike bets",
+   "why": "По-слабият jobs report намали очакванията за Fed hikes, което поддържа златото и сигнализира за по-меки финансови условия."
   },
   {
-   "headline": "Dow jumps nearly 600 points to record close; Nasdaq slides as chip stocks suffer",
-   "why": "Ротацията от tech/chips към Dow компании показва важна секторна динамика, която може да продължи в следващите сесии."
+   "headline": "Yen to extend historic slump, while AI and energy 'supply bust' to support the U.S. dollar: Goldman",
+   "why": "Goldman е bearish върху JPY, а силният USD засяга мултинационалните компании, emerging markets и commodity pricing."
   },
   {
-   "headline": "Tesla stock sinks 7% despite strong deliveries report, posting worst day in nearly a year",
-   "why": "Sell-the-news реакция при TSLA въпреки добри данни за доставки предполага слабост в EV сектора и sentiment проблеми около Musk."
+   "headline": "Why Iran may find it difficult to clear its oil inventories even after sanctions relief",
+   "why": "Потенциалното иранско предлагане добавя натиск върху петролните цени дори при санкционно облекчение, което е bearish за енергийния сектор."
   },
   {
-   "headline": "Surging Wall Street profit forecasts fuel fears of 'earnings bubble'",
-   "why": "Анализаторски очаквания за S&P 500 earnings растат с най-бързи темпове от Covid rebounds насам, което повдига въпроси за оценъчен риск."
+   "headline": "Nvidia's next-gen AI rack system delayed to 2028 on manufacturing snags",
+   "why": "Закъснението на следващото поколение AI инфраструктура на Nvidia може да удари sentiment-а в целия AI и semiconductor сектор."
   },
   {
-   "headline": "Oil up slightly ahead of long US weekend as peace efforts hold",
-   "why": "Умереният ръст на петрола на фона на US-Iran мирни усилия ограничава energy sector volatility, но геополитическият риск остава."
+   "headline": "'NATO 3.0': Defense spending pledges face the Trump test",
+   "why": "Натискът на Вашингтон за по-висок европейски defense бюджет е директен катализатор за акциите на отбранителни компании от двете страни на Атлантика."
   },
   {
-   "headline": "Iran readies mega-funeral for slain supreme leader",
-   "why": "Смъртта на Khamenei е ключово геополитическо събитие — несигурността около наследника на властта в Иран може рязко да движи петрол и regional risk assets."
+   "headline": "Lockheed Martin leading race for $3.5 billion purchase of Ultra Maritime",
+   "why": "Потенциална мащабна M&A сделка в defense сектора засяга LMT и широкия defense peer group amid нарастващи военни разходи."
   },
   {
-   "headline": "Nvidia offers start-ups chance to swap compute power for revenue share",
-   "why": "Новият бизнес модел на NVDA разширява AI ecosystem monetization и е важен сигнал за дългосрочния growth narrative на компанията."
+   "headline": "Honeywell spin-off in merger talks to create $27bn materials group",
+   "why": "Сливането на Solstice с Element Solutions би създало ключов доставчик за chipmaking, с директно значение за semiconductor supply chain."
   }
  ]
 }
