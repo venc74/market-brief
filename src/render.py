@@ -80,6 +80,7 @@ def render_dashboard(brief: dict) -> str:
         superinvestor_moves=brief.get("superinvestor_moves", []),
         magic_formula_top=brief.get("magic_formula_top", []),
         news=brief.get("news", []),
+        cot=brief.get("cot", []),
         available_dates=brief.get("date") and [brief.get("date")],
     )
     config.DOCS_DIR.mkdir(exist_ok=True)
