@@ -250,3 +250,7 @@ COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 10))
 COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
 COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
 COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 3000))
+# ── MOVE Index (ICE BofA, bond volatility) ────────────────────────────────
+MOVE_YELLOW_THRESHOLD = float(os.getenv("MOVE_YELLOW_THRESHOLD", 100))
+MOVE_RED_THRESHOLD = float(os.getenv("MOVE_RED_THRESHOLD", 150))
+MOVE_SPIKE_WEEKLY_DELTA = float(os.getenv("MOVE_SPIKE_WEEKLY_DELTA", 15))
