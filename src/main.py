@@ -23,6 +23,7 @@ from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
+from src import cot
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -86,7 +87,8 @@ def run() -> dict:
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
-
+    screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
+                          "industry": c.get("industry")} for c in candidates]
     print("[6/7] AI синтез (Claude API)…")
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo)
     # Значими новини (RSS + nitter → Claude филтър) — преди останалия анализ
@@ -96,7 +98,10 @@ def run() -> dict:
     candidates = ai_brief.merge_narratives(candidates, narratives)
     # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
     candidates = inject_split_catalysts(candidates)
-
+    print("      COT екстремуми…")
+    cot_extremes = cot.get_extremes() if config.ENABLE_COT else []
+    cot_with_theses = ai_brief.cot_theses(
+        cot_extremes, screener_universe, thermo["regime"]) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
@@ -125,6 +130,7 @@ def run() -> dict:
         "superinvestor_moves": superinvestor_moves,
         "magic_formula_top": magic_formula_top,
         "news": news,
+        "cot": cot_with_theses,
     }
 
     # исторически JSON за бъдещия backtest модул
