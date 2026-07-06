@@ -84,7 +84,7 @@ def global_market_signals() -> dict:
     """DXY, VIX, gold, oil, copper, 10Y yield — снимка + 5-дневна промяна."""
     tickers = {
         "DXY": "DX-Y.NYB", "VIX": "^VIX", "Gold": "GC=F",
-        "Oil_WTI": "CL=F", "Copper": "HG=F", "US10Y": "^TNX",
+        "Oil_WTI": "CL=F", "Copper": "HG=F", "US10Y": "^TNX", "MOVE": "^MOVE",
     }
     out = {}
     for name, symbol in tickers.items():
