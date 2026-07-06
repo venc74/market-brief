@@ -21,6 +21,16 @@ superinvestor → маркер 'SI✓'. Техническата сила пот
 мениджър просто се пропуска (graceful). Ако всички per-manager страници върнат нищо,
 има fallback към общата активност (`allact.php`), който не изисква кодове.
 
+EDGAR "нова покупка" vs "държана позиция": последният 13F сам по себе си е само
+снимка на текущите holdings — не казва дали позицията е нова или държана от години
+(Berkshire's Coca-Cola би излизала като "покупка" всеки ден иначе). Затова EDGAR
+пътят тегли И предходното тримесечие за същия CIK и съпоставя holdings-ите по CUSIP
+(стабилен идентификатор — имената на емитента могат леко да варират между подавания).
+Позиция без съвпадение в предходния 13F (или мениджър без предходен филинг изобщо —
+нов CIK в EDGAR историята) → "нова позиция". Ръст в брой акции над
+config.DATAROMA_MIN_SHARE_INCREASE_PCT → "увеличена". Непроменени/намалени позиции
+се изхвърлят — не са "покупка". config.DATAROMA_MIN_VALUE се прилага и тук.
+
 Graceful degradation (Секция 7): всяка грешка → празен резултат, брифът продължава.
 """
 from __future__ import annotations
@@ -214,8 +224,13 @@ def _ticker_map() -> dict[str, str]:
     return out
 
 
-def _latest_13f(cik: str) -> tuple[str, str] | None:
-    """Връща (accessionNumber, filingDate) на последния 13F-HR за CIK."""
+def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str]]:
+    """
+    Връща до n най-нови (accessionNumber, filingDate) 13F-HR за CIK, сортирани
+    низходящо по дата (filings[0] = последно, filings[1] = предходно тримесечие).
+    Ако мениджърът има само 1 филинг (нов CIK / фонд без история) — връща списък
+    с 1 елемент; извикващият код третира липсата на предходно тримесечие gracefully.
+    """
     try:
         r = requests.get(f"https://data.sec.gov/submissions/CIK{cik}.json",
                          timeout=20, headers=_EDGAR_UA)
@@ -224,20 +239,17 @@ def _latest_13f(cik: str) -> tuple[str, str] | None:
         forms = rec.get("form", [])
         accs = rec.get("accessionNumber", [])
         dates = rec.get("filingDate", [])
-        best = None
-        for i, f in enumerate(forms):
-            if f == "13F-HR":
-                d = dates[i] if i < len(dates) else ""
-                if best is None or d > best[1]:
-                    best = (accs[i], d)
-        return best
+        filings = [(accs[i], dates[i] if i < len(dates) else "")
+                   for i, f in enumerate(forms) if f == "13F-HR"]
+        filings.sort(key=lambda x: x[1], reverse=True)
+        return filings[:n]
     except Exception as e:
         print(f"[edgar] submissions {cik}: {e}")
-        return None
+        return []
 
 
 def _info_table(cik: str, accession: str) -> list[dict]:
-    """Сваля и парсва information table XML на 13F → [{issuer, value, cusip}]."""
+    """Сваля и парсва information table XML на 13F → [{issuer, value, cusip, shares}]."""
     cik_int = str(int(cik))
     acc_nodash = accession.replace("-", "")
     base = f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}"
@@ -259,10 +271,13 @@ def _info_table(cik: str, accession: str) -> list[dict]:
                         issuer = d.get("nameOfIssuer")
                         val = d.get("value")
                         cusip = d.get("cusip")
+                        shares = d.get("sshPrnAmt")
                         if issuer is not None and val is not None:
                             rows.append({"issuer": (issuer.text or "").strip(),
                                          "value": float(re.sub(r"[^\d.]", "", val.text or "0") or 0),
-                                         "cusip": (cusip.text or "").strip() if cusip is not None else ""})
+                                         "cusip": (cusip.text or "").strip() if cusip is not None else "",
+                                         "shares": float(re.sub(r"[^\d.]", "", shares.text or "0") or 0)
+                                                  if shares is not None else 0.0})
                 if rows:
                     holdings = rows
                     break
@@ -273,32 +288,87 @@ def _info_table(cik: str, accession: str) -> list[dict]:
     return holdings
 
 
-def _edgar_positions() -> list[dict]:
-    """Топ позиции от последните 13F на всички CIK мениджъри (с резолюция на тикър)."""
+def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
+    """
+    Сумира value/shares по CUSIP — един 13F понякога разбива една позиция на
+    няколко infoTable реда (sole/shared/none voting authority split), затова
+    сумираме преди сравнение, вместо да третираме всеки ред поотделно.
+    Редове без CUSIP се пропускат — CUSIP е задължително поле в 13F схемата,
+    липсата му означава повреден/нечетим ред, а той е единствената надеждна
+    ключ за съпоставка между тримесечия (имената на емитента могат леко да
+    се различават между подавания).
+    """
+    agg: dict[str, dict] = {}
+    for h in holdings:
+        cusip = h.get("cusip") or ""
+        if not cusip:
+            continue
+        a = agg.setdefault(cusip, {"issuer": h["issuer"], "value": 0.0, "shares": 0.0})
+        a["value"] += h.get("value", 0.0)
+        a["shares"] += h.get("shares", 0.0)
+    return agg
+
+
+def _edgar_positions(min_value: float) -> list[dict]:
+    """
+    НОВИ и УВЕЛИЧЕНИ позиции (не целия holdings dump) от последните 13F на всички
+    CIK мениджъри, съпоставени по CUSIP спрямо предходното тримесечие:
+      • CUSIP липсва в предходния 13F (или мениджърът няма предходен филинг изобщо —
+        нов CIK в EDGAR историята/фонд без история) → "нова позиция" (graceful default,
+        не пропускаме мениджъра и не гърмим).
+      • Брой акции е нараснал с поне config.DATAROMA_MIN_SHARE_INCREASE_PCT спрямо
+        предходното тримесечие → "увеличена".
+      • Непроменена/намалена позиция → изключва се от изхода (не е "покупка").
+    config.DATAROMA_MIN_VALUE се прилага и тук, върху текущата стойност на позицията.
+    """
     tmap = _ticker_map()
     rows = []
     for cik, name in config.DATAROMA_CIK.items():
-        latest = _latest_13f(cik)
-        if not latest:
+        filings = _recent_13f_filings(cik, n=2)
+        if not filings:
             continue
-        acc, fdate = latest
+        acc, fdate = filings[0]
         period = f"13F · {fdate}" if fdate else "13F"
         holdings = _info_table(cik, acc)
+        if not holdings:
+            continue
+        current_by_cusip = _aggregate_by_cusip(holdings)
+
+        # предходно тримесечие — липсва ли (нов CIK/фонд без история), prev_by_cusip
+        # остава {} и ВСЯКА текуща позиция по-долу пада в клона "нова позиция"
+        prev_by_cusip: dict[str, float] = {}
+        if len(filings) >= 2:
+            prev_acc, _ = filings[1]
+            prev_holdings = _info_table(cik, prev_acc)
+            prev_by_cusip = {c: a["shares"] for c, a in _aggregate_by_cusip(prev_holdings).items()}
+
         # 13F стойностите след 2023 са в долари; преди — в хиляди. Евристика:
-        if holdings:
-            mx = max(h["value"] for h in holdings)
-            scale = 1000 if mx < 1e7 else 1  # ако максимумът е „малък", значи са хиляди
-            for h in holdings:
-                ticker = tmap.get(_norm(h["issuer"]))
-                rows.append({
-                    "ticker": ticker or h["issuer"][:14].upper(),
-                    "company": h["issuer"],
-                    "manager": name,
-                    "action": "13F",
-                    "value": h["value"] * scale,
-                    "period": period,
-                    "_resolved": bool(ticker),
-                })
+        mx = max((a["value"] for a in current_by_cusip.values()), default=0)
+        scale = 1000 if mx and mx < 1e7 else 1  # ако максимумът е „малък", значи са хиляди
+
+        for cusip, cur in current_by_cusip.items():
+            prev_shares = prev_by_cusip.get(cusip)
+            if prev_shares is None or prev_shares <= 0:
+                action = "нова позиция"
+            elif cur["shares"] >= prev_shares * (1 + config.DATAROMA_MIN_SHARE_INCREASE_PCT / 100):
+                action = "увеличена"
+            else:
+                continue  # непроменена/намалена — не е "покупка", изхвърляме
+
+            value = cur["value"] * scale
+            if value < min_value:
+                continue
+
+            ticker = tmap.get(_norm(cur["issuer"]))
+            rows.append({
+                "ticker": ticker or cur["issuer"][:14].upper(),
+                "company": cur["issuer"],
+                "manager": name,
+                "action": action,
+                "value": value,
+                "period": period,
+                "_resolved": bool(ticker),
+            })
     return rows
 
 
@@ -314,7 +384,7 @@ def _fetch_body(min_value: float) -> list[dict]:
             pass
 
     # 1) EDGAR primary
-    rows = _edgar_positions()
+    rows = _edgar_positions(min_value)
 
     # 2) стар dataroma scrape, ако EDGAR върна нищо
     if not rows:

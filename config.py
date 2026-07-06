@@ -36,7 +36,7 @@ VIX_RISK_OFF = 25.0
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")        # newsapi.org, optional
-TRADIER_API_KEY = os.getenv("TRADIER_API_KEY", "")  # optional, options data
+# TRADIER_API_KEY / TRADIER_BASE — виж v2 секцията по-долу (заедно с коментара им)
 
 # ── Имейл доставка ────────────────────────────────────────────────────────
 EMAIL_METHOD = os.getenv("EMAIL_METHOD", "smtp")    # "smtp" | "sendgrid"
@@ -44,7 +44,7 @@ GMAIL_USER = os.getenv("GMAIL_USER", "")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
 EMAIL_TO = os.getenv("EMAIL_TO", "")
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://USERNAME.github.io/ai-investment-brief/")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://venc74.github.io/market-brief/")
 
 # ── Claude модел ──────────────────────────────────────────────────────────
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
@@ -233,8 +233,9 @@ SPLITS_MIN_MARKET_CAP = float(os.getenv("SPLITS_MIN_MARKET_CAP", 500_000_000))  
 UNUSUAL_OPTIONS_SCAN_LIMIT = int(os.getenv("UNUSUAL_OPTIONS_SCAN_LIMIT", 60))
 
 # ── SEC EDGAR 13F (Поправка 3): primary за Superinvestor Positions ─────────
-# EDGAR изисква descriptive User-Agent с контакт — смени с твой имейл при нужда.
-EDGAR_UA = os.getenv("EDGAR_UA", "market-brief venc74 contact@example.com")
+# EDGAR изисква descriptive User-Agent с реален контакт — стойността се
+# подава само през env var (GitHub Secret), никога не се комитва в кода.
+EDGAR_UA = os.getenv("EDGAR_UA", "market-brief-bot (contact via GitHub repo)")
 # CIK номера на топ мениджърите (подадени от теб). Ключ = CIK, стойност = име.
 DATAROMA_CIK = {
     "0001067983": "Уорън Бъфет · Berkshire Hathaway",
@@ -243,6 +244,11 @@ DATAROMA_CIK = {
     "0001061219": "Сет Кларман · Baupost Group",
     "0001536411": "Стенли Дракенмилър · Duquesne Family Office",
 }
+# EDGAR-специфичен праг: позиция се брои за "увеличена" само ако бр. акции е
+# нараснал с поне този % спрямо предходното тримесечие (сравнение по CUSIP).
+# 5% отсява шума от дребни закръгления/технически корекции между подавания,
+# без да губи реални акумулационни ходове.
+DATAROMA_MIN_SHARE_INCREASE_PCT = float(os.getenv("DATAROMA_MIN_SHARE_INCREASE_PCT", 5.0))
 
 # ── COT (Commitments of Traders) ──────────────────────────────────────────
 ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"

@@ -1,10 +1,9 @@
 name: Daily Investment Brief
 
-# 07:30 Europe/Berlin = 06:30 UTC през зимата (CET) и 05:30 UTC през лятото (CEST).
-# GitHub cron работи само в UTC и не знае за DST, затова пускаме И ДВАТА слота,
-# а guard стъпката проверява локалното време и убива грешния.
+# Пуска се само ръчно, през workflow_dispatch (external trigger от cron-job.org,
+# веднъж дневно към 07:30 Europe/Berlin) — виж CLAUDE.md за причината да няма
+# schedule: тригер тук (GitHub-native scheduler се оказа ненадежден).
 on:
-  
   workflow_dispatch: {}       # ръчно пускане за тест
 
 permissions:
@@ -19,25 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: DST guard — пускай само ако в Берлин е 07:3x
-        id: guard
-        run: echo "run=true" >> "$GITHUB_OUTPUT"
-
       - uses: actions/checkout@v4
-        if: steps.guard.outputs.run == 'true'
 
       - uses: actions/setup-python@v5
-        if: steps.guard.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
 
       - name: Install dependencies
-        if: steps.guard.outputs.run == 'true'
         run: pip install -r requirements.txt
 
       - name: Run the brief
-        if: steps.guard.outputs.run == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -52,7 +43,6 @@ jobs:
         run: python src/main.py
 
       - name: Commit dashboard + data
-        if: steps.guard.outputs.run == 'true'
         run: |
           git config user.name "brief-bot"
           git config user.email "actions@github.com"

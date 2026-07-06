@@ -1,6 +1,6 @@
 """
 Пазарен термометър (Секция 4).
-Шест индикатора + обща препоръка Offensive / Defensive / Cash.
+Седем индикатора + обща препоръка Offensive / Defensive / Cash.
 Всеки индикатор връща {value, status, label} където status ∈ green/yellow/red.
 """
 from __future__ import annotations
@@ -358,12 +358,15 @@ def build_thermometer(macro: dict) -> dict:
     move_val = move_ind.get("value") if move_ind else None
     move_spike = move_ind.get("spike") if move_ind else False
 
-    if vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD:
+    vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
+    move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
+
+    if vix_forces_defensive:
         regime, reason = "Defensive", f"VIX {vix_val:.0f} > 30 — автоматичен Defensive режим, sizing −50%"
-    elif move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike):
+    elif move_forces_defensive:
         regime, reason = "Defensive", (
             f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
-            + " — стрес в колатералната система (UST), автоматичен Defensive режим")
+            + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
     elif greens >= 4 and reds == 0:
         regime, reason = "Offensive", f"{greens}/7 индикатора зелени, нула червени"
     elif reds >= 3:
@@ -374,8 +377,8 @@ def build_thermometer(macro: dict) -> dict:
         regime, reason = "Offensive" if greens >= 3 else "Defensive", \
                          f"{greens} зелени / {reds} червени"
 
-    sizing_factor = config.DEFENSIVE_SIZING_FACTOR if (
-        vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD) else 1.0
+    sizing_factor = (config.DEFENSIVE_SIZING_FACTOR
+                     if (vix_forces_defensive or move_forces_defensive) else 1.0)
 
     return {"indicators": indicators, "regime": regime,
             "regime_reason": reason, "sizing_factor": sizing_factor}

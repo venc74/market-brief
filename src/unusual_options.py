@@ -14,7 +14,11 @@ proxy: днешен опционен обем спрямо open interest (vol/OI
 yfinance го дава) като втори сигнал. Топ 10 по vol/OI влизат в секцията.
 
 Сканирането на вериги е бавно → ограничаваме до config.UNUSUAL_OPTIONS_SCAN_LIMIT
-тикъра на ден. FALLBACK: Market Chameleon scrape, ако yfinance върне нищо.
+тикъра на ден. Изборът НЕ е азбучен (иначе всеки ден се сканират само A–C
+имена) — универсът се сортира по среден 20-дневен обем на АКЦИЯТА (ликвидност)
+низходящо и се взима топ N; резултатът се кешира за деня, за да не тегли обема
+повторно при повторни пускания. FALLBACK: Market Chameleon scrape, ако
+yfinance върне нищо.
 
 Graceful degradation: липсват ли данни за тикър — пропуска се; празно → секцията се крие.
 """
@@ -44,6 +48,7 @@ _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
        "Accept": "text/html,application/xhtml+xml"}
 _CACHE = config.DATA_DIR / "unusual_options_cache.json"
 _UNIV_CACHE = config.DATA_DIR / "sp500_ndx_universe.json"
+_VOLUME_RANK_CACHE = config.DATA_DIR / "unusual_options_volume_rank_cache.json"
 
 
 def _bias(call_vol: float, put_vol: float) -> tuple[str, str]:
@@ -115,6 +120,68 @@ def _sp500_ndx_universe() -> list[str]:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# Ранжиране на универса по ликвидност (обем на АКЦИЯТА, не на опциите)
+# ──────────────────────────────────────────────────────────────────────────
+def _avg_volumes(symbols: list[str], batch_size: int = 200) -> dict[str, float]:
+    """Среден 20-дневен обем на акцията за целия универс, на батчове (евтино спрямо опционни вериги)."""
+    out: dict[str, float] = {}
+    if yf is None:
+        return out
+    for i in range(0, len(symbols), batch_size):
+        batch = symbols[i:i + batch_size]
+        try:
+            data = yf.download(batch, period="1mo", progress=False,
+                               auto_adjust=True, threads=True)["Volume"]
+        except Exception as e:
+            print(f"[unusual_options] volume batch {i} failed: {e}")
+            continue
+        if pd is not None and isinstance(data, pd.Series):
+            data = data.to_frame(name=batch[0])
+        for sym in batch:
+            if sym not in data.columns:
+                continue
+            series = data[sym].dropna()
+            if len(series):
+                out[sym] = float(series.mean())
+    return out
+
+
+def _top_by_volume(universe: list[str], top_n: int) -> list[str]:
+    """
+    Топ N тикъра по среден 20-дневен обем на акцията (ликвидност), низходящо —
+    вместо предишния азбучен ред (който винаги сканираше само A–C имена).
+    Кешира се за деня, за да не тегли обемните данни повторно при повторни
+    пускания same day.
+    """
+    today = dt.date.today().isoformat()
+    if _VOLUME_RANK_CACHE.exists():
+        try:
+            cached = json.loads(_VOLUME_RANK_CACHE.read_text())
+            if cached.get("date") == today and cached.get("ranked"):
+                return cached["ranked"][:top_n]
+        except Exception:
+            pass
+
+    volumes = _avg_volumes(universe)
+    if not volumes:
+        # без обемни данни — пази стария ред, вместо да строши сканирането
+        print("[unusual_options] volume ranking неуспешен — пазя оригиналния ред")
+        return universe[:top_n]
+
+    ranked = sorted(volumes, key=volumes.get, reverse=True)
+    ranked += [s for s in universe if s not in volumes]  # без данни → накрая, не се губят
+
+    try:
+        config.DATA_DIR.mkdir(exist_ok=True)
+        _VOLUME_RANK_CACHE.write_text(json.dumps({"date": today, "ranked": ranked},
+                                                  ensure_ascii=False))
+    except Exception as e:
+        print(f"[unusual_options] volume rank cache write: {e}")
+
+    return ranked[:top_n]
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # PRIMARY · yfinance опционни вериги
 # ──────────────────────────────────────────────────────────────────────────
 def _stock_vol_ratio(tk) -> float | None:
@@ -134,7 +201,8 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
     if yf is None:
         return []
     rows = []
-    for sym in symbols[:config.UNUSUAL_OPTIONS_SCAN_LIMIT]:
+    scan_list = _top_by_volume(symbols, config.UNUSUAL_OPTIONS_SCAN_LIMIT)
+    for sym in scan_list:
         try:
             tk = yf.Ticker(sym)
             exps = tk.options
