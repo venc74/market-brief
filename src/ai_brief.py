@@ -199,12 +199,9 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
                                f"След earnings на {c['earnings'].get('next_earnings')}")
     return candidates
 
+
 # ══════════════════════════════════════════════════════════════════════════
 # COT (Commitments of Traders) — Секция [нова] — Шапиро тези
-# Additive: добави този блок в края на src/ai_brief.py. Нищо съществуващо
-# не се пипа. Ползва същия batch + retry + graceful-skip патърн като
-# ticker_narratives()/_narratives_for_batch(), за да не чупи pipeline-а
-# ако JSON-ът на един batch се провали.
 # ══════════════════════════════════════════════════════════════════════════
 
 SYSTEM_COT = """Ти си макро/позициониращ стратег, специализиран в тълкуване на \
@@ -276,4 +273,41 @@ def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
     return []
 
 
-def cot_theses(extremes: list[dict], screener_universe: list
+def cot_theses(extremes: list[dict], screener_universe: list[dict],
+              regime: str) -> list[dict]:
+    """
+    За всеки COT екстремум (extremes от src.cot.get_extremes()) генерира
+    директна + cross-sector теза. Batch-вано по config.COT_BATCH_SIZE заради
+    token budget (аналогично на ticker_narratives). Мърджва резултата обратно
+    в extremes по "market", запазвайки оригиналните числови полета
+    (percentile, net_position, direction, history) — Claude връща само
+    тезите, не пипа числата.
+    """
+    if not extremes:
+        return []
+
+    slim = [{"market": e["market"], "category": e["category"],
+            "percentile": e["percentile"], "direction": e["direction"],
+            "net_position": e["net_position"], "as_of": e["as_of"]}
+           for e in extremes]
+
+    size = max(1, config.COT_BATCH_SIZE)
+    batches = [slim[i:i + size] for i in range(0, len(slim), size)]
+    n = len(batches)
+    print(f"[ai] cot_theses: {len(slim)} екстремума → {n} batch(ове) по ≤{size}")
+
+    theses_by_market: dict[str, dict] = {}
+    for idx, batch in enumerate(batches, 1):
+        for t in _cot_theses_for_batch(batch, screener_universe, regime, f"{idx}/{n}"):
+            if t.get("market"):
+                theses_by_market[t["market"]] = t
+
+    merged = []
+    for e in extremes:
+        t = theses_by_market.get(e["market"])
+        if not t:
+            continue
+        merged.append({**e, "direct_thesis": t.get("direct_thesis", {}),
+                       "cross_sector_thesis": t.get("cross_sector_thesis", {}),
+                       "outside_screener": t.get("outside_screener", False)})
+    return merged
