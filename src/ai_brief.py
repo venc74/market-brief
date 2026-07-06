@@ -198,3 +198,82 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
             c["ai"].setdefault("watchlist_trigger",
                                f"След earnings на {c['earnings'].get('next_earnings')}")
     return candidates
+
+# ══════════════════════════════════════════════════════════════════════════
+# COT (Commitments of Traders) — Секция [нова] — Шапиро тези
+# Additive: добави този блок в края на src/ai_brief.py. Нищо съществуващо
+# не се пипа. Ползва същия batch + retry + graceful-skip патърн като
+# ticker_narratives()/_narratives_for_batch(), за да не чупи pipeline-а
+# ако JSON-ът на един batch се провали.
+# ══════════════════════════════════════════════════════════════════════════
+
+SYSTEM_COT = """Ти си макро/позициониращ стратег, специализиран в тълкуване на \
+CFTC Commitments of Traders данни по методологията на Jason Shapiro: managed \
+money (спекулативни/hedge fund) позиции на екстремни percentile нива са \
+contrarian сигнал — екстремно нетно дълги = потенциален bearish обрат, \
+екстремно нетно къси = потенциален bullish обрат. Пишеш на български, тикери \
+и технически термини на английски. Бъди директен и конкретен — не хеджирай. \
+Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
+
+
+def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
+                           regime: str) -> str:
+    """
+    batch: подмножество от cot.get_extremes() (market, category, net_position,
+    percentile, direction, as_of).
+    screener_universe: слим списък {ticker, sector, industry} от ТЕКУЩИЯ
+    CANSLIM скрийнър — за cross-reference, за да предпочита Claude тикъри,
+    които и без друго са в системния универс, вместо произволни имена.
+    """
+    return f"""Пазарен режим: {regime}
+
+CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо 156-седмична \
+история): {json.dumps(batch, ensure_ascii=False, default=str)}
+
+ТЕКУЩ CANSLIM СКРИЙНЪР (за cross-reference — предпочитай тези тикъри, когато \
+логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър, но \
+отбележи го с "outside_screener": true): \
+{json.dumps(screener_universe, ensure_ascii=False)}
+
+За ВСЕКИ инструмент в списъка върни обект с:
+- "market": точното име както е подадено
+- "direct_thesis": {{
+    "direction": "bullish"/"bearish" за самия инструмент или пряко свързаните \
+акции (contrarian спрямо екстремума — extreme_long → bearish обрат очакван, \
+extreme_short → bullish обрат очакван),
+    "tickers": [1-3 тикъра, пряко изложени на инструмента],
+    "reasoning": "2-3 изречения — защо точно тези тикъри и защо сега"
+  }}
+- "cross_sector_thesis": {{
+    "direction": "bullish"/"bearish",
+    "tickers": [1-3 тикъра, бенефициенти от ОБРАТНИЯ ефект — напр. ако петрол \
+readies за спад, кои некорелирани/обратно изложени сектори печелят],
+    "reasoning": "2-3 изречения — верижната логика инструмент → бенефициент"
+  }}
+- "outside_screener": true само ако нито един предложен тикър не е от подадения \
+скрийнър универс
+
+Ако екстремумът е твърде слаб/неясен за смислена теза (напр. пазар без ликвидни \
+свързани акции), пропусни го от отговора — не гадай.
+
+Връщай само JSON: {{"theses": [...]}}"""
+
+
+def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
+                          regime: str, tag: str) -> list[dict]:
+    """Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а."""
+    user = _build_cot_user_prompt(batch, screener_universe, regime)
+    for attempt in (1, 2):
+        try:
+            out = _parse_json(_call_claude(SYSTEM_COT, user,
+                                           max_tokens=config.COT_BATCH_MAX_TOKENS))
+            return out.get("theses", [])
+        except Exception as e:
+            label = "опит" if attempt == 1 else "retry"
+            print(f"[ai] cot batch {tag} {label} неуспешен: {type(e).__name__}: {e}")
+    print(f"[ai] cot batch {tag} пропуснат след 2 опита — "
+          f"губим {len(batch)} екстремума: {[e.get('market') for e in batch]}")
+    return []
+
+
+def cot_theses(extremes: list[dict], screener_universe: list
