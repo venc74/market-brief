@@ -88,7 +88,6 @@ def _naaim_from_nasdaq() -> list[dict]:
     ds = r.json().get("dataset", {})
     cols = [str(c).lower() for c in ds.get("column_names", [])]
     data = ds.get("data", [])
-    # колоната със средната експозиция: търсим "mean"/"average"/"naaim", иначе index 1
     val_idx = next((i for i, c in enumerate(cols)
                     if any(k in c for k in ("mean", "average", "naaim number"))), 1)
     pts = []
@@ -101,7 +100,7 @@ def _naaim_from_nasdaq() -> list[dict]:
             continue
         sort_key, raw = _parse_date_safe(str(row[0]))
         pts.append({"date": sort_key or raw, "value": round(val, 1), "_k": sort_key or raw})
-    pts.sort(key=lambda p: p["_k"])  # ISO дати → безопасно ascending
+    pts.sort(key=lambda p: p["_k"])
     for p in pts:
         p.pop("_k", None)
     return pts
@@ -124,7 +123,6 @@ def _points_from_json_obj(obj, out: list[dict]) -> None:
     Стойностите се ограничават до [-250, 250] (NAAIM е приблизително [-200, 200]).
     """
     if isinstance(obj, dict):
-        # dict с дата-подобен ключ + числова стойност
         date_val = next((obj[k] for k in ("date", "Date", "x", "t", "time", "label")
                          if k in obj and _looks_like_date(obj.get(k))), None)
         if date_val is not None:
@@ -137,7 +135,6 @@ def _points_from_json_obj(obj, out: list[dict]) -> None:
         for v in obj.values():
             _points_from_json_obj(v, out)
     elif isinstance(obj, list):
-        # двойка [date, number]
         if (len(obj) == 2 and _looks_like_date(obj[0])
                 and isinstance(obj[1], (int, float)) and -250 <= obj[1] <= 250):
             _, raw = _parse_date_safe(obj[0])
@@ -159,7 +156,6 @@ def _naaim_from_scrape() -> list[dict]:
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # — опит 1: класически HTML таблици —
     pts = []
     tables = soup.find_all("table")
     for table in tables:
@@ -169,18 +165,16 @@ def _naaim_from_scrape() -> list[dict]:
                 continue
             sort_key, raw = _parse_date_safe(cells[0])
             if sort_key is None:
-                continue  # първата клетка не е дата → пропускаме заглавни редове
+                continue
             for c in cells[1:]:
                 try:
                     val = float(c.replace("%", "").replace(",", "").strip())
                 except ValueError:
                     continue
-                if -250 <= val <= 250:  # NAAIM е приблизително в [-200, +200]
+                if -250 <= val <= 250:
                     pts.append({"date": raw, "value": round(val, 1), "_k": sort_key})
                     break
 
-    # — опит 2: SPA / JS-rendered страница → вграден JSON —
-    # Признаци за SPA: няма таблици с данни ИЛИ много малко видим текст спрямо script.
     if not pts:
         import json as _json
         scripts = soup.find_all("script")
@@ -193,12 +187,10 @@ def _naaim_from_scrape() -> list[dict]:
                 blob = blob.strip()
                 if not blob:
                     continue
-                # приоритет на декларираните JSON блокове, но опитваме и inline скриптове
                 candidates = []
                 if "json" in stype:
                     candidates.append(blob)
                 else:
-                    # извличаме първия балансиран {…} или […] от inline script
                     for opener, closer in (("[", "]"), ("{", "}")):
                         i, j = blob.find(opener), blob.rfind(closer)
                         if 0 <= i < j:
@@ -212,7 +204,6 @@ def _naaim_from_scrape() -> list[dict]:
                 if pts:
                     break
 
-    # дедупликация по (date, value) + сортиране ascending
     seen, uniq = set(), []
     for p in pts:
         key = (p["date"], p["value"])
@@ -262,8 +253,8 @@ def naaim_exposure() -> dict:
     last = pts[-1]
     val, date = last["value"], last["date"]
     status = "yellow"
-    if val > 90: status = "red"      # crowded long
-    elif val < 30: status = "green"  # песимизъм = гориво
+    if val > 90: status = "red"
+    elif val < 30: status = "green"
     return {"name": "NAAIM", "value": val, "as_of": date, "status": status,
             "label": f"NAAIM {val:.0f}"}
 
@@ -291,10 +282,51 @@ def market_put_call() -> dict:
                 "label": "P/C: няма данни"}
 
 
+def move_index() -> dict:
+    """
+    ICE BofA MOVE Index — имплицитна волатилност на UST (2/5/10/30г опции).
+    Измерва стреса в самия колатерал (трежъри), върху който стъпва целият
+    репо/маржин механизъм — структурно изпреварва VIX при системни кризи
+    (SVB март 2023: MOVE 130→200 за 48ч, VIX едва 26). Прагове: <100 нормално,
+    100-150 повишен стрес, >150 нестабилност. Отделно следим 1-седмичен delta —
+    скоростта на промяна, не само нивото, е ранният сигнал.
+    """
+    try:
+        hist = yf.Ticker("^MOVE").history(period="1mo")
+        if hist.empty or len(hist) < 6:
+            raise ValueError("insufficient history")
+        val = float(hist["Close"].iloc[-1])
+        week_ago = float(hist["Close"].iloc[-6])
+        delta = val - week_ago
+        spike = delta >= config.MOVE_SPIKE_WEEKLY_DELTA
+
+        if val < config.MOVE_YELLOW_THRESHOLD:
+            status = "green"
+        elif val < config.MOVE_RED_THRESHOLD:
+            status = "yellow"
+        else:
+            status = "red"
+        if spike:
+            status = "red"
+
+        spike_note = " ⚠ рязък скок" if spike else ""
+        return {
+            "name": "MOVE (Bond Vol)", "value": round(val, 1),
+            "delta_1w": round(delta, 1), "spike": spike, "status": status,
+            "label": f"MOVE {val:.0f} ({delta:+.0f}/седмица){spike_note}",
+        }
+    except Exception as e:
+        print(f"[thermo] MOVE failed: {e}")
+        return {"name": "MOVE (Bond Vol)", "value": None, "status": "yellow",
+                "hide": True, "label": ""}
+
+
 def build_thermometer(macro: dict) -> dict:
     """
-    Сглобява 6-те индикатора + правилото за режим:
+    Сглобява 7-те индикатора + правилото за режим:
     - VIX > 30 → задължително Defensive (Секция 8)
+    - MOVE > 150 или рязък седмичен скок → задължително Defensive (институционален
+      стрес в колатералната система бие останалите сигнали, аналогично на VIX правилото)
     - 4+ зелени → Offensive; 2+ червени → Cash/Defensive; иначе Defensive
     """
     spread = macro.get("spread_2s10s", {})
@@ -317,18 +349,25 @@ def build_thermometer(macro: dict) -> dict:
     }
 
     indicators = [spy_trend(), vix_level(), naaim_exposure(),
-                  market_put_call(), spread_ind, nl_ind]
+                  market_put_call(), spread_ind, nl_ind, move_index()]
 
     greens = sum(1 for i in indicators if i["status"] == "green")
     reds = sum(1 for i in indicators if i["status"] == "red")
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
+    move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
+    move_val = move_ind.get("value") if move_ind else None
+    move_spike = move_ind.get("spike") if move_ind else False
 
     if vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD:
         regime, reason = "Defensive", f"VIX {vix_val:.0f} > 30 — автоматичен Defensive режим, sizing −50%"
+    elif move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike):
+        regime, reason = "Defensive", (
+            f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
+            + " — стрес в колатералната система (UST), автоматичен Defensive режим")
     elif greens >= 4 and reds == 0:
-        regime, reason = "Offensive", f"{greens}/6 индикатора зелени, нула червени"
+        regime, reason = "Offensive", f"{greens}/7 индикатора зелени, нула червени"
     elif reds >= 3:
-        regime, reason = "Cash", f"{reds}/6 индикатора червени — капиталът е позиция"
+        regime, reason = "Cash", f"{reds}/7 индикатора червени — капиталът е позиция"
     elif reds >= 2:
         regime, reason = "Defensive", f"{reds} червени индикатора — намален риск"
     else:
