@@ -243,3 +243,10 @@ DATAROMA_CIK = {
     "0001061219": "Сет Кларман · Baupost Group",
     "0001536411": "Стенли Дракенмилър · Duquesne Family Office",
 }
+
+# ── COT (Commitments of Traders) ──────────────────────────────────────────
+ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"
+COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 15))
+COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 85))
+COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
+COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 3000))
