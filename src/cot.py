@@ -68,11 +68,11 @@ MAJOR_MARKETS = [
     ("Canadian Dollar",       "tff", ["CANADIAN DOLLAR"],            []),
     ("Australian Dollar",     "tff", ["AUSTRALIAN DOLLAR"],          []),
     ("Mexican Peso",          "tff", ["MEXICAN PESO"],               []),
-    ("2-Year Treasury Note",  "tff", ["2-YEAR", "TREASURY"],        []),
-    ("5-Year Treasury Note",  "tff", ["5-YEAR", "TREASURY"],        []),
-    ("10-Year Treasury Note", "tff", ["10-YEAR", "TREASURY"],       []),
-    ("Ultra Treasury Bond",   "tff", ["ULTRA", "TREASURY"],          []),
-    ("30-Year Treasury Bond", "tff", ["30-YEAR", "TREASURY"],       ["ULTRA"]),
+    ("2-Year Treasury Note",  "tff", ["UST", "2Y"],                 []),
+    ("5-Year Treasury Note",  "tff", ["UST", "5Y"],                 []),
+    ("10-Year Treasury Note", "tff", ["UST", "10Y"],                ["ULTRA"]),
+    ("Ultra Treasury Bond",   "tff", ["ULTRA", "UST", "BOND"],       []),
+    ("30-Year Treasury Bond", "tff", ["UST", "BOND"],               ["ULTRA"]),
 
     # ── Стоки (Disaggregated · Managed Money) ──
     ("Gold",           "disaggregated", ["GOLD"],          ["MICRO", "MINI"]),
@@ -185,7 +185,7 @@ def _update_report(cache: dict, key: str, dataset_id: str,
 def refresh_cache() -> dict:
     cache = _load_cache()
     _update_report(cache, "tff", _TFF_ID,
-                   "lev_money_positions_long_all", "lev_money_positions_short_all")
+                   "lev_money_positions_long", "lev_money_positions_short")
     _update_report(cache, "disaggregated", _DISAGG_ID,
                    "m_money_positions_long_all", "m_money_positions_short_all")
     _save_cache(cache)
