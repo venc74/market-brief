@@ -400,6 +400,17 @@
   {% endfor %}
 </section>
 
+{% if correlation_flags %}
+<div class="prose" style="border-left-color: var(--yellow); margin-top: 16px">
+  <b>⚠ Корелационен риск:</b>
+  {% for f in correlation_flags %}
+  {{ f.tickers[0] }} ↔ {{ f.tickers[1] }} (корелация {{ f.correlation }}){{ ", " if not loop.last else "" }}
+  {% endfor %}
+  — движат се силно синхронно; обмисли намалена експозиция в единия при
+  едновременно държане на двата.
+</div>
+{% endif %}
+
 <section>
   <h2>Watchlist · {{ watchlist|length }}</h2>
   <div class="watch-grid">

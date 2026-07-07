@@ -24,6 +24,7 @@ from src.sizing import position_plan
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
 from src import insider_buying
+from src import correlation_check
 from src import cot
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
@@ -106,6 +107,9 @@ def run() -> dict:
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
+    # чисто информационен флаг — не променя избора на Action, виж correlation_check.py
+    correlation_flags = (correlation_check.fetch_correlation_flags(action)
+                         if config.ENABLE_CORRELATION_CHECK else [])
 
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
     unusual_today = unusual_options.fetch_unusual_options(10) if config.ENABLE_UNUSUAL_OPTIONS else []
@@ -138,6 +142,7 @@ def run() -> dict:
         "magic_formula_top": magic_formula_top,
         "news": news,
         "cot": cot_with_theses,
+        "correlation_flags": correlation_flags,
     }
 
     # исторически JSON за бъдещия backtest модул
