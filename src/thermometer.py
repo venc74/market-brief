@@ -1,6 +1,6 @@
 """
 Пазарен термометър (Секция 4).
-Седем индикатора + обща препоръка Offensive / Defensive / Cash.
+Осем индикатора + обща препоръка Offensive / Defensive / Cash.
 Всеки индикатор връща {value, status, label} където status ∈ green/yellow/red.
 """
 from __future__ import annotations
@@ -321,9 +321,45 @@ def move_index() -> dict:
                 "hide": True, "label": ""}
 
 
+def vix_term_structure() -> dict:
+    """
+    VIX term structure — форма на кривата на имплицитна волатилност
+    (^VIX9D 9-дневна, ^VIX 30-дневна, ^VIX3M 3-месечна). Нормално: contango
+    (VIX9D < VIX < VIX3M) — пазарът очаква повече несигурност в бъдещето,
+    отколкото сега. Backwardation (VIX9D > VIX3M, низходяща крива) означава,
+    че краткосрочният страх е по-голям от дългосрочния — класически ранен
+    сигнал за остър, непосредствен стрес (вижда се точно преди/по време на
+    резки корекции). Следим ratio = VIX9D / VIX3M вместо самите нива.
+    """
+    try:
+        vix9d = float(yf.Ticker("^VIX9D").history(period="5d")["Close"].iloc[-1])
+        vix_mid = float(yf.Ticker("^VIX").history(period="5d")["Close"].iloc[-1])
+        vix3m = float(yf.Ticker("^VIX3M").history(period="5d")["Close"].iloc[-1])
+        if not vix9d or not vix3m:
+            raise ValueError("insufficient VIX9D/VIX3M data")
+        ratio = vix9d / vix3m
+
+        if ratio < config.VIX_TERM_WARNING_THRESHOLD:
+            status, note = "green", "contango, нормално"
+        elif ratio < config.VIX_TERM_BACKWARDATION_THRESHOLD:
+            status, note = "yellow", "леко изравняване"
+        else:
+            status, note = "red", "backwardation — остър стрес ⚠"
+
+        return {
+            "name": "VIX Term Structure", "value": round(ratio, 3), "status": status,
+            "label": f"VIX9D {vix9d:.1f} / VIX {vix_mid:.1f} / VIX3M {vix3m:.1f} "
+                     f"→ ratio {ratio:.2f} ({note})",
+        }
+    except Exception as e:
+        print(f"[thermo] VIX term structure failed: {e}")
+        return {"name": "VIX Term Structure", "value": None, "status": "yellow",
+                "hide": True, "label": ""}
+
+
 def build_thermometer(macro: dict) -> dict:
     """
-    Сглобява 7-те индикатора + правилото за режим:
+    Сглобява 8-те индикатора + правилото за режим:
     - VIX > 30 → задължително Defensive (Секция 8)
     - MOVE > 150 или рязък седмичен скок → задължително Defensive (институционален
       стрес в колатералната система бие останалите сигнали, аналогично на VIX правилото)
@@ -349,7 +385,8 @@ def build_thermometer(macro: dict) -> dict:
     }
 
     indicators = [spy_trend(), vix_level(), naaim_exposure(),
-                  market_put_call(), spread_ind, nl_ind, move_index()]
+                  market_put_call(), spread_ind, nl_ind, move_index(),
+                  vix_term_structure()]
 
     greens = sum(1 for i in indicators if i["status"] == "green")
     reds = sum(1 for i in indicators if i["status"] == "red")
@@ -368,9 +405,9 @@ def build_thermometer(macro: dict) -> dict:
             f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
             + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
     elif greens >= 4 and reds == 0:
-        regime, reason = "Offensive", f"{greens}/7 индикатора зелени, нула червени"
+        regime, reason = "Offensive", f"{greens}/8 индикатора зелени, нула червени"
     elif reds >= 3:
-        regime, reason = "Cash", f"{reds}/7 индикатора червени — капиталът е позиция"
+        regime, reason = "Cash", f"{reds}/8 индикатора червени — капиталът е позиция"
     elif reds >= 2:
         regime, reason = "Defensive", f"{reds} червени индикатора — намален риск"
     else:

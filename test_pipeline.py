@@ -11,7 +11,7 @@ from src.render import render_dashboard, render_email
 
 MOCK_THERMO = {
     "regime": "Offensive",
-    "regime_reason": "5/7 индикатора зелени, нула червени",
+    "regime_reason": "5/8 индикатора зелени, нула червени",
     "sizing_factor": 1.0,
     "indicators": [
         {"name": "SPY тренд", "value": 612.4, "status": "green", "label": "SPY 612 | над 50DMA, над 200DMA"},
@@ -21,6 +21,8 @@ MOCK_THERMO = {
         {"name": "2Y/10Y спред", "value": 0.45, "status": "green", "label": "0.45% (нормален, steepening)"},
         {"name": "Fed Net Liquidity", "value": 6240.0, "status": "green", "label": "$6240 млрд (↑)"},
         {"name": "MOVE (Bond Vol)", "value": 82.0, "status": "green", "label": "MOVE 82 (-3/седмица)"},
+        {"name": "VIX Term Structure", "value": 0.757, "status": "green",
+         "label": "VIX9D 12.8 / VIX 14.2 / VIX3M 16.9 → ratio 0.76 (contango, нормално)"},
     ],
 }
 
