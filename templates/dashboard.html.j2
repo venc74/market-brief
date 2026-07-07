@@ -505,6 +505,24 @@
   </div>
 </section>
 {% endif %}
+{% if insider_buying %}
+<section>
+  <h2>Insider Buying · Form 4 (open market покупки)</h2>
+  <div class="si-grid">
+    {% for i in insider_buying[:12] %}
+    <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ i.ticker }}</span>
+        <span class="si-val">{{ (i.value)|money_short }}</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
+      <div class="si-mgr">{{ i.insider_name }} · {{ i.title }}{% if i.cluster %} · <span style="color:var(--regime)">CLUSTER</span>{% endif %}</div>
+      {% if i.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 {% if cot %}
 <section>
   <h2>COT Екстремуми · Managed Money Positioning</h2>

@@ -263,3 +263,9 @@ MOVE_SPIKE_WEEKLY_DELTA = float(os.getenv("MOVE_SPIKE_WEEKLY_DELTA", 15))
 # ── VIX Term Structure (VIX9D / VIX3M ratio) ──────────────────────────────
 VIX_TERM_WARNING_THRESHOLD = float(os.getenv("VIX_TERM_WARNING_THRESHOLD", 1.0))
 VIX_TERM_BACKWARDATION_THRESHOLD = float(os.getenv("VIX_TERM_BACKWARDATION_THRESHOLD", 1.1))
+
+# ── SEC Form 4 Insider Buying (officers CEO/CFO/President/COO, open market) ──
+ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
+INSIDER_MIN_VALUE = float(os.getenv("INSIDER_MIN_VALUE", 100_000))
+INSIDER_CLUSTER_WINDOW_DAYS = int(os.getenv("INSIDER_CLUSTER_WINDOW_DAYS", 14))
+INSIDER_CLUSTER_MIN_COUNT = int(os.getenv("INSIDER_CLUSTER_MIN_COUNT", 3))

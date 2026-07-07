@@ -23,6 +23,7 @@ from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
+from src import insider_buying
 from src import cot
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
@@ -111,6 +112,11 @@ def run() -> dict:
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
     naaim_hist = naaim_history()
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
+    insider_buys = insider_buying.fetch_insider_buying() if config.ENABLE_INSIDER_BUYING else []
+    # конвергенция: тикър и в CANSLIM скрийнъра (action+watchlist), и в insider buying — виж insider_buying.py docstring
+    our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
+    for row in insider_buys:
+        row["in_screener"] = row["ticker"] in our_tickers
     # самостоятелен Magic Formula топ 10 (независим от CANSLIM) за dashboard секция
     magic_formula_top = magic_formula.build_ranked(top_n=10) if config.ENABLE_MAGIC_FORMULA else []
 
@@ -128,6 +134,7 @@ def run() -> dict:
         "splits": splits_month,
         "naaim_history": naaim_hist,
         "superinvestor_moves": superinvestor_moves,
+        "insider_buying": insider_buys,
         "magic_formula_top": magic_formula_top,
         "news": news,
         "cot": cot_with_theses,
