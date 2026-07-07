@@ -83,6 +83,7 @@ def render_dashboard(brief: dict) -> str:
         news=brief.get("news", []),
         cot=brief.get("cot", []),
         correlation_flags=brief.get("correlation_flags", []),
+        backtest=brief.get("backtest", {}),
         available_dates=brief.get("date") and [brief.get("date")],
     )
     config.DOCS_DIR.mkdir(exist_ok=True)

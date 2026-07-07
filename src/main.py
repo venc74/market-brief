@@ -25,6 +25,7 @@ from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
 from src import insider_buying
 from src import correlation_check
+from src import backtest
 from src import cot
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
@@ -123,6 +124,13 @@ def run() -> dict:
         row["in_screener"] = row["ticker"] in our_tickers
     # самостоятелен Magic Formula топ 10 (независим от CANSLIM) за dashboard секция
     magic_formula_top = magic_formula.build_ranked(top_n=10) if config.ENABLE_MAGIC_FORMULA else []
+    # Track Record: ingest четe data/*.json snapshot-и от диска — днешният {today}.json
+    # още не е записан на този етап, затова днешните Action се ingest-ват утре. Безобидно:
+    # резолюция (target/stop) никога не се проверява в деня на самото entry, само от
+    # следващия ден нататък, така че едно-дневното забавяне на ingest-а не губи сигнал.
+    if config.ENABLE_BACKTEST:
+        backtest.update_backtest_tracker()
+    backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
 
     brief = {
         "date": today,
@@ -143,6 +151,7 @@ def run() -> dict:
         "news": news,
         "cot": cot_with_theses,
         "correlation_flags": correlation_flags,
+        "backtest": backtest_summary,
     }
 
     # исторически JSON за бъдещия backtest модул

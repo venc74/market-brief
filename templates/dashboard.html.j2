@@ -593,6 +593,30 @@
 </section>
 {% endif %}
 
+{% if backtest and backtest.total_resolved %}
+<section>
+  <h2>Track Record · {{ backtest.total_resolved }} резолвирани</h2>
+  <div class="prose">
+    <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
+    {{ backtest.stopped }} stop (Фаза 1) / {{ backtest.trailing_stop_exit }} trailing-exit
+    / {{ backtest.expired_in_trail }} expired-in-trail / {{ backtest.expired }} expired (Фаза 1, target1 недостигнат)<br>
+    Все още отворени: {{ backtest.still_open }} (Фаза 1) + {{ backtest.trailing }} (Фаза 2, trailing 10DMA)<br>
+    Среден реализиран R: {{ backtest.avg_realized_r }}
+  </div>
+  {% if backtest.recent %}
+  <div class="watch-grid" style="margin-top:14px">
+    {% for r in backtest.recent %}
+    <div class="watch-card">
+      <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' if r.realized_r and r.realized_r <= 0 else 'var(--muted)' }}">{{ r.ticker }}</span>
+      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ r.resolution }}
+      {% if r.realized_r is not none %} · R={{ r.realized_r }}{% endif %}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
 <section>
   <h2>Borrow Rate · търсене на тикър</h2>
   <div class="borrow-box">
