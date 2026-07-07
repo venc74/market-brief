@@ -43,7 +43,7 @@ def fed_net_liquidity() -> dict:
     """
     walcl = _fred_series("WALCL")        # millions, weekly
     rrp = _fred_series("RRPONTSYD")      # billions, daily
-    tga = _fred_series("WTREGEN")        # billions, weekly
+    tga = _fred_series("WTREGEN")        # millions, weekly (същия H.4.1 отчет като WALCL — не billions)
 
     if not (walcl and rrp and tga):
         return {"value": None, "trend": "unknown", "history": []}
@@ -51,8 +51,8 @@ def fed_net_liquidity() -> dict:
     def latest(series): return series[-1][1]
     def prior(series): return series[-5][1] if len(series) >= 5 else series[0][1]
 
-    nl_now = latest(walcl) / 1000 - latest(rrp) - latest(tga)
-    nl_prev = prior(walcl) / 1000 - prior(rrp) - prior(tga)
+    nl_now = latest(walcl) / 1000 - latest(rrp) - latest(tga) / 1000
+    nl_prev = prior(walcl) / 1000 - prior(rrp) - prior(tga) / 1000
     return {
         "value": round(nl_now, 1),
         "prev": round(nl_prev, 1),
@@ -60,7 +60,7 @@ def fed_net_liquidity() -> dict:
         "components": {
             "fed_balance_bn": round(latest(walcl) / 1000, 1),
             "rrp_bn": round(latest(rrp), 1),
-            "tga_bn": round(latest(tga), 1),
+            "tga_bn": round(latest(tga) / 1000, 1),
         },
     }
 
