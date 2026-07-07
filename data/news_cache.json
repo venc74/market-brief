@@ -1,37 +1,37 @@
 {
- "date": "2026-07-06",
+ "date": "2026-07-07",
  "news": [
   {
-   "headline": "Oil slips after OPEC+ agrees to raise output targets",
-   "why": "OPEC+ увеличава добива от август, което натиска петрола надолу и засяга енергийния сектор и инфлационните очаквания."
+   "headline": "Trump heads to Turkey as NATO strained by Russian attacks and U.S. impatience",
+   "why": "Геополитическата нестабилност около NATO и Hormuz засяга defense секторa и петролните цени краткосрочно."
   },
   {
-   "headline": "Gold holds near two-week high on easing Fed rate-hike bets",
-   "why": "По-слабият jobs report намали очакванията за Fed hikes, което поддържа златото и сигнализира за по-меки финансови условия."
+   "headline": "Stock futures are mixed after Dow tops 53,000 for first time",
+   "why": "Dow на исторически връх сигнализира продължаващ bullish momentum, но mixed futures внасят предпазливост за opening."
   },
   {
-   "headline": "Yen to extend historic slump, while AI and energy 'supply bust' to support the U.S. dollar: Goldman",
-   "why": "Goldman е bearish върху JPY, а силният USD засяга мултинационалните компании, emerging markets и commodity pricing."
+   "headline": "Microsoft cuts 4,800 jobs as Xbox unit downsizes",
+   "why": "Корпоративните съкращения в tech сектора могат да окажат натиск върху MSFT и да свалят sentiment в по-широкия tech."
   },
   {
-   "headline": "Why Iran may find it difficult to clear its oil inventories even after sanctions relief",
-   "why": "Потенциалното иранско предлагане добавя натиск върху петролните цени дори при санкционно облекчение, което е bearish за енергийния сектор."
+   "headline": "Chinese AI models gaining ground with U.S. companies as OpenAI, Anthropic costs surge",
+   "why": "Конкурентен натиск от DeepSeek и Z.ai заплашва pricing power на водещите U.S. AI компании и може да ротира капитал."
   },
   {
-   "headline": "Nvidia's next-gen AI rack system delayed to 2028 on manufacturing snags",
-   "why": "Закъснението на следващото поколение AI инфраструктура на Nvidia може да удари sentiment-а в целия AI и semiconductor сектор."
+   "headline": "Samsung Electronics shares fall on capex and demand concerns despite record Q2 profit",
+   "why": "Слабостта в semiconductor demand guidance засяга целия chip сектор включително NVDA, ASML и INTC."
   },
   {
-   "headline": "'NATO 3.0': Defense spending pledges face the Trump test",
-   "why": "Натискът на Вашингтон за по-висок европейски defense бюджет е директен катализатор за акциите на отбранителни компании от двете страни на Атлантика."
+   "headline": "Toyota invests $3.6B to move Tacoma production from Mexico to Texas",
+   "why": "Индикатор за продължаващото reshoring под тарифен натиск — позитивно за U.S. manufacturing, негативно за MXN."
   },
   {
-   "headline": "Lockheed Martin leading race for $3.5 billion purchase of Ultra Maritime",
-   "why": "Потенциална мащабна M&A сделка в defense сектора засяга LMT и широкия defense peer group amid нарастващи военни разходи."
+   "headline": "HSBC pulls back from riskier private credit lending",
+   "why": "Отдръпване на голяма банка от private credit сигнализира нарастващ кредитен риск и може да засегне BDC и CLO пазарите."
   },
   {
-   "headline": "Honeywell spin-off in merger talks to create $27bn materials group",
-   "why": "Сливането на Solstice с Element Solutions би създало ключов доставчик за chipmaking, с директно значение за semiconductor supply chain."
+   "headline": "Trump Accounts could inject nearly $20 billion into the stock market",
+   "why": "Допълнителен структурен приток на капитал в equity markets е bullish катализатор за индексите средносрочно."
   }
  ]
 }
