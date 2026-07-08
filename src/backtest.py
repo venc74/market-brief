@@ -208,6 +208,21 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
+def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
+                             fields: tuple[str, ...]) -> dict[str, "pd.DataFrame | None"]:
+    """
+    yf.download за списък с ЕДИН тикър понякога връща плосък DataFrame
+    (директни Open/High/Low/Close колони, без ticker ниво) вместо MultiIndex.
+    Опаковаме в единична ticker-именувана колона, за да работи еднакво
+    result[field][ticker] надолу по кода, независимо от формата.
+    """
+    if isinstance(data.columns, pd.MultiIndex):
+        return {f: data.get(f) for f in fields}
+    only_ticker = tickers[0]
+    return {f: (data[[f]].rename(columns={f: only_ticker}) if f in data.columns else None)
+           for f in fields}
+
+
 def _resolve_open_positions(tracker: dict) -> None:
     live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _LIVE_STATUSES]
     if not live_items:
@@ -224,18 +239,8 @@ def _resolve_open_positions(tracker: dict) -> None:
         print("[backtest] price fetch върна празен резултат")
         return
 
-    if isinstance(data.columns, pd.MultiIndex):
-        highs, lows, closes = data.get("High"), data.get("Low"), data.get("Close")
-    else:
-        # Един тикър в списъка — някои yfinance версии връщат плосък DataFrame
-        # (директни Open/High/Low/Close колони, без ticker ниво) вместо MultiIndex.
-        # Опаковаме в единична ticker-именувана колона, за да работи еднакво
-        # highs[ticker]/lows[ticker]/closes[ticker] надолу по кода.
-        only_ticker = tickers[0]
-        highs = data[["High"]].rename(columns={"High": only_ticker}) if "High" in data.columns else None
-        lows = data[["Low"]].rename(columns={"Low": only_ticker}) if "Low" in data.columns else None
-        closes = data[["Close"]].rename(columns={"Close": only_ticker}) if "Close" in data.columns else None
-
+    cols = _normalize_price_columns(data, tickers, ("High", "Low", "Close"))
+    highs, lows, closes = cols.get("High"), cols.get("Low"), cols.get("Close")
     if highs is None or lows is None or closes is None:
         print("[backtest] price fetch не върна High/Low/Close колони")
         return
@@ -252,6 +257,36 @@ def _resolve_open_positions(tracker: dict) -> None:
         except Exception as e:
             print(f"[backtest] {ticker}: резолюция неуспешна, остава {rec['status']}: {e}")
             continue
+
+
+def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
+    """
+    Batch fetch на последната налична Close цена за списък тикъри (за
+    unrealized % на отворените позиции). Graceful: провал на целия fetch
+    или на конкретен тикър → просто липсва в резултата, не гърми.
+    """
+    if not tickers:
+        return {}
+    try:
+        data = yf.download(tickers, period="5d", progress=False, auto_adjust=False)
+    except Exception as e:
+        print(f"[backtest] current price fetch failed за {tickers}: {e}")
+        return {}
+    if data is None or data.empty:
+        return {}
+
+    closes = _normalize_price_columns(data, tickers, ("Close",)).get("Close")
+    if closes is None:
+        return {}
+
+    out: dict[str, float] = {}
+    for t in tickers:
+        if t not in getattr(closes, "columns", []):
+            continue
+        series = closes[t].dropna()
+        if len(series):
+            out[t] = float(series.iloc[-1])
+    return out
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -278,6 +313,11 @@ def get_backtest_summary() -> dict:
     realized_r > 0 (не само чист target_hit — trailing_stop_exit и
     expired_in_trail може да имат частичен положителен R). Празен/повреден
     tracker → нулеви стойности, никога грешка.
+
+    Забележка: прави batch мрежова заявка (текущи цени за отворените
+    позиции, за "open_positions"/unrealized %) — не е чисто локално четене
+    от диска както преди. Провал на тази заявка е graceful (виж
+    _fetch_current_prices) — не чупи останалата част на summary-то.
     """
     tracker = _load_tracker()
     records = list(tracker.values())
@@ -293,12 +333,39 @@ def get_backtest_summary() -> dict:
     for r in records:
         by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
 
+    # "recent" = само тази ISO седмица (пон-нед) — иначе стара резолюция може
+    # да "залепне" в топ-10 с дни наред, ако няма нови след нея. Кумулативната
+    # статистика по-горе (total_resolved/win_rate/avg_r/by_status) НЕ се
+    # ресетва седмично — трупа се от началото на tracking-а.
+    today = dt.date.today()
+    monday_this_week = (today - dt.timedelta(days=today.weekday())).isoformat()
     recent_pool = [r for r in records
-                  if r.get("status") not in _LIVE_STATUSES and r.get("resolution_date")]
+                  if r.get("status") not in _LIVE_STATUSES and r.get("resolution_date")
+                  and r["resolution_date"] >= monday_this_week]
     recent_pool.sort(key=lambda r: r["resolution_date"], reverse=True)
     recent = [{"ticker": r["ticker"], "entry_date": r["entry_date"], "resolution": r["status"],
               "resolution_date": r["resolution_date"], "realized_r": r.get("realized_r")}
-             for r in recent_pool[:10]]
+             for r in recent_pool[:20]]  # горен таван само като edge-case защита, не нормално поведение
+
+    # Живи позиции + текуща цена (batch fetch) за unrealized % изгледа в dashboard-а.
+    live_records = [r for r in records if r.get("status") in _LIVE_STATUSES]
+    open_positions = []
+    if live_records:
+        tickers = sorted({r["ticker"] for r in live_records})
+        prices = _fetch_current_prices(tickers)
+        for r in live_records:
+            entry_price = r.get("entry_price")
+            cur = prices.get(r["ticker"])
+            unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1)
+                              if cur is not None and entry_price else None)
+            open_positions.append({
+                "ticker": r["ticker"],
+                "entry_date": r["entry_date"],
+                "entry_price": entry_price,
+                "current_price": round(cur, 2) if cur is not None else None,
+                "unrealized_pct": unrealized_pct,
+            })
+        open_positions.sort(key=lambda r: r["entry_date"], reverse=True)
 
     return {
         "total_resolved": total_resolved,
@@ -313,6 +380,7 @@ def get_backtest_summary() -> dict:
         "trailing": by_status.get("trailing", 0),
         "avg_realized_r": avg_r,
         "recent": recent,
+        "open_positions": open_positions,
     }
 
 

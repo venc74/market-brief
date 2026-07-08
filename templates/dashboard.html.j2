@@ -551,7 +551,7 @@
         <div class="cot-sub-label">Директна теза
           <span class="cot-direction {{ c.direct_thesis.direction }}">{{ c.direct_thesis.direction }}</span>
         </div>
-        <div class="cot-tickers">{{ c.direct_thesis.tickers|join("  ·  ") }}</div>
+        <div class="cot-tickers">{% for t in c.direct_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
         <div class="thesis-chain">{{ c.direct_thesis.reasoning }}</div>
       </div>
       {% endif %}
@@ -561,7 +561,7 @@
         <div class="cot-sub-label">Cross-sector теза
           <span class="cot-direction {{ c.cross_sector_thesis.direction }}">{{ c.cross_sector_thesis.direction }}</span>
         </div>
-        <div class="cot-tickers">{{ c.cross_sector_thesis.tickers|join("  ·  ") }}</div>
+        <div class="cot-tickers">{% for t in c.cross_sector_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
         <div class="thesis-chain">{{ c.cross_sector_thesis.reasoning }}</div>
       </div>
       {% endif %}
@@ -593,7 +593,7 @@
 </section>
 {% endif %}
 
-{% if backtest and backtest.total_resolved %}
+{% if backtest and (backtest.total_resolved or backtest.open_positions) %}
 <section>
   <h2>Track Record · {{ backtest.total_resolved }} резолвирани</h2>
   <div class="prose">
@@ -604,12 +604,26 @@
     Среден реализиран R: {{ backtest.avg_realized_r }}
   </div>
   {% if backtest.recent %}
-  <div class="watch-grid" style="margin-top:14px">
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Резолюции тази седмица:</div>
+  <div class="watch-grid" style="margin-top:6px">
     {% for r in backtest.recent %}
     <div class="watch-card">
       <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' if r.realized_r and r.realized_r <= 0 else 'var(--muted)' }}">{{ r.ticker }}</span>
       <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ r.resolution }}
       {% if r.realized_r is not none %} · R={{ r.realized_r }}{% endif %}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if backtest.open_positions %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции ({{ backtest.open_positions|length }}):</div>
+  <div class="watch-grid" style="margin-top:6px">
+    {% for p in backtest.open_positions %}
+    <div class="watch-card">
+      <span class="ticker" style="color: {{ 'var(--green)' if p.unrealized_pct and p.unrealized_pct > 0 else 'var(--red)' if p.unrealized_pct and p.unrealized_pct < 0 else 'var(--muted)' }}">{{ p.ticker }}</span>
+      <p>Entry {{ p.entry_date }} @ ${{ p.entry_price }}
+      {% if p.current_price is not none %} → сега ${{ p.current_price }}
+      ({{ '+' if p.unrealized_pct and p.unrealized_pct > 0 else '' }}{{ p.unrealized_pct }}%){% else %} · текуща цена н/д{% endif %}</p>
     </div>
     {% endfor %}
   </div>

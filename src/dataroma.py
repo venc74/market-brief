@@ -97,6 +97,14 @@ def _find_col(columns, *needles):
     return None
 
 
+def _truncate_words(s: str, limit: int) -> str:
+    """Реже на цяла дума до limit знака — не по средата, ако има space за отрязване."""
+    if len(s) <= limit:
+        return s
+    cut = s[:limit].rsplit(" ", 1)[0]
+    return cut if cut else s[:limit]
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Слой 1: per-manager страници (стойност е налична → точен $ филтър)
 # ──────────────────────────────────────────────────────────────────────────
@@ -193,7 +201,10 @@ def _norm(name: str) -> str:
     s = re.sub(r"[^a-z0-9 ]", "", str(name).lower())
     for w in (" inc", " corp", " corporation", " co", " ltd", " plc", " the",
               " class a", " class b", " holdings", " group", " company"):
-        s = s.replace(w, "")
+        # word-boundary anchor (\s|$) — без него " corp" изяжда префикса на
+        # " corporation" (naive substring replace: "chevron corporation" →
+        # "chevronoration" вместо "chevron")
+        s = re.sub(re.escape(w) + r"(?=\s|$)", "", s)
     return re.sub(r"\s+", " ", s).strip()
 
 
@@ -215,7 +226,14 @@ def _ticker_map() -> dict[str, str]:
             t = (v.get("ticker") or "").upper()
             title = v.get("title") or ""
             if t and title:
-                out[_norm(title)] = t
+                key = _norm(title)
+                # един емитент може да има няколко тикъра (common + preferred
+                # класове) със СЪЩОТО SEC заглавие (напр. BAC/BAC-PK/BAC-PL/
+                # BAC-PS всички = "BANK OF AMERICA CORP /DE/") — предпочитаме
+                # "чист" тикър без "-" (обикновено common stock) пред preferred,
+                # независимо от реда в SEC JSON-а
+                if key not in out or ("-" in out[key] and "-" not in t):
+                    out[key] = t
         config.DATA_DIR.mkdir(exist_ok=True)
         _TMAP_CACHE.write_text(json.dumps({"month": dt.date.today().isoformat()[:7],
                                            "map": out}, ensure_ascii=False))
@@ -361,7 +379,7 @@ def _edgar_positions(min_value: float) -> list[dict]:
 
             ticker = tmap.get(_norm(cur["issuer"]))
             rows.append({
-                "ticker": ticker or cur["issuer"][:14].upper(),
+                "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
                 "company": cur["issuer"],
                 "manager": name,
                 "action": action,
