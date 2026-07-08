@@ -1,37 +1,37 @@
 {
- "date": "2026-07-07",
+ "date": "2026-07-08",
  "news": [
   {
-   "headline": "Trump heads to Turkey as NATO strained by Russian attacks and U.S. impatience",
-   "why": "Геополитическата нестабилност около NATO и Hormuz засяга defense секторa и петролните цени краткосрочно."
+   "headline": "U.S. launches strikes on Iran after Hormuz Strait ship attacks, revokes oil sales licence",
+   "why": "Директна военна ескалация в Персийския залив вдига петрола и носи risk-off настроение — следи XOM, CVX, USO и VIX."
   },
   {
-   "headline": "Stock futures are mixed after Dow tops 53,000 for first time",
-   "why": "Dow на исторически връх сигнализира продължаващ bullish momentum, но mixed futures внасят предпазливост за opening."
+   "headline": "Oil jumps as U.S. strikes against Iran risk unraveling fragile Mideast truce",
+   "why": "Supply disruption premium в crude се завръща — Brent и WTI могат да продължат нагоре при нова ескалация."
   },
   {
-   "headline": "Microsoft cuts 4,800 jobs as Xbox unit downsizes",
-   "why": "Корпоративните съкращения в tech сектора могат да окажат натиск върху MSFT и да свалят sentiment в по-широкия tech."
+   "headline": "Stock futures little changed as investors weigh Middle East tensions and await Fed minutes",
+   "why": "Fed minutes днес са ключовият катализатор за rate expectations и посоката на equity пазарите до края на сесията."
   },
   {
-   "headline": "Chinese AI models gaining ground with U.S. companies as OpenAI, Anthropic costs surge",
-   "why": "Конкурентен натиск от DeepSeek и Z.ai заплашва pricing power на водещите U.S. AI компании и може да ротира капитал."
+   "headline": "Japan's borrowing costs soar to 30-year high on debt fears",
+   "why": "Покачването на JGB yields притиска глобалния risk appetite и може да засили JPY carry unwind с ефект върху EM и tech."
   },
   {
-   "headline": "Samsung Electronics shares fall on capex and demand concerns despite record Q2 profit",
-   "why": "Слабостта в semiconductor demand guidance засяга целия chip сектор включително NVDA, ASML и INTC."
+   "headline": "Trump threatens to remove all U.S. troops from Europe at NATO summit",
+   "why": "Геополитическа несигурност около NATO натиска европейските defense акции нагоре и еврото надолу."
   },
   {
-   "headline": "Toyota invests $3.6B to move Tacoma production from Mexico to Texas",
-   "why": "Индикатор за продължаващото reshoring под тарифен натиск — позитивно за U.S. manufacturing, негативно за MXN."
+   "headline": "China's rare ballistic missile test pushes Asia-Pacific countries to close ranks",
+   "why": "Военна демонстрация на Китай засилва регионалното напрежение и е bearish за Asian EM, bullish за defense сектора."
   },
   {
-   "headline": "HSBC pulls back from riskier private credit lending",
-   "why": "Отдръпване на голяма банка от private credit сигнализира нарастващ кредитен риск и може да засегне BDC и CLO пазарите."
+   "headline": "Indonesia's stock market hit with second downgrade warning from S&P Dow Jones",
+   "why": "Потенциалното преквалифициране към 'frontier' би предизвикало принудителни outflows от EM фондове с тегло в IDX."
   },
   {
-   "headline": "Trump Accounts could inject nearly $20 billion into the stock market",
-   "why": "Допълнителен структурен приток на капитал в equity markets е bullish катализатор за индексите средносрочно."
+   "headline": "Lawmakers probe growing use of Chinese AI models in U.S. companies",
+   "why": "Регулаторен риск около Chinese AI (Alibaba, Baidu) и косвено bullish за U.S. AI plays като NVDA и MSFT."
   }
  ]
 }
