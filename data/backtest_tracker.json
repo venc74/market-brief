@@ -295,5 +295,38 @@
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null
+ },
+ "ADI_2026-06-19": {
+  "ticker": "ADI",
+  "entry_date": "2026-06-19",
+  "status": "stopped",
+  "entry_price": 439.7,
+  "target_1": 527.08,
+  "stop_loss": 396.01,
+  "target1_hit_date": null,
+  "resolution_date": "2026-06-26",
+  "realized_r": -1.0
+ },
+ "UMBF_2026-07-08": {
+  "ticker": "UMBF",
+  "entry_date": "2026-07-08",
+  "status": "open",
+  "entry_price": 146.9,
+  "target_1": 178.74,
+  "stop_loss": 130.98,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "AMG_2026-07-08": {
+  "ticker": "AMG",
+  "entry_date": "2026-07-08",
+  "status": "open",
+  "entry_price": 363.89,
+  "target_1": 457.59,
+  "stop_loss": 317.04,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
  }
 }

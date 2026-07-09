@@ -1,5 +1,5 @@
 {
- "date": "2026-07-08",
+ "date": "2026-07-09",
  "rows": [
   {
    "ticker": "FUWAY",
@@ -9,7 +9,7 @@
    "split_type": "normal",
    "date_human": "Jul 10, 2026",
    "price": 116.0,
-   "market_cap": 163211547600.0
+   "market_cap": 16353913044.0
   },
   {
    "ticker": "SSUMY",
@@ -18,8 +18,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Jul 10, 2026",
-   "price": 39.38,
-   "market_cap": 187449205500.07938
+   "price": 38.4,
+   "market_cap": 182784397714.3991
   }
  ]
 }

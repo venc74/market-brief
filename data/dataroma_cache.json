@@ -1,5 +1,5 @@
 {
- "date": "2026-07-08",
+ "date": "2026-07-09",
  "rows": [
   {
    "ticker": "AAPL",
@@ -41,7 +41,7 @@
    "count": 1
   },
   {
-   "ticker": "BANK AMERICA C",
+   "ticker": "BANK AMERICA CORP",
    "company": "BANK AMERICA CORP",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -54,20 +54,20 @@
    "count": 1
   },
   {
-   "ticker": "CHEVRON CORPOR",
+   "ticker": "CVX",
    "company": "CHEVRON CORPORATION",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
    "value": 17457364606.0,
    "period": "13F · 2026-05-15",
-   "_resolved": false,
+   "_resolved": true,
    "managers": [
     "Уорън Бъфет · Berkshire Hathaway"
    ],
    "count": 1
   },
   {
-   "ticker": "OCCIDENTAL PET",
+   "ticker": "OCCIDENTAL PETE CORP",
    "company": "OCCIDENTAL PETE CORP",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -80,7 +80,7 @@
    "count": 1
   },
   {
-   "ticker": "GOOGN",
+   "ticker": "GOOGL",
    "company": "ALPHABET INC",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -94,7 +94,7 @@
    "count": 3
   },
   {
-   "ticker": "CHUBB LTD SWIT",
+   "ticker": "CHUBB LTD SWITZ",
    "company": "CHUBB LTD SWITZ",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -159,7 +159,7 @@
    "count": 1
   },
   {
-   "ticker": "SIRIUSXM HOLDI",
+   "ticker": "SIRIUSXM HOLDINGS INC",
    "company": "SIRIUSXM HOLDINGS INC",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -185,7 +185,7 @@
    "count": 1
   },
   {
-   "ticker": "BROOKFIELD COR",
+   "ticker": "BROOKFIELD CORP",
    "company": "BROOKFIELD CORP",
    "manager": "Бил Акман · Pershing Square",
    "action": "нова позиция",
@@ -251,7 +251,7 @@
    "count": 1
   },
   {
-   "ticker": "RESTAURANT BRA",
+   "ticker": "RESTAURANT BRANDS INTL",
    "company": "RESTAURANT BRANDS INTL INC",
    "manager": "Бил Акман · Pershing Square",
    "action": "нова позиция",
@@ -278,7 +278,7 @@
    "count": 1
   },
   {
-   "ticker": "CAPITAL ONE FI",
+   "ticker": "CAPITAL ONE FINL CORP",
    "company": "CAPITAL ONE FINL CORP",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -291,7 +291,7 @@
    "count": 1
   },
   {
-   "ticker": "NEW YORK TIMES",
+   "ticker": "NEW YORK TIMES CO MTN BE",
    "company": "NEW YORK TIMES CO MTN BE",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -330,7 +330,7 @@
    "count": 1
   },
   {
-   "ticker": "LLYVK",
+   "ticker": "LLYVA",
    "company": "LIBERTY LIVE HOLDINGS INC",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -395,7 +395,7 @@
    "count": 1
   },
   {
-   "ticker": "LOUISIANA PAC ",
+   "ticker": "LOUISIANA PAC CORP",
    "company": "LOUISIANA PAC CORP",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -434,20 +434,20 @@
    "count": 1
   },
   {
-   "ticker": "NVIDIA CORPORA",
+   "ticker": "NVDA",
    "company": "NVIDIA CORPORATION",
    "manager": "Майкъл Бъри · Scion Asset Management",
    "action": "нова позиция",
    "value": 186580000.0,
    "period": "13F · 2025-11-03",
-   "_resolved": false,
+   "_resolved": true,
    "managers": [
     "Майкъл Бъри · Scion Asset Management"
    ],
    "count": 1
   },
   {
-   "ticker": "TAIWAN SEMICON",
+   "ticker": "TAIWAN SEMICONDUCTOR",
    "company": "Taiwan Semiconductor Manufac",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -460,7 +460,7 @@
    "count": 1
   },
   {
-   "ticker": "INVESCO EXCHAN",
+   "ticker": "INVESCO EXCHANGE TRADED",
    "company": "Invesco Exchange Traded Fd T",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -512,7 +512,7 @@
    "count": 1
   },
   {
-   "ticker": "SEAPORT ENTMT ",
+   "ticker": "SEAPORT ENTMT GROUP INC",
    "company": "SEAPORT ENTMT GROUP INC",
    "manager": "Бил Акман · Pershing Square",
    "action": "нова позиция",
@@ -538,7 +538,7 @@
    "count": 1
   },
   {
-   "ticker": "NEWAMSTERDAM P",
+   "ticker": "NEWAMSTERDAM PHARMA",
    "company": "Newamsterdam Pharma Company",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -577,7 +577,7 @@
    "count": 1
   },
   {
-   "ticker": "STMICROELECTRO",
+   "ticker": "STMICROELECTRONICS N V",
    "company": "Stmicroelectronics N V",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -616,7 +616,7 @@
    "count": 1
   },
   {
-   "ticker": "TEVA PHARMACEU",
+   "ticker": "TEVA PHARMACEUTICAL",
    "company": "Teva Pharmaceutical Inds Ltd",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -642,7 +642,7 @@
    "count": 1
   },
   {
-   "ticker": "HERTZ GLOBAL H",
+   "ticker": "HERTZ GLOBAL HLDGS INC",
    "company": "HERTZ GLOBAL HLDGS INC",
    "manager": "Бил Акман · Pershing Square",
    "action": "нова позиция",
@@ -681,7 +681,7 @@
    "count": 1
   },
   {
-   "ticker": "STATE STR SPDR",
+   "ticker": "STATE STR SPDR S&P 500",
    "company": "State Str Spdr S&P 500 Etf T",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -746,7 +746,7 @@
    "count": 1
   },
   {
-   "ticker": "FIGURE TECHNOL",
+   "ticker": "FIGURE TECHNOLOGY",
    "company": "Figure Technology Solutio",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -785,7 +785,7 @@
    "count": 1
   },
   {
-   "ticker": "RVMDW",
+   "ticker": "RVMD",
    "company": "Revolution Medicines Inc",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -824,7 +824,7 @@
    "count": 1
   },
   {
-   "ticker": "UNITED AIRLS H",
+   "ticker": "UNITED AIRLS HLDGS INC",
    "company": "United Airls Hldgs Inc",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -915,7 +915,7 @@
    "count": 1
   },
   {
-   "ticker": "ISHARES S&P GS",
+   "ticker": "ISHARES S&P GSCI",
    "company": "Ishares S&P Gsci Commodity-",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -941,7 +941,7 @@
    "count": 1
   },
   {
-   "ticker": "SEAGATE TECHNO",
+   "ticker": "SEAGATE TECHNOLOGY",
    "company": "Seagate Technology Hldngs Pl",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -967,7 +967,7 @@
    "count": 1
   },
   {
-   "ticker": "CLEVELAND-CLIF",
+   "ticker": "CLEVELAND-CLIFFS INC NEW",
    "company": "Cleveland-Cliffs Inc New",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -1019,7 +1019,7 @@
    "count": 1
   },
   {
-   "ticker": "JEFFERIES FINA",
+   "ticker": "JEFFERIES FINANCIAL",
    "company": "JEFFERIES FINANCIAL GROUP IN",
    "manager": "Уорън Бъфет · Berkshire Hathaway",
    "action": "нова позиция",
@@ -1045,7 +1045,7 @@
    "count": 1
   },
   {
-   "ticker": "BELITE BIO INC",
+   "ticker": "BELITE BIO INC SPONSORED",
    "company": "Belite Bio Inc Sponsored",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -1084,7 +1084,7 @@
    "count": 1
   },
   {
-   "ticker": "ARM HOLDINGS P",
+   "ticker": "ARM HOLDINGS PLC",
    "company": "Arm Holdings Plc",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
@@ -1149,7 +1149,7 @@
    "count": 1
   },
   {
-   "ticker": "SLMBP",
+   "ticker": "SLM",
    "company": "SLM CORP",
    "manager": "Майкъл Бъри · Scion Asset Management",
    "action": "нова позиция",
@@ -1162,7 +1162,7 @@
    "count": 1
   },
   {
-   "ticker": "BRKRP",
+   "ticker": "BRKR",
    "company": "BRUKER CORP",
    "manager": "Майкъл Бъри · Scion Asset Management",
    "action": "нова позиция",
@@ -1227,7 +1227,7 @@
    "count": 1
   },
   {
-   "ticker": "VSOGF",
+   "ticker": "VIST",
    "company": "Vista Energy S.A.B. De C.V.",
    "manager": "Стенли Дракенмилър · Duquesne Family Office",
    "action": "нова позиция",
