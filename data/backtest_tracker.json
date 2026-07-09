@@ -109,17 +109,6 @@
   "resolution_date": null,
   "realized_r": null
  },
- "AIZ_2026-06-25": {
-  "ticker": "AIZ",
-  "entry_date": "2026-06-25",
-  "status": "open",
-  "entry_price": 268.67,
-  "target_1": 321.01,
-  "stop_loss": 242.5,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
  "NBIX_2026-06-25": {
   "ticker": "NBIX",
   "entry_date": "2026-06-25",
@@ -230,28 +219,6 @@
   "resolution_date": null,
   "realized_r": null
  },
- "THG_2026-07-06": {
-  "ticker": "THG",
-  "entry_date": "2026-07-06",
-  "status": "open",
-  "entry_price": 221.7,
-  "target_1": 282.76,
-  "stop_loss": 191.17,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
- "NBIX_2026-07-06": {
-  "ticker": "NBIX",
-  "entry_date": "2026-07-06",
-  "status": "open",
-  "entry_price": 174.38,
-  "target_1": 217.94,
-  "stop_loss": 152.6,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
  "INCY_2026-07-06": {
   "ticker": "INCY",
   "entry_date": "2026-07-06",
@@ -274,28 +241,6 @@
   "resolution_date": null,
   "realized_r": null
  },
- "AIZ_2026-07-07": {
-  "ticker": "AIZ",
-  "entry_date": "2026-07-07",
-  "status": "open",
-  "entry_price": 282.36,
-  "target_1": 349.52,
-  "stop_loss": 248.78,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
- "EXEL_2026-07-07": {
-  "ticker": "EXEL",
-  "entry_date": "2026-07-07",
-  "status": "open",
-  "entry_price": 56.21,
-  "target_1": 69.09,
-  "stop_loss": 49.77,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
  "ADI_2026-06-19": {
   "ticker": "ADI",
   "entry_date": "2026-06-19",
@@ -306,27 +251,5 @@
   "target1_hit_date": null,
   "resolution_date": "2026-06-26",
   "realized_r": -1.0
- },
- "UMBF_2026-07-08": {
-  "ticker": "UMBF",
-  "entry_date": "2026-07-08",
-  "status": "open",
-  "entry_price": 146.9,
-  "target_1": 178.74,
-  "stop_loss": 130.98,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
- },
- "AMG_2026-07-08": {
-  "ticker": "AMG",
-  "entry_date": "2026-07-08",
-  "status": "open",
-  "entry_price": 363.89,
-  "target_1": 457.59,
-  "stop_loss": 317.04,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
  }
 }

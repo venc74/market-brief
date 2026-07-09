@@ -198,6 +198,17 @@
     border-radius: 50%; background: var(--regime-dim); color: var(--regime);
     font-family: "IBM Plex Mono", monospace; font-size: 12px; }
 
+  /* ── Track Record: Open Positions таблица ── */
+  .pos-table { width: 100%; border-collapse: collapse; }
+  .pos-table th, .pos-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .pos-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+  .pos-table td.n, .pos-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .pos-table .sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .pos-row-up { background: rgba(52,211,153,.06); }
+  .pos-row-up td.n.pct { color: var(--green); }
+  .pos-row-down { background: rgba(248,113,113,.06); }
+  .pos-row-down td.n.pct { color: var(--red); }
+
   /* ── iborrowdesk search box ── */
   .borrow-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
   .borrow-search { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -617,16 +628,28 @@
   {% endif %}
   {% if backtest.open_positions %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции ({{ backtest.open_positions|length }}):</div>
-  <div class="watch-grid" style="margin-top:6px">
-    {% for p in backtest.open_positions %}
-    <div class="watch-card">
-      <span class="ticker" style="color: {{ 'var(--green)' if p.unrealized_pct and p.unrealized_pct > 0 else 'var(--red)' if p.unrealized_pct and p.unrealized_pct < 0 else 'var(--muted)' }}">{{ p.ticker }}</span>
-      <p>Entry {{ p.entry_date }} @ ${{ p.entry_price }}
-      {% if p.current_price is not none %} → сега ${{ p.current_price }}
-      ({{ '+' if p.unrealized_pct and p.unrealized_pct > 0 else '' }}{{ p.unrealized_pct }}%){% else %} · текуща цена н/д{% endif %}</p>
-    </div>
-    {% endfor %}
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Дата на вход</th><th class="n">Entry цена</th>
+        <th class="n">Текуща цена</th><th class="n">% промяна</th></tr></thead>
+      <tbody>
+        {% for p in backtest.open_positions[:100] %}
+        <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
+          <td class="sym">{{ p.ticker }}</td>
+          <td>{{ p.entry_date }}</td>
+          <td class="n">${{ p.entry_price }}</td>
+          <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
+          <td class="n pct">{% if p.unrealized_pct is not none %}{{ '+' if p.unrealized_pct >= 0 else '' }}{{ p.unrealized_pct }}%{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+  {% if backtest.open_positions|length > 100 %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
+    и още {{ backtest.open_positions|length - 100 }} позиции
+  </div>
+  {% endif %}
   {% endif %}
 </section>
 {% endif %}

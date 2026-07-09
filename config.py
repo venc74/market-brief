@@ -278,6 +278,3 @@ CORRELATION_THRESHOLD = float(os.getenv("CORRELATION_THRESHOLD", 0.75))
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
 BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
-# Ако тикър вече има отворена (open/trailing) позиция от последните N дни,
-# нов Action сигнал за него се третира като продължение, не нова сделка.
-BACKTEST_DEDUP_WINDOW_DAYS = int(os.getenv("BACKTEST_DEDUP_WINDOW_DAYS", 10))
