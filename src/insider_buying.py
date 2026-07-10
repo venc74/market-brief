@@ -180,8 +180,13 @@ def _form4_xml_url(cik: str, accession: str, primary_document: str) -> str | Non
     return f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{xml_name}"
 
 
-def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]]:
-    """Връща [(accessionNumber, primaryDocument), ...] за form=='4' с filingDate >= since."""
+def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]] | None:
+    """
+    Връща [(accessionNumber, primaryDocument), ...] за form=='4' с filingDate
+    >= since. None (не []) при провал на самата заявка — различимо от "заявката
+    мина успешно, просто няма скорошни Form 4" за diagnostics в кеша (виж
+    fetch_insider_buying: submissions_fetch_errors vs tickers_with_filings).
+    """
     try:
         r = requests.get(f"https://data.sec.gov/submissions/CIK{cik}.json",
                          timeout=20, headers=_EDGAR_UA)
@@ -189,7 +194,7 @@ def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]]:
         rec = (r.json() or {}).get("filings", {}).get("recent", {})
     except Exception as e:
         print(f"[insider] submissions {cik}: {e}")
-        return []
+        return None
     forms = rec.get("form", [])
     accs = rec.get("accessionNumber", [])
     dates = rec.get("filingDate", [])
@@ -208,20 +213,32 @@ def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]]:
     return out
 
 
-def _fetch_raw_transactions(universe: list[str], since: dt.date) -> list[dict]:
+def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[dict], dict]:
     """
     За всеки тикър от universe: намира скорошни Form 4 filings и парсва P-code
-    транзакции. Връща суров списък (без филтър по стойност/роля — приложени в
-    _build_rows). Graceful: провал на отделен тикър/filing/XML се пропуска.
+    транзакции. Връща (суров списък без филтър по стойност/роля — приложени в
+    _build_rows, diagnostics dict) — diagnostics захранва instrumentation-а в
+    кеша (виж fetch_insider_buying), за да различим "0 квалифициращи" от "тих
+    провал по средата на loop-а" без нужда от GitHub Actions лог достъп.
+    Graceful: провал на отделен тикър/filing/XML се пропуска.
     """
     cik_map = _ticker_cik_map()
     raw: list[dict] = []
+    ciks_resolved = 0
+    tickers_with_filings = 0
+    submissions_fetch_errors = 0
     for ticker in universe:
         cik = cik_map.get(ticker)
         if not cik:
             continue
+        ciks_resolved += 1
         filings = _recent_form4_for_cik(cik, since)
         time.sleep(_SLEEP)
+        if filings is None:
+            submissions_fetch_errors += 1
+            continue  # заявката се провали — различимо от "0 filings" (виж docstring)
+        if filings:
+            tickers_with_filings += 1
         for accession, primary_doc in filings:
             url = _form4_xml_url(cik, accession, primary_doc)
             if not url:
@@ -252,7 +269,8 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> list[dict]:
                     "price": txn["price"],
                     "value": txn["value"],
                 })
-    return raw
+    return raw, {"ciks_resolved": ciks_resolved, "tickers_with_filings": tickers_with_filings,
+                "submissions_fetch_errors": submissions_fetch_errors}
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -311,41 +329,83 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     unusual_options._sp500_ndx_universe()) — само open market покупки (code
     "P") на officers (CEO/CFO/President/COO) над min_value, плюс cluster-
     flagged директорски покупки. Кешира за деня.
+
+    Instrumentation: кешът пази и "diagnostics" — ПИШЕ СЕ ВИНАГИ, дори при
+    0 rows, за да разчетем утре причината директно от кеш файла, без нужда от
+    GitHub Actions лог достъп:
+      - universe_size = 0                          → _sp500_ndx_universe() провал
+      - ciks_resolved = 0                          → company_tickers.json/UA проблем в основата
+      - ciks_resolved > 0, submissions_fetch_errors > 0 → мрежов/UA проблем на
+        конкретни submissions.json заявки (частичен провал)
+      - ciks_resolved > 0, submissions_fetch_errors = 0, tickers_with_filings = 0
+        → легитимно затишие, никой тикър няма скорошен Form 4
+      - tickers_with_filings > 0, raw_transactions_parsed = 0 → filings намерени,
+        но 0 P-code транзакции в тях (нормално — повечето Form 4 са sell/grant/exercise)
+      - raw_transactions_parsed > 0, qualifying_after_filter = 0 → P-code
+        транзакции има, но под INSIDER_MIN_VALUE прага/не officer роля без cluster
+
+    ВАЖНО — две отделни неща в кеша, с различна семантика:
+      - "diagnostics" = ВИНАГИ истинският резултат от ДНЕШНИЯ опит, дори 0 —
+        никога carry-over, инструментът трябва да е точен всеки ден поотделно.
+      - "rows" = fallback-aware display данни: ако днешният fetch е празен,
+        пазим последните ИЗВЕСТНИ добри резултати (не []) — и в кеша на диска,
+        и във върнатата стойност — за да не се къса fallback веригата след
+        първия провален ден (иначе провал ден N+1 презаписва диска с [], и
+        провал ден N+2 вече няма откъде да "падне назад").
     """
     min_value = min_value if min_value is not None else config.INSIDER_MIN_VALUE
     today = dt.date.today().isoformat()
+
+    previous_rows: list[dict] = []
     if _CACHE.exists():
         try:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today and cached.get("rows"):
                 return cached["rows"]
+            previous_rows = cached.get("rows", [])
         except Exception:
             pass
 
     rows: list[dict] = []
+    diagnostics = {
+        "universe_size": 0,
+        "ciks_resolved": 0,
+        "tickers_with_filings": 0,
+        "submissions_fetch_errors": 0,
+        "raw_transactions_parsed": 0,
+        "qualifying_after_filter": 0,
+    }
     try:
         universe = _sp500_ndx_universe()
+        diagnostics["universe_size"] = len(universe)
         since = dt.date.today() - dt.timedelta(days=_LOOKBACK_DAYS)
-        raw = _fetch_raw_transactions(universe, since)
+        raw, fetch_diag = _fetch_raw_transactions(universe, since)
+        diagnostics.update(fetch_diag)
+        diagnostics["raw_transactions_parsed"] = len(raw)
         rows = _build_rows(raw, min_value, config.INSIDER_CLUSTER_WINDOW_DAYS,
                            config.INSIDER_CLUSTER_MIN_COUNT)
+        diagnostics["qualifying_after_filter"] = len(rows)
     except Exception as e:
         print(f"[insider] fetch failed: {e}")
         rows = []
 
-    if not rows and _CACHE.exists():
-        try:
-            return json.loads(_CACHE.read_text()).get("rows", [])
-        except Exception:
-            return []
+    # "rows" в кеша = fallback-aware display данни (за dashboard-а) — ако
+    # днешният fetch е празен, пазим последните ИЗВЕСТНИ добри резултати, за
+    # да не се къса fallback веригата след първия провален ден (провал ден
+    # N+1 пише [] върху диска → провал ден N+2 вече няма откъде да "падне
+    # назад"). "diagnostics" пази ВИНАГИ истинския резултат от ДНЕШНИЯ опит
+    # (rows, не display_rows) — никога не се carry-over-ва, за да остане
+    # instrumentation-ът точен инструмент за утрешна диагностика.
+    display_rows = rows or previous_rows
 
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "rows": rows},
+        _CACHE.write_text(json.dumps({"date": today, "rows": display_rows, "diagnostics": diagnostics},
                                      ensure_ascii=False, indent=1))
     except Exception as e:
         print(f"[insider] cache write: {e}")
-    return rows
+
+    return display_rows
 
 
 if __name__ == "__main__":
@@ -355,3 +415,6 @@ if __name__ == "__main__":
         tag = " [CLUSTER]" if r["cluster"] else ""
         print(f"  {r['ticker']:6} {r['insider_name']:20} {r['title']:24} "
              f"${r['value']:>12,.0f}  {r['transaction_date']}{tag}")
+    if _CACHE.exists():
+        diag = json.loads(_CACHE.read_text()).get("diagnostics", {})
+        print("diagnostics:", json.dumps(diag, ensure_ascii=False))

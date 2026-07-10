@@ -4,6 +4,7 @@
 Всеки индикатор връща {value, status, label} където status ∈ green/yellow/red.
 """
 from __future__ import annotations
+import datetime as dt
 import io
 import os
 from functools import lru_cache
@@ -282,6 +283,19 @@ def market_put_call() -> dict:
                 "label": "P/C: няма данни"}
 
 
+def _is_stale(last_ts) -> bool:
+    """
+    True ако последният ред от yf .history() е по-стар от
+    config.STALENESS_THRESHOLD_DAYS календарни дни спрямо днес. Пази срещу
+    low-liquidity тикъри (^MOVE, ^VIX9D, ^VIX3M), при които Yahoo понякога
+    спира да публикува нови точки за дни наред, а .iloc[-1] тихо продължава
+    да връща същата стара стойност като "текуща" (потвърдено емпирично —
+    ^MOVE/^VIX9D/^VIX3M блокираха на 2026-07-02 за >1 седмица).
+    """
+    last_date = last_ts.date() if hasattr(last_ts, "date") else last_ts
+    return (dt.date.today() - last_date).days > config.STALENESS_THRESHOLD_DAYS
+
+
 def move_index() -> dict:
     """
     ICE BofA MOVE Index — имплицитна волатилност на UST (2/5/10/30г опции).
@@ -295,6 +309,8 @@ def move_index() -> dict:
         hist = yf.Ticker("^MOVE").history(period="1mo")
         if hist.empty or len(hist) < 6:
             raise ValueError("insufficient history")
+        if _is_stale(hist.index[-1]):
+            raise ValueError(f"stale data — последен ред {hist.index[-1].date()}")
         val = float(hist["Close"].iloc[-1])
         week_ago = float(hist["Close"].iloc[-6])
         delta = val - week_ago
@@ -332,9 +348,17 @@ def vix_term_structure() -> dict:
     резки корекции). Следим ratio = VIX9D / VIX3M вместо самите нива.
     """
     try:
-        vix9d = float(yf.Ticker("^VIX9D").history(period="5d")["Close"].iloc[-1])
-        vix_mid = float(yf.Ticker("^VIX").history(period="5d")["Close"].iloc[-1])
-        vix3m = float(yf.Ticker("^VIX3M").history(period="5d")["Close"].iloc[-1])
+        hist9d = yf.Ticker("^VIX9D").history(period="5d")
+        hist_mid = yf.Ticker("^VIX").history(period="5d")
+        hist3m = yf.Ticker("^VIX3M").history(period="5d")
+        if hist9d.empty or hist_mid.empty or hist3m.empty:
+            raise ValueError("insufficient VIX9D/VIX/VIX3M data")
+        if _is_stale(hist9d.index[-1]) or _is_stale(hist3m.index[-1]):
+            raise ValueError(f"stale data — VIX9D {hist9d.index[-1].date()} / "
+                             f"VIX3M {hist3m.index[-1].date()}")
+        vix9d = float(hist9d["Close"].iloc[-1])
+        vix_mid = float(hist_mid["Close"].iloc[-1])
+        vix3m = float(hist3m["Close"].iloc[-1])
         if not vix9d or not vix3m:
             raise ValueError("insufficient VIX9D/VIX3M data")
         ratio = vix9d / vix3m

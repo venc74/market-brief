@@ -55,7 +55,7 @@ CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
 # кандидати JSON-ът се отрязва по средата (Unterminated string). Малки batch-ове
 # гарантират достатъчен token budget на batch, независимо от общия брой тикъри.
 AI_BATCH_SIZE = int(os.getenv("AI_BATCH_SIZE", 5))           # тикъри на API извикване
-AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 4000))  # budget на batch
+AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 8000))  # budget на batch
 
 # ── Пътища ────────────────────────────────────────────────────────────────
 import pathlib
@@ -263,6 +263,10 @@ MOVE_SPIKE_WEEKLY_DELTA = float(os.getenv("MOVE_SPIKE_WEEKLY_DELTA", 15))
 # ── VIX Term Structure (VIX9D / VIX3M ratio) ──────────────────────────────
 VIX_TERM_WARNING_THRESHOLD = float(os.getenv("VIX_TERM_WARNING_THRESHOLD", 1.0))
 VIX_TERM_BACKWARDATION_THRESHOLD = float(os.getenv("VIX_TERM_BACKWARDATION_THRESHOLD", 1.1))
+# Low-liquidity yfinance тикъри (^MOVE, ^VIX9D, ^VIX3M) понякога спират да
+# публикуват нови данни за дни наред — над този праг стойността се третира
+# като stale и индикаторът се крие (hide), вместо да показва остаряло число.
+STALENESS_THRESHOLD_DAYS = int(os.getenv("STALENESS_THRESHOLD_DAYS", 3))
 
 # ── SEC Form 4 Insider Buying (officers CEO/CFO/President/COO, open market) ──
 ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
