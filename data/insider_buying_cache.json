@@ -1,4 +1,12 @@
 {
- "date": "2026-07-07",
- "rows": []
+ "date": "2026-07-13",
+ "rows": [],
+ "diagnostics": {
+  "universe_size": 25,
+  "ciks_resolved": 25,
+  "tickers_with_filings": 23,
+  "submissions_fetch_errors": 0,
+  "raw_transactions_parsed": 11,
+  "qualifying_after_filter": 0
+ }
 }

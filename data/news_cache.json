@@ -1,37 +1,37 @@
 {
- "date": "2026-07-10",
+ "date": "2026-07-13",
  "news": [
   {
-   "headline": "Kevin Warsh назначи Marc Andreessen и Mervyn King в задачните сили на Fed",
-   "why": "Реструктурирането на Fed под Warsh е ключов макро риск — пазарите следят дали новите task forces ще доведат до промяна в монетарната политика и независимостта на централната банка."
+   "headline": "US launches more strikes on Iran; Strait of Hormuz dispute escalates",
+   "why": "Контролът върху Hormuz заплашва глобалните петролни доставки — директен катализатор за spike в crude и risk-off разпродажба."
   },
   {
-   "headline": "САЩ продължават 'технически преговори' с Иран след обмен на удари",
-   "why": "Ескалацията между САЩ и Иран директно влияе на петролните цени и рисковия апетит — всяка нова новина може да движи crude и defense сектора рязко."
+   "headline": "Global stocks fall as US-Iran hostilities escalate; Kospi plunges 7%",
+   "why": "Risk-off режимът вече е факт — азиатските пазари водят надолу, което задава тона за европейска и американска сесия."
   },
   {
-   "headline": "SK Hynix набра $26.5 млрд. при дебюта си на Nasdaq — най-голямото US листване на чуждестранна компания",
-   "why": "Огромният капиталопоток в chip сектора сигнализира продължаващо институционално търсене на AI/memory exposure и задава тон за полупроводниковия сектор днес."
+   "headline": "Iran bets Trump will blink first over Strait of Hormuz",
+   "why": "Ескалационният сценарий остава отворен — пазарите ще ценообразуват геополитическа премия в петрол и защитни активи."
   },
   {
-   "headline": "Най-голямата сделка с QQQ ETF от четвъртък — tech bulls очакват нови върхове",
-   "why": "Рекордна опционна/ETF позиция в QQQ е директен сигнал за пазарните настроения и потенциална посока на Nasdaq в краткосрочен план."
+   "headline": "EU buys record amount of gas from Russia's flagship Yamal plant ahead of import ban",
+   "why": "Рекордното европейско търсене на руски LNG сигнализира за напрежение в енергийните запаси преди зимата и натиск върху gas цените."
   },
   {
-   "headline": "NATO: Тръмп промени тона за 48 часа и остави съюзниците в несигурност",
-   "why": "Непредвидимостта на US дипломацията добавя геополитическа премия към EUR активи и засяга defense сектора в Европа."
+   "headline": "SK Hynix shares slide 12% in Seoul after stellar Nasdaq debut",
+   "why": "Резкият спад показва арбитраж между листвания и предупреждава за потенциална корекция в по-широкия chip/AI сектор."
   },
   {
-   "headline": "Kospi влезе в мечи пазар — падна 20% от рекорда си",
-   "why": "Южнокорейският пазар е барометър за глобалното търсене на tech/chip акции и слабостта му може да оказва натиск върху свързаните US имена."
+   "headline": "Earnings playbook: JPMorgan Chase and Netflix on deck as reporting season begins",
+   "why": "JPMorgan ще даде тон за финансовия сектор, Netflix — за consumer discretionary; резултатите могат да преориентират пазарния нараратив."
   },
   {
-   "headline": "OpenAI и Google продават AI модели на черно-листвани китайски групи чрез Сингапур",
-   "why": "Новината носи регулаторен и геополитически риск за водещите AI компании — потенциални санкции или конгресни разследвания биха ударили tech сектора."
+   "headline": "Companies turn to Chinese AI models to cut costs; DoorDash, Siemens, Airbnb among adopters",
+   "why": "Корпоративното преминаване към китайски AI натиска маржовете на US hyperscalers и преначертава конкурентната карта в сектора."
   },
   {
-   "headline": "UBS посъветва клиенти да намалят експозицията към фонд на Blue Owl — предизвика масово изтегляне",
-   "why": "Сигнал за напрежение в private credit пазара — разпродажбата в алтернативните активи може да засегне ликвидността и настроенията в по-широкия credit пазар."
+   "headline": "Wall Street feasts on fees from SpaceX IPO and mega-mergers",
+   "why": "Съживяването на deal activity и IPO pipeline е бичи сигнал за investment banking приходи точно преди earnings сезона."
   }
  ]
 }

@@ -251,5 +251,27 @@
   "target1_hit_date": null,
   "resolution_date": "2026-06-26",
   "realized_r": -1.0
+ },
+ "LLY_2026-07-10": {
+  "ticker": "LLY",
+  "entry_date": "2026-07-10",
+  "status": "open",
+  "entry_price": 1249.45,
+  "target_1": 1609.89,
+  "stop_loss": 1069.23,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "ANET_2026-07-10": {
+  "ticker": "ANET",
+  "entry_date": "2026-07-10",
+  "status": "open",
+  "entry_price": 189.82,
+  "target_1": 252.84,
+  "stop_loss": 158.31,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
  }
 }
