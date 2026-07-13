@@ -224,6 +224,25 @@ UNUSUAL_OPTIONS_UNIVERSE = [
 ]
 UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  # vol/OI праг
 
+# NDX100 състав — СТАТИЧЕН списък, ръчно поддържан. Wikipedia премахна structured
+# компонентната таблица от Nasdaq-100 статията (само външен линк към nasdaq.com
+# остана) — вече не е скрейпваем източник. Обнови ръчно при промяна в индекса:
+# отвори https://www.nasdaq.com/market-activity/quotes/Nasdaq-100-Index-Components,
+# копирай тикърите. Снимка към 2026-07-10 (103 компонента, вкл. GOOG/GOOGL dual-class).
+NDX100_STATIC_TICKERS = [
+    "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "ALAB", "ALNY", "AMAT",
+    "AMD", "AMGN", "AMZN", "APP", "ARM", "ASML", "AVGO", "AXON", "BKNG", "BKR",
+    "CCEP", "CDNS", "CEG", "CMCSA", "COST", "CPRT", "CRWD", "CRWV", "CSCO", "CSX",
+    "CTAS", "DASH", "DDOG", "DXCM", "EA", "EXC", "FANG", "FAST", "FER", "FTNT",
+    "GEHC", "GILD", "GOOG", "GOOGL", "HON", "HONA", "IDXX", "INTC", "INTU", "ISRG",
+    "KDP", "KHC", "KLAC", "LIN", "LITE", "LRCX", "MAR", "MCHP", "MDLZ", "MELI",
+    "META", "MNST", "MPWR", "MRVL", "MSFT", "MSTR", "MU", "NBIS", "NFLX", "NVDA",
+    "NXPI", "ODFL", "ORLY", "PANW", "PAYX", "PCAR", "PDD", "PEP", "PLTR", "PYPL",
+    "QCOM", "REGN", "RKLB", "ROP", "ROST", "SBUX", "SHOP", "SNDK", "SNPS", "SPCX",
+    "STX", "TER", "TMUS", "TRI", "TSLA", "TTWO", "TXN", "VRTX", "WBD", "WDAY",
+    "WDC", "WMT", "XEL",
+]
+
 # ── Splits филтри (Поправка 1) ────────────────────────────────────────────
 SPLITS_MIN_PRICE = float(os.getenv("SPLITS_MIN_PRICE", 10))          # > $10
 SPLITS_MIN_MARKET_CAP = float(os.getenv("SPLITS_MIN_MARKET_CAP", 500_000_000))  # > $500M

@@ -82,9 +82,18 @@ def _stock_vol_label(svr: float) -> str:
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Универс: S&P500 + NDX (Wikipedia), с кеш и статичен fallback
+# Универс: S&P500 (live Wikipedia scrape) + NDX100 (статичен списък), с кеш
 # ──────────────────────────────────────────────────────────────────────────
 def _sp500_ndx_universe() -> list[str]:
+    """
+    S&P500 (live Wikipedia scrape, UA header — pd.read_html(url) директно гърми
+    с 403, Wikipedia блокира заявки без browser-like User-Agent) + NDX100
+    (config.NDX100_STATIC_TICKERS — Wikipedia премахна структурираната
+    компонентна таблица от Nasdaq-100 статията, вече не е скрейпваем източник,
+    виж коментара при константата за ръчно обновяване). Кешира месечно; при
+    провал на S&P500 scrape-а пада само на NDX100 статичния списък, а при
+    напълно празен резултат — config.UNUSUAL_OPTIONS_UNIVERSE.
+    """
     if _UNIV_CACHE.exists():
         try:
             cached = json.loads(_UNIV_CACHE.read_text())
@@ -92,21 +101,23 @@ def _sp500_ndx_universe() -> list[str]:
                 return cached["tickers"]
         except Exception:
             pass
-    tickers: list[str] = []
+
+    tickers: list[str] = list(config.NDX100_STATIC_TICKERS)
     if pd is not None:
-        for url, idx in (("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", 0),
-                         ("https://en.wikipedia.org/wiki/Nasdaq-100", None)):
-            try:
-                tables = pd.read_html(url)
-                for tbl in tables:
-                    col = next((c for c in tbl.columns
-                                if str(c).lower() in ("symbol", "ticker")), None)
-                    if col is not None:
-                        tickers += [str(s).replace(".", "-").upper() for s in tbl[col].tolist()]
-                        break
-            except Exception as e:
-                print(f"[unusual_options] universe {url}: {e}")
-    # дедупликация + статичен fallback
+        try:
+            html = requests.get("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+                               headers=_UA, timeout=20).text
+            tables = pd.read_html(io.StringIO(html))
+            for tbl in tables:
+                col = next((c for c in tbl.columns
+                            if str(c).lower() in ("symbol", "ticker")), None)
+                if col is not None:
+                    tickers += [str(s).replace(".", "-").upper() for s in tbl[col].tolist()]
+                    break
+        except Exception as e:
+            print(f"[unusual_options] S&P500 universe scrape: {e}")
+
+    # дедупликация + статичен fallback (само ако дори NDX100 списъкът излезе празен)
     tickers = sorted(set(t for t in tickers if re.fullmatch(r"[A-Z\-]{1,6}", t)))
     if not tickers:
         tickers = config.UNUSUAL_OPTIONS_UNIVERSE

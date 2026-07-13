@@ -178,6 +178,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
     compact = [{"s": r["source"], "t": r["title"], "d": r["summary"]} for r in raw[:60]]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
+        "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "
         f"секторни движения, суровини. Максимум {max_items} новини, всяка с едно "
         "изречение защо е важна за пазарите днес.\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False)}\n\n"
