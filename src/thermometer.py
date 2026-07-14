@@ -412,6 +412,7 @@ def build_thermometer(macro: dict) -> dict:
                   market_put_call(), spread_ind, nl_ind, move_index(),
                   vix_term_structure()]
 
+    visible_count = sum(1 for i in indicators if not i.get("hide"))
     greens = sum(1 for i in indicators if i["status"] == "green")
     reds = sum(1 for i in indicators if i["status"] == "red")
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
@@ -429,9 +430,9 @@ def build_thermometer(macro: dict) -> dict:
             f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
             + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
     elif greens >= 4 and reds == 0:
-        regime, reason = "Offensive", f"{greens}/8 индикатора зелени, нула червени"
+        regime, reason = "Offensive", f"{greens}/{visible_count} индикатора зелени, нула червени"
     elif reds >= 3:
-        regime, reason = "Cash", f"{reds}/8 индикатора червени — капиталът е позиция"
+        regime, reason = "Cash", f"{reds}/{visible_count} индикатора червени — капиталът е позиция"
     elif reds >= 2:
         regime, reason = "Defensive", f"{reds} червени индикатора — намален риск"
     else:

@@ -319,13 +319,56 @@ def _build_rows(raw: list[dict], min_value: float,
     return rows
 
 
+def _group_by_ticker(rows: list[dict]) -> list[dict]:
+    """
+    Групира плоски per-транзакция rows (от _build_rows) по тикър — един
+    "group" запис вместо N повтарящи се реда за същия тикър, ако няколко
+    officers купуват в различни дни (напр. 5 отделни FISV покупки). Аналогично
+    на dataroma.superinvestor_map()/_fetch_body() паттърна — агрегацията става
+    в самия fetch модул, не в main.py/шаблона, за да останат consumers-ите
+    (main.py in_screener loop, render.py, dashboard-а) непроменени/агностични
+    към формата.
+
+    "insiders" вътре в групата се сортира по дата НИЗХОДЯЩО (най-новите first)
+    — не по стойност — защото cluster сигналът е фундаментално за близост ВЪВ
+    ВРЕМЕТО (3+ инсайдъри в 14-дневен прозорец); датовия ред позволява визуално
+    потвърждение "да, тези са близо във времето" на пръв поглед, докато
+    подредба по стойност би разбъркала хронологията и скрила точно това.
+    Групите (тикърите) остават сортирани по total_value низходящо, както преди.
+    """
+    groups: dict[str, dict] = {}
+    for r in rows:
+        g = groups.setdefault(r["ticker"], {
+            "ticker": r["ticker"],
+            "company": r["company"],
+            "total_value": 0.0,
+            "cluster": False,
+            "in_screener": r.get("in_screener", False),
+            "insiders": [],
+        })
+        g["total_value"] += r["value"]
+        g["cluster"] = g["cluster"] or r["cluster"]
+        g["insiders"].append({
+            "name": r["insider_name"],
+            "title": r["title"],
+            "date": r["transaction_date"],
+            "value": r["value"],
+        })
+
+    for g in groups.values():
+        g["insiders"].sort(key=lambda x: x["date"], reverse=True)
+
+    return sorted(groups.values(), key=lambda g: g["total_value"], reverse=True)
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────
 def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     """
-    Връща [{ticker, company, insider_name, title, transaction_date, shares,
-    price, value, cluster, in_screener}] за S&P500+NDX100 универса (кеш от
+    Връща [{ticker, company, total_value, cluster, in_screener, insiders:
+    [{name, title, date, value}, ...]}] — един запис на ТИКЪР (не на
+    транзакция), групирано от _group_by_ticker(), за S&P500+NDX100 универса (кеш от
     unusual_options._sp500_ndx_universe()) — само open market покупки (code
     "P") на officers (CEO/CFO/President/COO) над min_value, плюс cluster-
     flagged директорски покупки. Кешира за деня.
@@ -384,7 +427,8 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
         diagnostics["raw_transactions_parsed"] = len(raw)
         rows = _build_rows(raw, min_value, config.INSIDER_CLUSTER_WINDOW_DAYS,
                            config.INSIDER_CLUSTER_MIN_COUNT)
-        diagnostics["qualifying_after_filter"] = len(rows)
+        diagnostics["qualifying_after_filter"] = len(rows)  # брой ТРАНЗАКЦИИ, преди групиране по тикър
+        rows = _group_by_ticker(rows)
     except Exception as e:
         print(f"[insider] fetch failed: {e}")
         rows = []
@@ -410,11 +454,12 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
 
 if __name__ == "__main__":
     res = fetch_insider_buying()
-    print(f"Insider buying (≥ ${config.INSIDER_MIN_VALUE:,.0f}, P-code само): {len(res)}")
-    for r in res[:25]:
-        tag = " [CLUSTER]" if r["cluster"] else ""
-        print(f"  {r['ticker']:6} {r['insider_name']:20} {r['title']:24} "
-             f"${r['value']:>12,.0f}  {r['transaction_date']}{tag}")
+    print(f"Insider buying (≥ ${config.INSIDER_MIN_VALUE:,.0f}, P-code само, групирано по тикър): {len(res)}")
+    for g in res[:25]:
+        tag = " [CLUSTER]" if g["cluster"] else ""
+        print(f"  {g['ticker']:6} {g['company']:30} ${g['total_value']:>12,.0f}{tag}")
+        for ins in g["insiders"]:
+            print(f"      {ins['date']}  {ins['name']:20} {ins['title']:24} ${ins['value']:>12,.0f}")
     if _CACHE.exists():
         diag = json.loads(_CACHE.read_text()).get("diagnostics", {})
         print("diagnostics:", json.dumps(diag, ensure_ascii=False))

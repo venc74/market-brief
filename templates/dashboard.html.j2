@@ -535,10 +535,15 @@
     <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
       <div class="si-top">
         <span class="si-sym">{{ i.ticker }}</span>
-        <span class="si-val">{{ (i.value)|money_short }}</span>
+        <span class="si-val">{{ (i.total_value)|money_short }}</span>
       </div>
       <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
-      <div class="si-mgr">{{ i.insider_name }} · {{ i.title }}{% if i.cluster %} · <span style="color:var(--regime)">CLUSTER</span>{% endif %}</div>
+      {% if i.cluster %}<div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>{% endif %}
+      <ul class="tight" style="margin-top:6px">
+        {% for ins in i.insiders %}
+        <li>{{ ins.name }}{% if ins.title %} ({{ ins.title }}){% endif %} — {{ ins.date }} — {{ ins.value|money_short }}</li>
+        {% endfor %}
+      </ul>
       {% if i.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
     {% endfor %}
