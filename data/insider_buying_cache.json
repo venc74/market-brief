@@ -1,133 +1,100 @@
 {
- "date": "2026-07-14",
+ "date": "2026-07-15",
  "rows": [
   {
    "ticker": "FISV",
    "company": "FISERV INC",
-   "insider_name": "Rosman Adam L.",
-   "title": "Chief Admin. and Legal Officer",
-   "transaction_date": "2026-06-16",
-   "shares": 10150.0,
-   "price": 49.33,
-   "value": 500699.5,
+   "total_value": 1723401.25,
    "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "insider_name": "Todd Paul M",
-   "title": "Chief Financial Officer",
-   "transaction_date": "2026-06-17",
-   "shares": 10060.0,
-   "price": 49.7,
-   "value": 499982.0,
-   "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "ADSK",
-   "company": "Autodesk, Inc.",
-   "insider_name": "Anagnost Andrew",
-   "title": "President and CEO",
-   "transaction_date": "2026-06-16",
-   "shares": 2460.0,
-   "price": 202.66,
-   "value": 498543.6,
-   "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "ADSK",
-   "company": "Autodesk, Inc.",
-   "insider_name": "Moorjani Janesh",
-   "title": "EVP, Chief Financial Officer",
-   "transaction_date": "2026-06-15",
-   "shares": 2500.0,
-   "price": 197.67,
-   "value": 494174.99999999994,
-   "cluster": true,
-   "in_screener": false
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Todd Paul M",
+     "title": "Chief Financial Officer",
+     "date": "2026-06-17",
+     "value": 499982.0
+    },
+    {
+     "name": "Mamilli Wafaa",
+     "title": "",
+     "date": "2026-06-17",
+     "value": 149746.40000000002
+    },
+    {
+     "name": "Rosman Adam L.",
+     "title": "Chief Admin. and Legal Officer",
+     "date": "2026-06-16",
+     "value": 500699.5
+    },
+    {
+     "name": "Nixon Gordon M.",
+     "title": "",
+     "date": "2026-06-16",
+     "value": 371775.0
+    },
+    {
+     "name": "DiSimone Harry",
+     "title": "",
+     "date": "2026-06-16",
+     "value": 101080.07999999999
+    },
+    {
+     "name": "Yarkoni Charlotte",
+     "title": "",
+     "date": "2026-06-16",
+     "value": 100118.27
+    }
+   ]
   },
   {
    "ticker": "ADSK",
    "company": "Autodesk, Inc.",
-   "insider_name": "CAHILL JOHN T",
-   "title": "",
-   "transaction_date": "2026-06-23",
-   "shares": 2000.0,
-   "price": 189.2,
-   "value": 378400.0,
+   "total_value": 1371118.5999999999,
    "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "insider_name": "Nixon Gordon M.",
-   "title": "",
-   "transaction_date": "2026-06-16",
-   "shares": 7500.0,
-   "price": 49.57,
-   "value": 371775.0,
-   "cluster": true,
-   "in_screener": false
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "CAHILL JOHN T",
+     "title": "",
+     "date": "2026-06-23",
+     "value": 378400.0
+    },
+    {
+     "name": "Anagnost Andrew",
+     "title": "President and CEO",
+     "date": "2026-06-16",
+     "value": 498543.6
+    },
+    {
+     "name": "Moorjani Janesh",
+     "title": "EVP, Chief Financial Officer",
+     "date": "2026-06-15",
+     "value": 494174.99999999994
+    }
+   ]
   },
   {
    "ticker": "OXY",
    "company": "OCCIDENTAL PETROLEUM CORP /DE/",
-   "insider_name": "Jackson Richard A.",
-   "title": "President and CEO",
-   "transaction_date": "2026-06-23",
-   "shares": 4770.0,
-   "price": 52.38,
-   "value": 249852.6,
+   "total_value": 249852.6,
    "cluster": false,
-   "in_screener": false
-  },
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "insider_name": "Mamilli Wafaa",
-   "title": "",
-   "transaction_date": "2026-06-17",
-   "shares": 2960.0,
-   "price": 50.59,
-   "value": 149746.40000000002,
-   "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "insider_name": "DiSimone Harry",
-   "title": "",
-   "transaction_date": "2026-06-16",
-   "shares": 2088.0,
-   "price": 48.41,
-   "value": 101080.07999999999,
-   "cluster": true,
-   "in_screener": false
-  },
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "insider_name": "Yarkoni Charlotte",
-   "title": "",
-   "transaction_date": "2026-06-16",
-   "shares": 2023.0,
-   "price": 49.49,
-   "value": 100118.27,
-   "cluster": true,
-   "in_screener": false
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Jackson Richard A.",
+     "title": "President and CEO",
+     "date": "2026-06-23",
+     "value": 249852.6
+    }
+   ]
   }
  ],
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 371,
+  "tickers_with_filings": 380,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 87,
+  "raw_transactions_parsed": 88,
   "qualifying_after_filter": 10
  }
 }

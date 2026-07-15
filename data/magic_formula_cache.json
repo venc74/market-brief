@@ -1,5 +1,5 @@
 {
- "date": "2026-07-14",
+ "date": "2026-07-15",
  "ranked": [
   {
    "ticker": "ADBE",
@@ -17,7 +17,7 @@
   },
   {
    "ticker": "BMY",
-   "earnings_yield": 0.1019,
+   "earnings_yield": 0.1052,
    "roc": 0.1069,
    "name": "Bristol-Myers Squibb Company",
    "mf_rank": 28
@@ -52,14 +52,14 @@
   },
   {
    "ticker": "MSFT",
-   "earnings_yield": 0.05,
+   "earnings_yield": 0.0507,
    "roc": 0.1481,
    "name": "Microsoft Corporation",
    "mf_rank": 48
   },
   {
    "ticker": "PFE",
-   "earnings_yield": 0.1045,
+   "earnings_yield": 0.1053,
    "roc": 0.0569,
    "name": "Pfizer, Inc.",
    "mf_rank": 49
@@ -142,18 +142,18 @@
    "mf_rank": 55
   },
   {
-   "ticker": "HON",
-   "earnings_yield": 0.0817,
-   "roc": 0.0595,
-   "name": "Honeywell International Inc.",
-   "mf_rank": 56
-  },
-  {
    "ticker": "FDX",
    "earnings_yield": 0.1002,
    "roc": 0.0503,
    "name": "FedEx Corporation",
    "mf_rank": 56
+  },
+  {
+   "ticker": "HON",
+   "earnings_yield": 0.0815,
+   "roc": 0.0595,
+   "name": "Honeywell International Inc.",
+   "mf_rank": 57
   },
   {
    "ticker": "LMT",
@@ -177,18 +177,18 @@
    "mf_rank": 61
   },
   {
-   "ticker": "AAPL",
-   "earnings_yield": 0.0312,
-   "roc": 0.2623,
-   "name": "Apple Inc.",
-   "mf_rank": 62
-  },
-  {
    "ticker": "VST",
    "earnings_yield": 0.0688,
    "roc": 0.0602,
    "name": "Vistra Corp.",
    "mf_rank": 62
+  },
+  {
+   "ticker": "AAPL",
+   "earnings_yield": 0.0312,
+   "roc": 0.2623,
+   "name": "Apple Inc.",
+   "mf_rank": 63
   },
   {
    "ticker": "CMCSA",
@@ -297,7 +297,7 @@
   },
   {
    "ticker": "DIS",
-   "earnings_yield": 0.0702,
+   "earnings_yield": 0.0703,
    "roc": 0.0445,
    "name": "Walt Disney Company (The)",
    "mf_rank": 75
@@ -317,6 +317,13 @@
    "mf_rank": 76
   },
   {
+   "ticker": "UNH",
+   "earnings_yield": 0.0815,
+   "roc": 0.0378,
+   "name": "UnitedHealth Group Incorporated",
+   "mf_rank": 77
+  },
+  {
    "ticker": "ORCL",
    "earnings_yield": 0.0469,
    "roc": 0.065,
@@ -325,17 +332,10 @@
   },
   {
    "ticker": "AMAT",
-   "earnings_yield": 0.0203,
+   "earnings_yield": 0.0196,
    "roc": 0.1486,
    "name": "Applied Materials, Inc.",
-   "mf_rank": 78
-  },
-  {
-   "ticker": "UNH",
-   "earnings_yield": 0.0815,
-   "roc": 0.0378,
-   "name": "UnitedHealth Group Incorporated",
-   "mf_rank": 78
+   "mf_rank": 79
   },
   {
    "ticker": "BAC",
@@ -353,7 +353,7 @@
   },
   {
    "ticker": "CEG",
-   "earnings_yield": 0.0568,
+   "earnings_yield": 0.057,
    "roc": 0.042,
    "name": "Constellation Energy Corporatio",
    "mf_rank": 85
@@ -363,7 +363,7 @@
    "earnings_yield": 0.0197,
    "roc": 0.1212,
    "name": "Broadcom Inc.",
-   "mf_rank": 88
+   "mf_rank": 87
   },
   {
    "ticker": "WFC",
@@ -398,14 +398,14 @@
    "earnings_yield": 0.0312,
    "roc": 0.0734,
    "name": "Cisco Systems, Inc.",
-   "mf_rank": 90
+   "mf_rank": 91
   },
   {
    "ticker": "WMT",
-   "earnings_yield": 0.031,
+   "earnings_yield": 0.0313,
    "roc": 0.0683,
    "name": "Walmart Inc.",
-   "mf_rank": 94
+   "mf_rank": 92
   },
   {
    "ticker": "SBUX",
@@ -507,14 +507,14 @@
   },
   {
    "ticker": "MCHP",
-   "earnings_yield": 0.0158,
+   "earnings_yield": 0.0153,
    "roc": 0.0223,
    "name": "Microchip Technology Incorporat",
    "mf_rank": 137
   },
   {
    "ticker": "INTC",
-   "earnings_yield": 0.0068,
+   "earnings_yield": 0.0065,
    "roc": 0.0063,
    "name": "Intel Corporation",
    "mf_rank": 145
