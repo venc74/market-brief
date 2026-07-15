@@ -301,3 +301,17 @@ CORRELATION_THRESHOLD = float(os.getenv("CORRELATION_THRESHOLD", 0.75))
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
 BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# v2.1 · Поправки 2026-07-15 (виж FIXES_2026-07-15.md)
+# ══════════════════════════════════════════════════════════════════════════
+# Magic Formula "value confirmed": кандидат получава MF✓ ако комбинираният му
+# Greenblatt ранг попада в топ дециала на (референтен универс + кандидати).
+MF_CONFIRM_DECILE = float(os.getenv("MF_CONFIRM_DECILE", 0.10))
+# ATM IV под този праг (%) = боклук от застояли котировки → отхвърля се.
+IV_SANITY_MIN_PCT = float(os.getenv("IV_SANITY_MIN_PCT", 5.0))
+# Минимален общ опционен обем (puts+calls), за да е смислен P/C ratio.
+PC_MIN_TOTAL_VOLUME = int(os.getenv("PC_MIN_TOTAL_VOLUME", 500))
+# Минимум дни IV история за категорична IVR-базирана опционна препоръка.
+IVR_MIN_DAYS_FOR_STRATEGY = int(os.getenv("IVR_MIN_DAYS_FOR_STRATEGY", 60))

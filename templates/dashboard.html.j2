@@ -187,17 +187,6 @@
   .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
   .news-why { font-size: 13.5px; color: var(--muted); }
 
-  /* ── Magic Formula Top 10 ── */
-  .mf-table { width: 100%; border-collapse: collapse; }
-  .mf-table th, .mf-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
-  .mf-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
-  .mf-table td.n, .mf-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; }
-  .mf-table .sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
-  .mf-table tr.in-screen .sym { color: var(--green); }
-  .mf-rank { display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center;
-    border-radius: 50%; background: var(--regime-dim); color: var(--regime);
-    font-family: "IBM Plex Mono", monospace; font-size: 12px; }
-
   /* ── Track Record: Open Positions таблица ── */
   .pos-table { width: 100%; border-collapse: collapse; }
   .pos-table th, .pos-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
@@ -440,32 +429,7 @@
 
 {% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
 
-{% if magic_formula_top %}
-<section>
-  <h2>Magic Formula Top 10 Today</h2>
-  <div class="card" style="padding:6px 4px">
-    <table class="mf-table">
-      <thead><tr><th class="n">#</th><th>Тикър</th><th>Компания</th>
-        <th class="n">Earnings Yield</th><th class="n">ROC</th></tr></thead>
-      <tbody>
-        {% for r in magic_formula_top[:10] %}
-        <tr class="{{ 'in-screen' if r.ticker in our_tickers else '' }}">
-          <td class="n"><span class="mf-rank">{{ loop.index }}</span></td>
-          <td class="sym">{{ r.ticker }}{% if r.ticker in our_tickers %} <span title="Magic Formula + CANSLIM" style="color:var(--regime)">MF✓</span>{% endif %}</td>
-          <td style="color:var(--muted)">{{ r.name }}</td>
-          <td class="n">{{ "%.1f%%"|format(r.earnings_yield * 100) }}</td>
-          <td class="n">{{ "%.1f%%"|format(r.roc * 100) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:10px">
-    Greenblatt: евтино (Earnings Yield = EBIT/EV) × качествено (ROC). Независим от CANSLIM —
-    зелено + <b>MF✓</b> означава съвпадение с нашия технически скрийнър (конвергенция стойност × моментум).
-  </div>
-</section>
-{% endif %}
+{# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
 
 {% if unusual_options %}
 <section>

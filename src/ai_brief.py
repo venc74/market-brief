@@ -79,7 +79,10 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
 2. "sector_logic": за топ 3-5 сектора с положителна динамика — пълната верижна \
 логика (макро събитие → механизъм → сектор), както изисква спекът: документирай \
 веригата, не само заключението. Поле "chain" за всяка.
-3. "regime_comment": защо режимът {thermometer.get('regime')} е правилен днес.
+3. "regime_comment": провери дали режимът {thermometer.get('regime')} е оправдан \
+от данните. Ако индикатори липсват, са скрити или съдържат невалидни стойности \
+(null/nan), кажи го изрично и оцени как това променя увереността в режима. НЕ \
+оправдавай режима на всяка цена — ако данните му противоречат, напиши го директно.
 
 Връщай само JSON с ключове: macro_brief, sector_logic (списък от обекти със \
 sector, etf, chain, horizon_weeks), regime_comment."""
@@ -121,7 +124,9 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
 Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
 работни дни = автоматично Watchlist (или Action с изрично предупреждение само при \
-изключителен setup, поле "warning").
+изключителен setup, поле "warning"). Ако days_to_earnings липсва или е ОТРИЦАТЕЛЕН, \
+earnings датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ \
+твърди, че няма blackout риск.
 
 Връщай само JSON: {{"tickers": [...]}}"""
 

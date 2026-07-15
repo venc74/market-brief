@@ -79,7 +79,6 @@ def render_dashboard(brief: dict) -> str:
         naaim_history=brief.get("naaim_history", {}),
         superinvestor_moves=brief.get("superinvestor_moves", []),
         insider_buying=brief.get("insider_buying", []),
-        magic_formula_top=brief.get("magic_formula_top", []),
         news=brief.get("news", []),
         cot=brief.get("cot", []),
         correlation_flags=brief.get("correlation_flags", []),

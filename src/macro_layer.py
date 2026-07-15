@@ -80,8 +80,24 @@ def treasury_spread_2s10s() -> dict:
     }
 
 
+def _is_stale(last_ts) -> bool:
+    """
+    Огледало на thermometer._is_stale (дублирано локално, за да няма
+    cross-module coupling). Пази срещу застояли Yahoo серии — виж
+    коментара в thermometer.py за ^MOVE/^VIX9D/^VIX3M инцидента.
+    """
+    last_date = last_ts.date() if hasattr(last_ts, "date") else last_ts
+    return (dt.date.today() - last_date).days > config.STALENESS_THRESHOLD_DAYS
+
+
 def global_market_signals() -> dict:
-    """DXY, VIX, gold, oil, copper, 10Y yield — снимка + 5-дневна промяна."""
+    """
+    DXY, VIX, gold, oil, copper, 10Y yield — снимка + 5-дневна промяна.
+    FIX 2026-07-15: staleness проверка. Преди: термометърът отхвърляше
+    застоял ^MOVE (hide=True), а този модул теглеше СЪЩИЯ ^MOVE без
+    проверка → AI макро наративът цитираше отхвърлената стойност като
+    текуща ("MOVE падна до 69.55") — двоен стандарт за същите данни.
+    """
     tickers = {
         "DXY": "DX-Y.NYB", "VIX": "^VIX", "Gold": "GC=F",
         "Oil_WTI": "CL=F", "Copper": "HG=F", "US10Y": "^TNX", "MOVE": "^MOVE",
@@ -91,6 +107,10 @@ def global_market_signals() -> dict:
         try:
             hist = yf.Ticker(symbol).history(period="10d")
             if len(hist) >= 2:
+                if _is_stale(hist.index[-1]):
+                    print(f"[macro] {name} stale — последен ред "
+                          f"{hist.index[-1].date()}, пропускам")
+                    continue
                 last = float(hist["Close"].iloc[-1])
                 wk = float(hist["Close"].iloc[0])
                 out[name] = {

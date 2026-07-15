@@ -6,6 +6,7 @@
 from __future__ import annotations
 import datetime as dt
 import io
+import math
 import os
 from functools import lru_cache
 import requests
@@ -17,26 +18,49 @@ import config
 
 
 def spy_trend() -> dict:
-    hist = yf.Ticker("SPY").history(period="1y")
-    close = hist["Close"]
-    price = float(close.iloc[-1])
-    ma50 = float(close.rolling(50).mean().iloc[-1])
-    ma200 = float(close.rolling(200).mean().iloc[-1])
-    above50, above200 = price > ma50, price > ma200
-    status = "green" if (above50 and above200) else ("yellow" if above200 else "red")
-    return {
-        "name": "SPY тренд", "value": round(price, 2),
-        "ma50": round(ma50, 2), "ma200": round(ma200, 2),
-        "above_50dma": above50, "above_200dma": above200, "status": status,
-        "label": f"SPY {price:.0f} | {'над' if above50 else 'под'} 50DMA, "
-                 f"{'над' if above200 else 'под'} 200DMA",
-    }
+    """
+    FIX 2026-07-15: NaN от Yahoo даваше price > ma50 == False (NaN сравнения
+    са винаги False) → тих фалшив "red" с етикет "SPY nan | под 50DMA". Сега:
+    липсващи/NaN данни → hide=True (unknown), НЕ фалшив сигнал в нито посока.
+    """
+    try:
+        hist = yf.Ticker("SPY").history(period="1y")
+        if hist.empty or len(hist) < 200:
+            raise ValueError("insufficient SPY history")
+        close = hist["Close"]
+        price = float(close.iloc[-1])
+        ma50 = float(close.rolling(50).mean().iloc[-1])
+        ma200 = float(close.rolling(200).mean().iloc[-1])
+        if any(math.isnan(v) for v in (price, ma50, ma200)):
+            raise ValueError("NaN в SPY цена/MA — невалидни данни от източника")
+        above50, above200 = price > ma50, price > ma200
+        status = "green" if (above50 and above200) else ("yellow" if above200 else "red")
+        return {
+            "name": "SPY тренд", "value": round(price, 2),
+            "ma50": round(ma50, 2), "ma200": round(ma200, 2),
+            "above_50dma": above50, "above_200dma": above200, "status": status,
+            "label": f"SPY {price:.0f} | {'над' if above50 else 'под'} 50DMA, "
+                     f"{'над' if above200 else 'под'} 200DMA",
+        }
+    except Exception as e:
+        print(f"[thermo] SPY trend failed: {e}")
+        return {"name": "SPY тренд", "value": None, "status": "yellow",
+                "hide": True, "label": ""}
 
 
 def vix_level() -> dict:
-    hist = yf.Ticker("^VIX").history(period="10d")
-    vix = float(hist["Close"].iloc[-1])
-    wk = float(hist["Close"].iloc[0])
+    try:
+        hist = yf.Ticker("^VIX").history(period="10d")
+        if hist.empty:
+            raise ValueError("empty VIX history")
+        vix = float(hist["Close"].iloc[-1])
+        wk = float(hist["Close"].iloc[0])
+        if math.isnan(vix):
+            raise ValueError("NaN VIX — невалидни данни от източника")
+    except Exception as e:
+        print(f"[thermo] VIX failed: {e}")
+        return {"name": "VIX", "value": None, "status": "yellow",
+                "hide": True, "label": ""}
     if vix < config.VIX_RISK_ON:
         status = "green"
     elif vix < config.VIX_RISK_OFF:
@@ -387,34 +411,57 @@ def build_thermometer(macro: dict) -> dict:
     - VIX > 30 → задължително Defensive (Секция 8)
     - MOVE > 150 или рязък седмичен скок → задължително Defensive (институционален
       стрес в колатералната система бие останалите сигнали, аналогично на VIX правилото)
-    - 4+ зелени → Offensive; 2+ червени → Cash/Defensive; иначе Defensive
+    - 4+ зелени при 0 червени → Offensive; 3+ червени → Cash; 2 червени → Defensive;
+      всичко останало → Defensive (недостатъчно потвърждение)
+    Броенето е само върху ВИДИМИТЕ индикатори (hide=True не участва); жълтите и
+    скритите се отчитат изрично в regime_reason. Sizing factor пада за всеки
+    не-Offensive режим, не само за принудителните.
     """
     spread = macro.get("spread_2s10s", {})
     nl = macro.get("net_liquidity", {})
 
-    spread_ind = {
-        "name": "2Y/10Y спред",
-        "value": spread.get("value"),
-        "status": "red" if spread.get("status") == "inverted" else "green",
-        "label": (f"{spread.get('value', '?')}% "
-                  f"({'инверсия' if spread.get('status') == 'inverted' else 'нормален'}, "
-                  f"{spread.get('direction', '')})"),
-    }
-    nl_ind = {
-        "name": "Fed Net Liquidity",
-        "value": nl.get("value"),
-        "status": "green" if nl.get("trend") == "up" else
-                  ("red" if nl.get("trend") == "down" else "yellow"),
-        "label": f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'})",
-    }
+    # FIX 2026-07-15: паднал FRED даваше status="unknown" → != "inverted" → GREEN,
+    # т.е. фалшив зелен сигнал от липсващи данни. Сега: None → hide (unknown).
+    if spread.get("value") is None:
+        spread_ind = {"name": "2Y/10Y спред", "value": None,
+                      "status": "yellow", "hide": True, "label": ""}
+    else:
+        spread_ind = {
+            "name": "2Y/10Y спред",
+            "value": spread.get("value"),
+            "status": "red" if spread.get("status") == "inverted" else "green",
+            "label": (f"{spread.get('value', '?')}% "
+                      f"({'инверсия' if spread.get('status') == 'inverted' else 'нормален'}, "
+                      f"{spread.get('direction', '')})"),
+        }
+    if nl.get("value") is None:
+        nl_ind = {"name": "Fed Net Liquidity", "value": None,
+                  "status": "yellow", "hide": True, "label": ""}
+    else:
+        nl_ind = {
+            "name": "Fed Net Liquidity",
+            "value": nl.get("value"),
+            "status": "green" if nl.get("trend") == "up" else
+                      ("red" if nl.get("trend") == "down" else "yellow"),
+            "label": f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'})",
+        }
 
     indicators = [spy_trend(), vix_level(), naaim_exposure(),
                   market_put_call(), spread_ind, nl_ind, move_index(),
                   vix_term_structure()]
 
-    visible_count = sum(1 for i in indicators if not i.get("hide"))
-    greens = sum(1 for i in indicators if i["status"] == "green")
-    reds = sum(1 for i in indicators if i["status"] == "red")
+    # FIX 2026-07-15: броим само ВИДИМИТЕ индикатори; жълтите и скритите се
+    # отчитат изрично в съобщението, вместо да изчезват тихо от "X зелени / Y червени".
+    visible = [i for i in indicators if not i.get("hide")]
+    visible_count = len(visible)
+    hidden_count = len(indicators) - visible_count
+    greens = sum(1 for i in visible if i["status"] == "green")
+    yellows = sum(1 for i in visible if i["status"] == "yellow")
+    reds = sum(1 for i in visible if i["status"] == "red")
+    counts = f"{greens} зелени / {yellows} жълти / {reds} червени от {visible_count} видими"
+    if hidden_count:
+        counts += f" ({hidden_count} скрити — невалидни/застояли данни)"
+
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
     move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
     move_val = move_ind.get("value") if move_ind else None
@@ -423,6 +470,9 @@ def build_thermometer(macro: dict) -> dict:
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
 
+    # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive",
+    # който противоречеше на правилото в docstring-а ("4+ зелени → Offensive; иначе
+    # Defensive") и на 2026-07-15 произведе Offensive при 3 зелени + 1 (фалшив) червен.
     if vix_forces_defensive:
         regime, reason = "Defensive", f"VIX {vix_val:.0f} > 30 — автоматичен Defensive режим, sizing −50%"
     elif move_forces_defensive:
@@ -430,17 +480,18 @@ def build_thermometer(macro: dict) -> dict:
             f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
             + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
     elif greens >= 4 and reds == 0:
-        regime, reason = "Offensive", f"{greens}/{visible_count} индикатора зелени, нула червени"
+        regime, reason = "Offensive", counts
     elif reds >= 3:
-        regime, reason = "Cash", f"{reds}/{visible_count} индикатора червени — капиталът е позиция"
+        regime, reason = "Cash", f"{counts} — капиталът е позиция"
     elif reds >= 2:
-        regime, reason = "Defensive", f"{reds} червени индикатора — намален риск"
+        regime, reason = "Defensive", f"{counts} — намален риск"
     else:
-        regime, reason = "Offensive" if greens >= 3 else "Defensive", \
-                         f"{greens} зелени / {reds} червени"
+        regime, reason = "Defensive", f"{counts} — недостатъчно потвърждение за Offensive"
 
-    sizing_factor = (config.DEFENSIVE_SIZING_FACTOR
-                     if (vix_forces_defensive or move_forces_defensive) else 1.0)
+    # FIX 2026-07-15: преди sizing_factor падаше САМО при принудителен Defensive
+    # (VIX/MOVE); нормален Defensive/Cash по броя сигнали оставаше на 1.0 —
+    # противоречие със семантиката на режима. Сега всеки не-Offensive → фактор.
+    sizing_factor = 1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR
 
     return {"indicators": indicators, "regime": regime,
             "regime_reason": reason, "sizing_factor": sizing_factor}

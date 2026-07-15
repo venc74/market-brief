@@ -22,13 +22,29 @@ from src.screener import run_screen
 from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan
 from src import ai_brief
-from src import unusual_options, splits_calendar, dataroma, magic_formula, news_aggregator
+from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
 from src import correlation_check
 from src import backtest
 from src import cot
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
+
+
+def _live_positions() -> dict[str, dict]:
+    """
+    FIX 2026-07-15: тикър → запис за живите (open/trailing) позиции от
+    backtest tracker-а. Скрийнърът нямаше представа какво вече държиш —
+    на 2026-07-15 и трите ACTION тикъра (AMG, EXEL, ALL) бяха отворени
+    позиции от седмици, представени като нови входове с нов риск $1000.
+    """
+    try:
+        tracker = backtest._load_tracker()
+        return {rec["ticker"]: rec for rec in tracker.values()
+                if rec.get("status") in ("open", "trailing")}
+    except Exception as e:
+        print(f"[main] live positions check failed: {e}")
+        return {}
 
 
 def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list, list]:
@@ -38,8 +54,26 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
     """
     action, watchlist = [], []
     sector_count: dict[str, int] = {}
+    live = _live_positions() if config.ENABLE_BACKTEST else {}
 
     for c in candidates:
+        # FIX 2026-07-15: тикър с жива позиция НЕ получава нов Action план
+        # (имплицитно удвояване на риска). Отива във Watchlist с изричен
+        # OPEN✓ маркер — повторният breakout сигнал е потвърждение на
+        # тезата, не нов вход.
+        rec = live.get(c.get("ticker"))
+        if rec:
+            c.setdefault("markers", []).append({
+                "tag": "OPEN✓",
+                "title": (f"Отворена позиция от {rec.get('entry_date')} "
+                          f"@ ${rec.get('entry_price')} — не е нов вход."),
+            })
+            c.setdefault("ai", {})
+            c["ai"]["classification"] = "Watchlist"
+            c["ai"]["watchlist_trigger"] = (
+                f"Вече в портфейла от {rec.get('entry_date')} "
+                f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
+                "потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.")
         cls = c.get("ai", {}).get("classification", "Watchlist")
         sector = c.get("sector", "Unknown")
 
@@ -122,8 +156,8 @@ def run() -> dict:
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
     for row in insider_buys:
         row["in_screener"] = row["ticker"] in our_tickers
-    # самостоятелен Magic Formula топ 10 (независим от CANSLIM) за dashboard секция
-    magic_formula_top = magic_formula.build_ranked(top_n=10) if config.ENABLE_MAGIC_FORMULA else []
+    # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
+    # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
     # Track Record: ingest четe data/*.json snapshot-и от диска — днешният {today}.json
     # още не е записан на този етап, затова днешните Action се ingest-ват утре. Безобидно:
     # резолюция (target/stop) никога не се проверява в деня на самото entry, само от
@@ -147,7 +181,6 @@ def run() -> dict:
         "naaim_history": naaim_hist,
         "superinvestor_moves": superinvestor_moves,
         "insider_buying": insider_buys,
-        "magic_formula_top": magic_formula_top,
         "news": news,
         "cot": cot_with_theses,
         "correlation_flags": correlation_flags,

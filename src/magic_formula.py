@@ -15,9 +15,12 @@ yfinance върху НЕЗАВИСИМ референтен универс (conf
 на същите тикъри. Резултатът се кешира за деня в data/magic_formula_cache.json,
 за да не пресмятаме при всяко извикване.
 
-Convergence signal: ако тикър е едновременно в CANSLIM скринера И в Magic Formula
-топ N → маркер 'MF✓'. Два независими метода към един извод = по-силен сигнал.
-Не променя sizing — само визуален индикатор (Секция 3.1).
+Convergence signal (redesign 2026-07-15): кандидатите от CANSLIM скринера се
+ранкират ЗАЕДНО с референтния универс; попадналите в топ дециала по комбиниран
+Greenblatt ранг получават маркер 'MF✓' ("value confirmed") на самата карта.
+Самостоятелната дневна топ-10 секция е премахната — тя показваше несвързан
+списък, а обещаната конвергенция беше структурно невъзможна (виж
+FIXES_2026-07-15.md). Не променя sizing — само визуален индикатор (Секция 3.1).
 
 Graceful degradation (Секция 7): при всяка грешка връщаме празно множество и
 системата продължава без маркера.
@@ -129,12 +132,42 @@ def build_ranked(universe: list[str] | None = None, top_n: int | None = None) ->
     return ranked[:top_n]
 
 
-def top_set(universe: list[str] | None = None, top_n: int | None = None) -> set[str]:
-    """Множество от топ-N Magic Formula тикъри за бърза проверка."""
+def value_confirmed(candidate_tickers: list[str],
+                    decile: float | None = None) -> set[str]:
+    """
+    FIX 2026-07-15 · Redesign на конвергенцията.
+
+    Старият top_set() проверяваше дали кандидат е в топ-50 от статичен
+    74-именен универс — CANSLIM кандидатите (mid-caps в бази) структурно
+    не бяха там, така че MF✓ никога не се появяваше.
+
+    Новата посока е обратната: изчисляваме EY/ROC за САМИТЕ кандидати,
+    вкарваме ги в ранкирания референтен универс и връщаме тези, чийто
+    комбиниран Greenblatt ранг попада в топ дециала на общата извадка.
+    Празно множество = няма стойностно потвърждение днес (валиден резултат).
+    """
+    decile = decile or config.MF_CONFIRM_DECILE
     try:
-        return {r["ticker"] for r in build_ranked(universe, top_n)}
+        base = build_ranked(top_n=10 ** 9)          # целият ранкиран универс (дневен кеш)
+        if not base:
+            return set()
+        base_syms = {b["ticker"] for b in base}
+        cand = []
+        for sym in dict.fromkeys(candidate_tickers):    # уникални, запазен ред
+            if sym in base_syms:
+                continue                                # вече е в base с метрики
+            m = _metrics(sym)
+            if m:
+                cand.append(m)
+        pool = [dict(r) for r in base] + cand           # копия — не мутираме кеша
+        for key, rk in (("earnings_yield", "_ey"), ("roc", "_roc")):
+            for i, r in enumerate(sorted(pool, key=lambda x: x[key], reverse=True)):
+                r[rk] = i + 1
+        cutoff = max(1, int(len(pool) * decile))
+        top = sorted(pool, key=lambda r: r["_ey"] + r["_roc"])[:cutoff]
+        return {r["ticker"] for r in top} & set(candidate_tickers)
     except Exception as e:
-        print(f"[magic_formula] top_set: {e}")
+        print(f"[magic_formula] value_confirmed: {e}")
         return set()
 
 
