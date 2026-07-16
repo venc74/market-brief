@@ -1,5 +1,5 @@
 {
- "date": "2026-07-15",
+ "date": "2026-07-16",
  "rows": [
   {
    "ticker": "FISV",
@@ -49,27 +49,15 @@
   {
    "ticker": "ADSK",
    "company": "Autodesk, Inc.",
-   "total_value": 1371118.5999999999,
-   "cluster": true,
+   "total_value": 498543.6,
+   "cluster": false,
    "in_screener": false,
    "insiders": [
-    {
-     "name": "CAHILL JOHN T",
-     "title": "",
-     "date": "2026-06-23",
-     "value": 378400.0
-    },
     {
      "name": "Anagnost Andrew",
      "title": "President and CEO",
      "date": "2026-06-16",
      "value": 498543.6
-    },
-    {
-     "name": "Moorjani Janesh",
-     "title": "EVP, Chief Financial Officer",
-     "date": "2026-06-15",
-     "value": 494174.99999999994
     }
    ]
   },
@@ -92,9 +80,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 380,
+  "tickers_with_filings": 372,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 88,
-  "qualifying_after_filter": 10
+  "raw_transactions_parsed": 77,
+  "qualifying_after_filter": 8
  }
 }
