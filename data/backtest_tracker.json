@@ -233,13 +233,13 @@
  "CW_2026-07-07": {
   "ticker": "CW",
   "entry_date": "2026-07-07",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 800.0,
   "target_1": 936.86,
   "stop_loss": 731.57,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-07-16",
+  "realized_r": -1.0
  },
  "ADI_2026-06-19": {
   "ticker": "ADI",
@@ -270,6 +270,28 @@
   "entry_price": 189.82,
   "target_1": 252.84,
   "stop_loss": 158.31,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "GS_2026-07-16": {
+  "ticker": "GS",
+  "entry_date": "2026-07-16",
+  "status": "open",
+  "entry_price": 1153.99,
+  "target_1": 1442.01,
+  "stop_loss": 1009.98,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "BAC_2026-07-16": {
+  "ticker": "BAC",
+  "entry_date": "2026-07-16",
+  "status": "open",
+  "entry_price": 62.03,
+  "target_1": 77.89,
+  "stop_loss": 54.1,
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null

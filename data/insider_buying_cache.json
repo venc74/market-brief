@@ -1,51 +1,6 @@
 {
- "date": "2026-07-16",
+ "date": "2026-07-17",
  "rows": [
-  {
-   "ticker": "FISV",
-   "company": "FISERV INC",
-   "total_value": 1723401.25,
-   "cluster": true,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "Todd Paul M",
-     "title": "Chief Financial Officer",
-     "date": "2026-06-17",
-     "value": 499982.0
-    },
-    {
-     "name": "Mamilli Wafaa",
-     "title": "",
-     "date": "2026-06-17",
-     "value": 149746.40000000002
-    },
-    {
-     "name": "Rosman Adam L.",
-     "title": "Chief Admin. and Legal Officer",
-     "date": "2026-06-16",
-     "value": 500699.5
-    },
-    {
-     "name": "Nixon Gordon M.",
-     "title": "",
-     "date": "2026-06-16",
-     "value": 371775.0
-    },
-    {
-     "name": "DiSimone Harry",
-     "title": "",
-     "date": "2026-06-16",
-     "value": 101080.07999999999
-    },
-    {
-     "name": "Yarkoni Charlotte",
-     "title": "",
-     "date": "2026-06-16",
-     "value": 100118.27
-    }
-   ]
-  },
   {
    "ticker": "ADSK",
    "company": "Autodesk, Inc.",
@@ -80,9 +35,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 372,
+  "tickers_with_filings": 365,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 77,
-  "qualifying_after_filter": 8
+  "raw_transactions_parsed": 69,
+  "qualifying_after_filter": 2
  }
 }
