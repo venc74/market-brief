@@ -111,11 +111,35 @@ def options_info(sym: str, price: float) -> dict:
         puts["dist"] = (puts["strike"] - price).abs()
         atm_call = calls.nsmallest(1, "dist")
         atm_put = puts.nsmallest(1, "dist")
+        # FIX 2026-07-17: pre-market timing bug, не ликвидност на тикъра. Cron-ът
+        # тръгва ~05:30-06:30 UTC, US опциите отварят в 13:30 UTC — по това време
+        # bid/ask са и за двата 0.0 (борсата още не публикува live котировки),
+        # само lastPrice/volume от ВЧЕРАШНОТО затваряне остават. Yahoo смята
+        # impliedVolatility от bid/ask, не от lastPrice → без валидна котировка
+        # деградира в near-нулев placeholder (наблюдавано: 0.00001, 0.015625,
+        # 0.03125, 0.0625 — степени на 2, solver artifact, не пазарна стойност).
+        # Потвърдено емпирично за BAC/GS — идентичен pattern, независимо от
+        # реалната им (изключително висока) ликвидност. IV_SANITY_MIN_PCT
+        # прагът по-долу хваща само деградиралите стойности, паднали СЛУЧАЙНО
+        # под прага — съседни strikes от същия „развален“ chain дават 6.25%/
+        # 12.5%, над прага, но също толкова невалидни. Затова проверяваме bid/
+        # ask валидност на самия избран контракт, преди изобщо да му вярваме.
         ivs = []
+        no_live_quote = True
         for df in (atm_call, atm_put):
-            if len(df) and not math.isnan(df["impliedVolatility"].iloc[0]):
-                ivs.append(float(df["impliedVolatility"].iloc[0]))
+            if not len(df):
+                continue
+            row = df.iloc[0]
+            has_live_quote = (row.get("bid") or 0) > 0 or (row.get("ask") or 0) > 0
+            if has_live_quote:
+                no_live_quote = False
+                if not math.isnan(row["impliedVolatility"]):
+                    ivs.append(float(row["impliedVolatility"]))
         iv = round(sum(ivs) / len(ivs) * 100, 1) if ivs else None
+        # iv_reject_reason захранва специфично съобщение по-долу вместо генеричното
+        # "без надеждни IV данни" — потребителят вижда КОЯ от двете причини е (виж
+        # FIXES_2026-07-17.md за пълния контекст на pre-market bid/ask проблема).
+        iv_reject_reason = "no_live_quote" if (iv is None and no_live_quote) else None
         # FIX 2026-07-15: yfinance връща боклук близо до нулата от застояли
         # котировки (ALL: ATM IV "1.6%" — физически невъзможно за акция).
         # Под sanity прага IV се отхвърля, за да не замърсява IVR историята
@@ -124,6 +148,7 @@ def options_info(sym: str, price: float) -> dict:
             print(f"[enrich] options {sym}: ATM IV {iv}% < {config.IV_SANITY_MIN_PCT}% "
                   f"sanity праг — отхвърлен като невалиден")
             iv = None
+            iv_reject_reason = "sanity_floor"
         out["iv"] = iv
 
         # P/C по обем за тикъра
@@ -173,8 +198,18 @@ def options_info(sym: str, price: float) -> dict:
             n_hist = 0
         ivr_reliable = ivr is not None and n_hist >= config.IVR_MIN_DAYS_FOR_STRATEGY
         if iv is None:
-            out["strategy"], out["strategy_reason"] = "акции", \
-                "Без надеждни IV данни — стой в акциите."
+            if iv_reject_reason == "no_live_quote":
+                out["strategy"], out["strategy_reason"] = "акции", (
+                    "Опционните котировки още не са активни (pre-market, bid/ask=0) — "
+                    "IV данните ще са надеждни след отварянето на US пазара.")
+            elif iv_reject_reason == "sanity_floor":
+                out["strategy"], out["strategy_reason"] = "акции", (
+                    f"Изчисленото IV е под {config.IV_SANITY_MIN_PCT:.0f}% "
+                    "(физически неправдоподобно за тази акция) — вероятно застояла "
+                    "котировка, отхвърлено. Без надеждни IV данни — стой в акциите.")
+            else:
+                out["strategy"], out["strategy_reason"] = "акции", \
+                    "Без надеждни IV данни — стой в акциите."
         elif ivr_reliable and ivr <= 30:
             out["strategy"] = "long call / bull call spread"
             out["strategy_reason"] = (f"IVR {ivr:.0f} е нисък — опционният premium е евтин, "
