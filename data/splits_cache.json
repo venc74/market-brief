@@ -1,4 +1,25 @@
 {
- "date": "2026-07-17",
- "rows": []
+ "date": "2026-07-20",
+ "rows": [
+  {
+   "ticker": "SNEX",
+   "company": "StoneX Group Inc.",
+   "date": "2026-07-20",
+   "ratio": "1.5:1",
+   "split_type": "normal",
+   "date_human": "Jul 20, 2026",
+   "price": 68.64,
+   "market_cap": 8159733955.603088
+  },
+  {
+   "ticker": "WLFC",
+   "company": "Willis Lease Finance Corporation",
+   "date": "2026-07-21",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Jul 21, 2026",
+   "price": 191.65,
+   "market_cap": 1526801907.7756348
+  }
+ ]
 }

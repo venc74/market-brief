@@ -1,18 +1,24 @@
 {
- "date": "2026-07-17",
+ "date": "2026-07-20",
  "rows": [
   {
-   "ticker": "ADSK",
-   "company": "Autodesk, Inc.",
-   "total_value": 498543.6,
+   "ticker": "ELV",
+   "company": "Elevance Health, Inc.",
+   "total_value": 1002230.05,
    "cluster": false,
    "in_screener": false,
    "insiders": [
     {
-     "name": "Anagnost Andrew",
+     "name": "BOUDREAUX GAIL",
      "title": "President and CEO",
-     "date": "2026-06-16",
-     "value": 498543.6
+     "date": "2026-07-17",
+     "value": 753071.25
+    },
+    {
+     "name": "BOUDREAUX GAIL",
+     "title": "President and CEO",
+     "date": "2026-07-17",
+     "value": 249158.80000000002
     }
    ]
   },
@@ -35,9 +41,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 365,
+  "tickers_with_filings": 356,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 69,
-  "qualifying_after_filter": 2
+  "raw_transactions_parsed": 66,
+  "qualifying_after_filter": 3
  }
 }

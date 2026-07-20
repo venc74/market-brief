@@ -1,23 +1,23 @@
 {
- "date": "2026-07-17",
+ "date": "2026-07-20",
  "ranked": [
   {
    "ticker": "ADBE",
-   "earnings_yield": 0.0937,
+   "earnings_yield": 0.093,
    "roc": 0.1993,
    "name": "Adobe Inc.",
    "mf_rank": 18
   },
   {
    "ticker": "MU",
-   "earnings_yield": 0.0769,
+   "earnings_yield": 0.0773,
    "roc": 0.3487,
    "name": "Micron Technology, Inc.",
-   "mf_rank": 21
+   "mf_rank": 19
   },
   {
    "ticker": "BMY",
-   "earnings_yield": 0.1004,
+   "earnings_yield": 0.1001,
    "roc": 0.1069,
    "name": "Bristol-Myers Squibb Company",
    "mf_rank": 29
@@ -31,493 +31,479 @@
   },
   {
    "ticker": "LOW",
-   "earnings_yield": 0.0601,
+   "earnings_yield": 0.0616,
    "roc": 0.1279,
    "name": "Lowe's Companies, Inc.",
+   "mf_rank": 38
+  },
+  {
+   "ticker": "NFLX",
+   "earnings_yield": 0.0548,
+   "roc": 0.1608,
+   "name": "Netflix, Inc.",
    "mf_rank": 41
   },
   {
    "ticker": "META",
-   "earnings_yield": 0.0516,
+   "earnings_yield": 0.0531,
    "roc": 0.164,
    "name": "Meta Platforms, Inc.",
-   "mf_rank": 44
+   "mf_rank": 43
   },
   {
    "ticker": "PEP",
-   "earnings_yield": 0.0706,
-   "roc": 0.0888,
+   "earnings_yield": 0.071,
+   "roc": 0.0893,
    "name": "Pepsico, Inc.",
-   "mf_rank": 45
+   "mf_rank": 43
   },
   {
-   "ticker": "QCOM",
-   "earnings_yield": 0.053,
-   "roc": 0.1269,
-   "name": "QUALCOMM Incorporated",
-   "mf_rank": 49
+   "ticker": "NKE",
+   "earnings_yield": 0.0879,
+   "roc": 0.0697,
+   "name": "Nike, Inc.",
+   "mf_rank": 46
   },
   {
    "ticker": "PFE",
-   "earnings_yield": 0.1025,
+   "earnings_yield": 0.1028,
    "roc": 0.0569,
    "name": "Pfizer, Inc.",
-   "mf_rank": 49
+   "mf_rank": 48
   },
   {
    "ticker": "MA",
-   "earnings_yield": 0.0415,
+   "earnings_yield": 0.042,
    "roc": 0.2503,
    "name": "Mastercard Incorporated",
-   "mf_rank": 50
+   "mf_rank": 49
   },
   {
    "ticker": "MSFT",
-   "earnings_yield": 0.0487,
+   "earnings_yield": 0.0496,
    "roc": 0.1481,
    "name": "Microsoft Corporation",
-   "mf_rank": 51
+   "mf_rank": 50
   },
   {
    "ticker": "MCD",
-   "earnings_yield": 0.049,
+   "earnings_yield": 0.0498,
    "roc": 0.1356,
    "name": "McDonald's Corporation",
-   "mf_rank": 51
+   "mf_rank": 50
   },
   {
-   "ticker": "NFLX",
-   "earnings_yield": 0.0477,
-   "roc": 0.154,
-   "name": "Netflix, Inc.",
+   "ticker": "QCOM",
+   "earnings_yield": 0.0526,
+   "roc": 0.1269,
+   "name": "QUALCOMM Incorporated",
    "mf_rank": 51
   },
   {
    "ticker": "V",
-   "earnings_yield": 0.0415,
+   "earnings_yield": 0.0422,
    "roc": 0.1919,
    "name": "Visa Inc.",
-   "mf_rank": 52
-  },
-  {
-   "ticker": "NKE",
-   "earnings_yield": 0.0814,
-   "roc": 0.0633,
-   "name": "Nike, Inc.",
-   "mf_rank": 53
+   "mf_rank": 51
   },
   {
    "ticker": "NVDA",
-   "earnings_yield": 0.0334,
+   "earnings_yield": 0.0342,
    "roc": 0.5273,
    "name": "NVIDIA Corporation",
+   "mf_rank": 52
+  },
+  {
+   "ticker": "PYPL",
+   "earnings_yield": 0.1161,
+   "roc": 0.0474,
+   "name": "PayPal Holdings, Inc.",
    "mf_rank": 54
   },
   {
    "ticker": "COP",
-   "earnings_yield": 0.0848,
+   "earnings_yield": 0.0835,
    "roc": 0.0587,
    "name": "ConocoPhillips",
    "mf_rank": 54
   },
   {
-   "ticker": "PYPL",
-   "earnings_yield": 0.1158,
-   "roc": 0.0474,
-   "name": "PayPal Holdings, Inc.",
-   "mf_rank": 55
+   "ticker": "HON",
+   "earnings_yield": 0.0809,
+   "roc": 0.0595,
+   "name": "Honeywell International Inc.",
+   "mf_rank": 54
   },
   {
    "ticker": "PG",
-   "earnings_yield": 0.0528,
+   "earnings_yield": 0.0533,
    "roc": 0.1093,
    "name": "Procter & Gamble Company (The)",
+   "mf_rank": 54
+  },
+  {
+   "ticker": "FDX",
+   "earnings_yield": 0.1003,
+   "roc": 0.0503,
+   "name": "FedEx Corporation",
+   "mf_rank": 54
+  },
+  {
+   "ticker": "HD",
+   "earnings_yield": 0.0497,
+   "roc": 0.1252,
+   "name": "Home Depot, Inc. (The)",
    "mf_rank": 55
   },
   {
-   "ticker": "HON",
-   "earnings_yield": 0.0806,
-   "roc": 0.0595,
-   "name": "Honeywell International Inc.",
-   "mf_rank": 56
-  },
-  {
    "ticker": "LMT",
-   "earnings_yield": 0.0602,
+   "earnings_yield": 0.0607,
    "roc": 0.0723,
    "name": "Lockheed Martin Corporation",
    "mf_rank": 56
   },
   {
-   "ticker": "FDX",
-   "earnings_yield": 0.0991,
-   "roc": 0.0503,
-   "name": "FedEx Corporation",
+   "ticker": "VZ",
+   "earnings_yield": 0.0932,
+   "roc": 0.0508,
+   "name": "Verizon Communications Inc.",
    "mf_rank": 56
   },
   {
-   "ticker": "HD",
-   "earnings_yield": 0.0486,
-   "roc": 0.1252,
-   "name": "Home Depot, Inc. (The)",
-   "mf_rank": 58
+   "ticker": "LLY",
+   "earnings_yield": 0.0327,
+   "roc": 0.2074,
+   "name": "Eli Lilly and Company",
+   "mf_rank": 59
   },
   {
    "ticker": "NOC",
-   "earnings_yield": 0.0556,
+   "earnings_yield": 0.0553,
    "roc": 0.0736,
    "name": "Northrop Grumman Corporation",
    "mf_rank": 59
   },
   {
-   "ticker": "VZ",
-   "earnings_yield": 0.0929,
-   "roc": 0.0508,
-   "name": "Verizon Communications Inc.",
-   "mf_rank": 59
-  },
-  {
    "ticker": "VST",
-   "earnings_yield": 0.07,
+   "earnings_yield": 0.0691,
    "roc": 0.0602,
    "name": "Vistra Corp.",
    "mf_rank": 59
   },
   {
-   "ticker": "LLY",
-   "earnings_yield": 0.033,
-   "roc": 0.2074,
-   "name": "Eli Lilly and Company",
-   "mf_rank": 62
-  },
-  {
    "ticker": "CMCSA",
-   "earnings_yield": 0.096,
+   "earnings_yield": 0.0966,
    "roc": 0.0454,
    "name": "Comcast Corporation",
-   "mf_rank": 62
+   "mf_rank": 60
   },
   {
    "ticker": "AAPL",
-   "earnings_yield": 0.0297,
+   "earnings_yield": 0.0296,
    "roc": 0.2623,
    "name": "Apple Inc.",
-   "mf_rank": 63
+   "mf_rank": 61
   },
   {
    "ticker": "GOOGL",
-   "earnings_yield": 0.0358,
+   "earnings_yield": 0.0366,
    "roc": 0.1464,
    "name": "Alphabet Inc.",
-   "mf_rank": 63
+   "mf_rank": 62
   },
   {
    "ticker": "TMUS",
-   "earnings_yield": 0.0664,
+   "earnings_yield": 0.0665,
    "roc": 0.0587,
    "name": "T-Mobile US, Inc.",
-   "mf_rank": 64
+   "mf_rank": 63
   },
   {
    "ticker": "SLB",
-   "earnings_yield": 0.0553,
+   "earnings_yield": 0.0554,
    "roc": 0.0647,
    "name": "SLB Limited",
-   "mf_rank": 66
+   "mf_rank": 65
   },
   {
    "ticker": "KO",
-   "earnings_yield": 0.0434,
+   "earnings_yield": 0.045,
    "roc": 0.0951,
    "name": "Coca-Cola Company (The)",
+   "mf_rank": 66
+  },
+  {
+   "ticker": "WFC",
+   "earnings_yield": 0.343,
+   "roc": 0.0108,
+   "name": "Wells Fargo & Company",
    "mf_rank": 67
   },
   {
+   "ticker": "JPM",
+   "earnings_yield": 0.2117,
+   "roc": 0.0136,
+   "name": "JP Morgan Chase & Co.",
+   "mf_rank": 68
+  },
+  {
    "ticker": "TGT",
-   "earnings_yield": 0.0605,
+   "earnings_yield": 0.0608,
    "roc": 0.0568,
    "name": "Target Corporation",
    "mf_rank": 68
   },
   {
-   "ticker": "JPM",
-   "earnings_yield": 0.2091,
-   "roc": 0.0136,
-   "name": "JP Morgan Chase & Co.",
-   "mf_rank": 69
-  },
-  {
-   "ticker": "WFC",
-   "earnings_yield": 0.3366,
-   "roc": 0.0108,
-   "name": "Wells Fargo & Company",
-   "mf_rank": 69
-  },
-  {
    "ticker": "T",
-   "earnings_yield": 0.0895,
+   "earnings_yield": 0.0899,
    "roc": 0.0412,
    "name": "AT&T Inc.",
-   "mf_rank": 69
+   "mf_rank": 68
+  },
+  {
+   "ticker": "BAC",
+   "earnings_yield": 0.2506,
+   "roc": 0.0097,
+   "name": "Bank of America Corporation",
+   "mf_rank": 70
+  },
+  {
+   "ticker": "UNH",
+   "earnings_yield": 0.0748,
+   "roc": 0.0438,
+   "name": "UnitedHealth Group Incorporated",
+   "mf_rank": 70
   },
   {
    "ticker": "ABBV",
    "earnings_yield": 0.0394,
    "roc": 0.1003,
    "name": "AbbVie Inc.",
-   "mf_rank": 71
-  },
-  {
-   "ticker": "ORCL",
-   "earnings_yield": 0.0489,
-   "roc": 0.065,
-   "name": "Oracle Corporation",
-   "mf_rank": 72
-  },
-  {
-   "ticker": "BAC",
-   "earnings_yield": 0.2484,
-   "roc": 0.0097,
-   "name": "Bank of America Corporation",
-   "mf_rank": 72
+   "mf_rank": 70
   },
   {
    "ticker": "GS",
-   "earnings_yield": 0.1767,
+   "earnings_yield": 0.1872,
    "roc": 0.0107,
    "name": "Goldman Sachs Group, Inc. (The)",
-   "mf_rank": 73
-  },
-  {
-   "ticker": "MS",
-   "earnings_yield": 0.1039,
-   "roc": 0.0127,
-   "name": "Morgan Stanley",
-   "mf_rank": 73
+   "mf_rank": 71
   },
   {
    "ticker": "GM",
-   "earnings_yield": 0.0979,
+   "earnings_yield": 0.0988,
    "roc": 0.0269,
    "name": "General Motors Company",
+   "mf_rank": 71
+  },
+  {
+   "ticker": "DIS",
+   "earnings_yield": 0.0692,
+   "roc": 0.0445,
+   "name": "Walt Disney Company (The)",
+   "mf_rank": 72
+  },
+  {
+   "ticker": "UPS",
+   "earnings_yield": 0.0455,
+   "roc": 0.0719,
+   "name": "United Parcel Service, Inc.",
    "mf_rank": 73
   },
   {
    "ticker": "CRM",
-   "earnings_yield": 0.0542,
+   "earnings_yield": 0.0547,
    "roc": 0.057,
    "name": "Salesforce, Inc.",
    "mf_rank": 74
   },
   {
-   "ticker": "UPS",
-   "earnings_yield": 0.0456,
-   "roc": 0.0719,
-   "name": "United Parcel Service, Inc.",
+   "ticker": "AMAT",
+   "earnings_yield": 0.0221,
+   "roc": 0.1486,
+   "name": "Applied Materials, Inc.",
    "mf_rank": 74
   },
   {
-   "ticker": "UNH",
-   "earnings_yield": 0.0833,
-   "roc": 0.0378,
-   "name": "UnitedHealth Group Incorporated",
+   "ticker": "ORCL",
+   "earnings_yield": 0.0483,
+   "roc": 0.065,
+   "name": "Oracle Corporation",
    "mf_rank": 75
-  },
-  {
-   "ticker": "DIS",
-   "earnings_yield": 0.0681,
-   "roc": 0.0445,
-   "name": "Walt Disney Company (The)",
-   "mf_rank": 75
-  },
-  {
-   "ticker": "AMAT",
-   "earnings_yield": 0.0208,
-   "roc": 0.1486,
-   "name": "Applied Materials, Inc.",
-   "mf_rank": 76
   },
   {
    "ticker": "TXN",
-   "earnings_yield": 0.0255,
+   "earnings_yield": 0.0261,
    "roc": 0.1216,
    "name": "Texas Instruments Incorporated",
-   "mf_rank": 81
+   "mf_rank": 79
   },
   {
    "ticker": "CSCO",
-   "earnings_yield": 0.0338,
+   "earnings_yield": 0.0332,
    "roc": 0.0734,
    "name": "Cisco Systems, Inc.",
-   "mf_rank": 81
+   "mf_rank": 82
   },
   {
    "ticker": "CEG",
-   "earnings_yield": 0.0578,
+   "earnings_yield": 0.0577,
    "roc": 0.042,
    "name": "Constellation Energy Corporatio",
    "mf_rank": 82
   },
   {
    "ticker": "AVGO",
-   "earnings_yield": 0.0202,
+   "earnings_yield": 0.0204,
    "roc": 0.1212,
    "name": "Broadcom Inc.",
-   "mf_rank": 86
+   "mf_rank": 84
   },
   {
    "ticker": "AXP",
-   "earnings_yield": 0.0577,
+   "earnings_yield": 0.0587,
    "roc": 0.038,
    "name": "American Express Company",
-   "mf_rank": 87
+   "mf_rank": 85
   },
   {
    "ticker": "CAT",
-   "earnings_yield": 0.029,
+   "earnings_yield": 0.0289,
    "roc": 0.0852,
    "name": "Caterpillar, Inc.",
-   "mf_rank": 87
+   "mf_rank": 85
   },
   {
    "ticker": "COST",
-   "earnings_yield": 0.0258,
+   "earnings_yield": 0.0259,
    "roc": 0.0867,
    "name": "Costco Wholesale Corporation",
    "mf_rank": 87
   },
   {
    "ticker": "WMT",
-   "earnings_yield": 0.031,
+   "earnings_yield": 0.0312,
    "roc": 0.0683,
    "name": "Walmart Inc.",
-   "mf_rank": 91
+   "mf_rank": 90
   },
   {
    "ticker": "SBUX",
-   "earnings_yield": 0.0221,
+   "earnings_yield": 0.0227,
    "roc": 0.0738,
    "name": "Starbucks Corporation",
-   "mf_rank": 92
+   "mf_rank": 90
   },
   {
    "ticker": "IBM",
-   "earnings_yield": 0.036,
+   "earnings_yield": 0.0369,
    "roc": 0.0539,
    "name": "International Business Machines",
-   "mf_rank": 95
-  },
-  {
-   "ticker": "ABT",
-   "earnings_yield": 0.0332,
-   "roc": 0.0559,
-   "name": "Abbott Laboratories",
-   "mf_rank": 99
-  },
-  {
-   "ticker": "OXY",
-   "earnings_yield": 0.0499,
-   "roc": 0.025,
-   "name": "Occidental Petroleum Corporatio",
-   "mf_rank": 101
-  },
-  {
-   "ticker": "TMO",
-   "earnings_yield": 0.0334,
-   "roc": 0.05,
-   "name": "Thermo Fisher Scientific Inc",
-   "mf_rank": 102
+   "mf_rank": 93
   },
   {
    "ticker": "F",
    "earnings_yield": 0.0561,
    "roc": 0.0034,
    "name": "Ford Motor Company",
-   "mf_rank": 102
+   "mf_rank": 99
+  },
+  {
+   "ticker": "TMO",
+   "earnings_yield": 0.034,
+   "roc": 0.05,
+   "name": "Thermo Fisher Scientific Inc",
+   "mf_rank": 100
+  },
+  {
+   "ticker": "OXY",
+   "earnings_yield": 0.0491,
+   "roc": 0.025,
+   "name": "Occidental Petroleum Corporatio",
+   "mf_rank": 103
   },
   {
    "ticker": "DE",
-   "earnings_yield": 0.0411,
+   "earnings_yield": 0.0412,
    "roc": 0.0383,
    "name": "Deere & Company",
-   "mf_rank": 104
+   "mf_rank": 103
   },
   {
    "ticker": "RTX",
-   "earnings_yield": 0.0403,
+   "earnings_yield": 0.0405,
    "roc": 0.0405,
    "name": "RTX Corporation",
-   "mf_rank": 104
-  },
-  {
-   "ticker": "LNG",
-   "earnings_yield": -0.1302,
-   "roc": 0.0643,
-   "name": "Cheniere Energy, Inc.",
-   "mf_rank": 109
-  },
-  {
-   "ticker": "XOM",
-   "earnings_yield": 0.0318,
-   "roc": 0.0422,
-   "name": "ExxonMobil Holdings Corporation",
-   "mf_rank": 111
+   "mf_rank": 103
   },
   {
    "ticker": "GE",
-   "earnings_yield": 0.0252,
-   "roc": 0.0485,
+   "earnings_yield": 0.028,
+   "roc": 0.0507,
    "name": "GE Aerospace",
-   "mf_rank": 113
+   "mf_rank": 106
+  },
+  {
+   "ticker": "LNG",
+   "earnings_yield": -0.1291,
+   "roc": 0.0643,
+   "name": "Cheniere Energy, Inc.",
+   "mf_rank": 108
+  },
+  {
+   "ticker": "XOM",
+   "earnings_yield": 0.0316,
+   "roc": 0.0422,
+   "name": "ExxonMobil Holdings Corporation",
+   "mf_rank": 109
   },
   {
    "ticker": "CVX",
-   "earnings_yield": 0.0332,
+   "earnings_yield": 0.0326,
    "roc": 0.0346,
    "name": "Chevron Corporation",
-   "mf_rank": 118
+   "mf_rank": 116
   },
   {
    "ticker": "CCJ",
-   "earnings_yield": 0.017,
+   "earnings_yield": 0.0173,
    "roc": 0.0357,
    "name": "Cameco Corporation",
-   "mf_rank": 129
+   "mf_rank": 126
   },
   {
    "ticker": "AMD",
    "earnings_yield": 0.0067,
    "roc": 0.0365,
    "name": "Advanced Micro Devices, Inc.",
-   "mf_rank": 132
+   "mf_rank": 129
   },
   {
    "ticker": "MCHP",
-   "earnings_yield": 0.0162,
+   "earnings_yield": 0.0163,
    "roc": 0.0223,
    "name": "Microchip Technology Incorporat",
-   "mf_rank": 134
+   "mf_rank": 131
   },
   {
    "ticker": "INTC",
-   "earnings_yield": 0.0072,
+   "earnings_yield": 0.0073,
    "roc": 0.0063,
    "name": "Intel Corporation",
-   "mf_rank": 142
+   "mf_rank": 138
   },
   {
    "ticker": "BA",
    "earnings_yield": 0.008,
    "roc": -0.0207,
    "name": "Boeing Company (The)",
-   "mf_rank": 144
+   "mf_rank": 140
   },
   {
    "ticker": "BTU",
-   "earnings_yield": -0.0669,
+   "earnings_yield": -0.0674,
    "roc": -0.0072,
    "name": "Peabody Energy Corporation",
-   "mf_rank": 146
+   "mf_rank": 142
   }
  ]
 }
