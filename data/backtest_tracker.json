@@ -295,5 +295,27 @@
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null
+ },
+ "CAT_2026-06-19": {
+  "ticker": "CAT",
+  "entry_date": "2026-06-19",
+  "status": "stopped",
+  "entry_price": 994.49,
+  "target_1": 1255.47,
+  "stop_loss": 864.0,
+  "target1_hit_date": null,
+  "resolution_date": "2026-07-17",
+  "realized_r": -1.0
+ },
+ "FITB_2026-07-20": {
+  "ticker": "FITB",
+  "entry_date": "2026-07-20",
+  "status": "open",
+  "entry_price": 59.5,
+  "target_1": 74.5,
+  "stop_loss": 52.0,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
  }
 }
