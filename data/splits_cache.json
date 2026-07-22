@@ -1,5 +1,5 @@
 {
- "date": "2026-07-21",
+ "date": "2026-07-22",
  "rows": [
   {
    "ticker": "SNEX",
@@ -8,8 +8,18 @@
    "ratio": "1.5:1",
    "split_type": "normal",
    "date_human": "Jul 20, 2026",
-   "price": 70.71,
-   "market_cap": 8405809814.404633
+   "price": 74.55,
+   "market_cap": 8862298902.984558
+  },
+  {
+   "ticker": "CLBK",
+   "company": "Columbia Financial, Inc.",
+   "date": "2026-07-21",
+   "ratio": "2.2:1",
+   "split_type": "normal",
+   "date_human": "Jul 21, 2026",
+   "price": 11.08,
+   "market_cap": 1152965235.8609867
   },
   {
    "ticker": "WLFC",
@@ -18,8 +28,8 @@
    "ratio": "3:1",
    "split_type": "normal",
    "date_human": "Jul 21, 2026",
-   "price": 63.21,
-   "market_cap": 1510629687.0205078
+   "price": 65.35,
+   "market_cap": 1561855066.8
   }
  ]
 }
