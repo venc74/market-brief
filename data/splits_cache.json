@@ -1,35 +1,4 @@
 {
- "date": "2026-07-24",
- "rows": [
-  {
-   "ticker": "SNEX",
-   "company": "StoneX Group Inc.",
-   "date": "2026-07-20",
-   "ratio": "1.5:1",
-   "split_type": "normal",
-   "date_human": "Jul 20, 2026",
-   "price": 74.86,
-   "market_cap": 8899150558.396912
-  },
-  {
-   "ticker": "CLBK",
-   "company": "Columbia Financial, Inc.",
-   "date": "2026-07-21",
-   "ratio": "2.2:1",
-   "split_type": "normal",
-   "date_human": "Jul 21, 2026",
-   "price": 11.01,
-   "market_cap": 1145681191.1670399
-  },
-  {
-   "ticker": "WLFC",
-   "company": "Willis Lease Finance Corporation",
-   "date": "2026-07-21",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Jul 21, 2026",
-   "price": 67.49,
-   "market_cap": 1613000690.4644165
-  }
- ]
+ "date": "2026-07-27",
+ "rows": []
 }
