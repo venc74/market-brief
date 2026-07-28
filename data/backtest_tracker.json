@@ -328,5 +328,16 @@
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null
+ },
+ "HWM_2026-07-27": {
+  "ticker": "HWM",
+  "entry_date": "2026-07-27",
+  "status": "open",
+  "entry_price": 293.0,
+  "target_1": 349.3,
+  "stop_loss": 264.85,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
  }
 }
