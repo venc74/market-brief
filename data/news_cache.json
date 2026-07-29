@@ -1,37 +1,37 @@
 {
- "date": "2026-07-28",
+ "date": "2026-07-29",
  "news": [
   {
-   "headline": "U.S. stock futures slip, South Korea's Kospi plunges 10%",
-   "why": "Масивен risk-off в Азия сигнализира потенциално заразяване към западните пазари в началото на седмицата с Fed среща и megacap earnings."
+   "headline": "Iran launches surprise ballistic missile attack on U.S. forces in the Middle East",
+   "why": "Пряка геополитическа ескалация, която вдига risk premium и натиска фючърсите надолу."
   },
   {
-   "headline": "SK Hynix shares plunge 13% in Seoul as chip sell-off deepens",
-   "why": "Секторен сигнал за semiconductor-ите — разпродажбата в чипмейкърите може да натисне Nasdaq и SOX index в американската сесия."
+   "headline": "Oil jumps as U.S.-Iran resume strikes after a brief pause",
+   "why": "Петролът скача рязко при подновено напрежение — директен импакт върху енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "AI stock sell-off deepens as investors dump chipmakers",
-   "why": "Широкото разпродаване на AI/chip акции в Азия поставя под въпрос оценките на целия сектор преди megacap earnings тази седмица."
+   "headline": "S&P 500 futures edge lower as oil climbs; South Korea stocks fall 8% amid chip rout",
+   "why": "Широката разпродажба в Азия и падащите фючърси сигнализират негативен старт за американските пазари."
   },
   {
-   "headline": "Trump backs 'fantastic' Warsh while calling for lower rates",
-   "why": "Политически натиск върху Fed точно преди заседанието — пазарите ще следят дали Warsh ще сигнализира dovish завой или ще устои на независимостта на централната банка."
+   "headline": "Asian technology stocks extend sell-off with SoftBank down 10% as AI plays take a hit",
+   "why": "Продължаващата разпродажба в AI/tech акции в Азия засяга настроенията към Nasdaq и технологичния сектор глобално."
   },
   {
-   "headline": "From 'oil' to 'shock', here's what Kalshi traders expect Fed Chairman Kevin Warsh will say this week",
-   "why": "Пазарните очаквания за тона на Fed press conference са ключов катализатор за rate-sensitive активи и общата посока на пазара тази седмица."
+   "headline": "SK Hynix shares tank as exponential earnings growth fails to satisfy AI-charged expectations",
+   "why": "Разочароващите резултати на SK Hynix сриват chip сектора и поставят под въпрос оценките на AI-свързани компании като Nvidia."
   },
   {
-   "headline": "Oil extends losses as a pause in U.S.-Iran hostilities raises de-escalation hopes",
-   "why": "Спадът в петрола при де-ескалация на конфликта сваля инфлационния риск и влияе директно на energy сектора и очакванията за PCE/CPI."
+   "headline": "Hedge funds face demands to stump up collateral as AI stocks tumble",
+   "why": "Margin calls при хедж фондовете усилват принудителното разпродаване и повишават волатилността на пазара."
   },
   {
-   "headline": "Big Tech credit risks rise sharply as AI spending soars",
-   "why": "Нарастващото корпоративно задлъжняване за AI инфраструктура повишава кредитния риск на megacap компаниите точно преди ключови earnings отчети."
+   "headline": "Amazon, Meta and Microsoft face skeptical investors this week after Google report sparked sell-off",
+   "why": "Мегакап tech earnings тази седмица са ключов катализатор — негативна реакция може да задълбочи корекцията в сектора."
   },
   {
-   "headline": "Nvidia behind $50bn lease on Texas data centre that will use its chips",
-   "why": "Nvidia залага собствен баланс за стимулиране на AI demand — circular financing модел с потенциални системни рискове за оценките в сектора."
+   "headline": "US poised to impose new Russia sanctions package",
+   "why": "Нови санкции срещу Русия могат да повлияят на енергийните доставки и да движат цените на суровини като петрол и газ."
   }
  ]
 }
