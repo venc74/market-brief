@@ -277,13 +277,13 @@
  "GS_2026-07-16": {
   "ticker": "GS",
   "entry_date": "2026-07-16",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 1153.99,
   "target_1": 1442.01,
   "stop_loss": 1009.98,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-07-29",
+  "realized_r": -1.0
  },
  "BAC_2026-07-16": {
   "ticker": "BAC",

@@ -1,37 +1,37 @@
 {
- "date": "2026-07-29",
+ "date": "2026-07-30",
  "news": [
   {
-   "headline": "Iran launches surprise ballistic missile attack on U.S. forces in the Middle East",
-   "why": "Пряка геополитическа ескалация, която вдига risk premium и натиска фючърсите надолу."
+   "headline": "U.S. launches strikes on Iran after surprise missile attack, dashing hopes of de-escalation",
+   "why": "Директен военен конфликт между САЩ и Иран е най-силният risk-off катализатор — удря петрола, злато, Treasury yields и широките индекси едновременно."
   },
   {
-   "headline": "Oil jumps as U.S.-Iran resume strikes after a brief pause",
-   "why": "Петролът скача рязко при подновено напрежение — директен импакт върху енергийния сектор и инфлационните очаквания."
+   "headline": "US borrowing costs hit 19-year high as Fed defies inflation fears",
+   "why": "19-годишен връх при borrowing costs след решението на Fed да задържи лихвите сигнализира загуба на доверие в централната банка и натиск върху дългосрочните yields."
   },
   {
-   "headline": "S&P 500 futures edge lower as oil climbs; South Korea stocks fall 8% amid chip rout",
-   "why": "Широката разпродажба в Азия и падащите фючърси сигнализират негативен старт за американските пазари."
+   "headline": "Analysis: Fed Chairman Warsh's credibility in question after leaving interest rates unchanged",
+   "why": "Пазарите ценообразуват по-висока инфлационна премия, ако се съмняват, че Fed ще действа — това е директен натиск върху bonds и growth акции."
   },
   {
-   "headline": "Asian technology stocks extend sell-off with SoftBank down 10% as AI plays take a hit",
-   "why": "Продължаващата разпродажба в AI/tech акции в Азия засяга настроенията към Nasdaq и технологичния сектор глобално."
+   "headline": "The Strait of Hormuz is just one trade chokepoint facing a new era of maritime warfare",
+   "why": "Блокиране или смущения в Ормузкия проток директно засяга петролните доставки и shipping разходи, с веднага видим ефект върху crude и energy сектора."
   },
   {
-   "headline": "SK Hynix shares tank as exponential earnings growth fails to satisfy AI-charged expectations",
-   "why": "Разочароващите резултати на SK Hynix сриват chip сектора и поставят под въпрос оценките на AI-свързани компании като Nvidia."
+   "headline": "Microsoft jumps 8% as it boosts capital spending plans, citing demand",
+   "why": "Microsoft е bellwether за mega-cap tech и AI capex цикъла — силните резултати и guidance-ът му движат фючърсите и настроението в целия tech сектор."
   },
   {
-   "headline": "Hedge funds face demands to stump up collateral as AI stocks tumble",
-   "why": "Margin calls при хедж фондовете усилват принудителното разпродаване и повишават волатилността на пазара."
+   "headline": "Meta shares tumble as Zuckerberg tries to sell his vision for AI 'agents'",
+   "why": "Разочароващите приходни прогнози и растящите разходи на Meta засягат sentiment-а към AI capex играчите и широкия Nasdaq."
   },
   {
-   "headline": "Amazon, Meta and Microsoft face skeptical investors this week after Google report sparked sell-off",
-   "why": "Мегакап tech earnings тази седмица са ключов катализатор — негативна реакция може да задълбочи корекцията в сектора."
+   "headline": "Samsung Electronics Q2 operating profit beats estimates on soaring AI chip demand",
+   "why": "Samsung потвърждава силното търсене на AI чипове, което е bullish сигнал за целия semiconductor сектор и свързаните ETF-и."
   },
   {
-   "headline": "US poised to impose new Russia sanctions package",
-   "why": "Нови санкции срещу Русия могат да повлияят на енергийните доставки и да движат цените на суровини като петрол и газ."
+   "headline": "Hedge funds raise bets against US-backed critical minerals companies",
+   "why": "Нарастващите short позиции срещу critical minerals компании сигнализират прекомерна оценка в сектора и потенциална корекция при materials акциите."
   }
  ]
 }
