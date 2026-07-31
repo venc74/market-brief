@@ -167,13 +167,13 @@
  "TRV_2026-06-29": {
   "ticker": "TRV",
   "entry_date": "2026-06-29",
-  "status": "trailing",
+  "status": "trailing_stop_exit",
   "entry_price": 327.64,
   "target_1": 384.84,
   "stop_loss": 299.04,
   "target1_hit_date": "2026-07-24",
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-07-30",
+  "realized_r": 1.69
  },
  "ALL_2026-06-29": {
   "ticker": "ALL",
@@ -189,13 +189,13 @@
  "WWD_2026-06-29": {
   "ticker": "WWD",
   "entry_date": "2026-06-29",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 450.92,
   "target_1": 608.9,
   "stop_loss": 371.93,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-07-30",
+  "realized_r": -1.0
  },
  "WTS_2026-07-01": {
   "ticker": "WTS",
@@ -336,6 +336,28 @@
   "entry_price": 293.0,
   "target_1": 349.3,
   "stop_loss": 264.85,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "ROST_2026-07-30": {
+  "ticker": "ROST",
+  "entry_date": "2026-07-30",
+  "status": "open",
+  "entry_price": 255.3,
+  "target_1": 315.24,
+  "stop_loss": 225.33,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "realized_r": null
+ },
+ "ONB_2026-07-30": {
+  "ticker": "ONB",
+  "entry_date": "2026-07-30",
+  "status": "open",
+  "entry_price": 27.32,
+  "target_1": 32.06,
+  "stop_loss": 24.95,
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null

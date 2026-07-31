@@ -1,37 +1,37 @@
 {
- "date": "2026-07-30",
+ "date": "2026-07-31",
  "news": [
   {
-   "headline": "U.S. launches strikes on Iran after surprise missile attack, dashing hopes of de-escalation",
-   "why": "Директен военен конфликт между САЩ и Иран е най-силният risk-off катализатор — удря петрола, злато, Treasury yields и широките индекси едновременно."
+   "headline": "Oil prices ease as recovering Hormuz Strait traffic tempers war premium",
+   "why": "Нормализирането на трафика през Ормузкия проток намалява геополитическата рискова премия в петрола, което влияе директно на енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "US borrowing costs hit 19-year high as Fed defies inflation fears",
-   "why": "19-годишен връх при borrowing costs след решението на Fed да задържи лихвите сигнализира загуба на доверие в централната банка и натиск върху дългосрочните yields."
+   "headline": "BOJ holds rates at 1%, warns of core inflation exceeding 2% target",
+   "why": "Решението на BOJ и сигналите за по-бързо затягане движат JPY и глобалните bond пазари, с директно отражение върху carry trades и азиатските активи."
   },
   {
-   "headline": "Analysis: Fed Chairman Warsh's credibility in question after leaving interest rates unchanged",
-   "why": "Пазарите ценообразуват по-висока инфлационна премия, ако се съмняват, че Fed ще действа — това е директен натиск върху bonds и growth акции."
+   "headline": "Asian stocks rebound and yen jumps on signs of intervention",
+   "why": "Рязкото движение на JPY и рекордният отскок на Kospi сигнализират за масивно преразпределение на капитали в азиатския регион с глобален ефект върху рисковите активи."
   },
   {
-   "headline": "The Strait of Hormuz is just one trade chokepoint facing a new era of maritime warfare",
-   "why": "Блокиране или смущения в Ормузкия проток директно засяга петролните доставки и shipping разходи, с веднага видим ефект върху crude и energy сектора."
+   "headline": "SK Hynix shares surge 25%, while Samsung soars over 20% as AI rally roars back",
+   "why": "Взривният ръст на memory chip производителите потвърждава завръщането на AI rally-то и е водещ индикатор за посоката на полупроводниковия сектор глобално."
   },
   {
-   "headline": "Microsoft jumps 8% as it boosts capital spending plans, citing demand",
-   "why": "Microsoft е bellwether за mega-cap tech и AI capex цикъла — силните резултати и guidance-ът му движат фючърсите и настроението в целия tech сектор."
+   "headline": "Big Tech AI spending spree tops $1tn",
+   "why": "Капиталовите разходи на Google, Amazon, Microsoft и Meta над $1 трилион задвижват търсенето на semiconductors, енергия и инфраструктура с мащабен секторен ефект."
   },
   {
-   "headline": "Meta shares tumble as Zuckerberg tries to sell his vision for AI 'agents'",
-   "why": "Разочароващите приходни прогнози и растящите разходи на Meta засягат sentiment-а към AI capex играчите и широкия Nasdaq."
+   "headline": "Apple earnings takeaways: Weak forecast, supply concerns overshadow sales beat",
+   "why": "Слабата прогноза и притесненията за supply chain на Apple натискат акцията в следпазарната сесия и дават тон за по-широкото tech настроение."
   },
   {
-   "headline": "Samsung Electronics Q2 operating profit beats estimates on soaring AI chip demand",
-   "why": "Samsung потвърждава силното търсене на AI чипове, което е bullish сигнал за целия semiconductor сектор и свързаните ETF-и."
+   "headline": "China's U.S.-bound shipments fall in July after brief recovery, survey shows",
+   "why": "Спадът в китайския износ към САЩ и забавената фабрична активност са ранен макро сигнал за ефекта на митата върху глобалната търговия и корпоративните вериги."
   },
   {
-   "headline": "Hedge funds raise bets against US-backed critical minerals companies",
-   "why": "Нарастващите short позиции срещу critical minerals компании сигнализират прекомерна оценка в сектора и потенциална корекция при materials акциите."
+   "headline": "Saudi Arabia announces maritime defence coalition as Houthi attacks threaten Red Sea route",
+   "why": "Новата коалиция за защита на корабоплаването в Червено море е ключова за петролните доставки и фрахтовите разходи, с директно влияние върху енергийните и транспортните пазари."
   }
  ]
 }
