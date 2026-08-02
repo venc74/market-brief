@@ -193,10 +193,20 @@ def options_info(sym: str, price: float) -> dict:
         # P/C по обем за тикъра
         # FIX 2026-07-15: минимален общ обем — P/C 41.19 при шепа контракта е
         # математически верен и информационно безполезен.
+        # FIX 2026-08-02: same pre-market проблем като IV (FIXES_2026-07-17.md), но
+        # никога не бе gate-нат тук. Потвърдено на FITB (20.07.2026 P/C=17.12,
+        # 21.07.2026 P/C=11.12) — и двата дни IV коректно показваше "pre-market,
+        # bid/ask=0" (no_live_quote), докато P/C ratio-то тихо смяташе от volume
+        # полетата на same заявка, без връзка с no_live_quote сигнала. Възпроизведено
+        # синтетично с идентичен резултат (17.12) — pre-market snapshot носи volume
+        # числа, отвъд PC_MIN_TOTAL_VOLUME прага, но не по-надеждни от bid/ask-а на
+        # same заявка. Ако цялата верига е "мъртва" (no_live_quote), P/C-то също не
+        # се доверява, независимо от абсолютния обем сбор.
         pv = float(puts["volume"].fillna(0).sum())
         cv = float(calls["volume"].fillna(0).sum())
         out["put_call_ratio"] = (round(pv / cv, 2)
-                                 if cv and (pv + cv) >= config.PC_MIN_TOTAL_VOLUME
+                                 if (not no_live_quote and cv
+                                     and (pv + cv) >= config.PC_MIN_TOTAL_VOLUME)
                                  else None)
 
         # OI около парите: 3 страйка под и над
