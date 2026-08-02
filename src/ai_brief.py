@@ -9,7 +9,9 @@ AI синтез чрез Claude API.
 """
 from __future__ import annotations
 import json
+from functools import lru_cache
 import requests
+import yfinance as yf
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -218,6 +220,38 @@ contrarian сигнал — екстремно нетно дълги = поте�
 Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
 
 
+@lru_cache(maxsize=256)
+def _verified_company_name(ticker: str) -> str:
+    """
+    FIX 2026-08-01: COT proxy тикъри получаваха различно AI-халюцинирано "company"
+    име при всяко извикване — напр. "WH" ту "Wyndham Hotels", ту "World Wrestling",
+    ту грешно "Westrock Coffee" (реалният WEST тикър е различен, различна компания).
+    AI-то вече не се доверява за company полето — верифицираме през yfinance
+    (същия shortName/longName паттърн като magic_formula.py/screener.py).
+    Graceful: провал/непознат тикър → връща самия ticker symbol, не халюцинация.
+    lru_cache пести повторни заявки за един и същ тикър в рамките на процеса.
+    """
+    try:
+        info = yf.Ticker(ticker).info or {}
+        return info.get("shortName") or info.get("longName") or ticker
+    except Exception as e:
+        print(f"[ai] company lookup {ticker}: {e}")
+        return ticker
+
+
+def _verify_thesis_tickers(thesis: dict) -> dict:
+    """Заменя AI-generated 'company' с верифицирано yfinance име за всеки тикър в тезата."""
+    tickers = thesis.get("tickers")
+    if not tickers:
+        return thesis
+    thesis = dict(thesis)
+    thesis["tickers"] = [
+        {**t, "company": _verified_company_name(t["ticker"])}
+        for t in tickers if isinstance(t, dict) and t.get("ticker")
+    ]
+    return thesis
+
+
 def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
                            regime: str) -> str:
     """
@@ -315,7 +349,8 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         t = theses_by_market.get(e["market"])
         if not t:
             continue
-        merged.append({**e, "direct_thesis": t.get("direct_thesis", {}),
-                       "cross_sector_thesis": t.get("cross_sector_thesis", {}),
+        merged.append({**e,
+                       "direct_thesis": _verify_thesis_tickers(t.get("direct_thesis", {})),
+                       "cross_sector_thesis": _verify_thesis_tickers(t.get("cross_sector_thesis", {})),
                        "outside_screener": t.get("outside_screener", False)})
     return merged
