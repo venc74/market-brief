@@ -101,42 +101,59 @@ def _has_live_position(tracker: dict, ticker: str) -> bool:
               for rec in tracker.values())
 
 
-def _ingest_new_positions(tracker: dict) -> None:
+def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict]) -> None:
+    """Ingest-ва ЕДИН ден's Action списък (от snapshot файл ИЛИ директно in-memory) в tracker-а."""
+    for c in action_list or []:
+        ticker = c.get("ticker")
+        plan = c.get("plan") or {}
+        entry_range = plan.get("entry_range")
+        target_1 = plan.get("target_1")
+        stop_loss = plan.get("stop_loss")
+        if not (ticker and entry_range and len(entry_range) == 2
+               and target_1 is not None and stop_loss is not None):
+            continue
+
+        key = f"{ticker}_{entry_date}"
+        if key in tracker:
+            continue
+        if _has_live_position(tracker, ticker):
+            continue  # продължение на съществуваща позиция, не нова сделка
+
+        tracker[key] = {
+            "ticker": ticker,
+            "entry_date": entry_date,
+            "status": "open",
+            "entry_price": round((entry_range[0] + entry_range[1]) / 2, 2),
+            "target_1": target_1,
+            "stop_loss": stop_loss,
+            "target1_hit_date": None,
+            "resolution_date": None,
+            "realized_r": None,
+        }
+
+
+def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
+                          today_date: str | None = None) -> None:
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
         except Exception as e:
             print(f"[backtest] snapshot {path.name} нечетим, пропускам: {e}")
             continue
-
         entry_date = snap.get("date") or path.stem
-        for c in snap.get("action", []) or []:
-            ticker = c.get("ticker")
-            plan = c.get("plan") or {}
-            entry_range = plan.get("entry_range")
-            target_1 = plan.get("target_1")
-            stop_loss = plan.get("stop_loss")
-            if not (ticker and entry_range and len(entry_range) == 2
-                   and target_1 is not None and stop_loss is not None):
-                continue
+        _ingest_action_list(tracker, entry_date, snap.get("action", []))
 
-            key = f"{ticker}_{entry_date}"
-            if key in tracker:
-                continue
-            if _has_live_position(tracker, ticker):
-                continue  # продължение на съществуваща позиция, не нова сделка
-
-            tracker[key] = {
-                "ticker": ticker,
-                "entry_date": entry_date,
-                "status": "open",
-                "entry_price": round((entry_range[0] + entry_range[1]) / 2, 2),
-                "target_1": target_1,
-                "stop_loss": stop_loss,
-                "target1_hit_date": None,
-                "resolution_date": None,
-                "realized_r": None,
-            }
+    # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
+    # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
+    # update_backtest_tracker() в СЪЩИЯ run, а файловият ingest по-горе не вижда
+    # днешния snapshot — той се пише СЛЕД тази функция, по-късно в същия run.
+    # Резултат: тикър, избран за Action днес, оставаше невидим за
+    # _live_positions() цял допълнителен run (утрешния), позволявайки дублиран
+    # Action избор точно "ден+1" (виж FIXES файла за трите потвърдени случая).
+    # Директно ingest-ване на днешния in-memory action списък тук елиминира
+    # закъснението — утрешният run вече ще завари тикъра в tracker-а.
+    if today_action and today_date:
+        _ingest_action_list(tracker, today_date, today_action)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -283,15 +300,20 @@ def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────
-def update_backtest_tracker() -> None:
+def update_backtest_tracker(today_action: list[dict] | None = None,
+                            today_date: str | None = None) -> None:
     """
     Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
     записано състояние (не презаписваме частично/счупено).
+
+    today_action/today_date: днешният in-memory Action списък (main.py) —
+    ingest-ва се директно, БЕЗ да чака утрешното файлово четене на
+    data/{today}.json (виж FIX 2026-08-01 в _ingest_new_positions).
     """
     tracker = _load_tracker()
     try:
-        _ingest_new_positions(tracker)
+        _ingest_new_positions(tracker, today_action, today_date)
         _resolve_open_positions(tracker)
         _save_tracker(tracker)
     except Exception as e:

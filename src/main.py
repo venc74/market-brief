@@ -159,11 +159,15 @@ def run() -> dict:
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
     # Track Record: ingest четe data/*.json snapshot-и от диска — днешният {today}.json
-    # още не е записан на този етап, затова днешните Action се ingest-ват утре. Безобидно:
-    # резолюция (target/stop) никога не се проверява в деня на самото entry, само от
-    # следващия ден нататък, така че едно-дневното забавяне на ingest-а не губи сигнал.
+    # още не е записан на този етап (пише се по-долу). FIX 2026-08-01: предишният
+    # коментар тук твърдеше, че "едно-дневното забавяне на ingest-а е безобидно" —
+    # ГРЕШНО. apply_hard_rules() по-горе вика _live_positions(), който чете
+    # tracker-а ПРЕДИ ingest-а — файловото четене-от-утре създаваше систематичен
+    # "ден+1" прозорец, в който днешен Action тикър не се разпознаваше като жива
+    # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
+    # списък директно, за да е налично в tracker-а от утрешния run нататък.
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker()
+        backtest.update_backtest_tracker(action, today)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
 
     brief = {
