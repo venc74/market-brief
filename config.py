@@ -17,6 +17,13 @@ DEFENSIVE_SIZING_FACTOR = 0.5
 MAX_PER_SECTOR = 2                # макс 2 акции от един сектор
 MIN_PRICE = 10.0                  # без акции под $10
 MIN_MARKET_CAP = 500_000_000      # без mcap под $500M
+# FIX 2026-08-02 (timeout guard): максимално чакане на извикващия код за
+# yf.Ticker(sym).info fetch, през net_utils.fetch_with_timeout() (ai_brief.py,
+# magic_formula.py, screener.py). yfinance вече слага собствен default
+# timeout=30s вътрешно — това е допълнителна горна граница, за да не се
+# натрупват 30s×N закъснения в secuential scan на десетки тикъри при
+# систематично забавен Yahoo.
+YF_INFO_TIMEOUT_SEC = float(os.getenv("YF_INFO_TIMEOUT_SEC", 10))
 
 # ── Технически критерии (Секция 3, Слой 3) ──────────────────────────────
 BREAKOUT_VOLUME_MULT = 1.5        # 1.5x среден 50-дневен обем

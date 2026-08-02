@@ -33,6 +33,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import net_utils
 
 _CACHE = config.DATA_DIR / "magic_formula_cache.json"
 
@@ -43,7 +44,7 @@ _CACHE = config.DATA_DIR / "magic_formula_cache.json"
 def _metrics(sym: str) -> dict | None:
     """Връща {ticker, earnings_yield, roc} или None при липсващи данни."""
     try:
-        info = yf.Ticker(sym).info or {}
+        info = net_utils.fetch_with_timeout(lambda: yf.Ticker(sym).info) or {}
         ebit = info.get("ebitda")  # ebit рядко е директно в .info; ebitda е proxy
         # по-точен EBIT: оперативни маржове × приходи, ако са налични
         op_margin = info.get("operatingMargins")

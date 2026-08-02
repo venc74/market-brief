@@ -18,6 +18,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import backtest
+from src import net_utils
 
 API_URL = "https://api.anthropic.com/v1/messages"
 
@@ -305,7 +306,7 @@ def _verified_company_name(ticker: str) -> str:
     lru_cache пести повторни заявки за един и същ тикър в рамките на процеса.
     """
     try:
-        info = yf.Ticker(ticker).info or {}
+        info = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).info) or {}
         return info.get("shortName") or info.get("longName") or ticker
     except Exception as e:
         print(f"[ai] company lookup {ticker}: {e}")

@@ -17,6 +17,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import net_utils
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
 
@@ -159,7 +160,7 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
         sym = row["ticker"]
         try:
             tk = yf.Ticker(sym)
-            info = tk.info or {}
+            info = net_utils.fetch_with_timeout(lambda: tk.info) or {}
 
             mcap = info.get("marketCap") or 0
             if mcap < config.MIN_MARKET_CAP:
