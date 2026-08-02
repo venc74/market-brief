@@ -49,28 +49,50 @@ def spy_trend() -> dict:
 
 
 def vix_level() -> dict:
+    """
+    FIX 2026-08-02 (точка 11): AI-то само отбеляза методологична дупка на
+    24.07.2026 — "VIX е зелен по абсолютна стойност (18.7), но 5-дневната
+    промяна е +24.4%". За разлика от move_index() по-долу, тук нямаше spike
+    detection — статичен праг само по ниво, без оглед на скоростта на промяна.
+    Добавен symmetric spike флаг (config.VIX_SPIKE_WEEKLY_PCT, калиброван на
+    2г реална VIX история — виж коментара в config.py), mirroring move_spike:
+    рязка 5-дневна % промяна форсира status="red" независимо от абсолютното
+    ниво. Заедно с това: period="10d"/iloc[0] замених с period="1mo"/iloc[-6]
+    (same похват като move_index()) — старото давашe fuzzy "около 5 дни"
+    прозорец (calendar days, не trading days), новото е точно 5 търговски дни.
+    """
     try:
-        hist = yf.Ticker("^VIX").history(period="10d")
-        if hist.empty:
-            raise ValueError("empty VIX history")
+        hist = yf.Ticker("^VIX").history(period="1mo")
+        if hist.empty or len(hist) < 6:
+            raise ValueError("insufficient VIX history")
         vix = float(hist["Close"].iloc[-1])
-        wk = float(hist["Close"].iloc[0])
-        if math.isnan(vix):
+        week_ago = float(hist["Close"].iloc[-6])
+        if math.isnan(vix) or math.isnan(week_ago):
             raise ValueError("NaN VIX — невалидни данни от източника")
     except Exception as e:
         print(f"[thermo] VIX failed: {e}")
         return {"name": "VIX", "value": None, "status": "yellow",
                 "hide": True, "label": ""}
+
+    pct_5d = (vix - week_ago) / week_ago * 100 if week_ago else None
+    spike = pct_5d is not None and pct_5d >= config.VIX_SPIKE_WEEKLY_PCT
+
     if vix < config.VIX_RISK_ON:
         status = "green"
     elif vix < config.VIX_RISK_OFF:
         status = "yellow"
     else:
         status = "red"
+    if spike:
+        status = "red"
+
+    spike_note = " ⚠ рязък скок" if spike else ""
     return {
-        "name": "VIX", "value": round(vix, 2), "chg_5d": round(vix - wk, 2),
-        "status": status,
-        "label": f"VIX {vix:.1f} ({'risk-on' if status == 'green' else 'risk-off' if status == 'red' else 'неутрално'})",
+        "name": "VIX", "value": round(vix, 2), "chg_5d": round(vix - week_ago, 2),
+        "pct_5d": round(pct_5d, 1) if pct_5d is not None else None,
+        "spike": spike, "status": status,
+        "label": f"VIX {vix:.1f} ({'risk-on' if status == 'green' else 'risk-off' if status == 'red' else 'неутрално'})"
+                 f"{spike_note}",
     }
 
 
