@@ -8,6 +8,7 @@ AI синтез чрез Claude API.
 Английски за тикъри и данни, български за обясненията (Секция 6.1).
 """
 from __future__ import annotations
+import datetime as dt
 import json
 from functools import lru_cache
 import requests
@@ -16,6 +17,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import backtest
 
 API_URL = "https://api.anthropic.com/v1/messages"
 
@@ -97,19 +99,83 @@ SYSTEM_TICKERS = """Ти си портфолио стратег за суинг 
 кажи го. Връщаш САМО валиден JSON."""
 
 
+def _load_prior_watchlist_triggers(today: str | None = None) -> dict[str, str]:
+    """
+    FIX 2026-08-02 (точка 4 follow-up — cross-day watchlist_trigger честност):
+    чете watchlist_trigger текста от НАЙ-СКОРОШНИЯ ПРЕДИШЕН data/YYYY-MM-DD.json
+    snapshot и го подава като контекст на днешния AI промпт. Soft механизъм,
+    mirroring prior_context в cot_theses() (виж по-долу в модула) — само cross-day
+    вместо cross-batch. Потвърдено 5/5 проверени случая при прегледа на точка 4
+    (2026-08-02): LLY, IRM, HWM, ROST, WWD — AI-то дава конкретен, измерим
+    watchlist_trigger, после на следващия ден промотира тикъра в Action без нито
+    едно от условията да е реално изпълнено, без обяснение защо (напр. LLY: trigger
+    изискваше затваряне >$1249.45 + обем ≥1.3x + RS new_high; на деня на промоция
+    цената беше $1216.95, обемът 0.62x, RS остана near_high — нищо от трите).
+
+    ВАЖНО РАЗГРАНИЧЕНИЕ: този fix прави AI-то ЧЕСТНО за случая (обяснява
+    противоречието, вместо мълчаливо да го подмине) — НЕ предотвратява
+    преждевременен вход. Structural защита срещу лош entry timing е задача на
+    бъдещ отделен Entry Timing модул (code-enforced праг, независим от AI текст,
+    mirroring как in_blackout вече force-ва Watchlist класификация независимо от
+    AI мнение — виж merge_narratives). Двете остават отделни, допълващи се слоеве
+    на same проблем: тук подобряваме прозрачността на разказа; бъдещият модул би
+    бил истинската защита срещу самия ранен вход.
+
+    Graceful: липсващ/нечетим/липсващ предишен snapshot → празен dict, промптът
+    просто няма prior-trigger секция, не чупи pipeline-а.
+    """
+    try:
+        today = today or dt.date.today().isoformat()
+        snaps = sorted(p for p in config.DATA_DIR.glob("*.json")
+                       if backtest._SNAPSHOT_RE.match(p.name) and p.stem < today)
+        if not snaps:
+            return {}
+        prior = json.loads(snaps[-1].read_text(encoding="utf-8"))
+        out = {}
+        for c in prior.get("watchlist", []):
+            ticker = c.get("ticker")
+            trigger = (c.get("ai") or {}).get("watchlist_trigger")
+            if ticker and trigger and trigger != "Изчаква потвърждение.":
+                out[ticker] = trigger
+        return out
+    except Exception as e:
+        print(f"[ai] prior watchlist triggers зареждане неуспешно: {e}")
+        return {}
+
+
 def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
-                              regime: str) -> str:
+                              regime: str, prior_triggers: dict[str, str] | None = None) -> str:
     """
     Изгражда user prompt-а за един batch кандидати. Логиката е идентична на
     оригинала — само `slim` тук е подмножество (batch), не целият списък.
     Глобалните Action лимити (MAX_ACTION_TICKERS / MAX_PER_SECTOR) остават в
     prompt-а непроменени; реалното им налагане е в main.apply_hard_rules СЛЕД
     merge, така че batch-ването не нарушава глобалния cap (кодът има последната дума).
+
+    prior_triggers: FIX 2026-08-02 (виж _load_prior_watchlist_triggers) — вчерашни
+    watchlist_trigger текстове, филтрирани само до тикърите в ТОЗИ batch.
     """
+    batch_triggers = {c["ticker"]: prior_triggers[c["ticker"]]
+                      for c in slim
+                      if prior_triggers and c.get("ticker") in prior_triggers}
+    trigger_block = (
+        f"""
+
+ВЧЕРАШНИ WATCHLIST TRIGGER-И ЗА ТЕЗИ ТИКЪРИ (за консистентност):
+{json.dumps(batch_triggers, ensure_ascii=False)}
+
+За тикър от списъка по-горе: провери дали вчерашният trigger (цена/обем/RS \
+условие) реално се е изпълнил, преди да го класифицираш като Action. Ако го \
+промотираш въпреки НЕизпълнено условие, обясни изрично в "why_now" защо \
+(нов катализатор, ревизирани фундаментали, друга основателна причина) — не \
+просто мълчаливо да го игнорираш."""
+        if batch_triggers else ""
+    )
     return f"""Пазарен режим: {regime}
 Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False)}
 
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
+{trigger_block}
 
 За ВСЕКИ кандидат върни обект:
 - "ticker"
@@ -136,13 +202,14 @@ days_to_earnings=0 означава earnings Е ДНЕС — пиши го из�
 
 
 def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
-                          regime: str, tag: str) -> list[dict]:
+                          regime: str, tag: str,
+                          prior_triggers: dict[str, str] | None = None) -> list[dict]:
     """
     Един batch → едно Claude извикване → парснат JSON. 1 retry при API/JSON грешка
     (преходни сривове). При провал и на двата опита: логва и връща [] (губим само
     тикърите от ТОЗИ batch), без да чупи останалите batch-ове или pipeline-а.
     """
-    user = _build_ticker_user_prompt(slim, sector_logic, regime)
+    user = _build_ticker_user_prompt(slim, sector_logic, regime, prior_triggers)
     for attempt in (1, 2):  # 1 опит + 1 retry
         try:
             out = _parse_json(_call_claude(SYSTEM_TICKERS, user,
@@ -191,9 +258,13 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     print(f"[ai] ticker_narratives: {len(slim)} финалиста → {n} batch(ове) "
           f"по ≤{size} (max_tokens={config.AI_BATCH_MAX_TOKENS}/batch)")
 
+    # FIX 2026-08-02 (точка 4 follow-up): вчерашни watchlist_trigger текстове,
+    # заредени веднъж за целия run — виж _load_prior_watchlist_triggers.
+    prior_triggers = _load_prior_watchlist_triggers()
+
     merged: list[dict] = []
     for idx, batch in enumerate(batches, 1):
-        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}")
+        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}", prior_triggers)
     return merged
 
 
