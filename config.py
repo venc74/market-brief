@@ -275,6 +275,10 @@ COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 10))
 COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
 COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
 COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 3000))
+# FIX 2026-08-02: горна граница на running seen_tickers речника (soft cross-batch
+# consistency, ai_brief.py: cot_theses) — FIFO, за да не расте prior_context
+# неограничено на дни с много batch-ове/тикъри.
+COT_SEEN_TICKERS_CAP = int(os.getenv("COT_SEEN_TICKERS_CAP", 20))
 # ── MOVE Index (ICE BofA, bond volatility) ────────────────────────────────
 MOVE_YELLOW_THRESHOLD = float(os.getenv("MOVE_YELLOW_THRESHOLD", 100))
 MOVE_RED_THRESHOLD = float(os.getenv("MOVE_RED_THRESHOLD", 150))

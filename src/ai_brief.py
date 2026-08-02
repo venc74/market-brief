@@ -253,14 +253,37 @@ def _verify_thesis_tickers(thesis: dict) -> dict:
 
 
 def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
-                           regime: str) -> str:
+                           regime: str, prior_context: str = "") -> str:
     """
     batch: подмножество от cot.get_extremes() (market, category, net_position,
     percentile, direction, as_of).
     screener_universe: слим списък {ticker, sector, industry} от ТЕКУЩИЯ
     CANSLIM скрийнър — за cross-reference, за да предпочита Claude тикъри,
     които и без друго са в системния универс, вместо произволни имена.
+    prior_context: FIX 2026-08-01 (soft cross-batch consistency, т.3 от прегледа
+    на 15-31.07) — компактно резюме на тикъри, вече характеризирани в ПО-РАННИ
+    batch-ове в СЪЩИЯ run (напр. "HWM: Copper/direct_thesis bearish — ...").
+    Batch-овете са изолирани Claude извиквания (виж cot_theses) — без това AI-то
+    няма видимост към собствените си по-раншни тези в същия бриф и може да даде
+    противоречива характеристика на един и същ тикър (напр. "defensive" в една
+    тема, "risk-on beta" в друга, същия ден) без да го отбележи. Празен низ на
+    първия batch (няма все още нищо генерирано).
     """
+    prior_block = (
+        f"""
+
+ВЕЧЕ ХАРАКТЕРИЗИРАНИ ТИКЪРИ ПО-РАНО В ТОЗИ БРИФ (за консистентност):
+{prior_context}
+
+Ако предложиш тикър от списъка по-горе: провери дали новата роля/характеристика \
+съвпада с предишната (defensive/cyclical/hedge/core bet и т.н.). Ако тезата тук \
+предполага различна роля — кажи го ИЗРИЧНО в reasoning-а (напр. "за разлика от \
+ролята му в Copper тезата, тук HWM действа като hedge, не core bet"), не просто \
+противоречи мълчаливо на предишната характеристика. Легитимно е тикър да има \
+няколко ортогонални роли (различни причини) — проблем е само ПРЯКОТО, необяснено \
+противоречие в характера на тикъра."""
+        if prior_context else ""
+    )
     return f"""Пазарен режим: {regime}
 
 CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо 156-седмична \
@@ -270,6 +293,7 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър, но \
 отбележи го с "outside_screener": true): \
 {json.dumps(screener_universe, ensure_ascii=False)}
+{prior_block}
 
 За ВСЕКИ инструмент в списъка върни обект с:
 - "market": точното име както е подадено
@@ -299,9 +323,9 @@ extreme_short → bullish обрат очакван),
 
 
 def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
-                          regime: str, tag: str) -> list[dict]:
+                          regime: str, tag: str, prior_context: str = "") -> list[dict]:
     """Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а."""
-    user = _build_cot_user_prompt(batch, screener_universe, regime)
+    user = _build_cot_user_prompt(batch, screener_universe, regime, prior_context)
     for attempt in (1, 2):
         try:
             out = _parse_json(_call_claude(SYSTEM_COT, user,
@@ -315,6 +339,32 @@ def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
     return []
 
 
+def _record_ticker_context(seen: dict[str, str], market: str, thesis_type: str,
+                           thesis: dict) -> None:
+    """
+    FIX 2026-08-01 (т.3): записва компактно резюме на всеки тикър от тази теза в
+    running `seen` речника — подава се на СЛЕДВАЩИТЕ batch-ове (виж cot_theses)
+    за soft consistency check. Пази само ПОСЛЕДНАТА поява на тикъра (не пълна
+    история) — целта е "не противоречи на скорошното", не пълен audit trail.
+
+    FIX 2026-08-02: капнато на config.COT_SEEN_TICKERS_CAP записа (FIFO) — без
+    това prior_context би растял неограничено на дни с много batch-ове/тикъри.
+    `del` преди презапис премества тикъра в края на dict-а (Python 3.7+ пази ред
+    по вмъкване) — така eviction-ът реално маха НАЙ-СТАРО ДОКОСНАТИЯ тикър, не
+    просто първия въведен, ако той междувременно е бил обновен отново.
+    """
+    direction = thesis.get("direction", "?")
+    reasoning = (thesis.get("reasoning") or "")[:120]
+    for t in thesis.get("tickers") or []:
+        ticker = t.get("ticker") if isinstance(t, dict) else None
+        if not ticker:
+            continue
+        seen.pop(ticker, None)
+        seen[ticker] = f'{ticker}: {market}/{thesis_type} {direction} — "{reasoning}"'
+        while len(seen) > config.COT_SEEN_TICKERS_CAP:
+            seen.pop(next(iter(seen)))
+
+
 def cot_theses(extremes: list[dict], screener_universe: list[dict],
               regime: str) -> list[dict]:
     """
@@ -324,6 +374,16 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     в extremes по "market", запазвайки оригиналните числови полета
     (percentile, net_position, direction, history) — Claude връща само
     тезите, не пипа числата.
+
+    FIX 2026-08-01 (т.3 от прегледа на 15-31.07): тикъри често се появяват в
+    2-6+ различни тези същия ден (потвърдено емпирично — JPM до 6 пъти в 1 бриф),
+    а batch-овете са изолирани Claude извиквания без взаимна видимост → противоречиви
+    характеристики на един и същ тикър (напр. "defensive" в една тема, "risk-on
+    beta" в друга) минаваха необяснени. Soft fix: running `seen_tickers` речник се
+    строи batch по batch (sequential, вече такъв е потокът) и се подава на ВСЕКИ
+    следващ batch като "вече характеризирани тикъри" контекст — AI-то е
+    инструктирано да обясни изрично, ако новата роля се различава, не просто да
+    противоречи мълчаливо. Не забранява легитимни multi-role тикъри.
     """
     if not extremes:
         return []
@@ -339,10 +399,17 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     print(f"[ai] cot_theses: {len(slim)} екстремума → {n} batch(ове) по ≤{size}")
 
     theses_by_market: dict[str, dict] = {}
+    seen_tickers: dict[str, str] = {}
     for idx, batch in enumerate(batches, 1):
-        for t in _cot_theses_for_batch(batch, screener_universe, regime, f"{idx}/{n}"):
+        prior_context = "\n".join(seen_tickers.values())
+        for t in _cot_theses_for_batch(batch, screener_universe, regime,
+                                       f"{idx}/{n}", prior_context):
             if t.get("market"):
                 theses_by_market[t["market"]] = t
+                _record_ticker_context(seen_tickers, t["market"], "direct_thesis",
+                                       t.get("direct_thesis") or {})
+                _record_ticker_context(seen_tickers, t["market"], "cross_sector_thesis",
+                                       t.get("cross_sector_thesis") or {})
 
     merged = []
     for e in extremes:
