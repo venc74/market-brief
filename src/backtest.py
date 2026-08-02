@@ -128,6 +128,7 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
             "stop_loss": stop_loss,
             "target1_hit_date": None,
             "resolution_date": None,
+            "discovered_date": None,
             "realized_r": None,
         }
 
@@ -161,7 +162,23 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
 # ──────────────────────────────────────────────────────────────────────────
 def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
                       today: dt.date) -> None:
-    """Мутира rec на място. Фаза 1 → евентуален преход във Фаза 2 в СЪЩИЯ проход."""
+    """
+    Мутира rec на място. Фаза 1 → евентуален преход във Фаза 2 в СЪЩИЯ проход.
+
+    FIX 2026-08-02 (точки 6/7/10 — общ корен): `resolution_date` е историческата
+    дата по цените (кога РЕАЛНО е ударен stop/target), но `_ingest_new_positions`
+    може да ingest-не позиция със СЕДМИЦИ закъснение — ако друга жива позиция за
+    същия тикър я е блокирала (_has_live_position), тя стои неingest-ната, докато
+    по-старата не резолвира. Веднъж отблокирана, тя може да резолвира В СЪЩИЯ run,
+    с resolution_date дълбоко назад, без никога да се е показвала "open" в бриф.
+    Потвърдено на CAT_2026-06-19: entry 19.06, resolved (по цени) 17.07, но
+    реално ingest-ната и резолвирана едва на 21.07 run-а — total_resolved скочи
+    незабелязано, а "Резолюции тази седмица" (keyed по resolution_date) не я
+    показа, защото 17.07 е в предишна ISO седмица спрямо 21.07. `discovered_date`
+    записва КОГА pipeline-ът реално я е засякъл (= "today" на този run) —
+    отделно от resolution_date, за да "Резолюции тази седмица" да отразява
+    реално откритото тази седмица, не историческата дата на пазарното събитие.
+    """
     if rec["status"] == "open":
         entry_dt = pd.Timestamp(rec["entry_date"])
         h1, l1 = h[h.index > entry_dt], l[l.index > entry_dt]
@@ -173,6 +190,7 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             if bool(l1.loc[day] <= rec["stop_loss"]):   # gap ден — stop печели консервативно
                 rec["status"] = "stopped"
                 rec["resolution_date"] = day.date().isoformat()
+                rec["discovered_date"] = today.isoformat()
                 rec["realized_r"] = -1.0
                 return
             if bool(h1.loc[day] >= rec["target_1"]):
@@ -186,6 +204,7 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             if today >= entry_cutoff:
                 rec["status"] = "expired"
                 rec["resolution_date"] = entry_cutoff.isoformat()
+                rec["discovered_date"] = today.isoformat()
                 rec["realized_r"] = None
             return
 
@@ -204,6 +223,7 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             if close_val < avg:
                 rec["status"] = "trailing_stop_exit"
                 rec["resolution_date"] = day.date().isoformat()
+                rec["discovered_date"] = today.isoformat()
                 rec["realized_r"] = round((close_val - entry_price) / (entry_price - original_stop), 2)
                 return
 
@@ -213,6 +233,7 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             last_close = float(c.iloc[-1])
             rec["status"] = "expired_in_trail"
             rec["resolution_date"] = entry_cutoff.isoformat()
+            rec["discovered_date"] = today.isoformat()
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
@@ -350,14 +371,28 @@ def get_backtest_summary() -> dict:
     # да "залепне" в топ-10 с дни наред, ако няма нови след нея. Кумулативната
     # статистика по-горе (total_resolved/win_rate/avg_r/by_status) НЕ се
     # ресетва седмично — трупа се от началото на tracking-а.
+    # FIX 2026-08-02 (точки 6/7/10): ключуване по resolution_date (историческа
+    # дата по цените) пропускаше late-ingested резолюции — виж коментара в
+    # _resolve_position за пълния механизъм (потвърдено на CAT_2026-06-19).
+    # discovered_date (кога pipeline-ът РЕАЛНО е засякъл резолюцията) е
+    # правилният сигнал за "тази седмица"; fallback към resolution_date за
+    # записи отпреди този фикс (нямат новото поле — graceful, без миграция).
     today = dt.date.today()
     monday_this_week = (today - dt.timedelta(days=today.weekday())).isoformat()
+
+    def _effective_date(r: dict) -> str:
+        return r.get("discovered_date") or r["resolution_date"]
+
     recent_pool = [r for r in records
                   if r.get("status") not in _LIVE_STATUSES and r.get("resolution_date")
-                  and r["resolution_date"] >= monday_this_week]
-    recent_pool.sort(key=lambda r: r["resolution_date"], reverse=True)
+                  and _effective_date(r) >= monday_this_week]
+    recent_pool.sort(key=_effective_date, reverse=True)
     recent = [{"ticker": r["ticker"], "entry_date": r["entry_date"], "resolution": r["status"],
-              "resolution_date": r["resolution_date"], "realized_r": r.get("realized_r")}
+              "resolution_date": r["resolution_date"], "realized_r": r.get("realized_r"),
+              # закъсняла резолюция (ingest-ната седмици след реалната пазарна дата) —
+              # dashboard-ът може да го отбележи, вместо да изглежда като "прескочен" брояч.
+              "late_discovery": bool(r.get("discovered_date")
+                                     and r["discovered_date"] != r["resolution_date"])}
              for r in recent_pool[:20]]  # горен таван само като edge-case защита, не нормално поведение
 
     # Живи позиции + текуща цена (batch fetch) за unrealized % изгледа в dashboard-а.

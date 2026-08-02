@@ -590,7 +590,8 @@
     <div class="watch-card">
       <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' if r.realized_r and r.realized_r <= 0 else 'var(--muted)' }}">{{ r.ticker }}</span>
       <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ r.resolution }}
-      {% if r.realized_r is not none %} · R={{ r.realized_r }}{% endif %}</p>
+      {% if r.realized_r is not none %} · R={{ r.realized_r }}{% endif %}
+      {% if r.late_discovery %} · <span style="color:var(--muted)">открито със закъснение</span>{% endif %}</p>
     </div>
     {% endfor %}
   </div>
