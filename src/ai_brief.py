@@ -125,10 +125,12 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 
 Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
 Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
-работни дни = автоматично Watchlist (или Action с изрично предупреждение само при \
-изключителен setup, поле "warning"). Ако days_to_earnings липсва или е ОТРИЦАТЕЛЕН, \
-earnings датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ \
-твърди, че няма blackout риск.
+работни дни (0 ≤ days_to_earnings ≤ 7) = автоматично Watchlist (или Action с \
+изрично предупреждение само при изключителен setup, поле "warning"). \
+days_to_earnings=0 означава earnings Е ДНЕС — пиши го изрично така, НЕ като \
+"неизвестна дата". Само ако days_to_earnings ЛИПСВА (null) или е ОТРИЦАТЕЛЕН, \
+датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ твърди, \
+че няма blackout риск.
 
 Връщай само JSON: {{"tickers": [...]}}"""
 
