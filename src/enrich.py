@@ -124,22 +124,61 @@ def options_info(sym: str, price: float) -> dict:
         # под прага — съседни strikes от същия „развален“ chain дават 6.25%/
         # 12.5%, над прага, но също толкова невалидни. Затова проверяваме bid/
         # ask валидност на самия избран контракт, преди изобщо да му вярваме.
+        # FIX 2026-08-02: обратната посока на горния проблем — контракт МОЖЕ да има
+        # bid>0/ask>0 (технически "жив"), но да е фактически мъртъв. Потвърдено
+        # живо на ONB: ATM put bid=2.65/ask=5.70, openInterest=1 → IV=133.9%,
+        # докато съседният ликвиден ATM call (активно търгуван) даде разумни 36.9%.
+        # Same solver-artifact клас като pre-market бъга (FIXES_2026-07-17.md), само
+        # в обратна посока — тук стойността е абсурдно ВИСОКА, не ниска.
+        # ПЪРВИ ОПИТ бе спред/mid праг (>60%) — отхвърлен СЛЕД проверка на реални
+        # ликвидни имена: GRMN (mega-cap, vol=22, OI=20, търгуван вчера) има 118%
+        # спред на ATM put-а — легитимен активен пазар, не боклук. Спредът НЕ
+        # разграничава надеждно. Реалният разграничител е СТАРОСТТА на последната
+        # сделка: ONB PUT последно търгуван преди 179 ДНИ (lastTradeDate), докато
+        # всички проверени легитимни тикъри (GRMN, NTRS, JPM, BAC, AIZ, DINO) са
+        # търгувани в рамките на ≤16 дни — чиста разделителна линия в реалните
+        # данни. Отхвърляме leg-а по СТАРОСТ на котировката (config.
+        # IV_MAX_QUOTE_AGE_DAYS), не по спред.
         ivs = []
         no_live_quote = True
+        stale_quote_rejected = False
         for df in (atm_call, atm_put):
             if not len(df):
                 continue
             row = df.iloc[0]
-            has_live_quote = (row.get("bid") or 0) > 0 or (row.get("ask") or 0) > 0
-            if has_live_quote:
-                no_live_quote = False
-                if not math.isnan(row["impliedVolatility"]):
-                    ivs.append(float(row["impliedVolatility"]))
+            bid, ask = row.get("bid") or 0, row.get("ask") or 0
+            has_live_quote = bid > 0 or ask > 0
+            if not has_live_quote:
+                continue
+            no_live_quote = False
+            last_trade = row.get("lastTradeDate")
+            quote_age_days = None
+            if last_trade is not None and last_trade == last_trade:  # изключва NaT/NaN
+                try:
+                    now = (dt.datetime.now(last_trade.tzinfo)
+                          if getattr(last_trade, "tzinfo", None) else dt.datetime.now())
+                    quote_age_days = (now - last_trade).days
+                except Exception:
+                    quote_age_days = None
+            if quote_age_days is not None and quote_age_days > config.IV_MAX_QUOTE_AGE_DAYS:
+                print(f"[enrich] options {sym}: последна сделка преди {quote_age_days}д "
+                      f"> {config.IV_MAX_QUOTE_AGE_DAYS}д sanity праг — leg отхвърлен "
+                      "като застоял/нетъргуван")
+                stale_quote_rejected = True
+                continue
+            if not math.isnan(row["impliedVolatility"]):
+                ivs.append(float(row["impliedVolatility"]))
         iv = round(sum(ivs) / len(ivs) * 100, 1) if ivs else None
         # iv_reject_reason захранва специфично съобщение по-долу вместо генеричното
-        # "без надеждни IV данни" — потребителят вижда КОЯ от двете причини е (виж
-        # FIXES_2026-07-17.md за пълния контекст на pre-market bid/ask проблема).
-        iv_reject_reason = "no_live_quote" if (iv is None and no_live_quote) else None
+        # "без надеждни IV данни" — потребителят вижда КОЯ от причините е (виж
+        # FIXES_2026-07-17.md за pre-market bid/ask контекста; stale_quote е
+        # FIX 2026-08-02, виж коментара при цикъла по-горе).
+        if iv is None and no_live_quote:
+            iv_reject_reason = "no_live_quote"
+        elif iv is None and stale_quote_rejected:
+            iv_reject_reason = "stale_quote"
+        else:
+            iv_reject_reason = None
         # FIX 2026-07-15: yfinance връща боклук близо до нулата от застояли
         # котировки (ALL: ATM IV "1.6%" — физически невъзможно за акция).
         # Под sanity прага IV се отхвърля, за да не замърсява IVR историята
@@ -207,6 +246,12 @@ def options_info(sym: str, price: float) -> dict:
                     f"Изчисленото IV е под {config.IV_SANITY_MIN_PCT:.0f}% "
                     "(физически неправдоподобно за тази акция) — вероятно застояла "
                     "котировка, отхвърлено. Без надеждни IV данни — стой в акциите.")
+            elif iv_reject_reason == "stale_quote":
+                out["strategy"], out["strategy_reason"] = "акции", (
+                    f"Последната сделка по достъпните контракти е преди над "
+                    f"{config.IV_MAX_QUOTE_AGE_DAYS} дни (вероятно неликвиден/нетъргуван "
+                    "контракт) — IV отхвърлено като ненадеждно. Без надеждни IV данни — "
+                    "стой в акциите.")
             else:
                 out["strategy"], out["strategy_reason"] = "акции", \
                     "Без надеждни IV данни — стой в акциите."
@@ -218,6 +263,17 @@ def options_info(sym: str, price: float) -> dict:
             out["strategy"] = "cash-secured put / акции"
             out["strategy_reason"] = (f"IVR {ivr:.0f} е висок — premium-ът е скъп. "
                                       "Продаването на CSP под pivot или директно акции.")
+        elif ivr is None:
+            # FIX 2026-08-02: потвърден бъг (ONB, 30.07.2026) — при <2 дни история
+            # IVR блокът по-горе никога не сетва out["iv_rank"] (остава None), но
+            # старият elif верижен ред нямаше clause за ТОЗИ случай — падаше в
+            # generic-ия долен else и твърдеше "IV в средата на диапазона", докато
+            # диапазон изобщо не съществува (0 или 1 ден история). Разграничено
+            # от "IVR изчислен, но ненадежден поради малко дни" clause-а по-долу.
+            out["strategy"] = "акции / bull call spread"
+            out["strategy_reason"] = (f"IV {iv}% — все още няма достатъчно история за IVR "
+                                      "(първи ден с данни за този тикър); акции по "
+                                      "подразбиране, spread при нужда от дефиниран риск.")
         elif ivr is not None and not ivr_reliable:
             out["strategy"] = "акции / bull call spread"
             out["strategy_reason"] = (f"IVR {ivr:.0f} върху само {n_hist} дни история — "

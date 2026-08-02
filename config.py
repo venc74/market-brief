@@ -315,6 +315,17 @@ BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
 MF_CONFIRM_DECILE = float(os.getenv("MF_CONFIRM_DECILE", 0.10))
 # ATM IV под този праг (%) = боклук от застояли котировки → отхвърля се.
 IV_SANITY_MIN_PCT = float(os.getenv("IV_SANITY_MIN_PCT", 5.0))
+# FIX 2026-08-02: ATM контракт с lastTradeDate по-стар от толкова дни се третира
+# като застоял/нетъргуван → IV-то му се отхвърля. Обратна посока на
+# IV_SANITY_MIN_PCT — там хващаме абсурдно НИСКИ, тук абсурдно ВИСОКИ IV
+# артефакти от мъртви контракти. Калибровано на реални данни (потвърдено 02.08.2026):
+# ONB PUT (OI=1) последно търгуван преди 179 дни → IV 133.9% solver artifact,
+# докато 6 реални ликвидни candidate тикъра (GRMN/NTRS/JPM/BAC/AIZ/DINO) бяха
+# всички търгувани в рамките на ≤16 дни — чиста разделителна линия. bid/ask
+# СПРЕД беше първоначален (грешен) избор за прага — GRMN PUT имаше 118% спред
+# при вчерашна активна търговия (vol=22, OI=20), спредът не разграничава
+# надеждно, старостта на сделката — да.
+IV_MAX_QUOTE_AGE_DAYS = int(os.getenv("IV_MAX_QUOTE_AGE_DAYS", 30))
 # Минимален общ опционен обем (puts+calls), за да е смислен P/C ratio.
 PC_MIN_TOTAL_VOLUME = int(os.getenv("PC_MIN_TOTAL_VOLUME", 500))
 # Минимум дни IV история за категорична IVR-базирана опционна препоръка.
