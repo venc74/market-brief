@@ -1,37 +1,37 @@
 {
- "date": "2026-07-31",
+ "date": "2026-08-03",
  "news": [
   {
-   "headline": "Oil prices ease as recovering Hormuz Strait traffic tempers war premium",
-   "why": "Нормализирането на трафика през Ормузкия проток намалява геополитическата рискова премия в петрола, което влияе директно на енергийния сектор и инфлационните очаквания."
+   "headline": "Stock futures rally as investors gear up for jobs report, key earnings",
+   "why": "Днешният July jobs report (nonfarm payrolls) е основният макро катализатор за пазарите — данните ще определят очакванията за следващия ход на Fed."
   },
   {
-   "headline": "BOJ holds rates at 1%, warns of core inflation exceeding 2% target",
-   "why": "Решението на BOJ и сигналите за по-бързо затягане движат JPY и глобалните bond пазари, с директно отражение върху carry trades и азиатските активи."
+   "headline": "U.S., Japan confirm coordinated yen intervention, signal readiness for more",
+   "why": "Рядката координирана USD/JPY интервенция между US Treasury и Bank of Japan сигнализира готовност за допълнителни действия и влияе директно на FX волатилността и carry trades."
   },
   {
-   "headline": "Asian stocks rebound and yen jumps on signs of intervention",
-   "why": "Рязкото движение на JPY и рекордният отскок на Kospi сигнализират за масивно преразпределение на капитали в азиатския регион с глобален ефект върху рисковите активи."
+   "headline": "Oil drops over 5% as Middle East tensions ebb on diplomatic efforts",
+   "why": "Спад от над 5% в петрола след новините за отложени удари срещу Иран свива геополитическата рискова премия и влияе върху енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "SK Hynix shares surge 25%, while Samsung soars over 20% as AI rally roars back",
-   "why": "Взривният ръст на memory chip производителите потвърждава завръщането на AI rally-то и е водещ индикатор за посоката на полупроводниковия сектор глобално."
+   "headline": "OPEC+ agrees September oil hike, completing rollback of voluntary cuts",
+   "why": "OPEC+ финализира поетапното премахване на доброволните съкращения с хайк за септември, което добавя предлагане на пазара и упражнява допълнителен натиск върху цените на петрола."
   },
   {
-   "headline": "Big Tech AI spending spree tops $1tn",
-   "why": "Капиталовите разходи на Google, Amazon, Microsoft и Meta над $1 трилион задвижват търсенето на semiconductors, енергия и инфраструктура с мащабен секторен ефект."
+   "headline": "Trump says Iran talks to resume Monday after calling off planned strikes",
+   "why": "Дипломатическото деескалиране с Иран намалява риска за Ормузкия проток и суровинните пазари, с директен ефект върху петрол, природен газ и корабоплавателни акции."
   },
   {
-   "headline": "Apple earnings takeaways: Weak forecast, supply concerns overshadow sales beat",
-   "why": "Слабата прогноза и притесненията за supply chain на Apple натискат акцията в следпазарната сесия и дават тон за по-широкото tech настроение."
+   "headline": "AstraZeneca in talks with Bristol Myers Squibb on $400 billion megadeal",
+   "why": "Потенциалното сливане би създало един от най-големите фармацевтични гиганти в света и ще движи волатилност в целия healthcare/биотех сектор."
   },
   {
-   "headline": "China's U.S.-bound shipments fall in July after brief recovery, survey shows",
-   "why": "Спадът в китайския износ към САЩ и забавената фабрична активност са ранен макро сигнал за ефекта на митата върху глобалната търговия и корпоративните вериги."
+   "headline": "AMD and Sandisk are two of the big chip stocks with earnings momentum in the new week",
+   "why": "Над 130 S&P 500 компании отчитат резултати тази седмица, а чип секторът остава ключов двигател на пазарната посока."
   },
   {
-   "headline": "Saudi Arabia announces maritime defence coalition as Houthi attacks threaten Red Sea route",
-   "why": "Новата коалиция за защита на корабоплаването в Червено море е ключова за петролните доставки и фрахтовите разходи, с директно влияние върху енергийните и транспортните пазари."
+   "headline": "Whatever happened to prudence? Governments have stopped correcting budget deficits",
+   "why": "Нарастващите фискални дефицити при мълчаливото търпение на bond пазарите е структурен макро риск с дългосрочни импликации за лихвени нива и суверенен дълг."
   }
  ]
 }

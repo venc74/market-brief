@@ -1,5 +1,5 @@
 {
- "date": "2026-07-31",
+ "date": "2026-08-03",
  "rows": [
   {
    "ticker": "ELV",
@@ -26,9 +26,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 356,
+  "tickers_with_filings": 276,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 62,
+  "raw_transactions_parsed": 31,
   "qualifying_after_filter": 2
  }
 }

@@ -361,5 +361,53 @@
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null
+ },
+ "TRV_2026-07-03": {
+  "ticker": "TRV",
+  "entry_date": "2026-07-03",
+  "status": "open",
+  "entry_price": 342.31,
+  "target_1": 423.23,
+  "stop_loss": 301.85,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "GRMN_2026-07-31": {
+  "ticker": "GRMN",
+  "entry_date": "2026-07-31",
+  "status": "open",
+  "entry_price": 304.0,
+  "target_1": 434.22,
+  "stop_loss": 238.89,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "CHE_2026-07-31": {
+  "ticker": "CHE",
+  "entry_date": "2026-07-31",
+  "status": "open",
+  "entry_price": 551.68,
+  "target_1": 735.44,
+  "stop_loss": 459.8,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "NTRS_2026-07-31": {
+  "ticker": "NTRS",
+  "entry_date": "2026-07-31",
+  "status": "open",
+  "entry_price": 191.6,
+  "target_1": 227.4,
+  "stop_loss": 173.7,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }
