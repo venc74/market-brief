@@ -1,37 +1,37 @@
 {
- "date": "2026-08-03",
+ "date": "2026-08-04",
  "news": [
   {
-   "headline": "Stock futures rally as investors gear up for jobs report, key earnings",
-   "why": "Днешният July jobs report (nonfarm payrolls) е основният макро катализатор за пазарите — данните ще определят очакванията за следващия ход на Fed."
+   "headline": "Saudi Aramco profits soar as Iran war squeezes oil supply",
+   "why": "Геополитическият риск около Иран продължава да поддържа петролните цени високи, което е директен катализатор за енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "U.S., Japan confirm coordinated yen intervention, signal readiness for more",
-   "why": "Рядката координирана USD/JPY интервенция между US Treasury и Bank of Japan сигнализира готовност за допълнителни действия и влияе директно на FX волатилността и carry trades."
+   "headline": "Federal Reserve може да бъде въвлечен в усилията на Bessent да подкрепи японската йена",
+   "why": "Потенциална Fed интервенция на валутните пазари е рядко събитие с широки последствия за Treasurys, долара и risk assets глобално."
   },
   {
-   "headline": "Oil drops over 5% as Middle East tensions ebb on diplomatic efforts",
-   "why": "Спад от над 5% в петрола след новините за отложени удари срещу Иран свива геополитическата рискова премия и влияе върху енергийния сектор и инфлационните очаквания."
+   "headline": "Bessent's yen intervention signals new era of US 'currency activism'",
+   "why": "Активна американска валутна политика в подкрепа на йената сигнализира нов геополитически режим, който може да повлияе на carry trades и FX волатилност."
   },
   {
-   "headline": "OPEC+ agrees September oil hike, completing rollback of voluntary cuts",
-   "why": "OPEC+ финализира поетапното премахване на доброволните съкращения с хайк за септември, което добавя предлагане на пазара и упражнява допълнителен натиск върху цените на петрола."
+   "headline": "25 щата съдят администрацията на Тръмп заради глобалните тарифи",
+   "why": "Правната несигурност около тарифната политика директно засяга прогнозите за корпоративни приходи, веригите на доставки и инфлацията."
   },
   {
-   "headline": "Trump says Iran talks to resume Monday after calling off planned strikes",
-   "why": "Дипломатическото деескалиране с Иран намалява риска за Ормузкия проток и суровинните пазари, с директен ефект върху петрол, природен газ и корабоплавателни акции."
+   "headline": "Palantir скача 12% след блестящо тримесечие с ръст на US commercial revenue от почти 150%",
+   "why": "Силните резултати потвърждават AI demand story и дават импулс на по-широкия технологичен и AI сектор в началото на август."
   },
   {
-   "headline": "AstraZeneca in talks with Bristol Myers Squibb on $400 billion megadeal",
-   "why": "Потенциалното сливане би създало един от най-големите фармацевтични гиганти в света и ще движи волатилност в целия healthcare/биотех сектор."
+   "headline": "Dow затваря на рекордно високо ниво, Amazon надхвърля $3 трилиона пазарна капитализация",
+   "why": "Рекордното затваряне след силно рали задава тона за фючърсите и sentiment-а в началото на седмицата."
   },
   {
-   "headline": "AMD and Sandisk are two of the big chip stocks with earnings momentum in the new week",
-   "why": "Над 130 S&P 500 компании отчитат резултати тази седмица, а чип секторът остава ключов двигател на пазарната посока."
+   "headline": "Русия разширява shadow LNG флота преди ЕС забраната",
+   "why": "Увеличеното руско LNG предлагане чрез shadow fleet може да смекчи европейските енергийни цени въпреки санкциите — важно за инфлационния outlook."
   },
   {
-   "headline": "Whatever happened to prudence? Governments have stopped correcting budget deficits",
-   "why": "Нарастващите фискални дефицити при мълчаливото търпение на bond пазарите е структурен макро риск с дългосрочни импликации за лихвени нива и суверенен дълг."
+   "headline": "Big Tech инвестиционните печалби от Anthropic и OpenAI изкривяват корпоративните earnings",
+   "why": "Ако се изключат unrealized AI gains, фундаменталната earnings картина е значително по-слаба — риск за оценките на мегакап технологичните акции."
   }
  ]
 }
