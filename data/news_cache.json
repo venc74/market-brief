@@ -1,37 +1,37 @@
 {
- "date": "2026-08-04",
+ "date": "2026-08-05",
  "news": [
   {
-   "headline": "Saudi Aramco profits soar as Iran war squeezes oil supply",
-   "why": "Геополитическият риск около Иран продължава да поддържа петролните цени високи, което е директен катализатор за енергийния сектор и инфлационните очаквания."
+   "headline": "U.S. says Strait of Hormuz is 'free and open' as Bessent signals deal with Iran is close",
+   "why": "Потенциална сделка с Иран би намалила геополитическия риск и натиска върху петролните цени, което е директен катализатор за енергийния сектор и пазарния сентимент."
   },
   {
-   "headline": "Federal Reserve може да бъде въвлечен в усилията на Bessent да подкрепи японската йена",
-   "why": "Потенциална Fed интервенция на валутните пазари е рядко събитие с широки последствия за Treasurys, долара и risk assets глобално."
+   "headline": "Michael Burry bets against rally: 'We are near a major top, and possible a 1987-type fall'",
+   "why": "Предупреждение от известен контрариански инвеститор за потенциален рязък срив може да засили волатилността и да провокира hedge активност сред институционалните играчи."
   },
   {
-   "headline": "Bessent's yen intervention signals new era of US 'currency activism'",
-   "why": "Активна американска валутна политика в подкрепа на йената сигнализира нов геополитически режим, който може да повлияе на carry trades и FX волатилност."
+   "headline": "The real message in the yen intervention",
+   "why": "Отслабването на долара като резервна валута и интервенциите при йената имат директно отражение върху forex пазарите и carry trade позициите."
   },
   {
-   "headline": "25 щата съдят администрацията на Тръмп заради глобалните тарифи",
-   "why": "Правната несигурност около тарифната политика директно засяга прогнозите за корпоративни приходи, веригите на доставки и инфлацията."
+   "headline": "AMD's revenue climbs 50% and data center sales doubled, but the stock is down",
+   "why": "Силни резултати при AMD с 107% ръст в data center сегмента, но негативната реакция на акцията сигнализира завишени очаквания и потенциален натиск върху целия AI/chip сектор."
   },
   {
-   "headline": "Palantir скача 12% след блестящо тримесечие с ръст на US commercial revenue от почти 150%",
-   "why": "Силните резултати потвърждават AI demand story и дават импулс на по-широкия технологичен и AI сектор в началото на август."
+   "headline": "SpaceX's AI spending unnerves Wall Street despite promises of quick payoff",
+   "why": "Масивните AI разходи на SpaceX при дебюта на SPCX на борсата задават тона за оценките на AI компании и могат да повлияят на по-широкия tech сектор."
   },
   {
-   "headline": "Dow затваря на рекордно високо ниво, Amazon надхвърля $3 трилиона пазарна капитализация",
-   "why": "Рекордното затваряне след силно рали задава тона за фючърсите и sentiment-а в началото на седмицата."
+   "headline": "Banks to offload $15bn of debt for Anthropic data centre backed by Google",
+   "why": "Мегасделката натоварва капацитета за финансиране на Wall Street и показва колко агресивно се ускорява AI инфраструктурният цикъл с потенциал за кредитен стрес."
   },
   {
-   "headline": "Русия разширява shadow LNG флота преди ЕС забраната",
-   "why": "Увеличеното руско LNG предлагане чрез shadow fleet може да смекчи европейските енергийни цени въпреки санкциите — важно за инфлационния outlook."
+   "headline": "India's central bank keeps benchmark rates steady, cites 'moderate' core inflation",
+   "why": "Решението на RBI е сигнал за глобалната посока на централните банки в EM и влияе на позиционирането в азиатските пазари и валути."
   },
   {
-   "headline": "Big Tech инвестиционните печалби от Anthropic и OpenAI изкривяват корпоративните earnings",
-   "why": "Ако се изключат unrealized AI gains, фундаменталната earnings картина е значително по-слаба — риск за оценките на мегакап технологичните акции."
+   "headline": "GM, Chinese automaker extend joint venture for 20 years despite geopolitical tensions with U.S.",
+   "why": "Удължаването на JV сред нарастващи търговски напрежения е важен индикатор за корпоративната стратегия спрямо China exposure и засяга целия автомобилен сектор."
   }
  ]
 }

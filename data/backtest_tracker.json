@@ -409,5 +409,17 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "ANET_2026-08-05": {
+  "ticker": "ANET",
+  "entry_date": "2026-08-05",
+  "status": "open",
+  "entry_price": 194.35,
+  "target_1": 249.79,
+  "stop_loss": 166.63,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

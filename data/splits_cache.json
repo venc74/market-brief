@@ -1,5 +1,5 @@
 {
- "date": "2026-08-04",
+ "date": "2026-08-05",
  "rows": [
   {
    "ticker": "TOP",
@@ -8,8 +8,8 @@
    "ratio": "1:5",
    "split_type": "reverse",
    "date_human": "Aug 03, 2026",
-   "price": 10.52,
-   "market_cap": 1385524196.9199998
+   "price": 11.02,
+   "market_cap": 1363216164.0471153
   }
  ]
 }
