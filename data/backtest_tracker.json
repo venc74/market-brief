@@ -421,5 +421,29 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "GE_2026-08-06": {
+  "ticker": "GE",
+  "entry_date": "2026-08-06",
+  "status": "open",
+  "entry_price": 384.51,
+  "target_1": 461.73,
+  "stop_loss": 345.9,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "RS_2026-08-06": {
+  "ticker": "RS",
+  "entry_date": "2026-08-06",
+  "status": "open",
+  "entry_price": 424.77,
+  "target_1": 495.19,
+  "stop_loss": 389.56,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

@@ -1,6 +1,36 @@
 {
- "date": "2026-08-05",
+ "date": "2026-08-06",
  "rows": [
+  {
+   "ticker": "BSX",
+   "company": "BOSTON SCIENTIFIC CORP",
+   "total_value": 9001407.552,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Mahoney Michael F",
+     "title": "Chairman, President & CEO",
+     "date": "2026-08-03",
+     "value": 9001407.552
+    }
+   ]
+  },
+  {
+   "ticker": "CSGP",
+   "company": "COSTAR GROUP, INC.",
+   "total_value": 2489837.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "FLORANCE ANDREW C",
+     "title": "Founder and CEO",
+     "date": "2026-08-04",
+     "value": 2489837.0
+    }
+   ]
+  },
   {
    "ticker": "ELV",
    "company": "Elevance Health, Inc.",
@@ -21,14 +51,29 @@
      "value": 249158.80000000002
     }
    ]
+  },
+  {
+   "ticker": "TSCO",
+   "company": "TRACTOR SUPPLY CO /DE/",
+   "total_value": 416829.00000000006,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Lawton III Harry A",
+     "title": "President & CEO",
+     "date": "2026-08-04",
+     "value": 416829.00000000006
+    }
+   ]
   }
  ],
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 335,
+  "tickers_with_filings": 336,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 45,
-  "qualifying_after_filter": 2
+  "raw_transactions_parsed": 56,
+  "qualifying_after_filter": 5
  }
 }
