@@ -273,6 +273,13 @@
     </div>
     {% endif %}
     {% endfor %}
+    {% if distribution_days %}
+    <div class="t-card {{ distribution_days.status }}">
+      <div class="t-name">Distribution Days</div>
+      <div class="t-val">{{ distribution_days.count }}</div>
+      <div class="t-label">{{ distribution_days.label }}</div>
+    </div>
+    {% endif %}
   </div>
 </section>
 

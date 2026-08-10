@@ -147,6 +147,9 @@ def run() -> dict:
     # screening и timing остават разделени, виж entry_timing.py docstring-а
     if config.ENABLE_ENTRY_TIMING:
         action = entry_timing.evaluate(action)
+    # концепция 3 — пазарно-глобален сигнал, не per-ticker (виж entry_timing.py)
+    distribution_days = (entry_timing.evaluate_distribution_days()
+                         if config.ENABLE_ENTRY_TIMING else None)
     # чисто информационен флаг — не променя избора на Action, виж correlation_check.py
     correlation_flags = (correlation_check.fetch_correlation_flags(action)
                          if config.ENABLE_CORRELATION_CHECK else [])
@@ -193,6 +196,7 @@ def run() -> dict:
         "news": news,
         "cot": cot_with_theses,
         "correlation_flags": correlation_flags,
+        "distribution_days": distribution_days,
         "backtest": backtest_summary,
     }
 

@@ -329,6 +329,24 @@ ENABLE_ENTRY_TIMING = os.getenv("ENABLE_ENTRY_TIMING", "1") == "1"
 # (screener.py вече го допуска), но Entry Timing го флагва като "extended,
 # изчакай pullback" вместо мълчаливо да го третира като идентично добър вход.
 ENTRY_TIMING_EXTENDED_PCT = float(os.getenv("ENTRY_TIMING_EXTENDED_PCT", 2.0))
+# Концепция 3 — distribution days market gate. IBD/O'Neil стандартна дефиниция:
+# close надолу с поне този % спрямо предходния close, И обем над предходния
+# обем (не просто close<prev без магнитуден праг — иначе тривиални -0.01%
+# тикове се броят наравно с -2% срив дни).
+DISTRIBUTION_DAYS_LOOKBACK = int(os.getenv("DISTRIBUTION_DAYS_LOOKBACK", 25))
+DISTRIBUTION_DAYS_MIN_DECLINE_PCT = float(os.getenv("DISTRIBUTION_DAYS_MIN_DECLINE_PCT", 0.2))
+# FIX калибрация: класическите O'Neil прагове ("3-4 = внимание", "5+ = риск")
+# НЕ пасват на реални данни — проверено на 3г SPY история (IBD дефиниция):
+# 50-ти персентил е ВЕЧЕ 5 (модерните пазари имат структурно по-висока базова
+# честота на "down+higher-vol" дни, отколкото когато O'Neil е калибрирал
+# правилото десетилетия по-рано) — "5+" би флагвало "риск" ~50% от времето,
+# безполезен сигнал. Прагове тук са на 70-ти/95-ти персентил от реалната
+# история (7 / 9), не текстовите O'Neil числа. Forward-return корелация е
+# практически нулева (0.011), но std на 10-дневен forward return расте
+# отчетливо с broя (1.96→2.37→3.20→5.12 по bucket) — метриката предсказва
+# НЕСИГУРНОСТ/риск, не посока, точно каквото Entry Timing търси.
+DISTRIBUTION_DAYS_YELLOW = int(os.getenv("DISTRIBUTION_DAYS_YELLOW", 7))
+DISTRIBUTION_DAYS_RED = int(os.getenv("DISTRIBUTION_DAYS_RED", 9))
 
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"

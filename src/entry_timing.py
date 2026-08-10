@@ -1,35 +1,36 @@
 """
-Entry Timing (Секция [нова], начало на итерация 1) — screening и timing
-остават СТРИКТНО разделени. Screening (screener.py + fundamental_screen +
-AI класификация в apply_hard_rules) отговаря на "коя акция е добра"; този
-модул отговаря на съвсем различен въпрос — "добър ли е точно СЕГА моментът
-да влезеш" в акция, която screening-ът вече е одобрил.
+Entry Timing (Секция [нова]) — screening и timing остават СТРИКТНО разделени.
+Screening (screener.py + fundamental_screen + AI класификация в
+apply_hard_rules) отговаря на "коя акция е добра"; този модул отговаря на
+съвсем различен въпрос — "добър ли е точно СЕГА моментът да влезеш".
 
-Взима ГОТОВИЯ Action списък (след apply_hard_rules) като вход, добавя
-"entry_timing" под-обект на всеки кандидат — чисто информационен badge,
-mirroring как enrich.py вече добавя "options"/"earnings"/"short_view"
-под-обекти. НЕ променя classification, plan, или sizing — ако този модул
+Концепции 1+2 (pivot + volume confirmation, 2% extension rule, виж
+evaluate_pivot_volume/evaluate по-долу) са per-ticker — взимат ГОТОВИЯ Action
+списък, добавят "entry_timing" под-обект на всеки кандидат, mirroring как
+enrich.py добавя "options"/"earnings"/"short_view". Използват СЪЩЕСТВУВАЩИ
+полета от screener.py, нула нови мрежови заявки.
+
+Концепция 3 (distribution days market gate, виж evaluate_distribution_days
+по-долу) е пазарно-глобален сигнал, НЕ per-ticker — SPY/QQQ дневен OHLCV,
+отделна функция, извиквана отделно от evaluate() в main.py, показвана като
+самостоятелен елемент близо до термометъра в dashboard-а, не badge на
+Action картата.
+
+И трите концепции НЕ променят classification, plan, или sizing — ако модулът
 се счупи изцяло, screening-ът продължава напълно непокътнат (graceful
 degradation, Секция 7).
 
-Итерация 1 покрива концепции 1+2 (pivot + volume confirmation, 2% extension
-rule) — и двете използват СЪЩЕСТВУВАЩИ полета, вече изчислени от
-screener.py (pct_from_pivot, volume_ratio, breakout_volume) за всеки
-Action кандидат. Нула нови мрежови заявки в тази итерация.
-
-Концепция 3 (distribution days market gate) е ОТДЕЛНА, по-късна задача —
-изисква нови данни (SPY/QQQ дневен OHLCV) и е пазарно-глобален сигнал, не
-per-ticker; остава извън обхвата на тази итерация нарочно.
-
-ИЗРИЧНО НЕ в тази итерация (за по-късна разработка): follow-through day
-логика, "3 дни над 21-EMA" филтър, undercut & rally (U&R) сетъп,
-staggered/pyramid entry.
+ИЗРИЧНО НЕ в този модул (за по-късна разработка): follow-through day логика,
+"3 дни над 21-EMA" филтър, undercut & rally (U&R) сетъп, staggered/pyramid
+entry.
 """
 from __future__ import annotations
+import yfinance as yf
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import net_utils
 
 
 def evaluate_pivot_volume(candidate: dict) -> dict | None:
@@ -103,6 +104,79 @@ def evaluate(action_candidates: list[dict]) -> list[dict]:
     return action_candidates
 
 
+def _count_distribution_days(sym: str, lookback: int) -> int | None:
+    """
+    Тегли дневен OHLCV за sym (lookback + буфер дни, за да има "предходен ден"
+    контекст за първата сесия в прозореца) през net_utils.fetch_with_timeout()
+    (Секция timeout guard, точка от 02.08.2026 review-то). IBD/O'Neil
+    дефиниция: close надолу с поне config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT
+    спрямо предходния close, И обем над предходния обем — виж config.py
+    коментара защо магнитуден праг, не просто close<prev.
+
+    Graceful: провал на fetch/недостатъчна история → None (не 0 — 0 би
+    означавало "проверено, нула distribution days", различно от "не успяхме
+    да проверим").
+    """
+    hist = net_utils.fetch_with_timeout(
+        lambda: yf.Ticker(sym).history(period=f"{lookback + 15}d"))
+    if hist is None or hist.empty or len(hist) < lookback + 1:
+        return None
+    close, volume = hist["Close"], hist["Volume"]
+    pct_chg = close.pct_change() * 100
+    is_dd = (pct_chg <= -config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT) & (volume > volume.shift(1))
+    return int(is_dd.iloc[-lookback:].sum())
+
+
+def evaluate_distribution_days() -> dict | None:
+    """
+    Концепция 3: distribution days market gate. Пазарно-глобален сигнал
+    (SPY + QQQ), НЕ per-ticker — показва се отделно близо до термометъра в
+    dashboard-а, не badge на Action картата (за разлика от концепции 1+2).
+
+    Калибрация (02.08.2026 review, проверено на 3г реална SPY история):
+    класическите O'Neil прагове ("3-4 = внимание", "5+ = сериозен риск") НЕ
+    пасват — медианата в 25-дневен rolling прозорец вече е 5 (модерните
+    пазари имат структурно по-висока базова честота на "down+higher-vol" дни,
+    отколкото когато O'Neil е калибрирал правилото десетилетия по-рано) —
+    "5+" би флагвало "риск" ~50% от времето, безполезен сигнал. Прагове тук
+    (config.DISTRIBUTION_DAYS_YELLOW/RED) са на 70-ти/95-ти персентил от
+    реалната история (7/9), не текстовите O'Neil числа. Forward 10-дневен
+    SPY return корелация с broя е практически нулева (0.011) — метриката НЕ
+    предсказва посока — но std на forward return расте отчетливо с broя
+    (1.96→2.37→3.20→5.12 по bucket) — предсказва НЕСИГУРНОСТ/риск, точно
+    каквото Entry Timing (кога е добър момент за нов вход) търси.
+
+    Gate статусът използва max(SPY, QQQ) — CANSLIM кандидатите тук са
+    growth-нагласени, QQQ distress е поне толкова релевантен, колкото SPY.
+
+    Graceful: провал на fetch за ДВАТА индекса → None (dashboard-ът скрива
+    целия елемент). Провал само на единия → продължава с наличния.
+    """
+    spy_count = _count_distribution_days("SPY", config.DISTRIBUTION_DAYS_LOOKBACK)
+    qqq_count = _count_distribution_days("QQQ", config.DISTRIBUTION_DAYS_LOOKBACK)
+    if spy_count is None and qqq_count is None:
+        return None
+
+    gate_count = max(c for c in (spy_count, qqq_count) if c is not None)
+    if gate_count >= config.DISTRIBUTION_DAYS_RED:
+        status = "red"
+    elif gate_count >= config.DISTRIBUTION_DAYS_YELLOW:
+        status = "yellow"
+    else:
+        status = "green"
+
+    parts = []
+    if spy_count is not None:
+        parts.append(f"SPY {spy_count}")
+    if qqq_count is not None:
+        parts.append(f"QQQ {qqq_count}")
+    label = (f"{' / '.join(parts)} (последни "
+            f"{config.DISTRIBUTION_DAYS_LOOKBACK} сесии)")
+
+    return {"count": gate_count, "spy_count": spy_count, "qqq_count": qqq_count,
+            "status": status, "label": label}
+
+
 if __name__ == "__main__":
     import json
     mock = [
@@ -112,3 +186,4 @@ if __name__ == "__main__":
         {"ticker": "NOT_YET", "pct_from_pivot": -2.1, "volume_ratio": 1.1, "breakout_volume": False},
     ]
     print(json.dumps(evaluate(mock), indent=2, ensure_ascii=False))
+    print(json.dumps(evaluate_distribution_days(), indent=2, ensure_ascii=False))
