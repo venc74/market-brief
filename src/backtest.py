@@ -404,7 +404,12 @@ def get_backtest_summary() -> dict:
         for r in live_records:
             entry_price = r.get("entry_price")
             cur = prices.get(r["ticker"])
-            unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1)
+            # FIX 2026-08-10: round(-0.04, 1) == -0.0 в Python — str(-0.0) е "-0.0",
+            # а -0.0 >= 0 е True (IEEE 754), затова темплейтният "+" prefix logic
+            # ("+" if pct >= 0 else "") произвежда "+-0.0%" (потвърдено живо: ROST
+            # на 10.08.2026, unrealized_pct=-0.0 в реалния persisted JSON). "+ 0.0"
+            # нормализира -0.0 → 0.0 на източника, не само козметично в темплейта.
+            unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1) + 0.0
                               if cur is not None and entry_price else None)
             open_positions.append({
                 "ticker": r["ticker"],

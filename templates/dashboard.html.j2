@@ -533,22 +533,28 @@
         </div>
         <div class="cot-tickers">{% for t in c.direct_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
         <div class="thesis-chain">{{ c.direct_thesis.reasoning }}</div>
+        {% if c.direct_thesis.outside_screener %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        {% endif %}
       </div>
       {% endif %}
 
       {% if c.cross_sector_thesis %}
       <div class="cot-sub">
         <div class="cot-sub-label">Cross-sector теза
-          <span class="cot-direction {{ c.cross_sector_thesis.direction }}">{{ c.cross_sector_thesis.direction }}</span>
+          {% if c.cross_sector_thesis.tickers %}<span class="cot-direction {{ c.cross_sector_thesis.direction }}">{{ c.cross_sector_thesis.direction }}</span>{% endif %}
         </div>
+        {% if c.cross_sector_thesis.tickers %}
         <div class="cot-tickers">{% for t in c.cross_sector_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
+        {% endif %}
         <div class="thesis-chain">{{ c.cross_sector_thesis.reasoning }}</div>
-      </div>
-      {% endif %}
-
-      {% if c.outside_screener %}
-      <div class="small" style="font-size:11px;color:var(--muted);margin-top:6px">
-        Тикърите не са в текущия CANSLIM скрийнър.
+        {% if c.cross_sector_thesis.outside_screener %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        {% endif %}
       </div>
       {% endif %}
     </div>

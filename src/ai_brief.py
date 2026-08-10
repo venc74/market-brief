@@ -313,16 +313,38 @@ def _verified_company_name(ticker: str) -> str:
         return ticker
 
 
-def _verify_thesis_tickers(thesis: dict) -> dict:
-    """Заменя AI-generated 'company' с верифицирано yfinance име за всеки тикър в тезата."""
-    tickers = thesis.get("tickers")
-    if not tickers:
+def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> dict | None:
+    """
+    Заменя AI-generated 'company' с верифицирано yfinance име за всеки тикър в тезата.
+
+    FIX 2026-08-10: 'outside_screener' вече се изчислява ТУК от кода (сравнение
+    с реалния screener_tickers set), не се доверяваме на AI self-report. Преди,
+    едно top-level 'outside_screener' поле покриваше ЦЯЛАТА теза (direct_thesis
+    + cross_sector_thesis заедно) — потвърдено грешно на 10.08.2026, Soybeans
+    тезата: direct_thesis тикъри (ADM/BG/MOO) РЕАЛНО бяха извън скрийнъра,
+    cross_sector тикъри (ABNB/ROKU) РЕАЛНО бяха в скрийнъра (потвърдено в
+    watchlist-а от same ден), но AI-то върна едно 'outside_screener: true' за
+    целия обект — footer бележката директно противоречеше на cross_sector
+    reasoning текста, който изрично твърдеше "ABNB и ROKU са в скрийнъра".
+    Сега всяка под-теза получава СВОЙ собствен, code-computed флаг.
+
+    thesis=None (напр. когато AI-то върне празен cross_sector_thesis при липса
+    на директен бенефициент) → връща None непроменено, template-ът вече прави
+    {% if c.cross_sector_thesis %} truthiness проверка.
+    """
+    if not thesis:
         return thesis
+    tickers = thesis.get("tickers")
     thesis = dict(thesis)
-    thesis["tickers"] = [
-        {**t, "company": _verified_company_name(t["ticker"])}
-        for t in tickers if isinstance(t, dict) and t.get("ticker")
-    ]
+    if tickers:
+        thesis["tickers"] = [
+            {**t, "company": _verified_company_name(t["ticker"])}
+            for t in tickers if isinstance(t, dict) and t.get("ticker")
+        ]
+        thesis["outside_screener"] = not any(
+            t.get("ticker") in screener_tickers for t in thesis["tickers"])
+    else:
+        thesis["outside_screener"] = False
     return thesis
 
 
@@ -364,8 +386,8 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 история): {json.dumps(batch, ensure_ascii=False, default=str)}
 
 ТЕКУЩ CANSLIM СКРИЙНЪР (за cross-reference — предпочитай тези тикъри, когато \
-логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър, но \
-отбележи го с "outside_screener": true): \
+логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър — дали \
+е извън скрийнъра се засича автоматично от кода, не отбелязвай го сам): \
 {json.dumps(screener_universe, ensure_ascii=False)}
 {prior_block}
 
@@ -383,12 +405,17 @@ extreme_short → bullish обрат очакван),
 - "cross_sector_thesis": {{
     "direction": "bullish"/"bearish",
     "tickers": [1-3 обекта {{"ticker": "...", "company": "..."}} — бенефициенти \
-от ОБРАТНИЯ ефект — напр. ако петрол readies за спад, кои некорелирани/обратно \
-изложени сектори печелят],
-    "reasoning": "2-3 изречения — верижната логика инструмент → бенефициент"
+от ОБРАТНИЯ ефект, САМО ако има ДИРЕКТНА икономическа връзка (1-2 стъпки: input \
+costs, revenue exposure, конкурентна позиция спрямо самия инструмент) — НЕ \
+generic макро верига от типа "цената пада → инфлацията спада → потребителите \
+харчат повече → X печели донякъде" (технически вярно, но твърде разредено за \
+реална теза — почти всяка discretionary акция "пасва" на почти всяка commodity \
+deflation тема по този начин, което го прави безсмислено),
+    "reasoning": "2-3 изречения — директната верижна логика инструмент → \
+бенефициент. Ако НИКОЙ кандидат няма реална директна връзка, върни ПРАЗЕН \
+tickers списък ([]) и кажи го изрично тук (напр. 'няма пряк бенефициент сред \
+днешните кандидати') — не насилвай генерична връзка само за да запълниш полето."
   }}
-- "outside_screener": true само ако нито един предложен тикър не е от подадения \
-скрийнър универс
 
 Ако екстремумът е твърде слаб/неясен за смислена теза (напр. пазар без ликвидни \
 свързани акции), пропусни го от отговора — не гадай.
@@ -485,13 +512,15 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
                 _record_ticker_context(seen_tickers, t["market"], "cross_sector_thesis",
                                        t.get("cross_sector_thesis") or {})
 
+    screener_tickers = {c["ticker"] for c in screener_universe if c.get("ticker")}
     merged = []
     for e in extremes:
         t = theses_by_market.get(e["market"])
         if not t:
             continue
         merged.append({**e,
-                       "direct_thesis": _verify_thesis_tickers(t.get("direct_thesis", {})),
-                       "cross_sector_thesis": _verify_thesis_tickers(t.get("cross_sector_thesis", {})),
-                       "outside_screener": t.get("outside_screener", False)})
+                       "direct_thesis": _verify_thesis_tickers(
+                           t.get("direct_thesis") or {}, screener_tickers),
+                       "cross_sector_thesis": _verify_thesis_tickers(
+                           t.get("cross_sector_thesis") or {}, screener_tickers)})
     return merged
