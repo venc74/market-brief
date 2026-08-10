@@ -1,5 +1,5 @@
 {
- "date": "2026-08-07",
+ "date": "2026-08-10",
  "rows": [
   {
    "ticker": "BSX",
@@ -71,9 +71,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 340,
+  "tickers_with_filings": 341,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 61,
+  "raw_transactions_parsed": 60,
   "qualifying_after_filter": 5
  }
 }

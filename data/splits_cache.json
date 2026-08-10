@@ -1,15 +1,25 @@
 {
- "date": "2026-08-07",
+ "date": "2026-08-10",
  "rows": [
   {
-   "ticker": "TOP",
-   "company": "TOP Financial Group Limited",
-   "date": "2026-08-03",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Aug 03, 2026",
-   "price": 10.66,
-   "market_cap": 1319301246.2460737
+   "ticker": "MNST",
+   "company": "Monster Beverage Corporation",
+   "date": "2026-08-11",
+   "ratio": "2:1",
+   "split_type": "normal",
+   "date_human": "Aug 11, 2026",
+   "price": 90.36,
+   "market_cap": 88509959295.37515
+  },
+  {
+   "ticker": "TYOYY",
+   "company": "Taiyo Yuden Co. Ltd ADR",
+   "date": "2026-08-12",
+   "ratio": "16:1",
+   "split_type": "normal",
+   "date_human": "Aug 12, 2026",
+   "price": 249.0,
+   "market_cap": 7790394774.0
   }
  ]
 }
