@@ -318,6 +318,18 @@ ENABLE_CORRELATION_CHECK = os.getenv("ENABLE_CORRELATION_CHECK", "1") == "1"
 CORRELATION_LOOKBACK_DAYS = int(os.getenv("CORRELATION_LOOKBACK_DAYS", 60))
 CORRELATION_THRESHOLD = float(os.getenv("CORRELATION_THRESHOLD", 0.75))
 
+# ── Entry Timing (screening ≠ timing — виж entry_timing.py docstring-а) ────
+# Концепции 1+2 (pivot+volume confirmation, extension rule) — чисто
+# информационен badge на Action картата, НЕ пипа CANSLIM screening/apply_
+# hard_rules логиката. Концепция 3 (distribution days market gate) е отделна,
+# по-късна задача — не участва тук.
+ENABLE_ENTRY_TIMING = os.getenv("ENABLE_ENTRY_TIMING", "1") == "1"
+# По-строг праг от screener.py's MAX_PCT_BELOW_PIVOT/+5% extended cutoff —
+# 0-2% над pivot = идеална входна зона; 2-5% е все още валиден CANSLIM setup
+# (screener.py вече го допуска), но Entry Timing го флагва като "extended,
+# изчакай pullback" вместо мълчаливо да го третира като идентично добър вход.
+ENTRY_TIMING_EXTENDED_PCT = float(os.getenv("ENTRY_TIMING_EXTENDED_PCT", 2.0))
+
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
 BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))

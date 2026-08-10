@@ -27,6 +27,7 @@ from src import insider_buying
 from src import correlation_check
 from src import backtest
 from src import cot
+from src import entry_timing
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -142,6 +143,10 @@ def run() -> dict:
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
+    # чисто информационен badge на картата — не пипа classification/plan/sizing,
+    # screening и timing остават разделени, виж entry_timing.py docstring-а
+    if config.ENABLE_ENTRY_TIMING:
+        action = entry_timing.evaluate(action)
     # чисто информационен флаг — не променя избора на Action, виж correlation_check.py
     correlation_flags = (correlation_check.fetch_correlation_flags(action)
                          if config.ENABLE_CORRELATION_CHECK else [])

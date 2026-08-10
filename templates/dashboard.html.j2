@@ -373,6 +373,14 @@
         <div class="kv"><span>RS Line</span><b>{{ "нов максимум" if st.rs_status == "new_high" else "близо до максимум" }}</b></div>
         <div class="kv"><span>50DMA / 200DMA</span><b>${{ st.ma50 }} / ${{ st.ma200 }}</b></div>
         <div class="kv"><span>Обем (vs 50d avg)</span><b>{{ st.volume_ratio }}x{{ " ✓ пробивен" if st.breakout_volume else "" }}</b></div>
+        {% if st.entry_timing %}
+        <div class="kv"><span>Entry Timing</span>
+          <b style="color: {{ 'var(--green)' if st.entry_timing.verdict == 'good' else 'var(--red)' if st.entry_timing.verdict == 'wait' else 'var(--yellow)' }}">
+            {{ 'Добър timing' if st.entry_timing.verdict == 'good' else 'Изчакай' if st.entry_timing.verdict == 'wait' else 'Внимание' }}
+          </b>
+        </div>
+        <div class="why" style="font-size:12.5px;color:var(--muted);margin-top:2px">{{ st.entry_timing.note }}</div>
+        {% endif %}
         <h3>Фундамент</h3>
         <div class="kv"><span>EPS ръст YoY</span><b>{{ st.eps_growth_yoy }}%</b></div>
         <div class="kv"><span>Revenue ръст YoY</span><b>{{ st.revenue_growth_yoy }}%</b></div>
