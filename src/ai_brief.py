@@ -295,22 +295,38 @@ contrarian сигнал — екстремно нетно дълги = поте�
 
 
 @lru_cache(maxsize=256)
-def _verified_company_name(ticker: str) -> str:
+def _verified_company_name(ticker: str) -> dict:
     """
     FIX 2026-08-01: COT proxy тикъри получаваха различно AI-халюцинирано "company"
     име при всяко извикване — напр. "WH" ту "Wyndham Hotels", ту "World Wrestling",
     ту грешно "Westrock Coffee" (реалният WEST тикър е различен, различна компания).
     AI-то вече не се доверява за company полето — верифицираме през yfinance
     (същия shortName/longName паттърн като magic_formula.py/screener.py).
-    Graceful: провал/непознат тикър → връща самия ticker symbol, не халюцинация.
+
+    FIX 2026-08-11: потвърдени случаи (MRO — придобита от ConocoPhillips
+    22.11.2024, делистната; HBI — придобита от Gildan 01.12.2025, делистната;
+    COTT-фамилията — вероятно предаденствала до PRMW, самата PRMW също се
+    оказа "possibly delisted; no price data found" в реалната yfinance
+    проверка) — AI-то продължава уверено да предлага такива тикъри в COT
+    тезите (training данните му вероятно предхождат сделките), а старият тих
+    fallback ("върни ticker символа") показваше "MRO (MRO)" в dashboard-а без
+    никакъв сигнал ЗАЩО lookup-ът е паднал. Потвърдено на живо: делистнати
+    тикъри системно връщат shortName=None И longName=None от yfinance
+    (докато валидни тикъри — AAPL/JPM/GOOGL — винаги ги връщат коректно) —
+    надежден, вече-съществуващ сигнал, нулев допълнителен network call.
+
+    Вместо гол string, сега връща {"name": ..., "verified": bool} —
+    извикващият код (_verify_thesis_tickers) премахва цели тикъри при
+    verified=False, вместо само да показва грозно "TICKER (TICKER)" име.
     lru_cache пести повторни заявки за един и същ тикър в рамките на процеса.
     """
     try:
         info = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).info) or {}
-        return info.get("shortName") or info.get("longName") or ticker
+        name = info.get("shortName") or info.get("longName")
+        return {"name": name or ticker, "verified": bool(name)}
     except Exception as e:
         print(f"[ai] company lookup {ticker}: {e}")
-        return ticker
+        return {"name": ticker, "verified": False}
 
 
 def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> dict | None:
@@ -331,20 +347,49 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> d
     thesis=None (напр. когато AI-то върне празен cross_sector_thesis при липса
     на директен бенефициент) → връща None непроменено, template-ът вече прави
     {% if c.cross_sector_thesis %} truthiness проверка.
+
+    FIX 2026-08-11: тикъри, за които _verified_company_name() върне
+    verified=False (потвърдени случаи MRO/HBI — делистнати, вероятно и
+    COTT/PRMW фамилията), се ПРЕМАХВАТ изцяло от финалния tickers списък —
+    не просто показват с грозно "TICKER (TICKER)" име. AI-то продължава
+    уверено да предлага такива тикъри от training данните си; тих fallback
+    не е достатъчен за delisted компания, предложена като реален trade
+    кандидат. Ако ВСИЧКИ тикъри в тезата отпаднат по тази причина, цялата
+    под-теза се връща като None — reasoning текстът реферира конкретно
+    премахнатите тикъри и би бил подвеждащ самичък, без нито един реален
+    тикър до него (template-ът вече прави truthiness проверка, скрива блока).
+    Частично отпаднали тикъри → останалите се показват нормално, плюс
+    "dropped_tickers" бележка (виж dashboard.html.j2).
     """
     if not thesis:
         return thesis
     tickers = thesis.get("tickers")
     thesis = dict(thesis)
-    if tickers:
-        thesis["tickers"] = [
-            {**t, "company": _verified_company_name(t["ticker"])}
-            for t in tickers if isinstance(t, dict) and t.get("ticker")
-        ]
-        thesis["outside_screener"] = not any(
-            t.get("ticker") in screener_tickers for t in thesis["tickers"])
-    else:
+    if not tickers:
         thesis["outside_screener"] = False
+        return thesis
+
+    verified, dropped = [], []
+    for t in tickers:
+        if not (isinstance(t, dict) and t.get("ticker")):
+            continue
+        lookup = _verified_company_name(t["ticker"])
+        if lookup["verified"]:
+            verified.append({**t, "company": lookup["name"]})
+        else:
+            dropped.append(t["ticker"])
+
+    if dropped:
+        print(f"[ai] COT тикъри премахнати при верификация "
+              f"(вероятно delisted/renamed): {dropped}")
+
+    if not verified:
+        return None
+
+    thesis["tickers"] = verified
+    thesis["dropped_tickers"] = dropped or None
+    thesis["outside_screener"] = not any(
+        t.get("ticker") in screener_tickers for t in thesis["tickers"])
     return thesis
 
 

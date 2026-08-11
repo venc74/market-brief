@@ -553,6 +553,11 @@
           Тези тикъри не са в текущия CANSLIM скрийнър.
         </div>
         {% endif %}
+        {% if c.direct_thesis.dropped_tickers %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          {{ c.direct_thesis.dropped_tickers|join(', ') }} премахнати при верификация (вероятно delisted/грешен тикър).
+        </div>
+        {% endif %}
       </div>
       {% endif %}
 
@@ -568,6 +573,11 @@
         {% if c.cross_sector_thesis.outside_screener %}
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
           Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        {% endif %}
+        {% if c.cross_sector_thesis.dropped_tickers %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          {{ c.cross_sector_thesis.dropped_tickers|join(', ') }} премахнати при верификация (вероятно delisted/грешен тикър).
         </div>
         {% endif %}
       </div>
