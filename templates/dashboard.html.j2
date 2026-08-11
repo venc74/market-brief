@@ -397,6 +397,14 @@
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
         <div class="kv"><span>Препоръка</span><b>{{ st.ai.earnings_call }}</b></div>
+        {% if st.earnings.recap %}
+        <div class="kv"><span>Последен отчет ({{ st.earnings.recap.date }})</span>
+          <b>EPS {{ st.earnings.recap.eps_actual }}{% if st.earnings.recap.eps_estimate is not none %} vs {{ st.earnings.recap.eps_estimate }} est.{% endif %}{% if st.earnings.recap.eps_surprise_pct is not none %} ({{ '+' if st.earnings.recap.eps_surprise_pct >= 0 else '' }}{{ st.earnings.recap.eps_surprise_pct }}%){% endif %}</b>
+        </div>
+        {% if st.earnings.recap.reaction_pct is not none %}
+        <div class="kv"><span>Реакция</span><b>{{ '+' if st.earnings.recap.reaction_pct >= 0 else '' }}{{ st.earnings.recap.reaction_pct }}%{% if st.earnings.recap.reaction_volume_ratio is not none %} ({{ st.earnings.recap.reaction_volume_ratio }}x обем){% endif %}</b></div>
+        {% endif %}
+        {% endif %}
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск ${{ p.max_risk_usd|int }}{% if p.sizing_factor < 1 %} (Defensive ×{{ p.sizing_factor }}){% endif %}</h3>
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
@@ -636,7 +644,7 @@
       <tbody>
         {% for p in backtest.open_positions[:100] %}
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
-          <td class="sym">{{ p.ticker }}</td>
+          <td class="sym">{{ p.ticker }}{% if p.earnings_recap %}<span style="cursor:help" title="Earnings {{ p.earnings_recap.date }}: EPS {{ p.earnings_recap.eps_actual }}{% if p.earnings_recap.eps_surprise_pct is not none %} ({{ '+' if p.earnings_recap.eps_surprise_pct >= 0 else '' }}{{ p.earnings_recap.eps_surprise_pct }}% surprise){% endif %}{% if p.earnings_recap.reaction_pct is not none %} · реакция {{ '+' if p.earnings_recap.reaction_pct >= 0 else '' }}{{ p.earnings_recap.reaction_pct }}%{% endif %}"> 📊</span>{% endif %}</td>
           <td>{{ p.entry_date }}</td>
           <td class="n">${{ p.entry_price }}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>

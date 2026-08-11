@@ -58,6 +58,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
+from src import enrich
 
 _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
@@ -480,6 +481,10 @@ def get_backtest_summary() -> dict:
                 "current_price": round(cur, 2) if cur is not None else None,
                 "unrealized_pct": unrealized_pct,
                 "needs_manual_review": needs_review,
+                # FIX 2026-08-12 (Earnings Season Recap, Case 2): само ако
+                # последният отчет е СЛЕД entry_date — "какво стана, докато
+                # държа тази позиция" (виж enrich.earnings_recap docstring-а).
+                "earnings_recap": enrich.earnings_recap(r["ticker"], r["entry_date"]),
             })
         open_positions.sort(key=lambda r: r["entry_date"])  # възходящо — най-старите първи
 

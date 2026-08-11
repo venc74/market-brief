@@ -17,14 +17,106 @@ import config
 
 # v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
 from src import magic_formula, borrow_data, unusual_options, splits_calendar, dataroma
+from src import net_utils
 
 
 # ──────────────────────────────────────────────────────────────────────────
 # Earnings (Секция 3.2 + правило за blackout от Секция 8)
+# + Earnings Season Recap (Секция [нова], v1 — виж дискусията 2026-08-12)
 # ──────────────────────────────────────────────────────────────────────────
+def _nan_to_none(v):
+    """
+    NaN -> None; иначе каства към native Python float (не numpy.float64 —
+    numpy.float64 Е instance на float в Python, isinstance проверката минава,
+    но json.dumps(..., default=str) би го сериализирал като STRING, не число,
+    ако не се кастне явно тук; потвърдено на живо: EPS Estimate/Surprise(%)
+    от pandas Series идват като numpy.float64, Reported EPS вече минаваше
+    през round(float(...), 2) отделно и затова не показваше проблема).
+    """
+    if v is None:
+        return None
+    f = float(v)
+    return None if f != f else f  # f != f само за NaN
+
+
+def _last_earnings_recap(df) -> dict | None:
+    """
+    Извлича последния МИНАЛ отчет от get_earnings_dates() DataFrame-а — СЪЩИЯ
+    df, който earnings_info() вече тегли за forward-looking next_earnings
+    (само обратния филтър: past вместо future). Нулев допълнителен network
+    call за EPS частта. Revenue actual не съществува в тази DataFrame изобщо
+    (проверено 2026-08-12: колоните са само EPS Estimate/Reported EPS/
+    Surprise(%)) — не graceful degradation на нестабилен източник, просто
+    полето структурно го няма тук.
+
+    Връща None ако няма минал отчет в прозореца, ИЛИ ако последният е
+    "отчетен" по дата, но Reported EPS все още е NaN (напр. отчет тази
+    сутрин, данните още не са публикувани от Yahoo).
+    """
+    if df is None or not len(df):
+        return None
+    now = dt.datetime.now(df.index.tz)
+    past = df[df.index <= now]
+    if not len(past):
+        return None
+    past = past.sort_index(ascending=False)
+    row, date = past.iloc[0], past.index[0]
+    eps_actual = _nan_to_none(row.get("Reported EPS"))
+    if eps_actual is None:
+        return None
+    return {
+        "date": date.date().isoformat(),
+        "eps_estimate": _nan_to_none(row.get("EPS Estimate")),
+        "eps_actual": round(float(eps_actual), 2),
+        "eps_surprise_pct": _nan_to_none(row.get("Surprise(%)")),
+    }
+
+
+def _earnings_reaction(sym: str, earnings_date: str) -> dict | None:
+    """
+    Ценова реакция на earnings датата: close-to-close спрямо предходния
+    търговски ден + обем спрямо средния от предходните 5 дни. Отделен fetch
+    от recap EPS частта (различен yfinance endpoint — history, не
+    get_earnings_dates).
+
+    v1 приближение (договорено 2026-08-12): earnings датата = реакционния
+    ден, без BMO/AMC разграничение. При AMC (after market close) отчет
+    реалната реакция е на СЛЕДВАЩИЯ ден — приемлив компромис за v1 срещу
+    двоен network call на тикър; прецизиране само ако на практика видим
+    системно подвеждащи "нулеви" реакции.
+
+    Graceful: провал/липсваща дата в прозореца/липсва предходен ден за
+    сравнение → None.
+    """
+    try:
+        ed = dt.date.fromisoformat(earnings_date)
+        start = (ed - dt.timedelta(days=10)).isoformat()
+        end = (ed + dt.timedelta(days=5)).isoformat()
+        hist = net_utils.fetch_with_timeout(
+            lambda: yf.Ticker(sym).history(start=start, end=end))
+        if hist is None or hist.empty:
+            return None
+        dates = [ts.date() for ts in hist.index]
+        if ed not in dates:
+            return None
+        i = dates.index(ed)
+        if i == 0:
+            return None
+        close_today, close_prev = float(hist["Close"].iloc[i]), float(hist["Close"].iloc[i - 1])
+        vol_today = float(hist["Volume"].iloc[i])
+        vol_avg = float(hist["Volume"].iloc[max(0, i - 5):i].mean())
+        return {
+            "reaction_pct": round((close_today / close_prev - 1) * 100, 2),
+            "reaction_volume_ratio": round(vol_today / vol_avg, 2) if vol_avg else None,
+        }
+    except Exception as e:
+        print(f"[enrich] earnings reaction {sym}: {e}")
+        return None
+
+
 def earnings_info(sym: str) -> dict:
     out = {"next_earnings": None, "days_to_earnings": None,
-           "in_blackout": False, "eps_estimate": None}
+           "in_blackout": False, "eps_estimate": None, "recap": None}
     try:
         tk = yf.Ticker(sym)
         cal = tk.calendar
@@ -43,13 +135,17 @@ def earnings_info(sym: str) -> dict:
                 print(f"[enrich] earnings {sym}: календарът върна минала дата "
                       f"{ed} — падам към get_earnings_dates()")
                 ed = None
-        if ed is None:
-            df = tk.get_earnings_dates(limit=8)
-            if df is not None and len(df):
-                future = df[df.index > dt.datetime.now(df.index.tz)]
-                if len(future):
-                    # .min() = най-близката бъдеща дата, независимо от реда на сортиране
-                    ed = future.index.min().date()
+
+        # FIX 2026-08-12 (Earnings Season Recap, Case 1): df се тегли БЕЗУСЛОВНО
+        # сега (преди: само при calendar fallback) — recap-ът (миналите редове
+        # от СЪЩАТА DataFrame) е нужен независимо дали tk.calendar вече е дал
+        # валидна бъдеща дата.
+        df = net_utils.fetch_with_timeout(lambda: tk.get_earnings_dates(limit=8))
+        if ed is None and df is not None and len(df):
+            future = df[df.index > dt.datetime.now(df.index.tz)]
+            if len(future):
+                # .min() = най-близката бъдеща дата, независимо от реда на сортиране
+                ed = future.index.min().date()
         if ed is not None:
             if isinstance(ed, dt.datetime):
                 ed = ed.date()
@@ -62,9 +158,52 @@ def earnings_info(sym: str) -> dict:
             })
         info = tk.info or {}
         out["eps_estimate"] = info.get("epsCurrentYear") or info.get("forwardEps")
+
+        # Case 1 (Action картата) — безусловно, БЕЗ entry_date филтър (пресен
+        # candidate няма entry_date още на този етап от pipeline-а, виж
+        # дискусията 2026-08-12). Датата на отчета вече комуникира давността.
+        recap = _last_earnings_recap(df)
+        if recap:
+            reaction = _earnings_reaction(sym, recap["date"])
+            if reaction:
+                recap.update(reaction)
+            out["recap"] = recap
     except Exception as e:
         print(f"[enrich] earnings {sym}: {e}")
     return out
+
+
+def earnings_recap(sym: str, entry_date: str | None = None) -> dict | None:
+    """
+    Case 2 (track record / отворени позиции, отпаднали от активния
+    watchlist) — лека, самостоятелна версия на recap логиката от
+    earnings_info(), без forward-looking calendar overhead (next_earnings/
+    days_to_earnings/in_blackout не са релевантни за вече отворена позиция).
+
+    entry_date: ако е подаден, recap се връща САМО ако last_earnings_date е
+    СЛЕД entry_date — "какво стана, докато държа тази позиция", не изобщо
+    последния отчет на компанията (виж дискусията 2026-08-12 — за разлика
+    от Case 1, тук entry_date РЕАЛНО съществува, съхранено в tracker записа).
+    ISO низовете ("YYYY-MM-DD") сравняват коректно лексикографски, без нужда
+    от date parsing.
+
+    Graceful: провал/липсващ отчет/отчет преди entry-то → None.
+    """
+    try:
+        df = net_utils.fetch_with_timeout(
+            lambda: yf.Ticker(sym).get_earnings_dates(limit=8))
+        recap = _last_earnings_recap(df)
+        if not recap:
+            return None
+        if entry_date and recap["date"] <= entry_date:
+            return None
+        reaction = _earnings_reaction(sym, recap["date"])
+        if reaction:
+            recap.update(reaction)
+        return recap
+    except Exception as e:
+        print(f"[enrich] earnings_recap {sym}: {e}")
+        return None
 
 
 # ──────────────────────────────────────────────────────────────────────────
