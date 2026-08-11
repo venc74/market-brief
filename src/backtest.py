@@ -57,6 +57,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import net_utils
 
 _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
@@ -237,6 +238,44 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
+def _split_since_entry(ticker: str, entry_date: str) -> dict | None:
+    """
+    FIX 2026-08-11 (MNST split артефакт): проверява дали ticker е претърпял
+    split между entry_date и днес. yfinance ретроактивно split-adjust-ва
+    ЦЯЛАТА историческа OHLC серия при всяко теглене, независимо от
+    auto_adjust=True/False (потвърдено емпирично — идентични стойности и
+    при двата флага за дати преди split) — stop_loss/target_1/entry_price
+    остават замразени в ценовата скала от момента на entry-то, докато
+    всяко следващо теглене на историята връща различно мащабирани
+    стойности за СЪЩИТЕ исторически дати. Сравнение на замразен stop_loss
+    срещу динамично прещъртани цени произвежда фалшива резолюция —
+    потвърден случай: MNST_2026-07-02, 2-за-1 split на 11.08.2026,
+    фалшив "stopped" с resolution_date само 4 дни след entry (докато
+    реалната, тогава-текуща цена никога не е доближавала stop_loss-а).
+
+    Скоуп нарочно тесен: само детекция + флаг, НЕ retroactive price
+    rescaling — по-безопасният от двата подхода, обсъдени с потребителя.
+
+    Graceful: провал на fetch → None (по-безопасно да продължи нормалната
+    резолюция, отколкото да блокира всичко при мрежов проблем).
+    """
+    try:
+        splits = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).splits)
+        if splits is None or splits.empty:
+            return None
+        entry_ts = pd.Timestamp(entry_date)
+        if entry_ts.tzinfo is None and splits.index.tz is not None:
+            entry_ts = entry_ts.tz_localize(splits.index.tz)
+        since_entry = splits[splits.index > entry_ts]
+        if since_entry.empty:
+            return None
+        split_date = since_entry.index[0]
+        return {"date": split_date.date().isoformat(), "ratio": float(since_entry.iloc[0])}
+    except Exception as e:
+        print(f"[backtest] split check {ticker}: {e}")
+        return None
+
+
 def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
                              fields: tuple[str, ...]) -> dict[str, "pd.DataFrame | None"]:
     """
@@ -277,8 +316,25 @@ def _resolve_open_positions(tracker: dict) -> None:
     today = dt.date.today()
     for _, rec in live_items:
         ticker = rec["ticker"]
+        # FIX 2026-08-11: веднъж флагнат, записът остава в needs_manual_review
+        # до ръчно изчистване — не пипаме split проверката отново всеки run,
+        # и НЕ позволяваме на транзиентен провал на split fetch-а да го
+        # плъзне обратно в автоматична резолюция.
+        if rec.get("needs_manual_review"):
+            continue
         if ticker not in getattr(highs, "columns", []):
             print(f"[backtest] {ticker}: няма данни в batch резултата — пропускам (остава {rec['status']})")
+            continue
+        split = _split_since_entry(ticker, rec["entry_date"])
+        if split:
+            rec["needs_manual_review"] = {
+                "reason": "split_detected",
+                "split_date": split["date"],
+                "split_ratio": split["ratio"],
+            }
+            print(f"[backtest] {ticker}: split {split['ratio']:.0f}:1 на {split['date']} след "
+                  f"entry ({rec['entry_date']}) — пропускам автоматична резолюция, "
+                  "needs_manual_review")
             continue
         try:
             _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
@@ -409,14 +465,21 @@ def get_backtest_summary() -> dict:
             # ("+" if pct >= 0 else "") произвежда "+-0.0%" (потвърдено живо: ROST
             # на 10.08.2026, unrealized_pct=-0.0 в реалния persisted JSON). "+ 0.0"
             # нормализира -0.0 → 0.0 на източника, не само козметично в темплейта.
+            # FIX 2026-08-11: needs_manual_review означава entry_price е замразен
+            # в предишна ценова скала (split-artifact, виж _split_since_entry) —
+            # unrealized_pct спрямо текущата (нова-скала) цена би бил също толкова
+            # подвеждащ, колкото самата автоматична резолюция, която този флаг
+            # съществува да предотврати. Потискаме изчислението, не само текста.
+            needs_review = r.get("needs_manual_review")
             unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1) + 0.0
-                              if cur is not None and entry_price else None)
+                              if (cur is not None and entry_price and not needs_review) else None)
             open_positions.append({
                 "ticker": r["ticker"],
                 "entry_date": r["entry_date"],
                 "entry_price": entry_price,
                 "current_price": round(cur, 2) if cur is not None else None,
                 "unrealized_pct": unrealized_pct,
+                "needs_manual_review": needs_review,
             })
         open_positions.sort(key=lambda r: r["entry_date"])  # възходящо — най-старите първи
 

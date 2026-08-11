@@ -640,7 +640,14 @@
           <td>{{ p.entry_date }}</td>
           <td class="n">${{ p.entry_price }}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
+          {% if p.needs_manual_review %}
+          <td class="n pct" style="color:var(--yellow)"
+              title="{{ p.needs_manual_review.reason }} · {{ p.needs_manual_review.split_ratio|int }}:1 split на {{ p.needs_manual_review.split_date }}">
+            ⚠ split — нужен ръчен преглед
+          </td>
+          {% else %}
           <td class="n pct">{% if p.unrealized_pct is not none %}{{ '+' if p.unrealized_pct >= 0 else '' }}{{ p.unrealized_pct }}%{% else %}—{% endif %}</td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
