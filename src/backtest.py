@@ -481,10 +481,10 @@ def get_backtest_summary() -> dict:
                 "current_price": round(cur, 2) if cur is not None else None,
                 "unrealized_pct": unrealized_pct,
                 "needs_manual_review": needs_review,
-                # FIX 2026-08-12 (Earnings Season Recap, Case 2): само ако
-                # последният отчет е СЛЕД entry_date — "какво стана, докато
-                # държа тази позиция" (виж enrich.earnings_recap docstring-а).
-                "earnings_recap": enrich.earnings_recap(r["ticker"], r["entry_date"]),
+                # FIX 2026-08-13: entry_date филтърът е премахнат — единен
+                # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
+                # docstring-а, дискусията 2026-08-13).
+                "earnings_recap": enrich.earnings_recap(r["ticker"]),
             })
         open_positions.sort(key=lambda r: r["entry_date"])  # възходящо — най-старите първи
 

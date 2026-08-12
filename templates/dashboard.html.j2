@@ -242,6 +242,36 @@
     .regime-badge { animation: pulse 4s ease-in-out infinite; }
     @keyframes pulse { 50% { box-shadow: 0 0 44px var(--regime-dim); } }
   }
+
+  /* ── v2: Earnings Season Recap — икона + модал (не hover tooltip) ── */
+  .earn-icon { display: inline-flex; cursor: pointer; margin-left: 7px; vertical-align: middle; }
+  .earn-icon.earn-green { color: var(--green); }
+  .earn-icon.earn-yellow { color: var(--yellow); }
+  .earn-icon.earn-red { color: var(--red); }
+  .earn-icon.earn-na { color: var(--muted); }
+  /* НЕ position:fixed — position:absolute + JS позиционира top спрямо
+     window.scrollY при отваряне, за да "покрие" текущия viewport, без
+     да разчита на fixed positioning. */
+  .earn-modal { position: absolute; left: 0; right: 0; height: 100vh;
+    background: rgba(4,8,18,.72); display: flex; align-items: flex-start;
+    justify-content: center; padding-top: 60px; z-index: 50; }
+  .earn-modal[hidden] { display: none; }
+  .earn-modal-content { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 22px 24px; max-width: 540px; width: 92%;
+    position: relative; max-height: 80vh; overflow-y: auto; }
+  .earn-modal-close { position: absolute; top: 12px; right: 16px; background: none;
+    border: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .earn-modal-close:hover { color: var(--text); }
+  .earn-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .earn-table th { text-align: left; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--muted); padding: 4px 8px 6px 0; border-bottom: 1px solid var(--line); }
+  .earn-table td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace; }
+  .earn-yoy-row { background: rgba(255,255,255,.03); }
+  .earn-yoy-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .earn-pos { color: var(--green); }
+  .earn-neg { color: var(--red); }
+  .earn-yoy-summary { font-size: 12.5px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -342,14 +372,75 @@
 </section>
 {% endif %}
 
+{% macro earnings_icon(modal_id, recap) %}
+{% if recap %}
+<span class="earn-icon earn-{{ recap.quality or 'na' }}" data-modal="{{ modal_id }}"
+      title="Earnings recap — кликни за детайли" role="button" tabindex="0">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -6" />
+    <path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -10" />
+    <path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -14" />
+    <path d="M4 20h14" />
+  </svg>
+</span>
+{% endif %}
+{% endmacro %}
+
+{% macro earnings_pct_cell(v, extra) %}{% if v is not none %}{{ '+' if v >= 0 else '' }}{{ v }}%{{ extra }}{% else %}—{% endif %}{% endmacro %}
+
+{% macro earnings_row(q, yoy) %}
+<tr class="{{ 'earn-yoy-row' if yoy else '' }}">
+  <td>{{ q.date }}{% if yoy %} <span class="earn-yoy-label">(YoY база)</span>{% endif %}</td>
+  <td>{{ q.eps_actual if q.eps_actual is not none else "—" }}{% if q.eps_estimate is not none %} / {{ q.eps_estimate }} est.{% endif %}</td>
+  <td class="{{ 'earn-pos' if q.eps_surprise_pct is not none and q.eps_surprise_pct >= 0 else 'earn-neg' if q.eps_surprise_pct is not none else '' }}">{{ earnings_pct_cell(q.eps_surprise_pct, '') }}</td>
+  <td class="{{ 'earn-pos' if q.reaction_pct is not none and q.reaction_pct >= 0 else 'earn-neg' if q.reaction_pct is not none else '' }}">{{ earnings_pct_cell(q.reaction_pct, ' (' ~ q.reaction_volume_ratio ~ 'x)' if q.reaction_volume_ratio is not none else '') }}</td>
+</tr>
+{% endmacro %}
+
+{% macro earnings_modal(modal_id, recap) %}
+{% if recap %}
+<div class="earn-modal" id="{{ modal_id }}" hidden>
+  <div class="earn-modal-content">
+    <button class="earn-modal-close" type="button" aria-label="Затвори">×</button>
+    <h3>Earnings История</h3>
+    <table class="earn-table">
+      <thead><tr><th>Тримесечие</th><th>EPS факт/оч.</th><th>Изненада</th><th>Реакция</th></tr></thead>
+      <tbody>
+        {% for q in recap.quarters %}{{ earnings_row(q, false) }}{% endfor %}
+        {% if recap.yoy %}{{ earnings_row(recap.yoy, true) }}{% endif %}
+      </tbody>
+    </table>
+    {% if recap.yoy_summary %}
+    <p class="earn-yoy-summary">{{ recap.yoy_summary.current_date }} срещу {{ recap.yoy_summary.yoy_date }}
+      (тримесечен ръст г/г, не годишен тотал): EPS {{ recap.yoy_summary.eps_current }} vs {{ recap.yoy_summary.eps_yoy }}
+      — {{ earnings_pct_cell(recap.yoy_summary.yoy_growth_pct, '') }}</p>
+    {% endif %}
+    {% if recap.forward %}
+    <h3>Следващ отчет</h3>
+    <div class="kv"><span>Дата</span><b>{{ recap.forward.next_earnings }} ({{ recap.forward.days_to_earnings }}д)
+      {%- if recap.forward.in_blackout %} · blackout{% endif %}</b></div>
+    {% if recap.forward.consensus_eps is not none %}
+    <div class="kv"><span>Консенсус EPS</span><b>{{ recap.forward.consensus_eps }}
+      {%- if recap.forward.expected_growth_pct is not none %} (спрямо {{ recap.forward.yoy_date }}:
+      {{ earnings_pct_cell(recap.forward.expected_growth_pct, '') }} очакван г/г ръст){% endif %}</b></div>
+    {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
+
 <section>
   <h2>Action · {{ action|length }} тикъра</h2>
   {% for st in action %}
   {% set p = st.plan %}
+  {% set earn_modal_id = "earn-modal-action-" ~ st.ticker %}
   <div class="stock-card">
     <div class="stock-head">
       <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company }} · {{ st.sector }}</span>
         {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
+        {{ earnings_icon(earn_modal_id, st.earnings.recap) }}
       </div>
       <div class="price-tag">${{ st.price }} <span style="color:var(--muted);font-size:13px">pivot ${{ st.pivot }} ({{ st.pct_from_pivot }}%)</span></div>
     </div>
@@ -397,14 +488,6 @@
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
         <div class="kv"><span>Препоръка</span><b>{{ st.ai.earnings_call }}</b></div>
-        {% if st.earnings.recap %}
-        <div class="kv"><span>Последен отчет ({{ st.earnings.recap.date }})</span>
-          <b>EPS {{ st.earnings.recap.eps_actual }}{% if st.earnings.recap.eps_estimate is not none %} vs {{ st.earnings.recap.eps_estimate }} est.{% endif %}{% if st.earnings.recap.eps_surprise_pct is not none %} ({{ '+' if st.earnings.recap.eps_surprise_pct >= 0 else '' }}{{ st.earnings.recap.eps_surprise_pct }}%){% endif %}</b>
-        </div>
-        {% if st.earnings.recap.reaction_pct is not none %}
-        <div class="kv"><span>Реакция</span><b>{{ '+' if st.earnings.recap.reaction_pct >= 0 else '' }}{{ st.earnings.recap.reaction_pct }}%{% if st.earnings.recap.reaction_volume_ratio is not none %} ({{ st.earnings.recap.reaction_volume_ratio }}x обем){% endif %}</b></div>
-        {% endif %}
-        {% endif %}
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск ${{ p.max_risk_usd|int }}{% if p.sizing_factor < 1 %} (Defensive ×{{ p.sizing_factor }}){% endif %}</h3>
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
@@ -418,6 +501,7 @@
       </div>
     </div>
   </div>
+  {{ earnings_modal(earn_modal_id, st.earnings.recap) }}
   {% else %}
   <div class="prose">Днес нито един кандидат не покрива всички критерии за Action. Това е информация, не провал — кешът също е позиция.</div>
   {% endfor %}
@@ -643,8 +727,9 @@
         <th class="n">Текуща цена</th><th class="n">% промяна</th></tr></thead>
       <tbody>
         {% for p in backtest.open_positions[:100] %}
+        {% set track_modal_id = "earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date %}
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
-          <td class="sym">{{ p.ticker }}{% if p.earnings_recap %}<span style="cursor:help" title="Earnings {{ p.earnings_recap.date }}: EPS {{ p.earnings_recap.eps_actual }}{% if p.earnings_recap.eps_surprise_pct is not none %} ({{ '+' if p.earnings_recap.eps_surprise_pct >= 0 else '' }}{{ p.earnings_recap.eps_surprise_pct }}% surprise){% endif %}{% if p.earnings_recap.reaction_pct is not none %} · реакция {{ '+' if p.earnings_recap.reaction_pct >= 0 else '' }}{{ p.earnings_recap.reaction_pct }}%{% endif %}"> 📊</span>{% endif %}</td>
+          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}</td>
           <td>{{ p.entry_date }}</td>
           <td class="n">${{ p.entry_price }}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
@@ -661,6 +746,9 @@
       </tbody>
     </table>
   </div>
+  {% for p in backtest.open_positions[:100] %}
+  {{ earnings_modal("earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date, p.earnings_recap) }}
+  {% endfor %}
   {% if backtest.open_positions|length > 100 %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
     и още {{ backtest.open_positions|length - 100 }} позиции
@@ -850,6 +938,34 @@
   }
   btn.addEventListener("click", lookup);
   input.addEventListener("keydown", function (e) { if (e.key === "Enter") lookup(); });
+})();
+
+(function () {
+  // Earnings Season Recap модал — НЕ position:fixed, position:absolute с
+  // top позициониран спрямо window.scrollY при отваряне (виж CSS коментара).
+  function closeAll() {
+    document.querySelectorAll(".earn-modal").forEach(function (m) { m.hidden = true; });
+  }
+  document.querySelectorAll(".earn-icon").forEach(function (icon) {
+    icon.addEventListener("click", function () {
+      var id = icon.getAttribute("data-modal");
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      closeAll();
+      modal.style.top = (window.scrollY || window.pageYOffset || 0) + "px";
+      modal.hidden = false;
+    });
+  });
+  document.querySelectorAll(".earn-modal").forEach(function (modal) {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal || e.target.closest(".earn-modal-close")) {
+        modal.hidden = true;
+      }
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll();
+  });
 })();
 </script>
 </body>

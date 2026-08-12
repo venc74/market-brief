@@ -376,3 +376,13 @@ IV_MAX_QUOTE_AGE_DAYS = int(os.getenv("IV_MAX_QUOTE_AGE_DAYS", 30))
 PC_MIN_TOTAL_VOLUME = int(os.getenv("PC_MIN_TOTAL_VOLUME", 500))
 # Минимум дни IV история за категорична IVR-базирана опционна препоръка.
 IVR_MIN_DAYS_FOR_STRATEGY = int(os.getenv("IVR_MIN_DAYS_FOR_STRATEGY", 60))
+
+# ── Earnings Season Recap (Case 1: Action картата, Case 2: track record) ──
+# FIX 2026-08-13: единен recency праг за ДВАТА UI пътя (преди: entry_date
+# филтър за Case 2 — премахнат, вече излишен, виж дискусията). recap изчезва
+# изцяло (не само визуално) след толкова дни от последния отчет.
+EARNINGS_RECAP_RECENCY_DAYS = int(os.getenv("EARNINGS_RECAP_RECENCY_DAYS", 10))
+# Толеранс (в дни) при търсене на YoY реда — най-близкият отчет до "текуща
+# дата - 365 дни", НЕ фиксирана позиция "N реда назад" (фискалните календари
+# могат да се разминават между компании).
+EARNINGS_YOY_TOLERANCE_DAYS = int(os.getenv("EARNINGS_YOY_TOLERANCE_DAYS", 60))
