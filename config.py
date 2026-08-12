@@ -352,6 +352,27 @@ DISTRIBUTION_DAYS_RED = int(os.getenv("DISTRIBUTION_DAYS_RED", 9))
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
 BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
 
+# ── GLB (Green Line Breakout) — Classic/Momentum ATH пробив скрийнър ──────
+# Вдъхновено от Eric Wish (wishingwealthblog.com) методологията, ПРЕРАБОТЕНО
+# след backtest диагностика (experiments/glb_backtest.py,
+# experiments/glb_monthly_check.py, 2026-08-12/13): буквалният месечен
+# duration-only критерий ("all-time high not penetrated for 3 straight
+# months") се генерализира на всичките 4 тествани тикъра (SNDK/WDC/MU/STX).
+# Дневен tightness overlay (band_hold_pct) е независимо потвърден от
+# WDC/STX/MU историческите multi-month бази, НО системно пропуска
+# explosive/momentum пробиви — включително WDC's собствен 2025 breakout,
+# ВЪПРЕКИ 47г история. Затова Classic/Momentum разграничението е ПО SETUP
+# (дали overlay-ът минава на конкретния breakout момент), НЕ по възрастта на
+# тикъра — age-based gating би направил WDC-стил зрели-компании-с-momentum-
+# пробив сетъпи невидими за модула.
+ENABLE_GLB_SCREENER = os.getenv("ENABLE_GLB_SCREENER", "1") == "1"
+GLB_HISTORY_PERIOD = os.getenv("GLB_HISTORY_PERIOD", "max")  # yfinance period — 2y (screener.py) е недостатъчен за multi-decade ATH
+GLB_MIN_MONTHS_UNPENETRATED = int(os.getenv("GLB_MIN_MONTHS_UNPENETRATED", 3))  # буквален Wish праг, универсален гейт
+GLB_MIN_ATH_HISTORY_YEARS = float(os.getenv("GLB_MIN_ATH_HISTORY_YEARS", 3.0))  # data-quality label (ath_label), НЕ Classic/Momentum gate
+GLB_APPROACH_PCT = float(os.getenv("GLB_APPROACH_PCT", 15.0))                  # tightness overlay: "в рамките на X% от prior_high"
+GLB_MIN_CONSOLIDATION_DAYS = int(os.getenv("GLB_MIN_CONSOLIDATION_DAYS", 63))  # trailing прозорец за overlay-а (~3 месеца в търг. дни)
+GLB_MIN_BAND_HOLD_PCT = float(os.getenv("GLB_MIN_BAND_HOLD_PCT", 85.0))        # overlay праг -> "classic" upgrade
+
 
 # ══════════════════════════════════════════════════════════════════════════
 # v2.1 · Поправки 2026-07-15 (виж FIXES_2026-07-15.md)
