@@ -1,5 +1,5 @@
 {
- "date": "2026-08-11",
+ "date": "2026-08-12",
  "rows": [
   {
    "ticker": "MNST",
@@ -8,18 +8,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 11, 2026",
-   "price": 45.72,
-   "market_cap": 89558051690.18758
-  },
-  {
-   "ticker": "TYOYY",
-   "company": "Taiyo Yuden Co. Ltd ADR",
-   "date": "2026-08-12",
-   "ratio": "16:1",
-   "split_type": "normal",
-   "date_human": "Aug 12, 2026",
-   "price": 243.0,
-   "market_cap": 7602674418.0
+   "price": 45.53,
+   "market_cap": 89195626814.92
   }
  ]
 }

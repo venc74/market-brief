@@ -450,5 +450,29 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "MPC_2026-08-12": {
+  "ticker": "MPC",
+  "entry_date": "2026-08-12",
+  "status": "open",
+  "entry_price": 336.45,
+  "target_1": 450.29,
+  "stop_loss": 279.53,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "VLO_2026-08-12": {
+  "ticker": "VLO",
+  "entry_date": "2026-08-12",
+  "status": "open",
+  "entry_price": 324.37,
+  "target_1": 421.91,
+  "stop_loss": 275.6,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }
