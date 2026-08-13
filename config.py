@@ -365,6 +365,16 @@ BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
 # (дали overlay-ът минава на конкретния breakout момент), НЕ по възрастта на
 # тикъра — age-based gating би направил WDC-стил зрели-компании-с-momentum-
 # пробив сетъпи невидими за модула.
+# ИЗВЕСТНО ОГРАНИЧЕНИЕ (2026-08-14): universe-ът тук е screener.build_
+# universe() — S&P500 + Nasdaq-100 + S&P MidCap 400. Established, ликвидни
+# компании; НЕ включва скорошни spinoff/малки IPO имена като SNDK (spin-off
+# от WDC, февруари 2025 — извън и трите Wikipedia списъка). Модулът работи
+# коректно за established компании (validirano: 903 тикъра, 71s, 0 грешки,
+# 15 classic + 9 momentum кандидата) — но НЯМА да хване точно "explosive
+# spinoff/recent-IPO" сценария, който първоначално мотивира изграждането му
+# (виж experiments/glb_backtest.py history). Разширяване на universe-а
+# (напр. отделен recent-IPO/spinoff списък) е отделна бъдеща задача, не
+# част от текущия обхват.
 ENABLE_GLB_SCREENER = os.getenv("ENABLE_GLB_SCREENER", "1") == "1"
 GLB_HISTORY_PERIOD = os.getenv("GLB_HISTORY_PERIOD", "max")  # yfinance period — 2y (screener.py) е недостатъчен за multi-decade ATH
 GLB_MIN_MONTHS_UNPENETRATED = int(os.getenv("GLB_MIN_MONTHS_UNPENETRATED", 3))  # буквален Wish праг, универсален гейт

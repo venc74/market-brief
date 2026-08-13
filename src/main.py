@@ -28,6 +28,7 @@ from src import correlation_check
 from src import backtest
 from src import cot
 from src import entry_timing
+from src import glb_screener
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -164,6 +165,21 @@ def run() -> dict:
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
     for row in insider_buys:
         row["in_screener"] = row["ticker"] in our_tickers
+    # GLB (Green Line Breakout) — независим механичен скрийнър, изцяло
+    # извън CANSLIM/Weinstein pipeline-а (собствен universe fetch, виж
+    # glb_screener.py docstring). Explicit try/except тук, въпреки че
+    # screen() вече е graceful вътрешно (batch+per-ticker) — не искаме и
+    # неочакван bug в нов модул да чупи целия дневен run.
+    if config.ENABLE_GLB_SCREENER:
+        try:
+            glb_candidates = glb_screener.screen()
+        except Exception as e:
+            print(f"[main] GLB screener failed: {e}")
+            glb_candidates = []
+    else:
+        glb_candidates = []
+    for row in glb_candidates:
+        row["in_screener"] = row["ticker"] in our_tickers
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
     # Track Record: ingest четe data/*.json snapshot-и от диска — днешният {today}.json
@@ -193,6 +209,7 @@ def run() -> dict:
         "naaim_history": naaim_hist,
         "superinvestor_moves": superinvestor_moves,
         "insider_buying": insider_buys,
+        "glb_candidates": glb_candidates,
         "news": news,
         "cot": cot_with_theses,
         "correlation_flags": correlation_flags,

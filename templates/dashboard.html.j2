@@ -179,6 +179,28 @@
   .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
   .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
 
+  /* ── GLB (Green Line Breakout) Watchlist ── */
+  .glb-group-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; margin: 14px 0 8px; }
+  .glb-group-label.classic { color: var(--green); }
+  .glb-group-label.momentum { color: var(--yellow); }
+  .glb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 6px; }
+  .glb-card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--muted);
+    border-radius: 8px; padding: 12px 16px; }
+  .glb-card.classic { border-left-color: var(--green); }
+  .glb-card.momentum { border-left-color: var(--yellow); }
+  .glb-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
+  .glb-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .glb-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+  .glb-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .glb-stat { font-size: 13.5px; font-weight: 600; margin-top: 6px; }
+  .glb-card.classic .glb-stat { color: var(--green); }
+  .glb-card.momentum .glb-stat { color: var(--yellow); }
+  .glb-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .glb-caveat { font-size: 11.5px; color: var(--yellow); margin-top: 6px; }
+  .glb-note { font-size: 12px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .glb-insufficient-note { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; }
+
   /* ── news_aggregator: Значими новини ── */
   .news-list { display: grid; gap: 10px; }
   .news-item { display: flex; gap: 12px; align-items: flex-start;
@@ -537,6 +559,72 @@
 {% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
 
 {# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
+
+{% if glb_candidates %}
+{% set glb_classic = glb_candidates|selectattr('glb_type', 'equalto', 'classic')|sort(attribute='months_unpenetrated', reverse=True)|list %}
+{% set glb_momentum = glb_candidates|selectattr('glb_type', 'equalto', 'momentum')|sort(attribute='months_unpenetrated', reverse=True)|list %}
+{% set glb_insufficient = glb_candidates|selectattr('glb_type', 'equalto', 'insufficient_history')|list %}
+<section>
+  <h2>GLB Watchlist · Green Line Breakout</h2>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
+    ATH пробив след дълъг unpenetrated период (Eric Wish методология) — механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline.
+    <b style="color:var(--green)">Classic</b> = тесен daily base преди пробива (по-нисък очакван риск) ·
+    <b style="color:var(--yellow)">Momentum</b> = потвърден бърз/волатилен пробив без тесен base (по-висок очакван риск).
+  </div>
+  {% if glb_classic %}
+  <div class="glb-group-label classic">Classic GLB ({{ glb_classic|length }})</div>
+  <div class="glb-grid">
+    {% for g in glb_classic %}
+    <div class="glb-card classic{{ ' in-screen' if g.in_screener else '' }}">
+      <div class="glb-top">
+        <span class="glb-sym">{{ g.ticker }}</span>
+        <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
+      </div>
+      <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
+      <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
+      {% if g.tightness %}
+      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · tightness ±{{ g.tightness.tightness_range_pct }}%</div>
+      {% endif %}
+      {% if g.ath_label == 'new_high_since_listing' %}
+      <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
+      {% endif %}
+      <div class="glb-note">{{ g.risk_note }}</div>
+      {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if glb_momentum %}
+  <div class="glb-group-label momentum">Momentum GLB ({{ glb_momentum|length }})</div>
+  <div class="glb-grid">
+    {% for g in glb_momentum %}
+    <div class="glb-card momentum{{ ' in-screen' if g.in_screener else '' }}">
+      <div class="glb-top">
+        <span class="glb-sym">{{ g.ticker }}</span>
+        <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
+      </div>
+      <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
+      <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
+      {% if g.tightness %}
+      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · tightness ±{{ g.tightness.tightness_range_pct }}%</div>
+      {% endif %}
+      {% if g.ath_label == 'new_high_since_listing' %}
+      <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
+      {% endif %}
+      <div class="glb-note">{{ g.risk_note }}</div>
+      {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if glb_insufficient %}
+  <div class="glb-insufficient-note">
+    Недостатъчна дневна история за tightness оценка (валиден месечен GLB сигнал, но некласифициран Classic/Momentum):
+    {{ glb_insufficient|map(attribute='ticker')|join(', ') }}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
 
 {% if unusual_options %}
 <section>
