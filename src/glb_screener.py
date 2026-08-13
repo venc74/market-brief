@@ -42,6 +42,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src.screener import build_universe
+from src.ai_brief import _verified_company_name
 
 import yfinance as yf
 
@@ -144,8 +145,11 @@ def _evaluate_ticker(sym: str, hist) -> dict | None:
     else:
         glb_type = "momentum"
 
+    company = _verified_company_name(sym)["name"]  # reuse — same lookup като COT секцията (ai_brief.py)
+
     return {
         "ticker": sym,
+        "company": company,
         "glb_type": glb_type,
         "price": round(float(hist["Close"].iloc[-1]), 2),
         "prior_high": m_result["prior_high"],

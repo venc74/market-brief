@@ -192,6 +192,7 @@
   .glb-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
   .glb-top { display: flex; justify-content: space-between; align-items: baseline; }
   .glb-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+  .glb-company { font-size: 12.5px; color: var(--text); margin-top: 2px; }
   .glb-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
   .glb-stat { font-size: 13.5px; font-weight: 600; margin-top: 6px; }
   .glb-card.classic .glb-stat { color: var(--green); }
@@ -580,6 +581,7 @@
         <span class="glb-sym">{{ g.ticker }}</span>
         <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
       </div>
+      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company[:40] }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
       <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
       {% if g.tightness %}
@@ -603,6 +605,7 @@
         <span class="glb-sym">{{ g.ticker }}</span>
         <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
       </div>
+      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company[:40] }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
       <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
       {% if g.tightness %}
