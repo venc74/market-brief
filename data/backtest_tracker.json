@@ -474,5 +474,29 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "EXPD_2026-08-13": {
+  "ticker": "EXPD",
+  "entry_date": "2026-08-13",
+  "status": "open",
+  "entry_price": 187.74,
+  "target_1": 229.38,
+  "stop_loss": 166.92,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "AVT_2026-08-13": {
+  "ticker": "AVT",
+  "entry_date": "2026-08-13",
+  "status": "open",
+  "entry_price": 100.0,
+  "target_1": 124.32,
+  "stop_loss": 87.84,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }
