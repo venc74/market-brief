@@ -307,6 +307,26 @@ VIX_TERM_BACKWARDATION_THRESHOLD = float(os.getenv("VIX_TERM_BACKWARDATION_THRES
 # като stale и индикаторът се крие (hide), вместо да показва остаряло число.
 STALENESS_THRESHOLD_DAYS = int(os.getenv("STALENESS_THRESHOLD_DAYS", 3))
 
+# ── Market Breadth (% над 40dMA) — 9-ти термометър индикатор ──────────────
+# Feasibility проверка 2026-08-15: чист безплатен T2108 feed НЕ съществува
+# (нито през yfinance — ^T2108/^NYSI/^NYMO/^NYAD всички 404, нито през друг
+# безплатен API — T2108 е proprietary на TC2000/Worden). Собствено изчислено
+# приближение върху screener.build_universe() (S&P500+Nasdaq100+MidCap400) —
+# ВАЖНО: това НЕ е буквален NYSE T2108 (различен, по-широк/Nasdaq-тежък
+# universe), затова навсякъде в кода/UI-а името е explicit "Market Breadth
+# (% над 40dMA)", никога "T2108". Empирично тествано: 903 тикъра, 38s, 0
+# грешки, 0 rate limiting (виж experiments discussion 2026-08-15).
+# Mean-reverting zoни (same дух като naaim_exposure()): 20-80% = здравословно,
+# >80% = overbought, 10-20% = приближава капитулация, <10% = механично "red"
+# за термометъра, НО contrarian-bullish текстов тон (историческа bottoming
+# зона), не паника.
+ENABLE_MARKET_BREADTH = os.getenv("ENABLE_MARKET_BREADTH", "1") == "1"
+BREADTH_BATCH_SIZE = int(os.getenv("BREADTH_BATCH_SIZE", 50))
+BREADTH_MIN_VALID_TICKERS = int(os.getenv("BREADTH_MIN_VALID_TICKERS", 200))  # sanity floor преди да се доверим на %-а
+BREADTH_OVERBOUGHT_THRESHOLD = float(os.getenv("BREADTH_OVERBOUGHT_THRESHOLD", 80.0))
+BREADTH_HEALTHY_LOW = float(os.getenv("BREADTH_HEALTHY_LOW", 20.0))
+BREADTH_CAPITULATION_THRESHOLD = float(os.getenv("BREADTH_CAPITULATION_THRESHOLD", 10.0))
+
 # ── SEC Form 4 Insider Buying (officers CEO/CFO/President/COO, open market) ──
 ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
 INSIDER_MIN_VALUE = float(os.getenv("INSIDER_MIN_VALUE", 100_000))

@@ -319,7 +319,7 @@
   <div class="thermo">
     {% for ind in thermometer.indicators %}
     {% if not ind.get('hide') %}
-    <div class="t-card {{ ind.status }}">
+    <div class="t-card {{ ind.status }}"{% if ind.get('methodology_note') %} title="{{ ind.methodology_note }}"{% endif %}>
       <div class="t-name">{{ ind.name }}</div>
       <div class="t-val">{{ ind.value if ind.value is not none else "—" }}</div>
       <div class="t-label">{{ ind.label }}</div>

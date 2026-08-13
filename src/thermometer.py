@@ -8,6 +8,7 @@ import datetime as dt
 import io
 import math
 import os
+import time
 from functools import lru_cache
 import requests
 import yfinance as yf
@@ -15,6 +16,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src.screener import build_universe
 
 
 def spy_trend() -> dict:
@@ -427,9 +429,108 @@ def vix_term_structure() -> dict:
                 "hide": True, "label": ""}
 
 
+def market_breadth() -> dict:
+    """
+    Market Breadth (% над 40dMA) — 9-ти термометър индикатор. Собствено
+    изчислен breadth proxy, inspired by T2108 методологията (Worden/TC2000
+    — % NYSE тикъри над 40-дневната им MA), НО изчислен върху НАШИЯ ВЕЧЕ
+    съществуващ universe (screener.build_universe() — S&P500+Nasdaq100+
+    MidCap400), НЕ буквален NYSE T2108. Feasibility проверка 2026-08-15
+    потвърди: няма готов безплатен T2108 feed (нито yfinance ^T2108/^NYSI/
+    ^NYMO/^NYAD — всички 404, нито друг безплатен API — T2108 е proprietary
+    TC2000/Worden). Explicit различно име навсякъде — nашият universe е по-
+    широк и Nasdaq-тежък спрямо истинския NYSE-специфичен T2108, структурно
+    различна (макар корелирана) мярка — не бива да се представя за буквален
+    T2108. "methodology_note" по-долу се показва като tooltip в dashboard-а
+    (виж dashboard.html.j2).
+
+    Reuse на screener.build_universe() + established batch fetch паттърн
+    (batch_size, group_by="ticker", threads=True, sleep между batch-овете —
+    виж screener.technical_screen()/glb_screener.screen()). period="3mo" е
+    достатъчно за 40-дневна MA, много по-лек payload от GLB-ския period="max".
+    Empирично тествано 2026-08-15: 903 тикъра, 38s, 0 грешки, 0 rate limiting.
+
+    Mean-reverting zoни (за разлика от повечето останали индикатори, "по-
+    високо не е по-добре" — same дух като naaim_exposure()):
+      >80%    жълто — overbought, твърде много акции разтегнати над MA
+      20-80%  зелено — здравословна ширина
+      10-20%  жълто — приближава капитулация
+      <10%    "red" МЕХАНИЧНО (участва в regime броенето като останалите
+              индикатори — краткосрочен breadth collapse си остава risk-off
+              сигнал за самия термометър), НО текстовият тон е explicit
+              contrarian bullish ("исторически bottoming зона"), не паника
+              — same принцип като naaim_exposure()'s <30 четене, приложен
+              тук само към label текста, не към status полето (изричен
+              избор — виж дискусията с юзъра, 2026-08-15).
+
+    Graceful: провал на universe fetch, batch download, или под sanity
+    прага BREADTH_MIN_VALID_TICKERS валидни тикъри → hide=True, same
+    паттърн като naaim_exposure()/move_index().
+    """
+    try:
+        universe = build_universe()
+        if not universe:
+            raise ValueError("празен universe")
+
+        above, total = 0, 0
+        for i in range(0, len(universe), config.BREADTH_BATCH_SIZE):
+            batch = universe[i:i + config.BREADTH_BATCH_SIZE]
+            try:
+                data = yf.download(batch, period="3mo", progress=False,
+                                   auto_adjust=True, group_by="ticker", threads=True)
+            except Exception as e:
+                print(f"[thermo] breadth batch {i} fetch грешка: {e}")
+                continue
+            for sym in batch:
+                try:
+                    df = data[sym].dropna() if len(batch) > 1 else data.dropna()
+                    if len(df) < 40:
+                        continue
+                    close = df["Close"]
+                    sma40 = float(close.rolling(40).mean().iloc[-1])
+                    last = float(close.iloc[-1])
+                    if math.isnan(sma40):
+                        continue
+                    total += 1
+                    if last > sma40:
+                        above += 1
+                except Exception:
+                    continue
+            time.sleep(1)  # не дразним Yahoo, same дисциплина като screener.py
+
+        if total < config.BREADTH_MIN_VALID_TICKERS:
+            raise ValueError(f"твърде малко валидни тикъри ({total}) за надежден %")
+
+        pct = above / total * 100
+    except Exception as e:
+        print(f"[thermo] Market Breadth failed: {e}")
+        return {"name": "Market Breadth (% над 40dMA)", "value": None,
+                "status": "yellow", "hide": True, "label": ""}
+
+    if pct < config.BREADTH_CAPITULATION_THRESHOLD:
+        status, note = "red", "extreme капитулация — исторически bottoming зона, contrarian bullish"
+    elif pct < config.BREADTH_HEALTHY_LOW:
+        status, note = "yellow", "приближава капитулация"
+    elif pct <= config.BREADTH_OVERBOUGHT_THRESHOLD:
+        status, note = "green", "здравословна ширина"
+    else:
+        status, note = "yellow", "overbought — разтегнато над 40dMA"
+
+    return {
+        "name": "Market Breadth (% над 40dMA)", "value": round(pct, 1),
+        "universe_size": total, "status": status,
+        "label": f"{pct:.1f}% над 40dMA ({note})",
+        "methodology_note": ("Inspired by T2108 методология (Worden/TC2000), но изчислено "
+                             "върху собствен universe (S&P500+Nasdaq100+MidCap400) — "
+                             "НЕ буквален NYSE T2108."),
+    }
+
+
 def build_thermometer(macro: dict) -> dict:
     """
-    Сглобява 8-те индикатора + правилото за режим:
+    Сглобява 9-те индикатора + правилото за режим (9-ти, Market Breadth,
+    добавен 2026-08-15 — виж market_breadth() докстринга за пълния
+    methodology rationale):
     - VIX > 30 → задължително Defensive (Секция 8)
     - MOVE > 150 или рязък седмичен скок → задължително Defensive (институционален
       стрес в колатералната система бие останалите сигнали, аналогично на VIX правилото)
@@ -471,6 +572,8 @@ def build_thermometer(macro: dict) -> dict:
     indicators = [spy_trend(), vix_level(), naaim_exposure(),
                   market_put_call(), spread_ind, nl_ind, move_index(),
                   vix_term_structure()]
+    if config.ENABLE_MARKET_BREADTH:
+        indicators.append(market_breadth())
 
     # FIX 2026-07-15: броим само ВИДИМИТЕ индикатори; жълтите и скритите се
     # отчитат изрично в съобщението, вместо да изчезват тихо от "X зелени / Y червени".
