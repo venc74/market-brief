@@ -13,6 +13,7 @@ import json
 from functools import lru_cache
 import requests
 import yfinance as yf
+import json_repair
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -23,9 +24,20 @@ from src import net_utils
 API_URL = "https://api.anthropic.com/v1/messages"
 
 
-def _call_claude(system: str, user: str, max_tokens: int = 4000) -> str:
+def _call_claude(system: str, user: str, max_tokens: int = 4000,
+                 extra_messages: list[dict] | None = None) -> str:
+    """
+    extra_messages: FIX 2026-08-17 (macro brief crash) — опционални допълнителни
+    turns СЛЕД началния user съобщение (напр. [{"role": "assistant", "content":
+    <malformed отговор>}, {"role": "user", "content": "поправи JSON-а"}]) — за
+    Ниво 1 "smart retry", виж macro_and_sector_brief(). Празно по подразбиране,
+    съществуващите извиквания с еднократно user съобщение остават непроменени.
+    """
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY липсва")
+    messages = [{"role": "user", "content": user}]
+    if extra_messages:
+        messages += extra_messages
     r = requests.post(API_URL, headers={
         "x-api-key": config.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
@@ -34,7 +46,7 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000) -> str:
         "model": config.CLAUDE_MODEL,
         "max_tokens": max_tokens,
         "system": system,
-        "messages": [{"role": "user", "content": user}],
+        "messages": messages,
     }, timeout=180)
     r.raise_for_status()
     return "".join(b.get("text", "") for b in r.json()["content"]
@@ -42,12 +54,40 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000) -> str:
 
 
 def _parse_json(text: str):
+    """
+    Ниво 0 защита (FIX 2026-08-17 — крашнат production run: macro_and_sector_
+    brief() нямаше НИКАКВА защита срещу malformed JSON от Claude, изключението
+    стигна необхванато до run() и събори целия pipeline). Споделена helper за
+    macro_and_sector_brief/_narratives_for_batch/_cot_theses_for_batch — един
+    fix предпазва и трите извиквания, не дублиран по call site.
+
+    json.loads() first (бърз, строг път за нормалния случай); при провал
+    json_repair.loads() поправя дребни синтактични грешки (липсваща запетайка/
+    кавичка, truncated при token limit) БЕЗ нова AI заявка — нулева допълнителна
+    цена. Емпирично тествано на реалистични malformed случаи — възстановява
+    коректен dict във всички (виж experiments discussion 2026-08-17).
+
+    ВАЖНО: json_repair НЕ хвърля изключение при напълно неспасяем вход — връща
+    '' (empty string), не None/dict (потвърдено емпирично). Затова explicit
+    проверяваме isinstance+truthiness на резултата, за да различим "поправено
+    успешно" от "нищо не остана за поправяне" — второто продължава да се
+    третира като провал (re-raise), за да сработи Ниво 1 retry нагоре по
+    веригата (за extend-натите извиквания, виж macro_and_sector_brief).
+    """
     clean = text.strip()
     if clean.startswith("```"):
         clean = clean.split("```")[1]
         if clean.startswith("json"):
             clean = clean[4:]
-    return json.loads(clean.strip())
+    clean = clean.strip()
+    try:
+        return json.loads(clean)
+    except json.JSONDecodeError as e:
+        repaired = json_repair.loads(clean)
+        if isinstance(repaired, (dict, list)) and repaired:
+            print(f"[ai] _parse_json: json_repair поправи malformed JSON ({e})")
+            return repaired
+        raise
 
 
 SYSTEM_MACRO = """Ти си макро аналитик, който пише за опитен суинг търговец \
@@ -55,6 +95,26 @@ SYSTEM_MACRO = """Ти си макро аналитик, който пише з�
 оперативна, не образователна — без дефиниции на базови понятия, без hedging \
 фрази. Пишеш на български, тикерите и техническите термини остават на английски. \
 Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
+
+
+def _macro_brief_fallback(thermometer: dict) -> dict:
+    """
+    Ниво 2 (FIX 2026-08-17) — минимален fallback, ако и Ниво 0 (json_repair),
+    и Ниво 1 (smart retry) се провалят. Суровите данни (термометър режим) без
+    AI наратив, explicit label в самия macro_brief текст (директно видим в
+    dashboard-ната "Макро бриф" секция, без нужда от template промяна) — за
+    да продължи останалата част от брифа (screening, sizing, render) напълно
+    нормално, вместо целият pipeline да се събори заради един AI hiccup.
+    """
+    regime = thermometer.get("regime", "?")
+    return {
+        "macro_brief": ("⚠ AI синтез неуспешен днес — Claude върна невалиден JSON "
+                        "и след автоматична поправка, и след retry. Показваме "
+                        "суровите данни от термометъра/скрийнъра без AI наратив."),
+        "sector_logic": [],
+        "regime_comment": f"Режим: {regime} — виж пазарния термометър по-горе за пълните индикатори.",
+        "ai_synthesis_failed": True,
+    }
 
 
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
@@ -69,6 +129,14 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
       ],
       "regime_comment": "1-2 изречения коментар към режима"
     }
+
+    FIX 2026-08-17 (production crash — json.decoder.JSONDecodeError необхванат
+    чак до run(), сборил целия pipeline): 3 нива защита, в ред на разходна
+    ефективност — Ниво 0 (json_repair, вътре в _parse_json(), нулева цена),
+    Ниво 1 (тук долу — smart retry: подаваме malformed отговора обратно на
+    Claude с explicit инструкция да го поправи, ЕДНА допълнителна AI заявка),
+    Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
+    никога не позволяваме на изключението да стигне до run()).
     """
     user = f"""Днешни данни:
 
@@ -91,7 +159,39 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
 
 Връщай само JSON с ключове: macro_brief, sector_logic (списък от обекти със \
 sector, etf, chain, horizon_weeks), regime_comment."""
-    return _parse_json(_call_claude(SYSTEM_MACRO, user))
+
+    # Ниво 0 (json_repair, вътре в _parse_json) + първи опит. try/except обхваща
+    # И _call_claude, И _parse_json — мрежова/API грешка тук е РАВНОСИЛНА на
+    # malformed JSON за целите на graceful degradation (и двете трябва да
+    # паднат към Ниво 1 retry, не да пробият необхванати до run()).
+    raw = None
+    error_msg = ""
+    try:
+        raw = _call_claude(SYSTEM_MACRO, user)
+        return _parse_json(raw)
+    except Exception as e:
+        # ВАЖНО: Python автоматично прави `del e` на изхода от except блока
+        # ("as e" гърми UnboundLocalError, ако се ползва по-долу извън него —
+        # реален бъг, хванат от изолираните тестове преди push, 2026-08-17).
+        # Затова съобщението се копира в отделна променлива ТУК, преди изхода.
+        error_msg = f"{type(e).__name__}: {e}"
+        print(f"[ai] macro brief: първи опит неуспешен ({error_msg}) "
+              f"— пробвам Ниво 1 (retry с explicit поправка)")
+
+    try:
+        fix_turns = [
+            {"role": "assistant", "content": raw or "(без отговор — предходната заявка се провали изцяло)"},
+            {"role": "user", "content": (
+                f"Предишният ти отговор имаше JSON синтактична грешка: {error_msg}. "
+                f"Върни ЦЕЛИЯ отговор наново — само валиден JSON, без markdown "
+                f"огради, без обяснения извън JSON структурата.")},
+        ]
+        raw_retry = _call_claude(SYSTEM_MACRO, user, extra_messages=fix_turns)
+        return _parse_json(raw_retry)
+    except Exception as e2:
+        print(f"[ai] macro brief: Ниво 1 retry също неуспешен "
+              f"({type(e2).__name__}: {e2}) — Ниво 2 fallback (суровите данни, без AI наратив)")
+        return _macro_brief_fallback(thermometer)
 
 
 SYSTEM_TICKERS = """Ти си портфолио стратег за суинг търговия. Потребителят е \

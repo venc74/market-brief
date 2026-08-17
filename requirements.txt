@@ -9,3 +9,7 @@ beautifulsoup4>=4.12
 html5lib>=1.1
 # news_aggregator — устойчив RSS/Atom парсър
 feedparser>=6.0
+# ai_brief._parse_json() Ниво 0 защита — поправя дребни JSON синтактични
+# грешки от Claude (липсваща запетайка/кавичка, truncated отговор) локално,
+# без допълнителна AI заявка (виж _parse_json докстринга, 2026-08-17 crash fix)
+json_repair>=0.63
