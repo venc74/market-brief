@@ -498,5 +498,17 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "MOG-A_2026-08-17": {
+  "ticker": "MOG-A",
+  "entry_date": "2026-08-17",
+  "status": "open",
+  "entry_price": 442.58,
+  "target_1": 529.24,
+  "stop_loss": 399.25,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

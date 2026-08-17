@@ -1,6 +1,21 @@
 {
- "date": "2026-08-14",
+ "date": "2026-08-17",
  "rows": [
+  {
+   "ticker": "INTC",
+   "company": "INTEL CORP",
+   "total_value": 9999985.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "TAN LIP BU",
+     "title": "CEO",
+     "date": "2026-08-11",
+     "value": 9999985.0
+    }
+   ]
+  },
   {
    "ticker": "BSX",
    "company": "BOSTON SCIENTIFIC CORP",
@@ -92,27 +107,6 @@
    ]
   },
   {
-   "ticker": "ELV",
-   "company": "Elevance Health, Inc.",
-   "total_value": 1002230.05,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "BOUDREAUX GAIL",
-     "title": "President and CEO",
-     "date": "2026-07-17",
-     "value": 753071.25
-    },
-    {
-     "name": "BOUDREAUX GAIL",
-     "title": "President and CEO",
-     "date": "2026-07-17",
-     "value": 249158.80000000002
-    }
-   ]
-  },
-  {
    "ticker": "TSCO",
    "company": "TRACTOR SUPPLY CO /DE/",
    "total_value": 416829.00000000006,
@@ -131,9 +125,9 @@
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 379,
+  "tickers_with_filings": 372,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 96,
-  "qualifying_after_filter": 12
+  "raw_transactions_parsed": 98,
+  "qualifying_after_filter": 11
  }
 }

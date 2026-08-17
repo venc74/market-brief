@@ -1,25 +1,25 @@
 {
- "date": "2026-08-14",
+ "date": "2026-08-17",
  "rows": [
   {
-   "ticker": "MNST",
-   "company": "Monster Beverage Corporation",
-   "date": "2026-08-11",
-   "ratio": "2:1",
-   "split_type": "normal",
-   "date_human": "Aug 11, 2026",
-   "price": 46.68,
-   "market_cap": 91448536941.37515
+   "ticker": "JMPLY",
+   "company": "Johnson Matthey plc ADR",
+   "date": "2026-08-17",
+   "ratio": "3:4",
+   "split_type": "reverse",
+   "date_human": "Aug 17, 2026",
+   "price": 68.0,
+   "market_cap": 4281076408.0
   },
   {
-   "ticker": "TYOYY",
-   "company": "Taiyo Yuden Co. Ltd ADR",
-   "date": "2026-08-12",
-   "ratio": "16:1",
+   "ticker": "SFBS",
+   "company": "ServisFirst Bancshares, Inc.",
+   "date": "2026-08-21",
+   "ratio": "2:1",
    "split_type": "normal",
-   "date_human": "Aug 12, 2026",
-   "price": 17.8,
-   "market_cap": 8910459111.681961
+   "date_human": "Aug 21, 2026",
+   "price": 91.33,
+   "market_cap": 4993240438.408356
   }
  ]
 }
