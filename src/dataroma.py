@@ -1,37 +1,43 @@
 """
-Допълнение към v2 — Superinvestor Moves от dataroma.com.
+Допълнение към v2 — Superinvestor сигнали от SEC EDGAR 13F-HR (16 мениджъра,
+config.DATAROMA_CIK). Три отделни, но споделящи данни изхода (виж _fetch_all
++ _manager_snapshot по-долу — ЕДИН fetch на 13F данни на мениджър, консумиран
+от трите):
 
-dataroma.com агрегира 13F заявките на известни „superinvestors" (Бъфет, Дракенмилър,
-Бъри и др.). Извличаме последните значими ПОКУПКИ (нова позиция или добавяне) и
-филтрираме само транзакции над прага (по подразбиране $10M).
+  1. fetch_superinvestor_buys() — общ "Moves" feed (нова позиция/увеличена,
+     $DATAROMA_MIN_VALUE праг). Top-N-per-manager селекция (config.
+     DATAROMA_TOP_PER_MANAGER), не global top-по-стойност — Berkshire's
+     позиции ($10B+) системно изяждаха всичките dashboard слота преди
+     FIX 2026-08-17.
+  2. fetch_new_position_highlights() — high-conviction "нова позиция":
+     съвсем нова (CUSIP отсъства в предишния filing) И >= config.
+     DATAROMA_MIN_NEW_POSITION_PCT% от портфейла на мениджъра. % на
+     портфейл, НЕ $ праг — нормализира за размера на фонда.
+  3. fetch_major_exits() — {"exits", "stopped_managers"}: позиция, била
+     >= config.DATAROMA_MAJOR_EXIT_PCT% от портфейла, отсъства напълно
+     сега. Explicit РАЗДЕЛЕНО от "мениджърът е спрял да подава 13F"
+     (config.DATAROMA_STALE_FILER_DAYS) — двете са различни събития
+     (потвърден реален случай: Michael Burry/Scion, фонд закрит 2025,
+     последен filing 2025-11-03 — "стопиран", не "продал всичко").
 
-Логика на сигнала: 13F е със закъснение (до 45 дни след тримесечието), затова не е
-тайминг инструмент — но КОНВЕРГЕНЦИЯ е силна. Ако акция, която вече излиза в нашия
-CANSLIM скринер (технически + фундаментален пробив СЕГА), е била и купена от
-superinvestor → маркер 'SI✓'. Техническата сила потвърждава, че умните пари не са
-сбъркали; институционалното позициониране потвърждава, че пробивът има фундамент.
+Логика на сигнала: 13F е със закъснение (до 45 дни след тримесечието), затова
+не е тайминг инструмент — но КОНВЕРГЕНЦИЯ е силна. Ако акция, която вече
+излиза в нашия CANSLIM скринер, е била и купена от superinvestor →
+конвергенция маркер в dashboard-а (виж dashboard.html.j2, "in our_tickers").
 
-Източник на стойността: dataroma показва Value (стойност на позицията) на страницата
-на всеки мениджър. За нова покупка (Buy) стойността на позицията ≈ стойността на
-транзакцията; за добавяне (Add) е горна граница. Затова прагът се прилага върху
-стойността на позицията — разумен proxy за „значима" сделка (документирано тук).
+CUSIP-базирано сравнение между последните 2 13F-HR filings на един CIK
+(стабилен идентификатор — имената на емитента могат леко да варират между
+подавания). config.DATAROMA_MIN_SHARE_INCREASE_PCT определя "увеличена".
 
-ВАЖНО: кодовете на мениджърите (config.DATAROMA_MANAGERS) идват от URL-а на dataroma
-(`/m/holdings.php?m=КОД`). Те се менят рядко, но ВЕРИФИЦИРАЙ ги — при грешен код този
-мениджър просто се пропуска (graceful). Ако всички per-manager страници върнат нищо,
-има fallback към общата активност (`allact.php`), който не изисква кодове.
+EDGAR CIK-овете са ВЕРИФИЦИРАНИ directamente през data.sec.gov/submissions
+(виж config.py FIX бележките — две грешки хванати само по име: грешен CIK и
+отдавна-неактивни filing entities). ⚠ ако разширяваш DATAROMA_CIK, потвърди
+по СЪЩИЯ начин, не само по textual name match.
 
-EDGAR "нова покупка" vs "държана позиция": последният 13F сам по себе си е само
-снимка на текущите holdings — не казва дали позицията е нова или държана от години
-(Berkshire's Coca-Cola би излизала като "покупка" всеки ден иначе). Затова EDGAR
-пътят тегли И предходното тримесечие за същия CIK и съпоставя holdings-ите по CUSIP
-(стабилен идентификатор — имената на емитента могат леко да варират между подавания).
-Позиция без съвпадение в предходния 13F (или мениджър без предходен филинг изобщо —
-нов CIK в EDGAR историята) → "нова позиция". Ръст в брой акции над
-config.DATAROMA_MIN_SHARE_INCREASE_PCT → "увеличена". Непроменени/намалени позиции
-се изхвърлят — не са "покупка". config.DATAROMA_MIN_VALUE се прилага и тук.
-
-Graceful degradation (Секция 7): всяка грешка → празен резултат, брифът продължава.
+Graceful degradation (Секция 7): всяка грешка → празен резултат, брифът
+продължава. Пълен EDGAR провал (0 активни мениджъра с данни) → dataroma.com
+allact.php fallback само за "moves" (new_positions/major_exits нямат смисъл
+без EDGAR $ context).
 """
 from __future__ import annotations
 import datetime as dt
@@ -46,7 +52,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 _BASE = "https://www.dataroma.com/m"
-_HOLDINGS = _BASE + "/holdings.php?m={code}"
 _ALLACT = _BASE + "/allact.php"
 _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
@@ -106,44 +111,10 @@ def _truncate_words(s: str, limit: int) -> str:
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Слой 1: per-manager страници (стойност е налична → точен $ филтър)
-# ──────────────────────────────────────────────────────────────────────────
-def _manager_buys(code: str, name: str, min_value: float) -> list[dict]:
-    rows = []
-    try:
-        html = requests.get(_HOLDINGS.format(code=code), timeout=20, headers=_UA).text
-        period = None
-        m = re.search(r"\bQ[1-4]\s*20\d{2}\b", html)
-        if m:
-            period = m.group(0)
-        for tbl in pd.read_html(io.StringIO(html)):
-            cols = list(tbl.columns)
-            sym_c = _find_col(cols, "stock") or _find_col(cols, "ticker") or _find_col(cols, "symbol")
-            act_c = _find_col(cols, "activity") or _find_col(cols, "recent")
-            val_c = _find_col(cols, "value")
-            if sym_c is None or act_c is None:
-                continue
-            for _, r in tbl.iterrows():
-                action = _classify_activity(r[act_c])
-                if action is None:
-                    continue
-                sym = _parse_symbol(r[sym_c])
-                if not sym:
-                    continue
-                value = _parse_money(r[val_c]) if val_c is not None else None
-                if value is not None and value < min_value:
-                    continue
-                rows.append({"ticker": sym, "manager": name, "action": action,
-                             "value": value, "period": period})
-            if rows:
-                break  # първата валидна таблица стига
-    except Exception as e:
-        print(f"[dataroma] manager {code}: {e}")
-    return rows
-
-
-# ──────────────────────────────────────────────────────────────────────────
-# Слой 2 (fallback): обща активност — без стойност, без нужда от кодове
+# Fallback: обща активност (dataroma.com allact.php) — без стойност, без
+# нужда от per-manager кодове. _manager_buys() (dataroma.com per-manager
+# scrape, старата "Слой 1") премахнат 2026-08-17 заедно с config.
+# DATAROMA_MANAGERS — беше практически мъртъв код (виж config.py коментара).
 # ──────────────────────────────────────────────────────────────────────────
 def _allact_buys() -> list[dict]:
     rows = []
@@ -176,17 +147,6 @@ def _allact_buys() -> list[dict]:
         print(f"[dataroma] allact fallback: {e}")
     return rows
 
-
-# ──────────────────────────────────────────────────────────────────────────
-# Публично API
-# ──────────────────────────────────────────────────────────────────────────
-def fetch_superinvestor_buys(min_value: float | None = None) -> list[dict]:
-    """
-    Връща [{ticker, company, manager, action, value, period}] от последните 13F
-    (EDGAR primary → dataroma scrape → кеш), подредени по стойност. Кешира за деня.
-    """
-    min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
-    return _fetch_body(min_value)
 
 # ══════════════════════════════════════════════════════════════════════════
 # SEC EDGAR 13F (Поправка 3) — primary, публичен API без блокиране
@@ -327,101 +287,166 @@ def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
     return agg
 
 
-def _edgar_positions(min_value: float) -> list[dict]:
+def _manager_snapshot(cik: str, name: str) -> dict:
     """
-    НОВИ и УВЕЛИЧЕНИ позиции (не целия holdings dump) от последните 13F на всички
-    CIK мениджъри, съпоставени по CUSIP спрямо предходното тримесечие:
-      • CUSIP липсва в предходния 13F (или мениджърът няма предходен филинг изобщо —
-        нов CIK в EDGAR историята/фонд без история) → "нова позиция" (graceful default,
-        не пропускаме мениджъра и не гърмим).
-      • Брой акции е нараснал с поне config.DATAROMA_MIN_SHARE_INCREASE_PCT спрямо
-        предходното тримесечие → "увеличена".
-      • Непроменена/намалена позиция → изключва се от изхода (не е "покупка").
-    config.DATAROMA_MIN_VALUE се прилага и тук, върху текущата стойност на позицията.
+    FIX 2026-08-17: единствен fetch на последните 2 13F-HR filings за
+    мениджъра — консумиран от ТРИТЕ downstream изхода (moves feed,
+    high-conviction new positions, major exits), вместо да теглим EDGAR
+    3 пъти за same данни. current_agg/prev_agg носят ПЪЛНИЯ {value, shares}
+    (не само shares, за разлика от старата _edgar_positions()) — major
+    exits логиката се нуждае и от предишните $ стойности, не само дяловете.
+
+    filing_status:
+      "no_filings" — CIK без НИТО ЕДИН 13F-HR (пропуска се навсякъде)
+      "stopped"    — последният filing е по-стар от config.DATAROMA_STALE_
+                     FILER_DAYS (виж config.py защо — Burry/Scion е реалният
+                     потвърден случай, фондът закрит 2025, не единична
+                     продажба на позиция)
+      "active"     — нормален случай
     """
-    tmap = _ticker_map()
+    filings = _recent_13f_filings(cik, n=2)
+    if not filings:
+        return {"manager": name, "cik": cik, "filing_status": "no_filings"}
+
+    acc, fdate = filings[0]
+    days_since = None
+    if fdate:
+        try:
+            days_since = (dt.date.today() - dt.date.fromisoformat(fdate)).days
+        except ValueError:
+            pass
+    filing_status = ("stopped" if (days_since is not None
+                                   and days_since > config.DATAROMA_STALE_FILER_DAYS)
+                     else "active")
+    period = f"13F · {fdate}" if fdate else "13F"
+
+    holdings = _info_table(cik, acc)
+    if not holdings:
+        return {"manager": name, "cik": cik, "filing_status": filing_status,
+                "period": period, "last_filing_date": fdate, "days_since_filing": days_since}
+    current_agg = _aggregate_by_cusip(holdings)
+    # 13F стойностите след 2023 са в долари; преди — в хиляди. Евристика:
+    mx = max((a["value"] for a in current_agg.values()), default=0)
+    cur_scale = 1000 if mx and mx < 1e7 else 1
+    current_total = sum(a["value"] for a in current_agg.values()) * cur_scale
+
+    prev_agg: dict[str, dict] = {}
+    prev_scale = 1
+    prev_total = 0.0
+    if len(filings) >= 2:
+        prev_acc, _ = filings[1]
+        prev_holdings = _info_table(cik, prev_acc)
+        if prev_holdings:
+            prev_agg = _aggregate_by_cusip(prev_holdings)
+            pmx = max((a["value"] for a in prev_agg.values()), default=0)
+            prev_scale = 1000 if pmx and pmx < 1e7 else 1
+            prev_total = sum(a["value"] for a in prev_agg.values()) * prev_scale
+
+    return {
+        "manager": name, "cik": cik, "filing_status": filing_status,
+        "period": period, "last_filing_date": fdate, "days_since_filing": days_since,
+        "current_agg": current_agg, "current_scale": cur_scale, "current_total": current_total,
+        "prev_agg": prev_agg, "prev_scale": prev_scale, "prev_total": prev_total,
+    }
+
+
+def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]:
+    """
+    "Нова позиция"/"увеличена" — same логика, каквато преди живееше в
+    _edgar_positions(), сега extract-ната да работи върху споделен snapshot.
+    """
     rows = []
-    for cik, name in config.DATAROMA_CIK.items():
-        filings = _recent_13f_filings(cik, n=2)
-        if not filings:
+    current_agg = snap.get("current_agg") or {}
+    prev_agg = snap.get("prev_agg") or {}
+    cur_scale = snap.get("current_scale", 1)
+    for cusip, cur in current_agg.items():
+        prev_shares = (prev_agg.get(cusip) or {}).get("shares")
+        if prev_shares is None or prev_shares <= 0:
+            action = "нова позиция"
+        elif cur["shares"] >= prev_shares * (1 + config.DATAROMA_MIN_SHARE_INCREASE_PCT / 100):
+            action = "увеличена"
+        else:
+            continue  # непроменена/намалена — не е "покупка"
+        value = cur["value"] * cur_scale
+        if value < min_value:
             continue
-        acc, fdate = filings[0]
-        period = f"13F · {fdate}" if fdate else "13F"
-        holdings = _info_table(cik, acc)
-        if not holdings:
-            continue
-        current_by_cusip = _aggregate_by_cusip(holdings)
-
-        # предходно тримесечие — липсва ли (нов CIK/фонд без история), prev_by_cusip
-        # остава {} и ВСЯКА текуща позиция по-долу пада в клона "нова позиция"
-        prev_by_cusip: dict[str, float] = {}
-        if len(filings) >= 2:
-            prev_acc, _ = filings[1]
-            prev_holdings = _info_table(cik, prev_acc)
-            prev_by_cusip = {c: a["shares"] for c, a in _aggregate_by_cusip(prev_holdings).items()}
-
-        # 13F стойностите след 2023 са в долари; преди — в хиляди. Евристика:
-        mx = max((a["value"] for a in current_by_cusip.values()), default=0)
-        scale = 1000 if mx and mx < 1e7 else 1  # ако максимумът е „малък", значи са хиляди
-
-        for cusip, cur in current_by_cusip.items():
-            prev_shares = prev_by_cusip.get(cusip)
-            if prev_shares is None or prev_shares <= 0:
-                action = "нова позиция"
-            elif cur["shares"] >= prev_shares * (1 + config.DATAROMA_MIN_SHARE_INCREASE_PCT / 100):
-                action = "увеличена"
-            else:
-                continue  # непроменена/намалена — не е "покупка", изхвърляме
-
-            value = cur["value"] * scale
-            if value < min_value:
-                continue
-
-            ticker = tmap.get(_norm(cur["issuer"]))
-            rows.append({
-                "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
-                "company": cur["issuer"],
-                "manager": name,
-                "action": action,
-                "value": value,
-                "period": period,
-                "_resolved": bool(ticker),
-            })
+        ticker = tmap.get(_norm(cur["issuer"]))
+        rows.append({
+            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
+            "company": cur["issuer"], "manager": snap["manager"], "action": action,
+            "value": value, "period": snap["period"], "_resolved": bool(ticker),
+        })
     return rows
 
 
-# ══════════════════════════════════════════════════════════════════════════
-def _fetch_body(min_value: float) -> list[dict]:
-    today = dt.date.today().isoformat()
-    if _CACHE.exists():
-        try:
-            cached = json.loads(_CACHE.read_text())
-            if cached.get("date") == today and cached.get("rows"):
-                return cached.get("rows", [])
-        except Exception:
-            pass
+def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
+    """
+    High-conviction "нова позиция": CUSIP отсъства в предишния filing И
+    value >= config.DATAROMA_MIN_NEW_POSITION_PCT% от ТЕКУЩИЯ портфейл на
+    мениджъра. Explicit БЕЗ $ праг (config.DATAROMA_MIN_VALUE) — виж
+    config.py коментара: % на портфейл вече нормализира за размера на фонда,
+    $ праг би изтрил точно small-fund high-conviction сигналите (напр. 2% от
+    Pabrai/Dalal Street ~$327M портфейл е ~$6.5M, под $10M).
+    """
+    out = []
+    current_agg = snap.get("current_agg") or {}
+    prev_agg = snap.get("prev_agg") or {}
+    cur_scale = snap.get("current_scale", 1)
+    total = snap.get("current_total") or 0
+    if not total:
+        return out
+    for cusip, cur in current_agg.items():
+        if cusip in prev_agg:
+            continue  # присъствала в предишния filing — не е "нова"
+        value = cur["value"] * cur_scale
+        pct = value / total * 100
+        if pct < config.DATAROMA_MIN_NEW_POSITION_PCT:
+            continue
+        ticker = tmap.get(_norm(cur["issuer"]))
+        out.append({
+            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
+            "company": cur["issuer"], "manager": snap["manager"], "value": value,
+            "pct_of_portfolio": round(pct, 1), "period": snap["period"],
+            "_resolved": bool(ticker),
+        })
+    return out
 
-    # 1) EDGAR primary
-    rows = _edgar_positions(min_value)
 
-    # 2) стар dataroma scrape, ако EDGAR върна нищо
-    if not rows:
-        for code, name in config.DATAROMA_MANAGERS.items():
-            rows.extend(_manager_buys(code, name, min_value))
-        if not rows:
-            fb = _allact_buys()
-            if config.DATAROMA_STRICT_VALUE:
-                fb = [r for r in fb if r["value"] is not None and r["value"] >= min_value]
-            rows = fb
+def _major_exits_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
+    """
+    Major exit: CUSIP присъствал в ПРЕДИШНИЯ filing на >= config.
+    DATAROMA_MAJOR_EXIT_PCT% от ТОГАВАШНИЯ портфейл, отсъства напълно сега.
+    Извикващият код (_fetch_all) вика тази функция САМО за filing_status=
+    "active" мениджъри — "stopped" мениджъри НЕ произвеждат exit редове тук
+    изобщо (виж config.py DATAROMA_STALE_FILER_DAYS — "фондът закри се" е
+    различно събитие от "продадена конкретна позиция").
+    """
+    out = []
+    current_agg = snap.get("current_agg") or {}
+    prev_agg = snap.get("prev_agg") or {}
+    prev_scale = snap.get("prev_scale", 1)
+    prev_total = snap.get("prev_total") or 0
+    if not prev_total:
+        return out
+    for cusip, prev in prev_agg.items():
+        if cusip in current_agg:
+            continue  # все още държана — не е exit
+        value = prev["value"] * prev_scale
+        pct = value / prev_total * 100
+        if pct < config.DATAROMA_MAJOR_EXIT_PCT:
+            continue
+        ticker = tmap.get(_norm(prev["issuer"]))
+        out.append({
+            "ticker": ticker or _truncate_words(prev["issuer"], 24).upper(),
+            "company": prev["issuer"], "manager": snap["manager"],
+            "prior_value": value, "prior_pct_of_portfolio": round(pct, 1),
+            "period": snap["period"], "_resolved": bool(ticker),
+        })
+    return out
 
-    # 3) ако всичко падна — последен кеш (по изискване)
-    if not rows and _CACHE.exists():
-        try:
-            return json.loads(_CACHE.read_text()).get("rows", [])
-        except Exception:
-            return []
 
-    # дедупликация по тикър (пазим най-голямата стойност, броим мениджърите)
+def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
+    """Пази най-голямата стойност на тикър, брои и изброява мениджърите — за конвергенция."""
     best: dict[str, dict] = {}
     for r in rows:
         key = r["ticker"]
@@ -434,15 +459,120 @@ def _fetch_body(min_value: float) -> list[dict]:
                 cur["managers"].append(r["manager"])
             if (r.get("value") or 0) > (cur.get("value") or 0):
                 cur["value"] = r["value"]; cur["company"] = r.get("company", cur.get("company"))
-    rows = sorted(best.values(), key=lambda r: (r.get("value") or 0), reverse=True)
+    return list(best.values())
 
-    try:
-        config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "rows": rows},
-                                     ensure_ascii=False, indent=1))
-    except Exception as e:
-        print(f"[dataroma] cache write: {e}")
-    return rows
+
+# ══════════════════════════════════════════════════════════════════════════
+def _fetch_all(min_value: float) -> dict:
+    """
+    Единствен fetch pass на ден (кеширан) — връща {"moves", "new_positions",
+    "major_exits", "stopped_managers"} общо, всичките производни на same
+    manager snapshots (виж _manager_snapshot). ЗАБЕЛЕЖКА: min_value влияе
+    само на "moves" ($ праг) — new_positions/major_exits ползват % на
+    портфейл, не $ (виж config.py). Кешът е по ДЕН, не по min_value — same
+    ограничение съществуваше и в старата _fetch_body() имплементация.
+    """
+    today = dt.date.today().isoformat()
+    if _CACHE.exists():
+        try:
+            cached = json.loads(_CACHE.read_text())
+            if cached.get("date") == today and cached.get("bundle"):
+                return cached["bundle"]
+        except Exception:
+            pass
+
+    tmap = _ticker_map()
+    manager_top: dict[str, list[dict]] = {}
+    new_positions: list[dict] = []
+    major_exits: list[dict] = []
+    stopped_managers: list[dict] = []
+    any_active_data = False
+
+    for cik, name in config.DATAROMA_CIK.items():
+        snap = _manager_snapshot(cik, name)
+        status = snap["filing_status"]
+        if status == "no_filings":
+            continue
+        if status == "stopped":
+            stopped_managers.append({
+                "manager": name, "last_filing_date": snap.get("last_filing_date"),
+                "days_since_filing": snap.get("days_since_filing"),
+            })
+            continue  # НЕ смятаме moves/exits за спрели мениджъри
+        if not snap.get("current_agg"):
+            continue
+
+        any_active_data = True
+        mgr_rows = _moves_from_snapshot(snap, min_value, tmap)
+        manager_top[name] = sorted(mgr_rows, key=lambda r: r.get("value") or 0,
+                                   reverse=True)[:config.DATAROMA_TOP_PER_MANAGER]
+        new_positions += _new_position_highlights_from_snapshot(snap, tmap)
+        major_exits += _major_exits_from_snapshot(snap, tmap)
+
+    pooled = [r for rows in manager_top.values() for r in rows]
+    moves = _dedupe_by_ticker(pooled)
+    moves = sorted(moves, key=lambda r: (r.get("value") or 0),
+                   reverse=True)[:config.DATAROMA_MOVES_DISPLAY_LIMIT]
+
+    # Ако EDGAR напълно е паднал (нито един активен мениджър с данни) —
+    # dataroma.com allact.php fallback, само за moves (няма % context за
+    # new_positions/major_exits без EDGAR $ данните).
+    if not any_active_data:
+        fb = _allact_buys()
+        if config.DATAROMA_STRICT_VALUE:
+            fb = [r for r in fb if r["value"] is not None and r["value"] >= min_value]
+        moves = _dedupe_by_ticker(fb)[:config.DATAROMA_MOVES_DISPLAY_LIMIT]
+
+    new_positions.sort(key=lambda r: r.get("pct_of_portfolio", 0), reverse=True)
+    major_exits.sort(key=lambda r: r.get("prior_pct_of_portfolio", 0), reverse=True)
+
+    bundle = {"moves": moves, "new_positions": new_positions,
+             "major_exits": major_exits, "stopped_managers": stopped_managers}
+
+    if moves or new_positions or major_exits or stopped_managers:
+        try:
+            config.DATA_DIR.mkdir(exist_ok=True)
+            _CACHE.write_text(json.dumps({"date": today, "bundle": bundle},
+                                         ensure_ascii=False, indent=1))
+        except Exception as e:
+            print(f"[dataroma] cache write: {e}")
+    elif _CACHE.exists():
+        # всичко падна ДНЕС — последен кеш (по изискване, съществуваше и в старата логика)
+        try:
+            return json.loads(_CACHE.read_text()).get("bundle", bundle)
+        except Exception:
+            pass
+    return bundle
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Публично API
+# ──────────────────────────────────────────────────────────────────────────
+def fetch_superinvestor_buys(min_value: float | None = None) -> list[dict]:
+    """
+    Връща [{ticker, company, manager(s), action, value, period}] — top-N-per-
+    manager selection (config.DATAROMA_TOP_PER_MANAGER), dedup по тикър,
+    общ таван config.DATAROMA_MOVES_DISPLAY_LIMIT. Кешира за деня.
+    """
+    min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
+    return _fetch_all(min_value)["moves"]
+
+
+def fetch_new_position_highlights(min_value: float | None = None) -> list[dict]:
+    """High-conviction нови позиции (>= DATAROMA_MIN_NEW_POSITION_PCT% от портфейла)."""
+    min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
+    return _fetch_all(min_value)["new_positions"]
+
+
+def fetch_major_exits(min_value: float | None = None) -> dict:
+    """
+    {"exits": [...], "stopped_managers": [...]} — explicit разделени, за да
+    не се бъркат "продадена конкретна позиция" с "фондът е спрял да подава"
+    (виж _major_exits_from_snapshot докстринга).
+    """
+    min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
+    bundle = _fetch_all(min_value)
+    return {"exits": bundle["major_exits"], "stopped_managers": bundle["stopped_managers"]}
 
 
 def superinvestor_map(rows: list[dict] | None = None) -> dict[str, dict]:
@@ -459,8 +589,24 @@ def superinvestor_map(rows: list[dict] | None = None) -> dict[str, dict]:
 
 
 if __name__ == "__main__":
-    res = fetch_superinvestor_buys()
-    print(f"Significant superinvestor buys (≥ ${config.DATAROMA_MIN_VALUE:,.0f}): {len(res)}")
-    for r in res[:25]:
+    moves = fetch_superinvestor_buys()
+    print(f"Superinvestor Moves (top {config.DATAROMA_TOP_PER_MANAGER}/мениджър, "
+         f"таван {config.DATAROMA_MOVES_DISPLAY_LIMIT}): {len(moves)}")
+    for r in moves:
         v = f"${r['value']:,.0f}" if r.get("value") else "—"
-        print(f"  {r['ticker']:6} {r['action']:4} {v:>16}  {r['manager']} ({r.get('period')})")
+        mgrs = "/".join(r.get("managers", [r.get("manager")]))
+        print(f"  {r['ticker']:6} {r['action']:4} {v:>16}  {mgrs} ({r.get('period')})")
+
+    print(f"\nHigh-Conviction New Positions (>= {config.DATAROMA_MIN_NEW_POSITION_PCT}% от портфейл):")
+    for r in fetch_new_position_highlights():
+        print(f"  {r['ticker']:6} {r['pct_of_portfolio']:>5.1f}%  ${r['value']:,.0f}  {r['manager']}")
+
+    exits = fetch_major_exits()
+    print(f"\nMajor Position Exits (>= {config.DATAROMA_MAJOR_EXIT_PCT}% от предишен портфейл):")
+    for r in exits["exits"]:
+        print(f"  {r['ticker']:6} {r['prior_pct_of_portfolio']:>5.1f}%  {r['manager']}")
+    if exits["stopped_managers"]:
+        print("\nМениджъри, спрели да подават 13F:")
+        for s in exits["stopped_managers"]:
+            print(f"  {s['manager']} — последен filing {s['last_filing_date']} "
+                 f"({s['days_since_filing']} дни)")

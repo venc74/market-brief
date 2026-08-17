@@ -182,25 +182,47 @@ ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
 
 
 # ── Dataroma · Superinvestor Moves ────────────────────────────────────────
-# Минимална стойност на позицията, за да се брои „значима" покупка.
+# Минимална стойност на позицията, за да се брои „значима" покупка (само за
+# основния Moves feed — high-conviction new positions ползва % на портфейл,
+# не $ праг, виж DATAROMA_MIN_NEW_POSITION_PCT по-долу).
 DATAROMA_MIN_VALUE = float(os.getenv("DATAROMA_MIN_VALUE", 10_000_000))   # $10M
 # Ако True: при fallback към allact.php (без стойности) се отхвърлят редовете
 # без известна стойност. По подразбиране False — по-добре да видиш хода.
 DATAROMA_STRICT_VALUE = os.getenv("DATAROMA_STRICT_VALUE", "0") == "1"
 ENABLE_DATAROMA = os.getenv("ENABLE_DATAROMA", "1") == "1"
-# Кодове на superinvestors от URL-а на dataroma (/m/holdings.php?m=КОД).
-# ⚠ ВЕРИФИЦИРАЙ ги на сайта — при грешен код мениджърът тихо се пропуска.
-# Редактируем: добавяй/махай свободно. Ключ = код, стойност = четимо име.
-DATAROMA_MANAGERS = {
-    "BRK":      "Уорън Бъфет · Berkshire Hathaway",
-    "SAM":      "Майкъл Бъри · Scion Asset Management",
-    "DFO":      "Стенли Дракенмилър · Duquesne Family Office",
-    "psc":      "Бил Акман · Pershing Square",
-    "BAUPOST":  "Сет Кларман · Baupost Group",
-    "GR":       "Дейвид Айнхорн · Greenlight Capital",
-    "AKRE":     "Чък Акре · Akre Capital",
-    "AM":       "Дейвид Тепър · Appaloosa",
-}
+# FIX 2026-08-17: top-N позиции НА МЕНИДЖЪР за основния Moves feed (не global
+# top-N по $ стойност) — Berkshire's позиции ($10B+ всяка) системно изяждаха
+# всичките 5 dashboard слота дори в дни, когато 3-4 други мениджъри имаха
+# съвсем реални, валидни редове точно под Buffett-овите в същия dataset
+# (потвърдено емпирично, 2026-08-17 диагностика). DATAROMA_MOVES_DISPLAY_LIMIT
+# е таванът СЛЕД top-N-per-manager селекцията + dedup по тикър (замества
+# старото hardcoded [:5] в темплейта — единствен източник на истината в код).
+DATAROMA_TOP_PER_MANAGER = int(os.getenv("DATAROMA_TOP_PER_MANAGER", 2))
+DATAROMA_MOVES_DISPLAY_LIMIT = int(os.getenv("DATAROMA_MOVES_DISPLAY_LIMIT", 8))
+# High-conviction "нова позиция" сигнал — CUSIP отсъства в предишния filing
+# И value >= този % от ТЕКУЩИЯ портфейл на мениджъра (не $ праг — 2% от
+# по-малък фонд, напр. Pabrai/Dalal Street ~$327M портфейл, е ~$6.5M, под
+# DATAROMA_MIN_VALUE $10M; $ праг тук би изтрил точно small-fund сигналите).
+DATAROMA_MIN_NEW_POSITION_PCT = float(os.getenv("DATAROMA_MIN_NEW_POSITION_PCT", 2.0))
+# "Major exit" сигнал — CUSIP присъствал в ПРЕДИШНИЯ filing на >= този % от
+# тогавашния портфейл, отсъства напълно в текущия. Изчислява се САМО за
+# filing_status="active" мениджъри (виж DATAROMA_STALE_FILER_DAYS) — иначе
+# "фондът затвори" (Burry/Scion, потвърдено 2026-08-17) би се смесило с
+# "продадена конкретна позиция", две различни събития.
+DATAROMA_MAJOR_EXIT_PCT = float(os.getenv("DATAROMA_MAJOR_EXIT_PCT", 10.0))
+# Мениджър без нов 13F-HR над този брой дни → filing_status="stopped", major
+# exit логиката се прескача изцяло за него (виж по-горе). ~135 дни е worst-
+# case gap между два НАВРЕМЕННИ тримесечни filing-а (45-дневен deadline след
+# края на тримесечието) — 165 дава разумен buffer над това, без да е толкова
+# хлабав, че истински спрял мениджър (Burry, последен filing 2025-11-03,
+# >280 дни към 2026-08-17) да остане незасечен.
+DATAROMA_STALE_FILER_DAYS = int(os.getenv("DATAROMA_STALE_FILER_DAYS", 165))
+# CIK номера — виж DATAROMA_CIK по-долу (Секция EDGAR 13F) за пълния,
+# верифициран списък от 16 мениджъра. DATAROMA_MANAGERS (dataroma.com URL
+# кодове) премахнат 2026-08-17 — беше практически мъртъв fallback код
+# (стигаше се до него само ако EDGAR върнеше 0 за ВСИЧКИ CIK-ове едновременно)
+# в ДРУГА ID система от CIK, синхронизирането му би удвоило поддръжката за
+# нулева практическа полза; _allact_buys() (code-free fallback) остава.
 
 
 # ── news_aggregator + Tradier (нов модул + поправка) ──────────────────────
@@ -271,13 +293,37 @@ UNUSUAL_OPTIONS_SCAN_LIMIT = int(os.getenv("UNUSUAL_OPTIONS_SCAN_LIMIT", 60))
 # EDGAR изисква descriptive User-Agent с реален контакт — стойността се
 # подава само през env var (GitHub Secret), никога не се комитва в кода.
 EDGAR_UA = os.getenv("EDGAR_UA", "market-brief-bot (contact via GitHub repo)")
-# CIK номера на топ мениджърите (подадени от теб). Ключ = CIK, стойност = име.
+# CIK номера — верифицирани directamente през data.sec.gov/submissions
+# (не по име само — вижте FIX бележките, две грешки хванати точно така).
+# 16 мениджъра общо. Ключ = CIK (10 цифри, нулево-допълнен), стойност = име.
+#
+# FIX 2026-08-17: старият Klarman CIK (0001061219) сочеше към ENTERPRISE
+# PRODUCTS PARTNERS L.P. — напълно различна компания, никога не е бил Baupost.
+# Верен CIK: 0001061768 (BAUPOST GROUP LLC/MA).
+#
+# FIX 2026-08-17: Разширяване от 5 на 16 мениджъра. Първите по име съвпадения
+# за Tepper/Appaloosa, Marks/Oaktree, Armitage/Egerton и Pabrai бяха ОТДАВНА
+# НЕАКТИВНИ entity-та (фирмите преминават към нови SEC filing CIK-ове с
+# годините — последен filing 2016/2011/2013/2012 съответно) — наложи се
+# допълнително търсене за текущите активни filers. Pabrai's официална SEC
+# filing entity се оказа "Dalal Street, LLC", не "Pabrai"/"Pabrai Investments".
 DATAROMA_CIK = {
     "0001067983": "Уорън Бъфет · Berkshire Hathaway",
-    "0001649339": "Майкъл Бъри · Scion Asset Management",
+    "0001649339": "Майкъл Бъри · Scion Asset Management",  # filing_status="stopped" очаквано — фондът закрит 2025
     "0001336528": "Бил Акман · Pershing Square",
-    "0001061219": "Сет Кларман · Baupost Group",
+    "0001061768": "Сет Кларман · Baupost Group",
     "0001536411": "Стенли Дракенмилър · Duquesne Family Office",
+    "0001167483": "Чейс Коулман · Tiger Global Management",
+    "0001647251": "Крис Хон · TCI Fund Management",
+    "0001040273": "Даниел Лоуб · Third Point",
+    "0001656456": "Дейвид Тепър · Appaloosa Management",
+    "0000949509": "Хауърд Маркс · Oaktree Capital Management",
+    "0001581811": "Джон Армитидж · Egerton Capital",
+    "0001709323": "Ли Лу · Himalaya Capital Management",
+    "0001549575": "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)",
+    "0001061165": "Стивън Мандел · Lone Pine Capital",
+    "0001569205": "Тери Смит · Fundsmith",
+    "0001454502": "Triple Frond Partners",
 }
 # EDGAR-специфичен праг: позиция се брои за "увеличена" само ако бр. акции е
 # нараснал с поне този % спрямо предходното тримесечие (сравнение по CUSIP).

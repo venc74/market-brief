@@ -160,11 +160,21 @@ def run() -> dict:
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
     naaim_hist = naaim_history()
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
+    # FIX 2026-08-17: high-conviction нови позиции (>DATAROMA_MIN_NEW_POSITION_PCT%
+    # от портфейл) и major exits (>DATAROMA_MAJOR_EXIT_PCT%, explicit разделени от
+    # "мениджър спрял да подава" — виж dataroma.py docstring-а) — отделни dashboard
+    # сигнали от общия Moves feed.
+    superinvestor_new_positions = dataroma.fetch_new_position_highlights() if config.ENABLE_DATAROMA else []
+    superinvestor_exits = (dataroma.fetch_major_exits() if config.ENABLE_DATAROMA
+                           else {"exits": [], "stopped_managers": []})
     insider_buys = insider_buying.fetch_insider_buying() if config.ENABLE_INSIDER_BUYING else []
     # конвергенция: тикър и в CANSLIM скрийнъра (action+watchlist), и в insider buying — виж insider_buying.py docstring
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
     for row in insider_buys:
         row["in_screener"] = row["ticker"] in our_tickers
+    # (superinvestor_new_positions/superinvestor_exits конвергенцията се
+    # изчислява в темплейта, "s.ticker in our_tickers" — same паттърн като
+    # съществуващата superinvestor_moves секция, не precomputed поле тук)
     # GLB (Green Line Breakout) — независим механичен скрийнър, изцяло
     # извън CANSLIM/Weinstein pipeline-а (собствен universe fetch, виж
     # glb_screener.py docstring). Explicit try/except тук, въпреки че
@@ -208,6 +218,8 @@ def run() -> dict:
         "splits": splits_month,
         "naaim_history": naaim_hist,
         "superinvestor_moves": superinvestor_moves,
+        "superinvestor_new_positions": superinvestor_new_positions,
+        "superinvestor_exits": superinvestor_exits,
         "insider_buying": insider_buys,
         "glb_candidates": glb_candidates,
         "news": news,

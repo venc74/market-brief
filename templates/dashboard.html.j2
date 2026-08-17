@@ -178,6 +178,13 @@
     letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
   .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
   .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
+  .si-card.exit { border-left: 3px solid var(--red); }
+  .si-pct { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .si-pct.new { color: var(--green); }
+  .si-pct.exit { color: var(--red); }
+  .si-stopped-note { font-size: 12.5px; color: var(--muted); margin-top: 12px; padding: 10px 14px;
+    background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; }
+  .si-stopped-note b { color: var(--yellow); }
 
   /* ── GLB (Green Line Breakout) Watchlist ── */
   .glb-group-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase;
@@ -671,7 +678,7 @@
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
   <div class="si-grid">
-    {% for s in superinvestor_moves[:5] %}
+    {% for s in superinvestor_moves %}
     <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
       <div class="si-top">
         <span class="si-sym">{{ s.ticker }}</span>
@@ -689,6 +696,63 @@
   </div>
 </section>
 {% endif %}
+
+{% if superinvestor_new_positions %}
+<section>
+  <h2>🆕 High-Conviction New Positions</h2>
+  <div class="si-grid">
+    {% for s in superinvestor_new_positions %}
+    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-pct new">{{ s.pct_of_portfolio }}%</span>
+      </div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{{ s.manager }}{% if s.value %} · {{ s.value|money_short }}{% endif %}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    Съвсем НОВА позиция (отсъствала в предишния 13F) над {{ dataroma_min_new_position_pct }}% от портфейла на мениджъра —
+    праг върху % от портфейла, не абсолютна $ стойност, за да не отпаднат high-conviction залози на по-малки фондове.
+  </div>
+</section>
+{% endif %}
+
+{% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
+<section>
+  <h2>📉 Major Position Exits</h2>
+  {% if superinvestor_exits.exits %}
+  <div class="si-grid">
+    {% for s in superinvestor_exits.exits %}
+    <div class="si-card exit {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
+      </div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    Позиция, която е била над {{ dataroma_major_exit_pct }}% от портфейла на мениджъра в предишния 13F,
+    напълно отсъства в текущия — пълна ликвидация на концентрирана позиция, не частично намаление.
+  </div>
+  {% endif %}
+  {% if superinvestor_exits.stopped_managers %}
+  <div class="si-stopped-note">
+    <b>⚠ Мениджъри, спрели да подават 13F</b> (изключени от Exits по-горе — липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
+    {% for m in superinvestor_exits.stopped_managers %}
+    <div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
 {% if insider_buying %}
 <section>
   <h2>Insider Buying · Form 4 (open market покупки)</h2>
