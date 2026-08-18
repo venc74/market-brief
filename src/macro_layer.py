@@ -40,16 +40,42 @@ def fed_net_liquidity() -> dict:
     """
     Net Liquidity = Fed Balance Sheet (WALCL) − Reverse Repo (RRPONTSYD)
                     − Treasury General Account (WTREGEN). В млрд USD.
+
+    FIX 2026-08-18: staleness guard, same принцип като _is_stale() за MOVE/
+    VIX (виж move_index()/vix_term_structure() в thermometer.py) — преди
+    имаше само "series напълно празна" защита (walcl/rrp/tga са []), НЕ
+    "валиден, но остарял отговор" защита. WALCL/WTREGEN (Fed H.4.1, седмичен
+    отчет) получават config.FED_LIQUIDITY_STALENESS_DAYS (по-дълъг праг —
+    легитимен 7-дневен цикъл между публикации + buffer, виж config.py
+    коментара за пълния rationale). RRPONTSYD (дневна, работни дни) ползва
+    same config.STALENESS_THRESHOLD_DAYS като VIX/MOVE — same клас серия.
+
+    value=None (заедно с hide=True) при stale данни — thermometer.py's
+    nl_ind construction вече прави `if nl.get("value") is None: hide=True`,
+    затова downstream кодът не се нуждае от собствена staleness логика,
+    само коректно value=None тук, при източника.
     """
     walcl = _fred_series("WALCL")        # millions, weekly
     rrp = _fred_series("RRPONTSYD")      # billions, daily
     tga = _fred_series("WTREGEN")        # millions, weekly (същия H.4.1 отчет като WALCL — не billions)
 
     if not (walcl and rrp and tga):
-        return {"value": None, "trend": "unknown", "history": []}
+        return {"value": None, "trend": "unknown", "history": [], "hide": True}
 
     def latest(series): return series[-1][1]
+    def latest_date(series): return dt.date.fromisoformat(series[-1][0])
     def prior(series): return series[-5][1] if len(series) >= 5 else series[0][1]
+
+    for label, series, threshold in (
+        ("WALCL", walcl, config.FED_LIQUIDITY_STALENESS_DAYS),
+        ("WTREGEN", tga, config.FED_LIQUIDITY_STALENESS_DAYS),
+        ("RRPONTSYD", rrp, config.STALENESS_THRESHOLD_DAYS),
+    ):
+        d = latest_date(series)
+        if _is_stale(d, threshold):
+            print(f"[macro] Net Liquidity: {label} stale (последно наблюдение {d}, "
+                 f"праг {threshold}д)")
+            return {"value": None, "trend": "unknown", "history": [], "hide": True}
 
     nl_now = latest(walcl) / 1000 - latest(rrp) - latest(tga) / 1000
     nl_prev = prior(walcl) / 1000 - prior(rrp) - prior(tga) / 1000
@@ -80,14 +106,21 @@ def treasury_spread_2s10s() -> dict:
     }
 
 
-def _is_stale(last_ts) -> bool:
+def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
     """
     Огледало на thermometer._is_stale (дублирано локално, за да няма
-    cross-module coupling). Пази срещу застояли Yahoo серии — виж
+    cross-module coupling). Пази срещу застояли Yahoo/FRED серии — виж
     коментара в thermometer.py за ^MOVE/^VIX9D/^VIX3M инцидента.
+
+    FIX 2026-08-18: опционален threshold_days (по подразбиране config.
+    STALENESS_THRESHOLD_DAYS, same поведение както преди) — fed_net_
+    liquidity() подава config.FED_LIQUIDITY_STALENESS_DAYS за WALCL/WTREGEN
+    (легитимно седмични серии, стандартният 3-дневен праг би ги флагвал
+    като "stale" всяка нормална седмица).
     """
     last_date = last_ts.date() if hasattr(last_ts, "date") else last_ts
-    return (dt.date.today() - last_date).days > config.STALENESS_THRESHOLD_DAYS
+    threshold = threshold_days if threshold_days is not None else config.STALENESS_THRESHOLD_DAYS
+    return (dt.date.today() - last_date).days > threshold
 
 
 def global_market_signals() -> dict:
