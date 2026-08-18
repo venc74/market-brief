@@ -1,5 +1,5 @@
 {
- "date": "2026-08-17",
+ "date": "2026-08-18",
  "rows": [
   {
    "ticker": "JMPLY",
@@ -9,7 +9,7 @@
    "split_type": "reverse",
    "date_human": "Aug 17, 2026",
    "price": 68.0,
-   "market_cap": 4281076408.0
+   "market_cap": 4288300932.0
   },
   {
    "ticker": "SFBS",
@@ -18,8 +18,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 21, 2026",
-   "price": 91.33,
-   "market_cap": 4993240438.408356
+   "price": 90.53,
+   "market_cap": 4949502330.3
   }
  ]
 }
