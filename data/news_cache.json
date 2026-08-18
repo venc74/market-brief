@@ -1,37 +1,37 @@
 {
- "date": "2026-08-17",
+ "date": "2026-08-18",
  "news": [
   {
-   "headline": "S&P 500 posts three-week win streak, market near all-time highs",
-   "why": "Поддържа бичи настроения, но повдига въпроса за потенциална корекция при негативен катализатор."
+   "headline": "30-year Treasury yield tops 5.31%, the highest in 19 years",
+   "why": "Рекордно високите yields оказват натиск върху акциите и повишават дисконтовия процент, особено за growth компании."
   },
   {
-   "headline": "Japan Q2 GDP grows 1.1% annualized, misses 2% estimate",
-   "why": "Слабият японски растеж намалява натиска върху BOJ за агресивно затягане, което влияе на yen carry trade и глобалните рискови активи."
+   "headline": "Stock futures are little changed after Wall Street starts the week with losses, hurt by higher oil prices and rising yields",
+   "why": "Комбинацията от поскъпващ петрол и растящи yields сигнализира за stagflationary натиск, който вреди на широкия пазар."
   },
   {
-   "headline": "Japanese automakers vulnerable to Iran war risk and yen rally",
-   "why": "Комбинацията от геополитически риск и силна йена може да удари печалбите на Toyota, Honda и Nissan — важно за автомобилния сектор."
+   "headline": "Ship attacked in Hormuz Strait as U.S.-Iran ceasefire expiry risks prolonged conflict",
+   "why": "Атака в Ормузкия проток заплашва около 20% от световния петролен трафит и е директен катализатор за spike в цените на суровия петрол."
   },
   {
-   "headline": "Trump orders Pentagon to scale back joint exercises with South Korea",
-   "why": "Геополитическа деескалация на Корейския полуостров, но сигнал за непредвидимост в отбранителната политика — засяга defense сектора."
+   "headline": "Airlines in 'stand-off' over price cuts as jet fuel costs ease",
+   "why": "Авиокомпаниите се съпротивляват на натиска за намаляване на тарифите въпреки поевтиняването на jet fuel, което е важен сигнал за маржовете в сектора."
   },
   {
-   "headline": "Trump's envoys meet with Egyptian, Qatari and Turkish mediators in Cairo as Israel strikes Gaza",
-   "why": "Продължаващото геополитическо напрежение на Близкия изток поддържа рискова премия в петрола и засяга регионалните пазари."
+   "headline": "Trump's cuts to South Korean drills stir doubts about US resolve in Asia",
+   "why": "Съмненията в американските ангажименти в Азия засягат отбранителния сектор и могат да пренаредят геополитическите рискови премии в региона."
   },
   {
-   "headline": "Private credit under strain as troubled loans swell to 2017 levels",
-   "why": "Нарастващият стрес в private credit пазара е ранен индикатор за кредитни проблеми, засягащ финансовия сектор и апетита към риск."
+   "headline": "Options investors are betting on this trend in gold prices, Susquehanna says",
+   "why": "Обновените inflows и upside skew в опциите върху злато отразяват търсенето на хеджове срещу геополитическа несигурност и инфлация."
   },
   {
-   "headline": "Goldman Sachs picks China stocks poised to benefit from AI-related hardware exports",
-   "why": "Секторна ротация към китайски AI хардуер акции — важно за tech и semiconductor сектора."
+   "headline": "'Not worth the squeeze': global private equity makes zero deals in China",
+   "why": "Пълното изтегляне на глобалния private equity от Китай задълбочава capital outflow тенденцията и влияе на emerging markets сентимента."
   },
   {
-   "headline": "JPMorgan could soon become first $1 trillion bank",
-   "why": "Позитивен сигнал за финансовия сектор — банковите акции могат да продължат рали при потвърждаване на оценката."
+   "headline": "Stanley Druckenmiller loaded up on Amazon and chip stocks before July rout",
+   "why": "Позиционирането на Druckenmiller в semiconductors и Amazon преди корекцията е важен сигнал за smart money flows в tech сектора."
   }
  ]
 }

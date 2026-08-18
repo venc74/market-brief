@@ -1,1362 +1,441 @@
 {
- "date": "2026-08-17",
- "rows": [
-  {
-   "ticker": "AAPL",
-   "company": "APPLE INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 65950296923.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "AXP",
-   "company": "AMERICAN EXPRESS CO",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 51282319275.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "KO",
-   "company": "COCA COLA CO",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 32508000000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "GOOGL",
-   "company": "ALPHABET INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 28157599351.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway",
-    "Бил Акман · Pershing Square",
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 4
-  },
-  {
-   "ticker": "BANK OF AMER CORP",
-   "company": "BANK OF AMER CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 27543790975.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CVX",
-   "company": "CHEVRON CORPORATION",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 13986141890.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "OCCIDENTAL PETE CORP",
-   "company": "OCCIDENTAL PETE CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 12868205304.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CHUBB LIMITED",
-   "company": "CHUBB LIMITED",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 11670066615.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "MOODYS CORP",
-   "company": "MOODYS CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 11173435852.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "KHC",
-   "company": "KRAFT HEINZ CO",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 7691494401.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "DVA",
-   "company": "DAVITA INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 6425268898.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "DAL",
-   "company": "DELTA AIR LINES INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 5368591200.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway",
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "SIRIUSXM HOLDINGS INC",
-   "company": "SIRIUSXM HOLDINGS INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 3686802237.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "BROOKFIELD CORP",
-   "company": "BROOKFIELD CORP",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 2415946008.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": false,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "AMZN",
-   "company": "AMAZON COM INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 2385104083.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": true,
-   "managers": [
-    "Бил Акман · Pershing Square",
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "VERISIGN INC",
-   "company": "VERISIGN INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 2261494212.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "KR",
-   "company": "KROGER CO",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 2165670000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "UBER",
-   "company": "UBER TECHNOLOGIES INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 2154934398.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": true,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "MSFT",
-   "company": "MICROSOFT CORP",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 2092970053.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": true,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RESTAURANT BRANDS INTL",
-   "company": "RESTAURANT BRANDS INTL INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 1673501194.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": false,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "META",
-   "company": "META PLATFORMS INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 1522358404.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": true,
-   "managers": [
-    "Бил Акман · Pershing Square",
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "ALLY FINL INC",
-   "company": "ALLY FINL INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 1240650000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "HHH",
-   "company": "HOWARD HUGHES HOLDINGS INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 1192581569.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": true,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LENNAR CORP",
-   "company": "LENNAR CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 1186481443.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "LLYVA",
-   "company": "LIBERTY LIVE HOLDINGS INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 1118425787.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "NEW YORK TIMES CO MTN BE",
-   "company": "NEW YORK TIMES CO MTN BE",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 1098686000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PLTR",
-   "company": "PALANTIR TECHNOLOGIES INC",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 912100000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NTRA",
-   "company": "Natera Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 864923000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CAPITAL ONE FINL CORP",
-   "company": "CAPITAL ONE FINL CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 601860000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LOUISIANA PAC CORP",
-   "company": "LOUISIANA PAC CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 445592617.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NUE",
-   "company": "NUCOR CORP",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 413814258.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "INSM",
-   "company": "Insmed Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 295837000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "TAIWAN SEMICONDUCTOR",
-   "company": "Taiwan Semiconductor Manufac",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 281613000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ISHARES INC",
-   "company": "Ishares Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 264414000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "STMICROELECTRONICS N V",
-   "company": "Stmicroelectronics N V",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 232375000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "INVESCO EXCHANGE TRADED",
-   "company": "Invesco Exchange Traded Fd T",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 190514000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NVDA",
-   "company": "NVIDIA CORPORATION",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 186580000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "M",
-   "company": "MACYS INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 173031882.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PFE",
-   "company": "PFIZER INC",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 152880000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "YPF",
-   "company": "Ypf Sociedad Anonima",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 142726000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CDW",
-   "company": "Cdw Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 139789000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "TBBB",
-   "company": "Bbb Foods Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 120915000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SEAGATE TECHNOLOGY",
-   "company": "Seagate Technology Hldngs Pl",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 117730000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "FOXA",
-   "company": "Fox Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 114992000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 2
-  },
-  {
-   "ticker": "UNITED AIRLS HLDGS INC",
-   "company": "United Airls Hldgs Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 108084000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SEAPORT ENTMT GROUP INC",
-   "company": "SEAPORT ENTMT GROUP INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 107910794.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": false,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SE",
-   "company": "Sea Ltd",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 105404000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NEWAMSTERDAM PHARMA",
-   "company": "Newamsterdam Pharma Company",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 104047000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ISHARES TR",
-   "company": "Ishares Tr",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 99149000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SNDK",
-   "company": "Sandisk Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 79353000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NVR",
-   "company": "NVR INC",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 75710501.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RVMD",
-   "company": "Revolution Medicines Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 74835000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "HERTZ GLOBAL HLDGS INC",
-   "company": "HERTZ GLOBAL HLDGS INC",
-   "manager": "Бил Акман · Pershing Square",
-   "action": "нова позиция",
-   "value": 70261595.0,
-   "period": "13F · 2026-05-15",
-   "_resolved": false,
-   "managers": [
-    "Бил Акман · Pershing Square"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "STATE STR SPDR S&P 500",
-   "company": "State Str Spdr S&P 500 Etf T",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 67209000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "BTDR",
-   "company": "Bitdeer Technologies Group",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 64670000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "HAL",
-   "company": "HALLIBURTON CO",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 61500000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CRH PLC",
-   "company": "Crh Plc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 59230000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "TSLA",
-   "company": "Tesla Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 52996000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "FLR",
-   "company": "Fluor Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 51457000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "D R HORTON INC",
-   "company": "D R Horton Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 48701000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CPNG",
-   "company": "Coupang Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 46334000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "AMD",
-   "company": "Advanced Micro Devices Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 42348000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PANW",
-   "company": "Palo Alto Networks Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 39780000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CLEVELAND-CLIFFS INC NEW",
-   "company": "Cleveland-Cliffs Inc New",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 39590000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "HUT",
-   "company": "Hut 8 Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 36267000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CAI",
-   "company": "Caris Life Sciences Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 33759000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "GLOBAL X FDS",
-   "company": "Global X Fds",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 30019000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "WWD",
-   "company": "Woodward Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 28587000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "NUVB",
-   "company": "Nuvation Bio Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 25786000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PTGX",
-   "company": "Protagonist Therapeutics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 25607000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ROKU",
-   "company": "Roku Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 25425000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "CAVCO INDS INC DEL",
-   "company": "Cavco Inds Inc Del",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 24268000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "MOH",
-   "company": "MOLINA HEALTHCARE INC",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 23920000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ADMA",
-   "company": "Adma Biologics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 23303000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PURR",
-   "company": "Hyperliquid Strategies Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 23150000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RAMBUS INC DEL",
-   "company": "Rambus Inc Del",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 22964000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RYTM",
-   "company": "Rhythm Pharmaceuticals Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 22608000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SKY",
-   "company": "Champion Homes Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 22418000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "DAKTRONICS INC",
-   "company": "Daktronics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21968000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "PCT",
-   "company": "Purecycle Technologies Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21746000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "JEFFERIES FINANCIAL",
-   "company": "JEFFERIES FINANCIAL GROUP IN",
-   "manager": "Уорън Бъфет · Berkshire Hathaway",
-   "action": "нова позиция",
-   "value": 21669229.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Уорън Бъфет · Berkshire Hathaway"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SCCO",
-   "company": "Southern Copper Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21444000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LIN",
-   "company": "Linde Plc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21380000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ENTG",
-   "company": "Entegris Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21277000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "TEVA PHARMACEUTICAL",
-   "company": "Teva Pharmaceutical Inds Ltd",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21175000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "U",
-   "company": "Unity Software Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 21114000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "AEVA",
-   "company": "Aeva Technologies Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 20683000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RIOT",
-   "company": "Riot Platforms Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 20666000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "Q",
-   "company": "Qnity Electronics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 20521000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "EQIX",
-   "company": "Equinix Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 19232000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LRCX",
-   "company": "Lam Research Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 18893000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LULU",
-   "company": "LULULEMON ATHLETICA INC",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 17793000.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "DFTX",
-   "company": "Definium Therapeutics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 16774000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "BELITE BIO INC SPONSORED",
-   "company": "Belite Bio Inc Sponsored",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 16338000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "TXG",
-   "company": "10X Genomics Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 15455000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "WABTEC",
-   "company": "Wabtec",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 15258000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "LLY",
-   "company": "Eli Lilly & Co",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 14849000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "XENE",
-   "company": "Xenon Pharmaceuticals Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 14402000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "SLM",
-   "company": "SLM CORP",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 13287895.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "BRKR",
-   "company": "BRUKER CORP",
-   "manager": "Майкъл Бъри · Scion Asset Management",
-   "action": "нова позиция",
-   "value": 13137181.0,
-   "period": "13F · 2025-11-03",
-   "_resolved": true,
-   "managers": [
-    "Майкъл Бъри · Scion Asset Management"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "OLMA",
-   "company": "Olema Pharmaceuticals Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 12345000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "RGEN",
-   "company": "Repligen Corp",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 10560000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "ROCKET COS INC",
-   "company": "Rocket Cos Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 10272000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": false,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  },
-  {
-   "ticker": "BIDU",
-   "company": "Baidu Inc",
-   "manager": "Стенли Дракенмилър · Duquesne Family Office",
-   "action": "нова позиция",
-   "value": 10080000.0,
-   "period": "13F · 2026-08-14",
-   "_resolved": true,
-   "managers": [
-    "Стенли Дракенмилър · Duquesne Family Office"
-   ],
-   "count": 1
-  }
- ]
+ "date": "2026-08-18",
+ "bundle": {
+  "moves": [
+   {
+    "ticker": "AAPL",
+    "company": "APPLE INC",
+    "manager": "Уорън Бъфет · Berkshire Hathaway",
+    "action": "нова позиция",
+    "value": 65950296923.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Уорън Бъфет · Berkshire Hathaway"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "AXP",
+    "company": "AMERICAN EXPRESS CO",
+    "manager": "Уорън Бъфет · Berkshire Hathaway",
+    "action": "нова позиция",
+    "value": 51282319275.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Уорън Бъфет · Berkshire Hathaway"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "GE AEROSPACE",
+    "company": "GE AEROSPACE",
+    "manager": "Крис Хон · TCI Fund Management",
+    "action": "нова позиция",
+    "value": 17725353519.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": false,
+    "managers": [
+     "Крис Хон · TCI Fund Management"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "V",
+    "company": "VISA INC",
+    "manager": "Крис Хон · TCI Fund Management",
+    "action": "нова позиция",
+    "value": 10462232091.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Крис Хон · TCI Fund Management",
+     "Джон Армитидж · Egerton Capital"
+    ],
+    "count": 2
+   },
+   {
+    "ticker": "BROOKFIELD CORP",
+    "company": "BROOKFIELD CORP",
+    "manager": "Бил Акман · Pershing Square",
+    "action": "нова позиция",
+    "value": 2415946008.0,
+    "period": "13F · 2026-05-15",
+    "_resolved": false,
+    "managers": [
+     "Бил Акман · Pershing Square"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "AMZN",
+    "company": "AMAZON COM INC",
+    "manager": "Бил Акман · Pershing Square",
+    "action": "нова позиция",
+    "value": 2385104083.0,
+    "period": "13F · 2026-05-15",
+    "_resolved": true,
+    "managers": [
+     "Бил Акман · Pershing Square",
+     "Сет Кларман · Baupost Group",
+     "Чейс Коулман · Tiger Global Management",
+     "Даниел Лоуб · Third Point",
+     "Дейвид Тепър · Appaloosa Management"
+    ],
+    "count": 5
+   },
+   {
+    "ticker": "TAIWAN SEMICONDUCTOR",
+    "company": "TAIWAN SEMICONDUCTOR MANUFAC",
+    "manager": "Чейс Коулман · Tiger Global Management",
+    "action": "нова позиция",
+    "value": 2331022991.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": false,
+    "managers": [
+     "Чейс Коулман · Tiger Global Management"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "NBIS",
+    "company": "NEBIUS GROUP N.V.",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "action": "нова позиция",
+    "value": 1175934069.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Стивън Мандел · Lone Pine Capital"
+    ],
+    "count": 1
+   }
+  ],
+  "new_positions": [
+   {
+    "ticker": "MSFT",
+    "company": "MICROSOFT CORP",
+    "manager": "Бил Акман · Pershing Square",
+    "value": 2092970053.0,
+    "pct_of_portfolio": 15.3,
+    "period": "13F · 2026-05-15",
+    "_resolved": true
+   },
+   {
+    "ticker": "STT",
+    "company": "STATE STREET CORP",
+    "manager": "Хауърд Маркс · Oaktree Capital Management",
+    "value": 1011873350.0,
+    "pct_of_portfolio": 14.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "WBD",
+    "company": "WARNER BROS DISCOVERY INC",
+    "manager": "Даниел Лоуб · Third Point",
+    "value": 533200000.0,
+    "pct_of_portfolio": 11.4,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "NBIS",
+    "company": "NEBIUS GROUP N.V.",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 1175934069.0,
+    "pct_of_portfolio": 7.2,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "SEAGATE TECHNOLOGY",
+    "company": "SEAGATE TECHNOLOGY HLDNGS PL",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 965105185.0,
+    "pct_of_portfolio": 5.9,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "HD",
+    "company": "HOME DEPOT INC",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 918092697.0,
+    "pct_of_portfolio": 5.6,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "APPLIED MATLS INC",
+    "company": "APPLIED MATLS INC",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 873193851.0,
+    "pct_of_portfolio": 5.3,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "LIN",
+    "company": "LINDE PLC",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 808550554.0,
+    "pct_of_portfolio": 4.9,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "DASH",
+    "company": "DOORDASH INC",
+    "manager": "Triple Frond Partners",
+    "value": 55404000.0,
+    "pct_of_portfolio": 4.9,
+    "period": "13F · 2026-08-13",
+    "_resolved": true
+   },
+   {
+    "ticker": "MASTERCARD INCORPORATED",
+    "company": "MASTERCARD INCORPORATED",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 639458194.0,
+    "pct_of_portfolio": 4.7,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "UBER",
+    "company": "UBER TECHNOLOGIES INC",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 645337776.0,
+    "pct_of_portfolio": 4.7,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "KEYS",
+    "company": "KEYSIGHT TECHNOLOGIES INC",
+    "manager": "Даниел Лоуб · Third Point",
+    "value": 204790950.0,
+    "pct_of_portfolio": 4.4,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "XYZ",
+    "company": "BLOCK INC",
+    "manager": "Даниел Лоуб · Third Point",
+    "value": 194479668.0,
+    "pct_of_portfolio": 4.2,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "SPGI",
+    "company": "S&P GLOBAL INC",
+    "manager": "Triple Frond Partners",
+    "value": 47527000.0,
+    "pct_of_portfolio": 4.2,
+    "period": "13F · 2026-08-13",
+    "_resolved": true
+   },
+   {
+    "ticker": "TAIWAN SEMICONDUCTOR",
+    "company": "TAIWAN SEMICONDUCTOR MANUFAC",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 548464789.0,
+    "pct_of_portfolio": 4.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "NFLX",
+    "company": "NETFLIX INC.",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 499110633.0,
+    "pct_of_portfolio": 3.7,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "FLEX",
+    "company": "FLEX LTD",
+    "manager": "Даниел Лоуб · Third Point",
+    "value": 166932100.0,
+    "pct_of_portfolio": 3.6,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "APPLIED MATLS INC",
+    "company": "APPLIED MATLS INC",
+    "manager": "Джон Армитидж · Egerton Capital",
+    "value": 376729995.0,
+    "pct_of_portfolio": 3.6,
+    "period": "13F · 2026-07-21",
+    "_resolved": false
+   },
+   {
+    "ticker": "INDV",
+    "company": "INDIVIOR PHARMACEUTICALS INC",
+    "manager": "Хауърд Маркс · Oaktree Capital Management",
+    "value": 251399508.0,
+    "pct_of_portfolio": 3.5,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "GEV",
+    "company": "GE VERNOVA INC",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 481498748.0,
+    "pct_of_portfolio": 3.5,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "AAPL",
+    "company": "APPLE INC",
+    "manager": "Дейвид Тепър · Appaloosa Management",
+    "value": 241615600.0,
+    "pct_of_portfolio": 3.1,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "STRL",
+    "company": "STERLING INFRASTRUCTURE INC",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 511709948.0,
+    "pct_of_portfolio": 3.1,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "TTMI",
+    "company": "TTM TECHNOLOGIES INC",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 512074787.0,
+    "pct_of_portfolio": 3.1,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "ON HLDG AG",
+    "company": "ON HLDG AG",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "value": 470378663.0,
+    "pct_of_portfolio": 2.9,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "CBRS",
+    "company": "CEREBRAS SYSTEMS INC",
+    "manager": "Чейс Коулман · Tiger Global Management",
+    "value": 662779000.0,
+    "pct_of_portfolio": 2.8,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "CDW",
+    "company": "Cdw Corp",
+    "manager": "Стенли Дракенмилър · Duquesne Family Office",
+    "value": 139789000.0,
+    "pct_of_portfolio": 2.7,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "APP",
+    "company": "APPLOVIN CORP",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 358892731.0,
+    "pct_of_portfolio": 2.6,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "CME",
+    "company": "CME GROUP INC",
+    "manager": "Сет Кларман · Baupost Group",
+    "value": 136694000.0,
+    "pct_of_portfolio": 2.5,
+    "period": "13F · 2026-08-13",
+    "_resolved": true
+   },
+   {
+    "ticker": "NXT",
+    "company": "NEXTPOWER INC",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 340274801.0,
+    "pct_of_portfolio": 2.5,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "TJX COS INC NEW",
+    "company": "TJX COS INC NEW",
+    "manager": "Тери Смит · Fundsmith",
+    "value": 344297688.0,
+    "pct_of_portfolio": 2.5,
+    "period": "13F · 2026-08-14",
+    "_resolved": false
+   },
+   {
+    "ticker": "GOOGL",
+    "company": "Alphabet Inc",
+    "manager": "Стенли Дракенмилър · Duquesne Family Office",
+    "value": 120184000.0,
+    "pct_of_portfolio": 2.3,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "EFX",
+    "company": "EQUIFAX INC",
+    "manager": "Джон Армитидж · Egerton Capital",
+    "value": 235094159.0,
+    "pct_of_portfolio": 2.3,
+    "period": "13F · 2026-07-21",
+    "_resolved": true
+   },
+   {
+    "ticker": "FOXA",
+    "company": "Fox Corp",
+    "manager": "Стенли Дракенмилър · Duquesne Family Office",
+    "value": 114992000.0,
+    "pct_of_portfolio": 2.2,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "BA",
+    "company": "BOEING CO",
+    "manager": "Дейвид Тепър · Appaloosa Management",
+    "value": 173176000.0,
+    "pct_of_portfolio": 2.2,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "TTMI",
+    "company": "TTM TECHNOLOGIES INC",
+    "manager": "Даниел Лоуб · Third Point",
+    "value": 94445100.0,
+    "pct_of_portfolio": 2.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true
+   }
+  ],
+  "major_exits": [],
+  "stopped_managers": [
+   {
+    "manager": "Майкъл Бъри · Scion Asset Management",
+    "last_filing_date": "2025-11-03",
+    "days_since_filing": 288
+   }
+  ]
+ }
 }
