@@ -1,37 +1,37 @@
 {
- "date": "2026-08-18",
+ "date": "2026-08-19",
  "news": [
   {
-   "headline": "30-year Treasury yield tops 5.31%, the highest in 19 years",
-   "why": "Рекордно високите yields оказват натиск върху акциите и повишават дисконтовия процент, особено за growth компании."
+   "headline": "Trump pauses 50% tariffs on Canada за три дни, обявява 'deal' с Отава",
+   "why": "Временното спиране на тарифите намалява непосредствения trade war риск и може да облекчи натиска върху CAD, акции в автомобилния и металния сектор."
   },
   {
-   "headline": "Stock futures are little changed after Wall Street starts the week with losses, hurt by higher oil prices and rising yields",
-   "why": "Комбинацията от поскъпващ петрол и растящи yields сигнализира за stagflationary натиск, който вреди на широкия пазар."
+   "headline": "UAE спира търговията с Иран след ракетен инцидент в Персийския залив",
+   "why": "Ескалацията в Залива заплашва морските маршрути и директно влияе върху петролните цени и геополитическата рискова премия."
   },
   {
-   "headline": "Ship attacked in Hormuz Strait as U.S.-Iran ceasefire expiry risks prolonged conflict",
-   "why": "Атака в Ормузкия проток заплашва около 20% от световния петролен трафит и е директен катализатор за spike в цените на суровия петрол."
+   "headline": "Trump намеква за действия в Хормузкия проток, отрича насрочени преговори с Иран",
+   "why": "Заплахата за блокада на Ормуз е екстремен tail risk за петрола и глобалните supply chains."
   },
   {
-   "headline": "Airlines in 'stand-off' over price cuts as jet fuel costs ease",
-   "why": "Авиокомпаниите се съпротивляват на натиска за намаляване на тарифите въпреки поевтиняването на jet fuel, което е важен сигнал за маржовете в сектора."
+   "headline": "Иран планира военни удари по европейски цели при ескалация от Trump, твърдят вътрешни източници",
+   "why": "Разширяването на конфликта извън Близкия изток би предизвикало масивен risk-off и скок на защитните активи."
   },
   {
-   "headline": "Trump's cuts to South Korean drills stir doubts about US resolve in Asia",
-   "why": "Съмненията в американските ангажименти в Азия засягат отбранителния сектор и могат да пренаредят геополитическите рискови премии в региона."
+   "headline": "Дали rising yields могат да спукат AI балона?",
+   "why": "Нарастващите дългосрочни доходности директно натискат оценките на high-growth AI акции, ключов риск за текущото пазарно рали."
   },
   {
-   "headline": "Options investors are betting on this trend in gold prices, Susquehanna says",
-   "why": "Обновените inflows и upside skew в опциите върху злато отразяват търсенето на хеджове срещу геополитическа несигурност и инфлация."
+   "headline": "Kevin Warsh начело на Fed — Wells Fargo предупреждава за нов пазарен режим",
+   "why": "Смяната на Fed ръководството сигнализира потенциална промяна в монетарната политика, критично за rate-sensitive сектори и bond пазара."
   },
   {
-   "headline": "'Not worth the squeeze': global private equity makes zero deals in China",
-   "why": "Пълното изтегляне на глобалния private equity от Китай задълбочава capital outflow тенденцията и влияе на emerging markets сентимента."
+   "headline": "Китай облекчава ограниченията за Nvidia H200 чипове при ескалиращата AI надпревара",
+   "why": "Решението засяга директно приходния outlook на Nvidia и баланса в технологичната конкуренция между САЩ и Китай."
   },
   {
-   "headline": "Stanley Druckenmiller loaded up on Amazon and chip stocks before July rout",
-   "why": "Позиционирането на Druckenmiller в semiconductors и Amazon преди корекцията е важен сигнал за smart money flows в tech сектора."
+   "headline": "Украинската война застрашава глобалната продоволствена сигурност чрез атаки срещу зърнен износ",
+   "why": "Нарушаването на зърнените доставки от Черно море би засилило инфлационния натиск и би повлияло на агро-суровините глобално."
   }
  ]
 }

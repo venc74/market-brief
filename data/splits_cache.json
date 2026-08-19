@@ -1,16 +1,6 @@
 {
- "date": "2026-08-18",
+ "date": "2026-08-19",
  "rows": [
-  {
-   "ticker": "JMPLY",
-   "company": "Johnson Matthey plc ADR",
-   "date": "2026-08-17",
-   "ratio": "3:4",
-   "split_type": "reverse",
-   "date_human": "Aug 17, 2026",
-   "price": 68.0,
-   "market_cap": 4288300932.0
-  },
   {
    "ticker": "SFBS",
    "company": "ServisFirst Bancshares, Inc.",
@@ -18,8 +8,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 21, 2026",
-   "price": 90.53,
-   "market_cap": 4949502330.3
+   "price": 90.02,
+   "market_cap": 4921619166.668015
   }
  ]
 }
