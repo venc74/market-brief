@@ -791,9 +791,11 @@
       {% if c.direct_thesis %}
       <div class="cot-sub">
         <div class="cot-sub-label">Директна теза
-          <span class="cot-direction {{ c.direct_thesis.direction }}">{{ c.direct_thesis.direction }}</span>
+          {% if c.direct_thesis.tickers %}<span class="cot-direction {{ c.direct_thesis.direction }}">{{ c.direct_thesis.direction }}</span>{% endif %}
         </div>
+        {% if c.direct_thesis.tickers %}
         <div class="cot-tickers">{% for t in c.direct_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
+        {% endif %}
         <div class="thesis-chain">{{ c.direct_thesis.reasoning }}</div>
         {% if c.direct_thesis.outside_screener %}
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
