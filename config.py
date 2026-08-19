@@ -171,9 +171,6 @@ THESIS_BASKETS = [
     },
 ]
 
-# ── 6. NAAIM исторически прозорец ─────────────────────────────────────────
-NAAIM_HISTORY_WEEKS = int(os.getenv("NAAIM_HISTORY_WEEKS", 52))
-
 # ── Toggle-и за новите скрейпъри (за лесно изключване при проблем) ─────────
 ENABLE_MAGIC_FORMULA = os.getenv("ENABLE_MAGIC_FORMULA", "1") == "1"
 ENABLE_BORROW_DATA = os.getenv("ENABLE_BORROW_DATA", "1") == "1"
@@ -379,7 +376,7 @@ FED_LIQUIDITY_STALENESS_DAYS = int(os.getenv("FED_LIQUIDITY_STALENESS_DAYS", 12)
 # universe), затова навсякъде в кода/UI-а името е explicit "Market Breadth
 # (% над 40dMA)", никога "T2108". Empирично тествано: 903 тикъра, 38s, 0
 # грешки, 0 rate limiting (виж experiments discussion 2026-08-15).
-# Mean-reverting zoни (same дух като naaim_exposure()): 20-80% = здравословно,
+# Mean-reverting zoни: 20-80% = здравословно,
 # >80% = overbought, 10-20% = приближава капитулация, <10% = механично "red"
 # за термометъра, НО contrarian-bullish текстов тон (историческа bottoming
 # зона), не паника.

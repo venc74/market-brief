@@ -12,7 +12,7 @@ GitHub Actions (cron 07:30 Berlin, DST-aware)
         │
         ▼
 src/main.py ─── Слой 1: macro_layer.py    (FRED, NewsAPI, DXY/VIX/gold/oil)
-        │   ─── Термометър: thermometer.py (SPY, VIX, NAAIM, P/C, 2s10s, Net Liquidity)
+        │   ─── Термометър: thermometer.py (SPY, VIX, P/C, 2s10s, Net Liquidity)
         │   ─── Слой 2: sector_layer.py    (RS ротация на 16 секторни ETF-а vs SPY)
         │   ─── Слой 3: screener.py        (S&P500+NDX+MidCap400 → Stage 2 → CANSLIM)
         │   ─── enrich.py                  (earnings, опции IV/IVR, short interest)
@@ -74,8 +74,6 @@ docs/index.html (GitHub Pages) + data/YYYY-MM-DD.json (история за backt
   Системата си я гради сама: всеки ден записва ATM IV в `data/iv_history.json`
   и изчислява IVR от наличния прозорец, маркиран като `partial (N дни)` докато
   не натрупа 200+ записа. Алтернатива: Tradier API ключ (има sandbox tier).
-- **NAAIM** се чете от публичния CSV на naaim.org — ако форматът им се промени,
-  индикаторът деградира до "няма данни" без да чупи брифа.
 - **Пазарният P/C** е апроксимация чрез SPY опционната верига; CBOE total P/C
   изисква платен фийд.
 - **Short interest** идва от Yahoo (`shortPercentOfFloat`, `shortRatio`) —

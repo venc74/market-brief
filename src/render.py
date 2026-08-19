@@ -76,7 +76,6 @@ def render_dashboard(brief: dict) -> str:
         theses=brief.get("theses", []),
         unusual_options=brief.get("unusual_options", []),
         splits=brief.get("splits", []),
-        naaim_history=brief.get("naaim_history", {}),
         superinvestor_moves=brief.get("superinvestor_moves", []),
         superinvestor_new_positions=brief.get("superinvestor_new_positions", []),
         superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),

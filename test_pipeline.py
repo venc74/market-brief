@@ -16,7 +16,6 @@ MOCK_THERMO = {
     "indicators": [
         {"name": "SPY тренд", "value": 612.4, "status": "green", "label": "SPY 612 | над 50DMA, над 200DMA"},
         {"name": "VIX", "value": 14.2, "status": "green", "label": "VIX 14.2 (risk-on)"},
-        {"name": "NAAIM", "value": 78.0, "status": "yellow", "label": "NAAIM 78"},
         {"name": "Put/Call (SPY)", "value": 0.92, "status": "yellow", "label": "P/C 0.92"},
         {"name": "2Y/10Y спред", "value": 0.45, "status": "green", "label": "0.45% (нормален, steepening)"},
         {"name": "Fed Net Liquidity", "value": 6240.0, "status": "green", "label": "$6240 млрд (↑)"},

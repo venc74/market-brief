@@ -5,11 +5,8 @@
 """
 from __future__ import annotations
 import datetime as dt
-import io
 import math
-import os
 import time
-from functools import lru_cache
 import requests
 import yfinance as yf
 
@@ -96,216 +93,6 @@ def vix_level() -> dict:
         "label": f"VIX {vix:.1f} ({'risk-on' if status == 'green' else 'risk-off' if status == 'red' else 'неутрално'})"
                  f"{spike_note}",
     }
-
-
-# ── NAAIM източници (приоритет: Nasdaq Data Link [API key] → naaim.org scrape) ──
-# naaim.org CSV (USE_Data_since_Inception.csv) е премахнат — върна 404 (файлът е
-# изтрит/преместен). Останаха два източника: оторизиран Nasdaq endpoint и scrape.
-NAAIM_NASDAQ_URL = "https://data.nasdaq.com/api/v3/datasets/NAAIM/NAAIM.json"
-NAAIM_PAGE_URL = "https://naaim.org/programs/naaim-exposure-index/"
-_NAAIM_HEADERS = {"User-Agent": "Mozilla/5.0"}
-
-
-def _parse_date_safe(s: str):
-    """Връща (sort_key, оригинален_низ). sort_key=ISO низ ако се разпознае, иначе None."""
-    s = (s or "").strip()
-    from datetime import datetime
-    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%Y/%m/%d", "%d.%m.%Y", "%b %d, %Y"):
-        try:
-            return datetime.strptime(s, fmt).strftime("%Y-%m-%d"), s
-        except ValueError:
-            continue
-    return None, s
-
-
-def _naaim_from_nasdaq() -> list[dict]:
-    """
-    Primary: Nasdaq Data Link (Quandl) — изисква API ключ (anonymous достъп е спрян,
-    връща 403). Ключът идва от env var NASDAQ_API_KEY и се подава като query параметър.
-    Ако ключът липсва → чист skip (връщаме [] без да правим заявка), за да паднем
-    тихо към следващия източник, вместо да генерираме 403 грешка.
-    Структура: dataset.column_names + dataset.data (newest-first по подразбиране).
-    Нормализираме до хронологичен ascending списък [{date, value}].
-    """
-    api_key = os.getenv("NASDAQ_API_KEY")
-    if not api_key:
-        print("[thermo] NAAIM: NASDAQ_API_KEY липсва — пропускам Nasdaq source")
-        return []
-    r = requests.get(NAAIM_NASDAQ_URL, timeout=20, headers=_NAAIM_HEADERS,
-                     params={"api_key": api_key})
-    r.raise_for_status()
-    ds = r.json().get("dataset", {})
-    cols = [str(c).lower() for c in ds.get("column_names", [])]
-    data = ds.get("data", [])
-    val_idx = next((i for i, c in enumerate(cols)
-                    if any(k in c for k in ("mean", "average", "naaim number"))), 1)
-    pts = []
-    for row in data:
-        if not row or len(row) <= val_idx:
-            continue
-        try:
-            val = float(row[val_idx])
-        except (TypeError, ValueError):
-            continue
-        sort_key, raw = _parse_date_safe(str(row[0]))
-        pts.append({"date": sort_key or raw, "value": round(val, 1), "_k": sort_key or raw})
-    pts.sort(key=lambda p: p["_k"])
-    for p in pts:
-        p.pop("_k", None)
-    return pts
-
-
-def _looks_like_date(s) -> bool:
-    """Бърза проверка дали низ прилича на дата (за JSON евристиката)."""
-    if not isinstance(s, str):
-        return False
-    return _parse_date_safe(s)[0] is not None
-
-
-def _points_from_json_obj(obj, out: list[dict]) -> None:
-    """
-    Рекурсивно обхожда произволна JSON структура и събира двойки (дата, число)
-    които приличат на времева серия. Покрива честите chart формати:
-      • [{"date": "...", "value": N}, ...]  (Chart.js / WP плъгини)
-      • [{"x": "...", "y": N}, ...]         (Highcharts/plotly)
-      • [["YYYY-MM-DD", N], ...]            (двойки)
-    Стойностите се ограничават до [-250, 250] (NAAIM е приблизително [-200, 200]).
-    """
-    if isinstance(obj, dict):
-        date_val = next((obj[k] for k in ("date", "Date", "x", "t", "time", "label")
-                         if k in obj and _looks_like_date(obj.get(k))), None)
-        if date_val is not None:
-            num = next((obj[k] for k in ("value", "y", "mean", "naaim", "close", "v")
-                        if isinstance(obj.get(k), (int, float))), None)
-            if num is not None and -250 <= num <= 250:
-                _, raw = _parse_date_safe(date_val)
-                out.append({"date": raw, "value": round(float(num), 1),
-                            "_k": _parse_date_safe(date_val)[0]})
-        for v in obj.values():
-            _points_from_json_obj(v, out)
-    elif isinstance(obj, list):
-        if (len(obj) == 2 and _looks_like_date(obj[0])
-                and isinstance(obj[1], (int, float)) and -250 <= obj[1] <= 250):
-            _, raw = _parse_date_safe(obj[0])
-            out.append({"date": raw, "value": round(float(obj[1]), 1),
-                        "_k": _parse_date_safe(obj[0])[0]})
-        for v in obj:
-            _points_from_json_obj(v, out)
-
-
-def _naaim_from_scrape() -> list[dict]:
-    """
-    Fallback: scrape на programs страницата. Първо опитва HTML таблици; ако страницата
-    е JS-rendered SPA (без таблици / почти празно body), търси вграден JSON в
-    <script type="application/json"> (и подобни inline script блокове) като
-    алтернативен начин за извличане. Best-effort, подреждаме ascending по дата.
-    """
-    from bs4 import BeautifulSoup
-    r = requests.get(NAAIM_PAGE_URL, timeout=20, headers=_NAAIM_HEADERS)
-    r.raise_for_status()
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    pts = []
-    tables = soup.find_all("table")
-    for table in tables:
-        for tr in table.find_all("tr"):
-            cells = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
-            if len(cells) < 2:
-                continue
-            sort_key, raw = _parse_date_safe(cells[0])
-            if sort_key is None:
-                continue
-            for c in cells[1:]:
-                try:
-                    val = float(c.replace("%", "").replace(",", "").strip())
-                except ValueError:
-                    continue
-                if -250 <= val <= 250:
-                    pts.append({"date": raw, "value": round(val, 1), "_k": sort_key})
-                    break
-
-    if not pts:
-        import json as _json
-        scripts = soup.find_all("script")
-        body_text = soup.get_text(" ", strip=True)
-        is_spa = (not tables) or (len(body_text) < 600 and len(scripts) > 3)
-        if is_spa or scripts:
-            for sc in scripts:
-                stype = (sc.get("type") or "").lower()
-                blob = sc.string or sc.get_text() or ""
-                blob = blob.strip()
-                if not blob:
-                    continue
-                candidates = []
-                if "json" in stype:
-                    candidates.append(blob)
-                else:
-                    for opener, closer in (("[", "]"), ("{", "}")):
-                        i, j = blob.find(opener), blob.rfind(closer)
-                        if 0 <= i < j:
-                            candidates.append(blob[i:j + 1])
-                for cand in candidates:
-                    try:
-                        data = _json.loads(cand)
-                    except (ValueError, TypeError):
-                        continue
-                    _points_from_json_obj(data, pts)
-                if pts:
-                    break
-
-    seen, uniq = set(), []
-    for p in pts:
-        key = (p["date"], p["value"])
-        if key in seen:
-            continue
-        seen.add(key)
-        uniq.append(p)
-    uniq.sort(key=lambda p: p.get("_k") or p["date"])
-    for p in uniq:
-        p.pop("_k", None)
-    return uniq
-
-
-@lru_cache(maxsize=1)
-def _naaim_series() -> tuple:
-    """
-    Връща хронологичен ascending кортеж точки от първия успял източник.
-    Кешира се за процеса (lru_cache) → exposure + history теглят мрежата веднъж.
-    При пълен провал на трите → празен кортеж (→ graceful hide нагоре по веригата).
-    Връща tuple (immutable), за да е hashable/безопасен за кеширане; консумерите
-    го третират като последователност (slice/индексиране работят непроменено).
-    """
-    for name, fn in (("nasdaq", _naaim_from_nasdaq),
-                     ("naaim.org scrape", _naaim_from_scrape)):
-        try:
-            pts = fn()
-            if pts:
-                return tuple(pts)
-            print(f"[thermo] NAAIM source '{name}' върна 0 точки — пробвам следващия")
-        except Exception as e:
-            print(f"[thermo] NAAIM source '{name}' failed: {e}")
-    return ()
-
-
-def naaim_exposure() -> dict:
-    """
-    NAAIM Exposure Index — седмичен барометър на експозицията на активните мениджъри.
-    <30 = дефанзивни (contrarian bullish при дъна), >90 = еуфория (предупреждение).
-    Източници по приоритет: Nasdaq Data Link (API ключ) → naaim.org scrape.
-    При провал и на трите картичката се скрива gracefully (hide=True), вместо
-    да показва "няма данни" текст.
-    """
-    pts = _naaim_series()
-    if not pts:
-        return {"name": "NAAIM", "value": None, "status": "yellow",
-                "hide": True, "label": ""}
-    last = pts[-1]
-    val, date = last["value"], last["date"]
-    status = "yellow"
-    if val > 90: status = "red"
-    elif val < 30: status = "green"
-    return {"name": "NAAIM", "value": val, "as_of": date, "status": status,
-            "label": f"NAAIM {val:.0f}"}
 
 
 def market_put_call() -> dict:
@@ -451,7 +238,7 @@ def market_breadth() -> dict:
     Empирично тествано 2026-08-15: 903 тикъра, 38s, 0 грешки, 0 rate limiting.
 
     Mean-reverting zoни (за разлика от повечето останали индикатори, "по-
-    високо не е по-добре" — same дух като naaim_exposure()):
+    високо не е по-добре"):
       >80%    жълто — overbought, твърде много акции разтегнати над MA
       20-80%  зелено — здравословна ширина
       10-20%  жълто — приближава капитулация
@@ -459,13 +246,12 @@ def market_breadth() -> dict:
               индикатори — краткосрочен breadth collapse си остава risk-off
               сигнал за самия термометър), НО текстовият тон е explicit
               contrarian bullish ("исторически bottoming зона"), не паника
-              — same принцип като naaim_exposure()'s <30 четене, приложен
-              тук само към label текста, не към status полето (изричен
-              избор — виж дискусията с юзъра, 2026-08-15).
+              — приложено само към label текста, не към status полето
+              (изричен избор — виж дискусията с юзъра, 2026-08-15).
 
     Graceful: провал на universe fetch, batch download, или под sanity
     прага BREADTH_MIN_VALID_TICKERS валидни тикъри → hide=True, same
-    паттърн като naaim_exposure()/move_index().
+    паттърн като move_index()/vix_term_structure().
     """
     try:
         universe = build_universe()
@@ -569,9 +355,8 @@ def build_thermometer(macro: dict) -> dict:
             "label": f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'})",
         }
 
-    indicators = [spy_trend(), vix_level(), naaim_exposure(),
-                  market_put_call(), spread_ind, nl_ind, move_index(),
-                  vix_term_structure()]
+    indicators = [spy_trend(), vix_level(), market_put_call(), spread_ind,
+                  nl_ind, move_index(), vix_term_structure()]
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
 
@@ -627,25 +412,3 @@ if __name__ == "__main__":
     from macro_layer import collect_macro_layer
     print(json.dumps(build_thermometer(collect_macro_layer()),
                      indent=2, ensure_ascii=False, default=str))
-
-
-# ══════════════════════════════════════════════════════════════════════════
-# v2 НАДСТРОЙКА · Секция 6 — NAAIM исторически прозорец (52 седмици)
-# naaim_exposure() по-горе чете само последната стойност. Тук връщаме цялата
-# поредица за chart в dashboard-а, с маркери за зоните <30 (дъно) и >90 (опасно).
-# Additive — съществуващите функции не са пипани.
-# ══════════════════════════════════════════════════════════════════════════
-def naaim_history(weeks: int | None = None) -> dict:
-    """
-    Връща {points: [{date, value}], low_zone: 30, high_zone: 90, current}.
-    Контрарианска логика: <30 = buy zone, >90 = caution. Празно при провал.
-    Ползва същия многоизточников fetcher като naaim_exposure() (Nasdaq Data Link
-    → naaim.org CSV → scrape), затова e достатъчно да поправим source-а на едно място.
-    """
-    weeks = weeks or config.NAAIM_HISTORY_WEEKS
-    out = {"points": [], "low_zone": 30, "high_zone": 90, "current": None}
-    pts = _naaim_series()
-    if pts:
-        out["points"] = pts[-weeks:]
-        out["current"] = out["points"][-1]["value"]
-    return out

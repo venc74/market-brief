@@ -245,11 +245,6 @@
   #borrow-result .hot { color: var(--red); } #borrow-result .ok { color: var(--green); }
   #borrow-msg { font-size: 13px; color: var(--muted); margin-top: 10px; }
 
-  /* ── v2: NAAIM 52-седмичен chart ── */
-  .naaim-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
-  .naaim-legend { display: flex; gap: 18px; font-size: 12px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
-  .naaim-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
-
   /* ── v2: исторически календар ── */
   .calendar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
@@ -837,22 +832,6 @@
 </section>
 {% endif %}
 
-{% if naaim_history and naaim_history.points %}
-<section>
-  <h2>NAAIM Exposure · последните {{ naaim_history.points|length }} седмици</h2>
-  <div class="naaim-wrap">
-    <svg id="naaim-chart" viewBox="0 0 1000 240" preserveAspectRatio="none"
-         style="width:100%;height:200px" role="img" aria-label="NAAIM Exposure Index график"></svg>
-    <div class="naaim-legend">
-      <span><i style="background:rgba(52,211,153,.35)"></i>Под 30 — buy zone (контрариански оптимизъм)</span>
-      <span><i style="background:rgba(248,113,113,.35)"></i>Над 90 — caution (еуфория)</span>
-      <span>Текуща стойност: <b class="mono">{{ naaim_history.current }}</b></span>
-    </div>
-  </div>
-  <script type="application/json" id="naaim-data">{{ naaim_history|tojson }}</script>
-</section>
-{% endif %}
-
 {% if backtest and (backtest.total_resolved or backtest.open_positions) %}
 <section>
   <h2>Track Record · {{ backtest.total_resolved }} резолвирани</h2>
@@ -950,50 +929,6 @@
 
 </div>
 <script>
-// ── NAAIM 52-седмичен chart (vanilla SVG, без външни библиотеки) ──────────
-(function () {
-  var el = document.getElementById("naaim-data");
-  var svg = document.getElementById("naaim-chart");
-  if (!el || !svg) return;
-  var data;
-  try { data = JSON.parse(el.textContent); } catch (e) { return; }
-  var pts = (data.points || []).filter(function (p) { return p.value != null; });
-  if (pts.length < 2) return;
-
-  var W = 1000, H = 240, padL = 34, padR = 10, padT = 10, padB = 22;
-  var minV = 0, maxV = 100;
-  var x = function (i) { return padL + (W - padL - padR) * i / (pts.length - 1); };
-  var y = function (v) { return padT + (H - padT - padB) * (1 - (v - minV) / (maxV - minV)); };
-  var css = getComputedStyle(document.documentElement);
-  var regime = css.getPropertyValue("--regime").trim() || "#fbbf24";
-  var line = css.getPropertyValue("--line").trim() || "#233252";
-  var muted = css.getPropertyValue("--muted").trim() || "#8593b3";
-  var NS = "http://www.w3.org/2000/svg";
-  function add(tag, attrs) {
-    var n = document.createElementNS(NS, tag);
-    for (var k in attrs) n.setAttribute(k, attrs[k]);
-    svg.appendChild(n); return n;
-  }
-  // зони <30 (buy) и >90 (caution)
-  add("rect", { x: padL, y: y(30), width: W - padL - padR, height: y(0) - y(30), fill: "rgba(52,211,153,.16)" });
-  add("rect", { x: padL, y: y(100), width: W - padL - padR, height: y(90) - y(100), fill: "rgba(248,113,113,.16)" });
-  // мрежа + етикети 0/30/50/90/100
-  [0, 30, 50, 90, 100].forEach(function (v) {
-    add("line", { x1: padL, y1: y(v), x2: W - padR, y2: y(v), stroke: line, "stroke-width": 1 });
-    var t = add("text", { x: 4, y: y(v) + 4, fill: muted, "font-size": 11, "font-family": "monospace" });
-    t.textContent = v;
-  });
-  // линия
-  var d = pts.map(function (p, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.value).toFixed(1); }).join(" ");
-  add("path", { d: d, fill: "none", stroke: regime, "stroke-width": 2 });
-  // маркери за екстремни седмици
-  pts.forEach(function (p, i) {
-    if (p.value < 30 || p.value > 90) {
-      add("circle", { cx: x(i), cy: y(p.value), r: 3, fill: p.value < 30 ? "#34d399" : "#f87171" });
-    }
-  });
-})();
-
 // ── Исторически календар: отваря docs/archive/<date>.html в iframe ────────
 (function () {
   var input = document.getElementById("hist-date");

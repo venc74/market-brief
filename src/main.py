@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 from src.macro_layer import collect_macro_layer, thesis_monitor
-from src.thermometer import build_thermometer, naaim_history
+from src.thermometer import build_thermometer
 from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
 from src.enrich import enrich, inject_split_catalysts
@@ -158,7 +158,6 @@ def run() -> dict:
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
     unusual_today = unusual_options.fetch_unusual_options(10) if config.ENABLE_UNUSUAL_OPTIONS else []
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
-    naaim_hist = naaim_history()
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
     # FIX 2026-08-17: high-conviction нови позиции (>DATAROMA_MIN_NEW_POSITION_PCT%
     # от портфейл) и major exits (>DATAROMA_MAJOR_EXIT_PCT%, explicit разделени от
@@ -216,7 +215,6 @@ def run() -> dict:
         "theses": theses,
         "unusual_options": unusual_today,
         "splits": splits_month,
-        "naaim_history": naaim_hist,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,
         "superinvestor_exits": superinvestor_exits,

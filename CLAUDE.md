@@ -19,7 +19,7 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 3. **Graceful degradation е задължителен стандарт.** Всеки нов source/fetch
    трябва да е в try/except, при провал да връща празен резултат или
    `hide: True` вместо да чупи pipeline-а. Виж примерите в `thermometer.py`
-   (`naaim_exposure()`) и `cot.py` (`get_extremes()`).
+   (`move_index()`) и `cot.py` (`get_extremes()`).
 4. **AI извиквания на batch-ове**, не едно голямо извикване с фиксиран
    `max_tokens` — доказан проблем (JSON truncation при много кандидати).
    Виж `ai_brief.py: ticker_narratives()` / `cot_theses()` за модела.
@@ -35,7 +35,7 @@ main.py              — оркестратор: macro → thermometer → secto
                         → enrich → AI synthesis → hard rules → sizing → render
 config.py            — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
 src/macro_layer.py    — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
-src/thermometer.py     — 7 индикатора (SPY, VIX, NAAIM, P/C, spread, Net
+src/thermometer.py     — 7 индикатора (SPY, VIX, P/C, spread, Net
                         Liquidity, MOVE) + Offensive/Defensive/Cash режим
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
 src/screener.py        — Stage 2 + CANSLIM скрийнър
@@ -59,8 +59,10 @@ templates/dashboard.html.j2 — единственият source за docs/index.
 
 - GitHub вграденият Actions scheduler се оказа ненадежден → заменен изцяло с
   cron-job.org external trigger.
-- NAAIM основният безплатен API е зад Cloudflare/платен модел от 08/2026 →
-  fallback верига с graceful hide.
+- NAAIM Exposure Index беше премахнат изцяло от термометъра (08/2026) —
+  основният безплатен API стана платен (Nasdaq Data Link), индикаторът беше
+  permanently скрит от седмици, и субективен survey resultat не може реално
+  да се замести с изчислен proxy от пазарни данни.
 - "Pages build and deployment" червени run-ове от overlapping deploys са
   безобидни (следващият deploy обикновено успява) — не е сигнал за проблем в
   кода.
