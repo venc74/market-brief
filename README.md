@@ -12,7 +12,8 @@ GitHub Actions (cron 07:30 Berlin, DST-aware)
         │
         ▼
 src/main.py ─── Слой 1: macro_layer.py    (FRED, NewsAPI, DXY/VIX/gold/oil)
-        │   ─── Термометър: thermometer.py (SPY, VIX, P/C, 2s10s, Net Liquidity)
+        │   ─── Термометър: thermometer.py (SPY, VIX, P/C, 2s10s, Net Liquidity,
+        │                                  MOVE, VIX Term Structure, Market Breadth)
         │   ─── Слой 2: sector_layer.py    (RS ротация на 16 секторни ETF-а vs SPY)
         │   ─── Слой 3: screener.py        (S&P500+NDX+MidCap400 → Stage 2 → CANSLIM)
         │   ─── enrich.py                  (earnings, опции IV/IVR, short interest)

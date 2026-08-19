@@ -35,8 +35,9 @@ main.py              — оркестратор: macro → thermometer → secto
                         → enrich → AI synthesis → hard rules → sizing → render
 config.py            — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
 src/macro_layer.py    — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
-src/thermometer.py     — 7 индикатора (SPY, VIX, P/C, spread, Net
-                        Liquidity, MOVE) + Offensive/Defensive/Cash режим
+src/thermometer.py     — 8 индикатора (SPY, VIX, P/C, spread, Net
+                        Liquidity, MOVE, VIX Term Structure, Market
+                        Breadth) + Offensive/Defensive/Cash режим
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
 src/screener.py        — Stage 2 + CANSLIM скрийнър
 src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
