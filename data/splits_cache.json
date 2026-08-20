@@ -1,5 +1,5 @@
 {
- "date": "2026-08-19",
+ "date": "2026-08-20",
  "rows": [
   {
    "ticker": "SFBS",
@@ -8,8 +8,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 21, 2026",
-   "price": 90.02,
-   "market_cap": 4921619166.668015
+   "price": 87.78,
+   "market_cap": 4799152927.8
   }
  ]
 }
