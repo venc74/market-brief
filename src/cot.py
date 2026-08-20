@@ -60,7 +60,11 @@ MAJOR_MARKETS = [
     ("E-mini Russell 2000",   "tff", ["RUSSELL", "E-MINI"],         []),
     ("E-mini Dow (DJIA)",     "tff", ["DJIA"],                      []),
     ("VIX Futures",           "tff", ["VIX"],                       []),
-    ("US Dollar Index",       "tff", ["DOLLAR INDEX"],              []),
+    # FIX 2026-08-19: борсата преименува контракта — старият keyword "DOLLAR
+    # INDEX" вече не съвпада с нищо в текущите CFTC данни (тих 0-data whitelist
+    # miss, потвърден на живо). Реалното текущо име е "USD INDEX - ICE FUTURES
+    # U.S." — уникално в TFF universe-а, не е нужен exclude.
+    ("US Dollar Index",       "tff", ["USD INDEX"],                 []),
     ("Euro FX",               "tff", ["EURO FX"],                   []),
     ("Japanese Yen",          "tff", ["JAPANESE YEN"],               []),
     ("British Pound",         "tff", ["BRITISH POUND"],             []),
@@ -79,6 +83,15 @@ MAJOR_MARKETS = [
     # MERCANTILE EXCHANGE" от Micro Bitcoin/Nano Bitcoin/Bitcoin Cash entries,
     # потвърдени реални CFTC market_and_exchange_names записи в TFF отчета.
     ("Bitcoin Futures (CME)",  "tff", ["BITCOIN"],           ["MICRO", "NANO", "CASH"]),
+    # FIX 2026-08-19: пълен CFTC universe скан (Venci, 2026-08-19) откри XRP
+    # (CME) като реален, ликвиден контракт с текущ percentile 98.1 — екстремум
+    # по нашия праг. ВАЖНО: историята му е ~53 седмици (launched ~юли 2025),
+    # далеч под стандартния 156-седмичен (3г) lookback — виж COT_SHORT_HISTORY_
+    # WEEKS в config.py и cot_theses() промпта за explicit disclosure клаузата,
+    # която флагва това directamente в generирания AI текст, не само в кода.
+    # Ether (CME)/Solana (CME)/Coinbase altcoin "PERP STYLE" контрактите бяха
+    # НАРОЧНО НЕ добавени — легитимно извън обхвата за сега (виж дискусията).
+    ("XRP",                    "tff", ["XRP"],               ["NANO", "MICRO"]),
 
     # ── Стоки (Disaggregated · Managed Money) ──
     ("Gold",           "disaggregated", ["GOLD"],          ["MICRO", "MINI"]),
@@ -90,7 +103,13 @@ MAJOR_MARKETS = [
     ("Brent Crude",    "disaggregated", ["BRENT"],         []),
     ("Natural Gas",    "disaggregated", ["NATURAL GAS"],   ["BASIS", "HUB", "ZONE"]),
     ("RBOB Gasoline",  "disaggregated", ["GASOLINE"],      []),
-    ("Heating Oil",    "disaggregated", ["HEATING OIL"],   []),
+    # FIX 2026-08-19: борсата преименува контракта към ULSD спецификацията
+    # преди години — старият keyword "HEATING OIL" вече не съвпада с нищо
+    # (тих 0-data whitelist miss, потвърден на живо). И двата keyword-а
+    # задължителни (не само "ULSD" самостоятелно) — избягва грешно съвпадение
+    # с "UP DOWN GC ULSD VS HO SPR" (spread контракт, различен инструмент,
+    # реален запис в CFTC universe-а, потвърден директно).
+    ("Heating Oil",    "disaggregated", ["NY HARBOR", "ULSD"], []),
     ("Corn",           "disaggregated", ["CORN"],          []),
     ("Soybeans",       "disaggregated", ["SOYBEANS"],      ["OIL", "MEAL"]),
     ("Soybean Oil",    "disaggregated", ["SOYBEAN OIL"],   []),

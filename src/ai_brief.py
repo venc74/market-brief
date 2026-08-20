@@ -527,14 +527,25 @@ def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
     )
     return f"""Пазарен режим: {regime}
 
-CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо 156-седмична \
-история): {json.dumps(batch, ensure_ascii=False, default=str)}
+CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо до 156-седмична \
+история — "weeks_of_history" полето показва точния брой за всеки инструмент, \
+виж инструкцията по-долу защо е важно): {json.dumps(batch, ensure_ascii=False, default=str)}
 
 ТЕКУЩ CANSLIM СКРИЙНЪР (за cross-reference — предпочитай тези тикъри, когато \
 логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър — дали \
 е извън скрийнъра се засича автоматично от кода, не отбелязвай го сам): \
 {json.dumps(screener_universe, ensure_ascii=False)}
 {prior_block}
+
+ВАЖНО за инструменти с "weeks_of_history" под {config.COT_SHORT_HISTORY_WEEKS} \
+(стандартният дизайн е 156 седмици/~3г — по-млад контракт означава по-кратка \
+налична история, не грешка в данните): добави explicit изречение В КРАЯ на \
+всеки reasoning текст (direct_thesis И cross_sector_thesis, ако имат tickers), \
+което flag-ва по-ниската статистическа увереност спрямо стандартните 156-\
+седмични инструменти в тезата — напр. "История само {{N}} седмици (под \
+стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от \
+обичайното." Не пропускай тази бележка мълчаливо — юзърът трябва да я вижда \
+directamente в текста, не само да се досеща от суровите данни.
 
 За ВСЕКИ инструмент в списъка върни обект с:
 - "market": точното име както е подадено
@@ -640,7 +651,8 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
 
     slim = [{"market": e["market"], "category": e["category"],
             "percentile": e["percentile"], "direction": e["direction"],
-            "net_position": e["net_position"], "as_of": e["as_of"]}
+            "net_position": e["net_position"], "as_of": e["as_of"],
+            "weeks_of_history": e.get("weeks_of_history")}
            for e in extremes]
 
     size = max(1, config.COT_BATCH_SIZE)

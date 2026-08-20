@@ -332,6 +332,17 @@ DATAROMA_MIN_SHARE_INCREASE_PCT = float(os.getenv("DATAROMA_MIN_SHARE_INCREASE_P
 ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"
 COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 10))
 COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
+# FIX 2026-08-20: дизайнерският lookback е 156 седмици (~3г, cot.py:
+# _LOOKBACK_WEEKS), но по-скоро добавени контракти (напр. XRP на CME,
+# launched ~юли 2025) имат много по-кратка налична история — percentile
+# спрямо 53 седмици е статистически по-малко сигурен от percentile спрямо
+# пълните 156. Праг под който AI-то трябва explicit да flag-не по-ниската
+# увереност в generирания текст (same честен дух като GLB ath_label
+# разграничението — не тихо наблюдение в кода, а видимо в reasoning-а).
+# 104 седмици (~2г) е разумен cutoff: достатъчно под 156 да хване genuinely
+# нови контракти, достатъчно над ~52 да не флагва обикновени, добре
+# established пазари с временни data gaps.
+COT_SHORT_HISTORY_WEEKS = int(os.getenv("COT_SHORT_HISTORY_WEEKS", 104))
 COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
 COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 3000))
 # FIX 2026-08-02: горна граница на running seen_tickers речника (soft cross-batch
