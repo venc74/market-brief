@@ -442,14 +442,14 @@
  "RS_2026-08-06": {
   "ticker": "RS",
   "entry_date": "2026-08-06",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 424.77,
   "target_1": 495.19,
   "stop_loss": 389.56,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-08-19",
+  "discovered_date": "2026-08-20",
+  "realized_r": -1.0
  },
  "MPC_2026-08-12": {
   "ticker": "MPC",
