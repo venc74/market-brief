@@ -73,6 +73,12 @@ MAJOR_MARKETS = [
     ("10-Year Treasury Note", "tff", ["UST", "10Y"],                ["ULTRA"]),
     ("Ultra Treasury Bond",   "tff", ["ULTRA", "UST", "BOND"],       []),
     ("30-Year Treasury Bond", "tff", ["UST", "BOND"],               ["ULTRA"]),
+    # FIX 2026-08-19: structural gap, потвърден на живо (Venci видя независими
+    # COT анализатори да коментират bitcoin positioning) — CME's контракт беше
+    # просто никога добавен, не бъг. Excludes изолират точно "BITCOIN - CHICAGO
+    # MERCANTILE EXCHANGE" от Micro Bitcoin/Nano Bitcoin/Bitcoin Cash entries,
+    # потвърдени реални CFTC market_and_exchange_names записи в TFF отчета.
+    ("Bitcoin Futures (CME)",  "tff", ["BITCOIN"],           ["MICRO", "NANO", "CASH"]),
 
     # ── Стоки (Disaggregated · Managed Money) ──
     ("Gold",           "disaggregated", ["GOLD"],          ["MICRO", "MINI"]),
