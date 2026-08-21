@@ -46,13 +46,14 @@
  "ROK_2026-06-18": {
   "ticker": "ROK",
   "entry_date": "2026-06-18",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 474.99,
   "target_1": 563.79,
   "stop_loss": 430.59,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-08-20",
+  "realized_r": -1.0,
+  "discovered_date": "2026-08-21"
  },
  "CAT_2026-06-18": {
   "ticker": "CAT",
@@ -430,14 +431,14 @@
  "GE_2026-08-06": {
   "ticker": "GE",
   "entry_date": "2026-08-06",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 384.51,
   "target_1": 461.73,
   "stop_loss": 345.9,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-08-20",
+  "discovered_date": "2026-08-21",
+  "realized_r": -1.0
  },
  "RS_2026-08-06": {
   "ticker": "RS",
@@ -490,22 +491,34 @@
  "AVT_2026-08-13": {
   "ticker": "AVT",
   "entry_date": "2026-08-13",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 100.0,
   "target_1": 124.32,
   "stop_loss": 87.84,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-08-20",
+  "discovered_date": "2026-08-21",
+  "realized_r": -1.0
  },
  "MOG-A_2026-08-17": {
   "ticker": "MOG-A",
   "entry_date": "2026-08-17",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 442.58,
   "target_1": 529.24,
   "stop_loss": 399.25,
+  "target1_hit_date": null,
+  "resolution_date": "2026-08-20",
+  "discovered_date": "2026-08-21",
+  "realized_r": -1.0
+ },
+ "TGT_2026-08-21": {
+  "ticker": "TGT",
+  "entry_date": "2026-08-21",
+  "status": "open",
+  "entry_price": 161.98,
+  "target_1": 210.16,
+  "stop_loss": 137.89,
   "target1_hit_date": null,
   "resolution_date": null,
   "discovered_date": null,
