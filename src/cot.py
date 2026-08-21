@@ -55,19 +55,60 @@ _FETCH_BUFFER_WEEKS = 170
 # ──────────────────────────────────────────────────────────────────────────
 MAJOR_MARKETS = [
     # ── Финансови (TFF · Leveraged Funds) ──
-    ("E-mini S&P 500",        "tff", ["E-MINI S&P 500"],            []),
-    ("Nasdaq-100",            "tff", ["NASDAQ-100"],                []),
-    ("E-mini Russell 2000",   "tff", ["RUSSELL", "E-MINI"],         []),
-    ("E-mini Dow (DJIA)",     "tff", ["DJIA"],                      []),
+    # FIX 2026-08-20 (пълен universe одит, Категория В — defensive, не беше
+    # счупено, но разчиташе на азбучен late над "MICRO E-MINI S&P 500 INDEX",
+    # не на explicit защита): "E" < "M" случайно печели винаги досега.
+    ("E-mini S&P 500",        "tff", ["E-MINI S&P 500"],            ["MICRO"]),
+    # FIX 2026-08-20 (одит + independent verification срещу CME спецификация,
+    # Категория А — категорично грешен match, 2 последователни бъга):
+    # (1) първоначално резолвираше към "MICRO E-MINI NASDAQ-100 INDEX"
+    #     (алфавитно "M" < "N"), не към стандартния контракт.
+    # (2) първата поправка (keyword "NASDAQ-100", exclude "MICRO") доведе до
+    #     "NASDAQ-100 Consolidated" — легитимен CFTC ред, но АГРЕГАТ на
+    #     практически мъртвия standard-size контракт + E-mini (аналогично на
+    #     "S&P 500 Consolidated", който съзнателно НЕ избираме за S&P 500 —
+    #     там взимаме чистия "E-MINI S&P 500" ред). Несъответствие в подхода,
+    #     хванато чрез independent verification, не чрез теста срещу кеша
+    #     (тестът минаваше "OK", защото само проверява дали резолюцията сочи
+    #     към name, съдържащ очаквания substring — не дали е ПРАВИЛНИЯТ ред).
+    # Верният, чист standalone E-mini ред живее под съвсем друго CFTC име —
+    # "NASDAQ MINI" (CFTC ID 209742, потвърдено официално = "CME Mini
+    # NASDAQ 100 Stock Index" = директно ticker NQ), keyword-слепота от same
+    # клас като оригиналния Natural Gas бъг ("100" не е substring на "MINI").
+    # Директно точно име, без нужда от exclude — единствен кандидат.
+    ("Nasdaq-100",            "tff", ["NASDAQ MINI"],                []),
+    # FIX 2026-08-20 (одит, Категория А): резолвираше към "MICRO E-MINI
+    # RUSSELL 2000 INDX" (126w) вместо "RUSSELL E-MINI" (166w, пълна история).
+    ("E-mini Russell 2000",   "tff", ["RUSSELL", "E-MINI"],         ["MICRO"]),
+    # FIX 2026-08-20 (одит + independent verification срещу CME спецификация,
+    # Категория Б — формално остава "изисква преценка" защото легитимна
+    # алтернатива съществува, но verification-ът засили, не отслаби,
+    # увереността в избора): "DJIA Consolidated" е потвърдено АГРЕГАТ на
+    # практически мъртвия standard-size DJIA контракт + E-mini ($5) — точен
+    # аналог на "S&P 500 Consolidated", който съзнателно НЕ избираме за
+    # S&P 500 (виж Nasdaq-100 по-горе за same находка). "DJIA x $5" е чистата
+    # standalone E-mini линия (multiplier $5×DJIA, тикер YM) — директен
+    # паралел на "E-MINI S&P 500", не на "Consolidated". Избраният вариант е
+    # правилният по established прецедент от другите два индекса, но остава
+    # Категория Б, защото самото съществуване на "Consolidated" като
+    # алтернативен, също легитимен CFTC ред не отпада — той просто отговаря
+    # на по-широк, размесен инструмент, не на грешка в избора.
+    ("E-mini Dow (DJIA)",     "tff", ["DJIA"],                      ["CONSOLIDATED", "MICRO"]),
     ("VIX Futures",           "tff", ["VIX"],                       []),
     # FIX 2026-08-19: борсата преименува контракта — старият keyword "DOLLAR
     # INDEX" вече не съвпада с нищо в текущите CFTC данни (тих 0-data whitelist
     # miss, потвърден на живо). Реалното текущо име е "USD INDEX - ICE FUTURES
     # U.S." — уникално в TFF universe-а, не е нужен exclude.
     ("US Dollar Index",       "tff", ["USD INDEX"],                 []),
-    ("Euro FX",               "tff", ["EURO FX"],                   []),
-    ("Japanese Yen",          "tff", ["JAPANESE YEN"],               []),
-    ("British Pound",         "tff", ["BRITISH POUND"],             []),
+    # FIX 2026-08-20 (одит, Категория В — defensive, не беше счупено, но
+    # разчиташе на азбучен late над "EURO FX/BRITISH POUND XRATE" продукта):
+    ("Euro FX",               "tff", ["EURO FX"],                   ["XRATE"]),
+    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): резолвираше
+    # към "JAPANESE YEN XRATE" (cross-rate дериват, различен инструмент) вместо
+    # стандартния outright futures контракт.
+    ("Japanese Yen",          "tff", ["JAPANESE YEN"],               ["XRATE"]),
+    # FIX 2026-08-20 (одит, Категория В — defensive, виж Euro FX по-горе):
+    ("British Pound",         "tff", ["BRITISH POUND"],             ["XRATE"]),
     ("Swiss Franc",           "tff", ["SWISS FRANC"],                []),
     ("Canadian Dollar",       "tff", ["CANADIAN DOLLAR"],            []),
     ("Australian Dollar",     "tff", ["AUSTRALIAN DOLLAR"],          []),
@@ -96,13 +137,29 @@ MAJOR_MARKETS = [
     # ── Стоки (Disaggregated · Managed Money) ──
     ("Gold",           "disaggregated", ["GOLD"],          ["MICRO", "MINI"]),
     ("Silver",         "disaggregated", ["SILVER"],        ["MICRO", "MINI"]),
-    ("Copper",         "disaggregated", ["COPPER"],        []),
+    # FIX 2026-08-20 (одит, Категория В — defensive, не беше счупено, но
+    # разчиташе на азбучен late над "COPPER-MICRO"):
+    ("Copper",         "disaggregated", ["COPPER"],        ["MICRO"]),
     ("Platinum",       "disaggregated", ["PLATINUM"],      []),
     ("Palladium",      "disaggregated", ["PALLADIUM"],     []),
-    ("WTI Crude Oil",  "disaggregated", ["WTI"],           []),
+    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): "WTI"
+    # съвпада и с спред/diff продукти, алфавитно преди "WTI-PHYSICAL"
+    # (стандартният outright контракт). Стеснено directamente до точното име.
+    ("WTI Crude Oil",  "disaggregated", ["WTI-PHYSICAL"],  []),
     ("Brent Crude",    "disaggregated", ["BRENT"],         []),
-    ("Natural Gas",    "disaggregated", ["NATURAL GAS"],   ["BASIS", "HUB", "ZONE"]),
-    ("RBOB Gasoline",  "disaggregated", ["GASOLINE"],      []),
+    # FIX 2026-08-20 (одит, Категория А — категорично грешен match, keyword
+    # слепота): старият keyword "NATURAL GAS" изобщо не съвпадаше с реалния
+    # CFTC запис — той е абревиатура "NAT GAS NYME - NEW YORK MERCANTILE
+    # EXCHANGE" (тих 0-data whitelist miss). Новият keyword "NAT GAS" обаче
+    # съвпада и с газолинови продукти в същия universe ("NAT GASOLINE",
+    # "NAT GASLNE") — оттук 3-членният exclude, верифициран чрез ръчна
+    # проверка на всичките 8 реални "NAT GAS"-съдържащи CFTC market names:
+    # "ICE"/"OPIS"/"PENULTIMATE" изолират точно физическия NYMEX контракт.
+    ("Natural Gas",    "disaggregated", ["NAT GAS"],       ["ICE", "OPIS", "PENULTIMATE"]),
+    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): "GASOLINE"
+    # съвпада с "NAT GASOLINE"/"NAT GASLNE" (природен газ продукти, друг
+    # инструмент). Стеснено directamente до "GASOLINE RBOB".
+    ("RBOB Gasoline",  "disaggregated", ["GASOLINE RBOB"], []),
     # FIX 2026-08-19: борсата преименува контракта към ULSD спецификацията
     # преди години — старият keyword "HEATING OIL" вече не съвпада с нищо
     # (тих 0-data whitelist miss, потвърден на живо). И двата keyword-а
@@ -111,10 +168,19 @@ MAJOR_MARKETS = [
     # реален запис в CFTC universe-а, потвърден директно).
     ("Heating Oil",    "disaggregated", ["NY HARBOR", "ULSD"], []),
     ("Corn",           "disaggregated", ["CORN"],          []),
-    ("Soybeans",       "disaggregated", ["SOYBEANS"],      ["OIL", "MEAL"]),
+    # FIX 2026-08-20 (одит, Категория А — категорично грешен match, откритo
+    # по време на XRP тестовете): резолвираше към "MINI SOYBEANS" (28w) вместо
+    # стандартния "SOYBEANS" контракт (166w, пълна история).
+    ("Soybeans",       "disaggregated", ["SOYBEANS"],      ["OIL", "MEAL", "MINI"]),
     ("Soybean Oil",    "disaggregated", ["SOYBEAN OIL"],   []),
     ("Soybean Meal",   "disaggregated", ["SOYBEAN MEAL"],  []),
-    ("Wheat",          "disaggregated", ["WHEAT"],         []),
+    # FIX 2026-08-20 (одит, Категория Б — ИЗИСКВА ПРЕЦЕНКА, по-ниска увереност
+    # от Категория А fix-овете): "WHEAT-SRW" (Chicago SRW, стандартният
+    # бенчмарк контракт) срещу "WHEAT-HRW"/"WHEAT-HRSpring" (алтернативни
+    # региони/сортове). SRW е исторически референтният "Wheat" контракт за
+    # общи macro/COT цели, но HRW е легитимна алтернатива, не грешка сама по
+    # себе си — избран SRW заради по-дълга и по-ликвидна история.
+    ("Wheat",          "disaggregated", ["WHEAT-SRW"],     []),
     ("Sugar No. 11",   "disaggregated", ["SUGAR"],         []),
     ("Coffee C",       "disaggregated", ["COFFEE"],        []),
     ("Cocoa",          "disaggregated", ["COCOA"],         []),
