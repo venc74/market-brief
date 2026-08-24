@@ -523,5 +523,17 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "ROK_2026-06-19": {
+  "ticker": "ROK",
+  "entry_date": "2026-06-19",
+  "status": "stopped",
+  "entry_price": 475.92,
+  "target_1": 566.52,
+  "stop_loss": 430.62,
+  "target1_hit_date": null,
+  "resolution_date": "2026-08-20",
+  "discovered_date": "2026-08-24",
+  "realized_r": -1.0
  }
 }

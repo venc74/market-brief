@@ -1,15 +1,15 @@
 {
- "date": "2026-08-21",
+ "date": "2026-08-24",
  "rows": [
   {
-   "ticker": "SFBS",
-   "company": "ServisFirst Bancshares, Inc.",
-   "date": "2026-08-21",
+   "ticker": "IESC",
+   "company": "IES Holdings, Inc.",
+   "date": "2026-08-24",
    "ratio": "2:1",
    "split_type": "normal",
-   "date_human": "Aug 21, 2026",
-   "price": 43.64,
-   "market_cap": 4771816606.061096
+   "date_human": "Aug 24, 2026",
+   "price": 342.52,
+   "market_cap": 13648980834.24
   }
  ]
 }
