@@ -2,7 +2,7 @@
 Секция 3.2 — Borrow Rate в реално време от iborrowdesk.com.
 
 iborrowdesk публикува borrow rate и short availability директно от Interactive
-Brokers. Има публично JSON API: https://iborrowdesk.com/api/ticker/{SYMBOL}
+Brokers. Има публично JSON API: https://www.iborrowdesk.com/api/ticker/{SYMBOL}
 (по-надеждно от HTML scrape). Връща поредица от записи с fee и available.
 
 Интерпретация (от спека):
@@ -18,7 +18,12 @@ Graceful degradation (Секция 7): при недостъпен сайт вр
 from __future__ import annotations
 import requests
 
-_API = "https://iborrowdesk.com/api/ticker/{sym}"
+# FIX 2026-08-24: сайтът мигрира към "www." поддомейн — голият домейн вече
+# само 301-пренасочва homepage-а, но /api/... пътят на голия домейн прекъсва
+# връзката без отговор ("Empty reply from server", потвърдено на живо за
+# произволен тикър, не само конкретния случай, който го разкри). www.
+# версията на СЪЩИЯ endpoint отговаря нормално с HTTP 200.
+_API = "https://www.iborrowdesk.com/api/ticker/{sym}"
 _UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
        "Accept": "application/json"}
 

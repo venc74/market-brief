@@ -1017,7 +1017,10 @@
     out.innerHTML = ""; msg.textContent = "";
     if (!sym) return;
     msg.textContent = "Зареждам " + sym + "…";
-    var api = "https://iborrowdesk.com/api/ticker/" + encodeURIComponent(sym);
+    // FIX 2026-08-24: голият домейн вече само пренасочва homepage-а — /api/...
+    // пътят там прекъсва връзката без отговор за ВСЕКИ тикър (потвърдено на
+    // живо, не CORS-специфично). www. версията на same endpoint работи.
+    var api = "https://www.iborrowdesk.com/api/ticker/" + encodeURIComponent(sym);
     // директно; при CORS блокаж — fallback през публичен CORS reader (премахни ако не искаш трета страна)
     fetch(api)
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
