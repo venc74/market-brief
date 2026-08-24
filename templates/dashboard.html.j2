@@ -669,108 +669,6 @@
 </section>
 {% endif %}
 
-{% if superinvestor_moves %}
-<section>
-  <h2>Superinvestor Positions — Last 13F</h2>
-  <div class="si-grid">
-    {% for s in superinvestor_moves %}
-    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
-        <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
-    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
-  </div>
-</section>
-{% endif %}
-
-{% if superinvestor_new_positions %}
-<section>
-  <h2>🆕 High-Conviction New Positions</h2>
-  <div class="si-grid">
-    {% for s in superinvestor_new_positions %}
-    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
-        <span class="si-pct new">{{ s.pct_of_portfolio }}%</span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{{ s.manager }}{% if s.value %} · {{ s.value|money_short }}{% endif %}{% if s.period %} · {{ s.period }}{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    Съвсем НОВА позиция (отсъствала в предишния 13F) над {{ dataroma_min_new_position_pct }}% от портфейла на мениджъра —
-    праг върху % от портфейла, не абсолютна $ стойност, за да не отпаднат high-conviction залози на по-малки фондове.
-  </div>
-</section>
-{% endif %}
-
-{% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
-<section>
-  <h2>📉 Major Position Exits</h2>
-  {% if superinvestor_exits.exits %}
-  <div class="si-grid">
-    {% for s in superinvestor_exits.exits %}
-    <div class="si-card exit {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
-        <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    Позиция, която е била над {{ dataroma_major_exit_pct }}% от портфейла на мениджъра в предишния 13F,
-    напълно отсъства в текущия — пълна ликвидация на концентрирана позиция, не частично намаление.
-  </div>
-  {% endif %}
-  {% if superinvestor_exits.stopped_managers %}
-  <div class="si-stopped-note">
-    <b>⚠ Мениджъри, спрели да подават 13F</b> (изключени от Exits по-горе — липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
-    {% for m in superinvestor_exits.stopped_managers %}
-    <div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-</section>
-{% endif %}
-
-{% if insider_buying %}
-<section>
-  <h2>Insider Buying · Form 4 (open market покупки)</h2>
-  <div class="si-grid">
-    {% for i in insider_buying[:12] %}
-    <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
-      <div class="si-top">
-        <span class="si-sym">{{ i.ticker }}</span>
-        <span class="si-val">{{ (i.total_value)|money_short }}</span>
-      </div>
-      <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
-      {% if i.cluster %}<div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>{% endif %}
-      <ul class="tight" style="margin-top:6px">
-        {% for ins in i.insiders %}
-        <li>{{ ins.name }}{% if ins.title %} ({{ ins.title }}){% endif %} — {{ ins.date }} — {{ ins.value|money_short }}</li>
-        {% endfor %}
-      </ul>
-      {% if i.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
 {% if cot %}
 <section>
   <h2>COT Екстремуми · Managed Money Positioning</h2>
@@ -891,6 +789,109 @@
   </div>
   {% endif %}
   {% endif %}
+</section>
+{% endif %}
+
+{% if superinvestor_moves %}
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  <div class="si-grid">
+    {% for s in superinvestor_moves %}
+    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
+      </div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
+    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  </div>
+</section>
+{% endif %}
+
+{% if superinvestor_new_positions %}
+<section>
+  <h2>🆕 High-Conviction New Positions</h2>
+  <div class="si-grid">
+    {% for s in superinvestor_new_positions %}
+    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-pct new">{{ s.pct_of_portfolio }}%</span>
+      </div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{{ s.manager }}{% if s.value %} · {{ s.value|money_short }}{% endif %}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    Съвсем НОВА позиция (отсъствала в предишния 13F) над {{ dataroma_min_new_position_pct }}% от портфейла на мениджъра —
+    праг върху % от портфейла, не абсолютна $ стойност, за да не отпаднат high-conviction залози на по-малки фондове.
+  </div>
+</section>
+{% endif %}
+
+{% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
+<section>
+  <h2>📉 Major Position Exits</h2>
+  {% if superinvestor_exits.exits %}
+  <div class="si-grid">
+    {% for s in superinvestor_exits.exits %}
+    <div class="si-card exit {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
+      </div>
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    Позиция, която е била над {{ dataroma_major_exit_pct }}% от портфейла на мениджъра в предишния 13F,
+    напълно отсъства в текущия — пълна ликвидация на концентрирана позиция, не частично намаление.
+  </div>
+  {% endif %}
+  {% if superinvestor_exits.stopped_managers %}
+  <div class="si-stopped-note">
+    <b>⚠ Мениджъри, спрели да подават 13F</b> (изключени от Exits по-горе — липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
+    {% for m in superinvestor_exits.stopped_managers %}
+    <div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if insider_buying %}
+<section>
+  <h2>Insider Buying · Form 4 (open market покупки)</h2>
+  <div class="si-grid">
+    {% for i in insider_buying[:12] %}
+    <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
+      <div class="si-top">
+        <span class="si-sym">{{ i.ticker }}</span>
+        <span class="si-val">{{ (i.total_value)|money_short }}</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
+      {% if i.cluster %}<div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>{% endif %}
+      <ul class="tight" style="margin-top:6px">
+        {% for ins in i.insiders %}
+        <li>{{ ins.name }}{% if ins.title %} ({{ ins.title }}){% endif %} — {{ ins.date }} — {{ ins.value|money_short }}</li>
+        {% endfor %}
+      </ul>
+      {% if i.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
 </section>
 {% endif %}
 
