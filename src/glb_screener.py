@@ -119,6 +119,38 @@ def _tightness_overlay(daily_close, daily_high, daily_low, prior_high: float) ->
     }
 
 
+def _split_only_adjust(close, high, low, splits):
+    """
+    FIX 2026-08-24 (GLB dividend-drift одит, Venci): auto_adjust=True
+    ретроактивно dividend-adjust-ва ЦЯЛАТА историческа Close/High/Low серия
+    при всяко ex-div събитие — потвърдено на живо (NWE ex-div 17.08.2026,
+    prior_high $71.66→$70.99 в СЪЩИЯ ден, нулева промяна в реалната пазарна
+    цена). Скалата е широка: за 44г-стар high-yield платец (SO/Southern Co)
+    auto_adjust=True показва 1981 close $0.27 срещу реалните $3.67
+    (auto_adjust=False) — 13.6× изкривяване. За price-breakout детекция
+    (Weinstein/Wish методология) искаме SPLIT-adjusted, НЕ dividend-adjusted
+    цени — total-return adjustment е грешен инструмент тук, price-level
+    пробив трябва да е спрямо реално търгуваната цена.
+
+    Ръчна split-only корекция върху auto_adjust=False суровите данни:
+    за всяка split дата, всички редове ПРЕДИ нея се делят на ratio-то.
+    Множество splits се композират коректно (всеки следващ split дели
+    и по-старите редове отново — ред на итерация няма значение, маските
+    са независими по абсолютна дата).
+    """
+    if splits is None or splits.empty:
+        return close, high, low
+    close, high, low = close.copy(), high.copy(), low.copy()
+    for split_date, ratio in splits.items():
+        if not ratio or ratio == 1:
+            continue
+        mask = close.index < split_date
+        close.loc[mask] = close.loc[mask] / ratio
+        high.loc[mask] = high.loc[mask] / ratio
+        low.loc[mask] = low.loc[mask] / ratio
+    return close, high, low
+
+
 def _evaluate_ticker(sym: str, hist) -> dict | None:
     """
     hist = пълен OHLCV df за sym (вече изтеглен batch-ово от screen()).
@@ -180,15 +212,26 @@ def screen(universe: list[str] | None = None, batch_size: int = 50) -> list[dict
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
         try:
+            # FIX 2026-08-24: auto_adjust=False + actions=True (виж
+            # _split_only_adjust docstring-а за пълния rationale) — сурови
+            # Close/High/Low, split историята идва БЕЗПЛАТНО в СЪЩИЯ batch
+            # call (Stock Splits колона), без нужда от отделна per-ticker
+            # yf.Ticker(sym).splits заявка.
             data = yf.download(batch, period=config.GLB_HISTORY_PERIOD, progress=False,
-                               auto_adjust=True, group_by="ticker", threads=True)
+                               auto_adjust=False, actions=True, group_by="ticker",
+                               threads=True)
         except Exception as e:
             print(f"[glb_screener] batch {i} fetch грешка: {e}")
             continue
 
         for sym in batch:
             try:
-                df = data[sym].dropna() if len(batch) > 1 else data.dropna()
+                df = (data[sym] if len(batch) > 1 else data).dropna(
+                    subset=["Close", "High", "Low"])
+                splits = df["Stock Splits"]
+                close, high, low = _split_only_adjust(
+                    df["Close"], df["High"], df["Low"], splits[splits != 0])
+                df = df.assign(Close=close, High=high, Low=low)
                 r = _evaluate_ticker(sym, df)
             except Exception as e:
                 print(f"[glb_screener] {sym}: {e}")
