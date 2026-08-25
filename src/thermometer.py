@@ -216,6 +216,106 @@ def vix_term_structure() -> dict:
                 "hide": True, "label": ""}
 
 
+def _percentile_rank(history: list[float], current: float) -> float:
+    """Same конвенция като cot.py: _percentile_rank — среща умишлено дублирана
+    локално вместо cross-module import на частна функция (self-contained
+    модули, виж останалите src/*.py)."""
+    if not history:
+        return 50.0
+    below_or_eq = sum(1 for v in history if v <= current)
+    return round(100.0 * below_or_eq / len(history), 1)
+
+
+def _evaluate_credit_spread(ratio) -> dict:
+    """
+    Чисто изчисление върху вече изтеглена, дата-сортирана IEI/HYG ratio
+    серия — разделено от credit_spread_proxy() (fetch+orchestration), за да
+    може backtest/regression тестове да го викат directamente с исторически
+    ratio срез, БЕЗ да пипат мрежата (same принцип като cot._market_extreme
+    vs cot.get_extremes(), glb_screener._evaluate_ticker vs screen()).
+
+    Level компонент: percentile на текущия ratio спрямо trailing
+    IEI_HYG_LOOKBACK_DAYS прозорец (изключвайки самия current ред от
+    референтната история, same конвенция като COT percentile-a) — ниска
+    percentile (ratio близо до дъното на скорошния си range = spreads
+    исторически tight) = late-cycle complacency флаг.
+
+    RoC компонент: IEI_HYG_ROC_WINDOW_DAYS-дневен % change, самият той
+    percentile-ranked спрямо собствения trailing прозорец — self-calibrating
+    спрямо конкретния режим, не фиксирана магнитуда (backtest потвърди: по-
+    леки събития като Aug'24 yen carry unwind никога не прекосяват фиксиран
+    % праг калибриран за GFC/COVID сериозност).
+    """
+    need = config.IEI_HYG_LOOKBACK_DAYS + config.IEI_HYG_ROC_WINDOW_DAYS + 1
+    if len(ratio) < need:
+        raise ValueError(f"недостатъчна история ({len(ratio)} дни, нужни ≥{need})")
+
+    window_all = ratio.iloc[-(config.IEI_HYG_LOOKBACK_DAYS + 1):]
+    current = float(window_all.iloc[-1])
+    level_pct = _percentile_rank(window_all.iloc[:-1].tolist(), current)
+
+    roc = ratio.pct_change(config.IEI_HYG_ROC_WINDOW_DAYS) * 100
+    roc_window_all = roc.iloc[-(config.IEI_HYG_LOOKBACK_DAYS + 1):].dropna()
+    current_roc = float(roc_window_all.iloc[-1])
+    roc_pct = _percentile_rank(roc_window_all.iloc[:-1].tolist(), current_roc)
+
+    spike = roc_pct >= config.IEI_HYG_ROC_SPIKE_PERCENTILE
+    complacency = level_pct <= config.IEI_HYG_LEVEL_PERCENTILE_LOW
+
+    if spike:
+        status = "red"
+    elif complacency:
+        status = "yellow"
+    else:
+        status = "green"
+
+    note = (" ⚠ рязък credit spread spike" if spike else
+           (" (late-cycle complacency)" if complacency else ""))
+    return {
+        "name": "IEI/HYG (Credit Spread)", "value": round(current, 4),
+        "level_percentile": level_pct, "roc_10d_pct": round(current_roc, 2),
+        "roc_percentile": roc_pct, "spike": spike, "status": status,
+        "label": f"IEI/HYG {current:.3f} ({level_pct:.0f}. percentile) · "
+                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}д RoC {current_roc:+.1f}% "
+                 f"({roc_pct:.0f}. percentile){note}",
+    }
+
+
+def credit_spread_proxy() -> dict:
+    """
+    IEI/HYG — 3-7г Treasury спрямо High-Yield Corporate Bond ETF, established
+    credit spread proxy. Backtest (Venci, 2026-08-2x, 4 известни кризисни
+    прозореца — GFC 2007-08, late-2018 selloff, COVID crash 2020, Aug'24 yen
+    carry unwind) потвърди паттърна directamente — виж _evaluate_credit_
+    spread() и config.py IEI_HYG_* коментарите за пълния rationale.
+
+    Hard override (виж build_thermometer): spike форсира Defensive, НЕЗАВИСИМ
+    трети тригер до VIX>30/MOVE, не дублиране на MOVE логиката. MOVE мери
+    имплицитна волатилност в UST опциите — bond PRICE volatility, деривативен
+    пазар. IEI/HYG spike мери разширяване на CREDIT RISK PREMIUM-а между
+    risk-free и high-yield — реален cash-bond пазар, компенсация за default
+    риск, различен ъгъл на стреса. Двата индикатора могат легитимно да се
+    разминат (MOVE спокоен, докато credit spreads вече горят, или обратното)
+    — затова е трети независим тригер, не redundant echo на MOVE.
+    """
+    try:
+        iei = yf.Ticker("IEI").history(period="3y")
+        hyg = yf.Ticker("HYG").history(period="3y")
+        if iei.empty or hyg.empty:
+            raise ValueError("insufficient IEI/HYG history")
+        if _is_stale(iei.index[-1]) or _is_stale(hyg.index[-1]):
+            raise ValueError(f"stale data — IEI {iei.index[-1].date()} / "
+                             f"HYG {hyg.index[-1].date()}")
+
+        common = iei.index.intersection(hyg.index)
+        ratio = (iei.loc[common, "Close"] / hyg.loc[common, "Close"]).sort_index()
+        return _evaluate_credit_spread(ratio)
+    except Exception as e:
+        print(f"[thermo] IEI/HYG credit spread failed: {e}")
+        return {"name": "IEI/HYG (Credit Spread)", "value": None, "status": "yellow",
+                "hide": True, "label": ""}
+
+
 def market_breadth() -> dict:
     """
     Market Breadth (% над 40dMA) — 9-ти термометър индикатор. Собствено
@@ -314,12 +414,18 @@ def market_breadth() -> dict:
 
 def build_thermometer(macro: dict) -> dict:
     """
-    Сглобява 9-те индикатора + правилото за режим (9-ти, Market Breadth,
-    добавен 2026-08-15 — виж market_breadth() докстринга за пълния
+    Сглобява 9-те индикатора + правилото за режим (8-ми, Market Breadth,
+    добавен 2026-08-15; 9-ти, IEI/HYG Credit Spread, добавен 2026-08-25 —
+    виж market_breadth()/credit_spread_proxy() докстринговете за пълния
     methodology rationale):
     - VIX > 30 → задължително Defensive (Секция 8)
     - MOVE > 150 или рязък седмичен скок → задължително Defensive (институционален
       стрес в колатералната система бие останалите сигнали, аналогично на VIX правилото)
+    - IEI/HYG spike (10д RoC в топ percentile) → задължително Defensive — трети,
+      НЕЗАВИСИМ hard-override тригер до VIX/MOVE (credit risk premium, не bond
+      price volatility — виж credit_spread_proxy() докстринга защо не е
+      дублиране на MOVE логиката); 4/4 известни кризи, 0 false positives в
+      backtest-а (Venci, 2026-08-2x)
     - 4+ зелени при 0 червени → Offensive; 3+ червени → Cash; 2 червени → Defensive;
       всичко останало → Defensive (недостатъчно потвърждение)
     Броенето е само върху ВИДИМИТЕ индикатори (hide=True не участва); жълтите и
@@ -356,7 +462,7 @@ def build_thermometer(macro: dict) -> dict:
         }
 
     indicators = [spy_trend(), vix_level(), market_put_call(), spread_ind,
-                  nl_ind, move_index(), vix_term_structure()]
+                  nl_ind, move_index(), vix_term_structure(), credit_spread_proxy()]
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
 
@@ -376,6 +482,8 @@ def build_thermometer(macro: dict) -> dict:
     move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
     move_val = move_ind.get("value") if move_ind else None
     move_spike = move_ind.get("spike") if move_ind else False
+    credit_ind = next((i for i in indicators if i["name"] == "IEI/HYG (Credit Spread)"), None)
+    credit_spike = bool(credit_ind and credit_ind.get("spike"))
 
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
@@ -389,6 +497,11 @@ def build_thermometer(macro: dict) -> dict:
         regime, reason = "Defensive", (
             f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
             + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
+    elif credit_spike:
+        regime, reason = "Defensive", (
+            f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
+            f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
+            "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%")
     elif greens >= 4 and reds == 0:
         regime, reason = "Offensive", counts
     elif reds >= 3:

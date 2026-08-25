@@ -356,6 +356,21 @@ MOVE_SPIKE_WEEKLY_DELTA = float(os.getenv("MOVE_SPIKE_WEEKLY_DELTA", 15))
 # ── VIX Term Structure (VIX9D / VIX3M ratio) ──────────────────────────────
 VIX_TERM_WARNING_THRESHOLD = float(os.getenv("VIX_TERM_WARNING_THRESHOLD", 1.0))
 VIX_TERM_BACKWARDATION_THRESHOLD = float(os.getenv("VIX_TERM_BACKWARDATION_THRESHOLD", 1.1))
+# ── IEI/HYG (Credit Spread Proxy) ──────────────────────────────────────────
+# FIX 2026-08-25: backtest (Venci) срещу 4 известни кризисни прозореца
+# (GFC 2007-08, late-2018 selloff, COVID crash 2020, Aug'24 yen carry
+# unwind) потвърди: остър 10-дневен RoC spike прецизно маркира началото на
+# credit turbulence, 0 false positives в 4/4 спокойни контролни периода
+# (вкл. SVB март 2023). 19-годишен секуларен спад в дъното на ratio-то
+# (2.13→1.46) изключва фиксирани абсолютни прагове — percentile/rolling
+# подход, same методология като COT модула (виж cot.py: _percentile_rank).
+# 504 дни (~2г) е разумен starting point за rolling прозорец — достатъчно
+# скорошен спрямо секуларния тренд, достатъчно данни за стабилна
+# статистика; всички стойности tunable занапред.
+IEI_HYG_LOOKBACK_DAYS = int(os.getenv("IEI_HYG_LOOKBACK_DAYS", 504))
+IEI_HYG_LEVEL_PERCENTILE_LOW = float(os.getenv("IEI_HYG_LEVEL_PERCENTILE_LOW", 10))
+IEI_HYG_ROC_WINDOW_DAYS = int(os.getenv("IEI_HYG_ROC_WINDOW_DAYS", 10))
+IEI_HYG_ROC_SPIKE_PERCENTILE = float(os.getenv("IEI_HYG_ROC_SPIKE_PERCENTILE", 90))
 # Low-liquidity yfinance тикъри (^MOVE, ^VIX9D, ^VIX3M) понякога спират да
 # публикуват нови данни за дни наред — над този праг стойността се третира
 # като stale и индикаторът се крие (hide), вместо да показва остаряло число.

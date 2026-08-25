@@ -35,9 +35,10 @@ main.py              — оркестратор: macro → thermometer → secto
                         → enrich → AI synthesis → hard rules → sizing → render
 config.py            — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
 src/macro_layer.py    — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
-src/thermometer.py     — 8 индикатора (SPY, VIX, P/C, spread, Net
+src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
                         Liquidity, MOVE, VIX Term Structure, Market
-                        Breadth) + Offensive/Defensive/Cash режим
+                        Breadth, IEI/HYG Credit Spread) +
+                        Offensive/Defensive/Cash режим
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
 src/screener.py        — Stage 2 + CANSLIM скрийнър
 src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
@@ -53,6 +54,9 @@ templates/dashboard.html.j2 — единственият source за docs/index.
 - `VIX_DEFENSIVE_THRESHOLD = 30` — VIX>30 форсира Defensive
 - `MOVE_RED_THRESHOLD = 150`, `MOVE_SPIKE_WEEKLY_DELTA = 15` — институционален
   стрес в колатерала форсира Defensive (аналогично на VIX правилото)
+- `IEI_HYG_ROC_SPIKE_PERCENTILE = 90` (10д RoC, 504д rolling прозорец) —
+  credit spread spike форсира Defensive, трети независим hard-override
+  тригер (виж `thermometer.py: credit_spread_proxy()`)
 - `COT_PERCENTILE_LOW/HIGH = 10/90` — строги прагове, малко на брой резултати
 - `MAX_ACTION_TICKERS = 5`, `MAX_PER_SECTOR = 2`
 
