@@ -1,5 +1,5 @@
 {
- "date": "2026-08-24",
+ "date": "2026-08-25",
  "rows": [
   {
    "ticker": "IESC",
@@ -8,8 +8,18 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 24, 2026",
-   "price": 342.52,
-   "market_cap": 13648980834.24
+   "price": 324.12,
+   "market_cap": 12915764533.44
+  },
+  {
+   "ticker": "GPMXY",
+   "company": "Grupo Mexico S.A. ADR",
+   "date": "2026-08-27",
+   "ratio": "0%",
+   "split_type": null,
+   "date_human": "Aug 27, 2026",
+   "price": 29.8,
+   "market_cap": 115996497030.25818
   }
  ]
 }
