@@ -1,5 +1,5 @@
 {
- "date": "2026-08-24",
+ "date": "2026-08-25",
  "rows": [
   {
    "ticker": "INTC",
@@ -126,14 +126,44 @@
      "value": 416829.00000000006
     }
    ]
+  },
+  {
+   "ticker": "VST",
+   "company": "Vistra Corp.",
+   "total_value": 270000.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-08-24",
+     "value": 270000.0
+    }
+   ]
+  },
+  {
+   "ticker": "PODD",
+   "company": "INSULET CORP",
+   "total_value": 162217.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "McEvoy Ashley",
+     "title": "President and CEO",
+     "date": "2026-08-21",
+     "value": 162217.0
+    }
+   ]
   }
  ],
  "diagnostics": {
   "universe_size": 518,
   "ciks_resolved": 518,
-  "tickers_with_filings": 382,
+  "tickers_with_filings": 388,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 120,
-  "qualifying_after_filter": 12
+  "raw_transactions_parsed": 131,
+  "qualifying_after_filter": 14
  }
 }
