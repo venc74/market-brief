@@ -125,11 +125,21 @@ def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
 
 def global_market_signals() -> dict:
     """
-    DXY, VIX, gold, oil, copper, 10Y yield — снимка + 5-дневна промяна.
+    DXY, VIX, gold, oil, copper, 10Y yield, MOVE — снимка + 5-дневна промяна.
     FIX 2026-07-15: staleness проверка. Преди: термометърът отхвърляше
     застоял ^MOVE (hide=True), а този модул теглеше СЪЩИЯ ^MOVE без
     проверка → AI макро наративът цитираше отхвърлената стойност като
     текуща ("MOVE падна до 69.55") — двоен стандарт за същите данни.
+
+    FIX 2026-08-26: period="10d" + iloc[0] даваше fuzzy "~5 дни" прозорец
+    (calendar days, не търговски дни) — same паттърн, вече диагностициран и
+    поправен в thermometer.py: vix_level() (FIX 2026-08-02), но никога не
+    пренесен тук. Потвърдено на живо 2026-08-26: VIX +6.19% оттук срещу
+    -2.5% в thermometer-a за СЪЩИЯ ден в СЪЩИЯ AI промпт — обратен знак, не
+    просто разлика в прецизността (VIX whipsaw между двата различни anchor-а
+    в рамките на прозореца). Same fix, приложен еднакво за всичките 7
+    сигнала тук (не само VIX, всичките споделяха стария паттърн):
+    period="1mo" + iloc[-6] — точен 5-търговски-дневен прозорец.
     """
     tickers = {
         "DXY": "DX-Y.NYB", "VIX": "^VIX", "Gold": "GC=F",
@@ -138,14 +148,14 @@ def global_market_signals() -> dict:
     out = {}
     for name, symbol in tickers.items():
         try:
-            hist = yf.Ticker(symbol).history(period="10d")
-            if len(hist) >= 2:
+            hist = yf.Ticker(symbol).history(period="1mo")
+            if len(hist) >= 6:
                 if _is_stale(hist.index[-1]):
                     print(f"[macro] {name} stale — последен ред "
                           f"{hist.index[-1].date()}, пропускам")
                     continue
                 last = float(hist["Close"].iloc[-1])
-                wk = float(hist["Close"].iloc[0])
+                wk = float(hist["Close"].iloc[-6])
                 out[name] = {
                     "value": round(last, 2),
                     "chg_5d_pct": round((last / wk - 1) * 100, 2),
