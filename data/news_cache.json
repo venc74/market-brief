@@ -1,37 +1,37 @@
 {
- "date": "2026-08-25",
+ "date": "2026-08-26",
  "news": [
   {
-   "headline": "Gold hits over three-month high on dollar weakness, Treasury bond buyback plans",
-   "why": "Златото като safe-haven актив сигнализира за слабост на долара и очаквания за по-ниски реални доходности при евентуален изкуп на облигации."
+   "headline": "Canada unveils retaliatory tariffs on about $20 billion of U.S. goods",
+   "why": "Ескалацията на търговската война между САЩ и Канада увеличава инфлационния натиск и риска за корпоративните маржове в засегнатите сектори."
   },
   {
-   "headline": "Bessent could tap near $1 trillion Treasury General Account to fund bond buybacks",
-   "why": "Използването на TGA за изкуп на облигации би натиснало надолу дългосрочните доходности и би повлияло директно на цените на Treasury-тата и equity оценките."
+   "headline": "Bessent's bond intervention puts US Treasury on collision course with Fed",
+   "why": "Конфликтът между Министерството на финансите и Fed относно дълговите покупки директно засяга очакванията за лихвени нива и Treasury yields."
   },
   {
-   "headline": "Trump says U.S. will hike Canada auto tariffs to 50% as trade war escalates",
-   "why": "50% тарифа върху канадски автомобили удря директно автомобилния сектор и supply chains, с риск от инфлационен ефект и преоценка на GM, Ford и Stellantis."
+   "headline": "Fidelity says this phenomenon is 'reshaping markets' and recommends stocks to fight it off",
+   "why": "Структурната инфлация, задвижена от дефицити, AI инвестиции и търговски бариери, променя asset allocation логиката за средносрочни позиции."
   },
   {
-   "headline": "Trump admin unveils anti-Iran global sanctions plan, signals China not exempt",
-   "why": "Вторичните санкции срещу китайски купувачи на ирански петрол носят геополитически риск за петролните пазари и за китайски акции с листинг в САЩ."
+   "headline": "Iran and Oman discuss joint shipping route in Strait of Hormuz and mine clearing mission",
+   "why": "Всяка промяна в статута на Хормузкия проток директно влияе върху петролния транзит и цените на суровия петрол."
   },
   {
-   "headline": "US grain farmers pummelled as Iran war triggers surge in costs",
-   "why": "Ескалацията на конфликта в Близкия изток вдига производствените разходи в агросектора, което е инфлационен сигнал за хранителни суровини."
+   "headline": "Nvidia's 'expectations premium' dogs the stock after earnings. Here's what analysts are watching",
+   "why": "NVDA е барометър за целия AI/semiconductor сектор и реакцията й след earnings движи по-широкия tech пазар."
   },
   {
-   "headline": "Bitcoin surges past $80,000 as crypto rally gathers pace",
-   "why": "Ускоряващото се рали на Bitcoin с нови inflows в spot ETF-и отразява завръщане на risk appetite и може да се разлее в tech и growth акции."
+   "headline": "Dick's Sporting Goods just had its worst day ever",
+   "why": "Рекордният спад от 30% сигнализира за сериозно влошаване в потребителските разходи за дискреционни стоки, с импликации за целия retail сектор."
   },
   {
-   "headline": "U.S. Trade Rep Greer blames Canada for failed tariff talks",
-   "why": "Провалените преговори потвърждават, че търговската война с Канада се задълбочава, увеличавайки несигурността за пазарите на суровини и промишления сектор."
+   "headline": "HP partners with U.S.-blacklisted Huawei for licensing the Chinese company's WiFi tech",
+   "why": "Сделката поставя под въпрос ефективността на U.S. export controls и може да провокира нови регулаторни реакции, засягащи tech компаниите."
   },
   {
-   "headline": "Scott Bessent threatens Iran's economic partners with more sanctions",
-   "why": "Позицията на Treasury secretary засилва геополитическото напрежение и поддържа premium-а в петролните цени с потенциал за нови движения в енергийния сектор."
+   "headline": "China challenges Korean champions in flash memory race",
+   "why": "YMTC's $5bn IPO и амбициите в NAND производството заплашват пазарните позиции на Samsung и SK Hynix, с последствия за semiconductor сектора глобално."
   }
  ]
 }

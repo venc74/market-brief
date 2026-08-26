@@ -1,5 +1,5 @@
 {
- "date": "2026-08-25",
+ "date": "2026-08-26",
  "rows": [
   {
    "ticker": "IESC",
@@ -8,8 +8,18 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 24, 2026",
-   "price": 324.12,
-   "market_cap": 12915764533.44
+   "price": 313.23,
+   "market_cap": 12481812497.551025
+  },
+  {
+   "ticker": "REAX",
+   "company": "Real REMAX Group Inc.",
+   "date": "2026-08-25",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Aug 25, 2026",
+   "price": 28.36,
+   "market_cap": 618089594.3422546
   },
   {
    "ticker": "GPMXY",
@@ -18,8 +28,8 @@
    "ratio": "0%",
    "split_type": null,
    "date_human": "Aug 27, 2026",
-   "price": 29.8,
-   "market_cap": 115996497030.25818
+   "price": 29.08,
+   "market_cap": 113213358936.30981
   }
  ]
 }
