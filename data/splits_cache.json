@@ -1,5 +1,5 @@
 {
- "date": "2026-08-26",
+ "date": "2026-08-27",
  "rows": [
   {
    "ticker": "IESC",
@@ -8,8 +8,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Aug 24, 2026",
-   "price": 313.23,
-   "market_cap": 12481812497.551025
+   "price": 331.48,
+   "market_cap": 13209051491.551025
   },
   {
    "ticker": "REAX",
@@ -18,8 +18,8 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Aug 25, 2026",
-   "price": 28.36,
-   "market_cap": 618089594.3422546
+   "price": 26.59,
+   "market_cap": 579513471.5855637
   },
   {
    "ticker": "GPMXY",
@@ -28,8 +28,8 @@
    "ratio": "0%",
    "split_type": null,
    "date_human": "Aug 27, 2026",
-   "price": 29.08,
-   "market_cap": 113213358936.30981
+   "price": 28.22,
+   "market_cap": 110430222182.09784
   }
  ]
 }
