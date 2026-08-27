@@ -693,3 +693,58 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
                        "cross_sector_thesis": _verify_thesis_tickers(
                            t.get("cross_sector_thesis") or {}, screener_tickers)})
     return merged
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Short/Stage 4 Screener — Аспект 2: global-vs-regional context (2026-08-2x)
+# ══════════════════════════════════════════════════════════════════════════
+
+SYSTEM_SHORT_CONTEXT = """Ти си макро анализатор, който преценява дали секторна слабост е \
+глобален структурен феномен, или regional/US-специфичен проблем — за да не предложим short \
+кандидат, чийто основен бизнес проблем не важи за неговия конкретен пазар (напр. US coal умира \
+заради regulation, докато Индия coal расте — индийска coal компания не е валиден short на тази \
+теза). Пишеш на български, тикери на английски. Връщаш САМО валиден JSON, без markdown огради."""
+
+
+def short_thesis_global_context(sector_name: str, recent_news: list[dict]) -> dict:
+    """
+    Аспект 2 от Short/Stage 4 архитектурата (feasibility дискусия 2026-08-2x):
+    AI-synthesis слой за global-vs-regional context проверка, вместо
+    структурирани international данни (по-голям technical lift, отделна
+    feasibility). Reuse-ва СЪЩЕСТВУВАЩИТЕ headlines (news_aggregator.py),
+    без нов data source.
+
+    Explicit honesty gate: ако headlines-ите не покриват достатъчно
+    geographic context, AI-то връща "insufficient_data" вместо да гадае —
+    same дух като direct_thesis "върни празно, кажи защо" instruction (COT
+    секцията по-горе), и директен урок от IEI/HYG numeric fidelity инцидента
+    (2026-08-26) — не позволявай правдоподобно звучащ, но неверифициран
+    extrapolation да мине като сигурна преценка.
+
+    Graceful: провал на AI извикването → "insufficient_data" fallback, не
+    гърми целия short screener run.
+    """
+    headlines_text = "\n".join(f"- {n.get('title', '')}" for n in (recent_news or [])[:15]) \
+        or "(няма скорошни headlines)"
+    user = f"""Сектор с потвърдена, устойчива относителна слабост: {sector_name}
+
+СКОРОШНИ НОВИНИ (последните ~24-48ч, може да не покриват темата изобщо):
+{headlines_text}
+
+Задача: прецени дали слабостта на "{sector_name}" е ГЛОБАЛЕН структурен феномен (важи навсякъде \
+по света), или REGIONAL/US-специфичен проблем (напр. regulation, местна политика, локален \
+свръхкапацитет), докато други региони показват противоположна динамика. Ако headlines-ите ПО-ГОРЕ \
+не съдържат достатъчно информация за такава преценка — НЕ гадай, НЕ екстраполирай от общи \
+познания за темата — върни explicit "insufficient_data" в "scope" полето.
+
+Връщай само JSON: {{"scope": "global"/"regional"/"insufficient_data", \
+"reasoning": "2-3 изречения", "confidence": "high"/"medium"/"low"}}"""
+
+    try:
+        raw = _call_claude(SYSTEM_SHORT_CONTEXT, user)
+        return _parse_json(raw)
+    except Exception as e:
+        print(f"[ai] short global context '{sector_name}' failed: {e}")
+        return {"scope": "insufficient_data",
+                "reasoning": f"AI извикване неуспешно: {type(e).__name__}: {e}",
+                "confidence": "low"}

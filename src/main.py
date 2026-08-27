@@ -17,7 +17,7 @@ import config
 
 from src.macro_layer import collect_macro_layer, thesis_monitor
 from src.thermometer import build_thermometer
-from src.sector_layer import sector_rotation, leading_sectors
+from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan
@@ -29,6 +29,8 @@ from src import backtest
 from src import cot
 from src import entry_timing
 from src import glb_screener
+from src import short_screener
+from src import short_tracker
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -120,6 +122,10 @@ def run() -> dict:
     print("[3/7] Слой 2: секторна ротация…")
     rotation = sector_rotation()
     leaders = leading_sectors(rotation)
+    # Short/Stage 4 screener вход — persistence-gated (не еднодневен snapshot),
+    # виж laggard_sectors() docstring-а. Реалният screening (мрежово скъп) се
+    # случва по-долу, до GLB блока — тук само евтиното sector-level изчисление.
+    laggards = laggard_sectors(rotation)
 
     print("[4/7] Слой 3: скрининг…")
     candidates = run_screen([s["sector"] for s in leaders])
@@ -189,6 +195,35 @@ def run() -> dict:
         glb_candidates = []
     for row in glb_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
+
+    # Short/Stage 4 screener — Модул 1, Short/Reversal тема (2026-08-2x).
+    # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
+    # short_screener.py docstring за пълния feasibility/backtest trail).
+    # Explicit try/except, same дух като GLB блока по-горе.
+    if config.ENABLE_SHORT_SCREENER:
+        try:
+            short_candidates = short_screener.run_short_screen(laggards)
+        except Exception as e:
+            print(f"[main] Short screener failed: {e}")
+            short_candidates = []
+    else:
+        short_candidates = []
+    # Global-vs-regional context (Аспект 2) — само за capped подмножество
+    # лагиращи сектори, сортирано по severity (виж MAX_LAGGARD_SECTORS_FOR_
+    # AI_CONTEXT коментара в config.py — 2023-2025 daily co-occurrence тест
+    # показа медиана 5, до 12 едновременно, cost/latency контрол е нужен на
+    # точно тази стъпка, не на detection gate-а).
+    short_sectors_seen = {c["lagging_sector"] for c in short_candidates}
+    global_context = {}
+    for sector in laggards[:config.MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT]:
+        if sector["sector"] not in short_sectors_seen:
+            continue
+        global_context[sector["sector"]] = ai_brief.short_thesis_global_context(
+            sector["sector"], news)
+    for row in short_candidates:
+        row["in_screener"] = row["ticker"] in our_tickers
+        row["global_context"] = global_context.get(row.get("lagging_sector"))
+
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
     # Track Record: ingest четe data/*.json snapshot-и от диска — днешният {today}.json
@@ -202,6 +237,16 @@ def run() -> dict:
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
+
+    # short_tracker.py — prospective проследяване на short кандидатите, same
+    # "ден+1" fix и graceful degradation дух като backtest блока по-горе.
+    # Единственият начин да измерим реален hit rate занапред (виж
+    # short_screener.py docstring-а за структурния лимит на историческата
+    # валидация на survival-risk критериите).
+    if config.ENABLE_SHORT_SCREENER:
+        short_tracker.update_short_tracker(short_candidates, today)
+    short_tracker_summary = (short_tracker.get_short_tracker_summary()
+                             if config.ENABLE_SHORT_SCREENER else {})
 
     brief = {
         "date": today,
@@ -225,6 +270,8 @@ def run() -> dict:
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
         "backtest": backtest_summary,
+        "short_candidates": short_candidates,
+        "short_tracker": short_tracker_summary,
     }
 
     # исторически JSON за бъдещия backtest модул
