@@ -1,0 +1,6045 @@
+{
+ "date": "2026-08-27",
+ "macro": {
+  "date": "2026-08-27",
+  "net_liquidity": {
+   "value": 5791.4,
+   "prev": 5917.5,
+   "trend": "down",
+   "components": {
+    "fed_balance_bn": 6745.7,
+    "rrp_bn": 0.7,
+    "tga_bn": 953.6
+   }
+  },
+  "spread_2s10s": {
+   "value": 0.47,
+   "prev_week": 0.46,
+   "status": "normal",
+   "direction": "steepening"
+  },
+  "global_signals": {
+   "DXY": {
+    "value": 99.14,
+    "chg_5d_pct": 0.24
+   },
+   "VIX": {
+    "value": 15.21,
+    "chg_5d_pct": 2.15
+   },
+   "Gold": {
+    "value": 4674.7,
+    "chg_5d_pct": 3.51
+   },
+   "Oil_WTI": {
+    "value": 81.75,
+    "chg_5d_pct": -6.92
+   },
+   "Copper": {
+    "value": 6.71,
+    "chg_5d_pct": 3.82
+   },
+   "US10Y": {
+    "value": 4.66,
+    "chg_5d_pct": 0.24
+   },
+   "MOVE": {
+    "value": 69.44,
+    "chg_5d_pct": -2.55
+   }
+  },
+  "headlines": []
+ },
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 766.08,
+    "ma50": 752.9,
+    "ma200": 706.43,
+    "above_50dma": true,
+    "above_200dma": true,
+    "status": "green",
+    "label": "SPY 766 | над 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 15.21,
+    "chg_5d": 0.32,
+    "pct_5d": 2.1,
+    "spike": false,
+    "status": "green",
+    "label": "VIX 15.2 (risk-on)"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 1.12,
+    "status": "green",
+    "label": "P/C 1.12"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.47,
+    "status": "green",
+    "label": "0.47% (нормален, steepening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": 5791.4,
+    "status": "red",
+    "label": "$5791.4 млрд (↓)"
+   },
+   {
+    "name": "MOVE (Bond Vol)",
+    "value": 69.4,
+    "delta_1w": -1.8,
+    "spike": false,
+    "status": "green",
+    "label": "MOVE 69 (-2/седмица)"
+   },
+   {
+    "name": "VIX Term Structure",
+    "value": 0.741,
+    "status": "green",
+    "label": "VIX9D 13.3 / VIX 15.2 / VIX3M 18.0 → ratio 0.74 (contango, нормално)"
+   },
+   {
+    "name": "IEI/HYG (Credit Spread)",
+    "value": 1.4606,
+    "level_percentile": 0.0,
+    "roc_10d_pct": -0.16,
+    "roc_percentile": 51.2,
+    "spike": false,
+    "status": "yellow",
+    "label": "IEI/HYG 1.461 (0. percentile) · 10д RoC -0.2% (51. percentile) (late-cycle complacency)"
+   },
+   {
+    "name": "Market Breadth (% над 40dMA)",
+    "value": 53.6,
+    "universe_size": 903,
+    "status": "green",
+    "label": "53.6% над 40dMA (здравословна ширина)",
+    "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+   }
+  ],
+  "regime": "Defensive",
+  "regime_reason": "7 зелени / 1 жълти / 1 червени от 9 видими — недостатъчно потвърждение за Offensive",
+  "sizing_factor": 0.5
+ },
+ "rotation": [
+  {
+   "etf": "GDX",
+   "sector": "Златодобив",
+   "rs_chg_4w_pct": 32.56,
+   "rs_chg_12w_pct": 15.42,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 39.21,
+   "leading": true
+  },
+  {
+   "etf": "URA",
+   "sector": "Уран/ядрена",
+   "rs_chg_4w_pct": 21.94,
+   "rs_chg_12w_pct": -6.98,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 28.07,
+   "leading": false
+  },
+  {
+   "etf": "XBI",
+   "sector": "Биотех",
+   "rs_chg_4w_pct": 8.4,
+   "rs_chg_12w_pct": 21.78,
+   "rs_at_6m_high": true,
+   "abs_chg_4w_pct": 13.85,
+   "leading": true
+  },
+  {
+   "etf": "SMH",
+   "sector": "Полупроводници",
+   "rs_chg_4w_pct": 4.95,
+   "rs_chg_12w_pct": -8.97,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 10.22,
+   "leading": false
+  },
+  {
+   "etf": "XLK",
+   "sector": "Технологии",
+   "rs_chg_4w_pct": 4.52,
+   "rs_chg_12w_pct": -3.75,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 9.77,
+   "leading": false
+  },
+  {
+   "etf": "XLE",
+   "sector": "Енергетика",
+   "rs_chg_4w_pct": 1.36,
+   "rs_chg_12w_pct": 8.48,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 6.45,
+   "leading": true
+  },
+  {
+   "etf": "XLY",
+   "sector": "Потребителски (циклични)",
+   "rs_chg_4w_pct": -0.05,
+   "rs_chg_12w_pct": -5.51,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.97,
+   "leading": false
+  },
+  {
+   "etf": "XLV",
+   "sector": "Здравеопазване",
+   "rs_chg_4w_pct": -0.6,
+   "rs_chg_12w_pct": 13.5,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 4.39,
+   "leading": false
+  },
+  {
+   "etf": "XLB",
+   "sector": "Материали",
+   "rs_chg_4w_pct": -1.23,
+   "rs_chg_12w_pct": 3.05,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 3.73,
+   "leading": false
+  },
+  {
+   "etf": "XLC",
+   "sector": "Комуникации",
+   "rs_chg_4w_pct": -2.08,
+   "rs_chg_12w_pct": -4.92,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.83,
+   "leading": false
+  },
+  {
+   "etf": "XLF",
+   "sector": "Финанси",
+   "rs_chg_4w_pct": -2.13,
+   "rs_chg_12w_pct": 12.03,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.79,
+   "leading": false
+  },
+  {
+   "etf": "TAN",
+   "sector": "Соларна",
+   "rs_chg_4w_pct": -2.58,
+   "rs_chg_12w_pct": -33.37,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.31,
+   "leading": false
+  },
+  {
+   "etf": "XLI",
+   "sector": "Индустрия",
+   "rs_chg_4w_pct": -2.8,
+   "rs_chg_12w_pct": 2.2,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.08,
+   "leading": false
+  },
+  {
+   "etf": "ITA",
+   "sector": "Отбрана",
+   "rs_chg_4w_pct": -4.73,
+   "rs_chg_12w_pct": -1.34,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.05,
+   "leading": false
+  },
+  {
+   "etf": "XLP",
+   "sector": "Потребителски (защитни)",
+   "rs_chg_4w_pct": -5.97,
+   "rs_chg_12w_pct": 1.09,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -1.25,
+   "leading": false
+  },
+  {
+   "etf": "XLRE",
+   "sector": "Недвижими имоти",
+   "rs_chg_4w_pct": -6.58,
+   "rs_chg_12w_pct": 0.63,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -1.89,
+   "leading": false
+  },
+  {
+   "etf": "XLU",
+   "sector": "Комунални услуги",
+   "rs_chg_4w_pct": -7.75,
+   "rs_chg_12w_pct": -3.61,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -3.12,
+   "leading": false
+  }
+ ],
+ "ai_macro": {
+  "macro_brief": "SPY затвори на 766 — над 50DMA и 200DMA — с широчина 53.6%, което е здравословно за настоящия режим. Золото удари +3.51% за 5 дни при Gold = $4674.7, а Copper скочи +3.82%, изпращайки едновременен сигнал за инфлационен натиск и глобално търсене на материали. WTI петролът падна рязко -6.92% за 5 дни до $81.75, натискайки енергийния сектор надолу като абсолютна доходност, но запазвайки инфлационната картина противоречива. Fed Net Liquidity се сви от $5917.5 млрд до $5791.4 млрд — TGA нараства до $953.6 млрд, което означава, че Министерството на финансите изтегля ликвидност от системата; това е структурен headwind за risk assets, обясняващ защо режимът остава Defensive въпреки зелените price-action сигнали. US10Y при 4.66% с 2s10s steepening до 0.47% очертава среда, в която кривата нормализира след инверсия — позитивно за financials дългосрочно, но текущите 4.66% на дългия край ограничават мултиплите в growth. Дневната сесия ще се движи в контекст на странична ликвидност, силен золотодобив и биотех momentum срещу тежест от скъпи облигационни доходности и свиваща се Fed ликвидност.",
+  "sector_logic": [
+   {
+    "sector": "Златодобив",
+    "etf": "GDX",
+    "chain": "Gold +3.51% за 5 дни до $4674.7 → DXY само +0.24% (слаб долар не обяснява цялото движение, значи реалното търсене на Gold като hedge срещу инфлация/геополитика е доминантно) → производителите на злато имат операционен leverage към цената на металa: при $4674 всеки долар ръст в Gold се превръща в непропорционален ръст на свободен паричен поток за миньорите → GDX RS +32.56% за 4 седмици и +15.42% за 12 седмици, с абсолютна доходност +39.21% за 4 седмици — моментумът е доминантен, trailing stops трябва да следват отблизо. Слабостта на Oil (-6.92%) намалява енергийните разходи за миньорите, допълнително разширявайки маржовете.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Биотех",
+    "etf": "XBI",
+    "chain": "2s10s spreаd steepening до 0.47% + MOVE падащ до 69.44 → bond volatility намалява → рисковата премия за дългодюрационни активи като биотех се компресира → по-евтино финансиране за клинични pipeline компании → XBI RS +8.4% за 4 седмици и +21.78% за 12 седмици с RS на 6-месечен връх (rs_at_6m_high = true) → това е единственият сектор с RS на 6M high, потвърждаващо устойчив institutional accumulation, а не само краткосрочен spike. IEI/HYG на level_percentile 0.0 (компресирани кредитни спредове) прави high-yield биотех финансирането достъпно — допълнителна верига.",
+    "horizon_weeks": 6
+   },
+   {
+    "sector": "Уран/ядрена",
+    "etf": "URA",
+    "chain": "Copper +3.82% за 5 седмици сигнализира глобално индустриално търсене, особено от енергийния преход → AI data centers и electrification policies тласкат baseload electricity demand към nuclear като единствения carbon-free dispatchable source → URA RS +21.94% за 4 седмици, абс. +28.07% — краткосрочен momentum е силен. Обаче RS за 12 седмици е -6.98% — сигнал, че 4-седмичният spike е реакционен, не структурен trend; 12W RS под нулата налага по-консервативен размер на позиция и по-тесен stop. Lipsa на rs_at_6m_high потвърждава, че влизането е в ранен стадий на потенциален обрат, а не в утвърден trend.",
+    "horizon_weeks": 3
+   },
+   {
+    "sector": "Енергетика",
+    "etf": "XLE",
+    "chain": "WTI -6.92% за 5 дни до $81.75 — силен headwind за абсолютни приходи на E&P компаниите → XLE абс. само +6.45% за 4 седмици (слабо в исторически контекст при такъв Oil move). Въпреки това XLE RS +1.36% за 4 седмици и +8.48% за 12 седмици (leading = true за 12W) → секторът outperforms SPY на 12-седмична база дори с падащ Oil, което означава, че пазарът вече е ценирал по-ниски петролни очаквания; всеки Oil bounce от $81 ще освободи допълнителен ценови потенциал. Позицията е conditional — с Oil в downtrend, XLE е hold, не агресивно добавяне.",
+    "horizon_weeks": 4
+   },
+   {
+    "sector": "Полупроводници",
+    "etf": "SMH",
+    "chain": "AI capex narrative остава интактна → Copper +3.82% (chip fabs са major copper consumers) → SMH абс. +10.22% за 4 седмици, RS +4.95% за 4 седмици. Обаче 12W RS = -8.97% (дълбоко отрицателна) и rs_at_6m_high = false — структурният RS trend е надолу; текущото 4-седмично поправяне е bounce в рамките на по-дълъг период на underperformance спрямо SPY. SMH изисква потвърждение с пробив на RS Line над 6-месечния peak преди пълна ангажираност.",
+    "horizon_weeks": 2
+   }
+  ],
+  "regime_comment": "Defensive режимът е частично оправдан, но данните показват вътрешно противоречие. В полза на Defensive: Fed Net Liquidity свита с $126.1 млрд за седмица до $5791.4 млрд — TGA $953.6 млрд е активен ликвиден drain; IEI/HYG на level_percentile 0.0 с формулировка 'late-cycle complacency' — компресирани спредове при тази среда са риск от рязка преоценка, а не сигурност. Срещу Defensive: SPY на 766 над 50DMA и 200DMA, 7 от 9 индикатора зелени, VIX 15.21 без spike, MOVE 69.44 падащ, Market Breadth 53.6%, VIX term structure в нормален contango (ratio 0.74), P/C 1.12 — price-action картината е по-скоро Moderate Offensive. Режимът се задържа Defensive не защото повечето индикатори го налагат, а защото системата изисква пълен зелен консенсус, а ликвидностният червен сигнал (TGA drain) и IEI/HYG жълтото са вето. Това е методологически консервативен, но логически последователен избор. Конкретният риск: ако TGA остане висок докато SPY продължи да расте, системата ще генерира sizing_factor=0.5 в bull market — missed opportunity cost. Препоръка: следи TGA trend седмично; ако TGA започне да пада (Treasury изразходва касата), ликвидностният сигнал ще се обърне на зелено и режимът може да ескалира към Offensive. Няма скрити null/nan стойности, всички 9 индикатора са валидни — увереността в режимната оценка е висока при текущите входни данни."
+ },
+ "action": [],
+ "watchlist": [
+  {
+   "ticker": "ROKU",
+   "price": 158.6,
+   "pivot": 159.89,
+   "pct_from_pivot": -0.81,
+   "base_type": "cup with handle",
+   "base_depth_pct": 26.9,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 145.55,
+   "ma200": 116.09,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 4075218,
+   "last_volume": 2696800,
+   "volume_ratio": 0.66,
+   "breakout_volume": false,
+   "base_low": 116.94,
+   "company": "Roku, Inc.",
+   "sector": "Communication Services",
+   "industry": "Entertainment",
+   "business_summary": "Roku, Inc., together with its subsidiaries, operates a TV streaming platform in the United States and internationally. The company operates in two segments, Platform and Devices. Its streaming platform allows users to find and access TV shows, movies, news, sports, and others, as well as offers digital advertising services. The company also sells streaming players, Roku-branded TVs, smart home products and services, audio products, and related accessories. Roku, Inc. was incorporated in 2002 and is headquartered in San Jose, California.",
+   "market_cap": 23539251200,
+   "eps_growth_yoy": 1463.5,
+   "revenue_growth_yoy": 21.9,
+   "roe": 13.1,
+   "pe": 67.489365,
+   "forward_pe": 40.428246,
+   "debt_to_equity": 16.792,
+   "inst_ownership_pct": 88.3,
+   "analyst_target": 162.3265,
+   "short_pct_float": 9.08,
+   "shares_short": 10437041,
+   "short_ratio_dtc": 3.97,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-11-05",
+    "days_to_earnings": 70,
+    "in_blackout": false,
+    "eps_estimate": 2.99,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 150.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 152.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 155.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 157.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 160.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 165.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 9.08,
+    "days_to_cover": 3.97,
+    "interpretation": "Умерен short interest (9.08%) — гориво при пробив с обем.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 4900000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "ROKU",
+    "why_now": "Вчерашните trigger условия НЕ са изпълнени: пазарният режим остава Defensive (не Neutral/Risk-On), няма дневно затваряне над $159.89 с volume_ratio ≥2.0x, и volume_ratio днес е едва 0.66x. Нито едно от трите условия не е изпълнено — не се промотира. Setup-ът е чисто технически (cup with handle, rs_status near_high), но без макро връзка към активните сектори (Zlatodobiv, Biotech, Uran, Energia). Communication Services/Entertainment не фигурира в нито една активна секторна верига. При Defensive режим ROKU е извън фокус.",
+    "business_bg": "Roku оперира TV стрийминг платформа, позволяваща на потребителите достъп до съдържание от множество стрийминг услуги. Приходите идват основно от дигитална реклама и лицензионни такси (Platform сегмент), а второстепенно — от хардуер (стрийминг плейъри, Roku TV). Компанията е ключов посредник в connected TV рекламната екосистема в САЩ.",
+    "catalysts": [
+     "Cup with handle база на <1% от pivot $159.89 — технически готов за пробив при смяна на режима",
+     "EPS ръст YoY +1463.5% (base effect, но показва рязко подобрение на рентабилността)",
+     "Short interest 9.08% — потенциал за short squeeze при пробив с обем",
+     "Next earnings 2026-11-05 (70 дни) — достатъчно пространство за swing trade без earnings риск"
+    ],
+    "risks": [
+     "Defensive пазарен режим — growth/entertainment акции системно underperform",
+     "volume_ratio 0.66x — институционалното натрупване липсва, пробивът без обем е ненадежден",
+     "Без секторна макро верига — ROKU е самотен кандидат без топлата вода на ротационен капитал",
+     "Analyst target $162.33 е само +2.3% над текущата цена — ограничен upside при текущото съотношение риск/награда"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-11-05, 70 дни напред, без blackout риск за swing позиция.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "ВСИЧКИ три едновременно (непроменени): (1) Пазарен режим се промени на Neutral или Risk-On; (2) Дневно затваряне над $159.89 с volume_ratio ≥2.0x; (3) ≥3 сесии с обем над 30-дневната средна преди пробива. Без режимна промяна — без оценка. Преоценка за staleness след 2026-09-15."
+   }
+  },
+  {
+   "ticker": "EXPD",
+   "price": 190.18,
+   "pivot": 191.79,
+   "pct_from_pivot": -0.84,
+   "base_type": "cup with handle",
+   "base_depth_pct": 18.0,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 174.52,
+   "ma200": 156.41,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 1163592,
+   "last_volume": 667200,
+   "volume_ratio": 0.57,
+   "breakout_volume": false,
+   "base_low": 157.18,
+   "company": "Expeditors International of Washington, Inc.",
+   "sector": "Industrials",
+   "industry": "Integrated Freight & Logistics",
+   "business_summary": "Expeditors International of Washington, Inc., together with its subsidiaries, provides logistics services in the Americas, North Asia, South Asia, Europe, and Middle East, Africa, and India. The company offers airfreight services, such as air freight consolidation and forwarding; ocean freight and ocean services, including ocean freight consolidation, direct ocean forwarding, and order management; customs brokerage and other services, import, intra-continental ground transportation and delivery, and warehousing and distribution services; and customs clearance, purchase order management, vendor",
+   "market_cap": 24721616896,
+   "eps_growth_yoy": 45.0,
+   "revenue_growth_yoy": 32.1,
+   "roe": 42.7,
+   "pe": 27.562317,
+   "forward_pe": 23.989605,
+   "debt_to_equity": 26.745,
+   "inst_ownership_pct": 99.7,
+   "analyst_target": 177.7143,
+   "short_pct_float": 3.77,
+   "shares_short": 4249367,
+   "short_ratio_dtc": 3.35,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-11-03",
+    "days_to_earnings": 68,
+    "in_blackout": false,
+    "eps_estimate": 7.66174,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 180.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 185.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 190.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 3.77,
+    "days_to_cover": 3.35,
+    "interpretation": "Нисък short interest (3.77%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 1400000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [
+    {
+     "tag": "OPEN✓",
+     "title": "Отворена позиция от 2026-08-13 @ $187.74 — не е нов вход."
+    }
+   ],
+   "ai": {
+    "ticker": "EXPD",
+    "why_now": "EXPD е вече в портфейла от 2026-08-13 (entry $187.74). Текущата цена $190.18 е +1.3% над entry. RS статус new_high потвърждава продължаваща relative strength. Вчерашният trigger казва изрично: управлявай съществуващата позиция, не добавяй риск. Няма нов breakout сигнал — volume_ratio е 0.57x, под pivot $191.79. Макро верига: Copper +3.82% → глобална индустриална активност → logistics throughput; но Defensive режим ограничава агресивно добавяне.",
+    "business_bg": "Expeditors International предоставя международни логистични услуги — въздушен и морски фрейт, митническо брокерство и складово дистрибуиране. Компанията е известна с изключително дисциплинирана cost structure и висока ROE (42.7%), без собствени самолети или кораби — чист asset-light модел. Работи в над 60 страни с фокус върху трансихтиански коридори.",
+    "catalysts": [
+     "RS Line на new_high — институционалното търсене е активно и продължаващо",
+     "Cup with handle база, само 0.84% под pivot $191.79 — потенциален добавъчен вход при пробив с обем",
+     "EPS ръст +45% YoY, Revenue +32.1% — фундаментите подкрепят premium оценка",
+     "Copper сила (+3.82%) → глобална индустриална активност → фрейт обеми"
+    ],
+    "risks": [
+     "Analyst target $177.71 е ПОД текущата цена $190.18 — sell-side не подкрепя текущите нива, риск от реверсия",
+     "volume_ratio 0.57x — пробивът над pivot $191.79 ще изисква значително по-висок обем за потвърждение",
+     "Defensive режим ограничава Industrials — рискът от broad market pullback засяга и EXPD",
+     "99.7% институционална собственост — почти не остава uninstituted capital за допълнителен upside"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-11-03, 68 дни напред, без blackout риск.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Вече в портфейла от 2026-08-13 (entry $187.74). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+   }
+  },
+  {
+   "ticker": "IVZ",
+   "price": 32.98,
+   "pivot": 33.31,
+   "pct_from_pivot": -0.99,
+   "base_type": "cup with handle",
+   "base_depth_pct": 22.9,
+   "weinstein_stage": 2,
+   "rs_status": "new_high",
+   "ma50": 29.58,
+   "ma200": 26.55,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 5016570,
+   "last_volume": 3622100,
+   "volume_ratio": 0.72,
+   "breakout_volume": false,
+   "base_low": 25.7,
+   "company": "Invesco Ltd.",
+   "sector": "Financial Services",
+   "industry": "Asset Management",
+   "business_summary": "Invesco Ltd. is a publicly owned investment manager. The firm provides its services to retail clients, institutional clients, high-net worth clients, public entities, corporations, unions, non-profit organizations, endowments, foundations, pension funds, financial institutions, and sovereign wealth funds. It manages separate client-focused equity and fixed income portfolios. The firm also launches equity, commodity, fixed income, multi-asset, and balanced mutual funds for its clients. It launches equity, fixed income, multi-asset, and balanced exchange-traded funds. The firm also launches and ",
+   "market_cap": 14560662528,
+   "eps_growth_yoy": 88.0,
+   "revenue_growth_yoy": 20.5,
+   "roe": -0.6,
+   "pe": null,
+   "forward_pe": 10.112439,
+   "debt_to_equity": 12.056,
+   "inst_ownership_pct": 98.1,
+   "analyst_target": 33.375,
+   "short_pct_float": 3.62,
+   "shares_short": 11091933,
+   "short_ratio_dtc": 2.16,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-10-27",
+    "days_to_earnings": 61,
+    "in_blackout": false,
+    "eps_estimate": 2.80685,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 31.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 32.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 33.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 34.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 35.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 3.62,
+    "days_to_cover": 2.16,
+    "interpretation": "Нисък short interest (3.62%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.33,
+    "available_shares": 7400000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "IVZ",
+    "why_now": "Вчерашните trigger условия НЕ са изпълнени: пазарният режим е Defensive (не Neutral/Risk-On), и критичното условие за ROE изисква earnings потвърждение на 2026-10-27. ROE е отрицателен (-0.6%) — това е фундаментален red flag за asset manager. PE е null (вероятно отрицателни earnings). EPS ръст +88% YoY може да е base effect или еднократни позиции. Analyst target $33.375 е само +1.2% над цената — незначителен upside. Без макро верига към активни сектори. IVZ е Financial Services, не фигурира в нито една активна секторна верига при Defensive режим.",
+    "business_bg": "Invesco е глобален investment manager, управляващ взаимни фондове, ETF-и и отделни портфейли за институционални и retail клиенти. Известен е с продукти като QQQ ETF (чрез лицензионно споразумение с Nasdaq). Приходите зависят критично от нивата на пазарите — AUM-базирани такси означават директна корелация с equity market performance.",
+    "catalysts": [
+     "RS статус new_high — относителна сила въпреки Defensive режим",
+     "Forward PE 10.1x е атрактивна оценка при потенциално нормализиране на earnings",
+     "EPS estimate $2.81 на earnings 2026-10-27 — ако се потвърди позитивен ROE, setup се активира",
+     "Cup with handle, само 0.99% под pivot $33.31"
+    ],
+    "risks": [
+     "ROE -0.6% е критичен red flag — отрицателна възвращаемост на собствения капитал при asset manager е сериозен структурен проблем",
+     "PE null — вероятно отрицателни trailing earnings; forward PE разчита на значително подобрение",
+     "Analyst target $33.375 само +1.2% над цената — крайно ограничен upside",
+     "Defensive режим + Financial Services = двоен headwind; AUM тактически уязвим при market drawdown"
+    ],
+    "earnings_call": "не сега — earnings 2026-10-27 (61 дни), но ROE потвърждение е задължително условие преди всякакъв вход.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "ВСИЧКИ три едновременно (непроменени, ROE условието е критично): (1) Пазарен режим Neutral или Risk-On; (2) Earnings на 2026-10-27 потвърди ROE положително с EPS ≥$2.81; (3) Дневно затваряне над $33.31 с volume_ratio ≥1.8x в рамките на 5 сесии след earnings. Без ROE позитивен потвърден на earnings — без вход при никакви условия."
+   }
+  },
+  {
+   "ticker": "VLO",
+   "price": 348.03,
+   "pivot": 353.0,
+   "pct_from_pivot": -1.41,
+   "base_type": "deep base",
+   "base_depth_pct": 33.3,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 297.89,
+   "ma200": 231.48,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2859758,
+   "last_volume": 2156500,
+   "volume_ratio": 0.75,
+   "breakout_volume": false,
+   "base_low": 235.39,
+   "company": "Valero Energy Corporation",
+   "sector": "Energy",
+   "industry": "Oil & Gas Refining & Marketing",
+   "business_summary": "Valero Energy Corporation manufactures, markets, and sells petroleum-based and low-carbon liquid transportation fuels and petrochemical products in the United States, Canada, the United Kingdom, Ireland, Latin America, Mexico, Peru, and internationally. It operates through three segments: Refining, Renewable Diesel, and Ethanol. The company produces California Reformulated Gasoline Blendstock for Oxygenate Blending (CARBOB) and Conventional Blendstock for Oxygenate Blending (CBOB) gasolines, CARB diesel, diesel, jet fuel, heating oil, and asphalt; feedstocks; aromatics; sulfur and residual fue",
+   "market_cap": 100207394816,
+   "eps_growth_yoy": 421.0,
+   "revenue_growth_yoy": 51.7,
+   "roe": 27.6,
+   "pe": 14.205306,
+   "forward_pe": 11.36022,
+   "debt_to_equity": 40.148,
+   "inst_ownership_pct": 87.1,
+   "analyst_target": 317.89474,
+   "short_pct_float": 3.89,
+   "shares_short": 9649639,
+   "short_ratio_dtc": 3.42,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-10-22",
+    "days_to_earnings": 56,
+    "in_blackout": false,
+    "eps_estimate": 43.59597,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 325.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 330.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 335.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 340.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 345.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 350.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 3.89,
+    "days_to_cover": 3.42,
+    "interpretation": "Нисък short interest (3.89%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 3200000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [
+    {
+     "tag": "MF✓",
+     "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."
+    },
+    {
+     "tag": "OPEN✓",
+     "title": "Отворена позиция от 2026-08-12 @ $324.37 — не е нов вход."
+    }
+   ],
+   "ai": {
+    "ticker": "VLO",
+    "why_now": "VLO е вече в портфейла от 2026-08-12 (entry $324.37). Текущата цена $348.03 е +7.3% над entry — trade работи. Вчерашният trigger казва изрично: управлявай съществуващата позиция, не добавяй риск. Макро верига: XLE RS +8.48% за 12W (leading=true) → пазарът е цениран по-нисък Oil; VLO като refiner има crack spread exposure, различен от E&P. Рефинирането може да се възползва от по-евтин crude input. Но deep base (33.3% дълбочина) и Oil в downtrend (-6.92%) са headwind-и. Analog target $317.89 е под entry — sell-side е негативен.",
+    "business_bg": "Valero Energy е един от най-големите нефтопреработватели в Северна Америка, оперирайки рафинерии в САЩ, Канада и Великобритания. Приходите идват от преработка на суров петрол в бензин, дизел, авиационно гориво и петрохимикали. Компанията развива и Renewable Diesel и Ethanol сегменти за диверсификация към нисковъглеродни горива.",
+    "catalysts": [
+     "Crack spreads могат да се разширят при падащ crude (по-евтин input → по-висок refining margin)",
+     "EPS ръст +421% YoY — изключително силна база",
+     "Forward PE 11.4x при ROE 27.6% — атрактивна оценка за качествен бизнес",
+     "Oil bounce от $81 ниво би освободил допълнителен ценови потенциал"
+    ],
+    "risks": [
+     "Analyst target $317.89 е 8.7% ПОД текущата цена — значителен sell-side headwind",
+     "WTI -6.92% за 5 дни — директен приходен натиск върху рафиниращите маржове при свит crack spread",
+     "Deep base 33.3% дълбочина — такива бази имат по-висок failure rate при пробив",
+     "Defensive режим + Oil downtrend = двоен хедуинд за Energy позиции"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-10-22, 56 дни напред. Достатъчно пространство, но наближава.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Вече в портфейла от 2026-08-12 (entry $324.37). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+   }
+  },
+  {
+   "ticker": "MPC",
+   "price": 362.27,
+   "pivot": 367.6,
+   "pct_from_pivot": -1.45,
+   "base_type": "deep base",
+   "base_depth_pct": 34.1,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 302.9,
+   "ma200": 233.82,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2354842,
+   "last_volume": 2089400,
+   "volume_ratio": 0.89,
+   "breakout_volume": false,
+   "base_low": 242.25,
+   "company": "Marathon Petroleum Corporation",
+   "sector": "Energy",
+   "industry": "Oil & Gas Refining & Marketing",
+   "business_summary": "Marathon Petroleum Corporation, together with its subsidiaries, operates as an integrated downstream energy company in the United States. The company operates through three segments: Refining & Marketing; Midstream; and Renewable Diesel. The Refining & Marketing segment refines crude oil and other feedstocks at its refineries in the Gulf Coast, Mid-Continent, and West Coast regions of the United States; and purchases refined products and ethanol for resale and distributes refined products through transportation, storage, distribution, and marketing services. Its refined products include transp",
+   "market_cap": 101734383616,
+   "eps_growth_yoy": 322.5,
+   "revenue_growth_yoy": 53.7,
+   "roe": 42.1,
+   "pe": 12.3011875,
+   "forward_pe": 11.249981,
+   "debt_to_equity": 133.328,
+   "inst_ownership_pct": 79.6,
+   "analyst_target": 324.55557,
+   "short_pct_float": 2.7,
+   "shares_short": 6521760,
+   "short_ratio_dtc": 2.85,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-11-03",
+    "days_to_earnings": 68,
+    "in_blackout": false,
+    "eps_estimate": 50.23425,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 340.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 350.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 360.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 370.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 380.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 2.7,
+    "days_to_cover": 2.85,
+    "interpretation": "Нисък short interest (2.7%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 2700000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [
+    {
+     "tag": "MF✓",
+     "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."
+    },
+    {
+     "tag": "OPEN✓",
+     "title": "Отворена позиция от 2026-08-12 @ $336.45 — не е нов вход."
+    }
+   ],
+   "ai": {
+    "ticker": "MPC",
+    "why_now": "MPC е вече в портфейла от 2026-08-12 (entry $336.45). Текущата цена $362.27 е +7.7% над entry — trade работи. Вчерашният trigger казва изрично: управлявай съществуващата позиция, не добавяй риск. Макро верига е идентична с VLO — XLE sector play, refiner с crack spread exposure. MPC има по-висок ROE (42.1% vs VLO 27.6%) и по-нисък PE (12.3x) — по-качествен profiler при сравнима оценка. Но analyst target $324.56 е 10.4% ПОД текущата цена — sell-side е силно негативен. Deep base 34.1% е идентичен red flag с VLO.",
+    "business_bg": "Marathon Petroleum е интегрирана downstream енергийна компания с рафинерии в Gulf Coast, Mid-Continent и West Coast региони на САЩ. Чрез дъщерното MPLX LP оперира midstream тръбопроводна и съхранителна инфраструктура. Renewable Diesel сегментът диверсифицира бизнеса към нисковъглеродни горива.",
+    "catalysts": [
+     "ROE 42.1% е изключителен за сектора — висококачествен capital allocator",
+     "MPLX midstream дивидентен поток осигурява partial insulation от Oil price volatility",
+     "EPS ръст +322.5% YoY при Forward PE 11.25x — оценката е компресирана спрямо ръста",
+     "Crack spread expansion при евтин crude input е позитивен за refining margins"
+    ],
+    "risks": [
+     "Analyst target $324.56 е 10.4% ПОД текущата цена $362.27 — критично негативен sell-side сигнал",
+     "WTI -6.92% — при нарастващ crude дефицит crack spreads могат да се свият рязко",
+     "Deep base 34.1% — структурна слабост, по-висок вероятност за failed breakout",
+     "Институционална собственост 79.6% — относително ниска, по-малко buffer при sell-off"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-11-03, 68 дни напред, без blackout риск.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Вече в портфейла от 2026-08-12 (entry $336.45). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+   }
+  },
+  {
+   "ticker": "AMGN",
+   "price": 440.34,
+   "pivot": 447.03,
+   "pct_from_pivot": -1.5,
+   "base_type": "cup with handle",
+   "base_depth_pct": 27.0,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 382.26,
+   "ma200": 350.26,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2654842,
+   "last_volume": 2289000,
+   "volume_ratio": 0.86,
+   "breakout_volume": false,
+   "base_low": 326.35,
+   "company": "Amgen Inc.",
+   "sector": "Healthcare",
+   "industry": "Drug Manufacturers - General",
+   "business_summary": "Amgen Inc. discovers, develops, manufactures, and delivers human therapeutics worldwide. The company's principal products include Enbrel for the treatment of rheumatoid arthritis, plaque psoriasis, and psoriatic arthritis; Otezla for the treatment of adult patients with plaque psoriasis, psoriatic arthritis, and oral ulcers associated with Behçet's disease; Prolia to treat postmenopausal women with osteoporosis; XGEVA for skeletal-related events prevention; Repatha, which reduces the risks of myocardial infarction, stroke, and coronary revascularization; Nplate for the treatment of patients wi",
+   "market_cap": 238061895680,
+   "eps_growth_yoy": 65.9,
+   "revenue_growth_yoy": 9.5,
+   "roe": 91.5,
+   "pe": 27.469744,
+   "forward_pe": 18.048504,
+   "debt_to_equity": 490.281,
+   "inst_ownership_pct": 85.1,
+   "analyst_target": 388.48276,
+   "short_pct_float": 2.23,
+   "shares_short": 12039849,
+   "short_ratio_dtc": 4.58,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-11-03",
+    "days_to_earnings": 68,
+    "in_blackout": false,
+    "eps_estimate": 23.04147,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 410.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 415.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 420.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 425.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 430.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 435.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 2.23,
+    "days_to_cover": 4.58,
+    "interpretation": "Нисък short interest (2.23%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.28,
+    "available_shares": 2500000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [
+    {
+     "tag": "OPEN✓",
+     "title": "Отворена позиция от 2026-08-25 @ $445.87 — не е нов вход."
+    }
+   ],
+   "ai": {
+    "ticker": "AMGN",
+    "why_now": "Вчерашният trigger: 'Вече в портфейла от 2026-08-25 (entry $445.87) — управлявай съществуващата позиция, не добавяй риск.' Цената е $440.34 — под entry-то и под pivot $447.03. Няма нов пробив, няма изпълнен trigger. Секторът Healthcare/Biotech е в активна секторна логика (XBI RS на 6M high), но AMGN е large-cap pharma с marketed products, не клинична pipeline компания — макро веригата за XBI не се прилага директно. Setup-ът е чисто технически: cup with handle, RS near_high, но volume_ratio 0.86 (под 1x) и без breakout потвърждение.",
+    "business_bg": "Amgen е водещ биофармацевтичен производител, фокусиран върху лечения за ревматоидни заболявания, остеопороза, сърдечно-съдови рискове и онкология. Основни продукти включват Enbrel, Repatha, Prolia и Otezla. Компанията генерира стабилни парични потоци от зряло портфолио с растящи biosimilar рискове.",
+    "catalysts": [
+     "EPS ръст +65.9% YoY при forward P/E 18x — компресия на мултипъл при следващи позитивни данни",
+     "Потенциални pipeline новини (Tarlatamab, MariTide за затлъстяване) преди earnings на 2026-11-03",
+     "Defensive режим фаворизира качествени healthcare имена с ниска цикличност",
+     "ROE 91.5% и институционално участие 85.1% — силна фундаментална основа при всеки pullback"
+    ],
+    "risks": [
+     "Цената е под entry $445.87 — позицията е на загуба, добавянето увеличава среден вход в слабост",
+     "Analyst target $388.48 е значително под текущата цена — институционален консенсус не подкрепя upside",
+     "Volume_ratio 0.86 — липса на институционален demand при текущите нива",
+     "Base depth 27% е значителна — при пробив провал рискът е пропорционален"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-11-03 (68 дни), без blackout риск сега, но не добавяй нова позиция преди потвърждение на пробив над $447.03.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Вече в портфейла от 2026-08-25 (entry $445.87). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+   }
+  },
+  {
+   "ticker": "IBKR",
+   "price": 97.02,
+   "pivot": 98.75,
+   "pct_from_pivot": -1.75,
+   "base_type": "cup with handle",
+   "base_depth_pct": 18.1,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 92.12,
+   "ma200": 77.95,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 4575808,
+   "last_volume": 3031500,
+   "volume_ratio": 0.66,
+   "breakout_volume": false,
+   "base_low": 80.87,
+   "company": "Interactive Brokers Group, Inc.",
+   "sector": "Financial Services",
+   "industry": "Capital Markets",
+   "business_summary": "Interactive Brokers Group, Inc. operates as an automated electronic broker in the United States and internationally. The company engages in the execution, clearance, and settlement of trades in stocks, options, futures, foreign exchange instruments, bonds, precious metals, and cryptocurrencies; and the company provides custody, prime brokerage, securities, and margin lending services. It also offers custody and service accounts for hedge and mutual funds, ETFs, registered investment advisors, proprietary trading groups, introducing brokers, and individual investors. In addition, the company pr",
+   "market_cap": 165304172544,
+   "eps_growth_yoy": 39.3,
+   "revenue_growth_yoy": 26.3,
+   "roe": 24.0,
+   "pe": 38.963856,
+   "forward_pe": 30.476082,
+   "debt_to_equity": 205.748,
+   "inst_ownership_pct": 88.6,
+   "analyst_target": 106.13333,
+   "short_pct_float": 2.07,
+   "shares_short": 8095922,
+   "short_ratio_dtc": 1.75,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-10-20",
+    "days_to_earnings": 54,
+    "in_blackout": false,
+    "eps_estimate": 2.70912,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 91.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 92.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 93.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 94.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 95.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 96.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 2.07,
+    "days_to_cover": 1.75,
+    "interpretation": "Нисък short interest (2.07%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 4200000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [
+    {
+     "tag": "OPEN✓",
+     "title": "Отворена позиция от 2026-06-18 @ $97.68 — не е нов вход."
+    }
+   ],
+   "ai": {
+    "ticker": "IBKR",
+    "why_now": "Вчерашният trigger: 'Вече в портфейла от 2026-06-18 (entry $97.68) — управлявай съществуващата позиция, не добавяй риск.' Цената е $97.02 — под entry и под pivot $98.75. Trigger не е изпълнен. Financial Services не е в активна секторна логика за Defensive режим. Макро връзка: steepening крива (2s10s 0.47%) и падащ MOVE (69.44) са умерено позитивни за брокерски бизнес модел (по-висок net interest margin), но това е косвена, не доминантна верига. Setup е чисто технически с cup with handle на 18.1% дълбочина.",
+    "business_bg": "Interactive Brokers е автоматизиран електронен брокер, предлагащ изпълнение на търговия с акции, опции, фючърси, форекс, облигации и криптовалути. Компанията обслужва хедж фондове, институционални клиенти и индивидуални инвеститори глобално. Приходите зависят значително от лихвени нива и обем на търговия.",
+    "catalysts": [
+     "Steepening крива (2s10s 0.47%) разширява net interest margin от margin lending бизнеса",
+     "EPS ръст +39.3% YoY, revenue +26.3% — органичен растеж без разчитане на цикличност",
+     "Earnings на 2026-10-20 (54 дни) — достатъчно прозорец за позиционен setup преди отчет",
+     "Analyst target $106.13 над текущата цена — умерен институционален upside консенсус"
+    ],
+    "risks": [
+     "Цената под entry $97.68 — позицията е на загуба, добавянето влошава средната цена",
+     "Volume_ratio 0.66 — най-ниски обеми в листата, сигнал за липса на institutional conviction",
+     "Defensive режим не фаворизира Capital Markets — секторна противоречивост",
+     "P/E 39x при forward 30x е агресивно оценено за брокерски бизнес в несигурна макро среда"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-10-20 (54 дни), без blackout риск сега.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Вече в портфейла от 2026-06-18 (entry $97.68). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+   }
+  },
+  {
+   "ticker": "DINO",
+   "price": 96.52,
+   "pivot": 98.39,
+   "pct_from_pivot": -1.9,
+   "base_type": "deep base",
+   "base_depth_pct": 34.8,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 82.74,
+   "ma200": 63.15,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2718598,
+   "last_volume": 2409900,
+   "volume_ratio": 0.89,
+   "breakout_volume": false,
+   "base_low": 64.1,
+   "company": "HF Sinclair Corporation",
+   "sector": "Energy",
+   "industry": "Oil & Gas Refining & Marketing",
+   "business_summary": "HF Sinclair Corporation operates as an independent energy company in the United States. It operates through five segments: Refining, Renewables, Marketing, Lubricants & Specialties, and Midstream. The company produces and markets gasoline, diesel fuel, jet fuel, renewable diesel, specialty lubricant products, specialty chemicals, commodity and modified asphalt products, and others. It also owns and operates refineries located in Kansas, Oklahoma, New Mexico, Wyoming, Washington, and Utah, as well as markets its refined products principally in the Southwest United States and Rocky Mountains, Pa",
+   "market_cap": 17159697408,
+   "eps_growth_yoy": 328.8,
+   "revenue_growth_yoy": 53.2,
+   "roe": 19.5,
+   "pe": 8.887661,
+   "forward_pe": 10.297092,
+   "debt_to_equity": 32.261,
+   "inst_ownership_pct": 89.6,
+   "analyst_target": 90.8,
+   "short_pct_float": 5.32,
+   "shares_short": 8421439,
+   "short_ratio_dtc": 2.75,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-10-29",
+    "days_to_earnings": 63,
+    "in_blackout": false,
+    "eps_estimate": 13.48029,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 90.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 92.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 95.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 97.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 100.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 5.32,
+    "days_to_cover": 2.75,
+    "interpretation": "Нисък short interest (5.32%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.31,
+    "available_shares": 2700000,
+    "fee_trend": "падащ",
+    "interpretation": "Borrow rate 0.3% — нормално, евтино за шортиране, без особен натиск. Падащ fee + ограничено наличие → част от шортистите се покриват."
+   },
+   "markers": [
+    {
+     "tag": "MF✓",
+     "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."
+    }
+   ],
+   "ai": {
+    "ticker": "DINO",
+    "why_now": "Setup е технически с слаба секторна подкрепа. XLE е в активна секторна логика като conditional hold (не агресивно добавяне) при WTI -6.92% в downtrend. DINO е рафинерия — бизнес моделът има обратна корелация с crude spread (crack spread), не директно с WTI цена, но падащ Oil все пак притиска sentiment и приходи. EPS ръст +328.8% YoY изглежда екстремен, но е вероятно от ниска база или едноkратен ефект — forward P/E 10.3x срещу trailing 8.9x не сигнализира ускорен ръст. Deep base 34.8% дълбочина е сериозен red flag — толкова дълбоки бази имат значително по-ниска breakout success rate.",
+    "business_bg": "HF Sinclair е независима рафинерска компания в САЩ, преработваща суров нефт в бензин, дизел, авиационно гориво и специализирани смазочни продукти. Компанията оперира рафинерии в Kansas, Oklahoma, Wyoming и Utah, с допълнителен бизнес в renewables и midstream. Приходите са силно зависими от crack spread маржовете.",
+    "catalysts": [
+     "Падащ Oil (-6.92%) компресира input cost за рафинерии — потенциално разширяване на crack spread",
+     "EPS ръст +328.8% YoY демонстрира значително подобрение в оперативния leverage",
+     "Институционална собственост 89.6% — силна база на дългосрочни holders",
+     "Analyst target $90.8 е под текущата цена $96.52 — lipsa на upside консенсус (неутрален фактор)"
+    ],
+    "risks": [
+     "Analyst target $90.8 е под текущата цена — консенсусът НЯМА upside, červen флаг за нова позиция",
+     "Deep base 34.8% — статистически по-нисък процент успешни пробиви, изисква 2x нормален volume",
+     "WTI в downtrend ($81.75) — секторна логика е conditional hold, не агресивно добавяне",
+     "Forward P/E 10.3x > trailing 8.9x — пазарът очаква забавяне на EPS ръста"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-10-29 (63 дни), без blackout риск.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Три условия едновременно: (1) WTI стабилизиране над $84 за ≥3 сесии; (2) Analyst target ревизия над $98 (текущият $90.8 е под цената — deal breaker); (3) Затваряне над $98.39 с volume_ratio ≥2.0x заради deep base дълбочина."
+   }
+  },
+  {
+   "ticker": "PSX",
+   "price": 242.23,
+   "pivot": 246.95,
+   "pct_from_pivot": -1.91,
+   "base_type": "deep base",
+   "base_depth_pct": 33.1,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 202.13,
+   "ma200": 166.52,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 2803032,
+   "last_volume": 2235000,
+   "volume_ratio": 0.8,
+   "breakout_volume": false,
+   "base_low": 165.26,
+   "company": "Phillips 66",
+   "sector": "Energy",
+   "industry": "Oil & Gas Refining & Marketing",
+   "business_summary": "Phillips 66 operates as an integrated downstream energy provider in the United States, the United Kingdom, Germany, and internationally. It operates through five segments: Midstream, Chemicals, Refining, Marketing and Specialties (M&S), and Renewable Fuels. The Midstream segment provides crude oil and refined petroleum product transportation, terminaling, and storage services, as well as natural gas and natural gas liquids (NGL) gathering, processing, transportation, fractionation, storage and marketing services. It also exports liquefied petroleum gas. The Chemicals segment produces and marke",
+   "market_cap": 97118486528,
+   "eps_growth_yoy": 338.7,
+   "revenue_growth_yoy": 53.1,
+   "roe": 23.5,
+   "pe": 13.50976,
+   "forward_pe": 11.707774,
+   "debt_to_equity": 62.884,
+   "inst_ownership_pct": 80.6,
+   "analyst_target": 222.0,
+   "short_pct_float": 1.43,
+   "shares_short": 4945738,
+   "short_ratio_dtc": 1.9,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-10-29",
+    "days_to_earnings": 63,
+    "in_blackout": false,
+    "eps_estimate": 25.16354,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 230.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 235.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 240.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 245.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 250.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 255.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 1.43,
+    "days_to_cover": 1.9,
+    "interpretation": "Нисък short interest (1.43%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.25,
+    "available_shares": 5600000,
+    "fee_trend": "стабилен",
+    "interpretation": "Borrow rate 0.2% — нормално, евтино за шортиране, без особен натиск."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "PSX",
+    "why_now": "Вчерашният trigger: четири условия — (1) затваряне над $246.95 с volume_ratio ≥1.75x; (2) ≥2 analyst upgrades с target над $245; (3) WTI над $85 за ≥3 сесии; (4) analyst target ревизия над $240 преди earnings иначе пропусни. Нито едно условие не е изпълнено: цена $242.23 (под $246.95), volume_ratio 0.8 (далеч под 1.75x), WTI е $81.75 (под $85), analyst target е $222 (далеч под $240). Всички четири условия са провалени. Без нов катализатор или ревизия — setup остава Watchlist по изрично посочената логика.",
+    "business_bg": "Phillips 66 е интегриран downstream енергиен провайдър с операции в рафиниране, petrochemicals (чрез CPChem JV с Chevron), midstream и renewable fuels. Компанията генерира диверсифицирани приходи от различни downstream сегменти, което я прави по-малко уязвима от pure-play рафинерии. Оперира глобално с фокус в САЩ, Великобритания и Германия.",
+    "catalysts": [
+     "Deep base 33.1% с EPS ръст +338.7% — при нормализиране на Oil потенциал за мощен breakout",
+     "Диверсификация (Chemicals + Midstream) буферира от WTI директна корелация",
+     "Forward P/E 11.7x е привлекателно ниско за качествена downstream компания",
+     "Институционална собственост 80.6% — по-ниска от конкурентите, потенциал за accumulation"
+    ],
+    "risks": [
+     "Analyst target $222 е 8.4% ПОД текущата цена $242.23 — институционалният консенсус е bearish",
+     "WTI $81.75 в downtrend — главен headwind за всички downstream имена",
+     "Deep base 34.8% — исторически по-нисък success rate, изисква изключителен обем при breakout",
+     "Всички четири вчерашни trigger условия са провалени едновременно"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-10-29 (63 дни), без blackout риск, но trigger условията трябва да се изпълнят преди earnings иначе пропусни изцяло.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Всички четири оригинални условия трябва да се изпълнят едновременно: (1) Затваряне над $246.95 с volume_ratio ≥1.75x; (2) ≥2 analyst upgrades с target над $245; (3) WTI над $85 за ≥3 последователни сесии; (4) Analyst target ревизия над $240 преди earnings — иначе пропусни тикъра изцяло."
+   }
+  },
+  {
+   "ticker": "ABNB",
+   "price": 188.07,
+   "pivot": 193.45,
+   "pct_from_pivot": -2.78,
+   "base_type": "deep base",
+   "base_depth_pct": 33.3,
+   "weinstein_stage": 2,
+   "rs_status": "near_high",
+   "ma50": 156.93,
+   "ma200": 137.19,
+   "above_ma50": true,
+   "above_ma200": true,
+   "avg_volume_50d": 4396602,
+   "last_volume": 3369500,
+   "volume_ratio": 0.77,
+   "breakout_volume": false,
+   "base_low": 129.1,
+   "company": "Airbnb, Inc.",
+   "sector": "Consumer Cyclical",
+   "industry": "Travel Services",
+   "business_summary": "Airbnb, Inc., together with its subsidiaries, operates a platform for stays, experiences, and services worldwide. The company's marketplace connects hosts and guests online or through mobile devices to book spaces, experiences, and services. It also offers gift cards. The company was formerly known as AirBed & Breakfast, Inc. and changed its name to Airbnb, Inc. in November 2010. Airbnb, Inc. was founded in 2007 and is headquartered in San Francisco, California.",
+   "market_cap": 112613621760,
+   "eps_growth_yoy": 27.1,
+   "revenue_growth_yoy": 16.5,
+   "roe": 34.5,
+   "pe": 43.43418,
+   "forward_pe": 30.636131,
+   "debt_to_equity": 32.004,
+   "inst_ownership_pct": 89.4,
+   "analyst_target": 176.75641,
+   "short_pct_float": 3.11,
+   "shares_short": 12860433,
+   "short_ratio_dtc": 2.69,
+   "macro_tailwind": false,
+   "earnings": {
+    "next_earnings": "2026-11-05",
+    "days_to_earnings": 70,
+    "in_blackout": false,
+    "eps_estimate": 5.27835,
+    "recap": null
+   },
+   "options": {
+    "iv": null,
+    "iv_rank": null,
+    "iv_rank_quality": null,
+    "put_call_ratio": null,
+    "oi_near_money": [
+     {
+      "strike": 175.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 180.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 182.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 185.0,
+      "call_oi": 0
+     },
+     {
+      "strike": 187.5,
+      "call_oi": 0
+     },
+     {
+      "strike": 190.0,
+      "call_oi": 0
+     }
+    ],
+    "strategy": "акции",
+    "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+   },
+   "short_view": {
+    "short_pct_float": 3.11,
+    "days_to_cover": 2.69,
+    "interpretation": "Нисък short interest (3.11%) — без squeeze динамика, но и без активна опозиция.",
+    "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "borrow": {
+    "available": true,
+    "fee_rate": 0.41,
+    "available_shares": 9700000,
+    "fee_trend": "покачващ",
+    "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск. Покачващ fee → натискът върху шортистите расте."
+   },
+   "markers": [],
+   "ai": {
+    "ticker": "ABNB",
+    "why_now": "Вчерашният trigger: три условия — (1) режим промяна към Neutral/Risk-On (задължително); (2) затваряне над $193.45 с volume_ratio ≥2.0x; (3) ≥2 analyst target ревизии над $190. Нито едно условие не е изпълнено: режимът е Defensive (не Neutral/Risk-On), цена $188.07 (под $193.45), volume_ratio 0.77 (далеч под 2.0x), analyst target $176.75 е под текущата цена. Consumer Cyclical/Travel в Defensive режим е директно противоречие на пазарния контекст. Setup-ът е структурно слаб за текущия режим.",
+    "business_bg": "Airbnb оперира глобална платформа за краткосрочно отдаване под наем на жилища и преживявания, свързваща домакини и гости. Приходите са процент от транзакционния обем и са силно зависими от туристическото търсене и consumer discretionary разходи. Компанията е profitably растяща, но чувствителна към икономически цикъл.",
+    "catalysts": [
+     "EPS ръст +27.1% YoY при разширяващи се маржове — качествен растеж",
+     "ROE 34.5% демонстрира ефективно използване на капитала",
+     "Институционална собственост 89.4% — силна база, потенциал за accumulation при режим промяна",
+     "Forward P/E 30.6x е разумно за ръстов профил при нормализиране на macro sentiment"
+    ],
+    "risks": [
+     "Defensive режим е директно противоречие — Consumer Cyclical/Travel е първата жертва при risk-off",
+     "Analyst target $176.75 е 6% ПОД текущата цена — институционалният консенсус не подкрепя позиция",
+     "Deep base 33.3% с volume_ratio 0.77 — липса на институционален интерес при текущите нива",
+     "Режим промяна към Neutral/Risk-On е задължително условие — без него trade-ът е невалиден"
+    ],
+    "earnings_call": "след earnings — next earnings 2026-11-05 (70 дни), без blackout риск, но режимът забранява влизане сега.",
+    "classification": "Watchlist",
+    "watchlist_trigger": "Три условия едновременно (непроменени): (1) Пазарен режим промяна към Neutral или Risk-On — задължително; (2) Затваряне над $193.45 с volume_ratio ≥2.0x (предпочитано ≥2.5x); (3) Минимум 2 analyst target ревизии над $190 (текущият $176.75 е deal breaker)."
+   }
+  }
+ ],
+ "theses": [
+  {
+   "name": "Финанси при стръмна крива",
+   "tickers": [
+    "JPM",
+    "BAC"
+   ],
+   "status": "active",
+   "chain": "Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.",
+   "trigger_reason": "2s10s спредът се разкривява (0.47%)."
+  },
+  {
+   "name": "Ядрена енергия",
+   "tickers": [
+    "VST",
+    "CEG",
+    "OKLO",
+    "CCJ",
+    "DNN",
+    "NNE"
+   ],
+   "status": "structural",
+   "chain": "AI data center-ите гладуват за стабилна базова мощност 24/7 → ядрената е единственият въглеродно-неутрален източник, който я дава → дългосрочно търсене на уран и реакторни оператори.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Полупроводници и AI инфраструктура",
+   "tickers": [
+    "AVGO",
+    "AMAT",
+    "MCHP"
+   ],
+   "status": "structural",
+   "chain": "AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Въглища и LNG",
+   "tickers": [
+    "BTU",
+    "HCC",
+    "AMR",
+    "CEIX",
+    "TELL",
+    "LNG"
+   ],
+   "status": "watch",
+   "chain": "Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Отбрана и дронове",
+   "tickers": [
+    "LMT",
+    "RTX",
+    "NOC",
+    "SWMR"
+   ],
+   "status": "watch",
+   "chain": "Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.",
+   "trigger_reason": ""
+  },
+  {
+   "name": "Крипто регулация (CLARITY Act)",
+   "tickers": [
+    "CRCL",
+    "COIN",
+    "HOOD",
+    "BLSH"
+   ],
+   "status": "watch",
+   "chain": "Ясна законодателна рамка (CLARITY Act) → институциите получават регулаторна сигурност → приток на капитал към регулирани крипто борси и custody → борсите и брокерите печелят на обем.",
+   "trigger_reason": ""
+  }
+ ],
+ "unusual_options": [
+  {
+   "ticker": "SPCX",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 391,229 ≈ 7824.6× OI (екстремна, необичайна активност). Обем на акцията 0.52× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "SNDK",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 113,994 ≈ 1999.9× OI (екстремна, необичайна активност). Обем на акцията 0.58× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "XOM",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 19,168 ≈ 259.0× OI (екстремна, необичайна активност). Обем на акцията 1.04× 20д средна (нормално)."
+  },
+  {
+   "ticker": "WBD",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 1,158 ≈ 6.2× OI (екстремна, необичайна активност). Обем на акцията 0.6× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "CPRT",
+   "call_put_bias": "mixed",
+   "note": "Балансиран call/put обем. Опц. обем 1,094 ≈ 2.0× OI (силно ново позициониране). Обем на акцията 0.51× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "KDP",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 1,094 ≈ 1.2× OI (леко повишена активност). Обем на акцията 0.6× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "NVDA",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 1,378,552. Обем на акцията 1.51× 20д средна (повишен интерес)."
+  },
+  {
+   "ticker": "INTC",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 182,157. Обем на акцията 0.71× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "SMCI",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 89,836. Обем на акцията 0.61× 20д средна (под нормалното)."
+  },
+  {
+   "ticker": "AAPL",
+   "call_put_bias": "calls",
+   "note": "Обемът е предимно в кол опции — bullish наклон. Опц. обем 320,807. Обем на акцията 0.68× 20д средна (под нормалното)."
+  }
+ ],
+ "splits": [
+  {
+   "ticker": "IESC",
+   "company": "IES Holdings, Inc.",
+   "date": "2026-08-24",
+   "ratio": "2:1",
+   "split_type": "normal",
+   "date_human": "Aug 24, 2026",
+   "price": 331.48,
+   "market_cap": 13209051491.551025
+  },
+  {
+   "ticker": "REAX",
+   "company": "Real REMAX Group Inc.",
+   "date": "2026-08-25",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Aug 25, 2026",
+   "price": 26.59,
+   "market_cap": 579513471.5855637
+  },
+  {
+   "ticker": "GPMXY",
+   "company": "Grupo Mexico S.A. ADR",
+   "date": "2026-08-27",
+   "ratio": "0%",
+   "split_type": null,
+   "date_human": "Aug 27, 2026",
+   "price": 28.22,
+   "market_cap": 110430222182.09784
+  }
+ ],
+ "superinvestor_moves": [
+  {
+   "ticker": "AAPL",
+   "company": "APPLE INC",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "нова позиция",
+   "value": 65950296923.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AXP",
+   "company": "AMERICAN EXPRESS CO",
+   "manager": "Уорън Бъфет · Berkshire Hathaway",
+   "action": "нова позиция",
+   "value": 51282319275.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true,
+   "managers": [
+    "Уорън Бъфет · Berkshire Hathaway"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "GE AEROSPACE",
+   "company": "GE AEROSPACE",
+   "manager": "Крис Хон · TCI Fund Management",
+   "action": "нова позиция",
+   "value": 17725353519.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": false,
+   "managers": [
+    "Крис Хон · TCI Fund Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "V",
+   "company": "VISA INC",
+   "manager": "Крис Хон · TCI Fund Management",
+   "action": "нова позиция",
+   "value": 10462232091.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true,
+   "managers": [
+    "Крис Хон · TCI Fund Management",
+    "Джон Армитидж · Egerton Capital"
+   ],
+   "count": 2
+  },
+  {
+   "ticker": "BROOKFIELD CORP",
+   "company": "BROOKFIELD CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "нова позиция",
+   "value": 2415946008.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": false,
+   "managers": [
+    "Бил Акман · Pershing Square"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "AMZN",
+   "company": "AMAZON COM INC",
+   "manager": "Бил Акман · Pershing Square",
+   "action": "нова позиция",
+   "value": 2385104083.0,
+   "period": "13F · 2026-05-15",
+   "_resolved": true,
+   "managers": [
+    "Бил Акман · Pershing Square",
+    "Сет Кларман · Baupost Group",
+    "Чейс Коулман · Tiger Global Management",
+    "Даниел Лоуб · Third Point",
+    "Дейвид Тепър · Appaloosa Management"
+   ],
+   "count": 5
+  },
+  {
+   "ticker": "TAIWAN SEMICONDUCTOR",
+   "company": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "manager": "Чейс Коулман · Tiger Global Management",
+   "action": "нова позиция",
+   "value": 2331022991.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": false,
+   "managers": [
+    "Чейс Коулман · Tiger Global Management"
+   ],
+   "count": 1
+  },
+  {
+   "ticker": "NBIS",
+   "company": "NEBIUS GROUP N.V.",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "action": "нова позиция",
+   "value": 1175934069.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true,
+   "managers": [
+    "Стивън Мандел · Lone Pine Capital"
+   ],
+   "count": 1
+  }
+ ],
+ "superinvestor_new_positions": [
+  {
+   "ticker": "MSFT",
+   "company": "MICROSOFT CORP",
+   "manager": "Бил Акман · Pershing Square",
+   "value": 2092970053.0,
+   "pct_of_portfolio": 15.3,
+   "period": "13F · 2026-05-15",
+   "_resolved": true
+  },
+  {
+   "ticker": "STT",
+   "company": "STATE STREET CORP",
+   "manager": "Хауърд Маркс · Oaktree Capital Management",
+   "value": 1011873350.0,
+   "pct_of_portfolio": 14.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "WBD",
+   "company": "WARNER BROS DISCOVERY INC",
+   "manager": "Даниел Лоуб · Third Point",
+   "value": 533200000.0,
+   "pct_of_portfolio": 11.4,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "NBIS",
+   "company": "NEBIUS GROUP N.V.",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 1175934069.0,
+   "pct_of_portfolio": 7.2,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "SEAGATE TECHNOLOGY",
+   "company": "SEAGATE TECHNOLOGY HLDNGS PL",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 965105185.0,
+   "pct_of_portfolio": 5.9,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "HD",
+   "company": "HOME DEPOT INC",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 918092697.0,
+   "pct_of_portfolio": 5.6,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "APPLIED MATLS INC",
+   "company": "APPLIED MATLS INC",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 873193851.0,
+   "pct_of_portfolio": 5.3,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "LIN",
+   "company": "LINDE PLC",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 808550554.0,
+   "pct_of_portfolio": 4.9,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "DASH",
+   "company": "DOORDASH INC",
+   "manager": "Triple Frond Partners",
+   "value": 55404000.0,
+   "pct_of_portfolio": 4.9,
+   "period": "13F · 2026-08-13",
+   "_resolved": true
+  },
+  {
+   "ticker": "MASTERCARD INCORPORATED",
+   "company": "MASTERCARD INCORPORATED",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 639458194.0,
+   "pct_of_portfolio": 4.7,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "UBER",
+   "company": "UBER TECHNOLOGIES INC",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 645337776.0,
+   "pct_of_portfolio": 4.7,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "KEYS",
+   "company": "KEYSIGHT TECHNOLOGIES INC",
+   "manager": "Даниел Лоуб · Third Point",
+   "value": 204790950.0,
+   "pct_of_portfolio": 4.4,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "XYZ",
+   "company": "BLOCK INC",
+   "manager": "Даниел Лоуб · Third Point",
+   "value": 194479668.0,
+   "pct_of_portfolio": 4.2,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "SPGI",
+   "company": "S&P GLOBAL INC",
+   "manager": "Triple Frond Partners",
+   "value": 47527000.0,
+   "pct_of_portfolio": 4.2,
+   "period": "13F · 2026-08-13",
+   "_resolved": true
+  },
+  {
+   "ticker": "TAIWAN SEMICONDUCTOR",
+   "company": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 548464789.0,
+   "pct_of_portfolio": 4.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "NFLX",
+   "company": "NETFLIX INC.",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 499110633.0,
+   "pct_of_portfolio": 3.7,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "FLEX",
+   "company": "FLEX LTD",
+   "manager": "Даниел Лоуб · Third Point",
+   "value": 166932100.0,
+   "pct_of_portfolio": 3.6,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "APPLIED MATLS INC",
+   "company": "APPLIED MATLS INC",
+   "manager": "Джон Армитидж · Egerton Capital",
+   "value": 376729995.0,
+   "pct_of_portfolio": 3.6,
+   "period": "13F · 2026-07-21",
+   "_resolved": false
+  },
+  {
+   "ticker": "INDV",
+   "company": "INDIVIOR PHARMACEUTICALS INC",
+   "manager": "Хауърд Маркс · Oaktree Capital Management",
+   "value": 251399508.0,
+   "pct_of_portfolio": 3.5,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "GEV",
+   "company": "GE VERNOVA INC",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 481498748.0,
+   "pct_of_portfolio": 3.5,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "AAPL",
+   "company": "APPLE INC",
+   "manager": "Дейвид Тепър · Appaloosa Management",
+   "value": 241615600.0,
+   "pct_of_portfolio": 3.1,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "STRL",
+   "company": "STERLING INFRASTRUCTURE INC",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 511709948.0,
+   "pct_of_portfolio": 3.1,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "TTMI",
+   "company": "TTM TECHNOLOGIES INC",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 512074787.0,
+   "pct_of_portfolio": 3.1,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "ON HLDG AG",
+   "company": "ON HLDG AG",
+   "manager": "Стивън Мандел · Lone Pine Capital",
+   "value": 470378663.0,
+   "pct_of_portfolio": 2.9,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "CBRS",
+   "company": "CEREBRAS SYSTEMS INC",
+   "manager": "Чейс Коулман · Tiger Global Management",
+   "value": 662779000.0,
+   "pct_of_portfolio": 2.8,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "CDW",
+   "company": "Cdw Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "value": 139789000.0,
+   "pct_of_portfolio": 2.7,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "APP",
+   "company": "APPLOVIN CORP",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 358892731.0,
+   "pct_of_portfolio": 2.6,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "CME",
+   "company": "CME GROUP INC",
+   "manager": "Сет Кларман · Baupost Group",
+   "value": 136694000.0,
+   "pct_of_portfolio": 2.5,
+   "period": "13F · 2026-08-13",
+   "_resolved": true
+  },
+  {
+   "ticker": "NXT",
+   "company": "NEXTPOWER INC",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 340274801.0,
+   "pct_of_portfolio": 2.5,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "TJX COS INC NEW",
+   "company": "TJX COS INC NEW",
+   "manager": "Тери Смит · Fundsmith",
+   "value": 344297688.0,
+   "pct_of_portfolio": 2.5,
+   "period": "13F · 2026-08-14",
+   "_resolved": false
+  },
+  {
+   "ticker": "GOOGL",
+   "company": "Alphabet Inc",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "value": 120184000.0,
+   "pct_of_portfolio": 2.3,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "EFX",
+   "company": "EQUIFAX INC",
+   "manager": "Джон Армитидж · Egerton Capital",
+   "value": 235094159.0,
+   "pct_of_portfolio": 2.3,
+   "period": "13F · 2026-07-21",
+   "_resolved": true
+  },
+  {
+   "ticker": "FOXA",
+   "company": "Fox Corp",
+   "manager": "Стенли Дракенмилър · Duquesne Family Office",
+   "value": 114992000.0,
+   "pct_of_portfolio": 2.2,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "BA",
+   "company": "BOEING CO",
+   "manager": "Дейвид Тепър · Appaloosa Management",
+   "value": 173176000.0,
+   "pct_of_portfolio": 2.2,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  },
+  {
+   "ticker": "TTMI",
+   "company": "TTM TECHNOLOGIES INC",
+   "manager": "Даниел Лоуб · Third Point",
+   "value": 94445100.0,
+   "pct_of_portfolio": 2.0,
+   "period": "13F · 2026-08-14",
+   "_resolved": true
+  }
+ ],
+ "superinvestor_exits": {
+  "exits": [],
+  "stopped_managers": [
+   {
+    "manager": "Майкъл Бъри · Scion Asset Management",
+    "last_filing_date": "2025-11-03",
+    "days_since_filing": 297
+   }
+  ]
+ },
+ "insider_buying": [
+  {
+   "ticker": "INTC",
+   "company": "INTEL CORP",
+   "total_value": 9999985.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "TAN LIP BU",
+     "title": "CEO",
+     "date": "2026-08-11",
+     "value": 9999985.0
+    }
+   ]
+  },
+  {
+   "ticker": "BSX",
+   "company": "BOSTON SCIENTIFIC CORP",
+   "total_value": 9001407.552,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Mahoney Michael F",
+     "title": "Chairman, President & CEO",
+     "date": "2026-08-03",
+     "value": 9001407.552
+    }
+   ]
+  },
+  {
+   "ticker": "APTV",
+   "company": "Aptiv PLC",
+   "total_value": 8204228.399200001,
+   "cluster": true,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Agnevall Hakan",
+     "title": "",
+     "date": "2026-08-13",
+     "value": 199182.1
+    },
+    {
+     "name": "Mahoney Sean O",
+     "title": "",
+     "date": "2026-08-11",
+     "value": 301255.2
+    },
+    {
+     "name": "Mahoney Sean O",
+     "title": "",
+     "date": "2026-08-11",
+     "value": 201148.0
+    },
+    {
+     "name": "CLARK KEVIN P",
+     "title": "Chair and CEO",
+     "date": "2026-08-10",
+     "value": 2502684.219
+    },
+    {
+     "name": "MEISTER PAUL M",
+     "title": "",
+     "date": "2026-08-05",
+     "value": 4999958.8802000005
+    }
+   ]
+  },
+  {
+   "ticker": "PFE",
+   "company": "PFIZER INC",
+   "total_value": 2960109.9,
+   "cluster": true,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "BOURLA ALBERT",
+     "title": "Chairman & CEO",
+     "date": "2026-08-12",
+     "value": 1000920.0
+    },
+    {
+     "name": "BLAYLOCK RONALD E",
+     "title": "",
+     "date": "2026-08-05",
+     "value": 998821.26
+    },
+    {
+     "name": "Buckley Mortimer J",
+     "title": "",
+     "date": "2026-08-05",
+     "value": 960368.64
+    }
+   ]
+  },
+  {
+   "ticker": "CSGP",
+   "company": "COSTAR GROUP, INC.",
+   "total_value": 2489837.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "FLORANCE ANDREW C",
+     "title": "Founder and CEO",
+     "date": "2026-08-04",
+     "value": 2489837.0
+    }
+   ]
+  },
+  {
+   "ticker": "TSCO",
+   "company": "TRACTOR SUPPLY CO /DE/",
+   "total_value": 416829.00000000006,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Lawton III Harry A",
+     "title": "President & CEO",
+     "date": "2026-08-04",
+     "value": 416829.00000000006
+    }
+   ]
+  },
+  {
+   "ticker": "VST",
+   "company": "Vistra Corp.",
+   "total_value": 270000.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-08-24",
+     "value": 270000.0
+    }
+   ]
+  },
+  {
+   "ticker": "PODD",
+   "company": "INSULET CORP",
+   "total_value": 162217.0,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "McEvoy Ashley",
+     "title": "President and CEO",
+     "date": "2026-08-21",
+     "value": 162217.0
+    }
+   ]
+  }
+ ],
+ "glb_candidates": [
+  {
+   "ticker": "AMGN",
+   "company": "Amgen Inc.",
+   "glb_type": "classic",
+   "price": 440.34,
+   "prior_high": 388.16,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 43.2,
+   "tightness": {
+    "band_hold_pct": 96.8,
+    "tightness_range_pct": 32.13,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": true
+  },
+  {
+   "ticker": "BDX",
+   "company": "Becton, Dickinson and Company",
+   "glb_type": "momentum",
+   "price": 190.21,
+   "prior_high": 176.48,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 53.5,
+   "tightness": {
+    "band_hold_pct": 71.4,
+    "tightness_range_pct": 30.01,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "BLK",
+   "company": "BlackRock, Inc.",
+   "glb_type": "classic",
+   "price": 1173.21,
+   "prior_high": 1165.87,
+   "prior_high_month": "2025-09",
+   "months_unpenetrated": 10,
+   "ath_label": "all_time_high",
+   "history_years": 26.9,
+   "tightness": {
+    "band_hold_pct": 87.3,
+    "tightness_range_pct": 20.55,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "CACI",
+   "company": "CACI International, Inc.",
+   "glb_type": "momentum",
+   "price": 624.74,
+   "prior_high": 620.58,
+   "prior_high_month": "2026-01",
+   "months_unpenetrated": 6,
+   "ath_label": "all_time_high",
+   "history_years": 46.4,
+   "tightness": {
+    "band_hold_pct": 27.0,
+    "tightness_range_pct": 40.07,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "CART",
+   "company": "Maplebear Inc.",
+   "glb_type": "classic",
+   "price": 50.77,
+   "prior_high": 48.28,
+   "prior_high_month": "2025-01",
+   "months_unpenetrated": 18,
+   "ath_label": "new_high_since_listing",
+   "history_years": 2.9,
+   "tightness": {
+    "band_hold_pct": 92.1,
+    "tightness_range_pct": 27.13,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "DRI",
+   "company": "Darden Restaurants, Inc.",
+   "glb_type": "classic",
+   "price": 218.81,
+   "prior_high": 217.97,
+   "prior_high_month": "2025-06",
+   "months_unpenetrated": 13,
+   "ath_label": "all_time_high",
+   "history_years": 31.3,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 17.79,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "EMR",
+   "company": "Emerson Electric Company",
+   "glb_type": "classic",
+   "price": 158.29,
+   "prior_high": 150.75,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 54.2,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 21.76,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "FAST",
+   "company": "Fastenal Company",
+   "glb_type": "classic",
+   "price": 51.15,
+   "prior_high": 49.66,
+   "prior_high_month": "2025-08",
+   "months_unpenetrated": 11,
+   "ath_label": "all_time_high",
+   "history_years": 39.0,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 19.45,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "FCX",
+   "company": "Freeport-McMoRan, Inc.",
+   "glb_type": "classic",
+   "price": 79.0,
+   "prior_high": 68.08,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 31.1,
+   "tightness": {
+    "band_hold_pct": 98.4,
+    "tightness_range_pct": 35.18,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "FIVE",
+   "company": "Five Below, Inc.",
+   "glb_type": "momentum",
+   "price": 257.35,
+   "prior_high": 235.66,
+   "prior_high_month": "2026-04",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 14.1,
+   "tightness": {
+    "band_hold_pct": 55.6,
+    "tightness_range_pct": 38.52,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "FTI",
+   "company": "TechnipFMC plc",
+   "glb_type": "classic",
+   "price": 75.7,
+   "prior_high": 75.57,
+   "prior_high_month": "2026-04",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 25.2,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 22.51,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "HSIC",
+   "company": "Henry Schein, Inc.",
+   "glb_type": "classic",
+   "price": 90.38,
+   "prior_high": 87.19,
+   "prior_high_month": "2022-03",
+   "months_unpenetrated": 52,
+   "ath_label": "all_time_high",
+   "history_years": 30.8,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 20.42,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "JLL",
+   "company": "Jones Lang LaSalle Incorporated",
+   "glb_type": "momentum",
+   "price": 386.08,
+   "prior_high": 357.91,
+   "prior_high_month": "2026-01",
+   "months_unpenetrated": 6,
+   "ath_label": "all_time_high",
+   "history_years": 29.1,
+   "tightness": {
+    "band_hold_pct": 68.3,
+    "tightness_range_pct": 32.39,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "LECO",
+   "company": "Lincoln Electric Holdings, Inc.",
+   "glb_type": "classic",
+   "price": 290.12,
+   "prior_high": 287.05,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 32.4,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 15.81,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "LITE",
+   "company": "Lumentum Holdings Inc.",
+   "glb_type": "momentum",
+   "price": 939.03,
+   "prior_high": 902.32,
+   "prior_high_month": "2026-04",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 11.1,
+   "tightness": {
+    "band_hold_pct": 77.8,
+    "tightness_range_pct": 50.39,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "MA",
+   "company": "Mastercard Incorporated",
+   "glb_type": "momentum",
+   "price": 598.47,
+   "prior_high": 595.29,
+   "prior_high_month": "2025-08",
+   "months_unpenetrated": 11,
+   "ath_label": "all_time_high",
+   "history_years": 20.3,
+   "tightness": {
+    "band_hold_pct": 65.1,
+    "tightness_range_pct": 22.97,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "MEDP",
+   "company": "Medpace Holdings, Inc.",
+   "glb_type": "momentum",
+   "price": 619.05,
+   "prior_high": 592.46,
+   "prior_high_month": "2025-11",
+   "months_unpenetrated": 8,
+   "ath_label": "all_time_high",
+   "history_years": 10.0,
+   "tightness": {
+    "band_hold_pct": 69.8,
+    "tightness_range_pct": 43.19,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "MRK",
+   "company": "Merck & Company, Inc.",
+   "glb_type": "classic",
+   "price": 153.1,
+   "prior_high": 131.95,
+   "prior_high_month": "2024-03",
+   "months_unpenetrated": 28,
+   "ath_label": "all_time_high",
+   "history_years": 64.6,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 34.37,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "NDAQ",
+   "company": "Nasdaq, Inc.",
+   "glb_type": "classic",
+   "price": 99.47,
+   "prior_high": 97.13,
+   "prior_high_month": "2025-12",
+   "months_unpenetrated": 7,
+   "ath_label": "all_time_high",
+   "history_years": 24.2,
+   "tightness": {
+    "band_hold_pct": 88.9,
+    "tightness_range_pct": 23.53,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "NEM",
+   "company": "Newmont Corporation",
+   "glb_type": "momentum",
+   "price": 131.6,
+   "prior_high": 130.0,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 46.4,
+   "tightness": {
+    "band_hold_pct": 20.6,
+    "tightness_range_pct": 35.8,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "NWS",
+   "company": "News Corporation",
+   "glb_type": "momentum",
+   "price": 35.24,
+   "prior_high": 34.55,
+   "prior_high_month": "2025-09",
+   "months_unpenetrated": 10,
+   "ath_label": "all_time_high",
+   "history_years": 13.2,
+   "tightness": {
+    "band_hold_pct": 82.5,
+    "tightness_range_pct": 21.79,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "NWSA",
+   "company": "News Corporation",
+   "glb_type": "momentum",
+   "price": 30.96,
+   "prior_high": 30.71,
+   "prior_high_month": "2025-09",
+   "months_unpenetrated": 10,
+   "ath_label": "all_time_high",
+   "history_years": 13.2,
+   "tightness": {
+    "band_hold_pct": 76.2,
+    "tightness_range_pct": 21.72,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "P",
+   "company": "Everpure, Inc.",
+   "glb_type": "momentum",
+   "price": 108.9,
+   "prior_high": 98.7,
+   "prior_high_month": "2025-10",
+   "months_unpenetrated": 9,
+   "ath_label": "all_time_high",
+   "history_years": 10.9,
+   "tightness": {
+    "band_hold_pct": 27.0,
+    "tightness_range_pct": 55.02,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "in_screener": false
+  },
+  {
+   "ticker": "PH",
+   "company": "Parker-Hannifin Corporation",
+   "glb_type": "classic",
+   "price": 1039.49,
+   "prior_high": 1009.18,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 46.4,
+   "tightness": {
+    "band_hold_pct": 90.5,
+    "tightness_range_pct": 28.23,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "PR",
+   "company": "Permian Resources Corporation",
+   "glb_type": "classic",
+   "price": 22.75,
+   "prior_high": 21.85,
+   "prior_high_month": "2018-09",
+   "months_unpenetrated": 94,
+   "ath_label": "all_time_high",
+   "history_years": 10.4,
+   "tightness": {
+    "band_hold_pct": 88.9,
+    "tightness_range_pct": 28.33,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  },
+  {
+   "ticker": "VRTX",
+   "company": "Vertex Pharmaceuticals Incorpor",
+   "glb_type": "classic",
+   "price": 547.29,
+   "prior_high": 509.5,
+   "prior_high_month": "2025-04",
+   "months_unpenetrated": 15,
+   "ath_label": "all_time_high",
+   "history_years": 35.1,
+   "tightness": {
+    "band_hold_pct": 96.8,
+    "tightness_range_pct": 26.63,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "in_screener": false
+  }
+ ],
+ "news": [
+  {
+   "headline": "Nvidia прогнозира 70% ръст на приходите за FY2028, далеч над очакванията",
+   "why": "Beats на Nvidia движат фючърсите нагоре и дават тон на целия tech сектор за сесията."
+  },
+  {
+   "headline": "Танкер е ударен в Ормузкия проток, геополитическият риск остава висок",
+   "why": "Атаката заплашва петролния транзит и може да натисне суровия петрол нагоре при ескалация."
+  },
+  {
+   "headline": "Европейските газови резерви са исторически ниски, цените може да надхвърлят 100 EUR тази зима",
+   "why": "Нарушените LNG потоци от Близкия изток повишават риска от енергийна криза, която ще удари европейската икономика."
+  },
+  {
+   "headline": "Китайският промишлен печалбен ръст се забавя до 7-месечно дъно",
+   "why": "Сигнал за задълбочаващо се забавяне в Китай, което натиска суровините и emerging markets."
+  },
+  {
+   "headline": "Южнокорейската централна банка повишава лихвите последователно втори път при висока базова инфлация",
+   "why": "Поредно затягане в Азия показва, че инфлационният натиск не е овладян глобално — ключово за Fed narrative."
+  },
+  {
+   "headline": "Fed управителят Лиза Кук: адвокатът й отвръща на заплахата на Тръмп да я уволни",
+   "why": "Политическата намеса в независимостта на Fed остава пазарен риск за доверието в институцията."
+  },
+  {
+   "headline": "Bitcoin treasury компаниите губят 80 млрд. долара пазарна капитализация",
+   "why": "Разпродажбата сигнализира разриване на leveraged crypto-equity модела, с последствия за рисковите апетити."
+  },
+  {
+   "headline": "Salesforce скача с 12% заради AI ръст и печалба от дял в Anthropic",
+   "why": "Потвърждава монетизацията на AI в enterprise software и подкрепя ротацията в tech сектора."
+  }
+ ],
+ "cot": [
+  {
+   "market": "2-Year Treasury Note",
+   "category": "financial",
+   "net_position": -1243004,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -2010300
+    },
+    {
+     "date": "2025-09-02",
+     "net": -2052042
+    },
+    {
+     "date": "2025-09-09",
+     "net": -2166356
+    },
+    {
+     "date": "2025-09-16",
+     "net": -2193514
+    },
+    {
+     "date": "2025-09-23",
+     "net": -2083450
+    },
+    {
+     "date": "2025-09-30",
+     "net": -1998595
+    },
+    {
+     "date": "2025-10-07",
+     "net": -2073288
+    },
+    {
+     "date": "2025-10-14",
+     "net": -2069628
+    },
+    {
+     "date": "2025-10-21",
+     "net": -2102580
+    },
+    {
+     "date": "2025-10-28",
+     "net": -2087346
+    },
+    {
+     "date": "2025-11-04",
+     "net": -2107571
+    },
+    {
+     "date": "2025-11-10",
+     "net": -2077590
+    },
+    {
+     "date": "2025-11-18",
+     "net": -2077765
+    },
+    {
+     "date": "2025-11-25",
+     "net": -2007545
+    },
+    {
+     "date": "2025-12-02",
+     "net": -2062416
+    },
+    {
+     "date": "2025-12-09",
+     "net": -2129134
+    },
+    {
+     "date": "2025-12-16",
+     "net": -2224075
+    },
+    {
+     "date": "2025-12-23",
+     "net": -2206929
+    },
+    {
+     "date": "2025-12-30",
+     "net": -2219735
+    },
+    {
+     "date": "2026-01-06",
+     "net": -2247276
+    },
+    {
+     "date": "2026-01-13",
+     "net": -2238093
+    },
+    {
+     "date": "2026-01-20",
+     "net": -2184458
+    },
+    {
+     "date": "2026-01-27",
+     "net": -2112059
+    },
+    {
+     "date": "2026-02-03",
+     "net": -2115177
+    },
+    {
+     "date": "2026-02-10",
+     "net": -2123228
+    },
+    {
+     "date": "2026-02-17",
+     "net": -2134525
+    },
+    {
+     "date": "2026-02-24",
+     "net": -2067446
+    },
+    {
+     "date": "2026-03-03",
+     "net": -2048812
+    },
+    {
+     "date": "2026-03-10",
+     "net": -1927605
+    },
+    {
+     "date": "2026-03-17",
+     "net": -2086476
+    },
+    {
+     "date": "2026-03-24",
+     "net": -2299260
+    },
+    {
+     "date": "2026-03-31",
+     "net": -2168752
+    },
+    {
+     "date": "2026-04-07",
+     "net": -2147829
+    },
+    {
+     "date": "2026-04-14",
+     "net": -2079200
+    },
+    {
+     "date": "2026-04-21",
+     "net": -2105973
+    },
+    {
+     "date": "2026-04-28",
+     "net": -2118008
+    },
+    {
+     "date": "2026-05-05",
+     "net": -2034475
+    },
+    {
+     "date": "2026-05-12",
+     "net": -1947829
+    },
+    {
+     "date": "2026-05-19",
+     "net": -1878632
+    },
+    {
+     "date": "2026-05-26",
+     "net": -1772557
+    },
+    {
+     "date": "2026-06-02",
+     "net": -1813011
+    },
+    {
+     "date": "2026-06-09",
+     "net": -1680942
+    },
+    {
+     "date": "2026-06-16",
+     "net": -1704817
+    },
+    {
+     "date": "2026-06-23",
+     "net": -1787552
+    },
+    {
+     "date": "2026-06-30",
+     "net": -1748875
+    },
+    {
+     "date": "2026-07-07",
+     "net": -1756528
+    },
+    {
+     "date": "2026-07-14",
+     "net": -1671766
+    },
+    {
+     "date": "2026-07-21",
+     "net": -1595128
+    },
+    {
+     "date": "2026-07-28",
+     "net": -1564294
+    },
+    {
+     "date": "2026-08-04",
+     "net": -1334181
+    },
+    {
+     "date": "2026-08-11",
+     "net": -1359521
+    },
+    {
+     "date": "2026-08-18",
+     "net": -1243004
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "SHY",
+      "company": "iShares 1-3 Year Treasury Bond "
+     }
+    ],
+    "reasoning": "Managed money е на 100-ти percentile нетно дълги 2-Year Treasury Note спрямо пълните 156 седмици история — това е контрариан bearish сигнал: очакваме обрат нагоре в краткосрочните доходности (надолу в цените). SHY е директно изложен ETF на 1-3 годишни трежъри и е най-ликвидният инструмент за тази теза. Позициониращата тълпа е максимално long, което исторически предхожда разочарование и разпродажба.",
+    "dropped_tickers": null,
+    "outside_screener": true
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "IBKR",
+      "company": "Interactive Brokers Group, Inc."
+     }
+    ],
+    "reasoning": "Ако краткосрочните доходности обратят нагоре (цени надолу), брокери като IBKR, чиито net interest margin е силно чувствителен към краткия край на кривата, поначало печелят от по-висок short-rate environment — но ако пазарът преоцени посоката агресивно, margin calls и волатилността могат да свият клиентската активност. По-директно: IBKR е в CANSLIM скрийнъра и е пряко зависим от лихвения режим на краткия край. Тезата е bearish за дюрацията, но за IBKR конкретно е неутрална до слабо bullish — включваме го като cross-sector watch, не като агресивна bearish залог.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "XRP",
+   "category": "financial",
+   "net_position": -1147,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 54,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-19",
+     "net": -4413
+    },
+    {
+     "date": "2025-08-26",
+     "net": -6129
+    },
+    {
+     "date": "2025-09-02",
+     "net": -5652
+    },
+    {
+     "date": "2025-09-16",
+     "net": -6456
+    },
+    {
+     "date": "2025-09-23",
+     "net": -6537
+    },
+    {
+     "date": "2025-09-30",
+     "net": -6774
+    },
+    {
+     "date": "2025-10-07",
+     "net": -6910
+    },
+    {
+     "date": "2025-10-14",
+     "net": -6689
+    },
+    {
+     "date": "2025-10-21",
+     "net": -7007
+    },
+    {
+     "date": "2025-10-28",
+     "net": -7087
+    },
+    {
+     "date": "2025-11-04",
+     "net": -5759
+    },
+    {
+     "date": "2025-11-10",
+     "net": -6553
+    },
+    {
+     "date": "2025-11-18",
+     "net": -5572
+    },
+    {
+     "date": "2025-11-25",
+     "net": -4945
+    },
+    {
+     "date": "2025-12-02",
+     "net": -4880
+    },
+    {
+     "date": "2025-12-09",
+     "net": -4713
+    },
+    {
+     "date": "2025-12-16",
+     "net": -3969
+    },
+    {
+     "date": "2025-12-23",
+     "net": -3247
+    },
+    {
+     "date": "2025-12-30",
+     "net": -2794
+    },
+    {
+     "date": "2026-01-06",
+     "net": -3938
+    },
+    {
+     "date": "2026-01-13",
+     "net": -3887
+    },
+    {
+     "date": "2026-01-20",
+     "net": -3451
+    },
+    {
+     "date": "2026-01-27",
+     "net": -3748
+    },
+    {
+     "date": "2026-02-03",
+     "net": -2570
+    },
+    {
+     "date": "2026-02-10",
+     "net": -2490
+    },
+    {
+     "date": "2026-02-17",
+     "net": -2983
+    },
+    {
+     "date": "2026-02-24",
+     "net": -2543
+    },
+    {
+     "date": "2026-03-03",
+     "net": -2940
+    },
+    {
+     "date": "2026-03-10",
+     "net": -4289
+    },
+    {
+     "date": "2026-03-17",
+     "net": -4862
+    },
+    {
+     "date": "2026-03-24",
+     "net": -4135
+    },
+    {
+     "date": "2026-03-31",
+     "net": -3206
+    },
+    {
+     "date": "2026-04-07",
+     "net": -3228
+    },
+    {
+     "date": "2026-04-14",
+     "net": -3374
+    },
+    {
+     "date": "2026-04-21",
+     "net": -3485
+    },
+    {
+     "date": "2026-04-28",
+     "net": -2852
+    },
+    {
+     "date": "2026-05-05",
+     "net": -2663
+    },
+    {
+     "date": "2026-05-12",
+     "net": -2584
+    },
+    {
+     "date": "2026-05-19",
+     "net": -2044
+    },
+    {
+     "date": "2026-05-26",
+     "net": -1823
+    },
+    {
+     "date": "2026-06-02",
+     "net": -1217
+    },
+    {
+     "date": "2026-06-09",
+     "net": -1949
+    },
+    {
+     "date": "2026-06-16",
+     "net": -2396
+    },
+    {
+     "date": "2026-06-23",
+     "net": -1950
+    },
+    {
+     "date": "2026-06-30",
+     "net": -1496
+    },
+    {
+     "date": "2026-07-07",
+     "net": -1885
+    },
+    {
+     "date": "2026-07-14",
+     "net": -1921
+    },
+    {
+     "date": "2026-07-21",
+     "net": -2270
+    },
+    {
+     "date": "2026-07-28",
+     "net": -1749
+    },
+    {
+     "date": "2026-08-04",
+     "net": -1509
+    },
+    {
+     "date": "2026-08-11",
+     "net": -1352
+    },
+    {
+     "date": "2026-08-18",
+     "net": -1147
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "COIN",
+      "company": "Coinbase Global, Inc."
+     }
+    ],
+    "reasoning": "Managed money е на 100-ти percentile нетно дълги XRP спрямо наличните 54 седмици история — максимален спекулативен оптимизъм. Контрарианският сигнал е bearish: тълпата е изцяло позиционирана long и дори умерено разочарование може да задейства значително разпродаване. COIN е най-директният ликвиден публичен тикър с реална XRP trading volume и custody exposure. История само 54 седмици (под стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от обичайното.",
+    "dropped_tickers": null,
+    "outside_screener": true
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "IBKR",
+      "company": "Interactive Brokers Group, Inc."
+     }
+    ],
+    "reasoning": "IBKR предлага crypto trading включително XRP и печели от обема — при bearish обрат в XRP и crypto sentiment широко, retail trading volumes в крипто падат, което директно намалява комисионните и margin приходите на IBKR от тези продукти. Връзката е реална и 1-2 стъпкова: XRP спад → crypto volume спад → по-нисък IBKR crypto revenue. IBKR е в CANSLIM скрийнъра. История само 54 седмици за XRP (под стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от обичайното.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Copper",
+   "category": "commodity",
+   "net_position": 78648,
+   "percentile": 99.4,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": 28754
+    },
+    {
+     "date": "2025-09-02",
+     "net": 35556
+    },
+    {
+     "date": "2025-09-09",
+     "net": 38375
+    },
+    {
+     "date": "2025-09-16",
+     "net": 42097
+    },
+    {
+     "date": "2025-09-23",
+     "net": 43389
+    },
+    {
+     "date": "2025-09-30",
+     "net": 48425
+    },
+    {
+     "date": "2025-10-07",
+     "net": 56449
+    },
+    {
+     "date": "2025-10-14",
+     "net": 58384
+    },
+    {
+     "date": "2025-10-21",
+     "net": 56676
+    },
+    {
+     "date": "2025-10-28",
+     "net": 61994
+    },
+    {
+     "date": "2025-11-04",
+     "net": 60729
+    },
+    {
+     "date": "2025-11-10",
+     "net": 63284
+    },
+    {
+     "date": "2025-11-18",
+     "net": 61603
+    },
+    {
+     "date": "2025-11-25",
+     "net": 57547
+    },
+    {
+     "date": "2025-12-02",
+     "net": 63459
+    },
+    {
+     "date": "2025-12-09",
+     "net": 70484
+    },
+    {
+     "date": "2025-12-16",
+     "net": 75134
+    },
+    {
+     "date": "2025-12-23",
+     "net": 75619
+    },
+    {
+     "date": "2025-12-30",
+     "net": 71019
+    },
+    {
+     "date": "2026-01-06",
+     "net": 68242
+    },
+    {
+     "date": "2026-01-13",
+     "net": 63391
+    },
+    {
+     "date": "2026-01-20",
+     "net": 62806
+    },
+    {
+     "date": "2026-01-27",
+     "net": 58018
+    },
+    {
+     "date": "2026-02-03",
+     "net": 55923
+    },
+    {
+     "date": "2026-02-10",
+     "net": 55564
+    },
+    {
+     "date": "2026-02-17",
+     "net": 53774
+    },
+    {
+     "date": "2026-02-24",
+     "net": 51027
+    },
+    {
+     "date": "2026-03-03",
+     "net": 48494
+    },
+    {
+     "date": "2026-03-10",
+     "net": 47676
+    },
+    {
+     "date": "2026-03-17",
+     "net": 46558
+    },
+    {
+     "date": "2026-03-24",
+     "net": 35284
+    },
+    {
+     "date": "2026-03-31",
+     "net": 39172
+    },
+    {
+     "date": "2026-04-07",
+     "net": 38393
+    },
+    {
+     "date": "2026-04-14",
+     "net": 52333
+    },
+    {
+     "date": "2026-04-21",
+     "net": 59585
+    },
+    {
+     "date": "2026-04-28",
+     "net": 60937
+    },
+    {
+     "date": "2026-05-05",
+     "net": 63473
+    },
+    {
+     "date": "2026-05-12",
+     "net": 74488
+    },
+    {
+     "date": "2026-05-19",
+     "net": 74188
+    },
+    {
+     "date": "2026-05-26",
+     "net": 70500
+    },
+    {
+     "date": "2026-06-02",
+     "net": 75747
+    },
+    {
+     "date": "2026-06-09",
+     "net": 69204
+    },
+    {
+     "date": "2026-06-16",
+     "net": 69008
+    },
+    {
+     "date": "2026-06-23",
+     "net": 66547
+    },
+    {
+     "date": "2026-06-30",
+     "net": 59703
+    },
+    {
+     "date": "2026-07-07",
+     "net": 58784
+    },
+    {
+     "date": "2026-07-14",
+     "net": 60185
+    },
+    {
+     "date": "2026-07-21",
+     "net": 71515
+    },
+    {
+     "date": "2026-07-28",
+     "net": 65008
+    },
+    {
+     "date": "2026-08-04",
+     "net": 75758
+    },
+    {
+     "date": "2026-08-11",
+     "net": 79027
+    },
+    {
+     "date": "2026-08-18",
+     "net": 78648
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "SCCO",
+      "company": "Southern Copper Corporation"
+     },
+     {
+      "ticker": "FCX",
+      "company": "Freeport-McMoRan, Inc."
+     }
+    ],
+    "reasoning": "Managed money е на 99.4-ти percentile нетно дълги Copper — почти рекорден оптимизъм за пълните 156 седмици история. Контрарианският сигнал е ясен: спекулативното позициониране е максимално затегнато и всяко разочарование в търсенето (Китай, глобален PMI) може да задейства масивно разпродаване. SCCO и FCX са двата най-директни, ликвидни pure-play медни производители и ще усетят ценовия натиск пропорционално.",
+    "dropped_tickers": null,
+    "outside_screener": true
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "VLO",
+      "company": "Valero Energy Corporation"
+     },
+     {
+      "ticker": "MPC",
+      "company": "Marathon Petroleum Corporation"
+     }
+    ],
+    "reasoning": "Рафинериите като VLO и MPC използват мед индиректно (електрически системи, оборудване), но по-важното е, че спад в медта сигнализира забавяне в индустриалното търсене, което натиска петролните цени — но рафинерийният crack spread се разширява при падащ суров петрол при стабилно търсене на горива. Двете са в CANSLIM скрийнъра и имат директна input-cost логика: по-евтини метали → по-ниски капиталови разходи за поддръжка на рафинериите. Връзката е реална, но не е доминантна — позиционираме я като вторичен бенефициент.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Euro FX",
+   "category": "financial",
+   "net_position": -57716,
+   "percentile": 1.3,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": 34207
+    },
+    {
+     "date": "2025-09-02",
+     "net": 29673
+    },
+    {
+     "date": "2025-09-09",
+     "net": 32612
+    },
+    {
+     "date": "2025-09-16",
+     "net": 26237
+    },
+    {
+     "date": "2025-09-23",
+     "net": 19803
+    },
+    {
+     "date": "2025-09-30",
+     "net": 22277
+    },
+    {
+     "date": "2025-10-07",
+     "net": 21385
+    },
+    {
+     "date": "2025-10-14",
+     "net": 22278
+    },
+    {
+     "date": "2025-10-21",
+     "net": 22464
+    },
+    {
+     "date": "2025-10-28",
+     "net": 17343
+    },
+    {
+     "date": "2025-11-04",
+     "net": 5182
+    },
+    {
+     "date": "2025-11-10",
+     "net": -5661
+    },
+    {
+     "date": "2025-11-18",
+     "net": 12421
+    },
+    {
+     "date": "2025-11-25",
+     "net": 14724
+    },
+    {
+     "date": "2025-12-02",
+     "net": 19272
+    },
+    {
+     "date": "2025-12-09",
+     "net": 41605
+    },
+    {
+     "date": "2025-12-16",
+     "net": 51301
+    },
+    {
+     "date": "2025-12-23",
+     "net": 56107
+    },
+    {
+     "date": "2025-12-30",
+     "net": 52662
+    },
+    {
+     "date": "2026-01-06",
+     "net": 50600
+    },
+    {
+     "date": "2026-01-13",
+     "net": 25392
+    },
+    {
+     "date": "2026-01-20",
+     "net": 10236
+    },
+    {
+     "date": "2026-01-27",
+     "net": 26361
+    },
+    {
+     "date": "2026-02-03",
+     "net": 42055
+    },
+    {
+     "date": "2026-02-10",
+     "net": 50204
+    },
+    {
+     "date": "2026-02-17",
+     "net": 43549
+    },
+    {
+     "date": "2026-02-24",
+     "net": 36797
+    },
+    {
+     "date": "2026-03-03",
+     "net": 29632
+    },
+    {
+     "date": "2026-03-10",
+     "net": 5231
+    },
+    {
+     "date": "2026-03-17",
+     "net": -6952
+    },
+    {
+     "date": "2026-03-24",
+     "net": -13538
+    },
+    {
+     "date": "2026-03-31",
+     "net": 3947
+    },
+    {
+     "date": "2026-04-07",
+     "net": 882
+    },
+    {
+     "date": "2026-04-14",
+     "net": 25382
+    },
+    {
+     "date": "2026-04-21",
+     "net": 20317
+    },
+    {
+     "date": "2026-04-28",
+     "net": 11594
+    },
+    {
+     "date": "2026-05-05",
+     "net": 11846
+    },
+    {
+     "date": "2026-05-12",
+     "net": 18003
+    },
+    {
+     "date": "2026-05-19",
+     "net": 16317
+    },
+    {
+     "date": "2026-05-26",
+     "net": 7296
+    },
+    {
+     "date": "2026-06-02",
+     "net": 12027
+    },
+    {
+     "date": "2026-06-09",
+     "net": -17388
+    },
+    {
+     "date": "2026-06-16",
+     "net": -8926
+    },
+    {
+     "date": "2026-06-23",
+     "net": -15410
+    },
+    {
+     "date": "2026-06-30",
+     "net": -32644
+    },
+    {
+     "date": "2026-07-07",
+     "net": -45461
+    },
+    {
+     "date": "2026-07-14",
+     "net": -53691
+    },
+    {
+     "date": "2026-07-21",
+     "net": -56671
+    },
+    {
+     "date": "2026-07-28",
+     "net": -65198
+    },
+    {
+     "date": "2026-08-04",
+     "net": -52205
+    },
+    {
+     "date": "2026-08-11",
+     "net": -60600
+    },
+    {
+     "date": "2026-08-18",
+     "net": -57716
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "FXE",
+      "company": "Invesco CurrencyShares Euro Cur"
+     }
+    ],
+    "reasoning": "Managed money е на 1.3-ти percentile нетно къси Euro FX спрямо пълните 156 седмици — почти рекорден песимизъм. Контрарианската теза е bullish EUR/USD: тълпата е максимално позиционирана за слабо евро, което означава, че покриването на тези шорти може да задейства рязко движение нагоре. FXE е директният ETF за EUR/USD дългата страна.",
+    "dropped_tickers": null,
+    "outside_screener": true
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Bullish EUR обрат означава по-силно евро спрямо долара — американските мултинационали с голяма европейска revenue база технически губят в превалутиране, но тази верига е прекалено разредена и generична (почти всяка S&P 500 компания има европейска експозиция). Няма пряк бенефициент сред днешните CANSLIM кандидати с достатъчно директна и специфична EUR валутна верига — списъкът е доминиран от energy рафинерии, domestic финансови и healthcare имена. Оставям празно.",
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Lean Hogs",
+   "category": "commodity",
+   "net_position": -28997,
+   "percentile": 2.6,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": 109066
+    },
+    {
+     "date": "2025-09-02",
+     "net": 119336
+    },
+    {
+     "date": "2025-09-09",
+     "net": 131103
+    },
+    {
+     "date": "2025-09-16",
+     "net": 140301
+    },
+    {
+     "date": "2025-09-23",
+     "net": 140103
+    },
+    {
+     "date": "2025-09-30",
+     "net": 144954
+    },
+    {
+     "date": "2025-10-07",
+     "net": 141060
+    },
+    {
+     "date": "2025-10-14",
+     "net": 129111
+    },
+    {
+     "date": "2025-10-21",
+     "net": 115639
+    },
+    {
+     "date": "2025-10-28",
+     "net": 92114
+    },
+    {
+     "date": "2025-11-04",
+     "net": 72216
+    },
+    {
+     "date": "2025-11-10",
+     "net": 62305
+    },
+    {
+     "date": "2025-11-18",
+     "net": 50612
+    },
+    {
+     "date": "2025-11-25",
+     "net": 41874
+    },
+    {
+     "date": "2025-12-02",
+     "net": 36889
+    },
+    {
+     "date": "2025-12-09",
+     "net": 42860
+    },
+    {
+     "date": "2025-12-16",
+     "net": 60013
+    },
+    {
+     "date": "2025-12-23",
+     "net": 72177
+    },
+    {
+     "date": "2025-12-30",
+     "net": 76307
+    },
+    {
+     "date": "2026-01-06",
+     "net": 78397
+    },
+    {
+     "date": "2026-01-13",
+     "net": 78658
+    },
+    {
+     "date": "2026-01-20",
+     "net": 92216
+    },
+    {
+     "date": "2026-01-27",
+     "net": 109537
+    },
+    {
+     "date": "2026-02-03",
+     "net": 123396
+    },
+    {
+     "date": "2026-02-10",
+     "net": 128463
+    },
+    {
+     "date": "2026-02-17",
+     "net": 111218
+    },
+    {
+     "date": "2026-02-24",
+     "net": 111133
+    },
+    {
+     "date": "2026-03-03",
+     "net": 117601
+    },
+    {
+     "date": "2026-03-10",
+     "net": 120610
+    },
+    {
+     "date": "2026-03-17",
+     "net": 109736
+    },
+    {
+     "date": "2026-03-24",
+     "net": 93770
+    },
+    {
+     "date": "2026-03-31",
+     "net": 85522
+    },
+    {
+     "date": "2026-04-07",
+     "net": 88726
+    },
+    {
+     "date": "2026-04-14",
+     "net": 78031
+    },
+    {
+     "date": "2026-04-21",
+     "net": 54876
+    },
+    {
+     "date": "2026-04-28",
+     "net": 46102
+    },
+    {
+     "date": "2026-05-05",
+     "net": 38687
+    },
+    {
+     "date": "2026-05-12",
+     "net": 29211
+    },
+    {
+     "date": "2026-05-19",
+     "net": 22810
+    },
+    {
+     "date": "2026-05-26",
+     "net": 1432
+    },
+    {
+     "date": "2026-06-02",
+     "net": -19849
+    },
+    {
+     "date": "2026-06-09",
+     "net": -24461
+    },
+    {
+     "date": "2026-06-16",
+     "net": -28640
+    },
+    {
+     "date": "2026-06-23",
+     "net": -33652
+    },
+    {
+     "date": "2026-06-30",
+     "net": -38411
+    },
+    {
+     "date": "2026-07-07",
+     "net": -40390
+    },
+    {
+     "date": "2026-07-14",
+     "net": -43181
+    },
+    {
+     "date": "2026-07-21",
+     "net": -27791
+    },
+    {
+     "date": "2026-07-28",
+     "net": -19118
+    },
+    {
+     "date": "2026-08-04",
+     "net": -19179
+    },
+    {
+     "date": "2026-08-11",
+     "net": -24363
+    },
+    {
+     "date": "2026-08-18",
+     "net": -28997
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bullish",
+    "tickers": [],
+    "reasoning": "Managed money е на 2.6-ти percentile нетно къси Lean Hogs спрямо пълните 156 седмици — екстремен bearish консенсус, контрарианският сигнал е bullish за цените на свинското месо. Няма самостоятелни, ликвидни публично търгувани компании с чиста direct exposure на Lean Hogs фючърси — основните американски производители (Smithfield, WH Group) или не са самостоятелно листнати на американски борси, или са неликвидни за тази цел. Не насилвам слаб избор.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Bullish обрат в Lean Hogs повишава input costs за преработватели на свинско месо — но нито един от CANSLIM кандидатите (energy, financials, healthcare, travel, logistics) няма директна 1-2 стъпкова верига към разходите за свинско месо. Няма пряк бенефициент сред днешните кандидати.",
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Nasdaq-100",
+   "category": "financial",
+   "net_position": -61771,
+   "percentile": 4.5,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -16901
+    },
+    {
+     "date": "2025-09-02",
+     "net": -18630
+    },
+    {
+     "date": "2025-09-09",
+     "net": -25025
+    },
+    {
+     "date": "2025-09-16",
+     "net": -24004
+    },
+    {
+     "date": "2025-09-23",
+     "net": -26084
+    },
+    {
+     "date": "2025-09-30",
+     "net": -1624
+    },
+    {
+     "date": "2025-10-07",
+     "net": -7214
+    },
+    {
+     "date": "2025-10-14",
+     "net": -5097
+    },
+    {
+     "date": "2025-10-21",
+     "net": 2044
+    },
+    {
+     "date": "2025-10-28",
+     "net": 11174
+    },
+    {
+     "date": "2025-11-04",
+     "net": 9130
+    },
+    {
+     "date": "2025-11-10",
+     "net": 17619
+    },
+    {
+     "date": "2025-11-18",
+     "net": 10383
+    },
+    {
+     "date": "2025-11-25",
+     "net": 9671
+    },
+    {
+     "date": "2025-12-02",
+     "net": -3040
+    },
+    {
+     "date": "2025-12-09",
+     "net": -21306
+    },
+    {
+     "date": "2025-12-16",
+     "net": -6974
+    },
+    {
+     "date": "2025-12-23",
+     "net": -15142
+    },
+    {
+     "date": "2025-12-30",
+     "net": -25674
+    },
+    {
+     "date": "2026-01-06",
+     "net": -18451
+    },
+    {
+     "date": "2026-01-13",
+     "net": -22748
+    },
+    {
+     "date": "2026-01-20",
+     "net": -27012
+    },
+    {
+     "date": "2026-01-27",
+     "net": -16838
+    },
+    {
+     "date": "2026-02-03",
+     "net": -11380
+    },
+    {
+     "date": "2026-02-10",
+     "net": -8601
+    },
+    {
+     "date": "2026-02-17",
+     "net": -9316
+    },
+    {
+     "date": "2026-02-24",
+     "net": -16554
+    },
+    {
+     "date": "2026-03-03",
+     "net": -21789
+    },
+    {
+     "date": "2026-03-10",
+     "net": -25167
+    },
+    {
+     "date": "2026-03-17",
+     "net": -31462
+    },
+    {
+     "date": "2026-03-24",
+     "net": -39379
+    },
+    {
+     "date": "2026-03-31",
+     "net": -37103
+    },
+    {
+     "date": "2026-04-07",
+     "net": -38828
+    },
+    {
+     "date": "2026-04-14",
+     "net": -49667
+    },
+    {
+     "date": "2026-04-21",
+     "net": -39000
+    },
+    {
+     "date": "2026-04-28",
+     "net": -35950
+    },
+    {
+     "date": "2026-05-05",
+     "net": -36100
+    },
+    {
+     "date": "2026-05-12",
+     "net": -52042
+    },
+    {
+     "date": "2026-05-19",
+     "net": -45371
+    },
+    {
+     "date": "2026-05-26",
+     "net": -51679
+    },
+    {
+     "date": "2026-06-02",
+     "net": -53650
+    },
+    {
+     "date": "2026-06-09",
+     "net": -34306
+    },
+    {
+     "date": "2026-06-16",
+     "net": -28154
+    },
+    {
+     "date": "2026-06-23",
+     "net": -51062
+    },
+    {
+     "date": "2026-06-30",
+     "net": -68617
+    },
+    {
+     "date": "2026-07-07",
+     "net": -55013
+    },
+    {
+     "date": "2026-07-14",
+     "net": -64163
+    },
+    {
+     "date": "2026-07-21",
+     "net": -74690
+    },
+    {
+     "date": "2026-07-28",
+     "net": -58298
+    },
+    {
+     "date": "2026-08-04",
+     "net": -78333
+    },
+    {
+     "date": "2026-08-11",
+     "net": -89125
+    },
+    {
+     "date": "2026-08-18",
+     "net": -61771
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "QQQ",
+      "company": "Invesco QQQ Trust, Series 1"
+     },
+     {
+      "ticker": "ROKU",
+      "company": "Roku, Inc."
+     }
+    ],
+    "reasoning": "Managed money е на 4.5-ти percentile нетно къси Nasdaq-100 спрямо пълните 156 седмици история — почти рекорден спекулативен песимизъм. Контрариан сигнал: hedge fund-овете са максимално позиционирани за спад, което означава, че продаващата сила е почти изчерпана и всяко позитивно изненадване ще принуди масово покриване на шорт позиции. ROKU от скрийнъра е в Communication Services/Entertainment — директно Nasdaq-100 компонент с висок beta, което го прави идеален бенефициент при short squeeze в индекса.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "IBKR",
+      "company": "Interactive Brokers Group, Inc."
+     }
+    ],
+    "reasoning": "За разлика от ролята му в XRP bearish тезата (където IBKR страда при crypto спад), тук IBKR действа като brokerage бенефициент от повишен trading volume при short squeeze в Nasdaq-100 — ролята е ортогонална и не противоречи на crypto тезата. При масово покриване на шорт позиции в Nasdaq futures и свързани акции, IBKR генерира директно повече комисионни и маржин приходи от increased volatility и volume — двустъпкова, директна верига: short squeeze → висок volume → IBKR приходи.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "E-mini Russell 2000",
+   "category": "financial",
+   "net_position": -99786,
+   "percentile": 4.5,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -78059
+    },
+    {
+     "date": "2025-09-02",
+     "net": -76948
+    },
+    {
+     "date": "2025-09-09",
+     "net": -87081
+    },
+    {
+     "date": "2025-09-16",
+     "net": -90215
+    },
+    {
+     "date": "2025-09-23",
+     "net": -75850
+    },
+    {
+     "date": "2025-09-30",
+     "net": -67624
+    },
+    {
+     "date": "2025-10-07",
+     "net": -65509
+    },
+    {
+     "date": "2025-10-14",
+     "net": -70144
+    },
+    {
+     "date": "2025-10-21",
+     "net": -63845
+    },
+    {
+     "date": "2025-10-28",
+     "net": -70143
+    },
+    {
+     "date": "2025-11-04",
+     "net": -80270
+    },
+    {
+     "date": "2025-11-10",
+     "net": -81258
+    },
+    {
+     "date": "2025-11-18",
+     "net": -91086
+    },
+    {
+     "date": "2025-11-25",
+     "net": -57610
+    },
+    {
+     "date": "2025-12-02",
+     "net": -54366
+    },
+    {
+     "date": "2025-12-09",
+     "net": -48287
+    },
+    {
+     "date": "2025-12-16",
+     "net": -42296
+    },
+    {
+     "date": "2025-12-23",
+     "net": -21987
+    },
+    {
+     "date": "2025-12-30",
+     "net": -27669
+    },
+    {
+     "date": "2026-01-06",
+     "net": -14985
+    },
+    {
+     "date": "2026-01-13",
+     "net": -12564
+    },
+    {
+     "date": "2026-01-20",
+     "net": -10486
+    },
+    {
+     "date": "2026-01-27",
+     "net": -16911
+    },
+    {
+     "date": "2026-02-03",
+     "net": -38075
+    },
+    {
+     "date": "2026-02-10",
+     "net": -29959
+    },
+    {
+     "date": "2026-02-17",
+     "net": -26752
+    },
+    {
+     "date": "2026-02-24",
+     "net": -36615
+    },
+    {
+     "date": "2026-03-03",
+     "net": -36591
+    },
+    {
+     "date": "2026-03-10",
+     "net": -43360
+    },
+    {
+     "date": "2026-03-17",
+     "net": -53978
+    },
+    {
+     "date": "2026-03-24",
+     "net": -49320
+    },
+    {
+     "date": "2026-03-31",
+     "net": -39430
+    },
+    {
+     "date": "2026-04-07",
+     "net": -36746
+    },
+    {
+     "date": "2026-04-14",
+     "net": -50736
+    },
+    {
+     "date": "2026-04-21",
+     "net": -55818
+    },
+    {
+     "date": "2026-04-28",
+     "net": -65275
+    },
+    {
+     "date": "2026-05-05",
+     "net": -55354
+    },
+    {
+     "date": "2026-05-12",
+     "net": -60631
+    },
+    {
+     "date": "2026-05-19",
+     "net": -67429
+    },
+    {
+     "date": "2026-05-26",
+     "net": -68212
+    },
+    {
+     "date": "2026-06-02",
+     "net": -73340
+    },
+    {
+     "date": "2026-06-09",
+     "net": -74454
+    },
+    {
+     "date": "2026-06-16",
+     "net": -84570
+    },
+    {
+     "date": "2026-06-23",
+     "net": -56428
+    },
+    {
+     "date": "2026-06-30",
+     "net": -84358
+    },
+    {
+     "date": "2026-07-07",
+     "net": -72262
+    },
+    {
+     "date": "2026-07-14",
+     "net": -88112
+    },
+    {
+     "date": "2026-07-21",
+     "net": -73468
+    },
+    {
+     "date": "2026-07-28",
+     "net": -74620
+    },
+    {
+     "date": "2026-08-04",
+     "net": -85145
+    },
+    {
+     "date": "2026-08-11",
+     "net": -95158
+    },
+    {
+     "date": "2026-08-18",
+     "net": -99786
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "IWM",
+      "company": "iShares Russell 2000 Index Fund"
+     },
+     {
+      "ticker": "IVZ",
+      "company": "Invesco Ltd"
+     }
+    ],
+    "reasoning": "Managed money е на 4.5-ти percentile нетно къси E-mini Russell 2000 спрямо пълните 156 седмици история — рекорден пессимизъм към small-cap. Контрариан сигналът тук е дори по-силен от Nasdaq, тъй като Russell 2000 е по-чувствителен към domestic macro и short interest е исторически екстремален. IVZ (Invesco) е директно свързан — управлява QQQ и множество small-cap ETF продукти, като assets under management растат при рали в индексите, което директно увеличава fee приходите им.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "IBKR",
+      "company": "Interactive Brokers Group, Inc."
+     }
+    ],
+    "reasoning": "Едновременен екстремален шорт в Nasdaq-100 И Russell 2000 е рядко съчетание, което при обрат генерира изключителен volume surge в двата индекса. IBKR като prime brokerage платформа с директна expозиция към futures и equity trading volume е двустъпков бенефициент: short squeeze в два major индекса → exceptional volume spike → IBKR приходи. Ролята тук е идентична на тази в Nasdaq тезата — volume/volatility play, не структурно противоречие с crypto позицията.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Mexican Peso",
+   "category": "financial",
+   "net_position": 65330,
+   "percentile": 95.5,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": 28277
+    },
+    {
+     "date": "2025-09-02",
+     "net": 34350
+    },
+    {
+     "date": "2025-09-09",
+     "net": 28791
+    },
+    {
+     "date": "2025-09-16",
+     "net": 35826
+    },
+    {
+     "date": "2025-09-23",
+     "net": 35492
+    },
+    {
+     "date": "2025-09-30",
+     "net": 43374
+    },
+    {
+     "date": "2025-10-07",
+     "net": 41398
+    },
+    {
+     "date": "2025-10-14",
+     "net": 25994
+    },
+    {
+     "date": "2025-10-21",
+     "net": 30502
+    },
+    {
+     "date": "2025-10-28",
+     "net": 38201
+    },
+    {
+     "date": "2025-11-04",
+     "net": 43144
+    },
+    {
+     "date": "2025-11-10",
+     "net": 52321
+    },
+    {
+     "date": "2025-11-18",
+     "net": 65495
+    },
+    {
+     "date": "2025-11-25",
+     "net": 60388
+    },
+    {
+     "date": "2025-12-02",
+     "net": 65444
+    },
+    {
+     "date": "2025-12-09",
+     "net": 75781
+    },
+    {
+     "date": "2025-12-16",
+     "net": 47841
+    },
+    {
+     "date": "2025-12-23",
+     "net": 55511
+    },
+    {
+     "date": "2025-12-30",
+     "net": 58466
+    },
+    {
+     "date": "2026-01-06",
+     "net": 63515
+    },
+    {
+     "date": "2026-01-13",
+     "net": 61419
+    },
+    {
+     "date": "2026-01-20",
+     "net": 65759
+    },
+    {
+     "date": "2026-01-27",
+     "net": 52617
+    },
+    {
+     "date": "2026-02-03",
+     "net": 44319
+    },
+    {
+     "date": "2026-02-10",
+     "net": 45860
+    },
+    {
+     "date": "2026-02-17",
+     "net": 45597
+    },
+    {
+     "date": "2026-02-24",
+     "net": 45617
+    },
+    {
+     "date": "2026-03-03",
+     "net": 54787
+    },
+    {
+     "date": "2026-03-10",
+     "net": 52866
+    },
+    {
+     "date": "2026-03-17",
+     "net": 46946
+    },
+    {
+     "date": "2026-03-24",
+     "net": 54787
+    },
+    {
+     "date": "2026-03-31",
+     "net": 52803
+    },
+    {
+     "date": "2026-04-07",
+     "net": 54606
+    },
+    {
+     "date": "2026-04-14",
+     "net": 48344
+    },
+    {
+     "date": "2026-04-21",
+     "net": 45220
+    },
+    {
+     "date": "2026-04-28",
+     "net": 49189
+    },
+    {
+     "date": "2026-05-05",
+     "net": 60183
+    },
+    {
+     "date": "2026-05-12",
+     "net": 57858
+    },
+    {
+     "date": "2026-05-19",
+     "net": 55593
+    },
+    {
+     "date": "2026-05-26",
+     "net": 49710
+    },
+    {
+     "date": "2026-06-02",
+     "net": 56065
+    },
+    {
+     "date": "2026-06-09",
+     "net": 50978
+    },
+    {
+     "date": "2026-06-16",
+     "net": 49274
+    },
+    {
+     "date": "2026-06-23",
+     "net": 56531
+    },
+    {
+     "date": "2026-06-30",
+     "net": 55314
+    },
+    {
+     "date": "2026-07-07",
+     "net": 54924
+    },
+    {
+     "date": "2026-07-14",
+     "net": 53799
+    },
+    {
+     "date": "2026-07-21",
+     "net": 54463
+    },
+    {
+     "date": "2026-07-28",
+     "net": 63807
+    },
+    {
+     "date": "2026-08-04",
+     "net": 67707
+    },
+    {
+     "date": "2026-08-11",
+     "net": 76282
+    },
+    {
+     "date": "2026-08-18",
+     "net": 65330
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Managed money е на 95.5-ти percentile нетно дълги Mexican Peso спрямо пълните 156 седмици — екстремален оптимизъм към MXN. Контрариан сигнал за обезценяване на Peso. Няма директно ликвиден, публично търгуван тикър с чиста дълга MXN expозиция — FXM (iShares MSCI Mexico ETF) е най-близкото, но то е equity, не currency play, и влияят допълнителни фактори. Оставям списъка празен — не насилвам индиректна логика.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "EXPD",
+      "company": "Expeditors International of Was"
+     }
+    ],
+    "reasoning": "Слабо Peso означава по-скъп USD-деноминиран внос за мексикански клиенти и потенциално намаляване на nearshoring trade flows — директна верига за freight & logistics компании с Mexico corridor expозиция. EXPD (Expeditors International) е integrated freight & logistics от скрийнъра с трансграничен Северноамерикански бизнес; обаче признавам, че тази връзка е гранична — Peso обезценяването влияе на volume-а, но не е еднозначно bearish за EXPD, тъй като те фактурират в USD. Ако не е достатъчно директна за потребителя, списъкът може да се счита за воден.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Cotton",
+   "category": "commodity",
+   "net_position": 72672,
+   "percentile": 95.5,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -60985
+    },
+    {
+     "date": "2025-09-02",
+     "net": -67283
+    },
+    {
+     "date": "2025-09-09",
+     "net": -69548
+    },
+    {
+     "date": "2025-09-16",
+     "net": -60280
+    },
+    {
+     "date": "2025-09-23",
+     "net": -62771
+    },
+    {
+     "date": "2025-09-30",
+     "net": -65025
+    },
+    {
+     "date": "2025-10-07",
+     "net": -75997
+    },
+    {
+     "date": "2025-10-14",
+     "net": -80436
+    },
+    {
+     "date": "2025-10-21",
+     "net": -79906
+    },
+    {
+     "date": "2025-10-28",
+     "net": -73602
+    },
+    {
+     "date": "2025-11-04",
+     "net": -64282
+    },
+    {
+     "date": "2025-11-10",
+     "net": -61227
+    },
+    {
+     "date": "2025-11-18",
+     "net": -59719
+    },
+    {
+     "date": "2025-11-25",
+     "net": -63430
+    },
+    {
+     "date": "2025-12-02",
+     "net": -60705
+    },
+    {
+     "date": "2025-12-09",
+     "net": -56289
+    },
+    {
+     "date": "2025-12-16",
+     "net": -56623
+    },
+    {
+     "date": "2025-12-23",
+     "net": -49723
+    },
+    {
+     "date": "2025-12-30",
+     "net": -48556
+    },
+    {
+     "date": "2026-01-06",
+     "net": -47192
+    },
+    {
+     "date": "2026-01-13",
+     "net": -49727
+    },
+    {
+     "date": "2026-01-20",
+     "net": -51546
+    },
+    {
+     "date": "2026-01-27",
+     "net": -64982
+    },
+    {
+     "date": "2026-02-03",
+     "net": -72336
+    },
+    {
+     "date": "2026-02-10",
+     "net": -76513
+    },
+    {
+     "date": "2026-02-17",
+     "net": -80705
+    },
+    {
+     "date": "2026-02-24",
+     "net": -66281
+    },
+    {
+     "date": "2026-03-03",
+     "net": -74199
+    },
+    {
+     "date": "2026-03-10",
+     "net": -67950
+    },
+    {
+     "date": "2026-03-17",
+     "net": -39838
+    },
+    {
+     "date": "2026-03-24",
+     "net": -33546
+    },
+    {
+     "date": "2026-03-31",
+     "net": -9884
+    },
+    {
+     "date": "2026-04-07",
+     "net": -445
+    },
+    {
+     "date": "2026-04-14",
+     "net": 13116
+    },
+    {
+     "date": "2026-04-21",
+     "net": 31329
+    },
+    {
+     "date": "2026-04-28",
+     "net": 36492
+    },
+    {
+     "date": "2026-05-05",
+     "net": 48337
+    },
+    {
+     "date": "2026-05-12",
+     "net": 55493
+    },
+    {
+     "date": "2026-05-19",
+     "net": 59665
+    },
+    {
+     "date": "2026-05-26",
+     "net": 55284
+    },
+    {
+     "date": "2026-06-02",
+     "net": 49899
+    },
+    {
+     "date": "2026-06-09",
+     "net": 42538
+    },
+    {
+     "date": "2026-06-16",
+     "net": 33542
+    },
+    {
+     "date": "2026-06-23",
+     "net": 35273
+    },
+    {
+     "date": "2026-06-30",
+     "net": 29423
+    },
+    {
+     "date": "2026-07-07",
+     "net": 34354
+    },
+    {
+     "date": "2026-07-14",
+     "net": 43926
+    },
+    {
+     "date": "2026-07-21",
+     "net": 47059
+    },
+    {
+     "date": "2026-07-28",
+     "net": 46368
+    },
+    {
+     "date": "2026-08-04",
+     "net": 55321
+    },
+    {
+     "date": "2026-08-11",
+     "net": 66780
+    },
+    {
+     "date": "2026-08-18",
+     "net": 72672
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Managed money е на 95.5-ти percentile нетно дълги Cotton спрямо пълните 156 седмици — почти рекорден спекулативен оптимизъм. Контрариан сигнал за спад в цените на памука. Няма самостоятелен публично търгуван тикър с достатъчно чиста директна expозиция само към cotton futures — основните производители (Parkdale, Plains Cotton) не са публично търгувани. Оставям списъка празен.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "ABNB",
+      "company": "Airbnb, Inc."
+     }
+    ],
+    "reasoning": "Няма пряк бенефициент сред днешните кандидати с реална директна икономическа верига от спад в cotton към конкретен тикър от скрийнъра — textile manufacturers и apparel companies биха били директните бенефициенти (намалени input costs), но никой от скрийнъра не е в тази индустрия. Включването на ABNB или друг тикър би представлявало точно онзи тип generic макро верига, която инструкцията изрично изключва. Оставям списъка празен.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Australian Dollar",
+   "category": "financial",
+   "net_position": 52108,
+   "percentile": 92.9,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -4483
+    },
+    {
+     "date": "2025-09-02",
+     "net": -10353
+    },
+    {
+     "date": "2025-09-09",
+     "net": -4754
+    },
+    {
+     "date": "2025-09-16",
+     "net": -3081
+    },
+    {
+     "date": "2025-09-23",
+     "net": -5546
+    },
+    {
+     "date": "2025-09-30",
+     "net": -11646
+    },
+    {
+     "date": "2025-10-07",
+     "net": -3037
+    },
+    {
+     "date": "2025-10-14",
+     "net": 5423
+    },
+    {
+     "date": "2025-10-21",
+     "net": 346
+    },
+    {
+     "date": "2025-10-28",
+     "net": -12434
+    },
+    {
+     "date": "2025-11-04",
+     "net": -7488
+    },
+    {
+     "date": "2025-11-10",
+     "net": -15531
+    },
+    {
+     "date": "2025-11-18",
+     "net": -12427
+    },
+    {
+     "date": "2025-11-25",
+     "net": -17558
+    },
+    {
+     "date": "2025-12-02",
+     "net": -17669
+    },
+    {
+     "date": "2025-12-09",
+     "net": 18563
+    },
+    {
+     "date": "2025-12-16",
+     "net": 39477
+    },
+    {
+     "date": "2025-12-23",
+     "net": 41482
+    },
+    {
+     "date": "2025-12-30",
+     "net": 33671
+    },
+    {
+     "date": "2026-01-06",
+     "net": 35115
+    },
+    {
+     "date": "2026-01-13",
+     "net": 30217
+    },
+    {
+     "date": "2026-01-20",
+     "net": 27558
+    },
+    {
+     "date": "2026-01-27",
+     "net": 44726
+    },
+    {
+     "date": "2026-02-03",
+     "net": 59409
+    },
+    {
+     "date": "2026-02-10",
+     "net": 64904
+    },
+    {
+     "date": "2026-02-17",
+     "net": 70260
+    },
+    {
+     "date": "2026-02-24",
+     "net": 64653
+    },
+    {
+     "date": "2026-03-03",
+     "net": 54635
+    },
+    {
+     "date": "2026-03-10",
+     "net": 46568
+    },
+    {
+     "date": "2026-03-17",
+     "net": 45359
+    },
+    {
+     "date": "2026-03-24",
+     "net": 49145
+    },
+    {
+     "date": "2026-03-31",
+     "net": 52569
+    },
+    {
+     "date": "2026-04-07",
+     "net": 45901
+    },
+    {
+     "date": "2026-04-14",
+     "net": 43642
+    },
+    {
+     "date": "2026-04-21",
+     "net": 48325
+    },
+    {
+     "date": "2026-04-28",
+     "net": 47855
+    },
+    {
+     "date": "2026-05-05",
+     "net": 56600
+    },
+    {
+     "date": "2026-05-12",
+     "net": 55851
+    },
+    {
+     "date": "2026-05-19",
+     "net": 61178
+    },
+    {
+     "date": "2026-05-26",
+     "net": 60234
+    },
+    {
+     "date": "2026-06-02",
+     "net": 58800
+    },
+    {
+     "date": "2026-06-09",
+     "net": 42292
+    },
+    {
+     "date": "2026-06-16",
+     "net": 41538
+    },
+    {
+     "date": "2026-06-23",
+     "net": 39111
+    },
+    {
+     "date": "2026-06-30",
+     "net": 31777
+    },
+    {
+     "date": "2026-07-07",
+     "net": 29683
+    },
+    {
+     "date": "2026-07-14",
+     "net": 27222
+    },
+    {
+     "date": "2026-07-21",
+     "net": 24788
+    },
+    {
+     "date": "2026-07-28",
+     "net": 27618
+    },
+    {
+     "date": "2026-08-04",
+     "net": 40637
+    },
+    {
+     "date": "2026-08-11",
+     "net": 48541
+    },
+    {
+     "date": "2026-08-18",
+     "net": 52108
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Managed money е на 92.9-ти percentile нетно дълги Australian Dollar спрямо пълните 156 седмици — екстремален оптимизъм към AUD. Контрариан сигнал за обезценяване на AUD. Няма директно ликвиден, самостоятелен публично търгуван тикър с чиста дълга AUD expозиция на американски пазари — FXA (Invesco CurrencyShares Australian Dollar) съществува, но е с много нисък обем. Оставям списъка празен.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bearish",
+    "tickers": [
+     {
+      "ticker": "SCCO",
+      "company": "Southern Copper Corporation"
+     }
+    ],
+    "reasoning": "AUD е силно корелиран с commodity цикъла — особено с мед и желязна руда, тъй като Австралия е major exporter. Bearish обрат в AUD сигнализира очакване за по-слабо commodity търсене (особено от Китай), което е директен двустъпков натиск върху copper miners: AUD слабост → commodity demand pessimism → copper price pressure → SCCO приходи. SCCO вече е характеризиран като bearish в Copper тезата — тук ролята е консистентна и допълнително подкрепена от AUD сигнала, не противоречие.",
+    "dropped_tickers": null,
+    "outside_screener": true
+   }
+  },
+  {
+   "market": "Canadian Dollar",
+   "category": "financial",
+   "net_position": -88897,
+   "percentile": 8.4,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -36143
+    },
+    {
+     "date": "2025-09-02",
+     "net": -44029
+    },
+    {
+     "date": "2025-09-09",
+     "net": -47347
+    },
+    {
+     "date": "2025-09-16",
+     "net": -48244
+    },
+    {
+     "date": "2025-09-23",
+     "net": -48756
+    },
+    {
+     "date": "2025-09-30",
+     "net": -45588
+    },
+    {
+     "date": "2025-10-07",
+     "net": -47742
+    },
+    {
+     "date": "2025-10-14",
+     "net": -49787
+    },
+    {
+     "date": "2025-10-21",
+     "net": -54845
+    },
+    {
+     "date": "2025-10-28",
+     "net": -59008
+    },
+    {
+     "date": "2025-11-04",
+     "net": -72945
+    },
+    {
+     "date": "2025-11-10",
+     "net": -72094
+    },
+    {
+     "date": "2025-11-18",
+     "net": -72368
+    },
+    {
+     "date": "2025-11-25",
+     "net": -72479
+    },
+    {
+     "date": "2025-12-02",
+     "net": -75724
+    },
+    {
+     "date": "2025-12-09",
+     "net": -74390
+    },
+    {
+     "date": "2025-12-16",
+     "net": -77018
+    },
+    {
+     "date": "2025-12-23",
+     "net": -57719
+    },
+    {
+     "date": "2025-12-30",
+     "net": -58678
+    },
+    {
+     "date": "2026-01-06",
+     "net": -57096
+    },
+    {
+     "date": "2026-01-13",
+     "net": -55699
+    },
+    {
+     "date": "2026-01-20",
+     "net": -57357
+    },
+    {
+     "date": "2026-01-27",
+     "net": -52216
+    },
+    {
+     "date": "2026-02-03",
+     "net": -52855
+    },
+    {
+     "date": "2026-02-10",
+     "net": -51008
+    },
+    {
+     "date": "2026-02-17",
+     "net": -42034
+    },
+    {
+     "date": "2026-02-24",
+     "net": -34101
+    },
+    {
+     "date": "2026-03-03",
+     "net": -41371
+    },
+    {
+     "date": "2026-03-10",
+     "net": -37159
+    },
+    {
+     "date": "2026-03-17",
+     "net": -37852
+    },
+    {
+     "date": "2026-03-24",
+     "net": -31700
+    },
+    {
+     "date": "2026-03-31",
+     "net": -42910
+    },
+    {
+     "date": "2026-04-07",
+     "net": -44144
+    },
+    {
+     "date": "2026-04-14",
+     "net": -61404
+    },
+    {
+     "date": "2026-04-21",
+     "net": -64215
+    },
+    {
+     "date": "2026-04-28",
+     "net": -53828
+    },
+    {
+     "date": "2026-05-05",
+     "net": -47758
+    },
+    {
+     "date": "2026-05-12",
+     "net": -37663
+    },
+    {
+     "date": "2026-05-19",
+     "net": -38654
+    },
+    {
+     "date": "2026-05-26",
+     "net": -38095
+    },
+    {
+     "date": "2026-06-02",
+     "net": -44601
+    },
+    {
+     "date": "2026-06-09",
+     "net": -58623
+    },
+    {
+     "date": "2026-06-16",
+     "net": -65053
+    },
+    {
+     "date": "2026-06-23",
+     "net": -83377
+    },
+    {
+     "date": "2026-06-30",
+     "net": -88101
+    },
+    {
+     "date": "2026-07-07",
+     "net": -85957
+    },
+    {
+     "date": "2026-07-14",
+     "net": -92771
+    },
+    {
+     "date": "2026-07-21",
+     "net": -98377
+    },
+    {
+     "date": "2026-07-28",
+     "net": -102495
+    },
+    {
+     "date": "2026-08-04",
+     "net": -101748
+    },
+    {
+     "date": "2026-08-11",
+     "net": -92005
+    },
+    {
+     "date": "2026-08-18",
+     "net": -88897
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bullish",
+    "tickers": [],
+    "reasoning": "Managed money е на 8.4-ти percentile нетно къси Canadian Dollar спрямо пълните 156 седмици история — почти рекорден спекулативен песимизъм. Контрариански сигнал за bullish обрат в CAD. Няма ликвидни публично търгувани тикъри с достатъчно директна и чиста CAD-exposure за да ги включим тук — FXC (ETF) е опция, но не е сред кандидатите и е с нисък обем; не насилваме избор.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "EXPD",
+      "company": "Expeditors International of Was"
+     }
+    ],
+    "reasoning": "За разлика от ролята на EXPD в Mexican Peso тезата (bearish/nearshoring риск), тук той действа като частичен beneficiary — по-силен CAD означава по-силна канадска икономика и повече трансграничен Canada-US freight volume, което директно подкрепя Expeditors' North American логистичен бизнес. Връзката е: CAD bullish обрат → Canadian import/export активност нагоре → cross-border freight demand. Това е различна роля от Peso тезата (там беше bearish поради nearshoring риск) и двете са ортогонални — не се противоречат пряко, но юзърът трябва да държи предвид, че EXPD в двете тези действа в противоположни посоки.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  },
+  {
+   "market": "Sugar No. 11",
+   "category": "commodity",
+   "net_position": 138613,
+   "percentile": 91.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-08-18",
+   "history": [
+    {
+     "date": "2025-08-26",
+     "net": -92246
+    },
+    {
+     "date": "2025-09-02",
+     "net": -100562
+    },
+    {
+     "date": "2025-09-09",
+     "net": -144886
+    },
+    {
+     "date": "2025-09-16",
+     "net": -126270
+    },
+    {
+     "date": "2025-09-23",
+     "net": -150907
+    },
+    {
+     "date": "2025-09-30",
+     "net": -136098
+    },
+    {
+     "date": "2025-10-07",
+     "net": -141337
+    },
+    {
+     "date": "2025-10-14",
+     "net": -165750
+    },
+    {
+     "date": "2025-10-21",
+     "net": -154301
+    },
+    {
+     "date": "2025-10-28",
+     "net": -169741
+    },
+    {
+     "date": "2025-11-04",
+     "net": -199182
+    },
+    {
+     "date": "2025-11-10",
+     "net": -206798
+    },
+    {
+     "date": "2025-11-18",
+     "net": -191697
+    },
+    {
+     "date": "2025-11-25",
+     "net": -196895
+    },
+    {
+     "date": "2025-12-02",
+     "net": -183859
+    },
+    {
+     "date": "2025-12-09",
+     "net": -175959
+    },
+    {
+     "date": "2025-12-16",
+     "net": -164366
+    },
+    {
+     "date": "2025-12-23",
+     "net": -148742
+    },
+    {
+     "date": "2025-12-30",
+     "net": -130928
+    },
+    {
+     "date": "2026-01-06",
+     "net": -137536
+    },
+    {
+     "date": "2026-01-13",
+     "net": -137476
+    },
+    {
+     "date": "2026-01-20",
+     "net": -146254
+    },
+    {
+     "date": "2026-01-27",
+     "net": -132441
+    },
+    {
+     "date": "2026-02-03",
+     "net": -176700
+    },
+    {
+     "date": "2026-02-10",
+     "net": -200034
+    },
+    {
+     "date": "2026-02-17",
+     "net": -231762
+    },
+    {
+     "date": "2026-02-24",
+     "net": -232316
+    },
+    {
+     "date": "2026-03-03",
+     "net": -238217
+    },
+    {
+     "date": "2026-03-10",
+     "net": -202363
+    },
+    {
+     "date": "2026-03-17",
+     "net": -198139
+    },
+    {
+     "date": "2026-03-24",
+     "net": -73170
+    },
+    {
+     "date": "2026-03-31",
+     "net": -40794
+    },
+    {
+     "date": "2026-04-07",
+     "net": -55858
+    },
+    {
+     "date": "2026-04-14",
+     "net": -133746
+    },
+    {
+     "date": "2026-04-21",
+     "net": -174720
+    },
+    {
+     "date": "2026-04-28",
+     "net": -174600
+    },
+    {
+     "date": "2026-05-05",
+     "net": -111557
+    },
+    {
+     "date": "2026-05-12",
+     "net": -95571
+    },
+    {
+     "date": "2026-05-19",
+     "net": -83869
+    },
+    {
+     "date": "2026-05-26",
+     "net": -89102
+    },
+    {
+     "date": "2026-06-02",
+     "net": -118732
+    },
+    {
+     "date": "2026-06-09",
+     "net": -123713
+    },
+    {
+     "date": "2026-06-16",
+     "net": -154935
+    },
+    {
+     "date": "2026-06-23",
+     "net": -186290
+    },
+    {
+     "date": "2026-06-30",
+     "net": -158202
+    },
+    {
+     "date": "2026-07-07",
+     "net": -108650
+    },
+    {
+     "date": "2026-07-14",
+     "net": -102817
+    },
+    {
+     "date": "2026-07-21",
+     "net": -102682
+    },
+    {
+     "date": "2026-07-28",
+     "net": -116424
+    },
+    {
+     "date": "2026-08-04",
+     "net": -87188
+    },
+    {
+     "date": "2026-08-11",
+     "net": 43584
+    },
+    {
+     "date": "2026-08-18",
+     "net": 138613
+    }
+   ],
+   "direct_thesis": {
+    "direction": "bearish",
+    "tickers": [],
+    "reasoning": "Managed money е на 91-ти percentile нетно дълги Sugar No. 11 спрямо пълните 156 седмици история — силен спекулативен оптимизъм, контрариански bearish сигнал за обрат надолу в цената на захарта. Няма ликвидни самостоятелно публично търгувани производители на захар в достатъчно чист вид на US пазарите — SGG (ETN) е опция, но не е акция; не насилваме избор.",
+    "outside_screener": false
+   },
+   "cross_sector_thesis": {
+    "direction": "bullish",
+    "tickers": [
+     {
+      "ticker": "AMGN",
+      "company": "Amgen Inc."
+     }
+    ],
+    "reasoning": "Спад в цената на захарта като основен input в хранително-вкусовата индустрия е реална директна верига, но нито един от кандидатите не е food/beverage manufacturer с material захарен input cost. AMGN е Healthcare/биофармацевтика без захарна експозиция — включването му би било генерична макро верига, не директна. Няма пряк бенефициент сред днешните кандидати с реална директна икономическа връзка от спад в Sugar No. 11 — списъкът е доминиран от Energy рафинерии, Financials и Tech/Travel, където захарата не е material input cost.",
+    "dropped_tickers": null,
+    "outside_screener": false
+   }
+  }
+ ],
+ "correlation_flags": [],
+ "distribution_days": {
+  "count": 6,
+  "spy_count": 5,
+  "qqq_count": 6,
+  "status": "green",
+  "label": "SPY 5 / QQQ 6 (последни 25 сесии)"
+ },
+ "backtest": {
+  "total_resolved": 17,
+  "win_rate_pct": 5.9,
+  "wins": 1,
+  "losses": 16,
+  "stopped": 16,
+  "trailing_stop_exit": 1,
+  "expired_in_trail": 0,
+  "expired": 0,
+  "still_open": 32,
+  "trailing": 0,
+  "avg_realized_r": -0.84,
+  "recent": [
+   {
+    "ticker": "HWM",
+    "entry_date": "2026-07-27",
+    "resolution": "stopped",
+    "resolution_date": "2026-08-24",
+    "realized_r": -1.0,
+    "late_discovery": true
+   },
+   {
+    "ticker": "ROK",
+    "entry_date": "2026-06-19",
+    "resolution": "stopped",
+    "resolution_date": "2026-08-20",
+    "realized_r": -1.0,
+    "late_discovery": true
+   }
+  ],
+  "open_positions": [
+   {
+    "ticker": "AIZ",
+    "entry_date": "2026-06-13",
+    "entry_price": 261.1,
+    "current_price": 288.51,
+    "unrealized_pct": 10.5,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "AMG",
+    "entry_date": "2026-06-13",
+    "entry_price": 355.55,
+    "current_price": 370.59,
+    "unrealized_pct": 4.2,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "LNTH",
+    "entry_date": "2026-06-14",
+    "entry_price": 104.57,
+    "current_price": 100.82,
+    "unrealized_pct": -3.6,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "IBKR",
+    "entry_date": "2026-06-18",
+    "entry_price": 97.68,
+    "current_price": 97.02,
+    "unrealized_pct": -0.7,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "THG",
+    "entry_date": "2026-06-24",
+    "entry_price": 207.79,
+    "current_price": 228.41,
+    "unrealized_pct": 9.9,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "UMBF",
+    "entry_date": "2026-06-24",
+    "entry_price": 139.89,
+    "current_price": 143.34,
+    "unrealized_pct": 2.5,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "UAL",
+    "entry_date": "2026-06-25",
+    "entry_price": 130.6,
+    "current_price": 114.83,
+    "unrealized_pct": -12.1,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "NBIX",
+    "entry_date": "2026-06-25",
+    "entry_price": 169.57,
+    "current_price": 156.59,
+    "unrealized_pct": -7.7,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "WST",
+    "entry_date": "2026-06-26",
+    "entry_price": 352.31,
+    "current_price": 349.92,
+    "unrealized_pct": -0.7,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "VLY",
+    "entry_date": "2026-06-26",
+    "entry_price": 14.94,
+    "current_price": 14.09,
+    "unrealized_pct": -5.7,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "EXEL",
+    "entry_date": "2026-06-26",
+    "entry_price": 53.93,
+    "current_price": 56.1,
+    "unrealized_pct": 4.0,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "ALL",
+    "entry_date": "2026-06-29",
+    "entry_price": 240.16,
+    "current_price": 261.81,
+    "unrealized_pct": 9.0,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "WTS",
+    "entry_date": "2026-07-01",
+    "entry_price": 394.54,
+    "current_price": 378.14,
+    "unrealized_pct": -4.2,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "MNST",
+    "entry_date": "2026-07-02",
+    "entry_price": 98.31,
+    "current_price": 47.81,
+    "unrealized_pct": null,
+    "needs_manual_review": {
+     "reason": "split_detected",
+     "split_date": "2026-08-11",
+     "split_ratio": 2.0
+    },
+    "earnings_recap": null
+   },
+   {
+    "ticker": "TRV",
+    "entry_date": "2026-07-03",
+    "entry_price": 342.31,
+    "current_price": 371.15,
+    "unrealized_pct": 8.4,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "INCY",
+    "entry_date": "2026-07-06",
+    "entry_price": 118.69,
+    "current_price": 128.12,
+    "unrealized_pct": 7.9,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "LLY",
+    "entry_date": "2026-07-10",
+    "entry_price": 1249.45,
+    "current_price": 1189.41,
+    "unrealized_pct": -4.8,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "BAC",
+    "entry_date": "2026-07-16",
+    "entry_price": 62.03,
+    "current_price": 62.23,
+    "unrealized_pct": 0.3,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "FITB",
+    "entry_date": "2026-07-20",
+    "entry_price": 59.5,
+    "current_price": 55.1,
+    "unrealized_pct": -7.4,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "JPM",
+    "entry_date": "2026-07-24",
+    "entry_price": 351.24,
+    "current_price": 356.5,
+    "unrealized_pct": 1.5,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "ROST",
+    "entry_date": "2026-07-30",
+    "entry_price": 255.3,
+    "current_price": 236.27,
+    "unrealized_pct": -7.5,
+    "needs_manual_review": null,
+    "earnings_recap": {
+     "quality": "yellow",
+     "quarters": [
+      {
+       "date": "2026-08-20",
+       "eps_estimate": 1.95,
+       "eps_actual": 2.66,
+       "eps_surprise_pct": 36.74,
+       "reaction_pct": -2.43,
+       "reaction_volume_ratio": 2.31
+      },
+      {
+       "date": "2026-05-21",
+       "eps_estimate": 1.73,
+       "eps_actual": 2.02,
+       "eps_surprise_pct": 16.67,
+       "reaction_pct": -0.28,
+       "reaction_volume_ratio": 1.32
+      },
+      {
+       "date": "2026-03-03",
+       "eps_estimate": 1.9,
+       "eps_actual": 2.0,
+       "eps_surprise_pct": 5.13,
+       "reaction_pct": -2.3,
+       "reaction_volume_ratio": 1.76
+      },
+      {
+       "date": "2025-11-20",
+       "eps_estimate": 1.42,
+       "eps_actual": 1.58,
+       "eps_surprise_pct": 11.4,
+       "reaction_pct": 0.03,
+       "reaction_volume_ratio": 1.93
+      }
+     ],
+     "yoy": {
+      "date": "2025-08-21",
+      "eps_estimate": 1.54,
+      "eps_actual": 1.56,
+      "eps_surprise_pct": 1.41,
+      "reaction_pct": -0.5,
+      "reaction_volume_ratio": 1.36
+     },
+     "yoy_summary": {
+      "current_date": "2026-08-20",
+      "yoy_date": "2025-08-21",
+      "eps_current": 2.66,
+      "eps_yoy": 1.56,
+      "yoy_growth_pct": 70.5
+     },
+     "forward": {
+      "next_earnings": "2026-11-19",
+      "days_to_earnings": 84,
+      "in_blackout": false,
+      "consensus_eps": 1.42,
+      "yoy_date": "2025-11-20",
+      "yoy_eps": 1.58,
+      "expected_growth_pct": -10.1
+     }
+    }
+   },
+   {
+    "ticker": "ONB",
+    "entry_date": "2026-07-30",
+    "entry_price": 27.32,
+    "current_price": 25.78,
+    "unrealized_pct": -5.6,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "GRMN",
+    "entry_date": "2026-07-31",
+    "entry_price": 304.0,
+    "current_price": 289.02,
+    "unrealized_pct": -4.9,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "CHE",
+    "entry_date": "2026-07-31",
+    "entry_price": 551.68,
+    "current_price": 548.56,
+    "unrealized_pct": -0.6,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "NTRS",
+    "entry_date": "2026-07-31",
+    "entry_price": 191.6,
+    "current_price": 187.66,
+    "unrealized_pct": -2.1,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "ANET",
+    "entry_date": "2026-08-05",
+    "entry_price": 194.35,
+    "current_price": 202.25,
+    "unrealized_pct": 4.1,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "MPC",
+    "entry_date": "2026-08-12",
+    "entry_price": 336.45,
+    "current_price": 362.27,
+    "unrealized_pct": 7.7,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "VLO",
+    "entry_date": "2026-08-12",
+    "entry_price": 324.37,
+    "current_price": 348.03,
+    "unrealized_pct": 7.3,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "EXPD",
+    "entry_date": "2026-08-13",
+    "entry_price": 187.74,
+    "current_price": 190.18,
+    "unrealized_pct": 1.3,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "TGT",
+    "entry_date": "2026-08-21",
+    "entry_price": 161.98,
+    "current_price": 164.04,
+    "unrealized_pct": 1.3,
+    "needs_manual_review": null,
+    "earnings_recap": {
+     "quality": "green",
+     "quarters": [
+      {
+       "date": "2026-08-19",
+       "eps_estimate": 2.34,
+       "eps_actual": 4.11,
+       "eps_surprise_pct": 75.83,
+       "reaction_pct": 4.28,
+       "reaction_volume_ratio": 1.99
+      },
+      {
+       "date": "2026-05-20",
+       "eps_estimate": 1.46,
+       "eps_actual": 1.71,
+       "eps_surprise_pct": 17.31,
+       "reaction_pct": -3.86,
+       "reaction_volume_ratio": 3.9
+      },
+      {
+       "date": "2026-03-03",
+       "eps_estimate": 2.16,
+       "eps_actual": 2.44,
+       "eps_surprise_pct": 12.97,
+       "reaction_pct": 6.74,
+       "reaction_volume_ratio": 2.79
+      },
+      {
+       "date": "2025-11-19",
+       "eps_estimate": 1.71,
+       "eps_actual": 1.78,
+       "eps_surprise_pct": 4.09,
+       "reaction_pct": -2.77,
+       "reaction_volume_ratio": 2.67
+      }
+     ],
+     "yoy": {
+      "date": "2025-08-20",
+      "eps_estimate": 2.03,
+      "eps_actual": 2.05,
+      "eps_surprise_pct": 0.82,
+      "reaction_pct": -6.33,
+      "reaction_volume_ratio": 4.82
+     },
+     "yoy_summary": {
+      "current_date": "2026-08-19",
+      "yoy_date": "2025-08-20",
+      "eps_current": 4.11,
+      "eps_yoy": 2.05,
+      "yoy_growth_pct": 100.5
+     },
+     "forward": {
+      "next_earnings": "2026-11-18",
+      "days_to_earnings": 83,
+      "in_blackout": false,
+      "consensus_eps": 1.71,
+      "yoy_date": "2025-11-19",
+      "yoy_eps": 1.78,
+      "expected_growth_pct": -3.9
+     }
+    }
+   },
+   {
+    "ticker": "FCFS",
+    "entry_date": "2026-08-25",
+    "entry_price": 238.38,
+    "current_price": 219.82,
+    "unrealized_pct": -7.8,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   },
+   {
+    "ticker": "AMGN",
+    "entry_date": "2026-08-25",
+    "entry_price": 445.87,
+    "current_price": 440.34,
+    "unrealized_pct": -1.2,
+    "needs_manual_review": null,
+    "earnings_recap": null
+   }
+  ]
+ }
+}

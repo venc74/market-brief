@@ -1,37 +1,37 @@
 {
- "date": "2026-08-26",
+ "date": "2026-08-27",
  "news": [
   {
-   "headline": "Canada unveils retaliatory tariffs on about $20 billion of U.S. goods",
-   "why": "Ескалацията на търговската война между САЩ и Канада увеличава инфлационния натиск и риска за корпоративните маржове в засегнатите сектори."
+   "headline": "Nvidia прогнозира 70% ръст на приходите за FY2028, далеч над очакванията",
+   "why": "Beats на Nvidia движат фючърсите нагоре и дават тон на целия tech сектор за сесията."
   },
   {
-   "headline": "Bessent's bond intervention puts US Treasury on collision course with Fed",
-   "why": "Конфликтът между Министерството на финансите и Fed относно дълговите покупки директно засяга очакванията за лихвени нива и Treasury yields."
+   "headline": "Танкер е ударен в Ормузкия проток, геополитическият риск остава висок",
+   "why": "Атаката заплашва петролния транзит и може да натисне суровия петрол нагоре при ескалация."
   },
   {
-   "headline": "Fidelity says this phenomenon is 'reshaping markets' and recommends stocks to fight it off",
-   "why": "Структурната инфлация, задвижена от дефицити, AI инвестиции и търговски бариери, променя asset allocation логиката за средносрочни позиции."
+   "headline": "Европейските газови резерви са исторически ниски, цените може да надхвърлят 100 EUR тази зима",
+   "why": "Нарушените LNG потоци от Близкия изток повишават риска от енергийна криза, която ще удари европейската икономика."
   },
   {
-   "headline": "Iran and Oman discuss joint shipping route in Strait of Hormuz and mine clearing mission",
-   "why": "Всяка промяна в статута на Хормузкия проток директно влияе върху петролния транзит и цените на суровия петрол."
+   "headline": "Китайският промишлен печалбен ръст се забавя до 7-месечно дъно",
+   "why": "Сигнал за задълбочаващо се забавяне в Китай, което натиска суровините и emerging markets."
   },
   {
-   "headline": "Nvidia's 'expectations premium' dogs the stock after earnings. Here's what analysts are watching",
-   "why": "NVDA е барометър за целия AI/semiconductor сектор и реакцията й след earnings движи по-широкия tech пазар."
+   "headline": "Южнокорейската централна банка повишава лихвите последователно втори път при висока базова инфлация",
+   "why": "Поредно затягане в Азия показва, че инфлационният натиск не е овладян глобално — ключово за Fed narrative."
   },
   {
-   "headline": "Dick's Sporting Goods just had its worst day ever",
-   "why": "Рекордният спад от 30% сигнализира за сериозно влошаване в потребителските разходи за дискреционни стоки, с импликации за целия retail сектор."
+   "headline": "Fed управителят Лиза Кук: адвокатът й отвръща на заплахата на Тръмп да я уволни",
+   "why": "Политическата намеса в независимостта на Fed остава пазарен риск за доверието в институцията."
   },
   {
-   "headline": "HP partners with U.S.-blacklisted Huawei for licensing the Chinese company's WiFi tech",
-   "why": "Сделката поставя под въпрос ефективността на U.S. export controls и може да провокира нови регулаторни реакции, засягащи tech компаниите."
+   "headline": "Bitcoin treasury компаниите губят 80 млрд. долара пазарна капитализация",
+   "why": "Разпродажбата сигнализира разриване на leveraged crypto-equity модела, с последствия за рисковите апетити."
   },
   {
-   "headline": "China challenges Korean champions in flash memory race",
-   "why": "YMTC's $5bn IPO и амбициите в NAND производството заплашват пазарните позиции на Samsung и SK Hynix, с последствия за semiconductor сектора глобално."
+   "headline": "Salesforce скача с 12% заради AI ръст и печалба от дял в Anthropic",
+   "why": "Потвърждава монетизацията на AI в enterprise software и подкрепя ротацията в tech сектора."
   }
  ]
 }
