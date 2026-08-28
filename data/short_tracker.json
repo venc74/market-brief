@@ -1,0 +1,72 @@
+{
+ "PLAY_2026-08-28": {
+  "ticker": "PLAY",
+  "entry_date": "2026-08-28",
+  "status": "open",
+  "entry_price": 9.18,
+  "target_1": 6.52,
+  "stop_loss": 10.51,
+  "lagging_sector": "Комуникации",
+  "distress_signal_count": 5,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "GDEV_2026-08-28": {
+  "ticker": "GDEV",
+  "entry_date": "2026-08-28",
+  "status": "open",
+  "entry_price": 10.8,
+  "target_1": 8.26,
+  "stop_loss": 12.07,
+  "lagging_sector": "Комуникации",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "CABO_2026-08-28": {
+  "ticker": "CABO",
+  "entry_date": "2026-08-28",
+  "status": "open",
+  "entry_price": 22.49,
+  "target_1": -9.95,
+  "stop_loss": 38.71,
+  "lagging_sector": "Комуникации",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "HE_2026-08-28": {
+  "ticker": "HE",
+  "entry_date": "2026-08-28",
+  "status": "open",
+  "entry_price": 11.46,
+  "target_1": 8.78,
+  "stop_loss": 12.8,
+  "lagging_sector": "Комунални услуги",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "SSTK_2026-08-28": {
+  "ticker": "SSTK",
+  "entry_date": "2026-08-28",
+  "status": "open",
+  "entry_price": 5.49,
+  "target_1": 0.53,
+  "stop_loss": 7.97,
+  "lagging_sector": "Комуникации",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ }
+}
