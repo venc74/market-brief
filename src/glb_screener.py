@@ -255,4 +255,4 @@ if __name__ == "__main__":
     # пълният universe scan е скъп (500+ тикъра × period="max"), за
     # production run виж screen() без universe= аргумент.
     out = screen(universe=["SNDK", "WDC", "MU", "STX"])
-    print(json.dumps(out, indent=2, ensure_ascii=False))
+    print(json.dumps(out, indent=2, ensure_ascii=False, default=str))

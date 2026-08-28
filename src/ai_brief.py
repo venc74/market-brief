@@ -144,7 +144,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
-СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False)}
+СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}
 
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
 (проценти, percentile, нива, delta-и) в prose текста — копирай Я ТОЧНО както е \
@@ -271,7 +271,7 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
         f"""
 
 ВЧЕРАШНИ WATCHLIST TRIGGER-И ЗА ТЕЗИ ТИКЪРИ (за консистентност):
-{json.dumps(batch_triggers, ensure_ascii=False)}
+{json.dumps(batch_triggers, ensure_ascii=False, default=str)}
 
 За тикър от списъка по-горе: провери дали вчерашният trigger (цена/обем/RS \
 условие) реално се е изпълнил, преди да го класифицираш като Action. Ако го \
@@ -281,7 +281,7 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
         if batch_triggers else ""
     )
     return f"""Пазарен режим: {regime}
-Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False)}
+Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False, default=str)}
 
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
 {trigger_block}
@@ -542,7 +542,7 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 ТЕКУЩ CANSLIM СКРИЙНЪР (за cross-reference — предпочитай тези тикъри, когато \
 логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър — дали \
 е извън скрийнъра се засича автоматично от кода, не отбелязвай го сам): \
-{json.dumps(screener_universe, ensure_ascii=False)}
+{json.dumps(screener_universe, ensure_ascii=False, default=str)}
 {prior_block}
 
 ВАЖНО за инструменти с "weeks_of_history" под {config.COT_SHORT_HISTORY_WEEKS} \

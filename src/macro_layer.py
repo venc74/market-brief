@@ -205,7 +205,7 @@ def collect_macro_layer() -> dict:
 
 if __name__ == "__main__":
     import json
-    print(json.dumps(collect_macro_layer(), indent=2, ensure_ascii=False))
+    print(json.dumps(collect_macro_layer(), indent=2, ensure_ascii=False, default=str))
 
 
 # ══════════════════════════════════════════════════════════════════════════

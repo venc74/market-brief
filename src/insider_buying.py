@@ -99,7 +99,7 @@ def _ticker_cik_map() -> dict[str, str]:
                 out[t] = str(cik).zfill(10)
         config.DATA_DIR.mkdir(exist_ok=True)
         _CIK_MAP_CACHE.write_text(json.dumps({"month": dt.date.today().isoformat()[:7],
-                                              "map": out}, ensure_ascii=False))
+                                              "map": out}, ensure_ascii=False, default=str))
     except Exception as e:
         print(f"[insider] ticker→CIK map: {e}")
     return out
@@ -445,7 +445,7 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _CACHE.write_text(json.dumps({"date": today, "rows": display_rows, "diagnostics": diagnostics},
-                                     ensure_ascii=False, indent=1))
+                                     ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[insider] cache write: {e}")
 
@@ -462,4 +462,4 @@ if __name__ == "__main__":
             print(f"      {ins['date']}  {ins['name']:20} {ins['title']:24} ${ins['value']:>12,.0f}")
     if _CACHE.exists():
         diag = json.loads(_CACHE.read_text()).get("diagnostics", {})
-        print("diagnostics:", json.dumps(diag, ensure_ascii=False))
+        print("diagnostics:", json.dumps(diag, ensure_ascii=False, default=str))

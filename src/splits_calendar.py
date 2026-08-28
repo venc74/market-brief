@@ -221,7 +221,7 @@ def fetch_upcoming_splits(days: int = 7) -> list[dict]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _CACHE.write_text(json.dumps({"date": iso, "rows": result},
-                                     ensure_ascii=False, indent=1))
+                                     ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[splits] cache write: {e}")
     return result

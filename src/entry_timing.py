@@ -185,5 +185,5 @@ if __name__ == "__main__":
         {"ticker": "EXTENDED", "pct_from_pivot": 3.8, "volume_ratio": 1.9, "breakout_volume": True},
         {"ticker": "NOT_YET", "pct_from_pivot": -2.1, "volume_ratio": 1.1, "breakout_volume": False},
     ]
-    print(json.dumps(evaluate(mock), indent=2, ensure_ascii=False))
-    print(json.dumps(evaluate_distribution_days(), indent=2, ensure_ascii=False))
+    print(json.dumps(evaluate(mock), indent=2, ensure_ascii=False, default=str))
+    print(json.dumps(evaluate_distribution_days(), indent=2, ensure_ascii=False, default=str))

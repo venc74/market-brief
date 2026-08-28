@@ -79,7 +79,7 @@ def _load_tracker() -> dict:
 
 def _save_tracker(tracker: dict) -> None:
     config.DATA_DIR.mkdir(exist_ok=True)
-    _TRACKER_PATH.write_text(json.dumps(tracker, ensure_ascii=False, indent=1),
+    _TRACKER_PATH.write_text(json.dumps(tracker, ensure_ascii=False, indent=1, default=str),
                              encoding="utf-8")
 
 
@@ -508,4 +508,4 @@ def get_backtest_summary() -> dict:
 if __name__ == "__main__":
     update_backtest_tracker()
     summary = get_backtest_summary()
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    print(json.dumps(summary, indent=2, ensure_ascii=False, default=str))

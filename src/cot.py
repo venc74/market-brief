@@ -239,7 +239,7 @@ def _load_cache() -> dict:
 def _save_cache(cache: dict) -> None:
     config.DATA_DIR.mkdir(exist_ok=True)
     cache["last_updated"] = dt.date.today().isoformat()
-    _CACHE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+    _CACHE.write_text(json.dumps(cache, ensure_ascii=False, default=str), encoding="utf-8")
 
 
 def _merge_series(existing: dict, new_rows: list[dict]) -> dict:

@@ -181,7 +181,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
         "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "
         f"секторни движения, суровини. Максимум {max_items} новини, всяка с едно "
         "изречение защо е важна за пазарите днес.\n\n"
-        f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False)}\n\n"
+        f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
         'Върни само JSON: {"news": [{"headline": "...", "why": "..."}]}'
     )
     try:
@@ -197,7 +197,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _CACHE.write_text(json.dumps({"date": today, "news": news},
-                                     ensure_ascii=False, indent=1))
+                                     ensure_ascii=False, indent=1, default=str))
     except Exception as ex:
         print(f"[news] cache write: {ex}")
 

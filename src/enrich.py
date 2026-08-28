@@ -320,7 +320,7 @@ def _load_iv_history() -> dict:
 
 def _save_iv_history(hist: dict) -> None:
     config.DATA_DIR.mkdir(exist_ok=True)
-    config.IV_HISTORY_FILE.write_text(json.dumps(hist, indent=1))
+    config.IV_HISTORY_FILE.write_text(json.dumps(hist, indent=1, default=str))
 
 
 def options_info(sym: str, price: float) -> dict:

@@ -124,7 +124,7 @@ def _sp500_ndx_universe() -> list[str]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _UNIV_CACHE.write_text(json.dumps({"date": dt.date.today().isoformat(),
-                                           "tickers": tickers}, ensure_ascii=False))
+                                           "tickers": tickers}, ensure_ascii=False, default=str))
     except Exception:
         pass
     return tickers
@@ -185,7 +185,7 @@ def _top_by_volume(universe: list[str], top_n: int) -> list[str]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _VOLUME_RANK_CACHE.write_text(json.dumps({"date": today, "ranked": ranked},
-                                                  ensure_ascii=False))
+                                                  ensure_ascii=False, default=str))
     except Exception as e:
         print(f"[unusual_options] volume rank cache write: {e}")
 
@@ -314,7 +314,7 @@ def fetch_unusual_options(limit: int = 10) -> list[dict]:
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _CACHE.write_text(json.dumps({"date": today, "source": source, "rows": dedup},
-                                     ensure_ascii=False, indent=1))
+                                     ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[unusual_options] cache write: {e}")
     return dedup[:limit]

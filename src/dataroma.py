@@ -196,7 +196,7 @@ def _ticker_map() -> dict[str, str]:
                     out[key] = t
         config.DATA_DIR.mkdir(exist_ok=True)
         _TMAP_CACHE.write_text(json.dumps({"month": dt.date.today().isoformat()[:7],
-                                           "map": out}, ensure_ascii=False))
+                                           "map": out}, ensure_ascii=False, default=str))
     except Exception as e:
         print(f"[edgar] ticker map: {e}")
     return out
@@ -533,7 +533,7 @@ def _fetch_all(min_value: float) -> dict:
         try:
             config.DATA_DIR.mkdir(exist_ok=True)
             _CACHE.write_text(json.dumps({"date": today, "bundle": bundle},
-                                         ensure_ascii=False, indent=1))
+                                         ensure_ascii=False, indent=1, default=str))
         except Exception as e:
             print(f"[dataroma] cache write: {e}")
     elif _CACHE.exists():

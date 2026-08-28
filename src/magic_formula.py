@@ -126,7 +126,7 @@ def build_ranked(universe: list[str] | None = None, top_n: int | None = None) ->
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
         _CACHE.write_text(json.dumps({"date": today, "ranked": ranked},
-                                     ensure_ascii=False, indent=1))
+                                     ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[magic_formula] cache write: {e}")
 

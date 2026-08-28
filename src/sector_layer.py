@@ -30,16 +30,27 @@ def _laggard_persistence(rs) -> tuple[float | None, bool]:
     if len(rs) < min_needed:
         return None, False
 
+    # FIX 2026-08-28 (production crash — json.dumps(rotation) в ai_brief.py
+    # без default= fallback гръмна "TypeError: Object of type bool is not
+    # JSON serializable"): rs.iloc[idx] тук НЕ беше float()-кастнато (за
+    # разлика от останалата част на sector_rotation(), която explicit го
+    # прави навсякъде другаде) — сравнения върху суров numpy/pandas scalar
+    # произвеждат numpy.bool_, не native bool. NumPy 2.x показва
+    # numpy.bool_.__class__.__name__ буквално като "bool" (старите версии —
+    # "bool_"), затова грешката подвеждащо изглеждаше като нормален Python
+    # bool. float() каст тук, same стил като rs_now/rs_4w/rs_12w по-горе.
     both_neg_flags = []
     for lag in range(window):
         idx = -1 - lag
-        r_now = rs.iloc[idx]
-        r_4w = rs.iloc[idx - 21]
-        r_12w = rs.iloc[idx - 63]
+        r_now = float(rs.iloc[idx])
+        r_4w = float(rs.iloc[idx - 21])
+        r_12w = float(rs.iloc[idx - 63])
         both_neg_flags.append(r_now / r_4w - 1 < 0 and r_now / r_12w - 1 < 0)
 
     persistence_pct = round(sum(both_neg_flags) / window * 100, 1)
-    confirmed_laggard = sum(both_neg_flags) >= config.SECTOR_PERSISTENCE_MIN_DAYS
+    # Explicit bool() каст — defensive, дори след float()-a по-горе, за да
+    # не разчитаме мълчаливо, че sum()/>= винаги връща native bool.
+    confirmed_laggard = bool(sum(both_neg_flags) >= config.SECTOR_PERSISTENCE_MIN_DAYS)
     return persistence_pct, confirmed_laggard
 
 
@@ -107,4 +118,4 @@ if __name__ == "__main__":
     import json
     rot = sector_rotation()
     print(json.dumps({"rotation": rot, "leaders": leading_sectors(rot)},
-                     indent=2, ensure_ascii=False))
+                     indent=2, ensure_ascii=False, default=str))
