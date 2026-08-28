@@ -601,6 +601,19 @@ SHORT_LEVERAGE_EXEMPT_INDUSTRIES = ["REIT - Mortgage"]
 
 MAX_SHORT_CANDIDATES = int(os.getenv("MAX_SHORT_CANDIDATES", 5))  # mirror на MAX_ACTION_TICKERS
 
+# ── short_tracker.py: _risk_plan() risk/entry guard ───────────────────────
+# FIX 2026-08-28 (първи реален production run): CABO (risk/entry=72%)
+# произведе target_1=-$9.95 — механично невъзможна отрицателна цена.
+# SSTK (risk/entry=45%, target_1=$0.53) потвърди, че чист "target_1 < 0"
+# guard не стига — подозрително близо до нула, не буквално невалидно.
+# Реалните "здрави" кандидати от СЪЩИЯ run клъстерираха 7-15% risk/entry
+# (JKS 7.6%, HE 11.7%, GDEV 11.8%, PLAY 14.5%) — ясна пропаст до
+# проблемните 45%/72%, без нищо по средата. 30% седи комфортно над
+# здравия клъстер, далеч под проблемния — виж short_tracker._risk_plan()
+# за пълния rationale защо guard-ваме на risk/entry ниво (root cause), не
+# само target_1 след факта.
+SHORT_MAX_RISK_PCT_OF_ENTRY = float(os.getenv("SHORT_MAX_RISK_PCT_OF_ENTRY", 0.30))
+
 # ── short_tracker.py (prospective, независим от backtest_tracker.json) ───
 # FIX 2026-08-2x: bankruptcy-filing-aware exit логика НЕ е implementирана —
 # нямаме надежден, безплатен data source за programmatic Chapter-11-filing

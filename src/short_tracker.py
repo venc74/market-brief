@@ -97,16 +97,37 @@ def _risk_plan(row: dict) -> dict | None:
     docstring-а). stop_loss = ma50 (над него тезата невалидна), target_1 =
     entry - risk*MIN_REWARD_RISK (same 2:1 конвенция като дългата страна,
     обърнат знак).
+
+    FIX 2026-08-28 (първи реален production run — Venci catch): CABO
+    (price=$22.49, ma50=$38.71, risk/entry=72%) произведе target_1=-$9.95 —
+    механично безсмислено, цена не може да падне под $0. SSTK (risk/entry=
+    45%, target_1=$0.53) показа, че чист "target_1 < 0" guard не стига —
+    подозрително близо до нула, не буквално невалидно. Реалните "здрави"
+    кандидати от същия run клъстерираха 7-15% risk/entry (JKS 7.6%, HE
+    11.7%, GDEV 11.8%, PLAY 14.5%) — ясна пропаст до проблемните 45%/72%,
+    без нищо по средата. Guard-ваме на risk/entry ниво (root cause — 50DMA
+    твърде далеч от entry, вече не е смислено tight risk ниво, same урок
+    като coal 2014-16 backtest-а: акция вече дълбоко extended под
+    референтната си точка е "твърде късно" за нов short с тази механика),
+    не само target_1 след факта. explicit target_1<=0 backstop остава —
+    defensive, ако MIN_REWARD_RISK някога се промени над ~3.33 (при 30%
+    праг target_1 математически >= 40% от entry за текущия MIN_REWARD_RISK
+    =2.0, но не разчитаме мълчаливо на тази аритметика занапред).
     """
     entry = row.get("price")
     ma50 = row.get("ma50")
     if not entry or not ma50 or ma50 <= entry:
         return None
     risk_per_share = ma50 - entry
+    if risk_per_share > entry * config.SHORT_MAX_RISK_PCT_OF_ENTRY:
+        return None
+    target_1 = entry - risk_per_share * config.MIN_REWARD_RISK
+    if target_1 <= 0:
+        return None
     return {
         "entry_price": round(entry, 2),
         "stop_loss": round(ma50, 2),
-        "target_1": round(entry - risk_per_share * config.MIN_REWARD_RISK, 2),
+        "target_1": round(target_1, 2),
     }
 
 
