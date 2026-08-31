@@ -1,37 +1,37 @@
 {
- "date": "2026-08-28",
+ "date": "2026-08-31",
  "news": [
   {
-   "headline": "Iran links Hormuz reopening to ending regional wars as Trump reportedly rejects return to June deal",
-   "why": "Блокадата на Ормуз засяга ~20% от световния петролен трафик — ескалацията или де-ескалацията директно движи петролните фючърси и енергийния сектор."
+   "headline": "Trump заплашва да удари петролния хъб Kharg Island на Иран; US и Иран размениха огън за първи път от над месец",
+   "why": "Ескалацията в Персийския залив директно заплашва доставките през Hormuz и натиска петролните цени нагоре, с директен ефект върху енергийния сектор и широкия пазар."
   },
   {
-   "headline": "Six months into the Iran war: Markets become accustomed to stalemate with no end in sight",
-   "why": "Продължителният конфликт вече е вграден в рисковата премия на петрола и отбранителния сектор, но ново развитие може рязко да ребалансира позициите."
+   "headline": "Stock futures падат след US удари срещу Иран",
+   "why": "Геополитическият риск материализира risk-off движение в pre-market, което поставя под въпрос петото поредно месечно покачване на Dow."
   },
   {
-   "headline": "S&P 500 futures are little changed as investors count down to Warsh's Jackson Hole address",
-   "why": "Речта на Fed председателя Warsh в Jackson Hole е основният катализатор за посоката на лихвените очаквания и пазарите тази сесия."
+   "headline": "Jackson Hole: Warsh изпраща hawkish сигнал, вдига шансовете за повишение на лихвите и може да постави Fed 'в конфликт' с Treasury",
+   "why": "Hawkish реторика от Fed Chair на Jackson Hole директно преоценява rate path за септемврийското FOMC, с ефект върху treasuries, долара и equity valuations."
   },
   {
-   "headline": "What Warsh will say and how the market will react, according to prediction markets",
-   "why": "Prediction markets залагат на минимален шанс Warsh да спомене 'rate cut' — сигнал, че пазарът не очаква гълъбова изненада, което е важно за позициониране в rate-sensitive активи."
+   "headline": "Франция се превръща в 'poster child' на суверенни дългови проблеми — разходите по заеми достигат нива от 2008 г.",
+   "why": "Растящите borrowing costs на втората икономика в еврозоната засилват системния риск за EUR активи и увеличават натиска върху ЕЦБ."
   },
   {
-   "headline": "US corporate profits surge to record as worker payouts wilt",
-   "why": "Рекордните корпоративни печалби подкрепят equity valuations, но свиването на работническите доходи е дефлационен макро сигнал с отражение върху потребителски акции."
+   "headline": "US планира санкции срещу още една банка в рамките на кампанията срещу Иран транзакции",
+   "why": "Разширяването на финансовите санкции срещу Иран засяга глобалните банки с експозиция към региона и допълнително ограничава петролния поток."
   },
   {
-   "headline": "Trump ratchets up rhetoric against Beijing as U.S.-China officials meet for Xi's Washington visit",
-   "why": "Ескалиращата реторика между САЩ и Китай в деня на срещата увеличава тарифния риск и волатилността при технологични и индустриални акции с висока China-exposure."
+   "headline": "Китайската фабрична активност се свива втори пореден месец, но по-малко от очакваното",
+   "why": "Слабите PMI данни от Китай продължават да потискат търсенето на суровини и оказват натиск върху emerging markets и commodities-свързани акции."
   },
   {
-   "headline": "Zero-interest convertible bonds set for record year",
-   "why": "Рекордната емисия на zero-coupon конвертируеми облигации сигнализира как компаниите управляват капиталовата структура при висока волатилност — важно за credit пазарите и M&A динамиката."
+   "headline": "Goldman очаква yen carry trade стратегиите да продължат да работят въпреки избледняващия ефект от интервенцията",
+   "why": "Yen carry dynamics влияят на глобалните capital flows и волатилността — ключов макро фактор за risk assets след августовската турбуленция."
   },
   {
-   "headline": "AI needs more power. Stephanie Link is buying this natural gas stock while it's cheap",
-   "why": "Нарастващото търсене на електроенергия от AI дата центрове превръща природния газ в структурна тема — секторен ротационен сигнал за utilities и energy акции."
+   "headline": "Корабният сектор привлича дългосрочни инвеститори заради конфликта в Близкия изток",
+   "why": "Институционалният интерес към shipping като hard asset хедж срещу геополитически риск сигнализира секторна ротация с потенциал за движение в акциите на корабни компании."
   }
  ]
 }

@@ -1,35 +1,35 @@
 {
- "date": "2026-08-28",
+ "date": "2026-08-31",
  "rows": [
   {
-   "ticker": "IESC",
-   "company": "IES Holdings, Inc.",
-   "date": "2026-08-24",
+   "ticker": "RUSHA",
+   "company": "Rush Enterprises, Inc.",
+   "date": "2026-09-01",
+   "ratio": "1.5:1",
+   "split_type": "normal",
+   "date_human": "Sep 01, 2026",
+   "price": 76.27,
+   "market_cap": 8267037951.016113
+  },
+  {
+   "ticker": "RUSHB",
+   "company": "Rush Enterprises, Inc.",
+   "date": "2026-09-01",
+   "ratio": "1.5:1",
+   "split_type": "normal",
+   "date_human": "Sep 01, 2026",
+   "price": 76.9,
+   "market_cap": 8976569091.616478
+  },
+  {
+   "ticker": "APH",
+   "company": "Amphenol Corporation",
+   "date": "2026-09-03",
    "ratio": "2:1",
    "split_type": "normal",
-   "date_human": "Aug 24, 2026",
-   "price": 333.67,
-   "market_cap": 13296320268.11792
-  },
-  {
-   "ticker": "REAX",
-   "company": "Real REMAX Group Inc.",
-   "date": "2026-08-25",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Aug 25, 2026",
-   "price": 23.63,
-   "market_cap": 515001984.5293999
-  },
-  {
-   "ticker": "GPMXY",
-   "company": "Grupo Mexico S.A. ADR",
-   "date": "2026-08-27",
-   "ratio": "0%",
-   "split_type": null,
-   "date_human": "Aug 27, 2026",
-   "price": 28.22,
-   "market_cap": 110430214719.47342
+   "date_human": "Sep 03, 2026",
+   "price": 157.74,
+   "market_cap": 194490817280.1604
   }
  ]
 }
