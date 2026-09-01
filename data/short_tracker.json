@@ -96,5 +96,19 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "AIV_2026-09-01": {
+  "ticker": "AIV",
+  "entry_date": "2026-09-01",
+  "status": "open",
+  "entry_price": 2.51,
+  "target_1": 2.09,
+  "stop_loss": 2.72,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

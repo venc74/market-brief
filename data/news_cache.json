@@ -1,37 +1,37 @@
 {
- "date": "2026-08-31",
+ "date": "2026-09-01",
  "news": [
   {
-   "headline": "Trump заплашва да удари петролния хъб Kharg Island на Иран; US и Иран размениха огън за първи път от над месец",
-   "why": "Ескалацията в Персийския залив директно заплашва доставките през Hormuz и натиска петролните цени нагоре, с директен ефект върху енергийния сектор и широкия пазар."
+   "headline": "Tanker struck in Hormuz, Trump vows to hit Iran 'hard'",
+   "why": "Удар в Ормузкия проток застрашава ~20% от световния петролен транзит и директно натиска oil prices нагоре."
   },
   {
-   "headline": "Stock futures падат след US удари срещу Иран",
-   "why": "Геополитическият риск материализира risk-off движение в pre-market, което поставя под въпрос петото поредно месечно покачване на Dow."
+   "headline": "Mortgage rates surge to highest since June 2025 as Middle East attacks push oil prices up",
+   "why": "Покачването на ипотечните лихви вследствие на геополитическото напрежение сигнализира за по-широко рефлиране на risk-off настроенията в rate-sensitive сектори."
   },
   {
-   "headline": "Jackson Hole: Warsh изпраща hawkish сигнал, вдига шансовете за повишение на лихвите и може да постави Fed 'в конфликт' с Treasury",
-   "why": "Hawkish реторика от Fed Chair на Jackson Hole директно преоценява rate path за септемврийското FOMC, с ефект върху treasuries, долара и equity valuations."
+   "headline": "Japan's benchmark yield hits 3% as global bond sell-off deepens",
+   "why": "Японските 10-годишни достигат 3% при очаквания за BOJ rate hike — това засилва глобалния bond sell-off и притиска и US Treasuries."
   },
   {
-   "headline": "Франция се превръща в 'poster child' на суверенни дългови проблеми — разходите по заеми достигат нива от 2008 г.",
-   "why": "Растящите borrowing costs на втората икономика в еврозоната засилват системния риск за EUR активи и увеличават натиска върху ЕЦБ."
+   "headline": "Trump says U.S. growth could hit 20%, argues against Fed rate hikes despite inflation above 2%",
+   "why": "Политическият натиск върху Fed за запазване на ниски лихви при висока инфлация засилва несигурността около monetary policy path."
   },
   {
-   "headline": "US планира санкции срещу още една банка в рамките на кампанията срещу Иран транзакции",
-   "why": "Разширяването на финансовите санкции срещу Иран засяга глобалните банки с експозиция към региона и допълнително ограничава петролния поток."
+   "headline": "'Ominous' small-cap signal suggests need for caution — BTIG warns of potential rate hike risk",
+   "why": "Техническо предупреждение за small-caps (Russell 2000) индикира risk-off ротация, която може да засегне по-широкия пазар."
   },
   {
-   "headline": "Китайската фабрична активност се свива втори пореден месец, но по-малко от очакваното",
-   "why": "Слабите PMI данни от Китай продължават да потискат търсенето на суровини и оказват натиск върху emerging markets и commodities-свързани акции."
+   "headline": "Venezuela grants U.S.-backed oil firm NABEP 100-year concessions for 17 oil fields",
+   "why": "Новите венецуелски петролни концесии могат да увеличат глобалното предлагане и да окажват натиск надолу върху oil prices средносрочно."
   },
   {
-   "headline": "Goldman очаква yen carry trade стратегиите да продължат да работят въпреки избледняващия ефект от интервенцията",
-   "why": "Yen carry dynamics влияят на глобалните capital flows и волатилността — ключов макро фактор за risk assets след августовската турбуленция."
+   "headline": "Bessent tells Russia no economic relief until Ukraine war ends; Europeans snub Moscow at G20",
+   "why": "Твърдата позиция на Treasury по санкциите спрямо Русия поддържа геополитическата premium в енергийните пазари."
   },
   {
-   "headline": "Корабният сектор привлича дългосрочни инвеститори заради конфликта в Близкия изток",
-   "why": "Институционалният интерес към shipping като hard asset хедж срещу геополитически риск сигнализира секторна ротация с потенциал за движение в акциите на корабни компании."
+   "headline": "Shein shares slide ~10% in Hong Kong trading debut",
+   "why": "Слабият дебют на Shein при занижена оценка е негативен сигнал за IPO пазара и consumer discretionary сектора в Азия."
   }
  ]
 }
