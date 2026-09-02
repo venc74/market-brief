@@ -146,13 +146,14 @@
  "VLY_2026-06-26": {
   "ticker": "VLY",
   "entry_date": "2026-06-26",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 14.94,
   "target_1": 17.96,
   "stop_loss": 13.43,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-01",
+  "realized_r": -1.0,
+  "discovered_date": "2026-09-02"
  },
  "EXEL_2026-06-26": {
   "ticker": "EXEL",
@@ -350,13 +351,14 @@
  "ROST_2026-07-30": {
   "ticker": "ROST",
   "entry_date": "2026-07-30",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 255.3,
   "target_1": 315.24,
   "stop_loss": 225.33,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-01",
+  "realized_r": -1.0,
+  "discovered_date": "2026-09-02"
  },
  "ONB_2026-07-30": {
   "ticker": "ONB",
