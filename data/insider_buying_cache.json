@@ -1,5 +1,5 @@
 {
- "date": "2026-09-02",
+ "date": "2026-09-03",
  "rows": [
   {
    "ticker": "INTC",
@@ -113,6 +113,33 @@
    ]
   },
   {
+   "ticker": "VST",
+   "company": "Vistra Corp.",
+   "total_value": 1173069.25,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-09-01",
+     "value": 603891.25
+    },
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-08-31",
+     "value": 299178.0
+    },
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-08-24",
+     "value": 270000.0
+    }
+   ]
+  },
+  {
    "ticker": "TSCO",
    "company": "TRACTOR SUPPLY CO /DE/",
    "total_value": 416829.00000000006,
@@ -124,21 +151,6 @@
      "title": "President & CEO",
      "date": "2026-08-04",
      "value": 416829.00000000006
-    }
-   ]
-  },
-  {
-   "ticker": "VST",
-   "company": "Vistra Corp.",
-   "total_value": 270000.0,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "BURKE JAMES A",
-     "title": "President and CEO",
-     "date": "2026-08-24",
-     "value": 270000.0
     }
    ]
   },
@@ -161,9 +173,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 406,
+  "tickers_with_filings": 407,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 160,
-  "qualifying_after_filter": 14
+  "raw_transactions_parsed": 166,
+  "qualifying_after_filter": 16
  }
 }

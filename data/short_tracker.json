@@ -110,5 +110,33 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "SITC_2026-09-03": {
+  "ticker": "SITC",
+  "entry_date": "2026-09-03",
+  "status": "open",
+  "entry_price": 2.93,
+  "target_1": 2.39,
+  "stop_loss": 3.2,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "CSR_2026-09-03": {
+  "ticker": "CSR",
+  "entry_date": "2026-09-03",
+  "status": "open",
+  "entry_price": 52.78,
+  "target_1": 47.72,
+  "stop_loss": 55.31,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }
