@@ -1,5 +1,5 @@
 {
- "date": "2026-09-03",
+ "date": "2026-09-04",
  "rows": [
   {
    "ticker": "INTC",
@@ -173,9 +173,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 407,
+  "tickers_with_filings": 404,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 166,
+  "raw_transactions_parsed": 171,
   "qualifying_after_filter": 16
  }
 }

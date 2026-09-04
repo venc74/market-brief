@@ -86,13 +86,13 @@
  "BHR_2026-08-31": {
   "ticker": "BHR",
   "entry_date": "2026-08-31",
-  "status": "open",
+  "status": "trailing",
   "entry_price": 2.03,
   "target_1": 1.89,
   "stop_loss": 2.1,
   "lagging_sector": "Недвижими имоти",
   "distress_signal_count": 4,
-  "target1_hit_date": null,
+  "target1_hit_date": "2026-09-03",
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null

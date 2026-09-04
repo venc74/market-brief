@@ -1,5 +1,5 @@
 {
- "date": "2026-09-03",
+ "date": "2026-09-04",
  "rows": [
   {
    "ticker": "RUSHA",
@@ -8,8 +8,8 @@
    "ratio": "1.5:1",
    "split_type": "normal",
    "date_human": "Sep 01, 2026",
-   "price": 49.33,
-   "market_cap": 5758276462.72847
+   "price": 50.11,
+   "market_cap": 5849361095.65
   },
   {
    "ticker": "RUSHB",
@@ -18,8 +18,8 @@
    "ratio": "1.5:1",
    "split_type": "normal",
    "date_human": "Sep 01, 2026",
-   "price": 49.26,
-   "market_cap": 5750104973.853069
+   "price": 50.48,
+   "market_cap": 5892551349.2
   },
   {
    "ticker": "APH",
@@ -28,8 +28,8 @@
    "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Sep 03, 2026",
-   "price": 80.04,
-   "market_cap": 197375994054.22015
+   "price": 82.07,
+   "market_cap": 202381903879.42664
   }
  ]
 }
