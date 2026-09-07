@@ -1,35 +1,4 @@
 {
- "date": "2026-09-04",
- "rows": [
-  {
-   "ticker": "RUSHA",
-   "company": "Rush Enterprises, Inc.",
-   "date": "2026-09-01",
-   "ratio": "1.5:1",
-   "split_type": "normal",
-   "date_human": "Sep 01, 2026",
-   "price": 50.11,
-   "market_cap": 5849361095.65
-  },
-  {
-   "ticker": "RUSHB",
-   "company": "Rush Enterprises, Inc.",
-   "date": "2026-09-01",
-   "ratio": "1.5:1",
-   "split_type": "normal",
-   "date_human": "Sep 01, 2026",
-   "price": 50.48,
-   "market_cap": 5892551349.2
-  },
-  {
-   "ticker": "APH",
-   "company": "Amphenol Corporation",
-   "date": "2026-09-03",
-   "ratio": "2:1",
-   "split_type": "normal",
-   "date_human": "Sep 03, 2026",
-   "price": 82.07,
-   "market_cap": 202381903879.42664
-  }
- ]
+ "date": "2026-09-07",
+ "rows": []
 }

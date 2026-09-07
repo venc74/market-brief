@@ -1,5 +1,5 @@
 {
- "date": "2026-09-04",
+ "date": "2026-09-07",
  "rows": [
   {
    "ticker": "INTC",
@@ -17,24 +17,9 @@
    ]
   },
   {
-   "ticker": "BSX",
-   "company": "BOSTON SCIENTIFIC CORP",
-   "total_value": 9001407.552,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "Mahoney Michael F",
-     "title": "Chairman, President & CEO",
-     "date": "2026-08-03",
-     "value": 9001407.552
-    }
-   ]
-  },
-  {
    "ticker": "APTV",
    "company": "Aptiv PLC",
-   "total_value": 8204228.399200001,
+   "total_value": 3204269.5190000003,
    "cluster": true,
    "in_screener": false,
    "insiders": [
@@ -61,54 +46,6 @@
      "title": "Chair and CEO",
      "date": "2026-08-10",
      "value": 2502684.219
-    },
-    {
-     "name": "MEISTER PAUL M",
-     "title": "",
-     "date": "2026-08-05",
-     "value": 4999958.8802000005
-    }
-   ]
-  },
-  {
-   "ticker": "PFE",
-   "company": "PFIZER INC",
-   "total_value": 2960109.9,
-   "cluster": true,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "BOURLA ALBERT",
-     "title": "Chairman & CEO",
-     "date": "2026-08-12",
-     "value": 1000920.0
-    },
-    {
-     "name": "BLAYLOCK RONALD E",
-     "title": "",
-     "date": "2026-08-05",
-     "value": 998821.26
-    },
-    {
-     "name": "Buckley Mortimer J",
-     "title": "",
-     "date": "2026-08-05",
-     "value": 960368.64
-    }
-   ]
-  },
-  {
-   "ticker": "CSGP",
-   "company": "COSTAR GROUP, INC.",
-   "total_value": 2489837.0,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "FLORANCE ANDREW C",
-     "title": "Founder and CEO",
-     "date": "2026-08-04",
-     "value": 2489837.0
     }
    ]
   },
@@ -140,17 +77,17 @@
    ]
   },
   {
-   "ticker": "TSCO",
-   "company": "TRACTOR SUPPLY CO /DE/",
-   "total_value": 416829.00000000006,
+   "ticker": "PFE",
+   "company": "PFIZER INC",
+   "total_value": 1000920.0,
    "cluster": false,
    "in_screener": false,
    "insiders": [
     {
-     "name": "Lawton III Harry A",
-     "title": "President & CEO",
-     "date": "2026-08-04",
-     "value": 416829.00000000006
+     "name": "BOURLA ALBERT",
+     "title": "Chairman & CEO",
+     "date": "2026-08-12",
+     "value": 1000920.0
     }
    ]
   },
@@ -173,9 +110,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 404,
+  "tickers_with_filings": 392,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 171,
-  "qualifying_after_filter": 16
+  "raw_transactions_parsed": 153,
+  "qualifying_after_filter": 10
  }
 }
