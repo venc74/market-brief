@@ -1,37 +1,37 @@
 {
- "date": "2026-09-08",
+ "date": "2026-09-09",
  "news": [
   {
-   "headline": "Oil extends gains as renewed Mideast hostilities raise worries of prolonged conflict",
-   "why": "Петролът поскъпва след американско-ирански удари, което натиска инфлационните очаквания и увеличава риска за глобалния растеж."
+   "headline": "Oil nears $100 as US launches new strikes on Iranian tankers",
+   "why": "Ескалацията около Ормузкия проток тласка петрола към $100, което директно удря транспортни разходи, инфлационни очаквания и енергийния сектор."
   },
   {
-   "headline": "Dow futures fall 300 points to start shortened week as oil prices climb",
-   "why": "Фючърсите сигнализират risk-off настроение в съкратена търговска седмица — важен контекст за дневните нива на S&P и Dow."
+   "headline": "Iran says it hit American vessels, oil tankers in Hormuz in retaliation for U.S. strikes",
+   "why": "Взаимни удари в най-стратегическия морски коридор за петрол засилват геополитическата премия и волатилността в суровините."
   },
   {
-   "headline": "China's export surge sets stage for record annual surplus",
-   "why": "Рекордният китайски търговски излишък поставя под напрежение преговорите Trump-Xi за тарифното примирие и може да ескалира търговската война."
+   "headline": "Canada's retaliatory tariffs worth CA$27.6 billion take effect as trade rift with U.S. deepens",
+   "why": "Ескалиращата търговска война между САЩ и Канада повишава риска за инфлация и верижни разходи в производствения и металния сектор."
   },
   {
-   "headline": "China's imports in August miss estimates as calls for rebalancing trade grow",
-   "why": "Слабото вътрешно търсене в Китай потвърждава дефлационния натиск и намалява глобалното търсене на суровини и стоки."
+   "headline": "US bans Canadian dairy, motorcycles and most alcoholic beverages",
+   "why": "Новите американски забрани разширяват търговския конфликт с Канада и засягат допълнителни потребителски и аграрни сектори."
   },
   {
-   "headline": "Bombardier points out U.S. footprint after Trump says aerospace giant must build in America",
-   "why": "Канадските ответни мита от $20 млрд. влизат в сила — ескалацията в търговския конфликт CAD/USA директно засяга секторите aerospace, energy и agriculture."
+   "headline": "China's wholesale inflation tops estimates in August on commodity costs, tech demand as consumer price increases meet forecast",
+   "why": "По-високата китайска PPI данна сигнализира за ценов натиск в суровините и технологичните вериги на доставки с глобален ефект."
   },
   {
-   "headline": "The world's $2tn interest bill",
-   "why": "Глобалното бреме от лихвени плащания надвишава разходите за отбрана в САЩ, Франция и Великобритания — структурен макро риск за дълговите пазари и sovereign spreads."
+   "headline": "Warsh might yet be a good Fed chair",
+   "why": "Дискусията около следващия председател на Fed е ключова за пазарните очаквания за лихвена политика и независимост на централната банка."
   },
   {
-   "headline": "Global shipping rules are collapsing, say maritime nations",
-   "why": "Разпадането на морските правила заради войни и shadow fleet означава structural shift в логистиката — директен риск за commodity supply chains и freight costs."
+   "headline": "Trump administration expresses 'profound concern' over Ford's ties to China",
+   "why": "Правителственият натиск върху Ford може да принуди преструктуриране на стратегически партньорства и да засегне целия автомобилен сектор."
   },
   {
-   "headline": "Nvidia supplier Wistron's shares drop after it announces $1.5 billion global stock sale",
-   "why": "Dilution сигнал в AI supply chain — движението на Wistron може да се отрази на sentiment-а около Nvidia и свързаните тайвански tech доставчици."
+   "headline": "G10's 'surprise' currency star could stumble as peers hike interest rates",
+   "why": "Промяна в посоката на BOE спрямо другите централни банки може да предизвика значително преоценяване на британската лира и свързаните активи."
   }
  ]
 }
