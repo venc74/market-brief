@@ -128,15 +128,16 @@
  "CSR_2026-09-03": {
   "ticker": "CSR",
   "entry_date": "2026-09-03",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 52.78,
   "target_1": 47.72,
   "stop_loss": 55.31,
   "lagging_sector": "Недвижими имоти",
   "distress_signal_count": 3,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-09",
+  "discovered_date": "2026-09-10",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.8%, 14.6× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
  }
 }

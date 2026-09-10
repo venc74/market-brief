@@ -1,5 +1,5 @@
 {
- "date": "2026-09-09",
+ "date": "2026-09-10",
  "rows": [
   {
    "ticker": "IGR",
@@ -8,8 +8,8 @@
    "ratio": "1:3",
    "split_type": "reverse",
    "date_human": "Sep 08, 2026",
-   "price": 13.41,
-   "market_cap": 678365279.121109
+   "price": 12.94,
+   "market_cap": 654589599.3330498
   }
  ]
 }
