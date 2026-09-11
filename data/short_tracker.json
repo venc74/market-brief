@@ -139,5 +139,34 @@
   "discovered_date": "2026-09-10",
   "realized_r": -1.0,
   "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.8%, 14.6× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "CSR_2026-09-04": {
+  "ticker": "CSR",
+  "entry_date": "2026-09-04",
+  "status": "stopped",
+  "entry_price": 52.78,
+  "target_1": 47.84,
+  "stop_loss": 55.25,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": "2026-09-09",
+  "discovered_date": "2026-09-11",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.8%, 14.7× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "SVC_2026-09-11": {
+  "ticker": "SVC",
+  "entry_date": "2026-09-11",
+  "status": "open",
+  "entry_price": 6.87,
+  "target_1": 4.29,
+  "stop_loss": 8.16,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

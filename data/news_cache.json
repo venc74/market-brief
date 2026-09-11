@@ -1,37 +1,37 @@
 {
- "date": "2026-09-10",
+ "date": "2026-09-11",
  "news": [
   {
-   "headline": "Trump says oil and gas prices won't fall until 'right after' midterm election",
-   "why": "Изявлението сигнализира, че енергийните цени ще останат повишени поради Iran конфликта, което натиска инфлацията и усложнява позицията на Fed."
+   "headline": "U.S. crude oil tops $100 again as market braces for prolonged Iran war",
+   "why": "Петролът над $100 засилва инфлационния натиск и притиска маржовете на потребителски компании, авиолинии и транспорт, директно влияейки на equity оценките."
   },
   {
-   "headline": "Stock futures inch higher as traders brace for wholesale inflation report",
-   "why": "PPI данните са първият от два ключови инфлационни отчета тази седмица и директно ще повлияят на очакванията за следващото решение на Fed."
+   "headline": "Stock futures edge higher as key consumer inflation report looms ahead",
+   "why": "Предстоящият CPI release е основният катализатор за деня — изненада нагоре или надолу ще определи посоката на Treasury yields и equity пазарите."
   },
   {
-   "headline": "Treasury yields jump as Bessent's $6bn buyback plan disappoints investors",
-   "why": "10-годишните доходности достигнаха най-високото ниво от близо три години, което оказва натиск върху акциите и разходите по дълга."
+   "headline": "Scott Bessent fails to break 'fever' in US bond market",
+   "why": "Неуспехът на $6B bond операцията да спре ръста на доходностите сигнализира структурен проблем с търсенето на UST, което натиска акциите с висока дюрация."
   },
   {
-   "headline": "US-China borrowing costs diverge to widest level ever",
-   "why": "Рекордната дивергенция в доходностите между САЩ и Китай заплашва да ускори капиталови потоци с глобални последствия за валути и облигации."
+   "headline": "US rate rise fears ripple through global bond markets",
+   "why": "Нарастващите очаквания за по-високи лихви от Fed предизвикват глобална разпродажба на облигации с директен ефект върху risk-off позиционирането."
   },
   {
-   "headline": "Japan must raise rates, central banker says",
-   "why": "Хокишките коментари от BoJ следват натиск от Bessent и добавят волатилност към JPY и глобалните bond пазари."
+   "headline": "Why Warsh is starting to bite back — Fed chair may defy desire for rate cut at Wednesday's meeting",
+   "why": "Потенциален hawkish сигнал от Fed на сряда е ключов event risk за пазарите тази седмица — пренасяне на очаквания за лихви ще движи USD и equity."
   },
   {
-   "headline": "TSMC sees August revenue surge over 53% to record high",
-   "why": "Рекордните приходи на TSMC са водещ индикатор за търсенето на чипове и AI инфраструктура, с директно отражение върху полупроводниковия сектор."
+   "headline": "Iran and Gulf states to meet in push for Hormuz deal",
+   "why": "Евентуално споразумение за Ормузкия проток може рязко да намали петролните цени и да обърне risk-off настроението на пазарите."
   },
   {
-   "headline": "IMF ditched top candidate for chief economist job over Trump tariff remarks",
-   "why": "Политическата намеса в IMF назначенията сигнализира засилено търговско напрежение и риск за независимостта на международните институции."
+   "headline": "Bessent says 'a large bank' will be sanctioned Monday as part of Iran strategy",
+   "why": "Санкции срещу голяма банка в понеделник ще ударят финансовия сектор и ще засегнат глобалните кредитни пазари и emerging market flows."
   },
   {
-   "headline": "UBS CEO flags investor complacency as geopolitical and economic risks mount",
-   "why": "Предупреждението от CEO на глобална системно значима банка за нарастващи рискове може да охлади апетита към риск на институционалните инвеститори."
+   "headline": "Oracle's stock edges up on earnings beat as cloud infrastructure revenue more than doubles",
+   "why": "Силните резултати на Oracle потвърждават продължаващото търсене на cloud инфраструктура и дават позитивен сигнал за целия tech/AI сектор."
   }
  ]
 }

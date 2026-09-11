@@ -1,5 +1,5 @@
 {
- "date": "2026-09-10",
+ "date": "2026-09-11",
  "rows": [
   {
    "ticker": "IGR",
@@ -8,8 +8,18 @@
    "ratio": "1:3",
    "split_type": "reverse",
    "date_human": "Sep 08, 2026",
-   "price": 12.94,
-   "market_cap": 654589599.3330498
+   "price": 12.54,
+   "market_cap": 634355009.0302773
+  },
+  {
+   "ticker": "GOSS",
+   "company": "Gossamer Bio, Inc.",
+   "date": "2026-09-11",
+   "ratio": "1:80",
+   "split_type": "reverse",
+   "date_human": "Sep 11, 2026",
+   "price": 11.41,
+   "market_cap": 5576763400.8463955
   }
  ]
 }
