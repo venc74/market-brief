@@ -31,6 +31,7 @@ from src import entry_timing
 from src import glb_screener
 from src import short_screener
 from src import short_tracker
+from src import watchlist_expiry
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -74,6 +75,12 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
             })
             c.setdefault("ai", {})
             c["ai"]["classification"] = "Watchlist"
+            # FIX 2026-09-12 (findings log 04-11.09, т.2): explicit override, не
+            # оставяй каквото AI-то е предложило (ако въобще) — watchlist_expiry.py
+            # разчита на този таг да НЕ третира вече отворени позиции като
+            # "regime_gate" (различен клас watchlist причина, не участва в
+            # expiry механизма).
+            c["ai"]["watchlist_reason_type"] = "existing_position"
             c["ai"]["watchlist_trigger"] = (
                 f"Вече в портфейла от {rec.get('entry_date')} "
                 f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
@@ -84,15 +91,18 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
         if cls == "Action":
             if len(action) >= config.MAX_ACTION_TICKERS:
                 cls = "Watchlist"
+                c["ai"]["watchlist_reason_type"] = "other"  # портфейлен лимит, не regime-gate
                 c["ai"]["watchlist_trigger"] = "Лимит 5 Action тикъра — следващ по сила."
             elif sector_count.get(sector, 0) >= config.MAX_PER_SECTOR:
                 cls = "Watchlist"
+                c["ai"]["watchlist_reason_type"] = "other"
                 c["ai"]["watchlist_trigger"] = f"Вече {config.MAX_PER_SECTOR} Action от {sector}."
 
         if cls == "Action":
             plan = position_plan(c, sizing_factor)
             if not plan.get("valid"):
                 cls = "Watchlist"
+                c["ai"]["watchlist_reason_type"] = "other"
                 c["ai"]["watchlist_trigger"] = plan.get("reason", "Невалиден риск план.")
             else:
                 c["plan"] = plan
@@ -148,6 +158,10 @@ def run() -> dict:
     cot_with_theses = ai_brief.cot_theses(
         cot_extremes, screener_universe, thermo["regime"]) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
+    # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
+    # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
+    # чист AI prose, датата "измисляна" наново всеки ден).
+    watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
     # чисто информационен badge на картата — не пипа classification/plan/sizing,

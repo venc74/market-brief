@@ -296,7 +296,14 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 - "earnings_call": "преди earnings" / "след earnings" / "не сега" + защо (1 изр.).
 - "classification": "Action" или "Watchlist". Watchlist ако: в earnings blackout, \
 без обем при пробив и още под pivot, RS слабее, или секторът противоречи на режима.
-- "watchlist_trigger": ако Watchlist — какво точно трябва да се случи (цена/обем/дата).
+- "watchlist_reason_type": ако Watchlist — категория на причината: "regime_gate" \
+(чака конкретна промяна в пазарния режим ЗАЕДНО с цена/обем условие), \
+"earnings_blackout" (в earnings прозорец), "other" (RS/обем/друга техническа причина, \
+без regime зависимост). НЕ пиши "existing_position" — това полето се override-ва от \
+кода за вече отворени позиции, не е твоя преценка.
+- "watchlist_trigger": ако Watchlist — какво точно трябва да се случи (цена/обем/regime \
+промяна). НЕ споменавай конкретна КАЛЕНДАРНА дата на изтичане на тезата — това вече се \
+управлява детерминистично от кода (виж watchlist_reason_type="regime_gate"), не от теб.
 
 Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
 Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
@@ -384,6 +391,7 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
         # Твърдите правила бият AI преценката (Секция 8):
         if c.get("earnings", {}).get("in_blackout") and not c["ai"].get("warning"):
             c["ai"]["classification"] = "Watchlist"
+            c["ai"]["watchlist_reason_type"] = "earnings_blackout"
             c["ai"].setdefault("watchlist_trigger",
                                f"След earnings на {c['earnings'].get('next_earnings')}")
     return candidates
@@ -431,13 +439,61 @@ def _verified_company_name(ticker: str) -> dict:
     try:
         info = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).info) or {}
         name = info.get("shortName") or info.get("longName")
-        return {"name": name or ticker, "verified": bool(name)}
+        # quote_type/category/long_name: reuse на СЪЩИЯ fetch за relevance
+        # проверката (_is_mismatched_commodity_etf) — нулев допълнителен
+        # network call, виж FIX 2026-09-12 по-долу.
+        return {"name": name or ticker, "verified": bool(name),
+               "quote_type": info.get("quoteType"), "category": info.get("category"),
+               "long_name": info.get("longName")}
     except Exception as e:
         print(f"[ai] company lookup {ticker}: {e}")
-        return {"name": ticker, "verified": False}
+        return {"name": ticker, "verified": False,
+               "quote_type": None, "category": None, "long_name": None}
 
 
-def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> dict | None:
+def _is_mismatched_commodity_etf(lookup: dict, market_name: str) -> bool:
+    """
+    FIX 2026-09-12 (findings log 04-11.09, т.6): нужна relevance проверка
+    отделно от existence проверката по-горе — потвърдено на 11.09, CANE
+    (Teucrium Sugar Fund) се появи и за Cotton, И за RBOB Gasoline
+    direct_thesis, реален verified ticker (минава existence проверката),
+    но нулева връзка с нито едната суровина. Съзнателно ТЕСЕН, targeted
+    check — НЕ generic relevance/keyword engine (риск от прекалено широко
+    blocking на легитимни cross-sector връзки, напр. EXPD за RBOB freight
+    тезата е легитимна, макар "непряка" — виж дискусията защо generic
+    подход е опасен).
+
+    Проверено directamente срещу реални данни: single-commodity ETF-и
+    (CANE/BAL/WEAT/CORN/UNG/USO) показват quoteType="ETF",
+    category="Commodities Focused", и longName буквално съдържа името на
+    суровината ("Teucrium Sugar Fund", "Teucrium Corn Fund"...) —
+    надежден, maintenance-free сигнал, не изисква ръчно поддържан mapping.
+
+    Връща True само ако тикърът Е commodity ETF (по category) И неговото
+    longName не съдържа никоя ключова дума от market_name — т.е. explicit
+    "friendly fire" случай (ETF за ДРУГА суровина), не генерична
+    "нерелевантност". Обикновени акции (quoteType != "ETF") никога не се
+    третират като mismatch тук.
+
+    FIX 2026-09-12 (хванато в собственото тестване, преди push): наивен
+    substring match фалшиво третираше SOYB ("Teucrium Soybean Fund",
+    singular) като mismatch за market_name="Soybeans" (plural) — "soybeans"
+    не е substring на "soybean". Лек trailing-"s" stem преди сравнение
+    (same дух като реалните commodity имена — не пълен NLP stemmer, само
+    достатъчен за single/plural разлики в наименования на суровини).
+    """
+    category = (lookup.get("category") or "").lower()
+    if lookup.get("quote_type") != "ETF" or "commodit" not in category:
+        return False
+    long_name = (lookup.get("long_name") or "").lower()
+    stem = lambda w: w[:-1] if w.endswith("s") and len(w) > 3 else w
+    market_keywords = [stem(w.lower()) for w in market_name.replace("-", " ").split() if len(w) > 2]
+    long_name_stemmed = " ".join(stem(w) for w in long_name.split())
+    return not any(kw in long_name_stemmed for kw in market_keywords)
+
+
+def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
+                          market_name: str = "") -> dict | None:
     """
     Заменя AI-generated 'company' с верифицирано yfinance име за всеки тикър в тезата.
 
@@ -468,6 +524,11 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> d
     тикър до него (template-ът вече прави truthiness проверка, скрива блока).
     Частично отпаднали тикъри → останалите се показват нормално, плюс
     "dropped_tickers" бележка (виж dashboard.html.j2).
+
+    FIX 2026-09-12: втора, relevance проверка след existence проверката —
+    виж _is_mismatched_commodity_etf() за пълния rationale. Реален verified
+    (не delisted) тикър вече не е достатъчно — трябва и да е свързан с
+    market_name-а на самата теза, не произволен друг commodity ETF.
     """
     if not thesis:
         return thesis
@@ -482,14 +543,18 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str]) -> d
         if not (isinstance(t, dict) and t.get("ticker")):
             continue
         lookup = _verified_company_name(t["ticker"])
-        if lookup["verified"]:
-            verified.append({**t, "company": lookup["name"]})
-        else:
+        if not lookup["verified"]:
             dropped.append(t["ticker"])
+        elif market_name and _is_mismatched_commodity_etf(lookup, market_name):
+            dropped.append(t["ticker"])
+            print(f"[ai] {t['ticker']} премахнат от '{market_name}' теза — "
+                 f"commodity ETF за друга суровина ({lookup.get('long_name')})")
+        else:
+            verified.append({**t, "company": lookup["name"]})
 
     if dropped:
         print(f"[ai] COT тикъри премахнати при верификация "
-              f"(вероятно delisted/renamed): {dropped}")
+              f"(вероятно delisted/renamed/грешна суровина): {dropped}")
 
     if not verified:
         return None
@@ -689,9 +754,9 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
             continue
         merged.append({**e,
                        "direct_thesis": _verify_thesis_tickers(
-                           t.get("direct_thesis") or {}, screener_tickers),
+                           t.get("direct_thesis") or {}, screener_tickers, e["market"]),
                        "cross_sector_thesis": _verify_thesis_tickers(
-                           t.get("cross_sector_thesis") or {}, screener_tickers)})
+                           t.get("cross_sector_thesis") or {}, screener_tickers, e["market"])})
     return merged
 
 

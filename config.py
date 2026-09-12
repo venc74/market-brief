@@ -17,6 +17,19 @@ DEFENSIVE_SIZING_FACTOR = 0.5
 MAX_PER_SECTOR = 2                # макс 2 акции от един сектор
 MIN_PRICE = 10.0                  # без акции под $10
 MIN_MARKET_CAP = 500_000_000      # без mcap под $500M
+# FIX 2026-09-12 (findings log 04-11.09, т.2): "regime_gate" watchlist
+# кандидати (чакат конкретна смяна на пазарния режим + цена/обем условие)
+# по-рано разчитаха на AI-измислена calendar дата в свободен текст —
+# потвърдено на 4 дни (DELL/ROKU): AI-то преждевременно твърдеше правилото
+# вече е задействало (8 дни преди собствената си дата), после напълно
+# забравяше концепцията на следващия ден. Нула code state зад нея.
+# WATCHLIST_STALENESS_DAYS вече е code-computed прозорец (src/watchlist_
+# expiry.py), не AI избор. 10 работни дни (~2 календарни седмици) — разумен
+# "watchlist review цикъл" здрав разум старт (не backtested): достатъчно
+# дълъг да даде честен шанс на regime промяна да се случи, достатъчно
+# кратък pivot/price нивата, изчислени спрямо конкретна историческа база,
+# да не остареят прекалено. Tunable.
+WATCHLIST_STALENESS_DAYS = int(os.getenv("WATCHLIST_STALENESS_DAYS", 10))
 # FIX 2026-08-02 (timeout guard): максимално чакане на извикващия код за
 # yf.Ticker(sym).info fetch, през net_utils.fetch_with_timeout() (ai_brief.py,
 # magic_formula.py, screener.py). yfinance вече слага собствен default
