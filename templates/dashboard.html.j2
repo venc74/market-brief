@@ -594,6 +594,7 @@
       {% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+      {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
     </div>
     {% endfor %}
   </div>
@@ -618,6 +619,7 @@
       {% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+      {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
     </div>
     {% endfor %}
   </div>

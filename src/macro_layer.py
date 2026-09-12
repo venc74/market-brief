@@ -98,11 +98,22 @@ def treasury_spread_2s10s() -> dict:
         return {"value": None, "status": "unknown"}
     val = obs[-1][1]
     prev = obs[-6][1] if len(obs) >= 6 else obs[0][1]
+    # FIX 2026-09-12 (findings log 04-11.09, т.5): "steepening" if val > prev
+    # else "flattening" няма tie клон — потвърдено на живо (09.09, 10.09):
+    # val == prev буквално (0.41==0.41, 0.40==0.40), но else клонът тихо
+    # label-ва точен tie като "flattening", подвеждащо (tie не е
+    # "flattening" по никакъв смислен начин — спредът не се е стеснил).
+    if val > prev:
+        direction = "steepening"
+    elif val < prev:
+        direction = "flattening"
+    else:
+        direction = "stable"
     return {
         "value": val,
         "prev_week": prev,
         "status": "inverted" if val < 0 else "normal",
-        "direction": "steepening" if val > prev else "flattening",
+        "direction": direction,
     }
 
 

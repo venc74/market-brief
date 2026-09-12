@@ -238,6 +238,17 @@ def run() -> dict:
         backtest.update_backtest_tracker(action, today)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
 
+    # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
+    # cross-reference срещу Track Record отворени позиции — потвърден gap
+    # (FCFS едновременно GLB Classic кандидат И отворена позиция, всичките
+    # 4 проверени дни, без никакъв визуален сигнал за конвергенцията/
+    # дублирането). Mirror на in_screener badge механизма по-горе — трябва
+    # да живее ТУК, след backtest_summary изчислението (open_positions не е
+    # наличен по-рано, при самия GLB блок).
+    open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
+    for row in glb_candidates:
+        row["already_open_position"] = row["ticker"] in open_position_tickers
+
     # short_tracker.py — prospective проследяване на short кандидатите, same
     # "ден+1" fix и graceful degradation дух като backtest блока по-горе.
     # Единственият начин да измерим реален hit rate занапред (виж

@@ -258,6 +258,19 @@ UNUSUAL_OPTIONS_UNIVERSE = [
     "F", "BAC", "INTC", "MU", "CRM", "NFLX", "DIS",
 ]
 UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  # vol/OI праг
+# FIX 2026-09-12 (findings log 04-11.09): yfinance-ното openInterest поле
+# понякога връща непълни/stale данни за multi-day прозорец (потвърдено:
+# 08-11.09, 4 последователни дни, за едни и същи mega-cap тикъри — same
+# volume, reconstructed OI пада от реалистичните ~70K-630K до 51-771,
+# стотици пъти по-малко). Съществуващият total_oi>=50 (контракти) guard
+# хваща само буквална нула/near-нула — множество "счупени" стойности
+# кацаха точно над него (51, 52, 60...). Горен sanity ceiling на САМОТО
+# съотношение хваща класа проблем директно: реалният здрав максимум тази
+# седмица беше 21.6× (KDP, 04.09), реалният "счупен" минимум беше 176.1×
+# (WMT, 11.09) — огромна пропаст, 50× седи comfortably по средата. Same
+# принцип като IV sanity floor прецедента (src/enrich.py) — горна граница
+# на правдоподобност, не само долна.
+UNUSUAL_OPTIONS_MAX_OI_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MAX_OI_RATIO", 50.0))
 
 # NDX100 състав — СТАТИЧЕН списък, ръчно поддържан. Wikipedia премахна structured
 # компонентната таблица от Nasdaq-100 статията (само външен линк към nasdaq.com

@@ -242,13 +242,27 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             # праг от 50 договора избягва абсурдни съотношения от почти-нулев OI.
             has_oi = total_oi >= 50
             ratio = (total_vol / total_oi) if has_oi else None
+            # FIX 2026-09-12: долният праг (>=50 контракта) хваща само буквална
+            # нула/near-нула — потвърдено на живо (08-11.09), yfinance openInterest
+            # понякога връща непълни данни за multi-day прозорец, кацащи ТОЧНО над
+            # този праг (51, 52, 60 контракта за mega-cap с реален OI в стотици
+            # хиляди) — довеждащи до подвеждащи "6900× OI" читания. Горен sanity
+            # ceiling third-ира implausibly високо съотношение като вероятно
+            # неактуални/непълни OI данни, не като genuine екстремна активност —
+            # виж config.UNUSUAL_OPTIONS_MAX_OI_RATIO коментара за пълния rationale.
+            oi_suspect = ratio is not None and ratio > config.UNUSUAL_OPTIONS_MAX_OI_RATIO
             bias, note = _bias(call_vol, put_vol)
             svr = _stock_vol_ratio(tk)
             extra = f" Обем на акцията {svr}× 20д средна ({_stock_vol_label(svr)})." if svr else ""
-            oi_part = f" ≈ {ratio:.1f}× OI ({_oi_label(ratio)})." if ratio is not None else "."
+            if oi_suspect:
+                oi_part = " OI данните вероятно неактуални/непълни (пропуснато съотношение)."
+            elif ratio is not None:
+                oi_part = f" ≈ {ratio:.1f}× OI ({_oi_label(ratio)})."
+            else:
+                oi_part = "."
             rows.append({"ticker": sym, "call_put_bias": bias,
                          "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
-                         "_ratio": round(ratio, 2) if ratio is not None else 0})
+                         "_ratio": round(ratio, 2) if (ratio is not None and not oi_suspect) else 0})
         except Exception as e:
             print(f"[unusual_options] yf {sym}: {e}")
             continue
