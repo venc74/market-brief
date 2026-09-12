@@ -1,37 +1,37 @@
 {
- "date": "2026-08-28",
+ "date": "2026-09-11",
  "news": [
   {
-   "headline": "Iran links Hormuz reopening to ending regional wars as Trump reportedly rejects return to June deal",
-   "why": "Блокадата на Ормуз засяга ~20% от световния петролен трафик — ескалацията или де-ескалацията директно движи петролните фючърси и енергийния сектор."
+   "headline": "U.S. crude oil tops $100 again as market braces for prolonged Iran war",
+   "why": "Петролът над $100 засилва инфлационния натиск и притиска маржовете на потребителски компании, авиолинии и транспорт, директно влияейки на equity оценките."
   },
   {
-   "headline": "Six months into the Iran war: Markets become accustomed to stalemate with no end in sight",
-   "why": "Продължителният конфликт вече е вграден в рисковата премия на петрола и отбранителния сектор, но ново развитие може рязко да ребалансира позициите."
+   "headline": "Stock futures edge higher as key consumer inflation report looms ahead",
+   "why": "Предстоящият CPI release е основният катализатор за деня — изненада нагоре или надолу ще определи посоката на Treasury yields и equity пазарите."
   },
   {
-   "headline": "S&P 500 futures are little changed as investors count down to Warsh's Jackson Hole address",
-   "why": "Речта на Fed председателя Warsh в Jackson Hole е основният катализатор за посоката на лихвените очаквания и пазарите тази сесия."
+   "headline": "Scott Bessent fails to break 'fever' in US bond market",
+   "why": "Неуспехът на $6B bond операцията да спре ръста на доходностите сигнализира структурен проблем с търсенето на UST, което натиска акциите с висока дюрация."
   },
   {
-   "headline": "What Warsh will say and how the market will react, according to prediction markets",
-   "why": "Prediction markets залагат на минимален шанс Warsh да спомене 'rate cut' — сигнал, че пазарът не очаква гълъбова изненада, което е важно за позициониране в rate-sensitive активи."
+   "headline": "US rate rise fears ripple through global bond markets",
+   "why": "Нарастващите очаквания за по-високи лихви от Fed предизвикват глобална разпродажба на облигации с директен ефект върху risk-off позиционирането."
   },
   {
-   "headline": "US corporate profits surge to record as worker payouts wilt",
-   "why": "Рекордните корпоративни печалби подкрепят equity valuations, но свиването на работническите доходи е дефлационен макро сигнал с отражение върху потребителски акции."
+   "headline": "Why Warsh is starting to bite back — Fed chair may defy desire for rate cut at Wednesday's meeting",
+   "why": "Потенциален hawkish сигнал от Fed на сряда е ключов event risk за пазарите тази седмица — пренасяне на очаквания за лихви ще движи USD и equity."
   },
   {
-   "headline": "Trump ratchets up rhetoric against Beijing as U.S.-China officials meet for Xi's Washington visit",
-   "why": "Ескалиращата реторика между САЩ и Китай в деня на срещата увеличава тарифния риск и волатилността при технологични и индустриални акции с висока China-exposure."
+   "headline": "Iran and Gulf states to meet in push for Hormuz deal",
+   "why": "Евентуално споразумение за Ормузкия проток може рязко да намали петролните цени и да обърне risk-off настроението на пазарите."
   },
   {
-   "headline": "Zero-interest convertible bonds set for record year",
-   "why": "Рекордната емисия на zero-coupon конвертируеми облигации сигнализира как компаниите управляват капиталовата структура при висока волатилност — важно за credit пазарите и M&A динамиката."
+   "headline": "Bessent says 'a large bank' will be sanctioned Monday as part of Iran strategy",
+   "why": "Санкции срещу голяма банка в понеделник ще ударят финансовия сектор и ще засегнат глобалните кредитни пазари и emerging market flows."
   },
   {
-   "headline": "AI needs more power. Stephanie Link is buying this natural gas stock while it's cheap",
-   "why": "Нарастващото търсене на електроенергия от AI дата центрове превръща природния газ в структурна тема — секторен ротационен сигнал за utilities и energy акции."
+   "headline": "Oracle's stock edges up on earnings beat as cloud infrastructure revenue more than doubles",
+   "why": "Силните резултати на Oracle потвърждават продължаващото търсене на cloud инфраструктура и дават позитивен сигнал за целия tech/AI сектор."
   }
  ]
 }

@@ -1,0 +1,3102 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Бриф · 31.08.2026, понеделник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b1220;          /* дълбоко мастилено синьо — небе преди отваряне */
+    --panel: #111a2e;
+    --panel-2: #16203a;
+    --line: #233252;
+    --text: #d9e1f2;
+    --muted: #8593b3;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --regime: #fbbf24; --regime-dim: rgba(251,191,36,.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink); color: var(--text);
+    font-family: "IBM Plex Sans", sans-serif; font-size: 15px; line-height: 1.55;
+  }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Хедър: режимът Е дизайнът ── */
+  header {
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--regime-dim), transparent 70%);
+    padding: 36px 0 28px;
+  }
+  .header-inner { max-width: 1080px; margin: 0 auto; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .masthead h1 { font-family: "Spectral", serif; font-size: 26px; font-weight: 700; letter-spacing: .3px; }
+  .masthead .date { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .regime-badge {
+    font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600;
+    color: var(--regime); border: 2px solid var(--regime); border-radius: 6px;
+    padding: 10px 22px; letter-spacing: 2px; text-transform: uppercase;
+    box-shadow: 0 0 28px var(--regime-dim);
+  }
+  .regime-reason { color: var(--muted); font-size: 13px; text-align: right; max-width: 360px; margin-top: 6px; }
+
+  section { margin-top: 44px; }
+  h2 {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 20px;
+  }
+  h2::before { content: "// "; color: var(--regime); }
+
+  /* ── Термометър ── */
+  .thermo { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .t-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; border-top: 3px solid var(--line);
+  }
+  .t-card.green { border-top-color: var(--green); }
+  .t-card.yellow { border-top-color: var(--yellow); }
+  .t-card.red { border-top-color: var(--red); }
+  .t-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .t-val { font-family: "IBM Plex Mono", monospace; font-size: 21px; font-weight: 600; margin-top: 6px; }
+  .t-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .prose { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--regime);
+    border-radius: 8px; padding: 20px 24px; font-size: 15.5px; }
+
+  /* ── Сектори ── */
+  .sectors { display: grid; gap: 12px; }
+  .sector-row { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; }
+  .sector-name { font-weight: 600; }
+  .sector-etf { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--regime); }
+  .sector-chain { font-size: 14px; color: var(--text); }
+  .sector-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Action карти ── */
+  .stock-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    margin-bottom: 22px; overflow: hidden; }
+  .stock-head { padding: 18px 24px; display: flex; justify-content: space-between;
+    align-items: baseline; flex-wrap: wrap; gap: 8px;
+    background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .ticker { font-family: "IBM Plex Mono", monospace; font-size: 24px; font-weight: 600; color: var(--regime); }
+  .company { color: var(--muted); font-size: 14px; margin-left: 10px; }
+  .price-tag { font-family: "IBM Plex Mono", monospace; font-size: 18px; }
+  .stock-body { padding: 20px 24px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .stock-body, .sector-row { grid-template-columns: 1fr; } }
+  .block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--muted); margin: 14px 0 6px; }
+  .block h3:first-child { margin-top: 0; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px;
+    font-size: 13.5px; padding: 3px 0; border-bottom: 1px dotted var(--line); }
+  .kv b { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-align: right; }
+  .why { font-size: 14.5px; }
+  ul.tight { padding-left: 18px; font-size: 13.5px; }
+  ul.tight li { margin: 4px 0; }
+  .plan { background: var(--regime-dim); border: 1px solid var(--regime);
+    border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .plan .kv { border-bottom-color: rgba(255,255,255,.08); }
+  .warn { color: var(--yellow); font-size: 13px; }
+
+  /* ── Watchlist ── */
+  .watch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .watch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .watch-card .ticker { font-size: 17px; color: var(--yellow); }
+  .watch-card p { font-size: 13px; margin-top: 8px; color: var(--text); }
+  .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
+    border-top: 1px dotted var(--line); padding-top: 8px; }
+
+  /* ── v2: convergence маркери ── */
+  .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
+  .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
+    color: var(--regime); border: 1px solid var(--regime); cursor: help; }
+  .watch-card .markers { margin-left: 8px; }
+  .borrow { font-size: 13px; color: var(--text); margin-top: 6px;
+    padding-top: 6px; border-top: 1px dotted var(--line); }
+  .borrow b { color: var(--yellow); }
+
+  /* ── v2: thesis monitor ── */
+  .theses { display: grid; gap: 12px; }
+  .thesis { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; border-left: 3px solid var(--line); }
+  .thesis.active { border-left-color: var(--green); }
+  .thesis.structural { border-left-color: var(--regime); }
+  .thesis.watch { border-left-color: var(--muted); }
+  .thesis-head { display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; }
+  .thesis-name { font-weight: 600; font-size: 15px; }
+  .thesis-status { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
+  .thesis-status.active { color: var(--green); background: rgba(52,211,153,.12); }
+  .thesis-status.structural { color: var(--regime); background: var(--regime-dim); }
+  .thesis-status.watch { color: var(--muted); background: rgba(133,147,179,.12); }
+  .thesis-tickers { font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: var(--regime); margin-top: 6px; }
+  .thesis-chain { font-size: 13.5px; color: var(--text); margin-top: 8px; }
+  .thesis-trigger { font-size: 12.5px; color: var(--green); margin-top: 6px; }
+  .cot-direction { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
+  .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
+  .cot-direction.bearish { color: var(--red); background: rgba(248,113,113,.12); }
+  .cot-percentile { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); }
+  .cot-sub { font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .cot-sub-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+    color: var(--muted); margin-bottom: 3px; }
+  .cot-tickers { font-family: "IBM Plex Mono", monospace; color: var(--regime); }
+
+  /* ── v2: signal таблици (unusual options / splits) ── */
+  .signal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .signal-chip { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; }
+  .signal-chip .sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; }
+  .signal-chip.calls .sym { color: var(--green); }
+  .signal-chip.puts .sym { color: var(--red); }
+  .signal-chip .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .signal-chip .in-screen { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
+    color: var(--regime); margin-top: 4px; }
+  .split-tag { font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .split-tag.fwd { color: var(--green); background: rgba(52,211,153,.12); }
+  .split-tag.rev { color: var(--red); background: rgba(248,113,113,.12); }
+
+  /* ── v2: Superinvestor Moves ── */
+  .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .si-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .si-card.in-screen { border-color: var(--regime); box-shadow: 0 0 0 1px var(--regime-dim); }
+  .si-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .si-sym { font-family: "IBM Plex Mono", monospace; font-size: 17px; font-weight: 600; color: var(--text); }
+  .si-val { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--green); }
+  .si-action { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
+  .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
+  .si-card.exit { border-left: 3px solid var(--red); }
+  .si-pct { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .si-pct.new { color: var(--green); }
+  .si-pct.exit { color: var(--red); }
+  .si-stopped-note { font-size: 12.5px; color: var(--muted); margin-top: 12px; padding: 10px 14px;
+    background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; }
+  .si-stopped-note b { color: var(--yellow); }
+
+  /* ── GLB (Green Line Breakout) Watchlist ── */
+  .glb-group-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; margin: 14px 0 8px; }
+  .glb-group-label.classic { color: var(--green); }
+  .glb-group-label.momentum { color: var(--yellow); }
+  .glb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 6px; }
+  .glb-card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--muted);
+    border-radius: 8px; padding: 12px 16px; }
+  .glb-card.classic { border-left-color: var(--green); }
+  .glb-card.momentum { border-left-color: var(--yellow); }
+  .glb-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
+  .glb-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .glb-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+  .glb-company { font-size: 12.5px; color: var(--text); margin-top: 2px; }
+  .glb-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .glb-stat { font-size: 13.5px; font-weight: 600; margin-top: 6px; }
+  .glb-card.classic .glb-stat { color: var(--green); }
+  .glb-card.momentum .glb-stat { color: var(--yellow); }
+  .glb-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .glb-caveat { font-size: 11.5px; color: var(--yellow); margin-top: 6px; }
+  .glb-note { font-size: 12px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .glb-insufficient-note { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; }
+
+  /* ── news_aggregator: Значими новини ── */
+  .news-list { display: grid; gap: 10px; }
+  .news-item { display: flex; gap: 12px; align-items: flex-start;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+  .news-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--regime); margin-top: 8px; }
+  .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
+  .news-why { font-size: 13.5px; color: var(--muted); }
+
+  /* ── Track Record: Open Positions таблица ── */
+  .pos-table { width: 100%; border-collapse: collapse; }
+  .pos-table th, .pos-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .pos-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+  .pos-table td.n, .pos-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .pos-table .sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .pos-row-up { background: rgba(52,211,153,.06); }
+  .pos-row-up td.n.pct { color: var(--green); }
+  .pos-row-down { background: rgba(248,113,113,.06); }
+  .pos-row-down td.n.pct { color: var(--red); }
+
+  /* ── iborrowdesk search box ── */
+  .borrow-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .borrow-search { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .borrow-search input { background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 6px; padding: 9px 12px; font-family: "IBM Plex Mono", monospace; font-size: 14px;
+    text-transform: uppercase; width: 140px; color-scheme: dark; }
+  .borrow-search button { background: var(--regime); color: var(--ink); border: none; border-radius: 6px;
+    padding: 9px 18px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: "IBM Plex Sans", sans-serif; }
+  .borrow-search button:hover { filter: brightness(1.08); }
+  #borrow-result { margin-top: 14px; font-size: 14px; }
+  #borrow-result .bd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 6px; }
+  #borrow-result .bd-cell { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+  #borrow-result .bd-cell .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  #borrow-result .bd-cell .val { font-family: "IBM Plex Mono", monospace; font-size: 17px; margin-top: 3px; }
+  #borrow-result .hot { color: var(--red); } #borrow-result .ok { color: var(--green); }
+  #borrow-msg { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+  /* ── v2: исторически календар ── */
+  .calendar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
+  .calendar label { font-size: 13px; color: var(--muted); }
+  .calendar input[type="date"] { background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 14px; color-scheme: dark; }
+  .calendar button { background: var(--regime); color: var(--ink); border: none;
+    border-radius: 6px; padding: 9px 18px; font-weight: 600; font-size: 13px; cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif; }
+  .calendar button:hover { filter: brightness(1.08); }
+  .calendar .hint { font-size: 12px; color: var(--muted); }
+  #history-frame { width: 100%; border: 1px solid var(--line); border-radius: 8px;
+    margin-top: 16px; height: 0; transition: height .2s; background: var(--ink); }
+  #history-msg { font-size: 13px; color: var(--yellow); margin-top: 10px; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px;
+    font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: no-preference) {
+    .regime-badge { animation: pulse 4s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 44px var(--regime-dim); } }
+  }
+
+  /* ── v2: Earnings Season Recap — икона + модал (не hover tooltip) ── */
+  .earn-icon { display: inline-flex; cursor: pointer; margin-left: 7px; vertical-align: middle; }
+  .earn-icon.earn-green { color: var(--green); }
+  .earn-icon.earn-yellow { color: var(--yellow); }
+  .earn-icon.earn-red { color: var(--red); }
+  .earn-icon.earn-na { color: var(--muted); }
+  /* НЕ position:fixed — position:absolute + JS позиционира top спрямо
+     window.scrollY при отваряне, за да "покрие" текущия viewport, без
+     да разчита на fixed positioning. */
+  .earn-modal { position: absolute; left: 0; right: 0; height: 100vh;
+    background: rgba(4,8,18,.72); display: flex; align-items: flex-start;
+    justify-content: center; padding-top: 60px; z-index: 50; }
+  .earn-modal[hidden] { display: none; }
+  .earn-modal-content { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 22px 24px; max-width: 540px; width: 92%;
+    position: relative; max-height: 80vh; overflow-y: auto; }
+  .earn-modal-close { position: absolute; top: 12px; right: 16px; background: none;
+    border: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .earn-modal-close:hover { color: var(--text); }
+  .earn-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .earn-table th { text-align: left; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--muted); padding: 4px 8px 6px 0; border-bottom: 1px solid var(--line); }
+  .earn-table td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace; }
+  .earn-yoy-row { background: rgba(255,255,255,.03); }
+  .earn-yoy-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .earn-pos { color: var(--green); }
+  .earn-neg { color: var(--red); }
+  .earn-yoy-summary { font-size: 12.5px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="masthead">
+      <h1>Персонален AI Инвестиционен Бриф</h1>
+      <div class="date mono">31.08.2026, понеделник · генериран 05:51 CET · 90 мин преди US pre-market</div>
+    </div>
+    <div>
+      <div class="regime-badge">Defensive</div>
+      <div class="regime-reason">6 зелени / 2 жълти / 1 червени от 9 видими — недостатъчно потвърждение за Offensive</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Пазарен термометър</h2>
+  <div class="thermo">
+    
+    
+    <div class="t-card green">
+      <div class="t-name">SPY тренд</div>
+      <div class="t-val">769.35</div>
+      <div class="t-label">SPY 769 | над 50DMA, над 200DMA</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">VIX</div>
+      <div class="t-val">14.43</div>
+      <div class="t-label">VIX 14.4 (risk-on)</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow">
+      <div class="t-name">Put/Call (SPY)</div>
+      <div class="t-val">1.06</div>
+      <div class="t-label">P/C 1.06</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">2Y/10Y спред</div>
+      <div class="t-val">0.39</div>
+      <div class="t-label">0.39% (нормален, flattening)</div>
+    </div>
+    
+    
+    
+    <div class="t-card red">
+      <div class="t-name">Fed Net Liquidity</div>
+      <div class="t-val">5780.0</div>
+      <div class="t-label">$5780.0 млрд (↓)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">MOVE (Bond Vol)</div>
+      <div class="t-val">71.0</div>
+      <div class="t-label">MOVE 71 (-2/седмица)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">VIX Term Structure</div>
+      <div class="t-val">0.642</div>
+      <div class="t-label">VIX9D 11.2 / VIX 14.4 / VIX3M 17.5 → ratio 0.64 (contango, нормално)</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow">
+      <div class="t-name">IEI/HYG (Credit Spread)</div>
+      <div class="t-val">1.4571</div>
+      <div class="t-label">IEI/HYG 1.457 (0. percentile) · 10д RoC -0.4% (35. percentile) (late-cycle complacency)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green" title="Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.">
+      <div class="t-name">Market Breadth (% над 40dMA)</div>
+      <div class="t-val">48.0</div>
+      <div class="t-label">48.0% над 40dMA (здравословна ширина)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">Distribution Days</div>
+      <div class="t-val">6</div>
+      <div class="t-label">SPY 5 / QQQ 6 (последни 25 сесии)</div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Значими новини · последните 24ч</h2>
+  <div class="news-list">
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Trump заплашва да удари петролния хъб Kharg Island на Иран; US и Иран размениха огън за първи път от над месец</span>
+        <span class="news-why"> — Ескалацията в Персийския залив директно заплашва доставките през Hormuz и натиска петролните цени нагоре, с директен ефект върху енергийния сектор и широкия пазар.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Stock futures падат след US удари срещу Иран</span>
+        <span class="news-why"> — Геополитическият риск материализира risk-off движение в pre-market, което поставя под въпрос петото поредно месечно покачване на Dow.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Jackson Hole: Warsh изпраща hawkish сигнал, вдига шансовете за повишение на лихвите и може да постави Fed 'в конфликт' с Treasury</span>
+        <span class="news-why"> — Hawkish реторика от Fed Chair на Jackson Hole директно преоценява rate path за септемврийското FOMC, с ефект върху treasuries, долара и equity valuations.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Франция се превръща в 'poster child' на суверенни дългови проблеми — разходите по заеми достигат нива от 2008 г.</span>
+        <span class="news-why"> — Растящите borrowing costs на втората икономика в еврозоната засилват системния риск за EUR активи и увеличават натиска върху ЕЦБ.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">US планира санкции срещу още една банка в рамките на кампанията срещу Иран транзакции</span>
+        <span class="news-why"> — Разширяването на финансовите санкции срещу Иран засяга глобалните банки с експозиция към региона и допълнително ограничава петролния поток.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Китайската фабрична активност се свива втори пореден месец, но по-малко от очакваното</span>
+        <span class="news-why"> — Слабите PMI данни от Китай продължават да потискат търсенето на суровини и оказват натиск върху emerging markets и commodities-свързани акции.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Goldman очаква yen carry trade стратегиите да продължат да работят въпреки избледняващия ефект от интервенцията</span>
+        <span class="news-why"> — Yen carry dynamics влияят на глобалните capital flows и волатилността — ключов макро фактор за risk assets след августовската турбуленция.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Корабният сектор привлича дългосрочни инвеститори заради конфликта в Близкия изток</span>
+        <span class="news-why"> — Институционалният интерес към shipping като hard asset хедж срещу геополитически риск сигнализира секторна ротация с потенциал за движение в акциите на корабни компании.</span></div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Макро бриф</h2>
+  <div class="prose">SPY затваря август на 769 — над 50DMA и 200DMA, с VIX на 14.4 и MOVE на 71, което сигнализира структурно спокойствие на volatility пазарите. Fed Net Liquidity обаче е паднала до $5780 млрд (от $5827 предишната седмица) с TGA на $950.7 млрд — дренажът продължава и потиска risk appetite на системно ниво. DXY е укрепнал с 0.61% за 5 дни, Gold е паднало с 3.42% — класическото 'dollar squeeze' натиска precious metals в краткосрочен план, но медта е +1.17%, което потвърждава, че industrial demand story остава жив. US10Y е на 4.72% (слабо -0.38% за седмицата) при флатираща 2s10s крива (0.39% от 0.50% преди седмица) — пазарът затяга очакванията за по-дълго високи лихви без рецесионна паника. IEI/HYG е на 0-ти percentile по ниво при 10-дневен RoC от -0.4% (35-ти percentile) — late-cycle complacency в credit, което добавя асиметричен риск при изненада. Днешната сесия започва с ротационна картина: GDX и XBI водят, докато SMH и XLY продължават да изостават — defensive quality bias остава оперативно оправдан.
+  <br><br><span style="color:var(--muted)">Defensive режимът е оправдан, но с нюанси, които заслужават директна оценка. Аргументите за Defensive: Fed Net Liquidity е в downtrend ($5780 млрд ↓), P/C ratio е 1.06 (elevated protection buying), IEI/HYG е на 0-ти percentile по ниво — кредитните спредове са толкова компресирани, че asymmetric downside risk е реален; никой от 17-те сектора няма rs_at_6m_high=true, което показва липса на broad momentum breadth confirmation. Аргументите срещу Defensive: 6 от 9 индикатора са зелени; VIX 14.4 в contango (ratio 0.64), MOVE 71 и падащ — volatility структурата е здрава; SPY е над 50DMA и 200DMA с почти 2% и 9% буфер съответно; Market Breadth 48% е описана като 'здравословна'; 2s10s е положителен и нормален. Критична бележка: режимът е определен като Defensive защото не достига прага за Offensive (изисква повече потвърждения), не защото данните са мечи — това е важна дистинкция. На практика данните описват 'cautious bull' среда, а не риск-off. Sizing factor 0.5 е консервативен, но защитим предвид ликвидностния дренаж и credit complacency на 0-ти percentile. Увереността в режима е средна — 65%: ако следващата седмица Net Liquidity стабилизира и P/C се нормализира под 0.9, преминаването към Neutral/Offensive би било оправдано.</span>
+  </div>
+</section>
+
+<section>
+  <h2>Секторна карта · следващите 2–6 седмици</h2>
+  <div class="sectors">
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Златодобив</div>
+        <div class="sector-etf">GDX</div>
+      </div>
+      <div>
+        <div class="sector-chain">Fed Net Liquidity пада ($5780 млрд, ↓ от $5827), TGA остава висок ($950.7 млрд) → системен ликвидностен дренаж → реалните лихви се очаква да останат натиснати структурно дори при номинален 10Y от 4.72% → физическото злато е хеджът; GDX с 4-седмичен RS +30.58% vs SPY и абсолютен ход +34.48% отразява именно тази позиция. Gold спада -3.42% тази седмица заради DXY +0.61% squeeze, но 12-седмичният RS на GDX е +13.06% — miners са в структурен outperformance, не в краткосрочен pop. Добавъчен механизъм: геополитическа несигурност (Gold над $4400) поддържа margin expansion за miners при сегашни производствени разходи.</div>
+        <div class="sector-meta">Хоризонт: 6 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Биотех</div>
+        <div class="sector-etf">XBI</div>
+      </div>
+      <div>
+        <div class="sector-chain">US10Y пада леко (-0.38% за 5 дни) и MOVE е на 71 (-2.4 за седмицата) → bond volatility намалява → discount rate за дългосрочни cash flows се стабилизира → биотех (висок duration актив) получава relative re-rating. 12-седмичният RS на XBI е +19.63% — това не е noise, а устойчив rotation от growth-at-any-price tech към quality-growth в health/biotech. Допълнителен катализатор: XLV (Healthcare широко) е +14.36% RS за 12 седмици, laggard_persistence 0% — секторът не е изморен. M&A pipeline в биотех остава активен при стабилизирани лихви, което добавя premium към малките caps в XBI.</div>
+        <div class="sector-meta">Хоризонт: 8 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Здравеопазване</div>
+        <div class="sector-etf">XLV</div>
+      </div>
+      <div>
+        <div class="sector-chain">Defensive режим (sizing_factor 0.5) и Put/Call 1.06 (yellow) → позиционирането търси quality+defensiveness → XLV е естественият landing spot. 12-седмичен RS +14.36%, 4-седмичен RS +2.24%, абсолютен ход +5.3% — последователна, не ексхибиционистична сила. Механизъм: при флатираща yield крива (2s10s 0.39% ↓ от 0.50%) финансовите сектори губят NIM advantage → капиталът ротира към non-cyclical earnings streams. XLV предлага EPS predictability, която пазарът в момента плаща с premium.</div>
+        <div class="sector-meta">Хоризонт: 6 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Енергетика</div>
+        <div class="sector-etf">XLE</div>
+      </div>
+      <div>
+        <div class="sector-chain">WTI +0.73% за 5 дни при $85.63, Copper +1.17% → industrial demand signal остава позитивен въпреки DXY силата. Механизъм: ОПЕК+ production discipline + geopolitical risk premium (Gold $4482 сигнализира, че tension не е изчезнало) → energy suppy floor. XLE 12-седмичен RS +8.35%, laggard_persistence 0% — чист лидер без умора. При US10Y 4.72% и продължаваща Fed QT, FCF-heavy имена в XLE са структурно предпочитани пред growth с negative free cash flow.</div>
+        <div class="sector-meta">Хоризонт: 5 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Материали</div>
+        <div class="sector-etf">XLB</div>
+      </div>
+      <div>
+        <div class="sector-chain">Copper +1.17% за 5 дни е директен input за XLB — industrial metals оживяват въпреки DXY strength, което означава demand-driven ход, не просто currency effect. 12-седмичен RS +3.09%, 4-седмичен RS +2.39% — умерена, стабилна outperformance. Механизъм: глобалната industrial activity (China restocking narrative + US reshoring capex) поддържа materials demand. XLB laggard_persistence 25% е умерено предупреждение — секторът не е с напълно чист record, но текущата copper динамика е bullish confirmation.</div>
+        <div class="sector-meta">Хоризонт: 4 седмици</div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Геополитически тези · мониторинг</h2>
+  <div class="theses">
+    
+    <div class="thesis structural">
+      <div class="thesis-head">
+        <span class="thesis-name">Ядрена енергия</span>
+        <span class="thesis-status structural">структурна</span>
+      </div>
+      <div class="thesis-tickers">VST  ·  CEG  ·  OKLO  ·  CCJ  ·  DNN  ·  NNE</div>
+      <div class="thesis-chain">AI data center-ите гладуват за стабилна базова мощност 24/7 → ядрената е единственият въглеродно-неутрален източник, който я дава → дългосрочно търсене на уран и реакторни оператори.</div>
+      
+    </div>
+    
+    <div class="thesis structural">
+      <div class="thesis-head">
+        <span class="thesis-name">Полупроводници и AI инфраструктура</span>
+        <span class="thesis-status structural">структурна</span>
+      </div>
+      <div class="thesis-tickers">AVGO  ·  AMAT  ·  MCHP</div>
+      <div class="thesis-chain">AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.</div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Въглища и LNG</span>
+        <span class="thesis-status watch">наблюдава се</span>
+      </div>
+      <div class="thesis-tickers">BTU  ·  HCC  ·  AMR  ·  CEIX  ·  TELL  ·  LNG</div>
+      <div class="thesis-chain">Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.</div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Отбрана и дронове</span>
+        <span class="thesis-status watch">наблюдава се</span>
+      </div>
+      <div class="thesis-tickers">LMT  ·  RTX  ·  NOC  ·  SWMR</div>
+      <div class="thesis-chain">Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.</div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Крипто регулация (CLARITY Act)</span>
+        <span class="thesis-status watch">наблюдава се</span>
+      </div>
+      <div class="thesis-tickers">CRCL  ·  COIN  ·  HOOD  ·  BLSH</div>
+      <div class="thesis-chain">Ясна законодателна рамка (CLARITY Act) → институциите получават регулаторна сигурност → приток на капитал към регулирани крипто борси и custody → борсите и брокерите печелят на обем.</div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Финанси при стръмна крива</span>
+        <span class="thesis-status watch">наблюдава се</span>
+      </div>
+      <div class="thesis-tickers">JPM  ·  BAC</div>
+      <div class="thesis-chain">Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>Action · 0 тикъра</h2>
+  
+  <div class="prose">Днес нито един кандидат не покрива всички критерии за Action. Това е информация, не провал — кешът също е позиция.</div>
+  
+</section>
+
+
+
+<section>
+  <h2>Watchlist · 7</h2>
+  <div class="watch-grid">
+    
+    <div class="watch-card">
+      <span class="ticker">MPC</span>
+      <span class="company">Marathon Petroleum Corporation</span>
+      <span class="markers"><span class="marker" title="Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс.">MF✓</span><span class="marker" title="Отворена позиция от 2026-08-12 @ $336.45 — не е нов вход.">OPEN✓</span></span>
+      <p>Вчерашният trigger потвърждава: MPC е в портфейла от 2026-08-12 при $336.45 — текущата цена $368.83 e +9.6% над entry. Повторният breakout сигнал при pivot $369.12 (-0.08% под него) не изисква нова позиция, а управление на съществуващата. Макро верига: WTI $85.63 + ОПЕК+ discipline → refining margin floor → MPC като най-голям US рафинерист директно ползва squeeze между crude input cost и product spread. EPS ръст YoY +322.5% при P/E 12.79 показва market still pricing in normalization — ако margins се задържат, re-rating нагоре. Analyst target $324.56 е под пазара — институционалните estimates вероятно изостават, не bearish сигнал.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Вече в портфейла от 2026-08-12 (entry $336.45). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.
+        · зона $361.74–$376.5</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">VLO</span>
+      <span class="company">Valero Energy Corporation</span>
+      <span class="markers"><span class="marker" title="Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс.">MF✓</span><span class="marker" title="Отворена позиция от 2026-08-12 @ $324.37 — не е нов вход.">OPEN✓</span></span>
+      <p>Вчерашният trigger потвърждава: VLO е в портфейла от 2026-08-12 при $324.37 — текущата цена $352.36 e +8.6% над entry. Повторният breakout сигнал не изисква добавяне. Макро: идентична верига с MPC — WTI $85.63, ОПЕК+ floor, но VLO има допълнителен Renewable Diesel + Ethanol сегмент, който дава policy hedge при IRA регулаторна стабилност. EPS +421% YoY при Forward P/E 11.5 — cheapest в peer групата спрямо earnings power. Институционална собственост 87.1% e highest в energy set — strong hands, ниска волатилност.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Вече в портфейла от 2026-08-12 (entry $324.37). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.
+        · зона $345.94–$360.06</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">EXPD</span>
+      <span class="company">Expeditors International of Washington, Inc.</span>
+      <span class="markers"><span class="marker" title="Отворена позиция от 2026-08-13 @ $187.74 — не е нов вход.">OPEN✓</span></span>
+      <p>Вчерашният trigger потвърждава: EXPD е в портфейла от 2026-08-13 при $187.74 — текущата цена $190.97 e +1.7% над entry. Позицията работи бавно, но cup-with-handle setup при pivot $192.28 (-0.68% под) е непробит. Volume_ratio 0.5 е слаб — без потвърждение. Макро връзка: EXPD е в Industrials/Logistics, не в активната секторна ротация (XLE, XBI, GDX, XLV). Директна макро верига е слаба — setup е чисто технически с fundamental backdrop (ROE 42.7%, EPS +45%). Analyst target $177.71 е значително под цената — consensus не купува тезата.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Вече в портфейла от 2026-08-13 (entry $187.74). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.
+        · зона $188.43–$196.13</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">PSX</span>
+      <span class="company">Phillips 66</span>
+      
+      <p>Вчерашните 4 trigger условия НЕ са изпълнени: (1) цена $244.01 е под pivot $246.95 — без breakout; (2) няма данни за ≥2 analyst upgrades над $245; (3) WTI $85.63 за 1 сесия — не са потвърдени ≥3 последователни; (4) analyst target $222.00 е далеч под $240. Нито едно от условията не е изпълнено. Setup остава непроменен — deep base с добри фундаменти (EPS +338.7%, Forward P/E 11.79), но analyst target $222 под цената е сериозен red flag за PSX vs peers. Без нов катализатор не се промотира.</p>
+      <div class="watch-trigger"><b>Trigger:</b> ВСИЧКИ четири едновременно (непроменени): (1) Дневно затваряне над $246.95 с volume_ratio ≥1.75x; (2) ≥2 analyst upgrades с target над $245; (3) WTI над $85 за ≥3 последователни сесии; (4) Analyst target ревизия над $240 преди earnings — иначе пропусни тикъра изцяло. Преоценка за staleness след 2026-09-15.
+        · зона $242.01–$251.89</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">ROKU</span>
+      <span class="company">Roku, Inc.</span>
+      
+      <p>Вчерашните 3 trigger условия НЕ са изпълнени: (1) Пазарният режим е Defensive — не Neutral/Risk-On; (2) цена $157.68 е под pivot $159.89 — без дневно затваряне над него; (3) volume_ratio 0.54 е далеч от ≥2.0x. Нито едно условие не е изпълнено. Освен това ROKU е в Communication Services/Entertainment — напълно извън активната секторна логика (Energy, Biotech, Healthcare, Gold Miners, Materials). EPS +1463% изглежда впечатляващо но идва от ниска база; P/E 66.5 при Defensive режим е inappropriate risk. Setup е staleness candidate — преоценка след 2026-09-15.</p>
+      <div class="watch-trigger"><b>Trigger:</b> ВСИЧКИ три едновременно (непроменени): (1) Пазарен режим се промени на Neutral или Risk-On; (2) Дневно затваряне над $159.89 с volume_ratio ≥2.0x; (3) ≥3 сесии с обем над 30-дневната средна преди пробива. Преоценка за staleness след 2026-09-15 — ако режимът остане Defensive, тикърът се drop-ва от watchlist.
+        · зона $156.69–$163.09</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">ABNB</span>
+      <span class="company">Airbnb, Inc.</span>
+      
+      <p>Секторът Consumer Cyclical (Travel) е извън активната секторна логика при Defensive режим — няма макро връзка с текущите ротации към злато, биотех, healthcare, енергетика или материали. Setup-ът е чисто технически: deep base с 33.3% дълбочина, цената е само 2.08% под pivot от $193.45, RS статус near_high. Проблемът е, че Defensive режим директно противоречи на дискреционен потребителски сектор — при put/call 1.06 и ликвидностен дренаж, travel spending е уязвим. Analyst target $176.76 е под текущата цена $189.43 — консенсусът не подкрепя upside.</p>
+      <div class="watch-trigger"><b>Trigger:</b> ВСИЧКИ условия трябва да са изпълнени едновременно: (1) Пазарен режим се смени на Neutral или Risk-On; (2) Дневно затваряне над $193.45 (pivot) с volume_ratio ≥1.5x; (3) Analyst target се ревизира над $195 от поне 2 брокера — без това консенсусът сигнализира overvaluation при текущото ниво.
+        · зона $189.58–$197.32</div>
+    </div>
+    
+    <div class="watch-card">
+      <span class="ticker">IVZ</span>
+      <span class="company">Invesco Ltd.</span>
+      
+      <p>Вчерашният watchlist trigger НЕ е изпълнен: (1) Пазарният режим е Defensive — не Neutral/Risk-On; (2) Earnings не са се случили (следващи са 2026-10-27, 57 дни); (3) Няма затваряне над $33.65 с volume ≥1.8x. ROE е отрицателен (-0.6%) — твърдото условие 'без ROE позитивен — без вход при никакви условия' блокира всякаква промоция. Нови катализатори, оправдаващи override, не са налични. Секторът Financial Services е структурно под натиск при флатираща yield крива (2s10s 0.39%), което директно свива NIM и AUM-базирания fee revenue. Setup-ът остава заключен зад earnings gate.</p>
+      <div class="watch-trigger"><b>Trigger:</b> Непроменени от вчера — ВСИЧКИ три условия трябва да са изпълнени едновременно: (1) Пазарен режим се смени на Neutral или Risk-On; (2) Earnings на 2026-10-27 потвърди ROE положително с EPS ≥$2.81; (3) Дневно затваряне над $33.65 (pivot) с volume_ratio ≥1.8x в рамките на 5 сесии след earnings. Без ROE позитивен — без вход при никакви условия.
+        · зона $32.99–$34.33</div>
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>GLB Watchlist · Green Line Breakout</h2>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
+    ATH пробив след дълъг unpenetrated период (Eric Wish методология) — механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline.
+    <b style="color:var(--green)">Classic</b> = тесен daily base преди пробива (по-нисък очакван риск) ·
+    <b style="color:var(--yellow)">Momentum</b> = потвърден бърз/волатилен пробив без тесен base (по-висок очакван риск).
+  </div>
+  
+  <div class="glb-group-label classic">Classic GLB (11)</div>
+  <div class="glb-grid">
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">PR</span>
+        <span class="glb-price">$22.70</span>
+      </div>
+      <div class="glb-company">Permian Resources Corporation</div>
+      <div class="glb-stat">94 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $21.85 (2018-09)</div>
+      
+      <div class="glb-detail">band_hold 88.9% · tightness ±28.33%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">HSIC</span>
+        <span class="glb-price">$89.52</span>
+      </div>
+      <div class="glb-company">Henry Schein, Inc.</div>
+      <div class="glb-stat">52 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $87.19 (2022-03)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · tightness ±19.2%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">MRK</span>
+        <span class="glb-price">$148.35</span>
+      </div>
+      <div class="glb-company">Merck & Company, Inc.</div>
+      <div class="glb-stat">28 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $131.95 (2024-03)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · tightness ±34.37%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">CART</span>
+        <span class="glb-price">$50.54</span>
+      </div>
+      <div class="glb-company">Maplebear Inc.</div>
+      <div class="glb-stat">18 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $48.28 (2025-01)</div>
+      
+      <div class="glb-detail">band_hold 95.2% · tightness ±27.13%</div>
+      
+      
+      <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">VRTX</span>
+        <span class="glb-price">$541.69</span>
+      </div>
+      <div class="glb-company">Vertex Pharmaceuticals Incorpor</div>
+      <div class="glb-stat">15 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $509.50 (2025-04)</div>
+      
+      <div class="glb-detail">band_hold 96.8% · tightness ±26.63%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">FAST</span>
+        <span class="glb-price">$49.78</span>
+      </div>
+      <div class="glb-company">Fastenal Company</div>
+      <div class="glb-stat">11 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $49.66 (2025-08)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · tightness ±19.45%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">NDAQ</span>
+        <span class="glb-price">$99.31</span>
+      </div>
+      <div class="glb-company">Nasdaq, Inc.</div>
+      <div class="glb-stat">7 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $97.13 (2025-12)</div>
+      
+      <div class="glb-detail">band_hold 88.9% · tightness ±25.14%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">AMGN</span>
+        <span class="glb-price">$432.42</span>
+      </div>
+      <div class="glb-company">Amgen Inc.</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $388.16 (2026-02)</div>
+      
+      <div class="glb-detail">band_hold 96.8% · tightness ±32.13%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">EMR</span>
+        <span class="glb-price">$155.18</span>
+      </div>
+      <div class="glb-company">Emerson Electric Company</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $150.75 (2026-02)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · tightness ±21.76%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">FCX</span>
+        <span class="glb-price">$76.45</span>
+      </div>
+      <div class="glb-company">Freeport-McMoRan, Inc.</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $68.08 (2026-02)</div>
+      
+      <div class="glb-detail">band_hold 98.4% · tightness ±35.61%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">FTI</span>
+        <span class="glb-price">$75.84</span>
+      </div>
+      <div class="glb-company">TechnipFMC plc</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $75.57 (2026-04)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · tightness ±22.51%</div>
+      
+      
+      <div class="glb-note">Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.</div>
+      
+    </div>
+    
+  </div>
+  
+  
+  <div class="glb-group-label momentum">Momentum GLB (8)</div>
+  <div class="glb-grid">
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">MA</span>
+        <span class="glb-price">$595.30</span>
+      </div>
+      <div class="glb-company">Mastercard Incorporated</div>
+      <div class="glb-stat">11 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $595.29 (2025-08)</div>
+      
+      <div class="glb-detail">band_hold 68.3% · tightness ±22.97%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">NWS</span>
+        <span class="glb-price">$34.85</span>
+      </div>
+      <div class="glb-company">News Corporation</div>
+      <div class="glb-stat">10 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $34.55 (2025-09)</div>
+      
+      <div class="glb-detail">band_hold 82.5% · tightness ±23.1%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">NWSA</span>
+        <span class="glb-price">$30.97</span>
+      </div>
+      <div class="glb-company">News Corporation</div>
+      <div class="glb-stat">10 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $30.71 (2025-09)</div>
+      
+      <div class="glb-detail">band_hold 76.2% · tightness ±23.8%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">MEDP</span>
+        <span class="glb-price">$600.65</span>
+      </div>
+      <div class="glb-company">Medpace Holdings, Inc.</div>
+      <div class="glb-stat">8 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $592.46 (2025-11)</div>
+      
+      <div class="glb-detail">band_hold 73.0% · tightness ±41.1%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">CACI</span>
+        <span class="glb-price">$628.20</span>
+      </div>
+      <div class="glb-company">CACI International, Inc.</div>
+      <div class="glb-stat">6 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $620.58 (2026-01)</div>
+      
+      <div class="glb-detail">band_hold 30.2% · tightness ±40.07%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">JLL</span>
+        <span class="glb-price">$378.01</span>
+      </div>
+      <div class="glb-company">Jones Lang LaSalle Incorporated</div>
+      <div class="glb-stat">6 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $357.91 (2026-01)</div>
+      
+      <div class="glb-detail">band_hold 71.4% · tightness ±32.39%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">BDX</span>
+        <span class="glb-price">$189.52</span>
+      </div>
+      <div class="glb-company">Becton, Dickinson and Company</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $176.48 (2026-02)</div>
+      
+      <div class="glb-detail">band_hold 74.6% · tightness ±30.01%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">FIVE</span>
+        <span class="glb-price">$241.89</span>
+      </div>
+      <div class="glb-company">Five Below, Inc.</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $235.66 (2026-04)</div>
+      
+      <div class="glb-detail">band_hold 55.6% · tightness ±38.52%</div>
+      
+      
+      <div class="glb-note">Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+    </div>
+    
+  </div>
+  
+  
+</section>
+
+
+
+<section>
+  <h2>Unusual Options Yesterday</h2>
+  <div class="signal-grid">
+    
+    <div class="signal-chip calls">
+      <div class="sym">PYPL</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 49,251 ≈ 80.6× OI (екстремна, необичайна активност). Обем на акцията 3.25× 20д средна (екстремен интерес).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">KDP</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 1,465 ≈ 1.6× OI (леко повишена активност). Обем на акцията 0.73× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">NVDA</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 1,248,830. Обем на акцията 1.52× 20д средна (повишен интерес).</div>
+      
+    </div>
+    
+    <div class="signal-chip mixed">
+      <div class="sym">SPCX</div>
+      <div class="note">Балансиран call/put обем. Опц. обем 268,580. Обем на акцията 0.47× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">INTC</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 112,530. Обем на акцията 0.84× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">SMCI</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 135,692. Обем на акцията 0.53× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">AAPL</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 251,497. Обем на акцията 0.9× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">AMZN</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 269,362. Обем на акцията 1.29× 20д средна (нормално).</div>
+      
+    </div>
+    
+    <div class="signal-chip calls">
+      <div class="sym">F</div>
+      <div class="note">Обемът е предимно в кол опции — bullish наклон. Опц. обем 22,159. Обем на акцията 0.99× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+    <div class="signal-chip mixed">
+      <div class="sym">PLTR</div>
+      <div class="note">Балансиран call/put обем. Опц. обем 146,391. Обем на акцията 0.53× 20д средна (под нормалното).</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section>
+  <h2>Сплитове · тази седмица</h2>
+  <div class="signal-grid">
+    
+    <div class="signal-chip ">
+      <div class="sym">RUSHA
+        <span class="split-tag fwd">normal</span>
+      </div>
+      <div class="note">
+        <b>1.5:1</b>
+         · $76.27
+         · Sep 01, 2026
+      </div>
+      <div class="note" style="color:var(--muted);font-size:12px">Rush Enterprises, Inc.</div>
+      
+    </div>
+    
+    <div class="signal-chip ">
+      <div class="sym">RUSHB
+        <span class="split-tag fwd">normal</span>
+      </div>
+      <div class="note">
+        <b>1.5:1</b>
+         · $76.90
+         · Sep 01, 2026
+      </div>
+      <div class="note" style="color:var(--muted);font-size:12px">Rush Enterprises, Inc.</div>
+      
+    </div>
+    
+    <div class="signal-chip ">
+      <div class="sym">APH
+        <span class="split-tag fwd">normal</span>
+      </div>
+      <div class="note">
+        <b>2:1</b>
+         · $157.74
+         · Sep 03, 2026
+      </div>
+      <div class="note" style="color:var(--muted);font-size:12px">Amphenol Corporation</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section>
+  <h2>COT Екстремуми · Managed Money Positioning</h2>
+  <div class="theses">
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">2-Year Treasury Note</span>
+        <span class="cot-percentile">100.0. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">SHY (iShares 1-3 Year Treasury Bond )</div>
+        
+        <div class="thesis-chain">Managed money е на абсолютен 100-ти percentile нетно ДЪЛГО (нетна позиция -1,232,753 е рекордно екстремна в 156-седмичната история) — contrarian сигналът е bearish за 2-Year yields, т.е. bullish за краткосрочни облигационни цени. Спекулантите са максимално наляти на short yield/long price позиция, което означава почти изчерпан buying pressure. SHY е най-директният ликвиден инструмент за дълга страна на 2-Year Treasury.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">IVZ (Invesco Ltd)</div>
+        
+        <div class="thesis-chain">Ако 2-Year yields се обърнат нагоре (цените надолу) при разпродажба на тази екстремна long позиция, fixed income AUM-ът на Invesco ще поеме директен performance hit — краткосрочните облигационни фондове са core продукт за тях. IVZ е в CANSLIM скрийнъра и има реална директна revenue зависимост от bond market performance. Rising short-end yields компресират и equity multiples, удвоявайки натиска.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Copper</span>
+        <span class="cot-percentile">98.7. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">SCCO (Southern Copper Corporation)  ·  FCX (Freeport-McMoRan, Inc.)</div>
+        
+        <div class="thesis-chain">98.7-ми percentile нетно ДЪЛГО в 156-седмична история — спекулантите са почти рекордно bullish на медта, което е класически contrarian bearish сигнал по Shapiro. При нормализация на позициите copper цената ще поеме значителен downside. SCCO и FCX са най-директно изложените мини компании с copper като основен revenue driver.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="thesis-chain">Директната верига е слаба между copper и рафинериите — тук cross-sector логиката е реално по-разредена и не отговаря на критерия за 1-2 стъпки. Връщам празен списък: няма пряк бенефициент сред кандидатите с истинска директна икономическа връзка към copper deflation.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Lean Hogs</span>
+        <span class="cot-percentile">1.9. percentile
+          (екстремно къси)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="thesis-chain">1.9-ти percentile нетно КЪСО — contrarian сигналът е силно bullish за lean hog цените. Нямa самостоятелно публично търгувани компании с директна и чиста lean hog production експозиция на US пазара (Smithfield е под WH Group, която е листната в Хонконг). Не насилвам индиректни тикъри — списъкът остава празен.</div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="thesis-chain">Bullish обрат в lean hog цените би натоварил input costs за преработватели на свинско месо, но нито един от кандидатите в скрийнъра няма директна верижна зависимост от hog prices. Няма пряк бенефициент или жертва сред наличните тикъри с реална 1-2 стъпки връзка.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Mexican Peso</span>
+        <span class="cot-percentile">98.1. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">EWW (iShares MSCI Mexico ETF)</div>
+        
+        <div class="thesis-chain">98.1-ви percentile нетно ДЪЛГО на MXN в 156-седмична история — спекулантите са рекордно bullish на pesото, класически contrarian bearish сигнал за самата валута. При разпродажба EWW е най-директният ликвиден инструмент за MXN-деноминирани Mexican assets и поема двоен удар (equity + FX). Peso слабостта исторически корелира с изходящи flows от EWW.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">EXPD (Expeditors International of Was)</div>
+        
+        <div class="thesis-chain">MXN bearish обрат натоварва nearshoring икономиката — компании с Mexico-intensive logistics operations виждат FX headwind в revenues и клиентски capex freeze. EXPD е в скрийнъра и има Mexico freight exposure като part от North American supply chain operations. Връзката е реална но не ultra-директна — peso weakeaning компресира мексиканските операции, не е само macro chain.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Sugar No. 11</span>
+        <span class="cot-percentile">98.1. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">SGG (iPathA Series B Bloomberg Sugar)</div>
+        
+        <div class="thesis-chain">98.1-ви percentile нетно ДЪЛГО на захар в 156-седмична история — спекулантите са рекордно bullish, contrarian сигналът е bearish за Sugar No. 11 цените. SGG е най-директният ликвиден инструмент за чиста sugar price exposure. Сред публичните компании Südzucker и Associated British Foods имат sugar segment, но не са оптимални US-листнати тикъри за тази теза.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="thesis-chain">Директната верига между Sugar No. 11 и наличните кандидати в скрийнъра е прекалено разредена — нито ABNB, нито MPC/VLO имат sugar като значим input cost. Предпочитам да върна празен списък пред генерична macro верига: няма пряк бенефициент сред кандидатите с реална директна икономическа зависимост от sugar цените.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Cotton</span>
+        <span class="cot-percentile">97.4. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">MOO (VanEck Agribusiness ETF)</div>
+        
+        <div class="thesis-chain">97.4-ми percentile нетно ДЪЛГО на памука в 156-седмична история — спекулантите са на ръба на рекорд, класически contrarian сигнал за обрат надолу. Директни публични тикъри с чиста cotton exposure са ограничени — основните производители като Olam или Louis Dreyfus не са самостоятелно публични на US пазари. MOO има частична агро-commodity exposure, но е разредена връзка — включен като най-близкия ликвиден proxy, с уговорката, че тезата е индиректна.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">PVH (PVH Corp.)</div>
+        
+        <div class="thesis-chain">Падащите цени на памука директно свалят input costs за текстилни и облекла компании — HBI и PVH са сред най-cotton-intensive публични ритейлъри/производители с материален ефект върху gross margins при ценов обрат на суровината. Връзката е 1-стъпкова: cotton price → fabric/yarn cost → gross margin expansion.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          HBI премахнати при верификация (вероятно delisted/грешен тикър).
+        </div>
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Corn</span>
+        <span class="cot-percentile">95.5. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">CORN (Teucrium Corn Fund ETV)  ·  ADM (Archer-Daniels-Midland Company)  ·  BG (Bunge Limited)</div>
+        
+        <div class="thesis-chain">95.5-ти percentile нетно ДЪЛГО на царевицата в 156-седмична история — спекулантите са рекордно bullish, което е силен contrarian сигнал за bearish обрат. CORN ETF е директната инструментална теза; ADM и BG като major grain merchandisers печелят от volume/spread но губят inventory value при ценов срив — net bearish ефект при остра корекция на grain цените.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">TSN (Tyson Foods, Inc.)</div>
+        
+        <div class="thesis-chain">Царевицата е основен feed grain — при ценови обрат надолу feed costs за птицевъдни и месни преработватели спадат директно, разширявайки margins. Връзката е 1-стъпкова: corn price → feed cost → operating margin за animal protein producers. TSN и Sanderson (поглъната от Wayne-Sanderson, но TSN е директния proxy) са сред най-corn-exposed протеинови компании.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          SAFM премахнати при верификация (вероятно delisted/грешен тикър).
+        </div>
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Soybeans</span>
+        <span class="cot-percentile">94.8. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">SOYB (Teucrium Soybean Fund ETV)  ·  ADM (Archer-Daniels-Midland Company)  ·  BG (Bunge Limited)</div>
+        
+        <div class="thesis-chain">94.8-ми percentile нетно ДЪЛГО на соята в 156-седмична история — заедно с царевицата, спекулативният агро-bullishness е концентриран едновременно в няколко grain пазара, което усилва contrarian сигнала. ADM и BG фигурират и в Corn тезата като bearish — тук ролята им е идентична (grain merchandising/inventory exposure), без противоречие, просто кумулативна bearish теза при широк grain selloff.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">TSN (Tyson Foods, Inc.)  ·  DAR (Darling Ingredients Inc.)</div>
+        
+        <div class="thesis-chain">Соята е основен протеинов feed компонент и feedstock за soybean meal — при ценови обрат надолу animal protein producers (TSN) и renewable diesel/soybean oil преработватели (DAR) виждат директно input cost relief. DAR е особено soy-sensitive заради used cooking oil/soybean oil overlap в renewable feedstock позиционирането му.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">E-mini Russell 2000</span>
+        <span class="cot-percentile">5.8. percentile
+          (екстремно къси)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">IWM (iShares Russell 2000 Index Fund)  ·  TNA (Direxion Small Cap Bull 3X ETF)</div>
+        
+        <div class="thesis-chain">5.8-ми percentile нетно КЪСО на Russell 2000 в 156-седмична история — managed money е близо до рекордно bearish на small caps, което е силен contrarian bullish сигнал по Shapiro методологията. При defensive пазарен режим timing-ът е труден, но extremum-ът е статистически значим. TNA е leveraged вариант за по-агресивна contrarian теза — подходящ само при потвърждение на обрат.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">IVZ (Invesco Ltd)</div>
+        
+        <div class="thesis-chain">IVZ фигурира по-рано в брифа като bearish (2-Year Treasury теза) — тук ролята е различна и ортогонална: Invesco управлява самия IWM/Russell 2000 ETF и масивен small cap AUM, така че bullish обрат при Russell 2000 директно увеличава AUM и management fee revenue. Тезата тук е bullish на IVZ като бенефициент от small cap recovery, за разлика от предишната bearish роля (fixed income AUM свиване при yield spike) — двете са логически независими и неконтрадикторни при различни сценарии.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">RBOB Gasoline</span>
+        <span class="cot-percentile">94.2. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">UGA (United States Gasoline Fund LP)  ·  MPC (Marathon Petroleum Corporation)  ·  VLO (Valero Energy Corporation)</div>
+        
+        <div class="thesis-chain">94.2-ри percentile нетно ДЪЛГО на RBOB в 156-седмична история — спекулантите са рекордно bullish на бензина, contrarian сигналът сочи bearish обрат. MPC и VLO са в CANSLIM скрийнъра като рафинерии — при падащи crack spreads/бензинови цени рафинерийните margins се свиват директно, което е bearish за акциите въпреки momentum-а им в скрийнъра. PSX е трети вариант от скрийнъра с идентична логика.</div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">ABNB (Airbnb, Inc.)  ·  EXPD (Expeditors International of Was)</div>
+        
+        <div class="thesis-chain">EXPD фигурира по-рано в брифа като bearish (Mexican Peso теза) — тук ролята е различна: падащите бензинови цени директно свалят fuel surcharges и transportation costs, което е bullish за freight-intensive logistics компании. EXPD като beneficiary на по-ниски fuel costs е ортогонална, bullish роля спрямо FX headwind тезата — двете са независими. ABNB печели индиректно но с достатъчно директна стъпка: по-евтин бензин → по-ниски road trip разходи → domestic leisure travel demand uptick, което е 1-2 стъпки от revenue.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Australian Dollar</span>
+        <span class="cot-percentile">93.5. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">FXA (Invesco CurrencyShares Australi)</div>
+        
+        <div class="thesis-chain">93.5-ти percentile нетно ДЪЛГО на AUD в 156-седмична история — спекулантите са близо до рекордно bullish на австралийския долар, класически contrarian сигнал за обрат надолу. FXA е директният ETF tracker на AUD/USD и е единственият ликвиден публичен инструмент с чиста директна експозиция. Defensive пазарен режим допълнително подкрепя потенциал за бягство от риск-валути като AUD.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">BHP (BHP Group Limited)  ·  RIO (Rio Tinto Plc)</div>
+        
+        <div class="thesis-chain">AUD е силно correlated с commodity export revenues на Австралия — BHP и RIO са мажорни Australian commodity exporters, листнати на NYSE като ADR-и, и тяхната USD-деноминирана приходна база се влошава когато AUD губи стойност (обратен ефект на currency translation). По-слаб AUD сигнализира и за по-слабо търсене на австралийски ресурсен износ, което натиска оценките.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Wheat</span>
+        <span class="cot-percentile">93.5. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">WEAT (Teucrium Wheat Fund ETV)</div>
+        
+        <div class="thesis-chain">93.5-ти percentile нетно ДЪЛГО на пшеницата в 156-седмична история въпреки факта, че net_position е отрицателен (-13597) — percentile-ът отразява относителна позиция спрямо историята, не абсолютния знак, и показва, че спекулантите са близо до максимално дълги за тяхната история. WEAT е единственият ликвиден пшеничен ETF и е директният инструмент за bearish теза. Defensive режим означава слабо commodity demand outlook, което усилва downside pressure.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">GIS (General Mills, Inc.)</div>
+        
+        <div class="thesis-chain">Пшеницата е основен input за flour-базирани продукти — General Mills и Kellanova имат директна, измерима зависимост от wheat input costs в себестойността си. При ценови обрат надолу margin expansion е директен и бърз, без нужда от дълга верига на предаване.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          K премахнати при верификация (вероятно delisted/грешен тикър).
+        </div>
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Euro FX</span>
+        <span class="cot-percentile">8.4. percentile
+          (екстремно къси)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">FXE (Invesco CurrencyShares Euro Cur)</div>
+        
+        <div class="thesis-chain">8.4-ти percentile нетно КЪСО на EUR/USD в 156-седмична история — managed money е близо до рекордно bearish на еврото, което по Shapiro методологията е силен contrarian bullish сигнал. FXE е директният EUR ETF с достатъчна ликвидност за тази теза. При bullish обрат на EUR, дългите FXE позиции се възползват директно.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bullish">bullish</span>
+        </div>
+        
+        <div class="cot-tickers">EWG (iShares MSCI Germany Index Fund)  ·  EZU (iShares MSCI Eurozone ETF)</div>
+        
+        <div class="thesis-chain">Силно нетно КЪСО на EUR от спекулантите, при обрат нагоре, директно boost-ва USD-деноминираните returns на eurozone equity ETF-и за американски инвеститори. EWG и EZU имат директна currency translation връзка — EUR appreciation е еднозначно tailwind за техните NAV-ове в USD.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">30-Year Treasury Bond</span>
+        <span class="cot-percentile">91.6. percentile
+          (екстремно дълги)</span>
+      </div>
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Директна теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">TLT (iShares 20+ Year Treasury Bond )  ·  TMV (Direxion Daily 20-Year Treasury)</div>
+        
+        <div class="thesis-chain">91.6-ти percentile нетно ДЪЛГО на 30-Year T-Bond в 156-седмична история — спекулантите са близо до рекордно bullish на дългосрочните облигации (net_position -302994 в futures контекст отразява extremeness спрямо историческата база). TLT е директният ликвиден tracker; TMV е leverage bearish алтернатива за по-агресивна теза за bond selloff. Contrarian сигналът предполага очакван ръст на yields и спад на цените.</div>
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+      </div>
+      
+
+      
+      <div class="cot-sub">
+        <div class="cot-sub-label">Cross-sector теза
+          <span class="cot-direction bearish">bearish</span>
+        </div>
+        
+        <div class="cot-tickers">IVZ (Invesco Ltd)</div>
+        
+        <div class="thesis-chain">IVZ фигурира по-рано в брифа като bullish (Russell 2000 теза) — тук ролята е различна и частично ортогонална: Invesco управлява огромни fixed income AUM и при bond selloff (rising yields) fixed income fund outflows натискат fee revenues директно. Връзката е 1-2 стъпки: higher yields → bond fund NAV спад → redemptions → по-ниски management fees за IVZ. Това е противоположната посока спрямо Russell 2000 тезата — двете са ортогонални по причина, но посоката тук е bearish за IVZ.</div>
+        
+        
+      </div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section>
+  <h2>Track Record · 17 резолвирани</h2>
+  <div class="prose">
+    <b>Win rate: 5.9%</b> (1 win / 16 loss)<br>
+    16 stop (Фаза 1) / 1 trailing-exit
+    / 0 expired-in-trail / 0 expired (Фаза 1, target1 недостигнат)<br>
+    Все още отворени: 33 (Фаза 1) + 0 (Фаза 2, trailing 10DMA)<br>
+    Среден реализиран R: -0.84
+  </div>
+  
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции (33):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Дата на вход</th><th class="n">Entry цена</th>
+        <th class="n">Текуща цена</th><th class="n">% промяна</th></tr></thead>
+      <tbody>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">AIZ
+
+</td>
+          <td>2026-06-13</td>
+          <td class="n">$261.1</td>
+          <td class="n">$285.65</td>
+          
+          <td class="n pct">+9.4%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">AMG
+
+</td>
+          <td>2026-06-13</td>
+          <td class="n">$355.55</td>
+          <td class="n">$370.87</td>
+          
+          <td class="n pct">+4.3%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">LNTH
+
+</td>
+          <td>2026-06-14</td>
+          <td class="n">$104.57</td>
+          <td class="n">$100.77</td>
+          
+          <td class="n pct">-3.6%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">IBKR
+
+</td>
+          <td>2026-06-18</td>
+          <td class="n">$97.68</td>
+          <td class="n">$95.84</td>
+          
+          <td class="n pct">-1.9%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">THG
+
+</td>
+          <td>2026-06-24</td>
+          <td class="n">$207.79</td>
+          <td class="n">$227.67</td>
+          
+          <td class="n pct">+9.6%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">UMBF
+
+</td>
+          <td>2026-06-24</td>
+          <td class="n">$139.89</td>
+          <td class="n">$144.59</td>
+          
+          <td class="n pct">+3.4%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">UAL
+
+</td>
+          <td>2026-06-25</td>
+          <td class="n">$130.6</td>
+          <td class="n">$110.6</td>
+          
+          <td class="n pct">-15.3%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">NBIX
+
+</td>
+          <td>2026-06-25</td>
+          <td class="n">$169.57</td>
+          <td class="n">$154.06</td>
+          
+          <td class="n pct">-9.1%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">WST
+
+</td>
+          <td>2026-06-26</td>
+          <td class="n">$352.31</td>
+          <td class="n">$337.47</td>
+          
+          <td class="n pct">-4.2%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">VLY
+
+</td>
+          <td>2026-06-26</td>
+          <td class="n">$14.94</td>
+          <td class="n">$13.92</td>
+          
+          <td class="n pct">-6.8%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">EXEL
+
+</td>
+          <td>2026-06-26</td>
+          <td class="n">$53.93</td>
+          <td class="n">$54.45</td>
+          
+          <td class="n pct">+1.0%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">ALL
+
+</td>
+          <td>2026-06-29</td>
+          <td class="n">$240.16</td>
+          <td class="n">$260.58</td>
+          
+          <td class="n pct">+8.5%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">WTS
+
+</td>
+          <td>2026-07-01</td>
+          <td class="n">$394.54</td>
+          <td class="n">$366.34</td>
+          
+          <td class="n pct">-7.1%</td>
+          
+        </tr>
+        
+        
+        <tr class="">
+          <td class="sym">MNST
+
+</td>
+          <td>2026-07-02</td>
+          <td class="n">$98.31</td>
+          <td class="n">$46.86</td>
+          
+          <td class="n pct" style="color:var(--yellow)"
+              title="split_detected · 2:1 split на 2026-08-11">
+            ⚠ split — нужен ръчен преглед
+          </td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">TRV
+
+</td>
+          <td>2026-07-03</td>
+          <td class="n">$342.31</td>
+          <td class="n">$369.9</td>
+          
+          <td class="n pct">+8.1%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">INCY
+
+</td>
+          <td>2026-07-06</td>
+          <td class="n">$118.69</td>
+          <td class="n">$124.37</td>
+          
+          <td class="n pct">+4.8%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">LLY
+
+</td>
+          <td>2026-07-10</td>
+          <td class="n">$1249.45</td>
+          <td class="n">$1174.61</td>
+          
+          <td class="n pct">-6.0%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">BAC
+
+</td>
+          <td>2026-07-16</td>
+          <td class="n">$62.03</td>
+          <td class="n">$62.32</td>
+          
+          <td class="n pct">+0.5%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">FITB
+
+</td>
+          <td>2026-07-20</td>
+          <td class="n">$59.5</td>
+          <td class="n">$54.54</td>
+          
+          <td class="n pct">-8.3%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">JPM
+
+</td>
+          <td>2026-07-24</td>
+          <td class="n">$351.24</td>
+          <td class="n">$357.62</td>
+          
+          <td class="n pct">+1.8%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">ROST
+
+</td>
+          <td>2026-07-30</td>
+          <td class="n">$255.3</td>
+          <td class="n">$228.55</td>
+          
+          <td class="n pct">-10.5%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">ONB
+
+</td>
+          <td>2026-07-30</td>
+          <td class="n">$27.32</td>
+          <td class="n">$25.85</td>
+          
+          <td class="n pct">-5.4%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">GRMN
+
+</td>
+          <td>2026-07-31</td>
+          <td class="n">$304.0</td>
+          <td class="n">$285.19</td>
+          
+          <td class="n pct">-6.2%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">CHE
+
+</td>
+          <td>2026-07-31</td>
+          <td class="n">$551.68</td>
+          <td class="n">$523.38</td>
+          
+          <td class="n pct">-5.1%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">NTRS
+
+</td>
+          <td>2026-07-31</td>
+          <td class="n">$191.6</td>
+          <td class="n">$186.79</td>
+          
+          <td class="n pct">-2.5%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">ANET
+
+</td>
+          <td>2026-08-05</td>
+          <td class="n">$194.35</td>
+          <td class="n">$195.38</td>
+          
+          <td class="n pct">+0.5%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">MPC
+
+</td>
+          <td>2026-08-12</td>
+          <td class="n">$336.45</td>
+          <td class="n">$368.83</td>
+          
+          <td class="n pct">+9.6%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">VLO
+
+</td>
+          <td>2026-08-12</td>
+          <td class="n">$324.37</td>
+          <td class="n">$352.36</td>
+          
+          <td class="n pct">+8.6%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">EXPD
+
+</td>
+          <td>2026-08-13</td>
+          <td class="n">$187.74</td>
+          <td class="n">$190.97</td>
+          
+          <td class="n pct">+1.7%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-up">
+          <td class="sym">TGT
+
+</td>
+          <td>2026-08-21</td>
+          <td class="n">$161.98</td>
+          <td class="n">$163.18</td>
+          
+          <td class="n pct">+0.7%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">FCFS
+
+</td>
+          <td>2026-08-25</td>
+          <td class="n">$238.38</td>
+          <td class="n">$219.21</td>
+          
+          <td class="n pct">-8.0%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">AMGN
+
+</td>
+          <td>2026-08-25</td>
+          <td class="n">$445.87</td>
+          <td class="n">$432.42</td>
+          
+          <td class="n pct">-3.0%</td>
+          
+        </tr>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">FTNT
+
+</td>
+          <td>2026-08-28</td>
+          <td class="n">$173.89</td>
+          <td class="n">$166.0</td>
+          
+          <td class="n pct">-4.5%</td>
+          
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+
+
+  
+  
+  
+</section>
+
+
+
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  <div class="si-grid">
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AAPL</span>
+        <span><span class="si-val">$66.0 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLE INC</div>
+      <div class="si-mgr">Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AXP</span>
+        <span><span class="si-val">$51.3 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">AMERICAN EXPRESS CO</div>
+      <div class="si-mgr">Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">GE AEROSPACE</span>
+        <span><span class="si-val">$17.7 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">GE AEROSPACE</div>
+      <div class="si-mgr">Крис Хон · TCI Fund Management · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">V</span>
+        <span><span class="si-val">$10.5 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">VISA INC</div>
+      <div class="si-mgr">2 мениджъра · Крис Хон · TCI Fund Management · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">BROOKFIELD CORP</span>
+        <span><span class="si-val">$2.4 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">BROOKFIELD CORP</div>
+      <div class="si-mgr">Бил Акман · Pershing Square · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AMZN</span>
+        <span><span class="si-val">$2.4 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">AMAZON COM INC</div>
+      <div class="si-mgr">5 мениджъра · Бил Акман · Pershing Square · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TAIWAN SEMICONDUCTOR</span>
+        <span><span class="si-val">$2.3 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TAIWAN SEMICONDUCTOR MANUFAC</div>
+      <div class="si-mgr">Чейс Коулман · Tiger Global Management · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">NBIS</span>
+        <span><span class="si-val">$1.2 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">NEBIUS GROUP N.V.</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · 13F · 2026-08-14</div>
+      
+    </div>
+    
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
+    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  </div>
+</section>
+
+
+
+<section>
+  <h2>🆕 High-Conviction New Positions</h2>
+  <div class="si-grid">
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">MSFT</span>
+        <span class="si-pct new">15.3%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">MICROSOFT CORP</div>
+      <div class="si-mgr">Бил Акман · Pershing Square · $2.1 млрд · 13F · 2026-05-15</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">STT</span>
+        <span class="si-pct new">14.0%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">STATE STREET CORP</div>
+      <div class="si-mgr">Хауърд Маркс · Oaktree Capital Management · $1.0 млрд · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">WBD</span>
+        <span class="si-pct new">11.4%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">WARNER BROS DISCOVERY INC</div>
+      <div class="si-mgr">Даниел Лоуб · Third Point · $533.2 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">NBIS</span>
+        <span class="si-pct new">7.2%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">NEBIUS GROUP N.V.</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $1.2 млрд · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">SEAGATE TECHNOLOGY</span>
+        <span class="si-pct new">5.9%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">SEAGATE TECHNOLOGY HLDNGS PL</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $965.1 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">HD</span>
+        <span class="si-pct new">5.6%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">HOME DEPOT INC</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $918.1 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">APPLIED MATLS INC</span>
+        <span class="si-pct new">5.3%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLIED MATLS INC</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $873.2 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">LIN</span>
+        <span class="si-pct new">4.9%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">LINDE PLC</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $808.6 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">DASH</span>
+        <span class="si-pct new">4.9%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">DOORDASH INC</div>
+      <div class="si-mgr">Triple Frond Partners · $55.4 млн · 13F · 2026-08-13</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">MASTERCARD INCORPORATED</span>
+        <span class="si-pct new">4.7%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">MASTERCARD INCORPORATED</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $639.5 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">UBER</span>
+        <span class="si-pct new">4.7%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">UBER TECHNOLOGIES INC</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $645.3 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">KEYS</span>
+        <span class="si-pct new">4.4%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">KEYSIGHT TECHNOLOGIES INC</div>
+      <div class="si-mgr">Даниел Лоуб · Third Point · $204.8 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">XYZ</span>
+        <span class="si-pct new">4.2%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">BLOCK INC</div>
+      <div class="si-mgr">Даниел Лоуб · Third Point · $194.5 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">SPGI</span>
+        <span class="si-pct new">4.2%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">S&P GLOBAL INC</div>
+      <div class="si-mgr">Triple Frond Partners · $47.5 млн · 13F · 2026-08-13</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TAIWAN SEMICONDUCTOR</span>
+        <span class="si-pct new">4.0%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TAIWAN SEMICONDUCTOR MANUFAC</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $548.5 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">NFLX</span>
+        <span class="si-pct new">3.7%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">NETFLIX INC.</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $499.1 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">FLEX</span>
+        <span class="si-pct new">3.6%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">FLEX LTD</div>
+      <div class="si-mgr">Даниел Лоуб · Third Point · $166.9 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">APPLIED MATLS INC</span>
+        <span class="si-pct new">3.6%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLIED MATLS INC</div>
+      <div class="si-mgr">Джон Армитидж · Egerton Capital · $376.7 млн · 13F · 2026-07-21</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">INDV</span>
+        <span class="si-pct new">3.5%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">INDIVIOR PHARMACEUTICALS INC</div>
+      <div class="si-mgr">Хауърд Маркс · Oaktree Capital Management · $251.4 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">GEV</span>
+        <span class="si-pct new">3.5%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">GE VERNOVA INC</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $481.5 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AAPL</span>
+        <span class="si-pct new">3.1%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLE INC</div>
+      <div class="si-mgr">Дейвид Тепър · Appaloosa Management · $241.6 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">STRL</span>
+        <span class="si-pct new">3.1%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">STERLING INFRASTRUCTURE INC</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $511.7 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TTMI</span>
+        <span class="si-pct new">3.1%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TTM TECHNOLOGIES INC</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $512.1 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">ON HLDG AG</span>
+        <span class="si-pct new">2.9%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">ON HLDG AG</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · $470.4 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">CBRS</span>
+        <span class="si-pct new">2.8%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">CEREBRAS SYSTEMS INC</div>
+      <div class="si-mgr">Чейс Коулман · Tiger Global Management · $662.8 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">CDW</span>
+        <span class="si-pct new">2.7%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">Cdw Corp</div>
+      <div class="si-mgr">Стенли Дракенмилър · Duquesne Family Office · $139.8 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">APP</span>
+        <span class="si-pct new">2.6%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">APPLOVIN CORP</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $358.9 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">CME</span>
+        <span class="si-pct new">2.5%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">CME GROUP INC</div>
+      <div class="si-mgr">Сет Кларман · Baupost Group · $136.7 млн · 13F · 2026-08-13</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">NXT</span>
+        <span class="si-pct new">2.5%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">NEXTPOWER INC</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $340.3 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TJX COS INC NEW</span>
+        <span class="si-pct new">2.5%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TJX COS INC NEW</div>
+      <div class="si-mgr">Тери Смит · Fundsmith · $344.3 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">GOOGL</span>
+        <span class="si-pct new">2.3%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">Alphabet Inc</div>
+      <div class="si-mgr">Стенли Дракенмилър · Duquesne Family Office · $120.2 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">EFX</span>
+        <span class="si-pct new">2.3%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">EQUIFAX INC</div>
+      <div class="si-mgr">Джон Армитидж · Egerton Capital · $235.1 млн · 13F · 2026-07-21</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">FOXA</span>
+        <span class="si-pct new">2.2%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">Fox Corp</div>
+      <div class="si-mgr">Стенли Дракенмилър · Duquesne Family Office · $115.0 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">BA</span>
+        <span class="si-pct new">2.2%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">BOEING CO</div>
+      <div class="si-mgr">Дейвид Тепър · Appaloosa Management · $173.2 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TTMI</span>
+        <span class="si-pct new">2.0%</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TTM TECHNOLOGIES INC</div>
+      <div class="si-mgr">Даниел Лоуб · Third Point · $94.4 млн · 13F · 2026-08-14</div>
+      
+    </div>
+    
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    Съвсем НОВА позиция (отсъствала в предишния 13F) над 2.0% от портфейла на мениджъра —
+    праг върху % от портфейла, не абсолютна $ стойност, за да не отпаднат high-conviction залози на по-малки фондове.
+  </div>
+</section>
+
+
+
+<section>
+  <h2>📉 Major Position Exits</h2>
+  
+  
+  <div class="si-stopped-note">
+    <b>⚠ Мениджъри, спрели да подават 13F</b> (изключени от Exits по-горе — липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
+    
+    <div style="margin-top:4px">Майкъл Бъри · Scion Asset Management — последен filing 2025-11-03 (301 дни)</div>
+    
+  </div>
+  
+</section>
+
+
+
+<section>
+  <h2>Insider Buying · Form 4 (open market покупки)</h2>
+  <div class="si-grid">
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">INTC</span>
+        <span class="si-val">$10.0 млн</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">INTEL CORP</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>TAN LIP BU (CEO) — 2026-08-11 — $10.0 млн</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">BSX</span>
+        <span class="si-val">$9.0 млн</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">BOSTON SCIENTIFIC CORP</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>Mahoney Michael F (Chairman, President & CEO) — 2026-08-03 — $9.0 млн</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">APTV</span>
+        <span class="si-val">$8.2 млн</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">Aptiv PLC</div>
+      <div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>Agnevall Hakan — 2026-08-13 — $199.2 хил</li>
+        
+        <li>Mahoney Sean O — 2026-08-11 — $301.3 хил</li>
+        
+        <li>Mahoney Sean O — 2026-08-11 — $201.1 хил</li>
+        
+        <li>CLARK KEVIN P (Chair and CEO) — 2026-08-10 — $2.5 млн</li>
+        
+        <li>MEISTER PAUL M — 2026-08-05 — $5.0 млн</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">PFE</span>
+        <span class="si-val">$3.0 млн</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">PFIZER INC</div>
+      <div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>BOURLA ALBERT (Chairman & CEO) — 2026-08-12 — $1.0 млн</li>
+        
+        <li>BLAYLOCK RONALD E — 2026-08-05 — $998.8 хил</li>
+        
+        <li>Buckley Mortimer J — 2026-08-05 — $960.4 хил</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">CSGP</span>
+        <span class="si-val">$2.5 млн</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">COSTAR GROUP, INC.</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>FLORANCE ANDREW C (Founder and CEO) — 2026-08-04 — $2.5 млн</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">TSCO</span>
+        <span class="si-val">$416.8 хил</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">TRACTOR SUPPLY CO /DE/</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>Lawton III Harry A (President & CEO) — 2026-08-04 — $416.8 хил</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">VST</span>
+        <span class="si-val">$270.0 хил</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">Vistra Corp.</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>BURKE JAMES A (President and CEO) — 2026-08-24 — $270.0 хил</li>
+        
+      </ul>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">PODD</span>
+        <span class="si-val">$162.2 хил</span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">INSULET CORP</div>
+      
+      <ul class="tight" style="margin-top:6px">
+        
+        <li>McEvoy Ashley (President and CEO) — 2026-08-21 — $162.2 хил</li>
+        
+      </ul>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Borrow Rate · търсене на тикър</h2>
+  <div class="borrow-box">
+    <div class="borrow-search">
+      <input type="text" id="borrow-input" placeholder="напр. GME" maxlength="6"
+             autocomplete="off" spellcheck="false">
+      <button id="borrow-btn" type="button">Провери</button>
+      <span class="small" style="color:var(--muted)">данни на живо от iborrowdesk (Interactive Brokers)</span>
+    </div>
+    <div id="borrow-result"></div>
+    <div id="borrow-msg"></div>
+  </div>
+</section>
+
+<section>
+  <h2>Исторически архив</h2>
+  <div class="calendar">
+    <label for="hist-date">Избери дата:</label>
+    <input type="date" id="hist-date">
+    <button id="hist-open" type="button">Отвори бриф</button>
+    <span class="hint" id="hist-avail">зареждам наличните дати…</span>
+  </div>
+  <div id="history-msg" hidden></div>
+  <iframe id="history-frame" title="Исторически бриф" hidden></iframe>
+</section>
+
+<footer>
+  Само за информационни цели. Не представлява финансов съвет, инвестиционна препоръка
+  или предложение за покупка/продажба на ценни книжа. Данните идват от публични API-та
+  и могат да съдържат грешки или закъснения. Всяко инвестиционно решение е лична отговорност.
+  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v2.0
+</footer>
+
+</div>
+<script>
+// ── Исторически календар: отваря docs/archive/<date>.html в iframe ────────
+(function () {
+  var input = document.getElementById("hist-date");
+  var btn = document.getElementById("hist-open");
+  var avail = document.getElementById("hist-avail");
+  var frame = document.getElementById("history-frame");
+  var msg = document.getElementById("history-msg");
+  if (!input || !btn) return;
+
+  var dates = [];
+  fetch("data/index.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (list) {
+      dates = Array.isArray(list) ? list.sort() : [];
+      if (dates.length) {
+        input.min = dates[0];
+        input.max = dates[dates.length - 1];
+        input.value = dates[dates.length - 1];
+        avail.textContent = dates.length + " налични дни (" + dates[0] + " → " + dates[dates.length - 1] + ")";
+      } else {
+        avail.textContent = "няма архивирани брифове все още";
+      }
+    })
+    .catch(function () { avail.textContent = "архивът е недостъпен"; });
+
+  function open() {
+    var d = input.value;
+    msg.hidden = true; frame.hidden = true; frame.style.height = "0";
+    if (!d) return;
+    if (dates.length && dates.indexOf(d) === -1) {
+      msg.hidden = false;
+      msg.textContent = "Няма бриф за " + d + " (уикенд, празник или извън архива).";
+      return;
+    }
+    frame.src = "archive/" + d + ".html";
+    frame.hidden = false;
+    frame.style.height = "1400px";
+  }
+  btn.addEventListener("click", open);
+})();
+
+// ── iborrowdesk borrow-rate търсене (директно от браузъра, без backend) ───
+(function () {
+  var input = document.getElementById("borrow-input");
+  var btn = document.getElementById("borrow-btn");
+  var out = document.getElementById("borrow-result");
+  var msg = document.getElementById("borrow-msg");
+  if (!input || !btn) return;
+
+  function cell(lbl, val, klass) {
+    return '<div class="bd-cell"><div class="lbl">' + lbl + '</div>' +
+           '<div class="val ' + (klass || "") + '">' + val + '</div></div>';
+  }
+
+  function render(sym, data) {
+    var series = data.daily || data.data || data.feed || (Array.isArray(data) ? data : []);
+    if (!series.length) { msg.textContent = "Няма borrow данни за " + sym + "."; return; }
+    function F(o){ return o.fee != null ? o.fee : (o.rate != null ? o.rate : null); }
+    function A(o){ return o.available != null ? o.available : (o.quantity != null ? o.quantity : o.availableShares); }
+    var latest = series[series.length - 1];
+    var fee = F(latest), avail = A(latest);
+    var fees = series.slice(-5).map(F).filter(function (x) { return x != null; });
+    var trend = fees.length < 2 ? "—" :
+      fees[fees.length - 1] > fees[0] ? "покачващ ▲" :
+      fees[fees.length - 1] < fees[0] ? "падащ ▼" : "стабилен";
+    var feeKlass = fee >= 20 ? "hot" : "ok";
+    var hist = series.slice(-10).map(function (s) {
+      var a = A(s); return (a != null ? Number(a).toLocaleString("de-DE") : "—"); }).join(" · ");
+
+    out.innerHTML =
+      '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;margin-bottom:4px">' + sym + '</div>' +
+      '<div class="bd-grid">' +
+        cell("Borrow Rate", (fee != null ? fee.toFixed(2) + "%" : "—"), feeKlass) +
+        cell("Налични акции", (avail != null ? Number(avail).toLocaleString("de-DE") : "—")) +
+        cell("Тренд на fee", trend) +
+      '</div>' +
+      '<div class="small" style="color:var(--muted);margin-top:10px">Налично (последни записи): ' + hist + '</div>';
+    msg.textContent = fee >= 20
+      ? "Висок borrow rate — акцията е трудна/скъпа за шортиране, натиск върху шортистите."
+      : "Нормален borrow rate — евтино за шортиране, без особен squeeze натиск.";
+  }
+
+  function lookup() {
+    var sym = (input.value || "").trim().toUpperCase();
+    out.innerHTML = ""; msg.textContent = "";
+    if (!sym) return;
+    msg.textContent = "Зареждам " + sym + "…";
+    // FIX 2026-08-24: голият домейн вече само пренасочва homepage-а — /api/...
+    // пътят там прекъсва връзката без отговор за ВСЕКИ тикър (потвърдено на
+    // живо, не CORS-специфично). www. версията на same endpoint работи.
+    var api = "https://www.iborrowdesk.com/api/ticker/" + encodeURIComponent(sym);
+    // директно; при CORS блокаж — fallback през публичен CORS reader (премахни ако не искаш трета страна)
+    fetch(api)
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) { render(sym, d); })
+      .catch(function () {
+        return fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(api))
+          .then(function (r) { return r.json(); })
+          .then(function (d) { render(sym, d); })
+          .catch(function (e) { msg.textContent = "Неуспех за " + sym + " (възможен CORS блокаж или невалиден тикър)."; });
+      });
+  }
+  btn.addEventListener("click", lookup);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") lookup(); });
+})();
+
+(function () {
+  // Earnings Season Recap модал — НЕ position:fixed, position:absolute с
+  // top позициониран спрямо window.scrollY при отваряне (виж CSS коментара).
+  function closeAll() {
+    document.querySelectorAll(".earn-modal").forEach(function (m) { m.hidden = true; });
+  }
+  document.querySelectorAll(".earn-icon").forEach(function (icon) {
+    icon.addEventListener("click", function () {
+      var id = icon.getAttribute("data-modal");
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      closeAll();
+      modal.style.top = (window.scrollY || window.pageYOffset || 0) + "px";
+      modal.hidden = false;
+    });
+  });
+  document.querySelectorAll(".earn-modal").forEach(function (modal) {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal || e.target.closest(".earn-modal-close")) {
+        modal.hidden = true;
+      }
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll();
+  });
+})();
+</script>
+</body>
+</html>
