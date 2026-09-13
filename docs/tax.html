@@ -3,672 +3,795 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Данъчен калкулатор · реализирани печалби (DE / BG)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+<title>Данъчен калкулатор · DE / BG · IBKR + CSV</title>
 <style>
-  :root {
-    --ink: #0b1220; --panel: #111a2e; --panel-2: #16203a; --line: #233252;
-    --text: #d9e1f2; --muted: #8593b3;
-    --de: #60a5fa;       /* Германия — синьо */
-    --bg: #34d399;       /* България — зелено */
-    --gain: #34d399; --loss: #f87171; --warn: #fbbf24;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--ink); color: var(--text);
-    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 15px; line-height: 1.55; }
-  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 80px; }
-
-  header { border-bottom: 1px solid var(--line);
-    background: linear-gradient(180deg, rgba(96,165,250,.10), transparent 70%); padding: 36px 0 26px; }
-  .header-inner { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-  h1 { font-family: "Spectral", serif; font-size: 27px; font-weight: 700; }
-  .sub { color: var(--muted); font-size: 13.5px; margin-top: 6px; max-width: 640px; }
-  .privacy { display: inline-block; margin-top: 12px; font-size: 12px; color: var(--bg);
-    border: 1px solid rgba(52,211,153,.4); border-radius: 4px; padding: 4px 10px; }
-
-  section { margin-top: 36px; }
-  h2 { font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted);
-    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 18px; }
-  h2::before { content: "// "; color: var(--de); }
-
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
-  .row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-  .row + .row { margin-top: 14px; }
-
-  button, .btn { background: var(--de); color: var(--ink); border: none; border-radius: 6px;
-    padding: 10px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer;
-    font-family: "IBM Plex Sans", sans-serif; }
-  button:hover { filter: brightness(1.08); }
-  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-  button.ghost:hover { border-color: var(--de); }
-  button:disabled { opacity: .5; cursor: not-allowed; }
-
-  input[type="number"], input[type="text"], select {
-    background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
-    border-radius: 6px; padding: 8px 10px; font-family: "IBM Plex Mono", monospace;
-    font-size: 14px; color-scheme: dark; }
-  label { font-size: 13px; color: var(--muted); }
-  label.inline { display: inline-flex; align-items: center; gap: 7px; color: var(--text); cursor: pointer; }
-  input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--de); }
-
-  .drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 28px; text-align: center;
-    color: var(--muted); transition: border-color .15s, background .15s; cursor: pointer; }
-  .drop.hot { border-color: var(--de); background: rgba(96,165,250,.07); color: var(--text); }
-  .drop b { color: var(--text); }
-  .small { font-size: 12.5px; color: var(--muted); }
-  .mt8 { margin-top: 8px; } .mt16 { margin-top: 16px; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
-  td.num, th.num { text-align: right; font-family: "IBM Plex Mono", monospace; }
-  .gain { color: var(--gain); } .loss { color: var(--loss); }
-  .tbl-scroll { overflow-x: auto; }
-  tr.err td { color: var(--loss); }
-
-  /* Двойната присъда — сигнатурата на инструмента */
-  .verdicts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 720px) { .verdicts { grid-template-columns: 1fr; } }
-  .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  .verdict .top { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex;
-    justify-content: space-between; align-items: baseline; }
-  .verdict.de .top { background: rgba(96,165,250,.10); }
-  .verdict.bg .top { background: rgba(52,211,153,.10); }
-  .verdict .flag { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 2px;
-    text-transform: uppercase; }
-  .verdict.de .flag { color: var(--de); } .verdict.bg .flag { color: var(--bg); }
-  .verdict .net { font-family: "IBM Plex Mono", monospace; font-size: 26px; font-weight: 600; }
-  .verdict .body { padding: 16px 20px; }
-  .kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; padding: 5px 0;
-    border-bottom: 1px dotted var(--line); font-size: 13.5px; }
-  .kv:last-child { border-bottom: none; }
-  .kv b { font-family: "IBM Plex Mono", monospace; font-weight: 500; }
-  .kv.total { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); border-bottom: none; font-size: 15px; }
-
-  /* Freistellungsauftrag — gauge */
-  .gauge { height: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; margin-top: 8px; }
-  .gauge > span { display: block; height: 100%; background: linear-gradient(90deg, var(--bg), var(--de)); width: 0; transition: width .3s; }
-
-  footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 18px; font-size: 12px; color: var(--muted); }
-  a { color: var(--de); }
-
-  @media print {
-    body { background: #fff; color: #111; }
-    header, .no-print, .drop, footer a { display: none !important; }
-    .card, .verdict { border-color: #ccc; background: #fff; }
-    h2 { color: #444; } .mono, .num { color: #111; }
-    .verdict.de .top { background: #eef4ff; } .verdict.bg .top { background: #ecfdf5; }
-  }
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#07090e;color:#d4dbe8;font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
+.wrap{max-width:1060px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:22px;font-weight:700;color:#f0f4ff;letter-spacing:-.3px}
+h1 em{font-style:normal;color:#38bdf8}
+.sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#334155;margin-top:4px;letter-spacing:.5px}
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #111827;padding-bottom:18px;margin-bottom:26px;gap:12px;flex-wrap:wrap}
+.yr{display:flex;align-items:center;gap:8px}
+.yr label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#334155;text-transform:uppercase;letter-spacing:1px}
+select{background:#0c1220;border:1px solid #1e2a3a;color:#d4dbe8;padding:6px 10px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;outline:none}
+.tabs{display:flex;gap:3px;background:#0b1018;border:1px solid #111827;border-radius:8px;padding:3px;width:fit-content;margin-bottom:22px}
+.tab{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#334155;transition:all .15s}
+.tab.on{background:#101c2e;color:#38bdf8;border:1px solid #38bdf815}
+.card{background:#0b1018;border:1px solid #111827;border-radius:10px;padding:20px;margin-bottom:16px}
+.ct{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1e3050;margin-bottom:14px}
+.drop{border:2px dashed #162030;border-radius:8px;padding:30px;text-align:center;cursor:pointer;transition:all .2s}
+.drop:hover,.drop.drag{border-color:#38bdf840;background:#091420}
+.drop h3{font-size:15px;color:#4b6880;margin-bottom:4px}
+.drop p{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1e3050}
+.files{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.frow{display:flex;align-items:center;justify-content:space-between;background:#070c14;border:1px solid #111827;border-radius:6px;padding:8px 12px}
+.frow span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#334155}
+.frow .fc{color:#38bdf8;font-weight:600;margin-right:10px}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
+.bp{background:#0ea5e9;color:#000}.bp:hover{background:#38bdf8}.bp:disabled{background:#0d1e30;color:#1e3050;cursor:not-allowed}
+.bg{background:#0d1c2e;color:#4b6880;border:1px solid #1e2a3a}.bg:hover{background:#111e30;color:#d4dbe8}
+.bd{background:#140a14;color:#f87171;border:1px solid #3a1212;padding:4px 10px;font-size:11px}
+.pbar{margin-top:12px}
+.pbl{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;margin-bottom:5px}
+.pt{height:4px;background:#0d1c2e;border-radius:99px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,#0284c7,#38bdf8);border-radius:99px;transition:width .3s}
+.msg{padding:10px 14px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:10px;line-height:1.6}
+.err{background:#130707;border:1px solid #7f1d1d;color:#f87171}
+.ok{background:#071310;border:1px solid #134e3a;color:#34d399}
+.warn{background:#130f07;border:1px solid #854d0e;color:#fbbf24}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:#07090e;border:1px solid #111827;border-radius:9px;padding:14px 16px}
+.sl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#1e3050;margin-bottom:6px}
+.sv{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.5px}
+.ss{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;margin-top:3px}
+.pos{color:#34d399}.neg{color:#f87171}.cya{color:#38bdf8}.yel{color:#fbbf24}.pur{color:#a78bfa}.dim{color:#1e3050}
+.ctabs{display:flex;gap:3px;background:#070c14;border:1px solid #0d1828;border-radius:7px;padding:3px;width:fit-content;margin-bottom:16px}
+.ctab{padding:6px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#1e3050;transition:all .15s}
+.ctab.on{background:#0d1c2e;color:#38bdf8}
+.brow{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0b1018}
+.brow:last-child{border-bottom:none}
+.brl{font-size:12px;color:#4b6880}
+.brh{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;margin-top:2px}
+.brv{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600}
+.brtot{border-top:1px solid #1e2a3a!important;margin-top:4px}
+.brtot .brl{color:#f0f4ff;font-weight:700}
+.brtot .brv{font-size:15px}
+.tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.tbl th{text-align:left;padding:7px 9px;color:#1e3050;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid #111827}
+.tbl td{padding:7px 9px;border-bottom:1px solid #0b1018;color:#4b6880}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#0b1018}
+.bdg{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.bb{background:#0a2010;color:#34d399;border:1px solid #134e3a}
+.bs{background:#200a0a;color:#f87171;border:1px solid #7f1d1d}
+.bd2{background:#0a1220;color:#38bdf8;border:1px solid #0c3a5a}
+.by{background:#140f07;color:#fbbf24;border:1px solid #7c4d0e}
+.fbar{margin-top:7px}
+.fbh{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;margin-bottom:4px}
+.ft{height:4px;background:#0d1c2e;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px;background:linear-gradient(90deg,#0284c7,#38bdf8);transition:width .4s}
+.ff.ov{background:linear-gradient(90deg,#d97706,#f87171)}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #0b1018}
+.srow:last-child{border-bottom:none}
+.srl label{font-size:13px;color:#4b6880}
+.srh{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;margin-top:2px}
+.ni{background:#070c14;border:1px solid #1e2a3a;color:#d4dbe8;padding:6px 10px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;width:105px;text-align:right;outline:none}
+.tgl{position:relative;width:40px;height:22px;cursor:pointer}
+.tgl input{display:none}
+.ts{position:absolute;inset:0;background:#0d1c2e;border-radius:99px;transition:.2s}
+.ts::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#1e3050;border-radius:50%;transition:.2s}
+.tgl input:checked+.ts{background:#0c4a6e}
+.tgl input:checked+.ts::before{transform:translateX(18px);background:#38bdf8}
+.info{background:#08111e;border:1px solid #111f30;border-left:3px solid #38bdf8;border-radius:6px;padding:10px 14px;font-size:11px;color:#1e3050;font-family:'IBM Plex Mono',monospace;line-height:1.65;margin-bottom:12px}
+.info b{color:#4b6880}
+.empty{text-align:center;padding:40px 20px;color:#111827;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.exbtn{background:#0a1e10;color:#34d399;border:1px solid #134e3a;padding:9px 18px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.exbtn:hover{background:#0d2814;border-color:#22c55e}
+.source-tag{font-size:9px;color:#1e3050;font-family:'IBM Plex Mono',monospace}
+.ibkr-badge{display:inline-block;background:#0a1e30;color:#38bdf8;border:1px solid #0c3a5a;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:.5px;margin-left:6px}
+pre.fmt{background:#040608;border:1px solid #0d1828;border-radius:7px;padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.7;white-space:pre-wrap;margin-top:10px}
+.cm{color:#162030}.ch{color:#38bdf8}.cd{color:#4b6880}
+.disclaimer{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1e3050;text-align:center;margin-top:30px;line-height:1.6}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="header-inner">
-    <h1>Данъчен калкулатор · реализирани печалби</h1>
-    <div class="sub">Импортирай сделките си като CSV, изчисли реализирана печалба/загуба по FIFO
-      и виж две данъчни присъди едновременно — германска (Abgeltungsteuer) и българска. ECB курсове
-      се теглят автоматично по датата на сделката.</div>
-    <span class="privacy">🔒 Всичко се смята в браузъра. Сделките ти не напускат устройството.</span>
-  </div>
-</header>
-
 <div class="wrap">
 
-  <!-- 1. ИМПОРТ -->
-  <section>
-    <h2>1 · Импорт на сделки</h2>
-    <div class="card">
-      <div id="drop" class="drop">
-        <b>Пусни CSV тук</b> или кликни да избереш файл.<br>
-        <span class="small">Колони: <span class="mono">date, ticker, action, shares, price, currency, exchange_rate, eu_exempt</span></span>
-        <input type="file" id="file" accept=".csv,text/csv" hidden>
-      </div>
-      <div class="row mt16 no-print">
-        <button id="sample" class="ghost">Зареди примерни данни</button>
-        <button id="fetch-all" class="ghost" disabled>Изтегли липсващите ECB курсове</button>
-        <span class="small" id="parse-msg"></span>
-      </div>
-      <div class="small mt16">
-        <b>Формат на колоните:</b>
-        <span class="mono">action</span> = buy / sell / dividend ·
-        <span class="mono">currency</span> = USD / EUR / … ·
-        <span class="mono">exchange_rate</span> = EUR за 1 единица валута (празно → авто от ECB) ·
-        <span class="mono">eu_exempt</span> = true за EU/EEA регулиран пазар (0% BG).
-      </div>
-    </div>
+<div class="hdr">
+  <div>
+    <h1>Данъчен <em>калкулатор</em></h1>
+    <div class="sub">DE ABGELTUNGSTEUER · BG ЗДДФЛ · FIFO · ECB AUTO · IBKR NATIVE</div>
+  </div>
+  <div class="yr">
+    <label>Данъчна година</label>
+    <select id="yearSel"></select>
+  </div>
+</div>
 
-    <div id="trades-wrap" class="card mt16" hidden>
-      <div class="tbl-scroll">
-        <table id="trades-table">
-          <thead><tr>
-            <th>Дата</th><th>Тикър</th><th>Действие</th><th class="num">Бр.</th>
-            <th class="num">Цена</th><th>Вал.</th><th class="num">FX (EUR)</th>
-            <th class="num">EUR ст-ст</th><th>EU</th><th class="no-print"></th>
-          </tr></thead>
-          <tbody id="trades-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<div class="tabs">
+  <button class="tab on" onclick="showTab('import')">Импорт</button>
+  <button class="tab" onclick="showTab('results')">Резултати</button>
+  <button class="tab" onclick="showTab('settings')">Настройки</button>
+</div>
 
-  <!-- 2. НАСТРОЙКИ -->
-  <section>
-    <h2>2 · Данъчни настройки</h2>
-    <div class="card">
-      <div class="row">
-        <div>
-          <label for="freibetrag">Freistellungsauftrag (€/година)</label><br>
-          <input type="number" id="freibetrag" value="1000" min="0" step="1" style="width:120px" class="mt8">
-        </div>
-        <div>
-          <label class="inline mt8"><input type="checkbox" id="kirche"> Kirchensteuer</label><br>
-          <select id="kirche-rate" class="mt8" disabled>
-            <option value="0.09">9% (повечето провинции)</option>
-            <option value="0.08">8% (Bayern / Baden-Württemberg)</option>
-          </select>
-        </div>
-        <div>
-          <label for="year">Данъчна година (филтър)</label><br>
-          <select id="year" class="mt8"><option value="">всички</option></select>
-        </div>
-      </div>
-      <div class="small mt16">
-        Германия: Abgeltungsteuer 25% + Solidaritätszuschlag 5,5% = <b>26,375%</b> ефективно (без църковен данък).
-        Печалбите и загубите от акции се нетират за годината; данък се дължи само над необлагаемия минимум.
-        България: <b>10%</b> за non-EU акции, <b>0%</b> за EU/EEA регулиран пазар (<span class="mono">eu_exempt=true</span>),
-        <b>5%</b> за дивиденти.
-      </div>
+<!-- IMPORT -->
+<div id="tab-import">
+  <div class="card">
+    <div class="ct">Файлове</div>
+    <div class="drop" id="dropZone" onclick="document.getElementById('fi').click()">
+      <h3>📂 Пусни файл(ове) тук или кликни</h3>
+      <p>Interactive Brokers Activity Summary CSV · или стандартен формат · множество файлове</p>
+      <input type="file" id="fi" accept=".csv,.txt" multiple style="display:none" onchange="handleFiles(this.files)">
     </div>
-  </section>
+    <div id="fileList" class="files"></div>
+    <div class="btns">
+      <button class="btn bp" id="calcBtn" disabled onclick="calculate()">⚡ Изчисли</button>
+      <button class="btn bg" onclick="loadSample()">Зареди примерни данни</button>
+    </div>
+    <div id="pbar" class="pbar" style="display:none">
+      <div class="pbl"><span id="pmsg">Зарежда ECB курсове…</span><span id="ppct">0%</span></div>
+      <div class="pt"><div class="pf" id="pfill" style="width:0%"></div></div>
+    </div>
+    <div id="msg"></div>
+  </div>
 
-  <!-- 3. ПРИСЪДА -->
-  <section id="result-section" hidden>
-    <h2>3 · Двойна данъчна присъда</h2>
-    <div class="verdicts">
-      <div class="verdict de">
-        <div class="top"><span class="flag">🇩🇪 Германия</span><span class="net mono" id="de-net">—</span></div>
-        <div class="body">
-          <div class="kv"><span>Реализирана печалба (нетна)</span><b id="de-gain">—</b></div>
-          <div class="kv"><span>Дивиденти</span><b id="de-div">—</b></div>
-          <div class="kv"><span>Необлагаем минимум използван</span><b id="de-frei">—</b></div>
-          <div class="gauge"><span id="de-gauge"></span></div>
-          <div class="kv mt16"><span>Облагаема основа</span><b id="de-base">—</b></div>
-          <div class="kv"><span>Abgeltungsteuer (25%)</span><b id="de-kapest">—</b></div>
-          <div class="kv"><span>Solidaritätszuschlag</span><b id="de-soli">—</b></div>
-          <div class="kv"><span>Kirchensteuer</span><b id="de-kirche">—</b></div>
-          <div class="kv total"><span>Дължим данък</span><b class="loss" id="de-tax">—</b></div>
-        </div>
-      </div>
-      <div class="verdict bg">
-        <div class="top"><span class="flag">🇧🇬 България</span><span class="net mono" id="bg-net">—</span></div>
-        <div class="body">
-          <div class="kv"><span>Печалба non-EU (10%)</span><b id="bg-noneu">—</b></div>
-          <div class="kv"><span>Печалба EU/EEA (0%)</span><b id="bg-eu">—</b></div>
-          <div class="kv"><span>Дивиденти (5%)</span><b id="bg-div">—</b></div>
-          <div class="kv mt16"><span>Данък върху печалби</span><b id="bg-cgt">—</b></div>
-          <div class="kv"><span>Данък върху дивиденти</span><b id="bg-divtax">—</b></div>
-          <div class="kv total"><span>Дължим данък</span><b class="loss" id="bg-tax">—</b></div>
-        </div>
-      </div>
+  <div class="card">
+    <div class="ct">Формат — Interactive Brokers</div>
+    <div class="info">
+      Пусни директно <b>Activity Statement CSV</b> от IBKR (Flex Query или стандартния Monthly/Annual Statement). Разпознава се автоматично. ECB курсовете се теглят по дата — не въвеждаш нищо.
     </div>
-    <div class="row mt16 no-print">
-      <button id="export-csv" class="ghost">Свали CSV отчет</button>
-      <button id="print">Печат / PDF</button>
-    </div>
-  </section>
+    <div class="ct" style="margin-top:10px">Формат — стандартен CSV</div>
+    <pre class="fmt"><span class="cm"># type: buy | sell | dividend  ·  asset_type: stock | etf | crypto</span>
+<span class="cm"># eu_exempt: true = EU/EEA регулиран пазар (0% BG)  ·  withholding_tax: удържан при дивидент</span>
+<span class="ch">type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt</span>
+<span class="cd">buy,stock,AAPL,2024-01-10,10,185.50,USD,,false</span>
+<span class="cd">sell,stock,AAPL,2024-06-15,10,210.00,USD,,false</span>
+<span class="cd">dividend,stock,AAPL,2024-03-10,12.50,,USD,1.88,false</span>
+<span class="cd">buy,crypto,BTC,2023-06-01,0.1,28000,USD,,</span>
+<span class="cd">sell,crypto,BTC,2024-07-01,0.1,62000,USD,,</span></pre>
+  </div>
+</div>
 
-  <!-- 4. РАЗБИВКИ -->
-  <section id="breakdown-section" hidden>
-    <h2>4 · Разбивка по тикър</h2>
-    <div class="card tbl-scroll">
-      <table><thead><tr>
-        <th>Тикър</th><th class="num">Реализирана P/L (EUR)</th><th class="num">Дивиденти (EUR)</th>
-        <th>EU/EEA</th><th class="num">Продадени лотове</th>
-      </tr></thead><tbody id="by-ticker"></tbody></table>
+<!-- RESULTS -->
+<div id="tab-results" style="display:none">
+  <div id="noResults" class="card"><div class="empty">Зареди файл и натисни ⚡ Изчисли.</div></div>
+  <div id="results" style="display:none">
+    <div class="grid" id="summaryGrid"></div>
+    <div class="ctabs">
+      <button class="ctab on" onclick="showCtry('de')">🇩🇪 Германия</button>
+      <button class="ctab" onclick="showCtry('bg')">🇧🇬 България</button>
     </div>
-    <h2 class="mt16" style="margin-top:32px">Разбивка по месец</h2>
-    <div class="card tbl-scroll">
-      <table><thead><tr>
-        <th>Месец</th><th class="num">Реализирана P/L (EUR)</th><th class="num">Дивиденти (EUR)</th>
-      </tr></thead><tbody id="by-month"></tbody></table>
+    <div id="de-results"></div>
+    <div id="bg-results" style="display:none"></div>
+    <div class="card" id="tradesCard"></div>
+    <div class="card" id="divsCard"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <button class="exbtn" onclick="doExport()">⬇ Изтегли CSV отчет</button>
     </div>
+  </div>
+</div>
 
-    <h2 class="mt16" style="margin-top:32px">Реализирани продажби (FIFO)</h2>
-    <div class="card tbl-scroll">
-      <table><thead><tr>
-        <th>Дата</th><th>Тикър</th><th class="num">Бр.</th><th class="num">Купено @ (EUR)</th>
-        <th class="num">Продадено @ (EUR)</th><th class="num">P/L (EUR)</th>
-      </tr></thead><tbody id="realized"></tbody></table>
+<!-- SETTINGS -->
+<div id="tab-settings" style="display:none">
+  <div class="card">
+    <div class="ct">🇩🇪 Германия</div>
+    <div class="srow">
+      <div class="srl"><label>Freistellungsauftrag</label><div class="srh">Необлагаем минимум — стандартно €1 000 (€2 000 за двойки)</div></div>
+      <input class="ni" type="number" id="freistellung" value="1000">
     </div>
-  </section>
+    <div class="srow">
+      <div class="srl"><label>Kirchensteuer</label><div class="srh">9% върху Abgeltungsteuer (8% в Bayern/BW)</div></div>
+      <label class="tgl"><input type="checkbox" id="kirche"><span class="ts"></span></label>
+    </div>
+    <div class="srow">
+      <div class="srl"><label>Пределна ставка — крипто (%)</label><div class="srh">§23 EStG — зависи от твоя доход (25–45%)</div></div>
+      <input class="ni" type="number" id="cryptoRate" value="30" min="0" max="45">
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">🇧🇬 България — бележки</div>
+    <div class="info" style="margin-bottom:0">
+      <b>EU/EEA акции</b> (BSE, Xetra, Euronext, LSE…): маркирай с eu_exempt=true → 0% по чл.13 ал.1 т.3 ЗДДФЛ.<br>
+      <b>Дивиденти</b>: 5% — Приложение 8 от ГДД. Удържаният при извор е приспадаем до 5%.<br>
+      <b>Крипто</b>: 10% без освобождаване по срок (за разлика от Германия).<br>
+      <b>IBKR лихва върху кеш</b> (Credit Interest): третира се като доход от капитал — не като дивидент от акции.
+    </div>
+  </div>
+</div>
 
-  <footer>
-    Само за информационни цели — не е данъчна консултация. Изчисленията са опростени (нетиране на
-    печалби/загуби от акции за годината, без пренос на загуби между години, без отчитане на
-    Teilfreistellung за фондове). За официална декларация се консултирай със счетоводител.
-    ECB курсове: <a href="https://www.frankfurter.app" target="_blank" rel="noopener">frankfurter.app</a>.
-  </footer>
+<div class="disclaimer">Само за информационни цели — не е данъчна консултация.<br>ECB референтни курсове · FIFO метод · Консултирай се със счетоводител за официална декларация.</div>
 </div>
 
 <script>
-"use strict";
-// ════════════════════════════════════════════════════════════════════════
-// Състояние
-// ════════════════════════════════════════════════════════════════════════
-var TRADES = [];   // {date, ticker, action, shares, price, currency, exchange_rate, eu_exempt, _err}
-var RESULT = null; // последното изчисление (за експорт)
+// ─── State ────────────────────────────────────────────────────────────────────
+const state = { files: [], result: null };
+const rateCache = {};
 
-var $ = function (id) { return document.getElementById(id); };
-var fmt = function (n) { return (n == null || isNaN(n)) ? "—" :
-  n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; };
-var cls = function (n) { return n > 0 ? "gain" : n < 0 ? "loss" : ""; };
-
-// Малък persist на настройките (по желание, не на сделките)
-try {
-  var s = JSON.parse(localStorage.getItem("tax_settings") || "{}");
-  if (s.freibetrag != null) $("freibetrag").value = s.freibetrag;
-  if (s.kirche) { $("kirche").checked = true; $("kirche-rate").disabled = false; }
-  if (s.kircheRate) $("kirche-rate").value = s.kircheRate;
-} catch (e) {}
-function saveSettings() {
-  try {
-    localStorage.setItem("tax_settings", JSON.stringify({
-      freibetrag: $("freibetrag").value, kirche: $("kirche").checked, kircheRate: $("kirche-rate").value }));
-  } catch (e) {}
-}
-
-// ════════════════════════════════════════════════════════════════════════
-// CSV парсване (поддържа кавички и запетаи в полета)
-// ════════════════════════════════════════════════════════════════════════
-function parseCSV(text) {
-  var rows = [], row = [], field = "", inQ = false;
-  for (var i = 0; i < text.length; i++) {
-    var c = text[i];
-    if (inQ) {
-      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (c === '"') inQ = false;
-      else field += c;
-    } else {
-      if (c === '"') inQ = true;
-      else if (c === ",") { row.push(field); field = ""; }
-      else if (c === "\n" || c === "\r") {
-        if (field !== "" || row.length) { row.push(field); rows.push(row); row = []; field = ""; }
-        if (c === "\r" && text[i + 1] === "\n") i++;
-      } else field += c;
-    }
+// ─── Year selector ────────────────────────────────────────────────────────────
+(function(){
+  const sel = document.getElementById('yearSel');
+  const cur = new Date().getFullYear();
+  for(let y = cur; y >= 2020; y--){
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if(y === cur - 1) o.selected = true;
+    sel.appendChild(o);
   }
-  if (field !== "" || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
+})();
 
-function loadTradesFromCSV(text) {
-  var rows = parseCSV(text).filter(function (r) { return r.some(function (c) { return c.trim() !== ""; }); });
-  if (!rows.length) { $("parse-msg").textContent = "Празен файл."; return; }
-  var header = rows[0].map(function (h) { return h.trim().toLowerCase(); });
-  var idx = {};
-  ["date", "ticker", "action", "shares", "price", "currency", "exchange_rate", "eu_exempt"].forEach(function (k) {
-    idx[k] = header.indexOf(k);
-  });
-  if (idx.date < 0 || idx.ticker < 0 || idx.action < 0) {
-    $("parse-msg").textContent = "Липсват задължителни колони (date, ticker, action).";
-    return;
-  }
-  TRADES = rows.slice(1).map(function (r) {
-    var get = function (k) { return idx[k] >= 0 ? (r[idx[k]] || "").trim() : ""; };
-    var t = {
-      date: get("date"),
-      ticker: get("ticker").toUpperCase(),
-      action: get("action").toLowerCase(),
-      shares: parseFloat(get("shares")) || 0,
-      price: parseFloat(get("price")) || 0,
-      currency: (get("currency") || "EUR").toUpperCase(),
-      exchange_rate: get("exchange_rate") === "" ? null : parseFloat(get("exchange_rate")),
-      eu_exempt: /^(true|1|да|yes)$/i.test(get("eu_exempt")),
-      _err: null,
-    };
-    if (t.currency === "EUR" && t.exchange_rate == null) t.exchange_rate = 1;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(t.date)) t._err = "невалидна дата (очаквам ГГГГ-ММ-ДД)";
-    if (["buy", "sell", "dividend"].indexOf(t.action) < 0) t._err = "action трябва да е buy/sell/dividend";
-    return t;
-  });
-  $("parse-msg").textContent = TRADES.length + " сделки заредени.";
-  renderTrades();
-  populateYears();
-  $("fetch-all").disabled = false;
-  compute();
-}
-
-// ════════════════════════════════════════════════════════════════════════
-// ECB курс по дата (frankfurter.app) — авто, без ръчно въвеждане
-// ════════════════════════════════════════════════════════════════════════
-function fetchRate(trade) {
-  if (trade.currency === "EUR") { trade.exchange_rate = 1; return Promise.resolve(1); }
-  var url = "https://api.frankfurter.app/" + trade.date + "?from=" + trade.currency + "&to=EUR";
-  return fetch(url).then(function (r) {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  }).then(function (j) {
-    var rate = j && j.rates && j.rates.EUR;
-    if (!rate) throw new Error("няма курс");
-    trade.exchange_rate = rate;
-    return rate;
-  });
-}
-
-function fetchAllRates() {
-  var missing = TRADES.filter(function (t) { return t.exchange_rate == null && !t._err; });
-  if (!missing.length) { $("parse-msg").textContent = "Всички курсове са налични."; return; }
-  $("fetch-all").disabled = true;
-  $("parse-msg").textContent = "Тегля " + missing.length + " ECB курса…";
-  // последователно, за да не заливаме API-то
-  var i = 0;
-  (function next() {
-    if (i >= missing.length) {
-      $("parse-msg").textContent = "ECB курсове изтеглени.";
-      $("fetch-all").disabled = false; renderTrades(); compute(); return;
-    }
-    fetchRate(missing[i]).catch(function (e) { missing[i]._err = "ECB курс неуспешен: " + e.message; })
-      .then(function () { i++; next(); });
-  })();
-}
-
-// ════════════════════════════════════════════════════════════════════════
-// Рендер на таблицата със сделки (с per-row Fetch ECB бутон)
-// ════════════════════════════════════════════════════════════════════════
-function eurValue(t) {
-  if (t.exchange_rate == null) return null;
-  return t.shares * t.price * t.exchange_rate;
-}
-function renderTrades() {
-  $("trades-wrap").hidden = TRADES.length === 0;
-  var body = $("trades-body"); body.innerHTML = "";
-  TRADES.forEach(function (t, i) {
-    var tr = document.createElement("tr");
-    if (t._err) tr.className = "err";
-    var ev = eurValue(t);
-    var fetchBtn = (t.currency !== "EUR" && t.exchange_rate == null)
-      ? '<button class="ghost" data-fetch="' + i + '" style="padding:4px 10px;font-size:12px">ECB курс</button>' : "";
-    tr.innerHTML =
-      "<td class='mono'>" + t.date + "</td>" +
-      "<td class='mono'>" + t.ticker + "</td>" +
-      "<td>" + t.action + "</td>" +
-      "<td class='num'>" + t.shares + "</td>" +
-      "<td class='num'>" + t.price.toFixed(2) + "</td>" +
-      "<td>" + t.currency + "</td>" +
-      "<td class='num'>" + (t.exchange_rate != null ? t.exchange_rate.toFixed(4) : "—") + "</td>" +
-      "<td class='num'>" + (ev != null ? fmt(ev) : "—") + "</td>" +
-      "<td>" + (t.eu_exempt ? "✓" : "") + "</td>" +
-      "<td class='no-print'>" + (t._err ? t._err : fetchBtn) + "</td>";
-    body.appendChild(tr);
-  });
-  body.querySelectorAll("[data-fetch]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var t = TRADES[+b.dataset.fetch];
-      b.disabled = true; b.textContent = "…";
-      fetchRate(t).then(function () { renderTrades(); compute(); })
-        .catch(function (e) { t._err = "ECB неуспешен"; renderTrades(); });
+// ─── Tab routing ──────────────────────────────────────────────────────────────
+function showTab(t){
+  ['import','results','settings'].forEach(id => {
+    document.getElementById('tab-'+id).style.display = id===t ? '' : 'none';
+    document.querySelectorAll('.tab').forEach((el,i) => {
+      if(['import','results','settings'][i]===t) el.classList.add('on'); else el.classList.remove('on');
     });
   });
 }
-
-function populateYears() {
-  var years = {};
-  TRADES.forEach(function (t) { if (/^\d{4}/.test(t.date)) years[t.date.slice(0, 4)] = 1; });
-  var sel = $("year"); var cur = sel.value;
-  sel.innerHTML = '<option value="">всички</option>';
-  Object.keys(years).sort().forEach(function (y) {
-    var o = document.createElement("option"); o.value = y; o.textContent = y; sel.appendChild(o);
+function showCtry(c){
+  document.getElementById('de-results').style.display = c==='de' ? '' : 'none';
+  document.getElementById('bg-results').style.display = c==='bg' ? '' : 'none';
+  document.querySelectorAll('.ctab').forEach((el,i) => {
+    if(['de','bg'][i]===c) el.classList.add('on'); else el.classList.remove('on');
   });
-  sel.value = cur;
 }
 
-// ════════════════════════════════════════════════════════════════════════
-// FIFO + данъчна логика
-// ════════════════════════════════════════════════════════════════════════
-function compute() {
-  var yearFilter = $("year").value;
-  var usable = TRADES.filter(function (t) {
-    return !t._err && t.exchange_rate != null && (!yearFilter || t.date.slice(0, 4) === yearFilter);
+// ─── IBKR detector + parser ───────────────────────────────────────────────────
+function isIBKR(text){
+  return text.startsWith('\uFEFFStatement,Header') || text.startsWith('Statement,Header') ||
+         text.includes('Statement,Data,BrokerName,Interactive Brokers');
+}
+
+function parseIBKR(text, filename){
+  const lines = text.replace(/^\uFEFF/,'').split(/\r?\n/);
+  const trades = [];
+
+  // Collect all Trades Data Order rows for Stocks
+  lines.forEach(line => {
+    const parts = splitCSVLine(line);
+    if(parts.length < 10) return;
+    if(parts[0] !== 'Trades') return;
+    if(parts[1] !== 'Data') return;
+    if(parts[2] !== 'Order') return;
+    const assetCat = parts[3];
+    if(!['Stocks','ETF'].includes(assetCat)) return; // skip Options, Forex
+
+    const currency = parts[4];
+    const ticker   = parts[6].trim();
+    const rawDate  = parts[7].replace(/"/g,'').trim(); // "2026-05-01, 15:56:23"
+    const date     = rawDate.substring(0,10); // 2026-05-01
+    const rawQty   = parseFloat(parts[8].replace(/[",]/g,''));
+    const tPrice   = parseFloat(parts[9].replace(/[",]/g,''));
+
+    if(isNaN(rawQty) || rawQty === 0) return;
+    if(isNaN(tPrice)) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+
+    const type     = rawQty > 0 ? 'buy' : 'sell';
+    const quantity = Math.abs(rawQty);
+    // Determine asset type from description if possible - default stock
+    const assetType = 'stock';
+
+    trades.push({ type, assetType, ticker, date, quantity, price: tPrice, currency, withholding: 0, euExempt: false, source: filename, priceEUR: null, totalEUR: null, ecbRate: null });
   });
-  // сортиране по дата за коректен FIFO
-  usable = usable.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
 
-  var lots = {};         // ticker -> [{shares, costEur, date}]
-  var realized = [];     // {date, ticker, shares, buyEur, sellEur, pl, eu_exempt}
-  var dividends = [];    // {date, ticker, amountEur, eu_exempt}
+  // Collect dividend rows if any (some IBKR exports have them)
+  lines.forEach(line => {
+    const parts = splitCSVLine(line);
+    if(parts.length < 6) return;
+    if(parts[0] !== 'Dividends' || parts[1] !== 'Data') return;
+    const currency = parts[2];
+    const rawDate  = parts[4].trim();
+    const date     = rawDate.substring(0,10);
+    const desc     = parts[5];
+    const amount   = parseFloat(parts[6]);
+    if(isNaN(amount) || amount <= 0) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    // Extract ticker from description e.g. "AAPL (US0378331005) Cash Dividend..."
+    const m = desc.match(/^([A-Z0-9\.]+)\s/);
+    const ticker = m ? m[1] : 'DIV';
+    trades.push({ type:'dividend', assetType:'stock', ticker, date, quantity: amount, price:0, currency, withholding:0, euExempt:false, source:filename, priceEUR:null, totalEUR:null, ecbRate:null });
+  });
 
-  usable.forEach(function (t) {
-    var pxEur = t.price * t.exchange_rate;
-    if (t.action === "buy") {
-      (lots[t.ticker] = lots[t.ticker] || []).push({ shares: t.shares, costEur: pxEur, date: t.date });
-    } else if (t.action === "dividend") {
-      dividends.push({ date: t.date, ticker: t.ticker, amountEur: t.shares * pxEur, eu_exempt: t.eu_exempt });
-    } else if (t.action === "sell") {
-      var remaining = t.shares;
-      var q = lots[t.ticker] || [];
-      while (remaining > 0 && q.length) {
-        var lot = q[0];
-        var matched = Math.min(remaining, lot.shares);
-        var pl = (pxEur - lot.costEur) * matched;
-        realized.push({ date: t.date, ticker: t.ticker, shares: matched,
-          buyEur: lot.costEur, sellEur: pxEur, pl: pl, eu_exempt: t.eu_exempt });
-        lot.shares -= matched; remaining -= matched;
-        if (lot.shares <= 1e-9) q.shift();
-      }
-      if (remaining > 1e-6) {
-        // продажба без налична позиция (липсва buy в данните) — третираме базата като 0
-        realized.push({ date: t.date, ticker: t.ticker, shares: remaining,
-          buyEur: 0, sellEur: pxEur, pl: pxEur * remaining, eu_exempt: t.eu_exempt, _orphan: true });
-      }
+  // Withholding tax on dividends
+  const whMap = {};
+  lines.forEach(line => {
+    const parts = splitCSVLine(line);
+    if(parts.length < 6) return;
+    if(parts[0] !== 'Withholding Tax' || parts[1] !== 'Data') return;
+    const currency = parts[2];
+    const rawDate  = parts[4].trim();
+    const date     = rawDate.substring(0,10);
+    const desc     = parts[5];
+    const amount   = Math.abs(parseFloat(parts[6]));
+    if(isNaN(amount)) return;
+    // Only stock dividend withholding (not interest withholding)
+    if(desc.toLowerCase().includes('interest')) return;
+    const m = desc.match(/^([A-Z0-9\.]+)\s/);
+    if(!m) return;
+    const ticker = m[1];
+    whMap[`${ticker}|${date}`] = (whMap[`${ticker}|${date}`]||0) + amount;
+  });
+  // Apply withholding to matching dividends
+  trades.forEach(t => {
+    if(t.type==='dividend'){
+      const k = `${t.ticker}|${t.date}`;
+      if(whMap[k]) t.withholding = whMap[k];
     }
   });
 
-  // агрегати
-  var totalPL = realized.reduce(function (s, r) { return s + r.pl; }, 0);
-  var plEU = realized.filter(function (r) { return r.eu_exempt; }).reduce(function (s, r) { return s + r.pl; }, 0);
-  var plNonEU = totalPL - plEU;
-  var divTotal = dividends.reduce(function (s, d) { return s + d.amountEur; }, 0);
-
-  // ── Германия ──────────────────────────────────────────────────────────
-  var frei = Math.max(0, parseFloat($("freibetrag").value) || 0);
-  var deIncome = totalPL + divTotal;                 // акции + дивиденти в общия Topf
-  var freiUsed = Math.min(Math.max(deIncome, 0), frei);
-  var deBase = Math.max(0, deIncome - frei);
-  var ki = $("kirche").checked ? parseFloat($("kirche-rate").value) : 0;
-  // точна формула с приспадане на църковния данък
-  var kapest = deBase * 0.25 / (1 + 0.25 * ki);
-  var soli = 0.055 * kapest;
-  var kirche = ki * kapest;
-  var deTax = kapest + soli + kirche;
-  var deNet = deIncome - deTax;
-
-  // ── България ──────────────────────────────────────────────────────────
-  var bgGainNonEU = Math.max(0, plNonEU);            // печалбите се облагат, загубите не дават кредит тук
-  var bgCGT = bgGainNonEU * 0.10;
-  var bgDivTax = Math.max(0, divTotal) * 0.05;
-  var bgTax = bgCGT + bgDivTax;
-  var bgNet = (totalPL + divTotal) - bgTax;
-
-  RESULT = { usable: usable, realized: realized, dividends: dividends,
-    totalPL: totalPL, plEU: plEU, plNonEU: plNonEU, divTotal: divTotal,
-    de: { income: deIncome, frei: frei, freiUsed: freiUsed, base: deBase,
-          kapest: kapest, soli: soli, kirche: kirche, tax: deTax, net: deNet, ki: ki },
-    bg: { gainNonEU: bgGainNonEU, gainEU: Math.max(0, plEU), cgt: bgCGT,
-          divTax: bgDivTax, tax: bgTax, net: bgNet } };
-
-  renderResult();
-  renderBreakdowns();
+  if(trades.length === 0) throw new Error(`${filename}: IBKR формат разпознат, но няма намерени сделки с акции.`);
+  return trades;
 }
 
-function setText(id, val, klass) {
-  var el = $(id); el.textContent = val;
-  el.className = el.className.replace(/\b(gain|loss)\b/g, "").trim();
-  if (klass) el.classList.add(klass);
-}
+// ─── Standard CSV parser ──────────────────────────────────────────────────────
+function parseStd(text, filename){
+  const lines = text.replace(/^\uFEFF/,'').trim().split(/\r?\n/).filter(l => !l.trim().startsWith('#') && l.trim());
+  if(lines.length < 2) throw new Error(`${filename}: трябва header + данни`);
+  const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/['"]/g,''));
+  const req = ['type','ticker','date','quantity','currency'];
+  req.forEach(r => { if(!headers.includes(r)) throw new Error(`${filename}: липсва колона "${r}"`); });
 
-function renderResult() {
-  if (!TRADES.length) return;
-  $("result-section").hidden = false;
-  var de = RESULT.de, bg = RESULT.bg;
-
-  setText("de-net", fmt(de.net), cls(de.net));
-  setText("de-gain", fmt(RESULT.totalPL), cls(RESULT.totalPL));
-  setText("de-div", fmt(RESULT.divTotal));
-  setText("de-frei", fmt(de.freiUsed) + " / " + fmt(de.frei));
-  $("de-gauge").style.width = (de.frei > 0 ? Math.min(100, de.freiUsed / de.frei * 100) : 0) + "%";
-  setText("de-base", fmt(de.base));
-  setText("de-kapest", fmt(de.kapest));
-  setText("de-soli", fmt(de.soli));
-  setText("de-kirche", de.ki ? fmt(de.kirche) : "—");
-  setText("de-tax", fmt(de.tax), "loss");
-
-  setText("bg-net", fmt(bg.net), cls(bg.net));
-  setText("bg-noneu", fmt(RESULT.plNonEU), cls(RESULT.plNonEU));
-  setText("bg-eu", fmt(RESULT.plEU) + " · 0%");
-  setText("bg-div", fmt(RESULT.divTotal));
-  setText("bg-cgt", fmt(bg.cgt), "loss");
-  setText("bg-divtax", fmt(bg.divTax), "loss");
-  setText("bg-tax", fmt(bg.tax), "loss");
-}
-
-function renderBreakdowns() {
-  if (!RESULT.realized.length && !RESULT.dividends.length) { $("breakdown-section").hidden = true; return; }
-  $("breakdown-section").hidden = false;
-
-  // по тикър
-  var byT = {};
-  RESULT.realized.forEach(function (r) {
-    var o = byT[r.ticker] = byT[r.ticker] || { pl: 0, div: 0, eu: r.eu_exempt, lots: 0 };
-    o.pl += r.pl; o.lots++; o.eu = o.eu || r.eu_exempt;
-  });
-  RESULT.dividends.forEach(function (d) {
-    var o = byT[d.ticker] = byT[d.ticker] || { pl: 0, div: 0, eu: d.eu_exempt, lots: 0 };
-    o.div += d.amountEur;
-  });
-  var tbT = $("by-ticker"); tbT.innerHTML = "";
-  Object.keys(byT).sort().forEach(function (k) {
-    var o = byT[k];
-    tbT.innerHTML += "<tr><td class='mono'>" + k + "</td>" +
-      "<td class='num " + cls(o.pl) + "'>" + fmt(o.pl) + "</td>" +
-      "<td class='num'>" + fmt(o.div) + "</td>" +
-      "<td>" + (o.eu ? "✓" : "") + "</td>" +
-      "<td class='num'>" + o.lots + "</td></tr>";
-  });
-
-  // по месец
-  var byM = {};
-  RESULT.realized.forEach(function (r) { var m = r.date.slice(0, 7); (byM[m] = byM[m] || { pl: 0, div: 0 }).pl += r.pl; });
-  RESULT.dividends.forEach(function (d) { var m = d.date.slice(0, 7); (byM[m] = byM[m] || { pl: 0, div: 0 }).div += d.amountEur; });
-  var tbM = $("by-month"); tbM.innerHTML = "";
-  Object.keys(byM).sort().forEach(function (m) {
-    var o = byM[m];
-    tbM.innerHTML += "<tr><td class='mono'>" + m + "</td>" +
-      "<td class='num " + cls(o.pl) + "'>" + fmt(o.pl) + "</td>" +
-      "<td class='num'>" + fmt(o.div) + "</td></tr>";
-  });
-
-  // реализирани продажби
-  var tbR = $("realized"); tbR.innerHTML = "";
-  RESULT.realized.forEach(function (r) {
-    tbR.innerHTML += "<tr><td class='mono'>" + r.date + "</td>" +
-      "<td class='mono'>" + r.ticker + (r._orphan ? " ⚠" : "") + "</td>" +
-      "<td class='num'>" + r.shares + "</td>" +
-      "<td class='num'>" + r.buyEur.toFixed(2) + "</td>" +
-      "<td class='num'>" + r.sellEur.toFixed(2) + "</td>" +
-      "<td class='num " + cls(r.pl) + "'>" + fmt(r.pl) + "</td></tr>";
+  return lines.slice(1).map((line, idx) => {
+    const vals = splitCSVLine(line).map(v => v.replace(/^["']|["']$/g,''));
+    const row = {};
+    headers.forEach((h,i) => row[h] = vals[i]||'');
+    const type = row.type.toLowerCase();
+    if(!['buy','sell','dividend'].includes(type)) throw new Error(`${filename} ред ${idx+2}: невалиден тип "${row.type}"`);
+    const assetType = (row.asset_type||'stock').toLowerCase();
+    const qty = parseFloat(row.quantity);
+    if(isNaN(qty)||qty<=0) throw new Error(`${filename} ред ${idx+2}: невалидно quantity`);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(row.date)) throw new Error(`${filename} ред ${idx+2}: дата трябва YYYY-MM-DD`);
+    return {
+      type, assetType, ticker: row.ticker.toUpperCase(), date: row.date,
+      quantity: qty, price: parseFloat(row.price)||0,
+      currency: (row.currency||'EUR').toUpperCase(),
+      withholding: parseFloat(row.withholding_tax)||0,
+      euExempt: row.eu_exempt?.toLowerCase()==='true',
+      source: filename, priceEUR: null, totalEUR: null, ecbRate: null
+    };
   });
 }
 
-// ════════════════════════════════════════════════════════════════════════
-// Експорт
-// ════════════════════════════════════════════════════════════════════════
-function exportCSV() {
-  if (!RESULT) return;
-  var L = [];
-  L.push("Отчет реализирани печалби;генериран;" + new Date().toISOString().slice(0, 10));
-  L.push("");
-  L.push("ОБОБЩЕНИЕ;EUR");
-  L.push("Реализирана печалба (нетна);" + RESULT.totalPL.toFixed(2));
-  L.push("в т.ч. EU/EEA;" + RESULT.plEU.toFixed(2));
-  L.push("в т.ч. non-EU;" + RESULT.plNonEU.toFixed(2));
-  L.push("Дивиденти;" + RESULT.divTotal.toFixed(2));
-  L.push("");
-  L.push("ГЕРМАНИЯ;EUR");
-  L.push("Облагаема основа;" + RESULT.de.base.toFixed(2));
-  L.push("Abgeltungsteuer;" + RESULT.de.kapest.toFixed(2));
-  L.push("Soli;" + RESULT.de.soli.toFixed(2));
-  L.push("Kirchensteuer;" + RESULT.de.kirche.toFixed(2));
-  L.push("Дължим данък DE;" + RESULT.de.tax.toFixed(2));
-  L.push("Нетно след данък DE;" + RESULT.de.net.toFixed(2));
-  L.push("");
-  L.push("БЪЛГАРИЯ;EUR");
-  L.push("Данък печалби (10% non-EU);" + RESULT.bg.cgt.toFixed(2));
-  L.push("Данък дивиденти (5%);" + RESULT.bg.divTax.toFixed(2));
-  L.push("Дължим данък BG;" + RESULT.bg.tax.toFixed(2));
-  L.push("Нетно след данък BG;" + RESULT.bg.net.toFixed(2));
-  L.push("");
-  L.push("РЕАЛИЗИРАНИ ПРОДАЖБИ");
-  L.push("дата;тикър;брой;купено_EUR;продадено_EUR;PL_EUR");
-  RESULT.realized.forEach(function (r) {
-    L.push([r.date, r.ticker, r.shares, r.buyEur.toFixed(2), r.sellEur.toFixed(2), r.pl.toFixed(2)].join(";"));
-  });
-  var blob = new Blob(["\ufeff" + L.join("\n")], { type: "text/csv;charset=utf-8" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "danachen-otchet-" + new Date().toISOString().slice(0, 10) + ".csv";
-  a.click();
-  URL.revokeObjectURL(a.href);
+function splitCSVLine(line){
+  const result = []; let cur = ''; let inQ = false;
+  for(let i=0; i<line.length; i++){
+    const c = line[i];
+    if(c==='"'){ inQ=!inQ; continue; }
+    if(c===','&&!inQ){ result.push(cur); cur=''; continue; }
+    cur += c;
+  }
+  result.push(cur);
+  return result;
 }
 
-// ════════════════════════════════════════════════════════════════════════
-// Примерни данни
-// ════════════════════════════════════════════════════════════════════════
-var SAMPLE = [
-  "date,ticker,action,shares,price,currency,exchange_rate,eu_exempt",
-  "2026-01-15,AAPL,buy,10,185.50,USD,0.92,false",
-  "2026-02-03,AAPL,buy,10,178.20,USD,0.88,false",
-  "2026-03-20,AAPL,sell,15,210.00,USD,0.91,false",
-  "2026-02-10,SAP,buy,20,145.00,EUR,1,true",
-  "2026-04-12,SAP,sell,20,162.50,EUR,1,true",
-  "2026-03-01,MSFT,dividend,30,0.83,USD,0.90,false",
-  "2026-05-05,BTU,buy,50,22.40,USD,0.89,false",
-  "2026-06-01,BTU,sell,50,19.10,USD,0.93,false",
-].join("\n");
+// ─── ECB rate fetch ───────────────────────────────────────────────────────────
+async function fetchECBRate(currency, date){
+  if(currency==='EUR') return 1.0;
+  const key = `${currency}|${date}`;
+  if(rateCache[key]) return rateCache[key];
+  for(let i=0; i<=6; i++){
+    const d = new Date(date+'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate()-i);
+    const ds = d.toISOString().split('T')[0];
+    try{
+      const url = `https://data-api.ecb.europa.eu/service/data/EXR/D.${currency}.EUR.SP00.A?startPeriod=${ds}&endPeriod=${ds}&format=jsondata`;
+      const r = await fetch(url);
+      if(!r.ok) continue;
+      const data = await r.json();
+      const series = data?.dataSets?.[0]?.series;
+      if(!series) continue;
+      const sk = Object.keys(series)[0];
+      const obs = series[sk]?.observations;
+      if(!obs) continue;
+      const ok2 = Object.keys(obs)[0];
+      const rate = parseFloat(obs[ok2][0]);
+      if(!isNaN(rate)&&rate>0){ rateCache[key]=rate; return rate; }
+    }catch(e){ continue; }
+  }
+  // Fallback: frankfurter.app
+  try{
+    const r = await fetch(`https://api.frankfurter.app/${date}?from=${currency}&to=EUR`);
+    if(r.ok){
+      const data = await r.json();
+      const rate = data?.rates?.EUR;
+      if(rate&&rate>0){ rateCache[key]=rate; return rate; }
+    }
+  }catch(e){}
+  throw new Error(`Няма ECB курс за ${currency} около ${date}`);
+}
 
-// ════════════════════════════════════════════════════════════════════════
-// Свързване на UI
-// ════════════════════════════════════════════════════════════════════════
-var drop = $("drop"), fileInput = $("file");
-drop.addEventListener("click", function () { fileInput.click(); });
-fileInput.addEventListener("change", function (e) {
-  var f = e.target.files[0]; if (!f) return;
-  var r = new FileReader(); r.onload = function () { loadTradesFromCSV(r.result); }; r.readAsText(f);
-});
-["dragenter", "dragover"].forEach(function (ev) {
-  drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("hot"); });
-});
-["dragleave", "drop"].forEach(function (ev) {
-  drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("hot"); });
-});
-drop.addEventListener("drop", function (e) {
-  var f = e.dataTransfer.files[0]; if (!f) return;
-  var r = new FileReader(); r.onload = function () { loadTradesFromCSV(r.result); }; r.readAsText(f);
-});
+async function enrichRates(transactions, onProgress){
+  const needed = [...new Set(transactions.filter(t=>t.currency!=='EUR').map(t=>`${t.currency}|${t.date}`))];
+  for(let i=0; i<needed.length; i++){
+    const [cur,date] = needed[i].split('|');
+    try{ await fetchECBRate(cur,date); }catch(e){ /* rateError flagged later */ }
+    onProgress(Math.round((i+1)/needed.length*100));
+  }
+  return transactions.map(t => {
+    const rate = t.currency==='EUR' ? 1.0 : rateCache[`${t.currency}|${t.date}`];
+    if(!rate) return {...t, rateError:true};
+    const toEUR = v => t.currency==='EUR' ? v : v/rate;
+    let priceEUR, totalEUR, withholdingEUR;
+    if(t.type==='dividend'){
+      totalEUR = toEUR(t.quantity);
+      priceEUR = totalEUR;
+      withholdingEUR = toEUR(t.withholding);
+    } else {
+      priceEUR = toEUR(t.price);
+      totalEUR = priceEUR * t.quantity;
+      withholdingEUR = 0;
+    }
+    return {...t, priceEUR, totalEUR, withholdingEUR, ecbRate: rate};
+  });
+}
 
-$("sample").addEventListener("click", function () { loadTradesFromCSV(SAMPLE); });
-$("fetch-all").addEventListener("click", fetchAllRates);
-$("export-csv").addEventListener("click", exportCSV);
-$("print").addEventListener("click", function () { window.print(); });
-$("kirche").addEventListener("change", function () {
-  $("kirche-rate").disabled = !this.checked; saveSettings(); compute();
-});
-["freibetrag", "kirche-rate", "year"].forEach(function (id) {
-  $(id).addEventListener("change", function () { saveSettings(); compute(); });
-});
+// ─── FIFO ─────────────────────────────────────────────────────────────────────
+function calcFIFO(transactions, year){
+  const endY = `${year}-12-31`;
+  const queues = {};
+  transactions.filter(t=>t.type==='buy'&&t.date<=endY)
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .forEach(t=>{
+      if(!queues[t.ticker]) queues[t.ticker]=[];
+      queues[t.ticker].push({qty:t.quantity, priceEUR:t.priceEUR, date:t.date, assetType:t.assetType});
+    });
+  const breakdown = [];
+  transactions.filter(t=>t.type==='sell'&&t.date.startsWith(String(year))).forEach(sell=>{
+    const q = queues[sell.ticker]||[];
+    let rem=sell.quantity, cost=0, minD=Infinity, maxD=0, freeGain=0;
+    while(rem>0&&q.length>0){
+      const lot=q[0]; const used=Math.min(lot.qty,rem);
+      const days=Math.floor((new Date(sell.date)-new Date(lot.date))/86400000);
+      minD=Math.min(minD,days); maxD=Math.max(maxD,days);
+      cost+=used*lot.priceEUR;
+      if(sell.assetType==='crypto'&&days>365) freeGain+=used*sell.priceEUR-used*lot.priceEUR;
+      lot.qty-=used; rem-=used;
+      if(lot.qty<=0) q.shift();
+    }
+    const proceeds=sell.quantity*sell.priceEUR;
+    const gain=proceeds-cost;
+    breakdown.push({
+      ticker:sell.ticker, assetType:sell.assetType, date:sell.date, qty:sell.quantity,
+      proceeds, cost, gain,
+      cryptoFreeGain: sell.assetType==='crypto'?freeGain:0,
+      cryptoTaxableGain: sell.assetType==='crypto'?gain-freeGain:0,
+      euExempt:sell.euExempt, minDays:minD===Infinity?0:minD, maxDays:maxD, source:sell.source
+    });
+  });
+  const dividends = transactions.filter(t=>t.type==='dividend'&&t.date.startsWith(String(year)));
+  return {breakdown, dividends};
+}
+
+// ─── Tax calculations ─────────────────────────────────────────────────────────
+function calcDE(breakdown, dividends, freistellung, kirchensteuer, cryptoRate){
+  const stockGain = breakdown.filter(b=>b.assetType!=='crypto').reduce((s,b)=>s+b.gain,0);
+  const totalDivs = dividends.reduce((s,t)=>s+(t.totalEUR||0),0);
+  const creditable = dividends.reduce((s,t)=>s+Math.min(t.withholdingEUR||0,(t.totalEUR||0)*0.15),0);
+  const grossBase = stockGain+totalDivs;
+  const taxableBase = Math.max(0,grossBase-freistellung);
+  const freiUsed = Math.min(freistellung,Math.max(0,grossBase));
+  const abgeltung = taxableBase*0.25;
+  const soli = abgeltung*0.055;
+  const kirche = kirchensteuer ? abgeltung*0.09 : 0;
+  const credit = Math.min(creditable, abgeltung);
+  const stockTax = Math.max(0, abgeltung+soli+kirche-credit);
+  const cryptoTaxableTotal = breakdown.filter(b=>b.assetType==='crypto').reduce((s,b)=>s+b.cryptoTaxableGain,0);
+  const cryptoFreeTotal = breakdown.filter(b=>b.assetType==='crypto').reduce((s,b)=>s+b.cryptoFreeGain,0);
+  const cryptoBase = (cryptoTaxableTotal<600&&cryptoTaxableTotal>0) ? 0 : Math.max(0,cryptoTaxableTotal);
+  const cryptoTax = cryptoBase*(cryptoRate/100);
+  return {stockGain,totalDivs,creditable,credit,grossBase,taxableBase,freiUsed,
+    abgeltung,soli,kirche,stockTax,cryptoTaxableTotal,cryptoFreeTotal,cryptoBase,cryptoTax,
+    totalTax:stockTax+cryptoTax};
+}
+
+function calcBG(breakdown, dividends){
+  const taxableStock = breakdown.filter(b=>b.assetType!=='crypto'&&!b.euExempt).reduce((s,b)=>s+b.gain,0);
+  const exemptStock  = breakdown.filter(b=>b.assetType!=='crypto'&&b.euExempt).reduce((s,b)=>s+b.gain,0);
+  const cryptoGain   = breakdown.filter(b=>b.assetType==='crypto').reduce((s,b)=>s+b.gain,0);
+  const totalDivs    = dividends.reduce((s,t)=>s+(t.totalEUR||0),0);
+  const creditable   = dividends.reduce((s,t)=>s+Math.min(t.withholdingEUR||0,(t.totalEUR||0)*0.05),0);
+  const stockTax  = Math.max(0,taxableStock)*0.10;
+  const cryptoTax = Math.max(0,cryptoGain)*0.10;
+  const divRaw    = Math.max(0,totalDivs)*0.05;
+  const divCredit = Math.min(creditable,divRaw);
+  const divTax    = Math.max(0,divRaw-divCredit);
+  return {taxableStock,exemptStock,cryptoGain,totalDivs,creditable,stockTax,cryptoTax,divRaw,divCredit,divTax,
+    totalTax:stockTax+cryptoTax+divTax};
+}
+
+// ─── Format ───────────────────────────────────────────────────────────────────
+const fmt = n => {
+  const s = Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f');
+  return (n<0?'−':'')+s+'\u202f€';
+};
+const fmtN = n => {
+  if(n===0) return '0';
+  return n%1===0 ? n.toString() : n.toFixed(4);
+};
+
+// ─── File handling ────────────────────────────────────────────────────────────
+function handleFiles(files){
+  Array.from(files).forEach(f => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const text = e.target.result;
+        let txs;
+        const ibkr = isIBKR(text);
+        if(ibkr) txs = parseIBKR(text, f.name);
+        else      txs = parseStd(text, f.name);
+        const existing = state.files.findIndex(x=>x.name===f.name);
+        const entry = {name:f.name, count:txs.length, transactions:txs, ibkr};
+        if(existing>=0) state.files[existing]=entry;
+        else state.files.push(entry);
+        renderFileList();
+        setMsg('', '');
+      }catch(err){ setMsg(err.message,'err'); }
+    };
+    reader.readAsText(f);
+  });
+}
+
+function renderFileList(){
+  const el = document.getElementById('fileList');
+  el.innerHTML = state.files.map(f=>`
+    <div class="frow">
+      <span>📄 ${f.name}${f.ibkr?'<span class="ibkr-badge">IBKR</span>':''}</span>
+      <div style="display:flex;align-items:center">
+        <span class="fc">${f.count} реда</span>
+        <button class="btn bd" onclick="removeFile('${f.name}')">✕</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('calcBtn').disabled = state.files.length===0;
+}
+
+function removeFile(name){ state.files = state.files.filter(f=>f.name!==name); renderFileList(); }
+
+// ─── Calculate ────────────────────────────────────────────────────────────────
+async function calculate(){
+  const allRaw = state.files.flatMap(f=>f.transactions);
+  if(allRaw.length===0){ setMsg('Зареди поне един файл.','err'); return; }
+  const year = parseInt(document.getElementById('yearSel').value);
+  const freistellung = parseFloat(document.getElementById('freistellung').value)||1000;
+  const kirchensteuer = document.getElementById('kirche').checked;
+  const cryptoRate = parseFloat(document.getElementById('cryptoRate').value)||30;
+
+  document.getElementById('pbar').style.display='';
+  document.getElementById('calcBtn').disabled=true;
+  setMsg('','');
+
+  const nonEUR = [...new Set(allRaw.filter(t=>t.currency!=='EUR').map(t=>t.currency))];
+  setProgress(0, `Зарежда ECB курсове за ${nonEUR.join(', ')||'EUR'}…`);
+
+  try{
+    const enriched = await enrichRates(allRaw, p=>setProgress(p,''));
+    const rateErrors = enriched.filter(t=>t.rateError);
+    const {breakdown, dividends} = calcFIFO(enriched, year);
+    const de = calcDE(breakdown, dividends, freistellung, kirchensteuer, cryptoRate);
+    const bg = calcBG(breakdown, dividends);
+    state.result = {transactions:enriched, breakdown, dividends, de, bg, year, freistellung, kirchensteuer, cryptoRate};
+    renderResults(state.result);
+    if(rateErrors.length>0){
+      setMsg(`⚠ ${rateErrors.length} транзакции без ECB курс: ${rateErrors.map(t=>`${t.ticker} (${t.date}, ${t.currency})`).join(', ')}`, 'warn');
+    } else {
+      setMsg(`✓ Изчислено — ${breakdown.length} продажби, ${dividends.length} дивидента за ${year}`, 'ok');
+    }
+    showTab('results');
+  }catch(e){ setMsg(e.message,'err'); }
+  finally{
+    document.getElementById('pbar').style.display='none';
+    document.getElementById('calcBtn').disabled=false;
+  }
+}
+
+function setProgress(p, msg){
+  if(msg) document.getElementById('pmsg').textContent=msg;
+  document.getElementById('ppct').textContent=p+'%';
+  document.getElementById('pfill').style.width=p+'%';
+}
+function setMsg(msg, type){
+  const el = document.getElementById('msg');
+  if(!msg){el.innerHTML='';return;}
+  el.innerHTML=`<div class="msg ${type}">${msg}</div>`;
+}
+
+// ─── Render results ───────────────────────────────────────────────────────────
+function renderResults(r){
+  document.getElementById('noResults').style.display='none';
+  document.getElementById('results').style.display='';
+  const {breakdown,dividends,de,bg,year,freistellung} = r;
+  const stockGain = breakdown.filter(b=>b.assetType!=='crypto').reduce((s,b)=>s+b.gain,0);
+  const cryptoGain = breakdown.filter(b=>b.assetType==='crypto').reduce((s,b)=>s+b.gain,0);
+  const totalDivs = dividends.reduce((s,t)=>s+(t.totalEUR||0),0);
+  const totalWH = dividends.reduce((s,t)=>s+(t.withholdingEUR||0),0);
+
+  // Summary grid
+  document.getElementById('summaryGrid').innerHTML = [
+    {l:'Печалба акции/ETF', v:stockGain, s:`FIFO · ${breakdown.filter(b=>b.assetType!=='crypto').length} сделки`, c:stockGain>=0?'pos':'neg'},
+    {l:'Крипто печалба', v:cryptoGain, s:'вкл. необлагаем >1г', c:'pur'},
+    {l:'Дивиденти брутно', v:totalDivs, s:`${dividends.length} плащания`, c:'cya'},
+    {l:'Удържан данък дивиденти', v:totalWH, s:'при извор', c:'dim'},
+  ].map(x=>`<div class="stat"><div class="sl">${x.l}</div><div class="sv ${x.c}">${fmt(x.v)}</div><div class="ss">${x.s}</div></div>`).join('');
+
+  // DE
+  document.getElementById('de-results').innerHTML = renderDE(de, freistellung, r.kirchensteuer, r.cryptoRate);
+  // BG
+  document.getElementById('bg-results').innerHTML = renderBG(bg);
+  // Trades
+  document.getElementById('tradesCard').innerHTML = renderTrades(breakdown, year);
+  // Dividends
+  document.getElementById('divsCard').innerHTML = renderDivs(dividends, year);
+}
+
+function brow(lbl, val, hint, cls, total){
+  return `<div class="brow ${total?'brtot':''}">
+    <div class="brl">${lbl}${hint?`<div class="brh">${hint}</div>`:''}
+    </div><div class="brv ${cls||''}">${fmt(val)}</div></div>`;
+}
+
+function renderDE(de, frei, kirche, cryptoRate){
+  const grid = [
+    {l:'Данък акции/ETF нето', v:de.stockTax, s:`Abgeltung+Soli${kirche?'+Kirche':''}−удържан`, c:de.stockTax>0?'yel':'dim'},
+    {l:'Данък крипто §23 EStG', v:de.cryptoTax, s:de.cryptoBase===0&&de.cryptoTaxableTotal>0?'Freigrenze <€600 → освоб.':de.cryptoFreeTotal>0?`${fmt(de.cryptoFreeTotal)} необл. >1г`:'—', c:de.cryptoTax>0?'yel':'dim'},
+    {l:'Общо данък 🇩🇪', v:de.totalTax, s:'всички компоненти', c:de.totalTax>0?'yel':'dim'},
+    {l:'Freistellungsauftrag', v:de.freiUsed, s:`от ${fmt(frei)}`, c:de.freiUsed>=frei?'yel':'cya', frei:true, freiMax:frei},
+  ].map(x=>{
+    const bar = x.frei ? `<div class="fbar"><div class="fbh"><span></span></div><div class="ft"><div class="ff ${de.freiUsed>=frei?'ov':''}" style="width:${Math.min(100,de.freiUsed/frei*100).toFixed(1)}%"></div></div></div>` : '';
+    return `<div class="stat"><div class="sl">${x.l}</div><div class="sv ${x.c}">${fmt(x.v)}</div><div class="ss">${x.s}</div>${bar}</div>`;
+  }).join('');
+
+  const rows = [
+    {lbl:'Печалба акции/ETF', val:de.stockGain, hint:'FIFO'},
+    {lbl:'+ Дивиденти брутно', val:de.totalDivs},
+    {lbl:'− Freistellungsauftrag', val:-de.freiUsed, hint:`лимит €${frei}`},
+    {lbl:'= Облагаема основа', val:de.taxableBase, cls:'yel'},
+    {lbl:'Abgeltungsteuer (25%)', val:de.abgeltung},
+    {lbl:'Solidaritätszuschlag (5.5%)', val:de.soli},
+    ...(kirche?[{lbl:'Kirchensteuer (9%)', val:de.kirche}]:[]),
+    {lbl:'− Приспаднат удържан данък', val:-de.credit, hint:'max 15% от брутото (US-DE договор)'},
+    {lbl:'Данък акции/ETF нето', val:de.stockTax, total:true, cls:'yel'},
+    {lbl:'Крипто >1 год. (необлагаемо)', val:de.cryptoFreeTotal, cls:'pos'},
+    {lbl:'Крипто облагаемо', val:de.cryptoBase, hint:de.cryptoTaxableTotal<600&&de.cryptoTaxableTotal>0?'Freigrenze <€600 → €0':''},
+    {lbl:`Крипто данък (${cryptoRate}%)`, val:de.cryptoTax},
+    {lbl:'ОБЩО ДАНЪК 🇩🇪', val:de.totalTax, total:true, cls:'yel'},
+  ].map(x=>brow(x.lbl,x.val,x.hint,x.cls||'cya',x.total)).join('');
+
+  return `<div class="grid">${grid}</div>
+  <div class="card"><div class="ct">Разбивка — Abgeltungsteuer</div>
+  <div class="info"><b>25% Abgeltungsteuer + 5.5% Soli = 26.375%</b> ефективно. Freistellungsauftrag покрива печалба + дивиденти заедно. Удържан при US дивиденти: max 15% е приспадаем директно.</div>
+  ${rows}</div>`;
+}
+
+function renderBG(bg){
+  const grid = [
+    {l:'Данък акции (non-EU)', v:bg.stockTax, s:'10%', c:bg.stockTax>0?'yel':'dim'},
+    {l:'Освободено (EU пазар)', v:bg.exemptStock, s:'чл.13 ал.1 т.3 ЗДДФЛ', c:'pos'},
+    {l:'Данък дивиденти нето', v:bg.divTax, s:'5% − удържан при извор', c:bg.divTax>0?'yel':'dim'},
+    {l:'Общо данък 🇧🇬', v:bg.totalTax, s:'ЗДДФЛ', c:bg.totalTax>0?'yel':'dim'},
+  ].map(x=>`<div class="stat"><div class="sl">${x.l}</div><div class="sv ${x.c}">${fmt(x.v)}</div><div class="ss">${x.s}</div></div>`).join('');
+
+  const rows = [
+    {lbl:'Облагаема печалба акции (non-EU)', val:bg.taxableStock, cls:bg.taxableStock>=0?'pos':'neg'},
+    {lbl:'Освободена печалба (EU пазар)', val:bg.exemptStock, cls:'pos', hint:'0% по ЗДДФЛ'},
+    {lbl:'Крипто печалба', val:bg.cryptoGain, cls:bg.cryptoGain>=0?'pur':'neg'},
+    {lbl:'Дивиденти брутно', val:bg.totalDivs, cls:'cya'},
+    {lbl:'Данък акции (10%)', val:bg.stockTax},
+    {lbl:'Данък крипто (10%)', val:bg.cryptoTax},
+    {lbl:'Данък дивиденти 5% (брутно)', val:bg.divRaw},
+    {lbl:'− Приспаднат удържан данък', val:-bg.divCredit, hint:'max 5% от брутото'},
+    {lbl:'ОБЩО ДАНЪК 🇧🇬', val:bg.totalTax, total:true, cls:'yel'},
+  ].map(x=>brow(x.lbl,x.val,x.hint,x.cls||'cya',x.total)).join('');
+
+  return `<div class="grid">${grid}</div>
+  <div class="card"><div class="ct">Разбивка — ЗДДФЛ</div>
+  <div class="info"><b>EU/EEA акции</b>: 0% (маркирай eu_exempt=true). <b>US/non-EU</b>: 10%. <b>Крипто</b>: 10% без освобождаване по срок. <b>Дивиденти</b>: 5% — удържаният при извор е приспадаем.</div>
+  ${rows}</div>`;
+}
+
+function renderTrades(breakdown, year){
+  if(breakdown.length===0) return `<div class="ct">Продажби ${year}</div><div class="empty">Няма продажби за ${year}</div>`;
+  const rows = breakdown.map(b=>`<tr>
+    <td>${b.date}</td>
+    <td style="color:#f0f4ff;font-weight:600">${b.ticker}</td>
+    <td><span class="bdg ${b.assetType==='crypto'?'by':b.assetType==='etf'?'bd2':'bs'}">${b.assetType}</span></td>
+    <td style="text-align:right">${fmtN(b.qty)}</td>
+    <td style="text-align:right">${fmt(b.proceeds)}</td>
+    <td style="text-align:right">${fmt(b.cost)}</td>
+    <td style="text-align:right;color:${b.gain>=0?'#34d399':'#f87171'};font-weight:600">${fmt(b.gain)}</td>
+    <td style="color:${b.minDays>365?'#34d399':'#1e3050'}">${b.minDays}–${b.maxDays}д</td>
+    <td class="source-tag">${b.source}</td>
+  </tr>`).join('');
+  return `<div class="ct">Продажби ${year}</div>
+  <div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Дата</th><th>Тикър</th><th>Тип</th><th style="text-align:right">Бр.</th><th style="text-align:right">Приходи EUR</th><th style="text-align:right">Цена пр. EUR</th><th style="text-align:right">Печалба EUR</th><th>Дни</th><th>Файл</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderDivs(dividends, year){
+  if(dividends.length===0) return `<div class="ct">Дивиденти ${year}</div><div class="empty">Няма дивиденти за ${year}</div>`;
+  const rows = dividends.map(d=>`<tr>
+    <td>${d.date}</td>
+    <td style="color:#f0f4ff;font-weight:600">${d.ticker}</td>
+    <td style="text-align:right" class="pur">${fmt(d.totalEUR||0)}</td>
+    <td style="text-align:right" class="neg">${fmt(d.withholdingEUR||0)}</td>
+    <td style="text-align:right" class="pos">${fmt(Math.min(d.withholdingEUR||0,(d.totalEUR||0)*0.15))}</td>
+    <td style="text-align:right" class="pos">${fmt(Math.min(d.withholdingEUR||0,(d.totalEUR||0)*0.05))}</td>
+    <td class="source-tag">${d.source}</td>
+  </tr>`).join('');
+  return `<div class="ct">Дивиденти ${year}</div>
+  <div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Дата</th><th>Тикър</th><th style="text-align:right">Брутно EUR</th><th style="text-align:right">Удържан EUR</th><th style="text-align:right">Приспад. DE 15%</th><th style="text-align:right">Приспад. BG 5%</th><th>Файл</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+function doExport(){
+  if(!state.result){ alert('Няма данни за експорт.'); return; }
+  const {breakdown,dividends,de,bg,year} = state.result;
+  const r = v => typeof v==='number'?v.toFixed(2):v;
+  const rows = [
+    [`Данъчен отчет ${year}`],[],
+    ['=== ПРОДАЖБИ ==='],
+    ['Дата','Тикър','Тип','Бр.','Приходи EUR','Цена придоб. EUR','Печалба EUR','Мин. дни','EU освоб.','Крипто >1г','Файл'],
+    ...breakdown.map(b=>[b.date,b.ticker,b.assetType,b.qty,r(b.proceeds),r(b.cost),r(b.gain),b.minDays,b.euExempt?'да':'не',r(b.cryptoFreeGain),b.source]),
+    [],[' === ДИВИДЕНТИ ==='],
+    ['Дата','Тикър','Брутно EUR','Удържан EUR','Приспадаем DE 15%','Приспадаем BG 5%','Файл'],
+    ...dividends.map(d=>[d.date,d.ticker,r(d.totalEUR),r(d.withholdingEUR),r(Math.min(d.withholdingEUR||0,(d.totalEUR||0)*0.15)),r(Math.min(d.withholdingEUR||0,(d.totalEUR||0)*0.05)),d.source]),
+    [],[' === ГЕРМАНИЯ 🇩🇪 ==='],
+    ['Позиция','EUR'],
+    ['Печалба акции/ETF',r(de.stockGain)],['Дивиденти',r(de.totalDivs)],
+    ['Freistellungsauftrag',r(-de.freiUsed)],['Облагаема основа',r(de.taxableBase)],
+    ['Abgeltungsteuer 25%',r(de.abgeltung)],['Soli 5.5%',r(de.soli)],
+    ['Удържан данък (−)',r(-de.credit)],['Данък акции/ETF нето',r(de.stockTax)],
+    ['Крипто необлагаемо >1г',r(de.cryptoFreeTotal)],['Крипто облагаемо',r(de.cryptoBase)],
+    ['Крипто данък',r(de.cryptoTax)],['ОБЩО DE',r(de.totalTax)],
+    [],[' === БЪЛГАРИЯ 🇧🇬 ==='],
+    ['Позиция','EUR'],
+    ['Облагаема печалба акции (non-EU)',r(bg.taxableStock)],['Освободена EU пазар',r(bg.exemptStock)],
+    ['Крипто печалба',r(bg.cryptoGain)],['Дивиденти брутно',r(bg.totalDivs)],
+    ['Данък акции 10%',r(bg.stockTax)],['Данък крипто 10%',r(bg.cryptoTax)],
+    ['Данък дивиденти 5%',r(bg.divRaw)],['Приспаднат удържан (−)',r(-bg.divCredit)],
+    ['ОБЩО BG',r(bg.totalTax)],
+  ];
+  const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`tax_report_${year}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Sample data ──────────────────────────────────────────────────────────────
+function loadSample(){
+  const sample = `type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt
+buy,stock,AAPL,2024-01-10,10,185.50,USD,,false
+buy,stock,BTU,2024-02-01,50,22.30,USD,,false
+sell,stock,AAPL,2024-06-15,10,210.00,USD,,false
+sell,stock,BTU,2024-09-20,50,28.50,USD,,false
+dividend,stock,AAPL,2024-03-10,12.50,,USD,1.88,false
+buy,etf,VWCE,2024-03-01,5,110.00,EUR,,true
+sell,etf,VWCE,2024-11-10,5,128.00,EUR,,true
+buy,crypto,BTC,2023-01-15,0.05,21000,USD,,
+sell,crypto,BTC,2024-07-01,0.05,62000,USD,,`;
+  try{
+    const txs = parseStd(sample, 'sample.csv');
+    state.files = [{name:'sample.csv', count:txs.length, transactions:txs, ibkr:false}];
+    renderFileList();
+    setMsg('✓ Примерни данни заредени — натисни ⚡ Изчисли','ok');
+    document.getElementById('yearSel').value = 2024;
+  }catch(e){ setMsg(e.message,'err'); }
+}
+
+// ─── Drag & drop ──────────────────────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files)});
 </script>
 </body>
 </html>
