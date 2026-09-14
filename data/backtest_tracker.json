@@ -574,5 +574,29 @@
   "resolution_date": "2026-09-02",
   "discovered_date": "2026-09-03",
   "realized_r": -1.0
+ },
+ "DELL_2026-09-14": {
+  "ticker": "DELL",
+  "entry_date": "2026-09-14",
+  "status": "open",
+  "entry_price": 567.75,
+  "target_1": 814.77,
+  "stop_loss": 444.24,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "AVT_2026-09-14": {
+  "ticker": "AVT",
+  "entry_date": "2026-09-14",
+  "status": "open",
+  "entry_price": 99.92,
+  "target_1": 122.54,
+  "stop_loss": 88.61,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }
