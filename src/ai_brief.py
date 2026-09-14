@@ -10,6 +10,7 @@ AI синтез чрез Claude API.
 from __future__ import annotations
 import datetime as dt
 import json
+import re
 from functools import lru_cache
 import requests
 import yfinance as yf
@@ -442,13 +443,17 @@ def _verified_company_name(ticker: str) -> dict:
         # quote_type/category/long_name: reuse на СЪЩИЯ fetch за relevance
         # проверката (_is_mismatched_commodity_etf) — нулев допълнителен
         # network call, виж FIX 2026-09-12 по-долу.
+        # sector/industry: same reuse, за identity проверката
+        # (_identity_mismatch_gloss), виж FIX 2026-09-14.
         return {"name": name or ticker, "verified": bool(name),
                "quote_type": info.get("quoteType"), "category": info.get("category"),
-               "long_name": info.get("longName")}
+               "long_name": info.get("longName"),
+               "sector": info.get("sector"), "industry": info.get("industry")}
     except Exception as e:
         print(f"[ai] company lookup {ticker}: {e}")
         return {"name": ticker, "verified": False,
-               "quote_type": None, "category": None, "long_name": None}
+               "quote_type": None, "category": None, "long_name": None,
+               "sector": None, "industry": None}
 
 
 def _is_mismatched_commodity_etf(lookup: dict, market_name: str) -> bool:
@@ -492,6 +497,91 @@ def _is_mismatched_commodity_etf(lookup: dict, market_name: str) -> bool:
     return not any(kw in long_name_stemmed for kw in market_keywords)
 
 
+_CYRILLIC = re.compile(r"[Ѐ-ӿ]")
+
+# Правни/структурни суфикси и съюзи — носят нула идентичност, изключват се
+# от сравнението (иначе "Inc" в двете страни би бил фалшиво "съвпадение").
+_NAME_STOPWORDS = {"inc", "corp", "corporation", "ltd", "plc", "sab", "the",
+                   "of", "and", "group", "holdings", "company", "incorporated",
+                   "etf", "fund", "trust"}
+
+
+def _name_tokens(text: str | None) -> set[str]:
+    """Думи >2 знака, без правни суфикси — за сравнение на фирмени имена."""
+    return {w for w in re.split(r"[^A-Za-z0-9]+", (text or "").lower())
+            if len(w) > 2 and w not in _NAME_STOPWORDS}
+
+
+def _identity_mismatch_gloss(lookup: dict, ticker: str, reasoning: str) -> str | None:
+    """
+    FIX 2026-09-14: трети клас дефект, различен от двата вече покрити.
+    Потвърден на 14.09.2026, Sugar No. 11 тезата: header-ът показа
+    "ASR (Grupo Aeroportuario del Sureste)" — verified, реален NYSE тикър за
+    мексикански airport operator — а reasoning текстът веднага след него
+    твърдеше "ASR (Arca Continental) е мексикански bottler". Arca Continental
+    е реална компания с реална захарна cost exposure (т.е. тезата логически
+    има смисъл), но истинският ѝ тикър е AC.MX, не ASR. Два различни, реални
+    бизнеса, объркани под едно тикър символ.
+
+    Защо съществуващите gate-ове не хващат това:
+      - _verified_company_name("ASR") -> verified=True (ASR РЕАЛНО съществува,
+        existence проверката няма какво да хване);
+      - _is_mismatched_commodity_etf() излиза на първия ред — quote_type е
+        "EQUITY", не "ETF" (проверката е нарочно тясна за commodity ETF-и).
+    Дефектът не е в тикъра и не е в 'company' полето (то е code-verified) — а
+    в разминаването МЕЖДУ верифицираното име и свободния AI prose до него.
+
+    Подходът: НЕ "съвпада ли glosa-та с името" (измерено срещу 63 дни реална
+    история: 27 от 34 двойки биха гръмнали — скобата след тикър почти никога
+    не е фирмено име, а дескриптор/индустрия/бранд: "JPM (large-cap bank)",
+    "THG (Property & Casualty)", "PVH (Calvin Klein, Tommy Hilfiger)"), а
+    "претендира ли glosa-та изобщо да е ДРУГА фирмена идентичност". Каскада,
+    в която всеки филтър изключва по един реален FP клас от историята:
+      кирилица       -> BG описание, не име ("NBIX (биотек)")
+      запетая/наклон -> списък от брандове/примери, не една идентичност
+      lowercase дума -> дескриптор, не собствено име ("RS (inventory ... risk)")
+      съвпада с име  -> консистентно ("HWM (Aerospace & Defense)" vs Howmet
+                        Aerospace)
+      съвпада с industry/sector -> индустриален дескриптор ("THG (Property &
+                        Casualty)" vs industry "Insurance - Property & Casualty")
+    Измерено срещу всички 34 исторически (ticker, gloss) двойки: 1 сработване
+    (реалният ASR случай), 0 false positives.
+
+    Обхватът е съзнателно ограничен: само explicit "TICKER (Име)" конструкция,
+    която се среща в ~4% от под-тезите. Останалите 96% не съдържат машинно-
+    проверимо твърдение за идентичност изобщо — за тях мярката е промпт
+    инструкция (виж _build_cot_user_prompt), mitigation, не guarantee.
+    Съзнателно НЕ се прави BG->EN семантично съпоставяне на описанието
+    ("мексикански bottler" vs "Airports & Air Services") — това е точно
+    генеричният relevance engine, отказан при CANE фикса, виж
+    _is_mismatched_commodity_etf() за rationale-а.
+
+    Връща самата glosa при разминаване (за логване), иначе None.
+    """
+    m = re.search(rf"\b{re.escape(ticker)}\s*\(([^)]{{2,60}})\)", reasoning or "")
+    if not m:
+        return None
+    gloss = m.group(1)
+
+    if _CYRILLIC.search(gloss) or re.search(r"[,;/]", gloss):
+        return None
+    words = re.findall(r"[A-Za-z][A-Za-z.\-]*", gloss)
+    if not words or not all(w[0].isupper() for w in words
+                            if len(w) > 2 and w.lower() not in _NAME_STOPWORDS):
+        return None
+
+    claimed = _name_tokens(gloss)
+    if not claimed:
+        return None
+    if claimed & (_name_tokens(lookup.get("name")) |
+                  _name_tokens(lookup.get("long_name"))):
+        return None
+    if claimed & (_name_tokens(lookup.get("sector")) |
+                  _name_tokens(lookup.get("industry"))):
+        return None
+    return gloss
+
+
 def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
                           market_name: str = "") -> dict | None:
     """
@@ -529,6 +619,18 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
     виж _is_mismatched_commodity_etf() за пълния rationale. Реален verified
     (не delisted) тикър вече не е достатъчно — трябва и да е свързан с
     market_name-а на самата теза, не произволен друг commodity ETF.
+
+    FIX 2026-09-14: трета, identity проверка — виж _identity_mismatch_gloss().
+    За разлика от двете по-горе, тук пада ЦЯЛАТА под-теза (return None), не
+    само отделният тикър. Причината е различният характер на дефекта: при
+    delisted тикър или commodity ETF за друга суровина prose-ът е верен за
+    грешен ИНСТРУМЕНТ (описва коректно какво би направил грешният избор), и
+    премахването на тикъра е достатъчно. При identity mismatch prose-ът
+    съдържа утвърдително НЕВЯРНО фактическо твърдение за реална компания
+    ("ASR (Arca Continental) е мексикански bottler") — оставянето му, докато
+    само тикърът изчезва, би оставило confidently грешно твърдение на
+    дъската, без дори тикър, който да го закотвя визуално. По-лошо, не
+    по-добро. Не може да се спаси частично.
     """
     if not thesis:
         return thesis
@@ -539,6 +641,7 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
         return thesis
 
     verified, dropped = [], []
+    reasoning = thesis.get("reasoning") or ""
     for t in tickers:
         if not (isinstance(t, dict) and t.get("ticker")):
             continue
@@ -549,6 +652,12 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
             dropped.append(t["ticker"])
             print(f"[ai] {t['ticker']} премахнат от '{market_name}' теза — "
                  f"commodity ETF за друга суровина ({lookup.get('long_name')})")
+        elif (gloss := _identity_mismatch_gloss(lookup, t["ticker"], reasoning)):
+            print(f"[ai] '{market_name}' под-теза премахната ИЗЦЯЛО — "
+                 f"{t['ticker']}: reasoning текстът я описва като '{gloss}', "
+                 f"а верифицираната компания е '{lookup['name']}' "
+                 f"({lookup.get('industry')})")
+            return None
         else:
             verified.append({**t, "company": lookup["name"]})
 
@@ -619,6 +728,16 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от \
 обичайното." Не пропускай тази бележка мълчаливо — юзърът трябва да я вижда \
 directamente в текста, не само да се досеща от суровите данни.
+
+ВАЖНО за имената на компаниите в reasoning текста: когато споменаваш тикър в \
+reasoning-а, използвай ТОЧНО името, което си дал в "company" полето за същия \
+тикър — не свободна перифраза и не друго име, което смяташ за същата компания. \
+Потвърден случай (14.09.2026): reasoning текст твърдеше "ASR (Arca Continental) \
+е мексикански bottler", докато ASR реално е Grupo Aeroportuario del Sureste — \
+съвсем различен бизнес (оператор на летища), който просто споделя същите букви; \
+истинският тикър на Arca Continental е AC.MX. Ако не си сигурен кой е точният \
+тикър на компанията, която искаш да опишеш — НЕ я предлагай изобщо, вместо да \
+залепиш описанието към чужд тикър.
 
 За ВСЕКИ инструмент в списъка върни обект с:
 - "market": точното име както е подадено
