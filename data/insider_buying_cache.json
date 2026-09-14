@@ -1,21 +1,6 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-14",
  "rows": [
-  {
-   "ticker": "INTC",
-   "company": "INTEL CORP",
-   "total_value": 9999985.0,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "TAN LIP BU",
-     "title": "CEO",
-     "date": "2026-08-11",
-     "value": 9999985.0
-    }
-   ]
-  },
   {
    "ticker": "VST",
    "company": "Vistra Corp.",
@@ -59,21 +44,6 @@
    ]
   },
   {
-   "ticker": "PFE",
-   "company": "PFIZER INC",
-   "total_value": 1000920.0,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "BOURLA ALBERT",
-     "title": "Chairman & CEO",
-     "date": "2026-08-12",
-     "value": 1000920.0
-    }
-   ]
-  },
-  {
    "ticker": "PODD",
    "company": "INSULET CORP",
    "total_value": 162217.0,
@@ -92,9 +62,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 386,
+  "tickers_with_filings": 370,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 168,
-  "qualifying_after_filter": 7
+  "raw_transactions_parsed": 126,
+  "qualifying_after_filter": 5
  }
 }

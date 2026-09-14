@@ -1,25 +1,15 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-14",
  "rows": [
   {
-   "ticker": "IGR",
-   "company": "CBRE Global Real Estate Income Fund",
-   "date": "2026-09-08",
-   "ratio": "1:3",
+   "ticker": "NFE",
+   "company": "New Fortress Energy Inc.",
+   "date": "2026-09-14",
+   "ratio": "1:50",
    "split_type": "reverse",
-   "date_human": "Sep 08, 2026",
-   "price": 12.54,
-   "market_cap": 634355009.0302773
-  },
-  {
-   "ticker": "GOSS",
-   "company": "Gossamer Bio, Inc.",
-   "date": "2026-09-11",
-   "ratio": "1:80",
-   "split_type": "reverse",
-   "date_human": "Sep 11, 2026",
-   "price": 11.41,
-   "market_cap": 5576763400.8463955
+   "date_human": "Sep 14, 2026",
+   "price": 16.48,
+   "market_cap": 4707258901.246834
   }
  ]
 }

@@ -1,37 +1,37 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-14",
  "news": [
   {
-   "headline": "U.S. crude oil tops $100 again as market braces for prolonged Iran war",
-   "why": "Петролът над $100 засилва инфлационния натиск и притиска маржовете на потребителски компании, авиолинии и транспорт, директно влияейки на equity оценките."
+   "headline": "Oil hits $108 after Gulf states postpone talks with Iran over Hormuz",
+   "why": "Ескалацията в Ормуз директно вдига петрола и засяга инфлационните очаквания, транспортния сектор и енергийните акции."
   },
   {
-   "headline": "Stock futures edge higher as key consumer inflation report looms ahead",
-   "why": "Предстоящият CPI release е основният катализатор за деня — изненада нагоре или надолу ще определи посоката на Treasury yields и equity пазарите."
+   "headline": "Vessel struck in Strait of Hormuz as prospects for U.S.-Iran diplomacy appear elusive",
+   "why": "Физическа атака в най-натовареното петролно трасе в света потвърждава геополитическия риск и поддържа петрола под напрежение."
   },
   {
-   "headline": "Scott Bessent fails to break 'fever' in US bond market",
-   "why": "Неуспехът на $6B bond операцията да спре ръста на доходностите сигнализира структурен проблем с търсенето на UST, което натиска акциите с висока дюрация."
+   "headline": "Trump says U.S. may keep Iranian oil 'like Venezuela' as Gulf-Iran Hormuz talks stall",
+   "why": "Геополитическата позиция на Тръмп влияе директно върху петролното предлагане и ценообразуването на суровия петрол."
   },
   {
-   "headline": "US rate rise fears ripple through global bond markets",
-   "why": "Нарастващите очаквания за по-високи лихви от Fed предизвикват глобална разпродажба на облигации с директен ефект върху risk-off позиционирането."
+   "headline": "The 10-year Treasury is closing in on 5% — how it gets there matters more",
+   "why": "Нивото от 5% на 10-годишния трежъри е ключов праг за оценките на акциите, ипотечните лихви и апетита към риск."
   },
   {
-   "headline": "Why Warsh is starting to bite back — Fed chair may defy desire for rate cut at Wednesday's meeting",
-   "why": "Потенциален hawkish сигнал от Fed на сряда е ключов event risk за пазарите тази седмица — пренасяне на очаквания за лихви ще движи USD и equity."
+   "headline": "Warsh and Trump on collision course as investors expect Fed to raise rates",
+   "why": "Политическото напрежение около Fed и очакванията за покачване на лихвите са централен макро риск за пазарите тази седмица."
   },
   {
-   "headline": "Iran and Gulf states to meet in push for Hormuz deal",
-   "why": "Евентуално споразумение за Ормузкия проток може рязко да намали петролните цени и да обърне risk-off настроението на пазарите."
+   "headline": "Japan's central bank set for pivotal moment on rates",
+   "why": "Решение на BOJ за лихвите би засегнало carry trade позиции в йена и глобалните капиталови потоци."
   },
   {
-   "headline": "Bessent says 'a large bank' will be sanctioned Monday as part of Iran strategy",
-   "why": "Санкции срещу голяма банка в понеделник ще ударят финансовия сектор и ще засегнат глобалните кредитни пазари и emerging market flows."
+   "headline": "Global AI stocks slip on concerns over risks",
+   "why": "Секторна разпродажба при AI акциите, включително SoftBank с -13%, сигнализира за прекалено позициониране и регулаторен риск в технологичния сектор."
   },
   {
-   "headline": "Oracle's stock edges up on earnings beat as cloud infrastructure revenue more than doubles",
-   "why": "Силните резултати на Oracle потвърждават продължаващото търсене на cloud инфраструктура и дават позитивен сигнал за целия tech/AI сектор."
+   "headline": "Baker Hughes sees no slowdown in energy projects despite higher rates as AI buildouts stoke LNG demand",
+   "why": "AI инфраструктурният бум увеличава LNG търсенето и поддържа капиталовите инвестиции в енергетиката въпреки високите лихви."
   }
  ]
 }
