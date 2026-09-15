@@ -16,16 +16,16 @@
  "GDEV_2026-08-28": {
   "ticker": "GDEV",
   "entry_date": "2026-08-28",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 10.8,
   "target_1": 8.26,
   "stop_loss": 12.07,
   "lagging_sector": "Комуникации",
   "distress_signal_count": 4,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-14",
+  "discovered_date": "2026-09-15",
+  "realized_r": -1.0
  },
  "CABO_2026-08-28": {
   "ticker": "CABO",
@@ -197,5 +197,20 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "CSR_2026-09-08": {
+  "ticker": "CSR",
+  "entry_date": "2026-09-08",
+  "status": "stopped",
+  "entry_price": 52.9,
+  "target_1": 48.46,
+  "stop_loss": 55.12,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": "2026-09-09",
+  "discovered_date": "2026-09-15",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.8%, 14.6× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
  }
 }
