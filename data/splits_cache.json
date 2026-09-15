@@ -1,5 +1,5 @@
 {
- "date": "2026-09-14",
+ "date": "2026-09-15",
  "rows": [
   {
    "ticker": "NFE",
@@ -8,8 +8,8 @@
    "ratio": "1:50",
    "split_type": "reverse",
    "date_human": "Sep 14, 2026",
-   "price": 16.48,
-   "market_cap": 4707258901.246834
+   "price": 13.88,
+   "market_cap": 3964608942.0
   }
  ]
 }
