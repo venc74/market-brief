@@ -411,6 +411,40 @@ contrarian сигнал — екстремно нетно дълги = поте�
 Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
 
 
+def _looks_like_exchange_code(name: str) -> bool:
+    """
+    FIX 2026-09-15: yfinance не винаги връща ИМЕ в полетата за име.
+
+    Два потвърдени класа (7 брифа за една седмица):
+      • само цифри — вътрешен fund ID вместо име. SUG -> shortName "499402",
+        UB -> "308889" (и двата quoteType "MUTUALFUND", longName=None).
+        Старият gate беше verified = bool(name), а "499402" е truthy, значи
+        тикърът минаваше като напълно валиден и влизаше в брифа с име-число.
+        Сигналът "делистнат" от FIX 2026-08-11 (shortName И longName са None)
+        също не се задейства — записът съществува, просто няма име.
+      • борсов padding — суров ред от изравнена таблица на борсата.
+        CSAN3.SA -> shortName "COSAN       ON      NM" (B3 тикър + клас +
+        сегмент), докато longName е чистото "Cosan S.A.".
+
+    Само тези два тесни сигнала. ВСИЧКИ главни букви НЕ е сигнал — реални имена
+    се връщат така ("ARCA CONTINENTAL SAB DE CV", "GRUPO MEXICO SAB DE CV").
+    """
+    return bool(name) and (name.isdigit() or "   " in name)
+
+
+def _best_company_name(short_name: str | None, long_name: str | None) -> str | None:
+    """
+    Предпочита shortName (кратко, познато име — както досега), но го прескача,
+    ако изглежда като борсов код, и пада към longName. Ако ГОДНО име няма от
+    нито едното поле, връща None → verified=False → тикърът отпада изцяло
+    (_verify_thesis_tickers), вместо да се покаже "SUG (499402)".
+    """
+    for candidate in ((short_name or "").strip(), (long_name or "").strip()):
+        if candidate and not _looks_like_exchange_code(candidate):
+            return candidate
+    return None
+
+
 @lru_cache(maxsize=256)
 def _verified_company_name(ticker: str) -> dict:
     """
@@ -439,7 +473,7 @@ def _verified_company_name(ticker: str) -> dict:
     """
     try:
         info = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).info) or {}
-        name = info.get("shortName") or info.get("longName")
+        name = _best_company_name(info.get("shortName"), info.get("longName"))
         # quote_type/category/long_name: reuse на СЪЩИЯ fetch за relevance
         # проверката (_is_mismatched_commodity_etf) — нулев допълнителен
         # network call, виж FIX 2026-09-12 по-долу.
@@ -676,7 +710,8 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
 
 
 def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
-                           regime: str, prior_context: str = "") -> str:
+                           regime: str, prior_context: str = "",
+                           open_positions: list[dict] | None = None) -> str:
     """
     batch: подмножество от cot.get_extremes() (market, category, net_position,
     percentile, direction, as_of).
@@ -707,6 +742,25 @@ def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
 противоречие в характера на тикъра."""
         if prior_context else ""
     )
+    # FIX 2026-09-15: виж cot_theses() docstring-а — без този блок промптът
+    # виждаше САМО днешния скрийнър, значи "извън скрийнъра" и "не фигурира
+    # никъде в брифа" бяха неразличими. Имената са ЗАДЪЛЖИТЕЛНИ: реалният
+    # случай назова "Valero", не "VLO".
+    positions_block = (
+        f"""
+
+ОТВОРЕНИ TRACK RECORD ПОЗИЦИИ (реално държани в момента, влезли на посочената \
+дата): {json.dumps(open_positions, ensure_ascii=False, default=str)}
+
+Тези компании СА част от брифа — следени са ежедневно, откакто са отворени. \
+Ако споменеш някоя от тях (по тикър ИЛИ по име), НЕ твърди, че „не фигурира в \
+брифа", „не е разглеждана досега" или подобно — това е фактически невярно. \
+Такъв тикър може напълно легитимно да липсва от ДНЕШНИЯ CANSLIM скрийнър — \
+скрийнърът е дневен snapshot на нови кандидати, не списък на държаното — но \
+двете са различни твърдения и не се смесват. Ако позицията пасва на тезата, \
+предложи я нормално и отбележи, че вече е отворена позиция."""
+        if open_positions else ""
+    )
     return f"""Пазарен режим: {regime}
 
 CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо до 156-седмична \
@@ -717,6 +771,7 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър — дали \
 е извън скрийнъра се засича автоматично от кода, не отбелязвай го сам): \
 {json.dumps(screener_universe, ensure_ascii=False, default=str)}
+{positions_block}
 {prior_block}
 
 ВАЖНО за инструменти с "weeks_of_history" под {config.COT_SHORT_HISTORY_WEEKS} \
@@ -776,9 +831,11 @@ tickers списък ([]) и кажи го изрично тук (напр. 'н�
 
 
 def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
-                          regime: str, tag: str, prior_context: str = "") -> list[dict]:
+                          regime: str, tag: str, prior_context: str = "",
+                          open_positions: list[dict] | None = None) -> list[dict]:
     """Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а."""
-    user = _build_cot_user_prompt(batch, screener_universe, regime, prior_context)
+    user = _build_cot_user_prompt(batch, screener_universe, regime, prior_context,
+                                  open_positions)
     for attempt in (1, 2):
         try:
             out = _parse_json(_call_claude(SYSTEM_COT, user,
@@ -819,7 +876,7 @@ def _record_ticker_context(seen: dict[str, str], market: str, thesis_type: str,
 
 
 def cot_theses(extremes: list[dict], screener_universe: list[dict],
-              regime: str) -> list[dict]:
+              regime: str, open_positions: list[dict] | None = None) -> list[dict]:
     """
     За всеки COT екстремум (extremes от src.cot.get_extremes()) генерира
     директна + cross-sector теза. Batch-вано по config.COT_BATCH_SIZE заради
@@ -837,6 +894,32 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     следващ batch като "вече характеризирани тикъри" контекст — AI-то е
     инструктирано да обясни изрично, ако новата роля се различава, не просто да
     противоречи мълчаливо. Не забранява легитимни multi-role тикъри.
+
+    FIX 2026-09-15: open_positions — отворените Track Record позиции {ticker,
+    company, entry_date} като ОТДЕЛЕН контекстен блок, симетрично на
+    screener_universe. Потвърдено на 15.09.2026, RBOB Gasoline тезата: AI-то
+    написа "рафинерии като Valero или PBF Logistics биха пасвали идеално, но
+    са характеризирани извън текущия скрийнър и не фигурират в досегашния
+    бриф", докато VLO е отворена позиция от 12.08 (+18.1%) — и самото AI я
+    предложи по име в СЪЩАТА RBOB теза на 07.09. Първата половина на
+    твърдението е вярна (VLO наистина е извън днешния скрийнър), втората е
+    невярна; дотогава промптът виждаше САМО скрийнъра, значи "извън скрийнъра"
+    и "не фигурира никъде" бяха неразличими от гледната точка на модела.
+
+    Защо контекст на ВХОДА, а не проверка на изхода (за разлика от FIX
+    2026-09-14): VLO изобщо не беше в "tickers" (списъкът беше празен) —
+    компанията беше спомената само в прозата, и то по ИМЕ ("Valero"), не по
+    тикър. Badge като GLB already_open_position няма какво да маркира, а
+    ticker-базирана проверка на текста не би я видяла: собственото ми
+    сканиране на 50 дни по тикър пропусна точно този случай и го намери едва
+    при търсене по фирмено име. Затова: да не се създава грешката, вместо да
+    се лови после.
+
+    Цената е пренебрежима — main._live_positions() е чисто локален прочит на
+    backtest_tracker.json, без нито една мрежова заявка, за разлика от
+    get_backtest_summary(), който fetch-ва текущи цени и затова живее чак в
+    края на pipeline-а. Тоест контекстът е наличен ТУК, без никакво
+    пренареждане на реда на изпълнение.
     """
     if not extremes:
         return []
@@ -857,7 +940,7 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     for idx, batch in enumerate(batches, 1):
         prior_context = "\n".join(seen_tickers.values())
         for t in _cot_theses_for_batch(batch, screener_universe, regime,
-                                       f"{idx}/{n}", prior_context):
+                                       f"{idx}/{n}", prior_context, open_positions):
             if t.get("market"):
                 theses_by_market[t["market"]] = t
                 _record_ticker_context(seen_tickers, t["market"], "direct_thesis",

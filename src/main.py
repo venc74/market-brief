@@ -155,8 +155,24 @@ def run() -> dict:
     candidates = inject_split_catalysts(candidates)
     print("      COT екстремуми…")
     cot_extremes = cot.get_extremes() if config.ENABLE_COT else []
+    # FIX 2026-09-15: COT промптът вижда и отворените Track Record позиции, не
+    # само днешния скрийнър — виж ai_brief.cot_theses() docstring-а (RBOB/VLO
+    # случаят). _live_positions() е чист локален прочит на backtest_tracker.json
+    # (без мрежа), затова може да се вика тук, преди backtest блока по-долу —
+    # никакво пренареждане на pipeline-а, за разлика от GLB badge фикса, който
+    # трябваше да живее СЛЕД get_backtest_summary(). apply_hard_rules() по-долу
+    # прави свой собствен такъв прочит; дублирането е евтино и нарочно, за да
+    # не се въвежда споделено състояние между двете места.
+    # Фирменото име е задължително — реалният случай назова "Valero", не "VLO".
+    cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
+    cot_open_positions = [
+        {"ticker": t, "company": ai_brief._verified_company_name(t)["name"],
+         "entry_date": rec.get("entry_date")}
+        for t, rec in sorted(cot_live.items())
+    ]
     cot_with_theses = ai_brief.cot_theses(
-        cot_extremes, screener_universe, thermo["regime"]) if cot_extremes else []
+        cot_extremes, screener_universe, thermo["regime"],
+        cot_open_positions) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:

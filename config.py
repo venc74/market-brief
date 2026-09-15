@@ -242,11 +242,18 @@ ENABLE_NEWS = os.getenv("ENABLE_NEWS", "1") == "1"
 # публичните RSS ~2020; AP feeds.* е мъртъв) → на GitHub runner-ите дават DNS
 # resolution грешки. Remap-нати са към Google News RSS прокси (news.google.com
 # resolve-ва навсякъде, връща валиден RSS XML с Reuters/AP заглавия за 24ч).
+# FIX 2026-09-15: "allinurl:" операторът беше спрял да връща резултати в Google
+# News RSS — HTTP 200, валиден RSS, коректно ехо на заявката, НУЛА <item>-а.
+# Проверено directamente: allinurl:reuters.com → 0 items (и с when:24h, и без,
+# и при when:7d), докато site:reuters.com → 100 items, същия ден, същия формат.
+# Тиха загуба на 2 от 4 източника; потвърдено последствие — на 15.09 Reuters
+# заглавието "US Senate to vote on advancing landmark crypto bill" (реалният
+# CLARITY Act cloture vote) изобщо не стигна до Claude филтъра.
 NEWS_RSS_FEEDS = {
-    "Reuters Business": "https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com&hl=en-US&gl=US&ceid=US:en",
+    "Reuters Business": "https://news.google.com/rss/search?q=when:24h+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
     "CNBC":             "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
     "Financial Times":  "https://www.ft.com/rss/home",
-    "AP Business":      "https://news.google.com/rss/search?q=when:24h+allinurl:apnews.com&hl=en-US&gl=US&ceid=US:en",
+    "AP Business":      "https://news.google.com/rss/search?q=when:24h+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
 }
 # nitter е нестабилен — изключен по подразбиране (Поправка 4)
 NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"

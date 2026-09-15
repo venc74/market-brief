@@ -128,13 +128,40 @@ def _scrape_headlines(name: str, url: str, limit: int = 12) -> list[dict]:
 
 
 def gather_raw(hours: int = 24) -> list[dict]:
+    """
+    FIX 2026-09-15: провалът се засича PER-SOURCE, не агрегатно.
+
+    Преди: единственият сигнал беше `if len(items) < 5`. Мъртъв източник, който
+    връща HTTP 200 с празен, валиден RSS, не вдига нито грешка, нито праг —
+    останалите източници лесно покриват петицата и загубата е напълно тиха.
+    Потвърдено на 15.09.2026: Reuters и AP връщаха 0 заглавия (спрял Google News
+    "allinurl:" оператор, виж config.NEWS_RSS_FEEDS), CNBC+FT даваха 27, прагът
+    никога не се задействаше — системата работеше месеци с 2 от 4 източника,
+    без нито един ред в лога. Реална цена: Reuters заглавието "US Senate to vote
+    on advancing landmark crypto bill" (CLARITY Act) не стигна до филтъра.
+
+    Сега: всеки източник с нула заглавия се логва поименно, и самò по себе си
+    задейства scrape fallback-а — не се чака агрегатният праг.
+    """
     items: list[dict] = []
+    dead: list[str] = []
     for src, url in config.NEWS_RSS_FEEDS.items():
-        items += _fetch_rss(url, src, hours)
-    # Fallback: ако RSS-ите върнаха твърде малко, scrape-ваме страниците директно
-    if len(items) < 5:
+        got = _fetch_rss(url, src, hours)
+        if not got:
+            dead.append(src)
+        items += got
+    if dead:
+        print(f"[news] ⚠ {len(dead)}/{len(config.NEWS_RSS_FEEDS)} източника върнаха "
+              f"НУЛА заглавия: {', '.join(dead)} — HTTP 200 с празен резултат не е "
+              "грешка, но е тиха загуба на покритие; провери дали URL-ът/заявката "
+              "още е валидна")
+    # Fallback: при МЪРТЪВ източник или твърде малко заглавия общо
+    if dead or len(items) < 5:
         for name, url in config.NEWS_SCRAPE_FALLBACK.items():
-            items += _scrape_headlines(name, url)
+            scraped = _scrape_headlines(name, url)
+            if not scraped:
+                print(f"[news] ⚠ scrape fallback '{name}' също върна нула")
+            items += scraped
     if config.NEWS_ENABLE_NITTER:
         for handle in config.NITTER_HANDLES:
             items += _fetch_nitter(handle)
