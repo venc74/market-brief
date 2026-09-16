@@ -542,14 +542,14 @@
  "FCFS_2026-08-25": {
   "ticker": "FCFS",
   "entry_date": "2026-08-25",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 238.38,
   "target_1": 291.52,
   "stop_loss": 211.81,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-15",
+  "discovered_date": "2026-09-16",
+  "realized_r": -1.0
  },
  "AMGN_2026-08-25": {
   "ticker": "AMGN",
