@@ -19,6 +19,7 @@ news_aggregator.py — агрегатор за макро и геополити�
 """
 from __future__ import annotations
 import datetime as dt
+import itertools
 import json
 import time
 import requests
@@ -127,6 +128,20 @@ def _scrape_headlines(name: str, url: str, limit: int = 12) -> list[dict]:
     return out
 
 
+def _interleave(per_source: list[list[dict]]) -> list[dict]:
+    """
+    Първо заглавие от всеки източник, после второто от всеки, и т.н.
+
+    FIX 2026-09-16: агрегатният таван в significant_news() реже СЛЕД сливането,
+    затова при конкатенация по източници по-задните източници се обезкървяват
+    изцяло, щом предните запълнят тавана. Редуването прави тавана справедлив:
+    всеки източник дава приблизително поравно, а дълбочината (ранг 15→50) вече
+    не се плаща от чуждото покритие. zip_longest понася източници с различна
+    дължина и напълно мъртви източници (празен списък → нищо не допринася).
+    """
+    return [x for tup in itertools.zip_longest(*per_source) for x in tup if x is not None]
+
+
 def gather_raw(hours: int = 24) -> list[dict]:
     """
     FIX 2026-09-15: провалът се засича PER-SOURCE, не агрегатно.
@@ -143,13 +158,15 @@ def gather_raw(hours: int = 24) -> list[dict]:
     Сега: всеки източник с нула заглавия се логва поименно, и самò по себе си
     задейства scrape fallback-а — не се чака агрегатният праг.
     """
-    items: list[dict] = []
+    per_source: list[list[dict]] = []
     dead: list[str] = []
     for src, url in config.NEWS_RSS_FEEDS.items():
-        got = _fetch_rss(url, src, hours)
+        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT)
         if not got:
             dead.append(src)
-        items += got
+        per_source.append(got)
+    # FIX 2026-09-16: редуване, не конкатенация — виж config.NEWS_PER_SOURCE_LIMIT
+    items: list[dict] = _interleave(per_source)
     if dead:
         print(f"[news] ⚠ {len(dead)}/{len(config.NEWS_RSS_FEEDS)} източника върнаха "
               f"НУЛА заглавия: {', '.join(dead)} — HTTP 200 с празен резултат не е "
@@ -202,7 +219,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
         return []
 
     # ограничаваме промпта
-    compact = [{"s": r["source"], "t": r["title"], "d": r["summary"]} for r in raw[:60]]
+    compact = [{"s": r["source"], "t": r["title"], "d": r["summary"]} for r in raw[:config.NEWS_MAX_TO_FILTER]]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
         "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "

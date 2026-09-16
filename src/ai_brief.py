@@ -402,6 +402,112 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
 # COT (Commitments of Traders) — Секция [нова] — Шапиро тези
 # ══════════════════════════════════════════════════════════════════════════
 
+SYSTEM_THESIS_CHECK = """Ти си скептичен редактор-факт-чекър. Задачата ти НЕ е \
+да намираш връзки, а да намираш ПРОТИВОРЕЧИЯ между дълготрайна теза и това, \
+което вече се е случило. По подразбиране отговорът е "unchanged" — отклоняваш \
+се от него само при конкретна новина, която материално разрешава или \
+опровергава механизма. Пишеш на български, тикери и термини на английски. \
+Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
+
+
+def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
+    """
+    FIX 2026-09-16: свереност на геополитическите тези срещу днешните новини.
+
+    Потвърденият случай: Senate cloture гласуването за CLARITY Act се провали
+    на 15.09.2026 (49-50, под 60-гласовия праг). Брифът на 16.09 продължи да
+    показва "Ясна законодателна рамка (CLARITY Act) → институциите получават
+    регулаторна сигурност → ...", без нито дума, че гласуването вече се е
+    случило и е паднало. Не е неточност — активно подвеждащ текст.
+
+    Защо изобщо е нужна НОВА стъпка: thesis_monitor() е чист код + статичен
+    конфиг (config.THESIS_BASKETS). `chain` е hardcoded низ, `status` идва от
+    _trigger_fires() върху макро серии. AI-то никога не е виждало тези тези —
+    нямаше промпт, към който да се добави инструкция.
+
+    Съзнателно САМО анотация. Не пипа `status` (остава trigger-driven), не
+    пипа `chain` (остава конфиг), не изисква нищо от trigger дизайна. Новата
+    информация седи ДО тезата, не я замества — "кодът има последната дума"
+    остава непокътнат, а промяната е напълно адитивна и обратима. Пълният
+    Layer 3 redesign (структуриран trigger за насрочени binary събития) е
+    отделна тема, съзнателно извън обхвата тук.
+
+    Предпоставка: config.NEWS_PER_SOURCE_LIMIT / NEWS_MAX_TO_FILTER. Преди тях
+    проверката би била инертна — заглавието за провала стоеше на ранг 17 при
+    limit=15 и изобщо не влизаше в събраното (виж config.py измерванията).
+
+    Добавя "news_status" (challenged|resolved|unchanged) и "news_note" към
+    всяка теза. Graceful: провал навсякъде тук → връща theses непроменени.
+    """
+    if not theses or not news:
+        return theses
+    try:
+        compact_theses = [{"name": t.get("name"), "chain": t.get("chain"),
+                           "tickers": t.get("tickers")} for t in theses]
+        compact_news = [{"headline": n.get("headline"), "why": n.get("why")}
+                        for n in news]
+        user = f"""ТЕЗИ (дълготрайни, от конфигурация — механизмът е описан в "chain"):
+{json.dumps(compact_theses, ensure_ascii=False, default=str)}
+
+ДНЕШНИ НОВИНИ:
+{json.dumps(compact_news, ensure_ascii=False, default=str)}
+
+За всяка теза прецени дали КОНКРЕТНА днешна новина материално променя \
+механизма, описан в "chain":
+
+- "challenged" — новина опровергава, блокира или проваля механизма. Пример: \
+теза "законодателна рамка X → регулаторна сигурност → приток на капитал", а \
+новина съобщава, че гласуването за X се е провалило. Механизмът не просто \
+още не се е случил — конкретно събитие го е спряло.
+- "resolved" — механизмът вече се е случил и е приключил; тезата е разрешена, \
+не предстояща.
+- "unchanged" — ВСИЧКО ОСТАНАЛО. Това е отговорът по подразбиране.
+
+КРИТИЧНО — кога НЕ се отклоняваш от "unchanged":
+- новината е по същата обща тема, но не казва нищо за механизма \
+(теза за ядрена енергия + новина "петролът пада" → unchanged);
+- новината движи цените на тикърите от тезата, но не пипа механизма \
+(акциите паднали днес → unchanged, това е шум, не разрешаване);
+- новината е свързана само косвено, през 2+ стъпки макро верига → unchanged;
+- не си сигурен → unchanged.
+
+Тезите са дълготрайни по замисъл. В типичен ден ВСИЧКИ са "unchanged" — това \
+е нормалният, очакван резултат, не пропуск от твоя страна. Не търси връзки.
+
+"note": САМО при challenged/resolved — едно изречение, което ЦИТИРА конкретното \
+заглавие, задействало преценката. Ако не можеш да посочиш точно заглавие, \
+върни "unchanged" с празен note.
+
+Върни JSON за ВСЯКА теза, в същия ред: \
+{{"checks": [{{"name": "...", "news_status": "...", "note": "..."}}]}}"""
+
+        out = _parse_json(_call_claude(SYSTEM_THESIS_CHECK, user,
+                                       max_tokens=config.THESIS_CHECK_MAX_TOKENS))
+        by_name = {c.get("name"): c for c in out.get("checks", [])
+                   if isinstance(c, dict)}
+        annotated = []
+        for t in theses:
+            c = by_name.get(t.get("name")) or {}
+            status = c.get("news_status")
+            if status not in ("challenged", "resolved"):
+                annotated.append(t)
+                continue
+            note = (c.get("note") or "").strip()
+            if not note:
+                # изрично изискване на промпта — без цитирано заглавие не се
+                # отклоняваме от unchanged
+                print(f"[ai] thesis_reality_check: '{t.get('name')}' върна "
+                      f"{status} без note — игнорирам")
+                annotated.append(t)
+                continue
+            print(f"[ai] thesis_reality_check: '{t.get('name')}' → {status} — {note}")
+            annotated.append({**t, "news_status": status, "news_note": note})
+        return annotated
+    except Exception as e:
+        print(f"[ai] thesis_reality_check неуспешен: {type(e).__name__}: {e}")
+        return theses
+
+
 SYSTEM_COT = """Ти си макро/позициониращ стратег, специализиран в тълкуване на \
 CFTC Commitments of Traders данни по методологията на Jason Shapiro: managed \
 money (спекулативни/hedge fund) позиции на екстремни percentile нива са \

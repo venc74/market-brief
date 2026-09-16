@@ -255,6 +255,27 @@ NEWS_RSS_FEEDS = {
     "Financial Times":  "https://www.ft.com/rss/home",
     "AP Business":      "https://news.google.com/rss/search?q=when:24h+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
 }
+# FIX 2026-09-16: заглавия под ранг 15 изобщо не влизаха в събраното. Потвърдено
+# на 16.09 — Reuters "Crypto bill's defeat shows limits of industry's political
+# machine" (провалилият се CLARITY cloture vote от 15.09) стои на ранг 17, в
+# 24-часовия прозорец и напълно достижим, но под стария limit=15.
+#
+# Вдигането само на limit НЕ е достатъчно: старият агрегатен таван raw[:60]
+# реже след конкатенация по източници, затова limit=30 даваше
+# {Reuters: 30, CNBC: 30, FT: 0, AP: 0} — точно обратното на fix-а от 15.09.
+# Затова заглавията се РЕДУВАТ между източниците (виж news_aggregator.
+# _interleave), а таванът е вдигнат. Измерено срещу реалните емисии на 16.09:
+#   limit=15, таван 60, конкатенация  → 55 загл., 4 източника, целевото НЕ минава
+#   limit=30, таван 60, конкатенация  → 60 загл., 2 източника (FT/AP нула)
+#   limit=50, таван 60, редуване      → 60 загл., 4 източника, целевото НЕ минава
+#   limit=50, таван 100, редуване     → 100 загл., 4 източника, целевото МИНАВА ✓
+# Цена: ~3100 → ~5600 входни токена за едно извикване на дневния news филтър.
+NEWS_PER_SOURCE_LIMIT = int(os.getenv("NEWS_PER_SOURCE_LIMIT", 50))
+NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
+# Свереност на геополитическите тези срещу днешните новини (ai_brief.
+# thesis_reality_check) — едно допълнително извикване на ден, само анотация,
+# не пипа thesis status-а. Изходът е ≤6 кратки обекта, 1000 стигат с запас.
+THESIS_CHECK_MAX_TOKENS = int(os.getenv("THESIS_CHECK_MAX_TOKENS", 1000))
 # nitter е нестабилен — изключен по подразбиране (Поправка 4)
 NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
 NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]

@@ -148,6 +148,11 @@ def run() -> dict:
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo)
     # Значими новини (RSS + nitter → Claude филтър) — преди останалия анализ
     news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
+    # FIX 2026-09-16: тезите се сверяват срещу днешните новини — виж
+    # ai_brief.thesis_reality_check(). САМО анотация (news_status/news_note);
+    # `status` остава trigger-driven, `chain` остава конфиг. Тук е най-ранното
+    # възможно място — `theses` е готов от ред 130, `news` току-що.
+    theses = ai_brief.thesis_reality_check(theses, news)
     narratives = ai_brief.ticker_narratives(
         candidates, ai_macro.get("sector_logic", []), thermo["regime"])
     candidates = ai_brief.merge_narratives(candidates, narratives)
