@@ -64,6 +64,21 @@ _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 _LIVE_STATUSES = ("open", "trailing")
 
+# FIX 2026-09-17: датата, за която резолюцията вече е минала В ТОЗИ ПРОЦЕС —
+# пази от двоен yf.download(), когато resolve_positions_only() е извикан рано
+# и update_backtest_tracker() го последва в същия run. Виж resolve_positions_only().
+#
+# СЪЗНАТЕЛНО in-process, не персистирано във файл: персистиран
+# "last_resolved_date" би потискал резолюцията и при РЪЧЕН re-trigger на
+# workflow-а същия ден (правено е), т.е. вторият run щеше да показва остаряло
+# Track Record състояние — точно дефектът, който този фикс поправя. Флагът
+# нарочно живее само колкото процеса.
+#
+# НЕ се пази в самия tracker dict: get_backtest_summary() прави
+# `for r in records: by_status[r.get("status")] += 1` (ред ~425), значи
+# мета-запис без "status" би добавил by_status[None] в dashboard брояча.
+_RESOLVED_THIS_RUN: str | None = None
+
 
 # ──────────────────────────────────────────────────────────────────────────
 # Persistence
@@ -378,6 +393,57 @@ def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────
+def resolve_positions_only() -> None:
+    """
+    FIX 2026-09-17: САМО резолюция на живите позиции, без ingest — за да може
+    да се извика РАНО в pipeline-а, преди каквото и да било да чете статусите.
+
+    Потвърденият случай (17.09.2026): Track Record показа FITB и ONB като
+    "stopped" на 16.09, докато COT секцията в СЪЩИЯ бриф ги описваше като
+    "вече отворени позиции" (E-mini Russell 2000 и 2-Year Treasury тезите),
+    с цитирани точни entry дати. Tracker-ът на диска сутринта наистина казваше
+    "open" — стопът е настъпил по цените от 16.09, но е бил открит едва в
+    днешния run (`late_discovery: true` в самите записи). UMBF, в същата теза
+    и нерезолвиран днес, беше реферирана коректно — контролът, който показва,
+    че проблемът е специфично при same-day резолюции.
+
+    Причината беше чист ordering gap: COT контекстът се сглобяваше на main.py
+    ред ~172 от _live_positions() (чете tracker-а ОТ ДИСКА), а резолюцията се
+    случваше едва на ред ~273 в update_backtest_tracker(). 101 реда разлика,
+    две секции в един бриф четат едно поле в две различни състояния.
+
+    Разделянето е възможно, защото _resolve_open_positions() приема само
+    tracker — не чете `action`. Свързаността с _ingest_new_positions() (който
+    ИЗИСКВА `action`, наличен чак след apply_hard_rules()) беше по конвенция,
+    не техническа.
+
+    Мрежова цена: нула допълнителна. _RESOLVED_THIS_RUN гарантира, че
+    update_backtest_tracker() по-късно не прави втори yf.download().
+
+    ИЗВЪН ОБХВАТА, съзнателно: main.apply_hard_rules() (ред ~62) чете същия
+    snapshot през свой собствен _live_positions() и след този фикс ще вижда
+    вече резолвиран tracker — т.е. FITB/ONB биха могли да получат нов Action
+    план вместо Watchlist с OPEN✓. Това е поправка, но и промяна в sizing
+    поведението, която заслужава собствено обсъждане. Записана е като ОТДЕЛНА
+    находка за следваща сесия; не се третира тук.
+
+    Graceful: провал → tracker-ът на диска остава последното успешно състояние.
+    """
+    global _RESOLVED_THIS_RUN
+    today = dt.date.today().isoformat()
+    if _RESOLVED_THIS_RUN == today:
+        return
+    tracker = _load_tracker()
+    try:
+        _resolve_open_positions(tracker)
+        _save_tracker(tracker)
+        _RESOLVED_THIS_RUN = today
+        live = sum(1 for r in tracker.values() if r.get("status") in _LIVE_STATUSES)
+        print(f"[backtest] ранна резолюция готова — {live} живи позиции остават")
+    except Exception as e:
+        print(f"[backtest] resolve_positions_only failed: {e}")
+
+
 def update_backtest_tracker(today_action: list[dict] | None = None,
                             today_date: str | None = None) -> None:
     """
@@ -392,7 +458,15 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     tracker = _load_tracker()
     try:
         _ingest_new_positions(tracker, today_action, today_date)
-        _resolve_open_positions(tracker)
+        # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
+        # не плащаме втори yf.download(). Днес ingest-натите позиции остават
+        # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла
+        # днес, не може да е стопната по вчерашни дневни барове.
+        if _RESOLVED_THIS_RUN == dt.date.today().isoformat():
+            print("[backtest] резолюцията вече мина по-рано в този run — "
+                  "пропускам втория price fetch")
+        else:
+            _resolve_open_positions(tracker)
         _save_tracker(tracker)
     except Exception as e:
         print(f"[backtest] update_backtest_tracker failed: {e}")

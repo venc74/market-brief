@@ -502,6 +502,15 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
                 continue
             print(f"[ai] thesis_reality_check: '{t.get('name')}' → {status} — {note}")
             annotated.append({**t, "news_status": status, "news_note": note})
+        # FIX 2026-09-17: успехът трябва да е ВИДИМ в лога. Дотук функцията
+        # логваше само при маркиране или при провал — а "всичко unchanged"
+        # (нормалният, очакван изход) мълчеше, което го правеше неразличимо
+        # от тихо паднало извикване: и в двата случая нито една теза няма
+        # news_status. Същото сляпо петно като мъртвите news източници преди
+        # FIX 2026-09-15 — успех и провал изглеждаха еднакво отвън.
+        flagged = sum(1 for t in annotated if t.get("news_status"))
+        print(f"[ai] thesis_reality_check: {len(annotated)} тези проверени "
+              f"срещу {len(news)} новини — {flagged} маркирани")
         return annotated
     except Exception as e:
         print(f"[ai] thesis_reality_check неуспешен: {type(e).__name__}: {e}")
