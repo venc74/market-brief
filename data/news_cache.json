@@ -1,37 +1,37 @@
 {
- "date": "2026-09-16",
+ "date": "2026-09-17",
  "news": [
   {
-   "headline": "Federal Reserve очаква да повиши лихвения процент, defying Trump's demands",
-   "why": "Fed решението днес е най-важният катализатор за пазарите — потенциален rate hike директно засяга equities, bonds и USD."
+   "headline": "Federal Reserve hikes key rate for 1st time in 3 years, defying Trump demands for a cut",
+   "why": "Централното събитие за деня — Fed повиши лихвата с 25 bps под Warsh, което директно удря equity valuations, bond yields и USD."
   },
   {
-   "headline": "Treasury yields hitting 5% may not break markets now — but the clock is ticking",
-   "why": "10-year yield на най-високо ниво от 2007 г. увеличава borrowing costs и оказва натиск върху акции, особено growth сектора."
+   "headline": "10-year Treasury yield climbs back to 5% after Fed hikes rates, Warsh highlights inflation risks",
+   "why": "10-годишният yield над 5% е критично ниво за equity пазарите — повишава discount rate и натиска оценките на акциите надолу."
   },
   {
-   "headline": "BOJ expected to hike rates by 25 basis points to fresh three-decade high",
-   "why": "BOJ hike засяга JPY, глобалните carry trades и може да предизвика разпродажба на рискови активи."
+   "headline": "Goldman Sachs sees October Fed hike after hawkish signal",
+   "why": "Goldman сигнализира още едно повишение идва, което поддържа elevated yields и bearish sentiment за rate-sensitive сектори."
   },
   {
-   "headline": "Gold gains with Fed rate decision in spotlight",
-   "why": "Покачването на злато отразява търсенето на hedge преди Fed решението и е индикатор за пазарно напрежение."
+   "headline": "Hawkish Fed lifts dollar to seven-week high as focus turns to BOJ",
+   "why": "Силният USD натиска emerging markets, commodities и мултинационалните компании с приходи извън САЩ."
   },
   {
-   "headline": "Oil falls as U.S. crude inventories reportedly rise, traders weigh Saudi pipeline closure",
-   "why": "Неочаквано покачване на US crude запасите натиска петрола надолу, докато атаката върху Saudi pipeline поддържа supply risk premium."
+   "headline": "US rate rise jolts yen ahead of Bank of Japan meeting",
+   "why": "Fed hike добавя натиск върху BOJ да затегне политиката, което може да предизвика yen carry trade разпродажби с глобален ефект."
   },
   {
-   "headline": "Dollar girded by bets on a US hiking cycle",
-   "why": "Очакванията за продължаващи Fed хикове укрепват USD, което засяга commodities, EM и мултинационалните корпорации."
+   "headline": "Bank of England set to defy Fed's rate-hike lead, despite rising inflation",
+   "why": "BOE държи лихви докато UK инфлацията расте — дивергенцията между централните банки движи FX волатилност и GBP двойки."
   },
   {
-   "headline": "Chinese investors rush into US stocks as Beijing opens wider path overseas",
-   "why": "Увеличеният китайски капиталов поток към US equities е структурен tailwind за американските пазари."
+   "headline": "Oil prices extend losses as fears of Middle East supply disruptions ease",
+   "why": "Облекчаването на supply disruption fears сваля петрола въпреки продължаващия конфликт — директен ефект върху energy сектора и инфлационните очаквания."
   },
   {
-   "headline": "Several explosions heard on Iran's Qeshm island",
-   "why": "Геополитическа ескалация в Персийския залив може бързо да засегне петролните доставки и да изстреля oil prices нагоре."
+   "headline": "Retail sales rise a better-than-expected 1.2% in August after shoppers pulled back spending in July",
+   "why": "По-силните от очакваното retail sales данни показват устойчив потребителски разход, което подкрепя Fed narrative за по-дълго задържане на високи лихви."
   }
  ]
 }

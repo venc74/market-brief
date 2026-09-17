@@ -1,6 +1,27 @@
 {
- "date": "2026-09-16",
+ "date": "2026-09-17",
  "rows": [
+  {
+   "ticker": "FOX",
+   "company": "Fox Corp",
+   "total_value": 20549954.04,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "MURDOCH LACHLAN K",
+     "title": "Executive Chair, CEO",
+     "date": "2026-09-15",
+     "value": 10274977.02
+    },
+    {
+     "name": "MURDOCH LACHLAN K",
+     "title": "Executive Chair, CEO",
+     "date": "2026-09-15",
+     "value": 10274977.02
+    }
+   ]
+  },
   {
    "ticker": "COO",
    "company": "COOPER COMPANIES, INC.",
@@ -110,9 +131,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 388,
+  "tickers_with_filings": 387,
   "submissions_fetch_errors": 0,
   "raw_transactions_parsed": 153,
-  "qualifying_after_filter": 10
+  "qualifying_after_filter": 12
  }
 }
