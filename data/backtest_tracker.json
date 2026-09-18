@@ -248,17 +248,6 @@
   "resolution_date": "2026-07-16",
   "realized_r": -1.0
  },
- "ADI_2026-06-19": {
-  "ticker": "ADI",
-  "entry_date": "2026-06-19",
-  "status": "stopped",
-  "entry_price": 439.7,
-  "target_1": 527.08,
-  "stop_loss": 396.01,
-  "target1_hit_date": null,
-  "resolution_date": "2026-06-26",
-  "realized_r": -1.0
- },
  "LLY_2026-07-10": {
   "ticker": "LLY",
   "entry_date": "2026-07-10",
@@ -302,17 +291,6 @@
   "target1_hit_date": null,
   "resolution_date": null,
   "realized_r": null
- },
- "CAT_2026-06-19": {
-  "ticker": "CAT",
-  "entry_date": "2026-06-19",
-  "status": "stopped",
-  "entry_price": 994.49,
-  "target_1": 1255.47,
-  "stop_loss": 864.0,
-  "target1_hit_date": null,
-  "resolution_date": "2026-07-17",
-  "realized_r": -1.0
  },
  "FITB_2026-07-20": {
   "ticker": "FITB",
@@ -372,18 +350,6 @@
   "resolution_date": "2026-09-16",
   "realized_r": -1.0,
   "discovered_date": "2026-09-17"
- },
- "TRV_2026-07-03": {
-  "ticker": "TRV",
-  "entry_date": "2026-07-03",
-  "status": "open",
-  "entry_price": 342.31,
-  "target_1": 423.23,
-  "stop_loss": 301.85,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
  },
  "GRMN_2026-07-31": {
   "ticker": "GRMN",
@@ -529,18 +495,6 @@
   "discovered_date": null,
   "realized_r": null
  },
- "ROK_2026-06-19": {
-  "ticker": "ROK",
-  "entry_date": "2026-06-19",
-  "status": "stopped",
-  "entry_price": 475.92,
-  "target_1": 566.52,
-  "stop_loss": 430.62,
-  "target1_hit_date": null,
-  "resolution_date": "2026-08-20",
-  "discovered_date": "2026-08-24",
-  "realized_r": -1.0
- },
  "FCFS_2026-08-25": {
   "ticker": "FCFS",
   "entry_date": "2026-08-25",
@@ -596,18 +550,6 @@
   "entry_price": 99.92,
   "target_1": 122.54,
   "stop_loss": 88.61,
-  "target1_hit_date": null,
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
- },
- "FITB_2026-07-21": {
-  "ticker": "FITB",
-  "entry_date": "2026-07-21",
-  "status": "open",
-  "entry_price": 59.5,
-  "target_1": 74.22,
-  "stop_loss": 52.14,
   "target1_hit_date": null,
   "resolution_date": null,
   "discovered_date": null,
