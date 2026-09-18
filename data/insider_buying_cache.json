@@ -1,5 +1,5 @@
 {
- "date": "2026-09-17",
+ "date": "2026-09-18",
  "rows": [
   {
    "ticker": "FOX",
@@ -25,10 +25,16 @@
   {
    "ticker": "COO",
    "company": "COOPER COMPANIES, INC.",
-   "total_value": 1330789.9777,
+   "total_value": 1880109.9777,
    "cluster": true,
    "in_screener": false,
    "insiders": [
+    {
+     "name": "Kurzius Lawrence Erik",
+     "title": "",
+     "date": "2026-09-16",
+     "value": 549320.0
+    },
     {
      "name": "Kurzius Lawrence Erik",
      "title": "",
@@ -131,9 +137,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 387,
+  "tickers_with_filings": 388,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 153,
-  "qualifying_after_filter": 12
+  "raw_transactions_parsed": 149,
+  "qualifying_after_filter": 13
  }
 }

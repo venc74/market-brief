@@ -1,37 +1,37 @@
 {
- "date": "2026-09-17",
+ "date": "2026-09-18",
  "news": [
   {
-   "headline": "Federal Reserve hikes key rate for 1st time in 3 years, defying Trump demands for a cut",
-   "why": "Централното събитие за деня — Fed повиши лихвата с 25 bps под Warsh, което директно удря equity valuations, bond yields и USD."
+   "headline": "BOJ raises interest rates to 31-year high, yen slumps after move",
+   "why": "BOJ вдигна лихвата с 25 bps до 1.25% при разделено гласуване 7-2, но йената парадоксално падна, което сигнализира за carry trade динамика и влияе върху глобалните валутни и equity позиции."
   },
   {
-   "headline": "10-year Treasury yield climbs back to 5% after Fed hikes rates, Warsh highlights inflation risks",
-   "why": "10-годишният yield над 5% е критично ниво за equity пазарите — повишава discount rate и натиска оценките на акциите надолу."
+   "headline": "Fed raised rates by 25 bps, stocks posted best day in 6 weeks on Thursday",
+   "why": "Първото покачване на Fed от три години насам движи цялата крива на доходност и определя risk appetite за equity, bonds и emerging markets днес."
   },
   {
-   "headline": "Goldman Sachs sees October Fed hike after hawkish signal",
-   "why": "Goldman сигнализира още едно повишение идва, което поддържа elevated yields и bearish sentiment за rate-sensitive сектори."
+   "headline": "US mortgage rates brush 7%, straining housing market",
+   "why": "Ипотечните лихви близо до 7% потвърждават трансмисията на Fed policy в реалната икономика и натискат rate-sensitive сектори като homebuilders и REITs."
   },
   {
-   "headline": "Hawkish Fed lifts dollar to seven-week high as focus turns to BOJ",
-   "why": "Силният USD натиска emerging markets, commodities и мултинационалните компании с приходи извън САЩ."
+   "headline": "Oil prices fall for third day on hopes of limited Saudi supply disruptions despite Houthi strikes",
+   "why": "Тридневният спад в петрола облекчава инфлационния натиск и помогна на акциите вчера, но Saudi East-West Pipeline удар и Iran conflict без ясен endgame по JP Morgan поддържат геополитическа премия."
   },
   {
-   "headline": "US rate rise jolts yen ahead of Bank of Japan meeting",
-   "why": "Fed hike добавя натиск върху BOJ да затегне политиката, което може да предизвика yen carry trade разпродажби с глобален ефект."
+   "headline": "Three pumping stations along Saudi East-West Pipeline hit in recent attack",
+   "why": "Директна атака върху Saudi петролна инфраструктура е ключов supply risk event, който може рязко да обърне текущия спад в цените на петрола."
   },
   {
-   "headline": "Bank of England set to defy Fed's rate-hike lead, despite rising inflation",
-   "why": "BOE държи лихви докато UK инфлацията расте — дивергенцията между централните банки движи FX волатилност и GBP двойки."
+   "headline": "JP Morgan says it has no clear oil market endgame as Iran conflict drags on",
+   "why": "JP Morgan открито заявява несигурност около oil price path, което е важен сигнал за петролния и по-широкия commodity пазар."
   },
   {
-   "headline": "Oil prices extend losses as fears of Middle East supply disruptions ease",
-   "why": "Облекчаването на supply disruption fears сваля петрола въпреки продължаващия конфликт — директен ефект върху energy сектора и инфлационните очаквания."
+   "headline": "10-year Treasury yield breakout above 5.25% could hold back stocks",
+   "why": "Технически праг при 10Y yield е директен headwind за equity valuations — следи се в реално време след вчерашното Fed движение."
   },
   {
-   "headline": "Retail sales rise a better-than-expected 1.2% in August after shoppers pulled back spending in July",
-   "why": "По-силните от очакваното retail sales данни показват устойчив потребителски разход, което подкрепя Fed narrative за по-дълго задържане на високи лихви."
+   "headline": "Unemployment claims drop to 196,000, lowest since mid-July as layoffs remain low",
+   "why": "Силен labor market data потвърждава Fed hawkish narrative и намалява вероятността от пауза в цикъла на покачване на лихвите."
   }
  ]
 }
