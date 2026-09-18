@@ -452,6 +452,140 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     return display_rows
 
 
+def _parse_form4_all_codes(xml_text: str) -> dict | None:
+    """
+    Като _parse_form4(), но БЕЗ филтъра `code != "P"` — връща и покупки (P), и
+    продажби (S), плюс сигналите, нужни за преценка routine/concerning.
+
+    Отделна функция, НЕ промяна на _parse_form4(): секцията "Insider Buying"
+    остава точно каквато е (само покупки, свой праг, своя дедупликация). Тази
+    е за watch_monitor, който гледа малък, ръчно избран списък тикъри и има
+    нужда от двете посоки. Additive подход, CLAUDE.md т.2.
+
+    aff10b5One: структурният Rule 10b5-1 флаг на SEC. Проверен на реални
+    filings (16 от 16 при MSFT/JPM/WMT/CRM го носят) — "1" = продажбата е по
+    предварително обявен план (routine), "0" = извънпланова. Елементът съдържа
+    ГОЛА стойност, не вложен <value>, затова се чете през .text. По-стари
+    filing агенти може да не го подават изобщо (потвърдено при част от NVDA) →
+    None, което AI-то трябва да третира като "неизвестно", не като "0".
+
+    shares_after: sharesOwnedFollowingTransaction — за дял от holdings, без
+    който "голяма продажба" е безсмислено число.
+    """
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return None
+    issuer = root.find("issuer")
+    if issuer is None:
+        return None
+    ticker = _xml_text(issuer, "issuerTradingSymbol").upper()
+    if not ticker:
+        return None
+
+    owners = []
+    for ro in root.findall("reportingOwner"):
+        rel = ro.find("reportingOwnerRelationship")
+        owners.append({
+            "name": _xml_text(ro, "reportingOwnerId/rptOwnerName"),
+            "title": _xml_text(rel, "officerTitle") if rel is not None else "",
+            "is_officer": (_xml_text(rel, "isOfficer") == "1") if rel is not None else False,
+            "is_director": (_xml_text(rel, "isDirector") == "1") if rel is not None else False,
+        })
+
+    transactions = []
+    for txn in root.findall("nonDerivativeTable/nonDerivativeTransaction"):
+        code = _xml_text(txn, "transactionCoding/transactionCode")
+        if code not in ("P", "S"):
+            continue  # само реални пазарни покупки/продажби; A/F/G/M са друг клас
+        date_s = _xml_text(txn, "transactionDate/value")
+        shares_s = _xml_text(txn, "transactionAmounts/transactionShares/value")
+        price_s = _xml_text(txn, "transactionAmounts/transactionPricePerShare/value")
+        after_s = _xml_text(txn, "postTransactionAmounts/sharesOwnedFollowingTransaction/value")
+        try:
+            shares = float(re.sub(r"[^\d.]", "", shares_s or "0") or 0)
+            price = float(re.sub(r"[^\d.]", "", price_s or "0") or 0)
+            date = dt.date.fromisoformat(date_s)
+        except (ValueError, TypeError):
+            continue
+        if shares <= 0 or price <= 0:
+            continue
+        try:
+            shares_after = float(re.sub(r"[^\d.]", "", after_s or "") or 0) or None
+        except (ValueError, TypeError):
+            shares_after = None
+        el = txn.find("transactionCoding/aff10b5One")
+        planned = None
+        if el is not None and (el.text or "").strip() in ("0", "1"):
+            planned = (el.text or "").strip() == "1"
+        transactions.append({
+            "date": date, "code": code, "shares": shares, "price": price,
+            "value": shares * price, "shares_after": shares_after,
+            "planned_10b5_1": planned,
+            "pct_of_holdings": (round(shares / (shares + shares_after) * 100, 1)
+                                if shares_after else None),
+        })
+
+    if not transactions:
+        return None
+    return {"ticker": ticker, "company": _xml_text(issuer, "issuerName"),
+            "owners": owners, "transactions": transactions}
+
+
+def fetch_insider_transactions(tickers: list[str], days: int | None = None) -> dict[str, list[dict]]:
+    """
+    Form 4 покупки И продажби за ИЗРИЧНО подаден списък тикъри (watch_monitor).
+
+    Различна по предназначение от fetch_insider_buying(): там универсът е
+    скрийнърът и се търси сигнал (клъстери, прагове по стойност); тук списъкът
+    е малък и ръчен, и се иска ПЪЛНАТА картина за конкретните тикъри — без
+    праг по стойност, защото "малка продажба" е част от отговора, не шум.
+
+    Връща {ticker: [транзакция, ...]}, всяка с owner_name/owner_title, сортирани
+    по дата низходящо. Тикър без filings → липсва от резултата (извикващият го
+    третира като "нищо не се е случило").
+
+    Graceful: провал за един тикър → само той отпада, останалите минават.
+    """
+    days = days or config.WATCH_INSIDER_LOOKBACK_DAYS
+    since = dt.date.today() - dt.timedelta(days=days)
+    cikmap = _ticker_cik_map()
+    out: dict[str, list[dict]] = {}
+    for tk in tickers:
+        cik = cikmap.get(tk.upper())
+        if not cik:
+            print(f"[watch] {tk}: няма CIK в SEC мапинга — пропускам insider проверката")
+            continue
+        filings = _recent_form4_for_cik(cik, since)
+        if not filings:
+            continue
+        rows = []
+        for acc, doc in filings:
+            url = _form4_xml_url(cik, acc, doc)
+            if not url:
+                continue
+            try:
+                time.sleep(_SLEEP)
+                r = requests.get(url, timeout=20, headers=_EDGAR_UA)
+                r.raise_for_status()
+                parsed = _parse_form4_all_codes(r.text)
+            except Exception as e:
+                print(f"[watch] {tk} filing {acc}: {e}")
+                continue
+            if not parsed or parsed["ticker"] != tk.upper():
+                continue
+            owner = (parsed["owners"] or [{}])[0]
+            for t in parsed["transactions"]:
+                rows.append({**t, "owner_name": owner.get("name", ""),
+                             "owner_title": owner.get("title", ""),
+                             "is_officer": owner.get("is_officer", False),
+                             "is_director": owner.get("is_director", False)})
+        if rows:
+            rows.sort(key=lambda r: r["date"], reverse=True)
+            out[tk.upper()] = rows
+    return out
+
+
 if __name__ == "__main__":
     res = fetch_insider_buying()
     print(f"Insider buying (≥ ${config.INSIDER_MIN_VALUE:,.0f}, P-code само, групирано по тикър): {len(res)}")

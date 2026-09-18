@@ -32,6 +32,7 @@ from src import glb_screener
 from src import short_screener
 from src import short_tracker
 from src import watchlist_expiry
+from src import watch_monitor
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -317,12 +318,41 @@ def run() -> dict:
     short_tracker_summary = (short_tracker.get_short_tracker_summary()
                              if config.ENABLE_SHORT_SCREENER else {})
 
+    # 🔎 Наблюдавани тикъри — ръчно куриран per-ticker монитор (watch_monitor.py).
+    # ТУК, а не по-рано: `theses`, `cot_with_theses` и `leaders` вече са готови
+    # и се подават като market_context за cross-referencing-а — reuse на вече
+    # наличното в паметта, не нов източник.
+    #
+    # "Нищо не се е случило" е CODE-ENFORCED: тих тикър (нула новини, нула
+    # Form 4) изобщо не стига до AI-то — кодът му слага текста сам. Така
+    # изричното "нищо" е гарантирано, не зависи от това дали моделът ще се
+    # сети да го каже, и не се плащат токени за празен вход.
+    watch_rows = []
+    if config.ENABLE_WATCH_MONITOR:
+        try:
+            watch_rows = watch_monitor.collect()
+            active = [r for r in watch_rows if not r["quiet"]]
+            if active:
+                market_context = {
+                    "active_theses": [t["name"] for t in theses
+                                      if t.get("status") in ("active", "structural")],
+                    "cot_markets": [c["market"] for c in cot_with_theses][:10],
+                    "leading_sectors": [s["sector"] for s in leaders],
+                }
+                active = ai_brief.watch_ticker_digest(active, market_context)
+            by_ticker = {r["ticker"]: r for r in active}
+            watch_rows = [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in watch_rows]
+        except Exception as e:
+            print(f"[watch] секцията се провали изцяло: {e}")
+            watch_rows = []
+
     brief = {
         "date": today,
         "macro": macro,
         "thermometer": thermo,
         "rotation": rotation,
         "ai_macro": ai_macro,
+        "watch": watch_rows,
         "action": action,
         "watchlist": watchlist,
         # v2 нови блокове

@@ -282,6 +282,17 @@ THESIS_CHECK_MAX_TOKENS = int(os.getenv("THESIS_CHECK_MAX_TOKENS", 1000))
 # твърдение. Кодът не може да провери семантиката, но може да отхвърли бележка,
 # която очевидно не носи двете. Праг, не гаранция.
 THESIS_EVOLVING_MIN_NOTE_CHARS = int(os.getenv("THESIS_EVOLVING_MIN_NOTE_CHARS", 80))
+
+# ── 🔎 Наблюдавани тикъри (watch_monitor.py) ──────────────────────────────
+# Ръчно куриран, per-ticker дневен монитор. Списъкът е в data/watch_list.json
+# и се редактира НА РЪКА — сайтът е статичен, няма backend за интерактивен бутон.
+ENABLE_WATCH_MONITOR = os.getenv("ENABLE_WATCH_MONITOR", "1") == "1"
+WATCH_NEWS_WINDOW_HOURS = int(os.getenv("WATCH_NEWS_WINDOW_HOURS", 24))
+WATCH_MAX_NEWS_PER_TICKER = int(os.getenv("WATCH_MAX_NEWS_PER_TICKER", 6))
+# Form 4 подаването изостава от самата сделка с дни — 30д прозорец улавя и
+# закъснели filings, AI-то вижда датата на транзакцията и преценява сам.
+WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))
+WATCH_MAX_TOKENS = int(os.getenv("WATCH_MAX_TOKENS", 2000))
 # nitter е нестабилен — изключен по подразбиране (Поправка 4)
 NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
 NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]

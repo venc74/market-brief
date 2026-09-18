@@ -123,6 +123,35 @@
     padding-top: 6px; border-top: 1px dotted var(--line); }
   .borrow b { color: var(--yellow); }
 
+  /* ── 🔎 Наблюдавани тикъри (2026-09-18) ── */
+  .wm-note { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .wm-note code { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .wm-grid { display: grid; gap: 12px; }
+  .wm-card { background: var(--panel); border: 1px solid var(--line);
+                border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--regime); }
+  .wm-card.quiet { border-left-color: var(--line); }
+  .wm-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .wm-ticker { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 15px; }
+  .wm-badge { font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+                 padding: 2px 7px; border-radius: 4px; }
+  .wm-badge.cluster { color: var(--red); background: rgba(248,113,113,.14); }
+  .wm-badge.insider { color: var(--yellow); background: rgba(251,191,36,.12); }
+  .wm-badge.news { color: var(--muted); background: rgba(133,147,179,.12); }
+  .wm-quiet { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .wm-summary { font-size: 13.5px; margin-top: 9px; }
+  .wm-news { margin: 8px 0 0 0; padding-left: 18px; font-size: 13px; }
+  .wm-news li { margin-bottom: 3px; }
+  .wm-src { color: var(--muted); font-size: 12px; }
+  .wm-insider { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+  .wm-insider th { text-align: left; color: var(--muted); font-weight: 500;
+                      border-bottom: 1px solid var(--line); padding: 4px 6px; }
+  .wm-insider td { padding: 4px 6px; border-bottom: 1px solid var(--line); }
+  .wm-insider .num { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .wm-insider td.buy { color: var(--green); }
+  .wm-insider td.sell { color: var(--red); }
+  .wm-read { font-size: 13px; margin-top: 9px; }
+  .wm-xref { font-size: 12.5px; color: var(--regime); margin-top: 7px; }
+
   /* ── v2: thesis monitor ── */
   .theses { display: grid; gap: 12px; }
   .thesis { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
@@ -368,6 +397,55 @@
   {% if regime_comment %}<br><br><span style="color:var(--muted)">{{ regime_comment }}</span>{% endif %}
   </div>
 </section>
+
+{% if watch %}
+<section>
+  <h2>🔎 Наблюдавани тикъри · последните 24ч</h2>
+  <div class="wm-note">Ръчно поддържан списък (<code>data/watch_list.json</code>) —
+    независим от скрийнъра, GLB и COT секциите.</div>
+  <div class="wm-grid">
+    {% for w in watch %}
+    <div class="wm-card{% if w.quiet %} quiet{% endif %}">
+      <div class="wm-head">
+        <span class="wm-ticker">{{ w.ticker }}</span>
+        {% if w.insider_cluster %}<span class="wm-badge cluster">CLUSTER</span>{% endif %}
+        {% if w.insider %}<span class="wm-badge insider">Form 4 · {{ w.insider|length }}</span>{% endif %}
+        {% if w.news %}<span class="wm-badge news">{{ w.news|length }} новини</span>{% endif %}
+      </div>
+      {% if w.quiet %}
+        <div class="wm-quiet">Няма значими събития за последните 24 часа — нито новини, нито Form 4 подавания.</div>
+      {% else %}
+        {% if w.ai and w.ai.summary %}<div class="wm-summary">{{ w.ai.summary }}</div>{% endif %}
+        {% if w.news %}
+        <ul class="wm-news">
+          {% for n in w.news %}
+          <li>{{ n.title }}{% if n.publisher %} <span class="wm-src">· {{ n.publisher }}</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if w.insider %}
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          {% for t in w.insider %}
+          <tr>
+            <td>{{ t.date }}</td>
+            <td class="{{ 'buy' if t.code == 'P' else 'sell' }}">{{ 'покупка' if t.code == 'P' else 'продажба' }}</td>
+            <td>{{ t.owner_name }}{% if t.owner_title %} <span class="wm-src">· {{ t.owner_title }}</span>{% endif %}</td>
+            <td class="num">${{ "{:,.0f}".format(t.value) }}</td>
+            <td class="num">{{ t.pct_of_holdings ~ "%" if t.pct_of_holdings is not none else "—" }}</td>
+            <td>{{ "10b5-1" if t.planned_10b5_1 else ("извънпланова" if t.planned_10b5_1 is false else "неизв.") }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+        {% if w.ai and w.ai.insider_read %}<div class="wm-read">{{ w.ai.insider_read }}</div>{% endif %}
+        {% if w.ai and w.ai.cross_reference %}<div class="wm-xref">🔗 {{ w.ai.cross_reference }}</div>{% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 
 <section>
   <h2>Секторна карта · следващите 2–6 седмици</h2>

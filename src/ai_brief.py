@@ -553,6 +553,106 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
         return theses
 
 
+SYSTEM_WATCH = """Ти си анализатор, който следи конкретни компании за инвеститор, \
+който вече държи позиции в тях. Обясняваш какво се е случило и какво означава \
+то — не преразказваш заглавия. Пишеш на български, тикери и термини на \
+английски. Директен си: ако събитието е рутинно, го казваш рутинно. Връщаш \
+САМО валиден JSON, без markdown огради, без преамбюл."""
+
+
+def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
+    """
+    AI тълкуване за „🔎 Наблюдавани тикъри" (виж watch_monitor.py).
+
+    rows: изходът на watch_monitor.collect(), БЕЗ тихите тикъри — те не стигат
+    дотук изобщо (кодът им слага текста сам, виж main.py).
+    market_context: {active_theses, cot_markets, leading_sectors} — вече
+    налични в паметта на run-а, не нов източник.
+
+    Insider продажбите се тълкуват по СТРУКТУРНИ сигнали, не по усещане:
+    planned_10b5_1 (SEC aff10b5One флагът), pct_of_holdings
+    (sharesOwnedFollowingTransaction), длъжност, и клъстер от няколко
+    инсайдъра. Кодът дава сигналите, AI-то дава тълкуването — същото
+    разделение като _distress_signals() в short_screener.
+
+    Cross-referencing е с изричен default „няма връзка" — същата
+    anti-over-flagging дисциплина като thesis_reality_check. Тикър и активна
+    тема по една обща дума не е връзка.
+
+    Graceful: провал → празен dict за всеки тикър, секцията показва суровите
+    данни без тълкуване.
+    """
+    if not rows:
+        return rows
+    try:
+        compact = [{
+            "ticker": r["ticker"],
+            "news": [{"title": n["title"], "publisher": n["publisher"]} for n in r["news"]],
+            "insider": [{"code": t["code"], "date": t["date"],
+                         "owner": t["owner_name"], "title": t["owner_title"],
+                         "value_usd": round(t["value"]),
+                         "pct_of_holdings": t["pct_of_holdings"],
+                         "planned_10b5_1": t["planned_10b5_1"]} for t in r["insider"]],
+            "insider_cluster": r["insider_cluster"],
+        } for r in rows]
+
+        user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 24 часа):
+{json.dumps(compact, ensure_ascii=False, default=str)}
+
+ТЕМИ, АКТИВНИ ДРУГАДЕ В ДНЕШНИЯ БРИФ:
+{json.dumps(market_context, ensure_ascii=False, default=str)}
+
+За всеки тикър върни:
+
+- "summary": 1-2 изречения — какво реално се случи. Не преразказвай заглавията \
+едно по едно; кажи какво е същественото. Ако новините са само аналитични \
+коментари/рейтинги без ново събитие, кажи точно това.
+
+- "insider_read": САМО ако има Form 4 транзакции. Разграничи рутинно от \
+тревожно по ДАДЕНИТЕ сигнали, не по усещане:
+  • planned_10b5_1 = true → продажбата е по предварително обявен план. Това е \
+рутинно по подразбиране — планът е приет месеци по-рано и не носи информация \
+за текущото мнение на инсайдъра. Кажи го така.
+  • planned_10b5_1 = false → извънпланова. Значима, ако е голяма спрямо \
+holdings (виж pct_of_holdings) или идва от CEO/CFO.
+  • planned_10b5_1 = null → флагът липсва в подаването (по-стар filing агент). \
+Кажи „неизвестно дали е планирана", НЕ предполагай.
+  • insider_cluster = true → няколко различни инсайдъра в една посока за \
+кратко. Това е най-силният сигнал в набора; кажи го изрично.
+  • малък pct_of_holdings при продажба (под ~10%) отслабва тревожността дори \
+при голяма абсолютна сума — ликвидност/данъци, не изход от позицията.
+  Ако няма транзакции, върни празен низ.
+
+- "cross_reference": САМО ако тикърът е ПРЯКО свързан с тема от списъка \
+по-горе — една стъпка, не макро верига. Едно изречение, което казва защо \
+темата има отражение върху тази конкретна компания. Обща дума, споделена между \
+тикъра и темата, НЕ е връзка. Ако няма пряка връзка, върни ПРАЗЕН низ — това е \
+нормалният случай, не пропуск.
+
+Върни JSON: {{"digests": [{{"ticker": "...", "summary": "...", \
+"insider_read": "...", "cross_reference": "..."}}]}}"""
+
+        out = _parse_json(_call_claude(SYSTEM_WATCH, user,
+                                       max_tokens=config.WATCH_MAX_TOKENS))
+        by_ticker = {d.get("ticker"): d for d in out.get("digests", [])
+                     if isinstance(d, dict)}
+        annotated = []
+        for r in rows:
+            d = by_ticker.get(r["ticker"]) or {}
+            annotated.append({**r, "ai": {
+                "summary": (d.get("summary") or "").strip(),
+                "insider_read": (d.get("insider_read") or "").strip(),
+                "cross_reference": (d.get("cross_reference") or "").strip(),
+            }})
+        linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
+        print(f"[ai] watch_ticker_digest: {len(annotated)} тикъра обработени, "
+              f"{linked} с cross-reference")
+        return annotated
+    except Exception as e:
+        print(f"[ai] watch_ticker_digest неуспешен: {type(e).__name__}: {e}")
+        return [{**r, "ai": {}} for r in rows]
+
+
 SYSTEM_COT = """Ти си макро/позициониращ стратег, специализиран в тълкуване на \
 CFTC Commitments of Traders данни по методологията на Jason Shapiro: managed \
 money (спекулативни/hedge fund) позиции на екстремни percentile нива са \
