@@ -147,7 +147,10 @@
                  padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
   .thesis-news.challenged { color: var(--red); background: rgba(248,113,113,.12); }
   .thesis-news.resolved { color: var(--muted); background: rgba(133,147,179,.12); }
+  /* 2026-09-18: "evolving" — оригиналният път спрян, алтернативен напредва */
+  .thesis-news.evolving { color: var(--yellow); background: rgba(251,191,36,.12); }
   .thesis-newsnote { font-size: 12.5px; color: var(--red); margin-top: 6px; }
+  .thesis-newsnote.evolving { color: var(--yellow); }
   .cot-direction { font-family: "IBM Plex Mono", monospace; font-size: 11px;
     text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
   .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
@@ -393,11 +396,11 @@
       <div class="thesis-head">
         <span class="thesis-name">{{ th.name }}</span>
         <span class="thesis-status {{ th.status }}">{{ "активна" if th.status == "active" else "структурна" if th.status == "structural" else "наблюдава се" }}</span>
-        {% if th.news_status %}<span class="thesis-news {{ th.news_status }}">{{ "опровергана от новина" if th.news_status == "challenged" else "разрешена" }}</span>{% endif %}
+        {% if th.news_status %}<span class="thesis-news {{ th.news_status }}">{{ "опровергана от новина" if th.news_status == "challenged" else "разрешена" if th.news_status == "resolved" else "друг път" }}</span>{% endif %}
       </div>
       <div class="thesis-tickers">{{ th.tickers|join("  ·  ") }}</div>
       <div class="thesis-chain">{{ th.chain }}</div>
-      {% if th.news_note %}<div class="thesis-newsnote">⚠ {{ th.news_note }}</div>{% endif %}
+      {% if th.news_note %}<div class="thesis-newsnote {{ th.news_status }}">⚠ {{ th.news_note }}</div>{% endif %}
       {% if th.trigger_reason %}<div class="thesis-trigger">▲ Тригер активен: {{ th.trigger_reason }}</div>{% endif %}
     </div>
     {% endfor %}

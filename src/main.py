@@ -150,9 +150,15 @@ def run() -> dict:
     news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
     # FIX 2026-09-16: тезите се сверяват срещу днешните новини — виж
     # ai_brief.thesis_reality_check(). САМО анотация (news_status/news_note);
-    # `status` остава trigger-driven, `chain` остава конфиг. Тук е най-ранното
-    # възможно място — `theses` е готов от ред 130, `news` току-що.
-    theses = ai_brief.thesis_reality_check(theses, news)
+    # `status` остава trigger-driven, `chain` остава конфиг.
+    #
+    # FIX 2026-09-18: подава се СУРОВИЯТ пул, не филтрираните ~8 — те се
+    # подбират по обща пазарна значимост за деня и системно изпускат тезово-
+    # релевантни новини в тесни домейни (потвърдено с SEC tokenized-stock
+    # историята на 18.09). Виж news_aggregator.raw_pool(). Нула допълнителен
+    # fetch — gather_raw мемоизира в процеса.
+    theses = ai_brief.thesis_reality_check(
+        theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
     narratives = ai_brief.ticker_narratives(
         candidates, ai_macro.get("sector_logic", []), thermo["regime"])
     candidates = ai_brief.merge_narratives(candidates, narratives)

@@ -444,8 +444,17 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
     try:
         compact_theses = [{"name": t.get("name"), "chain": t.get("chain"),
                            "tickers": t.get("tickers")} for t in theses]
-        compact_news = [{"headline": n.get("headline"), "why": n.get("why")}
-                        for n in news]
+        # FIX 2026-09-18: приема И двете форми — филтрираните новини
+        # ({headline, why}) и суровия пул от news_aggregator.raw_pool()
+        # ({source, title, summary}). Суровият е реалният вход след тази
+        # промяна, но подписът остава съвместим с филтрирания списък.
+        compact_news = [
+            {"headline": n.get("headline") or n.get("title"),
+             "why": n.get("why") or (n.get("summary") or "")[:200]}
+            for n in news if (n.get("headline") or n.get("title"))
+        ]
+        if not compact_news:
+            return theses
         user = f"""ТЕЗИ (дълготрайни, от конфигурация — механизмът е описан в "chain"):
 {json.dumps(compact_theses, ensure_ascii=False, default=str)}
 
@@ -461,6 +470,17 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
 още не се е случил — конкретно събитие го е спряло.
 - "resolved" — механизмът вече се е случил и е приключил; тезата е разрешена, \
 не предстояща.
+- "evolving" — назованото в тезата СРЕДСТВО е спряно/забавено, но конкретен \
+АЛТЕРНАТИВЕН път напредва към СЪЩАТА крайна цел. Използвай го САМО когато \
+можеш да назовеш и ДВЕТЕ страни поименно: (1) кой точно оригинален път се е \
+провалил или забавил, и (2) кой точно алтернативен път напредва вместо него. \
+Ако можеш да посочиш само едното, това не е "evolving" — то е "challenged" \
+(ако само оригиналът е спрян) или "unchanged" (ако само има някаква свързана \
+новина). Пример за ВАЛИДНО evolving: теза "законодателна рамка X → регулаторна \
+сигурност"; гласуването за X се проваля, НО регулаторът подава собствени \
+правила към същата цел — оригиналът е спрян, алтернативата е конкретна и \
+назована. Пример за НЕВАЛИДНО: "регулаторната среда изглежда по-благоприятна" \
+— няма назован провалил се път, няма назована алтернатива, това е unchanged.
 - "unchanged" — ВСИЧКО ОСТАНАЛО. Това е отговорът по подразбиране.
 
 КРИТИЧНО — кога НЕ се отклоняваш от "unchanged":
@@ -474,9 +494,11 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
 Тезите са дълготрайни по замисъл. В типичен ден ВСИЧКИ са "unchanged" — това \
 е нормалният, очакван резултат, не пропуск от твоя страна. Не търси връзки.
 
-"note": САМО при challenged/resolved — едно изречение, което ЦИТИРА конкретното \
-заглавие, задействало преценката. Ако не можеш да посочиш точно заглавие, \
-върни "unchanged" с празен note.
+"note": САМО при challenged/resolved/evolving — едно изречение, което ЦИТИРА \
+конкретното заглавие, задействало преценката. При "evolving" бележката трябва \
+да назове И ДВАТА пътя: спрения оригинал и конкретната алтернатива. Ако не \
+можеш да посочиш точно заглавие (или при evolving — и двата пътя), върни \
+"unchanged" с празен note.
 
 Върни JSON за ВСЯКА теза, в същия ред: \
 {{"checks": [{{"name": "...", "news_status": "...", "note": "..."}}]}}"""
@@ -489,7 +511,7 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
         for t in theses:
             c = by_name.get(t.get("name")) or {}
             status = c.get("news_status")
-            if status not in ("challenged", "resolved"):
+            if status not in ("challenged", "resolved", "evolving"):
                 annotated.append(t)
                 continue
             note = (c.get("note") or "").strip()
@@ -498,6 +520,20 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
                 # отклоняваме от unchanged
                 print(f"[ai] thesis_reality_check: '{t.get('name')}' върна "
                       f"{status} без note — игнорирам")
+                annotated.append(t)
+                continue
+            # FIX 2026-09-18: "evolving" е по-мек праг от "challenged" и затова
+            # по-лесен за злоупотреба. Промптът изисква бележката да назове И
+            # ДВАТА пътя (спрян оригинал + конкретна алтернатива), а това по
+            # необходимост е по-дълго от едно изречение с едно твърдение.
+            # Едноредова бележка при evolving почти сигурно назовава само едната
+            # страна → третира се като неизпълнено изискване. Кодът не може да
+            # провери семантиката, но може да провери, че изобщо е даден
+            # достатъчно материал — същият дух като note-задължителността.
+            if status == "evolving" and len(note) < config.THESIS_EVOLVING_MIN_NOTE_CHARS:
+                print(f"[ai] thesis_reality_check: '{t.get('name')}' върна evolving "
+                      f"с твърде кратка бележка ({len(note)} знака) — вероятно не "
+                      "назовава и двата пътя, игнорирам")
                 annotated.append(t)
                 continue
             print(f"[ai] thesis_reality_check: '{t.get('name')}' → {status} — {note}")

@@ -276,6 +276,12 @@ NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
 # thesis_reality_check) — едно допълнително извикване на ден, само анотация,
 # не пипа thesis status-а. Изходът е ≤6 кратки обекта, 1000 стигат с запас.
 THESIS_CHECK_MAX_TOKENS = int(os.getenv("THESIS_CHECK_MAX_TOKENS", 1000))
+# Минимална дължина на бележката при news_status="evolving" (виж
+# ai_brief.thesis_reality_check). "evolving" изисква да се назоват И ДВАТА пътя —
+# спрян оригинал И конкретна алтернатива — което не се побира в едно късо
+# твърдение. Кодът не може да провери семантиката, но може да отхвърли бележка,
+# която очевидно не носи двете. Праг, не гаранция.
+THESIS_EVOLVING_MIN_NOTE_CHARS = int(os.getenv("THESIS_EVOLVING_MIN_NOTE_CHARS", 80))
 # nitter е нестабилен — изключен по подразбиране (Поправка 4)
 NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
 NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]
