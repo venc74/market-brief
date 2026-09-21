@@ -1,37 +1,37 @@
 {
- "date": "2026-09-18",
+ "date": "2026-09-21",
  "news": [
   {
-   "headline": "BOJ raises interest rates to 31-year high, yen slumps after move",
-   "why": "BOJ вдигна лихвата с 25 bps до 1.25% при разделено гласуване 7-2, но йената парадоксално падна, което сигнализира за carry trade динамика и влияе върху глобалните валутни и equity позиции."
+   "headline": "Trump-Xi summit: Bessent нарече срещата с китайския вицепремиер He Lifeng 'успешна'",
+   "why": "Позитивният тон преди Trump-Xi срещата на 24 септември намалява trade war риска и подкрепя risk-on настроения в equity и FX пазарите."
   },
   {
-   "headline": "Fed raised rates by 25 bps, stocks posted best day in 6 weeks on Thursday",
-   "why": "Първото покачване на Fed от три години насам движи цялата крива на доходност и определя risk appetite за equity, bonds и emerging markets днес."
+   "headline": "Fed's Kashkari: инфлацията е все още твърде висока 'във всички аспекти' на икономиката",
+   "why": "Hawkish сигнал от Fed официален натиска очакванията за rate cuts и може да повлияе на Treasury yields и equity valuations."
   },
   {
-   "headline": "US mortgage rates brush 7%, straining housing market",
-   "why": "Ипотечните лихви близо до 7% потвърждават трансмисията на Fed policy в реалната икономика и натискат rate-sensitive сектори като homebuilders и REITs."
+   "headline": "Иран заплашва с 'болезнено' отмъщение, Strait of Hormuz остава затворен за трафик",
+   "why": "Ограниченият корабен трафик през Hormuz застрашава петролните доставки и поддържа волатилност в crude oil и energy акции."
   },
   {
-   "headline": "Oil prices fall for third day on hopes of limited Saudi supply disruptions despite Houthi strikes",
-   "why": "Тридневният спад в петрола облекчава инфлационния натиск и помогна на акциите вчера, но Saudi East-West Pipeline удар и Iran conflict без ясен endgame по JP Morgan поддържат геополитическа премия."
+   "headline": "QatarEnergy предупреди, че кризата с Hormuz може да забави някои разширителни проекти",
+   "why": "Потенциалното забавяне на LNG капацитет от Qatar засяга глобалните energy supply chain очаквания и цените на природния газ."
   },
   {
-   "headline": "Three pumping stations along Saudi East-West Pipeline hit in recent attack",
-   "why": "Директна атака върху Saudi петролна инфраструктура е ключов supply risk event, който може рязко да обърне текущия спад в цените на петрола."
+   "headline": "Китайски biopharma акции скочиха след новини, че САЩ може да запази достъпа за повечето drug licensing сделки",
+   "why": "Регулаторна/законодателна яснота относно Biosecure Act ограниченията директно движи сектора нагоре и е важна за DRUG/biotech позиции."
   },
   {
-   "headline": "JP Morgan says it has no clear oil market endgame as Iran conflict drags on",
-   "why": "JP Morgan открито заявява несигурност около oil price path, което е важен сигнал за петролния и по-широкия commodity пазар."
+   "headline": "SoftBank пуска облигации за над $10 млрд. за финансиране на инвестицията в OpenAI",
+   "why": "Мащабната дългова емисия засяга кредитните пазари и сигнализира за огромния апетит към AI капиталови разходи, което е важно за tech сектора."
   },
   {
-   "headline": "10-year Treasury yield breakout above 5.25% could hold back stocks",
-   "why": "Технически праг при 10Y yield е директен headwind за equity valuations — следи се в реално време след вчерашното Fed движение."
+   "headline": "Fed и BoE засилват проверките на банковата експозиция към trading firms след загуби при AI хедж фонд",
+   "why": "Регулаторният натиск върху prime brokers може да доведе до свиване на leverage в trading книгите и да засегне ликвидността на equity пазарите."
   },
   {
-   "headline": "Unemployment claims drop to 196,000, lowest since mid-July as layoffs remain low",
-   "why": "Силен labor market data потвърждава Fed hawkish narrative и намалява вероятността от пауза в цикъла на покачване на лихвите."
+   "headline": "Тарифи, горивни разходи и лихви притискат американските компании, особено производители и retailers",
+   "why": "Макро комбинацията от тарифен натиск и sticky inflation директно удря маржовете на корпоративния сектор и влияе на earnings очакванията."
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "date": "2026-09-18",
+ "date": "2026-09-21",
  "rows": [
   {
    "ticker": "FOX",
@@ -137,9 +137,9 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 388,
+  "tickers_with_filings": 366,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 149,
+  "raw_transactions_parsed": 133,
   "qualifying_after_filter": 13
  }
 }

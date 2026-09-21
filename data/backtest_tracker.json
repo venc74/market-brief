@@ -113,13 +113,14 @@
  "NBIX_2026-06-25": {
   "ticker": "NBIX",
   "entry_date": "2026-06-25",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 169.57,
   "target_1": 212.53,
   "stop_loss": 148.09,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-09-18",
+  "realized_r": -1.0,
+  "discovered_date": "2026-09-21"
  },
  "IRM_2026-06-25": {
   "ticker": "IRM",
@@ -550,6 +551,18 @@
   "entry_price": 99.92,
   "target_1": 122.54,
   "stop_loss": 88.61,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
+ },
+ "DXCM_2026-09-21": {
+  "ticker": "DXCM",
+  "entry_date": "2026-09-21",
+  "status": "open",
+  "entry_price": 92.59,
+  "target_1": 111.77,
+  "stop_loss": 83.0,
   "target1_hit_date": null,
   "resolution_date": null,
   "discovered_date": null,
