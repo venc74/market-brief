@@ -227,6 +227,31 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[d
     ciks_resolved = 0
     tickers_with_filings = 0
     submissions_fetch_errors = 0
+    # FIX 2026-09-21: дедупликация по accession номер.
+    #
+    # Универсът съдържа компании с два класа акции ПО ДВА ПЪТИ, а двата тикъра
+    # сочат към ЕДИН И СЪЩ CIK — потвърдено за трите двойки в текущия универс:
+    #   FOX / FOXA   -> 0001754301
+    #   GOOG / GOOGL -> 0001652044
+    #   NWS / NWSA   -> 0001564708
+    # Loop-ът обхожда тикъри, не CIK-ове, затова един и същи filing се теглеше
+    # и парсваше по веднъж за всеки тикър. А _parse_form4 връща ticker от
+    # issuerTradingSymbol (за FOXA също "FOX"), значи двата резултата попадаха
+    # в една група като ИДЕНТИЧНИ редове.
+    #
+    # Потвърдено в production: FOX/MURDOCH LACHLAN K, 2026-09-15, $10.27 млн се
+    # показваше два пъти (общо $20.5 млн) на 17, 18 и 21.09. Един filing в SEC
+    # (0001628280-26-062330), не двойно подаване.
+    #
+    # Не е регресия от commit — латентно от началото на модула; трите двойки
+    # просто нямаха квалифицираща покупка досега (FOXA/GOOG/GOOGL/NWS/NWSA не
+    # са се появявали в секцията нито веднъж).
+    #
+    # Дедупликацията е по accession, не по списък от известни CIK-ове:
+    # accession номерата са глобално уникални за filing, затова това покрива и
+    # бъдещи dual-class двойки без поддръжка на ръчен списък. Пропускането е
+    # ПРЕДИ fetch-а — спестява и дублиращата се SEC заявка.
+    seen_accessions: set[str] = set()
     for ticker in universe:
         cik = cik_map.get(ticker)
         if not cik:
@@ -240,6 +265,9 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[d
         if filings:
             tickers_with_filings += 1
         for accession, primary_doc in filings:
+            if accession in seen_accessions:
+                continue  # вече обработен под друг тикър на същия CIK
+            seen_accessions.add(accession)
             url = _form4_xml_url(cik, accession, primary_doc)
             if not url:
                 continue
@@ -270,7 +298,11 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[d
                     "value": txn["value"],
                 })
     return raw, {"ciks_resolved": ciks_resolved, "tickers_with_filings": tickers_with_filings,
-                "submissions_fetch_errors": submissions_fetch_errors}
+                "submissions_fetch_errors": submissions_fetch_errors,
+                # видимост за дедупликацията — колко уникални filings реално са
+                # обработени; ако dual-class двойка има filings, това число ще е
+                # по-малко от сумата на filings-ите по тикър, и това е коректно
+                "unique_filings_processed": len(seen_accessions)}
 
 
 # ──────────────────────────────────────────────────────────────────────────
