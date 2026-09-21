@@ -113,6 +113,42 @@ def _xml_text(el, path: str) -> str:
     return (node.text or "").strip() if node is not None else ""
 
 
+def _is_paired_transfer(buy_leg: dict, legs: list[dict]) -> bool:
+    """
+    FIX 2026-09-21 (Дефект 2): True ако този P крак има съответстващ S крак в
+    СЪЩИЯ filing — същата дата, същия брой акции, същата цена, и кодове
+    "disposed" → "acquired". Това не е покупка, а прехвърляне на собственост.
+
+    Потвърденият случай: FOX, MURDOCH LACHLAN K, 2026-09-15 —
+      крак 1: S, 149934 акции @ $68.53, A/D=D, пряка собственост,  дял след: 152
+      крак 2: P, 149934 акции @ $68.53, A/D=A, "By LKM Family Trust", дял: 1401713
+    Прякото държане пада от ~150 хиляди на 152 акции, тръстът получава точно
+    толкова. Нула нов капитал. Влизаше в брифа като най-голямата insider
+    покупка в цялата история на секцията ($10.27 млн).
+
+    Критерият е СЪЗНАТЕЛНО тесен. Първата интуиция — да се изключи индиректната
+    собственост (FOX записът е "I / By LKM Family Trust") — е ИЗМЕРЕНО грешна:
+    14 от 48 истински покупки в периода са индиректни, включително втората по
+    големина (INTC, $10 млн, "by Family Trust"). Купуването през семеен тръст е
+    нормален начин за реална покупка; разграничителят е СДВОЯВАНЕТО, не формата
+    на собственост.
+
+    Измерено срещу всички 49 P крака от 01.06.2026 за 16-те тикъра, минавали
+    през секцията: 1 попадение (точно FOX), 0 фалшиви. 2% по брой, но 18.8% по
+    стойност — явлението е рядко и голямо.
+    """
+    if buy_leg.get("acquired_disposed") != "A":
+        return False
+    return any(
+        s["code"] == "S"
+        and s["date"] == buy_leg["date"]
+        and abs(s["shares"] - buy_leg["shares"]) < 0.01
+        and abs(s["price"] - buy_leg["price"]) < 0.01
+        and s.get("acquired_disposed") == "D"
+        for s in legs
+    )
+
+
 def _parse_form4(xml_text: str) -> dict | None:
     """
     Парсва един Form 4 XML → {ticker, company, owners:[{name, title, is_officer}],
@@ -140,11 +176,13 @@ def _parse_form4(xml_text: str) -> dict | None:
         is_officer = (_xml_text(rel, "isOfficer") == "1") if rel is not None else False
         owners.append({"name": name, "title": title, "is_officer": is_officer})
 
-    transactions = []
+    # FIX 2026-09-21 (Дефект 2): първо СЕ ЧЕТАТ и двата вида крака, за да може
+    # да се засече сдвоен трансфер — виж _is_paired_transfer() по-долу.
+    legs = []
     for txn in root.findall("nonDerivativeTable/nonDerivativeTransaction"):
         code = _xml_text(txn, "transactionCoding/transactionCode")
-        if code != "P":
-            continue  # само open market purchase — виж docstring за изключените кодове
+        if code not in ("P", "S"):
+            continue  # виж docstring за изключените кодове (A/F/G/M и т.н.)
         date_s = _xml_text(txn, "transactionDate/value")
         shares_s = _xml_text(txn, "transactionAmounts/transactionShares/value")
         price_s = _xml_text(txn, "transactionAmounts/transactionPricePerShare/value")
@@ -156,8 +194,26 @@ def _parse_form4(xml_text: str) -> dict | None:
             continue
         if shares <= 0 or price <= 0:
             continue
-        transactions.append({"date": date, "shares": shares, "price": price,
-                             "value": shares * price})
+        legs.append({
+            "code": code, "date": date, "shares": shares, "price": price,
+            "value": shares * price,
+            "acquired_disposed": _xml_text(txn, "transactionAmounts/"
+                                           "transactionAcquiredDisposedCode/value"),
+            "ownership": _xml_text(txn, "ownershipNature/directOrIndirectOwnership/value"),
+            "nature": _xml_text(txn, "ownershipNature/natureOfOwnership/value"),
+        })
+
+    transactions = []
+    for leg in legs:
+        if leg["code"] != "P":
+            continue  # навън се връщат само покупки, точно както преди
+        transactions.append({
+            "date": leg["date"], "shares": leg["shares"], "price": leg["price"],
+            "value": leg["value"],
+            "internal_transfer": _is_paired_transfer(leg, legs),
+            "ownership": leg["ownership"],
+            "nature": leg["nature"],
+        })
 
     if not transactions:
         return None
@@ -296,6 +352,10 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[d
                     "shares": txn["shares"],
                     "price": txn["price"],
                     "value": txn["value"],
+                    # FIX 2026-09-21 (Дефект 2) — виж _is_paired_transfer()
+                    "internal_transfer": txn.get("internal_transfer", False),
+                    "ownership": txn.get("ownership", ""),
+                    "nature": txn.get("nature", ""),
                 })
     return raw, {"ciks_resolved": ciks_resolved, "tickers_with_filings": tickers_with_filings,
                 "submissions_fetch_errors": submissions_fetch_errors,
@@ -321,7 +381,18 @@ def _has_cluster(txns: list[dict], window_days: int, min_count: int) -> bool:
 
 def _build_rows(raw: list[dict], min_value: float,
                 cluster_window: int, cluster_min: int) -> list[dict]:
+    """
+    FIX 2026-09-21 (Дефект 2): сдвоените S+P трансфери се ИЗКЛЮЧВАТ от всички
+    агрегати — total_value, клъстер броенето и подредбата — но НЕ изчезват:
+    маркират се с internal_transfer=True и се показват като отделен, изрично
+    етикетиран ред под истинските покупки (виж шаблона).
+
+    Изключването от клъстер броенето е съществено, не козметично: клъстерът е
+    "3+ различни инсайдъри купуват за кратко" и прехвърляне между собствени
+    сметки не е покупка, значи не бива да помага на тикър да мине прага.
+    """
     qualifying = [t for t in raw if t["value"] >= min_value]
+    real = [t for t in qualifying if not t.get("internal_transfer")]
 
     by_ticker: dict[str, list[dict]] = {}
     for t in qualifying:
@@ -329,7 +400,9 @@ def _build_rows(raw: list[dict], min_value: float,
 
     rows = []
     for ticker, txns in by_ticker.items():
-        cluster = _has_cluster(txns, cluster_window, cluster_min)
+        # клъстерът се смята САМО върху реалните покупки за този тикър
+        cluster = _has_cluster([t for t in txns if not t.get("internal_transfer")],
+                               cluster_window, cluster_min)
         for t in txns:
             # основен сигнал = officer роля; директорска покупка влиза само
             # ако тикърът е потвърден cluster (role-agnostic бонус сигнал)
@@ -345,9 +418,17 @@ def _build_rows(raw: list[dict], min_value: float,
                 "price": t["price"],
                 "value": t["value"],
                 "cluster": cluster,
+                "internal_transfer": bool(t.get("internal_transfer")),
+                "ownership": t.get("ownership", ""),
+                "nature": t.get("nature", ""),
                 "in_screener": False,  # попълва се по-късно в main.py (виж модулния docstring)
             })
-    rows.sort(key=lambda r: r["value"], reverse=True)
+    # трансферите НЕ участват в подредбата по стойност — те не са сигнал
+    rows.sort(key=lambda r: (r["internal_transfer"], -r["value"]))
+    if any(r["internal_transfer"] for r in rows):
+        n = sum(1 for r in rows if r["internal_transfer"])
+        print(f"[insider] {n} сдвоен(и) S+P трансфер(а) изключен(и) от агрегатите "
+              "— показват се отделно като вътрешно преструктуриране")
     return rows
 
 
@@ -377,7 +458,22 @@ def _group_by_ticker(rows: list[dict]) -> list[dict]:
             "cluster": False,
             "in_screener": r.get("in_screener", False),
             "insiders": [],
+            # FIX 2026-09-21 (Дефект 2): сдвоените трансфери живеят в отделен
+            # списък, не в "insiders" — така total_value и cluster остават чисти,
+            # а информацията не се губи (виж _is_paired_transfer)
+            "transfers": [],
         })
+        if r.get("internal_transfer"):
+            g["transfers"].append({
+                "name": r["insider_name"],
+                "title": r["title"],
+                "date": r["transaction_date"],
+                "shares": r["shares"],
+                "value": r["value"],
+                "destination": r.get("nature") or ("индиректно държане"
+                                                   if r.get("ownership") == "I" else ""),
+            })
+            continue
         g["total_value"] += r["value"]
         g["cluster"] = g["cluster"] or r["cluster"]
         g["insiders"].append({
@@ -389,6 +485,7 @@ def _group_by_ticker(rows: list[dict]) -> list[dict]:
 
     for g in groups.values():
         g["insiders"].sort(key=lambda x: x["date"], reverse=True)
+        g["transfers"].sort(key=lambda x: x["date"], reverse=True)
 
     return sorted(groups.values(), key=lambda g: g["total_value"], reverse=True)
 

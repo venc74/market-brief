@@ -216,6 +216,11 @@
     letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
   .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
   .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
+  /* 2026-09-21: сдвоен S+P трансфер — изключен от агрегатите, но видим */
+  .si-transfer { margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--line); }
+  .si-transfer-head { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
+                      color: var(--yellow); }
+  .si-transfer-row { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
   .si-card.exit { border-left: 3px solid var(--red); }
   .si-pct { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
   .si-pct.new { color: var(--green); }
@@ -970,15 +975,29 @@
     <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
       <div class="si-top">
         <span class="si-sym">{{ i.ticker }}</span>
-        <span class="si-val">{{ (i.total_value)|money_short }}</span>
+        {# само трансфери, нула реални покупки → "—", не подвеждащо "$0" #}
+        <span class="si-val">{{ (i.total_value)|money_short if i.insiders else "—" }}</span>
       </div>
       <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
       {% if i.cluster %}<div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>{% endif %}
+      {% if i.insiders %}
       <ul class="tight" style="margin-top:6px">
         {% for ins in i.insiders %}
         <li>{{ ins.name }}{% if ins.title %} ({{ ins.title }}){% endif %} — {{ ins.date }} — {{ ins.value|money_short }}</li>
         {% endfor %}
       </ul>
+      {% endif %}
+      {% if i.transfers %}
+      <div class="si-transfer">
+        <div class="si-transfer-head">🔄 Вътрешно преструктуриране, не нов капитал</div>
+        {% for t in i.transfers %}
+        <div class="si-transfer-row">{{ t.name }}{% if t.title %} ({{ t.title }}){% endif %}
+          — {{ t.date }} — {{ "{:,.0f}".format(t.shares) }} акции
+          ({{ t.value|money_short }}){% if t.destination %} към {{ t.destination }}{% endif %}.
+          Прехвърляне между собствени сметки — не влиза в сумата по-горе.</div>
+        {% endfor %}
+      </div>
+      {% endif %}
       {% if i.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
     {% endfor %}
