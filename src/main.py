@@ -53,6 +53,48 @@ def _live_positions() -> dict[str, dict]:
         return {}
 
 
+_RESOLUTION_BG = {
+    "stopped": "стоп",
+    "trailing_stop_exit": "trailing изход",
+    "expired": "изтекла по време",
+    "expired_in_trail": "изтекла в trail",
+}
+
+
+def _last_resolved_positions() -> dict[str, dict]:
+    """
+    FIX 2026-09-22: тикър → НАЙ-СКОРОШНАТА приключила позиция от tracker-а.
+
+    Нужен е заради страничен ефект на фикса от 17.09. Дотогава
+    resolve_positions_only() се случваше в края на pipeline-а, затова
+    apply_hard_rules() четеше ПРЕДрезолюционния tracker: тикър, приключил в
+    този run, още изглеждаше жив, получаваше OPEN✓ и отиваше във Watchlist.
+    След преместването на резолюцията по-рано (за COT контекста) той вече не е
+    жив на този етап и може да получи пълен Action план с нов риск — в същия
+    run, в който предишната му позиция е приключила.
+
+    Съзнателно БЕЗ времеви прозорец. Измерено срещу всичките 30 дневни run-а:
+    маркерът би гръмнал общо 2 пъти (ANET на 05.08, 19 дни след стоп; AVT на
+    14.09, 25 дни след стоп) — и двата са легитимни повторни входове. Прозорец
+    от 5 или 10 дни би дал 0 попадения, т.е. само би добавил произволно число
+    без да променя нищо. Показваме датата и изхода, юзърът преценява
+    релевантността сам.
+    """
+    try:
+        tracker = backtest._load_tracker()
+        out: dict[str, dict] = {}
+        for rec in tracker.values():
+            if rec.get("realized_r") is None or not rec.get("resolution_date"):
+                continue
+            cur = out.get(rec["ticker"])
+            if cur is None or rec["resolution_date"] > cur["resolution_date"]:
+                out[rec["ticker"]] = rec
+        return out
+    except Exception as e:
+        print(f"[main] resolved positions check failed: {e}")
+        return {}
+
+
 def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list, list]:
     """
     Твърдите правила от Секция 8, наложени СЛЕД AI класификацията —
@@ -61,6 +103,8 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
     action, watchlist = [], []
     sector_count: dict[str, int] = {}
     live = _live_positions() if config.ENABLE_BACKTEST else {}
+    closed = _last_resolved_positions() if config.ENABLE_BACKTEST else {}
+    today = dt.date.today().isoformat()
 
     for c in candidates:
         # FIX 2026-07-15: тикър с жива позиция НЕ получава нов Action план
@@ -86,6 +130,50 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
                 f"Вече в портфейла от {rec.get('entry_date')} "
                 f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
                 "потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.")
+        else:
+            # FIX 2026-09-22: тикърът НЯМА жива позиция, но може да е имал
+            # такава, която току-що е приключила. Виж _last_resolved_positions()
+            # за пълния rationale. Само при липса на жива позиция — иначе
+            # OPEN✓ по-горе вече казва същественото и този маркер е шум.
+            prev = closed.get(c.get("ticker"))
+            if prev:
+                outcome = _RESOLUTION_BG.get(prev.get("status"), prev.get("status") or "?")
+                r = prev.get("realized_r")
+                detail = (f"Предишна позиция от {prev.get('entry_date')} "
+                          f"приключи на {prev.get('resolution_date')} "
+                          f"({outcome}{f', {r:+.1f}R' if r is not None else ''}).")
+                if prev.get("resolution_date") == today:
+                    # Ръб на консистентността, НЕ търговска преценка: Track
+                    # Record-ът няма да запише този вход като отделна сделка —
+                    # _is_continuation() го третира като продължение, защото
+                    # датата му попада в [entry_date, resolution_date] на току-що
+                    # приключилата позиция. Ако въпреки това дадем Action план с
+                    # реален риск, брифът ще показва план, който системата не
+                    # проследява. На практика редки: run-ът е 05:30 UTC, преди
+                    # US отваряне, затова resolution_date е винаги ≤ вчера
+                    # (потвърдено: 0 от 14 резолюции носят днешна дата).
+                    c.setdefault("markers", []).append({
+                        "tag": "ЗАТВОРЕНА ДНЕС",
+                        "title": f"{detail} Нов вход в същия ден не се планира.",
+                    })
+                    c.setdefault("ai", {})
+                    c["ai"]["classification"] = "Watchlist"
+                    c["ai"]["watchlist_reason_type"] = "other"
+                    c["ai"]["watchlist_trigger"] = (
+                        f"{detail} Нов вход в СЪЩИЯ ден не се планира — Track "
+                        "Record-ът не може да го запише като отделна сделка. "
+                        "Ако сетъпът е валиден, ще се прецени утре.")
+                else:
+                    c.setdefault("markers", []).append({
+                        "tag": "RE-ENTRY",
+                        "title": f"{detail} Това е НОВ вход, не продължение.",
+                    })
+                    c["prev_position"] = {
+                        "entry_date": prev.get("entry_date"),
+                        "resolution_date": prev.get("resolution_date"),
+                        "outcome": outcome,
+                        "realized_r": r,
+                    }
         cls = c.get("ai", {}).get("classification", "Watchlist")
         sector = c.get("sector", "Unknown")
 
