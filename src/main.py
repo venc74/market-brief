@@ -33,6 +33,7 @@ from src import short_screener
 from src import short_tracker
 from src import watchlist_expiry
 from src import watch_monitor
+from src import model_selector
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -207,6 +208,19 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
 def run() -> dict:
     today = dt.date.today().isoformat()
     print(f"═══ AI Инвестиционен Бриф · {today} ═══")
+
+    # Кой Claude модел ползваме днес — ВЕДНЪЖ, преди всяка AI стъпка. Резултатът
+    # се присвоява на config.CLAUDE_MODEL и се наследява от всички извиквания,
+    # защото _call_claude чете конфигурацията при всяко извикване. Виж
+    # model_selector.resolve_model() за escape hatch / probe / fallback реда.
+    model_info = {"model": config.CLAUDE_MODEL, "source": "static",
+                  "rejected": None, "rejected_reason": "", "banner": {}}
+    try:
+        model_info = model_selector.resolve_model(today)
+        config.CLAUDE_MODEL = model_info["model"]
+    except Exception as e:
+        print(f"[model] resolve_model се провали изцяло, оставам на "
+              f"{config.CLAUDE_MODEL}: {e}")
 
     print("[1/7] Слой 1: макро контекст…")
     macro = collect_macro_layer()
@@ -440,6 +454,7 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         "ai_macro": ai_macro,
+        "model_info": model_info,
         "watch": watch_rows,
         "action": action,
         "watchlist": watchlist,

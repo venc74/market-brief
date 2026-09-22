@@ -75,6 +75,7 @@ def render_dashboard(brief: dict) -> str:
         # v2 нови блокове
         theses=brief.get("theses", []),
         watch=brief.get("watch", []),
+        model_info=brief.get("model_info", {}),
         unusual_options=brief.get("unusual_options", []),
         splits=brief.get("splits", []),
         superinvestor_moves=brief.get("superinvestor_moves", []),

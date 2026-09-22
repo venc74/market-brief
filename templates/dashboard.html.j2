@@ -114,6 +114,12 @@
     border-top: 1px dotted var(--line); padding-top: 8px; }
 
   /* ── v2: convergence маркери ── */
+  /* 2026-09-23: смяна на AI модела / отхвърлен модел — най-горе в брифа */
+  .model-banner { font-size: 13px; color: var(--yellow); background: rgba(251,191,36,.10);
+                  border: 1px solid rgba(251,191,36,.35); border-radius: 8px;
+                  padding: 10px 14px; margin-bottom: 14px; }
+  .model-banner.rejected { color: var(--red); background: rgba(248,113,113,.10);
+                           border-color: rgba(248,113,113,.35); }
   /* 2026-09-22: предишна позиция в същия тикър е приключила — виж
      main._last_resolved_positions(). Видим ред, не само marker tooltip:
      новият план носи реален риск в име, което току-що е струвало пари. */
@@ -363,6 +369,17 @@
 </header>
 
 <div class="wrap">
+
+{% if model_info and model_info.banner %}
+<div class="model-banner">⚠ AI моделът се смени от <strong>{{ model_info.banner.from }}</strong>
+  на <strong>{{ model_info.banner.to }}</strong> — следващите дни следим за промени
+  в поведението (ден {{ model_info.banner.day }} от {{ model_info.banner.of }}).</div>
+{% endif %}
+{% if model_info and model_info.rejected %}
+<div class="model-banner rejected">⛔ Моделът <strong>{{ model_info.rejected }}</strong> беше
+  отхвърлен при проверката и брифът е генериран с <strong>{{ model_info.model }}</strong>.
+  Причина: {{ model_info.rejected_reason }}</div>
+{% endif %}
 
 <section>
   <h2>Пазарен термометър</h2>

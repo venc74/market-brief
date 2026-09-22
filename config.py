@@ -76,7 +76,20 @@ EMAIL_TO = os.getenv("EMAIL_TO", "")
 DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://venc74.github.io/market-brief/")
 
 # ── Claude модел ──────────────────────────────────────────────────────────
+# CLAUDE_MODEL е РАБОТНАТА стойност — model_selector.resolve_model() я
+# презаписва в началото на всеки run, а _call_claude я чете при всяко
+# извикване, така че всички AI стъпки наследяват избора автоматично.
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+# Изрично зададен env → печели, discovery не се пуска (escape hatch при
+# проблем с нов модел: една променлива в workflow-а, без code промяна).
+CLAUDE_MODEL_PINNED = os.getenv("CLAUDE_MODEL") is not None
+# Известният работещ модел. Използва се при всеки провал — недостъпен Models
+# API, празен списък, паднал probe.
+CLAUDE_MODEL_FALLBACK = os.getenv("CLAUDE_MODEL_FALLBACK", "claude-sonnet-4-6")
+MODEL_AUTO_SELECT = os.getenv("MODEL_AUTO_SELECT", "1") == "1"
+# Колко ПОСЛЕДОВАТЕЛНИ run-а стои банерът след смяна на модела.
+MODEL_BANNER_RUNS = int(os.getenv("MODEL_BANNER_RUNS", 5))
+MODEL_PROBE_MAX_TOKENS = int(os.getenv("MODEL_PROBE_MAX_TOKENS", 16))
 
 # ── AI batch синтез (ticker_narratives) ───────────────────────────────────
 # Per-ticker наративите се правят на batch-ове, а не в едно извикване, защото
