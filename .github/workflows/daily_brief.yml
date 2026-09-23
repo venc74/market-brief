@@ -31,6 +31,12 @@ jobs:
       - name: Run the brief
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # АВАРИЕН КЛЮЧ, 2026-09-23: закотвен на доказания модел. Първият run на
+          # claude-sonnet-5 (23.09) излезе видимо повреден и ~1.8-1.9x по-скъп в
+          # токени. Изрично зададеният CLAUDE_MODEL печели над динамичния избор и
+          # изключва discovery-то изцяло (виж model_selector.resolve_model).
+          # Махни този ред, за да се върне автоматичният избор.
+          CLAUDE_MODEL: claude-sonnet-4-6
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           NASDAQ_API_KEY: ${{ secrets.NASDAQ_API_KEY }}
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
