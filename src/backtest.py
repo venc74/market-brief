@@ -295,50 +295,123 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
 
         entry_dt = pd.Timestamp(rec["entry_date"])
         entry_cutoff = entry_dt.date() + dt.timedelta(weeks=config.BACKTEST_MAX_HOLD_WEEKS)
-        if today >= entry_cutoff and len(c):
-            last_close = float(c.iloc[-1])
+        # FIX 2026-09-23: последният ВАЛИДЕН Close, не .iloc[-1] на суровата
+        # серия. Единственият call site вече подава closes.dropna(), така че
+        # в текущия път NaN не може да стигне дотук — това е защита в
+        # дълбочина, за да не зависи коректността на функцията от извикващия.
+        # Контекст: на 23.09 Yahoo върна частичен бар (Close = NaN).
+        valid = c.dropna()
+        if today >= entry_cutoff and len(valid):
+            last_close = float(valid.iloc[-1])
             rec["status"] = "expired_in_trail"
             rec["resolution_date"] = entry_cutoff.isoformat()
             rec["discovered_date"] = today.isoformat()
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
-def _split_since_entry(ticker: str, entry_date: str) -> dict | None:
+def _unapplied_splits(rec: dict) -> list[dict] | None:
     """
-    FIX 2026-08-11 (MNST split артефакт): проверява дали ticker е претърпял
-    split между entry_date и днес. yfinance ретроактивно split-adjust-ва
-    ЦЯЛАТА историческа OHLC серия при всяко теглене, независимо от
-    auto_adjust=True/False (потвърдено емпирично — идентични стойности и
-    при двата флага за дати преди split) — stop_loss/target_1/entry_price
-    остават замразени в ценовата скала от момента на entry-то, докато
-    всяко следващо теглене на историята връща различно мащабирани
-    стойности за СЪЩИТЕ исторически дати. Сравнение на замразен stop_loss
-    срещу динамично прещъртани цени произвежда фалшива резолюция —
-    потвърден случай: MNST_2026-07-02, 2-за-1 split на 11.08.2026,
-    фалшив "stopped" с resolution_date само 4 дни след entry (докато
-    реалната, тогава-текуща цена никога не е доближавала stop_loss-а).
+    FIX 2026-09-23: ВСИЧКИ сплитове след entry, които още НЕ са приложени към
+    този запис. `None` при провал на fetch-а (различимо от "няма сплитове" = []).
+    Замества _split_since_entry (FIX 2026-08-11), който връщаше само първия
+    сплит и водеше до замразяване без срок.
 
-    Скоуп нарочно тесен: само детекция + флаг, НЕ retroactive price
-    rescaling — по-безопасният от двата подхода, обсъдени с потребителя.
+    Историята (от FIX 2026-08-11): yfinance ретроактивно split-коригира ЦЯЛАТА
+    историческа OHLC серия при всяко теглене, независимо от auto_adjust
+    (потвърдено емпирично), докато stop_loss/target_1/entry_price остават в
+    ценовата скала от момента на entry-то. Сравнение на замразен стоп срещу
+    прещъртани цени дава фалшива резолюция — потвърден случай MNST_2026-07-02,
+    2:1 сплит на 11.08.2026, фалшив "stopped" 4 дни след entry.
 
-    Graceful: провал на fetch → None (по-безопасно да продължи нормалната
-    резолюция, отколкото да блокира всичко при мрежов проблем).
+    Филтрирането по вече приложените е задължително: сплитът остава "след entry"
+    завинаги, така че без него вторият run би разделил entry-то на коефициента
+    втори път.
     """
     try:
-        splits = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).splits)
-        if splits is None or splits.empty:
-            return None
-        entry_ts = pd.Timestamp(entry_date)
-        if entry_ts.tzinfo is None and splits.index.tz is not None:
-            entry_ts = entry_ts.tz_localize(splits.index.tz)
-        since_entry = splits[splits.index > entry_ts]
-        if since_entry.empty:
-            return None
-        split_date = since_entry.index[0]
-        return {"date": split_date.date().isoformat(), "ratio": float(since_entry.iloc[0])}
+        splits = net_utils.fetch_with_timeout(lambda: yf.Ticker(rec["ticker"]).splits)
     except Exception as e:
-        print(f"[backtest] split check {ticker}: {e}")
+        print(f"[backtest] split check {rec['ticker']}: {e}")
         return None
+    if splits is None:
+        return None
+    if splits.empty:
+        return []
+    entry_ts = pd.Timestamp(rec["entry_date"])
+    if entry_ts.tzinfo is None and splits.index.tz is not None:
+        entry_ts = entry_ts.tz_localize(splits.index.tz)
+    applied = {s["date"] for s in (rec.get("split_adjusted") or {}).get("splits", [])}
+    return [{"date": d.date().isoformat(), "ratio": float(r)}
+            for d, r in splits[splits.index > entry_ts].items()
+            if d.date().isoformat() not in applied and float(r) > 0]
+
+
+def _apply_split_adjustment(rec: dict, splits: list[dict], closes: "pd.Series",
+                            today: dt.date) -> bool:
+    """
+    FIX 2026-09-23: вместо да замразява позицията завинаги, коригира entry /
+    stop / target по кумулативния коефициент на сплитовете. True → записът е
+    коригиран и може да се резолвира нормално; False → остава във флаг.
+
+    Защо корекцията е вярна: yfinance split-коригира ЦЯЛАТА историческа OHLC
+    серия ретроактивно (потвърдено 11.08, виж _unapplied_splits), така че
+    всички барове вече са в новата скала — замразените нива просто трябва да
+    се преместят в нея.
+
+    Санитарна проверка, преди да се приложи: коригираният entry се сравнява със
+    split-коригирания Close на entry деня. Минава само ако (а) е в границата
+    config.SPLIT_SANITY_MAX_DEV И (б) е по-близо от НЕкоригирания. (б) пази
+    сляпото място на (а): за малки коефициенти (напр. 1.05 — stock dividend,
+    който Yahoo записва като сплит) и двата варианта попадат в 15%, и само
+    сравнението между тях показва коя скала е историята. Ако проверката падне
+    — историята още не е коригирана и корекцията би била грешна; записът
+    остава флагнат и се преразглежда при всеки следващ run.
+
+    Оригиналните стойности се пазят в split_adjusted.original (само веднъж —
+    при първата корекция) за одит.
+    """
+    ratio = 1.0
+    for s in splits:
+        ratio *= s["ratio"]
+    entry = rec["entry_price"]
+    hist = closes[closes.index >= pd.Timestamp(rec["entry_date"])]
+    prev_flag = rec.get("needs_manual_review") or {}
+    since = prev_flag.get("since") or prev_flag.get("split_date") or today.isoformat()
+
+    def flag(reason: str, sanity: dict | None = None) -> bool:
+        rec["needs_manual_review"] = {
+            "reason": reason, "split_date": splits[0]["date"], "split_ratio": ratio,
+            "since": since, **({"sanity": sanity} if sanity else {}),
+        }
+        print(f"[backtest] {rec['ticker']}: split {ratio:g}:1 — корекцията НЕ е приложена "
+              f"({reason}), остава needs_manual_review от {since}")
+        return False
+
+    if hist.empty:
+        return flag("no_history_at_entry")
+    hist_close = float(hist.iloc[0])
+    adj = entry / ratio
+    dev_adj = abs(adj - hist_close) / hist_close
+    dev_raw = abs(entry - hist_close) / hist_close
+    sanity = {"hist_close": round(hist_close, 4), "dev_adjusted": round(dev_adj, 4),
+              "dev_unadjusted": round(dev_raw, 4)}
+    if not (dev_adj <= config.SPLIT_SANITY_MAX_DEV and dev_adj < dev_raw):
+        return flag("split_sanity_failed", sanity)
+
+    sa = rec.setdefault("split_adjusted", {
+        "original": {"entry_price": entry, "stop_loss": rec["stop_loss"],
+                     "target_1": rec["target_1"]},
+        "splits": [],
+    })
+    sa["splits"] += [{**s, "applied_on": today.isoformat()} for s in splits]
+    sa["sanity"] = sanity
+    rec["entry_price"] = round(entry / ratio, 4)
+    rec["stop_loss"] = round(rec["stop_loss"] / ratio, 4)
+    rec["target_1"] = round(rec["target_1"] / ratio, 4)
+    rec.pop("needs_manual_review", None)
+    print(f"[backtest] {rec['ticker']}: split {ratio:g}:1 — коригирано автоматично "
+          f"(entry {entry} → {rec['entry_price']}, разлика спрямо историята "
+          f"{dev_adj * 100:.1f}% при {dev_raw * 100:.1f}% некоригирано)")
+    return True
 
 
 def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
@@ -381,26 +454,28 @@ def _resolve_open_positions(tracker: dict) -> None:
     today = dt.date.today()
     for _, rec in live_items:
         ticker = rec["ticker"]
-        # FIX 2026-08-11: веднъж флагнат, записът остава в needs_manual_review
-        # до ръчно изчистване — не пипаме split проверката отново всеки run,
-        # и НЕ позволяваме на транзиентен провал на split fetch-а да го
-        # плъзне обратно в автоматична резолюция.
-        if rec.get("needs_manual_review"):
-            continue
         if ticker not in getattr(highs, "columns", []):
             print(f"[backtest] {ticker}: няма данни в batch резултата — пропускам (остава {rec['status']})")
             continue
-        split = _split_since_entry(ticker, rec["entry_date"])
-        if split:
-            rec["needs_manual_review"] = {
-                "reason": "split_detected",
-                "split_date": split["date"],
-                "split_ratio": split["ratio"],
-            }
-            print(f"[backtest] {ticker}: split {split['ratio']:.0f}:1 на {split['date']} след "
-                  f"entry ({rec['entry_date']}) — пропускам автоматична резолюция, "
-                  "needs_manual_review")
-            continue
+        # FIX 2026-09-23: сплит → автоматична корекция със санитарна проверка,
+        # вместо замразяване завинаги (виж _apply_split_adjustment). Дотук
+        # флагнат запис се прескачаше при всеки run без срок и без напомняне —
+        # MNST стоя 43 дни "отворена", макар да е пробила коригирания си стоп
+        # на 09.09. Флагнатите записи вече се преразглеждат всеки run.
+        new_splits = _unapplied_splits(rec)
+        if new_splits is None:
+            # Провал на split fetch-а. Флагнат запис остава флагнат (не бива
+            # транзиентна мрежова грешка да го плъзне в резолюция в грешна
+            # скала); нефлагнат продължава нормално, както и преди.
+            if rec.get("needs_manual_review"):
+                continue
+        elif new_splits:
+            if not _apply_split_adjustment(rec, new_splits, closes[ticker].dropna(), today):
+                continue
+        elif rec.get("needs_manual_review"):
+            continue  # флаг без видим неприложен сплит — консервативно остава
+        # FIX 2026-09-23: `discovered_date` се слага при резолюцията както винаги
+        # — корекция днес + стоп в миналото = late_discovery в брифа (MNST).
         try:
             _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
                               closes[ticker].dropna(), today)
@@ -590,13 +665,23 @@ def get_backtest_summary() -> dict:
             # на 10.08.2026, unrealized_pct=-0.0 в реалния persisted JSON). "+ 0.0"
             # нормализира -0.0 → 0.0 на източника, не само козметично в темплейта.
             # FIX 2026-08-11: needs_manual_review означава entry_price е замразен
-            # в предишна ценова скала (split-artifact, виж _split_since_entry) —
+            # в предишна ценова скала (split-artifact, виж _unapplied_splits) —
             # unrealized_pct спрямо текущата (нова-скала) цена би бил също толкова
             # подвеждащ, колкото самата автоматична резолюция, която този флаг
             # съществува да предотврати. Потискаме изчислението, не само текста.
             needs_review = r.get("needs_manual_review")
             unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1) + 0.0
                               if (cur is not None and entry_price and not needs_review) else None)
+            # FIX 2026-09-23: видим брояч за всичко, което остане във флаг —
+            # дотук флагът нямаше нито срок, нито напомняне. Стари флагове без
+            # `since` броят от датата на сплита.
+            if needs_review:
+                since = needs_review.get("since") or needs_review.get("split_date")
+                try:
+                    needs_review = {**needs_review, "frozen_days":
+                                    (today - dt.date.fromisoformat(since)).days}
+                except (TypeError, ValueError):
+                    pass
             open_positions.append({
                 "ticker": r["ticker"],
                 "entry_date": r["entry_date"],

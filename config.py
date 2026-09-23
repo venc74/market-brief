@@ -557,6 +557,15 @@ DISTRIBUTION_DAYS_RED = int(os.getenv("DISTRIBUTION_DAYS_RED", 9))
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
 BACKTEST_MAX_HOLD_WEEKS = int(os.getenv("BACKTEST_MAX_HOLD_WEEKS", 16))
+# Санитарна проверка при автоматична split корекция (backtest._apply_split_adjustment):
+# коригираният entry трябва да е в тази граница от split-коригирания Close на
+# entry деня в историята на yfinance — иначе историята още не е коригирана и
+# корекцията би била грешна. Калибрирано срещу 48 записа без сплит (23.09):
+# натуралното разминаване entry↔Close е медиана 1.76%, p99 6.52%, макс 8.21%
+# (entry е средата на плановата зона, не Close-ът). Най-малкият реален сплит
+# (5:4) дава 25%. 15% стои по средата на празнината 8.2%→25% — ~1.8× над
+# най-лошия наблюдаван шум, и под най-малкия реален сплит.
+SPLIT_SANITY_MAX_DEV = float(os.getenv("SPLIT_SANITY_MAX_DEV", 0.15))
 
 # ── GLB (Green Line Breakout) — Classic/Momentum ATH пробив скрийнър ──────
 # Вдъхновено от Eric Wish (wishingwealthblog.com) методологията, ПРЕРАБОТЕНО

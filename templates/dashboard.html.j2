@@ -910,7 +910,8 @@
           {% if p.needs_manual_review %}
           <td class="n pct" style="color:var(--yellow)"
               title="{{ p.needs_manual_review.reason }} · {{ p.needs_manual_review.split_ratio|int }}:1 split на {{ p.needs_manual_review.split_date }}">
-            ⚠ split — нужен ръчен преглед
+            ⚠ split — нужен ръчен преглед{% if p.needs_manual_review.frozen_days is defined %}
+            · замразена от {{ p.needs_manual_review.frozen_days }} дни{% endif %}
           </td>
           {% else %}
           <td class="n pct">{% if p.unrealized_pct is not none %}{{ '+' if p.unrealized_pct >= 0 else '' }}{{ p.unrealized_pct }}%{% else %}—{% endif %}</td>
