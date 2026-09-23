@@ -1,6 +1,6 @@
 {
-  "model": "opus",
+  "model": "claude-opus-5-5",
   "env": {
-    "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5"
   }
 }

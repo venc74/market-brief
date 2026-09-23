@@ -375,6 +375,14 @@
   на <strong>{{ model_info.banner.to }}</strong> — следващите дни следим за промени
   в поведението (ден {{ model_info.banner.day }} от {{ model_info.banner.of }}).</div>
 {% endif %}
+{% if ai_truncations %}
+<div class="model-banner rejected">✂ <strong>Отрязан AI отговор</strong> — следните секции
+  са непълни или празни, защото моделът е достигнал лимита си за изход:
+  <ul class="tight" style="margin:6px 0 0 18px">
+  {% for t in ai_truncations %}<li><strong>{{ t.section }}</strong> — лимит {{ t.max_tokens }}
+    токена ({{ t.model }})</li>{% endfor %}
+  </ul></div>
+{% endif %}
 {% if model_info and model_info.rejected %}
 <div class="model-banner rejected">⛔ Моделът <strong>{{ model_info.rejected }}</strong> беше
   отхвърлен при проверката и брифът е генериран с <strong>{{ model_info.model }}</strong>.
@@ -673,6 +681,14 @@
       <span class="ticker">{{ st.ticker }}</span>
       <span class="company">{{ st.company }}</span>
       {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
+      {# FIX 2026-09-23: маркерът RE-ENTRY пътува и до Watchlist картите
+         (слага се в apply_hard_rules ПРЕДИ класификацията), но обясняващият ред
+         беше само в Action шаблона — FTNT на 23.09 показа таг без обяснение. #}
+      {% if st.prev_position %}
+      <div class="re-entry" style="margin:6px 0 4px">↻ Предишна позиция от {{ st.prev_position.entry_date }}
+        приключи на {{ st.prev_position.resolution_date }} ({{ st.prev_position.outcome }}{% if st.prev_position.realized_r is not none %},
+        {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
+      {% endif %}
       <p>{{ st.ai.why_now }}</p>
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}
         · зона ${{ (st.pivot * 0.98)|round(2) }}–${{ (st.pivot * 1.02)|round(2) }}</div>

@@ -131,6 +131,14 @@ def _is_stale(last_ts) -> bool:
     return (dt.date.today() - last_date).days > config.STALENESS_THRESHOLD_DAYS
 
 
+def _nan_last_close(hist) -> bool:
+    """True ако последният Close е NaN (частичен бар от Yahoo — виж 23.09)."""
+    try:
+        return math.isnan(float(hist["Close"].iloc[-1]))
+    except (TypeError, ValueError, IndexError, KeyError):
+        return True
+
+
 def move_index() -> dict:
     """
     ICE BofA MOVE Index — имплицитна волатилност на UST (2/5/10/30г опции).
@@ -148,6 +156,13 @@ def move_index() -> dict:
             raise ValueError(f"stale data — последен ред {hist.index[-1].date()}")
         val = float(hist["Close"].iloc[-1])
         week_ago = float(hist["Close"].iloc[-6])
+        # FIX 2026-09-23: NaN тук е ПО-ЛОШ от видимия "nan" при IEI/HYG.
+        # Сравненията с NaN са винаги False, затова статусът пада в else-клона
+        # → "red" — фалшив червен, който влиза в броенето за режима ("2
+        # червени → Defensive, 3+ → Cash"). Hard override-ът не е засегнат
+        # (`move_val > 150` с NaN е False), но броенето е.
+        if math.isnan(val) or math.isnan(week_ago):
+            raise ValueError(f"NaN Close — последен ред {hist.index[-1].date()}")
         delta = val - week_ago
         spike = delta >= config.MOVE_SPIKE_WEEKLY_DELTA
 
@@ -194,6 +209,11 @@ def vix_term_structure() -> dict:
         vix9d = float(hist9d["Close"].iloc[-1])
         vix_mid = float(hist_mid["Close"].iloc[-1])
         vix3m = float(hist3m["Close"].iloc[-1])
+        # FIX 2026-09-23: `not vix9d` НЕ хваща NaN — NaN е truthy. Без тази
+        # проверка ratio=NaN пада в else-клона → "backwardation — остър стрес",
+        # фалшив червен, който влиза в броенето за режима (виж move_index).
+        if any(math.isnan(v) for v in (vix9d, vix_mid, vix3m)):
+            raise ValueError(f"NaN Close — VIX9D {vix9d} / VIX {vix_mid} / VIX3M {vix3m}")
         if not vix9d or not vix3m:
             raise ValueError("insufficient VIX9D/VIX3M data")
         ratio = vix9d / vix3m
@@ -305,6 +325,14 @@ def credit_spread_proxy() -> dict:
             raise ValueError("insufficient IEI/HYG history")
         if _is_stale(iei.index[-1]) or _is_stale(hyg.index[-1]):
             raise ValueError(f"stale data — IEI {iei.index[-1].date()} / "
+                             f"HYG {hyg.index[-1].date()}")
+        # FIX 2026-09-23: трети случай, който двете проверки по-горе не хващат —
+        # непразен frame със СВЕЖ индекс, но NaN в Close. Потвърдено на 23.09:
+        # Yahoo върна частичен бар за 22.09 (High/Low налични, Close = NaN), и
+        # индикаторът излезе като видим "nan" вместо скрит. Случвало се е и на
+        # 04.09. NaN = липсващи данни → hide, както при празен/застоял frame.
+        if _nan_last_close(iei) or _nan_last_close(hyg):
+            raise ValueError(f"NaN Close в последния ред — IEI {iei.index[-1].date()} / "
                              f"HYG {hyg.index[-1].date()}")
 
         common = iei.index.intersection(hyg.index)

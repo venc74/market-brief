@@ -213,6 +213,9 @@ def run() -> dict:
     # се присвоява на config.CLAUDE_MODEL и се наследява от всички извиквания,
     # защото _call_claude чете конфигурацията при всяко извикване. Виж
     # model_selector.resolve_model() за escape hatch / probe / fallback реда.
+    # FIX 2026-09-23: чисти записи за отрязвания и usage за ТОЗИ run.
+    ai_brief.TRUNCATIONS.clear()
+    ai_brief.AI_USAGE.clear()
     model_info = {"model": config.CLAUDE_MODEL, "source": "static",
                   "rejected": None, "rejected_reason": "", "banner": {}}
     try:
@@ -455,6 +458,11 @@ def run() -> dict:
         "rotation": rotation,
         "ai_macro": ai_macro,
         "model_info": model_info,
+        # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
+        # usage по извикване (единственият достъпен източник на реални token
+        # числа — Actions логът иска автентикация)
+        "ai_truncations": list(ai_brief.TRUNCATIONS),
+        "ai_usage": list(ai_brief.AI_USAGE),
         "watch": watch_rows,
         "action": action,
         "watchlist": watchlist,

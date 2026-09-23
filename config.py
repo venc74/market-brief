@@ -86,10 +86,26 @@ CLAUDE_MODEL_PINNED = os.getenv("CLAUDE_MODEL") is not None
 # Известният работещ модел. Използва се при всеки провал — недостъпен Models
 # API, празен списък, паднал probe.
 CLAUDE_MODEL_FALLBACK = os.getenv("CLAUDE_MODEL_FALLBACK", "claude-sonnet-4-6")
-MODEL_AUTO_SELECT = os.getenv("MODEL_AUTO_SELECT", "1") == "1"
+# FIX 2026-09-23 (политика): ИЗКЛЮЧЕН по подразбиране. Първият автоматичен
+# избор (claude-sonnet-5, 23.09) излезе повреден и по-скъп — новият модел
+# включва adaptive thinking по подразбиране и ползва нов tokenizer (~30% повече
+# токени за същия текст), и двете изяждат лимити, калибрирани за 4.6. Смяна на
+# модел занапред — само с изрична команда (CLAUDE_MODEL в workflow-а). Probe-ът
+# и банерът остават и при ръчна смяна.
+MODEL_AUTO_SELECT = os.getenv("MODEL_AUTO_SELECT", "0") == "1"
 # Колко ПОСЛЕДОВАТЕЛНИ run-а стои банерът след смяна на модела.
 MODEL_BANNER_RUNS = int(os.getenv("MODEL_BANNER_RUNS", 5))
 MODEL_PROBE_MAX_TOKENS = int(os.getenv("MODEL_PROBE_MAX_TOKENS", 16))
+
+# FIX 2026-09-23: изричен лимит за macro_and_sector_brief. Дотук извикването
+# не подаваше max_tokens и падаше на default-а 4000 на _call_claude.
+# Измерено срещу 70 дни на 4.6: изходът е медиана 4 770 знака, p95 5 797,
+# макс. 6 074 — най-големият единичен изход в pipeline-а. Реални token числа
+# няма откъде да се видят (Actions логът иска автентикация) — от този fix
+# нататък всяко извикване записва usage в брифа (ai_brief.AI_USAGE).
+# max_tokens е ТАВАН, не такса: плаща се само реално генерираното, затова
+# запасът не струва нищо, а отрязването струва секция.
+MACRO_MAX_TOKENS = int(os.getenv("MACRO_MAX_TOKENS", 8000))
 
 # ── AI batch синтез (ticker_narratives) ───────────────────────────────────
 # Per-ticker наративите се правят на batch-ове, а не в едно извикване, защото

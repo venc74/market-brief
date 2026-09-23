@@ -25,8 +25,49 @@ from src import net_utils
 API_URL = "https://api.anthropic.com/v1/messages"
 
 
+class TruncatedResponse(RuntimeError):
+    """
+    FIX 2026-09-23: отговорът е спрял на max_tokens. Хвърля се ВМЕСТО да се
+    върне орязаният текст — така той никога не стига до _parse_json/json_repair.
+
+    Причината е 23.09, първият run на claude-sonnet-5: секторната карта излезе
+    празна, COT — 6 пазара вместо ~15, XRP текст прекъснат по средата на дума,
+    празни JPY и SBUX тези. Всяко отрязано извикване е пристигнало със
+    stop_reason="max_tokens", но _call_claude връщаше само текстовите блокове и
+    изхвърляше останалото. После json_repair — построен точно за да спасява
+    truncated JSON — запушваше дупката, и повредата изглеждаше като успех.
+    Две защити работеха срещу нас.
+
+    Подклас на RuntimeError, затова съществуващите try/except на всяко
+    извикване го хващат и секцията деградира както при всяка друга грешка —
+    но с видимо предупреждение в брифа (виж TRUNCATIONS).
+    """
+
+
+# FIX 2026-09-23: записи за текущия run. main.py ги нулира в началото и ги
+# слага в брифа — отрязванията като видимо предупреждение, usage-а като данни.
+# AI_USAGE съществува, защото Actions логът не е достъпен без автентикация, а
+# без него реалните token числа по секции нямаше откъде да се видят.
+TRUNCATIONS: list[dict] = []
+AI_USAGE: list[dict] = []
+
+# Име на извикващата функция → четим етикет за лога и брифа. Извличат се от
+# стека, за да не се пипат шестте call site-а само заради етикет.
+_SECTION_LABELS = {
+    "macro_and_sector_brief": "Макро бриф и секторна карта",
+    "_narratives_for_batch": "Тикър наративи",
+    "_cot_theses_for_batch": "COT тези",
+    "thesis_reality_check": "Проверка на тезите срещу новините",
+    "watch_ticker_digest": "Наблюдавани тикъри",
+    "short_thesis_global_context": "Short контекст",
+    "significant_news": "Значими новини",
+    "_probe": "Проверка на модела",
+}
+
+
 def _call_claude(system: str, user: str, max_tokens: int = 4000,
-                 extra_messages: list[dict] | None = None) -> str:
+                 extra_messages: list[dict] | None = None,
+                 allow_truncation: bool = False) -> str:
     """
     extra_messages: FIX 2026-08-17 (macro brief crash) — опционални допълнителни
     turns СЛЕД началния user съобщение (напр. [{"role": "assistant", "content":
@@ -50,7 +91,29 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000,
         "messages": messages,
     }, timeout=180)
     r.raise_for_status()
-    return "".join(b.get("text", "") for b in r.json()["content"]
+    resp = r.json()
+
+    # FIX 2026-09-23: stop_reason и usage се четат при ВСЯКО извикване.
+    caller = sys._getframe(1).f_code.co_name
+    section = _SECTION_LABELS.get(caller, caller)
+    usage = resp.get("usage") or {}
+    stop = resp.get("stop_reason")
+    out_tok = usage.get("output_tokens")
+    AI_USAGE.append({"section": section, "model": config.CLAUDE_MODEL,
+                     "input_tokens": usage.get("input_tokens"),
+                     "output_tokens": out_tok, "max_tokens": max_tokens,
+                     "stop_reason": stop})
+    print(f"[ai] {section}: out={out_tok}/{max_tokens} "
+          f"in={usage.get('input_tokens')} stop={stop}")
+
+    if stop == "max_tokens" and not allow_truncation:
+        TRUNCATIONS.append({"section": section, "max_tokens": max_tokens,
+                            "output_tokens": out_tok, "model": config.CLAUDE_MODEL})
+        print(f"[ai] ⚠ ОТРЯЗАН ОТГОВОР — {section}: достигнат лимит {max_tokens} "
+              f"токена ({config.CLAUDE_MODEL}). Отговорът НЕ се подава на парсера.")
+        raise TruncatedResponse(f"{section}: stop_reason=max_tokens при {max_tokens}")
+
+    return "".join(b.get("text", "") for b in resp["content"]
                    if b.get("type") == "text")
 
 
@@ -176,8 +239,16 @@ sector, etf, chain, horizon_weeks), regime_comment."""
     raw = None
     error_msg = ""
     try:
-        raw = _call_claude(SYSTEM_MACRO, user)
+        # FIX 2026-09-23: изричен лимит. Дотук извикването нямаше max_tokens и
+        # падаше на default-а 4000 — най-стегнатият бюджет в целия pipeline,
+        # при най-големия единичен изход. Виж config.MACRO_MAX_TOKENS.
+        raw = _call_claude(SYSTEM_MACRO, user, max_tokens=config.MACRO_MAX_TOKENS)
         return _parse_json(raw)
+    except TruncatedResponse as e:
+        # FIX 2026-09-23: retry при същия лимит отрязва пак, на двойна цена —
+        # направо към Ниво 2 (суровите данни), предупреждението е вече записано.
+        print(f"[ai] macro brief: отрязан ({e}) — без retry, Ниво 2 fallback")
+        return _macro_brief_fallback(thermometer)
     except Exception as e:
         # ВАЖНО: Python автоматично прави `del e` на изхода от except блока
         # ("as e" гърми UnboundLocalError, ако се ползва по-долу извън него —
@@ -195,7 +266,8 @@ sector, etf, chain, horizon_weeks), regime_comment."""
                 f"Върни ЦЕЛИЯ отговор наново — само валиден JSON, без markdown "
                 f"огради, без обяснения извън JSON структурата.")},
         ]
-        raw_retry = _call_claude(SYSTEM_MACRO, user, extra_messages=fix_turns)
+        raw_retry = _call_claude(SYSTEM_MACRO, user, extra_messages=fix_turns,
+                                 max_tokens=config.MACRO_MAX_TOKENS)
         return _parse_json(raw_retry)
     except Exception as e2:
         print(f"[ai] macro brief: Ниво 1 retry също неуспешен "
@@ -332,6 +404,8 @@ def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
             out = _parse_json(_call_claude(SYSTEM_TICKERS, user,
                                            max_tokens=config.AI_BATCH_MAX_TOKENS))
             return out.get("tickers", [])
+        except TruncatedResponse:
+            break  # FIX 2026-09-23: retry при същия лимит отрязва пак, на двойна цена
         except Exception as e:
             label = "опит" if attempt == 1 else "retry"
             print(f"[ai] ticker batch {tag} {label} неуспешен: {type(e).__name__}: {e}")
@@ -1092,6 +1166,8 @@ def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
             out = _parse_json(_call_claude(SYSTEM_COT, user,
                                            max_tokens=config.COT_BATCH_MAX_TOKENS))
             return out.get("theses", [])
+        except TruncatedResponse:
+            break  # FIX 2026-09-23: retry при същия лимит отрязва пак, на двойна цена
         except Exception as e:
             label = "опит" if attempt == 1 else "retry"
             print(f"[ai] cot batch {tag} {label} неуспешен: {type(e).__name__}: {e}")

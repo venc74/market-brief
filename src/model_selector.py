@@ -122,8 +122,12 @@ def _probe(model: str) -> tuple[bool, str]:
     saved = config.CLAUDE_MODEL
     config.CLAUDE_MODEL = model
     try:
+        # allow_truncation: probe-ът проверява дали моделът ОТГОВАРЯ, не дали
+        # отговорът се побира — отрязан отговор на 16 токена е успех тук, и не
+        # бива да се записва като предупреждение в брифа.
         ai_brief._call_claude("Отговаряй с една дума.", "Кажи: ок",
-                              max_tokens=config.MODEL_PROBE_MAX_TOKENS)
+                              max_tokens=config.MODEL_PROBE_MAX_TOKENS,
+                              allow_truncation=True)
         return True, ""
     except Exception as e:
         detail = f"{type(e).__name__}: {e}"
@@ -170,8 +174,15 @@ def _update_state(model: str, today: str) -> dict:
     runs = state.get("runs_since_change") or 0
     changed_on = state.get("changed_on")
 
-    if state.get("model") and state["model"] != model:
-        prev, runs, changed_on = state["model"], 1, today
+    # FIX 2026-09-23: липсващ запис НЕ значи "няма предишен модел". Преди
+    # model_state.json да съществува, брифът е работил на
+    # CLAUDE_MODEL_FALLBACK — това е факт, не предположение. Старото условие
+    # (`state.get("model") and ...`) приемаше празния файл за "няма смяна" и
+    # на 23.09 премълча точно първата смяна към claude-sonnet-5 — същият клас
+    # тих провал като безусловното изключване на датираните id-та.
+    known = state.get("model") or config.CLAUDE_MODEL_FALLBACK
+    if known != model:
+        prev, runs, changed_on = known, 1, today
     elif runs and state.get("last_run_date") != today:
         runs += 1
     if runs > config.MODEL_BANNER_RUNS:
@@ -197,28 +208,28 @@ def resolve_model(today: str | None = None) -> dict:
     today = today or dt.date.today().isoformat()
     fallback = config.CLAUDE_MODEL_FALLBACK
 
+    # FIX 2026-09-23 (политика): смяна на модел САМО с изрична команда.
+    # Изрично зададеният CLAUDE_MODEL вече НЕ прескача probe-а и банера — те
+    # са точно толкова полезни при ръчна смяна, колкото при автоматична.
+    chosen, rejected, reason, source = None, None, "", "auto"
     if config.CLAUDE_MODEL_PINNED:
-        print(f"[model] CLAUDE_MODEL е изрично зададен ({config.CLAUDE_MODEL}) — "
-              "discovery пропуснато")
-        return {"model": config.CLAUDE_MODEL, "source": "env", "rejected": None,
-                "rejected_reason": "", "banner": _update_state(config.CLAUDE_MODEL, today)}
-
-    if not config.MODEL_AUTO_SELECT:
-        return {"model": fallback, "source": "disabled", "rejected": None,
-                "rejected_reason": "", "banner": _update_state(fallback, today)}
-
-    chosen, rejected, reason = None, None, ""
-    try:
-        models = _list_models()
-        chosen = pick_newest(models)
-        if chosen:
-            print(f"[model] от {len(models)} модела избран най-нов sonnet: {chosen}")
-        else:
-            reason = f"списъкът върна {len(models)} модела, нито един подходящ sonnet"
+        chosen, source = config.CLAUDE_MODEL, "env"
+        print(f"[model] CLAUDE_MODEL е изрично зададен ({chosen}) — discovery пропуснато")
+    elif not config.MODEL_AUTO_SELECT:
+        chosen, source = fallback, "disabled"
+        print(f"[model] автоматичният избор е изключен — {fallback}")
+    else:
+        try:
+            models = _list_models()
+            chosen = pick_newest(models)
+            if chosen:
+                print(f"[model] от {len(models)} модела избран най-нов sonnet: {chosen}")
+            else:
+                reason = f"списъкът върна {len(models)} модела, нито един подходящ sonnet"
+                print(f"[model] {reason}")
+        except Exception as e:
+            reason = f"Models API недостъпен ({type(e).__name__}: {e})"
             print(f"[model] {reason}")
-    except Exception as e:
-        reason = f"Models API недостъпен ({type(e).__name__}: {e})"
-        print(f"[model] {reason}")
 
     if chosen and chosen != fallback:
         ok, why = _probe(chosen)
@@ -233,6 +244,6 @@ def resolve_model(today: str | None = None) -> dict:
     if model == fallback and chosen is None:
         print(f"[model] връщам се на резервния {fallback}")
     print(f"[model] дневният бриф ползва: {model}")
-    return {"model": model, "source": "auto" if chosen else "fallback",
+    return {"model": model, "source": source if chosen else "fallback",
             "rejected": rejected, "rejected_reason": reason,
             "banner": _update_state(model, today)}
