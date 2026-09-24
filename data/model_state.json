@@ -1,7 +1,7 @@
 {
- "model": "claude-sonnet-5",
- "previous_model": null,
- "changed_on": null,
- "runs_since_change": 0,
- "last_run_date": "2026-09-23"
+ "model": "claude-sonnet-4-6",
+ "previous_model": "claude-sonnet-5",
+ "changed_on": "2026-09-24",
+ "runs_since_change": 1,
+ "last_run_date": "2026-09-24"
 }

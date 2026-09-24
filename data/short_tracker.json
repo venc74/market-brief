@@ -283,5 +283,19 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null
+ },
+ "JBLU_2026-09-24": {
+  "ticker": "JBLU",
+  "entry_date": "2026-09-24",
+  "status": "open",
+  "entry_price": 4.39,
+  "target_1": 2.87,
+  "stop_loss": 5.15,
+  "lagging_sector": "Индустрия",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

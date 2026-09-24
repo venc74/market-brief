@@ -1,5 +1,5 @@
 {
- "date": "2026-09-23",
+ "date": "2026-09-24",
  "rows": [
   {
    "ticker": "COO",
@@ -42,34 +42,6 @@
    "transfers": []
   },
   {
-   "ticker": "VST",
-   "company": "Vistra Corp.",
-   "total_value": 1173069.25,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "BURKE JAMES A",
-     "title": "President and CEO",
-     "date": "2026-09-01",
-     "value": 603891.25
-    },
-    {
-     "name": "BURKE JAMES A",
-     "title": "President and CEO",
-     "date": "2026-08-31",
-     "value": 299178.0
-    },
-    {
-     "name": "BURKE JAMES A",
-     "title": "President and CEO",
-     "date": "2026-08-24",
-     "value": 270000.0
-    }
-   ],
-   "transfers": []
-  },
-  {
    "ticker": "TSN",
    "company": "TYSON FOODS, INC.",
    "total_value": 1001616.65,
@@ -86,6 +58,28 @@
    "transfers": []
   },
   {
+   "ticker": "VST",
+   "company": "Vistra Corp.",
+   "total_value": 903069.25,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-09-01",
+     "value": 603891.25
+    },
+    {
+     "name": "BURKE JAMES A",
+     "title": "President and CEO",
+     "date": "2026-08-31",
+     "value": 299178.0
+    }
+   ],
+   "transfers": []
+  },
+  {
    "ticker": "DVN",
    "company": "DEVON ENERGY CORP/DE",
    "total_value": 199876.03999999998,
@@ -97,22 +91,6 @@
      "title": "PRESIDENT AND CEO",
      "date": "2026-09-14",
      "value": 199876.03999999998
-    }
-   ],
-   "transfers": []
-  },
-  {
-   "ticker": "PODD",
-   "company": "INSULET CORP",
-   "total_value": 162217.0,
-   "cluster": false,
-   "in_screener": false,
-   "insiders": [
-    {
-     "name": "McEvoy Ashley",
-     "title": "President and CEO",
-     "date": "2026-08-21",
-     "value": 162217.0
     }
    ],
    "transfers": []
@@ -141,8 +119,8 @@
   "ciks_resolved": 518,
   "tickers_with_filings": 368,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 151,
-  "qualifying_after_filter": 12,
-  "unique_filings_processed": 1976
+  "raw_transactions_parsed": 141,
+  "qualifying_after_filter": 10,
+  "unique_filings_processed": 1880
  }
 }
