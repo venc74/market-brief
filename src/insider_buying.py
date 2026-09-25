@@ -113,6 +113,31 @@ def _xml_text(el, path: str) -> str:
     return (node.text or "").strip() if node is not None else ""
 
 
+def _xml_bool(el, path: str) -> bool | None:
+    """
+    FIX 2026-09-25: XML булева стойност → True/False/None.
+
+    SEC Form 4 (схема X0609) допуска и двата XML boolean формата. Проверено на
+    56 реални документа от 14 емитента:
+      aff10b5One  : '0' 33, 'false' 11, '1' 7, 'true' 5
+      isOfficer   : '1' 35, 'false' 8, 'true' 4, '0' 1
+      isDirector  : '1' 16, '0' 13, 'true' 12, 'false' 1
+    Близо една трета са "true"/"false". Дотук и двата парсера проверяваха само
+    `== "1"`, така че "true" се четеше като False — директор/офицер губеше
+    ролята си, а покупката му отпадаше от Insider Buying, освен при клъстер.
+
+    Липсващо поле или непозната стойност → None ("неизвестно"), НЕ False.
+    """
+    if el is None:
+        return None
+    v = _xml_text(el, path).lower()
+    if v in ("1", "true"):
+        return True
+    if v in ("0", "false"):
+        return False
+    return None
+
+
 def _is_paired_transfer(buy_leg: dict, legs: list[dict]) -> bool:
     """
     FIX 2026-09-21 (Дефект 2): True ако този P крак има съответстващ S крак в
@@ -173,7 +198,8 @@ def _parse_form4(xml_text: str) -> dict | None:
         name = _xml_text(ro, "reportingOwnerId/rptOwnerName")
         rel = ro.find("reportingOwnerRelationship")
         title = _xml_text(rel, "officerTitle") if rel is not None else ""
-        is_officer = (_xml_text(rel, "isOfficer") == "1") if rel is not None else False
+        # FIX 2026-09-25: _xml_bool приема и "true" — виж там
+        is_officer = _xml_bool(rel, "isOfficer") is True
         owners.append({"name": name, "title": title, "is_officer": is_officer})
 
     # FIX 2026-09-21 (Дефект 2): първо СЕ ЧЕТАТ и двата вида крака, за да може
@@ -591,12 +617,16 @@ def _parse_form4_all_codes(xml_text: str) -> dict | None:
     е за watch_monitor, който гледа малък, ръчно избран списък тикъри и има
     нужда от двете посоки. Additive подход, CLAUDE.md т.2.
 
-    aff10b5One: структурният Rule 10b5-1 флаг на SEC. Проверен на реални
-    filings (16 от 16 при MSFT/JPM/WMT/CRM го носят) — "1" = продажбата е по
-    предварително обявен план (routine), "0" = извънпланова. Елементът съдържа
-    ГОЛА стойност, не вложен <value>, затова се чете през .text. По-стари
-    filing агенти може да не го подават изобщо (потвърдено при част от NVDA) →
-    None, което AI-то трябва да третира като "неизвестно", не като "0".
+    aff10b5One: структурният Rule 10b5-1 флаг на SEC — "1"/"true" = продажбата
+    е по предварително обявен план (routine), "0"/"false" = извънпланова.
+    Елементът съдържа ГОЛА стойност, не вложен <value>. Стои на ниво документ,
+    не на транзакция (виж FIX 2026-09-25 по-долу). Липсва → None, което AI-то
+    трябва да третира като "неизвестно", не като "0".
+
+    ГРЕШКА В ПЪРВАТА ВЕРСИЯ (поправена 2026-09-25): полето се търсеше в
+    транзакцията и се приемаха само "0"/"1". Тестът я пусна, защото беше
+    конструиран XML с полето точно там — валидираше предположението, не
+    реалността. Тестът вече е срещу реални документи.
 
     shares_after: sharesOwnedFollowingTransaction — за дял от holdings, без
     който "голяма продажба" е безсмислено число.
@@ -618,9 +648,19 @@ def _parse_form4_all_codes(xml_text: str) -> dict | None:
         owners.append({
             "name": _xml_text(ro, "reportingOwnerId/rptOwnerName"),
             "title": _xml_text(rel, "officerTitle") if rel is not None else "",
-            "is_officer": (_xml_text(rel, "isOfficer") == "1") if rel is not None else False,
-            "is_director": (_xml_text(rel, "isDirector") == "1") if rel is not None else False,
+            "is_officer": _xml_bool(rel, "isOfficer") is True,
+            "is_director": _xml_bool(rel, "isDirector") is True,
         })
+
+    # FIX 2026-09-25: aff10b5One е на ниво ДОКУМЕНТ (ownershipDocument/aff10b5One)
+    # в 56 от 56 проверени реални Form 4 (схема X0609). Мястото, където парсерът
+    # търсеше досега (transactionCoding/aff10b5One на всяка транзакция), не се
+    # срещна нито веднъж — `planned_10b5_1` беше None за всяка транзакция от
+    # пускането на монитора. Потвърдено на BLSH: трите продажби на директора
+    # Andrew Bliss 21-23.09 носят aff10b5One=true (планови), а се показваха като
+    # "неизв.". Флагът важи за целия документ — един Form 4 = един reporting
+    # owner, едно декларирано състояние на 10b5-1 плана.
+    doc_planned = _xml_bool(root, "aff10b5One")
 
     transactions = []
     for txn in root.findall("nonDerivativeTable/nonDerivativeTransaction"):
@@ -643,10 +683,9 @@ def _parse_form4_all_codes(xml_text: str) -> dict | None:
             shares_after = float(re.sub(r"[^\d.]", "", after_s or "") or 0) or None
         except (ValueError, TypeError):
             shares_after = None
-        el = txn.find("transactionCoding/aff10b5One")
-        planned = None
-        if el is not None and (el.text or "").strip() in ("0", "1"):
-            planned = (el.text or "").strip() == "1"
+        # FIX 2026-09-25: ниво документ първо, транзакцията — само резерва
+        planned = (doc_planned if doc_planned is not None
+                   else _xml_bool(txn, "transactionCoding/aff10b5One"))
         transactions.append({
             "date": date, "code": code, "shares": shares, "price": price,
             "value": shares * price, "shares_after": shares_after,

@@ -363,7 +363,15 @@
     </div>
     <div>
       <div class="regime-badge">{{ regime }}</div>
-      <div class="regime-reason">{{ regime_reason }}</div>
+      {# FIX 2026-09-25: override-ът като ред НАД броенето, броенето — винаги.
+         Дотук при override `regime_reason` подменяше броенето изцяло.
+         Стари брифове без `counts` показват regime_reason както преди. #}
+      {% if thermometer.counts is defined %}
+        {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+        <div class="regime-reason">{{ thermometer.counts }}{% if thermometer.overrides %} · по броене: {{ thermometer.regime_by_count }}{% endif %}</div>
+      {% else %}
+        <div class="regime-reason">{{ regime_reason }}</div>
+      {% endif %}
     </div>
   </div>
 </header>

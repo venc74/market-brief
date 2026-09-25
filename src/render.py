@@ -110,6 +110,9 @@ def render_email(brief: dict) -> str:
     """
     today = dt.date.today()
     t = brief["thermometer"]
+    # FIX 2026-09-25: при override броенето не изчезва — добавя се след причината
+    regime_line = t["regime_reason"] + (
+        f" · {t['counts']}" if t.get("overrides") and t.get("counts") else "")
     regime = t["regime"]
     color = {"Offensive": "#0e9f6e", "Defensive": "#d97706", "Cash": "#dc2626"}[regime]
 
@@ -206,7 +209,7 @@ def render_email(brief: dict) -> str:
                  padding:6px 16px;border-radius:4px;font-size:14px;letter-spacing:1px">
       {regime.upper()}</span>
     <span style="margin-left:12px">{thermo_dots}</span>
-    <div style="color:#374151;font-size:13px;margin-top:10px">{t['regime_reason']}</div>
+    <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
   </td></tr>
 
   {news_block}

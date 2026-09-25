@@ -596,6 +596,35 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
         print(f"[backtest] update_backtest_tracker failed: {e}")
 
 
+def _is_late_discovery(rec: dict) -> bool:
+    """
+    FIX 2026-09-25: резолюцията е открита ПО-КЪСНО от първия възможен run.
+
+    Дотук беше `discovered_date != resolution_date` — и беше вярно за ВСЯКА
+    резолюция. Брифът е в 05:30 UTC, преди US отваряне, затова пазарно събитие
+    от ден D най-рано се вижда в run-а на следващия работен ден (потвърдено:
+    0 от 14 резолюции с discovered == resolution). Измерено в историята на
+    "Резолюции тази седмица": 17 True, 6 без поле, нула False — маркерът
+    "открито със закъснение" стоеше на всичко и не казваше нищо.
+
+    Сега закъснение = открито СЛЕД първия работен ден след събитието. Това
+    покрива и изтичане, паднало в уикенд (срок събота 03.10 → първи run
+    понеделник 05.10 → навреме), и нормален стоп (петък → понеделник, вторник →
+    сряда — навреме). Реални закъснения остават маркирани — напр. MNST (стоп
+    09.09, открит след split корекцията на 24.09) или пропуснат run.
+    """
+    disc, res = rec.get("discovered_date"), rec.get("resolution_date")
+    if not disc or not res:
+        return False
+    try:
+        d = dt.date.fromisoformat(res) + dt.timedelta(days=1)
+        while d.weekday() >= 5:          # събота/неделя → следващият понеделник
+            d += dt.timedelta(days=1)
+        return dt.date.fromisoformat(disc) > d
+    except ValueError:
+        return False
+
+
 def get_backtest_summary() -> dict:
     """
     Обобщение за dashboard-а. "Win" = всякакъв терминален изход с
@@ -646,8 +675,7 @@ def get_backtest_summary() -> dict:
               "resolution_date": r["resolution_date"], "realized_r": r.get("realized_r"),
               # закъсняла резолюция (ingest-ната седмици след реалната пазарна дата) —
               # dashboard-ът може да го отбележи, вместо да изглежда като "прескочен" брояч.
-              "late_discovery": bool(r.get("discovered_date")
-                                     and r["discovered_date"] != r["resolution_date"])}
+              "late_discovery": _is_late_discovery(r)}
              for r in recent_pool[:20]]  # горен таван само като edge-case защита, не нормално поведение
 
     # Живи позиции + текуща цена (batch fetch) за unrealized % изгледа в dashboard-а.

@@ -145,13 +145,44 @@ def _parse_json(text: str):
             clean = clean[4:]
     clean = clean.strip()
     try:
-        return json.loads(clean)
+        return _fix_translit(json.loads(clean))
     except json.JSONDecodeError as e:
         repaired = json_repair.loads(clean)
         if isinstance(repaired, (dict, list)) and repaired:
             print(f"[ai] _parse_json: json_repair поправи malformed JSON ({e})")
-            return repaired
+            return _fix_translit(repaired)
         raise
+
+
+# FIX 2026-09-25: латински транслитерации на български думи в AI текстовете.
+# Сканирана цялата COT история: единствената е "ekspozitsiya" — 7 пъти от 01.09.
+# Замяната е в кода, не в промпта: за толкова рядка грешка промпт инструкция е
+# ненадеждна, а детерминистичната замяна струва нищо. Нови случаи не се
+# поправят автоматично (списъкът не бива да расте на сляпо), а се логват, за да
+# се видят.
+_TRANSLIT_FIX = {
+    "ekspozitsiya": "експозиция", "ekspozitsiyata": "експозицията",
+    "ekspozitsii": "експозиции", "ekspozitsiite": "експозициите",
+}
+_TRANSLIT_RE = re.compile(r"\b[A-Za-z]*(?:tsiya|tsii|iyata|tsiite)[A-Za-z]*\b")
+
+
+def _fix_translit(obj):
+    """Обхожда всички низове в парснатия JSON: заменя познатите, логва новите."""
+    if isinstance(obj, dict):
+        return {k: _fix_translit(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_fix_translit(v) for v in obj]
+    if not isinstance(obj, str):
+        return obj
+    def repl(m):
+        w = m.group(0)
+        fixed = _TRANSLIT_FIX.get(w.lower())
+        if fixed is None:
+            print(f"[ai] ⚠ латинска транслитерация без замяна: '{w}' — добави в _TRANSLIT_FIX")
+            return w
+        return fixed.capitalize() if w[0].isupper() else fixed
+    return _TRANSLIT_RE.sub(repl, obj)
 
 
 SYSTEM_MACRO = """Ти си макро аналитик, който пише за опитен суинг търговец \
@@ -217,6 +248,14 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 прецизни изчислени стойности, не грубa оценка; върни числото директно от полето, \
 не генерирай "правдоподобно звучащо" число от паметта си (потвърден случай \
 2026-08-26: level_percentile=0.2 цитирано в текста като "20-ти percentile").
+
+ВАЖНО за условия за смяна на режима: ако пишеш какво би отменило или сменило \
+режима, цитирай САМО полето "exit_rule" от термометъра по-горе (и "overrides" / \
+"regime_by_count", ако ти трябват детайли). НЕ формулирай собствени прагове, \
+нива или дати, които не са там. Потвърден случай 2026-09-25: текстът твърдеше \
+"единственото, което би отменило Defensive, е MOVE под 85" — 85 не е праг никъде \
+в системата, а реалното условие дори не изисква MOVE да падне, само да спре да \
+расте. Ако exit_rule не казва нещо, ти също не го казвай.
 
 Задачи:
 1. "macro_brief": 4-6 изречения — какво се случи в света и какво означава за \

@@ -155,7 +155,19 @@ def move_index() -> dict:
         if _is_stale(hist.index[-1]):
             raise ValueError(f"stale data — последен ред {hist.index[-1].date()}")
         val = float(hist["Close"].iloc[-1])
-        week_ago = float(hist["Close"].iloc[-6])
+        # FIX 2026-09-25: прозорецът е по ДАТА, не по позиция. Дотук беше
+        # `.iloc[-6]` — пет БАРА назад. На 25.09 барът за 22.09 липсваше изцяло
+        # в историята на ^MOVE, и "седмица назад" стигна до 16.09 вместо до
+        # 17.09 (делта +23.8 вместо +28.4). Един липсващ бар премества прозореца
+        # тихо и при граничен случай може да създаде или да скрие скок.
+        # Котвата е ДАТАТА НА ПОСЛЕДНИЯ БАР, не датата на run-а: така разликата
+        # между двете наблюдения е винаги точно 7 календарни дни. С котва "днес"
+        # run-ът в понеделник (последен бар петък) би сравнил петък с миналия
+        # понеделник — 4 дни вместо 7.
+        prior = hist["Close"].loc[hist.index <= hist.index[-1] - dt.timedelta(days=7)].dropna()
+        if prior.empty:
+            raise ValueError("няма стойност на или преди 7 дни назад")
+        week_ago = float(prior.iloc[-1])
         # FIX 2026-09-23: NaN тук е ПО-ЛОШ от видимия "nan" при IEI/HYG.
         # Сравненията с NaN са винаги False, затова статусът пада в else-клона
         # → "red" — фалшив червен, който влиза в броенето за режима ("2
@@ -516,28 +528,65 @@ def build_thermometer(macro: dict) -> dict:
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
 
+    # Режимът САМО по броенето — изчислява се винаги, дори при override.
     # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive",
     # който противоречеше на правилото в docstring-а ("4+ зелени → Offensive; иначе
     # Defensive") и на 2026-07-15 произведе Offensive при 3 зелени + 1 (фалшив) червен.
-    if vix_forces_defensive:
-        regime, reason = "Defensive", f"VIX {vix_val:.0f} > 30 — автоматичен Defensive режим, sizing −50%"
-    elif move_forces_defensive:
-        regime, reason = "Defensive", (
-            f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
-            + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%")
-    elif credit_spike:
-        regime, reason = "Defensive", (
-            f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
-            f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
-            "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%")
-    elif greens >= 4 and reds == 0:
-        regime, reason = "Offensive", counts
+    if greens >= 4 and reds == 0:
+        count_regime, count_reason = "Offensive", counts
     elif reds >= 3:
-        regime, reason = "Cash", f"{counts} — капиталът е позиция"
+        count_regime, count_reason = "Cash", f"{counts} — капиталът е позиция"
     elif reds >= 2:
-        regime, reason = "Defensive", f"{counts} — намален риск"
+        count_regime, count_reason = "Defensive", f"{counts} — намален риск"
     else:
-        regime, reason = "Defensive", f"{counts} — недостатъчно потвърждение за Offensive"
+        count_regime, count_reason = "Defensive", f"{counts} — недостатъчно потвърждение за Offensive"
+
+    # FIX 2026-09-25: всички АКТИВНИ override-и, всеки с условието си за изход,
+    # изчислено от кода. Дотук условието не съществуваше никъде — промптът
+    # виждаше value/delta/spike, но не и правилото, и на 25.09 макро текстът
+    # измисли "единственото, което би отменило Defensive, е MOVE под 85". 85 не
+    # е праг никъде в кода; реалният изход дори не изисква спад — само MOVE да
+    # спре да расте. Същият клас като старите "20-и percentile" и "2026-09-15":
+    # AI-то формулира условия, които не идват от кода. Условията са събрани в
+    # списък, защото при два активни override-а изходът изисква ДВЕТЕ да паднат.
+    overrides: list[dict] = []
+    if vix_forces_defensive:
+        overrides.append({
+            "trigger": "VIX",
+            "text": f"VIX {vix_val:.0f} > {config.VIX_DEFENSIVE_THRESHOLD:.0f} — автоматичен Defensive режим, sizing −50%",
+            "exit_condition": (f"VIX падне до {config.VIX_DEFENSIVE_THRESHOLD:.0f} или под "
+                               f"(сега {vix_val:.1f})"),
+        })
+    if move_forces_defensive:
+        exits = []
+        if move_val > config.MOVE_RED_THRESHOLD:
+            exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} или под (сега {move_val:.1f})")
+        if move_spike:
+            exits.append(
+                f"седмичната промяна на MOVE спадне под +{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} "
+                f"(сега {move_ind.get('delta_1w'):+.1f}) — тоест MOVE спре да расте; "
+                "НЕ се изисква спад до конкретно ниво")
+        overrides.append({
+            "trigger": "MOVE",
+            "text": (f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
+                     + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%"),
+            "exit_condition": " И ".join(exits),
+        })
+    if credit_spike:
+        overrides.append({
+            "trigger": "IEI/HYG",
+            "text": (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
+                     f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
+                     "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%"),
+            "exit_condition": (f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната промяна на IEI/HYG падне "
+                               f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. percentile "
+                               f"(сега {credit_ind['roc_percentile']:.0f}.)"),
+        })
+
+    if overrides:
+        regime, reason = "Defensive", overrides[0]["text"]
+    else:
+        regime, reason = count_regime, count_reason
 
     # FIX 2026-07-15: преди sizing_factor падаше САМО при принудителен Defensive
     # (VIX/MOVE); нормален Defensive/Cash по броя сигнали оставаше на 1.0 —
@@ -545,7 +594,19 @@ def build_thermometer(macro: dict) -> dict:
     sizing_factor = 1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR
 
     return {"indicators": indicators, "regime": regime,
-            "regime_reason": reason, "sizing_factor": sizing_factor}
+            "regime_reason": reason, "sizing_factor": sizing_factor,
+            # FIX 2026-09-25: броенето винаги, override-ите с изхода си, и какво
+            # би дало броенето само по себе си — за header-а и за макро промпта.
+            "counts": counts, "overrides": overrides,
+            "regime_by_count": count_regime,
+            "exit_rule": (
+                ("Override-ът пада, когато ВСИЧКИ условия отпаднат: "
+                 + "; ".join(f"{o['trigger']}: {o['exit_condition']}" for o in overrides)
+                 + f". След това режимът се определя от броенето — в момента то дава "
+                 f"{count_regime} ({counts}).")
+                if overrides else
+                f"Режимът е по броенето ({counts}). Няма активен автоматичен override."),
+            }
 
 
 if __name__ == "__main__":
