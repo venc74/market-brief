@@ -1,37 +1,37 @@
 {
- "date": "2026-09-24",
+ "date": "2026-09-25",
  "news": [
   {
-   "headline": "US, China extend trade truce by two months until Jan. 10 — Bessent",
-   "why": "Продължаването на 'Busan agreement' намалява тарифния риск и подкрепя risk-on настроението, особено за акции с China exposure и emerging markets."
+   "headline": "30-year Treasury yield hits highest level since 2004 as bond market rout continues",
+   "why": "Рязкото покачване на дългосрочните доходности вдига financing costs за всички asset класове и исторически предшества финансови сривове — директен риск за equities и real estate."
   },
   {
-   "headline": "10-year Treasury yield hits 19-year high; US yields cross 5% threshold",
-   "why": "Скокът на доходността повишава discount rate за всички активи, натиска equities (особено growth) и сигнализира нови залози за Fed rate hike."
+   "headline": "Dollar set for weekly gains as yields surge, Fed bets build",
+   "why": "Нарастващите очаквания за по-рестриктивна Fed политика укрепват долара и оказват натиск върху emerging markets и суровинните цени."
   },
   {
-   "headline": "Dollar at two-month high as hot PMI fuels inflation fears and rate hike bets",
-   "why": "Силният PMI засилва очакванията за допълнително затягане от Fed, което движи DXY нагоре и натиска commodities и EM активи."
+   "headline": "US and Iran discuss phased deal to reopen Hormuz and end US blockade, sources say",
+   "why": "Потенциалното отваряне на Ормузкия проток би намалило геополитическата премия в петрола и би облекчило инфлационния натиск върху глобалните пазари."
   },
   {
-   "headline": "Global bond sell-off deepens; JGB yields hit 30-year high",
-   "why": "Синхронизираният глобален bond sell-off повишава финансиране разходите за правителства и корпорации и сигнализира structural shift в rate expectations."
+   "headline": "Oil falls amid optimism over potential diplomatic solution to the Iran conflict",
+   "why": "Спадът в петрола при новини за иранска сделка директно засяга енергийния сектор и е ключова дезинфлационна сигнализация за Fed."
   },
   {
-   "headline": "Oil falls as Iran signals openness to diplomacy; Asia crude imports at record high",
-   "why": "Дипломатически сигнали от Иран и рекордното азиатско търсене изпращат противоречиви сигнали за петролния пазар и влияят върху energy sector позиции."
+   "headline": "Houthis say they attacked Riyadh and Aramco facilities in Yanbu",
+   "why": "Атаки срещу Aramco инфраструктура заплашват глобалното петролно предлагане и може да обърнат низходящото движение в петролните цени."
   },
   {
-   "headline": "World's largest copper mine halts operations after worker death",
-   "why": "Спирането на най-голямата медна мина в света ограничава предлагането и може да тласне цените на copper нагоре с ефект върху materials и industrial сектори."
+   "headline": "Trump-Xi summit: Xi urges US to cooperate on AI; state dinner guest list includes Musk, Nvidia's Huang",
+   "why": "Резултатите от срещата оформят очакванията за US-China търговски и технологични отношения — ключово за Nvidia, Apple и целия tech сектор."
   },
   {
-   "headline": "Trump administration weighs 90-day diesel export ban",
-   "why": "Евентуалната забрана за износ на дизел е регулаторно събитие с директен ефект върху refining margins, energy stocks и domestic fuel prices."
+   "headline": "EU urges UK to raise tariffs on Chinese cars to avoid 'made in Europe' barriers",
+   "why": "Ескалацията на тарифите срещу китански EVs засяга автомобилния сектор и търговските потоци между UK, ЕС и Китай."
   },
   {
-   "headline": "EU faces backlash after lifting sanctions on Russian billionaires",
-   "why": "Отмяната на санкции предизвиква политически натиск и може да доведе до преразглеждане на EU sanctions policy с ефект върху руски активи и европейски банки."
+   "headline": "US Senate rejects resolution curbing Trump's Iran war powers",
+   "why": "Гласуването потвърждава продължаването на военния конфликт с Иран, поддържа геополитическата премия в петрола и несигурността на пазарите."
   }
  ]
 }
