@@ -215,6 +215,15 @@
     letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
   .split-tag.fwd { color: var(--green); background: rgba(52,211,153,.12); }
   .split-tag.rev { color: var(--red); background: rgba(248,113,113,.12); }
+  /* 2026-09-27: сплитове — секцията вече не се скрива (празно / провал / приоритетни) */
+  .splits-empty { font-size: 13px; color: var(--text); }
+  .splits-funnel { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .splits-warn { font-size: 13px; color: var(--red); background: rgba(248,113,113,.10);
+                 border: 1px solid rgba(248,113,113,.35); border-radius: 8px; padding: 10px 14px; }
+  .splits-priority { margin-bottom: 12px; }
+  .signal-chip.split-pos { border-color: var(--yellow); }
+  .signal-chip .split-badge { font-size: 11px; font-family: "IBM Plex Mono", monospace;
+    color: var(--yellow); margin-top: 4px; }
 
   /* ── v2: Superinvestor Moves ── */
   .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -414,6 +423,20 @@
       <div class="t-name">Distribution Days</div>
       <div class="t-val">{{ distribution_days.count }}</div>
       <div class="t-label">{{ distribution_days.label }}</div>
+    </div>
+    {% endif %}
+    {# 2026-09-27: основна инфлация — информативна, не влиза в броенето/режима #}
+    {% if core_inflation is not none %}
+    {% set ci = core_inflation %}
+    <div class="t-card" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
+      <div class="t-name">Основна инфлация</div>
+      {% if ci.value is not none %}
+      <div class="t-val">{{ "%.2f"|format(ci.value) }}%</div>
+      <div class="t-label">за {{ ci.month }}{% if ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
+      {% else %}
+      <div class="t-val">—</div>
+      <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · информативно, не влиза в режима</div>
+      {% endif %}
     </div>
     {% endif %}
   </div>
@@ -794,7 +817,56 @@
 </section>
 {% endif %}
 
-{% if splits %}
+{% macro split_chip(s) %}
+    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }} {{ 'split-pos' if s.badge == 'position' else '' }}">
+      <div class="sym">{{ s.ticker }}
+        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
+        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
+      </div>
+      <div class="note">
+        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
+        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
+        {% if s.date_human %} · {{ s.date_human }}{% endif %}
+      </div>
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company[:34] }}</div>{% endif %}
+      {% if s.badge %}
+      {% set d = s.days_to_split %}
+      <div class="split-badge">{{ '📌 отворена позиция' if s.badge == 'position' else '🔎 наблюдаван' }}{% if d is not none %} · {% if d == 0 %}днес{% elif d == 1 %}утре{% elif d > 1 %}след {{ d }} дни{% else %}преди {{ -d }} {{ 'ден' if d == -1 else 'дни' }}{% endif %}{% endif %}</div>
+      {% endif %}
+      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% if splits_report %}
+{% set sr = splits_report %}
+{% set dg = sr.diag or {} %}
+<section>
+  <h2>Сплитове · тази седмица</h2>
+  {% if sr.priority %}
+  <div class="splits-funnel" style="margin-bottom:6px">Отворени позиции и наблюдавани · целият хоризонт на източника, без филтри</div>
+  <div class="signal-grid splits-priority">
+    {% for s in sr.priority %}{{ split_chip(s) }}{% endfor %}
+  </div>
+  {% endif %}
+  {% if sr.state == 'source_failed' %}
+  <div class="splits-warn">⚠ Календарът на сплитовете не върна данни днес.</div>
+  {% elif sr.state == 'empty' %}
+  <div class="splits-empty">Няма предстоящи сплитове тази седмица по нашите критерии
+    (цена над ${{ "%.0f"|format(splits_min_price) }}, пазарна стойност над ${{ "%.0f"|format(splits_min_cap_m) }} млн).</div>
+  <div class="splits-funnel">
+    Източникът върна {{ dg.in_week }} за седмицата{% if dg.in_week %}:
+    {{ dg.dropped_price|length }} под ${{ "%.0f"|format(splits_min_price) }},
+    {{ dg.dropped_cap|length }} под ${{ "%.0f"|format(splits_min_cap_m) }} млн,
+    {{ dg.dropped_no_data|length }} без данни{% if dg.dropped_no_data %} ({{ dg.dropped_no_data|join(', ') }}){% endif %}{% endif %}
+    · общо {{ dg.source_rows }} в хоризонта{% if dg.horizon_to %} до {{ dg.horizon_to[8:10] }}.{{ dg.horizon_to[5:7] }}{% endif %}.
+  </div>
+  {% else %}
+  <div class="signal-grid">
+    {% for s in sr.rows %}{{ split_chip(s) }}{% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% elif splits %}
 <section>
   <h2>Сплитове · тази седмица</h2>
   <div class="signal-grid">

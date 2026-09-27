@@ -451,6 +451,19 @@ def run() -> dict:
             print(f"[watch] секцията се провали изцяло: {e}")
             watch_rows = []
 
+    # FIX 2026-09-27: пълен отчет за сплитовете — секцията вече не се скрива
+    # (ok / empty с фуния по филтри / source_failed), + сплитове на отворени
+    # позиции и наблюдавани в целия хоризонт на източника, без филтри. ТУК,
+    # след update_backtest_tracker(): днешните нови позиции вече са в tracker-а.
+    splits_rep = None
+    if config.ENABLE_SPLITS_CALENDAR:
+        try:
+            splits_rep = splits_calendar.splits_report(
+                positions=set(_live_positions()) if config.ENABLE_BACKTEST else set(),
+                watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set())
+        except Exception as e:
+            print(f"[splits] отчетът се провали: {e}")
+
     brief = {
         "date": today,
         "macro": macro,
@@ -470,6 +483,7 @@ def run() -> dict:
         "theses": theses,
         "unusual_options": unusual_today,
         "splits": splits_month,
+        "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,
         "superinvestor_exits": superinvestor_exits,

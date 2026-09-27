@@ -493,6 +493,20 @@ FED_LIQUIDITY_STALENESS_DAYS = int(os.getenv("FED_LIQUIDITY_STALENESS_DAYS", 12)
 # (публикува се всеки работен ден), затова reuse-ва STALENESS_THRESHOLD_DAYS
 # директно, не нужна отделна константа.
 
+# ── Основна инфлация · Dallas Fed Trimmed Mean PCE (2026-09-27) ──────────
+# Информативна карта в зоната на термометъра (като Distribution Days) — НЕ
+# влиза в броенето зелени/жълти/червени и НЕ влияе на режима. Подава се на
+# макро брифа като котва за твърдения за "инфлационен натиск".
+ENABLE_CORE_INFLATION = os.getenv("ENABLE_CORE_INFLATION", "1") == "1"
+CORE_PCE_SERIES = "PCETRIM12M159SFRBDAL"   # месечна, % г/г
+# Сравнение с наблюдението N месеца назад (2 → юли срещу май).
+CORE_PCE_LOOKBACK_OBS = int(os.getenv("CORE_PCE_LOOKBACK_OBS", 2))
+# Месечна серия с ~1 месец закъснение — дневният 3-дневен праг би я крил
+# постоянно. Възрастта се мери от КРАЯ на отчетния месец (FRED датира
+# наблюдението с 1-во число): юли (01.07) на 29.09 е 60 дни от 31.07, но 90
+# от 01.07 — нормален цикъл точно преди новото издание, не застой.
+CORE_PCE_STALENESS_DAYS = int(os.getenv("CORE_PCE_STALENESS_DAYS", 75))
+
 # ── Market Breadth (% над 40dMA) — 9-ти термометър индикатор ──────────────
 # Feasibility проверка 2026-08-15: чист безплатен T2108 feed НЕ съществува
 # (нито през yfinance — ^T2108/^NYSI/^NYMO/^NYAD всички 404, нито през друг

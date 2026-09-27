@@ -79,6 +79,9 @@ def render_dashboard(brief: dict) -> str:
         ai_truncations=brief.get("ai_truncations", []),
         unusual_options=brief.get("unusual_options", []),
         splits=brief.get("splits", []),
+        splits_report=brief.get("splits_report"),
+        splits_min_price=config.SPLITS_MIN_PRICE,
+        splits_min_cap_m=config.SPLITS_MIN_MARKET_CAP / 1e6,
         superinvestor_moves=brief.get("superinvestor_moves", []),
         superinvestor_new_positions=brief.get("superinvestor_new_positions", []),
         superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),
@@ -90,6 +93,7 @@ def render_dashboard(brief: dict) -> str:
         cot=brief.get("cot", []),
         correlation_flags=brief.get("correlation_flags", []),
         distribution_days=brief.get("distribution_days"),
+        core_inflation=(brief.get("macro") or {}).get("core_inflation"),
         backtest=brief.get("backtest", {}),
         available_dates=brief.get("date") and [brief.get("date")],
     )
@@ -100,6 +104,27 @@ def render_dashboard(brief: dict) -> str:
     (archive / f"{today.isoformat()}.html").write_text(html, encoding="utf-8")
     _publish_history(brief)
     return html
+
+
+_SPLIT_BADGE_EMAIL = {"position": "📌", "watch": "🔎"}
+
+
+def _split_when(s: dict) -> str:
+    """'11.08 · след 5 дни' — същият текст като badge-а на dashboard-а."""
+    d = s.get("days_to_split")
+    date = s.get("date") or ""
+    dm = f"{date[8:10]}.{date[5:7]}" if len(date) >= 10 else ""
+    if d is None:
+        rel = ""
+    elif d == 0:
+        rel = "днес"
+    elif d == 1:
+        rel = "утре"
+    elif d > 1:
+        rel = f"след {d} дни"
+    else:
+        rel = f"преди {-d} {'ден' if d == -1 else 'дни'}"
+    return " · ".join(x for x in (dm, rel) if x)
 
 
 def render_email(brief: dict) -> str:
@@ -151,16 +176,30 @@ def render_email(brief: dict) -> str:
 
     # v2 · компактна секция „Сигнали днес" (Секции 3.3 + 3.4) — само ако има данни
     uo = [r["ticker"] for r in brief.get("unusual_options", [])][:8]
-    sp = brief.get("splits", [])[:6]
+    # FIX 2026-09-27: заглавието казваше "30 дни", а списъкът е само текущата
+    # седмица; + сплитовете на отворени позиции/наблюдавани, както на dashboard-а
+    sr = brief.get("splits_report") or {}
+    sp = (sr.get("rows") if sr else brief.get("splits", []))[:6]
+    sp_prio = sr.get("priority", [])
     signals_rows = ""
     if uo:
         signals_rows += (
             '<div style="margin-bottom:6px"><span style="color:#6b7280">Необичаен опционен обем:</span> '
             f'<span style="font-family:monospace;color:#111827">{", ".join(uo)}</span></div>')
-    if sp:
-        sp_txt = ", ".join(f'{s["ticker"]}{(" " + s["ratio"]) if s.get("ratio") else ""}' for s in sp)
+    if sp_prio:
+        pr_txt = ", ".join(
+            f'{_SPLIT_BADGE_EMAIL.get(s.get("badge"), "")} {s["ticker"]}'
+            f'{(" " + s["ratio"]) if s.get("ratio") else ""} · {_split_when(s)}' for s in sp_prio)
         signals_rows += (
-            '<div><span style="color:#6b7280">Предстоящи сплитове (30 дни):</span> '
+            '<div style="margin-bottom:6px"><span style="color:#6b7280">Сплитове на отворени позиции / наблюдавани:</span> '
+            f'<span style="font-family:monospace;color:#b45309">{pr_txt}</span></div>')
+    if sp:
+        sp_txt = ", ".join(
+            f'{s["ticker"]}{(" " + s["ratio"]) if s.get("ratio") else ""}'
+            f'{(" " + _SPLIT_BADGE_EMAIL[s["badge"]]) if s.get("badge") in _SPLIT_BADGE_EMAIL else ""}'
+            for s in sp)
+        signals_rows += (
+            '<div><span style="color:#6b7280">Сплитове тази седмица:</span> '
             f'<span style="font-family:monospace;color:#111827">{sp_txt}</span></div>')
     si = brief.get("superinvestor_moves", [])[:8]
     if si:

@@ -117,6 +117,59 @@ def treasury_spread_2s10s() -> dict:
     }
 
 
+_MONTHS_BG = ["януари", "февруари", "март", "април", "май", "юни", "юли",
+              "август", "септември", "октомври", "ноември", "декември"]
+
+
+def core_inflation() -> dict:
+    """
+    FIX 2026-09-27: основна инфлация — Dallas Fed Trimmed Mean PCE (12м, % г/г).
+    Информативна: не влиза в броенето на термометъра и не влияе на режима.
+
+    Месечна серия с ~1 месец закъснение → НЕ ползва дневния _is_stale().
+    Застояла е, ако от края на отчетния месец са минали повече от
+    config.CORE_PCE_STALENESS_DAYS дни (виж config.py коментара).
+    При провал/застой → {"value": None}: картата показва "няма данни",
+    брифът продължава.
+    """
+    empty = {"value": None}
+    try:
+        obs = _fred_series(config.CORE_PCE_SERIES, days=400)
+        if not obs:
+            print("[macro] core PCE: няма данни от FRED")
+            return empty
+        last_d = dt.date.fromisoformat(obs[-1][0])
+        # край на отчетния месец
+        nxt = (last_d.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+        age = (dt.date.today() - (nxt - dt.timedelta(days=1))).days
+        if age > config.CORE_PCE_STALENESS_DAYS:
+            print(f"[macro] core PCE stale — последно наблюдение {last_d} "
+                  f"({age}д от края на месеца, праг {config.CORE_PCE_STALENESS_DAYS}д)")
+            return {**empty, "stale": True, "last_date": last_d.isoformat(),
+                    "last_month": _MONTHS_BG[last_d.month - 1], "age_days": age}
+        val = obs[-1][1]
+        n = config.CORE_PCE_LOOKBACK_OBS
+        prev = obs[-1 - n] if len(obs) > n else None
+        out = {
+            "value": round(val, 2),
+            "date": last_d.isoformat(),
+            "month": _MONTHS_BG[last_d.month - 1],
+            "age_days": age,
+        }
+        if prev:
+            pd_ = dt.date.fromisoformat(prev[0])
+            out.update({
+                "prev": round(prev[1], 2),
+                "prev_date": pd_.isoformat(),
+                "prev_month": _MONTHS_BG[pd_.month - 1],
+                "direction": ("up" if val > prev[1] else "down" if val < prev[1] else "flat"),
+            })
+        return out
+    except Exception as e:
+        print(f"[macro] core PCE failed: {e}")
+        return empty
+
+
 def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
     """
     Огледало на thermometer._is_stale (дублирано локално, за да няма
@@ -210,6 +263,8 @@ def collect_macro_layer() -> dict:
         "net_liquidity": fed_net_liquidity(),
         "spread_2s10s": treasury_spread_2s10s(),
         "global_signals": global_market_signals(),
+        # преди headlines: промптът реже macro JSON-а на 6000 знака
+        "core_inflation": core_inflation() if config.ENABLE_CORE_INFLATION else None,
         "headlines": recent_headlines(),
     }
 
