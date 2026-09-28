@@ -148,21 +148,29 @@ def core_inflation() -> dict:
             return {**empty, "stale": True, "last_date": last_d.isoformat(),
                     "last_month": _MONTHS_BG[last_d.month - 1], "age_days": age}
         val = obs[-1][1]
-        n = config.CORE_PCE_LOOKBACK_OBS
-        prev = obs[-1 - n] if len(obs) > n else None
         out = {
             "value": round(val, 2),
             "date": last_d.isoformat(),
             "month": _MONTHS_BG[last_d.month - 1],
             "age_days": age,
         }
-        if prev:
-            pd_ = dt.date.fromisoformat(prev[0])
+        # FIX 2026-09-28: посока от средни стойности, не от една точка
+        n = config.CORE_PCE_AVG_MONTHS
+        if len(obs) >= 2 * n:
+            recent, prior = obs[-n:], obs[-2 * n:-n]
+            a = sum(v for _, v in recent) / n
+            b = sum(v for _, v in prior) / n
+            chg = a - b
+            month = lambda d: _MONTHS_BG[dt.date.fromisoformat(d).month - 1]
             out.update({
-                "prev": round(prev[1], 2),
-                "prev_date": pd_.isoformat(),
-                "prev_month": _MONTHS_BG[pd_.month - 1],
-                "direction": ("up" if val > prev[1] else "down" if val < prev[1] else "flat"),
+                "avg_recent": round(a, 2),
+                "avg_prior": round(b, 2),
+                "change_pp": round(chg, 2),
+                "recent_span": f"{month(recent[0][0])}–{month(recent[-1][0])}",
+                "prior_span": f"{month(prior[0][0])}–{month(prior[-1][0])}",
+                "direction": ("up" if chg > config.CORE_PCE_FLAT_PP
+                              else "down" if chg < -config.CORE_PCE_FLAT_PP else "flat"),
+                "flat_threshold_pp": config.CORE_PCE_FLAT_PP,
             })
         return out
     except Exception as e:

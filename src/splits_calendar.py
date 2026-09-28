@@ -369,8 +369,13 @@ def splits_report(positions: set[str] | None = None,
         print("[splits] приоритетни: " + ", ".join(
             f"{r['ticker']} ({r['badge']}, {r['date']}, {r['days_to_split']:+d}д)"
             for r in priority))
+    # FIX 2026-09-28: колко позиции/наблюдавани са проверени — за изричния ред
+    # "няма сплитове в хоризонта", вместо тишина при празен priority
+    priority_checked = len(positions | watched)
+    in_rows = sum(1 for r in rows if r["badge"])
     return {"state": data["diag"]["state"], "diag": data["diag"],
-            "rows": rows, "priority": priority}
+            "rows": rows, "priority": priority,
+            "priority_checked": priority_checked, "priority_in_rows": in_rows}
 
 
 if __name__ == "__main__":

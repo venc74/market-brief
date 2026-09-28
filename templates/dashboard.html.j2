@@ -433,7 +433,7 @@
       <div class="t-name">Основна инфлация</div>
       {% if ci.value is not none %}
       <div class="t-val">{{ "%.2f"|format(ci.value) }}%</div>
-      <div class="t-label">за {{ ci.month }}{% if ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
+      <div class="t-label">за {{ ci.month }}{% if ci.avg_recent is defined %} · <span title="Средно {{ ci.recent_span }} срещу {{ ci.prior_span }}; под ±{{ ci.flat_threshold_pp }} пп = стабилна">{{ {'up': '↑ расте', 'down': '↓ пада', 'flat': '→ стабилна'}[ci.direction] }}: 3м средно {{ "%.2f"|format(ci.avg_recent) }}% срещу {{ "%.2f"|format(ci.avg_prior) }}%</span>{% elif ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
       {% else %}
       <div class="t-val">—</div>
       <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · информативно, не влиза в режима</div>
@@ -497,7 +497,11 @@
           <tr>
             <td>{{ t.date }}</td>
             <td class="{{ 'buy' if t.code == 'P' else 'sell' }}">{{ 'покупка' if t.code == 'P' else 'продажба' }}</td>
-            <td>{{ t.owner_name }}{% if t.owner_title %} <span class="wm-src">· {{ t.owner_title }}</span>{% endif %}</td>
+            {# FIX 2026-09-28: директорите нямат officerTitle в Form 4 → длъжността
+               липсваше (BLSH, Andrew Bliss); is_director вече се парсва #}
+            {% set roles = [t.owner_title] if t.owner_title else [] %}
+            {% if t.is_director and 'director' not in (t.owner_title or '')|lower %}{% set roles = roles + ['директор'] %}{% endif %}
+            <td>{{ t.owner_name }}{% if roles %} <span class="wm-src">· {{ roles|join(' · ') }}</span>{% endif %}</td>
             <td class="num">${{ "{:,.0f}".format(t.value) }}</td>
             <td class="num">{{ t.pct_of_holdings ~ "%" if t.pct_of_holdings is not none else "—" }}</td>
             <td>{{ "10b5-1" if t.planned_10b5_1 else ("извънпланова" if t.planned_10b5_1 is false else "неизв.") }}</td>
@@ -806,6 +810,15 @@
 {% if unusual_options %}
 <section>
   <h2>Unusual Options Yesterday</h2>
+  {# FIX 2026-09-28: без съотношение обем/OI подредбата е по ликвидност #}
+  {% set uod = unusual_options_diag or {} %}
+  {% if uod.source == 'yfinance' and uod.with_ratio is defined and uod.with_ratio < unusual_min_ratios %}
+  <div class="splits-warn" style="color:var(--yellow);background:rgba(251,191,36,.10);border-color:rgba(251,191,36,.35);margin-bottom:10px">
+    ⚠ Съотношение обем/OI има само за {{ uod.with_ratio }} от {{ uod.shown }} — данните за OI липсват
+    в часа на изтегляне ({{ uod.fetched_at_utc }} UTC). Днес подредбата е по ликвидност на акцията,
+    не по необичайност на опционната активност.
+  </div>
+  {% endif %}
   <div class="signal-grid">
     {% for u in unusual_options %}
     <div class="signal-chip {{ u.call_put_bias or '' }}">
@@ -848,6 +861,8 @@
   <div class="signal-grid splits-priority">
     {% for s in sr.priority %}{{ split_chip(s) }}{% endfor %}
   </div>
+  {% elif sr.priority_checked and sr.state != 'source_failed' and not sr.priority_in_rows %}
+  <div class="splits-funnel" style="margin-bottom:10px">Отворени позиции и наблюдавани ({{ sr.priority_checked }}): няма сплитове в хоризонта{% if dg.horizon_to %} до {{ dg.horizon_to[8:10] }}.{{ dg.horizon_to[5:7] }}{% endif %}.</div>
   {% endif %}
   {% if sr.state == 'source_failed' %}
   <div class="splits-warn">⚠ Календарът на сплитовете не върна данни днес.</div>

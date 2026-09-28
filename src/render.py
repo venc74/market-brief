@@ -78,6 +78,8 @@ def render_dashboard(brief: dict) -> str:
         model_info=brief.get("model_info", {}),
         ai_truncations=brief.get("ai_truncations", []),
         unusual_options=brief.get("unusual_options", []),
+        unusual_options_diag=brief.get("unusual_options_diag"),
+        unusual_min_ratios=config.UNUSUAL_OPTIONS_MIN_RATIOS,
         splits=brief.get("splits", []),
         splits_report=brief.get("splits_report"),
         splits_min_price=config.SPLITS_MIN_PRICE,

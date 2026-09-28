@@ -145,13 +145,23 @@ def _parse_json(text: str):
             clean = clean[4:]
     clean = clean.strip()
     try:
-        return _fix_translit(json.loads(clean))
+        return _fix_text(json.loads(clean))
     except json.JSONDecodeError as e:
         repaired = json_repair.loads(clean)
         if isinstance(repaired, (dict, list)) and repaired:
             print(f"[ai] _parse_json: json_repair поправи malformed JSON ({e})")
-            return _fix_translit(repaired)
+            return _fix_text(repaired)
         raise
+
+
+def _fix_text(obj):
+    """_fix_translit + един обобщен лог ред за хибридните думи в отговора."""
+    _HYBRIDS.clear()
+    out = _fix_translit(obj)
+    if _HYBRIDS:
+        print(f"[ai] смесено писмо (само лог, {len(_HYBRIDS)}): "
+              f"{', '.join(dict.fromkeys(_HYBRIDS))}")
+    return out
 
 
 # FIX 2026-09-25: латински транслитерации на български думи в AI текстовете.
@@ -163,25 +173,80 @@ def _parse_json(text: str):
 _TRANSLIT_FIX = {
     "ekspozitsiya": "експозиция", "ekspozitsiyata": "експозицията",
     "ekspozitsii": "експозиции", "ekspozitsiite": "експозициите",
+    # FIX 2026-09-28: останалите потвърдени случаи от историята (скан 06–09.2026)
+    "natisik": "натиск", "volatilnost": "волатилност", "direktnost": "директност",
+    "najsilnite": "най-силните",
 }
-_TRANSLIT_RE = re.compile(r"\b[A-Za-z]*(?:tsiya|tsii|iyata|tsiite)[A-Za-z]*\b")
+# FIX 2026-09-28: детекторът от 25.09 хващаше САМО наставките -tsiya/-tsii/
+# -iyata/-tsiite (скроен около "ekspozitsiya") — "natisik" (28.09) не пасва на
+# нито една. Нов модел, измерен върху цялата история (2587 различни латински
+# думи в малки букви в български текст — английските термини са легитимни по
+# дизайн): 6 удара, всичките реални транслитерации (ekspozitsiya ×7,
+# najsilnite, dedik[ирани], volatilnost, direktnost, natisik), 0 английски
+# думи. Нови случаи само се логват — замяна само за потвърдените по-горе.
+_TRANSLIT_RE = re.compile(
+    r"(?<![A-Za-z\-])[A-Za-z]{4,}(?![A-Za-z\-])")
+_TRANSLIT_PAT = re.compile(
+    r"^naj|nost$|(?<!n)ik$|tsi(?:ya|i|a|e)|iya|zh|sht|[^aeiou]ya$|yu|ski$|ska$", re.I)
+# FIX 2026-09-28: китайски/японски/корейски символи в български текст — 6 появи
+# в историята (損害, 底, 升级, 映射, 催化剂 в DXCM 21.09, 純 в Cocoa 28.09).
+# Никога не са легитимни тук → премахват се и се логват.
+_CJK_RE = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯豈-﫿]+")
+# FIX 2026-09-28: латински букви-двойници в иначе кирилска дума ("нямa",
+# "секторa", "Oперира") — изглеждат еднакво, но са друг символ. Замяна само
+# когато латинските букви са ≤2 и ВСИЧКИ са двойници: иначе е хибрид
+# ("момentum", "benefitват", "expозиция" — последната е изцяло от двойници,
+# но замяната би дала "ехрозиция", пак грешна дума) → само лог. Измерено върху
+# историята: 12 различни замени (24 появи), всичките правилни; 88 хибрида.
+_HOMOGLYPHS = dict(zip("aeopcxyAEOPCXTHKMB", "аеорсхуАЕОРСХТНКМВ"))
+_WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё]+")
+# хибридите се събират за един обобщен лог ред на AI отговор (виж _parse_json)
+_HYBRIDS: list[str] = []
+
+
+def _fix_homoglyphs(s: str) -> str:
+    def repl(m):
+        w = m.group(0)
+        lat = [c for c in w if c.isascii()]
+        if not lat or len(lat) == len(w):
+            return w
+        if len(lat) <= 2 and len(w) - len(lat) >= 2 and all(c in _HOMOGLYPHS for c in lat):
+            fixed = "".join(_HOMOGLYPHS.get(c, c) for c in w)
+            print(f"[ai] буква-двойник заменена: '{w}' → '{fixed}'")
+            return fixed
+        _HYBRIDS.append(w)
+        return w
+    return _WORD_RE.sub(repl, s)
 
 
 def _fix_translit(obj):
-    """Обхожда всички низове в парснатия JSON: заменя познатите, логва новите."""
+    """
+    Обхожда всички низове в парснатия JSON (всички AI отговори минават през
+    _parse_json): премахва CJK символи, заменя букви-двойници и познатите
+    транслитерации, логва новите и хибридите.
+    """
     if isinstance(obj, dict):
         return {k: _fix_translit(v) for k, v in obj.items()}
     if isinstance(obj, list):
         return [_fix_translit(v) for v in obj]
     if not isinstance(obj, str):
         return obj
+    if _CJK_RE.search(obj):
+        for m in _CJK_RE.finditer(obj):
+            print(f"[ai] ⚠ премахнати чужди символи '{m.group(0)}' в "
+                  f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
+        obj = re.sub(r" {2,}", " ", _CJK_RE.sub("", obj))
+    if not re.search(r"[А-Яа-я]", obj):
+        return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
+    obj = _fix_homoglyphs(obj)
     def repl(m):
         w = m.group(0)
         fixed = _TRANSLIT_FIX.get(w.lower())
-        if fixed is None:
+        if fixed is not None:
+            return fixed.capitalize() if w[0].isupper() else fixed
+        if _TRANSLIT_PAT.search(w):
             print(f"[ai] ⚠ латинска транслитерация без замяна: '{w}' — добави в _TRANSLIT_FIX")
-            return w
-        return fixed.capitalize() if w[0].isupper() else fixed
+        return w
     return _TRANSLIT_RE.sub(repl, obj)
 
 
@@ -227,11 +292,16 @@ def _core_inflation_block(macro: dict) -> str:
 от термометъра и НЕ влияе на режима): {json.dumps(ci, ensure_ascii=False, default=str)}
 
 ВАЖНО за инфлацията: всяко твърдение за "инфлационен натиск" (засилващ се, \
-отслабващ, упорит) сверявай с тази стойност и посоката ѝ спрямо "prev". Ако \
-пазарни сигнали (петрол, доходности, злато) внушават натиск, а основната \
-инфлация пада — кажи го изрично като разминаване, не го представяй като \
-потвърден натиск. Цитирай стойността точно и за кой месец е. Ако "value" е \
-null — не прави твърдения за нивото или посоката на основната инфлация.
+отслабващ, упорит) сверявай с тази стойност и полето "direction" — посоката е \
+изчислена от кода като средно за последните 3 месеца ("avg_recent") срещу \
+предходните 3 ("avg_prior"). Ако "direction" е "flat" — основната инфлация е \
+СТАБИЛНА: НЕ пиши, че "пада", "расте", "продължава да пада" или "се ускорява", \
+и не сравнявай единични месеци, за да изведеш посока. Посока твърди само при \
+"up"/"down". Ако пазарни сигнали (петрол, доходности, злато) внушават натиск, \
+а основната инфлация не расте — кажи го изрично като разминаване, не го \
+представяй като потвърден натиск. Цитирай стойността точно и за кой месец е. \
+Ако "value" е null — не прави твърдения за нивото или посоката на основната \
+инфлация.
 """
 
 
@@ -279,6 +349,12 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 "единственото, което би отменило Defensive, е MOVE под 85" — 85 не е праг никъде \
 в системата, а реалното условие дори не изисква MOVE да падне, само да спре да \
 расте. Ако exit_rule не казва нещо, ти също не го казвай.
+
+ВАЖНО за единиците на MOVE: "delta_1w" в термометъра и прагът за override са в \
+ПУНКТОВЕ на индекса (напр. "+15.4 пункта"), НЕ в проценти. Процентната промяна \
+е отделно поле — "chg_5d_pct" в МАКРО global_signals.MOVE. Пиши винаги с единица \
+("пункта" или "%") и никога не слагай % на delta_1w. Потвърден случай 28.09.2026: \
+делтата +15.4 пункта беше цитирана като "+15.4%" (реалната % промяна беше +19.05%).
 {_core_inflation_block(macro)}
 Задачи:
 1. "macro_brief": 4-6 изречения — какво се случи в света и какво означава за \

@@ -49,6 +49,8 @@ _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
 _CACHE = config.DATA_DIR / "unusual_options_cache.json"
 _UNIV_CACHE = config.DATA_DIR / "sp500_ndx_universe.json"
 _VOLUME_RANK_CACHE = config.DATA_DIR / "unusual_options_volume_rank_cache.json"
+# FIX 2026-09-28: диагностика на последния fetch (виж _yf_unusual) → брифа
+LAST_DIAG: dict = {}
 
 
 def _bias(call_vol: float, put_vol: float) -> tuple[str, str]:
@@ -262,14 +264,36 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
                 oi_part = "."
             rows.append({"ticker": sym, "call_put_bias": bias,
                          "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
+                         # FIX 2026-09-28: изрично поле + суров OI за диагностиката
+                         "has_oi_ratio": ratio is not None and not oi_suspect,
+                         "_oi": int(total_oi), "_oi_suspect": oi_suspect,
                          "_ratio": round(ratio, 2) if (ratio is not None and not oi_suspect) else 0})
         except Exception as e:
             print(f"[unusual_options] yf {sym}: {e}")
             continue
     rows.sort(key=lambda r: r.get("_ratio", 0), reverse=True)
+    top = rows[:top_n]
+    # FIX 2026-09-28: от 21.09 OI в 05:55 UTC идва празен за 9/10 (до 18.09 —
+    # 10/10; в 13:54 UTC на 28.09 OI си беше там) — без съотношение
+    # подредбата пада до реда на сканиране = ликвидност на акцията. Диагностика
+    # за всеки ден: колко имат съотношение, суровият OI, часът на fetch-а.
+    LAST_DIAG.clear()
+    LAST_DIAG.update({
+        "fetched_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M"),
+        "scanned_with_volume": len(rows),
+        "with_ratio": sum(1 for r in top if r.get("has_oi_ratio")),
+        "shown": len(top),
+        "oi_missing": [r["ticker"] for r in top if r["_oi"] < 50],
+        "oi_suspect": [r["ticker"] for r in top if r["_oi_suspect"]],
+        "raw_oi": {r["ticker"]: r["_oi"] for r in top},
+    })
+    print(f"[unusual_options] {LAST_DIAG['fetched_at_utc']} UTC: съотношение обем/OI за "
+          f"{LAST_DIAG['with_ratio']}/{LAST_DIAG['shown']}; OI липсва (<50): "
+          f"{LAST_DIAG['oi_missing'] or '—'}; суров OI: {LAST_DIAG['raw_oi']}")
     for r in rows:
-        r.pop("_ratio", None)
-    return rows[:top_n]
+        for k in ("_ratio", "_oi", "_oi_suspect"):
+            r.pop(k, None)
+    return top
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -309,16 +333,19 @@ def fetch_unusual_options(limit: int = 10) -> list[dict]:
         try:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today:
+                LAST_DIAG.clear(); LAST_DIAG.update(cached.get("diag") or {})
                 return cached.get("rows", [])[:limit]
         except Exception:
             pass
 
+    LAST_DIAG.clear()
     universe = _sp500_ndx_universe()
     rows = _yf_unusual(universe, limit)
     source = "yfinance"
     if not rows:
         rows = _fetch_marketchameleon(limit)
         source = "marketchameleon"
+    LAST_DIAG["source"] = source
 
     seen, dedup = set(), []
     for r in rows:
@@ -327,7 +354,8 @@ def fetch_unusual_options(limit: int = 10) -> list[dict]:
 
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "source": source, "rows": dedup},
+        _CACHE.write_text(json.dumps({"date": today, "source": source, "rows": dedup,
+                                      "diag": LAST_DIAG},
                                      ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[unusual_options] cache write: {e}")

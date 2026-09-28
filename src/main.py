@@ -482,6 +482,8 @@ def run() -> dict:
         # v2 нови блокове
         "theses": theses,
         "unusual_options": unusual_today,
+        # FIX 2026-09-28: колко имат съотношение обем/OI, суров OI, час на fetch-а
+        "unusual_options_diag": dict(unusual_options.LAST_DIAG),
         "splits": splits_month,
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,

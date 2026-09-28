@@ -34,8 +34,12 @@ def spy_trend() -> dict:
             raise ValueError("NaN в SPY цена/MA — невалидни данни от източника")
         above50, above200 = price > ma50, price > ma200
         status = "green" if (above50 and above200) else ("yellow" if above200 else "red")
+        # FIX 2026-09-28: разстояние до 52-седмичния връх (затваряния) — за
+        # бележката за разминаване с Market Breadth; не влияе на статуса
+        high_52w = float(close.iloc[-252:].max())
         return {
             "name": "SPY тренд", "value": round(price, 2),
+            "pct_from_high": round((1 - price / high_52w) * 100, 2),
             "ma50": round(ma50, 2), "ma200": round(ma200, 2),
             "above_50dma": above50, "above_200dma": above200, "status": status,
             "label": f"SPY {price:.0f} | {'над' if above50 else 'под'} 50DMA, "
@@ -191,7 +195,9 @@ def move_index() -> dict:
         return {
             "name": "MOVE (Bond Vol)", "value": round(val, 1),
             "delta_1w": round(delta, 1), "spike": spike, "status": status,
-            "label": f"MOVE {val:.0f} ({delta:+.0f}/седмица){spike_note}",
+            # FIX 2026-09-28: изрично "пункта" — на 28.09 макро текстът цитира
+            # делтата (+15.4 пункта) като "+15.4%" (реалната % промяна е +19.05%)
+            "label": f"MOVE {val:.0f} ({delta:+.0f} пункта/седмица){spike_note}",
         }
     except Exception as e:
         print(f"[thermo] MOVE failed: {e}")
@@ -380,7 +386,8 @@ def market_breadth() -> dict:
     Mean-reverting zoни (за разлика от повечето останали индикатори, "по-
     високо не е по-добре"):
       >80%    жълто — overbought, твърде много акции разтегнати над MA
-      20-80%  зелено — здравословна ширина
+      40-80%  зелено — здравословна ширина
+      20-40%  жълто — слаба/тясна ширина (FIX 2026-09-28; до тогава зелено)
       10-20%  жълто — приближава капитулация
       <10%    "red" МЕХАНИЧНО (участва в regime броенето като останалите
               индикатори — краткосрочен breadth collapse си остава risk-off
@@ -437,6 +444,8 @@ def market_breadth() -> dict:
         status, note = "red", "extreme капитулация — исторически bottoming зона, contrarian bullish"
     elif pct < config.BREADTH_HEALTHY_LOW:
         status, note = "yellow", "приближава капитулация"
+    elif pct < config.BREADTH_WEAK_THRESHOLD:
+        status, note = "yellow", "слаба/тясна ширина"  # FIX 2026-09-28, виж config.py
     elif pct <= config.BREADTH_OVERBOUGHT_THRESHOLD:
         status, note = "green", "здравословна ширина"
     else:
@@ -450,6 +459,25 @@ def market_breadth() -> dict:
                              "върху собствен universe (S&P500+Nasdaq100+MidCap400) — "
                              "НЕ буквален NYSE T2108."),
     }
+
+
+def _breadth_divergence(indicators: list[dict]) -> None:
+    """
+    FIX 2026-09-28: бележка при разминаване — SPY близо до 52-седмичния връх,
+    а под BREADTH_WEAK_THRESHOLD% от акциите са над 40dMA (тесен пазар).
+    Само етикет + поле "divergence"; статусът и броенето не се пипат.
+    """
+    spy = next((i for i in indicators if i.get("name") == "SPY тренд"), None)
+    br = next((i for i in indicators if i.get("name", "").startswith("Market Breadth")), None)
+    if not (spy and br) or spy.get("hide") or br.get("hide"):
+        return
+    gap, val = spy.get("pct_from_high"), br.get("value")
+    if gap is None or val is None:
+        return
+    if val < config.BREADTH_WEAK_THRESHOLD and gap <= config.SPY_NEAR_HIGH_PCT:
+        br["divergence"] = True
+        br["label"] += (f" · ⚠ разминаване: SPY е на {gap:.1f}% от 52-седм. връх, "
+                        f"а ширината е под {config.BREADTH_WEAK_THRESHOLD:.0f}%")
 
 
 def build_thermometer(macro: dict) -> dict:
@@ -505,6 +533,7 @@ def build_thermometer(macro: dict) -> dict:
                   nl_ind, move_index(), vix_term_structure(), credit_spread_proxy()]
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
+        _breadth_divergence(indicators)
 
     # FIX 2026-07-15: броим само ВИДИМИТЕ индикатори; жълтите и скритите се
     # отчитат изрично в съобщението, вместо да изчезват тихо от "X зелени / Y червени".
@@ -560,15 +589,20 @@ def build_thermometer(macro: dict) -> dict:
     if move_forces_defensive:
         exits = []
         if move_val > config.MOVE_RED_THRESHOLD:
-            exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} или под (сега {move_val:.1f})")
+            exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} пункта или под "
+                         f"(сега {move_val:.1f})")
         if move_spike:
+            # FIX 2026-09-28: единици "пункта" (не %); и "спре да расте" беше
+            # неточно — условието е ръстът за седмица да е под прага, не нула
             exits.append(
-                f"седмичната промяна на MOVE спадне под +{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} "
-                f"(сега {move_ind.get('delta_1w'):+.1f}) — тоест MOVE спре да расте; "
+                f"седмичната промяна на MOVE спадне под +{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта "
+                f"(сега {move_ind.get('delta_1w'):+.1f} пункта) — тоест седмичният ръст "
+                f"се забави под {config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта; "
                 "НЕ се изисква спад до конкретно ниво")
         overrides.append({
             "trigger": "MOVE",
-            "text": (f"MOVE {move_val:.0f}" + (" (рязък седмичен скок)" if move_spike else " > 150")
+            "text": (f"MOVE {move_val:.0f}" + (f" (рязък седмичен скок, {move_ind.get('delta_1w'):+.1f} пункта)"
+                                               if move_spike else f" > {config.MOVE_RED_THRESHOLD:.0f}")
                      + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%"),
             "exit_condition": " И ".join(exits),
         })

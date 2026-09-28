@@ -358,6 +358,9 @@ UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  
 # принцип като IV sanity floor прецедента (src/enrich.py) — горна граница
 # на правдоподобност, не само долна.
 UNUSUAL_OPTIONS_MAX_OI_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MAX_OI_RATIO", 50.0))
+# FIX 2026-09-28: под толкова показани тикъра със съотношение обем/OI секцията
+# казва изрично, че подредбата е по ликвидност (от 21.09: 1–3/10 всеки ден)
+UNUSUAL_OPTIONS_MIN_RATIOS = int(os.getenv("UNUSUAL_OPTIONS_MIN_RATIOS", 5))
 
 # NDX100 състав — СТАТИЧЕН списък, ръчно поддържан. Wikipedia премахна structured
 # компонентната таблица от Nasdaq-100 статията (само външен линк към nasdaq.com
@@ -501,8 +504,13 @@ FED_LIQUIDITY_STALENESS_DAYS = int(os.getenv("FED_LIQUIDITY_STALENESS_DAYS", 12)
 # макро брифа като котва за твърдения за "инфлационен натиск".
 ENABLE_CORE_INFLATION = os.getenv("ENABLE_CORE_INFLATION", "1") == "1"
 CORE_PCE_SERIES = "PCETRIM12M159SFRBDAL"   # месечна, % г/г
-# Сравнение с наблюдението N месеца назад (2 → юли срещу май).
-CORE_PCE_LOOKBACK_OBS = int(os.getenv("CORE_PCE_LOOKBACK_OBS", 2))
+# FIX 2026-09-28: посока = средно за последните N месеца срещу предходните N,
+# не една точка (юли срещу май сравняваше с локален връх: 2.43 при плоска
+# серия 2.36/2.35/2.43/2.26/2.28). Под ±FLAT_PP → "стабилна". Измерено върху
+# цялата серия (578 месеца от 1978): ±0.10 пп дава 48% стабилна (53% от 2015);
+# ±0.05 е в шума на закръглянето до 2 знака, ±0.15 пропуска спада 11.2025.
+CORE_PCE_AVG_MONTHS = int(os.getenv("CORE_PCE_AVG_MONTHS", 3))
+CORE_PCE_FLAT_PP = float(os.getenv("CORE_PCE_FLAT_PP", 0.10))
 # Месечна серия с ~1 месец закъснение — дневният 3-дневен праг би я крил
 # постоянно. Възрастта се мери от КРАЯ на отчетния месец (FRED датира
 # наблюдението с 1-во число): юли (01.07) на 29.09 е 60 дни от 31.07, но 90
@@ -528,6 +536,15 @@ BREADTH_MIN_VALID_TICKERS = int(os.getenv("BREADTH_MIN_VALID_TICKERS", 200))  # 
 BREADTH_OVERBOUGHT_THRESHOLD = float(os.getenv("BREADTH_OVERBOUGHT_THRESHOLD", 80.0))
 BREADTH_HEALTHY_LOW = float(os.getenv("BREADTH_HEALTHY_LOW", 20.0))
 BREADTH_CAPITULATION_THRESHOLD = float(os.getenv("BREADTH_CAPITULATION_THRESHOLD", 10.0))
+# FIX 2026-09-28: 20–40% вече е жълто "слаба/тясна ширина", не зелено
+# "здравословна" — 67% (17.08) → 22.5% (28.09) при SPY близо до върха беше
+# показвано като здравословно. Проверено върху 14-те дни под 40% (09–28.09):
+# режимът по броене не се сменя нито веднъж (Offensive иска ≥4 зелени, 0 червени).
+BREADTH_WEAK_THRESHOLD = float(os.getenv("BREADTH_WEAK_THRESHOLD", 40.0))
+# Бележка за разминаване: ширина под BREADTH_WEAK_THRESHOLD, докато SPY е на
+# ≤ този % от 52-седмичния си връх. Измерено 14.08–28.09 (цялата наличната
+# breadth история): SPY беше на ≤3% от върха в 13 от 14-те дни под 40%.
+SPY_NEAR_HIGH_PCT = float(os.getenv("SPY_NEAR_HIGH_PCT", 3.0))
 
 # ── SEC Form 4 Insider Buying (officers CEO/CFO/President/COO, open market) ──
 ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
