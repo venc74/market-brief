@@ -1,5 +1,5 @@
 {
- "date": "2026-09-25",
+ "date": "2026-09-28",
  "rows": [
   {
    "ticker": "COO",
@@ -37,6 +37,22 @@
      "title": "",
      "date": "2026-09-11",
      "value": 249999.97770000002
+    }
+   ],
+   "transfers": []
+  },
+  {
+   "ticker": "TFC",
+   "company": "TRUIST FINANCIAL CORP",
+   "total_value": 1015576.7999999999,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Lyons Michael P.",
+     "title": "President & CEO",
+     "date": "2026-09-17",
+     "value": 1015576.7999999999
     }
    ],
    "transfers": []
@@ -117,10 +133,10 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 364,
+  "tickers_with_filings": 352,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 142,
-  "qualifying_after_filter": 10,
-  "unique_filings_processed": 1875
+  "raw_transactions_parsed": 129,
+  "qualifying_after_filter": 11,
+  "unique_filings_processed": 1747
  }
 }

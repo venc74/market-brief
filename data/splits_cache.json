@@ -1,4 +1,135 @@
 {
- "date": "2026-09-25",
- "rows": []
+ "date": "2026-09-28",
+ "rows": [],
+ "horizon": [
+  {
+   "ticker": "BTLN",
+   "company": "Brightline Interactive, Inc.",
+   "date": "2026-09-28",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "CTNT",
+   "company": "Cheetah Net Supply Chain Service Inc.",
+   "date": "2026-09-28",
+   "ratio": "1:150",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "DLXY",
+   "company": "Delixy Holdings Limited",
+   "date": "2026-09-28",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "DCX",
+   "company": "Digital Currency X Technology Inc.",
+   "date": "2026-09-28",
+   "ratio": "1:160",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "FBGL",
+   "company": "FBS Global Limited",
+   "date": "2026-09-28",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "GMEX",
+   "company": "GMEX ROBOTICS CORPORATION",
+   "date": "2026-09-28",
+   "ratio": "1:9",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "IMMP",
+   "company": "Immutep Limited",
+   "date": "2026-09-28",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "MTNB",
+   "company": "Matinas Biopharma Holdings, Inc.",
+   "date": "2026-09-28",
+   "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Sep 28, 2026"
+  },
+  {
+   "ticker": "ZCSH",
+   "company": "Grayscale Zcash Trust The Zcash ETF The Zcash ETF Shares",
+   "date": "2026-09-30",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Sep 30, 2026"
+  },
+  {
+   "ticker": "DHY",
+   "company": "UBS Asset Management High Yield Credit Fund",
+   "date": "2026-09-30",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Sep 30, 2026"
+  },
+  {
+   "ticker": "RUBI",
+   "company": "Rubico Inc.",
+   "date": "2026-10-06",
+   "ratio": "1.5:1",
+   "split_type": "normal",
+   "date_human": "Oct 06, 2026"
+  },
+  {
+   "ticker": "GCDT",
+   "company": "Green Circle Decarbonize Technology Limited",
+   "date": "2026-10-07",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Oct 07, 2026"
+  },
+  {
+   "ticker": "DXJ",
+   "company": "WisdomTree Japan Hedged Equity Fund",
+   "date": "2026-10-09",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Oct 09, 2026"
+  }
+ ],
+ "diag": {
+  "source": "nasdaq",
+  "errors": [],
+  "source_rows": 13,
+  "horizon_from": "2026-09-28",
+  "horizon_to": "2026-10-09",
+  "in_week": 10,
+  "dropped_price": [
+   "BTLN",
+   "CTNT",
+   "DLXY",
+   "DCX",
+   "FBGL",
+   "GMEX",
+   "IMMP",
+   "MTNB",
+   "DHY"
+  ],
+  "dropped_cap": [],
+  "dropped_no_data": [
+   "ZCSH"
+  ],
+  "passed": 0,
+  "state": "empty"
+ }
 }
