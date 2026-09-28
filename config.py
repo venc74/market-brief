@@ -444,7 +444,9 @@ COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
 # established пазари с временни data gaps.
 COT_SHORT_HISTORY_WEEKS = int(os.getenv("COT_SHORT_HISTORY_WEEKS", 104))
 COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
-COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 3000))
+# FIX 2026-09-28: 3000 → 4000. На 28.09 batch-овете стигнаха до 2162/3000;
+# Release 2 добавя effect на тикър + assumed_move + no_direct_link (~+300).
+COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 4000))
 # FIX 2026-08-02: горна граница на running seen_tickers речника (soft cross-batch
 # consistency, ai_brief.py: cot_theses) — FIFO, за да не расте prior_context
 # неограничено на дни с много batch-ове/тикъри.

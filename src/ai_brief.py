@@ -1096,6 +1096,132 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
     return thesis
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# FIX 2026-09-28 (Release 2): семантика на посоката в COT тезите.
+#
+# Старото поле thesis.direction ("bullish"/"bearish") нямаше дефиниция —
+# моделът го ползваше ту за посоката на СУРОВИНАТА, ту за ефекта върху
+# АКЦИЯТА. 77 обръщания за същия (пазар, тикър, вид) при непроменен
+# екстремум до 25.09; на 28.09 BROS "bullish" в директната Coffee теза
+# (= кафето нагоре) и "bearish" в cross-sector (= BROS губи от това), а
+# HSY/MDLZ едновременно bullish и bearish в Cocoa.
+#
+# Сега:
+#   • посоката на ИНСТРУМЕНТА се изчислява от кода (extreme_long → надолу,
+#     extreme_short → нагоре) и се подава на модела като даденост;
+#   • моделът връща за всеки тикър само "effect": gains/loses от ТОВА движение,
+#     и "assumed_move" — ехо на движението; разминаване = тезата е писана
+#     върху обратната предпоставка (30Y на 28.09 прочете -162 052 като "нетно
+#     къси") → тезата се отхвърля;
+#   • bullish/bearish за всеки тикър се извежда от кода: gains → bullish;
+#   • "no_direct_link": true → кодът изпразва tickers (срещу "само като
+#     индикативна референция" с тикъра оставен в списъка, 5Y на 28.09).
+# ──────────────────────────────────────────────────────────────────────────
+_RATE_MARKET = re.compile(r"Treasury|T-Bond|Fed Funds|SOFR", re.I)
+_EFFECT_ALIASES = {"gains": "gains", "gain": "gains", "печели": "gains",
+                   "loses": "loses", "lose": "loses", "губи": "loses"}
+_MOVE_ALIASES = {"up": "up", "нагоре": "up", "down": "down", "надолу": "down"}
+_EFFECT_BG = {"gains": "печели", "loses": "губи"}
+# само за измерване/лог — отказ в текста при непразен списък (виж Release 2)
+_GIVEUP_TEXT = re.compile(
+    r"не насилвам|не включвам|твърде разредена|генерична (верига|макро)|"
+    r"нито един от (днешните|кандидатите)|няма (реал|пряк|директ)\w* "
+    r"(връзк|верига|бенефициент|експозиц)|само като индикатив", re.I)
+
+
+def _instrument_move(extreme: dict) -> dict:
+    """Contrarian движение на инструмента — изчислено от кода, не от модела."""
+    up = extreme.get("direction") == "extreme_short"
+    text = f"цената на {extreme.get('market')} {'НАГОРЕ' if up else 'НАДОЛУ'}"
+    short = f"цена {'↑' if up else '↓'}"
+    if _RATE_MARKET.search(extreme.get("market") or ""):
+        text += f" (= доходността {'надолу' if up else 'нагоре'})"
+        short += f" · доходност {'↓' if up else '↑'}"
+    return {"instrument_direction": "bullish" if up else "bearish",
+            "move": "up" if up else "down", "move_text": text, "move_short": short}
+
+
+def _apply_effects(thesis: dict | None, market: str, kind: str) -> dict | None:
+    """
+    Нормализира под-тезата към новата семантика: no_direct_link → празен
+    списък; effect → per-ticker direction. Моделното thesis.direction се маха
+    — двусмислено по дефиниция.
+    """
+    if not thesis:
+        return thesis
+    thesis = dict(thesis)
+    thesis.pop("direction", None)
+    tickers = [t for t in (thesis.get("tickers") or [])
+               if isinstance(t, dict) and t.get("ticker")]
+    if thesis.get("no_direct_link") is True and tickers:
+        thesis["withdrawn_tickers"] = [t["ticker"] for t in tickers]
+        print(f"[ai] COT '{market}' {kind}: no_direct_link → tickers изпразнени "
+              f"{thesis['withdrawn_tickers']}")
+        tickers = []
+    out = []
+    for t in tickers:
+        eff = _EFFECT_ALIASES.get(str(t.get("effect") or "").strip().lower())
+        t = {**t, "effect": eff,
+             "direction": {"gains": "bullish", "loses": "bearish"}.get(eff)}
+        if eff is None:
+            print(f"[ai] COT '{market}' {kind}: {t['ticker']} без валиден effect "
+                  f"({t.get('effect')!r}) — показва се без посока")
+            COT_DIAG.setdefault("missing_effect", []).append(f"{market}/{t['ticker']}")
+        out.append(t)
+    thesis["tickers"] = out
+    if out and _GIVEUP_TEXT.search(thesis.get("reasoning") or ""):
+        print(f"[ai] COT '{market}' {kind}: текстът звучи като отказ, но tickers "
+              f"остават {[t['ticker'] for t in out]} (само лог)")
+        COT_DIAG.setdefault("giveup_text_with_tickers", []).append(f"{market}/{kind}")
+    return thesis
+
+
+def _reconcile_same_market(direct: dict | None, cross: dict | None,
+                           market: str) -> tuple[dict | None, dict | None]:
+    """
+    Един тикър в двете под-тези на СЪЩИЯ пазар: същият effect → дубликат,
+    маха се от cross-sector; различен effect → моделът си противоречи
+    (Cocoa 28.09: HSY/MDLZ) — маркира се conflict в двете, без да гадаем
+    коя е вярната.
+    """
+    if not (direct and cross):
+        return direct, cross
+    d_eff = {t["ticker"]: t.get("effect") for t in direct.get("tickers") or []}
+    keep = []
+    for t in cross.get("tickers") or []:
+        if t["ticker"] not in d_eff:
+            keep.append(t)
+        elif d_eff[t["ticker"]] == t.get("effect"):
+            print(f"[ai] COT '{market}': {t['ticker']} дублиран в двете под-тези "
+                  f"(същия effect) — махнат от cross-sector")
+        else:
+            print(f"[ai] COT '{market}': {t['ticker']} ПРОТИВОРЕЧИЕ — "
+                  f"{d_eff[t['ticker']]} в директната, {t.get('effect')} в cross-sector")
+            keep.append({**t, "conflict": True})
+            direct = {**direct, "tickers": [
+                {**x, "conflict": True} if x["ticker"] == t["ticker"] else x
+                for x in direct["tickers"]]}
+    return direct, {**cross, "tickers": keep}
+
+
+# FIX 2026-09-28: дневна диагностика на COT проверките — в лога и в брифа
+# ("cot_diag"), за да се мери спазването на новата схема след пускането.
+COT_DIAG: dict = {}
+
+
+def _move_mismatch(t: dict, move: dict) -> str | None:
+    """assumed_move срещу изчисленото. Липсващо ехо → само лог, не отхвърляне."""
+    got = _MOVE_ALIASES.get(str(t.get("assumed_move") or "").strip().lower())
+    if got is None:
+        print(f"[ai] COT '{t.get('market')}': липсва assumed_move — не може да се сравни")
+        COT_DIAG.setdefault("missing_assumed_move", []).append(t.get("market"))
+        return None
+    if got != move["move"]:
+        return (f"моделът е приел движение '{got}', а изчисленото от позиционирането "
+                f"е '{move['move']}' ({move['move_text']})")
+    return None
+
+
 def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
                            regime: str, prior_context: str = "",
                            open_positions: list[dict] | None = None) -> str:
@@ -1117,8 +1243,14 @@ def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
     prior_block = (
         f"""
 
-ВЕЧЕ ХАРАКТЕРИЗИРАНИ ТИКЪРИ ПО-РАНО В ТОЗИ БРИФ (за консистентност):
+ВЕЧЕ ХАРАКТЕРИЗИРАНИ ТИКЪРИ ПО-РАНО В ТОЗИ БРИФ (за консистентност; всеки \
+ред казва дали компанията ПЕЧЕЛИ или ГУБИ при изчисленото движение на онзи \
+инструмент, и изведената посока за самата акция):
 {prior_context}
+
+Ако същият тикър тук печели, а там губи (или обратно) — провери дали движенията \
+на двата инструмента наистина го обясняват (напр. 30Y надолу и 5Y надолу водят \
+до еднакъв ефект за застраховател); ако не — кажи го изрично.
 
 Ако предложиш тикър от списъка по-горе: провери дали новата роля/характеристика \
 съвпада с предишната (defensive/cyclical/hedge/core bet и т.н.). Ако тезата тук \
@@ -1181,35 +1313,66 @@ reasoning-а, използвай ТОЧНО името, което си дал �
 тикър на компанията, която искаш да опишеш — НЕ я предлагай изобщо, вместо да \
 залепиш описанието към чужд тикър.
 
+ДРУГА ТЕЗА НЕ Е ДОКАЗАТЕЛСТВО: всяка верига трябва да стои самостоятелно, върху \
+реален икономически механизъм на ТОЗИ инструмент — и между инструментите в \
+този отговор, и спрямо по-рано характеризираните тикъри. Не пиши "ролята се \
+потвърждава от X тезата", "идентична логика като в X" или подобно — това, че \
+тикърът фигурира и другаде, не прави връзката по-вярна. Потвърден случай \
+28.09.2026: Soybean Meal тезата твърдеше, че соевото брашно е основен компонент \
+в авиационното биогориво (невярно — SAF се прави от масла и мазнини, брашното \
+е фураж), а Corn тезата го цитира като потвърждение.
+
+ПОСОКАТА НА ИНСТРУМЕНТА Е ДАДЕНА — НЕ Я ИЗВЕЖДАЙ САМ: полето "expected_move" \
+за всеки инструмент е изчислено от кода от позиционирането (contrarian: \
+extreme_long → цената надолу, extreme_short → цената нагоре). Позиционирането \
+се чете САМО от "direction" и "percentile". Знакът на "net_position" НЕ означава \
+"нетно къси": при облигационни и някои финансови фючърси спекулантите са \
+структурно на минус, и 100-и percentile с отрицателно net_position означава \
+"най-малко къси за 156 седмици" = ЕКСТРЕМНО ДЪЛГИ спрямо историята. Потвърден \
+случай 28.09.2026: 30-Year Treasury Bond, 100-и percentile, net -162 052 — \
+текстът написа "НЕТНО КЪСИ… максимален short" и обърна цялата теза. Никога не \
+пиши "нетно къси/дълги" въз основа на знака.
+
 За ВСЕКИ инструмент в списъка върни обект с:
 - "market": точното име както е подадено
+- "assumed_move": "up" или "down" — препиши движението от "expected_move" \
+(проверява се от кода; разминаване = тезата се отхвърля)
 - "direct_thesis": {{
-    "direction": "bullish"/"bearish" за самия инструмент или пряко свързаните \
-акции (contrarian спрямо екстремума — extreme_long → bearish обрат очакван, \
-extreme_short → bullish обрат очакван),
-    "tickers": [1-3 обекта {{"ticker": "ADM", "company": "Archer-Daniels-Midland"}} — \
-пряко изложени на инструмента; "company" е кратко, познато име, НЕ пълното \
-юридическо наименование],
+    "tickers": [1-3 обекта {{"ticker": "ADM", "company": "Archer-Daniels-Midland", \
+"effect": "gains"/"loses"}} — пряко изложени на инструмента; "company" е кратко, \
+познато име, НЕ пълното юридическо наименование; "effect" = дали КОМПАНИЯТА \
+печели ("gains") или губи ("loses"), АКО инструментът се движи както казва \
+"expected_move". Не посоката на суровината, а ефектът върху акцията — напр. \
+какаото нагоре → HSY "loses"; облигациите надолу → TLT "loses"],
+    "no_direct_link": true/false — true, ако НЯМА нито един реален, ликвиден, \
+публично търгуван тикър с истинска директна експозиция (тогава tickers е []; \
+ако все пак оставиш тикър "само за референция" — кодът ще го премахне),
     "reasoning": "2-3 изречения — защо точно тези тикъри и защо сега. Ако НЯМА \
 нито един реален, ликвиден, публично търгуван тикър с истинска директна \
 експозиция на инструмента (напр. основният производител не е самостоятелно \
-публичен), върни ПРАЗЕН tickers списък ([]) и кажи го изрично тук — не \
-насилвай слаб/индиректен избор само за да запълниш полето."
+публичен), върни ПРАЗЕН tickers списък ([]), no_direct_link: true и кажи го \
+изрично тук — не насилвай слаб/индиректен избор само за да запълниш полето."
   }}
 - "cross_sector_thesis": {{
-    "direction": "bullish"/"bearish",
-    "tickers": [1-3 обекта {{"ticker": "...", "company": "..."}} — бенефициенти \
-от ОБРАТНИЯ ефект, САМО ако има ДИРЕКТНА икономическа връзка (1-2 стъпки: input \
+    "no_direct_link": true/false — както по-горе,
+    "tickers": [1-3 обекта {{"ticker": "...", "company": "...", "effect": \
+"gains"/"loses"}} — компании, засегнати ВТОРИЧНО (не същите като в директната \
+теза), САМО ако има ДИРЕКТНА икономическа връзка (1-2 стъпки: input \
 costs, revenue exposure, конкурентна позиция спрямо самия инструмент) — НЕ \
 generic макро верига от типа "цената пада → инфлацията спада → потребителите \
 харчат повече → X печели донякъде" (технически вярно, но твърде разредено за \
 реална теза — почти всяка discretionary акция "пасва" на почти всяка commodity \
 deflation тема по този начин, което го прави безсмислено),
     "reasoning": "2-3 изречения — директната верижна логика инструмент → \
-бенефициент. Ако НИКОЙ кандидат няма реална директна връзка, върни ПРАЗЕН \
-tickers списък ([]) и кажи го изрично тук (напр. 'няма пряк бенефициент сред \
-днешните кандидати') — не насилвай генерична връзка само за да запълниш полето."
+компания. Ако НИКОЙ кандидат няма реална директна връзка, върни ПРАЗЕН \
+tickers списък ([]), no_direct_link: true и кажи го изрично тук (напр. 'няма \
+пряк бенефициент сред днешните кандидати') — не насилвай генерична връзка само \
+за да запълниш полето."
   }}
+
+Тикър, който вече е в "direct_thesis" на СЪЩИЯ инструмент, не се повтаря в \
+"cross_sector_thesis". Не пиши думите bullish/bearish за тикърите в текста — \
+посоката им се извежда от "effect" от кода.
 
 Ако екстремумът е твърде слаб/неясен за смислена теза (напр. пазар без ликвидни \
 свързани акции), пропусни го от отговора — не гадай.
@@ -1252,14 +1415,25 @@ def _record_ticker_context(seen: dict[str, str], market: str, thesis_type: str,
     по вмъкване) — така eviction-ът реално маха НАЙ-СТАРО ДОКОСНАТИЯ тикър, не
     просто първия въведен, ако той междувременно е бил обновен отново.
     """
-    direction = thesis.get("direction", "?")
-    reasoning = (thesis.get("reasoning") or "")[:120]
+    # FIX 2026-09-28 (Release 2): контекстът носи ЕФЕКТА върху компанията
+    # спрямо изчисленото движение, не двусмисления thesis.direction етикет
+    # ("TLT: 5Y bearish" не казваше дали облигациите или TLT падат).
+    # FIX 2026-09-28 (т.10): БЕЗ откъс от reasoning-а. Точно по този канал
+    # невярното "соевото брашно е основен компонент в SAF" (Soybean Meal,
+    # batch 1) стигна до Corn (batch 2) и беше цитирано като потвърждение.
+    # Само ролята пътува между batch-овете, не фактически твърдения.
+    move_text = thesis.get("_move_text") or "?"
     for t in thesis.get("tickers") or []:
         ticker = t.get("ticker") if isinstance(t, dict) else None
         if not ticker:
             continue
+        eff = _EFFECT_BG.get(t.get("effect"))
+        if eff:
+            role = f"{eff} при {move_text} → {t.get('direction')} за {ticker}"
+        else:
+            role = f"ефект неизвестен при {move_text}"
         seen.pop(ticker, None)
-        seen[ticker] = f'{ticker}: {market}/{thesis_type} {direction} — "{reasoning}"'
+        seen[ticker] = f'{ticker}: {market}/{thesis_type} — {role}'
         while len(seen) > config.COT_SEEN_TICKERS_CAP:
             seen.pop(next(iter(seen)))
 
@@ -1310,11 +1484,14 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     края на pipeline-а. Тоест контекстът е наличен ТУК, без никакво
     пренареждане на реда на изпълнение.
     """
+    COT_DIAG.clear()
     if not extremes:
         return []
 
+    moves = {e["market"]: _instrument_move(e) for e in extremes}
     slim = [{"market": e["market"], "category": e["category"],
             "percentile": e["percentile"], "direction": e["direction"],
+            "expected_move": moves[e["market"]]["move_text"],
             "net_position": e["net_position"], "as_of": e["as_of"],
             "weeks_of_history": e.get("weeks_of_history")}
            for e in extremes]
@@ -1330,8 +1507,11 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         prior_context = "\n".join(seen_tickers.values())
         for t in _cot_theses_for_batch(batch, screener_universe, regime,
                                        f"{idx}/{n}", prior_context, open_positions):
-            if t.get("market"):
+            if t.get("market") in moves:
+                t = _normalize_cot_thesis(t, moves[t["market"]])
                 theses_by_market[t["market"]] = t
+                if t.get("thesis_rejected"):
+                    continue  # отхвърлена теза не влиза в контекста на следващите batch-ове
                 _record_ticker_context(seen_tickers, t["market"], "direct_thesis",
                                        t.get("direct_thesis") or {})
                 _record_ticker_context(seen_tickers, t["market"], "cross_sector_thesis",
@@ -1343,12 +1523,58 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         t = theses_by_market.get(e["market"])
         if not t:
             continue
-        merged.append({**e,
-                       "direct_thesis": _verify_thesis_tickers(
-                           t.get("direct_thesis") or {}, screener_tickers, e["market"]),
-                       "cross_sector_thesis": _verify_thesis_tickers(
-                           t.get("cross_sector_thesis") or {}, screener_tickers, e["market"])})
+        move = {k: moves[e["market"]][k]
+                for k in ("instrument_direction", "move_text", "move_short")}
+        if t.get("thesis_rejected"):
+            merged.append({**e, **move, "direct_thesis": None, "cross_sector_thesis": None,
+                           "thesis_rejected": t["thesis_rejected"]})
+            continue
+        merged.append({**e, **move,
+                       "direct_thesis": _strip_internal(_verify_thesis_tickers(
+                           t.get("direct_thesis") or {}, screener_tickers, e["market"])),
+                       "cross_sector_thesis": _strip_internal(_verify_thesis_tickers(
+                           t.get("cross_sector_thesis") or {}, screener_tickers, e["market"]))})
+
+    subs = [(c["market"], c.get(k) or {}) for c in merged
+            for k in ("direct_thesis", "cross_sector_thesis")]
+    COT_DIAG.update({
+        "extremes": len(extremes),
+        "theses": len(merged),
+        "rejected": [c["market"] for c in merged if c.get("thesis_rejected")],
+        "conflicts": sorted({f"{m}/{t['ticker']}" for m, th in subs
+                             for t in th.get("tickers") or [] if t.get("conflict")}),
+        "withdrawn": [f"{m}/{x}" for m, th in subs for x in th.get("withdrawn_tickers") or []],
+    })
+    print(f"[ai] cot_theses: {len(merged)}/{len(extremes)} тези · отхвърлени "
+          f"{len(COT_DIAG['rejected'])} {COT_DIAG['rejected'] or ''} · противоречия "
+          f"{len(COT_DIAG['conflicts'])} · махнати (no_direct_link) {len(COT_DIAG['withdrawn'])} · "
+          f"без assumed_move {len(COT_DIAG.get('missing_assumed_move', []))} · "
+          f"без effect {len(COT_DIAG.get('missing_effect', []))}")
     return merged
+
+
+def _strip_internal(thesis: dict | None) -> dict | None:
+    return {k: v for k, v in thesis.items() if not k.startswith("_")} if thesis else thesis
+
+
+def _normalize_cot_thesis(t: dict, move: dict) -> dict:
+    """
+    FIX 2026-09-28 (Release 2): един отговор за пазар → новата семантика.
+    Ред: проверка на assumed_move → effect/no_direct_link → същия пазар
+    дубликат/противоречие. Резултатът е и това, което отива в prior_context.
+    """
+    market = t["market"]
+    why = _move_mismatch(t, move)
+    if why:
+        print(f"[ai] COT '{market}': ТЕЗАТА ОТХВЪРЛЕНА — {why}")
+        return {"market": market, "thesis_rejected": why}
+    direct = _apply_effects(t.get("direct_thesis") or {}, market, "direct")
+    cross = _apply_effects(t.get("cross_sector_thesis") or {}, market, "cross")
+    direct, cross = _reconcile_same_market(direct, cross, market)
+    for th in (direct, cross):
+        if th:
+            th["_move_text"] = move["move_text"]
+    return {**t, "direct_thesis": direct, "cross_sector_thesis": cross}
 
 
 # ══════════════════════════════════════════════════════════════════════════

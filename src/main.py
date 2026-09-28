@@ -491,6 +491,8 @@ def run() -> dict:
         "glb_candidates": glb_candidates,
         "news": news,
         "cot": cot_with_theses,
+        # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
+        "cot_diag": dict(ai_brief.COT_DIAG),
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
         "backtest": backtest_summary,

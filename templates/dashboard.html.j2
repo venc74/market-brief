@@ -195,6 +195,7 @@
     text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
   .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
   .cot-direction.bearish { color: var(--red); background: rgba(248,113,113,.12); }
+  .cot-direction.conflict { color: var(--yellow); background: rgba(251,191,36,.12); }
   .cot-percentile { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); }
   .cot-sub { font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
   .cot-sub-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
@@ -889,6 +890,37 @@
 </section>
 {% endif %}
 
+{# FIX 2026-09-28 (Release 2): bullish/bearish вече е ЗА ВСЕКИ ТИКЪР, изведен
+   от кода от effect (печели/губи от изчисленото движение на инструмента).
+   Стар JSON (само th.direction на ниво теза) се рендерира както преди. #}
+{% macro cot_sub(th, label) %}
+      <div class="cot-sub">
+        {% set per_ticker = th.tickers and (th.tickers|selectattr('effect', 'defined')|list) %}
+        <div class="cot-sub-label">{{ label }}
+          {% if th.tickers and not per_ticker and th.direction %}<span class="cot-direction {{ th.direction }}">{{ th.direction }}</span>{% endif %}
+        </div>
+        {% if th.tickers %}
+        <div class="cot-tickers">{% for t in th.tickers %}{{ t.ticker }} ({{ t.company }}){% if per_ticker %}{% if t.conflict %} <span class="cot-direction conflict" title="Моделът дава противоположен ефект за същия тикър в другата под-теза на този пазар">⚠ противоречие</span>{% elif t.direction %} <span class="cot-direction {{ t.direction }}" title="{{ 'печели' if t.effect == 'gains' else 'губи' }} от очакваното движение">{{ t.direction }}</span>{% endif %}{% endif %}{{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
+        {% endif %}
+        <div class="thesis-chain">{{ th.reasoning }}</div>
+        {% if th.withdrawn_tickers %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Няма пряка връзка — {{ th.withdrawn_tickers|join(', ') }} махнат(и) от списъка.
+        </div>
+        {% endif %}
+        {% if th.outside_screener %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        {% endif %}
+        {% if th.dropped_tickers %}
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          {{ th.dropped_tickers|join(', ') }} премахнати при верификация (вероятно delisted/грешен тикър).
+        </div>
+        {% endif %}
+      </div>
+{% endmacro %}
+
 {% if cot %}
 <section>
   <h2>COT Екстремуми · Managed Money Positioning</h2>
@@ -898,52 +930,16 @@
       <div class="thesis-head">
         <span class="thesis-name">{{ c.market }}</span>
         <span class="cot-percentile">{{ c.percentile }}. percentile
-          ({{ "екстремно дълги" if c.direction == "extreme_long" else "екстремно къси" }})</span>
+          ({{ "екстремно дълги" if c.direction == "extreme_long" else "екстремно къси" }}){% if c.move_short %} · очакване: {{ c.move_short }}{% endif %}</span>
       </div>
 
-      {% if c.direct_thesis %}
-      <div class="cot-sub">
-        <div class="cot-sub-label">Директна теза
-          {% if c.direct_thesis.tickers %}<span class="cot-direction {{ c.direct_thesis.direction }}">{{ c.direct_thesis.direction }}</span>{% endif %}
-        </div>
-        {% if c.direct_thesis.tickers %}
-        <div class="cot-tickers">{% for t in c.direct_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
-        {% endif %}
-        <div class="thesis-chain">{{ c.direct_thesis.reasoning }}</div>
-        {% if c.direct_thesis.outside_screener %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Тези тикъри не са в текущия CANSLIM скрийнър.
-        </div>
-        {% endif %}
-        {% if c.direct_thesis.dropped_tickers %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          {{ c.direct_thesis.dropped_tickers|join(', ') }} премахнати при верификация (вероятно delisted/грешен тикър).
-        </div>
-        {% endif %}
+      {% if c.thesis_rejected %}
+      <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
+        Тезата е отхвърлена от проверката — {{ c.thesis_rejected }}.
       </div>
       {% endif %}
-
-      {% if c.cross_sector_thesis %}
-      <div class="cot-sub">
-        <div class="cot-sub-label">Cross-sector теза
-          {% if c.cross_sector_thesis.tickers %}<span class="cot-direction {{ c.cross_sector_thesis.direction }}">{{ c.cross_sector_thesis.direction }}</span>{% endif %}
-        </div>
-        {% if c.cross_sector_thesis.tickers %}
-        <div class="cot-tickers">{% for t in c.cross_sector_thesis.tickers %}{{ t.ticker }} ({{ t.company }}){{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
-        {% endif %}
-        <div class="thesis-chain">{{ c.cross_sector_thesis.reasoning }}</div>
-        {% if c.cross_sector_thesis.outside_screener %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Тези тикъри не са в текущия CANSLIM скрийнър.
-        </div>
-        {% endif %}
-        {% if c.cross_sector_thesis.dropped_tickers %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          {{ c.cross_sector_thesis.dropped_tickers|join(', ') }} премахнати при верификация (вероятно delisted/грешен тикър).
-        </div>
-        {% endif %}
-      </div>
-      {% endif %}
+      {% if c.direct_thesis %}{{ cot_sub(c.direct_thesis, "Директна теза") }}{% endif %}
+      {% if c.cross_sector_thesis %}{{ cot_sub(c.cross_sector_thesis, "Cross-sector теза") }}{% endif %}
     </div>
     {% endfor %}
   </div>
