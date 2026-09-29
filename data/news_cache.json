@@ -1,37 +1,37 @@
 {
- "date": "2026-09-28",
+ "date": "2026-09-29",
  "news": [
   {
-   "headline": "China says US trade truce extension creates space to advance talks",
-   "why": "Продължението на търговското примирие между САЩ и Китай намалява риска от ескалация на тарифите и поддържа risk-on настроението в глобалните пазари."
+   "headline": "Bond yields crank higher, stocks wobble as bonds head for monthly loss",
+   "why": "Покачването на доходностите натиска акциите и сигнализира за преоценка на риска на широкото пазарно ниво."
   },
   {
-   "headline": "US and China agree $60bn low tariff regime for goods from foie gras to camels",
-   "why": "Конкретно споразумение за намалени мита между двете икономики сигнализира осезаем напредък в търговските преговори с директен ефект върху секторите, засегнати от тарифите."
+   "headline": "Dollar holds near two-month peak as yields rise, Fed data looms",
+   "why": "Силният долар и очакваните Fed данни определят посоката на валутните и облигационните пазари краткосрочно."
   },
   {
-   "headline": "Brent gains 2.7% as Trump rejects Iranian proposal to reopen Hormuz Strait",
-   "why": "Отхвърлянето на иранското предложение задълбочава геополитическото напрежение в Близкия изток и тласка петрола нагоре, което засяга инфлационните очаквания и енергийния сектор."
+   "headline": "Oil prices rise for second session on continued Middle East supply concern; U.S.-Iran talks ongoing",
+   "why": "Двудневното поскъпване на суровия петрол на фона на US-Iran напрежение директно влияе върху инфлационните очаквания и енергийния сектор."
   },
   {
-   "headline": "Gold drops more than 2% on US rate-hike bets",
-   "why": "Спадът в златото отразява нарастващите очаквания за по-агресивна Fed политика, което е ключов сигнал за посоката на лихвените проценти и долара."
+   "headline": "Oil price and US Treasury yields in tightest relationship since 1990",
+   "why": "Корелацията петрол-доходности е на 35-годишен връх, което означава, че всяко движение в суровините се пренася директно в bond пазара."
   },
   {
-   "headline": "Dollar firms as US-Iran tensions lift oil, hawkish Fed bets build",
-   "why": "Комбинацията от геополитически риск и hawkish Fed залози укрепва долара, оказвайки натиск върху emerging markets и суровинните валути."
+   "headline": "FAA delays Boeing 737 MAX 10 certification, shares dive 7%",
+   "why": "Регулаторното забавяне от FAA удря BA акциите с 7% и поставя под въпрос приходните прогнози на компанията."
   },
   {
-   "headline": "Bank of Japan debated need for faster rate hikes, July minutes show",
-   "why": "Протоколите на BoJ показват вътрешен дебат за по-бързо затягане, което е пазарно значимо за йената, JGB и глобалните carry trade позиции."
+   "headline": "Pentagon awards Raytheon $20.7 billion AMRAAM contract amid stockpile concerns",
+   "why": "Мегадоговорът директно ускелетира приходите на RTX и повдига целия defense сектор."
   },
   {
-   "headline": "China posts weakest industrial profit growth this year, expanding 4.2% in August",
-   "why": "Слабите корпоративни печалби в Китай сигнализират забавяне на икономическата активност и може да ускорят допълнителни стимули от Пекин с ефект върху суровините и свързаните сектори."
+   "headline": "Anthropic files IPO prospectus, warns of 'existential risks'; lost $8bn on $4.6bn revenue",
+   "why": "Първото голямо AI IPO filing на годината дава пазарна оценка на AI сектора и разкрива мащаба на загубите в индустрията."
   },
   {
-   "headline": "The post-Enron auditor reforms are being rolled back",
-   "why": "Плановете за ограничаване на одиторските изисквания по Sarbanes-Oxley представляват регулаторна промяна с потенциален ефект върху корпоративното управление и accounting сектора."
+   "headline": "AMD to acquire Fei-Fei Li's World Labs for $8.2 billion in 'physical AI' bet",
+   "why": "Крупното AI придобиване от AMD ускелетира консолидацията в сектора и дава насока за оценките на AI стартъпите."
   }
  ]
 }

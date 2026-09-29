@@ -1,5 +1,5 @@
 {
- "date": "2026-09-28",
+ "date": "2026-09-29",
  "rows": [],
  "horizon": [
   {
@@ -67,6 +67,46 @@
    "date_human": "Sep 28, 2026"
   },
   {
+   "ticker": "AGRZ",
+   "company": "Agroz Inc.",
+   "date": "2026-09-29",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Sep 29, 2026"
+  },
+  {
+   "ticker": "CDT",
+   "company": "CDT Equity Inc.",
+   "date": "2026-09-29",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Sep 29, 2026"
+  },
+  {
+   "ticker": "ONMD",
+   "company": "OneMedNet Corp",
+   "date": "2026-09-29",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Sep 29, 2026"
+  },
+  {
+   "ticker": "TRUG",
+   "company": "TruGolf Holdings, Inc.",
+   "date": "2026-09-29",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Sep 29, 2026"
+  },
+  {
+   "ticker": "VRME",
+   "company": "VerifyMe, Inc.",
+   "date": "2026-09-29",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Sep 29, 2026"
+  },
+  {
    "ticker": "ZCSH",
    "company": "Grayscale Zcash Trust The Zcash ETF The Zcash ETF Shares",
    "date": "2026-09-30",
@@ -99,6 +139,22 @@
    "date_human": "Oct 07, 2026"
   },
   {
+   "ticker": "MGF",
+   "company": "Aberdeen Government Markets Income Fund",
+   "date": "2026-10-08",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Oct 08, 2026"
+  },
+  {
+   "ticker": "MIN",
+   "company": "Aberdeen Intermediate Income Fund",
+   "date": "2026-10-08",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Oct 08, 2026"
+  },
+  {
    "ticker": "DXJ",
    "company": "WisdomTree Japan Hedged Equity Fund",
    "date": "2026-10-09",
@@ -110,10 +166,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 13,
+  "source_rows": 20,
   "horizon_from": "2026-09-28",
   "horizon_to": "2026-10-09",
-  "in_week": 10,
+  "in_week": 15,
   "dropped_price": [
    "BTLN",
    "CTNT",
@@ -123,6 +179,11 @@
    "GMEX",
    "IMMP",
    "MTNB",
+   "AGRZ",
+   "CDT",
+   "ONMD",
+   "TRUG",
+   "VRME",
    "DHY"
   ],
   "dropped_cap": [],
