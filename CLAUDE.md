@@ -44,6 +44,7 @@ src/screener.py        — Stage 2 + CANSLIM скрийнър
 src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
 src/ai_brief.py         — Claude API: macro brief, ticker narratives, COT theses
 src/cot.py              — CFTC Commitments of Traders, whitelist 35 пазара
+src/thesis_context.py   — каре "Контекст" (само данни) към маркираните тези
 src/oi_snapshot.py      — следобедна OI снимка за Unusual Options (отделен job)
 src/sizing.py           — 1% риск, 2:1 R/R, Defensive ×0.5
 src/render.py            — dashboard HTML (Jinja2) + email HTML

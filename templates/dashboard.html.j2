@@ -194,6 +194,24 @@
   /* 2026-09-29: "confirmed" — събитие потвърждава механизма; тезата продължава */
   .thesis-news.confirmed { color: var(--green); background: rgba(52,211,153,.12); }
   .thesis-newsnote.confirmed { color: var(--green); }
+  /* 2026-09-29: тикър от тезата без ценови данни (CEIX/TELL мълчаха месеци) */
+  .thesis-missing { font-size: 12.5px; color: var(--red); margin-top: 6px; }
+  /* 2026-09-29: каре "Контекст" — само данни, без AI текст */
+  .thesis-ctx { margin-top: 10px; padding: 10px 12px; border: 1px dashed var(--line);
+                border-radius: 6px; background: var(--panel-2); overflow-x: auto; }
+  .ctx-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .ctx-summary { font-family: "IBM Plex Mono", monospace; font-size: 13px; margin-top: 4px; }
+  .ctx-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .ctx-meta b { color: var(--text); font-weight: 500; }
+  .ctx-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }
+  .ctx-table th { text-align: left; color: var(--muted); font-weight: 500;
+                  border-bottom: 1px solid var(--line); padding: 3px 6px; }
+  .ctx-table td { padding: 3px 6px; border-bottom: 1px solid var(--line); }
+  .ctx-table .num { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .ctx-table .mono { font-family: "IBM Plex Mono", monospace; }
+  .thesis-ctx .pos { color: var(--green); }
+  .thesis-ctx .neg { color: var(--red); }
+  .thesis-ctx .na, .thesis-ctx .warn-txt { color: var(--yellow); }
   .cot-direction { font-family: "IBM Plex Mono", monospace; font-size: 11px;
     text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
   .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
@@ -538,6 +556,30 @@
     {% endfor %}
   </div>
 </section>
+
+{# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}
+{% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
+{% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
+{% macro thesis_context_box(ctx) %}
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
+        <div class="ctx-summary">{{ ctx.summary }}</div>
+        <div class="ctx-meta">Режим: <b>{{ ctx.regime }}</b> ·
+          {% if ctx.sector.etf %}Сектор {{ ctx.sector.etf }}{% if ctx.sector.label %} ({{ ctx.sector.label }}){% endif %}:
+            {% if ctx.sector.rs_4w is not none %}RS {{ pct_cell(ctx.sector.rs_4w) }} (4с) / {{ pct_cell(ctx.sector.rs_12w) }} (12с){% else %}няма данни{% endif %}{% if ctx.sector.laggard %} · <span class="neg">изоставащ</span>{% elif ctx.sector.leading %} · <span class="pos">водещ</span>{% endif %}
+          {% else %}Сектор: —{% endif %}</div>
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
+          {% for r in ctx.rows %}
+          <tr><td class="mono">{{ r.ticker }}</td>
+            {% if r.no_price_data %}<td colspan="3" class="neg">няма ценови данни</td>
+            {% else %}<td class="num">{{ pct_cell(r.chg_1m_pct) }}</td><td>{{ ma_cell(r.above_50, r.history_days, 50) }}</td><td>{{ ma_cell(r.above_200, r.history_days, 200) }}</td>{% endif %}
+            <td>{% if r.next_earnings %}<span class="{{ 'warn-txt' if r.earnings_soon else '' }}">{{ r.next_earnings[8:10] }}.{{ r.next_earnings[5:7] }} ({{ r.days_to_earnings }} дни)</span>{% else %}—{% endif %}</td>
+            <td>{{ r.status or "—" }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+{% endmacro %}
 
 {% if theses %}
 <section>

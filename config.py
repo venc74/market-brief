@@ -156,10 +156,18 @@ MAGIC_FORMULA_UNIVERSE = [
 # ── 5. Геополитически тематични кошници (thesis monitor) ──────────────────
 # status: "active" — макро тригер е налице; "structural" — дългосрочен попътен
 # вятър без нужда от тригер; "watch" — следи се ръчно (законодателство/събитие).
+# FIX 2026-09-29: "sector_etf" — секторът за карето "Контекст" (src/
+# thesis_context.py); трябва да е ключ от SECTOR_ETFS, иначе "—".
+# "sector_etf_label" — изричен надпис, когато ETF-ът е прокси.
 THESIS_BASKETS = [
     {
         "name": "Въглища и LNG",
-        "tickers": ["BTU", "HCC", "AMR", "CEIX", "TELL", "LNG"],
+        # FIX 2026-09-29: CEIX → CNR (CONSOL + Arch = Core Natural Resources от
+        # 15.01.2025); TELL махнат (купена от Woodside, сделката приключи 08.10.2024).
+        # И двата мълчаха месеци без ценови данни.
+        "tickers": ["BTU", "HCC", "AMR", "CNR", "LNG"],
+        # една акция (BTU) не измерва сектор → енергетиката като прокси
+        "sector_etf": "XLE", "sector_etf_label": "прокси: енергетика",
         "default_status": "watch",
         "trigger": "oil_shock",
         "chain": ("Петролен шок или напрежение в Близкия изток → скок в цената на "
@@ -169,6 +177,7 @@ THESIS_BASKETS = [
     {
         "name": "Ядрена енергия",
         "tickers": ["VST", "CEG", "OKLO", "CCJ", "DNN", "NNE"],
+        "sector_etf": "URA",
         "default_status": "structural",
         "trigger": None,
         "chain": ("AI data center-ите гладуват за стабилна базова мощност 24/7 → "
@@ -178,6 +187,7 @@ THESIS_BASKETS = [
     {
         "name": "Отбрана и дронове",
         "tickers": ["LMT", "RTX", "NOC", "SWMR"],
+        "sector_etf": "ITA",
         "default_status": "watch",
         "trigger": "geopolitical_stress",
         "chain": ("Геополитическа ескалация → държавите вдигат отбранителни бюджети → "
@@ -187,6 +197,7 @@ THESIS_BASKETS = [
     {
         "name": "Крипто регулация (CLARITY Act)",
         "tickers": ["CRCL", "COIN", "HOOD", "BLSH"],
+        "sector_etf": None,  # няма крипто ETF в SECTOR_ETFS → "—"
         "default_status": "watch",
         "trigger": None,
         "chain": ("Ясна законодателна рамка (CLARITY Act) → институциите получават "
@@ -196,6 +207,7 @@ THESIS_BASKETS = [
     {
         "name": "Полупроводници и AI инфраструктура",
         "tickers": ["AVGO", "AMAT", "MCHP"],
+        "sector_etf": "SMH",
         "default_status": "structural",
         "trigger": None,
         "chain": ("AI build-out → търсене не само на GPU, а на цялата верига: mature-"
@@ -205,6 +217,7 @@ THESIS_BASKETS = [
     {
         "name": "Финанси при стръмна крива",
         "tickers": ["JPM", "BAC"],
+        "sector_etf": "XLF",
         "default_status": "watch",
         "trigger": "curve_steepening",
         "chain": ("Кривата се разкривява (дълъг край нагоре) → банките заемат евтино "
@@ -218,6 +231,10 @@ ENABLE_MAGIC_FORMULA = os.getenv("ENABLE_MAGIC_FORMULA", "1") == "1"
 ENABLE_BORROW_DATA = os.getenv("ENABLE_BORROW_DATA", "1") == "1"
 ENABLE_UNUSUAL_OPTIONS = os.getenv("ENABLE_UNUSUAL_OPTIONS", "1") == "1"
 ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
+# FIX 2026-09-29: каре "Контекст" към маркираните тези (src/thesis_context.py)
+# — само данни от кода, без AI текст. Проверката за липсващи ценови данни
+# важи за ВСИЧКИ тези (CEIX/TELL мълчаха месеци).
+ENABLE_THESIS_CONTEXT = os.getenv("ENABLE_THESIS_CONTEXT", "1") == "1"
 
 
 # ── Dataroma · Superinvestor Moves ────────────────────────────────────────

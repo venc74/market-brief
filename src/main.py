@@ -34,6 +34,7 @@ from src import short_tracker
 from src import watchlist_expiry
 from src import watch_monitor
 from src import model_selector
+from src import thesis_context
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief
 
@@ -314,6 +315,14 @@ def run() -> dict:
     watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
+    # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +
+    # предупреждение за тикъри без ценови данни — виж thesis_context.py. ТУК:
+    # новините, ротацията, action/watchlist и резолвираните позиции са готови.
+    if config.ENABLE_THESIS_CONTEXT:
+        theses = thesis_context.annotate(
+            theses, rotation, thermo["regime"],
+            positions=set(cot_live), action={a["ticker"] for a in action},
+            watchlist={w["ticker"] for w in watchlist})
     # чисто информационен badge на картата — не пипа classification/plan/sizing,
     # screening и timing остават разделени, виж entry_timing.py docstring-а
     if config.ENABLE_ENTRY_TIMING:
