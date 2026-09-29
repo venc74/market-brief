@@ -191,6 +191,9 @@
   .thesis-news.evolving { color: var(--yellow); background: rgba(251,191,36,.12); }
   .thesis-newsnote { font-size: 12.5px; color: var(--red); margin-top: 6px; }
   .thesis-newsnote.evolving { color: var(--yellow); }
+  /* 2026-09-29: "confirmed" — събитие потвърждава механизма; тезата продължава */
+  .thesis-news.confirmed { color: var(--green); background: rgba(52,211,153,.12); }
+  .thesis-newsnote.confirmed { color: var(--green); }
   .cot-direction { font-family: "IBM Plex Mono", monospace; font-size: 11px;
     text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
   .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
@@ -545,12 +548,14 @@
       <div class="thesis-head">
         <span class="thesis-name">{{ th.name }}</span>
         <span class="thesis-status {{ th.status }}">{{ "активна" if th.status == "active" else "структурна" if th.status == "structural" else "наблюдава се" }}</span>
-        {% if th.news_status %}<span class="thesis-news {{ th.news_status }}">{{ "опровергана от новина" if th.news_status == "challenged" else "разрешена" if th.news_status == "resolved" else "друг път" }}</span>{% endif %}
+        {% if th.news_status %}<span class="thesis-news {{ th.news_status }}">{{ "опровергана от новина" if th.news_status == "challenged" else "разрешена" if th.news_status == "resolved" else "потвърдена от новина" if th.news_status == "confirmed" else "друг път" }}</span>{% endif %}
       </div>
       <div class="thesis-tickers">{{ th.tickers|join("  ·  ") }}</div>
       <div class="thesis-chain">{{ th.chain }}</div>
-      {% if th.news_note %}<div class="thesis-newsnote {{ th.news_status }}">⚠ {{ th.news_note }}</div>{% endif %}
+      {% if th.news_note %}<div class="thesis-newsnote {{ th.news_status }}">{{ "✓" if th.news_status == "confirmed" else "⚠" }} {{ th.news_note }}</div>{% endif %}
       {% if th.trigger_reason %}<div class="thesis-trigger">▲ Тригер активен: {{ th.trigger_reason }}</div>{% endif %}
+      {% if th.missing_price %}<div class="thesis-missing">⚠ Няма ценови данни за {{ th.missing_price|join(", ") }} — вероятно делистнат или сменен тикър; провери списъка в config.py.</div>{% endif %}
+      {% if th.context %}{{ thesis_context_box(th.context) }}{% endif %}
     </div>
     {% endfor %}
   </div>
