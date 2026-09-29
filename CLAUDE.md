@@ -44,6 +44,7 @@ src/screener.py        — Stage 2 + CANSLIM скрийнър
 src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
 src/ai_brief.py         — Claude API: macro brief, ticker narratives, COT theses
 src/cot.py              — CFTC Commitments of Traders, whitelist 35 пазара
+src/oi_snapshot.py      — следобедна OI снимка за Unusual Options (отделен job)
 src/sizing.py           — 1% риск, 2:1 R/R, Defensive ×0.5
 src/render.py            — dashboard HTML (Jinja2) + email HTML
 templates/dashboard.html.j2 — единственият source за docs/index.html
@@ -68,6 +69,10 @@ templates/dashboard.html.j2 — единственият source за docs/index.
   основният безплатен API стана платен (Nasdaq Data Link), индикаторът беше
   permanently скрит от седмици, и субективен survey resultat не може реално
   да се замести с изчислен proxy от пазарни данни.
+- Unusual Options OI (от 29.09.2026): сутрин в 05:30–05:55 UTC Yahoo връща
+  празен/непълен open interest, затова OI идва от отделен следобеден job
+  (`.github/workflows/oi_snapshot.yml`, 15:00 UTC пон–пет, с `schedule:` —
+  прозорецът е широк и закъснение не вреди) → `data/unusual_options_oi_snapshot.json`.
 - "Pages build and deployment" червени run-ове от overlapping deploys са
   безобидни (следващият deploy обикновено успява) — не е сигнал за проблем в
   кода.

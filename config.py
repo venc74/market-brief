@@ -388,6 +388,23 @@ SPLITS_MIN_MARKET_CAP = float(os.getenv("SPLITS_MIN_MARKET_CAP", 500_000_000))  
 # ── Unusual options (Поправка 2): yfinance primary ────────────────────────
 # Сканирането на опционни вериги е бавно — лимитираме броя тикъри на ден.
 UNUSUAL_OPTIONS_SCAN_LIMIT = int(os.getenv("UNUSUAL_OPTIONS_SCAN_LIMIT", 60))
+# FIX 2026-09-29: OI за съотношението идва от следобедна снимка (отделен
+# GitHub Actions job, .github/workflows/oi_snapshot.yml → src/oi_snapshot.py),
+# не от сутрешния fetch. Проба 29.09: в 05:40 UTC OI е 0 за седмичните падежи
+# и непълен за месечните (APH 38 734 в 05:35 срещу 248 232 в 13:09 UTC за
+# същите падежи; HBAN 4 903 срещу 72 042). Сутрешният бриф сравнява вчерашния
+# обем с OI в началото на вчерашната сесия = това, което Yahoo има следобед.
+UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = DATA_DIR / "unusual_options_oi_snapshot.json"
+# Колко тикъра снима следобедът: утрешният списък се ранжира наново, затова
+# резерв над SCAN_LIMIT. Измерено по 61 дни от git историята на ранжирането:
+# с топ 80 утрешните топ 60 липсват само 2 пъти по 1 тикър (без еднократната
+# смяна на универса 13→14.07); с топ 60 — 37 от 60 дни.
+UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS", 80))
+# Колко падежа на тикър: утрешните два най-близки са сред днешните първи 3
+# (един може да изтече днес); 4 — резерв за празници.
+UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))
+# Колко снимки се пазят (по дата на сесията)
+UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP", 7))
 
 # ── SEC EDGAR 13F (Поправка 3): primary за Superinvestor Positions ─────────
 # EDGAR изисква descriptive User-Agent с реален контакт — стойността се

@@ -1,0 +1,51 @@
+name: Unusual Options OI snapshot
+
+# FIX 2026-09-29: следобедна снимка на open interest за сутрешния бриф — виж
+# src/oi_snapshot.py. В 05:30–05:55 UTC Yahoo връща празен/непълен OI; следобед
+# в деня на сесията OI е пълен и отразява началото на сесията.
+#
+# За разлика от daily_brief.yml тук има schedule: прозорецът е широк (всеки
+# час между ~13:30 и 20:00 UTC дава същия OI), затова закъснение на GitHub
+# scheduler-а с до час не вреди, а пропуснат run само скрива съотношението
+# на следващата сутрин (с изрично обяснение). workflow_dispatch — за ръчно
+# пускане или ако се премине към cron-job.org като при брифа.
+on:
+  schedule:
+    - cron: "0 15 * * 1-5"    # 15:00 UTC, пон–пет (11:00 EDT / 10:00 EST)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# същата група като брифа — двата job-а никога не push-ват едновременно
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Take OI snapshot
+        run: python src/oi_snapshot.py
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "brief-bot"
+          git config user.email "actions@github.com"
+          git add data/unusual_options_oi_snapshot.json 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "oi snapshot: $(date -u +%F)"
+          git pull --rebase
+          git push

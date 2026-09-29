@@ -21,6 +21,11 @@ yfinance го дава) като втори сигнал. Топ 10 по vol/OI 
 yfinance върне нищо.
 
 Graceful degradation: липсват ли данни за тикър — пропуска се; празно → секцията се крие.
+
+FIX 2026-09-29: знаменателят OI идва от следобедната снимка на СЪЩАТА сесия
+(src/oi_snapshot.py, отделен GitHub Actions job), не от сутрешния fetch — в
+05:30–05:55 UTC Yahoo връща празен/непълен OI. Липсва ли снимка/тикър/падеж →
+без съотношение, с причина в diag и на страницата.
 """
 from __future__ import annotations
 import datetime as dt
@@ -210,11 +215,56 @@ def _stock_vol_ratio(tk) -> float | None:
         return None
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# FIX 2026-09-29: OI от следобедна снимка (src/oi_snapshot.py, отделен Actions job)
+# ──────────────────────────────────────────────────────────────────────────
+def last_session_date() -> dt.date | None:
+    """Датата на последната (или текущата) US сесия — последният дневен бар на SPY."""
+    if yf is None:
+        return None
+    try:
+        h = yf.Ticker("SPY").history(period="5d")
+        return h.index[-1].date() if h is not None and not h.empty else None
+    except Exception as e:
+        print(f"[unusual_options] датата на последната сесия: {e}")
+        return None
+
+
+def load_oi_snapshots() -> dict:
+    try:
+        return json.loads(config.UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE.read_text()).get("snapshots", {})
+    except Exception:
+        return {}
+
+
+def _snapshot_for_yesterday(today: dt.date) -> tuple[dict | None, str, str]:
+    """
+    Сутрешният обем е от последната сесия → OI трябва да е снимката от СЪЩАТА
+    сесия (началото ѝ). Връща (снимка, сесия, причина при липса).
+    """
+    snaps = load_oi_snapshots()
+    session = last_session_date()
+    if session is not None:
+        snap = snaps.get(session.isoformat())
+        if snap:
+            return snap, session.isoformat(), ""
+        return None, session.isoformat(), (f"следобедната OI снимка за сесията "
+                                           f"{session.strftime('%d.%m')} липсва")
+    # без дата на сесията — най-новата снимка отпреди днес, ако е до 4 дни стара
+    older = sorted(d for d in snaps if d < today.isoformat())
+    if older and (today - dt.date.fromisoformat(older[-1])).days <= 4:
+        return snaps[older[-1]], older[-1], ""
+    return None, "", "следобедната OI снимка липсва (датата на сесията не е известна)"
+
+
 def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
     if yf is None:
         return []
     rows = []
     scan_list = _top_by_volume(symbols, config.UNUSUAL_OPTIONS_SCAN_LIMIT)
+    snap, session, snap_missing = _snapshot_for_yesterday(dt.date.today())
+    snap_oi = (snap or {}).get("tickers") or {}
+    reasons: dict[str, str] = {}
     for sym in scan_list:
         try:
             tk = yf.Ticker(sym)
@@ -222,6 +272,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             if not exps:
                 continue
             call_vol = put_vol = total_oi = 0
+            vol_by_exp: dict[str, float] = {}
             for exp in exps[:2]:  # най-близките 2 падежа
                 ch = tk.option_chain(exp)
                 for df, is_call in ((ch.calls, True), (ch.puts, False)):
@@ -230,6 +281,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
                     v = float(df.get("volume").fillna(0).sum()) if "volume" in df else 0
                     oi = float(df.get("openInterest").fillna(0).sum()) if "openInterest" in df else 0
                     total_oi += oi
+                    vol_by_exp[exp] = vol_by_exp.get(exp, 0) + v
                     if is_call:
                         call_vol += v
                     else:
@@ -237,13 +289,26 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
             total_vol = call_vol + put_vol
             if total_vol < 1000:  # отсяваме неликвидни
                 continue
-            # total_oi може да е 0 при ранен сутрешен fetch (OI още не е обновен) —
-            # в този случай пропускаме vol/OI съотношението вместо да показваме
-            # подвеждащо число (обем делен на защитния delitel 1).
-            # total_oi може да е 0 (или близо до 0) при ранен сутрешен fetch —
-            # праг от 50 договора избягва абсурдни съотношения от почти-нулев OI.
-            has_oi = total_oi >= 50
-            ratio = (total_vol / total_oi) if has_oi else None
+            # FIX 2026-09-29: съотношението е обем / OI от следобедната снимка на
+            # СЪЩАТА сесия, само по падежите, които са и в двете (обем и OI от
+            # едни и същи падежи). Сутрешният OI (total_oi) остава само в
+            # диагностиката за сравнение — в 05:35 UTC е празен/непълен.
+            # Праг от 50 договора избягва абсурдни съотношения от почти-нулев OI.
+            why = ""
+            if snap is None:
+                why = snap_missing
+            elif sym not in snap_oi:
+                why = "тикърът не е в следобедната снимка"
+            matched = [e for e in vol_by_exp if (snap_oi.get(sym) or {}).get(e, 0) > 0]
+            if not why and not matched:
+                why = "падежите не съвпадат със следобедната снимка"
+            snap_total = sum(snap_oi[sym][e] for e in matched) if matched else 0
+            if not why and snap_total < 50:
+                why = "OI в следобедната снимка е под 50 договора"
+            has_oi = not why
+            ratio = (sum(vol_by_exp[e] for e in matched) / snap_total) if has_oi else None
+            if why:
+                reasons[sym] = why
             # FIX 2026-09-12: долният праг (>=50 контракта) хваща само буквална
             # нула/near-нула — потвърдено на живо (08-11.09), yfinance openInterest
             # понякога връща непълни данни за multi-day прозорец, кацащи ТОЧНО над
@@ -266,7 +331,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
                          "note": f"{note} Опц. обем {int(total_vol):,}{oi_part}{extra}",
                          # FIX 2026-09-28: изрично поле + суров OI за диагностиката
                          "has_oi_ratio": ratio is not None and not oi_suspect,
-                         "_oi": int(total_oi), "_oi_suspect": oi_suspect,
+                         "_oi": snap_total, "_live_oi": int(total_oi), "_oi_suspect": oi_suspect,
                          "_ratio": round(ratio, 2) if (ratio is not None and not oi_suspect) else 0})
         except Exception as e:
             print(f"[unusual_options] yf {sym}: {e}")
@@ -285,13 +350,29 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
         "shown": len(top),
         "oi_missing": [r["ticker"] for r in top if r["_oi"] < 50],
         "oi_suspect": [r["ticker"] for r in top if r["_oi_suspect"]],
+        # FIX 2026-09-29: raw_oi = OI от следобедната снимка (използваният);
+        # live_oi_morning = сутрешният, само за сравнение
         "raw_oi": {r["ticker"]: r["_oi"] for r in top},
+        "live_oi_morning": {r["ticker"]: r["_live_oi"] for r in top},
+        "oi_source": "afternoon_snapshot",
+        "snapshot_session": session,
+        "snapshot_fetched_at_utc": (snap or {}).get("fetched_at_utc"),
+        "ratio_missing_reasons": {r["ticker"]: reasons[r["ticker"]]
+                                  for r in top if r["ticker"] in reasons},
+        # една причина за цялата секция, ако снимката липсва изцяло
+        "snapshot_missing_reason": snap_missing,
     })
+    grouped: dict[str, list[str]] = {}
+    for t, why in LAST_DIAG["ratio_missing_reasons"].items():
+        grouped.setdefault(why, []).append(t)
+    LAST_DIAG["ratio_missing_grouped"] = grouped
     print(f"[unusual_options] {LAST_DIAG['fetched_at_utc']} UTC: съотношение обем/OI за "
-          f"{LAST_DIAG['with_ratio']}/{LAST_DIAG['shown']}; OI липсва (<50): "
-          f"{LAST_DIAG['oi_missing'] or '—'}; суров OI: {LAST_DIAG['raw_oi']}")
+          f"{LAST_DIAG['with_ratio']}/{LAST_DIAG['shown']} (OI от снимката на сесия "
+          f"{session or '?'}, заснета {LAST_DIAG['snapshot_fetched_at_utc'] or '—'}); "
+          f"без съотношение: {LAST_DIAG['ratio_missing_reasons'] or '—'}; "
+          f"сутрешен OI за сравнение: {LAST_DIAG['live_oi_morning']}")
     for r in rows:
-        for k in ("_ratio", "_oi", "_oi_suspect"):
+        for k in ("_ratio", "_oi", "_live_oi", "_oi_suspect"):
             r.pop(k, None)
     return top
 

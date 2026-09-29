@@ -814,9 +814,23 @@
   {% set uod = unusual_options_diag or {} %}
   {% if uod.source == 'yfinance' and uod.with_ratio is defined and uod.with_ratio < unusual_min_ratios %}
   <div class="splits-warn" style="color:var(--yellow);background:rgba(251,191,36,.10);border-color:rgba(251,191,36,.35);margin-bottom:10px">
+    {% if uod.oi_source == 'afternoon_snapshot' %}
+    {# FIX 2026-09-29: OI идва от следобедната снимка (src/oi_snapshot.py) #}
+    ⚠ Съотношение обем/OI има само за {{ uod.with_ratio }} от {{ uod.shown }} —
+    {% if uod.snapshot_missing_reason %}{{ uod.snapshot_missing_reason }}.
+    {% else %}{% for why, ts in (uod.ratio_missing_grouped or {}).items() %}{{ why }} ({{ ts|join(", ") }}){{ "; " if not loop.last else "." }}{% endfor %}
+    {% endif %}
+    Подредбата на тикърите без съотношение е по ликвидност на акцията, не по необичайност на опционната активност.
+    {% else %}
     ⚠ Съотношение обем/OI има само за {{ uod.with_ratio }} от {{ uod.shown }} — данните за OI липсват
     в часа на изтегляне ({{ uod.fetched_at_utc }} UTC). Днес подредбата е по ликвидност на акцията,
     не по необичайност на опционната активност.
+    {% endif %}
+  </div>
+  {% elif uod.oi_source == 'afternoon_snapshot' and uod.snapshot_session %}
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:8px">
+    OI от следобедната снимка на сесията {{ uod.snapshot_session[8:10] }}.{{ uod.snapshot_session[5:7] }}
+    ({{ uod.snapshot_fetched_at_utc[11:] if uod.snapshot_fetched_at_utc else "—" }} UTC) — началото на сесията, чийто обем се показва.
   </div>
   {% endif %}
   <div class="signal-grid">
