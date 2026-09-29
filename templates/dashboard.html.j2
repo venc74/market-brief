@@ -917,7 +917,12 @@
         {% if th.tickers %}
         <div class="cot-tickers">{% for t in th.tickers %}{{ t.ticker }} ({{ t.company }}){% if per_ticker %}{% if t.conflict %} <span class="cot-direction conflict" title="Моделът дава противоположен ефект за същия тикър в другата под-теза на този пазар">⚠ противоречие</span>{% elif t.direction %} <span class="cot-direction {{ t.direction }}" title="{{ 'печели' if t.effect == 'gains' else 'губи' }} от очакваното движение">{{ t.direction }}</span>{% endif %}{% endif %}{{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
         {% endif %}
-        <div class="thesis-chain">{{ th.reasoning }}</div>
+        {% if th.reasoning %}<div class="thesis-chain">{{ th.reasoning }}</div>{% endif %}
+        {% if th.empty_reason %}
+        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
+          Няма {{ label|lower }} — {{ th.empty_reason }}.
+        </div>
+        {% endif %}
         {% if th.withdrawn_tickers %}
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
           Няма пряка връзка — {{ th.withdrawn_tickers|join(', ') }} махнат(и) от списъка.
@@ -953,8 +958,11 @@
         Тезата е отхвърлена от проверката — {{ c.thesis_rejected }}.
       </div>
       {% endif %}
-      {% if c.direct_thesis %}{{ cot_sub(c.direct_thesis, "Директна теза") }}{% endif %}
-      {% if c.cross_sector_thesis %}{{ cot_sub(c.cross_sector_thesis, "Cross-sector теза") }}{% endif %}
+      {# FIX 2026-09-29: липсваща под-теза (стар JSON без empty_reason) → ред, не нищо #}
+      {% if c.direct_thesis %}{{ cot_sub(c.direct_thesis, "Директна теза") }}
+      {% elif not c.thesis_rejected %}{{ cot_sub({"empty_reason": "причината не е записана"}, "Директна теза") }}{% endif %}
+      {% if c.cross_sector_thesis %}{{ cot_sub(c.cross_sector_thesis, "Cross-sector теза") }}
+      {% elif not c.thesis_rejected %}{{ cot_sub({"empty_reason": "причината не е записана"}, "Cross-sector теза") }}{% endif %}
     </div>
     {% endfor %}
   </div>

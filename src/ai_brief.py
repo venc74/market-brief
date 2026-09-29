@@ -192,6 +192,16 @@ _TRANSLIT_PAT = re.compile(
 # в историята (損害, 底, 升级, 映射, 催化剂 в DXCM 21.09, 純 в Cocoa 28.09).
 # Никога не са легитимни тук → премахват се и се логват.
 _CJK_RE = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯豈-﫿]+")
+# FIX 2026-09-29: руски букви, които ги няма в българския (ы, э, ё) — "по-высоката"
+# (Lean Hogs), "по-высоки" (5Y) на 29.09. Измерено върху 74 дни (123 745 низа):
+# 10 появи, 8 различни думи (высок-×6, события×2, это, экспанзия), всичките
+# руски, 0 фалшиви. Само лог — автоматична замяна не е безопасна ("события").
+_RU_ONLY_RE = re.compile(r"[\w\-]*[ЫыЭэЁё][\w\-]*")
+# FIX 2026-09-29: несъществуващи кирилски думи с потвърдена замяна. "ускелетира"
+# — 2 появи на 29.09 (новините за RTX и AMD), 0 преди това в 74 дни. Списъкът
+# расте само с потвърдени случаи, както _TRANSLIT_FIX.
+_CYR_WORD_FIX = {"ускелетира": "ускорява", "ускелетират": "ускоряват"}
+_CYR_WORD_RE = re.compile(r"[А-Яа-я]+")
 # FIX 2026-09-28: латински букви-двойници в иначе кирилска дума ("нямa",
 # "секторa", "Oперира") — изглеждат еднакво, но са друг символ. Замяна само
 # когато латинските букви са ≤2 и ВСИЧКИ са двойници: иначе е хибрид
@@ -236,9 +246,20 @@ def _fix_translit(obj):
             print(f"[ai] ⚠ премахнати чужди символи '{m.group(0)}' в "
                   f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
         obj = re.sub(r" {2,}", " ", _CJK_RE.sub("", obj))
+    for m in _RU_ONLY_RE.finditer(obj):
+        print(f"[ai] ⚠ руска буква (ы/э/ё) в '{m.group(0)}' — "
+              f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
     if not re.search(r"[А-Яа-я]", obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
     obj = _fix_homoglyphs(obj)
+    def cyr_repl(m):
+        w = m.group(0)
+        fixed = _CYR_WORD_FIX.get(w.lower())
+        if fixed is None:
+            return w
+        print(f"[ai] несъществуваща дума заменена: '{w}' → '{fixed}'")
+        return fixed.capitalize() if w[0].isupper() else fixed
+    obj = _CYR_WORD_RE.sub(cyr_repl, obj)
     def repl(m):
         w = m.group(0)
         fixed = _TRANSLIT_FIX.get(w.lower())
@@ -1203,6 +1224,15 @@ _GIVEUP_TEXT = re.compile(
     r"не насилвам|не включвам|твърде разредена|генерична (верига|макро)|"
     r"нито един от (днешните|кандидатите)|няма (реал|пряк|директ)\w* "
     r"(връзк|верига|бенефициент|експозиц)|само като индикатив", re.I)
+# FIX 2026-09-29: текстът обявява празен списък с думи, но флагът не е вдигнат
+# (Sugar cross 29.09: "no_direct_link е true, tickers е празен", а TSN/CHE
+# остават с no_direct_link false). За разлика от _GIVEUP_TEXT (само лог) това
+# изпразва списъка. Измерено върху 74 дни (1521 под-тези с текст): 34 появи,
+# 30 при вече празен списък, 4 при непразен — и четирите изричен отказ
+# (Lean Hogs/WH 04.09, Cotton/FTNT 15.09, Lean Hogs/MNST 16.09, Sugar/TSN,CHE 29.09).
+_EXPLICIT_EMPTY_TEXT = re.compile(
+    r"no_direct_link\W{0,3}(е\s+|is\s+|=\s*)?true|tickers\W{0,3}(е|остава|оставям)\s+празен|"
+    r"оставям\s+tickers\s+празен|връщам\s+(празен|no_direct_link)", re.I)
 
 
 def _instrument_move(extreme: dict) -> dict:
@@ -1229,6 +1259,12 @@ def _apply_effects(thesis: dict | None, market: str, kind: str) -> dict | None:
     thesis.pop("direction", None)
     tickers = [t for t in (thesis.get("tickers") or [])
                if isinstance(t, dict) and t.get("ticker")]
+    if (tickers and thesis.get("no_direct_link") is not True
+            and (m := _EXPLICIT_EMPTY_TEXT.search(thesis.get("reasoning") or ""))):
+        print(f"[ai] COT '{market}' {kind}: текстът казва '{m.group(0)}', а флагът "
+              f"no_direct_link е {thesis.get('no_direct_link')!r} — третира се като true")
+        COT_DIAG.setdefault("withdrawn_by_text", []).append(f"{market}/{kind}")
+        thesis["no_direct_link"] = True
     if thesis.get("no_direct_link") is True and tickers:
         thesis["withdrawn_tickers"] = [t["ticker"] for t in tickers]
         print(f"[ai] COT '{market}' {kind}: no_direct_link → tickers изпразнени "
@@ -1450,6 +1486,13 @@ tickers списък ([]), no_direct_link: true и кажи го изрично 
 "cross_sector_thesis". Не пиши думите bullish/bearish за тикърите в текста — \
 посоката им се извежда от "effect" от кода.
 
+ФЛАГЪТ И ТЕКСТЪТ ТРЯБВА ДА СЪВПАДАТ: ако в "reasoning" пишеш, че няма реална \
+връзка, че тикърът няма материална експозиция или че списъкът е празен — \
+"no_direct_link" е true и "tickers" е []. Не оставяй тикър в списъка, който \
+самият текст отхвърля. Потвърден случай 29.09.2026: Sugar cross-sector текстът \
+написа "no_direct_link е true, tickers е празен", а върна TSN и CHE с \
+no_direct_link false.
+
 Ако екстремумът е твърде слаб/неясен за смислена теза (напр. пазар без ликвидни \
 свързани акции), пропусни го от отговора — не гадай.
 
@@ -1606,10 +1649,14 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
                            "thesis_rejected": t["thesis_rejected"]})
             continue
         merged.append({**e, **move,
-                       "direct_thesis": _strip_internal(_verify_thesis_tickers(
-                           t.get("direct_thesis") or {}, screener_tickers, e["market"])),
-                       "cross_sector_thesis": _strip_internal(_verify_thesis_tickers(
-                           t.get("cross_sector_thesis") or {}, screener_tickers, e["market"]))})
+                       "direct_thesis": _empty_sub_reason(
+                           t.get("direct_thesis"), _strip_internal(_verify_thesis_tickers(
+                               t.get("direct_thesis") or {}, screener_tickers, e["market"])),
+                           e["market"], "direct"),
+                       "cross_sector_thesis": _empty_sub_reason(
+                           t.get("cross_sector_thesis"), _strip_internal(_verify_thesis_tickers(
+                               t.get("cross_sector_thesis") or {}, screener_tickers, e["market"])),
+                           e["market"], "cross")})
 
     subs = [(c["market"], c.get(k) or {}) for c in merged
             for k in ("direct_thesis", "cross_sector_thesis")]
@@ -1627,6 +1674,30 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
           f"без assumed_move {len(COT_DIAG.get('missing_assumed_move', []))} · "
           f"без effect {len(COT_DIAG.get('missing_effect', []))}")
     return merged
+
+
+def _empty_sub_reason(raw: dict | None, verified: dict | None,
+                      market: str, kind: str) -> dict:
+    """
+    FIX 2026-09-29: под-теза без нищо за показване изчезваше от страницата
+    изцяло (Cotton direct 29.09: без заглавие, без обяснение). Два пътя: всички
+    тикъри отпадат при _verify_thesis_tickers (→ None) или моделът изобщо не
+    върне под-тезата (→ {}). 7 случая в 74 дни (6 None, 1 {}). Вместо това —
+    празна под-теза с причина, която шаблонът показва като ред.
+    """
+    if verified:
+        return verified
+    dropped = [t["ticker"] for t in (raw or {}).get("tickers") or []
+               if isinstance(t, dict) and t.get("ticker")]
+    if dropped:
+        why = (f"предложените тикъри ({', '.join(dropped)}) отпаднаха при проверката "
+               f"(delisted, грешна суровина или грешно описание на компанията)")
+    else:
+        why = "моделът не върна тази под-теза"
+    print(f"[ai] COT '{market}' {kind}: няма под-теза за показване — {why}")
+    COT_DIAG.setdefault("empty_sub", []).append(f"{market}/{kind}")
+    return {"tickers": [], "no_direct_link": True, "reasoning": "",
+            "empty_reason": why, "outside_screener": False}
 
 
 def _strip_internal(thesis: dict | None) -> dict | None:
