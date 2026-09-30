@@ -321,7 +321,12 @@ NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
 # Свереност на геополитическите тези срещу днешните новини (ai_brief.
 # thesis_reality_check) — едно допълнително извикване на ден, само анотация,
 # не пипа thesis status-а. Изходът е ≤6 кратки обекта, 1000 стигат с запас.
-THESIS_CHECK_MAX_TOKENS = int(os.getenv("THESIS_CHECK_MAX_TOKENS", 1000))
+# FIX 2026-09-30: 1000 → 2000. Структурните полета за G1–G3 (basis, subject_ticker,
+# affected_tickers, effect, chain_quote, event_type) са ~190 знака на маркирана
+# теза; реалният изход е ~2.8–3 знака/токен (24/29/30.09), песимистично 1.6 →
+# ~120 токена. Максимумът досега е 791/1000 (25.09, 0 маркирани); с полета за
+# всичките 6 тези ≈ 1 500 → 1000 би отрязал и скрил ЦЯЛАТА проверка.
+THESIS_CHECK_MAX_TOKENS = int(os.getenv("THESIS_CHECK_MAX_TOKENS", 2000))
 # Минимална дължина на бележката при news_status="evolving" (виж
 # ai_brief.thesis_reality_check). "evolving" изисква да се назоват И ДВАТА пътя —
 # спрян оригинал И конкретна алтернатива — което не се побира в едно късо

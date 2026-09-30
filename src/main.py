@@ -291,12 +291,11 @@ def run() -> dict:
     # backtest.resolve_positions_only() за пълния rationale. Нула допълнителна
     # мрежова цена — update_backtest_tracker() по-долу пропуска втория fetch.
     #
-    # ОТДЕЛНА НАХОДКА, съзнателно НЕ поправяна тук: apply_hard_rules() по-долу
-    # прави свой _live_positions() прочит (ред ~62) и след тази промяна също
-    # ще вижда резолвиран tracker — т.е. току-що стопнат тикър вече може да
-    # получи нов Action план, вместо Watchlist с OPEN✓. Това е поправка, но и
-    # промяна в sizing поведението, която заслужава собствен разговор, а не да
-    # дойде безплатно като страничен ефект от COT context фикса.
+    # Страничен ефект: apply_hard_rules() по-долу също вижда резолвирания
+    # tracker, т.е. току-що стопнат тикър може да получи нов Action план.
+    # Решено на 22.09: _last_resolved_positions() маркира такъв кандидат с
+    # RE-ENTRY (нов вход, не продължение) или ЗАТВОРЕНА ДНЕС (без Action план
+    # в същия ден — Track Record не би го записал като отделна сделка).
     if config.ENABLE_BACKTEST:
         backtest.resolve_positions_only()
     cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
@@ -504,6 +503,9 @@ def run() -> dict:
         "cot": cot_with_theses,
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
+        # FIX 2026-09-30: приети/отхвърлени маркирания от проверката на тезите
+        # срещу новините — правило (G0–G3) и причина
+        "thesis_check_diag": dict(ai_brief.THESIS_CHECK_DIAG),
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
         "backtest": backtest_summary,

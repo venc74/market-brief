@@ -252,6 +252,7 @@ def _fix_translit(obj):
     if not re.search(r"[А-Яа-я]", obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
     obj = _fix_homoglyphs(obj)
+    obj = _fix_glued(obj)
     def cyr_repl(m):
         w = m.group(0)
         fixed = _CYR_WORD_FIX.get(w.lower())
@@ -267,8 +268,86 @@ def _fix_translit(obj):
             return fixed.capitalize() if w[0].isupper() else fixed
         if _TRANSLIT_PAT.search(w):
             print(f"[ai] ⚠ латинска транслитерация без замяна: '{w}' — добави в _TRANSLIT_FIX")
+        elif (cyr_w := _latin_as_bg(w)):
+            print(f"[ai] ⚠ латиница вместо кирилица: '{w}' (= '{cyr_w}') — само лог")
         return w
     return _TRANSLIT_RE.sub(repl, obj)
+
+
+# FIX 2026-09-30: речник от предишните брифове (docs/data/*.json, вече в
+# checkout-а на Actions) — за слепените думи и за латиница вместо кирилица.
+# Липсва/гръмне ли → празен речник и двете проверки просто не правят нищо.
+_GLUED_RE = re.compile(r"(?<![A-Za-zА-Яа-я])([A-Za-z]{4,})([а-я]{5,})(?![A-Za-zА-Яа-я])")
+_BG_TRANSLIT = ([("sht", "щ"), ("zh", "ж"), ("ts", "ц"), ("ch", "ч"), ("sh", "ш"),
+                 ("yu", "ю"), ("ya", "я")]
+                + list(zip("abvgdeziyklmnoprstufhc", "абвгдезийклмнопрстуфхк")))
+
+
+@lru_cache(maxsize=1)
+def _bg_vocab() -> tuple[dict, dict]:
+    """(кирилска дума → брой, латинска дума → брой) в българските текстове."""
+    from collections import Counter
+    cyr, lat = Counter(), Counter()
+    try:
+        def walk(o):
+            if isinstance(o, dict):
+                for v in o.values(): yield from walk(v)
+            elif isinstance(o, list):
+                for v in o: yield from walk(v)
+            elif isinstance(o, str) and re.search(r"[а-я]", o):
+                yield o
+        for f in sorted((config.DOCS_DIR / "data").glob("20*.json")):
+            for s in walk(json.loads(f.read_text(encoding="utf-8"))):
+                cyr.update(w.lower() for w in re.findall(
+                    r"(?<![A-Za-zА-Яа-я])[А-Яа-я]+(?![A-Za-zА-Яа-я])", s))
+                lat.update(w.lower() for w in re.findall(
+                    r"(?<![A-Za-zА-Яа-я\-])[A-Za-z]{4,}(?![A-Za-zА-Яа-я\-])", s))
+    except Exception as e:
+        print(f"[ai] речник от историята недостъпен ({type(e).__name__}: {e}) — "
+              "проверките за слепени думи и латиница вместо кирилица са изключени")
+        return {}, {}
+    return dict(cyr), dict(lat)
+
+
+def _fix_glued(s: str) -> str:
+    """
+    Латиница ≥4 + кирилица ≥5, слепени без интервал, където кирилската част е
+    самостоятелна дума ≥3 пъти в историята → интервал. Цялата история (32 321
+    низа, 101 хибрида): точно 2 разделяния, и двете правилни — "longпозиция",
+    "Healthcareгенерира" (30.09). "benefitват"/"dedikирани" не се пипат —
+    кирилската част е наставка, не дума.
+    """
+    cyr = _bg_vocab()[0]
+    if not cyr:
+        return s
+    def repl(m):
+        if cyr.get(m.group(2), 0) < 3:
+            return m.group(0)
+        fixed = f"{m.group(1)} {m.group(2)}"
+        print(f"[ai] слепени думи разделени: '{m.group(0)}' → '{fixed}'")
+        return fixed
+    return _GLUED_RE.sub(repl, s)
+
+
+def _latin_as_bg(w: str) -> str | None:
+    """
+    "Kakao" (Cocoa 30.09): латинска дума, невиждана досега в историята, чиято
+    кирилска транслитерация е дума от корпуса. Само лог: върху историята 27
+    сигнала, 17 истински (negativen, bufer, rotira, globalno, kakao…), 10
+    английски думи/имена (Africa, region, Panama Canal, model…).
+    """
+    cyr, lat = _bg_vocab()
+    lw = w.lower()
+    if not cyr or lat.get(lw, 0) > 0:
+        return None
+    out, i = "", 0
+    while i < len(lw):
+        for a, b in _BG_TRANSLIT:
+            if lw.startswith(a, i):
+                out += b; i += len(a); break
+        else:
+            return None
+    return out if cyr.get(out, 0) >= 2 else None
 
 
 SYSTEM_MACRO = """Ти си макро аналитик, който пише за опитен суинг търговец \
@@ -643,6 +722,91 @@ SYSTEM_THESIS_CHECK = """Ти си скептичен редактор-факт-
 Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
 
 
+# FIX 2026-09-30: дневна диагностика на проверката — приети и отхвърлени
+# маркирания с правилото (G0–G3) и причината, по модела на COT_DIAG → брифа.
+THESIS_CHECK_DIAG: dict = {}
+_NEWS_EVENT_TYPES = {"contract", "order", "budget", "legislation", "policy",
+                     "macro_data", "price_move", "topic"}
+
+
+_ARROWS = ("->", "=>", "⟶", "➔", "➜", "⇒")
+
+
+def _norm_quote(s) -> str:
+    """
+    FIX 2026-09-30: и двете страни за G3 — моделът цитира почти дословно
+    (други кавички, "->" вместо "→", тирета, главни букви, двойни интервали).
+    Малки букви, стрелките уеднаквени до "→", кавички/тирета/скоби/пунктуация
+    → интервал, един интервал.
+    """
+    s = str(s or "").lower()
+    for a in _ARROWS:
+        s = s.replace(a, "→")
+    s = re.sub(r"[^\w\s→]", " ", s)
+    s = re.sub(r"\s*→\s*", " → ", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _news_gate(thesis: dict, c: dict, status: str) -> tuple[str | None, str]:
+    """
+    FIX 2026-09-30: кодови проверки за confirmed/challenged. Първия ден на
+    "confirmed" (30.09) 3 от 6 тези бяха "потвърдени" и 1 "опровергана" —
+    промптът вече казваше "в типичен ден всички са unchanged". Същият подход
+    като COT Release 2: моделът попълва структурни полета, кодът ги проверява.
+    Връща (правило, причина) при отказ или (None, "") при приемане.
+
+      G0 — схемата: basis липсва/невалиден.
+      G1 — event_type е ценово движение / новина по темата (или невалиден).
+      G2 — affected_tickers не са непразно подмножество на тикърите на тезата,
+           effect не съвпада със статуса, или при ticker_event subject_ticker
+           е ИЗВЪН тезата (Boeing срещу NOC, 30.09; DeepSeek/Huawei/Nvidia).
+      G3 — chain_step: chain_quote не е дословно от chain, или тезата има
+           макро тригер (config.THESIS_BASKETS "trigger"), който НЕ е сработил
+           (status != "active") — кодът вече мери тази стъпка и казва, че не
+           се е случила (въглища 30.09 "потвърдена" при несработил oil_shock;
+           23 и 24.09 "опровергана" на теза, която и без това не е активна).
+           Тези без тригер (ядрена, крипто/CLARITY, полупроводници) минават
+           само проверката на цитата.
+    """
+    basis = c.get("basis")
+    if basis not in ("ticker_event", "chain_step"):
+        return "G0", f"basis липсва или е невалиден ({basis!r})"
+    ev = c.get("event_type")
+    if ev not in _NEWS_EVENT_TYPES:
+        return "G1", f"event_type липсва или е невалиден ({ev!r})"
+    if ev in ("price_move", "topic"):
+        return "G1", f"event_type='{ev}' — ценово движение/новина по темата не е {status}"
+
+    tickers = {str(x).upper() for x in (thesis.get("tickers") or [])}
+    affected = [str(x).upper() for x in (c.get("affected_tickers") or [])
+                if isinstance(x, str) and x.strip()]
+    want = "positive" if status == "confirmed" else "negative"
+    if not affected:
+        return "G2", "affected_tickers е празен"
+    outside = [x for x in affected if x not in tickers]
+    if outside:
+        return "G2", f"affected_tickers извън тезата: {outside}"
+    if c.get("effect") != want:
+        return "G2", f"effect={c.get('effect')!r}, а {status} изисква '{want}'"
+    if basis == "ticker_event":
+        subj = str(c.get("subject_ticker") or "").upper()
+        if subj not in tickers:
+            return "G2", (f"събитието е за {subj or '(не е посочено)'}, а то не е "
+                          f"в тезата {sorted(tickers)}")
+        return None, ""
+
+    q = _norm_quote(c.get("chain_quote"))
+    if len(q) < 12 or q not in _norm_quote(thesis.get("chain")):
+        return "G3", f"chain_quote не е дословно от веригата ({c.get('chain_quote')!r})"
+    trigger = next((b.get("trigger") for b in config.THESIS_BASKETS
+                    if b.get("name") == thesis.get("name")), None)
+    if trigger and thesis.get("status") != "active":
+        return "G3", (f"макро тригерът '{trigger}' не е сработил (статус "
+                      f"'{thesis.get('status')}') — стъпката от веригата не се е случила "
+                      f"по собственото ни мерене")
+    return None, ""
+
+
 def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
     """
     FIX 2026-09-16: свереност на геополитическите тези срещу днешните новини.
@@ -672,6 +836,7 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
     Добавя "news_status" (challenged|resolved|evolving|confirmed|unchanged) и "news_note" към
     всяка теза. Graceful: провал навсякъде тук → връща theses непроменени.
     """
+    THESIS_CHECK_DIAG.clear()
     if not theses or not news:
         return theses
     try:
@@ -700,7 +865,12 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
 - "challenged" — новина опровергава, блокира или проваля механизма. Пример: \
 теза "законодателна рамка X → регулаторна сигурност → приток на капитал", а \
 новина съобщава, че гласуването за X се е провалило. Механизмът не просто \
-още не се е случил — конкретно събитие го е спряло.
+още не се е случил — конкретно събитие го е спряло. САМО ако новината \
+блокира механизма ЗА ТИКЪРИТЕ НА ТЕЗАТА, не за съседна компания. Потвърден \
+случай 30.09.2026: "DeepSeek partners with Huawei … reducing reliance on \
+Nvidia" беше маркирано като опровержение на теза с AVGO/AMAT/MCHP \
+(оборудване и mature-node чипове) — Nvidia не е в тезата и механизмът за \
+тези тикъри не е блокиран. Ценово движение (петролът пада) не е challenged.
 - "resolved" — механизмът е ИЗЦЯЛО приключил и тезата вече няма какво да \
 предложи занапред (напр. законът е приет и в сила, събитието е минало и \
 ефектът е изчерпан). Едно потвърждаващо събитие по пътя НЕ е resolved — то е \
@@ -710,7 +880,16 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
 поръчка, бюджетно решение, законодателна стъпка напред), а тезата остава в \
 сила занапред. Потвърден случай 29.09.2026: договор за $20.7 млрд за RTX беше \
 маркиран "resolved", а е потвърждение на тезата за отбраната, не неин край. \
-Новина само по темата или ценово движение НЕ е confirmed.
+Новина само по темата или ценово движение НЕ е confirmed. "confirmed" САМО ако: \
+(а) събитието засяга ПРЯКО и ПОЛОЖИТЕЛНО компания от "tickers" на тезата \
+(договор, поръчка, бюджет за НЕЯ), или (б) е конкретна макро стъпка, дословно \
+описана в "chain" (напр. дългият край на кривата расте при теза за стръмна \
+крива). НИКОГА, когато компания ИЗВЪН тезата печели нещо, за което се е \
+състезавала компания от тезата — за компанията от тезата това е ЗАГУБА. \
+Потвърден случай 30.09.2026: "Boeing wins US Navy's next-generation fighter \
+contract" беше маркирано като потвърждение на тезата за отбраната, а Boeing \
+не е в тезата и е спечелил срещу Northrop Grumman (NOC), който е в нея. \
+Еднодневно ценово движение (петролът поскъпна днес) НИКОГА не е confirmed.
 - "evolving" — назованото в тезата СРЕДСТВО е спряно/забавено, но конкретен \
 АЛТЕРНАТИВЕН път напредва към СЪЩАТА крайна цел. Използвай го САМО когато \
 можеш да назовеш и ДВЕТЕ страни поименно: (1) кой точно оригинален път се е \
@@ -741,8 +920,26 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
 можеш да посочиш точно заглавие (или при evolving — и двата пътя), върни \
 "unchanged" с празен note.
 
+При "confirmed" и "challenged" (и САМО при тях — за останалите не ги пиши) \
+добави и полета, които кодът проверява; липсващо или невалидно поле → \
+маркирането се отхвърля:
+- "basis": "ticker_event" (събитието е за конкретна компания) или "chain_step" \
+(макро/законодателна стъпка от веригата);
+- "subject_ticker": тикърът на компанията, за която е новината (кой печели \
+договора, кой е обект на решението) — или null при chain_step;
+- "affected_tickers": тикъри ОТ "tickers" на тезата, засегнати пряко;
+- "effect": "positive" (при confirmed) или "negative" (при challenged) — за \
+affected_tickers;
+- "chain_quote": при chain_step — ДОСЛОВЕН откъс от "chain" на тезата за \
+стъпката, която се е случила или е блокирана; иначе null;
+- "event_type": "contract" | "order" | "budget" | "legislation" | "policy" | \
+"macro_data" | "price_move" | "topic".
+
 Върни JSON за ВСЯКА теза, в същия ред: \
-{{"checks": [{{"name": "...", "news_status": "...", "note": "..."}}]}}"""
+{{"checks": [{{"name": "...", "news_status": "...", "note": "...", \
+"basis": "...", "subject_ticker": "...", "affected_tickers": [...], \
+"effect": "...", "chain_quote": "...", "event_type": "..."}}]}} — \
+последните шест полета само при confirmed/challenged."""
 
         out = _parse_json(_call_claude(SYSTEM_THESIS_CHECK, user,
                                        max_tokens=config.THESIS_CHECK_MAX_TOKENS))
@@ -779,7 +976,23 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
                       "назовава и двата пътя, игнорирам")
                 annotated.append(t)
                 continue
+            # FIX 2026-09-30: G1–G3 — виж _news_gate(). Само confirmed/challenged.
+            if status in ("confirmed", "challenged"):
+                rule, why = _news_gate(t, c, status)
+                if rule:
+                    print(f"[ai] thesis_reality_check: '{t.get('name')}' {status} "
+                          f"ОТХВЪРЛЕНО ({rule}) — {why}")
+                    entry = {"thesis": t.get("name"), "status": status, "rule": rule,
+                             "reason": why, "note": note}
+                    if rule == "G3":  # цитатът на модела — за да се вижда разликата
+                        entry["chain_quote"] = c.get("chain_quote")
+                        entry["chain_quote_norm"] = _norm_quote(c.get("chain_quote"))
+                    THESIS_CHECK_DIAG.setdefault("rejected", []).append(entry)
+                    annotated.append(t)
+                    continue
             print(f"[ai] thesis_reality_check: '{t.get('name')}' → {status} — {note}")
+            THESIS_CHECK_DIAG.setdefault("accepted", []).append(
+                {"thesis": t.get("name"), "status": status})
             annotated.append({**t, "news_status": status, "news_note": note})
         # FIX 2026-09-17: успехът трябва да е ВИДИМ в лога. Дотук функцията
         # логваше само при маркиране или при провал — а "всичко unchanged"
@@ -788,8 +1001,11 @@ def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
         # news_status. Същото сляпо петно като мъртвите news източници преди
         # FIX 2026-09-15 — успех и провал изглеждаха еднакво отвън.
         flagged = sum(1 for t in annotated if t.get("news_status"))
+        rejected = THESIS_CHECK_DIAG.get("rejected", [])
         print(f"[ai] thesis_reality_check: {len(annotated)} тези проверени "
-              f"срещу {len(news)} новини — {flagged} маркирани")
+              f"срещу {len(news)} новини — {flagged} маркирани, "
+              f"{len(rejected)} отхвърлени от G0–G3"
+              + (f" {[(r['thesis'], r['rule']) for r in rejected]}" if rejected else ""))
         return annotated
     except Exception as e:
         print(f"[ai] thesis_reality_check неуспешен: {type(e).__name__}: {e}")
