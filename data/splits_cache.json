@@ -1,5 +1,5 @@
 {
- "date": "2026-09-29",
+ "date": "2026-09-30",
  "rows": [],
  "horizon": [
   {
@@ -115,12 +115,28 @@
    "date_human": "Sep 30, 2026"
   },
   {
+   "ticker": "SHFS",
+   "company": "SHF Holdings, Inc.",
+   "date": "2026-09-30",
+   "ratio": "1:12",
+   "split_type": "reverse",
+   "date_human": "Sep 30, 2026"
+  },
+  {
    "ticker": "DHY",
    "company": "UBS Asset Management High Yield Credit Fund",
    "date": "2026-09-30",
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Sep 30, 2026"
+  },
+  {
+   "ticker": "VTAK",
+   "company": "Catheter Precision, Inc.",
+   "date": "2026-10-05",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
   },
   {
    "ticker": "RUBI",
@@ -166,10 +182,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 20,
+  "source_rows": 22,
   "horizon_from": "2026-09-28",
   "horizon_to": "2026-10-09",
-  "in_week": 15,
+  "in_week": 16,
   "dropped_price": [
    "BTLN",
    "CTNT",
@@ -184,9 +200,11 @@
    "ONMD",
    "TRUG",
    "VRME",
+   "SHFS"
+  ],
+  "dropped_cap": [
    "DHY"
   ],
-  "dropped_cap": [],
   "dropped_no_data": [
    "ZCSH"
   ],

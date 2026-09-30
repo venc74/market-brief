@@ -1,37 +1,37 @@
 {
- "date": "2026-09-29",
+ "date": "2026-09-30",
  "news": [
   {
-   "headline": "Bond yields crank higher, stocks wobble as bonds head for monthly loss",
-   "why": "Покачването на доходностите натиска акциите и сигнализира за преоценка на риска на широкото пазарно ниво."
+   "headline": "30-year Treasury bond yield hits highest level since 2002",
+   "why": "Екстремното покачване на дългосрочните лихви притиска equity valuations и сигнализира за преоценка на monetary policy очакванията, директно движейки акции и bonds днес."
   },
   {
-   "headline": "Dollar holds near two-month peak as yields rise, Fed data looms",
-   "why": "Силният долар и очакваните Fed данни определят посоката на валутните и облигационните пазари краткосрочно."
+   "headline": "The Fed's main inflation measure (PCE) will be released Wednesday",
+   "why": "PCE е предпочитаният от Fed инфлационен индикатор и предстоящият release ще определи очакванията за темпото на rate cuts, с директен ефект върху всички asset класове."
   },
   {
-   "headline": "Oil prices rise for second session on continued Middle East supply concern; U.S.-Iran talks ongoing",
-   "why": "Двудневното поскъпване на суровия петрол на фона на US-Iran напрежение директно влияе върху инфлационните очаквания и енергийния сектор."
+   "headline": "U.S. job openings slipped to 7.1 million in August but labor market remains sturdy",
+   "why": "JOLTS данните са водещ индикатор за пазара на труда и влияят върху Fed позицията преди предстоящия jobs report."
   },
   {
-   "headline": "Oil price and US Treasury yields in tightest relationship since 1990",
-   "why": "Корелацията петрол-доходности е на 35-годишен връх, което означава, че всяко движение в суровините се пренася директно в bond пазара."
+   "headline": "Prediction market traders think the U.S. added more jobs in September than economists estimate",
+   "why": "По-силен от очакванията nonfarm payrolls report би намалил вероятността за rate cuts и би натиснал облигациите допълнително."
   },
   {
-   "headline": "FAA delays Boeing 737 MAX 10 certification, shares dive 7%",
-   "why": "Регулаторното забавяне от FAA удря BA акциите с 7% и поставя под въпрос приходните прогнози на компанията."
+   "headline": "DeepSeek partners with Huawei to develop chip programming tools, reducing reliance on Nvidia",
+   "why": "Директна заплаха за Nvidia пазарен дял и потенциален negative catalyst за semiconductor сектора, докато засилва технологичната независимост на Китай."
   },
   {
-   "headline": "Pentagon awards Raytheon $20.7 billion AMRAAM contract amid stockpile concerns",
-   "why": "Мегадоговорът директно ускелетира приходите на RTX и повдига целия defense сектор."
+   "headline": "Beijing warns of retaliation if Europe imposes curbs on Chinese businesses",
+   "why": "Ескалацията на търговското напрежение между ЕС и Китай носи риск за европейски акции и суровини, и може да засегне глобалните supply chains."
   },
   {
-   "headline": "Anthropic files IPO prospectus, warns of 'existential risks'; lost $8bn on $4.6bn revenue",
-   "why": "Първото голямо AI IPO filing на годината дава пазарна оценка на AI сектора и разкрива мащаба на загубите в индустрията."
+   "headline": "Oil gains after Trump denies he is willing to ease sanctions on Iran; US imposes sanctions on 13 tied to Iran weapons procurement",
+   "why": "Новите санкции и липсата на дипломатическо разведряване поддържат геополитическа премия в петрола и засягат енергийния сектор."
   },
   {
-   "headline": "AMD to acquire Fei-Fei Li's World Labs for $8.2 billion in 'physical AI' bet",
-   "why": "Крупното AI придобиване от AMD ускелетира консолидацията в сектора и дава насока за оценките на AI стартъпите."
+   "headline": "Chinese factory activity expands in September amid AI boom; China services growth hits three-month high",
+   "why": "Двойният PMI beat от Китай сигнализира за стабилизиране на втората икономика в света след стимулите, с бичи ефект за суровини и emerging markets."
   }
  ]
 }
