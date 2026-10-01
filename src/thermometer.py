@@ -501,12 +501,27 @@ _REGIME_SEVERITY = {"Offensive": 0, "Defensive": 1, "Cash": 2}
 
 
 def _load_override_state() -> dict:
-    if _OVERRIDE_STATE_FILE.exists():
-        try:
-            return json.loads(_OVERRIDE_STATE_FILE.read_text())
-        except Exception:
-            pass
-    return {}
+    """
+    FIX 2026-10-03 (отговор на прегледа на партида 1, т.1): fail-safe при
+    липсващ/повреден state файл — ВИНАГИ връща dict (никога не гърми нагоре),
+    и логва изрично двата различни случая (липсва vs повреден), за да се
+    вижда в Actions лога, а не да се предполага тихо.
+    """
+    if not _OVERRIDE_STATE_FILE.exists():
+        print(f"[thermo] override state файл липсва ({_OVERRIDE_STATE_FILE.name}) — "
+              f"fail-safe старт: override-ите тръгват все едно днес е 1-ви ден под "
+              f"прага (остават активни, не се третират като изтекли)")
+        return {}
+    try:
+        data = json.loads(_OVERRIDE_STATE_FILE.read_text())
+        if not isinstance(data, dict):
+            raise ValueError(f"очакван dict на top-level, получен {type(data).__name__}")
+        return data
+    except Exception as e:
+        print(f"[thermo] ⚠ override state файл повреден ({type(e).__name__}: {e}) — "
+              f"fail-safe: override-ите тръгват все едно днес е 1-ви ден под прага "
+              f"(остават активни, не се третират като изтекли)")
+        return {}
 
 
 def _save_override_state(state: dict) -> None:
@@ -524,16 +539,30 @@ def _hysteresis_effective(key: str, raw_today: bool, today_iso: str) -> tuple[bo
     — един граничен ден не го маха, трябва ВТОРИ пореден ден под прага.
     Идемпотентно спрямо повторен run СЪЩИЯ ден (last_date проверка) — ръчно
     повторно пускане същия ден не брои двойно.
+
+    Fail-safe по конструкция (виж _load_override_state): липсващ/повреден
+    файл → празен state → всеки ключ стартира от streak_below=0 "преди днес",
+    т.е. ДНЕС винаги излиза като streak<2 → override ефективно активен,
+    НЕЗАВИСИМО от raw_today. Единственият начин override да излезе неактивен
+    е при ЗДРАВ файл, потвърждаващ 2 реални поредни дни под прага — загубата
+    на данни никога не бърза да го изключи, най-много го държи активен по-дълго.
+    Отделно: ако конкретен запис в state е с повреден формат (не dict), същият
+    fail-safe се прилага САМО за този ключ, с лог.
     """
     state = _load_override_state()
-    entry = state.get(key, {"streak_below": 0, "last_date": None})
+    raw_entry = state.get(key)
+    if raw_entry is not None and not isinstance(raw_entry, dict):
+        print(f"[thermo] ⚠ override state за '{key}' е в повреден формат ({raw_entry!r}) — "
+              f"fail-safe reset само за този ключ")
+        raw_entry = None
+    entry = raw_entry or {"streak_below": 0, "last_date": None}
     if entry.get("last_date") != today_iso:
-        entry["streak_below"] = 0 if raw_today else entry.get("streak_below", 0) + 1
-        entry["last_date"] = today_iso
+        prev_streak = entry.get("streak_below", 0)
+        entry = {"streak_below": 0 if raw_today else prev_streak + 1, "last_date": today_iso}
         state[key] = entry
         _save_override_state(state)
-    effective = raw_today or entry["streak_below"] < 2
-    return effective, entry["streak_below"]
+    effective = raw_today or entry.get("streak_below", 0) < 2
+    return effective, entry.get("streak_below", 0)
 
 
 def _merge_regime(count_regime: str, count_reason: str, counts: str,

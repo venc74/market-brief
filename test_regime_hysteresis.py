@@ -9,7 +9,7 @@ _hysteresis_effective() (2-дневен хистерезис за MOVE/IEI-HYG s
 
 Пускане: python test_regime_hysteresis.py
 """
-import sys, pathlib, tempfile
+import sys, pathlib, tempfile, json
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from src import thermometer as th
@@ -112,6 +112,54 @@ with tempfile.TemporaryDirectory() as tmp:
         eff_b, streak_b = th._hysteresis_effective("test_key", False, "2026-01-05")
         assert (eff_a, streak_a) == (eff_b, streak_b) == (True, 1), (eff_a, streak_a, eff_b, streak_b)
         print(f"  ден 5 ×2 (same-day повторен run): streak={streak_b} и двата пъти ✓ (без двойно броене)")
+    finally:
+        th._OVERRIDE_STATE_FILE = orig
+print()
+
+# ──────────────────────────────────────────────────────────────────────────
+# Fail-safe: липсващ / повреден state файл (отговор на прегледа на партида 1)
+# ──────────────────────────────────────────────────────────────────────────
+print("── СИНТЕТИЧЕН fail-safe: липсващ/повреден state файл ──")
+with tempfile.TemporaryDirectory() as tmp:
+    orig = th._OVERRIDE_STATE_FILE
+    th._OVERRIDE_STATE_FILE = pathlib.Path(tmp) / "regime_override_state.json"
+    try:
+        # Файлът изобщо не съществува (първи run) — raw_today=False все пак
+        # дава effective=True (fail-safe: override остава активен)
+        eff, streak = th._hysteresis_effective("fs_missing", False, "2026-02-01")
+        assert eff is True, f"липсващ файл + raw=False трябваше да даде effective=True, получено {eff}"
+        print(f"  липсващ файл, raw=False → effective={eff} ✓ (fail-safe активен)")
+
+        # Повреден (невалиден JSON) файл — пак effective=True при raw=False
+        th._OVERRIDE_STATE_FILE.write_text("{ это не е валиден JSON ][")
+        eff, streak = th._hysteresis_effective("fs_broken", False, "2026-02-02")
+        assert eff is True, f"повреден файл + raw=False трябваше да даде effective=True, получено {eff}"
+        print(f"  повреден JSON, raw=False → effective={eff} ✓ (fail-safe активен)")
+
+        # Файлът е валиден JSON, но НЕ е dict на top-level (напр. списък) — пак fail-safe
+        th._OVERRIDE_STATE_FILE.write_text("[1, 2, 3]")
+        eff, streak = th._hysteresis_effective("fs_notdict", False, "2026-02-03")
+        assert eff is True, f"non-dict JSON трябваше да даде fail-safe effective=True, получено {eff}"
+        print(f"  валиден JSON, но не dict ([1,2,3]), raw=False → effective={eff} ✓ (fail-safe активен)")
+
+        # Конкретен ключ в state е с повреден формат (не dict), останалите ключове здрави
+        th._OVERRIDE_STATE_FILE.write_text(json.dumps({
+            "fs_corrupt_key": "не е dict, а низ",
+            "fs_healthy_key": {"streak_below": 2, "last_date": "2026-02-03"},
+        }))
+        eff, streak = th._hysteresis_effective("fs_corrupt_key", False, "2026-02-04")
+        assert eff is True, f"повреден ключ трябваше да даде fail-safe effective=True, получено {eff}"
+        print(f"  повреден формат за конкретен ключ, raw=False → effective={eff} ✓ (fail-safe само за този ключ)")
+        # здравият ключ не е засегнат от повредата на другия
+        eff2, streak2 = th._hysteresis_effective("fs_healthy_key", False, "2026-02-04")
+        assert eff2 is False and streak2 == 3, (eff2, streak2)
+        print(f"  успореден здрав ключ (streak=2→3) → effective={eff2} ✓ (непроменен от повредата на другия ключ)")
+
+        # raw_today=True при повреден файл → effective=True тривиално (независимо от fail-safe пътя)
+        th._OVERRIDE_STATE_FILE.write_text("пак не е JSON {{{")
+        eff, streak = th._hysteresis_effective("fs_broken2", True, "2026-02-05")
+        assert eff is True and streak == 0, (eff, streak)
+        print(f"  повреден файл, НО raw=True (фрешен скок) → effective={eff}, streak={streak} ✓")
     finally:
         th._OVERRIDE_STATE_FILE = orig
 
