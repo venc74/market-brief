@@ -22,6 +22,13 @@ SCAN_LIMIT покрива разликата (виж config).
 Graceful: провал на тикър → пропуска се; ден без сесия (празник) → нищо не се
 записва; провал изцяло → файлът остава какъвто е, сутрешният бриф казва, че
 снимката липсва.
+
+Dedup/cutoff (FIX 2026-10-03): workflow-ът пуска И schedule: (15:00 UTC), И
+workflow_dispatch от cron-job.org — ако вече има снимка за днешната сесия
+(кой да е от двата тригера я е взел), вторият run пропуска, не презаписва.
+Ако нищо още няма и часът е след config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR
+(20:00 UTC по подразбиране) — също пропуска, вместо да пази OI извън измерения
+валиден прозорец (~13:30–20:00 UTC). Виж _skip_reason().
 """
 from __future__ import annotations
 import datetime as dt
@@ -34,6 +41,27 @@ import config
 from src import unusual_options as uo
 
 
+def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str | None:
+    """
+    Чиста функция (без мрежа/часовник) — FIX 2026-10-03 (отговор на прегледа
+    на партида 1, т.4): workflow-ът има и schedule: (15:00 UTC), и
+    workflow_dispatch от cron-job.org — двата може да стрелят за същия ден
+    (GitHub-native scheduler закъснява с часове, наблюдавано: 19:55 UTC и
+    18:22 UTC за 30.09/29.09). Връща причина за пропускане, или None ако
+    трябва да продължи. Изнесена отделно за тест без мокване на
+    дата/мрежа — виж _merge_regime() в thermometer.py за същия паттърн.
+    """
+    if session.isoformat() in existing:
+        fetched = existing[session.isoformat()].get("fetched_at_utc", "?")
+        return (f"снимка за сесия {session} вече съществува (fetched_at_utc={fetched}) "
+                f"— пропускам, не презаписвам")
+    if now_utc.hour >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR:
+        return (f"{now_utc.strftime('%H:%M')} UTC — след прага "
+                f"({config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR}:00 UTC) за валиден OI "
+                f"прозорец — пропускам вместо да пазя данни извън измерения прозорец")
+    return None
+
+
 def take_snapshot() -> dict | None:
     if uo.yf is None:
         print("[oi_snapshot] yfinance липсва — нищо не е заснето")
@@ -43,6 +71,11 @@ def take_snapshot() -> dict | None:
     if session != today:
         print(f"[oi_snapshot] днес ({today}) няма сесия (последна: {session}) — "
               f"нищо не се записва")
+        return None
+
+    reason = _skip_reason(session, uo.load_oi_snapshots(), dt.datetime.now(dt.timezone.utc))
+    if reason:
+        print(f"[oi_snapshot] {reason}")
         return None
 
     t0 = time.time()
