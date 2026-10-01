@@ -214,11 +214,62 @@ _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё]+")
 _HYBRIDS: list[str] = []
 
 
+def _is_pure_cyrillic(word: str) -> bool:
+    return bool(word) and all(("А" <= c <= "я" or c in "Ёё") for c in word)
+
+
 def _fix_homoglyphs(s: str) -> str:
+    """
+    FIX 2026-10-02 (т.4 от прегледа на 01.10): самотен ASCII буква-двойник
+    ("e" вместо "е") преди не стигаше нито до поправката, нито до лога —
+    `not lat or len(lat) == len(w)` връщаше w непроменено ПРЕДИ `_HYBRIDS.append`
+    за ЦЯЛО-ASCII "дума" (а едносимволен ASCII токен е винаги цяло-ASCII по
+    дефиниция). Сега: едносимволен токен, който Е познат двойник (в
+    _HOMOGLYPHS), се поправя автоматично САМО ако думите ПРЕДИ и СЛЕД него са
+    изцяло кирилски (ниско-рисков контекст — кирилско "е"/"а" между две
+    кирилски думи няма легитимно ASCII четене); иначе само лог. Multi-char
+    ASCII "думи" (легитимни тикъри/английски термини) остават непипнати, както
+    досега.
+
+    КРИТИЧНО изключение, открито при прогон на цялата история (на пробен
+    вариант без тази проверка: 355 "поправки", после сведени до 1802 чисти
+    лог записа без нея — виж по-долу):
+      • "x" директно до цифра ("1.5x", "обем >1.5x среден") Е multiplier
+        нотация, не буква — `_WORD_RE` не матчва цифри, затова "обем" /
+        "среден" излизат като "съседни кирилски думи" на "x", и без тази
+        проверка "1.5x" се чупеше на "1.5х".
+      • Едносимволни ASCII абревиатурни букви, допрени до "/", "&", "'" или
+        "." (P/E, M&A, O'Neil, J.B. Hunt, J.P. Morgan) доминираха лога
+        (726×P + 429×E от "P/E", 110×A + 99×M от "M&A", 74×O от "O'Neil" —
+        98% от 1802-те записа), давейки реално полезните случаи.
+    Символ непосредствено ДОПРЯН (без интервал) до цифра ИЛИ /&-'. преди ИЛИ
+    след самотната буква → изобщо не се третира като дума-кандидат (нито
+    поправка, нито лог). След тази проверка: 9 авто-поправки + 43 лог записа
+    за ~90 дни история (от които 19 "Coffee C" — легитимно COT пазарно име,
+    14 генерирано "e" между нечисто-кирилски думи, останалото разни ситуации
+    като "Zone A" — приемлив, нисък шум).
+    """
     def repl(m):
         w = m.group(0)
         lat = [c for c in w if c.isascii()]
-        if not lat or len(lat) == len(w):
+        if not lat:
+            return w
+        if len(lat) == len(w):
+            if len(w) == 1 and w in _HOMOGLYPHS:
+                touches = lambda c: c.isdigit() or c in "/&-'."
+                if ((m.start() > 0 and touches(s[m.start() - 1]))
+                        or (m.end() < len(s) and touches(s[m.end()]))):
+                    return w  # "1.5x"/"P/E"/"M&A"/"O'Neil"/"J.B." и т.н. — не буква-двойник
+                prev_matches = list(_WORD_RE.finditer(s[:m.start()]))
+                prev_word = prev_matches[-1].group(0) if prev_matches else ""
+                next_match = _WORD_RE.search(s[m.end():])
+                next_word = next_match.group(0) if next_match else ""
+                if _is_pure_cyrillic(prev_word) and _is_pure_cyrillic(next_word):
+                    fixed = _HOMOGLYPHS[w]
+                    print(f"[ai] самотен буква-двойник заменен: '{w}' → '{fixed}' "
+                          f"(между '{prev_word}' и '{next_word}')")
+                    return fixed
+                _HYBRIDS.append(w)
             return w
         if len(lat) <= 2 and len(w) - len(lat) >= 2 and all(c in _HOMOGLYPHS for c in lat):
             fixed = "".join(_HOMOGLYPHS.get(c, c) for c in w)
@@ -227,6 +278,35 @@ def _fix_homoglyphs(s: str) -> str:
         _HYBRIDS.append(w)
         return w
     return _WORD_RE.sub(repl, s)
+
+
+# FIX 2026-10-02 (т.4 от прегледа на 01.10): "по-ата" (01.10, 2Y Treasury теза)
+# — изпусната дума в кирилска фраза, не max_tokens срязване (ai_truncations
+# беше []) и не слепена латиница+кирилица (_fix_glued цели друг дефект).
+# Няма безопасна генерична поправка без BG речник — само лог. Ползва СЪЩИЯ
+# исторически корпус като _fix_glued (_bg_vocab()), но count==0 (никога
+# невиждана дума ДОСЕГА), не count<3: измерено на 01.10 срещу корпуса от
+# ВСИЧКИ предходни дни (без самия 01.10, за да симулира реалния момент на
+# проверка) — 2/23 "по-XXX" суфикса от брифа флагнати с count==0 ("ата" —
+# реалният бъг, и "меките" — легитимна, но за пръв път употребена дума);
+# count<3 прагът (като при _fix_glued) даде 62/293 за цялата история —
+# твърде шумно за този проблем (повечето рядко срещани "по-" форми са
+# напълно легитимни думи, не отрязъци).
+_PO_SUFFIX_RE = re.compile(r"по-([а-яА-Я]+)")
+
+
+def _check_po_suffix(s: str) -> None:
+    cyr = _bg_vocab()[0]
+    if not cyr:
+        return
+    seen = set()
+    for m in _PO_SUFFIX_RE.finditer(s):
+        suf = m.group(1).lower()
+        if suf in seen or cyr.get(suf, 0) > 0:
+            continue
+        seen.add(suf)
+        print(f"[ai] ⚠ 'по-{suf}' — суфиксът не е срещан в историята (вероятно "
+              f"изпусната дума) — «…{s[max(0, m.start() - 20):m.end() + 20]}…»")
 
 
 def _fix_translit(obj):
@@ -251,6 +331,7 @@ def _fix_translit(obj):
               f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
     if not re.search(r"[А-Яа-я]", obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
+    _check_po_suffix(obj)
     obj = _fix_homoglyphs(obj)
     obj = _fix_glued(obj)
     def cyr_repl(m):
