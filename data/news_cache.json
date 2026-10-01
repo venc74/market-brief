@@ -1,37 +1,37 @@
 {
- "date": "2026-09-30",
+ "date": "2026-10-01",
  "news": [
   {
-   "headline": "30-year Treasury bond yield hits highest level since 2002",
-   "why": "Екстремното покачване на дългосрочните лихви притиска equity valuations и сигнализира за преоценка на monetary policy очакванията, директно движейки акции и bonds днес."
+   "headline": "Global bond sell-off deepens as Asian yields jump",
+   "why": "Покачването на японски и австралийски доходности задълбочава глобалния bond sell-off, оказвайки натиск върху акциите и повишавайки borrowing costs навсякъде."
   },
   {
-   "headline": "The Fed's main inflation measure (PCE) will be released Wednesday",
-   "why": "PCE е предпочитаният от Fed инфлационен индикатор и предстоящият release ще определи очакванията за темпото на rate cuts, с директен ефект върху всички asset класове."
+   "headline": "Stock futures rise as traders eye elevated Treasury yields, brace for jobs report due this week",
+   "why": "Предстоящият nonfarm payrolls report е ключовият макро катализатор тази седмица, определящ следващия ход на Fed по лихвените проценти."
   },
   {
-   "headline": "U.S. job openings slipped to 7.1 million in August but labor market remains sturdy",
-   "why": "JOLTS данните са водещ индикатор за пазара на труда и влияят върху Fed позицията преди предстоящия jobs report."
+   "headline": "Fed's Kashkari says inflation is 'still too high' even after softer-than-expected PCE data, labor market is 'pretty good'",
+   "why": "Hawkish сигнал от Fed, потвърждаващ, че намаляване на лихвите не е неминуемо въпреки по-меките PCE данни, което поддържа yields високо."
   },
   {
-   "headline": "Prediction market traders think the U.S. added more jobs in September than economists estimate",
-   "why": "По-силен от очакванията nonfarm payrolls report би намалил вероятността за rate cuts и би натиснал облигациите допълнително."
+   "headline": "US economy grew a solid 2.2% in the second quarter, government says, upgrading previous estimate",
+   "why": "Ревизирано нагоре GDP Q2 показва по-устойчива икономика, което намалява очакванията за агресивно Fed easing."
   },
   {
-   "headline": "DeepSeek partners with Huawei to develop chip programming tools, reducing reliance on Nvidia",
-   "why": "Директна заплаха за Nvidia пазарен дял и потенциален negative catalyst за semiconductor сектора, докато засилва технологичната независимост на Китай."
+   "headline": "Trump 'thinking about' diesel export ban, but says it could have 'negative impact' on gasoline",
+   "why": "Потенциална забрана на дизелов износ би разтърсила energy markets, повишила domestic fuel цени и засегнала рафинериите и транспортния сектор."
   },
   {
-   "headline": "Beijing warns of retaliation if Europe imposes curbs on Chinese businesses",
-   "why": "Ескалацията на търговското напрежение между ЕС и Китай носи риск за европейски акции и суровини, и може да засегне глобалните supply chains."
+   "headline": "Greer urges G20 to back Trump tariff agenda, takes aim at China",
+   "why": "Засилването на тарифния натиск към G20 и Китай увеличава риска от ескалация на trade war с директни последици за глобалните вериги на доставки и пазарите."
   },
   {
-   "headline": "Oil gains after Trump denies he is willing to ease sanctions on Iran; US imposes sanctions on 13 tied to Iran weapons procurement",
-   "why": "Новите санкции и липсата на дипломатическо разведряване поддържат геополитическа премия в петрола и засягат енергийния сектор."
+   "headline": "Senators will try to win approval of permanent Chinese car ban in November",
+   "why": "Законодателна инициатива за постоянна забрана на китайски автомобили би имала дългосрочен ефект върху auto сектора и US-China търговските отношения."
   },
   {
-   "headline": "Chinese factory activity expands in September amid AI boom; China services growth hits three-month high",
-   "why": "Двойният PMI beat от Китай сигнализира за стабилизиране на втората икономика в света след стимулите, с бичи ефект за суровини и emerging markets."
+   "headline": "FTC is investigating OpenAI and Anthropic over possible risks to consumers",
+   "why": "Регулаторно разследване от FTC срещу водещи AI компании носи риск от ограничения и e негативен сигнал за целия AI и tech сектор."
   }
  ]
 }

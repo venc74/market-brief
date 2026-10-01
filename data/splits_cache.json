@@ -1,5 +1,5 @@
 {
- "date": "2026-09-30",
+ "date": "2026-10-01",
  "rows": [],
  "horizon": [
   {
@@ -131,6 +131,30 @@
    "date_human": "Sep 30, 2026"
   },
   {
+   "ticker": "BGM",
+   "company": "BGM Group Ltd.",
+   "date": "2026-10-01",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Oct 01, 2026"
+  },
+  {
+   "ticker": "KUST",
+   "company": "Kustom Entertainment, Inc.",
+   "date": "2026-10-01",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 01, 2026"
+  },
+  {
+   "ticker": "MYPS",
+   "company": "PLAYSTUDIOS, Inc.",
+   "date": "2026-10-01",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 01, 2026"
+  },
+  {
    "ticker": "VTAK",
    "company": "Catheter Precision, Inc.",
    "date": "2026-10-05",
@@ -182,10 +206,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 22,
+  "source_rows": 25,
   "horizon_from": "2026-09-28",
   "horizon_to": "2026-10-09",
-  "in_week": 16,
+  "in_week": 19,
   "dropped_price": [
    "BTLN",
    "CTNT",
@@ -200,7 +224,10 @@
    "ONMD",
    "TRUG",
    "VRME",
-   "SHFS"
+   "SHFS",
+   "BGM",
+   "KUST",
+   "MYPS"
   ],
   "dropped_cap": [
    "DHY"
