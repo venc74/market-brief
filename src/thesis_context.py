@@ -133,6 +133,25 @@ def _summary(rows: list[dict], sector: dict) -> str:
     return " · ".join(parts)
 
 
+def _price_diverges(rows: list[dict], sector: dict) -> bool:
+    """
+    FIX 2026-10-02 (т.2 от прегледа на 01.10): чисто визуален флаг — gate-овете
+    (news_status/G0-G3, laggard/leading класификацията) НЕ се пипат тук, само
+    се чете резултатът им. True когато "потвърдена от новина" тезата всъщност
+    се търгува обратно на механизма ѝ: мнозинство тикъри под 200DMA (сред
+    редовете с известна стойност — not None) ИЛИ секторният RS е отрицателен
+    и на 4, и на 12 седмици. "Мнозинство" = строго >50% (не тай/половина) —
+    реалният пример от 01.10 (Финанси: JPM above_200=True, BAC above_200=False,
+    1/2 не е мнозинство) пада под тази проверка през RS крака (-6.65%/-6.14%),
+    не през 200DMA крака — двата критерия са умишлено независими (ИЛИ, не И).
+    """
+    with_200 = [r for r in rows if r.get("above_200") is not None]
+    majority_below_200 = bool(with_200) and sum(1 for r in with_200 if not r["above_200"]) > len(with_200) / 2
+    rs_both_negative = (sector.get("rs_4w") is not None and sector.get("rs_12w") is not None
+                        and sector["rs_4w"] < 0 and sector["rs_12w"] < 0)
+    return majority_below_200 or rs_both_negative
+
+
 def annotate(theses: list[dict], rotation: list[dict], regime: str,
              positions: set[str], action: set[str], watchlist: set[str],
              today: dt.date | None = None) -> list[dict]:
@@ -195,4 +214,5 @@ def _context(th, basket, closes, rotation, regime, positions, action, watchlist,
         rows.append(row)
     sector = _sector(basket, rotation)
     return {"regime": regime, "sector": sector, "rows": rows,
-            "summary": _summary(rows, sector)}
+            "summary": _summary(rows, sector),
+            "price_diverges": _price_diverges(rows, sector)}
