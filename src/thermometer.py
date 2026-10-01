@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 import datetime as dt
+import json
 import math
 import time
 import requests
@@ -480,6 +481,98 @@ def _breadth_divergence(indicators: list[dict]) -> None:
                         f"а ширината е под {config.BREADTH_WEAK_THRESHOLD:.0f}%")
 
 
+# ══════════════════════════════════════════════════════════════════════════
+# Хистерезис за delta/RoC-базираните override-и (MOVE spike, IEI/HYG spike)
+# FIX 2026-10-02 (т.1 от прегледа на 01.10):
+#
+# И двата spike флага идват от прозорец, който се плъзга всеки ден (MOVE:
+# today − преди точно 7 календарни дни; IEI/HYG: 10-дневна RoC, percentile-
+# ранкната спрямо rolling прозорец) — щом еднократният скок "изпадне" от
+# прозореца, флагът пада САМ, дори нивото на стрес да не се е реално
+# успокоило (напр. 01.10: MOVE=110, вече под червения праг 150 — само spike
+# флагът държи override-а; той би паднал до ~седмица чисто календарно, без
+# MOVE да мръдне). "2 поредни дни под прага" НЕ поправя тази динамика (пак е
+# чисто календарна по решение — виж прегледа, "без логика за отдръпване от
+# пика") — пази override-а само от едно гранично отчитане (whipsaw), а
+# exit_rule текстът вече казва честно какво точно значи "отпада", вместо да
+# го представя като реално успокояване.
+_OVERRIDE_STATE_FILE = config.DATA_DIR / "regime_override_state.json"
+_REGIME_SEVERITY = {"Offensive": 0, "Defensive": 1, "Cash": 2}
+
+
+def _load_override_state() -> dict:
+    if _OVERRIDE_STATE_FILE.exists():
+        try:
+            return json.loads(_OVERRIDE_STATE_FILE.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def _save_override_state(state: dict) -> None:
+    try:
+        config.DATA_DIR.mkdir(exist_ok=True)
+        _OVERRIDE_STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=1))
+    except Exception as e:
+        print(f"[thermo] override hysteresis state write failed: {e}")
+
+
+def _hysteresis_effective(key: str, raw_today: bool, today_iso: str) -> tuple[bool, int]:
+    """
+    streak_below = последователни дни (ВКЛЮЧИТЕЛНО днес), в които raw флагът
+    е бил False. Override-ът остава ефективно активен, докато streak_below < 2
+    — един граничен ден не го маха, трябва ВТОРИ пореден ден под прага.
+    Идемпотентно спрямо повторен run СЪЩИЯ ден (last_date проверка) — ръчно
+    повторно пускане същия ден не брои двойно.
+    """
+    state = _load_override_state()
+    entry = state.get(key, {"streak_below": 0, "last_date": None})
+    if entry.get("last_date") != today_iso:
+        entry["streak_below"] = 0 if raw_today else entry.get("streak_below", 0) + 1
+        entry["last_date"] = today_iso
+        state[key] = entry
+        _save_override_state(state)
+    effective = raw_today or entry["streak_below"] < 2
+    return effective, entry["streak_below"]
+
+
+def _merge_regime(count_regime: str, count_reason: str, counts: str,
+                  overrides: list[dict]) -> tuple[str, str, str]:
+    """
+    Чиста функция (без мрежа) — FIX 2026-10-02 (т.1 от прегледа на 01.10):
+    override-ите само ПОВДИГАТ пода до Defensive, не трябва да смекчават
+    регим, който броенето вече е определило като по-строг (01.10: count=Cash,
+    overrides=MOVE+IEI/HYG → преди този фикс финалният regime ставаше
+    "Defensive", по-мек от самото броене). Изнесена отделно от build_thermometer,
+    за да се тества директно с реални/синтетични (count_regime, overrides)
+    комбинации, без да се мокват деветте мрежови indicator fetch-а.
+    """
+    if not overrides:
+        return count_regime, count_reason, f"Режимът е по броенето ({counts}). Няма активен автоматичен override."
+
+    override_exit_desc = "; ".join(f"{o['trigger']}: {o['exit_condition']}" for o in overrides)
+    if _REGIME_SEVERITY[count_regime] > _REGIME_SEVERITY["Defensive"]:
+        # единственият count_regime по-строг от Defensive е "Cash" (reds >= 3) —
+        # прагът за подобрение до Defensive е винаги "под 3 червени"
+        trig = ", ".join(o["trigger"] for o in overrides)
+        regime = count_regime
+        reason = (f"{count_reason} — override-и също активни ({trig}); те сами биха "
+                 f"форсирали само Defensive, но броенето вече е по-строго ({count_regime}).")
+        exit_rule = (
+            f"Регимът в момента се определя от броенето ({count_reason}), не от "
+            f"override-ите — те сами биха дали само Defensive. За подобрение трябва "
+            f"ИЛИ броенето да падне под 3 червени, ИЛИ override-ите да паднат: "
+            f"{override_exit_desc}.")
+    else:
+        regime = "Defensive"
+        reason = overrides[0]["text"]
+        exit_rule = (
+            f"Override-ът пада, когато ВСИЧКИ условия отпаднат: {override_exit_desc}. "
+            f"След това режимът се определя от броенето — в момента то дава "
+            f"{count_regime} ({counts}).")
+    return regime, reason, exit_rule
+
+
 def build_thermometer(macro: dict) -> dict:
     """
     Сглобява 9-те индикатора + правилото за режим (8-ми, Market Breadth,
@@ -550,9 +643,16 @@ def build_thermometer(macro: dict) -> dict:
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
     move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
     move_val = move_ind.get("value") if move_ind else None
-    move_spike = move_ind.get("spike") if move_ind else False
+    move_spike_raw = bool(move_ind and move_ind.get("spike"))
     credit_ind = next((i for i in indicators if i["name"] == "IEI/HYG (Credit Spread)"), None)
-    credit_spike = bool(credit_ind and credit_ind.get("spike"))
+    credit_spike_raw = bool(credit_ind and credit_ind.get("spike"))
+
+    # хистерезис САМО върху delta/RoC-базираните spike флагове (виж бележката
+    # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
+    # се пипат
+    today_iso = dt.date.today().isoformat()
+    move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
+    credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
 
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
@@ -592,35 +692,47 @@ def build_thermometer(macro: dict) -> dict:
             exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} пункта или под "
                          f"(сега {move_val:.1f})")
         if move_spike:
-            # FIX 2026-09-28: единици "пункта" (не %); и "спре да расте" беше
-            # неточно — условието е ръстът за седмица да е под прага, не нула
+            # FIX 2026-10-02: честен текст за хистерезиса (виж бележката над
+            # build_thermometer) — "седмичният ръст се забави" звучеше като
+            # реално успокояване; реално делтата пада САМА до ~седмица чисто
+            # защото прозорецът се плъзга, дори MOVE да стои непроменено високо
             exits.append(
-                f"седмичната промяна на MOVE спадне под +{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта "
-                f"(сега {move_ind.get('delta_1w'):+.1f} пункта) — тоест седмичният ръст "
-                f"се забави под {config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта; "
-                "НЕ се изисква спад до конкретно ниво")
+                f"седмичната делта (сега {move_ind.get('delta_1w'):+.1f} пункта) да е под "
+                f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни (хистерезис — "
+                f"в момента {min(move_spike_streak, 2)}/2); без нов скок това става до около "
+                "седмица — това е прозорецът, не непременно реално успокояване на стреса")
+        hysteresis_note = (
+            f" (хистерезис — {move_spike_streak}-и ден под прага, override все още активен)"
+            if move_spike and not move_spike_raw else ""
+        )
         overrides.append({
             "trigger": "MOVE",
             "text": (f"MOVE {move_val:.0f}" + (f" (рязък седмичен скок, {move_ind.get('delta_1w'):+.1f} пункта)"
-                                               if move_spike else f" > {config.MOVE_RED_THRESHOLD:.0f}")
-                     + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%"),
+                                               if move_spike_raw else f" > {config.MOVE_RED_THRESHOLD:.0f}")
+                     + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%"
+                     + hysteresis_note),
             "exit_condition": " И ".join(exits),
         })
     if credit_spike:
+        hysteresis_note = (
+            f" (хистерезис — {credit_spike_streak}-и ден под прага, override все още активен)"
+            if not credit_spike_raw else ""
+        )
         overrides.append({
             "trigger": "IEI/HYG",
             "text": (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
                      f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
-                     "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%"),
-            "exit_condition": (f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната промяна на IEI/HYG падне "
-                               f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. percentile "
-                               f"(сега {credit_ind['roc_percentile']:.0f}.)"),
+                     "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%"
+                     + hysteresis_note),
+            "exit_condition": (
+                f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile (сега "
+                f"{credit_ind['roc_percentile']:.0f}.) да е под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. "
+                f"percentile два поредни дни (хистерезис — в момента {min(credit_spike_streak, 2)}/2); "
+                f"без нов скок това става до около {config.IEI_HYG_ROC_WINDOW_DAYS} дни — това е "
+                "прозорецът на изчислението, не непременно реално успокояване"),
         })
 
-    if overrides:
-        regime, reason = "Defensive", overrides[0]["text"]
-    else:
-        regime, reason = count_regime, count_reason
+    regime, reason, exit_rule = _merge_regime(count_regime, count_reason, counts, overrides)
 
     # FIX 2026-07-15: преди sizing_factor падаше САМО при принудителен Defensive
     # (VIX/MOVE); нормален Defensive/Cash по броя сигнали оставаше на 1.0 —
@@ -633,13 +745,7 @@ def build_thermometer(macro: dict) -> dict:
             # би дало броенето само по себе си — за header-а и за макро промпта.
             "counts": counts, "overrides": overrides,
             "regime_by_count": count_regime,
-            "exit_rule": (
-                ("Override-ът пада, когато ВСИЧКИ условия отпаднат: "
-                 + "; ".join(f"{o['trigger']}: {o['exit_condition']}" for o in overrides)
-                 + f". След това режимът се определя от броенето — в момента то дава "
-                 f"{count_regime} ({counts}).")
-                if overrides else
-                f"Режимът е по броенето ({counts}). Няма активен автоматичен override."),
+            "exit_rule": exit_rule,
             }
 
 
