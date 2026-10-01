@@ -707,7 +707,50 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
             c["ai"].setdefault("watchlist_trigger",
                                f"След earnings на {c['earnings'].get('next_earnings')}")
+        _check_price_mentions(c.get("ticker", "?"), c["ai"].get("why_now") or "", c.get("price"))
     return candidates
+
+
+# FIX 2026-10-02 (т.3 от прегледа на 01.10): batch-ов cross-contamination —
+# AVT защо_сега (01.10) цитира "Текущата цена $210.08", реалната AVT цена е
+# $99.95; $210.08 е точната реална цена на NTAP, друг тикър в СЪЩИЯ batch.
+# Пост-хок, САМО лог (не пипа текста — рисковано е сляпо find/replace, защото
+# цена в текста може легитимно да е pivot/stop/target, не "текуща цена").
+#
+# Измерено върху цялата история (data/20*.json, 633 карти с why_now и price):
+# 7/633 флагнати с наивна "цена...$X в 30-символен прозорец"; след изключване
+# на pivot/stop/target/цел/под/над (с \b, за да не хване "надминава") остават
+# 3/633 — AVT/NTAP (потвърден бъг), и две гранични "текуща цена $X" фрази,
+# които реално описват друг референтен праг (delta/breakout ниво), не днешната
+# цена. 3/633 ≈ 0.5% е приемлив шум за чисто диагностичен лог.
+_PRICE_WORD_RE = re.compile(r"цена(?:та)?", re.I)
+_PRICE_EXCLUDE_RE = re.compile(r"pivot|stop|target|цел|\bпод\b|\bнад\b", re.I)
+_DOLLAR_AMOUNT_RE = re.compile(r"\$([\d,]+\.?\d*)")
+
+
+def _check_price_mentions(ticker: str, text: str, real_price: float | None,
+                          tolerance_pct: float = 2.0) -> None:
+    """Лог (не промяна) при '...цена... $X' в текст, разминаващо се с real_price с >tolerance_pct%."""
+    if not text or not real_price:
+        return
+    for pm in _PRICE_WORD_RE.finditer(text):
+        before_word = text[max(0, pm.start() - 15):pm.start()]
+        window = text[pm.end():pm.end() + 30]
+        dm = _DOLLAR_AMOUNT_RE.search(window)
+        if not dm:
+            continue
+        if (_PRICE_EXCLUDE_RE.search(before_word) or _PRICE_EXCLUDE_RE.search(window[:dm.start()])
+                or _PRICE_EXCLUDE_RE.search(window[dm.end():dm.end() + 15])):
+            continue  # pivot/stop/target/под/над наблизо (преди или след) — друг референтен праг, не текуща цена
+        try:
+            mentioned = float(dm.group(1).replace(",", ""))
+        except ValueError:
+            continue
+        if mentioned <= 0 or abs(mentioned - real_price) / real_price * 100 <= tolerance_pct:
+            continue
+        ctx = text[max(0, pm.start() - 15):pm.end() + 30]
+        print(f"[ai] ⚠ защо_сега цена разминаване за {ticker}: текстът споменава ${mentioned:.2f}, "
+              f"реалната цена е ${real_price:.2f} ({(mentioned / real_price - 1) * 100:+.1f}%) — «…{ctx}…»")
 
 
 # ══════════════════════════════════════════════════════════════════════════
