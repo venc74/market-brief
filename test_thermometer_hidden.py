@@ -5,7 +5,7 @@
   т.1 KeyError при скрит IEI/HYG (и MOVE) докато хистерезисът държи override;
       + fallback "Defensive (термометърът е недостъпен)", ако термометърът гръмне.
   т.2 минимум видими индикатори за Offensive (реална конфигурация от 08.09).
-  т.3 (допълва се в следващия commit) хистерезисът не брои скрит ден за спокоен.
+  т.3 хистерезисът не брои скрит ден за спокоен (streak се замразява).
 
 РЕАЛНИ данни: индикаторите от data/2026-10-02.json; формата на СКРИТ индикатор е
 копирана от data/2026-09-08.json (реален ден с 4 скрити). Състоянието на
@@ -167,6 +167,69 @@ t, _, _ = run_with({"MOVE (Bond Vol)": {"status": "red", "spike": False},
                    CALM, dt.date(2026, 9, 8), hide=("VIX Term Structure", "Market Breadth (% над 40dMA)", "Fed Net Liquidity"))
 assert t["regime_by_count"] in ("Cash", "Defensive")
 print("  ✓ при червени индикатори прагът не променя Cash/Defensive:", t["regime_by_count"])
+
+print()
+print("── т.3: скрит ден не е спокоен ден — streak се замразява (СИНТЕТИЧНО, вериги от дни) ──")
+D = lambda n: dt.date(2026, 10, n)
+calm_credit = {"IEI/HYG (Credit Spread)": {"spike": False, "status": "green", "roc_percentile": 40.0}}
+MOVE_H = "MOVE (Bond Vol)"
+state = {"move_spike": {"streak_below": 0, "last_date": "2026-10-02"},   # вчера: spike
+         "credit_spike": {"streak_below": 9, "last_date": "2026-10-02"}}
+
+# два поредни скрити дни: преди фикса streak стигаше 2 и override-ът падаше
+t, log, state = run_with(calm_credit, state, D(5), hide=(MOVE_H,))
+assert state["move_spike"]["streak_below"] == 0 and state["move_spike"]["frozen_days"] == 1
+assert "замразен" in log and any(o["trigger"] == "MOVE" for o in t["overrides"])
+t, log, state = run_with(calm_credit, state, D(6), hide=(MOVE_H,))
+assert state["move_spike"]["streak_below"] == 0 and state["move_spike"]["frozen_days"] == 2
+ov = {o["trigger"]: o for o in t["overrides"]}
+assert "MOVE" in ov and "2-и ден без данни" in ov["MOVE"]["text"], ov
+print("  ✓ 2 поредни скрити дни → streak остава 0, override още активен (2-и ден без данни)")
+print("    лог:", log.strip().splitlines()[0])
+
+# първият ВИДИМ спокоен ден продължава от замразеното: 0 → 1 (още активен), после 2 → пада
+t, log, state = run_with(calm_credit, state, D(7))
+assert state["move_spike"]["streak_below"] == 1 and "frozen_days" not in state["move_spike"]
+assert any(o["trigger"] == "MOVE" for o in t["overrides"])
+t, log, state = run_with(calm_credit, state, D(8))
+assert state["move_spike"]["streak_below"] == 2 and not any(o["trigger"] == "MOVE" for o in t["overrides"])
+print("  ✓ видим спокоен ден 1 → 1/2 (държи), ден 2 → 2/2 (пада); frozen_days се чисти")
+
+# скрит ден между два спокойни: не нулира и не добавя
+state = {"move_spike": {"streak_below": 1, "last_date": "2026-10-02"},
+         "credit_spike": {"streak_below": 9, "last_date": "2026-10-02"}}
+t, log, state = run_with(calm_credit, state, D(5), hide=(MOVE_H,))
+assert state["move_spike"]["streak_below"] == 1
+t, log, state = run_with(calm_credit, state, D(6))
+assert state["move_spike"]["streak_below"] == 2 and not any(o["trigger"] == "MOVE" for o in t["overrides"])
+print("  ✓ streak 1, скрит ден (остава 1), видим спокоен ден → 2 → пада (скритият не нулира)")
+
+# същото за IEI/HYG
+state = {"credit_spike": {"streak_below": 0, "last_date": "2026-10-02"},
+         "move_spike": {"streak_below": 9, "last_date": "2026-10-02"}}
+CH = "IEI/HYG (Credit Spread)"
+for d in (5, 6, 7):
+    t, log, state = run_with({}, state, D(d), hide=(CH,))
+assert state["credit_spike"]["streak_below"] == 0 and state["credit_spike"]["frozen_days"] == 3
+assert any(o["trigger"] == "IEI/HYG" for o in t["overrides"])
+print("  ✓ IEI/HYG: 3 скрити дни → streak 0, override активен (3-и ден без данни)")
+
+# идемпотентност в рамките на един ден: frozen_days не расте двойно
+state = {"move_spike": {"streak_below": 0, "last_date": "2026-10-02"}, "credit_spike": {"streak_below": 9, "last_date": "2026-10-02"}}
+_, _, state = run_with(calm_credit, state, D(5), hide=(MOVE_H,))
+_, _, state = run_with(calm_credit, state, D(5), hide=(MOVE_H,))
+assert state["move_spike"]["frozen_days"] == 1
+print("  ✓ повторен run същия ден → frozen_days остава 1")
+
+# няма записан spike (празно състояние) + скрит индикатор → НЯМА фантомен override
+t, log, state = run_with(calm_credit, {}, D(5), hide=(MOVE_H,))
+assert not any(o["trigger"] == "MOVE" for o in t["overrides"]) and "няма записано състояние" in log
+print("  ✓ скрит MOVE без записано състояние → няма override (преди фикса fail-safe държеше фантомен)")
+
+# повреден запис за ключа + скрит индикатор → fail-safe: държи
+t, log, _ = run_with(calm_credit, {"move_spike": "боклук", "credit_spike": {"streak_below": 9, "last_date": "2026-10-02"}}, D(5), hide=(MOVE_H,))
+assert any(o["trigger"] == "MOVE" for o in t["overrides"]) and "fail-safe" in log
+print("  ✓ повреден запис + скрит индикатор → fail-safe, override се държи")
 
 print()
 print("Всички тестове минаха.")

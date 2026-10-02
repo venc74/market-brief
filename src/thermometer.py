@@ -565,6 +565,43 @@ def _hysteresis_effective(key: str, raw_today: bool, today_iso: str) -> tuple[bo
     return effective, entry.get("streak_below", 0)
 
 
+def _hysteresis_hidden(key: str, today_iso: str) -> tuple[bool, int, int]:
+    """
+    FIX 2026-10-02 (находка 3 от прегледа): скрит индикатор (hide=True) НЕ е
+    спокоен ден. Преди скритият MOVE/IEI-HYG даваше raw=False и streak_below
+    растеше, така че два дни застоял ^MOVE сваляха override-а без реално
+    успокоение. Сега при скрит индикатор streak-ът се ЗАМРАЗЯВА — не расте и не се
+    нулира; пази се само брояч на дните без данни (frozen_days, за лога и
+    текста). Връща (effective, streak, frozen_days): effective = streak < 2 по
+    последния ЗАПИСАН streak. Няма запис за ключа (никога не е имало spike, или
+    файлът е изгубен) → няма какво да се държи → False; повреден запис (не
+    dict) → fail-safe True, както в _hysteresis_effective. Идемпотентно за един
+    и същи ден (last_frozen_date). Първият видим ден след скритите продължава
+    броенето от замразената стойност (+1 при raw=False).
+    """
+    state = _load_override_state()
+    raw_entry = state.get(key)
+    if raw_entry is None:
+        print(f"[thermo] {key}: индикаторът е скрит и няма записано състояние — "
+              f"няма override за държане")
+        return False, 0, 0
+    if not isinstance(raw_entry, dict):
+        print(f"[thermo] ⚠ override state за '{key}' е в повреден формат ({raw_entry!r}) и "
+              f"индикаторът е скрит — fail-safe: override-ът се държи")
+        return True, 0, 0
+    streak = raw_entry.get("streak_below", 0)
+    frozen = raw_entry.get("frozen_days", 0)
+    if raw_entry.get("last_frozen_date") != today_iso:
+        frozen += 1
+        raw_entry["frozen_days"] = frozen
+        raw_entry["last_frozen_date"] = today_iso
+        state[key] = raw_entry
+        _save_override_state(state)
+    print(f"[thermo] {key}: индикаторът е скрит — хистерезисът е замразен "
+          f"(streak_below={streak}, {frozen}-и ден без данни; не се брои за спокоен ден)")
+    return streak < 2, streak, frozen
+
+
 def _merge_regime(count_regime: str, count_reason: str, counts: str,
                   overrides: list[dict]) -> tuple[str, str, str]:
     """
@@ -705,8 +742,16 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
     # се пипат
     today_iso = (today or dt.date.today()).isoformat()  # today — само за тестове
-    move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
-    credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
+    if move_visible:
+        move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
+        move_frozen = 0
+    else:
+        move_spike, move_spike_streak, move_frozen = _hysteresis_hidden("move_spike", today_iso)
+    if credit_visible:
+        credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
+        credit_frozen = 0
+    else:
+        credit_spike, credit_spike_streak, credit_frozen = _hysteresis_hidden("credit_spike", today_iso)
 
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = ((move_visible and (move_val > config.MOVE_RED_THRESHOLD or move_spike))
@@ -755,8 +800,9 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         overrides.append({
             "trigger": "MOVE",
             "state": "hysteresis",
-            "text": ("MOVE: данните липсват днес, override-ът се държи по хистерезис "
-                     f"(последно {min(move_spike_streak, 2)}/2 дни под прага) — sizing −50%"),
+            "text": (f"MOVE: данните липсват днес ({move_frozen}-и ден без данни), override-ът се "
+                     f"държи по хистерезис — замразен на {min(move_spike_streak, 2)}/2 дни под "
+                     f"прага, скритите дни не се броят за спокойни — sizing −50%"),
             "exit_condition": (f"данните за MOVE да се върнат и седмичната делта да е под "
                                f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни"),
         })
@@ -806,8 +852,9 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         overrides.append({
             "trigger": "IEI/HYG",
             "state": "hysteresis",
-            "text": ("IEI/HYG: данните липсват днес, override-ът се държи по хистерезис "
-                     f"(последно {min(credit_spike_streak, 2)}/2 дни под прага) — sizing −50%"),
+            "text": (f"IEI/HYG: данните липсват днес ({credit_frozen}-и ден без данни), override-ът се "
+                     f"държи по хистерезис — замразен на {min(credit_spike_streak, 2)}/2 дни под "
+                     f"прага, скритите дни не се броят за спокойни — sizing −50%"),
             "exit_condition": (f"данните за IEI/HYG да се върнат и "
                                f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile да е под "
                                f"{config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. два поредни дни"),
