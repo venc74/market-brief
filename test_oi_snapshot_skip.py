@@ -15,7 +15,10 @@
 import sys, pathlib, datetime as dt
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
-from src.oi_snapshot import _skip_reason
+import json, tempfile, copy
+from src import oi_snapshot as oi
+from src.oi_snapshot import _skip_reason, snapshot_is_complete
+import config
 
 print("── СИНТЕТИЧНИ сценарии (измислени часове/дати) ──")
 
@@ -33,11 +36,60 @@ reason = _skip_reason(dt.date(2026, 9, 30), {}, now)
 assert reason is None, f"19:55 UTC е преди 20:00 прага, трябваше да продължи: {reason!r}"
 print("  ✓ 19:55 UTC (реалното закъснение от 30.09), без снимка → продължава (все още преди прага)")
 
-# 3) Вече има снимка за сесията (напр. cron-job.org я е взел по-рано) → пропуска
-existing = {session.isoformat(): {"fetched_at_utc": "2026-10-02 14:05"}}
-reason = _skip_reason(session, existing, dt.datetime(2026, 10, 2, 15, 0, tzinfo=dt.timezone.utc))
-assert reason is not None and "вече съществува" in reason and "14:05" in reason
-print(f"  ✓ снимка вече съществува (от 14:05) → пропуска: {reason}")
+# 3) Вече има ПЪЛНА снимка за сесията (напр. cron-job.org я е взел по-рано) → пропуска.
+#    Тук е РЕАЛНАТА снимка за 2026-10-01 от data/unusual_options_oi_snapshot.json
+#    (80/80 тикъра, failed 0, 18:47 UTC), само с променена дата на сесията.
+REAL = json.load(open(pathlib.Path(__file__).parent / "data" / "unusual_options_oi_snapshot.json",
+                      encoding="utf-8"))["snapshots"]["2026-10-01"]
+assert snapshot_is_complete(REAL)
+existing = {session.isoformat(): REAL}
+reason = _skip_reason(session, existing, dt.datetime(2026, 10, 2, 19, 0, tzinfo=dt.timezone.utc))
+assert reason is not None and "пълна снимка" in reason and "18:47" in reason
+print(f"  ✓ РЕАЛНА пълна снимка (80/80, 18:47) → пропуска: {reason}")
+
+# 3б) НЕПЪЛНА снимка (синтетична: 40 от 80 успешни) → нов опит, ако е преди прага
+partial = copy.deepcopy(REAL)
+keys = list(partial["tickers"])
+partial["failed"] = keys[40:]
+partial["tickers"] = {k: partial["tickers"][k] for k in keys[:40]}
+assert not snapshot_is_complete(partial)
+existing_p = {session.isoformat(): partial}
+reason = _skip_reason(session, existing_p, dt.datetime(2026, 10, 2, 15, 30, tzinfo=dt.timezone.utc))
+assert reason is None, reason
+print("  ✓ синт. непълна (40/80) преди прага → повторен опит (None)")
+
+# 3в) същата непълна, но вече след прага → пропуска, с бележка
+reason = _skip_reason(session, existing_p, dt.datetime(2026, 10, 2, 20, 30, tzinfo=dt.timezone.utc))
+assert reason and "непълна" in reason
+print(f"  ✓ синт. непълна след прага → пропуска: {reason}")
+
+# 3г) граници на пълнотата: 72/80 (90%) пълна; 71/80 непълна; празен OI (<50) непълна
+at90 = copy.deepcopy(REAL); k = list(at90["tickers"])
+at90["failed"] = k[72:]; at90["tickers"] = {x: at90["tickers"][x] for x in k[:72]}
+assert snapshot_is_complete(at90)
+below = copy.deepcopy(REAL); below["failed"] = k[71:]; below["tickers"] = {x: below["tickers"][x] for x in k[:71]}
+assert not snapshot_is_complete(below)
+empty_oi = copy.deepcopy(REAL)
+empty_oi["tickers"] = {x: {"2026-10-09": 0} for x in k}  # 80/80 успешни, но OI 0 (Yahoo празен)
+assert not snapshot_is_complete(empty_oi)
+assert not snapshot_is_complete({"tickers": {}, "failed": []})
+print("  ✓ синт. граници: 72/80 пълна, 71/80 непълна, 80/80 но OI=0 непълна, празна непълна")
+
+# 3д) save() не заменя по-добра снимка с по-лоша (tempdir, реалният файл не се пипа)
+with tempfile.TemporaryDirectory() as tmp:
+    orig = config.UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE
+    config.UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = pathlib.Path(tmp) / "snap.json"
+    try:
+        good = copy.deepcopy(REAL); good["session_date"] = "2026-10-02"
+        worse = copy.deepcopy(partial); worse["session_date"] = "2026-10-02"
+        oi.save(worse)          # първо непълната
+        oi.save(good)                             # после пълната → заменя
+        assert len(oi.uo.load_oi_snapshots()["2026-10-02"]["tickers"]) == 80
+        oi.save(worse)                            # после пак лошата → пази добрата
+        assert len(oi.uo.load_oi_snapshots()["2026-10-02"]["tickers"]) == 80
+    finally:
+        config.UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = orig
+print("  ✓ синт. save(): по-добрата снимка не се заменя от по-лоша (tempdir)")
 
 # 4) Часът е точно на прага (20:00 UTC) → пропуска (>=, не >)
 now = dt.datetime(2026, 10, 2, 20, 0, tzinfo=dt.timezone.utc)
@@ -51,8 +103,7 @@ reason = _skip_reason(session, {}, now)
 assert reason is not None and "21:30" in reason
 print(f"  ✓ 21:30 UTC (ясно след прага) → пропуска: {reason}")
 
-# 6) Приоритет: ако И двете условия са налице (снимка ВЕЧЕ съществува, И е след
-#    прага), съобщението е за дедуп-а първо (по-конкретната/по-честата причина)
+# 6) Приоритет: ПЪЛНА снимка + след прага → причината е дедуп (проверява се първо)
 now = dt.datetime(2026, 10, 2, 21, 0, tzinfo=dt.timezone.utc)
 reason = _skip_reason(session, existing, now)
 assert "вече съществува" in reason

@@ -41,6 +41,28 @@ import config
 from src import unusual_options as uo
 
 
+def _quality(snap: dict) -> tuple[int, int, int]:
+    """(тикъри, от тях с OI ≥ 50, заявени) — заявени = успешни + неуспешни."""
+    t = snap.get("tickers") or {}
+    with_oi = sum(1 for v in t.values() if sum(v.values()) >= 50)
+    return len(t), with_oi, len(t) + len(snap.get("failed") or [])
+
+
+def snapshot_is_complete(snap: dict) -> bool:
+    """
+    FIX 2026-10-02 (т.4 от 02.10): "вече има снимка" не значи "има ПЪЛНА снимка".
+    Пълна = поне config.UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT % от
+    заявените тикъри са успешни И поне половината от успешните имат OI ≥ 50
+    (същият праг като предупреждението "празен OI и следобед" в take_snapshot).
+    Реалните снимки 29.09–01.10: 80/80, failed 0, OI ≥ 50 за 80 — пълни.
+    """
+    n, with_oi, requested = _quality(snap)
+    if n == 0 or requested == 0:
+        return False
+    return (n / requested * 100 >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT
+            and with_oi >= n / 2)
+
+
 def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str | None:
     """
     Чиста функция (без мрежа/часовник) — FIX 2026-10-03 (отговор на прегледа
@@ -50,15 +72,25 @@ def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str 
     18:22 UTC за 30.09/29.09). Връща причина за пропускане, или None ако
     трябва да продължи. Изнесена отделно за тест без мокване на
     дата/мрежа — виж _merge_regime() в thermometer.py за същия паттърн.
+
+    02.10: пропуска само ако съществуващата снимка е ПЪЛНА; непълна → нов
+    опит (преди крайния срок), а save() пази по-добрата от двете.
     """
-    if session.isoformat() in existing:
-        fetched = existing[session.isoformat()].get("fetched_at_utc", "?")
-        return (f"снимка за сесия {session} вече съществува (fetched_at_utc={fetched}) "
+    snap = existing.get(session.isoformat())
+    if snap and snapshot_is_complete(snap):
+        fetched = snap.get("fetched_at_utc", "?")
+        return (f"пълна снимка за сесия {session} вече съществува (fetched_at_utc={fetched}) "
                 f"— пропускам, не презаписвам")
     if now_utc.hour >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR:
+        extra = (" (съществуващата снимка е непълна, но повторен опит вече е късно)"
+                 if snap else "")
         return (f"{now_utc.strftime('%H:%M')} UTC — след прага "
                 f"({config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR}:00 UTC) за валиден OI "
-                f"прозорец — пропускам вместо да пазя данни извън измерения прозорец")
+                f"прозорец — пропускам вместо да пазя данни извън измерения прозорец{extra}")
+    if snap:
+        n, with_oi, requested = _quality(snap)
+        print(f"[oi_snapshot] съществуваща снимка за {session} е непълна "
+              f"({n}/{requested} тикъра, OI ≥ 50 за {with_oi}) — нов опит")
     return None
 
 
@@ -115,6 +147,11 @@ def take_snapshot() -> dict | None:
 def save(snap: dict) -> None:
     path = config.UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE
     snaps = uo.load_oi_snapshots()
+    old = snaps.get(snap["session_date"])
+    if old and (_quality(old)[1], _quality(old)[0]) > (_quality(snap)[1], _quality(snap)[0]):
+        print(f"[oi_snapshot] новата снимка е по-лоша от съществуващата за "
+              f"{snap['session_date']} — запазвам старата")
+        return
     snaps[snap["session_date"]] = snap
     keep = sorted(snaps)[-config.UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP:]
     path.parent.mkdir(exist_ok=True)

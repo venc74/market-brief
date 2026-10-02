@@ -437,6 +437,10 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_KE
 # данни извън измерения прозорец.
 UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR = int(
     os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR", 20))
+# Колко % от заявените тикъри трябва да са успешни, за да е снимката "пълна"
+# (и поне половината от тях с OI ≥ 50) — непълна снимка не блокира повторен опит
+UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT = float(
+    os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT", 90))
 
 # ── SEC EDGAR 13F (Поправка 3): primary за Superinvestor Positions ─────────
 # EDGAR изисква descriptive User-Agent с реален контакт — стойността се
