@@ -583,9 +583,15 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
     if _REGIME_SEVERITY[count_regime] > _REGIME_SEVERITY["Defensive"]:
         # единственият count_regime по-строг от Defensive е "Cash" (reds >= 3) —
         # прагът за подобрение до Defensive е винаги "под 3 червени"
-        trig = ", ".join(o["trigger"] for o in overrides)
+        act = [o["trigger"] for o in overrides if o.get("state", "active") == "active"]
+        hyst = [o["trigger"] for o in overrides if o.get("state") == "hysteresis"]
+        parts = []
+        if act:
+            parts.append(f"override-и също активни ({', '.join(act)})")
+        if hyst:
+            parts.append(f"в хистерезис ({', '.join(hyst)})")
         regime = count_regime
-        reason = (f"{count_reason} — override-и също активни ({trig}); те сами биха "
+        reason = (f"{count_reason} — {'; '.join(parts)}; те сами биха "
                  f"форсирали само Defensive, но броенето вече е по-строго ({count_regime}).")
         exit_rule = (
             f"Регимът в момента се определя от броенето ({count_reason}), не от "
@@ -594,7 +600,16 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
             f"{override_exit_desc}.")
     else:
         regime = "Defensive"
-        reason = overrides[0]["text"]
+        # първо реално активният тригер (списъкът е сортиран active-first), след
+        # него тези в хистерезис — не губим информацията, че още държат override
+        active = [o for o in overrides if o.get("state", "active") == "active"]
+        hyst = [o for o in overrides if o.get("state") == "hysteresis"]
+        lead = (active or hyst)[0]
+        reason = lead["text"]
+        hyst_rest = hyst if active else hyst[1:]
+        if hyst_rest:
+            reason += (" · в хистерезис: " if active else " · също в хистерезис: ") + \
+                      "; ".join(o["text"] for o in hyst_rest)
         exit_rule = (
             f"Override-ът пада, когато ВСИЧКИ условия отпаднат: {override_exit_desc}. "
             f"След това режимът се определя от броенето — в момента то дава "
@@ -602,7 +617,7 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
     return regime, reason, exit_rule
 
 
-def build_thermometer(macro: dict) -> dict:
+def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     """
     Сглобява 9-те индикатора + правилото за режим (8-ми, Market Breadth,
     добавен 2026-08-15; 9-ти, IEI/HYG Credit Spread, добавен 2026-08-25 —
@@ -679,7 +694,7 @@ def build_thermometer(macro: dict) -> dict:
     # хистерезис САМО върху delta/RoC-базираните spike флагове (виж бележката
     # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
     # се пипат
-    today_iso = dt.date.today().isoformat()
+    today_iso = (today or dt.date.today()).isoformat()  # today — само за тестове
     move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
     credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
 
@@ -730,29 +745,49 @@ def build_thermometer(macro: dict) -> dict:
                 f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни (хистерезис — "
                 f"в момента {min(move_spike_streak, 2)}/2); без нов скок това става до около "
                 "седмица — това е прозорецът, не непременно реално успокояване на стреса")
-        hysteresis_note = (
-            f" (хистерезис — {move_spike_streak}-и ден под прага, override все още активен)"
-            if move_spike and not move_spike_raw else ""
-        )
+        # FIX 2026-10-02 (т.1 от прегледа на 02.10): текстът описва РЕАЛНОТО
+        # състояние. Преди, при хистерезис (raw spike=False, ниво под 150), падаше
+        # в else-клона на "рязък скок" и казваше "MOVE 108 > 150" — невярно
+        # (108 < 150, MOVE е жълт). Три различни състояния, три различни текста.
+        level_active = move_val > config.MOVE_RED_THRESHOLD
+        if level_active or move_spike_raw:
+            head = f"MOVE {move_val:.0f}"
+            if level_active:
+                head += f" > {config.MOVE_RED_THRESHOLD:.0f}"
+            if move_spike_raw:
+                head += (" и " if level_active else " ") + (
+                    f"(рязък седмичен скок, {move_ind.get('delta_1w'):+.1f} пункта)")
+            move_text = (head + " — стрес в колатералната система (UST), "
+                         "автоматичен Defensive режим, sizing −50%")
+            move_state = "active"
+        else:
+            move_text = (f"MOVE {move_val:.0f}: спайкът отшумява (делта "
+                         f"{move_ind.get('delta_1w'):+.1f} пункта, под прага +"
+                         f"{config.MOVE_SPIKE_WEEKLY_DELTA:.0f}), хистерезис "
+                         f"{min(move_spike_streak, 2)}/2 — override още активен, sizing −50%")
+            move_state = "hysteresis"
         overrides.append({
             "trigger": "MOVE",
-            "text": (f"MOVE {move_val:.0f}" + (f" (рязък седмичен скок, {move_ind.get('delta_1w'):+.1f} пункта)"
-                                               if move_spike_raw else f" > {config.MOVE_RED_THRESHOLD:.0f}")
-                     + " — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%"
-                     + hysteresis_note),
+            "state": move_state,
+            "text": move_text,
             "exit_condition": " И ".join(exits),
         })
     if credit_spike:
-        hysteresis_note = (
-            f" (хистерезис — {credit_spike_streak}-и ден под прага, override все още активен)"
-            if not credit_spike_raw else ""
-        )
+        if credit_spike_raw:
+            credit_text = (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
+                           "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%")
+            credit_state = "active"
+        else:
+            credit_text = (f"IEI/HYG: spike-ът отшумява ({credit_ind['roc_10d_pct']:+.1f}% за "
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile, "
+                           f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}.), хистерезис "
+                           f"{min(credit_spike_streak, 2)}/2 — override още активен, sizing −50%")
+            credit_state = "hysteresis"
         overrides.append({
             "trigger": "IEI/HYG",
-            "text": (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
-                     f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
-                     "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%"
-                     + hysteresis_note),
+            "state": credit_state,
+            "text": credit_text,
             "exit_condition": (
                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile (сега "
                 f"{credit_ind['roc_percentile']:.0f}.) да е под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. "
@@ -760,6 +795,10 @@ def build_thermometer(macro: dict) -> dict:
                 f"без нов скок това става до около {config.IEI_HYG_ROC_WINDOW_DAYS} дни — това е "
                 "прозорецът на изчислението, не непременно реално успокояване"),
         })
+
+    # реално активните тригери първо, тези в хистерезис след тях (стабилна
+    # сортировка — VIX/MOVE/IEI-HYG редът се пази вътре във всяка група)
+    overrides.sort(key=lambda o: o.get("state", "active") != "active")
 
     regime, reason, exit_rule = _merge_regime(count_regime, count_reason, counts, overrides)
 
