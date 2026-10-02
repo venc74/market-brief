@@ -91,13 +91,14 @@
  "UMBF_2026-06-24": {
   "ticker": "UMBF",
   "entry_date": "2026-06-24",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 139.89,
   "target_1": 165.59,
   "stop_loss": 127.04,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-10-01",
+  "realized_r": -1.0,
+  "discovered_date": "2026-10-02"
  },
  "UAL_2026-06-25": {
   "ticker": "UAL",
@@ -300,13 +301,14 @@
  "BAC_2026-07-16": {
   "ticker": "BAC",
   "entry_date": "2026-07-16",
-  "status": "open",
+  "status": "stopped",
   "entry_price": 62.03,
   "target_1": 77.89,
   "stop_loss": 54.1,
   "target1_hit_date": null,
-  "resolution_date": null,
-  "realized_r": null
+  "resolution_date": "2026-10-01",
+  "realized_r": -1.0,
+  "discovered_date": "2026-10-02"
  },
  "FITB_2026-07-20": {
   "ticker": "FITB",

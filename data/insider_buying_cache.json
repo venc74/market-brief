@@ -1,5 +1,5 @@
 {
- "date": "2026-10-01",
+ "date": "2026-10-02",
  "rows": [
   {
    "ticker": "COO",
@@ -133,10 +133,10 @@
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 355,
+  "tickers_with_filings": 354,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 133,
+  "raw_transactions_parsed": 139,
   "qualifying_after_filter": 11,
-  "unique_filings_processed": 1852
+  "unique_filings_processed": 1937
  }
 }

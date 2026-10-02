@@ -1,0 +1,10 @@
+{
+ "move_spike": {
+  "streak_below": 1,
+  "last_date": "2026-10-02"
+ },
+ "credit_spike": {
+  "streak_below": 0,
+  "last_date": "2026-10-02"
+ }
+}

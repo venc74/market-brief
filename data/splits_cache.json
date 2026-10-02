@@ -1,5 +1,5 @@
 {
- "date": "2026-10-01",
+ "date": "2026-10-02",
  "rows": [],
  "horizon": [
   {
@@ -99,14 +99,6 @@
    "date_human": "Sep 29, 2026"
   },
   {
-   "ticker": "VRME",
-   "company": "VerifyMe, Inc.",
-   "date": "2026-09-29",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Sep 29, 2026"
-  },
-  {
    "ticker": "ZCSH",
    "company": "Grayscale Zcash Trust The Zcash ETF The Zcash ETF Shares",
    "date": "2026-09-30",
@@ -153,6 +145,22 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 01, 2026"
+  },
+  {
+   "ticker": "RETO",
+   "company": "ReTo Eco-Solutions, Inc.",
+   "date": "2026-10-02",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Oct 02, 2026"
+  },
+  {
+   "ticker": "ZCMD",
+   "company": "ZHONGCHAO INC.",
+   "date": "2026-10-02",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Oct 02, 2026"
   },
   {
    "ticker": "VTAK",
@@ -206,10 +214,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 25,
+  "source_rows": 26,
   "horizon_from": "2026-09-28",
   "horizon_to": "2026-10-09",
-  "in_week": 19,
+  "in_week": 20,
   "dropped_price": [
    "BTLN",
    "CTNT",
@@ -223,11 +231,12 @@
    "CDT",
    "ONMD",
    "TRUG",
-   "VRME",
    "SHFS",
    "BGM",
    "KUST",
-   "MYPS"
+   "MYPS",
+   "RETO",
+   "ZCMD"
   ],
   "dropped_cap": [
    "DHY"
