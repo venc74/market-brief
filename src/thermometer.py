@@ -483,7 +483,7 @@ def _breadth_divergence(indicators: list[dict]) -> None:
 
 # ══════════════════════════════════════════════════════════════════════════
 # Хистерезис за delta/RoC-базираните override-и (MOVE spike, IEI/HYG spike)
-# FIX 2026-10-02 (т.1 от прегледа на 01.10):
+# FIX 2026-10-01 (т.1 от прегледа на 01.10):
 #
 # И двата spike флага идват от прозорец, който се плъзга всеки ден (MOVE:
 # today − преди точно 7 календарни дни; IEI/HYG: 10-дневна RoC, percentile-
@@ -502,7 +502,7 @@ _REGIME_SEVERITY = {"Offensive": 0, "Defensive": 1, "Cash": 2}
 
 def _load_override_state() -> dict:
     """
-    FIX 2026-10-03 (отговор на прегледа на партида 1, т.1): fail-safe при
+    FIX 2026-10-01 (отговор на прегледа на партида 1, т.1): fail-safe при
     липсващ/повреден state файл — ВИНАГИ връща dict (никога не гърми нагоре),
     и логва изрично двата различни случая (липсва vs повреден), за да се
     вижда в Actions лога, а не да се предполага тихо.
@@ -568,7 +568,7 @@ def _hysteresis_effective(key: str, raw_today: bool, today_iso: str) -> tuple[bo
 def _merge_regime(count_regime: str, count_reason: str, counts: str,
                   overrides: list[dict]) -> tuple[str, str, str]:
     """
-    Чиста функция (без мрежа) — FIX 2026-10-02 (т.1 от прегледа на 01.10):
+    Чиста функция (без мрежа) — FIX 2026-10-01 (т.1 от прегледа на 01.10):
     override-ите само ПОВДИГАТ пода до Defensive, не трябва да смекчават
     регим, който броенето вече е определило като по-строг (01.10: count=Cash,
     overrides=MOVE+IEI/HYG → преди този фикс финалният regime ставаше
@@ -736,7 +736,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} пункта или под "
                          f"(сега {move_val:.1f})")
         if move_spike:
-            # FIX 2026-10-02: честен текст за хистерезиса (виж бележката над
+            # FIX 2026-10-01: честен текст за хистерезиса (виж бележката над
             # build_thermometer) — "седмичният ръст се забави" звучеше като
             # реално успокояване; реално делтата пада САМА до ~седмица чисто
             # защото прозорецът се плъзга, дори MOVE да стои непроменено високо

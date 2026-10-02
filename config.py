@@ -427,7 +427,7 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT
 UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))
 # Колко снимки се пазят (по дата на сесията)
 UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP", 7))
-# FIX 2026-10-03 (отговор на прегледа на партида 1, т.4): oi_snapshot.yml има
+# FIX 2026-10-01 (отговор на прегледа на партида 1, т.4): oi_snapshot.yml има
 # и schedule: (15:00 UTC), и workflow_dispatch от cron-job.org — двата може
 # да стрелят за същия ден (GitHub-native scheduler закъснява с часове,
 # наблюдавано: 19:55 UTC и 18:22 UTC за 30.09/29.09). Без guard втория run

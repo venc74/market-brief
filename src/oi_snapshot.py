@@ -23,7 +23,7 @@ Graceful: провал на тикър → пропуска се; ден без 
 записва; провал изцяло → файлът остава какъвто е, сутрешният бриф казва, че
 снимката липсва.
 
-Dedup/cutoff (FIX 2026-10-03): workflow-ът пуска И schedule: (15:00 UTC), И
+Dedup/cutoff (FIX 2026-10-01): workflow-ът пуска И schedule: (15:00 UTC), И
 workflow_dispatch от cron-job.org — ако вече има снимка за днешната сесия
 (кой да е от двата тригера я е взел), вторият run пропуска, не презаписва.
 Ако няма пълна снимка и часът в Ню Йорк е след
@@ -70,7 +70,7 @@ def snapshot_is_complete(snap: dict) -> bool:
 
 def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str | None:
     """
-    Чиста функция (без мрежа/часовник) — FIX 2026-10-03 (отговор на прегледа
+    Чиста функция (без мрежа/часовник) — FIX 2026-10-01 (отговор на прегледа
     на партида 1, т.4): workflow-ът има и schedule: (15:00 UTC), и
     workflow_dispatch от cron-job.org — двата може да стрелят за същия ден
     (GitHub-native scheduler закъснява с часове, наблюдавано: 19:55 UTC и
