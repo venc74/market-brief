@@ -687,9 +687,18 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
     move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
     move_val = move_ind.get("value") if move_ind else None
-    move_spike_raw = bool(move_ind and move_ind.get("spike"))
     credit_ind = next((i for i in indicators if i["name"] == "IEI/HYG (Credit Spread)"), None)
-    credit_spike_raw = bool(credit_ind and credit_ind.get("spike"))
+    # FIX 2026-10-02 (находка 1 от прегледа): скрит индикатор (hide=True) няма
+    # value/delta_1w/roc_*. Хистерезисът може да държи override-а активен при
+    # raw=False, а текстът му четеше credit_ind['roc_10d_pct'] → KeyError →
+    # build_thermometer пада → брифът не излиза. Видимостта се смята веднъж тук;
+    # без данни override-ът (ако се държи по хистерезис) получава изричен текст.
+    move_visible = bool(move_ind) and not move_ind.get("hide") and move_val is not None
+    credit_visible = (bool(credit_ind) and not credit_ind.get("hide")
+                      and credit_ind.get("roc_10d_pct") is not None
+                      and credit_ind.get("roc_percentile") is not None)
+    move_spike_raw = move_visible and bool(move_ind.get("spike"))
+    credit_spike_raw = credit_visible and bool(credit_ind.get("spike"))
 
     # хистерезис САМО върху delta/RoC-базираните spike флагове (виж бележката
     # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
@@ -699,7 +708,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
 
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
-    move_forces_defensive = move_val is not None and (move_val > config.MOVE_RED_THRESHOLD or move_spike)
+    move_forces_defensive = ((move_visible and (move_val > config.MOVE_RED_THRESHOLD or move_spike))
+                             or (not move_visible and move_spike))
 
     # Режимът САМО по броенето — изчислява се винаги, дори при override.
     # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive",
@@ -730,7 +740,16 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "exit_condition": (f"VIX падне до {config.VIX_DEFENSIVE_THRESHOLD:.0f} или под "
                                f"(сега {vix_val:.1f})"),
         })
-    if move_forces_defensive:
+    if move_forces_defensive and not move_visible:
+        overrides.append({
+            "trigger": "MOVE",
+            "state": "hysteresis",
+            "text": ("MOVE: данните липсват днес, override-ът се държи по хистерезис "
+                     f"(последно {min(move_spike_streak, 2)}/2 дни под прага) — sizing −50%"),
+            "exit_condition": (f"данните за MOVE да се върнат и седмичната делта да е под "
+                               f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни"),
+        })
+    elif move_forces_defensive:
         exits = []
         if move_val > config.MOVE_RED_THRESHOLD:
             exits.append(f"MOVE падне до {config.MOVE_RED_THRESHOLD:.0f} пункта или под "
@@ -772,7 +791,17 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "text": move_text,
             "exit_condition": " И ".join(exits),
         })
-    if credit_spike:
+    if credit_spike and not credit_visible:
+        overrides.append({
+            "trigger": "IEI/HYG",
+            "state": "hysteresis",
+            "text": ("IEI/HYG: данните липсват днес, override-ът се държи по хистерезис "
+                     f"(последно {min(credit_spike_streak, 2)}/2 дни под прага) — sizing −50%"),
+            "exit_condition": (f"данните за IEI/HYG да се върнат и "
+                               f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile да е под "
+                               f"{config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. два поредни дни"),
+        })
+    elif credit_spike:
         if credit_spike_raw:
             credit_text = (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
                            f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
@@ -815,6 +844,23 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "regime_by_count": count_regime,
             "exit_rule": exit_rule,
             }
+
+
+def thermometer_unavailable(exc: BaseException) -> dict:
+    """
+    FIX 2026-10-02 (находка 1 от прегледа): fallback, когато build_thermometer()
+    гръмне изцяло — режимът е "Defensive (термометърът е недостъпен)" със
+    sizing ×0.5, вместо run() да падне и брифът да не излезе. Същата форма като
+    нормалния резултат (шаблонът/имейлът/макро промптът четат тези ключове).
+    """
+    reason = "Defensive (термометърът е недостъпен)"
+    return {"indicators": [], "regime": "Defensive", "regime_reason": reason,
+            "sizing_factor": config.DEFENSIVE_SIZING_FACTOR,
+            "counts": f"термометърът е недостъпен ({type(exc).__name__})",
+            "overrides": [], "regime_by_count": "Defensive",
+            "exit_rule": ("Термометърът не можа да се изчисли днес — режимът е Defensive "
+                          "по подразбиране до следващия успешен run."),
+            "unavailable": True, "error": f"{type(exc).__name__}: {exc}"}
 
 
 if __name__ == "__main__":

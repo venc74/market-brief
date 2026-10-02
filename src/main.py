@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 from src.macro_layer import collect_macro_layer, thesis_monitor
-from src.thermometer import build_thermometer
+from src.thermometer import build_thermometer, thermometer_unavailable
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src.enrich import enrich, inject_split_catalysts
@@ -230,7 +230,15 @@ def run() -> dict:
     macro = collect_macro_layer()
 
     print("[2/7] Пазарен термометър…")
-    thermo = build_thermometer(macro)
+    try:
+        thermo = build_thermometer(macro)
+    except Exception as e:
+        # термометърът не бива да сваля целия бриф (класът KeyError при скрит
+        # индикатор в хистерезис) — Defensive по подразбиране, виж thermometer_unavailable
+        traceback.print_exc()
+        print(f"[thermo] ⚠ build_thermometer пропадна ({type(e).__name__}: {e}) — "
+              f"fallback Defensive")
+        thermo = thermometer_unavailable(e)
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
 
     # v2 · Секция 5 — кои геополитически тези са активни при текущото макро
