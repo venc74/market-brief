@@ -2,12 +2,32 @@
 Тест на пълния pipeline с мок данни — без външни API-та.
 Валидира: apply_hard_rules, position sizing, dashboard render, email render.
 Пускане: python test_pipeline.py
-"""
-import sys, json, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
+Изходът (dashboard, архив, docs/data, тестов имейл) НИКОГАЗ не отива в docs/ —
+по подразбиране е във временна директория, която се трие накрая. За ръчна
+инспекция: KEEP_TEST_OUTPUT=1 python test_pipeline.py → пише в .test_output/
+(в .gitignore). Причина: на 02.10 пускане на теста презаписа реалния
+docs/index.html и docs/archive/<дата>.html с мок данни.
+"""
+import os, sys, json, pathlib, shutil, tempfile
+ROOT = pathlib.Path(__file__).parent
+sys.path.insert(0, str(ROOT))
+
+import config
 from src.main import apply_hard_rules
 from src.render import render_dashboard, render_email
+
+# render.py чете config.DOCS_DIR динамично при всяко извикване → пренасочване
+if os.getenv("KEEP_TEST_OUTPUT") == "1":
+    OUT = ROOT / ".test_output"
+    shutil.rmtree(OUT, ignore_errors=True)
+    OUT.mkdir()
+    _tmp = None
+else:
+    _tmp = tempfile.TemporaryDirectory(prefix="market_brief_test_")
+    OUT = pathlib.Path(_tmp.name)
+config.DOCS_DIR = OUT
+assert not str(OUT.resolve()).startswith(str((ROOT / "docs").resolve())), "изходът не бива да е в docs/"
 
 MOCK_THERMO = {
     "regime": "Offensive",
@@ -93,10 +113,15 @@ brief = {"date": "2026-06-12", "thermometer": MOCK_THERMO, "ai_macro": MOCK_AI_M
 
 html = render_dashboard(brief)
 assert "AVGT" in html and "Offensive" in html and "термометър" in html.lower()
-print(f"✓ Dashboard: {len(html):,} символа → docs/index.html")
+print(f"✓ Dashboard: {len(html):,} символа → {OUT / 'index.html'}")
 
 email = render_email(brief)
 assert "AVGT" in email and "OFFENSIVE" in email
-pathlib.Path("docs/_test_email.html").write_text(email, encoding="utf-8")
-print(f"✓ Email: {len(email):,} символа → docs/_test_email.html")
+(OUT / "_test_email.html").write_text(email, encoding="utf-8")
+print(f"✓ Email: {len(email):,} символа → {OUT / '_test_email.html'}")
 print("\nВсички тестове минаха.")
+if _tmp is not None:
+    _tmp.cleanup()
+    print("(временният изход е изтрит; KEEP_TEST_OUTPUT=1 го запазва в .test_output/)")
+else:
+    print(f"Изходът е запазен в {OUT}")
