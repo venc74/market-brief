@@ -28,6 +28,7 @@ from src import correlation_check
 from src import backtest
 from src import cot
 from src import entry_timing
+from src import setup_rules
 from src import glb_screener
 from src import short_screener
 from src import short_tracker
@@ -179,6 +180,21 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
         cls = c.get("ai", {}).get("classification", "Watchlist")
         sector = c.get("sector", "Unknown")
 
+        # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — кодът има
+        # последната дума. Action е допустим САМО при потвърден пробив: close над
+        # pivot (най-високия High на базата без последните N бара), до +5% над него,
+        # с обем >= BREAKOUT_VOLUME_MULT × среден. Всичко останало (под pivot →
+        # buy-stop ниво, над pivot без обем, extended) отива във Watchlist, колкото и
+        # силно да го е оценило AI-то. Проверява се ПРЕДИ лимитите по-долу, за да не
+        # заема Action слот кандидат, който така или иначе е върнат.
+        setup = c.get("setup") or setup_rules.classify_setup(c, today)
+        c["setup"] = setup
+        if cls == "Action" and not setup["eligible"]:
+            cls = "Watchlist"
+            c.setdefault("ai", {})
+            c["ai"]["watchlist_reason_type"] = "technical_gate"
+            c["ai"]["watchlist_trigger"] = setup["trigger_text"]
+
         if cls == "Action":
             if len(action) >= config.MAX_ACTION_TICKERS:
                 cls = "Watchlist"
@@ -203,6 +219,10 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
         c["ai"].setdefault("watchlist_trigger", "Изчаква потвърждение.")
         watchlist.append(c)
 
+    # Watchlist е най-много 10 карти: потвърден пробив, спрян от лимит/режим/earnings,
+    # първи; после buy-stop кандидатите (най-близките до pivot), после "над pivot без
+    # обем", extended най-накрая. Стабилна сортировка — вътре в групата остава AI редът.
+    watchlist.sort(key=setup_rules.watchlist_sort_key)
     return action, watchlist[:10]
 
 
@@ -257,6 +277,9 @@ def run() -> dict:
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
+    # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
+    # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
+    candidates = setup_rules.annotate(candidates, today)
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
     print("[6/7] AI синтез (Claude API)…")

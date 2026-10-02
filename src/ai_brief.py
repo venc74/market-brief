@@ -718,8 +718,13 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 - "catalysts": списък от 2-4 катализатора в следващите 4-8 седмици.
 - "risks": списък от 2-4 конкретни риска — какво обръща trade-а.
 - "earnings_call": "преди earnings" / "след earnings" / "не сега" + защо (1 изр.).
-- "classification": "Action" или "Watchlist". Watchlist ако: в earnings blackout, \
-без обем при пробив и още под pivot, RS слабее, или секторът противоречи на режима.
+- "classification": "Action" или "Watchlist". pivot = най-високият High на базата БЕЗ \
+последните {config.PIVOT_EXCLUDE_LAST_BARS} бара. Полето "setup" е изчислено от кода: Action е \
+допустим САМО при "confirmed" (close над pivot, до +{config.BUYABLE_ZONE_MAX_PCT:g}% над него, обем ≥ \
+{config.BREAKOUT_VOLUME_MULT:g}× среден) — кодът връща във Watchlist всичко останало ("below_pivot" \
+= чака buy-stop пробив, "no_volume" = над pivot без обем, "extended" = над buyable zone), \
+независимо от твоята класификация; ти избираш най-силните сред "confirmed". Watchlist ако: \
+setup не е "confirmed", в earnings blackout, RS слабее, или секторът противоречи на режима.
 - "watchlist_reason_type": ако Watchlist — категория на причината: "regime_gate" \
 (чака конкретна промяна в пазарния режим ЗАЕДНО с цена/обем условие), \
 "earnings_blackout" (в earnings прозорец), "other" (RS/обем/друга техническа причина, \
@@ -787,6 +792,9 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
             "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
             "inst_ownership_pct", "analyst_target")})
         slim[-1]["earnings"] = c.get("earnings")
+        # код-изчислена техническа класификация (виж setup_rules): confirmed |
+        # no_volume | below_pivot | extended — Action е допустим само при confirmed
+        slim[-1]["setup"] = (c.get("setup") or {}).get("kind")
         slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
         slim[-1]["options"] = {k: c.get("options", {}).get(k)
                                for k in ("iv", "iv_rank", "strategy")}

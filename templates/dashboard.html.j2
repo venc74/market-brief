@@ -110,6 +110,7 @@
   .watch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
   .watch-card .ticker { font-size: 17px; color: var(--yellow); }
   .watch-card p { font-size: 13px; margin-top: 8px; color: var(--text); }
+  .buy-stop { font-size: 12.5px; font-weight: 600; color: var(--green); margin-top: 6px; }
   .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
     border-top: 1px dotted var(--line); padding-top: 8px; }
 
@@ -781,7 +782,16 @@
       {% endif %}
       <p>{{ st.ai.why_now }}</p>
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}
-        · зона ${{ (st.pivot * 0.98)|round(2) }}–${{ (st.pivot * 1.02)|round(2) }}</div>
+        · pivot ${{ st.pivot }} ({{ "%+.1f"|format(st.pct_from_pivot) }}%)</div>
+      {# FIX 2026-10-02 (пакет 1, т.1): код-изчислен сетъп — buy-stop ниво за кандидатите
+         под pivot; за останалите (над pivot без обем / extended) — причината от кода #}
+      {% if st.setup and st.ai.watchlist_reason_type != 'technical_gate' %}
+      <div class="watch-trigger"><b>Сетъп:</b> {{ st.setup.trigger_text }}</div>
+      {% endif %}
+      {% if st.setup and st.setup.buy_stop %}
+      <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден до {{ st.setup.valid_through }}
+        · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

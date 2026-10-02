@@ -18,6 +18,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
+from src import setup_rules
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
 
@@ -55,7 +56,8 @@ def build_universe() -> list[str]:
 def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     """
     Прилага: Weinstein Stage 2, RS Line близо до връх, цена ≥ $10,
-    наличие на консолидация (proxy за база), близост до pivot.
+    наличие на консолидация (proxy за база), близост до pivot (най-много 5% под;
+    над pivot — вкл. extended — се пази, класифицира се в setup_rules).
     """
     spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
     if isinstance(spy, pd.DataFrame):
@@ -85,6 +87,19 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     return survivors
 
 
+def compute_pivot(high: pd.Series) -> float:
+    """
+    FIX 2026-10-02 (пакет 1, т.1): pivot = най-високият High на базата БЕЗ
+    последните config.PIVOT_EXCLUDE_LAST_BARS бара. Преди беше max(High[-65:]) —
+    включваше сигналния бар, затова close <= pivot винаги и "пробив" не съществуваше.
+    Базата е PIVOT_BASE_BARS бара, завършващи на сигналния бар; последните N се
+    изключват (N=0 връща старото поведение).
+    """
+    n = config.PIVOT_EXCLUDE_LAST_BARS
+    window = high.iloc[-config.PIVOT_BASE_BARS:(-n if n else None)]
+    return float(window.max())
+
+
 def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | None:
     if len(df) < 260:
         return None
@@ -111,17 +126,21 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     if rs_status == "lagging":
         return None
 
-    # ── База: pivot = 13-седмичен максимум; не extended, не >5% под ─────
-    pivot = float(high.iloc[-65:].max())
-    pct_from_pivot = (price / pivot - 1) * 100      # отрицателно = под pivot
+    # ── База: pivot = най-високият High на базата БЕЗ последните N бара ──
+    # pct_from_pivot вече може да е ПОЛОЖИТЕЛЕН (пробив). Над +BUYABLE_ZONE_MAX_PCT
+    # ("extended") кандидатът НЕ се отхвърля — остава за Watchlist ("не гони"),
+    # сортиран най-отзад (виж run_screen). Под pivot — най-много MAX_PCT_BELOW_PIVOT.
+    pivot = compute_pivot(high)
+    pct_from_pivot = (price / pivot - 1) * 100      # <0 = под pivot, >0 = над (пробив)
     if pct_from_pivot < -config.MAX_PCT_BELOW_PIVOT:   # твърде дълбоко под
-        return None
-    if pct_from_pivot > 5.0:                            # extended над pivot
         return None
 
     # ── Дълбочина на базата: проста класификация на формацията ──────────
-    base_low = float(close.iloc[-65:].min())
-    depth = (pivot - base_low) / pivot * 100
+    # спрямо ПЪЛНИЯ 13-седмичен връх (включва последните бара), като досега —
+    # филтърът за качество на базата не е част от промяната на pivot-а
+    base_high = float(high.iloc[-config.PIVOT_BASE_BARS:].max())
+    base_low = float(close.iloc[-config.PIVOT_BASE_BARS:].min())
+    depth = (base_high - base_low) / base_high * 100
     if depth > 35:                                      # счупена структура
         return None
     base_type = ("flat base" if depth <= 15
@@ -140,6 +159,7 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     return {
         "ticker": sym, "price": round(price, 2), "pivot": round(pivot, 2),
         "pct_from_pivot": round(pct_from_pivot, 2),
+        "pivot_bars_excluded": config.PIVOT_EXCLUDE_LAST_BARS,
         "base_type": base_type, "base_depth_pct": round(depth, 1),
         "weinstein_stage": 2,
         "rs_status": rs_status,
@@ -216,8 +236,9 @@ def run_screen(leading_sector_names: list[str] | None = None) -> list[dict]:
     universe = build_universe()
     tech = technical_screen(universe)
 
-    # сортиране: близост до pivot + обем сигнал
-    tech.sort(key=lambda r: (not r["breakout_volume"], abs(r["pct_from_pivot"])))
+    # сортиране: потвърдени пробиви → над pivot без обем → под pivot (най-близките) →
+    # extended (виж setup_rules.screen_priority); fundamental_screen гледа първите 60
+    tech.sort(key=setup_rules.screen_priority)
     finalists = fundamental_screen(tech)
 
     if leading_sector_names:

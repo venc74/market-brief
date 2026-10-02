@@ -48,6 +48,12 @@ def evaluate_pivot_volume(candidate: dict) -> dict | None:
     Комбинирано с breakout_volume (bool, вече >= config.BREAKOUT_VOLUME_MULT
     от screener.py) за финалния verdict в {"good", "caution", "wait"}.
 
+    FIX 2026-10-02 (пакет 1, т.1): pivot вече е най-високият High на базата БЕЗ
+    последните N бара, затова pct_from_pivot може да е положителен и "good" е
+    достижим (преди: 14 "wait", 0 "good" от 97 — close <= pivot винаги). Над
+    pivot × (1 + BUYABLE_ZONE_MAX_PCT%) кандидатът е extended и в screener-а се
+    пази само за Watchlist (виж setup_rules.classify_setup).
+
     Връща None ако pct_from_pivot липсва (graceful — candidate идва от
     нестандартен път, напр. тест данни без пълно enrich).
     """
