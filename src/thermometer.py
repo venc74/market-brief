@@ -631,7 +631,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
       price volatility — виж credit_spread_proxy() докстринга защо не е
       дублиране на MOVE логиката); 4/4 известни кризи, 0 false positives в
       backtest-а (Venci, 2026-08-2x)
-    - 4+ зелени при 0 червени → Offensive; 3+ червени → Cash; 2 червени → Defensive;
+    - 4+ зелени при 0 червени И поне THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE (7)
+      видими индикатора → Offensive; 3+ червени → Cash; 2 червени → Defensive;
       всичко останало → Defensive (недостатъчно потвърждение)
     Броенето е само върху ВИДИМИТЕ индикатори (hide=True не участва); жълтите и
     скритите се отчитат изрично в regime_reason. Sizing factor пада за всеки
@@ -716,7 +717,17 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # който противоречеше на правилото в docstring-а ("4+ зелени → Offensive; иначе
     # Defensive") и на 2026-07-15 произведе Offensive при 3 зелени + 1 (фалшив) червен.
     if greens >= 4 and reds == 0:
-        count_regime, count_reason = "Offensive", counts
+        # FIX 2026-10-02 (находка 2 от прегледа): броенето е само върху видимите,
+        # затова скрити индикатори СТРУВАХА зелен режим. 08.09 (реално): 4 от 9
+        # скрити, 5 зелени от 5 видими → Offensive с пълен sizing, при липсващи
+        # Net Liquidity, MOVE, VIX Term Structure и IEI/HYG — точно стресовите
+        # барометри. Offensive изисква минимум видими индикатори.
+        if visible_count >= config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE:
+            count_regime, count_reason = "Offensive", counts
+        else:
+            count_regime, count_reason = "Defensive", (
+                f"{counts} — недостатъчно данни за Offensive (видими {visible_count} "
+                f"от {len(indicators)}, нужни ≥ {config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE})")
     elif reds >= 3:
         count_regime, count_reason = "Cash", f"{counts} — капиталът е позиция"
     elif reds >= 2:

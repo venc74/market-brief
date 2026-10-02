@@ -4,7 +4,7 @@
 
   т.1 KeyError при скрит IEI/HYG (и MOVE) докато хистерезисът държи override;
       + fallback "Defensive (термометърът е недостъпен)", ако термометърът гръмне.
-  т.2 (допълва се в следващия commit) минимум видими индикатори за Offensive.
+  т.2 минимум видими индикатори за Offensive (реална конфигурация от 08.09).
   т.3 (допълва се в следващия commit) хистерезисът не брои скрит ден за спокоен.
 
 РЕАЛНИ данни: индикаторите от data/2026-10-02.json; формата на СКРИТ индикатор е
@@ -34,9 +34,9 @@ NAMES = {"spy_trend": "SPY тренд", "vix_level": "VIX", "market_put_call": "
          "credit_spread_proxy": "IEI/HYG (Credit Spread)", "market_breadth": "Market Breadth (% над 40dMA)"}
 
 
-def run_with(patch: dict, prior_state, today: dt.date, hide=(), state_file_text=None):
+def run_with(patch: dict, prior_state, today: dt.date, hide=(), state_file_text=None, base=None, macro=None):
     """build_thermometer без мрежа. patch: {име: полета}; hide: имена, заменени със СКРИТ вариант."""
-    ind = {k: dict(v) for k, v in REAL_IND.items()}
+    ind = {k: dict(v) for k, v in (base or REAL_IND).items()}
     for name, p in patch.items():
         ind[name].update(p)
     for name in hide:
@@ -56,7 +56,7 @@ def run_with(patch: dict, prior_state, today: dt.date, hide=(), state_file_text=
             th._OVERRIDE_STATE_FILE.write_text(json.dumps(prior_state))
         try:
             with contextlib.redirect_stdout(buf):
-                out = th.build_thermometer(REAL["macro"], today=today)
+                out = th.build_thermometer(macro or REAL["macro"], today=today)
             return out, buf.getvalue(), json.loads(th._OVERRIDE_STATE_FILE.read_text()) \
                 if th._OVERRIDE_STATE_FILE.exists() else None
         finally:
@@ -131,6 +131,42 @@ print("  ✓ fallback има формата на нормалния резулт
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert "thermo = thermometer_unavailable(e)" in src
 print("  ✓ main.py опакова build_thermometer в try с fallback")
+
+print()
+print("── т.2: минимум видими индикатори за Offensive ──")
+CALM = {"move_spike": {"streak_below": 9, "last_date": "2026-09-07"},
+        "credit_spike": {"streak_below": 9, "last_date": "2026-09-07"}}
+OLD_IND = {i["name"]: i for i in OLD["thermometer"]["indicators"]}
+assert OLD["thermometer"]["regime"] == "Offensive" and OLD["thermometer"]["sizing_factor"] == 1.0
+t, _, _ = run_with({}, CALM, dt.date(2026, 9, 8), base=OLD_IND, macro=OLD["macro"])  # CALM: изолира т.2 от хистерезиса
+print("  РЕАЛНО 08.09 (преди фикса):", OLD["thermometer"]["regime"], "|", OLD["thermometer"]["regime_reason"])
+print("  РЕАЛНА конфигурация 08.09 (след фикса):", t["regime"], "|", t["regime_reason"])
+assert t["regime"] == "Defensive" and t["sizing_factor"] == config.DEFENSIVE_SIZING_FACTOR
+assert t["regime_reason"].startswith("5 зелени / 0 жълти / 0 червени от 5 видими")
+assert "недостатъчно данни за Offensive (видими 5 от 9, нужни ≥ 7)" in t["regime_reason"]
+assert not t["overrides"], t["overrides"]  # режимът е от броенето, не от override
+print("  ✓ реалната 08.09 конфигурация (5 видими, 4 скрити) вече дава Defensive с причина")
+
+print("  СИНТЕТИЧНО (реалните индикатори от 02.10, всички зелени, спокоен хистерезис):")
+GREEN = {n: {"status": "green"} for n in REAL_IND}
+GREEN["IEI/HYG (Credit Spread)"].update({"spike": False, "roc_percentile": 30.0})
+GREEN["MOVE (Bond Vol)"].update({"spike": False, "delta_1w": 1.0, "value": 80.0})
+for hide, expect in (((), "Offensive"),
+                     (("VIX Term Structure", "Market Breadth (% над 40dMA)"), "Offensive"),   # 7 видими = граница
+                     (("VIX Term Structure", "Market Breadth (% над 40dMA)", "Put/Call (SPY)"), "Defensive")):  # 6
+    t, _, _ = run_with(GREEN, CALM, dt.date(2026, 9, 8), hide=hide)
+    n_vis = 9 - len(hide)
+    assert t["regime"] == expect, (n_vis, t["regime"], t["regime_reason"])
+    print(f"    {n_vis} видими, всички зелени → {t['regime']}")
+assert "недостатъчно данни" in t["regime_reason"]
+print("  ✓ граница: 7 видими → Offensive, 6 → Defensive; 9 → Offensive (без регресия)")
+
+# Cash/Defensive по броенето не се смекчават от прага (прагът само затяга)
+t, _, _ = run_with({"MOVE (Bond Vol)": {"status": "red", "spike": False},
+                    "Put/Call (SPY)": {"status": "red"}, "VIX": {"status": "red"}},
+                   CALM, dt.date(2026, 9, 8), hide=("VIX Term Structure", "Market Breadth (% над 40dMA)", "Fed Net Liquidity"))
+assert t["regime_by_count"] in ("Cash", "Defensive")
+print("  ✓ при червени индикатори прагът не променя Cash/Defensive:", t["regime_by_count"])
 
 print()
 print("Всички тестове минаха.")

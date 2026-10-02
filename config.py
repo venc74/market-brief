@@ -61,6 +61,12 @@ VIX_RISK_OFF = 25.0
 # 28.07 (+13%, ~78-ми персентил, нормален шум) незасегнат.
 VIX_SPIKE_WEEKLY_PCT = float(os.getenv("VIX_SPIKE_WEEKLY_PCT", 20.0))
 
+# Минимум ВИДИМИ индикатори (от 9), за да е допустим Offensive. Скрит индикатор
+# (невалидни/застояли данни) не участва в броенето, затова без този праг 5 зелени
+# от 5 видими даваха Offensive с пълен sizing (08.09: 4 от 9 скрити). Под прага
+# режимът е Defensive с причина "недостатъчно данни".
+THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE = int(os.getenv("THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE", 7))
+
 # ── API ключове (от GitHub Secrets / .env) ───────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
