@@ -157,10 +157,12 @@ def _parse_json(text: str):
 def _fix_text(obj):
     """_fix_translit + един обобщен лог ред за хибридните думи в отговора."""
     _HYBRIDS.clear()
+    _HYBRID_CTX.clear()
     out = _fix_translit(obj)
     if _HYBRIDS:
         print(f"[ai] смесено писмо (само лог, {len(_HYBRIDS)}): "
               f"{', '.join(dict.fromkeys(_HYBRIDS))}")
+        _log_mixed_words()
     return out
 
 
@@ -212,6 +214,8 @@ _HOMOGLYPHS = dict(zip("aeopcxyAEOPCXTHKMB", "аеорсхуАЕОРСХТНКМ
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё]+")
 # хибридите се събират за един обобщен лог ред на AI отговор (виж _parse_json)
 _HYBRIDS: list[str] = []
+# дума → контекст (първо срещане) за подробния лог на смесените думи
+_HYBRID_CTX: dict[str, str] = {}
 
 
 def _is_pure_cyrillic(word: str) -> bool:
@@ -276,8 +280,36 @@ def _fix_homoglyphs(s: str) -> str:
             print(f"[ai] буква-двойник заменена: '{w}' → '{fixed}'")
             return fixed
         _HYBRIDS.append(w)
+        _HYBRID_CTX.setdefault(w, s[max(0, m.start() - 35):m.end() + 25])
         return w
     return _WORD_RE.sub(repl, s)
+
+
+_SCRIPT_RUN_RE = re.compile(r"[A-Za-z]+|[А-Яа-яЁё]+")
+
+
+def _log_mixed_words() -> None:
+    """
+    FIX 2026-10-02 (т.2 от прегледа на 02.10): думи с латиница И кирилица в
+    един токен, които нито една поправка не хваща — "directно", "неpubblично"
+    (Cotton direct), "пolicymakers" (news) на 02.10. Едно обобщено ред ("смесено
+    писмо ... directно, неpubblично") е лесно да се пропусне; тук всяка дума е
+    на отделен ред с контекст, формата на смесването и какво би дало
+    auto-space. САМО лог — автоматична поправка не е безопасна: "direct но" е безсмислено
+    ("directно" = "direct" + "но"), а при кир+лат+кир ("неpubblично") няма
+    единствено валидно разделяне.
+    Измерено върху историята: ~2.3 различни смесени думи на ден (макс 10).
+    """
+    for w in dict.fromkeys(_HYBRIDS):
+        if len(w) < 2 or w not in _HYBRID_CTX:
+            continue  # едносимволните си имат отделен лог/поправка
+        runs = [(("лат" if r[0].isascii() else "кир"), r) for r in _SCRIPT_RUN_RE.findall(w)]
+        if len(runs) < 2:
+            continue
+        shape = "+".join(f"{k}«{r}»" for k, r in runs)
+        spaced = " ".join(r for _, r in runs)
+        print(f"[ai] ⚠ смесена дума '{w}' ({shape}) — auto-space би дал '{spaced}', "
+              f"не е безопасен, не се пипа — «…{_HYBRID_CTX[w]}…»")
 
 
 # FIX 2026-10-02 (т.4 от прегледа на 01.10): "по-ата" (01.10, 2Y Treasury теза)
