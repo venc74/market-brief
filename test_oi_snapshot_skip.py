@@ -109,5 +109,24 @@ reason = _skip_reason(session, existing, now)
 assert "вече съществува" in reason
 print(f"  ✓ дедуп + след прага едновременно → причината е дедуп (проверява се първо)")
 
+# ── DST: прозорецът следва Ню Йорк, не фиксиран UTC (т.5 от 02.10) ──
+print("── СИНТЕТИЧНИ DST случаи (измислени часове; DST в САЩ свършва 01.11.2026) ──")
+utc = dt.timezone.utc
+# лято (EDT, UTC-4): 19:59 UTC = 15:59 ET → продължава; 20:00 UTC = 16:00 ET → пропуска
+assert _skip_reason(dt.date(2026, 10, 2), {}, dt.datetime(2026, 10, 2, 19, 59, tzinfo=utc)) is None
+r = _skip_reason(dt.date(2026, 10, 2), {}, dt.datetime(2026, 10, 2, 20, 0, tzinfo=utc))
+assert r and "16:00 EDT" in r, r
+print("  ✓ EDT (окт.): 19:59 UTC продължава, 20:00 UTC (=16:00 EDT) пропуска")
+# зима (EST, UTC-5), след 01.11: 20:30 UTC = 15:30 ET → ВСЕ ОЩЕ продължава
+# (при фиксиран 20:00 UTC cutoff това щеше грешно да се пропусне)
+assert _skip_reason(dt.date(2026, 11, 2), {}, dt.datetime(2026, 11, 2, 20, 30, tzinfo=utc)) is None
+assert _skip_reason(dt.date(2026, 11, 2), {}, dt.datetime(2026, 11, 2, 20, 59, tzinfo=utc)) is None
+r = _skip_reason(dt.date(2026, 11, 2), {}, dt.datetime(2026, 11, 2, 21, 0, tzinfo=utc))
+assert r and "16:00 EST" in r, r
+print("  ✓ EST (ноем.): 20:30 и 20:59 UTC продължават (15:30/15:59 EST), 21:00 UTC (=16:00 EST) пропуска")
+# самият ден на смяната (неделя 01.11): 20:59 UTC = 15:59 EST
+assert _skip_reason(dt.date(2026, 11, 1), {}, dt.datetime(2026, 11, 1, 20, 59, tzinfo=utc)) is None
+print("  ✓ 01.11 (ден на смяната) 20:59 UTC = 15:59 EST → продължава")
+
 print()
 print("Всички тестове минаха.")

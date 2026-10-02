@@ -26,19 +26,24 @@ Graceful: провал на тикър → пропуска се; ден без 
 Dedup/cutoff (FIX 2026-10-03): workflow-ът пуска И schedule: (15:00 UTC), И
 workflow_dispatch от cron-job.org — ако вече има снимка за днешната сесия
 (кой да е от двата тригера я е взел), вторият run пропуска, не презаписва.
-Ако нищо още няма и часът е след config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR
-(20:00 UTC по подразбиране) — също пропуска, вместо да пази OI извън измерения
-валиден прозорец (~13:30–20:00 UTC). Виж _skip_reason().
+Ако няма пълна снимка и часът в Ню Йорк е след
+config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR (16:00 ET = 20:00 UTC през
+лятото, 21:00 UTC през зимата) — също пропуска, вместо да пази OI извън
+измерения валиден прозорец (сесията 09:30–16:00 ET). Виж _skip_reason().
 """
 from __future__ import annotations
 import datetime as dt
 import json
 import time
 
+from zoneinfo import ZoneInfo
+
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import unusual_options as uo
+
+_NY = ZoneInfo("America/New_York")
 
 
 def _quality(snap: dict) -> tuple[int, int, int]:
@@ -81,12 +86,14 @@ def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str 
         fetched = snap.get("fetched_at_utc", "?")
         return (f"пълна снимка за сесия {session} вече съществува (fetched_at_utc={fetched}) "
                 f"— пропускам, не презаписвам")
-    if now_utc.hour >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR:
+    now_ny = now_utc.astimezone(_NY)
+    if now_ny.hour >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR:
         extra = (" (съществуващата снимка е непълна, но повторен опит вече е късно)"
                  if snap else "")
-        return (f"{now_utc.strftime('%H:%M')} UTC — след прага "
-                f"({config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_UTC_HOUR}:00 UTC) за валиден OI "
-                f"прозорец — пропускам вместо да пазя данни извън измерения прозорец{extra}")
+        return (f"{now_utc.strftime('%H:%M')} UTC ({now_ny.strftime('%H:%M %Z')}) — след "
+                f"прага ({config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR}:00 Ню Йорк) за "
+                f"валиден OI прозорец — пропускам вместо да пазя данни извън измерения "
+                f"прозорец{extra}")
     if snap:
         n, with_oi, requested = _quality(snap)
         print(f"[oi_snapshot] съществуваща снимка за {session} е непълна "
@@ -98,7 +105,8 @@ def take_snapshot() -> dict | None:
     if uo.yf is None:
         print("[oi_snapshot] yfinance липсва — нищо не е заснето")
         return None
-    today = dt.datetime.now(dt.timezone.utc).date()
+    # дата в Ню Йорк (като датата на последния бар на SPY), не UTC датата
+    today = dt.datetime.now(dt.timezone.utc).astimezone(_NY).date()
     session = uo.last_session_date()
     if session != today:
         print(f"[oi_snapshot] днес ({today}) няма сесия (последна: {session}) — "
