@@ -1,0 +1,36 @@
+name: Tests
+
+# Пуска тестовите скриптове при push (пакет 4а т.10). Отделен от daily_brief.yml и oi_snapshot.yml — те не се пипат.
+# Без schedule: нарочно (както в проекта). Без secrets: ключовете не се подават, платени API не могат да се викат —
+# run_tests.py допълнително забранява мрежата и следи docs/ и data/ за запис.
+# Ботовите commit-и на daily_brief.yml (git push с GITHUB_TOKEN) не тригерират този workflow — GitHub не пуска
+# workflow-и от push-ове с GITHUB_TOKEN.
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the tests
+        run: python run_tests.py
