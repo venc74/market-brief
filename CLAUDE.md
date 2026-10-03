@@ -77,10 +77,13 @@ src/backtest.py         — Track Record v2: tracker (pending/open/trailing/…)
 src/tracker_switch.py   — еднократно превключване v1→v2 (архив), revert_to_v1()
 src/render.py            — dashboard HTML (Jinja2) + email HTML
 templates/dashboard.html.j2 — единственият source за docs/index.html
-test_*.py, tests/fixtures/ — тестове (python test_<име>.py), без мрежа и НИКОГА
-                        срещу реалните data/*.json (временна директория); фикстури:
-                        реални OHLC (AMD, TWLO, LNTH, EXEL, SPY) и копие на реалния
-                        v1 tracker от 02.10.2026
+run_tests.py, test_*.py — пуска всички тестове (python run_tests.py [име ...]); без
+                        мрежа, без секрети, без запис в docs/ и data/ (иначе провал);
+                        същото пуска .github/workflows/tests.yml при push
+tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, EXEL, SPY), копие на
+                        реалния v1 tracker, реални брифове (22.09, 29.06, 02.10, 08.09),
+                        OI снимка от 01.10 — тестовете НЕ четат data/ (ротира се) и
+                        НИКОГА не пишат в нея (временна директория)
 ```
 
 ## Текущи toggle-и и прагове (config.py)
@@ -159,6 +162,12 @@ test_*.py, tests/fixtures/ — тестове (python test_<име>.py), без 
   старите snapshot-и не се ingest-ват повторно. Идемпотентно и graceful: без цени →
   отлага за следващия run; срив на всяка стъпка не губи данни (архив → tracker → състояние).
   Новите файлове в `data/` се записват от workflow-а (`git add docs/ data/`).
+- Пакет 4а (03.10.2026) — изчистване: махнати са Scion от 13F списъка, секцията High-Conviction
+  New Positions (вместо нея маркер SI✓ с мениджър и дата на filing-а), widget-ът Borrow Rate
+  (търсене), опционният блок на картите и AI контекстът на short скрийнъра
+  (`ENABLE_SHORT_AI_CONTEXT=0`); базата се казва "база X% дълбочина"; Insider/13F показват давност и
+  разграничават легитимна нула от провал; Jinja е с autoescape, имейлът escape-ва външния текст;
+  13F мащабът хиляди/долари е по дата на филинга + цена/акция.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
