@@ -870,6 +870,12 @@ SECTOR_PERSISTENCE_MIN_DAYS = int(os.getenv("SECTOR_PERSISTENCE_MIN_DAYS", 15))
 # (rs_chg_12w_pct възходящо), same "малко, но значимо" принцип като
 # MAX_ACTION_TICKERS/COT whitelist-а.
 MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT = int(os.getenv("MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT", 3))
+# 2026-10-03 (пакет 4а т.5): AI контекстът "глобално срещу регионално" за short кандидатите е СПРЯН —
+# резултатът не се визуализира никъде (short кандидатите не са в dashboard-а), а плащаме до
+# MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT Claude извиквания на ден. Логиката на short скрийнъра, данните
+# (short_candidates в брифа) и short_tracker остават; ENABLE_SHORT_AI_CONTEXT=1 връща извикванията,
+# когато има визуализация.
+ENABLE_SHORT_AI_CONTEXT = os.getenv("ENABLE_SHORT_AI_CONTEXT", "0") == "1"
 
 # ── Universe expansion (short_screener.py: short_universe()) ─────────────
 # yf.EquityQuery/yf.screen() — потвърдено на живо, нулева нова dependency.

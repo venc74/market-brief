@@ -265,6 +265,25 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
     return action, watchlist[:10]
 
 
+def _short_global_context(short_candidates: list[dict], laggards: list[dict], news) -> dict:
+    """
+    Пакет 4а т.5: AI контекстът "глобално срещу регионално" за секторите на short кандидатите.
+    ИЗКЛЮЧЕН по подразбиране (config.ENABLE_SHORT_AI_CONTEXT) — няма визуализация, а всяко
+    извикване е платено. Когато е включен: само за capped подмножество лагиращи сектори,
+    сортирано по severity (MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT — 2023-2025 daily co-occurrence
+    тест: медиана 5, до 12 едновременно; cost/latency контрол на тази стъпка, не на detection gate-а).
+    """
+    if not config.ENABLE_SHORT_AI_CONTEXT or not short_candidates:
+        return {}
+    seen = {c["lagging_sector"] for c in short_candidates}
+    out = {}
+    for sector in laggards[:config.MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT]:
+        if sector["sector"] not in seen:
+            continue
+        out[sector["sector"]] = ai_brief.short_thesis_global_context(sector["sector"], news)
+    return out
+
+
 def run() -> dict:
     today = dt.date.today().isoformat()
     print(f"═══ AI Инвестиционен Бриф · {today} ═══")
@@ -455,18 +474,9 @@ def run() -> dict:
             short_candidates = []
     else:
         short_candidates = []
-    # Global-vs-regional context (Аспект 2) — само за capped подмножество
-    # лагиращи сектори, сортирано по severity (виж MAX_LAGGARD_SECTORS_FOR_
-    # AI_CONTEXT коментара в config.py — 2023-2025 daily co-occurrence тест
-    # показа медиана 5, до 12 едновременно, cost/latency контрол е нужен на
-    # точно тази стъпка, не на detection gate-а).
-    short_sectors_seen = {c["lagging_sector"] for c in short_candidates}
-    global_context = {}
-    for sector in laggards[:config.MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT]:
-        if sector["sector"] not in short_sectors_seen:
-            continue
-        global_context[sector["sector"]] = ai_brief.short_thesis_global_context(
-            sector["sector"], news)
+    # Global-vs-regional context (Аспект 2) — СПРЯН на 2026-10-03 (config.ENABLE_SHORT_AI_CONTEXT=0):
+    # резултатът не се визуализира. Виж _short_global_context().
+    global_context = _short_global_context(short_candidates, laggards, news)
     for row in short_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
         row["global_context"] = global_context.get(row.get("lagging_sector"))
