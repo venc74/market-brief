@@ -1,6 +1,6 @@
 """
 Слой 1: Глобален макро контекст.
-Събира сурови данни от FRED, NewsAPI и yfinance. Синтезът на естествен
+Събира сурови данни от FRED и yfinance (NewsAPI е махнат на 2026-10-03). Синтезът на естествен
 език се прави по-късно от ai_brief.py — този модул връща само факти.
 """
 from __future__ import annotations
@@ -294,33 +294,6 @@ def global_market_signals() -> dict:
     return out
 
 
-def recent_headlines(max_items: int = 25) -> list[dict]:
-    """
-    Новини от последните 24ч в категориите от спека: монетарна политика,
-    геополитика, макро данни. NewsAPI free tier — ако ключ липсва, празно.
-    """
-    if not config.NEWS_API_KEY:
-        return []
-    query = ("Federal Reserve OR FOMC OR inflation OR CPI OR tariffs OR sanctions "
-             "OR OPEC OR \"interest rates\" OR geopolitics OR war")
-    try:
-        r = requests.get("https://newsapi.org/v2/everything", params={
-            "q": query, "language": "en", "sortBy": "publishedAt",
-            "from": (dt.datetime.utcnow() - dt.timedelta(hours=24)).isoformat(),
-            "pageSize": max_items, "apiKey": config.NEWS_API_KEY,
-        }, timeout=20)
-        r.raise_for_status()
-        return [{
-            "title": a["title"],
-            "source": a["source"]["name"],
-            "published": a["publishedAt"],
-            "description": (a.get("description") or "")[:300],
-        } for a in r.json().get("articles", [])]
-    except Exception as e:
-        print(f"[macro] NewsAPI failed: {e}")
-        return []
-
-
 def collect_macro_layer() -> dict:
     """Пълният Слой 1 пакет — подава се на AI синтеза и термометъра."""
     return {
@@ -328,9 +301,10 @@ def collect_macro_layer() -> dict:
         "net_liquidity": fed_net_liquidity(),
         "spread_2s10s": treasury_spread_2s10s(),
         "global_signals": global_market_signals(),
-        # преди headlines: промптът реже macro JSON-а на 6000 знака
+        # промптът реже macro JSON-а на 6000 знака — core_inflation е последна преди края
         "core_inflation": core_inflation() if config.ENABLE_CORE_INFLATION else None,
-        "headlines": recent_headlines(),
+        # 2026-10-03 (пакет 2 т.4): NewsAPI е махнат (macro.headlines беше празен във всичките 78 брифа);
+        # новините са curated (news_aggregator.significant_news) и влизат в макро промпта отделно, ПРЕДИ брифа.
     }
 
 

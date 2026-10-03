@@ -11,7 +11,7 @@
 GitHub Actions (cron 07:30 Berlin, DST-aware)
         │
         ▼
-src/main.py ─── Слой 1: macro_layer.py    (FRED, NewsAPI, DXY/VIX/gold/oil)
+src/main.py ─── Слой 1: macro_layer.py    (FRED, DXY/VIX/gold/oil)
         │   ─── Термометър: thermometer.py (SPY, VIX, P/C, 2s10s, Net Liquidity,
         │                                  MOVE, VIX Term Structure, Market Breadth)
         │   ─── Слой 2: sector_layer.py    (RS ротация на 16 секторни ETF-а vs SPY)
@@ -37,8 +37,8 @@ docs/index.html (GitHub Pages) + data/YYYY-MM-DD.json (история за backt
    - `FRED_API_KEY` — безплатен, fred.stlouisfed.org/docs/api/api_key.html
    - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — myaccount.google.com/apppasswords (изисква 2FA)
    - `EMAIL_TO` — къде да пристига брифът
-   - `NEWS_API_KEY` — опционален (newsapi.org free tier); без него макро брифът
-     работи само с FRED + пазарни данни
+   - ~~`NEWS_API_KEY`~~ — NewsAPI е махнат (03.10.2026); secret-ът в GitHub може да се изтрие. Новините са
+     curated от RSS/nitter (news_aggregator) и влизат в макро брифа
 
 4. **Variables** (същото меню → *Variables*):
    - `DASHBOARD_URL` = URL-ът от стъпка 2

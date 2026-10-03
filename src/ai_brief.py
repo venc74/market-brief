@@ -518,8 +518,21 @@ def _core_inflation_block(macro: dict) -> str:
 """
 
 
+def _news_block(news: list[dict] | None) -> str:
+    """Блок за макро промпта: курираните значими новини със "защо са значими" (пакет 2 т.4)."""
+    items = [{"headline": n.get("headline", ""), "why": n.get("why", "")} for n in (news or []) if n.get("headline")]
+    if not items:
+        return ('ЗНАЧИМИ НОВИНИ ЗА ДЕНЯ: няма подбрани новини — не твърди нищо за новинарския фон и не '
+                'измисляй новини.\n')
+    return (f"ЗНАЧИМИ НОВИНИ ЗА ДЕНЯ (подбрани от кода: заглавие и защо е значима): "
+            f"{json.dumps(items, ensure_ascii=False)}\n"
+            "Свържи макро брифа с тези новини там, където реално са свързани с данните по-горе (термометър, "
+            "доходности, суровини, сектори); цитирай същността им, но НЕ измисляй други новини и не твърди "
+            "факти, които не са в заглавието или в \"why\".\n")
+
+
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
-                           thermometer: dict) -> dict:
+                           thermometer: dict, news: list[dict] | None = None) -> dict:
     """
     Връща:
     {
@@ -547,6 +560,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
 
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}
 
+{_news_block(news)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
 (проценти, percentile, нива, delta-и) в prose текста — копирай Я ТОЧНО както е \
 в JSON-а, никога не я преизчислявай или приблизителствай наум. Специфично за \

@@ -190,7 +190,7 @@ PUTCALL_LOOKBACK = int(os.getenv("PUTCALL_LOOKBACK", 252))
 # ── API ключове (от GitHub Secrets / .env) ───────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
-NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")        # newsapi.org, optional
+# NEWS_API_KEY е махнат (2026-10-03): NewsAPI даде 0 заглавия за 78 дни; новините са news_aggregator (RSS/nitter + Claude филтър)
 # TRADIER_API_KEY / TRADIER_BASE — виж v2 секцията по-долу (заедно с коментара им)
 
 # ── Имейл доставка ────────────────────────────────────────────────────────

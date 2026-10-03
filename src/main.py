@@ -341,9 +341,15 @@ def run() -> dict:
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
     print("[6/7] AI синтез (Claude API)…")
-    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo)
-    # Значими новини (RSS + nitter → Claude филтър) — преди останалия анализ
-    news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
+    # FIX 2026-10-03 (пакет 2 т.4): значимите новини (RSS + nitter → Claude филтър) се подбират ПРЕДИ макро
+    # брифа и му се подават с обяснението защо са значими — преди брифът се пишеше без тях, а NewsAPI
+    # заглавията бяха празни във всичките 78 брифа. Graceful: провал на новините → празен списък.
+    try:
+        news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
+    except Exception as e:
+        print(f"[main] significant_news пропадна, макро брифът е без новини: {e}")
+        news = []
+    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news)
     # FIX 2026-09-16: тезите се сверяват срещу днешните новини — виж
     # ai_brief.thesis_reality_check(). САМО анотация (news_status/news_note);
     # `status` остава trigger-driven, `chain` остава конфиг.
