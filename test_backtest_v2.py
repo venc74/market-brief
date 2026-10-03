@@ -18,6 +18,7 @@ import config
 from src import backtest, sizing, main as brief_main
 
 EXEL = pd.read_csv(ROOT / "tests/fixtures/ohlc_EXEL.csv", index_col=0, parse_dates=True)
+SPY = pd.read_csv(ROOT / "tests/fixtures/ohlc_SPY.csv", index_col=0, parse_dates=True)
 TODAY = dt.date(2026, 10, 2)
 
 _tmp = tempfile.TemporaryDirectory(prefix="market_brief_bt_")
@@ -26,7 +27,7 @@ backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 config.ENABLE_BACKTEST = True
 
-DATA = {"EXEL": EXEL}                  # какво "връща" подмененият yf.download
+DATA = {"EXEL": EXEL, "SPY": SPY}      # какво "връща" подмененият yf.download (SPY — за сравнението, т.8)
 LAST_CUT = {"to": None}                # ограничава барове до дата (за "жива" позиция)
 
 

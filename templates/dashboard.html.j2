@@ -1085,6 +1085,11 @@
     Чакат buy-stop: {{ backtest.pending or 0 }} · не се задействаха: {{ backtest.not_triggered or 0 }}{% if backtest.skipped_extended %}
     · над тавана за вход: {{ backtest.skipped_extended }}{% endif %} (извън статистиката)<br>
     Среден реализиран R: {{ backtest.avg_realized_r }}
+    {# FIX 2026-10-03 (пакет 1, т.8): същият капитал в SPY за СЪЩИТЕ периоди на държане #}
+    {% if backtest.spy_compare %}<br>Спрямо SPY (същите периоди на държане, {{ backtest.spy_compare.n }} затворени):
+    средно {{ "%+.2f"|format(backtest.spy_compare.avg_return_pct) }}% срещу SPY {{ "%+.2f"|format(backtest.spy_compare.avg_spy_pct) }}%
+    → разлика {{ "%+.2f"|format(backtest.spy_compare.avg_alpha_pct) }}%
+    · {{ backtest.spy_compare.beat_spy_pct }}% от позициите водят SPY{% endif %}
   </div>
   {% if backtest.pending_positions %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакат buy-stop ({{ backtest.pending_positions|length }}):</div>
@@ -1119,7 +1124,7 @@
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Дата на вход</th><th class="n">Entry цена</th>
-        <th class="n">Текуща цена</th><th class="n">% промяна</th></tr></thead>
+        <th class="n">Текуща цена</th><th class="n">% промяна</th><th class="n">SPY, същия период</th></tr></thead>
       <tbody>
         {% for p in backtest.open_positions[:100] %}
         {% set track_modal_id = "earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date %}
@@ -1137,6 +1142,7 @@
           {% else %}
           <td class="n pct">{% if p.unrealized_pct is not none %}{{ '+' if p.unrealized_pct >= 0 else '' }}{{ p.unrealized_pct }}%{% else %}—{% endif %}</td>
           {% endif %}
+          <td class="n pct">{% if p.spy_return_pct is defined and p.spy_return_pct is not none %}{{ "%+.1f"|format(p.spy_return_pct) }}%{% else %}—{% endif %}</td>
         </tr>
         {% endfor %}
       </tbody>

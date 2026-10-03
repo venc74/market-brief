@@ -213,6 +213,8 @@ def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
         "exit_date": None, "exit_price": None,
         "resolution_date": None, "discovered_date": None,
         "realized_r": None, "current_r": None,
+        # т.8: доходност върху входа (с частичната продажба) и на SPY за същите периоди
+        "return_pct": None, "spy_return_pct": None, "alpha_pct": None,
     }
 
 
@@ -383,10 +385,11 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
 
 _V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "target1_hit_date",
                    "partial_price", "partial_fraction", "exit_date", "exit_price", "realized_r",
-                   "current_r", "last_close", "last_close_date")
+                   "current_r", "return_pct", "last_close", "last_close_date")
 
 
-def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date) -> None:
+def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date,
+                         spy_bars: "pd.DataFrame | None" = None) -> None:
     """
     v2: преизчислява състоянието от сигнала с trade_sim.simulate() (чиста функция на плана
     и дневните барове) — не наслагва върху старото състояние. Мутира rec на място.
@@ -396,6 +399,10 @@ def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date) -> Non
     res = trade_sim.simulate(rec, bars, today)
     for k in _V2_RESULT_KEYS:
         rec[k] = res.get(k)
+    # т.8: SPY за същите периоди (graceful: без SPY барове → None, останалото не се засяга)
+    rec["spy_return_pct"] = trade_sim.spy_return_pct(res, spy_bars) if spy_bars is not None else None
+    rec["alpha_pct"] = (round(res["return_pct"] - rec["spy_return_pct"], 2)
+                        if rec["spy_return_pct"] is not None and res.get("return_pct") is not None else None)
     if res.get("fill_price") is not None:
         rec["entry_price"] = res["fill_price"]
     elif rec.get("signal_price") is not None:
@@ -563,8 +570,10 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
     # първия ден след входа (v2 симулацията ползва същата серия, както реплеят)
     earliest = (dt.date.fromisoformat(min(rec["entry_date"] for _, rec in live_items))
                 - dt.timedelta(days=30)).isoformat()
+    # т.8: SPY за сравнението със v2 позициите — във ВСЕКИ случай в същия batch (нула втори fetch)
+    dl = tickers + (["SPY"] if "SPY" not in tickers and any(r.get("method") == "v2" for _, r in live_items) else [])
     try:
-        data = yf.download(tickers, start=earliest, progress=False, auto_adjust=False)
+        data = yf.download(dl, start=earliest, progress=False, auto_adjust=False)
     except Exception as e:
         print(f"[backtest] batch price fetch failed за {tickers}: {e}")
         return
@@ -572,11 +581,15 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         print("[backtest] price fetch върна празен резултат")
         return
 
-    cols = _normalize_price_columns(data, tickers, ("Open", "High", "Low", "Close"))
+    cols = _normalize_price_columns(data, dl, ("Open", "High", "Low", "Close"))
     opens, highs, lows, closes = cols.get("Open"), cols.get("High"), cols.get("Low"), cols.get("Close")
     if highs is None or lows is None or closes is None:
         print("[backtest] price fetch не върна High/Low/Close колони")
         return
+    spy_bars = None
+    if "SPY" in dl and opens is not None and "SPY" in getattr(opens, "columns", []):
+        spy_bars = pd.DataFrame({"Open": opens["SPY"], "High": highs["SPY"], "Low": lows["SPY"],
+                                 "Close": closes["SPY"]}).dropna()
 
     today = today or dt.date.today()
     for _, rec in live_items:
@@ -611,7 +624,7 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
                     continue
                 bars = pd.DataFrame({"Open": opens[ticker], "High": highs[ticker],
                                      "Low": lows[ticker], "Close": closes[ticker]}).dropna()
-                _resolve_position_v2(rec, bars, today)
+                _resolve_position_v2(rec, bars, today, spy_bars)
             else:
                 _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
                                   closes[ticker].dropna(), today)
@@ -838,6 +851,10 @@ def get_backtest_summary() -> dict:
             needs_review = r.get("needs_manual_review")
             unrealized_pct = (round((cur - entry_price) / entry_price * 100, 1) + 0.0
                               if (cur is not None and entry_price and not needs_review) else None)
+            if r.get("return_pct") is not None and not needs_review:
+                # v2: претеглена с частичната продажба доходност (виж trade_sim); ако 50% са
+                # продадени на целта, "цена спрямо входа" би подценила реалния резултат
+                unrealized_pct = round(r["return_pct"], 1) + 0.0
             # FIX 2026-09-23: видим брояч за всичко, което остане във флаг —
             # дотук флагът нямаше нито срок, нито напомняне. Стари флагове без
             # `since` броят от датата на сплита.
@@ -856,6 +873,8 @@ def get_backtest_summary() -> dict:
                 "entry_price": entry_price,
                 "current_price": round(cur, 2) if cur is not None else None,
                 "unrealized_pct": unrealized_pct,
+                "spy_return_pct": r.get("spy_return_pct"),
+                "alpha_pct": r.get("alpha_pct"),
                 "needs_manual_review": needs_review,
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
@@ -863,6 +882,18 @@ def get_backtest_summary() -> dict:
                 "earnings_recap": enrich.earnings_recap(r["ticker"]),
             })
         open_positions.sort(key=lambda r: r["entry_date"])  # възходящо — най-старите първи
+
+    # т.8: доходност спрямо SPY за СЪЩИТЕ периоди — само затворените позиции с R и с SPY данни
+    cmp_recs = [r for r in records if r.get("realized_r") is not None
+                and r.get("return_pct") is not None and r.get("spy_return_pct") is not None]
+    spy_compare = None
+    if cmp_recs:
+        n_c = len(cmp_recs)
+        avg_ret = sum(r["return_pct"] for r in cmp_recs) / n_c
+        avg_spy = sum(r["spy_return_pct"] for r in cmp_recs) / n_c
+        spy_compare = {"n": n_c, "avg_return_pct": round(avg_ret, 2), "avg_spy_pct": round(avg_spy, 2),
+                       "avg_alpha_pct": round(avg_ret - avg_spy, 2),
+                       "beat_spy_pct": round(sum(1 for r in cmp_recs if r["return_pct"] > r["spy_return_pct"]) / n_c * 100, 1)}
 
     # v2: препоръки, които още чакат buy-stop (няма позиция, не е в статистиката)
     pending_positions = sorted(
@@ -892,6 +923,7 @@ def get_backtest_summary() -> dict:
                                      and r.get("partial_price") is not None),
         "pending": by_status.get("pending", 0),
         "methodology": {"version": methodology(), "switched_on": load_state().get("switched_on")},
+        "spy_compare": spy_compare,
         "v1_archive": load_state().get("v1_stats"),
         "not_triggered": by_status.get("not_triggered", 0),
         "skipped_extended": by_status.get("skipped_extended", 0) + by_status.get("invalid_risk", 0),

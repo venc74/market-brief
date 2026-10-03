@@ -47,7 +47,7 @@ def _blank(status: str = "pending") -> dict:
             "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0,
             "exit_date": None, "exit_price": None,
             "resolution_date": None, "realized_r": None, "current_r": None, "R": None,
-            "last_close": None, "last_close_date": None}
+            "return_pct": None, "last_close": None, "last_close_date": None}
 
 
 def _as_date(d) -> dt.date:
@@ -138,11 +138,17 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
     def weighted_r(px) -> float:
         return float(sold * r_sold + (1 - sold) * (px - fill) / risk)
 
+    def weighted_ret(px) -> float:
+        """% доходност върху входа, претеглена с частичната продажба (виж spy_return_pct)."""
+        sell = out["partial_price"] if out["partial_price"] is not None else px
+        return float((sold * (sell - fill) + (1 - sold) * (px - fill)) / fill * 100)
+
     last = n - 1
     while last > fi and idx[last] > exp_date:
         last -= 1
     out.update(last_close=round(float(c[last]), 4), last_close_date=idx[last].date().isoformat())
     out["current_r"] = round(weighted_r(c[last]), 2)
+    out["return_pct"] = round(weighted_ret(c[last]), 2)           # mark-to-market; терминалните го презаписват
 
     if status is None:
         expired = idx[-1] > exp_date or (today is not None and _as_date(today) > exp_date.date())
@@ -154,9 +160,41 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
                    exit_date=idx[last].date().isoformat(), exit_price=round(float(c[last]), 4),
                    R=weighted_r(c[last]))                      # т.5: mark-to-market и във фаза 1
         out["realized_r"] = round(out["R"], 2)
+        out["return_pct"] = round(weighted_ret(c[last]), 2)
         return out
 
     out.update(status=status, exit_date=idx[exit_j].date().isoformat(), exit_price=round(float(exit_px), 4),
                resolution_date=idx[exit_j].date().isoformat(), R=weighted_r(exit_px))
     out["realized_r"] = round(out["R"], 2)
+    out["return_pct"] = round(weighted_ret(exit_px), 2)
     return out
+
+
+def spy_return_pct(res: dict, spy: pd.DataFrame) -> float | None:
+    """
+    Пакет 1, т.8: какво щеше да направи SPY със СЪЩИЯ капитал за СЪЩИТЕ периоди на държане —
+    купува се на Open на деня на входа; частичната продажба (target1_hit_date) и остатъкът се
+    продават на Close на съответните си дати (за живи позиции — на последния Close). Така
+    сравнението е честно и с частичната продажба: фракция × (SPY до целта) + остатък × (SPY до
+    изхода). None без вход, без дати или ако SPY няма бар за някоя от датите.
+    """
+    if res.get("fill_price") is None or res.get("fill_date") is None:
+        return None
+    end = res.get("exit_date") or res.get("last_close_date")
+    if end is None or spy is None or len(spy) == 0:
+        return None
+    try:
+        idx = pd.DatetimeIndex(spy.index)
+        if idx.tz is not None:
+            idx = idx.tz_localize(None)
+        s = spy.copy()
+        s.index = idx
+        open_in = float(s.loc[pd.Timestamp(res["fill_date"]), "Open"])
+        rest = float(s.loc[pd.Timestamp(end), "Close"]) / open_in - 1
+        if res.get("partial_price") is not None and res.get("target1_hit_date"):
+            frac = float(res.get("partial_fraction") or 0.0)
+            sold = float(s.loc[pd.Timestamp(res["target1_hit_date"]), "Close"]) / open_in - 1
+            return round((frac * sold + (1 - frac) * rest) * 100, 2)
+        return round(rest * 100, 2)
+    except (KeyError, ValueError, TypeError):
+        return None
