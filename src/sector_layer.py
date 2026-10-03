@@ -54,42 +54,72 @@ def _laggard_persistence(rs) -> tuple[float | None, bool]:
     return persistence_pct, confirmed_laggard
 
 
+# Състоянието на последното извикване на sector_rotation() — main го слага в брифа като предупреждение.
+# {"ok": bool, "reason": str, "etfs_total": int, "etfs_ok": int}
+LAST_STATUS: dict = {}
+
+
 def sector_rotation() -> list[dict]:
+    """
+    FIX 2026-10-03 (пакет 2 т.6): паднал или празен Yahoo (yf.download връща празна таблица или хвърля) вече не сваля
+    run-а с KeyError/TypeError — функцията връща [] и записва причината в LAST_STATUS (main.py я показва в брифа).
+    Всеки ETF е в собствен try/except: един лош ETF (твърде къса RS история и т.н.) не губи останалите. Празният
+    резултат се чете надолу като "няма секторни данни" (leading_sectors([]) = [], laggard_sectors([]) = []).
+    """
     etfs = {k: v for k, v in config.SECTOR_ETFS.items() if "PROXY" not in k}
     symbols = list(etfs.keys()) + ["SPY"]
-    data = yf.download(symbols, period="6mo", progress=False, auto_adjust=True)["Close"]
+    LAST_STATUS.clear()
+    LAST_STATUS.update(ok=False, reason="", etfs_total=len(etfs), etfs_ok=0)
+    try:
+        data = yf.download(symbols, period="6mo", progress=False, auto_adjust=True)["Close"]
+        if data is None or len(data) == 0:
+            raise ValueError("Yahoo върна празна таблица")
+        spy = data["SPY"].dropna()
+        if len(spy) < 65:
+            raise ValueError(f"SPY има само {len(spy)} реда история (нужни ≥ 65)")
+    except Exception as e:
+        reason = f"{type(e).__name__}: {e}"
+        LAST_STATUS["reason"] = reason
+        print(f"[sector] ⚠ секторната ротация не е изчислена — Yahoo данните са недостъпни ({reason})")
+        return []
 
-    spy = data["SPY"]
     results = []
     for sym, name in etfs.items():
-        if sym not in data.columns:
-            continue
-        series = data[sym].dropna()
-        if len(series) < 65:
-            continue
-        rs = (series / spy).dropna()
-        rs_now = float(rs.iloc[-1])
-        rs_4w = float(rs.iloc[-21])
-        rs_12w = float(rs.iloc[-63])
-        rs_max_6m = float(rs.max())
+        try:
+            if sym not in data.columns:
+                continue
+            series = data[sym].dropna()
+            if len(series) < 65:
+                continue
+            rs = (series / spy).dropna()
+            rs_now = float(rs.iloc[-1])
+            rs_4w = float(rs.iloc[-21])
+            rs_12w = float(rs.iloc[-63])
+            rs_max_6m = float(rs.max())
 
-        chg_4w = (rs_now / rs_4w - 1) * 100
-        chg_12w = (rs_now / rs_12w - 1) * 100
-        at_high = rs_now >= rs_max_6m * 0.99
-        persistence_pct, confirmed_laggard = _laggard_persistence(rs)
+            chg_4w = (rs_now / rs_4w - 1) * 100
+            chg_12w = (rs_now / rs_12w - 1) * 100
+            at_high = rs_now >= rs_max_6m * 0.99
+            persistence_pct, confirmed_laggard = _laggard_persistence(rs)
 
-        results.append({
-            "etf": sym, "sector": name,
-            "rs_chg_4w_pct": round(chg_4w, 2),
-            "rs_chg_12w_pct": round(chg_12w, 2),
-            "rs_at_6m_high": at_high,
-            "abs_chg_4w_pct": round((float(series.iloc[-1]) / float(series.iloc[-21]) - 1) * 100, 2),
-            "leading": chg_4w > 0 and chg_12w > 0,
-            "laggard_persistence_pct": persistence_pct,
-            "confirmed_laggard": confirmed_laggard,
-        })
+            results.append({
+                "etf": sym, "sector": name,
+                "rs_chg_4w_pct": round(chg_4w, 2),
+                "rs_chg_12w_pct": round(chg_12w, 2),
+                "rs_at_6m_high": at_high,
+                "abs_chg_4w_pct": round((float(series.iloc[-1]) / float(series.iloc[-21]) - 1) * 100, 2),
+                "leading": chg_4w > 0 and chg_12w > 0,
+                "laggard_persistence_pct": persistence_pct,
+                "confirmed_laggard": confirmed_laggard,
+            })
+        except Exception as e:
+            print(f"[sector] {sym} пропуснат: {type(e).__name__}: {e}")
 
     results.sort(key=lambda x: x["rs_chg_4w_pct"], reverse=True)
+    LAST_STATUS.update(ok=bool(results), etfs_ok=len(results),
+                       reason="" if results else "нито един секторен ETF няма достатъчно история")
+    if not results:
+        print(f"[sector] ⚠ секторната ротация е празна — {LAST_STATUS['reason']}")
     return results
 
 

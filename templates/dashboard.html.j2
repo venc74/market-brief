@@ -427,6 +427,13 @@
     токена ({{ t.model }})</li>{% endfor %}
   </ul></div>
 {% endif %}
+{# пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не е "няма сетъпи" #}
+{% if data_warnings %}
+<div class="model-banner rejected">⚠ <strong>Проблем с данните днес</strong>
+  <ul class="tight" style="margin:6px 0 0 18px">
+  {% for w in data_warnings %}<li>{{ w.message }}</li>{% endfor %}
+  </ul></div>
+{% endif %}
 {% if model_info and model_info.rejected %}
 <div class="model-banner rejected">⛔ Моделът <strong>{{ model_info.rejected }}</strong> беше
   отхвърлен при проверката и брифът е генериран с <strong>{{ model_info.model }}</strong>.
@@ -766,7 +773,11 @@
   </div>
   {{ earnings_modal(earn_modal_id, st.earnings.recap) }}
   {% else %}
+  {% if data_warnings and data_warnings|selectattr('source', 'equalto', 'screener')|selectattr('level', 'equalto', 'error')|list %}
+  <div class="prose">Скринингът днес не се изпълни (липсват данни — виж предупреждението най-горе). Празният списък НЕ значи, че няма сетъпи.</div>
+  {% else %}
   <div class="prose">Днес нито един кандидат не покрива всички критерии за Action. Това е информация, не провал — кешът също е позиция.</div>
+  {% endif %}
   {% endfor %}
 </section>
 

@@ -89,6 +89,7 @@ def render_dashboard(brief: dict) -> str:
         watch=brief.get("watch", []),
         model_info=brief.get("model_info", {}),
         ai_truncations=brief.get("ai_truncations", []),
+        data_warnings=brief.get("data_warnings", []),
         unusual_options=brief.get("unusual_options", []),
         unusual_options_diag=brief.get("unusual_options_diag"),
         unusual_min_ratios=config.UNUSUAL_OPTIONS_MIN_RATIOS,
@@ -184,9 +185,21 @@ def render_email(brief: dict) -> str:
                      font-family:monospace;font-size:13px;white-space:nowrap">
               {plan_txt}</td>
         </tr>"""
+    # пакет 2 т.6: предупреждения за данни (паднал Yahoo и т.н.) — червена кутия най-горе
+    warnings = brief.get("data_warnings") or []
+    warn_block = ""
+    if warnings:
+        items = "".join(f'<li style="margin-bottom:4px">{_e(w.get("message", ""))}</li>' for w in warnings)
+        warn_block = ('<tr><td style="padding:14px 28px;background:#fef2f2;border-bottom:1px solid #fecaca;'
+                      'font-size:12.5px;color:#991b1b"><b>⚠ Проблем с данните днес</b>'
+                      f'<ul style="margin:6px 0 0;padding-left:18px">{items}</ul></td></tr>')
+    screener_failed = any(w.get("source") == "screener" and w.get("level") == "error" for w in warnings)
     if not brief["action"]:
-        rows = """<tr><td colspan="3" style="padding:14px;color:#6b7280">
-                  Днес няма Action кандидати. Кешът е позиция.</td></tr>"""
+        rows = ("""<tr><td colspan="3" style="padding:14px;color:#991b1b">
+                  Скринингът днес не се изпълни (липсват данни) — празният списък НЕ значи, че няма сетъпи.</td></tr>"""
+                if screener_failed else
+                """<tr><td colspan="3" style="padding:14px;color:#6b7280">
+                  Днес няма Action кандидати. Кешът е позиция.</td></tr>""")
 
     watch = ", ".join(_e(st["ticker"]) for st in brief["watchlist"]) or "—"
     dot_color = {"green": "#0e9f6e", "yellow": "#d97706", "red": "#dc2626"}
@@ -274,6 +287,8 @@ def render_email(brief: dict) -> str:
     <span style="margin-left:12px">{thermo_dots}</span>
     <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
   </td></tr>
+
+  {warn_block}
 
   {news_block}
 

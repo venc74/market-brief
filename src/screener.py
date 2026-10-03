@@ -22,6 +22,10 @@ from src import setup_rules
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
 
+# Състоянието на последния technical_screen(): {"ok", "kind" (ok/partial/spy_failed/no_history/universe_empty), "reason",
+# "universe", "with_history", "batches", "batches_failed"} — main.py го превръща в предупреждение в брифа.
+LAST_STATUS: dict = {}
+
 
 # ──────────────────────────────────────────────────────────────────────────
 # Универс
@@ -60,18 +64,34 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     наличие на консолидация (proxy за база), близост до pivot (най-много 5% под;
     над pivot — вкл. extended — се пази, класифицира се в setup_rules).
     """
-    spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
-    if isinstance(spy, pd.DataFrame):
-        spy = spy.iloc[:, 0]
+    # FIX 2026-10-03 (пакет 2 т.6): паднал Yahoo не сваля run-а. Празният yf.download("SPY") даваше KeyError на
+    # ["Close"] още на първия ред; сега → [] + причина в LAST_STATUS (main.py я показва в брифа като предупреждение,
+    # за да не се чете празният списък като "днес няма сетъпи"). Провалените партиди се броят (batches_failed).
+    LAST_STATUS.clear()
+    LAST_STATUS.update(ok=False, kind="", reason="", universe=len(universe), with_history=0,
+                       batches=0, batches_failed=0)
+    try:
+        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
+        if isinstance(spy, pd.DataFrame):
+            spy = spy.iloc[:, 0]
+        spy = spy.dropna()
+        if len(spy) == 0:
+            raise ValueError("Yahoo върна празна история за SPY")
+    except Exception as e:
+        LAST_STATUS.update(kind="spy_failed", reason=f"{type(e).__name__}: {e}")
+        print(f"[screener] ⚠ няма SPY история — технически филтър пропуснат ({LAST_STATUS['reason']})")
+        return []
 
     survivors = []
     rs_scores: dict[str, float] = {}          # ВСИЧКИ тикъри с история — основата на RS перцентила
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
+        LAST_STATUS["batches"] += 1
         try:
             data = yf.download(batch, period="2y", progress=False,
                                auto_adjust=True, group_by="ticker", threads=True)
         except Exception as e:
+            LAST_STATUS["batches_failed"] += 1
             print(f"[screener] batch {i} failed: {e}")
             continue
 
@@ -89,6 +109,14 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
                 continue
         time.sleep(1)  # не дразним Yahoo
 
+    LAST_STATUS["with_history"] = len(rs_scores)
+    if universe and not rs_scores:
+        LAST_STATUS.update(kind="no_history", reason="нито един тикър от универса не върна ценова история")
+        print(f"[screener] ⚠ {LAST_STATUS['reason']} ({LAST_STATUS['batches_failed']} от {LAST_STATUS['batches']} партиди с грешка)")
+    elif not universe:
+        LAST_STATUS.update(kind="universe_empty", reason="списъкът с тикъри (Wikipedia) е празен")
+    else:
+        LAST_STATUS.update(ok=True, kind="partial" if LAST_STATUS["batches_failed"] else "ok")
     before = len(survivors)
     survivors = apply_rs_rating(survivors, rs_scores)          # т.9: втори проход — RS перцентил в универса
     print(f"[screener] технически филтър: {before} оцелели, {len(survivors)} с RS rating "

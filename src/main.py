@@ -19,6 +19,7 @@ from src.macro_layer import collect_macro_layer, thesis_monitor
 from src.thermometer import build_thermometer, thermometer_unavailable
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
+from src import screener, sector_layer, data_warnings
 from src.enrich import enrich, inject_split_catalysts
 from src.sizing import position_plan_v2
 from src import ai_brief
@@ -323,7 +324,15 @@ def run() -> dict:
     theses = thesis_monitor(macro)
 
     print("[3/7] Слой 2: секторна ротация…")
-    rotation = sector_rotation()
+    # FIX 2026-10-03 (пакет 2 т.6): паднал Yahoo не сваля run-а — sector_rotation() връща [] и записва причината
+    # в sector_layer.LAST_STATUS; в брифа излиза предупреждение (data_warnings), а не тих празен резултат.
+    try:
+        rotation = sector_rotation()
+    except Exception as e:
+        traceback.print_exc()
+        sector_layer.LAST_STATUS.clear()
+        sector_layer.LAST_STATUS.update(ok=False, reason=f"{type(e).__name__}: {e}")
+        rotation = []
     leaders = leading_sectors(rotation)
     # Short/Stage 4 screener вход — persistence-gated (не еднодневен snapshot),
     # виж laggard_sectors() docstring-а. Реалният screening (мрежово скъп) се
@@ -331,7 +340,13 @@ def run() -> dict:
     laggards = laggard_sectors(rotation)
 
     print("[4/7] Слой 3: скрининг…")
-    candidates = run_screen([s["sector"] for s in leaders], leaders=leaders)
+    try:
+        candidates = run_screen([s["sector"] for s in leaders], leaders=leaders)
+    except Exception as e:
+        traceback.print_exc()
+        screener.LAST_STATUS.clear()
+        screener.LAST_STATUS.update(ok=False, kind="crashed", reason=f"{type(e).__name__}: {e}")
+        candidates = []
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
@@ -579,6 +594,8 @@ def run() -> dict:
         "macro": macro,
         "thermometer": thermo,
         "rotation": rotation,
+        # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
+        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation)),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +

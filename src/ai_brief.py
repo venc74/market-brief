@@ -518,6 +518,14 @@ def _core_inflation_block(macro: dict) -> str:
 """
 
 
+def _rotation_unavailable_note(rotation: list[dict] | None) -> str:
+    """Пакет 2 т.6: празна ротация = данните не са изтеглени (паднал Yahoo), не "няма водещи сектори"."""
+    if rotation:
+        return ""
+    return ('\nСЕКТОРНИТЕ ДАННИ НЕ СА НАЛИЧНИ днес (Yahoo Finance не върна ценови данни) — НЕ измисляй водещи сектори, '
+            'RS стойности или ETF-и; върни "sector_logic": [] и кажи в macro_brief, че ротацията не е изчислена.')
+
+
 def _news_block(news: list[dict] | None) -> str:
     """Блок за макро промпта: курираните значими новини със "защо са значими" (пакет 2 т.4)."""
     items = [{"headline": n.get("headline", ""), "why": n.get("why", "")} for n in (news or []) if n.get("headline")]
@@ -558,7 +566,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
-СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}
+СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
 
 {_news_block(news)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
