@@ -567,7 +567,7 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     референтния универс (value_confirmed), вместо да търси пресичане със
     статичен топ списък, което беше структурно невъзможно.
     """
-    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}}
+    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
     if config.ENABLE_MAGIC_FORMULA:
         try:
             sets["mf"] = magic_formula.value_confirmed(candidate_tickers)
@@ -588,6 +588,10 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
             sets["si"] = dataroma.superinvestor_map()
         except Exception as e:
             print(f"[enrich] dataroma skipped: {e}")
+        try:
+            sets["si_new"] = dataroma.new_position_markers()      # пакет 4а т.2: нови позиции → SI✓
+        except Exception as e:
+            print(f"[enrich] dataroma new positions skipped: {e}")
     return sets
 
 
@@ -614,13 +618,20 @@ def _apply_markers(row: dict, sets: dict) -> None:
             f"Предстоящ stock split{ratio} ({sp.get('date', 'скоро')}) — момент на momentum.")
 
     si = sets["si"].get(sym)
-    if si:
-        who = ", ".join(dict.fromkeys(si.get("managers", [])))  # уникални, запазен ред
-        val = f" · ${si['value']:,.0f}" if si.get("value") else ""
-        n = si.get("count", 1)
-        tag = "SI✓" if n == 1 else f"SI✓×{n}"
-        markers.append({"tag": tag,
-                        "title": f"Superinvestor покупка ({si.get('action', 'Buy')}){val}: {who}"})
+    si_new = sets.get("si_new", {}).get(sym)
+    if si or si_new:
+        # ЕДИН маркер SI✓: нова позиция на мениджър от списъка (кой и от коя дата е filing-ът), плюс —
+        # ако същият тикър е и в общия Moves feed — реда за него
+        parts = []
+        if si_new:
+            parts.append(si_new["title"])
+        if si:
+            who = ", ".join(dict.fromkeys(si.get("managers", [])))  # уникални, запазен ред
+            val = f" · ${si['value']:,.0f}" if si.get("value") else ""
+            parts.append(f"Superinvestor покупка ({si.get('action', 'Buy')}){val}: {who}")
+        n = si.get("count", 1) if si else 1
+        tag = si_new["tag"] if si_new else ("SI✓" if n == 1 else f"SI✓×{n}")
+        markers.append({"tag": tag, "title": "\n".join(parts)})
 
 
 def inject_split_catalysts(candidates: list[dict]) -> list[dict]:

@@ -132,6 +132,13 @@
     padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
     color: var(--regime); border: 1px solid var(--regime); cursor: help; }
   .watch-card .markers { margin-left: 8px; }
+  /* 2026-10-03 (пакет 4а т.2): маркерът се отваря и с клик (мобилно няма hover) */
+  .marker { position: relative; }
+  .marker .marker-tip { display: none; position: absolute; left: 0; top: 100%; z-index: 20; margin-top: 4px;
+    min-width: 220px; max-width: 360px; padding: 8px 10px; border-radius: 6px; background: var(--card, #111827);
+    color: var(--text); border: 1px solid var(--line); font-family: inherit; font-weight: 400; font-size: 12px;
+    white-space: pre-line; text-align: left; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .marker.open .marker-tip { display: block; }
   .borrow { font-size: 13px; color: var(--text); margin-top: 6px;
     padding-top: 6px; border-top: 1px dotted var(--line); }
   .borrow b { color: var(--yellow); }
@@ -566,6 +573,8 @@
 </section>
 
 {# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}
+{# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
+{% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
 {% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
 {% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
 {% macro thesis_context_box(ctx) %}
@@ -680,7 +689,7 @@
   <div class="stock-card">
     <div class="stock-head">
       <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company }} · {{ st.sector }}</span>
-        {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
+        {{ markers_html(st.markers) }}
         {{ earnings_icon(earn_modal_id, st.earnings.recap) }}
       </div>
       <div class="price-tag">${{ st.price }} <span style="color:var(--muted);font-size:13px">pivot ${{ st.pivot }} ({{ st.pct_from_pivot }}%)</span></div>
@@ -787,7 +796,7 @@
       <span class="ticker">{{ st.ticker }}</span>
       <span class="company">{{ st.company }}</span>
       {% if st.rs_rating is defined and st.rs_rating is not none %}<span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS {{ st.rs_rating }}</span>{% endif %}
-      {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
+      {{ markers_html(st.markers) }}
       {# FIX 2026-09-23: маркерът RE-ENTRY пътува и до Watchlist картите
          (слага се в apply_hard_rules ПРЕДИ класификацията), но обясняващият ред
          беше само в Action шаблона — FTNT на 23.09 показа таг без обяснение. #}
@@ -1099,7 +1108,7 @@
         <th class="n">Стоп</th><th>Валиден до</th></tr></thead>
       <tbody>
         {% for p in backtest.pending_positions %}
-        <tr><td class="sym">{{ p.ticker }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
+        <tr><td class="sym">{{ p.ticker }}{{ markers_html(p.markers) }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
           <td class="n">${{ p.max_chase }}</td><td class="n">${{ p.stop_loss }}</td><td>{{ p.valid_through or "—" }}</td></tr>
         {% endfor %}
       </tbody>
@@ -1129,7 +1138,7 @@
         {% for p in backtest.open_positions[:100] %}
         {% set track_modal_id = "earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date %}
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
-          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}</td>
+          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}</td>
           <td>{{ p.entry_date }}</td>
           <td class="n">${{ p.entry_price }}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
@@ -1183,28 +1192,8 @@
 </section>
 {% endif %}
 
-{% if superinvestor_new_positions %}
-<section>
-  <h2>🆕 High-Conviction New Positions</h2>
-  <div class="si-grid">
-    {% for s in superinvestor_new_positions %}
-    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
-        <span class="si-pct new">{{ s.pct_of_portfolio }}%</span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{{ s.manager }}{% if s.value %} · {{ s.value|money_short }}{% endif %}{% if s.period %} · {{ s.period }}{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    Съвсем НОВА позиция (отсъствала в предишния 13F) над {{ dataroma_min_new_position_pct }}% от портфейла на мениджъра —
-    праг върху % от портфейла, не абсолютна $ стойност, за да не отпаднат high-conviction залози на по-малки фондове.
-  </div>
-</section>
-{% endif %}
+{# 2026-10-03 (пакет 4а т.2): секцията High-Conviction New Positions е махната — нова позиция на мениджър
+   от списъка е маркер SI✓ върху кандидатите и v2 позициите (hover/клик: кой и от коя дата е filing-ът) #}
 
 {% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
 <section>

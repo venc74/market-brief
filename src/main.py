@@ -414,8 +414,8 @@ def run() -> dict:
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
     # FIX 2026-08-17: high-conviction нови позиции (>DATAROMA_MIN_NEW_POSITION_PCT%
     # от портфейл) и major exits (>DATAROMA_MAJOR_EXIT_PCT%, explicit разделени от
-    # "мениджър спрял да подава" — виж dataroma.py docstring-а) — отделни dashboard
-    # сигнали от общия Moves feed.
+    # "мениджър спрял да подава" — виж dataroma.py docstring-а). От 2026-10-03 новите
+    # позиции не са секция, а маркер SI✓ (данните остават в брифа за маркерите и историята).
     superinvestor_new_positions = dataroma.fetch_new_position_highlights() if config.ENABLE_DATAROMA else []
     superinvestor_exits = (dataroma.fetch_major_exits() if config.ENABLE_DATAROMA
                            else {"exits": [], "stopped_managers": []})
@@ -424,9 +424,9 @@ def run() -> dict:
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
     for row in insider_buys:
         row["in_screener"] = row["ticker"] in our_tickers
-    # (superinvestor_new_positions/superinvestor_exits конвергенцията се
-    # изчислява в темплейта, "s.ticker in our_tickers" — same паттърн като
-    # съществуващата superinvestor_moves секция, не precomputed поле тук)
+    # (superinvestor_exits конвергенцията се изчислява в темплейта, "s.ticker in
+    # our_tickers" — same паттърн като superinvestor_moves, не precomputed поле тук;
+    # новите позиции вече не са секция — виж SI✓ маркерите в enrich и по-долу)
     # GLB (Green Line Breakout) — независим механичен скрийнър, изцяло
     # извън CANSLIM/Weinstein pipeline-а (собствен universe fetch, виж
     # glb_screener.py docstring). Explicit try/except тук, въпреки че
@@ -492,6 +492,15 @@ def run() -> dict:
     # дублирането). Mirror на in_screener badge механизма по-горе — трябва
     # да живее ТУК, след backtest_summary изчислението (open_positions не е
     # наличен по-рано, при самия GLB блок).
+    # FIX 2026-10-03 (пакет 4а т.2): SI✓ върху v2 позициите (отворени и чакащи buy-stop), когато
+    # мениджър от списъка е открил нова позиция в тикъра — вместо секцията-списък
+    try:
+        si_markers = dataroma.new_position_markers(superinvestor_new_positions)
+        for p in (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])):
+            if p["ticker"] in si_markers:
+                p["markers"] = [si_markers[p["ticker"]]]
+    except Exception as e:
+        print(f"[main] SI✓ маркери за позициите пропуснати: {e}")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers

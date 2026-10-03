@@ -9,7 +9,8 @@ config.DATAROMA_CIK). Три отделни, но споделящи данни 
      DATAROMA_TOP_PER_MANAGER), не global top-по-стойност — Berkshire's
      позиции ($10B+) системно изяждаха всичките dashboard слота преди
      FIX 2026-08-17.
-  2. fetch_new_position_highlights() — high-conviction "нова позиция":
+  2. fetch_new_position_highlights() — high-conviction "нова позиция" (от 2026-10-03 НЕ е секция-
+     списък, а маркер SI✓ върху кандидатите и v2 позициите — виж new_position_markers):
      съвсем нова (CUSIP отсъства в предишния filing) И >= config.
      DATAROMA_MIN_NEW_POSITION_PCT% от портфейла на мениджъра. % на
      портфейл, НЕ $ праг — нормализира за размера на фонда.
@@ -407,6 +408,7 @@ def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]
             "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
             "company": cur["issuer"], "manager": snap["manager"], "value": value,
             "pct_of_portfolio": round(pct, 1), "period": snap["period"],
+            "filing_date": snap.get("last_filing_date"),
             "_resolved": bool(ticker),
         })
     return out
@@ -573,6 +575,53 @@ def fetch_major_exits(min_value: float | None = None) -> dict:
     min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
     bundle = _fetch_all(min_value)
     return {"exits": bundle["major_exits"], "stopped_managers": bundle["stopped_managers"]}
+
+
+def _filing_date(row: dict) -> str | None:
+    """Датата на 13F filing-а: явното поле, а за стар кеш без него — от period ("13F · 2026-08-14")."""
+    if row.get("filing_date"):
+        return str(row["filing_date"])
+    m = re.search(r"\d{4}-\d{2}-\d{2}", str(row.get("period") or ""))
+    return m.group(0) if m else None
+
+
+def new_position_markers(rows: list[dict] | None = None) -> dict[str, dict]:
+    """
+    Пакет 4а · т.2: тикър → маркер SI✓ {"tag", "title"} за нова позиция на мениджър от списъка
+    (CUSIP отсъства в предишния 13F И >= DATAROMA_MIN_NEW_POSITION_PCT% от портфейла му). Ползва се
+    върху кандидатите (enrich) и върху v2 позициите (main) вместо старата секция-списък.
+    Заглавието (hover/клик) казва кой мениджър и от коя дата е filing-ът. Нерезолвиран тикър
+    (само името на емитента) се пропуска — не може да съвпадне с наш кандидат.
+    """
+    rows = rows if rows is not None else fetch_new_position_highlights()
+    by_ticker: dict[str, list[dict]] = {}
+    for r in rows:
+        if r.get("_resolved") is False or not r.get("ticker"):
+            continue
+        by_ticker.setdefault(r["ticker"], []).append(r)
+    out: dict[str, dict] = {}
+    for ticker, rs in by_ticker.items():
+        managers = list(dict.fromkeys(r["manager"] for r in rs))
+        lines = []
+        for r in sorted(rs, key=lambda x: x.get("pct_of_portfolio") or 0, reverse=True):
+            when = _filing_date(r)
+            val = f", {_money_txt(r['value'])}" if r.get("value") else ""
+            lines.append(f"{r['manager']} — {r.get('pct_of_portfolio')}% от портфейла{val}; "
+                         f"13F filing от {when or 'неизвестна дата'}")
+        out[ticker] = {"tag": "SI✓" if len(managers) == 1 else f"SI✓×{len(managers)}",
+                       "title": "Нова позиция на superinvestor: " + " | ".join(lines)}
+    return out
+
+
+def _money_txt(v) -> str:
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return ""
+    for unit, div in (("млрд", 1e9), ("млн", 1e6), ("хил", 1e3)):
+        if abs(v) >= div:
+            return f"${v / div:.1f} {unit}"
+    return f"${v:.0f}"
 
 
 def superinvestor_map(rows: list[dict] | None = None) -> dict[str, dict]:
