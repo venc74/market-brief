@@ -96,6 +96,20 @@ STOP_REJECT_STRUCT_RISK_PCT = float(os.getenv("STOP_REJECT_STRUCT_RISK_PCT", 10.
 TARGET_PARTIAL_FRACTION = float(os.getenv("TARGET_PARTIAL_FRACTION", 0.5))
 TRAIL_SMA_DAYS = int(os.getenv("TRAIL_SMA_DAYS", 10))
 
+# ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
+# Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
+# "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.
+# Блокираните отиват във Watchlist с причина "regime_block" (БЕЗ 10-дневното изтичане на
+# "regime_gate" — те се преоценяват сами всеки ден). Преди: Cash даваше Action с ×0.5 риск.
+# Реплей 02.01.2024 → 02.10.2026 (v2 сигнали, обем ≥1.4×, хоризонт 20 дни; режим = реалният
+# от 12.06.2026, преди това прокси "SPY над 50 и 200DMA"): Offensive 641 сигнала → win 50%,
+# среден R +0.08 ± 0.04; Defensive 172 → win 46%, R −0.11 ± 0.07 (разлика 2.4σ). Вътре в
+# Defensive "good ≤2%" (109 сигнала, R −0.12) НЕ се различава от "2–5%" (63, R −0.08;
+# разлика ±0.14) — филтърът реже ~37% от сигналите, но данните не показват, че ги подобрява.
+# Cash в историята няма (прокси без Cash). Двата превключвателя позволяват връщане без код.
+REGIME_CASH_BLOCKS_ACTION = os.getenv("REGIME_CASH_BLOCKS_ACTION", "1") == "1"
+REGIME_DEFENSIVE_REQUIRES_GOOD_TIMING = os.getenv("REGIME_DEFENSIVE_REQUIRES_GOOD_TIMING", "1") == "1"
+
 # ── Фундаментални критерии (CANSLIM) ─────────────────────────────────────
 MIN_EPS_GROWTH_YOY = 25.0         # %
 MIN_REVENUE_GROWTH_YOY = 20.0     # %

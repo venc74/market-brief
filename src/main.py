@@ -98,10 +98,30 @@ def _last_resolved_positions() -> dict[str, dict]:
         return {}
 
 
-def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list, list]:
+def _regime_gate(c: dict, regime: str | None) -> str | None:
+    """
+    Пакет 1, т.6: текстът за Watchlist, ако режимът блокира Action за този кандидат;
+    None → преминава. Cash → никакъв Action; Defensive → само при Entry Timing "good"
+    (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем). regime=None → без ограничение.
+    """
+    if regime == "Cash" and config.REGIME_CASH_BLOCKS_ACTION:
+        return ("Режим Cash — нов Action не се дава (капиталът е позиция). "
+                "Сетъпът се преценява отново, щом режимът се подобри.")
+    if regime == "Defensive" and config.REGIME_DEFENSIVE_REQUIRES_GOOD_TIMING:
+        timing = entry_timing.evaluate_pivot_volume(c)
+        if not timing or timing["verdict"] != "good":
+            why = timing["note"] if timing else "няма данни за entry timing"
+            return (f"Режим Defensive — Action само при добър entry timing (0…+"
+                    f"{config.ENTRY_TIMING_EXTENDED_PCT:g}% над pivot, с обем): {why}")
+    return None
+
+
+def apply_hard_rules(candidates: list[dict], sizing_factor: float,
+                     regime: str | None = None) -> tuple[list, list]:
     """
     Твърдите правила от Секция 8, наложени СЛЕД AI класификацията —
-    кодът има последната дума, не моделът.
+    кодът има последната дума, не моделът. `regime` (термометърът) включва и
+    режимния gate (т.6); без него режимът не ограничава Action.
     """
     action, watchlist = [], []
     sector_count: dict[str, int] = {}
@@ -196,6 +216,17 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
             c.setdefault("ai", {})
             c["ai"]["watchlist_reason_type"] = "technical_gate"
             c["ai"]["watchlist_trigger"] = setup["trigger_text"]
+
+        # FIX 2026-10-03 (пакет 1, т.6): режимен gate СЛЕД техническия и ПРЕДИ лимитите —
+        # блокиран кандидат не заема Action слот. reason_type "regime_block" е код-наложена
+        # причина и НЕ участва в 10-дневното изтичане на "regime_gate" (watchlist_expiry).
+        if cls == "Action":
+            gate_text = _regime_gate(c, regime)
+            if gate_text:
+                cls = "Watchlist"
+                c.setdefault("ai", {})
+                c["ai"]["watchlist_reason_type"] = "regime_block"
+                c["ai"]["watchlist_trigger"] = gate_text
 
         if cls == "Action":
             if len(action) >= config.MAX_ACTION_TICKERS:
@@ -342,7 +373,7 @@ def run() -> dict:
     cot_with_theses = ai_brief.cot_theses(
         cot_extremes, screener_universe, thermo["regime"],
         cot_open_positions) if cot_extremes else []
-    action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"])
+    action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
     # чист AI prose, датата "измисляна" наново всеки ден).
