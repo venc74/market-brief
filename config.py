@@ -96,6 +96,35 @@ STOP_REJECT_STRUCT_RISK_PCT = float(os.getenv("STOP_REJECT_STRUCT_RISK_PCT", 10.
 TARGET_PARTIAL_FRACTION = float(os.getenv("TARGET_PARTIAL_FRACTION", 0.5))
 TRAIL_SMA_DAYS = int(os.getenv("TRAIL_SMA_DAYS", 10))
 
+# ── Minervini trend template + RS rating (пакет 1, т.9 — 2026-10-03) ─────
+# Задължителен филтър за Action И Watchlist, слят със съществуващата Weinstein Stage 2
+# проверка (screener.trend_template_checks — Stage 2 е първата част на шаблона, не
+# отделен филтър): цена > 150DMA и 200DMA; 150DMA > 200DMA; 200DMA расте поне
+# TT_MA200_RISING_BARS сесии (~1 месец); 50DMA > 150DMA и 200DMA; цена > 50DMA; цена
+# поне TT_MIN_ABOVE_52W_LOW_PCT% над 52-седмичното дъно и най-много
+# TT_MAX_BELOW_52W_HIGH_PCT% под 52-седмичния връх (252 сесии, High/Low).
+# RS rating = перцентил (1–100) на претеглената доходност — 40% последното тримесечие
+# + по 20% за всяко от трите преди него (тримесечие = RS_QUARTER_BARS сесии) — в ЦЕЛИЯ
+# универс (всички с история, не само оцелелите); минимум RS_RATING_MIN. При по-малко от
+# RS_RATING_MIN_UNIVERSE тикъра с данни (счупени batch-ове) рейтингът не се смята и
+# филтърът се пропуска с предупреждение, вместо да реже на произволна извадка.
+# TREND_TEMPLATE_ENABLED=0 връща само старата Stage 2 проверка (рейтингът остава за показване).
+# Реплей 02.01.2024 → 01.10.2026 (904 тикъра, 690 сигнални дни, v2 с финалните параметри —
+# обем ≥1.5×, 15-баров стоп, buy-stop 5 сесии, 50% на 2R, гап изход, MTM изтичане; векторизираният
+# шаблон/рейтинг съвпада със screener.py на 1800/4465 проверени точки, trade_sim — със симулатора на
+# реплея на всички 497 сигнала): БЕЗ т.9 → 61.4 технически оцелели на ден, 497 сигнала (0.72/ден, на
+# 35% от дните), хоризонт 20 дни: win 57%, среден R +0.15, α спрямо SPY 0.0%; С т.9 → 54.1 на ден,
+# 432 сигнала (0.63/ден, 32% от дните), win 59%, R +0.19, α +0.3%. Филтърът маха ~13% от сигналите;
+# разликата в резултата е в рамките на шума (±0.08R) — не е демонстрирано подобрение, а по-чист пул.
+TREND_TEMPLATE_ENABLED = os.getenv("TREND_TEMPLATE_ENABLED", "1") == "1"
+TT_MA200_RISING_BARS = int(os.getenv("TT_MA200_RISING_BARS", 21))
+TT_MIN_ABOVE_52W_LOW_PCT = float(os.getenv("TT_MIN_ABOVE_52W_LOW_PCT", 30.0))
+TT_MAX_BELOW_52W_HIGH_PCT = float(os.getenv("TT_MAX_BELOW_52W_HIGH_PCT", 25.0))
+RS_RATING_MIN = float(os.getenv("RS_RATING_MIN", 70))
+RS_RATING_WEIGHTS = (0.4, 0.2, 0.2, 0.2)          # [последно тримесечие, 3–6м, 6–9м, 9–12м]
+RS_QUARTER_BARS = 63
+RS_RATING_MIN_UNIVERSE = int(os.getenv("RS_RATING_MIN_UNIVERSE", 150))
+
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
 # "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.

@@ -55,7 +55,8 @@ def build_universe() -> list[str]:
 # ──────────────────────────────────────────────────────────────────────────
 def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     """
-    Прилага: Weinstein Stage 2, RS Line близо до връх, цена ≥ $10,
+    Прилага: Weinstein Stage 2 + Minervini trend template (+ RS rating ≥ 70 във втория
+    проход), RS Line близо до връх, цена ≥ $10,
     наличие на консолидация (proxy за база), близост до pivot (най-много 5% под;
     над pivot — вкл. extended — се пази, класифицира се в setup_rules).
     """
@@ -64,6 +65,7 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
         spy = spy.iloc[:, 0]
 
     survivors = []
+    rs_scores: dict[str, float] = {}          # ВСИЧКИ тикъри с история — основата на RS перцентила
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
         try:
@@ -76,15 +78,96 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
         for sym in batch:
             try:
                 df = data[sym].dropna() if len(batch) > 1 else data.dropna()
+                score = rs_score(df["Close"])
+                if score is not None:
+                    rs_scores[sym] = score
                 row = _evaluate_technicals(sym, df, spy)
                 if row:
+                    row["rs_score"] = None if score is None else round(score, 4)
                     survivors.append(row)
             except Exception:
                 continue
         time.sleep(1)  # не дразним Yahoo
 
-    print(f"[screener] технически филтър: {len(survivors)} оцелели")
+    before = len(survivors)
+    survivors = apply_rs_rating(survivors, rs_scores)          # т.9: втори проход — RS перцентил в универса
+    print(f"[screener] технически филтър: {before} оцелели, {len(survivors)} с RS rating "
+          f">= {config.RS_RATING_MIN:g} ({len(rs_scores)} тикъра в универса за перцентила)")
     return survivors
+
+
+def trend_template_checks(price: float, ma50: float, ma150: float, ma200: float, *,
+                          ma150_prev: float, ma200_prev: float,
+                          high52: float, low52: float) -> dict[str, bool]:
+    """
+    Пакет 1, т.9 (2026-10-03): Weinstein Stage 2 + Minervini trend template — чиста функция
+    върху числа. Първите две проверки са старата Stage 2 (цена над покачваща се 30-седмична
+    MA); останалите са критериите на Минервини. RS rating-ът (т.8 на шаблона) не е тук —
+    изисква целия универс, виж apply_rs_rating().
+    """
+    return {
+        "stage2_price_above_ma150": price > ma150,
+        "stage2_ma150_rising": ma150 > ma150_prev,
+        "price_above_ma200": price > ma200,
+        "ma150_above_ma200": ma150 > ma200,
+        "ma200_rising": ma200 > ma200_prev,
+        "ma50_above_ma150_ma200": ma50 > ma150 and ma50 > ma200,
+        "price_above_ma50": price > ma50,
+        "above_52w_low": price >= low52 * (1 + config.TT_MIN_ABOVE_52W_LOW_PCT / 100),
+        "near_52w_high": price >= high52 * (1 - config.TT_MAX_BELOW_52W_HIGH_PCT / 100),
+    }
+
+
+def rs_score(close: pd.Series) -> float | None:
+    """
+    Претеглена 12-месечна доходност: 40% последното тримесечие + по 20% за всяко от трите
+    преди него (тримесечие = config.RS_QUARTER_BARS сесии). None при недостатъчна история
+    или невалидни цени.
+    """
+    q = config.RS_QUARTER_BARS
+    if close is None or len(close) < 4 * q + 1:
+        return None
+    c = close.to_numpy(dtype=float)
+    pts = [c[-1 - k * q] for k in range(5)]
+    if any(x != x or x <= 0 for x in pts):
+        return None
+    rets = [pts[i] / pts[i + 1] - 1 for i in range(4)]
+    return float(sum(w * r for w, r in zip(config.RS_RATING_WEIGHTS, rets)))
+
+
+def rs_ratings(scores: dict[str, float]) -> dict[str, int]:
+    """
+    Перцентил (1–100) на rs_score в целия универс: ранг × 100 / N, закръглен НАДОЛУ (рейтинг
+    70 = поне 70% от универса са на или под този тикър), със средния ранг при равни
+    стойности. Целочислена аритметика — граничните стойности не зависят от float шум.
+    """
+    s = pd.Series(scores, dtype=float).dropna()
+    if s.empty:
+        return {}
+    n = len(s)
+    return {k: max(1, int(v * 100 / n + 1e-9)) for k, v in s.rank(method="average").items()}
+
+
+def apply_rs_rating(rows: list[dict], scores: dict[str, float]) -> list[dict]:
+    """
+    Слага row["rs_rating"] (перцентил в универса) и — при TREND_TEMPLATE_ENABLED — маха
+    редовете под RS_RATING_MIN. Универс под RS_RATING_MIN_UNIVERSE тикъра с данни →
+    рейтингът не е надежден: не се смята, филтърът се пропуска, предупреждение в лога.
+    """
+    if len(scores) < config.RS_RATING_MIN_UNIVERSE:
+        print(f"[screener] ⚠ RS rating: само {len(scores)} тикъра с история "
+              f"(< {config.RS_RATING_MIN_UNIVERSE}) — рейтингът не е надежден, филтърът е пропуснат")
+        for r in rows:
+            r["rs_rating"] = None
+        return rows
+    ratings = rs_ratings(scores)
+    out = []
+    for r in rows:
+        r["rs_rating"] = ratings.get(r["ticker"])
+        if config.TREND_TEMPLATE_ENABLED and (r["rs_rating"] is None or r["rs_rating"] < config.RS_RATING_MIN):
+            continue
+        out.append(r)
+    return out
 
 
 def compute_pivot(high: pd.Series) -> float:
@@ -109,10 +192,24 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     if price < config.MIN_PRICE:
         return None
 
-    # ── Weinstein Stage 2: цена над покачваща се 30-седмична MA ──────────
-    ma30w = close.rolling(config.WEINSTEIN_MA_WEEKS * 5).mean()
-    ma30w_now, ma30w_prev = float(ma30w.iloc[-1]), float(ma30w.iloc[-21])
-    if not (price > ma30w_now and ma30w_now > ma30w_prev):
+    # ── Weinstein Stage 2 + Minervini trend template (пакет 1, т.9) ──────
+    # Една обща проверка: Stage 2 (цена над покачваща се 30-седмична MA = 150 сесии) е
+    # първата част на шаблона, не отделен филтър; шаблонът добавя 200DMA, 50DMA и
+    # позицията в 52-седмичния диапазон. RS rating (перцентил в целия универс) се
+    # прилага след първия проход — виж technical_screen / apply_rs_rating.
+    ma150 = close.rolling(config.WEINSTEIN_MA_WEEKS * 5).mean()
+    ma50_s = close.rolling(50).mean()
+    ma200_s = close.rolling(200).mean()
+    low52 = float(df["Low"].iloc[-252:].min())
+    high52 = float(high.iloc[-252:].max())
+    tt = trend_template_checks(
+        price, float(ma50_s.iloc[-1]), float(ma150.iloc[-1]), float(ma200_s.iloc[-1]),
+        ma150_prev=float(ma150.iloc[-21]),
+        ma200_prev=float(ma200_s.iloc[-1 - config.TT_MA200_RISING_BARS]),
+        high52=high52, low52=low52)
+    required = list(tt) if config.TREND_TEMPLATE_ENABLED else [
+        "stage2_price_above_ma150", "stage2_ma150_rising"]      # изключен шаблон = само старата Stage 2
+    if not all(tt[k] for k in required):
         return None
 
     # ── RS Line: на или близо до 52-седмичен максимум (рамките 3%) ───────
@@ -153,8 +250,8 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     vol_ratio = last_vol / avg_vol_50 if avg_vol_50 else 0
     breakout_volume = vol_ratio >= config.BREAKOUT_VOLUME_MULT
 
-    ma50 = float(close.rolling(50).mean().iloc[-1])
-    ma200 = float(close.rolling(200).mean().iloc[-1])
+    ma50 = float(ma50_s.iloc[-1])
+    ma200 = float(ma200_s.iloc[-1])
 
     # FIX 2026-10-03 (пакет 1, т.3): структурен low = най-ниският Low на последните
     # STOP_STRUCT_LOOKBACK_BARS бара (сигналният бар е включен) — основата на стопа
@@ -174,6 +271,11 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
         "volume_ratio": round(vol_ratio, 2), "breakout_volume": breakout_volume,
         "base_low": round(base_low, 2),
         "struct_low": round(struct_low, 2),
+        # т.9: позицията в 52-седмичния диапазон (за показване); rs_score/rs_rating се слагат
+        # във втория проход на technical_screen
+        "pct_above_52w_low": round((price / low52 - 1) * 100, 1),
+        "pct_below_52w_high": round((1 - price / high52) * 100, 1),
+        "trend_template_applied": config.TREND_TEMPLATE_ENABLED,
     }
 
 

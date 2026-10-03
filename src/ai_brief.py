@@ -789,7 +789,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         slim.append({k: c.get(k) for k in (
             "ticker", "company", "sector", "industry", "business_summary",
             "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
-            "rs_status", "volume_ratio", "breakout_volume",
+            "rs_status", "rs_rating", "volume_ratio", "breakout_volume",
             "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
             "inst_ownership_pct", "analyst_target")})
         slim[-1]["earnings"] = c.get("earnings")

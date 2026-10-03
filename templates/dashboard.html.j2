@@ -110,6 +110,7 @@
   .watch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
   .watch-card .ticker { font-size: 17px; color: var(--yellow); }
   .watch-card p { font-size: 13px; margin-top: 8px; color: var(--text); }
+  .rs-badge { font-size: 11px; color: var(--muted); margin-left: 8px; white-space: nowrap; }
   .buy-stop { font-size: 12.5px; font-weight: 600; color: var(--green); margin-top: 6px; }
   .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
     border-top: 1px dotted var(--line); padding-top: 8px; }
@@ -715,6 +716,9 @@
         <div class="kv"><span>Формация</span><b>{{ st.base_type }} ({{ st.base_depth_pct }}%)</b></div>
         <div class="kv"><span>Weinstein Stage</span><b>{{ st.weinstein_stage }}</b></div>
         <div class="kv"><span>RS Line</span><b>{{ "нов максимум" if st.rs_status == "new_high" else "близо до максимум" }}</b></div>
+        {# FIX 2026-10-03 (пакет 1, т.9): RS rating = перцентил на претеглената 12-месечна доходност в универса #}
+        {% if st.rs_rating is not none and st.rs_rating is defined %}<div class="kv"><span>RS rating (перцентил)</span><b>{{ st.rs_rating }}</b></div>{% endif %}
+        {% if st.pct_above_52w_low is defined %}<div class="kv"><span>52-седмичен диапазон</span><b>+{{ st.pct_above_52w_low }}% над дъното · −{{ st.pct_below_52w_high }}% под върха</b></div>{% endif %}
         <div class="kv"><span>50DMA / 200DMA</span><b>${{ st.ma50 }} / ${{ st.ma200 }}</b></div>
         <div class="kv"><span>Обем (vs 50d avg)</span><b>{{ st.volume_ratio }}x{{ " ✓ пробивен" if st.breakout_volume else "" }}</b></div>
         {% if st.entry_timing %}
@@ -782,6 +786,7 @@
     <div class="watch-card">
       <span class="ticker">{{ st.ticker }}</span>
       <span class="company">{{ st.company }}</span>
+      {% if st.rs_rating is defined and st.rs_rating is not none %}<span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS {{ st.rs_rating }}</span>{% endif %}
       {% if st.markers %}<span class="markers">{% for m in st.markers %}<span class="marker" title="{{ m.title }}">{{ m.tag }}</span>{% endfor %}</span>{% endif %}
       {# FIX 2026-09-23: маркерът RE-ENTRY пътува и до Watchlist картите
          (слага се в apply_hard_rules ПРЕДИ класификацията), но обясняващият ред
