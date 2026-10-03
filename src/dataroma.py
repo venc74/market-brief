@@ -292,6 +292,38 @@ def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
     return agg
 
 
+# Пакет 4а т.9 (2026-10-03): мащабът на стойностите в 13F information table. Правилото на SEC: филинг, подаден
+# на или след 2023-01-03, е в ДОЛАРИ; по-стар — в ХИЛЯДИ. Старата евристика гледаше само размера на най-голямата
+# позиция ("под 1e7 → хиляди"): за малък фонд в долари (най-голяма позиция под $10M, т.е. портфейл под ~$30–50M)
+# вдигаше всичко 1000 пъти ($8M → $8 млрд) и пробиваше $-прага; обратно — голям фонд в хиляди минаваше за
+# долари. Сега: (1) датата на филинга; (2) независима проверка — медианната "цена" стойност/акции: в долари е
+# десетки/стотици $, в хиляди е стотни. При разминаване печели цената (филъри, които не спазват правилото),
+# стига да има поне _MIN_PRICED позиции за медиана.
+_DOLLARS_SINCE = dt.date(2023, 1, 3)
+_MIN_PRICED = 5
+_THOUSANDS_BELOW_PRICE = 1.0
+
+
+def _value_scale(agg: dict[str, dict], filing_date: str | None) -> tuple[int, str]:
+    """(множител към долари, основание) за ЕДИН филинг — виж коментара по-горе."""
+    by_date = None
+    if filing_date:
+        try:
+            by_date = 1 if dt.date.fromisoformat(str(filing_date)[:10]) >= _DOLLARS_SINCE else 1000
+        except ValueError:
+            by_date = None
+    prices = sorted(a["value"] / a["shares"] for a in agg.values() if a.get("shares", 0) > 0 and a.get("value", 0) > 0)
+    by_price = None
+    if len(prices) >= _MIN_PRICED:
+        median = prices[len(prices) // 2] if len(prices) % 2 else (prices[len(prices) // 2 - 1] + prices[len(prices) // 2]) / 2
+        by_price = 1000 if median < _THOUSANDS_BELOW_PRICE else 1
+    if by_price is not None:
+        return by_price, "price" if by_date in (None, by_price) else "price_override"
+    if by_date is not None:
+        return by_date, "date"
+    return 1, "default_dollars"                 # без дата и без достатъчно позиции: след 2023 е в долари
+
+
 def _manager_snapshot(cik: str, name: str) -> dict:
     """
     FIX 2026-08-17: единствен fetch на последните 2 13F-HR filings за
@@ -330,28 +362,27 @@ def _manager_snapshot(cik: str, name: str) -> dict:
         return {"manager": name, "cik": cik, "filing_status": filing_status,
                 "period": period, "last_filing_date": fdate, "days_since_filing": days_since}
     current_agg = _aggregate_by_cusip(holdings)
-    # 13F стойностите след 2023 са в долари; преди — в хиляди. Евристика:
-    mx = max((a["value"] for a in current_agg.values()), default=0)
-    cur_scale = 1000 if mx and mx < 1e7 else 1
+    cur_scale, cur_basis = _value_scale(current_agg, fdate)        # т.9: дата на филинга + проверка по цена/акция
     current_total = sum(a["value"] for a in current_agg.values()) * cur_scale
 
     prev_agg: dict[str, dict] = {}
     prev_scale = 1
+    prev_basis = None
     prev_total = 0.0
     if len(filings) >= 2:
-        prev_acc, _ = filings[1]
+        prev_acc, prev_fdate = filings[1]
         prev_holdings = _info_table(cik, prev_acc)
         if prev_holdings:
             prev_agg = _aggregate_by_cusip(prev_holdings)
-            pmx = max((a["value"] for a in prev_agg.values()), default=0)
-            prev_scale = 1000 if pmx and pmx < 1e7 else 1
+            prev_scale, prev_basis = _value_scale(prev_agg, prev_fdate)
             prev_total = sum(a["value"] for a in prev_agg.values()) * prev_scale
 
     return {
         "manager": name, "cik": cik, "filing_status": filing_status,
         "period": period, "last_filing_date": fdate, "days_since_filing": days_since,
-        "current_agg": current_agg, "current_scale": cur_scale, "current_total": current_total,
-        "prev_agg": prev_agg, "prev_scale": prev_scale, "prev_total": prev_total,
+        "current_agg": current_agg, "current_scale": cur_scale, "current_scale_basis": cur_basis,
+        "current_total": current_total,
+        "prev_agg": prev_agg, "prev_scale": prev_scale, "prev_scale_basis": prev_basis, "prev_total": prev_total,
     }
 
 
