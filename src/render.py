@@ -24,6 +24,28 @@ env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
                   autoescape=True)
 
 
+def berlin_clock(now: dt.datetime | None = None) -> tuple[str, str]:
+    """
+    ("HH:MM", "CET"|"CEST") по берлинско време.
+
+    FIX 2026-10-03 (пакет 2 т.8): страницата казваше "генериран HH:MM CET", но `dt.datetime.now()` е времето на машината —
+    на GitHub runner-а UTC (в 79-те архивни страници: 68 са "05:xx CET", а реално е 07:xx CEST), при локално пускане —
+    местното. Сега винаги Europe/Berlin, със сезонния етикет (CET зимата, CEST лятото). Ако няма tz база данни
+    (zoneinfo без tzdata) — честен резервен вариант: UTC с етикет "UTC", не грешно "CET".
+    `now` — за тестове; наивно време се счита за UTC.
+    """
+    now = now or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=dt.timezone.utc)
+    try:
+        from zoneinfo import ZoneInfo
+        local = now.astimezone(ZoneInfo("Europe/Berlin"))
+        return local.strftime("%H:%M"), local.tzname() or "CET"
+    except Exception as e:
+        print(f"[render] Europe/Berlin недостъпна ({type(e).__name__}) — часът е в UTC")
+        return now.astimezone(dt.timezone.utc).strftime("%H:%M"), "UTC"
+
+
 def _e(x) -> str:
     """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
     return _html.escape("" if x is None else str(x), quote=True)
@@ -73,9 +95,11 @@ def _publish_history(brief: dict) -> None:
 def render_dashboard(brief: dict) -> str:
     today = dt.date.today()
     tpl = env.get_template("dashboard.html.j2")
+    gen_time, gen_tz = berlin_clock()                      # един вик — часът и етикетът са от един и същи момент
     html = tpl.render(
         date_human=f"{today.strftime('%d.%m.%Y')}, {WEEKDAYS_BG[today.weekday()]}",
-        generated_at=dt.datetime.now().strftime("%H:%M"),
+        generated_at=gen_time,
+        generated_tz=gen_tz,
         regime=brief["thermometer"]["regime"],
         regime_reason=brief["thermometer"]["regime_reason"],
         thermometer=brief["thermometer"],
