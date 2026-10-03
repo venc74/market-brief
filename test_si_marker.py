@@ -59,7 +59,7 @@ print()
 print("── dashboard: секцията я няма; маркерът е на Action, Watchlist и v2 позициите ──")
 def cand(t, cls):
     return {"ticker": t, "company": t + " Corp", "sector": "Tech", "price": 100.0, "pivot": 99.0, "pct_from_pivot": 1.0,
-            "base_type": "flat base", "base_depth_pct": 10.0, "weinstein_stage": 2, "rs_status": "new_high", "ma50": 90.0, "ma200": 80.0,
+            "base_type": "база 10.0% дълбочина", "base_depth_pct": 10.0, "weinstein_stage": 2, "rs_status": "new_high", "ma50": 90.0, "ma200": 80.0,
             "volume_ratio": 2.0, "breakout_volume": True, "eps_growth_yoy": 30, "revenue_growth_yoy": 25, "roe": 20, "inst_ownership_pct": 70,
             "earnings": {}, "options": {}, "short_view": {}, "markers": [mk[t]] if t in mk else [],
             "ai": {"classification": cls, "why_now": "тест", "catalysts": [], "risks": [], "watchlist_trigger": "тест"},

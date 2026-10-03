@@ -66,7 +66,7 @@ def mock_stock(ticker, sector, cls, **over):
     base = {
         "ticker": ticker, "company": f"{ticker} Corp", "sector": sector,
         "industry": "Semiconductors", "price": 146.20, "pivot": 145.00,
-        "pct_from_pivot": 0.83, "base_type": "flat base", "base_depth_pct": 11.2,
+        "pct_from_pivot": 0.83, "base_type": "база 11.2% дълбочина", "base_depth_pct": 11.2,
         "weinstein_stage": 2, "rs_status": "new_high",
         "ma50": 134.20, "ma200": 118.50, "base_low": 128.80, "struct_low": 138.00,
         "avg_volume_50d": 4_200_000, "volume_ratio": 1.8, "breakout_volume": True,
@@ -92,7 +92,7 @@ def mock_stock(ticker, sector, cls, **over):
 candidates = [
     mock_stock("AVGT", "Technology", "Action"),
     mock_stock("ENRX", "Energy", "Action", price=59.60, pivot=59.00, pct_from_pivot=1.02, struct_low=56.00,
-               base_type="cup with handle", base_low=49.10, ma50=54.30, ma200=47.80),
+               base_type="база 18.4% дълбочина", base_low=49.10, ma50=54.30, ma200=47.80),
     mock_stock("TECB", "Technology", "Action", price=90.40, pivot=89.50, pct_from_pivot=1.01, struct_low=85.00, base_low=78.40, ma50=83.10, ma200=72.00),
     mock_stock("TECC", "Technology", "Action", price=32.10, pivot=31.80, pct_from_pivot=0.94, struct_low=30.20, base_low=27.50, ma50=29.40, ma200=25.10),  # 3-ти tech → правилото го реже
     mock_stock("WTCH", "Healthcare", "Watchlist", price=72.10, pivot=76.00, pct_from_pivot=-5.1, struct_low=70.00),

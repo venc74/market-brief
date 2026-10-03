@@ -710,6 +710,10 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
 {trigger_block}
 
+Полето "base_type" е само ДЪЛБОЧИНАТА на 13-седмичната база ("база X% дълбочина") — кодът не \
+разпознава формация. НЕ наричай базата "cup with handle", "flat base", "VCP" или друга формация и не \
+извеждай форма от дълбочината; ако говориш за базата, цитирай само дълбочината.
+
 За ВСЕКИ кандидат върни обект:
 - "ticker"
 - "why_now": конкретната верига макро → сектор → тази акция. Ако няма реална \

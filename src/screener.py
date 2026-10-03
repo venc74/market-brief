@@ -240,9 +240,10 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     depth = (base_high - base_low) / base_high * 100
     if depth > 35:                                      # счупена структура
         return None
-    base_type = ("flat base" if depth <= 15
-                 else "cup with handle" if depth <= 30
-                 else "deep base")
+    # 2026-10-03 (пакет 4а т.6): кодът мери САМО дълбочина (връх − най-ниско затваряне за 13 седмици),
+    # не разпознава форма — затова етикетът е честното "база X% дълбочина", не "cup with handle"/
+    # "flat base" (прагове 15/30 нямаха връзка с реалната формация).
+    base_type = f"база {depth:.1f}% дълбочина"
 
     # ── Обем ─────────────────────────────────────────────────────────────
     avg_vol_50 = float(volume.iloc[-50:].mean())
