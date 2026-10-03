@@ -21,7 +21,13 @@
 фаза "trailing" и излиза при Close под TRAIL_SMA_DAYS-дневната средна. Първоначалният
 стоп остава активен и в trailing; в един и същ бар стопът се проверява ПЪРВИ (консервативно).
 R = дял × (цена на частичната − вход) / риск + (1 − дял) × (изход на остатъка − вход) / риск.
-Изтичане (до т.5 — като досега във v1): след BACKTEST_MAX_HOLD_WEEKS от входа.
+Гап през стопа (т.5): на бар СЛЕД входния, който отваря на или под стопа, изходът е по
+отварянето (min(Open, стоп) — загубата може да е над 1R); ако стопът е ударен вътре в бара,
+изходът е на стоп-цената. На входния ден — винаги на стоп-цената (редът на ценовите
+събития в бара е неизвестен).
+Изтичане (т.5): BACKTEST_MAX_HOLD_WEEKS след ВХОДА; позицията се оценява по последния Close
+(mark-to-market, претеглен с частичната продажба) — "expired" / "expired_in_trail" вече
+носят R и влизат в статистиката (преди "expired" беше без R и невидим за win rate).
 """
 from __future__ import annotations
 import datetime as dt
@@ -110,6 +116,9 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
     for j in range(fi, n):
         if idx[j] > exp_date:
             break
+        if j > fi and o[j] <= stop:                          # т.5: гап през стопа → по отварянето
+            status, exit_px, exit_j = "stopped", o[j], j
+            break
         if l[j] <= stop:                                     # стопът е активен и след частичната; първи в бара
             status, exit_px, exit_j = "stopped", stop, j
             break
@@ -141,12 +150,11 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
             out["status"] = state                              # "open" | "trailing" — още жива
             return out
         status = "expired_in_trail" if state == "trailing" else "expired"
-        out.update(status=status, resolution_date=exp_date.date().isoformat())
-        if status == "expired_in_trail":
-            out.update(exit_date=idx[last].date().isoformat(), exit_price=round(float(c[last]), 4),
-                       R=weighted_r(c[last]))
-            out["realized_r"] = round(out["R"], 2)
-        return out                                             # "expired" във фаза 1 → без R
+        out.update(status=status, resolution_date=exp_date.date().isoformat(),
+                   exit_date=idx[last].date().isoformat(), exit_price=round(float(c[last]), 4),
+                   R=weighted_r(c[last]))                      # т.5: mark-to-market и във фаза 1
+        out["realized_r"] = round(out["R"], 2)
+        return out
 
     out.update(status=status, exit_date=idx[exit_j].date().isoformat(), exit_price=round(float(exit_px), 4),
                resolution_date=idx[exit_j].date().isoformat(), R=weighted_r(exit_px))

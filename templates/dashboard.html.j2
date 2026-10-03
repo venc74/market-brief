@@ -1065,7 +1065,7 @@
     <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
     {{ backtest.stopped }} стоп{% if backtest.stopped_after_partial %} (от тях {{ backtest.stopped_after_partial }} след частична продажба){% endif %}
     / {{ backtest.trailing_stop_exit }} trailing-exit / {{ backtest.expired_in_trail }} expired-in-trail
-    / {{ backtest.expired }} expired (цел 1 недостигната)<br>
+    / {{ backtest.expired }} expired (оценени по последния Close, mark-to-market)<br>
     {# FIX 2026-10-03 (пакет 1, т.4): 50% се продава на цел 1 (2R), остатъкът е в trailing #}
     Все още отворени: {{ backtest.still_open }} (преди цел 1) + {{ backtest.trailing }} (след частична продажба на цел 1, trailing)<br>
     {# FIX 2026-10-03 (пакет 1, т.2): buy-stop входове — не са позиции и не влизат в статистиката #}

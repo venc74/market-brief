@@ -141,7 +141,7 @@ print("  ✓ резолвирани 2 (not_triggered/pending не са в win ra
 print("    препоръка 25.09) и цена $59.72, 1 pending в отделен списък")
 print()
 
-print("── обобщение: частична продажба (т.4) — СИНТЕТИЧНИ записи ──")
+print("── обобщение: частична продажба (т.4) и изтичане с R (т.5) — СИНТЕТИЧНИ записи ──")
 def synth(key, status, r, partial=None, **kw):
     rec = backtest._new_v2_record("EXEL", key, PLANS["2026-09-25"])
     rec.update(status=status, realized_r=r, partial_price=partial, partial_fraction=0.5 if partial else 0.0,
@@ -151,14 +151,15 @@ backtest._save_tracker({
     "EXEL_2026-01-05": synth("2026-01-05", "stopped", 0.5, 116.0),                   # частична + стоп на остатъка
     "EXEL_2026-02-02": synth("2026-02-02", "trailing_stop_exit", 1.06, 116.0),
     "EXEL_2026-03-02": synth("2026-03-02", "stopped", -1.0),
+    "EXEL_2026-05-04": synth("2026-05-04", "expired", 0.24),                          # т.5: изтекла, оценена по Close
     "EXEL_2026-04-06": synth("2026-04-06", "trailing", None, 116.0),                  # жива, след частична
 })
 sm2 = backtest.get_backtest_summary()
-assert sm2["total_resolved"] == 3 and sm2["wins"] == 2 and sm2["losses"] == 1 and sm2["win_rate_pct"] == 66.7
-assert sm2["avg_realized_r"] == 0.19 and sm2["stopped"] == 2 and sm2["stopped_after_partial"] == 1
+assert sm2["total_resolved"] == 4 and sm2["wins"] == 3 and sm2["losses"] == 1 and sm2["win_rate_pct"] == 75.0
+assert sm2["avg_realized_r"] == 0.2 and sm2["stopped"] == 2 and sm2["stopped_after_partial"] == 1 and sm2["expired"] == 1
 assert sm2["partial_taken"] == 3 and sm2["trailing"] == 1
-print("  ✓ 'stopped' след частична = +0.50R (печалба по R): 2 от 3 резолвирани са win (66.7%), среден R +0.19,")
-print("    1 стоп е след частична продажба, 3 позиции са минали през частична, 1 е жива в trailing")
+print("  ✓ 'stopped' след частична = +0.50R (печалба по R); изтеклата позиция е със своя R (+0.24) и ВЛИЗА в статистиката:")
+print("    3 от 4 резолвирани са win (75.0%), среден R +0.20; 1 стоп е след частична, 3 са минали през частична, 1 е жива")
 print()
 
 print("── OPEN✓ и COT позиции: датата на входа, не на препоръката; pending не е позиция ──")

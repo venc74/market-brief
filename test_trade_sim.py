@@ -79,7 +79,7 @@ assert sim(dict(PLAN, stop_loss=101.0), mk([(98, 100.0, 97, 99)]))["status"] == 
 print("  ✓ стоп ≥ цената на входа → invalid_risk")
 print()
 
-print("── СИНТЕТИЧНО: изход след входа (т.4 — частична продажба на цел 1; т.5 още не) ──")
+print("── СИНТЕТИЧНО: изход след входа (т.4 частична продажба · т.5 гап през стопа и изтичане) ──")
 # стоп на входния ден (гап вход + Low под стопа) → -1R на стоп-цената
 r = sim(PLAN, mk([(100.5, 101, 91.0, 95)]))
 assert (r["status"], r["exit_price"], r["realized_r"]) == ("stopped", 92.0, -1.0), r
@@ -87,6 +87,22 @@ assert (r["status"], r["exit_price"], r["realized_r"]) == ("stopped", 92.0, -1.0
 r = sim(PLAN, mk([(99, 101, 98, 100), (99, 100, 91.5, 95)]))
 assert (r["status"], r["exit_date"], r["realized_r"]) == ("stopped", "2026-03-03", -1.0), r
 print("  ✓ стоп на входния ден и по-късно = -1.00R (цялата позиция)")
+
+# т.5: гап през стопа → изход по отварянето (загуба над 1R); отваряне ТОЧНО на стопа и вътре в бара → по стопа
+r = sim(PLAN, mk([(99, 101, 98, 100), (90.0, 91, 89, 90.5)]))
+assert (r["status"], r["exit_price"], r["realized_r"]) == ("stopped", 90.0, -1.25), r          # (90-100)/8
+r = sim(PLAN, mk([(99, 101, 98, 100), (92.0, 93, 90, 91)]))
+assert (r["exit_price"], r["realized_r"]) == (92.0, -1.0), r
+r = sim(PLAN, mk([(99, 101, 98, 100), (92.01, 93, 91, 92)]))
+assert (r["exit_price"], r["realized_r"]) == (92.0, -1.0), r
+# гап през стопа СЛЕД частична продажба: 0.5×(+2.0) + 0.5×(88-100)/8
+r = sim(PLAN, mk([(99, 101, 98, 100), (100, 117, 99, 115), (88.0, 89, 87, 88.5)]))
+assert (r["exit_price"], r["realized_r"]) == (88.0, round(0.5 * 2.0 + 0.5 * (88 - 100) / 8, 2)) and r["realized_r"] == 0.25, r
+# на ВХОДНИЯ ден редът на събитията е неизвестен → винаги по стоп-цената, не по отварянето
+r = sim(PLAN, mk([(100.5, 101, 85.0, 95)]))
+assert (r["exit_price"], r["realized_r"]) == (92.0, -1.0), r
+print("  ✓ гап под стопа на по-късен бар → по Open $90 = -1.25R (над 1R); Open точно $92.00 и вътре в бара → по стопа;")
+print("    след частична продажба: +0.25R; на входния ден → по стоп-цената")
 
 # цел → 50% се продава на $116 (2R), остатъкът → trailing → излиза при Close под 10DMA
 rows = [(99, 101, 98, 100)]                                            # вход 100.0 (риск 8)
@@ -130,20 +146,24 @@ config.TARGET_PARTIAL_FRACTION = orig_frac
 assert r["status"] == "trailing_stop_exit" and r["realized_r"] == round((101.0 - 100.0) / 8.0, 2) == 0.12, r
 print("  ✓ TARGET_PARTIAL_FRACTION = 0 → цялата позиция се пази до trailing изхода (+0.12R)")
 
-# изтичане (т.5 още не: фаза 1 → expired без R; фаза 2 → expired_in_trail с претеглен R) и календарен срок
+# изтичане (т.5): mark-to-market и във фаза 1; фаза 2 → претеглен R; календарен срок
 weeks = config.BACKTEST_MAX_HOLD_WEEKS
-long_open = mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * (weeks * 5 + 8))
+long_open = mk([(99, 101, 98, 100)] + [(100, 104, 98, 102)] * (weeks * 5 + 8))
 r = sim(PLAN, long_open)
-assert r["status"] == "expired" and r["realized_r"] is None and r["resolution_date"] == "2026-06-22", r   # 02.03 + 16 седмици
+assert r["status"] == "expired" and r["resolution_date"] == "2026-06-22", r            # 02.03 + 16 седмици
+assert (r["exit_date"], r["exit_price"], r["realized_r"]) == ("2026-06-22", 102.0, 0.25), r   # т.5: mark-to-market (102-100)/8
+r = sim(PLAN, mk([(99, 101, 98, 100)] + [(97, 98, 94, 96)] * (weeks * 5 + 8)))
+assert r["status"] == "expired" and r["realized_r"] == -0.5, r                          # под водата: (96-100)/8
 rows = [(99, 101, 98, 100)] + [(100 + i * 0.5, 117 + i * 0.5, 99, 101 + i * 0.5) for i in range(weeks * 5 + 8)]
 r = sim(PLAN, mk(rows))
 assert r["status"] == "expired_in_trail" and r["resolution_date"] == "2026-06-22" and r["partial_price"] == 116.0, r
 assert r["realized_r"] == round(0.5 * 2.0 + 0.5 * (r["exit_price"] - 100.0) / 8.0, 2), r
 r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-23")   # данните свършват рано, срокът е минал
-assert r["status"] == "expired", r
+assert r["status"] == "expired" and r["exit_date"] == "2026-03-16" and r["realized_r"] == 0.12, r     # по последния наличен Close
 r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-22")   # на самия срок още не е изтекла
 assert r["status"] == "open", r
-print("  ✓ изтичане 16 седмици след входа: фаза 1 → expired (без R), фаза 2 → expired_in_trail (претеглен R); срокът важи и по календар")
+print("  ✓ изтичане 16 седмици след входа → mark-to-market по последния Close: expired +0.25R / -0.50R (преди: без R),")
+print("    expired_in_trail с претеглен R; срокът важи и по календар")
 print()
 
 print("── РЕАЛНИ барове на EXEL (tests/fixtures) ──")
