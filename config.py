@@ -385,7 +385,7 @@ DATAROMA_MAJOR_EXIT_PCT = float(os.getenv("DATAROMA_MAJOR_EXIT_PCT", 10.0))
 # >280 дни към 2026-08-17) да остане незасечен.
 DATAROMA_STALE_FILER_DAYS = int(os.getenv("DATAROMA_STALE_FILER_DAYS", 165))
 # CIK номера — виж DATAROMA_CIK по-долу (Секция EDGAR 13F) за пълния,
-# верифициран списък от 16 мениджъра. DATAROMA_MANAGERS (dataroma.com URL
+# верифициран списък от 15 мениджъра. DATAROMA_MANAGERS (dataroma.com URL
 # кодове) премахнат 2026-08-17 — беше практически мъртъв fallback код
 # (стигаше се до него само ако EDGAR върнеше 0 за ВСИЧКИ CIK-ове едновременно)
 # в ДРУГА ID система от CIK, синхронизирането му би удвоило поддръжката за
@@ -563,13 +563,18 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT = float(
 EDGAR_UA = os.getenv("EDGAR_UA", "market-brief-bot (contact via GitHub repo)")
 # CIK номера — верифицирани directamente през data.sec.gov/submissions
 # (не по име само — вижте FIX бележките, две грешки хванати точно така).
-# 16 мениджъра общо. Ключ = CIK (10 цифри, нулево-допълнен), стойност = име.
+# 15 мениджъра общо. Ключ = CIK (10 цифри, нулево-допълнен), стойност = име.
+#
+# 2026-10-03: Майкъл Бъри / Scion Asset Management (CIK 0001649339) е махнат от списъка —
+# фондът е закрит (последен filing 2025-11-03), т.е. нямаше какво да се чете. Механизмът за
+# мениджъри, спрели да подават 13F (DATAROMA_STALE_FILER_DAYS → "stopped" → отделен ред във
+# "Major Position Exits"), е непроменен и важи за всеки бъдещ спрял мениджър.
 #
 # FIX 2026-08-17: старият Klarman CIK (0001061219) сочеше към ENTERPRISE
 # PRODUCTS PARTNERS L.P. — напълно различна компания, никога не е бил Baupost.
 # Верен CIK: 0001061768 (BAUPOST GROUP LLC/MA).
 #
-# FIX 2026-08-17: Разширяване от 5 на 16 мениджъра. Първите по име съвпадения
+# FIX 2026-08-17: Разширяване от 5 на 16 мениджъра (15 след махането на Scion на 2026-10-03). Първите по име съвпадения
 # за Tepper/Appaloosa, Marks/Oaktree, Armitage/Egerton и Pabrai бяха ОТДАВНА
 # НЕАКТИВНИ entity-та (фирмите преминават към нови SEC filing CIK-ове с
 # годините — последен filing 2016/2011/2013/2012 съответно) — наложи се
@@ -577,7 +582,6 @@ EDGAR_UA = os.getenv("EDGAR_UA", "market-brief-bot (contact via GitHub repo)")
 # filing entity се оказа "Dalal Street, LLC", не "Pabrai"/"Pabrai Investments".
 DATAROMA_CIK = {
     "0001067983": "Уорън Бъфет · Berkshire Hathaway",
-    "0001649339": "Майкъл Бъри · Scion Asset Management",  # filing_status="stopped" очаквано — фондът закрит 2025
     "0001336528": "Бил Акман · Pershing Square",
     "0001061768": "Сет Кларман · Baupost Group",
     "0001536411": "Стенли Дракенмилър · Duquesne Family Office",

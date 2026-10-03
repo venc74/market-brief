@@ -1,5 +1,5 @@
 """
-Допълнение към v2 — Superinvestor сигнали от SEC EDGAR 13F-HR (16 мениджъра,
+Допълнение към v2 — Superinvestor сигнали от SEC EDGAR 13F-HR (15 мениджъра,
 config.DATAROMA_CIK). Три отделни, но споделящи данни изхода (виж _fetch_all
 + _manager_snapshot по-долу — ЕДИН fetch на 13F данни на мениджър, консумиран
 от трите):
