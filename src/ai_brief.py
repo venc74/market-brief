@@ -721,9 +721,10 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
 - "classification": "Action" или "Watchlist". pivot = най-високият High на базата БЕЗ \
 последните {config.PIVOT_EXCLUDE_LAST_BARS} бара. Полето "setup" е изчислено от кода: Action е \
 допустим САМО при "confirmed" (close над pivot, до +{config.BUYABLE_ZONE_MAX_PCT:g}% над него, обем ≥ \
-{config.BREAKOUT_VOLUME_MULT:g}× среден) — кодът връща във Watchlist всичко останало ("below_pivot" \
-= чака buy-stop пробив, "no_volume" = над pivot без обем, "extended" = над buyable zone), \
-независимо от твоята класификация; ти избираш най-силните сред "confirmed". Watchlist ако: \
+{config.BREAKOUT_VOLUME_MULT:g}× среден, структурен стоп ≤ {config.STOP_REJECT_STRUCT_RISK_PCT:g}% под входа) — \
+кодът връща във Watchlist всичко останало ("below_pivot" = чака buy-stop пробив, "no_volume" = над \
+pivot без обем, "extended" = над buyable zone, "too_wide" = твърде разтегнато, стопът е прекалено \
+далеч), независимо от твоята класификация; ти избираш най-силните сред "confirmed". Watchlist ако: \
 setup не е "confirmed", в earnings blackout, RS слабее, или секторът противоречи на режима.
 - "watchlist_reason_type": ако Watchlist — категория на причината: "regime_gate" \
 (чака конкретна промяна в пазарния режим ЗАЕДНО с цена/обем условие), \

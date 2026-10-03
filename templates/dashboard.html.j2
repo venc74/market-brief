@@ -736,13 +736,24 @@
         <div class="kv"><span>Препоръка</span><b>{{ st.ai.earnings_call }}</b></div>
         <div class="plan">
           <h3 style="color:var(--regime)">План · риск ${{ p.max_risk_usd|int }}{% if p.sizing_factor < 1 %} (Defensive ×{{ p.sizing_factor }}){% endif %}</h3>
+          {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
+             структурен стоп с процент, цел 1 е за половината позиция #}
+          {% if p.method == 'v2' %}
+          <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}</b></div>
+          <div class="kv"><span>Валиден до</span><b>{{ p.valid_through }} ({{ p.window_sessions }} сесии)</b></div>
+          {% else %}
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
-          <div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}</b></div>
+          {% endif %}
+          <div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>
           <div class="kv"><span>Брой акции</span><b>{{ p.shares }}</b></div>
           <div class="kv"><span>Инвестиция</span><b>${{ "{:,.0f}".format(p.total_investment) }} ({{ p.pct_of_portfolio }}%)</b></div>
-          <div class="kv"><span>Цел 1 (2:1)</span><b>${{ p.target_1 }}</b></div>
+          <div class="kv"><span>Цел 1 (2:1){% if p.method == 'v2' %} · 50%{% endif %}</span><b>${{ p.target_1 }}</b></div>
           <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">{{ p.target_2 }}</b></div>
           <div class="kv"><span>Хоризонт</span><b>{{ p.time_horizon }}</b></div>
+          {% if p.method == 'v2' %}
+          <div class="why" style="font-size:12px;color:var(--muted);margin-top:6px">Акциите са при вход ≈ ${{ p.entry_mid }}
+            (сигналният close); ако отвори по-високо, риск/акция = цена − ${{ p.stop_loss }} — преизчисли броя.</div>
+          {% endif %}
         </div>
       </div>
     </div>

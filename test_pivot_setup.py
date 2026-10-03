@@ -37,6 +37,15 @@ def row_at(sym, last_bar):
     return r
 
 
+def tight(r):
+    """
+    СИНТЕТИЧНО: реалният ред + тесен структурен low (5% под входа), за да остане т.1
+    (pivot/обем/extended) изолирана от стопа (т.3). Реалните struct_low стойности са
+    в test_stop_plan.py. Всички други полета (цена, pivot, обем) са РЕАЛНИ.
+    """
+    return {**r, "struct_low": round(max(r["price"], r["pivot"]) * 0.95, 2)}
+
+
 print("── compute_pivot (СИНТЕТИЧНО) ──")
 def series(n=120, base=100.0):
     return pd.Series([base] * n, dtype=float)
@@ -104,10 +113,10 @@ print("  ✓ 13.06 (събота) → 15,16,17,18,22.06 (19.06 празник); 
 print()
 
 print("── РЕАЛНИ примери през screener._evaluate_technicals + classify_setup ──")
-amd = row_at("AMD", "2026-09-21")
-twlo = row_at("TWLO", "2026-09-21")
-lnth = row_at("LNTH", "2026-06-26")
-exel = row_at("EXEL", "2026-06-26")
+amd = tight(row_at("AMD", "2026-09-21"))
+twlo = tight(row_at("TWLO", "2026-09-21"))
+lnth = tight(row_at("LNTH", "2026-06-26"))
+exel = tight(row_at("EXEL", "2026-06-26"))
 for name, r in (("AMD 22.09", amd), ("TWLO 22.09", twlo), ("LNTH 29.06", lnth), ("EXEL 29.06", exel)):
     print(f"  {name}: цена {r['price']} pivot {r['pivot']} ({r['pct_from_pivot']:+.2f}%) обем {r['volume_ratio']}× "
           f"→ {setup_rules.classify_setup(r, dt.date(2026, 9, 22))['kind']}")
@@ -148,7 +157,7 @@ def cand(r, sector, **kw):
 c_amd, c_twlo = cand(amd, "Technology"), cand(twlo, "Technology")
 c_lnth, c_exel = cand(lnth, "Healthcare"), cand(exel, "Healthcare")
 below = cand({**lnth, "ticker": "BELOW", "price": 105.0, "pivot": 107.99, "pct_from_pivot": -2.78,
-              "breakout_volume": False}, "Industrials")                    # СИНТЕТИЧЕН: под pivot
+              "breakout_volume": False, "struct_low": 100.0}, "Industrials")   # СИНТЕТИЧЕН: под pivot
 for c in (c_amd, c_twlo, c_lnth, c_exel, below):
     c["setup"] = setup_rules.classify_setup(c, dt.date(2026, 9, 29))
 action, watch = brief_main.apply_hard_rules([c_amd, c_twlo, c_lnth, c_exel, below], 1.0)
@@ -171,7 +180,7 @@ many = []
 for i in range(12):
     kind_price = {0: 90.0, 1: 102.0, 2: 108.0}[i % 3]     # под pivot / над без обем / extended
     c = cand({**lnth, "ticker": f"S{i:02d}", "price": kind_price, "pivot": 100.0, "pct_from_pivot": kind_price - 100,
-              "breakout_volume": False}, "Industrials")
+              "breakout_volume": False, "struct_low": round(max(kind_price, 100.0) * 0.95, 2)}, "Industrials")
     c["ai"]["classification"] = "Watchlist"
     c["setup"] = setup_rules.classify_setup(c, dt.date(2026, 9, 29))
     many.append(c)

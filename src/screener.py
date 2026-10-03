@@ -156,6 +156,11 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     ma50 = float(close.rolling(50).mean().iloc[-1])
     ma200 = float(close.rolling(200).mean().iloc[-1])
 
+    # FIX 2026-10-03 (пакет 1, т.3): структурен low = най-ниският Low на последните
+    # STOP_STRUCT_LOOKBACK_BARS бара (сигналният бар е включен) — основата на стопа
+    # в sizing.position_plan_v2 и на проверката "твърде разтегнато" в setup_rules.
+    struct_low = float(df["Low"].iloc[-config.STOP_STRUCT_LOOKBACK_BARS:].min())
+
     return {
         "ticker": sym, "price": round(price, 2), "pivot": round(pivot, 2),
         "pct_from_pivot": round(pct_from_pivot, 2),
@@ -168,6 +173,7 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
         "avg_volume_50d": int(avg_vol_50), "last_volume": int(last_vol),
         "volume_ratio": round(vol_ratio, 2), "breakout_volume": breakout_volume,
         "base_low": round(base_low, 2),
+        "struct_low": round(struct_low, 2),
     }
 
 

@@ -146,6 +146,15 @@ def render_email(brief: dict) -> str:
     rows = ""
     for st in brief["action"]:
         p = st["plan"]
+        # FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop с таван, стоп с процент, цел за 50%
+        if p.get("method") == "v2":
+            plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
+                        f"Stop ${p['stop_loss']} (−{p['risk_pct']}%) · Цел ${p['target_1']} (50%)<br>"
+                        f"{p['shares']} акции (${p['total_investment']:,.0f})")
+        else:
+            plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
+                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}<br>"
+                        f"{p['shares']} акции (${p['total_investment']:,.0f})")
         mk = "".join(
             f'<span style="display:inline-block;background:#eef2ff;color:#3730a3;'
             f'font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;'
@@ -161,9 +170,7 @@ def render_email(brief: dict) -> str:
               <span style="color:#6b7280">{st['base_type']} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span></td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-size:13px;white-space:nowrap">
-              Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>
-              Stop ${p['stop_loss']} · Цел ${p['target_1']}<br>
-              {p['shares']} акции (${p['total_investment']:,.0f})</td>
+              {plan_txt}</td>
         </tr>"""
     if not brief["action"]:
         rows = """<tr><td colspan="3" style="padding:14px;color:#6b7280">

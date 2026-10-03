@@ -20,7 +20,7 @@ from src.thermometer import build_thermometer, thermometer_unavailable
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src.enrich import enrich, inject_split_catalysts
-from src.sizing import position_plan
+from src.sizing import position_plan_v2
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
@@ -206,7 +206,9 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
                 c["ai"]["watchlist_trigger"] = f"Вече {config.MAX_PER_SECTOR} Action от {sector}."
 
         if cls == "Action":
-            plan = position_plan(c, sizing_factor)
+            # FIX 2026-10-03 (пакет 1, т.3): структурен стоп (15-баров low, макс. 8% под
+            # входа), buy-stop вход, цел 50% на 2R — виж sizing.position_plan_v2
+            plan = position_plan_v2(c, sizing_factor, today)
             if not plan.get("valid"):
                 cls = "Watchlist"
                 c["ai"]["watchlist_reason_type"] = "other"

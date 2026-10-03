@@ -8,7 +8,11 @@
                  може да стане Action;
   • no_volume  — над pivot (в buyable zone), но без обем → Watchlist, чака потвърждение;
   • below_pivot — под pivot (или точно на него) → Watchlist с buy-stop ниво = pivot;
-  • extended   — над pivot × (1 + BUYABLE_ZONE_MAX_PCT%) → не се гони, чака pullback.
+  • extended   — над pivot × (1 + BUYABLE_ZONE_MAX_PCT%) → не се гони, чака pullback;
+  • too_wide   — структурният стоп (най-ниският Low на последните 15 бара −1%) е повече
+                 от STOP_REJECT_STRUCT_RISK_PCT% под входа → не е Action, колкото и
+                 чист да е пробивът (пакет 1, т.3); има предимство пред останалите
+                 причини, защото не се оправя с изчакване на pullback или обем.
 
 Решението е на кода: main.apply_hard_rules() връща във Watchlist всяко Action,
 което не е `eligible`, независимо от AI класификацията (кодът има последната дума).
@@ -66,6 +70,33 @@ def max_chase(pivot: float) -> float:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# Стоп (споделено между класификацията и sizing.position_plan_v2)
+# ──────────────────────────────────────────────────────────────────────────
+def stop_levels(struct_low, entry_ref) -> dict | None:
+    """
+    Структурен стоп = struct_low × (1 − STOP_STRUCT_BUFFER_PCT%); реалният стоп е
+    най-много STOP_MAX_PCT% под входа. `too_wide` = СТРУКТУРНИЯТ риск (преди таванa)
+    е над STOP_REJECT_STRUCT_RISK_PCT% (строго по-голям; точно на прага е допустим).
+    None без валиден struct_low (нестандартен път/тестови данни) — графейсфул.
+    """
+    if not isinstance(struct_low, (int, float)) or not isinstance(entry_ref, (int, float)):
+        return None
+    if struct_low <= 0 or entry_ref <= 0 or struct_low > entry_ref:
+        return None                               # low над входа е невъзможен (счупени данни)
+    struct_stop = struct_low * (1 - config.STOP_STRUCT_BUFFER_PCT / 100)
+    if struct_stop >= entry_ref:                  # дегенерирано: стопът не е под входа
+        return None
+    struct_risk = (entry_ref - struct_stop) / entry_ref * 100
+    floor = entry_ref * (1 - config.STOP_MAX_PCT / 100)
+    stop = max(struct_stop, floor)
+    return {"struct_low": round(float(struct_low), 2), "struct_stop": round(struct_stop, 2),
+            "struct_risk_pct": round(struct_risk, 2), "stop": round(stop, 2),
+            "stop_capped": struct_stop < floor,
+            "risk_pct": round((entry_ref - stop) / entry_ref * 100, 2),
+            "too_wide": struct_risk > config.STOP_REJECT_STRUCT_RISK_PCT}
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # Класификация
 # ──────────────────────────────────────────────────────────────────────────
 def _volume_ok(c: dict) -> bool:
@@ -86,6 +117,7 @@ def classify_setup(c: dict, today=None) -> dict:
     out = {"kind": "no_data", "eligible": False, "gate": "no_data",
            "pct_from_pivot": c.get("pct_from_pivot"), "volume_ok": _volume_ok(c),
            "buy_stop": None, "max_chase": None, "valid_through": None,
+           "struct_stop": None, "struct_risk_pct": None, "stop": None, "risk_pct": None,
            "trigger_text": "Няма данни за цена/pivot — не може да се прецени пробив."}
     if not isinstance(price, (int, float)) or not isinstance(pivot, (int, float)) or pivot <= 0:
         return out
@@ -97,7 +129,24 @@ def classify_setup(c: dict, today=None) -> dict:
     vol_txt = f"{vr:.2f}×" if isinstance(vr, (int, float)) else "?"
     out.update({"pct_from_pivot": round(pct, 2), "max_chase": chase, "valid_through": through})
 
-    if price > chase:
+    # референтен вход за риска: сигналният close при пробив, buy-stop нивото под pivot
+    stop = stop_levels(c.get("struct_low"), max(price, pivot))
+    if stop:
+        out.update(struct_stop=stop["struct_stop"], struct_risk_pct=stop["struct_risk_pct"],
+                   stop=stop["stop"], risk_pct=stop["risk_pct"])
+
+    if stop and stop["too_wide"]:
+        also = ""
+        if price > chase:
+            also = f" Също extended: {pct:+.1f}% над pivot ${pivot:.2f}."
+        elif price > pivot and not out["volume_ok"]:
+            also = f" Също без обем ({vol_txt} < {mult:g}×)."
+        out.update(kind="too_wide", gate="too_wide", trigger_text=(
+            f"Твърде разтегнато: стопът под {config.STOP_STRUCT_LOOKBACK_BARS}-барния low "
+            f"(${stop['struct_low']:.2f} −{config.STOP_STRUCT_BUFFER_PCT:g}% = ${stop['struct_stop']:.2f}) "
+            f"е {stop['struct_risk_pct']:.1f}% под входа (> {config.STOP_REJECT_STRUCT_RISK_PCT:g}%) — "
+            f"не се купува, докато базата не се стегне.{also}"))
+    elif price > chase:
         out.update(kind="extended", gate="extended", trigger_text=(
             f"Extended: {pct:+.1f}% над pivot ${pivot:.2f} (над +{config.BUYABLE_ZONE_MAX_PCT:g}%, "
             f"таван за вход ${chase:.2f}) — не се гони; чака pullback към pivot."))
@@ -133,7 +182,8 @@ def annotate(candidates: list[dict], today=None) -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────
 # Подредба
 # ──────────────────────────────────────────────────────────────────────────
-_SCREEN_GROUP = {"confirmed": 0, "no_volume": 1, "below_pivot": 2, "extended": 3, "no_data": 4}
+_SCREEN_GROUP = {"confirmed": 0, "no_volume": 1, "below_pivot": 2, "extended": 3, "too_wide": 3,
+                 "no_data": 4}
 
 
 def screen_priority(row: dict) -> tuple:
@@ -148,7 +198,8 @@ def screen_priority(row: dict) -> tuple:
 
 # Watchlist картите са най-много 10: потвърден пробив, спрян от лимит/режим/earnings,
 # е по-силен от buy-stop кандидат, а той — от "над pivot без обем"; extended най-накрая.
-_WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3, "no_data": 4}
+_WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3, "too_wide": 3,
+                "no_data": 4}
 
 
 def watchlist_sort_key(c: dict) -> tuple:
