@@ -92,6 +92,7 @@ all_r = [r["realized_r"] for r in REAL.values() if r.get("realized_r") is not No
 exp_wins = sum(1 for x in all_r if x > 0)
 sv = state["v1_stats"]
 assert sv["n"] == len(all_r) == 50 and sv["wins"] == exp_wins and sv["unpriced"] == 1 and sv["v1_closed"] == 25
+assert sv["expired_no_r"] == 0                                              # в реалния tracker няма изтекли без R
 assert sv["win_rate_pct"] == round(exp_wins / 50 * 100, 1) and sv["avg_r"] == round(sum(all_r) / 50, 2)
 print(f"  ✓ 51 записа в архива (с точно копие на оригиналния tracker), 25 затворени като v1_closed ({24} с R, 1 без цена →")
 print(f"    извън статистиката), tracker започва от нула; v1 ред: n={sv['n']}, win rate {sv['win_rate_pct']}%, среден R {sv['avg_r']}")
@@ -136,6 +137,28 @@ line = f"v1 методология: n={sv['n']}, win rate {sv['win_rate_pct']}%,
 assert " ".join(line.split()) in " ".join(html.split()) and "Track Record v2 започва от нула" in html
 assert f"({sv['unpriced']} без цена)" in " ".join(html.split())
 print(f"  ✓ dashboard: 'v1 методология: n={sv['n']}, win rate {sv['win_rate_pct']}%, среден R {sv['avg_r']} (1 без цена)'")
+print()
+
+print("── v1 изтекли без R се броят, не се крият ──")
+exp_tr = copy.deepcopy(REAL)
+k0 = LIVE[0][0]
+exp_tr[k0].update(status="expired", resolution_date="2026-10-03", realized_r=None)          # СИНТЕТИЧНО: един запис изтича (v1 фаза 1)
+reset(exp_tr)
+rs_ = tracker_switch.switch_to_v2(TODAY, fetch_prices=fetch)
+sx = rs_["stats"]
+assert sx["expired_no_r"] == 1 and sx["n"] == 49 and rs_["closed"] == 24, sx            # 24 живи затворени + 1 изтекъл без R (извън n)
+brief_x = {"date": "2026-10-05", "thermometer": thermometer.thermometer_unavailable(RuntimeError("тест")),
+           "action": [], "watchlist": [], "backtest": backtest.get_backtest_summary(),
+           "ai_macro": {"macro_brief": "тест", "regime_comment": "", "sector_logic": []}}
+with tempfile.TemporaryDirectory() as docs:
+    orig_docs = config.DOCS_DIR
+    config.DOCS_DIR = pathlib.Path(docs)
+    try:
+        html_x = render.render_dashboard(brief_x)
+    finally:
+        config.DOCS_DIR = orig_docs
+assert "(1 изтекли без R, извън n)" in " ".join(html_x.split())
+print("  ✓ изтекъл v1 запис (фаза 1, без R) не влиза в n, но редът казва '(1 изтекли без R, извън n)'")
 print()
 
 print("── обратимост ──")

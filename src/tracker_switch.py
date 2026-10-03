@@ -57,6 +57,9 @@ def v1_stats(records: dict) -> dict:
         "records": len(recs),
         "v1_closed": sum(1 for r in recs if r.get("status") == "v1_closed"),
         "unpriced": sum(1 for r in recs if r.get("status") == "v1_closed" and r.get("realized_r") is None),
+        # v1 "expired" (фаза 1, цел 1 недостигната) е без R по дизайн и не влиза в n — но се брои тук,
+        # за да не е скрито колко позиции липсват от статистиката
+        "expired_no_r": sum(1 for r in recs if r.get("status") == "expired" and r.get("realized_r") is None),
         "by_status": dict(collections.Counter(r.get("status") for r in recs)),
     }
 
