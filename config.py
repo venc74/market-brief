@@ -166,11 +166,13 @@ VIX_RISK_OFF = 25.0
 # 28.07 (+13%, ~78-ми персентил, нормален шум) незасегнат.
 VIX_SPIKE_WEEKLY_PCT = float(os.getenv("VIX_SPIKE_WEEKLY_PCT", 20.0))
 
-# Минимум ВИДИМИ индикатори (от 9), за да е допустим Offensive. Скрит индикатор
+# Минимум ВИДИМИ индикатори (от 8 БРОЕНИ), за да е допустим Offensive. Скрит индикатор
 # (невалидни/застояли данни) не участва в броенето, затова без този праг 5 зелени
 # от 5 видими даваха Offensive с пълен sizing (08.09: 4 от 9 скрити). Под прага
 # режимът е Defensive с причина "недостатъчно данни".
-THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE = int(os.getenv("THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE", 7))
+# 2026-10-03 (пакет 2 т.2): Fed Net Liquidity стана САМО информативен (не се брои), затова
+# бройките са 8 вместо 9 и прагът е 6 от 8 (беше 7 от 9 — същата пропорция ~75%).
+THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE = int(os.getenv("THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE", 6))
 
 # ── API ключове (от GitHub Secrets / .env) ───────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
@@ -681,6 +683,20 @@ STALENESS_THRESHOLD_DAYS = int(os.getenv("STALENESS_THRESHOLD_DAYS", 3))
 # закъснение вече е нормално, не стрес сигнал; ~5 дни допълнителен buffer над
 # това покрива и празнични отмествания).
 FED_LIQUIDITY_STALENESS_DAYS = int(os.getenv("FED_LIQUIDITY_STALENESS_DAYS", 12))
+# 2026-10-03 (пакет 2 т.2): Fed Net Liquidity — преработена сметка, САМО информативна (не влиза в броенето).
+# Преди: WALCL (ниво в сряда) − RRPONTSYD (дневна) − WTREGEN (СЕДМИЧНА СРЕДНА), а "4-седмичният" сравнителен
+# ред беше series[-5] на трите РАЗЛИЧНИ серии — 4 седмици назад за WALCL/TGA, но 5 ДНИ назад за дневната RRP;
+# и трите компонента бяха към различни дати. Реален пример, сряда 30.09.2026: TGA ниво в сряда (WDTGAL)
+# 984 046 млн срещу седмична средна (WTREGEN) 948 674 млн — 35 млрд разлика, повече от типичната седмична
+# промяна. Сега и трите компонента са към ЕДНА И СЪЩА сряда (WALCL и WDTGAL са "Wednesday level"; RRP — на същия
+# ден, а при празник — последния работен ден до 4 дни назад), промяната е за NET_LIQ_WINDOW_WEEKS седмици, мъртва
+# зона ±NET_LIQ_DEAD_ZONE_PCT% (жълто), а цветът се сменя чак след NET_LIQ_CONFIRM_WEEKS поредни седмици в
+# новия цвят. История: FRED_HISTORY_DAYS дни седмични точки (хистерезисът се смята върху тях, без state файл).
+NET_LIQ_TGA_SERIES = os.getenv("NET_LIQ_TGA_SERIES", "WDTGAL")        # Treasury General Account: Wednesday Level
+NET_LIQ_WINDOW_WEEKS = int(os.getenv("NET_LIQ_WINDOW_WEEKS", 4))
+NET_LIQ_DEAD_ZONE_PCT = float(os.getenv("NET_LIQ_DEAD_ZONE_PCT", 1.0))
+NET_LIQ_CONFIRM_WEEKS = int(os.getenv("NET_LIQ_CONFIRM_WEEKS", 2))
+NET_LIQ_HISTORY_DAYS = int(os.getenv("NET_LIQ_HISTORY_DAYS", 300))
 # RRPONTSYD е ДНЕВНА (работни дни) компонента — same клас серия като VIX/MOVE
 # (публикува се всеки работен ден), затова reuse-ва STALENESS_THRESHOLD_DAYS
 # директно, не нужна отделна константа.

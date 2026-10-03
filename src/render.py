@@ -191,8 +191,11 @@ def render_email(brief: dict) -> str:
     watch = ", ".join(_e(st["ticker"]) for st in brief["watchlist"]) or "—"
     dot_color = {"green": "#0e9f6e", "yellow": "#d97706", "red": "#dc2626"}
     thermo_dots = "".join(
-        f'<span title="{_e(i["name"])}" style="display:inline-block;width:11px;height:11px;'
-        f'border-radius:50%;margin-right:5px;background:{dot_color.get(i["status"], "#d97706")}"></span>'
+        f'<span title="{_e(i["name"])}{" (информативен, не се брои)" if i.get("informational") else ""}" '
+        f'style="display:inline-block;width:{7 if i.get("informational") else 11}px;height:{7 if i.get("informational") else 11}px;'
+        f'border-radius:50%;margin-right:5px;'
+        + (f'border:2px solid {dot_color.get(i["status"], "#d97706")};background:#ffffff"' if i.get("informational")
+           else f'background:{dot_color.get(i["status"], "#d97706")}"') + '></span>'
         for i in t["indicators"])
 
     # v2 · компактна секция „Сигнали днес" (Секции 3.3 + 3.4) — само ако има данни

@@ -36,59 +36,116 @@ def _fred_series(series_id: str, days: int = 90) -> list[tuple[str, float]]:
         return []
 
 
+def _wednesday_points(walcl, tga, rrp) -> list[dict]:
+    """
+    Пакет 2 т.2: седмични точки Net Liquidity, и трите компонента към ЕДНА сряда. walcl/tga са
+    (дата, млн $) "Wednesday level"; rrp е дневна (дата, млрд $). За всяка сряда на WALCL е нужно TGA
+    ниво на същата дата; RRP е стойността на същия ден или на последния работен ден до 4 дни назад
+    (празник в сряда). Седмица, на която липсва компонент, се пропуска (не се приближава).
+    Връща възходящ списък {date, nl_bn, walcl_bn, tga_bn, rrp_bn}.
+    """
+    tga_by = dict(tga)
+    rrp_sorted = sorted((dt.date.fromisoformat(d), v) for d, v in rrp)
+    out = []
+    for d, w in sorted(walcl):
+        t_val = tga_by.get(d)
+        if t_val is None:
+            continue
+        day = dt.date.fromisoformat(d)
+        r_val = None
+        for rd, rv in reversed(rrp_sorted):
+            if rd <= day:
+                if (day - rd).days <= 4:
+                    r_val = rv
+                break
+        if r_val is None:
+            continue
+        out.append({"date": d, "nl_bn": round(w / 1000 - r_val - t_val / 1000, 1),
+                    "walcl_bn": round(w / 1000, 1), "tga_bn": round(t_val / 1000, 1), "rrp_bn": round(r_val, 1)})
+    return out
+
+
+def _liquidity_color(change_pct: float) -> str:
+    change_pct = round(change_pct, 6)               # граница ±1.00% точно, без float шум (5050/5000-1 = 1.0000000000000009)
+    dz = config.NET_LIQ_DEAD_ZONE_PCT
+    return "green" if change_pct > dz else ("red" if change_pct < -dz else "yellow")
+
+
+def _confirmed_color(raw: list[str], weeks: int) -> str:
+    """
+    Цветът за показване със закъснение: нов цвят се приема едва след `weeks` ПОРЕДНИ седмици със същия
+    сурови цвят; докато това не стане, остава предишният. Започва от първия цвят на серията.
+    """
+    shown = raw[0]
+    run, cand = 1, raw[0]
+    for c in raw[1:]:
+        if c == cand:
+            run += 1
+        else:
+            cand, run = c, 1
+        if run >= weeks:
+            shown = cand
+    return shown
+
+
+def liquidity_signal(points: list[dict]) -> dict:
+    """
+    Информативният сигнал върху седмичните точки (виж _wednesday_points): промяна за NET_LIQ_WINDOW_WEEKS
+    седмици в % от нивото, мъртва зона ±NET_LIQ_DEAD_ZONE_PCT% → жълто, показван цвят с потвърждение от
+    NET_LIQ_CONFIRM_WEEKS поредни седмици. Без достатъчно история → value=None, hide=True.
+    """
+    n, w = len(points), config.NET_LIQ_WINDOW_WEEKS
+    if n < w + 1:
+        return {"value": None, "trend": "unknown", "history": [], "hide": True}
+    raw = []
+    for i in range(w, n):
+        base = points[i - w]["nl_bn"]
+        raw.append(_liquidity_color((points[i]["nl_bn"] / base - 1) * 100) if base else "yellow")
+    last, base = points[-1], points[-1 - w]
+    change = round((last["nl_bn"] / base["nl_bn"] - 1) * 100, 6) if base["nl_bn"] else 0.0
+    color = _confirmed_color(raw, config.NET_LIQ_CONFIRM_WEEKS)
+    dz = config.NET_LIQ_DEAD_ZONE_PCT
+    return {
+        "value": last["nl_bn"], "prev": base["nl_bn"], "as_of": last["date"],
+        "change_4w_pct": round(change, 2), "window_weeks": w, "dead_zone_pct": dz,
+        "raw_color": raw[-1], "color": color,
+        "trend": "up" if change > dz else ("down" if change < -dz else "flat"),
+        "components": {"fed_balance_bn": last["walcl_bn"], "rrp_bn": last["rrp_bn"], "tga_bn": last["tga_bn"]},
+        "history": points[-8:], "informational": True,
+    }
+
+
 def fed_net_liquidity() -> dict:
     """
-    Net Liquidity = Fed Balance Sheet (WALCL) − Reverse Repo (RRPONTSYD)
-                    − Treasury General Account (WTREGEN). В млрд USD.
+    Net Liquidity = WALCL − RRP − TGA, в млрд $ — ИНФОРМАТИВЕН индикатор (не влиза в броенето за режима).
+    Сметката е върху седмични нива към една и съща сряда (WALCL "Wednesday level", TGA "Wednesday level"
+    = WDTGAL, не WTREGEN, която е седмична СРЕДНА; RRPONTSYD от същия ден), 4-седмична промяна,
+    мъртва зона ±1% и цвят с потвърждение от 2 седмици — виж config.NET_LIQ_* и liquidity_signal().
 
-    FIX 2026-08-18: staleness guard, same принцип като _is_stale() за MOVE/
-    VIX (виж move_index()/vix_term_structure() в thermometer.py) — преди
-    имаше само "series напълно празна" защита (walcl/rrp/tga са []), НЕ
-    "валиден, но остарял отговор" защита. WALCL/WTREGEN (Fed H.4.1, седмичен
-    отчет) получават config.FED_LIQUIDITY_STALENESS_DAYS (по-дълъг праг —
-    легитимен 7-дневен цикъл между публикации + buffer, виж config.py
-    коментара за пълния rationale). RRPONTSYD (дневна, работни дни) ползва
-    same config.STALENESS_THRESHOLD_DAYS като VIX/MOVE — same клас серия.
-
-    value=None (заедно с hide=True) при stale данни — thermometer.py's
-    nl_ind construction вече прави `if nl.get("value") is None: hide=True`,
-    затова downstream кодът не се нуждае от собствена staleness логика,
-    само коректно value=None тук, при източника.
+    FIX 2026-08-18: staleness guard — WALCL/WDTGAL са седмични (config.FED_LIQUIDITY_STALENESS_DAYS),
+    RRPONTSYD е дневна (config.STALENESS_THRESHOLD_DAYS). Застояли/липсващи данни → value=None, hide=True.
     """
-    walcl = _fred_series("WALCL")        # millions, weekly
-    rrp = _fred_series("RRPONTSYD")      # billions, daily
-    tga = _fred_series("WTREGEN")        # millions, weekly (същия H.4.1 отчет като WALCL — не billions)
-
+    hide = {"value": None, "trend": "unknown", "history": [], "hide": True}
+    days = config.NET_LIQ_HISTORY_DAYS
+    walcl = _fred_series("WALCL", days=days)                       # млн $, седмична, сряда
+    tga = _fred_series(config.NET_LIQ_TGA_SERIES, days=days)       # млн $, седмична, сряда
+    rrp = _fred_series("RRPONTSYD", days=days)                     # млрд $, дневна
     if not (walcl and rrp and tga):
-        return {"value": None, "trend": "unknown", "history": [], "hide": True}
-
-    def latest(series): return series[-1][1]
-    def latest_date(series): return dt.date.fromisoformat(series[-1][0])
-    def prior(series): return series[-5][1] if len(series) >= 5 else series[0][1]
-
+        return hide
     for label, series, threshold in (
         ("WALCL", walcl, config.FED_LIQUIDITY_STALENESS_DAYS),
-        ("WTREGEN", tga, config.FED_LIQUIDITY_STALENESS_DAYS),
+        (config.NET_LIQ_TGA_SERIES, tga, config.FED_LIQUIDITY_STALENESS_DAYS),
         ("RRPONTSYD", rrp, config.STALENESS_THRESHOLD_DAYS),
     ):
-        d = latest_date(series)
+        d = dt.date.fromisoformat(series[-1][0])
         if _is_stale(d, threshold):
-            print(f"[macro] Net Liquidity: {label} stale (последно наблюдение {d}, "
-                 f"праг {threshold}д)")
-            return {"value": None, "trend": "unknown", "history": [], "hide": True}
-
-    nl_now = latest(walcl) / 1000 - latest(rrp) - latest(tga) / 1000
-    nl_prev = prior(walcl) / 1000 - prior(rrp) - prior(tga) / 1000
-    return {
-        "value": round(nl_now, 1),
-        "prev": round(nl_prev, 1),
-        "trend": "up" if nl_now > nl_prev else "down",
-        "components": {
-            "fed_balance_bn": round(latest(walcl) / 1000, 1),
-            "rrp_bn": round(latest(rrp), 1),
-            "tga_bn": round(latest(tga) / 1000, 1),
-        },
-    }
+            print(f"[macro] Net Liquidity: {label} stale (последно наблюдение {d}, праг {threshold}д)")
+            return hide
+    points = _wednesday_points(walcl, tga, rrp)
+    if points and _is_stale(dt.date.fromisoformat(points[-1]["date"]), config.FED_LIQUIDITY_STALENESS_DAYS):
+        print(f"[macro] Net Liquidity: няма цяла сряда с трите компонента след {points[-1]['date']}")
+        return hide
+    return liquidity_signal(points)
 
 
 def treasury_spread_2s10s() -> dict:

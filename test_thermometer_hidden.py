@@ -143,7 +143,7 @@ print("  РЕАЛНО 08.09 (преди фикса):", OLD["thermometer"]["regim
 print("  РЕАЛНА конфигурация 08.09 (след фикса):", t["regime"], "|", t["regime_reason"])
 assert t["regime"] == "Defensive" and t["sizing_factor"] == config.DEFENSIVE_SIZING_FACTOR
 assert t["regime_reason"].startswith("5 зелени / 0 жълти / 0 червени от 5 видими")
-assert "недостатъчно данни за Offensive (видими 5 от 9, нужни ≥ 7)" in t["regime_reason"]
+assert "недостатъчно данни за Offensive (видими 5 от 8, нужни ≥ 6)" in t["regime_reason"]    # пакет 2 т.2: 8 броени, Net Liquidity е информативен
 assert not t["overrides"], t["overrides"]  # режимът е от броенето, не от override
 print("  ✓ реалната 08.09 конфигурация (5 видими, 4 скрити) вече дава Defensive с причина")
 
@@ -152,14 +152,14 @@ GREEN = {n: {"status": "green"} for n in REAL_IND}
 GREEN["IEI/HYG (Credit Spread)"].update({"spike": False, "roc_percentile": 30.0})
 GREEN["MOVE (Bond Vol)"].update({"spike": False, "delta_1w": 1.0, "value": 80.0})
 for hide, expect in (((), "Offensive"),
-                     (("VIX Term Structure", "Market Breadth (% над 40dMA)"), "Offensive"),   # 7 видими = граница
-                     (("VIX Term Structure", "Market Breadth (% над 40dMA)", "Put/Call (SPY)"), "Defensive")):  # 6
+                     (("VIX Term Structure", "Market Breadth (% над 40dMA)"), "Offensive"),   # 6 видими = граница
+                     (("VIX Term Structure", "Market Breadth (% над 40dMA)", "Put/Call (SPY)"), "Defensive")):  # 5
     t, _, _ = run_with(GREEN, CALM, dt.date(2026, 9, 8), hide=hide)
-    n_vis = 9 - len(hide)
+    n_vis = 8 - len(hide)
     assert t["regime"] == expect, (n_vis, t["regime"], t["regime_reason"])
     print(f"    {n_vis} видими, всички зелени → {t['regime']}")
 assert "недостатъчно данни" in t["regime_reason"]
-print("  ✓ граница: 7 видими → Offensive, 6 → Defensive; 9 → Offensive (без регресия)")
+print("  ✓ граница: 6 видими (от 8 броени) → Offensive, 5 → Defensive; 8 → Offensive (без регресия)")
 
 # Cash/Defensive по броенето не се смекчават от прага (прагът само затяга)
 t, _, _ = run_with({"MOVE (Bond Vol)": {"status": "red", "spike": False},

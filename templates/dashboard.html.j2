@@ -61,6 +61,7 @@
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
     padding: 14px 16px; border-top: 3px solid var(--line);
   }
+  .t-card.info { border-style: dashed; }   /* пакет 2 т.2: информативен индикатор — показва се, не се брои */
   .t-card.green { border-top-color: var(--green); }
   .t-card.yellow { border-top-color: var(--yellow); }
   .t-card.red { border-top-color: var(--red); }
@@ -437,7 +438,7 @@
   <div class="thermo">
     {% for ind in thermometer.indicators %}
     {% if not ind.get('hide') %}
-    <div class="t-card {{ ind.status }}"{% if ind.get('methodology_note') %} title="{{ ind.methodology_note }}"{% endif %}>
+    <div class="t-card {{ ind.status }}{% if ind.get('informational') %} info{% endif %}"{% if ind.get('methodology_note') %} title="{{ ind.methodology_note }}"{% endif %}>
       <div class="t-name">{{ ind.name }}</div>
       <div class="t-val">{{ ind.value if ind.value is not none else "—" }}</div>
       <div class="t-label">{{ ind.label }}</div>

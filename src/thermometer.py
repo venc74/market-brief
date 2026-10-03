@@ -654,6 +654,70 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
     return regime, reason, exit_rule
 
 
+def _net_liquidity_indicator(nl: dict) -> dict:
+    """
+    Пакет 2 т.2: Fed Net Liquidity е САМО информативен ("informational": True) — показва се с цвят, но не влиза
+    в броенето за режима и не се брои за видим/скрит (виж _count_regime). Стар формат на macro (преди
+    2026-10-03, без "color"/"change_4w_pct") се чете с цвят по старата "trend" — само за исторически данни.
+    """
+    name = "Fed Net Liquidity"
+    if nl.get("value") is None:
+        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": ""}
+    if nl.get("change_4w_pct") is None:                                   # исторически формат
+        status = ("green" if nl.get("trend") == "up" else "red" if nl.get("trend") == "down" else "yellow")
+        label = f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'}) · само информативен"
+        return {"name": name, "value": nl.get("value"), "status": status, "informational": True, "label": label}
+    chg, dz, w = nl["change_4w_pct"], nl.get("dead_zone_pct", config.NET_LIQ_DEAD_ZONE_PCT), nl.get("window_weeks", 4)
+    zone = f"в мъртвата зона ±{dz:g}%" if abs(chg) <= dz else ("над +" if chg > 0 else "под −") + f"{dz:g}%"
+    note = ""
+    if nl.get("raw_color") != nl.get("color"):
+        note = f" · седмицата е {_COLOR_BG[nl['raw_color']]}, цветът се сменя след {config.NET_LIQ_CONFIRM_WEEKS} поредни"
+    return {
+        "name": name, "value": nl["value"], "status": nl["color"], "informational": True,
+        "change_4w_pct": chg, "as_of": nl.get("as_of"),
+        "label": (f"${nl['value']:,.0f} млрд към {nl.get('as_of')} · {chg:+.1f}% за {w} седмици ({zone}){note} "
+                  f"· само информативен, не влиза в режима"),
+    }
+
+
+_COLOR_BG = {"green": "зелена", "yellow": "жълта", "red": "червена"}
+
+
+def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tuple[str, str, str]:
+    """
+    Чисто броене (без мрежа и без override-и): (режим по броенето, причина, counts). Информативните
+    индикатори ("informational": True — Fed Net Liquidity) не се броят нито като видими, нито като скрити.
+    Изнесено от build_thermometer, за да го ползва и реплеят върху записаните брифове (същият код).
+    """
+    min_visible = config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE if min_visible is None else min_visible
+    counted = [i for i in indicators if not i.get("informational")]
+    visible = [i for i in counted if not i.get("hide")]
+    visible_count = len(visible)
+    hidden_count = len(counted) - visible_count
+    greens = sum(1 for i in visible if i["status"] == "green")
+    yellows = sum(1 for i in visible if i["status"] == "yellow")
+    reds = sum(1 for i in visible if i["status"] == "red")
+    counts = f"{greens} зелени / {yellows} жълти / {reds} червени от {visible_count} видими"
+    if hidden_count:
+        counts += f" ({hidden_count} скрити — невалидни/застояли данни)"
+    if len(counted) != len(indicators):
+        counts += " · не се броят: " + ", ".join(i["name"] for i in indicators if i.get("informational")) + " (информативен)"
+
+    # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive"; Offensive = 4+ зелени и 0 червени.
+    if greens >= 4 and reds == 0:
+        # FIX 2026-10-02 (находка 2 от прегледа): броенето е само върху видимите, затова скрити индикатори
+        # СТРУВАХА зелен режим (08.09: 5 зелени от 5 видими при скрити Net Liquidity, MOVE, VIX Term, IEI/HYG).
+        if visible_count >= min_visible:
+            return "Offensive", counts, counts
+        return "Defensive", (f"{counts} — недостатъчно данни за Offensive (видими {visible_count} "
+                             f"от {len(counted)}, нужни ≥ {min_visible})"), counts
+    if reds >= 3:
+        return "Cash", f"{counts} — капиталът е позиция", counts
+    if reds >= 2:
+        return "Defensive", f"{counts} — намален риск", counts
+    return "Defensive", f"{counts} — недостатъчно потвърждение за Offensive", counts
+
+
 def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     """
     Сглобява 9-те индикатора + правилото за режим (8-ми, Market Breadth,
@@ -668,12 +732,13 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
       price volatility — виж credit_spread_proxy() докстринга защо не е
       дублиране на MOVE логиката); 4/4 известни кризи, 0 false positives в
       backtest-а (Venci, 2026-08-2x)
-    - 4+ зелени при 0 червени И поне THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE (7)
-      видими индикатора → Offensive; 3+ червени → Cash; 2 червени → Defensive;
-      всичко останало → Defensive (недостатъчно потвърждение)
-    Броенето е само върху ВИДИМИТЕ индикатори (hide=True не участва); жълтите и
-    скритите се отчитат изрично в regime_reason. Sizing factor пада за всеки
-    не-Offensive режим, не само за принудителните.
+    - 4+ зелени при 0 червени И поне THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE (6 от 8
+      броени) видими индикатора → Offensive; 3+ червени → Cash; 2 червени →
+      Defensive; всичко останало → Defensive (недостатъчно потвърждение)
+    Броенето (_count_regime) е само върху ВИДИМИТЕ индикатори (hide=True не участва);
+    жълтите и скритите се отчитат изрично в regime_reason. Fed Net Liquidity е
+    информативен ("informational") — показва се, но не се брои (пакет 2 т.2). Sizing
+    factor пада за всеки не-Offensive режим, не само за принудителните.
     """
     spread = macro.get("spread_2s10s", {})
     nl = macro.get("net_liquidity", {})
@@ -692,17 +757,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
                       f"({'инверсия' if spread.get('status') == 'inverted' else 'нормален'}, "
                       f"{spread.get('direction', '')})"),
         }
-    if nl.get("value") is None:
-        nl_ind = {"name": "Fed Net Liquidity", "value": None,
-                  "status": "yellow", "hide": True, "label": ""}
-    else:
-        nl_ind = {
-            "name": "Fed Net Liquidity",
-            "value": nl.get("value"),
-            "status": "green" if nl.get("trend") == "up" else
-                      ("red" if nl.get("trend") == "down" else "yellow"),
-            "label": f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'})",
-        }
+    nl_ind = _net_liquidity_indicator(nl)
 
     indicators = [spy_trend(), vix_level(), market_put_call(), spread_ind,
                   nl_ind, move_index(), vix_term_structure(), credit_spread_proxy()]
@@ -710,17 +765,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         indicators.append(market_breadth())
         _breadth_divergence(indicators)
 
-    # FIX 2026-07-15: броим само ВИДИМИТЕ индикатори; жълтите и скритите се
-    # отчитат изрично в съобщението, вместо да изчезват тихо от "X зелени / Y червени".
-    visible = [i for i in indicators if not i.get("hide")]
-    visible_count = len(visible)
-    hidden_count = len(indicators) - visible_count
-    greens = sum(1 for i in visible if i["status"] == "green")
-    yellows = sum(1 for i in visible if i["status"] == "yellow")
-    reds = sum(1 for i in visible if i["status"] == "red")
-    counts = f"{greens} зелени / {yellows} жълти / {reds} червени от {visible_count} видими"
-    if hidden_count:
-        counts += f" ({hidden_count} скрити — невалидни/застояли данни)"
+    count_regime, count_reason, counts = _count_regime(indicators)
 
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
     move_ind = next((i for i in indicators if i["name"] == "MOVE (Bond Vol)"), None)
@@ -756,29 +801,6 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = ((move_visible and (move_val > config.MOVE_RED_THRESHOLD or move_spike))
                              or (not move_visible and move_spike))
-
-    # Режимът САМО по броенето — изчислява се винаги, дори при override.
-    # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive",
-    # който противоречеше на правилото в docstring-а ("4+ зелени → Offensive; иначе
-    # Defensive") и на 2026-07-15 произведе Offensive при 3 зелени + 1 (фалшив) червен.
-    if greens >= 4 and reds == 0:
-        # FIX 2026-10-02 (находка 2 от прегледа): броенето е само върху видимите,
-        # затова скрити индикатори СТРУВАХА зелен режим. 08.09 (реално): 4 от 9
-        # скрити, 5 зелени от 5 видими → Offensive с пълен sizing, при липсващи
-        # Net Liquidity, MOVE, VIX Term Structure и IEI/HYG — точно стресовите
-        # барометри. Offensive изисква минимум видими индикатори.
-        if visible_count >= config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE:
-            count_regime, count_reason = "Offensive", counts
-        else:
-            count_regime, count_reason = "Defensive", (
-                f"{counts} — недостатъчно данни за Offensive (видими {visible_count} "
-                f"от {len(indicators)}, нужни ≥ {config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE})")
-    elif reds >= 3:
-        count_regime, count_reason = "Cash", f"{counts} — капиталът е позиция"
-    elif reds >= 2:
-        count_regime, count_reason = "Defensive", f"{counts} — намален риск"
-    else:
-        count_regime, count_reason = "Defensive", f"{counts} — недостатъчно потвърждение за Offensive"
 
     # FIX 2026-09-25: всички АКТИВНИ override-и, всеки с условието си за изход,
     # изчислено от кода. Дотук условието не съществуваше никъде — промптът
