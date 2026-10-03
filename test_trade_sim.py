@@ -1,0 +1,157 @@
+"""
+Пакет 1, т.2 (2026-10-03): buy-stop изпълнение в trade_sim.simulate().
+
+РЕАЛНИ барове: tests/fixtures/ohlc_EXEL.csv (Yahoo, свалени на 02.10.2026). Плановите нива са:
+  • бриф 29.06 — РЕАЛНИЯТ Action план на EXEL (position_plan_v2);
+  • брифове 20.07, 25.09, 01.10 — ХИПОТЕТИЧНИ планове (тогава EXEL беше Watchlist под pivot):
+    реалните барове, но нивата са изчислени от същите правила, за да покажат буквално
+    not_triggered / вход при докосване / pending.
+Всичко останало (граници на pivot/прозореца/тавана, празници, гап) е СИНТЕТИЧНО — маркирано.
+Пускане: python test_trade_sim.py
+"""
+import sys, pathlib
+ROOT = pathlib.Path(__file__).parent
+sys.path.insert(0, str(ROOT))
+
+import pandas as pd
+import config
+from src import trade_sim, sizing
+
+sim = trade_sim.simulate
+
+
+def mk(rows, start="2026-03-02"):
+    """СИНТЕТИЧНИ дневни барове (O, H, L, C) по работни дни от `start`."""
+    idx = pd.bdate_range(start, periods=len(rows))
+    return pd.DataFrame(rows, index=idx, columns=["Open", "High", "Low", "Close"])
+
+
+PLAN = dict(entry_date="2026-03-02", buy_stop=100.0, max_chase=105.0, stop_loss=92.0,
+            target_1=116.0, window_sessions=5)
+QUIET = (97.0, 99.5, 96.0, 98.0)        # не стига до pivot 100.00
+
+
+print("── СИНТЕТИЧНО: изпълнение на buy-stop ──")
+# pivot докоснат ТОЧНО (High == 100.00), отваряне под него → вход на 100.00, първата сесия е деня на брифа
+r = sim(PLAN, mk([(98, 100.0, 97, 99)]))
+assert (r["status"], r["fill_date"], r["fill_price"]) == ("open", "2026-03-02", 100.0), r
+# High с цент под pivot → няма вход
+r = sim(PLAN, mk([(98, 99.99, 97, 99)] * 5))
+assert r["status"] == "not_triggered" and r["resolution_date"] == "2026-03-06" and r["fill_price"] is None, r
+# гап над pivot → по отварянето
+r = sim(PLAN, mk([(102.0, 103, 101, 102.5)]))
+assert (r["status"], r["fill_price"]) == ("open", 102.0), r
+# таванът за вход: отваряне точно на $105.00 е допустимо, $105.01 → не се гони
+assert sim(PLAN, mk([(105.0, 106, 104, 105.5)]))["status"] == "open"
+r = sim(PLAN, mk([(105.01, 107, 105, 106)]))
+assert r["status"] == "skipped_extended" and r["resolution_date"] == "2026-03-02" and r["fill_price"] is None, r
+print("  ✓ High == pivot → вход на pivot (в деня на брифа); High 99.99 ×5 → not_triggered; гап → по Open;")
+print("    $105.00 вход, $105.01 → skipped_extended (извън статистиката)")
+
+# прозорец: 5-тата сесия още важи, 6-тата — не; докато тече → pending
+r = sim(PLAN, mk([QUIET] * 4 + [(99, 100.0, 98, 99)]))
+assert (r["status"], r["fill_date"]) == ("open", "2026-03-06"), r
+r = sim(PLAN, mk([QUIET] * 5 + [(99, 101, 98, 100)]))
+assert r["status"] == "not_triggered" and r["resolution_date"] == "2026-03-06", r
+r = sim(PLAN, mk([QUIET] * 4))
+assert r["status"] == "pending" and r["resolution_date"] is None, r
+assert sim(PLAN, mk([]))["status"] == "pending"
+print("  ✓ вход на 5-тата сесия ✓, на 6-тата → not_triggered; с 4 бара (прозорецът тече) → pending; без бара → pending")
+
+# бриф в събота → първата сесия е понеделник; барове ПРЕДИ entry_date не пълнят
+wk = dict(PLAN, entry_date="2026-03-07")                               # събота
+bars = mk([(98, 101, 97, 100)] + [(98, 100.0, 97, 99)] * 3, start="2026-03-05")   # Чт, Пт, Пн, Вт
+r = sim(wk, bars)
+assert (r["status"], r["fill_date"]) == ("open", "2026-03-09"), r      # чт/пт (High 101) са преди брифа
+r = sim(dict(PLAN, entry_date="2026-03-03"), mk([(98, 101, 97, 100)] + [QUIET] * 6))   # понеделникът е преди брифа
+assert r["status"] == "not_triggered", r
+print("  ✓ събота → първата сесия е понеделник; барове преди деня на брифа не пълнят")
+
+# празник: прозорецът е по БАРОВЕ (сесии), не по календарни дни — липсващ работен ден не е сесия
+idx = pd.DatetimeIndex(["2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23"])   # 19.06 празник
+b = pd.DataFrame([QUIET] * 4 + [(99, 100.0, 98, 99), (99, 101, 98, 100)], index=idx, columns=["Open", "High", "Low", "Close"])
+r = sim(dict(PLAN, entry_date="2026-06-13"), b)
+assert (r["status"], r["fill_date"]) == ("open", "2026-06-22"), r        # 5-тата сесия е 22.06
+print("  ✓ прозорецът брои сесии (13.06 → 15,16,17,18,22.06; 19.06 е празник)")
+
+# невалиден риск: стопът над входа
+assert sim(dict(PLAN, stop_loss=101.0), mk([(98, 100.0, 97, 99)]))["status"] == "invalid_risk"
+print("  ✓ стоп ≥ цената на входа → invalid_risk")
+print()
+
+print("── СИНТЕТИЧНО: изход след входа (v1 семантика до т.4/т.5) ──")
+# стоп на входния ден (гап вход + Low под стопа) → -1R на стоп-цената
+r = sim(PLAN, mk([(100.5, 101, 91.0, 95)]))
+assert (r["status"], r["exit_price"], r["realized_r"]) == ("stopped", 92.0, -1.0), r
+# стоп по-късно
+r = sim(PLAN, mk([(99, 101, 98, 100), (99, 100, 91.5, 95)]))
+assert (r["status"], r["exit_date"], r["realized_r"]) == ("stopped", "2026-03-03", -1.0), r
+# цел → trailing → излизане при Close под 10DMA
+rows = [(99, 101, 98, 100)]                                            # вход 100.0 (риск 8)
+rows += [(100 + i, 106 + i, 100 + i, 101 + i) for i in range(1, 12)]   # покачване; High стига $116 (t1) на 10-тия бар
+rows += [(112, 113, 111, 112), (111, 112, 110, 111), (108, 109, 100, 101)]      # Close 101 под 10DMA
+r = sim(PLAN, mk(rows))
+assert r["status"] == "trailing_stop_exit" and r["target1_hit_date"] is not None, r
+assert r["exit_price"] == 101.0 and r["realized_r"] == round((101.0 - 100.0) / 8.0, 2) == 0.12, r
+print("  ✓ стоп на входния ден и по-късно = -1.00R; цел → trailing → изход при Close под 10DMA (R по реалния изход)")
+
+# живи: open / trailing с текущ R
+r = sim(PLAN, mk([(99, 101, 98, 100), (100, 104, 99, 104)]))
+assert (r["status"], r["current_r"], r["realized_r"]) == ("open", 0.5, None), r        # (104-100)/8
+r = sim(PLAN, mk([(99, 101, 98, 100), (110, 117, 109, 115)]))
+assert r["status"] == "trailing" and r["target1_hit_date"] == "2026-03-03" and r["current_r"] == 1.88, r
+print("  ✓ живи: 'open' (+0.50R) и 'trailing' след цел (+1.88R) — без realized_r")
+
+# изтичане (v1: във фаза 1 → expired без R; във фаза 2 → expired_in_trail с R) и календарен срок
+weeks = config.BACKTEST_MAX_HOLD_WEEKS
+long_open = mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * (weeks * 5 + 8))
+r = sim(PLAN, long_open)
+assert r["status"] == "expired" and r["realized_r"] is None and r["resolution_date"] == "2026-06-22", r   # 02.03 + 16 седмици
+rows = [(99, 101, 98, 100)] + [(100 + i * 0.5, 117 + i * 0.5, 99, 101 + i * 0.5) for i in range(weeks * 5 + 8)]
+r = sim(PLAN, mk(rows))
+assert r["status"] == "expired_in_trail" and r["resolution_date"] == "2026-06-22" and r["realized_r"] is not None, r
+r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-23")   # данните свършват рано, срокът е минал
+assert r["status"] == "expired", r
+r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-22")   # на самия срок още не е изтекла
+assert r["status"] == "open", r
+print("  ✓ изтичане 16 седмици след входа: фаза 1 → expired (без R), фаза 2 → expired_in_trail (с R); срокът важи и по календар")
+print()
+
+print("── РЕАЛНИ барове на EXEL (tests/fixtures) ──")
+exel = pd.read_csv(ROOT / "tests/fixtures/ohlc_EXEL.csv", index_col=0, parse_dates=True)
+TODAY = "2026-10-02"
+
+# 29.06: РЕАЛНИЯТ Action план — гап над pivot, стоп на 12.08
+plan = sizing.position_plan_v2({"price": 54.77, "pivot": 53.93, "struct_low": 50.80}, 1.0, "2026-06-29")
+rec = dict(entry_date="2026-06-29", buy_stop=plan["buy_stop"], max_chase=plan["max_chase"],
+           stop_loss=plan["stop_loss"], target_1=plan["target_1"])
+assert exel.loc["2026-06-29", "Open"] == 55.00 and 53.93 < 55.00 <= plan["max_chase"]      # отваря над pivot, под тавана
+r = sim(rec, exel, TODAY)
+assert (r["status"], r["fill_date"], r["fill_price"]) == ("stopped", "2026-06-29", 55.0), r
+assert (r["exit_date"], r["exit_price"], r["realized_r"]) == ("2026-08-12", 50.39, -1.0), r
+assert exel.loc["2026-08-12", "Open"] > 50.39 >= exel.loc["2026-08-12", "Low"]              # без гап — стопът е ударен вътре в деня
+print("  ✓ бриф 29.06 (реален Action): вход по отварянето $55.00 (гап над pivot $53.93), стоп $50.39 на 12.08 → -1.00R")
+
+# 20.07: хипотетичен buy-stop $57.57, а EXEL не го стига 5 сесии (20–24.07)
+rec = dict(entry_date="2026-07-20", buy_stop=57.57, max_chase=60.45, stop_loss=52.96, target_1=66.79)
+assert exel.loc["2026-07-20":"2026-07-24", "High"].max() < 57.57
+r = sim(rec, exel, TODAY)
+assert r["status"] == "not_triggered" and r["resolution_date"] == "2026-07-24" and r["realized_r"] is None, r
+print("  ✓ бриф 20.07 (хипотетичен buy-stop $57.57): най-високият High 20–24.07 е под него → not_triggered (до 24.07)")
+
+# 25.09: докосване — отваря под pivot $59.72, High го стига на 30.09 → вход точно на pivot
+rec = dict(entry_date="2026-09-25", buy_stop=59.72, max_chase=62.71, stop_loss=54.94, target_1=69.28)
+assert exel.loc["2026-09-30", "Open"] < 59.72 <= exel.loc["2026-09-30", "High"]
+assert exel.loc["2026-09-25":"2026-09-29", "High"].max() < 59.72
+r = sim(rec, exel, TODAY)
+assert (r["status"], r["fill_date"], r["fill_price"]) == ("open", "2026-09-30", 59.72), r
+print("  ✓ бриф 25.09 (хипотетичен buy-stop $59.72): без вход 25–29.09, на 30.09 High го докосва → вход $59.72, жива")
+
+# 01.10: прозорецът (01.10 … 07.10) още тече при данни до 02.10 → pending
+rec = dict(entry_date="2026-10-01", buy_stop=59.72, max_chase=62.71, stop_loss=54.94, target_1=69.28)
+r = sim(rec, exel, TODAY)
+assert r["status"] == "pending", r
+print("  ✓ бриф 01.10 (хипотетичен): има 2 от 5 сесии (01–02.10), High под $59.72 → pending")
+
+print()
+print("Всички тестове минаха.")

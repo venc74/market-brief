@@ -116,9 +116,11 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
         # тезата, не нов вход.
         rec = live.get(c.get("ticker"))
         if rec:
+            # v2: датата на ВХОДА (fill_date), не на препоръката; entry_price вече е реалната цена
+            held_since = rec.get("fill_date") or rec.get("entry_date")
             c.setdefault("markers", []).append({
                 "tag": "OPEN✓",
-                "title": (f"Отворена позиция от {rec.get('entry_date')} "
+                "title": (f"Отворена позиция от {held_since} "
                           f"@ ${rec.get('entry_price')} — не е нов вход."),
             })
             c.setdefault("ai", {})
@@ -130,7 +132,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float) -> tuple[list
             # expiry механизма).
             c["ai"]["watchlist_reason_type"] = "existing_position"
             c["ai"]["watchlist_trigger"] = (
-                f"Вече в портфейла от {rec.get('entry_date')} "
+                f"Вече в портфейла от {held_since} "
                 f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
                 "потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.")
         else:
@@ -334,7 +336,7 @@ def run() -> dict:
     cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
     cot_open_positions = [
         {"ticker": t, "company": ai_brief._verified_company_name(t)["name"],
-         "entry_date": rec.get("entry_date")}
+         "entry_date": rec.get("fill_date") or rec.get("entry_date")}
         for t, rec in sorted(cot_live.items())
     ]
     cot_with_theses = ai_brief.cot_theses(

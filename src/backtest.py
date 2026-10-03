@@ -41,6 +41,14 @@ Entry price = средата (midpoint) на plan.entry_range в деня на �
 
 Персистира се в data/backtest_tracker.json, keyed по "{ticker}_{entry_date}".
 
+Track Record v2 (пакет 1, 2026-10-03): плановете с method == "v2" не влизат с
+"entry = средата на entry_range", а като buy-stop на pivot (виж trade_sim.py):
+статус "pending" до първата сесия с High >= pivot в прозорец от 5 сесии (вкл. деня на
+брифа), вход по max(Open, pivot); иначе "not_triggered" (извън статистиката).
+Състоянието се преизчислява БЕЗ памет от сигнала при всеки run (чиста функция на
+плана и дневните барове) — затова не зависи от пропуснати run-ове. v1 записите
+(без "method") се резолвират както досега.
+
 Graceful degradation (Секция 7): провал на price fetch за конкретен тикър
 → остава в текущия си статус, опитва пак следващия ден; липсващ/повреден
 tracker JSON → започва от празен dict; провал на update_backtest_tracker()
@@ -60,10 +68,13 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
 from src import enrich
+from src import trade_sim
 
 _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 _LIVE_STATUSES = ("open", "trailing")
+# v2: "pending" още няма позиция (чака buy-stop), но трябва да се резолвира всеки run
+_RESOLVABLE_STATUSES = _LIVE_STATUSES + ("pending",)
 
 # FIX 2026-09-17: датата, за която резолюцията вече е минала В ТОЗИ ПРОЦЕС —
 # пази от двоен yf.download(), когато resolve_positions_only() е извикан рано
@@ -157,11 +168,43 @@ def _is_continuation(tracker: dict, ticker: str, entry_date: str) -> bool:
     return False
 
 
+_V2_PLAN_KEYS = ("buy_stop", "max_chase", "stop_loss", "target_1", "entry_mid")
+
+
+def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
+    """
+    v2 запис: entry_date = датата на брифа (препоръката); реалният вход е fill_date /
+    fill_price (след buy-stop). entry_price = планиращият вход (сигналният close) до
+    входа, после реалната цена на входа — така старите потребители на полето (таблицата
+    с отворени позиции, OPEN✓ текстът) показват реалното.
+    """
+    return {
+        "method": "v2", "ticker": ticker, "entry_date": entry_date, "status": "pending",
+        "signal_price": plan["entry_mid"], "entry_price": plan["entry_mid"],
+        "buy_stop": plan["buy_stop"], "max_chase": plan["max_chase"],
+        "stop_loss": plan["stop_loss"], "target_1": plan["target_1"],
+        "window_sessions": plan.get("window_sessions") or config.BUY_STOP_WINDOW_SESSIONS,
+        "valid_through": plan.get("valid_through"),
+        "fill_date": None, "fill_price": None, "risk_per_share": None,
+        "target1_hit_date": None, "exit_date": None, "exit_price": None,
+        "resolution_date": None, "discovered_date": None,
+        "realized_r": None, "current_r": None,
+    }
+
+
 def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict]) -> None:
     """Ingest-ва ЕДИН ден's Action списък (от snapshot файл ИЛИ директно in-memory) в tracker-а."""
     for c in action_list or []:
         ticker = c.get("ticker")
         plan = c.get("plan") or {}
+        if plan.get("method") == "v2":                    # пакет 1, т.2: buy-stop запис
+            if not (ticker and all(plan.get(k) is not None for k in _V2_PLAN_KEYS)):
+                continue
+            key = f"{ticker}_{entry_date}"
+            if key in tracker or _is_continuation(tracker, ticker, entry_date):
+                continue
+            tracker[key] = _new_v2_record(ticker, entry_date, plan)
+            continue
         entry_range = plan.get("entry_range")
         target_1 = plan.get("target_1")
         stop_loss = plan.get("stop_loss")
@@ -309,6 +352,33 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
+_V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "target1_hit_date",
+                   "exit_date", "exit_price", "realized_r", "current_r", "last_close",
+                   "last_close_date")
+
+
+def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date) -> None:
+    """
+    v2: преизчислява състоянието от сигнала с trade_sim.simulate() (чиста функция на плана
+    и дневните барове) — не наслагва върху старото състояние. Мутира rec на място.
+    resolution_date е датата на събитието (изход / последна сесия на прозореца);
+    discovered_date — първият run, който го вижда (както във v1).
+    """
+    res = trade_sim.simulate(rec, bars, today)
+    for k in _V2_RESULT_KEYS:
+        rec[k] = res.get(k)
+    if res.get("fill_price") is not None:
+        rec["entry_price"] = res["fill_price"]
+    elif rec.get("signal_price") is not None:
+        rec["entry_price"] = rec["signal_price"]
+    if res["status"] in trade_sim.LIVE:
+        rec["resolution_date"] = None
+    else:
+        rec["resolution_date"] = res["resolution_date"]
+        if not rec.get("discovered_date"):
+            rec["discovered_date"] = today.isoformat()
+
+
 def _unapplied_splits(rec: dict) -> list[dict] | None:
     """
     FIX 2026-09-23: ВСИЧКИ сплитове след entry, които още НЕ са приложени към
@@ -340,8 +410,11 @@ def _unapplied_splits(rec: dict) -> list[dict] | None:
     if entry_ts.tzinfo is None and splits.index.tz is not None:
         entry_ts = entry_ts.tz_localize(splits.index.tz)
     applied = {s["date"] for s in (rec.get("split_adjusted") or {}).get("splits", [])}
+    # v2: сигналният бар е ПРЕДИ entry_date, затова сплит с ex-date == entry_date
+    # (първата сесия) вече е "след" сигнала; v1 влиза в entry_date и го пропуска
+    after = (splits.index >= entry_ts) if rec.get("method") == "v2" else (splits.index > entry_ts)
     return [{"date": d.date().isoformat(), "ratio": float(r)}
-            for d, r in splits[splits.index > entry_ts].items()
+            for d, r in splits[after].items()
             if d.date().isoformat() not in applied and float(r) > 0]
 
 
@@ -414,6 +487,28 @@ def _apply_split_adjustment(rec: dict, splits: list[dict], closes: "pd.Series",
     return True
 
 
+def _apply_split_adjustment_v2(rec: dict, splits: list[dict], closes: "pd.Series",
+                               today: dt.date) -> bool:
+    """
+    v2 обвивка около _apply_split_adjustment(): тя коригира entry_price / stop_loss /
+    target_1 (+ санитарната проверка и одита); тук се мащабират и останалите нива на
+    плана — buy_stop, max_chase, signal_price. Входът/изходът се преизчисляват от
+    сигнала при следващата резолюция, затова fill/exit не се пипат.
+    """
+    ratio = 1.0
+    for s in splits:
+        ratio *= s["ratio"]
+    before = {k: rec.get(k) for k in ("signal_price", "buy_stop", "max_chase")}
+    if not _apply_split_adjustment(rec, splits, closes, today):
+        return False
+    sa = rec.get("split_adjusted") or {}
+    sa.setdefault("original", {}).update({k: v for k, v in before.items() if v is not None})
+    for k, v in before.items():
+        if v is not None:
+            rec[k] = round(v / ratio, 4)
+    return True
+
+
 def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
                              fields: tuple[str, ...]) -> dict[str, "pd.DataFrame | None"]:
     """
@@ -429,13 +524,16 @@ def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
            for f in fields}
 
 
-def _resolve_open_positions(tracker: dict) -> None:
-    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _LIVE_STATUSES]
+def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
+    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES]
     if not live_items:
         return
 
     tickers = sorted({rec["ticker"] for _, rec in live_items})
-    earliest = min(rec["entry_date"] for _, rec in live_items)
+    # 30 календарни дни ПРЕДИ най-ранния запис: 10DMA на trailing-а трябва да е пълна от
+    # първия ден след входа (v2 симулацията ползва същата серия, както реплеят)
+    earliest = (dt.date.fromisoformat(min(rec["entry_date"] for _, rec in live_items))
+                - dt.timedelta(days=30)).isoformat()
     try:
         data = yf.download(tickers, start=earliest, progress=False, auto_adjust=False)
     except Exception as e:
@@ -445,13 +543,13 @@ def _resolve_open_positions(tracker: dict) -> None:
         print("[backtest] price fetch върна празен резултат")
         return
 
-    cols = _normalize_price_columns(data, tickers, ("High", "Low", "Close"))
-    highs, lows, closes = cols.get("High"), cols.get("Low"), cols.get("Close")
+    cols = _normalize_price_columns(data, tickers, ("Open", "High", "Low", "Close"))
+    opens, highs, lows, closes = cols.get("Open"), cols.get("High"), cols.get("Low"), cols.get("Close")
     if highs is None or lows is None or closes is None:
         print("[backtest] price fetch не върна High/Low/Close колони")
         return
 
-    today = dt.date.today()
+    today = today or dt.date.today()
     for _, rec in live_items:
         ticker = rec["ticker"]
         if ticker not in getattr(highs, "columns", []):
@@ -470,15 +568,24 @@ def _resolve_open_positions(tracker: dict) -> None:
             if rec.get("needs_manual_review"):
                 continue
         elif new_splits:
-            if not _apply_split_adjustment(rec, new_splits, closes[ticker].dropna(), today):
+            adjust = _apply_split_adjustment_v2 if rec.get("method") == "v2" else _apply_split_adjustment
+            if not adjust(rec, new_splits, closes[ticker].dropna(), today):
                 continue
         elif rec.get("needs_manual_review"):
             continue  # флаг без видим неприложен сплит — консервативно остава
         # FIX 2026-09-23: `discovered_date` се слага при резолюцията както винаги
         # — корекция днес + стоп в миналото = late_discovery в брифа (MNST).
         try:
-            _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
-                              closes[ticker].dropna(), today)
+            if rec.get("method") == "v2":
+                if opens is None or ticker not in getattr(opens, "columns", []):
+                    print(f"[backtest] {ticker}: няма Open в batch резултата — пропускам v2 резолюцията")
+                    continue
+                bars = pd.DataFrame({"Open": opens[ticker], "High": highs[ticker],
+                                     "Low": lows[ticker], "Close": closes[ticker]}).dropna()
+                _resolve_position_v2(rec, bars, today)
+            else:
+                _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
+                                  closes[ticker].dropna(), today)
         except Exception as e:
             print(f"[backtest] {ticker}: резолюция неуспешна, остава {rec['status']}: {e}")
             continue
@@ -712,7 +819,9 @@ def get_backtest_summary() -> dict:
                     pass
             open_positions.append({
                 "ticker": r["ticker"],
-                "entry_date": r["entry_date"],
+                # v2: показваме РЕАЛНИЯ вход (fill_date); entry_date е датата на препоръката
+                "entry_date": r.get("fill_date") or r["entry_date"],
+                "signal_date": r["entry_date"],
                 "entry_price": entry_price,
                 "current_price": round(cur, 2) if cur is not None else None,
                 "unrealized_pct": unrealized_pct,
@@ -723,6 +832,14 @@ def get_backtest_summary() -> dict:
                 "earnings_recap": enrich.earnings_recap(r["ticker"]),
             })
         open_positions.sort(key=lambda r: r["entry_date"])  # възходящо — най-старите първи
+
+    # v2: препоръки, които още чакат buy-stop (няма позиция, не е в статистиката)
+    pending_positions = sorted(
+        ({"ticker": r["ticker"], "entry_date": r["entry_date"], "buy_stop": r.get("buy_stop"),
+          "max_chase": r.get("max_chase"), "valid_through": r.get("valid_through"),
+          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1")}
+         for r in records if r.get("status") == "pending"),
+        key=lambda r: r["entry_date"])
 
     return {
         "total_resolved": total_resolved,
@@ -735,6 +852,12 @@ def get_backtest_summary() -> dict:
         "expired": by_status.get("expired", 0),
         "still_open": by_status.get("open", 0),
         "trailing": by_status.get("trailing", 0),
+        # v2: чакат buy-stop / прозорецът изтече без вход / над тавана за вход — не са
+        # позиции и не влизат в win rate и средния R
+        "pending": by_status.get("pending", 0),
+        "not_triggered": by_status.get("not_triggered", 0),
+        "skipped_extended": by_status.get("skipped_extended", 0) + by_status.get("invalid_risk", 0),
+        "pending_positions": pending_positions,
         "avg_realized_r": avg_r,
         "recent": recent,
         "open_positions": open_positions,
