@@ -99,6 +99,9 @@ LAST_CUT["to"] = None
 backtest._resolve_open_positions(tr, today=TODAY)
 r = tr["EXEL_2026-06-29"]
 assert (r["status"], r["resolution_date"], r["exit_price"], r["realized_r"]) == ("stopped", "2026-08-12", 50.39, -1.0), r
+# Track Record-ът пази сигналния close само за одит; рискът и доходността са от реалния вход $55.00
+assert r["signal_price"] == 54.77 and r["entry_price"] == r["fill_price"] == 55.0
+assert r["risk_per_share"] == 4.61 and r["return_pct"] == -8.38, r
 assert r["discovered_date"] == "2026-10-02" and r["fill_date"] == "2026-06-29"
 before = copy.deepcopy(r)
 backtest._resolve_open_positions(tr, today=dt.date(2026, 10, 5))        # терминален → не се пипа

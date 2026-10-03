@@ -166,6 +166,26 @@ print("  ✓ изтичане 16 седмици след входа → mark-to-
 print("    expired_in_trail с претеглен R; срокът важи и по календар")
 print()
 
+print("── СИНТЕТИЧНО: R и доходността се мерят от РЕАЛНАТА цена на изпълнение, не от сигналния close ──")
+# Планът е изчислен от сигнален close $101 (стоп $92 → риск $9, цел 2R = $119), но simulate() получава само
+# нивата — сигналният close не е негов вход. Реалният вход е max(Open, pivot).
+PLAN_SC = dict(entry_date="2026-03-02", buy_stop=100.0, max_chase=105.0, stop_loss=92.0, target_1=119.0, window_sessions=5)
+# а) гап над pivot: вход по Open $103 (не $100 и не $101); следващият ден гапва под стопа и излиза по Open $90
+r = sim(PLAN_SC, mk([(103.0, 104, 102, 103.5), (90.0, 91, 89, 90.5)]))
+assert (r["fill_price"], r["risk_per_share"], r["exit_price"]) == (103.0, 11.0, 90.0), r
+assert r["realized_r"] == round((90.0 - 103.0) / 11.0, 2) == -1.18, r                      # от сигналния close щеше да е -1.22, от pivot -1.25
+assert r["return_pct"] == round((90.0 - 103.0) / 103.0 * 100, 2) == -12.62, r
+# б) докосване: Open $98 под pivot, High го стига → вход точно на pivot $100 (не на Open $98, не на close $101)
+r = sim(PLAN_SC, mk([(98.0, 100.0, 97, 99), (99, 109, 98, 108)]))
+assert (r["fill_price"], r["status"]) == (100.0, "open") and r["current_r"] == round((108.0 - 100.0) / 8.0, 2) == 1.0, r   # от close $101 → 0.78
+# в) целта е ЦЕНОВО ниво от плана ($119); частичната продажба на нея е R от реалния вход: (119-103)/11 = +1.45, не +2.00
+r = sim(PLAN_SC, mk([(103.0, 104, 102, 103.5), (104, 120, 103, 119), (100, 101, 91, 95)]))
+assert (r["fill_price"], r["partial_price"], r["status"], r["exit_price"]) == (103.0, 119.0, "stopped", 92.0), r
+assert r["realized_r"] == round(0.5 * (119.0 - 103.0) / 11.0 + 0.5 * (92.0 - 103.0) / 11.0, 2) == 0.23, r
+print("  ✓ гап вход $103: риск $11 (не $9 от плана), гап изход $90 → -1.18R / -12.62% (от close $101 би било -1.22R);")
+print("    вход при докосване $100 → +1.00R при Close $108 (от close $101 — +0.78R); цел $119 от плана = +1.45R от реалния вход")
+print()
+
 print("── РЕАЛНИ барове на EXEL (tests/fixtures) ──")
 exel = pd.read_csv(ROOT / "tests/fixtures/ohlc_EXEL.csv", index_col=0, parse_dates=True)
 TODAY = "2026-10-02"
@@ -179,6 +199,8 @@ r = sim(rec, exel, TODAY)
 assert (r["status"], r["fill_date"], r["fill_price"]) == ("stopped", "2026-06-29", 55.0), r
 assert (r["exit_date"], r["exit_price"], r["realized_r"]) == ("2026-08-12", 50.39, -1.0), r
 assert exel.loc["2026-08-12", "Open"] > 50.39 >= exel.loc["2026-08-12", "Low"]              # без гап — стопът е ударен вътре в деня
+# реалният риск е от входа $55.00 (Open), не от сигналния close $54.77 на картата: $4.61 срещу $4.38 в плана
+assert plan["risk_per_share"] == 4.38 and r["risk_per_share"] == 4.61 and r["return_pct"] == -8.38   # от close $54.77 би било -7.99%
 print("  ✓ бриф 29.06 (реален Action): вход по отварянето $55.00 (гап над pivot $53.93), стоп $50.39 на 12.08 → -1.00R")
 
 # 20.07: хипотетичен buy-stop $57.57, а EXEL не го стига 5 сесии (20–24.07)
