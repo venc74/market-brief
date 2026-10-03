@@ -3,7 +3,7 @@
 ## Какво е това
 Автоматизирана система за ежедневен pre-market бриф (07:30 CET), достъпна на
 `venc74.github.io/market-brief`. Събира макро контекст, измерва пазарен режим
-(термометър), скринира акции по Weinstein + CANSLIM, синтезира анализ през
+(термометър), скринира акции по Weinstein / Minervini trend template + CANSLIM, синтезира анализ през
 Claude API, рендерира dashboard (GitHub Pages) + имейл.
 
 Пуска се **само** през cron-job.org (external trigger към GitHub Actions
@@ -46,7 +46,9 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 
 ```
 main.py              — оркестратор: macro → thermometer → sectors → screener
-                        → enrich → AI synthesis → hard rules → sizing → render
+                        → enrich → AI synthesis → Track Record (ensure v2,
+                        резолюция) → hard rules (технически + режимен gate)
+                        → sizing → ingest → render
 config.py            — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
 src/macro_layer.py    — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
 src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
@@ -54,15 +56,31 @@ src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
                         Breadth, IEI/HYG Credit Spread) +
                         Offensive/Defensive/Cash режим
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
-src/screener.py        — Stage 2 + CANSLIM скрийнър
+src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rating
+                        (втори проход върху целия универс) + CANSLIM скрийнър;
+                        pivot = най-високият High на базата БЕЗ последните 5 бара
+src/setup_rules.py     — код-класификация на сетъпа (confirmed / no_volume /
+                        below_pivot / extended / too_wide), buy-stop ниво, "валиден
+                        до" в сесии, stop_levels() — общата стоп математика
 src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
 src/ai_brief.py         — Claude API: macro brief, ticker narratives, COT theses
 src/cot.py              — CFTC Commitments of Traders, whitelist 35 пазара
 src/thesis_context.py   — каре "Контекст" (само данни) към маркираните тези
 src/oi_snapshot.py      — следобедна OI снимка за Unusual Options (отделен job)
-src/sizing.py           — 1% риск, 2:1 R/R, Defensive ×0.5
+src/sizing.py           — 1% риск, 2:1 R/R, Defensive ×0.5; position_plan_v2():
+                        buy-stop вход, структурен стоп, цел 50% на 2R
+src/trade_sim.py        — ЧИСТА симулация на изпълнението (buy-stop, частична
+                        продажба, trailing 10DMA, гап изход, mark-to-market
+                        изтичане, SPY сравнение); без I/O — ползва се и от реплея
+src/backtest.py         — Track Record v2: tracker (pending/open/trailing/…),
+                        резолюция през trade_sim, обобщение за dashboard-а
+src/tracker_switch.py   — еднократно превключване v1→v2 (архив), revert_to_v1()
 src/render.py            — dashboard HTML (Jinja2) + email HTML
 templates/dashboard.html.j2 — единственият source за docs/index.html
+test_*.py, tests/fixtures/ — тестове (python test_<име>.py), без мрежа и НИКОГА
+                        срещу реалните data/*.json (временна директория); фикстури:
+                        реални OHLC (AMD, TWLO, LNTH, EXEL, SPY) и копие на реалния
+                        v1 tracker от 02.10.2026
 ```
 
 ## Текущи toggle-и и прагове (config.py)
@@ -75,6 +93,23 @@ templates/dashboard.html.j2 — единственият source за docs/index.
   тригер (виж `thermometer.py: credit_spread_proxy()`)
 - `COT_PERCENTILE_LOW/HIGH = 10/90` — строги прагове, малко на брой резултати
 - `MAX_ACTION_TICKERS = 5`, `MAX_PER_SECTOR = 2`
+- Сетъп/вход (пакет 1): `PIVOT_BASE_BARS = 65`, `PIVOT_EXCLUDE_LAST_BARS = 5`,
+  `BUYABLE_ZONE_MAX_PCT = 5.0` (над това = extended), `BUY_STOP_WINDOW_SESSIONS = 5`
+  (сесии, вкл. деня на брифа), `BREAKOUT_VOLUME_MULT = 1.5`. `NYSE_HOLIDAYS` покрива
+  2026–2027 и трябва да се допълва (за "валиден до")
+- Стоп: `STOP_STRUCT_LOOKBACK_BARS = 15`, `STOP_STRUCT_BUFFER_PCT = 1.0` (1% под low-а),
+  `STOP_MAX_PCT = 8.0`, `STOP_REJECT_STRUCT_RISK_PCT = 10.0` (над това → Watchlist
+  "твърде разтегнато")
+- Цел/изтичане: `TARGET_PARTIAL_FRACTION = 0.5` (на 2R = `MIN_REWARD_RISK`),
+  `TRAIL_SMA_DAYS = 10`, `BACKTEST_MAX_HOLD_WEEKS = 16` (от ВХОДА, mark-to-market)
+- Режим → Action: `REGIME_CASH_BLOCKS_ACTION = 1`,
+  `REGIME_DEFENSIVE_REQUIRES_GOOD_TIMING = 1` (причина във Watchlist: `regime_block`,
+  не изтича като `regime_gate`)
+- Trend template: `TREND_TEMPLATE_ENABLED = 1`, `TT_MA200_RISING_BARS = 21`,
+  `TT_MIN_ABOVE_52W_LOW_PCT = 30`, `TT_MAX_BELOW_52W_HIGH_PCT = 25`, `RS_RATING_MIN = 70`
+  (перцентил в целия универс; `RS_RATING_WEIGHTS = 40/20/20/20`, `RS_QUARTER_BARS = 63`,
+  `RS_RATING_MIN_UNIVERSE = 150` — под него филтърът се пропуска с предупреждение)
+- Track Record: `TRACK_RECORD_V2 = 1` — автоматично превключване v1→v2 при първия run
 
 ## Известни особености / история на решенията
 
@@ -94,6 +129,44 @@ templates/dashboard.html.j2 — единственият source за docs/index.
 - Данните тръгват от commit в `main` → GitHub Pages `/docs` папката сервира
   живия dashboard; `data/*.json` в root-а НЕ е публично достъпен по HTTP,
   затова `render.py` огледалва в `docs/data/`.
+- Пакет 1 (03.10.2026) — ядро на сигналите. Преди: pivot = max(High[-65:]) включваше
+  сигналния бар, затова close ≤ pivot ВИНАГИ (95 от 97 Action реда под pivot, 2 на него,
+  0 над; Entry Timing "good" — недостижим), а Track Record влизаше по средата на
+  entry_range без реално изпълнение (фантомни входове; 1 печеливш от 26). Сега:
+  • pivot без последните 5 бара; Action само при ПОТВЪРДЕН пробив (close над pivot, до +5%,
+    обем ≥ 1.5×, структурен риск ≤ 10%); останалото отива във Watchlist (`technical_gate`)
+    с buy-stop ниво — кодът има последната дума над AI класификацията;
+  • изпълнение: buy-stop на pivot; първата сесия е деня на брифа (бриф преди отваряне),
+    прозорец 5 сесии, вход по max(Open, pivot), над pivot +5% не се гони; без вход →
+    `not_triggered` (извън статистиката). R и доходността се мерят от РЕАЛНАТА цена на входа,
+    не от сигналния close (той е само за плана на картата);
+  • стоп под 15-баровия low (−1%), най-много 8% под входа; 50% на 2R, остатъкът trailing под
+    10DMA със запазен стоп; гап през стопа → изход по Open; изтичане след 16 седмици →
+    mark-to-market R;
+  • режим: Cash → без Action; Defensive → само при Entry Timing "good";
+  • Minervini trend template + RS rating ≥ 70, слети със старата Stage 2 проверка.
+  Реплей 02.01.2024–01.10.2026 (904 тикъра): НЯМА демонстрирана алфа — промените са за
+  коректност и контрол на риска, не обещание за доходност (числата са в коментарите на
+  config.py и в commit-ите "Package 1").
+- Track Record v1 → v2 (чист старт). При ПЪРВИЯ run с v2 код `tracker_switch.
+  ensure_v2_methodology()` (от main.run, преди резолюцията): резолюция на живите v1;
+  изтеклите във фаза 1 получават mark-to-market R по Close при изтичането; останалите
+  отворени се затварят по последния Close като `v1_closed` (MTM R). Всичко отива в
+  `data/backtest_archive_v1.json` (заедно с точно копие на tracker-а преди превключването),
+  `data/backtest_tracker.json` остава само с v2 записи, `data/track_record_state.json` пази
+  методологията и v1 статистиката. Брифът показва един ред "v1 методология: n=…, win rate …,
+  среден R …". OPEN✓, RE-ENTRY и позициите в COT промпта гледат само v2 записи; v1 планове от
+  старите snapshot-и не се ingest-ват повторно. Идемпотентно и graceful: без цени →
+  отлага за следващия run; срив на всяка стъпка не губи данни (архив → tracker → състояние).
+  Новите файлове в `data/` се записват от workflow-а (`git add docs/ data/`).
+- Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
+  отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
+  ```bash
+  .venv/bin/python -c "from src import tracker_switch; print(tracker_switch.revert_to_v1())"
+  ```
+  Следващият run превключва наново, затова при реално връщане първо задай `TRACK_RECORD_V2=0`
+  (default в config.py или env), после revert, после commit на `data/`. Не пипай
+  `daily_brief.yml` без нужда — няма `schedule:` нарочно.
 
 ## Език
 
