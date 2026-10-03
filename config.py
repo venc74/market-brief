@@ -174,6 +174,19 @@ VIX_SPIKE_WEEKLY_PCT = float(os.getenv("VIX_SPIKE_WEEKLY_PCT", 20.0))
 # бройките са 8 вместо 9 и прагът е 6 от 8 (беше 7 от 9 — същата пропорция ~75%).
 THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE = int(os.getenv("THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE", 6))
 
+# 2026-10-03 (пакет 2 т.3): Put/Call на SPY — калибриран спрямо СОБСТВЕНАТА история (percentile, като IEI/HYG), не
+# спрямо фиксирани 1.1/0.7. Проблемът: P/C на най-близкия SPY експирейшън има медиана 1.12 (хеджиране) — старият праг
+# "над 1.1 → зелено" правеше индикатора зелен в 42 от 78 дни (54%), червен само 2 пъти. Сега: висок percentile
+# (страх, contrarian) → зелено, нисък (самодоволство) → червено; крайните 10% от двете страни, както IEI/HYG (спайк 90.,
+# ниво 10.) — "малко, но значимо", за да не раздува червените в броенето. Реплей върху 78-те снимки (без поглед напред,
+# първите 30 дни скрити): 90/10 → зелено 13 / жълто 31 / червено 4 / скрито 30; в стационарно състояние 10/80/10%.
+# Алтернативата 80/20 дава 20% червени и 5 дни с различен режим (срещу 3). История: най-много PUTCALL_LOOKBACK дни, поне
+# PUTCALL_MIN_HISTORY, иначе индикаторът се скрива; пази се в data/put_call_history.json (при липса — от брифовете).
+PUTCALL_PERCENTILE_GREEN = float(os.getenv("PUTCALL_PERCENTILE_GREEN", 90))
+PUTCALL_PERCENTILE_RED = float(os.getenv("PUTCALL_PERCENTILE_RED", 10))
+PUTCALL_MIN_HISTORY = int(os.getenv("PUTCALL_MIN_HISTORY", 30))
+PUTCALL_LOOKBACK = int(os.getenv("PUTCALL_LOOKBACK", 252))
+
 # ── API ключове (от GitHub Secrets / .env) ───────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
@@ -233,6 +246,7 @@ import pathlib
 ROOT = pathlib.Path(__file__).parent
 DATA_DIR = ROOT / "data"
 DOCS_DIR = ROOT / "docs"
+PUTCALL_HISTORY_FILE = DATA_DIR / "put_call_history.json"
 
 # ── Секторни ETF-и за ротационен анализ (Слой 2) ─────────────────────────
 SECTOR_ETFS = {

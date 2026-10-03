@@ -100,27 +100,95 @@ def vix_level() -> dict:
     }
 
 
-def market_put_call() -> dict:
+def _put_call_hidden(reason: str) -> dict:
+    print(f"[thermo] P/C скрит: {reason}")
+    return {"name": "Put/Call (SPY)", "value": None, "status": "yellow", "hide": True, "label": ""}
+
+
+def _load_put_call_history(today_iso: str) -> dict[str, float]:
     """
-    Пазарен P/C ratio — апроксимация чрез SPY опционната верига
-    (CBOE total P/C изисква платен фийд). >1.1 = страх, <0.8 = алчност.
+    {дата: P/C} от data/put_call_history.json; при липсващ/повреден файл или под PUTCALL_MIN_HISTORY записа —
+    допълва се от записаните брифове (data/YYYY-MM-DD.json, термометър → "Put/Call (SPY)".value). Днешната
+    дата се изключва (не се сравнява със себе си). Никога не гърми.
     """
+    hist: dict[str, float] = {}
+    try:
+        if config.PUTCALL_HISTORY_FILE.exists():
+            raw = json.loads(config.PUTCALL_HISTORY_FILE.read_text())
+            hist = {k: float(v) for k, v in raw.items() if isinstance(v, (int, float)) and v > 0}
+    except Exception as e:
+        print(f"[thermo] P/C история: файлът е повреден ({type(e).__name__}: {e}) — ще се пресъздаде от брифовете")
+        hist = {}
+    if len(hist) < config.PUTCALL_MIN_HISTORY:
+        try:
+            for p in sorted(config.DATA_DIR.glob("20??-??-??.json")):
+                if p.stem in hist:
+                    continue
+                for i in (json.loads(p.read_text()).get("thermometer", {}).get("indicators") or []):
+                    v = i.get("value")
+                    if str(i.get("name", "")).startswith("Put/Call") and isinstance(v, (int, float)) and v > 0:
+                        hist[p.stem] = float(v)
+        except Exception as e:
+            print(f"[thermo] P/C история от брифовете: {type(e).__name__}: {e}")
+    hist.pop(today_iso, None)
+    return hist
+
+
+def _save_put_call_value(hist: dict[str, float], today_iso: str, value: float) -> None:
+    try:
+        config.DATA_DIR.mkdir(exist_ok=True)
+        config.PUTCALL_HISTORY_FILE.write_text(json.dumps({**hist, today_iso: value}, sort_keys=True))
+    except Exception as e:
+        print(f"[thermo] P/C история: запис неуспешен ({type(e).__name__}: {e})")
+
+
+def _evaluate_put_call(pc: float, history: list[float]) -> dict:
+    """
+    Чисто изчисление: percentile на днешния P/C спрямо собствената история (последните PUTCALL_LOOKBACK
+    стойности, без днешната; както cot.py/IEI-HYG — дял ≤ текущото). Висок percentile (страх, contrarian) →
+    зелено, нисък (самодоволство) → червено; жълто между PUTCALL_PERCENTILE_RED и _GREEN. Под
+    PUTCALL_MIN_HISTORY стойности → индикаторът се скрива (не може да се калибрира).
+    """
+    history = history[-config.PUTCALL_LOOKBACK:]
+    if len(history) < config.PUTCALL_MIN_HISTORY:
+        return _put_call_hidden(f"недостатъчна история за калибриране ({len(history)} от {config.PUTCALL_MIN_HISTORY} дни)")
+    pct = _percentile_rank(history, pc)
+    if pct >= config.PUTCALL_PERCENTILE_GREEN:
+        status, note = "green", "страх — висок за собствената история (contrarian)"
+    elif pct <= config.PUTCALL_PERCENTILE_RED:
+        status, note = "red", "самодоволство — ниско за собствената история"
+    else:
+        status, note = "yellow", "в нормалния диапазон"
+    return {"name": "Put/Call (SPY)", "value": round(pc, 2), "percentile": pct, "history_days": len(history),
+            "status": status,
+            "label": f"P/C {pc:.2f} ({pct:.0f}. percentile от {len(history)} дни; {note})"}
+
+
+def market_put_call(today: dt.date | None = None) -> dict:
+    """
+    Пазарен P/C ratio — апроксимация чрез SPY опционната верига (CBOE total P/C изисква платен фийд).
+    ПАКЕТ 2 т.3: цветът е percentile спрямо СОБСТВЕНАТА история (_evaluate_put_call), не фиксирани 1.1/0.7 (при
+    медиана 1.12 те даваха зелено 54% от дните). При провал на данните или недостатъчна история
+    индикаторът се СКРИВА (hide=True) — не остава видимо жълт и не влиза в броенето.
+    """
+    today_iso = (today or dt.date.today()).isoformat()
     try:
         spy = yf.Ticker("SPY")
         exp = spy.options[0]
         chain = spy.option_chain(exp)
         put_vol = int(chain.puts["volume"].fillna(0).sum())
         call_vol = int(chain.calls["volume"].fillna(0).sum())
-        pc = put_vol / call_vol if call_vol else None
-        if pc is None:
-            raise ValueError("no volume")
-        status = "green" if pc > 1.1 else ("red" if pc < 0.7 else "yellow")
-        return {"name": "Put/Call (SPY)", "value": round(pc, 2), "status": status,
-                "label": f"P/C {pc:.2f}"}
+        if not call_vol:
+            raise ValueError("няма call обем")
+        pc = put_vol / call_vol
+        if math.isnan(pc) or pc <= 0:
+            raise ValueError(f"невалиден P/C ({pc})")
     except Exception as e:
-        print(f"[thermo] P/C failed: {e}")
-        return {"name": "Put/Call (SPY)", "value": None, "status": "yellow",
-                "label": "P/C: няма данни"}
+        return _put_call_hidden(f"{type(e).__name__}: {e}")
+    hist = _load_put_call_history(today_iso)
+    out = _evaluate_put_call(pc, list(hist[k] for k in sorted(hist)))
+    _save_put_call_value(hist, today_iso, round(pc, 4))            # днешната стойност влиза в историята и при скрит индикатор
+    return out
 
 
 def _is_stale(last_ts) -> bool:
