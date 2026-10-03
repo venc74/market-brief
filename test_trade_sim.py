@@ -79,42 +79,71 @@ assert sim(dict(PLAN, stop_loss=101.0), mk([(98, 100.0, 97, 99)]))["status"] == 
 print("  ✓ стоп ≥ цената на входа → invalid_risk")
 print()
 
-print("── СИНТЕТИЧНО: изход след входа (v1 семантика до т.4/т.5) ──")
+print("── СИНТЕТИЧНО: изход след входа (т.4 — частична продажба на цел 1; т.5 още не) ──")
 # стоп на входния ден (гап вход + Low под стопа) → -1R на стоп-цената
 r = sim(PLAN, mk([(100.5, 101, 91.0, 95)]))
 assert (r["status"], r["exit_price"], r["realized_r"]) == ("stopped", 92.0, -1.0), r
 # стоп по-късно
 r = sim(PLAN, mk([(99, 101, 98, 100), (99, 100, 91.5, 95)]))
 assert (r["status"], r["exit_date"], r["realized_r"]) == ("stopped", "2026-03-03", -1.0), r
-# цел → trailing → излизане при Close под 10DMA
+print("  ✓ стоп на входния ден и по-късно = -1.00R (цялата позиция)")
+
+# цел → 50% се продава на $116 (2R), остатъкът → trailing → излиза при Close под 10DMA
 rows = [(99, 101, 98, 100)]                                            # вход 100.0 (риск 8)
 rows += [(100 + i, 106 + i, 100 + i, 101 + i) for i in range(1, 12)]   # покачване; High стига $116 (t1) на 10-тия бар
 rows += [(112, 113, 111, 112), (111, 112, 110, 111), (108, 109, 100, 101)]      # Close 101 под 10DMA
 r = sim(PLAN, mk(rows))
-assert r["status"] == "trailing_stop_exit" and r["target1_hit_date"] is not None, r
-assert r["exit_price"] == 101.0 and r["realized_r"] == round((101.0 - 100.0) / 8.0, 2) == 0.12, r
-print("  ✓ стоп на входния ден и по-късно = -1.00R; цел → trailing → изход при Close под 10DMA (R по реалния изход)")
+assert r["status"] == "trailing_stop_exit" and r["target1_hit_date"] == "2026-03-16", r
+assert (r["partial_price"], r["partial_fraction"], r["exit_price"]) == (116.0, 0.5, 101.0), r
+assert r["R"] == 0.5 * 2.0 + 0.5 * (101.0 - 100.0) / 8.0 and r["realized_r"] == 1.06, r     # 1.0 + 0.0625 = 1.0625
+print("  ✓ 50% на $116 (+2.00R) + остатък на $101 (+0.125R) = +1.0625R → 1.06; стопът не е изключен")
 
-# живи: open / trailing с текущ R
+# цел на входния ден → частичната е точно на целта; гап над целта на по-късен бар → по отварянето
+r = sim(PLAN, mk([(99, 117, 98, 116)]))
+assert (r["status"], r["partial_price"], r["target1_hit_date"]) == ("trailing", 116.0, "2026-03-02"), r
+r = sim(PLAN, mk([(99, 101, 98, 100), (120.0, 121, 119, 120)]))
+assert r["partial_price"] == 120.0 and r["current_r"] == round(0.5 * (120 - 100) / 8 + 0.5 * (120 - 100) / 8, 2) == 2.5, r
+print("  ✓ цел на входния ден → продава на $116; гап над целта ($120) на по-късен бар → по отварянето ($120, +2.50R)")
+
+# стоп СЛЕД частичната: остатъкът излиза на стопа → +0.5R (печалба по R, макар и "stopped")
+r = sim(PLAN, mk([(99, 101, 98, 100), (100, 117, 99, 115), (99, 100, 91.0, 95)]))
+assert r["status"] == "stopped" and r["partial_price"] == 116.0 and r["exit_price"] == 92.0, r
+assert r["R"] == 0.5 * 2.0 + 0.5 * -1.0 == 0.5 and r["realized_r"] == 0.5, r
+# в един бар стопът е ПЪРВИ: Low под стопа и High над целта → -1R, без частична
+r = sim(PLAN, mk([(99, 101, 98, 100), (100, 117, 91.0, 110)]))
+assert r["status"] == "stopped" and r["partial_price"] is None and r["realized_r"] == -1.0, r
+print("  ✓ стоп след частичната: 0.5×(+2.0) + 0.5×(-1.0) = +0.50R; Low под стопа и High над целта в един бар → стопът е първи (-1.00R)")
+
+# живи: open / trailing с текущ R (включва частичната)
 r = sim(PLAN, mk([(99, 101, 98, 100), (100, 104, 99, 104)]))
 assert (r["status"], r["current_r"], r["realized_r"]) == ("open", 0.5, None), r        # (104-100)/8
-r = sim(PLAN, mk([(99, 101, 98, 100), (110, 117, 109, 115)]))
-assert r["status"] == "trailing" and r["target1_hit_date"] == "2026-03-03" and r["current_r"] == 1.88, r
-print("  ✓ живи: 'open' (+0.50R) и 'trailing' след цел (+1.88R) — без realized_r")
+r = sim(PLAN, mk([(99, 101, 98, 100), (110, 117, 109, 111)]))
+assert r["status"] == "trailing" and r["target1_hit_date"] == "2026-03-03" and r["realized_r"] is None, r
+assert r["current_r"] == round(0.5 * 2.0 + 0.5 * (111 - 100) / 8, 2) == 1.69, r        # 1.0 + 0.6875
+print("  ✓ живи: 'open' (+0.50R) и 'trailing' след частична продажба (+1.69R = 1.00 + 0.69) — без realized_r")
 
-# изтичане (v1: във фаза 1 → expired без R; във фаза 2 → expired_in_trail с R) и календарен срок
+# TARGET_PARTIAL_FRACTION е параметър: 0 → цялата позиция е в trailing
+orig_frac = config.TARGET_PARTIAL_FRACTION
+config.TARGET_PARTIAL_FRACTION = 0.0
+r = sim(PLAN, mk(rows))
+config.TARGET_PARTIAL_FRACTION = orig_frac
+assert r["status"] == "trailing_stop_exit" and r["realized_r"] == round((101.0 - 100.0) / 8.0, 2) == 0.12, r
+print("  ✓ TARGET_PARTIAL_FRACTION = 0 → цялата позиция се пази до trailing изхода (+0.12R)")
+
+# изтичане (т.5 още не: фаза 1 → expired без R; фаза 2 → expired_in_trail с претеглен R) и календарен срок
 weeks = config.BACKTEST_MAX_HOLD_WEEKS
 long_open = mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * (weeks * 5 + 8))
 r = sim(PLAN, long_open)
 assert r["status"] == "expired" and r["realized_r"] is None and r["resolution_date"] == "2026-06-22", r   # 02.03 + 16 седмици
 rows = [(99, 101, 98, 100)] + [(100 + i * 0.5, 117 + i * 0.5, 99, 101 + i * 0.5) for i in range(weeks * 5 + 8)]
 r = sim(PLAN, mk(rows))
-assert r["status"] == "expired_in_trail" and r["resolution_date"] == "2026-06-22" and r["realized_r"] is not None, r
+assert r["status"] == "expired_in_trail" and r["resolution_date"] == "2026-06-22" and r["partial_price"] == 116.0, r
+assert r["realized_r"] == round(0.5 * 2.0 + 0.5 * (r["exit_price"] - 100.0) / 8.0, 2), r
 r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-23")   # данните свършват рано, срокът е минал
 assert r["status"] == "expired", r
 r = sim(PLAN, mk([(99, 101, 98, 100)] + [(100, 104, 98, 101)] * 10), today="2026-06-22")   # на самия срок още не е изтекла
 assert r["status"] == "open", r
-print("  ✓ изтичане 16 седмици след входа: фаза 1 → expired (без R), фаза 2 → expired_in_trail (с R); срокът важи и по календар")
+print("  ✓ изтичане 16 седмици след входа: фаза 1 → expired (без R), фаза 2 → expired_in_trail (претеглен R); срокът важи и по календар")
 print()
 
 print("── РЕАЛНИ барове на EXEL (tests/fixtures) ──")

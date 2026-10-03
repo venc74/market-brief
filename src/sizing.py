@@ -74,8 +74,8 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     Стоп = най-ниският Low на последните STOP_STRUCT_LOOKBACK_BARS бара −buffer, но не
     повече от STOP_MAX_PCT% под входа; структурен риск над STOP_REJECT_STRUCT_RISK_PCT%
     → невалиден план ("твърде разтегнато", запасна проверка след setup_rules).
-    Цел 1 = 2R (MIN_REWARD_RISK) за половината позиция; остатъкът — trailing под 10DMA,
-    стопът остава активен (виж backtest).
+    Цел 1 = 2R (MIN_REWARD_RISK) за TARGET_PARTIAL_FRACTION от позицията; остатъкът —
+    trailing под TRAIL_SMA_DAYS-дневната средна, стопът остава активен (виж trade_sim).
 
     Ключовете от стария position_plan() са запазени (entry_range, entry_mid, stop_loss,
     stop_basis, risk_per_share, max_risk_usd, sizing_factor, shares, total_investment,
@@ -139,8 +139,9 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "total_investment": total_invest,
         "pct_of_portfolio": pct_portfolio,
         "target_1": target1,
-        "target_2": (f"остатъкът (50%): trailing под 10DMA след ${target1}; "
-                     f"стопът ${stop} остава активен"),
+        "target_1_fraction": config.TARGET_PARTIAL_FRACTION,
+        "target_2": (f"остатъкът ({(1 - config.TARGET_PARTIAL_FRACTION) * 100:.0f}%): trailing под "
+                     f"{config.TRAIL_SMA_DAYS}DMA след ${target1}; стопът ${stop} остава активен"),
         "reward_risk": config.MIN_REWARD_RISK,
         "time_horizon": horizon,
     }

@@ -86,6 +86,16 @@ STOP_STRUCT_BUFFER_PCT = float(os.getenv("STOP_STRUCT_BUFFER_PCT", 1.0))
 STOP_MAX_PCT = float(os.getenv("STOP_MAX_PCT", 8.0))
 STOP_REJECT_STRUCT_RISK_PCT = float(os.getenv("STOP_REJECT_STRUCT_RISK_PCT", 10.0))
 
+# ── Цел (пакет 1, т.4 — 2026-10-03) ───────────────────────────────────────
+# Цел 1 = MIN_REWARD_RISK (2R). На нея се продава TARGET_PARTIAL_FRACTION от позицията;
+# остатъкът се пази с trailing — излиза при Close под TRAIL_SMA_DAYS-дневната средна, а
+# първоначалният стоп остава активен. Преди: цялата позиция минаваше в trailing на цел 1
+# и стопът се изключваше. Реплей: цел 2R / 3R / +20% / +25% дават статистически същия
+# резултат (win 49%, R 0.04–0.06 при хоризонт 20 дни) — няма оптимум по данни; частичната
+# продажба е решение за управление на риска, не за доходност.
+TARGET_PARTIAL_FRACTION = float(os.getenv("TARGET_PARTIAL_FRACTION", 0.5))
+TRAIL_SMA_DAYS = int(os.getenv("TRAIL_SMA_DAYS", 10))
+
 # ── Фундаментални критерии (CANSLIM) ─────────────────────────────────────
 MIN_EPS_GROWTH_YOY = 25.0         # %
 MIN_REVENUE_GROWTH_YOY = 20.0     # %

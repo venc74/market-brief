@@ -747,7 +747,7 @@
           <div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>
           <div class="kv"><span>Брой акции</span><b>{{ p.shares }}</b></div>
           <div class="kv"><span>Инвестиция</span><b>${{ "{:,.0f}".format(p.total_investment) }} ({{ p.pct_of_portfolio }}%)</b></div>
-          <div class="kv"><span>Цел 1 (2:1){% if p.method == 'v2' %} · 50%{% endif %}</span><b>${{ p.target_1 }}</b></div>
+          <div class="kv"><span>Цел 1 (2:1){% if p.method == 'v2' %} · {{ (p.target_1_fraction * 100)|round|int }}% от позицията{% endif %}</span><b>${{ p.target_1 }}</b></div>
           <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">{{ p.target_2 }}</b></div>
           <div class="kv"><span>Хоризонт</span><b>{{ p.time_horizon }}</b></div>
           {% if p.method == 'v2' %}
@@ -1063,9 +1063,11 @@
   <h2>Track Record · {{ backtest.total_resolved }} резолвирани</h2>
   <div class="prose">
     <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
-    {{ backtest.stopped }} stop (Фаза 1) / {{ backtest.trailing_stop_exit }} trailing-exit
-    / {{ backtest.expired_in_trail }} expired-in-trail / {{ backtest.expired }} expired (Фаза 1, target1 недостигнат)<br>
-    Все още отворени: {{ backtest.still_open }} (Фаза 1) + {{ backtest.trailing }} (Фаза 2, trailing 10DMA)<br>
+    {{ backtest.stopped }} стоп{% if backtest.stopped_after_partial %} (от тях {{ backtest.stopped_after_partial }} след частична продажба){% endif %}
+    / {{ backtest.trailing_stop_exit }} trailing-exit / {{ backtest.expired_in_trail }} expired-in-trail
+    / {{ backtest.expired }} expired (цел 1 недостигната)<br>
+    {# FIX 2026-10-03 (пакет 1, т.4): 50% се продава на цел 1 (2R), остатъкът е в trailing #}
+    Все още отворени: {{ backtest.still_open }} (преди цел 1) + {{ backtest.trailing }} (след частична продажба на цел 1, trailing)<br>
     {# FIX 2026-10-03 (пакет 1, т.2): buy-stop входове — не са позиции и не влизат в статистиката #}
     Чакат buy-stop: {{ backtest.pending or 0 }} · не се задействаха: {{ backtest.not_triggered or 0 }}{% if backtest.skipped_extended %}
     · над тавана за вход: {{ backtest.skipped_extended }}{% endif %} (извън статистиката)<br>

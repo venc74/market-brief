@@ -186,7 +186,8 @@ def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
         "window_sessions": plan.get("window_sessions") or config.BUY_STOP_WINDOW_SESSIONS,
         "valid_through": plan.get("valid_through"),
         "fill_date": None, "fill_price": None, "risk_per_share": None,
-        "target1_hit_date": None, "exit_date": None, "exit_price": None,
+        "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0,
+        "exit_date": None, "exit_price": None,
         "resolution_date": None, "discovered_date": None,
         "realized_r": None, "current_r": None,
     }
@@ -353,8 +354,8 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
 
 
 _V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "target1_hit_date",
-                   "exit_date", "exit_price", "realized_r", "current_r", "last_close",
-                   "last_close_date")
+                   "partial_price", "partial_fraction", "exit_date", "exit_price", "realized_r",
+                   "current_r", "last_close", "last_close_date")
 
 
 def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date) -> None:
@@ -854,6 +855,11 @@ def get_backtest_summary() -> dict:
         "trailing": by_status.get("trailing", 0),
         # v2: чакат buy-stop / прозорецът изтече без вход / над тавана за вход — не са
         # позиции и не влизат в win rate и средния R
+        # т.4: колко позиции са минали през частична продажба на цел 1 и колко от "stopped"
+        # са излезли на стопа ЧЕ СЛЕД нея (печалба по R, макар статусът да е "stopped")
+        "partial_taken": sum(1 for r in records if r.get("partial_price") is not None),
+        "stopped_after_partial": sum(1 for r in records if r.get("status") == "stopped"
+                                     and r.get("partial_price") is not None),
         "pending": by_status.get("pending", 0),
         "not_triggered": by_status.get("not_triggered", 0),
         "skipped_extended": by_status.get("skipped_extended", 0) + by_status.get("invalid_risk", 0),

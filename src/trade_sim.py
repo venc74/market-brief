@@ -16,9 +16,12 @@
   • Прозорецът изтече без вход → "not_triggered" (извън статистиката); докато още тече
     (няма достатъчно бара) → "pending".
   • Сделка с (вход − стоп) <= 0 → "invalid_risk" (извън статистиката).
-След входа (до т.4/т.5 — като досега във v1): стопът е на стоп-цената (на входния ден и
-при гап); на target_1 позицията минава във фаза "trailing" (стопът вече не важи) и излиза
-при Close под 10DMA; изтичане след BACKTEST_MAX_HOLD_WEEKS от входа.
+Цел (т.4): на target_1 (2R) се продава TARGET_PARTIAL_FRACTION от позицията — на target_1, а
+ако баровете след входния ден отварят над него, по отварянето; остатъкът минава във
+фаза "trailing" и излиза при Close под TRAIL_SMA_DAYS-дневната средна. Първоначалният
+стоп остава активен и в trailing; в един и същ бар стопът се проверява ПЪРВИ (консервативно).
+R = дял × (цена на частичната − вход) / риск + (1 − дял) × (изход на остатъка − вход) / риск.
+Изтичане (до т.5 — като досега във v1): след BACKTEST_MAX_HOLD_WEEKS от входа.
 """
 from __future__ import annotations
 import datetime as dt
@@ -35,7 +38,8 @@ NOT_A_POSITION = ("not_triggered", "skipped_extended", "invalid_risk")   # из�
 
 def _blank(status: str = "pending") -> dict:
     return {"status": status, "fill_date": None, "fill_price": None, "risk_per_share": None,
-            "target1_hit_date": None, "exit_date": None, "exit_price": None,
+            "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0,
+            "exit_date": None, "exit_price": None,
             "resolution_date": None, "realized_r": None, "current_r": None, "R": None,
             "last_close": None, "last_close_date": None}
 
@@ -96,32 +100,40 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
     out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(fill, 4),
                risk_per_share=round(risk, 4))
 
-    # ── изход (v1 семантика; т.4/т.5 я променят) ─────────────────────────
+    # ── т.4: частична продажба на цел 1, trailing за остатъка, стопът остава ──
+    frac = config.TARGET_PARTIAL_FRACTION
     exp_date = idx[fi] + pd.Timedelta(weeks=config.BACKTEST_MAX_HOLD_WEEKS)
-    sma10 = pd.Series(c).rolling(10).mean().to_numpy()
+    sma = pd.Series(c).rolling(config.TRAIL_SMA_DAYS).mean().to_numpy()
     state, t_idx = "open", None
+    sold = r_sold = 0.0                                      # продаден дял и R на тази част
     status = exit_px = exit_j = None
     for j in range(fi, n):
         if idx[j] > exp_date:
             break
-        if state == "open":
-            if l[j] <= stop:                                 # стопът печели консервативно
-                status, exit_px, exit_j = "stopped", stop, j
-                break
-            if h[j] >= t1:
-                state, t_idx = "trailing", j
-                out["target1_hit_date"] = idx[j].date().isoformat()
-        elif j > t_idx:
-            s10 = sma10[j]
-            if s10 == s10 and c[j] < s10:
+        if l[j] <= stop:                                     # стопът е активен и след частичната; първи в бара
+            status, exit_px, exit_j = "stopped", stop, j
+            break
+        if state == "open" and h[j] >= t1:
+            state, t_idx = "trailing", j
+            sell = t1 if j == fi else max(o[j], t1)          # гап над целта → по отварянето
+            sold, r_sold = frac, (sell - fill) / risk
+            out.update(target1_hit_date=idx[j].date().isoformat(), partial_price=round(float(sell), 4),
+                       partial_fraction=frac)
+            continue
+        if state == "trailing" and j > t_idx:
+            ma = sma[j]
+            if ma == ma and c[j] < ma:
                 status, exit_px, exit_j = "trailing_stop_exit", c[j], j
                 break
+
+    def weighted_r(px) -> float:
+        return float(sold * r_sold + (1 - sold) * (px - fill) / risk)
 
     last = n - 1
     while last > fi and idx[last] > exp_date:
         last -= 1
     out.update(last_close=round(float(c[last]), 4), last_close_date=idx[last].date().isoformat())
-    out["current_r"] = round(float((c[last] - fill) / risk), 2)
+    out["current_r"] = round(weighted_r(c[last]), 2)
 
     if status is None:
         expired = idx[-1] > exp_date or (today is not None and _as_date(today) > exp_date.date())
@@ -132,11 +144,11 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
         out.update(status=status, resolution_date=exp_date.date().isoformat())
         if status == "expired_in_trail":
             out.update(exit_date=idx[last].date().isoformat(), exit_price=round(float(c[last]), 4),
-                       R=float((c[last] - fill) / risk))
+                       R=weighted_r(c[last]))
             out["realized_r"] = round(out["R"], 2)
         return out                                             # "expired" във фаза 1 → без R
 
     out.update(status=status, exit_date=idx[exit_j].date().isoformat(), exit_price=round(float(exit_px), 4),
-               resolution_date=idx[exit_j].date().isoformat(), R=float((exit_px - fill) / risk))
+               resolution_date=idx[exit_j].date().isoformat(), R=weighted_r(exit_px))
     out["realized_r"] = round(out["R"], 2)
     return out

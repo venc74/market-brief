@@ -149,7 +149,7 @@ def render_email(brief: dict) -> str:
         # FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop с таван, стоп с процент, цел за 50%
         if p.get("method") == "v2":
             plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
-                        f"Stop ${p['stop_loss']} (−{p['risk_pct']}%) · Цел ${p['target_1']} (50%)<br>"
+                        f"Stop ${p['stop_loss']} (−{p['risk_pct']}%) · Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)<br>"
                         f"{p['shares']} акции (${p['total_investment']:,.0f})")
         else:
             plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
