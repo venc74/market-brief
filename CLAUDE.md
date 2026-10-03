@@ -54,8 +54,12 @@ src/macro_layer.py    — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
 src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
                         Liquidity, MOVE, VIX Term Structure, Market
                         Breadth, IEI/HYG Credit Spread) +
-                        Offensive/Defensive/Cash режим
+                        Offensive/Defensive/Cash режим; Net Liquidity е
+                        САМО информативен (не се брои), Offensive иска ≥ 6
+                        видими от 8 броени
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
+src/series_utils.py    — last_and_week_ago(): седмица назад по ДАТА + NaN guard (VIX, global signals)
+src/data_warnings.py   — предупреждения за данни в брифа (паднал Yahoo → brief["data_warnings"])
 src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rating
                         (втори проход върху целия универс) + CANSLIM скрийнър;
                         pivot = най-високият High на базата БЕЗ последните 5 бара
@@ -95,6 +99,12 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   credit spread spike форсира Defensive, трети независим hard-override
   тригер (виж `thermometer.py: credit_spread_proxy()`)
 - `COT_PERCENTILE_LOW/HIGH = 10/90` — строги прагове, малко на брой резултати
+- `COT_STALE_DAYS = 13` — над това най-новият COT отчет е "стар" (банер в секцията); 6–10 е нормалното,
+  13 е празничен петък (06.07.2026)
+- `HYSTERESIS_HIDDEN_RELEASE_DAYS = 10` — override, държан от хистерезис при скрит индикатор, се
+  освобождава на 10-ия пореден ден без данни (ред в лога + текст в брифа)
+- Net Liquidity: `NET_LIQ_WINDOW_WEEKS = 4`, `NET_LIQ_DEAD_ZONE_PCT = 1.0`, `NET_LIQ_CONFIRM_WEEKS = 2`;
+  Put/Call SPY: percentile спрямо собствената история, `PUTCALL_PERCENTILE_GREEN/RED = 90/10`
 - `MAX_ACTION_TICKERS = 5`, `MAX_PER_SECTOR = 2`
 - Сетъп/вход (пакет 1): `PIVOT_BASE_BARS = 65`, `PIVOT_EXCLUDE_LAST_BARS = 5`,
   `BUYABLE_ZONE_MAX_PCT = 5.0` (над това = extended), `BUY_STOP_WINDOW_SESSIONS = 5`
@@ -168,6 +178,12 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   (`ENABLE_SHORT_AI_CONTEXT=0`); базата се казва "база X% дълбочина"; Insider/13F показват давност и
   разграничават легитимна нула от провал; Jinja е с autoescape, имейлът escape-ва външния текст;
   13F мащабът хиляди/долари е по дата на филинга + цена/акция.
+- Пакет 2 (03.10.2026) — термометър, макро и данни: секторен приоритет (ETF → Yahoo сектор/индустрия,
+  маркер SECT✓, само подредба); Net Liquidity с седмични нива към една сряда (WALCL, WDTGAL, RRP),
+  4-седмична промяна, мъртва зона ±1%, 2 седмици потвърждение — информативен; Put/Call по собствена
+  история (скрит при провал); макро брифът след значимите новини (NewsAPI махнат); доходностите в
+  б.п. (`chg_5d_bp`); паднал Yahoo не сваля run-а (`data_warnings`); COT давност; часът е берлински
+  (CET/CEST); VIX и global signals с календарен прозорец + NaN guard; освобождаване на хистерезиса.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
