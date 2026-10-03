@@ -518,6 +518,17 @@ def _core_inflation_block(macro: dict) -> str:
 """
 
 
+def _hysteresis_release_note(thermometer: dict) -> str:
+    """Пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да не се чете като подобрение на пазара."""
+    rel = (thermometer or {}).get("hysteresis_released") or []
+    if not rel:
+        return ""
+    names = ", ".join(f"{r.get('trigger')} ({r.get('hidden_days')} поредни дни без данни)" for r in rel)
+    return ("\nВАЖНО за режима: днес override-ът за " + names + " е ОСВОБОДЕН от кода — индикаторът е без данни, а "
+            "хистерезисът не се държи безкрайно. Това НЕ е подобрение на пазарните условия: кажи го изрично в "
+            "regime_comment и не представяй по-мекия режим като успокояване на стреса.")
+
+
 def _rotation_unavailable_note(rotation: list[dict] | None) -> str:
     """Пакет 2 т.6: празна ротация = данните не са изтеглени (паднал Yahoo), не "няма водещи сектори"."""
     if rotation:
@@ -562,7 +573,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     """
     user = f"""Днешни данни:
 
-ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}
+ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 

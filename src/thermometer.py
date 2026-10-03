@@ -566,6 +566,9 @@ def _breadth_divergence(indicators: list[dict]) -> None:
 # exit_rule текстът вече казва честно какво точно значи "отпада", вместо да
 # го представя като реално успокояване.
 _OVERRIDE_STATE_FILE = config.DATA_DIR / "regime_override_state.json"
+# Ключове (move_spike / credit_spike), чийто override се освободи ДНЕС заради дългото отсъствие на данни → брой дни.
+# Чисти се в началото на build_thermometer; попълва го _hysteresis_hidden; build_thermometer го превръща в текст в брифа.
+HYSTERESIS_RELEASED: dict[str, int] = {}
 _REGIME_SEVERITY = {"Offensive": 0, "Defensive": 1, "Cash": 2}
 
 
@@ -666,8 +669,26 @@ def _hysteresis_hidden(key: str, today_iso: str) -> tuple[bool, int, int]:
         raw_entry["last_frozen_date"] = today_iso
         state[key] = raw_entry
         _save_override_state(state)
-    print(f"[thermo] {key}: индикаторът е скрит — хистерезисът е замразен "
-          f"(streak_below={streak}, {frozen}-и ден без данни; не се брои за спокоен ден)")
+    # FIX 2026-10-03 (пакет 2 т.10): таван на задържането. Замразеният streak държеше override-а без край, докато
+    # индикаторът е скрит; след HYSTERESIS_HIDDEN_RELEASE_DAYS поредни дни без данни override-ът се освобождава — streak-ът
+    # се вдига до 2 (като при реални 2 спокойни дни), за да не се върне при завръщане на данните, и денят се записва
+    # (released_on) — повторен run същия ден отново вижда освобождаването, а не нов замразен ден.
+    limit = config.HYSTERESIS_HIDDEN_RELEASE_DAYS
+    if streak < 2 and frozen >= limit:
+        raw_entry["streak_below"] = 2
+        raw_entry["released_on"] = today_iso
+        raw_entry["released_after_days"] = frozen
+        state[key] = raw_entry
+        _save_override_state(state)
+        streak = 2
+        print(f"[thermo] {key}: ⚠ {frozen} поредни дни без данни (праг {limit}) — override-ът се ОСВОБОЖДАВА; "
+              f"хистерезисът не се държи безкрайно при повредени данни")
+    if raw_entry.get("released_on") == today_iso:
+        HYSTERESIS_RELEASED[key] = raw_entry.get("released_after_days", frozen)
+    else:
+        print(f"[thermo] {key}: индикаторът е скрит — хистерезисът е замразен "
+              f"(streak_below={streak}, {frozen}-и ден без данни; не се брои за спокоен ден; "
+              f"освобождава се на {limit}-ия)")
     return streak < 2, streak, frozen
 
 
@@ -856,6 +877,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
     # се пипат
     today_iso = (today or dt.date.today()).isoformat()  # today — само за тестове
+    HYSTERESIS_RELEASED.clear()
     if move_visible:
         move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
         move_frozen = 0
@@ -893,7 +915,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "state": "hysteresis",
             "text": (f"MOVE: данните липсват днес ({move_frozen}-и ден без данни), override-ът се "
                      f"държи по хистерезис — замразен на {min(move_spike_streak, 2)}/2 дни под "
-                     f"прага, скритите дни не се броят за спокойни — sizing −50%"),
+                     f"прага, скритите дни не се броят за спокойни; освобождава се на "
+                     f"{config.HYSTERESIS_HIDDEN_RELEASE_DAYS}-ия пореден ден без данни — sizing −50%"),
             "exit_condition": (f"данните за MOVE да се върнат и седмичната делта да е под "
                                f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни"),
         })
@@ -945,7 +968,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "state": "hysteresis",
             "text": (f"IEI/HYG: данните липсват днес ({credit_frozen}-и ден без данни), override-ът се "
                      f"държи по хистерезис — замразен на {min(credit_spike_streak, 2)}/2 дни под "
-                     f"прага, скритите дни не се броят за спокойни — sizing −50%"),
+                     f"прага, скритите дни не се броят за спокойни; освобождава се на "
+                     f"{config.HYSTERESIS_HIDDEN_RELEASE_DAYS}-ия пореден ден без данни — sizing −50%"),
             "exit_condition": (f"данните за IEI/HYG да се върнат и "
                                f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile да е под "
                                f"{config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. два поредни дни"),
@@ -980,6 +1004,16 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
 
     regime, reason, exit_rule = _merge_regime(count_regime, count_reason, counts, overrides)
 
+    # FIX 2026-10-03 (пакет 2 т.10): override, освободен днес заради дълго отсъствие на данни, се казва в брифа — иначе
+    # режимът "тихо" се смекчава (виж _hysteresis_hidden). Структурирано поле + изречение в regime_reason.
+    released = [{"trigger": {"move_spike": "MOVE", "credit_spike": "IEI/HYG"}.get(k, k), "hidden_days": d}
+                for k, d in sorted(HYSTERESIS_RELEASED.items())]
+    if released:
+        reason += " · " + " ".join(
+            f"Override-ът за {r['trigger']} е ОСВОБОДЕН: {r['hidden_days']} поредни дни без данни за индикатора "
+            f"(праг {config.HYSTERESIS_HIDDEN_RELEASE_DAYS}) — режимът е по броенето, не по override."
+            for r in released)
+
     # FIX 2026-07-15: преди sizing_factor падаше САМО при принудителен Defensive
     # (VIX/MOVE); нормален Defensive/Cash по броя сигнали оставаше на 1.0 —
     # противоречие със семантиката на режима. Сега всеки не-Offensive → фактор.
@@ -992,6 +1026,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "counts": counts, "overrides": overrides,
             "regime_by_count": count_regime,
             "exit_rule": exit_rule,
+            "hysteresis_released": released,
             }
 
 

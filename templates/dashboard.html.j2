@@ -404,6 +404,8 @@
          Стари брифове без `counts` показват regime_reason както преди. #}
       {% if thermometer.counts is defined %}
         {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+        {# пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да се види в брифа #}
+        {% if thermometer.hysteresis_released %}<div class="regime-reason" style="color:var(--yellow)">{% for r in thermometer.hysteresis_released %}⚡ Override-ът за {{ r.trigger }} е ОСВОБОДЕН: {{ r.hidden_days }} поредни дни без данни за индикатора — режимът е по броенето, не по override.{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
         <div class="regime-reason">{{ thermometer.counts }}{% if thermometer.overrides %} · по броене: {{ thermometer.regime_by_count }}{% endif %}</div>
       {% else %}
         <div class="regime-reason">{{ regime_reason }}</div>

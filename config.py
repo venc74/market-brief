@@ -685,6 +685,12 @@ IEI_HYG_LOOKBACK_DAYS = int(os.getenv("IEI_HYG_LOOKBACK_DAYS", 504))
 IEI_HYG_LEVEL_PERCENTILE_LOW = float(os.getenv("IEI_HYG_LEVEL_PERCENTILE_LOW", 10))
 IEI_HYG_ROC_WINDOW_DAYS = int(os.getenv("IEI_HYG_ROC_WINDOW_DAYS", 10))
 IEI_HYG_ROC_SPIKE_PERCENTILE = float(os.getenv("IEI_HYG_ROC_SPIKE_PERCENTILE", 90))
+# FIX 2026-10-03 (пакет 2 т.10): хистерезисът държи override (MOVE spike / IEI-HYG spike) при СКРИТ индикатор — скритите дни не
+# са спокойни (замразява се streak-ът). Без таван това е безкрайно: ^MOVE беше скрит 22 поредни дни през юли 2026 (27 общо от 78
+# брифа), а override, повдигнал режима до Defensive, би стоял толкова, колкото тече повредата на източника. След този брой
+# ПОРЕДНИ дни без данни override-ът се ОСВОБОЖДАВА (10-ият пореден скрит ден е първият без override): ред в лога и текст в брифа.
+# Ако данните се върнат със спайк, override-ът се вдига наново; ако не — режимът е по броенето.
+HYSTERESIS_HIDDEN_RELEASE_DAYS = int(os.getenv("HYSTERESIS_HIDDEN_RELEASE_DAYS", 10))
 # Low-liquidity yfinance тикъри (^MOVE, ^VIX9D, ^VIX3M) понякога спират да
 # публикуват нови данни за дни наред — над този праг стойността се третира
 # като stale и индикаторът се крие (hide), вместо да показва остаряло число.
