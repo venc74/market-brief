@@ -37,9 +37,9 @@ assert reason is None, f"19:55 UTC е преди 20:00 прага, трябва�
 print("  ✓ 19:55 UTC (реалното закъснение от 30.09), без снимка → продължава (все още преди прага)")
 
 # 3) Вече има ПЪЛНА снимка за сесията (напр. cron-job.org я е взел по-рано) → пропуска.
-#    Тук е РЕАЛНАТА снимка за 2026-10-01 от data/unusual_options_oi_snapshot.json
+#    Тук е РЕАЛНАТА снимка за 2026-10-01 (копие на data/unusual_options_oi_snapshot.json в tests/fixtures, защото снимките се ротират)
 #    (80/80 тикъра, failed 0, 18:47 UTC), само с променена дата на сесията.
-REAL = json.load(open(pathlib.Path(__file__).parent / "data" / "unusual_options_oi_snapshot.json",
+REAL = json.load(open(pathlib.Path(__file__).parent / "tests" / "fixtures" / "oi_snapshot_2026-10-01.json",
                       encoding="utf-8"))["snapshots"]["2026-10-01"]
 assert snapshot_is_complete(REAL)
 existing = {session.isoformat(): REAL}

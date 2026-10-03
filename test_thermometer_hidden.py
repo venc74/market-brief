@@ -21,9 +21,9 @@ sys.path.insert(0, str(ROOT))
 import config
 from src import thermometer as th
 
-REAL = json.load(open(ROOT / "data" / "2026-10-02.json", encoding="utf-8"))
+REAL = json.load(open(ROOT / "tests" / "fixtures" / "brief_2026-10-02.json", encoding="utf-8"))
 REAL_IND = {i["name"]: i for i in REAL["thermometer"]["indicators"]}
-OLD = json.load(open(ROOT / "data" / "2026-09-08.json", encoding="utf-8"))
+OLD = json.load(open(ROOT / "tests" / "fixtures" / "brief_2026-09-08.json", encoding="utf-8"))
 HIDDEN = {i["name"]: i for i in OLD["thermometer"]["indicators"] if i.get("hide")}
 assert {"MOVE (Bond Vol)", "IEI/HYG (Credit Spread)"} <= set(HIDDEN)
 

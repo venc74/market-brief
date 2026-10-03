@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from src import thermometer as th
 
-REAL = json.load(open(pathlib.Path(__file__).parent / "data" / "2026-10-02.json", encoding="utf-8"))
+REAL = json.load(open(pathlib.Path(__file__).parent / "tests" / "fixtures" / "brief_2026-10-02.json", encoding="utf-8"))
 REAL_IND = {i["name"]: i for i in REAL["thermometer"]["indicators"]}
 
 
