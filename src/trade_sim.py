@@ -103,8 +103,8 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
     if risk <= 0:
         out.update(status="invalid_risk", resolution_date=idx[fi].date().isoformat())
         return out
-    out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(fill, 4),
-               risk_per_share=round(risk, 4))
+    out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(float(fill), 4),
+               risk_per_share=round(float(risk), 4))
 
     # ── т.4: частична продажба на цел 1, trailing за остатъка, стопът остава ──
     frac = config.TARGET_PARTIAL_FRACTION
