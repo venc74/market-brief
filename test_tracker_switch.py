@@ -12,6 +12,7 @@ import sys, pathlib, json, tempfile, copy, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
+import pandas as pd
 import config
 from src import backtest, tracker_switch, thermometer, render
 from src import main as brief_main
@@ -139,16 +140,53 @@ assert f"({sv['unpriced']} без цена)" in " ".join(html.split())
 print(f"  ✓ dashboard: 'v1 методология: n={sv['n']}, win rate {sv['win_rate_pct']}%, среден R {sv['avg_r']} (1 без цена)'")
 print()
 
-print("── v1 изтекли без R се броят, не се крият ──")
-exp_tr = copy.deepcopy(REAL)
-k0 = LIVE[0][0]
-exp_tr[k0].update(status="expired", resolution_date="2026-10-03", realized_r=None)          # СИНТЕТИЧНО: един запис изтича (v1 фаза 1)
-reset(exp_tr)
-rs_ = tracker_switch.switch_to_v2(TODAY, fetch_prices=fetch)
-sx = rs_["stats"]
-assert sx["expired_no_r"] == 1 and sx["n"] == 49 and rs_["closed"] == 24, sx            # 24 живи затворени + 1 изтекъл без R (извън n)
+print("── изтеклите v1 (AIZ, AMG, LNTH) получават mark-to-market R при изтичането и влизат в n ──")
+EXP_KEYS = ["AIZ_2026-06-13", "AMG_2026-06-13", "LNTH_2026-06-14"]            # РЕАЛНИ записи; тук са още "open"
+assert all(REAL[k]["status"] == "open" for k in EXP_KEYS)
+
+
+def fake_resolve_expiry(tracker, today=None):
+    """Както v1 _resolve_position: срок = entry_date + 16 седмици, фаза 1, без R."""
+    for k in EXP_KEYS:
+        cutoff = dt.date.fromisoformat(tracker[k]["entry_date"]) + dt.timedelta(weeks=config.BACKTEST_MAX_HOLD_WEEKS)
+        tracker[k].update(status="expired", resolution_date=cutoff.isoformat(), discovered_date=TODAY.isoformat(), realized_r=None)
+
+
+expiry_calls = []
+def fetch_expiry(items):
+    """СИНТЕТИЧНИ Close-ове при изтичането: AIZ +5%, AMG -8% спрямо entry; за LNTH няма цена."""
+    expiry_calls.append(list(items))
+    mult = {"AIZ": 1.05, "AMG": 0.92}
+    return {(t, d): round(REAL[f"{t}_2026-06-13"]["entry_price"] * mult[t], 2) for t, d in items if t in mult}
+
+
+orig_resolve = backtest._resolve_open_positions
+backtest._resolve_open_positions = fake_resolve_expiry
+reset()
+res = tracker_switch.switch_to_v2(TODAY, fetch_prices=fetch, fetch_expiry_closes=fetch_expiry)
+backtest._resolve_open_positions = orig_resolve
+arch = read("backtest_archive_v1.json")
+aiz, amg, lnth = (arch["records"][k] for k in EXP_KEYS)
+assert (aiz["resolution_date"], amg["resolution_date"], lnth["resolution_date"]) == ("2026-10-03", "2026-10-03", "2026-10-04")
+assert expiry_calls == [[("AIZ", "2026-10-03"), ("AMG", "2026-10-03"), ("LNTH", "2026-10-04")]]
+for rec, mult in ((aiz, 1.05), (amg, 0.92)):
+    entry, stop = rec["entry_price"], rec["stop_loss"]
+    px = round(entry * mult, 2)
+    assert rec["status"] == "expired" and rec["expiry_mtm"] is True and rec["expiry_close"] == px
+    assert rec["realized_r"] == round((px - entry) / (entry - stop), 2)
+assert lnth["status"] == "expired" and lnth["realized_r"] is None and "expiry_mtm" not in lnth      # без цена → без R
+assert arch["expired_marked_to_market"] == ["AIZ_2026-06-13", "AMG_2026-06-13"]
+assert res["expired_mtm"] == 2 and res["closed"] == 22                      # 25 живи − 3 изтекли
+sx = res["stats"]
+priced = [r["realized_r"] for k, r in arch["records"].items() if r["status"] == "v1_closed" and r["realized_r"] is not None]
+resolved_before = [r["realized_r"] for r in REAL.values() if r.get("realized_r") is not None]
+all_x = resolved_before + priced + [aiz["realized_r"], amg["realized_r"]]
+assert sx["n"] == len(all_x) == 26 + 21 + 2 and sx["expired_mtm"] == 2 and sx["expired_no_r"] == 1, sx
+assert sx["wins"] == sum(1 for x in all_x if x > 0) and sx["avg_r"] == round(sum(all_x) / len(all_x), 2)
+assert arch["pre_switch_tracker"] == REAL                                   # revert пази оригинала
+sm_x = backtest.get_backtest_summary()
 brief_x = {"date": "2026-10-05", "thermometer": thermometer.thermometer_unavailable(RuntimeError("тест")),
-           "action": [], "watchlist": [], "backtest": backtest.get_backtest_summary(),
+           "action": [], "watchlist": [], "backtest": sm_x,
            "ai_macro": {"macro_brief": "тест", "regime_comment": "", "sector_logic": []}}
 with tempfile.TemporaryDirectory() as docs:
     orig_docs = config.DOCS_DIR
@@ -157,8 +195,39 @@ with tempfile.TemporaryDirectory() as docs:
         html_x = render.render_dashboard(brief_x)
     finally:
         config.DOCS_DIR = orig_docs
-assert "(1 изтекли без R, извън n)" in " ".join(html_x.split())
-print("  ✓ изтекъл v1 запис (фаза 1, без R) не влиза в n, но редът казва '(1 изтекли без R, извън n)'")
+flat_x = " ".join(html_x.split())
+assert f"v1 методология: n={sx['n']}, win rate {sx['win_rate_pct']}%" in flat_x
+assert "(2 изтекли — оценени по Close при изтичането)" in flat_x and "(1 изтекли без R, извън n)" in flat_x
+print(f"  ✓ AIZ и AMG (срок 03.10) получават R по Close при изтичането и влизат в n (n={sx['n']}); LNTH (срок 04.10, неделя) е без цена →")
+print("    остава без R и се казва в реда (СИНТЕТИЧНО: стъбът няма цена за LNTH); изтеклите се оценяват по Close на/преди срока")
+# няма изобщо цени при изтичането → всичките три остават без R, превключването пак минава
+backtest._resolve_open_positions = fake_resolve_expiry
+reset()
+res0 = tracker_switch.switch_to_v2(TODAY, fetch_prices=fetch, fetch_expiry_closes=lambda items: {})
+backtest._resolve_open_positions = orig_resolve
+assert res0["status"] == "switched" and res0["expired_mtm"] == 0 and res0["stats"]["expired_no_r"] == 3 and res0["stats"]["n"] == 26 + 21
+print("  ✓ без цени при изтичането: превключването пак минава, 3 изтекли без R (извън n, но преброени)")
+print()
+
+print("── _fetch_closes_on_or_before: Close на/преди датата (РЕАЛНИ барове на EXEL; yf е подменен) ──")
+EXEL = pd.read_csv(ROOT / "tests/fixtures/ohlc_EXEL.csv", index_col=0, parse_dates=True)
+seen_dl = {}
+def fake_dl(tickers, start=None, end=None, progress=False, auto_adjust=False, **kw):
+    seen_dl.update(tickers=list(tickers), start=start, end=end)
+    df = EXEL[(EXEL.index >= pd.Timestamp(start)) & (EXEL.index < pd.Timestamp(end))]     # end е изключителен, като в yfinance
+    return pd.concat({f: pd.DataFrame({"EXEL": df[f]}) for f in ["Open", "High", "Low", "Close", "Volume"]}, axis=1)
+orig_dl = backtest.yf.download
+backtest.yf.download = fake_dl
+got = backtest._fetch_closes_on_or_before([("EXEL", "2026-10-03"), ("EXEL", "2026-08-12"), ("EXEL", "2026-07-04"), ("NOPE", "2026-08-12")])
+assert got == {("EXEL", "2026-10-03"): float(EXEL.loc["2026-10-02", "Close"]),          # събота → петък
+               ("EXEL", "2026-08-12"): float(EXEL.loc["2026-08-12", "Close"]),          # ден с бар → същият Close
+               ("EXEL", "2026-07-04"): float(EXEL.loc["2026-07-02", "Close"])}, got      # празник/уикенд → 02.07 (03.07 е празник)
+assert seen_dl["start"] == "2026-06-24" and seen_dl["end"] == "2026-10-04"
+backtest.yf.download = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("мрежа"))
+assert backtest._fetch_closes_on_or_before([("EXEL", "2026-08-12")]) == {} and backtest._fetch_closes_on_or_before([]) == {}
+backtest.yf.download = orig_dl
+print(f"  ✓ събота 03.10 → Close на петък 02.10 (${got[('EXEL', '2026-10-03')]:.2f}); 12.08 → ${got[('EXEL', '2026-08-12')]:.2f}; 04.07 → Close на 02.07; "
+      "липсващ тикър отсъства; провал на fetch → {}")
 print()
 
 print("── обратимост ──")

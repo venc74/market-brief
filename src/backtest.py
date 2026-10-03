@@ -663,6 +663,38 @@ def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
     return out
 
 
+def _fetch_closes_on_or_before(items: list[tuple[str, str]]) -> dict[tuple[str, str], float]:
+    """
+    Последният Close на или ПРЕДИ дадена дата — за mark-to-market на изтекли позиции
+    (tracker_switch). items = [(тикър, ISO дата)], резултат {(тикър, дата): Close}. Един batch
+    за всички. Graceful: провал на fetch-а или липсващ тикър → просто липсва в резултата.
+    """
+    if not items:
+        return {}
+    tickers = sorted({t for t, _ in items})
+    dates = [dt.date.fromisoformat(d) for _, d in items]
+    lo, hi = min(dates) - dt.timedelta(days=10), max(dates) + dt.timedelta(days=1)   # end е изключителен
+    try:
+        data = yf.download(tickers, start=lo.isoformat(), end=hi.isoformat(), progress=False, auto_adjust=False)
+    except Exception as e:
+        print(f"[backtest] close-on-date fetch failed за {tickers}: {e}")
+        return {}
+    if data is None or data.empty:
+        return {}
+    closes = _normalize_price_columns(data, tickers, ("Close",)).get("Close")
+    if closes is None:
+        return {}
+    out: dict[tuple[str, str], float] = {}
+    for t, d in items:
+        if t not in getattr(closes, "columns", []):
+            continue
+        series = closes[t].dropna()
+        series = series[series.index <= pd.Timestamp(d)]
+        if len(series):
+            out[(t, d)] = float(series.iloc[-1])
+    return out
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────

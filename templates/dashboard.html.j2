@@ -1070,7 +1070,7 @@
   {% if backtest.v1_archive %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
     v1 методология: n={{ backtest.v1_archive.n }}, win rate {{ backtest.v1_archive.win_rate_pct }}%,
-    среден R {{ backtest.v1_archive.avg_r }}{% if backtest.v1_archive.unpriced %} ({{ backtest.v1_archive.unpriced }} без цена){% endif %}{% if backtest.v1_archive.expired_no_r %} ({{ backtest.v1_archive.expired_no_r }} изтекли без R, извън n){% endif %}
+    среден R {{ backtest.v1_archive.avg_r }}{% if backtest.v1_archive.unpriced %} ({{ backtest.v1_archive.unpriced }} без цена){% endif %}{% if backtest.v1_archive.expired_mtm %} ({{ backtest.v1_archive.expired_mtm }} изтекли — оценени по Close при изтичането){% endif %}{% if backtest.v1_archive.expired_no_r %} ({{ backtest.v1_archive.expired_no_r }} изтекли без R, извън n){% endif %}
     · архивирана на {{ backtest.methodology.switched_on }} (отворените v1 позиции затворени по последния Close, mark-to-market);
     Track Record v2 започва от нула.</div>
   {% endif %}

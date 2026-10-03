@@ -7,6 +7,8 @@ Track Record v2 — чист старт и архив на v1 (пакет 1, т.
 
 switch_to_v2() — еднократно, при първия run с v2 код:
   1. резолюция на живите v1 позиции по обичайната логика (стоп/цел в пропуснатите дни);
+  1а. v1 позициите, изтекли във фаза 1 (цел 1 недостигната → по v1 дизайн без R), получават
+     mark-to-market R по Close на/преди датата на изтичане — както v2 изтичането — и влизат в n;
   2. останалите отворени v1 (open/trailing) се затварят по последния Close като "v1_closed" с
      mark-to-market R = (цена − entry) / (entry − стоп) (без цена или split флаг → без R, броят се
      като "без цена" и не влизат в статистиката);
@@ -57,9 +59,10 @@ def v1_stats(records: dict) -> dict:
         "records": len(recs),
         "v1_closed": sum(1 for r in recs if r.get("status") == "v1_closed"),
         "unpriced": sum(1 for r in recs if r.get("status") == "v1_closed" and r.get("realized_r") is None),
-        # v1 "expired" (фаза 1, цел 1 недостигната) е без R по дизайн и не влиза в n — но се брои тук,
-        # за да не е скрито колко позиции липсват от статистиката
+        # v1 "expired" (фаза 1) получава R при превключването (mark-to-market при изтичането, виж
+        # _mark_expired_to_market); без цена/с split флаг остава без R, не влиза в n и се брои тук
         "expired_no_r": sum(1 for r in recs if r.get("status") == "expired" and r.get("realized_r") is None),
+        "expired_mtm": sum(1 for r in recs if r.get("expiry_mtm")),
         "by_status": dict(collections.Counter(r.get("status") for r in recs)),
     }
 
@@ -86,10 +89,35 @@ def _close_v1_positions(legacy: dict, prices: dict, today: dt.date) -> list[str]
     return closed
 
 
-def switch_to_v2(today: dt.date | None = None, *, fetch_prices=None) -> dict:
+def _mark_expired_to_market(legacy: dict, fetch_closes) -> list[str]:
+    """
+    v1 "expired" без R (фаза 1: цел 1 недостигната до 16-ата седмица) → R по Close на/преди
+    датата на изтичане (resolution_date), с формулата на v1: (Close − entry) / (entry − стоп).
+    Без цена, split флаг или невалидни нива → остава без R. Връща ключовете с R.
+    """
+    pending = {k: r for k, r in legacy.items()
+               if r.get("status") == "expired" and r.get("realized_r") is None and r.get("resolution_date")}
+    if not pending:
+        return []
+    closes = fetch_closes(sorted({(r["ticker"], r["resolution_date"]) for r in pending.values()})) or {}
+    done = []
+    for key, rec in pending.items():
+        px = closes.get((rec["ticker"], rec["resolution_date"]))
+        entry, stop = rec.get("entry_price"), rec.get("stop_loss")
+        if px is None or rec.get("needs_manual_review") or not entry or not stop or entry <= stop:
+            continue
+        rec["expiry_close"] = round(float(px), 4)
+        rec["realized_r"] = round((float(px) - entry) / (entry - stop), 2)
+        rec["expiry_mtm"] = True
+        done.append(key)
+    return done
+
+
+def switch_to_v2(today: dt.date | None = None, *, fetch_prices=None, fetch_expiry_closes=None) -> dict:
     """Виж модулния docstring. Връща {"status": ..., ...}; не вдига при очаквани провали."""
     today = today or dt.date.today()
     fetch_prices = fetch_prices or backtest._fetch_current_prices
+    fetch_expiry_closes = fetch_expiry_closes or backtest._fetch_closes_on_or_before
     tracker = backtest._load_tracker()
     legacy = {k: r for k, r in tracker.items() if r.get("method") != "v2"}
     v2_recs = {k: r for k, r in tracker.items() if r.get("method") == "v2"}
@@ -108,6 +136,7 @@ def switch_to_v2(today: dt.date | None = None, *, fetch_prices=None) -> dict:
     pre_switch = copy.deepcopy(tracker)            # точното v1 състояние — за revert
     # 1) пропуснати стопове/цели по обичайната логика (мутира записите на място)
     backtest._resolve_open_positions(tracker, today)
+    expired_mtm = _mark_expired_to_market(legacy, fetch_expiry_closes)      # 1а) изтеклите получават R
     live = {k: r for k, r in legacy.items() if r.get("status") in _LIVE}
     prices = {}
     if live:
@@ -121,24 +150,27 @@ def switch_to_v2(today: dt.date | None = None, *, fetch_prices=None) -> dict:
     archive = {"archived_on": today.isoformat(),
                "note": "v1 методология — архив при превключването към Track Record v2; не се трие.",
                "pre_switch_tracker": pre_switch, "records": legacy, "closed_on_switch": closed,
+               "expired_marked_to_market": expired_mtm,
                "prices": {t: round(float(p), 4) for t, p in prices.items()}, "stats": stats}
     _write_json(_archive_path(), archive)                         # 1) архив (при срив tracker-ът е непокътнат)
     backtest._save_tracker(v2_recs)                               # 2) tracker само с v2
     _write_json(state_path, {"methodology": "v2", "switched_on": today.isoformat(),   # 3) състояние ПОСЛЕДНО
                              "v1_archive_file": _archive_path().name, "v1_stats": stats, "reverted_on": None})
     print(f"[switch] Track Record v2 от {today}: {len(legacy)} v1 записа в архива, {len(closed)} затворени по "
-          f"последната цена; v1: n={stats['n']}, win rate {stats['win_rate_pct']}%, среден R {stats['avg_r']}")
-    return {"status": "switched", "archived": len(legacy), "closed": len(closed), "stats": stats}
+          f"последната цена, {len(expired_mtm)} изтекли оценени по Close при изтичането; "
+          f"v1: n={stats['n']}, win rate {stats['win_rate_pct']}%, среден R {stats['avg_r']}")
+    return {"status": "switched", "archived": len(legacy), "closed": len(closed),
+            "expired_mtm": len(expired_mtm), "stats": stats}
 
 
-def ensure_v2_methodology(today: dt.date | None = None, *, fetch_prices=None) -> dict:
+def ensure_v2_methodology(today: dt.date | None = None, *, fetch_prices=None, fetch_expiry_closes=None) -> dict:
     """Безопасният вход от main.py: идемпотентен и graceful (провал → v1 до следващия run)."""
     if not config.TRACK_RECORD_V2:
         return {"status": "disabled"}
     try:
         if backtest.methodology() == "v2":
             return {"status": "already"}
-        return switch_to_v2(today, fetch_prices=fetch_prices)
+        return switch_to_v2(today, fetch_prices=fetch_prices, fetch_expiry_closes=fetch_expiry_closes)
     except Exception as e:
         print(f"[switch] превключването към v2 пропадна, остава v1 до следващия run: {type(e).__name__}: {e}")
         return {"status": "failed", "error": str(e)}
