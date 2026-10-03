@@ -11,6 +11,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src.series_utils import last_and_week_ago
 
 FRED_BASE = "https://api.stlouisfed.org/fred/series/observations"
 
@@ -275,6 +276,10 @@ def global_market_signals() -> dict:
     в рамките на прозореца). Same fix, приложен еднакво за всичките 7
     сигнала тук (не само VIX, всичките споделяха стария паттърн):
     period="1mo" + iloc[-6] — точен 5-търговски-дневен прозорец.
+
+    FIX 2026-10-03 (пакет 2 т.9): и `iloc[-6]` се оказа позиционен (пет БАРА, не пет търговски дни — бар, който
+    липсва, го мести) и без NaN проверка → прозорецът вече е по ДАТА (7 календарни дни от последния бар), виж
+    series_utils.last_and_week_ago(). Името на полето остава chg_5d_*.
     """
     tickers = {
         "DXY": "DX-Y.NYB", "VIX": "^VIX", "Gold": "GC=F",
@@ -289,8 +294,11 @@ def global_market_signals() -> dict:
                     print(f"[macro] {name} stale — последен ред "
                           f"{hist.index[-1].date()}, пропускам")
                     continue
-                last = float(hist["Close"].iloc[-1])
-                wk = float(hist["Close"].iloc[-6])
+                # FIX 2026-10-03 (пакет 2 т.9): `.iloc[-6]` (пет бара назад) беше позиционно и без NaN проверка —
+                # липсващ бар мести прозореца, NaN в последния бар стигаше до AI като "nan". Сега: последният бар
+                # на или преди 7 календарни дни назад (като MOVE от 25.09) и ValueError при NaN/липса → сигналът
+                # се пропуска с ред в лога (виж series_utils.last_and_week_ago).
+                last, wk, _ = last_and_week_ago(hist["Close"])
                 if name in _YIELD_SIGNALS:
                     # FIX 2026-10-03 (пакет 2 т.5): доходностите се движат в БАЗИСНИ ПУНКТОВЕ, не в относителен %
                     # (^TNX 5.24 → 5.32 е +8 б.п., а относителното "+1.5%" се чете като 1.5 пункта доходност).

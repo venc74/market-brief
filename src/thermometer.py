@@ -15,6 +15,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src.screener import build_universe
+from src.series_utils import last_and_week_ago
 
 
 def spy_trend() -> dict:
@@ -69,10 +70,10 @@ def vix_level() -> dict:
         hist = yf.Ticker("^VIX").history(period="1mo")
         if hist.empty or len(hist) < 6:
             raise ValueError("insufficient VIX history")
-        vix = float(hist["Close"].iloc[-1])
-        week_ago = float(hist["Close"].iloc[-6])
-        if math.isnan(vix) or math.isnan(week_ago):
-            raise ValueError("NaN VIX — невалидни данни от източника")
+        # FIX 2026-10-03 (пакет 2 т.9): прозорецът е по ДАТА (последният бар на или преди 7 календарни дни от
+        # последния бар), не `.iloc[-6]` — както MOVE от 25.09. Липсващ бар местеше котвата и при праг 20% обръщаше
+        # флага за скок (на 2г реална история: 5 от 499 дни; котвата се различава в 86 от 499). NaN → ValueError.
+        vix, week_ago, _ = last_and_week_ago(hist["Close"])
     except Exception as e:
         print(f"[thermo] VIX failed: {e}")
         return {"name": "VIX", "value": None, "status": "yellow",
