@@ -2,6 +2,8 @@
 Пакет 4а (2026-10-03): махане на мъртво/ненадеждно съдържание от dashboard-а — проверки върху РЕАЛНИЯ
 шаблон с СИНТЕТИЧЕН вход (мок кандидат, мок режим).
   т.3 — widget-ът "Borrow Rate · търсене на тикър" (CORS proxy) е махнат; Borrow редът върху картите остава.
+  т.4 — опционният блок на картите е махнат от enrich, от AI payload-а и от шаблона (OI снимката за Unusual
+        Options не е пипана).
 Пускане: python test_dashboard_cleanup.py
 """
 import sys, pathlib, tempfile
@@ -9,7 +11,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
-from src import render, thermometer
+from src import render, thermometer, enrich, ai_brief, borrow_data
 
 
 def render_brief(**over):
@@ -51,6 +53,29 @@ if __name__ == "__main__":
     html = render_brief(action=[card])
     assert '<div class="borrow"><b>Borrow:</b> Borrow 0.8% — евтино за шортиране</div>' in html
     print("  ✓ няма секция, поле за тикър, скрипт и CORS proxy (allorigins); реда 'Borrow:' върху картата остава")
+
+    print()
+    print("── т.4: опционният блок на картите е махнат ──")
+    html = render_brief(action=[action_card()])                       # картата няма "options" ключ изобщо
+    for gone in ("<h3>Опции</h3>", "IV / IVR", "P/C ratio", "Стратегия"):
+        assert gone not in html, gone
+    assert "<h3>Short Interest</h3>" in html and "<h3>Техническа картина</h3>" in html     # съседните блокове са си на място
+    assert not hasattr(enrich, "options_info") and not hasattr(config, "IV_HISTORY_FILE")
+    # enrich() не вика опции и не слага "options" на реда
+    enrich.earnings_info = lambda sym: {"next_earnings": None, "days_to_earnings": None, "in_blackout": False}
+    enrich._build_crosscheck_sets = lambda tickers: {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
+    borrow_data.borrow_info = lambda sym: {"available": False}
+    row = {"ticker": "ABCD", "price": 100.0}
+    out = enrich.enrich([row])[0]
+    assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and out["borrow"] == {"available": False}
+    # AI payload-ът не носи опции
+    seen = []
+    ai_brief._narratives_for_batch = lambda batch, sector_logic, regime, label, prior: seen.extend(batch) or []
+    ai_brief._load_prior_watchlist_triggers = lambda: {}
+    ai_brief.ticker_narratives([{**row, "options": {"iv": 38.5, "iv_rank": 22.0, "strategy": "long call"}, "short_view": {}}], [], "Offensive")
+    assert seen and all("options" not in s for s in seen)
+    print("  ✓ картата няма 'Опции' (IV/IVR, P/C, Стратегия); enrich() не слага options; AI payload-ът ги няма; Short Interest и")
+    print("    Техническа картина са на място; следобедната OI снимка (oi_snapshot.py/unusual_options.py) не е пипана")
 
     print()
     print("Всички тестове минаха.")

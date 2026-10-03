@@ -231,7 +231,6 @@ import pathlib
 ROOT = pathlib.Path(__file__).parent
 DATA_DIR = ROOT / "data"
 DOCS_DIR = ROOT / "docs"
-IV_HISTORY_FILE = DATA_DIR / "iv_history.json"
 
 # ── Секторни ETF-и за ротационен анализ (Слой 2) ─────────────────────────
 SECTOR_ETFS = {

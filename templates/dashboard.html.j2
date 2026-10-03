@@ -700,11 +700,6 @@
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">{{ st.short_view.interpretation }}</div>
         {% if st.short_view.borrow %}<div class="borrow"><b>Borrow:</b> {{ st.short_view.borrow }}</div>{% endif %}
-        <h3>Опции</h3>
-        <div class="kv"><span>IV / IVR</span><b>{{ st.options.iv or "—" }}% / {{ st.options.iv_rank or "—" }}{% if st.options.iv_rank_quality %} ({{ st.options.iv_rank_quality }}){% endif %}</b></div>
-        <div class="kv"><span>P/C ratio</span><b>{{ st.options.put_call_ratio or "—" }}</b></div>
-        <div class="kv"><span>Стратегия</span><b>{{ st.options.strategy }}</b></div>
-        <div class="why" style="font-size:13px;color:var(--muted);margin-top:6px">{{ st.options.strategy_reason }}</div>
       </div>
       <div class="block">
         <h3>Техническа картина</h3>

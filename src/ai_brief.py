@@ -797,8 +797,6 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         # no_volume | below_pivot | extended — Action е допустим само при confirmed
         slim[-1]["setup"] = (c.get("setup") or {}).get("kind")
         slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
-        slim[-1]["options"] = {k: c.get("options", {}).get(k)
-                               for k in ("iv", "iv_rank", "strategy")}
 
     if not slim:
         return []

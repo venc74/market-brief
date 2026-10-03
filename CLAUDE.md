@@ -62,7 +62,7 @@ src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rat
 src/setup_rules.py     — код-класификация на сетъпа (confirmed / no_volume /
                         below_pivot / extended / too_wide), buy-stop ниво, "валиден
                         до" в сесии, stop_levels() — общата стоп математика
-src/enrich.py           — earnings, опции IV/IVR, short interest, маркери
+src/enrich.py           — earnings, short interest, borrow, маркери (MF✓/UOV✓/SPLIT✓/SI✓)
 src/ai_brief.py         — Claude API: macro brief, ticker narratives, COT theses
 src/cot.py              — CFTC Commitments of Traders, whitelist 35 пазара
 src/thesis_context.py   — каре "Контекст" (само данни) към маркираните тези
