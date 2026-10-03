@@ -623,6 +623,8 @@ def run() -> dict:
         "glb_candidates": glb_candidates,
         "news": news,
         "cot": cot_with_theses,
+        # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
+        "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
         # FIX 2026-09-30: приети/отхвърлени маркирания от проверката на тезите

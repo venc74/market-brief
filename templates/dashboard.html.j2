@@ -1048,9 +1048,17 @@
       </div>
 {% endmacro %}
 
-{% if cot %}
+{% if cot or (cot_status and cot_status.stale) %}
 <section>
   <h2>COT Екстремуми · Managed Money Positioning</h2>
+  {# пакет 2 т.7: давност на данните — спряна/забавена публикация на CFTC или провалено теглене #}
+  {% if cot_status and cot_status.stale %}
+  <div class="model-banner rejected">⚠ <strong>COT данните са остарели</strong> —
+    {% if cot_status.as_of %}последният отчет е към {{ cot_status.as_of }} ({{ cot_status.age_days }} дни назад; нормално 6–10, праг {{ cot_status.threshold_days }}).
+    Вероятно CFTC е спряла или забавила публикацията (или теглянето е пропаднало): показаното по-долу е по по-стари позиции, не по днешните.
+    {% else %}няма налични данни (кешът е празен или CFTC е недостъпна).{% endif %}</div>
+  {% endif %}
+  {% if not cot %}<div class="prose">Няма показани екстремуми.</div>{% endif %}
   <div class="theses">
     {% for c in cot %}
     <div class="thesis {{ 'active' if c.direction == 'extreme_long' else 'watch' }}">

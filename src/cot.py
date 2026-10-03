@@ -346,22 +346,56 @@ def _market_extreme(label: str, pts: list[dict], category: str,
     }
 
 
-def get_extremes(low: float | None = None, high: float | None = None) -> list[dict]:
+# Състоянието на последния get_extremes(): давност на най-новия отчет — main го слага в брифа (cot_status), шаблонът
+# показва банер, ако е стар. {"as_of", "age_days", "stale", "threshold_days", "reason"}
+LAST_STATUS: dict = {}
+
+
+def freshness(cache: dict, resolved: list[tuple[str, str, str]], today: dt.date | None = None) -> dict:
+    """
+    FIX 2026-10-03 (пакет 2 т.7): давност на данните. Най-новата дата на отчет сред whitelist пазарите срещу днес; "стар" е
+    повече от config.COT_STALE_DAYS дни (спряна или забавена публикация на CFTC, провалено теглене — кешът мълчаливо
+    остава с по-стари данни и екстремумите изглеждат актуални). Без никакви данни → stale с причина "no_data".
+    """
+    today = today or dt.date.today()
+    limit = config.COT_STALE_DAYS
+    dates = []
+    for _label, source, market in resolved:
+        pts = cache.get(source, {}).get(market, [])
+        if pts:
+            dates.append(pts[-1]["date"])
+    if not dates:
+        return {"as_of": None, "age_days": None, "stale": True, "threshold_days": limit, "reason": "no_data"}
+    as_of = max(dates)
+    age = (today - dt.date.fromisoformat(as_of)).days
+    stale = age > limit
+    return {"as_of": as_of, "age_days": age, "stale": stale, "threshold_days": limit, "reason": "stale" if stale else ""}
+
+
+def get_extremes(low: float | None = None, high: float | None = None, today: dt.date | None = None) -> list[dict]:
     """
     Връща екстремумите за MAJOR_MARKETS whitelist-а (не целия CFTC универс),
     под `low` или над `high` percentile спрямо 156-седмична история.
     Строги прагове по подразбиране (10/90) — малко на брой, но значими.
+    Давността на данните остава в LAST_STATUS (виж freshness()).
     """
     low = low if low is not None else config.COT_PERCENTILE_LOW
     high = high if high is not None else config.COT_PERCENTILE_HIGH
 
+    LAST_STATUS.clear()
     try:
         cache = refresh_cache()
     except Exception as e:
         print(f"[cot] refresh_cache failed: {e}")
+        LAST_STATUS.update(as_of=None, age_days=None, stale=True, threshold_days=config.COT_STALE_DAYS, reason="no_data")
         return []
 
     resolved = _resolve_whitelist(cache)
+    LAST_STATUS.update(freshness(cache, resolved, today))
+    if LAST_STATUS["stale"]:
+        print("[cot] ⚠ няма COT данни за whitelist пазарите" if LAST_STATUS["as_of"] is None else
+              f"[cot] ⚠ данните са остарели — последен отчет {LAST_STATUS['as_of']} "
+              f"({LAST_STATUS['age_days']} дни, праг {LAST_STATUS['threshold_days']})")
     category_map = {"tff": "financial", "disaggregated": "commodity"}
 
     extremes = []
