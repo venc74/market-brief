@@ -169,6 +169,8 @@ def treasury_spread_2s10s() -> dict:
     return {
         "value": val,
         "prev_week": prev,
+        # FIX 2026-10-03 (пакет 2 т.5): седмичната промяна е готова в б.п. — AI-то да не я смята наум
+        "change_1w_bp": round((val - prev) * 100, 1),
         "status": "inverted" if val < 0 else "normal",
         "direction": direction,
     }
@@ -252,6 +254,10 @@ def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
     return (dt.date.today() - last_date).days > threshold
 
 
+# сигналите, които са ДОХОДНОСТИ (ниво в %, промяна в базисни пунктове — не относителен %)
+_YIELD_SIGNALS = {"US10Y"}
+
+
 def global_market_signals() -> dict:
     """
     DXY, VIX, gold, oil, copper, 10Y yield, MOVE — снимка + 5-дневна промяна.
@@ -285,6 +291,15 @@ def global_market_signals() -> dict:
                     continue
                 last = float(hist["Close"].iloc[-1])
                 wk = float(hist["Close"].iloc[-6])
+                if name in _YIELD_SIGNALS:
+                    # FIX 2026-10-03 (пакет 2 т.5): доходностите се движат в БАЗИСНИ ПУНКТОВЕ, не в относителен %
+                    # (^TNX 5.24 → 5.32 е +8 б.п., а относителното "+1.5%" се чете като 1.5 пункта доходност).
+                    # Затова САМО chg_5d_bp, без chg_5d_pct. ^TNX е в % годишна доходност (5.24 = 5.24%).
+                    out[name] = {
+                        "value": round(last, 2),
+                        "chg_5d_bp": round((last - wk) * 100, 1),
+                    }
+                    continue
                 out[name] = {
                     "value": round(last, 2),
                     "chg_5d_pct": round((last / wk - 1) * 100, 2),
