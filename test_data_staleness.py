@@ -5,7 +5,7 @@
 Мрежата е подменена; всички редове (покупки, мениджъри, холдинги) и датите са СИНТЕТИЧНИ — тестови вход, не реални
 Form 4 / 13F. Шаблонът е реалният. Пускане: python test_data_staleness.py
 """
-import sys, pathlib, tempfile, json, datetime as dt
+import sys, pathlib, tempfile, json, datetime as dt, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -168,7 +168,7 @@ def render_brief(**over):
     with tempfile.TemporaryDirectory() as docs:
         orig = config.DOCS_DIR; config.DOCS_DIR = pathlib.Path(docs)
         try:
-            return render.render_dashboard(brief)
+            return htmllib.unescape(render.render_dashboard(brief))     # autoescape (т.8): сравняваме видимия текст
         finally:
             config.DOCS_DIR = orig
 

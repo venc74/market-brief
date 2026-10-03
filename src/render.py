@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 import datetime as dt
+import html as _html
 from jinja2 import Environment, FileSystemLoader
 
 import sys, pathlib
@@ -13,8 +14,19 @@ import config
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
                "петък", "събота", "неделя"]
 
+# 2026-10-03 (пакет 4а т.8): autoescape=True. Външен текст (RSS заглавия, AI текст, имена на компании, причини)
+# влиза в HTML — без escape един "<" или кавичка в заглавие чупи страницата или атрибут (title="..."), а
+# злонамерен текст би се изпълнил. Проверено срещу всичките 78 реални брифа (шаблонът се прекомпилира при всяко
+# превключване): таговете, атрибутите и видимият текст са идентични с и без escape — данните никъде не носят
+# умишлен HTML, шаблонът не ползва |safe. (Реалните AI текстове вече съдържат "<1%" — без escape това беше
+# невалиден HTML, който браузърът прощаваше по късмет.)
 env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
-                  autoescape=False)
+                  autoescape=True)
+
+
+def _e(x) -> str:
+    """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
+    return _html.escape("" if x is None else str(x), quote=True)
 
 
 def _money_short(v):
@@ -138,8 +150,8 @@ def render_email(brief: dict) -> str:
     today = dt.date.today()
     t = brief["thermometer"]
     # FIX 2026-09-25: при override броенето не изчезва — добавя се след причината
-    regime_line = t["regime_reason"] + (
-        f" · {t['counts']}" if t.get("overrides") and t.get("counts") else "")
+    regime_line = _e(t["regime_reason"]) + (
+        f" · {_e(t['counts'])}" if t.get("overrides") and t.get("counts") else "")
     regime = t["regime"]
     color = {"Offensive": "#0e9f6e", "Defensive": "#d97706", "Cash": "#dc2626"}[regime]
 
@@ -158,16 +170,16 @@ def render_email(brief: dict) -> str:
         mk = "".join(
             f'<span style="display:inline-block;background:#eef2ff;color:#3730a3;'
             f'font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;'
-            f'margin:3px 3px 0 0">{m["tag"]}</span>'
+            f'margin:3px 3px 0 0">{_e(m["tag"])}</span>'
             for m in st.get("markers", []))
         mk = f'<div style="margin-top:4px">{mk}</div>' if mk else ""
         rows += f"""
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
-                     font-family:monospace;font-weight:bold;color:{color}">{st['ticker']}{mk}</td>
+                     font-family:monospace;font-weight:bold;color:{color}">{_e(st['ticker'])}{mk}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">
-              {st['company']}<br>
-              <span style="color:#6b7280">{st['base_type']} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span></td>
+              {_e(st['company'])}<br>
+              <span style="color:#6b7280">{_e(st['base_type'])} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span></td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-size:13px;white-space:nowrap">
               {plan_txt}</td>
@@ -176,10 +188,10 @@ def render_email(brief: dict) -> str:
         rows = """<tr><td colspan="3" style="padding:14px;color:#6b7280">
                   Днес няма Action кандидати. Кешът е позиция.</td></tr>"""
 
-    watch = ", ".join(st["ticker"] for st in brief["watchlist"]) or "—"
+    watch = ", ".join(_e(st["ticker"]) for st in brief["watchlist"]) or "—"
     dot_color = {"green": "#0e9f6e", "yellow": "#d97706", "red": "#dc2626"}
     thermo_dots = "".join(
-        f'<span title="{i["name"]}" style="display:inline-block;width:11px;height:11px;'
+        f'<span title="{_e(i["name"])}" style="display:inline-block;width:11px;height:11px;'
         f'border-radius:50%;margin-right:5px;background:{dot_color.get(i["status"], "#d97706")}"></span>'
         for i in t["indicators"])
 
@@ -194,17 +206,17 @@ def render_email(brief: dict) -> str:
     if uo:
         signals_rows += (
             '<div style="margin-bottom:6px"><span style="color:#6b7280">Необичаен опционен обем:</span> '
-            f'<span style="font-family:monospace;color:#111827">{", ".join(uo)}</span></div>')
+            f'<span style="font-family:monospace;color:#111827">{", ".join(_e(x) for x in uo)}</span></div>')
     if sp_prio:
         pr_txt = ", ".join(
-            f'{_SPLIT_BADGE_EMAIL.get(s.get("badge"), "")} {s["ticker"]}'
-            f'{(" " + s["ratio"]) if s.get("ratio") else ""} · {_split_when(s)}' for s in sp_prio)
+            f'{_SPLIT_BADGE_EMAIL.get(s.get("badge"), "")} {_e(s["ticker"])}'
+            f'{(" " + _e(s["ratio"])) if s.get("ratio") else ""} · {_e(_split_when(s))}' for s in sp_prio)
         signals_rows += (
             '<div style="margin-bottom:6px"><span style="color:#6b7280">Сплитове на отворени позиции / наблюдавани:</span> '
             f'<span style="font-family:monospace;color:#b45309">{pr_txt}</span></div>')
     if sp:
         sp_txt = ", ".join(
-            f'{s["ticker"]}{(" " + s["ratio"]) if s.get("ratio") else ""}'
+            f'{_e(s["ticker"])}{(" " + _e(s["ratio"])) if s.get("ratio") else ""}'
             f'{(" " + _SPLIT_BADGE_EMAIL[s["badge"]]) if s.get("badge") in _SPLIT_BADGE_EMAIL else ""}'
             for s in sp)
         signals_rows += (
@@ -212,7 +224,7 @@ def render_email(brief: dict) -> str:
             f'<span style="font-family:monospace;color:#111827">{sp_txt}</span></div>')
     si = brief.get("superinvestor_moves", [])[:8]
     if si:
-        si_txt = ", ".join(dict.fromkeys(r["ticker"] for r in si))
+        si_txt = ", ".join(dict.fromkeys(_e(r["ticker"]) for r in si))
         signals_rows += (
             '<div style="margin-top:6px"><span style="color:#6b7280">Superinvestor покупки (13F):</span> '
             f'<span style="font-family:monospace;color:#111827">{si_txt}</span></div>')
@@ -225,8 +237,8 @@ def render_email(brief: dict) -> str:
     news_block = ""
     if news:
         items = "".join(
-            f'<li style="margin-bottom:6px"><b>{n.get("headline","")}</b>'
-            f'<span style="color:#6b7280"> — {n.get("why","")}</span></li>' for n in news)
+            f'<li style="margin-bottom:6px"><b>{_e(n.get("headline",""))}</b>'
+            f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
         news_block = (
             '<tr><td style="padding:16px 28px 4px">'
             '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;'
@@ -255,7 +267,7 @@ def render_email(brief: dict) -> str:
   <tr><td style="padding:20px 28px;border-bottom:1px solid #e5e7eb">
     <span style="display:inline-block;background:{color};color:#fff;font-weight:bold;
                  padding:6px 16px;border-radius:4px;font-size:14px;letter-spacing:1px">
-      {regime.upper()}</span>
+      {_e(regime.upper())}</span>
     <span style="margin-left:12px">{thermo_dots}</span>
     <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
   </td></tr>
@@ -263,7 +275,7 @@ def render_email(brief: dict) -> str:
   {news_block}
 
   <tr><td style="padding:20px 28px;font-size:14px;color:#111827;line-height:1.6">
-    {brief['ai_macro']['macro_brief']}
+    {_e(brief['ai_macro']['macro_brief'])}
   </td></tr>
 
   <tr><td style="padding:0 28px 8px">
