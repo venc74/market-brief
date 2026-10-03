@@ -125,6 +125,15 @@ RS_RATING_WEIGHTS = (0.4, 0.2, 0.2, 0.2)          # [последно триме
 RS_QUARTER_BARS = 63
 RS_RATING_MIN_UNIVERSE = int(os.getenv("RS_RATING_MIN_UNIVERSE", 150))
 
+# ── Track Record v2: чист старт (пакет 1, т.7 — 2026-10-03) ───────────────
+# При първия run с v2 кодът архивира v1 записите (data/backtest_archive_v1.json — НЕ се трият),
+# затваря отворените v1 позиции по последния Close като "v1_closed" (mark-to-market R) и започва
+# Track Record от нула; брифът показва един ред "v1 методология: n=…, win rate …, среден R …".
+# OPEN✓, RE-ENTRY и позициите в COT промпта гледат само v2 записи. Превключването е еднократно
+# и идемпотентно (data/track_record_state.json) и се връща с tracker_switch.revert_to_v1().
+# TRACK_RECORD_V2=0 спира автоматичното превключване (v2 плановете пак се записват като v2).
+TRACK_RECORD_V2 = os.getenv("TRACK_RECORD_V2", "1") == "1"
+
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
 # "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.

@@ -110,6 +110,29 @@ def _save_tracker(tracker: dict) -> None:
                              encoding="utf-8")
 
 
+def _state_path() -> pathlib.Path:
+    return config.DATA_DIR / "track_record_state.json"
+
+
+def load_state() -> dict:
+    """
+    Състоянието на Track Record методологията (виж tracker_switch.py). Липсващ/повреден
+    файл → {} (методология v1, т.е. още не е превключено). Път от config.DATA_DIR при всяко
+    извикване, не при импорт.
+    """
+    p = _state_path()
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[backtest] state JSON повреден, считам методология v1: {e}")
+    return {}
+
+
+def methodology() -> str:
+    return "v2" if load_state().get("methodology") == "v2" else "v1"
+
+
 def _snapshot_files() -> list[pathlib.Path]:
     """Само YYYY-MM-DD.json — изключва кеш файлове (cot_cache.json и т.н.)."""
     return sorted(p for p in config.DATA_DIR.glob("*.json") if _SNAPSHOT_RE.match(p.name))
@@ -205,6 +228,11 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
             if key in tracker or _is_continuation(tracker, ticker, entry_date):
                 continue
             tracker[key] = _new_v2_record(ticker, entry_date, plan)
+            continue
+        if methodology() == "v2":
+            # стар (v1) план от архивните snapshot-и (data/YYYY-MM-DD.json се четат наново
+            # при всеки run): след чистия старт НЕ влиза в Track Record-а — иначе всичките
+            # ~50 исторически позиции щяха да се върнат като нови v1 записи
             continue
         entry_range = plan.get("entry_range")
         target_1 = plan.get("target_1")
@@ -746,7 +774,9 @@ def get_backtest_summary() -> dict:
     _fetch_current_prices) — не чупи останалата част на summary-то.
     """
     tracker = _load_tracker()
-    records = list(tracker.values())
+    # пакет 1, т.7: Track Record-ът е само v2; v1 записите (ако още са в tracker-а) са
+    # извън статистиката — v1 е един архивен ред (виж по-долу и tracker_switch.py)
+    records = [r for r in tracker.values() if r.get("method") == "v2"]
 
     resolved = [r for r in records if r.get("realized_r") is not None]
     total_resolved = len(resolved)
@@ -861,6 +891,8 @@ def get_backtest_summary() -> dict:
         "stopped_after_partial": sum(1 for r in records if r.get("status") == "stopped"
                                      and r.get("partial_price") is not None),
         "pending": by_status.get("pending", 0),
+        "methodology": {"version": methodology(), "switched_on": load_state().get("switched_on")},
+        "v1_archive": load_state().get("v1_stats"),
         "not_triggered": by_status.get("not_triggered", 0),
         "skipped_extended": by_status.get("skipped_extended", 0) + by_status.get("invalid_risk", 0),
         "pending_positions": pending_positions,

@@ -1063,9 +1063,17 @@
 </section>
 {% endif %}
 
-{% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions) %}
+{% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions or backtest.v1_archive) %}
 <section>
-  <h2>Track Record · {{ backtest.total_resolved }} резолвирани</h2>
+  <h2>Track Record v2 · {{ backtest.total_resolved }} резолвирани</h2>
+  {# FIX 2026-10-03 (пакет 1, т.7): чист старт — v1 е архив, един ред #}
+  {% if backtest.v1_archive %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    v1 методология: n={{ backtest.v1_archive.n }}, win rate {{ backtest.v1_archive.win_rate_pct }}%,
+    среден R {{ backtest.v1_archive.avg_r }}{% if backtest.v1_archive.unpriced %} ({{ backtest.v1_archive.unpriced }} без цена){% endif %}
+    · архивирана на {{ backtest.methodology.switched_on }} (отворените v1 позиции затворени по последния Close, mark-to-market);
+    Track Record v2 започва от нула.</div>
+  {% endif %}
   <div class="prose">
     <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
     {{ backtest.stopped }} стоп{% if backtest.stopped_after_partial %} (от тях {{ backtest.stopped_after_partial }} след частична продажба){% endif %}

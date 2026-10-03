@@ -26,6 +26,7 @@ from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
 from src import correlation_check
 from src import backtest
+from src import tracker_switch
 from src import cot
 from src import entry_timing
 from src import setup_rules
@@ -49,8 +50,9 @@ def _live_positions() -> dict[str, dict]:
     """
     try:
         tracker = backtest._load_tracker()
+        # пакет 1, т.7: само v2 позиции — v1 е архив, не „държа" и не пречи на нов вход
         return {rec["ticker"]: rec for rec in tracker.values()
-                if rec.get("status") in ("open", "trailing")}
+                if rec.get("method") == "v2" and rec.get("status") in ("open", "trailing")}
     except Exception as e:
         print(f"[main] live positions check failed: {e}")
         return {}
@@ -87,6 +89,8 @@ def _last_resolved_positions() -> dict[str, dict]:
         tracker = backtest._load_tracker()
         out: dict[str, dict] = {}
         for rec in tracker.values():
+            if rec.get("method") != "v2":        # т.7: v1 историята е архив
+                continue
             if rec.get("realized_r") is None or not rec.get("resolution_date"):
                 continue
             cur = out.get(rec["ticker"])
@@ -363,6 +367,11 @@ def run() -> dict:
     # RE-ENTRY (нов вход, не продължение) или ЗАТВОРЕНА ДНЕС (без Action план
     # в същия ден — Track Record не би го записал като отделна сделка).
     if config.ENABLE_BACKTEST:
+        # FIX 2026-10-03 (пакет 1, т.7): еднократен чист старт на Track Record-а — v1 записите се
+        # архивират, отворените се затварят по последния Close ("v1_closed"). ПРЕДИ резолюцията
+        # и преди каквото и да четe _live_positions() (OPEN✓/RE-ENTRY/COT гледат само v2).
+        # Идемпотентно и graceful — провал оставя v1 до следващия run, без загуба на данни.
+        tracker_switch.ensure_v2_methodology()
         backtest.resolve_positions_only()
     cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
     cot_open_positions = [

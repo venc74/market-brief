@@ -129,15 +129,15 @@ print()
 print("── обобщение за dashboard-а ──")
 backtest._save_tracker(tr)
 sm = backtest.get_backtest_summary()
-assert sm["total_resolved"] == 2 and sm["wins"] == 0 and sm["losses"] == 2 and sm["win_rate_pct"] == 0.0   # v2 stop + v1 stop
-assert sm["stopped"] == 2 and sm["still_open"] == 1 and sm["pending"] == 1 and sm["not_triggered"] == 1
+assert sm["total_resolved"] == 1 and sm["wins"] == 0 and sm["losses"] == 1 and sm["win_rate_pct"] == 0.0   # само v2 (v1 записът е извън статистиката, т.7)
+assert sm["stopped"] == 1 and sm["still_open"] == 1 and sm["pending"] == 1 and sm["not_triggered"] == 1
 assert sm["skipped_extended"] == 0 and sm["avg_realized_r"] == -1.0
 pp = sm["pending_positions"]
 assert [(p["ticker"], p["entry_date"], p["buy_stop"], p["stop_loss"]) for p in pp] == [("EXEL", "2026-10-01", 59.72, 54.94)]
 op = sm["open_positions"]
 assert len(op) == 1 and op[0]["entry_date"] == "2026-09-30" and op[0]["signal_date"] == "2026-09-25" and op[0]["entry_price"] == 59.72
 assert op[0]["unrealized_pct"] == round((float(EXEL["Close"].iloc[-1]) - 59.72) / 59.72 * 100, 1)
-print("  ✓ резолвирани 2 (not_triggered/pending не са в win rate и средния R), 1 жива с РЕАЛНАТА дата на входа (30.09,")
+print("  ✓ резолвирани 1 (v1 записът е извън статистиката; not_triggered/pending не са в win rate), 1 жива с РЕАЛНАТА дата на входа (30.09,")
 print("    препоръка 25.09) и цена $59.72, 1 pending в отделен списък")
 print()
 
