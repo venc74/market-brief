@@ -39,6 +39,7 @@ HOLD = {"a-new": [{"issuer": "NEWCO INC", "value": 50_000_000.0, "cusip": "N1", 
 dataroma._recent_13f_filings = lambda cik, n=2: FILINGS.get(cik, [])[:n]
 dataroma._info_table = lambda cik, acc: [dict(h) for h in HOLD.get(acc, [])]
 config.DATAROMA_CIK = {"0000000001": "Активен · Test Fund", "0000000002": "Спрял · Stopped Fund"}
+dataroma._MEMO.clear()
 b = dataroma._fetch_all(config.DATAROMA_MIN_VALUE)
 assert [m["manager"] for m in b["stopped_managers"]] == ["Спрял · Stopped Fund"]
 assert b["stopped_managers"][0]["last_filing_date"] == OLD and b["stopped_managers"][0]["days_since_filing"] > config.DATAROMA_STALE_FILER_DAYS

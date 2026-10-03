@@ -88,6 +88,8 @@ def render_dashboard(brief: dict) -> str:
         superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         insider_buying=brief.get("insider_buying", []),
+        insider_status=brief.get("insider_buying_status") or {},
+        superinvestor_status=brief.get("superinvestor_status") or {},
         glb_candidates=brief.get("glb_candidates", []),
         news=brief.get("news", []),
         cot=brief.get("cot", []),

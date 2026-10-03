@@ -70,6 +70,11 @@ _EDGAR_UA = {"User-Agent": config.EDGAR_UA, "Accept-Encoding": "gzip, deflate"}
 _CACHE = config.DATA_DIR / "insider_buying_cache.json"
 _CIK_MAP_CACHE = config.DATA_DIR / "insider_ticker_cik_cache.json"
 
+# Пакет 4а т.7 (2026-10-03): статусът на ПОСЛЕДНОТО теглене — различава "легитимна нула" от провал и казва
+# от кога са показаните редове. Пише се при всяко извикване (и при кеш); main го слага в брифа.
+#   kind: "ok" | "ok_partial" | "legit_zero" | "failed"; stale = показаните редове НЕ са от днешното теглене
+LAST_STATUS: dict = {}
+
 _OFFICER_TITLE_KEYWORDS = ("ceo", "cfo", "president", "coo")
 _LOOKBACK_DAYS = config.INSIDER_CLUSTER_WINDOW_DAYS + 16  # ≈30д: cluster прозорец + filing lag буфер
 _SLEEP = 0.12  # ~10 заявки/сек SEC fair-use лимит с коректен UA
@@ -519,6 +524,39 @@ def _group_by_ticker(rows: list[dict]) -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────
+def _classify_fetch(diagnostics: dict, rows_today: int, error: str | None) -> tuple[str, str]:
+    """
+    (kind, обяснение) за днешното теглене — виж LAST_STATUS. Празен резултат е "легитимна нула" САМО ако
+    тегленето е минало чисто: универсът е зареден, CIK мапингът работи и нито една submissions заявка не е
+    паднала. Иначе е провал — нулата не може да се докаже.
+    """
+    d = diagnostics
+    if error:
+        return "failed", f"тегленето гръмна: {error}"
+    if rows_today:
+        if d.get("submissions_fetch_errors"):
+            return "ok_partial", f"{d['submissions_fetch_errors']} от {d.get('ciks_resolved')} заявки към SEC не успяха — списъкът може да е непълен"
+        return "ok", f"проверени {d.get('ciks_resolved')} компании"
+    if not d.get("universe_size"):
+        return "failed", "универсът S&P500+NDX100 не се зареди"
+    if not d.get("ciks_resolved"):
+        return "failed", "няма CIK мапинг от SEC (company_tickers.json / User-Agent)"
+    if d.get("submissions_fetch_errors"):
+        return "failed", f"{d['submissions_fetch_errors']} от {d['ciks_resolved']} заявки към SEC не успяха — нулата не е сигурна"
+    return "legit_zero", (f"проверени {d['ciks_resolved']} компании: нито една квалифицираща покупка "
+                          f"(≥ ${config.INSIDER_MIN_VALUE:,.0f}, officers/cluster) в последните {_LOOKBACK_DAYS} дни")
+
+
+def _annotate_stale(rows: list[dict], data_date: str | None) -> list[dict]:
+    """Редове от ПРЕДИШНО теглене: копие с stale/data_date/latest_txn_date, за да не изглеждат като днешни."""
+    out = []
+    for r in rows:
+        txn_dates = [str(i.get("date")) for i in (r.get("insiders") or []) if i.get("date")]
+        out.append({**r, "stale": True, "data_date": data_date,
+                    "latest_txn_date": max(txn_dates) if txn_dates else None})
+    return out
+
+
 def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     """
     Връща [{ticker, company, total_value, cluster, in_screener, insiders:
@@ -555,12 +593,17 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     today = dt.date.today().isoformat()
 
     previous_rows: list[dict] = []
+    previous_rows_date: str | None = None
     if _CACHE.exists():
         try:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today and cached.get("rows"):
-                return cached["rows"]
+                st = cached.get("status") or {"kind": "ok", "note": "", "stale": False, "data_date": today}
+                LAST_STATUS.clear(); LAST_STATUS.update(st)
+                return _annotate_stale(cached["rows"], st.get("data_date")) if st.get("stale") else cached["rows"]
             previous_rows = cached.get("rows", [])
+            # старите кешове не пазят кога са теглени редовете (date се презаписваше всеки ден) → None
+            previous_rows_date = cached.get("rows_date")
         except Exception:
             pass
 
@@ -573,6 +616,7 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
         "raw_transactions_parsed": 0,
         "qualifying_after_filter": 0,
     }
+    error = None
     try:
         universe = _sp500_ndx_universe()
         diagnostics["universe_size"] = len(universe)
@@ -587,6 +631,7 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     except Exception as e:
         print(f"[insider] fetch failed: {e}")
         rows = []
+        error = f"{type(e).__name__}: {e}"
 
     # "rows" в кеша = fallback-aware display данни (за dashboard-а) — ако
     # днешният fetch е празен, пазим последните ИЗВЕСТНИ добри резултати, за
@@ -596,15 +641,22 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     # (rows, не display_rows) — никога не се carry-over-ва, за да остане
     # instrumentation-ът точен инструмент за утрешна диагностика.
     display_rows = rows or previous_rows
+    kind, note = _classify_fetch(diagnostics, len(rows), error)
+    stale = not rows and bool(previous_rows)
+    rows_date = today if rows else previous_rows_date
+    status = {"kind": kind, "note": note, "stale": stale, "data_date": rows_date if stale else today,
+              "universe_size": diagnostics.get("universe_size"), "ciks_resolved": diagnostics.get("ciks_resolved")}
+    LAST_STATUS.clear(); LAST_STATUS.update(status)
 
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "rows": display_rows, "diagnostics": diagnostics},
+        _CACHE.write_text(json.dumps({"date": today, "rows": display_rows, "rows_date": rows_date,
+                                      "status": status, "diagnostics": diagnostics},
                                      ensure_ascii=False, indent=1, default=str))
     except Exception as e:
         print(f"[insider] cache write: {e}")
 
-    return display_rows
+    return _annotate_stale(display_rows, status["data_date"]) if stale else display_rows
 
 
 def _parse_form4_all_codes(xml_text: str) -> dict | None:

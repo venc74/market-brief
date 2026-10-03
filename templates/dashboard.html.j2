@@ -139,6 +139,9 @@
     color: var(--text); border: 1px solid var(--line); font-family: inherit; font-weight: 400; font-size: 12px;
     white-space: pre-line; text-align: left; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
   .marker.open .marker-tip { display: block; }
+  /* 2026-10-03 (пакет 4а т.7): давност и причина при празен/остарял днешен резултат */
+  .data-note { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
+  .data-note.warn { color: var(--yellow); border-left: 2px solid var(--yellow); padding: 4px 10px; }
   .borrow { font-size: 13px; color: var(--text); margin-top: 6px;
     padding-top: 6px; border-top: 1px dotted var(--line); }
   .borrow b { color: var(--yellow); }
@@ -561,6 +564,14 @@
 {# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}
 {# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
+{# статус на данни: остарели редове (дата на данните) и легитимна нула срещу провал при теглене #}
+{% macro data_note(st, label) %}{% if st %}{% if st.stale %}
+<div class="data-note warn">⚠ {{ label }}: показаното е от по-ранно теглене{% if st.data_date %} — данни от {{ st.data_date }}{% else %} — датата на теглене е неизвестна{% endif %}, не от днес.
+  {% if st.kind == 'legit_zero' %}Днешното теглене е чисто, но празно: {{ st.note }}.{% elif st.kind == 'failed' %}Днешното теглене не успя: {{ st.note }}.{% endif %}</div>
+{% elif st.kind == 'failed' %}<div class="data-note warn">⚠ {{ label }}: тегленето не успя — {{ st.note }}.</div>
+{% elif st.kind in ['ok_partial', 'fallback_allact'] %}<div class="data-note warn">⚠ {{ label }}: {{ st.note }}.</div>
+{% elif st.kind == 'legit_zero' %}<div class="data-note">{{ label }}: {{ st.note }}.</div>
+{% endif %}{% endif %}{% endmacro %}
 {% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
 {% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
 {% macro thesis_context_box(ctx) %}
@@ -1153,6 +1164,7 @@
 {% if superinvestor_moves %}
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
+  {{ data_note(superinvestor_status, "13F") }}
   <div class="si-grid">
     {% for s in superinvestor_moves %}
     <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
@@ -1179,6 +1191,7 @@
 {% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
 <section>
   <h2>📉 Major Position Exits</h2>
+  {% if not superinvestor_moves %}{{ data_note(superinvestor_status, "13F") }}{% endif %}
   {% if superinvestor_exits.exits %}
   <div class="si-grid">
     {% for s in superinvestor_exits.exits %}
@@ -1209,9 +1222,18 @@
 </section>
 {% endif %}
 
-{% if insider_buying %}
+{% if not superinvestor_moves and not (superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers))
+      and superinvestor_status and superinvestor_status.kind in ['failed', 'legit_zero'] %}
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  {{ data_note(superinvestor_status, "13F") }}
+</section>
+{% endif %}
+
+{% if insider_buying or (insider_status and insider_status.kind in ['failed', 'legit_zero', 'ok_partial']) %}
 <section>
   <h2>Insider Buying · Form 4 (open market покупки)</h2>
+  {{ data_note(insider_status, "Insider buying") }}
   <div class="si-grid">
     {% for i in insider_buying[:12] %}
     <div class="si-card {{ 'in-screen' if i.in_screener else '' }}">
@@ -1221,6 +1243,7 @@
         <span class="si-val">{{ (i.total_value)|money_short if i.insiders else "—" }}</span>
       </div>
       <div class="si-mgr" style="color:var(--text)">{{ i.company[:36] }}</div>
+      {% if i.stale %}<div class="si-mgr" style="color:var(--yellow)">⚠ остарели данни — {% if i.data_date %}теглени на {{ i.data_date }}{% else %}датата на теглене е неизвестна{% endif %}{% if i.latest_txn_date %} · последна транзакция {{ i.latest_txn_date }}{% endif %}</div>{% endif %}
       {% if i.cluster %}<div class="si-mgr"><span style="color:var(--regime)">CLUSTER</span></div>{% endif %}
       {% if i.insiders %}
       <ul class="tight" style="margin-top:6px">

@@ -438,7 +438,9 @@ def run() -> dict:
     superinvestor_new_positions = dataroma.fetch_new_position_highlights() if config.ENABLE_DATAROMA else []
     superinvestor_exits = (dataroma.fetch_major_exits() if config.ENABLE_DATAROMA
                            else {"exits": [], "stopped_managers": []})
+    superinvestor_status = dataroma.fetch_status() if config.ENABLE_DATAROMA else {}
     insider_buys = insider_buying.fetch_insider_buying() if config.ENABLE_INSIDER_BUYING else []
+    insider_status = dict(insider_buying.LAST_STATUS) if config.ENABLE_INSIDER_BUYING else {}
     # конвергенция: тикър и в CANSLIM скрийнъра (action+watchlist), и в insider buying — виж insider_buying.py docstring
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
     for row in insider_buys:
@@ -592,6 +594,9 @@ def run() -> dict:
         "superinvestor_new_positions": superinvestor_new_positions,
         "superinvestor_exits": superinvestor_exits,
         "insider_buying": insider_buys,
+        # пакет 4а т.7: давност и причина при празен днешен резултат (легитимна нула срещу провал)
+        "insider_buying_status": insider_status,
+        "superinvestor_status": superinvestor_status,
         "glb_candidates": glb_candidates,
         "news": news,
         "cot": cot_with_theses,

@@ -58,6 +58,10 @@ _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
        "Accept": "text/html,application/xhtml+xml"}
 _CACHE = config.DATA_DIR / "dataroma_cache.json"
+# Пакет 4а т.7 (2026-10-03): статусът на последното теглене — различава "легитимна нула" от провал и казва
+# от кога са показаните данни. kind: "ok" | "fallback_allact" | "legit_zero" | "failed"; stale = показаното
+# е от кеш на ПРЕДИШЕН ден, не от днешното теглене. main го слага в брифа (superinvestor_status).
+LAST_STATUS: dict = {}
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -465,7 +469,20 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
 
 
 # ══════════════════════════════════════════════════════════════════════════
+_MEMO: dict = {}          # един fetch на процес: без кеш на диска (празен/провален ден) всяко извикване би теглило EDGAR наново
+
+
 def _fetch_all(min_value: float) -> dict:
+    today = dt.date.today().isoformat()
+    if _MEMO.get("date") == today:
+        return _MEMO["bundle"]
+    bundle = _fetch_all_uncached(min_value)
+    _MEMO.clear()
+    _MEMO.update({"date": today, "bundle": bundle})
+    return bundle
+
+
+def _fetch_all_uncached(min_value: float) -> dict:
     """
     Единствен fetch pass на ден (кеширан) — връща {"moves", "new_positions",
     "major_exits", "stopped_managers"} общо, всичките производни на same
@@ -475,11 +492,15 @@ def _fetch_all(min_value: float) -> dict:
     ограничение съществуваше и в старата _fetch_body() имплементация.
     """
     today = dt.date.today().isoformat()
+    cached_prev = None
     if _CACHE.exists():
         try:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today and cached.get("bundle"):
+                meta = (cached["bundle"].get("meta") or {"kind": "ok", "note": "", "stale": False, "data_date": today})
+                LAST_STATUS.clear(); LAST_STATUS.update(meta)
                 return cached["bundle"]
+            cached_prev = cached
         except Exception:
             pass
 
@@ -489,11 +510,13 @@ def _fetch_all(min_value: float) -> dict:
     major_exits: list[dict] = []
     stopped_managers: list[dict] = []
     any_active_data = False
+    n_active = n_no_filings = 0
 
     for cik, name in config.DATAROMA_CIK.items():
         snap = _manager_snapshot(cik, name)
         status = snap["filing_status"]
         if status == "no_filings":
+            n_no_filings += 1
             continue
         if status == "stopped":
             stopped_managers.append({
@@ -505,6 +528,7 @@ def _fetch_all(min_value: float) -> dict:
             continue
 
         any_active_data = True
+        n_active += 1
         mgr_rows = _moves_from_snapshot(snap, min_value, tmap)
         manager_top[name] = sorted(mgr_rows, key=lambda r: r.get("value") or 0,
                                    reverse=True)[:config.DATAROMA_TOP_PER_MANAGER]
@@ -531,25 +555,53 @@ def _fetch_all(min_value: float) -> dict:
     bundle = {"moves": moves, "new_positions": new_positions,
              "major_exits": major_exits, "stopped_managers": stopped_managers}
 
+    total = len(config.DATAROMA_CIK)
+    if not any_active_data:
+        # нито един мениджър с данни: EDGAR е недостъпен. dataroma.com fallback дава само общ списък без $
+        kind = "fallback_allact" if moves else "failed"
+        note = (f"EDGAR недостъпен (0 от {total} мениджъра с данни) — само общ списък от dataroma.com, без стойности"
+                if moves else f"EDGAR недостъпен (0 от {total} мениджъра с данни)")
+    elif moves or new_positions or major_exits or stopped_managers:
+        kind = "ok"
+        note = f"{n_active} от {total} мениджъра с данни" + (f", {n_no_filings} без достъп до filings" if n_no_filings else "")
+    else:
+        kind = "legit_zero"
+        note = f"{n_active} от {total} мениджъра с данни: нито една нова/увеличена позиция и нито един голям изход"
+    meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
+            "managers_total": total, "managers_without_filings": n_no_filings}
+
     if moves or new_positions or major_exits or stopped_managers:
+        bundle["meta"] = meta
+        LAST_STATUS.clear(); LAST_STATUS.update(meta)
         try:
             config.DATA_DIR.mkdir(exist_ok=True)
             _CACHE.write_text(json.dumps({"date": today, "bundle": bundle},
                                          ensure_ascii=False, indent=1, default=str))
         except Exception as e:
             print(f"[dataroma] cache write: {e}")
-    elif _CACHE.exists():
-        # всичко падна ДНЕС — последен кеш (по изискване, съществуваше и в старата логика)
-        try:
-            return json.loads(_CACHE.read_text()).get("bundle", bundle)
-        except Exception:
-            pass
+    elif cached_prev and cached_prev.get("bundle"):
+        # днес е празно — последният кеш, но ВИНАГИ с етикет за давност: не изглежда като днешен, а причината
+        # е различена (легитимна нула срещу провал на теглене). Кешът на диска не се пипа (датата му е
+        # реалната дата на данните).
+        prev = dict(cached_prev["bundle"])
+        meta = {**meta, "stale": True, "data_date": cached_prev.get("date")}
+        prev["meta"] = meta
+        LAST_STATUS.clear(); LAST_STATUS.update(meta)
+        return prev
+    else:
+        bundle["meta"] = meta
+        LAST_STATUS.clear(); LAST_STATUS.update(meta)
     return bundle
 
 
 # ──────────────────────────────────────────────────────────────────────────
 # Публично API
 # ──────────────────────────────────────────────────────────────────────────
+def fetch_status() -> dict:
+    """Статусът на последното теглене (виж LAST_STATUS) — за брифа и за етикета "данни от <дата>"."""
+    return dict(LAST_STATUS)
+
+
 def fetch_superinvestor_buys(min_value: float | None = None) -> list[dict]:
     """
     Връща [{ticker, company, manager(s), action, value, period}] — top-N-per-
