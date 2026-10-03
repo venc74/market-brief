@@ -99,6 +99,28 @@ def leading_sectors(rotation: list[dict], top_n: int = 6) -> list[dict]:
     return leaders[:top_n] if leaders else rotation[:3]
 
 
+def etf_matches(row: dict, etf: str) -> bool:
+    """Пакет 2 т.1: кандидатът е в сектора/индустрията на този ETF (config.SECTOR_ETF_YAHOO, точно, без регистър)."""
+    rule = config.SECTOR_ETF_YAHOO.get(etf) or {}
+    sector, industry = str(row.get("sector") or "").lower(), str(row.get("industry") or "").lower()
+    return (bool(sector) and sector in [x.lower() for x in rule.get("sector", [])]) or \
+           (bool(industry) and industry in [x.lower() for x in rule.get("industry", [])])
+
+
+def tailwind_leaders(row: dict, leaders: list[dict]) -> list[dict]:
+    """Водещите сектори (от leading_sectors), в които е кандидатът — [] ако няма съвпадение. Не филтрира."""
+    return [l for l in leaders if etf_matches(row, l.get("etf"))]
+
+
+def tailwind_marker(matched: list[dict]) -> dict | None:
+    """Маркер SECT✓ за картата: кои водещи сектори и с каква относителна сила."""
+    if not matched:
+        return None
+    parts = [f"{m.get('sector')} ({m.get('etf')}, RS {m.get('rs_chg_4w_pct'):+.1f}% за 4 седмици)"
+             if isinstance(m.get("rs_chg_4w_pct"), (int, float)) else f"{m.get('sector')} ({m.get('etf')})" for m in matched]
+    return {"tag": "SECT✓", "title": "Водещ сектор (макро попътен вятър): " + "; ".join(parts)}
+
+
 def laggard_sectors(rotation: list[dict], top_n: int = 6) -> list[dict]:
     """
     Огледало на leading_sectors() — входът за Short/Stage 4 screener-а

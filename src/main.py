@@ -331,7 +331,7 @@ def run() -> dict:
     laggards = laggard_sectors(rotation)
 
     print("[4/7] Слой 3: скрининг…")
-    candidates = run_screen([s["sector"] for s in leaders])
+    candidates = run_screen([s["sector"] for s in leaders], leaders=leaders)
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)

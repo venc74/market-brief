@@ -336,11 +336,17 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
     return passed
 
 
-def run_screen(leading_sector_names: list[str] | None = None) -> list[dict]:
+def run_screen(leading_sector_names: list[str] | None = None, leaders: list[dict] | None = None) -> list[dict]:
     """
     Пълният Слой 3. Ако са подадени водещи сектори от Слой 2,
     кандидатите от тях се приоритизират (макро съответствие),
     но не се изключват силни setup-и извън тях — те отиват към Watchlist.
+
+    FIX 2026-10-03 (пакет 2 т.1): macro_tailwind се смята през ETF → Yahoo сектор/индустрия
+    (config.SECTOR_ETF_YAHOO, sector_layer.tailwind_leaders), а не със сравнение на български имена с
+    английски Yahoo полета (беше False за всичките 645 карти). Резултатът е САМО подредба и маркер SECT✓
+    върху картата — никога филтър. `leaders` = редовете от leading_sectors(); при подадени само имена
+    те се превръщат обратно в ETF-и през config.SECTOR_ETFS.
     """
     universe = build_universe()
     tech = technical_screen(universe)
@@ -349,13 +355,26 @@ def run_screen(leading_sector_names: list[str] | None = None) -> list[dict]:
     # extended (виж setup_rules.screen_priority); fundamental_screen гледа първите 60
     tech.sort(key=setup_rules.screen_priority)
     finalists = fundamental_screen(tech)
+    return apply_sector_tailwind(finalists, leaders, leading_sector_names)
 
-    if leading_sector_names:
-        keys = [s.lower() for s in leading_sector_names]
-        for f in finalists:
-            f["macro_tailwind"] = any(k in (f.get("sector", "") + f.get("industry", "")).lower()
-                                      or (f.get("sector", "").lower() in k) for k in keys)
-        finalists.sort(key=lambda r: not r.get("macro_tailwind", False))
+
+def apply_sector_tailwind(finalists: list[dict], leaders: list[dict] | None = None,
+                          leading_sector_names: list[str] | None = None) -> list[dict]:
+    """macro_tailwind/tailwind_etfs + маркер SECT✓ + стабилна подредба (tailwind първи). Не маха кандидати."""
+    from src import sector_layer
+    if not leaders and leading_sector_names:
+        inverse = {v: k for k, v in config.SECTOR_ETFS.items()}
+        leaders = [{"etf": inverse[n], "sector": n} for n in leading_sector_names if n in inverse]
+    if not leaders:
+        return finalists
+    for f in finalists:
+        matched = sector_layer.tailwind_leaders(f, leaders)
+        f["macro_tailwind"] = bool(matched)
+        f["tailwind_etfs"] = [m["etf"] for m in matched]
+        marker = sector_layer.tailwind_marker(matched)
+        if marker:
+            f.setdefault("markers", []).append(marker)
+    finalists.sort(key=lambda r: not r.get("macro_tailwind", False))
     return finalists
 
 

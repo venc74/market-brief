@@ -243,6 +243,22 @@ SECTOR_ETFS = {
 }
 
 
+# 2026-10-03 (пакет 2 т.1): мост секторен ETF → Yahoo "sector"/"industry" на кандидатите. leading_sectors()
+# връща български имена ("Технологии"), а картите носят английските Yahoo полета ("Technology") — старото
+# сравнение на подниз беше False за всичките 645 карти от 78-те брифа (macro_tailwind никога не се сетваше).
+# Всяка ETF е сектор (11 SPDR) или тясна индустрия (ITA, GDX, URA, TAN, SMH, XBI); съвпадението е точно, без
+# регистър. Само сортиране и маркер SECT✓ — НЕ филтър.
+SECTOR_ETF_YAHOO = {
+    "XLK": {"sector": ["Technology"]}, "XLE": {"sector": ["Energy"]}, "XLF": {"sector": ["Financial Services"]},
+    "XLV": {"sector": ["Healthcare"]}, "XLI": {"sector": ["Industrials"]}, "XLB": {"sector": ["Basic Materials"]},
+    "XLY": {"sector": ["Consumer Cyclical"]}, "XLP": {"sector": ["Consumer Defensive"]},
+    "XLU": {"sector": ["Utilities"]}, "XLRE": {"sector": ["Real Estate"]}, "XLC": {"sector": ["Communication Services"]},
+    "ITA": {"industry": ["Aerospace & Defense"]}, "GDX": {"industry": ["Gold"]}, "URA": {"industry": ["Uranium"]},
+    "TAN": {"industry": ["Solar"]}, "XBI": {"industry": ["Biotechnology"]},
+    "SMH": {"industry": ["Semiconductors", "Semiconductor Equipment & Materials"]},
+}
+
+
 # ══════════════════════════════════════════════════════════════════════════
 # v2 НАДСТРОЙКА — нови настройки (additive, нищо отгоре не е пипано)
 # ══════════════════════════════════════════════════════════════════════════
