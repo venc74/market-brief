@@ -1113,6 +1113,13 @@ GLB_MIN_ATH_HISTORY_YEARS = float(os.getenv("GLB_MIN_ATH_HISTORY_YEARS", 3.0))  
 GLB_APPROACH_PCT = float(os.getenv("GLB_APPROACH_PCT", 15.0))                  # tightness overlay: "в рамките на X% от prior_high"
 GLB_MIN_CONSOLIDATION_DAYS = int(os.getenv("GLB_MIN_CONSOLIDATION_DAYS", 63))  # trailing прозорец за overlay-а (~3 месеца в търг. дни)
 GLB_MIN_BAND_HOLD_PCT = float(os.getenv("GLB_MIN_BAND_HOLD_PCT", 85.0))        # overlay праг -> "classic" upgrade
+# Пакет 4б т.е (06.10.2026): ХИСТЕРЕЗИС — вход само при close ≥ линията × (1 + ENTRY%); кандидатът остава, докато close ≥ линията × (1 − EXIT%). Събитието (дата, линия, тип)
+# се пази в data/glb_state.json и оцелява при смяна на месеца. Преди: close > линията с точно 0% буфер и преизчисляване всеки ден от месечната серия → граничен тикър мигаше
+# всеки ден, а в първия ден на месеца линията се прескачаше от последния месечен close и ВСИЧКИ кандидати на месеца изчезваха (реално 01.09→02.09: 18 от 18).
+GLB_HYSTERESIS = os.getenv("GLB_HYSTERESIS", "1") == "1"
+GLB_ENTRY_MARGIN_PCT = float(os.getenv("GLB_ENTRY_MARGIN_PCT", 1.0))
+GLB_EXIT_MARGIN_PCT = float(os.getenv("GLB_EXIT_MARGIN_PCT", 3.0))
+GLB_STATE_FILE = DATA_DIR / "glb_state.json"
 
 
 # ══════════════════════════════════════════════════════════════════════════

@@ -32,10 +32,16 @@ batch извиквания с GLB_HISTORY_PERIOD (default "max") — screener.py
 само 2г, структурно недостатъчно за multi-decade ATH detection (WDC
 сигналът изисква данни чак до 2014 г.).
 
+Хистерезис (пакет 4б т.е, 06.10.2026): вход само при close >= линията x (1 + GLB_ENTRY_MARGIN_PCT%); кандидатът остава, докато close >= линията x
+(1 - GLB_EXIT_MARGIN_PCT%). Събитието (линия, дата на входа, тип, детайли) се пази в data/glb_state.json (apply_hysteresis — чиста функция), затова не мига
+около линията и не се нулира при смяна на месеца. Картата показва "GLB от <дата>, +X% над линията".
+
 Graceful degradation: провал на batch fetch или единичен тикър -> пропусни,
 print диагностика, продължи с останалите (Секция 7).
 """
 from __future__ import annotations
+import datetime as dt
+import json
 import time
 
 import sys, pathlib
@@ -69,11 +75,12 @@ RISK_NOTES = {
 }
 
 
-def _monthly_duration_check(monthly_close) -> dict | None:
+def _monthly_duration_check(monthly_close, margin_pct: float = 0.0) -> dict | None:
     """
     Буквален Wish критерий, приложен на месечно orязана Close серия
     (последният елемент = текущият/последният наличен месец). Връща None
     ако текущият месец НЕ е валиден GLB breakout момент.
+    margin_pct (пакет 4б т.е): 0 = буквалното close > линията; > 0 = close >= линията x (1 + margin_pct/100) (буфер за ВХОД).
     """
     if len(monthly_close) < config.GLB_MIN_MONTHS_UNPENETRATED + 2:
         return None
@@ -83,7 +90,7 @@ def _monthly_duration_check(monthly_close) -> dict | None:
     prior_high_pos = int(window_before.values.argmax())
     months_unpenetrated = i - prior_high_pos - 1
     this_close = float(monthly_close.iloc[i])
-    breakout = this_close > prior_high
+    breakout = this_close > prior_high if not margin_pct else this_close >= prior_high * (1 + margin_pct / 100)
     if not (breakout and months_unpenetrated >= config.GLB_MIN_MONTHS_UNPENETRATED):
         return None
     return {
@@ -151,7 +158,7 @@ def _split_only_adjust(close, high, low, splits):
     return close, high, low
 
 
-def _evaluate_ticker(sym: str, hist) -> dict | None:
+def _evaluate_ticker(sym: str, hist, entry_margin_pct: float = 0.0) -> dict | None:
     """
     hist = пълен OHLCV df за sym (вече изтеглен batch-ово от screen()).
     Прилага универсалния месечен гейт, после класифицира Classic/Momentum
@@ -161,7 +168,7 @@ def _evaluate_ticker(sym: str, hist) -> dict | None:
         return None
 
     monthly_close = hist["Close"].resample("ME").last().dropna()
-    m_result = _monthly_duration_check(monthly_close)
+    m_result = _monthly_duration_check(monthly_close, entry_margin_pct)
     if m_result is None:
         return None
 
@@ -194,7 +201,69 @@ def _evaluate_ticker(sym: str, hist) -> dict | None:
     }
 
 
-def screen(universe: list[str] | None = None, batch_size: int = 50) -> list[dict]:
+# ──────────────────────────────────────────────────────────────────────────
+# Хистерезис и състояние (пакет 4б т.е)
+# ──────────────────────────────────────────────────────────────────────────
+def load_state(path=None) -> dict:
+    """{тикър: събитие} от data/glb_state.json; липсващ/повреден файл -> {} (чист старт, без грешка)."""
+    p = path or config.GLB_STATE_FILE
+    try:
+        return dict(json.loads(pathlib.Path(p).read_text(encoding="utf-8")).get("events") or {})
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        print(f"[glb_screener] state нечетим, започвам от празен: {type(e).__name__}: {e}")
+        return {}
+
+
+def save_state(events: dict, today: str, path=None) -> None:
+    p = pathlib.Path(path or config.GLB_STATE_FILE)
+    try:
+        p.parent.mkdir(exist_ok=True)
+        p.write_text(json.dumps({"updated": today, "events": events}, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
+    except Exception as e:
+        print(f"[glb_screener] state не се записа: {type(e).__name__}: {e}")
+
+
+def _row(ev: dict, close: float) -> dict:
+    """Редът за показване: събитието от входа + днешната цена и разстоянието до линията."""
+    return {**ev, "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1)}
+
+
+def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_pct: float | None = None) -> tuple[dict, list[dict], dict]:
+    """
+    Чиста функция. events: състоянието {тикър: събитие}; observations: {тикър: {"close": последният close, "entry": резултат от _evaluate_ticker с буфер за вход, или None}}.
+      • тикър със събитие: остава, докато close >= линията x (1 - EXIT%); под това — отпада (и може да влезе пак само през правилото за вход);
+        без наблюдение днес (липсват данни) — събитието се пази, но не се показва (не се губи заради провал на теглене);
+      • тикър без събитие и с "entry" (close >= линията x (1 + ENTRY%) при валиден месечен гейт) — НОВО събитие: линия, дата на входа, тип и детайли се замразяват.
+    Връща (нови събития, редове за показване, {"entered": [...], "dropped": [...], "held_unseen": [...]}).
+    """
+    exit_m = config.GLB_EXIT_MARGIN_PCT if exit_margin_pct is None else exit_margin_pct
+    new: dict = {}
+    rows: list[dict] = []
+    ch: dict = {"entered": [], "dropped": [], "held_unseen": []}
+    for sym, ev in events.items():
+        ob = observations.get(sym)
+        if ob is None or ob.get("close") is None:
+            new[sym] = ev
+            ch["held_unseen"].append(sym)
+        elif ob["close"] >= ev["line"] * (1 - exit_m / 100):
+            new[sym] = ev
+            rows.append(_row(ev, ob["close"]))
+        else:
+            ch["dropped"].append(sym)
+    for sym, ob in observations.items():
+        if sym in events or not ob.get("entry"):
+            continue
+        e = ob["entry"]
+        ev = {**{k: v for k, v in e.items() if k not in ("price",)}, "line": e["prior_high"], "since": today}
+        new[sym] = ev
+        rows.append(_row(ev, ob["close"]))
+        ch["entered"].append(sym)
+    return new, rows, ch
+
+
+def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=None, today: str | None = None) -> list[dict]:
     """
     Главна входна точка. universe=None -> reuse-ва screener.build_universe()
     (само СПИСЪКА от тикъри, виж модул docstring-а). batch_size по-малък от
@@ -208,6 +277,10 @@ def screen(universe: list[str] | None = None, batch_size: int = 50) -> list[dict
     if universe is None:
         universe = build_universe()
 
+    hyst = config.GLB_HYSTERESIS
+    events = load_state(state_path) if hyst else {}
+    observations: dict = {}
+    today = today or dt.date.today().isoformat()
     results = []
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
@@ -232,6 +305,11 @@ def screen(universe: list[str] | None = None, batch_size: int = 50) -> list[dict
                 close, high, low = _split_only_adjust(
                     df["Close"], df["High"], df["Low"], splits[splits != 0])
                 df = df.assign(Close=close, High=high, Low=low)
+                if hyst:
+                    last = float(df["Close"].iloc[-1]) if len(df) else None
+                    # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
+                    observations[sym] = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT)}
+                    continue
                 r = _evaluate_ticker(sym, df)
             except Exception as e:
                 print(f"[glb_screener] {sym}: {e}")
@@ -239,6 +317,12 @@ def screen(universe: list[str] | None = None, batch_size: int = 50) -> list[dict
             if r:
                 results.append(r)
         time.sleep(1)  # не дразним Yahoo, same дисциплина като screener.py
+
+    if hyst:
+        events, results, ch = apply_hysteresis(events, observations, today)
+        save_state(events, today, state_path)
+        print(f"[glb_screener] хистерезис: нови {len(ch['entered'])}, отпаднали {len(ch['dropped'])} {ch['dropped'] or ''}, "
+              f"пазени без данни днес {len(ch['held_unseen'])}")
 
     classic = [r for r in results if r["glb_type"] == "classic"]
     momentum = [r for r in results if r["glb_type"] == "momentum"]
