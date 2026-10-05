@@ -287,6 +287,8 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
     """
     if not config.TRACK_BUYSTOP:
         return
+    if config.BUYSTOP_TRACK_FROM and entry_date < config.BUYSTOP_TRACK_FROM:    # чист старт: без ретроактивни записи (виж config.BUYSTOP_TRACK_FROM)
+        return
     for c in watchlist or []:
         ticker = c.get("ticker")
         setup = c.get("setup") or {}

@@ -21,6 +21,7 @@ config.DATA_DIR = pathlib.Path(_tmp.name)
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 config.ENABLE_BACKTEST = True
+config.BUYSTOP_TRACK_FROM = ""                                  # тук се тества ingest-ът; guard-ът по дата има собствен тест (test_buystop_start_guard.py)
 backtest._unapplied_splits = lambda rec: []
 backtest.enrich.earnings_recap = lambda t: None
 
