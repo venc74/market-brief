@@ -749,6 +749,59 @@ COT_SCHEMA_VERSION = os.getenv("COT_SCHEMA_VERSION", "1")
 COT_THESES_MAX_AGE_DAYS = int(os.getenv("COT_THESES_MAX_AGE_DAYS", 8))
 COT_THESES_CACHE_KEEP_DAYS = int(os.getenv("COT_THESES_CACHE_KEEP_DAYS", 30))
 FORCE_COT_REGEN = os.getenv("FORCE_COT_REGEN", "0") == "1"
+# COT: дали работи (пакет 3 т.з) — ценово потвърждение и track record (src/cot_track.py).
+# Потвърждение: цената ПРЕСИЧА SMA10 на седмичните затваряния в посоката на contrarian сигнала и пресичането е скорошно (≤ 4 седмици).
+# Track record: екстремуми от COT историята (percentile 10/90 спрямо до 156 предишни седмици, поне 52 предишни) и доходността 2/4/8 седмици
+# по-късно. Цените са Yahoo (седмични затваряния, 5 г.): непрекъснати фючърси (=F) за стоки, лихви и индекси, спот за валути, ^VIX за VIX
+# (VIX фючърсите не са на Yahoo — спотът е прокси) и BTC-USD/XRP-USD за крипто (спот вместо CME фючърсите). ENABLE_COT_TRACK=0 го изключва.
+ENABLE_COT_TRACK = os.getenv("ENABLE_COT_TRACK", "1") == "1"
+COT_SMA_WEEKS = int(os.getenv("COT_SMA_WEEKS", 10))
+COT_CONFIRM_LOOKBACK_WEEKS = int(os.getenv("COT_CONFIRM_LOOKBACK_WEEKS", 4))
+COT_TRACK_MIN_PRIOR_WEEKS = int(os.getenv("COT_TRACK_MIN_PRIOR_WEEKS", 52))
+COT_TRACK_MIN_EPISODES = int(os.getenv("COT_TRACK_MIN_EPISODES", 3))      # под толкова епизода редът е "малка извадка"
+COT_PRICE_SYMBOLS = {
+    "E-mini S&P 500": "ES=F",
+    "Nasdaq-100": "NQ=F",
+    "E-mini Russell 2000": "RTY=F",
+    "E-mini Dow (DJIA)": "YM=F",
+    "VIX Futures": "^VIX",
+    "US Dollar Index": "DX-Y.NYB",
+    "Euro FX": "EURUSD=X",
+    "Japanese Yen": "JPYUSD=X",
+    "British Pound": "GBPUSD=X",
+    "Swiss Franc": "CHFUSD=X",
+    "Canadian Dollar": "CADUSD=X",
+    "Australian Dollar": "AUDUSD=X",
+    "Mexican Peso": "MXNUSD=X",
+    "2-Year Treasury Note": "ZT=F",
+    "5-Year Treasury Note": "ZF=F",
+    "10-Year Treasury Note": "ZN=F",
+    "Ultra Treasury Bond": "UB=F",
+    "30-Year Treasury Bond": "ZB=F",
+    "Bitcoin Futures (CME)": "BTC-USD",
+    "XRP": "XRP-USD",
+    "Gold": "GC=F",
+    "Silver": "SI=F",
+    "Copper": "HG=F",
+    "Platinum": "PL=F",
+    "Palladium": "PA=F",
+    "WTI Crude Oil": "CL=F",
+    "Natural Gas": "NG=F",
+    "RBOB Gasoline": "RB=F",
+    "Heating Oil": "HO=F",
+    "Corn": "ZC=F",
+    "Soybeans": "ZS=F",
+    "Soybean Oil": "ZL=F",
+    "Soybean Meal": "ZM=F",
+    "Wheat": "ZW=F",
+    "Sugar No. 11": "SB=F",
+    "Coffee C": "KC=F",
+    "Cocoa": "CC=F",
+    "Cotton": "CT=F",
+    "Lean Hogs": "HE=F",
+    "Live Cattle": "LE=F",
+}
+
 # значка CLOSED при тикър на COT теза, чиято позиция е затворена до толкова дни назад (виж cot_theses.ticker_badges)
 COT_CLOSED_BADGE_DAYS = int(os.getenv("COT_CLOSED_BADGE_DAYS", 14))
 COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))

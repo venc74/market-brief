@@ -29,6 +29,7 @@ from src import correlation_check
 from src import backtest
 from src import tracker_switch
 from src import cot
+from src import cot_track
 from src import entry_timing
 from src import setup_rules
 from src import glb_screener
@@ -449,6 +450,13 @@ def run() -> dict:
     cot_with_theses = ai_brief.cot_theses(
         cot_extremes, screener_universe, cot_open_positions, cot_closed_positions,
         data_stale=bool(config.ENABLE_COT and cot.LAST_STATUS.get("stale"))) if cot_extremes else []
+    # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване, не влияе на тезите
+    cot_summary = None
+    if config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses:
+        try:
+            cot_with_theses, cot_summary = cot_track.annotate(cot_with_theses, cot.LAST_SERIES)
+        except Exception as e:
+            print(f"[cot] ценово потвърждение/track record пропаднаха: {type(e).__name__}: {e}")
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
@@ -653,6 +661,8 @@ def run() -> dict:
         "glb_candidates": glb_candidates,
         "news": news,
         "cot": cot_with_theses,
+        # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
+        "cot_summary": cot_summary,
         # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
         "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня

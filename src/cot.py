@@ -306,6 +306,9 @@ def _market_extreme(label: str, pts: list[dict], category: str,
 # Състоянието на последния get_extremes(): давност на най-новия отчет — main го слага в брифа (cot_status), шаблонът
 # показва банер, ако е стар. {"as_of", "age_days", "stale", "threshold_days", "reason"}
 LAST_STATUS: dict = {}
+# Пълните COT серии на резолвираните whitelist пазари от последния get_extremes(): {label: [{"date", "net"}]} — за track record-а
+# (src/cot_track.py), който има нужда от цялата история, а не от последните 52 точки в екстремума.
+LAST_SERIES: dict[str, list[dict]] = {}
 
 
 def freshness(cache: dict, resolved: list[tuple[str, str, str]], today: dt.date | None = None) -> dict:
@@ -348,6 +351,8 @@ def get_extremes(low: float | None = None, high: float | None = None, today: dt.
         return []
 
     resolved = _resolve_whitelist(cache)
+    LAST_SERIES.clear()
+    LAST_SERIES.update({label: cache.get(source, {}).get(market, []) for label, source, market in resolved})
     LAST_STATUS.update(freshness(cache, resolved, today))
     if LAST_STATUS["stale"]:
         print("[cot] ⚠ няма COT данни за whitelist пазарите" if LAST_STATUS["as_of"] is None else

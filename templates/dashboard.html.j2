@@ -1082,6 +1082,7 @@
     Вероятно CFTC е спряла или забавила публикацията (или теглянето е пропаднало): показаното по-долу е по по-стари позиции, не по днешните.
     {% else %}няма налични данни (кешът е празен или CFTC е недостъпна).{% endif %}</div>
   {% endif %}
+  {% if cot_summary and cot_summary.text %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px">{{ cot_summary.text }}</div>{% endif %}
   {% if not cot %}<div class="prose">Няма показани екстремуми.</div>{% endif %}
   <div class="theses">
     {% for c in cot %}
@@ -1092,6 +1093,9 @@
           ({{ "екстремно дълги" if c.direction == "extreme_long" else "екстремно къси" }}){% if c.move_short %} · очакване: {{ c.move_short }}{% endif %}</span>
       </div>
 
+      {# пакет 3 т.з: ценово потвърждение (код) и история на екстремумите — един ред на пазар #}
+      {% if c.price_confirmation and c.price_confirmation.text %}<div class="small" style="font-size:12px;margin-top:6px;color:{{ 'var(--green)' if c.price_confirmation.confirmed else 'var(--muted)' }}">{{ '✔' if c.price_confirmation.confirmed else '○' }} {{ c.price_confirmation.text }}</div>{% endif %}
+      {% if c.track_record and c.track_record.text %}<div class="small" style="font-size:12px;color:var(--muted)">{{ c.track_record.text }}</div>{% endif %}
       {% if c.history_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:6px">{{ c.history_note }}</div>{% endif %}
       {% if c.thesis_rejected %}
       <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">

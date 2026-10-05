@@ -133,6 +133,7 @@ def render_dashboard(brief: dict) -> str:
         news=brief.get("news", []),
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},
+        cot_summary=brief.get("cot_summary"),
         correlation_flags=brief.get("correlation_flags", []),
         distribution_days=brief.get("distribution_days"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),
