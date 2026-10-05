@@ -125,6 +125,14 @@ def render_dashboard(brief: dict) -> str:
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         glb_candidates=brief.get("glb_candidates", []),
+        # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)
+        qm_cards=brief.get("qm_breakout") or [],
+        qm_diag=brief.get("qm_diag") or {},
+        qm_ep=brief.get("qm_ep") or {},
+        qm_adr_min=config.QM_ADR_MIN, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
+        qm_max_position_pct=config.QM_MAX_POSITION_PCT, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
+        qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
+        qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},
@@ -163,6 +171,50 @@ def _split_when(s: dict) -> str:
     else:
         rel = f"преди {-d} {'ден' if d == -1 else 'дни'}"
     return " · ".join(x for x in (dm, rel) if x)
+
+
+def _qm_email_block(brief: dict) -> str:
+    """
+    Qullamaggie: компактен блок за имейла (отделна стратегия — измерване, не препоръка): най-много QM_MAX_CARDS кандидата с нивата, EP наблюдението (само реални редове) и един ред за книгата.
+    Старите брифове без ключовете → "". Всяка грешка → "" (имейлът никога не пада заради този блок).
+    """
+    try:
+        cards, diag, ep = brief.get("qm_breakout") or [], brief.get("qm_diag") or {}, brief.get("qm_ep") or {}
+        qb = (brief.get("backtest") or {}).get("qm_breakout") or {}
+        if not (cards or diag or ep.get("rows") or ep.get("not_neglected") or (qb and qb.get("enabled"))):
+            return ""
+        td = "padding:6px 8px;border-bottom:1px solid #f3f4f6;font-size:12.5px;vertical-align:top"
+        body = ""
+        if diag.get("ok") is False:
+            body += (f'<div style="color:#991b1b;font-size:12.5px">Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив.</div>')
+        elif cards:
+            rows = ""
+            for c in cards:
+                rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}</td>'
+                         f'<td style="{td};font-family:monospace;white-space:nowrap">ниво ${c["trigger"]:.2f}<br><span style="color:#6b7280">+{c["pct_to_trigger"]:.1f}% до него</span></td>'
+                         f'<td style="{td}">ADR {c["adr"]:.1f}% · ръст +{c["runup_pct"]:.0f}% · база {c["base_days"]} сесии ({c["depth_pct"]:.0f}%)<br>'
+                         f'<span style="color:#6b7280">стоп ≈ ${c["expected_stop"]:.2f}, макс. ${c["max_stop"]:.2f} · {c["shares"]} акции при ${c["risk_usd"]:.0f} риск</span></td></tr>')
+            body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
+        else:
+            body += '<div style="color:#6b7280;font-size:12.5px">Няма breakout кандидати днес.</div>'
+        eprows = ep.get("rows") or []
+        if eprows:
+            lines = "".join(
+                f'<div style="margin-top:4px"><b style="font-family:monospace">{_e(r["ticker"])}</b> +{r["gap_pct"]:.1f}% after-hours (ръст 3 м. {r["ret63_pct"]:+.0f}%, ADR {r["adr"]:.1f}%, стоп лимит ${r["max_stop"]:.2f}) · '
+                f'{_e(r.get("catalyst_label") or "Неясен катализатор")}{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</div>' for r in eprows)
+            body += (f'<div style="margin-top:10px;font-size:12.5px"><span style="color:#6b7280">Episodic Pivot — наблюдение (обемът в after-hours не е наличен):</span>{lines}</div>')
+        if qb and qb.get("enabled") and qb.get("records"):
+            avg = (f" · среден R {qb['avg_realized_r']:+.2f} opt / {qb['avg_realized_r_pess']:+.2f} pess" if qb.get("closed") and qb.get("avg_realized_r") is not None else "")
+            wr = (f" · win rate {qb['win_rate_pct']}% opt / {qb['win_rate_pess_pct']}% pess" if qb.get("stats_visible") else f" · win rate след {qb.get('min_closed')} затворени")
+            body += (f'<div style="margin-top:10px;font-size:12px;color:#6b7280">Измерване: {qb["records"]} записа · затворени {qb.get("closed", 0)}{avg}{wr}</div>')
+        return ('<tr><td style="padding:12px 28px 14px;border-top:1px solid #f3f4f6">'
+                '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;font-weight:bold;margin-bottom:4px">Qullamaggie сетъпи</div>'
+                '<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Отделна стратегия — измерване, не препоръка.</b> '
+                'Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>'
+                f'{body}</td></tr>')
+    except Exception as e:
+        print(f"[render] имейл блокът на Qullamaggie пропуснат: {type(e).__name__}: {e}")
+        return ""
 
 
 def render_email(brief: dict) -> str:
@@ -282,6 +334,8 @@ def render_email(brief: dict) -> str:
             f'<ul style="margin:0;padding-left:18px;font-size:13px;color:#111827;line-height:1.5">{items}</ul>'
             '</td></tr>')
 
+    qm_block = _qm_email_block(brief)
+
     return f"""<!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -328,6 +382,8 @@ def render_email(brief: dict) -> str:
   </td></tr>
 
   {signals_block}
+
+  {qm_block}
 
   <tr><td align="center" style="padding:24px 28px">
     <a href="{config.DASHBOARD_URL}" style="display:inline-block;background:{color};
