@@ -1,0 +1,581 @@
+{
+"_note": "РЕАЛНА проверка през Yahoo (yfinance) на 05.10.2026: последен търгуван ден, тип и име на всеки кандидат-тикър; делистнатите нямат цена. Ползва се от test_cot_tables.py.",
+"checked": {
+"ADM": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Archer-Daniels-Midland Company",
+"category": null
+},
+"AEM": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Agnico Eagle Mines Limited",
+"category": null
+},
+"AG": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "First Majestic Silver Corp.",
+"category": null
+},
+"AR": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Antero Resources Corporation",
+"category": null
+},
+"ARKB": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ARK 21Shares Bitcoin ETF",
+"category": "Digital Assets"
+},
+"BAL": {
+"last": null,
+"quote_type": "NONE",
+"name": null,
+"category": null
+},
+"BG": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Bunge Global SA",
+"category": null
+},
+"BITO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares Bitcoin ETF",
+"category": "Digital Assets"
+},
+"BOIL": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares Ultra Bloomberg Natural Gas",
+"category": "Trading--Leveraged Commodities"
+},
+"CANE": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Teucrium Sugar Fund",
+"category": "Commodities Focused"
+},
+"COP": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "ConocoPhillips",
+"category": null
+},
+"COPX": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Global X Copper Miners ETF",
+"category": "Natural Resources"
+},
+"CORN": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Teucrium Corn Fund",
+"category": "Commodities Focused"
+},
+"COW": {
+"last": null,
+"quote_type": "NONE",
+"name": null,
+"category": null
+},
+"CPER": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "United States Copper Index Fund, LP",
+"category": "Commodities Focused"
+},
+"CTRA": {
+"last": null,
+"quote_type": null,
+"name": null,
+"category": null
+},
+"CTVA": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Vylor, Inc.",
+"category": null
+},
+"DBA": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco DB Agriculture Fund",
+"category": "Commodities Focused"
+},
+"DIA": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "State Street SPDR Dow Jones Industrial Average ETF Trust",
+"category": "Large Value"
+},
+"DVN": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Devon Energy Corporation",
+"category": null
+},
+"EDV": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard Extended Duration Treasury Index Fund ETF Shares",
+"category": "Long Government"
+},
+"EOG": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "EOG Resources, Inc.",
+"category": null
+},
+"EQT": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "EQT Corporation",
+"category": null
+},
+"EUO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares UltraShort Euro",
+"category": "Trading--Miscellaneous"
+},
+"FBTC": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Fidelity Wise Origin Bitcoin Fund",
+"category": "Digital Assets"
+},
+"FCX": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Freeport-McMoRan Inc.",
+"category": null
+},
+"FXA": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares Australian Dollar Trust",
+"category": "Single Currency"
+},
+"FXB": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares British Pound Sterling Trust",
+"category": "Single Currency"
+},
+"FXC": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares Canadian Dollar Trust",
+"category": "Single Currency"
+},
+"FXE": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares Euro Currency Trust",
+"category": "Single Currency"
+},
+"FXF": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares Swiss Franc Trust",
+"category": "Single Currency"
+},
+"FXM": {
+"last": null,
+"quote_type": "ETF",
+"name": "Rydex CurrencyShares Mexican Pe",
+"category": null
+},
+"FXY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco CurrencyShares Japanese Yen Trust",
+"category": "Single Currency"
+},
+"GBTC": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Grayscale Bitcoin Trust ETF",
+"category": "Digital Assets"
+},
+"GDX": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "VanEck Gold Miners ETF",
+"category": "Equity Precious Metals"
+},
+"GLD": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "SPDR Gold Shares",
+"category": "Commodities Focused"
+},
+"GLDM": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "SPDR Gold MiniShares",
+"category": "Commodities Focused"
+},
+"GXRP": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Grayscale XRP Trust ETF",
+"category": "Digital Assets"
+},
+"IAU": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares Gold Trust",
+"category": "Commodities Focused"
+},
+"IBIT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares Bitcoin Trust ETF",
+"category": "Digital Assets"
+},
+"IEF": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares 7-10 Year Treasury Bond ETF",
+"category": "Long Government"
+},
+"IEI": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares 3-7 Year Treasury Bond ETF",
+"category": "Intermediate Government"
+},
+"IVV": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares Core S&P 500 ETF",
+"category": "Large Blend"
+},
+"IWM": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares Russell 2000 ETF",
+"category": "Small Blend"
+},
+"JO": {
+"last": null,
+"quote_type": "ETF",
+"name": "iPath Series B Bloomberg Coffee Subindex Total Return ETN",
+"category": "Commodities Broad Basket"
+},
+"JVA": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Coffee Holding Co., Inc.",
+"category": null
+},
+"MOO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "VanEck Agribusiness ETF",
+"category": "Natural Resources"
+},
+"MPC": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Marathon Petroleum Corporation",
+"category": null
+},
+"NEM": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Newmont Corporation",
+"category": null
+},
+"NIB": {
+"last": null,
+"quote_type": "NONE",
+"name": null,
+"category": null
+},
+"OXY": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Occidental Petroleum Corporation",
+"category": null
+},
+"PAAS": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Pan American Silver Corp.",
+"category": null
+},
+"PALL": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "abrdn Physical Palladium Shares ETF",
+"category": "Commodities Focused"
+},
+"PPLT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "abrdn Physical Platinum Shares ETF",
+"category": "Commodities Focused"
+},
+"PSX": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Phillips 66",
+"category": null
+},
+"QQQ": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco QQQ Trust",
+"category": "Large Growth"
+},
+"QQQM": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco NASDAQ 100 ETF",
+"category": "Large Growth"
+},
+"RRC": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Range Resources Corporation",
+"category": null
+},
+"SBSW": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Sibanye Stillwater Limited",
+"category": null
+},
+"SCCO": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Southern Copper Corporation",
+"category": null
+},
+"SCHO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Schwab Short-Term U.S. Treasury ETF",
+"category": "Short Government"
+},
+"SCHR": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Schwab Intermediate-Term U.S. Treasury ETF",
+"category": "Intermediate Government"
+},
+"SFD": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Smithfield Foods, Inc.",
+"category": null
+},
+"SHY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares 1-3 Year Treasury Bond ETF",
+"category": "Short Government"
+},
+"SIVR": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "abrdn Physical Silver Shares ETF",
+"category": "Commodities Focused"
+},
+"SLV": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares Silver Trust",
+"category": "Commodities Focused"
+},
+"SOYB": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Teucrium Soybean Fund",
+"category": "Commodities Focused"
+},
+"SPTL": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "State Street SPDR Portfolio Long Term Treasury ETF",
+"category": "Long Government"
+},
+"SPY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "State Street SPDR S&P 500 ETF Trust",
+"category": "Large Blend"
+},
+"SVXY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares Short VIX Short-Term Futures ETF",
+"category": "Trading--Miscellaneous"
+},
+"TBF": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares Short 20+ Year Treasury",
+"category": "Trading--Inverse Debt"
+},
+"TLT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iShares 20+ Year Treasury Bond ETF",
+"category": "Long Government"
+},
+"TSN": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Tyson Foods, Inc.",
+"category": null
+},
+"UDN": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco DB US Dollar Index Bearish Fund",
+"category": "Trading--Miscellaneous"
+},
+"UGA": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "United States Gasoline Fund, LP",
+"category": "Commodities Focused"
+},
+"UNG": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "United States Natural Gas Fund, LP",
+"category": "Commodities Focused"
+},
+"USL": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "United States 12 Month Oil Fund, LP",
+"category": "Commodities Focused"
+},
+"USO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "United States Oil Fund, LP",
+"category": "Commodities Focused"
+},
+"UUP": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Invesco DB US Dollar Index Bullish Fund",
+"category": "Trading--Miscellaneous"
+},
+"UVXY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares Ultra VIX Short-Term Futures ETF",
+"category": "Trading--Miscellaneous"
+},
+"VGIT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard Intermediate-Term Treasury Index Fund ETF Shares",
+"category": "Intermediate Government"
+},
+"VGLT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard Long-Term Treasury Index Fund ETF Shares",
+"category": "Long Government"
+},
+"VGSH": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard Short-Term Treasury Index Fund ETF Shares",
+"category": "Short Government"
+},
+"VIXY": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares VIX Short-Term Futures ETF",
+"category": "Trading--Miscellaneous"
+},
+"VLO": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Valero Energy Corporation",
+"category": null
+},
+"VOO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard S&P 500 ETF",
+"category": "Large Blend"
+},
+"VTWO": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Vanguard Russell 2000 Index Fund ETF Shares",
+"category": "Small Blend"
+},
+"VXX": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "iPath Series B S&P 500 VIX Short-Term Futures ETN",
+"category": "Trading--Miscellaneous"
+},
+"WEAT": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Teucrium Wheat Fund",
+"category": "Commodities Focused"
+},
+"WPM": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Wheaton Precious Metals Corp.",
+"category": null
+},
+"XLE": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "State Street Energy Select Sector SPDR ETF",
+"category": "Equity Energy"
+},
+"XRP": {
+"last": "2026-10-02",
+"quote_type": "EQUITY",
+"name": "Bitwise XRP ETF",
+"category": null
+},
+"XRPC": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "Canary XRP ETF",
+"category": "Digital Assets"
+},
+"XRPR": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "REX-Osprey™ XRP ETF",
+"category": null
+},
+"YCS": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "ProShares UltraShort Yen",
+"category": "Trading--Miscellaneous"
+},
+"ZROZ": {
+"last": "2026-10-02",
+"quote_type": "ETF",
+"name": "PIMCO 25+ Year Zero Coupon U.S. Treasury Index Exchange-Traded Fund",
+"category": "Long Government"
+}
+}
+}

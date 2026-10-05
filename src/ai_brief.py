@@ -21,6 +21,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import backtest
 from src import net_utils
+from src import cot_theses as _cot_table     # пакет 3: таблиците за директните тикъри и знака (без AI)
 
 API_URL = "https://api.anthropic.com/v1/messages"
 
@@ -1934,7 +1935,7 @@ CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрям�
 ВАЖНО за инструменти с "weeks_of_history" под {config.COT_SHORT_HISTORY_WEEKS} \
 (стандартният дизайн е 156 седмици/~3г — по-млад контракт означава по-кратка \
 налична история, не грешка в данните): добави explicit изречение В КРАЯ на \
-всеки reasoning текст (direct_thesis И cross_sector_thesis, ако имат tickers), \
+reasoning текста на cross_sector_thesis (ако има tickers), \
 което flag-ва по-ниската статистическа увереност спрямо стандартните 156-\
 седмични инструменти в тезата — напр. "История само {{N}} седмици (под \
 стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от \
@@ -1971,46 +1972,35 @@ extreme_long → цената надолу, extreme_short → цената на�
 текстът написа "НЕТНО КЪСИ… максимален short" и обърна цялата теза. Никога не \
 пиши "нетно къси/дълги" въз основа на знака.
 
+Директната теза за всеки инструмент се дава от фиксирана таблица в кода — ТИ пишеш \
+САМО cross-sector тезата. За всеки инструмент "direct_tickers" са тикърите, които \
+таблицата вече покрива като директни: НЕ ги повтаряй в cross-sector тезата.
+
 За ВСЕКИ инструмент в списъка върни обект с:
 - "market": точното име както е подадено
 - "assumed_move": "up" или "down" — препиши движението от "expected_move" \
 (проверява се от кода; разминаване = тезата се отхвърля)
-- "direct_thesis": {{
-    "tickers": [1-3 обекта {{"ticker": "ADM", "company": "Archer-Daniels-Midland", \
-"effect": "gains"/"loses"}} — пряко изложени на инструмента; "company" е кратко, \
-познато име, НЕ пълното юридическо наименование; "effect" = дали КОМПАНИЯТА \
-печели ("gains") или губи ("loses"), АКО инструментът се движи както казва \
-"expected_move". Не посоката на суровината, а ефектът върху акцията — напр. \
-какаото нагоре → HSY "loses"; облигациите надолу → TLT "loses"],
-    "no_direct_link": true/false — true, ако НЯМА нито един реален, ликвиден, \
-публично търгуван тикър с истинска директна експозиция (тогава tickers е []; \
-ако все пак оставиш тикър "само за референция" — кодът ще го премахне),
-    "reasoning": "2-3 изречения — защо точно тези тикъри и защо сега. Ако НЯМА \
-нито един реален, ликвиден, публично търгуван тикър с истинска директна \
-експозиция на инструмента (напр. основният производител не е самостоятелно \
-публичен), върни ПРАЗЕН tickers списък ([]), no_direct_link: true и кажи го \
-изрично тук — не насилвай слаб/индиректен избор само за да запълниш полето."
-  }}
 - "cross_sector_thesis": {{
-    "no_direct_link": true/false — както по-горе,
+    "no_direct_link": true/false — true, ако нито един кандидат няма реална връзка,
     "tickers": [1-3 обекта {{"ticker": "...", "company": "...", "effect": \
-"gains"/"loses"}} — компании, засегнати ВТОРИЧНО (не същите като в директната \
-теза), САМО ако има ДИРЕКТНА икономическа връзка (1-2 стъпки: input \
+"gains"/"loses"}} — компании, засегнати ВТОРИЧНО (не директните от таблицата), \
+САМО ако има ДИРЕКТНА икономическа връзка (1-2 стъпки: input \
 costs, revenue exposure, конкурентна позиция спрямо самия инструмент) — НЕ \
 generic макро верига от типа "цената пада → инфлацията спада → потребителите \
 харчат повече → X печели донякъде" (технически вярно, но твърде разредено за \
 реална теза — почти всяка discretionary акция "пасва" на почти всяка commodity \
-deflation тема по този начин, което го прави безсмислено),
+deflation тема по този начин, което го прави безсмислено); "effect" = дали \
+КОМПАНИЯТА печели ("gains") или губи ("loses"), АКО инструментът се движи както \
+казва "expected_move" (не посоката на суровината, а ефектът върху акцията — \
+какаото нагоре → HSY "loses"; облигациите надолу → TLT "loses"),
     "reasoning": "2-3 изречения — директната верижна логика инструмент → \
 компания. Ако НИКОЙ кандидат няма реална директна връзка, върни ПРАЗЕН \
 tickers списък ([]), no_direct_link: true и кажи го изрично тук (напр. 'няма \
-пряк бенефициент сред днешните кандидати') — не насилвай генерична връзка само \
-за да запълниш полето."
+пряк бенефициент') — не насилвай генерична връзка само за да запълниш полето."
   }}
 
-Тикър, който вече е в "direct_thesis" на СЪЩИЯ инструмент, не се повтаря в \
-"cross_sector_thesis". Не пиши думите bullish/bearish за тикърите в текста — \
-посоката им се извежда от "effect" от кода.
+Не пиши думите bullish/bearish за тикърите в текста — посоката им се извежда от \
+"effect" от кода.
 
 ФЛАГЪТ И ТЕКСТЪТ ТРЯБВА ДА СЪВПАДАТ: ако в "reasoning" пишеш, че няма реална \
 връзка, че тикърът няма материална експозиция или че списъкът е празен — \
@@ -2134,11 +2124,14 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         return []
 
     moves = {e["market"]: _instrument_move(e) for e in extremes}
+    direct_by_market = {e["market"]: _cot_table.direct_thesis(e["market"], moves[e["market"]]) for e in extremes}
     slim = [{"market": e["market"], "category": e["category"],
             "percentile": e["percentile"], "direction": e["direction"],
             "expected_move": moves[e["market"]]["move_text"],
             "net_position": e["net_position"], "as_of": e["as_of"],
-            "weeks_of_history": e.get("weeks_of_history")}
+            "weeks_of_history": e.get("weeks_of_history"),
+            # пакет 3 т.в: директните тикъри идват от таблицата в кода — моделът ги вижда само за да не ги повтаря
+            "direct_tickers": [x["ticker"] for x in direct_by_market[e["market"]]["tickers"]]}
            for e in extremes]
 
     size = max(1, config.COT_BATCH_SIZE)
@@ -2158,26 +2151,38 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
                 if t.get("thesis_rejected"):
                     continue  # отхвърлена теза не влиза в контекста на следващите batch-ове
                 _record_ticker_context(seen_tickers, t["market"], "direct_thesis",
-                                       t.get("direct_thesis") or {})
+                                       {**direct_by_market[t["market"]], "_move_text": moves[t["market"]]["move_text"]})
                 _record_ticker_context(seen_tickers, t["market"], "cross_sector_thesis",
                                        t.get("cross_sector_thesis") or {})
 
     screener_tickers = {c["ticker"] for c in screener_universe if c.get("ticker")}
     merged = []
     for e in extremes:
-        t = theses_by_market.get(e["market"])
-        if not t:
-            continue
+        # пакет 3 т.в: директната теза не зависи от AI — пазарът се показва и когато моделът не е върнал нищо за него
+        t = theses_by_market.get(e["market"]) or {"market": e["market"], "cross_sector_thesis": {}}
         move = {k: moves[e["market"]][k]
                 for k in ("instrument_direction", "move_text", "move_short")}
+        direct = direct_by_market[e["market"]]
+        # тикър от директната таблица не се повтаря в cross-sector (моделът е инструктиран, кодът пази)
+        direct_set = {x["ticker"] for x in direct["tickers"]}
+        cross_raw = t.get("cross_sector_thesis")
+        if cross_raw and cross_raw.get("tickers"):
+            kept = [x for x in cross_raw["tickers"] if x.get("ticker") not in direct_set]
+            if len(kept) != len(cross_raw["tickers"]):
+                print(f"[ai] COT '{e['market']}': cross-sector тикъри, вече директни по таблицата, махнати: "
+                      f"{[x['ticker'] for x in cross_raw['tickers'] if x.get('ticker') in direct_set]}")
+            t = {**t, "cross_sector_thesis": {**cross_raw, "tickers": kept}}
         if t.get("thesis_rejected"):
-            merged.append({**e, **move, "direct_thesis": None, "cross_sector_thesis": None,
-                           "thesis_rejected": t["thesis_rejected"]})
+            # отхвърлена е само AI частта (cross); директната е от таблицата и остава
+            merged.append({**e, **move,
+                           "direct_thesis": _empty_sub_reason(
+                               direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, e["market"])),
+                               e["market"], "direct"),
+                           "cross_sector_thesis": None, "thesis_rejected": t["thesis_rejected"]})
             continue
         merged.append({**e, **move,
                        "direct_thesis": _empty_sub_reason(
-                           t.get("direct_thesis"), _strip_internal(_verify_thesis_tickers(
-                               t.get("direct_thesis") or {}, screener_tickers, e["market"])),
+                           direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, e["market"])),
                            e["market"], "direct"),
                        "cross_sector_thesis": _empty_sub_reason(
                            t.get("cross_sector_thesis"), _strip_internal(_verify_thesis_tickers(
@@ -2216,7 +2221,8 @@ def _empty_sub_reason(raw: dict | None, verified: dict | None,
     dropped = [t["ticker"] for t in (raw or {}).get("tickers") or []
                if isinstance(t, dict) and t.get("ticker")]
     if dropped:
-        why = (f"предложените тикъри ({', '.join(dropped)}) отпаднаха при проверката "
+        who = "тикърите от таблицата" if (raw or {}).get("source") == "table" else "предложените тикъри"
+        why = (f"{who} ({', '.join(dropped)}) отпаднаха при проверката "
                f"(delisted, грешна суровина или грешно описание на компанията)")
     else:
         why = "моделът не върна тази под-теза"
