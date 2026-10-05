@@ -47,11 +47,22 @@ for m, spec in config.COT_DIRECT_TICKERS.items():
         assert (sign == 1) == (e["side"] == "long"), (m, e)                             # знакът на типа съвпада със side
         assert e["mechanism_type"] in config.COT_DIRECT_ONLY_TYPES or e["mechanism_type"] in config.COT_MECHANISM_SIGN, (m, e)
 tickers = sorted({e["ticker"] for s in config.COT_DIRECT_TICKERS.values() for e in s["tickers"]})
-assert n_entries == 70 and len(tickers) == 65
+assert n_entries == 65 and len(tickers) == 62
 empty = [m for m, s in config.COT_DIRECT_TICKERS.items() if not s["tickers"]]
-assert empty == ["Mexican Peso", "Coffee C", "Cocoa", "Cotton"]
-print(f"  ✓ {len(LABELS)} пазара с вид и запис; {n_entries} реда, {len(tickers)} различни тикъра; 4 пазара са празни с причина: {empty};")
+assert empty == ["Mexican Peso", "Soybean Oil", "Soybean Meal", "Coffee C", "Cocoa", "Cotton", "Live Cattle"]
+# правилото на потребителя (05.10): само притежатели/производители (L) или обратни продукти (S) — никакви купувачи/преработватели/потребители
+for m, spec in config.COT_DIRECT_TICKERS.items():
+    for e in spec["tickers"]:
+        assert (e["side"], e["mechanism_type"]) in config.COT_DIRECT_ALLOWED, (m, e)
+        assert e["mechanism_type"] not in ("input_cost", "consumer_wallet", "substitute"), (m, e)
+removed = {t for t in ("TSN", "BG", "ADM") if t in tickers}
+assert not removed, removed                                                                  # TSN (Live Cattle) и BG/ADM (Soybean Oil/Meal) вече не са директни
+assert all("cross" in config.COT_DIRECT_TICKERS[m]["empty_reason"] for m in ("Soybean Oil", "Soybean Meal", "Live Cattle"))
+partial = sorted({(m, e["ticker"]) for m, s in config.COT_DIRECT_TICKERS.items() for e in s["tickers"] if e["partial"]})
+assert partial == [("Heating Oil", "MPC"), ("Heating Oil", "VLO"), ("Lean Hogs", "SFD"), ("Palladium", "SBSW"), ("Platinum", "SBSW"), ("RBOB Gasoline", "MPC"), ("RBOB Gasoline", "VLO")]
+print(f"  ✓ {len(LABELS)} пазара с вид и запис; {n_entries} реда, {len(tickers)} различни тикъра; 7 пазара са празни с причина: {empty};")
 print("    знакът на типа съвпада със страната на експозицията във всеки ред; 0–4 тикъра на пазар")
+print("  ✓ правилото на потребителя: всеки ред е (long, tracks_instrument | output_price) или (short, tracks_instrument); TSN, BG, ADM ги няма; VLO/MPC (p) остават")
 
 print()
 print("── РЕАЛНА проверка през Yahoo (05.10.2026) ──")

@@ -820,6 +820,10 @@ COT_DIRECT_ONLY_TYPES = {"tracks_instrument"}
 def _d(ticker, side, mtype, note="", partial=False):
     return {"ticker": ticker, "side": side, "mechanism_type": mtype, "note": note, "partial": partial}
 
+# ПРАВИЛО за директната таблица (потребител, 05.10): само ПРИТЕЖАТЕЛИ/ПРОИЗВОДИТЕЛИ на инструмента (side long: tracks_instrument за продукт, който го
+# следва, output_price за производител) или ОБРАТНИ продукти (side short + tracks_instrument). Купувачи на суровината, преработватели и потребители
+# (input_cost, substitute, consumer_wallet…) НЕ са директни — те са cross тезата с механизъм. Тестът проверява всеки ред срещу това множество.
+COT_DIRECT_ALLOWED = {("long", "tracks_instrument"), ("long", "output_price"), ("short", "tracks_instrument")}
 COT_DIRECT_TICKERS = {
     "E-mini S&P 500": {"tickers": [_d("SPY", "long", "tracks_instrument", "ETF върху S&P 500"), _d("VOO", "long", "tracks_instrument", "ETF върху S&P 500")]},
     "Nasdaq-100": {"tickers": [_d("QQQ", "long", "tracks_instrument", "ETF върху Nasdaq-100"), _d("QQQM", "long", "tracks_instrument", "ETF върху Nasdaq-100")]},
@@ -860,17 +864,15 @@ COT_DIRECT_TICKERS = {
     "Heating Oil": {"tickers": [_d("VLO", "long", "output_price", "рафинер (дизел/ULSD е основен продукт)", partial=True), _d("MPC", "long", "output_price", "рафинер (дизел/ULSD е основен продукт)", partial=True)]},
     "Corn": {"tickers": [_d("CORN", "long", "tracks_instrument", "фонд върху фючърси на царевица")]},
     "Soybeans": {"tickers": [_d("SOYB", "long", "tracks_instrument", "фонд върху фючърси на соя")]},
-    "Soybean Oil": {"tickers": [_d("BG", "long", "output_price", "преработвател — продава соево масло (марж на смилането)", partial=True),
-                                _d("ADM", "long", "output_price", "преработвател — продава соево масло (марж на смилането)", partial=True)]},
-    "Soybean Meal": {"tickers": [_d("BG", "long", "output_price", "преработвател — продава соево брашно (марж на смилането)", partial=True),
-                                 _d("ADM", "long", "output_price", "преработвател — продава соево брашно (марж на смилането)", partial=True)]},
+    "Soybean Oil": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху соевото масло; преработвателите (BG, ADM) са cross тикъри"},
+    "Soybean Meal": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху соевото брашно; преработвателите (BG, ADM) и потребителите на фураж са cross тикъри"},
     "Wheat": {"tickers": [_d("WEAT", "long", "tracks_instrument", "фонд върху фючърси на пшеница")]},
     "Sugar No. 11": {"tickers": [_d("CANE", "long", "tracks_instrument", "фонд върху фючърси на захар")]},
     "Coffee C": {"tickers": [], "empty_reason": "няма листнат американски продукт върху кафето (iPath JO е делистнат)"},
     "Cocoa": {"tickers": [], "empty_reason": "няма листнат американски продукт върху какаото (iPath NIB е делистнат)"},
     "Cotton": {"tickers": [], "empty_reason": "няма листнат американски продукт върху памука (iPath BAL е делистнат)"},
     "Lean Hogs": {"tickers": [_d("SFD", "long", "output_price", "производител на свинско (разходите за фураж също влияят)", partial=True)]},
-    "Live Cattle": {"tickers": [_d("TSN", "short", "input_cost", "преработвател на говеждо купува добитък (марж на месопреработвателя); диверсифицирана", partial=True)]},
+    "Live Cattle": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху говеждия добитък (COW е делистнат); месопреработвателите (TSN) са cross с input_cost"},
 }
 
 # ── MOVE Index (ICE BofA, bond volatility) ────────────────────────────────
