@@ -1108,16 +1108,21 @@
     Track Record v2 започва от нула.</div>
   {% endif %}
   <div class="prose">
+    {# пакет 2 (05.10): без нито една резолвирана v2 сделка няма win rate — "0.0% (0 win / 0 loss)" би се четало като измерен резултат #}
+    {% if not backtest.total_resolved %}
+    <b>Още няма затворени сделки по v2</b> — win rate и среден R се показват от първата резолюция.<br>
+    {% else %}
     <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
     {{ backtest.stopped }} стоп{% if backtest.stopped_after_partial %} (от тях {{ backtest.stopped_after_partial }} след частична продажба){% endif %}
     / {{ backtest.trailing_stop_exit }} trailing-exit / {{ backtest.expired_in_trail }} expired-in-trail
     / {{ backtest.expired }} expired (оценени по последния Close, mark-to-market)<br>
+    {% endif %}
     {# FIX 2026-10-03 (пакет 1, т.4): 50% се продава на цел 1 (2R), остатъкът е в trailing #}
     Все още отворени: {{ backtest.still_open }} (преди цел 1) + {{ backtest.trailing }} (след частична продажба на цел 1, trailing)<br>
     {# FIX 2026-10-03 (пакет 1, т.2): buy-stop входове — не са позиции и не влизат в статистиката #}
     Чакат buy-stop: {{ backtest.pending or 0 }} · не се задействаха: {{ backtest.not_triggered or 0 }}{% if backtest.skipped_extended %}
     · над тавана за вход: {{ backtest.skipped_extended }}{% endif %} (извън статистиката)<br>
-    Среден реализиран R: {{ backtest.avg_realized_r }}
+    {% if backtest.total_resolved %}Среден реализиран R: {{ backtest.avg_realized_r }}{% endif %}
     {# FIX 2026-10-03 (пакет 1, т.8): същият капитал в SPY за СЪЩИТЕ периоди на държане #}
     {% if backtest.spy_compare %}<br>Спрямо SPY (същите периоди на държане, {{ backtest.spy_compare.n }} затворени):
     средно {{ "%+.2f"|format(backtest.spy_compare.avg_return_pct) }}% срещу SPY {{ "%+.2f"|format(backtest.spy_compare.avg_spy_pct) }}%
