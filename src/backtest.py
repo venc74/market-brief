@@ -153,7 +153,7 @@ def _snapshot_files() -> list[pathlib.Path]:
 # ──────────────────────────────────────────────────────────────────────────
 # Стъпка 1: нови позиции от Action snapshot-ите (с дедупликация)
 # ──────────────────────────────────────────────────────────────────────────
-def _is_continuation(tracker: dict, ticker: str, entry_date: str) -> bool:
+def _is_continuation(tracker: dict, ticker: str, entry_date: str, category: str = CATEGORY_ACTION) -> bool:
     """
     True ако entry_date попада В ЖИВОТА на вече записана позиция за същия тикър:
     интервалът [entry_date, resolution_date], или [entry_date, ∞) докато е жива.
@@ -193,6 +193,8 @@ def _is_continuation(tracker: dict, ticker: str, entry_date: str) -> bool:
     """
     for rec in tracker.values():
         if rec.get("ticker") != ticker:
+            continue
+        if record_category(rec) != category:     # пакет 1б: книгите са независими — buy-stop запис не блокира Action и обратно
             continue
         start = rec.get("entry_date")
         if not start or start > entry_date:
@@ -275,8 +277,35 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
         }
 
 
+def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], regime: str | None = None) -> None:
+    """
+    Пакет 1б: ingest-ва Watchlist картите с buy-stop (setup.kind == "below_pivot", валиден plan_preview) като категория "buystop" —
+    ЕДИН запис на (тикър, ден на брифа), със същата v2 форма като Action (плановите ключове идват от plan_preview, т.е. са същите
+    стоп/цел, които картата показва). Дедупът е в рамките на категорията (_is_continuation с category): картата, която стои във
+    Watchlist няколко дни с едно и също ниво, е ЕДИН запис, докато не се резолвира; след резолюция/изтекъл прозорец е нов. Записва се
+    във всички режими (Cash/Defensive/Offensive) — режимът е само таг ("regime"). Карта без валиден план се пропуска (graceful).
+    """
+    if not config.TRACK_BUYSTOP:
+        return
+    for c in watchlist or []:
+        ticker = c.get("ticker")
+        setup = c.get("setup") or {}
+        plan = c.get("plan_preview") or {}
+        if not (ticker and setup.get("kind") == "below_pivot" and setup.get("buy_stop")
+                and plan.get("valid") and plan.get("method") == "v2"
+                and all(plan.get(k) is not None for k in _V2_PLAN_KEYS)):
+            continue
+        key = f"{ticker}_{entry_date}_{CATEGORY_BUYSTOP}"
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_BUYSTOP):
+            continue
+        rec = _new_v2_record(ticker, entry_date, plan)
+        rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot")})
+        tracker[key] = rec
+
+
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
-                          today_date: str | None = None) -> None:
+                          today_date: str | None = None, today_watchlist: list[dict] | None = None,
+                          today_regime: str | None = None) -> None:
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -285,6 +314,9 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
             continue
         entry_date = snap.get("date") or path.stem
         _ingest_action_list(tracker, entry_date, snap.get("action", []))
+        # пакет 1б: Watchlist картите със заснет plan_preview (по-старите snapshot-и нямат такъв → не влизат); чисто временно правило —
+        # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action
+        _ingest_buystop_list(tracker, entry_date, snap.get("watchlist", []), (snap.get("thermometer") or {}).get("regime"))
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -297,6 +329,8 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
     # закъснението — утрешният run вече ще завари тикъра в tracker-а.
     if today_action and today_date:
         _ingest_action_list(tracker, today_date, today_action)
+    if today_watchlist and today_date:
+        _ingest_buystop_list(tracker, today_date, today_watchlist, today_regime)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -762,7 +796,8 @@ def resolve_positions_only() -> None:
 
 
 def update_backtest_tracker(today_action: list[dict] | None = None,
-                            today_date: str | None = None) -> None:
+                            today_date: str | None = None, today_watchlist: list[dict] | None = None,
+                            today_regime: str | None = None) -> None:
     """
     Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
@@ -771,10 +806,11 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     today_action/today_date: днешният in-memory Action списък (main.py) —
     ingest-ва се директно, БЕЗ да чака утрешното файлово четене на
     data/{today}.json (виж FIX 2026-08-01 в _ingest_new_positions).
+    today_watchlist/today_regime (пакет 1б): днешният Watchlist и режимът — buy-stop кандидатите се записват като отделна книга.
     """
     tracker = _load_tracker()
     try:
-        _ingest_new_positions(tracker, today_action, today_date)
+        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
         # не плащаме втори yf.download(). Днес ingest-натите позиции остават
         # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла

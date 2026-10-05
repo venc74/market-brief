@@ -532,7 +532,7 @@ def run() -> dict:
     # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
     # списък директно, за да е налично в tracker-а от утрешния run нататък.
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today)
+        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"))     # пакет 1б: + buy-stop кандидатите (отделна книга)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха

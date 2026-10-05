@@ -134,6 +134,13 @@ RS_RATING_MIN_UNIVERSE = int(os.getenv("RS_RATING_MIN_UNIVERSE", 150))
 # TRACK_RECORD_V2=0 спира автоматичното превключване (v2 плановете пак се записват като v2).
 TRACK_RECORD_V2 = os.getenv("TRACK_RECORD_V2", "1") == "1"
 
+# ── Track Record: buy-stop кандидати (пакет 1б — 05.10.2026) ──────────────
+# Watchlist картите с buy-stop (setup.kind == "below_pivot", валиден plan_preview) се следят като ОТДЕЛНА, независима книга ("buystop") в същия
+# tracker — със същия модел на изпълнение като Action (trade_sim: вход при High ≥ buy-stop в прозорец от BUY_STOP_WINDOW_SESSIONS сесии, по
+# max(Open, buy-stop), не над таван +5%; стоп/цел от картата). Записва се във ВСИЧКИ режими, с таг на режима. Не е препоръка и не е позиция:
+# четците на позиции (OPEN✓, RE-ENTRY, COT, обобщението на Action) я игнорират. Реплей 02.01.2024–01.10.2026: без демонстрирана алфа.
+TRACK_BUYSTOP = os.getenv("TRACK_BUYSTOP", "1") == "1"
+
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
 # "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.
