@@ -719,7 +719,8 @@ def _live_v2_positions() -> dict[str, dict]:
     try:
         tracker = backtest._load_tracker()
         return {rec["ticker"]: rec for rec in tracker.values()
-                if rec.get("method") == "v2" and rec.get("status") in ("open", "trailing")}
+                if rec.get("method") == "v2" and backtest.is_action_record(rec)      # пакет 1б: buy-stop кандидатите не са позиции
+                and rec.get("status") in ("open", "trailing")}
     except Exception as e:
         print(f"[ai] живите v2 позиции не се заредиха: {e}")
         return {}

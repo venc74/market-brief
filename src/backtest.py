@@ -73,6 +73,9 @@ from src import trade_sim
 _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 _LIVE_STATUSES = ("open", "trailing")
+# Пакет 1б (05.10): втора, НЕЗАВИСИМА книга в същия tracker — Watchlist buy-stop кандидатите ("buystop"). Запис без "category" е Action
+# (всичко, записано до пакет 1б). Всеки четец на позиции (OPEN✓, RE-ENTRY, COT, обобщението на Action) гледа само is_action_record().
+CATEGORY_ACTION, CATEGORY_BUYSTOP = "action", "buystop"
 # v2: "pending" още няма позиция (чака buy-stop), но трябва да се резолвира всеки run
 _RESOLVABLE_STATUSES = _LIVE_STATUSES + ("pending",)
 
@@ -131,6 +134,15 @@ def load_state() -> dict:
 
 def methodology() -> str:
     return "v2" if load_state().get("methodology") == "v2" else "v1"
+
+
+def record_category(rec: dict) -> str:
+    return rec.get("category") or CATEGORY_ACTION
+
+
+def is_action_record(rec: dict) -> bool:
+    """Запис от Action книгата (без "category" или "action"). Buy-stop кандидатите НЕ са позиции — не се чете като такива никъде."""
+    return record_category(rec) == CATEGORY_ACTION
 
 
 def _snapshot_files() -> list[pathlib.Path]:
@@ -821,7 +833,7 @@ def get_backtest_summary() -> dict:
     tracker = _load_tracker()
     # пакет 1, т.7: Track Record-ът е само v2; v1 записите (ако още са в tracker-а) са
     # извън статистиката — v1 е един архивен ред (виж по-долу и tracker_switch.py)
-    records = [r for r in tracker.values() if r.get("method") == "v2"]
+    records = [r for r in tracker.values() if r.get("method") == "v2" and is_action_record(r)]   # пакет 1б: buy-stop книгата е отделна
 
     resolved = [r for r in records if r.get("realized_r") is not None]
     total_resolved = len(resolved)

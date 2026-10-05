@@ -53,7 +53,8 @@ def _live_positions() -> dict[str, dict]:
         tracker = backtest._load_tracker()
         # пакет 1, т.7: само v2 позиции — v1 е архив, не „държа" и не пречи на нов вход
         return {rec["ticker"]: rec for rec in tracker.values()
-                if rec.get("method") == "v2" and rec.get("status") in ("open", "trailing")}
+                if rec.get("method") == "v2" and backtest.is_action_record(rec)      # пакет 1б: buy-stop кандидатите не са позиции
+                and rec.get("status") in ("open", "trailing")}
     except Exception as e:
         print(f"[main] live positions check failed: {e}")
         return {}
@@ -91,6 +92,8 @@ def _last_resolved_positions() -> dict[str, dict]:
         out: dict[str, dict] = {}
         for rec in tracker.values():
             if rec.get("method") != "v2":        # т.7: v1 историята е архив
+                continue
+            if not backtest.is_action_record(rec):   # пакет 1б: затворен buy-stop кандидат не е "предишна позиция"
                 continue
             if rec.get("realized_r") is None or not rec.get("resolution_date"):
                 continue
