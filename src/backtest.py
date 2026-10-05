@@ -854,6 +854,87 @@ def _is_late_discovery(rec: dict) -> bool:
         return False
 
 
+def _wilson_ci_pct(wins: int, n: int, z: float = 1.96) -> list[float] | None:
+    """95% интервал на Wilson за дял (в %), None без наблюдения."""
+    if not n:
+        return None
+    p = wins / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return [round(100 * (c - h), 1), round(100 * (c + h), 1)]
+
+
+def get_buystop_summary() -> dict:
+    """
+    Пакет 1б: обобщение на ОТДЕЛНАТА книга "buystop" (Watchlist buy-stop кандидати) — не е препоръка и не е позиция. Чисто локално четене
+    (без мрежа; текущи цени не се теглят). Win rate (с интервал на Wilson), медианата на R, сравнението със SPY и разбивката по режим се
+    попълват чак при поне config.BUYSTOP_MIN_CLOSED_FOR_WINRATE ЗАТВОРЕНИ записа (stats_visible); дотогава — само броят и средният R.
+    "Не се задействаха" е важна част от картината (кандидат, чиято цена не пробива pivot в прозореца), затова се показва като дял от
+    записите с приключил прозорец. Празен/изключен → {} / нулеви стойности, никога грешка.
+    """
+    if not config.TRACK_BUYSTOP:
+        return {}
+    records = [r for r in _load_tracker().values() if r.get("method") == "v2" and record_category(r) == CATEGORY_BUYSTOP]
+    by_status: dict = {}
+    for r in records:
+        by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
+    closed = [r for r in records if r.get("realized_r") is not None]
+    triggered = [r for r in records if r.get("fill_date")]
+    not_triggered = by_status.get("not_triggered", 0)
+    skipped = by_status.get("skipped_extended", 0) + by_status.get("invalid_risk", 0)
+    window_done = len(triggered) + not_triggered + skipped
+    min_closed = config.BUYSTOP_MIN_CLOSED_FOR_WINRATE
+    visible = len(closed) >= min_closed
+    rs = sorted(r["realized_r"] for r in closed)
+    wins = sum(1 for x in rs if x > 0)
+
+    spy_compare = None
+    cmp_recs = [r for r in closed if r.get("return_pct") is not None and r.get("spy_return_pct") is not None]
+    if visible and cmp_recs:
+        n_c = len(cmp_recs)
+        avg_ret = sum(r["return_pct"] for r in cmp_recs) / n_c
+        avg_spy = sum(r["spy_return_pct"] for r in cmp_recs) / n_c
+        spy_compare = {"n": n_c, "avg_return_pct": round(avg_ret, 2), "avg_spy_pct": round(avg_spy, 2),
+                       "avg_alpha_pct": round(avg_ret - avg_spy, 2),
+                       "beat_spy_pct": round(sum(1 for r in cmp_recs if r["return_pct"] > r["spy_return_pct"]) / n_c * 100, 1)}
+
+    by_regime: dict = {}
+    for r in records:
+        g = by_regime.setdefault(r.get("regime") or "н/д", {"records": 0, "closed": 0, "_rs": []})
+        g["records"] += 1
+        if r.get("realized_r") is not None:
+            g["closed"] += 1
+            g["_rs"].append(r["realized_r"])
+    for g in by_regime.values():
+        rs_g = g.pop("_rs")
+        g["avg_r"] = round(sum(rs_g) / len(rs_g), 2) if (visible and rs_g) else None
+
+    def _row(r: dict) -> dict:
+        return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "buy_stop": r.get("buy_stop"),
+                "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
+                "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
+                "current_r": r.get("current_r"), "regime": r.get("regime")}
+
+    live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
+    recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),
+                      "realized_r": r.get("realized_r")} for r in closed),
+                    key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
+    return {
+        "enabled": True, "records": len(records),
+        "pending": by_status.get("pending", 0), "open": by_status.get("open", 0) + by_status.get("trailing", 0),
+        "closed": len(closed), "triggered": len(triggered), "not_triggered": not_triggered, "skipped": skipped,
+        "not_triggered_pct": round(100 * not_triggered / window_done, 1) if window_done else None,
+        "avg_realized_r": round(sum(rs) / len(rs), 2) if rs else None,
+        "min_closed": min_closed, "stats_visible": visible,
+        "wins": wins if visible else None, "losses": (len(rs) - wins) if visible else None,
+        "win_rate_pct": round(100 * wins / len(rs), 1) if visible else None,
+        "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
+        "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
+        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
+    }
+
+
 def get_backtest_summary() -> dict:
     """
     Обобщение за dashboard-а. "Win" = всякакъв терминален изход с
