@@ -118,7 +118,8 @@ assert (agree, dis) == (7, 0)
 print("  ✓ РЕАЛНО сравнение със стария AI: 7 общи (пазар, тикър) двойки от 02.10 — 7 със същия ефект, 0 с обратен")
 
 print()
-print("── през ai_brief.cot_theses: директната е от таблицата, AI връща само cross (РЕАЛНИ cross отговори от 02.10) ──")
+print("── през ai_brief.cot_theses: директната е от таблицата, AI връща само cross (СИНТЕТИЧЕН отговор в новия формат) ──")
+ANS = json.loads((FIX / "cot_model_answers_2026-10-02.json").read_text(encoding="utf-8"))["markets"]       # реални (пазар, тикър) двойки от 02.10; типове/quote от теста
 company = {t: r["name"] for t, r in CHK.items() if r["name"]}
 for c in BRIEF["cot"]:
     for k in ("direct_thesis", "cross_sector_thesis"):
@@ -134,16 +135,7 @@ EXTREMES = [{k: c[k] for k in ("market", "category", "net_position", "percentile
 seen = {}
 def fake_claude(system, user, max_tokens=0):
     seen["user"] = user
-    rows = []
-    for c in BRIEF["cot"]:
-        if c["market"] in seen.get("skip", ()):
-            continue
-        move = "up" if c["direction"] == "extreme_short" else "down"
-        if c["market"] in seen.get("wrong_move", ()):
-            move = "down" if move == "up" else "up"
-        rows.append({"market": c["market"], "assumed_move": move,
-                     "direct_thesis": c.get("direct_thesis"),                              # РЕАЛНАТА стара AI директна теза — трябва да се игнорира
-                     "cross_sector_thesis": c.get("cross_sector_thesis")})
+    rows = [{"market": m, "tickers": [dict(t, ticker=t["ticker"]) for t in v] + seen.get("extra", {}).get(m, [])} for m, v in ANS.items() if m not in seen.get("skip", ())]
     return json.dumps({"theses": rows}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()):
@@ -151,37 +143,30 @@ with contextlib.redirect_stdout(io.StringIO()):
 by = {c["market"]: c for c in out}
 assert len(out) == 18
 u = seen["user"]
-assert '"direct_tickers"' in u and "TLT" in u and "САМО cross-sector" in u and "Не пиши думите bullish/bearish" in u
-assert '"direct_thesis"' not in u and "direct_thesis" not in u                             # промптът не иска директна теза
+assert '"direct_tickers"' in u and "TLT" in u and "direct_thesis" not in u        # промптът не иска директна теза
+assert "НЕ тикъри от" in u and "direct_tickers" in u
 cocoa_out = by["Cocoa"]["direct_thesis"]
-assert cocoa_out["tickers"] == [] and "NIB е делистнат" in cocoa_out["empty_reason"]                # AI директните HSY/MDLZ не влизат
-real_cocoa_cross = [t["ticker"] for t in BRIEF["cot"][[c["market"] for c in BRIEF["cot"]].index("Cocoa")]["cross_sector_thesis"]["tickers"]]
-assert [t["ticker"] for t in by["Cocoa"]["cross_sector_thesis"]["tickers"]] == real_cocoa_cross       # cross-ът е реалният от 02.10, без промяна (няма директни по таблицата)
+assert cocoa_out["tickers"] == [] and "NIB е делистнат" in cocoa_out["empty_reason"]               # директната идва от таблицата (празен запис)
 tlt = {t["ticker"]: (t["effect"], t["company"]) for t in by["30-Year Treasury Bond"]["direct_thesis"]["tickers"]}
 assert tlt["TLT"][0] == "loses" and tlt["TBF"][0] == "gains" and "20+ Year" in tlt["TLT"][1]
 assert by["30-Year Treasury Bond"]["direct_thesis"]["reasoning"].startswith("Фиксирана таблица с директни тикъри (не е AI).")
-# cross: тикърите, които са директни по таблицата, се махат
-real_cross = {c["market"]: [t["ticker"] for t in (c.get("cross_sector_thesis") or {}).get("tickers") or []] for c in BRIEF["cot"]}
-for m, c in by.items():
-    got = [t["ticker"] for t in (c["cross_sector_thesis"] or {}).get("tickers") or []]
-    direct = {t["ticker"] for t in config.COT_DIRECT_TICKERS[m]["tickers"]}
-    assert not set(got) & direct, (m, got)
-    assert set(got) <= set(real_cross[m]), (m, got, real_cross[m])
-print("  ✓ промптът носи direct_tickers и 'САМО cross-sector' (без инструкция за директна теза); 18 пазара в изхода; реалните стари AI директни")
-print("    (Cocoa: HSY/MDLZ) се игнорират — директната е от таблицата; TLT губи, TBF печели, имената са от проверката; cross няма директни тикъри")
+cross30 = by["30-Year Treasury Bond"]["cross_sector_thesis"]["tickers"]
+assert [(t["ticker"], t["effect"]) for t in cross30] == [("JPM", "gains")]                          # rate_asset_yield, цена↓ → доходност↑ → печели
+print("  ✓ промптът носи direct_tickers (с TLT) и не иска директна теза; Cocoa: директната е празен запис от таблицата с причина;")
+print("    30Y: TLT губи, TBF печели (таблица), cross JPM печели (механизъм rate_asset_yield) — 18 пазара в изхода")
 
-seen["skip"] = {"Wheat"}                                                                    # моделът не връща нищо за Wheat
+seen["extra"] = {"Corn": [{"ticker": "CORN", "company": "Teucrium Corn Fund", "mechanisms": [{"type": "output_price", "quote": "фонд върху фючърси на царевица"}]}]}   # моделът повтаря директен тикър
+with contextlib.redirect_stdout(io.StringIO()):
+    out_dup = ai_brief.cot_theses(EXTREMES, [], None)
+corn_cross = {c["market"]: c for c in out_dup}["Corn"]["cross_sector_thesis"]["tickers"]
+assert [t["ticker"] for t in corn_cross] == ["TSN", "PPC"]                                         # CORN е директен по таблицата → махнат от cross
+seen["extra"] = {}
+seen["skip"] = {"Wheat"}                                                                          # моделът не връща нищо за Wheat
 with contextlib.redirect_stdout(io.StringIO()):
     out2 = ai_brief.cot_theses(EXTREMES, [], None)
 w = {c["market"]: c for c in out2}["Wheat"]
 assert [t["ticker"] for t in w["direct_thesis"]["tickers"]] == ["WEAT"] and w["direct_thesis"]["tickers"][0]["effect"] == "loses"
-assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"]
-seen["skip"] = set(); seen["wrong_move"] = {"Corn"}                                         # AI е приел обратното движение → cross се отхвърля, директната остава
-with contextlib.redirect_stdout(io.StringIO()):
-    out3 = ai_brief.cot_theses(EXTREMES, [], None)
-cn = {c["market"]: c for c in out3}["Corn"]
-assert cn["thesis_rejected"] and cn["cross_sector_thesis"] is None and [t["ticker"] for t in cn["direct_thesis"]["tickers"]] == ["CORN"]
-print("  ✓ пазар без AI отговор (Wheat) пак се показва с директния WEAT (губи) и празен cross с причина; разминаване в assumed_move (Corn)")
-print("    отхвърля само cross частта — директната (CORN) остава")
+assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"] == "моделът не върна тази под-теза"
+print("  ✓ повтореният директен тикър (CORN) се маха от cross; пазар без AI отговор (Wheat) пак се показва с директния WEAT (губи) и празен cross с причина")
 print()
 print("Всички тестове минаха.")

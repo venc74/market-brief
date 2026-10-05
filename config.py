@@ -708,29 +708,39 @@ COT_MARKET_KINDS = {
 # (значката "отворена позиция" се слага само при пряк механизъм); "other" не показва посока. Два механизма с противоположен
 # знак → "mixed" → тикърът се изключва. "text" е дефиницията, която влиза в промпта (и е част от версията му).
 COT_MECHANISM_SIGN = {
-    "input_cost":              {"direct": True,  "sign": {"commodity": -1},
+    "input_cost":              {"label": "разход за суровина", "direct": True,  "sign": {"commodity": -1},
                                 "text": "компанията КУПУВА инструмента като суровина/разход — по-висока цена = по-високи разходи"},
-    "output_price":            {"direct": True,  "sign": {"commodity": +1},
+    "output_price":            {"label": "цена на продукта", "direct": True,  "sign": {"commodity": +1},
                                 "text": "компанията ПРОДАВА инструмента или продукт, чиято цена го следва — по-висока цена = по-високи приходи"},
-    "fx_revenue_translation":  {"direct": True,  "sign": {"fx_foreign": +1, "fx_usd": -1},
+    "fx_revenue_translation":  {"label": "валутен превод на приходи", "direct": True,  "sign": {"fx_foreign": +1, "fx_usd": -1},
                                 "text": "значителна част от приходите са в чужда валута и се превеждат в USD — по-силна чужда валута = повече USD приходи"},
-    "fx_cost_local":           {"direct": True,  "sign": {"fx_foreign": -1, "fx_usd": +1},
+    "fx_cost_local":           {"label": "разходи в чужда валута", "direct": True,  "sign": {"fx_foreign": -1, "fx_usd": +1},
                                 "text": "значителна част от разходите са в чужда валута — по-силна чужда валута = по-високи разходи в USD"},
-    "rate_asset_yield":        {"direct": True,  "sign": {"rate": -1},
+    "rate_asset_yield":        {"label": "доходност на активите", "direct": True,  "sign": {"rate": -1},
                                 "text": "компанията печели от по-високи доходности (лихвен марж, реинвестиране) — цена на облигацията НАГОРЕ = доходност НАДОЛУ = по-малко печалба"},
-    "rate_duration_valuation": {"direct": True,  "sign": {"rate": +1},
+    "rate_duration_valuation": {"label": "оценка при дълга дюрация", "direct": True,  "sign": {"rate": +1},
                                 "text": "дългосрочни парични потоци/оценка (дълга дюрация) — доходност НАДОЛУ (цена на облигацията НАГОРЕ) = по-висока оценка"},
-    "index_beta":              {"direct": False, "sign": {"equity_index": +1, "volatility": -1, "crypto": +1},
+    "index_beta":              {"label": "бета към пазара", "direct": False, "sign": {"equity_index": +1, "volatility": -1, "crypto": +1},
                                 "text": "тикърът се движи с широкия пазар/риск апетита (бета), не заради конкретен бизнес механизъм"},
-    "risk_off_hedge":          {"direct": False, "sign": {"equity_index": -1, "volatility": +1, "crypto": -1},
+    "risk_off_hedge":          {"label": "защитен актив", "direct": False, "sign": {"equity_index": -1, "volatility": +1, "crypto": -1},
                                 "text": "тикърът расте, когато пазарът бяга от риск (защитен актив)"},
-    "substitute":              {"direct": True,  "sign": {"commodity": +1},
+    "substitute":              {"label": "заместител", "direct": True,  "sign": {"commodity": +1},
                                 "text": "компанията продава заместител на инструмента — по-висока цена на инструмента = повече търсене на заместителя"},
-    "consumer_wallet":         {"direct": False, "sign": {"commodity": -1},
+    "consumer_wallet":         {"label": "потребителски бюджет", "direct": False, "sign": {"commodity": -1},
                                 "text": "клиентите на компанията харчат по-малко, когато цената на инструмента расте (потребителски бюджет)"},
-    "other":                   {"direct": False, "sign": {},
+    "other":                   {"label": "друг механизъм", "direct": False, "sign": {},
                                 "text": "друг механизъм извън списъка — без изчислена посока"},
 }
+# Вид на пазара — как се чете "цената" (влиза в промпта към модела)
+COT_KIND_TEXT = {
+    "equity_index": "борсов индекс (цена↑ = пазарът расте)", "volatility": "волатилност VIX (цена↑ = страх на пазара)",
+    "fx_foreign": "чужда валута срещу USD (цена↑ = валутата поскъпва спрямо долара)", "fx_usd": "US Dollar Index (цена↑ = доларът поскъпва)",
+    "rate": "облигационен фючърс (цена↑ = доходността ПАДА)", "crypto": "криптовалута", "commodity": "стока",
+}
+# Cross-sector (пакет 3 т.г): колко тикъра и механизма, максимална дължина на описанието (quote)
+COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))
+COT_MECHANISMS_PER_TICKER = int(os.getenv("COT_MECHANISMS_PER_TICKER", 2))
+COT_QUOTE_MAX_CHARS = int(os.getenv("COT_QUOTE_MAX_CHARS", 300))
 # само за таблицата с директните тикъри: продукт, който пряко следва инструмента (ETF/ETN/trust); знакът е по "side"
 COT_DIRECT_ONLY_TYPES = {"tracks_instrument"}
 

@@ -3,7 +3,7 @@
 контекст от други batch-ове; редът, който канеше позициите към cross тезите, е махнат. Значките "в скрийнъра" (SCR✓) и "отворена позиция"
 (OPEN✓) ги слага кодът всеки ден при показване.
 
-РЕАЛНО: 18-те COT екстремума и реалните стари AI cross отговори от брифа на 02.10.2026 (tests/fixtures), реалният скрийнър на същия ден
+РЕАЛНО: 18-те COT екстремума и реалните (пазар, тикър) двойки на cross тезите от брифа на 02.10.2026 (tests/fixtures; отговорът на модела в новия формат е СИНТЕТИЧЕН), реалният скрийнър на същия ден
 (Action ∪ Watchlist), реалните имена на тикърите от проверката през Yahoo (05.10.2026). СИНТЕТИЧНО: подменените _call_claude и
 _verified_company_name, "отворените позиции" (FCX от 22.09 и VLO от 12.08 — имената са взети от реалния случай RBOB/VLO от 15.09, но позициите
 в теста са зададени от теста), другият скрийнър/режим, механизмите с типове 7/8/10 (формата идва със следващата точка).
@@ -32,11 +32,10 @@ ai_brief._verified_company_name = lambda t: {"name": company.get(t, t), "verifie
                                               "category": (CHK.get(t) or {}).get("category"), "long_name": company.get(t), "sector": None, "industry": None}
 config.COT_BATCH_SIZE = 100
 prompts = []
+ANS = json.loads((FIX / "cot_model_answers_2026-10-02.json").read_text(encoding="utf-8"))["markets"]            # синтетичен отговор в новия формат
 def fake_claude(system, user, max_tokens=0):
     prompts.append(user)
-    rows = [{"market": c["market"], "assumed_move": "up" if c["direction"] == "extreme_short" else "down",
-             "cross_sector_thesis": c.get("cross_sector_thesis")} for c in BRIEF["cot"]]
-    return json.dumps({"theses": rows}, ensure_ascii=False)
+    return json.dumps({"theses": [{"market": m, "tickers": v} for m, v in ANS.items()]}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 
 

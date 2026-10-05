@@ -1,0 +1,173 @@
+{
+"_note": "МОДЕЛЪТ НЕ Е ПИТАН — това е СИНТЕТИЧЕН отговор в новия формат (механизми {type, quote}), сглобен от РЕАЛНИТЕ (пазар, тикър) двойки на cross тезите от 02.10.2026 (старият AI формат с effect): типовете на механизма са зададени от теста по икономиката, описана в старата реална проза; quote е написан без посока. Ползва се от test_cot_cross.py, test_cot_tables.py, test_cot_blind.py.",
+"markets": {
+"30-Year Treasury Bond": [
+{
+"ticker": "JPM",
+"company": "JP Morgan Chase & Co.",
+"mechanisms": [
+{
+"type": "rate_asset_yield",
+"quote": "нетният лихвен марж на банката зависи от доходностите по дългия край на кривата"
+}
+]
+}
+],
+"Copper": [
+{
+"ticker": "AMD",
+"company": "Advanced Micro Devices, Inc.",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "медта е суровина за опаковането на чипове и свързващите елементи"
+}
+]
+}
+],
+"RBOB Gasoline": [
+{
+"ticker": "UAL",
+"company": "United Airlines Holdings, Inc.",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "горивото е един от най-големите оперативни разходи на авиокомпанията"
+}
+]
+}
+],
+"Lean Hogs": [
+{
+"ticker": "TSN",
+"company": "Tyson Foods, Inc.",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "преработвателят купува живи прасета като основна суровина за свинския си сегмент"
+}
+]
+}
+],
+"Corn": [
+{
+"ticker": "TSN",
+"company": "Tyson Foods, Inc.",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "царевицата е основен компонент на фуража за птици и свине"
+}
+]
+},
+{
+"ticker": "PPC",
+"company": "Pilgrim's Pride Corporation",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "царевицата е основен компонент на фуража за птици"
+}
+]
+}
+],
+"5-Year Treasury Note": [
+{
+"ticker": "JPM",
+"company": "JP Morgan Chase & Co.",
+"mechanisms": [
+{
+"type": "rate_asset_yield",
+"quote": "нетният лихвен марж зависи от доходностите в средата на кривата"
+}
+]
+},
+{
+"ticker": "ALL",
+"company": "Allstate Corporation (The)",
+"mechanisms": [
+{
+"type": "rate_asset_yield",
+"quote": "инвестиционният портфейл на застрахователя се реинвестира по текущите доходности"
+}
+]
+},
+{
+"ticker": "AIZ",
+"company": "Assurant, Inc.",
+"mechanisms": [
+{
+"type": "rate_asset_yield",
+"quote": "инвестиционният портфейл на застрахователя се реинвестира по текущите доходности"
+}
+]
+}
+],
+"E-mini Russell 2000": [
+{
+"ticker": "IBKR",
+"company": "Interactive Brokers Group, Inc.",
+"mechanisms": [
+{
+"type": "index_beta",
+"quote": "приходите следват търговската активност на клиентите на пазара на акции"
+}
+]
+}
+],
+"Swiss Franc": [
+{
+"ticker": "ALL",
+"company": "Allstate Corporation (The)",
+"mechanisms": [
+{
+"type": "risk_off_hedge",
+"quote": "защитно позициониране на застраховател"
+}
+]
+},
+{
+"ticker": "AIZ",
+"company": "Assurant, Inc.",
+"mechanisms": [
+{
+"type": "risk_off_hedge",
+"quote": "защитно позициониране на застраховател"
+}
+]
+}
+],
+"2-Year Treasury Note": [
+{
+"ticker": "JPM",
+"company": "JP Morgan Chase & Co.",
+"mechanisms": [
+{
+"type": "rate_asset_yield",
+"quote": "нетният лихвен марж зависи от краткия край на кривата"
+}
+]
+}
+],
+"Wheat": [
+{
+"ticker": "ADM",
+"company": "Archer-Daniels-Midland Company",
+"mechanisms": [
+{
+"type": "input_cost",
+"quote": "преработва зърно — пшеницата е суровина за мелничния ѝ бизнес"
+}
+]
+}
+],
+"Soybeans": [],
+"Soybean Meal": [],
+"Mexican Peso": [],
+"Sugar No. 11": [],
+"Cocoa": [],
+"Coffee C": [],
+"Australian Dollar": [],
+"Cotton": []
+}
+}
