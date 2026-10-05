@@ -877,6 +877,10 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  {# пакет 2 (05.10): празна група има ред, а не липсва — иначе не личи дали е проверена #}
+  <div class="glb-group-label classic">Classic GLB (0)</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 12px">няма Classic кандидати днес</div>
   {% endif %}
   {% if glb_momentum %}
   <div class="glb-group-label momentum">Momentum GLB ({{ glb_momentum|length }})</div>
@@ -902,6 +906,9 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <div class="glb-group-label momentum">Momentum GLB (0)</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 12px">няма Momentum кандидати днес</div>
   {% endif %}
   {% if glb_insufficient %}
   <div class="glb-insufficient-note">
