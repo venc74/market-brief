@@ -1,0 +1,3067 @@
+{
+"_note": "РЕАЛЕН списък на CFTC контрактите (име, cftc_contract_market_code, последна дата, брой седмици от 2024-01-01) за TFF (gpe5-46if) и Disaggregated (72hh-3qpy), теглен от публичния Socrata API на 05.10.2026; последен отчет 2026-09-29. Ползва се от test_cot_whitelist.py.",
+"tff": [
+{
+"name": "10 YEAR ERIS SOFR SWAP - CHICAGO BOARD OF TRADE",
+"code": "343603",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "1K SHIB - COINBASE DERIVATIVES, LLC",
+"code": "172LM1",
+"last": "2025-11-10",
+"n": 9
+},
+{
+"name": "1K SHIB - LMX LABS LLC",
+"code": "172LM1",
+"last": "2025-01-28",
+"n": 12
+},
+{
+"name": "1K SHIB PERP - COINBASE DERIVATIVES, LLC",
+"code": "172LM2",
+"last": "2026-09-29",
+"n": 38
+},
+{
+"name": "2 YEAR ERIS SOFR SWAP - CHICAGO BOARD OF TRADE",
+"code": "342603",
+"last": "2026-09-29",
+"n": 117
+},
+{
+"name": "3 YEAR ERIS SOFR SWAP - CHICAGO BOARD OF TRADE",
+"code": "344606",
+"last": "2026-09-29",
+"n": 40
+},
+{
+"name": "5 YEAR ERIS SOFR SWAP - CHICAGO BOARD OF TRADE",
+"code": "344605",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "7 YEAR ERIS SOFR SWAP - CHICAGO BOARD OF TRADE",
+"code": "344607",
+"last": "2026-09-29",
+"n": 17
+},
+{
+"name": "AAVE PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM5",
+"last": "2026-09-15",
+"n": 4
+},
+{
+"name": "ADJUSTED INT RATE S&P 500 TOTL - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874W",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+"code": "232741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "AVALANCHE - COINBASE DERIVATIVES, LLC",
+"code": "171LM1",
+"last": "2026-09-29",
+"n": 44
+},
+{
+"name": "AVALANCHE - LMX LABS LLC",
+"code": "171LM1",
+"last": "2025-07-15",
+"n": 32
+},
+{
+"name": "AVALANCHE PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "171LM2",
+"last": "2026-09-29",
+"n": 41
+},
+{
+"name": "BBG COMMODITY - CHICAGO BOARD OF TRADE",
+"code": "221602",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+"code": "133741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "BITCOIN CASH PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "133LM5",
+"last": "2026-09-29",
+"n": 21
+},
+{
+"name": "BLOOMBERG HY CREDIT FUTURES - CHICAGO BOARD OF TRADE",
+"code": "221605",
+"last": "2026-09-15",
+"n": 24
+},
+{
+"name": "BLOOMBERG IG CREDIT FUTURES - CHICAGO BOARD OF TRADE",
+"code": "221606",
+"last": "2026-09-29",
+"n": 22
+},
+{
+"name": "BLOOMBERG IG DURATION-HEDGED  - CHICAGO BOARD OF TRADE",
+"code": "221607",
+"last": "2026-09-29",
+"n": 5
+},
+{
+"name": "BRAZILIAN REAL - CHICAGO MERCANTILE EXCHANGE",
+"code": "102741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "BRITISH POUND - CHICAGO MERCANTILE EXCHANGE",
+"code": "096742",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+"code": "090741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CARDONA - COINBASE DERIVATIVES, LLC",
+"code": "174LM1",
+"last": "2026-09-08",
+"n": 29
+},
+{
+"name": "CARDONA - LMX LABS LLC",
+"code": "174LM1",
+"last": "2025-07-15",
+"n": 8
+},
+{
+"name": "CARDONA PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "174LM2",
+"last": "2026-09-29",
+"n": 41
+},
+{
+"name": "CHAINLINK - COINBASE DERIVATIVES, LLC",
+"code": "170LM1",
+"last": "2025-12-16",
+"n": 22
+},
+{
+"name": "CHAINLINK - LMX LABS LLC",
+"code": "170LM1",
+"last": "2025-07-15",
+"n": 25
+},
+{
+"name": "CHAINLINK PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "170LM2",
+"last": "2026-09-29",
+"n": 40
+},
+{
+"name": "CRYPTO HYPE PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "183LM2",
+"last": "2026-09-29",
+"n": 16
+},
+{
+"name": "DJIA Consolidated - CHICAGO BOARD OF TRADE",
+"code": "12460+",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "DJIA x $5 - CHICAGO BOARD OF TRADE",
+"code": "124603",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "DOGECOIN - COINBASE DERIVATIVES, LLC",
+"code": "168DC1",
+"last": "2026-09-22",
+"n": 42
+},
+{
+"name": "DOGECOIN - LMX LABS LLC",
+"code": "168DC1",
+"last": "2025-07-15",
+"n": 28
+},
+{
+"name": "DOGECOIN PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "168LM2",
+"last": "2026-09-29",
+"n": 35
+},
+{
+"name": "DOW JONES U.S. REAL ESTATE IDX - CHICAGO BOARD OF TRADE",
+"code": "124606",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "E-MINI S&P 400 STOCK INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "33874A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "E-MINI S&P 500 - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "E-MINI S&P COMMUNICATION INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874P",
+"last": "2026-09-29",
+"n": 73
+},
+{
+"name": "E-MINI S&P CONSU STAPLES INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "138748",
+"last": "2026-09-29",
+"n": 137
+},
+{
+"name": "E-MINI S&P CONSUMER DISC INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "138747",
+"last": "2026-06-02",
+"n": 5
+},
+{
+"name": "E-MINI S&P ENERGY INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "138749",
+"last": "2026-09-29",
+"n": 143
+},
+{
+"name": "E-MINI S&P FINANCIAL INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874C",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "E-MINI S&P HEALTH CARE INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874E",
+"last": "2026-09-29",
+"n": 73
+},
+{
+"name": "E-MINI S&P INDUSTRIAL INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874F",
+"last": "2026-09-29",
+"n": 64
+},
+{
+"name": "E-MINI S&P MATERIALS INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874H",
+"last": "2026-03-17",
+"n": 50
+},
+{
+"name": "E-MINI S&P REAL ESTATE INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874R",
+"last": "2025-09-16",
+"n": 28
+},
+{
+"name": "E-MINI S&P TECHNOLOGY INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874I",
+"last": "2026-09-29",
+"n": 112
+},
+{
+"name": "E-MINI S&P UTILITIES INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874J",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "EMINI RUSSELL 1000 GROWTH - CHICAGO MERCANTILE EXCHANGE",
+"code": "239745",
+"last": "2025-03-18",
+"n": 2
+},
+{
+"name": "EMINI RUSSELL 1000 VALUE INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "239744",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "ETHENA PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM6",
+"last": "2026-09-22",
+"n": 4
+},
+{
+"name": "ETHER CASH SETTLED - CHICAGO MERCANTILE EXCHANGE",
+"code": "146021",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "EURO FX - CHICAGO MERCANTILE EXCHANGE",
+"code": "099741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "EURO FX/BRITISH POUND XRATE - CHICAGO MERCANTILE EXCHANGE",
+"code": "299741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "EURO FX/JAPANESE YEN XRATE - CHICAGO MERCANTILE EXCHANGE",
+"code": "399741",
+"last": "2026-09-22",
+"n": 67
+},
+{
+"name": "EURO SHORT TERM RATE - CHICAGO MERCANTILE EXCHANGE",
+"code": "047745",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "FED FUNDS - CHICAGO BOARD OF TRADE",
+"code": "045601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HEDERA - COINBASE DERIVATIVES, LLC",
+"code": "180LM1",
+"last": "2025-09-23",
+"n": 8
+},
+{
+"name": "HEDERA PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM4",
+"last": "2026-09-29",
+"n": 34
+},
+{
+"name": "JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE",
+"code": "097741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "LITECOIN CASH - COINBASE DERIVATIVES, LLC",
+"code": "167LM0",
+"last": "2026-01-27",
+"n": 20
+},
+{
+"name": "LITECOIN CASH - LMX LABS LLC",
+"code": "167LM0",
+"last": "2025-06-24",
+"n": 28
+},
+{
+"name": "LITECOIN PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "167LM1",
+"last": "2026-09-29",
+"n": 38
+},
+{
+"name": "MEXICAN PESO - CHICAGO MERCANTILE EXCHANGE",
+"code": "095741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICRO 10 YEAR YIELD - CHICAGO BOARD OF TRADE",
+"code": "04360Y",
+"last": "2026-09-29",
+"n": 109
+},
+{
+"name": "MICRO BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+"code": "133742",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICRO E-MINI DJIA (x$0.5) - CHICAGO BOARD OF TRADE",
+"code": "124608",
+"last": "2026-09-29",
+"n": 59
+},
+{
+"name": "MICRO E-MINI NASDAQ-100 INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "209747",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICRO E-MINI RUSSELL 2000 INDX - CHICAGO MERCANTILE EXCHANGE",
+"code": "239747",
+"last": "2026-09-29",
+"n": 126
+},
+{
+"name": "MICRO E-MINI S&P 500 INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874U",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICRO ETHER  - CHICAGO MERCANTILE EXCHANGE",
+"code": "146022",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICRO SOL - CHICAGO MERCANTILE EXCHANGE",
+"code": "177742",
+"last": "2026-09-22",
+"n": 36
+},
+{
+"name": "MICRO XRP - CHICAGO MERCANTILE EXCHANGE",
+"code": "176741",
+"last": "2025-12-23",
+"n": 4
+},
+{
+"name": "MINI MSCI ACWI NTR INDEX  - ICE FUTURES U.S.",
+"code": "24477M",
+"last": "2026-07-28",
+"n": 6
+},
+{
+"name": "MSCI EAFE  - ICE FUTURES U.S.",
+"code": "244041",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MSCI EM INDEX - ICE FUTURES U.S.",
+"code": "244042",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NANO BITCOIN PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "133LM4",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "NANO ETHER - COINBASE DERIVATIVES, LLC",
+"code": "146LM1",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "NANO ETHER - LMX LABS LLC",
+"code": "146LM1",
+"last": "2025-07-15",
+"n": 81
+},
+{
+"name": "NANO ETHER PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "146LM3",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "NANO SOLANA - COINBASE DERIVATIVES, LLC",
+"code": "177LM1",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "NANO SOLANA - LMX LABS LLC",
+"code": "177LM1",
+"last": "2025-07-15",
+"n": 21
+},
+{
+"name": "NANO SOLANA PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "177LM3",
+"last": "2026-09-29",
+"n": 59
+},
+{
+"name": "NANO STELLAR - COINBASE DERIVATIVES, LLC",
+"code": "173LM1",
+"last": "2025-08-19",
+"n": 2
+},
+{
+"name": "NANO STELLAR - LMX LABS LLC",
+"code": "173LM1",
+"last": "2025-07-15",
+"n": 2
+},
+{
+"name": "NANO XRP - COINBASE DERIVATIVES, LLC",
+"code": "176LM1",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "NANO XRP - LMX LABS LLC",
+"code": "176LM1",
+"last": "2025-07-15",
+"n": 12
+},
+{
+"name": "NANO XRP PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "176LM3",
+"last": "2026-09-29",
+"n": 59
+},
+{
+"name": "NASDAQ MINI - CHICAGO MERCANTILE EXCHANGE",
+"code": "209742",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE",
+"code": "20974+",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NEAR PROTOCAL PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM7",
+"last": "2026-09-29",
+"n": 19
+},
+{
+"name": "NIKKEI STOCK AVERAGE - CHICAGO MERCANTILE EXCHANGE",
+"code": "240741",
+"last": "2026-03-03",
+"n": 55
+},
+{
+"name": "NIKKEI STOCK AVERAGE YEN DENOM - CHICAGO MERCANTILE EXCHANGE",
+"code": "240743",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NZ DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+"code": "112741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "Nano Bitcoin  - COINBASE DERIVATIVES, LLC",
+"code": "133LM1",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "Nano Bitcoin  - LMX LABS LLC",
+"code": "133LM1",
+"last": "2025-07-15",
+"n": 81
+},
+{
+"name": "ONDO PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM8",
+"last": "2026-09-29",
+"n": 26
+},
+{
+"name": "PAX GOLD PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM9",
+"last": "2026-09-29",
+"n": 7
+},
+{
+"name": "POLKADOT - COINBASE DERIVATIVES, LLC",
+"code": "169LM1",
+"last": "2025-12-23",
+"n": 11
+},
+{
+"name": "POLKADOT - LMX LABS LLC",
+"code": "169LM1",
+"last": "2025-02-25",
+"n": 12
+},
+{
+"name": "POLKADOT PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "169LM2",
+"last": "2026-09-29",
+"n": 38
+},
+{
+"name": "RUSSELL 2000 ANNUAL DIVIDEND  - CHICAGO MERCANTILE EXCHANGE",
+"code": "239750",
+"last": "2026-09-29",
+"n": 62
+},
+{
+"name": "RUSSELL E-MINI - CHICAGO MERCANTILE EXCHANGE",
+"code": "239742",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "S&P 500 ANNUAL DIVIDEND INDEX - CHICAGO MERCANTILE EXCHANGE",
+"code": "43874A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE",
+"code": "13874+",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "S&P 500 QUARTERLY DIVIDEND IND - CHICAGO MERCANTILE EXCHANGE",
+"code": "43874Q",
+"last": "2026-09-29",
+"n": 133
+},
+{
+"name": "SO AFRICAN RAND - CHICAGO MERCANTILE EXCHANGE",
+"code": "122741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOFR-1M - CHICAGO MERCANTILE EXCHANGE",
+"code": "134742",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOFR-3M - CHICAGO MERCANTILE EXCHANGE",
+"code": "134741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOFR-3M - FMX FUTURES EXCHANGE",
+"code": "134FM1",
+"last": "2026-09-29",
+"n": 4
+},
+{
+"name": "SOL - CHICAGO MERCANTILE EXCHANGE",
+"code": "177741",
+"last": "2026-09-29",
+"n": 63
+},
+{
+"name": "STELLAR - LMX LABS LLC",
+"code": "173LM1",
+"last": "2025-02-11",
+"n": 8
+},
+{
+"name": "STELLAR PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "173LM2",
+"last": "2026-09-29",
+"n": 24
+},
+{
+"name": "SUI - COINBASE DERIVATIVES, LLC",
+"code": "180LM2",
+"last": "2026-09-29",
+"n": 2
+},
+{
+"name": "SUI PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LM3",
+"last": "2026-09-29",
+"n": 39
+},
+{
+"name": "SWISS FRANC - CHICAGO MERCANTILE EXCHANGE",
+"code": "092741",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ULTRA US T BOND - CHICAGO BOARD OF TRADE",
+"code": "020604",
+"last": "2025-09-16",
+"n": 2
+},
+{
+"name": "ULTRA UST 10Y - CHICAGO BOARD OF TRADE",
+"code": "043607",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ULTRA UST BOND - CHICAGO BOARD OF TRADE",
+"code": "020604",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "USD INDEX - ICE FUTURES U.S.",
+"code": "098662",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "USD/CHINESE RENMINBI-OFFSHORE  - CHICAGO MERCANTILE EXCHANGE",
+"code": "082744",
+"last": "2024-04-30",
+"n": 2
+},
+{
+"name": "UST 10Y NOTE - CHICAGO BOARD OF TRADE",
+"code": "043602",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "UST 2Y NOTE - CHICAGO BOARD OF TRADE",
+"code": "042601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "UST 5Y NOTE - CHICAGO BOARD OF TRADE",
+"code": "044601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "UST BOND - CHICAGO BOARD OF TRADE",
+"code": "020601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "VIX FUTURES - CBOE FUTURES EXCHANGE",
+"code": "1170E1",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "XRP - CHICAGO MERCANTILE EXCHANGE",
+"code": "176740",
+"last": "2026-09-29",
+"n": 60
+},
+{
+"name": "XRP - COINBASE DERIVATIVES, LLC",
+"code": "176LM2",
+"last": "2026-09-22",
+"n": 4
+},
+{
+"name": "ZCASH PERP STYLE - COINBASE DERIVATIVES, LLC",
+"code": "180LMB",
+"last": "2026-09-29",
+"n": 29
+}
+],
+"disaggregated": [
+{
+"name": "AECO FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023396",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "AEP DAYTON HUB DA PEAK DAILY - ICE FUTURES ENERGY DIV",
+"code": "06439E",
+"last": "2026-09-29",
+"n": 56
+},
+{
+"name": "ALGONQUIN CITYGATES BASIS - ICE FUTURES ENERGY DIV",
+"code": "02339E",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ALGONQUIN CITYGATES INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233AW",
+"last": "2026-09-01",
+"n": 56
+},
+{
+"name": "ALUMINIUM EURO PREM DUTY-PAID - COMMODITY EXCHANGE INC.",
+"code": "191696",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ALUMINUM - COMMODITY EXCHANGE INC.",
+"code": "191691",
+"last": "2026-06-09",
+"n": 93
+},
+{
+"name": "ALUMINUM MWP - COMMODITY EXCHANGE INC.",
+"code": "191693",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ARGUS CIF ARA Lg Finl Propane - ICE FUTURES ENERGY DIV",
+"code": "066411",
+"last": "2026-09-29",
+"n": 75
+},
+{
+"name": "ARGUS FAR EAST PROPANE - ICE FUTURES ENERGY DIV",
+"code": "066413",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ARGUS PROPANE FAR EAST INDEX - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665B",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ARGUS PROPANE SAUDI ARAMCO - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665A",
+"last": "2025-05-27",
+"n": 3
+},
+{
+"name": "BRENT LAST DAY - NEW YORK MERCANTILE EXCHANGE",
+"code": "06765T",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "BUTANE ARGUS SAUDI CP  - ICE FUTURES ENERGY DIV",
+"code": "06641M",
+"last": "2025-07-01",
+"n": 1
+},
+{
+"name": "BUTANE OPIS MT BELV NONTET FP  - ICE FUTURES ENERGY DIV",
+"code": "06641D",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "BUTANE,OPIS MT B, NONTET FIX - ICE FUTURES ENERGY DIV",
+"code": "066397",
+"last": "2026-09-29",
+"n": 12
+},
+{
+"name": "BUTTER (CASH SETTLED) - CHICAGO MERCANTILE EXCHANGE",
+"code": "050642",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CAISO NP-15 DA OFF-PK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643BR",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CAISO NP-15 PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BM",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CAISO SP-15 DA OFF-PK FIXED - ICE FUTURES ENERGY DIV",
+"code": "064396",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CAISO SP-15 PEAK 0900-1600 HE - ICE FUTURES ENERGY DIV",
+"code": "0643HS",
+"last": "2026-09-29",
+"n": 59
+},
+{
+"name": "CALIF CARBON ALL VINTAGE 2025 - ICE FUTURES ENERGY DIV",
+"code": "0063E5",
+"last": "2025-12-23",
+"n": 73
+},
+{
+"name": "CALIF CARBON ALL VINTAGE 2026 - ICE FUTURES ENERGY DIV",
+"code": "0063EE",
+"last": "2026-09-29",
+"n": 100
+},
+{
+"name": "CALIF CARBON ALL VINTAGE 2027 - ICE FUTURES ENERGY DIV",
+"code": "0063EI",
+"last": "2026-09-29",
+"n": 35
+},
+{
+"name": "CALIF CARBON ALLOWANCE V2024 - ICE FUTURES ENERGY DIV",
+"code": "0063E2",
+"last": "2024-12-24",
+"n": 52
+},
+{
+"name": "CALIF CARBON ALLOWANCE V2024 - NODAL EXCHANGE",
+"code": "006NGQ",
+"last": "2024-12-10",
+"n": 16
+},
+{
+"name": "CALIF CARBON ALLOWANCE V2025 - ICE FUTURES ENERGY DIV",
+"code": "0063E5",
+"last": "2024-07-30",
+"n": 28
+},
+{
+"name": "CALIF CARBON ALLOWANCE V2025 - NODAL EXCHANGE",
+"code": "006NGR",
+"last": "2025-12-09",
+"n": 52
+},
+{
+"name": "CALIF CARBON ALLOWANCE V2026 - NODAL EXCHANGE",
+"code": "0063EL",
+"last": "2026-09-29",
+"n": 35
+},
+{
+"name": "CALIF CARBON CURRENT AUCTION - ICE FUTURES ENERGY DIV",
+"code": "0063DB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CALIF CARBON VINTAGE SPEC 2028 - ICE FUTURES ENERGY DIV",
+"code": "006WBY",
+"last": "2025-12-23",
+"n": 8
+},
+{
+"name": "CALIF CARBON VINTAGE SPEC 2029 - ICE FUTURES ENERGY DIV",
+"code": "006WCA",
+"last": "2026-09-22",
+"n": 4
+},
+{
+"name": "CALIF LOW CARBON FSC-OPIS  - ICE FUTURES ENERGY DIV",
+"code": "0063CU",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CALIF LOW CARBON FUEL STANDARD - NODAL EXCHANGE",
+"code": "006NGF",
+"last": "2024-11-19",
+"n": 4
+},
+{
+"name": "CANOLA - ICE FUTURES U.S.",
+"code": "135731",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CBL GLOBAL EMISSIONS OFFSET  - NEW YORK MERCANTILE EXCHANGE",
+"code": "006NJZ",
+"last": "2024-12-17",
+"n": 48
+},
+{
+"name": "CBL NATURE GLOBAL EMISSIONS - NEW YORK MERCANTILE EXCHANGE",
+"code": "00665T",
+"last": "2024-12-24",
+"n": 52
+},
+{
+"name": "CG Mainline Basis - ICE FUTURES ENERGY DIV",
+"code": "02339Y",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CG-MAINLINE FINANCIAL INDEX - ICE FUTURES ENERGY DIV",
+"code": "02339P",
+"last": "2026-09-29",
+"n": 95
+},
+{
+"name": "CHEESE (CASH-SETTLED) - CHICAGO MERCANTILE EXCHANGE",
+"code": "063642",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CHICAGO BUSHELING FERROUS  - COMMODITY EXCHANGE INC.",
+"code": "257690",
+"last": "2025-12-09",
+"n": 1
+},
+{
+"name": "CHICAGO CITYGATE (INDEX) - ICE FUTURES ENERGY DIV",
+"code": "02339Q",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CHICAGO FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023397",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CIG ROCKIES BASIS - ICE FUTURES ENERGY DIV",
+"code": "02339U",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CIG ROCKIES FINANCIAL INDEX - ICE FUTURES ENERGY DIV",
+"code": "02339S",
+"last": "2026-09-29",
+"n": 108
+},
+{
+"name": "CME MILK IV - CHICAGO MERCANTILE EXCHANGE",
+"code": "052644",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "COBALT - COMMODITY EXCHANGE INC.",
+"code": "188691",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "COCOA - ICE FUTURES U.S.",
+"code": "073732",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "COFFEE C - ICE FUTURES U.S.",
+"code": "083731",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CONDENSATE DIF-TMX C5 1A INDEX - ICE FUTURES ENERGY DIV",
+"code": "06743A",
+"last": "2026-09-29",
+"n": 141
+},
+{
+"name": "CONWAY PROPANE (OPIS) - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665T",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "COPPER- #1 - COMMODITY EXCHANGE INC.",
+"code": "085692",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CORN - CHICAGO BOARD OF TRADE",
+"code": "002602",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "COTTON NO. 2 - ICE FUTURES U.S.",
+"code": "033661",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CRUDE DIFF-TMX SW 1A INDEX - ICE FUTURES ENERGY DIV",
+"code": "06742T",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CRUDE DIFF-TMX WCS 1A INDEX - ICE FUTURES ENERGY DIV",
+"code": "06742G",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CRUDE DIFF-WCS HOUSTON/WTI 1ST - ICE FUTURES ENERGY DIV",
+"code": "06739C",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CRUDE OIL, LIGHT SWEET-WTI - ICE FUTURES EUROPE",
+"code": "067411",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "CT RECs CLASS 1  - ICE FUTURES ENERGY DIV",
+"code": "0063DK",
+"last": "2026-09-29",
+"n": 86
+},
+{
+"name": "D4 BIODIESEL RINs OPIS CURR YR - ICE FUTURES ENERGY DIV",
+"code": "0063DG",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "D6 RINs OPIS CURRENT YEAR - ICE FUTURES ENERGY DIV",
+"code": "0063CW",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "DC SOLAR RECS V2026 - NODAL EXCHANGE",
+"code": "006NP1",
+"last": "2026-09-29",
+"n": 1
+},
+{
+"name": "DOMINION - SOUTH POINT (BASIS) - ICE FUTURES ENERGY DIV",
+"code": "0233A3",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "DOMINION - SOUTH POINT - ICE FUTURES ENERGY DIV",
+"code": "0233A2",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "DRY WHEY - CHICAGO MERCANTILE EXCHANGE",
+"code": "052645",
+"last": "2026-09-29",
+"n": 32
+},
+{
+"name": "E-MINI NATURAL GAS - NEW YORK MERCANTILE EXCHANGE",
+"code": "023655",
+"last": "2024-08-27",
+"n": 5
+},
+{
+"name": "EP SAN JUAN BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233A8",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT - NORTH MONTHLY OFF-PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643A8",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT HOUSTON 345KV RT PK FIX - ICE FUTURES ENERGY DIV",
+"code": "06439N",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT Houston 345KV Hub RT 7x8 - ICE FUTURES ENERGY DIV",
+"code": "0643IL",
+"last": "2026-09-29",
+"n": 96
+},
+{
+"name": "ERCOT Houston 345KV RT OFF FIX - ICE FUTURES ENERGY DIV",
+"code": "06439Q",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT N 345KV REAL T PK 2x16 - ICE FUTURES ENERGY DIV",
+"code": "0643ID",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT N 345KV REAL T PK DALY M - ICE FUTURES ENERGY DIV",
+"code": "0643IB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT N 345KV RT OFF-PEAK MINI - ICE FUTURES ENERGY DIV",
+"code": "064IBJ",
+"last": "2026-02-03",
+"n": 9
+},
+{
+"name": "ERCOT NORTH 345K RT OFFPK DLY  - ICE FUTURES ENERGY DIV",
+"code": "0643A7",
+"last": "2026-09-29",
+"n": 18
+},
+{
+"name": "ERCOT NORTH 345KV DA PK DLY FI - ICE FUTURES ENERGY DIV",
+"code": "0643A5",
+"last": "2026-09-29",
+"n": 100
+},
+{
+"name": "ERCOT NORTH 345KV RT PK FIX - ICE FUTURES ENERGY DIV",
+"code": "06439R",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT North 345KV Hub RT 10x17 - ICE FUTURES ENERGY DIV",
+"code": "064ED7",
+"last": "2026-09-08",
+"n": 9
+},
+{
+"name": "ERCOT North 345KV Hub RT 7x16 - ICE FUTURES ENERGY DIV",
+"code": "064IBM",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT North 345KV Hub RT 7x8 - ICE FUTURES ENERGY DIV",
+"code": "0643IK",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT SOUTH 345 KV RT PEAK FIX - ICE FUTURES ENERGY DIV",
+"code": "06439S",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT WEST 345K RT OFF-PEAK - ICE FUTURES ENERGY DIV",
+"code": "06439W",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT WEST 345KV RT PEAK - ICE FUTURES ENERGY DIV",
+"code": "06439V",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ERCOT-SOUTH MONTHLY OFFPEAK - ICE FUTURES ENERGY DIV",
+"code": "06439U",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "ERCOT.HB_HOUSTON_month_on_rtp - NODAL EXCHANGE",
+"code": "064FOI",
+"last": "2026-06-16",
+"n": 5
+},
+{
+"name": "ERCOT.HB_NORTH_month_2x16_rtp - NODAL EXCHANGE",
+"code": "064GBC",
+"last": "2026-09-29",
+"n": 2
+},
+{
+"name": "ERCOT.HB_NORTH_month_7x8_rtp - NODAL EXCHANGE",
+"code": "064GBD",
+"last": "2026-09-29",
+"n": 79
+},
+{
+"name": "ERCOT.HB_NORTH_month_off_rtp - NODAL EXCHANGE",
+"code": "064FOL",
+"last": "2026-09-29",
+"n": 143
+},
+{
+"name": "ERCOT.HB_NORTH_month_on_rtp - NODAL EXCHANGE",
+"code": "064FOK",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ETHANE, MT. BELV-ENTERPRISE - ICE FUTURES ENERGY DIV",
+"code": "066416",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ETHANOL - NEW YORK MERCANTILE EXCHANGE",
+"code": "025651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ETHANOL T2 FOB INCL DUTY - NEW YORK MERCANTILE EXCHANGE",
+"code": "025608",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "EUROPEAN PROPANE CIF ARA - NEW YORK MERCANTILE EXCHANGE",
+"code": "066652",
+"last": "2025-09-30",
+"n": 1
+},
+{
+"name": "FEEDER CATTLE - CHICAGO MERCANTILE EXCHANGE",
+"code": "061641",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "FLORIDA GAS-ZONE 3 BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233A9",
+"last": "2026-09-29",
+"n": 16
+},
+{
+"name": "FRZN CONCENTRATED ORANGE JUICE - ICE FUTURES U.S.",
+"code": "040701",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "FUEL OIL USGC HSFO PLATTS BALM - ICE FUTURES ENERGY DIV",
+"code": "021391",
+"last": "2025-04-29",
+"n": 10
+},
+{
+"name": "FUEL OIL-3% USGC/3.5% FOB RDAM - ICE FUTURES ENERGY DIV",
+"code": "02141C",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "GASOLINE CRK-RBOB/BRENT 1st - ICE FUTURES ENERGY DIV",
+"code": "111415",
+"last": "2026-08-25",
+"n": 64
+},
+{
+"name": "GASOLINE RBOB - NEW YORK MERCANTILE EXCHANGE",
+"code": "111659",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "GOLD - COMMODITY EXCHANGE INC.",
+"code": "088691",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "GOLD -1 TROY OUNCE  - COINBASE DERIVATIVES, LLC",
+"code": "088LM1",
+"last": "2026-09-08",
+"n": 6
+},
+{
+"name": "GRP 3 SOC GAS VS RBOB SPR - NEW YORK MERCANTILE EXCHANGE",
+"code": "111A08",
+"last": "2026-03-03",
+"n": 3
+},
+{
+"name": "GULF # 6 FUEL 3.0% SULFUR - NEW YORK MERCANTILE EXCHANGE",
+"code": "02165A",
+"last": "2026-04-28",
+"n": 57
+},
+{
+"name": "GULF # 6 FUEL OIL CRACK - NEW YORK MERCANTILE EXCHANGE",
+"code": "86565A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "GULF COAST CBOB GAS A2 PL RBOB - NEW YORK MERCANTILE EXCHANGE",
+"code": "111A34",
+"last": "2026-09-29",
+"n": 129
+},
+{
+"name": "GULF JET NY HEAT OIL SPR - NEW YORK MERCANTILE EXCHANGE",
+"code": "86465A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB - NEW YORK MERCANTILE EXCHANGE",
+"code": "03565B",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233AG",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233AH",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB LAST DAY FIN - NEW YORK MERCANTILE EXCHANGE",
+"code": "023A55",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB PENULTIMATE FIN - NEW YORK MERCANTILE EXCHANGE",
+"code": "023A56",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HENRY HUB PENULTIMATE NAT GAS - NEW YORK MERCANTILE EXCHANGE",
+"code": "03565C",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HOUSTON SHIP CHANNEL (INDEX) - ICE FUTURES ENERGY DIV",
+"code": "0233AM",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "HSC FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023398",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ISO NE MASS HUB DA OFF-PK FIXD - ICE FUTURES ENERGY DIV",
+"code": "0643BF",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ISO NE MASS HUB DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BG",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ISOBUTANE OPIS MT BELV NONTET - ICE FUTURES ENERGY DIV",
+"code": "066418",
+"last": "2026-09-29",
+"n": 45
+},
+{
+"name": "ISONE.H.INTERNAL_HB_mo_off_dap - NODAL EXCHANGE",
+"code": "064AAB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "ISONE.H.INTERNAL_HUB_mo_on_dap - NODAL EXCHANGE",
+"code": "064AAA",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "JET UP-DOWN BALMO - NEW YORK MERCANTILE EXCHANGE",
+"code": "86465K",
+"last": "2026-03-31",
+"n": 10
+},
+{
+"name": "LEAN HOGS - CHICAGO MERCANTILE EXCHANGE",
+"code": "054642",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "LITHIUM HYDROXIDE  - COMMODITY EXCHANGE INC.",
+"code": "189691",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "LIVE CATTLE - CHICAGO MERCANTILE EXCHANGE",
+"code": "057642",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "LUMBER - CHICAGO MERCANTILE EXCHANGE",
+"code": "058644",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MALIN (BASIS) - ICE FUTURES ENERGY DIV",
+"code": "0233BH",
+"last": "2026-09-29",
+"n": 95
+},
+{
+"name": "MARINE .5% FOB USGC/BRENT 1st - ICE FUTURES ENERGY DIV",
+"code": "865392",
+"last": "2026-07-28",
+"n": 104
+},
+{
+"name": "MARINE FUEL OIL 0.5% FOB USGC - ICE FUTURES ENERGY DIV",
+"code": "021397",
+"last": "2026-05-26",
+"n": 54
+},
+{
+"name": "MARYLAND COMPLIANCE REC TIER1 - ICE FUTURES ENERGY DIV",
+"code": "0063DM",
+"last": "2026-09-29",
+"n": 132
+},
+{
+"name": "MARYLAND SOLAR REC - ICE FUTURES ENERGY DIV",
+"code": "0063DN",
+"last": "2026-09-29",
+"n": 76
+},
+{
+"name": "MASS COMPLIANCE RECs CLASS 1  - ICE FUTURES ENERGY DIV",
+"code": "0063DL",
+"last": "2026-09-29",
+"n": 143
+},
+{
+"name": "MICHCON BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233AQ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MICHCON FINANCIAL INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233AN",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "MICRO COPPER - COMMODITY EXCHANGE INC.",
+"code": "085699",
+"last": "2026-05-12",
+"n": 3
+},
+{
+"name": "MICRO GOLD - COMMODITY EXCHANGE INC.",
+"code": "088695",
+"last": "2026-09-29",
+"n": 131
+},
+{
+"name": "MICRO SILVER - COMMODITY EXCHANGE INC.",
+"code": "084694",
+"last": "2026-05-26",
+"n": 5
+},
+{
+"name": "MID-C DAY-AHEAD OFF-PEAK - ICE FUTURES ENERGY DIV",
+"code": "064392",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MID-C DAY-AHEAD PEAK - ICE FUTURES ENERGY DIV",
+"code": "064391",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MILK, Class III - CHICAGO MERCANTILE EXCHANGE",
+"code": "052641",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MINI SOYBEANS - CHICAGO BOARD OF TRADE",
+"code": "005603",
+"last": "2026-09-29",
+"n": 25
+},
+{
+"name": "MISO ARKANSAS DA PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643F9",
+"last": "2026-09-29",
+"n": 42
+},
+{
+"name": "MISO IN. DAY-AHEAD PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643AZ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MISO IN. REAL-TIME OFF-PEAK - ICE FUTURES ENERGY DIV",
+"code": "06439L",
+"last": "2026-09-29",
+"n": 143
+},
+{
+"name": "MISO INDIANA  OFF-PEAK - ICE FUTURES ENERGY DIV",
+"code": "06439K",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MISO INDIANA HUB RT PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643B3",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MISO.AMIL.BGS6_month_off_dap - NODAL EXCHANGE",
+"code": "064ATX",
+"last": "2024-06-11",
+"n": 7
+},
+{
+"name": "MISO.AMIL.BGS6_month_on_dap - NODAL EXCHANGE",
+"code": "064ATW",
+"last": "2024-12-31",
+"n": 27
+},
+{
+"name": "MISO.INDIANA.HUB_month_off_dap - NODAL EXCHANGE",
+"code": "064BFJ",
+"last": "2026-09-29",
+"n": 138
+},
+{
+"name": "MISO.INDIANA.HUB_month_off_rtp - NODAL EXCHANGE",
+"code": "064FJZ",
+"last": "2026-09-29",
+"n": 110
+},
+{
+"name": "MISO.INDIANA.HUB_month_on_dap - NODAL EXCHANGE",
+"code": "064BFI",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MISO.INDIANA.HUB_month_on_rtp - NODAL EXCHANGE",
+"code": "064FJY",
+"last": "2026-09-29",
+"n": 58
+},
+{
+"name": "MONT BELVIEU ETHYLENE FIN - NEW YORK MERCANTILE EXCHANGE",
+"code": "405652",
+"last": "2026-06-30",
+"n": 17
+},
+{
+"name": "MT BELV NAT GASOLINE OPIS - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665R",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MT BELV NORM BUTANE OPIS - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665Q",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MT BELVIEU ETHANE OPIS - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665P",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "MT BELVIEU LDH PROPANE BALMO  - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665W",
+"last": "2025-05-27",
+"n": 32
+},
+{
+"name": "MT BELVIEU NORMAL BUTANE BALMO - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665Z",
+"last": "2024-01-30",
+"n": 2
+},
+{
+"name": "MiniARGUS PROPANE FAR EAST INX - NEW YORK MERCANTILE EXCHANGE",
+"code": "066A21",
+"last": "2025-01-28",
+"n": 25
+},
+{
+"name": "NAT GAS ICE LD1 - ICE FUTURES ENERGY DIV",
+"code": "023391",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NAT GAS ICE PEN - ICE FUTURES ENERGY DIV",
+"code": "023392",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NAT GAS LD1 for GDD -TEXOK - ICE FUTURES ENERGY DIV",
+"code": "0233AT",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NAT GAS NYME - NEW YORK MERCANTILE EXCHANGE",
+"code": "023651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NAT GAS TETCO-WLA INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233EP",
+"last": "2026-09-29",
+"n": 15
+},
+{
+"name": "NAT GASLNE OPIS MT B NONTET FP - ICE FUTURES ENERGY DIV",
+"code": "06641A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NATURAL GAS INDEX: EP SAN JUAN - ICE FUTURES ENERGY DIV",
+"code": "0233AX",
+"last": "2026-09-29",
+"n": 9
+},
+{
+"name": "NEPOOL DUAL RECs CLASS 1  - ICE FUTURES ENERGY DIV",
+"code": "0063DQ",
+"last": "2026-09-29",
+"n": 111
+},
+{
+"name": "NEW JERSEY RECs CLASS 2 V2025 - NODAL EXCHANGE",
+"code": "006NKV",
+"last": "2025-07-22",
+"n": 70
+},
+{
+"name": "NEW JERSEY RECs CLASS 2 V2026 - NODAL EXCHANGE",
+"code": "006NLD",
+"last": "2026-07-28",
+"n": 77
+},
+{
+"name": "NEW JERSEY RECs CLASS 2 V2027 - NODAL EXCHANGE",
+"code": "006NMM",
+"last": "2026-09-29",
+"n": 43
+},
+{
+"name": "NEW JERSEY RECs CLASS 2 V2028 - NODAL EXCHANGE",
+"code": "006NMW",
+"last": "2026-09-29",
+"n": 8
+},
+{
+"name": "NGPL MIDCONT BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233AY",
+"last": "2026-09-29",
+"n": 97
+},
+{
+"name": "NGPL TXOK BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233B1",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NJ COMPLIANCE RECs CLASS 1 - ICE FUTURES ENERGY DIV",
+"code": "0063DR",
+"last": "2026-09-29",
+"n": 15
+},
+{
+"name": "NJ SRECS - ICE FUTURES ENERGY DIV",
+"code": "0063CC",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NNG VENTURA BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233BB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NNG VENTURA FINANCIAL INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233B7",
+"last": "2026-01-27",
+"n": 5
+},
+{
+"name": "NON FAT DRY MILK - CHICAGO MERCANTILE EXCHANGE",
+"code": "052642",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NORTH EURO HOT-ROLL COIL STEEL - COMMODITY EXCHANGE INC.",
+"code": "192691",
+"last": "2026-09-29",
+"n": 120
+},
+{
+"name": "NWP ROCKIES FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023395",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NWP Rockies Index - ICE FUTURES ENERGY DIV",
+"code": "0233BD",
+"last": "2026-09-29",
+"n": 112
+},
+{
+"name": "NWP SUMAS BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233BC",
+"last": "2026-09-01",
+"n": 54
+},
+{
+"name": "NY HARBOR ULSD - NEW YORK MERCANTILE EXCHANGE",
+"code": "022651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO ZONE A DA OFF-PK FIX PR - ICE FUTURES ENERGY DIV",
+"code": "0643BZ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO ZONE A DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BY",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO ZONE G DA OFF-PK - ICE FUTURES ENERGY DIV",
+"code": "0643C4",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO ZONE G DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643C3",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO ZONE J DA OFF-PK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643BX",
+"last": "2026-09-29",
+"n": 100
+},
+{
+"name": "NYISO ZONE J DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BW",
+"last": "2026-09-29",
+"n": 117
+},
+{
+"name": "NYISO.CENTRL_month_off_dap - NODAL EXCHANGE",
+"code": "064CTR",
+"last": "2026-09-29",
+"n": 37
+},
+{
+"name": "NYISO.CENTRL_month_on_dap - NODAL EXCHANGE",
+"code": "064CTQ",
+"last": "2026-09-29",
+"n": 86
+},
+{
+"name": "NYISO.HUD VL_month_off_dap - NODAL EXCHANGE",
+"code": "064CXP",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO.HUD VL_month_on_dap - NODAL EXCHANGE",
+"code": "064CXO",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO.N.Y.C._month_off_dap - NODAL EXCHANGE",
+"code": "064CZT",
+"last": "2026-09-29",
+"n": 135
+},
+{
+"name": "NYISO.N.Y.C._month_on_dap - NODAL EXCHANGE",
+"code": "064CZS",
+"last": "2026-09-29",
+"n": 136
+},
+{
+"name": "NYISO.WEST_month_off_dap - NODAL EXCHANGE",
+"code": "064DEV",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "NYISO.WEST_month_on_dap - NODAL EXCHANGE",
+"code": "064DEU",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "OATS - CHICAGO BOARD OF TRADE",
+"code": "004603",
+"last": "2026-09-01",
+"n": 50
+},
+{
+"name": "ONEOK GAS TRANSPORTATION BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233BF",
+"last": "2026-09-29",
+"n": 34
+},
+{
+"name": "PA COMPLIANCE AECs TIER1 - ICE FUTURES ENERGY DIV",
+"code": "0063DT",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PA SOLAR ALTER ENERGY CREDIT - ICE FUTURES ENERGY DIV",
+"code": "0063DA",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PALLADIUM - NEW YORK MERCANTILE EXCHANGE",
+"code": "075651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PALO VERDE DA OFF-PK FiXED PR - ICE FUTURES ENERGY DIV",
+"code": "0643CC",
+"last": "2026-09-29",
+"n": 141
+},
+{
+"name": "PALO VERDE DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643CB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PANHANDLE BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233BL",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2024 - NODAL EXCHANGE",
+"code": "006NH1",
+"last": "2024-07-23",
+"n": 19
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2025 - NODAL EXCHANGE",
+"code": "006NH2",
+"last": "2025-07-22",
+"n": 62
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2026 - NODAL EXCHANGE",
+"code": "006NLV",
+"last": "2026-07-28",
+"n": 98
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2027 - NODAL EXCHANGE",
+"code": "006NMT",
+"last": "2026-09-29",
+"n": 77
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2028 - NODAL EXCHANGE",
+"code": "006NMX",
+"last": "2026-09-29",
+"n": 47
+},
+{
+"name": "PENNSYLVANIA AEC TIER 2-V2029 - NODAL EXCHANGE",
+"code": "006NNO",
+"last": "2026-09-29",
+"n": 3
+},
+{
+"name": "PG&E - CITYGATE (INDEX) - ICE FUTURES ENERGY DIV",
+"code": "0233BQ",
+"last": "2026-09-29",
+"n": 72
+},
+{
+"name": "PG&E CITYGATE FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023394",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PGP PROPYLENE (PCW) CAL - NEW YORK MERCANTILE EXCHANGE",
+"code": "406651",
+"last": "2026-09-29",
+"n": 88
+},
+{
+"name": "PJM AEP DAYTON DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "06439F",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM AEP DAYTON HUB DA OFF-PK  - ICE FUTURES ENERGY DIV",
+"code": "06439C",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM AEP DAYTON RT OFF-PK FIXED - ICE FUTURES ENERGY DIV",
+"code": "06439A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM AEP DAYTON RT PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "06439B",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM BGE ZONE DA OFFPEAK FIXED  - ICE FUTURES ENERGY DIV",
+"code": "0643CJ",
+"last": "2024-01-02",
+"n": 1
+},
+{
+"name": "PJM BGE ZONE DA, PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643CK",
+"last": "2024-01-02",
+"n": 1
+},
+{
+"name": "PJM DOM ZONE DAY AHEAD OFFPEAK - ICE FUTURES ENERGY DIV",
+"code": "064IBA",
+"last": "2025-12-30",
+"n": 24
+},
+{
+"name": "PJM DOM ZONE DAY AHEAD PEAK - ICE FUTURES ENERGY DIV",
+"code": "064IAZ",
+"last": "2025-12-30",
+"n": 59
+},
+{
+"name": "PJM N. IL HUB DA OFF-PK  - ICE FUTURES ENERGY DIV",
+"code": "0643BC",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM N. IL HUB DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BE",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM N. IL HUB RT PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643BT",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM NI HUB DA PEAK DAILY FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643BD",
+"last": "2025-06-24",
+"n": 1
+},
+{
+"name": "PJM NI HUB RT OFF-PK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643BS",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM PECO DA OFFPK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643D1",
+"last": "2025-11-04",
+"n": 41
+},
+{
+"name": "PJM PECO ZONE DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643CZ",
+"last": "2025-11-04",
+"n": 42
+},
+{
+"name": "PJM PPL ZONE DA OFF-PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643D7",
+"last": "2026-06-02",
+"n": 97
+},
+{
+"name": "PJM PPL ZONE DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643D8",
+"last": "2026-06-02",
+"n": 94
+},
+{
+"name": "PJM PSEG DA OFF-PK FIXED PRICE - ICE FUTURES ENERGY DIV",
+"code": "0643DM",
+"last": "2026-03-03",
+"n": 76
+},
+{
+"name": "PJM PSEG DAP - NODAL EXCHANGE",
+"code": "064EXE",
+"last": "2026-09-29",
+"n": 25
+},
+{
+"name": "PJM PSEG DAY-AHEAD PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643DL",
+"last": "2026-03-03",
+"n": 89
+},
+{
+"name": "PJM TRI-RECs CLASS 1  - ICE FUTURES ENERGY DIV",
+"code": "0063CH",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM TRI-RECs CLASS 1 PRIOR YR - ICE FUTURES ENERGY DIV",
+"code": "0063DU",
+"last": "2024-07-23",
+"n": 2
+},
+{
+"name": "PJM WEST HUB REAL TIME PK MINI - ICE FUTURES ENERGY DIV",
+"code": "0643IA",
+"last": "2026-09-22",
+"n": 44
+},
+{
+"name": "PJM WESTERN HUB DA OFF-PK - ICE FUTURES ENERGY DIV",
+"code": "0643DB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM WESTERN HUB DA PEAK - ICE FUTURES ENERGY DIV",
+"code": "0643DC",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM WESTERN HUB RT OFF - ICE FUTURES ENERGY DIV",
+"code": "064394",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM WESTERN HUB RT PEAK MINI - ICE FUTURES ENERGY DIV",
+"code": "0643DF",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.AEP-DAYTON HUB_mo_off_dap - NODAL EXCHANGE",
+"code": "064DLX",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.AEP-DAYTON HUB_mo_off_rtp - NODAL EXCHANGE",
+"code": "064FKB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.AEP-DAYTON HUB_mo_on_dap - NODAL EXCHANGE",
+"code": "064DLW",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.AEP-DAYTON HUB_mo_on_rtp - NODAL EXCHANGE",
+"code": "064FKA",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.AEP_month_off_dap - NODAL EXCHANGE",
+"code": "064DLR",
+"last": "2026-09-29",
+"n": 86
+},
+{
+"name": "PJM.AEP_month_on_dap - NODAL EXCHANGE",
+"code": "064DLQ",
+"last": "2026-09-29",
+"n": 98
+},
+{
+"name": "PJM.APS_month_off_dap - NODAL EXCHANGE",
+"code": "064DMZ",
+"last": "2026-09-29",
+"n": 60
+},
+{
+"name": "PJM.APS_month_on_dap - NODAL EXCHANGE",
+"code": "064DMY",
+"last": "2026-09-29",
+"n": 46
+},
+{
+"name": "PJM.ATSI_month_off_dap - NODAL EXCHANGE",
+"code": "064FZB",
+"last": "2026-09-29",
+"n": 19
+},
+{
+"name": "PJM.ATSI_month_on_dap - NODAL EXCHANGE",
+"code": "064FZA",
+"last": "2026-09-29",
+"n": 20
+},
+{
+"name": "PJM.BGE_month_off_dap - NODAL EXCHANGE",
+"code": "064DPR",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.BGE_month_on_dap - NODAL EXCHANGE",
+"code": "064DPQ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.COMED_month_off_dap - NODAL EXCHANGE",
+"code": "064DVP",
+"last": "2024-05-28",
+"n": 21
+},
+{
+"name": "PJM.COMED_month_on_dap - NODAL EXCHANGE",
+"code": "064DVO",
+"last": "2024-05-28",
+"n": 21
+},
+{
+"name": "PJM.DEOK_month_on_dap - NODAL EXCHANGE",
+"code": "064GAA",
+"last": "2024-05-28",
+"n": 11
+},
+{
+"name": "PJM.DOM_month_off_dap - NODAL EXCHANGE",
+"code": "064DZT",
+"last": "2026-09-29",
+"n": 133
+},
+{
+"name": "PJM.DOM_month_on_dap - NODAL EXCHANGE",
+"code": "064DZS",
+"last": "2026-09-29",
+"n": 122
+},
+{
+"name": "PJM.FE OHIO_month_on_dap - NODAL EXCHANGE",
+"code": "064FWW",
+"last": "2025-05-27",
+"n": 3
+},
+{
+"name": "PJM.JCPL_month_off_dap - NODAL EXCHANGE",
+"code": "064EJJ",
+"last": "2026-09-29",
+"n": 140
+},
+{
+"name": "PJM.JCPL_month_on_dap - NODAL EXCHANGE",
+"code": "064EJI",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.METED_month_off_dap - NODAL EXCHANGE",
+"code": "064EOX",
+"last": "2026-09-29",
+"n": 109
+},
+{
+"name": "PJM.METED_month_on_dap - NODAL EXCHANGE",
+"code": "064EOW",
+"last": "2026-09-29",
+"n": 129
+},
+{
+"name": "PJM.N ILLINOIS HUB_mo_off_dap - NODAL EXCHANGE",
+"code": "064ERN",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.N ILLINOIS HUB_mo_off_rtp - NODAL EXCHANGE",
+"code": "064FKD",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.N ILLINOIS HUB_mo_on_dap - NODAL EXCHANGE",
+"code": "064ERM",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.N ILLINOIS HUB_mo_on_rtp - NODAL EXCHANGE",
+"code": "064FKC",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PECO_month_off_dap - NODAL EXCHANGE",
+"code": "064EUZ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PECO_month_on_dap - NODAL EXCHANGE",
+"code": "064EUY",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PENELEC_month_off_dap - NODAL EXCHANGE",
+"code": "064EVB",
+"last": "2026-09-01",
+"n": 110
+},
+{
+"name": "PJM.PENELEC_month_on_dap - NODAL EXCHANGE",
+"code": "064EVA",
+"last": "2026-09-29",
+"n": 113
+},
+{
+"name": "PJM.PEPCO_month_off_dap - NODAL EXCHANGE",
+"code": "064EVH",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PEPCO_month_on_dap - NODAL EXCHANGE",
+"code": "064EVG",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PPL_month_off_dap - NODAL EXCHANGE",
+"code": "064EWV",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PPL_month_on_dap - NODAL EXCHANGE",
+"code": "064EWU",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PSEG_month_off_dap - NODAL EXCHANGE",
+"code": "064EXF",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.PSEG_month_on_dap - NODAL EXCHANGE",
+"code": "064EXE",
+"last": "2026-04-07",
+"n": 119
+},
+{
+"name": "PJM.WESTERN HUB DAP - NODAL EXCHANGE",
+"code": "064FHK",
+"last": "2026-09-29",
+"n": 25
+},
+{
+"name": "PJM.WESTERN HUB_month_2x16_dap - NODAL EXCHANGE",
+"code": "064GBY",
+"last": "2025-05-27",
+"n": 1
+},
+{
+"name": "PJM.WESTERN HUB_month_off_dap - NODAL EXCHANGE",
+"code": "064FHL",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.WESTERN HUB_month_off_rtp - NODAL EXCHANGE",
+"code": "064FKF",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PJM.WESTERN HUB_month_on_dap - NODAL EXCHANGE",
+"code": "064FHK",
+"last": "2026-04-07",
+"n": 119
+},
+{
+"name": "PJM.WESTERN HUB_month_on_rtp - NODAL EXCHANGE",
+"code": "064FKE",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PLATINUM - NEW YORK MERCANTILE EXCHANGE",
+"code": "076651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665O",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE ARGUS CIF ARA MINI - ICE FUTURES ENERGY DIV",
+"code": "066391",
+"last": "2026-09-29",
+"n": 90
+},
+{
+"name": "PROPANE ARGUS FAR EAST MINI - ICE FUTURES ENERGY DIV",
+"code": "066393",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE ARGUS SAUDI CP FP - ICE FUTURES ENERGY DIV",
+"code": "06641H",
+"last": "2026-09-29",
+"n": 143
+},
+{
+"name": "PROPANE ARGUS SAUDI CP MINI - ICE FUTURES ENERGY DIV",
+"code": "06639H",
+"last": "2026-09-29",
+"n": 47
+},
+{
+"name": "PROPANE NON-LDH MT BEL - NEW YORK MERCANTILE EXCHANGE",
+"code": "06665G",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE OPIS CONWAY INWELL FP - ICE FUTURES ENERGY DIV",
+"code": "06641E",
+"last": "2026-09-29",
+"n": 137
+},
+{
+"name": "PROPANE OPIS MT BELV NONTET FP - ICE FUTURES ENERGY DIV",
+"code": "06641F",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE OPIS MT BELVIEU TET FP - ICE FUTURES ENERGY DIV",
+"code": "06641G",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "PROPANE,OPIS MT B TET/AFEI - ICE FUTURES ENERGY DIV",
+"code": "06639W",
+"last": "2026-09-29",
+"n": 19
+},
+{
+"name": "PROPANE,OPIS MT B, NONTET BALM - ICE FUTURES ENERGY DIV",
+"code": "06639E",
+"last": "2026-06-30",
+"n": 2
+},
+{
+"name": "PROPANE,OPIS MT BELV TET BALMO - ICE FUTURES ENERGY DIV",
+"code": "06639Z",
+"last": "2026-09-29",
+"n": 64
+},
+{
+"name": "RBOB CALENDAR - NEW YORK MERCANTILE EXCHANGE",
+"code": "11165K",
+"last": "2025-09-30",
+"n": 18
+},
+{
+"name": "RBOB GASOLINE 1ST LINE - ICE FUTURES ENERGY DIV",
+"code": "111416",
+"last": "2026-06-23",
+"n": 8
+},
+{
+"name": "REX ZONE 3 BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233EB",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "REX ZONE 3 INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233ED",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "RGGI AUCTION CLEARING PRICE - ICE FUTURES ENERGY DIV",
+"code": "0063DD",
+"last": "2026-09-08",
+"n": 2
+},
+{
+"name": "RGGI V2024 - ICE FUTURES ENERGY DIV",
+"code": "0063EB",
+"last": "2025-01-21",
+"n": 55
+},
+{
+"name": "RGGI V2025 - ICE FUTURES ENERGY DIV",
+"code": "0063EG",
+"last": "2026-01-27",
+"n": 71
+},
+{
+"name": "RGGI V2025 - NODAL EXCHANGE",
+"code": "006NGL",
+"last": "2025-12-02",
+"n": 26
+},
+{
+"name": "RGGI V2026 - ICE FUTURES ENERGY DIV",
+"code": "0063EM",
+"last": "2026-09-29",
+"n": 54
+},
+{
+"name": "RGGI V2027 - ICE FUTURES ENERGY DIV",
+"code": "0063F6",
+"last": "2026-09-29",
+"n": 23
+},
+{
+"name": "ROUGH RICE - CHICAGO BOARD OF TRADE",
+"code": "039601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "S PATH 15 EZ GEN HUB DA DLY OP - ICE FUTURES ENERGY DIV",
+"code": "0643DN",
+"last": "2026-09-01",
+"n": 2
+},
+{
+"name": "SILVER - COMMODITY EXCHANGE INC.",
+"code": "084691",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOCAL (INDEX) - ICE FUTURES ENERGY DIV",
+"code": "0233BW",
+"last": "2026-09-29",
+"n": 90
+},
+{
+"name": "SOCAL BORDER FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023393",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOCAL CITYGATE FINANCIAL BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233BY",
+"last": "2026-09-01",
+"n": 103
+},
+{
+"name": "SOCAL CITYGATE FINANCIAL INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233BZ",
+"last": "2024-10-01",
+"n": 6
+},
+{
+"name": "SONAT - TIER 1 POOL (ZONE 0) - ICE FUTURES ENERGY DIV",
+"code": "0233C1",
+"last": "2026-09-29",
+"n": 141
+},
+{
+"name": "SOYBEAN MEAL - CHICAGO BOARD OF TRADE",
+"code": "026603",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOYBEAN OIL - CHICAGO BOARD OF TRADE",
+"code": "007601",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SOYBEANS - CHICAGO BOARD OF TRADE",
+"code": "005602",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SP15 FIN DA PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "064395",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SPP SOUTH HUB DA PEAK FIXED - ICE FUTURES ENERGY DIV",
+"code": "0643F4",
+"last": "2025-06-24",
+"n": 1
+},
+{
+"name": "STEEL SCRAP - COMMODITY EXCHANGE INC.",
+"code": "257652",
+"last": "2024-04-09",
+"n": 4
+},
+{
+"name": "STEEL-HRC - COMMODITY EXCHANGE INC.",
+"code": "192651",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "SUGAR NO. 11 - ICE FUTURES U.S.",
+"code": "080732",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TCO Basis  - ICE FUTURES ENERGY DIV",
+"code": "02339W",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TENNESSEE 500L BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233C9",
+"last": "2026-08-04",
+"n": 6
+},
+{
+"name": "TETCO ELA BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233CF",
+"last": "2026-09-01",
+"n": 3
+},
+{
+"name": "TETCO M2 Basis (Receipts) - ICE FUTURES ENERGY DIV",
+"code": "0233DR",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TETCO M2 Index (Receipts) - ICE FUTURES ENERGY DIV",
+"code": "0233DW",
+"last": "2026-09-29",
+"n": 123
+},
+{
+"name": "TETCO M3 BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233CH",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TETCO M3 INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233CG",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TETCO WLA BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233CC",
+"last": "2026-09-29",
+"n": 64
+},
+{
+"name": "TGT ZONE 1 BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233CM",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TGT ZONE 1 INDEX DIFF - ICE FUTURES ENERGY DIV",
+"code": "0233DC",
+"last": "2026-09-29",
+"n": 11
+},
+{
+"name": "TRANSCO LEIDY BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233DT",
+"last": "2026-09-29",
+"n": 135
+},
+{
+"name": "TRANSCO LEIDY INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233E5",
+"last": "2026-03-31",
+"n": 15
+},
+{
+"name": "TRANSCO STATION 85-ZONE 4 BASI - ICE FUTURES ENERGY DIV",
+"code": "0233CW",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TRANSCO STN 85 MONTHLY INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233CS",
+"last": "2026-09-29",
+"n": 135
+},
+{
+"name": "TRANSCO ZONE 5 SOUTH INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233FK",
+"last": "2025-07-01",
+"n": 32
+},
+{
+"name": "TRANSCO ZONE 6 (NY) (BASIS) - ICE FUTURES ENERGY DIV",
+"code": "0233CZ",
+"last": "2024-10-01",
+"n": 1
+},
+{
+"name": "TRANSCO ZONE 6 BASIS - ICE FUTURES ENERGY DIV",
+"code": "0233CU",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TRANSCO ZONE 6 MONTHLY INDEX - ICE FUTURES ENERGY DIV",
+"code": "0233CV",
+"last": "2026-09-29",
+"n": 142
+},
+{
+"name": "TX GREEN-E REC V23 BACK HALF - NODAL EXCHANGE",
+"code": "006NG2",
+"last": "2024-03-19",
+"n": 12
+},
+{
+"name": "TX GREEN-E REC V24 BACK HALF - NODAL EXCHANGE",
+"code": "006NG3",
+"last": "2025-03-25",
+"n": 65
+},
+{
+"name": "TX GREEN-E REC V24 FRONT HALF - NODAL EXCHANGE",
+"code": "006NFH",
+"last": "2024-09-24",
+"n": 39
+},
+{
+"name": "TX GREEN-E REC V25 BACK HALF - NODAL EXCHANGE",
+"code": "006NG4",
+"last": "2026-03-24",
+"n": 117
+},
+{
+"name": "TX GREEN-E REC V25 FRONT HALF - NODAL EXCHANGE",
+"code": "006NFJ",
+"last": "2025-09-23",
+"n": 91
+},
+{
+"name": "TX REC CRS V26 BACK HALF - NODAL EXCHANGE",
+"code": "006NHT",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TX REC CRS V26 FRONT HALF - NODAL EXCHANGE",
+"code": "006NHY",
+"last": "2026-09-22",
+"n": 143
+},
+{
+"name": "TX REC CRS V27 BACK HALF - NODAL EXCHANGE",
+"code": "006NHU",
+"last": "2026-09-29",
+"n": 141
+},
+{
+"name": "TX REC CRS V27 FRONT HALF - NODAL EXCHANGE",
+"code": "006NHZ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "TX REC CRS V28 BACK HALF - NODAL EXCHANGE",
+"code": "006NHV",
+"last": "2026-09-29",
+"n": 108
+},
+{
+"name": "TX REC CRS V28 FRONT HALF - NODAL EXCHANGE",
+"code": "006NJ1",
+"last": "2026-09-29",
+"n": 110
+},
+{
+"name": "TX REC CRS V29 BACK HALF - NODAL EXCHANGE",
+"code": "006NHW",
+"last": "2026-09-29",
+"n": 110
+},
+{
+"name": "TX REC CRS V29 FRONT HALF - NODAL EXCHANGE",
+"code": "006NJ2",
+"last": "2026-09-29",
+"n": 110
+},
+{
+"name": "TX REC CRS V30 BACK HALF - NODAL EXCHANGE",
+"code": "006NHX",
+"last": "2026-09-29",
+"n": 78
+},
+{
+"name": "TX REC CRS V30 FRONT HALF - NODAL EXCHANGE",
+"code": "006NJ3",
+"last": "2026-09-29",
+"n": 82
+},
+{
+"name": "TX REC CRS V31 BACK HALF - NODAL EXCHANGE",
+"code": "006NKH",
+"last": "2026-09-29",
+"n": 35
+},
+{
+"name": "TX REC CRS V31 FRONT HALF - NODAL EXCHANGE",
+"code": "006NKJ",
+"last": "2026-09-29",
+"n": 22
+},
+{
+"name": "Transco Zone 5 South Basis - ICE FUTURES ENERGY DIV",
+"code": "0233FJ",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "UP DOWN GC ULSD VS HO SPR - NEW YORK MERCANTILE EXCHANGE",
+"code": "022A13",
+"last": "2026-09-08",
+"n": 137
+},
+{
+"name": "UREA (GRANULAR) FOB US GULF - CHICAGO BOARD OF TRADE",
+"code": "251607",
+"last": "2026-09-29",
+"n": 2
+},
+{
+"name": "USD Malaysian Crude Palm Oil C - CHICAGO MERCANTILE EXCHANGE",
+"code": "037021",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "USGC HSFO (PLATTS) - ICE FUTURES ENERGY DIV",
+"code": "02141B",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "USGC HSFO PLATTS vs WTI 1st  - ICE FUTURES ENERGY DIV",
+"code": "02141X",
+"last": "2024-03-26",
+"n": 10
+},
+{
+"name": "USGC HSFO-PLATTS/BRENT 1ST LN  - ICE FUTURES ENERGY DIV",
+"code": "02141R",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WAHA FIN BASIS - ICE FUTURES ENERGY DIV",
+"code": "023399",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WAHA INDEX  - ICE FUTURES ENERGY DIV",
+"code": "0233D4",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WASHINGTON CARBON ALL V2024 - ICE FUTURES ENERGY DIV",
+"code": "0063E9",
+"last": "2025-01-28",
+"n": 25
+},
+{
+"name": "WASHINGTON CARBON ALL V2025 - ICE FUTURES ENERGY DIV",
+"code": "0063EN",
+"last": "2025-12-23",
+"n": 45
+},
+{
+"name": "WASHINGTON CARBON ALL V2026 - ICE FUTURES ENERGY DIV",
+"code": "0063EA",
+"last": "2026-09-29",
+"n": 36
+},
+{
+"name": "WASHINGTON CARBON V2024 - ICE FUTURES ENERGY DIV",
+"code": "0063E9",
+"last": "2024-07-30",
+"n": 27
+},
+{
+"name": "WHEAT-HRSpring - MIAX FUTURES EXCHANGE",
+"code": "001626",
+"last": "2026-09-29",
+"n": 97
+},
+{
+"name": "WHEAT-HRSpring - MINNEAPOLIS GRAIN EXCHANGE",
+"code": "001626",
+"last": "2024-11-19",
+"n": 47
+},
+{
+"name": "WHEAT-HRW - CHICAGO BOARD OF TRADE",
+"code": "001612",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WHEAT-SRW - CHICAGO BOARD OF TRADE",
+"code": "001602",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WTI  HOUSTON ARGUS/WTI BALMO - NEW YORK MERCANTILE EXCHANGE",
+"code": "0676A6",
+"last": "2026-09-22",
+"n": 17
+},
+{
+"name": "WTI  HOUSTON ARGUS/WTI TR MO - NEW YORK MERCANTILE EXCHANGE",
+"code": "0676A5",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WTI 1st Line-Brent 1st Line - ICE FUTURES ENERGY DIV",
+"code": "06741R",
+"last": "2025-06-24",
+"n": 1
+},
+{
+"name": "WTI CRUDE OIL 1ST LINE - ICE FUTURES ENERGY DIV",
+"code": "06741Q",
+"last": "2026-09-29",
+"n": 20
+},
+{
+"name": "WTI FINANCIAL CRUDE OIL - NEW YORK MERCANTILE EXCHANGE",
+"code": "06765A",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WTI MIDLAND ARGUS VS WTI TRADE - NEW YORK MERCANTILE EXCHANGE",
+"code": "067A71",
+"last": "2026-09-29",
+"n": 144
+},
+{
+"name": "WTI-BRENT CALENDAR - NEW YORK MERCANTILE EXCHANGE",
+"code": "06765L",
+"last": "2026-05-26",
+"n": 75
+},
+{
+"name": "WTI-PHYSICAL - NEW YORK MERCANTILE EXCHANGE",
+"code": "067651",
+"last": "2026-09-29",
+"n": 144
+}
+]
+}

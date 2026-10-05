@@ -47,147 +47,95 @@ _LOOKBACK_WEEKS = 156
 _FETCH_BUFFER_WEEKS = 170
 
 # ──────────────────────────────────────────────────────────────────────────
-# Whitelist: (label_bg, source, all_keywords, exclude_keywords)
+# Whitelist: (label_bg, source, ТОЧНО име в market_and_exchange_names, cftc_contract_market_code)
 # source: "tff" (финансови, Leveraged Funds) или "disaggregated" (стоки, Managed Money)
-# Match: market_and_exchange_names (uppercase) съдържа ВСИЧКИ all_keywords и
-# НИТО ЕДИН exclude_keyword. При няколко съвпадения — избира се първото по
-# азбучен ред (детерминистично, елиминира дублиране).
+# Match: ТОЧНО съвпадение по име ИЛИ по cftc_contract_market_code (виж whitelist_candidates / _resolve_whitelist) —
+# кодът оцелява при преименуване на контракта от борсата, името работи с кеша, който още няма кодове. Точно един кандидат
+# за всеки запис: 0 → whitelist miss (лог), повече от 1 различни контракта → двусмислие (лог, пазарът се пропуска — НЕ се
+# избира първият по азбучен ред); няколко имена на ЕДИН контракт (един код) → най-скорошното име. Тестът test_cot_whitelist.py изисква точно един кандидат за всеки запис срещу реалния списък на CFTC.
+#
+# FIX 2026-10-05 (пакет 3, т.е): преди whitelist-ът беше по ключови думи + exclude и при няколко съвпадения избираше първото по
+# азбучен ред. Върху реалния CFTC списък от 05.10.2026 XRP имаше 2 кандидата (CME и Coinbase Derivatives), Gold също 2 (COMEX
+# и "GOLD -1 TROY OUNCE - COINBASE DERIVATIVES") — работеха само защото правилният се нарежда пръв; Brent имаше 6.
+# Brent Crude е махнат: в CFTC има само NYMEX финансов "BRENT LAST DAY" (слаб заместител на Brent на ICE); петролът е покрит
+# от WTI. Избраните контракти са същите, които резолвираха и досега (проверено срещу списъка), например:
+#   • Nasdaq-100 → "NASDAQ MINI" (CFTC 209742 = CME Mini NASDAQ 100, NQ), не "NASDAQ-100 Consolidated" (агрегат);
+#   • E-mini Dow → "DJIA x $5" (YM), не "DJIA Consolidated"; E-mini S&P → чистият "E-MINI S&P 500", не "Consolidated";
+#   • Japanese Yen/Euro FX/British Pound → outright контрактът, не XRATE кръстосаните;
+#   • WTI → "WTI-PHYSICAL" (стандартният outright), Natural Gas → "NAT GAS NYME" (NYMEX), Heating Oil → "NY HARBOR ULSD";
+#   • Soybeans → "SOYBEANS" (не MINI), Wheat → "WHEAT-SRW" (Chicago SRW, най-ликвидната история; HRW е легитимна алтернатива);
+#   • XRP (CME) има ~53 седмици история (под стандартните 156) — виж COT_SHORT_HISTORY_WEEKS в config.py.
 # ──────────────────────────────────────────────────────────────────────────
 MAJOR_MARKETS = [
     # ── Финансови (TFF · Leveraged Funds) ──
-    # FIX 2026-08-20 (пълен universe одит, Категория В — defensive, не беше
-    # счупено, но разчиташе на азбучен late над "MICRO E-MINI S&P 500 INDEX",
-    # не на explicit защита): "E" < "M" случайно печели винаги досега.
-    ("E-mini S&P 500",        "tff", ["E-MINI S&P 500"],            ["MICRO"]),
-    # FIX 2026-08-20 (одит + independent verification срещу CME спецификация,
-    # Категория А — категорично грешен match, 2 последователни бъга):
-    # (1) първоначално резолвираше към "MICRO E-MINI NASDAQ-100 INDEX"
-    #     (алфавитно "M" < "N"), не към стандартния контракт.
-    # (2) първата поправка (keyword "NASDAQ-100", exclude "MICRO") доведе до
-    #     "NASDAQ-100 Consolidated" — легитимен CFTC ред, но АГРЕГАТ на
-    #     практически мъртвия standard-size контракт + E-mini (аналогично на
-    #     "S&P 500 Consolidated", който съзнателно НЕ избираме за S&P 500 —
-    #     там взимаме чистия "E-MINI S&P 500" ред). Несъответствие в подхода,
-    #     хванато чрез independent verification, не чрез теста срещу кеша
-    #     (тестът минаваше "OK", защото само проверява дали резолюцията сочи
-    #     към name, съдържащ очаквания substring — не дали е ПРАВИЛНИЯТ ред).
-    # Верният, чист standalone E-mini ред живее под съвсем друго CFTC име —
-    # "NASDAQ MINI" (CFTC ID 209742, потвърдено официално = "CME Mini
-    # NASDAQ 100 Stock Index" = директно ticker NQ), keyword-слепота от same
-    # клас като оригиналния Natural Gas бъг ("100" не е substring на "MINI").
-    # Директно точно име, без нужда от exclude — единствен кандидат.
-    ("Nasdaq-100",            "tff", ["NASDAQ MINI"],                []),
-    # FIX 2026-08-20 (одит, Категория А): резолвираше към "MICRO E-MINI
-    # RUSSELL 2000 INDX" (126w) вместо "RUSSELL E-MINI" (166w, пълна история).
-    ("E-mini Russell 2000",   "tff", ["RUSSELL", "E-MINI"],         ["MICRO"]),
-    # FIX 2026-08-20 (одит + independent verification срещу CME спецификация,
-    # Категория Б — формално остава "изисква преценка" защото легитимна
-    # алтернатива съществува, но verification-ът засили, не отслаби,
-    # увереността в избора): "DJIA Consolidated" е потвърдено АГРЕГАТ на
-    # практически мъртвия standard-size DJIA контракт + E-mini ($5) — точен
-    # аналог на "S&P 500 Consolidated", който съзнателно НЕ избираме за
-    # S&P 500 (виж Nasdaq-100 по-горе за same находка). "DJIA x $5" е чистата
-    # standalone E-mini линия (multiplier $5×DJIA, тикер YM) — директен
-    # паралел на "E-MINI S&P 500", не на "Consolidated". Избраният вариант е
-    # правилният по established прецедент от другите два индекса, но остава
-    # Категория Б, защото самото съществуване на "Consolidated" като
-    # алтернативен, също легитимен CFTC ред не отпада — той просто отговаря
-    # на по-широк, размесен инструмент, не на грешка в избора.
-    ("E-mini Dow (DJIA)",     "tff", ["DJIA"],                      ["CONSOLIDATED", "MICRO"]),
-    ("VIX Futures",           "tff", ["VIX"],                       []),
-    # FIX 2026-08-19: борсата преименува контракта — старият keyword "DOLLAR
-    # INDEX" вече не съвпада с нищо в текущите CFTC данни (тих 0-data whitelist
-    # miss, потвърден на живо). Реалното текущо име е "USD INDEX - ICE FUTURES
-    # U.S." — уникално в TFF universe-а, не е нужен exclude.
-    ("US Dollar Index",       "tff", ["USD INDEX"],                 []),
-    # FIX 2026-08-20 (одит, Категория В — defensive, не беше счупено, но
-    # разчиташе на азбучен late над "EURO FX/BRITISH POUND XRATE" продукта):
-    ("Euro FX",               "tff", ["EURO FX"],                   ["XRATE"]),
-    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): резолвираше
-    # към "JAPANESE YEN XRATE" (cross-rate дериват, различен инструмент) вместо
-    # стандартния outright futures контракт.
-    ("Japanese Yen",          "tff", ["JAPANESE YEN"],               ["XRATE"]),
-    # FIX 2026-08-20 (одит, Категория В — defensive, виж Euro FX по-горе):
-    ("British Pound",         "tff", ["BRITISH POUND"],             ["XRATE"]),
-    ("Swiss Franc",           "tff", ["SWISS FRANC"],                []),
-    ("Canadian Dollar",       "tff", ["CANADIAN DOLLAR"],            []),
-    ("Australian Dollar",     "tff", ["AUSTRALIAN DOLLAR"],          []),
-    ("Mexican Peso",          "tff", ["MEXICAN PESO"],               []),
-    ("2-Year Treasury Note",  "tff", ["UST", "2Y"],                 []),
-    ("5-Year Treasury Note",  "tff", ["UST", "5Y"],                 []),
-    ("10-Year Treasury Note", "tff", ["UST", "10Y"],                ["ULTRA"]),
-    ("Ultra Treasury Bond",   "tff", ["ULTRA", "UST", "BOND"],       []),
-    ("30-Year Treasury Bond", "tff", ["UST", "BOND"],               ["ULTRA"]),
-    # FIX 2026-08-19: structural gap, потвърден на живо (Venci видя независими
-    # COT анализатори да коментират bitcoin positioning) — CME's контракт беше
-    # просто никога добавен, не бъг. Excludes изолират точно "BITCOIN - CHICAGO
-    # MERCANTILE EXCHANGE" от Micro Bitcoin/Nano Bitcoin/Bitcoin Cash entries,
-    # потвърдени реални CFTC market_and_exchange_names записи в TFF отчета.
-    ("Bitcoin Futures (CME)",  "tff", ["BITCOIN"],           ["MICRO", "NANO", "CASH"]),
-    # FIX 2026-08-19: пълен CFTC universe скан (Venci, 2026-08-19) откри XRP
-    # (CME) като реален, ликвиден контракт с текущ percentile 98.1 — екстремум
-    # по нашия праг. ВАЖНО: историята му е ~53 седмици (launched ~юли 2025),
-    # далеч под стандартния 156-седмичен (3г) lookback — виж COT_SHORT_HISTORY_
-    # WEEKS в config.py и cot_theses() промпта за explicit disclosure клаузата,
-    # която флагва това directamente в generирания AI текст, не само в кода.
-    # Ether (CME)/Solana (CME)/Coinbase altcoin "PERP STYLE" контрактите бяха
-    # НАРОЧНО НЕ добавени — легитимно извън обхвата за сега (виж дискусията).
-    ("XRP",                    "tff", ["XRP"],               ["NANO", "MICRO"]),
+    ('E-mini S&P 500'        , "tff", 'E-MINI S&P 500 - CHICAGO MERCANTILE EXCHANGE', '13874A'),
+    ('Nasdaq-100'            , "tff", 'NASDAQ MINI - CHICAGO MERCANTILE EXCHANGE', '209742'),
+    ('E-mini Russell 2000'   , "tff", 'RUSSELL E-MINI - CHICAGO MERCANTILE EXCHANGE', '239742'),
+    ('E-mini Dow (DJIA)'     , "tff", 'DJIA x $5 - CHICAGO BOARD OF TRADE', '124603'),
+    ('VIX Futures'           , "tff", 'VIX FUTURES - CBOE FUTURES EXCHANGE', '1170E1'),
+    ('US Dollar Index'       , "tff", 'USD INDEX - ICE FUTURES U.S.', '098662'),
+    ('Euro FX'               , "tff", 'EURO FX - CHICAGO MERCANTILE EXCHANGE', '099741'),
+    ('Japanese Yen'          , "tff", 'JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE', '097741'),
+    ('British Pound'         , "tff", 'BRITISH POUND - CHICAGO MERCANTILE EXCHANGE', '096742'),
+    ('Swiss Franc'           , "tff", 'SWISS FRANC - CHICAGO MERCANTILE EXCHANGE', '092741'),
+    ('Canadian Dollar'       , "tff", 'CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE', '090741'),
+    ('Australian Dollar'     , "tff", 'AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE', '232741'),
+    ('Mexican Peso'          , "tff", 'MEXICAN PESO - CHICAGO MERCANTILE EXCHANGE', '095741'),
+    ('2-Year Treasury Note'  , "tff", 'UST 2Y NOTE - CHICAGO BOARD OF TRADE', '042601'),
+    ('5-Year Treasury Note'  , "tff", 'UST 5Y NOTE - CHICAGO BOARD OF TRADE', '044601'),
+    ('10-Year Treasury Note' , "tff", 'UST 10Y NOTE - CHICAGO BOARD OF TRADE', '043602'),
+    ('Ultra Treasury Bond'   , "tff", 'ULTRA UST BOND - CHICAGO BOARD OF TRADE', '020604'),
+    ('30-Year Treasury Bond' , "tff", 'UST BOND - CHICAGO BOARD OF TRADE', '020601'),
+    ('Bitcoin Futures (CME)' , "tff", 'BITCOIN - CHICAGO MERCANTILE EXCHANGE', '133741'),
+    ('XRP'                   , "tff", 'XRP - CHICAGO MERCANTILE EXCHANGE', '176740'),
 
     # ── Стоки (Disaggregated · Managed Money) ──
-    ("Gold",           "disaggregated", ["GOLD"],          ["MICRO", "MINI"]),
-    ("Silver",         "disaggregated", ["SILVER"],        ["MICRO", "MINI"]),
-    # FIX 2026-08-20 (одит, Категория В — defensive, не беше счупено, но
-    # разчиташе на азбучен late над "COPPER-MICRO"):
-    ("Copper",         "disaggregated", ["COPPER"],        ["MICRO"]),
-    ("Platinum",       "disaggregated", ["PLATINUM"],      []),
-    ("Palladium",      "disaggregated", ["PALLADIUM"],     []),
-    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): "WTI"
-    # съвпада и с спред/diff продукти, алфавитно преди "WTI-PHYSICAL"
-    # (стандартният outright контракт). Стеснено directamente до точното име.
-    ("WTI Crude Oil",  "disaggregated", ["WTI-PHYSICAL"],  []),
-    ("Brent Crude",    "disaggregated", ["BRENT"],         []),
-    # FIX 2026-08-20 (одит, Категория А — категорично грешен match, keyword
-    # слепота): старият keyword "NATURAL GAS" изобщо не съвпадаше с реалния
-    # CFTC запис — той е абревиатура "NAT GAS NYME - NEW YORK MERCANTILE
-    # EXCHANGE" (тих 0-data whitelist miss). Новият keyword "NAT GAS" обаче
-    # съвпада и с газолинови продукти в същия universe ("NAT GASOLINE",
-    # "NAT GASLNE") — оттук 3-членният exclude, верифициран чрез ръчна
-    # проверка на всичките 8 реални "NAT GAS"-съдържащи CFTC market names:
-    # "ICE"/"OPIS"/"PENULTIMATE" изолират точно физическия NYMEX контракт.
-    ("Natural Gas",    "disaggregated", ["NAT GAS"],       ["ICE", "OPIS", "PENULTIMATE"]),
-    # FIX 2026-08-20 (одит, Категория А — категорично грешен match): "GASOLINE"
-    # съвпада с "NAT GASOLINE"/"NAT GASLNE" (природен газ продукти, друг
-    # инструмент). Стеснено directamente до "GASOLINE RBOB".
-    ("RBOB Gasoline",  "disaggregated", ["GASOLINE RBOB"], []),
-    # FIX 2026-08-19: борсата преименува контракта към ULSD спецификацията
-    # преди години — старият keyword "HEATING OIL" вече не съвпада с нищо
-    # (тих 0-data whitelist miss, потвърден на живо). И двата keyword-а
-    # задължителни (не само "ULSD" самостоятелно) — избягва грешно съвпадение
-    # с "UP DOWN GC ULSD VS HO SPR" (spread контракт, различен инструмент,
-    # реален запис в CFTC universe-а, потвърден директно).
-    ("Heating Oil",    "disaggregated", ["NY HARBOR", "ULSD"], []),
-    ("Corn",           "disaggregated", ["CORN"],          []),
-    # FIX 2026-08-20 (одит, Категория А — категорично грешен match, откритo
-    # по време на XRP тестовете): резолвираше към "MINI SOYBEANS" (28w) вместо
-    # стандартния "SOYBEANS" контракт (166w, пълна история).
-    ("Soybeans",       "disaggregated", ["SOYBEANS"],      ["OIL", "MEAL", "MINI"]),
-    ("Soybean Oil",    "disaggregated", ["SOYBEAN OIL"],   []),
-    ("Soybean Meal",   "disaggregated", ["SOYBEAN MEAL"],  []),
-    # FIX 2026-08-20 (одит, Категория Б — ИЗИСКВА ПРЕЦЕНКА, по-ниска увереност
-    # от Категория А fix-овете): "WHEAT-SRW" (Chicago SRW, стандартният
-    # бенчмарк контракт) срещу "WHEAT-HRW"/"WHEAT-HRSpring" (алтернативни
-    # региони/сортове). SRW е исторически референтният "Wheat" контракт за
-    # общи macro/COT цели, но HRW е легитимна алтернатива, не грешка сама по
-    # себе си — избран SRW заради по-дълга и по-ликвидна история.
-    ("Wheat",          "disaggregated", ["WHEAT-SRW"],     []),
-    ("Sugar No. 11",   "disaggregated", ["SUGAR"],         []),
-    ("Coffee C",       "disaggregated", ["COFFEE"],        []),
-    ("Cocoa",          "disaggregated", ["COCOA"],         []),
-    ("Cotton",         "disaggregated", ["COTTON"],        []),
-    ("Lean Hogs",      "disaggregated", ["LEAN HOGS"],     []),
-    ("Live Cattle",    "disaggregated", ["LIVE CATTLE"],   []),
+    ('Gold'                  , "disaggregated", 'GOLD - COMMODITY EXCHANGE INC.', '088691'),
+    ('Silver'                , "disaggregated", 'SILVER - COMMODITY EXCHANGE INC.', '084691'),
+    ('Copper'                , "disaggregated", 'COPPER- #1 - COMMODITY EXCHANGE INC.', '085692'),
+    ('Platinum'              , "disaggregated", 'PLATINUM - NEW YORK MERCANTILE EXCHANGE', '076651'),
+    ('Palladium'             , "disaggregated", 'PALLADIUM - NEW YORK MERCANTILE EXCHANGE', '075651'),
+    ('WTI Crude Oil'         , "disaggregated", 'WTI-PHYSICAL - NEW YORK MERCANTILE EXCHANGE', '067651'),
+    ('Natural Gas'           , "disaggregated", 'NAT GAS NYME - NEW YORK MERCANTILE EXCHANGE', '023651'),
+    ('RBOB Gasoline'         , "disaggregated", 'GASOLINE RBOB - NEW YORK MERCANTILE EXCHANGE', '111659'),
+    ('Heating Oil'           , "disaggregated", 'NY HARBOR ULSD - NEW YORK MERCANTILE EXCHANGE', '022651'),
+    ('Corn'                  , "disaggregated", 'CORN - CHICAGO BOARD OF TRADE', '002602'),
+    ('Soybeans'              , "disaggregated", 'SOYBEANS - CHICAGO BOARD OF TRADE', '005602'),
+    ('Soybean Oil'           , "disaggregated", 'SOYBEAN OIL - CHICAGO BOARD OF TRADE', '007601'),
+    ('Soybean Meal'          , "disaggregated", 'SOYBEAN MEAL - CHICAGO BOARD OF TRADE', '026603'),
+    ('Wheat'                 , "disaggregated", 'WHEAT-SRW - CHICAGO BOARD OF TRADE', '001602'),
+    ('Sugar No. 11'          , "disaggregated", 'SUGAR NO. 11 - ICE FUTURES U.S.', '080732'),
+    ('Coffee C'              , "disaggregated", 'COFFEE C - ICE FUTURES U.S.', '083731'),
+    ('Cocoa'                 , "disaggregated", 'COCOA - ICE FUTURES U.S.', '073732'),
+    ('Cotton'                , "disaggregated", 'COTTON NO. 2 - ICE FUTURES U.S.', '033661'),
+    ('Lean Hogs'             , "disaggregated", 'LEAN HOGS - CHICAGO MERCANTILE EXCHANGE', '054642'),
+    ('Live Cattle'           , "disaggregated", 'LIVE CATTLE - CHICAGO MERCANTILE EXCHANGE', '057642'),
 ]
+
+
+def whitelist_candidates(entry: tuple, markets: dict[str, str | None]) -> list[str]:
+    """
+    Имената в `markets` ({име на пазар: cftc код или None}), които съвпадат със записа от MAJOR_MARKETS — ТОЧНО име или
+    ТОЧЕН код. Сортиран списък. Едно и също име може да се води под няколко имена за същия контракт (борсата преименува:
+    Ultra T-Bond е "ULTRA US T BOND" две седмици през 09.2025 и "ULTRA UST BOND" иначе, един и същ код 020604).
+    """
+    _label, _source, name, code = entry
+    found = {m for m in markets if m == name}
+    found |= {m for m, c in markets.items() if c and c == code}
+    return sorted(found)
+
+
+def whitelist_contracts(entry: tuple, markets: dict[str, str | None]) -> list[str]:
+    """Различните КОНТРАКТИ (код, а без код — самото име) сред кандидатите; валидният запис има точно един."""
+    return sorted({markets.get(m) or m for m in whitelist_candidates(entry, markets)})
+
+
+def pick_current_name(info: dict[str, tuple[str, int]]) -> str:
+    """
+    От няколко имена на ЕДИН контракт ({име: (последна дата, брой седмици)}) — най-скорошното (при равенство — с повече
+    седмици, после по име за детерминизъм). Не "първото по азбучен ред".
+    """
+    return max(info, key=lambda m: (info[m][0], info[m][1], m))
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -197,7 +145,7 @@ def _fetch_since(dataset_id: str, long_field: str, short_field: str,
                  since: str | None) -> list[dict]:
     params = {
         "$limit": 50000,
-        "$select": f"market_and_exchange_names,report_date_as_yyyy_mm_dd,"
+        "$select": f"market_and_exchange_names,cftc_contract_market_code,report_date_as_yyyy_mm_dd,"
                    f"{long_field},{short_field}",
         "$order": "report_date_as_yyyy_mm_dd ASC",
     }
@@ -223,7 +171,8 @@ def _fetch_since(dataset_id: str, long_field: str, short_field: str,
         date = row.get("report_date_as_yyyy_mm_dd", "")[:10]
         if not market or not date:
             continue
-        out.append({"market": market, "date": date, "net": long_v - short_v})
+        out.append({"market": market, "date": date, "net": long_v - short_v,
+                    "code": row.get("cftc_contract_market_code") or None})
     return out
 
 
@@ -271,6 +220,12 @@ def _update_report(cache: dict, key: str, dataset_id: str,
         print(f"[cot] {key} fetch failed: {e}")
         new_rows = []
     cache[key] = _merge_series(existing, new_rows)
+    # пакет 3 т.е: кодът на контракта се пази отделно (пазар → код) за whitelist резолюцията по код; старите кешове го
+    # получават постепенно — с всеки нов седмичен ред (резолюцията по име работи и без него)
+    codes = cache.setdefault("codes", {}).setdefault(key, {})
+    for r in new_rows:
+        if r.get("code"):
+            codes[r["market"]] = r["code"]
 
 
 def refresh_cache() -> dict:
@@ -288,23 +243,25 @@ def refresh_cache() -> dict:
 # ──────────────────────────────────────────────────────────────────────────
 def _resolve_whitelist(cache: dict) -> list[tuple[str, str, str]]:
     """
-    Връща [(label_bg, source, resolved_market_name), ...] — само за whitelist
-    entries, които реално се намират в текущия кеш. Едно съвпадение на entry
-    (първото по азбучен ред), за да елиминираме дублиране.
+    Връща [(label_bg, source, resolved_market_name), ...] — за whitelist записите с ТОЧНО един кандидат в текущия кеш
+    (точно име или точен cftc код, виж whitelist_candidates). 0 кандидата → whitelist miss (лог); повече от 1 → двусмислие
+    (лог, пазарът се пропуска — никога "първият по азбучен ред").
     """
     resolved = []
-    for label, source, keywords, excludes in MAJOR_MARKETS:
-        markets = sorted(cache.get(source, {}).keys())
-        match = None
-        for m in markets:
-            up = m.upper()
-            if all(k in up for k in keywords) and not any(x in up for x in excludes):
-                match = m
-                break
-        if match:
-            resolved.append((label, source, match))
+    for entry in MAJOR_MARKETS:
+        label, source = entry[0], entry[1]
+        names = cache.get(source, {})
+        codes = (cache.get("codes") or {}).get(source, {})
+        markets = {m: codes.get(m) for m in names}
+        cands, contracts = whitelist_candidates(entry, markets), whitelist_contracts(entry, markets)
+        if len(contracts) == 1:
+            # едно или няколко имена на ЕДИН контракт (преименуване) → най-скорошното
+            info = {m: ((names[m][-1]["date"] if names.get(m) else ""), len(names.get(m) or [])) for m in cands}
+            resolved.append((label, source, pick_current_name(info)))
+        elif not contracts:
+            print(f"[cot] whitelist miss: '{label}' няма точно съвпадение в '{source}' (име '{entry[2]}', код {entry[3]})")
         else:
-            print(f"[cot] whitelist miss: '{label}' няма съвпадение в '{source}' (все още)")
+            print(f"[cot] ⚠ whitelist двусмислие: '{label}' има {len(contracts)} различни контракта в '{source}' {cands} — пропуска се")
     return resolved
 
 
