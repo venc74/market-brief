@@ -436,6 +436,73 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# Пакет 4б т.б: маркер UOV✓ върху НАШИ тикъри (кандидати и позиции) — вместо списъка "Unusual Options Yesterday"
+# ──────────────────────────────────────────────────────────────────────────
+LAST_MARKER_DIAG: dict = {}
+
+
+def _marker_note(a: dict, ratio: float, session: str) -> str:
+    """Текстът при hover/клик: колко, по какви падежи, с каква посока и кога е снимката на OI."""
+    bias, bias_note = _bias(a["call_vol"], a["put_vol"])
+    calls_pct = (100 * a["call_vol"] / a["total_vol"]) if a["total_vol"] else 0
+    used = a["used"]
+    return (f"Необичаен опционен обем вчера: ≈ {ratio:.1f}× OI ({_oi_label(ratio)}) върху {len(used)} падежа до {used[-1][8:10]}.{used[-1][5:7]} "
+            f"(без изтеклите и изтичащите днес). Обем {int(a['total_vol']):,} / OI {int(a['oi_used']):,} договора; calls {calls_pct:.0f}% от обема — {bias_note} "
+            f"OI е от следобедната снимка на сесията {session[8:10]}.{session[5:7]}.")
+
+
+def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple[dict, dict]:
+    """
+    Съотношението обем/OI (по прозореца на падежите, виж analyze_ticker) за НАШИТЕ тикъри; маркер за онези с ratio ≥ config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO.
+    Връща ({тикър: {ticker, ratio, call_put_bias, note, expiries}}, diag). diag: scanned, with_ratio, marked, ratios (ВСИЧКИ пресметнати — за калибриране),
+    missing {тикър: причина} (тикър без съотношение НЕ значи "без необичаен обем"), snapshot_session/…_fetched_at_utc, snapshot_missing_reason.
+    Graceful: провал на тикър/снимка → празен резултат за него, не чупи run-а.
+    """
+    today = today or dt.date.today()
+    tickers = list(dict.fromkeys(t for t in tickers if t))[:config.UNUSUAL_OPTIONS_MARKER_MAX_TICKERS]
+    diag: dict = {"requested": len(tickers), "scanned": 0, "with_ratio": 0, "marked": 0, "ratios": {}, "missing": {},
+                  "window_days": config.UNUSUAL_OPTIONS_HORIZON_DAYS, "min_ratio": config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO,
+                  "snapshot_session": None, "snapshot_fetched_at_utc": None, "snapshot_missing_reason": ""}
+    markers: dict[str, dict] = {}
+    if yf is None or not tickers:
+        return markers, diag
+    try:
+        snap, session, snap_missing = _snapshot_for_yesterday(today)
+    except Exception as e:
+        snap, session, snap_missing = None, "", f"снимката не се зареди: {type(e).__name__}"
+    diag.update(snapshot_session=session or None, snapshot_fetched_at_utc=(snap or {}).get("fetched_at_utc"), snapshot_missing_reason=snap_missing)
+    for sym in tickers:
+        try:
+            a = analyze_ticker(sym, yf.Ticker(sym), snap, today, snap_missing)
+        except Exception as e:
+            diag["missing"][sym] = f"{type(e).__name__}: {e}"
+            print(f"[unusual_options] маркер {sym}: {e}")
+            continue
+        if a is None:
+            diag["missing"][sym] = "няма опционна верига"
+            continue
+        diag["scanned"] += 1
+        if a["why"]:
+            diag["missing"][sym] = a["why"]
+            continue
+        ratio = a["ratio"]
+        if ratio > config.UNUSUAL_OPTIONS_MAX_OI_RATIO:                    # същият таван като преди: OI вероятно неактуален/непълен
+            diag["missing"][sym] = "OI вероятно неактуален/непълен (нереалистично съотношение)"
+            continue
+        diag["with_ratio"] += 1
+        diag["ratios"][sym] = round(ratio, 2)
+        if ratio >= config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO:
+            bias, _ = _bias(a["call_vol"], a["put_vol"])
+            markers[sym] = {"ticker": sym, "ratio": round(ratio, 2), "call_put_bias": bias, "expiries": a["used"],
+                            "note": _marker_note(a, ratio, session or today.isoformat())}
+    diag["marked"] = len(markers)
+    LAST_MARKER_DIAG.clear(); LAST_MARKER_DIAG.update(diag)
+    print(f"[unusual_options] маркери UOV✓: {len(markers)} от {diag['requested']} (съотношение за {diag['with_ratio']}, праг {diag['min_ratio']}×; "
+          f"без съотношение: {diag['missing'] or '—'})")
+    return markers, diag
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # FALLBACK · Market Chameleon scrape
 # ──────────────────────────────────────────────────────────────────────────
 def _fetch_marketchameleon(limit: int) -> list[dict]:

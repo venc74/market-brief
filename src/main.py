@@ -20,7 +20,7 @@ from src.thermometer import build_thermometer, thermometer_unavailable, apply_di
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
-from src.enrich import enrich, inject_split_catalysts
+from src.enrich import enrich, inject_split_catalysts, uov_marker
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
@@ -59,6 +59,21 @@ def _live_positions() -> dict[str, dict]:
     except Exception as e:
         print(f"[main] live positions check failed: {e}")
         return {}
+
+
+def attach_position_uov(rows: list[dict]) -> dict:
+    """
+    Пакет 4б т.б: слага UOV✓ върху редовете на позициите (v2 отворени/чакащи и buy-stop книгата) — по ЕДНО извикване за всички тикъри.
+    Връща компактна диагностика (колко имат съотношение, причини за липсата, съотношенията — за калибриране).
+    """
+    tickers = sorted({r["ticker"] for r in rows if r.get("ticker")})
+    if not tickers:
+        return {}
+    uov, diag = unusual_options.candidate_markers(tickers)
+    for r in rows:
+        if r.get("ticker") in uov:
+            r.setdefault("markers", []).append(uov_marker(uov[r["ticker"]]))
+    return {k: diag.get(k) for k in ("requested", "with_ratio", "marked", "missing", "ratios")}
 
 
 _RESOLUTION_BG = {
@@ -482,7 +497,7 @@ def run() -> dict:
                          if config.ENABLE_CORRELATION_CHECK else [])
 
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
-    unusual_today = unusual_options.fetch_unusual_options(10) if config.ENABLE_UNUSUAL_OPTIONS else []
+    # пакет 4б т.б: списъкът "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ върху кандидатите (enrich) и позициите (по-долу)
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
     superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
     # FIX 2026-08-17: high-conviction нови позиции (>DATAROMA_MIN_NEW_POSITION_PCT%
@@ -572,6 +587,15 @@ def run() -> dict:
                 p["markers"] = [si_markers[p["ticker"]]]
     except Exception as e:
         print(f"[main] SI✓ маркери за позициите пропуснати: {e}")
+    # пакет 4б т.б: UOV✓ и върху позициите — v2 отворени/чакащи и книгата на buy-stop кандидатите. diag на кандидатите е от enrich (LAST_MARKER_DIAG).
+    uov_diag = dict(unusual_options.LAST_MARKER_DIAG) if config.ENABLE_UNUSUAL_OPTIONS else {}
+    try:
+        pos_rows = (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])
+                    + (backtest_summary.get("buystop") or {}).get("live", []))
+        if config.ENABLE_UNUSUAL_OPTIONS and pos_rows:
+            uov_diag["positions"] = attach_position_uov(pos_rows)
+    except Exception as e:
+        print(f"[main] UOV✓ маркерите за позициите пропуснати: {e}")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers
@@ -646,9 +670,8 @@ def run() -> dict:
         "watchlist": watchlist,
         # v2 нови блокове
         "theses": theses,
-        "unusual_options": unusual_today,
-        # FIX 2026-09-28: колко имат съотношение обем/OI, суров OI, час на fetch-а
-        "unusual_options_diag": dict(unusual_options.LAST_DIAG),
+        # пакет 4б т.б: покритие на маркера UOV✓ (колко кандидата/позиции имат съотношение, причини, съотношенията за калибриране)
+        "uov_diag": uov_diag,
         "splits": splits_month,
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,

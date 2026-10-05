@@ -577,7 +577,16 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = DATA_DIR / "unusual_options_oi_snapshot.json"
 # резерв над SCAN_LIMIT. Измерено по 61 дни от git историята на ранжирането:
 # с топ 80 утрешните топ 60 липсват само 2 пъти по 1 тикър (без еднократната
 # смяна на универса 13→14.07); с топ 60 — 37 от 60 дни.
-UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS", 80))
+# Пакет 4б т.б: списъкът "Unusual Options" отпадна — снимката вече е за НАШИТЕ тикъри (кандидатите от последните брифове и позициите, виж
+# oi_snapshot.snapshot_tickers); това е допълнителен брой най-ликвидни тикъри (0 = само кандидати и позиции).
+UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS", 0))
+# Колко от последните брифове дават кандидати за снимката (Watchlist стои няколко дни, утрешните кандидати са почти същите като днешните)
+UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = int(os.getenv("UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS", 5))
+# Маркер UOV✓ върху кандидат/позиция: съотношението обем/OI по прозореца (виж UNUSUAL_OPTIONS_HORIZON_DAYS) поне толкова. 2.0 е границата на старото
+# "силно ново позициониране" (_oi_label); НЕ е калибрирана на новия прозорец — съотношенията на ВСИЧКИ сканирани тикъри се пишат в brief["uov_diag"],
+# за да се калибрира по реални дни. Таван на тикърите на едно извикване (всеки тикър = до ~14 заявки за вериги).
+UNUSUAL_OPTIONS_MARKER_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_RATIO", 2.0))
+UNUSUAL_OPTIONS_MARKER_MAX_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MAX_TICKERS", 40))
 # ОСТАРЯЛО от пакет 4б т.а (06.10.2026): снимката вече пази OI по ВРЕМЕВИ прозорец (виж UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS), не "първите N
 # падежа". Константата се чете само от стария формат на снимките.
 UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))

@@ -13,8 +13,8 @@ Yahoo показва следобед в деня на сесията (OI се �
 и не се мени в рамките на сесията). Затова тази снимка се пази с датата на
 сесията, а утрешният бриф търси снимката за своята "последна сесия".
 
-Какво се снима: топ config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS от днешното
-ранжиране по ликвидност (кешът от сутрешния run, същият ред), OI по падеж
+Какво се снима (пакет 4б т.б, 06.10.2026): НАШИТЕ тикъри — кандидатите от последните брифове и позициите (snapshot_tickers); списъкът "Unusual
+Options" отпадна, затова топ-80 по ликвидност вече не е нужен (config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS, по подразбиране 0). OI по падеж
 (calls + puts) за ВСИЧКИ падежи в (сесия, сесия + UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS]
 (пакет 4б т.а, 06.10.2026: преди — първите 4 падежа; знаменателят на
 съотношението трябва да е от един и същ времеви прозорец, виж unusual_options.py).
@@ -35,6 +35,7 @@ config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR (16:00 ET = 20:00 UTC през
 from __future__ import annotations
 import datetime as dt
 import json
+import re
 import time
 
 from zoneinfo import ZoneInfo
@@ -102,6 +103,39 @@ def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str 
     return None
 
 
+def snapshot_tickers(max_briefs: int | None = None) -> list[str]:
+    """
+    Пакет 4б т.б: НАШИТЕ тикъри за снимката — Action/Watchlist от последните config.UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS брифа (data/YYYY-MM-DD.json;
+    кандидатите се повтарят от ден на ден) плюс позициите от tracker-а (pending/open/trailing, и двете книги). Чисто локално четене; провал на файл
+    се пропуска. Редът е стабилен (най-новите брифове първи), без дубликати.
+    """
+    n = config.UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS if max_briefs is None else max_briefs
+    out: list[str] = []
+
+    def add(t):
+        if isinstance(t, str) and t and t not in out:
+            out.append(t)
+    files = sorted((p for p in config.DATA_DIR.glob("*.json") if re.match(r"^\d{4}-\d{2}-\d{2}\.json$", p.name)), reverse=True)[:n]
+    for path in files:
+        try:
+            brief = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[oi_snapshot] {path.name} нечетим, пропускам: {e}")
+            continue
+        for c in (brief.get("action") or []) + (brief.get("watchlist") or []):
+            add(c.get("ticker"))
+    try:
+        tracker = json.loads((config.DATA_DIR / "backtest_tracker.json").read_text(encoding="utf-8"))
+        for rec in tracker.values():
+            if rec.get("status") in ("pending", "open", "trailing"):
+                add(rec.get("ticker"))
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        print(f"[oi_snapshot] tracker нечетим, пропускам позициите: {e}")
+    return out
+
+
 def _window_oi(tk, session: dt.date) -> dict[str, int]:
     """OI (calls + puts) по падеж за падежите в (session, session + HORIZON_DAYS]; падеж, изтекъл в деня на сесията, не се снима."""
     hi = session + dt.timedelta(days=config.UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS)
@@ -139,8 +173,13 @@ def take_snapshot() -> dict | None:
         return None
 
     t0 = time.time()
-    tickers = uo._top_by_volume(uo._sp500_ndx_universe(),
-                                config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS)
+    # пакет 4б т.б: нашите кандидати и позиции (+ по избор най-ликвидните, config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS; по подразбиране 0)
+    tickers = snapshot_tickers()
+    if config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS > 0:
+        tickers += [t for t in uo._top_by_volume(uo._sp500_ndx_universe(), config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS) if t not in tickers]
+    if not tickers:
+        print("[oi_snapshot] няма кандидати и позиции за снимка — нищо не е заснето")
+        return None
     oi: dict[str, dict[str, int]] = {}
     failed: list[str] = []
     for sym in tickers:

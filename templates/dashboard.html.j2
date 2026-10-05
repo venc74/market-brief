@@ -919,43 +919,7 @@
 </section>
 {% endif %}
 
-{% if unusual_options %}
-<section>
-  <h2>Unusual Options Yesterday</h2>
-  {# FIX 2026-09-28: без съотношение обем/OI подредбата е по ликвидност #}
-  {% set uod = unusual_options_diag or {} %}
-  {% if uod.source == 'yfinance' and uod.with_ratio is defined and uod.with_ratio < unusual_min_ratios %}
-  <div class="splits-warn" style="color:var(--yellow);background:rgba(251,191,36,.10);border-color:rgba(251,191,36,.35);margin-bottom:10px">
-    {% if uod.oi_source == 'afternoon_snapshot' %}
-    {# FIX 2026-09-29: OI идва от следобедната снимка (src/oi_snapshot.py) #}
-    ⚠ Съотношение обем/OI има само за {{ uod.with_ratio }} от {{ uod.shown }} —
-    {% if uod.snapshot_missing_reason %}{{ uod.snapshot_missing_reason }}.
-    {% else %}{% for why, ts in (uod.ratio_missing_grouped or {}).items() %}{{ why }} ({{ ts|join(", ") }}){{ "; " if not loop.last else "." }}{% endfor %}
-    {% endif %}
-    Подредбата на тикърите без съотношение е по ликвидност на акцията, не по необичайност на опционната активност.
-    {% else %}
-    ⚠ Съотношение обем/OI има само за {{ uod.with_ratio }} от {{ uod.shown }} — данните за OI липсват
-    в часа на изтегляне ({{ uod.fetched_at_utc }} UTC). Днес подредбата е по ликвидност на акцията,
-    не по необичайност на опционната активност.
-    {% endif %}
-  </div>
-  {% elif uod.oi_source == 'afternoon_snapshot' and uod.snapshot_session %}
-  <div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:8px">
-    OI от следобедната снимка на сесията {{ uod.snapshot_session[8:10] }}.{{ uod.snapshot_session[5:7] }}
-    ({{ uod.snapshot_fetched_at_utc[11:] if uod.snapshot_fetched_at_utc else "—" }} UTC) — началото на сесията, чийто обем се показва.
-  </div>
-  {% endif %}
-  <div class="signal-grid">
-    {% for u in unusual_options %}
-    <div class="signal-chip {{ u.call_put_bias or '' }}">
-      <div class="sym">{{ u.ticker }}</div>
-      <div class="note">{{ u.note }}</div>
-      {% if u.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
+{# Пакет 4б т.б: секцията "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ (hover/клик) върху кандидатите и позициите #}
 
 {% macro split_chip(s) %}
     <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }} {{ 'split-pos' if s.badge == 'position' else '' }}">
@@ -1254,7 +1218,7 @@
         <th>Валиден до</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in bs.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}</td>
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}</td>
           <td class="n">${{ p.buy_stop }}</td><td class="n">${{ p.stop_loss }}</td><td class="n">${{ p.target_1 }}</td>

@@ -344,7 +344,8 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
             print(f"[enrich] magic_formula skipped: {e}")
     if config.ENABLE_UNUSUAL_OPTIONS:
         try:
-            sets["uov"] = unusual_options.unusual_set()
+            # пакет 4б т.б: не топ-10 списък, а съотношението на НАШИТЕ кандидати (по прозореца на падежите)
+            sets["uov"] = unusual_options.candidate_markers(candidate_tickers)[0]
         except Exception as e:
             print(f"[enrich] unusual_options skipped: {e}")
     if config.ENABLE_SPLITS_CALENDAR:
@@ -364,6 +365,13 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     return sets
 
 
+def uov_marker(uov: dict) -> dict:
+    """Маркерът UOV✓ (за кандидатите и за позициите): етикет с посока и текст с числата при hover/клик."""
+    bias = uov.get("call_put_bias")
+    suffix = " (calls)" if bias == "calls" else " (puts)" if bias == "puts" else ""
+    return {"tag": f"UOV✓{suffix}", "title": uov.get("note", "Необичаен опционен обем вчера.")}
+
+
 def _apply_markers(row: dict, sets: dict) -> None:
     """Слага визуалните convergence маркери MF✓ / UOV✓ / SPLIT✓ върху картата."""
     sym = row["ticker"]
@@ -374,9 +382,7 @@ def _apply_markers(row: dict, sets: dict) -> None:
 
     uov = sets["uov"].get(sym)
     if uov:
-        bias = uov.get("call_put_bias")
-        suffix = " (calls)" if bias == "calls" else " (puts)" if bias == "puts" else ""
-        markers.append({"tag": f"UOV✓{suffix}", "title": uov.get("note", "Необичаен опционен обем днес.")})
+        markers.append(uov_marker(uov))
 
     sp = sets["splits"].get(sym)
     if sp:

@@ -114,9 +114,6 @@ def render_dashboard(brief: dict) -> str:
         model_info=brief.get("model_info", {}),
         ai_truncations=brief.get("ai_truncations", []),
         data_warnings=brief.get("data_warnings", []),
-        unusual_options=brief.get("unusual_options", []),
-        unusual_options_diag=brief.get("unusual_options_diag"),
-        unusual_min_ratios=config.UNUSUAL_OPTIONS_MIN_RATIOS,
         buy_stop_window=config.BUY_STOP_WINDOW_SESSIONS,          # пакет 1б: текстът на блока за buy-stop кандидатите
         buyable_zone_pct=config.BUYABLE_ZONE_MAX_PCT,
         splits=brief.get("splits", []),
@@ -240,17 +237,12 @@ def render_email(brief: dict) -> str:
         for i in t["indicators"])
 
     # v2 · компактна секция „Сигнали днес" (Секции 3.3 + 3.4) — само ако има данни
-    uo = [r["ticker"] for r in brief.get("unusual_options", [])][:8]
     # FIX 2026-09-27: заглавието казваше "30 дни", а списъкът е само текущата
     # седмица; + сплитовете на отворени позиции/наблюдавани, както на dashboard-а
     sr = brief.get("splits_report") or {}
     sp = (sr.get("rows") if sr else brief.get("splits", []))[:6]
     sp_prio = sr.get("priority", [])
     signals_rows = ""
-    if uo:
-        signals_rows += (
-            '<div style="margin-bottom:6px"><span style="color:#6b7280">Необичаен опционен обем:</span> '
-            f'<span style="font-family:monospace;color:#111827">{", ".join(_e(x) for x in uo)}</span></div>')
     if sp_prio:
         pr_txt = ", ".join(
             f'{_SPLIT_BADGE_EMAIL.get(s.get("badge"), "")} {_e(s["ticker"])}'
