@@ -44,8 +44,24 @@ def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list
     return out
 
 
+def _qm_warning(qm_diag: dict | None) -> list[dict]:
+    """Qullamaggie скенерът: празен списък от провал на данните не бива да се чете като "днес няма сетъпи" (графика на скрийнъра)."""
+    d = qm_diag
+    if not d:
+        return []
+    if d.get("ok") is False:
+        return [{"source": "qm_breakout", "level": "warn",
+                 "message": (f"Qullamaggie скенер: не се изпълни ({d.get('error') or 'Yahoo не върна данни'}) — празният списък НЕ значи, че няма кандидати за пробив днес.")}]
+    if d.get("batches_failed"):
+        return [{"source": "qm_breakout", "level": "warn",
+                 "message": (f"Qullamaggie скенер: {d['batches_failed']} от {d.get('batches')} партиди тикъри не се изтеглиха — списъкът е върху {d.get('with_history')} от "
+                             f"{d.get('universe')} тикъра и може да е непълен.")}]
+    return []
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
-            cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None) -> list[dict]:
+            cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
+            qm_diag: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -80,4 +96,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
         })
     out += _cot_warning(cot_diag)
     out.extend(_marker_warnings(insider_status, uov_diag))
+    out.extend(_qm_warning(qm_diag))
     return out

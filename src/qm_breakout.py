@@ -245,6 +245,13 @@ def scan(universe: list[str] | None = None, now_utc: dt.datetime | None = None) 
         return [], {"ok": False, "error": f"{type(e).__name__}: {e}", "candidates": 0, "shown": 0}
 
 
+def qm_marker(row: dict) -> dict:
+    """Маркерът QM✓ (за нашите CANSLIM карти и позиции): тикърът е и кандидат за пробив на Qullamaggie. Текст при hover/клик — числата и честен надпис за стратегията."""
+    return {"tag": "QM✓", "title": (f"Breakout кандидат (Qullamaggie): ниво ${row['trigger']:.2f} (+{row['pct_to_trigger']:.1f}% над затварянето), ADR {row['adr']:.1f}%, "
+                                    f"ръст +{row['runup_pct']:.0f}% преди базата, база {row['base_days']} сесии, очакван стоп ≈ ${row['expected_stop']:.2f}, максимален ${row['max_stop']:.2f}.\n"
+                                    f"Отделна стратегия — измерване, не препоръка. Входът е по opening range high в сесията, стопът — low of day.")}
+
+
 def cards(rows: list[dict], name_lookup=None) -> list[dict]:
     """Най-много config.QM_MAX_CARDS реда (вече подредени по стягане) с име на компания (по желание, graceful)."""
     out = []

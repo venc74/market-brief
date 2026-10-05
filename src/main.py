@@ -34,6 +34,7 @@ from src import entry_timing
 from src import setup_rules
 from src import earnings_move
 from src import glb_screener
+from src import qm_breakout
 from src import short_screener
 from src import short_tracker
 from src import watchlist_expiry
@@ -75,6 +76,17 @@ def attach_position_uov(rows: list[dict]) -> dict:
         if r.get("ticker") in uov:
             r.setdefault("markers", []).append(uov_marker(uov[r["ticker"]]))
     return {k: diag.get(k) for k in ("requested", "with_ratio", "marked", "missing", "ratios")}
+
+
+def attach_qm_markers(rows: list[dict], qm_by_ticker: dict[str, dict]) -> int:
+    """Qullamaggie: слага QM✓ върху редовете (Action/Watchlist карти, позиции), чийто тикър е и кандидат за пробив (ВСИЧКИ кандидати, не само показаните 8). Връща броя маркирани."""
+    n = 0
+    for r in rows:
+        q = qm_by_ticker.get(r.get("ticker"))
+        if q:
+            r.setdefault("markers", []).append(qm_breakout.qm_marker(q))
+            n += 1
+    return n
 
 
 def attach_position_insider(rows: list[dict]) -> dict:
@@ -550,6 +562,19 @@ def run() -> dict:
     for row in glb_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
 
+    # Qullamaggie breakout скенер (06.10.2026) — ОТДЕЛНА стратегия: механичен (без AI), собствено теглене на данни, независим от CANSLIM и GLB. Не е препоръка — измерване.
+    # Explicit try/except, същият дух като GLB блока: неочакван провал не чупи брифа (празният списък се придружава от предупреждение в data_warnings).
+    qm_rows, qm_diag, qm_cards = [], {}, []
+    if config.ENABLE_QM:
+        try:
+            qm_rows, qm_diag = qm_breakout.scan()
+            qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
+        except Exception as e:
+            print(f"[main] Qullamaggie скенерът пропадна: {e}")
+            qm_diag = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+    qm_by_ticker = {r["ticker"]: r for r in qm_rows}
+    attach_qm_markers(action + watchlist, qm_by_ticker)             # QM✓ върху нашите карти, ако са и кандидати за пробив
+
     # Short/Stage 4 screener — Модул 1, Short/Reversal тема (2026-08-2x).
     # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
     # short_screener.py docstring за пълния feasibility/backtest trail).
@@ -619,6 +644,11 @@ def run() -> dict:
             ins_pos_status = attach_position_insider(pos_rows)
     except Exception as e:
         print(f"[main] INS✓ маркерите за позициите пропуснати: {e}")
+    try:
+        if qm_by_ticker and pos_rows:
+            attach_qm_markers(pos_rows, qm_by_ticker)            # QM✓ и върху позициите (v2 отворени/чакащи и buy-stop книгата)
+    except Exception as e:
+        print(f"[main] QM✓ маркерите за позициите пропуснати: {e}")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers
@@ -681,7 +711,7 @@ def run() -> dict:
         "rotation": rotation,
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag),
+                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
@@ -706,6 +736,9 @@ def run() -> dict:
         "insider_buying_positions_status": ins_pos_status,
         "superinvestor_status": superinvestor_status,
         "glb_candidates": glb_candidates,
+        # Qullamaggie (отделна стратегия — измерване, не препоръка): до 8 карти за пробив + диагностика на скана
+        "qm_breakout": qm_cards,
+        "qm_diag": qm_diag,
         "news": news,
         "cot": cot_with_theses,
         # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
