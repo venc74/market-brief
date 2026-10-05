@@ -9,12 +9,20 @@
 пазар без AI отговор. Таблицата е ПРЕДЛОЖЕНИЕ за преглед от потребителя — тестът проверява вътрешната ѝ съгласуваност, не че изборът е верен.
 Пускане: python test_cot_tables.py
 """
-import sys, json, pathlib, io, contextlib
+import sys, json, pathlib, io, contextlib, tempfile as _tf
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
 from src import cot, cot_theses as ct, ai_brief
+
+_CACHE_DIR = _tf.TemporaryDirectory(prefix="mb_cotcache_")
+_cache_n = [0]
+def fresh_cache():
+    """нов (празен) файл за кеша на тезите във временна директория — реалният data/cot_theses_cache.json не се пипа"""
+    _cache_n[0] += 1
+    return pathlib.Path(_CACHE_DIR.name) / f"cache_{_cache_n[0]}.json"
+
 
 FIX = ROOT / "tests" / "fixtures"
 CHK = json.loads((FIX / "cot_direct_tickers_2026-10-05.json").read_text(encoding="utf-8"))["checked"]
@@ -139,7 +147,7 @@ def fake_claude(system, user, max_tokens=0):
     return json.dumps({"theses": rows}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()):
-    out = ai_brief.cot_theses(EXTREMES, [], None)
+    out = ai_brief.cot_theses(EXTREMES, [], None, cache_path=fresh_cache())
 by = {c["market"]: c for c in out}
 assert len(out) == 18
 u = seen["user"]
@@ -157,13 +165,13 @@ print("    30Y: TLT губи, TBF печели (таблица), cross JPM пе�
 
 seen["extra"] = {"Corn": [{"ticker": "CORN", "company": "Teucrium Corn Fund", "mechanisms": [{"type": "output_price", "quote": "фонд върху фючърси на царевица"}]}]}   # моделът повтаря директен тикър
 with contextlib.redirect_stdout(io.StringIO()):
-    out_dup = ai_brief.cot_theses(EXTREMES, [], None)
+    out_dup = ai_brief.cot_theses(EXTREMES, [], None, cache_path=fresh_cache())
 corn_cross = {c["market"]: c for c in out_dup}["Corn"]["cross_sector_thesis"]["tickers"]
 assert [t["ticker"] for t in corn_cross] == ["TSN", "PPC"]                                         # CORN е директен по таблицата → махнат от cross
 seen["extra"] = {}
 seen["skip"] = {"Wheat"}                                                                          # моделът не връща нищо за Wheat
 with contextlib.redirect_stdout(io.StringIO()):
-    out2 = ai_brief.cot_theses(EXTREMES, [], None)
+    out2 = ai_brief.cot_theses(EXTREMES, [], None, cache_path=fresh_cache())
 w = {c["market"]: c for c in out2}["Wheat"]
 assert [t["ticker"] for t in w["direct_thesis"]["tickers"]] == ["WEAT"] and w["direct_thesis"]["tickers"][0]["effect"] == "loses"
 assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"] == "моделът не върна тази под-теза"

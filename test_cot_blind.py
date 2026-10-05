@@ -9,12 +9,20 @@ _verified_company_name, "отворените позиции" (FCX от 22.09 и
 в теста са зададени от теста), другият скрийнър/режим, механизмите с типове 7/8/10 (формата идва със следващата точка).
 Пускане: python test_cot_blind.py
 """
-import sys, json, pathlib, io, contextlib, inspect, html as htmllib, tempfile
+import sys, json, pathlib, io, contextlib, tempfile as _tf, inspect, html as htmllib, tempfile
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
 from src import ai_brief, cot_theses as ct, render
+
+_CACHE_DIR = _tf.TemporaryDirectory(prefix="mb_cotcache_")
+_cache_n = [0]
+def fresh_cache():
+    """нов (празен) файл за кеша на тезите във временна директория — реалният data/cot_theses_cache.json не се пипа"""
+    _cache_n[0] += 1
+    return pathlib.Path(_CACHE_DIR.name) / f"cache_{_cache_n[0]}.json"
+
 
 FIX = ROOT / "tests" / "fixtures"
 BRIEF = json.loads((FIX / "brief_2026-10-02.json").read_text(encoding="utf-8"))
@@ -41,11 +49,12 @@ ai_brief._call_claude = fake_claude
 
 def run(screener, positions):
     with contextlib.redirect_stdout(io.StringIO()):
-        return ai_brief.cot_theses(EXTREMES, screener, positions)
+        return ai_brief.cot_theses(EXTREMES, screener, positions, cache_path=fresh_cache())
 
 
 print("── промптът е сляп ──")
-assert list(inspect.signature(ai_brief.cot_theses).parameters) == ["extremes", "screener_universe", "open_positions", "closed_positions"]      # без режим
+params = list(inspect.signature(ai_brief.cot_theses).parameters)
+assert params[:4] == ["extremes", "screener_universe", "open_positions", "closed_positions"] and "regime" not in params                  # без режим
 POS_A = [{"ticker": "VLO", "company": "Valero Energy Corporation", "entry_date": "2026-08-12"}, {"ticker": "FCX", "company": "Freeport-McMoRan Inc.", "entry_date": "2026-09-22"}]
 out_a = run(REAL_SCREENER, POS_A)
 out_b = run([{"ticker": "ZZZZ", "sector": "x", "industry": "y"}], [])

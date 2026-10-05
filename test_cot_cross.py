@@ -10,12 +10,20 @@
 подменените _call_claude и _verified_company_name.
 Пускане: python test_cot_cross.py
 """
-import sys, json, pathlib, io, contextlib, html as htmllib, tempfile, itertools
+import sys, json, pathlib, io, contextlib, tempfile as _tf, html as htmllib, tempfile, itertools
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
 from src import cot_theses as ct, ai_brief, render
+
+_CACHE_DIR = _tf.TemporaryDirectory(prefix="mb_cotcache_")
+_cache_n = [0]
+def fresh_cache():
+    """нов (празен) файл за кеша на тезите във временна директория — реалният data/cot_theses_cache.json не се пипа"""
+    _cache_n[0] += 1
+    return pathlib.Path(_CACHE_DIR.name) / f"cache_{_cache_n[0]}.json"
+
 
 FIX = ROOT / "tests" / "fixtures"
 BRIEF = json.loads((FIX / "brief_2026-10-02.json").read_text(encoding="utf-8"))
@@ -173,7 +181,7 @@ EXTREMES = [{k: c[k] for k in ("market", "category", "net_position", "percentile
 EXTREMES.append({**EXTREMES[0], "market": "XRP", "category": "financial", "weeks_of_history": 53, "direction": "extreme_long"})
 buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
-    out = ai_brief.cot_theses(EXTREMES, [], None)
+    out = ai_brief.cot_theses(EXTREMES, [], None, cache_path=fresh_cache())
 by = {c["market"]: c for c in out}
 corn = by["Corn"]["cross_sector_thesis"]
 assert [t["ticker"] for t in corn["tickers"]] == ["TSN", "PPC"] and corn["dropped_tickers"] == [{"ticker": "ADM", "code": "mixed", "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"}]

@@ -1847,18 +1847,34 @@ def cot_theses_badges(thesis: dict | None, screener_tickers: set[str], open_by_t
         for t in thesis["tickers"]]}
 
 
+def cot_prompt_version() -> str:
+    """
+    Версията на промпта/схемата за ключа на кеша: ръчната COT_SCHEMA_VERSION + хеш на системния текст, промпта (без данни) и
+    таблиците, от които зависи отговорът (механизми по вид, видове пазари, текстове). Промяна на промпта или на таблицата за знака
+    сама сменя версията → кешът се обезсилва; промяна на таблицата с директните тикъри — не (директните се смятат от кода,
+    а повтарящите се тикъри в cross се махат всеки ден от evaluate_cross).
+    """
+    import hashlib
+    payload = json.dumps([SYSTEM_COT, _build_cot_user_prompt([]), config.COT_MECHANISM_SIGN, config.COT_MARKET_KINDS,
+                          config.COT_KIND_TEXT], ensure_ascii=False, sort_keys=True, default=str)
+    return f"v{config.COT_SCHEMA_VERSION}-{hashlib.sha1(payload.encode('utf-8')).hexdigest()[:8]}"
+
+
 def cot_theses(extremes: list[dict], screener_universe: list[dict],
               open_positions: list[dict] | None = None,
-              closed_positions: list[dict] | None = None) -> list[dict]:
+              closed_positions: list[dict] | None = None, *,
+              data_stale: bool = False, today: dt.date | None = None, cache_path=None) -> list[dict]:
     """
     За всеки COT екстремум (extremes от src.cot.get_extremes()) връща директна (от таблицата) + cross-sector (от AI) теза.
-    Batch-вано по config.COT_BATCH_SIZE заради token budget. Мърджва резултата обратно в extremes по "market", запазвайки
-    оригиналните числови полета (percentile, net_position, direction, history).
+    Мърджва резултата обратно в extremes по "market", запазвайки оригиналните числови полета (percentile, net_position,
+    direction, history).
 
-    Две отделни стъпки (пакет 3): (1) генериране — сляпо AI извикване, връща СУРОВИ механизми по пазар; (2) evaluate_cot_theses —
-    детерминирани проверки без AI, които се пускат всеки ден върху суровите отговори (знак по таблицата, верификация на тикъра,
-    outside_screener, значки за отворена/затворена позиция, схема). Втората стъпка няма достъп до модела: отхвърлянето на тикър
-    никога не води до регенерация.
+    Три стъпки (пакет 3): (1) КЕШ — суровите механизми на модела се пазят в data/cot_theses_cache.json по ключ (пазар, as_of,
+    посока, версия на промпта, модел); регенерация само при нов ключ (нов as_of, нова посока, нов екстремум, нова версия/модел)
+    или FORCE_COT_REGEN=1; (2) генериране САМО за липсващите ключове — сляпо AI извикване на batch-ове; при провал на batch се
+    показва старата теза на пазара с флаг stale (най-много COT_THESES_MAX_AGE_DAYS дни стара); ако COT данните са остарели
+    (data_stale) нищо не се регенерира; (3) evaluate_cot_theses — детерминирани проверки без AI, всеки ден върху суровите
+    отговори (знак по таблицата, верификация на тикъра, outside_screener, значки, схема).
 
     Пакет 3 т.б: AI извикването е СЛЯПО — screener_universe, open_positions и closed_positions НЕ влизат в промпта; служат само
     при показване. История: на 15.09 (RBOB/VLO) промптът получи отворените позиции, за да не твърди "не фигурира в брифа" за
@@ -1867,29 +1883,74 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     COT_DIAG.clear()
     if not extremes:
         return []
+    today = today or dt.date.today()
+    version, model = cot_prompt_version(), config.CLAUDE_MODEL
+    cache = _cot_table.load_cache(cache_path)
+    plan = _cot_table.plan_generation(extremes, cache, version, model, today, config.FORCE_COT_REGEN, data_stale)
     moves = {e["market"]: _instrument_move(e) for e in extremes}
     direct_by_market = {e["market"]: _cot_table.direct_thesis(e["market"], moves[e["market"]]) for e in extremes}
+
+    need = [e for e in extremes if plan[e["market"]]["action"] == "generate"]
     slim = [{"market": e["market"], "kind": config.COT_MARKET_KINDS.get(e["market"]), "category": e["category"],
              # пакет 3 т.в: директните тикъри идват от таблицата — моделът ги вижда само за да не ги повтаря
              "direct_tickers": [x["ticker"] for x in direct_by_market[e["market"]]["tickers"]]}
-            for e in extremes]
-
+            for e in need]
     size = max(1, config.COT_BATCH_SIZE)
     batches = [slim[i:i + size] for i in range(0, len(slim), size)]
     n = len(batches)
-    print(f"[ai] cot_theses: {len(slim)} екстремума → {n} batch(ове) по ≤{size}")
+    print(f"[ai] cot_theses: {len(extremes)} екстремума · от кеша {sum(p['action'] == 'cached' for p in plan.values())} · "
+          f"за генериране {len(need)} → {n} batch(ове) по ≤{size}"
+          + (" · FORCE_COT_REGEN" if config.FORCE_COT_REGEN else "") + (" · данните са остарели — без регенерация" if data_stale else ""))
 
-    raw_by_market: dict[str, list] = {}                      # сурови отговори на модела: пазар → [{ticker, company, mechanisms}]
+    fresh: dict[str, list] = {}                              # сурови отговори на модела: пазар → [{ticker, company, mechanisms}]
     for idx, batch in enumerate(batches, 1):
         for t in _cot_theses_for_batch(batch, f"{idx}/{n}"):
-            if isinstance(t, dict) and t.get("market") in moves:
-                raw_by_market[t["market"]] = t.get("tickers") if isinstance(t.get("tickers"), list) else []
-    return evaluate_cot_theses(extremes, raw_by_market, screener_universe, open_positions, closed_positions)
+            if isinstance(t, dict) and t.get("market") in moves and t["market"] in {x["market"] for x in batch}:
+                fresh[t["market"]] = t.get("tickers") if isinstance(t.get("tickers"), list) else []
+
+    raw_by_market: dict[str, list | None] = {}
+    meta: dict[str, dict] = {}
+    counts = {"cached": 0, "generated": 0, "stale_fallback": 0, "none": 0}
+    for e in extremes:
+        m = e["market"]
+        pl = plan[m]
+        if pl["action"] == "cached":
+            raw_by_market[m], meta[m] = pl["entry"]["tickers"], {"source": "cache", "generated_at": pl["entry"].get("generated_at")}
+            counts["cached"] += 1
+        elif pl["action"] == "generate" and m in fresh:
+            raw = fresh[m]
+            excluded = (_cot_table.evaluate_cross(raw, m, moves[m], exclude={x["ticker"] for x in direct_by_market[m]["tickers"]})
+                        .get("dropped_tickers") or [])
+            cache["entries"][pl["key"]] = {"market": m, "as_of": e["as_of"], "direction": e["direction"], "version": version, "model": model,
+                                           "generated_at": today.isoformat(), "tickers": raw, "excluded": excluded}
+            raw_by_market[m], meta[m] = raw, {"source": "generated", "generated_at": today.isoformat()}
+            counts["generated"] += 1
+        else:
+            why = ("COT данните са остарели — тезите не се регенерират" if pl["action"] == "stale_data"
+                   else "моделът не върна тази под-теза")
+            fb = _cot_table.fallback_entry(cache, m, today)
+            if fb:
+                raw_by_market[m] = fb["tickers"]
+                meta[m] = {"source": "stale_fallback", "stale": True, "generated_at": fb.get("generated_at"),
+                           "stale_note": (f"Остаряла теза: генерирана на {fb.get('generated_at')} за отчет към {fb.get('as_of')} "
+                                          f"({fb.get('direction')}); новата не е налична — {why}.")}
+                counts["stale_fallback"] += 1
+            else:
+                raw_by_market[m], meta[m] = None, {"source": "none", "empty_reason": why}
+                counts["none"] += 1
+    pruned = _cot_table.prune_cache(cache, today)
+    if counts["generated"] or pruned:
+        _cot_table.save_cache(cache, cache_path)
+    COT_DIAG["cache"] = {**counts, "pruned": pruned, "prompt_version": version, "model": model, "forced": bool(config.FORCE_COT_REGEN),
+                         "data_stale": bool(data_stale), "generated_markets": sorted(fresh)}
+    print(f"[ai] cot_theses кеш: {counts} · версия {version}")
+    return evaluate_cot_theses(extremes, raw_by_market, screener_universe, open_positions, closed_positions, meta_by_market=meta)
 
 
 def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | None], screener_universe: list[dict],
                         open_positions: list[dict] | None = None,
-                        closed_positions: list[dict] | None = None) -> list[dict]:
+                        closed_positions: list[dict] | None = None,
+                        meta_by_market: dict[str, dict] | None = None) -> list[dict]:
     """
     Ежедневните ДЕТЕРМИНИРАНИ проверки върху суровите механизми на модела (пакет 3 т.д) — без AI, без регенерация:
       1. таблицата за знака и схемата (cot_theses.evaluate_cross): ефект, "mixed", невалиден тип/quote → dropped_tickers с причина;
@@ -1913,14 +1974,16 @@ def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | No
         cross = _cot_table.evaluate_cross(raw, market, moves[market],
                                           exclude={x["ticker"] for x in direct["tickers"]},
                                           log=lambda msg, m=market: _cot_diag_log(m, msg))
+        meta = (meta_by_market or {}).get(market) or {}
         if raw is None:
-            cross["empty_reason"] = "моделът не върна тази под-теза"
+            cross["empty_reason"] = meta.get("empty_reason") or "моделът не върна тази под-теза"
         badges = lambda th: cot_theses_badges(th, screener_tickers, open_by_ticker, closed_by_ticker)
         merged.append({**e, **move,
                        "direct_thesis": badges(_empty_sub_reason(
                            direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, market)), market, "direct")),
-                       "cross_sector_thesis": badges(_empty_sub_reason(
-                           cross, _strip_internal(_verify_thesis_tickers(cross, screener_tickers, market)), market, "cross"))})
+                       "cross_sector_thesis": {**badges(_empty_sub_reason(
+                           cross, _strip_internal(_verify_thesis_tickers(cross, screener_tickers, market)), market, "cross")),
+                           **{k: v for k, v in meta.items() if k in ("source", "generated_at", "stale", "stale_note")}}})
         weeks = e.get("weeks_of_history")
         if weeks is not None and weeks < config.COT_SHORT_HISTORY_WEEKS:
             merged[-1]["history_note"] = (f"История само {weeks} седмици (под стандартните ~156) — percentile-ът тук е "

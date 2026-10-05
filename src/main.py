@@ -445,8 +445,10 @@ def run() -> dict:
          "outcome": _RESOLUTION_BG.get(rec.get("status"), rec.get("status"))}
         for t, rec in sorted(_last_resolved_positions().items()) if t not in cot_live
     ] if config.ENABLE_BACKTEST else []
+    # пакет 3 т.а/т.ж: кеш на тезите; при остарели COT данни (cot.LAST_STATUS["stale"]) нищо не се регенерира
     cot_with_theses = ai_brief.cot_theses(
-        cot_extremes, screener_universe, cot_open_positions, cot_closed_positions) if cot_extremes else []
+        cot_extremes, screener_universe, cot_open_positions, cot_closed_positions,
+        data_stale=bool(config.ENABLE_COT and cot.LAST_STATUS.get("stale"))) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:

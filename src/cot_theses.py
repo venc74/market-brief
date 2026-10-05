@@ -9,7 +9,12 @@ COT тези — частта, която държи КОДЪТ, не модел
 """
 from __future__ import annotations
 
+import datetime as dt
+import json
+import os
+import pathlib
 import re
+import tempfile
 
 import config
 
@@ -246,3 +251,93 @@ def cross_empty_reason(model_returned: bool, dropped: list[dict]) -> str:
     if model_returned:
         return "предложените тикъри бяха директни по таблицата или невалидни"
     return "моделът не предложи тикър със структурен механизъм към този инструмент"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Кеш на тезите (пакет 3 т.а, т.ж): суровите отговори на модела по ключ; ежедневните проверки (evaluate_cot_theses) са отгоре
+# ══════════════════════════════════════════════════════════════════════════
+def cache_key(market: str, as_of: str, direction: str, version: str, model: str) -> str:
+    return "|".join([market, str(as_of), str(direction), version, model])
+
+
+def load_cache(path=None) -> dict:
+    """Кешът от data/cot_theses_cache.json; липсващ/повреден файл → празен кеш (с лог), никога изключение."""
+    path = pathlib.Path(path or config.COT_THESES_CACHE_FILE)
+    empty = {"version": 1, "entries": {}}
+    if not path.exists():
+        return empty
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or not isinstance(data.get("entries"), dict):
+            raise ValueError("няма 'entries'")
+        return data
+    except Exception as e:
+        print(f"[cot] ⚠ кешът на тезите е повреден ({type(e).__name__}: {e}) — започва се начисто")
+        return empty
+
+
+def save_cache(cache: dict, path=None) -> None:
+    """Атомичен запис (временен файл + replace); провал → лог, не изключение."""
+    path = pathlib.Path(path or config.COT_THESES_CACHE_FILE)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".cot_theses_", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, path)
+    except Exception as e:
+        print(f"[cot] кешът на тезите не се записа: {type(e).__name__}: {e}")
+
+
+def latest_for_market(cache: dict, market: str) -> dict | None:
+    """Най-скорошният запис за пазара (по дата на генериране, после по as_of), с какъвто и да е ключ."""
+    rows = [e for e in cache["entries"].values() if e.get("market") == market]
+    return max(rows, key=lambda e: (e.get("generated_at", ""), e.get("as_of", ""))) if rows else None
+
+
+def entry_age_days(entry: dict, today: dt.date) -> int | None:
+    try:
+        return (today - dt.date.fromisoformat(str(entry.get("generated_at"))[:10])).days
+    except ValueError:
+        return None
+
+
+def plan_generation(extremes: list[dict], cache: dict, version: str, model: str, today: dt.date,
+                    force: bool = False, data_stale: bool = False) -> dict[str, dict]:
+    """
+    Какво да се прави за всеки екстремум (чиста функция):
+      "cached"     — ключът (пазар, as_of, посока, версия, модел) е в кеша → повторно ползване;
+      "generate"   — нов ключ (нов as_of, нова посока, нов екстремум, нова версия/модел) или FORCE_COT_REGEN → AI;
+      "stale_data" — COT данните са остарели (as_of по-стар от COT_STALE_DAYS) и ключът липсва → НЕ се регенерира (т.ж).
+    Резултат: {market: {"action", "key", "entry" (при cached)}}.
+    """
+    out = {}
+    for e in extremes:
+        key = cache_key(e["market"], e["as_of"], e["direction"], version, model)
+        entry = cache["entries"].get(key)
+        if entry and not force:
+            out[e["market"]] = {"action": "cached", "key": key, "entry": entry}
+        elif data_stale and not force:
+            out[e["market"]] = {"action": "stale_data", "key": key}
+        else:
+            out[e["market"]] = {"action": "generate", "key": key}
+    return out
+
+
+def fallback_entry(cache: dict, market: str, today: dt.date) -> dict | None:
+    """Старата теза на пазара при провал на генерирането — само ако е най-много COT_THESES_MAX_AGE_DAYS дни стара."""
+    e = latest_for_market(cache, market)
+    if not e:
+        return None
+    age = entry_age_days(e, today)
+    return e if age is not None and 0 <= age <= config.COT_THESES_MAX_AGE_DAYS else None
+
+
+def prune_cache(cache: dict, today: dt.date) -> int:
+    """Маха записи, по-стари от COT_THESES_CACHE_KEEP_DAYS дни, освен най-скорошния за всеки пазар. Връща броя махнати."""
+    keep_latest = {id(latest_for_market(cache, m)) for m in {e.get("market") for e in cache["entries"].values()}}
+    drop = [k for k, e in cache["entries"].items()
+            if id(e) not in keep_latest and (entry_age_days(e, today) or 0) > config.COT_THESES_CACHE_KEEP_DAYS]
+    for k in drop:
+        del cache["entries"][k]
+    return len(drop)

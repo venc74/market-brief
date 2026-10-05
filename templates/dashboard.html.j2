@@ -1051,6 +1051,9 @@
           Няма {{ label|lower }} — {{ th.empty_reason }}.
         </div>
         {% endif %}
+        {% if th.stale_note %}
+        <div class="small" style="font-size:11.5px;color:var(--yellow);margin-top:4px">⚠ {{ th.stale_note }}</div>
+        {% endif %}
         {% if th.withdrawn_tickers %}
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
           Няма пряка връзка — {{ th.withdrawn_tickers|join(', ') }} махнат(и) от списъка.

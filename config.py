@@ -738,6 +738,17 @@ COT_KIND_TEXT = {
     "rate": "облигационен фючърс (цена↑ = доходността ПАДА)", "crypto": "криптовалута", "commodity": "стока",
 }
 # Cross-sector (пакет 3 т.г): колко тикъра и механизма, максимална дължина на описанието (quote)
+# Кеш на COT тезите (пакет 3 т.а): data/cot_theses_cache.json. Ключ: (пазар, as_of, посока на екстремума, версия на промпта/схемата,
+# модел). Регенерация само при нов as_of, нова посока, нов екстремум (нов ключ), смяна на версията или модела; иначе тезата се
+# ползва повторно. COT_SCHEMA_VERSION се вдига на ръка при промяна на логиката/схемата, която промптът не отразява; освен него
+# версията включва хеш на системния текст, промпта и таблиците (виж ai_brief.cot_prompt_version) — промяна на промпта или
+# таблицата за знака сама сменя версията. COT_THESES_MAX_AGE_DAYS: при провал на batch се показва СТАРАТА теза на пазара (с
+# флаг stale) само ако е най-много толкова дни стара, иначе — празна с причина. FORCE_COT_REGEN=1 регенерира всичко.
+COT_THESES_CACHE_FILE = DATA_DIR / "cot_theses_cache.json"
+COT_SCHEMA_VERSION = os.getenv("COT_SCHEMA_VERSION", "1")
+COT_THESES_MAX_AGE_DAYS = int(os.getenv("COT_THESES_MAX_AGE_DAYS", 8))
+COT_THESES_CACHE_KEEP_DAYS = int(os.getenv("COT_THESES_CACHE_KEEP_DAYS", 30))
+FORCE_COT_REGEN = os.getenv("FORCE_COT_REGEN", "0") == "1"
 # значка CLOSED при тикър на COT теза, чиято позиция е затворена до толкова дни назад (виж cot_theses.ticker_badges)
 COT_CLOSED_BADGE_DAYS = int(os.getenv("COT_CLOSED_BADGE_DAYS", 14))
 COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))
