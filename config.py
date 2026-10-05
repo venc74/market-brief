@@ -148,6 +148,20 @@ BUYSTOP_TRACK_FROM = os.getenv("BUYSTOP_TRACK_FROM", "2026-10-07")
 # само броят и средният R (при n=14 доверителният интервал на win rate е ~±25 пункта — реплеят на реалните кандидати: 1 печеливш от 14).
 BUYSTOP_MIN_CLOSED_FOR_WINRATE = int(os.getenv("BUYSTOP_MIN_CLOSED_FOR_WINRATE", 20))
 
+# ── Предупреждение за отчет върху картата (пакет 4б т.д — 06.10.2026) ──────
+# При отчет в следващите EARNINGS_WARNING_SESSIONS търговски сесии картата показва датата и ОЧАКВАНОТО движение от опциите (само информация, без промяна на размера).
+# Очакваното движение = ATM straddle на първия падеж СЛЕД отчета, от който е извадена базовата волатилност (straddle на последния падеж ПРЕДИ отчета, мащабиран
+# по корен от броя сесии): събитие = sqrt(A² − B²·Ta/Tb) / цена. Реален пример (FTNT, отчет 28.10, опции от 05.10): простият straddle на 30.10 е ±13.9%
+# (включва 25 дни базова волатилност), а само събитието е ±10.6%. Данните са от следобедната снимка (bid/ask в сесията); ненадеждно → само датата.
+EARNINGS_WARNING_SESSIONS = int(os.getenv("EARNINGS_WARNING_SESSIONS", 20))
+EARNINGS_SNAPSHOT_WINDOW_DAYS = int(os.getenv("EARNINGS_SNAPSHOT_WINDOW_DAYS", 32))      # календарни дни напред (20 сесии ≈ 28 дни + резерв) за кои отчети се снимат straddle-и
+EARNINGS_MOVE_MAX_EXPIRY_GAP_DAYS = int(os.getenv("EARNINGS_MOVE_MAX_EXPIRY_GAP_DAYS", 7))   # падежът след отчета най-много толкова дни след него
+EARNINGS_MOVE_MAX_BASELINE_GAP_DAYS = int(os.getenv("EARNINGS_MOVE_MAX_BASELINE_GAP_DAYS", 21))  # падежите преди и след отчета са най-много толкова дни един от друг
+EARNINGS_MOVE_MIN_BASELINE_SESSIONS = int(os.getenv("EARNINGS_MOVE_MIN_BASELINE_SESSIONS", 3))  # падежът преди отчета е поне толкова сесии след снимката
+EARNINGS_MOVE_MAX_SPREAD_PCT = float(os.getenv("EARNINGS_MOVE_MAX_SPREAD_PCT", 25.0))     # bid/ask спред на всяко краче (% от mid)
+EARNINGS_MOVE_MAX_STRIKE_DIST_PCT = float(os.getenv("EARNINGS_MOVE_MAX_STRIKE_DIST_PCT", 3.0))  # ATM страйкът е най-много толкова % от цената
+EARNINGS_MOVE_MIN_PCT, EARNINGS_MOVE_MAX_PCT = 0.3, 60.0                                  # правдоподобност на резултата
+
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
 # "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.

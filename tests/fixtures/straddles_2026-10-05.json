@@ -1,0 +1,860 @@
+{
+ "_note": "РЕАЛНИ опционни котировки от Yahoo, изтеглени на 2026-10-05 ~14:45 UTC (понеделник, US сесията е в ход; bid/ask са валидни). Само редовете около ATM (±3 страйка).",
+ "fetched_utc": "2026-10-05 14:38",
+ "tickers": {
+  "FTNT": {
+   "spot": 182.79,
+   "options": [
+    "2026-10-09",
+    "2026-10-16",
+    "2026-10-23",
+    "2026-10-30",
+    "2026-11-06",
+    "2026-11-13",
+    "2026-11-20",
+    "2026-12-18",
+    "2027-01-15",
+    "2027-03-19",
+    "2027-06-17",
+    "2027-09-17",
+    "2028-01-21",
+    "2029-01-19"
+   ],
+   "chains": {
+    "2026-10-16": {
+     "calls": [
+      {
+       "strike": 175.0,
+       "bid": 9.55,
+       "ask": 11.0,
+       "lastPrice": 10.15
+      },
+      {
+       "strike": 177.5,
+       "bid": 7.85,
+       "ask": 9.3,
+       "lastPrice": 8.45
+      },
+      {
+       "strike": 180.0,
+       "bid": 6.8,
+       "ask": 7.45,
+       "lastPrice": 6.95
+      },
+      {
+       "strike": 182.5,
+       "bid": 5.8,
+       "ask": 6.35,
+       "lastPrice": 5.7
+      },
+      {
+       "strike": 185.0,
+       "bid": 4.35,
+       "ask": 5.0,
+       "lastPrice": 4.5
+      },
+      {
+       "strike": 187.5,
+       "bid": 2.24,
+       "ask": 4.0,
+       "lastPrice": 3.05
+      },
+      {
+       "strike": 190.0,
+       "bid": 2.42,
+       "ask": 2.93,
+       "lastPrice": 2.5
+      }
+     ],
+     "puts": [
+      {
+       "strike": 172.5,
+       "bid": 1.4,
+       "ask": 1.74,
+       "lastPrice": 1.97
+      },
+      {
+       "strike": 175.0,
+       "bid": 1.96,
+       "ask": 2.37,
+       "lastPrice": 3.2
+      },
+      {
+       "strike": 177.5,
+       "bid": 2.75,
+       "ask": 3.2,
+       "lastPrice": 3.5
+      },
+      {
+       "strike": 180.0,
+       "bid": 3.6,
+       "ask": 4.15,
+       "lastPrice": 4.95
+      },
+      {
+       "strike": 182.5,
+       "bid": 4.6,
+       "ask": 5.35,
+       "lastPrice": 9.2
+      },
+      {
+       "strike": 185.0,
+       "bid": 6.0,
+       "ask": 6.6,
+       "lastPrice": 8.45
+      },
+      {
+       "strike": 190.0,
+       "bid": 9.15,
+       "ask": 11.25,
+       "lastPrice": 11.5
+      }
+     ]
+    },
+    "2026-10-23": {
+     "calls": [
+      {
+       "strike": 170.0,
+       "bid": 14.2,
+       "ask": 16.45,
+       "lastPrice": 14.16
+      },
+      {
+       "strike": 175.0,
+       "bid": 10.2,
+       "ask": 12.65,
+       "lastPrice": 11.47
+      },
+      {
+       "strike": 180.0,
+       "bid": 8.4,
+       "ask": 9.2,
+       "lastPrice": 7.0
+      },
+      {
+       "strike": 185.0,
+       "bid": 5.75,
+       "ask": 6.55,
+       "lastPrice": 5.82
+      },
+      {
+       "strike": 190.0,
+       "bid": 3.8,
+       "ask": 4.5,
+       "lastPrice": 3.7
+      },
+      {
+       "strike": 195.0,
+       "bid": 2.37,
+       "ask": 2.97,
+       "lastPrice": 2.36
+      },
+      {
+       "strike": 200.0,
+       "bid": 1.52,
+       "ask": 1.95,
+       "lastPrice": 1.67
+      }
+     ],
+     "puts": [
+      {
+       "strike": 155.0,
+       "bid": 0.19,
+       "ask": 0.77,
+       "lastPrice": 0.4
+      },
+      {
+       "strike": 160.0,
+       "bid": 0.51,
+       "ask": 1.0,
+       "lastPrice": 0.79
+      },
+      {
+       "strike": 165.0,
+       "bid": 0.84,
+       "ask": 1.24,
+       "lastPrice": 1.24
+      },
+      {
+       "strike": 170.0,
+       "bid": 1.57,
+       "ask": 2.25,
+       "lastPrice": 2.58
+      },
+      {
+       "strike": 175.0,
+       "bid": 3.15,
+       "ask": 3.65,
+       "lastPrice": 4.2
+      },
+      {
+       "strike": 180.0,
+       "bid": 4.9,
+       "ask": 5.55,
+       "lastPrice": 6.32
+      },
+      {
+       "strike": 185.0,
+       "bid": 7.35,
+       "ask": 8.0,
+       "lastPrice": 9.1
+      }
+     ]
+    },
+    "2026-10-30": {
+     "calls": [
+      {
+       "strike": 170.0,
+       "bid": 18.15,
+       "ask": 21.05,
+       "lastPrice": 18.45
+      },
+      {
+       "strike": 175.0,
+       "bid": 16.45,
+       "ask": 17.85,
+       "lastPrice": 16.9
+      },
+      {
+       "strike": 180.0,
+       "bid": 13.35,
+       "ask": 15.2,
+       "lastPrice": 13.26
+      },
+      {
+       "strike": 185.0,
+       "bid": 11.25,
+       "ask": 12.6,
+       "lastPrice": 11.1
+      },
+      {
+       "strike": 190.0,
+       "bid": 9.2,
+       "ask": 10.5,
+       "lastPrice": 8.95
+      },
+      {
+       "strike": 195.0,
+       "bid": 7.5,
+       "ask": 8.45,
+       "lastPrice": 7.3
+      },
+      {
+       "strike": 200.0,
+       "bid": 5.0,
+       "ask": 7.35,
+       "lastPrice": 5.55
+      }
+     ],
+     "puts": [
+      {
+       "strike": 165.0,
+       "bid": 4.7,
+       "ask": 5.15,
+       "lastPrice": 5.1
+      },
+      {
+       "strike": 170.0,
+       "bid": 6.45,
+       "ask": 6.8,
+       "lastPrice": 7.03
+      },
+      {
+       "strike": 175.0,
+       "bid": 8.4,
+       "ask": 8.8,
+       "lastPrice": 9.7
+      },
+      {
+       "strike": 180.0,
+       "bid": 10.55,
+       "ask": 11.05,
+       "lastPrice": 11.6
+      },
+      {
+       "strike": 185.0,
+       "bid": 13.1,
+       "ask": 13.75,
+       "lastPrice": 15.05
+      },
+      {
+       "strike": 190.0,
+       "bid": 15.6,
+       "ask": 16.65,
+       "lastPrice": 20.8
+      },
+      {
+       "strike": 205.0,
+       "bid": 26.3,
+       "ask": 28.55,
+       "lastPrice": 27.8
+      }
+     ]
+    },
+    "2026-11-06": {
+     "calls": [
+      {
+       "strike": 165.0,
+       "bid": 22.65,
+       "ask": 24.9,
+       "lastPrice": 20.82
+      },
+      {
+       "strike": 170.0,
+       "bid": 19.35,
+       "ask": 22.05,
+       "lastPrice": 17.9
+      },
+      {
+       "strike": 175.0,
+       "bid": 16.35,
+       "ask": 18.6,
+       "lastPrice": 15.34
+      },
+      {
+       "strike": 180.0,
+       "bid": 13.55,
+       "ask": 15.9,
+       "lastPrice": 15.27
+      },
+      {
+       "strike": 185.0,
+       "bid": 11.5,
+       "ask": 13.4,
+       "lastPrice": 12.55
+      },
+      {
+       "strike": 190.0,
+       "bid": 9.15,
+       "ask": 11.65,
+       "lastPrice": 10.75
+      },
+      {
+       "strike": 200.0,
+       "bid": 6.05,
+       "ask": 8.05,
+       "lastPrice": 7.43
+      }
+     ],
+     "puts": [
+      {
+       "strike": 165.0,
+       "bid": 5.5,
+       "ask": 7.0,
+       "lastPrice": 6.6
+      },
+      {
+       "strike": 170.0,
+       "bid": 7.15,
+       "ask": 9.15,
+       "lastPrice": 8.13
+      },
+      {
+       "strike": 175.0,
+       "bid": 9.1,
+       "ask": 11.25,
+       "lastPrice": 10.52
+      },
+      {
+       "strike": 180.0,
+       "bid": 11.15,
+       "ask": 13.65,
+       "lastPrice": 12.37
+      },
+      {
+       "strike": 185.0,
+       "bid": 14.05,
+       "ask": 16.4,
+       "lastPrice": 16.39
+      },
+      {
+       "strike": 190.0,
+       "bid": 17.0,
+       "ask": 19.3,
+       "lastPrice": 21.42
+      },
+      {
+       "strike": 200.0,
+       "bid": 23.45,
+       "ask": 25.6,
+       "lastPrice": 26.45
+      }
+     ]
+    },
+    "2026-11-20": {
+     "calls": [
+      {
+       "strike": 170.0,
+       "bid": 21.55,
+       "ask": 23.1,
+       "lastPrice": 20.65
+      },
+      {
+       "strike": 175.0,
+       "bid": 19.35,
+       "ask": 20.2,
+       "lastPrice": 19.51
+      },
+      {
+       "strike": 180.0,
+       "bid": 16.65,
+       "ask": 17.25,
+       "lastPrice": 16.35
+      },
+      {
+       "strike": 185.0,
+       "bid": 14.1,
+       "ask": 14.95,
+       "lastPrice": 13.43
+      },
+      {
+       "strike": 190.0,
+       "bid": 12.1,
+       "ask": 12.65,
+       "lastPrice": 11.96
+      },
+      {
+       "strike": 195.0,
+       "bid": 10.2,
+       "ask": 10.85,
+       "lastPrice": 9.87
+      },
+      {
+       "strike": 200.0,
+       "bid": 8.75,
+       "ask": 9.1,
+       "lastPrice": 8.25
+      }
+     ],
+     "puts": [
+      {
+       "strike": 165.0,
+       "bid": 6.75,
+       "ask": 7.55,
+       "lastPrice": 7.3
+      },
+      {
+       "strike": 170.0,
+       "bid": 8.5,
+       "ask": 9.35,
+       "lastPrice": 8.99
+      },
+      {
+       "strike": 175.0,
+       "bid": 10.4,
+       "ask": 10.75,
+       "lastPrice": 11.65
+      },
+      {
+       "strike": 180.0,
+       "bid": 12.65,
+       "ask": 13.2,
+       "lastPrice": 14.25
+      },
+      {
+       "strike": 185.0,
+       "bid": 15.5,
+       "ask": 16.1,
+       "lastPrice": 16.95
+      },
+      {
+       "strike": 190.0,
+       "bid": 18.05,
+       "ask": 19.0,
+       "lastPrice": 19.35
+      },
+      {
+       "strike": 195.0,
+       "bid": 21.15,
+       "ask": 23.55,
+       "lastPrice": 26.1
+      }
+     ]
+    }
+   }
+  },
+  "AVT": {
+   "spot": 105.97,
+   "options": [
+    "2026-10-16",
+    "2026-11-20",
+    "2027-02-19",
+    "2027-05-21",
+    "2027-12-17"
+   ],
+   "chains": {
+    "2026-10-16": {
+     "calls": [
+      {
+       "strike": 90.0,
+       "bid": 15.6,
+       "ask": 18.2,
+       "lastPrice": 17.3
+      },
+      {
+       "strike": 95.0,
+       "bid": 10.9,
+       "ask": 13.3,
+       "lastPrice": 10.49
+      },
+      {
+       "strike": 100.0,
+       "bid": 6.7,
+       "ask": 8.7,
+       "lastPrice": 7.75
+      },
+      {
+       "strike": 105.0,
+       "bid": 3.5,
+       "ask": 5.9,
+       "lastPrice": 4.6
+      },
+      {
+       "strike": 110.0,
+       "bid": 1.65,
+       "ask": 2.0,
+       "lastPrice": 1.8
+      },
+      {
+       "strike": 115.0,
+       "bid": 0.45,
+       "ask": 1.3,
+       "lastPrice": 1.1
+      },
+      {
+       "strike": 120.0,
+       "bid": 0.0,
+       "ask": 1.25,
+       "lastPrice": 0.98
+      }
+     ],
+     "puts": [
+      {
+       "strike": 80.0,
+       "bid": 0.0,
+       "ask": 0.95,
+       "lastPrice": 0.32
+      },
+      {
+       "strike": 85.0,
+       "bid": 0.0,
+       "ask": 0.7,
+       "lastPrice": 0.37
+      },
+      {
+       "strike": 90.0,
+       "bid": 0.0,
+       "ask": 0.45,
+       "lastPrice": 0.58
+      },
+      {
+       "strike": 95.0,
+       "bid": 0.15,
+       "ask": 2.0,
+       "lastPrice": 0.55
+      },
+      {
+       "strike": 100.0,
+       "bid": 0.75,
+       "ask": 1.9,
+       "lastPrice": 1.0
+      },
+      {
+       "strike": 105.0,
+       "bid": 1.45,
+       "ask": 3.2,
+       "lastPrice": 4.8
+      },
+      {
+       "strike": 110.0,
+       "bid": 3.9,
+       "ask": 6.5,
+       "lastPrice": 5.04
+      }
+     ]
+    },
+    "2026-11-20": {
+     "calls": [
+      {
+       "strike": 90.0,
+       "bid": 17.4,
+       "ask": 20.0,
+       "lastPrice": 19.2
+      },
+      {
+       "strike": 95.0,
+       "bid": 14.2,
+       "ask": 15.3,
+       "lastPrice": 15.35
+      },
+      {
+       "strike": 100.0,
+       "bid": 10.8,
+       "ask": 12.5,
+       "lastPrice": 11.4
+      },
+      {
+       "strike": 105.0,
+       "bid": 8.0,
+       "ask": 9.5,
+       "lastPrice": 9.44
+      },
+      {
+       "strike": 110.0,
+       "bid": 5.6,
+       "ask": 6.5,
+       "lastPrice": 7.0
+      },
+      {
+       "strike": 115.0,
+       "bid": 3.6,
+       "ask": 5.3,
+       "lastPrice": 2.6
+      },
+      {
+       "strike": 120.0,
+       "bid": 1.6,
+       "ask": 4.4,
+       "lastPrice": 3.1
+      }
+     ],
+     "puts": [
+      {
+       "strike": 80.0,
+       "bid": 0.25,
+       "ask": 0.45,
+       "lastPrice": 0.85
+      },
+      {
+       "strike": 85.0,
+       "bid": 0.45,
+       "ask": 1.3,
+       "lastPrice": 0.97
+      },
+      {
+       "strike": 90.0,
+       "bid": 1.5,
+       "ask": 3.2,
+       "lastPrice": 1.65
+      },
+      {
+       "strike": 95.0,
+       "bid": 2.0,
+       "ask": 4.1,
+       "lastPrice": 2.66
+      },
+      {
+       "strike": 100.0,
+       "bid": 4.0,
+       "ask": 5.4,
+       "lastPrice": 4.28
+      },
+      {
+       "strike": 105.0,
+       "bid": 6.0,
+       "ask": 7.1,
+       "lastPrice": 6.84
+      },
+      {
+       "strike": 110.0,
+       "bid": 7.9,
+       "ask": 10.4,
+       "lastPrice": 11.4
+      }
+     ]
+    }
+   }
+  },
+  "ARW": {
+   "spot": 241.71,
+   "options": [
+    "2026-10-16",
+    "2026-11-20",
+    "2026-12-18",
+    "2027-03-19"
+   ],
+   "chains": {
+    "2026-10-16": {
+     "calls": [
+      {
+       "strike": 210.0,
+       "bid": 31.2,
+       "ask": 34.0,
+       "lastPrice": 36.15
+      },
+      {
+       "strike": 220.0,
+       "bid": 23.8,
+       "ask": 25.2,
+       "lastPrice": 24.79
+      },
+      {
+       "strike": 230.0,
+       "bid": 14.0,
+       "ask": 16.0,
+       "lastPrice": 16.6
+      },
+      {
+       "strike": 240.0,
+       "bid": 7.2,
+       "ask": 9.8,
+       "lastPrice": 8.3
+      },
+      {
+       "strike": 250.0,
+       "bid": 3.9,
+       "ask": 4.5,
+       "lastPrice": 4.8
+      },
+      {
+       "strike": 260.0,
+       "bid": 0.85,
+       "ask": 2.35,
+       "lastPrice": 2.25
+      },
+      {
+       "strike": 270.0,
+       "bid": 0.1,
+       "ask": 1.75,
+       "lastPrice": 0.85
+      }
+     ],
+     "puts": [
+      {
+       "strike": 190.0,
+       "bid": 0.0,
+       "ask": 0.75,
+       "lastPrice": 0.1
+      },
+      {
+       "strike": 195.0,
+       "bid": 0.0,
+       "ask": 0.75,
+       "lastPrice": 1.1
+      },
+      {
+       "strike": 200.0,
+       "bid": 0.0,
+       "ask": 0.2,
+       "lastPrice": 0.16
+      },
+      {
+       "strike": 210.0,
+       "bid": 0.0,
+       "ask": 0.4,
+       "lastPrice": 0.35
+      },
+      {
+       "strike": 220.0,
+       "bid": 0.0,
+       "ask": 2.2,
+       "lastPrice": 3.6
+      },
+      {
+       "strike": 230.0,
+       "bid": 0.85,
+       "ask": 3.0,
+       "lastPrice": 10.0
+      },
+      {
+       "strike": 270.0,
+       "bid": 26.9,
+       "ask": 29.7,
+       "lastPrice": 29.2
+      }
+     ]
+    },
+    "2026-11-20": {
+     "calls": [
+      {
+       "strike": 220.0,
+       "bid": 28.0,
+       "ask": 30.6,
+       "lastPrice": 31.2
+      },
+      {
+       "strike": 230.0,
+       "bid": 21.8,
+       "ask": 24.2,
+       "lastPrice": 25.58
+      },
+      {
+       "strike": 240.0,
+       "bid": 17.2,
+       "ask": 18.6,
+       "lastPrice": 18.2
+      },
+      {
+       "strike": 250.0,
+       "bid": 12.6,
+       "ask": 14.3,
+       "lastPrice": 13.2
+      },
+      {
+       "strike": 260.0,
+       "bid": 8.9,
+       "ask": 10.8,
+       "lastPrice": 6.42
+      },
+      {
+       "strike": 270.0,
+       "bid": 6.2,
+       "ask": 8.0,
+       "lastPrice": 8.0
+      },
+      {
+       "strike": 280.0,
+       "bid": 4.3,
+       "ask": 5.8,
+       "lastPrice": 5.4
+      }
+     ],
+     "puts": [
+      {
+       "strike": 195.0,
+       "bid": 0.15,
+       "ask": 2.5,
+       "lastPrice": 1.7
+      },
+      {
+       "strike": 200.0,
+       "bid": 0.9,
+       "ask": 2.7,
+       "lastPrice": 1.9
+      },
+      {
+       "strike": 210.0,
+       "bid": 3.4,
+       "ask": 3.9,
+       "lastPrice": 3.8
+      },
+      {
+       "strike": 220.0,
+       "bid": 5.7,
+       "ask": 6.8,
+       "lastPrice": 5.7
+      },
+      {
+       "strike": 230.0,
+       "bid": 8.9,
+       "ask": 10.5,
+       "lastPrice": 18.62
+      },
+      {
+       "strike": 240.0,
+       "bid": 13.2,
+       "ask": 15.2,
+       "lastPrice": 15.67
+      },
+      {
+       "strike": 250.0,
+       "bid": 18.7,
+       "ask": 20.9,
+       "lastPrice": 18.66
+      }
+     ]
+    }
+   }
+  }
+ }
+}

@@ -32,6 +32,7 @@ from src import cot
 from src import cot_track
 from src import entry_timing
 from src import setup_rules
+from src import earnings_move
 from src import glb_screener
 from src import short_screener
 from src import short_tracker
@@ -489,6 +490,12 @@ def run() -> dict:
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
     # чист AI prose, датата "измисляна" наново всеки ден).
     watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
+    # пакет 4б т.д: отчет в следващите ~20 сесии → предупреждение върху картата с датата и очакваното движение от опциите (само информация)
+    try:
+        n_warn = earnings_move.annotate(action + watchlist)
+        print(f"      Предупреждения за отчет: {n_warn} ({sum(1 for c in action + watchlist if (c.get('earnings_warning') or {}).get('implied_move_pct') is not None)} с очаквано движение)")
+    except Exception as e:
+        print(f"[main] предупрежденията за отчети пропуснати: {type(e).__name__}: {e}")
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
     # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +

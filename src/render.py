@@ -197,13 +197,15 @@ def render_email(brief: dict) -> str:
             f'margin:3px 3px 0 0">{_e(m["tag"])}</span>'
             for m in st.get("markers", []))
         mk = f'<div style="margin-top:4px">{mk}</div>' if mk else ""
+        ew = st.get("earnings_warning")
+        earn_line = f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>' if ew else ""
         rows += f"""
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-weight:bold;color:{color}">{_e(st['ticker'])}{mk}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">
               {_e(st['company'])}<br>
-              <span style="color:#6b7280">{_e(st['base_type'])} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span></td>
+              <span style="color:#6b7280">{_e(st['base_type'])} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span>{earn_line}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-size:13px;white-space:nowrap">
               {plan_txt}</td>

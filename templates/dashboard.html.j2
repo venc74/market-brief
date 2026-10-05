@@ -128,6 +128,10 @@
      новият план носи реален риск в име, което току-що е струвало пари. */
   .re-entry { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
               border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  /* пакет 4б т.д: предупреждение за отчет върху картата (само информация) */
+  .earn-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
+               border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  .watch-card .earn-warn { margin: 6px 0 4px; }
   .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
   .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
     padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
@@ -709,6 +713,7 @@
       {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).
       Това е <strong>нов вход</strong>, не продължение на старата теза.</div>
     {% endif %}
+    {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
     <div class="stock-body">
       <div class="block">
         <h3>Защо точно сега</h3>
@@ -813,6 +818,7 @@
         приключи на {{ st.prev_position.resolution_date }} ({{ st.prev_position.outcome }}{% if st.prev_position.realized_r is not none %},
         {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
       {% endif %}
+      {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
       <p>{{ st.ai.why_now }}</p>
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}
         · pivot ${{ st.pivot }} ({{ "%+.1f"|format(st.pct_from_pivot) }}%)</div>

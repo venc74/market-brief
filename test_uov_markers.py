@@ -147,7 +147,8 @@ def fake_ticker(sym):
 oi_snapshot.uo.yf = types.SimpleNamespace(Ticker=fake_ticker)
 oi_snapshot.uo._top_by_volume = lambda *a, **k: (_ for _ in ()).throw(AssertionError("топ-N по ликвидност не се ползва при N=0"))
 snap = oi_snapshot.take_snapshot()
-assert config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS == 0 and seen == exp and sorted(snap["tickers"]) == sorted(exp)
+assert config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS == 0 and seen[:len(exp)] == exp and sorted(snap["tickers"]) == sorted(exp)     # първата обиколка е за OI; след нея — straddle-ите за отчетите (т.д)
+assert isinstance(snap["straddles"], dict)
 assert snap["horizon_days"] == 28 and all(list(v.values()) == [600] for v in snap["tickers"].values())
 (config.DATA_DIR / "backtest_tracker.json").unlink()
 for f in config.DATA_DIR.glob("2026-*.json"):

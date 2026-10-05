@@ -44,6 +44,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import unusual_options as uo
+from src import earnings_move
 
 _NY = ZoneInfo("America/New_York")
 
@@ -192,10 +193,17 @@ def take_snapshot() -> dict | None:
             print(f"[oi_snapshot] {sym}: {type(e).__name__}: {e}")
 
     with_oi = sum(1 for v in oi.values() if sum(v.values()) >= 50)
+    # пакет 4б т.д: сурови ATM straddle-и около отчетите (падеж след и преди) за тикърите с отчет в следващите ~32 дни; провал → празно, снимката на OI не страда
+    try:
+        straddles = earnings_move.snapshot_straddles(tickers, session, uo.yf)
+    except Exception as e:
+        print(f"[oi_snapshot] straddle-ите за отчети пропуснати: {type(e).__name__}: {e}")
+        straddles = {}
     snap = {"session_date": session.isoformat(),
             "fetched_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M"),
             "horizon_days": config.UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS,
-            "tickers": oi, "failed": failed}
+            "tickers": oi, "straddles": straddles, "failed": failed}
+    print(f"[oi_snapshot] straddle-и за отчети: {len(straddles)} ({sum(1 for v in straddles.values() if v.get('after') and not v.get('reason'))} с падеж след отчета)")
     print(f"[oi_snapshot] сесия {session}: {len(oi)}/{len(tickers)} тикъра, "
           f"OI ≥ 50 за {with_oi}, неуспешни {failed or '—'}, {time.time() - t0:.0f} с")
     if oi and with_oi < len(oi) / 2:
