@@ -188,6 +188,10 @@ QM_RISK_FACTOR = float(os.getenv("QM_RISK_FACTOR", 0.5))         # размер 
 QM_MAX_POSITION_PCT = float(os.getenv("QM_MAX_POSITION_PCT", 30))   # негово: не повече от 30% от сметката в един инструмент за през нощта
 # Изход и книга "qm_breakout" (trade_sim.simulate_qm — същата функция в реплея и в Track Record-а)
 TRACK_QM = os.getenv("TRACK_QM", "1") == "1"
+# Чист старт (по модела на BUYSTOP_TRACK_FROM): книгата qm_breakout приема записи само с дата >= тази (и от snapshot-ите, и от днешния списък). ПЛЕЙСХОЛДЪР 2099-01-01 — книгата не записва
+# нищо, докато не се сложи истинската дата: в деня на качването, при rebase-а върху main (не по-рано — иначе първото пускане записва ретроактивно картите от дните преди качването).
+# Празен низ изключва guard-а.
+QM_TRACK_FROM = os.getenv("QM_TRACK_FROM", "2099-01-01")
 QM_ENTRY_WINDOW_SESSIONS = 1                                     # кандидатът е валиден за ЕДНА сесия (деня на брифа)
 QM_CHASE_ADR = 1.0                                               # не се гони гап над нивото с повече от 1× ADR
 QM_ADR_STOP = 1.0                                                # стоп (вход − low на деня) ≤ 1× ADR, иначе записът е "skipped_adr"

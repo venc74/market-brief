@@ -22,6 +22,7 @@ config.DATA_DIR = pathlib.Path(_tmp.name)
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 config.ENABLE_BACKTEST = True
+config.QM_TRACK_FROM = ""                                                                       # тук се тества книгата; guard-ът по дата има собствен тест (test_qm_start_guard.py)
 backtest.enrich.earnings_recap = lambda t: None
 backtest._unapplied_splits = lambda rec: []
 

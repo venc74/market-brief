@@ -19,6 +19,7 @@ tmp = tempfile.TemporaryDirectory(prefix="mb_qmr_")
 config.DOCS_DIR, config.DATA_DIR = pathlib.Path(tmp.name) / "docs", pathlib.Path(tmp.name) / "data"
 config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
+config.QM_TRACK_FROM = ""                                                                           # guard-ът по дата има собствен тест (test_qm_start_guard.py)
 
 FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").read_text(encoding="utf-8"))
 EPF = json.loads((ROOT / "tests" / "fixtures" / "qm_ep_2026-10-02.json").read_text(encoding="utf-8"))
@@ -81,6 +82,8 @@ page = page_of(brief_with())
 sec = section(page)
 txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", sec))
 assert page.count("<section") == page.count("</section>")
+SURV = "Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима."
+assert SURV in txt
 assert "отделна стратегия — измерване, не препоръка" in txt.lower() and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in txt
 by = {c["ticker"]: c for c in CARDS}
 d = by["DOCN"]
@@ -171,6 +174,7 @@ print()
 print("── имейл ──")
 em = render.render_email(brief_with())
 emt = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", em)))
+assert SURV in emt
 assert "Qullamaggie сетъпи" in emt and "Отделна стратегия — измерване, не препоръка." in emt and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in emt
 for c in CARDS:
     assert c["ticker"] in emt and f"ниво ${c['trigger']:.2f}" in emt and f"+{c['pct_to_trigger']:.1f}% до него" in emt and f"стоп ≈ ${c['expected_stop']:.2f}, макс. ${c['max_stop']:.2f}" in emt

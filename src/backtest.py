@@ -320,6 +320,8 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
     """
     if not config.TRACK_QM:
         return
+    if config.QM_TRACK_FROM and entry_date < config.QM_TRACK_FROM:             # чист старт: без ретроактивни записи (виж config.QM_TRACK_FROM)
+        return
     for c in cards or []:
         ticker = c.get("ticker")
         if not (ticker and isinstance(c.get("trigger"), (int, float)) and isinstance(c.get("adr"), (int, float)) and c["trigger"] > 0 and c["adr"] > 0):
@@ -1116,7 +1118,7 @@ def get_qm_summary() -> dict:
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
                       "realized_r_pess": r.get("realized_r_pess")} for r in closed), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
     return {
-        "enabled": True, "records": len(records), "pending": by_status.get("pending", 0), "open": by_status.get("open", 0) + by_status.get("trailing", 0),
+        "enabled": True, "track_from": config.QM_TRACK_FROM or None, "records": len(records), "pending": by_status.get("pending", 0), "open": by_status.get("open", 0) + by_status.get("trailing", 0),
         "closed": len(closed), "triggered": len(triggered), "not_triggered": not_trig, "skipped": skipped,
         "not_triggered_pct": round(100 * not_trig / window_done, 1) if window_done else None,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)),

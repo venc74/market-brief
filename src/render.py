@@ -210,7 +210,8 @@ def _qm_email_block(brief: dict) -> str:
         return ('<tr><td style="padding:12px 28px 14px;border-top:1px solid #f3f4f6">'
                 '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;font-weight:bold;margin-bottom:4px">Qullamaggie сетъпи</div>'
                 '<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Отделна стратегия — измерване, не препоръка.</b> '
-                'Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>'
+                'Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.<br>'
+                'Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.</div>'
                 f'{body}</td></tr>')
     except Exception as e:
         print(f"[render] имейл блокът на Qullamaggie пропуснат: {type(e).__name__}: {e}")
