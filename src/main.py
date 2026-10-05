@@ -21,7 +21,7 @@ from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
 from src.enrich import enrich, inject_split_catalysts
-from src.sizing import position_plan_v2
+from src.sizing import position_plan_v2, buy_stop_preview
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
@@ -257,6 +257,9 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 action.append(c)
                 continue
         c["ai"].setdefault("watchlist_trigger", "Изчаква потвърждение.")
+        # пакет 2: buy-stop кандидатите показват стоп, риск %, цел 1 и размер на позицията при sizing-а на режима (само показване)
+        if (c.get("setup") or {}).get("buy_stop"):
+            c["plan_preview"] = buy_stop_preview(c, sizing_factor, today)
         watchlist.append(c)
 
     # Watchlist е най-много 10 карти: потвърден пробив, спрян от лимит/режим/earnings,

@@ -146,3 +146,18 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "time_horizon": horizon,
     }
 
+
+
+def buy_stop_preview(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
+    """
+    Пакет 2 (2026-10-05): план-преглед за Watchlist карта с buy-stop (кандидат под pivot) — стоп, риск %, цел 1 (2R), брой акции и
+    сума при ТЕКУЩИЯ sizing на режима, както Action картата. Референтният вход е самото buy-stop ниво (pivot), не текущата цена
+    под него — същото, с което setup_rules.classify_setup смята стопа и риска, затова stop/risk_pct съвпадат със setup.
+    Няма buy-stop или няма валиден план (твърде разтегнато, без struct_low) → {"valid": False, "reason": ...}. Не променя класификацията.
+    """
+    setup = row.get("setup") or {}
+    bs = setup.get("buy_stop")
+    if not isinstance(bs, (int, float)) or bs <= 0:
+        return {"valid": False, "reason": "Няма buy-stop ниво."}
+    plan = position_plan_v2({**row, "price": bs}, sizing_factor, today)
+    return {**plan, "preview": True} if plan.get("valid") else plan

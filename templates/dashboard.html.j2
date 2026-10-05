@@ -824,6 +824,14 @@
       {% if st.setup and st.setup.buy_stop %}
       <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден до {{ st.setup.valid_through }}
         · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
+      {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
+      {% set pp = st.plan_preview %}
+      {% if pp and pp.valid %}
+      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства (вход ≈ ${{ "%.2f"|format(pp.entry_mid) }}):
+        Stop ${{ "%.2f"|format(pp.stop_loss) }} (−{{ pp.risk_pct }}%) · Цел 1 (2R, {{ (pp.target_1_fraction * 100)|round|int }}% от позицията) ${{ "%.2f"|format(pp.target_1) }}
+        · риск ${{ pp.max_risk_usd|int }}{% if pp.sizing_factor < 1 %} ({{ regime }} ×{{ pp.sizing_factor }}){% endif %}
+        → {{ pp.shares }} акции (${{ "{:,.0f}".format(pp.total_investment) }}, {{ pp.pct_of_portfolio }}% от портфейла){% if regime == 'Cash' %} · режим Cash: нов Action не се дава, планът е само ориентир{% endif %}</div>
+      {% endif %}
       {% endif %}
     </div>
     {% endfor %}
