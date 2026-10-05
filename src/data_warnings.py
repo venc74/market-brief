@@ -59,9 +59,22 @@ def _qm_warning(qm_diag: dict | None) -> list[dict]:
     return []
 
 
+def _ep_warning(ep: dict | None) -> list[dict]:
+    """EP наблюдението: провал на after-hours теглене не бива да се чете като "няма гапове днес"."""
+    if not ep or ep.get("ok") is not False and not (ep.get("diag") or {}).get("batches_failed"):
+        return []
+    d = ep.get("diag") or {}
+    if ep.get("ok") is False:
+        why = (ep.get("notes") or ["Yahoo не върна after-hours данни"])[0]
+        return [{"source": "qm_ep", "level": "warn",
+                 "message": f"EP наблюдение (after-hours): не се изпълни ({why}) — празният списък НЕ значи, че няма гапове след затваряне."}]
+    return [{"source": "qm_ep", "level": "warn",
+             "message": (f"EP наблюдение (after-hours): {d['batches_failed']} от {d.get('batches')} партиди тикъри не се изтеглиха — списъкът с гапове може да е непълен.")}]
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
-            qm_diag: dict | None = None) -> list[dict]:
+            qm_diag: dict | None = None, qm_ep: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -97,4 +110,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out += _cot_warning(cot_diag)
     out.extend(_marker_warnings(insider_status, uov_diag))
     out.extend(_qm_warning(qm_diag))
+    out.extend(_ep_warning(qm_ep))
     return out

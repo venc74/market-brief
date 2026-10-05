@@ -75,7 +75,7 @@ assert "scan" in names and names.count("attach_qm_markers") == 2 and "cards" in 
 keys = [k.value for n in ast.walk(run) if isinstance(n, ast.Dict) for k in n.keys if isinstance(k, ast.Constant) and isinstance(k.value, str)]
 assert "qm_breakout" in keys and "qm_diag" in keys
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "qm_diag=qm_diag" in src and src.index("qm_breakout.scan()") > src.index("glb_screener.screen()") and src.index("attach_qm_markers(action + watchlist, qm_by_ticker)") > src.index("qm_breakout.scan()")
+assert "qm_diag=qm_diag" in src and src.index("qm_breakout.scan(universe=qm_universe)") > src.index("glb_screener.screen()") and src.index("attach_qm_markers(action + watchlist, qm_by_ticker)") > src.index("qm_breakout.scan(universe=qm_universe)")
 glb_line = next(l for c, l in calls if c == "screen")
 scan_line = next(l for c, l in calls if c == "scan")
 assert scan_line > glb_line

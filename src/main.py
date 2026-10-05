@@ -35,6 +35,7 @@ from src import setup_rules
 from src import earnings_move
 from src import glb_screener
 from src import qm_breakout
+from src import qm_ep
 from src import short_screener
 from src import short_tracker
 from src import watchlist_expiry
@@ -564,16 +565,30 @@ def run() -> dict:
 
     # Qullamaggie breakout скенер (06.10.2026) — ОТДЕЛНА стратегия: механичен (без AI), собствено теглене на данни, независим от CANSLIM и GLB. Не е препоръка — измерване.
     # Explicit try/except, същият дух като GLB блока: неочакван провал не чупи брифа (празният списък се придружава от предупреждение в data_warnings).
-    qm_rows, qm_diag, qm_cards = [], {}, []
-    if config.ENABLE_QM:
+    qm_rows, qm_diag, qm_cards, qm_ep_out = [], {}, [], {}
+    qm_universe: list[str] = []
+    if config.ENABLE_QM or config.ENABLE_QM_EP:
         try:
-            qm_rows, qm_diag = qm_breakout.scan()
+            qm_universe = screener.build_universe()                  # същият универс като скрийнъра (без малки акции); един път за скенера и за EP наблюдението
+        except Exception as e:
+            print(f"[main] универсът за Qullamaggie не се зареди: {e}")
+            qm_diag = {"ok": False, "error": f"универсът не се зареди ({type(e).__name__})"}
+    if config.ENABLE_QM and qm_universe:
+        try:
+            qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
             qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
         except Exception as e:
             print(f"[main] Qullamaggie скенерът пропадна: {e}")
             qm_diag = {"ok": False, "error": f"{type(e).__name__}: {e}"}
     qm_by_ticker = {r["ticker"]: r for r in qm_rows}
     attach_qm_markers(action + watchlist, qm_by_ticker)             # QM✓ върху нашите карти, ако са и кандидати за пробив
+    # EP наблюдение (САМО информация, без Track Record): after-hours гапове ≥ 10% при "пренебрегване"; AI само класифицира катализатора от заглавията; дневник на AH гап срещу реалния гап
+    if config.ENABLE_QM_EP and qm_universe:
+        try:
+            qm_ep_out = qm_ep.run(qm_universe, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
+        except Exception as e:
+            print(f"[main] EP наблюдението пропадна: {e}")
+            qm_ep_out = {"ok": False, "notes": [f"{type(e).__name__}: {e}"], "rows": []}
 
     # Short/Stage 4 screener — Модул 1, Short/Reversal тема (2026-08-2x).
     # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
@@ -711,7 +726,7 @@ def run() -> dict:
         "rotation": rotation,
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag),
+                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
@@ -739,6 +754,7 @@ def run() -> dict:
         # Qullamaggie (отделна стратегия — измерване, не препоръка): до 8 карти за пробив + диагностика на скана
         "qm_breakout": qm_cards,
         "qm_diag": qm_diag,
+        "qm_ep": qm_ep_out,
         "news": news,
         "cot": cot_with_theses,
         # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
