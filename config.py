@@ -162,6 +162,49 @@ EARNINGS_MOVE_MAX_SPREAD_PCT = float(os.getenv("EARNINGS_MOVE_MAX_SPREAD_PCT", 2
 EARNINGS_MOVE_MAX_STRIKE_DIST_PCT = float(os.getenv("EARNINGS_MOVE_MAX_STRIKE_DIST_PCT", 3.0))  # ATM страйкът е най-много толкова % от цената
 EARNINGS_MOVE_MIN_PCT, EARNINGS_MOVE_MAX_PCT = 0.3, 60.0                                  # правдоподобност на резултата
 
+# ── Qullamaggie сетъпи (отделна стратегия — измерване, не препоръка; 06.10.2026) ──────────────────────────────────────────────
+# Първоизточници на правилата (qullamaggie.com): https://qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/ ,
+# https://qullamaggie.com/how-to-master-a-setup-episodic-pivots/ , https://qullamaggie.com/faq/ (формулата на ADR). Какво е негово и какво е мое — в DESIGN.md на проучването
+# (scratchpad/qm) и в CLAUDE.md. Универсът е същият като на скрийнъра (без малки акции).
+ENABLE_QM = os.getenv("ENABLE_QM", "1") == "1"
+# Breakout скенер (src/qm_breakout.py) — "отпуснатата конфигурация" на реплея (02.2024–10.2026, 904 тикъра), но с лидери топ 10%
+QM_LEAD_PCT = float(os.getenv("QM_LEAD_PCT", 0.90))              # най-добрият перцентил по ръст за 1, 3 и 6 месеца (негово: топ 1–2% от ~7000 ≈ топ 10% от наш универс от ~900)
+QM_RUN_MIN = float(os.getenv("QM_RUN_MIN", 0.20))                # предходен ръст до пика ≥ +20% (негово: 30–100%+; в реплея махането му не променя резултата)
+QM_RUN_LOOKBACK_BARS, QM_PEAK_WINDOW_BARS = 40, 62               # низ преди пика / прозорец за пика (≈1–3 месеца)
+QM_BASE_MIN_BARS, QM_BASE_MAX_BARS = 8, 45                       # консолидация ≈ 2 седмици – 2 месеца (негово)
+QM_DEPTH_MAX = float(os.getenv("QM_DEPTH_MAX", 0.30))            # пулбек от пика най-много 30% (мое: "организиран")
+QM_HIGHER_LOW_TOL = 0.005                                        # higher lows: low на последните 5 бара ≥ low на предишните 5 (допуск 0.5%)
+QM_TIGHT_MAX = float(os.getenv("QM_TIGHT_MAX", 1.2))             # среден дневен диапазон на последните 5 бара ≤ 1.2× ADR (отпуснато); служи и за подредба — по-малко = по-стегнато
+QM_VOL_DRY = float(os.getenv("QM_VOL_DRY", 1.1))                 # среден обем на последните 5 бара ≤ 1.1× 50-дневния (спадащ обем в базата)
+QM_NEAR_ADR = float(os.getenv("QM_NEAR_ADR", 2.0))               # нивото на пробива е най-много 2× ADR над затварянето
+QM_TRIGGER_BARS = 10                                             # ниво на пробив = най-високият High на последните 10 сесии (върхът на флага)
+QM_ADR_MIN = float(os.getenv("QM_ADR_MIN", 3.0))                 # ADR20 ≥ 3% (негово е само "стопът ≤ ADR"; минималният ADR е мой)
+QM_DOLLAR_VOLUME_MIN = float(os.getenv("QM_DOLLAR_VOLUME_MIN", 10_000_000))   # среден 20-дневен долар обем (мое; универсът е >$60M)
+QM_PRICE_MIN = float(os.getenv("QM_PRICE_MIN", 5.0))
+QM_MAX_CARDS = int(os.getenv("QM_MAX_CARDS", 8))                 # най-много карти, подредени по стягане на базата
+QM_EXPECTED_STOP_ADR = float(os.getenv("QM_EXPECTED_STOP_ADR", 0.55))   # очакван стоп = ниво − 0.55×ADR (медианата на (вход − low на деня) в реплея; интерквартилно 0.41–0.71)
+QM_MAX_STOP_ADR = float(os.getenv("QM_MAX_STOP_ADR", 1.0))      # негово: стопът не по-широк от ADR
+QM_RISK_FACTOR = float(os.getenv("QM_RISK_FACTOR", 0.5))         # размер на позицията при ПОЛОВИН риск: PORTFOLIO_SIZE × RISK_PER_TRADE_PCT × 0.5 ($500 при $1000)
+QM_MAX_POSITION_PCT = float(os.getenv("QM_MAX_POSITION_PCT", 30))   # негово: не повече от 30% от сметката в един инструмент за през нощта
+# Изход и книга "qm_breakout" (trade_sim.simulate_qm — същата функция в реплея и в Track Record-а)
+TRACK_QM = os.getenv("TRACK_QM", "1") == "1"
+QM_ENTRY_WINDOW_SESSIONS = 1                                     # кандидатът е валиден за ЕДНА сесия (деня на брифа)
+QM_CHASE_ADR = 1.0                                               # не се гони гап над нивото с повече от 1× ADR
+QM_ADR_STOP = 1.0                                                # стоп (вход − low на деня) ≤ 1× ADR, иначе записът е "skipped_adr"
+QM_PARTIAL_DAYS = int(os.getenv("QM_PARTIAL_DAYS", 4))           # негово: 1/3–1/2 след 3–5 дни → затварянето на 4-тата сесия след входния ден
+QM_PARTIAL_FRACTION = float(os.getenv("QM_PARTIAL_FRACTION", 0.4))   # среда на 1/3–1/2
+QM_TRAIL_ADR_SWITCH = float(os.getenv("QM_TRAIL_ADR_SWITCH", 5.0))   # остатъкът по SMA10 при ADR ≥ 5%, иначе по SMA20 (първо затваряне под)
+QM_MAX_HOLD_SESSIONS = int(os.getenv("QM_MAX_HOLD_SESSIONS", 180))
+QM_MIN_CLOSED_FOR_WINRATE = int(os.getenv("QM_MIN_CLOSED_FOR_WINRATE", 20))
+# EP наблюдение (src/qm_ep.py): само информация, без Track Record
+ENABLE_QM_EP = os.getenv("ENABLE_QM_EP", "1") == "1"
+QM_EP_GAP_PCT = float(os.getenv("QM_EP_GAP_PCT", 10.0))          # негово: гап нагоре ≥ 10% (тук — after-hours цена спрямо затварянето)
+QM_EP_NEGLECT_RET63_PCT = float(os.getenv("QM_EP_NEGLECT_RET63_PCT", 20.0))   # "пренебрегване": ръст за предходните ~3 месеца ≤ 20%
+QM_EP_STOP_ADR = float(os.getenv("QM_EP_STOP_ADR", 1.0))         # информация: максимален стоп 1× ADR (негово: 1×, най-много 1.5×)
+QM_EP_MAX_ROWS = int(os.getenv("QM_EP_MAX_ROWS", 10))
+QM_EP_MIN_AH_BARS = 3                                            # поне толкова 5-минутни after-hours бара (иначе няма реална търговия)
+QM_EP_BATCH = 100
+
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing
 # "good" (0…+ENTRY_TIMING_EXTENDED_PCT% над pivot, с обем); Offensive → без ограничение.
@@ -274,6 +317,7 @@ import pathlib
 ROOT = pathlib.Path(__file__).parent
 DATA_DIR = ROOT / "data"
 DOCS_DIR = ROOT / "docs"
+QM_EP_LOG_FILE = DATA_DIR / "ep_ah_log.json"       # пакет QM: after-hours гапът срещу реалния гап на отварянето — за решение след 4–6 седмици дали си струва второ пускане
 PUTCALL_HISTORY_FILE = DATA_DIR / "put_call_history.json"
 
 # ── Секторни ETF-и за ротационен анализ (Слой 2) ─────────────────────────

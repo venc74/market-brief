@@ -32,6 +32,7 @@ R = дял × (цена на частичната − вход) / риск + (1 
 from __future__ import annotations
 import datetime as dt
 
+import numpy as np
 import pandas as pd
 
 import sys, pathlib
@@ -198,3 +199,129 @@ def spy_return_pct(res: dict, spy: pd.DataFrame) -> float | None:
         return round(rest * 100, 2)
     except (KeyError, ValueError, TypeError):
         return None
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Qullamaggie breakout (06.10.2026): вход на нивото на пробива, стоп = Low на входния ден, изход по неговите правила
+# ══════════════════════════════════════════════════════════════════════════
+QM_NOT_A_POSITION = ("not_triggered", "skipped_extended", "skipped_adr", "invalid_risk")     # извън статистиката
+QM_TERMINAL = ("stopped", "trailing_stop_exit", "expired")
+
+
+def _blank_qm(status: str = "pending") -> dict:
+    return {"status": status, "fill_date": None, "fill_price": None, "stop_loss": None, "risk_per_share": None,
+            "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0, "trail_ma": None,
+            "exit_date": None, "exit_price": None, "resolution_date": None,
+            "R": None, "R_pess": None, "realized_r": None, "realized_r_pess": None, "current_r": None,
+            "return_pct": None, "return_pct_pess": None, "last_close": None, "last_close_date": None, "how": None}
+
+
+def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
+    """
+    Чиста симулация (без I/O) на Qullamaggie breakout по ДНЕВНИ барове — ПОЛЗВА СЕ И В РЕПЛЕЯ, И В Track Record-а (книгата "qm_breakout").
+    Вход: rec = {entry_date (денят на брифа = първата сесия), buy_stop (нивото на пробива), adr (ADR20 в %)}; bars = дневни Open/High/Low/Close, без NaN.
+
+    Вход: ЕДНА сесия (config.QM_ENTRY_WINDOW_SESSIONS) — High >= нивото → вход по max(Open, ниво); гап над нивото с повече от QM_CHASE_ADR×ADR → "skipped_extended".
+    Стоп = Low на входния ден (в реалността е low of the day КЪМ момента на входа — по-висок; тук е по-ниският, дневният). Стоп по-широк от QM_ADR_STOP×ADR → "skipped_adr".
+    Изход (негов): QM_PARTIAL_FRACTION от позицията на затварянето на QM_PARTIAL_DAYS-тата сесия след входния ден, стопът към break-even за остатъка, остатъкът — първо
+    ЗАТВАРЯНЕ под SMA10 (ADR >= QM_TRAIL_ADR_SWITCH) или SMA20; гап през стопа → по отварянето; максимум QM_MAX_HOLD_SESSIONS (mark-to-market, "expired").
+    Две граници за стопа на входния ден: R/return_pct ("opt": low-ът е бил ПРЕДИ входа, стопът на входния ден не се удря) и R_pess/return_pct_pess ("pess": ако денят затваря
+    под входа → −1R). Без плъзгане и комисионни. Връща речник като _blank_qm: статус pending|not_triggered|skipped_extended|skipped_adr|invalid_risk|open|trailing|stopped|
+    trailing_stop_exit|expired; за живи — current_r (mark-to-market), за затворени — realized_r / realized_r_pess.
+    """
+    out = _blank_qm()
+    if bars is None or len(bars) == 0:
+        return out
+    idx = pd.DatetimeIndex(bars.index)
+    if idx.tz is not None:
+        idx = idx.tz_localize(None)
+    o, h, l, c = (bars[k].to_numpy(dtype=float) for k in ("Open", "High", "Low", "Close"))
+    n = len(idx)
+    trig, adr = float(rec["buy_stop"]), float(rec["adr"])
+    first = int(idx.searchsorted(pd.Timestamp(rec["entry_date"]), side="left"))
+    if first >= n:
+        return out
+    window = config.QM_ENTRY_WINDOW_SESSIONS
+    fi = fill = None
+    for j in range(first, min(first + window, n)):
+        if o[j] >= trig:
+            f = o[j]
+        elif h[j] >= trig:
+            f = trig
+        else:
+            continue
+        if f > trig * (1 + config.QM_CHASE_ADR * adr / 100):
+            out.update(status="skipped_extended", resolution_date=idx[j].date().isoformat())
+            return out
+        fi, fill = j, f
+        break
+    if fi is None:
+        if first + window > n:
+            return out
+        out.update(status="not_triggered", resolution_date=idx[first + window - 1].date().isoformat())
+        return out
+    stop0 = float(l[fi])
+    risk = fill - stop0
+    if risk <= 0:
+        out.update(status="invalid_risk", resolution_date=idx[fi].date().isoformat())
+        return out
+    if risk / fill * 100 > config.QM_ADR_STOP * adr:
+        out.update(status="skipped_adr", resolution_date=idx[fi].date().isoformat())
+        return out
+    trail_n = 10 if adr >= config.QM_TRAIL_ADR_SWITCH else 20
+    sma = pd.Series(c).rolling(trail_n).mean().to_numpy()
+    out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(float(fill), 4), stop_loss=round(stop0, 4), risk_per_share=round(float(risk), 4),
+               trail_ma=trail_n)
+    pess_day1 = bool(c[fi] < fill)                                         # граница "pess": денят затваря под входа
+
+    frac, pdays = config.QM_PARTIAL_FRACTION, config.QM_PARTIAL_DAYS
+    stop, part, r_part, p_px, p_j = stop0, False, 0.0, None, None
+    how = ex = exj = None
+    last = min(n - 1, fi + config.QM_MAX_HOLD_SESSIONS)
+    for j in range(fi + 1, last + 1):
+        if o[j] <= stop:                                                   # гап през стопа → по отварянето
+            how, ex, exj = ("stop_gap", float(o[j]), j)
+            break
+        if l[j] <= stop:
+            how, ex, exj = ("stop", float(stop), j)
+            break
+        if not part and j == fi + pdays:                                   # частична продажба на затварянето; стопът към break-even
+            part, p_px, p_j = True, float(c[j]), j
+            r_part = (p_px - fill) / risk
+            stop = max(stop, fill)
+            continue
+        if part and sma[j] == sma[j] and c[j] < sma[j]:                    # първо ЗАТВАРЯНЕ под MA
+            how, ex, exj = ("trail", float(c[j]), j)
+            break
+    if part:
+        out.update(target1_hit_date=idx[p_j].date().isoformat(), partial_price=round(p_px, 4), partial_fraction=frac)
+
+    def weighted(px):
+        r = (frac * r_part + (1 - frac) * (px - fill) / risk) if part else (px - fill) / risk
+        ret = ((frac * (p_px - fill) + (1 - frac) * (px - fill)) / fill * 100) if part else ((px - fill) / fill * 100)
+        return float(r), float(ret)
+
+    r_pess_day1, ret_pess_day1 = -1.0, float((stop0 / fill - 1) * 100)
+    out.update(last_close=round(float(c[last]), 4), last_close_date=idx[last].date().isoformat())
+    if exj is None:
+        cur_r, cur_ret = weighted(float(c[last]))
+        out["current_r"], out["return_pct"] = round(cur_r, 2), round(cur_ret, 2)
+        if pess_day1:
+            out["R_pess"], out["return_pct_pess"] = r_pess_day1, round(ret_pess_day1, 2)
+        else:
+            out["R_pess"], out["return_pct_pess"] = round(cur_r, 2), round(cur_ret, 2)
+        if not (last - fi >= config.QM_MAX_HOLD_SESSIONS):
+            out["status"] = "trailing" if part else "open"
+            return out
+        # максимумът на държане е достигнат → mark-to-market на последния Close
+        how, ex, exj = "mtm", float(c[last]), last
+        status = "expired"
+    else:
+        status = "trailing_stop_exit" if how == "trail" else "stopped"
+    r_opt, ret_opt = weighted(ex)
+    out.update(status=status, how=how, exit_date=idx[exj].date().isoformat(), exit_price=round(ex, 4), resolution_date=idx[exj].date().isoformat(),
+               R=r_opt, realized_r=round(r_opt, 2), return_pct=round(ret_opt, 2), current_r=round(r_opt, 2))
+    out["R_pess"] = r_pess_day1 if pess_day1 else r_opt
+    out["return_pct_pess"] = round(ret_pess_day1, 2) if pess_day1 else round(ret_opt, 2)
+    out["realized_r_pess"] = round(out["R_pess"], 2)
+    return out
