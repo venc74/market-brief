@@ -1,0 +1,24 @@
+{
+ "methodology": "v2",
+ "switched_on": "2026-10-05",
+ "v1_archive_file": "backtest_archive_v1.json",
+ "v1_stats": {
+  "n": 51,
+  "wins": 13,
+  "losses": 38,
+  "win_rate_pct": 25.5,
+  "avg_r": -0.42,
+  "records": 51,
+  "v1_closed": 22,
+  "unpriced": 0,
+  "expired_no_r": 0,
+  "expired_mtm": 3,
+  "by_status": {
+   "expired": 3,
+   "v1_closed": 22,
+   "stopped": 25,
+   "trailing_stop_exit": 1
+  }
+ },
+ "reverted_on": null
+}

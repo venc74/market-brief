@@ -1,172 +1,44 @@
 {
- "date": "2026-10-02",
+ "date": "2026-10-05",
  "rows": [],
  "horizon": [
-  {
-   "ticker": "BTLN",
-   "company": "Brightline Interactive, Inc.",
-   "date": "2026-09-28",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "CTNT",
-   "company": "Cheetah Net Supply Chain Service Inc.",
-   "date": "2026-09-28",
-   "ratio": "1:150",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "DLXY",
-   "company": "Delixy Holdings Limited",
-   "date": "2026-09-28",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "DCX",
-   "company": "Digital Currency X Technology Inc.",
-   "date": "2026-09-28",
-   "ratio": "1:160",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "FBGL",
-   "company": "FBS Global Limited",
-   "date": "2026-09-28",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "GMEX",
-   "company": "GMEX ROBOTICS CORPORATION",
-   "date": "2026-09-28",
-   "ratio": "1:9",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "IMMP",
-   "company": "Immutep Limited",
-   "date": "2026-09-28",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "MTNB",
-   "company": "Matinas Biopharma Holdings, Inc.",
-   "date": "2026-09-28",
-   "ratio": "1:15",
-   "split_type": "reverse",
-   "date_human": "Sep 28, 2026"
-  },
-  {
-   "ticker": "AGRZ",
-   "company": "Agroz Inc.",
-   "date": "2026-09-29",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Sep 29, 2026"
-  },
-  {
-   "ticker": "CDT",
-   "company": "CDT Equity Inc.",
-   "date": "2026-09-29",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Sep 29, 2026"
-  },
-  {
-   "ticker": "ONMD",
-   "company": "OneMedNet Corp",
-   "date": "2026-09-29",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Sep 29, 2026"
-  },
-  {
-   "ticker": "TRUG",
-   "company": "TruGolf Holdings, Inc.",
-   "date": "2026-09-29",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Sep 29, 2026"
-  },
-  {
-   "ticker": "ZCSH",
-   "company": "Grayscale Zcash Trust The Zcash ETF The Zcash ETF Shares",
-   "date": "2026-09-30",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Sep 30, 2026"
-  },
-  {
-   "ticker": "SHFS",
-   "company": "SHF Holdings, Inc.",
-   "date": "2026-09-30",
-   "ratio": "1:12",
-   "split_type": "reverse",
-   "date_human": "Sep 30, 2026"
-  },
-  {
-   "ticker": "DHY",
-   "company": "UBS Asset Management High Yield Credit Fund",
-   "date": "2026-09-30",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Sep 30, 2026"
-  },
-  {
-   "ticker": "BGM",
-   "company": "BGM Group Ltd.",
-   "date": "2026-10-01",
-   "ratio": "1:30",
-   "split_type": "reverse",
-   "date_human": "Oct 01, 2026"
-  },
-  {
-   "ticker": "KUST",
-   "company": "Kustom Entertainment, Inc.",
-   "date": "2026-10-01",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 01, 2026"
-  },
-  {
-   "ticker": "MYPS",
-   "company": "PLAYSTUDIOS, Inc.",
-   "date": "2026-10-01",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 01, 2026"
-  },
-  {
-   "ticker": "RETO",
-   "company": "ReTo Eco-Solutions, Inc.",
-   "date": "2026-10-02",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Oct 02, 2026"
-  },
-  {
-   "ticker": "ZCMD",
-   "company": "ZHONGCHAO INC.",
-   "date": "2026-10-02",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Oct 02, 2026"
-  },
   {
    "ticker": "VTAK",
    "company": "Catheter Precision, Inc.",
    "date": "2026-10-05",
    "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "CMND",
+   "company": "Clearmind Medicine Inc.",
+   "date": "2026-10-05",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "GUTS",
+   "company": "Fractyl Health, Inc.",
+   "date": "2026-10-05",
+   "ratio": "1:12",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "SCNX",
+   "company": "Scienture Holdings, Inc.",
+   "date": "2026-10-05",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "VIVK",
+   "company": "Vivakor, Inc.",
+   "date": "2026-10-05",
+   "ratio": "1:15",
    "split_type": "reverse",
    "date_human": "Oct 05, 2026"
   },
@@ -209,40 +81,37 @@
    "ratio": "3:1",
    "split_type": "normal",
    "date_human": "Oct 09, 2026"
+  },
+  {
+   "ticker": "LU",
+   "company": "Lufax Holding Ltd",
+   "date": "2026-10-23",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 23, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 26,
-  "horizon_from": "2026-09-28",
-  "horizon_to": "2026-10-09",
-  "in_week": 20,
+  "source_rows": 11,
+  "horizon_from": "2026-10-05",
+  "horizon_to": "2026-10-23",
+  "in_week": 10,
   "dropped_price": [
-   "BTLN",
-   "CTNT",
-   "DLXY",
-   "DCX",
-   "FBGL",
-   "GMEX",
-   "IMMP",
-   "MTNB",
-   "AGRZ",
-   "CDT",
-   "ONMD",
-   "TRUG",
-   "SHFS",
-   "BGM",
-   "KUST",
-   "MYPS",
-   "RETO",
-   "ZCMD"
+   "VTAK",
+   "CMND",
+   "GUTS",
+   "SCNX",
+   "VIVK",
+   "RUBI",
+   "GCDT",
+   "MGF",
+   "MIN"
   ],
-  "dropped_cap": [
-   "DHY"
-  ],
+  "dropped_cap": [],
   "dropped_no_data": [
-   "ZCSH"
+   "DXJ"
   ],
   "passed": 0,
   "state": "empty"
