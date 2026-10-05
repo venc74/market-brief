@@ -78,13 +78,16 @@ def direct_thesis(market: str, move: dict) -> dict:
     return {"tickers": tickers, "no_direct_link": False, "reasoning": reasoning, "source": "table"}
 
 
-def ticker_badges(ticker: dict, screener_tickers: set[str], open_by_ticker: dict[str, str | None]) -> list[dict]:
+def ticker_badges(ticker: dict, screener_tickers: set[str], open_by_ticker: dict[str, str | None],
+                  closed_by_ticker: dict[str, dict] | None = None) -> list[dict]:
     """
-    Значките на тикър в COT теза — слага ги КОДЪТ при показване, всеки ден (тезата се генерира сляпо):
+    Значките на тикър в COT теза — слага ги КОДЪТ при показване, всеки ден (тезата се генерира сляпо и се кешира):
       • SCR✓ "в скрийнъра" — тикърът е сред днешните кандидати;
       • OPEN✓ "отворена позиция" — тикърът е сред отворените Track Record позиции. При тикър с механизми (cross теза) само ако
         поне един механизъм е ПРЯК (types 7, 8, 10 и "other" никога не са пряк механизъм — виж config.COT_MECHANISM_SIGN);
-        тикър без информация за механизъм (директна таблица, стар формат) се третира като пряк.
+        тикър без информация за механизъм (директна таблица) се третира като пряк;
+      • CLOSED — позицията е ЗАТВОРЕНА скоро (до config.COT_CLOSED_BADGE_DAYS дни назад): казва датата и изхода и че вече не е
+        отворена (случаят FITB/ONB от 17.09, описани като отворени, докато бяха стопнати). Не се слага при отворена позиция.
     """
     out = []
     sym = ticker.get("ticker")
@@ -95,7 +98,23 @@ def ticker_badges(ticker: dict, screener_tickers: set[str], open_by_ticker: dict
     if sym in open_by_ticker and direct:
         since = open_by_ticker[sym]
         out.append({"tag": "OPEN✓", "title": "Отворена позиция" + (f" от {since}" if since else "") + " — слага се от кода."})
+    rec = (closed_by_ticker or {}).get(sym)
+    if rec and sym not in open_by_ticker and _closed_recently(rec):
+        r = rec.get("realized_r")
+        out.append({"tag": "CLOSED", "title": (f"Позицията е затворена на {rec.get('resolution_date')}"
+                                               f"{' — ' + str(rec.get('outcome')) if rec.get('outcome') else ''}"
+                                               f"{f', {r:+.1f}R' if isinstance(r, (int, float)) else ''}; не е отворена.")})
     return out
+
+
+def _closed_recently(rec: dict, today=None) -> bool:
+    """Затворена до config.COT_CLOSED_BADGE_DAYS дни назад (по resolution_date)."""
+    import datetime as dt
+    try:
+        d = dt.date.fromisoformat(str(rec.get("resolution_date"))[:10])
+    except ValueError:
+        return False
+    return 0 <= ((today or dt.date.today()) - d).days <= config.COT_CLOSED_BADGE_DAYS
 
 
 # ══════════════════════════════════════════════════════════════════════════

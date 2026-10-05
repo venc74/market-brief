@@ -738,6 +738,8 @@ COT_KIND_TEXT = {
     "rate": "облигационен фючърс (цена↑ = доходността ПАДА)", "crypto": "криптовалута", "commodity": "стока",
 }
 # Cross-sector (пакет 3 т.г): колко тикъра и механизма, максимална дължина на описанието (quote)
+# значка CLOSED при тикър на COT теза, чиято позиция е затворена до толкова дни назад (виж cot_theses.ticker_badges)
+COT_CLOSED_BADGE_DAYS = int(os.getenv("COT_CLOSED_BADGE_DAYS", 14))
 COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))
 COT_MECHANISMS_PER_TICKER = int(os.getenv("COT_MECHANISMS_PER_TICKER", 2))
 COT_QUOTE_MAX_CHARS = int(os.getenv("COT_QUOTE_MAX_CHARS", 300))

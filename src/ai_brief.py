@@ -1837,31 +1837,36 @@ def _cot_theses_for_batch(batch: list[dict], tag: str) -> list[dict]:
     return []
 
 
-def cot_theses_badges(thesis: dict | None, screener_tickers: set[str], open_by_ticker: dict) -> dict | None:
+def cot_theses_badges(thesis: dict | None, screener_tickers: set[str], open_by_ticker: dict,
+                      closed_by_ticker: dict | None = None) -> dict | None:
     """Слага значките на всеки тикър от под-тезата (кодът, при показване): виж cot_theses.ticker_badges."""
     if not thesis or not thesis.get("tickers"):
         return thesis
     return {**thesis, "tickers": [
-        {**t, "markers": _cot_table.ticker_badges(t, screener_tickers, open_by_ticker)} for t in thesis["tickers"]]}
+        {**t, "markers": _cot_table.ticker_badges(t, screener_tickers, open_by_ticker, closed_by_ticker)}
+        for t in thesis["tickers"]]}
 
 
 def cot_theses(extremes: list[dict], screener_universe: list[dict],
-              open_positions: list[dict] | None = None) -> list[dict]:
+              open_positions: list[dict] | None = None,
+              closed_positions: list[dict] | None = None) -> list[dict]:
     """
     За всеки COT екстремум (extremes от src.cot.get_extremes()) връща директна (от таблицата) + cross-sector (от AI) теза.
     Batch-вано по config.COT_BATCH_SIZE заради token budget. Мърджва резултата обратно в extremes по "market", запазвайки
     оригиналните числови полета (percentile, net_position, direction, history).
 
-    Пакет 3 т.б: AI извикването е СЛЯПО — screener_universe и open_positions НЕ влизат в промпта; служат само при показване
-    (значки "в скрийнъра" и "отворена позиция", слагани от кода — виж cot_theses_badges и outside_screener). Контекстът
-    между batch-овете (prior_context) и пазарният режим също са махнати от промпта. История: на 15.09 (RBOB/VLO) промптът
-    получи отворените позиции, за да не твърди "не фигурира в брифа" за държана позиция; сега тази грешка не може да се
-    създаде, защото моделът не вижда нито скрийнъра, нито позициите, а значката я слага кодът.
+    Две отделни стъпки (пакет 3): (1) генериране — сляпо AI извикване, връща СУРОВИ механизми по пазар; (2) evaluate_cot_theses —
+    детерминирани проверки без AI, които се пускат всеки ден върху суровите отговори (знак по таблицата, верификация на тикъра,
+    outside_screener, значки за отворена/затворена позиция, схема). Втората стъпка няма достъп до модела: отхвърлянето на тикър
+    никога не води до регенерация.
+
+    Пакет 3 т.б: AI извикването е СЛЯПО — screener_universe, open_positions и closed_positions НЕ влизат в промпта; служат само
+    при показване. История: на 15.09 (RBOB/VLO) промптът получи отворените позиции, за да не твърди "не фигурира в брифа" за
+    държана позиция; сега тази грешка не може да се създаде — моделът не вижда нито скрийнъра, нито позициите.
     """
     COT_DIAG.clear()
     if not extremes:
         return []
-
     moves = {e["market"]: _instrument_move(e) for e in extremes}
     direct_by_market = {e["market"]: _cot_table.direct_thesis(e["market"], moves[e["market"]]) for e in extremes}
     slim = [{"market": e["market"], "kind": config.COT_MARKET_KINDS.get(e["market"]), "category": e["category"],
@@ -1879,27 +1884,43 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         for t in _cot_theses_for_batch(batch, f"{idx}/{n}"):
             if isinstance(t, dict) and t.get("market") in moves:
                 raw_by_market[t["market"]] = t.get("tickers") if isinstance(t.get("tickers"), list) else []
+    return evaluate_cot_theses(extremes, raw_by_market, screener_universe, open_positions, closed_positions)
 
+
+def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | None], screener_universe: list[dict],
+                        open_positions: list[dict] | None = None,
+                        closed_positions: list[dict] | None = None) -> list[dict]:
+    """
+    Ежедневните ДЕТЕРМИНИРАНИ проверки върху суровите механизми на модела (пакет 3 т.д) — без AI, без регенерация:
+      1. таблицата за знака и схемата (cot_theses.evaluate_cross): ефект, "mixed", невалиден тип/quote → dropped_tickers с причина;
+      2. верификация на тикъра (делистнат/без име, commodity ETF за друга суровина, identity разминаване) → dropped_tickers с причина;
+      3. outside_screener и значка SCR✓ спрямо ДНЕШНИЯ скрийнър;
+      4. значки OPEN✓ (отворена позиция, само при пряк механизъм) и CLOSED (затворена скоро) спрямо днешния tracker;
+      5. empty_reason при празна под-теза се сглобява от кода.
+    raw_by_market[market] е None/липсва → моделът не е върнал нищо за пазара (cross е празна с причина; директната е от таблицата).
+    """
+    moves = {e["market"]: _instrument_move(e) for e in extremes}
     screener_tickers = {c["ticker"] for c in screener_universe if c.get("ticker")}
     open_by_ticker = {p["ticker"]: p.get("entry_date") for p in (open_positions or []) if p.get("ticker")}
+    closed_by_ticker = {p["ticker"]: p for p in (closed_positions or []) if p.get("ticker") and p["ticker"] not in open_by_ticker}
     merged = []
     for e in extremes:
         market = e["market"]
         move = {k: moves[market][k] for k in ("instrument_direction", "move_text", "move_short")}
-        direct = direct_by_market[market]
+        direct = _cot_table.direct_thesis(market, moves[market])
+        raw = raw_by_market.get(market)
         # пазарът се показва и когато моделът не е върнал нищо за него (директната теза е от таблицата)
-        cross = _cot_table.evaluate_cross(raw_by_market.get(market), market, moves[market],
+        cross = _cot_table.evaluate_cross(raw, market, moves[market],
                                           exclude={x["ticker"] for x in direct["tickers"]},
                                           log=lambda msg, m=market: _cot_diag_log(m, msg))
-        if market not in raw_by_market:
+        if raw is None:
             cross["empty_reason"] = "моделът не върна тази под-теза"
+        badges = lambda th: cot_theses_badges(th, screener_tickers, open_by_ticker, closed_by_ticker)
         merged.append({**e, **move,
-                       "direct_thesis": cot_theses_badges(_empty_sub_reason(
-                           direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, market)),
-                           market, "direct"), screener_tickers, open_by_ticker),
-                       "cross_sector_thesis": cot_theses_badges(_empty_sub_reason(
-                           cross, _strip_internal(_verify_thesis_tickers(cross, screener_tickers, market)),
-                           market, "cross"), screener_tickers, open_by_ticker)})
+                       "direct_thesis": badges(_empty_sub_reason(
+                           direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, market)), market, "direct")),
+                       "cross_sector_thesis": badges(_empty_sub_reason(
+                           cross, _strip_internal(_verify_thesis_tickers(cross, screener_tickers, market)), market, "cross"))})
         weeks = e.get("weeks_of_history")
         if weeks is not None and weeks < config.COT_SHORT_HISTORY_WEEKS:
             merged[-1]["history_note"] = (f"История само {weeks} седмици (под стандартните ~156) — percentile-ът тук е "

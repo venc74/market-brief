@@ -439,8 +439,14 @@ def run() -> dict:
         for t, rec in sorted(cot_live.items())
     ]
     # пакет 3 т.б: генерацията е сляпа — скрийнърът и позициите служат само за значките при показване
+    # затворените позиции (резолвирани преди този момент — виж resolve_positions_only) → значка CLOSED при показване
+    cot_closed_positions = [
+        {"ticker": t, "resolution_date": rec.get("resolution_date"), "realized_r": rec.get("realized_r"),
+         "outcome": _RESOLUTION_BG.get(rec.get("status"), rec.get("status"))}
+        for t, rec in sorted(_last_resolved_positions().items()) if t not in cot_live
+    ] if config.ENABLE_BACKTEST else []
     cot_with_theses = ai_brief.cot_theses(
-        cot_extremes, screener_universe, cot_open_positions) if cot_extremes else []
+        cot_extremes, screener_universe, cot_open_positions, cot_closed_positions) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:

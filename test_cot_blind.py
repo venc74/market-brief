@@ -45,7 +45,7 @@ def run(screener, positions):
 
 
 print("── промптът е сляп ──")
-assert list(inspect.signature(ai_brief.cot_theses).parameters) == ["extremes", "screener_universe", "open_positions"]      # без режим
+assert list(inspect.signature(ai_brief.cot_theses).parameters) == ["extremes", "screener_universe", "open_positions", "closed_positions"]      # без режим
 POS_A = [{"ticker": "VLO", "company": "Valero Energy Corporation", "entry_date": "2026-08-12"}, {"ticker": "FCX", "company": "Freeport-McMoRan Inc.", "entry_date": "2026-09-22"}]
 out_a = run(REAL_SCREENER, POS_A)
 out_b = run([{"ticker": "ZZZZ", "sector": "x", "industry": "y"}], [])
