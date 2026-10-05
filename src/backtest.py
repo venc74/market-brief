@@ -69,6 +69,7 @@ import config
 from src import net_utils
 from src import enrich
 from src import trade_sim
+from src import setup_rules
 
 _TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 _SNAPSHOT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
@@ -76,6 +77,7 @@ _LIVE_STATUSES = ("open", "trailing")
 # Пакет 1б (05.10): втора, НЕЗАВИСИМА книга в същия tracker — Watchlist buy-stop кандидатите ("buystop"). Запис без "category" е Action
 # (всичко, записано до пакет 1б). Всеки четец на позиции (OPEN✓, RE-ENTRY, COT, обобщението на Action) гледа само is_action_record().
 CATEGORY_ACTION, CATEGORY_BUYSTOP = "action", "buystop"
+CATEGORY_QM = "qm_breakout"        # Qullamaggie breakout кандидатите (отделна стратегия — измерване, не препоръка); същото правило: никой четец на позиции не я брои
 # v2: "pending" още няма позиция (чака buy-stop), но трябва да се резолвира всеки run
 _RESOLVABLE_STATUSES = _LIVE_STATUSES + ("pending",)
 
@@ -305,9 +307,39 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
         tracker[key] = rec
 
 
+_QM_RESULT_KEYS = ("status", "fill_date", "fill_price", "stop_loss", "risk_per_share", "target1_hit_date", "partial_price", "partial_fraction", "trail_ma",
+                   "exit_date", "exit_price", "R", "R_pess", "realized_r", "realized_r_pess", "current_r", "return_pct", "return_pct_pess", "last_close",
+                   "last_close_date", "how")
+
+
+def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None) -> None:
+    """
+    Qullamaggie: ингестира карти на breakout кандидатите (показаните, най-много 8) като НЕЗАВИСИМА книга "qm_breakout" — ЕДИН запис на (тикър, ден на брифа), дедуп в рамките на
+    категорията (_is_continuation), записва се във всички режими с таг. Вход на нивото на пробива (buy_stop = нивото), валиден ЕДНА сесия; стопът = Low на входния ден и изходът се
+    определят при резолюцията от дневните барове (trade_sim.simulate_qm). Не е позиция и не е препоръка — четците на позиции я игнорират. TRACK_QM=0 я изключва.
+    """
+    if not config.TRACK_QM:
+        return
+    for c in cards or []:
+        ticker = c.get("ticker")
+        if not (ticker and isinstance(c.get("trigger"), (int, float)) and isinstance(c.get("adr"), (int, float)) and c["trigger"] > 0 and c["adr"] > 0):
+            continue
+        key = f"{ticker}_{entry_date}_qm"
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM):
+            continue
+        rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime,
+               "buy_stop": round(float(c["trigger"]), 4), "adr": round(float(c["adr"]), 2), "signal_price": c.get("close"), "entry_price": c.get("close"),
+               "signal_date": c.get("signal_date"), "expected_stop": c.get("expected_stop"), "max_stop": c.get("max_stop"), "base_days": c.get("base_days"),
+               "runup_pct": c.get("runup_pct"), "tight": c.get("tight"), "window_sessions": config.QM_ENTRY_WINDOW_SESSIONS,
+               "valid_through": setup_rules.valid_through(entry_date, config.QM_ENTRY_WINDOW_SESSIONS),
+               "resolution_date": None, "discovered_date": None, "spy_return_pct": None, "alpha_pct": None}
+        rec.update({k: None for k in _QM_RESULT_KEYS if k != "status"})
+        tracker[key] = rec
+
+
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
                           today_date: str | None = None, today_watchlist: list[dict] | None = None,
-                          today_regime: str | None = None) -> None:
+                          today_regime: str | None = None, today_qm: list[dict] | None = None) -> None:
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -319,6 +351,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         # пакет 1б: Watchlist картите със заснет plan_preview (по-старите snapshot-и нямат такъв → не влизат); чисто временно правило —
         # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action
         _ingest_buystop_list(tracker, entry_date, snap.get("watchlist", []), (snap.get("thermometer") or {}).get("regime"))
+        _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -333,6 +366,8 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_action_list(tracker, today_date, today_action)
     if today_watchlist and today_date:
         _ingest_buystop_list(tracker, today_date, today_watchlist, today_regime)
+    if today_qm and today_date:
+        _ingest_qm_list(tracker, today_date, today_qm, today_regime)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -608,6 +643,41 @@ def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
            for f in fields}
 
 
+def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: dt.date) -> None:
+    """
+    Резолюция на запис от книгата "qm_breakout": trade_sim.simulate_qm върху дневните барове (чиста функция на плана и баровете — както buy-stop книгата, без памет от сигнала).
+    Сплит след входа → запис във флаг needs_manual_review и пропуск (книгата не коригира нива; позициите са краткотрайни). Мутира rec на място; не вдига.
+    """
+    t = rec["ticker"]
+    if opens is None or t not in getattr(opens, "columns", []):
+        print(f"[backtest] {t}: няма Open в batch резултата — пропускам QM резолюцията")
+        return
+    new_splits = _unapplied_splits(rec)
+    if new_splits:
+        prev = rec.get("needs_manual_review") or {}
+        ratio = 1.0
+        for sp in new_splits:
+            ratio *= sp["ratio"]
+        rec["needs_manual_review"] = {"reason": "split_after_entry_qm", "split_date": new_splits[0]["date"], "split_ratio": ratio, "since": prev.get("since") or today.isoformat()}
+        print(f"[backtest] {t}: split {ratio:g}:1 след входа — QM записът не се коригира, остава needs_manual_review")
+        return
+    if rec.get("needs_manual_review"):
+        return
+    bars = pd.DataFrame({"Open": opens[t], "High": highs[t], "Low": lows[t], "Close": closes[t]}).dropna()
+    res = trade_sim.simulate_qm(rec, bars, today)
+    for k in _QM_RESULT_KEYS:
+        rec[k] = res.get(k)
+    rec["spy_return_pct"] = trade_sim.spy_return_pct(res, spy_bars) if spy_bars is not None else None
+    rec["alpha_pct"] = (round(res["return_pct"] - rec["spy_return_pct"], 2) if rec["spy_return_pct"] is not None and res.get("return_pct") is not None else None)
+    rec["entry_price"] = res["fill_price"] if res.get("fill_price") is not None else rec.get("signal_price")
+    if res["status"] in trade_sim.LIVE:
+        rec["resolution_date"] = None
+    else:
+        rec["resolution_date"] = res.get("resolution_date")
+        if not rec.get("discovered_date"):
+            rec["discovered_date"] = today.isoformat()
+
+
 def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
     live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES]
     if not live_items:
@@ -644,6 +714,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         ticker = rec["ticker"]
         if ticker not in getattr(highs, "columns", []):
             print(f"[backtest] {ticker}: няма данни в batch резултата — пропускам (остава {rec['status']})")
+            continue
+        if rec.get("category") == CATEGORY_QM:                                        # Qullamaggie книгата има собствена симулация и собствена политика за сплитове
+            try:
+                _resolve_qm_record(rec, opens, highs, lows, closes, spy_bars, today)
+            except Exception as e:
+                print(f"[backtest] {ticker}: QM резолюцията неуспешна, остава {rec['status']}: {e}")
             continue
         # FIX 2026-09-23: сплит → автоматична корекция със санитарна проверка,
         # вместо замразяване завинаги (виж _apply_split_adjustment). Дотук
@@ -799,7 +875,7 @@ def resolve_positions_only() -> None:
 
 def update_backtest_tracker(today_action: list[dict] | None = None,
                             today_date: str | None = None, today_watchlist: list[dict] | None = None,
-                            today_regime: str | None = None) -> None:
+                            today_regime: str | None = None, today_qm: list[dict] | None = None) -> None:
     """
     Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
@@ -812,7 +888,7 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     """
     tracker = _load_tracker()
     try:
-        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime)
+        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
         # не плащаме втори yf.download(). Днес ingest-натите позиции остават
         # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла
@@ -970,6 +1046,88 @@ def get_buystop_summary() -> dict:
         "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
+    }
+
+
+def get_qm_summary() -> dict:
+    """
+    Qullamaggie: обобщение на ОТДЕЛНАТА книга "qm_breakout" (отделна стратегия — измерване, не препоръка). Чисто локално четене (без мрежа). Win rate (интервал на Wilson), медианата на R и
+    сравнението със SPY — чак при ≥ config.QM_MIN_CLOSED_FOR_WINRATE затворени записа; дотогава само броят и средният R (и за двете граници на стопа на входния ден: opt и pess).
+    Редовете носят отметка also_action / also_buystop, когато тикърът е и в Action / buy-stop книгата (застъпване на интервалите). Изключено → {}.
+    """
+    if not config.TRACK_QM:
+        return {}
+    tracker = _load_tracker()
+    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_QM]
+
+    def intervals(cat_fn, exclude=()):
+        d: dict = {}
+        for a_ in tracker.values():
+            if a_.get("method") == "v2" and cat_fn(a_) and a_.get("entry_date") and a_.get("status") not in exclude:
+                d.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
+        return d
+    act = intervals(is_action_record, trade_sim.NOT_A_POSITION)
+    bst = intervals(lambda r: record_category(r) == CATEGORY_BUYSTOP, trade_sim.NOT_A_POSITION)
+
+    def overlaps(r: dict, other: dict) -> bool:
+        s0, e0 = r["entry_date"], r.get("resolution_date") or "9999-12-31"
+        return any(a0 <= e0 and s0 <= b0 for a0, b0 in other.get(r["ticker"], []))
+
+    by_status: dict = {}
+    for r in records:
+        by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
+    closed = [r for r in records if r.get("status") in trade_sim.QM_TERMINAL and r.get("realized_r") is not None]
+    triggered = [r for r in records if r.get("fill_date")]
+    not_trig = by_status.get("not_triggered", 0)
+    skipped = by_status.get("skipped_extended", 0) + by_status.get("skipped_adr", 0) + by_status.get("invalid_risk", 0)
+    window_done = len(triggered) + not_trig + skipped
+    min_closed = config.QM_MIN_CLOSED_FOR_WINRATE
+    visible = len(closed) >= min_closed
+    ro = sorted(r["realized_r"] for r in closed)
+    rp = sorted((r.get("realized_r_pess") if r.get("realized_r_pess") is not None else r["realized_r"]) for r in closed)
+    wins = sum(1 for x in ro if x > 0)
+    wins_p = sum(1 for x in rp if x > 0)
+    med = lambda xs: round((xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2), 2)
+    cmp_recs = [r for r in closed if r.get("return_pct") is not None and r.get("spy_return_pct") is not None]
+    spy_compare = None
+    if visible and cmp_recs:
+        n_c = len(cmp_recs)
+        ar = sum(r["return_pct"] for r in cmp_recs) / n_c
+        asp = sum(r["spy_return_pct"] for r in cmp_recs) / n_c
+        spy_compare = {"n": n_c, "avg_return_pct": round(ar, 2), "avg_spy_pct": round(asp, 2), "avg_alpha_pct": round(ar - asp, 2),
+                       "beat_spy_pct": round(sum(1 for r in cmp_recs if r["return_pct"] > r["spy_return_pct"]) / n_c * 100, 1)}
+    by_regime: dict = {}
+    for r in records:
+        g = by_regime.setdefault(r.get("regime") or "н/д", {"records": 0, "closed": 0, "_rs": []})
+        g["records"] += 1
+        if r in closed:
+            g["closed"] += 1
+            g["_rs"].append(r["realized_r"])
+    for g in by_regime.values():
+        x = g.pop("_rs")
+        g["avg_r"] = round(sum(x) / len(x), 2) if (visible and x) else None
+
+    def _row(r: dict) -> dict:
+        return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "trigger": r.get("buy_stop"), "adr": r.get("adr"),
+                "expected_stop": r.get("expected_stop"), "stop_loss": r.get("stop_loss"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
+                "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
+                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
+    live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
+    recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
+                      "realized_r_pess": r.get("realized_r_pess")} for r in closed), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
+    return {
+        "enabled": True, "records": len(records), "pending": by_status.get("pending", 0), "open": by_status.get("open", 0) + by_status.get("trailing", 0),
+        "closed": len(closed), "triggered": len(triggered), "not_triggered": not_trig, "skipped": skipped,
+        "not_triggered_pct": round(100 * not_trig / window_done, 1) if window_done else None,
+        "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)),
+        "avg_realized_r": round(sum(ro) / len(ro), 2) if ro else None, "avg_realized_r_pess": round(sum(rp) / len(rp), 2) if rp else None,
+        "min_closed": min_closed, "stats_visible": visible,
+        "wins": wins if visible else None, "losses": (len(ro) - wins) if visible else None, "win_rate_pct": round(100 * wins / len(ro), 1) if visible else None,
+        "win_rate_pess_pct": round(100 * wins_p / len(rp), 1) if visible else None, "win_ci_pct": _wilson_ci_pct(wins, len(ro)) if visible else None,
+        "median_realized_r": med(ro) if visible else None, "median_realized_r_pess": med(rp) if visible else None,
+        "big_winners_5r": sum(1 for x in ro if x > 5) if visible else None,
+        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
+        "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
     }
 
 

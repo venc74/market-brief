@@ -620,13 +620,18 @@ def run() -> dict:
     # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
     # списък директно, за да е налично в tracker-а от утрешния run нататък.
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"))     # пакет 1б: + buy-stop кандидатите (отделна книга)
+        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"), qm_cards)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
         try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
             backtest_summary["buystop"] = backtest.get_buystop_summary()
         except Exception as e:
             print(f"[main] обобщението на buy-stop кандидатите пропуснато: {e}")
+    if config.ENABLE_BACKTEST and config.TRACK_QM:
+        try:                                                                   # Qullamaggie: отделната книга qm_breakout (чисто локално четене)
+            backtest_summary["qm_breakout"] = backtest.get_qm_summary()
+        except Exception as e:
+            print(f"[main] обобщението на qm_breakout книгата пропуснато: {e}")
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap
