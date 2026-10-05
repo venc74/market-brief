@@ -3,7 +3,7 @@ Qullamaggie (06.10.2026) · т.6: секцията "Qullamaggie сетъпи" в
 (всички полета от заданието), EP наблюдение (без Track Record), блок за книгата qm_breakout (win rate чак след ≥ 20 затворени), банери при провал, стар бриф без ключовете → без секция.
 
 РЕАЛНО: картите DOCN/CORT/CRL от скана към 02.10.2026 (tests/fixtures/qm_frames_2026-10-02.json); SYNA +15.0% after-hours на 01.10 (5-минутни барове, дневни данни и заглавия от Yahoo, tests/fixtures/qm_ep_2026-10-02.json);
-базовият бриф е РЕАЛНИЯТ от 05.10.2026 (tests/fixtures/brief_2026-10-05.json). СИНТЕТИЧНО: отговорът на AI за катализатора на SYNA (резюме), записите на книгата с резултати (25 затворени за проверка на прага;
+базовият бриф е РЕАЛНИЯТ от 05.10.2026 (tests/fixtures/brief_2026-10-05.json). Диагностиката на скана (903 тикъра, 892 с история, 167 лидери) е РЕАЛНАТА от скана на целия универс към 02.10. СИНТЕТИЧНО: отговорът на AI за катализатора на SYNA (резюме), записите на книгата с резултати (25 затворени за проверка на прага;
 реалните записи са 3 чакащи карти без резултат), провалените диагностики и злонамереният текст за escape проверката.
 Пускане: python test_qm_render.py
 """
@@ -27,7 +27,9 @@ frames = {t: pd.DataFrame({"Open": d["o"], "High": d["h"], "Low": d["l"], "Close
 ROWS, DIAG = q.scan_frames(frames, lead=FIX["lead"])
 CARDS = q.cards(ROWS)
 assert [c["ticker"] for c in CARDS] == ["DOCN", "CORT", "CRL"] or sorted(c["ticker"] for c in CARDS) == ["CORT", "CRL", "DOCN"]
-DIAG = {**DIAG, "ok": True, "batches": 1, "batches_failed": 0}
+US = FIX["universe_scan"]                                                                                         # РЕАЛНИЯТ скан на целия универс към 02.10 (903 тикъра, 892 с история; 167 лидери; кандидати DOCN, CORT, CRL)
+assert US["candidates"] == ["DOCN", "CORT", "CRL"] and (US["leaders"], US["with_history"]) == (167, 892)
+DIAG = {"universe": 903, "with_history": US["with_history"], "leaders": US["leaders"], "candidates": 3, "shown": 3, "as_of": FIX["as_of"], "lead_pct": config.QM_LEAD_PCT, "ok": True, "batches": 10, "batches_failed": 0}
 
 
 def m5(t):
@@ -145,13 +147,14 @@ print("── банери, празни състояния и стар бриф
 tf = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(cards=[], diag={"ok": False, "error": "RuntimeError: мрежата падна", "candidates": 0, "shown": 0})))))
 assert "Скенерът не се изпълни (RuntimeError: мрежата падна) — празният списък НЕ значи, че няма кандидати за пробив" in tf and "Ниво на пробива" not in tf
 te = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(cards=[], diag={**DIAG, "candidates": 0, "shown": 0})))))
-assert "няма кандидати днес (проверени 8 тикъра)" in te
+assert "няма кандидати днес (проверени 892 тикъра)" in te
 tm = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(diag={**DIAG, "candidates": 11, "shown": 8})))))
 assert "кандидати: 11, показани най-стегнатите 3" in tm and "(3 от 11)" in tm
+assert "Лидери: горните 10% по ръст за 1, 3 и 6 месеца (167 от 892 тикъра с история към 02.10) · кандидати: 3." in txt
 old = page_of(copy.deepcopy(B05))
 old_body = old.split("</style>", 1)[1]                                                                                # CSS коментарът е в <style>; секцията — в тялото
 assert "Qullamaggie" not in old_body and 'id="qm"' not in old_body and "qm-card" not in old_body and old.count("<section") == old.count("</section>")
-print("  ✓ провал на скенера → 'празният списък НЕ значи …'; 0 кандидати → 'няма кандидати днес (проверени 8 тикъра)'; повече от показаните → '(3 от 11)'; РЕАЛНИЯТ бриф от 05.10 без ключовете → страницата е без секцията")
+print("  ✓ провал на скенера → 'празният списък НЕ значи …'; 0 кандидати → 'няма кандидати днес (проверени 892 тикъра)'; повече от показаните → '(3 от 11)'; РЕАЛНИЯТ бриф от 05.10 без ключовете → страницата е без секцията")
 mal = brief_with()
 mal["watchlist"] = [{**mal["watchlist"][0], "ticker": "DOCN"}] + mal["watchlist"][1:]
 page_m = page_of(mal)
