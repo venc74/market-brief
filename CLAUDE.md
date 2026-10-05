@@ -77,7 +77,8 @@ src/trade_sim.py        — ЧИСТА симулация на изпълнен�
                         продажба, trailing 10DMA, гап изход, mark-to-market
                         изтичане, SPY сравнение); без I/O — ползва се и от реплея
 src/backtest.py         — Track Record v2: tracker (pending/open/trailing/…),
-                        резолюция през trade_sim, обобщение за dashboard-а
+                        резолюция през trade_sim, обобщение за dashboard-а;
+                        втора НЕЗАВИСИМА книга "buystop" (Watchlist buy-stop кандидати)
 src/tracker_switch.py   — еднократно превключване v1→v2 (архив), revert_to_v1()
 src/render.py            — dashboard HTML (Jinja2) + email HTML
 templates/dashboard.html.j2 — единственият source за docs/index.html
@@ -126,6 +127,8 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   (перцентил в целия универс; `RS_RATING_WEIGHTS = 40/20/20/20`, `RS_QUARTER_BARS = 63`,
   `RS_RATING_MIN_UNIVERSE = 150` — под него филтърът се пропуска с предупреждение)
 - Track Record: `TRACK_RECORD_V2 = 1` — автоматично превключване v1→v2 при първия run
+- Buy-stop кандидати (пакет 1б): `TRACK_BUYSTOP = 1`, `BUYSTOP_MIN_CLOSED_FOR_WINRATE = 20` — win rate, медиана, SPY и разбивка по
+  режим се показват чак при ≥ 20 затворени записа
 
 ## Известни особености / история на решенията
 
@@ -193,6 +196,16 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   от кода (too_wide ≠ дълбочина на базата); "вчерашният trigger" се филтрира спрямо текущите v2 позиции (без "вече в портфейла" от
   архивирани v1); Track Record v2 без затворени сделки казва "още няма затворени сделки по v2"; празна Momentum група има ред;
   езиковият филтър маха soft hyphen и логва "marginalen"/"expозиция".
+- Пакет 1б (05.10.2026) — buy-stop кандидатите (Watchlist карта със `setup.kind == "below_pivot"` и валиден `plan_preview`) се следят като
+  ОТДЕЛНА, независима книга в същия tracker (`category: "buystop"`; запис без `category` е Action). Същият модел на изпълнение като
+  Action (`trade_sim`: High ≥ buy-stop в 5 сесии, по max(Open, buy-stop), не над +5%; стоп/цел от картата), записва се във ВСИЧКИ
+  режими с таг `regime`. Дедупът е в рамките на категорията (`_is_continuation(..., category)`); отметка "и Action" = застъпване на
+  интервалите на двата записа (само показване, статистиките не се сумират). Четците на позиции (`main._live_positions`,
+  `main._last_resolved_positions`, `ai_brief._live_v2_positions`, Action обобщението) гледат само `backtest.is_action_record()` — иначе
+  се връща "вече в портфейла" за нещо, което не е позиция. Блокът в dashboard-а е надписан "измерване, не препоръка". Реплей 02.01.2024–
+  01.10.2026 (технически слой): 1680 записа (2.43/ден), 38% не се задействат, след 20 сесии R +0.05 [−0.03; +0.14], алфа спрямо SPY
+  −0.80% [−1.32; −0.25] — без демонстрирана алфа; реалните кандидати на брифовете дават ~0.3 записа/ден, значими изводи след около година.
+  Записът идва и от snapshot-ите със заснет `plan_preview` (като при Action — възстановява пропуснат run); по-старите нямат такъв.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
