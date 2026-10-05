@@ -14,10 +14,11 @@ Yahoo показва следобед в деня на сесията (OI се �
 сесията, а утрешният бриф търси снимката за своята "последна сесия".
 
 Какво се снима: топ config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS от днешното
-ранжиране по ликвидност (кешът от сутрешния run, същият ред), по
-config.UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS най-близки падежа, OI по падеж
-(calls + puts). Утрешното ранжиране се прави наново — резервът над
-SCAN_LIMIT покрива разликата (виж config).
+ранжиране по ликвидност (кешът от сутрешния run, същият ред), OI по падеж
+(calls + puts) за ВСИЧКИ падежи в (сесия, сесия + UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS]
+(пакет 4б т.а, 06.10.2026: преди — първите 4 падежа; знаменателят на
+съотношението трябва да е от един и същ времеви прозорец, виж unusual_options.py).
+Снимката носи horizon_days — по него се различава от старата (първите 4 падежа).
 
 Graceful: провал на тикър → пропуска се; ден без сесия (празник) → нищо не се
 записва; провал изцяло → файлът остава какъвто е, сутрешният бриф казва, че
@@ -101,6 +102,25 @@ def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str 
     return None
 
 
+def _window_oi(tk, session: dt.date) -> dict[str, int]:
+    """OI (calls + puts) по падеж за падежите в (session, session + HORIZON_DAYS]; падеж, изтекъл в деня на сесията, не се снима."""
+    hi = session + dt.timedelta(days=config.UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS)
+    per_exp: dict[str, int] = {}
+    for exp in (tk.options or []):
+        try:
+            d = dt.date.fromisoformat(str(exp))
+        except ValueError:
+            continue
+        if not (session < d <= hi) or len(per_exp) >= config.UNUSUAL_OPTIONS_MAX_EXPIRIES + 2:
+            continue
+        ch = tk.option_chain(exp)
+        per_exp[str(exp)] = int(sum(
+            float(df["openInterest"].fillna(0).sum())
+            for df in (ch.calls, ch.puts)
+            if df is not None and not df.empty and "openInterest" in df))
+    return per_exp
+
+
 def take_snapshot() -> dict | None:
     if uo.yf is None:
         print("[oi_snapshot] yfinance липсва — нищо не е заснето")
@@ -125,14 +145,7 @@ def take_snapshot() -> dict | None:
     failed: list[str] = []
     for sym in tickers:
         try:
-            tk = uo.yf.Ticker(sym)
-            per_exp = {}
-            for exp in (tk.options or [])[:config.UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS]:
-                ch = tk.option_chain(exp)
-                per_exp[exp] = int(sum(
-                    float(df["openInterest"].fillna(0).sum())
-                    for df in (ch.calls, ch.puts)
-                    if df is not None and not df.empty and "openInterest" in df))
+            per_exp = _window_oi(uo.yf.Ticker(sym), session)
             if per_exp:
                 oi[sym] = per_exp
         except Exception as e:
@@ -142,6 +155,7 @@ def take_snapshot() -> dict | None:
     with_oi = sum(1 for v in oi.values() if sum(v.values()) >= 50)
     snap = {"session_date": session.isoformat(),
             "fetched_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M"),
+            "horizon_days": config.UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS,
             "tickers": oi, "failed": failed}
     print(f"[oi_snapshot] сесия {session}: {len(oi)}/{len(tickers)} тикъра, "
           f"OI ≥ 50 за {with_oi}, неуспешни {failed or '—'}, {time.time() - t0:.0f} с")

@@ -22,6 +22,12 @@ yfinance върне нищо.
 
 Graceful degradation: липсват ли данни за тикър — пропуска се; празно → секцията се крие.
 
+Пакет 4б т.а (06.10.2026): ЗНАМЕНАТЕЛЯТ е сравним между дните. Преди: "най-близките 2 падежа" — петъчният седмичен падеж държи 60–70% от OI
+и влиза/излиза от двойката според деня от седмицата (TSLA 626 692 в четвъртък → 114 346 в понеделник; на жива верига ×15–×26 за една
+седмица). Сега: ВСИЧКИ падежи в прозорец (ден на брифа, ден на брифа + UNUSUAL_OPTIONS_HORIZON_DAYS]; изтекъл или изтичащ в деня на брифа
+падеж не участва; обемът и OI са по едни и същи падежи (падеж без OI в снимката отпада и от двете страни); снимка в стария формат (първите 4
+падежа) не се ползва — съотношението от нея не е сравнимо.
+
 FIX 2026-09-29: знаменателят OI идва от следобедната снимка на СЪЩАТА сесия
 (src/oi_snapshot.py, отделен GitHub Actions job), не от сутрешния fetch — в
 05:30–05:55 UTC Yahoo връща празен/непълен OI. Липсва ли снимка/тикър/падеж →
@@ -237,6 +243,86 @@ def load_oi_snapshots() -> dict:
         return {}
 
 
+def window_expiries(expiries, brief_date: dt.date, horizon_days: int | None = None, max_n: int | None = None) -> list[str]:
+    """
+    Падежите в прозореца (brief_date, brief_date + horizon_days]: строго СЛЕД деня на брифа (изтеклите и изтичащите в деня на брифа не участват —
+    обемът им е roll/гама шум, а OI им умира), най-много max_n. Чиста функция.
+    """
+    horizon = config.UNUSUAL_OPTIONS_HORIZON_DAYS if horizon_days is None else horizon_days
+    cap = config.UNUSUAL_OPTIONS_MAX_EXPIRIES if max_n is None else max_n
+    hi = brief_date + dt.timedelta(days=horizon)
+    out = []
+    for e in sorted({str(x) for x in (expiries or [])}):
+        try:
+            d = dt.date.fromisoformat(e)
+        except ValueError:
+            continue
+        if brief_date < d <= hi:
+            out.append(e)
+    return out[:cap]
+
+
+def window_ratio(vol_by_exp: dict, oi_by_exp: dict, expiries: list[str]) -> dict:
+    """
+    Съотношението обем/OI по ЕДНИ И СЪЩИ падежи: падеж без обем или без OI (>0) в снимката отпада и от числителя, и от знаменателя
+    (dropped). Чиста функция. ratio е None, ако не е останал нито един падеж с OI.
+    """
+    used = [e for e in expiries if e in vol_by_exp and (oi_by_exp.get(e) or 0) > 0]
+    dropped = [e for e in expiries if e not in used]
+    vol = float(sum(vol_by_exp[e] for e in used))
+    oi = float(sum(oi_by_exp[e] for e in used))
+    return {"used": used, "dropped": dropped, "volume": vol, "oi": oi, "ratio": (vol / oi) if oi > 0 else None}
+
+
+def snapshot_in_window_format(snap: dict | None) -> bool:
+    """Снимка с OI за целия времеви прозорец (нов формат: horizon_days). Старата — първите 4 падежа — не дава сравнимо съотношение."""
+    return bool(snap) and (snap.get("horizon_days") or 0) >= config.UNUSUAL_OPTIONS_HORIZON_DAYS + 4
+
+
+def analyze_ticker(sym: str, tk, snap: dict | None, brief_date: dt.date, snap_missing: str = "") -> dict | None:
+    """
+    Обем/OI на един тикър по правилото на прозореца (виж модулния docstring). tk е yfinance.Ticker (или негов заместител: .options,
+    .option_chain(exp)). Връща None без падежи; иначе речник: ticker, call_vol, put_vol, total_vol, ratio (None + why при проблем),
+    used/dropped (падежи), oi_used, live_oi (сутрешният OI, само за сравнение), window.
+    """
+    exps = tk.options
+    if not exps:
+        return None
+    window = window_expiries(exps, brief_date)
+    call_vol = put_vol = live_oi = 0.0
+    vol_by_exp: dict[str, float] = {}
+    for exp in window:
+        ch = tk.option_chain(exp)
+        for df, is_call in ((ch.calls, True), (ch.puts, False)):
+            if df is None or df.empty:
+                continue
+            v = float(df.get("volume").fillna(0).sum()) if "volume" in df else 0
+            live_oi += float(df.get("openInterest").fillna(0).sum()) if "openInterest" in df else 0
+            vol_by_exp[exp] = vol_by_exp.get(exp, 0) + v
+            if is_call:
+                call_vol += v
+            else:
+                put_vol += v
+    snap_oi = ((snap or {}).get("tickers") or {}).get(sym)
+    why = ""
+    if not window:
+        why = "няма падеж в прозореца на брифа"
+    elif snap is None:
+        why = snap_missing or "следобедната OI снимка липсва"
+    elif not snapshot_in_window_format(snap):
+        why = "снимката е в стария формат (първите 4 падежа) — съотношението не е сравнимо между дните"
+    elif snap_oi is None:
+        why = "тикърът не е в следобедната снимка"
+    res = window_ratio(vol_by_exp, snap_oi or {}, window)
+    if not why and not res["used"]:
+        why = "падежите не съвпадат със следобедната снимка"
+    if not why and res["oi"] < 50:
+        why = "OI в следобедната снимка е под 50 договора"
+    return {"ticker": sym, "call_vol": call_vol, "put_vol": put_vol, "total_vol": call_vol + put_vol,
+            "ratio": None if why else res["ratio"], "why": why, "used": res["used"], "dropped": res["dropped"],
+            "oi_used": res["oi"] if not why else 0, "live_oi": int(live_oi), "window": window}
+
+
 def _snapshot_for_yesterday(today: dt.date) -> tuple[dict | None, str, str]:
     """
     Сутрешният обем е от последната сесия → OI трябва да е снимката от СЪЩАТА
@@ -263,50 +349,18 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
     rows = []
     scan_list = _top_by_volume(symbols, config.UNUSUAL_OPTIONS_SCAN_LIMIT)
     snap, session, snap_missing = _snapshot_for_yesterday(dt.date.today())
-    snap_oi = (snap or {}).get("tickers") or {}
     reasons: dict[str, str] = {}
     for sym in scan_list:
         try:
             tk = yf.Ticker(sym)
-            exps = tk.options
-            if not exps:
+            a = analyze_ticker(sym, tk, snap, dt.date.today(), snap_missing)
+            if a is None:
                 continue
-            call_vol = put_vol = total_oi = 0
-            vol_by_exp: dict[str, float] = {}
-            for exp in exps[:2]:  # най-близките 2 падежа
-                ch = tk.option_chain(exp)
-                for df, is_call in ((ch.calls, True), (ch.puts, False)):
-                    if df is None or df.empty:
-                        continue
-                    v = float(df.get("volume").fillna(0).sum()) if "volume" in df else 0
-                    oi = float(df.get("openInterest").fillna(0).sum()) if "openInterest" in df else 0
-                    total_oi += oi
-                    vol_by_exp[exp] = vol_by_exp.get(exp, 0) + v
-                    if is_call:
-                        call_vol += v
-                    else:
-                        put_vol += v
-            total_vol = call_vol + put_vol
+            call_vol, put_vol, total_vol = a["call_vol"], a["put_vol"], a["total_vol"]
             if total_vol < 1000:  # отсяваме неликвидни
                 continue
-            # FIX 2026-09-29: съотношението е обем / OI от следобедната снимка на
-            # СЪЩАТА сесия, само по падежите, които са и в двете (обем и OI от
-            # едни и същи падежи). Сутрешният OI (total_oi) остава само в
-            # диагностиката за сравнение — в 05:35 UTC е празен/непълен.
-            # Праг от 50 договора избягва абсурдни съотношения от почти-нулев OI.
-            why = ""
-            if snap is None:
-                why = snap_missing
-            elif sym not in snap_oi:
-                why = "тикърът не е в следобедната снимка"
-            matched = [e for e in vol_by_exp if (snap_oi.get(sym) or {}).get(e, 0) > 0]
-            if not why and not matched:
-                why = "падежите не съвпадат със следобедната снимка"
-            snap_total = sum(snap_oi[sym][e] for e in matched) if matched else 0
-            if not why and snap_total < 50:
-                why = "OI в следобедната снимка е под 50 договора"
-            has_oi = not why
-            ratio = (sum(vol_by_exp[e] for e in matched) / snap_total) if has_oi else None
+            ratio, why = a["ratio"], a["why"]
+            snap_total, total_oi = a["oi_used"], a["live_oi"]
             if why:
                 reasons[sym] = why
             # FIX 2026-09-12: долният праг (>=50 контракта) хваща само буквална
@@ -332,6 +386,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
                          # FIX 2026-09-28: изрично поле + суров OI за диагностиката
                          "has_oi_ratio": ratio is not None and not oi_suspect,
                          "_oi": snap_total, "_live_oi": int(total_oi), "_oi_suspect": oi_suspect,
+                         "_used": a["used"],
                          "_ratio": round(ratio, 2) if (ratio is not None and not oi_suspect) else 0})
         except Exception as e:
             print(f"[unusual_options] yf {sym}: {e}")
@@ -354,6 +409,9 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
         # live_oi_morning = сутрешният, само за сравнение
         "raw_oi": {r["ticker"]: r["_oi"] for r in top},
         "live_oi_morning": {r["ticker"]: r["_live_oi"] for r in top},
+        # пакет 4б т.а: по кои падежи е съотношението (обем и OI — едни и същи) и размерът на прозореца
+        "expiries_used": {r["ticker"]: r["_used"] for r in top},
+        "window_days": config.UNUSUAL_OPTIONS_HORIZON_DAYS,
         "oi_source": "afternoon_snapshot",
         "snapshot_session": session,
         "snapshot_fetched_at_utc": (snap or {}).get("fetched_at_utc"),
@@ -372,7 +430,7 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
           f"без съотношение: {LAST_DIAG['ratio_missing_reasons'] or '—'}; "
           f"сутрешен OI за сравнение: {LAST_DIAG['live_oi_morning']}")
     for r in rows:
-        for k in ("_ratio", "_oi", "_live_oi", "_oi_suspect"):
+        for k in ("_ratio", "_oi", "_live_oi", "_oi_suspect", "_used"):
             r.pop(k, None)
     return top
 

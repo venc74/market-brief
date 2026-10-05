@@ -578,9 +578,18 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = DATA_DIR / "unusual_options_oi_snapshot.json"
 # с топ 80 утрешните топ 60 липсват само 2 пъти по 1 тикър (без еднократната
 # смяна на универса 13→14.07); с топ 60 — 37 от 60 дни.
 UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS", 80))
-# Колко падежа на тикър: утрешните два най-близки са сред днешните първи 3
-# (един може да изтече днес); 4 — резерв за празници.
+# ОСТАРЯЛО от пакет 4б т.а (06.10.2026): снимката вече пази OI по ВРЕМЕВИ прозорец (виж UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS), не "първите N
+# падежа". Константата се чете само от стария формат на снимките.
 UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))
+# Пакет 4б т.а: съотношението обем/OI е сравнимо между дните само ако знаменателят е от ЕДИН И СЪЩ времеви прозорец, не от "най-близките 2 падежа".
+# Измерено на жива верига (05.10.2026, TSLA/NVDA/AAPL): при плъзгане на деня на брифа от пон до пет "най-близките 2 падежа" се клатят ×15–×26
+# (петъчният седмичен падеж държи 60–70% от OI и влиза/излиза според деня), прозорец от 21 дни — ×1.2–×1.4. Падеж, изтекъл или изтичащ в деня
+# на брифа, не участва; обемът и OI са по едни и същи падежи (падеж без OI в снимката отпада и от двете страни).
+UNUSUAL_OPTIONS_HORIZON_DAYS = int(os.getenv("UNUSUAL_OPTIONS_HORIZON_DAYS", 21))
+# Снимката пази OI за падежите в (сесия, сесия + 28 дни]: брифът е най-много 4 дни след сесията (уикенд + празник), а прозорецът му стига до +21.
+UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS", 28))
+# Таван на падежите на тикър (дълги вериги със седмични падежи Пн/Ср/Пт): повече вериги = повече заявки, а по-далечните тежат малко
+UNUSUAL_OPTIONS_MAX_EXPIRIES = int(os.getenv("UNUSUAL_OPTIONS_MAX_EXPIRIES", 14))
 # Колко снимки се пазят (по дата на сесията)
 UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP", 7))
 # FIX 2026-10-01 (отговор на прегледа на партида 1, т.4): oi_snapshot.yml има
