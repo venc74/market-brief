@@ -103,6 +103,9 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   13 е празничен петък (06.07.2026)
 - `HYSTERESIS_HIDDEN_RELEASE_DAYS = 10` — override, държан от хистерезис при скрит индикатор, се
   освобождава на 10-ия пореден ден без данни (ред в лога + текст в брифа)
+- `DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE = 1` — червени distribution days (max(SPY, QQQ) ≥ `DISTRIBUTION_DAYS_RED = 9`)
+  ограничават режима до Defensive (`thermometer.apply_distribution_cap`; Cash не се пипа; main смята distribution
+  days веднага след термометъра)
 - Net Liquidity: `NET_LIQ_WINDOW_WEEKS = 4`, `NET_LIQ_DEAD_ZONE_PCT = 1.0`, `NET_LIQ_CONFIRM_WEEKS = 2`;
   Put/Call SPY: percentile спрямо собствената история, `PUTCALL_PERCENTILE_GREEN/RED = 90/10`
 - `MAX_ACTION_TICKERS = 5`, `MAX_PER_SECTOR = 2`
@@ -184,6 +187,7 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   история (скрит при провал); макро брифът след значимите новини (NewsAPI махнат); доходностите в
   б.п. (`chg_5d_bp`); паднал Yahoo не сваля run-а (`data_warnings`); COT давност; часът е берлински
   (CET/CEST); VIX и global signals с календарен прозорец + NaN guard; освобождаване на хистерезиса.
+  Допълнение (05.10): червени distribution days → режимът е най-много Defensive.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
