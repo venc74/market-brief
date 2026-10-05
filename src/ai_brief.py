@@ -1965,18 +1965,27 @@ def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | No
     open_by_ticker = {p["ticker"]: p.get("entry_date") for p in (open_positions or []) if p.get("ticker")}
     closed_by_ticker = {p["ticker"]: p for p in (closed_positions or []) if p.get("ticker") and p["ticker"] not in open_by_ticker}
     merged = []
+    # 1) cross тезите на всички пазари от суровите механизми (знак по таблицата, схема, mixed в рамките на пазара)
+    directs, crosses = {}, {}
     for e in extremes:
         market = e["market"]
-        move = {k: moves[market][k] for k in ("instrument_direction", "move_text", "move_short")}
-        direct = _cot_table.direct_thesis(market, moves[market])
+        directs[market] = _cot_table.direct_thesis(market, moves[market])
         raw = raw_by_market.get(market)
         # пазарът се показва и когато моделът не е върнал нищо за него (директната теза е от таблицата)
         cross = _cot_table.evaluate_cross(raw, market, moves[market],
-                                          exclude={x["ticker"] for x in direct["tickers"]},
+                                          exclude={x["ticker"] for x in directs[market]["tickers"]},
                                           log=lambda msg, m=market: _cot_diag_log(m, msg))
         meta = (meta_by_market or {}).get(market) or {}
         if raw is None:
             cross["empty_reason"] = meta.get("empty_reason") or "моделът не върна тази под-теза"
+        crosses[market] = cross
+    # 2) междупазарна проверка: един тикър с противоположен ефект в различни лихвени пазари при една и съща посока на доходностите
+    crosses = _cot_table.apply_rate_market_conflicts(crosses, moves)
+    for e in extremes:
+        market = e["market"]
+        move = {k: moves[market][k] for k in ("instrument_direction", "move_text", "move_short")}
+        direct, cross = directs[market], crosses[market]
+        meta = (meta_by_market or {}).get(market) or {}
         badges = lambda th: cot_theses_badges(th, screener_tickers, open_by_ticker, closed_by_ticker)
         merged.append({**e, **move,
                        "direct_thesis": badges(_empty_sub_reason(
@@ -1997,6 +2006,8 @@ def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | No
                     if isinstance(d, dict)],
         "mixed": [f"{m}/{d['ticker']}" for m, th in subs for d in th.get("dropped_tickers") or []
                   if isinstance(d, dict) and d.get("code") == "mixed"],
+        "mixed_cross_market": [f"{m}/{d['ticker']}" for m, th in subs for d in th.get("dropped_tickers") or []
+                               if isinstance(d, dict) and d.get("code") == "mixed_cross_market"],
     })
     print(f"[ai] cot_theses: {len(merged)}/{len(extremes)} тези · изключени тикъри {len(COT_DIAG['dropped'])} "
           f"(mixed {len(COT_DIAG['mixed'])}) · прозата с посока, противоречаща на ефекта: "

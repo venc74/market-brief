@@ -243,6 +243,52 @@ def evaluate_cross(raw_tickers, market: str, move: dict, exclude: set[str] | fro
     return out
 
 
+def rate_market_conflicts(crosses: dict[str, dict], moves: dict[str, dict]) -> dict[str, list[dict]]:
+    """
+    Междупазарна проверка (пакет 3, 05.10): един и същ тикър с ПРОТИВОПОЛОЖЕН ефект в различни лихвени пазари (2Y/5Y/10Y/Ultra/30Y) при
+    ЕДНА И СЪЩА посока на доходностите → "mixed" → тикърът се изключва от ВСИЧКИ тези лихвени пазари за тази посока. Доходностите
+    са обратни на цената на фючърса (цена надолу = доходности нагоре). Реален пример 05.10: EXPD "губи" в 2Y (доходности нагоре) и
+    "печели" в 30Y (доходности нагоре) — моделът му дава различни механизми за двата срока. Ефект None ("other") не се брои.
+    crosses: {пазар: резултат на evaluate_cross}; moves: {пазар: _instrument_move}. Връща {пазар: [{ticker, code, reason}]}.
+    """
+    groups: dict[tuple[str, str], list[tuple[str, str, str]]] = {}
+    for market, th in crosses.items():
+        if config.COT_MARKET_KINDS.get(market) != "rate" or market not in moves:
+            continue
+        ydir = "нагоре" if moves[market]["move"] == "down" else "надолу"
+        for t in th.get("tickers") or []:
+            if t.get("effect"):
+                labels = " и ".join(mechanism_label(m["type"]) for m in t.get("mechanisms") or [])
+                groups.setdefault((t["ticker"], ydir), []).append((market, t["effect"], labels))
+    out: dict[str, list[dict]] = {}
+    for (ticker, ydir), rows in groups.items():
+        if len({e for _, e, _ in rows}) < 2:
+            continue
+        gains = [f"{m} ({lab})" for m, e, lab in rows if e == "gains"]
+        loses = [f"{m} ({lab})" for m, e, lab in rows if e == "loses"]
+        reason = (f"mixed между пазари: печели в {', '.join(gains)}, но губи в {', '.join(loses)} при една и съща посока на "
+                  f"доходностите ({ydir})")
+        for m, _, _ in rows:
+            out.setdefault(m, []).append({"ticker": ticker, "code": "mixed_cross_market", "reason": reason})
+    return out
+
+
+def apply_rate_market_conflicts(crosses: dict[str, dict], moves: dict[str, dict]) -> dict[str, dict]:
+    """Прилага rate_market_conflicts: изключените тикъри минават в dropped_tickers; празна теза получава empty_reason от кода."""
+    conflicts = rate_market_conflicts(crosses, moves)
+    out = dict(crosses)
+    for market, drops in conflicts.items():
+        th = dict(crosses[market])
+        bad = {d["ticker"] for d in drops}
+        th["tickers"] = [t for t in th.get("tickers") or [] if t["ticker"] not in bad]
+        th["dropped_tickers"] = list(th.get("dropped_tickers") or []) + drops
+        th["no_direct_link"] = not th["tickers"]
+        if not th["tickers"]:
+            th["empty_reason"] = cross_empty_reason(True, th["dropped_tickers"])
+        out[market] = th
+    return out
+
+
 def cross_empty_reason(model_returned: bool, dropped: list[dict]) -> str:
     """Причината за празна cross теза — сглобява се от кода (не от модела)."""
     if dropped:
