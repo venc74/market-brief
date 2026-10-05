@@ -147,9 +147,6 @@
   /* 2026-10-03 (пакет 4а т.7): давност и причина при празен/остарял днешен резултат */
   .data-note { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
   .data-note.warn { color: var(--yellow); border-left: 2px solid var(--yellow); padding: 4px 10px; }
-  .borrow { font-size: 13px; color: var(--text); margin-top: 6px;
-    padding-top: 6px; border-top: 1px dotted var(--line); }
-  .borrow b { color: var(--yellow); }
 
   /* ── 🔎 Наблюдавани тикъри (2026-09-18) ── */
   .wm-note { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
@@ -337,7 +334,7 @@
   .pos-row-down td.n.pct { color: var(--red); }
 
   /* 2026-10-03 (пакет 4а т.3): widget-ът за търсене на Borrow Rate е махнат (CORS proxy-то беше ненадеждно);
-     .borrow по-горе е за реда с borrow данните върху картите, който остава */
+     2026-10-06 (пакет 4б т.ж): махнат е и редът с borrow данните върху картите (дълги swing позиции) */
 
   /* ── v2: исторически календар ── */
   .calendar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
@@ -727,7 +724,6 @@
         {% if st.ai.warning %}<p class="warn">⚠ {{ st.ai.warning }}</p>{% endif %}
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">{{ st.short_view.interpretation }}</div>
-        {% if st.short_view.borrow %}<div class="borrow"><b>Borrow:</b> {{ st.short_view.borrow }}</div>{% endif %}
       </div>
       <div class="block">
         <h3>Техническа картина</h3>

@@ -1,5 +1,5 @@
 """
-Обогатяване на финалистите: earnings календар (3.2), short interest, borrow и convergence
+Обогатяване на финалистите: earnings календар (3.2), short interest и convergence
 маркери (MF✓ / UOV✓ / SPLIT✓ / SI✓). Опционният блок (IV/IVR/стратегия) е махнат на 2026-10-03.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 # v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
-from src import magic_formula, borrow_data, unusual_options, splits_calendar, dataroma, insider_buying
+from src import magic_formula, unusual_options, splits_calendar, dataroma, insider_buying
 from src import net_utils
 
 
@@ -442,18 +442,8 @@ def enrich(candidates: list[dict]) -> list[dict]:
         row["earnings"] = earnings_info(sym)
         row["short_view"] = short_interest_view(row)
 
-        # 3.2 borrow rate → влиза в short_view секцията
-        if config.ENABLE_BORROW_DATA:
-            try:
-                borrow = borrow_data.borrow_info(sym)
-            except Exception as e:
-                print(f"[enrich] borrow {sym}: {e}")
-                borrow = {"available": False}
-            row["borrow"] = borrow
-            if borrow.get("available") and borrow.get("interpretation"):
-                row["short_view"]["borrow"] = borrow["interpretation"]
-        else:
-            row["borrow"] = {"available": False}
+        # пакет 4б т.ж (06.10.2026): borrow rate вече не се тегли за кандидатите и не се показва върху картите (дълги swing позиции) — модулът
+        # src/borrow_data.py остава непипнат
 
         # 3.1 / 3.3 / 3.4 convergence маркери
         _apply_markers(row, sets)

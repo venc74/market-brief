@@ -48,11 +48,11 @@ if __name__ == "__main__":
     html = render_brief()
     for gone in ("Borrow Rate · търсене на тикър", "borrow-input", "borrow-btn", "borrow-result", "allorigins", "iborrowdesk"):
         assert gone not in html, gone
-    # Borrow данните върху картите остават
+    # Пакет 4б т.ж: редът "Borrow:" върху картите също е махнат (дори ако стар бриф още носи short_view.borrow)
     card = action_card(short_view={"interpretation": "Нисък short interest", "borrow": "Borrow 0.8% — евтино за шортиране"})
     html = render_brief(action=[card])
-    assert '<div class="borrow"><b>Borrow:</b> Borrow 0.8% — евтино за шортиране</div>' in html
-    print("  ✓ няма секция, поле за тикър, скрипт и CORS proxy (allorigins); реда 'Borrow:' върху картата остава")
+    assert "Borrow:" not in html and "Borrow 0.8%" not in html and "<h3>Short Interest</h3>" in html and "Нисък short interest" in html
+    print("  ✓ няма секция, поле за тикър, скрипт и CORS proxy (allorigins); редът 'Borrow:' върху картата също е махнат (Short Interest интерпретацията остава)")
 
     print()
     print("── т.4: опционният блок на картите е махнат ──")
@@ -64,10 +64,10 @@ if __name__ == "__main__":
     # enrich() не вика опции и не слага "options" на реда
     enrich.earnings_info = lambda sym: {"next_earnings": None, "days_to_earnings": None, "in_blackout": False}
     enrich._build_crosscheck_sets = lambda tickers: {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
-    borrow_data.borrow_info = lambda sym: {"available": False}
+    borrow_data.borrow_info = lambda sym: (_ for _ in ()).throw(AssertionError("borrow не се тегли за кандидатите (пакет 4б т.ж)"))
     row = {"ticker": "ABCD", "price": 100.0}
     out = enrich.enrich([row])[0]
-    assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and out["borrow"] == {"available": False}
+    assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and "borrow" not in out and "borrow" not in out["short_view"]
     # AI payload-ът не носи опции
     seen = []
     ai_brief._narratives_for_batch = lambda batch, sector_logic, regime, label, prior: seen.extend(batch) or []
