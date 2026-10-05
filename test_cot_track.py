@@ -99,12 +99,15 @@ conf = [m for m, r in by.items() if r["price_confirmation"]["confirmed"]]
 assert conf == ["Copper", "Mexican Peso", "Australian Dollar", "Cotton", "Wheat"]
 assert [(m, by[m]["price_confirmation"]["state"], by[m]["price_confirmation"]["weeks_on_side"]) for m in ("30-Year Treasury Bond", "5-Year Treasury Note", "2-Year Treasury Note", "Soybeans")] == \
        [("30-Year Treasury Bond", "stale_cross", 14), ("5-Year Treasury Note", "stale_cross", 14), ("2-Year Treasury Note", "stale_cross", 7), ("Soybeans", "not_crossed", 0)]
-assert by["Copper"]["price_confirmation"]["text"] == "Потвърдено от цената: пресича 10-седмичната си средна под нея (тази седмица); цена 6.492 срещу SMA10 6.5617 (-1.1%)."
-assert by["Cotton"]["price_confirmation"]["text"].startswith("Потвърдено от цената: пресича 10-седмичната си средна под нея (преди 3 седмици)")
-assert by["30-Year Treasury Bond"]["price_confirmation"]["text"].startswith("Още не: цената е под 10-седмичната си средна от 14 седмици (пресичането не е скорошно, над 4)")
-assert by["Soybeans"]["price_confirmation"]["text"].startswith("Още не: цената не е пресякла 10-седмичната си средна под нея")
-print("  ✓ потвърдени от цената: Copper, Mexican Peso, Australian Dollar, Cotton, Wheat (5 от 18); 30Y и 5Y са под средната от 14 седмици (не е скорошно пресичане) → 'още не';")
-print("    Soybeans още над средната → 'още не'")
+assert by["Copper"]["price_confirmation"]["text"] == "Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); цена 6.492 срещу SMA10 6.5617 (-1.1%)."
+assert by["Cotton"]["price_confirmation"]["text"].startswith("Цената пресече SMA10 в посоката на сигнала (под нея, преди 3 седмици)")
+assert by["30-Year Treasury Bond"]["price_confirmation"]["text"].startswith("Цената е под SMA10 от 14 седмици — пресичането в посоката на сигнала не е скорошно (над 4)")
+assert by["Soybeans"]["price_confirmation"]["text"].startswith("Цената не е пресякла SMA10 в посоката на сигнала (още е над нея)")
+assert by["Lean Hogs"]["price_confirmation"]["text"].startswith("Цената не е пресякла SMA10 в посоката на сигнала (още е под нея)")        # extreme_short: огледално
+for r in out:                                                                                                                 # никъде думата "потвърд…"
+    assert "потвърд" not in (r["price_confirmation"]["text"] + r["track_record"]["text"]).lower(), r["market"]
+print("  ✓ пресекли SMA10 в посоката на сигнала: Copper, Mexican Peso, Australian Dollar, Cotton, Wheat (5 от 18); 30Y и 5Y са под средната от 14 седмици (не е скорошно пресичане);")
+print("    Soybeans още над средната — 'не е пресякла'; текстовете са неутрални (без думата 'потвърдено')")
 t = by["Copper"]["track_record"]
 assert (t["n"], t["episodes"], t["direction"]) == (35, 3, "extreme_long") and t["h4"] == {"n": 33, "mean_signal_pct": -2.31, "hit_pct": 24, "mean_raw_pct": 2.31}
 assert by["Cotton"]["track_record"]["text"].endswith("Малка извадка — не е за изводи.") and "Малка извадка" not in by["Copper"]["track_record"]["text"]
@@ -118,10 +121,12 @@ assert sm["h2"] == {"n": 369, "mean_signal_pct": -0.29, "hit_pct": 47} and sm["h
 assert (sm["confirmed"]["n"], sm["confirmed"]["episodes"], sm["not_confirmed"]["n"], sm["not_confirmed"]["episodes"]) == (72, 35, 315, 55)
 assert sm["confirmed"]["h4"] == {"n": 65, "mean_signal_pct": -1.18, "hit_pct": 52} and sm["not_confirmed"]["h4"] == {"n": 275, "mean_signal_pct": -0.06, "hit_pct": 50}
 assert sm["text"] == ("Обобщение (в посока на сигнала, 18 пазара, 387 седмици в 53 епизода): след 2/4/8 седмици -0.3% (47%) / -0.3% (50%) / -1.2% (50%). "
-                      "С ценово потвърждение: n=72, след 4 седм. -1.2% (52% успех); Без: n=315, след 4 седм. -0.1% (50% успех). "
+                      "С пресичане на SMA10: n=72, след 4 седм. -1.2% (52% успех); без пресичане: n=315, след 4 седм. -0.1% (50% успех) "
+                      "(SMA10 = 10-седмична средна на седмичните затваряния). "
                       "Седмиците се припокриват и историята е ~2–3 години — ориентир, не доказателство.")
+assert "потвърд" not in sm["text"].lower()
 print("  ✓ обобщение: 18 пазара, 387 седмици с екстремум в 53 епизода; в посока на сигнала след 2/4/8 седмици средно −0.3% / −0.3% / −1.2% (успех 47% / 50% / 50%);")
-print("    с ценово потвърждение 72 седмици (19%), без — 315; на 4 седмици −1.2% срещу −0.1% — потвърждението не помага в тази извадка")
+print("    с пресичане на SMA10 72 седмици (19%), без — 315; на 4 седмици −1.2% срещу −0.1% — пресичането не помага в тази извадка")
 
 print()
 print("── graceful degradation ──")
@@ -155,9 +160,10 @@ with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as dat
     finally:
         config.DOCS_DIR, config.DATA_DIR = o1, o2
 assert sm["text"] in page and by["Copper"]["price_confirmation"]["text"] in page and by["Copper"]["track_record"]["text"] in page
-assert "✔ Потвърдено от цената" in page and "○ Още не" in page
+assert "Цената пресече SMA10 в посоката на сигнала" in page and "Цената не е пресякла SMA10" in page
+assert "Потвърдено от цената" not in page and "✔" not in page.split("COT Екстремуми")[1].split("</section>")[0]                  # без думата и без отметката
 assert "Потвърдено от цената" not in plain                                                          # стар бриф без полетата — без промяна
-print("  ✓ над картите — един ред обобщение; във всяка карта — ред за потвърждението (✔ / ○) и ред за историята; стар бриф без тези полета се рендерира както преди")
+print("  ✓ над картите — един ред обобщение; във всяка карта — неутрален ред за SMA10 и ред за историята; стар бриф без тези полета се рендерира както преди")
 
 print()
 print("Всички тестове минаха.")
