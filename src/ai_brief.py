@@ -523,7 +523,7 @@ def _distribution_cap_note(thermometer: dict) -> str:
     cap = (thermometer or {}).get("distribution_cap") or {}
     if not cap.get("active"):
         return ""
-    return ("\nВАЖНО за режима: червените distribution days (полето \"distribution_cap\") блокират Offensive — кодът "
+    return ("\nВАЖНО за режима: блокът от distribution days (полето \"distribution_cap\") не позволява Offensive — кодът "
             "ограничава режима до Defensive. Кажи го като причина в regime_comment; не го представяй като слабост на "
             "индикаторите по броенето (\"regime_by_count\" е по-добрият режим) и не измисляй други условия за изход.")
 

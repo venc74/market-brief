@@ -744,48 +744,126 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
     return regime, reason, exit_rule
 
 
-def apply_distribution_cap(thermo: dict, distribution_days: dict | None) -> dict:
+_DISTRIBUTION_KEY = "distribution_block"
+
+
+def _distribution_block(distribution_days: dict | None, today_iso: str) -> dict:
+    """
+    Асиметричен хистерезис за блока от distribution days (допълнение към пакет 2, 2026-10-05): при ПЪРВИЯ червен ден
+    блокът се включва веднага; пада чак след config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS (2) ПОРЕДНИ нечервени дни
+    (жълт или зелен); нов червен ден нулира броя. Състоянието е в data/regime_override_state.json под "distribution_block"
+    (като при override-ите), идемпотентно за един и същи ден (last_date).
+
+    Липсващи данни (distribution_days=None) НЕ са нечервен ден: броячът не мърда, блокът (ако е включен) се държи, като
+    при скрит индикатор в _hysteresis_hidden; след HYSTERESIS_HIDDEN_RELEASE_DAYS поредни дни без данни се освобождава.
+    Липсващ/повреден state файл или запис: блок няма какво да държи (никога не е бил записан) → не е блокиран, докато
+    не дойде червен ден. Различно от override-ите, които държат при загуба на състояние — тук липсата на запис не доказва,
+    че е имало червен ден, а блокът при първия червен ден така или иначе се включва веднага.
+    Връща {"blocked", "kind": "red"|"hysteresis"|"no_data"|None, "nonred_days", "frozen_days"}.
+    """
+    state = _load_override_state()
+    entry = state.get(_DISTRIBUTION_KEY)
+    if entry is not None and not isinstance(entry, dict):
+        print(f"[thermo] ⚠ state за '{_DISTRIBUTION_KEY}' е в повреден формат ({entry!r}) — започва се начисто")
+        entry = None
+    entry = dict(entry or {"blocked": False, "streak_nonred": 0, "last_date": None})
+    need = config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS
+    known = bool(distribution_days)
+    red = known and distribution_days.get("status") == "red"
+    dirty = False
+    if known:
+        if entry.get("last_date") != today_iso:
+            if red:
+                if not entry.get("blocked"):
+                    print("[thermo] distribution days: първи червен ден — Offensive се блокира веднага")
+                entry.update(blocked=True, streak_nonred=0)
+            elif entry.get("blocked"):
+                streak = entry.get("streak_nonred", 0) + 1
+                entry.update(streak_nonred=streak, blocked=streak < need)
+                print(f"[thermo] distribution days не са червени ({streak}/{need} поредни дни)"
+                      + (" — блокът се освобождава" if streak >= need else " — блокът се държи по хистерезис"))
+            else:
+                entry.update(blocked=False, streak_nonred=0)
+            entry.update(last_date=today_iso)
+            entry.pop("frozen_days", None); entry.pop("last_frozen_date", None)
+            dirty = True
+    elif entry.get("blocked") and entry.get("last_frozen_date") != today_iso:
+        frozen = entry.get("frozen_days", 0) + 1
+        entry.update(frozen_days=frozen, last_frozen_date=today_iso)
+        if frozen >= config.HYSTERESIS_HIDDEN_RELEASE_DAYS:
+            entry.update(blocked=False, streak_nonred=need)
+            print(f"[thermo] distribution days: {frozen} поредни дни без данни — блокът се ОСВОБОЖДАВА")
+        else:
+            print(f"[thermo] distribution days: няма данни ({frozen}-и ден) — блокът се държи")
+        dirty = True
+    if dirty:
+        state[_DISTRIBUTION_KEY] = entry
+        _save_override_state(state)
+    blocked = bool(entry.get("blocked"))
+    kind = None if not blocked else ("red" if red else "hysteresis" if known else "no_data")
+    return {"blocked": blocked, "kind": kind, "nonred_days": entry.get("streak_nonred", 0),
+            "frozen_days": entry.get("frozen_days", 0)}
+
+
+def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: dt.date | None = None) -> dict:
     """
     Допълнение към пакет 2 (2026-10-05): червени distribution days (entry_timing.evaluate_distribution_days:
-    max(SPY, QQQ) >= config.DISTRIBUTION_DAYS_RED, статус "red") → режимът е най-много Defensive. Чиста функция върху
-    резултата на build_thermometer (нищо не тегли) — извиква се от main.py, след като distribution days са изчислени.
+    max(SPY, QQQ) >= config.DISTRIBUTION_DAYS_RED, статус "red") → режимът е най-много Defensive. Извиква се от main.py,
+    след като distribution days са изчислени. Асиметричен хистерезис (виж _distribution_block): блокът се включва на първия
+    червен ден и пада след 2 поредни нечервени дни; състоянието е в regime_override_state.json (тест: подмени
+    thermometer._OVERRIDE_STATE_FILE).
 
-    • Offensive → Defensive: regime_reason получава "distribution days червени (SPY N/25, QQQ M/25; праг 9) — Offensive
-      блокиран", sizing_factor става като при всеки Defensive, regime_by_count остава "Offensive" (какво дава броенето),
-      exit_rule казва кога отпада блокът; полето distribution_cap носи числата и текста.
+    • Offensive → Defensive: regime_reason получава причината ("distribution days червени (SPY N/25, QQQ M/25; праг 9) —
+      Offensive блокиран" или при хистерезис "… вече не са червени …, но блокът се държи по хистерезис — 1/2 нечервени дни
+      — Offensive блокиран"), sizing_factor става като при всеки Defensive, regime_by_count остава "Offensive",
+      exit_rule казва кога отпада блокът; полето distribution_cap носи числата, състоянието и текста.
     • Defensive по override при Offensive по броенето: режимът не се променя, но причината и exit_rule казват, че и без
-      override-а Offensive би бил блокиран (иначе падането на override-а би изглеждало като път към Offensive).
-    • Cash и Defensive по броенето не се променят (нищо не се записва). Без данни за distribution days (None) или статус,
-      различен от "red" → без промяна. Идемпотентна (втори вик не дублира текста).
-    Изключва се с DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE=0.
+      override-а Offensive би бил блокиран.
+    • Cash и Defensive по броенето не се променят (състоянието на хистерезиса се води всеки ден независимо от режима).
+      Идемпотентна (втори вик за същия thermo не дублира текста; втори run същия ден не брои двойно).
+    Изключва се с DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE=0 (тогава и състоянието не се пипа).
     """
-    if (not config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE or not isinstance(thermo, dict) or not distribution_days
-            or distribution_days.get("status") != "red" or "distribution_cap" in thermo):
+    if not config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE or not isinstance(thermo, dict) or "distribution_cap" in thermo:
+        return thermo
+    today_iso = (today or dt.date.today()).isoformat()
+    blk = _distribution_block(distribution_days, today_iso)
+    if not blk["blocked"]:
         return thermo
     count_regime = thermo.get("regime_by_count") or thermo.get("regime")
     if count_regime != "Offensive" or thermo.get("regime") not in ("Offensive", "Defensive"):
         return thermo
-    lb, red = config.DISTRIBUTION_DAYS_LOOKBACK, config.DISTRIBUTION_DAYS_RED
-    parts = [f"{name} {n}/{lb}" for name, n in (("SPY", distribution_days.get("spy_count")),
-                                                 ("QQQ", distribution_days.get("qqq_count"))) if n is not None]
-    what = f"distribution days червени ({', '.join(parts)}; праг {red})"
+    lb, red, need = config.DISTRIBUTION_DAYS_LOOKBACK, config.DISTRIBUTION_DAYS_RED, config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS
+    dd = distribution_days or {}
+    parts = [f"{name} {n}/{lb}" for name, n in (("SPY", dd.get("spy_count")), ("QQQ", dd.get("qqq_count"))) if n is not None]
+    kind = blk["kind"]
+    if kind == "red":
+        what = f"distribution days червени ({', '.join(parts)}; праг {red})"
+        until = (f"Блокът се включва на първия червен ден и пада чак след {need} поредни нечервени дни "
+                 f"(max(SPY, QQQ) под {red}); сега е {dd.get('count')}.")
+    elif kind == "hysteresis":
+        what = (f"distribution days вече не са червени ({', '.join(parts)}; праг {red}), но блокът се държи по "
+                f"хистерезис — {blk['nonred_days']}/{need} нечервени дни")
+        until = (f"Блокът пада след още {need - blk['nonred_days']} нечервен ден (общо {need} поредни под {red}); "
+                 f"нов червен ден нулира броя.")
+    else:
+        what = (f"няма данни за distribution days днес ({blk['frozen_days']}-и ден), блокът от последния червен ден се държи "
+                f"(освобождава се на {config.HYSTERESIS_HIDDEN_RELEASE_DAYS}-ия пореден ден без данни)")
+        until = "Блокът пада, когато данните се върнат и има поредни нечервени дни, или след дългото отсъствие на данни."
     changed = thermo.get("regime") == "Offensive"
     out = dict(thermo)
-    cap = {"active": True, "changed_regime": changed, "count": distribution_days.get("count"),
-           "spy_count": distribution_days.get("spy_count"), "qqq_count": distribution_days.get("qqq_count"),
-           "threshold": red, "lookback": lb}
-    unblock = (f"Distribution days блокират Offensive, докато max(SPY, QQQ) е {red} или повече (сега "
-               f"{distribution_days.get('count')}); прозорецът е плъзгащ се {lb} сесии.")
+    cap = {"active": True, "changed_regime": changed, "kind": kind, "nonred_days": blk["nonred_days"],
+           "release_after_nonred_days": need, "count": dd.get("count"), "spy_count": dd.get("spy_count"),
+           "qqq_count": dd.get("qqq_count"), "threshold": red, "lookback": lb}
     if changed:
         out["regime"] = "Defensive"
         out["regime_reason"] = f"{thermo.get('regime_reason', '')} — {what} — Offensive блокиран"
         out["sizing_factor"] = config.DEFENSIVE_SIZING_FACTOR
-        out["exit_rule"] = (f"Режимът по броенето е Offensive ({thermo.get('counts', '')}), но {what}. {unblock} "
-                            "Когато падне под прага, режимът се връща към броенето.")
+        out["exit_rule"] = (f"Режимът по броенето е Offensive ({thermo.get('counts', '')}), но {what}. {until} "
+                            "След това режимът се връща към броенето.")
         cap["text"] = f"{what} — Offensive блокиран (по броене: Offensive)"
     else:
         out["regime_reason"] = f"{thermo.get('regime_reason', '')} · {what} — Offensive би бил блокиран и без override"
-        out["exit_rule"] = f"{thermo.get('exit_rule', '')} Освен това: {unblock}".strip()
+        out["exit_rule"] = f"{thermo.get('exit_rule', '')} Освен това: {until}".strip()
         cap["text"] = f"{what} — Offensive е блокиран и независимо от override-а"
     out["distribution_cap"] = cap
     return out

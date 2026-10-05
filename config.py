@@ -819,6 +819,9 @@ DISTRIBUTION_DAYS_RED = int(os.getenv("DISTRIBUTION_DAYS_RED", 9))
 # Defensive, никога Offensive (с ясна причина в regime_reason; Cash и Defensive не се пипат). Преди това сигналът беше само
 # информативна карта до термометъра: на 16–24.09 имаше 6 Offensive дни с червени distribution days.
 DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE = os.getenv("DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE", "1") == "1"
+# Асиметричен хистерезис на блока: влиза веднага при първия червен ден, пада след толкова ПОРЕДНИ нечервени дни (жълт/зелен).
+# Без него броят около прага (8↔9) връщаше Offensive за един ден между два червени (25.09 червено, 28.09 жълто, 29.09 червено).
+DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS = int(os.getenv("DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS", 2))
 
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
