@@ -188,6 +188,11 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   б.п. (`chg_5d_bp`); паднал Yahoo не сваля run-а (`data_warnings`); COT давност; часът е берлински
   (CET/CEST); VIX и global signals с календарен прозорец + NaN guard; освобождаване на хистерезиса.
   Допълнение (05.10): червени distribution days → режимът е най-много Defensive.
+  Допълнение 2 (05.10, след първия v2 бриф): Watchlist картите с buy-stop показват план (стоп, риск %, цел 2R, акции при
+  sizing-а на режима; `sizing.buy_stop_preview`, само показване); AI получава `setup.trigger_text`/`setup_reason` и цитира причината
+  от кода (too_wide ≠ дълбочина на базата); "вчерашният trigger" се филтрира спрямо текущите v2 позиции (без "вече в портфейла" от
+  архивирани v1); Track Record v2 без затворени сделки казва "още няма затворени сделки по v2"; празна Momentum група има ред;
+  езиковият филтър маха soft hyphen и логва "marginalen"/"expозиция".
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
