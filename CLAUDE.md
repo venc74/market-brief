@@ -24,7 +24,7 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
    `max_tokens` — доказан проблем (JSON truncation при много кандидати).
    Виж `ai_brief.py: ticker_narratives()` / `cot_theses()` за модела.
 5. **Не разширявай CFTC/CANSLIM/screener универси безразборно.** COT модулът
-   изрично има whitelist от ~35 ликвидни пазара (`cot.py: MAJOR_MARKETS`) —
+   изрично има whitelist от 40 ликвидни пазара (`cot.py: MAJOR_MARKETS`, точно име/код) —
    принципът е "малко, но значимо" пред "всичко налично".
 6. Преди да пишеш код — прочети целия релевантен файл. Не гадай структура.
 7. **Примерен резултат винаги с етикет за произхода на данните.** Когато
@@ -68,7 +68,9 @@ src/setup_rules.py     — код-класификация на сетъпа (co
                         до" в сесии, stop_levels() — общата стоп математика
 src/enrich.py           — earnings, short interest, borrow, маркери (MF✓/UOV✓/SPLIT✓/SI✓)
 src/ai_brief.py         — Claude API: macro brief, ticker narratives, COT theses
-src/cot.py              — CFTC Commitments of Traders, whitelist 35 пазара
+src/cot.py              — CFTC Commitments of Traders, whitelist 40 пазара по ТОЧНО име/cftc код
+src/cot_theses.py       — COT тези: таблица с директни тикъри, знак по механизъм, cross оценка, кеш (без AI)
+src/cot_track.py        — COT: потвърждение от цената (SMA10) и track record на екстремумите
 src/thesis_context.py   — каре "Контекст" (само данни) към маркираните тези
 src/oi_snapshot.py      — следобедна OI снимка за Unusual Options (отделен job)
 src/sizing.py           — 1% риск, 2:1 R/R, Defensive ×0.5; position_plan_v2():
@@ -100,6 +102,11 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   credit spread spike форсира Defensive, трети независим hard-override
   тригер (виж `thermometer.py: credit_spread_proxy()`)
 - `COT_PERCENTILE_LOW/HIGH = 10/90` — строги прагове, малко на брой резултати
+- COT тези (`data/cot_theses_cache.json`): ключ (пазар, as_of, посока, версия на промпта, модел); регенерация само при нов ключ
+  или `FORCE_COT_REGEN=1`; `COT_THESES_MAX_AGE_DAYS = 8` — максимална възраст на стара теза при провал на batch; при остарели
+  COT данни нищо не се регенерира. Директните тикъри са в `COT_DIRECT_TICKERS`, механизмите/знакът — `COT_MECHANISM_SIGN`
+  (в config.py); AI връща само механизми, ефектът е на кода
+- `DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS = 2` — блокът от distribution days пада след 2 поредни нечервени дни
 - `COT_STALE_DAYS = 13` — над това най-новият COT отчет е "стар" (банер в секцията); 6–10 е нормалното,
   13 е празничен петък (06.07.2026)
 - `HYSTERESIS_HIDDEN_RELEASE_DAYS = 10` — override, държан от хистерезис при скрит индикатор, се
@@ -196,6 +203,11 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   от кода (too_wide ≠ дълбочина на базата); "вчерашният trigger" се филтрира спрямо текущите v2 позиции (без "вече в портфейла" от
   архивирани v1); Track Record v2 без затворени сделки казва "още няма затворени сделки по v2"; празна Momentum група има ред;
   езиковият филтър маха soft hyphen и логва "marginalen"/"expозиция".
+- Пакет 3 (05.10.2026) — COT: whitelist по точно име/код (Brent махнат); директната теза от таблица; cross само от механизми
+  {type, quote} от затворен списък, ефектът по таблица (mixed → изключване); сляпа генерация (без скрийнър/позиции/режим,
+  значките SCR✓/OPEN✓/CLOSED ги слага кодът); ежедневни детерминирани проверки без AI; кеш на тезите; потвърждение от
+  цената и track record. Реплей 05.10: ~88% по-малко COT токени на ден; върху 40 пазара/1303 екстремни седмици контрариански
+  сигнал без измерим ефект (ДИ включват 0), потвърждението от цената не помага.
 - Пакет 1б (05.10.2026) — buy-stop кандидатите (Watchlist карта със `setup.kind == "below_pivot"` и валиден `plan_preview`) се следят като
   ОТДЕЛНА, независима книга в същия tracker (`category: "buystop"`; запис без `category` е Action). Същият модел на изпълнение като
   Action (`trade_sim`: High ≥ buy-stop в 5 сесии, по max(Open, buy-stop), не над +5%; стоп/цел от картата), записва се във ВСИЧКИ
