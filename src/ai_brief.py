@@ -687,7 +687,46 @@ SYSTEM_TICKERS = """Ти си портфолио стратег за суинг 
 кажи го. Връщаш САМО валиден JSON."""
 
 
-def _load_prior_watchlist_triggers(today: str | None = None) -> dict[str, str]:
+# Текстове за ПОЗИЦИЯ във вчерашен trigger ("Вече в портфейла от …", "управлявай съществуващата позиция", OPEN✓ …)
+_POSITION_WORDING = re.compile(
+    r"вече\s+(?:е\s+)?в\s+портфейла|съществуваща\s+позиция|съществуващата\s+позиция|вече\s+отворена|отворена\s+позиция|OPEN✓", re.I)
+
+
+def _live_v2_positions() -> dict[str, dict]:
+    """Тикър → запис за живите v2 позиции (open/trailing) — същото като main._live_positions(), без импорт на main."""
+    try:
+        tracker = backtest._load_tracker()
+        return {rec["ticker"]: rec for rec in tracker.values()
+                if rec.get("method") == "v2" and rec.get("status") in ("open", "trailing")}
+    except Exception as e:
+        print(f"[ai] живите v2 позиции не се заредиха: {e}")
+        return {}
+
+
+def prior_trigger_usable(ticker: str, card: dict, live: dict[str, dict]) -> tuple[bool, str]:
+    """
+    Пакет 2 (05.10): може ли вчерашният watchlist_trigger на тикъра да се подаде на модела?
+    Trigger, който говори за ПОЗИЦИЯ (reason_type "existing_position" или текст "вече в портфейла / управлявай съществуващата
+    позиция"), е верен само ако днес има ЖИВА v2 позиция за тикъра и датата в текста (ако има) е нейната. След превключването
+    v1 → v2 (05.10) позициите от архива вече не са живи — подаден, текстът кара модела да повтаря "вече в портфейла / не добавяй"
+    (AMD, AVT, ANET) и така се самоподсилва ден след ден. Връща (годен, причина при отказ).
+    """
+    trigger = (card.get("ai") or {}).get("watchlist_trigger") or ""
+    positional = (card.get("ai") or {}).get("watchlist_reason_type") == "existing_position" or bool(_POSITION_WORDING.search(trigger))
+    if not positional:
+        return True, ""
+    rec = live.get(ticker)
+    if rec is None:
+        return False, "вчерашният текст е за позиция, която не е жива v2 позиция днес"
+    dates = set(re.findall(r"\d{4}-\d{2}-\d{2}", trigger))
+    own = {d for d in (rec.get("fill_date"), rec.get("entry_date")) if d}
+    if dates and not (dates & own):
+        return False, f"датата на позицията във вчерашния текст ({', '.join(sorted(dates))}) не е на жива v2 позиция"
+    return True, ""
+
+
+def _load_prior_watchlist_triggers(today: str | None = None,
+                                   live_positions: dict[str, dict] | None = None) -> dict[str, str]:
     """
     FIX 2026-08-02 (точка 4 follow-up — cross-day watchlist_trigger честност):
     чете watchlist_trigger текста от НАЙ-СКОРОШНИЯ ПРЕДИШЕН data/YYYY-MM-DD.json
@@ -719,11 +758,16 @@ def _load_prior_watchlist_triggers(today: str | None = None) -> dict[str, str]:
         if not snaps:
             return {}
         prior = json.loads(snaps[-1].read_text(encoding="utf-8"))
+        live = _live_v2_positions() if live_positions is None else live_positions
         out = {}
         for c in prior.get("watchlist", []):
             ticker = c.get("ticker")
             trigger = (c.get("ai") or {}).get("watchlist_trigger")
             if ticker and trigger and trigger != "Изчаква потвърждение.":
+                ok, why = prior_trigger_usable(ticker, c, live)
+                if not ok:
+                    print(f"[ai] вчерашният trigger за {ticker} не се подава на модела — {why}")
+                    continue
                 out[ticker] = trigger
         return out
     except Exception as e:
