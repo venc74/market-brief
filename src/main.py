@@ -438,9 +438,9 @@ def run() -> dict:
          "entry_date": rec.get("fill_date") or rec.get("entry_date")}
         for t, rec in sorted(cot_live.items())
     ]
+    # пакет 3 т.б: генерацията е сляпа — скрийнърът и позициите служат само за значките при показване
     cot_with_theses = ai_brief.cot_theses(
-        cot_extremes, screener_universe, thermo["regime"],
-        cot_open_positions) if cot_extremes else []
+        cot_extremes, screener_universe, cot_open_positions) if cot_extremes else []
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:

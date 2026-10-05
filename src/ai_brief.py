@@ -1861,76 +1861,26 @@ def _move_mismatch(t: dict, move: dict) -> str | None:
     return None
 
 
-def _build_cot_user_prompt(batch: list[dict], screener_universe: list[dict],
-                           regime: str, prior_context: str = "",
-                           open_positions: list[dict] | None = None) -> str:
+def _build_cot_user_prompt(batch: list[dict]) -> str:
     """
-    batch: подмножество от cot.get_extremes() (market, category, net_position,
-    percentile, direction, as_of).
-    screener_universe: слим списък {ticker, sector, industry} от ТЕКУЩИЯ
-    CANSLIM скрийнър — за cross-reference, за да предпочита Claude тикъри,
-    които и без друго са в системния универс, вместо произволни имена.
-    prior_context: FIX 2026-08-01 (soft cross-batch consistency, т.3 от прегледа
-    на 15-31.07) — компактно резюме на тикъри, вече характеризирани в ПО-РАННИ
-    batch-ове в СЪЩИЯ run (напр. "HWM: Copper/direct_thesis bearish — ...").
-    Batch-овете са изолирани Claude извиквания (виж cot_theses) — без това AI-то
-    няма видимост към собствените си по-раншни тези в същия бриф и може да даде
-    противоречива характеристика на един и същ тикър (напр. "defensive" в една
-    тема, "risk-on beta" в друга, същия ден) без да го отбележи. Празен низ на
-    първия batch (няма все още нищо генерирано).
+    batch: подмножество от cot.get_extremes() (market, category, net_position, percentile, direction, as_of, ...) като
+    "slim" речници от cot_theses().
+
+    Пакет 3 т.б (2026-10-05): промптът е СЛЯП — зависи само от екстремумите в batch-а (и от версията му), не от деня:
+    без дневния скрийнър, без отворените Track Record позиции, без пазарния режим и без контекст от предишни batch-ове.
+    Така една теза може да се кешира по (пазар, as_of, посока, версия, модел) и да се ползва повторно. Значките "в
+    скрийнъра" и "отворена позиция" ги слага кодът при показване (виж cot_theses_badges). Преди промптът носеше скрийнъра
+    (за cross-reference), позициите (за да не твърди "не фигурира в брифа" — RBOB/VLO, 15.09), "ВЕЧЕ ХАРАКТЕРИЗИРАНИ
+    ТИКЪРИ" между batch-овете (консистентност на ролята) и режима; първите два бяха причина една и съща теза да не може да
+    се ползва втори ден, а последният правеше резултата зависим от реда на batch-овете.
     """
-    prior_block = (
-        f"""
-
-ВЕЧЕ ХАРАКТЕРИЗИРАНИ ТИКЪРИ ПО-РАНО В ТОЗИ БРИФ (за консистентност; всеки \
-ред казва дали компанията ПЕЧЕЛИ или ГУБИ при изчисленото движение на онзи \
-инструмент, и изведената посока за самата акция):
-{prior_context}
-
-Ако същият тикър тук печели, а там губи (или обратно) — провери дали движенията \
-на двата инструмента наистина го обясняват (напр. 30Y надолу и 5Y надолу водят \
-до еднакъв ефект за застраховател); ако не — кажи го изрично.
-
-Ако предложиш тикър от списъка по-горе: провери дали новата роля/характеристика \
-съвпада с предишната (defensive/cyclical/hedge/core bet и т.н.). Ако тезата тук \
-предполага различна роля — кажи го ИЗРИЧНО в reasoning-а (напр. "за разлика от \
-ролята му в Copper тезата, тук HWM действа като hedge, не core bet"), не просто \
-противоречи мълчаливо на предишната характеристика. Легитимно е тикър да има \
-няколко ортогонални роли (различни причини) — проблем е само ПРЯКОТО, необяснено \
-противоречие в характера на тикъра."""
-        if prior_context else ""
-    )
-    # FIX 2026-09-15: виж cot_theses() docstring-а — без този блок промптът
-    # виждаше САМО днешния скрийнър, значи "извън скрийнъра" и "не фигурира
-    # никъде в брифа" бяха неразличими. Имената са ЗАДЪЛЖИТЕЛНИ: реалният
-    # случай назова "Valero", не "VLO".
-    positions_block = (
-        f"""
-
-ОТВОРЕНИ TRACK RECORD ПОЗИЦИИ (реално държани в момента, влезли на посочената \
-дата): {json.dumps(open_positions, ensure_ascii=False, default=str)}
-
-Тези компании СА част от брифа — следени са ежедневно, откакто са отворени. \
-Ако споменеш някоя от тях (по тикър ИЛИ по име), НЕ твърди, че „не фигурира в \
-брифа", „не е разглеждана досега" или подобно — това е фактически невярно. \
-Такъв тикър може напълно легитимно да липсва от ДНЕШНИЯ CANSLIM скрийнър — \
-скрийнърът е дневен snapshot на нови кандидати, не списък на държаното — но \
-двете са различни твърдения и не се смесват. Ако позицията пасва на тезата, \
-предложи я нормално и отбележи, че вече е отворена позиция."""
-        if open_positions else ""
-    )
-    return f"""Пазарен режим: {regime}
-
-CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо до 156-седмична \
+    return f"""CFTC ЕКСТРЕМУМИ (managed money net positioning, percentile спрямо до 156-седмична \
 история — "weeks_of_history" полето показва точния брой за всеки инструмент, \
 виж инструкцията по-долу защо е важно): {json.dumps(batch, ensure_ascii=False, default=str)}
 
-ТЕКУЩ CANSLIM СКРИЙНЪР (за cross-reference — предпочитай тези тикъри, когато \
-логически пасват; ако нищо не пасва добре, предложи друг ликвиден тикър — дали \
-е извън скрийнъра се засича автоматично от кода, не отбелязвай го сам): \
-{json.dumps(screener_universe, ensure_ascii=False, default=str)}
-{positions_block}
-{prior_block}
+Предлагай ликвидни, публично търгувани тикъри (САЩ). Дали тикърът е в днешния скрийнър \
+или е отворена позиция се засича автоматично от кода — не го отбелязвай и не го \
+коментирай.
 
 ВАЖНО за инструменти с "weeks_of_history" под {config.COT_SHORT_HISTORY_WEEKS} \
 (стандартният дизайн е 156 седмици/~3г — по-млад контракт означава по-кратка \
@@ -1954,7 +1904,7 @@ reasoning-а, използвай ТОЧНО името, което си дал �
 
 ДРУГА ТЕЗА НЕ Е ДОКАЗАТЕЛСТВО: всяка верига трябва да стои самостоятелно, върху \
 реален икономически механизъм на ТОЗИ инструмент — и между инструментите в \
-този отговор, и спрямо по-рано характеризираните тикъри. Не пиши "ролята се \
+този отговор. Не пиши "ролята се \
 потвърждава от X тезата", "идентична логика като в X" или подобно — това, че \
 тикърът фигурира и другаде, не прави връзката по-вярна. Потвърден случай \
 28.09.2026: Soybean Meal тезата твърдеше, че соевото брашно е основен компонент \
@@ -2015,12 +1965,9 @@ no_direct_link false.
 Връщай само JSON: {{"theses": [...]}}"""
 
 
-def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
-                          regime: str, tag: str, prior_context: str = "",
-                          open_positions: list[dict] | None = None) -> list[dict]:
+def _cot_theses_for_batch(batch: list[dict], tag: str) -> list[dict]:
     """Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а."""
-    user = _build_cot_user_prompt(batch, screener_universe, regime, prior_context,
-                                  open_positions)
+    user = _build_cot_user_prompt(batch)
     for attempt in (1, 2):
         try:
             out = _parse_json(_call_claude(SYSTEM_COT, user,
@@ -2036,88 +1983,26 @@ def _cot_theses_for_batch(batch: list[dict], screener_universe: list[dict],
     return []
 
 
-def _record_ticker_context(seen: dict[str, str], market: str, thesis_type: str,
-                           thesis: dict) -> None:
-    """
-    FIX 2026-08-01 (т.3): записва компактно резюме на всеки тикър от тази теза в
-    running `seen` речника — подава се на СЛЕДВАЩИТЕ batch-ове (виж cot_theses)
-    за soft consistency check. Пази само ПОСЛЕДНАТА поява на тикъра (не пълна
-    история) — целта е "не противоречи на скорошното", не пълен audit trail.
-
-    FIX 2026-08-02: капнато на config.COT_SEEN_TICKERS_CAP записа (FIFO) — без
-    това prior_context би растял неограничено на дни с много batch-ове/тикъри.
-    `del` преди презапис премества тикъра в края на dict-а (Python 3.7+ пази ред
-    по вмъкване) — така eviction-ът реално маха НАЙ-СТАРО ДОКОСНАТИЯ тикър, не
-    просто първия въведен, ако той междувременно е бил обновен отново.
-    """
-    # FIX 2026-09-28 (Release 2): контекстът носи ЕФЕКТА върху компанията
-    # спрямо изчисленото движение, не двусмисления thesis.direction етикет
-    # ("TLT: 5Y bearish" не казваше дали облигациите или TLT падат).
-    # FIX 2026-09-28 (т.10): БЕЗ откъс от reasoning-а. Точно по този канал
-    # невярното "соевото брашно е основен компонент в SAF" (Soybean Meal,
-    # batch 1) стигна до Corn (batch 2) и беше цитирано като потвърждение.
-    # Само ролята пътува между batch-овете, не фактически твърдения.
-    move_text = thesis.get("_move_text") or "?"
-    for t in thesis.get("tickers") or []:
-        ticker = t.get("ticker") if isinstance(t, dict) else None
-        if not ticker:
-            continue
-        eff = _EFFECT_BG.get(t.get("effect"))
-        if eff:
-            role = f"{eff} при {move_text} → {t.get('direction')} за {ticker}"
-        else:
-            role = f"ефект неизвестен при {move_text}"
-        seen.pop(ticker, None)
-        seen[ticker] = f'{ticker}: {market}/{thesis_type} — {role}'
-        while len(seen) > config.COT_SEEN_TICKERS_CAP:
-            seen.pop(next(iter(seen)))
+def cot_theses_badges(thesis: dict | None, screener_tickers: set[str], open_by_ticker: dict) -> dict | None:
+    """Слага значките на всеки тикър от под-тезата (кодът, при показване): виж cot_theses.ticker_badges."""
+    if not thesis or not thesis.get("tickers"):
+        return thesis
+    return {**thesis, "tickers": [
+        {**t, "markers": _cot_table.ticker_badges(t, screener_tickers, open_by_ticker)} for t in thesis["tickers"]]}
 
 
 def cot_theses(extremes: list[dict], screener_universe: list[dict],
-              regime: str, open_positions: list[dict] | None = None) -> list[dict]:
+              open_positions: list[dict] | None = None) -> list[dict]:
     """
-    За всеки COT екстремум (extremes от src.cot.get_extremes()) генерира
-    директна + cross-sector теза. Batch-вано по config.COT_BATCH_SIZE заради
-    token budget (аналогично на ticker_narratives). Мърджва резултата обратно
-    в extremes по "market", запазвайки оригиналните числови полета
-    (percentile, net_position, direction, history) — Claude връща само
-    тезите, не пипа числата.
+    За всеки COT екстремум (extremes от src.cot.get_extremes()) връща директна (от таблицата) + cross-sector (от AI) теза.
+    Batch-вано по config.COT_BATCH_SIZE заради token budget. Мърджва резултата обратно в extremes по "market", запазвайки
+    оригиналните числови полета (percentile, net_position, direction, history).
 
-    FIX 2026-08-01 (т.3 от прегледа на 15-31.07): тикъри често се появяват в
-    2-6+ различни тези същия ден (потвърдено емпирично — JPM до 6 пъти в 1 бриф),
-    а batch-овете са изолирани Claude извиквания без взаимна видимост → противоречиви
-    характеристики на един и същ тикър (напр. "defensive" в една тема, "risk-on
-    beta" в друга) минаваха необяснени. Soft fix: running `seen_tickers` речник се
-    строи batch по batch (sequential, вече такъв е потокът) и се подава на ВСЕКИ
-    следващ batch като "вече характеризирани тикъри" контекст — AI-то е
-    инструктирано да обясни изрично, ако новата роля се различава, не просто да
-    противоречи мълчаливо. Не забранява легитимни multi-role тикъри.
-
-    FIX 2026-09-15: open_positions — отворените Track Record позиции {ticker,
-    company, entry_date} като ОТДЕЛЕН контекстен блок, симетрично на
-    screener_universe. Потвърдено на 15.09.2026, RBOB Gasoline тезата: AI-то
-    написа "рафинерии като Valero или PBF Logistics биха пасвали идеално, но
-    са характеризирани извън текущия скрийнър и не фигурират в досегашния
-    бриф", докато VLO е отворена позиция от 12.08 (+18.1%) — и самото AI я
-    предложи по име в СЪЩАТА RBOB теза на 07.09. Първата половина на
-    твърдението е вярна (VLO наистина е извън днешния скрийнър), втората е
-    невярна; дотогава промптът виждаше САМО скрийнъра, значи "извън скрийнъра"
-    и "не фигурира никъде" бяха неразличими от гледната точка на модела.
-
-    Защо контекст на ВХОДА, а не проверка на изхода (за разлика от FIX
-    2026-09-14): VLO изобщо не беше в "tickers" (списъкът беше празен) —
-    компанията беше спомената само в прозата, и то по ИМЕ ("Valero"), не по
-    тикър. Badge като GLB already_open_position няма какво да маркира, а
-    ticker-базирана проверка на текста не би я видяла: собственото ми
-    сканиране на 50 дни по тикър пропусна точно този случай и го намери едва
-    при търсене по фирмено име. Затова: да не се създава грешката, вместо да
-    се лови после.
-
-    Цената е пренебрежима — main._live_positions() е чисто локален прочит на
-    backtest_tracker.json, без нито една мрежова заявка, за разлика от
-    get_backtest_summary(), който fetch-ва текущи цени и затова живее чак в
-    края на pipeline-а. Тоест контекстът е наличен ТУК, без никакво
-    пренареждане на реда на изпълнение.
+    Пакет 3 т.б: AI извикването е СЛЯПО — screener_universe и open_positions НЕ влизат в промпта; служат само при показване
+    (значки "в скрийнъра" и "отворена позиция", слагани от кода — виж cot_theses_badges и outside_screener). Контекстът
+    между batch-овете (prior_context) и пазарният режим също са махнати от промпта. История: на 15.09 (RBOB/VLO) промптът
+    получи отворените позиции, за да не твърди "не фигурира в брифа" за държана позиция; сега тази грешка не може да се
+    създаде, защото моделът не вижда нито скрийнъра, нито позициите, а значката я слага кодът.
     """
     COT_DIAG.clear()
     if not extremes:
@@ -2140,22 +2025,14 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     print(f"[ai] cot_theses: {len(slim)} екстремума → {n} batch(ове) по ≤{size}")
 
     theses_by_market: dict[str, dict] = {}
-    seen_tickers: dict[str, str] = {}
     for idx, batch in enumerate(batches, 1):
-        prior_context = "\n".join(seen_tickers.values())
-        for t in _cot_theses_for_batch(batch, screener_universe, regime,
-                                       f"{idx}/{n}", prior_context, open_positions):
+        for t in _cot_theses_for_batch(batch, f"{idx}/{n}"):
             if t.get("market") in moves:
                 t = _normalize_cot_thesis(t, moves[t["market"]])
                 theses_by_market[t["market"]] = t
-                if t.get("thesis_rejected"):
-                    continue  # отхвърлена теза не влиза в контекста на следващите batch-ове
-                _record_ticker_context(seen_tickers, t["market"], "direct_thesis",
-                                       {**direct_by_market[t["market"]], "_move_text": moves[t["market"]]["move_text"]})
-                _record_ticker_context(seen_tickers, t["market"], "cross_sector_thesis",
-                                       t.get("cross_sector_thesis") or {})
 
     screener_tickers = {c["ticker"] for c in screener_universe if c.get("ticker")}
+    open_by_ticker = {p["ticker"]: p.get("entry_date") for p in (open_positions or []) if p.get("ticker")}
     merged = []
     for e in extremes:
         # пакет 3 т.в: директната теза не зависи от AI — пазарът се показва и когато моделът не е върнал нищо за него
@@ -2175,19 +2052,19 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
         if t.get("thesis_rejected"):
             # отхвърлена е само AI частта (cross); директната е от таблицата и остава
             merged.append({**e, **move,
-                           "direct_thesis": _empty_sub_reason(
+                           "direct_thesis": cot_theses_badges(_empty_sub_reason(
                                direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, e["market"])),
-                               e["market"], "direct"),
+                               e["market"], "direct"), screener_tickers, open_by_ticker),
                            "cross_sector_thesis": None, "thesis_rejected": t["thesis_rejected"]})
             continue
         merged.append({**e, **move,
-                       "direct_thesis": _empty_sub_reason(
+                       "direct_thesis": cot_theses_badges(_empty_sub_reason(
                            direct, _strip_internal(_verify_thesis_tickers(direct, screener_tickers, e["market"])),
-                           e["market"], "direct"),
-                       "cross_sector_thesis": _empty_sub_reason(
+                           e["market"], "direct"), screener_tickers, open_by_ticker),
+                       "cross_sector_thesis": cot_theses_badges(_empty_sub_reason(
                            t.get("cross_sector_thesis"), _strip_internal(_verify_thesis_tickers(
                                t.get("cross_sector_thesis") or {}, screener_tickers, e["market"])),
-                           e["market"], "cross")})
+                           e["market"], "cross"), screener_tickers, open_by_ticker)})
 
     subs = [(c["market"], c.get(k) or {}) for c in merged
             for k in ("direct_thesis", "cross_sector_thesis")]
@@ -2240,7 +2117,7 @@ def _normalize_cot_thesis(t: dict, move: dict) -> dict:
     """
     FIX 2026-09-28 (Release 2): един отговор за пазар → новата семантика.
     Ред: проверка на assumed_move → effect/no_direct_link → същия пазар
-    дубликат/противоречие. Резултатът е и това, което отива в prior_context.
+    дубликат/противоречие.
     """
     market = t["market"]
     why = _move_mismatch(t, move)

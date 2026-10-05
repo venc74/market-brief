@@ -147,7 +147,7 @@ def fake_claude(system, user, max_tokens=0):
     return json.dumps({"theses": rows}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()):
-    out = ai_brief.cot_theses(EXTREMES, [], "Defensive", None)
+    out = ai_brief.cot_theses(EXTREMES, [], None)
 by = {c["market"]: c for c in out}
 assert len(out) == 18
 u = seen["user"]
@@ -172,13 +172,13 @@ print("    (Cocoa: HSY/MDLZ) се игнорират — директната е
 
 seen["skip"] = {"Wheat"}                                                                    # моделът не връща нищо за Wheat
 with contextlib.redirect_stdout(io.StringIO()):
-    out2 = ai_brief.cot_theses(EXTREMES, [], "Defensive", None)
+    out2 = ai_brief.cot_theses(EXTREMES, [], None)
 w = {c["market"]: c for c in out2}["Wheat"]
 assert [t["ticker"] for t in w["direct_thesis"]["tickers"]] == ["WEAT"] and w["direct_thesis"]["tickers"][0]["effect"] == "loses"
 assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"]
 seen["skip"] = set(); seen["wrong_move"] = {"Corn"}                                         # AI е приел обратното движение → cross се отхвърля, директната остава
 with contextlib.redirect_stdout(io.StringIO()):
-    out3 = ai_brief.cot_theses(EXTREMES, [], "Defensive", None)
+    out3 = ai_brief.cot_theses(EXTREMES, [], None)
 cn = {c["market"]: c for c in out3}["Corn"]
 assert cn["thesis_rejected"] and cn["cross_sector_thesis"] is None and [t["ticker"] for t in cn["direct_thesis"]["tickers"]] == ["CORN"]
 print("  ✓ пазар без AI отговор (Wheat) пак се показва с директния WEAT (губи) и празен cross с причина; разминаване в assumed_move (Corn)")

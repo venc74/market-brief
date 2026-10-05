@@ -74,3 +74,23 @@ def direct_thesis(market: str, move: dict) -> dict:
     reasoning = (f"Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — {move['move_text']}: "
                  + "; ".join(parts) + ".")
     return {"tickers": tickers, "no_direct_link": False, "reasoning": reasoning, "source": "table"}
+
+
+def ticker_badges(ticker: dict, screener_tickers: set[str], open_by_ticker: dict[str, str | None]) -> list[dict]:
+    """
+    Значките на тикър в COT теза — слага ги КОДЪТ при показване, всеки ден (тезата се генерира сляпо):
+      • SCR✓ "в скрийнъра" — тикърът е сред днешните кандидати;
+      • OPEN✓ "отворена позиция" — тикърът е сред отворените Track Record позиции. При тикър с механизми (cross теза) само ако
+        поне един механизъм е ПРЯК (types 7, 8, 10 и "other" никога не са пряк механизъм — виж config.COT_MECHANISM_SIGN);
+        тикър без информация за механизъм (директна таблица, стар формат) се третира като пряк.
+    """
+    out = []
+    sym = ticker.get("ticker")
+    if sym in screener_tickers:
+        out.append({"tag": "SCR✓", "title": "В днешния скрийнър (кандидат за Action/Watchlist) — слага се от кода."})
+    mechs = ticker.get("mechanisms")
+    direct = True if not mechs else any(config.COT_MECHANISM_SIGN.get(m.get("type"), {}).get("direct") for m in mechs)
+    if sym in open_by_ticker and direct:
+        since = open_by_ticker[sym]
+        out.append({"tag": "OPEN✓", "title": "Отворена позиция" + (f" от {since}" if since else "") + " — слага се от кода."})
+    return out
