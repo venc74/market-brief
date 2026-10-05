@@ -341,11 +341,27 @@ def _check_po_suffix(s: str) -> None:
               f"изпусната дума) — «…{s[max(0, m.start() - 20):m.end() + 20]}…»")
 
 
+# FIX 2026-10-05: soft hyphen (U+00AD) — невидим символ, който моделът понякога вмъква в дума ("ви­соки" в cross тезата на 05.10); в
+# търсене/копиране чупи думата. Премахва се безусловно. Измерено върху историята: 1 поява (05.10) — безопасно, няма легитимна употреба.
+_SOFT_HYPHEN = "\u00ad"
+# FIX 2026-10-05: дефекти, видени на 05.10, които се ЛОГВАТ поименно (без автоматична замяна — списъкът с замени расте само с потвърдени
+# безопасни случаи): "marginalen" (латинска транслитерация на "маргинален", не се хваща от шаблона и не е в речника) и "expозиция" (смесено
+# писмо — x→"кс", затова буквената замяна би дала "ехрозиция"; 19 появи в историята, 2 от тях на 05.10). Думата → правилната форма.
+_KNOWN_DEFECTS = {"marginalen": "маргинален", "expозиция": "експозиция"}
+
+
+def _log_known_defects(s: str) -> None:
+    for w, good in _KNOWN_DEFECTS.items():
+        for m in re.finditer(r"(?<![A-Za-zА-Яа-яЁё])" + re.escape(w) + r"(?![A-Za-zА-Яа-яЁё])", s, re.I):
+            print(f"[ai] ⚠ известен езиков дефект '{m.group(0)}' (трябва '{good}') — само лог, текстът не се пипа — "
+                  f"«…{s[max(0, m.start() - 35):m.end() + 25]}…»")
+
+
 def _fix_translit(obj):
     """
     Обхожда всички низове в парснатия JSON (всички AI отговори минават през
-    _parse_json): премахва CJK символи, заменя букви-двойници и познатите
-    транслитерации, логва новите и хибридите.
+    _parse_json): премахва CJK символи и soft hyphen, заменя букви-двойници и
+    познатите транслитерации, логва новите, хибридите и известните дефекти.
     """
     if isinstance(obj, dict):
         return {k: _fix_translit(v) for k, v in obj.items()}
@@ -353,6 +369,12 @@ def _fix_translit(obj):
         return [_fix_translit(v) for v in obj]
     if not isinstance(obj, str):
         return obj
+    if _SOFT_HYPHEN in obj:
+        n = obj.count(_SOFT_HYPHEN)
+        i = obj.index(_SOFT_HYPHEN)
+        print(f"[ai] премахнат soft hyphen (U+00AD) ×{n} — «…{obj[max(0, i - 25):i + 25].replace(_SOFT_HYPHEN, '·')}…»")
+        obj = obj.replace(_SOFT_HYPHEN, "")
+    _log_known_defects(obj)
     if _CJK_RE.search(obj):
         for m in _CJK_RE.finditer(obj):
             print(f"[ai] ⚠ премахнати чужди символи '{m.group(0)}' в "
