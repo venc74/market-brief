@@ -871,11 +871,25 @@ def get_buystop_summary() -> dict:
     (без мрежа; текущи цени не се теглят). Win rate (с интервал на Wilson), медианата на R, сравнението със SPY и разбивката по режим се
     попълват чак при поне config.BUYSTOP_MIN_CLOSED_FOR_WINRATE ЗАТВОРЕНИ записа (stats_visible); дотогава — само броят и средният R.
     "Не се задействаха" е важна част от картината (кандидат, чиято цена не пробива pivot в прозореца), затова се показва като дял от
-    записите с приключил прозорец. Празен/изключен → {} / нулеви стойности, никога грешка.
+    записите с приключил прозорец. Редовете носят also_action, когато тикърът е и в Action книгата (застъпване на интервалите на двата записа).
+    Празен/изключен → {} / нулеви стойности, никога грешка.
     """
     if not config.TRACK_BUYSTOP:
         return {}
-    records = [r for r in _load_tracker().values() if r.get("method") == "v2" and record_category(r) == CATEGORY_BUYSTOP]
+    tracker = _load_tracker()
+    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_BUYSTOP]
+    # "и Action": същият тикър е и в Action книгата — интервалите [entry_date, resolution_date | ∞) на двата записа се застъпват. Action записи,
+    # които никога не са станали позиция (не се задействаха / над тавана), не се броят. Книгите са независими — отметката НЕ слива статистиките.
+    action_by_ticker: dict = {}
+    for a_ in tracker.values():
+        if (a_.get("method") == "v2" and is_action_record(a_) and a_.get("entry_date")
+                and a_.get("status") not in trade_sim.NOT_A_POSITION):
+            action_by_ticker.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
+
+    def _also_action(r: dict) -> bool:
+        b_start, b_end = r["entry_date"], r.get("resolution_date") or "9999-12-31"
+        return any(a_start <= b_end and b_start <= a_end for a_start, a_end in action_by_ticker.get(r["ticker"], []))
+
     by_status: dict = {}
     for r in records:
         by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
@@ -914,7 +928,7 @@ def get_buystop_summary() -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "buy_stop": r.get("buy_stop"),
                 "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
-                "current_r": r.get("current_r"), "regime": r.get("regime")}
+                "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r)}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),
@@ -924,6 +938,7 @@ def get_buystop_summary() -> dict:
         "enabled": True, "records": len(records),
         "pending": by_status.get("pending", 0), "open": by_status.get("open", 0) + by_status.get("trailing", 0),
         "closed": len(closed), "triggered": len(triggered), "not_triggered": not_triggered, "skipped": skipped,
+        "also_action": sum(1 for r in records if _also_action(r)),
         "not_triggered_pct": round(100 * not_triggered / window_done, 1) if window_done else None,
         "avg_realized_r": round(sum(rs) / len(rs), 2) if rs else None,
         "min_closed": min_closed, "stats_visible": visible,
