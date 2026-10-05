@@ -1030,7 +1030,7 @@
   {% endif %}
   {% if qm_ep.log and qm_ep.log.entries %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
-    Дневник за решение след 4–6 седмици (after-hours гап срещу реалния гап на отварянето): {{ qm_ep.log.entries }} записа, {{ qm_ep.log.resolved }} разрешени{% if qm_ep.log.resolved %};
+    Дневник за решение след 4–6 седмици (after-hours гап срещу реалния гап на отварянето): записи {{ qm_ep.log.entries }}, разрешени {{ qm_ep.log.resolved }}{% if qm_ep.log.resolved %};
     {{ qm_ep.log.held_at_open }} от тях отварят ≥ {{ qm_ep_gap|round|int }}% ({{ qm_ep.log.held_share_pct|round|int }}%) · медианно разминаване {{ "%+.1f"|format(qm_ep.log.median_diff_pp) }} пр.п.{% if qm_ep.log.corr is not none %} · корелация {{ "%.2f"|format(qm_ep.log.corr) }}{% endif %}{% endif %}.
   </div>
   {% endif %}
@@ -1060,7 +1060,7 @@
     {% if qb.spy_compare %}Спрямо SPY (същите периоди, {{ qb.spy_compare.n }} затворени): средно {{ "%+.2f"|format(qb.spy_compare.avg_return_pct) }}%
     срещу SPY {{ "%+.2f"|format(qb.spy_compare.avg_spy_pct) }}% → разлика {{ "%+.2f"|format(qb.spy_compare.avg_alpha_pct) }}%<br>{% endif %}
     {% else %}
-    Win rate се показва след {{ qb.min_closed }} затворени (сега {{ qb.closed }}) — при по-малко е шум. Той самият споменава win rate около 25% (2019).<br>
+    Win rate се показва след {{ qb.min_closed }} затворени (сега {{ qb.closed }}) — при по-малко е шум.<br>
     {% endif %}
     По режим на деня на картата (записани / затворени{% if qb.stats_visible %}, среден R{% endif %}):
     {% for name, g in qb.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if qb.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}

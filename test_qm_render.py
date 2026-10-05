@@ -104,7 +104,7 @@ for frag in ("SYNA", "Synaptics Inc", f"+{r['gap_pct']:.1f}%", f"${r['prev_close
              "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в after-hours: н/д", "≤1×ADR", "сесия 01.10"):
     assert frag in txt, frag
 assert sum(1 for h in HL[:2] if h["title"] in txt) == 2
-assert "Дневник за решение след 4–6 седмици" in txt and "1 записа, 0 разрешени" in txt
+assert "Дневник за решение след 4–6 седмици" in txt and "записи 1, разрешени 0" in txt
 print(f"  ✓ SYNA: +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), ръст 3 м. {r['ret63_pct']:+.0f}%, ADR {r['adr']:.1f}%, стоп лимит ${r['max_stop']:.2f}, катализатор 'Придобиване (оферта)'; "
       "обемът е н/д; 2 заглавия; дневникът: 1 запис")
 ep_empty = {**EP, "rows": [], "not_neglected": [{"ticker": "ABCD", "gap_pct": 12.3, "ret63_pct": 55.0, "why": "ръст 55% за 3 месеца > 20%"}]}
