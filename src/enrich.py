@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 # v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
-from src import magic_formula, borrow_data, unusual_options, splits_calendar, dataroma
+from src import magic_formula, borrow_data, unusual_options, splits_calendar, dataroma, insider_buying
 from src import net_utils
 
 
@@ -336,7 +336,7 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     референтния универс (value_confirmed), вместо да търси пресичане със
     статичен топ списък, което беше структурно невъзможно.
     """
-    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
+    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}, "ins": {}}
     if config.ENABLE_MAGIC_FORMULA:
         try:
             sets["mf"] = magic_formula.value_confirmed(candidate_tickers)
@@ -348,6 +348,12 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
             sets["uov"] = unusual_options.candidate_markers(candidate_tickers)[0]
         except Exception as e:
             print(f"[enrich] unusual_options skipped: {e}")
+    if config.ENABLE_INSIDER_BUYING:
+        try:
+            # пакет 4б т.в: Form 4 само за НАШИТЕ кандидати (не за целия универс) → маркер INS✓
+            sets["ins"] = insider_buying.insider_for(candidate_tickers)[0]
+        except Exception as e:
+            print(f"[enrich] insider_buying skipped: {e}")
     if config.ENABLE_SPLITS_CALENDAR:
         try:
             sets["splits"] = splits_calendar.splits_map()
@@ -373,7 +379,7 @@ def uov_marker(uov: dict) -> dict:
 
 
 def _apply_markers(row: dict, sets: dict) -> None:
-    """Слага визуалните convergence маркери MF✓ / UOV✓ / SPLIT✓ върху картата."""
+    """Слага визуалните convergence маркери MF✓ / UOV✓ / INS✓ / SPLIT✓ / SI✓ върху картата."""
     sym = row["ticker"]
     markers = row.setdefault("markers", [])
 
@@ -383,6 +389,10 @@ def _apply_markers(row: dict, sets: dict) -> None:
     uov = sets["uov"].get(sym)
     if uov:
         markers.append(uov_marker(uov))
+
+    ins = (sets.get("ins") or {}).get(sym)
+    if ins:
+        markers.append(insider_buying.insider_marker(ins))
 
     sp = sets["splits"].get(sym)
     if sp:

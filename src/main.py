@@ -76,6 +76,18 @@ def attach_position_uov(rows: list[dict]) -> dict:
     return {k: diag.get(k) for k in ("requested", "with_ratio", "marked", "missing", "ratios")}
 
 
+def attach_position_insider(rows: list[dict]) -> dict:
+    """Пакет 4б т.в: слага INS✓ върху редовете на позициите (по ЕДНО теглене за всички тикъри). Връща статуса на тегленето."""
+    tickers = sorted({r["ticker"] for r in rows if r.get("ticker")})
+    if not tickers:
+        return {}
+    ins, status = insider_buying.insider_for(tickers)
+    for r in rows:
+        if r.get("ticker") in ins:
+            r.setdefault("markers", []).append(insider_buying.insider_marker(ins[r["ticker"]]))
+    return status
+
+
 _RESOLUTION_BG = {
     "stopped": "стоп",
     "trailing_stop_exit": "trailing изход",
@@ -508,12 +520,10 @@ def run() -> dict:
     superinvestor_exits = (dataroma.fetch_major_exits() if config.ENABLE_DATAROMA
                            else {"exits": [], "stopped_managers": []})
     superinvestor_status = dataroma.fetch_status() if config.ENABLE_DATAROMA else {}
-    insider_buys = insider_buying.fetch_insider_buying() if config.ENABLE_INSIDER_BUYING else []
-    insider_status = dict(insider_buying.LAST_STATUS) if config.ENABLE_INSIDER_BUYING else {}
-    # конвергенция: тикър и в CANSLIM скрийнъра (action+watchlist), и в insider buying — виж insider_buying.py docstring
+    # пакет 4б т.в: списъкът "Insider Buying" (скенер на целия S&P500+NDX100) отпадна — маркерът INS✓ идва от enrich (кандидатите) и от позициите (по-долу);
+    # статусът на тегленето за кандидатите се взима веднага след enrich, преди извикването за позициите да го презапише
+    insider_status = dict(insider_buying.LAST_MARKER_STATUS) if config.ENABLE_INSIDER_BUYING else {}
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
-    for row in insider_buys:
-        row["in_screener"] = row["ticker"] in our_tickers
     # (superinvestor_exits конвергенцията се изчислява в темплейта, "s.ticker in
     # our_tickers" — same паттърн като superinvestor_moves, не precomputed поле тук;
     # новите позиции вече не са секция — виж SI✓ маркерите в enrich и по-долу)
@@ -589,13 +599,19 @@ def run() -> dict:
         print(f"[main] SI✓ маркери за позициите пропуснати: {e}")
     # пакет 4б т.б: UOV✓ и върху позициите — v2 отворени/чакащи и книгата на buy-stop кандидатите. diag на кандидатите е от enrich (LAST_MARKER_DIAG).
     uov_diag = dict(unusual_options.LAST_MARKER_DIAG) if config.ENABLE_UNUSUAL_OPTIONS else {}
+    ins_pos_status: dict = {}
+    pos_rows = (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])
+                + (backtest_summary.get("buystop") or {}).get("live", []))
     try:
-        pos_rows = (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])
-                    + (backtest_summary.get("buystop") or {}).get("live", []))
         if config.ENABLE_UNUSUAL_OPTIONS and pos_rows:
             uov_diag["positions"] = attach_position_uov(pos_rows)
     except Exception as e:
         print(f"[main] UOV✓ маркерите за позициите пропуснати: {e}")
+    try:
+        if config.ENABLE_INSIDER_BUYING and pos_rows:
+            ins_pos_status = attach_position_insider(pos_rows)
+    except Exception as e:
+        print(f"[main] INS✓ маркерите за позициите пропуснати: {e}")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers
@@ -657,7 +673,8 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
-        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation), cot_diag=ai_brief.COT_DIAG),
+        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
+                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
@@ -677,9 +694,9 @@ def run() -> dict:
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,
         "superinvestor_exits": superinvestor_exits,
-        "insider_buying": insider_buys,
-        # пакет 4а т.7: давност и причина при празен днешен резултат (легитимна нула срещу провал)
+        # пакет 4б т.в: статус на тегленето на Form 4 за кандидатите/позициите (kind: ok|ok_partial|legit_zero|failed; stale/data_date от 4а)
         "insider_buying_status": insider_status,
+        "insider_buying_positions_status": ins_pos_status,
         "superinvestor_status": superinvestor_status,
         "glb_candidates": glb_candidates,
         "news": news,

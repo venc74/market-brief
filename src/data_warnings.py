@@ -19,7 +19,33 @@ def _cot_warning(cot_diag: dict | None) -> list[dict]:
                          f"показват се с директната теза от таблицата (или със стара теза, ако има); следващият run опитва пак.")}]
 
 
-def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None, cot_diag: dict | None = None) -> list[dict]:
+def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list[dict]:
+    """
+    Пакет 4б т.б/т.в: секциите "Insider Buying" и "Unusual Options" отпаднаха — остават маркерите INS✓/UOV✓. Липсващ маркер, защото тегленето/снимката
+    са паднали, не бива да изглежда като "няма покупки / нормален обем": тук е банерът за провала (легитимната нула не е предупреждение).
+    """
+    out: list[dict] = []
+    ins = insider_status or {}
+    if ins.get("kind") == "failed" and not ins.get("stale"):
+        out.append({"source": "insider", "level": "warn",
+                    "message": f"Insider buying: {ins.get('note')} — маркерите INS✓ липсват днес; това НЕ значи, че няма insider покупки."})
+    elif ins.get("kind") == "failed":
+        out.append({"source": "insider", "level": "warn",
+                    "message": (f"Insider buying: днешното теглене не успя ({ins.get('note')}) — маркерите INS✓ са от тегленето на "
+                                f"{ins.get('data_date') or 'неизвестна дата'}.")})
+    elif ins.get("kind") == "ok_partial":
+        out.append({"source": "insider", "level": "warn", "message": f"Insider buying: {ins.get('note')}."})
+    u = uov_diag or {}
+    if u.get("requested") and not u.get("with_ratio"):
+        reasons = list((u.get("missing") or {}).values())
+        why = u.get("snapshot_missing_reason") or (max(set(reasons), key=reasons.count) if reasons else "няма данни")
+        out.append({"source": "unusual_options", "level": "warn",
+                    "message": f"Unusual options: за нито един кандидат няма съотношение обем/OI ({why}) — маркерите UOV✓ липсват днес; това НЕ значи нормален обем."})
+    return out
+
+
+def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
+            cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -53,4 +79,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"и списъкът с кандидати са непълни."),
         })
     out += _cot_warning(cot_diag)
+    out.extend(_marker_warnings(insider_status, uov_diag))
     return out

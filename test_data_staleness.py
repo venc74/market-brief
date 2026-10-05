@@ -175,24 +175,20 @@ def render_brief(**over):
 stale_row = {"ticker": "AAA", "company": "AAA Corp", "total_value": 500000.0, "cluster": False, "in_screener": False, "stale": True,
              "data_date": "2026-10-01", "latest_txn_date": "2026-09-29",
              "insiders": [{"name": "Jane CEO", "title": "CEO", "date": "2026-09-29", "value": 500000.0}]}
-html = render_brief(insider_buying=[stale_row], insider_buying_status={"kind": "legit_zero", "stale": True, "data_date": "2026-10-01",
-                                                                           "note": "проверени 480 компании: нито една квалифицираща покупка"})
-flat = " ".join(html.split())
-assert "Insider buying: показаното е от по-ранно теглене — данни от 2026-10-01, не от днес." in flat
-assert "Днешното теглене е чисто, но празно: проверени 480 компании" in flat
-assert "⚠ остарели данни — теглени на 2026-10-01 · последна транзакция 2026-09-29" in flat
-html = render_brief(insider_buying=[], insider_buying_status={"kind": "failed", "stale": False, "note": "универсът S&P500+NDX100 не се зареди"})
-assert "Insider buying: тегленето не успя — универсът S&P500+NDX100 не се зареди." in " ".join(html.split()) and "Insider Buying · Form 4" in html
-html = render_brief(insider_buying=[], insider_buying_status={"kind": "ok", "stale": False, "note": ""})
-assert "Insider Buying · Form 4" not in html                                              # нормален празен ден без статус за показване
+# Пакет 4б т.в (06.10.2026): секцията "Insider Buying" отпадна — етикетите за давност живеят в маркера INS✓ (виж test_insider_markers.py); бриф със старите ключове
+# не показва нито секцията, нито бележката за данните
+for status in ({"kind": "legit_zero", "stale": True, "data_date": "2026-10-01", "note": "проверени 480 компании: нито една квалифицираща покупка"},
+               {"kind": "failed", "stale": False, "note": "универсът S&P500+NDX100 не се зареди"}, {"kind": "ok", "stale": False, "note": ""}):
+    html = render_brief(insider_buying=[stale_row], insider_buying_status=status)
+    assert "Insider Buying" not in html and "Insider buying:" not in html and "Jane CEO" not in html
 html = render_brief(superinvestor_moves=[{"ticker": "NEWCO", "manager": "Тест · Fund A", "action": "нова позиция", "value": 8e7, "period": "13F · 2026-09-20"}],
                     superinvestor_status={"kind": "failed", "stale": True, "data_date": "2026-10-01", "note": "EDGAR недостъпен (0 от 2 мениджъра с данни)"})
 flat = " ".join(html.split())
 assert "13F: показаното е от по-ранно теглене — данни от 2026-10-01, не от днес." in flat and "Днешното теглене не успя: EDGAR недостъпен" in flat
 html = render_brief(superinvestor_moves=[], superinvestor_status={"kind": "failed", "stale": False, "note": "EDGAR недостъпен (0 от 2 мениджъра с данни)"})
 assert "13F: тегленето не успя — EDGAR недостъпен" in " ".join(html.split())
-print("  ✓ остарели редове: 'показаното е от по-ранно теглене — данни от 01.10, не от днес' + причина (чисто, но празно / не успя) + етикет")
-print("    на всяка карта; провал без данни → видима бележка; нормален празен ден → нищо; същото за 13F")
+print("  ✓ 13F: остарели редове → 'показаното е от по-ранно теглене — данни от 01.10, не от днес' + причина; провал без данни → видима бележка;")
+print("    Insider: секцията отпадна (давността е в маркера INS✓, виж test_insider_markers.py) — старите ключове в брифа не показват нищо")
 
 tmp.cleanup()
 print()

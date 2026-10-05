@@ -1010,6 +1010,9 @@ ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
 INSIDER_MIN_VALUE = float(os.getenv("INSIDER_MIN_VALUE", 100_000))
 INSIDER_CLUSTER_WINDOW_DAYS = int(os.getenv("INSIDER_CLUSTER_WINDOW_DAYS", 14))
 INSIDER_CLUSTER_MIN_COUNT = int(os.getenv("INSIDER_CLUSTER_MIN_COUNT", 3))
+# Пакет 4б т.в: списъкът "Insider Buying" отпадна — маркер INS✓ върху НАШИ кандидати и позиции. Тегли се само за тях (не за целия S&P500+NDX100);
+# таван на тикърите на едно извикване (всеки тикър = 1 заявка към SEC submissions + XML на скорошните Form 4).
+INSIDER_MARKER_MAX_TICKERS = int(os.getenv("INSIDER_MARKER_MAX_TICKERS", 60))
 
 # ── Корелационен риск между Action кандидати (pairwise Pearson) ───────────
 ENABLE_CORRELATION_CHECK = os.getenv("ENABLE_CORRELATION_CHECK", "1") == "1"

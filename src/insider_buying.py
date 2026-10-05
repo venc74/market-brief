@@ -659,6 +659,126 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     return _annotate_stale(display_rows, status["data_date"]) if stale else display_rows
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# Пакет 4б т.в (06.10.2026): маркер INS✓ върху НАШИ тикъри вместо списъка "Insider Buying"
+# ──────────────────────────────────────────────────────────────────────────
+LAST_MARKER_STATUS: dict = {}
+
+
+def _marker_cache_path() -> pathlib.Path:
+    return config.DATA_DIR / "insider_markers_cache.json"
+
+
+def _money_short(v: float) -> str:
+    v = float(v or 0)
+    return f"${v / 1e6:.1f}M" if v >= 1e6 else f"${v / 1e3:.0f}k" if v >= 1e3 else f"${v:.0f}"
+
+
+def _classify_marker_fetch(diag: dict, found: int, error: str | None) -> tuple[str, str]:
+    """(kind, обяснение) за теглене за конкретен списък тикъри. Празен резултат е "легитимна нула" само ако тегленето е минало чисто."""
+    if error:
+        return "failed", f"тегленето гръмна: {error}"
+    n = diag.get("universe_size") or 0
+    if n and not diag.get("ciks_resolved"):
+        return "failed", "няма CIK мапинг от SEC (company_tickers.json / User-Agent)"
+    if diag.get("submissions_fetch_errors"):
+        part = f"{diag['submissions_fetch_errors']} от {diag.get('ciks_resolved')} заявки към SEC не успяха"
+        return ("ok_partial", f"{part} — маркерите може да са непълни") if found else ("failed", f"{part} — липсата на покупки не е сигурна")
+    if found:
+        return "ok", f"проверени {diag.get('ciks_resolved')} от {n} тикъра"
+    return "legit_zero", (f"проверени {diag.get('ciks_resolved')} от {n} тикъра: нито една квалифицираща покупка "
+                          f"(≥ ${config.INSIDER_MIN_VALUE:,.0f}, officers/cluster) в последните {_LOOKBACK_DAYS} дни")
+
+
+def insider_for(tickers: list[str], today: dt.date | None = None, min_value: float | None = None) -> tuple[dict, dict]:
+    """
+    Form 4 (open market покупки, officers/cluster над INSIDER_MIN_VALUE) САМО за подадените тикъри — същите правила, парсер и групиране като
+    fetch_insider_buying(), но без целия универс. Връща ({тикър: група}, статус); статус: kind (ok|ok_partial|legit_zero|failed), note, stale,
+    data_date. Провал на тегленето → последните известни редове за тези тикъри от кеша, маркирани stale/data_date/latest_txn_date (старите
+    данни не изглеждат като днешни); легитимна нула → празно. Кеш: data/insider_markers_cache.json (по тикър, с дата на тегленето).
+    """
+    today = today or dt.date.today()
+    min_value = min_value if min_value is not None else config.INSIDER_MIN_VALUE
+    tickers = list(dict.fromkeys(str(t).upper() for t in tickers if t))[:config.INSIDER_MARKER_MAX_TICKERS]
+    diag = {"universe_size": len(tickers), "ciks_resolved": 0, "tickers_with_filings": 0, "submissions_fetch_errors": 0}
+    groups: dict[str, dict] = {}
+    error = None
+    if tickers:
+        try:
+            raw, fetch_diag = _fetch_raw_transactions(tickers, today - dt.timedelta(days=_LOOKBACK_DAYS))
+            diag.update(fetch_diag)
+            built = _build_rows(raw, min_value, config.INSIDER_CLUSTER_WINDOW_DAYS, config.INSIDER_CLUSTER_MIN_COUNT)
+            groups = {g["ticker"]: g for g in _group_by_ticker(built) if g["ticker"] in tickers}
+        except Exception as e:
+            print(f"[insider] marker fetch failed: {e}")
+            error = f"{type(e).__name__}: {e}"
+    kind, note = _classify_marker_fetch(diag, len(groups), error)
+    status = {"kind": kind, "note": note, "stale": False, "data_date": today.isoformat(), "requested": len(tickers),
+              "ciks_resolved": diag.get("ciks_resolved"), "found": len(groups)}
+
+    cache_path = _marker_cache_path()
+    cached = {"rows": {}, "fetched": {}}
+    try:
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    if kind == "failed":
+        # днешното теглене не успя → последните известни редове за ТЕЗИ тикъри, ясно маркирани като стари
+        old = {t: cached.get("rows", {}).get(t) for t in tickers if cached.get("rows", {}).get(t)}
+        if old:
+            dates = [cached.get("fetched", {}).get(t) for t in old]
+            data_date = min((d for d in dates if d), default=None)
+            groups = {r["ticker"]: r for r in _annotate_stale(list(old.values()), data_date)}
+            status.update(stale=True, data_date=data_date, found=len(groups))
+    else:
+        rows = {t: r for t, r in cached.get("rows", {}).items() if t not in tickers}
+        fetched = {t: d for t, d in cached.get("fetched", {}).items() if t in rows}
+        for t, g in groups.items():
+            rows[t], fetched[t] = g, today.isoformat()
+        cutoff = (today - dt.timedelta(days=_LOOKBACK_DAYS)).isoformat()
+        rows = {t: r for t, r in rows.items() if (fetched.get(t) or "") >= cutoff}
+        try:
+            config.DATA_DIR.mkdir(exist_ok=True)
+            cache_path.write_text(json.dumps({"rows": rows, "fetched": {t: fetched.get(t) for t in rows}}, ensure_ascii=False, indent=1, default=str),
+                                  encoding="utf-8")
+        except Exception as e:
+            print(f"[insider] marker cache write: {e}")
+    LAST_MARKER_STATUS.clear(); LAST_MARKER_STATUS.update(status)
+    print(f"[insider] маркери INS✓: {len(groups)} от {len(tickers)} тикъра ({kind}: {note})")
+    return groups, status
+
+
+def insider_marker(group: dict, today: dt.date | None = None) -> dict:
+    """
+    Маркерът INS✓ за тикър: кой, кога, колко (hover/клик). Давността от 4а остава в текста: датата на последната транзакция и преди колко
+    дни е; остарели данни (днешното теглене не успя) се казват изрично с датата на тегленето.
+    """
+    today = today or dt.date.today()
+    ins = group.get("insiders") or []
+    lines = [f"Insider buying (Form 4, покупка на open market): общо {_money_short(group.get('total_value'))} от "
+             f"{len({i.get('name') for i in ins})} инсайдър{'и' if len({i.get('name') for i in ins}) != 1 else ''}."]
+    for i in ins[:5]:
+        lines.append(f"• {i.get('name')}{' (' + i['title'] + ')' if i.get('title') else ''} — {i.get('date')} — {_money_short(i.get('value'))}")
+    if len(ins) > 5:
+        lines.append(f"… и още {len(ins) - 5}")
+    dates = [str(i["date"]) for i in ins if i.get("date")]
+    if dates:
+        last = max(dates)
+        try:
+            ago = (today - dt.date.fromisoformat(last[:10])).days
+            lines.append(f"Последна транзакция: {last} (преди {ago} {'ден' if ago == 1 else 'дни'}).")
+        except ValueError:
+            lines.append(f"Последна транзакция: {last}.")
+    if group.get("cluster"):
+        lines.append(f"CLUSTER: {config.INSIDER_CLUSTER_MIN_COUNT}+ различни инсайдъри за {config.INSIDER_CLUSTER_WINDOW_DAYS} дни.")
+    for t in (group.get("transfers") or [])[:2]:
+        lines.append(f"🔄 Вътрешно преструктуриране, не нов капитал: {t.get('name')} — {t.get('date')} — {_money_short(t.get('value'))} (не е в сумата).")
+    if group.get("stale"):
+        lines.append("⚠ остарели данни — днешното теглене не успя; показаното е от "
+                     + (f"тегленето на {group['data_date']}." if group.get("data_date") else "по-ранно теглене (датата е неизвестна)."))
+    return {"tag": "INS✓ CLUSTER" if group.get("cluster") else "INS✓", "title": "\n".join(lines)}
+
+
 def _parse_form4_all_codes(xml_text: str) -> dict | None:
     """
     Като _parse_form4(), но БЕЗ филтъра `code != "P"` — връща и покупки (P), и
