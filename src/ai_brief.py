@@ -1798,7 +1798,11 @@ def _build_cot_user_prompt(batch: list[dict]) -> str:
 описва САМО механизма — как цената на инструмента влиза в бизнеса на компанията (напр. "купува \
 природен газ като суровина за азотни торове"). БЕЗ посока: не пиши печели/губи/расте/пада/\
 по-висока/по-ниска/нагоре/надолу/bullish/bearish — посоката и ефектът се изчисляват от кода по \
-таблица; не знаеш и не трябва да познаваш в коя посока се движи инструментът.
+таблица; не знаеш и не трябва да познаваш в коя посока се движи инструментът. БЕЗ твърдения за \
+членство в индекс (Russell 2000, S&P 500, Nasdaq-100, Dow Jones и т.н.): не знаеш кой тикър в кой \
+индекс е, а механизмът описва бизнеса на компанията, не индекса. Потвърден случай 05.10.2026: FTNT и \
+ZBRA бяха описани като "в Russell 2000 constituent universe" — невярно; кодът маха механизъм с такова \
+твърдение, а тикър без друг механизъм отпада.
 
 ВАЖНО за имената на компаниите: "company" е кратко, познато име на ТОЧНО този тикър. Потвърден \
 случай (14.09.2026): reasoning текст твърдеше "ASR (Arca Continental) е мексикански bottler", \
@@ -2011,7 +2015,7 @@ def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | No
     })
     print(f"[ai] cot_theses: {len(merged)}/{len(extremes)} тези · изключени тикъри {len(COT_DIAG['dropped'])} "
           f"(mixed {len(COT_DIAG['mixed'])}) · прозата с посока, противоречаща на ефекта: "
-          f"{len(COT_DIAG.get('prose_direction', []))}")
+          f"{len(COT_DIAG.get('prose_direction', []))} · твърдения за членство в индекс: {len(COT_DIAG.get('index_claims', []))}")
     return merged
 
 
@@ -2020,6 +2024,8 @@ def _cot_diag_log(market: str, msg: str) -> None:
     print(f"[ai] COT '{market}': {msg}")
     if "прозата казва" in msg:
         COT_DIAG.setdefault("prose_direction", []).append(f"{market}/{msg.split(':')[0]}")
+    elif "членство в индекс" in msg:
+        COT_DIAG.setdefault("index_claims", []).append(f"{market}/{msg.split(':')[0]}")
 
 
 def _empty_sub_reason(raw: dict | None, verified: dict | None,

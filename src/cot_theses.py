@@ -139,12 +139,42 @@ def _clean_quote(q) -> str:
     return q[:config.COT_QUOTE_MAX_CHARS].rstrip()
 
 
-def parse_mechanisms(raw, kind: str | None) -> tuple[list[dict], str | None]:
+# Твърдения за членство в индекс в прозата на модела (пакет 3 т.г, 05.10): моделът не знае кой тикър в кой индекс е (реално 05.10:
+# FTNT и ZBRA "в Russell 2000 constituent universe" — невярно), а механизмът трябва да описва бизнеса, не индекса. Затворен списък
+# индекси × три форми на твърдението; мерено върху 4639 изречения от cot.*.reasoning във всички съхранени брифове: 4 съвпадения, и
+# четирите реални твърдения (07.30, 08.11, 08.27, 10.05), 0 фалшиви. Граници на думите — иначе "downtrend" пасва на "Dow".
+_INDEX = (r"(?:Russell\s*(?:1000|2000|3000|Microcap|Midcap)?|S\s?&\s?P\s*(?:500|400|600|1500|MidCap|SmallCap)?"
+          r"|Nasdaq[- ]?(?:100|Composite)?|Dow(?:\s+Jones)?(?:\s+Industrials?)?|DJIA|MSCI(?:\s+\w+)?|FTSE\s*\d*|Wilshire\s*\d*)")
+_INDEX_CLAIMS = (
+    # "част от / в състава на / компонент на / влиза в … <индекс>"
+    re.compile(r"(?<![\w-])(?:част\s+от|в\s+състава\s+на|от\s+състава\s+на|член(?:ове)?\s+на|компонент(?:и|а)?\s+(?:на|от)"
+               r"|включен(?:а|и|о)?\s+в|влиза(?:т)?\s+в|принадлеж\w+\s+(?:на|към)|(?:е|са)\s+в)(?![\w-])\s+(?:индекса\s+|индекс\s+)?"
+               + _INDEX + r"(?![\w-])", re.I),
+    # "<индекс> компоненти / constituent universe / акции / members"
+    re.compile(r"(?<![\w-])" + _INDEX + r"\s+(?:constituent\s+universe|index\s+members?|constituents?|members?|components?"
+               r"|компонент\w*|съставк\w*|членове|акци\w+|stocks?|names)(?![\w-])", re.I),
+    # "member / part / constituent / component of <index>"
+    re.compile(r"(?<![\w-])(?:part\s+of|member\s+of|constituent\s+of|component\s+of|included\s+in)\s+(?:the\s+)?" + _INDEX
+               + r"(?![\w-])(?:\s+index)?", re.I),
+)
+
+
+def index_claim(text) -> str | None:
+    """Намереното твърдение за членство в индекс (фрагментът от текста) или None. Само откриване — решението е на извикващия."""
+    for pat in _INDEX_CLAIMS:
+        m = pat.search(str(text or ""))
+        if m:
+            return m.group(0).strip()
+    return None
+
+
+def parse_mechanisms(raw, kind: str | None, claims: list | None = None) -> tuple[list[dict], str | None]:
     """
     (механизми, грешка). Схема: списък от {type ∈ затворения списък, quote — непразно описание}; най-много
     config.COT_MECHANISMS_PER_TICKER различни типа. Тип, който не важи за вида на пазара (напр. input_cost за облигации,
     rate_* за стока), е невалидна схема. "other" е допустим навсякъде и няма знак. Всеки механизъм получава "sign"
-    (+1/−1 при цена↑, None за "other").
+    (+1/−1 при цена↑, None за "other"). Механизъм, чийто quote твърди членство в индекс (index_claim), се маха; фрагментите се
+    добавят в `claims` (ако е подаден списък). Ако не остане нито един механизъм заради това — грешка "твърдение за членство в индекс".
     """
     if not isinstance(raw, list) or not raw:
         return [], "няма механизъм"
@@ -161,10 +191,17 @@ def parse_mechanisms(raw, kind: str | None) -> tuple[list[dict], str | None]:
         sign = mechanism_sign(typ, kind)
         if typ != "other" and sign is None:
             return [], f"невалидна схема: типът '{typ}' не важи за пазар от вид '{kind}'"
+        claim = index_claim(quote)
+        if claim:
+            if claims is not None:
+                claims.append(claim)
+            continue
         if typ in seen:
             continue
         seen.add(typ)
         out.append({"type": typ, "quote": quote, "sign": sign})
+    if not out:
+        return [], "твърдение за членство в индекс (моделът не знае членството) — механизмът е махнат"
     return out[:config.COT_MECHANISMS_PER_TICKER], None
 
 
@@ -210,9 +247,13 @@ def evaluate_cross(raw_tickers, market: str, move: dict, exclude: set[str] | fro
             continue
         if len(kept) >= config.COT_CROSS_MAX_TICKERS:
             break
-        mechs, err = parse_mechanisms(item.get("mechanisms"), kind)
+        claims: list[str] = []
+        mechs, err = parse_mechanisms(item.get("mechanisms"), kind, claims)
+        for c in claims:
+            if log:
+                log(f"{ticker}: твърдение за членство в индекс — \"{c}\" → механизмът е махнат")
         if err:
-            dropped.append({"ticker": ticker, "reason": err, "code": "schema"})
+            dropped.append({"ticker": ticker, "reason": err, "code": "index_claim" if err.startswith("твърдение за членство") else "schema"})
             continue
         signs = {m["sign"] for m in mechs if m["sign"] is not None}
         if len(signs) > 1:
