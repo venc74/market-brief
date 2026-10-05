@@ -1205,6 +1205,69 @@
 </section>
 {% endif %}
 
+{# Пакет 1б (05.10): buy-stop кандидатите (Watchlist) — ОТДЕЛНА книга, измерване, не препоръка; не е позиция и не се слива с Action #}
+{% if backtest and backtest.buystop and backtest.buystop.enabled %}
+{% set bs = backtest.buystop %}
+{% set bs_res = {"stopped": "стоп", "trailing_stop_exit": "trailing изход", "expired": "изтекла по време", "expired_in_trail": "изтекла в trail"} %}
+{% set bs_st = {"pending": "чака buy-stop", "open": "отворена", "trailing": "след цел 1 (trailing)"} %}
+<section>
+  <h2>Buy-stop кандидати — измерване, не препоръка</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
+    {{ buy_stop_window }} сесии, по max(Open, buy-stop), не над +{{ buyable_zone_pct|round(0)|int }}%; стоп и цел от картата) във всички режими.
+    Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
+  <div class="prose">
+    {% if not bs.records %}
+    <b>Още няма записани кандидати</b> — записват се Watchlist карти с buy-stop и валиден план.<br>
+    {% else %}
+    <b>Записани: {{ bs.records }}</b> · чакат buy-stop {{ bs.pending }} · отворени {{ bs.open }} · затворени {{ bs.closed }}
+    · не се задействаха {{ bs.not_triggered }}{% if bs.not_triggered_pct is not none %} ({{ bs.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if bs.skipped %}
+    · над тавана за вход {{ bs.skipped }}{% endif %}{% if bs.also_action %} · и в Action: {{ bs.also_action }}{% endif %}<br>
+    {% if bs.closed %}Затворени: {{ bs.closed }} · среден R: {{ "%+.2f"|format(bs.avg_realized_r) }}<br>{% endif %}
+    {% if bs.stats_visible %}
+    <b>Win rate: {{ bs.win_rate_pct }}%</b> ({{ bs.wins }} win / {{ bs.losses }} loss; 95% интервал {{ bs.win_ci_pct[0] }}–{{ bs.win_ci_pct[1] }}%)
+    · медиана R {{ "%+.2f"|format(bs.median_realized_r) }}<br>
+    {% if bs.spy_compare %}Спрямо SPY (същите периоди, {{ bs.spy_compare.n }} затворени): средно {{ "%+.2f"|format(bs.spy_compare.avg_return_pct) }}%
+    срещу SPY {{ "%+.2f"|format(bs.spy_compare.avg_spy_pct) }}% → разлика {{ "%+.2f"|format(bs.spy_compare.avg_alpha_pct) }}%<br>{% endif %}
+    {% else %}
+    Win rate се показва след {{ bs.min_closed }} затворени (сега {{ bs.closed }}) — при по-малко е шум.<br>
+    {% endif %}
+    По режим на деня на картата (записани / затворени{% if bs.stats_visible %}, среден R{% endif %}):
+    {% for name, g in bs.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if bs.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% endif %}
+  </div>
+  {% if bs.live %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ bs.live|length }}):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Buy-stop</th><th class="n">Стоп</th><th class="n">Цел 1</th>
+        <th>Валиден до</th><th>Режим</th></tr></thead>
+      <tbody>
+        {% for p in bs.live %}
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}</td>
+          <td>{{ p.entry_date }}</td>
+          <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}</td>
+          <td class="n">${{ p.buy_stop }}</td><td class="n">${{ p.stop_loss }}</td><td class="n">${{ p.target_1 }}</td>
+          <td>{{ p.valid_through or "—" }}</td><td>{{ p.regime or "н/д" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% if bs.recent %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({{ bs.recent|length }}):</div>
+  <div class="watch-grid" style="margin-top:6px">
+    {% for r in bs.recent %}
+    <div class="watch-card">
+      <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' }}">{{ r.ticker }}</span>{% if r.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период."}]) }}{% endif %}
+      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ bs_res.get(r.resolution, r.resolution) }} · R={{ r.realized_r }} · {{ r.regime or "н/д" }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
 {% if superinvestor_moves %}
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>

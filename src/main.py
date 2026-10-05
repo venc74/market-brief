@@ -534,6 +534,11 @@ def run() -> dict:
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"))     # пакет 1б: + buy-stop кандидатите (отделна книга)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
+    if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
+        try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
+            backtest_summary["buystop"] = backtest.get_buystop_summary()
+        except Exception as e:
+            print(f"[main] обобщението на buy-stop кандидатите пропуснато: {e}")
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap

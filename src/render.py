@@ -117,6 +117,8 @@ def render_dashboard(brief: dict) -> str:
         unusual_options=brief.get("unusual_options", []),
         unusual_options_diag=brief.get("unusual_options_diag"),
         unusual_min_ratios=config.UNUSUAL_OPTIONS_MIN_RATIOS,
+        buy_stop_window=config.BUY_STOP_WINDOW_SESSIONS,          # пакет 1б: текстът на блока за buy-stop кандидатите
+        buyable_zone_pct=config.BUYABLE_ZONE_MAX_PCT,
         splits=brief.get("splits", []),
         splits_report=brief.get("splits_report"),
         splits_min_price=config.SPLITS_MIN_PRICE,
