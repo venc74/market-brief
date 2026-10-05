@@ -518,6 +518,16 @@ def _core_inflation_block(macro: dict) -> str:
 """
 
 
+def _distribution_cap_note(thermometer: dict) -> str:
+    """Допълнение към пакет 2: червени distribution days блокират Offensive — причината е в кода, не в броенето."""
+    cap = (thermometer or {}).get("distribution_cap") or {}
+    if not cap.get("active"):
+        return ""
+    return ("\nВАЖНО за режима: червените distribution days (полето \"distribution_cap\") блокират Offensive — кодът "
+            "ограничава режима до Defensive. Кажи го като причина в regime_comment; не го представяй като слабост на "
+            "индикаторите по броенето (\"regime_by_count\" е по-добрият режим) и не измисляй други условия за изход.")
+
+
 def _hysteresis_release_note(thermometer: dict) -> str:
     """Пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да не се чете като подобрение на пазара."""
     rel = (thermometer or {}).get("hysteresis_released") or []
@@ -573,7 +583,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     """
     user = f"""Днешни данни:
 
-ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}
+ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}{_distribution_cap_note(thermometer)}
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 

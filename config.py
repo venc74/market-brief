@@ -815,6 +815,10 @@ DISTRIBUTION_DAYS_MIN_DECLINE_PCT = float(os.getenv("DISTRIBUTION_DAYS_MIN_DECLI
 # НЕСИГУРНОСТ/риск, не посока, точно каквото Entry Timing търси.
 DISTRIBUTION_DAYS_YELLOW = int(os.getenv("DISTRIBUTION_DAYS_YELLOW", 7))
 DISTRIBUTION_DAYS_RED = int(os.getenv("DISTRIBUTION_DAYS_RED", 9))
+# 2026-10-05 (допълнение към пакет 2): червени distribution days (max(SPY, QQQ) >= DISTRIBUTION_DAYS_RED) → режимът е най-много
+# Defensive, никога Offensive (с ясна причина в regime_reason; Cash и Defensive не се пипат). Преди това сигналът беше само
+# информативна карта до термометъра: на 16–24.09 имаше 6 Offensive дни с червени distribution days.
+DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE = os.getenv("DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE", "1") == "1"
 
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"

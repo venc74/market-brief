@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 from src.macro_layer import collect_macro_layer, thesis_monitor
-from src.thermometer import build_thermometer, thermometer_unavailable
+from src.thermometer import build_thermometer, thermometer_unavailable, apply_distribution_cap
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
@@ -318,6 +318,19 @@ def run() -> dict:
         print(f"[thermo] ⚠ build_thermometer пропадна ({type(e).__name__}: {e}) — "
               f"fallback Defensive")
         thermo = thermometer_unavailable(e)
+    # Допълнение към пакет 2 (2026-10-05): distribution days (пазарно-глобален сигнал, SPY + QQQ) се смятат ТУК, преди
+    # макро брифа и режимния gate на Action — червени → режимът е най-много Defensive (виж apply_distribution_cap).
+    # Преди се смятаха по-надолу, само за информативна карта; сега се ползва същият резултат (един fetch).
+    distribution_days = None
+    if config.ENABLE_ENTRY_TIMING:
+        try:
+            distribution_days = entry_timing.evaluate_distribution_days()
+        except Exception as e:
+            print(f"[entry_timing] distribution days пропаднаха: {type(e).__name__}: {e}")
+        try:
+            thermo = apply_distribution_cap(thermo, distribution_days)
+        except Exception as e:
+            print(f"[thermo] ⚠ apply_distribution_cap пропадна ({type(e).__name__}: {e}) — режимът е без този блок")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
 
     # v2 · Секция 5 — кои геополитически тези са активни при текущото макро
@@ -441,9 +454,7 @@ def run() -> dict:
     # screening и timing остават разделени, виж entry_timing.py docstring-а
     if config.ENABLE_ENTRY_TIMING:
         action = entry_timing.evaluate(action)
-    # концепция 3 — пазарно-глобален сигнал, не per-ticker (виж entry_timing.py)
-    distribution_days = (entry_timing.evaluate_distribution_days()
-                         if config.ENABLE_ENTRY_TIMING else None)
+    # концепция 3 — distribution days: изчислени по-горе (след термометъра), за да ограничат режима
     # чисто информационен флаг — не променя избора на Action, виж correlation_check.py
     correlation_flags = (correlation_check.fetch_correlation_flags(action)
                          if config.ENABLE_CORRELATION_CHECK else [])

@@ -744,6 +744,53 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
     return regime, reason, exit_rule
 
 
+def apply_distribution_cap(thermo: dict, distribution_days: dict | None) -> dict:
+    """
+    Допълнение към пакет 2 (2026-10-05): червени distribution days (entry_timing.evaluate_distribution_days:
+    max(SPY, QQQ) >= config.DISTRIBUTION_DAYS_RED, статус "red") → режимът е най-много Defensive. Чиста функция върху
+    резултата на build_thermometer (нищо не тегли) — извиква се от main.py, след като distribution days са изчислени.
+
+    • Offensive → Defensive: regime_reason получава "distribution days червени (SPY N/25, QQQ M/25; праг 9) — Offensive
+      блокиран", sizing_factor става като при всеки Defensive, regime_by_count остава "Offensive" (какво дава броенето),
+      exit_rule казва кога отпада блокът; полето distribution_cap носи числата и текста.
+    • Defensive по override при Offensive по броенето: режимът не се променя, но причината и exit_rule казват, че и без
+      override-а Offensive би бил блокиран (иначе падането на override-а би изглеждало като път към Offensive).
+    • Cash и Defensive по броенето не се променят (нищо не се записва). Без данни за distribution days (None) или статус,
+      различен от "red" → без промяна. Идемпотентна (втори вик не дублира текста).
+    Изключва се с DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE=0.
+    """
+    if (not config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE or not isinstance(thermo, dict) or not distribution_days
+            or distribution_days.get("status") != "red" or "distribution_cap" in thermo):
+        return thermo
+    count_regime = thermo.get("regime_by_count") or thermo.get("regime")
+    if count_regime != "Offensive" or thermo.get("regime") not in ("Offensive", "Defensive"):
+        return thermo
+    lb, red = config.DISTRIBUTION_DAYS_LOOKBACK, config.DISTRIBUTION_DAYS_RED
+    parts = [f"{name} {n}/{lb}" for name, n in (("SPY", distribution_days.get("spy_count")),
+                                                 ("QQQ", distribution_days.get("qqq_count"))) if n is not None]
+    what = f"distribution days червени ({', '.join(parts)}; праг {red})"
+    changed = thermo.get("regime") == "Offensive"
+    out = dict(thermo)
+    cap = {"active": True, "changed_regime": changed, "count": distribution_days.get("count"),
+           "spy_count": distribution_days.get("spy_count"), "qqq_count": distribution_days.get("qqq_count"),
+           "threshold": red, "lookback": lb}
+    unblock = (f"Distribution days блокират Offensive, докато max(SPY, QQQ) е {red} или повече (сега "
+               f"{distribution_days.get('count')}); прозорецът е плъзгащ се {lb} сесии.")
+    if changed:
+        out["regime"] = "Defensive"
+        out["regime_reason"] = f"{thermo.get('regime_reason', '')} — {what} — Offensive блокиран"
+        out["sizing_factor"] = config.DEFENSIVE_SIZING_FACTOR
+        out["exit_rule"] = (f"Режимът по броенето е Offensive ({thermo.get('counts', '')}), но {what}. {unblock} "
+                            "Когато падне под прага, режимът се връща към броенето.")
+        cap["text"] = f"{what} — Offensive блокиран (по броене: Offensive)"
+    else:
+        out["regime_reason"] = f"{thermo.get('regime_reason', '')} · {what} — Offensive би бил блокиран и без override"
+        out["exit_rule"] = f"{thermo.get('exit_rule', '')} Освен това: {unblock}".strip()
+        cap["text"] = f"{what} — Offensive е блокиран и независимо от override-а"
+    out["distribution_cap"] = cap
+    return out
+
+
 def _net_liquidity_indicator(nl: dict) -> dict:
     """
     Пакет 2 т.2: Fed Net Liquidity е САМО информативен ("informational": True) — показва се с цвят, но не влиза
