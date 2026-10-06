@@ -1,37 +1,37 @@
 {
- "date": "2026-10-05",
+ "date": "2026-10-06",
  "news": [
   {
-   "headline": "Iran says Strait of Hormuz will not reopen until conditions are met",
-   "why": "Затварянето на Ормузкия проток засяга ~20% от световния петролен транзит и може да предизвика рязък spike в цените на суровините и енергийните акции."
+   "headline": "Surge in borrowing costs hits corporate America — junk-rated companies feel Treasury sell-off",
+   "why": "Покачването на доходностите по US Treasuries директно вдига cost of capital за high-yield емитентите, притиска кредитните спредове и сигнализира за по-широко финансово затягане."
   },
   {
-   "headline": "Saudi Arabia unexpectedly cuts November oil prices to Asia to 6-year lows",
-   "why": "Неочакваното намаление на официалните цени на саудитски суров петрол сигнализира слабо търсене от Азия и натиска надолу върху петролните фючърси и енергийния сектор."
+   "headline": "French bond contagion fears are rattling the euro near 17-month low",
+   "why": "Предизборна разпродажба на френски ДЦК заплашва да пренесе стреса към целия Eurozone, притиска EUR/USD и повишава риск-премията на европейски активи."
   },
   {
-   "headline": "OPEC+ agrees to keep November oil output targets steady",
-   "why": "Запазването на производствените квоти при едновременен ценови натиск от Саудитска Арабия изпраща смесен сигнал за петролния пазар и акциите на енергийните компании."
+   "headline": "Oil gains as traders weigh Gulf tensions against strong Mideast exports",
+   "why": "Геополитическото напрежение в Персийския залив поддържа bid-а при суровия петрол, което се отразява директно върху инфлационните очаквания и енергийния сектор."
   },
   {
-   "headline": "Stock futures are flat as investors grapple with higher yields, await Fed minutes",
-   "why": "Очакваните протоколи от Fed заседанието ще определят нагласите за бъдещи лихвени движения и директно влияят върху позиционирането в акции, облигации и долар."
+   "headline": "Saudi-backed Yemeni forces expel Houthi rebels from areas around key strait",
+   "why": "Промяна в контрола над Баб ел-Мандеб засяга корабоплаването и петролните маршрути — ключов фактор за енергийните цени и shipping сектора."
   },
   {
-   "headline": "Surging Treasury yields don't signal a U.S. 'fiscal apocalypse' — yet",
-   "why": "Treasury yields над 5% повишават cost of capital за корпорациите и оказват натиск върху оценките на акциите, особено в growth и tech секторите."
+   "headline": "Trump signs order expanding access to tax-exempt red diesel",
+   "why": "Регулаторна промяна, която намалява данъчната тежест върху дизела за земеделие и строителство — влияе на енергийното търсене, рафинериите и агросектора."
   },
   {
-   "headline": "Euro slides as French fiscal worries grip markets",
-   "why": "Фискалните притеснения около Франция отслабват еврото и повишават спредовете на европейски ДЦК, което засяга позиции в EUR/USD и европейски акции."
+   "headline": "Wall Street banks launch record $60bn chip deal for Broadcom and Anthropic",
+   "why": "Рекордният leveraged financing пакет тества апетита за AI-свързан дълг и може да постави ново ниво за корпоративното кредитиране в tech сектора."
   },
   {
-   "headline": "Britain set to levy tariffs on Chinese electric cars",
-   "why": "Новите тарифи върху китайски EV-та имат секторен ефект върху европейски и китайски автомобилни производители и веригите им на доставки."
+   "headline": "Cocoa prices climb again as El Niño threatens West African supplies",
+   "why": "Новото поскъпване на какаото натиска маржовете на FMCG производителите и допринася за хранителната инфлация в глобален мащаб."
   },
   {
-   "headline": "Trump tells South Korea to sign on to Alaska LNG deal or 'I'll just charge them more'",
-   "why": "Тарифните заплахи към Южна Корея създават търговска несигурност за корейски износители и LNG пазара, с потенциален ефект върху енергийни и индустриални акции."
+   "headline": "India-US trade impasse confirmed by finance minister — little room for 'giving and taking'",
+   "why": "Задълбочаването на търговския застой между двете страни увеличава несигурността за компании с верига на доставки в Южна Азия и може да забави потенциален тарифен relief."
   }
  ]
 }

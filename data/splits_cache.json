@@ -1,15 +1,7 @@
 {
- "date": "2026-10-05",
+ "date": "2026-10-06",
  "rows": [],
  "horizon": [
-  {
-   "ticker": "VTAK",
-   "company": "Catheter Precision, Inc.",
-   "date": "2026-10-05",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
-  },
   {
    "ticker": "CMND",
    "company": "Clearmind Medicine Inc.",
@@ -41,6 +33,22 @@
    "ratio": "1:15",
    "split_type": "reverse",
    "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "ETHA",
+   "company": "iShares Ethereum Trust ETF",
+   "date": "2026-10-06",
+   "ratio": "1:3",
+   "split_type": "reverse",
+   "date_human": "Oct 06, 2026"
+  },
+  {
+   "ticker": "ITOC",
+   "company": "iTonic Holdings Ltd",
+   "date": "2026-10-06",
+   "ratio": "1:16",
+   "split_type": "reverse",
+   "date_human": "Oct 06, 2026"
   },
   {
    "ticker": "RUBI",
@@ -83,6 +91,22 @@
    "date_human": "Oct 09, 2026"
   },
   {
+   "ticker": "POAS",
+   "company": "Phaos Technology Holdings (Cayman) Limited",
+   "date": "2026-10-12",
+   "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Oct 12, 2026"
+  },
+  {
+   "ticker": "AMTD",
+   "company": "AMTD IDEA Group",
+   "date": "2026-10-19",
+   "ratio": "1:60",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026"
+  },
+  {
    "ticker": "LU",
    "company": "Lufax Holding Ltd",
    "date": "2026-10-23",
@@ -94,16 +118,16 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 11,
+  "source_rows": 14,
   "horizon_from": "2026-10-05",
   "horizon_to": "2026-10-23",
-  "in_week": 10,
+  "in_week": 11,
   "dropped_price": [
-   "VTAK",
    "CMND",
    "GUTS",
    "SCNX",
    "VIVK",
+   "ITOC",
    "RUBI",
    "GCDT",
    "MGF",
@@ -111,6 +135,7 @@
   ],
   "dropped_cap": [],
   "dropped_no_data": [
+   "ETHA",
    "DXJ"
   ],
   "passed": 0,

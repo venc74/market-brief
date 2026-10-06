@@ -1,5 +1,5 @@
 {
- "date": "2026-10-05",
+ "date": "2026-10-06",
  "rows": [
   {
    "ticker": "COO",
@@ -108,13 +108,22 @@
    ]
   }
  ],
+ "rows_date": "2026-10-06",
+ "status": {
+  "kind": "ok",
+  "note": "проверени 518 компании",
+  "stale": false,
+  "data_date": "2026-10-06",
+  "universe_size": 519,
+  "ciks_resolved": 518
+ },
  "diagnostics": {
   "universe_size": 519,
   "ciks_resolved": 518,
-  "tickers_with_filings": 341,
+  "tickers_with_filings": 365,
   "submissions_fetch_errors": 0,
-  "raw_transactions_parsed": 113,
+  "raw_transactions_parsed": 130,
   "qualifying_after_filter": 9,
-  "unique_filings_processed": 1841
+  "unique_filings_processed": 2168
  }
 }

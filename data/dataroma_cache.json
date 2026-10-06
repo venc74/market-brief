@@ -1,5 +1,5 @@
 {
- "date": "2026-10-05",
+ "date": "2026-10-06",
  "bundle": {
   "moves": [
    {
@@ -78,12 +78,11 @@
     "_resolved": true,
     "managers": [
      "Бил Акман · Pershing Square",
-     "Сет Кларман · Baupost Group",
      "Чейс Коулман · Tiger Global Management",
      "Даниел Лоуб · Third Point",
      "Дейвид Тепър · Appaloosa Management"
     ],
-    "count": 5
+    "count": 4
    },
    {
     "ticker": "TAIWAN SEMICONDUCTOR",
@@ -120,6 +119,7 @@
     "value": 2092970053.0,
     "pct_of_portfolio": 15.3,
     "period": "13F · 2026-05-15",
+    "filing_date": "2026-05-15",
     "_resolved": true
    },
    {
@@ -129,6 +129,7 @@
     "value": 1011873350.0,
     "pct_of_portfolio": 14.0,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -138,6 +139,7 @@
     "value": 533200000.0,
     "pct_of_portfolio": 11.4,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -147,6 +149,7 @@
     "value": 1175934069.0,
     "pct_of_portfolio": 7.2,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -156,6 +159,7 @@
     "value": 965105185.0,
     "pct_of_portfolio": 5.9,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
@@ -165,6 +169,7 @@
     "value": 918092697.0,
     "pct_of_portfolio": 5.6,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -174,6 +179,7 @@
     "value": 873193851.0,
     "pct_of_portfolio": 5.3,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
@@ -183,15 +189,17 @@
     "value": 808550554.0,
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
     "ticker": "DASH",
     "company": "DOORDASH INC",
     "manager": "Triple Frond Partners",
-    "value": 55404000.0,
+    "value": 55404.0,
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-13",
+    "filing_date": "2026-08-13",
     "_resolved": true
    },
    {
@@ -201,6 +209,7 @@
     "value": 639458194.0,
     "pct_of_portfolio": 4.7,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
@@ -210,6 +219,7 @@
     "value": 645337776.0,
     "pct_of_portfolio": 4.7,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -219,6 +229,7 @@
     "value": 204790950.0,
     "pct_of_portfolio": 4.4,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -228,15 +239,17 @@
     "value": 194479668.0,
     "pct_of_portfolio": 4.2,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
     "ticker": "SPGI",
     "company": "S&P GLOBAL INC",
     "manager": "Triple Frond Partners",
-    "value": 47527000.0,
+    "value": 47527.0,
     "pct_of_portfolio": 4.2,
     "period": "13F · 2026-08-13",
+    "filing_date": "2026-08-13",
     "_resolved": true
    },
    {
@@ -246,6 +259,7 @@
     "value": 548464789.0,
     "pct_of_portfolio": 4.0,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
@@ -255,6 +269,7 @@
     "value": 499110633.0,
     "pct_of_portfolio": 3.7,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -264,6 +279,7 @@
     "value": 166932100.0,
     "pct_of_portfolio": 3.6,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -273,6 +289,7 @@
     "value": 376729995.0,
     "pct_of_portfolio": 3.6,
     "period": "13F · 2026-07-21",
+    "filing_date": "2026-07-21",
     "_resolved": false
    },
    {
@@ -282,6 +299,7 @@
     "value": 251399508.0,
     "pct_of_portfolio": 3.5,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -291,6 +309,7 @@
     "value": 481498748.0,
     "pct_of_portfolio": 3.5,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -300,6 +319,7 @@
     "value": 241615600.0,
     "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -309,6 +329,7 @@
     "value": 511709948.0,
     "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -318,6 +339,7 @@
     "value": 512074787.0,
     "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -327,6 +349,7 @@
     "value": 470378663.0,
     "pct_of_portfolio": 2.9,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
@@ -336,15 +359,17 @@
     "value": 662779000.0,
     "pct_of_portfolio": 2.8,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
     "ticker": "CDW",
     "company": "Cdw Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 139789000.0,
+    "value": 139789.0,
     "pct_of_portfolio": 2.7,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -354,15 +379,17 @@
     "value": 358892731.0,
     "pct_of_portfolio": 2.6,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
     "ticker": "CME",
     "company": "CME GROUP INC",
     "manager": "Сет Кларман · Baupost Group",
-    "value": 136694000.0,
+    "value": 136694.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-13",
+    "filing_date": "2026-08-13",
     "_resolved": true
    },
    {
@@ -372,6 +399,7 @@
     "value": 340274801.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -381,15 +409,17 @@
     "value": 344297688.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": false
    },
    {
     "ticker": "GOOGL",
     "company": "Alphabet Inc",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 120184000.0,
+    "value": 120184.0,
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -399,15 +429,17 @@
     "value": 235094159.0,
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-07-21",
+    "filing_date": "2026-07-21",
     "_resolved": true
    },
    {
     "ticker": "FOXA",
     "company": "Fox Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 114992000.0,
+    "value": 114992.0,
     "pct_of_portfolio": 2.2,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -417,6 +449,7 @@
     "value": 173176000.0,
     "pct_of_portfolio": 2.2,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -426,16 +459,20 @@
     "value": 94445100.0,
     "pct_of_portfolio": 2.0,
     "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    }
   ],
   "major_exits": [],
-  "stopped_managers": [
-   {
-    "manager": "Майкъл Бъри · Scion Asset Management",
-    "last_filing_date": "2025-11-03",
-    "days_since_filing": 336
-   }
-  ]
+  "stopped_managers": [],
+  "meta": {
+   "kind": "ok",
+   "note": "15 от 15 мениджъра с данни",
+   "stale": false,
+   "data_date": "2026-10-06",
+   "managers_with_data": 15,
+   "managers_total": 15,
+   "managers_without_filings": 0
+  }
  }
 }
