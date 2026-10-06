@@ -822,7 +822,7 @@
       <div class="watch-trigger"><b>Сетъп:</b> {{ st.setup.trigger_text }}</div>
       {% endif %}
       {% if st.setup and st.setup.buy_stop %}
-      <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден до {{ st.setup.valid_through }}
+      <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ st.setup.valid_through) }}
         · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
       {% set pp = st.plan_preview %}

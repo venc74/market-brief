@@ -371,7 +371,7 @@ def run() -> dict:
     candidates = enrich(candidates)
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
-    candidates = setup_rules.annotate(candidates, today)
+    candidates = setup_rules.annotate(candidates, today, backtest.pending_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис в книгата, не нов от днес
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
     print("[6/7] AI синтез (Claude API)…")

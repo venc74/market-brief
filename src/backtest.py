@@ -867,6 +867,27 @@ def _wilson_ci_pct(wins: int, n: int, z: float = 1.96) -> list[float] | None:
     return [round(100 * (c - h), 1), round(100 * (c + h), 1)]
 
 
+def pending_buystop_by_ticker() -> dict[str, dict]:
+    """
+    Пакет 1б (б): тикър → ЧАКАЩИЯТ запис на buy-stop книгата (status "pending"; при няколко — най-скорошният по entry_date). Чисто локално четене на tracker-а без мрежа;
+    ползва се само за ПОКАЗВАНЕ — картата в Watchlist казва прозореца на записа ("валиден до 09.10, от 05.10"), а не плаваща рамка от днес. Всяка грешка → {}.
+    """
+    try:
+        out: dict[str, dict] = {}
+        for rec in _load_tracker().values():
+            if rec.get("method") != "v2" or record_category(rec) != CATEGORY_BUYSTOP or rec.get("status") != "pending":
+                continue
+            if not rec.get("ticker") or not rec.get("entry_date") or not rec.get("valid_through"):
+                continue
+            cur = out.get(rec["ticker"])
+            if cur is None or rec["entry_date"] > cur["entry_date"]:
+                out[rec["ticker"]] = rec
+        return out
+    except Exception as e:
+        print(f"[backtest] чакащите buy-stop записи не се прочетоха: {type(e).__name__}: {e}")
+        return {}
+
+
 def get_buystop_summary() -> dict:
     """
     Пакет 1б: обобщение на ОТДЕЛНАТА книга "buystop" (Watchlist buy-stop кандидати) — не е препоръка и не е позиция. Чисто локално четене

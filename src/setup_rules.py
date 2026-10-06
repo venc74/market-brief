@@ -167,11 +167,45 @@ def classify_setup(c: dict, today=None) -> dict:
     return out
 
 
-def annotate(candidates: list[dict], today=None) -> list[dict]:
-    """Слага c["setup"] на всеки кандидат (преди AI синтеза, за да го вижда и промптът)."""
+def _dm(iso: str) -> str:
+    return f"{iso[8:10]}.{iso[5:7]}"
+
+
+def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
+    """
+    Пакет 1б (б): за buy-stop кандидат (kind "below_pivot") със ЧАКАЩ запис в книгата картата показва прозореца на записа, не нов от днес. Записът брои 5-те сесии от ПЪРВИЯ ден
+    (EXPD: запис от 05.10 е валиден до 09.10), а classify_setup смята "до 12.10" всеки следващ ден — картата и таблицата на книгата си противоречаха. Слага valid_through (от записа),
+    valid_from, valid_label ("до 09.10, от 05.10") и пренаписва скобата в trigger_text; ако нивото на картата се е изместило от нивото на записа — book_level и бележка (записът пази плана
+    от първия ден). Изтекъл запис (valid_through < днес, още нерезолвиран) или запис от бъдеща дата се игнорира. Само показване; връща същия setup.
+    """
+    if not rec or setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
+        return setup
+    today_iso = (today or dt.date.today()).isoformat() if not isinstance(today, str) else today
+    through, start = rec.get("valid_through"), rec.get("entry_date")
+    if not through or not start or through < today_iso or start > today_iso:
+        return setup
+    sessions = rec.get("window_sessions") or config.BUY_STOP_WINDOW_SESSIONS
+    old = f"(валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, до {setup.get('valid_through')})"
+    new = f"(валиден до {_dm(through)}, от {_dm(start)} — {sessions} сесии от първия ден)"
+    text = setup.get("trigger_text") or ""
+    if old in text:
+        text = text.replace(old, new, 1)
+    setup.update(valid_through=through, valid_from=start, valid_label=f"до {_dm(through)}, от {_dm(start)}", book_status="pending")
+    level = rec.get("buy_stop")
+    if isinstance(level, (int, float)) and abs(level - setup["buy_stop"]) >= 0.005:
+        setup["book_level"] = level
+        text += f" Книгата следи ниво ${level:.2f} от {_dm(start)} (записът пази плана от първия ден)."
+    setup["trigger_text"] = text
+    return setup
+
+
+def annotate(candidates: list[dict], today=None, buystop_book: dict | None = None) -> list[dict]:
+    """Слага c["setup"] на всеки кандидат (преди AI синтеза, за да го вижда и промптът). buystop_book: тикър → чакащ запис на buy-stop книгата (виж apply_book_window)."""
     for c in candidates:
         try:
             c["setup"] = classify_setup(c, today)
+            if buystop_book:
+                apply_book_window(c["setup"], buystop_book.get(c.get("ticker")), today)
         except Exception as e:                       # graceful: един счупен кандидат не чупи run-а
             print(f"[setup] {c.get('ticker')}: {type(e).__name__}: {e}")
             c["setup"] = {"kind": "no_data", "eligible": False, "gate": "no_data",

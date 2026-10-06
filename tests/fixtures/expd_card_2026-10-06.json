@@ -1,0 +1,108 @@
+{
+ "_note": "РЕАЛНАТА Watchlist карта на EXPD от брифа от 06.10.2026 (docs/data/2026-10-06.json на origin/main, генериран 06.10 сутрин). buy-stop $194.59, под pivot с 0.24%; картата казва 'валиден до 2026-10-12' (нов 5-сесиен прозорец от 06.10), докато записът в книгата от 05.10 е валиден до 09.10. Брифът е преди пакет 2 — plan_preview е null.",
+ "card": {
+  "ticker": "EXPD",
+  "price": 194.12,
+  "pivot": 194.59,
+  "pct_from_pivot": -0.24,
+  "pivot_bars_excluded": 5,
+  "base_type": "база 15.9% дълбочина",
+  "base_depth_pct": 15.9,
+  "weinstein_stage": 2,
+  "rs_status": "near_high",
+  "ma50": 185.25,
+  "ma200": 162.5,
+  "above_ma50": true,
+  "above_ma200": true,
+  "avg_volume_50d": 1030536,
+  "last_volume": 1633300,
+  "volume_ratio": 1.58,
+  "breakout_volume": true,
+  "base_low": 164.36,
+  "struct_low": 183.36,
+  "pct_above_52w_low": 73.7,
+  "pct_below_52w_high": 0.6,
+  "trend_template_applied": true,
+  "rs_score": 0.1372,
+  "rs_rating": 90,
+  "company": "Expeditors International of Washington, Inc.",
+  "sector": "Industrials",
+  "industry": "Integrated Freight & Logistics",
+  "business_summary": "Expeditors International of Washington, Inc., together with its subsidiaries, provides logistics services in the Americas, North Asia, South Asia, Europe, and Middle East, Africa, and India. The company offers airfreight services, such as air freight consolidation and forwarding; ocean freight and ocean services, including ocean freight consolidation, direct ocean forwarding, and order management; customs brokerage and other services, import, intra-continental ground transportation and delivery, and warehousing and distribution services; and customs clearance, purchase order management, vendor",
+  "market_cap": 25233778688,
+  "eps_growth_yoy": 45.0,
+  "revenue_growth_yoy": 32.1,
+  "roe": 42.7,
+  "pe": 28.256186,
+  "forward_pe": 24.155424,
+  "debt_to_equity": 26.745,
+  "inst_ownership_pct": 99.7,
+  "analyst_target": 180.46667,
+  "short_pct_float": 3.94,
+  "shares_short": 4446596,
+  "short_ratio_dtc": 5.77,
+  "macro_tailwind": false,
+  "earnings": {
+   "next_earnings": "2026-11-03",
+   "days_to_earnings": 28,
+   "in_blackout": false,
+   "eps_estimate": 7.80352,
+   "recap": null
+  },
+  "short_view": {
+   "short_pct_float": 3.94,
+   "days_to_cover": 5.77,
+   "interpretation": "Нисък short interest (3.94%) — без squeeze динамика, но и без активна опозиция.",
+   "borrow": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск."
+  },
+  "borrow": {
+   "available": true,
+   "fee_rate": 0.41,
+   "available_shares": 1900000,
+   "fee_trend": "стабилен",
+   "interpretation": "Borrow rate 0.4% — нормално, евтино за шортиране, без особен натиск."
+  },
+  "markers": [
+   {
+    "tag": "MF✓",
+    "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."
+   }
+  ],
+  "setup": {
+   "kind": "below_pivot",
+   "eligible": false,
+   "gate": "below_pivot",
+   "pct_from_pivot": -0.24,
+   "volume_ok": true,
+   "buy_stop": 194.59,
+   "max_chase": 204.32,
+   "valid_through": "2026-10-12",
+   "struct_stop": 181.53,
+   "struct_risk_pct": 6.71,
+   "stop": 181.53,
+   "risk_pct": 6.71,
+   "trigger_text": "Чака пробив: buy-stop $194.59 (валиден 5 сесии, до 2026-10-12); сега 0.2% под pivot. Купува се само ако High ≥ $194.59, до $204.32; обем ≥ 1.5× среден за потвърждение."
+  },
+  "ai": {
+   "ticker": "EXPD",
+   "why_now": "Чисто технически setup с частична макро връзка — глобалната ликвидност подкрепя trade volumes, но EXPD е Industrials/Logistics, не директен бенефициент на AI capex цикъла или duration-sensitive growth тезата. RS рейтинг 90, near_high статус, volume_ratio 1.58 (breakout_volume=true) и цена само -0.24% под pivot $194.59 са технически силни. Въпреки това вчерашният trigger изискваше едновременно: пробив над $194.59 + volume_ratio ≥ 1.5x + RS Line да достигне new_high — RS статусът е 'near_high', НЕ 'new_high', т.е. третото условие НЕ е изпълнено. Освен това analyst target $180.47 е под текущата цена — структурно предупреждение. Без пълно изпълнение на тригера, остава Watchlist.",
+   "business_bg": "Expeditors International е глобален логистичен оператор, предлагащ въздушен и морски фрахт, митническо брокерство, складиране и управление на веригата на доставки. Оперира в Америка, Азия, Европа и MENA. Бизнес моделът е asset-light с висока ROE (42.7%) и стабилни парични потоци.",
+   "catalysts": [
+    "Ребаунд в глобалните trade volumes при стабилизиране на тарифната несигурност",
+    "Потенциален RS Line new_high при следващо относително представяне над пазара",
+    "EPS ръст YoY 45% и Revenue +32.1% — фундаментите поддържат оценката при P/E 28.3x",
+    "Next earnings 2026-11-03 (28 дни) — достатъчен прозорец за swing trade преди reporting risk"
+   ],
+   "risks": [
+    "Analyst target $180.47 е ~7% под текущата цена — институционален консенсус не подкрепя upside",
+    "RS Line остава near_high, а не new_high — моментумът може да се изчерпа преди потвърждение",
+    "Defensive пазарен режим ограничава sizing -50% и толерантността към риск",
+    "Макро: забавяне на глобалния trade при по-силен USD или рецесионни сигнали"
+   ],
+   "earnings_call": "след earnings — next earnings 2026-11-03, 28 дни напред, достатъчен прозорец за управление на позицията преди reporting risk.",
+   "classification": "Watchlist",
+   "watchlist_reason_type": "other",
+   "watchlist_trigger": "Пробив над $194.59 с volume_ratio ≥ 1.5x средния дневен обем И RS Line достигне new_high статус едновременно с пробива. Analyst target под цената изисква допълнително потвърждение от price action преди entry. Sizing -50% при Defensive режим."
+  }
+ }
+}
