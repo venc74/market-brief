@@ -8,7 +8,18 @@ brief["data_warnings"] — [{"source", "level", "message"}]; render ги пок�
 from __future__ import annotations
 
 
-def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None) -> list[dict]:
+def _cot_warning(cot_diag: dict | None) -> list[dict]:
+    """COT: пазари, за които моделът не върна теза нито след повторното извикване (виж ai_brief.cot_theses) — без ред в диагностиката те бяха мълчалива загуба (06.10: 4 от 20)."""
+    nr = (cot_diag or {}).get("not_returned") or []
+    if not nr:
+        return []
+    total = (cot_diag or {}).get("extremes")
+    return [{"source": "cot", "level": "warn",
+             "message": (f"COT: моделът не върна теза за {len(nr)}{f' от {total}' if total else ''} пазара ({', '.join(nr)}) и след повторно извикване — "
+                         f"показват се с директната теза от таблицата (или със стара теза, ако има); следващият run опитва пак.")}]
+
+
+def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None, cot_diag: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -41,4 +52,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"скринингът е върху {sc.get('with_history')} от {sc.get('universe')} тикъра; RS rating перцентилът "
                         f"и списъкът с кандидати са непълни."),
         })
+    out += _cot_warning(cot_diag)
     return out

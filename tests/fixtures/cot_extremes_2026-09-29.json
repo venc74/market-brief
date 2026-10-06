@@ -1,0 +1,185 @@
+{
+ "_note": "РЕАЛНИТЕ 20 COT екстремума (cot.get_extremes() с P3 кода) към отчета от 2026-09-29, изтеглени от CFTC на 06.10.2026 — същите 20 пазара и същият ред като в cot_diag на брифа от 06.10 (extremes=20). Без полето history (156 седмици на пазар) — тезите не го ползват.",
+ "extremes": [
+  {
+   "market": "2-Year Treasury Note",
+   "category": "financial",
+   "net_position": -1165980,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "XRP",
+   "category": "financial",
+   "net_position": -423,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 60,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Soybean Meal",
+   "category": "commodity",
+   "net_position": 207578,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Lean Hogs",
+   "category": "commodity",
+   "net_position": -50635,
+   "percentile": 0.0,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "E-mini Russell 2000",
+   "category": "financial",
+   "net_position": -114554,
+   "percentile": 0.6,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Soybeans",
+   "category": "commodity",
+   "net_position": 246558,
+   "percentile": 98.7,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Mexican Peso",
+   "category": "financial",
+   "net_position": 80587,
+   "percentile": 98.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "RBOB Gasoline",
+   "category": "commodity",
+   "net_position": 94186,
+   "percentile": 98.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Sugar No. 11",
+   "category": "commodity",
+   "net_position": 218336,
+   "percentile": 98.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Copper",
+   "category": "commodity",
+   "net_position": 78058,
+   "percentile": 97.4,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Corn",
+   "category": "commodity",
+   "net_position": 381220,
+   "percentile": 97.4,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Australian Dollar",
+   "category": "financial",
+   "net_position": 60592,
+   "percentile": 96.8,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Natural Gas",
+   "category": "commodity",
+   "net_position": -132799,
+   "percentile": 3.2,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Cocoa",
+   "category": "commodity",
+   "net_position": -16022,
+   "percentile": 3.9,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "British Pound",
+   "category": "financial",
+   "net_position": 4606,
+   "percentile": 4.5,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "30-Year Treasury Bond",
+   "category": "financial",
+   "net_position": -251395,
+   "percentile": 95.5,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Coffee C",
+   "category": "commodity",
+   "net_position": 16206,
+   "percentile": 4.5,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Bitcoin Futures (CME)",
+   "category": "financial",
+   "net_position": -6856,
+   "percentile": 94.8,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Euro FX",
+   "category": "financial",
+   "net_position": -39265,
+   "percentile": 8.4,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  },
+  {
+   "market": "Cotton",
+   "category": "commodity",
+   "net_position": 67837,
+   "percentile": 91.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-09-29"
+  }
+ ]
+}

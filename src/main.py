@@ -633,7 +633,7 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
-        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation)),
+        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation), cot_diag=ai_brief.COT_DIAG),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +

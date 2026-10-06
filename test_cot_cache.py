@@ -165,7 +165,7 @@ log["fail_markets"] = {"Corn"}                                                  
 r, gen, text = run(EX2, "2026-09-27")                                                                           # 5 дни след 22.09 (≤ 8)
 cn = r["Corn"]["cross_sector_thesis"]
 assert cn["stale"] is True and cn["source"] == "stale_fallback" and cn["generated_at"] == "2026-09-22"
-assert cn["stale_note"].startswith("Остаряла теза: генерирана на 2026-09-22 за отчет към 2026-09-15 (extreme_long); новата не е налична — моделът не върна тази под-теза.")
+assert cn["stale_note"].startswith("Остаряла теза: генерирана на 2026-09-22 за отчет към 2026-09-15 (extreme_long); новата не е налична — моделът не върна пазара, следващият run опитва пак.")
 assert [t["ticker"] for t in cn["tickers"]] == ["TSN", "PPC"]                                                    # старата теза се показва
 assert ai_brief.COT_DIAG["cache"]["stale_fallback"] >= 1
 failed = [m for m, c in r.items() if c["cross_sector_thesis"].get("stale")]
@@ -179,7 +179,7 @@ print(f"  ✓ batch-ът с Corn пада: {len(failed)} пазара от не�
 log["fail_markets"] = {m for m in log["fail_markets"]} | {e["market"] for e in EX2}
 r, gen, _ = run(EX2, "2026-10-02")                                                                              # 10 дни след 22.09 (> 8)
 assert all(c["cross_sector_thesis"]["source"] in ("none", "cache") for c in r.values())
-assert r["Corn"]["cross_sector_thesis"]["empty_reason"] == "моделът не върна тази под-теза" and not r["Corn"]["cross_sector_thesis"]["tickers"]
+assert r["Corn"]["cross_sector_thesis"]["empty_reason"] == "моделът не върна пазара, следващият run опитва пак" and not r["Corn"]["cross_sector_thesis"]["tickers"]
 assert [t["ticker"] for t in r["Corn"]["direct_thesis"]["tickers"]] == ["CORN"]                                  # директната е от таблицата и остава
 log["fail_markets"] = set()
 print("  ✓ резервата е по-стара от 8 дни (10) → без стара теза: cross е празна с причина, директната (от таблицата) остава")

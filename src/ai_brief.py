@@ -1823,19 +1823,36 @@ Arca Continental е AC.MX. Ако не си сигурен кой е точни�
 "mechanisms": [{{"type": "...", "quote": "..."}}]}}]}}]}}"""
 
 
+COT_BATCH_STATUS: dict[str, str] = {}                        # тагът на партидата → "ok" (отговор получен) | "failed" (изключение/отрязване след опитите)
+COT_RAW_LOG_CHARS = 8000                                      # колко от суровия отговор отива в лога при непълна партида
+
+
 def _cot_theses_for_batch(batch: list[dict], tag: str) -> list[dict]:
-    """Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а."""
+    """
+    Един batch → едно Claude извикване. 1 retry, после graceful skip на batch-а.
+    Непълен отговор (върнати са по-малко пазари от поискани, или непознати имена) се логва с ИМЕНАТА и със суровия текст (до COT_RAW_LOG_CHARS символа) — в лога на run-а, не в brief JSON:
+    на 06.10 едно от четирите извиквания върна 1 от 5 пазара (569 токена, end_turn) и причината не се виждаше никъде.
+    """
     user = _build_cot_user_prompt(batch)
     for attempt in (1, 2):
         try:
-            out = _parse_json(_call_claude(SYSTEM_COT, user,
-                                           max_tokens=config.COT_BATCH_MAX_TOKENS))
-            return out.get("theses", [])
+            raw = _call_claude(SYSTEM_COT, user, max_tokens=config.COT_BATCH_MAX_TOKENS)
+            theses = _parse_json(raw).get("theses", [])
+            COT_BATCH_STATUS[tag] = "ok"
+            asked = [b.get("market") for b in batch]
+            got = [t.get("market") for t in theses if isinstance(t, dict)]
+            missing = [m for m in asked if m not in got]
+            unknown = [m for m in got if m not in asked]
+            if missing or unknown:
+                print(f"[ai] cot batch {tag} ⚠ НЕПЪЛЕН отговор: поискани {len(asked)}, върнати {len(got)}; липсват {missing}; непознати {unknown}; "
+                      f"суров отговор ({len(raw)} символа): {raw[:COT_RAW_LOG_CHARS]}")
+            return theses
         except TruncatedResponse:
             break  # FIX 2026-09-23: retry при същия лимит отрязва пак, на двойна цена
         except Exception as e:
             label = "опит" if attempt == 1 else "retry"
             print(f"[ai] cot batch {tag} {label} неуспешен: {type(e).__name__}: {e}")
+    COT_BATCH_STATUS[tag] = "failed"
     print(f"[ai] cot batch {tag} пропуснат след 2 опита — "
           f"губим {len(batch)} екстремума: {[e.get('market') for e in batch]}")
     return []
@@ -1885,6 +1902,7 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
     държана позиция; сега тази грешка не може да се създаде — моделът не вижда нито скрийнъра, нито позициите.
     """
     COT_DIAG.clear()
+    COT_BATCH_STATUS.clear()
     if not extremes:
         return []
     today = today or dt.date.today()
@@ -1907,10 +1925,38 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
           + (" · FORCE_COT_REGEN" if config.FORCE_COT_REGEN else "") + (" · данните са остарели — без регенерация" if data_stale else ""))
 
     fresh: dict[str, list] = {}                              # сурови отговори на модела: пазар → [{ticker, company, mechanisms}]
-    for idx, batch in enumerate(batches, 1):
-        for t in _cot_theses_for_batch(batch, f"{idx}/{n}"):
-            if isinstance(t, dict) and t.get("market") in moves and t["market"] in {x["market"] for x in batch}:
+    batch_stats: list[dict] = []
+
+    def _run_batch(batch: list[dict], tag: str, retry: bool = False) -> None:
+        usage_before = len(AI_USAGE)
+        asked = {x["market"] for x in batch}
+        got = set()
+        for t in _cot_theses_for_batch(batch, tag):
+            if isinstance(t, dict) and t.get("market") in moves and t["market"] in asked:
                 fresh[t["market"]] = t.get("tickers") if isinstance(t.get("tickers"), list) else []
+                got.add(t["market"])
+        tokens = AI_USAGE[-1].get("output_tokens") if len(AI_USAGE) > usage_before else None
+        batch_stats.append({"batch": tag, "requested": len(asked), "returned": len(got), "output_tokens": tokens,
+                            "status": COT_BATCH_STATUS.get(tag, "ok"), **({"retry": True} if retry else {})})
+
+    for idx, batch in enumerate(batches, 1):
+        _run_batch(batch, f"{idx}/{n}")
+    # едно повторно извикване САМО за пазарите, които успешно получена партида е пропуснала (при изключение/отрязване партидата вече е опитана два пъти — без нови разходи);
+    # на порции до COT_BATCH_SIZE (правило 4: на batch-ове, не едно голямо извикване)
+    retry_markets = [x for idx, b in enumerate(batches, 1) if COT_BATCH_STATUS.get(f"{idx}/{n}") == "ok" for x in b if x["market"] not in fresh]
+    retried = [x["market"] for x in retry_markets]
+    if retry_markets:
+        rb = [retry_markets[i:i + size] for i in range(0, len(retry_markets), size)]
+        print(f"[ai] cot_theses: {len(retry_markets)} пазара липсват в получени отговори {retried} → {len(rb)} повторно извикване")
+        for j, batch in enumerate(rb, 1):
+            _run_batch(batch, f"повторение {j}/{len(rb)}", retry=True)
+    not_returned = [e["market"] for e in need if e["market"] not in fresh]
+    COT_DIAG["batches"] = batch_stats
+    COT_DIAG["not_returned"] = not_returned
+    COT_DIAG["retried"] = retried
+    COT_DIAG["recovered"] = [m for m in retried if m in fresh]
+    if not_returned:
+        print(f"[ai] ⚠ cot_theses: моделът не върна {len(not_returned)} от {len(need)} пазара и след повторно извикване: {not_returned}")
 
     raw_by_market: dict[str, list | None] = {}
     meta: dict[str, dict] = {}
@@ -1931,7 +1977,7 @@ def cot_theses(extremes: list[dict], screener_universe: list[dict],
             counts["generated"] += 1
         else:
             why = ("COT данните са остарели — тезите не се регенерират" if pl["action"] == "stale_data"
-                   else "моделът не върна тази под-теза")
+                   else "моделът не върна пазара, следващият run опитва пак")
             fb = _cot_table.fallback_entry(cache, m, today)
             if fb:
                 raw_by_market[m] = fb["tickers"]

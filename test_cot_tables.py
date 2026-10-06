@@ -185,7 +185,7 @@ with contextlib.redirect_stdout(io.StringIO()):
     out2 = ai_brief.cot_theses(EXTREMES, [], None, cache_path=fresh_cache())
 w = {c["market"]: c for c in out2}["Wheat"]
 assert [t["ticker"] for t in w["direct_thesis"]["tickers"]] == ["WEAT"] and w["direct_thesis"]["tickers"][0]["effect"] == "loses"
-assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"] == "моделът не върна тази под-теза"
+assert not w["cross_sector_thesis"]["tickers"] and w["cross_sector_thesis"]["empty_reason"] == "моделът не върна пазара, следващият run опитва пак"
 print("  ✓ повтореният директен тикър (CORN) се маха от cross; пазар без AI отговор (Wheat) пак се показва с директния WEAT (губи) и празен cross с причина")
 print()
 print("Всички тестове минаха.")
