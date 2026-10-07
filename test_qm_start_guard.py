@@ -1,9 +1,9 @@
 """
-Qullamaggie · чист старт: книгата qm_breakout приема записи само с дата >= config.QM_TRACK_FROM (и от snapshot-ите, и от днешния списък). Стойността по подразбиране е 2026-10-09 (първият бриф след качването на 08.10; беше плейсхолдър 2099-01-01) — книгата не
+Qullamaggie · чист старт: книгата qm_breakout приема записи само с дата >= config.QM_TRACK_FROM (и от snapshot-ите, и от днешния списък). Стойността по подразбиране е 2026-10-08 (първият бриф след качването на 08.10; беше плейсхолдър 2099-01-01) — книгата не
 записва нищо, докато в деня на качването (при rebase-а върху main) не се сложи истинската дата. По модела на test_buystop_start_guard.py.
 
 РЕАЛНО: картите DOCN, CORT, CRL от скана към 02.10.2026 (tests/fixtures/qm_frames_2026-10-02.json). СИНТЕТИЧНО: датите на брифовете и snapshot файловете във временната data/ (избрани да
-показват границата; реалният tracker не се пипа), режимите, (Датата по подразбиране е реалната 2026-10-09.)
+показват границата; реалният tracker не се пипа), режимите, (Датата по подразбиране е реалната 2026-10-08.)
 Пускане: python test_qm_start_guard.py
 """
 import sys, json, pathlib, tempfile
@@ -14,7 +14,7 @@ import pandas as pd
 import config
 from src import qm_breakout as q, backtest
 
-assert config.QM_TRACK_FROM == "2026-10-09"                                  # стойността по подразбиране (без env): първият бриф след качването на 08.10
+assert config.QM_TRACK_FROM == "2026-10-08"                                  # стойността по подразбиране (без env): първият бриф след качването на 08.10
 _tmp = tempfile.TemporaryDirectory(prefix="mb_qmg_")
 config.DATA_DIR = pathlib.Path(_tmp.name)
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
@@ -27,43 +27,43 @@ ROWS, _ = q.scan_frames(frames, lead=FIX["lead"])
 CARDS = {r["ticker"]: r for r in ROWS}
 assert sorted(CARDS) == ["CORT", "CRL", "DOCN"]
 
-print("── по подразбиране (2026-10-09): картите от по-ранни дни не влизат ──")
+print("── по подразбиране (2026-10-08): картите от по-ранни дни не влизат ──")
 tr = {}
 backtest._ingest_qm_list(tr, "2026-10-05", list(CARDS.values()), "Defensive")
-backtest._ingest_qm_list(tr, "2026-10-08", list(CARDS.values()), "Defensive")
+backtest._ingest_qm_list(tr, "2026-10-07", list(CARDS.values()), "Defensive")
 assert tr == {}
 backtest._save_tracker({})
 (config.DATA_DIR / "2026-10-05.json").write_text(json.dumps({"date": "2026-10-05", "action": [], "watchlist": [], "thermometer": {"regime": "Defensive"}, "qm_breakout": [CARDS["DOCN"]]}), encoding="utf-8")
 backtest.update_backtest_tracker([], "2026-10-06", [], "Defensive", [CARDS["CORT"]])
 assert backtest._load_tracker() == {}
-assert backtest.get_qm_summary()["track_from"] == "2026-10-09" and backtest.get_qm_summary()["records"] == 0
-print("  ✓ реални карти на 05.10.2026 (ingest, snapshot файл, днешен списък) → нула записа; обобщението казва track_from=2026-10-09")
+assert backtest.get_qm_summary()["track_from"] == "2026-10-08" and backtest.get_qm_summary()["records"] == 0
+print("  ✓ реални карти на 05.10.2026 (ingest, snapshot файл, днешен списък) → нула записа; обобщението казва track_from=2026-10-08")
 
 print()
-print("── граничните дати около 2026-10-09 ──")
+print("── граничните дати около 2026-10-08 ──")
 tr = {}
-for d, t in (("2026-10-07", "DOCN"), ("2026-10-08", "CORT"), ("2026-10-09", "CRL"), ("2026-10-10", "DOCN")):
+for d, t in (("2026-10-06", "DOCN"), ("2026-10-07", "CORT"), ("2026-10-08", "CRL"), ("2026-10-09", "DOCN")):
     backtest._ingest_qm_list(tr, d, [CARDS[t]], "Defensive")
-assert sorted(tr) == ["CRL_2026-10-09_qm", "DOCN_2026-10-10_qm"]
-print("  ✓ карти от 07.10 и 08.10 не се записват; 09.10 (първият бриф с кода) и 10.10 — да")
+assert sorted(tr) == ["CRL_2026-10-08_qm", "DOCN_2026-10-09_qm"]
+print("  ✓ карти от 06.10 и 07.10 не се записват; 08.10 (първият бриф с кода) и 09.10 — да")
 
 print()
 print("── snapshot файловете и днешният списък (update_backtest_tracker) ──")
 for f in config.DATA_DIR.glob("2026-*.json"):
     f.unlink()
-for d, t in (("2026-10-07", "DOCN"), ("2026-10-08", "CORT"), ("2026-10-09", "CRL")):
+for d, t in (("2026-10-06", "DOCN"), ("2026-10-07", "CORT"), ("2026-10-08", "CRL")):
     snap = {"date": d, "action": [], "watchlist": [], "thermometer": {"regime": "Defensive"}, "qm_breakout": [CARDS[t]]}
     (config.DATA_DIR / f"{d}.json").write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
 backtest._save_tracker({})
-backtest.update_backtest_tracker([], "2026-10-10", [], "Offensive", [CARDS["DOCN"]])
+backtest.update_backtest_tracker([], "2026-10-09", [], "Offensive", [CARDS["DOCN"]])
 T = backtest._load_tracker()
-assert sorted(T) == ["CRL_2026-10-09_qm", "DOCN_2026-10-10_qm"], sorted(T)
+assert sorted(T) == ["CRL_2026-10-08_qm", "DOCN_2026-10-09_qm"], sorted(T)
 backtest._save_tracker({})
-backtest.update_backtest_tracker([], "2026-10-08", [], "Offensive", [CARDS["CORT"]])                    # днешен списък ПРЕДИ датата (напр. ръчно пускане преди качването)
-assert [k for k in backtest._load_tracker() if k.startswith("CORT_2026-10-08")] == []
+backtest.update_backtest_tracker([], "2026-10-07", [], "Offensive", [CARDS["CORT"]])                    # днешен списък ПРЕДИ датата (напр. ръчно пускане преди качването)
+assert [k for k in backtest._load_tracker() if k.startswith("CORT_2026-10-07")] == []
 S = backtest.get_qm_summary()
-assert S["track_from"] == "2026-10-09"
-print("  ✓ snapshot-ите от 07.10 и 08.10 не дават записи, този от 09.10 — да; днешният списък преди датата се пропуска; обобщението носи track_from")
+assert S["track_from"] == "2026-10-08"
+print("  ✓ snapshot-ите от 06.10 и 07.10 не дават записи, този от 08.10 — да; днешният списък преди датата се пропуска; обобщението носи track_from")
 
 print()
 print("── изключване на guard-а ──")
