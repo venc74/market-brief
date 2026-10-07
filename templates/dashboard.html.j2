@@ -415,11 +415,46 @@
   .earn-pos { color: var(--green); }
   .earn-neg { color: var(--red); }
   .earn-yoy-summary { font-size: 12.5px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+  /* ── Стоп и размер (07.10.2026): нива от брифа + оразмеряване в браузъра (localStorage) ── */
+  header { position: relative; }
+  .mb-gear { position: absolute; top: 10px; right: 14px; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px;
+    font-size: 16px; line-height: 1; padding: 6px 9px; cursor: pointer; }
+  .mb-gear:hover, .mb-gear[aria-expanded="true"] { color: var(--text); border-color: var(--regime); }
+  .mb-settings { background: var(--panel); border-bottom: 1px solid var(--line); }
+  .mb-settings[hidden] { display: none; }
+  .mb-settings-inner { max-width: 1080px; margin: 0 auto; padding: 14px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 16px; align-items: end; }
+  .mb-settings label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .mb-settings input[type=number], .lv-adj input { background: var(--ink); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 8px 10px;
+    font: 14px "IBM Plex Mono", monospace; width: 100%; }
+  .mb-settings .mb-check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); }
+  .mb-note { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); }
+  .mb-note[hidden] { display: none; }
+  .lv { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12.5px; }
+  .lv-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); padding: 1px 0; }
+  .lv-row b { color: var(--text); font-family: "IBM Plex Mono", monospace; font-weight: 600; text-align: right; }
+  .lv-row i { font-style: normal; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+  .lv-note { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .lv-warn { font-size: 12px; color: var(--yellow); margin-top: 4px; }
+  .lv-hint { color: var(--muted); font-size: 12px; }
+  .lv-size { margin-top: 6px; padding: 6px 8px; background: rgba(255,255,255,.03); border-radius: 6px; }
+  .lv-main { color: var(--text); font-size: 13px; margin-top: 2px; }
+  .lv-risk, .lv-loss { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .lv-size b { color: var(--text); font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .lv-actions { margin-top: 6px; }
+  .lv-adjust-btn, .lv-reset { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  .lv-adj { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; }
+  .lv-adj[hidden] { display: none; }
+  .lv-adj label { font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; flex: 1 1 110px; }
+  .lv-adj .lv-note { flex-basis: 100%; }
+  .qm-lv-row td { border-top: 0; padding-top: 0; }
+  @media (max-width: 760px) { .mb-settings input[type=number], .lv-adj input { font-size: 16px; } }   /* без автоматично увеличение на iOS */
 </style>
 </head>
 <body>
 
 <header>
+  <button id="mb-settings-btn" class="mb-gear" type="button" aria-expanded="false" aria-controls="mb-settings" title="Настройки за оразмеряване на позицията" aria-label="Настройки за оразмеряване на позицията">⚙</button>
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
@@ -443,6 +478,18 @@
     </div>
   </div>
 </header>
+
+{# 07.10.2026: настройки за оразмеряване — само в localStorage на устройството на читателя; в брифа няма размер на сметка и брой акции #}
+<div id="mb-settings" class="mb-settings" hidden>
+  <div class="mb-settings-inner">
+    <label>Баланс на сметката ($)<input id="mb-balance" type="number" inputmode="decimal" min="0" step="any" placeholder="напр. 80000" autocomplete="off"></label>
+    <label>Риск на сделка (% от сметката)<input id="mb-risk" type="number" inputmode="decimal" min="0" step="any" placeholder="0.5" autocomplete="off"></label>
+    <label>Таван на позиция (% от сметката)<input id="mb-cap" type="number" inputmode="decimal" min="0" step="any" placeholder="25" autocomplete="off"></label>
+    <label class="mb-check"><input id="mb-regime" type="checkbox" checked> прилагай режимния фактор (Action/Watchlist: ×0.5 при Defensive и Cash)</label>
+    <div class="mb-note">Стойностите остават само на това устройство (localStorage) — не се изпращат никъде и не са част от брифа. Размерът на позицията се смята в браузъра от нивата на картата.</div>
+    <div class="mb-note" id="mb-persist-note" hidden>localStorage не е достъпен — настройките важат само докато страницата е отворена.</div>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -604,6 +651,32 @@
 {# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}
 {# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
+
+{# 07.10.2026 (стоп и размер): нива на вход, стоп, ADR и предупреждения — ЕДНАКВИ за всички зрители (от брифа); размерът (акции, сума, загуба при стоп/гап) се смята в браузъра от настройките на читателя
+   (sizing_core.js / sizing_ui.js). Без JS се виждат нивата и подсказката "въведи баланса…". #}
+{% macro levels_block(lv, show_entry=true, show_adr=true) %}
+{% if lv %}
+<div class="lv" data-strategy="{{ lv.strategy }}" data-entry="{{ lv.entry }}" data-stop="{{ lv.stop }}" data-adr="{{ lv.adr_pct if lv.adr_pct is not none else '' }}" data-factor="{{ lv.regime_factor }}" data-regime-label="{{ 'защитен режим' if lv.regime_factor < 1 else '' }}" data-regime-note="{{ lv.regime_note or '' }}">
+  <div class="lv-info">
+    {% if show_entry %}<div class="lv-row"><span>{{ lv.entry_label }}</span><b>${{ "%.2f"|format(lv.entry) }}</b></div>{% endif %}
+    <div class="lv-row"><span>{{ "Стоп" if lv.strategy == "canslim" else (lv.stop_source_text[0:1]|upper ~ lv.stop_source_text[1:]) }}</span><b>${{ "%.2f"|format(lv.stop) }} <i>(−{{ "%.1f"|format(lv.stop_pct) }}%)</i></b></div>
+    {% if lv.expected_stop is defined %}<div class="lv-row"><span>{{ lv.expected_stop_label[0:1]|upper ~ lv.expected_stop_label[1:] }}</span><b>≈ ${{ "%.2f"|format(lv.expected_stop) }} <i>(−{{ "%.1f"|format(lv.expected_stop_pct) }}%)</i></b></div>{% endif %}
+    {% if show_adr %}<div class="lv-row"><span>ADR (20 бара)</span><b>{{ ("%.1f"|format(lv.adr_pct) ~ "%") if lv.adr_pct is not none else "н/д" }}</b></div>{% endif %}
+  </div>
+  {% if lv.strategy == "canslim" %}<div class="lv-note">източник на стопа: {{ lv.stop_source_text }}</div>{% endif %}
+  {% if lv.stop_note %}<div class="lv-note">{{ lv.stop_note }}</div>{% endif %}
+  {% for w in lv.warnings %}<div class="lv-warn">⚠ {{ w }}</div>{% endfor %}
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
 {# статус на данни: остарели редове (дата на данните) и легитимна нула срещу провал при теглене #}
 {% macro data_note(st, label) %}{% if st %}{% if st.stale %}
 <div class="data-note warn">⚠ {{ label }}: показаното е от по-ранно теглене{% if st.data_date %} — данни от {{ st.data_date }}{% else %} — датата на теглене е неизвестна{% endif %}, не от днес.
@@ -780,7 +853,7 @@
         <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
         <div class="kv"><span>Препоръка</span><b>{{ st.ai.earnings_call }}</b></div>
         <div class="plan">
-          <h3 style="color:var(--regime)">План · риск ${{ p.max_risk_usd|int }}{% if p.sizing_factor < 1 %} (Defensive ×{{ p.sizing_factor }}){% endif %}</h3>
+          <h3 style="color:var(--regime)">План{% if p.sizing_factor < 1 %} · режимен фактор ×{{ p.sizing_factor }} (Defensive){% endif %}</h3>
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
              структурен стоп с процент, цел 1 е за половината позиция #}
           {% if p.method == 'v2' %}
@@ -789,16 +862,14 @@
           {% else %}
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
           {% endif %}
-          <div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>
-          <div class="kv"><span>Брой акции</span><b>{{ p.shares }}</b></div>
-          <div class="kv"><span>Инвестиция</span><b>${{ "{:,.0f}".format(p.total_investment) }} ({{ p.pct_of_portfolio }}%)</b></div>
+          {% if not st.levels %}<div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>{% endif %}
           <div class="kv"><span>Цел 1 (2:1){% if p.method == 'v2' %} · {{ (p.target_1_fraction * 100)|round|int }}% от позицията{% endif %}</span><b>${{ p.target_1 }}</b></div>
           <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">{{ p.target_2 }}</b></div>
           <div class="kv"><span>Хоризонт</span><b>{{ p.time_horizon }}</b></div>
           {% if p.method == 'v2' %}
-          <div class="why" style="font-size:12px;color:var(--muted);margin-top:6px">Акциите са при вход ≈ ${{ p.entry_mid }}
-            (сигналният close); ако отвори по-високо, риск/акция = цена − ${{ p.stop_loss }} — преизчисли броя.</div>
+          <div class="why" style="font-size:12px;color:var(--muted);margin-top:6px">Референтният вход е ≈ ${{ p.entry_mid }} (сигналният close); ако отвори по-високо, риск/акция = цена − ${{ p.stop_loss }} — въведи реалния вход с „коригирай“.</div>
           {% endif %}
+          {{ levels_block(st.levels) }}
         </div>
       </div>
     </div>
@@ -861,10 +932,10 @@
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
       {% set pp = st.plan_preview %}
       {% if pp and pp.valid %}
-      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства (вход ≈ ${{ "%.2f"|format(pp.entry_mid) }}):
-        Stop ${{ "%.2f"|format(pp.stop_loss) }} (−{{ pp.risk_pct }}%) · Цел 1 (2R, {{ (pp.target_1_fraction * 100)|round|int }}% от позицията) ${{ "%.2f"|format(pp.target_1) }}
-        · риск ${{ pp.max_risk_usd|int }}{% if pp.sizing_factor < 1 %} ({{ regime }} ×{{ pp.sizing_factor }}){% endif %}
-        → {{ pp.shares }} акции (${{ "{:,.0f}".format(pp.total_investment) }}, {{ pp.pct_of_portfolio }}% от портфейла){% if regime == 'Cash' %} · режим Cash: нов Action не се дава, планът е само ориентир{% endif %}</div>
+      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
+        {% if not st.levels %}вход ≈ ${{ "%.2f"|format(pp.entry_mid) }} · Stop ${{ "%.2f"|format(pp.stop_loss) }} (−{{ pp.risk_pct }}%) · {% endif %}Цел 1 (2R, {{ (pp.target_1_fraction * 100)|round|int }}% от позицията) ${{ "%.2f"|format(pp.target_1) }}
+        {% if pp.sizing_factor < 1 %}· режимен фактор {{ regime }} ×{{ pp.sizing_factor }}{% endif %}{% if regime == 'Cash' %} · режим Cash: нов Action не се дава, планът е само ориентир{% endif %}</div>
+      {{ levels_block(st.levels) }}
       {% endif %}
       {% endif %}
     </div>
@@ -895,19 +966,18 @@
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:34] }}</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span></div>
       <div class="qm-kv">
-        <span>Стоп</span><b title="Очакван стоп ≈ {{ qm_expected_stop_adr }}×ADR под входа; максимален (1×ADR) ${{ "%.2f"|format(c.max_stop) }} (−{{ "%.1f"|format(c.max_risk_pct) }}%)">≈ ${{ "%.2f"|format(c.expected_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(c.expected_risk_pct) }}%)</span></b>
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
-        <span>Акции при ${{ "%.0f"|format(c.risk_usd) }} риск</span><b title="≈ ${{ "{:,.0f}".format(c.total_investment) }} ({{ "%.1f"|format(c.pct_of_portfolio) }}% от портфейла){% if c.capped_by_position_limit %}; ограничено до {{ qm_max_position_pct|round|int }}% от портфейла{% endif %}">{{ c.shares }}</b>
         <span>Предходен ръст</span><b>+{{ "%.0f"|format(c.runup_pct) }}%</b>
         <span>Консолидация</span><b title="дълбочина {{ "%.1f"|format(c.depth_pct) }}% · стягане {{ "%.2f"|format(c.tight) }}× ADR · обем {{ "%.2f"|format(c.vol_ratio) }}× от 50-дневния · цена {{ "%+.1f"|format(c.vs_sma10_pct) }}% от 10 MA, {{ "%+.1f"|format(c.vs_sma20_pct) }}% от 20 MA">{{ c.base_days }} дни</b>
       </div>
+      {{ levels_block(c.levels, false, false) }}
     </div>
     {% endfor %}
   </div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
     {% if qm_diag and qm_diag.with_history %}Подредени по стягане на базата (най-стегнатите първи); лидери: горните {{ ((1 - qm_diag.lead_pct) * 100)|round|int }}% по ръст за 1, 3 и 6 месеца ({{ qm_diag.leaders }} от {{ qm_diag.with_history }} тикъра към
     {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}), кандидати {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани {{ qm_cards|length }}{% endif %}. {% endif %}
-    Задръж курсора върху стопа, акциите и консолидацията за подробности (максимален стоп, дълбочина на базата, позиция спрямо 10/20 MA).
+    Задръж курсора върху консолидацията за подробности (дълбочина на базата, стягане, позиция спрямо 10/20 MA). Стопът за оразмеряване е максималният (1×ADR); реалният стоп е дъното на деня на влизане.
   </div>
   {% else %}
   <div class="small" style="font-size:12.5px;color:var(--muted)">няма кандидати днес{% if qm_diag and qm_diag.with_history %} (проверени {{ qm_diag.with_history }} тикъра){% endif %}</div>
@@ -999,7 +1069,7 @@
   {% elif qm_ep.rows %}
   <div class="card" style="padding:6px 4px">
     <table class="pos-table qm-ep-table">
-      <thead><tr><th>Тикър</th><th class="n">AH гап</th><th>Новина</th><th class="n">Ръст 3 м.</th><th class="n">Стоп лимит и размер</th></tr></thead>
+      <thead><tr><th>Тикър</th><th class="n">AH гап</th><th>Новина</th><th class="n">Ръст 3 м.</th><th class="n">Стоп лимит (1×ADR)</th></tr></thead>
       <tbody>
         {% for r in qm_ep.rows %}
         <tr>
@@ -1009,8 +1079,9 @@
             <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: н/д</span>{% endif %}</div>
             {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}</td>
           <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
-          <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span>{% if r.shares %}<div class="qm-sm">{{ r.shares }} акции при ${{ "%.0f"|format(r.risk_usd) }} риск</div>{% endif %}</td>
+          <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span></td>
         </tr>
+        {% if r.levels %}<tr class="qm-lv-row"><td colspan="5">{{ levels_block(r.levels) }}</td></tr>{% endif %}
         {% endfor %}
       </tbody>
     </table>
@@ -1542,6 +1613,12 @@
 </footer>
 
 </div>
+<script>
+{{ sizing_core_js|safe }}
+</script>
+<script>
+{{ sizing_ui_js|safe }}
+</script>
 <script>
 // ── Исторически календар: отваря docs/archive/<date>.html в iframe ────────
 (function () {

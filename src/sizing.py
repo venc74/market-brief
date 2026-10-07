@@ -1,7 +1,7 @@
 """
-Position Sizing (Секция 3.7). Таблицата от спека, ред по ред, като код.
-Stop = по-високото от (под базата −2%) и (под 50DMA −1%) — т.е. по-близкият
-логичен stop, за да не раздуваме риска на акция изкуствено.
+Риск план на сетъп (Секция 3.7, пакет 1): вход, структурен стоп, цел 1 (2R) и хоризонт. БЕЗ размер на позицията (07.10.2026): брой акции, сума и риск в долари вече НЕ се смятат
+и НЕ се публикуват — брифът е публичен и няма размер на сметка. Размерът се смята в браузъра на читателя (templates/sizing_core.js) от неговия баланс и риск, които стоят само в
+localStorage на устройството му; тук остава `sizing_factor` (режимният фактор, Defensive ×0.5), защото е публичен и от режима, не лично число. Нивата за картата — src/trade_levels.py.
 """
 from __future__ import annotations
 
@@ -13,63 +13,13 @@ import config
 from src import setup_rules
 
 
-def position_plan(row: dict, sizing_factor: float = 1.0) -> dict:
-    price = row["price"]
-    pivot = row["pivot"]
-    base_low = row.get("base_low", price * 0.92)
-    ma50 = row.get("ma50", price * 0.95)
-
-    entry_low = round(pivot * 0.98, 2)
-    entry_high = round(pivot * 1.02, 2)
-    entry_mid = round(pivot, 2)
-
-    stop_base = base_low * 0.98
-    stop_ma = ma50 * 0.99
-    stop = round(max(stop_base, stop_ma), 2)
-    if stop >= entry_low:                       # дегенерирал стоп — под базата
-        stop = round(stop_base, 2)
-
-    risk_per_share = round(entry_mid - stop, 2)
-    if risk_per_share <= 0:
-        return {"valid": False, "reason": "Stop над entry — структурата не позволява смислен план."}
-
-    max_risk_usd = round(config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100
-                         * sizing_factor, 0)
-    shares = int(max_risk_usd // risk_per_share)
-    total_invest = round(shares * entry_mid, 0)
-    pct_portfolio = round(total_invest / config.PORTFOLIO_SIZE * 100, 1)
-
-    target1 = round(entry_mid + risk_per_share * config.MIN_REWARD_RISK, 2)
-    risk_pct_of_price = risk_per_share / entry_mid * 100
-    horizon = ("2–4 седмици" if risk_pct_of_price < 6 else
-               "4–8 седмици" if risk_pct_of_price < 10 else "8–12 седмици")
-
-    return {
-        "valid": True,
-        "entry_range": [entry_low, entry_high],
-        "entry_mid": entry_mid,
-        "stop_loss": stop,
-        "stop_basis": "под 50DMA" if stop == round(stop_ma, 2) else "под базата",
-        "risk_per_share": risk_per_share,
-        "max_risk_usd": max_risk_usd,
-        "sizing_factor": sizing_factor,
-        "shares": shares,
-        "total_investment": total_invest,
-        "pct_of_portfolio": pct_portfolio,
-        "target_1": target1,
-        "target_2": f"trailing stop под 10DMA след достигане на ${target1}",
-        "reward_risk": config.MIN_REWARD_RISK,
-        "time_horizon": horizon,
-    }
-
-
 def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     """
     Пакет 1, т.3 (2026-10-03): план за ПОТВЪРДЕН пробив (виж setup_rules).
 
     Вход: buy-stop на pivot — ако инструментът отвори над него, изпълнението е по
     отварянето, но не по-високо от pivot +BUYABLE_ZONE_MAX_PCT% ("таван за вход").
-    Референтният вход за стоп/цел/брой акции е сигналният close (`price`), както в
+    Референтният вход за стоп/цел е сигналният close (`price`), както в
     реплея — реалното изпълнение може да е по-високо в рамките на тавана.
     Стоп = най-ниският Low на последните STOP_STRUCT_LOOKBACK_BARS бара −buffer, но не
     повече от STOP_MAX_PCT% под входа; структурен риск над STOP_REJECT_STRUCT_RISK_PCT%
@@ -77,10 +27,8 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     Цел 1 = 2R (MIN_REWARD_RISK) за TARGET_PARTIAL_FRACTION от позицията; остатъкът —
     trailing под TRAIL_SMA_DAYS-дневната средна, стопът остава активен (виж trade_sim).
 
-    Ключовете от стария position_plan() са запазени (entry_range, entry_mid, stop_loss,
-    stop_basis, risk_per_share, max_risk_usd, sizing_factor, shares, total_investment,
-    pct_of_portfolio, target_1, target_2, reward_risk, time_horizon); entry_range вече
-    е зоната за покупка [buy-stop, таван], entry_mid — планиращият вход.
+    Ключове: entry_range (зоната за покупка [buy-stop, таван]), entry_mid (планиращият вход), stop_loss, stop_basis, risk_per_share, sizing_factor,
+    target_1, target_2, reward_risk, time_horizon. Без max_risk_usd/shares/total_investment/pct_of_portfolio — размерът е в браузъра (07.10.2026).
     """
     price, pivot = row.get("price"), row.get("pivot")
     if (not isinstance(price, (int, float)) or not isinstance(pivot, (int, float))
@@ -100,12 +48,6 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     risk_per_share = round(entry_ref - stop, 2)
     if risk_per_share <= 0:
         return {"valid": False, "reason": "Стоп над входа — структурата не позволява смислен план."}
-
-    max_risk_usd = round(config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100
-                         * sizing_factor, 0)
-    shares = int(max_risk_usd // risk_per_share)
-    total_invest = round(shares * entry_ref, 0)
-    pct_portfolio = round(total_invest / config.PORTFOLIO_SIZE * 100, 1)
 
     target1 = round(entry_ref + risk_per_share * config.MIN_REWARD_RISK, 2)
     risk_pct = risk_per_share / entry_ref * 100
@@ -133,11 +75,7 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "struct_risk_pct": st["struct_risk_pct"],
         "risk_pct": round(risk_pct, 2),
         "risk_per_share": risk_per_share,
-        "max_risk_usd": max_risk_usd,
         "sizing_factor": sizing_factor,
-        "shares": shares,
-        "total_investment": total_invest,
-        "pct_of_portfolio": pct_portfolio,
         "target_1": target1,
         "target_1_fraction": config.TARGET_PARTIAL_FRACTION,
         "target_2": (f"остатъкът ({(1 - config.TARGET_PARTIAL_FRACTION) * 100:.0f}%): trailing под "
@@ -150,8 +88,8 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
 
 def buy_stop_preview(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     """
-    Пакет 2 (2026-10-05): план-преглед за Watchlist карта с buy-stop (кандидат под pivot) — стоп, риск %, цел 1 (2R), брой акции и
-    сума при ТЕКУЩИЯ sizing на режима, както Action картата. Референтният вход е самото buy-stop ниво (pivot), не текущата цена
+    Пакет 2 (2026-10-05): план-преглед за Watchlist карта с buy-stop (кандидат под pivot) — стоп, риск % и цел 1 (2R) при
+    ТЕКУЩИЯ sizing_factor на режима, както Action картата (без брой акции — той е в браузъра). Референтният вход е самото buy-stop ниво (pivot), не текущата цена
     под него — същото, с което setup_rules.classify_setup смята стопа и риска, затова stop/risk_pct съвпадат със setup.
     Няма buy-stop или няма валиден план (твърде разтегнато, без struct_low) → {"valid": False, "reason": ...}. Не променя класификацията.
     """

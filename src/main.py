@@ -22,6 +22,7 @@ from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
 from src.enrich import enrich, inject_split_catalysts, uov_marker
 from src.sizing import position_plan_v2, buy_stop_preview
+from src import trade_levels
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
@@ -298,6 +299,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 c["ai"]["watchlist_trigger"] = plan.get("reason", "Невалиден риск план.")
             else:
                 c["plan"] = plan
+                c["levels"] = trade_levels.for_candidate(plan, c, sizing_factor, "референтен вход (сигнален close)")      # 07.10: вход/стоп/ADR/предупреждения; размерът е в браузъра
                 sector_count[sector] = sector_count.get(sector, 0) + 1
                 action.append(c)
                 continue
@@ -305,6 +307,9 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
         # пакет 2: buy-stop кандидатите показват стоп, риск %, цел 1 и размер на позицията при sizing-а на режима (само показване)
         if (c.get("setup") or {}).get("buy_stop"):
             c["plan_preview"] = buy_stop_preview(c, sizing_factor, today)
+            lv = trade_levels.for_candidate(c["plan_preview"], c, sizing_factor, "вход при задействане (buy-stop)")
+            if lv:
+                c["levels"] = lv
         watchlist.append(c)
 
     # Watchlist е най-много 10 карти: потвърден пробив, спрян от лимит/режим/earnings,

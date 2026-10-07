@@ -19,6 +19,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
 from src import setup_rules
+from src import trade_levels
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
 
@@ -405,6 +406,8 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
         "volume_ratio": round(vol_ratio, 2), "breakout_volume": breakout_volume,
         "base_low": round(base_low, 2),
         "struct_low": round(struct_low, 2),
+        # 07.10.2026 (стоп и размер): ADR% за 20 бара (формулата на Qullamaggie) — основата на предупреждението "стопът е в нормалния дневен шум"; само информация
+        "adr_pct": trade_levels.adr_pct(high, df["Low"]),
         # т.9: позицията в 52-седмичния диапазон (за показване); rs_score/rs_rating се слагат
         # във втория проход на technical_screen
         "pct_above_52w_low": round((price / low52 - 1) * 100, 1),

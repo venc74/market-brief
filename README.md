@@ -42,8 +42,7 @@ docs/index.html (GitHub Pages) + data/YYYY-MM-DD.json (история за backt
 
 4. **Variables** (същото меню → *Variables*):
    - `DASHBOARD_URL` = URL-ът от стъпка 2
-   - `PORTFOLIO_SIZE` = 100000 (или твоята стойност)
-   - `RISK_PER_TRADE_PCT` = 1.0
+   - (размерът на сметката и рискът на сделка НЕ се задават тук — брифът е публичен; те са в настройките на страницата, само в браузъра на читателя)
 
 5. **Workflow permissions.** Settings → Actions → General →
    Workflow permissions → *Read and write* (за commit на docs/ и data/).

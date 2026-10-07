@@ -9,7 +9,7 @@
 Граничните случаи (10.00% / 8.00%, дегенерирани входове, приоритет на причините) са
 СИНТЕТИЧНИ — маркирани като такива. Пускане: python test_stop_plan.py
 """
-import sys, pathlib, tempfile, datetime as dt
+import sys, re, pathlib, tempfile, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -56,22 +56,21 @@ print()
 
 print("── РЕАЛНИ: position_plan_v2 ──")
 p = sizing.position_plan_v2(exel, 1.0, D_JUN)
-max_risk = round(config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100, 0)
 assert p["valid"] and p["method"] == "v2"
 assert (p["buy_stop"], p["max_chase"], p["valid_through"]) == (53.93, 56.63, "2026-07-06")   # 03.07 е празник
 assert (p["stop_loss"], p["stop_capped"], p["struct_stop"], p["risk_pct"]) == (50.39, True, 50.29, 8.0)
 assert p["risk_per_share"] == 4.38 and p["target_1"] == 63.53 and p["entry_mid"] == 54.77
-assert p["shares"] == int(max_risk // 4.38) and p["total_investment"] == round(p["shares"] * 54.77, 0)
+assert p["sizing_factor"] == 1.0 and not any(k in p for k in ("shares", "total_investment", "pct_of_portfolio", "max_risk_usd"))     # 07.10: размерът е в браузъра, не в плана
 assert "таван 8% под входа" in p["stop_basis"] and "(структурният е 8.2%)" in p["stop_basis"]
 pd_ = sizing.position_plan_v2(exel, 0.5, D_JUN)                                           # Defensive ×0.5
-assert pd_["shares"] == int(round(max_risk * 0.5, 0) // 4.38) and pd_["max_risk_usd"] == round(max_risk * 0.5, 0)
+assert pd_["sizing_factor"] == 0.5 and all(pd_[k] == p[k] for k in ("stop_loss", "risk_pct", "target_1", "entry_mid"))   # режимният фактор не мести нивата
 for name, r in (("LNTH", lnth), ("TWLO", twlo), ("AMD", amd)):
     bad = sizing.position_plan_v2(r, 1.0, D_JUN)
     assert not bad["valid"] and "Твърде разтегнато" in bad["reason"], (name, bad)
 assert not sizing.position_plan_v2({**exel, "struct_low": None}, 1.0)["valid"]             # без low → невалиден
 assert not sizing.position_plan_v2({"ticker": "X"}, 1.0)["valid"]                          # без цена/pivot
 print("  ✓ EXEL: buy-stop $53.93, таван $56.63, до 06.07; стоп $50.39 (−8.0%), риск/акция $4.38, цел 1 $63.53,")
-print(f"    {p['shares']} акции при риск ${max_risk:.0f} ({pd_['shares']} при Defensive ×0.5); LNTH/TWLO/AMD → невалиден план")
+print("    режимен фактор 1.0 / 0.5 (нивата не се местят, без брой акции в плана); LNTH/TWLO/AMD → невалиден план")
 print()
 
 print("── СИНТЕТИЧНО: граници на stop_levels (вход $100.00) ──")
@@ -151,13 +150,14 @@ with tempfile.TemporaryDirectory() as tmp:
 vt = action[0]["plan"]["valid_through"]
 assert vt == setup_rules.valid_through(dt.date.today()), vt
 assert "Вход (buy-stop)" in html and "$53.93 · таван $56.63" in html and f"{vt} (5 сесии)" in html
-assert "Stop (таван 8% под входа (структурният е 8.2%))" in html
-assert "(−8.0%)" in html and "Цел 1 (2:1) · 50%" in html and "$63.53" in html
+txt = " ".join(re.sub(r"<[^>]+>", " ", html).split())
+assert "източник на стопа: таван 8% под входа (структурният е 8.2%)" in txt and "$50.39 (−8.0%)" in txt and "Цел 1 (2:1) · 50%" in html and "$63.53" in html
+assert 'data-strategy="canslim" data-entry="54.77" data-stop="50.39"' in html and not any(w in txt for w in ("Брой акции", "Инвестиция", "риск $"))
 assert "риск/акция = цена − $50.39" in html
-assert "Buy-stop $53.93 (таван $56.63)" in email and "Stop $50.39 (−8.0%) · Цел $63.53 (50%)" in email
+assert "Buy-stop $53.93 (таван $56.63)" in email and "Вход ≈ $54.77 · Stop $50.39 (−8.0%)" in email and "Цел $63.53 (50%)" in email and "акции" not in email.split("Action")[1].split("Watchlist")[0]
 assert html.count("Твърде разтегнато") >= 3
 print(f"  ✓ Action картата: 'Вход (buy-stop) $53.93 · таван $56.63', 'Валиден до {vt} (5 сесии)' (от днешната дата), стоп с процент,")
-print("    'Цел 1 (2:1) · 50%'; имейлът: 'Buy-stop $53.93 (таван $56.63) / Stop $50.39 (−8.0%) · Цел $63.53 (50%)'")
+print("    'Цел 1 (2:1) · 50%'; блок с нивата: източник 'таван 8% под входа', стоп $50.39 (−8.0%); имейлът: 'Buy-stop $53.93 (таван $56.63) / Вход ≈ $54.77 · Stop $50.39 (−8.0%) / Цел $63.53 (50%)', без брой акции'")
 
 config.ENABLE_BACKTEST = True
 print()

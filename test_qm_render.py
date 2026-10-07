@@ -115,15 +115,20 @@ order = [m.group(1) for m in re.finditer(r'class="qm-sym">(\w+)', sec)]
 assert order == [c["ticker"] for c in CARDS] == [r["ticker"] for r in sorted(ROWS, key=lambda r: (r["tight"], -r["lead"], r["ticker"]))]
 d = by["DOCN"]
 doc = txt_of(cards_html[0])
-for frag in ("DOCN", f"${d['close']:.2f}", f"Вход над ${d['trigger']:.2f} (+{d['pct_to_trigger']:.1f}%)", f"Стоп ≈ ${d['expected_stop']:.2f} (−{d['expected_risk_pct']:.1f}%)", f"ADR {d['adr']:.1f}%",
-             f"Акции при ${d['risk_usd']:.0f} риск {d['shares']}", f"Предходен ръст +{d['runup_pct']:.0f}%", f"Консолидация {d['base_days']} дни"):
+L = d["levels"]
+for frag in ("DOCN", f"${d['close']:.2f}", f"Вход над ${d['trigger']:.2f} (+{d['pct_to_trigger']:.1f}%)", f"ADR {d['adr']:.1f}%", f"Предходен ръст +{d['runup_pct']:.0f}%", f"Консолидация {d['base_days']} дни",
+             # 07.10 (стоп и размер): стоп за оразмеряване (1×ADR) е главният, очакваният (0.55×ADR) — втори ред; без брой акции
+             f"Стоп за оразмеряване (макс. 1×ADR) ${L['stop']:.2f} (−{L['stop_pct']:.1f}%)", f"Очакван стоп (0.55×ADR) ≈ ${L['expected_stop']:.2f} (−{L['expected_stop_pct']:.1f}%)",
+             "ориентировъчен — реалният стоп е дъното на деня на влизане", "въведи баланса в настройките, за да видиш размера на позицията", "коригирай"):
     assert frag in doc, (frag, doc)
-assert "Ниво на пробива" not in txt and "Очакван стоп" not in txt                                                                  # старият подробен вид го няма
-assert f"максимален (1×ADR) ${d['max_stop']:.2f}" in cards_html[0] and "дълбочина" in cards_html[0] and "от 10 MA" in cards_html[0]    # подробностите са в подсказката (title)
+assert (L["entry"], L["stop"], L["expected_stop"]) == (d["trigger"], d["max_stop"], d["expected_stop"])
+assert all(f'data-strategy="kullamagi" data-entry="{c["trigger"]}" data-stop="{c["levels"]["stop"]}"' in cards_html[i] and 'data-factor="1.0"' in cards_html[i] for i, c in enumerate(CARDS))
+assert "Ниво на пробива" not in txt and "Акции при" not in txt and "брой акции" not in txt.lower() and "риск $" not in txt                  # старият подробен вид и размерът по сметка ги няма
+assert "дълбочина" in cards_html[0] and "от 10 MA" in cards_html[0]                                                                # подробностите за базата са в подсказката (title)
 assert "QM✓" not in doc                                                                                                            # DOCN не е в Watchlist на 05.10
 assert raw.index("Watchlist ·") < raw.index('<section id="qm">') < raw.index('<section id="qm-ep">')
 print(f"  ✓ карти по реда на стягане {order}; DOCN: {doc}")
-print("  ✓ банерът 'Измерване, не препоръка…' е НАД картите; няма старите подробни редове; подробности (максимален стоп, дълбочина, 10/20 MA) — в подсказката; HTML-ът е балансиран")
+print("  ✓ банерът 'Измерване, не препоръка…' е НАД картите; стоп за оразмеряване (макс. 1×ADR) + очакван стоп (0.55×ADR) като втори ред, без брой акции; подробности (дълбочина, 10/20 MA) — в подсказката; HTML-ът е балансиран")
 glb = copy.deepcopy(B05)
 glb["glb_candidates"] = [{"ticker": "ZZZ", "glb_type": "classic", "months_unpenetrated": 40, "price": 10.0, "prior_high": 9.0, "prior_high_month": "2020-01", "tightness": None, "company": "ZZZ", "risk_note": "x"}]   # СИНТЕТИЧНО: GLB кандидат, за да има секция GLB
 glb["qm_breakout"], glb["qm_diag"], glb["qm_ep"] = copy.deepcopy(CARDS), copy.deepcopy(DIAG), copy.deepcopy(EP)
@@ -144,16 +149,18 @@ et = txt_of(esec)
 r = EP["rows"][0]
 assert "Епизодични пивоти (EP) · гапове след новина" in et
 head_row = txt_of(re.search(r"<thead>.*?</thead>", esec, re.S).group(0))
-assert head_row == "Тикър AH гап Новина Ръст 3 м. Стоп лимит и размер", head_row
+assert head_row == "Тикър AH гап Новина Ръст 3 м. Стоп лимит (1×ADR)", head_row
 body_row = txt_of(re.search(r"<tbody>.*?</tbody>", esec, re.S).group(0))
 for frag in ("SYNA", "Synaptics Inc", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.2f} → ${r['ah_price']:.2f}", HL[0]["title"], "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в AH: н/д",
-             f"{r['ret63_pct']:+.0f}%", f"${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)", f"{r['shares']} акции при ${r['risk_usd']:.0f} риск"):
+             f"{r['ret63_pct']:+.0f}%", f"${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)",
+             f"After-hours цена ${r['ah_price']:.2f}" if False else f"after-hours цена ${r['ah_price']:.2f}", f"Стоп за оразмеряване (макс. 1×ADR) ${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)", "въведи баланса в настройките"):
     assert frag in body_row, (frag, body_row)
-assert r["shares"] == 91 and r["risk_usd"] == 500 and r["total_investment"] == round(91 * r["ah_price"])                         # $500 / (122.04 − 116.56) = 91 акции
+assert not any(k in r for k in ("shares", "risk_usd", "total_investment", "pct_of_portfolio")) and "акции при" not in body_row           # 07.10: размерът е в браузъра
+assert (r["levels"]["entry"], r["levels"]["stop"], r["levels"]["strategy"]) == (round(r["ah_price"], 2), r["max_stop"], "kullamagi")    # вход = after-hours цената, стоп = 1×ADR под нея
 assert "Проверката е отварянето (15:30 CEST / 09:30 ET)" in et
 assert "Вчерашният дневник — after-hours срещу отваряне: SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)" in et
 assert "Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%)" in et and "решение за второ пускане — след 4–6 седмици" in et
-print(f"  ✓ колони: {head_row}; SYNA: AH +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), реалното заглавие на Yahoo, 'Придобиване (оферта)', ръст 3 м. {r['ret63_pct']:+.0f}%, стоп лимит ${r['max_stop']:.2f} и {r['shares']} акции при $500 риск")
+print(f"  ✓ колони: {head_row}; SYNA: AH +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), реалното заглавие на Yahoo, 'Придобиване (оферта)', ръст 3 м. {r['ret63_pct']:+.0f}%, стоп лимит ${r['max_stop']:.2f} (1×ADR), вход = after-hours цената; без брой акции")
 print("  ✓ под таблицата: 'Проверката е отварянето…' и 'Вчерашният дневник — SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)' (РЕАЛНО отваряне на 02.10, 14.65%)")
 et0 = txt_of(section(page_raw(brief_with()), "qm-ep"))
 assert "Вчера няма гапове за проверка срещу отварянето" in et0 and "Вчерашният дневник" not in et0
@@ -226,14 +233,15 @@ emt = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", em)))
 assert SURV in emt and "Пробиви по Kullamägi (Breakout)" in emt and "Епизодични пивоти (EP) · гапове след новина" in emt
 assert "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in emt
 for c in CARDS:
-    assert c["ticker"] in emt and f"вход над ${c['trigger']:.2f}" in emt and f"стоп ≈ ${c['expected_stop']:.2f} (−{c['expected_risk_pct']:.1f}%)" in emt and f"{c['shares']} акции при ${c['risk_usd']:.0f} риск" in emt
+    assert c["ticker"] in emt and f"вход над ${c['trigger']:.2f}" in emt and f"стоп (макс. 1×ADR) ${c['levels']['stop']:.2f} (−{c['levels']['stop_pct']:.1f}%)" in emt
+    assert f"очакван стоп (0.55×ADR) ≈ ${c['expected_stop']:.2f}" in emt and "акции при" not in emt
     assert f"ръст +{c['runup_pct']:.0f}% преди базата · консолидация {c['base_days']} дни" in emt and f"ADR {c['adr']:.1f}%" in emt
-assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 · 91 акции" in emt and SUMMARY in emt
+assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 (−4.5%)" in emt and "91 акции" not in emt and SUMMARY in emt
 assert "Проверката е отварянето (15:30 CEST): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
 assert "Измерване: 3 записа · затворени 0 · win rate след 20 затворени" in emt
 assert emt.index("Watchlist:") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
 assert "Qullamaggie сетъпи" not in emt
-print("  ✓ в имейла: веднага след реда Watchlist — 'Пробиви по Kullamägi (Breakout)' (3-те карти: ниво, стоп и %, ADR, акции при $500, ръст, дни консолидация) и 'Епизодични пивоти (EP)' (SYNA: AH гап, заглавие, ръст, стоп и размер; ред за отварянето и вчерашния дневник)")
+print("  ✓ в имейла: веднага след реда Watchlist — 'Пробиви по Kullamägi (Breakout)' (3-те карти: ниво, стоп за оразмеряване и %, ADR, очакван стоп, ръст, дни консолидация; без брой акции) и 'Епизодични пивоти (EP)' (SYNA: AH гап, заглавие, ръст, стоп и %; ред за отварянето и вчерашния дневник)")
 em_q = render.render_email({**brief_with(), "watchlist": [{"ticker": "DOCN"}] + brief_with()["watchlist"]})
 assert re.search(r"DOCN</td>|DOCN<span[^>]*>QM✓", em_q) and "QM✓" in em_q
 em25 = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render.render_email(brief_with(qb=QB25)))))

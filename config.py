@@ -4,9 +4,9 @@
 """
 import os
 
-# ── Портфолио и риск (Секция 3.7) ────────────────────────────────────────
-PORTFOLIO_SIZE = float(os.getenv("PORTFOLIO_SIZE", 100_000))
-RISK_PER_TRADE_PCT = float(os.getenv("RISK_PER_TRADE_PCT", 1.0))   # % от портфолиото
+# ── Риск (Секция 3.7) ────────────────────────────────────────────────────
+# 07.10.2026: размер на сметка и риск на сделка (променливите за тях) ги НЯМА тук, в workflow-а и в публикуваните данни — брифът е публичен (пази го test_no_account_numbers.py). Размерът на позицията се смята
+# в браузъра на читателя от неговите настройки (templates/sizing_core.js, localStorage на устройството); тук остава само публичният режимен фактор (DEFENSIVE_SIZING_FACTOR).
 MIN_REWARD_RISK = 2.0                                              # минимум 2:1
 
 # ── Твърди правила (Секция 8) ────────────────────────────────────────────
@@ -184,8 +184,6 @@ QM_PRICE_MIN = float(os.getenv("QM_PRICE_MIN", 5.0))
 QM_MAX_CARDS = int(os.getenv("QM_MAX_CARDS", 8))                 # най-много карти, подредени по стягане на базата
 QM_EXPECTED_STOP_ADR = float(os.getenv("QM_EXPECTED_STOP_ADR", 0.55))   # очакван стоп = ниво − 0.55×ADR (медианата на (вход − low на деня) в реплея; интерквартилно 0.41–0.71)
 QM_MAX_STOP_ADR = float(os.getenv("QM_MAX_STOP_ADR", 1.0))      # негово: стопът не по-широк от ADR
-QM_RISK_FACTOR = float(os.getenv("QM_RISK_FACTOR", 0.5))         # размер на позицията при ПОЛОВИН риск: PORTFOLIO_SIZE × RISK_PER_TRADE_PCT × 0.5 ($500 при $1000)
-QM_MAX_POSITION_PCT = float(os.getenv("QM_MAX_POSITION_PCT", 30))   # негово: не повече от 30% от сметката в един инструмент за през нощта
 # Изход и книга "qm_breakout" (trade_sim.simulate_qm — същата функция в реплея и в Track Record-а)
 TRACK_QM = os.getenv("TRACK_QM", "1") == "1"
 # Чист старт (по модела на BUYSTOP_TRACK_FROM): книгата qm_breakout приема записи само с дата >= тази (и от snapshot-ите, и от днешния списък). 2026-10-08 = първият бриф след качването

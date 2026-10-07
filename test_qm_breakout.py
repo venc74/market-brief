@@ -133,12 +133,12 @@ row = {"trigger": 151.83, "adr": 7.2}
 lv = q.card_levels(row)
 exp_stop = 151.83 * (1 - 0.55 * 7.2 / 100); mx = 151.83 * (1 - 7.2 / 100)
 assert lv["expected_stop"] == round(exp_stop, 2) == 145.82 and lv["max_stop"] == round(mx, 2) == 140.9 and lv["expected_risk_pct"] == 4.0 and lv["max_risk_pct"] == 7.2
-assert lv["risk_usd"] == config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100 * 0.5 == 500
-assert lv["shares"] == int(500 // (151.83 - exp_stop)) == 83 and lv["total_investment"] == round(83 * 151.83) and lv["shares_at_max_stop"] == int(500 // (151.83 - mx))
-print(f"  ✓ ниво $151.83, ADR 7.2%: очакван стоп $145.82 (−4.0%), максимален $140.90 (−7.2%), риск $500 → 83 акции (${lv['total_investment']:,.0f}, {lv['pct_of_portfolio']}% от портфейла); при максималния стоп — {lv['shares_at_max_stop']} акции")
-cap = q.card_levels({"trigger": 10.0, "adr": 3.0})
-assert cap["shares"] == int(config.PORTFOLIO_SIZE * 0.3 // 10) and cap["capped_by_position_limit"] is True
-print(f"  ✓ ограничение 30% от портфейла: ниво $10, ADR 3% → риск-размерът би бил {int(500 // (10 * 0.55 * 0.03))} акции, ограничено до {cap['shares']} (30% = ${config.PORTFOLIO_SIZE * 0.3:,.0f})")
+assert not any(k in lv for k in ("risk_usd", "shares", "total_investment", "pct_of_portfolio", "shares_at_max_stop", "capped_by_position_limit"))     # 07.10: размерът е в браузъра
+L = lv["levels"]                                                                      # вход = нивото, стоп за оразмеряване = 1×ADR, очакван стоп = 0.55×ADR (втори ред)
+assert (L["entry"], L["stop"], L["stop_pct"], L["adr_pct"], L["strategy"]) == (151.83, 140.9, 7.2, 7.2, "kullamagi") and L["stop"] == lv["max_stop"]
+assert (L["expected_stop"], L["expected_stop_pct"]) == (145.82, 3.96) and L["stop_source_text"] == "стоп за оразмеряване (макс. 1×ADR)" and L["expected_stop_label"] == "очакван стоп (0.55×ADR)"
+assert L["regime_factor"] == 1.0 and L["warnings"] == []
+print("  ✓ ниво $151.83, ADR 7.2%: стоп за оразмеряване $140.90 (−7.2%, 1×ADR), очакван стоп $145.82 (−4.0%, 0.55×ADR) като втори ред; без брой акции в картата")
 
 print()
 print("── РЕАЛНИ данни към 02.10.2026 (8 тикъра, РЕАЛНИ лидерски перцентили от скана на 903 тикъра) ──")
@@ -150,7 +150,8 @@ assert (d["trigger"], c["trigger"], k["trigger"]) == (151.83, 120.51, 298.98)
 assert (round(d["adr"], 1), round(c["adr"], 1), round(k["adr"], 1)) == (7.2, 4.7, 3.2) and (d["base_days"], c["base_days"], k["base_days"]) == (8, 27, 25)
 assert (round(d["runup_pct"]), round(c["runup_pct"]), round(k["runup_pct"])) == (49, 49, 42) and (round(d["pct_to_trigger"], 1), round(c["pct_to_trigger"], 1), round(k["pct_to_trigger"], 1)) == (8.4, 3.7, 3.0)
 assert [round(x["tight"], 2) for x in (d, c, k)] == [0.79, 0.81, 0.86] and all(x["vol_ratio"] < 0.8 for x in (d, c, k))
-assert (d["shares"], c["shares"], k["shares"]) == (83, 160, 95)
+assert (d["levels"]["stop"], c["levels"]["stop"], k["levels"]["stop"]) == (140.91, 114.84, 289.48) and all(x["levels"]["stop"] == x["max_stop"] for x in (d, c, k))     # стоп за оразмеряване = вход × (1 − ADR)
+assert [x["levels"]["stop_pct"] for x in (d, c, k)] == [7.19, 4.71, 3.18] == [round(x["adr"], 2) for x in (d, c, k)] and not any("shares" in x for x in (d, c, k))
 print("  ✓ DOCN (ниво $151.83 +8.4%, ADR 7.2%, ръст +49%, база 8 сесии, tight 0.79), CORT ($120.51 +3.7%, ADR 4.7%, база 27 сесии, 0.81), CRL ($298.98 +3.0%, ADR 3.2%, база 25 сесии, 0.86) — подредени по стягане")
 f = q.compute_features(REAL["PVH"])
 assert q.check_candidate(f, f["n"] - 1, FIX["lead"]["PVH"]) is None and q.check_candidate(f, f["n"] - 1, 0.95) is not None

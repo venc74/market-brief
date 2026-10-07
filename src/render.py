@@ -46,6 +46,20 @@ def berlin_clock(now: dt.datetime | None = None) -> tuple[str, str]:
         return now.astimezone(dt.timezone.utc).strftime("%H:%M"), "UTC"
 
 
+def _asset(name: str) -> str:
+    """Съдържанието на templates/<name> (JS за оразмеряването) — вгражда се в страницата; липсващ файл → празно (страницата работи без оразмеряване)."""
+    try:
+        return (config.ROOT / "templates" / name).read_text(encoding="utf-8")
+    except Exception as e:
+        print(f"[render] липсва templates/{name}: {e}")
+        return ""
+
+
+def _lv_warn_html(lv) -> str:
+    """Предупрежденията от нивата като редове за имейла (само текст)."""
+    return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(w)}</span>' for w in ((lv or {}).get("warnings") or []))
+
+
 def _e(x) -> str:
     """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
     return _html.escape("" if x is None else str(x), quote=True)
@@ -126,11 +140,12 @@ def render_dashboard(brief: dict) -> str:
         superinvestor_status=brief.get("superinvestor_status") or {},
         glb_candidates=brief.get("glb_candidates", []),
         # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)
+        sizing_core_js=_asset("sizing_core.js"), sizing_ui_js=_asset("sizing_ui.js"),      # 07.10: оразмеряването е в браузъра (localStorage), не в брифа
         qm_cards=brief.get("qm_breakout") or [],
         qm_diag=brief.get("qm_diag") or {},
         qm_ep=brief.get("qm_ep") or {},
         qm_adr_min=config.QM_ADR_MIN, qm_trigger_bars=config.QM_TRIGGER_BARS, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
-        qm_max_position_pct=config.QM_MAX_POSITION_PCT, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
+        qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
@@ -196,11 +211,13 @@ def _qm_email_block(brief: dict) -> str:
         elif cards:
             rows = ""
             for c in cards:
+                lv = c.get("levels")
                 name = c.get("company") if c.get("company") and c.get("company") != c["ticker"] else ""
                 rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}{badge if c["ticker"] in ours else ""}'
                          f'{f"<br><span style=font-weight:normal;font-family:Arial;color:#6b7280>{_e(name[:26])}</span>" if name else ""}</td>'
-                         f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}<br><span style="color:#6b7280">стоп ≈ ${c["expected_stop"]:.2f} (−{c["expected_risk_pct"]:.1f}%)</span></td>'
-                         f'<td style="{td}">ADR {c["adr"]:.1f}% · {c["shares"]} акции при ${c["risk_usd"]:.0f} риск<br>'
+                         f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
+                         f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
+                         f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
                          f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span></td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
@@ -219,7 +236,8 @@ def _qm_email_block(brief: dict) -> str:
                 rows = ""
                 for r in eprows:
                     hl = (r.get("headlines") or [{}])[0].get("title") or "не е намерено заглавие"
-                    sz = f" · {r['shares']} акции" if r.get("shares") else ""
+                    lv = r.get("levels") or {}
+                    sz = f" (−{lv['stop_pct']:.1f}%)" if lv.get("stop_pct") else (f" (−{r['max_stop_pct']:.1f}%)" if r.get("max_stop_pct") else "")
                     rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(r["ticker"])}{badge if r["ticker"] in ours else ""}</td>'
                              f'<td style="{td};font-family:monospace;white-space:nowrap">AH +{r["gap_pct"]:.1f}%</td>'
                              f'<td style="{td}">{_e(hl)}<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
@@ -258,15 +276,15 @@ def render_email(brief: dict) -> str:
     rows = ""
     for st in brief["action"]:
         p = st["plan"]
+        lv = st.get("levels")                      # 07.10: вход/стоп/ADR/предупреждения; без брой акции (размерът е в браузъра на читателя)
         # FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop с таван, стоп с процент, цел за 50%
         if p.get("method") == "v2":
             plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
-                        f"Stop ${p['stop_loss']} (−{p['risk_pct']}%) · Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)<br>"
-                        f"{p['shares']} акции (${p['total_investment']:,.0f})")
+                        f"Вход ≈ ${(lv or {}).get('entry', p['entry_mid'])} · Stop ${(lv or {}).get('stop', p['stop_loss'])} (−{(lv or {}).get('stop_pct', p['risk_pct'])}%)<br>"
+                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv))
         else:
             plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
-                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}<br>"
-                        f"{p['shares']} акции (${p['total_investment']:,.0f})")
+                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv))
         mk = "".join(
             f'<span style="display:inline-block;background:#eef2ff;color:#3730a3;'
             f'font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;'

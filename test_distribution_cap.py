@@ -217,13 +217,14 @@ for regime, sizing in (("Offensive", 1.0), (out["regime"], out["sizing_factor"])
     action, watch = brief_main.apply_hard_rules([copy.deepcopy(real), copy.deepcopy(ext)], sizing, regime)
     if regime == "Offensive":
         assert [a["ticker"] for a in action] == ["EXEL", "SYN3"] and not watch
-        risk_off = {a["ticker"]: a["plan"]["max_risk_usd"] for a in action}
+        offensive_plans = {a["ticker"]: a["plan"] for a in action}
+        assert all(a["plan"]["sizing_factor"] == 1.0 and a["levels"]["regime_factor"] == 1.0 for a in action)
     else:
         assert [a["ticker"] for a in action] == ["EXEL"] and [w["ticker"] for w in watch] == ["SYN3"]
         assert watch[0]["ai"]["watchlist_reason_type"] == "regime_block" and "Режим Defensive" in watch[0]["ai"]["watchlist_trigger"]
-        assert action[0]["plan"]["max_risk_usd"] == risk_off["EXEL"] / 2 and action[0]["plan"]["sizing_factor"] == 0.5
+        assert action[0]["plan"]["sizing_factor"] == 0.5 and action[0]["levels"]["regime_factor"] == 0.5 and action[0]["plan"]["stop_loss"] == offensive_plans["EXEL"]["stop_loss"]
 print("  ✓ при Offensive (sizing 1.0): РЕАЛЕН EXEL (+1.56%, 'good') и СИНТЕТИЧЕН +3% → 2 Action; при блока (Defensive, sizing 0.5):")
-print(f"    EXEL остава Action с риск ${risk_off['EXEL'] / 2:,.0f} вместо ${risk_off['EXEL']:,.0f}, +3% отива във Watchlist 'regime_block'")
+print("    EXEL остава Action със същия стоп, но режимен фактор 0.5 вместо 1.0 (размерът е в браузъра), +3% отива във Watchlist 'regime_block'")
 print()
 
 print("── макро промптът и рендерът ──")

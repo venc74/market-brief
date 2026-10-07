@@ -22,6 +22,7 @@ import pandas as pd
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import trade_levels
 
 try:
     import yfinance as yf
@@ -124,21 +125,16 @@ def lead_percentiles(frames: dict[str, pd.DataFrame]) -> dict[str, float]:
 
 
 def card_levels(row: dict) -> dict:
-    """Нивата на картата от числата на кандидата: очакван стоп (медиана ~0.55×ADR под входа), максимален стоп (1×ADR) и размер при половин риск. Чиста функция."""
+    """
+    Нивата на картата от числата на кандидата (чиста функция): очакван стоп (медиана ~0.55×ADR под входа), максимален стоп (1×ADR) и `levels` — вход/стоп за оразмеряване/ADR/етикети за
+    картата (trade_levels.kullamagi_levels). БЕЗ размер на позицията (07.10.2026): брой акции, сума и риск в долари вече не се смятат и не се публикуват — размерът е в браузъра на читателя.
+    """
     trig, a = row["trigger"], row["adr"]
     exp_stop = trig * (1 - config.QM_EXPECTED_STOP_ADR * a / 100)
     max_stop = trig * (1 - config.QM_MAX_STOP_ADR * a / 100)
-    risk_usd = config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100 * config.QM_RISK_FACTOR
-    per_share = trig - exp_stop
-    cap_shares = int(config.PORTFOLIO_SIZE * config.QM_MAX_POSITION_PCT / 100 // trig)
-    shares = min(int(risk_usd // per_share) if per_share > 0 else 0, cap_shares)
-    per_share_max = trig - max_stop
     return {"expected_stop": round(exp_stop, 2), "expected_risk_pct": round(config.QM_EXPECTED_STOP_ADR * a, 1),
             "max_stop": round(max_stop, 2), "max_risk_pct": round(config.QM_MAX_STOP_ADR * a, 1),
-            "risk_usd": round(risk_usd, 0), "shares": shares, "total_investment": round(shares * trig, 0),
-            "pct_of_portfolio": round(shares * trig / config.PORTFOLIO_SIZE * 100, 1), "capped_by_position_limit": bool(shares == cap_shares and shares > 0 and
-                                                                                                                 int(risk_usd // per_share) > cap_shares),
-            "shares_at_max_stop": min(int(risk_usd // per_share_max) if per_share_max > 0 else 0, cap_shares)}
+            "levels": trade_levels.kullamagi_levels(trig, a, stop_adr=config.QM_MAX_STOP_ADR, entry_label="ниво на пробива", expected_adr=config.QM_EXPECTED_STOP_ADR)}
 
 
 def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None = None) -> tuple[list[dict], dict]:

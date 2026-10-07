@@ -27,6 +27,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import setup_rules
+from src import trade_levels
 
 try:
     import yfinance as yf
@@ -146,7 +147,7 @@ def enrich_gappers(rows: list[dict], daily: dict[str, pd.DataFrame]) -> list[dic
     for r in rows:
         d = daily.get(r["ticker"])
         e = {**r, "ret63_pct": None, "adr": None, "dollar_volume": None, "neglect": None, "max_stop": None, "max_stop_pct": None, "liquid": None,
-             "risk_usd": None, "shares": None, "total_investment": None, "pct_of_portfolio": None}
+             "levels": None}
         if d is not None and len(d):
             pos = d.index.searchsorted(pd.Timestamp(r["session"]))
             if pos < len(d) and pd.Timestamp(d.index[pos]).date().isoformat() == r["session"] and pos >= 63:
@@ -162,13 +163,8 @@ def enrich_gappers(rows: list[dict], daily: dict[str, pd.DataFrame]) -> list[dic
                 e["max_stop_pct"] = round(config.QM_EP_STOP_ADR * e["adr"], 1)
                 e["max_stop"] = round(r["ah_price"] * (1 - config.QM_EP_STOP_ADR * e["adr"] / 100), 2)
                 e["liquid"] = bool(e["dollar_volume"] >= config.QM_DOLLAR_VOLUME_MIN and official >= config.QM_PRICE_MIN)
-                # размер при половин риск до стопа лимит (информация, както при breakout картите): риск $ / (after-hours цена − стоп), най-много QM_MAX_POSITION_PCT% от портфейла
-                risk_usd = config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100 * config.QM_RISK_FACTOR
-                per_share = r["ah_price"] - e["max_stop"]
-                cap = int(config.PORTFOLIO_SIZE * config.QM_MAX_POSITION_PCT / 100 // r["ah_price"])
-                shares = min(int(risk_usd // per_share), cap) if per_share > 0 else 0
-                e.update(risk_usd=round(risk_usd), shares=shares, total_investment=round(shares * r["ah_price"]),
-                         pct_of_portfolio=round(shares * r["ah_price"] / config.PORTFOLIO_SIZE * 100, 1))
+                # 07.10.2026: вход = after-hours цената, стоп за оразмеряване = вход × (1 − ADR); размерът на позицията е в браузъра на читателя (не се смята и не се публикува тук)
+                e["levels"] = trade_levels.kullamagi_levels(r["ah_price"], e["adr"], stop_adr=config.QM_EP_STOP_ADR, entry_label="after-hours цена")
         out.append(e)
     return out
 

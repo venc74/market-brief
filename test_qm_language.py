@@ -45,13 +45,15 @@ assert problems("\\n\u041a\u0410\u0422\u0410\u041b\u0418\u0417\u0410\u0422\u041e
 print("  ✓ детекторът хваща кирилско 'АН'/'ЕР' и смесени думи, а истинските български думи и 'Kullamägi' не ги хваща")
 
 # ── 1. кодът ──
-files = {f: (ROOT / f).read_text(encoding="utf-8") for f in ("src/qm_breakout.py", "src/qm_ep.py")}
+files = {f: (ROOT / f).read_text(encoding="utf-8") for f in ("src/qm_breakout.py", "src/qm_ep.py", "src/trade_levels.py", "templates/sizing_core.js", "templates/sizing_ui.js")}      # + 07.10 (стоп и размер)
 for p in sorted(ROOT.glob("test_qm_*.py")):
     if p.name != pathlib.Path(__file__).name:                    # този файл съдържа проверените низове
         files[p.name] = p.read_text(encoding="utf-8")
 tpl = (ROOT / "templates" / "dashboard.html.j2").read_text(encoding="utf-8")
 i0 = tpl.index('<section id="qm">'); i1 = tpl.index("</section>", tpl.index('<section id="qm-ep">')) + len("</section>")
 files["templates/dashboard.html.j2 [qm + qm-ep]"] = tpl[i0:i1]
+m0 = tpl.index("{% macro levels_block"); files["templates/dashboard.html.j2 [levels_block]"] = tpl[m0:tpl.index("{% endmacro %}", m0)]                  # стоп и размер (07.10)
+s0 = tpl.index('<div id="mb-settings"'); files["templates/dashboard.html.j2 [настройки]"] = tpl[s0:tpl.index("</header>", s0) if "</header>" in tpl[s0:] else s0 + 1800]
 from src import render
 files["render._qm_email_block"] = inspect.getsource(render._qm_email_block)
 cfg = (ROOT / "config.py").read_text(encoding="utf-8")
