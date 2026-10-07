@@ -2921,6 +2921,249 @@
     }
    },
    "failed": []
+  },
+  "2026-10-07": {
+   "session_date": "2026-10-07",
+   "fetched_at_utc": "2026-10-07 16:01",
+   "horizon_days": 28,
+   "tickers": {
+    "ZBRA": {
+     "2026-10-16": 894
+    },
+    "ANET": {
+     "2026-10-09": 15794,
+     "2026-10-16": 41961,
+     "2026-10-23": 6292,
+     "2026-10-30": 8210
+    },
+    "AMD": {
+     "2026-10-09": 198264,
+     "2026-10-12": 10511,
+     "2026-10-14": 4099,
+     "2026-10-16": 312961,
+     "2026-10-23": 55933,
+     "2026-10-30": 40404
+    },
+    "AVT": {
+     "2026-10-16": 1454
+    },
+    "NVDA": {
+     "2026-10-09": 840851,
+     "2026-10-12": 60386,
+     "2026-10-14": 21808,
+     "2026-10-16": 1564878,
+     "2026-10-23": 202851,
+     "2026-10-30": 163662
+    },
+    "ARW": {
+     "2026-10-16": 834
+    },
+    "FTNT": {
+     "2026-10-09": 5066,
+     "2026-10-16": 20047,
+     "2026-10-23": 2714,
+     "2026-10-30": 5830
+    },
+    "KEYS": {
+     "2026-10-16": 7960
+    },
+    "NTAP": {
+     "2026-10-16": 13179
+    },
+    "EXPD": {
+     "2026-10-16": 1215
+    },
+    "AMG": {
+     "2026-10-16": 103
+    }
+   },
+   "straddles": {
+    "ZBRA": {
+     "earnings_date": "2026-11-03",
+     "session": "2026-10-07",
+     "spot": 381.67,
+     "after": {
+      "expiry": "2026-11-20",
+      "sessions": 32,
+      "strike": 380.0,
+      "call_mid": 24.95,
+      "call_spread_pct": 16.4,
+      "put_mid": 23.15,
+      "put_spread_pct": 18.6
+     },
+     "before": {
+      "expiry": "2026-10-16",
+      "sessions": 7,
+      "strike": 380.0,
+      "call_mid": 8.45,
+      "call_spread_pct": 34.3,
+      "put_mid": 8.1,
+      "put_spread_pct": 39.5
+     }
+    },
+    "ANET": {
+     "earnings_date": "2026-11-03",
+     "session": "2026-10-07",
+     "spot": 214.41,
+     "after": {
+      "expiry": "2026-11-06",
+      "sessions": 22,
+      "strike": 215.0,
+      "call_mid": 13.275,
+      "call_spread_pct": 4.9,
+      "put_mid": 13.575,
+      "put_spread_pct": 7.7
+     },
+     "before": {
+      "expiry": "2026-10-30",
+      "sessions": 17,
+      "strike": 215.0,
+      "call_mid": 9.05,
+      "call_spread_pct": 6.6,
+      "put_mid": 9.825,
+      "put_spread_pct": 12.7
+     }
+    },
+    "AMD": {
+     "earnings_date": "2026-11-03",
+     "session": "2026-10-07",
+     "spot": 644.86,
+     "after": {
+      "expiry": "2026-11-06",
+      "sessions": 22,
+      "strike": 645.0,
+      "call_mid": 42.1,
+      "call_spread_pct": 1.7,
+      "put_mid": 40.075,
+      "put_spread_pct": 3.6
+     },
+     "before": {
+      "expiry": "2026-10-30",
+      "sessions": 17,
+      "strike": 645.0,
+      "call_mid": 31.425,
+      "call_spread_pct": 3.7,
+      "put_mid": 30.175,
+      "put_spread_pct": 3.8
+     }
+    },
+    "AVT": {
+     "earnings_date": "2026-10-28",
+     "session": "2026-10-07",
+     "spot": 102.85,
+     "after": {
+      "expiry": "2026-11-20",
+      "sessions": 32,
+      "strike": 105.0,
+      "call_mid": 6.25,
+      "call_spread_pct": 8.0,
+      "put_mid": 7.7,
+      "put_spread_pct": 10.4
+     },
+     "before": {
+      "expiry": "2026-10-16",
+      "sessions": 7,
+      "strike": 105.0,
+      "call_mid": 3.0,
+      "call_spread_pct": 86.7,
+      "put_mid": 3.55,
+      "put_spread_pct": 53.5
+     }
+    },
+    "ARW": {
+     "earnings_date": "2026-10-29",
+     "session": "2026-10-07",
+     "spot": 231.77,
+     "after": {
+      "expiry": "2026-11-20",
+      "sessions": 32,
+      "strike": 230.0,
+      "call_mid": 16.8,
+      "call_spread_pct": 13.1,
+      "put_mid": 12.3,
+      "put_spread_pct": 19.5
+     },
+     "before": {
+      "expiry": "2026-10-16",
+      "sessions": 7,
+      "strike": 230.0,
+      "call_mid": 7.6,
+      "call_spread_pct": 39.5,
+      "put_mid": 4.9,
+      "put_spread_pct": 28.6
+     }
+    },
+    "FTNT": {
+     "earnings_date": "2026-10-28",
+     "session": "2026-10-07",
+     "spot": 189.58,
+     "after": {
+      "expiry": "2026-10-30",
+      "sessions": 17,
+      "strike": 190.0,
+      "call_mid": 12.875,
+      "call_spread_pct": 13.6,
+      "put_mid": 13.0,
+      "put_spread_pct": 12.3
+     },
+     "before": {
+      "expiry": "2026-10-23",
+      "sessions": 12,
+      "strike": 185.0,
+      "call_mid": 9.775,
+      "call_spread_pct": 17.9,
+      "put_mid": 4.7,
+      "put_spread_pct": 14.9
+     }
+    },
+    "EXPD": {
+     "earnings_date": "2026-11-03",
+     "session": "2026-10-07",
+     "spot": 191.46,
+     "after": {
+      "expiry": "2026-11-20",
+      "sessions": 32,
+      "strike": 190.0,
+      "call_mid": 8.5,
+      "call_spread_pct": 7.1,
+      "put_mid": 6.6,
+      "put_spread_pct": 18.2
+     },
+     "before": {
+      "expiry": "2026-10-16",
+      "sessions": 7,
+      "strike": 190.0,
+      "call_mid": 3.125,
+      "call_spread_pct": 24.0,
+      "put_mid": 2.075,
+      "put_spread_pct": 41.0
+     }
+    },
+    "AMG": {
+     "earnings_date": "2026-11-02",
+     "session": "2026-10-07",
+     "spot": 373.3,
+     "after": {
+      "expiry": "2026-11-20",
+      "sessions": 32,
+      "strike": 370.0,
+      "call_mid": 24.75,
+      "call_spread_pct": 11.7,
+      "put_mid": 17.55,
+      "put_spread_pct": 16.5
+     },
+     "before": {
+      "expiry": "2026-10-16",
+      "sessions": 7,
+      "strike": 370.0,
+      "call_mid": 9.35,
+      "call_spread_pct": 22.5,
+      "put_mid": 7.35,
+      "put_spread_pct": 20.4
+     }
+    }
+   },
+   "failed": []
   }
  }
 }
