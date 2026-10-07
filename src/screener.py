@@ -57,6 +57,110 @@ def build_universe() -> list[str]:
 # ──────────────────────────────────────────────────────────────────────────
 # Стъпка 1: Технически филтър (върху целия универс)
 # ──────────────────────────────────────────────────────────────────────────
+LAST_RS_SCORES: dict[str, float] = {}      # rs_score на всички тикъри с история в последния technical_screen
+
+# Праговете на RS линията в _evaluate_technicals ("new_high" ≥ 99.9% от 52-седмичния максимум, "near_high" ≥ 97%, иначе "lagging" → кандидатът отпада). Същите стойности ползва
+# explain_exclusion; test_buystop_book_state.py сверява двете върху реални данни, за да не се разминат.
+RS_LINE_NEW_HIGH, RS_LINE_NEAR_HIGH = 0.999, 0.97
+
+_TT_TEXT = {
+    "stage2_price_above_ma150": "цената е под 30-седмичната MA",
+    "stage2_ma150_rising": "30-седмичната MA не расте",
+    "price_above_ma200": "цената е под 200DMA",
+    "ma150_above_ma200": "150DMA не е над 200DMA",
+    "ma200_rising": "200DMA не расте",
+    "ma50_above_ma150_ma200": "50DMA не е над 150/200DMA",
+    "price_above_ma50": "цената е под 50DMA",
+    "above_52w_low": f"цената не е поне {config.TT_MIN_ABOVE_52W_LOW_PCT:g}% над 52-седмичния минимум",
+    "near_52w_high": f"цената е повече от {config.TT_MAX_BELOW_52W_HIGH_PCT:g}% под 52-седмичния максимум",
+}
+
+
+def explain_exclusion(sym: str, df: pd.DataFrame, spy: pd.Series, rs_scores: dict[str, float] | None = None) -> str | None:
+    """
+    Защо тикърът НЕ е в днешния технически списък — първият филтър от _evaluate_technicals (в същия ред), с числата. None = технически филтри преминати (отпадането е по-късно: RS rating,
+    CANSLIM фундаментите или лимитът). Само обяснение за показване (книгата показва "излезе от скрийнъра: …" до реда на жив запис); не решава нищо и не вика мрежа. Пакет 1б, 07.10: EXPD,
+    изпълнен на 05.10, изчезна на 07.10 без следа — RS линията падна от 97.6% на 95.9% от максимума (праг 97%).
+    """
+    try:
+        if df is None or len(df) < 260:
+            return f"по-малко от 260 дневни бара история ({0 if df is None else len(df)})"
+        close, high = df["Close"], df["High"]
+        price = float(close.iloc[-1])
+        if price < config.MIN_PRICE:
+            return f"цена ${price:.2f} под минимума ${config.MIN_PRICE:g}"
+        ma150 = close.rolling(config.WEINSTEIN_MA_WEEKS * 5).mean(); ma50 = close.rolling(50).mean(); ma200 = close.rolling(200).mean()
+        tt = trend_template_checks(price, float(ma50.iloc[-1]), float(ma150.iloc[-1]), float(ma200.iloc[-1]),
+                                   ma150_prev=float(ma150.iloc[-21]), ma200_prev=float(ma200.iloc[-1 - config.TT_MA200_RISING_BARS]),
+                                   high52=float(high.iloc[-252:].max()), low52=float(df["Low"].iloc[-252:].min()))
+        required = list(tt) if config.TREND_TEMPLATE_ENABLED else ["stage2_price_above_ma150", "stage2_ma150_rising"]
+        failed = [k for k in required if not tt[k]]
+        if failed:
+            return "trend template: " + "; ".join(_TT_TEXT[k] for k in failed)
+        rs = (close / spy.reindex(close.index).ffill()).dropna().iloc[-252:]
+        now, top = float(rs.iloc[-1]), float(rs.max())
+        if now < top * RS_LINE_NEAR_HIGH:
+            return f"RS линия {now / top * 100:.1f}% от 52-седмичния максимум < {RS_LINE_NEAR_HIGH * 100:.0f}%"
+        pivot = compute_pivot(high)
+        pct = (price / pivot - 1) * 100
+        if pct < -config.MAX_PCT_BELOW_PIVOT:
+            return f"цената е {abs(pct):.1f}% под pivot ${pivot:.2f} (над допустимите {config.MAX_PCT_BELOW_PIVOT:g}%)"
+        base_high = float(high.iloc[-config.PIVOT_BASE_BARS:].max()); base_low = float(close.iloc[-config.PIVOT_BASE_BARS:].min())
+        depth = (base_high - base_low) / base_high * 100
+        if depth > 35:
+            return f"база с дълбочина {depth:.1f}% (над 35%)"
+        if rs_scores and config.TREND_TEMPLATE_ENABLED and len(rs_scores) >= config.RS_RATING_MIN_UNIVERSE:
+            own = rs_score(close)
+            if own is not None:
+                rating = rs_ratings({**rs_scores, sym: own}).get(sym)
+                if rating is not None and rating < config.RS_RATING_MIN:
+                    return f"RS rating {rating} < {config.RS_RATING_MIN:g}"
+        return None
+    except Exception as e:
+        return f"не може да се обясни ({type(e).__name__})"
+
+
+def _frame_for(data: pd.DataFrame, sym: str, n_tickers: int) -> pd.DataFrame:
+    """Колоните на ЕДИН тикър от резултата на yf.download — при няколко тикъра (тикър, поле); при един yfinance връща ту (тикър, поле), ту плоски колони (зависи от версията)."""
+    if isinstance(data.columns, pd.MultiIndex):
+        if sym in data.columns.get_level_values(0):
+            return data[sym]
+        if sym in data.columns.get_level_values(1):
+            return data.xs(sym, axis=1, level=1)
+        raise KeyError(sym)
+    if n_tickers == 1:
+        return data
+    raise KeyError(sym)
+
+
+def explain_exits(tickers: list[str]) -> dict[str, str]:
+    """
+    {тикър: причина} за тикъри с жив запис в книгата, които ги няма в днешния списък: един SPY + една партида от Yahoo. Технически филтри преминати → отпадане по-късно
+    (CANSLIM фундаменти/лимит); без данни → "няма ценови данни". Graceful: провал на тегленето → {}.
+    """
+    out: dict[str, str] = {}
+    if not tickers:
+        return out
+    try:
+        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
+        if isinstance(spy, pd.DataFrame):
+            spy = spy.iloc[:, 0]
+        spy = spy.dropna()
+        data = yf.download(list(tickers), period="2y", progress=False, auto_adjust=True, group_by="ticker", threads=True)
+        for sym in tickers:
+            try:
+                df = _frame_for(data, sym, len(tickers)).dropna()
+            except Exception:
+                df = None
+            if df is None or not len(df):
+                out[sym] = "няма ценови данни"
+                continue
+            out[sym] = explain_exclusion(sym, df, spy, LAST_RS_SCORES) or "техническите филтри са преминати — отпаднал по-късно (CANSLIM фундаментите или лимитът на финалистите)"
+    except Exception as e:
+        print(f"[screener] причините за излизане от списъка не се смятаха: {type(e).__name__}: {e}")
+    return out
+
+
 def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     """
     Прилага: Weinstein Stage 2 + Minervini trend template (+ RS rating ≥ 70 във втория
@@ -110,6 +214,7 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
         time.sleep(1)  # не дразним Yahoo
 
     LAST_STATUS["with_history"] = len(rs_scores)
+    LAST_RS_SCORES.clear(); LAST_RS_SCORES.update(rs_scores)           # за explain_exclusion: перцентилът на RS rating е спрямо СЪЩИЯ универс на този run
     if universe and not rs_scores:
         LAST_STATUS.update(kind="no_history", reason="нито един тикър от универса не върна ценова история")
         print(f"[screener] ⚠ {LAST_STATUS['reason']} ({LAST_STATUS['batches_failed']} от {LAST_STATUS['batches']} партиди с грешка)")

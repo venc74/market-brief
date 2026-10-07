@@ -117,7 +117,7 @@ src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 tree = ast.parse(src)
 run = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "run")
 calls = [n for n in ast.walk(run) if isinstance(n, ast.Call) and ast.unparse(n.func) == "setup_rules.annotate"]
-assert len(calls) == 1 and [ast.unparse(a) for a in calls[0].args] == ["candidates", "today", "backtest.pending_buystop_by_ticker()"]
+assert len(calls) == 1 and [ast.unparse(a) for a in calls[0].args] == ["candidates", "today", "backtest.live_buystop_by_ticker()"]
 assert src.index("setup_rules.annotate(candidates") < src.index("ai_brief.ticker_narratives(")
 print("  ✓ run(): annotate получава чакащите записи на книгата ПРЕДИ AI синтеза (промптът цитира същия текст)")
 print()

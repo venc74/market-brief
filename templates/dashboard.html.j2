@@ -836,14 +836,19 @@
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
       <p>{{ st.ai.why_now }}</p>
+      {# 07.10: жив запис в книгата, задействан (open/trailing) — картата казва изпълнения сигнал, не "чака пробив" #}
+      {% if not (st.setup and st.setup.triggered) %}
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}
         · pivot ${{ st.pivot }} ({{ "%+.1f"|format(st.pct_from_pivot) }}%)</div>
+      {% endif %}
       {# FIX 2026-10-02 (пакет 1, т.1): код-изчислен сетъп — buy-stop ниво за кандидатите
          под pivot; за останалите (над pivot без обем / extended) — причината от кода #}
       {% if st.setup and st.ai.watchlist_reason_type != 'technical_gate' %}
       <div class="watch-trigger"><b>Сетъп:</b> {{ st.setup.trigger_text }}</div>
       {% endif %}
-      {% if st.setup and st.setup.buy_stop %}
+      {% if st.setup and st.setup.triggered %}
+      <div class="buy-stop" style="color:var(--green)">{{ st.setup.trigger_text }}</div>
+      {% elif st.setup and st.setup.buy_stop %}
       <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ st.setup.valid_through) }}
         · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
@@ -1406,7 +1411,8 @@
         {% for p in bs.live %}
         <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}</td>
           <td>{{ p.entry_date }}</td>
-          <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}</td>
+          <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}
+            {% if p.screener_exit %}<div style="font-size:11.5px;color:var(--yellow)">излезе от скрийнъра: {{ p.screener_exit }}</div>{% endif %}</td>
           <td class="n">${{ p.buy_stop }}</td><td class="n">${{ p.stop_loss }}</td><td class="n">${{ p.target_1 }}</td>
           <td>{{ p.valid_through or "—" }}</td><td>{{ p.regime or "н/д" }}</td></tr>
         {% endfor %}

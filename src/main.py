@@ -314,6 +314,23 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
     return action, watchlist[:10]
 
 
+def _annotate_screener_exits(buystop_summary: dict, present: set) -> None:
+    """
+    Жив запис на buy-stop книгата (pending/open/trailing), чийто тикър го няма в днешния списък, получава "screener_exit" — първият филтър, който го е махнал, с числата
+    ("RS линия 95.9% от 52-седмичния максимум < 97%"); редът в секцията на книгата остава независимо от скрийнъра. Graceful: провал → без причина, редът си стои.
+    """
+    try:
+        rows = [r for r in (buystop_summary or {}).get("live", []) if r.get("ticker") and r["ticker"] not in present]
+        if not rows:
+            return
+        reasons = screener.explain_exits(sorted({r["ticker"] for r in rows}))
+        for r in rows:
+            if r["ticker"] in reasons:
+                r["screener_exit"] = reasons[r["ticker"]]
+    except Exception as e:
+        print(f"[main] причините за излизане от скрийнъра пропуснати: {type(e).__name__}: {e}")
+
+
 def _short_global_context(short_candidates: list[dict], laggards: list[dict], news) -> dict:
     """
     Пакет 4а т.5: AI контекстът "глобално срещу регионално" за секторите на short кандидатите.
@@ -413,7 +430,7 @@ def run() -> dict:
     candidates = enrich(candidates)
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
-    candidates = setup_rules.annotate(candidates, today, backtest.pending_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис в книгата, не нов от днес
+    candidates = setup_rules.annotate(candidates, today, backtest.live_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис / състоянието на задействания, не нов от днес
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
     print("[6/7] AI синтез (Claude API)…")
@@ -625,6 +642,7 @@ def run() -> dict:
     if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
         try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
             backtest_summary["buystop"] = backtest.get_buystop_summary()
+            _annotate_screener_exits(backtest_summary["buystop"], {c.get("ticker") for c in candidates})      # защо жив запис е излязъл от скрийнъра
         except Exception as e:
             print(f"[main] обобщението на buy-stop кандидатите пропуснато: {e}")
     if config.ENABLE_BACKTEST and config.TRACK_QM:

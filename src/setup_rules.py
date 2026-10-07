@@ -181,6 +181,8 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     if not rec or setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
         return setup
     today_iso = (today or dt.date.today()).isoformat() if not isinstance(today, str) else today
+    if rec.get("status") in ("open", "trailing"):
+        return _apply_triggered(setup, rec, today_iso)
     through, start = rec.get("valid_through"), rec.get("entry_date")
     if not through or not start or through < today_iso or start > today_iso:
         return setup
@@ -196,6 +198,30 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
         setup["book_level"] = level
         text += f" Книгата следи ниво ${level:.2f} от {_dm(start)} (записът пази плана от първия ден)."
     setup["trigger_text"] = text
+    return setup
+
+
+def _apply_triggered(setup: dict, rec: dict, today_iso: str) -> dict:
+    """
+    Записът е ЗАДЕЙСТВАН (open / trailing): картата казва какво е станало, а не "чака пробив". setup["triggered"] = True и setup["book"] носят числата за шаблона; trigger_text се пренаписва.
+    Само показване — класификацията и книгата не се променят.
+    """
+    fill, fdate, stop, target, r = rec.get("fill_price"), rec.get("fill_date"), rec.get("stop_loss"), rec.get("target_1"), rec.get("current_r")
+    if not (isinstance(fill, (int, float)) and fdate):
+        return setup
+    parts = [f"✅ Задействан на {_dm(fdate)} по ${fill:.2f} (buy-stop от {_dm(rec['entry_date'])})"]
+    if isinstance(stop, (int, float)):
+        parts.append(f"стоп ${stop:.2f}")
+    if isinstance(target, (int, float)):
+        parts.append(f"цел 2R ${target:.2f}")
+    if rec.get("status") == "trailing":
+        sold = rec.get("target1_hit_date")
+        parts.append(f"частично продадена на 2R{(' (' + _dm(sold) + ')') if sold else ''}, остатъкът е в trailing" + (f" под SMA{rec['trail_ma']}" if rec.get("trail_ma") else ""))
+    if isinstance(r, (int, float)):
+        parts.append(f"текущо {r:+.1f}R")
+    setup.update(triggered=True, book_status=rec["status"], valid_label=None,
+                 book={"fill_date": fdate, "fill_price": fill, "entry_date": rec["entry_date"], "stop_loss": stop, "target_1": target, "current_r": r, "status": rec["status"]},
+                 trigger_text=" · ".join(parts) + " — изпълнен сигнал от книгата, не нов вход.")
     return setup
 
 
