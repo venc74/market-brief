@@ -577,11 +577,15 @@
   </div>
 </section>
 
-{% if watch %}
+{# 08.10: секцията остава и при празен списък (data/watch_list.json) — иначе изчезва мълчаливо и не личи дали е проверена #}
+{% if watch or watch_enabled %}
 <section>
   <h2>🔎 Наблюдавани тикъри · последните 24ч</h2>
   <div class="wm-note">Ръчно поддържан списък (<code>data/watch_list.json</code>) —
     независим от скрийнъра, GLB и COT секциите.</div>
+  {% if not watch %}
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Списъкът е празен — тикъри се добавят в <code>data/watch_list.json</code>; ефектът е видим в следващия дневен бриф.</div>
+  {% endif %}
   <div class="wm-grid">
     {% for w in watch %}
     <div class="wm-card{% if w.quiet %} quiet{% endif %}">

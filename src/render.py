@@ -125,6 +125,7 @@ def render_dashboard(brief: dict) -> str:
         # v2 нови блокове
         theses=brief.get("theses", []),
         watch=brief.get("watch", []),
+        watch_enabled=config.ENABLE_WATCH_MONITOR,           # празен списък ≠ изключен модул: секцията остава с ред
         model_info=brief.get("model_info", {}),
         ai_truncations=brief.get("ai_truncations", []),
         data_warnings=brief.get("data_warnings", []),
