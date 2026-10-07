@@ -1,37 +1,37 @@
 {
- "date": "2026-10-06",
+ "date": "2026-10-07",
  "news": [
   {
-   "headline": "Surge in borrowing costs hits corporate America — junk-rated companies feel Treasury sell-off",
-   "why": "Покачването на доходностите по US Treasuries директно вдига cost of capital за high-yield емитентите, притиска кредитните спредове и сигнализира за по-широко финансово затягане."
+   "headline": "Oil rises as Houthi attacks on Saudi airports and Iranian tanker strikes threaten Hormuz supply",
+   "why": "Ескалацията в Червено море и Ормузкия проток директно засяга петролните доставки и натиска върху цените на суровия петрол, с отражение върху енергийния сектор и инфлационните очаквания."
   },
   {
-   "headline": "French bond contagion fears are rattling the euro near 17-month low",
-   "why": "Предизборна разпродажба на френски ДЦК заплашва да пренесе стреса към целия Eurozone, притиска EUR/USD и повишава риск-премията на европейски активи."
+   "headline": "Gold slips as dollar gains; investors await Fed minutes for rate clues",
+   "why": "Fed minutes са ключов катализатор за посоката на лихвите и очакванията на пазара — движат долара, облигациите и рисковите активи."
   },
   {
-   "headline": "Oil gains as traders weigh Gulf tensions against strong Mideast exports",
-   "why": "Геополитическото напрежение в Персийския залив поддържа bid-а при суровия петрол, което се отразява директно върху инфлационните очаквания и енергийния сектор."
+   "headline": "India's central bank (RBI) hikes rates for first time since 2023 as inflation risks build",
+   "why": "Изненадващо затягане от RBI сигнализира за глобален инфлационен натиск и може да повлияе на emerging market позиционирането и капиталовите потоци."
   },
   {
-   "headline": "Saudi-backed Yemeni forces expel Houthi rebels from areas around key strait",
-   "why": "Промяна в контрола над Баб ел-Мандеб засяга корабоплаването и петролните маршрути — ключов фактор за енергийните цени и shipping сектора."
+   "headline": "Brussels considers broad tax levy on large corporations to avoid singling out US Big Tech",
+   "why": "Регулаторна инициатива на ЕК с потенциален фискален ефект върху мултинационалните компании, включително US tech giants, търгувани на американските борси."
   },
   {
-   "headline": "Trump signs order expanding access to tax-exempt red diesel",
-   "why": "Регулаторна промяна, която намалява данъчната тежест върху дизела за земеделие и строителство — влияе на енергийното търсене, рафинериите и агросектора."
+   "headline": "SpaceX seeks $40 billion financing led by Apollo to buy Nvidia chips",
+   "why": "Мащабна дългова сделка, която потвърждава продължаващото масивно търсене на AI инфраструктура и е бичи сигнал за NVDA и свързания chip сектор."
   },
   {
-   "headline": "Wall Street banks launch record $60bn chip deal for Broadcom and Anthropic",
-   "why": "Рекордният leveraged financing пакет тества апетита за AI-свързан дълг и може да постави ново ниво за корпоративното кредитиране в tech сектора."
+   "headline": "Trump says he is considering suspending federal petrol tax amid surging fuel prices",
+   "why": "Евентуалното суспендиране на федералния данък върху горивата е фискална мярка с пряко влияние върху енергийния сектор, потребителските разходи и инфлацията."
   },
   {
-   "headline": "Cocoa prices climb again as El Niño threatens West African supplies",
-   "why": "Новото поскъпване на какаото натиска маржовете на FMCG производителите и допринася за хранителната инфлация в глобален мащаб."
+   "headline": "Venezuela's Cardon refinery halted after fire",
+   "why": "Спирането на рафинерия в Карадон допълнително стяга предлагането на петрол в момент на вече повишени цени заради геополитическата ескалация."
   },
   {
-   "headline": "India-US trade impasse confirmed by finance minister — little room for 'giving and taking'",
-   "why": "Задълбочаването на търговския застой между двете страни увеличава несигурността за компании с верига на доставки в Южна Азия и може да забави потенциален тарифен relief."
+   "headline": "Vance says Iran must cut enrichment to end war",
+   "why": "Геополитическо изявление на вицепрезидента, което засилва напрежението около Иран и поддържа рисковата премия в петрола и пазарите на суровини."
   }
  ]
 }

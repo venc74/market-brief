@@ -1,5 +1,5 @@
 {
- "date": "2026-10-06",
+ "date": "2026-10-07",
  "rows": [],
  "horizon": [
   {
@@ -35,6 +35,22 @@
    "date_human": "Oct 05, 2026"
   },
   {
+   "ticker": "WQEY",
+   "company": "WISeQey Corp",
+   "date": "2026-10-05",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Oct 05, 2026"
+  },
+  {
+   "ticker": "GPMT",
+   "company": "Granite Point Mortgage Trust Inc.",
+   "date": "2026-10-06",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 06, 2026"
+  },
+  {
    "ticker": "ETHA",
    "company": "iShares Ethereum Trust ETF",
    "date": "2026-10-06",
@@ -61,6 +77,14 @@
   {
    "ticker": "GCDT",
    "company": "Green Circle Decarbonize Technology Limited",
+   "date": "2026-10-07",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Oct 07, 2026"
+  },
+  {
+   "ticker": "SUGP",
+   "company": "SU Group Holdings Limited",
    "date": "2026-10-07",
    "ratio": "1:6",
    "split_type": "reverse",
@@ -118,22 +142,26 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 14,
+  "source_rows": 17,
   "horizon_from": "2026-10-05",
   "horizon_to": "2026-10-23",
-  "in_week": 11,
+  "in_week": 14,
   "dropped_price": [
    "CMND",
    "GUTS",
    "SCNX",
    "VIVK",
+   "GPMT",
    "ITOC",
    "RUBI",
    "GCDT",
+   "SUGP",
    "MGF",
    "MIN"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "WQEY"
+  ],
   "dropped_no_data": [
    "ETHA",
    "DXJ"
