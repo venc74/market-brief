@@ -1,6 +1,7 @@
 """
-Qullamaggie (06.10.2026) · т.6: секцията "Qullamaggie сетъпи" в dashboard-а и в имейла — отделна от Action/Watchlist, с надпис "отделна стратегия — измерване, не препоръка", карти на breakout кандидатите
-(всички полета от заданието), EP наблюдение (без Track Record), блок за книгата qm_breakout (win rate чак след ≥ 20 затворени), банери при провал, стар бриф без ключовете → без секция.
+Qullamaggie (07.10.2026) · две секции веднага след Watchlist и преди GLB — "Пробиви по Kullamägi (Breakout)" (банер "Измерване, не препоръка…", до 8 компактни карти по стягане: тикър, компания, вход, стоп и %,
+ADR, акции при риск $500, предходен ръст, дни консолидация, QM✓ ако е и в Watchlist) и "Епизодични пивоти (EP) · гапове след новина" (таблица: тикър, AH гап, заглавие на новината, ръст за 3 месеца, стоп и
+размер; ред, че проверката е отварянето, и вчерашният дневник AH срещу отваряне); книгата qm_breakout е свита под картите. Същото в имейла (веднага след реда Watchlist). Банери при провал, стар бриф → без секциите.
 
 РЕАЛНО: картите DOCN/CORT/CRL от скана към 02.10.2026 (tests/fixtures/qm_frames_2026-10-02.json); SYNA +15.0% after-hours на 01.10 (5-минутни барове, дневни данни и заглавия от Yahoo, tests/fixtures/qm_ep_2026-10-02.json);
 базовият бриф е РЕАЛНИЯТ от 05.10.2026 (tests/fixtures/brief_2026-10-05.json). Диагностиката на скана (903 тикъра, 892 с история, 167 лидери) е РЕАЛНАТА от скана на целия универс към 02.10. СИНТЕТИЧНО: отговорът на AI за катализатора на SYNA (резюме), записите на книгата с резултати (25 затворени за проверка на прага;
@@ -77,55 +78,107 @@ def section(page):
     return page[i:page.index("</section>", i)]
 
 
-print("── dashboard · карти (РЕАЛНИ към 02.10.2026) ──")
-page = page_of(brief_with())
-sec = section(page)
-txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", sec))
-assert page.count("<section") == page.count("</section>")
+def txt_of(raw_html):
+    """Видимият текст: първо се махат таговете, СЛЕД това се декодират &lt; / &amp; ("< 97%" не бива да се чете като таг)."""
+    return re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", raw_html))).strip()
+
+
+def page_raw(b):
+    return render.render_dashboard(b)
+
+
+def section(raw, sid="qm"):
+    i = raw.index(f'<section id="{sid}">')
+    return raw[i:raw.index("</section>", i)]
+
+
+# РЕАЛНО: вторият EP пуск (бриф от 05.10) разрешава записа на SYNA срещу РЕАЛНОТО отваряне на 02.10 → "вчерашният дневник"
+EP2 = ep.run(TICKERS, dt.date(2026, 10, 5), fetch_5m_fn=lambda u: ({t: m5(t) for t in TICKERS}, {"batches": 1, "batches_failed": 0}), fetch_daily_fn=lambda ts: {t: daily(t) for t in ts},
+             headlines_fn=lambda t, s: [], ai_call=ai, name_lookup=lambda t: t, log_path=pathlib.Path(tmp.name) / "ep_log.json")
+YD = EP2["log"]["yesterday"]
+assert [(y["ticker"], y["gap_session"], y["ah_gap_pct"], y["open_gap_pct"], y["held"]) for y in YD] == [("SYNA", "2026-10-02", 14.97, 14.65, True)]
+EP_Y = {**EP, "log": EP2["log"]}                                                                                       # редовете на сутрешния бриф от 02.10 + дневникът, разрешен на 05.10
+
+
+print("── Breakout: секция, позиция, банер, компактни карти (РЕАЛНИ към 02.10.2026) ──")
+raw = page_raw(brief_with(ep_out=EP_Y))
+sec = section(raw)
+txt = txt_of(sec)
+assert raw.count("<section") == raw.count("</section>")
 SURV = "Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима."
-assert SURV in txt
-assert "отделна стратегия — измерване, не препоръка" in txt.lower() and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in txt
+assert "Пробиви по Kullamägi (Breakout)" in txt and txt.index(SURV) < txt.index("DOCN") and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in txt
+assert "Qullamaggie сетъпи" not in txt_of(raw.split("</style>", 1)[1])                                                          # старото заглавие го няма
 by = {c["ticker"]: c for c in CARDS}
-d = by["DOCN"]
-for frag in ("DOCN", f"Ниво на пробива ${d['trigger']:.2f} · +{d['pct_to_trigger']:.1f}% до него", f"ADR {d['adr']:.1f}%", f"ръст преди базата +{d['runup_pct']:.0f}%", f"База {d['base_days']} сесии",
-             f"дълбочина {d['depth_pct']:.1f}%", f"Цена спрямо 10 MA {d['vs_sma10_pct']:+.1f}% · 20 MA {d['vs_sma20_pct']:+.1f}%", f"Очакван стоп ≈ ${d['expected_stop']:.2f}", f"максимален ${d['max_stop']:.2f}",
-             "0.55×ADR", "1×ADR", "При половин риск ($500)", f"{d['shares']} акции", f"${d['total_investment']:,.0f}", f"{d['shares_at_max_stop']} акции при максималния"):
-    assert frag in txt, frag
-assert txt.count("Ниво на пробива") == 3 and txt.index("Ниво на пробива") < txt.index("Episodic Pivot")
-order = [m.group(1) for m in re.finditer(r'class="qm-sym">(\w+)<', sec)]
+cards_html = re.findall(r'<div class="qm-card[^"]*">.*?(?=<div class="qm-card|</div>\s*<div class="small")', sec, re.S)
+assert len(cards_html) == 3
+order = [m.group(1) for m in re.finditer(r'class="qm-sym">(\w+)', sec)]
 assert order == [c["ticker"] for c in CARDS] == [r["ticker"] for r in sorted(ROWS, key=lambda r: (r["tight"], -r["lead"], r["ticker"]))]
-print(f"  ✓ 3 карти по реда на стягане {order}; всяка с ниво и % до него, ADR, ръст преди базата, дължина/дълбочина на базата, позиция спрямо 10/20 MA, очакван и максимален стоп, размер при половин риск ($500); DOCN: "
-      f"ниво ${d['trigger']:.2f} (+{d['pct_to_trigger']:.1f}%), ADR {d['adr']:.1f}%, стоп ≈ ${d['expected_stop']:.2f} / ${d['max_stop']:.2f}, {d['shares']} акции")
-assert page.index('id="qm"') > page.index("Action") and "Watchlist" in page
-print("  ✓ собствена секция (id=qm), с банер 'отделна стратегия — измерване, не препоръка' и бележката за opening range high / low of day; HTML-ът е балансиран")
+d = by["DOCN"]
+doc = txt_of(cards_html[0])
+for frag in ("DOCN", f"${d['close']:.2f}", f"Вход над ${d['trigger']:.2f} (+{d['pct_to_trigger']:.1f}%)", f"Стоп ≈ ${d['expected_stop']:.2f} (−{d['expected_risk_pct']:.1f}%)", f"ADR {d['adr']:.1f}%",
+             f"Акции при ${d['risk_usd']:.0f} риск {d['shares']}", f"Предходен ръст +{d['runup_pct']:.0f}%", f"Консолидация {d['base_days']} дни"):
+    assert frag in doc, (frag, doc)
+assert "Ниво на пробива" not in txt and "Очакван стоп" not in txt                                                                  # старият подробен вид го няма
+assert f"максимален (1×ADR) ${d['max_stop']:.2f}" in cards_html[0] and "дълбочина" in cards_html[0] and "от 10 MA" in cards_html[0]    # подробностите са в подсказката (title)
+assert "QM✓" not in doc                                                                                                            # DOCN не е в Watchlist на 05.10
+assert raw.index("Watchlist ·") < raw.index('<section id="qm">') < raw.index('<section id="qm-ep">')
+print(f"  ✓ карти по реда на стягане {order}; DOCN: {doc}")
+print("  ✓ банерът 'Измерване, не препоръка…' е НАД картите; няма старите подробни редове; подробности (максимален стоп, дълбочина, 10/20 MA) — в подсказката; HTML-ът е балансиран")
+glb = copy.deepcopy(B05)
+glb["glb_candidates"] = [{"ticker": "ZZZ", "glb_type": "classic", "months_unpenetrated": 40, "price": 10.0, "prior_high": 9.0, "prior_high_month": "2020-01", "tightness": None, "company": "ZZZ", "risk_note": "x"}]   # СИНТЕТИЧНО: GLB кандидат, за да има секция GLB
+glb["qm_breakout"], glb["qm_diag"], glb["qm_ep"] = copy.deepcopy(CARDS), copy.deepcopy(DIAG), copy.deepcopy(EP)
+gp = page_raw(glb)
+assert gp.index("Watchlist ·") < gp.index('<section id="qm">') < gp.index('<section id="qm-ep">') < gp.index("GLB Watchlist")
+print("  ✓ позиция: веднага след Watchlist и ПРЕДИ GLB Watchlist (СИНТЕТИЧЕН GLB кандидат върху реалния бриф от 05.10)")
+mal = brief_with()
+mal["watchlist"] = [{**mal["watchlist"][0], "ticker": "DOCN"}] + mal["watchlist"][1:]                                              # СИНТЕТИЧНО: DOCN е на нашата Watchlist
+mp = section(page_raw(mal))
+mc = re.findall(r'<div class="qm-card[^"]*">.*?(?=<div class="qm-card|</div>\s*<div class="small")', mp, re.S)
+assert "QM✓" in mc[0] and "QM✓" not in mc[1] and "QM✓" not in mc[2]
+print("  ✓ QM✓ на картата само за тикъра, който е и в Watchlist/Action (СИНТЕТИЧНО: DOCN подменен като Watchlist карта)")
 
 print()
-print("── dashboard · EP наблюдение (РЕАЛНО: SYNA 01.10; СИНТЕТИЧНО: резюмето на AI) ──")
-assert "Episodic Pivot — наблюдение (без Track Record)" in txt and "Обемът в after-hours не е наличен" in txt
+print("── EP: таблица, ред за отварянето и вчерашният дневник (РЕАЛНО: SYNA; СИНТЕТИЧНО: резюмето на AI) ──")
+esec = section(raw, "qm-ep")
+et = txt_of(esec)
 r = EP["rows"][0]
-for frag in ("SYNA", "Synaptics Inc", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.2f} → ${r['ah_price']:.2f}", f"{r['ret63_pct']:+.0f}%", f"{r['adr']:.1f}%", f"${r['max_stop']:.2f}", f"−{r['max_stop_pct']:.1f}%".replace("−", "-") if False else f"{r['max_stop_pct']:.1f}%",
-             "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в after-hours: н/д", "≤1×ADR", "сесия 01.10"):
-    assert frag in txt, frag
-assert sum(1 for h in HL[:2] if h["title"] in txt) == 2
-assert "Дневник за решение след 4–6 седмици" in txt and "записи 1, разрешени 0" in txt
-print(f"  ✓ SYNA: +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), ръст 3 м. {r['ret63_pct']:+.0f}%, ADR {r['adr']:.1f}%, стоп лимит ${r['max_stop']:.2f}, катализатор 'Придобиване (оферта)'; "
-      "обемът е н/д; 2 заглавия; дневникът: 1 запис")
+assert "Епизодични пивоти (EP) · гапове след новина" in et
+head_row = txt_of(re.search(r"<thead>.*?</thead>", esec, re.S).group(0))
+assert head_row == "Тикър AH гап Новина Ръст 3 м. Стоп лимит и размер", head_row
+body_row = txt_of(re.search(r"<tbody>.*?</tbody>", esec, re.S).group(0))
+for frag in ("SYNA", "Synaptics Inc", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.2f} → ${r['ah_price']:.2f}", HL[0]["title"], "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в AH: н/д",
+             f"{r['ret63_pct']:+.0f}%", f"${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)", f"{r['shares']} акции при ${r['risk_usd']:.0f} риск"):
+    assert frag in body_row, (frag, body_row)
+assert r["shares"] == 91 and r["risk_usd"] == 500 and r["total_investment"] == round(91 * r["ah_price"])                         # $500 / (122.04 − 116.56) = 91 акции
+assert "Проверката е отварянето (15:30 CEST / 09:30 ET)" in et
+assert "Вчерашният дневник — after-hours срещу отваряне: SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)" in et
+assert "Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%)" in et and "решение за второ пускане — след 4–6 седмици" in et
+print(f"  ✓ колони: {head_row}; SYNA: AH +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), реалното заглавие на Yahoo, 'Придобиване (оферта)', ръст 3 м. {r['ret63_pct']:+.0f}%, стоп лимит ${r['max_stop']:.2f} и {r['shares']} акции при $500 риск")
+print("  ✓ под таблицата: 'Проверката е отварянето…' и 'Вчерашният дневник — SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)' (РЕАЛНО отваряне на 02.10, 14.65%)")
+et0 = txt_of(section(page_raw(brief_with()), "qm-ep"))
+assert "Вчера няма гапове за проверка срещу отварянето" in et0 and "Вчерашният дневник" not in et0
 ep_empty = {**EP, "rows": [], "not_neglected": [{"ticker": "ABCD", "gap_pct": 12.3, "ret63_pct": 55.0, "why": "ръст 55% за 3 месеца > 20%"}]}
-txt2 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(ep_out=ep_empty)))))
-assert "няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри" in txt2 and "ABCD +12.3%" in txt2 and "ръст 55% за 3 месеца > 20%" in txt2
+t2 = txt_of(section(page_raw(brief_with(ep_out=ep_empty)), "qm-ep"))
+assert "няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри" in t2 and "ABCD +12.3%" in t2 and "ръст 55% за 3 месеца > 20%" in t2
 ep_fail = {"ok": False, "rows": [], "notes": ["RuntimeError: Yahoo"], "diag": {}, "log": {}, "not_neglected": []}
-txt3 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(ep_out=ep_fail)))))
-assert "Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове" in txt3 and "няма after-hours гапове" not in txt3
-print("  ✓ без 'пренебрегнати' гапове: 'няма …' + другите гапове с причина; провал на наблюдението → 'празният списък НЕ значи, че няма гапове'")
+t3 = txt_of(section(page_raw(brief_with(ep_out=ep_fail)), "qm-ep"))
+assert "Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове" in t3 and "няма after-hours гапове" not in t3
+nohl = copy.deepcopy(EP); nohl["rows"][0]["headlines"] = []
+assert "не е намерено заглавие" in txt_of(section(page_raw(brief_with(ep_out=nohl)), "qm-ep"))
+print("  ✓ без 'пренебрегнати' гапове: 'няма …' + другите гапове с причина; провал → 'празният списък НЕ значи …'; без заглавие → 'не е намерено заглавие'")
+assert 'id="qm-ep"' not in page_raw(brief_with(ep_out={})) and 'id="qm"' in page_raw(brief_with(ep_out={}))
+print("  ✓ при ENABLE_QM_EP=0 (празен qm_ep) секцията EP липсва, Breakout остава")
 
 print()
-print("── dashboard · книгата qm_breakout ──")
-assert "Измерване — книга qm_breakout (отделна от Action и buy-stop)" in txt and "две граници" in txt and "opt" in txt and "pess" in txt
+print("── книгата qm_breakout (свита под картите) ──")
+assert '<details class="qm-book"' in sec
+sm = txt_of(re.search(r"<summary.*?</summary>", sec, re.S).group(0))
+assert sm == "Измерване — книга qm_breakout: записани 3 · затворени 0 · win rate след 20 затворени", sm
 assert "Записани: 3" in txt and "чакат вход 3" in txt and "Win rate се показва след 20 затворени (сега 0)" in txt and "Win rate:" not in txt
-assert "Чакащи и отворени (3)" in txt and "$151.83" in txt and "Defensive" in txt
+assert "Чакащи и отворени (3)" in txt and "$151.83" in txt and "Defensive" in txt and "две граници" in txt
 for u in ("qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/", "qullamaggie.com/how-to-master-a-setup-episodic-pivots/", "qullamaggie.com/faq/"):
     assert u in sec
-print("  ✓ 3 реални чакащи записа (DOCN, CORT, CRL — режим Defensive): 'Win rate се показва след 20 затворени (сега 0)'; таблица със нивата; линкове към qullamaggie.com")
+print("  ✓ <details> със заглавен ред 'записани 3 · затворени 0 · win rate след 20 затворени'; вътре — таблицата на 3-те реални чакащи записа, двете граници, линковете към qullamaggie.com")
 tr25 = {}
 for i in range(25):                                                                                                # СИНТЕТИЧНО: 25 затворени записа, 7 печеливши
     rr = 3.0 if i < 7 else -1.0
@@ -135,65 +188,66 @@ for i in range(25):                                                             
 backtest._save_tracker(tr25)
 QB25 = backtest.get_qm_summary()
 assert QB25["stats_visible"] and QB25["closed"] == 25
-t25 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(qb=QB25)))))
-assert "Win rate: 28.0% opt / 28.0% pess (7 win / 18 loss; 95% интервал" in t25 and "медиана R -1.00 / -1.00" in t25 and "Спрямо SPY (същите периоди, 25 затворени)" in t25 and "Win rate се показва след" not in t25
-assert "Последни затворени (10)" in t25 and "opt /" in t25
-print("  ✓ СИНТЕТИЧНИ 25 затворени: 'Win rate: 28.0% opt / 28.0% pess (7 win / 18 loss; 95% интервал …)', медиана, SPY, последни затворени; при 0 затворени (по-горе) win rate го няма")
+s25 = section(page_raw(brief_with(qb=QB25)))
+t25 = txt_of(s25)
+assert txt_of(re.search(r"<summary.*?</summary>", s25, re.S).group(0)) == "Измерване — книга qm_breakout: записани 25 · затворени 25 · win rate 28.0%"
+assert "Win rate: 28.0% opt / 28.0% pess (7 win / 18 loss; 95% интервал" in t25 and "медиана R -1.00 / -1.00" in t25 and "Спрямо SPY (същите периоди, 25 затворени)" in t25 and "Последни затворени (10)" in t25
+print("  ✓ СИНТЕТИЧНИ 25 затворени: заглавният ред казва 'win rate 28.0%', вътре — интервал, медиана, SPY, последни затворени")
 QB19 = copy.deepcopy(QB25); QB19.update(closed=19, stats_visible=False, win_rate_pct=None, win_rate_pess_pct=None, win_ci_pct=None, median_realized_r=None, median_realized_r_pess=None, spy_compare=None, wins=None, losses=None, big_winners_5r=None)
 for g in QB19["by_regime"].values():
     g["avg_r"] = None
-t19 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(qb=QB19)))))
-assert "Win rate се показва след 20 затворени (сега 19)" in t19 and "Затворени: 19 · среден R:" in t19 and "Win rate:" not in t19
+t19 = txt_of(section(page_raw(brief_with(qb=QB19))))
+assert "Win rate се показва след 20 затворени (сега 19)" in t19 and "Win rate:" not in t19
 
 print()
 print("── банери, празни състояния и стар бриф ──")
-tf = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(cards=[], diag={"ok": False, "error": "RuntimeError: мрежата падна", "candidates": 0, "shown": 0})))))
-assert "Скенерът не се изпълни (RuntimeError: мрежата падна) — празният списък НЕ значи, че няма кандидати за пробив" in tf and "Ниво на пробива" not in tf
-te = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(cards=[], diag={**DIAG, "candidates": 0, "shown": 0})))))
+tf = txt_of(section(page_raw(brief_with(cards=[], diag={"ok": False, "error": "RuntimeError: мрежата падна", "candidates": 0, "shown": 0}))))
+assert "Скенерът не се изпълни (RuntimeError: мрежата падна) — празният списък НЕ значи, че няма кандидати за пробив" in tf and "Вход над" not in tf
+te = txt_of(section(page_raw(brief_with(cards=[], diag={**DIAG, "candidates": 0, "shown": 0}))))
 assert "няма кандидати днес (проверени 892 тикъра)" in te
-tm = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section(page_of(brief_with(diag={**DIAG, "candidates": 11, "shown": 8})))))
-assert "кандидати: 11, показани най-стегнатите 3" in tm and "(3 от 11)" in tm
-assert "Лидери: горните 10% по ръст за 1, 3 и 6 месеца (167 от 892 тикъра с история към 02.10) · кандидати: 3." in txt
-old = page_of(copy.deepcopy(B05))
-old_body = old.split("</style>", 1)[1]                                                                                # CSS коментарът е в <style>; секцията — в тялото
-assert "Qullamaggie" not in old_body and 'id="qm"' not in old_body and "qm-card" not in old_body and old.count("<section") == old.count("</section>")
-print("  ✓ провал на скенера → 'празният списък НЕ значи …'; 0 кандидати → 'няма кандидати днес (проверени 892 тикъра)'; повече от показаните → '(3 от 11)'; РЕАЛНИЯТ бриф от 05.10 без ключовете → страницата е без секцията")
-mal = brief_with()
-mal["watchlist"] = [{**mal["watchlist"][0], "ticker": "DOCN"}] + mal["watchlist"][1:]
-page_m = page_of(mal)
-assert "✓ и в Action/Watchlist — маркер QM✓" in section(page_m)
-print("  ✓ карта, чийто тикър е и на нашата CANSLIM карта → 'и в Action/Watchlist — маркер QM✓' (СИНТЕТИЧНО: DOCN е подменен като Watchlist карта)")
-xss = brief_with()
+tm = txt_of(section(page_raw(brief_with(diag={**DIAG, "candidates": 11, "shown": 8}))))
+assert "кандидати 11, показани 3" in tm
+assert "Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (167 от 892 тикъра към 02.10), кандидати 3." in txt
+old = page_raw(copy.deepcopy(B05))
+old_body = old.split("</style>", 1)[1]                                                                                # CSS коментарът е в <style>; секциите — в тялото
+assert "Kullamägi" not in old_body and 'id="qm"' not in old_body and 'id="qm-ep"' not in old_body and "qm-card" not in old_body and old.count("<section") == old.count("</section>")
+print("  ✓ провал на скенера → 'празният списък НЕ значи …'; 0 кандидати → 'няма кандидати днес (проверени 892 тикъра)'; повече от показаните → 'кандидати 11, показани 3'; РЕАЛНИЯТ бриф от 05.10 без ключовете → без секциите")
+xss = brief_with(ep_out=EP_Y)
 xss["qm_ep"]["rows"][0]["summary_bg"] = '<script>alert(1)</script> "x"'                                           # СИНТЕТИЧНО: злонамерен текст в AI резюме
 xss["qm_ep"]["rows"][0]["headlines"] = [{"title": "<img src=x onerror=alert(1)>", "published": "2026-10-01"}]
-raw = render.render_dashboard(xss)
-assert "<script>alert(1)</script>" not in raw and "<img src=x" not in raw and "&lt;script&gt;" in raw
+rawx = page_raw(xss)
+assert "<script>alert(1)</script>" not in rawx and "<img src=x" not in rawx and "&lt;script&gt;" in rawx
 print("  ✓ escape: <script> и <img onerror> в резюмето/заглавията излизат като текст")
 
 print()
 print("── имейл ──")
-em = render.render_email(brief_with())
+em = render.render_email(brief_with(ep_out=EP_Y))
 emt = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", em)))
-assert SURV in emt
-assert "Qullamaggie сетъпи" in emt and "Отделна стратегия — измерване, не препоръка." in emt and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in emt
+assert SURV in emt and "Пробиви по Kullamägi (Breakout)" in emt and "Епизодични пивоти (EP) · гапове след новина" in emt
+assert "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in emt
 for c in CARDS:
-    assert c["ticker"] in emt and f"ниво ${c['trigger']:.2f}" in emt and f"+{c['pct_to_trigger']:.1f}% до него" in emt and f"стоп ≈ ${c['expected_stop']:.2f}, макс. ${c['max_stop']:.2f}" in emt
-assert "SYNA +15.0% after-hours (ръст 3 м. -11%, ADR 4.5%, стоп лимит $116.56)" in emt and "Придобиване (оферта)" in emt and SUMMARY in emt and "обемът в after-hours не е наличен" in emt
+    assert c["ticker"] in emt and f"вход над ${c['trigger']:.2f}" in emt and f"стоп ≈ ${c['expected_stop']:.2f} (−{c['expected_risk_pct']:.1f}%)" in emt and f"{c['shares']} акции при ${c['risk_usd']:.0f} риск" in emt
+    assert f"ръст +{c['runup_pct']:.0f}% преди базата · консолидация {c['base_days']} дни" in emt and f"ADR {c['adr']:.1f}%" in emt
+assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 · 91 акции" in emt and SUMMARY in emt
+assert "Проверката е отварянето (15:30 CEST): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
 assert "Измерване: 3 записа · затворени 0 · win rate след 20 затворени" in emt
-assert emt.index("Qullamaggie сетъпи") > emt.index("Action ·") and emt.index("Qullamaggie сетъпи") < emt.index("Отвори пълния dashboard")
-print("  ✓ блок 'Qullamaggie сетъпи' между Action/Watchlist и бутона: надписът, бележката, 3-те карти с ниво/стоп/размер, EP редът на SYNA, ред за книгата ('win rate след 20 затворени')")
+assert emt.index("Watchlist:") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
+assert "Qullamaggie сетъпи" not in emt
+print("  ✓ в имейла: веднага след реда Watchlist — 'Пробиви по Kullamägi (Breakout)' (3-те карти: ниво, стоп и %, ADR, акции при $500, ръст, дни консолидация) и 'Епизодични пивоти (EP)' (SYNA: AH гап, заглавие, ръст, стоп и размер; ред за отварянето и вчерашния дневник)")
+em_q = render.render_email({**brief_with(), "watchlist": [{"ticker": "DOCN"}] + brief_with()["watchlist"]})
+assert re.search(r"DOCN</td>|DOCN<span[^>]*>QM✓", em_q) and "QM✓" in em_q
 em25 = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render.render_email(brief_with(qb=QB25)))))
 assert "Измерване: 25 записа · затворени 25 · среден R" in em25 and "win rate 28.0% opt / 28.0% pess" in em25
 em_old = render.render_email(copy.deepcopy(B05))
-assert "Qullamaggie" not in em_old
+assert "Kullamägi" not in em_old
 bad = brief_with(); bad["qm_breakout"] = [{"ticker": "X"}]                                                          # повреден ред → блокът отпада, имейлът се рендерира
 em_bad = render.render_email(bad)
-assert "Отвори пълния dashboard" in em_bad and "Qullamaggie сетъпи" not in em_bad
+assert "Отвори пълния dashboard" in em_bad and "Пробиви по Kullamägi" not in em_bad
 em_fail = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render.render_email(brief_with(cards=[], diag={"ok": False, "error": "x"})))))
 assert "Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив." in em_fail
 em_xss = render.render_email(xss)
 assert "<script>alert(1)</script>" not in em_xss and "&lt;script&gt;" in em_xss
-print("  ✓ при 25 затворени се показва win rate; стар бриф → без блока; повреден ред → блокът отпада, имейлът остава цял; провал на скенера → предупреждение; escape на външния текст")
+print("  ✓ QM✓ в имейла за тикър от Watchlist; при 25 затворени се показва win rate; стар бриф → без блока; повреден ред → блокът отпада, имейлът остава цял; провал на скенера → предупреждение; escape")
 
 print()
 print("Всички тестове минаха.")

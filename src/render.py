@@ -129,7 +129,7 @@ def render_dashboard(brief: dict) -> str:
         qm_cards=brief.get("qm_breakout") or [],
         qm_diag=brief.get("qm_diag") or {},
         qm_ep=brief.get("qm_ep") or {},
-        qm_adr_min=config.QM_ADR_MIN, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
+        qm_adr_min=config.QM_ADR_MIN, qm_trigger_bars=config.QM_TRIGGER_BARS, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
         qm_max_position_pct=config.QM_MAX_POSITION_PCT, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
@@ -175,44 +175,67 @@ def _split_when(s: dict) -> str:
 
 def _qm_email_block(brief: dict) -> str:
     """
-    Qullamaggie: компактен блок за имейла (отделна стратегия — измерване, не препоръка): най-много QM_MAX_CARDS кандидата с нивата, EP наблюдението (само реални редове) и един ред за книгата.
-    Старите брифове без ключовете → "". Всяка грешка → "" (имейлът никога не пада заради този блок).
+    Qullamaggie за имейла: две подсекции веднага след реда "Watchlist" — "Пробиви по Kullamägi (Breakout)" (най-много QM_MAX_CARDS по стягане: тикър, компания, ниво за вход, стоп и %, ADR, акции при риск,
+    предходен ръст, дни консолидация, QM✓ ако е и в Action/Watchlist) и "Епизодични пивоти (EP) · гапове след новина" (тикър, AH гап, заглавие на новината, ръст за 3 месеца, стоп лимит и размер; ред, че
+    проверката е отварянето, и вчерашният дневник AH срещу отваряне). Отделна стратегия — измерване, не препоръка. Старите брифове без ключовете → "". Всяка грешка → "" (имейлът не пада заради този блок).
     """
     try:
         cards, diag, ep = brief.get("qm_breakout") or [], brief.get("qm_diag") or {}, brief.get("qm_ep") or {}
         qb = (brief.get("backtest") or {}).get("qm_breakout") or {}
-        if not (cards or diag or ep.get("rows") or ep.get("not_neglected") or (qb and qb.get("enabled"))):
+        if not (cards or diag or ep.get("rows") or ep.get("not_neglected") or ep.get("log") or (qb and qb.get("enabled"))):
             return ""
+        ours = {c.get("ticker") for c in (brief.get("action") or []) + (brief.get("watchlist") or [])}
         td = "padding:6px 8px;border-bottom:1px solid #f3f4f6;font-size:12.5px;vertical-align:top"
-        body = ""
+        head = lambda txt: (f'<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;font-weight:bold;margin:{{m}}px 0 4px">{txt}</div>')
+        badge = ('<span style="display:inline-block;background:#eef2ff;color:#3730a3;font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;margin-left:4px">QM✓</span>')
+        body = head("Пробиви по Kullamägi (Breakout)").replace("{m}", "0")
+        body += ('<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. '
+                 'Алфата не е статистически значима.</b> Отделна стратегия. Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>')
         if diag.get("ok") is False:
-            body += (f'<div style="color:#991b1b;font-size:12.5px">Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив.</div>')
+            body += '<div style="color:#991b1b;font-size:12.5px">Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив.</div>'
         elif cards:
             rows = ""
             for c in cards:
-                rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}</td>'
-                         f'<td style="{td};font-family:monospace;white-space:nowrap">ниво ${c["trigger"]:.2f}<br><span style="color:#6b7280">+{c["pct_to_trigger"]:.1f}% до него</span></td>'
-                         f'<td style="{td}">ADR {c["adr"]:.1f}% · ръст +{c["runup_pct"]:.0f}% · база {c["base_days"]} сесии ({c["depth_pct"]:.0f}%)<br>'
-                         f'<span style="color:#6b7280">стоп ≈ ${c["expected_stop"]:.2f}, макс. ${c["max_stop"]:.2f} · {c["shares"]} акции при ${c["risk_usd"]:.0f} риск</span></td></tr>')
+                name = c.get("company") if c.get("company") and c.get("company") != c["ticker"] else ""
+                rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}{badge if c["ticker"] in ours else ""}'
+                         f'{f"<br><span style=font-weight:normal;font-family:Arial;color:#6b7280>{_e(name[:26])}</span>" if name else ""}</td>'
+                         f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}<br><span style="color:#6b7280">стоп ≈ ${c["expected_stop"]:.2f} (−{c["expected_risk_pct"]:.1f}%)</span></td>'
+                         f'<td style="{td}">ADR {c["adr"]:.1f}% · {c["shares"]} акции при ${c["risk_usd"]:.0f} риск<br>'
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span></td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
-            body += '<div style="color:#6b7280;font-size:12.5px">Няма breakout кандидати днес.</div>'
-        eprows = ep.get("rows") or []
-        if eprows:
-            lines = "".join(
-                f'<div style="margin-top:4px"><b style="font-family:monospace">{_e(r["ticker"])}</b> +{r["gap_pct"]:.1f}% after-hours (ръст 3 м. {r["ret63_pct"]:+.0f}%, ADR {r["adr"]:.1f}%, стоп лимит ${r["max_stop"]:.2f}) · '
-                f'{_e(r.get("catalyst_label") or "Неясен катализатор")}{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</div>' for r in eprows)
-            body += (f'<div style="margin-top:10px;font-size:12.5px"><span style="color:#6b7280">Episodic Pivot — наблюдение (обемът в after-hours не е наличен):</span>{lines}</div>')
+            body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'
         if qb and qb.get("enabled") and qb.get("records"):
             avg = (f" · среден R {qb['avg_realized_r']:+.2f} opt / {qb['avg_realized_r_pess']:+.2f} pess" if qb.get("closed") and qb.get("avg_realized_r") is not None else "")
             wr = (f" · win rate {qb['win_rate_pct']}% opt / {qb['win_rate_pess_pct']}% pess" if qb.get("stats_visible") else f" · win rate след {qb.get('min_closed')} затворени")
-            body += (f'<div style="margin-top:10px;font-size:12px;color:#6b7280">Измерване: {qb["records"]} записа · затворени {qb.get("closed", 0)}{avg}{wr}</div>')
-        return ('<tr><td style="padding:12px 28px 14px;border-top:1px solid #f3f4f6">'
-                '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;font-weight:bold;margin-bottom:4px">Qullamaggie сетъпи</div>'
-                '<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Отделна стратегия — измерване, не препоръка.</b> '
-                'Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.<br>'
-                'Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.</div>'
-                f'{body}</td></tr>')
+            body += f'<div style="margin-top:8px;font-size:12px;color:#6b7280">Измерване: {qb["records"]} записа · затворени {qb.get("closed", 0)}{avg}{wr}</div>'
+        eprows = ep.get("rows") or []
+        if ep:
+            body += head("Епизодични пивоти (EP) · гапове след новина").replace("{m}", "16")
+            body += '<div style="font-size:11.5px;color:#92400e;margin-bottom:6px"><b>Само наблюдение, не препоръка.</b> Обемът в after-hours не е наличен — гапът не е потвърден до отварянето.</div>'
+            if ep.get("ok") is False and not eprows:
+                body += '<div style="color:#991b1b;font-size:12.5px">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>'
+            elif eprows:
+                rows = ""
+                for r in eprows:
+                    hl = (r.get("headlines") or [{}])[0].get("title") or "не е намерено заглавие"
+                    sz = f" · {r['shares']} акции" if r.get("shares") else ""
+                    rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(r["ticker"])}{badge if r["ticker"] in ours else ""}</td>'
+                             f'<td style="{td};font-family:monospace;white-space:nowrap">AH +{r["gap_pct"]:.1f}%</td>'
+                             f'<td style="{td}">{_e(hl)}<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
+                             f'{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</span></td>'
+                             f'<td style="{td};white-space:nowrap">3 м. {r["ret63_pct"]:+.0f}%<br><span style="color:#6b7280">стоп ${r["max_stop"]:.2f}'
+                             f'{sz}</span></td></tr>')
+                body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
+            else:
+                body += '<div style="color:#6b7280;font-size:12.5px">Няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри.</div>'
+            yd = (ep.get("log") or {}).get("yesterday") or []
+            line = "<b>Проверката е отварянето</b> (15:30 CEST): гапът се доказва едва тогава."
+            if yd:
+                line += " Вчера, AH срещу отваряне: " + "; ".join(
+                    f'{_e(y["ticker"])} {y["ah_gap_pct"]:+.1f}% → {y["open_gap_pct"]:+.1f}% ({"издържа" if y.get("held") else "не издържа"})' for y in yd) + "."
+            body += f'<div style="margin-top:6px;font-size:12px;color:#374151">{line}</div>'
+        return f'<tr><td style="padding:12px 28px 14px;border-top:1px solid #f3f4f6">{body}</td></tr>'
     except Exception as e:
         print(f"[render] имейл блокът на Qullamaggie пропуснат: {type(e).__name__}: {e}")
         return ""
@@ -382,9 +405,9 @@ def render_email(brief: dict) -> str:
     <b>Watchlist:</b> <span style="font-family:monospace">{watch}</span>
   </td></tr>
 
-  {signals_block}
-
   {qm_block}
+
+  {signals_block}
 
   <tr><td align="center" style="padding:24px 28px">
     <a href="{config.DASHBOARD_URL}" style="display:inline-block;background:{color};

@@ -319,7 +319,7 @@
     border-radius: 6px; padding: 9px 12px; margin: 0 0 12px; line-height: 1.5; }
   .qm-sub { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
     color: var(--yellow); margin: 18px 0 8px; }
-  .qm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; margin-bottom: 6px; }
+  .qm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 10px; margin-bottom: 6px; }
   .qm-card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--yellow);
     border-radius: 8px; padding: 12px 16px; }
   .qm-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
@@ -327,10 +327,17 @@
   .qm-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
   .qm-company { font-size: 12.5px; color: var(--text); margin-top: 2px; }
   .qm-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
-  .qm-stat { font-size: 13.5px; font-weight: 600; margin-top: 6px; color: var(--yellow); }
+  .qm-stat { font-size: 13px; font-weight: 600; margin-top: 4px; color: var(--yellow); }
   .qm-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .qm-detail b { color: var(--text); font-weight: 600; }
   .qm-note { font-size: 11.5px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .qm-sm { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  .qm-kv { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; font-size: 12px; margin-top: 8px; color: var(--muted); }
+  .qm-kv span, .qm-kv b { white-space: nowrap; }
+  .qm-kv b { color: var(--text); font-weight: 600; text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .qm-card { padding: 10px 12px; }
+  .qm-card .markers { margin-left: 6px; }
+  .qm-ep-table td { vertical-align: top; }
   .qm-ep-sum { font-size: 12.5px; color: var(--text); margin-top: 4px; }
   .qm-ep-hl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
@@ -865,6 +872,167 @@
   </div>
 </section>
 
+{# Qullamaggie (07.10.2026): ДВЕ секции веднага след Watchlist и преди GLB — "Пробиви по Kullamägi (Breakout)" и "Епизодични пивоти (EP) · гапове след новина".
+   ОТДЕЛНА стратегия (механичен скенер без AI, наблюдение на EP, собствена книга qm_breakout) — не е Action/Watchlist и не пипа размера на позициите ни; QM✓ върху нашите карти води тук #}
+{% set qb = backtest.qm_breakout if backtest and backtest.qm_breakout else none %}
+{% set our_qm = (action + watchlist)|map(attribute='ticker')|list %}
+{% if qm_cards or qm_diag or (qb and qb.enabled) %}
+<section id="qm">
+  <h2>Пробиви по Kullamägi (Breakout)</h2>
+  <div class="qm-banner">
+    <b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.</b>
+    Отделна стратегия, механичен скенер (без AI), независим от CANSLIM скрийнъра, GLB и от Action/Watchlist; не влиза в Action и не променя размера на позициите ни.
+    <b>Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</b>
+  </div>
+  {% if qm_diag and qm_diag.ok is sameas false %}
+  <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
+  {% else %}
+  {% if qm_cards %}
+  <div class="qm-grid">
+    {% for c in qm_cards %}
+    <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
+      <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
+      {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:34] }}</div>{% endif %}
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span></div>
+      <div class="qm-kv">
+        <span>Стоп</span><b title="Очакван стоп ≈ {{ qm_expected_stop_adr }}×ADR под входа; максимален (1×ADR) ${{ "%.2f"|format(c.max_stop) }} (−{{ "%.1f"|format(c.max_risk_pct) }}%)">≈ ${{ "%.2f"|format(c.expected_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(c.expected_risk_pct) }}%)</span></b>
+        <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
+        <span>Акции при ${{ "%.0f"|format(c.risk_usd) }} риск</span><b title="≈ ${{ "{:,.0f}".format(c.total_investment) }} ({{ "%.1f"|format(c.pct_of_portfolio) }}% от портфейла){% if c.capped_by_position_limit %}; ограничено до {{ qm_max_position_pct|round|int }}% от портфейла{% endif %}">{{ c.shares }}</b>
+        <span>Предходен ръст</span><b>+{{ "%.0f"|format(c.runup_pct) }}%</b>
+        <span>Консолидация</span><b title="дълбочина {{ "%.1f"|format(c.depth_pct) }}% · стягане {{ "%.2f"|format(c.tight) }}× ADR · обем {{ "%.2f"|format(c.vol_ratio) }}× от 50-дневния · цена {{ "%+.1f"|format(c.vs_sma10_pct) }}% от 10 MA, {{ "%+.1f"|format(c.vs_sma20_pct) }}% от 20 MA">{{ c.base_days }} дни</b>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
+    {% if qm_diag and qm_diag.with_history %}Подредени по стягане на базата (най-стегнатите първи); лидери: горните {{ ((1 - qm_diag.lead_pct) * 100)|round|int }}% по ръст за 1, 3 и 6 месеца ({{ qm_diag.leaders }} от {{ qm_diag.with_history }} тикъра към
+    {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}), кандидати {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани {{ qm_cards|length }}{% endif %}. {% endif %}
+    Задръж курсора върху стопа, акциите и консолидацията за подробности (максимален стоп, дълбочина на базата, позиция спрямо 10/20 MA).
+  </div>
+  {% else %}
+  <div class="small" style="font-size:12.5px;color:var(--muted)">няма кандидати днес{% if qm_diag and qm_diag.with_history %} (проверени {{ qm_diag.with_history }} тикъра){% endif %}</div>
+  {% endif %}
+  {% endif %}
+
+  {# ── Измерване: отделната книга qm_breakout (свита; редът над нея казва главното) ── #}
+  {% if qb and qb.enabled %}
+  <details class="qm-book" style="margin-top:14px">
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани {{ qb.records }} · затворени {{ qb.closed }}{% if qb.stats_visible %} · win rate {{ qb.win_rate_pct }}%{% else %} · win rate след {{ qb.min_closed }} затворени{% endif %}</summary>
+  {% if qb and qb.enabled %}
+  {% set qb_res = {"stopped": "стоп", "trailing_stop_exit": "trailing изход", "expired": "изтекла по време"} %}
+  {% set qb_st = {"pending": "чака пробива", "open": "отворена", "trailing": "след частична продажба (trailing)"} %}
+  <div class="qm-sub">Измерване — книга qm_breakout (отделна от Action и buy-stop)</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    Всеки показан кандидат се следи със симулация на неговите правила: вход на нивото на пробива само в сесията на брифа (гап над нивото с повече от {{ qm_chase_adr|round|int }}×ADR не се гони),
+    стоп = low на входния ден (не по-широк от {{ qm_adr_stop|round|int }}×ADR), след {{ qm_partial_days }} сесии се продава {{ (qm_partial_fraction * 100)|round|int }}% със стоп на break-even, остатъкът — първо затваряне под
+    SMA10 (ADR ≥ {{ qm_trail_switch|round|int }}%) или SMA20. Записват се <b>две граници</b> за стопа на входния ден: <b>opt</b> (low-ът е бил преди входа) и <b>pess</b> (денят затваря под входа → −1R).
+    Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
+  <div class="prose">
+    {% if not qb.records %}
+    <b>Още няма записани кандидати</b> — записват се показаните breakout карти{% if qb.track_from %}, от {{ qb.track_from }} нататък (чист старт){% endif %}.<br>
+    {% else %}
+    <b>Записани: {{ qb.records }}</b> · чакат вход {{ qb.pending }} · отворени {{ qb.open }} · затворени {{ qb.closed }}
+    · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
+    · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}<br>
+    {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: <b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess)<br>{% endif %}
+    {% if qb.stats_visible %}
+    <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
+    · медиана R {{ "%+.2f"|format(qb.median_realized_r) }} / {{ "%+.2f"|format(qb.median_realized_r_pess) }} · над 5R: {{ qb.big_winners_5r }}<br>
+    {% if qb.spy_compare %}Спрямо SPY (същите периоди, {{ qb.spy_compare.n }} затворени): средно {{ "%+.2f"|format(qb.spy_compare.avg_return_pct) }}%
+    срещу SPY {{ "%+.2f"|format(qb.spy_compare.avg_spy_pct) }}% → разлика {{ "%+.2f"|format(qb.spy_compare.avg_alpha_pct) }}%<br>{% endif %}
+    {% else %}
+    Win rate се показва след {{ qb.min_closed }} затворени (сега {{ qb.closed }}) — при по-малко е шум.<br>
+    {% endif %}
+    По режим на деня на картата (записани / затворени{% if qb.stats_visible %}, среден R{% endif %}):
+    {% for name, g in qb.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if qb.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% endif %}
+    {% if qb.needs_review %}<br><span style="color:var(--yellow)">⚠ {{ qb.needs_review }} запис(а) със сплит след входа — не се коригират, нужен е ръчен преглед.</span>{% endif %}
+  </div>
+  {% if qb.live %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ qb.live|length }}):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
+      <tbody>
+        {% for p in qb.live %}
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}</td>
+          <td>{{ p.entry_date }}</td>
+          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}</td>
+          <td class="n">${{ p.trigger }}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
+          <td>{{ p.regime or "н/д" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% if qb.recent %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({{ qb.recent|length }}):</div>
+  <div class="watch-grid" style="margin-top:6px">
+    {% for r in qb.recent %}
+    <div class="watch-card">
+      <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' }}">{{ r.ticker }}</span>{% if r.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период."}]) }}{% endif %}{% if r.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период."}]) }}{% endif %}
+      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ qb_res.get(r.resolution, r.resolution) }} · R={{ r.realized_r }} opt / {{ r.realized_r_pess }} pess · {{ r.regime or "н/д" }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endif %}
+  </details>
+  {% endif %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">
+    Източници: <a href="https://qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/" style="color:var(--muted)">3 timeless setups</a> ·
+    <a href="https://qullamaggie.com/how-to-master-a-setup-episodic-pivots/" style="color:var(--muted)">Episodic Pivots</a> ·
+    <a href="https://qullamaggie.com/faq/" style="color:var(--muted)">FAQ (ADR, риск)</a>. Негови са правилата за сетъпа и изхода; прагът за „лидер“ (топ 10% от ~900 тикъра), очакваният стоп 0.55×ADR и симулацията са наши.
+  </div>
+</section>
+{% endif %}
+
+{% if qm_ep %}
+<section id="qm-ep">
+  <h2>Епизодични пивоти (EP) · гапове след новина</h2>
+  <div class="qm-banner">
+    <b>Само наблюдение — без Track Record, не е препоръка.</b> After-hours гап нагоре ≥ {{ qm_ep_gap|round|int }}% за тикъри от универса при „пренебрегване“ (ръст ≤ {{ qm_ep_neglect|round|int }}% за предходните 3 месеца);
+    стоп лимитът е информация (най-много {{ qm_ep_stop_adr|round|int }}×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
+  </div>
+  {% if qm_ep.ok is sameas false and not qm_ep.rows %}
+  <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
+  {% elif qm_ep.rows %}
+  <div class="card" style="padding:6px 4px">
+    <table class="pos-table qm-ep-table">
+      <thead><tr><th>Тикър</th><th class="n">AH гап</th><th>Новина</th><th class="n">Ръст 3 м.</th><th class="n">Стоп лимит и размер</th></tr></thead>
+      <tbody>
+        {% for r in qm_ep.rows %}
+        <tr>
+          <td class="sym">{{ r.ticker }}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф."}]) }}{% endif %}{% if r.company and r.company != r.ticker %}<div class="qm-sm" style="font-family:inherit;font-weight:400">{{ r.company[:28] }}</div>{% endif %}</td>
+          <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div class="qm-sm">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
+          <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
+            <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: н/д</span>{% endif %}</div>
+            {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}</td>
+          <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
+          <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span>{% if r.shares %}<div class="qm-sm">{{ r.shares }} акции при ${{ "%.0f"|format(r.risk_usd) }} риск</div>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="small" style="font-size:12.5px;color:var(--muted)">няма after-hours гапове ≥ {{ qm_ep_gap|round|int }}% при „пренебрегнати“ тикъри{% if qm_ep.diag and qm_ep.diag.tickers_with_ah %} (проверени {{ qm_ep.diag.tickers_with_ah }} тикъра с after-hours бар){% endif %}</div>
+  {% endif %}
+  {% if qm_ep.not_neglected %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Други гапове ≥ {{ qm_ep_gap|round|int }}% — не са „пренебрегнати“ или не са ликвидни (не се показват като EP):
+    {% for x in qm_ep.not_neglected %}<span style="font-family:'IBM Plex Mono',monospace;color:var(--text)">{{ x.ticker }} +{{ "%.1f"|format(x.gap_pct) }}%</span> ({{ x.why }}){{ "; " if not loop.last else "" }}{% endfor %}</div>
+  {% endif %}
+  <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
+    <b>Проверката е отварянето</b> (15:30 CEST / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
+    {% set yd = (qm_ep.log or {}).get("yesterday") %}
+    {% if yd %}<br><b>Вчерашният дневник — after-hours срещу отваряне:</b>
+    {% for y in yd %}<span style="font-family:'IBM Plex Mono',monospace">{{ y.ticker }}</span> AH {{ "%+.1f"|format(y.ah_gap_pct) }}% → отваряне {{ "%+.1f"|format(y.open_gap_pct) }}% ({{ "издържа ≥ " ~ (qm_ep_gap|round|int) ~ "%" if y.held else "не издържа" }}){{ "; " if not loop.last else "" }}{% endfor %}.
+    {% elif qm_ep.log and qm_ep.log.entries %}<br><span style="color:var(--muted)">Вчера няма гапове за проверка срещу отварянето.</span>{% endif %}
+    {% if qm_ep.log and qm_ep.log.entries %}<span style="color:var(--muted)"> Общо в дневника: записи {{ qm_ep.log.entries }}, разрешени {{ qm_ep.log.resolved }}{% if qm_ep.log.resolved %}; {{ qm_ep.log.held_at_open }} от тях отварят ≥ {{ qm_ep_gap|round|int }}% ({{ qm_ep.log.held_share_pct|round|int }}%) · медианно разминаване {{ "%+.1f"|format(qm_ep.log.median_diff_pp) }} пр.п.{% if qm_ep.log.corr is not none %} · корелация {{ "%.2f"|format(qm_ep.log.corr) }}{% endif %}{% endif %}; решение за второ пускане — след 4–6 седмици.</span>{% endif %}
+  </div>
+</section>
+{% endif %}
+
 {% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
 
 {# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
@@ -947,166 +1115,6 @@
     {{ glb_insufficient|map(attribute='ticker')|join(', ') }}
   </div>
   {% endif %}
-</section>
-{% endif %}
-
-{# Qullamaggie (06.10.2026): ОТДЕЛНА стратегия — механичен breakout скенер (без AI), EP наблюдение (без Track Record) и собствена книга qm_breakout.
-   Не е Action/Watchlist и не пипа размера на позициите ни; QM✓ върху нашите карти води тук #}
-{% set qb = backtest.qm_breakout if backtest and backtest.qm_breakout else none %}
-{% if qm_cards or qm_diag or qm_ep or (qb and qb.enabled) %}
-{% set our_qm = (action + watchlist)|map(attribute='ticker')|list %}
-<section id="qm">
-  <h2>Qullamaggie сетъпи</h2>
-  <div class="qm-banner">
-    <b>Отделна стратегия — измерване, не препоръка.</b> Механичен скенер (без AI) по методологията на Kristjan Kullamägi, независим от CANSLIM скрийнъра, GLB и от
-    Action/Watchlist; не влиза в Action и не променя размера на позициите ни. <b>Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата,
-    не самия вход.</b><br>
-    Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.
-  </div>
-
-  {# ── Breakout кандидати ── #}
-  <div class="qm-sub">Breakout кандидати{% if qm_cards %} ({{ qm_cards|length }}{% if qm_diag and qm_diag.candidates and qm_diag.candidates > qm_cards|length %} от {{ qm_diag.candidates }}{% endif %}){% endif %}</div>
-  {% if qm_diag and qm_diag.ok is sameas false %}
-  <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
-  {% else %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:10px">
-    {% if qm_diag and qm_diag.with_history %}Лидери: горните {{ ((1 - qm_diag.lead_pct) * 100)|round|int }}% по ръст за 1, 3 и 6 месеца ({{ qm_diag.leaders }} от {{ qm_diag.with_history }} тикъра с история към
-    {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}) · кандидати: {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани най-стегнатите {{ qm_cards|length }}{% endif %}.{% endif %}
-    Предходен ръст, организирана база с по-високи дъна и стягащ се диапазон, цена около растящите 10/20 MA, спадащ обем, ADR ≥ {{ qm_adr_min|round|int }}%.
-  </div>
-  {% if qm_cards %}
-  <div class="qm-grid">
-    {% for c in qm_cards %}
-    <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
-      <div class="qm-top"><span class="qm-sym">{{ c.ticker }}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
-      {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:40] }}</div>{% endif %}
-      <div class="qm-stat">Ниво на пробива ${{ "%.2f"|format(c.trigger) }} · +{{ "%.1f"|format(c.pct_to_trigger) }}% до него</div>
-      <div class="qm-detail">ADR <b>{{ "%.1f"|format(c.adr) }}%</b> · ръст преди базата <b>+{{ "%.0f"|format(c.runup_pct) }}%</b></div>
-      <div class="qm-detail">База <b>{{ c.base_days }} сесии</b>, дълбочина {{ "%.1f"|format(c.depth_pct) }}% · стягане {{ "%.2f"|format(c.tight) }}× ADR · обем {{ "%.2f"|format(c.vol_ratio) }}× от 50-дневния</div>
-      <div class="qm-detail">Цена спрямо 10 MA {{ "%+.1f"|format(c.vs_sma10_pct) }}% · 20 MA {{ "%+.1f"|format(c.vs_sma20_pct) }}%</div>
-      <div class="qm-detail">Очакван стоп ≈ <b>${{ "%.2f"|format(c.expected_stop) }}</b> (−{{ "%.1f"|format(c.expected_risk_pct) }}%, {{ qm_expected_stop_adr }}×ADR) · максимален <b>${{ "%.2f"|format(c.max_stop) }}</b> (−{{ "%.1f"|format(c.max_risk_pct) }}%, {{ qm_max_stop_adr|round|int }}×ADR)</div>
-      <div class="qm-detail">При половин риск (${{ "%.0f"|format(c.risk_usd) }}): <b>{{ c.shares }} акции</b> ≈ ${{ "{:,.0f}".format(c.total_investment) }} ({{ "%.1f"|format(c.pct_of_portfolio) }}% от портфейла) при очаквания стоп{% if c.capped_by_position_limit %} — ограничено до {{ qm_max_position_pct|round|int }}% от портфейла{% endif %}; {{ c.shares_at_max_stop }} акции при максималния</div>
-      <div class="qm-note">{{ c.note }}</div>
-      {% if c.ticker in our_qm %}<div class="si-flag">✓ и в Action/Watchlist — маркер QM✓ на картата</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="small" style="font-size:12.5px;color:var(--muted)">няма кандидати днес{% if qm_diag and qm_diag.with_history %} (проверени {{ qm_diag.with_history }} тикъра){% endif %}</div>
-  {% endif %}
-  {% endif %}
-
-  {# ── Episodic Pivot: само наблюдение ── #}
-  {% if qm_ep %}
-  <div class="qm-sub">Episodic Pivot — наблюдение (без Track Record)</div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:10px">
-    Гапове нагоре ≥ {{ qm_ep_gap|round|int }}% след затваряне (after-hours, 5-минутни барове на Yahoo{% if qm_ep.session %}; сесия {{ qm_ep.session[8:10] }}.{{ qm_ep.session[5:7] }}{% endif %}) за тикъри от универса, при „пренебрегване“
-    (ръст ≤ {{ qm_ep_neglect|round|int }}% за предходните 3 месеца). Стоп лимитът е информация — най-много {{ qm_ep_stop_adr|round|int }}×ADR под after-hours цената. <b>Обемът в after-hours не е наличен в безплатния
-    източник</b> — гапът може да е на няколко сделки и не е потвърден до отварянето; катализаторът е от заглавия (AI само го класифицира, числата проверява кодът).
-  </div>
-  {% if qm_ep.ok is sameas false and not qm_ep.rows %}
-  <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
-  {% elif qm_ep.rows %}
-  <div class="card" style="padding:6px 4px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th class="n">Гап (затваряне → after-hours)</th><th class="n">Ръст 3 м.</th><th class="n">ADR</th><th class="n">Стоп лимит (≤{{ qm_ep_stop_adr|round|int }}×ADR)</th><th>Катализатор</th></tr></thead>
-      <tbody>
-        {% for r in qm_ep.rows %}
-        <tr>
-          <td class="sym">{{ r.ticker }}{% if r.company and r.company != r.ticker %}<div style="font-family:inherit;font-weight:400;font-size:11.5px;color:var(--muted)">{{ r.company[:30] }}</div>{% endif %}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "в Action/Watchlist", "title": "Тикърът е и на нашата CANSLIM карта."}]) }}{% endif %}</td>
-          <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div style="font-size:11.5px;color:var(--muted)">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
-          <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
-          <td class="n">{{ "%.1f"|format(r.adr) }}%</td>
-          <td class="n">${{ "%.2f"|format(r.max_stop) }}<div style="font-size:11.5px;color:var(--muted)">−{{ "%.1f"|format(r.max_stop_pct) }}%</div></td>
-          <td>{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}
-            {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}
-            {% for h in (r.headlines or [])[:2] %}<div class="qm-ep-hl">• {{ h.title }}</div>{% endfor %}
-            {% if not r.ah_volume_available %}<div class="qm-ep-hl" style="color:var(--yellow)">⚠ обем в after-hours: н/д</div>{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
-  <div class="small" style="font-size:12.5px;color:var(--muted)">няма after-hours гапове ≥ {{ qm_ep_gap|round|int }}% при „пренебрегнати“ тикъри{% if qm_ep.diag and qm_ep.diag.tickers_with_ah %} (проверени {{ qm_ep.diag.tickers_with_ah }} тикъра с after-hours бар){% endif %}</div>
-  {% endif %}
-  {% if qm_ep.not_neglected %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Други гапове ≥ {{ qm_ep_gap|round|int }}% — не са „пренебрегнати“ или не са ликвидни (не се показват като EP):
-    {% for x in qm_ep.not_neglected %}<span style="font-family:'IBM Plex Mono',monospace;color:var(--text)">{{ x.ticker }} +{{ "%.1f"|format(x.gap_pct) }}%</span> ({{ x.why }}){{ "; " if not loop.last else "" }}{% endfor %}</div>
-  {% endif %}
-  {% if qm_ep.log and qm_ep.log.entries %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
-    Дневник за решение след 4–6 седмици (after-hours гап срещу реалния гап на отварянето): записи {{ qm_ep.log.entries }}, разрешени {{ qm_ep.log.resolved }}{% if qm_ep.log.resolved %};
-    {{ qm_ep.log.held_at_open }} от тях отварят ≥ {{ qm_ep_gap|round|int }}% ({{ qm_ep.log.held_share_pct|round|int }}%) · медианно разминаване {{ "%+.1f"|format(qm_ep.log.median_diff_pp) }} пр.п.{% if qm_ep.log.corr is not none %} · корелация {{ "%.2f"|format(qm_ep.log.corr) }}{% endif %}{% endif %}.
-  </div>
-  {% endif %}
-  {% endif %}
-
-  {# ── Измерване: отделната книга qm_breakout ── #}
-  {% if qb and qb.enabled %}
-  {% set qb_res = {"stopped": "стоп", "trailing_stop_exit": "trailing изход", "expired": "изтекла по време"} %}
-  {% set qb_st = {"pending": "чака пробива", "open": "отворена", "trailing": "след частична продажба (trailing)"} %}
-  <div class="qm-sub">Измерване — книга qm_breakout (отделна от Action и buy-stop)</div>
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
-    Всеки показан кандидат се следи със симулация на неговите правила: вход на нивото на пробива само в сесията на брифа (гап над нивото с повече от {{ qm_chase_adr|round|int }}×ADR не се гони),
-    стоп = low на входния ден (не по-широк от {{ qm_adr_stop|round|int }}×ADR), след {{ qm_partial_days }} сесии се продава {{ (qm_partial_fraction * 100)|round|int }}% със стоп на break-even, остатъкът — първо затваряне под
-    SMA10 (ADR ≥ {{ qm_trail_switch|round|int }}%) или SMA20. Записват се <b>две граници</b> за стопа на входния ден: <b>opt</b> (low-ът е бил преди входа) и <b>pess</b> (денят затваря под входа → −1R).
-    Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
-  <div class="prose">
-    {% if not qb.records %}
-    <b>Още няма записани кандидати</b> — записват се показаните breakout карти{% if qb.track_from %}, от {{ qb.track_from }} нататък (чист старт){% endif %}.<br>
-    {% else %}
-    <b>Записани: {{ qb.records }}</b> · чакат вход {{ qb.pending }} · отворени {{ qb.open }} · затворени {{ qb.closed }}
-    · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
-    · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}<br>
-    {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: <b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess)<br>{% endif %}
-    {% if qb.stats_visible %}
-    <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
-    · медиана R {{ "%+.2f"|format(qb.median_realized_r) }} / {{ "%+.2f"|format(qb.median_realized_r_pess) }} · над 5R: {{ qb.big_winners_5r }}<br>
-    {% if qb.spy_compare %}Спрямо SPY (същите периоди, {{ qb.spy_compare.n }} затворени): средно {{ "%+.2f"|format(qb.spy_compare.avg_return_pct) }}%
-    срещу SPY {{ "%+.2f"|format(qb.spy_compare.avg_spy_pct) }}% → разлика {{ "%+.2f"|format(qb.spy_compare.avg_alpha_pct) }}%<br>{% endif %}
-    {% else %}
-    Win rate се показва след {{ qb.min_closed }} затворени (сега {{ qb.closed }}) — при по-малко е шум.<br>
-    {% endif %}
-    По режим на деня на картата (записани / затворени{% if qb.stats_visible %}, среден R{% endif %}):
-    {% for name, g in qb.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if qb.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
-    {% endif %}
-    {% if qb.needs_review %}<br><span style="color:var(--yellow)">⚠ {{ qb.needs_review }} запис(а) със сплит след входа — не се коригират, нужен е ръчен преглед.</span>{% endif %}
-  </div>
-  {% if qb.live %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ qb.live|length }}):</div>
-  <div class="card" style="padding:6px 4px;margin-top:6px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
-      <tbody>
-        {% for p in qb.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}</td>
-          <td>{{ p.entry_date }}</td>
-          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}</td>
-          <td class="n">${{ p.trigger }}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
-          <td>{{ p.regime or "н/д" }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
-  {% if qb.recent %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({{ qb.recent|length }}):</div>
-  <div class="watch-grid" style="margin-top:6px">
-    {% for r in qb.recent %}
-    <div class="watch-card">
-      <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' }}">{{ r.ticker }}</span>{% if r.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период."}]) }}{% endif %}{% if r.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период."}]) }}{% endif %}
-      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ qb_res.get(r.resolution, r.resolution) }} · R={{ r.realized_r }} opt / {{ r.realized_r_pess }} pess · {{ r.regime or "н/д" }}</p>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-  {% endif %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">
-    Източници: <a href="https://qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/" style="color:var(--muted)">3 timeless setups</a> ·
-    <a href="https://qullamaggie.com/how-to-master-a-setup-episodic-pivots/" style="color:var(--muted)">Episodic Pivots</a> ·
-    <a href="https://qullamaggie.com/faq/" style="color:var(--muted)">FAQ (ADR, риск)</a>. Негови са правилата за сетъпа и изхода; прагът за „лидер“ (топ 10% от ~900 тикъра), очакваният стоп 0.55×ADR и симулацията са наши.
-  </div>
 </section>
 {% endif %}
 

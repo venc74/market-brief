@@ -145,7 +145,8 @@ def enrich_gappers(rows: list[dict], daily: dict[str, pd.DataFrame]) -> list[dic
     out = []
     for r in rows:
         d = daily.get(r["ticker"])
-        e = {**r, "ret63_pct": None, "adr": None, "dollar_volume": None, "neglect": None, "max_stop": None, "max_stop_pct": None, "liquid": None}
+        e = {**r, "ret63_pct": None, "adr": None, "dollar_volume": None, "neglect": None, "max_stop": None, "max_stop_pct": None, "liquid": None,
+             "risk_usd": None, "shares": None, "total_investment": None, "pct_of_portfolio": None}
         if d is not None and len(d):
             pos = d.index.searchsorted(pd.Timestamp(r["session"]))
             if pos < len(d) and pd.Timestamp(d.index[pos]).date().isoformat() == r["session"] and pos >= 63:
@@ -161,6 +162,13 @@ def enrich_gappers(rows: list[dict], daily: dict[str, pd.DataFrame]) -> list[dic
                 e["max_stop_pct"] = round(config.QM_EP_STOP_ADR * e["adr"], 1)
                 e["max_stop"] = round(r["ah_price"] * (1 - config.QM_EP_STOP_ADR * e["adr"] / 100), 2)
                 e["liquid"] = bool(e["dollar_volume"] >= config.QM_DOLLAR_VOLUME_MIN and official >= config.QM_PRICE_MIN)
+                # размер при половин риск до стопа лимит (информация, както при breakout картите): риск $ / (after-hours цена − стоп), най-много QM_MAX_POSITION_PCT% от портфейла
+                risk_usd = config.PORTFOLIO_SIZE * config.RISK_PER_TRADE_PCT / 100 * config.QM_RISK_FACTOR
+                per_share = r["ah_price"] - e["max_stop"]
+                cap = int(config.PORTFOLIO_SIZE * config.QM_MAX_POSITION_PCT / 100 // r["ah_price"])
+                shares = min(int(risk_usd // per_share), cap) if per_share > 0 else 0
+                e.update(risk_usd=round(risk_usd), shares=shares, total_investment=round(shares * r["ah_price"]),
+                         pct_of_portfolio=round(shares * r["ah_price"] / config.PORTFOLIO_SIZE * 100, 1))
         out.append(e)
     return out
 
@@ -419,7 +427,10 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
         added = add_entries(log, allrows, today.isoformat())
         resolved = resolve_entries(log, today, fetch_daily_fn)
         save_log(log, log_path)
-        out["log"] = {**summarize_log(log["entries"]), "added_today": added, "resolved_today": resolved}
+        yesterday = [{"ticker": x["ticker"], "session": x["session"], "gap_session": x["gap_session"], "ah_gap_pct": x["ah_gap_pct"], "open_gap_pct": x["open_gap_pct"],
+                      "close_pct": x.get("close_pct"), "held": bool(x["open_gap_pct"] >= config.QM_EP_GAP_PCT)}
+                     for x in log["entries"] if x.get("resolved_on") == today.isoformat() and x.get("open_gap_pct") is not None]
+        out["log"] = {**summarize_log(log["entries"]), "added_today": added, "resolved_today": resolved, "yesterday": yesterday}
         print(f"[qm_ep] сесия {diag.get('session')}: {len(gappers)} after-hours гапа ≥ {config.QM_EP_GAP_PCT:g}%, показани {len(shown)} (пренебрегнати), "
               f"останали {len(out['not_neglected'])}; дневник: {out['log']['entries']} записа, {out['log']['resolved']} разрешени")
     except Exception as e:
