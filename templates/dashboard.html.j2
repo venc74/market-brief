@@ -1440,7 +1440,7 @@
         <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
       </div>
       {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
       {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
     {% endfor %}
@@ -1468,7 +1468,7 @@
         <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
       </div>
       {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
-      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}</div>
+      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
       {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
     {% endfor %}
@@ -1486,6 +1486,15 @@
     {% endfor %}
   </div>
   {% endif %}
+</section>
+{% endif %}
+
+{# 13F пакет (07.10): постоянен ред — секцията не изчезва мълчаливо, когато няма изходи ("няма" ≠ "не е проверено") #}
+{% if superinvestor_exits is not none and not (superinvestor_exits.exits or superinvestor_exits.stopped_managers)
+      and superinvestor_status and superinvestor_status.kind in ['ok', 'legit_zero'] and superinvestor_status.managers_with_comparison %}
+<section>
+  <h2>📉 Major Position Exits</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма големи изходи ({{ superinvestor_status.managers_with_comparison }} мениджъра със сравнение с предходния 13F, праг {{ dataroma_major_exit_pct|round|int }}% от портфейла).</div>
 </section>
 {% endif %}
 

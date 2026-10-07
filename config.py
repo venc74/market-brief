@@ -726,6 +726,12 @@ DATAROMA_CIK = {
 # 5% отсява шума от дребни закръгления/технически корекции между подавания,
 # без да губи реални акумулационни ходове.
 DATAROMA_MIN_SHARE_INCREASE_PCT = float(os.getenv("DATAROMA_MIN_SHARE_INCREASE_PCT", 5.0))
+# 13F пакет (07.10): (а) под този дял позиции с прочетен брой акции "нова/увеличена" не се показва за мениджъра (+ банер) — броят акции е основата на сравнението;
+# (б) прагът на SEC за 13F филър е $100M: сума под него като ДОЛАРИ значи стойности в ХИЛЯДИ (виж dataroma._value_scale); (в) срокът за подаване е 45 дни след
+# края на тримесечието — мениджър без 13F след края на последното просрочено тримесечие получава етикет за давност.
+THIRTEENF_MIN_SHARES_COVERAGE = float(os.getenv("THIRTEENF_MIN_SHARES_COVERAGE", 0.8))
+THIRTEENF_MIN_PORTFOLIO_USD = float(os.getenv("THIRTEENF_MIN_PORTFOLIO_USD", 100_000_000))
+THIRTEENF_FILING_DEADLINE_DAYS = int(os.getenv("THIRTEENF_FILING_DEADLINE_DAYS", 45))
 
 # ── COT (Commitments of Traders) ──────────────────────────────────────────
 ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"

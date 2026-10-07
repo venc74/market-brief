@@ -231,8 +231,34 @@ def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str]]:
         return []
 
 
+def _num(el, default: float = 0.0) -> float:
+    return float(re.sub(r"[^\d.]", "", (el.text or "") if el is not None else "") or default)
+
+
+def _parse_info_table(xml_text: str) -> list[dict]:
+    """
+    Чист парсер на information table XML на 13F → [{issuer, value, cusip, shares, stype}] (без мрежа — тества се върху реални SEC файлове).
+    ПАКЕТ 13F (07.10.2026): таговете се търсят БЕЗ значение на регистъра. Реалният тег за броя акции е `sshPrnamt` (малко "amt"), а кодът четеше
+    `sshPrnAmt` — акциите бяха 0 за ВСЕКИ ред и всеки мениджър (от 08.07 всяка позиция беше "нова позиция", проверката на мащаба по цена/акция в 4а
+    никога не се задействаше). `stype` е sshPrnamtType: SH (акции) или PRN (главница на облигация — не е брой акции).
+    """
+    root = ET.fromstring(xml_text)
+    rows = []
+    for el in root.iter():
+        if el.tag.split("}")[-1].lower() == "infotable":
+            d = {ch.tag.split("}")[-1].lower(): ch for ch in el.iter()}
+            issuer, val, cusip = d.get("nameofissuer"), d.get("value"), d.get("cusip")
+            if issuer is not None and val is not None:
+                stype = d.get("sshprnamttype")
+                rows.append({"issuer": (issuer.text or "").strip(), "value": _num(val),
+                             "cusip": (cusip.text or "").strip() if cusip is not None else "",
+                             "shares": _num(d.get("sshprnamt")),
+                             "stype": ((stype.text or "SH").strip().upper() if stype is not None else "SH")})
+    return rows
+
+
 def _info_table(cik: str, accession: str) -> list[dict]:
-    """Сваля и парсва information table XML на 13F → [{issuer, value, cusip, shares}]."""
+    """Сваля и парсва information table XML на 13F → [{issuer, value, cusip, shares, stype}]."""
     cik_int = str(int(cik))
     acc_nodash = accession.replace("-", "")
     base = f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}"
@@ -245,22 +271,7 @@ def _info_table(cik: str, accession: str) -> list[dict]:
         cand = [n for n in xmls if re.search(r"info.?table|form13f|information", n, re.I)]
         for name in (cand or xmls):
             try:
-                xml = requests.get(f"{base}/{name}", timeout=20, headers=_EDGAR_UA).text
-                root = ET.fromstring(xml)
-                rows = []
-                for el in root.iter():
-                    if el.tag.split("}")[-1] == "infoTable":
-                        d = {ch.tag.split("}")[-1]: ch for ch in el.iter()}
-                        issuer = d.get("nameOfIssuer")
-                        val = d.get("value")
-                        cusip = d.get("cusip")
-                        shares = d.get("sshPrnAmt")
-                        if issuer is not None and val is not None:
-                            rows.append({"issuer": (issuer.text or "").strip(),
-                                         "value": float(re.sub(r"[^\d.]", "", val.text or "0") or 0),
-                                         "cusip": (cusip.text or "").strip() if cusip is not None else "",
-                                         "shares": float(re.sub(r"[^\d.]", "", shares.text or "0") or 0)
-                                                  if shares is not None else 0.0})
+                rows = _parse_info_table(requests.get(f"{base}/{name}", timeout=20, headers=_EDGAR_UA).text)
                 if rows:
                     holdings = rows
                     break
@@ -286,10 +297,17 @@ def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
         cusip = h.get("cusip") or ""
         if not cusip:
             continue
-        a = agg.setdefault(cusip, {"issuer": h["issuer"], "value": 0.0, "shares": 0.0})
+        a = agg.setdefault(cusip, {"issuer": h["issuer"], "value": 0.0, "shares": 0.0, "priced_shares": 0.0})
         a["value"] += h.get("value", 0.0)
         a["shares"] += h.get("shares", 0.0)
+        if h.get("stype", "SH") != "PRN":                       # главница на облигация (PRN) не е брой акции — не участва в "цената" за мащаба
+            a["priced_shares"] += h.get("shares", 0.0)
     return agg
+
+
+def shares_coverage(agg: dict[str, dict]) -> float | None:
+    """Дял на позициите с прочетен брой акции > 0 (None при празен филинг). Под config.THIRTEENF_MIN_SHARES_COVERAGE "нова/увеличена" не е надеждно."""
+    return (sum(1 for a in agg.values() if a.get("shares", 0) > 0) / len(agg)) if agg else None
 
 
 # Пакет 4а т.9 (2026-10-03): мащабът на стойностите в 13F information table. Правилото на SEC: филинг, подаден
@@ -305,23 +323,71 @@ _THOUSANDS_BELOW_PRICE = 1.0
 
 
 def _value_scale(agg: dict[str, dict], filing_date: str | None) -> tuple[int, str]:
-    """(множител към долари, основание) за ЕДИН филинг — виж коментара по-горе."""
+    """
+    (множител към долари, основание) за ЕДИН филинг. Три независими проверки, по ред на надеждност:
+      1. цена: медианата на стойност/акции (поне _MIN_PRICED позиции с акции; PRN не участва) — в долари е десетки/стотици $, в хиляди — стотни;
+      2. размер на портфейла (13F пакет, 07.10): филър с поне $100M (config.THIRTEENF_MIN_PORTFOLIO_USD — прагът на SEC за подаване) не може да има
+         сума под него В ДОЛАРИ — ако сумата е под прага като долари, а като хиляди е правдоподобна, стойностите са в хиляди. Независима от акциите;
+         едностранна: над прага не доказва долари (Berkshire в хиляди също е над $100M "като долари");
+      3. датата на филинга (правилото на SEC: от 2023-01-03 е в долари) — само когато предишните две не могат да решат.
+    Реален случай (06.10): Triple Frond, Duquesne и Baupost подават в хиляди и след 2023; без акции (грешният таг) решаваше датата → 1000× по-малки стойности.
+    """
     by_date = None
     if filing_date:
         try:
             by_date = 1 if dt.date.fromisoformat(str(filing_date)[:10]) >= _DOLLARS_SINCE else 1000
         except ValueError:
             by_date = None
-    prices = sorted(a["value"] / a["shares"] for a in agg.values() if a.get("shares", 0) > 0 and a.get("value", 0) > 0)
+    prices = sorted(a["value"] / sh for a in agg.values()
+                    if (sh := a.get("priced_shares", a.get("shares", 0))) > 0 and a.get("value", 0) > 0)
     by_price = None
     if len(prices) >= _MIN_PRICED:
         median = prices[len(prices) // 2] if len(prices) % 2 else (prices[len(prices) // 2 - 1] + prices[len(prices) // 2]) / 2
         by_price = 1000 if median < _THOUSANDS_BELOW_PRICE else 1
     if by_price is not None:
         return by_price, "price" if by_date in (None, by_price) else "price_override"
+    total = sum(a.get("value", 0.0) for a in agg.values())
+    minimum = config.THIRTEENF_MIN_PORTFOLIO_USD
+    by_size = 1000 if 0 < total < minimum <= total * 1000 else None
+    if by_size is not None:
+        return by_size, "size" if by_date in (None, by_size) else "size_override"
     if by_date is not None:
         return by_date, "date"
     return 1, "default_dollars"                 # без дата и без достатъчно позиции: след 2023 е в долари
+
+
+def last_quarter_deadline(today: dt.date | None = None) -> tuple[dt.date, dt.date]:
+    """(край на тримесечието, срок за подаване) за НАЙ-СКОРОШНОТО тримесечие, чийто срок (край + THIRTEENF_FILING_DEADLINE_DAYS дни) вече е минал."""
+    today = today or dt.date.today()
+    ends = []
+    for y in (today.year - 1, today.year):
+        ends += [dt.date(y, 3, 31), dt.date(y, 6, 30), dt.date(y, 9, 30), dt.date(y, 12, 31)]
+    due = [(q, q + dt.timedelta(days=config.THIRTEENF_FILING_DEADLINE_DAYS)) for q in ends]
+    q, deadline = max((x for x in due if x[1] < today), key=lambda x: x[0])
+    return q, deadline
+
+
+def late_filer(last_filing_date: str | None, today: dt.date | None = None) -> dict | None:
+    """
+    13F пакет (07.10): мениджър, чийто последен 13F е подаден НА или ПРЕДИ края на последното вече просрочено тримесечие, закъснява — етикет за давност, различен от "спрял да подава"
+    (DATAROMA_STALE_FILER_DAYS = 165 би маркирал Pershing чак на 27.10). {quarter_end, deadline, last_filing_date} или None.
+    """
+    if not last_filing_date:
+        return None
+    try:
+        last = dt.date.fromisoformat(str(last_filing_date)[:10])
+    except ValueError:
+        return None
+    q, deadline = last_quarter_deadline(today)
+    return {"quarter_end": q.isoformat(), "deadline": deadline.isoformat(), "last_filing_date": last.isoformat()} if last <= q else None
+
+
+def _late_label(late: dict | None) -> str | None:
+    if not late:
+        return None
+    q = dt.date.fromisoformat(late["quarter_end"]); d = dt.date.fromisoformat(late["deadline"])
+    return (f"⚠ закъснява: последен 13F от {late['last_filing_date']}, няма за Q{(q.month - 1) // 3 + 1} {q.year} "
+            f"(срок {d.day:02d}.{d.month:02d}.{d.year})")
 
 
 def _manager_snapshot(cik: str, name: str) -> dict:
@@ -380,9 +446,11 @@ def _manager_snapshot(cik: str, name: str) -> dict:
     return {
         "manager": name, "cik": cik, "filing_status": filing_status,
         "period": period, "last_filing_date": fdate, "days_since_filing": days_since,
+        "late": late_filer(fdate) if filing_status == "active" else None,
         "current_agg": current_agg, "current_scale": cur_scale, "current_scale_basis": cur_basis,
-        "current_total": current_total,
+        "current_total": current_total, "current_shares_coverage": shares_coverage(current_agg),
         "prev_agg": prev_agg, "prev_scale": prev_scale, "prev_scale_basis": prev_basis, "prev_total": prev_total,
+        "prev_shares_coverage": shares_coverage(prev_agg),
     }
 
 
@@ -395,6 +463,9 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
     current_agg = snap.get("current_agg") or {}
     prev_agg = snap.get("prev_agg") or {}
     cur_scale = snap.get("current_scale", 1)
+    if low_coverage(snap):                          # без прочетени акции "нова/увеличена" е измислица (08.07–06.10: всичко беше "нова позиция") — мениджърът не дава редове, банер
+        return rows
+    late = _late_label(snap.get("late"))
     for cusip, cur in current_agg.items():
         prev_shares = (prev_agg.get(cusip) or {}).get("shares")
         if prev_shares is None or prev_shares <= 0:
@@ -411,8 +482,19 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
             "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
             "company": cur["issuer"], "manager": snap["manager"], "action": action,
             "value": value, "period": snap["period"], "_resolved": bool(ticker),
+            **({"late": late} if late else {}),
         })
     return rows
+
+
+def low_coverage(snap: dict) -> dict | None:
+    """{"current", "prev"} покритие на акциите, ако е под config.THIRTEENF_MIN_SHARES_COVERAGE (предишният филинг се брои само ако го има); иначе None."""
+    cur, prev = snap.get("current_shares_coverage"), snap.get("prev_shares_coverage")
+    if not snap.get("current_agg"):
+        return None
+    m = config.THIRTEENF_MIN_SHARES_COVERAGE
+    bad = (cur is not None and cur < m) or (snap.get("prev_agg") and prev is not None and prev < m)
+    return {"current": cur, "prev": prev} if bad else None
 
 
 def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
@@ -445,6 +527,7 @@ def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]
             "pct_of_portfolio": round(pct, 1), "period": snap["period"],
             "filing_date": snap.get("last_filing_date"),
             "_resolved": bool(ticker),
+            **({"late": _late_label(snap.get("late"))} if snap.get("late") else {}),
         })
     return out
 
@@ -478,25 +561,41 @@ def _major_exits_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
             "company": prev["issuer"], "manager": snap["manager"],
             "prior_value": value, "prior_pct_of_portfolio": round(pct, 1),
             "period": snap["period"], "_resolved": bool(ticker),
+            **({"late": _late_label(snap.get("late"))} if snap.get("late") else {}),
         })
     return out
 
 
 def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
-    """Пази най-голямата стойност на тикър, брои и изброява мениджърите — за конвергенция."""
+    """
+    Пази най-голямата стойност на тикър, брои и изброява мениджърите — за конвергенция. Етикетът за давност ("late") е по мениджър: при един мениджър е пълният етикет, при няколко
+    сливани — "⚠ закъснява: <кои>" (редът не губи етикета на закъснелия мениджър само защото друг мениджър е държал същия тикър).
+    """
     best: dict[str, dict] = {}
     for r in rows:
         key = r["ticker"]
         cur = best.get(key)
         if cur is None:
-            best[key] = {**r, "managers": [r["manager"]], "count": 1}
+            best[key] = {**r, "managers": [r["manager"]], "count": 1, "_late_by": ({r["manager"]: r["late"]} if r.get("late") else {})}
         else:
             cur["count"] += 1
             if r["manager"] not in cur["managers"]:
                 cur["managers"].append(r["manager"])
+            if r.get("late"):
+                cur["_late_by"][r["manager"]] = r["late"]
             if (r.get("value") or 0) > (cur.get("value") or 0):
                 cur["value"] = r["value"]; cur["company"] = r.get("company", cur.get("company"))
-    return list(best.values())
+    out = []
+    for row in best.values():
+        late_by = row.pop("_late_by")
+        if not late_by:
+            row.pop("late", None)
+        elif row["count"] == 1:
+            row["late"] = next(iter(late_by.values()))
+        else:
+            row["late"] = "⚠ закъснява: " + ", ".join(m.split("·")[-1].strip() for m in late_by)
+        out.append(row)
+    return out
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -541,7 +640,10 @@ def _fetch_all_uncached(min_value: float) -> dict:
     major_exits: list[dict] = []
     stopped_managers: list[dict] = []
     any_active_data = False
-    n_active = n_no_filings = 0
+    n_active = n_no_filings = n_compared = 0
+    low_cov: list[dict] = []                          # мениджъри без надеждно покритие на акциите (13F пакет)
+    late_managers: list[dict] = []                    # мениджъри без 13F за последното просрочено тримесечие
+    scale_basis: dict[str, str] = {}                  # мениджър → основание на мащаба (price / price_override / size / size_override / date) — за диагностика
 
     for cik, name in config.DATAROMA_CIK.items():
         snap = _manager_snapshot(cik, name)
@@ -560,6 +662,14 @@ def _fetch_all_uncached(min_value: float) -> dict:
 
         any_active_data = True
         n_active += 1
+        n_compared += 1 if snap.get("prev_agg") else 0
+        scale_basis[name] = f"{snap.get('current_scale')}×:{snap.get('current_scale_basis')}"
+        lc = low_coverage(snap)
+        if lc:
+            low_cov.append({"manager": name, **{k: (None if v is None else round(v, 2)) for k, v in lc.items()}})
+            print(f"[dataroma] ⚠ {name}: покритие на акциите {lc} < {config.THIRTEENF_MIN_SHARES_COVERAGE:g} — без нова/увеличена за този мениджър")
+        if snap.get("late"):
+            late_managers.append({"manager": name, **snap["late"]})
         mgr_rows = _moves_from_snapshot(snap, min_value, tmap)
         manager_top[name] = sorted(mgr_rows, key=lambda r: r.get("value") or 0,
                                    reverse=True)[:config.DATAROMA_TOP_PER_MANAGER]
@@ -599,7 +709,8 @@ def _fetch_all_uncached(min_value: float) -> dict:
         kind = "legit_zero"
         note = f"{n_active} от {total} мениджъра с данни: нито една нова/увеличена позиция и нито един голям изход"
     meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
-            "managers_total": total, "managers_without_filings": n_no_filings}
+            "managers_total": total, "managers_without_filings": n_no_filings,
+            "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "scale_basis": scale_basis}
 
     if moves or new_positions or major_exits or stopped_managers:
         bundle["meta"] = meta
@@ -690,7 +801,7 @@ def new_position_markers(rows: list[dict] | None = None) -> dict[str, dict]:
             when = _filing_date(r)
             val = f", {_money_txt(r['value'])}" if r.get("value") else ""
             lines.append(f"{r['manager']} — {r.get('pct_of_portfolio')}% от портфейла{val}; "
-                         f"13F filing от {when or 'неизвестна дата'}")
+                         f"13F filing от {when or 'неизвестна дата'}" + (f" ({r['late']})" if r.get("late") else ""))
         out[ticker] = {"tag": "SI✓" if len(managers) == 1 else f"SI✓×{len(managers)}",
                        "title": "Нова позиция на superinvestor: " + " | ".join(lines)}
     return out

@@ -731,7 +731,8 @@ def run() -> dict:
         "rotation": rotation,
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out),
+                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
+                                               superinvestor_status=superinvestor_status),
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +

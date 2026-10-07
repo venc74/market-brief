@@ -72,9 +72,31 @@ def _ep_warning(ep: dict | None) -> list[dict]:
              "message": (f"EP наблюдение (after-hours): {d['batches_failed']} от {d.get('batches')} партиди тикъри не се изтеглиха — списъкът с гапове може да е непълен.")}]
 
 
+def _13f_warnings(status: dict | None) -> list[dict]:
+    """
+    13F пакет (07.10): (а) мениджъри с покритие на акциите под прага — "нова/увеличена" не се показва за тях (не значи "няма покупки"); (б) мениджъри без 13F за последното просрочено тримесечие
+    (давност: Pershing на 06.10 — последен 13F от 15.05, Q2 е с срок 14.08). Легитимна нула не е предупреждение.
+    """
+    st = status or {}
+    out = []
+    lc = st.get("low_coverage") or []
+    if lc:
+        out.append({"source": "13f", "level": "warn",
+                    "message": ("13F: броят акции не е прочетен надеждно за " + ", ".join(x["manager"] for x in lc)
+                                + " — „нова/увеличена позиция“ не се показва за тях днес; това НЕ значи, че няма покупки.")})
+    late = st.get("late_managers") or []
+    if late:
+        def one(x):
+            q = x["quarter_end"]; d = x["deadline"]
+            return f"{x['manager']} (последен 13F от {x['last_filing_date']}, няма за тримесечие до {q[8:10]}.{q[5:7]}, срок {d[8:10]}.{d[5:7]})"
+        out.append({"source": "13f", "level": "warn",
+                    "message": "13F: закъсняват — " + "; ".join(one(x) for x in late) + ". Позициите им са от по-старо тримесечие."})
+    return out
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
-            qm_diag: dict | None = None, qm_ep: dict | None = None) -> list[dict]:
+            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -111,4 +133,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_marker_warnings(insider_status, uov_diag))
     out.extend(_qm_warning(qm_diag))
     out.extend(_ep_warning(qm_ep))
+    out.extend(_13f_warnings(superinvestor_status))
     return out
