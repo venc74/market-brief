@@ -159,7 +159,8 @@ print("  ✓ банер най-горе в dashboard-а и в имейла; Coco
 print()
 print("── main (структурно) ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation), cot_diag=ai_brief.COT_DIAG)" in src
+call = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Call) and ast.unparse(n.func) == "data_warnings.collect")
+assert {k.arg: ast.unparse(k.value) for k in call.keywords}["cot_diag"] == "ai_brief.COT_DIAG"                 # по аргумент, не по точния низ: други пакети добавят свои аргументи към същото извикване
 print("  ✓ main подава ai_brief.COT_DIAG на data_warnings.collect")
 
 assert (REAL_CACHE.read_bytes() if REAL_CACHE.exists() else None) == real_before
