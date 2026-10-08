@@ -59,10 +59,8 @@ print()
 print("── четци на позиции ──")
 assert set(brief_main._live_positions()) == {"AAA"}, brief_main._live_positions()                         # BBB и EXPD (buy-stop, отворени) не са позиции
 assert set(brief_main._last_resolved_positions()) == {"EEE"}                                               # CCC (затворен buy-stop) не е "предишна позиция"
-buf = io.StringIO()
-with contextlib.redirect_stdout(buf):
-    assert set(ai_brief._live_v2_positions()) == {"AAA"}
-print("  ✓ main._live_positions → {AAA}; main._last_resolved_positions → {EEE}; ai_brief._live_v2_positions → {AAA} (buy-stop BBB/CCC/DDD/EXPD не се броят)")
+assert not hasattr(ai_brief, "_live_v2_positions")                                                         # 08.10 (2б): четецът беше само за вчерашните trigger-и — махнат заедно с тях
+print("  ✓ main._live_positions → {AAA}; main._last_resolved_positions → {EEE} (buy-stop BBB/CCC/DDD/EXPD не се броят); ai_brief._live_v2_positions е махнат (08.10, 2б)")
 
 print()
 print("── Action обобщението ──")

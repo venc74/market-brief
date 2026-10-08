@@ -32,7 +32,6 @@ def fake(system, user, max_tokens=0):
     seen["user"] = user
     return json.dumps({"tickers": []})
 ai_brief._call_claude = fake
-ai_brief._load_prior_watchlist_triggers = lambda *a, **k: {}
 cands = [dict(CARDS[t]) for t in ("FTNT", "AMD", "EXPD")]
 ai_brief.ticker_narratives(cands, [], "Defensive")
 u = seen["user"]

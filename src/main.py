@@ -168,6 +168,29 @@ def _regime_gate(c: dict, regime: str | None) -> str | None:
     return None
 
 
+def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
+    """
+    Текстът "Trigger" на Watchlist картата, сглобен от КОДА (08.10.2026, 2б) — моделът не пише watchlist_trigger. Части, в ред: отчет (earnings.in_blackout / дни до отчета),
+    сетъпът (setup.trigger_text — buy-stop, обем, extended, твърде разтегнато; за потвърден пробив, който AI не е избрал за Action, също), режимният gate (_regime_gate).
+    Без нито една част → кратко пояснение, че потвърденият сетъп не е избран. Чиста функция.
+    """
+    parts: list[str] = []
+    e = c.get("earnings") or {}
+    days = e.get("days_to_earnings")
+    if e.get("in_blackout") or (isinstance(days, (int, float)) and 0 <= days <= 7):
+        when = "ДНЕС" if days == 0 else (f"на {e.get('next_earnings')} ({int(days)} дни)" if isinstance(days, (int, float)) and e.get("next_earnings") else f"на {e.get('next_earnings') or 'неизвестна дата'}")
+        parts.append(f"Отчет {when} — нов Action най-рано след отчета.")
+    setup = c.get("setup") or {}
+    if setup.get("trigger_text"):
+        parts.append(setup["trigger_text"])
+    gate = _regime_gate(c, regime)
+    if gate:
+        parts.append(gate)
+    if not parts:
+        parts.append("Не е избран за Action днес — виж „Защо точно сега“.")
+    return " ".join(parts)
+
+
 def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                      regime: str | None = None) -> tuple[list, list]:
     """
@@ -304,7 +327,8 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 sector_count[sector] = sector_count.get(sector, 0) + 1
                 action.append(c)
                 continue
-        c["ai"].setdefault("watchlist_trigger", "Изчаква потвърждение.")
+        if not c["ai"].get("watchlist_trigger"):                                   # 08.10 (2б): не е наложен от по-ранно правило → сглобява се от кода (отчет + сетъп + режим)
+            c["ai"]["watchlist_trigger"] = _watchlist_trigger_text(c, regime)
         # пакет 2: buy-stop кандидатите показват стоп, риск %, цел 1 и размер на позицията при sizing-а на режима (само показване)
         if (c.get("setup") or {}).get("buy_stop"):
             c["plan_preview"] = buy_stop_preview(c, sizing_factor, today)

@@ -932,7 +932,7 @@
       {% endif %}
       {# FIX 2026-10-02 (пакет 1, т.1): код-изчислен сетъп — buy-stop ниво за кандидатите
          под pivot; за останалите (над pivot без обем / extended) — причината от кода #}
-      {% if st.setup and st.ai.watchlist_reason_type != 'technical_gate' %}
+      {% if st.setup and st.ai.watchlist_reason_type != 'technical_gate' and st.setup.trigger_text not in (st.ai.watchlist_trigger or '') %}
       <div class="watch-trigger"><b>Сетъп:</b> {{ st.setup.trigger_text }}</div>
       {% endif %}
       {% if st.setup and st.setup.triggered %}

@@ -757,97 +757,12 @@ SYSTEM_TICKERS = """Ти си портфолио стратег за суинг 
 кажи го. Връщаш САМО валиден JSON."""
 
 
-# Текстове за ПОЗИЦИЯ във вчерашен trigger ("Вече в портфейла от …", "управлявай съществуващата позиция", OPEN✓ …)
-_POSITION_WORDING = re.compile(
-    r"вече\s+(?:е\s+)?в\s+портфейла|съществуваща\s+позиция|съществуващата\s+позиция|вече\s+отворена|отворена\s+позиция|OPEN✓", re.I)
+# 08.10.2026 (2б): блокът "ВЧЕРАШНИ WATCHLIST TRIGGER-И" и всичко около него (_load_prior_watchlist_triggers, prior_trigger_usable, _live_v2_positions, _POSITION_WORDING)
+# са махнати. Вчерашният текст на модела се подаваше обратно като "контекст" и се самоподсилваше ("вече в портфейла / не добавяй" за AMD, AVT, ANET дори след като
+# позициите бяха архивирани). Сега моделът изобщо не пише watchlist_trigger — текстът на Watchlist картата се сглобява от кода (main._watchlist_trigger_text).
 
 
-def _live_v2_positions() -> dict[str, dict]:
-    """Тикър → запис за живите v2 позиции (open/trailing) — същото като main._live_positions(), без импорт на main."""
-    try:
-        tracker = backtest._load_tracker()
-        return {rec["ticker"]: rec for rec in tracker.values()
-                if rec.get("method") == "v2" and backtest.is_action_record(rec)      # пакет 1б: buy-stop кандидатите не са позиции
-                and rec.get("status") in ("open", "trailing")}
-    except Exception as e:
-        print(f"[ai] живите v2 позиции не се заредиха: {e}")
-        return {}
-
-
-def prior_trigger_usable(ticker: str, card: dict, live: dict[str, dict]) -> tuple[bool, str]:
-    """
-    Пакет 2 (05.10): може ли вчерашният watchlist_trigger на тикъра да се подаде на модела?
-    Trigger, който говори за ПОЗИЦИЯ (reason_type "existing_position" или текст "вече в портфейла / управлявай съществуващата
-    позиция"), е верен само ако днес има ЖИВА v2 позиция за тикъра и датата в текста (ако има) е нейната. След превключването
-    v1 → v2 (05.10) позициите от архива вече не са живи — подаден, текстът кара модела да повтаря "вече в портфейла / не добавяй"
-    (AMD, AVT, ANET) и така се самоподсилва ден след ден. Връща (годен, причина при отказ).
-    """
-    trigger = (card.get("ai") or {}).get("watchlist_trigger") or ""
-    positional = (card.get("ai") or {}).get("watchlist_reason_type") == "existing_position" or bool(_POSITION_WORDING.search(trigger))
-    if not positional:
-        return True, ""
-    rec = live.get(ticker)
-    if rec is None:
-        return False, "вчерашният текст е за позиция, която не е жива v2 позиция днес"
-    dates = set(re.findall(r"\d{4}-\d{2}-\d{2}", trigger))
-    own = {d for d in (rec.get("fill_date"), rec.get("entry_date")) if d}
-    if dates and not (dates & own):
-        return False, f"датата на позицията във вчерашния текст ({', '.join(sorted(dates))}) не е на жива v2 позиция"
-    return True, ""
-
-
-def _load_prior_watchlist_triggers(today: str | None = None,
-                                   live_positions: dict[str, dict] | None = None) -> dict[str, str]:
-    """
-    FIX 2026-08-02 (точка 4 follow-up — cross-day watchlist_trigger честност):
-    чете watchlist_trigger текста от НАЙ-СКОРОШНИЯ ПРЕДИШЕН data/YYYY-MM-DD.json
-    snapshot и го подава като контекст на днешния AI промпт. Soft механизъм,
-    mirroring prior_context в cot_theses() (виж по-долу в модула) — само cross-day
-    вместо cross-batch. Потвърдено 5/5 проверени случая при прегледа на точка 4
-    (2026-08-02): LLY, IRM, HWM, ROST, WWD — AI-то дава конкретен, измерим
-    watchlist_trigger, после на следващия ден промотира тикъра в Action без нито
-    едно от условията да е реално изпълнено, без обяснение защо (напр. LLY: trigger
-    изискваше затваряне >$1249.45 + обем ≥1.3x + RS new_high; на деня на промоция
-    цената беше $1216.95, обемът 0.62x, RS остана near_high — нищо от трите).
-
-    ВАЖНО РАЗГРАНИЧЕНИЕ: този fix прави AI-то ЧЕСТНО за случая (обяснява
-    противоречието, вместо мълчаливо да го подмине) — НЕ предотвратява
-    преждевременен вход. Structural защита срещу лош entry timing е задача на
-    бъдещ отделен Entry Timing модул (code-enforced праг, независим от AI текст,
-    mirroring как in_blackout вече force-ва Watchlist класификация независимо от
-    AI мнение — виж merge_narratives). Двете остават отделни, допълващи се слоеве
-    на same проблем: тук подобряваме прозрачността на разказа; бъдещият модул би
-    бил истинската защита срещу самия ранен вход.
-
-    Graceful: липсващ/нечетим/липсващ предишен snapshot → празен dict, промптът
-    просто няма prior-trigger секция, не чупи pipeline-а.
-    """
-    try:
-        today = today or dt.date.today().isoformat()
-        snaps = sorted(p for p in config.DATA_DIR.glob("*.json")
-                       if backtest._SNAPSHOT_RE.match(p.name) and p.stem < today)
-        if not snaps:
-            return {}
-        prior = json.loads(snaps[-1].read_text(encoding="utf-8"))
-        live = _live_v2_positions() if live_positions is None else live_positions
-        out = {}
-        for c in prior.get("watchlist", []):
-            ticker = c.get("ticker")
-            trigger = (c.get("ai") or {}).get("watchlist_trigger")
-            if ticker and trigger and trigger != "Изчаква потвърждение.":
-                ok, why = prior_trigger_usable(ticker, c, live)
-                if not ok:
-                    print(f"[ai] вчерашният trigger за {ticker} не се подава на модела — {why}")
-                    continue
-                out[ticker] = trigger
-        return out
-    except Exception as e:
-        print(f"[ai] prior watchlist triggers зареждане неуспешно: {e}")
-        return {}
-
-
-def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
-                              regime: str, prior_triggers: dict[str, str] | None = None) -> str:
+def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime: str) -> str:
     """
     Изгражда user prompt-а за един batch кандидати. Логиката е идентична на
     оригинала — само `slim` тук е подмножество (batch), не целият списък.
@@ -855,30 +770,12 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict],
     prompt-а непроменени; реалното им налагане е в main.apply_hard_rules СЛЕД
     merge, така че batch-ването не нарушава глобалния cap (кодът има последната дума).
 
-    prior_triggers: FIX 2026-08-02 (виж _load_prior_watchlist_triggers) — вчерашни
-    watchlist_trigger текстове, филтрирани само до тикърите в ТОЗИ batch.
+    08.10.2026 (2б): няма блок с вчерашни watchlist_trigger-и и моделът не връща watchlist_trigger — текстът на Watchlist картата е на кода.
     """
-    batch_triggers = {c["ticker"]: prior_triggers[c["ticker"]]
-                      for c in slim
-                      if prior_triggers and c.get("ticker") in prior_triggers}
-    trigger_block = (
-        f"""
-
-ВЧЕРАШНИ WATCHLIST TRIGGER-И ЗА ТЕЗИ ТИКЪРИ (за консистентност):
-{json.dumps(batch_triggers, ensure_ascii=False, default=str)}
-
-За тикър от списъка по-горе: провери дали вчерашният trigger (цена/обем/RS \
-условие) реално се е изпълнил, преди да го класифицираш като Action. Ако го \
-промотираш въпреки НЕизпълнено условие, обясни изрично в "why_now" защо \
-(нов катализатор, ревизирани фундаментали, друга основателна причина) — не \
-просто мълчаливо да го игнорираш."""
-        if batch_triggers else ""
-    )
     return f"""Пазарен режим: {regime}
 Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False, default=str)}
 
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
-{trigger_block}
 
 Полето "base_type" е само ДЪЛБОЧИНАТА на 13-седмичната база ("база X% дълбочина") — кодът не \
 разпознава формация. НЕ наричай базата "cup with handle", "flat base", "VCP" или друга формация и не \
@@ -911,10 +808,10 @@ setup не е "confirmed", в earnings blackout, RS слабее, или сек�
 (чака конкретна промяна в пазарния режим ЗАЕДНО с цена/обем условие), \
 "earnings_blackout" (в earnings прозорец), "other" (RS/обем/друга техническа причина, \
 без regime зависимост). НЕ пиши "existing_position" — това полето се override-ва от \
-кода за вече отворени позиции, не е твоя преценка.
-- "watchlist_trigger": ако Watchlist — какво точно трябва да се случи (цена/обем/regime \
-промяна). НЕ споменавай конкретна КАЛЕНДАРНА дата на изтичане на тезата — това вече се \
-управлява детерминистично от кода (виж watchlist_reason_type="regime_gate"), не от теб.
+кода за вече отворени позиции, не е твоя преценка. НЕ пиши "watchlist_trigger" и \
+не описвай какво трябва да се случи (цена/обем/дата) — тази част на картата се \
+сглобява от кода по сетъпа, режима и отчетите; ти обясни само в "why_now" защо \
+кандидатът е интересен или слаб.
 
 Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
 Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
@@ -929,14 +826,13 @@ days_to_earnings=0 означава earnings Е ДНЕС — пиши го из�
 
 
 def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
-                          regime: str, tag: str,
-                          prior_triggers: dict[str, str] | None = None) -> list[dict]:
+                          regime: str, tag: str) -> list[dict]:
     """
     Един batch → едно Claude извикване → парснат JSON. 1 retry при API/JSON грешка
     (преходни сривове). При провал и на двата опита: логва и връща [] (губим само
     тикърите от ТОЗИ batch), без да чупи останалите batch-ове или pipeline-а.
     """
-    user = _build_ticker_user_prompt(slim, sector_logic, regime, prior_triggers)
+    user = _build_ticker_user_prompt(slim, sector_logic, regime)
     for attempt in (1, 2):  # 1 опит + 1 retry
         try:
             out = _parse_json(_call_claude(SYSTEM_TICKERS, user,
@@ -958,7 +854,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     За всеки кандидат Claude връща:
     why_now (верижна логика макро→сектор→акция), business_bg (2-3 изречения),
     catalysts (4-8 седмици), risks, earnings_call (преди/след/не сега),
-    classification (Action/Watchlist) + watchlist_trigger ако е Watchlist.
+    classification (Action/Watchlist) + watchlist_reason_type ако е Watchlist (текстът на картата е на кода — main._watchlist_trigger_text).
 
     Извикванията са на batch-ове по config.AI_BATCH_SIZE тикъра — отделно API
     извикване + отделно JSON парсване на batch, после обединяване. Така token
@@ -992,13 +888,9 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     print(f"[ai] ticker_narratives: {len(slim)} финалиста → {n} batch(ове) "
           f"по ≤{size} (max_tokens={config.AI_BATCH_MAX_TOKENS}/batch)")
 
-    # FIX 2026-08-02 (точка 4 follow-up): вчерашни watchlist_trigger текстове,
-    # заредени веднъж за целия run — виж _load_prior_watchlist_triggers.
-    prior_triggers = _load_prior_watchlist_triggers()
-
     merged: list[dict] = []
     for idx, batch in enumerate(batches, 1):
-        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}", prior_triggers)
+        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}")
     return merged
 
 
@@ -1006,6 +898,7 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
     by_ticker = {n["ticker"]: n for n in narratives}
     for c in candidates:
         c["ai"] = by_ticker.get(c["ticker"], {})
+        c["ai"].pop("watchlist_trigger", None)           # 08.10 (2б): текстът е на кода — ако моделът въпреки всичко върне такова поле, то се изхвърля
         # Твърдите правила бият AI преценката (Секция 8):
         if c.get("earnings", {}).get("in_blackout") and not c["ai"].get("warning"):
             c["ai"]["classification"] = "Watchlist"

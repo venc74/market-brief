@@ -1,0 +1,206 @@
+{
+"_note": "РЕАЛНО: Watchlist картите от брифа на 08.10.2026 (цена, pivot, обем, сетъп, отчет) и каквото е било публикувано като watchlist_trigger (текст на модела). Режимът на деня: Defensive. Ползва се от test_watchlist_trigger.py.",
+"regime": "Defensive",
+"cards": [
+{
+"ticker": "ZBRA",
+"price": 386.05,
+"pivot": 386.23,
+"pct_from_pivot": -0.05,
+"volume_ratio": 0.71,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($341.02 −1% = $337.61) е 12.6% под входа (> 10%) — не се купува, докато базата не се стегне.",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-11-03",
+"days_to_earnings": 26,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "regime_gate",
+"watchlist_trigger": "Пазарният режим се промени на Neutral или по-добър И затваряне над $386.23 с volume_ratio ≥ 1.5x среден дневен обем И RS достигне new_high статус. Структурният стоп трябва да се стегне до ≤ 10% под входа (базата трябва да оформи по-висок 15-барен low). И трите условия трябва да са изпълнени едновременно.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "ANET",
+"price": 215.83,
+"pivot": 214.89,
+"pct_from_pivot": 0.44,
+"volume_ratio": 0.83,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($192.98 −1% = $191.05) е 11.5% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.83× < 1.5×).",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-11-03",
+"days_to_earnings": 26,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Структурният стоп да се стегне до ≤ 10% под входа (нов, по-висок 15-барен low да се формира) И затваряне над $214.89 с volume_ratio ≥ 1.5x среден дневен обем. При Defensive режим sizing задължително ×0.5.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "AMD",
+"price": 645.86,
+"pivot": 639.0,
+"pct_from_pivot": 1.07,
+"volume_ratio": 0.83,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($527.60 −1% = $522.32) е 19.1% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.83× < 1.5×).",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-11-03",
+"days_to_earnings": 26,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Базата да се стегне значително — нов 15-барен low да се формира достатъчно по-горе, така че структурният стоп да намалее до ≤ 10% под входа. Analyst target да бъде ревизиран над текущата цена. Едва тогава: затваряне над новия pivot с volume_ratio ≥ 1.5x.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "VLO",
+"price": 424.1,
+"pivot": 419.04,
+"pct_from_pivot": 1.21,
+"volume_ratio": 0.6,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($364.96 −1% = $361.31) е 14.8% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.60× < 1.5×).",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-10-22",
+"days_to_earnings": 14,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Изчакай earnings (2026-10-22) и реакцията след тях. При позитивна реакция — търси консолидация около pivot $419 с volume_ratio < 0.8× (изсъхване), последвана от close над $419-$425 с volume_ratio ≥ 1.5× и структурен стоп ≤ 10% под входа. Setup трябва да се промени от 'too_wide' на 'confirmed'. Analyst target трябва да бъде ревизиран над текущата цена преди entry.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "DINO",
+"price": 115.63,
+"pivot": 118.39,
+"pct_from_pivot": -2.33,
+"volume_ratio": 0.83,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($103.00 −1% = $101.97) е 13.9% под входа (> 10%) — не се купува, докато базата не се стегне.",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-10-28",
+"days_to_earnings": 20,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Изчакай earnings (2026-10-28) и реакцията след тях. При позитивна реакция — търси close над pivot $118.39 с volume_ratio ≥ 1.5× и структурен стоп ≤ 10% под входа (setup да се промени от 'too_wide' на 'confirmed'). Analyst target трябва да бъде ревизиран над текущата цена преди entry. Затваряне под $103 анулира тезата.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "KEYS",
+"price": 381.42,
+"pivot": 366.88,
+"pct_from_pivot": 3.96,
+"volume_ratio": 0.85,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($327.97 −1% = $324.69) е 14.9% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.85× < 1.5×).",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-11-24",
+"days_to_earnings": 47,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Консолидация обратно към pivot зоната ($366.88-$384) с изсъхване на обема (volume_ratio < 0.8x), последвана от затваряне над $384 с volume_ratio ≥ 1.5x и RS да достигне new_high статус. Setup трябва да се промени на confirmed с структурен стоп ≤ 10% под входа. Ако цената затвори под $366.88 — тезата се анулира. При Defensive режим sizing ×0.5.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "FTNT",
+"price": 189.28,
+"pivot": 181.37,
+"pct_from_pivot": 4.36,
+"volume_ratio": 0.84,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($166.09 −1% = $164.43) е 13.1% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.84× < 1.5×).",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-10-28",
+"days_to_earnings": 20,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Изчакай earnings 2026-10-28. След earnings: пробив с volume_ratio ≥ 1.5x при close над актуалния pivot, analyst target да бъде ревизиран над текущата цена (в момента е под нея на $164.32) и setup да се промени от too_wide на confirmed (структурен стоп ≤ 10% под входа). При Defensive режим sizing ×0.5 е задължително.",
+"classification": "Watchlist"
+}
+},
+{
+"ticker": "NTAP",
+"price": 235.77,
+"pivot": 216.81,
+"pct_from_pivot": 8.74,
+"volume_ratio": 1.16,
+"breakout_volume": false,
+"setup": {
+"kind": "too_wide",
+"eligible": false,
+"gate": "too_wide",
+"trigger_text": "Твърде разтегнато: стопът под 15-барния low ($190.89 −1% = $188.98) е 19.9% под входа (> 10%) — не се купува, докато базата не се стегне. Също extended: +8.7% над pivot $216.81.",
+"buy_stop": null
+},
+"earnings": {
+"next_earnings": "2026-12-01",
+"days_to_earnings": 54,
+"in_blackout": false
+},
+"ai_published": {
+"watchlist_reason_type": "other",
+"watchlist_trigger": "Вчерашният trigger НЕ е изпълнен. Необходима е консолидация обратно към pivot зоната $210-$220 с volume_ratio < 0.8× (изсъхване на обема), последвана от close над $220 с volume_ratio ≥ 1.5×. Analyst target трябва да бъде ревизиран над текущата цена ($235+) преди entry. Setup трябва да се промени от 'too_wide' на 'confirmed' (структурен стоп ≤ 10% под входа). Затваряне под $210 анулира тезата.",
+"classification": "Watchlist"
+}
+}
+]
+}

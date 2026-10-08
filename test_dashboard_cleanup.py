@@ -70,8 +70,7 @@ if __name__ == "__main__":
     assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and "borrow" not in out and "borrow" not in out["short_view"]
     # AI payload-ът не носи опции
     seen = []
-    ai_brief._narratives_for_batch = lambda batch, sector_logic, regime, label, prior: seen.extend(batch) or []
-    ai_brief._load_prior_watchlist_triggers = lambda: {}
+    ai_brief._narratives_for_batch = lambda batch, sector_logic, regime, label: seen.extend(batch) or []
     ai_brief.ticker_narratives([{**row, "options": {"iv": 38.5, "iv_rank": 22.0, "strategy": "long call"}, "short_view": {}}], [], "Offensive")
     assert seen and all("options" not in s for s in seen)
     print("  ✓ картата няма 'Опции' (IV/IVR, P/C, Стратегия); enrich() не слага options; AI payload-ът ги няма; Short Interest и")
