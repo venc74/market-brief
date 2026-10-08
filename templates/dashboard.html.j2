@@ -466,7 +466,7 @@
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
-      <div class="date mono">{{ date_human }} · генериран {{ generated_at }} {{ generated_tz }} · 90 мин преди US pre-market</div>
+      <div class="date mono">{{ date_human }} · генериран {{ generated_at }} {{ generated_tz }}{% if premarket_note %} · {{ premarket_note }}{% endif %}</div>
     </div>
     <div>
       <div class="regime-badge">{{ regime }}</div>
@@ -1385,7 +1385,8 @@
 
 {% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions or backtest.v1_archive) %}
 <section>
-  <h2>Track Record v2 · {{ backtest.total_resolved }} резолвирани</h2>
+  {# 08.10: заглавието казва колко Action сигнала са записани от старта — "0 резолвирани" без това изглежда като празна система, а сигнали може да чакат buy-stop или да не са се задействали #}
+  <h2>Track Record v2 · {% if backtest.action_signals is defined %}{{ backtest.action_signals }} Action {{ "сигнал" if backtest.action_signals == 1 else "сигнала" }}{% if backtest.methodology and backtest.methodology.switched_on %} от {{ backtest.methodology.switched_on[8:10] }}.{{ backtest.methodology.switched_on[5:7] }}{% endif %} · {% endif %}{{ backtest.total_resolved }} резолвирани</h2>
   {# FIX 2026-10-03 (пакет 1, т.7): чист старт — v1 е архив, един ред #}
   {% if backtest.v1_archive %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">

@@ -378,6 +378,7 @@ def _fix_translit(obj):
         i = obj.index(_SOFT_HYPHEN)
         print(f"[ai] премахнат soft hyphen (U+00AD) ×{n} — «…{obj[max(0, i - 25):i + 25].replace(_SOFT_HYPHEN, '·')}…»")
         obj = obj.replace(_SOFT_HYPHEN, "")
+    obj = _fix_latin_prefix(obj)                  # 08.10: ПРЕДИ лога на известните дефекти и буквите-двойници — иначе поправена дума ("expозиция") пак се води като неподправена хибридна
     _log_known_defects(obj)
     if _CJK_RE.search(obj):
         for m in _CJK_RE.finditer(obj):
@@ -466,6 +467,44 @@ def _fix_glued(s: str) -> str:
         print(f"[ai] слепени думи разделени: '{m.group(0)}' → '{fixed}'")
         return fixed
     return _GLUED_RE.sub(repl, s)
+
+
+# 08.10.2026 (език): латинска ПРИСТАВКА (1–3 букви) пред кирилска дума — "Verижната" (= "Верижната"), "natиск", "rotацията", "katализатор", "sedмичен", "umерено", "verига". Моделът започва думата с
+# латиница и продължава с кирилица. Безопасно е само ако транслитерираната приставка + кирилската част дава ЦЯЛА дума, която е в речника на историята поне 3 пъти (като _fix_glued). Мерено
+# върху цялата история (107 различни хибридни думи, 322 появи): 17 думи отговарят на условието и всичките 17 са правилни поправки; думите с английска основа ("benefitват" — приставка 7 букви,
+# "момentum" — кирилицата е отпред) не отговарят на шаблона и остават само в лога.
+_LAT_PREFIX_RE = re.compile(r"(?<![A-Za-zА-Яа-яЁё])([A-Za-z]{1,3})([А-Яа-я]{3,})(?![A-Za-zА-Яа-яЁё])")
+_LAT_TO_CYR = {**dict(zip("abvgdeziyklmnoprstufhc", "абвгдезийклмнопрстуфхц")), "c": "к", "j": "й", "w": "в", "q": "к"}
+
+
+def _translit_prefix(lat: str) -> str | None:
+    """Латинска приставка → кирилица буква по буква (x → "кс"); None, ако има буква без съответствие."""
+    out = ""
+    for ch in lat:
+        low = ch.lower()
+        c = "кс" if low == "x" else _LAT_TO_CYR.get(low)
+        if c is None:
+            return None
+        out += c.upper() if (ch.isupper() and not out) else c
+    return out
+
+
+def _fix_latin_prefix(s: str) -> str:
+    cyr = _bg_vocab()[0]
+    if not cyr:
+        return s
+
+    def repl(m):
+        t = _translit_prefix(m.group(1))
+        if t is None:
+            return m.group(0)
+        whole = t + m.group(2)
+        if cyr.get(whole.lower(), 0) < 3:
+            return m.group(0)
+        fixed = whole if m.group(1)[0].isupper() else whole.lower()
+        print(f"[ai] латинска приставка пред кирилица заменена: '{m.group(0)}' → '{fixed}'")
+        return fixed
+    return _LAT_PREFIX_RE.sub(repl, s)
 
 
 def _latin_as_bg(w: str) -> str | None:

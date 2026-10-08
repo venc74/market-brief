@@ -46,6 +46,32 @@ def berlin_clock(now: dt.datetime | None = None) -> tuple[str, str]:
         return now.astimezone(dt.timezone.utc).strftime("%H:%M"), "UTC"
 
 
+def premarket_note(now: dt.datetime | None = None) -> str:
+    """
+    Текстът за часа до US pre-market в заглавието (08.10.2026, code-queue): преди беше твърдото "90 мин преди US pre-market", а pre-market започва в 04:00 Ню Йорк (10:00 CEST през лятото,
+    09:00 CET в двете седмици, когато САЩ са още на лятно, а Европа вече на зимно време) и брифът излиза около 07:30 берлинско време, т.е. ~2.5 часа преди. Смята се от момента на генериране:
+    преди 04:00 ET на същия ден → «2 ч 30 мин до US pre-market (04:00 ET)»; pre-market тече (04:00–09:30 ET) → «US pre-market тече»; след 09:30 ET → празно (текстът няма смисъл).
+    Празно и при липса на tz база. `now` — за тестове (наивно време = UTC).
+    """
+    now = now or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=dt.timezone.utc)
+    try:
+        from zoneinfo import ZoneInfo
+        ny = now.astimezone(ZoneInfo("America/New_York"))
+    except Exception:
+        return ""
+    open_pm = ny.replace(hour=4, minute=0, second=0, microsecond=0)
+    open_rth = ny.replace(hour=9, minute=30, second=0, microsecond=0)
+    if ny < open_pm:
+        mins = int((open_pm - ny).total_seconds() // 60)
+        h, m = divmod(mins, 60)
+        return "{} до US pre-market (04:00 ET)".format(f"{h} ч {m} мин" if h else f"{m} мин")
+    if ny < open_rth:
+        return "US pre-market тече"
+    return ""
+
+
 def _asset(name: str) -> str:
     """Съдържанието на templates/<name> (JS за оразмеряването) — вгражда се в страницата; липсващ файл → празно (страницата работи без оразмеряване)."""
     try:
@@ -125,6 +151,7 @@ def render_dashboard(brief: dict) -> str:
         date_human=f"{today.strftime('%d.%m.%Y')}, {WEEKDAYS_BG[today.weekday()]}",
         generated_at=gen_time,
         generated_tz=gen_tz,
+        premarket_note=premarket_note(),
         regime=brief["thermometer"]["regime"],
         regime_reason=brief["thermometer"]["regime_reason"],
         thermometer=brief["thermometer"],

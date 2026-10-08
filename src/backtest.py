@@ -1288,6 +1288,8 @@ def get_backtest_summary() -> dict:
 
     return {
         "total_resolved": total_resolved,
+        # 08.10: колко Action сигнала са записани във v2 книгата от старта (всички статуси: чакащи, отворени, затворени, незадействани, прескочени) — за заглавието на секцията
+        "action_signals": len(records),
         "win_rate_pct": win_rate,
         "wins": len(wins),
         "losses": len(losses),

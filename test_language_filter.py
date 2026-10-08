@@ -43,7 +43,10 @@ print("── известни дефекти: само лог ──")
 out, log = run({"t": marg})
 assert out["t"] == marg                                                                  # текстът не се пипа
 assert "известен езиков дефект 'marginalen' (трябва 'маргинален')" in log and "USD/GBP движението би имало marginalen P&L ефект" in log
+_orig_vocab = ai_brief._bg_vocab
+ai_brief._bg_vocab = lambda: ({}, {})                                                    # без речник от историята (изключен/липсва) — старото поведение: само лог
 out, log = run({"t": expo[0], "u": expo[1]})
+ai_brief._bg_vocab = _orig_vocab
 assert out["t"] == expo[0] and out["u"] == expo[1]
 assert log.count("известен езиков дефект 'expозиция' (трябва 'експозиция')") == 2 and "смесена дума 'expозиция'" in log      # и общият лог за хибриди остава
 print("  ✓ РЕАЛНО: 'marginalen' (USD/GBP тезата) и двете 'expозиция' от 05.10 → ред 'известен езиков дефект … (трябва …)' с контекст; текстът остава непроменен;")

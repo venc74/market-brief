@@ -49,9 +49,28 @@ assert len(now_h) == 5 and now_tz in ("CET", "CEST")
 print(f"  ✓ без аргумент (сега): {now_h} {now_tz}")
 print()
 
+print("── premarket_note() — часът до US pre-market (04:00 Ню Йорк) от момента на генериране ──")
+_pm = render.premarket_note
+assert _pm(U(2026, 10, 2, 5, 53)) == "2 ч 7 мин до US pre-market (04:00 ET)"                    # РЕАЛНО пускане 02.10 (07:53 CEST): 127 минути, не 90
+assert _pm(U(2026, 10, 8, 5, 30)) == "2 ч 30 мин до US pre-market (04:00 ET)"                    # типично пускане 07:30 CEST
+assert _pm(U(2026, 10, 27, 5, 30)) == "2 ч 30 мин до US pre-market (04:00 ET)"                   # седмицата 25.10–01.11: Берлин вече зимно (CET), Ню Йорк още лятно (EDT) — часът се смята по ET, не по берлинския
+assert _pm(U(2026, 11, 3, 6, 30)) == "2 ч 30 мин до US pre-market (04:00 ET)"                    # и двете зимни: 04:00 EST = 09:00 UTC
+assert _pm(U(2026, 10, 8, 7, 35)) == "25 мин до US pre-market (04:00 ET)" and _pm(U(2026, 10, 8, 8, 30)) == "US pre-market тече" and _pm(U(2026, 10, 8, 13, 29)) == "US pre-market тече"
+assert _pm(U(2026, 10, 8, 13, 30)) == "" and _pm(U(2026, 10, 8, 19, 0)) == ""
+assert _pm(dt.datetime(2026, 10, 8, 5, 30)) == "2 ч 30 мин до US pre-market (04:00 ET)"           # наивно време = UTC
+zoneinfo.ZoneInfo = no_tz
+try:
+    assert _pm(U(2026, 10, 8, 5, 30)) == ""
+finally:
+    zoneinfo.ZoneInfo = orig
+print("  ✓ 02.10 07:53 CEST → «2 ч 7 мин» (РЕАЛНОТО пускане; твърдото «90 мин» не беше вярно); 07:30 CEST → «2 ч 30 мин»; седмицата 25.10–01.11 (Берлин CET, Ню Йорк още EDT) и зимата дават същото; 07:35 UTC → «25 мин»;")
+print("    след 04:00 ET → «US pre-market тече»; след 09:30 ET → празно; без tz база → празно")
+print()
+
 print("── страницата (РЕАЛЕН бриф от 02.10) ──")
 brief = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-02.json").read_text(encoding="utf-8"))
 render.berlin_clock = lambda now=None, _o=render.berlin_clock: _o(U(2026, 10, 2, 5, 53))
+render.premarket_note = lambda now=None, _o=render.premarket_note: _o(U(2026, 10, 2, 5, 53))
 with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as data:
     o1, o2 = config.DOCS_DIR, config.DATA_DIR
     config.DOCS_DIR, config.DATA_DIR = pathlib.Path(docs), pathlib.Path(data)
@@ -59,8 +78,9 @@ with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as dat
         page = htmllib.unescape(render.render_dashboard(brief))
     finally:
         config.DOCS_DIR, config.DATA_DIR = o1, o2
-assert "генериран 07:53 CEST · 90 мин преди US pre-market" in page and "05:53" not in page.split("генериран")[1][:30]
-print("  ✓ при момент 05:53 UTC страницата казва 'генериран 07:53 CEST' (а не '05:53 CET')")
+assert "генериран 07:53 CEST · 2 ч 7 мин до US pre-market (04:00 ET)" in page and "05:53" not in page.split("генериран")[1][:30]
+assert "90 мин" not in page
+print("  ✓ при момент 05:53 UTC страницата казва 'генериран 07:53 CEST · 2 ч 7 мин до US pre-market (04:00 ET)' (а не '05:53 CET' и не твърдото '90 мин')")
 src = (ROOT / "templates" / "dashboard.html.j2").read_text(encoding="utf-8")
 assert "{{ generated_at }} CET" not in src and "{{ generated_tz }}" in src
 print("  ✓ шаблонът няма хардкоднат 'CET'")

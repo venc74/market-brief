@@ -1,0 +1,754 @@
+{
+"_note": "РЕАЛНО (08.10.2026): всички 107 различни думи със смесено писмо (латиница+кирилица в един токен) в docs/data/20*.json (юни–октомври), с броя появи, контекст и — за шаблона 'латинска приставка 1–3 букви + кирилица' — транслитерираната дума и колко пъти е в речника на историята (кирилски думи). Ползва се от test_language_prefix.py.",
+"words": [
+{
+"word": "Benefitва",
+"count": 1,
+"context": "ciplined credit underwriting. Benefitва структурно от steep yiel",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Deflация",
+"count": 1,
+"context": "Deflация в потреблението и инфлац",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Extremeно",
+"count": 1,
+"context": "иходи от wholesale генерация. Extremeно кратката позиция на mana",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Fед",
+"count": 1,
+"context": " в системата, не паркирана на Fед; Oil -19.8% е дезинфлаци",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Hawkиш",
+"count": 1,
+"context": "Hawkиш сигнал от Fed управител ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Healthcareгенерира",
+"count": 1,
+"context": "ска корелация с UST дюрация → Healthcareгенерира domestic revenue, не се ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Oперира",
+"count": 2,
+"context": "ентрати в САЩ и международно. Oперира под бранда Monster Energ",
+"candidate": "оперира",
+"candidate_vocab_count": 229
+},
+{
+"word": "Pesото",
+"count": 2,
+"context": " contrarian bearish сигнал за Pesото. Компании с приходи дено",
+"candidate": "песото",
+"candidate_vocab_count": 19
+},
+{
+"word": "Setupът",
+"count": 2,
+"context": "ternational ops (UK, Canada). Setupът е чисто технически — cup",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Stabilизиран",
+"count": 1,
+"context": "Stabilизиран credit spread (IEI/HYG t",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Verижната",
+"count": 1,
+"context": "върждение на RS обрат нагоре. Verижната логика е условна, не дей",
+"candidate": "верижната",
+"candidate_vocab_count": 5
+},
+{
+"word": "abundantни",
+"count": 1,
+"context": "hort exposure на памука. Няма abundantни pure-play cotton equity ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "adoptionи",
+"count": 1,
+"context": "Структурен ръст на PYLARIFY adoptionи нови labeling индикации ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "alcholол",
+"count": 1,
+"context": "ични стратегически брандове и alcholол сегмент. Компанията има ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "banково",
+"count": 1,
+"context": "2s10s нормализация → banково кредитиране за capex ста",
+"candidate": "банково",
+"candidate_vocab_count": 2
+},
+{
+"word": "benefitsва",
+"count": 1,
+"context": "зира industrial demand, което benefitsва ad spend → позицията е в",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "benefitва",
+"count": 12,
+"context": "ектор: regional bank директно benefitва от yield curve steepenin",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "benefitват",
+"count": 12,
+"context": "ктор: asset managers директно benefitват от steepening yield curv",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "benefitира",
+"count": 4,
+"context": "medical instruments/supplies, benefitира от XLV ротационния интер",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "benefitират",
+"count": 1,
+"context": "на Nasdaq-100 експозиция и ще benefitират несъразмерно при short s",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "bенефициент",
+"count": 1,
+"context": "ност и волатилност — директен bенефициент е IBKR, чиито приходи са",
+"candidate": "бенефициент",
+"candidate_vocab_count": 292
+},
+{
+"word": "canадски",
+"count": 1,
+"context": "и crude (WCS) при рафинерии с canадски доставки, подобрявайки c",
+"candidate": "канадски",
+"candidate_vocab_count": 41
+},
+{
+"word": "cerealи",
+"count": 1,
+"context": "oducts — Pillsbury, бисквити, cerealи) и Conagra (frozen meals",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "clearно",
+"count": 1,
+"context": "рма — Wall Street consensus е clearно bearish.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "czerwена",
+"count": 1,
+"context": "ст плюс hedging натиск — не е czerwена светлина, но е предупреж",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "dedikирани",
+"count": 1,
+"context": "редлагащ интермодален превоз, dedikирани договорни услуги и final",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "deflация",
+"count": 1,
+"context": " значителен cotton sourcing — deflация в cotton подобрява gross",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "demографски",
+"count": 1,
+"context": "и hospitality. Silver economy demографски trend е дългосрочен stru",
+"candidate": "демографски",
+"candidate_vocab_count": 9
+},
+{
+"word": "denominirани",
+"count": 1,
+"context": "DXY допълнително boost-ва USD-denominirани commodity цени. Механизм",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "denominирания",
+"count": 1,
+"context": "ханизъм 2: слаб DXY прави USD-denominирания уран по-евтин за европей",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "directна",
+"count": 1,
+"context": "АЩ с достатъчна ликвидност за directна short теза.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "directно",
+"count": 2,
+"context": "тино за американски туристи — directно увеличава booking volume",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "direktно",
+"count": 1,
+"context": "евицата — bearish обрат в соя direktно намалява feed costs за п",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "ekстремен",
+"count": 1,
+"context": "PE trailing 1693 (ekстремен) поради счетоводни ефект",
+"candidate": "екстремен",
+"candidate_vocab_count": 59
+},
+{
+"word": "expозиции",
+"count": 1,
+"context": "динствените смислени директни expозиции.",
+"candidate": "експозиции",
+"candidate_vocab_count": 0
+},
+{
+"word": "expозиция",
+"count": 19,
+"context": "CANSLIM скрийнъра и има пряка expозиция към лихвената среда чрез",
+"candidate": "експозиция",
+"candidate_vocab_count": 257
+},
+{
+"word": "favorира",
+"count": 1,
+"context": "03% за седмицата) исторически favorира energy sector като real ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "fundamentalната",
+"count": 1,
+"context": "ологии и енергетика губят, но fundamentalната верига е наранена от com",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "fundamentalния",
+"count": 1,
+"context": "в следващия отчет би изменило fundamentalния case.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "fundamentalно",
+"count": 1,
+"context": "ith handle, near_high RS), но fundamentalно и macro е wrong stock, w",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "fundamentален",
+"count": 3,
+"context": "+54.6% и Revenue +21% — силен fundamentален momentum пред earnings н",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "generират",
+"count": 1,
+"context": "er +0.75%, не колапс) банките generират по-добра rентабилност → ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "generична",
+"count": 1,
+"context": "ерига е прекалено разредена и generична (почти всяка S&P 500 ком",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "insurер",
+"count": 1,
+"context": "о (Allstate е доминантен auto insurер). Earnings вече са минал",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "katализатор",
+"count": 1,
+"context": ") Phase 3 данни — потенциален katализатор в следващите месеци",
+"candidate": "катализатор",
+"candidate_vocab_count": 228
+},
+{
+"word": "linии",
+"count": 1,
+"context": "взаимно — различни input cost linии водят до един и същ резу",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "longпозиция",
+"count": 1,
+"context": "кстремум е висококонвикционна longпозиция.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "macrocontextът",
+"count": 1,
+"context": "ехнически cup with handle, но macrocontextът е против.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "managementи",
+"count": 1,
+"context": "pp предоставя enterprise data managementи системи за hybrid cloud ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "marginален",
+"count": 1,
+"context": "pper в hardware, но ефектът е marginален спрямо total BOM. AMGN е",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "moмeнтум",
+"count": 1,
+"context": "ve режим се търгуват на силен moмeнтум — по-високи премии при п",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "narrativе",
+"count": 1,
+"context": "пящ GLP-1 obesity drug demand narrativе — LLY и AMGN (с obesity ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "natиск",
+"count": 1,
+"context": " long → yield spike очакван → natиск върху fixed-income portf",
+"candidate": "натиск",
+"candidate_vocab_count": 1230
+},
+{
+"word": "normalizира",
+"count": 1,
+"context": "като кривата продължава да се normalizира.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "pesото",
+"count": 1,
+"context": "антите са рекордно bullish на pesото, класически contrarian b",
+"candidate": "песото",
+"candidate_vocab_count": 19
+},
+{
+"word": "portfоlio",
+"count": 1,
+"context": "t income ръст от fixed income portfоlio management fees",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "premiumно",
+"count": 1,
+"context": "P/E 50.8x е premiumно при Defensive пазарен ре",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "preработватели",
+"count": 2,
+"context": " максимум. BG и ADM са водещи preработватели и търговци на soybean me",
+"candidate": "преработватели",
+"candidate_vocab_count": 47
+},
+{
+"word": "profesionalните",
+"count": 1,
+"context": "ски се влошават рязко, защото profesionalните мениджъри нямат свободен",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "rallyват",
+"count": 1,
+"context": "4.49% (+0.27% w/w) — bonds не rallyват въпреки commodities слаб",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "retailъри",
+"count": 1,
+"context": "вериги, за разлика от generic retailъри без директна commodity l",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "rotация",
+"count": 1,
+"context": "ват — тезата е за риск-апетит rotация, не за input costs. Двет",
+"candidate": "ротация",
+"candidate_vocab_count": 295
+},
+{
+"word": "rotацията",
+"count": 1,
+"context": "y cycles — при copper selloff rotацията към defensive consumer/t",
+"candidate": "ротацията",
+"candidate_vocab_count": 93
+},
+{
+"word": "rентабилност",
+"count": 1,
+"context": "с) банките generират по-добра rентабилност → XLF leading=true, но к",
+"candidate": "рентабилност",
+"candidate_vocab_count": 15
+},
+{
+"word": "saturация",
+"count": 1,
+"context": "7% означава практически пълна saturация — нов institutional buyi",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "sedмичен",
+"count": 1,
+"context": "runway е прекалено дълъг за 4-sedмичен swing trade в слаб setup",
+"candidate": "седмичен",
+"candidate_vocab_count": 140
+},
+{
+"word": "sharп",
+"count": 1,
+"context": ", която исторически предхожда sharп разпродажба. NWP Rockies",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "spreаd",
+"count": 1,
+"context": "2s10s spreаd steepening до 0.47% + MO",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "substitут",
+"count": 1,
+"context": "3% за 4 седмици) търси growth substitут с некорелиран катализато",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "surowина",
+"count": 2,
+"context": "Захарта е пряка surowина за carbonated beverages ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "testвозможни",
+"count": 1,
+"context": ", но US10Y@5% е macro ceiling testвозможни резки разпродажби при mi",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "umерено",
+"count": 1,
+"context": "бенефициенти — bearish RBOB е umерено негативен за рафинерийни",
+"candidate": "умерено",
+"candidate_vocab_count": 51
+},
+{
+"word": "verига",
+"count": 1,
+"context": "кущите нива потвърждава macro verига.",
+"candidate": "верига",
+"candidate_vocab_count": 489
+},
+{
+"word": "volatilност",
+"count": 1,
+"context": "BI е small-cap heavy с висока volatilност — при Defensive sizing_f",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "volatилни",
+"count": 1,
+"context": "за: small caps исторически са volatилни при short cover рали, а ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "volumetrично",
+"count": 1,
+"context": "а — спад в BTC директно свива volumetrично-зависимия им revenue. Ис",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Арista",
+"count": 1,
+"context": "chlist trigger НЕ е изпълнен. Арista е директен бенефициент н",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Блowout",
+"count": 1,
+"context": "Блowout резултатите на Intel пот",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Венtura",
+"count": 1,
+"context": " транспорт на природен газ до Венtura точка в Калифорния — екс",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Нямa",
+"count": 3,
+"context": "ian bearish сигнал за цената. Нямa директно изложени тикъри",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Реimbursement",
+"count": 1,
+"context": "Реimbursement риск: CMS coverage проме",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "Тezi",
+"count": 1,
+"context": "ма само посока нагоре от тук. Тezi два фактора взети заедно",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "бarel",
+"count": 1,
+"context": "-висок oil → по-висок Revenue/бarel → FCF expansion → инстит",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "бrokerage",
+"count": 1,
+"context": "Capital Markets / бrokerage е в XLF сектор. Макро: п",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "базеload",
+"count": 1,
+"context": "ните, намалявайки revenues на базеload генератори в APS зона. A",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "горivo",
+"count": 1,
+"context": "rest 12.37% осигурява squeeze горivo при пробив. Проблеми: re",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "долaрова",
+"count": 1,
+"context": " дни и се търгува на 100.02 — долaрова слабост, която директно ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "едноkратен",
+"count": 1,
+"context": " е вероятно от ниска база или едноkратен ефект — forward P/E 10.3",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "металa",
+"count": 2,
+"context": "uble impact: спад в цената на металa плюс margin компресия.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "микросредa",
+"count": 1,
+"context": "ъл, привлекателен при risk-on микросредa → RS на 6-месечен връх п",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "можe",
+"count": 1,
+"context": "$236.34 с обем >1.4x средния, можe да се разгледа. Алтернат",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "момentum",
+"count": 153,
+"context": "реди пробива — бърз/волатилен момentum move, не тиха консолидац",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "неpubblично",
+"count": 1,
+"context": "производители на памук са или неpubblично търгувани агрокомпании, ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "нискa",
+"count": 1,
+"context": "bursements + branded pharma), нискa корелация с икономически",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "нямa",
+"count": 4,
+"context": "то им включване тук: всъщност нямa ликвиден ETF или чисто C",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "оverbought",
+"count": 2,
+"context": "о да засили profit-taking при оverbought имена.",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "оверextended",
+"count": 1,
+"context": "ето показва ранна ротация, не оверextended позиция — добра точка за",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "опериращa",
+"count": 2,
+"context": " банкова холдингова компания, опериращa в три сегмента: Commerci",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "пolicymakers",
+"count": 1,
+"context": "Fed пolicymakers се накланят срещу октомв",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "падa",
+"count": 2,
+"context": " в universe. Паралелно: US10Y падa (реалните лихви намалява",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "плumbing",
+"count": 1,
+"context": "от доставчици, а CHE (hospice/плumbing services) се ползва от п",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "прякo",
+"count": 1,
+"context": " в сектора — двете роли не са прякo противоречиви, но юзърът",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "рoasters",
+"count": 1,
+"context": "Кофе производителите и рoasters-ите хеджират значителна ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "реbound",
+"count": 1,
+"context": "apital efficiency въпреки EPS реbound",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "сoja",
+"count": 1,
+"context": "efensive с минимална директна сoja exposure печели от дезин",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "сqueeze",
+"count": 1,
+"context": " е силно bullish за CAD. Шорт-сqueeze потенциалът е висок при ",
+"candidate": null,
+"candidate_vocab_count": null
+},
+{
+"word": "секторa",
+"count": 4,
+"context": "ло петролните цени и shipping секторa.",
+"candidate": null,
+"candidate_vocab_count": null
+}
+]
+}
