@@ -36,6 +36,7 @@ from src import setup_rules
 from src import earnings_move
 from src import glb_screener
 from src import qm_breakout
+from src import cot_opposites
 from src import qm_ep
 from src import short_screener
 from src import short_tracker
@@ -639,6 +640,12 @@ def run() -> dict:
     for row in short_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
         row["global_context"] = global_context.get(row.get("lagging_sector"))
+    # 08.10: бележка за ОБРАТЕН ЗАЛОГ между COT тезите и нашите карти (Action/Watchlist/Qullamaggie — покупки, Short — шорт) и между COT пазарите; сглобена от кода, нищо не се маха
+    try:
+        cot_opp_diag = cot_opposites.annotate(cot_with_theses, {"action": action, "watchlist": watchlist, "qm": qm_cards}, short_candidates)
+        print(f"      обратен залог (COT): карти {cot_opp_diag['cards']} · тези {cot_opp_diag['theses']} · между пазари {cot_opp_diag['cross_market']}")
+    except Exception as e:
+        print(f"[main] бележките за обратен залог пропуснати: {type(e).__name__}: {e}")
 
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).

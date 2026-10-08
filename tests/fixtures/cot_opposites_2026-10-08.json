@@ -1,0 +1,869 @@
+{
+"_note": "РЕАЛНО: COT тезите на брифа от 08.10.2026 (само пазар, движение, тикъри, ефект, механизъм) и тикърите в Action/Watchlist/Qullamaggie/Short на същия бриф. Ползва се от test_cot_opposites.py.",
+"cot": [
+{
+"market": "2-Year Treasury Note",
+"move_text": "цената на 2-Year Treasury Note НАДОЛУ (= доходността нагоре)",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "SHY",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "SCHO",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "JPM",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "rate_asset_yield"
+}
+]
+},
+{
+"ticker": "MS",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "rate_asset_yield"
+}
+]
+},
+{
+"ticker": "BX",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "rate_duration_valuation"
+}
+]
+}
+]
+}
+},
+{
+"market": "XRP",
+"move_text": "цената на XRP НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "GXRP",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "XRP",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "XRPC",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "AFRM",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "COIN",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "SI",
+"effect": null,
+"mechanisms": [
+{
+"type": "other"
+}
+]
+}
+]
+}
+},
+{
+"market": "Soybean Meal",
+"move_text": "цената на Soybean Meal НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": []
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "TSN",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "PPC",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "DAR",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "substitute"
+}
+]
+}
+]
+}
+},
+{
+"market": "Lean Hogs",
+"move_text": "цената на Lean Hogs НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "SFD",
+"effect": "gains",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": true
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "WH",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+},
+{
+"ticker": "HRL",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "E-mini Russell 2000",
+"move_text": "цената на E-mini Russell 2000 НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "IWM",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "VTWO",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "SCHA",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "IJR",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "PSCT",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+}
+]
+}
+},
+{
+"market": "Soybeans",
+"move_text": "цената на Soybeans НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "SOYB",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "TSN",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "Mexican Peso",
+"move_text": "цената на Mexican Peso НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": []
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "KOF",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+}
+]
+}
+},
+{
+"market": "RBOB Gasoline",
+"move_text": "цената на RBOB Gasoline НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "UGA",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "VLO",
+"effect": "loses",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": true
+},
+{
+"ticker": "MPC",
+"effect": "loses",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": true
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "PSX",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+},
+{
+"ticker": "PBF",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+},
+{
+"ticker": "DINO",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+}
+]
+}
+},
+{
+"market": "Sugar No. 11",
+"move_text": "цената на Sugar No. 11 НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "CANE",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "MGPI",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "substitute"
+}
+]
+},
+{
+"ticker": "MDLZ",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "HSY",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "Copper",
+"move_text": "цената на Copper НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "CPER",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "FCX",
+"effect": "loses",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "SCCO",
+"effect": "loses",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "NEM",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+},
+{
+"ticker": "STLD",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "substitute"
+}
+]
+}
+]
+}
+},
+{
+"market": "Corn",
+"move_text": "цената на Corn НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "CORN",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "INGR",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "MPC",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "Australian Dollar",
+"move_text": "цената на Australian Dollar НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "FXA",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "BHP",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+},
+{
+"ticker": "RIO",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+},
+{
+"ticker": "WPM",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "fx_cost_local"
+}
+]
+}
+]
+}
+},
+{
+"market": "Natural Gas",
+"move_text": "цената на Natural Gas НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "UNG",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "EQT",
+"effect": "gains",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "AR",
+"effect": "gains",
+"mechanism_type": "output_price",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "CF",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "Cocoa",
+"move_text": "цената на Cocoa НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": []
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "HSY",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "MDLZ",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "TR",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "British Pound",
+"move_text": "цената на British Pound НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "FXB",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "RELX",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+},
+{
+"ticker": "AZN",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "fx_cost_local"
+}
+]
+}
+]
+}
+},
+{
+"market": "30-Year Treasury Bond",
+"move_text": "цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре)",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "TLT",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "VGLT",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "TBF",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "short",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": []
+}
+},
+{
+"market": "Coffee C",
+"move_text": "цената на Coffee C НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": []
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "SBUX",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+}
+]
+}
+},
+{
+"market": "Bitcoin Futures (CME)",
+"move_text": "цената на Bitcoin Futures (CME) НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "IBIT",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+},
+{
+"ticker": "FBTC",
+"effect": "loses",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "MSTR",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "COIN",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+},
+{
+"ticker": "MARA",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "index_beta"
+}
+]
+}
+]
+}
+},
+{
+"market": "Euro FX",
+"move_text": "цената на Euro FX НАГОРЕ",
+"direction": "extreme_short",
+"direct_thesis": {
+"tickers": [
+{
+"ticker": "FXE",
+"effect": "gains",
+"mechanism_type": "tracks_instrument",
+"side": "long",
+"partial": false
+}
+]
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "SAP",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+},
+{
+"ticker": "LLY",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+},
+{
+"ticker": "MCD",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "fx_revenue_translation"
+}
+]
+}
+]
+}
+},
+{
+"market": "Cotton",
+"move_text": "цената на Cotton НАДОЛУ",
+"direction": "extreme_long",
+"direct_thesis": {
+"tickers": []
+},
+"cross_sector_thesis": {
+"tickers": [
+{
+"ticker": "PVH",
+"effect": "gains",
+"mechanisms": [
+{
+"type": "input_cost"
+}
+]
+},
+{
+"ticker": "MOO",
+"effect": "loses",
+"mechanisms": [
+{
+"type": "output_price"
+}
+]
+}
+]
+}
+}
+],
+"action": [],
+"watchlist": [
+"ZBRA",
+"ANET",
+"AMD",
+"VLO",
+"DINO",
+"KEYS",
+"FTNT",
+"NTAP"
+],
+"qm_breakout": [
+"SN",
+"SANM",
+"SITM",
+"CORT"
+],
+"short_candidates": []
+}

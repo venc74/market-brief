@@ -61,6 +61,11 @@ def _ew_html(card: dict) -> str:
     return f'<br><span style="color:#b45309;font-size:12px">{_e(w["text"])}</span>' if w and w.get("text") else ""
 
 
+def _cot_html(card: dict) -> str:
+    """Бележките за обратен залог (cot_opposites) като редове под картата в имейла; без бележки → празно."""
+    return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(n.get("text"))}</span>' for n in ((card or {}).get("cot_notes") or []) if n.get("text"))
+
+
 def _lv_warn_html(lv) -> str:
     """Предупрежденията от нивата като редове за имейла (само текст)."""
     return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(w)}</span>' for w in ((lv or {}).get("warnings") or []))
@@ -225,7 +230,7 @@ def _qm_email_block(brief: dict) -> str:
                          f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
-                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}</td></tr>')
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}{_cot_html(c)}</td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'
@@ -288,10 +293,10 @@ def render_email(brief: dict) -> str:
         if p.get("method") == "v2":
             plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
                         f"Вход ≈ ${(lv or {}).get('entry', p['entry_mid'])} · Stop ${(lv or {}).get('stop', p['stop_loss'])} (−{(lv or {}).get('stop_pct', p['risk_pct'])}%)<br>"
-                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv))
+                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv) + _cot_html(st))
         else:
             plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
-                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv))
+                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv) + _cot_html(st))
         mk = "".join(
             f'<span style="display:inline-block;background:#eef2ff;color:#3730a3;'
             f'font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;'

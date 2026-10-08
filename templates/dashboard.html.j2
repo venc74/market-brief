@@ -132,6 +132,11 @@
   .earn-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
                border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
   .watch-card .earn-warn { margin: 6px 0 4px; }
+  /* 08.10: бележка за обратен залог — COT тезата казва обратното на сетъпа (сглобена от кода, само информация) */
+  .cot-note { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.06);
+              border-left: 2px solid var(--yellow); padding: 6px 11px; margin: 0 16px 8px; }
+  .watch-card .cot-note, .qm-card .cot-note { margin: 6px 0 4px; }
+  .opp-note { font-size: 12px; color: var(--yellow); margin-top: 3px; }
   .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
   .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
     padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
@@ -815,6 +820,7 @@
       Това е <strong>нов вход</strong>, не продължение на старата теза.</div>
     {% endif %}
     {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+    {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
     <div class="stock-body">
       <div class="block">
         <h3>Защо точно сега</h3>
@@ -917,6 +923,7 @@
         {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+      {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <p>{{ st.ai.why_now }}</p>
       {# 07.10: жив запис в книгата, задействан (open/trailing) — картата казва изпълнения сигнал, не "чака пробив" #}
       {% if not (st.setup and st.setup.triggered) %}
@@ -970,6 +977,7 @@
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:34] }}</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
+      {% for n in c.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <div class="qm-kv">
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
         <span>Предходен ръст</span><b>+{{ "%.0f"|format(c.runup_pct) }}%</b>
@@ -1284,6 +1292,8 @@
         {% endif %}
         {# пакет 3: cross-sector — изречението с посоката е шаблон от кода, прозата на модела описва само механизма #}
         {% for t in th.tickers or [] %}{% if t.sentence %}<div class="thesis-chain">{{ t.sentence }}{% if t.quote %} <span class="small" style="color:var(--muted)">{{ t.quote }}</span>{% endif %}</div>{% endif %}{% endfor %}
+        {# 08.10: обратен залог (подбран тикър срещу обратния ефект на тезата) и обратни сигнали между COT пазари — бележки от кода #}
+        {% for t in th.tickers or [] %}{% for o in t.opposite or [] %}<div class="opp-note">{{ o.text }}</div>{% endfor %}{% for x in t.cross_market or [] %}<div class="opp-note">{{ x }}</div>{% endfor %}{% endfor %}
         {% if th.reasoning %}<div class="thesis-chain">{{ th.reasoning }}</div>{% endif %}
         {% if th.empty_reason %}
         <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
