@@ -76,6 +76,23 @@ assert code == 0 and "test_fails" not in out
 code, out = run("няма-такъв")
 assert code == 1 and "няма тестове" in out
 print("  ✓ запис в docs/ или нов файл в data/ → провал с името на файла; опит за мрежа → провал; ненулев тест → код 1; филтър по име")
+print("── анотации за GitHub Actions (08.10): причината за червен run се чете без вход ──")
+ann = run_tests.annotations([("test_x", "ред 1\nAssertionError: 100% грешка\r\nкрай"), ("test_y", "a" * 5000)], ["data/new.json", "docs/index.html"])
+assert ann[0] == "::error title=Test test_x::ред 1%0AAssertionError: 100%25 грешка%0D%0Aкрай"
+assert ann[1].startswith("::error title=Test test_y::") and len(ann[1]) == len("::error title=Test test_y::") + 1200 and "\n" not in ann[1]
+assert ann[2] == "::error title=docs/data са пипнати::data/new.json, docs/index.html" and run_tests.annotations([], []) == []
+import os
+write("test_fails2.py", "raise SystemExit(3)\n")
+os.environ["GITHUB_ACTIONS"] = "true"
+try:
+    code, out = run("test_fails2")
+finally:
+    del os.environ["GITHUB_ACTIONS"]
+assert code == 1 and "::error title=Test test_fails2::" in out
+code, out = run("test_fails2")
+assert code == 1 and "::error" not in out                                                  # извън GitHub Actions не се печата нищо допълнително
+(T / "test_fails2.py").unlink()
+print("  ✓ СИНТЕТИЧНО: %, CR и LF са екранирани; изходът се реже до последните 1200 знака; пипнатите папки са отделна анотация; печата се само при GITHUB_ACTIONS=true")
 tmp.cleanup()
 
 print()

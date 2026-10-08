@@ -53,6 +53,22 @@ def changed(before: dict[str, str], after: dict[str, str]) -> list[str]:
     return sorted({*before, *after} - {k for k in before if before.get(k) == after.get(k)})
 
 
+def _escape_data(text: str) -> str:
+    """Екраниране на съобщение на GitHub workflow команда (::error::…): %, CR, LF."""
+    return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def annotations(failures: list[tuple[str, str]], touched: list[str], tail: int = 1200) -> list[str]:
+    """
+    GitHub Actions анотации (08.10.2026): редовете "::error title=…::…" за всеки провален тест (последните `tail` знака от изхода му) и за пипнатите docs/ и data/. Причина: логът на run-а се чете само
+    след вход в GitHub, а анотациите са видими и през публичния API (check-runs/<id>/annotations) — на 08.10 червеният Tests run не можеше да се прочете отстрани. Чиста функция; печата се само в CI.
+    """
+    out = [f"::error title=Test {name}::{_escape_data(text.strip()[-tail:])}" for name, text in failures]
+    if touched:
+        out.append(f"::error title=docs/data са пипнати::{_escape_data(', '.join(touched[:20]))}")
+    return out
+
+
 def discover(patterns: list[str]) -> list[pathlib.Path]:
     tests = sorted(ROOT.glob("test_*.py"))     # ROOT се чете при извикване (подменяем в теста на самия runner)
     return [t for t in tests if not patterns or any(p in t.stem for p in patterns)]
@@ -85,6 +101,9 @@ def main(argv: list[str]) -> int:
             print("   ", p)
     print(f"\n{len(tests) - len(failures)}/{len(tests)} теста минават за {time.time() - started:.0f}s"
           + (f"; {len(failures)} провал(а)" if failures else "") + ("; docs/data са пипнати" if touched else ""))
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        for line in annotations(failures, touched):
+            print(line)
     return 1 if (failures or touched) else 0
 
 
