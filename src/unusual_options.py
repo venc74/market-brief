@@ -437,31 +437,195 @@ def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
 
 # ──────────────────────────────────────────────────────────────────────────
 # Пакет 4б т.б: маркер UOV✓ върху НАШИ тикъри (кандидати и позиции) — вместо списъка "Unusual Options Yesterday"
+# 08.10.2026: относителен праг — перцентил спрямо референтната кошница за деня и (когато има история) спрямо собствената история (виж config.py)
 # ──────────────────────────────────────────────────────────────────────────
 LAST_MARKER_DIAG: dict = {}
 
 
-def _marker_note(a: dict, ratio: float, session: str) -> str:
-    """Текстът при hover/клик: колко, по какви падежи, с каква посока и кога е снимката на OI."""
+def percentile(values: list[float], q: float) -> float | None:
+    """q-ти перцентил (0–100) с линейна интерполация, без numpy; None за празен списък. Чиста функция."""
+    s = sorted(float(v) for v in values)
+    if not s:
+        return None
+    k = (len(s) - 1) * q / 100.0
+    lo, hi = int(k), min(int(k) + 1, len(s) - 1)
+    return s[lo] + (s[hi] - s[lo]) * (k - lo)
+
+
+def percent_rank(prior: list[float], x: float) -> float | None:
+    """Колко процента от наблюденията са под x (равните се броят наполовина) — перцентилът на x в собствената история. None за празен списък."""
+    if not prior:
+        return None
+    below = sum(1 for v in prior if v < x)
+    equal = sum(1 for v in prior if v == x)
+    return 100.0 * (below + 0.5 * equal) / len(prior)
+
+
+def load_ratio_history(path=None) -> dict:
+    """{тикър: {дата на сесията: съотношение}}; липсващ/повреден файл → празно (с лог), никога изключение."""
+    path = pathlib.Path(path or config.UNUSUAL_OPTIONS_HISTORY_FILE)
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        t = data.get("tickers")
+        if not isinstance(t, dict):
+            raise ValueError("няма 'tickers'")
+        return {k: {d: float(v) for d, v in (obs or {}).items()} for k, obs in t.items() if isinstance(obs, dict)}
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        print(f"[unusual_options] историята на съотношенията е нечетима ({type(e).__name__}: {e}) — започва се начисто")
+        return {}
+
+
+def record_ratios(history: dict, session: str, ratios: dict[str, float], keep: int | None = None) -> dict:
+    """Добавя съотношенията на сесията към историята (презаписва същата дата — идемпотентно) и пази най-много `keep` най-нови дати на тикър. Връща нов речник."""
+    keep = config.UNUSUAL_OPTIONS_HISTORY_KEEP if keep is None else keep
+    out = {t: dict(obs) for t, obs in history.items()}
+    for sym, r in ratios.items():
+        obs = out.setdefault(sym, {})
+        obs[session] = round(float(r), 4)
+        if len(obs) > keep:
+            for d in sorted(obs)[:len(obs) - keep]:
+                del obs[d]
+    return out
+
+
+def save_ratio_history(history: dict, path=None) -> None:
+    """Атомичен запис; провал → лог, не изключение."""
+    import os, tempfile
+    path = pathlib.Path(path or config.UNUSUAL_OPTIONS_HISTORY_FILE)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".uov_hist_", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump({"version": 1, "tickers": {t: dict(sorted(o.items())) for t, o in sorted(history.items())}}, f, ensure_ascii=False, indent=0)
+        os.replace(tmp, path)
+    except Exception as e:
+        print(f"[unusual_options] историята на съотношенията не се записа: {type(e).__name__}: {e}")
+
+
+_ANALYSIS_MEMO: dict = {}          # (тикър, ден на брифа, снимка) → резултат на analyze_ticker: един тикър е и в кошницата, и сред нашите — една верига на run
+_BASKET_MEMO: dict = {}            # (сесия, ден на брифа, снимка) → резултат на reference_basket: кошницата се смята веднъж на run (кандидати и позиции викат candidate_markers поотделно)
+
+
+def _analysis_memo(sym: str, snap: dict | None, brief_date: dt.date, snap_missing: str) -> dict | None:
+    key = (sym, brief_date.isoformat(), (snap or {}).get("fetched_at_utc"))
+    if key not in _ANALYSIS_MEMO:
+        _ANALYSIS_MEMO[key] = analyze_ticker(sym, yf.Ticker(sym), snap, brief_date, snap_missing)
+    return _ANALYSIS_MEMO[key]
+
+
+def reference_basket(snap: dict | None, session: str, brief_date: dt.date, snap_missing: str = "", budget_sec: float | None = None,
+                     clock=None) -> dict:
+    """
+    Референтната кошница за деня: съотношенията обем/OI на най-ликвидните тикъри (snap["reference"], снимани заедно с нашите) за същата сесия и прозорец.
+    Връща {reference, valid, ratios {тикър: съотношение}, p (праг: UNUSUAL_OPTIONS_MARKER_PERCENTILE-ият перцентил или None), median, missing {тикър: причина},
+    reason (защо няма праг), stopped (спряно по бюджета)}. Сканирането е ограничено по време (UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC); провал на тикър → пропуска се.
+    Праг има само при поне config.UNUSUAL_OPTIONS_REFERENCE_MIN_VALID валидни съотношения.
+    """
+    import time
+    key = (session, brief_date.isoformat(), (snap or {}).get("fetched_at_utc"))
+    if key in _BASKET_MEMO:
+        return _BASKET_MEMO[key]
+    clock = clock or time.monotonic
+    budget = config.UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC if budget_sec is None else budget_sec
+    ref = [t for t in ((snap or {}).get("reference") or []) if isinstance(t, str)]
+    out: dict = {"reference": len(ref), "valid": 0, "ratios": {}, "p": None, "median": None, "missing": {}, "reason": "", "stopped": False}
+    if not ref:
+        out["reason"] = "снимката няма референтна кошница" if snap else (snap_missing or "няма снимка")
+    elif yf is None:
+        out["reason"] = "yfinance липсва"
+    else:
+        t0 = clock()
+        for sym in ref:
+            if clock() - t0 > budget:
+                out["stopped"] = True
+                break
+            try:
+                a = _analysis_memo(sym, snap, brief_date, snap_missing)
+            except Exception as e:
+                out["missing"][sym] = f"{type(e).__name__}: {e}"
+                continue
+            if a is None or a["why"] or a["ratio"] is None:
+                out["missing"][sym] = (a or {}).get("why") or "няма опционна верига"
+            elif a["ratio"] > config.UNUSUAL_OPTIONS_MAX_OI_RATIO:
+                out["missing"][sym] = "OI вероятно неактуален/непълен (нереалистично съотношение)"
+            else:
+                out["ratios"][sym] = round(a["ratio"], 4)
+        out["valid"] = len(out["ratios"])
+        if out["valid"] >= config.UNUSUAL_OPTIONS_REFERENCE_MIN_VALID:
+            out["p"] = round(percentile(list(out["ratios"].values()), config.UNUSUAL_OPTIONS_MARKER_PERCENTILE), 4)
+            out["median"] = round(percentile(list(out["ratios"].values()), 50), 4)
+        else:
+            out["reason"] = (f"валидни съотношения в кошницата {out['valid']} от {out['reference']} (нужни ≥ {config.UNUSUAL_OPTIONS_REFERENCE_MIN_VALID})"
+                             + (" — спряно по бюджета" if out["stopped"] else ""))
+    _BASKET_MEMO[key] = out
+    return out
+
+
+def marker_decision(sym: str, ratio: float, basket: dict, prior: list[float]) -> dict:
+    """
+    Решението за маркер на един наш тикър (чиста функция). prior — собствените му наблюдения ПРЕДИ днешната сесия.
+      • абсолютен път: ratio ≥ UNUSUAL_OPTIONS_MARKER_MIN_RATIO (2.0);
+      • по история: ≥ UNUSUAL_OPTIONS_HISTORY_MIN_DAYS наблюдения → перцентил спрямо тях ≥ UNUSUAL_OPTIONS_MARKER_PERCENTILE;
+      • за деня: иначе, ако кошницата има праг → ratio ≥ P на кошницата.
+    Връща {marked, mode ("absolute"/"history"/"day"/None), percentile (спрямо историята или кошницата, или None), threshold, why (при marked=False и липсващ път)}.
+    """
+    q = config.UNUSUAL_OPTIONS_MARKER_PERCENTILE
+    out = {"marked": False, "mode": None, "percentile": None, "threshold": None, "history_days": len(prior), "why": ""}
+    if len(prior) >= config.UNUSUAL_OPTIONS_HISTORY_MIN_DAYS:
+        pr = percent_rank(prior, ratio)
+        out.update(mode="history", percentile=round(pr, 1), threshold=round(percentile(prior, q), 4), marked=pr >= q)
+    elif basket.get("p") is not None:
+        vals = list(basket["ratios"].values())
+        pr = 100.0 * sum(1 for v in vals if v <= ratio) / len(vals)
+        out.update(mode="day", percentile=round(pr, 1), threshold=basket["p"], marked=ratio >= basket["p"])
+    else:
+        out["why"] = f"няма с какво да се сравни: {basket.get('reason') or 'кошницата няма праг'}; собствена история {len(prior)} от {config.UNUSUAL_OPTIONS_HISTORY_MIN_DAYS} дни"
+    if not out["marked"] and ratio >= config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO:
+        out.update(marked=True, mode="absolute")
+    return out
+
+
+def _fmt_ratio(x: float) -> str:
+    """Съотношението с достатъчно знаци: 0.83, 0.26, 0.014 (под 0.1 — три знака), 3.25."""
+    return f"{x:.3f}" if abs(x) < 0.1 else f"{x:.2f}"
+
+
+def _marker_basis(dec: dict, basket: dict) -> str:
+    q = f"{config.UNUSUAL_OPTIONS_MARKER_PERCENTILE:g}"
+    if dec["mode"] == "absolute":
+        return f"над абсолютния праг от {config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO:g}× (силно ново позициониране)"
+    if dec["mode"] == "history":
+        return f"над {q}-ия перцентил на собствената му история (праг {_fmt_ratio(dec['threshold'])}×, {dec['history_days']} дни)"
+    return f"над {q}-ия перцентил на {basket['valid']} ликвидни тикъра за деня (праг {_fmt_ratio(dec['threshold'])}×)"
+
+
+def _marker_note(a: dict, ratio: float, session: str, dec: dict | None = None, basket: dict | None = None) -> str:
+    """Текстът при hover/клик: колко, спрямо какво е необичайно, по какви падежи, с каква посока и кога е снимката на OI."""
     bias, bias_note = _bias(a["call_vol"], a["put_vol"])
     calls_pct = (100 * a["call_vol"] / a["total_vol"]) if a["total_vol"] else 0
     used = a["used"]
-    return (f"Необичаен опционен обем вчера: ≈ {ratio:.1f}× OI ({_oi_label(ratio)}) върху {len(used)} падежа до {used[-1][8:10]}.{used[-1][5:7]} "
+    basis = _marker_basis(dec, basket or {}) if dec else _oi_label(ratio)
+    return (f"Необичаен опционен обем вчера: ≈ {_fmt_ratio(ratio)}× OI — {basis}; върху {len(used)} падежа до {used[-1][8:10]}.{used[-1][5:7]} "
             f"(без изтеклите и изтичащите днес). Обем {int(a['total_vol']):,} / OI {int(a['oi_used']):,} договора; calls {calls_pct:.0f}% от обема — {bias_note} "
             f"OI е от следобедната снимка на сесията {session[8:10]}.{session[5:7]}.")
 
 
 def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple[dict, dict]:
     """
-    Съотношението обем/OI (по прозореца на падежите, виж analyze_ticker) за НАШИТЕ тикъри; маркер за онези с ratio ≥ config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO.
-    Връща ({тикър: {ticker, ratio, call_put_bias, note, expiries}}, diag). diag: scanned, with_ratio, marked, ratios (ВСИЧКИ пресметнати — за калибриране),
-    missing {тикър: причина} (тикър без съотношение НЕ значи "без необичаен обем"), snapshot_session/…_fetched_at_utc, snapshot_missing_reason.
-    Graceful: провал на тикър/снимка → празен резултат за него, не чупи run-а.
+    Съотношението обем/OI (по прозореца на падежите, виж analyze_ticker) за НАШИТЕ тикъри; маркер за онези, които минават marker_decision (перцентил спрямо
+    референтната кошница за деня или собствената история; абсолютният праг 2.0 остава като допълнителен път).
+    Връща ({тикър: {ticker, ratio, call_put_bias, note, expiries, mode, percentile}}, diag). diag: scanned, with_ratio, marked, ratios (ВСИЧКИ пресметнати),
+    missing {тикър: причина} (тикър без съотношение НЕ значи "без необичаен обем"), basket {reference, valid, p, median, reason, stopped}, decisions {тикър: решение},
+    snapshot_session/…_fetched_at_utc, snapshot_missing_reason. Историята на съотношенията (кошница + нашите) се допълва с днешната сесия.
+    Graceful: провал на тикър/снимка/кошница → празен резултат за него, не чупи run-а.
     """
     today = today or dt.date.today()
     tickers = list(dict.fromkeys(t for t in tickers if t))[:config.UNUSUAL_OPTIONS_MARKER_MAX_TICKERS]
-    diag: dict = {"requested": len(tickers), "scanned": 0, "with_ratio": 0, "marked": 0, "ratios": {}, "missing": {},
+    diag: dict = {"requested": len(tickers), "scanned": 0, "with_ratio": 0, "marked": 0, "ratios": {}, "missing": {}, "decisions": {}, "no_basis": {},
                   "window_days": config.UNUSUAL_OPTIONS_HORIZON_DAYS, "min_ratio": config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO,
+                  "percentile": config.UNUSUAL_OPTIONS_MARKER_PERCENTILE, "history_min_days": config.UNUSUAL_OPTIONS_HISTORY_MIN_DAYS, "basket": None,
                   "snapshot_session": None, "snapshot_fetched_at_utc": None, "snapshot_missing_reason": ""}
     markers: dict[str, dict] = {}
     if yf is None or not tickers:
@@ -471,9 +635,17 @@ def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple
     except Exception as e:
         snap, session, snap_missing = None, "", f"снимката не се зареди: {type(e).__name__}"
     diag.update(snapshot_session=session or None, snapshot_fetched_at_utc=(snap or {}).get("fetched_at_utc"), snapshot_missing_reason=snap_missing)
+    try:
+        basket = reference_basket(snap, session or today.isoformat(), today, snap_missing)
+    except Exception as e:
+        basket = {"reference": 0, "valid": 0, "ratios": {}, "p": None, "median": None, "missing": {}, "reason": f"кошницата не се пресметна: {type(e).__name__}: {e}", "stopped": False}
+        print(f"[unusual_options] референтна кошница: {type(e).__name__}: {e}")
+    diag["basket"] = {k: basket.get(k) for k in ("reference", "valid", "p", "median", "reason", "stopped")}
+    history = load_ratio_history()
+    exact: dict[str, float] = {}                                            # точните съотношения на нашите тикъри (diag["ratios"] е закръглен до 2 знака) — за историята
     for sym in tickers:
         try:
-            a = analyze_ticker(sym, yf.Ticker(sym), snap, today, snap_missing)
+            a = _analysis_memo(sym, snap, today, snap_missing)
         except Exception as e:
             diag["missing"][sym] = f"{type(e).__name__}: {e}"
             print(f"[unusual_options] маркер {sym}: {e}")
@@ -491,14 +663,29 @@ def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple
             continue
         diag["with_ratio"] += 1
         diag["ratios"][sym] = round(ratio, 2)
-        if ratio >= config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO:
+        exact[sym] = ratio
+        prior = [v for d, v in (history.get(sym) or {}).items() if d < (session or today.isoformat())]
+        dec = marker_decision(sym, ratio, basket, prior)
+        diag["decisions"][sym] = {k: dec[k] for k in ("marked", "mode", "percentile", "threshold", "history_days")}
+        if dec["why"]:                                                      # има съотношение, но няма с какво да се сравни (не е "без съотношение")
+            diag["no_basis"][sym] = dec["why"]
+        if dec["marked"]:
             bias, _ = _bias(a["call_vol"], a["put_vol"])
-            markers[sym] = {"ticker": sym, "ratio": round(ratio, 2), "call_put_bias": bias, "expiries": a["used"],
-                            "note": _marker_note(a, ratio, session or today.isoformat())}
+            markers[sym] = {"ticker": sym, "ratio": round(ratio, 2), "call_put_bias": bias, "expiries": a["used"], "mode": dec["mode"], "percentile": dec["percentile"],
+                            "note": _marker_note(a, ratio, session or today.isoformat(), dec, basket)}
     diag["marked"] = len(markers)
+    # историята: днешната сесия за кошницата и за нашите тикъри (идемпотентно по дата); без известна сесия не се записва нищо
+    if session:
+        try:
+            obs = {**basket.get("ratios", {}), **exact}
+            if obs:
+                save_ratio_history(record_ratios(history, session, obs))
+        except Exception as e:
+            print(f"[unusual_options] историята не се допълни: {type(e).__name__}: {e}")
     LAST_MARKER_DIAG.clear(); LAST_MARKER_DIAG.update(diag)
-    print(f"[unusual_options] маркери UOV✓: {len(markers)} от {diag['requested']} (съотношение за {diag['with_ratio']}, праг {diag['min_ratio']}×; "
-          f"без съотношение: {diag['missing'] or '—'})")
+    b = diag["basket"] or {}
+    print(f"[unusual_options] маркери UOV✓: {len(markers)} от {diag['requested']} (съотношение за {diag['with_ratio']}; кошница {b.get('valid')}/{b.get('reference')}, "
+          f"P{config.UNUSUAL_OPTIONS_MARKER_PERCENTILE:g} = {b.get('p')}{', ' + b['reason'] if b.get('reason') else ''}; без съотношение: {diag['missing'] or '—'})")
     return markers, diag
 
 

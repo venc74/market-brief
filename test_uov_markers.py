@@ -48,6 +48,7 @@ CHAINS = {
 }
 SNAP = {"horizon_days": 28, "fetched_at_utc": "2026-10-02 16:01",
         "tickers": {"AAA": {"2026-10-07": 1200, "2026-10-09": 800}, "BBB": {"2026-10-07": 1000}, "CCC": {"2026-10-07": 20}, "EEE": {"2026-10-07": 100}}}
+config.UNUSUAL_OPTIONS_HISTORY_FILE = pathlib.Path(tempfile.mkdtemp(prefix="mb_uovhist_")) / "uov_ratio_history.json"           # 08.10: историята на съотношенията не се пише в data/
 uo.yf = types.SimpleNamespace(Ticker=lambda sym: CHAINS[sym])
 uo._snapshot_for_yesterday = lambda today: (SNAP, "2026-10-02", "")
 
@@ -55,7 +56,7 @@ print("── candidate_markers (СИНТЕТИЧНИ вериги, снимка
 mk, diag = uo.candidate_markers(["AAA", "BBB", "CCC", "DDD", "EEE", "GGG"], D("2026-10-05"))
 assert list(mk) == ["AAA"] and mk["AAA"]["ratio"] == 3.25 and mk["AAA"]["call_put_bias"] == "calls" and mk["AAA"]["expiries"] == ["2026-10-07", "2026-10-09"]
 note = mk["AAA"]["note"]
-assert "≈ 3.2× OI (силно ново позициониране)" in note and "върху 2 падежа до 09.10" in note and "Обем 6,500 / OI 2,000" in note and "calls 85%" in note and "сесията 02.10" in note, note
+assert "≈ 3.25× OI — над абсолютния праг от 2× (силно ново позициониране)" in note and "върху 2 падежа до 09.10" in note and "Обем 6,500 / OI 2,000" in note and "calls 85%" in note and "сесията 02.10" in note, note
 assert diag["with_ratio"] == 2 and diag["marked"] == 1 and diag["ratios"] == {"AAA": 3.25, "BBB": 0.8}
 assert diag["missing"] == {"CCC": "OI в следобедната снимка е под 50 договора", "DDD": "няма опционна верига",
                            "EEE": "OI вероятно неактуален/непълен (нереалистично съотношение)", "GGG": "тикърът не е в следобедната снимка"}
@@ -77,7 +78,7 @@ for c in brief["watchlist"]:
     if c["ticker"] == "EXPD":
         enrich._apply_markers(c, {"mf": set(), "uov": {"EXPD": {**mk["AAA"], "ticker": "EXPD"}}, "splits": {}, "si": {}, "si_new": {}})
 page = htmllib.unescape(render.render_dashboard(brief))
-assert page.count("UOV✓ (calls)") >= 1 and "Необичаен опционен обем вчера: ≈ 3.2× OI" in page
+assert page.count("UOV✓ (calls)") >= 1 and "Необичаен опционен обем вчера: ≈ 3.25× OI" in page
 print("  ✓ РЕАЛНАТА карта на EXPD (05.10) получава маркер UOV✓ (calls) с текста за числата в страницата (маркерът е само показване)")
 
 print()

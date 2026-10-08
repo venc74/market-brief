@@ -20,6 +20,9 @@ Options" отпадна, затова топ-80 по ликвидност веч
 съотношението трябва да е от един и същ времеви прозорец, виж unusual_options.py).
 Снимката носи horizon_days — по него се различава от старата (първите 4 падежа).
 
+Референтна кошница (08.10.2026, калибриране на UOV✓): към НАШИТЕ тикъри се снима и OI на най-ликвидните config.UNUSUAL_OPTIONS_REFERENCE_TICKERS тикъра на
+S&P500+NDX (snap["reference"]) — сутрешният бриф смята съотношението им обем/OI за същата сесия и прагът на маркера е P90 на кошницата (unusual_options.reference_basket).
+
 Graceful: провал на тикър → пропуска се; ден без сесия (празник) → нищо не се
 записва; провал изцяло → файлът остава какъвто е, сутрешният бриф казва, че
 снимката липсва.
@@ -178,6 +181,14 @@ def take_snapshot() -> dict | None:
     tickers = snapshot_tickers()
     if config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS > 0:
         tickers += [t for t in uo._top_by_volume(uo._sp500_ndx_universe(), config.UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS) if t not in tickers]
+    own = list(tickers)                                              # нашите тикъри (кандидати, позиции) — само за тях са straddle-ите около отчети
+    reference: list[str] = []
+    if config.UNUSUAL_OPTIONS_REFERENCE_TICKERS > 0:
+        try:
+            reference = list(dict.fromkeys(uo._top_by_volume(uo._sp500_ndx_universe(), config.UNUSUAL_OPTIONS_REFERENCE_TICKERS)))
+        except Exception as e:
+            print(f"[oi_snapshot] референтната кошница не се състави ({type(e).__name__}: {e}) — снимка само за нашите тикъри")
+        tickers += [t for t in reference if t not in tickers]
     if not tickers:
         print("[oi_snapshot] няма кандидати и позиции за снимка — нищо не е заснето")
         return None
@@ -195,14 +206,14 @@ def take_snapshot() -> dict | None:
     with_oi = sum(1 for v in oi.values() if sum(v.values()) >= 50)
     # пакет 4б т.д: сурови ATM straddle-и около отчетите (падеж след и преди) за тикърите с отчет в следващите ~32 дни; провал → празно, снимката на OI не страда
     try:
-        straddles = earnings_move.snapshot_straddles(tickers, session, uo.yf)
+        straddles = earnings_move.snapshot_straddles(own, session, uo.yf)
     except Exception as e:
         print(f"[oi_snapshot] straddle-ите за отчети пропуснати: {type(e).__name__}: {e}")
         straddles = {}
     snap = {"session_date": session.isoformat(),
             "fetched_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M"),
             "horizon_days": config.UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS,
-            "tickers": oi, "straddles": straddles, "failed": failed}
+            "tickers": oi, "straddles": straddles, "failed": failed, "reference": [t for t in reference if t in oi]}
     print(f"[oi_snapshot] straddle-и за отчети: {len(straddles)} ({sum(1 for v in straddles.values() if v.get('after') and not v.get('reason'))} с падеж след отчета)")
     print(f"[oi_snapshot] сесия {session}: {len(oi)}/{len(tickers)} тикъра, "
           f"OI ≥ 50 за {with_oi}, неуспешни {failed or '—'}, {time.time() - t0:.0f} с")

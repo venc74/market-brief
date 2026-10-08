@@ -41,6 +41,12 @@ def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list
         why = u.get("snapshot_missing_reason") or (max(set(reasons), key=reasons.count) if reasons else "няма данни")
         out.append({"source": "unusual_options", "level": "warn",
                     "message": f"Unusual options: за нито един кандидат няма съотношение обем/OI ({why}) — маркерите UOV✓ липсват днес; това НЕ значи нормален обем."})
+    elif u.get("with_ratio") and "basket" in u and (u.get("basket") or {}).get("p") is None \
+            and not any((d or {}).get("mode") == "history" for d in (u.get("decisions") or {}).values()):
+        # 08.10.2026: съотношения има, но няма референтна кошница за деня (и няма собствена история) → маркер само при абсолютния праг
+        out.append({"source": "unusual_options", "level": "warn",
+                    "message": (f"Unusual options: няма референтна кошница за деня ({(u.get('basket') or {}).get('reason') or 'липсва'}) — UOV✓ се слага само при "
+                                f"съотношение ≥ {u.get('min_ratio')}×; липсата на маркер НЕ значи нормален обем.")})
     return out
 
 

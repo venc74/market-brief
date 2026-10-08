@@ -649,6 +649,21 @@ UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = int(os.getenv("UNUSUAL_OPTIONS_SNAPSHOT_BR
 # за да се калибрира по реални дни. Таван на тикърите на едно извикване (всеки тикър = до ~14 заявки за вериги).
 UNUSUAL_OPTIONS_MARKER_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_RATIO", 2.0))
 UNUSUAL_OPTIONS_MARKER_MAX_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MAX_TICKERS", 40))
+# 08.10.2026 — КАЛИБРИРАНЕ на UOV✓ (бриф 08.10: съотношенията на нашите тикъри 0.09–0.29 при праг 2.0 → маркерът е недостижим с прозореца от 21 дни).
+# Относителен праг вместо абсолютен: маркерът върху НАШ тикър се слага, когато съотношението му е в най-високите 10% (UNUSUAL_OPTIONS_MARKER_PERCENTILE)
+#   • "за деня": спрямо РЕФЕРЕНТНА КОШНИЦА — топ UNUSUAL_OPTIONS_REFERENCE_TICKERS най-ликвидни тикъра (S&P500+NDX по среден 20-дневен обем), чийто OI се
+#     снима заедно с нашите тикъри (snap["reference"]); праг = P90 на съотношенията на кошницата за същата сесия (нужни поне UNUSUAL_OPTIONS_REFERENCE_MIN_VALID
+#     валидни, иначе без маркер по този път); сутрешното сканиране на кошницата има бюджет от секунди (UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC);
+#   • "по история": когато тикърът има поне UNUSUAL_OPTIONS_HISTORY_MIN_DAYS собствени наблюдения (data/uov_ratio_history.json, дневно съотношение на кошницата и на
+#     нашите тикъри, до UNUSUAL_OPTIONS_HISTORY_KEEP дни), маркерът е перцентилът му спрямо СОБСТВЕНАТА история (без днешното наблюдение).
+# Абсолютният праг UNUSUAL_OPTIONS_MARKER_MIN_RATIO (2.0, "силно ново позициониране") остава като допълнителен път — маркира и когато относителният не би.
+UNUSUAL_OPTIONS_REFERENCE_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_TICKERS", 60))
+UNUSUAL_OPTIONS_REFERENCE_MIN_VALID = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_MIN_VALID", 30))
+UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC", 600))
+UNUSUAL_OPTIONS_MARKER_PERCENTILE = float(os.getenv("UNUSUAL_OPTIONS_MARKER_PERCENTILE", 90))
+UNUSUAL_OPTIONS_HISTORY_FILE = DATA_DIR / "uov_ratio_history.json"
+UNUSUAL_OPTIONS_HISTORY_MIN_DAYS = int(os.getenv("UNUSUAL_OPTIONS_HISTORY_MIN_DAYS", 20))
+UNUSUAL_OPTIONS_HISTORY_KEEP = int(os.getenv("UNUSUAL_OPTIONS_HISTORY_KEEP", 60))
 # ОСТАРЯЛО от пакет 4б т.а (06.10.2026): снимката вече пази OI по ВРЕМЕВИ прозорец (виж UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS), не "първите N
 # падежа". Константата се чете само от стария формат на снимките.
 UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))
