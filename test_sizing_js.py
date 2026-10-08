@@ -70,29 +70,48 @@ print(f"  среда: node = {NODE or 'няма'}; Chrome = {CHROME or 'няма
 
 
 def chrome_dump(html_text, tmp, extra=()):
-    """Зарежда страницата в headless Chrome и връща DOM-а след изпълнението на скриптовете. `--dump-dom` на някои версии (напр. 154 на macOS) печата DOM-а, но процесът НЕ излиза —
-    затова се чете до затварящия </html> и процесът се убива (с watchdog при провал)."""
-    import threading
+    """
+    Зарежда страницата в headless Chrome и връща DOM-а след изпълнението на скриптовете. `--dump-dom` на някои версии (напр. 154 на macOS) печата DOM-а, но процесът не излиза сам, затова се чете до
+    затварящия </html> и процесът се убива (с watchdog при провал).
+    08.10.2026 (вероятната причина за червения Tests run на ubuntu-latest, непотвърдена — логът изисква вход): двете извиквания в (д) делят един и същ --user-data-dir и първият Chrome се убива със SIGKILL; на Linux
+    остава SingletonLock/деца на процеса и вторият Chrome се "закача" за стария сесия и излиза без изход (празен stdout). Затова: СОБСТВЕН профил на всяко извикване, убива се цялата група процеси, един повторен
+    опит при празен изход, а при провал съобщението носи края на stderr на Chrome (виси в анотацията на Tests run-а).
+    """
+    import threading, signal, tempfile as _tf
     f = pathlib.Path(tmp) / "page.html"
     f.write_text(html_text, encoding="utf-8")
-    cmd = [CHROME, "--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", f"--user-data-dir={pathlib.Path(tmp) / 'profile'}", "--virtual-time-budget=4000",
-           '--host-resolver-rules=MAP * ~NOTFOUND', "--dump-dom", *extra, f.as_uri()]                       # без мрежа: всички имена → NOTFOUND
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, encoding="utf-8")
-    watchdog = threading.Timer(60, proc.kill)
-    watchdog.start()
-    lines = []
-    try:
-        for line in proc.stdout:
-            lines.append(line)
-            if "</html>" in line:
-                break
-    finally:
-        watchdog.cancel()
-        proc.kill()
-        proc.wait(timeout=20)
-    out = "".join(lines)
-    assert "<html" in out and "</html>" in out, out[-400:]
-    return out
+    last = ""
+    for attempt in (1, 2):
+        profile = pathlib.Path(_tf.mkdtemp(prefix="chrome_profile_", dir=tmp))
+        err_path = pathlib.Path(tmp) / f"chrome_err_{attempt}.txt"
+        cmd = [CHROME, "--headless=new", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", f"--user-data-dir={profile}", "--virtual-time-budget=4000",
+               '--host-resolver-rules=MAP * ~NOTFOUND', "--dump-dom", *extra, f.as_uri()]                       # без мрежа: всички имена → NOTFOUND
+        with open(err_path, "w") as err:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=err, text=True, encoding="utf-8", start_new_session=True)
+
+            def kill_group():
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError):
+                    proc.kill()
+            watchdog = threading.Timer(60, kill_group)
+            watchdog.start()
+            lines = []
+            try:
+                for line in proc.stdout:
+                    lines.append(line)
+                    if "</html>" in line:
+                        break
+            finally:
+                watchdog.cancel()
+                kill_group()
+                proc.wait(timeout=20)
+        out = "".join(lines)
+        if "<html" in out and "</html>" in out:
+            return out
+        last = f"опит {attempt}: изход {out[-300:]!r}; stderr на Chrome: {err_path.read_text(errors='replace')[-500:]!r}"
+        print(f"  ⚠ chrome_dump: празен/непълен изход — {last}")
+    raise AssertionError(last)
 
 
 # ── 1. математиката: JS срещу Python ─────────────────────────────────────────
