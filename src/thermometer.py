@@ -324,6 +324,15 @@ def vix_term_structure() -> dict:
                 "hide": True, "label": ""}
 
 
+def _pct_ord(p: float, ref: float | None = None, near: float = 2.0) -> str:
+    """
+    Перцентилът за текст (08.10, 2д): цяло число с точка ("91."), а на по-малко от `near` пункта от прага (по подразбиране прагът на IEI/HYG spike) — с един знак след запетаята ("90.4"),
+    за да не изглежда "90." като над или под прага. "{_pct_ord(p)} percentile" → "91. percentile" / "90.4 percentile".
+    """
+    ref = config.IEI_HYG_ROC_SPIKE_PERCENTILE if ref is None else ref
+    return f"{p:.1f}" if abs(p - ref) < near else f"{p:.0f}."
+
+
 def _percentile_rank(history: list[float], current: float) -> float:
     """Same конвенция като cot.py: _percentile_rank — среща умишлено дублирана
     локално вместо cross-module import на частна функция (self-contained
@@ -385,7 +394,7 @@ def _evaluate_credit_spread(ratio) -> dict:
         "roc_percentile": roc_pct, "spike": spike, "status": status,
         "label": f"IEI/HYG {current:.3f} ({level_pct:.0f}. percentile) · "
                  f"{config.IEI_HYG_ROC_WINDOW_DAYS}д RoC {current_roc:+.1f}% "
-                 f"({roc_pct:.0f}. percentile){note}",
+                 f"({_pct_ord(roc_pct)} percentile){note}",
     }
 
 
@@ -747,7 +756,25 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
 _DISTRIBUTION_KEY = "distribution_block"
 
 
-def _distribution_block(distribution_days: dict | None, today_iso: str) -> dict:
+def replay_distribution_block(statuses: list[str]) -> dict:
+    """
+    Чиста функция (08.10, 2д): състоянието на блока след серия дневни статуси (най-старият първо) със СЪЩИТЕ правила като _distribution_block — червен → блок и нула нечервени; нечервен при блок
+    → още един нечервен ден, блокът пада при DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS; нечервен без блок → нищо. Връща {"blocked", "streak_nonred"}. Тестът я сверява с _distribution_block ден по ден.
+    """
+    need = config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS
+    blocked, streak = False, 0
+    for st in statuses:
+        if st == "red":
+            blocked, streak = True, 0
+        elif blocked:
+            streak += 1
+            blocked = streak < need
+        else:
+            streak = 0
+    return {"blocked": blocked, "streak_nonred": streak}
+
+
+def _distribution_block(distribution_days: dict | None, today_iso: str, history=None) -> dict:
     """
     Асиметричен хистерезис за блока от distribution days (допълнение към пакет 2, 2026-10-05): при ПЪРВИЯ червен ден
     блокът се включва веднага; пада чак след config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS (2) ПОРЕДНИ нечервени дни
@@ -768,6 +795,23 @@ def _distribution_block(distribution_days: dict | None, today_iso: str) -> dict:
         entry = None
     entry = dict(entry or {"blocked": False, "streak_nonred": 0, "last_date": None})
     need = config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS
+    # 08.10 (2д): начално състояние от историята — еднократно (белег "seed"), с днешния ден, приложен след това по обичайния път. history() → [{date, status}] на последните сесии ПРЕДИ днешната.
+    if (history is not None and config.DISTRIBUTION_SEED_SESSIONS > 0
+            and (entry.get("seed") or {}).get("version", 0) < config.DISTRIBUTION_SEED_VERSION):
+        try:
+            rows = history() or []
+        except Exception as e:
+            print(f"[thermo] distribution days: историята не се зареди ({type(e).__name__}: {e}) — без начално състояние от историята")
+            rows = []
+        if rows:
+            rep = replay_distribution_block([r["status"] for r in rows])
+            entry = {"blocked": rep["blocked"], "streak_nonred": rep["streak_nonred"], "last_date": None,
+                     "seed": {"version": config.DISTRIBUTION_SEED_VERSION, "sessions": len(rows), "from": rows[0]["date"], "to": rows[-1]["date"]}}
+            state[_DISTRIBUTION_KEY] = entry
+            _save_override_state(state)
+            print(f"[thermo] distribution days: НАЧАЛНО състояние от историята ({len(rows)} сесии {rows[0]['date']} → {rows[-1]['date']}): "
+                  f"{'блокиран' if rep['blocked'] else 'не е блокиран'}, нечервени поред {rep['streak_nonred']}")
+            entry = dict(entry)
     known = bool(distribution_days)
     red = known and distribution_days.get("status") == "red"
     dirty = False
@@ -805,7 +849,7 @@ def _distribution_block(distribution_days: dict | None, today_iso: str) -> dict:
             "frozen_days": entry.get("frozen_days", 0)}
 
 
-def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: dt.date | None = None) -> dict:
+def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: dt.date | None = None, history=None) -> dict:
     """
     Допълнение към пакет 2 (2026-10-05): червени distribution days (entry_timing.evaluate_distribution_days:
     max(SPY, QQQ) >= config.DISTRIBUTION_DAYS_RED, статус "red") → режимът е най-много Defensive. Извиква се от main.py,
@@ -826,7 +870,7 @@ def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: 
     if not config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE or not isinstance(thermo, dict) or "distribution_cap" in thermo:
         return thermo
     today_iso = (today or dt.date.today()).isoformat()
-    blk = _distribution_block(distribution_days, today_iso)
+    blk = _distribution_block(distribution_days, today_iso, history)
     if not blk["blocked"]:
         return thermo
     count_regime = thermo.get("regime_by_count") or thermo.get("regime")
@@ -1102,12 +1146,12 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     elif credit_spike:
         if credit_spike_raw:
             credit_text = (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
-                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile) — "
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {_pct_ord(credit_ind['roc_percentile'])} percentile) — "
                            "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%")
             credit_state = "active"
         else:
             credit_text = (f"IEI/HYG: spike-ът отшумява ({credit_ind['roc_10d_pct']:+.1f}% за "
-                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {credit_ind['roc_percentile']:.0f}. percentile, "
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {_pct_ord(credit_ind['roc_percentile'])} percentile, "
                            f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}.), хистерезис "
                            f"{min(credit_spike_streak, 2)}/2 — override още активен, sizing −50%")
             credit_state = "hysteresis"
@@ -1117,7 +1161,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "text": credit_text,
             "exit_condition": (
                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile (сега "
-                f"{credit_ind['roc_percentile']:.0f}.) да е под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. "
+                f"{_pct_ord(credit_ind['roc_percentile'])}) да е под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. "
                 f"percentile два поредни дни (хистерезис — в момента {min(credit_spike_streak, 2)}/2); "
                 f"без нов скок това става до около {config.IEI_HYG_ROC_WINDOW_DAYS} дни — това е "
                 "прозорецът на изчислението, не непременно реално успокояване"),

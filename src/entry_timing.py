@@ -133,6 +133,43 @@ def _count_distribution_days(sym: str, lookback: int) -> int | None:
     return int(is_dd.iloc[-lookback:].sum())
 
 
+def distribution_series(spy_hist, qqq_hist) -> list[dict]:
+    """
+    Дневният статус на distribution days към ВСЯКА сесия (08.10.2026, начално състояние на блока от историята): за всяка дата 25-сесийният брой (config.DISTRIBUTION_DAYS_LOOKBACK) на SPY
+    и QQQ по същата дефиниция като _count_distribution_days (close надолу с поне DISTRIBUTION_DAYS_MIN_DECLINE_PCT и обем над предходния), статус по max(SPY, QQQ) — червен ≥
+    DISTRIBUTION_DAYS_RED, жълт ≥ DISTRIBUTION_DAYS_YELLOW. Чиста функция върху два DataFrame с Close/Volume; общите дати, нужен е пълен прозорец и за двата. [{date, spy_count, qqq_count, count, status}].
+    """
+    import pandas as pd
+
+    def counts(h):
+        c, v = h["Close"], h["Volume"]
+        dd = ((c.pct_change() * 100) <= -config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT) & (v > v.shift(1))
+        return dd.rolling(config.DISTRIBUTION_DAYS_LOOKBACK).sum()
+    both = pd.concat({"spy": counts(spy_hist), "qqq": counts(qqq_hist)}, axis=1).dropna()
+    out = []
+    for ts, row in both.iterrows():
+        gate = int(max(row["spy"], row["qqq"]))
+        status = "red" if gate >= config.DISTRIBUTION_DAYS_RED else ("yellow" if gate >= config.DISTRIBUTION_DAYS_YELLOW else "green")
+        out.append({"date": ts.date().isoformat(), "spy_count": int(row["spy"]), "qqq_count": int(row["qqq"]), "count": gate, "status": status})
+    return out
+
+
+def distribution_history(n_sessions: int, fetch=None) -> list[dict]:
+    """
+    Статусите на последните n_sessions сесии ПРЕДИ последната (последната е днешната — смята се от evaluate_distribution_days и се прилага от самия блок). Мрежата е един fetch на SPY и QQQ
+    (~150 календарни дни = пълният прозорец + n сесии); провал → [] (началното състояние остава празно, както преди). `fetch(sym)` е за тестове.
+    """
+    fetch = fetch or (lambda sym: net_utils.fetch_with_timeout(lambda: yf.Ticker(sym).history(period="150d")))
+    try:
+        spy, qqq = fetch("SPY"), fetch("QQQ")
+        if spy is None or qqq is None or spy.empty or qqq.empty:
+            return []
+        return distribution_series(spy, qqq)[:-1][-n_sessions:]
+    except Exception as e:
+        print(f"[entry_timing] историята на distribution days не се зареди: {type(e).__name__}: {e}")
+        return []
+
+
 def evaluate_distribution_days() -> dict | None:
     """
     Концепция 3: distribution days market gate. Пазарно-глобален сигнал

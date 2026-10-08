@@ -261,7 +261,7 @@ print()
 print("── main.py ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert src.count("entry_timing.evaluate_distribution_days()") == 1                                    # един fetch
-i_dd, i_cap = src.index("entry_timing.evaluate_distribution_days()"), src.index("apply_distribution_cap(thermo, distribution_days)")
+i_dd, i_cap = src.index("entry_timing.evaluate_distribution_days()"), src.index("apply_distribution_cap(thermo, distribution_days")                      # 08.10: + history= (начално състояние от историята)
 i_thermo, i_macro, i_hard = src.index("thermo = build_thermometer(macro)"), src.index("ai_brief.macro_and_sector_brief("), src.index("apply_hard_rules(candidates, thermo[")
 assert i_thermo < i_dd < i_cap < i_macro < i_hard
 seg = src[i_dd - 200:i_cap + 400]

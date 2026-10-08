@@ -423,7 +423,7 @@ def run() -> dict:
         except Exception as e:
             print(f"[entry_timing] distribution days пропаднаха: {type(e).__name__}: {e}")
         try:
-            thermo = apply_distribution_cap(thermo, distribution_days)
+            thermo = apply_distribution_cap(thermo, distribution_days, history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS))
         except Exception as e:
             print(f"[thermo] ⚠ apply_distribution_cap пропадна ({type(e).__name__}: {e}) — режимът е без този блок")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")

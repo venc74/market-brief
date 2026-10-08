@@ -1190,6 +1190,11 @@ DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE = os.getenv("DISTRIBUTION_DAYS_BLOCKS_OFFENSI
 # Асиметричен хистерезис на блока: влиза веднага при първия червен ден, пада след толкова ПОРЕДНИ нечервени дни (жълт/зелен).
 # Без него броят около прага (8↔9) връщаше Offensive за един ден между два червени (25.09 червено, 28.09 жълто, 29.09 червено).
 DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS = int(os.getenv("DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS", 2))
+# 08.10.2026 (2д): началното състояние на блока се изгражда ЕДНОКРАТНО от историята — последните DISTRIBUTION_SEED_SESSIONS сесии (преди днешната), ден по ден със същите правила (първи
+# червен → блок; освобождаване след DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS нечервени). Преди: празно състояние = "не е блокиран", докато не дойде червен ден (пакетът тръгна на 05.10;
+# реалната история е червена 15.09–24.09 и 28.09–05.10). 0 изключва; версията на белега се вдига, когато се променя правилото.
+DISTRIBUTION_SEED_SESSIONS = int(os.getenv("DISTRIBUTION_SEED_SESSIONS", 15))
+DISTRIBUTION_SEED_VERSION = 1
 
 # ── Track Record / Backtest (Action препоръки: target/stop резолюция) ─────
 ENABLE_BACKTEST = os.getenv("ENABLE_BACKTEST", "1") == "1"
