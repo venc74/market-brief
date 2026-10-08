@@ -1,0 +1,7 @@
+{
+ "_note": "РЕАЛНО (08.10.2026): полето runs.using в action.yml на всяка основна версия на actions/checkout и actions/setup-python — прочетено от raw.githubusercontent.com/actions/<име>/<версия>/action.yml. node20 е изведен от употреба на GitHub-hosted runner-ите (предупреждение в анотациите на Tests run-а: 'Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24').",
+ "runtime": {
+  "actions/checkout@v4": "node20", "actions/checkout@v5": "node24", "actions/checkout@v6": "node24", "actions/checkout@v7": "node24",
+  "actions/setup-python@v5": "node20", "actions/setup-python@v6": "node24", "actions/setup-python@v7": "node24"
+ }
+}
