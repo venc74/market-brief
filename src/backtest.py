@@ -1242,7 +1242,7 @@ def get_glb_wish_summary() -> dict:
     GLB по Уиш: обобщение на ОТДЕЛНАТА книга "glb_wish" (буквалното правило на Wish, без нашите филтри — измерване, не препоръка). Чисто локално четене (без мрежа). Доходност в % (няма стоп → няма R) на две граници:
     literal (вход и изход на затварянето) и exec (отварянето на следващата сесия), спрямо SPY за същите дати. Записите с резултат са затворените (изход по линията / изтекли след
     config.GLB_WISH_MAX_HOLD_SESSIONS) И отворените по mark-to-market — само затворените биха били структурно негативни (изходът по линията е загуба по построение). Статистиката (win rate, медиана, алфа) се
-    попълва чак при >= config.GLB_WISH_MIN_ENTRIES_FOR_STATS такива записа; дотогава — броят и средната доходност. Редовете носят отметка also_action / also_buystop / also_qm. Изключено → {}.
+    попълва чак при >= config.GLB_WISH_MIN_ENTRIES_FOR_STATS такива записа (затворените и отворените се показват ОТДЕЛНО: closed_result / open_result и групите); дотогава — броят и средната доходност. Редовете носят отметка also_action / also_buystop / also_qm. Изключено → {}.
     """
     if not config.TRACK_GLB_WISH:
         return {}
@@ -1268,7 +1268,9 @@ def get_glb_wish_summary() -> dict:
         by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
     with_result = [r for r in records if r.get("status") in ("open",) + trade_sim.GW_TERMINAL and r.get("return_pct") is not None]
     line_exit = [r for r in with_result if r["status"] == "line_exit"]
-    held = [r for r in with_result if r["status"] in ("open", "expired")]
+    expired = [r for r in with_result if r["status"] == "expired"]
+    open_res = [r for r in with_result if r["status"] == "open"]
+    closed_res = line_exit + expired                                        # затворени: изход по линията ИЛИ изтекли по нашия таван (оценка по затварянето му)
     min_n = config.GLB_WISH_MIN_ENTRIES_FOR_STATS
     visible = len(with_result) >= min_n
     med = lambda xs: round((xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2), 2)
@@ -1311,9 +1313,9 @@ def get_glb_wish_summary() -> dict:
     return {
         "enabled": True, "track_from": config.GLB_WISH_TRACK_FROM or None, "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
         "pending": by_status.get("pending", 0), "open": by_status.get("open", 0), "line_exit": by_status.get("line_exit", 0), "expired": by_status.get("expired", 0), "invalid": by_status.get("invalid_signal", 0),
-        "with_result": len(with_result), "min_entries": min_n, "stats_visible": visible,
+        "with_result": len(with_result), "closed_result": len(closed_res), "open_result": len(open_res), "min_entries": min_n, "stats_visible": visible,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
-        "all": stats(with_result), "line_exit_group": stats(line_exit), "held_group": stats(held),
+        "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
         "live": live, "live_total": len(live_all), "recent": recent,
     }

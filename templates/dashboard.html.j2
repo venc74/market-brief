@@ -1233,28 +1233,29 @@
 {# ── GLB по Уиш (09.10.2026): отделна книга с БУКВАЛНОТО правило на Wish — измерване, не препоръка. Самостоятелна секция: тя съществува и когато списъкът с карти е празен или скринърът е паднал ── #}
 {% set gw = backtest.get("glb_wish") if backtest else none %}
 {% if gw and gw.enabled %}
-{% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла (граница на държане)"} %}
+{% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла по нашия таван"} %}
 <section>
   <h2>GLB по Уиш · книга (измерване, не препоръка)</h2>
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
     <b>Буквалното правило на Eric Wish без нашите филтри:</b> вход при затваряне над зелената линия (най-високият месечен close, непробит поне {{ glb_min_months }} месеца), изход при първото затваряне под същата линия (замразена при входа).
     Няма Classic / Momentum филтър (типът е само етикет), няма хистерезис +1% / −3% и няма стоп — затова доходността е в %, не в R. Две граници: <b>literal</b> = и вход, и изход на затварянето на сигналния ден;
-    <b>exec</b> = отварянето на следващата сесия (първото изпълнимо след брифа). Горна граница на държане {{ gw.max_hold_sessions if gw.max_hold_sessions else "няма" }} сесии (наша: без нея печелившите остават отворени, а затворените са само загубилите).
+    <b>exec</b> = отварянето на следващата сесия (първото изпълнимо след брифа). <b>Таванът на държане{% if gw.max_hold_sessions %} от {{ gw.max_hold_sessions }} сесии{% endif %} е НАШ — при Уиш няма такъв:</b> без него печелившите остават отворени с години, а затворените са само загубилите; след тавана позицията се оценява по затварянето на последния ден.
     Записва се само пробив на последния цял бар, от {{ gw.track_from or "началото" }} нататък (чист старт). Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.
     Реплей върху историята (1962–2026, {{ glb_wish_replay.trades }} сделки, <b>днешният универс — оцелели</b>): печеливши {{ glb_wish_replay.win_literal_pct }}% (literal) / {{ glb_wish_replay.win_exec_pct }}% (exec), медиана {{ glb_wish_replay.median_literal_pct }}% на сделка,
     алфа спрямо SPY за същите дати {{ "%+.2f"|format(glb_wish_replay.alpha_literal_pct) }}% [{{ glb_wish_replay.alpha_literal_ci[0] }}; {{ glb_wish_replay.alpha_literal_ci[1] }}] — почти цялата доходност е в най-добрите 5% от сделките.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани {{ gw.records }} · отворени {{ gw.open + gw.pending }} · изход по линията {{ gw.line_exit }} · изтекли {{ gw.expired }}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа{% endif %}</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани {{ gw.records }} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа (затворени + отворени){% endif %}</summary>
   <div class="prose" style="margin-top:8px">
     {% if not gw.records %}
     <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.
     {% else %}
-    <b>Записани: {{ gw.records }}</b> · отворени {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %} · изход по линията {{ gw.line_exit }} · изтекли {{ gw.expired }}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
+    <b>Записани: {{ gw.records }}</b> · <b>затворени {{ gw.line_exit + gw.expired }}</b> (изход по линията {{ gw.line_exit }} · изтекли по нашия таван {{ gw.expired }}) / <b>отворени по текуща цена {{ gw.open }}</b>{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
     {% if gw.with_result %}
-    Записи с резултат (затворени + отворени по последното затваряне): {{ gw.with_result }} · средна доходност <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
+    Записи с резултат: <b>{{ gw.with_result }} = затворени {{ gw.closed_result }} / отворени по текуща цена {{ gw.open_result }}</b> · средна доходност <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
     {% if gw.line_exit_group.n %}Изход по линията ({{ gw.line_exit_group.n }}): средно {{ "%+.2f"|format(gw.line_exit_group.avg_return_pct) }}% — по построение загуби (вход над линията, изход под нея).<br>{% endif %}
-    {% if gw.held_group.n %}Държани или изтекли ({{ gw.held_group.n }}): средно {{ "%+.2f"|format(gw.held_group.avg_return_pct) }}% — тук е цялата печалба.<br>{% endif %}
+    {% if gw.expired_group.n %}Изтекли по нашия таван ({{ gw.expired_group.n }}, оценка по затварянето на последния ден): средно {{ "%+.2f"|format(gw.expired_group.avg_return_pct) }}%.<br>{% endif %}
+    {% if gw.open_group.n %}Отворени по текуща цена ({{ gw.open_group.n }}): средно {{ "%+.2f"|format(gw.open_group.avg_return_pct) }}% — още не са затворени, цената им може да се върне под линията.<br>{% endif %}
     {% endif %}
     {% if gw.stats_visible %}
     <b>Печеливши: {{ gw["all"].win_rate_pct }}%</b> literal{% if gw["all"].win_rate_exec_pct is not none %} / {{ gw["all"].win_rate_exec_pct }}% exec{% endif %} (95% интервал {{ gw["all"].win_ci_pct[0] }}–{{ gw["all"].win_ci_pct[1] }}%)

@@ -9,7 +9,7 @@ backtest (категория glb_wish, чист старт, дедуп, неза
 праговите записи (24 затворени записа), граничните стойности в обобщението и подменените yf.download.
 Пускане: python test_glb_wish.py
 """
-import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt, importlib
+import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt, importlib, re
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -26,6 +26,8 @@ backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 config.ENABLE_BACKTEST = True
 config.TRACK_GLB_WISH = True
+assert config.GLB_WISH_TRACK_FROM == "2026-10-12"                 # стойността по подразбиране: push в петък следобед, първият бриф с кода е понеделник 12.10
+DEFAULT_TRACK_FROM = config.GLB_WISH_TRACK_FROM
 config.GLB_WISH_TRACK_FROM = ""                                  # тук се тества книгата; чистият старт има свой раздел по-долу
 config.GLB_WISH_MAX_HOLD_SESSIONS = 252
 backtest.enrich.earnings_recap = lambda t: None
@@ -204,8 +206,15 @@ backtest._ingest_glb_wish_list(t2, "2024-05-29", [AA], "Offensive")
 assert t2 == {}
 backtest._ingest_glb_wish_list(t2, "2024-06-01", [AA], "Offensive")
 assert len(t2) == 1
+config.GLB_WISH_TRACK_FROM = DEFAULT_TRACK_FROM
+t_def = {}
+backtest._ingest_glb_wish_list(t_def, "2026-10-09", [AA], "Offensive")                                            # петък — денят на push-а: още не се записва
+backtest._ingest_glb_wish_list(t_def, "2026-10-11", [AA], "Offensive")
+assert t_def == {}
+backtest._ingest_glb_wish_list(t_def, "2026-10-12", [AA], "Offensive")                                            # понеделник — първият бриф с кода
+assert list(t_def) == ["AA_2026-10-12_gw"]
 config.GLB_WISH_TRACK_FROM = ""
-print("  ✓ чист старт: запис с дата на брифа преди GLB_WISH_TRACK_FROM не влиза (и от snapshot-ите), на самата дата влиза")
+print("  ✓ чист старт: запис с дата на брифа преди GLB_WISH_TRACK_FROM не влиза (и от snapshot-ите), на самата дата влиза; по подразбиране 12.10.2026 — записите от петък 09.10 и уикенда не влизат, от понеделник влизат")
 
 # независимост от другите книги и четците
 t3 = {}
@@ -283,15 +292,16 @@ S20 = backtest.get_glb_wish_summary()
 rl = sorted(v["return_pct"] for v in rows.values())
 assert S20["with_result"] == 20 and S20["stats_visible"] and S20["records"] == 20 and S20["line_exit"] == 19 and S20["expired"] == 1 and S20["open"] == 0
 assert S20["all"]["n"] == 20 and S20["all"]["avg_return_pct"] == round(sum(rl) / 20, 2) and S20["all"]["win_rate_pct"] == 5.0 and S20["all"]["win_ci_pct"] is not None
-assert S20["all"]["median_return_pct"] == round((rl[9] + rl[10]) / 2, 2) and S20["line_exit_group"]["n"] == 19 and S20["line_exit_group"]["win_rate_pct"] == 0.0 and S20["held_group"]["n"] == 1
+assert S20["all"]["median_return_pct"] == round((rl[9] + rl[10]) / 2, 2) and S20["line_exit_group"]["n"] == 19 and S20["line_exit_group"]["win_rate_pct"] == 0.0 and S20["expired_group"]["n"] == 1 and S20["open_group"]["n"] == 0 and S20["closed_group"]["n"] == 20 and (S20["closed_result"], S20["open_result"]) == (20, 0)
 assert S20["all"]["avg_alpha_pct"] == round(sum(v["alpha_pct"] for v in rows.values()) / 20, 2) and S20["all"]["beat_spy_pct"] == 5.0
 assert S20["by_type"]["classic"]["records"] == 11 and S20["by_type"]["momentum"]["records"] == 9 and S20["by_regime"]["Offensive"]["records"] == 20
-print(f"  ✓ при 19 записа с резултат: само броят и средната доходност ({S19['all']['avg_return_pct']:+.2f}%); при 20-я: win rate {S20['all']['win_rate_pct']}%, медиана {S20['all']['median_return_pct']:+.2f}%, алфа {S20['all']['avg_alpha_pct']:+.2f}%, групите (изход по линията n=19 → 0% печеливши; държани n=1) — всичко сверено независимо")
+print(f"  ✓ при 19 записа с резултат: само броят и средната доходност ({S19['all']['avg_return_pct']:+.2f}%); при 20-я: win rate {S20['all']['win_rate_pct']}%, медиана {S20['all']['median_return_pct']:+.2f}%, алфа {S20['all']['avg_alpha_pct']:+.2f}%, групите (изход по линията n=19 → 0% печеливши; изтекли по тавана n=1; отворени n=0) — всичко сверено независимо")
 assert S20["line_exit_group"]["win_rate_pct"] == 0.0
 live_rows = {f"L{i}_gw": mk(100 + i, "open", 5.0 + i, entry=f"2026-09-{1 + i:02d}") for i in range(17)}
 rows.update(live_rows)
 backtest._save_tracker(rows)
 SL = backtest.get_glb_wish_summary()
+assert (SL["closed_result"], SL["open_result"], SL["with_result"]) == (20, 17, 37) and SL["open_group"]["n"] == 17 and SL["closed_group"]["n"] == 20
 assert SL["open"] == 17 and len(SL["live"]) == 15 and SL["live_total"] == 17 and SL["live"][0]["entry_date"] >= SL["live"][-1]["entry_date"] and len(SL["recent"]) == 10
 print("  ✓ отворените са най-новите 15 от 17 (с брой на всички), последно затворените — 10")
 config.TRACK_GLB_WISH = False
@@ -312,15 +322,16 @@ with contextlib.redirect_stdout(io.StringIO()):
 sec = page[page.index("GLB по Уиш · книга"):]
 sec = sec[:sec.index("</section>")]
 assert "измерване, не препоръка" in page[page.index("GLB по Уиш · книга"):][:200] and "Буквалното правило на Eric Wish без нашите филтри" in sec and "оцелели" in sec and "тесен" not in sec.lower()
-assert "Измерване — книга glb_wish: записани 37" in sec and f"win rate {SL['all']['win_rate_pct']}%" in sec and "по построение загуби" in sec and "тук е цялата печалба" in sec
+assert "Измерване — книга glb_wish: записани 37" in sec and f"win rate {SL['all']['win_rate_pct']}%" in sec and "по построение загуби" in sec and "затворени 20 / отворени по текуща цена 17" in sec and "затворени 20 (изход по линията 19 · изтекли по нашия таван 1) / отворени по текуща цена 17" in re.sub(r"<[^>]+>", "", sec) and "Отворени по текуща цена (17)" in sec and "Изтекли по нашия таван (1" in sec
+assert "НАШ — при Уиш няма такъв" in sec and "от 252 сесии" in sec and "изтекла по нашия таван" in sec
 assert sec.count("<tr><td class=\"sym\">T1") >= 10 and "от 17, най-новите" in sec and "и Action" not in sec
 print("  ✓ СИНТЕТИЧНИ записи от точка 8 в РЕАЛНАТА страница от 05.10: секция «GLB по Уиш · книга (измерване, не препоръка)» с честното описание (буквално правило, оцелели, без тесен), реда за 37 записа, win rate от обобщението, обяснението за групите, 15 отворени «от 17, най-новите»")
 b2 = copy.deepcopy(B05)
-b2.setdefault("backtest", {})["glb_wish"] = {"enabled": True, "track_from": "2026-10-09", "max_hold_sessions": 252, "records": 0, "pending": 0, "open": 0, "line_exit": 0, "expired": 0, "invalid": 0, "with_result": 0,
-        "min_entries": 20, "stats_visible": False, "also_action": 0, "also_buystop": 0, "also_qm": 0, "all": {}, "line_exit_group": {}, "held_group": {}, "by_type": {}, "by_regime": {}, "live": [], "live_total": 0, "recent": []}
+b2.setdefault("backtest", {})["glb_wish"] = {"enabled": True, "track_from": "2026-10-12", "max_hold_sessions": 252, "records": 0, "pending": 0, "open": 0, "line_exit": 0, "expired": 0, "invalid": 0, "with_result": 0, "closed_result": 0, "open_result": 0,
+        "min_entries": 20, "stats_visible": False, "also_action": 0, "also_buystop": 0, "also_qm": 0, "all": {}, "closed_group": {}, "line_exit_group": {}, "expired_group": {}, "open_group": {}, "by_type": {}, "by_regime": {}, "live": [], "live_total": 0, "recent": []}
 with contextlib.redirect_stdout(io.StringIO()):
     page_empty = render.render_dashboard(b2)
-assert "Още няма записани пробиви" in page_empty and "от 2026-10-09 нататък" in page_empty and "статистика след 20 записа" in page_empty
+assert "Още няма записани пробиви" in page_empty and "от 2026-10-12 нататък" in page_empty and "статистика след 20 записа" in page_empty
 print("  ✓ празната книга казва, че още няма записи и от коя дата се записва")
 
 print()
