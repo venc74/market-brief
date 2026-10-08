@@ -22,6 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import backtest
 from src import net_utils
+from src import regime_claims
 from src import cot_theses as _cot_table     # пакет 3: таблиците за директните тикъри и знака (без AI)
 
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -57,6 +58,7 @@ AI_USAGE: list[dict] = []
 # стека, за да не се пипат шестте call site-а само заради етикет.
 _SECTION_LABELS = {
     "macro_and_sector_brief": "Макро бриф и секторна карта",
+    "_macro_and_sector_brief_ai": "Макро бриф и секторна карта",      # 08.10: същото тяло под ново име (обвивка с проверка на твърденията за режима)
     "_narratives_for_batch": "Тикър наративи",
     "_cot_theses_for_batch": "COT тези",
     "thesis_reality_check": "Проверка на тезите срещу новините",
@@ -587,6 +589,42 @@ def _news_block(news: list[dict] | None) -> str:
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
                            thermometer: dict, news: list[dict] | None = None) -> dict:
     """
+    AI макро бриф + проверка на числовите твърдения за режима срещу кода (08.10.2026, виж src/regime_claims.py): броят зелени/жълти/червени, индикаторите по
+    групи и "един индикатор определя режима сам" се сверяват с термометъра; изречение със грешно твърдение се заменя с броенето от кода или се маха
+    (`regime_claims_fixed` в резултата). Graceful: всяка грешка в проверката връща отговора на модела непроменен.
+    """
+    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news)
+    try:
+        return _apply_regime_claims(out, thermometer)
+    except Exception as e:
+        print(f"[ai] проверка на твърденията за режима пропусната: {type(e).__name__}: {e}")
+        return out
+
+
+def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
+    if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
+        return out
+    f = regime_claims.facts(thermometer)
+    fixed = []
+    out = dict(out)
+    for field in ("macro_brief", "regime_comment"):
+        text = out.get(field)
+        if not isinstance(text, str) or not text:
+            continue
+        new, problems = regime_claims.clean(text, f)
+        if problems:
+            out[field] = new
+            fixed += [{"field": field, **p} for p in problems]
+    if fixed:
+        out["regime_claims_fixed"] = fixed
+        for x in fixed:
+            print(f"[ai] режим: {x['field']} — {x['why']} → изречението е поправено от кода: «{x['sentence'][:140]}»")
+    return out
+
+
+def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
+                               thermometer: dict, news: list[dict] | None = None) -> dict:
+    """
     Връща:
     {
       "macro_brief": "4-6 изречения какво се случи и какво значи",
@@ -634,6 +672,14 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 показва се, но НЕ влиза в броенето за режима и не е причина за него; не го представяй \
 като довод за Offensive/Defensive. Цитирай "change_4w_pct" и "as_of" точно; промяна \
 в мъртвата зона (±1%) е "без значима промяна", не растеж или спад.
+
+ВАЖНО за броенето на индикаторите (08.10.2026): броенето и правилото за режима са ГОТОВИ от кода — НЕ преброявай и \
+НЕ групирай индикаторите по цвят сам. Броене: {regime_claims.facts(thermometer)['counts_text']}. \
+{regime_claims.facts(thermometer)['rule_text']} Ако споменаваш броенето, ползвай ТОЧНО тези числа и групи (или само общия \
+брой, напр. "4 зелени срещу 3 жълти и 1 червен"); не слагай индикатор в група, която не го съдържа тук — информативните \
+индикатори (Fed Net Liquidity) не са в нито една група. Не твърди, че един единичен индикатор (вкл. Market Breadth) "сам по \
+себе си" дава Defensive или Offensive. Потвърден случай 08.10.2026: Fed Net Liquidity беше изброен сред жълтите, а Market Breadth \
+— като сам определящ Defensive; кодът поправя такова изречение.
 
 ВАЖНО за единиците на MOVE: "delta_1w" в термометъра и прагът за override са в \
 ПУНКТОВЕ на индекса (напр. "+15.4 пункта"), НЕ в проценти. Процентната промяна \
