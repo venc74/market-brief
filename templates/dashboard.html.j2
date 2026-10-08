@@ -968,7 +968,8 @@
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
       <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:34] }}</div>{% endif %}
-      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span></div>
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
+      {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       <div class="qm-kv">
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
         <span>Предходен ръст</span><b>+{{ "%.0f"|format(c.runup_pct) }}%</b>
@@ -980,11 +981,11 @@
   </div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
     {% if qm_diag and qm_diag.with_history %}Подредени по стягане на базата (най-стегнатите първи); лидери: горните {{ ((1 - qm_diag.lead_pct) * 100)|round|int }}% по ръст за 1, 3 и 6 месеца ({{ qm_diag.leaders }} от {{ qm_diag.with_history }} тикъра към
-    {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}), кандидати {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани {{ qm_cards|length }}{% endif %}. {% endif %}
+    {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}), кандидати {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани {{ qm_cards|length }}{% endif %}. {% endif %}{% if qm_diag and qm_diag.beyond_adr %}Още {{ qm_diag.beyond_adr }} кандидат(а) са на повече от {{ '%g'|format(qm_max_dist_adr) }}×ADR от нивото ({{ qm_diag.beyond_adr_tickers|join(", ") }}) — не се показват и не се записват. {% endif %}
     Задръж курсора върху консолидацията за подробности (дълбочина на базата, стягане, позиция спрямо 10/20 MA). Стопът за оразмеряване е максималният (1×ADR); реалният стоп е дъното на деня на влизане.
   </div>
   {% else %}
-  <div class="small" style="font-size:12.5px;color:var(--muted)">няма кандидати днес{% if qm_diag and qm_diag.with_history %} (проверени {{ qm_diag.with_history }} тикъра){% endif %}</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted)">няма кандидати днес{% if qm_diag and qm_diag.with_history %} (проверени {{ qm_diag.with_history }} тикъра){% endif %}{% if qm_diag and qm_diag.beyond_adr %}; още {{ qm_diag.beyond_adr }} са на повече от {{ '%g'|format(qm_max_dist_adr) }}×ADR от нивото ({{ qm_diag.beyond_adr_tickers|join(", ") }}) — не се показват{% endif %}</div>
   {% endif %}
   {% endif %}
 

@@ -30,7 +30,7 @@ FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").rea
 B05 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 BARS = {t: pd.DataFrame({"Open": d["o"], "High": d["h"], "Low": d["l"], "Close": d["c"], "Volume": d["v"]}, index=pd.to_datetime(d["dates"])) for t, d in FIX["frames"].items()}
 BARS["SPY"] = pd.read_csv(ROOT / "tests" / "fixtures" / "ohlc_SPY.csv", index_col=0, parse_dates=True)
-ROWS, _ = q.scan_frames({t: BARS[t] for t in FIX["frames"]}, lead=FIX["lead"])
+ROWS, _ = q.scan_frames({t: BARS[t] for t in FIX["frames"]}, lead=FIX["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 CARDS = {r["ticker"]: r for r in ROWS}
 assert sorted(CARDS) == ["CORT", "CRL", "DOCN"]
 

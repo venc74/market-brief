@@ -55,6 +55,12 @@ def _asset(name: str) -> str:
         return ""
 
 
+def _ew_html(card: dict) -> str:
+    """Предупреждението за отчет (earnings_move) като ред под картата в имейла; без предупреждение → празно."""
+    w = (card or {}).get("earnings_warning")
+    return f'<br><span style="color:#b45309;font-size:12px">{_e(w["text"])}</span>' if w and w.get("text") else ""
+
+
 def _lv_warn_html(lv) -> str:
     """Предупрежденията от нивата като редове за имейла (само текст)."""
     return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(w)}</span>' for w in ((lv or {}).get("warnings") or []))
@@ -146,7 +152,7 @@ def render_dashboard(brief: dict) -> str:
         qm_diag=brief.get("qm_diag") or {},
         qm_ep=brief.get("qm_ep") or {},
         qm_adr_min=config.QM_ADR_MIN, qm_trigger_bars=config.QM_TRIGGER_BARS, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
-        qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
+        qm_max_dist_adr=config.QM_MAX_DIST_ADR, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
@@ -216,10 +222,10 @@ def _qm_email_block(brief: dict) -> str:
                 name = c.get("company") if c.get("company") and c.get("company") != c["ticker"] else ""
                 rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}{badge if c["ticker"] in ours else ""}'
                          f'{f"<br><span style=font-weight:normal;font-family:Arial;color:#6b7280>{_e(name[:26])}</span>" if name else ""}</td>'
-                         f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
+                         f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
-                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span></td></tr>')
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}</td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'

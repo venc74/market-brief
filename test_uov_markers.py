@@ -128,6 +128,9 @@ exp = list(dict.fromkeys(want_05 + want_02 + ["AAA", "ZZZ"]))
 assert got == exp, (got, exp)
 assert "BBB" not in got                                                                   # затворена позиция не е за снимка
 assert oi_snapshot.snapshot_tickers(max_briefs=1) == list(dict.fromkeys(want_05 + ["AAA", "ZZZ"]))
+(config.DATA_DIR / "2026-10-06.json").write_text(json.dumps({"action": [], "watchlist": [], "qm_breakout": [{"ticker": "CORT"}, {"ticker": "CRL"}]}), encoding="utf-8")      # СИНТЕТИЧЕН бриф с РЕАЛНИТЕ QM тикъри от 02.10
+assert oi_snapshot.snapshot_tickers(max_briefs=1)[:2] == ["CORT", "CRL"]                                                              # 08.10: и QM картите влизат в следобедната снимка (очаквано движение при отчет)
+(config.DATA_DIR / "2026-10-06.json").unlink()
 print(f"  ✓ РЕАЛНИ кандидати на 05.10 ({len(want_05)}) + на 02.10 + живи позиции от двете книги; затворена позиция не влиза; max_briefs=1 → само последния бриф")
 
 # take_snapshot със заместители: снима точно тези тикъри, в нов формат

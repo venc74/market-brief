@@ -23,7 +23,7 @@ backtest._resolve_open_positions = lambda tracker, today=None: None          # �
 
 FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").read_text(encoding="utf-8"))
 frames = {t: pd.DataFrame({"Open": d["o"], "High": d["h"], "Low": d["l"], "Close": d["c"], "Volume": d["v"]}, index=pd.to_datetime(d["dates"])) for t, d in FIX["frames"].items()}
-ROWS, _ = q.scan_frames(frames, lead=FIX["lead"])
+ROWS, _ = q.scan_frames(frames, lead=FIX["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 CARDS = {r["ticker"]: r for r in ROWS}
 assert sorted(CARDS) == ["CORT", "CRL", "DOCN"]
 

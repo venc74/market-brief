@@ -142,8 +142,14 @@ print("  ✓ ниво $151.83, ADR 7.2%: стоп за оразмеряване 
 
 print()
 print("── РЕАЛНИ данни към 02.10.2026 (8 тикъра, РЕАЛНИ лидерски перцентили от скана на 903 тикъра) ──")
-rows, diag = q.scan_frames(REAL, lead=FIX["lead"])
-assert [r["ticker"] for r in rows] == ["DOCN", "CORT", "CRL"] == FIX["universe_scan"]["candidates"], [r["ticker"] for r in rows]
+rows_old, diag_old = q.scan_frames(REAL, lead=FIX["lead"], max_dist_adr=2.0)                                            # старото определение (≤2 ADR) — както е в реалния скан от 02.10
+assert [r["ticker"] for r in rows_old] == ["DOCN", "CORT", "CRL"] == FIX["universe_scan"]["candidates"], [r["ticker"] for r in rows_old]
+rows, diag = q.scan_frames(REAL, lead=FIX["lead"])                                                                       # правилото от 08.10: нивото най-много 1×ADR над затварянето
+assert [r["ticker"] for r in rows] == ["CORT", "CRL"] and diag["beyond_adr"] == 1 and diag["beyond_adr_tickers"] == ["DOCN"] and diag["candidates"] == 2 and diag["max_dist_adr"] == 1.0
+dd = {r["ticker"]: r["dist_adr"] for r in rows_old}
+assert dd == {"DOCN": 1.17, "CORT": 0.78, "CRL": 0.95}, dd                                                              # "до нивото: X ADR" = pct_to_trigger / ADR (8.4/7.2, 3.7/4.7, 3.0/3.2)
+print("  ✓ РЕАЛНО 02.10: до нивото DOCN 1.17 ADR (скрит: над 1×ADR), CORT 0.78, CRL 0.95 → карти CORT и CRL; diag.beyond_adr = 1 ['DOCN']; със старото определение (≤2 ADR) пак са трите")
+rows = rows_old
 by = {r["ticker"]: r for r in rows}
 d, c, k = by["DOCN"], by["CORT"], by["CRL"]
 assert (d["trigger"], c["trigger"], k["trigger"]) == (151.83, 120.51, 298.98)

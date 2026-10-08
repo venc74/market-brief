@@ -123,7 +123,7 @@ def snapshot_tickers(max_briefs: int | None = None) -> list[str]:
         except Exception as e:
             print(f"[oi_snapshot] {path.name} нечетим, пропускам: {e}")
             continue
-        for c in (brief.get("action") or []) + (brief.get("watchlist") or []):
+        for c in (brief.get("action") or []) + (brief.get("watchlist") or []) + (brief.get("qm_breakout") or []):      # 08.10: + QM картите (очакваното движение при отчет)
             add(c.get("ticker"))
     try:
         tracker = json.loads((config.DATA_DIR / "backtest_tracker.json").read_text(encoding="utf-8"))

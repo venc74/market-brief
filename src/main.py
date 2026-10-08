@@ -599,6 +599,15 @@ def run() -> dict:
         try:
             qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
             qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
+            try:                                                     # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
+                import yfinance as _yf
+                d0 = dt.date.today()
+                for c in qm_cards:
+                    c["earnings"] = {"next_earnings": earnings_move.next_earnings_date(c["ticker"], _yf, d0)}
+                n_qm_warn = earnings_move.annotate(qm_cards, d0)
+                print(f"      QM карти с отчет в следващите ~{config.EARNINGS_WARNING_SESSIONS} сесии: {n_qm_warn}")
+            except Exception as e:
+                print(f"[main] предупрежденията за отчет върху QM картите пропуснати: {type(e).__name__}: {e}")
         except Exception as e:
             print(f"[main] Qullamaggie скенерът пропадна: {e}")
             qm_diag = {"ok": False, "error": f"{type(e).__name__}: {e}"}

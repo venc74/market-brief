@@ -173,8 +173,11 @@ tree = ast.parse((ROOT / "src" / "main.py").read_text(encoding="utf-8"))
 run = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "run")
 calls = [n for n in ast.walk(run) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "annotate" and getattr(n.func.value, "id", "") == "earnings_move"]
 exp_call = [n for n in ast.walk(run) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "apply_regime_gate_expiry"]
-assert len(calls) == 1 and ast.unparse(calls[0].args[0]) == "action + watchlist" and calls[0].lineno > exp_call[0].lineno
-print("  ✓ main.run: earnings_move.annotate(action + watchlist) — след изтичането на Watchlist (картите са окончателни)")
+main_calls = [c for c in calls if ast.unparse(c.args[0]) == "action + watchlist"]
+assert len(main_calls) == 1 and main_calls[0].lineno > exp_call[0].lineno
+qm_calls = [c for c in calls if ast.unparse(c.args[0]) == "qm_cards"]                                                  # 08.10: предупреждение за отчет и върху QM картите
+assert len(qm_calls) == 1 and len(calls) == 2
+print("  ✓ main.run: earnings_move.annotate(action + watchlist) — след изтичането на Watchlist (картите са окончателни); и един отделен извик за qm_cards")
 
 print()
 print("Всички тестове минаха.")

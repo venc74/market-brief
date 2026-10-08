@@ -40,7 +40,7 @@ def build_brief():
 
     QMF = json.loads((F / "qm_frames_2026-10-02.json").read_text(encoding="utf-8"))
     frames = {t: pd.DataFrame({"Open": x["o"], "High": x["h"], "Low": x["l"], "Close": x["c"], "Volume": x["v"]}, index=pd.to_datetime(x["dates"])) for t, x in QMF["frames"].items()}
-    rows, _ = q.scan_frames(frames, lead=QMF["lead"])
+    rows, _ = q.scan_frames(frames, lead=QMF["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 
     EP = json.loads((F / "qm_ep_2026-10-02.json").read_text(encoding="utf-8"))
     dd = EP["daily"]["SYNA"]

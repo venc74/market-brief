@@ -71,7 +71,7 @@ print("  ✓ main.run подава на qm_breakout.cards и на qm_ep.run то
 # ── 2. реални карти + реален Yahoo отговор → име, което не е празно и не е тикърът ──
 FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").read_text(encoding="utf-8"))
 frames = {t: pd.DataFrame({"Open": d["o"], "High": d["h"], "Low": d["l"], "Close": d["c"], "Volume": d["v"]}, index=pd.to_datetime(d["dates"])) for t, d in FIX["frames"].items()}
-ROWS, _ = q.scan_frames(frames, lead=FIX["lead"])
+ROWS, _ = q.scan_frames(frames, lead=FIX["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 assert sorted(r["ticker"] for r in ROWS) == ["CORT", "CRL", "DOCN"]
 CARDS = q.cards(ROWS, name_lookup=LOOKUP)
 by = {c["ticker"]: c for c in CARDS}

@@ -96,7 +96,7 @@ print("  ✓ Action (EXEL): запис в Track Record-а stop_loss = 50.39 = с
 
 print()
 print("── 4. Kullamägi: стоп = вход × (1 − ADR), очакван стоп 0.55×ADR ──")
-rows, _ = q.scan_frames(frames, lead=QMF["lead"])
+rows, _ = q.scan_frames(frames, lead=QMF["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 by = {r["ticker"]: r for r in rows}
 for t, (e, s, a, es) in {"DOCN": (151.83, 140.91, 7.19, 145.82), "CORT": (120.51, 114.84, 4.71, 117.39), "CRL": (298.98, 289.48, 3.18, 293.75)}.items():
     L = by[t]["levels"]

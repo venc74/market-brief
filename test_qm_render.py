@@ -26,7 +26,7 @@ FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").rea
 EPF = json.loads((ROOT / "tests" / "fixtures" / "qm_ep_2026-10-02.json").read_text(encoding="utf-8"))
 B05 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 frames = {t: pd.DataFrame({"Open": d["o"], "High": d["h"], "Low": d["l"], "Close": d["c"], "Volume": d["v"]}, index=pd.to_datetime(d["dates"])) for t, d in FIX["frames"].items()}
-ROWS, DIAG = q.scan_frames(frames, lead=FIX["lead"])
+ROWS, DIAG = q.scan_frames(frames, lead=FIX["lead"], max_dist_adr=2.0)  # РЕАЛНАТА карта DOCN от 02.10 е на 1.17 ADR от нивото; с правилото ≤1 ADR (08.10) не е карта — тук пазим и трите реални карти (старото определение ≤2 ADR) за рендера/книгата
 CARDS = q.cards(ROWS)
 assert [c["ticker"] for c in CARDS] == ["DOCN", "CORT", "CRL"] or sorted(c["ticker"] for c in CARDS) == ["CORT", "CRL", "DOCN"]
 US = FIX["universe_scan"]                                                                                         # РЕАЛНИЯТ скан на целия универс към 02.10 (903 тикъра, 892 с история; 167 лидери; кандидати DOCN, CORT, CRL)
@@ -256,6 +256,21 @@ assert "Скенерът не се изпълни — празният спис�
 em_xss = render.render_email(xss)
 assert "<script>alert(1)</script>" not in em_xss and "&lt;script&gt;" in em_xss
 print("  ✓ QM✓ в имейла за тикър от Watchlist; при 25 затворени се показва win rate; стар бриф → без блока; повреден ред → блокът отпада, имейлът остава цял; провал на скенера → предупреждение; escape")
+
+print()
+print("── 08.10: 'до нивото: X ADR', скрити карти над 1×ADR, предупреждение за отчет ──")
+cards2 = copy.deepcopy(CARDS)
+cards2[0]["earnings_warning"] = {"text": "⚠ отчет на 12.10 (след 2 сесии) — пазарът очаква ±8%"}                                        # СИНТЕТИЧНО: предупреждение (механизмът е в earnings_move; тук — само показването)
+diag2 = {**DIAG, "beyond_adr": 2, "beyond_adr_tickers": ["SANM", "SITM"], "max_dist_adr": 1.0}                                         # СИНТЕТИЧНО: диагностиката на 08.10 (2 скрити карти)
+p2 = txt_of(section(page_raw(brief_with(cards=cards2, diag=diag2))))
+assert "Вход над $151.83 (+8.4%) · до нивото 1.17 ADR" in p2 and "Вход над $120.51 (+3.7%) · до нивото 0.78 ADR" in p2                    # РЕАЛНИТЕ карти от 02.10
+assert "⚠ отчет на 12.10 (след 2 сесии) — пазарът очаква ±8%" in p2
+assert "Още 2 кандидат(а) са на повече от 1×ADR от нивото (SANM, SITM) — не се показват и не се записват." in p2
+em2 = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render.render_email(brief_with(cards=cards2, diag=diag2)))))
+assert "вход над $151.83 · до нивото 1.17 ADR" in em2 and "⚠ отчет на 12.10 (след 2 сесии) — пазарът очаква ±8%" in em2
+pe = txt_of(section(page_raw(brief_with(cards=[], diag={**DIAG, "candidates": 0, "shown": 0, "beyond_adr": 2, "beyond_adr_tickers": ["SANM", "SITM"], "max_dist_adr": 1.0}))))
+assert "няма кандидати днес (проверени 892 тикъра); още 2 са на повече от 1×ADR от нивото (SANM, SITM) — не се показват" in pe
+print("  ✓ картите: 'Вход над $151.83 (+8.4%) · до нивото 1.17 ADR'; бележка 'Още 2 кандидат(а) са на повече от 1×ADR от нивото (SANM, SITM) — не се показват и не се записват'; предупреждение за отчет — и в dashboard-а, и в имейла; празен списък помни скритите")
 
 print()
 print("Всички тестове минаха.")

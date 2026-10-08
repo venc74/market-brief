@@ -137,14 +137,16 @@ def card_levels(row: dict) -> dict:
             "levels": trade_levels.kullamagi_levels(trig, a, stop_adr=config.QM_MAX_STOP_ADR, entry_label="ниво на пробива", expected_adr=config.QM_EXPECTED_STOP_ADR)}
 
 
-def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None = None) -> tuple[list[dict], dict]:
+def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None = None, max_dist_adr: float | None = None) -> tuple[list[dict], dict]:
     """
     Всички кандидати за пробив към ПОСЛЕДНИЯ бар на кадрите, подредени по стягане на базата (най-стегнатите първи). frames: {тикър: дневен DataFrame};
     lead: по подразбиране се смята от кадрите (lead_percentiles). Връща (редове, diag). Редовете носят нивата на картата (card_levels), без име на компания.
     """
     P = params()
     lead = lead if lead is not None else lead_percentiles(frames)
+    max_dist = config.QM_MAX_DIST_ADR if max_dist_adr is None else max_dist_adr          # 08.10: нивото най-много толкова ADR над затварянето, иначе картата не се показва и не се записва
     rows, with_hist, leaders = [], 0, 0
+    beyond: list[str] = []
     for t, df in frames.items():
         if len(df) < MIN_BARS:
             continue
@@ -154,10 +156,15 @@ def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None =
         f = compute_features(df)
         r = check_candidate(f, f["n"] - 1, L, P)
         if r:
-            rows.append({"ticker": t, **r, **card_levels(r), "note": NOTE_BG})
+            dist = round(r["pct_to_trigger"] / r["adr"], 2)                                   # "до нивото: X ADR"
+            if dist > max_dist + 1e-9:
+                beyond.append(t)
+                continue
+            rows.append({"ticker": t, **r, "dist_adr": dist, **card_levels(r), "note": NOTE_BG})
     rows.sort(key=lambda r: (r["tight"], -r["lead"], r["ticker"]))
     as_of = max((df.index[-1] for df in frames.values() if len(df)), default=None)
     return rows, {"universe": len(frames), "with_history": with_hist, "leaders": leaders, "candidates": len(rows), "shown": min(len(rows), config.QM_MAX_CARDS),
+                  "beyond_adr": len(beyond), "beyond_adr_tickers": sorted(beyond), "max_dist_adr": max_dist,
                   "as_of": pd.Timestamp(as_of).date().isoformat() if as_of is not None else None, "lead_pct": config.QM_LEAD_PCT}
 
 
@@ -234,7 +241,7 @@ def scan(universe: list[str] | None = None, now_utc: dt.datetime | None = None) 
         diag.update(st, universe=len(universe))
         diag["ok"] = bool(frames) and st["batches_failed"] < max(1, st["batches"])
         print(f"[qm_breakout] универс {len(universe)}, с история {diag['with_history']}, лидери {diag['leaders']}, кандидати {diag['candidates']} "
-              f"(показват се {diag['shown']}), към {diag['as_of']}, неуспешни партиди {st['batches_failed']}/{st['batches']}")
+              f"(показват се {diag['shown']}; над {diag['max_dist_adr']:g}×ADR от нивото, скрити: {diag['beyond_adr']} {diag['beyond_adr_tickers']}), към {diag['as_of']}, неуспешни партиди {st['batches_failed']}/{st['batches']}")
         return rows, diag
     except Exception as e:
         print(f"[qm_breakout] скенерът пропадна: {type(e).__name__}: {e}")
