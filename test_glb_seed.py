@@ -99,14 +99,14 @@ import io, contextlib
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res = g.screen(universe=TK, batch_size=50, state_path=state, today="2026-10-08")
 saved = json.loads(state.read_text(encoding="utf-8"))
-assert sorted(r["ticker"] for r in res) == sorted(TK) and saved["seed"] == {"version": 1, "sessions": 40, "from": "2026-08-12", "to": "2026-10-07"}
+assert sorted(r["ticker"] for r in res) == sorted(TK) and saved["seed"] == {"version": config.GLB_SEED_VERSION, "sessions": 40, "from": "2026-08-12", "to": "2026-10-07"} and config.GLB_SEED_VERSION == 2
 assert {s: e["since"] for s, e in saved["events"].items()} == {s: EXPECT[s]["since"] for s in TK}                               # реалните дати, не 08.10
 assert "НАЧАЛНО състояние от историята" in out.getvalue()
-print(f"  ✓ състояние без белег → еднократно изграждане: {len(res)} кандидата с реалните дати (WCC от {saved['events']['WCC']['since']}); белег seed v1 (40 сесии 12.08 → 07.10)")
+print(f"  ✓ състояние без белег → еднократно изграждане: {len(res)} кандидата с реалните дати (WCC от {saved['events']['WCC']['since']}); белег seed v2 (40 сесии 12.08 → 07.10)")
 with contextlib.redirect_stdout(io.StringIO()) as out2:
     res2 = g.screen(universe=TK, batch_size=50, state_path=state, today="2026-10-08")
 assert sorted(r["ticker"] for r in res2) == sorted(TK) and "НАЧАЛНО" not in out2.getvalue() and "хистерезис:" in out2.getvalue()
-assert json.loads(state.read_text(encoding="utf-8"))["seed"]["version"] == 1                                                    # белегът се пази при обикновен ден
+assert json.loads(state.read_text(encoding="utf-8"))["seed"]["version"] == config.GLB_SEED_VERSION                                                    # белегът се пази при обикновен ден
 print("  ✓ втори run: обикновен хистерезис (без ново изграждане), белегът остава")
 config.GLB_SEED_SESSIONS = 0                                                                                                    # СИНТЕТИЧНО: изключено
 state.write_text(json.dumps(before), encoding="utf-8")

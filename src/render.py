@@ -182,6 +182,8 @@ def render_dashboard(brief: dict) -> str:
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         glb_candidates=brief.get("glb_candidates", []),
+        glb_min_months=config.GLB_MIN_MONTHS_UNPENETRATED, glb_band_hold=f"{config.GLB_MIN_BAND_HOLD_PCT:.0f}", glb_days=config.GLB_MIN_CONSOLIDATION_DAYS,
+        glb_approach=f"{config.GLB_APPROACH_PCT:.0f}", glb_vol_bars=config.GLB_VOLUME_AVG_BARS,
         # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)
         sizing_core_js=_asset("sizing_core.js"), sizing_ui_js=_asset("sizing_ui.js"),      # 07.10: оразмеряването е в браузъра (localStorage), не в брифа
         qm_cards=brief.get("qm_breakout") or [],

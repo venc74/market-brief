@@ -55,23 +55,18 @@ import yfinance as yf
 
 RISK_NOTES = {
     "classic": (
-        "Тесен, добре удържан base преди пробива "
-        f"(band_hold>={config.GLB_MIN_BAND_HOLD_PCT:.0f}% от последните "
-        f"{config.GLB_MIN_CONSOLIDATION_DAYS} дни) — по-нисък очакван "
-        "volatility профил, най-близък до класически Stage 2 setup."
+        f"Наш филтър (не на Wish): поне {config.GLB_MIN_BAND_HOLD_PCT:.0f}% от последните {config.GLB_MIN_CONSOLIDATION_DAYS} затваряния преди пробива са не по-ниско от "
+        f"{config.GLB_APPROACH_PCT:.0f}% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за \"тесен\" base."
     ),
     "momentum": (
-        "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди "
-        "пробива — бърз/волатилен momentum move, не тиха консолидация. "
-        "По-висок очакван drawdown риск спрямо стандартните Action "
-        "кандидати — обмисли намален size."
+        "Дълъг период без нов връх, но по-малко от "
+        f"{config.GLB_MIN_BAND_HOLD_PCT:.0f}% от последните {config.GLB_MIN_CONSOLIDATION_DAYS} затваряния преди пробива са близо до линията (наш филтър, не на Wish) — "
+        "бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size."
     ),
     "insufficient_history": (
         "Недостатъчна дневна история (< GLB_MIN_CONSOLIDATION_DAYS дни "
-        "налични) за оценка на консолидационното качество — НЕ е "
-        "потвърдено нито тесен base, нито momentum move, просто не сме "
-        "проверили. Третирай предпазливо като непроверен случай, не като "
-        "'без база'."
+        "налични) за оценка на близостта до линията — НЕ е потвърдено нито Classic, нито Momentum, просто не сме "
+        "проверили. Третирай предпазливо като непроверен случай."
     ),
 }
 
@@ -125,6 +120,30 @@ def _tightness_overlay(daily_close, daily_high, daily_low, prior_high: float) ->
         "tightness_range_pct": round(tightness_range_pct, 2),
         "meets_tightness": band_hold_pct >= config.GLB_MIN_BAND_HOLD_PCT,
     }
+
+
+def breakout_volume_ratio(hist) -> float | None:
+    """
+    Обемът на последния бар (деня на пробива) ÷ средния обем на предишните config.GLB_VOLUME_AVG_BARS бара (последният не влиза в средната). None при липсващ обем/недостатъчна история/нулева средна. Информативно поле
+    (09.10.2026): Wish не изисква обем за пробива, нашият Action изисква ≥ 1.5×; тук се показва, без да филтрира.
+    """
+    try:
+        n = config.GLB_VOLUME_AVG_BARS
+        vol = hist["Volume"].dropna()
+        if len(vol) < n + 1:
+            return None
+        avg = float(vol.iloc[-(n + 1):-1].mean())
+        return round(float(vol.iloc[-1]) / avg, 2) if avg > 0 else None
+    except Exception:
+        return None
+
+
+def x_from_low52(close: float, low52) -> float | None:
+    """Цената ÷ най-ниското дневно Low на последните 252 сесии ("× от 52-седмичното дъно"); информативно поле, смята се всеки ден."""
+    try:
+        return round(float(close) / float(low52), 2) if low52 and float(low52) > 0 else None
+    except Exception:
+        return None
 
 
 def _split_only_adjust(close, high, low, splits):
@@ -186,6 +205,7 @@ def _evaluate_ticker(sym: str, hist, entry_margin_pct: float = 0.0) -> dict | No
         glb_type = "momentum"
 
     company = _verified_company_name(sym)["name"]  # reuse — same lookup като COT секцията (ai_brief.py)
+    volume_ratio = breakout_volume_ratio(hist)
 
     return {
         "ticker": sym,
@@ -197,6 +217,7 @@ def _evaluate_ticker(sym: str, hist, entry_margin_pct: float = 0.0) -> dict | No
         "months_unpenetrated": m_result["months_unpenetrated"],
         "ath_label": ath_label,
         "history_years": round(history_years, 1),
+        "breakout_volume_ratio": volume_ratio,      # 09.10: обемът на деня на пробива ÷ средния обем на предишните GLB_VOLUME_AVG_BARS бара; САМО информация, не филтър
         "tightness": overlay,  # None ако няма достатъчно дневна история за overlay-а
         "risk_note": RISK_NOTES[glb_type],
     }
@@ -238,9 +259,10 @@ def save_state(events: dict, today: str, path=None, seed: dict | None = None) ->
         print(f"[glb_screener] state не се записа: {type(e).__name__}: {e}")
 
 
-def _row(ev: dict, close: float) -> dict:
-    """Редът за показване: събитието от входа + днешната цена и разстоянието до линията."""
-    return {**ev, "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1)}
+def _row(ev: dict, close: float, low52=None) -> dict:
+    """Редът за показване: събитието от входа + днешната цена, разстоянието до линията и (информативно, 09.10) "× от 52-седмичното дъно"."""
+    return {**ev, "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
+            "x_from_52w_low": x_from_low52(close, low52)}
 
 
 def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_pct: float | None = None) -> tuple[dict, list[dict], dict]:
@@ -262,7 +284,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
             ch["held_unseen"].append(sym)
         elif ob["close"] >= ev["line"] * (1 - exit_m / 100):
             new[sym] = ev
-            rows.append(_row(ev, ob["close"]))
+            rows.append(_row(ev, ob["close"], ob.get("low52")))
         else:
             ch["dropped"].append(sym)
     for sym, ob in observations.items():
@@ -271,7 +293,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
         e = ob["entry"]
         ev = {**{k: v for k, v in e.items() if k not in ("price",)}, "line": e["prior_high"], "since": today}
         new[sym] = ev
-        rows.append(_row(ev, ob["close"]))
+        rows.append(_row(ev, ob["close"], ob.get("low52")))
         ch["entered"].append(sym)
     return new, rows, ch
 
@@ -296,7 +318,8 @@ def replay_observations(sym: str, hist, n_sessions: int, entry_margin_pct: float
             series = pd.concat([prior, pd.Series([cur], index=[d])])
             if _monthly_duration_check(series, entry_margin_pct) is not None:
                 entry = _evaluate_ticker(sym, hist.loc[:d], entry_margin_pct)
-        out[d.date().isoformat()] = {"close": cur, "entry": entry}
+        low = hist["Low"].loc[:d].iloc[-252:].min() if "Low" in hist else None
+        out[d.date().isoformat()] = {"close": cur, "entry": entry, "low52": None if low is None or low != low else float(low)}
     return out
 
 
@@ -365,7 +388,8 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                 if hyst:
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
-                    observations[sym] = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT)}
+                    observations[sym] = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT),
+                                         "low52": float(df["Low"].iloc[-252:].min()) if len(df) else None}
                     continue
                 r = _evaluate_ticker(sym, df)
             except Exception as e:

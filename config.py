@@ -1265,7 +1265,9 @@ GLB_STATE_FILE = DATA_DIR / "glb_state.json"
 # Сега състоянието се гради ЕДНОКРАТНО от историята: ден по ден същият apply_hysteresis върху последните GLB_SEED_SESSIONS сесии (линия, дълъг период и overlay към всяка дата); белегът е в data/glb_state.json
 # ("seed"). Нова версия на правилото (GLB_SEED_VERSION) → ново еднократно изграждане; GLB_SEED_SESSIONS=0 го изключва.
 GLB_SEED_SESSIONS = int(os.getenv("GLB_SEED_SESSIONS", 40))
-GLB_SEED_VERSION = 1
+# версия 2 (09.10.2026): събитията носят и breakout_volume_ratio (обем на деня на пробива ÷ средния) — старото състояние (версия 1) няма това поле, затова се гради наново от историята (еднократно)
+GLB_SEED_VERSION = 2
+GLB_VOLUME_AVG_BARS = int(os.getenv("GLB_VOLUME_AVG_BARS", 50))      # средният обем за "обем на пробива ÷ средния" (както volume_ratio в screener.py: 50 бара)
 
 
 # ══════════════════════════════════════════════════════════════════════════

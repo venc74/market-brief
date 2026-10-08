@@ -77,6 +77,6 @@ print("  ✓ «Verижната логика е условна…» → «Вер�
 print()
 print("── 4. първоизточникът в кода: glb_screener.py ──")
 g = (ROOT / "src" / "glb_screener.py").read_text(encoding="utf-8")
-assert "момentum" not in g and "orязана" not in g and "momentum move" in g and "месечно орязана Close" in g
+assert "момentum" not in g and "orязана" not in g and '"momentum":' in g and "месечно орязана Close" in g                  # 09.10: бележките са пренаписани (без «momentum move»); смесени думи пак няма
 print("  ✓ «момentum» → «momentum» и «orязана» → «орязана» в самия текст на картите (src/glb_screener.py)")
 print("\n✅ test_language_prefix: всичко мина")

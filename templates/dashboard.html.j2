@@ -1151,9 +1151,10 @@
 <section>
   <h2>GLB Watchlist · Green Line Breakout</h2>
   <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
-    ATH пробив след дълъг unpenetrated период (Eric Wish методология) — механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline.
-    <b style="color:var(--green)">Classic</b> = тесен daily base преди пробива (по-нисък очакван риск) ·
-    <b style="color:var(--yellow)">Momentum</b> = потвърден бърз/волатилен пробив без тесен base (по-висок очакван риск).
+    <b>Идеята е на Eric Wish:</b> „зелена линия“ = най-високият месечен close, непробит поне {{ glb_min_months }} месеца; сигнал — затваряне над нея. <b>Наши са:</b> разделянето Classic / Momentum,
+    филтърът за близост до линията (band_hold) и хистерезисът (вход ≥ +1% над линията, остава до −3%). Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+    <b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията ·
+    <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
   </div>
   {% if glb_classic %}
   <div class="glb-group-label classic">Classic GLB ({{ glb_classic|length }})</div>
@@ -1170,8 +1171,10 @@
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
       {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {% if g.tightness %}
-      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · tightness ±{{ g.tightness.tightness_range_pct }}%</div>
+      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
       {% endif %}
+      {# 09.10: информативни полета — не филтрират (виж config.GLB_VOLUME_AVG_BARS) #}
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните {{ glb_vol_bars }} бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива {% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.get("breakout_volume_ratio")) }}× средния{% else %}н/д{% endif %} · {% if g.get("x_from_52w_low") is not none %}{{ "%.1f"|format(g.get("x_from_52w_low")) }}× от 52-седм. дъно{% else %}дъно н/д{% endif %}</div>
       {% if g.ath_label == 'new_high_since_listing' %}
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
@@ -1201,8 +1204,10 @@
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
       {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {% if g.tightness %}
-      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · tightness ±{{ g.tightness.tightness_range_pct }}%</div>
+      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
       {% endif %}
+      {# 09.10: информативни полета — не филтрират (виж config.GLB_VOLUME_AVG_BARS) #}
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните {{ glb_vol_bars }} бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива {% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.get("breakout_volume_ratio")) }}× средния{% else %}н/д{% endif %} · {% if g.get("x_from_52w_low") is not none %}{{ "%.1f"|format(g.get("x_from_52w_low")) }}× от 52-седм. дъно{% else %}дъно н/д{% endif %}</div>
       {% if g.ath_label == 'new_high_since_listing' %}
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
