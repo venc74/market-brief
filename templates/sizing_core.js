@@ -63,6 +63,19 @@
     };
   }
 
+  // Серия загуби (09.10.2026): колко от сметката губиш след n поредни загуби по пълния стоп, ако рискът на сделка е ефективният (въведеният риск × режимния фактор, когато е включен).
+  // Линейно (n × риска) — без натрупване/компаундиране: редът в настройките е за ориентир на характера на риска, не прогноза.
+  // o: { riskPct, applyRegime, regimeFactor, n } → { ok:false } или { ok:true, n, riskPct, factor, effRiskPct, lossPct, lossPctFull }
+  function losingStreak(o) {
+    var risk = num(o.riskPct);
+    if (!(risk > 0)) return { ok: false };
+    var n = num(o.n);
+    if (!(n > 0)) n = 10;
+    var rf = num(o.regimeFactor);
+    var factor = (o.applyRegime && rf > 0) ? rf : 1;
+    return { ok: true, n: n, riskPct: risk, factor: factor, effRiskPct: risk * factor, lossPct: n * risk * factor, lossPctFull: n * risk };
+  }
+
   function money(n) {                                            // "$5,466" — без locale, за да е еднакво на всяко устройство
     var s = String(Math.round(Math.abs(n)));
     s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -74,7 +87,7 @@
     return String(parseFloat(n.toFixed(d === undefined ? 1 : d))) + "%";
   }
 
-  var api = { sizePosition: sizePosition, money: money, pct: pct, num: num };
+  var api = { sizePosition: sizePosition, losingStreak: losingStreak, money: money, pct: pct, num: num };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.MBSizing = api;
 })(typeof window !== "undefined" ? window : this);

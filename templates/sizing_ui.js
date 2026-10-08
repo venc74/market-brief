@@ -93,9 +93,21 @@
     if (res.chase) box.appendChild(line(["⚠ акцията е избягала над 1 ADR — входът е преследване"], "lv-warn"));
   }
 
+  function renderStreak() {                           // "10 поредни загуби ≈ −X% от сметката" — 10 × ефективния риск (виж MBSizing.losingStreak)
+    var box = document.getElementById("mb-streak"), panel = document.getElementById("mb-settings");
+    if (!box) return;
+    var pf = panel ? S.num(panel.getAttribute("data-regime-factor")) : NaN;
+    var r = S.losingStreak({ riskPct: state.risk, applyRegime: state.regime, regimeFactor: pf, n: 10 });
+    if (!r.ok) { box.textContent = "10 поредни загуби ≈ — (въведи риск на сделка)"; return; }
+    var txt = "10 поредни загуби ≈ −" + S.pct(r.lossPct, 2) + " от сметката (10 × риск " + S.pct(r.riskPct, 2);
+    if (r.factor !== 1) txt += " × " + r.factor + " защитен режим; за QM и EP, които са без режимен фактор: −" + S.pct(r.lossPctFull, 2);
+    box.textContent = txt + ")";
+  }
+
   function renderAll() {
     var cards = document.querySelectorAll(".lv");
     for (var i = 0; i < cards.length; i++) renderCard(cards[i]);
+    renderStreak();
     var n = document.getElementById("mb-persist-note");
     if (n) n.hidden = persisted;
   }

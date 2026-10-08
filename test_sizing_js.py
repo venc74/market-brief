@@ -184,6 +184,29 @@ if NODE or CHROME:
     g = got[3]
     assert (g["shares"], r0(g["value"]), r0(g["lossAtStop"]), r0(g["gap10"]), r0(g["gap15"])) == (36, 5466, 393, 547, 820)       # DOCN: $400 / 10.92 = 36.6 → 36
     print(f"  ✓ ръчно: EXPD (×0.5) = 15 акции, $2,919 (3.6%), загуба при стоп $196, гап $292/$438; DOCN = 36 акции, $5,466 (6.8%), загуба $393, гап $547/$820  [мотор: {how}]")
+    # серия загуби (09.10): 10 × ефективния риск, линейно — независим Python-еталон
+    STREAKS = [(0.5, True, 0.5), (0.5, False, 0.5), (0.5, True, 1.0), (1.0, True, 0.5), (0.25, True, 0.5), (2, True, 1.0), (0, True, 0.5), ("", True, 0.5), ("0,5", True, 0.5), (-1, True, 0.5), (0.5, True, 0)]
+    spay = [{"riskPct": r, "applyRegime": ar, "regimeFactor": f, "n": 10} for r, ar, f in STREAKS]
+    code = (f"const S = require({json.dumps(str(CORE))}); const P = {json.dumps(spay)}; console.log(JSON.stringify(P.map(p => S.losingStreak(p))));")
+    if NODE:
+        rr = subprocess.run([NODE, "-e", code], capture_output=True, text=True, timeout=60)
+        assert rr.returncode == 0, rr.stderr[-400:]
+        sg = json.loads(rr.stdout)
+    else:
+        with tempfile.TemporaryDirectory() as tmp0:
+            page0 = (f"<!doctype html><html><head><meta charset='utf-8'><script>{CORE.read_text(encoding='utf-8')}</script></head><body><pre id='out'></pre>"
+                     f"<script>document.getElementById('out').textContent = JSON.stringify({json.dumps(spay)}.map(p => MBSizing.losingStreak(p)));</script></body></html>")
+            o0 = chrome_dump(page0, tmp0)
+            import html as _h
+            sg = json.loads(_h.unescape(re.search(r'<pre id="out">(.*?)</pre>', o0, re.S).group(1)))
+    for (r, ar, f), g in zip(STREAKS, sg):
+        rv = float(str(r).replace(",", ".") or 0)
+        if not rv > 0:
+            assert g == {"ok": False}, (r, g)
+            continue
+        fac = f if (ar and f > 0) else 1
+        assert g["ok"] and g["n"] == 10 and close(g["lossPct"], 10 * rv * fac) and close(g["effRiskPct"], rv * fac) and close(g["lossPctFull"], 10 * rv) and g["factor"] == fac, (r, ar, f, g)
+    print("  ✓ серия загуби: 10 × (риск × режимен фактор) за 11 входа — 0.5% ×0.5 = 2.5%; без фактор 5%; невалиден/нулев/отрицателен риск → няма резултат; '0,5' със запетая = 0.5  [мотор: " + ("node" if NODE else "headless Chrome") + "]")
 else:
     print("SKIP: няма нито node, нито Chrome — математиката на JS НЕ е проверена в тази среда (в CI има node)")
 
@@ -304,6 +327,28 @@ if CHROME:
         print("  ✓ 80000 / 0.5% / 25% (фактор вкл.): Action и Watchlist — 'риск 0.5% × 0.5 защитен режим = 0.25%'; QM и EP — 'отделна стратегия — без режимен фактор'; всички числа = еталона")
         for n in ("EXEL", "EXPD", "DOCN"):
             print(f"      {n}: {got[n]}")
+
+    def streak_text(out_html):
+        m = re.search(r'<div class="mb-note mb-streak" id="mb-streak"[^>]*>(.*?)</div>', out_html, re.S)
+        assert m, "няма реда #mb-streak"
+        import html as _h2
+        return _h2.unescape(m.group(1)).strip()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        # (б2) редът «10 поредни загуби» в настройките: 10 × ефективния риск (Defensive ×0.5 в РЕАЛНИЯ бриф от 05.10)
+        assert 'data-regime-factor="0.5"' in html, "липсва режимният фактор на страницата"
+        st = streak_text(chrome_dump(with_settings(SET), tmp))
+        assert st == "10 поредни загуби ≈ −2.5% от сметката (10 × риск 0.5% × 0.5 защитен режим; за QM и EP, които са без режимен фактор: −5%)", st
+        st2 = streak_text(chrome_dump(with_settings({**SET, "regime": False}), tmp))
+        assert st2 == "10 поредни загуби ≈ −5% от сметката (10 × риск 0.5%)", st2
+        st3 = streak_text(chrome_dump(with_settings({**SET, "risk": "1"}), tmp))
+        assert st3 == "10 поредни загуби ≈ −5% от сметката (10 × риск 1% × 0.5 защитен режим; за QM и EP, които са без режимен фактор: −10%)", st3
+        st4 = streak_text(chrome_dump(with_settings({**SET, "risk": ""}), tmp))
+        assert st4 == "10 поредни загуби ≈ — (въведи риск на сделка)", st4
+        stn = streak_text(chrome_dump(html, tmp))                                                                  # без настройки: рискът по подразбиране 0.5%
+        assert stn == st, stn
+        print("  ✓ ред в ⚙ (РЕАЛНИЯТ бриф от 05.10, Defensive ×0.5): «" + st + "»")
+        print("    без режимен фактор: «" + st2 + "»; при риск 1%: −5% / −10%; без риск: «" + st4 + "»; без настройки — по подразбиране 0.5%")
 
     with tempfile.TemporaryDirectory() as tmp:
         # (в) режимният фактор изключен
