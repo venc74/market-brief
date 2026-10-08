@@ -1230,6 +1230,84 @@
 </section>
 {% endif %}
 
+{# ── GLB по Уиш (09.10.2026): отделна книга с БУКВАЛНОТО правило на Wish — измерване, не препоръка. Самостоятелна секция: тя съществува и когато списъкът с карти е празен или скринърът е паднал ── #}
+{% set gw = backtest.get("glb_wish") if backtest else none %}
+{% if gw and gw.enabled %}
+{% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла (граница на държане)"} %}
+<section>
+  <h2>GLB по Уиш · книга (измерване, не препоръка)</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    <b>Буквалното правило на Eric Wish без нашите филтри:</b> вход при затваряне над зелената линия (най-високият месечен close, непробит поне {{ glb_min_months }} месеца), изход при първото затваряне под същата линия (замразена при входа).
+    Няма Classic / Momentum филтър (типът е само етикет), няма хистерезис +1% / −3% и няма стоп — затова доходността е в %, не в R. Две граници: <b>literal</b> = и вход, и изход на затварянето на сигналния ден;
+    <b>exec</b> = отварянето на следващата сесия (първото изпълнимо след брифа). Горна граница на държане {{ gw.max_hold_sessions if gw.max_hold_sessions else "няма" }} сесии (наша: без нея печелившите остават отворени, а затворените са само загубилите).
+    Записва се само пробив на последния цял бар, от {{ gw.track_from or "началото" }} нататък (чист старт). Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.
+    Реплей върху историята (1962–2026, {{ glb_wish_replay.trades }} сделки, <b>днешният универс — оцелели</b>): печеливши {{ glb_wish_replay.win_literal_pct }}% (literal) / {{ glb_wish_replay.win_exec_pct }}% (exec), медиана {{ glb_wish_replay.median_literal_pct }}% на сделка,
+    алфа спрямо SPY за същите дати {{ "%+.2f"|format(glb_wish_replay.alpha_literal_pct) }}% [{{ glb_wish_replay.alpha_literal_ci[0] }}; {{ glb_wish_replay.alpha_literal_ci[1] }}] — почти цялата доходност е в най-добрите 5% от сделките.
+  </div>
+  <details class="gw-book" open>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани {{ gw.records }} · отворени {{ gw.open + gw.pending }} · изход по линията {{ gw.line_exit }} · изтекли {{ gw.expired }}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа{% endif %}</summary>
+  <div class="prose" style="margin-top:8px">
+    {% if not gw.records %}
+    <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.
+    {% else %}
+    <b>Записани: {{ gw.records }}</b> · отворени {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %} · изход по линията {{ gw.line_exit }} · изтекли {{ gw.expired }}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
+    {% if gw.with_result %}
+    Записи с резултат (затворени + отворени по последното затваряне): {{ gw.with_result }} · средна доходност <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
+    {% if gw.line_exit_group.n %}Изход по линията ({{ gw.line_exit_group.n }}): средно {{ "%+.2f"|format(gw.line_exit_group.avg_return_pct) }}% — по построение загуби (вход над линията, изход под нея).<br>{% endif %}
+    {% if gw.held_group.n %}Държани или изтекли ({{ gw.held_group.n }}): средно {{ "%+.2f"|format(gw.held_group.avg_return_pct) }}% — тук е цялата печалба.<br>{% endif %}
+    {% endif %}
+    {% if gw.stats_visible %}
+    <b>Печеливши: {{ gw["all"].win_rate_pct }}%</b> literal{% if gw["all"].win_rate_exec_pct is not none %} / {{ gw["all"].win_rate_exec_pct }}% exec{% endif %} (95% интервал {{ gw["all"].win_ci_pct[0] }}–{{ gw["all"].win_ci_pct[1] }}%)
+    · медиана {{ "%+.2f"|format(gw["all"].median_return_pct) }}%{% if gw["all"].median_return_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].median_return_pct_exec) }}%{% endif %}<br>
+    {% if gw["all"].avg_alpha_pct is not none %}Спрямо SPY (същите дати): алфа средно {{ "%+.2f"|format(gw["all"].avg_alpha_pct) }}% literal{% if gw["all"].avg_alpha_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}% exec{% endif %}{% if gw["all"].beat_spy_pct is not none %} · бие SPY в {{ gw["all"].beat_spy_pct }}% от записите{% endif %}<br>{% endif %}
+    {% else %}
+    Печеливши, медиана и сравнение със SPY се показват след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}) — при по-малко е шум.<br>
+    {% endif %}
+    По наш етикет (записани / с резултат{% if gw.stats_visible %}, средна доходност{% endif %}):
+    {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.stats_visible and g.avg_return_pct is not none %} ({{ "%+.2f"|format(g.avg_return_pct) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    · по режим на деня на пробива:
+    {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.stats_visible and g.avg_return_pct is not none %} ({{ "%+.2f"|format(g.avg_return_pct) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% endif %}
+  </div>
+  {% if gw.live %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи ({{ gw.live|length }}{% if gw.live_total > gw.live|length %} от {{ gw.live_total }}, най-новите{% endif %}):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
+      <tbody>
+        {% for p in gw.live %}
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}</td>
+          <td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.glb_type or "н/д" }}</td>
+          <td class="n">{% if p.line is not none %}${{ "%.2f"|format(p.line) }}{% else %}—{% endif %}</td>
+          <td class="n">{% if p.fill_price is not none %}${{ "%.2f"|format(p.fill_price) }}{% else %}—{% endif %}</td>
+          <td class="n">{% if p.last_close is not none %}${{ "%.2f"|format(p.last_close) }}{% else %}—{% endif %}</td>
+          <td class="n">{% if p.current_return_pct is not none %}{{ "%+.1f"|format(p.current_return_pct) }}%{% else %}—{% endif %}</td>
+          <td class="n">{% if p.dist_to_line_pct is not none %}{{ "%+.1f"|format(p.dist_to_line_pct) }}%{% else %}—{% endif %}</td>
+          <td>{{ p.regime or "н/д" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% if gw.recent %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени ({{ gw.recent|length }}):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Пробив на</th><th>Затворена</th><th>Как</th><th class="n">literal</th><th class="n">exec</th><th class="n">Алфа (literal)</th><th class="n">Сесии</th></tr></thead>
+      <tbody>
+        {% for p in gw.recent %}
+        <tr><td class="sym">{{ p.ticker }}</td><td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.resolution_date }}</td><td>{{ gw_st.get(p.resolution, p.resolution) }}</td>
+          <td class="n">{{ "%+.1f"|format(p.return_pct) }}%</td><td class="n">{% if p.return_pct_exec is not none %}{{ "%+.1f"|format(p.return_pct_exec) }}%{% else %}…{% endif %}</td>
+          <td class="n">{% if p.alpha_pct is not none %}{{ "%+.1f"|format(p.alpha_pct) }}%{% else %}—{% endif %}</td><td class="n">{{ p.hold_sessions if p.hold_sessions is not none else "—" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  </details>
+</section>
+{% endif %}
+
 {# Пакет 4б т.б: секцията "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ (hover/клик) върху кандидатите и позициите #}
 
 {% macro split_chip(s) %}

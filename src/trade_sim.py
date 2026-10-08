@@ -325,3 +325,112 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     out["return_pct_pess"] = round(ret_pess_day1, 2) if pess_day1 else round(ret_opt, 2)
     out["realized_r_pess"] = round(out["R_pess"], 2)
     return out
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# GLB по Уиш (09.10.2026): вход при затваряне над зелената линия, изход при ПЪРВОТО затваряне под нея — без стоп, доходност в %
+# ══════════════════════════════════════════════════════════════════════════
+GW_TERMINAL = ("line_exit", "expired")
+GW_NOT_A_POSITION = ("invalid_signal",)             # извън статистиката
+
+
+def _blank_gw(status: str = "pending") -> dict:
+    return {"status": status, "fill_date": None, "fill_price": None, "fill_exec_date": None, "fill_exec_price": None,
+            "line_used": None, "split_scale": None, "exit_date": None, "exit_price": None, "exit_exec_date": None, "exit_exec_price": None,
+            "resolution_date": None, "return_pct": None, "return_pct_exec": None, "current_return_pct": None,
+            "last_close": None, "last_close_date": None, "dist_to_line_pct": None, "hold_sessions": None, "how": None}
+
+
+def simulate_glb_wish(rec: dict, bars: pd.DataFrame, today=None) -> dict:
+    """
+    Чиста симулация (без I/O) на книгата "GLB по Уиш" по ДНЕВНИ барове — ПОЛЗВА СЕ И В РЕПЛЕЯ, И В Track Record-а (както simulate_qm).
+    Вход: rec = {signal_date (последният цял бар с пробива), line (замразената линия при сигнала), signal_close (затварянето на сигналния ден — за откриване на сплит)};
+    bars = дневни Open/Close (индекс = дата на сесията, без NaN; другите колони се пренебрегват).
+
+    Две граници (без плъзгане и комисионни):
+      • literal — вход на затварянето на сигналния бар, изход на затварянето на ПЪРВИЯ бар след него с Close < линията (return_pct): така е описано правилото;
+      • exec    — първото изпълнимо: вход на отварянето на следващата сесия, изход на отварянето на сесията след затварянето под линията (return_pct_exec); None, докато този бар още не съществува.
+    Горна граница на държане (config.GLB_WISH_MAX_HOLD_SESSIONS, 0 = няма): след толкова сесии от сигналния бар — оценка по затварянето му (status "expired", how "mtm").
+    Сплит след сигнала: данните от Yahoo са ретроактивно split-коригирани, а линията е замразена в старата скала → съотношението съхранен/сегашен close на сигналния ден (над GLB_WISH_SPLIT_TOLERANCE)
+    мащабира линията (split_scale); никакви мрежови заявки.
+    Статуси: pending (сигналният бар още не е в данните) | open | line_exit | expired | invalid_signal (няма бар за деня или close не е над линията).
+    """
+    out = _blank_gw()
+    if bars is None or len(bars) == 0:
+        return out
+    idx = pd.DatetimeIndex(bars.index)
+    if idx.tz is not None:
+        idx = idx.tz_localize(None)
+    o = bars["Open"].to_numpy(dtype=float)
+    c = bars["Close"].to_numpy(dtype=float)
+    n = len(idx)
+    sd = pd.Timestamp(rec["signal_date"])
+    s = int(idx.searchsorted(sd, side="left"))
+    if s >= n:
+        return out                                           # сигналният бар още не е в данните
+    if idx[s] != sd:                                         # за деня няма бар, а по-късни има → няма да се появи
+        out.update(status="invalid_signal", how="no_bar", resolution_date=idx[s].date().isoformat())
+        return out
+    scale = 1.0
+    sc = rec.get("signal_close")
+    if sc and c[s] > 0 and abs(float(sc) / c[s] - 1) > config.GLB_WISH_SPLIT_TOLERANCE:
+        scale = float(sc) / c[s]
+    line = float(rec["line"]) / scale
+    if not c[s] > line:
+        out.update(status="invalid_signal", how="not_above_line", resolution_date=idx[s].date().isoformat())
+        return out
+    fill = float(c[s])
+    cap = int(config.GLB_WISH_MAX_HOLD_SESSIONS or 0)
+    last_bar = n - 1
+    lim = min(last_bar, s + cap) if cap else last_bar
+    exit_j = how = None
+    for j in range(s + 1, lim + 1):
+        if c[j] < line:
+            exit_j, how = j, "line"
+            break
+    if exit_j is None and cap and s + cap <= last_bar:
+        exit_j, how = s + cap, "mtm"
+    jj = exit_j if exit_j is not None else last_bar
+    out.update(fill_date=idx[s].date().isoformat(), fill_price=round(fill, 4), line_used=round(line, 4), split_scale=None if scale == 1.0 else round(scale, 4),
+               last_close=round(float(c[jj]), 4), last_close_date=idx[jj].date().isoformat(), dist_to_line_pct=round((float(c[jj]) / line - 1) * 100, 2),
+               hold_sessions=int(jj - s), return_pct=round((float(c[jj]) / fill - 1) * 100, 2))
+    e0 = float(o[s + 1]) if s + 1 < n else None
+    if e0 is not None:
+        out.update(fill_exec_date=idx[s + 1].date().isoformat(), fill_exec_price=round(e0, 4))
+    if exit_j is None:
+        out.update(status="open", current_return_pct=out["return_pct"], how=None)
+        out["return_pct_exec"] = round((float(c[jj]) / e0 - 1) * 100, 2) if e0 else None      # оценка по последното затваряне, докато е отворена
+        return out
+    out.update(status="line_exit" if how == "line" else "expired", how=how, exit_date=idx[exit_j].date().isoformat(), exit_price=round(float(c[exit_j]), 4),
+               resolution_date=idx[exit_j].date().isoformat(), current_return_pct=out["return_pct"])
+    if exit_j + 1 < n:
+        x0 = float(o[exit_j + 1])
+        out.update(exit_exec_date=idx[exit_j + 1].date().isoformat(), exit_exec_price=round(x0, 4))
+        out["return_pct_exec"] = round((x0 / e0 - 1) * 100, 2) if e0 else None
+    return out
+
+
+def spy_return_pct_gw(res: dict, spy: pd.DataFrame, exec_leg: bool = False) -> float | None:
+    """
+    SPY за СЪЩИТЕ дати на записа от книгата "GLB по Уиш": literal — от Close на деня на входа до Close на деня на изхода (за отворена — на последния Close); exec_leg — от Open на деня на входа до Open на деня на
+    изхода (за отворена — до последния Close). None без вход/дати или ако SPY няма бар за някоя от тях.
+    """
+    if res.get("fill_date") is None or spy is None or len(spy) == 0:
+        return None
+    try:
+        s = spy.copy()
+        idx = pd.DatetimeIndex(s.index)
+        s.index = idx.tz_localize(None) if idx.tz is not None else idx
+        if not exec_leg:
+            end = res.get("exit_date") or res.get("last_close_date")
+            return round((float(s.loc[pd.Timestamp(end), "Close"]) / float(s.loc[pd.Timestamp(res["fill_date"]), "Close"]) - 1) * 100, 2)
+        if res.get("fill_exec_date") is None:
+            return None
+        e0 = float(s.loc[pd.Timestamp(res["fill_exec_date"]), "Open"])
+        if res.get("exit_exec_date"):
+            return round((float(s.loc[pd.Timestamp(res["exit_exec_date"]), "Open"]) / e0 - 1) * 100, 2)
+        if res.get("exit_date"):
+            return None                                       # затворена, но следващото отваряне още не съществува
+        return round((float(s.loc[pd.Timestamp(res["last_close_date"]), "Close"]) / e0 - 1) * 100, 2)
+    except (KeyError, ValueError, TypeError):
+        return None

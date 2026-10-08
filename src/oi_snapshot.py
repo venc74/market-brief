@@ -131,6 +131,8 @@ def snapshot_tickers(max_briefs: int | None = None) -> list[str]:
     try:
         tracker = json.loads((config.DATA_DIR / "backtest_tracker.json").read_text(encoding="utf-8"))
         for rec in tracker.values():
+            if rec.get("category") == "glb_wish":          # книгата "GLB по Уиш" може да държи стотици позиции (до година) и няма опционен маркер — не влиза в снимката
+                continue
             if rec.get("status") in ("pending", "open", "trailing"):
                 add(rec.get("ticker"))
     except FileNotFoundError:

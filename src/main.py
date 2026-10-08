@@ -599,9 +599,11 @@ def run() -> dict:
     # glb_screener.py docstring). Explicit try/except тук, въпреки че
     # screen() вече е graceful вътрешно (batch+per-ticker) — не искаме и
     # неочакван bug в нов модул да чупи целия дневен run.
+    glb_wish_signals: list[dict] = []            # книгата "GLB по Уиш": свежите пробиви на последния цял бар (измерване, не препоръка)
     if config.ENABLE_GLB_SCREENER:
         try:
             glb_candidates = glb_screener.screen()
+            glb_wish_signals = list(glb_screener.LAST_WISH_SIGNALS)
         except Exception as e:
             print(f"[main] GLB screener failed: {e}")
             glb_candidates = []
@@ -682,7 +684,7 @@ def run() -> dict:
     # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
     # списък директно, за да е налично в tracker-а от утрешния run нататък.
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"), qm_cards)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
         try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
@@ -695,6 +697,11 @@ def run() -> dict:
             backtest_summary["qm_breakout"] = backtest.get_qm_summary()
         except Exception as e:
             print(f"[main] обобщението на qm_breakout книгата пропуснато: {e}")
+    if config.ENABLE_BACKTEST and config.TRACK_GLB_WISH:
+        try:                                                                   # GLB по Уиш: отделната книга glb_wish (чисто локално четене)
+            backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()
+        except Exception as e:
+            print(f"[main] обобщението на glb_wish книгата пропуснато: {e}")
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap
@@ -820,6 +827,7 @@ def run() -> dict:
         "insider_buying_positions_status": ins_pos_status,
         "superinvestor_status": superinvestor_status,
         "glb_candidates": glb_candidates,
+        "glb_wish": glb_wish_signals,        # свежите пробиви за книгата "GLB по Уиш" — snapshot-ът ги пази, за да се възстанови пропуснат run
         # Qullamaggie (отделна стратегия — измерване, не препоръка): до 8 карти за пробив + диагностика на скана
         "qm_breakout": qm_cards,
         "qm_diag": qm_diag,

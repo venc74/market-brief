@@ -50,6 +50,7 @@ import config
 from src.screener import build_universe
 from src.ai_brief import _verified_company_name
 
+import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -143,6 +144,77 @@ def x_from_low52(close: float, low52) -> float | None:
     try:
         return round(float(close) / float(low52), 2) if low52 and float(low52) > 0 else None
     except Exception:
+        return None
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Книга "GLB по Уиш" (09.10.2026): БУКВАЛНОТО правило, без нашите филтри — сигнал, разделен от картите (хистерезис, Classic/Momentum)
+# ──────────────────────────────────────────────────────────────────────────
+LAST_WISH_SIGNALS: list[dict] = []          # свежите пробиви от последния screen() (main ги подава на книгата); [] при провал
+
+
+def wish_table(close: "pd.Series") -> "pd.DataFrame":
+    """
+    Дневна таблица на буквалното правило на Wish върху дневните затваряния (ЕДНА векторизирана функция за живия сигнал и за историческия реплей):
+      line          — най-високият месечен close на ПРЕДХОДНИТЕ календарни месеци (не включва месеца на деня);
+      months_unpen  — месеци между месеца на този максимум и текущия (същото като `months_unpenetrated` в _monthly_duration_check);
+      signal        — close > линията (БЕЗ буфер, за разлика от хистерезисния вход) И months_unpen >= GLB_MIN_MONTHS_UNPENETRATED (при >= GLB_MIN_MONTHS_UNPENETRATED + 1 предходни месеца);
+      fresh         — сигнал в този бар, който не е продължение (предишният бар не е бил сигнал при същата линия): само пробивът, не седмиците над линията.
+    Празна/кратка серия → празна таблица. Чиста функция, без мрежа.
+    """
+    c = close.dropna()
+    cols = ["close", "line", "months_unpen", "prior_high_month", "signal", "fresh"]
+    if len(c) == 0:
+        return pd.DataFrame(columns=cols)
+    mc = c.resample("ME").last().dropna()
+    n = len(mc)
+    vals = mc.to_numpy(dtype=float)
+    line_m = np.full(n, np.nan)
+    pos_m = np.full(n, -1)
+    best, bpos = -np.inf, -1
+    for m in range(n):
+        if m:
+            line_m[m], pos_m[m] = best, bpos
+        if vals[m] > best:                       # строго по-голям: при равенство остава ПЪРВИЯТ максимум (както argmax в _monthly_duration_check)
+            best, bpos = vals[m], m
+    midx = mc.index.to_period("M").get_indexer(c.index.to_period("M"))
+    ok = midx >= 0
+    line = np.where(ok, line_m[np.where(ok, midx, 0)], np.nan)
+    pos = np.where(ok, pos_m[np.where(ok, midx, 0)], -1)
+    unpen = np.where(pos >= 0, midx - pos - 1, -1)
+    enough = midx >= config.GLB_MIN_MONTHS_UNPENETRATED + 1           # len(series) >= GLB_MIN_MONTHS_UNPENETRATED + 2, както в _monthly_duration_check
+    cv = c.to_numpy(dtype=float)
+    signal = enough & (cv > line) & (unpen >= config.GLB_MIN_MONTHS_UNPENETRATED)
+    prev = np.concatenate([[False], signal[:-1]])
+    prev_line = np.concatenate([[np.nan], line[:-1]])
+    fresh = signal & ~(prev & (prev_line == line))
+    names = np.array([mc.index[k].strftime("%Y-%m") if k >= 0 else "" for k in range(n)] + [""])
+    return pd.DataFrame({"close": cv, "line": line, "months_unpen": unpen, "prior_high_month": names[np.where(pos >= 0, pos, n)], "signal": signal, "fresh": fresh}, index=c.index)
+
+
+def wish_signal(hist, today: str | None = None) -> dict | None:
+    """
+    Свеж пробив на ПОСЛЕДНИЯ ЦЯЛ бар по буквалното правило на Wish (wish_table) → речник за книгата, иначе None. Бар с дата >= today (частичната сесия при ръчно пускане в хода на деня) не е затваряне и се
+    отрязва. Типът (classic/momentum/insufficient_history) е САМО таг (нашият overlay), не филтър. Грешка → None (graceful).
+    """
+    try:
+        close = hist["Close"].dropna()
+        if today:
+            close = close[close.index < pd.Timestamp(today)]
+        if len(close) < 60:
+            return None
+        t = wish_table(close)
+        last = t.iloc[-1]
+        if not bool(last["fresh"]):
+            return None
+        h = hist.loc[:close.index[-1]]
+        ov = _tightness_overlay(h["Close"], h["High"], h["Low"], float(last["line"])) if {"High", "Low"} <= set(h.columns) else None
+        return {"signal_date": close.index[-1].date().isoformat(), "close": round(float(last["close"]), 4), "line": round(float(last["line"]), 4),
+                "prior_high_month": str(last["prior_high_month"]), "months_unpenetrated": int(last["months_unpen"]),
+                "glb_type": "insufficient_history" if ov is None else ("classic" if ov["meets_tightness"] else "momentum"),
+                "band_hold_pct": None if ov is None else ov["band_hold_pct"]}
+    except Exception as e:
+        print(f"[glb_screener] wish_signal: {type(e).__name__}: {e}")
         return None
 
 
@@ -349,6 +421,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     ("classic"/"momentum") — Двата типа остават заедно в резултата,
     разделянето/визуализацията е грижа на извикващия код (dashboard).
     """
+    global LAST_WISH_SIGNALS
+    LAST_WISH_SIGNALS = []                       # книгата "GLB по Уиш": нов списък на всяко извикване (при провал остава празен)
+    wish_signals: list[dict] = []
     if universe is None:
         universe = build_universe()
 
@@ -378,6 +453,12 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
             try:
                 df = (data[sym] if len(batch) > 1 else data).dropna(
                     subset=["Close", "High", "Low"])
+                if config.TRACK_GLB_WISH:
+                    # Книгата "GLB по Уиш" ползва цените КАКТО ГИ ВРЪЩА Yahoo: при auto_adjust=False Close е вече ретроактивно split-коригиран (проверено на NVDA, AAPL, AMZN с yfinance 1.5.2 и 1.7.0),
+                    # затова ръчната _split_only_adjust по-долу ги дели ВТОРИ път (NVDA 07.06.2024: 12.09 вместо 120.89) — това е известен проблем на картите, виж CLAUDE.md; книгата не го наследява.
+                    w = wish_signal(df, today)
+                    if w:
+                        wish_signals.append({"ticker": sym, **w})
                 splits = df["Stock Splits"]
                 close, high, low = _split_only_adjust(
                     df["Close"], df["High"], df["Low"], splits[splits != 0])
@@ -411,6 +492,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
         print(f"[glb_screener] хистерезис: нови {len(ch['entered'])}, отпаднали {len(ch['dropped'])} {ch['dropped'] or ''}, "
               f"пазени без данни днес {len(ch['held_unseen'])}")
 
+    LAST_WISH_SIGNALS = wish_signals
+    if config.TRACK_GLB_WISH:
+        print(f"[glb_screener] GLB по Уиш: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
     classic = [r for r in results if r["glb_type"] == "classic"]
     momentum = [r for r in results if r["glb_type"] == "momentum"]
     insufficient = [r for r in results if r["glb_type"] == "insufficient_history"]

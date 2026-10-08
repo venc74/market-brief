@@ -78,6 +78,7 @@ _LIVE_STATUSES = ("open", "trailing")
 # (всичко, записано до пакет 1б). Всеки четец на позиции (OPEN✓, RE-ENTRY, COT, обобщението на Action) гледа само is_action_record().
 CATEGORY_ACTION, CATEGORY_BUYSTOP = "action", "buystop"
 CATEGORY_QM = "qm_breakout"        # Qullamaggie breakout кандидатите (отделна стратегия — измерване, не препоръка); същото правило: никой четец на позиции не я брои
+CATEGORY_GLB_WISH = "glb_wish"   # GLB по Уиш (буквалното правило, без нашите филтри — измерване, не препоръка); същото правило: никой четец на позиции не я брои
 # v2: "pending" още няма позиция (чака buy-stop), но трябва да се резолвира всеки run
 _RESOLVABLE_STATUSES = _LIVE_STATUSES + ("pending",)
 
@@ -339,9 +340,39 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         tracker[key] = rec
 
 
+_GW_RESULT_KEYS = tuple(k for k in trade_sim._blank_gw() if k != "resolution_date")      # полетата, които резолюцията презаписва на всеки run (resolution_date се слага отделно)
+
+
+def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], regime: str | None = None) -> None:
+    """
+    GLB по Уиш: ингестира СВЕЖИТЕ пробиви на последния цял бар (glb_screener.wish_signal) като НЕЗАВИСИМА книга "glb_wish" — ЕДИН запис на (тикър, ден на брифа), дедуп в рамките на категорията
+    (_is_continuation: докато предишната позиция е жива, нов запис за същия тикър не се прави). Записва се във всички режими с таг. Линията е замразена в записа; входът/изходът се определят
+    при резолюцията от дневните барове (trade_sim.simulate_glb_wish). Не е позиция и не е препоръка — четците на позиции я игнорират. TRACK_GLB_WISH=0 я изключва; GLB_WISH_TRACK_FROM е чистият старт.
+    """
+    if not config.TRACK_GLB_WISH:
+        return
+    if config.GLB_WISH_TRACK_FROM and entry_date < config.GLB_WISH_TRACK_FROM:        # чист старт: без ретроактивни записи (виж config.GLB_WISH_TRACK_FROM)
+        return
+    for c in signals or []:
+        ticker = c.get("ticker")
+        num = lambda k: isinstance(c.get(k), (int, float)) and not isinstance(c.get(k), bool) and c[k] > 0
+        if not (ticker and c.get("signal_date") and num("line") and num("close") and c["close"] > c["line"]):
+            continue
+        key = f"{ticker}_{entry_date}_gw"
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_GLB_WISH):
+            continue
+        rec = {"method": "v2", "category": CATEGORY_GLB_WISH, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime,
+               "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),
+               "months_unpenetrated": c.get("months_unpenetrated"), "band_hold_pct": c.get("band_hold_pct"), "resolution_date": None, "discovered_date": None,
+               "spy_return_pct": None, "spy_return_pct_exec": None, "alpha_pct": None, "alpha_pct_exec": None}
+        rec.update({k: None for k in _GW_RESULT_KEYS if k != "status"})
+        tracker[key] = rec
+
+
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
                           today_date: str | None = None, today_watchlist: list[dict] | None = None,
-                          today_regime: str | None = None, today_qm: list[dict] | None = None) -> None:
+                          today_regime: str | None = None, today_qm: list[dict] | None = None,
+                          today_glb_wish: list[dict] | None = None) -> None:
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -354,6 +385,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action
         _ingest_buystop_list(tracker, entry_date, snap.get("watchlist", []), (snap.get("thermometer") or {}).get("regime"))
         _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
+        _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish") or [], (snap.get("thermometer") or {}).get("regime"))   # GLB по Уиш: само snapshot-и с glb_wish (нов код)
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -370,6 +402,8 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_buystop_list(tracker, today_date, today_watchlist, today_regime)
     if today_qm and today_date:
         _ingest_qm_list(tracker, today_date, today_qm, today_regime)
+    if today_glb_wish and today_date:
+        _ingest_glb_wish_list(tracker, today_date, today_glb_wish, today_regime)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -680,8 +714,48 @@ def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: d
             rec["discovered_date"] = today.isoformat()
 
 
+def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date) -> None:
+    """
+    Резолюция на запис от книгата "glb_wish": trade_sim.simulate_glb_wish върху дневните барове (чиста функция на записа и баровете — без памет от сигнала, затова пропуснат run не губи нищо). Сплитът се
+    открива без мрежа (съхранен срещу сегашен close на сигналния ден — виж симулацията). Мутира rec на място; не вдига.
+    """
+    t = rec["ticker"]
+    if opens is None or t not in getattr(opens, "columns", []) or t not in getattr(closes, "columns", []):
+        print(f"[backtest] {t}: няма Open/Close в batch резултата — пропускам GLB по Уиш резолюцията")
+        return
+    bars = pd.DataFrame({"Open": opens[t], "Close": closes[t]}).dropna()
+    res = trade_sim.simulate_glb_wish(rec, bars, today)
+    for k in _GW_RESULT_KEYS:
+        rec[k] = res.get(k)
+    rec["spy_return_pct"] = trade_sim.spy_return_pct_gw(res, spy_bars, False) if spy_bars is not None else None
+    rec["spy_return_pct_exec"] = trade_sim.spy_return_pct_gw(res, spy_bars, True) if spy_bars is not None else None
+    rec["alpha_pct"] = round(res["return_pct"] - rec["spy_return_pct"], 2) if res.get("return_pct") is not None and rec["spy_return_pct"] is not None else None
+    rec["alpha_pct_exec"] = round(res["return_pct_exec"] - rec["spy_return_pct_exec"], 2) if res.get("return_pct_exec") is not None and rec["spy_return_pct_exec"] is not None else None
+    rec["entry_price"] = res["fill_price"] if res.get("fill_price") is not None else rec.get("signal_close")
+    if res["status"] in ("pending", "open"):
+        rec["resolution_date"] = None
+    else:
+        rec["resolution_date"] = res.get("resolution_date")
+        if not rec.get("discovered_date"):
+            rec["discovered_date"] = today.isoformat()
+
+
+def _gw_needs_exec_fill(rec: dict, today: dt.date) -> bool:
+    """
+    Затворен запис от GLB по Уиш, на който изпълнимият изход (отварянето на сесията СЛЕД затварянето под линията) още не е известен: денят на откриване е първата сутрин след затварянето, а отварянето
+    на тази сесия още не съществува → записът се резолвира още веднъж (най-много 10 дни след затварянето, за да не се опитва вечно при делистван тикър).
+    """
+    if rec.get("category") != CATEGORY_GLB_WISH or rec.get("status") not in trade_sim.GW_TERMINAL or rec.get("exit_exec_date") or not rec.get("resolution_date"):
+        return False
+    try:
+        return (today - dt.date.fromisoformat(rec["resolution_date"])).days <= 10
+    except ValueError:
+        return False
+
+
 def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
-    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES]
+    today = today or dt.date.today()
+    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today)]
     if not live_items:
         return
 
@@ -711,11 +785,16 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         spy_bars = pd.DataFrame({"Open": opens["SPY"], "High": highs["SPY"], "Low": lows["SPY"],
                                  "Close": closes["SPY"]}).dropna()
 
-    today = today or dt.date.today()
     for _, rec in live_items:
         ticker = rec["ticker"]
         if ticker not in getattr(highs, "columns", []):
             print(f"[backtest] {ticker}: няма данни в batch резултата — пропускам (остава {rec['status']})")
+            continue
+        if rec.get("category") == CATEGORY_GLB_WISH:                                   # GLB по Уиш: собствена симулация; сплитът се открива от самия бар (без мрежа)
+            try:
+                _resolve_glb_wish_record(rec, opens, closes, spy_bars, today)
+            except Exception as e:
+                print(f"[backtest] {ticker}: GLB по Уиш резолюцията неуспешна, остава {rec['status']}: {e}")
             continue
         if rec.get("category") == CATEGORY_QM:                                        # Qullamaggie книгата има собствена симулация и собствена политика за сплитове
             try:
@@ -877,7 +956,8 @@ def resolve_positions_only() -> None:
 
 def update_backtest_tracker(today_action: list[dict] | None = None,
                             today_date: str | None = None, today_watchlist: list[dict] | None = None,
-                            today_regime: str | None = None, today_qm: list[dict] | None = None) -> None:
+                            today_regime: str | None = None, today_qm: list[dict] | None = None,
+                            today_glb_wish: list[dict] | None = None) -> None:
     """
     Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
@@ -890,7 +970,7 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     """
     tracker = _load_tracker()
     try:
-        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm)
+        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
         # не плащаме втори yf.download(). Днес ingest-натите позиции остават
         # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла
@@ -1154,6 +1234,88 @@ def get_qm_summary() -> dict:
         "big_winners_5r": sum(1 for x in ro if x > 5) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
+    }
+
+
+def get_glb_wish_summary() -> dict:
+    """
+    GLB по Уиш: обобщение на ОТДЕЛНАТА книга "glb_wish" (буквалното правило на Wish, без нашите филтри — измерване, не препоръка). Чисто локално четене (без мрежа). Доходност в % (няма стоп → няма R) на две граници:
+    literal (вход и изход на затварянето) и exec (отварянето на следващата сесия), спрямо SPY за същите дати. Записите с резултат са затворените (изход по линията / изтекли след
+    config.GLB_WISH_MAX_HOLD_SESSIONS) И отворените по mark-to-market — само затворените биха били структурно негативни (изходът по линията е загуба по построение). Статистиката (win rate, медиана, алфа) се
+    попълва чак при >= config.GLB_WISH_MIN_ENTRIES_FOR_STATS такива записа; дотогава — броят и средната доходност. Редовете носят отметка also_action / also_buystop / also_qm. Изключено → {}.
+    """
+    if not config.TRACK_GLB_WISH:
+        return {}
+    tracker = _load_tracker()
+    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_GLB_WISH]
+
+    def intervals(cat_fn, exclude=()):
+        d: dict = {}
+        for a_ in tracker.values():
+            if a_.get("method") == "v2" and cat_fn(a_) and a_.get("entry_date") and a_.get("status") not in exclude:
+                d.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
+        return d
+    act = intervals(is_action_record, trade_sim.NOT_A_POSITION)
+    bst = intervals(lambda r: record_category(r) == CATEGORY_BUYSTOP, trade_sim.NOT_A_POSITION)
+    qmb = intervals(lambda r: record_category(r) == CATEGORY_QM, trade_sim.QM_NOT_A_POSITION)
+
+    def overlaps(r: dict, other: dict) -> bool:
+        s0, e0 = r["entry_date"], r.get("resolution_date") or "9999-12-31"
+        return any(a0 <= e0 and s0 <= b0 for a0, b0 in other.get(r["ticker"], []))
+
+    by_status: dict = {}
+    for r in records:
+        by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
+    with_result = [r for r in records if r.get("status") in ("open",) + trade_sim.GW_TERMINAL and r.get("return_pct") is not None]
+    line_exit = [r for r in with_result if r["status"] == "line_exit"]
+    held = [r for r in with_result if r["status"] in ("open", "expired")]
+    min_n = config.GLB_WISH_MIN_ENTRIES_FOR_STATS
+    visible = len(with_result) >= min_n
+    med = lambda xs: round((xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2), 2)
+
+    def stats(group: list[dict]) -> dict:
+        rl = sorted(r["return_pct"] for r in group)
+        re_ = sorted(r["return_pct_exec"] for r in group if r.get("return_pct_exec") is not None)
+        al = [r["alpha_pct"] for r in group if r.get("alpha_pct") is not None]
+        ae = [r["alpha_pct_exec"] for r in group if r.get("alpha_pct_exec") is not None]
+        wins = sum(1 for x in rl if x > 0)
+        return {"n": len(group), "avg_return_pct": round(sum(rl) / len(rl), 2) if rl else None, "median_return_pct": med(rl) if (visible and rl) else None,
+                "avg_return_pct_exec": round(sum(re_) / len(re_), 2) if re_ else None, "n_exec": len(re_), "median_return_pct_exec": med(re_) if (visible and re_) else None,
+                "win_rate_pct": round(100 * wins / len(rl), 1) if (visible and rl) else None, "win_ci_pct": _wilson_ci_pct(wins, len(rl)) if (visible and rl) else None,
+                "win_rate_exec_pct": round(100 * sum(1 for x in re_ if x > 0) / len(re_), 1) if (visible and re_) else None,
+                "avg_alpha_pct": round(sum(al) / len(al), 2) if (visible and al) else None, "avg_alpha_pct_exec": round(sum(ae) / len(ae), 2) if (visible and ae) else None,
+                "beat_spy_pct": round(100 * sum(1 for x in al if x > 0) / len(al), 1) if (visible and al) else None}
+
+    def by_key(key_fn):
+        out: dict = {}
+        for r in records:
+            g = out.setdefault(key_fn(r) or "н/д", {"records": 0, "_rs": []})
+            g["records"] += 1
+            if r in with_result:
+                g["_rs"].append(r["return_pct"])
+        for g in out.values():
+            x = g.pop("_rs")
+            g["n"] = len(x)
+            g["avg_return_pct"] = round(sum(x) / len(x), 2) if (visible and x) else None
+        return out
+
+    def _row(r: dict) -> dict:
+        return {"ticker": r["ticker"], "entry_date": r["entry_date"], "signal_date": r.get("signal_date"), "status": r.get("status"), "glb_type": r.get("glb_type"), "regime": r.get("regime"),
+                "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
+                "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
+                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb)}
+    live_all = sorted((r for r in records if r.get("status") in ("open", "pending")), key=lambda r: (r["entry_date"], r["ticker"]), reverse=True)
+    live = [_row(r) for r in live_all[:15]]
+    recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "return_pct": r.get("return_pct"), "return_pct_exec": r.get("return_pct_exec"),
+                      "alpha_pct": r.get("alpha_pct")} for r in with_result if r["status"] in trade_sim.GW_TERMINAL), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
+    return {
+        "enabled": True, "track_from": config.GLB_WISH_TRACK_FROM or None, "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
+        "pending": by_status.get("pending", 0), "open": by_status.get("open", 0), "line_exit": by_status.get("line_exit", 0), "expired": by_status.get("expired", 0), "invalid": by_status.get("invalid_signal", 0),
+        "with_result": len(with_result), "min_entries": min_n, "stats_visible": visible,
+        "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
+        "all": stats(with_result), "line_exit_group": stats(line_exit), "held_group": stats(held),
+        "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
+        "live": live, "live_total": len(live_all), "recent": recent,
     }
 
 
