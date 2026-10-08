@@ -62,7 +62,38 @@ LAST_RS_SCORES: dict[str, float] = {}      # rs_score на всички тикъ
 
 # Праговете на RS линията в _evaluate_technicals ("new_high" ≥ 99.9% от 52-седмичния максимум, "near_high" ≥ 97%, иначе "lagging" → кандидатът отпада). Същите стойности ползва
 # explain_exclusion; test_buystop_book_state.py сверява двете върху реални данни, за да не се разминат.
-RS_LINE_NEW_HIGH, RS_LINE_NEAR_HIGH = 0.999, 0.97
+RS_LINE_NEW_HIGH, RS_LINE_NEAR_HIGH = 0.999, config.RS_LINE_ENTER
+RS_LINE_STAY = config.RS_LINE_STAY                       # 09.10: оставане при хистерезис (вход ≥ RS_LINE_NEAR_HIGH, оставане ≥ RS_LINE_STAY)
+LAST_RS_HELD: set[str] = set()                           # тикърите със състояние от предишния run (за explain_exclusion) в последния run_screen
+LAST_RS_EVALUATED: set[str] = set()                      # тикърите с данни в последния technical_screen (останалите пазят състоянието си)
+
+
+def load_rs_state(path=None) -> set[str]:
+    """Тикърите, преминали техническия списък при предишния успешен run (data/screener_rs_state.json); липсващ/повреден файл → празно множество (чист старт), никога изключение."""
+    import json
+    try:
+        data = json.loads(pathlib.Path(path or config.RS_LINE_STATE_FILE).read_text(encoding="utf-8"))
+        return {str(t) for t in data.get("tickers") or []}
+    except FileNotFoundError:
+        return set()
+    except Exception as e:
+        print(f"[screener] състоянието на RS линията е нечетимо ({type(e).__name__}: {e}) — чист старт")
+        return set()
+
+
+def next_rs_state(prev: set[str], survivors: set[str], evaluated: set[str]) -> set[str]:
+    """Новото състояние: оцелелите днес + тикърите от предишното състояние, за които днес няма данни (паднала партида не бива да ги изхвърля към единния праг)."""
+    return set(survivors) | {t for t in prev if t not in evaluated}
+
+
+def save_rs_state(tickers: set[str], today: str, path=None) -> None:
+    import json
+    p = pathlib.Path(path or config.RS_LINE_STATE_FILE)
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"updated": today, "enter": config.RS_LINE_ENTER, "stay": config.RS_LINE_STAY, "tickers": sorted(tickers)}, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception as e:
+        print(f"[screener] състоянието на RS линията не се записа: {type(e).__name__}: {e}")
 
 _TT_TEXT = {
     "stage2_price_above_ma150": "цената е под 30-седмичната MA",
@@ -77,7 +108,7 @@ _TT_TEXT = {
 }
 
 
-def explain_exclusion(sym: str, df: pd.DataFrame, spy: pd.Series, rs_scores: dict[str, float] | None = None) -> str | None:
+def explain_exclusion(sym: str, df: pd.DataFrame, spy: pd.Series, rs_scores: dict[str, float] | None = None, held: bool = False) -> str | None:
     """
     Защо тикърът НЕ е в днешния технически списък — първият филтър от _evaluate_technicals (в същия ред), с числата. None = технически филтри преминати (отпадането е по-късно: RS rating,
     CANSLIM фундаментите или лимитът). Само обяснение за показване (книгата показва "излезе от скрийнъра: …" до реда на жив запис); не решава нищо и не вика мрежа. Пакет 1б, 07.10: EXPD,
@@ -100,8 +131,10 @@ def explain_exclusion(sym: str, df: pd.DataFrame, spy: pd.Series, rs_scores: dic
             return "trend template: " + "; ".join(_TT_TEXT[k] for k in failed)
         rs = (close / spy.reindex(close.index).ffill()).dropna().iloc[-252:]
         now, top = float(rs.iloc[-1]), float(rs.max())
-        if now < top * RS_LINE_NEAR_HIGH:
-            return f"RS линия {now / top * 100:.1f}% от 52-седмичния максимум < {RS_LINE_NEAR_HIGH * 100:.0f}%"
+        limit = RS_LINE_STAY if held else RS_LINE_NEAR_HIGH
+        if now < top * limit:
+            return (f"RS линия {now / top * 100:.1f}% от 52-седмичния максимум < {limit * 100:.0f}%"
+                    + (f" (оставане по хистерезис; вход ≥ {RS_LINE_NEAR_HIGH * 100:.0f}%)" if held else ""))
         pivot = compute_pivot(high)
         pct = (price / pivot - 1) * 100
         if pct < -config.MAX_PCT_BELOW_PIVOT:
@@ -156,13 +189,13 @@ def explain_exits(tickers: list[str]) -> dict[str, str]:
             if df is None or not len(df):
                 out[sym] = "няма ценови данни"
                 continue
-            out[sym] = explain_exclusion(sym, df, spy, LAST_RS_SCORES) or "техническите филтри са преминати — отпаднал по-късно (CANSLIM фундаментите или лимитът на финалистите)"
+            out[sym] = explain_exclusion(sym, df, spy, LAST_RS_SCORES, held=sym in LAST_RS_HELD) or "техническите филтри са преминати — отпаднал по-късно (CANSLIM фундаментите или лимитът на финалистите)"
     except Exception as e:
         print(f"[screener] причините за излизане от списъка не се смятаха: {type(e).__name__}: {e}")
     return out
 
 
-def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
+def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] | None = None) -> list[dict]:
     """
     Прилага: Weinstein Stage 2 + Minervini trend template (+ RS rating ≥ 70 във втория
     проход), RS Line близо до връх, цена ≥ $10,
@@ -175,6 +208,9 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
     LAST_STATUS.clear()
     LAST_STATUS.update(ok=False, kind="", reason="", universe=len(universe), with_history=0,
                        batches=0, batches_failed=0)
+    held = set(held or ())                                       # 09.10: хистерезис на RS линията — тикърите от предишния успешен run остават до RS_LINE_STAY
+    LAST_RS_HELD.clear(); LAST_RS_HELD.update(held)
+    LAST_RS_EVALUATED.clear()
     try:
         spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
         if isinstance(spy, pd.DataFrame):
@@ -206,7 +242,8 @@ def technical_screen(universe: list[str], batch_size: int = 100) -> list[dict]:
                 score = rs_score(df["Close"])
                 if score is not None:
                     rs_scores[sym] = score
-                row = _evaluate_technicals(sym, df, spy)
+                LAST_RS_EVALUATED.add(sym)
+                row = _evaluate_technicals(sym, df, spy, held=True) if sym in held else _evaluate_technicals(sym, df, spy)
                 if row:
                     row["rs_score"] = None if score is None else round(score, 4)
                     survivors.append(row)
@@ -317,7 +354,7 @@ def compute_pivot(high: pd.Series) -> float:
     return float(window.max())
 
 
-def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | None:
+def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series, held: bool = False) -> dict | None:
     if len(df) < 260:
         return None
     close, volume, high = df["Close"], df["Volume"], df["High"]
@@ -351,11 +388,13 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
     rs = (close / aligned_spy).dropna()
     rs_52w = rs.iloc[-252:]
     rs_now, rs_max = float(rs_52w.iloc[-1]), float(rs_52w.max())
-    rs_status = ("new_high" if rs_now >= rs_max * 0.999
-                 else "near_high" if rs_now >= rs_max * 0.97
+    # хистерезис (09.10): нов тикър влиза от RS_LINE_NEAR_HIGH (97%), а такъв от предишния run (held) остава до RS_LINE_STAY (94%)
+    rs_status = ("new_high" if rs_now >= rs_max * RS_LINE_NEW_HIGH
+                 else "near_high" if rs_now >= rs_max * (RS_LINE_STAY if held else RS_LINE_NEAR_HIGH)
                  else "lagging")
     if rs_status == "lagging":
         return None
+    rs_held = rs_now < rs_max * RS_LINE_NEAR_HIGH               # допуснат САМО заради хистерезиса (между 94% и 97%)
 
     # ── База: pivot = най-високият High на базата БЕЗ последните N бара ──
     # pct_from_pivot вече може да е ПОЛОЖИТЕЛЕН (пробив). Над +BUYABLE_ZONE_MAX_PCT
@@ -400,6 +439,7 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series) -> dict | N
         "base_type": base_type, "base_depth_pct": round(depth, 1),
         "weinstein_stage": 2,
         "rs_status": rs_status,
+        "rs_line_pct": round(rs_now / rs_max * 100, 1), "rs_held": rs_held,
         "ma50": round(ma50, 2), "ma200": round(ma200, 2),
         "above_ma50": price > ma50, "above_ma200": price > ma200,
         "avg_volume_50d": int(avg_vol_50), "last_volume": int(last_vol),
@@ -485,7 +525,14 @@ def run_screen(leading_sector_names: list[str] | None = None, leaders: list[dict
     те се превръщат обратно в ETF-и през config.SECTOR_ETFS.
     """
     universe = build_universe()
-    tech = technical_screen(universe)
+    held = load_rs_state() if config.RS_LINE_HYSTERESIS else set()
+    tech = technical_screen(universe, held=held) if held else technical_screen(universe)
+    if config.RS_LINE_HYSTERESIS and LAST_STATUS.get("ok"):                              # състоянието се обновява само след успешен run (паднал Yahoo не го нулира)
+        import datetime as _dt
+        save_rs_state(next_rs_state(held, {r["ticker"] for r in tech}, LAST_RS_EVALUATED), _dt.date.today().isoformat())
+        held_in = [r["ticker"] for r in tech if r.get("rs_held")]
+        print(f"[screener] хистерезис на RS линията: {len(held)} тикъра от предишния run, {len(held_in)} остават между {RS_LINE_STAY * 100:.0f}% и {RS_LINE_NEAR_HIGH * 100:.0f}%"
+              + (f": {held_in}" if held_in else ""))
 
     # сортиране: потвърдени пробиви → над pivot без обем → под pivot (най-близките) →
     # extended (виж setup_rules.screen_priority); fundamental_screen гледа първите 60

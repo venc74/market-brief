@@ -862,7 +862,7 @@
         <h3>Техническа картина</h3>
         <div class="kv"><span>База (13 седмици)</span><b>{{ st.base_type }}</b></div>
         <div class="kv"><span>Weinstein Stage</span><b>{{ st.weinstein_stage }}</b></div>
-        <div class="kv"><span>RS Line</span><b>{{ "нов максимум" if st.rs_status == "new_high" else "близо до максимум" }}</b></div>
+        <div class="kv"><span>RS Line</span><b>{{ "нов максимум" if st.rs_status == "new_high" else "близо до максимум" }}{% if st.rs_held %} <span title="Влиза от 97% от 52-седмичния максимум на RS линията и остава до 94% (хистерезис, 09.10) — по-малко мигане на списъка" style="font-weight:400;color:var(--yellow)">· {{ "%.1f"|format(st.rs_line_pct) }}% от макс. (задържан)</span>{% endif %}</b></div>
         {# FIX 2026-10-03 (пакет 1, т.9): RS rating = перцентил на претеглената 12-месечна доходност в универса #}
         {% if st.rs_rating is not none and st.rs_rating is defined %}<div class="kv"><span>RS rating (перцентил)</span><b>{{ st.rs_rating }}</b></div>{% endif %}
         {% if st.pct_above_52w_low is defined %}<div class="kv"><span>52-седмичен диапазон</span><b>+{{ st.pct_above_52w_low }}% над дъното · −{{ st.pct_below_52w_high }}% под върха</b></div>{% endif %}

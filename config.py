@@ -124,6 +124,14 @@ RS_RATING_MIN = float(os.getenv("RS_RATING_MIN", 70))
 RS_RATING_WEIGHTS = (0.4, 0.2, 0.2, 0.2)          # [последно тримесечие, 3–6м, 6–9м, 9–12м]
 RS_QUARTER_BARS = 63
 RS_RATING_MIN_UNIVERSE = int(os.getenv("RS_RATING_MIN_UNIVERSE", 150))
+# RS линия (отношението цена/SPY спрямо 52-седмичния ѝ максимум) — ХИСТЕРЕЗИС (09.10.2026): вход ≥ RS_LINE_ENTER (97%), оставане ≥ RS_LINE_STAY (94%). Тикър, който е бил в техническия списък при предишния
+# успешен run (data/screener_rs_state.json), остава и при RS линия между 94% и 97%; нов тикър влиза само от 97%. Само праг на RS линията — всички останали филтри са непроменени, а състоянието е множеството
+# на тикърите, преминали ВСИЧКИ технически филтри (вкл. RS rating). Измерено върху РЕАЛНИ дневни данни на 903 тикъра за 80-те дни на брифовете (12.06–06.10.2026; технически слой без CANSLIM фундаментите):
+# излизания и връщане до 5 сесии 248 → 93 (−62%), смяна на имена на ден (влизания + излизания) 13.4 → 8.9; допълнителните 43 записа на buy-stop книгата са средно R −0.60 срещу −0.57 за цялата книга
+# при правило 97% (R −0.57 → −0.53) — без промяна в качеството. RS_LINE_HYSTERESIS=0 връща единния праг 97%.
+RS_LINE_HYSTERESIS = os.getenv("RS_LINE_HYSTERESIS", "1") == "1"
+RS_LINE_ENTER = float(os.getenv("RS_LINE_ENTER", 0.97))
+RS_LINE_STAY = float(os.getenv("RS_LINE_STAY", 0.94))
 
 # ── Track Record v2: чист старт (пакет 1, т.7 — 2026-10-03) ───────────────
 # При първия run с v2 кодът архивира v1 записите (data/backtest_archive_v1.json — НЕ се трият),
@@ -320,6 +328,7 @@ AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 8000))  # budget на
 import pathlib
 ROOT = pathlib.Path(__file__).parent
 DATA_DIR = ROOT / "data"
+RS_LINE_STATE_FILE = DATA_DIR / "screener_rs_state.json"          # състоянието на хистерезиса на RS линията (screener.load_rs_state), виж RS_LINE_ENTER
 DOCS_DIR = ROOT / "docs"
 QM_EP_LOG_FILE = DATA_DIR / "ep_ah_log.json"       # пакет QM: after-hours гапът срещу реалния гап на отварянето — за решение след 4–6 седмици дали си струва второ пускане
 PUTCALL_HISTORY_FILE = DATA_DIR / "put_call_history.json"
