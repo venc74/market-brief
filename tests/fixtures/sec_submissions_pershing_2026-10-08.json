@@ -1,0 +1,195 @@
+{
+ "_note": "РЕАЛНИ отговори на SEC, прочетени на 08.10.2026 през браузъра (data.sec.gov/submissions/CIK0001336528.json и CIK0002026053.json — само първите 8 записа от filings.recent, форматът е същият; и index.json на филинга 0001172661-26-003790). Pershing Square Capital Management (1336528) подаде 13F-NT на 14.08.2026, а холдингите на Q2 са в 13F-HR на PERSHING SQUARE INC. (2026053).",
+ "submissions": {
+  "0001336528": {
+   "name": "Pershing Square Capital Management, L.P.",
+   "cik": "0001336528",
+   "entityType": "other",
+   "filings": {
+    "recent": {
+     "accessionNumber": [
+      "0001438934-26-001601",
+      "0001172661-26-003777",
+      "0001140361-26-032051",
+      "0001140361-26-024482",
+      "0001140361-26-024479",
+      "0001172661-26-002336",
+      "0001140361-26-020328",
+      "0001140361-26-019617"
+     ],
+     "filingDate": [
+      "2026-08-25",
+      "2026-08-14",
+      "2026-08-10",
+      "2026-06-08",
+      "2026-06-08",
+      "2026-05-15",
+      "2026-05-08",
+      "2026-05-07"
+     ],
+     "reportDate": [
+      "2026-06-30",
+      "2026-06-30",
+      "",
+      "2026-06-04",
+      "",
+      "2026-03-31",
+      "",
+      "2026-04-27"
+     ],
+     "form": [
+      "N-PX",
+      "13F-NT",
+      "40-APP",
+      "4",
+      "SCHEDULE 13D/A",
+      "13F-HR",
+      "SCHEDULE 13D/A",
+      "3"
+     ],
+     "primaryDocument": [
+      "xslN-PX_X01/primary_doc.xml",
+      "xslForm13F_X02/primary_doc.xml",
+      "ef20079517_40app.htm",
+      "xslF345X06/form4.xml",
+      "xslSCHEDULE_13D_X02/primary_doc.xml",
+      "xslForm13F_X02/primary_doc.xml",
+      "xslSCHEDULE_13D_X02/primary_doc.xml",
+      "xslF345X06/form3.xml"
+     ]
+    }
+   }
+  },
+  "0002026053": {
+   "name": "PERSHING SQUARE INC.",
+   "cik": "0002026053",
+   "entityType": "operating",
+   "formerNames": [
+    {
+     "name": "PERSHING SQUARE HOLDCO, L.P.",
+     "from": "2024-06-13T00:00:00.000Z",
+     "to": "2026-04-23T00:00:00.000Z"
+    }
+   ],
+   "filings": {
+    "recent": {
+     "accessionNumber": [
+      "0001438934-26-001592",
+      "0001140361-26-033760",
+      "0001140361-26-033230",
+      "0001140361-26-033228",
+      "0001140361-26-033226",
+      "0001172661-26-003790",
+      "0001193125-26-349628",
+      "0001193125-26-347123"
+     ],
+     "filingDate": [
+      "2026-08-25",
+      "2026-08-19",
+      "2026-08-14",
+      "2026-08-14",
+      "2026-08-14",
+      "2026-08-14",
+      "2026-08-13",
+      "2026-08-12"
+     ],
+     "reportDate": [
+      "2026-06-30",
+      "2026-08-17",
+      "",
+      "",
+      "",
+      "2026-06-30",
+      "2026-06-30",
+      "2026-08-12"
+     ],
+     "form": [
+      "N-PX",
+      "4",
+      "SCHEDULE 13G",
+      "SCHEDULE 13G",
+      "SCHEDULE 13G",
+      "13F-HR",
+      "10-Q",
+      "8-K"
+     ],
+     "primaryDocument": [
+      "xslN-PX_X01/primary_doc.xml",
+      "xslF345X06/form4.xml",
+      "xslSCHEDULE_13G_X02/primary_doc.xml",
+      "xslSCHEDULE_13G_X02/primary_doc.xml",
+      "xslSCHEDULE_13G_X02/primary_doc.xml",
+      "xslForm13F_X02/primary_doc.xml",
+      "ps-20260630.htm",
+      "ps-20260813.htm"
+     ]
+    }
+   }
+  }
+ },
+ "index_json_2026053_0001172661-26-003790": {
+  "directory": {
+   "item": [
+    {
+     "last-modified": "2026-08-14 16:27:06",
+     "name": "0001172661-26-003790-index-headers.html",
+     "type": "text.gif",
+     "size": ""
+    },
+    {
+     "last-modified": "2026-08-14 16:27:06",
+     "name": "0001172661-26-003790-index.html",
+     "type": "text.gif",
+     "size": ""
+    },
+    {
+     "last-modified": "2026-08-14 16:27:06",
+     "name": "0001172661-26-003790.txt",
+     "type": "text.gif",
+     "size": ""
+    },
+    {
+     "last-modified": "2026-08-14 16:27:06",
+     "name": "infotable.xml",
+     "type": "text.gif",
+     "size": "8054"
+    },
+    {
+     "last-modified": "2026-08-14 16:27:06",
+     "name": "primary_doc.xml",
+     "type": "text.gif",
+     "size": "3679"
+    }
+   ],
+   "name": "/Archives/edgar/data/2026053/000117266126003790",
+   "parent-dir": "/Archives/edgar/data/2026053"
+  }
+ },
+ "index_json_1336528_0001172661-26-002336": {
+  "_note": "имената и размерите от листинга на SEC (08.10.2026); тестът ползва само directory.item[].name",
+  "directory": {
+   "item": [
+    {
+     "name": "0001172661-26-002336-index-headers.html",
+     "size": ""
+    },
+    {
+     "name": "0001172661-26-002336-index.html",
+     "size": ""
+    },
+    {
+     "name": "0001172661-26-002336.txt",
+     "size": ""
+    },
+    {
+     "name": "infotable.xml",
+     "size": "5520"
+    },
+    {
+     "name": "primary_doc.xml",
+     "size": "2193"
+    }
+   ]
+  }
+ }
+}

@@ -231,6 +231,57 @@ def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str]]:
         return []
 
 
+def _nt_other_managers(xml_text: str) -> list[tuple[str, str]]:
+    """
+    Чист парсер на primary_doc.xml на 13F-NT → [(CIK от 10 цифри, име)] на мениджърите, в чийто доклад са включени холдингите ("otherManager" в "otherManagersInfo").
+    Без мрежа — тества се върху реалния файл на Pershing (tests/fixtures/sec_13f_nt_*). Нечетим XML → [].
+    """
+    out = []
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return out
+    for el in root.iter():
+        if el.tag.rsplit("}", 1)[-1] != "otherManager":
+            continue
+        kids = {c.tag.rsplit("}", 1)[-1].lower(): (c.text or "").strip() for c in el}
+        cik = re.sub(r"\D", "", kids.get("cik", ""))
+        if cik:
+            out.append((cik.zfill(10), kids.get("name", "")))
+    return out
+
+
+def _nt_successor(cik: str, last_hr_date: str = "") -> dict | None:
+    """
+    13F-NT → родителят (08.10.2026). Pershing Square Capital Management (CIK 1336528) на 14.08.2026 подаде 13F-NT ("холдингите са включени в доклада на публичния родител"), а холдингите на Q2 са в 13F-HR на
+    PERSHING SQUARE INC. (CIK 2026053). Кодът четеше само 13F-HR на конфигурирания CIK и показваше "закъснява" (последен 13F от 15.05). Тук: ако CIK-ът има 13F-NT, по-нов от последния му 13F-HR, се чете
+    primary_doc.xml на известието, взема се CIK-ът от otherManagers и се търси най-новият 13F-HR на родителя от същото подаване (≤ NOTICE_WINDOW дни от известието).
+    Връща {cik, name, acc, date, nt_acc, nt_date} или None (няма известие / провал на теглене — graceful, старото поведение остава).
+    """
+    try:
+        r = requests.get(f"https://data.sec.gov/submissions/CIK{cik}.json", timeout=20, headers=_EDGAR_UA)
+        r.raise_for_status()
+        rec = (r.json() or {}).get("filings", {}).get("recent", {})
+        rows = list(zip(rec.get("form", []), rec.get("accessionNumber", []), rec.get("filingDate", [])))
+        nts = sorted((x for x in rows if x[0] == "13F-NT" and x[2] > (last_hr_date or "")), key=lambda x: x[2], reverse=True)
+        if not nts:
+            return None
+        _, nt_acc, nt_date = nts[0]
+        xml = requests.get(f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{nt_acc.replace('-', '')}/primary_doc.xml", timeout=20, headers=_EDGAR_UA).text
+        lo = (dt.date.fromisoformat(nt_date) - dt.timedelta(days=NOTICE_WINDOW_DAYS)).isoformat()
+        hi = (dt.date.fromisoformat(nt_date) + dt.timedelta(days=NOTICE_WINDOW_DAYS)).isoformat()
+        for pcik, pname in _nt_other_managers(xml):
+            pf = _recent_13f_filings(pcik, n=1)
+            if pf and lo <= pf[0][1] <= hi:
+                return {"cik": pcik, "name": pname, "acc": pf[0][0], "date": pf[0][1], "nt_acc": nt_acc, "nt_date": nt_date}
+    except Exception as e:
+        print(f"[edgar] 13F-NT {cik}: {type(e).__name__}: {e}")
+    return None
+
+
+NOTICE_WINDOW_DAYS = 20                      # родителският 13F-HR е подаден в същия срок като известието (на практика — същия ден)
+
+
 def _num(el, default: float = 0.0) -> float:
     return float(re.sub(r"[^\d.]", "", (el.text or "") if el is not None else "") or default)
 
@@ -408,6 +459,12 @@ def _manager_snapshot(cik: str, name: str) -> dict:
       "active"     — нормален случай
     """
     filings = _recent_13f_filings(cik, n=2)
+    cur_cik = prev_cik = cik
+    followed = _nt_successor(cik, filings[0][1] if filings else "")          # 13F-NT → холдингите са в доклада на родител (Pershing, 14.08.2026)
+    if followed:
+        filings = [(followed["acc"], followed["date"])] + filings[:1]        # текущо = родителят; предишно тримесечие = последният 13F-HR на стария CIK (сравнението е по CUSIP)
+        cur_cik = followed["cik"]
+        print(f"[edgar] {name}: 13F-NT от {followed['nt_date']} → холдингите са в доклада на {followed['name']} (CIK {followed['cik']})")
     if not filings:
         return {"manager": name, "cik": cik, "filing_status": "no_filings"}
 
@@ -423,10 +480,10 @@ def _manager_snapshot(cik: str, name: str) -> dict:
                      else "active")
     period = f"13F · {fdate}" if fdate else "13F"
 
-    holdings = _info_table(cik, acc)
+    holdings = _info_table(cur_cik, acc)
     if not holdings:
         return {"manager": name, "cik": cik, "filing_status": filing_status,
-                "period": period, "last_filing_date": fdate, "days_since_filing": days_since}
+                "period": period, "last_filing_date": fdate, "days_since_filing": days_since, "followed_nt": followed}
     current_agg = _aggregate_by_cusip(holdings)
     cur_scale, cur_basis = _value_scale(current_agg, fdate)        # т.9: дата на филинга + проверка по цена/акция
     current_total = sum(a["value"] for a in current_agg.values()) * cur_scale
@@ -437,7 +494,7 @@ def _manager_snapshot(cik: str, name: str) -> dict:
     prev_total = 0.0
     if len(filings) >= 2:
         prev_acc, prev_fdate = filings[1]
-        prev_holdings = _info_table(cik, prev_acc)
+        prev_holdings = _info_table(prev_cik, prev_acc)
         if prev_holdings:
             prev_agg = _aggregate_by_cusip(prev_holdings)
             prev_scale, prev_basis = _value_scale(prev_agg, prev_fdate)
@@ -445,7 +502,7 @@ def _manager_snapshot(cik: str, name: str) -> dict:
 
     return {
         "manager": name, "cik": cik, "filing_status": filing_status,
-        "period": period, "last_filing_date": fdate, "days_since_filing": days_since,
+        "period": period, "last_filing_date": fdate, "days_since_filing": days_since, "followed_nt": followed,
         "late": late_filer(fdate) if filing_status == "active" else None,
         "current_agg": current_agg, "current_scale": cur_scale, "current_scale_basis": cur_basis,
         "current_total": current_total, "current_shares_coverage": shares_coverage(current_agg),
@@ -643,6 +700,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
     n_active = n_no_filings = n_compared = 0
     low_cov: list[dict] = []                          # мениджъри без надеждно покритие на акциите (13F пакет)
     late_managers: list[dict] = []                    # мениджъри без 13F за последното просрочено тримесечие
+    followed_nt: list[dict] = []                      # мениджъри, чийто 13F-NT сочи към родител (холдингите са в неговия 13F-HR)
     scale_basis: dict[str, str] = {}                  # мениджър → основание на мащаба (price / price_override / size / size_override / date) — за диагностика
 
     for cik, name in config.DATAROMA_CIK.items():
@@ -670,6 +728,9 @@ def _fetch_all_uncached(min_value: float) -> dict:
             print(f"[dataroma] ⚠ {name}: покритие на акциите {lc} < {config.THIRTEENF_MIN_SHARES_COVERAGE:g} — без нова/увеличена за този мениджър")
         if snap.get("late"):
             late_managers.append({"manager": name, **snap["late"]})
+        if snap.get("followed_nt"):
+            f = snap["followed_nt"]
+            followed_nt.append({"manager": name, "to_cik": f["cik"], "to_name": f["name"], "nt_date": f["nt_date"], "filing_date": f["date"]})
         mgr_rows = _moves_from_snapshot(snap, min_value, tmap)
         manager_top[name] = sorted(mgr_rows, key=lambda r: r.get("value") or 0,
                                    reverse=True)[:config.DATAROMA_TOP_PER_MANAGER]
@@ -710,7 +771,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
         note = f"{n_active} от {total} мениджъра с данни: нито една нова/увеличена позиция и нито един голям изход"
     meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
             "managers_total": total, "managers_without_filings": n_no_filings,
-            "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "scale_basis": scale_basis}
+            "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "followed_nt": followed_nt, "scale_basis": scale_basis}
 
     if moves or new_positions or major_exits or stopped_managers:
         bundle["meta"] = meta

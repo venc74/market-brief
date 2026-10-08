@@ -159,9 +159,9 @@ assert meta["managers_with_data"] == 4 and meta["managers_with_comparison"] == 3
 print(f"  ✓ A (долари): 'увеличена' за Frontier и Hertz; B (хиляди, СИНТЕТИЧНА дата 2026 — като Duquesne): стойностите са ×1000 (A10 NETWORKS $53 688 000, основание price_override) и редовете СЕ ВРЪЩАТ; "
       f"D (счупен таг): 0% покритие → без редове; C: 'закъснява … срок 14.08.2026'; сравнение имат {meta['managers_with_comparison']} от {meta['managers_with_data']}")
 w = data_warnings.collect(None, None, superinvestor_status=meta)
-assert [x["source"] for x in w] == ["13f", "13f"] and "броят акции не е прочетен надеждно за Тест D" in w[0]["message"] and "закъсняват — Тест C" in w[1]["message"] and "срок 14.08" in w[1]["message"]
+assert [x["source"] for x in w] == ["13f"] and "броят акции не е прочетен надеждно за Тест D" in w[0]["message"] and not any("закъсн" in x["message"] for x in w)     # 08.10: без банер за давност — етикетът е само в секцията на 13F
 assert data_warnings.collect(None, None, superinvestor_status={"kind": "ok", "low_coverage": [], "late_managers": []}) == [] and data_warnings.collect(None, None, superinvestor_status=None) == []
-print("  ✓ банери: 'броят акции не е прочетен надеждно за … — нова/увеличена не се показва' и 'закъсняват — … срок 14.08'; нищо при чист статус")
+print("  ✓ банер: само 'броят акции не е прочетен надеждно за … — нова/увеличена не се показва'; за закъснелия мениджър (Тест C) НЯМА банер в 'Проблем с данните днес' (етикетът остава в секцията на 13F); нищо при чист статус")
 
 merged = dataroma._dedupe_by_ticker([{"ticker": "AAPL", "manager": "Уорън Бъфет · Berkshire Hathaway", "value": 10.0, "company": "APPLE"},
                                      {"ticker": "AAPL", "manager": "Бил Акман · Pershing Square", "value": 20.0, "company": "APPLE", "late": "⚠ закъснява: …"},

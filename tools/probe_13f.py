@@ -57,7 +57,10 @@ def main(argv: list[str]) -> int:
             print(f"   → последен 13F-HR: {hr[0][1]} — {'ЗАКЪСНЯВА (няма подаване след ' + str(q_end) + ')' if late else 'в срок'}")
             if late:
                 other = [x for x in f13 if x[1] > str(q_end) and x[0] != "13F-HR"]
-                print(f"     други 13F форми след {q_end}: {other or 'няма'}  (13F-HR/A и 13F-NT не се броят от кода — _recent_13f_filings взима само 13F-HR)")
+                print(f"     други 13F форми след {q_end}: {other or 'няма'}")
+                succ = dataroma._nt_successor(cik, hr[0][1])          # 13F-NT към родител (Pershing → Pershing Square Inc., 08.10.2026): кодът го следва
+                if succ:
+                    print(f"     → 13F-NT от {succ['nt_date']}: холдингите са в доклада на {succ['name']} (CIK {succ['cik']}), 13F-HR {succ['acc']} от {succ['date']} — кодът го следва, мениджърът НЕ е закъснял")
         else:
             print("   → няма 13F-HR в последните подавания (recent[] е ограничен до ~1000 записа)")
         if show_forms:
