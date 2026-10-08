@@ -1,0 +1,59 @@
+{
+ "updated": "2026-10-08",
+ "events": {
+  "SNX": {
+   "ticker": "SNX",
+   "company": "TD SYNNEX Corporation",
+   "glb_type": "classic",
+   "prior_high": 267.34,
+   "prior_high_month": "2026-06",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 22.9,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 23.37,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 267.34,
+   "since": "2026-10-08"
+  },
+  "WCC": {
+   "ticker": "WCC",
+   "company": "WESCO International, Inc.",
+   "glb_type": "classic",
+   "prior_high": 361.17,
+   "prior_high_month": "2026-05",
+   "months_unpenetrated": 4,
+   "ath_label": "all_time_high",
+   "history_years": 27.4,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 22.18,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 361.17,
+   "since": "2026-10-08"
+  },
+  "WSM": {
+   "ticker": "WSM",
+   "company": "Williams-Sonoma, Inc.",
+   "glb_type": "classic",
+   "prior_high": 233.1,
+   "prior_high_month": "2026-06",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 43.3,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 17.46,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 233.1,
+   "since": "2026-10-08"
+  }
+ }
+}

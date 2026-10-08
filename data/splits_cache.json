@@ -1,5 +1,5 @@
 {
- "date": "2026-10-07",
+ "date": "2026-10-08",
  "rows": [],
  "horizon": [
   {
@@ -107,6 +107,14 @@
    "date_human": "Oct 08, 2026"
   },
   {
+   "ticker": "GLE",
+   "company": "Global Engine Group Holding Limited",
+   "date": "2026-10-08",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 08, 2026"
+  },
+  {
    "ticker": "DXJ",
    "company": "WisdomTree Japan Hedged Equity Fund",
    "date": "2026-10-09",
@@ -142,26 +150,26 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 17,
+  "source_rows": 18,
   "horizon_from": "2026-10-05",
   "horizon_to": "2026-10-23",
-  "in_week": 14,
+  "in_week": 15,
   "dropped_price": [
    "CMND",
    "GUTS",
    "SCNX",
    "VIVK",
+   "WQEY",
    "GPMT",
    "ITOC",
    "RUBI",
    "GCDT",
    "SUGP",
    "MGF",
-   "MIN"
+   "MIN",
+   "GLE"
   ],
-  "dropped_cap": [
-   "WQEY"
-  ],
+  "dropped_cap": [],
   "dropped_no_data": [
    "ETHA",
    "DXJ"

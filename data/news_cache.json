@@ -1,37 +1,37 @@
 {
- "date": "2026-10-07",
+ "date": "2026-10-08",
  "news": [
   {
-   "headline": "Oil rises as Houthi attacks on Saudi airports and Iranian tanker strikes threaten Hormuz supply",
-   "why": "Ескалацията в Червено море и Ормузкия проток директно засяга петролните доставки и натиска върху цените на суровия петрол, с отражение върху енергийния сектор и инфлационните очаквания."
+   "headline": "Fed officials see another hike coming, but no sign as to when, minutes show",
+   "why": "Fed minutes сигнализират допълнително затягане, което поддържа yields високи и натиска акциите и rate-sensitive секторите."
   },
   {
-   "headline": "Gold slips as dollar gains; investors await Fed minutes for rate clues",
-   "why": "Fed minutes са ключов катализатор за посоката на лихвите и очакванията на пазара — движат долара, облигациите и рисковите активи."
+   "headline": "Dollar steady near 18-month high after Fed minutes flag inflation risks",
+   "why": "Силният долар притиска emerging markets, суровините и мултинационалните компании с приходи извън САЩ."
   },
   {
-   "headline": "India's central bank (RBI) hikes rates for first time since 2023 as inflation risks build",
-   "why": "Изненадващо затягане от RBI сигнализира за глобален инфлационен натиск и може да повлияе на emerging market позиционирането и капиталовите потоци."
+   "headline": "Inflation fears on the rise as one-year outlook in Fed survey hits highest level since May 2023",
+   "why": "Нарастващите инфлационни очаквания на потребителите увеличават вероятността от по-дълго рестриктивна Fed политика."
   },
   {
-   "headline": "Brussels considers broad tax levy on large corporations to avoid singling out US Big Tech",
-   "why": "Регулаторна инициатива на ЕК с потенциален фискален ефект върху мултинационалните компании, включително US tech giants, търгувани на американските борси."
+   "headline": "Oil gains as Middle East hostilities, potential escalation stoke supply worries; Hormuz transits at lowest in over two months",
+   "why": "Potential US military action срещу Иран и Houthi атаки над Riyadh airport заплашват ключови нефтени доставъчни маршрути и тласкат цените нагоре."
   },
   {
-   "headline": "SpaceX seeks $40 billion financing led by Apollo to buy Nvidia chips",
-   "why": "Мащабна дългова сделка, която потвърждава продължаващото масивно търсене на AI инфраструктура и е бичи сигнал за NVDA и свързания chip сектор."
+   "headline": "Gold prices recover from two-month low as dollar rally stalls",
+   "why": "Стабилизирането на долара позволява на gold да се възстанови, което сигнализира за повишено търсене на safe-haven активи."
   },
   {
-   "headline": "Trump says he is considering suspending federal petrol tax amid surging fuel prices",
-   "why": "Евентуалното суспендиране на федералния данък върху горивата е фискална мярка с пряко влияние върху енергийния сектор, потребителските разходи и инфлацията."
+   "headline": "Samsung flags $80 billion profit on AI boom, highest quarterly for any tech company",
+   "why": "Рекордните печалби на Samsung потвърждават силното търсене на AI чипове и дават позитивен сигнал за целия semiconductor сектор."
   },
   {
-   "headline": "Venezuela's Cardon refinery halted after fire",
-   "why": "Спирането на рафинерия в Карадон допълнително стяга предлагането на петрол в момент на вече повишени цени заради геополитическата ескалация."
+   "headline": "Trading platform Webull's China ties create national security risk, congressional panel finds; stock drops 18%",
+   "why": "Регулаторният и законодателен натиск върху Webull заради връзки с Китай може да се разпростре и върху други fintech платформи с подобна собственост."
   },
   {
-   "headline": "Vance says Iran must cut enrichment to end war",
-   "why": "Геополитическо изявление на вицепрезидента, което засилва напрежението около Иран и поддържа рисковата премия в петрола и пазарите на суровини."
+   "headline": "US FCC to vote to ban all Chinese labs from testing US electronics",
+   "why": "FCC решение би принудило производителите да сменят сертификационната верига, увеличавайки разходите и засилвайки tech decoupling между САЩ и Китай."
   }
  ]
 }

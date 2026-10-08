@@ -1,99 +1,51 @@
 {
- "date": "2026-10-07",
+ "date": "2026-10-08",
  "bundle": {
   "moves": [
    {
-    "ticker": "AAPL",
-    "company": "APPLE INC",
+    "ticker": "GOOGL",
+    "company": "ALPHABET INC",
     "manager": "Уорън Бъфет · Berkshire Hathaway",
-    "action": "нова позиция",
-    "value": 65950296923.0,
+    "action": "увеличена",
+    "value": 28157599351.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
     "managers": [
-     "Уорън Бъфет · Berkshire Hathaway"
-    ],
-    "count": 1
-   },
-   {
-    "ticker": "AXP",
-    "company": "AMERICAN EXPRESS CO",
-    "manager": "Уорън Бъфет · Berkshire Hathaway",
-    "action": "нова позиция",
-    "value": 51282319275.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": true,
-    "managers": [
-     "Уорън Бъфет · Berkshire Hathaway"
-    ],
-    "count": 1
-   },
-   {
-    "ticker": "GE AEROSPACE",
-    "company": "GE AEROSPACE",
-    "manager": "Крис Хон · TCI Fund Management",
-    "action": "нова позиция",
-    "value": 17725353519.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": false,
-    "managers": [
-     "Крис Хон · TCI Fund Management"
-    ],
-    "count": 1
-   },
-   {
-    "ticker": "V",
-    "company": "VISA INC",
-    "manager": "Крис Хон · TCI Fund Management",
-    "action": "нова позиция",
-    "value": 10462232091.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": true,
-    "managers": [
+     "Уорън Бъфет · Berkshire Hathaway",
+     "Сет Кларман · Baupost Group",
      "Крис Хон · TCI Fund Management",
-     "Джон Армитидж · Egerton Capital"
+     "Даниел Лоуб · Third Point"
     ],
-    "count": 2
-   },
-   {
-    "ticker": "BROOKFIELD CORP",
-    "company": "BROOKFIELD CORP",
-    "manager": "Бил Акман · Pershing Square",
-    "action": "нова позиция",
-    "value": 2415946008.0,
-    "period": "13F · 2026-05-15",
-    "_resolved": false,
-    "managers": [
-     "Бил Акман · Pershing Square"
-    ],
-    "count": 1
+    "count": 5
    },
    {
     "ticker": "AMZN",
     "company": "AMAZON COM INC",
     "manager": "Бил Акман · Pershing Square",
-    "action": "нова позиция",
+    "action": "увеличена",
     "value": 2385104083.0,
     "period": "13F · 2026-05-15",
     "_resolved": true,
+    "late": "⚠ закъснява: Pershing Square",
     "managers": [
      "Бил Акман · Pershing Square",
-     "Чейс Коулман · Tiger Global Management",
-     "Даниел Лоуб · Third Point",
-     "Дейвид Тепър · Appaloosa Management"
+     "Сет Кларман · Baupost Group",
+     "Дейвид Тепър · Appaloosa Management",
+     "Джон Армитидж · Egerton Capital"
     ],
     "count": 4
    },
    {
-    "ticker": "TAIWAN SEMICONDUCTOR",
-    "company": "TAIWAN SEMICONDUCTOR MANUFAC",
-    "manager": "Чейс Коулман · Tiger Global Management",
+    "ticker": "MSFT",
+    "company": "MICROSOFT CORP",
+    "manager": "Бил Акман · Pershing Square",
     "action": "нова позиция",
-    "value": 2331022991.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": false,
+    "value": 2092970053.0,
+    "period": "13F · 2026-05-15",
+    "_resolved": true,
+    "late": "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)",
     "managers": [
-     "Чейс Коулман · Tiger Global Management"
+     "Бил Акман · Pershing Square"
     ],
     "count": 1
    },
@@ -109,6 +61,58 @@
      "Стивън Мандел · Lone Pine Capital"
     ],
     "count": 1
+   },
+   {
+    "ticker": "STT",
+    "company": "STATE STREET CORP",
+    "manager": "Хауърд Маркс · Oaktree Capital Management",
+    "action": "нова позиция",
+    "value": 1011873350.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Хауърд Маркс · Oaktree Capital Management"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "SEAGATE TECHNOLOGY",
+    "company": "SEAGATE TECHNOLOGY HLDNGS PL",
+    "manager": "Стивън Мандел · Lone Pine Capital",
+    "action": "нова позиция",
+    "value": 965105185.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": false,
+    "managers": [
+     "Стивън Мандел · Lone Pine Capital"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "AMPHENOL CORP",
+    "company": "AMPHENOL CORP",
+    "manager": "Джон Армитидж · Egerton Capital",
+    "action": "увеличена",
+    "value": 858094428.0,
+    "period": "13F · 2026-07-21",
+    "_resolved": false,
+    "managers": [
+     "Джон Армитидж · Egerton Capital"
+    ],
+    "count": 1
+   },
+   {
+    "ticker": "PDD",
+    "company": "PDD HOLDINGS INC",
+    "manager": "Ли Лу · Himalaya Capital Management",
+    "action": "увеличена",
+    "value": 820858157.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Ли Лу · Himalaya Capital Management"
+    ],
+    "count": 1
    }
   ],
   "new_positions": [
@@ -120,7 +124,8 @@
     "pct_of_portfolio": 15.3,
     "period": "13F · 2026-05-15",
     "filing_date": "2026-05-15",
-    "_resolved": true
+    "_resolved": true,
+    "late": "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)"
    },
    {
     "ticker": "STT",
@@ -196,7 +201,7 @@
     "ticker": "DASH",
     "company": "DOORDASH INC",
     "manager": "Triple Frond Partners",
-    "value": 55404.0,
+    "value": 55404000.0,
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
@@ -246,7 +251,7 @@
     "ticker": "SPGI",
     "company": "S&P GLOBAL INC",
     "manager": "Triple Frond Partners",
-    "value": 47527.0,
+    "value": 47527000.0,
     "pct_of_portfolio": 4.2,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
@@ -366,7 +371,7 @@
     "ticker": "CDW",
     "company": "Cdw Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 139789.0,
+    "value": 139789000.0,
     "pct_of_portfolio": 2.7,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
@@ -386,7 +391,7 @@
     "ticker": "CME",
     "company": "CME GROUP INC",
     "manager": "Сет Кларман · Baupost Group",
-    "value": 136694.0,
+    "value": 136694000.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
@@ -416,7 +421,7 @@
     "ticker": "GOOGL",
     "company": "Alphabet Inc",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 120184.0,
+    "value": 120184000.0,
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
@@ -436,7 +441,7 @@
     "ticker": "FOXA",
     "company": "Fox Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 114992.0,
+    "value": 114992000.0,
     "pct_of_portfolio": 2.2,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
@@ -469,10 +474,37 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-07",
+   "data_date": "2026-10-08",
    "managers_with_data": 15,
    "managers_total": 15,
-   "managers_without_filings": 0
+   "managers_without_filings": 0,
+   "managers_with_comparison": 15,
+   "low_coverage": [],
+   "late_managers": [
+    {
+     "manager": "Бил Акман · Pershing Square",
+     "quarter_end": "2026-06-30",
+     "deadline": "2026-08-14",
+     "last_filing_date": "2026-05-15"
+    }
+   ],
+   "scale_basis": {
+    "Уорън Бъфет · Berkshire Hathaway": "1×:price",
+    "Бил Акман · Pershing Square": "1×:price",
+    "Сет Кларман · Baupost Group": "1000×:price_override",
+    "Стенли Дракенмилър · Duquesne Family Office": "1000×:price_override",
+    "Чейс Коулман · Tiger Global Management": "1×:price",
+    "Крис Хон · TCI Fund Management": "1×:price",
+    "Даниел Лоуб · Third Point": "1×:price",
+    "Дейвид Тепър · Appaloosa Management": "1×:price",
+    "Хауърд Маркс · Oaktree Capital Management": "1×:price",
+    "Джон Армитидж · Egerton Capital": "1×:price",
+    "Ли Лу · Himalaya Capital Management": "1×:price",
+    "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)": "1×:date",
+    "Стивън Мандел · Lone Pine Capital": "1×:price",
+    "Тери Смит · Fundsmith": "1×:price",
+    "Triple Frond Partners": "1000×:price_override"
+   }
   }
  }
 }

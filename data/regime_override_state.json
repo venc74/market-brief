@@ -1,15 +1,15 @@
 {
  "move_spike": {
-  "streak_below": 4,
-  "last_date": "2026-10-07"
+  "streak_below": 5,
+  "last_date": "2026-10-08"
  },
  "credit_spike": {
   "streak_below": 0,
-  "last_date": "2026-10-07"
+  "last_date": "2026-10-08"
  },
  "distribution_block": {
   "blocked": false,
   "streak_nonred": 0,
-  "last_date": "2026-10-07"
+  "last_date": "2026-10-08"
  }
 }
