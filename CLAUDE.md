@@ -97,6 +97,9 @@ src/trade_levels.py     — стоп и размер (07.10): вход, стоп
                         Kullamägi: вход × (1 − ADR); чист код, без лични числа
 templates/sizing_core.js, sizing_ui.js — оразмеряване в браузъра: чиста функция sizePosition() + настройки (баланс, риск %, таван %, режимен фактор) в localStorage, "коригирай" на карта;
                         вграждат се в страницата; тестват се през node/headless Chrome (test_sizing_js.py)
+src/regime_claims.py    — броенето на термометъра (групи по имена, правилото) като ГОТОВИ низове от кода + проверка на числовите твърдения в макро текста (08.10)
+src/cot_opposites.py    — бележка за обратен залог, сглобена от кода: карти (Action/Watchlist/QM) ↔ COT тези и между COT пазарите (маркира, не маха; 08.10)
+src/names.py            — имена за показване: longName при отрязано shortName, без правни окончания, рязане по граница на дума със «…» (08.10)
 src/trade_sim.py        — ЧИСТА симулация на изпълнението (buy-stop, частична
                         продажба, trailing 10DMA, гап изход, mark-to-market
                         изтичане, SPY сравнение); без I/O — ползва се и от реплея;
@@ -178,6 +181,11 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   (стоп = low на входния ден, не по-широк от 1×ADR, иначе `skipped_adr`), `QM_PARTIAL_DAYS = 4`, `QM_PARTIAL_FRACTION = 0.4` (негово: 1/3–1/2 на ден 3–5), остатъкът по SMA10 при ADR ≥
   `QM_TRAIL_ADR_SWITCH = 5.0`, иначе SMA20 (първо ЗАТВАРЯНЕ под), `QM_MAX_HOLD_SESSIONS = 180`, `QM_MIN_CLOSED_FOR_WINRATE = 20`. EP: `ENABLE_QM_EP = 1`, `QM_EP_GAP_PCT = 10`,
   `QM_EP_NEGLECT_RET63_PCT = 20`, `QM_EP_STOP_ADR = 1.0`, `QM_EP_MAX_ROWS = 10`, `QM_EP_MIN_AH_BARS = 3`; дневник `data/ep_ah_log.json` (`QM_EP_LOG_FILE`)
+
+- Петъчен пакет (09.10.2026) — параметри: `COT_CROSS_BLOCKED_QUOTE_TYPES = ("ETF", "MUTUALFUND")`, `COT_FX_TYPES`/`COT_FX_SIDE_TYPE`/`COT_FX_MARKET_CURRENCY` (валутен механизъм от `exposure_side`),
+  `COT_EFFECT_REASON` (механизъм × ефект → причина за бележката за обратен залог); `UNUSUAL_OPTIONS_REFERENCE_TICKERS = 60`, `_REFERENCE_MIN_VALID = 30`, `_REFERENCE_BUDGET_SEC = 600`, `UNUSUAL_OPTIONS_MARKER_PERCENTILE = 90`,
+  `UNUSUAL_OPTIONS_HISTORY_MIN_DAYS = 20`, `_HISTORY_KEEP = 60` (файл `data/uov_ratio_history.json`), абсолютният `UNUSUAL_OPTIONS_MARKER_MIN_RATIO = 2.0` остава втори път; `GLB_SEED_SESSIONS = 40`, `GLB_SEED_VERSION = 1`;
+  `QM_MAX_DIST_ADR = 1.0`; `DISTRIBUTION_SEED_SESSIONS = 15`, `DISTRIBUTION_SEED_VERSION = 1`; `THESIS_BASKETS`: `names`/`terms` (котви за гейт G4) и `groups` (подгрупи със свой ориентир, ядрената)
 
 ## Известни особености / история на решенията
 
@@ -326,6 +334,25 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
     свива се до тавана ("ограничено от тавана" + реалният риск), загуба при стоп и при гап −10%/−15%; "коригирай" = реален вход/стоп само за картата (не се записва); при Kullamägi стоп по-далеч от 1 ADR → "входът е преследване".
     Имейлът: само вход, стоп, стоп % и предупрежденията. Махнати са `shares`, `total_investment`, `pct_of_portfolio`, `max_risk_usd`, `risk_usd` от плановете/картите/JSON и `PORTFOLIO_SIZE`/`RISK_PER_TRADE_PCT` от кода и workflow-а
     (по-старите публикувани docs/data/*.json от юни–октомври ги съдържат с номинални $100k — не се пренаписват).
+- Петъчен пакет (09.10.2026, по прегледа на брифа от 08.10; всичко е с РЕАЛНИ fixture-и от 08.10 и измерване върху историята преди въвеждане):
+  • 13F-NT: `dataroma._nt_successor` — ако най-новото известие 13F-NT е по-ново от последния 13F-HR, мениджърът се следва към CIK-а от `otherManagers` (Pershing Square Capital Management → PERSHING SQUARE INC., CIK 2026053);
+    предишното тримесечие остава от стария CIK (сравнение по CUSIP); банерът за давност вече не е в "Проблем с данните днес" (етикетът остава само в секцията на 13F).
+  • GLB: началното състояние на хистерезиса се гради ЕДНОКРАТНО от историята (`GLB_SEED_SESSIONS = 40`, ден по ден със същия `apply_hysteresis`, белег `seed` в `data/glb_state.json`) — "GLB от" е реалната дата, а не денят на първото пускане.
+  • QM: карта на повече от `QM_MAX_DIST_ADR` (1×ADR) над нивото не се показва и не се записва; "до нивото: X ADR" върху картата; предупреждение за отчет и върху QM картите; QM картите влизат в следобедната OI снимка.
+  • COT cross проверки (`cot_theses.cross_gate` + `claim_matches`): моделът връща `company_claim` (за коя компания е описанието) — името се сверява с Yahoo (name/shortName/longName; не индустрията), без твърдение → `no_claim`, без сектор И индустрия →
+    `unverifiable`; фондове (quoteType ETF/MUTUALFUND) не влизат в cross (`etf`); валутен механизъм: `exposure_side` (foreign_revenue/foreign_cost/both) + `currencies` → кодът извежда типа (`fx_both` → изключен, `fx_currency`, `fx_exposure`);
+    не-USD отчитащи се (Yahoo `financialCurrency` ≠ USD) са извън валутните тези (`non_usd_reporter`). Мерено върху 50 реални двойки (име на модела × Yahoo): точно SI и WH не съвпадат. Версията на промпта се смени → еднократна регенерация на кеша.
+    `COT_DIAG["dropped_by_code"]` брои всеки код. Прозата-филтър (глагол с посока): 43 механизма, 0 удара → остава само лог.
+  • Макро текст: `regime_claims.facts` дава броенето по групи и правилото като готови низове; грешен брой/индикатор в грешна група → изречението се заменя с "По броенето: …", "един индикатор сам определя режима" → маха се
+    (`ai_macro["regime_claims_fixed"]`); мерено върху 163 реални текста: точно двата дефекта от 08.10, 0 фалшиви.
+  • UOV✓: праг = P90 спрямо референтна кошница (топ 60 по ликвидност, снимана заедно с нашите тикъри; `snap["reference"]`) за същата сесия; с ≥ 20 собствени наблюдения — перцентил спрямо собствената история; `brief["uov_diag"]` носи кошницата и
+    решенията; банер, ако няма нито кошница, нито история. Реално (59 тикъра, 08.10): P50 0.082×, P90 0.258× — абсолютният 2.0× беше 7.8 пъти над P90.
+  • Обратен залог (2г): `cot_opposites.annotate` — `card["cot_notes"]` (Action/Watchlist/QM), `ticker["opposite"]` и `ticker["cross_market"]` в COT тезите; в двете посоки (покупка срещу "губи", шорт срещу "печели").
+  • Watchlist (2б): моделът не пише `watchlist_trigger` и не получава вчерашните; текстът е `main._watchlist_trigger_text` (отчет + `setup.trigger_text` + `_regime_gate`); `watchlist_reason_type` остава (изтичането на regime_gate).
+  • Тези (2в): гейт G4 (`headline_quote` е дословно заглавие от днешните новини и съдържа тикър/име/термин на тезата; 1 от 14 приети маркирания отхвърлено — BKH на 07.10) и подгрупи с собствен ориентир в каре "Контекст".
+  • Distribution days (2д): началното състояние на блока от историята (15 сесии, `distribution_history`); IEI/HYG percentile с един знак около прага (`_pct_ord`).
+  • Дребни: часът до US pre-market се смята (`render.premarket_note`); заглавието на Track Record казва колко Action сигнала има (`backtest.action_signals`); езикът — `_fix_latin_prefix` (латинска приставка 1–3 букви пред кирилица, само ако
+    цялата дума е в речника ≥ 3 пъти; 18 от 107 реални хибридни думи, 0 грешни); имена за показване (`names.py`); еднаквите причини за изключени тикъри — на един ред. "Samsung флагова …" е граматика на модела — кодът не я поправя.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
