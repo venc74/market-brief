@@ -218,36 +218,12 @@ def wish_signal(hist, today: str | None = None) -> dict | None:
         return None
 
 
-def _split_only_adjust(close, high, low, splits):
-    """
-    FIX 2026-08-24 (GLB dividend-drift одит, Venci): auto_adjust=True
-    ретроактивно dividend-adjust-ва ЦЯЛАТА историческа Close/High/Low серия
-    при всяко ex-div събитие — потвърдено на живо (NWE ex-div 17.08.2026,
-    prior_high $71.66→$70.99 в СЪЩИЯ ден, нулева промяна в реалната пазарна
-    цена). Скалата е широка: за 44г-стар high-yield платец (SO/Southern Co)
-    auto_adjust=True показва 1981 close $0.27 срещу реалните $3.67
-    (auto_adjust=False) — 13.6× изкривяване. За price-breakout детекция
-    (Weinstein/Wish методология) искаме SPLIT-adjusted, НЕ dividend-adjusted
-    цени — total-return adjustment е грешен инструмент тук, price-level
-    пробив трябва да е спрямо реално търгуваната цена.
-
-    Ръчна split-only корекция върху auto_adjust=False суровите данни:
-    за всяка split дата, всички редове ПРЕДИ нея се делят на ratio-то.
-    Множество splits се композират коректно (всеки следващ split дели
-    и по-старите редове отново — ред на итерация няма значение, маските
-    са независими по абсолютна дата).
-    """
-    if splits is None or splits.empty:
-        return close, high, low
-    close, high, low = close.copy(), high.copy(), low.copy()
-    for split_date, ratio in splits.items():
-        if not ratio or ratio == 1:
-            continue
-        mask = close.index < split_date
-        close.loc[mask] = close.loc[mask] / ratio
-        high.loc[mask] = high.loc[mask] / ratio
-        low.loc[mask] = low.loc[mask] / ratio
-    return close, high, low
+# Цени за GLB: yf.download(..., auto_adjust=False) — БЕЗ ръчна корекция за сплитове.
+# История (2026-08-24, GLB dividend-drift одит): auto_adjust=True ретроактивно dividend-adjust-ва ЦЯЛАТА историческа Close/High/Low серия при всяко ex-div събитие (NWE ex-div 17.08.2026: prior_high $71.66→$70.99
+# в същия ден; SO 1981 close $0.27 срещу реалните $3.67 — 13.6× изкривяване). За price-breakout искаме цени, коригирани за сплитове, а НЕ за дивиденти → auto_adjust=False.
+# Тогава (24.08) към това добавихме ръчна split-only корекция (делене на всички редове преди сплита), в предположение, че auto_adjust=False връща СУРОВИ цени. Не е така: Yahoo `Close` (и Open/High/Low/Volume) при
+# auto_adjust=False е вече ретроактивно split-коригиран — открито при реплея на 08.10.2026 (NVDA 07.06.2024 = 120.89; AAPL 28.08.2020 = 124.81; AMZN 02.06.2022 = 125.51; yfinance 1.5.2 и 1.7.0), затова ръчната корекция делеше ВТОРИ път (NVDA 12.09, AAPL 31.20,
+# AMZN 6.28) и занижаваше линията на акции със сплит. Функцията `_split_only_adjust` и колоната "Stock Splits" (actions=True) са махнати; тестът върху реалните NVDA/AAPL/AMZN е test_split_not_doubled.py.
 
 
 def _evaluate_ticker(sym: str, hist, entry_margin_pct: float = 0.0) -> dict | None:
@@ -437,13 +413,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
         try:
-            # FIX 2026-08-24: auto_adjust=False + actions=True (виж
-            # _split_only_adjust docstring-а за пълния rationale) — сурови
-            # Close/High/Low, split историята идва БЕЗПЛАТНО в СЪЩИЯ batch
-            # call (Stock Splits колона), без нужда от отделна per-ticker
-            # yf.Ticker(sym).splits заявка.
+            # auto_adjust=False: цени, коригирани за сплитове, но НЕ за дивиденти (виж бележката над _evaluate_ticker). Без ръчна корекция — Yahoo вече е коригирал сплитовете.
             data = yf.download(batch, period=config.GLB_HISTORY_PERIOD, progress=False,
-                               auto_adjust=False, actions=True, group_by="ticker",
+                               auto_adjust=False, group_by="ticker",
                                threads=True)
         except Exception as e:
             print(f"[glb_screener] batch {i} fetch грешка: {e}")
@@ -454,15 +426,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                 df = (data[sym] if len(batch) > 1 else data).dropna(
                     subset=["Close", "High", "Low"])
                 if config.TRACK_GLB_WISH:
-                    # Книгата "GLB по Уиш" ползва цените КАКТО ГИ ВРЪЩА Yahoo: при auto_adjust=False Close е вече ретроактивно split-коригиран (проверено на NVDA, AAPL, AMZN с yfinance 1.5.2 и 1.7.0),
-                    # затова ръчната _split_only_adjust по-долу ги дели ВТОРИ път (NVDA 07.06.2024: 12.09 вместо 120.89) — това е известен проблем на картите, виж CLAUDE.md; книгата не го наследява.
-                    w = wish_signal(df, today)
+                    w = wish_signal(df, today)                       # книгата "GLB по Уиш": сигналът върху същите цени като картите
                     if w:
                         wish_signals.append({"ticker": sym, **w})
-                splits = df["Stock Splits"]
-                close, high, low = _split_only_adjust(
-                    df["Close"], df["High"], df["Low"], splits[splits != 0])
-                df = df.assign(Close=close, High=high, Low=low)
                 if hyst and seed:
                     replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
                     continue
