@@ -12,6 +12,7 @@
 import sys, json, pathlib, io, contextlib, tempfile as _tf
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import cot, cot_theses as ct, ai_brief
@@ -149,6 +150,7 @@ def fake_lookup(t):
     return {"name": company.get(t, t), "verified": t in company, "quote_type": (r or {}).get("quote_type"), "category": (r or {}).get("category"),
             "long_name": company.get(t), "sector": None, "industry": None}
 ai_brief._verified_company_name = fake_lookup
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 config.COT_BATCH_SIZE = 100                                                               # един batch → едно извикване
 EXTREMES = [{k: c[k] for k in ("market", "category", "net_position", "percentile", "direction", "as_of", "weeks_of_history", "history")} for c in BRIEF["cot"]]
 seen = {}

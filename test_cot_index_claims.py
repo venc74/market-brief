@@ -12,6 +12,7 @@ universe" (невярно) — и три реални изречения от п
 import sys, json, pathlib, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import ai_brief, cot_theses as ct
@@ -80,6 +81,7 @@ print("  ✓ механизъм с твърдение се маха, други�
 print()
 print("── evaluate_cross: РЕАЛНИЯТ случай 05.10 (E-mini Russell 2000, extreme_short, цена нагоре) ──")
 ai_brief._verified_company_name = lambda t: {"name": t, "verified": True, "quote_type": "EQUITY", "category": None, "long_name": t, "sector": None, "industry": None}
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 ai_brief._call_claude = lambda *a, **k: (_ for _ in ()).throw(AssertionError("моделът не бива да се вика"))
 keys = ("market", "category", "net_position", "percentile", "direction", "as_of", "weeks_of_history", "history")
 ext = {k: RUSSELL[k] for k in keys}

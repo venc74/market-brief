@@ -14,6 +14,7 @@ empty_reason при празна теза се сглобява от кода. �
 import sys, json, pathlib, io, contextlib, copy, datetime as dt, html as htmllib, tempfile
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import ai_brief, cot_theses as ct, render
@@ -44,6 +45,7 @@ def lookup(t):
     return {"name": company.get(t, t), "verified": t in company, "quote_type": (r or {}).get("quote_type"), "category": (r or {}).get("category"),
             "long_name": company.get(t), "sector": None, "industry": None}
 ai_brief._verified_company_name = lookup
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 
 
 def day(raw, screener=REAL_SCREENER, open_pos=None, closed=None, extremes=EXTREMES):
@@ -90,8 +92,8 @@ raw2["Cotton"] = [{"ticker": "CANE", "company": "Teucrium Sugar Fund", "mechanis
 company["GAP"] = "Gap, Inc."
 d = day(raw2)
 cot = cross(d, "Cotton")
-assert names(cot) == ["GAP"] and cot["dropped_tickers"] == [{"ticker": "CANE", "code": "wrong_commodity", "reason": "commodity ETF за друга суровина (Teucrium Sugar Fund)"}]
-print("  ✓ РЕАЛЕН случай 11.09: CANE (захар) в тезата за Cotton → изключен ('commodity ETF за друга суровина'), GAP остава")
+assert names(cot) == ["GAP"] and [(x["ticker"], x["code"]) for x in cot["dropped_tickers"]] == [("CANE", "etf")] and "Teucrium Sugar Fund" in cot["dropped_tickers"][0]["reason"]
+print("  ✓ РЕАЛЕН случай 11.09: CANE (захар) в тезата за Cotton → изключен; от 08.10 като фонд в cross (код 'etf'; 'commodity ETF за друга суровина' остава за директните тикъри), GAP остава")
 
 # 3) РЕАЛЕН случай 14.09: identity — ASR е Grupo Aeroportuario del Sureste, а прозата го описва като Arca Continental
 LOOKUP_OVERRIDE["ASR"] = {"name": "Grupo Aeroportuario del Sureste", "verified": True, "quote_type": "EQUITY", "category": None,

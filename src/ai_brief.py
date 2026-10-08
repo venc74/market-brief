@@ -11,6 +11,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
+from collections import Counter
 from functools import lru_cache
 import requests
 import yfinance as yf
@@ -1489,15 +1490,18 @@ def _verified_company_name(ticker: str) -> dict:
         # network call, виж FIX 2026-09-12 по-долу.
         # sector/industry: same reuse, за identity проверката
         # (_identity_mismatch_gloss), виж FIX 2026-09-14.
+        # short_name/financial_currency (08.10.2026): сверяване на твърдението за компанията с ВСИЧКИ имена на Yahoo и валута на отчитане за
+        # валутните тези (cot_theses.cross_gate) — същият fetch, нулев допълнителен network call.
         return {"name": name or ticker, "verified": bool(name),
                "quote_type": info.get("quoteType"), "category": info.get("category"),
-               "long_name": info.get("longName"),
-               "sector": info.get("sector"), "industry": info.get("industry")}
+               "long_name": info.get("longName"), "short_name": info.get("shortName"),
+               "sector": info.get("sector"), "industry": info.get("industry"),
+               "financial_currency": info.get("financialCurrency")}
     except Exception as e:
         print(f"[ai] company lookup {ticker}: {e}")
         return {"name": ticker, "verified": False,
-               "quote_type": None, "category": None, "long_name": None,
-               "sector": None, "industry": None}
+               "quote_type": None, "category": None, "long_name": None, "short_name": None,
+               "sector": None, "industry": None, "financial_currency": None}
 
 
 def _is_mismatched_commodity_etf(lookup: dict, market_name: str) -> bool:
@@ -1697,6 +1701,11 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
         if not lookup["verified"]:
             dropped.append({"ticker": t["ticker"], "code": "unverified",
                             "reason": "няма име в Yahoo (вероятно делистнат или преименуван)"})
+        elif t.get("source") == "model" and (gate := _cot_table.cross_gate(t, lookup, market_name)):
+            # 08.10.2026: cross тикър от модела — фонд / идентичност (company_claim срещу Yahoo) / не може да се провери / не-USD отчитаща се
+            # при валутна теза. Директните от таблицата (source "table") са извън това.
+            dropped.append({"ticker": t["ticker"], "code": gate[0], "reason": gate[1]})
+            print(f"[ai] '{market_name}': {t['ticker']} изключен ({gate[0]}) — {gate[1]}")
         elif market_name and _is_mismatched_commodity_etf(lookup, market_name):
             dropped.append({"ticker": t["ticker"], "code": "wrong_commodity",
                             "reason": f"commodity ETF за друга суровина ({lookup.get('long_name')})"})
@@ -1804,11 +1813,23 @@ def _build_cot_user_prompt(batch: list[dict]) -> str:
 ZBRA бяха описани като "в Russell 2000 constituent universe" — невярно; кодът маха механизъм с такова \
 твърдение, а тикър без друг механизъм отпада.
 
-ВАЖНО за имената на компаниите: "company" е кратко, познато име на ТОЧНО този тикър. Потвърден \
-случай (14.09.2026): reasoning текст твърдеше "ASR (Arca Continental) е мексикански bottler", \
-докато ASR реално е Grupo Aeroportuario del Sureste (оператор на летища); истинският тикър на \
-Arca Continental е AC.MX. Ако не си сигурен кой е точният тикър на компанията — НЕ я предлагай \
-изобщо, вместо да залепиш описанието към чужд тикър.
+ВАЖНО за имената на компаниите: "company_claim" е официалното име (на латиница, както е на борсата) \
+на компанията, чийто бизнес описваш в "quote" — ТОЧНО на тази компания, не на тикъра по асоциация. \
+Кодът сверява това име с името на тикъра в Yahoo Finance и изключва тикъра при разминаване. Потвърдени \
+случаи: 14.09.2026 "ASR (Arca Continental) е мексикански bottler", докато ASR реално е Grupo \
+Aeroportuario del Sureste (оператор на летища); истинският тикър на Arca Continental е AC.MX; \
+08.10.2026 Lean Hogs "WH" — текстът беше за WH Group (Хонконг), а тикърът WH е Wyndham Hotels; XRP "SI" — \
+текстът беше за Silvergate (делистната), а тикърът SI е преизползван от Shoulder Innovations. Ако не си \
+сигурен кой е точният тикър на компанията — НЕ я предлагай изобщо, вместо да залепиш описанието към \
+чужд тикър. НЕ предлагай ETF/фондове — те не са компании (индексите и стоките покрива директната таблица).
+
+ВАЛУТНИ ИНСТРУМЕНТИ (kind "fx_foreign" и "fx_usd"): ако механизмът е валутен, "type" е "fx_revenue_translation" \
+или "fx_cost_local" (кодът го извежда сам от следващото поле) и ЗАДЪЛЖИТЕЛНО добавяш към механизма: \
+"exposure_side" — "foreign_revenue" (компанията ПОЛУЧАВА значителна част от приходите си в чуждата валута), \
+"foreign_cost" (компанията ПЛАЩА значителна част от разходите си в чуждата валута, а продава в USD — напр. \
+добивна компания с разходи в местна валута) или "both" (и двете, нетният ефект е неясен); и "currencies" — списък \
+с ISO кодове на валутите на експозицията (напр. ["AUD"]). Внимание: ако компанията продава в USD, а \
+разходите ѝ са в чуждата валута, страната е "foreign_cost", не "foreign_revenue". Компании, които отчитат в чужда валута (не в USD), не са подходящи за валутен механизъм.
 
 ДРУГА ТЕЗА НЕ Е ДОКАЗАТЕЛСТВО: всяка връзка трябва да стои самостоятелно, върху реален \
 икономически механизъм на ТОЗИ инструмент и между инструментите в този отговор. Не пиши "ролята \
@@ -1819,8 +1840,9 @@ Arca Continental е AC.MX. Ако не си сигурен кой е точни�
 Ако за инструмент няма нито един тикър с реален механизъм, върни "tickers": [] (кодът записва \
 причината) — не гадай и не насилвай връзка само за да запълниш полето.
 
-Връщай само JSON: {{"theses": [{{"market": "...", "tickers": [{{"ticker": "...", "company": "...", \
-"mechanisms": [{{"type": "...", "quote": "..."}}]}}]}}]}}"""
+Връщай само JSON: {{"theses": [{{"market": "...", "tickers": [{{"ticker": "...", "company_claim": "...", \
+"mechanisms": [{{"type": "...", "quote": "..."}}]}}]}}]}} ; валутен механизъм: {{"type": "fx_cost_local", \
+"exposure_side": "foreign_cost", "currencies": ["AUD"], "quote": "..."}}"""
 
 
 COT_BATCH_STATUS: dict[str, str] = {}                        # тагът на партидата → "ok" (отговор получен) | "failed" (изключение/отрязване след опитите)
@@ -2058,6 +2080,10 @@ def evaluate_cot_theses(extremes: list[dict], raw_by_market: dict[str, list | No
                   if isinstance(d, dict) and d.get("code") == "mixed"],
         "mixed_cross_market": [f"{m}/{d['ticker']}" for m, th in subs for d in th.get("dropped_tickers") or []
                                if isinstance(d, dict) and d.get("code") == "mixed_cross_market"],
+        # 08.10.2026: изключени тикъри по код (etf, no_claim, identity_claim, unverifiable, non_usd_reporter, fx_exposure, fx_both, fx_currency, …)
+        # — за да се мери колко често работят новите проверки и дали не изключват излишно
+        "dropped_by_code": dict(sorted(Counter(d.get("code") for m, th in subs for d in th.get("dropped_tickers") or []
+                                               if isinstance(d, dict)).items(), key=lambda kv: str(kv[0]))),
     })
     print(f"[ai] cot_theses: {len(merged)}/{len(extremes)} тези · изключени тикъри {len(COT_DIAG['dropped'])} "
           f"(mixed {len(COT_DIAG['mixed'])}) · прозата с посока, противоречаща на ефекта: "
@@ -2072,6 +2098,8 @@ def _cot_diag_log(market: str, msg: str) -> None:
         COT_DIAG.setdefault("prose_direction", []).append(f"{market}/{msg.split(':')[0]}")
     elif "членство в индекс" in msg:
         COT_DIAG.setdefault("index_claims", []).append(f"{market}/{msg.split(':')[0]}")
+    elif "валутният тип е поправен" in msg:
+        COT_DIAG.setdefault("fx_corrected", []).append(f"{market}/{msg.split(':')[0]}")
 
 
 def _empty_sub_reason(raw: dict | None, verified: dict | None,

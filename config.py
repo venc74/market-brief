@@ -893,6 +893,21 @@ COT_CLOSED_BADGE_DAYS = int(os.getenv("COT_CLOSED_BADGE_DAYS", 14))
 COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))
 COT_MECHANISMS_PER_TICKER = int(os.getenv("COT_MECHANISMS_PER_TICKER", 2))
 COT_QUOTE_MAX_CHARS = int(os.getenv("COT_QUOTE_MAX_CHARS", 300))
+# Проверки на cross тикъра (08.10.2026, бриф 08.10 РЕАЛНО): кодът има последната дума над идентичността и над валутния механизъм.
+#  • company_claim: моделът казва ЗА КОЯ компания е описанието; името се сверява с Yahoo (cot_theses.claim_matches). Реални случаи:
+#    Lean Hogs "WH (Wyndham Hotels)" — текстът е за WH Group (HK); XRP "SI (Shoulder Innovations)" — текстът е за Silvergate (делистната,
+#    тикърът е преизползван). Без име в Yahoo (sector И industry липсват) идентичността не може да се провери → тикърът се изключва.
+#  • Фондове (quoteType ETF/MUTUALFUND) не влизат в cross: Russell 2000 cross беше три small-cap ETF-а (SCHA, IJR, PSCT), дубликати на IWM,
+#    който директната таблица вече покрива. Директната таблица (source "table") е извън това правило — там ETF е нормален.
+#  • Валутен механизъм: моделът дава СТРАНАТА на експозицията (exposure_side) и валутите; типът (fx_revenue_translation / fx_cost_local) го
+#    извежда кодът. Реален случай: AUD ↓ → BHP и RIO "губят" чрез "валутен превод на приходи", а те продават в USD и имат разходи в AUD
+#    (печелят). "both" → изключен (нетният ефект не се определя от кода). Не-USD отчитащи се (Yahoo financialCurrency ≠ USD: TSM→TWD,
+#    RELX→GBP, KOF→MXN) се изключват от валутните тези — преводът на отчета им не е механизмът от таблицата.
+COT_CROSS_BLOCKED_QUOTE_TYPES = ("ETF", "MUTUALFUND")
+COT_FX_TYPES = ("fx_revenue_translation", "fx_cost_local")                         # типове, които кодът извежда от exposure_side
+COT_FX_SIDE_TYPE = {"foreign_revenue": "fx_revenue_translation", "foreign_cost": "fx_cost_local"}   # "both" няма запис → изключване
+COT_FX_MARKET_CURRENCY = {"Euro FX": "EUR", "Japanese Yen": "JPY", "British Pound": "GBP", "Swiss Franc": "CHF",
+                          "Canadian Dollar": "CAD", "Australian Dollar": "AUD", "Mexican Peso": "MXN"}
 # само за таблицата с директните тикъри: продукт, който пряко следва инструмента (ETF/ETN/trust); знакът е по "side"
 COT_DIRECT_ONLY_TYPES = {"tracks_instrument"}
 

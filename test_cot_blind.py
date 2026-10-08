@@ -12,6 +12,7 @@ _verified_company_name, "отворените позиции" (FCX от 22.09 и
 import sys, json, pathlib, io, contextlib, tempfile as _tf, inspect, html as htmllib, tempfile
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import ai_brief, cot_theses as ct, render
@@ -38,6 +39,7 @@ for c in BRIEF["cot"]:
             company.setdefault(t["ticker"], t["company"])
 ai_brief._verified_company_name = lambda t: {"name": company.get(t, t), "verified": t in company, "quote_type": (CHK.get(t) or {}).get("quote_type"),
                                               "category": (CHK.get(t) or {}).get("category"), "long_name": company.get(t), "sector": None, "industry": None}
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 config.COT_BATCH_SIZE = 100
 prompts = []
 ANS = json.loads((FIX / "cot_model_answers_2026-10-02.json").read_text(encoding="utf-8"))["markets"]            # синтетичен отговор в новия формат

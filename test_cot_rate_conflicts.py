@@ -10,6 +10,7 @@
 import sys, json, pathlib, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import ai_brief, cot_theses as ct
@@ -23,6 +24,7 @@ assert real["2-Year Treasury Note"]["EXPD"] == "loses" and real["30-Year Treasur
 assert ROWS["2-Year Treasury Note"]["direction"] == ROWS["30-Year Treasury Bond"]["direction"] == "extreme_long"
 
 ai_brief._verified_company_name = lambda t: {"name": t, "verified": True, "quote_type": "EQUITY", "category": None, "long_name": t, "sector": None, "industry": None}
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 ai_brief._call_claude = lambda *a, **k: (_ for _ in ()).throw(AssertionError("моделът не бива да се вика"))
 T = lambda t, *m: {"ticker": t, "company": t, "mechanisms": [{"type": a, "quote": "описание на механизма"} for a in m]}
 
@@ -69,14 +71,14 @@ assert effs == {"2-Year Treasury Note": "loses", "5-Year Treasury Note": "gains"
 print("  ✓ СИНТЕТИЧНО: при ОБРАТНА посока на доходностите (2Y нагоре, 5Y надолу) противоположният ефект е нормален (един механизъм) → без конфликт")
 # еднакъв ефект в три лихвени пазара; ефект None не се брои; три срока с един различен → изключва се от всички три
 three = [ext("2-Year Treasury Note"), ext("30-Year Treasury Bond"), ext("2-Year Treasury Note", market="10-Year Treasury Note")]
-o4 = run({"2-Year Treasury Note": [T("A", "rate_asset_yield"), T("B", "rate_asset_yield"), T("C", "other")], "30-Year Treasury Bond": [T("A", "rate_asset_yield"), T("B", "rate_duration_valuation"), T("C", "rate_asset_yield")],
-          "10-Year Treasury Note": [T("A", "rate_asset_yield"), T("B", "rate_asset_yield"), T("C", "rate_asset_yield")]}, three)
+o4 = run({"2-Year Treasury Note": [T("AA", "rate_asset_yield"), T("BB", "rate_asset_yield"), T("CC", "other")], "30-Year Treasury Bond": [T("AA", "rate_asset_yield"), T("BB", "rate_duration_valuation"), T("CC", "rate_asset_yield")],
+          "10-Year Treasury Note": [T("AA", "rate_asset_yield"), T("BB", "rate_asset_yield"), T("CC", "rate_asset_yield")]}, three)
 by = {m: [t["ticker"] for t in o4[m]["cross_sector_thesis"]["tickers"]] for m in o4}
-assert by == {"2-Year Treasury Note": ["A", "C"], "30-Year Treasury Bond": ["A", "C"], "10-Year Treasury Note": ["A", "C"]}, by          # B: 2 пазара печелят, 1 губи → изключен навсякъде; C: other няма ефект → не се брои
-assert [d["ticker"] for d in o4["10-Year Treasury Note"]["cross_sector_thesis"]["dropped_tickers"]] == ["B"]
-print("  ✓ СИНТЕТИЧНО: A печели навсякъде (остава); B печели в два срока и губи в един → изключен от ВСИЧКИ три; C с 'other' в единия (без ефект) → не се брои, остава")
+assert by == {"2-Year Treasury Note": ["AA", "CC"], "30-Year Treasury Bond": ["AA", "CC"], "10-Year Treasury Note": ["AA", "CC"]}, by          # BB: 2 пазара печелят, 1 губи → изключен навсякъде; CC: other няма ефект → не се брои
+assert [d["ticker"] for d in o4["10-Year Treasury Note"]["cross_sector_thesis"]["dropped_tickers"]] == ["BB"]
+print("  ✓ СИНТЕТИЧНО: A печели навсякъде (остава); BB печели в два срока и губи в един → изключен от ВСИЧКИ три; CC с 'other' в единия (без ефект) → не се брои, остава")
 # нелихвени пазари с противоположен ефект — не е това правило
-o5 = run({"RBOB Gasoline": [T("X", "input_cost")], "Corn": [T("X", "output_price")]}, [ext("RBOB Gasoline"), ext("Corn")])
+o5 = run({"RBOB Gasoline": [T("XX", "input_cost")], "Corn": [T("XX", "output_price")]}, [ext("RBOB Gasoline"), ext("Corn")])
 assert all(o5[m]["cross_sector_thesis"]["tickers"] for m in o5)
 print("  ✓ нелихвени пазари (RBOB/Corn) със същия тикър и различен механизъм — правилото не ги засяга")
 print()

@@ -15,6 +15,7 @@ import os
 import pathlib
 import re
 import tempfile
+import unicodedata
 
 import config
 
@@ -168,13 +169,125 @@ def index_claim(text) -> str | None:
     return None
 
 
-def parse_mechanisms(raw, kind: str | None, claims: list | None = None) -> tuple[list[dict], str | None]:
+# ══════════════════════════════════════════════════════════════════════════
+# 08.10.2026 — идентичност на компанията и валутен механизъм (виж коментара в config.py над COT_CROSS_BLOCKED_QUOTE_TYPES)
+# ══════════════════════════════════════════════════════════════════════════
+_FX_KINDS = ("fx_foreign", "fx_usd")
+_FX_SIDES = ("foreign_revenue", "foreign_cost", "both")
+
+# Думи без идентичност: правни форми/съкращения и общи думи в имена на компании. Сверяването иска СПОДЕЛЕН отличителен токен;
+# ако в твърдението не е останал такъв, се ползват и общите думи (напр. "Global Industries").
+_LEGAL = {"inc", "incorporated", "corp", "corporation", "co", "company", "ltd", "limited", "plc", "llc", "lp", "sa", "sab", "nv", "ag",
+          "se", "spa", "the", "of", "and", "de", "cv", "cl", "class", "adr", "ads", "ord", "shs", "new", "common", "stock"}
+_GENERIC = {"group", "holdings", "holding", "capital", "financial", "bancorp", "bank", "banco", "energy", "technologies",
+            "technology", "systems", "international", "global", "resources", "partners", "therapeutics", "pharmaceuticals",
+            "industries", "enterprises", "services", "solutions", "brands", "health", "healthcare", "communications", "media",
+            "digital", "foods", "trust", "fund", "etf"}
+
+
+def _norm_tokens(text) -> list[str]:
+    """Малки букви, без диакритики ("Mondelēz" → mondelez), "&" → and, думи по небуквени-нецифрови разделители."""
+    s = unicodedata.normalize("NFKD", str(text or "")).encode("ascii", "ignore").decode("ascii").lower()
+    return [w for w in re.split(r"[^a-z0-9]+", s.replace("&", " and ")) if len(w) >= 2]
+
+
+def _token_match(a: str, b: str) -> bool:
+    """Равни, или по-късият (≥ 4 знака) е начало на по-дългия, или (≥ 6 знака) се съдържа в него (MicroStrategy ↔ Strategy, Marathon ↔ MARA)."""
+    if a == b:
+        return True
+    s, l = (a, b) if len(a) <= len(b) else (b, a)
+    return len(s) >= 4 and (l.startswith(s) or (len(s) >= 6 and s in l))
+
+
+def claim_matches(claim, lookup: dict) -> bool:
+    """
+    Съвпада ли компанията, която моделът описва (company_claim), с името на тикъра в Yahoo (name / short_name / long_name)? Чиста функция.
+    Сверява се САМО името (не индустрията: "Silvergate Capital" би съвпаднало с индустрията "Capital Markets"). Реално, измерено върху 48 двойки
+    (име на модела от кеша × име от Yahoo в публикуваните брифове): тест test_cot_claims.py.
+    """
+    ct = [w for w in _norm_tokens(claim) if w not in _LEGAL]
+    if not ct:
+        return False
+    strong = [w for w in ct if w not in _GENERIC] or ct
+    names = {w for k in ("name", "short_name", "long_name") for w in _norm_tokens((lookup or {}).get(k)) if w not in _LEGAL}
+    return any(_token_match(c, n) for c in strong for n in names)
+
+
+def _derive_fx(m: dict, typ: str, market: str | None, kind: str) -> tuple[str | None, dict | None, str | None]:
+    """
+    Валутен механизъм: кодът извежда типа от СТРАНАТА на експозицията (exposure_side), не от типа, който е избрал моделът.
+    foreign_revenue → fx_revenue_translation, foreign_cost → fx_cost_local; both → грешка (нетният ефект не се определя от таблицата).
+    Валутите (currencies, ISO) трябва да включват валутата на пазара (fx_foreign) или поне една не-USD валута (fx_usd).
+    Връща (изведен тип, {exposure_side, currencies, type_corrected, model_type}, грешка).
+    """
+    side = str(m.get("exposure_side") or "").strip().lower()
+    raw_cur = m.get("currencies")
+    cur = [str(c).strip().upper() for c in raw_cur if str(c).strip()] if isinstance(raw_cur, list) else []
+    if side not in _FX_SIDES:
+        return None, None, "валутен механизъм без валидна страна на експозицията (exposure_side: foreign_revenue / foreign_cost / both)"
+    if side == "both":
+        return None, None, "валутен механизъм: и приходи, и разходи в чужда валута — нетният ефект не се определя от таблицата"
+    if not cur:
+        return None, None, "валутен механизъм без валути на експозицията (currencies)"
+    if kind == "fx_foreign":
+        mc = config.COT_FX_MARKET_CURRENCY.get(market or "")
+        if mc and mc not in cur:
+            return None, None, f"валутата на пазара ({mc}) не е сред валутите на експозицията ({', '.join(cur)})"
+    elif all(c == "USD" for c in cur):
+        return None, None, "валутен механизъм към US Dollar Index, но експозицията е само в USD"
+    derived = config.COT_FX_SIDE_TYPE[side]
+    return derived, {"exposure_side": side, "currencies": cur, "type_corrected": derived != typ, "model_type": typ}, None
+
+
+# Кодът на причината за изключване по началото на текста на грешката (parse_mechanisms връща само текст)
+_ERR_CODES = (("твърдение за членство", "index_claim"), ("валутен механизъм: и приходи", "fx_both"),
+              ("валутата на пазара", "fx_currency"), ("валутен механизъм", "fx_exposure"))
+
+
+def error_code(err: str) -> str:
+    return next((code for prefix, code in _ERR_CODES if str(err).startswith(prefix)), "schema")
+
+
+def has_fx_mechanism(ticker: dict) -> bool:
+    return any(m.get("type") in config.COT_FX_TYPES for m in ticker.get("mechanisms") or [])
+
+
+def cross_gate(t: dict, lookup: dict, market: str | None) -> tuple[str, str] | None:
+    """
+    Проверките на cross тикър срещу Yahoo (вика се от ai_brief._verify_thesis_tickers за тикър от модела; директните от таблицата са извън това).
+    Връща (код, причина) или None. Ред: фонд → липсва твърдение за компанията → името не съвпада → няма сектор/индустрия (не може да се провери)
+    → валутна теза с не-USD отчитаща се компания.
+    """
+    qt = str(lookup.get("quote_type") or "").upper()
+    if qt in config.COT_CROSS_BLOCKED_QUOTE_TYPES:
+        return "etf", (f"{qt} ({lookup.get('long_name') or lookup.get('name')}), не компания — индексите и стоките се покриват от директната "
+                       f"таблица, а cross тезата е за бизнес механизъм")
+    claim = str(t.get("company_claim") or "").strip()
+    if not claim:
+        return "no_claim", "моделът не посочи за коя компания е описанието (company_claim) — идентичността не може да се провери"
+    if not claim_matches(claim, lookup):
+        return "identity_claim", f"описанието е за „{claim}“, а Yahoo води {t.get('ticker')} като „{lookup.get('name')}“"
+    if not (lookup.get("sector") or lookup.get("industry")):
+        return "unverifiable", "Yahoo няма сектор и индустрия за тикъра — идентичността не може да се провери"
+    if config.COT_MARKET_KINDS.get(market or "") in _FX_KINDS and has_fx_mechanism(t):
+        cur = str(lookup.get("financial_currency") or "").strip().upper()
+        if not cur:
+            return "unverifiable", "Yahoo няма валута на отчитане — валутният механизъм не може да се провери"
+        if cur != "USD":
+            return "non_usd_reporter", f"отчита в {cur}, не в USD — валутният механизъм по таблицата важи за компании с отчет в USD"
+    return None
+
+
+def parse_mechanisms(raw, kind: str | None, claims: list | None = None, market: str | None = None,
+                     fx_log: list | None = None) -> tuple[list[dict], str | None]:
     """
     (механизми, грешка). Схема: списък от {type ∈ затворения списък, quote — непразно описание}; най-много
     config.COT_MECHANISMS_PER_TICKER различни типа. Тип, който не важи за вида на пазара (напр. input_cost за облигации,
     rate_* за стока), е невалидна схема. "other" е допустим навсякъде и няма знак. Всеки механизъм получава "sign"
     (+1/−1 при цена↑, None за "other"). Механизъм, чийто quote твърди членство в индекс (index_claim), се маха; фрагментите се
     добавят в `claims` (ако е подаден списък). Ако не остане нито един механизъм заради това — грешка "твърдение за членство в индекс".
+    Валутен механизъм (fx_revenue_translation / fx_cost_local на fx_foreign / fx_usd пазар): типът се ИЗВЕЖДА от exposure_side (виж _derive_fx);
+    поправките на типа се добавят в `fx_log` (ако е подаден списък).
     """
     if not isinstance(raw, list) or not raw:
         return [], "няма механизъм"
@@ -188,6 +301,14 @@ def parse_mechanisms(raw, kind: str | None, claims: list | None = None) -> tuple
             return [], f"невалидна схема: типът '{typ or '?'}' не е от затворения списък"
         if not quote:
             return [], f"невалидна схема: механизмът '{typ}' е без описание (quote)"
+        extra: dict = {}
+        if kind in _FX_KINDS and typ in config.COT_FX_TYPES:
+            typ, fx, err = _derive_fx(m, typ, market, kind)
+            if err:
+                return [], err
+            extra = {"exposure_side": fx["exposure_side"], "currencies": fx["currencies"]}
+            if fx["type_corrected"] and fx_log is not None:
+                fx_log.append(f"типът {fx['model_type']} → {typ} (exposure_side={fx['exposure_side']}, {'/'.join(fx['currencies'])})")
         sign = mechanism_sign(typ, kind)
         if typ != "other" and sign is None:
             return [], f"невалидна схема: типът '{typ}' не важи за пазар от вид '{kind}'"
@@ -199,7 +320,7 @@ def parse_mechanisms(raw, kind: str | None, claims: list | None = None) -> tuple
         if typ in seen:
             continue
         seen.add(typ)
-        out.append({"type": typ, "quote": quote, "sign": sign})
+        out.append({"type": typ, "quote": quote, "sign": sign, **extra})
     if not out:
         return [], "твърдение за членство в индекс (моделът не знае членството) — механизмът е махнат"
     return out[:config.COT_MECHANISMS_PER_TICKER], None
@@ -248,12 +369,16 @@ def evaluate_cross(raw_tickers, market: str, move: dict, exclude: set[str] | fro
         if len(kept) >= config.COT_CROSS_MAX_TICKERS:
             break
         claims: list[str] = []
-        mechs, err = parse_mechanisms(item.get("mechanisms"), kind, claims)
+        fx_log: list[str] = []
+        mechs, err = parse_mechanisms(item.get("mechanisms"), kind, claims, market, fx_log)
         for c in claims:
             if log:
                 log(f"{ticker}: твърдение за членство в индекс — \"{c}\" → механизмът е махнат")
+        for msg in fx_log:
+            if log:
+                log(f"{ticker}: валутният тип е поправен по страната на експозицията — {msg}")
         if err:
-            dropped.append({"ticker": ticker, "reason": err, "code": "index_claim" if err.startswith("твърдение за членство") else "schema"})
+            dropped.append({"ticker": ticker, "reason": err, "code": error_code(err)})
             continue
         signs = {m["sign"] for m in mechs if m["sign"] is not None}
         if len(signs) > 1:
@@ -273,7 +398,8 @@ def evaluate_cross(raw_tickers, market: str, move: dict, exclude: set[str] | fro
             verb = prose_direction_conflict(m["quote"], effect)
             if verb and log:
                 log(f"{ticker}: прозата казва '{verb}', а кодът изчислява {effect} (само лог)")
-        kept.append({"ticker": ticker, "company": str(item.get("company") or ticker).strip() or ticker,
+        kept.append({"ticker": ticker, "company": str(item.get("company") or item.get("company_claim") or ticker).strip() or ticker,
+                     "company_claim": str(item.get("company_claim") or "").strip(),
                      "effect": effect, "direction": {"gains": "bullish", "loses": "bearish"}.get(effect),
                      "mechanisms": mechs, "direct_mechanism": any(config.COT_MECHANISM_SIGN[m["type"]]["direct"] for m in mechs),
                      "sentence": sentence, "quote": " ".join(m["quote"] for m in mechs), "source": "model"})

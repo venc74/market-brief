@@ -13,6 +13,7 @@
 import sys, json, pathlib, io, contextlib, tempfile as _tf, html as htmllib, tempfile, itertools
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+from tests import helpers_cot
 
 import config
 from src import cot_theses as ct, ai_brief, render
@@ -83,7 +84,11 @@ KIND_MARKET = {"commodity": "Cocoa", "fx_foreign": "Euro FX", "fx_usd": "US Doll
 n = 0
 for (typ, kind), sign in EXPECT.items():
     for mv in (UP, DOWN):
-        th, _ = ev(KIND_MARKET[kind], [tk("ZZ", (typ, Q))], mv)
+        row = tk("ZZ", (typ, Q))
+        if typ in config.COT_FX_TYPES:                                                  # 08.10: валутният механизъм носи страната на експозицията (типът му се извежда от нея)
+            row["mechanisms"][0].update(exposure_side={"fx_revenue_translation": "foreign_revenue", "fx_cost_local": "foreign_cost"}[typ],
+                                        currencies=[config.COT_FX_MARKET_CURRENCY.get(KIND_MARKET[kind], "EUR")])
+        th, _ = ev(KIND_MARKET[kind], [row], mv)
         want = "gains" if sign * (1 if mv["move"] == "up" else -1) > 0 else "loses"
         assert th["tickers"][0]["effect"] == want, (typ, kind, mv["move"])
         n += 1
@@ -170,6 +175,7 @@ for c in BRIEF["cot"]:
             company.setdefault(t["ticker"], t["company"])
 ai_brief._verified_company_name = lambda t: {"name": company.get(t, t), "verified": t in company, "quote_type": (CHK.get(t) or {}).get("quote_type"),
                                               "category": (CHK.get(t) or {}).get("category"), "long_name": company.get(t), "sector": None, "industry": None}
+helpers_cot.neutral_identity(ai_brief)                                                                                          # проверките за идентичност имат свой тест (test_cot_claims.py)
 config.COT_BATCH_SIZE = 100
 seen = {}
 extra = {"Corn": [tk("ADM", ("input_cost", Q), ("output_price", Q), company="Archer-Daniels-Midland Company")]}
