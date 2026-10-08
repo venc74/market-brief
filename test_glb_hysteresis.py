@@ -88,6 +88,7 @@ print(f"  ✓ 01.10→02.10: реално {len(real[a])} → {len(real[b])} (и�
 
 print()
 print("── screen() със състояние (СИНТЕТИЧНИ цени, подменено yf.download) ──")
+config.GLB_SEED_SESSIONS = 0                    # тук се проверява ОБИКНОВЕНИЯТ хистерезис от празно състояние; изграждането от историята (08.10) е в test_glb_seed.py
 tmp = tempfile.TemporaryDirectory(prefix="mb_glb_")
 STATE = pathlib.Path(tmp.name) / "glb_state.json"
 days_idx = pd.bdate_range("2026-01-01", "2026-09-03")

@@ -50,6 +50,7 @@ import config
 from src.screener import build_universe
 from src.ai_brief import _verified_company_name
 
+import pandas as pd
 import yfinance as yf
 
 RISK_NOTES = {
@@ -216,11 +217,23 @@ def load_state(path=None) -> dict:
         return {}
 
 
-def save_state(events: dict, today: str, path=None) -> None:
+def load_seed_meta(path=None) -> dict:
+    """{version, sessions, from, to} на последното начално състояние от историята (08.10.2026) или {}."""
+    try:
+        return dict(json.loads(pathlib.Path(path or config.GLB_STATE_FILE).read_text(encoding="utf-8")).get("seed") or {})
+    except Exception:
+        return {}
+
+
+def save_state(events: dict, today: str, path=None, seed: dict | None = None) -> None:
     p = pathlib.Path(path or config.GLB_STATE_FILE)
     try:
         p.parent.mkdir(exist_ok=True)
-        p.write_text(json.dumps({"updated": today, "events": events}, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
+        payload = {"updated": today, "events": events}
+        meta = seed if seed is not None else load_seed_meta(p)               # обикновен ден: белегът за началното състояние се пази
+        if meta:
+            payload["seed"] = meta
+        p.write_text(json.dumps(payload, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
     except Exception as e:
         print(f"[glb_screener] state не се записа: {type(e).__name__}: {e}")
 
@@ -263,6 +276,45 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
     return new, rows, ch
 
 
+def replay_observations(sym: str, hist, n_sessions: int, entry_margin_pct: float) -> dict:
+    """
+    Началното състояние от историята (08.10.2026): за последните n сесии на тикъра — {дата: {"close", "entry"}} така, както би го видял всеки дневен run: месечната серия до деня = затворените месеци + close-а на деня
+    (текущият месец), входът е _evaluate_ticker върху историята ДО деня (линия/дълъг период/overlay към тази дата). Бърза проверка преди скъпата: close >= (най-високия месечен close преди месеца) x (1 + буфера).
+    Чиста функция върху hist (без мрежа, освен лукапа на името в _evaluate_ticker за тикъри, които влизат).
+    """
+    close = hist["Close"].dropna()
+    if len(close) < 60:
+        return {}
+    mc = close.resample("ME").last().dropna()
+    per = mc.index.to_period("M")
+    out = {}
+    for d in close.index[-n_sessions:]:
+        cur = float(close.loc[d])
+        prior = mc[per < d.to_period("M")]
+        entry = None
+        if len(prior) and cur >= float(prior.max()) * (1 + entry_margin_pct / 100):
+            series = pd.concat([prior, pd.Series([cur], index=[d])])
+            if _monthly_duration_check(series, entry_margin_pct) is not None:
+                entry = _evaluate_ticker(sym, hist.loc[:d], entry_margin_pct)
+        out[d.date().isoformat()] = {"close": cur, "entry": entry}
+    return out
+
+
+def replay_state(replays: dict[str, dict]) -> tuple[dict, list[dict], dict]:
+    """
+    Ден по ден apply_hysteresis (същата чиста функция като в дневния run) върху replays {тикър: {дата: {close, entry}}}, от най-старата към най-новата сесия. Връща (събития, редове за последния ден,
+    {"entered": [...], "dropped": [...], "held_unseen": [...]} за ПОСЛЕДНИЯ ден) — "since" е реалният ден на входа, не денят на първия run.
+    """
+    dates = sorted({d for r in replays.values() for d in r})
+    events: dict = {}
+    rows: list[dict] = []
+    ch: dict = {"entered": [], "dropped": [], "held_unseen": []}
+    for d in dates:
+        obs = {s: r[d] for s, r in replays.items() if d in r}
+        events, rows, ch = apply_hysteresis(events, obs, d)
+    return events, rows, ch
+
+
 def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=None, today: str | None = None) -> list[dict]:
     """
     Главна входна точка. universe=None -> reuse-ва screener.build_universe()
@@ -278,7 +330,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
         universe = build_universe()
 
     hyst = config.GLB_HYSTERESIS
-    events = load_state(state_path) if hyst else {}
+    seed = bool(hyst and config.GLB_SEED_SESSIONS and load_seed_meta(state_path).get("version", 0) < config.GLB_SEED_VERSION)   # еднократно: състоянието се гради от историята
+    events = load_state(state_path) if (hyst and not seed) else {}
+    replays: dict = {}
     observations: dict = {}
     today = today or dt.date.today().isoformat()
     results = []
@@ -305,6 +359,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                 close, high, low = _split_only_adjust(
                     df["Close"], df["High"], df["Low"], splits[splits != 0])
                 df = df.assign(Close=close, High=high, Low=low)
+                if hyst and seed:
+                    replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
+                    continue
                 if hyst:
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
@@ -318,7 +375,13 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                 results.append(r)
         time.sleep(1)  # не дразним Yahoo, same дисциплина като screener.py
 
-    if hyst:
+    if hyst and seed:
+        events, results, ch = replay_state(replays)
+        dates = sorted({d for r in replays.values() for d in r})
+        save_state(events, today, state_path, seed={"version": config.GLB_SEED_VERSION, "sessions": len(dates), "from": dates[0] if dates else None, "to": dates[-1] if dates else None})
+        print(f"[glb_screener] НАЧАЛНО състояние от историята ({len(dates)} сесии {dates[0] if dates else '?'} → {dates[-1] if dates else '?'}): {len(events)} събития, "
+              f"показват се {len(results)}; в последния ден: нови {len(ch['entered'])}, отпаднали {len(ch['dropped'])} {ch['dropped'] or ''}")
+    elif hyst:
         events, results, ch = apply_hysteresis(events, observations, today)
         save_state(events, today, state_path)
         print(f"[glb_screener] хистерезис: нови {len(ch['entered'])}, отпаднали {len(ch['dropped'])} {ch['dropped'] or ''}, "

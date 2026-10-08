@@ -1171,6 +1171,11 @@ GLB_HYSTERESIS = os.getenv("GLB_HYSTERESIS", "1") == "1"
 GLB_ENTRY_MARGIN_PCT = float(os.getenv("GLB_ENTRY_MARGIN_PCT", 1.0))
 GLB_EXIT_MARGIN_PCT = float(os.getenv("GLB_EXIT_MARGIN_PCT", 3.0))
 GLB_STATE_FILE = DATA_DIR / "glb_state.json"
+# 08.10.2026: на първия run (празно/старо състояние) хистерезисът започваше "от нула" — на 08.10 списъкът падна от 9 на 3, а "GLB от" показваше деня на първия run (WCC "08.10", реално над линията от 01.10).
+# Сега състоянието се гради ЕДНОКРАТНО от историята: ден по ден същият apply_hysteresis върху последните GLB_SEED_SESSIONS сесии (линия, дълъг период и overlay към всяка дата); белегът е в data/glb_state.json
+# ("seed"). Нова версия на правилото (GLB_SEED_VERSION) → ново еднократно изграждане; GLB_SEED_SESSIONS=0 го изключва.
+GLB_SEED_SESSIONS = int(os.getenv("GLB_SEED_SESSIONS", 40))
+GLB_SEED_VERSION = 1
 
 
 # ══════════════════════════════════════════════════════════════════════════
