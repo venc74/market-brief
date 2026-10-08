@@ -456,11 +456,25 @@ def apply_rate_market_conflicts(crosses: dict[str, dict], moves: dict[str, dict]
     return out
 
 
+def group_dropped(dropped: list | None) -> list[dict]:
+    """
+    Изключените тикъри, групирани по една и съща причина (08.10.2026): [{tickers: [..], reason}] в реда на първото срещане. Преди "BAC — mixed: …; MET — mixed: …; PFG — mixed: …" повтаряше
+    една и съща дълга причина три пъти (30Y на 08.10). Запис без причина (стар формат — само име) се групира под празна причина.
+    """
+    groups: dict[str, list[str]] = {}
+    for d in dropped or []:
+        if isinstance(d, dict):
+            groups.setdefault(d.get("reason") or "", []).append(str(d.get("ticker")))
+        else:
+            groups.setdefault("", []).append(str(d))
+    return [{"tickers": t, "reason": r} for r, t in groups.items()]
+
+
 def cross_empty_reason(model_returned: bool, dropped: list[dict]) -> str:
-    """Причината за празна cross теза — сглобява се от кода (не от модела)."""
+    """Причината за празна cross теза — сглобява се от кода (не от модела); еднаквите причини са групирани (BAC, MET, PFG — mixed: …)."""
     if dropped:
         return (f"всички предложени тикъри бяха изключени при проверката ({len(dropped)}): "
-                + "; ".join(f"{d['ticker']} — {d['reason']}" for d in dropped))
+                + "; ".join(f"{', '.join(g['tickers'])} — {g['reason']}" for g in group_dropped(dropped)))
     if model_returned:
         return "предложените тикъри бяха директни по таблицата или невалидни"
     return "моделът не предложи тикър със структурен механизъм към този инструмент"

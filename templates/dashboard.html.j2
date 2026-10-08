@@ -828,7 +828,7 @@
   {% set earn_modal_id = "earn-modal-action-" ~ st.ticker %}
   <div class="stock-card">
     <div class="stock-head">
-      <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company }} · {{ st.sector }}</span>
+      <div><span class="ticker">{{ st.ticker }}</span><span class="company">{{ st.company|cname }} · {{ st.sector }}</span>
         {{ markers_html(st.markers) }}
         {{ earnings_icon(earn_modal_id, st.earnings.recap) }}
       </div>
@@ -932,7 +932,7 @@
     {% for st in watchlist %}
     <div class="watch-card">
       <span class="ticker">{{ st.ticker }}</span>
-      <span class="company">{{ st.company }}</span>
+      <span class="company">{{ st.company|cname }}</span>
       {% if st.rs_rating is defined and st.rs_rating is not none %}<span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS {{ st.rs_rating }}</span>{% endif %}
       {{ markers_html(st.markers) }}
       {# FIX 2026-09-23: маркерът RE-ENTRY пътува и до Watchlist картите
@@ -995,7 +995,7 @@
     {% for c in qm_cards %}
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
       <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
-      {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company[:34] }}</div>{% endif %}
+      {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company|cname(34) }}</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       {% for n in c.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
@@ -1107,7 +1107,7 @@
       <tbody>
         {% for r in qm_ep.rows %}
         <tr>
-          <td class="sym">{{ r.ticker }}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф."}]) }}{% endif %}{% if r.company and r.company != r.ticker %}<div class="qm-sm" style="font-family:inherit;font-weight:400">{{ r.company[:28] }}</div>{% endif %}</td>
+          <td class="sym">{{ r.ticker }}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф."}]) }}{% endif %}{% if r.company and r.company != r.ticker %}<div class="qm-sm" style="font-family:inherit;font-weight:400">{{ r.company|cname(28) }}</div>{% endif %}</td>
           <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div class="qm-sm">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
           <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
             <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: н/д</span>{% endif %}</div>
@@ -1162,7 +1162,7 @@
         <span class="glb-sym">{{ g.ticker }}</span>
         <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
       </div>
-      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company[:40] }}</div>{% endif %}
+      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
       <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
@@ -1193,7 +1193,7 @@
         <span class="glb-sym">{{ g.ticker }}</span>
         <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
       </div>
-      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company[:40] }}</div>{% endif %}
+      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
       <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
@@ -1236,7 +1236,7 @@
         {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
         {% if s.date_human %} · {{ s.date_human }}{% endif %}
       </div>
-      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company[:34] }}</div>{% endif %}
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
       {% if s.badge %}
       {% set d = s.days_to_split %}
       <div class="split-badge">{{ '📌 отворена позиция' if s.badge == 'position' else '🔎 наблюдаван' }}{% if d is not none %} · {% if d == 0 %}днес{% elif d == 1 %}утре{% elif d > 1 %}след {{ d }} дни{% else %}преди {{ -d }} {{ 'ден' if d == -1 else 'дни' }}{% endif %}{% endif %}</div>
@@ -1291,7 +1291,7 @@
         {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
         {% if s.date_human %} · {{ s.date_human }}{% endif %}
       </div>
-      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company[:34] }}</div>{% endif %}
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
       {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
     </div>
     {% endfor %}
@@ -1309,7 +1309,7 @@
           {% if th.tickers and not per_ticker and th.direction %}<span class="cot-direction {{ th.direction }}">{{ th.direction }}</span>{% endif %}
         </div>
         {% if th.tickers %}
-        <div class="cot-tickers">{% for t in th.tickers %}{{ t.ticker }} ({{ t.company }}){{ markers_html(t.markers) }}{% if t.partial %} <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span>{% endif %}{% if per_ticker %}{% if t.conflict %} <span class="cot-direction conflict" title="Моделът дава противоположен ефект за същия тикър в другата под-теза на този пазар">⚠ противоречие</span>{% elif t.direction %} <span class="cot-direction {{ t.direction }}" title="{{ 'печели' if t.effect == 'gains' else 'губи' }} от очакваното движение">{{ t.direction }}</span>{% endif %}{% endif %}{{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
+        <div class="cot-tickers">{% for t in th.tickers %}{{ t.ticker }} ({{ t.company|cname }}){{ markers_html(t.markers) }}{% if t.partial %} <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span>{% endif %}{% if per_ticker %}{% if t.conflict %} <span class="cot-direction conflict" title="Моделът дава противоположен ефект за същия тикър в другата под-теза на този пазар">⚠ противоречие</span>{% elif t.direction %} <span class="cot-direction {{ t.direction }}" title="{{ 'печели' if t.effect == 'gains' else 'губи' }} от очакваното движение">{{ t.direction }}</span>{% endif %}{% endif %}{{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
         {% endif %}
         {# пакет 3: cross-sector — изречението с посоката е шаблон от кода, прозата на модела описва само механизма #}
         {% for t in th.tickers or [] %}{% if t.sentence %}<div class="thesis-chain">{{ t.sentence }}{% if t.quote %} <span class="small" style="color:var(--muted)">{{ t.quote }}</span>{% endif %}</div>{% endif %}{% endfor %}
@@ -1334,9 +1334,10 @@
           Тези тикъри не са в текущия CANSLIM скрийнър.
         </div>
         {% endif %}
-        {% if th.dropped_tickers %}
+        {# 08.10: празна теза носи списъка на изключените в самата причина ("Няма … — всички предложени тикъри бяха изключени …") — вторият ред "Изключени:" би го повторил; еднаквите причини са на един ред #}
+        {% if th.dropped_tickers and (th.tickers or not th.empty_reason) %}
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Изключени: {% for d in th.dropped_tickers %}{% if d is mapping %}{{ d.ticker }} — {{ d.reason }}{% else %}{{ d }} (премахнат при верификация){% endif %}{{ "; " if not loop.last else "." }}{% endfor %}
+          Изключени: {% for g in th.dropped_tickers|group_dropped %}{{ g.tickers|join(", ") }}{% if g.reason %} — {{ g.reason }}{% else %} (премахнат при верификация){% endif %}{{ "; " if not loop.last else "." }}{% endfor %}
         </div>
         {% endif %}
       </div>
@@ -1561,7 +1562,7 @@
         <span class="si-sym">{{ s.ticker }}</span>
         <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
       </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}
       <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
       {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>
@@ -1589,7 +1590,7 @@
         <span class="si-sym">{{ s.ticker }}</span>
         <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
       </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company[:36] }}</div>{% endif %}
+      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}
       <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
       {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
     </div>

@@ -6,7 +6,8 @@ Qullamaggie · името на компанията в картите (07.10.202
 производствената _verified_company_name върна на живо "DigitalOcean Holdings, Inc.", "Corcept Therapeutics Incorporat", "Charles River Laboratories Inte" — отрязаното е на Yahoo, shortName се реже на
 30 знака, виж забележката по-долу); картите DOCN/CORT/CRL от скана към 02.10.2026 (tests/fixtures/qm_frames_2026-10-02.json); базовият бриф е реалният от 05.10.2026.
 СИНТЕТИЧНО: само отказите — Yahoo гърми / тикър без име (проверка на мълчаливия fallback: картата няма ред с компания, не се чупи).
-Забележка (известно, не се променя тук): Yahoo реже shortName на ~30 знака ("Charles River Laboratories Inte"); същото име се вижда и в Action/GLB/COT. Тестът проверява само prefix-а.
+08.10.2026: Yahoo реже shortName на ~30 знака ("Corcept Therapeutics Incorporat", "Charles River Laboratories Inte") — names.prefer_long взима longName при отрязано име, а за показване names.display_name маха правните
+окончания и реже по граница на дума със «…» (dashboard 34 знака, имейл 26). Пълното име остава в данните.
 Пускане: python test_qm_company_name.py
 """
 import sys, json, ast, copy, types, pathlib, tempfile, re, html as htmllib
@@ -79,6 +80,7 @@ for t, c in by.items():
     info = YF["info"][t]
     want = ai_brief._best_company_name(info["shortName"], info["longName"])
     assert c["company"] and c["company"] != t and c["company"] == want and c["company"].startswith(PREFIX[t]), (t, c["company"], want)
+    assert len(info["shortName"]) <= 31 and c["company"] == info["longName"] or t == "DOCN", (t, info["shortName"], info["longName"])    # РЕАЛНО отрязаните shortName (CORT, CRL) → longName
     lk = ai_brief._verified_company_name(t)
     assert lk["verified"] is True and lk["name"] == c["company"], (t, lk)
 print("  ✓ картите (РЕАЛНИ към 02.10) носят: " + "; ".join(f"{t} → {c['company']!r}" for t, c in by.items()))
@@ -92,11 +94,13 @@ b.setdefault("backtest", {})["qm_breakout"] = backtest.get_qm_summary()         
 raw = render.render_dashboard(b)
 sec = raw[raw.index('<section id="qm">'):raw.index("</section>", raw.index('<section id="qm">'))]
 shown = [htmllib.unescape(m) for m in re.findall(r'<div class="qm-company">(.*?)</div>', sec)]
-assert shown == [c["company"][:34] for c in CARDS], (shown, [c["company"] for c in CARDS])             # по реда на картите, шаблонът реже на 34
+assert [c["company"] for c in CARDS] == ["DigitalOcean Holdings, Inc.", "Corcept Therapeutics Incorporated", "Charles River Laboratories International, Inc."]      # пълните РЕАЛНИ имена (longName) са в данните
+assert shown == ["DigitalOcean", "Corcept Therapeutics", "Charles River Laboratories…"], shown          # за показване: без правни окончания, рязане по дума със «…» (34 знака)
 em = htmllib.unescape(render._qm_email_block(b))
-for t, c in by.items():
-    assert c["company"][:26] in em, (t, "липсва в имейла")                                               # имейлът реже на 26 знака (render._qm_email_block)
-print(f"  ✓ dashboard: {shown}; имейл: началото (26 знака) на всички три имена присъства")
+for name in ("DigitalOcean", "Corcept Therapeutics", "Charles River Laboratories…"):
+    assert name in em, (name, "липсва в имейла")                                                      # имейлът реже на 26 знака, също по дума
+assert "Incorporat<" not in em and "Incorporat " not in em and "Inte<" not in em
+print(f"  ✓ dashboard: {shown}; имейл: същите имена (рязане по дума на 26 знака, не «Corcept Therapeutics Incorporat»)")
 
 # ── 4. мълчаливият fallback е ВИДИМ в теста: без име картата няма ред с компания и нищо не се чупи ──
 for mode in ("fail", "empty"):

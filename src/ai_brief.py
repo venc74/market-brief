@@ -22,6 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import backtest
 from src import net_utils
+from src import names
 from src import regime_claims
 from src import cot_theses as _cot_table     # пакет 3: таблиците за директните тикъри и знака (без AI)
 
@@ -1478,6 +1479,9 @@ def _best_company_name(short_name: str | None, long_name: str | None) -> str | N
     """
     for candidate in ((short_name or "").strip(), (long_name or "").strip()):
         if candidate and not _looks_like_exchange_code(candidate):
+            # 08.10: Yahoo реже shortName на ~30 знака ("Corcept Therapeutics Incorporat") — при отрязано име се взима longName (виж names.prefer_long)
+            if candidate == (short_name or "").strip() and long_name and not _looks_like_exchange_code(long_name.strip()):
+                return names.prefer_long(short_name, long_name)
             return candidate
     return None
 

@@ -193,7 +193,7 @@ corn = by["Corn"]["cross_sector_thesis"]
 assert [t["ticker"] for t in corn["tickers"]] == ["TSN", "PPC"] and corn["dropped_tickers"] == [{"ticker": "ADM", "code": "mixed", "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"}]
 assert ai_brief.COT_DIAG["mixed"] == ["Corn/ADM"] and any("Corn/ADM" in x for x in ai_brief.COT_DIAG["dropped"])
 swiss = by["Swiss Franc"]["cross_sector_thesis"]
-assert swiss["tickers"] == [] and swiss["empty_reason"].startswith("всички предложени тикъри бяха изключени при проверката (2): ALL — невалидна схема")
+assert swiss["tickers"] == [] and swiss["empty_reason"].startswith("всички предложени тикъри бяха изключени при проверката (2): ALL, AIZ — невалидна схема")                                                 # 08.10: еднаквата причина е на един ред
 assert [x["ticker"] for x in swiss["dropped_tickers"]] == ["ALL", "AIZ"]
 assert by["XRP"]["history_note"] == "История само 53 седмици (под стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от обичайното." and "history_note" not in by["Cocoa"]
 t30 = by["30-Year Treasury Bond"]["cross_sector_thesis"]["tickers"][0]
@@ -229,7 +229,7 @@ with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as dat
         config.DOCS_DIR, config.DATA_DIR = o1, o2
 assert "При цената на Corn НАДОЛУ TSN ПЕЧЕЛИ (механизъм: разход за суровина)." in page
 assert "Изключени: ADM — mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)." in page
-assert "Няма cross-sector теза — всички предложени тикъри бяха изключени при проверката (2): ALL — невалидна схема" in page
+assert "Няма cross-sector теза — всички предложени тикъри бяха изключени при проверката (2): ALL, AIZ — невалидна схема" in page
 assert "История само 53 седмици" in page
 print("  ✓ dashboard-ът показва изречението от кода и прозата на модела отделно, 'Изключени: ADM — mixed …', причината за празна cross теза и бележката за кратка история")
 print()

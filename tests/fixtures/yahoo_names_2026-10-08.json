@@ -1,0 +1,75 @@
+{
+ "_note": "ЖИВ Yahoo info (shortName, longName, quoteType), 08.10.2026, за тикърите с отрязани имена в брифа от 08.10 (виж test_names_display.py).",
+ "info": {
+  "NWN": {
+   "shortName": "Northwest Natural Holding Compa",
+   "longName": "Northwest Natural Holding Company",
+   "quoteType": "EQUITY"
+  },
+  "EXPD": {
+   "shortName": "Expeditors International of Was",
+   "longName": "Expeditors International of Washington, Inc.",
+   "quoteType": "EQUITY"
+  },
+  "HE": {
+   "shortName": "Hawaiian Electric Industries, I",
+   "longName": "Hawaiian Electric Industries, Inc.",
+   "quoteType": "EQUITY"
+  },
+  "FXA": {
+   "shortName": "Invesco CurrencyShares Australi",
+   "longName": "Invesco CurrencyShares Australian Dollar Trust",
+   "quoteType": "ETF"
+  },
+  "FXB": {
+   "shortName": "Invesco CurrencyShares British ",
+   "longName": "Invesco CurrencyShares British Pound Sterling Trust",
+   "quoteType": "ETF"
+  },
+  "FXE": {
+   "shortName": "Invesco CurrencyShares Euro Cur",
+   "longName": "Invesco CurrencyShares Euro Currency Trust",
+   "quoteType": "ETF"
+  },
+  "TBF": {
+   "shortName": "ProShares Short 20+ Year Treasu",
+   "longName": "ProShares Short 20+ Year Treasury",
+   "quoteType": "ETF"
+  },
+  "SCHO": {
+   "shortName": "Schwab Short-Term U.S. Treasury",
+   "longName": "Schwab Short-Term U.S. Treasury ETF",
+   "quoteType": "ETF"
+  },
+  "FBTC": {
+   "shortName": "Fidelity Wise Origin Bitcoin Fu",
+   "longName": "Fidelity Wise Origin Bitcoin Fund",
+   "quoteType": "ETF"
+  },
+  "SHY": {
+   "shortName": "iShares 1-3 Year Treasury Bond ",
+   "longName": "iShares 1-3 Year Treasury Bond ETF",
+   "quoteType": "ETF"
+  },
+  "TLT": {
+   "shortName": "iShares 20+ Year Treasury Bond ",
+   "longName": "iShares 20+ Year Treasury Bond ETF",
+   "quoteType": "ETF"
+  },
+  "VGLT": {
+   "shortName": "Vanguard Long-Term Treasury ETF",
+   "longName": "Vanguard Long-Term Treasury Index Fund ETF Shares",
+   "quoteType": "ETF"
+  },
+  "UNG": {
+   "shortName": "United States Natural Gas Fund ",
+   "longName": "United States Natural Gas Fund, LP",
+   "quoteType": "ETF"
+  },
+  "IWM": {
+   "shortName": "iShares Russell 2000 Index Fund",
+   "longName": "iShares Russell 2000 ETF",
+   "quoteType": "ETF"
+  }
+ }
+}

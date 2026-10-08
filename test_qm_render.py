@@ -151,7 +151,7 @@ assert "Епизодични пивоти (EP) · гапове след нови
 head_row = txt_of(re.search(r"<thead>.*?</thead>", esec, re.S).group(0))
 assert head_row == "Тикър AH гап Новина Ръст 3 м. Стоп лимит (1×ADR)", head_row
 body_row = txt_of(re.search(r"<tbody>.*?</tbody>", esec, re.S).group(0))
-for frag in ("SYNA", "Synaptics Inc", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.2f} → ${r['ah_price']:.2f}", HL[0]["title"], "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в AH: н/д",
+for frag in ("SYNA", "Synaptics", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.2f} → ${r['ah_price']:.2f}", HL[0]["title"], "Придобиване (оферта)", "изненада", SUMMARY, "⚠ обем в AH: н/д",
              f"{r['ret63_pct']:+.0f}%", f"${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)",
              f"After-hours цена ${r['ah_price']:.2f}" if False else f"after-hours цена ${r['ah_price']:.2f}", f"Стоп за оразмеряване (макс. 1×ADR) ${r['max_stop']:.2f} (−{r['max_stop_pct']:.1f}%)", "въведи баланса в настройките"):
     assert frag in body_row, (frag, body_row)
