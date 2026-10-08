@@ -988,7 +988,46 @@ def _norm_quote(s) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
-def _news_gate(thesis: dict, c: dict, status: str) -> tuple[str | None, str]:
+def _anchor_match(basket: dict, headline: str) -> str | None:
+    """
+    Първата котва от тезата, намерена в заглавието (08.10, гейт G4): тикър (главни букви, цяла дума), име на компания (config "names") или термин на механизма
+    (config "terms"; "*" в края = всяка наставка: "yield*" → yield, yields). Цели думи/фрази, без разлика в регистъра за имена и термини. None → заглавието няма връзка с тезата.
+    """
+    for t in basket.get("tickers") or []:
+        if re.search(rf"(?<![A-Za-z0-9]){re.escape(t)}(?![A-Za-z0-9])", headline):
+            return t
+    low = headline.lower()
+    for n in basket.get("names") or []:
+        if re.search(rf"(?<!\w){re.escape(n.lower())}(?!\w)", low):
+            return n
+    for term in basket.get("terms") or []:
+        pat = re.escape(term.lower().rstrip("*")) + (r"\w*" if term.endswith("*") else "")
+        if re.search(rf"(?<!\w){pat}(?!\w)", low):
+            return term
+    return None
+
+
+def _headline_gate(thesis: dict, c: dict, headlines: list[str]) -> tuple[str | None, str]:
+    """
+    Гейт G4 (08.10.2026): за confirmed/challenged моделът връща и ДОСЛОВНОТО заглавие (headline_quote); кодът изисква (а) то да е част от днешните новини и (б) цялото заглавие да съдържа
+    тикър, име на компания от тезата или термин на механизма ѝ. Реален случай 07.10: "Black Hills plans $1.8 billion investment to power Google's data center" беше "потвърждение" на
+    ядрената теза през chain_step — стъпката "AI data center-ите гладуват за базова мощност" е изпълнена и от газова централа, а G3 проверява само цитата от веригата.
+    """
+    q = _norm_quote(c.get("headline_quote"))
+    if len(q) < 12:
+        return "G4", f"headline_quote липсва или е твърде кратко ({c.get('headline_quote')!r})"
+    src = next((h for h in headlines if q in _norm_quote(h)), None)
+    if src is None:
+        return "G4", f"заглавието не е дословно от днешните новини ({c.get('headline_quote')!r})"
+    basket = next((b for b in config.THESIS_BASKETS if b.get("name") == thesis.get("name")), None)
+    if basket is None or not (basket.get("terms") or basket.get("names")):
+        return None, ""                                                   # тези без котви в конфига (нови/ръчни) — само проверката на цитата
+    if _anchor_match(basket, src) is None:
+        return "G4", f"заглавието «{src}» няма тикър, име на компания или термин на механизма на тезата — не е за нея"
+    return None, ""
+
+
+def _news_gate(thesis: dict, c: dict, status: str, headlines: list[str] | None = None) -> tuple[str | None, str]:
     """
     FIX 2026-09-30: кодови проверки за confirmed/challenged. Първия ден на
     "confirmed" (30.09) 3 от 6 тези бяха "потвърдени" и 1 "опровергана" —
@@ -1008,6 +1047,8 @@ def _news_gate(thesis: dict, c: dict, status: str) -> tuple[str | None, str]:
            23 и 24.09 "опровергана" на теза, която и без това не е активна).
            Тези без тригер (ядрена, крипто/CLARITY, полупроводници) минават
            само проверката на цитата.
+      G4 — (08.10, само ако са подадени `headlines`) headline_quote е дословно заглавие от днешните новини И съдържа тикър, име на компания или термин на механизма на тезата
+           (виж _headline_gate); важи и за двата basis.
     """
     basis = c.get("basis")
     if basis not in ("ticker_event", "chain_step"):
@@ -1034,7 +1075,7 @@ def _news_gate(thesis: dict, c: dict, status: str) -> tuple[str | None, str]:
         if subj not in tickers:
             return "G2", (f"събитието е за {subj or '(не е посочено)'}, а то не е "
                           f"в тезата {sorted(tickers)}")
-        return None, ""
+        return _headline_gate(thesis, c, headlines) if headlines is not None else (None, "")
 
     q = _norm_quote(c.get("chain_quote"))
     if len(q) < 12 or q not in _norm_quote(thesis.get("chain")):
@@ -1045,7 +1086,7 @@ def _news_gate(thesis: dict, c: dict, status: str) -> tuple[str | None, str]:
         return "G3", (f"макро тригерът '{trigger}' не е сработил (статус "
                       f"'{thesis.get('status')}') — стъпката от веригата не се е случила "
                       f"по собственото ни мерене")
-    return None, ""
+    return _headline_gate(thesis, c, headlines) if headlines is not None else (None, "")
 
 
 def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
@@ -1173,14 +1214,19 @@ contract" беше маркирано като потвърждение на т�
 affected_tickers;
 - "chain_quote": при chain_step — ДОСЛОВЕН откъс от "chain" на тезата за \
 стъпката, която се е случила или е блокирана; иначе null;
+- "headline_quote": ДОСЛОВНОТО заглавие от ДНЕШНИТЕ НОВИНИ, което задейства преценката \
+(копирай го знак по знак; кодът го търси в новините и изисква то да съдържа тикър, име \
+на компания или термин на механизма на ТЕЗАТА — новина за друг сектор, която само \
+удовлетворява общата стъпка, не потвърждава тезата; потвърден случай 07.10.2026: \
+газова централа за data center беше маркирана като потвърждение на ядрената теза);
 - "event_type": "contract" | "order" | "budget" | "legislation" | "policy" | \
 "macro_data" | "price_move" | "topic".
 
 Върни JSON за ВСЯКА теза, в същия ред: \
 {{"checks": [{{"name": "...", "news_status": "...", "note": "...", \
 "basis": "...", "subject_ticker": "...", "affected_tickers": [...], \
-"effect": "...", "chain_quote": "...", "event_type": "..."}}]}} — \
-последните шест полета само при confirmed/challenged."""
+"effect": "...", "chain_quote": "...", "headline_quote": "...", "event_type": "..."}}]}} — \
+последните седем полета само при confirmed/challenged."""
 
         out = _parse_json(_call_claude(SYSTEM_THESIS_CHECK, user,
                                        max_tokens=config.THESIS_CHECK_MAX_TOKENS))
@@ -1217,9 +1263,9 @@ affected_tickers;
                       "назовава и двата пътя, игнорирам")
                 annotated.append(t)
                 continue
-            # FIX 2026-09-30: G1–G3 — виж _news_gate(). Само confirmed/challenged.
+            # FIX 2026-09-30: G1–G3 (08.10: + G4) — виж _news_gate(). Само confirmed/challenged.
             if status in ("confirmed", "challenged"):
-                rule, why = _news_gate(t, c, status)
+                rule, why = _news_gate(t, c, status, [h["headline"] for h in compact_news])
                 if rule:
                     print(f"[ai] thesis_reality_check: '{t.get('name')}' {status} "
                           f"ОТХВЪРЛЕНО ({rule}) — {why}")
@@ -1228,6 +1274,8 @@ affected_tickers;
                     if rule == "G3":  # цитатът на модела — за да се вижда разликата
                         entry["chain_quote"] = c.get("chain_quote")
                         entry["chain_quote_norm"] = _norm_quote(c.get("chain_quote"))
+                    if rule == "G4":  # заглавието, което моделът цитира
+                        entry["headline_quote"] = c.get("headline_quote")
                     THESIS_CHECK_DIAG.setdefault("rejected", []).append(entry)
                     annotated.append(t)
                     continue
@@ -1245,7 +1293,7 @@ affected_tickers;
         rejected = THESIS_CHECK_DIAG.get("rejected", [])
         print(f"[ai] thesis_reality_check: {len(annotated)} тези проверени "
               f"срещу {len(news)} новини — {flagged} маркирани, "
-              f"{len(rejected)} отхвърлени от G0–G3"
+              f"{len(rejected)} отхвърлени от G0–G4"
               + (f" {[(r['thesis'], r['rule']) for r in rejected]}" if rejected else ""))
         return annotated
     except Exception as e:

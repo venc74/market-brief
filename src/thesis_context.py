@@ -213,6 +213,29 @@ def _context(th, basket, closes, rotation, regime, positions, action, watchlist,
                          else "watchlist" if sym in watchlist else None)
         rows.append(row)
     sector = _sector(basket, rotation)
-    return {"regime": regime, "sector": sector, "rows": rows,
-            "summary": _summary(rows, sector),
-            "price_diverges": _price_diverges(rows, sector)}
+    ctx = {"regime": regime, "sector": sector, "rows": rows,
+           "summary": _summary(rows, sector),
+           "price_diverges": _price_diverges(rows, sector)}
+    groups = _group_blocks(basket, rows, rotation)
+    if groups:                                    # 08.10 (2в): подгрупи със собствен ориентир и собствено обобщение; предупреждението за цената — ако някоя група се търгува обратно на механизма
+        ctx["groups"] = groups
+        ctx["price_diverges"] = any(g["price_diverges"] for g in groups)
+    return ctx
+
+
+def _group_blocks(basket: dict, rows: list[dict], rotation: list[dict]) -> list[dict]:
+    """
+    Подгрупите на тезата (config.THESIS_BASKETS "groups": име, тикъри, sector_etf[, sector_etf_label]) — за всяка свой ориентир (секторен ETF), собствена таблица и собствено обобщение,
+    сглобено САМО от числата в нейните редове. Група без ред от таблицата се пропуска. Основание (08.10): добивът на уран и операторите/реакторите не се движат заедно — общ ориентир (URA)
+    за всички шест тикъра казва нещо само за добива.
+    """
+    out = []
+    for g in basket.get("groups") or []:
+        syms = set(g.get("tickers") or [])
+        sub = [r for r in rows if r["ticker"] in syms]
+        if not sub:
+            continue
+        sector = _sector(g, rotation)
+        out.append({"name": g.get("name"), "sector": sector, "rows": sub, "summary": _summary(sub, sector),
+                    "price_diverges": _price_diverges(sub, sector)})
+    return out

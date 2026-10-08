@@ -137,6 +137,9 @@
               border-left: 2px solid var(--yellow); padding: 6px 11px; margin: 0 16px 8px; }
   .watch-card .cot-note, .qm-card .cot-note { margin: 6px 0 4px; }
   .opp-note { font-size: 12px; color: var(--yellow); margin-top: 3px; }
+  /* 08.10 (2в): подгрупи в каре "Контекст" */
+  .ctx-group { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--border, rgba(255,255,255,.12)); }
+  .ctx-group-name { font-weight: 600; font-size: 12.5px; margin-bottom: 2px; }
   .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
   .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
     padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
@@ -696,17 +699,16 @@
 {% endif %}{% endif %}{% endmacro %}
 {% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
 {% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
-{% macro thesis_context_box(ctx) %}
-      <div class="thesis-ctx">
-        <div class="ctx-title">Контекст · само данни</div>
-        <div class="ctx-summary">{{ ctx.summary }}</div>
-        <div class="ctx-meta">Режим: <b>{{ ctx.regime }}</b> ·
-          {% if ctx.sector.etf %}Сектор {{ ctx.sector.etf }}{% if ctx.sector.label %} ({{ ctx.sector.label }}){% endif %}:
-            {% if ctx.sector.rs_4w is not none %}RS {{ pct_cell(ctx.sector.rs_4w) }} (4с) / {{ pct_cell(ctx.sector.rs_12w) }} (12с){% else %}няма данни{% endif %}{% if ctx.sector.laggard %} · <span class="neg">изоставащ</span>{% elif ctx.sector.leading %} · <span class="pos">водещ</span>{% endif %}
+{% macro ctx_meta(ctx_regime, sector) %}
+        <div class="ctx-meta">Режим: <b>{{ ctx_regime }}</b> ·
+          {% if sector.etf %}Сектор {{ sector.etf }}{% if sector.label %} ({{ sector.label }}){% endif %}:
+            {% if sector.rs_4w is not none %}RS {{ pct_cell(sector.rs_4w) }} (4с) / {{ pct_cell(sector.rs_12w) }} (12с){% else %}няма данни{% endif %}{% if sector.laggard %} · <span class="neg">изоставащ</span>{% elif sector.leading %} · <span class="pos">водещ</span>{% endif %}
           {% else %}Сектор: —{% endif %}</div>
+{% endmacro %}
+{% macro ctx_table(rows) %}
         <table class="ctx-table">
           <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
-          {% for r in ctx.rows %}
+          {% for r in rows %}
           <tr><td class="mono">{{ r.ticker }}</td>
             {% if r.no_price_data %}<td colspan="3" class="neg">няма ценови данни</td>
             {% else %}<td class="num">{{ pct_cell(r.chg_1m_pct) }}</td><td>{{ ma_cell(r.above_50, r.history_days, 50) }}</td><td>{{ ma_cell(r.above_200, r.history_days, 200) }}</td>{% endif %}
@@ -714,6 +716,25 @@
             <td>{{ r.status or "—" }}</td></tr>
           {% endfor %}
         </table>
+{% endmacro %}
+{% macro thesis_context_box(ctx) %}
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
+        {# 08.10 (2в): тези с подгрупи (уран/добив срещу оператори) — по група собствен ориентир, обобщение и таблица #}
+        {% if ctx.groups %}
+        {% for g in ctx.groups %}
+        <div class="ctx-group">
+          <div class="ctx-group-name">{{ g.name }}</div>
+          <div class="ctx-summary">{{ g.summary }}</div>
+          {{ ctx_meta(ctx.regime, g.sector) }}
+          {{ ctx_table(g.rows) }}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ctx-summary">{{ ctx.summary }}</div>
+        {{ ctx_meta(ctx.regime, ctx.sector) }}
+        {{ ctx_table(ctx.rows) }}
+        {% endif %}
       </div>
 {% endmacro %}
 

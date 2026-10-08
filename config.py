@@ -386,6 +386,9 @@ THESIS_BASKETS = [
         "tickers": ["BTU", "HCC", "AMR", "CNR", "LNG"],
         # една акция (BTU) не измерва сектор → енергетиката като прокси
         "sector_etf": "XLE", "sector_etf_label": "прокси: енергетика",
+        # 08.10 (2в, гейт G4): котви за заглавието на новината — имена на компаниите и термини на механизма; новина без нито една котва не може да "потвърди" или "опровергава" тезата
+        "names": ["Peabody", "Warrior Met", "Alpha Metallurgical", "Core Natural", "Cheniere"],
+        "terms": ["coal", "lng", "liquefied natural gas", "natural gas", "oil", "crude", "brent", "hormuz", "iran", "opec", "energy"],
         "default_status": "watch",
         "trigger": "oil_shock",
         "chain": ("Петролен шок или напрежение в Близкия изток → скок в цената на "
@@ -396,6 +399,15 @@ THESIS_BASKETS = [
         "name": "Ядрена енергия",
         "tickers": ["VST", "CEG", "OKLO", "CCJ", "DNN", "NNE"],
         "sector_etf": "URA",
+        # 08.10 (2в): подгрупи със СОБСТВЕН ориентир — добивът на уран и операторите/реакторите не се движат заедно (общият URA е ориентир само за добива); каре "Контекст" по група
+        "groups": [
+            {"name": "Уран и добив", "tickers": ["CCJ", "DNN"], "sector_etf": "URA"},
+            {"name": "Оператори и реактори", "tickers": ["VST", "CEG", "OKLO", "NNE"], "sector_etf": "XLU", "sector_etf_label": "прокси: комунални услуги"},
+        ],
+        # 08.10 (2в, гейт G4): котви за заглавието. Реален случай 07.10: "Black Hills plans $1.8 billion investment to power Google's data center" (газова централа, BKH не е в тезата)
+        # беше "потвърждение" чрез chain_step — стъпката "AI data center-ите гладуват за базова мощност" е изпълнена и от газова централа; без термин на ядрената верига или компания от тезата — отхвърля се
+        "names": ["Vistra", "Constellation", "Oklo", "Cameco", "Denison", "NANO Nuclear"],
+        "terms": ["nuclear", "uranium", "reactor*", "smr*", "small modular", "enrichment", "fission", "atomic"],
         "default_status": "structural",
         "trigger": None,
         "chain": ("AI data center-ите гладуват за стабилна базова мощност 24/7 → "
@@ -406,6 +418,8 @@ THESIS_BASKETS = [
         "name": "Отбрана и дронове",
         "tickers": ["LMT", "RTX", "NOC", "SWMR"],
         "sector_etf": "ITA",
+        "names": ["Lockheed", "Raytheon", "Northrop", "Swarmer"],
+        "terms": ["defense", "defence", "pentagon", "military", "missile*", "drone*", "navy", "army", "air force", "munition*", "weapon*", "nato", "warfare", "autowarcom"],
         "default_status": "watch",
         "trigger": "geopolitical_stress",
         "chain": ("Геополитическа ескалация → държавите вдигат отбранителни бюджети → "
@@ -416,6 +430,8 @@ THESIS_BASKETS = [
         "name": "Крипто регулация (CLARITY Act)",
         "tickers": ["CRCL", "COIN", "HOOD", "BLSH"],
         "sector_etf": None,  # няма крипто ETF в SECTOR_ETFS → "—"
+        "names": ["Circle", "Coinbase", "Robinhood", "Bullish"],
+        "terms": ["crypto*", "clarity act", "bitcoin", "stablecoin*", "digital asset*", "cftc", "market structure"],
         "default_status": "watch",
         "trigger": None,
         "chain": ("Ясна законодателна рамка (CLARITY Act) → институциите получават "
@@ -426,6 +442,8 @@ THESIS_BASKETS = [
         "name": "Полупроводници и AI инфраструктура",
         "tickers": ["AVGO", "AMAT", "MCHP"],
         "sector_etf": "SMH",
+        "names": ["Broadcom", "Applied Materials", "Microchip"],
+        "terms": ["chip*", "semiconductor*", "ai", "data center*", "gpu*", "foundr*", "wafer*", "lithograph*", "accelerator*", "nvidia", "build-out", "buildout"],
         "default_status": "structural",
         "trigger": None,
         "chain": ("AI build-out → търсене не само на GPU, а на цялата верига: mature-"
@@ -436,6 +454,8 @@ THESIS_BASKETS = [
         "name": "Финанси при стръмна крива",
         "tickers": ["JPM", "BAC"],
         "sector_etf": "XLF",
+        "names": ["JPMorgan", "Bank of America"],
+        "terms": ["yield*", "treasur*", "bond*", "curve", "steepen*", "interest rate*", "rate hike*", "fed", "bank*", "lending", "net interest"],
         "default_status": "watch",
         "trigger": "curve_steepening",
         "chain": ("Кривата се разкривява (дълъг край нагоре) → банките заемат евтино "

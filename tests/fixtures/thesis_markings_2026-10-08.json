@@ -1,0 +1,124 @@
+{
+"_note": "РЕАЛНО: всички приети маркирания confirmed/challenged на проверката на тезите срещу новините (data/2026-*.json, 21.09–08.10) с бележката на модела, която цитира заглавието; секторната ротация на 08.10 за URA, XLU, XLF. Ползва се от test_thesis_g4.py.",
+"markings": [
+{
+"date": "2026-09-23",
+"thesis": "Въглища и LNG",
+"status": "challenged",
+"note": "Петролът пада пети пореден ден и е на път за най-дългата серия от над 12 месеца заради дипломатически преговори между САЩ и Иран ('Oil falls after U.S. and Iran talk for hours at UN meeting'; Иран твърди, че може да отвори Ормузкия проток в рамките на 7 дни), което директно противоречи на сценария за петролен шок/ескалация, задвижващ маржовете на въглища и LNG."
+},
+{
+"date": "2026-09-24",
+"thesis": "Въглища и LNG",
+"status": "challenged",
+"note": "\"Oil prices fall as Iran says it is open to diplomacy to end the war\" и \"Bonds shaky, oil eases off highs amid trade, peace talks\" — дипломатическият сигнал от Иран намалява геополитическото напрежение, което е тригерът в механизма (петролен шок/близкоизточно напрежение → скок в цената → въглища/LNG поемат търсенето); ако напрежението се разведри, механизмът губи своята задействаща причина."
+},
+{
+"date": "2026-09-30",
+"thesis": "Финанси при стръмна крива",
+"status": "confirmed",
+"note": "\"30-year Treasury bond yield scales to highest level since 2002\" директно потвърждава разкривяването на кривата — дългият край расте, което е първата стъпка в механизма за разширяване на NIM при JPM и BAC."
+},
+{
+"date": "2026-09-30",
+"thesis": "Полупроводници и AI инфраструктура",
+"status": "challenged",
+"note": "\"DeepSeek partners with Huawei to develop chip programming tools, reducing reliance on Nvidia\" сигнализира алтернативен хардуерен стек извън западната верига, което директно подкопава предпоставката, че AI build-out неизбежно минава през AVGO/AMAT/MCHP."
+},
+{
+"date": "2026-09-30",
+"thesis": "Въглища и LNG",
+"status": "confirmed",
+"note": "\"Oil gains after Trump denies he is willing to ease sanctions on Iran\" и \"EU nations seek energy alternatives after spending over $113 billion extra since Iran war began\" потвърждават геополитическото напрежение и търсенето на алтернативни енергийни източници, което е ключовата стъпка в механизма за BTU, HCC, AMR, LNG."
+},
+{
+"date": "2026-09-30",
+"thesis": "Отбрана и дронове",
+"status": "confirmed",
+"note": "\"Boeing wins US Navy's next-generation fighter contract, Pentagon says\" потвърждава, че отбранителни поръчки с дългосрочен backlog продължават да се реализират, което валидира механизма за LMT, RTX, NOC."
+},
+{
+"date": "2026-10-01",
+"thesis": "Финанси при стръмна крива",
+"status": "confirmed",
+"note": "\"Global bond sell-off deepens as Asian yields jump\" и \"Most US stocks fall after the bond market cranks the pressure higher\" показват, че дългият край на кривата расте — дословно описаната в chain първа стъпка."
+},
+{
+"date": "2026-10-02",
+"thesis": "Финанси при стръмна крива",
+"status": "confirmed",
+"note": "\"Global bond market steadies after sharp sell-off\" и \"Heavy selling this week pushed 10-year US Treasury yields to their highest level since 2002\" — дългият край расте рязко, което е дословно описаната стъпка в chain за разкривяване на кривата."
+},
+{
+"date": "2026-10-02",
+"thesis": "Отбрана и дронове",
+"status": "confirmed",
+"note": "\"US Navy awards RTX's Raytheon $24.4 billion contract for Standard Missile-6 amid stockpile concerns\" — конкретен многомилиарден договор пряко за RTX, тикър от тезата."
+},
+{
+"date": "2026-10-06",
+"thesis": "Ядрена енергия",
+"status": "confirmed",
+"note": "\"Google, Constellation near deal for nuclear power\" — конкретна стъпка по веригата: AI data center търси стабилна базова мощност и се насочва към ядрена енергия от CEG."
+},
+{
+"date": "2026-10-06",
+"thesis": "Полупроводници и AI инфраструктура",
+"status": "confirmed",
+"note": "\"Wall Street banks launch record $60bn chip deal for Broadcom and Anthropic\" — директно финансиране на AI build-out свързано с AVGO, потвърждавайки търсенето по веригата."
+},
+{
+"date": "2026-10-06",
+"thesis": "Крипто регулация (CLARITY Act)",
+"status": "challenged",
+"note": "\"The CLARITY Act failed in the Senate\" (от новина \"Fairshake crypto PAC network backs 32 House candidates in midterms\") — законодателният механизъм, описан в тезата, е спрян."
+},
+{
+"date": "2026-10-07",
+"thesis": "Ядрена енергия",
+"status": "confirmed",
+"note": "\"Black Hills plans $1.8 billion investment to power Google's data center\" показва пряко търсене на базова мощност за AI data centers, потвърждавайки стъпката от веригата; допълнително \"Robust AI spending sets investors up for another bumper US earnings season\" потвърждава продължаващия AI build-out като двигател на търсенето на енергия."
+},
+{
+"date": "2026-10-07",
+"thesis": "Полупроводници и AI инфраструктура",
+"status": "confirmed",
+"note": "\"SpaceX looks to raise $40bn to buy Nvidia chips in financing led by Apollo\" демонстрира масивно продължаващо търсене по цялата AI инфраструктурна верига, потвърждавайки стъпката \"AI build-out → търсене на цялата верига\"."
+}
+],
+"rotation_2026_10_08": [
+{
+"etf": "XLU",
+"sector": "Комунални услуги",
+"rs_chg_4w_pct": -5.54,
+"rs_chg_12w_pct": -11.55,
+"rs_at_6m_high": false,
+"abs_chg_4w_pct": -3.46,
+"leading": false,
+"laggard_persistence_pct": 100.0,
+"confirmed_laggard": true
+},
+{
+"etf": "XLF",
+"sector": "Финанси",
+"rs_chg_4w_pct": -7.5,
+"rs_chg_12w_pct": -6.18,
+"rs_at_6m_high": false,
+"abs_chg_4w_pct": -5.47,
+"leading": false,
+"laggard_persistence_pct": 60.0,
+"confirmed_laggard": false
+},
+{
+"etf": "URA",
+"sector": "Уран/ядрена",
+"rs_chg_4w_pct": -16.62,
+"rs_chg_12w_pct": -9.96,
+"rs_at_6m_high": false,
+"abs_chg_4w_pct": -14.79,
+"leading": false,
+"laggard_persistence_pct": 95.0,
+"confirmed_laggard": true
+}
+]
+}
