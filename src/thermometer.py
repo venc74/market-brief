@@ -470,10 +470,12 @@ def market_breadth() -> dict:
       10-20%  жълто — приближава капитулация
       <10%    "red" МЕХАНИЧНО (участва в regime броенето като останалите
               индикатори — краткосрочен breadth collapse си остава risk-off
-              сигнал за самия термометър), НО текстовият тон е explicit
-              contrarian bullish ("исторически bottoming зона"), не паника
-              — приложено само към label текста, не към status полето
-              (изричен избор — виж дискусията с юзъра, 2026-08-15).
+              сигнал за самия термометър). Текстът (09.10.2026): "oversold,
+              вероятен отскок — не е сигнал за дъно" + измерената цифра
+              (config.BREADTH_OVERSOLD_STATS: 8 от 17 епизода са последвани от
+              ≥5% по-ниско затваряне на SPY за 3 месеца) — приложено само към
+              label текста, не към status полето. До 09.10 текстът казваше
+              "исторически bottoming зона, contrarian bullish".
 
     Graceful: провал на universe fetch, batch download, или под sanity
     прага BREADTH_MIN_VALID_TICKERS валидни тикъри → hide=True, same
@@ -520,7 +522,9 @@ def market_breadth() -> dict:
                 "status": "yellow", "hide": True, "label": ""}
 
     if pct < config.BREADTH_CAPITULATION_THRESHOLD:
-        status, note = "red", "extreme капитулация — исторически bottoming зона, contrarian bullish"
+        st = config.BREADTH_OVERSOLD_STATS
+        status, note = "red", (f"oversold, вероятен отскок — не е сигнал за дъно: в {st['lower_5pct']} от {st['episodes']} исторически епизода "
+                               f"(собствен breadth, 2006–2026) SPY е затворил поне 5% по-ниско в следващите 3 месеца")
     elif pct < config.BREADTH_HEALTHY_LOW:
         status, note = "yellow", "приближава капитулация"
     elif pct < config.BREADTH_WEAK_THRESHOLD:

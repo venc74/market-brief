@@ -1122,14 +1122,20 @@ CORE_PCE_STALENESS_DAYS = int(os.getenv("CORE_PCE_STALENESS_DAYS", 75))
 # грешки, 0 rate limiting (виж experiments discussion 2026-08-15).
 # Mean-reverting zoни: 20-80% = здравословно,
 # >80% = overbought, 10-20% = приближава капитулация, <10% = механично "red"
-# за термометъра, НО contrarian-bullish текстов тон (историческа bottoming
-# зона), не паника.
+# за термометъра. Текстът на <10% (09.10.2026, решение по проучването на Eric Wish): "oversold, вероятен
+# отскок — не е сигнал за дъно" + измерената цифра BREADTH_OVERSOLD_STATS — Wish ползва T2108 <10% като
+# oversold флаг, не като вход (входът му е GMI, който изостава), а при нашия собствен breadth първият ден
+# на 17 епизода под 10% (2006–2026) е последван от поне 5% по-ниско затваряне на SPY в 8 от тях.
 ENABLE_MARKET_BREADTH = os.getenv("ENABLE_MARKET_BREADTH", "1") == "1"
 BREADTH_BATCH_SIZE = int(os.getenv("BREADTH_BATCH_SIZE", 50))
 BREADTH_MIN_VALID_TICKERS = int(os.getenv("BREADTH_MIN_VALID_TICKERS", 200))  # sanity floor преди да се доверим на %-а
 BREADTH_OVERBOUGHT_THRESHOLD = float(os.getenv("BREADTH_OVERBOUGHT_THRESHOLD", 80.0))
 BREADTH_HEALTHY_LOW = float(os.getenv("BREADTH_HEALTHY_LOW", 20.0))
 BREADTH_CAPITULATION_THRESHOLD = float(os.getenv("BREADTH_CAPITULATION_THRESHOLD", 10.0))
+# Измерено (собствен breadth % над 40dMA върху днешния универс на S&P500+NDX100+MidCap400, оцеляване; 5184 общи сесии 2006-03-01 → 2026-10-07; fixture tests/fixtures/breadth_spy_2006-2026-10-07.csv,
+# проверка в test_breadth_oversold_text.py): 17 епизода (първи ден под 10%, нов епизод след >20 сесии пауза); в следващите 63 сесии SPY е затворил поне 5% под затварянето на първия ден в 8 от 17,
+# изобщо по-ниско затваряне — в 16 от 17. Не е оценка на предимство, а ограничение на текста.
+BREADTH_OVERSOLD_STATS = {"episodes": 17, "lower_5pct": 8, "lower_any": 16, "sessions": 63}
 # FIX 2026-09-28: 20–40% вече е жълто "слаба/тясна ширина", не зелено
 # "здравословна" — 67% (17.08) → 22.5% (28.09) при SPY близо до върха беше
 # показвано като здравословно. Проверено върху 14-те дни под 40% (09–28.09):
