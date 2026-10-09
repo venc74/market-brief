@@ -1053,6 +1053,8 @@
     {% for name, g in qb.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if qb.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
     {% endif %}
     {% if qb.needs_review %}<br><span style="color:var(--yellow)">⚠ {{ qb.needs_review }} запис(а) със сплит след входа — не се коригират, нужен е ръчен преглед.</span>{% endif %}
+    {% if qb.get("before_rule") %}<br><span style="color:var(--muted)">Извън статистиката: {{ qb.before_rule }} запис(а) от преди правилото „нивото най-много {{ qb.max_dist_adr|round|int }}×ADR над затварянето“ (в сила от {{ qb.rule_from }}) — пазят се, но не влизат в броя, процентите и средните:
+      {% for r in qb.before_rule_rows %}{{ r.ticker }} ({{ r.entry_date[8:10] }}.{{ r.entry_date[5:7] }}, {{ "%.2f"|format(r.dist_adr) }} ADR до нивото, {{ {"not_triggered": "не се задейства", "pending": "чакаше", "open": "отворен", "trailing": "отворен", "stopped": "стоп", "trailing_stop_exit": "trailing изход", "expired": "изтекъл", "skipped_extended": "пропуснат (гап)", "skipped_adr": "пропуснат (стоп над границата)"}.get(r.status, r.status) }}){{ ", " if not loop.last else "" }}{% endfor %}.</span>{% endif %}
   </div>
   {% if qb.live %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ qb.live|length }}):</div>

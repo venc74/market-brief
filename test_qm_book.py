@@ -23,6 +23,7 @@ backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 config.ENABLE_BACKTEST = True
 config.QM_TRACK_FROM = ""                                                                       # тук се тества книгата; guard-ът по дата има собствен тест (test_qm_start_guard.py)
+config.QM_MAX_DIST_RULE_FROM = ""                                                                  # тук се тества книгата върху механични сетъпи от преди 09.10; правилото "преди 1×ADR" има собствен тест (test_qm_before_rule.py)
 backtest.enrich.earnings_recap = lambda t: None
 backtest._unapplied_splits = lambda rec: []
 

@@ -21,6 +21,7 @@ config.DOCS_DIR, config.DATA_DIR = pathlib.Path(tmp.name) / "docs", pathlib.Path
 config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 config.QM_TRACK_FROM = ""                                                                           # guard-ът по дата има собствен тест (test_qm_start_guard.py)
+config.QM_MAX_DIST_RULE_FROM = ""                                                                  # тук се тества книгата върху механични сетъпи от преди 09.10; правилото "преди 1×ADR" има собствен тест (test_qm_before_rule.py)
 
 FIX = json.loads((ROOT / "tests" / "fixtures" / "qm_frames_2026-10-02.json").read_text(encoding="utf-8"))
 EPF = json.loads((ROOT / "tests" / "fixtures" / "qm_ep_2026-10-02.json").read_text(encoding="utf-8"))

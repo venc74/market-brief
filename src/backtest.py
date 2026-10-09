@@ -1155,6 +1155,24 @@ def get_buystop_summary() -> dict:
     }
 
 
+def qm_before_rule(rec: dict) -> float | None:
+    """
+    Запис от книгата qm_breakout, направен ПРЕДИ правилото "нивото най-много QM_MAX_DIST_ADR × ADR над затварянето" (датата на брифа < config.QM_MAX_DIST_RULE_FROM) и с ниво по-далеч от границата → разстоянието в ADR,
+    иначе None. Смята се от съхранените полета (buy_stop, signal_price, adr) със същата формула като скенера (pct_to_trigger ÷ ADR, 2 знака) — записът не се променя и не се трие; get_qm_summary го държи
+    извън статистиката. Липсващи/неверни полета → None (не се изключва нищо по догадка).
+    """
+    try:
+        if rec.get("entry_date") is None or not config.QM_MAX_DIST_RULE_FROM or rec["entry_date"] >= config.QM_MAX_DIST_RULE_FROM:
+            return None
+        lvl, px, adr = float(rec["buy_stop"]), float(rec["signal_price"]), float(rec["adr"])
+        if not (lvl > 0 and px > 0 and adr > 0):
+            return None
+        dist = round((lvl / px - 1) * 100 / adr, 2)
+        return dist if dist > config.QM_MAX_DIST_ADR + 1e-9 else None
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
 def get_qm_summary() -> dict:
     """
     Qullamaggie: обобщение на ОТДЕЛНАТА книга "qm_breakout" (отделна стратегия — измерване, не препоръка). Чисто локално четене (без мрежа). Win rate (интервал на Wilson), медианата на R и
@@ -1164,7 +1182,9 @@ def get_qm_summary() -> dict:
     if not config.TRACK_QM:
         return {}
     tracker = _load_tracker()
-    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_QM]
+    all_records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_QM]
+    before_rule = [(r, qm_before_rule(r)) for r in all_records]
+    records = [r for r, d in before_rule if d is None]                       # записите "преди правилото за 1×ADR" са извън статистиката (пазят се в tracker-а)
 
     def intervals(cat_fn, exclude=()):
         d: dict = {}
@@ -1234,6 +1254,8 @@ def get_qm_summary() -> dict:
         "big_winners_5r": sum(1 for x in ro if x > 5) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
+        "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
+        "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
     }
 
 
