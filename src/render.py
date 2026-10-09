@@ -92,6 +92,12 @@ def _ew_html(card: dict) -> str:
     return f'<br><span style="color:#b45309;font-size:12px">{_e(w["text"])}</span>' if w and w.get("text") else ""
 
 
+def _corp_html(card: dict) -> str:
+    """Маркерът за корпоративно действие (corp_actions) като ред под картата в имейла; без маркер → празно."""
+    ca = (card or {}).get("corp_action")
+    return f'<br><span style="color:#b45309;font-size:12px">{_e(ca["text"])}</span>' if ca and ca.get("text") else ""
+
+
 def _cot_html(card: dict) -> str:
     """Бележките за обратен залог (cot_opposites) като редове под картата в имейла; без бележки → празно."""
     return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(n.get("text"))}</span>' for n in ((card or {}).get("cot_notes") or []) if n.get("text"))
@@ -265,7 +271,7 @@ def _qm_email_block(brief: dict) -> str:
                          f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
-                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}{_cot_html(c)}</td></tr>')
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}{_corp_html(c)}{_cot_html(c)}</td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'
@@ -340,6 +346,7 @@ def render_email(brief: dict) -> str:
         mk = f'<div style="margin-top:4px">{mk}</div>' if mk else ""
         ew = st.get("earnings_warning")
         earn_line = f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>' if ew else ""
+        earn_line += _corp_html(st)
         rows += f"""
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;

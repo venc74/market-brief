@@ -36,6 +36,7 @@ from src import setup_rules
 from src import earnings_move
 from src import glb_screener
 from src import watchlist_exits
+from src import corp_actions
 from src import qm_breakout
 from src import cot_opposites
 from src import qm_ep
@@ -798,6 +799,10 @@ def run() -> dict:
         except Exception as e:
             print(f"[splits] отчетът се провали: {e}")
 
+    # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
+    corp_diag = corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)
+    print(f"      Корпоративни действия: проверени {corp_diag['checked']} тикъра, маркирани {[f['ticker'] for f in corp_diag['flagged']]}" + ("" if corp_diag["ok"] else f" — ПРОВАЛ: {corp_diag['error']}"))
+
     brief = {
         "date": today,
         "macro": macro,
@@ -806,7 +811,8 @@ def run() -> dict:
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
-                                               superinvestor_status=superinvestor_status),
+                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag),
+        "corp_actions": corp_diag,
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +

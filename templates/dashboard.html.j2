@@ -132,6 +132,9 @@
   .earn-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
                border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
   .watch-card .earn-warn { margin: 6px 0 4px; }
+  /* 09.10: корпоративно действие (отделяне / нецял сплит коефициент) — историята около датата е приблизителна; само информация */
+  .corp-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08); border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  .watch-card .corp-warn, .qm-card .corp-warn, .glb-card .corp-warn { margin: 6px 0 4px; }
   /* 08.10: бележка за обратен залог — COT тезата казва обратното на сетъпа (сглобена от кода, само информация) */
   .cot-note { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.06);
               border-left: 2px solid var(--yellow); padding: 6px 11px; margin: 0 16px 8px; }
@@ -843,6 +846,7 @@
       Това е <strong>нов вход</strong>, не продължение на старата теза.</div>
     {% endif %}
     {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+    {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
     {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
     <div class="stock-body">
       <div class="block">
@@ -952,6 +956,7 @@
         {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+      {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
       {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <p>{{ st.ai.why_now }}</p>
       {# 07.10: жив запис в книгата, задействан (open/trailing) — картата казва изпълнения сигнал, не "чака пробив" #}
@@ -1006,6 +1011,7 @@
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company|cname(34) }}</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
+      {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
       {% for n in c.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <div class="qm-kv">
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
@@ -1186,6 +1192,7 @@
       {% if g.ath_label == 'new_high_since_listing' %}
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
+      {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
@@ -1219,6 +1226,7 @@
       {% if g.ath_label == 'new_high_since_listing' %}
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
+      {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}

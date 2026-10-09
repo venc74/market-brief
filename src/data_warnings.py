@@ -78,6 +78,14 @@ def _ep_warning(ep: dict | None) -> list[dict]:
              "message": (f"EP наблюдение (after-hours): {d['batches_failed']} от {d.get('batches')} партиди тикъри не се изтеглиха — списъкът с гапове може да е непълен.")}]
 
 
+def _corp_warning(diag: dict | None) -> list[dict]:
+    """Проверката за корпоративни действия (маркерът ⚠ върху картите): паднала проверка не бива да се чете като "няма събития"."""
+    if not diag or diag.get("ok", True):
+        return []
+    return [{"source": "corp_actions", "level": "warn",
+             "message": (f"Корпоративни действия: проверката не се изпълни ({diag.get('error') or 'Yahoo не върна данни'}) — липсата на маркер ⚠ върху картите днес НЕ значи, че няма отделяне или сплит с нецял коефициент.")}]
+
+
 def _13f_warnings(status: dict | None) -> list[dict]:
     """
     13F пакет (07.10): мениджъри с покритие на акциите под прага — "нова/увеличена" не се показва за тях (не значи "няма покупки").
@@ -96,7 +104,7 @@ def _13f_warnings(status: dict | None) -> list[dict]:
 
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
-            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None) -> list[dict]:
+            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -134,4 +142,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_qm_warning(qm_diag))
     out.extend(_ep_warning(qm_ep))
     out.extend(_13f_warnings(superinvestor_status))
+    out.extend(_corp_warning(corp_diag))
     return out
