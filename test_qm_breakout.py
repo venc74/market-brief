@@ -166,20 +166,15 @@ assert all(t not in by for t in ("AAPL", "NVDA", "MSFT", "TSLA", "PVH"))
 
 print()
 print("── теглене на данни (подменено yf.download върху РЕАЛНИТЕ кадри) ──")
-def multi(tickers, splits=None):
-    parts = {}
-    for t in tickers:
-        df = REAL[t].copy()
-        df["Stock Splits"] = 0.0
-        if splits and t in splits:
-            df.loc[df.index[-60], "Stock Splits"] = splits[t]
-        parts[t] = df
-    return pd.concat(parts, axis=1)
+def multi(tickers):
+    return pd.concat({t: REAL[t].copy() for t in tickers}, axis=1)
 
 
 calls = []
 flat_single = [True]
+dl_kwargs = []
 def fake_download(batch, **kw):
+    dl_kwargs.append(kw)
     calls.append(list(batch))
     if "BOOM" in batch:
         raise RuntimeError("Yahoo недостъпен")
@@ -197,11 +192,9 @@ assert sorted(fr2) == ["AAPL"] and len(fr2["AAPL"]) == len(REAL["AAPL"])
 fr, st = q.fetch_frames(["DOCN", "BOOM"], batch_size=1)
 assert sorted(fr) == ["DOCN"] and st == {"batches": 2, "batches_failed": 1}
 print("  ✓ теглене на партиди: кадрите съвпадат с реалните; провалена партида се брои (batches_failed) и не спира останалите")
-# split корекция
-sp = q.split_adjust(multi(["CORT"], {"CORT": 2.0})["CORT"])
-raw = REAL["CORT"]
-assert abs(sp["Close"].iloc[-61] - raw["Close"].iloc[-61] / 2) < 1e-9 and abs(sp["Volume"].iloc[-61] - raw["Volume"].iloc[-61] * 2) < 1e-6 and sp["Close"].iloc[-1] == raw["Close"].iloc[-1]
-print("  ✓ split 2:1 на 60 бара назад: цените преди сплита ÷ 2, обемът × 2, след сплита — непроменено")
+# без ръчна split корекция (09.10.2026): Yahoo вече е коригирал сплитовете — виж test_qm_split_not_doubled.py (реални данни)
+assert not hasattr(q, "split_adjust") and all("actions" not in kw for kw in dl_kwargs) and all(kw.get("auto_adjust") is False for kw in dl_kwargs)
+print("  ✓ няма split_adjust и actions=True: теглене с auto_adjust=False, кадрите са каквито ги връща Yahoo")
 # незавършена сесия
 df = REAL["CORT"]
 last = df.index[-1]

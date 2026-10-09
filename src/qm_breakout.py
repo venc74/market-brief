@@ -171,23 +171,10 @@ def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None =
 # ──────────────────────────────────────────────────────────────────────────
 # Мрежа: собствено теглене на дневни данни (като GLB; не зависи от скрийнъра)
 # ──────────────────────────────────────────────────────────────────────────
-def split_adjust(df: pd.DataFrame) -> pd.DataFrame:
-    """Само split корекция върху суровите OHLCV (цените преди сплита ÷ коефициента, обемът × коефициента); цените НЕ са коригирани за дивиденти — нивото на пробива е реалната котировка."""
-    if "Stock Splits" not in df.columns:
-        return df
-    sp = df["Stock Splits"]
-    sp = sp[(sp != 0) & sp.notna()]
-    if sp.empty:
-        return df
-    df = df.copy()
-    for d, ratio in sp.items():
-        if not ratio or ratio == 1:
-            continue
-        m = df.index < d
-        for k in ("Open", "High", "Low", "Close"):
-            df.loc[m, k] = df.loc[m, k] / ratio
-        df.loc[m, "Volume"] = df.loc[m, "Volume"] * ratio
-    return df
+# Цените са такива, каквито ги връща Yahoo при yf.download(..., auto_adjust=False): коригирани за сплитове, НЕ за дивиденти — нивото на пробива е реалната котировка. БЕЗ ръчна корекция за сплитове:
+# Yahoo Close/Open/High/Low И Volume са вече ретроактивно коригирани (NVDA 07.06.2024 = 120.89; медианният обем на NVDA, AAPL и AMZN около сплита не скача ×коефициент), а старата `split_adjust` (цените ÷ коефициента, обемът × коефициента)
+# ги коригираше втори път. Ефект върху скенера (09.10.2026, РЕАЛНИ данни): акции със сплит или корекция от отделяне в последните ~6 месеца изглеждаха като лидери (CVNA 126-дневен ръст +280% вместо −24%, MLI +80% вместо −10%,
+# MIDD +36% вместо +9%) → фалшиви кандидати 15.07, 20.07 и 05.08; пропуснати кандидати — никога. Функцията и колоната "Stock Splits" (actions=True) са махнати; тест: test_qm_split_not_doubled.py.
 
 
 def drop_incomplete(df: pd.DataFrame, now_utc: dt.datetime | None = None) -> pd.DataFrame:
@@ -212,7 +199,7 @@ def fetch_frames(universe: list[str], batch_size: int = 100, now_utc: dt.datetim
         batch = universe[i:i + batch_size]
         st["batches"] += 1
         try:
-            data = yf.download(batch, period="1y", progress=False, auto_adjust=False, actions=True, group_by="ticker", threads=True)
+            data = yf.download(batch, period="1y", progress=False, auto_adjust=False, group_by="ticker", threads=True)
             if data is None or data.empty:
                 raise ValueError("празен резултат")
         except Exception as e:
@@ -222,7 +209,7 @@ def fetch_frames(universe: list[str], batch_size: int = 100, now_utc: dt.datetim
         for sym in batch:
             try:
                 df = (data[sym] if isinstance(data.columns, pd.MultiIndex) else data).dropna(subset=["Close", "High", "Low"])      # един тикър в партида → понякога плоски колони
-                df = drop_incomplete(split_adjust(df), now_utc)
+                df = drop_incomplete(df, now_utc)
                 if len(df) >= MIN_BARS:
                     frames[sym] = df[["Open", "High", "Low", "Close", "Volume"]].dropna()
             except Exception:
