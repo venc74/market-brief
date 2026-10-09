@@ -67,6 +67,7 @@ _SECTION_LABELS = {
     "short_thesis_global_context": "Short контекст",
     "significant_news": "Значими новини",
     "_probe": "Проверка на модела",
+    "ep_catalyst_call": "EP катализатор",                    # 09.10: qm_ep.ep_catalyst_call (преди — lambda → "<lambda>")
 }
 
 

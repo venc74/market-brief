@@ -246,6 +246,15 @@ def _build_prompt(batch: list[dict]) -> str:
             f"Връщай само JSON: {{\"items\": [{{\"ticker\": \"...\", \"catalyst\": \"...\", \"summary_bg\": \"...\", \"surprise\": \"...\"}}]}}")
 
 
+def ep_catalyst_call(system: str, user: str) -> str:
+    """
+    AI извикването за катализатора на EP. Нарочно ИМЕНУВАНА функция, не lambda: ai_brief._call_claude етикетира секцията в brief["ai_usage"] по името на извикващата функция (ai_brief._SECTION_LABELS),
+    а lambda излизаше като "<lambda>" (09.10.2026). Импортът е тук, за да остане graceful пътят на classify_catalysts (липсващ ai_brief → бележка, без падане).
+    """
+    from src import ai_brief
+    return ai_brief._call_claude(system, user, max_tokens=1500)
+
+
 def classify_catalysts(rows: list[dict], ai_call=None, batch_size: int = 5) -> tuple[dict[str, dict], list[str]]:
     """
     AI класифицира катализатора от заглавията — на batch-ове (правило 4 от CLAUDE.md); отговорът минава през verify_ai_item. Редове без заглавия не се пращат ("unknown", без AI).
@@ -262,7 +271,7 @@ def classify_catalysts(rows: list[dict], ai_call=None, batch_size: int = 5) -> t
     if ai_call is None:
         try:
             from src import ai_brief
-            ai_call = lambda system, user: ai_brief._call_claude(system, user, max_tokens=1500)
+            ai_call = ep_catalyst_call
             parse = ai_brief._parse_json
         except Exception as e:
             notes.append(f"AI не е достъпен ({type(e).__name__})")

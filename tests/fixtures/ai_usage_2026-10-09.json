@@ -1,0 +1,82 @@
+[
+ {
+  "section": "Значими новини",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 6116,
+  "output_tokens": 687,
+  "max_tokens": 2000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "Макро бриф и секторна карта",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 7491,
+  "output_tokens": 1649,
+  "max_tokens": 8000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "Проверка на тезите срещу новините",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 10123,
+  "output_tokens": 301,
+  "max_tokens": 2000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "Тикър наративи",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 4649,
+  "output_tokens": 3506,
+  "max_tokens": 8000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "Тикър наративи",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 3068,
+  "output_tokens": 1316,
+  "max_tokens": 8000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "COT тези",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 3021,
+  "output_tokens": 1464,
+  "max_tokens": 4000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "COT тези",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 3012,
+  "output_tokens": 1290,
+  "max_tokens": 4000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "COT тези",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 2994,
+  "output_tokens": 1991,
+  "max_tokens": 4000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "COT тези",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 3004,
+  "output_tokens": 1921,
+  "max_tokens": 4000,
+  "stop_reason": "end_turn"
+ },
+ {
+  "section": "<lambda>",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 592,
+  "output_tokens": 94,
+  "max_tokens": 1500,
+  "stop_reason": "end_turn"
+ }
+]
