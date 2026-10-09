@@ -11,6 +11,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import names
+from src import watchlist_exits
 from src import cot_theses
 
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
@@ -164,6 +165,7 @@ def render_dashboard(brief: dict) -> str:
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         action=brief["action"],
         watchlist=brief["watchlist"],
+        watchlist_exits=brief.get("watchlist_exits") or {}, watchlist_exits_label=watchlist_exits.label(brief.get("watchlist_exits") or {}, brief.get("date") or ""),
         # v2 нови блокове
         theses=brief.get("theses", []),
         watch=brief.get("watch", []),
@@ -366,6 +368,10 @@ def render_email(brief: dict) -> str:
                   Днес няма Action кандидати. Кешът е позиция.</td></tr>""")
 
     watch = ", ".join(_e(st["ticker"]) for st in brief["watchlist"]) or "—"
+    wx = brief.get("watchlist_exits") or {}
+    watch_exits = ("" if not wx.get("from") else
+                   f'<br><b>Излязоха от {_e(watchlist_exits.label(wx, brief.get("date") or ""))}:</b> '
+                   + ("; ".join(f'{_e(r["ticker"])}: {_e(r["reason"])}' + (f' (вчера: {_e(r["yesterday"])})' if r.get("yesterday") else "") for r in wx.get("rows", [])) or "няма"))
     dot_color = {"green": "#0e9f6e", "yellow": "#d97706", "red": "#dc2626"}
     thermo_dots = "".join(
         f'<span title="{_e(i["name"])}{" (информативен, не се брои)" if i.get("informational") else ""}" '
@@ -465,7 +471,7 @@ def render_email(brief: dict) -> str:
   </td></tr>
 
   <tr><td style="padding:14px 28px;font-size:13px;color:#374151">
-    <b>Watchlist:</b> <span style="font-family:monospace">{watch}</span>
+    <b>Watchlist:</b> <span style="font-family:monospace">{watch}</span>{watch_exits}
   </td></tr>
 
   {qm_block}

@@ -1,0 +1,167 @@
+{
+ "_note": "РЕАЛНО: Watchlist на брифа от 08.10.2026 (тикър, сетъп с числата на кода) и тикърите на Watchlist/Action от брифа на 09.10.2026; explain = РЕАЛНИЯТ изход на screener.explain_exits(['AMD','DINO','KEYS','VLO']), пуснат върху живи данни на Yahoo на 09.10.2026 (запис, не изчисление в теста).",
+ "date_prior": "2026-10-08",
+ "date_today": "2026-10-09",
+ "prior_watchlist": [
+  {
+   "ticker": "ZBRA",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": -0.05,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 405.54,
+    "valid_through": "2026-10-14",
+    "struct_stop": 337.61,
+    "struct_risk_pct": 12.59,
+    "stop": 355.33,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($341.02 −1% = $337.61) е 12.6% под входа (> 10%) — не се купува, докато базата не се стегне."
+   }
+  },
+  {
+   "ticker": "ANET",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 0.44,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 225.63,
+    "valid_through": "2026-10-14",
+    "struct_stop": 191.05,
+    "struct_risk_pct": 11.48,
+    "stop": 198.56,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($192.98 −1% = $191.05) е 11.5% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.83× < 1.5×)."
+   }
+  },
+  {
+   "ticker": "AMD",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 1.07,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 670.95,
+    "valid_through": "2026-10-14",
+    "struct_stop": 522.32,
+    "struct_risk_pct": 19.13,
+    "stop": 594.19,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($527.60 −1% = $522.32) е 19.1% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.83× < 1.5×)."
+   }
+  },
+  {
+   "ticker": "VLO",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 1.21,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 439.99,
+    "valid_through": "2026-10-14",
+    "struct_stop": 361.31,
+    "struct_risk_pct": 14.81,
+    "stop": 390.17,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($364.96 −1% = $361.31) е 14.8% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.60× < 1.5×)."
+   }
+  },
+  {
+   "ticker": "DINO",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": -2.33,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 124.31,
+    "valid_through": "2026-10-14",
+    "struct_stop": 101.97,
+    "struct_risk_pct": 13.87,
+    "stop": 108.92,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($103.00 −1% = $101.97) е 13.9% под входа (> 10%) — не се купува, докато базата не се стегне."
+   }
+  },
+  {
+   "ticker": "KEYS",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 3.96,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 385.22,
+    "valid_through": "2026-10-14",
+    "struct_stop": 324.69,
+    "struct_risk_pct": 14.87,
+    "stop": 350.91,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($327.97 −1% = $324.69) е 14.9% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.85× < 1.5×)."
+   }
+  },
+  {
+   "ticker": "FTNT",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 4.36,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 190.44,
+    "valid_through": "2026-10-14",
+    "struct_stop": 164.43,
+    "struct_risk_pct": 13.13,
+    "stop": 174.14,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($166.09 −1% = $164.43) е 13.1% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.84× < 1.5×)."
+   }
+  },
+  {
+   "ticker": "NTAP",
+   "setup": {
+    "kind": "too_wide",
+    "eligible": false,
+    "gate": "too_wide",
+    "pct_from_pivot": 8.74,
+    "volume_ok": false,
+    "buy_stop": null,
+    "max_chase": 227.65,
+    "valid_through": "2026-10-14",
+    "struct_stop": 188.98,
+    "struct_risk_pct": 19.85,
+    "stop": 216.91,
+    "risk_pct": 8.0,
+    "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($190.89 −1% = $188.98) е 19.9% под входа (> 10%) — не се купува, докато базата не се стегне. Също extended: +8.7% над pivot $216.81."
+   }
+  }
+ ],
+ "today_watchlist": [
+  "EXPD",
+  "ANET",
+  "ZBRA",
+  "AMG",
+  "PSX",
+  "FTNT",
+  "NTAP"
+ ],
+ "today_action": [],
+ "explain": {
+  "AMD": "RS линия 95.2% от 52-седмичния максимум < 97%",
+  "DINO": "база с дълбочина 36.4% (над 35%)",
+  "KEYS": "RS линия 96.7% от 52-седмичния максимум < 97%",
+  "VLO": "база с дълбочина 37.4% (над 35%)"
+ }
+}

@@ -35,6 +35,7 @@ from src import entry_timing
 from src import setup_rules
 from src import earnings_move
 from src import glb_screener
+from src import watchlist_exits
 from src import qm_breakout
 from src import cot_opposites
 from src import qm_ep
@@ -558,6 +559,9 @@ def run() -> dict:
         print(f"[main] предупрежденията за отчети пропуснати: {type(e).__name__}: {e}")
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
+    # 09.10: "Излязоха от вчера" — тикърите от Watchlist на предишния бриф, които днес ги няма, с причината от кода (само информация)
+    wl_exits = watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits)
+    print(f"      Излязоха от Watchlist ({wl_exits.get('from', 'няма предишен бриф')}): {[r['ticker'] for r in wl_exits.get('rows', [])]}")
     # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +
     # предупреждение за тикъри без ценови данни — виж thesis_context.py. ТУК:
     # новините, ротацията, action/watchlist и резолвираните позиции са готови.
@@ -813,6 +817,7 @@ def run() -> dict:
         "watch": watch_rows,
         "action": action,
         "watchlist": watchlist,
+        "watchlist_exits": wl_exits,
         # v2 нови блокове
         "theses": theses,
         # пакет 4б т.б: покритие на маркера UOV✓ (колко кандидата/позиции имат съотношение, причини, съотношенията за калибриране)
