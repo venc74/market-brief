@@ -1,5 +1,5 @@
 {
- "date": "2026-10-08",
+ "date": "2026-10-09",
  "bundle": {
   "moves": [
    {
@@ -19,35 +19,46 @@
     "count": 5
    },
    {
-    "ticker": "AMZN",
-    "company": "AMAZON COM INC",
+    "ticker": "UBER",
+    "company": "UBER TECHNOLOGIES INC",
     "manager": "Бил Акман · Pershing Square",
     "action": "увеличена",
-    "value": 2385104083.0,
-    "period": "13F · 2026-05-15",
+    "value": 2476978592.0,
+    "period": "13F · 2026-08-14",
     "_resolved": true,
-    "late": "⚠ закъснява: Pershing Square",
     "managers": [
      "Бил Акман · Pershing Square",
-     "Сет Кларман · Baupost Group",
-     "Дейвид Тепър · Appaloosa Management",
-     "Джон Армитидж · Egerton Capital"
+     "Тери Смит · Fundsmith"
     ],
-    "count": 4
+    "count": 2
    },
    {
     "ticker": "MSFT",
     "company": "MICROSOFT CORP",
     "manager": "Бил Акман · Pershing Square",
-    "action": "нова позиция",
-    "value": 2092970053.0,
-    "period": "13F · 2026-05-15",
+    "action": "увеличена",
+    "value": 2315234425.0,
+    "period": "13F · 2026-08-14",
     "_resolved": true,
-    "late": "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)",
     "managers": [
      "Бил Акман · Pershing Square"
     ],
     "count": 1
+   },
+   {
+    "ticker": "AMZN",
+    "company": "AMAZON COM INC",
+    "manager": "Сет Кларман · Baupost Group",
+    "action": "увеличена",
+    "value": 1191700000.0,
+    "period": "13F · 2026-08-13",
+    "_resolved": true,
+    "managers": [
+     "Сет Кларман · Baupost Group",
+     "Дейвид Тепър · Appaloosa Management",
+     "Джон Армитидж · Egerton Capital"
+    ],
+    "count": 3
    },
    {
     "ticker": "NBIS",
@@ -100,33 +111,9 @@
      "Джон Армитидж · Egerton Capital"
     ],
     "count": 1
-   },
-   {
-    "ticker": "PDD",
-    "company": "PDD HOLDINGS INC",
-    "manager": "Ли Лу · Himalaya Capital Management",
-    "action": "увеличена",
-    "value": 820858157.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": true,
-    "managers": [
-     "Ли Лу · Himalaya Capital Management"
-    ],
-    "count": 1
    }
   ],
   "new_positions": [
-   {
-    "ticker": "MSFT",
-    "company": "MICROSOFT CORP",
-    "manager": "Бил Акман · Pershing Square",
-    "value": 2092970053.0,
-    "pct_of_portfolio": 15.3,
-    "period": "13F · 2026-05-15",
-    "filing_date": "2026-05-15",
-    "_resolved": true,
-    "late": "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)"
-   },
    {
     "ticker": "STT",
     "company": "STATE STREET CORP",
@@ -168,11 +155,41 @@
     "_resolved": false
    },
    {
+    "ticker": "V",
+    "company": "VISA INC",
+    "manager": "Бил Акман · Pershing Square",
+    "value": 1122065552.0,
+    "pct_of_portfolio": 5.8,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "MASTERCARD INCORPORATED",
+    "company": "MASTERCARD INCORPORATED",
+    "manager": "Бил Акман · Pershing Square",
+    "value": 1091218186.0,
+    "pct_of_portfolio": 5.6,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": false
+   },
+   {
     "ticker": "HD",
     "company": "HOME DEPOT INC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 918092697.0,
     "pct_of_portfolio": 5.6,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "SPGI",
+    "company": "S&P GLOBAL INC",
+    "manager": "Бил Акман · Pershing Square",
+    "value": 1056088305.0,
+    "pct_of_portfolio": 5.4,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
     "_resolved": true
@@ -205,6 +222,16 @@
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
+    "_resolved": true
+   },
+   {
+    "ticker": "NFLX",
+    "company": "NETFLIX INC.",
+    "manager": "Бил Акман · Pershing Square",
+    "value": 934016601.0,
+    "pct_of_portfolio": 4.8,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -474,18 +501,20 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-08",
+   "data_date": "2026-10-09",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
    "managers_with_comparison": 15,
    "low_coverage": [],
-   "late_managers": [
+   "late_managers": [],
+   "followed_nt": [
     {
      "manager": "Бил Акман · Pershing Square",
-     "quarter_end": "2026-06-30",
-     "deadline": "2026-08-14",
-     "last_filing_date": "2026-05-15"
+     "to_cik": "0002026053",
+     "to_name": "PERSHING SQUARE INC.",
+     "nt_date": "2026-08-14",
+     "filing_date": "2026-08-14"
     }
    ],
    "scale_basis": {

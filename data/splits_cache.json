@@ -1,5 +1,5 @@
 {
- "date": "2026-10-08",
+ "date": "2026-10-09",
  "rows": [],
  "horizon": [
   {
@@ -165,11 +165,12 @@
    "RUBI",
    "GCDT",
    "SUGP",
-   "MGF",
-   "MIN",
    "GLE"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "MGF",
+   "MIN"
+  ],
   "dropped_no_data": [
    "ETHA",
    "DXJ"

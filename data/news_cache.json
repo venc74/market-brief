@@ -1,37 +1,37 @@
 {
- "date": "2026-10-08",
+ "date": "2026-10-09",
  "news": [
   {
-   "headline": "Fed officials see another hike coming, but no sign as to when, minutes show",
-   "why": "Fed minutes сигнализират допълнително затягане, което поддържа yields високи и натиска акциите и rate-sensitive секторите."
+   "headline": "US 10-year Treasury yields risk hitting 6% for first time since 2000, Pimco says",
+   "why": "Pimco предупреждава, че допълнително покачване на yields е 'feasible', което директно притиска оценките на акции и увеличава разходите по дълга за корпорациите."
   },
   {
-   "headline": "Dollar steady near 18-month high after Fed minutes flag inflation risks",
-   "why": "Силният долар притиска emerging markets, суровините и мултинационалните компании с приходи извън САЩ."
+   "headline": "Inflation on many everyday items was entirely due to tariffs, NY Fed says",
+   "why": "NY Fed установява, че тарифите са добавили 2.9 процентни пункта към инфлацията в 67 категории стоки, което усложнява позицията на Fed и очакванията за лихвени намаления."
   },
   {
-   "headline": "Inflation fears on the rise as one-year outlook in Fed survey hits highest level since May 2023",
-   "why": "Нарастващите инфлационни очаквания на потребителите увеличават вероятността от по-дълго рестриктивна Fed политика."
+   "headline": "Treasury yields are lower after reaching multiyear highs, traders weigh latest bond auction",
+   "why": "Движението на Treasury yields след дългосрочния bond auction е ключов индикатор за апетита към риск и посоката на equity пазарите в краткосрочен план."
   },
   {
-   "headline": "Oil gains as Middle East hostilities, potential escalation stoke supply worries; Hormuz transits at lowest in over two months",
-   "why": "Potential US military action срещу Иран и Houthi атаки над Riyadh airport заплашват ключови нефтени доставъчни маршрути и тласкат цените нагоре."
+   "headline": "Gold rises more than 1%, Fed outlook in focus",
+   "why": "Покачването на злато с над 1% отразява нарастваща несигурност около Fed политиката и реалните лихвени нива, сигнализирайки defensive позициониране."
   },
   {
-   "headline": "Gold prices recover from two-month low as dollar rally stalls",
-   "why": "Стабилизирането на долара позволява на gold да се възстанови, което сигнализира за повишено търсене на safe-haven активи."
+   "headline": "Oil prices jump as Iran steps up tanker attacks, hurricane threatens U.S. Gulf production",
+   "why": "Двоен supply shock — иранска ескалация срещу танкери и hurricane Isaias към Gulf Coast — директно движи crude prices и свързаните енергийни акции."
   },
   {
-   "headline": "Samsung flags $80 billion profit on AI boom, highest quarterly for any tech company",
-   "why": "Рекордните печалби на Samsung потвърждават силното търсене на AI чипове и дават позитивен сигнал за целия semiconductor сектор."
+   "headline": "Trump says U.S. will not attack Iran before midterm election; Treasury sanctions 17 tankers linked to Iran's shadow fleet",
+   "why": "Комбинацията от дипломатическа де-ескалация и нови санкции срещу shadow fleet формира oil supply outlook и геополитическата рискова премия за пазарите."
   },
   {
-   "headline": "Trading platform Webull's China ties create national security risk, congressional panel finds; stock drops 18%",
-   "why": "Регулаторният и законодателен натиск върху Webull заради връзки с Китай може да се разпростре и върху други fintech платформи с подобна собственост."
+   "headline": "OpenAI annualised revenues $20bn less than previously signalled, AI stocks sink",
+   "why": "Реалните приходи на OpenAI от ~$50bn вместо очакваните $70bn разклатиха AI growth нарратива и предизвикаха разпродажба в Nvidia, Oracle и CoreWeave."
   },
   {
-   "headline": "US FCC to vote to ban all Chinese labs from testing US electronics",
-   "why": "FCC решение би принудило производителите да сменят сертификационната верига, увеличавайки разходите и засилвайки tech decoupling между САЩ и Китай."
+   "headline": "SpaceX deal to acquire spectrum license hammers shares of AT&T, Verizon and T-Mobile",
+   "why": "SpaceX навлиза директно в US telecom пазара чрез spectrum придобиване, което е регулаторно и конкурентно събитие с незабавен негативен ефект върху incumbent carriers."
   }
  ]
 }

@@ -443,5 +443,20 @@
   "discovered_date": "2026-10-08",
   "realized_r": -1.0,
   "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.4%, 4.3× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "SITC_2026-09-11": {
+  "ticker": "SITC",
+  "entry_date": "2026-09-11",
+  "status": "stopped",
+  "entry_price": 2.83,
+  "target_1": 2.19,
+  "stop_loss": 3.15,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": "2026-09-30",
+  "discovered_date": "2026-10-09",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.4%, 4.3× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
  }
 }

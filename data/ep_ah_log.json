@@ -1,3 +1,21 @@
 {
- "entries": []
+ "entries": [
+  {
+   "ticker": "HUM",
+   "session": "2026-10-08",
+   "brief_date": "2026-10-09",
+   "gap_session": "2026-10-09",
+   "prev_close": 387.12,
+   "ah_price": 436.5,
+   "ah_gap_pct": 12.76,
+   "ah_bars": 3,
+   "ah_volume": 350117.0,
+   "neglect": true,
+   "ret63_pct": -1.3,
+   "open_gap_pct": null,
+   "close_pct": null,
+   "high_pct": null,
+   "resolved_on": null
+  }
+ ]
 }

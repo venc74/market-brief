@@ -918,6 +918,963 @@
     }
    ],
    "excluded": []
+  },
+  "2-Year Treasury Note|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "2-Year Treasury Note",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "JPM",
+     "company_claim": "JPMorgan Chase & Co.",
+     "mechanisms": [
+      {
+       "type": "rate_asset_yield",
+       "quote": "JPMorgan Chase реинвестира краткосрочни активи и депозити в инструменти, чиято доходност следва 2-годишните съкровищни бонове, влияейки на нетния лихвен марж на банката."
+      }
+     ]
+    },
+    {
+     "ticker": "MS",
+     "company_claim": "Morgan Stanley",
+     "mechanisms": [
+      {
+       "type": "rate_asset_yield",
+       "quote": "Morgan Stanley държи краткосрочни инвестиционни портфейли и брокерски активи, чиято доходност е обвързана с нивото на 2-годишните съкровищни бонове."
+      }
+     ]
+    },
+    {
+     "ticker": "BX",
+     "company_claim": "Blackstone Inc.",
+     "mechanisms": [
+      {
+       "type": "rate_duration_valuation",
+       "quote": "Blackstone оценява портфейлни активи с дисконтиране на парични потоци, чийто дисконтов процент е повлиян от нивото на краткосрочните лихви, отразени в 2-годишния фючърс."
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "XRP|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "XRP",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "COIN",
+     "company_claim": "Coinbase Global, Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "Coinbase генерира транзакционни такси от търговия с XRP и други криптоактиви на своята платформа, като обемът е свързан с активността в XRP пазара."
+      }
+     ]
+    },
+    {
+     "ticker": "MARA",
+     "company_claim": "MARA Holdings, Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "MARA Holdings притежава криптоактиви в баланса си и бизнес моделът й е пряко изложен на общия апетит за риск в крипто пазара, към който XRP принадлежи."
+      }
+     ]
+    },
+    {
+     "ticker": "HOOD",
+     "company_claim": "Robinhood Markets, Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "Robinhood предлага търговия с XRP на своята платформа и приходите от крипто транзакции зависят от активността и обема на търговия с XRP."
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "Soybean Meal|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Soybean Meal",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "TSN",
+     "company_claim": "Tyson Foods, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "Tyson Foods използва соево брашно като основен компонент в фуражните смески за отглеждане на пилета, прасета и говеда в своите вертикално интегрирани операции."
+      }
+     ]
+    },
+    {
+     "ticker": "PPC",
+     "company_claim": "Pilgrim's Pride Corporation",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "Pilgrim's Pride произвежда пилешко месо и соевото брашно е ключова съставка в фуража, с който се хранят птиците в нейните стопанства."
+      }
+     ]
+    },
+    {
+     "ticker": "SAFM",
+     "company_claim": "Sanderson Farms, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "Sanderson Farms отглежда бройлери и соевото брашно представлява значителна част от разходите за фураж в производствения й процес."
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "Lean Hogs|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Lean Hogs",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "TSN",
+     "company_claim": "Tyson Foods, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "Tyson Foods закупува живи свине за преработка в свинско месо и цената на lean hogs фючърсите директно влияе на разходите за суровина в сегмента свинско."
+      }
+     ]
+    },
+    {
+     "ticker": "HRL",
+     "company_claim": "Hormel Foods Corporation",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "Hormel Foods преработва свинско месо в продукти като SPAM и Jennie-O и цената на живите свине е основен компонент в себестойността на продукцията."
+      }
+     ]
+    },
+    {
+     "ticker": "PPC",
+     "company_claim": "Pilgrim's Pride Corporation",
+     "mechanisms": [
+      {
+       "type": "substitute",
+       "quote": "Pilgrim's Pride продава пилешко месо, което е директен заместител на свинското в потребителската кошница, и търсенето на пилешко е свързано с относителната цена на свинското."
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "E-mini Russell 2000|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "E-mini Russell 2000",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "ARES",
+     "company_claim": "Ares Management Corporation",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "Ares Management управлява портфейли от акции и кредити на малки и средни компании, чиято оценка е свързана с общото представяне на сегмента малка капитализация."
+      }
+     ]
+    },
+    {
+     "ticker": "STEP",
+     "company_claim": "StepStone Group Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "StepStone Group инвестира в частни пазари и акции на малки компании, чиято пазарна оценка се влияе от представянето на широкия сегмент малка капитализация."
+      }
+     ]
+    },
+    {
+     "ticker": "SMLF",
+     "company_claim": "iShares MSCI USA Small-Cap Multifactor ETF",
+     "mechanisms": []
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "SMLF",
+     "reason": "няма механизъм",
+     "code": "schema"
+    }
+   ]
+  },
+  "Soybeans|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Soybeans",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "ADM",
+     "company_claim": "Archer-Daniels-Midland Company",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува соя като основна суровина за преработка в соево масло и соево брашно"
+      },
+      {
+       "type": "output_price",
+       "quote": "продава соево масло и соево брашно, чиито цени следват цената на соята"
+      }
+     ]
+    },
+    {
+     "ticker": "BG",
+     "company_claim": "Bunge Global SA",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува соя за преработка в агропромишлени продукти"
+      },
+      {
+       "type": "output_price",
+       "quote": "продава соеви деривати (масло, шрот), чиято пазарна цена е свързана с цената на соята"
+      }
+     ]
+    },
+    {
+     "ticker": "INGR",
+     "company_claim": "Ingredion Incorporated",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "използва соя като суровина в производството на растителни протеини и специализирани съставки"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "ADM",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"
+    },
+    {
+     "ticker": "BG",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"
+    }
+   ]
+  },
+  "Mexican Peso|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Mexican Peso",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "GME",
+     "company_claim": "GameStop Corp.",
+     "mechanisms": []
+    },
+    {
+     "ticker": "KOF",
+     "company_claim": "Coca-Cola FEMSA, S.A.B. de C.V.",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "MXN"
+       ],
+       "quote": "генерира значителна част от приходите си в мексикански песо от операции в Мексико, които се превеждат в USD при консолидация"
+      }
+     ]
+    },
+    {
+     "ticker": "AMX",
+     "company_claim": "America Movil SAB de CV",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "MXN"
+       ],
+       "quote": "реализира голяма част от приходите си в мексикански песо от телекомуникационни услуги в Мексико, отчитани в USD"
+      }
+     ]
+    },
+    {
+     "ticker": "BSMX",
+     "company_claim": "Banco Santander Mexico SA",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "MXN"
+       ],
+       "quote": "генерира приходи в мексикански песо от банкови операции в Мексико, превеждани в USD при отчитане"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "GME",
+     "reason": "няма механизъм",
+     "code": "schema"
+    }
+   ]
+  },
+  "RBOB Gasoline|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "RBOB Gasoline",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "PSX",
+     "company_claim": "Phillips 66",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "рафинира и продава бензин, чиято цена следва цената на RBOB gasoline на едро"
+      }
+     ]
+    },
+    {
+     "ticker": "PBF",
+     "company_claim": "PBF Logistics LP",
+     "mechanisms": []
+    },
+    {
+     "ticker": "DINO",
+     "company_claim": "HF Sinclair Corporation",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "продава рафиниран бензин на едро, чиято реализационна цена е обвързана с RBOB gasoline"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "PBF",
+     "reason": "няма механизъм",
+     "code": "schema"
+    }
+   ]
+  },
+  "Sugar No. 11|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Sugar No. 11",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "TSN",
+     "company_claim": "Tyson Foods, Inc.",
+     "mechanisms": []
+    },
+    {
+     "ticker": "CPB",
+     "company_claim": "Campbell Soup Company",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "използва захар като суровина в производството на хранителни продукти и супи"
+      }
+     ]
+    },
+    {
+     "ticker": "HSY",
+     "company_claim": "The Hershey Company",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува захар в значителни количества като ключова суровина за производство на шоколад и сладкарски изделия"
+      }
+     ]
+    },
+    {
+     "ticker": "MDLZ",
+     "company_claim": "Mondelez International, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува захар като основна суровина за производство на бисквити, шоколад и снаксове"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "TSN",
+     "reason": "няма механизъм",
+     "code": "schema"
+    }
+   ]
+  },
+  "Copper|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Copper",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "RS",
+     "company_claim": "Reliance, Inc.",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "дистрибутира медни продукти, чиято стойност и маржове са свързани с пазарната цена на медта"
+      }
+     ]
+    },
+    {
+     "ticker": "WIRE",
+     "company_claim": "Encore Wire Corporation",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува медна пръчка като основна суровина за производство на електрически кабели"
+      },
+      {
+       "type": "output_price",
+       "quote": "продава медни кабели, чиято цена следва пазарната цена на медта"
+      }
+     ]
+    },
+    {
+     "ticker": "NEM",
+     "company_claim": "Newmont Corporation",
+     "mechanisms": []
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "WIRE",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"
+    },
+    {
+     "ticker": "NEM",
+     "reason": "няма механизъм",
+     "code": "schema"
+    }
+   ]
+  },
+  "Corn|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Corn",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "ADM",
+     "company_claim": "Archer-Daniels-Midland Company",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува царевица като основна суровина за преработка в царевично нишесте, подсладители, етанол и фураж"
+      },
+      {
+       "type": "output_price",
+       "quote": "продава царевичен етанол и царевични деривати, чиито цени следват цената на царевицата"
+      }
+     ]
+    },
+    {
+     "ticker": "INGR",
+     "company_claim": "Ingredion Incorporated",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува царевица като основна суровина за производство на царевично нишесте, подсладители и специализирани съставки"
+      }
+     ]
+    },
+    {
+     "ticker": "CF",
+     "company_claim": "CF Industries Holdings, Inc.",
+     "mechanisms": [
+      {
+       "type": "substitute",
+       "quote": "производител на азотни торове — по-скъпата царевица стимулира земеделците да увеличат засетите площи, което засилва търсенето на азотни торове"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "ADM",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"
+    }
+   ]
+  },
+  "Australian Dollar|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Australian Dollar",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "BHP",
+     "company_claim": "BHP Group Limited",
+     "mechanisms": [
+      {
+       "type": "fx_cost_local",
+       "exposure_side": "foreign_cost",
+       "currencies": [
+        "AUD"
+       ],
+       "quote": "значителна част от оперативните разходи на BHP са в австралийски долари (добив, работна ръка, инфраструктура в Австралия), докато приходите са предимно в USD"
+      }
+     ]
+    },
+    {
+     "ticker": "RIO",
+     "company_claim": "Rio Tinto Group",
+     "mechanisms": [
+      {
+       "type": "fx_cost_local",
+       "exposure_side": "foreign_cost",
+       "currencies": [
+        "AUD"
+       ],
+       "quote": "голяма част от производствените разходи на Rio Tinto са в австралийски долари заради мащабните австралийски операции по добив на желязна руда и мед, докато продажбите са деноминирани в USD"
+      }
+     ]
+    },
+    {
+     "ticker": "WPM",
+     "company_claim": "Wheaton Precious Metals Corp.",
+     "mechanisms": [
+      {
+       "type": "fx_cost_local",
+       "exposure_side": "foreign_cost",
+       "currencies": [
+        "AUD"
+       ],
+       "quote": "Wheaton изплаща streaming плащания към австралийски мини операции в AUD, докато приходите от продажба на метали са в USD"
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "Natural Gas|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Natural Gas",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "LNG",
+     "company_claim": "Cheniere Energy, Inc.",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "продава втечнен природен газ (LNG), чиято цена е свързана с цената на природния газ като суровина и пазарен бенчмарк"
+      },
+      {
+       "type": "input_cost",
+       "quote": "закупува природен газ като основна суровина за втечняване и износ"
+      }
+     ]
+    },
+    {
+     "ticker": "SWN",
+     "company_claim": "SWN (now a part of Expand Energy; formerly Southwestern Energy Company)",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "добива и продава природен газ от находища в Апалачите, приходите директно следват пазарната цена на природния газ"
+      }
+     ]
+    },
+    {
+     "ticker": "OKE",
+     "company_claim": "ONEOK, Inc.",
+     "mechanisms": [
+      {
+       "type": "output_price",
+       "quote": "транспортира и преработва природен газ и течности от природен газ, като обемите и тарифите са обвързани с активността в сектора на природния газ"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "LNG",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−)"
+    }
+   ]
+  },
+  "Cocoa|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Cocoa",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "HSY",
+     "company_claim": "The Hershey Company",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува какаови зърна и какаови полуфабрикати като основна суровина за производство на шоколад и конфекции"
+      }
+     ]
+    },
+    {
+     "ticker": "MDLZ",
+     "company_claim": "Mondelez International, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува какао в значителни количества като суровина за шоколадови продукти под марките Cadbury, Milka и Toblerone"
+      }
+     ]
+    },
+    {
+     "ticker": "TR",
+     "company_claim": "Tootsie Roll Industries, Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува какао като суровина за производство на шоколадови бонбони и конфекции"
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "British Pound|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "British Pound",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "RELX",
+     "company_claim": "RELX PLC",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "GBP"
+       ],
+       "quote": "RELX генерира значителна част от приходите си във Великобритания и в британски лири, които се превеждат в USD при консолидация"
+      }
+     ]
+    },
+    {
+     "ticker": "AZN",
+     "company_claim": "AstraZeneca PLC",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "GBP"
+       ],
+       "quote": "AstraZeneca е британска фармацевтична компания с приходи и разходи частично в британски лири, транслирани в USD за отчетност"
+      }
+     ]
+    },
+    {
+     "ticker": "LIN",
+     "company_claim": "Linde plc",
+     "mechanisms": [
+      {
+       "type": "fx_cost_local",
+       "exposure_side": "foreign_cost",
+       "currencies": [
+        "GBP"
+       ],
+       "quote": "Linde има значителни операции и разходи за работна ръка и инфраструктура във Великобритания, деноминирани в британски лири, докато глобалните приходи са предимно в USD"
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "30-Year Treasury Bond|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "30-Year Treasury Bond",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "BAC",
+     "company_claim": "Bank of America Corporation",
+     "mechanisms": [
+      {
+       "type": "rate_asset_yield",
+       "quote": "притежава голям портфейл от дългосрочни ценни книжа и кредити, чиято доходност е обвързана с нивото на дългосрочните лихвени проценти"
+      }
+     ]
+    },
+    {
+     "ticker": "MET",
+     "company_claim": "MetLife, Inc.",
+     "mechanisms": [
+      {
+       "type": "rate_asset_yield",
+       "quote": "инвестира застрахователните резерви предимно в дългосрочни облигации, чиято реинвестиционна доходност следва нивото на 30-годишните лихви"
+      },
+      {
+       "type": "rate_duration_valuation",
+       "quote": "дългосрочните задължения към осигурените лица се дисконтират с дългосрочна лихва, което влияе на актюерската оценка на пасивите"
+      }
+     ]
+    },
+    {
+     "ticker": "RDN",
+     "company_claim": "Radian Group Inc.",
+     "mechanisms": [
+      {
+       "type": "rate_duration_valuation",
+       "quote": "ипотечният застрахователен бизнес е чувствителен към обема на новото ипотечно кредитиране, което е обратно свързано с нивото на 30-годишните ипотечни лихви, следващи доходността на дългосрочните трежъри"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "MET",
+     "code": "mixed",
+     "reason": "mixed: противоположен ефект — оценка при дълга дюрация (+) срещу доходност на активите (−)"
+    }
+   ]
+  },
+  "Coffee C|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Coffee C",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "SBUX",
+     "company_claim": "Starbucks Corporation",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува арабика кафе като основна суровина за напитките, продавани в глобалната мрежа от кафенета"
+      }
+     ]
+    },
+    {
+     "ticker": "BROS",
+     "company_claim": "Dutch Bros Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува кафе зърна като основна суровина за приготвяне на напитките в своите кафе-барове"
+      }
+     ]
+    },
+    {
+     "ticker": "GMCR",
+     "company_claim": "Keurig Dr Pepper Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува зелено кафе в значителни обеми като суровина за производство на капсули и пакетирано кафе под марките Keurig и Green Mountain"
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "Bitcoin Futures (CME)|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Bitcoin Futures (CME)",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "MSTR",
+     "company_claim": "MicroStrategy Incorporated",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "притежава биткойн като основен корпоративен актив в баланса си, като стойността на акцията следва пазарната цена на биткойн"
+      }
+     ]
+    },
+    {
+     "ticker": "COIN",
+     "company_claim": "Coinbase Global, Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "генерира транзакционни такси от търговия с криптовалути, включително биткойн, като обемите на търговия и приходите са тясно свързани с активността на крипто пазара"
+      }
+     ]
+    },
+    {
+     "ticker": "RIOT",
+     "company_claim": "Riot Platforms, Inc.",
+     "mechanisms": [
+      {
+       "type": "index_beta",
+       "quote": "добива биткойн като основна дейност и реализира приходи в биткойн, чиято USD стойност директно следва пазарната цена на биткойн"
+      }
+     ]
+    }
+   ],
+   "excluded": []
+  },
+  "Euro FX|2026-09-29|extreme_short|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Euro FX",
+   "as_of": "2026-09-29",
+   "direction": "extreme_short",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "KEYS",
+     "company_claim": "Keysight Technologies, Inc.",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "EUR"
+       ],
+       "quote": "реализира значителна част от приходите си в Европа в евро, които се превеждат в USD при консолидацията на финансовите отчети"
+      }
+     ]
+    },
+    {
+     "ticker": "PH",
+     "company_claim": "Parker-Hannifin Corporation",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "foreign_revenue",
+       "currencies": [
+        "EUR"
+       ],
+       "quote": "продава индустриални системи и компоненти на европейски клиенти с приходи, деноминирани в евро, конвертирани в USD при отчитане"
+      }
+     ]
+    },
+    {
+     "ticker": "ETN",
+     "company_claim": "Eaton Corporation plc",
+     "mechanisms": [
+      {
+       "type": "fx_revenue_translation",
+       "exposure_side": "both",
+       "currencies": [
+        "EUR"
+       ],
+       "quote": "притежава производствени мощности и реализира продажби в Европа с приходи и разходи деноминирани в евро, нетният ефект зависи от баланса между двете"
+      }
+     ]
+    }
+   ],
+   "excluded": [
+    {
+     "ticker": "ETN",
+     "reason": "валутен механизъм: и приходи, и разходи в чужда валута — нетният ефект не се определя от таблицата",
+     "code": "fx_both"
+    }
+   ]
+  },
+  "Cotton|2026-09-29|extreme_long|v1-6a41a00a|claude-sonnet-4-6": {
+   "market": "Cotton",
+   "as_of": "2026-09-29",
+   "direction": "extreme_long",
+   "version": "v1-6a41a00a",
+   "model": "claude-sonnet-4-6",
+   "generated_at": "2026-10-09",
+   "tickers": [
+    {
+     "ticker": "HBI",
+     "company_claim": "Hanesbrands Inc.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува памук и памучен прежди в значителни обеми като основна суровина за производство на бельо, тениски и чорапи"
+      }
+     ]
+    },
+    {
+     "ticker": "PVH",
+     "company_claim": "PVH Corp.",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува памучни тъкани и прежда за производство на облекло под марките Calvin Klein и Tommy Hilfiger"
+      }
+     ]
+    },
+    {
+     "ticker": "RL",
+     "company_claim": "Ralph Lauren Corporation",
+     "mechanisms": [
+      {
+       "type": "input_cost",
+       "quote": "закупува памучни материали като основна суровина за производство на облекло и текстилни изделия"
+      }
+     ]
+    }
+   ],
+   "excluded": []
   }
  }
 }

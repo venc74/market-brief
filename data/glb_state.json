@@ -1,6 +1,240 @@
 {
- "updated": "2026-10-08",
+ "updated": "2026-10-09",
  "events": {
+  "BDX": {
+   "ticker": "BDX",
+   "company": "Becton, Dickinson and Company",
+   "glb_type": "momentum",
+   "prior_high": 176.48,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 53.5,
+   "tightness": {
+    "band_hold_pct": 57.1,
+    "tightness_range_pct": 24.73,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 176.48,
+   "since": "2026-08-13"
+  },
+  "MRK": {
+   "ticker": "MRK",
+   "company": "Merck & Company, Inc.",
+   "glb_type": "classic",
+   "prior_high": 131.95,
+   "prior_high_month": "2024-03",
+   "months_unpenetrated": 28,
+   "ath_label": "all_time_high",
+   "history_years": 64.6,
+   "tightness": {
+    "band_hold_pct": 98.4,
+    "tightness_range_pct": 18.27,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 131.95,
+   "since": "2026-08-13"
+  },
+  "VRTX": {
+   "ticker": "VRTX",
+   "company": "Vertex Pharmaceuticals Incorporated",
+   "glb_type": "classic",
+   "prior_high": 509.5,
+   "prior_high_month": "2025-04",
+   "months_unpenetrated": 15,
+   "ath_label": "all_time_high",
+   "history_years": 35.1,
+   "tightness": {
+    "band_hold_pct": 95.2,
+    "tightness_range_pct": 24.76,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 509.5,
+   "since": "2026-08-13"
+  },
+  "FCX": {
+   "ticker": "FCX",
+   "company": "Freeport-McMoRan, Inc.",
+   "glb_type": "classic",
+   "prior_high": 68.08,
+   "prior_high_month": "2026-02",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 31.1,
+   "tightness": {
+    "band_hold_pct": 98.4,
+    "tightness_range_pct": 23.91,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 68.08,
+   "since": "2026-08-19"
+  },
+  "MEDP": {
+   "ticker": "MEDP",
+   "company": "Medpace Holdings, Inc.",
+   "glb_type": "momentum",
+   "prior_high": 592.46,
+   "prior_high_month": "2025-11",
+   "months_unpenetrated": 8,
+   "ath_label": "all_time_high",
+   "history_years": 10.0,
+   "tightness": {
+    "band_hold_pct": 61.9,
+    "tightness_range_pct": 46.32,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 592.46,
+   "since": "2026-08-19"
+  },
+  "CVX": {
+   "ticker": "CVX",
+   "company": "Chevron Corporation",
+   "glb_type": "momentum",
+   "prior_high": 206.9,
+   "prior_high_month": "2026-03",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 64.7,
+   "tightness": {
+    "band_hold_pct": 81.0,
+    "tightness_range_pct": 21.36,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 206.9,
+   "since": "2026-09-01"
+  },
+  "P": {
+   "ticker": "P",
+   "company": "Everpure, Inc.",
+   "glb_type": "momentum",
+   "prior_high": 98.7,
+   "prior_high_month": "2025-10",
+   "months_unpenetrated": 10,
+   "ath_label": "all_time_high",
+   "history_years": 10.9,
+   "tightness": {
+    "band_hold_pct": 47.6,
+    "tightness_range_pct": 54.05,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 98.7,
+   "since": "2026-09-17"
+  },
+  "WAT": {
+   "ticker": "WAT",
+   "company": "Waters Corporation",
+   "glb_type": "classic",
+   "prior_high": 415.48,
+   "prior_high_month": "2025-01",
+   "months_unpenetrated": 19,
+   "ath_label": "all_time_high",
+   "history_years": 30.8,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 19.5,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 415.48,
+   "since": "2026-09-17"
+  },
+  "ETN": {
+   "ticker": "ETN",
+   "company": "Eaton Corporation, PLC",
+   "glb_type": "classic",
+   "prior_high": 433.01,
+   "prior_high_month": "2026-04",
+   "months_unpenetrated": 4,
+   "ath_label": "all_time_high",
+   "history_years": 54.3,
+   "tightness": {
+    "band_hold_pct": 98.4,
+    "tightness_range_pct": 27.68,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 433.01,
+   "since": "2026-09-22"
+  },
+  "FAST": {
+   "ticker": "FAST",
+   "company": "Fastenal Company",
+   "glb_type": "classic",
+   "prior_high": 49.66,
+   "prior_high_month": "2025-08",
+   "months_unpenetrated": 12,
+   "ath_label": "all_time_high",
+   "history_years": 39.1,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 17.84,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 49.66,
+   "since": "2026-09-23"
+  },
+  "WCC": {
+   "ticker": "WCC",
+   "company": "WESCO International, Inc.",
+   "glb_type": "classic",
+   "prior_high": 361.17,
+   "prior_high_month": "2026-05",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 27.4,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 23.74,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 361.17,
+   "since": "2026-09-23"
+  },
+  "TMO": {
+   "ticker": "TMO",
+   "company": "Thermo Fisher Scientific Inc",
+   "glb_type": "momentum",
+   "prior_high": 667.24,
+   "prior_high_month": "2021-12",
+   "months_unpenetrated": 56,
+   "ath_label": "all_time_high",
+   "history_years": 46.5,
+   "tightness": {
+    "band_hold_pct": 66.7,
+    "tightness_range_pct": 26.82,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 667.24,
+   "since": "2026-09-24"
+  },
+  "CTVA": {
+   "ticker": "CTVA",
+   "company": "Corteva, Inc.",
+   "glb_type": "classic",
+   "prior_high": 1.91,
+   "prior_high_month": "2026-06",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 7.4,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 19.4,
+    "meets_tightness": true
+   },
+   "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+   "line": 1.91,
+   "since": "2026-10-01"
+  },
   "SNX": {
    "ticker": "SNX",
    "company": "TD SYNNEX Corporation",
@@ -12,30 +246,48 @@
    "history_years": 22.9,
    "tightness": {
     "band_hold_pct": 100.0,
-    "tightness_range_pct": 23.37,
+    "tightness_range_pct": 24.22,
     "meets_tightness": true
    },
    "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
    "line": 267.34,
-   "since": "2026-10-08"
+   "since": "2026-10-01"
   },
-  "WCC": {
-   "ticker": "WCC",
-   "company": "WESCO International, Inc.",
+  "ADI": {
+   "ticker": "ADI",
+   "company": "Analog Devices, Inc.",
    "glb_type": "classic",
-   "prior_high": 361.17,
+   "prior_high": 413.85,
    "prior_high_month": "2026-05",
    "months_unpenetrated": 4,
    "ath_label": "all_time_high",
-   "history_years": 27.4,
+   "history_years": 46.6,
    "tightness": {
     "band_hold_pct": 100.0,
-    "tightness_range_pct": 22.18,
+    "tightness_range_pct": 17.81,
     "meets_tightness": true
    },
    "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
-   "line": 361.17,
-   "since": "2026-10-08"
+   "line": 413.85,
+   "since": "2026-10-05"
+  },
+  "QLYS": {
+   "ticker": "QLYS",
+   "company": "Qualys, Inc.",
+   "glb_type": "momentum",
+   "prior_high": 196.28,
+   "prior_high_month": "2023-12",
+   "months_unpenetrated": 33,
+   "ath_label": "all_time_high",
+   "history_years": 14.0,
+   "tightness": {
+    "band_hold_pct": 63.5,
+    "tightness_range_pct": 35.94,
+    "meets_tightness": false
+   },
+   "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен momentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+   "line": 196.28,
+   "since": "2026-10-05"
   },
   "WSM": {
    "ticker": "WSM",
@@ -45,7 +297,7 @@
    "prior_high_month": "2026-06",
    "months_unpenetrated": 3,
    "ath_label": "all_time_high",
-   "history_years": 43.3,
+   "history_years": 43.2,
    "tightness": {
     "band_hold_pct": 100.0,
     "tightness_range_pct": 17.46,
@@ -53,7 +305,13 @@
    },
    "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
    "line": 233.1,
-   "since": "2026-10-08"
+   "since": "2026-10-05"
   }
+ },
+ "seed": {
+  "version": 1,
+  "sessions": 41,
+  "from": "2026-08-12",
+  "to": "2026-10-08"
  }
 }
