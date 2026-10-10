@@ -251,8 +251,11 @@ def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
     като "stale" всяка нормална седмица).
     """
     last_date = last_ts.date() if hasattr(last_ts, "date") else last_ts
-    threshold = threshold_days if threshold_days is not None else config.STALENESS_THRESHOLD_DAYS
-    return (dt.date.today() - last_date).days > threshold
+    if threshold_days is None:
+        # С1 (10.10.2026): дневните серии (global signals, RRP) — в NYSE сесии, както thermometer._is_stale
+        from src.setup_rules import is_stale_daily
+        return is_stale_daily(last_date)
+    return (dt.date.today() - last_date).days > threshold_days        # седмичните серии с изричен праг (WALCL/WTREGEN) — календарни дни
 
 
 # сигналите, които са ДОХОДНОСТИ (ниво в %, промяна в базисни пунктове — не относителен %)

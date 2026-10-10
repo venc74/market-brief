@@ -44,6 +44,24 @@ def is_session(d) -> bool:
     return d.weekday() < 5 and d.isoformat() not in config.NYSE_HOLIDAYS
 
 
+def sessions_between(last_date, today) -> int:
+    """
+    С1 (10.10.2026): брой NYSE сесии СТРОГО между last_date и today (без двата края). Последният бар от предишната сесия → 0; брифът е преди
+    отваряне, затова днешната сесия не се брои. Празниците и уикендите не са сесии (NYSE_HOLIDAYS).
+    """
+    a, b = _as_date(last_date), _as_date(today)
+    n, d = 0, a + dt.timedelta(days=1)
+    while d < b:
+        n += is_session(d)
+        d += dt.timedelta(days=1)
+    return n
+
+
+def is_stale_daily(last_date, today=None) -> bool:
+    """С1: дневна серия е застояла при повече от config.STALENESS_MAX_LAG_SESSIONS пропуснати NYSE сесии."""
+    return sessions_between(last_date, today or dt.date.today()) > config.STALENESS_MAX_LAG_SESSIONS
+
+
 def session_window(brief_date, sessions: int | None = None) -> list[dt.date]:
     """
     Първите `sessions` търговски сесии, ВКЛЮЧИТЕЛНО сесията на брифа (брифът е

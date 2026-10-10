@@ -194,15 +194,17 @@ def market_put_call(today: dt.date | None = None) -> dict:
 
 def _is_stale(last_ts) -> bool:
     """
-    True ако последният ред от yf .history() е по-стар от
-    config.STALENESS_THRESHOLD_DAYS календарни дни спрямо днес. Пази срещу
+    True ако след последния ред от yf .history() има повече от
+    config.STALENESS_MAX_LAG_SESSIONS пропуснати NYSE сесии (до 10.10: календарни дни). Пази срещу
     low-liquidity тикъри (^MOVE, ^VIX9D, ^VIX3M), при които Yahoo понякога
     спира да публикува нови точки за дни наред, а .iloc[-1] тихо продължава
     да връща същата стара стойност като "текуща" (потвърдено емпирично —
     ^MOVE/^VIX9D/^VIX3M блокираха на 2026-07-02 за >1 седмица).
     """
     last_date = last_ts.date() if hasattr(last_ts, "date") else last_ts
-    return (dt.date.today() - last_date).days > config.STALENESS_THRESHOLD_DAYS
+    # С1 (10.10.2026): в NYSE сесии, не календарни дни — виж config.STALENESS_MAX_LAG_SESSIONS (08.09: петъчен бар след празник беше "застоял")
+    from src.setup_rules import is_stale_daily
+    return is_stale_daily(last_date)
 
 
 def _nan_last_close(hist) -> bool:
