@@ -279,6 +279,15 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
         cls = c.get("ai", {}).get("classification", "Watchlist")
         sector = c.get("sector", "Unknown")
 
+        # В1 (втори преглед, 10.10.2026): прозорецът преди отчет (EARNINGS_BLACKOUT_DAYS) е БЕЗУСЛОВЕН — без изключение за AI поле
+        # "warning" (до 10.10 merge_narratives го пропускаше). Текстът на картата не се задава тук — сглобява се от кода по-долу
+        # (_watchlist_trigger_text: отчет + сетъп + режим), за да не се губи buy-stop нивото.
+        if cls == "Action" and (c.get("earnings") or {}).get("in_blackout"):
+            cls = "Watchlist"
+            c.setdefault("ai", {})
+            c["ai"]["classification"] = "Watchlist"
+            c["ai"]["watchlist_reason_type"] = "earnings_blackout"
+
         # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — кодът има
         # последната дума. Action е допустим САМО при потвърден пробив: close над
         # pivot (най-високия High на базата без последните N бара), до +5% над него,

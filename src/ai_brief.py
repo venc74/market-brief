@@ -871,8 +871,8 @@ setup не е "confirmed", в earnings blackout, RS слабее, или сек�
 
 Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
 Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
-работни дни (0 ≤ days_to_earnings ≤ 7) = автоматично Watchlist (или Action с \
-изрично предупреждение само при изключителен setup, поле "warning"). \
+работни дни (0 ≤ days_to_earnings ≤ 7) = Watchlist. Кодът го налага безусловно, \
+независимо от класификацията ти — няма изключение и няма поле, което да го отмени. \
 days_to_earnings=0 означава earnings Е ДНЕС — пиши го изрично така, НЕ като \
 "неизвестна дата". Само ако days_to_earnings ЛИПСВА (null) или е ОТРИЦАТЕЛЕН, \
 датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ твърди, \
@@ -955,8 +955,10 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
     for c in candidates:
         c["ai"] = by_ticker.get(c["ticker"], {})
         c["ai"].pop("watchlist_trigger", None)           # 08.10 (2б): текстът е на кода — ако моделът въпреки всичко върне такова поле, то се изхвърля
-        # Твърдите правила бият AI преценката (Секция 8):
-        if c.get("earnings", {}).get("in_blackout") and not c["ai"].get("warning"):
+        # Твърдите правила бият AI преценката (Секция 8). В1 (втори преглед, 10.10): БЕЗУСЛОВНО — до 10.10 условието беше
+        # "in_blackout and not warning" и промптът разрешаваше Action с поле "warning" → моделът можеше да държи Action 0–7 дни
+        # преди отчет (латентно: 0 от 40 карти в прозореца в историята). Същото правило и в main.apply_hard_rules (кодът има последната дума).
+        if c.get("earnings", {}).get("in_blackout"):
             c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
             c["ai"].setdefault("watchlist_trigger",
