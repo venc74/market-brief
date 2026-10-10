@@ -109,7 +109,11 @@ backtest._save_tracker({
     "A_2026-04-06": synth("2026-04-06", "stopped", -1.0, -7.0, None),                   # без SPY данни → не влиза в сравнението
     "A_2026-05-04": synth("2026-05-04", "trailing", None, 8.5, 2.0, partial_price=116.0, partial_fraction=0.5),   # жива
 })
+sm20 = backtest.get_backtest_summary()
+assert sm20["spy_compare"] is None and sm20["stats_visible"] is False and sm20["win_rate_pct"] is None   # С4 (10.10): 4 затворени < 20 → без SPY сравнение и win rate
+config.TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 1                                           # математиката на сравнението — с праг 1
 sm = backtest.get_backtest_summary()
+config.TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 20
 sc = sm["spy_compare"]
 assert sc["n"] == 3 and sc["avg_return_pct"] == round((-8.38 + 10.0 + 1.0) / 3, 2) == 0.87
 assert sc["avg_spy_pct"] == round((5.0 + 2.0 + 3.0) / 3, 2) == 3.33 and sc["avg_alpha_pct"] == round(0.87 - 3.33, 2) == -2.46
@@ -117,6 +121,7 @@ assert sc["beat_spy_pct"] == 33.3                                               
 lp = sm["open_positions"][0]
 assert lp["unrealized_pct"] == 8.5 and lp["spy_return_pct"] == 2.0 and lp["alpha_pct"] == 6.5   # претеглена с частичната, не 60/55-1
 assert round((60.0 - 55.0) / 55.0 * 100, 1) == 9.1                                       # наивният % (цена спрямо входа) би бил друг
+print("  ✓ С4: при 4 затворени (< 20) няма SPY сравнение и win rate; с праг 1 (само за математиката):")
 print("  ✓ 3 затворени със SPY данни (4-тата без SPY е изключена): средно +0.87% срещу SPY +3.33% → -2.46%, 33.3% водят SPY;")
 print("    живата позиция показва претеглената доходност (+8.5% с частичната продажба, не наивните +9.1%) и SPY +2.0%")
 

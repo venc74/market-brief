@@ -1513,7 +1513,12 @@
     {% if not backtest.total_resolved %}
     <b>Още няма затворени сделки по v2</b> — win rate и среден R се показват от първата резолюция.<br>
     {% else %}
+    {# С4 (10.10.2026): win rate и win/loss чак при ≥ min_closed затворени, както другите книги; стар бриф без полето — както преди #}
+    {% if backtest.stats_visible is not defined or backtest.stats_visible %}
     <b>Win rate: {{ backtest.win_rate_pct }}%</b> ({{ backtest.wins }} win / {{ backtest.losses }} loss)<br>
+    {% else %}
+    <b>Затворени: {{ backtest.total_resolved }}</b> — win rate и сравнението със SPY се показват при ≥ {{ backtest.min_closed }} затворени (дотогава броят и средният R).<br>
+    {% endif %}
     {{ backtest.stopped }} стоп{% if backtest.stopped_after_partial %} (от тях {{ backtest.stopped_after_partial }} след частична продажба){% endif %}
     / {{ backtest.trailing_stop_exit }} trailing-exit / {{ backtest.expired_in_trail }} expired-in-trail
     / {{ backtest.expired }} expired (оценени по последния Close, mark-to-market)<br>

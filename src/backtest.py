@@ -1364,7 +1364,9 @@ def get_backtest_summary() -> dict:
     total_resolved = len(resolved)
     wins = [r for r in resolved if r["realized_r"] > 0]
     losses = [r for r in resolved if r["realized_r"] <= 0]
-    win_rate = round(len(wins) / total_resolved * 100, 1) if total_resolved else 0.0
+    min_closed = config.TRACK_RECORD_MIN_CLOSED_FOR_WINRATE
+    stats_visible = total_resolved >= min_closed             # С4 (10.10): win rate / win-loss / SPY — чак при ≥ min_closed затворени
+    win_rate = round(len(wins) / total_resolved * 100, 1) if stats_visible else None
     avg_r = round(sum(r["realized_r"] for r in resolved) / total_resolved, 2) if total_resolved else 0.0
 
     by_status = {}
@@ -1456,7 +1458,7 @@ def get_backtest_summary() -> dict:
     cmp_recs = [r for r in records if r.get("realized_r") is not None
                 and r.get("return_pct") is not None and r.get("spy_return_pct") is not None]
     spy_compare = None
-    if cmp_recs:
+    if cmp_recs and stats_visible:                           # С4: сравнението със SPY — същият праг
         n_c = len(cmp_recs)
         avg_ret = sum(r["return_pct"] for r in cmp_recs) / n_c
         avg_spy = sum(r["spy_return_pct"] for r in cmp_recs) / n_c
@@ -1476,9 +1478,10 @@ def get_backtest_summary() -> dict:
         "total_resolved": total_resolved,
         # 08.10: колко Action сигнала са записани във v2 книгата от старта (всички статуси: чакащи, отворени, затворени, незадействани, прескочени) — за заглавието на секцията
         "action_signals": len(records),
+        "min_closed": min_closed, "stats_visible": stats_visible,
         "win_rate_pct": win_rate,
-        "wins": len(wins),
-        "losses": len(losses),
+        "wins": len(wins) if stats_visible else None,
+        "losses": len(losses) if stats_visible else None,
         "stopped": by_status.get("stopped", 0),
         "trailing_stop_exit": by_status.get("trailing_stop_exit", 0),
         "expired_in_trail": by_status.get("expired_in_trail", 0),

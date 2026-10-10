@@ -133,7 +133,8 @@ print()
 print("── обобщение за dashboard-а ──")
 backtest._save_tracker(tr)
 sm = backtest.get_backtest_summary()
-assert sm["total_resolved"] == 1 and sm["wins"] == 0 and sm["losses"] == 1 and sm["win_rate_pct"] == 0.0   # само v2 (v1 записът е извън статистиката, т.7)
+assert sm["total_resolved"] == 1 and sm["stats_visible"] is False and sm["min_closed"] == 20                # само v2 (v1 записът е извън статистиката, т.7)
+assert sm["wins"] is None and sm["losses"] is None and sm["win_rate_pct"] is None and sm["spy_compare"] is None   # С4 (10.10): 1 затворена < 20 → без win rate / SPY
 assert sm["stopped"] == 1 and sm["still_open"] == 1 and sm["pending"] == 1 and sm["not_triggered"] == 1
 assert sm["skipped_extended"] == 0 and sm["avg_realized_r"] == -1.0
 pp = sm["pending_positions"]
@@ -158,7 +159,9 @@ backtest._save_tracker({
     "EXEL_2026-05-04": synth("2026-05-04", "expired", 0.24),                          # т.5: изтекла, оценена по Close
     "EXEL_2026-04-06": synth("2026-04-06", "trailing", None, 116.0),                  # жива, след частична
 })
+config.TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 1                    # броенето на win/loss — с праг 1 (С4: по подразбиране 20)
 sm2 = backtest.get_backtest_summary()
+config.TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 20
 assert sm2["total_resolved"] == 4 and sm2["wins"] == 3 and sm2["losses"] == 1 and sm2["win_rate_pct"] == 75.0
 assert sm2["avg_realized_r"] == 0.2 and sm2["stopped"] == 2 and sm2["stopped_after_partial"] == 1 and sm2["expired"] == 1
 assert sm2["partial_taken"] == 3 and sm2["trailing"] == 1
