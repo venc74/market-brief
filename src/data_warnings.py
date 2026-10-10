@@ -133,7 +133,7 @@ def _13f_warnings(status: dict | None) -> list[dict]:
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
-            glb_status: dict | None = None, canary: dict | None = None) -> list[dict]:
+            glb_status: dict | None = None, canary: dict | None = None, health: list | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -174,4 +174,6 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_corp_warning(corp_diag))
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
+    for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
+        out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})
     return out

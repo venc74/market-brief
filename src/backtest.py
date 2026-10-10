@@ -753,9 +753,16 @@ def _gw_needs_exec_fill(rec: dict, today: dt.date) -> bool:
         return False
 
 
+# Здравен монитор (втори преглед, 10.10.2026): състоянието на последната резолюция — {ok, live, priced, missing, data_through, error}; празно → не е пускана.
+# Провал на цените отлага резолюцията тихо (графично) — src/health_monitor.py го показва като банер.
+LAST_RESOLUTION: dict = {}
+
+
 def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
+    global LAST_RESOLUTION
     today = today or dt.date.today()
     live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today)]
+    LAST_RESOLUTION = {"ok": True, "live": len(live_items)}
     if not live_items:
         return
 
@@ -770,16 +777,27 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         data = yf.download(dl, start=earliest, progress=False, auto_adjust=False)
     except Exception as e:
         print(f"[backtest] batch price fetch failed за {tickers}: {e}")
+        LAST_RESOLUTION = {"ok": False, "live": len(live_items), "error": f"{type(e).__name__}: {e}"}
         return
     if data is None or data.empty:
         print("[backtest] price fetch върна празен резултат")
+        LAST_RESOLUTION = {"ok": False, "live": len(live_items), "error": "празен резултат от Yahoo"}
         return
 
     cols = _normalize_price_columns(data, dl, ("Open", "High", "Low", "Close"))
     opens, highs, lows, closes = cols.get("Open"), cols.get("High"), cols.get("Low"), cols.get("Close")
     if highs is None or lows is None or closes is None:
         print("[backtest] price fetch не върна High/Low/Close колони")
+        LAST_RESOLUTION = {"ok": False, "live": len(live_items), "error": "няма High/Low/Close колони"}
         return
+    try:
+        cols_set = set(getattr(closes, "columns", []))
+        last_ok = closes.dropna(how="all").index
+        LAST_RESOLUTION = {"ok": True, "live": len(live_items), "priced": sum(1 for t in tickers if t in cols_set and closes[t].notna().any()),
+                           "missing": [t for t in tickers if t not in cols_set or not closes[t].notna().any()],
+                           "data_through": pd.Timestamp(last_ok[-1]).date().isoformat() if len(last_ok) else None}
+    except Exception as e:
+        LAST_RESOLUTION = {"ok": True, "live": len(live_items), "error": f"статусът не се сметна: {type(e).__name__}"}
     spy_bars = None
     if "SPY" in dl and opens is not None and "SPY" in getattr(opens, "columns", []):
         spy_bars = pd.DataFrame({"Open": opens["SPY"], "High": highs["SPY"], "Low": lows["SPY"],

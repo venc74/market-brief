@@ -51,7 +51,7 @@ print("  ✓ РЕАЛНИТЕ стойности → OK, без банер; СИ
 print()
 print("── 3. main записва канарчето и го подава на банерите ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "canary = data_canary.check() if config.ENABLE_DATA_CANARY else None" in src and "canary=canary)," in src and '"data_canary": canary,' in src
+assert "canary = data_canary.check() if config.ENABLE_DATA_CANARY else None" in src and "canary=canary" in src and '"data_canary": canary,' in src
 print("  ✓ data_canary.check() се пуска в main; резултатът е в брифа (data_canary) и в data_warnings")
 print()
 print("Всички тестове минаха.")
