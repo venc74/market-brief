@@ -158,6 +158,9 @@ BUYSTOP_MIN_CLOSED_FOR_WINRATE = int(os.getenv("BUYSTOP_MIN_CLOSED_FOR_WINRATE",
 # С4 (втори преглед, 10.10.2026): Track Record v2 (Action) — win rate, броят win/loss и сравнението със SPY чак при ≥ толкова затворени, както другите книги
 # (дотогава броят и средният R); до 10.10 се показваха от първата резолюция ("Win rate: 100% (1 win / 0 loss)").
 TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = int(os.getenv("TRACK_RECORD_MIN_CLOSED_FOR_WINRATE", 20))
+# С5 (10.10.2026): дневно канарче за split корекцията на Yahoo (src/data_canary.py — NVDA 07.06.2024 ≈ $120.888); отклонение над толеранса → банер
+ENABLE_DATA_CANARY = os.getenv("ENABLE_DATA_CANARY", "1") == "1"
+DATA_CANARY_TOLERANCE = float(os.getenv("DATA_CANARY_TOLERANCE", 0.01))
 
 # ── Предупреждение за отчет върху картата (пакет 4б т.д — 06.10.2026) ──────
 # При отчет в следващите EARNINGS_WARNING_SESSIONS търговски сесии картата показва датата и ОЧАКВАНОТО движение от опциите (само информация, без промяна на размера).

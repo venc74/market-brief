@@ -35,6 +35,7 @@ from src import entry_timing
 from src import setup_rules
 from src import earnings_move
 from src import glb_screener
+from src import data_canary
 from src import watchlist_exits
 from src import corp_actions
 from src import qm_breakout
@@ -849,6 +850,11 @@ def run() -> dict:
     corp_diag = corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)
     print(f"      Корпоративни действия: проверени {corp_diag['checked']} тикъра, маркирани {[f['ticker'] for f in corp_diag['flagged']]}" + ("" if corp_diag["ok"] else f" — ПРОВАЛ: {corp_diag['error']}"))
 
+    # С5 (втори преглед, 10.10.2026): канарче за split корекцията на Yahoo — една заявка; провал на тегленето → неизвестно, без банер
+    canary = data_canary.check() if config.ENABLE_DATA_CANARY else None
+    if canary:
+        print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
+              f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
     brief = {
         "date": today,
         "macro": macro,
@@ -858,7 +864,9 @@ def run() -> dict:
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                                superinvestor_status=superinvestor_status, corp_diag=corp_diag,
-                                               glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None)),
+                                               glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
+                                               canary=canary),
+        "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,
         "ai_macro": ai_macro,

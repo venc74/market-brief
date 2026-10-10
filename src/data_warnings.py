@@ -97,6 +97,15 @@ def _glb_warning(status: dict | None) -> list[dict]:
     return []
 
 
+def _canary_warning(c: dict | None) -> list[dict]:
+    """С5 (10.10.2026): split корекцията на Yahoo — close-ът на NVDA за 07.06.2024 не е ≈ $120.888 → нивата и реплеите може да са изкривени."""
+    if not c or c.get("ok") is not False:
+        return []
+    return [{"source": "data_canary", "level": "error",
+             "message": (f"Данни: split корекцията на Yahoo изглежда грешна — close на {c.get('ticker')} за {c.get('date')} е ${c.get('close')} "
+                         f"вместо ≈ ${c.get('expected')} (сплит 10:1 на 10.06.2024). Ценовите нива (pivot, стопове, GLB линии) и книгите може да са изкривени днес.")}]
+
+
 def _corp_warning(diag: dict | None) -> list[dict]:
     """Проверката за корпоративни действия (маркерът ⚠ върху картите): паднала проверка не бива да се чете като "няма събития"."""
     if not diag or diag.get("ok", True):
@@ -124,7 +133,7 @@ def _13f_warnings(status: dict | None) -> list[dict]:
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
-            glb_status: dict | None = None) -> list[dict]:
+            glb_status: dict | None = None, canary: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -164,4 +173,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_13f_warnings(superinvestor_status))
     out.extend(_corp_warning(corp_diag))
     out.extend(_glb_warning(glb_status))
+    out.extend(_canary_warning(canary))
     return out
