@@ -16,7 +16,10 @@ concurrency:
 jobs:
   brief:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # С8 (втори преглед, 10.10.2026): 45 → 60. Run-овете 07.09–09.10: 12–29 мин (07.10: 29.1); от 12.10 се добавят сутрешното сканиране на UOV
+    # кошницата (бюджет UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = 600 s, активно след К1) и еднократно новото GLB състояние (версия 2; версия 1 мина в
+    # run-а от 09.10, 12.3 мин общо) → до ~40–42 мин при най-лошия досегашен ден, твърде близо до 45.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
 
