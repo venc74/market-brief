@@ -1,0 +1,479 @@
+{
+ "_note": "РЕАЛНИ карти (docs/data/2026-10-01.json и 2026-10-09.json) — полетата, нужни за проверката на числата в AI наративите (втори преглед, 10.10.2026): цена/pivot/struct_low/analyst_target/setup и AI текстът; AVT 01.10 цитира цената на NTAP ($210.08), NTAP 09.10 — стопа на FTNT ($164.43).",
+ "briefs": {
+  "2026-10-01": [
+   {
+    "ticker": "FTNT",
+    "price": 178.76,
+    "pivot": 181.37,
+    "struct_low": null,
+    "analyst_target": 164.31944,
+    "setup": null,
+    "earnings": {
+     "next_earnings": "2026-11-04",
+     "days_to_earnings": 34,
+     "in_blackout": false,
+     "eps_estimate": 3.45008,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Макро: Defensive режим с допустим Technology exposure при мега-cap и quality names. Секторна логика: XLK RS +6.34% за 4 седмици, потвърден 12-седмичен тренд — cyber security е subset на tech с висока recurring revenue и ниска rate-sensitivity. FTNT специфично: cybersecurity spending е non-discretionary за enterprise бюджети, FortiOS ecosystem lock-in генерира predictable ARR. RS статус е new_high — силен относителен momentum. Trigger от вчера: пробив над $181.37 с volume_ratio ≥ 1.5x И RS new_high едновременно. Към момента цената е $178.76 (-1.44% под pivot) и volume_ratio е 0.66 — НИТО едно от двете условия не е изпълнено. Промотирам като Watchlist без промяна на tier.",
+     "risks": [
+      "Analyst target $164.31 е под текущата цена $178.76 — съществен headwind за institutional ново купуване",
+      "Volume_ratio 0.66 — под средния обем, без demand confirmation; breakout може да се провали",
+      "Base depth 17.3% е умерена, но в Defensive режим дори малки корекции в market могат да я задълбочат",
+      "Конкурентен натиск от PANW, CRWD в enterprise security може да натисне маржовете"
+     ],
+     "catalysts": [
+      "Earnings на 2026-11-04 — 34 дни напред, извън blackout; силен EPS ръст от 37.8% YoY може да генерира post-earnings breakout",
+      "Нарастващо enterprise търсене за AI-driven security (FortiAI) в контекст на по-сложни заплахи",
+      "Пробив над pivot $181.37 с потвърден обем би активирал momentum buying от institutional страна",
+      "Потенциално ускорение на OT Security сегмента при индустриална дигитализация"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "NTAP",
+    "price": 210.08,
+    "pivot": 216.81,
+    "struct_low": null,
+    "analyst_target": 198.25,
+    "setup": null,
+    "earnings": {
+     "next_earnings": "2026-12-01",
+     "days_to_earnings": 61,
+     "in_blackout": false,
+     "eps_estimate": 10.01046,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Макро: Defensive режим допуска Technology с -50% sizing при потвърден RS тренд. Секторна логика: XLK 12-седмичен RS потвърждава структурна ротация в tech quality names. NTAP специфично: enterprise data management за hybrid cloud е mission-critical infrastructure — не discretionary. Forward P/E 18.89 е атрактивно за quality tech, особено при EPS ръст 60.9% YoY. RS статус new_high. Trigger от вчера: пробив над $210.04 с volume_ratio ≥ 1.5x И RS new_high едновременно. Към момента цената е $210.08 — технически над вчерашния trigger price, но volume_ratio е 1.3 (под изискуемия 1.5x праг) и breakout_volume е false. Условието за обем НЕ е изпълнено. Промотирам като Watchlist.",
+     "risks": [
+      "Analyst target $198.25 е под текущата цена $210.08 — wall street консенсусът не поддържа upside от текущите нива",
+      "Base depth 29.1% е дълбока — изисква значителна работа за successful breakout и задържане над pivot",
+      "Volume_ratio 1.3 — близо до прага, но не достатъчно; false breakout риск при липса на institutional participation",
+      "Defensive пазарен режим може да потисне tech positioned като 'value' ако macro deteriorates"
+     ],
+     "catalysts": [
+      "Earnings на 2026-12-01 — 61 дни напред, достатъчно хоризонт за swing trade без earnings риск",
+      "AI-driven storage demand: хиперскейлърите разширяват data infrastructure за AI workloads — директен tailwind за NTAP",
+      "Forward P/E 18.89 при EPS ръст 60.9% е значително undervalued спрямо tech peers — value rotation може да привлече institutional buying",
+      "Институционалното ownership 102% (над 100%) индикира силно conviction — допълнително натрупване при пробив"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "ZBRA",
+    "price": 373.31,
+    "pivot": 386.23,
+    "struct_low": null,
+    "analyst_target": 411.45267,
+    "setup": null,
+    "earnings": {
+     "next_earnings": "2026-11-03",
+     "days_to_earnings": 33,
+     "in_blackout": false,
+     "eps_estimate": 21.03934,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Макро: Defensive режим е директна пречка. Вчерашният trigger изрично изисква Neutral или по-добър режим ПРЕДИ entry. Текущият режим е Defensive — условието НЕ е изпълнено и не промотирам. ZBRA е deep base (33.9% дълбочина) с rs_status near_high (не new_high) и volume_ratio 0.48 — изключително слаба техническа картина. Earnings след 33 дни добавят допълнителен риск. Setup-ът е слаб на всички фронтове в текущия режим.",
+     "risks": [
+      "Defensive пазарен режим директно блокира entry — deep base акции са първите жертви при market weakness",
+      "Base depth 33.9% е опасно дълбока — показва сериозна selling pressure в базата",
+      "Volume_ratio 0.48 — под средния обем, абсолютна липса на demand; breakout без обем ще се провали",
+      "RS near_high (не new_high) — relative strength не потвърждава leadership; рискува да изостане от market"
+     ],
+     "catalysts": [
+      "EPS ръст 108% YoY — ако macro се стабилизира, re-rating потенциал е значителен",
+      "Analyst target $411.45 предлага ~10% upside от pivot — валиден при правилния режим",
+      "Warehouse автоматизация и inventory visibility остават secular tailwind за ZBRA продуктите",
+      "Earnings на 2026-11-03 — потенциален catalyst, но и двупосочен риск"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "AMD",
+    "price": 611.76,
+    "pivot": 639.0,
+    "struct_low": null,
+    "analyst_target": 618.508,
+    "setup": null,
+    "earnings": {
+     "next_earnings": "2026-11-03",
+     "days_to_earnings": 33,
+     "in_blackout": false,
+     "eps_estimate": 7.57578,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Макро: Полупроводници имат допустима логика в Defensive режим при -50% sizing (SMH RS +11.3% за 4 седмици). AMD е директен бенефициент на AI capex cycle чрез MI300X GPU серията срещу NVIDIA. Въпреки това setup-ът има сериозни слабости: deep base 32.8%, rs_status near_high (не new_high), volume_ratio 0.72, -4.26% под pivot. Analyst target $618.51 е само 1.1% над текущата цена — минимален upside buffer. PE 154.9x е трудно защитимо в Defensive режим. Earnings след 33 дни. Setup-ът е слаб — казвам го директно.",
+     "risks": [
+      "Analyst target $618.51 е едва $6.75 над текущата цена — практически без upside buffer от Wall Street консенсус",
+      "Deep base 32.8% и rs_status near_high (не new_high) — AMD изостава от semiconductor peers, не е лидер",
+      "PE 154.9x е труден за защита при macro deterioration в Defensive режим",
+      "NVIDIA dominance в AI accelerators може да ограничи AMD market share gains и да натисне margins"
+     ],
+     "catalysts": [
+      "MI300X и MI325X GPU demand от хиперскейлъри — директна връзка с AI capex cycle",
+      "EPYC server CPU market share gains срещу Intel — secular share shift продължава",
+      "Earnings на 2026-11-03 — EPS ръст 163.4% YoY може да генерира positive re-rating ако guidance е силен",
+      "SMH сектор momentum (+11.3% за 4 седмици) може да привлече momentum buyers в AMD"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "AVT",
+    "price": 99.95,
+    "pivot": 104.58,
+    "struct_low": null,
+    "analyst_target": 106.25,
+    "setup": null,
+    "earnings": {
+     "next_earnings": "2026-10-28",
+     "days_to_earnings": 27,
+     "in_blackout": false,
+     "eps_estimate": 10.5725,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "AVT е вече в портфейла от 2026-09-14 при entry $99.92. Текущата цена $210.08 надминава entry с малка маржа. Вчерашният trigger изрично казва: управлявай съществуващата позиция, не добавяй риск. Volume_ratio 1.2 е близо до threshold, но breakout_volume е false и цената е -4.43% под pivot $104.58. EPS ръст 1978.8% е артефакт на ниска база, а ROE 6.7% е слаб за justifying premium. Earnings след 27 дни — относително близо. Не добавям нова позиция.",
+     "risks": [
+      "Analyst target $106.25 е само 6.3% над текущата цена — ограничен upside",
+      "Earnings след 27 дни — добавя binary risk към swing позиция",
+      "ROE 6.7% е слаб — capital allocation не е premier quality за Defensive режим",
+      "Macro slowdown директно удря electronics distribution volumes и margins"
+     ],
+     "catalysts": [
+      "Semiconductor inventory restocking цикъл — при нормализиране AVT е early beneficiary като дистрибутор",
+      "Earnings на 2026-10-28 след 27 дни — потенциален catalyst при позитивно guidance за H2",
+      "Forward P/E 9.0x е атрактивно ако margin recovery продължи",
+      "Short interest 11.98% предлага squeeze потенциал при пробив с обем"
+     ],
+     "classification": "Watchlist"
+    }
+   }
+  ],
+  "2026-10-09": [
+   {
+    "ticker": "EXPD",
+    "price": 193.71,
+    "pivot": 194.59,
+    "struct_low": 183.36,
+    "analyst_target": 180.86667,
+    "setup": {
+     "kind": "below_pivot",
+     "eligible": false,
+     "gate": "below_pivot",
+     "pct_from_pivot": -0.45,
+     "volume_ok": false,
+     "buy_stop": 194.59,
+     "max_chase": 204.32,
+     "valid_through": "2026-10-15",
+     "struct_stop": 181.53,
+     "struct_risk_pct": 6.71,
+     "stop": 181.53,
+     "risk_pct": 6.71,
+     "trigger_text": "Чака пробив: buy-stop $194.59 (валиден 5 сесии, до 2026-10-15); сега 0.5% под pivot. Купува се само ако High ≥ $194.59, до $204.32; обем ≥ 1.5× среден за потвърждение."
+    },
+    "earnings": {
+     "next_earnings": "2026-11-03",
+     "days_to_earnings": 25,
+     "in_blackout": false,
+     "eps_estimate": 7.84587,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Setup е below_pivot — чака buy-stop пробив на $194.59. Базата е само 14.5% дълбочина — най-тясната в листата, показва относителна сила по време на пазарната слабост. EPS растеж 45% YoY и revenue 32.1% YoY са солидни. Макро верига е чисто техническа: EXPD е в Industrials/Logistics, което не е приоритетен сектор в Defensive режим. Analyst target $180.87 е под текущата цена — консенсусът не поддържа нов ATH. RS рейтинг 90 е привлекателен, но секторният fit е слаб.",
+     "risks": [
+      "Analyst target $180.87 е под текущата цена $193.71 — sell-side консенсусът вижда downside от текущите нива",
+      "Industrials/Logistics не е defensive sectoral fit при текущия режим — ротационен headwind",
+      "Обем 0.98× среден — при buy-stop пробив трябва ≥1.5× потвърждение, иначе сигналът е ненадежден",
+      "Macro риск: тарифна несигурност и глобална търговска слабост директно засягат logistics volumes"
+     ],
+     "catalysts": [
+      "EPS растеж 45% YoY — силно accelerating earnings при сравнително ниско P/E (28.2×)",
+      "База 14.5% дълбочина — тясна консолидация показва institutional accumulation при пазарна слабост",
+      "Next earnings 2026-11-03 (25 дни) — достатъчен прозорец за trade ако пробивът се случи скоро",
+      "RS рейтинг 90 и near_high статус — акцията outperform при относително слаб сектор"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "ANET",
+    "price": 210.97,
+    "pivot": 214.89,
+    "struct_low": 196.89,
+    "analyst_target": 243.69,
+    "setup": {
+     "kind": "below_pivot",
+     "eligible": false,
+     "gate": "below_pivot",
+     "pct_from_pivot": -1.82,
+     "volume_ok": false,
+     "buy_stop": 214.89,
+     "max_chase": 225.63,
+     "valid_through": "2026-10-15",
+     "struct_stop": 194.92,
+     "struct_risk_pct": 9.29,
+     "stop": 197.7,
+     "risk_pct": 8.0,
+     "trigger_text": "Чака пробив: buy-stop $214.89 (валиден 5 сесии, до 2026-10-15); сега 1.8% под pivot. Купува се само ако High ≥ $214.89, до $225.63; обем ≥ 1.5× среден за потвърждение."
+    },
+    "earnings": {
+     "next_earnings": "2026-11-03",
+     "days_to_earnings": 25,
+     "in_blackout": false,
+     "eps_estimate": 4.11606,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "XLK е единственият сектор с потвърдена позитивна RS на двата таймфрейма (4W и 12W). ANET е в networking за AI/data center — директна бенефициент на AI capex цикъла, без да е толкова изложена към чиста AI hardware мулти-плиер компресия, каквато нанесе OpenAI разочарованието върху Nvidia. RS рейтинг 87 и near_high статус потвърждават relative strength на акцията. Setup е below_pivot — чака buy-stop пробив на $214.89.",
+     "risks": [
+      "OpenAI приходното разочарование добавя краткосрочен downside risk към AI hardware мулти-плиера — ANET не е имунна",
+      "Buy-stop $214.89 може да не се активира в 5-сесийния прозорец (до 2026-10-15) — setup изтича без action",
+      "Обем 0.81× среден — при пробив трябва ≥1.5× потвърждение, без което сигналът е ненадежден",
+      "Defensive пазарен режим ограничава sizing до 50% от нормалното — risk/reward е компресиран"
+     ],
+     "catalysts": [
+      "Продължаващ AI capex от hyperscalers — ANET доставя 400G/800G switching infrastructure, търсенето е структурно, не еднократно",
+      "Следващ earnings 2026-11-03 (25 дни) — EPS растеж 36.5% YoY и revenue 37.7% YoY дават позитивен baseline преди отчета",
+      "Analyst target $243.69 (+15.4% от текущата цена) — потенциал за re-rating при потвърден пробив",
+      "XLK секторна ротация в Defensive режим — мега-cap tech с pricing power привлича defensive капитал"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "ZBRA",
+    "price": 382.14,
+    "pivot": 386.23,
+    "struct_low": 342.07,
+    "analyst_target": 413.85266,
+    "setup": {
+     "kind": "too_wide",
+     "eligible": false,
+     "gate": "too_wide",
+     "pct_from_pivot": -1.06,
+     "volume_ok": false,
+     "buy_stop": null,
+     "max_chase": 405.54,
+     "valid_through": "2026-10-15",
+     "struct_stop": 338.65,
+     "struct_risk_pct": 12.32,
+     "stop": 355.33,
+     "risk_pct": 8.0,
+     "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($342.07 −1% = $338.65) е 12.3% под входа (> 10%) — не се купува, докато базата не се стегне."
+    },
+    "earnings": {
+     "next_earnings": "2026-11-03",
+     "days_to_earnings": 25,
+     "in_blackout": false,
+     "eps_estimate": 21.04684,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "RS рейтинг 92 и near_high статус са силни. ZBRA е в автоматизация и data capture — индиректна бенефициент на enterprise tech spending. Setup обаче е too_wide: структурният стоп ($338.65) е 12.3% под входа, което надвишава допустимия праг от 10%. Базата има 34.7% дълбочина — широка консолидация, но too_wide е заради стопа, не заради дълбочината. В Defensive режим това risk profile е неприемливо без стягане на базата.",
+     "risks": [
+      "Setup too_wide: стопът под 15-барния low ($342.07 −1% = $338.65) е 12.3% под входа (>10%) — не се купува при текущата структура",
+      "Inst. ownership 105.9% (>100%) — heavy institutional ownership, ограничена маржинална buyer база за squeeze",
+      "Defensive пазарен режим — ZBRA е cyclical/industrial flavour, не е defensive sectoral fit",
+      "Analyst target $413.85 (+8.3% от цената) — умерен upside за риска, който се носи"
+     ],
+     "catalysts": [
+      "EPS растеж 108% YoY — изключителен momentum, показва recovery от предишен цикличен спад",
+      "Revenue растеж 20.4% YoY потвърждава, че demand recovery е реален, не само margin driven",
+      "Forward P/E 17.2× при такъв растеж е атрактивна оценка — re-rating потенциал при нормализиране",
+      "Next earnings 2026-11-03 (25 дни) — позитивен surprise може да свие базата до actionable стоп"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "AMG",
+    "price": 386.99,
+    "pivot": 392.91,
+    "struct_low": 349.58,
+    "analyst_target": 440.42856,
+    "setup": {
+     "kind": "too_wide",
+     "eligible": false,
+     "gate": "too_wide",
+     "pct_from_pivot": -1.51,
+     "volume_ok": false,
+     "buy_stop": null,
+     "max_chase": 412.56,
+     "valid_through": "2026-10-15",
+     "struct_stop": 346.08,
+     "struct_risk_pct": 11.92,
+     "stop": 361.48,
+     "risk_pct": 8.0,
+     "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($349.58 −1% = $346.08) е 11.9% под входа (> 10%) — не се купува, докато базата не се стегне."
+    },
+    "earnings": {
+     "next_earnings": "2026-11-02",
+     "days_to_earnings": 24,
+     "in_blackout": false,
+     "eps_estimate": 37.05744,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Setup-ът е чисто технически — AMG не е в активен сектор (Financial Services / Asset Management е извън SMH/XLK/XLV секторната логика). RS рейтинг 88 и near_high RS статус показват относителна сила, но при Defensive режим и кредитен spread spike секторът е изложен на волатилност в AUM и fee income.",
+     "risks": [
+      "Defensive режим + кредитен spread spike могат да компресират AUM и fee приходи",
+      "Институционалното ownership 100.6% означава малко 'dry powder' за нов institutional buying",
+      "Лихвената среда (US10Y 5.23%) натиска equity valuations и може да забави retail inflows",
+      "Ако broader market продължи слабостта, high-beta Financial Services продава се непропорционално"
+     ],
+     "catalysts": [
+      "Forward P/E 9.0× при EPS ръст 120.5% YoY — потенциал за multiple re-rating",
+      "Analyst target $440.43 предполага ~13.8% upside от текущото ниво",
+      "Earnings на 2026-11-02 (24 дни) — извън непосредствен blackout риск",
+      "Ако пазарният режим се подобри, AUM flow-овете в boutique managers могат да ускорят"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "PSX",
+    "price": 281.6,
+    "pivot": 277.12,
+    "struct_low": 248.51,
+    "analyst_target": 257.6842,
+    "setup": {
+     "kind": "too_wide",
+     "eligible": false,
+     "gate": "too_wide",
+     "pct_from_pivot": 1.62,
+     "volume_ok": false,
+     "buy_stop": null,
+     "max_chase": 290.98,
+     "valid_through": "2026-10-15",
+     "struct_stop": 246.02,
+     "struct_risk_pct": 12.63,
+     "stop": 259.07,
+     "risk_pct": 8.0,
+     "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($248.51 −1% = $246.02) е 12.6% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (0.81× < 1.5×)."
+    },
+    "earnings": {
+     "next_earnings": "2026-10-28",
+     "days_to_earnings": 19,
+     "in_blackout": false,
+     "eps_estimate": 29.30512,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "Setup-ът е чисто технически — PSX е в Energy/Refining, не в активните сектори (SMH/XLK/XLV). RS рейтинг 96 и new_high RS статус са изключително силни, но setup-ът е 'too_wide': стопът под 15-барния low ($248.51 −1% = $246.02) е 12.6% под входа, което надвишава 10% лимита. Освен това volume_ratio 0.81× е под изисквания 1.5× праг. Базата е с 33.7% дълбочина, но 'too_wide' квалификацията идва от разстоянието до структурния стоп (12.6%), не от дълбочината.",
+     "risks": [
+      "Analyst target $257.68 е ПОД текущата цена $281.60 — консенсусът не поддържа upside отук",
+      "Setup 'too_wide': стопът ($246.02) е 12.6% под входа — рискът на позицията е структурно прекомерен",
+      "Volume 0.81× — без институционален conviction при текущото ниво",
+      "Нефтените цени и refining margins са цикличко чувствителни; Defensive режим не фаворизира Energy"
+     ],
+     "catalysts": [
+      "RS рейтинг 96 и new_high RS статус — сред най-силните акции на пазара относително",
+      "EPS ръст 338.7% YoY показва значително цикличко ускорение",
+      "Earnings на 2026-10-28 (19 дни) — потенциален catalyst, но и риск",
+      "Ако нефтените цени стабилизират и refining spreads се задържат, forward P/E 10.5× е атрактивен"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "FTNT",
+    "price": 189.1,
+    "pivot": 181.37,
+    "struct_low": 166.09,
+    "analyst_target": 164.31944,
+    "setup": {
+     "kind": "too_wide",
+     "eligible": false,
+     "gate": "too_wide",
+     "pct_from_pivot": 4.26,
+     "volume_ok": false,
+     "buy_stop": null,
+     "max_chase": 190.44,
+     "valid_through": "2026-10-15",
+     "struct_stop": 164.43,
+     "struct_risk_pct": 13.05,
+     "stop": 173.97,
+     "risk_pct": 8.0,
+     "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($166.09 −1% = $164.43) е 13.1% под входа (> 10%) — не се купува, докато базата не се стегне. Също без обем (1.00× < 1.5×)."
+    },
+    "earnings": {
+     "next_earnings": "2026-10-28",
+     "days_to_earnings": 19,
+     "in_blackout": false,
+     "eps_estimate": 3.45008,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "RS рейтинг 96 е най-висок в листата — изключителна relative strength. Cybersecurity е структурно търсен в enterprise tech дори при Defensive режим — компаниите не спират security spending. Въпреки това setup е too_wide: стопът под 15-барния low ($166.09 −1% = $164.43) е 13.1% под входа, обемът е точно 1.00× (без потвърждение). Analyst target $164.32 е под текущата цена $189.10 — консенсусът не виждат upside от тук.",
+     "risks": [
+      "Setup too_wide: стопът под 15-барния low ($166.09 −1% = $164.43) е 13.1% под входа (>10%) — не се купува при текущата структура",
+      "Analyst target $164.32 е 13.1% ПОД текущата цена $189.10 — консенсусът е bearish спрямо текущото ниво",
+      "Earnings в 19 дни (2026-10-28) — влизане сега означава binary earnings риск в краткосрочна позиция",
+      "ROE 117.4% е изкуствено висок (financial leverage driven) — не рефлектира органична капиталова ефективност"
+     ],
+     "catalysts": [
+      "RS рейтинг 96 — акцията демонстрира изключителна relative strength спрямо целия пазар",
+      "EPS растеж 37.8% YoY и revenue 25.6% YoY — solid fundamental backdrop",
+      "Cybersecurity demand е non-discretionary — при макро несигурност enterprise security budgets се защитават",
+      "Next earnings 2026-10-28 (19 дни) — позитивен surprise може да активира ново движение"
+     ],
+     "classification": "Watchlist"
+    }
+   },
+   {
+    "ticker": "NTAP",
+    "price": 231.05,
+    "pivot": 216.81,
+    "struct_low": 190.89,
+    "analyst_target": 211.6875,
+    "setup": {
+     "kind": "too_wide",
+     "eligible": false,
+     "gate": "too_wide",
+     "pct_from_pivot": 6.57,
+     "volume_ok": false,
+     "buy_stop": null,
+     "max_chase": 227.65,
+     "valid_through": "2026-10-15",
+     "struct_stop": 188.98,
+     "struct_risk_pct": 18.21,
+     "stop": 212.57,
+     "risk_pct": 8.0,
+     "trigger_text": "Твърде разтегнато: стопът под 15-барния low ($190.89 −1% = $188.98) е 18.2% под входа (> 10%) — не се купува, докато базата не се стегне. Също extended: +6.6% над pivot $216.81."
+    },
+    "earnings": {
+     "next_earnings": "2026-12-01",
+     "days_to_earnings": 53,
+     "in_blackout": false,
+     "eps_estimate": 10.00569,
+     "recap": null
+    },
+    "ai": {
+     "why_now": "RS рейтинг 96 и near_high статус са силни. NTAP е в enterprise storage и hybrid cloud — бенефициент на AI data infrastructure buildout. Setup обаче е too_wide и extended: стопът ($188.98) е 18.2% под входа, и цената е +6.6% над pivot $216.81 — извън buyable zone. Analyst target $211.69 е под текущата цена $231.05 — консенсусът вижда downside. Setup е неприемлив на три фронта едновременно.",
+     "risks": [
+      "Setup too_wide и extended: стопът ($164.43 — wait, $188.98) е 18.2% под входа (>10%) — далеч извън приемливия risk параметър",
+      "Цената е +6.6% над pivot $216.81 — извън buyable zone, late entry с компресиран risk/reward",
+      "Analyst target $211.69 е под текущата цена $231.05 — консенсусът сигнализира overvaluation",
+      "Inst. ownership 102.1% (>100%) — ограничена нова institutional buying база"
+     ],
+     "catalysts": [
+      "EPS растеж 60.9% YoY и revenue 29.9% YoY — силен fundamental momentum",
+      "AI data infrastructure търсене — NTAP storage решения са critical layer за AI training data",
+      "Next earnings 2026-12-01 (53 дни) — дълъг прозорец без earnings binary риск",
+      "Forward P/E 20.7× при 60%+ EPS растеж — потенциално undervalued при нормален пазар"
+     ],
+     "classification": "Watchlist"
+    }
+   }
+  ]
+ }
+}

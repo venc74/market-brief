@@ -971,7 +971,118 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
             # С7 (втори преглед, 10.10): БЕЗ setdefault("След earnings на …") — той блокираше main._watchlist_trigger_text и картата губеше
             # buy-stop нивото и текста за режима; текстът от кода вече започва с "Отчет на … — нов Action най-рано след отчета."
         _check_price_mentions(c.get("ticker", "?"), c["ai"].get("why_now") or "", c.get("price"))
+    verify_narrative_numbers(candidates)
     return candidates
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Втори преглед (10.10.2026): числата в AI наративите срещу кода — замърсяване между тикъри.
+#
+# Сума в долари, която я няма сред числата на САМИЯ тикър, но съвпада точно с ключово ниво на ДРУГ тикър от същия бриф (цена, pivot,
+# структурен low, analyst target, числата на сетъпа) → изречението (why_now) или точката (risks/catalysts) се маха и се логва.
+# Защо толкова тясно: измерено върху цялата история (679 карти, 2 241 суми в $) — 200 суми ги няма сред числата на картата, но почти
+# всички са легитимни (разлики "само $4.63 над цената", макро "$5 841 млрд", закръглени цели "~$115–120", факти "$1.7B приходи");
+# правило "няма го в картата → махни" би изрязало ~185 верни изречения. Тесният подпис дава точно 2 удара, и двата истински:
+# AVT 01.10 ("Текущата цена $210.08" — цената на NTAP) и NTAP 09.10 ("стопът ($164.43 — wait, $188.98)" — стопът на FTNT).
+# ──────────────────────────────────────────────────────────────────────────
+_DOLLAR_RE = re.compile(r"\$\s?(\d[\d,]*\.?\d*)")
+_ANYNUM_RE = re.compile(r"\d[\d,]*\.?\d*")
+NARRATIVE_DIAG: list = []
+
+
+def _card_numbers(o, out: set) -> set:
+    """Всички числа в картата БЕЗ полето ai (входът на модела за този тикър е подмножество на това)."""
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k != "ai":
+                _card_numbers(v, out)
+    elif isinstance(o, list):
+        for v in o:
+            _card_numbers(v, out)
+    elif isinstance(o, (int, float)) and not isinstance(o, bool):
+        out.add(round(float(o), 2))
+    elif isinstance(o, str):
+        for m in _ANYNUM_RE.finditer(o):
+            try:
+                out.add(round(float(m.group(0).replace(",", "")), 2))
+            except ValueError:
+                pass
+    return out
+
+
+def _key_levels(c: dict) -> set:
+    """Ключовите ценови нива на тикъра — по тях се разпознава чуждо число."""
+    s = set()
+    for k in ("price", "pivot", "struct_low", "analyst_target"):
+        v = c.get(k)
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            s.add(round(float(v), 2))
+    for sub in ("setup", "plan", "plan_preview", "levels"):
+        for k, v in (c.get(sub) or {}).items():
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and v > 5:
+                s.add(round(float(v), 2))
+            elif k == "trigger_text" and isinstance(v, str):
+                s.update(round(float(m.group(1).replace(",", "")), 2) for m in _DOLLAR_RE.finditer(v))
+    return s
+
+
+def _foreign_amounts(text: str, own: set, foreign: dict) -> list[tuple[float, list[str]]]:
+    out = []
+    for m in _DOLLAR_RE.finditer(text or ""):
+        try:
+            v = round(float(m.group(1).replace(",", "")), 2)
+        except ValueError:
+            continue
+        if v < 5 or any(abs(v - x) <= max(0.01, abs(x) * 0.005) for x in own):
+            continue
+        who = sorted(t for t, levels in foreign.items() if v in levels)
+        if who:
+            out.append((v, who))
+    return out
+
+
+def verify_narrative_numbers(candidates: list[dict]) -> list[dict]:
+    """
+    Чисти чуждите числа от AI текста на всеки кандидат (виж бележката по-горе). Записва в NARRATIVE_DIAG
+    [{ticker, field, amount, from, removed}] и логва. Грешка → нищо не се маха (graceful).
+    """
+    NARRATIVE_DIAG.clear()
+    try:
+        own = {c.get("ticker"): _card_numbers(c, set()) for c in candidates}
+        keys = {c.get("ticker"): _key_levels(c) for c in candidates}
+        for c in candidates:
+            t = c.get("ticker")
+            ai = c.get("ai") or {}
+            foreign = {o: lv for o, lv in keys.items() if o != t}
+            text = ai.get("why_now")
+            if isinstance(text, str) and text:
+                kept = []
+                for sent in re.split(r"(?<=[.!?])\s+", text):
+                    hits = _foreign_amounts(sent, own.get(t, set()), foreign)
+                    if hits:
+                        for v, who in hits:
+                            NARRATIVE_DIAG.append({"ticker": t, "field": "why_now", "amount": v, "from": who, "removed": sent})
+                        continue
+                    kept.append(sent)
+                ai["why_now"] = " ".join(kept)
+            for field in ("risks", "catalysts"):
+                items = ai.get(field)
+                if not isinstance(items, list):
+                    continue
+                kept = []
+                for it in items:
+                    hits = _foreign_amounts(it, own.get(t, set()), foreign) if isinstance(it, str) else []
+                    if hits:
+                        for v, who in hits:
+                            NARRATIVE_DIAG.append({"ticker": t, "field": field, "amount": v, "from": who, "removed": it})
+                        continue
+                    kept.append(it)
+                ai[field] = kept
+        for d in NARRATIVE_DIAG:
+            print(f"[ai] {d['ticker']}: чуждо число ${d['amount']} (ниво на {', '.join(d['from'])}) в {d['field']} — махнато: «{d['removed'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на числата в наративите пропусната: {type(e).__name__}: {e}")
+    return NARRATIVE_DIAG
 
 
 # FIX 2026-10-01 (т.3 от прегледа на 01.10): batch-ов cross-contamination —

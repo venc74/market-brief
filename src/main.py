@@ -916,6 +916,7 @@ def run() -> dict:
         "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
+        "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
         # FIX 2026-09-30: приети/отхвърлени маркирания от проверката на тезите
         # срещу новините — правило (G0–G3) и причина
         "thesis_check_diag": dict(ai_brief.THESIS_CHECK_DIAG),
