@@ -154,8 +154,19 @@ def treasury_spread_2s10s() -> dict:
     obs = _fred_series("T10Y2Y", days=30)
     if not obs:
         return {"value": None, "status": "unknown"}
-    val = obs[-1][1]
-    prev = obs[-6][1] if len(obs) >= 6 else obs[0][1]
+    # втори преглед (10.10.2026): "седмица назад" по ДАТА (series_utils.last_and_week_ago — котва 7 календарни дни от последното наблюдение), не
+    # obs[-6] (пет наблюдения назад — около празници прозорецът ставаше 8–9 дни), + проверка за застояли данни в NYSE сесии (допуск 2 — облигационни празници)
+    import pandas as pd
+    from src.setup_rules import sessions_between
+    try:
+        ser = pd.Series([v for _, v in obs], index=pd.to_datetime([d for d, _ in obs]))
+        val, prev, last_date = last_and_week_ago(ser)
+    except ValueError as e:
+        print(f"[macro] 2s10s: {e}")
+        return {"value": None, "status": "unknown"}
+    if sessions_between(last_date, dt.date.today()) > config.FRED_DAILY_MAX_LAG_SESSIONS:
+        print(f"[macro] 2s10s stale — последно наблюдение {last_date}")
+        return {"value": None, "status": "unknown", "stale": True, "last_date": last_date.isoformat()}
     # FIX 2026-09-12 (findings log 04-11.09, т.5): "steepening" if val > prev
     # else "flattening" няма tie клон — потвърдено на живо (09.09, 10.09):
     # val == prev буквално (0.41==0.41, 0.40==0.40), но else клонът тихо
@@ -170,6 +181,7 @@ def treasury_spread_2s10s() -> dict:
     return {
         "value": val,
         "prev_week": prev,
+        "as_of": last_date.isoformat(),
         # FIX 2026-10-03 (пакет 2 т.5): седмичната промяна е готова в б.п. — AI-то да не я смята наум
         "change_1w_bp": round((val - prev) * 100, 1),
         "status": "inverted" if val < 0 else "normal",

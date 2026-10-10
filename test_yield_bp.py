@@ -68,7 +68,9 @@ print()
 
 print("── спредът 2s10s и промптът ──")
 ml._fred_series = lambda sid, days=30: [("2026-09-%02d" % d, 0.31) for d in range(1, 6)] + [("2026-09-30", 0.46)]
+_lag, config.FRED_DAILY_MAX_LAG_SESSIONS = config.FRED_DAILY_MAX_LAG_SESSIONS, 10_000    # тук е форматът в б.п.; застоялостта е в test_2s10s_dates.py
 sp = ml.treasury_spread_2s10s()
+config.FRED_DAILY_MAX_LAG_SESSIONS = _lag
 assert sp["value"] == 0.46 and sp["prev_week"] == 0.31 and sp["change_1w_bp"] == 15.0
 assert (BRIEF["spread_2s10s"]["value"], BRIEF["spread_2s10s"]["prev_week"]) == (0.46, 0.31)       # РЕАЛНИТЕ числа от брифа 02.10
 print("  ✓ T10Y2Y 0.46 срещу 0.31 (реалните от 02.10; серията е СИНТЕТИЧНА) → change_1w_bp +15.0")
