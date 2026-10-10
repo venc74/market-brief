@@ -70,6 +70,19 @@ def _live_positions() -> dict[str, dict]:
         return {}
 
 
+def _pending_action_plans() -> dict[str, dict]:
+    """
+    Втори преглед (10.10.2026): тикър → v2 Action запис, който ЧАКА buy-stop (status pending — прозорецът още тече). Не е позиция (COT контекстът
+    и "вече в портфейла" не го броят), но нов Action план за същия тикър би дублирал чакащия — apply_hard_rules го връща във Watchlist.
+    """
+    try:
+        return {rec["ticker"]: rec for rec in backtest._load_tracker().values()
+                if rec.get("method") == "v2" and backtest.is_action_record(rec) and rec.get("status") == "pending"}
+    except Exception as e:
+        print(f"[main] pending plans check failed: {e}")
+        return {}
+
+
 def attach_position_uov(rows: list[dict]) -> dict:
     """
     Пакет 4б т.б: слага UOV✓ върху редовете на позициите (v2 отворени/чакащи и buy-stop книгата) — по ЕДНО извикване за всички тикъри.
@@ -221,6 +234,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
     action, watchlist = [], []
     sector_count: dict[str, int] = {}
     live = _live_positions() if config.ENABLE_BACKTEST else {}
+    pending = _pending_action_plans() if config.ENABLE_BACKTEST else {}
     closed = _last_resolved_positions() if config.ENABLE_BACKTEST else {}
     today = dt.date.today().isoformat()
 
@@ -252,6 +266,22 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 f"Вече в портфейла от {held_since} "
                 f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
                 "потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.")
+        elif pending.get(c.get("ticker")):
+            # втори преглед (10.10.2026): Action планът от предишен бриф още чака buy-stop → без втори план (рядко, но тогава картата показваше
+            # нов вход с нов риск, докато старият е в сила)
+            pr = pending[c["ticker"]]
+            c.setdefault("markers", []).append({
+                "tag": "ЧАКА BUY-STOP",
+                "title": (f"Action планът от {pr.get('entry_date')} чака buy-stop ${pr.get('buy_stop')} "
+                          f"до {pr.get('valid_through')} — не е нов вход."),
+            })
+            c.setdefault("ai", {})
+            c["ai"]["classification"] = "Watchlist"
+            c["ai"]["watchlist_reason_type"] = "existing_position"
+            forced = True
+            c["ai"]["watchlist_trigger"] = (
+                f"Action планът от {pr.get('entry_date')} е в сила: buy-stop ${pr.get('buy_stop')} (таван ${pr.get('max_chase')}), "
+                f"валиден до {pr.get('valid_through')}. Нов план не се дава, докато този чака.")
         else:
             # FIX 2026-09-22: тикърът НЯМА жива позиция, но може да е имал
             # такава, която току-що е приключила. Виж _last_resolved_positions()
