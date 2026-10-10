@@ -330,7 +330,10 @@ def _close_on(df, day) -> float | None:
 
 def _row(ev: dict, close: float, low52=None) -> dict:
     """Редът за показване: събитието от входа + днешната цена, разстоянието до линията и (информативно, 09.10) "× от 52-седмичното дъно"."""
-    return {**ev, "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
+    # втори преглед (10.10.2026): текстът (risk_note) е от ТЕКУЩИЯ код, не замразен в събитието — иначе промяна на текста не стига до картите
+    # (реално на 10.10: и 17-те събития пазеха старото "Тесен, добре удържан base…" / "Дълъг ATH unpenetrated период…")
+    return {**ev, "risk_note": RISK_NOTES.get(ev.get("glb_type"), ev.get("risk_note")),
+            "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
             "x_from_52w_low": x_from_low52(close, low52)}
 
 
@@ -384,7 +387,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
         if sym in events or not ob.get("entry"):
             continue
         e = ob["entry"]
-        ev = {**{k: v for k, v in e.items() if k not in ("price",)}, "line": e["prior_high"], "since": today}
+        ev = {**{k: v for k, v in e.items() if k not in ("price", "risk_note")}, "line": e["prior_high"], "since": today}     # risk_note — от кода при показване
         if ob.get("last_date"):            # С2: close-ът и ДАТАТА НА БАРА му (since е датата на брифа — друг бар) → откриване на сплит след входа
             ev.update(since_close=round(float(ob["close"]), 4), since_bar=ob["last_date"])
         new[sym] = ev

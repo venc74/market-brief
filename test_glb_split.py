@@ -71,3 +71,14 @@ assert '"close_at_since": _close_on(df, (events.get(sym) or {}).get("since_bar")
 print("  ✓ наблюденията носят last_date и close_at_since по ДАТАТА НА БАРА (since_bar), не по датата на брифа; apply_hysteresis мащабира преди проверката за изход")
 print()
 print("Всички тестове минаха.")
+
+print()
+print("── 5. текстът на картата е от текущия код, не от състоянието (РЕАЛЕН остарял текст на MRK от data/glb_state.json, 10.10) ──")
+stale = "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup."
+(new6, rows6, _), _ = run({"MRK": {"glb_type": "classic", "line": 140.0, "since": "2026-10-01", "risk_note": stale}}, {"MRK": {"close": 149.28}})
+assert rows6[0]["risk_note"] == g.RISK_NOTES["classic"] != stale
+(new7, rows7, _), _ = run({}, {"ZZZ": {"close": 105.0, "last_date": "2026-10-09", "entry": {"glb_type": "momentum", "prior_high": 100.0, "risk_note": stale, "price": 105.0}}})
+assert "risk_note" not in new7["ZZZ"] and rows7[0]["risk_note"] == g.RISK_NOTES["momentum"]
+print("  ✓ събитие със стария текст → картата показва текущия RISK_NOTES['classic']; ново събитие не замразява risk_note")
+print()
+print("Всички тестове минаха (вкл. т.5).")
