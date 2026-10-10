@@ -15,9 +15,10 @@ apply_hard_rules() в main.py. AI-то продължава да описва ц
 свободно (watchlist_trigger), но вече не решава КОГА тезата изтича, нито
 дали правилото вече се е задействало.
 
-Само "regime_gate" reason_type participва (виж ai_brief.py промпт
-инструкцията) — "existing_position"/"earnings_blackout"/"other" не се
-засягат от този механизъм.
+Само "regime_gate" reason_type participва — от 10.10.2026 (В2) етикетът е на
+КОДА (main._code_reason_type: потвърден сетъп, спрян от режима), не на модела;
+"existing_position"/"earnings_blackout"/"technical_gate"/"regime_block"/"other"
+не се засягат. Срокът е WATCHLIST_STALENESS_DAYS NYSE сесии (не календарни дни).
 
 Anti-renewal защита: при изтичане записът се маркира "expired": True, НЕ
 се трие директно — ако СЪЩИЯТ тикър продължи да получава "regime_gate"
@@ -41,6 +42,18 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 _STATE_PATH = config.DATA_DIR / "watchlist_expiry.json"
+# В2 (10.10.2026): тикърите, изключени ДНЕС (изтекъл прозорец или вече изтекъл, докато режимът е Defensive) → {тикър: запис};
+# main ги подава на watchlist_exits, за да покаже "Излязоха от вчера" с вярната причина
+LAST_EXPIRED: dict = {}
+
+
+def _expiry_for(first_seen: str) -> str:
+    """
+    В2: срокът е WATCHLIST_STALENESS_DAYS NYSE СЕСИИ след първото появяване (config: "работни дни"); до 10.10 беше timedelta(days=10) —
+    календарни. Денят на първото появяване не се брои: изтича в сесия № N+1 от него, включително.
+    """
+    from src.setup_rules import session_window
+    return session_window(first_seen, config.WATCHLIST_STALENESS_DAYS + 1)[-1].isoformat()
 
 
 def _load() -> dict:
@@ -75,9 +88,11 @@ def apply_regime_gate_expiry(watchlist: list[dict], regime: str, today: str) -> 
     Връща филтрирания watchlist списък. Graceful: изключение -> оригиналния
     watchlist непроменен.
     """
+    LAST_EXPIRED.clear()
     try:
         state = _load()
         current_tickers = set()
+        gated = set()           # В2: само тикърите, които ДНЕС са regime_gate (етикетът е на кода — main._code_reason_type)
         kept = []
 
         for c in watchlist:
@@ -91,12 +106,11 @@ def apply_regime_gate_expiry(watchlist: list[dict], regime: str, today: str) -> 
             if reason_type != "regime_gate":
                 kept.append(c)
                 continue
+            gated.add(ticker)
 
             rec = state.get(ticker)
             if rec is None:
-                expiry = (dt.date.fromisoformat(today) +
-                         dt.timedelta(days=config.WATCHLIST_STALENESS_DAYS)).isoformat()
-                state[ticker] = {"first_seen_date": today, "expiry_date": expiry,
+                state[ticker] = {"first_seen_date": today, "expiry_date": _expiry_for(today),
                                  "expired": False}
                 kept.append(c)
                 continue
@@ -105,19 +119,25 @@ def apply_regime_gate_expiry(watchlist: list[dict], regime: str, today: str) -> 
                 if regime != "Defensive":
                     del state[ticker]
                     kept.append(c)
+                else:
+                    LAST_EXPIRED[ticker] = dict(rec)
                 continue
 
+            rec["expiry_date"] = _expiry_for(rec["first_seen_date"])       # В2: стари записи (календарни) → в сесии
             if today >= rec["expiry_date"] and regime == "Defensive":
                 print(f"[watchlist_expiry] {ticker}: изтекъл regime-gate прозорец "
                      f"({rec['expiry_date']}), режимът остава Defensive — "
                      "автоматично изключен от watchlist")
                 rec["expired"] = True
+                LAST_EXPIRED[ticker] = dict(rec)
                 continue
 
             kept.append(c)
 
         for ticker in list(state.keys()):
-            if ticker not in current_tickers:
+            # В2: изчиства се и записът на тикър, който е във Watchlist, но вече НЕ е regime_gate (сетъпът е друг — нова ситуация,
+            # не подновяване от AI етикет; до 10.10 ZBRA/EXPD пазеха брояч, пуснат от етикета на модела)
+            if ticker not in current_tickers or ticker not in gated:
                 del state[ticker]
 
         _save(state)

@@ -86,8 +86,10 @@ card.update({"sector": "Technology", "company": "Zebra", "ai": {"classification"
 with contextlib.redirect_stdout(io.StringIO()):
     action, watch = brief_main.apply_hard_rules([card], 0.5, "Defensive")
 assert not action and watch[0]["ai"]["watchlist_trigger"] == brief_main._watchlist_trigger_text(CARDS[0], "Defensive")
-assert watch[0]["ai"]["watchlist_reason_type"] == "regime_gate"                                              # reason_type (AI) остава — по него е изтичането на regime_gate
-print("  ✓ ZBRA през apply_hard_rules: Trigger = текстът от кода; reason_type 'regime_gate' (AI) се пази за watchlist_expiry")
+# В2 (10.10): reason_type е на КОДА — ZBRA е too_wide (непотвърден сетъп) → technical_gate; AI етикетът "regime_gate" се пази само за
+# проследимост (watchlist_reason_type_ai) и вече НЕ пуска 10-сесийното изтичане (до 10.10 го пускаше — реалният ZBRA 05–08.10)
+assert watch[0]["ai"]["watchlist_reason_type"] == "technical_gate" and watch[0]["ai"]["watchlist_reason_type_ai"] == "regime_gate"
+print("  ✓ ZBRA (реалната карта от 08.10, too_wide) през apply_hard_rules: Trigger = текстът от кода; reason_type = technical_gate от кода (AI 'regime_gate' не пуска изтичането)")
 override = {**copy.deepcopy(CARDS[1]), "sector": "Technology", "ai": {"classification": "Action", "why_now": "x"}}
 with contextlib.redirect_stdout(io.StringIO()):
     _, w2 = brief_main.apply_hard_rules([override], 0.5, "Defensive")

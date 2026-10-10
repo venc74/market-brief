@@ -21,7 +21,7 @@ def call(attr):
 upd = call("update_backtest_tracker")
 assert len(upd) == 1
 args = upd[0].args
-assert [ast.unparse(a) for a in args[:3]] == ["action", "today", "watchlist"] and "regime" in ast.unparse(args[3]) and "thermo" in ast.unparse(args[3]), [ast.unparse(a) for a in args]
+assert [ast.unparse(a) for a in args[:3]] == ["action", "today", "watchlist_before_expiry"]       # В2 (10.10): Watchlist-ът ПРЕДИ regime-gate изтичането and "regime" in ast.unparse(args[3]) and "thermo" in ast.unparse(args[3]), [ast.unparse(a) for a in args]
 assert first_store("watchlist") < upd[0].lineno and first_store("thermo") < upd[0].lineno
 print("  ✓ update_backtest_tracker(action, today, watchlist, thermo…regime) — Watchlist и режимът са изчислени преди извикването")
 

@@ -103,13 +103,18 @@ with tempfile.TemporaryDirectory() as tmp:
         ai_gate["ai"].update(watchlist_reason_type="regime_gate", watchlist_trigger="AI")
         day0 = watchlist_expiry.apply_regime_gate_expiry([blocked, ai_gate], "Defensive", "2026-10-01")
         assert {x["ticker"] for x in day0} == {"BLCK", "AIGT"}
-        later = "2026-10-%02d" % (1 + config.WATCHLIST_STALENESS_DAYS + 1)       # след прозореца
+        # В2 (10.10): срокът е в NYSE СЕСИИ — от 01.10: 01,02,05,06,07,08,09,12,13,14,15 → изтича на 15.10 (до 10.10: календарно 11.10)
+        assert watchlist_expiry._expiry_for("2026-10-01") == "2026-10-15"
+        day_mid = watchlist_expiry.apply_regime_gate_expiry([blocked, ai_gate], "Defensive", "2026-10-12")
+        assert {x["ticker"] for x in day_mid} == {"BLCK", "AIGT"}                  # 12.10: календарно щеше да е изтекъл, в сесии — не
+        later = "2026-10-15"                                                        # след прозореца
         day_n = watchlist_expiry.apply_regime_gate_expiry([blocked, ai_gate], "Defensive", later)
         assert [x["ticker"] for x in day_n] == ["BLCK"], [x["ticker"] for x in day_n]
+        assert set(watchlist_expiry.LAST_EXPIRED) == {"AIGT"}
     finally:
         watchlist_expiry._STATE_PATH = orig_state
         config.DATA_DIR = orig_dir
-print(f"  ✓ след {config.WATCHLIST_STALENESS_DAYS + 1} дни в Defensive 'regime_gate' (AI) изтича, 'regime_block' (код) остава")
+print(f"  ✓ 'regime_gate' изтича след {config.WATCHLIST_STALENESS_DAYS} NYSE сесии (01.10 → 15.10; на 12.10 още не), 'regime_block' (код) остава; изтеклият е в LAST_EXPIRED")
 
 config.ENABLE_BACKTEST = True
 print()

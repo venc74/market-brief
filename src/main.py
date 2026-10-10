@@ -193,6 +193,22 @@ def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
     return " ".join(parts)
 
 
+def _code_reason_type(c: dict, regime: str | None) -> str:
+    """
+    В2 (10.10.2026): причината на Watchlist картата от кода, за картите без код-наложена причина в apply_hard_rules. Отчет в прозореца →
+    earnings_blackout; потвърден сетъп, спрян от режима (_regime_gate) → regime_gate (само той участва в 10-сесийното изтичане); непотвърден
+    сетъп → technical_gate; иначе → other (потвърден пробив, който AI не е избрал). Чиста функция.
+    """
+    if (c.get("earnings") or {}).get("in_blackout"):
+        return "earnings_blackout"
+    setup = c.get("setup") or {}
+    if setup.get("kind") == "confirmed" and _regime_gate(c, regime):
+        return "regime_gate"
+    if setup and not setup.get("eligible"):
+        return "technical_gate"
+    return "other"
+
+
 def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                      regime: str | None = None) -> tuple[list, list]:
     """
@@ -207,6 +223,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
     today = dt.date.today().isoformat()
 
     for c in candidates:
+        forced = False          # В2: True, щом КОДЪТ е наложил watchlist_reason_type по-долу (позиция, отчет, технически/режимен gate, лимит, план)
         # FIX 2026-07-15: тикър с жива позиция НЕ получава нов Action план
         # (имплицитно удвояване на риска). Отива във Watchlist с изричен
         # OPEN✓ маркер — повторният breakout сигнал е потвърждение на
@@ -228,6 +245,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             # "regime_gate" (различен клас watchlist причина, не участва в
             # expiry механизма).
             c["ai"]["watchlist_reason_type"] = "existing_position"
+            forced = True
             c["ai"]["watchlist_trigger"] = (
                 f"Вече в портфейла от {held_since} "
                 f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
@@ -261,6 +279,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                     c.setdefault("ai", {})
                     c["ai"]["classification"] = "Watchlist"
                     c["ai"]["watchlist_reason_type"] = "other"
+                    forced = True
                     c["ai"]["watchlist_trigger"] = (
                         f"{detail} Нов вход в СЪЩИЯ ден не се планира — Track "
                         "Record-ът не може да го запише като отделна сделка. "
@@ -287,6 +306,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             c.setdefault("ai", {})
             c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
+            forced = True
 
         # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — кодът има
         # последната дума. Action е допустим САМО при потвърден пробив: close над
@@ -301,6 +321,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             cls = "Watchlist"
             c.setdefault("ai", {})
             c["ai"]["watchlist_reason_type"] = "technical_gate"
+            forced = True
             c["ai"]["watchlist_trigger"] = setup["trigger_text"]
 
         # FIX 2026-10-03 (пакет 1, т.6): режимен gate СЛЕД техническия и ПРЕДИ лимитите —
@@ -312,16 +333,19 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 cls = "Watchlist"
                 c.setdefault("ai", {})
                 c["ai"]["watchlist_reason_type"] = "regime_block"
+                forced = True
                 c["ai"]["watchlist_trigger"] = gate_text
 
         if cls == "Action":
             if len(action) >= config.MAX_ACTION_TICKERS:
                 cls = "Watchlist"
                 c["ai"]["watchlist_reason_type"] = "other"  # портфейлен лимит, не regime-gate
+                forced = True
                 c["ai"]["watchlist_trigger"] = "Лимит 5 Action тикъра — следващ по сила."
             elif sector_count.get(sector, 0) >= config.MAX_PER_SECTOR:
                 cls = "Watchlist"
                 c["ai"]["watchlist_reason_type"] = "other"
+                forced = True
                 c["ai"]["watchlist_trigger"] = f"Вече {config.MAX_PER_SECTOR} Action от {sector}."
 
         if cls == "Action":
@@ -331,6 +355,7 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             if not plan.get("valid"):
                 cls = "Watchlist"
                 c["ai"]["watchlist_reason_type"] = "other"
+                forced = True
                 c["ai"]["watchlist_trigger"] = plan.get("reason", "Невалиден риск план.")
             else:
                 c["plan"] = plan
@@ -338,6 +363,15 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 sector_count[sector] = sector_count.get(sector, 0) + 1
                 action.append(c)
                 continue
+        if not forced:
+            # В2 (втори преглед, 10.10.2026): watchlist_reason_type е на КОДА, не на модела. До 10.10 AI етикетът "regime_gate" пускаше
+            # 10-дневното изтичане (watchlist_expiry) и за карти, които кодът е класифицирал като below_pivot/too_wide (ZBRA too_wide 05–08.10,
+            # EXPD below_pivot 09.10 с жив buy-stop запис); на другия ден "other" връщаше картата. regime_gate = само потвърден сетъп, спрян от режима.
+            ai = c.setdefault("ai", {})
+            code_reason = _code_reason_type(c, regime)
+            if ai.get("watchlist_reason_type") and ai["watchlist_reason_type"] != code_reason:
+                ai["watchlist_reason_type_ai"] = ai["watchlist_reason_type"]          # за проследимост; не се ползва
+            ai["watchlist_reason_type"] = code_reason
         if not c["ai"].get("watchlist_trigger"):                                   # 08.10 (2б): не е наложен от по-ранно правило → сглобява се от кода (отчет + сетъп + режим)
             c["ai"]["watchlist_trigger"] = _watchlist_trigger_text(c, regime)
         # пакет 2: buy-stop кандидатите показват стоп, риск %, цел 1 и размер на позицията при sizing-а на режима (само показване)
@@ -560,6 +594,7 @@ def run() -> dict:
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
     # чист AI prose, датата "измисляна" наново всеки ден).
+    watchlist_before_expiry = list(watchlist)     # В2: buy-stop книгата се захранва ПРЕДИ изтичането (иначе изтичането решава кои кандидати се измерват)
     watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
     # пакет 4б т.д: отчет в следващите ~20 сесии → предупреждение върху картата с датата и очакваното движение от опциите (само информация)
     try:
@@ -570,7 +605,8 @@ def run() -> dict:
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
     # 09.10: "Излязоха от вчера" — тикърите от Watchlist на предишния бриф, които днес ги няма, с причината от кода (само информация)
-    wl_exits = watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits)
+    wl_exits = watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits,
+                                   expired=watchlist_expiry.LAST_EXPIRED)       # В2: изтекъл прозорец → тази причина, не "извън 10-те карти"
     print(f"      Излязоха от Watchlist ({wl_exits.get('from', 'няма предишен бриф')}): {[r['ticker'] for r in wl_exits.get('rows', [])]}")
     # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +
     # предупреждение за тикъри без ценови данни — виж thesis_context.py. ТУК:
@@ -698,7 +734,7 @@ def run() -> dict:
     # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
     # списък директно, за да е налично в tracker-а от утрешния run нататък.
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today, watchlist, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+        backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
         try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)

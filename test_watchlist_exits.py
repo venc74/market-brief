@@ -94,7 +94,7 @@ print("  ✓ понеделник → «предишния бриф (09.10)»; �
 print()
 print("── 4. свързването ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits)" in src and '"watchlist_exits": wl_exits' in src
+assert "watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits,\n                                   expired=watchlist_expiry.LAST_EXPIRED)" in src and '"watchlist_exits": wl_exits' in src
 assert src.index("watchlist_exits.run(") > src.index("action, watchlist = apply_hard_rules(") and src.index("watchlist_exits.run(") > src.index("watchlist_expiry.apply_regime_gate_expiry(")
 print("  ✓ main.run: след apply_hard_rules и изтичането на regime_gate; brief['watchlist_exits']")
 print("\n✅ test_watchlist_exits: всичко мина")
