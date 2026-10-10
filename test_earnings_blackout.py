@@ -50,4 +50,15 @@ assert watch == [] or watch[0]["ai"].get("watchlist_reason_type") != "earnings_b
 print("  ✓ потвърден пробив + Action + warning, отчет след 4 дни → Watchlist / earnings_blackout, текстът започва с «Отчет на … — нов Action най-рано след отчета.»;"
       " отчет след 30 дни → правилото не се намесва")
 print()
+print("── 4. С7: текстът на картата е от кода (отчет + buy-stop + режим), не «След earnings на …» ──")
+c = copy.deepcopy(EXPD); c.pop("ai", None); c["earnings"] = dict(BLACKOUT)
+ai_brief.merge_narratives([c], [{"ticker": "EXPD", "classification": "Watchlist", "why_now": "x"}])
+assert "watchlist_trigger" not in c["ai"]                                                     # до 10.10: setdefault("След earnings на 2026-10-09")
+_, watch = brief_main.apply_hard_rules([c], 1.0, "Defensive")
+t = watch[0]["ai"]["watchlist_trigger"]
+assert t.startswith("Отчет на 2026-10-09 (4 дни) — нов Action най-рано след отчета.") and EXPD["setup"]["trigger_text"] in t and "$194.59" in t and "Режим Defensive" in t
+assert "След earnings на" not in t
+print("  ✓ реалната EXPD (05.10) + СИНТЕТИЧЕН отчет: текстът пази buy-stop $194.59 и режима (до 10.10 беше само «След earnings на 2026-10-09»)")
+print("    " + t[:200] + "…")
+print()
 print("Всички тестове минаха.")

@@ -961,8 +961,8 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
         if c.get("earnings", {}).get("in_blackout"):
             c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
-            c["ai"].setdefault("watchlist_trigger",
-                               f"След earnings на {c['earnings'].get('next_earnings')}")
+            # С7 (втори преглед, 10.10): БЕЗ setdefault("След earnings на …") — той блокираше main._watchlist_trigger_text и картата губеше
+            # buy-stop нивото и текста за режима; текстът от кода вече започва с "Отчет на … — нов Action най-рано след отчета."
         _check_price_mentions(c.get("ticker", "?"), c["ai"].get("why_now") or "", c.get("price"))
     return candidates
 
