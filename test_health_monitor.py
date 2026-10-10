@@ -83,6 +83,16 @@ assert hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cac
 print("  ✓ липсващ предишен бриф, стари кешове (4) и незаписано GLB състояние → редове; при паднал GLB мониторът не дублира банера на С3")
 
 print()
+print("── 4б. таблицата NYSE_HOLIDAYS (РЕАЛНАТА — покрива до 2027) ──")
+assert max(int(h[:4]) for h in config.NYSE_HOLIDAYS) == 2027
+w_ok = world(cache_date="2027-10-01", glb_updated="2027-10-01", briefs=("2027-09-30",), sessions=["2027-09-30"])
+assert "holidays" not in {i["check"] for i in hm.check("2027-10-01", w_ok, resolution={"ok": True, "live": 0}, glb_status={"ok": True})}
+w_late = world(cache_date="2027-11-15", glb_updated="2027-11-15", briefs=("2027-11-12",), sessions=["2027-11-12"])
+hol = [i for i in hm.check("2027-11-15", w_late, resolution={"ok": True, "live": 0}, glb_status={"ok": True}) if i["check"] == "holidays"]
+assert len(hol) == 1 and "покрива до 2027 г. (остават 46 дни)" in hol[0]["message"] and "празниците за 2028" in hol[0]["message"]
+print("  ✓ СИНТЕТИЧНА 'днес' 01.10.2027 (91 дни до края) → нищо; 15.11.2027 (46 дни) → «покрива до 2027 г. (остават 46 дни) — добави празниците за 2028»")
+
+print()
 print("── 5. main ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert "health_monitor.check(today, resolution=backtest.LAST_RESOLUTION" in src and "canary=canary, health=health)," in src and '"health": health,' in src

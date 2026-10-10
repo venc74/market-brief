@@ -161,6 +161,9 @@ TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = int(os.getenv("TRACK_RECORD_MIN_CLOSED_FOR
 # С5 (10.10.2026): дневно канарче за split корекцията на Yahoo (src/data_canary.py — NVDA 07.06.2024 ≈ $120.888); отклонение над толеранса → банер
 ENABLE_DATA_CANARY = os.getenv("ENABLE_DATA_CANARY", "1") == "1"
 DATA_CANARY_TOLERANCE = float(os.getenv("DATA_CANARY_TOLERANCE", 0.01))
+# втори преглед (10.10.2026): предупреждение, когато до края на последната година в NYSE_HOLIDAYS остават под толкова дни — сесиите (buy-stop прозорец,
+# застояли данни, изтичане на Watchlist, монитора) иначе тихо биха третирали празниците от следващата година като сесии
+NYSE_HOLIDAYS_WARN_DAYS = int(os.getenv("NYSE_HOLIDAYS_WARN_DAYS", 60))
 
 # ── Предупреждение за отчет върху картата (пакет 4б т.д — 06.10.2026) ──────
 # При отчет в следващите EARNINGS_WARNING_SESSIONS търговски сесии картата показва датата и ОЧАКВАНОТО движение от опциите (само информация, без промяна на размера).

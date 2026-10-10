@@ -8,7 +8,8 @@
   2. брифът (data/<дата>.json) за предишната NYSE сесия — пропуснат сутрешен run;
   3. книгите: резолюцията на живите записи (backtest.LAST_RESOLUTION) — цени няма / до по-стара дата / тикъри без цени;
   4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал;
-  5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата.
+  5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата;
+  6. таблицата NYSE_HOLIDAYS не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни.
 Всяка проверка е в собствен try — грешка в монитора не чупи брифа и не вдига фалшив банер.
 """
 from __future__ import annotations
@@ -94,6 +95,16 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
                 out.append({"check": "glb_state", "message": f"GLB скрийнърът мина, но състоянието му (data/glb_state.json) не е записано днес (последно: {_fmt(upd)})."})
         except Exception as e:
             out.append({"check": "glb_state", "message": f"GLB състоянието не се прочете ({type(e).__name__}) — утре хистерезисът започва отначало."})
+
+    try:                                     # 6. таблицата NYSE_HOLIDAYS свършва (последната ѝ година)
+        last_year = max(int(h[:4]) for h in config.NYSE_HOLIDAYS)
+        left = (dt.date(last_year, 12, 31) - dt.date.fromisoformat(today)).days
+        if left < config.NYSE_HOLIDAYS_WARN_DAYS:
+            out.append({"check": "holidays", "message": (
+                f"NYSE_HOLIDAYS в config.py покрива до {last_year} г. (остават {max(left, 0)} дни) — добави празниците за {last_year + 1}, иначе те ще се броят за сесии "
+                "(buy-stop прозорец, застояли данни, изтичане на Watchlist).")})
+    except Exception as e:
+        print(f"[health] NYSE_HOLIDAYS не се провери: {type(e).__name__}: {e}")
 
     for fname, (flag, name) in DAILY_CACHES.items():
         if not getattr(config, flag, False):
