@@ -195,7 +195,7 @@ def explain_exits(tickers: list[str]) -> dict[str, str]:
     return out
 
 
-def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] | None = None) -> list[dict]:
+def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] | None = None, seed_prev: bool = False) -> list[dict]:
     """
     Прилага: Weinstein Stage 2 + Minervini trend template (+ RS rating ≥ 70 във втория
     проход), RS Line близо до връх, цена ≥ $10,
@@ -211,6 +211,11 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     held = set(held or ())                                       # 09.10: хистерезис на RS линията — тикърите от предишния успешен run остават до RS_LINE_STAY
     LAST_RS_HELD.clear(); LAST_RS_HELD.update(held)
     LAST_RS_EVALUATED.clear()
+    # втори преглед (10.10.2026): seed_prev — състоянието липсва (първи run / изтрит файл) → предишният технически списък се гради от СЪЩИТЕ данни
+    # без последния бар (правилото за вход, RS rating върху вчерашните доходности); днешният ред на всеки тикър се избира по него. Без нова заявка.
+    prev_survivors: list[dict] = []
+    prev_scores: dict[str, float] = {}
+    variants: dict[str, tuple] = {}
     try:
         spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
         if isinstance(spy, pd.DataFrame):
@@ -243,6 +248,16 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
                 if score is not None:
                     rs_scores[sym] = score
                 LAST_RS_EVALUATED.add(sym)
+                if seed_prev:
+                    pdf = df.iloc[:-1]
+                    ps = rs_score(pdf["Close"])
+                    if ps is not None:
+                        prev_scores[sym] = ps
+                    pr = _evaluate_technicals(sym, pdf, spy)
+                    if pr:
+                        prev_survivors.append(pr)
+                    variants[sym] = (score, _evaluate_technicals(sym, df, spy), _evaluate_technicals(sym, df, spy, held=True))
+                    continue
                 row = _evaluate_technicals(sym, df, spy, held=True) if sym in held else _evaluate_technicals(sym, df, spy)
                 if row:
                     row["rs_score"] = None if score is None else round(score, 4)
@@ -260,6 +275,15 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         LAST_STATUS.update(kind="universe_empty", reason="списъкът с тикъри (Wikipedia) е празен")
     else:
         LAST_STATUS.update(ok=True, kind="partial" if LAST_STATUS["batches_failed"] else "ok")
+    if seed_prev:
+        seeded = {r["ticker"] for r in apply_rs_rating(prev_survivors, prev_scores)}
+        LAST_RS_HELD.clear(); LAST_RS_HELD.update(seeded)
+        for sym, (score, r_new, r_held) in variants.items():
+            row = r_held if sym in seeded else r_new
+            if row:
+                row["rs_score"] = None if score is None else round(score, 4)
+                survivors.append(row)
+        print(f"[screener] хистерезис на RS линията: състоянието липсва → изградено от историята (предишната сесия): {len(seeded)} тикъра")
     before = len(survivors)
     survivors = apply_rs_rating(survivors, rs_scores)          # т.9: втори проход — RS перцентил в универса
     print(f"[screener] технически филтър: {before} оцелели, {len(survivors)} с RS rating "
@@ -526,7 +550,12 @@ def run_screen(leading_sector_names: list[str] | None = None, leaders: list[dict
     """
     universe = build_universe()
     held = load_rs_state() if config.RS_LINE_HYSTERESIS else set()
-    tech = technical_screen(universe, held=held) if held else technical_screen(universe)
+    # втори преглед (10.10): липсващ файл (първият run след 09.10 — data/screener_rs_state.json още не съществува) → началото от историята, не празно
+    seed = bool(config.RS_LINE_HYSTERESIS and not pathlib.Path(config.RS_LINE_STATE_FILE).exists())
+    tech = (technical_screen(universe, seed_prev=True) if seed
+            else technical_screen(universe, held=held) if held else technical_screen(universe))
+    if seed:
+        held = set(LAST_RS_HELD)
     if config.RS_LINE_HYSTERESIS and LAST_STATUS.get("ok"):                              # състоянието се обновява само след успешен run (паднал Yahoo не го нулира)
         import datetime as _dt
         save_rs_state(next_rs_state(held, {r["ticker"] for r in tech}, LAST_RS_EVALUATED), _dt.date.today().isoformat())

@@ -77,26 +77,29 @@ print("  ✓ липсващ/повреден файл → празно (с ло�
 print()
 print("── 4. run_screen: заредено състояние, запис само след успешен run (СИНТЕТИЧНО подменени technical_screen/fundamental_screen) ──")
 calls = []
-def fake_tech(universe, batch_size=100, held=None):
-    calls.append(held)
+def fake_tech(universe, batch_size=100, held=None, seed_prev=False):
+    calls.append("seed" if seed_prev else held)
+    if seed_prev:                                                                                     # втори преглед (10.10): изградено от историята
+        screener.LAST_RS_HELD.clear(); screener.LAST_RS_HELD.update({"AAA"})
     screener.LAST_STATUS.update(ok=True, kind="ok")
     screener.LAST_RS_EVALUATED.clear(); screener.LAST_RS_EVALUATED.update(universe)
     return [{"ticker": "AAA", "rs_held": True}, {"ticker": "BBB", "rs_held": False}]
 screener.build_universe = lambda: ["AAA", "BBB", "CCC"]
+REAL_TECH = screener.technical_screen
 screener.technical_screen = fake_tech
 screener.fundamental_screen = lambda rows: rows
 screener.apply_sector_tailwind = lambda finalists, leaders, names: finalists
 config.RS_LINE_STATE_FILE.unlink()
 with contextlib.redirect_stdout(io.StringIO()):
     screener.run_screen([])
-assert calls == [None] or calls[0] in (None, set())                                                  # празно състояние → извиква се без held (както преди)
+assert calls == ["seed"]                                                                            # втори преглед (10.10): липсващ файл → изграждане от историята (не празно)
 assert screener.load_rs_state() == {"AAA", "BBB"}
 screener.save_rs_state({"AAA", "ZZZ"}, "2026-10-08")
 with contextlib.redirect_stdout(io.StringIO()) as out:
     screener.run_screen([])
 assert calls[-1] == {"AAA", "ZZZ"} and screener.load_rs_state() == {"AAA", "BBB", "ZZZ"}             # ZZZ няма данни днес (не е в универса) → пази се
 assert "хистерезис на RS линията: 2 тикъра от предишния run, 1 остават между 94% и 97%: ['AAA']" in out.getvalue()
-def failed_tech(universe, batch_size=100, held=None):
+def failed_tech(universe, batch_size=100, held=None, seed_prev=False):
     screener.LAST_STATUS.update(ok=False, kind="spy_failed")
     return []
 screener.technical_screen = failed_tech
@@ -110,7 +113,27 @@ with contextlib.redirect_stdout(io.StringIO()):
     screener.run_screen([])
 assert calls == [None] and screener.load_rs_state() == {"AAA", "BBB", "ZZZ"}                          # изключено: не чете и не пише
 config.RS_LINE_HYSTERESIS = True
-print("  ✓ празно състояние → извикване без held; със състояние → held; запис след успешен run (тикър без данни пази състоянието си); паднал run не го пипа; RS_LINE_HYSTERESIS=0 → не чете и не пише")
+print("  ✓ липсващ файл → изграждане от историята (seed_prev); със състояние → held; запис след успешен run (тикър без данни пази състоянието си); паднал run не го пипа; RS_LINE_HYSTERESIS=0 → не чете и не пише")
+
+print()
+print("── 4б. изграждане от историята с РЕАЛНИЯ EXPD (06.10: RS 95.9% — под входа 97%) ──")
+screener.technical_screen = REAL_TECH
+_dl = screener.yf.download
+def fake_dl(tickers, **kw):
+    if tickers == "SPY":
+        return pd.DataFrame({"Close": SPY})
+    return DF.assign(Open=DF["Close"])                                                                 # една партида с един тикър → без колони по тикър
+screener.yf.download = fake_dl
+screener.time.sleep = lambda s: None
+with contextlib.redirect_stdout(io.StringIO()) as out:
+    plain = screener.technical_screen(["EXPD"])                                                        # без състояние (както беше в понеделник без поправката)
+    seeded = screener.technical_screen(["EXPD"], seed_prev=True)
+screener.yf.download = _dl
+prev_pct = screener._evaluate_technicals("EXPD", DF.iloc[:-1], SPY)
+assert DF.index[-1] == pd.Timestamp("2026-10-06") and prev_pct is not None and prev_pct["rs_line_pct"] >= 97.0
+assert [r["ticker"] for r in plain] == [] and [r["ticker"] for r in seeded] == ["EXPD"] and seeded[0]["rs_held"] is True
+assert screener.LAST_RS_HELD == {"EXPD"} and "изградено от историята (предишната сесия): 1 тикъра" in out.getvalue()
+print(f"  ✓ без състояние EXPD изпада на 06.10; с изграждане от 05.10 (RS {prev_pct['rs_line_pct']}% ≥ 97%) остава като «задържан» ({seeded[0]['rs_line_pct']}%)")
 
 print()
 print("── 5. картата ──")
