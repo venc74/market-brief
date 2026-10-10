@@ -19,7 +19,8 @@ concurrency:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    # втори преглед (10.10.2026): закрепено на 24.04 преди смяната на ubuntu-latest (19.10); на 26 — когато браузърният тест мине там
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
