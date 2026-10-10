@@ -307,10 +307,53 @@ def save_state(events: dict, today: str, path=None, seed: dict | None = None) ->
         print(f"[glb_screener] state не се записа: {type(e).__name__}: {e}")
 
 
+def _bar_date(df) -> str | None:
+    """ISO датата на последния бар (без часова зона); None при празен df."""
+    try:
+        return pd.Timestamp(df.index[-1]).date().isoformat() if len(df) else None
+    except Exception:
+        return None
+
+
+def _close_on(df, day) -> float | None:
+    """Close-ът на сесията `day` (ISO) в сегашните (split-коригирани) данни; None, ако няма такъв бар/ден."""
+    try:
+        if not day:
+            return None
+        idx = df.index.tz_localize(None) if getattr(df.index, "tz", None) is not None else df.index
+        hit = df["Close"][idx.normalize() == pd.Timestamp(day)]
+        return float(hit.iloc[-1]) if len(hit) else None
+    except Exception:
+        return None
+
+
 def _row(ev: dict, close: float, low52=None) -> dict:
     """Редът за показване: събитието от входа + днешната цена, разстоянието до линията и (информативно, 09.10) "× от 52-седмичното дъно"."""
     return {**ev, "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
             "x_from_52w_low": x_from_low52(close, low52)}
+
+
+def _rescale_for_split(sym: str, ev: dict, ob: dict, today: str) -> dict:
+    """
+    С2 (втори преглед, 10.10.2026): замразената линия е в скалата на деня на входа, а Yahoo коригира историята ретроактивно при сплит → след 2:1
+    close-ът е в новата скала, линията — в старата, и картата отпада (а не се връща, ако месецът на пробива е минал). Както книгата на Уиш
+    (trade_sim.simulate_glb_wish, signal_close): съхраненият close на бара при входа ("since_close", "since_bar" — датата на БАРА, не на брифа)
+    срещу close-а в СЕГАШНИТЕ данни за същия бар ("close_at_since" от screen()); разлика над GLB_WISH_SPLIT_TOLERANCE → line и prior_high се делят
+    на съотношението, since_close се обновява. Събитие без since_close (записано преди 10.10) или без бар за деня → без промяна. Чиста функция.
+    """
+    sc, cur = ev.get("since_close"), (ob or {}).get("close_at_since")
+    try:
+        if not sc or not cur or cur <= 0 or abs(float(sc) / float(cur) - 1) <= config.GLB_WISH_SPLIT_TOLERANCE:
+            return ev
+        scale = float(sc) / float(cur)
+    except (TypeError, ValueError):
+        return ev
+    out = {**ev, "line": round(float(ev["line"]) / scale, 4), "since_close": round(float(cur), 4),
+           "split_scales": [*(ev.get("split_scales") or []), {"date": today, "scale": round(scale, 4)}]}
+    if ev.get("prior_high") is not None:
+        out["prior_high"] = round(float(ev["prior_high"]) / scale, 2)
+    print(f"[glb_screener] {sym}: сплит след входа ({ev.get('since')}) — линията ${float(ev['line']):.2f} → ${out['line']:.2f} (÷{scale:.4f})")
+    return out
 
 
 def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_pct: float | None = None) -> tuple[dict, list[dict], dict]:
@@ -327,6 +370,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
     ch: dict = {"entered": [], "dropped": [], "held_unseen": []}
     for sym, ev in events.items():
         ob = observations.get(sym)
+        ev = _rescale_for_split(sym, ev, ob, today)                 # С2: линията в скалата на сегашните данни
         if ob is None or ob.get("close") is None:
             new[sym] = ev
             ch["held_unseen"].append(sym)
@@ -340,6 +384,8 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
             continue
         e = ob["entry"]
         ev = {**{k: v for k, v in e.items() if k not in ("price",)}, "line": e["prior_high"], "since": today}
+        if ob.get("last_date"):            # С2: close-ът и ДАТАТА НА БАРА му (since е датата на брифа — друг бар) → откриване на сплит след входа
+            ev.update(since_close=round(float(ob["close"]), 4), since_bar=ob["last_date"])
         new[sym] = ev
         rows.append(_row(ev, ob["close"], ob.get("low52")))
         ch["entered"].append(sym)
@@ -367,7 +413,8 @@ def replay_observations(sym: str, hist, n_sessions: int, entry_margin_pct: float
             if _monthly_duration_check(series, entry_margin_pct) is not None:
                 entry = _evaluate_ticker(sym, hist.loc[:d], entry_margin_pct)
         low = hist["Low"].loc[:d].iloc[-252:].min() if "Low" in hist else None
-        out[d.date().isoformat()] = {"close": cur, "entry": entry, "low52": None if low is None or low != low else float(low)}
+        out[d.date().isoformat()] = {"close": cur, "entry": entry, "low52": None if low is None or low != low else float(low),
+                                     "last_date": d.date().isoformat()}                          # С2: датата на бара за since_bar
     return out
 
 
@@ -436,7 +483,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
                     observations[sym] = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT),
-                                         "low52": float(df["Low"].iloc[-252:].min()) if len(df) else None}
+                                         "low52": float(df["Low"].iloc[-252:].min()) if len(df) else None,
+                                         "last_date": _bar_date(df),                                           # С2: датата на бара на close-а
+                                         "close_at_since": _close_on(df, (events.get(sym) or {}).get("since_bar"))}  # С2: сплит след входа
                     continue
                 r = _evaluate_ticker(sym, df)
             except Exception as e:
