@@ -176,11 +176,11 @@ def explain_exits(tickers: list[str]) -> dict[str, str]:
     if not tickers:
         return out
     try:
-        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
+        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST)["Close"]
         if isinstance(spy, pd.DataFrame):
             spy = spy.iloc[:, 0]
         spy = spy.dropna()
-        data = yf.download(list(tickers), period="2y", progress=False, auto_adjust=True, group_by="ticker", threads=True)
+        data = yf.download(list(tickers), period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True)
         for sym in tickers:
             try:
                 df = _frame_for(data, sym, len(tickers)).dropna()
@@ -217,7 +217,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     prev_scores: dict[str, float] = {}
     variants: dict[str, tuple] = {}
     try:
-        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=True)["Close"]
+        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST)["Close"]
         if isinstance(spy, pd.DataFrame):
             spy = spy.iloc[:, 0]
         spy = spy.dropna()
@@ -235,7 +235,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         LAST_STATUS["batches"] += 1
         try:
             data = yf.download(batch, period="2y", progress=False,
-                               auto_adjust=True, group_by="ticker", threads=True)
+                               auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True)
         except Exception as e:
             LAST_STATUS["batches_failed"] += 1
             print(f"[screener] batch {i} failed: {e}")
