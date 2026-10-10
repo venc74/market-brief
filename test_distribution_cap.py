@@ -275,3 +275,15 @@ print("  ✓ реалният data/regime_override_state.json не е пипна
 _tmp.cleanup()
 print()
 print("Всички тестове минаха.")
+
+# втори преглед (10.10.2026): честен етикет — "(подобно на IBD)" + подсказка с разликите (SPY/QQQ обем, без изтриването при +5%)
+import tempfile as _tf, copy as _cp, json as _json, pathlib as _pl, html as _h
+from src import render as _render, entry_timing as _et
+_t = _tf.TemporaryDirectory(prefix="mb_dd_")
+config.DOCS_DIR, config.DATA_DIR = _pl.Path(_t.name) / "docs", _pl.Path(_t.name) / "data"
+config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
+_b = _cp.deepcopy(_json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8")))
+_b["distribution_days"] = {"count": 6, "spy_count": 6, "qqq_count": 5, "status": "yellow", "label": "SPY 6 / QQQ 5 (последни 25 сесии)", "methodology_note": _et.METHODOLOGY_NOTE}
+_page = _h.unescape(_render.render_dashboard(_b))
+assert "Distribution Days <span" in _page and "(подобно на IBD)" in _page and "няма правилото на IBD за изтриване" in _page and "обемът е на ETF-ите SPY/QQQ" in _page
+print("  ✓ картата: «Distribution Days (подобно на IBD)» + подсказка с разликите (обем на SPY/QQQ, без изтриването при +5%) — РЕАЛНАТА страница от 05.10, СИНТЕТИЧЕН брой")

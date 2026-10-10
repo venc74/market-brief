@@ -110,12 +110,20 @@ def evaluate(action_candidates: list[dict]) -> list[dict]:
     return action_candidates
 
 
+# втори преглед (10.10.2026): честен етикет на картата (подсказка) — какво е и какво НЕ е спрямо дефиницията на IBD
+METHODOLOGY_NOTE = (f"Подобно на distribution days на IBD: сесия с close надолу с поне {config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT:g}% при обем над предходния, "
+                    f"за последните {config.DISTRIBUTION_DAYS_LOOKBACK} сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; "
+                    "няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.")
+
+
 def _count_distribution_days(sym: str, lookback: int) -> int | None:
     """
     Тегли дневен OHLCV за sym (lookback + буфер дни, за да има "предходен ден"
     контекст за първата сесия в прозореца) през net_utils.fetch_with_timeout()
-    (Секция timeout guard, точка от 02.08.2026 review-то). IBD/O'Neil
-    дефиниция: close надолу с поне config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT
+    (Секция timeout guard, точка от 02.08.2026 review-то). ПОДОБНО на IBD/O'Neil
+    (втори преглед, 10.10.2026 — честен етикет): БЕЗ правилото за изтриване при
+    +5% над деня на разпределение и с обема на ETF-ите SPY/QQQ, не на индексите.
+    Дефиниция: close надолу с поне config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT
     спрямо предходния close, И обем над предходния обем — виж config.py
     коментара защо магнитуден праг, не просто close<prev.
 
@@ -217,7 +225,7 @@ def evaluate_distribution_days() -> dict | None:
             f"{config.DISTRIBUTION_DAYS_LOOKBACK} сесии)")
 
     return {"count": gate_count, "spy_count": spy_count, "qqq_count": qqq_count,
-            "status": status, "label": label}
+            "status": status, "label": label, "methodology_note": METHODOLOGY_NOTE}
 
 
 if __name__ == "__main__":
