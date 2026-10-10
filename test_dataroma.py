@@ -42,6 +42,7 @@ HOLD = {"a-new": [{"issuer": "NEWCO INC", "value": 50_000_000.0, "cusip": "N1", 
         "b-last": [{"issuer": "ZZZ INC", "value": 90_000_000.0, "cusip": "Z1", "shares": 900.0}]}
 dataroma._recent_13f_filings = lambda cik, n=2: FILINGS.get(cik, [])[:n]
 dataroma._info_table = lambda cik, acc: [dict(h) for h in HOLD.get(acc, [])]
+dataroma._nt_successor = lambda cik, last_hr_date="": None          # втори преглед (10.10): без реални заявки към data.sec.gov (13F-NT) — тестовете са без мрежа
 config.DATAROMA_CIK = {"0000000001": "Активен · Test Fund", "0000000002": "Спрял · Stopped Fund"}
 dataroma._MEMO.clear()
 b = dataroma._fetch_all(config.DATAROMA_MIN_VALUE)

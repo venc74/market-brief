@@ -24,12 +24,15 @@ GUARDED_DIRS = ("docs", "data")
 TIMEOUT = 300
 _SECRET_RE = re.compile(r"(_API_KEY|PASSWORD|SECRET)$")
 _SECRET_NAMES = {"GITHUB_TOKEN", "EDGAR_UA", "GMAIL_USER"}
+# втори преглед (10.10.2026): прокси на loopback (HTTPS_PROXY=http://127.0.0.1:…) заобикаляше защитата — връзката е към 127.0.0.1 (разрешено), а проксито
+# тунелира към data.sec.gov (CONNECT); test_13f_real/test_dataroma правеха 7 такива заявки, грешката се поглъщаше. Прокситата не стигат до тестовете.
+_PROXY_RE = re.compile(r"^(https?|all|ftp|no)_proxy$", re.I)
 
 
 def clean_env(env: dict[str, str] | None = None) -> dict[str, str]:
     """Средата за тестовия процес: без секрети, с мрежовата защита в PYTHONPATH."""
     src = dict(os.environ if env is None else env)
-    out = {k: v for k, v in src.items() if k not in _SECRET_NAMES and not _SECRET_RE.search(k)}
+    out = {k: v for k, v in src.items() if k not in _SECRET_NAMES and not _SECRET_RE.search(k) and not _PROXY_RE.search(k)}
     out["PYTHONPATH"] = os.pathsep.join(filter(None, [str(GUARD), str(ROOT), out.get("PYTHONPATH", "")]))
     out["PYTHONDONTWRITEBYTECODE"] = "1"
     return out

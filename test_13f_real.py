@@ -31,6 +31,7 @@ config.DATA_DIR = pathlib.Path(_tmp.name)
 config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DOCS_DIR.mkdir()
 dataroma._CACHE = config.DATA_DIR / "dataroma_cache.json"
+dataroma._nt_successor = lambda cik, last_hr_date="": None          # втори преглед (10.10): без реални заявки към data.sec.gov (13F-NT) — тестовете са без мрежа
 
 
 def old_parse(xml_text):

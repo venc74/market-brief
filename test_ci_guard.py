@@ -18,6 +18,15 @@ assert env["MODEL_PROBE_MAX_TOKENS"] == "16" and env["ENABLE_NEWS"] == "0" and e
 assert str(run_tests.GUARD) in env["PYTHONPATH"].split(":")
 print("  ✓ API ключове, пароли, EDGAR_UA, GITHUB_TOKEN и *_SECRET се махат; обикновените настройки остават")
 
+print("── прокситата не стигат до тестовете (втори преглед, 10.10) ──")
+env = run_tests.clean_env({"PATH": "/usr/bin", "HTTPS_PROXY": "http://127.0.0.1:3128", "http_proxy": "http://127.0.0.1:3128", "ALL_PROXY": "socks5://127.0.0.1:1080",
+                           "NO_PROXY": "localhost", "ENABLE_NEWS": "0"})
+assert not any(k.lower().endswith("_proxy") for k in env) and env["ENABLE_NEWS"] == "0"
+r = subprocess.run([sys.executable, "-c", "import os; print(sorted(k for k in os.environ if k.lower().endswith('proxy')))"],
+                   env={**run_tests.clean_env(), "HTTPS_PROXY": "http://127.0.0.1:3128"}, capture_output=True, text=True, timeout=30)
+assert r.returncode == 0 and r.stdout.strip() == "[]", r.stdout + r.stderr                  # sitecustomize ги маха и при директно пускане
+print("  ✓ HTTPS_PROXY/http_proxy/ALL_PROXY/NO_PROXY се махат от средата; sitecustomize маха прокси, подадено отвън (иначе 127.0.0.1-прокси тунелира навън)")
+
 print("── мрежата е забранена, loopback работи ──")
 env = run_tests.clean_env()
 r = subprocess.run([sys.executable, "-c", "import socket; socket.create_connection(('1.1.1.1', 80), timeout=2)"],

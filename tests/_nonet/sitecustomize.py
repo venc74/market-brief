@@ -3,7 +3,13 @@
 (виж run_tests.py). Всяка опит за връзка към адрес извън loopback гърми веднага — тест, който вика платено API
 (Claude), Yahoo, SEC и т.н., се проваля шумно, вместо тихо да харчи пари или да зависи от интернет.
 """
+import os
 import socket
+
+# втори преглед (10.10.2026): прокси на loopback заобикаляше проверката по адрес (връзката е към 127.0.0.1, проксито тунелира навън) — махат се и тук,
+# за тест, пуснат директно (python test_x.py) в среда с прокси; run_tests.clean_env ги маха също
+for _k in [k for k in os.environ if k.lower() in ("http_proxy", "https_proxy", "all_proxy", "ftp_proxy")]:
+    os.environ.pop(_k, None)
 
 _LOCAL = {"127.0.0.1", "::1", "localhost", "0.0.0.0", ""}
 
