@@ -918,7 +918,12 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     провален batch не сваля останалите (graceful degradation на batch ниво).
     """
     slim = []
+    skipped = []
     for c in candidates:
+        kind = (c.get("setup") or {}).get("kind")
+        if kind and kind not in config.AI_NARRATIVE_SETUPS:
+            skipped.append(f"{c.get('ticker')} ({kind})")       # опростяване (10.10): без наратив — компактен ред във Watchlist
+            continue
         slim.append({k: c.get(k) for k in (
             "ticker", "company", "sector", "industry", "business_summary",
             "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
@@ -935,6 +940,8 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         slim[-1]["setup_reason"] = (c.get("setup") or {}).get("trigger_text")
         slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
 
+    if skipped:
+        print(f"[ai] ticker_narratives: без наратив (сетъп извън {config.AI_NARRATIVE_SETUPS}): {', '.join(skipped)}")
     if not slim:
         return []
 

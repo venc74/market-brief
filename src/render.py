@@ -154,6 +154,26 @@ def _publish_history(brief: dict) -> None:
         json.dumps(sorted(dates), ensure_ascii=False), encoding="utf-8")
 
 
+def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
+    """
+    Опростяване (втори преглед, 10.10.2026): (карти, компактни редове). Карти: сетъп в config.AI_NARRATIVE_SETUPS (потвърден пробив, buy-stop кандидат),
+    без сетъп (стар бриф) или отворена позиция (OPEN✓ — информацията за позицията остава видима). Останалите (too_wide / extended / no_volume) →
+    {ticker, reason, stop_pct} — причината от кода (watchlist_exits.setup_text), без AI текст.
+    """
+    cards, compact = [], []
+    for c in watchlist or []:
+        setup = c.get("setup") or {}
+        kind = setup.get("kind")
+        if not kind or kind in config.AI_NARRATIVE_SETUPS or (c.get("ai") or {}).get("watchlist_reason_type") == "existing_position":
+            cards.append(c)
+            continue
+        ew = c.get("earnings_warning") or {}
+        compact.append({"ticker": c.get("ticker"), "kind": kind, "reason": watchlist_exits.setup_text(setup) or kind,
+                        "stop_pct": setup.get("struct_risk_pct"), "markers": c.get("markers") or [],
+                        "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})   # отчет в ~20 сесии: дата (и ±%)
+    return cards, compact
+
+
 def render_dashboard(brief: dict) -> str:
     today = dt.date.today()
     tpl = env.get_template("dashboard.html.j2")
@@ -170,7 +190,8 @@ def render_dashboard(brief: dict) -> str:
         regime_comment=brief["ai_macro"].get("regime_comment", ""),
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         action=brief["action"],
-        watchlist=brief["watchlist"],
+        watchlist=split_watchlist(brief["watchlist"])[0],
+        watchlist_compact=split_watchlist(brief["watchlist"])[1],             # опростяване (10.10): too_wide/extended/no_volume — един ред
         watchlist_exits=brief.get("watchlist_exits") or {}, watchlist_exits_label=watchlist_exits.label(brief.get("watchlist_exits") or {}, brief.get("date") or ""),
         # v2 нови блокове
         theses=brief.get("theses", []),

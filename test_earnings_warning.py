@@ -8,7 +8,7 @@
 временната data/.
 Пускане: python test_earnings_warning.py
 """
-import sys, json, math, pathlib, tempfile, copy, ast, datetime as dt, html as htmllib, shutil, types
+import sys, re, json, math, pathlib, tempfile, copy, ast, datetime as dt, html as htmllib, shutil, types
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -144,9 +144,11 @@ config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 brief = copy.deepcopy(B05)
 em.annotate(brief["watchlist"], TODAY, snapshot_loader=lambda: (snap, "2026-10-05", ""))
 page = " ".join(htmllib.unescape(render.render_dashboard(brief)).split())
-assert 'class="earn-warn">⚠ Отчет на 28.10 (след 17 сесии) — пазарът очаква ±10.7% при отчета' in page
-assert page.count("няма данни за очаквано движение") == 2
-print("  ✓ Watchlist картите на FTNT/AVT/ARW показват реда (±10.7% / 'няма данни за очаквано движение' ×2)")
+# опростяване (10.10): FTNT/AVT/ARW са too_wide → компактният ред носи датата на отчета (и ±%), не цялото предупреждение
+txt = " ".join(re.sub(r"<[^>]+>", " ", page).split())
+assert "FTNT — структурен стоп 12.6% > 10%, отчет 28.10 (±10.7%)" in txt, txt[txt.find("без сетъп"):txt.find("без сетъп") + 400]
+assert "AVT — структурен стоп" in txt and "ARW — структурен стоп" in txt and ", отчет 28.10 " in txt.split("AVT — ")[1][:60] and ", отчет 29.10" in txt.split("ARW — ")[1][:60]
+print("  ✓ компактният ред на FTNT/AVT/ARW (too_wide) носи отчета: FTNT «отчет 28.10 (±10.7%)», AVT «отчет 28.10», ARW «отчет 29.10» (без ±%, когато няма данни)")
 act = copy.deepcopy(CARDS["FTNT"])                                                                                  # СИНТЕТИЧНО: РЕАЛНАТА карта на FTNT като Action (за да се види и Action картата и имейлът)
 act.update({"plan": {"method": "v2", "buy_stop": 190.0, "max_chase": 199.5, "stop_loss": 175.0, "risk_pct": 7.9, "target_1": 220.0, "target_1_fraction": 0.5,
                      "shares": 30, "total_investment": 5700, "stop_basis": "x", "max_risk_usd": 500, "sizing_factor": 0.5, "entry_mid": 190.0,

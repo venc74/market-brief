@@ -933,11 +933,17 @@
 {% endif %}
 
 <section>
-  <h2>Watchlist · {{ watchlist|length }}</h2>
+  <h2>Watchlist · {{ watchlist|length }}{% if watchlist_compact %} <span style="font-size:13px;color:var(--muted);font-weight:400">(+{{ watchlist_compact|length }} без сетъп за вход)</span>{% endif %}</h2>
   {# 09.10: "Излязоха от вчера" — тикърите от предишния Watchlist, които днес ги няма, с причината от кода (само информация) #}
   {% if watchlist_exits and watchlist_exits.get("from") %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от {{ watchlist_exits_label }}:</b>
     {% for r in watchlist_exits.get("rows", []) %}<b>{{ r.ticker }}</b>: {{ r.reason }}{% if r.yesterday %} <span style="opacity:.8">(вчера: {{ r.yesterday }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% else %}няма{% endfor %}
+  </div>
+  {% endif %}
+  {# опростяване (втори преглед, 10.10.2026): too_wide / extended / no_volume — един ред, причината и стопът от кода, без AI наратив #}
+  {% if watchlist_compact %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
+    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
   </div>
   {% endif %}
   <div class="watch-grid">

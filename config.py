@@ -336,6 +336,10 @@ MACRO_MAX_TOKENS = int(os.getenv("MACRO_MAX_TOKENS", 8000))
 # гарантират достатъчен token budget на batch, независимо от общия брой тикъри.
 AI_BATCH_SIZE = int(os.getenv("AI_BATCH_SIZE", 5))           # тикъри на API извикване
 AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 8000))  # budget на batch
+# Опростяване (втори преглед, 10.10.2026, решено): AI наративи само за кандидати с тези сетъпи (setup_rules); too_wide / extended / no_volume
+# не отиват към модела и във Watchlist са един компактен ред (тикър, причина, стоп %). Реално 05–09.10: 0 Action, 5–9 от картите too_wide — а
+# наративите им бяха най-голямото перо в изхода (виж commit-а за числата).
+AI_NARRATIVE_SETUPS = ("confirmed", "below_pivot")
 
 # ── Пътища ────────────────────────────────────────────────────────────────
 import pathlib

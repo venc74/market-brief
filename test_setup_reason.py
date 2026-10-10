@@ -37,12 +37,13 @@ ai_brief.ticker_narratives(cands, [], "Defensive")
 u = seen["user"]
 m = re.search(r"КАНДИДАТИ: (\[.*?\])\n", u, re.S)
 slim = {x["ticker"]: x for x in json.loads(m.group(1))}
-for t in ("FTNT", "AMD", "EXPD"):
-    assert slim[t]["setup_reason"] == CARDS[t]["setup"]["trigger_text"] and slim[t]["setup"] == CARDS[t]["setup"]["kind"]
-assert "е 12.6% под входа (> 10%)" in slim["FTNT"]["setup_reason"] and "е 25.6% под входа (> 10%)" in slim["AMD"]["setup_reason"]
+# опростяване (10.10): FTNT/AMD са too_wide → не отиват към модела (компактен ред); EXPD (below_pivot) — с причината от кода
+assert set(slim) == {"EXPD"}
+assert slim["EXPD"]["setup_reason"] == CARDS["EXPD"]["setup"]["trigger_text"] and slim["EXPD"]["setup"] == CARDS["EXPD"]["setup"]["kind"]
+assert "е 12.6% под входа (> 10%)" in CARDS["FTNT"]["setup"]["trigger_text"] and "е 25.6% под входа (> 10%)" in CARDS["AMD"]["setup"]["trigger_text"]
 assert "buy-stop $194.59" in slim["EXPD"]["setup_reason"]
 assert "ПРИЧИНАТА за сетъпа, изчислена и написана от кода" in u and 'НЕ се определя от дълбочината на базата' in u and "НЕ измисляй собствено обяснение" in u
-print("  ✓ FTNT: \"…е 12.6% под входа (> 10%)\", AMD: \"…е 25.6% под входа\", EXPD: \"buy-stop $194.59…\" — точно текстът на кода; \"setup\" остава kind-ът")
+print("  ✓ EXPD (below_pivot): \"buy-stop $194.59…\" — точно текстът на кода; FTNT/AMD (too_wide) не отиват към модела (опростяване 10.10)")
 print("  ✓ инструкцията: цитирай причината и числата ѝ, не тълкувай \"too_wide\" с base_depth (с реалния пример FTNT 18.1% срещу 12.6%)")
 
 print()
