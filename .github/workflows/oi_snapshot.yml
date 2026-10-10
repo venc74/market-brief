@@ -47,5 +47,20 @@ jobs:
           git add data/unusual_options_oi_snapshot.json 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "oi snapshot: $(date -u +%F)"
-          git pull --rebase
-          git push
+          # FIX 2026-10-10 (К1): от 08.10 (UOV кошницата) снимката пише и кешовете, които git следи
+          # (unusual_options_volume_rank_cache.json, sp500_ndx_universe.json) → "cannot pull with rebase: You have
+          # unstaged changes" и job-ът пада с код 128 (run 37955976842, 09.10; сесията 09.10 е загубена). Кешовете
+          # НЕ се качват оттук — сутрешният бриф ги преизчислява и commit-ва (git add docs/ data/); ако и двата job-а
+          # ги пишат, rebase-ът може да удари конфликт. Слагат се настрана, а после pull --rebase с до 4 опита като
+          # в daily_brief.yml; след 4-те опита стъпката пада видимо вместо да мълчи.
+          git stash push --include-untracked -q -m "oi-snapshot: локални кешове" || true
+          for attempt in 1 2 3 4; do
+            if git pull --rebase && git push; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "push опит $attempt от 4 неуспешен — повторен опит след пауза"
+            sleep $((attempt * ${RETRY_DELAY:-5}))
+          done
+          echo "::error::OI снимката не успя да се качи след 4 опита (pull --rebase / push)"
+          exit 1
