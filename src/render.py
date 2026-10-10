@@ -190,6 +190,7 @@ def render_dashboard(brief: dict) -> str:
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         glb_candidates=brief.get("glb_candidates", []),
+        glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
         glb_min_months=config.GLB_MIN_MONTHS_UNPENETRATED, glb_band_hold=f"{config.GLB_MIN_BAND_HOLD_PCT:.0f}", glb_days=config.GLB_MIN_CONSOLIDATION_DAYS,
         glb_approach=f"{config.GLB_APPROACH_PCT:.0f}", glb_vol_bars=config.GLB_VOLUME_AVG_BARS, glb_wish_replay=config.GLB_WISH_REPLAY_STATS,
         # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)

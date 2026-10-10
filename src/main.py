@@ -657,6 +657,7 @@ def run() -> dict:
         except Exception as e:
             print(f"[main] GLB screener failed: {e}")
             glb_candidates = []
+            glb_screener.LAST_STATUS = {"ok": False, "error": f"{type(e).__name__}: {e}"}      # С3: банер + ред в секцията вместо тишина
     else:
         glb_candidates = []
     for row in glb_candidates:
@@ -856,7 +857,9 @@ def run() -> dict:
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
-                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag),
+                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag,
+                                               glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None)),
+        "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,
         "ai_macro": ai_macro,
         "model_info": model_info,

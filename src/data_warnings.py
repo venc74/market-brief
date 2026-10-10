@@ -78,6 +78,25 @@ def _ep_warning(ep: dict | None) -> list[dict]:
              "message": (f"EP наблюдение (after-hours): {d['batches_failed']} от {d.get('batches')} партиди тикъри не се изтеглиха — списъкът с гапове може да е непълен.")}]
 
 
+def _glb_warning(status: dict | None) -> list[dict]:
+    """
+    С3 (втори преглед, 10.10.2026): GLB скрийнърът — провал не бива да изглежда като "няма кандидати", а книгата "GLB по Уиш" губи деня (сигналите са
+    "свеж пробив на последния цял бар" — утре вече не са свежи). До 10.10 секцията просто изчезваше. Легитимна нула (изпълнен, 0 кандидати) не е предупреждение.
+    """
+    st = status or {}
+    if not st:
+        return []
+    if st.get("ok") is False:
+        return [{"source": "glb", "level": "warn",
+                 "message": (f"GLB скрийнър: не се изпълни ({st.get('error') or 'Yahoo не върна данни'}) — празният списък НЕ значи, че няма GLB кандидати; "
+                             "книгата „GLB по Уиш“ не получи сигнали за днешния бар (той не се записва по-късно).")}]
+    if st.get("batches_failed"):
+        return [{"source": "glb", "level": "warn",
+                 "message": (f"GLB скрийнър: {st['batches_failed']} от {st.get('batches')} партиди тикъри не се изтеглиха — списъкът (и сигналите за книгата "
+                             f"„GLB по Уиш“) е върху {st.get('with_history')} от {st.get('universe')} тикъра и може да е непълен.")}]
+    return []
+
+
 def _corp_warning(diag: dict | None) -> list[dict]:
     """Проверката за корпоративни действия (маркерът ⚠ върху картите): паднала проверка не бива да се чете като "няма събития"."""
     if not diag or diag.get("ok", True):
@@ -104,7 +123,8 @@ def _13f_warnings(status: dict | None) -> list[dict]:
 
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
-            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None) -> list[dict]:
+            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
+            glb_status: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -143,4 +163,5 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_ep_warning(qm_ep))
     out.extend(_13f_warnings(superinvestor_status))
     out.extend(_corp_warning(corp_diag))
+    out.extend(_glb_warning(glb_status))
     return out

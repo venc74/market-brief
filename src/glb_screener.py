@@ -151,6 +151,7 @@ def x_from_low52(close: float, low52) -> float | None:
 # Книга "GLB по Уиш" (09.10.2026): БУКВАЛНОТО правило, без нашите филтри — сигнал, разделен от картите (хистерезис, Classic/Momentum)
 # ──────────────────────────────────────────────────────────────────────────
 LAST_WISH_SIGNALS: list[dict] = []          # свежите пробиви от последния screen() (main ги подава на книгата); [] при провал
+LAST_STATUS: dict = {}                      # С3 (10.10): {"ok", "error", "universe", "batches", "batches_failed", "with_history", "candidates", "wish_signals"}
 
 
 def wish_table(close: "pd.Series") -> "pd.DataFrame":
@@ -444,8 +445,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     ("classic"/"momentum") — Двата типа остават заедно в резултата,
     разделянето/визуализацията е грижа на извикващия код (dashboard).
     """
-    global LAST_WISH_SIGNALS
+    global LAST_WISH_SIGNALS, LAST_STATUS
     LAST_WISH_SIGNALS = []                       # книгата "GLB по Уиш": нов списък на всяко извикване (при провал остава празен)
+    LAST_STATUS = {"ok": False, "error": "не завърши"}      # С3: презаписва се в края; main го слага и при изключение
     wish_signals: list[dict] = []
     if universe is None:
         universe = build_universe()
@@ -457,8 +459,10 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     observations: dict = {}
     today = today or dt.date.today().isoformat()
     results = []
+    batches = failed = with_history = 0
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
+        batches += 1
         try:
             # auto_adjust=False: цени, коригирани за сплитове, но НЕ за дивиденти (виж бележката над _evaluate_ticker). Без ръчна корекция — Yahoo вече е коригирал сплитовете.
             data = yf.download(batch, period=config.GLB_HISTORY_PERIOD, progress=False,
@@ -466,12 +470,14 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                                threads=True)
         except Exception as e:
             print(f"[glb_screener] batch {i} fetch грешка: {e}")
+            failed += 1
             continue
 
         for sym in batch:
             try:
                 df = (data[sym] if len(batch) > 1 else data).dropna(
                     subset=["Close", "High", "Low"])
+                with_history += bool(len(df))
                 if config.TRACK_GLB_WISH:
                     w = wish_signal(df, today)                       # книгата "GLB по Уиш": сигналът върху същите цени като картите
                     if w:
@@ -508,6 +514,10 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
               f"пазени без данни днес {len(ch['held_unseen'])}")
 
     LAST_WISH_SIGNALS = wish_signals
+    # С3 (втори преглед, 10.10): празен списък от провал не бива да изглежда като "няма кандидати" (банер в data_warnings, ред в секцията)
+    LAST_STATUS = {"ok": with_history > 0, "error": None if with_history else "Yahoo не върна ценови данни",
+                   "universe": len(universe), "batches": batches, "batches_failed": failed, "with_history": with_history,
+                   "candidates": len(results), "wish_signals": len(wish_signals)}
     if config.TRACK_GLB_WISH:
         print(f"[glb_screener] GLB по Уиш: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
     classic = [r for r in results if r["glb_type"] == "classic"]
