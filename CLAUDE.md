@@ -67,6 +67,9 @@ src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
 src/series_utils.py    — last_and_week_ago(): седмица назад по ДАТА + NaN guard (VIX, global signals)
 src/data_warnings.py   — предупреждения за данни в брифа (паднал Yahoo → brief["data_warnings"])
+src/health_monitor.py  — здравен монитор в края на run-а: OI снимка за предишната сесия, предишен бриф, книги (backtest.LAST_RESOLUTION), GLB състояние,
+                        дневни кешове, края на NYSE_HOLIDAYS → банер "Здравна проверка: …" (brief["health"])
+src/data_canary.py     — дневно канарче за split корекцията на Yahoo (NVDA 07.06.2024 ≈ $120.888) → банер при отклонение
 src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rating
                         (втори проход върху целия универс) + CANSLIM скрийнър;
                         pivot = най-високият High на базата БЕЗ последните 5 бара
@@ -396,6 +399,29 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   • Измерване 1в (само доклад): линия по месечен High вместо Close → от 16 карти (07.10) 2 остават, 14 падат, 5 нови (линията по High е 3–12% по-висока). Измерване 7: Breadth > 80% зелено → 0 сменени дни (в записаните 82 дни Breadth ≤ 67.6%, а при зелен
     Breadth Offensive се получава само при точно 3 други зелени и 0 червени — такъв ден няма); в 20-годишната собствена серия > 80% е в 15% от дните и SPY напред не се различава значимо. Измерване 8: QM по режим (реконструиран режим, валидиран 31/32 дни):
     Offensive n=128 R +0.72 [−0.43; +2.54], Defensive n=120 R +2.14 [+0.20; +5.45], Cash n=4; Defensive не е по-слаб → режимен фактор за QM няма основание (знакът не е устойчив между годините).
+- Втори преглед (10.10.2026) — поправки, всяка потвърдена на реални данни преди кода:
+  • К1: `oi_snapshot.yml` падаше от 09.10 (UOV кошницата пише следени кешове → `pull --rebase` отказва) — `git stash -u` преди pull + 4 опита; кешовете НЕ се
+    качват от този job (сутрешният бриф ги commit-ва). Сесията 09.10 е загубена.
+  • Отчет: прозорецът преди отчет е БЕЗУСЛОВЕН (без AI поле "warning"), и в `merge_narratives`, и в `apply_hard_rules`; текстът на картата е от кода.
+  • `watchlist_reason_type` е на КОДА (`main._code_reason_type`): `regime_gate` само за ПОТВЪРДЕН сетъп, спрян от режима — само той изтича след
+    `WATCHLIST_STALENESS_DAYS` NYSE СЕСИИ (не календарни дни); "Излязоха от вчера" казва "изтекъл прозорец"; buy-stop книгата се храни ПРЕДИ изтичането;
+    `regime_block` (Action, спрян от режима) не изтича — непроменено. Чакащ Action план (pending) не допуска втори план ("ЧАКА BUY-STOP").
+  • Застояли данни в NYSE сесии: `STALENESS_MAX_LAG_SESSIONS = 1` (допуск 1 — измерено: MOVE/VIX9D с една сесия назад на 04.09 и 23.09);
+    FRED дневни (2s10s) — `FRED_DAILY_MAX_LAG_SESSIONS = 2` (облигационни празници, напр. Columbus Day); RRP и седмичните — непроменени.
+    2s10s "седмица назад" по дата (`last_and_week_ago`).
+  • GLB: линията се мащабира при сплит (`since_close` + `since_bar`, по `GLB_WISH_SPLIT_TOLERANCE`); провал → `glb_screener.LAST_STATUS`, банер и ред в
+    секцията (загубеният ден на книгата на Уиш не се допълва по-късно); `risk_note` — от текущия код, не от състоянието.
+  • Track Record v2 (Action): win rate / win-loss / SPY чак при ≥ `TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 20` затворени.
+  • `requirements.txt`: yfinance==1.7.0, pandas==3.0.6 (версиите на production); канарчето (`data_canary`) пази от смяна на split корекцията.
+  • `daily_brief.yml`: timeout 60 мин (кошницата до 600 s + новото GLB състояние); Tests workflow: `ubuntu-24.04`.
+  • Скрийнърът — цени само за сплитове (`SCREENER_AUTO_ADJUST = False`, както книгите/GLB/QM); измерено: pivot > 1% по-нисък при 79 от 898 тикъра.
+  • RS хистерезисът тръгва от историята, ако `data/screener_rs_state.json` липсва (`technical_screen(seed_prev=True)`).
+  • Watchlist: too_wide / extended / no_volume — един компактен ред (тикър, причина, стоп %, отчет) без AI наратив; AI наративи само за
+    `AI_NARRATIVE_SETUPS = (confirmed, below_pivot)` (оценка: ~6 700 изходни токена/ден по-малко). Отворена позиция остава карта.
+  • AI наративи: сума в $, която е ключово ниво на ДРУГ тикър (и не е собствено число) → изречението/точката се маха (`verify_narrative_numbers`;
+    върху историята точно 2 удара — AVT 01.10, NTAP 09.10).
+  • Distribution days: "(подобно на IBD)" — обем на SPY/QQQ, без правилото за изтриване при +5% (правилото НЕ е добавено).
+  • Тестовете: прокситата (`*_proxy`) не стигат до тестовите процеси (прокси на 127.0.0.1 заобикаляше мрежовата защита — 7 CONNECT към data.sec.gov).
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
