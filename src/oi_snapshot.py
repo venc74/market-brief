@@ -1,8 +1,8 @@
 """
 Следобедна снимка на open interest за Unusual Options (FIX 2026-09-29).
 
-Пуска се от отделен GitHub Actions job (.github/workflows/oi_snapshot.yml) в
-15:00 UTC в работни дни, НЕ от сутрешния бриф. Причината — проба 29.09.2026:
+Пуска се от отделен GitHub Actions job (.github/workflows/oi_snapshot.yml) — workflow_dispatch от cron-job.org в ~16:00 UTC и
+schedule тригери като резерва (12.10.2026) — в работни дни, НЕ от сутрешния бриф. Причината — проба 29.09.2026:
 в 05:40 UTC Yahoo връща OI 0 за седмичните падежи и непълен за месечните
 (APH 38 734 в 05:35 срещу 248 232 в 13:09 UTC за същите два падежа). До 18.09
 сутрешният fetch получаваше пълен OI; от 21.09 — не.
@@ -93,6 +93,11 @@ def _skip_reason(session: dt.date, existing: dict, now_utc: dt.datetime) -> str 
         return (f"пълна снимка за сесия {session} вече съществува (fetched_at_utc={fetched}) "
                 f"— пропускам, не презаписвам")
     now_ny = now_utc.astimezone(_NY)
+    start = config.UNUSUAL_OPTIONS_OI_SNAPSHOT_START_NY
+    sh, sm = (int(x) for x in start.split(":"))
+    if (now_ny.hour, now_ny.minute) < (sh, sm):                                    # 12.10.2026: преди отварянето — следващ тригер опитва пак
+        return (f"{now_utc.strftime('%H:%M')} UTC ({now_ny.strftime('%H:%M %Z')}) — преди началото на валидния OI прозорец "
+                f"({start} Ню Йорк) — пропускам, по-късен тригер опитва пак")
     if now_ny.hour >= config.UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR:
         extra = (" (съществуващата снимка е непълна, но повторен опит вече е късно)"
                  if snap else "")
@@ -166,16 +171,19 @@ def take_snapshot() -> dict | None:
         print("[oi_snapshot] yfinance липсва — нищо не е заснето")
         return None
     # дата в Ню Йорк (като датата на последния бар на SPY), не UTC датата
-    today = dt.datetime.now(dt.timezone.utc).astimezone(_NY).date()
+    now = dt.datetime.now(dt.timezone.utc)
+    today = now.astimezone(_NY).date()
+    # 12.10.2026: първо съществуващата снимка и прозорецът (без мрежа) — допълнителните schedule тригери прескачат евтино и с ясна причина;
+    # ред ::notice:: я показва и в обобщението на run-а (иначе "success" без снимка изглежда като снимка). Сесията (SPY) — след това.
+    reason = _skip_reason(today, uo.load_oi_snapshots(), now)
+    if reason:
+        print(f"[oi_snapshot] {reason}")
+        print(f"::notice title=OI snapshot::{reason}")
+        return None
     session = uo.last_session_date()
     if session != today:
         print(f"[oi_snapshot] днес ({today}) няма сесия (последна: {session}) — "
               f"нищо не се записва")
-        return None
-
-    reason = _skip_reason(session, uo.load_oi_snapshots(), dt.datetime.now(dt.timezone.utc))
-    if reason:
-        print(f"[oi_snapshot] {reason}")
         return None
 
     t0 = time.time()
