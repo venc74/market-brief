@@ -167,7 +167,12 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"и списъкът с кандидати са непълни."),
         })
     out += _cot_warning(cot_diag)
-    out.extend(_marker_warnings(insider_status, uov_diag))
+    markers = _marker_warnings(insider_status, uov_diag)
+    if any(h.get("check") == "oi_snapshot" for h in health or []) and (uov_diag or {}).get("snapshot_missing_reason"):
+        # 12.10.2026: един банер за липсващата OI снимка — здравната проверка (последната снимка, кой job да се провери); UOV банерът за СЪЩАТА причина
+        # отпада (на 12.10 двата казваха едно и също). UOV банер по друга причина (снимката е налице, съотношения няма) остава.
+        markers = [w for w in markers if w.get("source") != "unusual_options"]
+    out.extend(markers)
     out.extend(_qm_warning(qm_diag))
     out.extend(_ep_warning(qm_ep))
     out.extend(_13f_warnings(superinvestor_status))

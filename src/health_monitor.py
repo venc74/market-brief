@@ -62,7 +62,7 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
             if prev not in snaps:
                 last = max(snaps) if snaps else None
                 out.append({"check": "oi_snapshot", "message": (
-                    f"OI снимката за сесията {_fmt(prev)} липсва (последна: {_fmt(last) if last else 'няма'}) — UOV✓ и очакваното движение при отчет липсват; "
+                    f"OI снимката за сесията {_fmt(prev)} липсва (последна: {_fmt(last) if last else 'няма'}) — UOV✓ и очакваното движение при отчет липсват (липсващ UOV✓ НЕ значи нормален обем); "
                     "провери job-а „Unusual Options OI snapshot“ в GitHub Actions.")})
         except FileNotFoundError:
             out.append({"check": "oi_snapshot", "message": "файлът с OI снимките липсва — job-ът „Unusual Options OI snapshot“ не е записвал."})
