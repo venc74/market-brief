@@ -213,8 +213,10 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   да се замести с изчислен proxy от пазарни данни.
 - Unusual Options OI (от 29.09.2026): сутрин в 05:30–05:55 UTC Yahoo връща
   празен/непълен open interest, затова OI идва от отделен следобеден job
-  (`.github/workflows/oi_snapshot.yml`, 15:00 UTC пон–пет, с `schedule:` —
-  прозорецът е широк и закъснение не вреди) → `data/unusual_options_oi_snapshot.json`.
+  (`.github/workflows/oi_snapshot.yml`) → `data/unusual_options_oi_snapshot.json`. Снимката е от `workflow_dispatch` от cron-job.org в ~16:00 UTC
+  пон–пет; `schedule:` "0 15 * * 1-5" е резерва, но GitHub реално го пуска около 20:00 UTC (02.10–09.10: 19:51–21:56) — след прага от 16:00 Ню Йорк
+  (`UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR`; 20:00 UTC през лятното време, 21:00 през зимното), затова през лятото резервата прескача: на 09.10 в 20:03 UTC
+  "след прага … пропускам" в лога на стъпката, run-ът е success без снимка (dispatch-ът в 16:00 беше паднал — К1).
 - "Pages build and deployment" червени run-ове от overlapping deploys са
   безобидни (следващият deploy обикновено успява) — не е сигнал за проблем в
   кода.
@@ -441,7 +443,7 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   • Само доклад (без промени): правилото за имената в COT (`claim_matches`) остава; тип "производно търсене" не се добавя (CF/MOS × царевица/соя — материал за решението за AI cross тезите);
     конфигурацията: от 1 049 символа (таблици + универси) Yahoo не връща цени само за EA (придобита и делистната 04.08.2026, махната от Nasdaq-100 без заместник; още стои в `NDX100_STATIC_TICKERS` — решението е на Венци)
     и `KOL_PROXY_BTU` (умишлен плейсхолдър, sector_layer го прескача).
-  • OI job-ът има два тригера: `workflow_dispatch` в ~16:00 UTC (снимката) и `schedule` "0 15 * * 1-5", който GitHub пуска около 20:00 UTC.
+  • OI job-ът има два тригера: `workflow_dispatch` от cron-job.org в ~16:00 UTC (снимката) и `schedule` "0 15 * * 1-5" (резерва), който GitHub пуска около 20:00 UTC — виж "Unusual Options OI" по-горе.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
