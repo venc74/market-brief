@@ -230,9 +230,15 @@ QM_PARTIAL_FRACTION = float(os.getenv("QM_PARTIAL_FRACTION", 0.4))   # сред�
 QM_TRAIL_ADR_SWITCH = float(os.getenv("QM_TRAIL_ADR_SWITCH", 5.0))   # остатъкът по SMA10 при ADR ≥ 5%, иначе по SMA20 (първо затваряне под)
 QM_MAX_HOLD_SESSIONS = int(os.getenv("QM_MAX_HOLD_SESSIONS", 180))
 QM_MIN_CLOSED_FOR_WINRATE = int(os.getenv("QM_MIN_CLOSED_FOR_WINRATE", 20))
-# 12.10.2026: САМО показване — запис с риск (вход − low на входния ден) под QM_TIGHT_RISK_ADR × ADR получава флаг в книгата: R е раздут от малкия знаменател (ELF 09.10: вход $107.36 при гап,
-# low $107.00, риск 0.09×ADR → +5.2R при +1.7%). Реплей 02.01.2024–01.10.2026 (244 сделки): такива са 30 (12%) и носят 69% от ΣR. Изчислението на R НЕ е променено (решението е на Венци).
-QM_TIGHT_RISK_ADR = float(os.getenv("QM_TIGHT_RISK_ADR", 0.25))
+# 12.10.2026 (решение на Венци): R в книгата и в реплея = печалба ÷ max(вход − low на входния ден, QM_R_RISK_FLOOR_ADR × ADR) — trade_sim.simulate_qm. При гап над нивото
+# дъното на деня може да е на центове от входа (ELF 09.10: вход $107.36, low $107.00, риск 0.09×ADR → "+5.2R" при +1.7%). Реплей 02.01.2024–01.10.2026 (244 сделки): 30 сделки
+# (12%) с риск под 0.25×ADR носеха 69% от ΣR; със знаменателя по-долу средният R е +1.00 вместо +1.51. Стопът и изходът НЕ се променят. Същият праг дава и флага в таблицата.
+QM_R_RISK_FLOOR_ADR = float(os.getenv("QM_R_RISK_FLOOR_ADR", 0.25))
+# Реплей 02.01.2024–01.10.2026 с тази формула (производствените check_candidate + simulate_qm, показаните ≤ 8 карти, правилото 1×ADR; 904 тикъра = днешният универс → survivorship).
+# Показва се в банера на секцията и в имейла (render) — една истина. old_* = със стария знаменател (вход − low).
+QM_REPLAY_STATS = {"period": "02.01.2024–01.10.2026", "trades": 244, "avg_r": 1.00, "avg_r_ci": [0.07, 2.19], "avg_r_pess": 0.24, "median_r": -1.00,
+                   "avg_return_pct": 1.41, "median_return_pct": -1.49, "alpha_pct": 1.07, "alpha_ci": [-0.44, 3.13],
+                   "old_avg_r": 1.51, "floored_trades": 30, "floored_share_of_sum_r_pct": 69}
 # EP наблюдение (src/qm_ep.py): само информация, без Track Record
 ENABLE_QM_EP = os.getenv("ENABLE_QM_EP", "1") == "1"
 QM_EP_GAP_PCT = float(os.getenv("QM_EP_GAP_PCT", 10.0))          # негово: гап нагоре ≥ 10% (тук — after-hours цена спрямо затварянето)

@@ -213,7 +213,8 @@ def _blank_qm(status: str = "pending") -> dict:
             "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0, "trail_ma": None,
             "exit_date": None, "exit_price": None, "resolution_date": None,
             "R": None, "R_pess": None, "realized_r": None, "realized_r_pess": None, "current_r": None,
-            "return_pct": None, "return_pct_pess": None, "last_close": None, "last_close_date": None, "how": None}
+            "return_pct": None, "return_pct_pess": None, "last_close": None, "last_close_date": None, "how": None,
+            "r_risk": None, "r_floored": None}
 
 
 def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
@@ -226,7 +227,10 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     Изход (негов): QM_PARTIAL_FRACTION от позицията на затварянето на QM_PARTIAL_DAYS-тата сесия след входния ден, стопът към break-even за остатъка, остатъкът — първо
     ЗАТВАРЯНЕ под SMA10 (ADR >= QM_TRAIL_ADR_SWITCH) или SMA20; гап през стопа → по отварянето; максимум QM_MAX_HOLD_SESSIONS (mark-to-market, "expired").
     Две граници за стопа на входния ден: R/return_pct ("opt": low-ът е бил ПРЕДИ входа, стопът на входния ден не се удря) и R_pess/return_pct_pess ("pess": ако денят затваря
-    под входа → −1R). Без плъзгане и комисионни. Връща речник като _blank_qm: статус pending|not_triggered|skipped_extended|skipped_adr|invalid_risk|open|trailing|stopped|
+    под входа → загуба до стопа). Без плъзгане и комисионни.
+    R (12.10.2026, решение на Венци): печалба ÷ max(вход − low на входния ден, QM_R_RISK_FLOOR_ADR × ADR) — r_risk; при гап над нивото дъното на деня може да е на центове от входа
+    (ELF 09.10: 0.09×ADR → "+5.2R" при +1.7%; в реплея 30 сделки с риск под 0.25×ADR носеха 69% от ΣR). Стопът (low на деня) и изходът НЕ се променят — само знаменателят;
+    risk_per_share остава реалното разстояние до стопа, r_floored казва дали е приложен подът. Връща речник като _blank_qm: статус pending|not_triggered|skipped_extended|skipped_adr|invalid_risk|open|trailing|stopped|
     trailing_stop_exit|expired; за живи — current_r (mark-to-market), за затворени — realized_r / realized_r_pess.
     """
     out = _blank_qm()
@@ -270,8 +274,9 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
         return out
     trail_n = 10 if adr >= config.QM_TRAIL_ADR_SWITCH else 20
     sma = pd.Series(c).rolling(trail_n).mean().to_numpy()
+    r_risk = max(risk, config.QM_R_RISK_FLOOR_ADR * adr / 100 * fill)                   # знаменателят на R (под 0.25×ADR); стопът остава stop0
     out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(float(fill), 4), stop_loss=round(stop0, 4), risk_per_share=round(float(risk), 4),
-               trail_ma=trail_n)
+               trail_ma=trail_n, r_risk=round(float(r_risk), 4), r_floored=bool(r_risk > risk))
     pess_day1 = bool(c[fi] < fill)                                         # граница "pess": денят затваря под входа
 
     frac, pdays = config.QM_PARTIAL_FRACTION, config.QM_PARTIAL_DAYS
@@ -287,7 +292,7 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
             break
         if not part and j == fi + pdays:                                   # частична продажба на затварянето; стопът към break-even
             part, p_px, p_j = True, float(c[j]), j
-            r_part = (p_px - fill) / risk
+            r_part = (p_px - fill) / r_risk
             stop = max(stop, fill)
             continue
         if part and sma[j] == sma[j] and c[j] < sma[j]:                    # първо ЗАТВАРЯНЕ под MA
@@ -297,11 +302,11 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
         out.update(target1_hit_date=idx[p_j].date().isoformat(), partial_price=round(p_px, 4), partial_fraction=frac)
 
     def weighted(px):
-        r = (frac * r_part + (1 - frac) * (px - fill) / risk) if part else (px - fill) / risk
+        r = (frac * r_part + (1 - frac) * (px - fill) / r_risk) if part else (px - fill) / r_risk
         ret = ((frac * (p_px - fill) + (1 - frac) * (px - fill)) / fill * 100) if part else ((px - fill) / fill * 100)
         return float(r), float(ret)
 
-    r_pess_day1, ret_pess_day1 = -1.0, float((stop0 / fill - 1) * 100)
+    r_pess_day1, ret_pess_day1 = float((stop0 - fill) / r_risk), float((stop0 / fill - 1) * 100)      # = −1R без пода; с пода загубата е ПО-МАЛКА от 1R по модул (ELF 09.10: −$0.36 ÷ $1.036 ≈ −0.35R)
     out.update(last_close=round(float(c[last]), 4), last_close_date=idx[last].date().isoformat())
     if exj is None:
         cur_r, cur_ret = weighted(float(c[last]))

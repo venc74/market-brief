@@ -154,6 +154,16 @@ def _publish_history(brief: dict) -> None:
         json.dumps(sorted(dates), ensure_ascii=False), encoding="utf-8")
 
 
+def _qm_replay_line() -> str:
+    """12.10.2026: ред за имейла — числата от реплея с новата формула за R (config.QM_REPLAY_STATS); празен низ без тях."""
+    q = getattr(config, "QM_REPLAY_STATS", None)
+    if not q:
+        return ""
+    return (f"Реплей {q['period']} ({q['trades']} сделки), R = печалба ÷ max(вход − дъното на деня, {config.QM_R_RISK_FLOOR_ADR:g}×ADR): среден R {q['avg_r']:+.2f} "
+            f"(pess {q['avg_r_pess']:+.2f}), доходност на сделка средно {q['avg_return_pct']:+.2f}%; досегашният среден R ({q['old_avg_r']:+.2f}) беше раздут от сделки с нищожен риск "
+            f"({q['floored_trades']} сделки = {q['floored_share_of_sum_r_pct']}% от ΣR). ")
+
+
 def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     Опростяване (втори преглед, 10.10.2026): (карти, компактни редове). Карти: сетъп в config.AI_NARRATIVE_SETUPS (потвърден пробив, buy-stop кандидат),
@@ -232,6 +242,8 @@ def render_dashboard(brief: dict) -> str:
         qm_adr_min=config.QM_ADR_MIN, qm_trigger_bars=config.QM_TRIGGER_BARS, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
         qm_max_dist_adr=config.QM_MAX_DIST_ADR, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
+        qm_r_floor=f"{config.QM_R_RISK_FLOOR_ADR:g}",                    # 12.10: подът на знаменателя на R в книгата qm_breakout
+        qm_replay=config.QM_REPLAY_STATS,                                  # 12.10: числата от реплея с новата формула (банерът на секцията)
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         cot=brief.get("cot", []),
@@ -290,7 +302,7 @@ def _qm_email_block(brief: dict) -> str:
         badge = ('<span style="display:inline-block;background:#eef2ff;color:#3730a3;font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;margin-left:4px">QM✓</span>')
         body = head("Пробиви по Kullamägi (Breakout)").replace("{m}", "0")
         body += ('<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. '
-                 'Алфата не е статистически значима.</b> Отделна стратегия. Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>')
+                 'Алфата не е статистически значима.</b> ' + _qm_replay_line() + 'Отделна стратегия. Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>')
         if diag.get("ok") is False:
             body += '<div style="color:#991b1b;font-size:12.5px">Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив.</div>'
         elif cards:

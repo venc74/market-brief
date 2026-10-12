@@ -107,6 +107,8 @@ sec = section(raw)
 txt = txt_of(sec)
 assert raw.count("<section") == raw.count("</section>")
 SURV = "Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима."
+assert "R = печалба ÷ max(вход − дъното на деня, 0.25×ADR): среден R +1.00 [+0.07; +2.19] (pess +0.24)" in txt                  # 12.10: банерът с новата формула
+assert "Досегашният среден R (+1.51) беше раздут от сделки с нищожен риск: 30 сделки носеха 69% от ΣR." in txt
 assert "Пробиви по Kullamägi (Breakout)" in txt and txt.index(SURV) < txt.index("DOCN") and "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in txt
 assert "Qullamaggie сетъпи" not in txt_of(raw.split("</style>", 1)[1])                                                          # старото заглавие го няма
 by = {c["ticker"]: c for c in CARDS}
@@ -231,6 +233,7 @@ print()
 print("── имейл ──")
 em = render.render_email(brief_with(ep_out=EP_Y))
 emt = htmllib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", em)))
+assert "досегашният среден R (+1.51) беше раздут от сделки с нищожен риск (30 сделки = 69% от ΣR)" in emt                       # 12.10: числата на реплея с новата формула
 assert SURV in emt and "Пробиви по Kullamägi (Breakout)" in emt and "Епизодични пивоти (EP) · гапове след новина" in emt
 assert "Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход." in emt
 for c in CARDS:

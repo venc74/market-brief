@@ -310,7 +310,7 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
 
 _QM_RESULT_KEYS = ("status", "fill_date", "fill_price", "stop_loss", "risk_per_share", "target1_hit_date", "partial_price", "partial_fraction", "trail_ma",
                    "exit_date", "exit_price", "R", "R_pess", "realized_r", "realized_r_pess", "current_r", "return_pct", "return_pct_pess", "last_close",
-                   "last_close_date", "how")
+                   "last_close_date", "how", "r_risk", "r_floored")
 
 
 def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None) -> None:
@@ -758,9 +758,46 @@ def _gw_needs_exec_fill(rec: dict, today: dt.date) -> bool:
 LAST_RESOLUTION: dict = {}
 
 
+QM_R_METHOD = "floor_adr"                     # 12.10.2026: R = печалба ÷ max(вход − low на входния ден, QM_R_RISK_FLOOR_ADR × ADR) — виж trade_sim.simulate_qm
+
+
+def _migrate_qm_r_floor(tracker: dict, today: dt.date) -> int:
+    """
+    12.10.2026 (решение на Венци): еднократно преизчисляване на R в записите на книгата qm_breakout по новата формула — печалба ÷ max(вход − low на входния ден, 0.25×ADR).
+    Всички досегашни R са печалба ÷ (вход − low), затова новото е старото × (вход − low) ÷ новия знаменател; стопът, изходът и доходността в % НЕ се променят.
+    Бележка в записа: r_method, r_note и старите стойности (r_before_floor). Идемпотентно (по r_method); запис без вход/ADR само получава r_method. Връща броя променени.
+    """
+    n = 0
+    for rec in tracker.values():
+        if record_category(rec) != CATEGORY_QM or rec.get("r_method") == QM_R_METHOD:
+            continue
+        fill, risk, adr = rec.get("fill_price"), rec.get("risk_per_share"), rec.get("adr")
+        if all(isinstance(x, (int, float)) for x in (fill, risk, adr)) and fill > 0 and risk > 0 and adr > 0:
+            r_risk = max(risk, config.QM_R_RISK_FLOOR_ADR * adr / 100 * fill)
+            k = risk / r_risk
+            old = {f: rec.get(f) for f in ("R", "R_pess", "realized_r", "realized_r_pess", "current_r")}
+            for f, v in old.items():
+                if isinstance(v, (int, float)):
+                    rec[f] = round(v * k, 2) if f not in ("R", "R_pess") else v * k
+            formula = f"печалба ÷ max(вход − low на входния ден, {config.QM_R_RISK_FLOOR_ADR:g}×ADR)"
+            was = old["current_r"] if old["current_r"] is not None else old["realized_r"]
+            rec.update(r_risk=round(r_risk, 4), r_floored=bool(r_risk > risk), r_before_floor=old,
+                       r_note=(f"R преизчислен на {today.isoformat()}: {formula}; стопът и изходът не са променени (беше {was}R)" if r_risk > risk else
+                               f"R проверен на {today.isoformat()} по новата формула ({formula}) — без промяна: рискът на входа е над пода"))
+            n += r_risk > risk
+        rec["r_method"] = QM_R_METHOD
+    if n:
+        print(f"[backtest] qm_breakout: R преизчислен по новата формула в {n} запис(а) (подът {config.QM_R_RISK_FLOOR_ADR:g}×ADR)")
+    return n
+
+
 def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
     global LAST_RESOLUTION
     today = today or dt.date.today()
+    try:                                                    # 12.10.2026: преди мрежата — старите записи на qm_breakout по новата формула за R (идемпотентно)
+        _migrate_qm_r_floor(tracker, today)
+    except Exception as e:
+        print(f"[backtest] qm_breakout: преизчисляването на R не успя: {type(e).__name__}: {e}")
     live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today)]
     LAST_RESOLUTION = {"ok": True, "live": len(live_items)}
     if not live_items:
@@ -1191,6 +1228,13 @@ def qm_before_rule(rec: dict) -> float | None:
         return None
 
 
+def _avg_pct(recs: list[dict], key: str, fallback: str | None = None) -> float | None:
+    """Средна доходност в % на сделка (12.10.2026: до R в книгата qm_breakout); fallback — полето, ако key липсва (pess = opt, когато денят не затваря под входа)."""
+    xs = [r.get(key) if r.get(key) is not None else (r.get(fallback) if fallback else None) for r in recs]
+    xs = [x for x in xs if isinstance(x, (int, float))]
+    return round(sum(xs) / len(xs), 2) if xs else None
+
+
 def get_qm_summary() -> dict:
     """
     Qullamaggie: обобщение на ОТДЕЛНАТА книга "qm_breakout" (отделна стратегия — измерване, не препоръка). Чисто локално четене (без мрежа). Win rate (интервал на Wilson), медианата на R и
@@ -1263,7 +1307,8 @@ def get_qm_summary() -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "trigger": r.get("buy_stop"), "adr": r.get("adr"),
                 "expected_stop": r.get("expected_stop"), "stop_loss": r.get("stop_loss"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
-                "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_TIGHT_RISK_ADR,            # 12.10: флаг "R е раздут" (ELF 09.10: 0.09×ADR → +5.2R при +1.7%)
+                "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_R_RISK_FLOOR_ADR,          # 12.10: флаг — R е смятан от пода 0.25×ADR (ELF 09.10: 0.09×ADR)
+                "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -1279,8 +1324,9 @@ def get_qm_summary() -> dict:
         "win_rate_pess_pct": round(100 * wins_p / len(rp), 1) if visible else None, "win_ci_pct": _wilson_ci_pct(wins, len(ro)) if visible else None,
         "median_realized_r": med(ro) if visible else None, "median_realized_r_pess": med(rp) if visible else None,
         "big_winners_5r": sum(1 for x in ro if x > 5) if visible else None,
-        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "tight_risk_adr": config.QM_TIGHT_RISK_ADR,
-        "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_TIGHT_RISK_ADR),
+        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "tight_risk_adr": config.QM_R_RISK_FLOOR_ADR,
+        "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_R_RISK_FLOOR_ADR),
+        "avg_return_pct": _avg_pct(closed, "return_pct"), "avg_return_pct_pess": _avg_pct(closed, "return_pct_pess", "return_pct"),
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),

@@ -131,6 +131,7 @@ def ref(rec_, o, h, l, c, dates, cfg):
     stop0 = l[j]; risk = fill - stop0
     if risk <= 0: return ("invalid_risk",)
     if risk / fill * 100 > cfg["adrstop"] * adr: return ("skipped_adr",)
+    rr = max(risk, cfg["floor"] * adr / 100 * fill)                                               # 12.10: знаменателят на R (под 0.25×ADR); стопът остава stop0
     tn = 10 if adr >= cfg["switch"] else 20
     def sma(k): return sum(c[k - tn + 1:k + 1]) / tn if k >= tn - 1 else None
     stop, part, rp, pp = stop0, False, 0.0, None
@@ -139,21 +140,22 @@ def ref(rec_, o, h, l, c, dates, cfg):
         if o[k] <= stop: ex, exj, how = o[k], k, "stop"; break
         if l[k] <= stop: ex, exj, how = stop, k, "stop"; break
         if not part and k == j + cfg["pdays"]:
-            part, pp = True, c[k]; rp = (pp - fill) / risk; stop = max(stop, fill); continue
+            part, pp = True, c[k]; rp = (pp - fill) / rr; stop = max(stop, fill); continue
         s = sma(k)
         if part and s is not None and c[k] < s: ex, exj, how = c[k], k, "trail"; break
     if ex is None:
         if last - j < cfg["hold"]:
-            px = c[last]; r = (cfg["frac"] * rp + (1 - cfg["frac"]) * (px - fill) / risk) if part else (px - fill) / risk
+            px = c[last]; r = (cfg["frac"] * rp + (1 - cfg["frac"]) * (px - fill) / rr) if part else (px - fill) / rr
             st = "trailing" if part else "open"
-            return (st, fill, stop0, None, (-1.0 if c[j] < fill else r), None)
+            return (st, fill, stop0, None, ((stop0 - fill) / rr if c[j] < fill else r), None)
         ex, exj = c[last], last
-    R = (cfg["frac"] * rp + (1 - cfg["frac"]) * (ex - fill) / risk) if part else (ex - fill) / risk
+    R = (cfg["frac"] * rp + (1 - cfg["frac"]) * (ex - fill) / rr) if part else (ex - fill) / rr
     st = "trailing_stop_exit" if how == "trail" else "stopped" if how == "stop" else "expired"
-    return (st, fill, stop0, R, (-1.0 if c[j] < fill else R), dates[exj])
+    return (st, fill, stop0, R, ((stop0 - fill) / rr if c[j] < fill else R), dates[exj])
 
 
-cfg = dict(chase=config.QM_CHASE_ADR, adrstop=config.QM_ADR_STOP, switch=config.QM_TRAIL_ADR_SWITCH, hold=config.QM_MAX_HOLD_SESSIONS, pdays=config.QM_PARTIAL_DAYS, frac=config.QM_PARTIAL_FRACTION)
+cfg = dict(chase=config.QM_CHASE_ADR, adrstop=config.QM_ADR_STOP, switch=config.QM_TRAIL_ADR_SWITCH, hold=config.QM_MAX_HOLD_SESSIONS, pdays=config.QM_PARTIAL_DAYS, frac=config.QM_PARTIAL_FRACTION,
+           floor=config.QM_R_RISK_FLOOR_ADR)
 stats = {}
 total = 0
 for tk in ("AMD", "TWLO", "LNTH", "EXEL"):
