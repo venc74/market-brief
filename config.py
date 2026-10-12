@@ -230,6 +230,9 @@ QM_PARTIAL_FRACTION = float(os.getenv("QM_PARTIAL_FRACTION", 0.4))   # сред�
 QM_TRAIL_ADR_SWITCH = float(os.getenv("QM_TRAIL_ADR_SWITCH", 5.0))   # остатъкът по SMA10 при ADR ≥ 5%, иначе по SMA20 (първо затваряне под)
 QM_MAX_HOLD_SESSIONS = int(os.getenv("QM_MAX_HOLD_SESSIONS", 180))
 QM_MIN_CLOSED_FOR_WINRATE = int(os.getenv("QM_MIN_CLOSED_FOR_WINRATE", 20))
+# 12.10.2026: САМО показване — запис с риск (вход − low на входния ден) под QM_TIGHT_RISK_ADR × ADR получава флаг в книгата: R е раздут от малкия знаменател (ELF 09.10: вход $107.36 при гап,
+# low $107.00, риск 0.09×ADR → +5.2R при +1.7%). Реплей 02.01.2024–01.10.2026 (244 сделки): такива са 30 (12%) и носят 69% от ΣR. Изчислението на R НЕ е променено (решението е на Венци).
+QM_TIGHT_RISK_ADR = float(os.getenv("QM_TIGHT_RISK_ADR", 0.25))
 # EP наблюдение (src/qm_ep.py): само информация, без Track Record
 ENABLE_QM_EP = os.getenv("ENABLE_QM_EP", "1") == "1"
 QM_EP_GAP_PCT = float(os.getenv("QM_EP_GAP_PCT", 10.0))          # негово: гап нагоре ≥ 10% (тук — after-hours цена спрямо затварянето)

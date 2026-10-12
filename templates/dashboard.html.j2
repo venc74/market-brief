@@ -1043,6 +1043,8 @@
   <details class="qm-book" style="margin-top:14px">
     <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани {{ qb.records }} · затворени {{ qb.closed }}{% if qb.stats_visible %} · win rate {{ qb.win_rate_pct }}%{% else %} · win rate след {{ qb.min_closed }} затворени{% endif %}</summary>
   {% if qb and qb.enabled %}
+  {# 12.10.2026: флаг за малък риск на входа — R е раздут от знаменателя (само показване; изчислението на R не е променено) #}
+  {% macro qm_tight(p, qb) %}<span style="color:var(--yellow)" title="Рискът на входа (вход − low на входния ден) е {{ "%.2f"|format(p.risk_adr) }}×ADR — под {{ qb.tight_risk_adr }}×ADR. R е голям, защото знаменателят е малък: в реплея такива сделки са 12% и носят 69% от сумата на R.">⚠ риск {{ "%.2f"|format(p.risk_adr) }}×ADR &lt; {{ qb.tight_risk_adr }}×ADR — R е раздут</span>{% endmacro %}
   {% set qb_res = {"stopped": "стоп", "trailing_stop_exit": "trailing изход", "expired": "изтекла по време"} %}
   {% set qb_st = {"pending": "чака пробива", "open": "отворена", "trailing": "след частична продажба (trailing)"} %}
   <div class="qm-sub">Измерване — книга qm_breakout (отделна от Action и buy-stop)</div>
@@ -1057,7 +1059,7 @@
     {% else %}
     <b>Записани: {{ qb.records }}</b> · чакат вход {{ qb.pending }} · отворени {{ qb.open }} · затворени {{ qb.closed }}
     · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
-    · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}<br>
+    · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}{% if qb.tight_risk %} · <span style="color:var(--yellow)">с риск на входа под {{ qb.tight_risk_adr }}×ADR: {{ qb.tight_risk }} (R е раздут)</span>{% endif %}<br>
     {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: <b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess)<br>{% endif %}
     {% if qb.stats_visible %}
     <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
@@ -1078,13 +1080,13 @@
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ qb.live|length }}):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in qb.live %}
         <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}</td>
           <td>{{ p.entry_date }}</td>
-          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}</td>
-          <td class="n">${{ p.trigger }}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
+          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
+          <td class="n">${{ p.trigger }}</td><td class="n">{% if p.fill_price is not none %}${{ p.fill_price }}{% if p.trigger is not none and p.fill_price > p.trigger %} <span style="color:var(--muted)" title="Отвори над нивото — входът е по отварянето">(гап)</span>{% endif %}{% else %}—{% endif %}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
           <td>{{ p.regime or "н/д" }}</td></tr>
         {% endfor %}
       </tbody>
@@ -1097,7 +1099,7 @@
     {% for r in qb.recent %}
     <div class="watch-card">
       <span class="ticker" style="color: {{ 'var(--green)' if r.realized_r and r.realized_r > 0 else 'var(--red)' }}">{{ r.ticker }}</span>{% if r.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период."}]) }}{% endif %}{% if r.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период."}]) }}{% endif %}
-      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ qb_res.get(r.resolution, r.resolution) }} · R={{ r.realized_r }} opt / {{ r.realized_r_pess }} pess · {{ r.regime or "н/д" }}</p>
+      <p>{{ r.entry_date }} → {{ r.resolution_date }} · {{ qb_res.get(r.resolution, r.resolution) }} · R={{ r.realized_r }} opt / {{ r.realized_r_pess }} pess · {{ r.regime or "н/д" }}{% if r.tight_risk %} {{ qm_tight(r, qb) }}{% endif %}</p>
     </div>
     {% endfor %}
   </div>

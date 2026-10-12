@@ -1251,10 +1251,19 @@ def get_qm_summary() -> dict:
         x = g.pop("_rs")
         g["avg_r"] = round(sum(x) / len(x), 2) if (visible and x) else None
 
+    def _risk_adr(r: dict) -> float | None:
+        """12.10.2026: рискът на входа (вход − low на входния ден) в ADR; None без вход/данни. Само показване."""
+        f, st, a = r.get("fill_price"), r.get("stop_loss"), r.get("adr")
+        if not all(isinstance(x, (int, float)) for x in (f, st, a)) or f <= 0 or a <= 0:
+            return None
+        return round((f - st) / f * 100 / a, 2)
+
     def _row(r: dict) -> dict:
+        ra = _risk_adr(r)
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "trigger": r.get("buy_stop"), "adr": r.get("adr"),
                 "expected_stop": r.get("expected_stop"), "stop_loss": r.get("stop_loss"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
+                "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_TIGHT_RISK_ADR,            # 12.10: флаг "R е раздут" (ELF 09.10: 0.09×ADR → +5.2R при +1.7%)
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -1270,7 +1279,8 @@ def get_qm_summary() -> dict:
         "win_rate_pess_pct": round(100 * wins_p / len(rp), 1) if visible else None, "win_ci_pct": _wilson_ci_pct(wins, len(ro)) if visible else None,
         "median_realized_r": med(ro) if visible else None, "median_realized_r_pess": med(rp) if visible else None,
         "big_winners_5r": sum(1 for x in ro if x > 5) if visible else None,
-        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
+        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "tight_risk_adr": config.QM_TIGHT_RISK_ADR,
+        "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_TIGHT_RISK_ADR),
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
