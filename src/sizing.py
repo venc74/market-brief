@@ -98,4 +98,8 @@ def buy_stop_preview(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     if not isinstance(bs, (int, float)) or bs <= 0:
         return {"valid": False, "reason": "Няма buy-stop ниво."}
     plan = position_plan_v2({**row, "price": bs}, sizing_factor, today)
-    return {**plan, "preview": True} if plan.get("valid") else plan
+    if not plan.get("valid"):
+        return plan
+    # 12.10.2026: прозорецът е на картата (setup_rules.apply_book_window: при чакащ запис — на ЗАПИСА, 5 сесии от първия ден), не нов от днес —
+    # EXPD на 12.10: setup "до 15.10" (запис от 09.10), а plan_preview "до 16.10". Без записа двете са една и съща дата (valid_through(today)).
+    return {**plan, "preview": True, "valid_through": setup.get("valid_through") or plan["valid_through"]}

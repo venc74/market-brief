@@ -168,8 +168,18 @@ def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
             cards.append(c)
             continue
         ew = c.get("earnings_warning") or {}
-        compact.append({"ticker": c.get("ticker"), "kind": kind, "reason": watchlist_exits.setup_text(setup) or kind,
-                        "stop_pct": setup.get("struct_risk_pct"), "markers": c.get("markers") or [],
+        reason, stop_pct = watchlist_exits.setup_text(setup) or kind, setup.get("struct_risk_pct")
+        bk = setup.get("book") if setup.get("triggered") else None
+        if bk and isinstance(bk.get("fill_price"), (int, float)) and isinstance(bk.get("stop_loss"), (int, float)) and bk["fill_price"] > 0:
+            # 12.10.2026: задействан запис в buy-stop книгата има предимство пред причината на сетъпа (ANET: "над pivot без обем, стоп 9.2%" беше единственото на реда,
+            # а книгата държеше вход 09.10 по $215.38 със стоп $197.70) — стопът е на книгата, днешният сетъп остава като допълнение
+            r = bk.get("current_r")
+            reason = (f"✅ задействан в buy-stop книгата на {bk['fill_date'][8:10]}.{bk['fill_date'][5:7]} по ${bk['fill_price']:.2f}, "
+                      f"стоп ${bk['stop_loss']:.2f} ({(bk['fill_price'] - bk['stop_loss']) / bk['fill_price'] * 100:.1f}% под входа)"
+                      + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; днес: {reason}")
+            stop_pct = None                                                         # стопът на сетъпа от днес не е стопът на позицията
+        compact.append({"ticker": c.get("ticker"), "kind": kind, "reason": reason,
+                        "stop_pct": stop_pct, "markers": c.get("markers") or [], "book": bk,
                         "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})   # отчет в ~20 сесии: дата (и ±%)
     return cards, compact
 

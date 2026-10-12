@@ -195,12 +195,17 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     (EXPD: запис от 05.10 е валиден до 09.10), а classify_setup смята "до 12.10" всеки следващ ден — картата и таблицата на книгата си противоречаха. Слага valid_through (от записа),
     valid_from, valid_label ("до 09.10, от 05.10") и пренаписва скобата в trigger_text; ако нивото на картата се е изместило от нивото на записа — book_level и бележка (записът пази плана
     от първия ден). Изтекъл запис (valid_through < днес, още нерезолвиран) или запис от бъдеща дата се игнорира. Само показване; връща същия setup.
+    12.10.2026: ЗАДЕЙСТВАН запис (open / trailing) има предимство пред всеки kind, не само below_pivot — ANET (вход 09.10 по $215.38 при отварянето над buy-stop $214.89)
+    беше на 12.10 компактен ред "над pivot без обем" без дума за книгата. Изключение: confirmed — единственият kind, който може да стане Action; книгите са независими
+    (отметката "и Action" в книгата), а текстът "не нов вход" отива и в промпта (setup_reason) и би могъл да свали кодово допустим Action през AI класификацията.
     """
-    if not rec or setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
+    if not rec:
         return setup
     today_iso = (today or dt.date.today()).isoformat() if not isinstance(today, str) else today
     if rec.get("status") in ("open", "trailing"):
-        return _apply_triggered(setup, rec, today_iso)
+        return setup if setup.get("kind") == "confirmed" else _apply_triggered(setup, rec, today_iso)
+    if setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
+        return setup
     through, start = rec.get("valid_through"), rec.get("entry_date")
     if not through or not start or through < today_iso or start > today_iso:
         return setup

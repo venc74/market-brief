@@ -535,6 +535,17 @@ def run() -> dict:
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
+    # 12.10.2026: ранната резолюция на книгите (виж FIX 2026-09-17 по-долу) е ПРЕДИ setup_rules.annotate — картата в Watchlist чете
+    # състоянието на buy-stop книгата (live_buystop_by_ticker), а до 12.10 го четеше от диска преди резолюцията: EXPD беше "open, вход 09.10
+    # по $194.59" в книгата и "чака buy-stop" на картата в същия бриф. Резолюцията чете само tracker-а и цените (без кандидатите) — нищо
+    # между двете места не зависи от реда.
+    if config.ENABLE_BACKTEST:
+        # FIX 2026-10-03 (пакет 1, т.7): еднократен чист старт на Track Record-а — v1 записите се
+        # архивират, отворените се затварят по последния Close ("v1_closed"). ПРЕДИ резолюцията
+        # и преди каквото и да четe _live_positions() (OPEN✓/RE-ENTRY/COT гледат само v2).
+        # Идемпотентно и graceful — провал оставя v1 до следващия run, без загуба на данни.
+        tracker_switch.ensure_v2_methodology()
+        backtest.resolve_positions_only()
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
     candidates = setup_rules.annotate(candidates, today, backtest.live_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис / състоянието на задействания, не нов от днес
@@ -591,13 +602,7 @@ def run() -> dict:
     # Решено на 22.09: _last_resolved_positions() маркира такъв кандидат с
     # RE-ENTRY (нов вход, не продължение) или ЗАТВОРЕНА ДНЕС (без Action план
     # в същия ден — Track Record не би го записал като отделна сделка).
-    if config.ENABLE_BACKTEST:
-        # FIX 2026-10-03 (пакет 1, т.7): еднократен чист старт на Track Record-а — v1 записите се
-        # архивират, отворените се затварят по последния Close ("v1_closed"). ПРЕДИ резолюцията
-        # и преди каквото и да четe _live_positions() (OPEN✓/RE-ENTRY/COT гледат само v2).
-        # Идемпотентно и graceful — провал оставя v1 до следващия run, без загуба на данни.
-        tracker_switch.ensure_v2_methodology()
-        backtest.resolve_positions_only()
+    # 12.10.2026: самото извикване (ensure_v2_methodology + resolve_positions_only) е преместено по-горе, преди setup_rules.annotate.
     cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
     cot_open_positions = [
         {"ticker": t, "company": ai_brief._verified_company_name(t)["name"],

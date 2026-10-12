@@ -87,10 +87,10 @@ assert "частично продадена на 2R (09.10), остатъкът 
 nofill = {"EXPD": {**rec, "fill_price": None}}                                                                 # СИНТЕТИЧНО: повреден запис без цена на входа → без промяна
 c3 = copy.deepcopy(C06); c3.pop("setup", None); setup_rules.annotate([c3], D("2026-10-06"), nofill)
 assert "triggered" not in c3["setup"] and c3["setup"]["trigger_text"].startswith("Чака пробив")
-c4 = copy.deepcopy(C06); c4.pop("setup", None); c4["price"] = c4["pivot"] * 1.02                                  # СИНТЕТИЧНО: над pivot → не е below_pivot → без промяна
+c4 = copy.deepcopy(C06); c4.pop("setup", None); c4["price"] = c4["pivot"] * 1.02                                  # СИНТЕТИЧНО: над pivot с обем 1.58× → confirmed → без промяна (12.10: другите kind-ове получават състоянието — test_buystop_book_order.py)
 setup_rules.annotate([c4], D("2026-10-06"), live)
 assert "triggered" not in c4["setup"]
-print("  ✓ trailing (СИНТЕТИЧЕН запис): 'частично продадена на 2R (09.10), остатъкът е в trailing под SMA10 · текущо +1.4R'; запис без цена на входа и карта над pivot — без промяна")
+print("  ✓ trailing (СИНТЕТИЧЕН запис): 'частично продадена на 2R (09.10), остатъкът е в trailing под SMA10 · текущо +1.4R'; запис без цена на входа и потвърден пробив над pivot — без промяна")
 
 print()
 print("── страницата (РЕАЛНИЯТ бриф от 05.10, но с картата на EXPD от 06.10) ──")
