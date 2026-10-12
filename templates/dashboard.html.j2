@@ -1473,7 +1473,7 @@
     Вероятно CFTC е спряла или забавила публикацията (или теглянето е пропаднало): показаното по-долу е по по-стари позиции, не по днешните.
     {% else %}няма налични данни (кешът е празен или CFTC е недостъпна).{% endif %}</div>
   {% endif %}
-  {% if cot_summary and cot_summary.text %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px">{{ cot_summary.text }}</div>{% endif %}
+  {% if cot_summary and cot_summary.text %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"{% if cot_summary.market_names %} title="Смятано върху: {{ cot_summary.market_names|join(', ') }}"{% endif %}>{{ cot_summary.text }}</div>{% endif %}
   {% if not cot %}<div class="prose">Няма показани екстремуми.</div>{% endif %}
   <div class="theses">
     {% for c in cot %}

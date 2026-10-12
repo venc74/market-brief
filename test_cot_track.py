@@ -120,7 +120,9 @@ assert (sm["markets"], sm["n"], sm["episodes"]) == (18, 387, 53)
 assert sm["h2"] == {"n": 369, "mean_signal_pct": -0.29, "hit_pct": 47} and sm["h4"] == {"n": 340, "mean_signal_pct": -0.28, "hit_pct": 50} and sm["h8"] == {"n": 298, "mean_signal_pct": -1.19, "hit_pct": 50}
 assert (sm["confirmed"]["n"], sm["confirmed"]["episodes"], sm["not_confirmed"]["n"], sm["not_confirmed"]["episodes"]) == (72, 35, 315, 55)
 assert sm["confirmed"]["h4"] == {"n": 65, "mean_signal_pct": -1.18, "hit_pct": 52} and sm["not_confirmed"]["h4"] == {"n": 275, "mean_signal_pct": -0.06, "hit_pct": 50}
-assert sm["text"] == ("Обобщение (в посока на сигнала, 18 пазара, 387 седмици в 53 епизода): след 2/4/8 седмици -0.3% (47%) / -0.3% (50%) / -1.2% (50%). "
+assert sm["markets_total"] == 18 and len(sm["market_names"]) == 18 and "Copper" in sm["market_names"]                       # 12.10: върху какво е смятано
+assert sm["text"] == ("Обобщение върху днешните 18 пазара с екстремум (историята на всеки само в текущата му посока; списъкът се сменя с всеки COT отчет, затова се местят и числата) — "
+                      "в посока на сигнала, 387 седмици в 53 епизода: след 2/4/8 седмици -0.3% (47%) / -0.3% (50%) / -1.2% (50%). "
                       "С пресичане на SMA10: n=72, след 4 седм. -1.2% (52% успех); без пресичане: n=315, след 4 седм. -0.1% (50% успех) "
                       "(SMA10 = 10-седмична средна на седмичните затваряния). "
                       "Седмиците се припокриват и историята е ~2–3 години — ориентир, не доказателство.")
@@ -138,7 +140,7 @@ with contextlib.redirect_stdout(io.StringIO()):
     out2, sm2 = tr.annotate(BRIEF["cot"], SER, TODAY, flaky)
 b2 = {r["market"]: r for r in out2}
 assert "price_confirmation" not in b2["Copper"] and "track_record" not in b2["Copper"] and "price_confirmation" in b2["Wheat"]
-assert sm2["markets"] == 17
+assert sm2["markets"] == 17 and sm2["text"].startswith("Обобщение върху 17 от днешните 18 пазара с екстремум (") and "Copper" not in sm2["market_names"]
 with contextlib.redirect_stdout(io.StringIO()):
     o3, s3 = tr.annotate(BRIEF["cot"], SER, TODAY, lambda sym: (_ for _ in ()).throw(RuntimeError("всичко е счупено")))
 assert all("price_confirmation" not in r for r in o3) and s3 is None and [r["market"] for r in o3] == [r["market"] for r in BRIEF["cot"]]

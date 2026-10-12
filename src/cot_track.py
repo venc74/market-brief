@@ -214,10 +214,11 @@ def track_text(st: dict) -> str:
             f"2/4/8 седмици: {' / '.join(parts)}.{small}")
 
 
-def summary(rows_by_market: dict[str, list[dict]], directions: dict[str, str]) -> dict:
-    """Обобщение за секцията: всичко в посока на сигнала, за пазарите в секцията и тяхната ТЕКУЩА посока; с/без потвърждение."""
+def summary(rows_by_market: dict[str, list[dict]], directions: dict[str, str], total: int | None = None) -> dict:
+    """Обобщение за секцията: всичко в посока на сигнала, за пазарите в секцията и тяхната ТЕКУЩА посока; с/без потвърждение.
+    12.10.2026: total = днешните пазари с екстремум (вкл. тези без ценова история); market_names — върху кои пазари е смятано."""
     rows = [r for m, rs in rows_by_market.items() for r in rs if r["direction"] == directions.get(m)]
-    return {"markets": len(rows_by_market), **stats(rows),
+    return {"markets": len(rows_by_market), "markets_total": total, "market_names": sorted(rows_by_market), **stats(rows),
             "confirmed": stats([r for r in rows if r["confirmed"]]), "not_confirmed": stats([r for r in rows if not r["confirmed"]])}
 
 
@@ -232,7 +233,12 @@ def summary_text(sm: dict) -> str:
         return f"{label}: n={st['n']}, след 4 седм. " + ("—" if not h["n"] else f"{h['mean_signal_pct']:+.1f}% ({h['hit_pct']}% успех)")
     h = {k: sm[f"h{k}"] for k in HORIZONS}
     main = " / ".join("—" if not h[k]["n"] else f"{h[k]['mean_signal_pct']:+.1f}% ({h[k]['hit_pct']}%)" for k in HORIZONS)
-    return (f"Обобщение (в посока на сигнала, {sm['markets']} пазара, {sm['n']} седмици в {sm['episodes']} епизода): след 2/4/8 седмици "
+    # 12.10.2026: изрично върху какво е смятано — днешните пазари с екстремум, всеки в текущата си посока; списъкът се сменя с всеки COT отчет и числата се местят
+    # заедно с него (09.10: 20 пазара / 425 седмици / 62 епизода; 12.10: 19 / 335 / 60) — не е натрупана история на сигнала.
+    tot = sm.get("markets_total")
+    of = f"{sm['markets']} от днешните {tot} пазара с екстремум" if tot and tot != sm["markets"] else f"днешните {sm['markets']} пазара с екстремум"
+    return (f"Обобщение върху {of} (историята на всеки само в текущата му посока; списъкът се сменя с всеки COT отчет, затова се местят и числата) — "
+            f"в посока на сигнала, {sm['n']} седмици в {sm['episodes']} епизода: след 2/4/8 седмици "
             f"{main}. {seg(sm['confirmed'], 'С пресичане на SMA10')}; {seg(sm['not_confirmed'], 'без пресичане')} "
             f"(SMA10 = 10-седмична средна на седмичните затваряния). "
             f"Седмиците се припокриват и историята е ~2–3 години — ориентир, не доказателство.")
@@ -270,7 +276,7 @@ def annotate(cot_rows: list[dict], series_by_market: dict[str, list[dict]], toda
         except Exception as e:
             print(f"[cot] ценово потвърждение/история за '{m}': {type(e).__name__}: {e}")
         out.append(row)
-    sm = summary(rows_by_market, directions) if rows_by_market else None
+    sm = summary(rows_by_market, directions, total=len(cot_rows)) if rows_by_market else None
     if sm:
         sm["text"] = summary_text(sm)
     return out, sm
