@@ -1,0 +1,404 @@
+{
+"_note": "РЕАЛНО: отговорите на Yahoo (yfinance 1.7.0), записани на 12.10.2026 ~14:30 UTC — info (shortName/longName/quoteType), дневните барове за period=7d (дати и Close) и yf.Search(company_claim).quotes; company_claim — от data/cot_theses_cache.json (отговорите на модела); dropped_2026_10_12 — изключените 'unverified' в брифа от 12.10. EXPD е контрола (действащ тикър).",
+"claims": {
+"BK": "The Bank of New York Mellon Corporation",
+"CSWI": "CSW Industrials, Inc.",
+"GMCR": "Keurig Dr Pepper Inc.",
+"SWN": "SWN (now a part of Expand Energy; formerly Southwestern Energy Company)",
+"BSMX": "Banco Santander Mexico SA",
+"DNKN": "Dunkin' Brands Group",
+"MAG": "MAG Silver Corp.",
+"HBI": "Hanesbrands Inc.",
+"SAFM": "Sanderson Farms, Inc.",
+"EXPD": null
+},
+"dropped_2026_10_12": [
+{
+"market": "Natural Gas",
+"ticker": "SWN",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "2-Year Treasury Note",
+"ticker": "BK",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "Mexican Peso",
+"ticker": "BSMX",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "E-mini Russell 2000",
+"ticker": "CSWI",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "Coffee C",
+"ticker": "DNKN",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "Coffee C",
+"ticker": "GMCR",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+},
+{
+"market": "Silver",
+"ticker": "MAG",
+"code": "unverified",
+"reason": "няма име в Yahoo (вероятно делистнат или преименуван)"
+}
+],
+"info": {
+"BK": {
+"shortName": null,
+"longName": null,
+"quoteType": null
+},
+"CSWI": {
+"shortName": null,
+"longName": null,
+"quoteType": null
+},
+"GMCR": {
+"shortName": null,
+"longName": null,
+"quoteType": null
+},
+"SWN": {
+"shortName": null,
+"longName": null,
+"quoteType": "NONE"
+},
+"BSMX": {
+"shortName": null,
+"longName": null,
+"quoteType": "NONE"
+},
+"DNKN": {
+"shortName": null,
+"longName": null,
+"quoteType": "NONE"
+},
+"MAG": {
+"shortName": null,
+"longName": null,
+"quoteType": null
+},
+"HBI": {
+"shortName": null,
+"longName": null,
+"quoteType": null
+},
+"SAFM": {
+"shortName": null,
+"longName": null,
+"quoteType": "NONE"
+},
+"EXPD": {
+"shortName": "Expeditors International of Was",
+"longName": "Expeditors International of Washington, Inc.",
+"quoteType": "EQUITY"
+}
+},
+"bars": {
+"BK": {
+"dates": [],
+"close": []
+},
+"CSWI": {
+"dates": [],
+"close": []
+},
+"GMCR": {
+"dates": [],
+"close": []
+},
+"SWN": {
+"dates": [],
+"close": []
+},
+"BSMX": {
+"dates": [],
+"close": []
+},
+"DNKN": {
+"dates": [],
+"close": []
+},
+"MAG": {
+"dates": [],
+"close": []
+},
+"HBI": {
+"dates": [],
+"close": []
+},
+"SAFM": {
+"dates": [],
+"close": []
+},
+"EXPD": {
+"dates": [
+"2026-10-02",
+"2026-10-05",
+"2026-10-06",
+"2026-10-07",
+"2026-10-08",
+"2026-10-09",
+"2026-10-12"
+],
+"close": [
+192.47,
+194.12,
+191.8,
+190.85,
+193.71,
+193.24,
+194.0
+]
+}
+},
+"search": {
+"The Bank of New York Mellon Corporation": [
+{
+"symbol": "BNY",
+"shortname": "The Bank of New York Mellon Cor",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "NYQ",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BNY-PK",
+"shortname": "The Bank Of New York Mellon Cor",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "NYQ",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BNY.MX",
+"shortname": "BANK OF NY MELLON CORPORATION",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "MEX",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BONY.VI",
+"shortname": "BANK OF NEW YORK MELLON CORP",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "VIE",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "1BK.MI",
+"shortname": "THE BANK OF NEW YORK MELLON",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "MIL",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BNY.BA",
+"shortname": "BANK OF NY MELLON CORPORATION C",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "BUE",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BN9.F",
+"shortname": "Bk of New York MellonCorp.,TheR",
+"longname": "The Bank of New York Mellon Corporation",
+"exchange": "FRA",
+"quoteType": "EQUITY"
+}
+],
+"CSW Industrials, Inc.": [
+{
+"symbol": "CSW",
+"shortname": "CSW Industrials, Inc.",
+"longname": "CSW Industrials, Inc.",
+"exchange": "NYQ",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "MU",
+"shortname": "Micron Technology, Inc.",
+"longname": "Micron Technology, Inc.",
+"exchange": "NMS",
+"quoteType": "EQUITY"
+}
+],
+"Keurig Dr Pepper Inc.": [
+{
+"symbol": "KDP",
+"shortname": "Keurig Dr Pepper Inc.",
+"longname": "Keurig Dr Pepper Inc.",
+"exchange": "NMS",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "0Z62.L",
+"shortname": "KEURIG DR PEPPER INC KEURIG DR ",
+"longname": "Keurig Dr Pepper Inc.",
+"exchange": "LSE",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "DP5.HA",
+"shortname": "Keurig Dr Pepper Inc.         R",
+"longname": "Keurig Dr Pepper Inc",
+"exchange": "HAN",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "DP5.SG",
+"shortname": "Keurig Dr Pepper Inc.",
+"longname": "Keurig Dr Pepper Inc",
+"exchange": "STU",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "DP5.F",
+"shortname": "Keurig Dr Pepper Inc.         R",
+"longname": "Keurig Dr Pepper Inc.",
+"exchange": "FRA",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "DP5.DE",
+"shortname": "Keurig Dr Pepper Inc.         R",
+"longname": "Keurig Dr Pepper Inc.",
+"exchange": "GER",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "DP5.HM",
+"shortname": "Keurig Dr Pepper Inc.         R",
+"longname": "Keurig Dr Pepper Inc",
+"exchange": "HAM",
+"quoteType": "EQUITY"
+}
+],
+"SWN (now a part of Expand Energy; formerly Southwestern Energy Company)": [],
+"Banco Santander Mexico SA": [],
+"Dunkin' Brands Group": [],
+"MAG Silver Corp.": [
+{
+"symbol": "BC21.SG",
+"shortname": "Magma Silver Corp.",
+"longname": "Magma Silver Corp",
+"exchange": "STU",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "MAGMF",
+"shortname": "MAGMA SILVER CORP.",
+"longname": "Magma Silver Corp.",
+"exchange": "OQB",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "MGMA.V",
+"shortname": "MAGMA SILVER CORP",
+"longname": "Magma Silver Corp.",
+"exchange": "VAN",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "MGMA.NE",
+"shortname": "MAGMA SILVER CORP",
+"longname": null,
+"exchange": "NEO",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BC21.F",
+"shortname": "Magma Silver Corp.            R",
+"longname": "Magma Silver Corp.",
+"exchange": "FRA",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BC21.MU",
+"shortname": "Magma Silver Corp.            R",
+"longname": "Magma Silver Corp.",
+"exchange": "MUN",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "BC21.DU",
+"shortname": "Magma Silver Corp.            R",
+"longname": "Magma Silver Corp",
+"exchange": "DUS",
+"quoteType": "EQUITY"
+}
+],
+"Hanesbrands Inc.": [],
+"Sanderson Farms, Inc.": [
+{
+"symbol": "MU",
+"shortname": "Micron Technology, Inc.",
+"longname": "Micron Technology, Inc.",
+"exchange": "NMS",
+"quoteType": "EQUITY"
+}
+],
+"Expeditors International of Washington": [
+{
+"symbol": "EXPD",
+"shortname": "Expeditors International of Was",
+"longname": "Expeditors International of Washington, Inc.",
+"exchange": "NYQ",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "EXPD.MX",
+"shortname": "EXPEDITORS INTERN OF WASHINGTON",
+"longname": "Expeditors International of Washington, Inc.",
+"exchange": "MEX",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "EW1.F",
+"shortname": "EXPEDITORS INTL OF WASH. INC. R",
+"longname": "Expeditors International of Washington, Inc.",
+"exchange": "FRA",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "EW1.MU",
+"shortname": "EXPEDITORS INTL OF WASH. INC. R",
+"longname": "Expeditors International of Washington Inc",
+"exchange": "MUN",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "0IJR.L",
+"shortname": "EXPEDITORS INTERNATIONAL OF WAS",
+"longname": "Expeditors International of Washington, Inc.",
+"exchange": "LSE",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "EW1.SG",
+"shortname": "Expeditors International of Was",
+"longname": "Expeditors International of Washington Inc",
+"exchange": "STU",
+"quoteType": "EQUITY"
+},
+{
+"symbol": "E1XP34.SA",
+"shortname": "EXPEDITORS IDRN",
+"longname": "Expeditors International of Washington, Inc.",
+"exchange": "SAO",
+"quoteType": "EQUITY"
+}
+]
+}
+}

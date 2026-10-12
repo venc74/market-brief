@@ -35,6 +35,8 @@ def lookup_real(t):
 
 
 ai_brief._verified_company_name = lookup_real
+ai_brief._recent_bars = lambda t: 0                                                                                             # 12.10: BSMX и AMXL — 0 бара в Yahoo (РЕАЛНО, измерено на 12.10); проверката: test_cot_unverified.py
+ai_brief._successor_by_claim = lambda t, claim: None
 ai_brief._call_claude = lambda *a, **k: (_ for _ in ()).throw(AssertionError("моделът не бива да се вика"))
 
 

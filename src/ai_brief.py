@@ -1711,6 +1711,62 @@ def _is_mismatched_commodity_etf(lookup: dict, market_name: str) -> bool:
     return not any(kw in long_name_stemmed for kw in market_keywords)
 
 
+# 12.10.2026: тикър без име в Yahoo не е непременно "делистнат". На 12.10 BK и CSWI отпаднаха като "вероятно делистнат", а компаниите работят — символите са сменени
+# (BNY Mellon: BK → BNY на 21.05.2026; CSW Industrials: CSWI → CSW на 09.06.2025); моделът дава старите. Измерено на живо (12.10): Yahoo връща 404 и 0 бара и за двата,
+# а търсене по company_claim намира BNY, CSW (и KDP за GMCR); за 6 придобити компании (SWN, BSMX, HBI, DNKN, MAG, SAFM) — нито едно фалшиво попадение.
+_US_EXCHANGES = {"NYQ", "NMS", "NGM", "NCM", "ASE", "PCX", "BTS", "NYS"}
+
+
+def _recent_bars(ticker: str) -> int | None:
+    """Брой дневни барове на тикъра за последните ~5 сесии (period 7d) от Yahoo; None — проверката не успя (мрежа/timeout). Отделна функция — тестовете я подменят."""
+    try:
+        h = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).history(period="7d", auto_adjust=False))
+        return None if h is None else int(h["Close"].notna().sum()) if "Close" in h else 0
+    except Exception as e:
+        print(f"[ai] ценова проверка {ticker}: {type(e).__name__}: {e}")
+        return None
+
+
+def _successor_by_claim(ticker: str, claim: str | None) -> dict | None:
+    """US акция в Yahoo, чието име съвпада с company_claim на модела (cot_theses.claim_matches) и чийто символ е различен — вероятният нов символ. Само подсказка в текста;
+    тикърът НЕ се заменя. Без твърдение или при провал → None."""
+    claim = str(claim or "").strip()
+    if not claim:
+        return None
+    try:
+        quotes = net_utils.fetch_with_timeout(lambda: yf.Search(claim, max_results=8).quotes) or []
+        for q in quotes:
+            sym, nm = q.get("symbol"), q.get("shortname") or q.get("longname")
+            if (sym and sym != ticker and q.get("quoteType") == "EQUITY" and q.get("exchange") in _US_EXCHANGES
+                    and _cot_table.claim_matches(claim, {"name": nm, "short_name": q.get("shortname"), "long_name": q.get("longname")})):
+                return {"ticker": sym, "name": nm}
+    except Exception as e:
+        print(f"[ai] търсене по име {ticker} ({claim}): {type(e).__name__}: {e}")
+    return None
+
+
+def _unverified_reason(t: dict) -> tuple[dict, dict | None]:
+    """
+    12.10.2026: тикър без име в Yahoo → (lookup след повторен опит, изключване или None). Повторен опит (lru_cache пази провала — вика се самата функция);
+    после цени за последните ~5 сесии: има цени → "не можа да се провери днес" (код unverified_today); няма цени → "няма котировка … делистнат или сменен
+    символ" (код unverified, както досега) + подсказка за новия символ по company_claim; ценовата проверка не успя → "не можа да се провери днес".
+    """
+    tk = t["ticker"]
+    lookup = getattr(_verified_company_name, "__wrapped__", _verified_company_name)(tk)
+    if lookup.get("verified"):
+        return lookup, None
+    bars = _recent_bars(tk)
+    if bars:
+        return lookup, {"ticker": tk, "code": "unverified_today", "reason": "Yahoo не върна име днес (цени има) — не можа да се провери днес"}
+    if bars is None:
+        return lookup, {"ticker": tk, "code": "unverified_today", "reason": "не можа да се провери днес (Yahoo не върна нито име, нито цени)"}
+    reason = "няма котировка в Yahoo (нито име, нито цени за последните 5 сесии) — делистнат или сменен символ"
+    succ = _successor_by_claim(tk, t.get("company_claim"))
+    if succ:
+        reason += f"; по името „{t.get('company_claim')}“ Yahoo води {succ['ticker']} ({succ['name']}) — вероятно новият символ"
+    return lookup, {"ticker": tk, "code": "unverified", "reason": reason, **({"successor": succ["ticker"]} if succ else {})}
+
+
 _CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 
 # Правни/структурни суфикси и съюзи — носят нула идентичност, изключват се
@@ -1862,11 +1918,12 @@ def _verify_thesis_tickers(thesis: dict | None, screener_tickers: set[str],
         if not (isinstance(t, dict) and t.get("ticker")):
             continue
         lookup = _verified_company_name(t["ticker"])
+        if not lookup["verified"]:                 # 12.10.2026: повторен опит + цени + подсказка за сменен символ (виж _unverified_reason)
+            lookup, why = _unverified_reason(t)
         # cross теза: прозата е ПО ТИКЪР (quote) — identity проверката е per-ticker; директна (таблица): общият текст
         own_text = t.get("quote") if "quote" in t else reasoning
         if not lookup["verified"]:
-            dropped.append({"ticker": t["ticker"], "code": "unverified",
-                            "reason": "няма име в Yahoo (вероятно делистнат или преименуван)"})
+            dropped.append(why)
         elif t.get("source") == "model" and (gate := _cot_table.cross_gate(t, lookup, market_name)):
             # 08.10.2026: cross тикър от модела — фонд / идентичност (company_claim срещу Yahoo) / не може да се провери / не-USD отчитаща се
             # при валутна теза. Директните от таблицата (source "table") са извън това.
