@@ -1,132 +1,52 @@
 {
- "date": "2026-10-09",
+ "date": "2026-10-12",
  "rows": [],
  "horizon": [
   {
-   "ticker": "CMND",
-   "company": "Clearmind Medicine Inc.",
-   "date": "2026-10-05",
+   "ticker": "DFLI",
+   "company": "Dragonfly Energy Holdings Corp",
+   "date": "2026-10-12",
    "ratio": "1:8",
    "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
+   "date_human": "Oct 12, 2026"
   },
   {
-   "ticker": "GUTS",
-   "company": "Fractyl Health, Inc.",
-   "date": "2026-10-05",
-   "ratio": "1:12",
+   "ticker": "MDCX",
+   "company": "Medicus Pharma Ltd.",
+   "date": "2026-10-12",
+   "ratio": "1:50",
    "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
+   "date_human": "Oct 12, 2026"
   },
   {
-   "ticker": "SCNX",
-   "company": "Scienture Holdings, Inc.",
-   "date": "2026-10-05",
-   "ratio": "1:25",
+   "ticker": "NIVF",
+   "company": "NewGenIvf Group Limited",
+   "date": "2026-10-12",
+   "ratio": "1:4",
    "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
+   "date_human": "Oct 12, 2026"
   },
   {
-   "ticker": "VIVK",
-   "company": "Vivakor, Inc.",
-   "date": "2026-10-05",
-   "ratio": "1:15",
+   "ticker": "NXGL",
+   "company": "NexGel, Inc",
+   "date": "2026-10-12",
+   "ratio": "1:20",
    "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
-  },
-  {
-   "ticker": "WQEY",
-   "company": "WISeQey Corp",
-   "date": "2026-10-05",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Oct 05, 2026"
-  },
-  {
-   "ticker": "GPMT",
-   "company": "Granite Point Mortgage Trust Inc.",
-   "date": "2026-10-06",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 06, 2026"
-  },
-  {
-   "ticker": "ETHA",
-   "company": "iShares Ethereum Trust ETF",
-   "date": "2026-10-06",
-   "ratio": "1:3",
-   "split_type": "reverse",
-   "date_human": "Oct 06, 2026"
-  },
-  {
-   "ticker": "ITOC",
-   "company": "iTonic Holdings Ltd",
-   "date": "2026-10-06",
-   "ratio": "1:16",
-   "split_type": "reverse",
-   "date_human": "Oct 06, 2026"
-  },
-  {
-   "ticker": "RUBI",
-   "company": "Rubico Inc.",
-   "date": "2026-10-06",
-   "ratio": "1.5:1",
-   "split_type": "normal",
-   "date_human": "Oct 06, 2026"
-  },
-  {
-   "ticker": "GCDT",
-   "company": "Green Circle Decarbonize Technology Limited",
-   "date": "2026-10-07",
-   "ratio": "1:6",
-   "split_type": "reverse",
-   "date_human": "Oct 07, 2026"
-  },
-  {
-   "ticker": "SUGP",
-   "company": "SU Group Holdings Limited",
-   "date": "2026-10-07",
-   "ratio": "1:6",
-   "split_type": "reverse",
-   "date_human": "Oct 07, 2026"
-  },
-  {
-   "ticker": "MGF",
-   "company": "Aberdeen Government Markets Income Fund",
-   "date": "2026-10-08",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Oct 08, 2026"
-  },
-  {
-   "ticker": "MIN",
-   "company": "Aberdeen Intermediate Income Fund",
-   "date": "2026-10-08",
-   "ratio": "1:6",
-   "split_type": "reverse",
-   "date_human": "Oct 08, 2026"
-  },
-  {
-   "ticker": "GLE",
-   "company": "Global Engine Group Holding Limited",
-   "date": "2026-10-08",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 08, 2026"
-  },
-  {
-   "ticker": "DXJ",
-   "company": "WisdomTree Japan Hedged Equity Fund",
-   "date": "2026-10-09",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Oct 09, 2026"
+   "date_human": "Oct 12, 2026"
   },
   {
    "ticker": "POAS",
    "company": "Phaos Technology Holdings (Cayman) Limited",
    "date": "2026-10-12",
    "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Oct 12, 2026"
+  },
+  {
+   "ticker": "ZBAO",
+   "company": "Zhibao Technology Inc.",
+   "date": "2026-10-12",
+   "ratio": "1:50",
    "split_type": "reverse",
    "date_human": "Oct 12, 2026"
   },
@@ -150,31 +70,20 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 18,
-  "horizon_from": "2026-10-05",
+  "source_rows": 8,
+  "horizon_from": "2026-10-12",
   "horizon_to": "2026-10-23",
-  "in_week": 15,
+  "in_week": 6,
   "dropped_price": [
-   "CMND",
-   "GUTS",
-   "SCNX",
-   "VIVK",
-   "WQEY",
-   "GPMT",
-   "ITOC",
-   "RUBI",
-   "GCDT",
-   "SUGP",
-   "GLE"
+   "DFLI",
+   "MDCX",
+   "NIVF",
+   "NXGL",
+   "POAS",
+   "ZBAO"
   ],
-  "dropped_cap": [
-   "MGF",
-   "MIN"
-  ],
-  "dropped_no_data": [
-   "ETHA",
-   "DXJ"
-  ],
+  "dropped_cap": [],
+  "dropped_no_data": [],
   "passed": 0,
   "state": "empty"
  }

@@ -1,0 +1,3534 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Бриф · 12.10.2026, понеделник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b1220;          /* дълбоко мастилено синьо — небе преди отваряне */
+    --panel: #111a2e;
+    --panel-2: #16203a;
+    --line: #233252;
+    --text: #d9e1f2;
+    --muted: #8593b3;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --regime: #fbbf24; --regime-dim: rgba(251,191,36,.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink); color: var(--text);
+    font-family: "IBM Plex Sans", sans-serif; font-size: 15px; line-height: 1.55;
+  }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Хедър: режимът Е дизайнът ── */
+  header {
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--regime-dim), transparent 70%);
+    padding: 36px 0 28px;
+  }
+  .header-inner { max-width: 1080px; margin: 0 auto; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .masthead h1 { font-family: "Spectral", serif; font-size: 26px; font-weight: 700; letter-spacing: .3px; }
+  .masthead .date { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .regime-badge {
+    font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600;
+    color: var(--regime); border: 2px solid var(--regime); border-radius: 6px;
+    padding: 10px 22px; letter-spacing: 2px; text-transform: uppercase;
+    box-shadow: 0 0 28px var(--regime-dim);
+  }
+  .regime-reason { color: var(--muted); font-size: 13px; text-align: right; max-width: 360px; margin-top: 6px; }
+
+  section { margin-top: 44px; }
+  h2 {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 20px;
+  }
+  h2::before { content: "// "; color: var(--regime); }
+
+  /* ── Термометър ── */
+  .thermo { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .t-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; border-top: 3px solid var(--line);
+  }
+  .t-card.info { border-style: dashed; }   /* пакет 2 т.2: информативен индикатор — показва се, не се брои */
+  .t-card.green { border-top-color: var(--green); }
+  .t-card.yellow { border-top-color: var(--yellow); }
+  .t-card.red { border-top-color: var(--red); }
+  .t-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .t-val { font-family: "IBM Plex Mono", monospace; font-size: 21px; font-weight: 600; margin-top: 6px; }
+  .t-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .prose { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--regime);
+    border-radius: 8px; padding: 20px 24px; font-size: 15.5px; }
+
+  /* ── Сектори ── */
+  .sectors { display: grid; gap: 12px; }
+  .sector-row { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; }
+  .sector-name { font-weight: 600; }
+  .sector-etf { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--regime); }
+  .sector-chain { font-size: 14px; color: var(--text); }
+  .sector-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Action карти ── */
+  .stock-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    margin-bottom: 22px; overflow: hidden; }
+  .stock-head { padding: 18px 24px; display: flex; justify-content: space-between;
+    align-items: baseline; flex-wrap: wrap; gap: 8px;
+    background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .ticker { font-family: "IBM Plex Mono", monospace; font-size: 24px; font-weight: 600; color: var(--regime); }
+  .company { color: var(--muted); font-size: 14px; margin-left: 10px; }
+  .price-tag { font-family: "IBM Plex Mono", monospace; font-size: 18px; }
+  .stock-body { padding: 20px 24px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .stock-body, .sector-row { grid-template-columns: 1fr; } }
+  .block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--muted); margin: 14px 0 6px; }
+  .block h3:first-child { margin-top: 0; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px;
+    font-size: 13.5px; padding: 3px 0; border-bottom: 1px dotted var(--line); }
+  .kv b { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-align: right; }
+  .why { font-size: 14.5px; }
+  ul.tight { padding-left: 18px; font-size: 13.5px; }
+  ul.tight li { margin: 4px 0; }
+  .plan { background: var(--regime-dim); border: 1px solid var(--regime);
+    border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .plan .kv { border-bottom-color: rgba(255,255,255,.08); }
+  .warn { color: var(--yellow); font-size: 13px; }
+
+  /* ── Watchlist ── */
+  .watch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .watch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .watch-card .ticker { font-size: 17px; color: var(--yellow); }
+  .watch-card p { font-size: 13px; margin-top: 8px; color: var(--text); }
+  .rs-badge { font-size: 11px; color: var(--muted); margin-left: 8px; white-space: nowrap; }
+  .buy-stop { font-size: 12.5px; font-weight: 600; color: var(--green); margin-top: 6px; }
+  .watch-trigger { font-size: 12.5px; color: var(--muted); margin-top: 8px;
+    border-top: 1px dotted var(--line); padding-top: 8px; }
+
+  /* ── v2: convergence маркери ── */
+  /* 2026-09-23: смяна на AI модела / отхвърлен модел — най-горе в брифа */
+  .model-banner { font-size: 13px; color: var(--yellow); background: rgba(251,191,36,.10);
+                  border: 1px solid rgba(251,191,36,.35); border-radius: 8px;
+                  padding: 10px 14px; margin-bottom: 14px; }
+  .model-banner.rejected { color: var(--red); background: rgba(248,113,113,.10);
+                           border-color: rgba(248,113,113,.35); }
+  /* 2026-09-22: предишна позиция в същия тикър е приключила — виж
+     main._last_resolved_positions(). Видим ред, не само marker tooltip:
+     новият план носи реален риск в име, което току-що е струвало пари. */
+  .re-entry { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
+              border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  /* пакет 4б т.д: предупреждение за отчет върху картата (само информация) */
+  .earn-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08);
+               border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  .watch-card .earn-warn { margin: 6px 0 4px; }
+  /* 09.10: корпоративно действие (отделяне / нецял сплит коефициент) — историята около датата е приблизителна; само информация */
+  .corp-warn { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08); border-left: 2px solid var(--yellow); padding: 7px 11px; margin: 0 16px 10px; }
+  .watch-card .corp-warn, .qm-card .corp-warn, .glb-card .corp-warn { margin: 6px 0 4px; }
+  /* 08.10: бележка за обратен залог — COT тезата казва обратното на сетъпа (сглобена от кода, само информация) */
+  .cot-note { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.06);
+              border-left: 2px solid var(--yellow); padding: 6px 11px; margin: 0 16px 8px; }
+  .watch-card .cot-note, .qm-card .cot-note { margin: 6px 0 4px; }
+  .opp-note { font-size: 12px; color: var(--yellow); margin-top: 3px; }
+  /* 08.10 (2в): подгрупи в каре "Контекст" */
+  .ctx-group { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--border, rgba(255,255,255,.12)); }
+  .ctx-group-name { font-weight: 600; font-size: 12.5px; margin-bottom: 2px; }
+  .markers { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 12px; vertical-align: middle; }
+  .marker { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--regime-dim);
+    color: var(--regime); border: 1px solid var(--regime); cursor: help; }
+  .watch-card .markers { margin-left: 8px; }
+  /* 2026-10-03 (пакет 4а т.2): маркерът се отваря и с клик (мобилно няма hover) */
+  .marker { position: relative; }
+  .marker .marker-tip { display: none; position: absolute; left: 0; top: 100%; z-index: 20; margin-top: 4px;
+    min-width: 220px; max-width: 360px; padding: 8px 10px; border-radius: 6px; background: var(--card, #111827);
+    color: var(--text); border: 1px solid var(--line); font-family: inherit; font-weight: 400; font-size: 12px;
+    white-space: pre-line; text-align: left; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .marker.open .marker-tip { display: block; }
+  /* 2026-10-03 (пакет 4а т.7): давност и причина при празен/остарял днешен резултат */
+  .data-note { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
+  .data-note.warn { color: var(--yellow); border-left: 2px solid var(--yellow); padding: 4px 10px; }
+
+  /* ── 🔎 Наблюдавани тикъри (2026-09-18) ── */
+  .wm-note { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .wm-note code { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .wm-grid { display: grid; gap: 12px; }
+  .wm-card { background: var(--panel); border: 1px solid var(--line);
+                border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--regime); }
+  .wm-card.quiet { border-left-color: var(--line); }
+  .wm-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .wm-ticker { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 15px; }
+  .wm-badge { font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+                 padding: 2px 7px; border-radius: 4px; }
+  .wm-badge.cluster { color: var(--red); background: rgba(248,113,113,.14); }
+  .wm-badge.insider { color: var(--yellow); background: rgba(251,191,36,.12); }
+  .wm-badge.news { color: var(--muted); background: rgba(133,147,179,.12); }
+  .wm-quiet { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .wm-summary { font-size: 13.5px; margin-top: 9px; }
+  .wm-news { margin: 8px 0 0 0; padding-left: 18px; font-size: 13px; }
+  .wm-news li { margin-bottom: 3px; }
+  .wm-src { color: var(--muted); font-size: 12px; }
+  .wm-insider { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+  .wm-insider th { text-align: left; color: var(--muted); font-weight: 500;
+                      border-bottom: 1px solid var(--line); padding: 4px 6px; }
+  .wm-insider td { padding: 4px 6px; border-bottom: 1px solid var(--line); }
+  .wm-insider .num { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .wm-insider td.buy { color: var(--green); }
+  .wm-insider td.sell { color: var(--red); }
+  .wm-read { font-size: 13px; margin-top: 9px; }
+  .wm-xref { font-size: 12.5px; color: var(--regime); margin-top: 7px; }
+
+  /* ── v2: thesis monitor ── */
+  .theses { display: grid; gap: 12px; }
+  .thesis { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 20px; border-left: 3px solid var(--line); }
+  .thesis.active { border-left-color: var(--green); }
+  .thesis.structural { border-left-color: var(--regime); }
+  .thesis.watch { border-left-color: var(--muted); }
+  .thesis-head { display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; }
+  .thesis-name { font-weight: 600; font-size: 15px; }
+  .thesis-status { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
+  .thesis-status.active { color: var(--green); background: rgba(52,211,153,.12); }
+  .thesis-status.structural { color: var(--regime); background: var(--regime-dim); }
+  .thesis-status.watch { color: var(--muted); background: rgba(133,147,179,.12); }
+  .thesis-tickers { font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: var(--regime); margin-top: 6px; }
+  .thesis-chain { font-size: 13.5px; color: var(--text); margin-top: 8px; }
+  .thesis-trigger { font-size: 12.5px; color: var(--green); margin-top: 6px; }
+  /* 2026-09-16: свереност срещу новините — само анотация, status е непроменен */
+  .thesis-news { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+                 padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+  .thesis-news.challenged { color: var(--red); background: rgba(248,113,113,.12); }
+  .thesis-news.resolved { color: var(--muted); background: rgba(133,147,179,.12); }
+  /* 2026-09-18: "evolving" — оригиналният път спрян, алтернативен напредва */
+  .thesis-news.evolving { color: var(--yellow); background: rgba(251,191,36,.12); }
+  .thesis-newsnote { font-size: 12.5px; color: var(--red); margin-top: 6px; }
+  .thesis-newsnote.evolving { color: var(--yellow); }
+  /* 2026-09-29: "confirmed" — събитие потвърждава механизма; тезата продължава */
+  .thesis-news.confirmed { color: var(--green); background: rgba(52,211,153,.12); }
+  .thesis-newsnote.confirmed { color: var(--green); }
+  /* 2026-09-29: тикър от тезата без ценови данни (CEIX/TELL мълчаха месеци) */
+  .thesis-missing { font-size: 12.5px; color: var(--red); margin-top: 6px; }
+  /* FIX 2026-10-01 (т.2): механизмът е потвърден от новина, но цената още не
+     го следва (мнозинство под 200DMA / RS отрицателен на 4с и 12с) — чисто
+     визуално, не пипа news_status/laggard-leading гейтовете */
+  .thesis-price-warn { color: var(--yellow); background: rgba(251,191,36,.12);
+    font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 4px;
+    margin-left: 6px; }
+  /* 2026-09-29: каре "Контекст" — само данни, без AI текст */
+  .thesis-ctx { margin-top: 10px; padding: 10px 12px; border: 1px dashed var(--line);
+                border-radius: 6px; background: var(--panel-2); overflow-x: auto; }
+  .ctx-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .ctx-summary { font-family: "IBM Plex Mono", monospace; font-size: 13px; margin-top: 4px; }
+  .ctx-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .ctx-meta b { color: var(--text); font-weight: 500; }
+  .ctx-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }
+  .ctx-table th { text-align: left; color: var(--muted); font-weight: 500;
+                  border-bottom: 1px solid var(--line); padding: 3px 6px; }
+  .ctx-table td { padding: 3px 6px; border-bottom: 1px solid var(--line); }
+  .ctx-table .num { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .ctx-table .mono { font-family: "IBM Plex Mono", monospace; }
+  .thesis-ctx .pos { color: var(--green); }
+  .thesis-ctx .neg { color: var(--red); }
+  .thesis-ctx .na, .thesis-ctx .warn-txt { color: var(--yellow); }
+  .cot-direction { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
+  .cot-direction.bullish { color: var(--green); background: rgba(52,211,153,.12); }
+  .cot-direction.bearish { color: var(--red); background: rgba(248,113,113,.12); }
+  .cot-direction.conflict { color: var(--yellow); background: rgba(251,191,36,.12); }
+  .cot-percentile { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); }
+  .cot-sub { font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .cot-sub-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+    color: var(--muted); margin-bottom: 3px; }
+  .cot-tickers { font-family: "IBM Plex Mono", monospace; color: var(--regime); }
+
+  /* ── v2: signal таблици (unusual options / splits) ── */
+  .signal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .signal-chip { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; }
+  .signal-chip .sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; }
+  .signal-chip.calls .sym { color: var(--green); }
+  .signal-chip.puts .sym { color: var(--red); }
+  .signal-chip .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .signal-chip .in-screen { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
+    color: var(--regime); margin-top: 4px; }
+  .split-tag { font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .split-tag.fwd { color: var(--green); background: rgba(52,211,153,.12); }
+  .split-tag.rev { color: var(--red); background: rgba(248,113,113,.12); }
+  /* 2026-09-27: сплитове — секцията вече не се скрива (празно / провал / приоритетни) */
+  .splits-empty { font-size: 13px; color: var(--text); }
+  .splits-funnel { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .splits-warn { font-size: 13px; color: var(--red); background: rgba(248,113,113,.10);
+                 border: 1px solid rgba(248,113,113,.35); border-radius: 8px; padding: 10px 14px; }
+  .splits-priority { margin-bottom: 12px; }
+  .signal-chip.split-pos { border-color: var(--yellow); }
+  .signal-chip .split-badge { font-size: 11px; font-family: "IBM Plex Mono", monospace;
+    color: var(--yellow); margin-top: 4px; }
+
+  /* ── v2: Superinvestor Moves ── */
+  .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .si-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .si-card.in-screen { border-color: var(--regime); box-shadow: 0 0 0 1px var(--regime-dim); }
+  .si-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .si-sym { font-family: "IBM Plex Mono", monospace; font-size: 17px; font-weight: 600; color: var(--text); }
+  .si-val { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--green); }
+  .si-action { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
+  .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
+  /* 2026-09-21: сдвоен S+P трансфер — изключен от агрегатите, но видим */
+  .si-transfer { margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--line); }
+  .si-transfer-head { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
+                      color: var(--yellow); }
+  .si-transfer-row { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .si-card.exit { border-left: 3px solid var(--red); }
+  .si-pct { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .si-pct.new { color: var(--green); }
+  .si-pct.exit { color: var(--red); }
+  .si-stopped-note { font-size: 12.5px; color: var(--muted); margin-top: 12px; padding: 10px 14px;
+    background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; }
+  .si-stopped-note b { color: var(--yellow); }
+
+  /* ── GLB (Green Line Breakout) Watchlist ── */
+  .glb-group-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; margin: 14px 0 8px; }
+  .glb-group-label.classic { color: var(--green); }
+  .glb-group-label.momentum { color: var(--yellow); }
+  .glb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 6px; }
+  .glb-card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--muted);
+    border-radius: 8px; padding: 12px 16px; }
+  .glb-card.classic { border-left-color: var(--green); }
+  .glb-card.momentum { border-left-color: var(--yellow); }
+  .glb-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
+  .glb-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .glb-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+  .glb-company { font-size: 12.5px; color: var(--text); margin-top: 2px; }
+  .glb-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .glb-stat { font-size: 13.5px; font-weight: 600; margin-top: 6px; }
+  .glb-card.classic .glb-stat { color: var(--green); }
+  .glb-card.momentum .glb-stat { color: var(--yellow); }
+  .glb-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .glb-caveat { font-size: 11.5px; color: var(--yellow); margin-top: 6px; }
+  .glb-note { font-size: 12px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .glb-insufficient-note { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; }
+
+  /* ── Qullamaggie сетъпи (отделна стратегия — измерване, не препоръка) ── */
+  .qm-banner { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.35);
+    border-radius: 6px; padding: 9px 12px; margin: 0 0 12px; line-height: 1.5; }
+  .qm-sub { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--yellow); margin: 18px 0 8px; }
+  .qm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 10px; margin-bottom: 6px; }
+  .qm-card { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--yellow);
+    border-radius: 8px; padding: 12px 16px; }
+  .qm-card.in-screen { box-shadow: 0 0 0 1px var(--regime-dim); }
+  .qm-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .qm-sym { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+  .qm-company { font-size: 12.5px; color: var(--text); margin-top: 2px; }
+  .qm-price { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .qm-stat { font-size: 13px; font-weight: 600; margin-top: 4px; color: var(--yellow); }
+  .qm-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .qm-detail b { color: var(--text); font-weight: 600; }
+  .qm-note { font-size: 11.5px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .qm-sm { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  .qm-kv { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; font-size: 12px; margin-top: 8px; color: var(--muted); }
+  .qm-kv span, .qm-kv b { white-space: nowrap; }
+  .qm-kv b { color: var(--text); font-weight: 600; text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .qm-card { padding: 10px 12px; }
+  .qm-card .markers { margin-left: 6px; }
+  .qm-ep-table td { vertical-align: top; }
+  .qm-ep-sum { font-size: 12.5px; color: var(--text); margin-top: 4px; }
+  .qm-ep-hl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ── news_aggregator: Значими новини ── */
+  .news-list { display: grid; gap: 10px; }
+  .news-item { display: flex; gap: 12px; align-items: flex-start;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+  .news-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--regime); margin-top: 8px; }
+  .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
+  .news-why { font-size: 13.5px; color: var(--muted); }
+
+  /* ── Track Record: Open Positions таблица ── */
+  .pos-table { width: 100%; border-collapse: collapse; }
+  .pos-table th, .pos-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .pos-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+  .pos-table td.n, .pos-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; }
+  .pos-table .sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .pos-row-up { background: rgba(52,211,153,.06); }
+  .pos-row-up td.n.pct { color: var(--green); }
+  .pos-row-down { background: rgba(248,113,113,.06); }
+  .pos-row-down td.n.pct { color: var(--red); }
+
+  /* 2026-10-03 (пакет 4а т.3): widget-ът за търсене на Borrow Rate е махнат (CORS proxy-то беше ненадеждно);
+     2026-10-06 (пакет 4б т.ж): махнат е и редът с borrow данните върху картите (дълги swing позиции) */
+
+  /* ── v2: исторически календар ── */
+  .calendar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; }
+  .calendar label { font-size: 13px; color: var(--muted); }
+  .calendar input[type="date"] { background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 14px; color-scheme: dark; }
+  .calendar button { background: var(--regime); color: var(--ink); border: none;
+    border-radius: 6px; padding: 9px 18px; font-weight: 600; font-size: 13px; cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif; }
+  .calendar button:hover { filter: brightness(1.08); }
+  .calendar .hint { font-size: 12px; color: var(--muted); }
+  #history-frame { width: 100%; border: 1px solid var(--line); border-radius: 8px;
+    margin-top: 16px; height: 0; transition: height .2s; background: var(--ink); }
+  #history-msg { font-size: 13px; color: var(--yellow); margin-top: 10px; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px;
+    font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: no-preference) {
+    .regime-badge { animation: pulse 4s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 44px var(--regime-dim); } }
+  }
+
+  /* ── v2: Earnings Season Recap — икона + модал (не hover tooltip) ── */
+  .earn-icon { display: inline-flex; cursor: pointer; margin-left: 7px; vertical-align: middle; }
+  .earn-icon.earn-green { color: var(--green); }
+  .earn-icon.earn-yellow { color: var(--yellow); }
+  .earn-icon.earn-red { color: var(--red); }
+  .earn-icon.earn-na { color: var(--muted); }
+  /* НЕ position:fixed — position:absolute + JS позиционира top спрямо
+     window.scrollY при отваряне, за да "покрие" текущия viewport, без
+     да разчита на fixed positioning. */
+  .earn-modal { position: absolute; left: 0; right: 0; height: 100vh;
+    background: rgba(4,8,18,.72); display: flex; align-items: flex-start;
+    justify-content: center; padding-top: 60px; z-index: 50; }
+  .earn-modal[hidden] { display: none; }
+  .earn-modal-content { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 22px 24px; max-width: 540px; width: 92%;
+    position: relative; max-height: 80vh; overflow-y: auto; }
+  .earn-modal-close { position: absolute; top: 12px; right: 16px; background: none;
+    border: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .earn-modal-close:hover { color: var(--text); }
+  .earn-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .earn-table th { text-align: left; font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--muted); padding: 4px 8px 6px 0; border-bottom: 1px solid var(--line); }
+  .earn-table td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace; }
+  .earn-yoy-row { background: rgba(255,255,255,.03); }
+  .earn-yoy-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .earn-pos { color: var(--green); }
+  .earn-neg { color: var(--red); }
+  .earn-yoy-summary { font-size: 12.5px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+  /* ── Стоп и размер (07.10.2026): нива от брифа + оразмеряване в браузъра (localStorage) ── */
+  header { position: relative; }
+  .mb-gear { position: absolute; top: 10px; right: 14px; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px;
+    font-size: 16px; line-height: 1; padding: 6px 9px; cursor: pointer; }
+  .mb-gear:hover, .mb-gear[aria-expanded="true"] { color: var(--text); border-color: var(--regime); }
+  .mb-settings { background: var(--panel); border-bottom: 1px solid var(--line); }
+  .mb-settings[hidden] { display: none; }
+  .mb-settings-inner { max-width: 1080px; margin: 0 auto; padding: 14px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 16px; align-items: end; }
+  .mb-settings label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .mb-settings input[type=number], .lv-adj input { background: var(--ink); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 8px 10px;
+    font: 14px "IBM Plex Mono", monospace; width: 100%; }
+  .mb-settings .mb-streak { color: var(--text); font-size: 12.5px; }
+  .mb-settings .mb-check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); }
+  .mb-note { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); }
+  .mb-note[hidden] { display: none; }
+  .lv { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12.5px; }
+  .lv-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); padding: 1px 0; }
+  .lv-row b { color: var(--text); font-family: "IBM Plex Mono", monospace; font-weight: 600; text-align: right; }
+  .lv-row i { font-style: normal; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+  .lv-note { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .lv-warn { font-size: 12px; color: var(--yellow); margin-top: 4px; }
+  .lv-hint { color: var(--muted); font-size: 12px; }
+  .lv-size { margin-top: 6px; padding: 6px 8px; background: rgba(255,255,255,.03); border-radius: 6px; }
+  .lv-main { color: var(--text); font-size: 13px; margin-top: 2px; }
+  .lv-risk, .lv-loss { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .lv-size b { color: var(--text); font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .lv-actions { margin-top: 6px; }
+  .lv-adjust-btn, .lv-reset { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  .lv-adj { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; }
+  .lv-adj[hidden] { display: none; }
+  .lv-adj label { font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; flex: 1 1 110px; }
+  .lv-adj .lv-note { flex-basis: 100%; }
+  .qm-lv-row td { border-top: 0; padding-top: 0; }
+  @media (max-width: 760px) { .mb-settings input[type=number], .lv-adj input { font-size: 16px; } }   /* без автоматично увеличение на iOS */
+</style>
+</head>
+<body>
+
+<header>
+  <button id="mb-settings-btn" class="mb-gear" type="button" aria-expanded="false" aria-controls="mb-settings" title="Настройки за оразмеряване на позицията" aria-label="Настройки за оразмеряване на позицията">⚙</button>
+  <div class="header-inner">
+    <div class="masthead">
+      <h1>Персонален AI Инвестиционен Бриф</h1>
+      <div class="date mono">12.10.2026, понеделник · генериран 07:43 CEST · 2 ч 16 мин до US pre-market (04:00 ET)</div>
+    </div>
+    <div>
+      <div class="regime-badge">Defensive</div>
+      
+      
+        <div class="regime-reason" style="color:var(--yellow)">⚡ IEI/HYG: spike-ът отшумява (+0.4% за 10д, 84. percentile, под 90.), хистерезис 1/2 — override още активен, sizing −50%</div>
+        
+        
+        
+        
+        <div class="regime-reason">6 зелени / 2 жълти / 0 червени от 8 видими · не се броят: Fed Net Liquidity (информативен) · по броене: Offensive</div>
+      
+    </div>
+  </div>
+</header>
+
+
+<div id="mb-settings" class="mb-settings" data-regime-factor="0.5" hidden>
+  <div class="mb-settings-inner">
+    <label>Баланс на сметката ($)<input id="mb-balance" type="number" inputmode="decimal" min="0" step="any" placeholder="напр. 80000" autocomplete="off"></label>
+    <label>Риск на сделка (% от сметката)<input id="mb-risk" type="number" inputmode="decimal" min="0" step="any" placeholder="0.5" autocomplete="off"></label>
+    <label>Таван на позиция (% от сметката)<input id="mb-cap" type="number" inputmode="decimal" min="0" step="any" placeholder="25" autocomplete="off"></label>
+    <label class="mb-check"><input id="mb-regime" type="checkbox" checked> прилагай режимния фактор (Action/Watchlist: ×0.5 при Defensive и Cash)</label>
+    <div class="mb-note mb-streak" id="mb-streak" aria-live="polite"></div>
+    <div class="mb-note">Стойностите остават само на това устройство (localStorage) — не се изпращат никъде и не са част от брифа. Размерът на позицията се смята в браузъра от нивата на картата.</div>
+    <div class="mb-note" id="mb-persist-note" hidden>localStorage не е достъпен — настройките важат само докато страницата е отворена.</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+
+
+
+
+<div class="model-banner rejected">⚠ <strong>Проблем с данните днес</strong>
+  <ul class="tight" style="margin:6px 0 0 18px">
+  <li>Unusual options: за нито един кандидат няма съотношение обем/OI (следобедната OI снимка за сесията 09.10 липсва) — маркерите UOV✓ липсват днес; това НЕ значи нормален обем.</li><li>Здравна проверка: OI снимката за сесията 09.10 липсва (последна: 08.10) — UOV✓ и очакваното движение при отчет липсват; провери job-а „Unusual Options OI snapshot“ в GitHub Actions.</li>
+  </ul></div>
+
+
+
+<section>
+  <h2>Пазарен термометър</h2>
+  <div class="thermo">
+    
+    
+    <div class="t-card green">
+      <div class="t-name">SPY тренд</div>
+      <div class="t-val">778.57</div>
+      <div class="t-label">SPY 779 | над 50DMA, над 200DMA</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">VIX</div>
+      <div class="t-val">14.84</div>
+      <div class="t-label">VIX 14.8 (risk-on)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">Put/Call (SPY)</div>
+      <div class="t-val">1.62</div>
+      <div class="t-label">P/C 1.62 (100. percentile от 83 дни; страх — висок за собствената история (contrarian))</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">2Y/10Y спред</div>
+      <div class="t-val">0.44</div>
+      <div class="t-label">0.44% (нормален, flattening)</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow info">
+      <div class="t-name">Fed Net Liquidity</div>
+      <div class="t-val">5859.4</div>
+      <div class="t-label">$5,859 млрд към 2026-10-07 · -0.6% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">MOVE (Bond Vol)</div>
+      <div class="t-val">98.5</div>
+      <div class="t-label">MOVE 98 (-9 пункта/седмица)</div>
+    </div>
+    
+    
+    
+    <div class="t-card green">
+      <div class="t-name">VIX Term Structure</div>
+      <div class="t-val">0.634</div>
+      <div class="t-label">VIX9D 11.3 / VIX 14.8 / VIX3M 17.8 → ratio 0.63 (contango, нормално)</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow">
+      <div class="t-name">IEI/HYG (Credit Spread)</div>
+      <div class="t-val">1.4695</div>
+      <div class="t-label">IEI/HYG 1.470 (7. percentile) · 10д RoC +0.4% (84. percentile) (late-cycle complacency)</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow" title="Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&amp;P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.">
+      <div class="t-name">Market Breadth (% над 40dMA)</div>
+      <div class="t-val">33.3</div>
+      <div class="t-label">33.3% над 40dMA (слаба/тясна ширина) · ⚠ разминаване: SPY е на 0.1% от 52-седм. връх, а ширината е под 40%</div>
+    </div>
+    
+    
+    
+    <div class="t-card yellow" title="Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.">
+      <div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div>
+      <div class="t-val">8</div>
+      <div class="t-label">SPY 8 / QQQ 4 (последни 25 сесии)</div>
+    </div>
+    
+    
+    
+    
+    <div class="t-card" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
+      <div class="t-name">Основна инфлация</div>
+      
+      <div class="t-val">2.19%</div>
+      <div class="t-label">за август · <span title="Средно юни–август срещу март–май; под ±0.1 пп = стабилна">↓ пада: 3м средно 2.25% срещу 2.39%</span> · информативно, не влиза в режима</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Значими новини · последните 24ч</h2>
+  <div class="news-list">
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Oil falls after Trump declares &#39;energy ceasefire&#39; between Russia and Ukraine</span>
+        <span class="news-why"> — Потенциалното спиране на атаките срещу енергийна инфраструктура намалява рисковата премия в петрола и натиска върху цените надолу, директно засягайки energy сектора и инфлационните очаквания.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Gold gains on weaker oil, dollar; US inflation data in focus</span>
+        <span class="news-why"> — Пазарът очаква ключов макро release — инфлационни данни (CPI/PCE), което движи gold и dollar positioning преди публикуването.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Dollar steady near 18-month high as Mideast conflict, US inflation in focus</span>
+        <span class="news-why"> — DXY на 18-месечен връх влияе върху целия asset mix — commodities, EM активи и мултинационални корпоративни приходи, с поглед към предстоящите инфлационни данни.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">US Republicans and Democrats want Trump to reverse course on Russia diesel deal</span>
+        <span class="news-why"> — Двупартийната опозиция в Конгреса срещу дизеловата сделка с Русия създава риск от законодателна намеса и санкционни усложнения, засягащи energy пазарите.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">US threatens to block arms for Ukraine over attacks on Russian refineries</span>
+        <span class="news-why"> — Геополитическият натиск върху Украйна да спре ударите по рафинерии директно засяга петролните фючърси и енергийната инфраструктура в региона.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Iran says US response to its proposal to reopen Hormuz was &#39;insufficient&#39;</span>
+        <span class="news-why"> — Задънена улица по Hormuz преговорите поддържа геополитическа рискова премия в петрола и засяга глобалните доставки на суровини.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">Houthi attacks on Saudi airport — BP and oil chiefs pull out of Riyadh energy congress; FAA warns US airlines</span>
+        <span class="news-why"> — Повтарящите се удари по саудитска инфраструктура ескалират Middle East риска, движат петролните цени и засягат авиационния сектор.</span></div>
+    </div>
+    
+    <div class="news-item">
+      <span class="news-dot"></span>
+      <div><span class="news-head">TSMC expected to report sixth straight quarter of record profit thanks to AI boom</span>
+        <span class="news-why"> — Резултатите на TSMC са водещ индикатор за целия semiconductor и AI сектор и ще задават тона на tech earnings сезона.</span></div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Макро бриф</h2>
+  <div class="prose">SPY е на 0.07% от 52-седмичния си връх при 778.57, над 50DMA и 200DMA, VIX е на 14.84 с risk-on контанго в term structure — повърхността изглежда здрава. Нефтът пада след обявеното от Тръмп &#39;енергийно примирие&#39; между Русия и Украйна, което свива рисковата премия в суровините; паралелно Иран сигнализира задънена улица по преговорите за Hormuz, а хуситите атакуват Рияд — геополитическата премия не е изчезнала, само се е преразпределила. US10Y е на 5.24% (-3.3 б.п. за 5 дни), 2s10s спредът е на 44 б.п. и се изравнява с -1 б.п. за седмицата — облигационният пазар смекчава, MOVE е паднал с 8.8 пункта за седмицата до 98.47. Базовата инфлация (Dallas Fed Trimmed Mean PCE) е 2.19% за август, средната за юни–август е 2.25% срещу 2.39% за март–май — посоката е надолу; предстоящите CPI/PCE данни обаче движат позиционирането в злато (Gold +1.3% за 5 дни) и DXY (102.25, +0.08% за 5 дни). TSMC се очаква да отчете шесто поредно тримесечие с рекордна печалба, което задава тона за tech earnings сезона и директно подкрепя SMH и XLK.
+  <br><br><span style="color:var(--muted)">Defensive режимът е оправдан, но с ясна нюансировка. По чисто броене системата дава Offensive (6 зелени / 2 жълти / 0 червени от 8 видими), но активен override от IEI/HYG поддържа Defensive с sizing -50%. IEI/HYG RoC percentile е на 84.3-ти percentile и трябва да остане под 90-ти percentile два поредни дни (хистерезис — в момента 1/2), за да отпадне override-ът; exit условието е точно това от полето exit_rule — нищо повече, нищо по-малко. Данните не противоречат на режима: кредитният спред остава на 7.3-ри percentile по ниво (complacency), Market Breadth е на 33.3% над 40dMA при SPY на 0.07% от 52-седмичния връх — разминаването е реално и флагирано. Put/Call e на 100-ти percentile от 83-дневната история, което е contrarian bullish сигнал, но в контекста на Defensive режима не е достатъчен сам за смяна. Fed Net Liquidity (-0.63% за 4 седмици) е в мъртвата зона ±1% и е само информативен — не влиза в режима. Увереността в Defensive е умерена: системата е на ръба на преминаване към Offensive при следващия ден с RoC под 90-ти percentile, но докато override е активен, sizing остава намален.</span>
+  </div>
+</section>
+
+
+
+<section>
+  <h2>🔎 Наблюдавани тикъри · последните 24ч</h2>
+  <div class="wm-note">Ръчно поддържан списък (<code>data/watch_list.json</code>) —
+    независим от скрийнъра, GLB и COT секциите.</div>
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Списъкът е празен — тикъри се добавят в <code>data/watch_list.json</code>; ефектът е видим в следващия дневен бриф.</div>
+  
+  <div class="wm-grid">
+    
+  </div>
+</section>
+
+
+<section>
+  <h2>Секторна карта · следващите 2–6 седмици</h2>
+  <div class="sectors">
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Технологии</div>
+        <div class="sector-etf">XLK</div>
+      </div>
+      <div>
+        <div class="sector-chain">TSMC се очаква с рекордна печалба за шести пореден квартал, задвижвана от AI boom → semiconductor и software компаниите в XLK получават earnings-visibility bid преди сезона → XLK вече е confirmed leading: RS +3.84% за 4 седмици и +4.4% за 12 седмици, абсолютно +6.04% за 4 седмици. Допълнително US10Y падна с 3.3 б.п. — дори минималното облекчение на доходностите намалява discount rate натиска върху growth акции. Позицията е подкрепена от широкия risk-on сигнал (VIX 14.84, VIX term structure contango ratio 0.63).</div>
+        <div class="sector-meta">Хоризонт: 4 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Полупроводници</div>
+        <div class="sector-etf">SMH</div>
+      </div>
+      <div>
+        <div class="sector-chain">TSMC earnings очакванията са директен катализатор за SMH — TSMC е водещ холдинг и барометър на AI chip demand → рекордна печалба потвърждава, че цикълът на капиталови разходи в AI не се е обърнал → SMH RS +3.92% за 4 седмици, абсолютно +6.12% за 4 седмици. Предупреждение: RS за 12 седмици е -3.19% — секторът не е confirmed leading по системата (laggard_persistence 20%); моментумът е краткосрочен и трябва потвърждение от реалните резултати.</div>
+        <div class="sector-meta">Хоризонт: 2 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Здравеопазване</div>
+        <div class="sector-etf">XLV</div>
+      </div>
+      <div>
+        <div class="sector-chain">При Defensive режим с sizing -50% defensive rotation е рационална позиция → XLV е confirmed leading: RS +1.54% за 4 седмици и +4.34% за 12 седмици, абсолютно +3.69% за 4 седмици, laggard_persistence само 15% → здравеопазването типично се задържа в late-cycle среда, потвърдена от IEI/HYG кредитния спред на 7.3-ри percentile по ниво с ускоряваща се RoC (84.3-ти percentile). Базовата инфлация е в посока надолу (avg_recent 2.25% срещу avg_prior 2.39%), което не генерира pricing pressure срещу сектора.</div>
+        <div class="sector-meta">Хоризонт: 6 седмици</div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>Геополитически тези · мониторинг</h2>
+  <div class="theses">
+    
+    <div class="thesis structural">
+      <div class="thesis-head">
+        <span class="thesis-name">Ядрена енергия</span>
+        <span class="thesis-status structural">структурна</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">VST  ·  CEG  ·  OKLO  ·  CCJ  ·  DNN  ·  NNE</div>
+      <div class="thesis-chain">AI data center-ите гладуват за стабилна базова мощност 24/7 → ядрената е единственият въглеродно-неутрален източник, който я дава → дългосрочно търсене на уран и реакторни оператори.</div>
+      
+      
+      
+      
+    </div>
+    
+    <div class="thesis structural">
+      <div class="thesis-head">
+        <span class="thesis-name">Полупроводници и AI инфраструктура</span>
+        <span class="thesis-status structural">структурна</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">AVGO  ·  AMAT  ·  MCHP</div>
+      <div class="thesis-chain">AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.</div>
+      
+      
+      
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Въглища и LNG</span>
+        <span class="thesis-status watch">наблюдава се</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">BTU  ·  HCC  ·  AMR  ·  CNR  ·  LNG</div>
+      <div class="thesis-chain">Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.</div>
+      
+      
+      
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Отбрана и дронове</span>
+        <span class="thesis-status watch">наблюдава се</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">LMT  ·  RTX  ·  NOC  ·  SWMR</div>
+      <div class="thesis-chain">Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.</div>
+      
+      
+      
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Крипто регулация (CLARITY Act)</span>
+        <span class="thesis-status watch">наблюдава се</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">CRCL  ·  COIN  ·  HOOD  ·  BLSH</div>
+      <div class="thesis-chain">Ясна законодателна рамка (CLARITY Act) → институциите получават регулаторна сигурност → приток на капитал към регулирани крипто борси и custody → борсите и брокерите печелят на обем.</div>
+      
+      
+      
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Финанси при стръмна крива</span>
+        <span class="thesis-status watch">наблюдава се</span>
+        
+        
+      </div>
+      <div class="thesis-tickers">JPM  ·  BAC</div>
+      <div class="thesis-chain">Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.</div>
+      
+      
+      
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>Action · 0 тикъра</h2>
+  
+  
+  <div class="prose">Днес нито един кандидат не покрива всички критерии за Action. Това е информация, не провал — кешът също е позиция.</div>
+  
+  
+</section>
+
+
+
+<section>
+  <h2>Watchlist · 1 <span style="font-size:13px;color:var(--muted);font-weight:400">(+9 без сетъп за вход)</span></h2>
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от предишния бриф (09.10):</b>
+    няма
+  </div>
+  
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
+    <b>ANET</b> — над pivot без обем ≥ 1.5×, стоп 9.2%, отчет 03.11 SECT✓ · <b>DDOG</b> — структурен стоп 23.4% &gt; 10%, отчет 05.11 SECT✓ · <b>ZBRA</b> — структурен стоп 11.4% &gt; 10%, отчет 03.11 SECT✓ · <b>PSX</b> — структурен стоп 11.6% &gt; 10%, отчет 28.10 · <b>HUM</b> — структурен стоп 15.4% &gt; 10%, отчет 06.11 SECT✓ · <b>KEYS</b> — структурен стоп 14.4% &gt; 10% SECT✓ SI✓ · <b>AMG</b> — структурен стоп 10.5% &gt; 10%, отчет 02.11 · <b>NTAP</b> — структурен стоп 20.3% &gt; 10% SECT✓ · <b>FTNT</b> — структурен стоп 14.9% &gt; 10%, отчет 28.10 SECT✓
+  </div>
+  
+  <div class="watch-grid">
+    
+    <div class="watch-card">
+      <span class="ticker">EXPD</span>
+      <span class="company">Expeditors International of Washington</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 90</span>
+      <span class="markers"><span class="marker" title="Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс." tabindex="0" onclick="this.classList.toggle('open')">MF✓<span class="marker-tip">Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс.</span></span></span>
+      
+      
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 16 сесии) — няма данни за очаквано движение (следобедната OI снимка за сесията 09.10 липсва).</div>
+      
+      
+      <p>Setup-ът е чисто технически — EXPD е в сектор Industrials (Freight &amp; Logistics), който не фигурира в активната секторна логика за Defensive режим. Няма директна макро верига към текущите катализатори (AI boom, TSMC earnings, defensive rotation). RS rating 90 и near_high RS статус са силни сигнали, но секторът не е в play при текущия режим.</p>
+      
+      
+      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $194.59 (валиден до 15.10, от 09.10 — 5 сесии от първия ден); сега 0.7% под pivot. Купува се само ако High ≥ $194.59, до $204.32; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 0.7% под pivot — не е пробил още, изчакай реален пробив.
+        · pivot $194.59 (-0.7%)</div>
+      
+      
+      
+      
+      <div class="buy-stop">🎯 Buy-stop $194.59 · валиден до 15.10, от 09.10
+        · таван за вход $204.32</div>
+      
+      
+      
+      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
+        Цел 1 (2R, 50% от позицията) $220.71
+        · режимен фактор Defensive ×0.5</div>
+      
+
+<div class="lv" data-strategy="canslim" data-entry="194.59" data-stop="181.53" data-adr="2.09" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
+  <div class="lv-info">
+    <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$194.59</b></div>
+    <div class="lv-row"><span>Стоп</span><b>$181.53 <i>(−6.7%)</i></b></div>
+    
+    <div class="lv-row"><span>ADR (20 бара)</span><b>2.1%</b></div>
+  </div>
+  <div class="lv-note">източник на стопа: структурен: 15-барен low −1%</div>
+  
+  
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+
+
+      
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+
+<section id="qm">
+  <h2>Пробиви по Kullamägi (Breakout)</h2>
+  <div class="qm-banner">
+    <b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.</b>
+    Отделна стратегия, механичен скенер (без AI), независим от CANSLIM скрийнъра, GLB и от Action/Watchlist; не влиза в Action и не променя размера на позициите ни.
+    <b>Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</b>
+  </div>
+  
+  
+  <div class="qm-grid">
+    
+    <div class="qm-card">
+      <div class="qm-top"><span class="qm-sym">SN</span><span class="qm-price">$184.98</span></div>
+      <div class="qm-company">SharkNinja</div>
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +1.0% над затварянето">Вход над $186.75 <span class="qm-sm">(+1.0%)</span> <span class="qm-sm">· до нивото 0.28 ADR</span></div>
+      <div class="earn-warn">⚠ Отчет на 05.11 (след 18 сесии) — няма данни за очаквано движение (следобедната OI снимка за сесията 09.10 липсва).</div>
+      
+      
+      <div class="qm-kv">
+        <span>ADR</span><b>3.4%</b>
+        <span>Предходен ръст</span><b>+37%</b>
+        <span>Консолидация</span><b title="дълбочина 19.3% · стягане 0.67× ADR · обем 0.58× от 50-дневния · цена +1.1% от 10 MA, +4.9% от 20 MA">29 дни</b>
+      </div>
+      
+
+<div class="lv" data-strategy="kullamagi" data-entry="186.75" data-stop="180.44" data-adr="3.38" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
+  <div class="lv-info">
+    
+    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$180.44 <i>(−3.4%)</i></b></div>
+    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $183.28 <i>(−1.9%)</i></b></div>
+    
+  </div>
+  
+  <div class="lv-note">ориентировъчен — реалният стоп е дъното на деня на влизане</div>
+  
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+
+
+    </div>
+    
+    <div class="qm-card">
+      <div class="qm-top"><span class="qm-sym">CORT</span><span class="qm-price">$121.19</span></div>
+      <div class="qm-company">Corcept Therapeutics</div>
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +1.3% над затварянето">Вход над $122.81 <span class="qm-sm">(+1.3%)</span> <span class="qm-sm">· до нивото 0.28 ADR</span></div>
+      <div class="earn-warn">⚠ Отчет на 04.11 (след 17 сесии) — няма данни за очаквано движение (следобедната OI снимка за сесията 09.10 липсва).</div>
+      
+      
+      <div class="qm-kv">
+        <span>ADR</span><b>4.7%</b>
+        <span>Предходен ръст</span><b>+49%</b>
+        <span>Консолидация</span><b title="дълбочина 14.3% · стягане 1.01× ADR · обем 0.58× от 50-дневния · цена +3.0% от 10 MA, +4.7% от 20 MA">32 дни</b>
+      </div>
+      
+
+<div class="lv" data-strategy="kullamagi" data-entry="122.81" data-stop="117.01" data-adr="4.73" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
+  <div class="lv-info">
+    
+    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$117.01 <i>(−4.7%)</i></b></div>
+    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $119.62 <i>(−2.6%)</i></b></div>
+    
+  </div>
+  
+  <div class="lv-note">ориентировъчен — реалният стоп е дъното на деня на влизане</div>
+  
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+
+
+    </div>
+    
+  </div>
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
+    Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (161 от 900 тикъра към
+    09.10), кандидати 2. Още 3 кандидат(а) са на повече от 1×ADR от нивото (BE, GAP, SANM) — не се показват и не се записват. 
+    Задръж курсора върху консолидацията за подробности (дълбочина на базата, стягане, позиция спрямо 10/20 MA). Стопът за оразмеряване е максималният (1×ADR); реалният стоп е дъното на деня на влизане.
+  </div>
+  
+  
+
+  
+  
+  <details class="qm-book" style="margin-top:14px">
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани 6 · затворени 0 · win rate след 20 затворени</summary>
+  
+  
+  
+  <div class="qm-sub">Измерване — книга qm_breakout (отделна от Action и buy-stop)</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    Всеки показан кандидат се следи със симулация на неговите правила: вход на нивото на пробива само в сесията на брифа (гап над нивото с повече от 1×ADR не се гони),
+    стоп = low на входния ден (не по-широк от 1×ADR), след 4 сесии се продава 40% със стоп на break-even, остатъкът — първо затваряне под
+    SMA10 (ADR ≥ 5%) или SMA20. Записват се <b>две граници</b> за стопа на входния ден: <b>opt</b> (low-ът е бил преди входа) и <b>pess</b> (денят затваря под входа → −1R).
+    Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
+  <div class="prose">
+    
+    <b>Записани: 6</b> · чакат вход 1 · отворени 2 · затворени 0
+    · не се задействаха 3 (60.0% от приключилите прозорци)<br>
+    
+    
+    Win rate се показва след 20 затворени (сега 0) — при по-малко е шум.<br>
+    
+    По режим на деня на картата (записани / затворени):
+    Defensive 6 / 0
+    
+    
+    <br><span style="color:var(--muted)">Извън статистиката: 2 запис(а) от преди правилото „нивото най-много 1×ADR над затварянето“ (в сила от 2026-10-09) — пазят се, но не влизат в броя, процентите и средните:
+      SANM (08.10, 1.27 ADR до нивото, не се задейства), SITM (08.10, 1.81 ADR до нивото, не се задейства).</span>
+  </div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (3):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
+      <tbody>
+        
+        <tr><td class="sym">ELF</td>
+          <td>2026-10-09</td>
+          <td>отворена от 2026-10-09 · +5.2R · SMA20</td>
+          <td class="n">$106.97</td><td class="n">$107.0</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">SN</td>
+          <td>2026-10-09</td>
+          <td>отворена от 2026-10-09 · -0.5R · SMA20</td>
+          <td class="n">$186.325</td><td class="n">$183.355</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">CORT</td>
+          <td>2026-10-12</td>
+          <td>чака пробива</td>
+          <td class="n">$122.81</td><td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+  
+  </details>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">
+    Източници: <a href="https://qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/" style="color:var(--muted)">3 timeless setups</a> ·
+    <a href="https://qullamaggie.com/how-to-master-a-setup-episodic-pivots/" style="color:var(--muted)">Episodic Pivots</a> ·
+    <a href="https://qullamaggie.com/faq/" style="color:var(--muted)">FAQ (ADR, риск)</a>. Негови са правилата за сетъпа и изхода; прагът за „лидер“ (топ 10% от ~900 тикъра), очакваният стоп 0.55×ADR и симулацията са наши.
+  </div>
+</section>
+
+
+
+<section id="qm-ep">
+  <h2>Епизодични пивоти (EP) · гапове след новина</h2>
+  <div class="qm-banner">
+    <b>Само наблюдение — без Track Record, не е препоръка.</b> After-hours гап нагоре ≥ 10% за тикъри от универса при „пренебрегване“ (ръст ≤ 20% за предходните 3 месеца);
+    стоп лимитът е информация (най-много 1×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
+  </div>
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted)">няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри (проверени 903 тикъра с after-hours бар)</div>
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
+    <b>Проверката е отварянето</b> (15:30 CEST / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
+    
+    <br><b>Вчерашният дневник — after-hours срещу отваряне:</b>
+    <span style="font-family:'IBM Plex Mono',monospace">HUM</span> AH +12.8% → отваряне +16.4% (издържа ≥ 10%).
+    
+    <span style="color:var(--muted)"> Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%) · медианно разминаване +3.6 пр.п.; решение за второ пускане — след 4–6 седмици.</span>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>GLB Watchlist · Green Line Breakout</h2>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
+    <b>Идеята е на Eric Wish:</b> „зелена линия“ = най-високият месечен close, непробит поне 3 месеца; сигнал — затваряне над нея. <b>Наши са:</b> разделянето Classic / Momentum,
+    филтърът за близост до линията (band_hold) и хистерезисът (вход ≥ +1% над линията, остава до −3%). Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+    <b style="color:var(--green)">Classic</b> = поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията ·
+    <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
+  </div>
+  
+  <div class="glb-group-label classic">Classic GLB (11)</div>
+  <div class="glb-grid">
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">MRK</span>
+        <span class="glb-price">$145.60</span>
+      </div>
+      <div class="glb-company">Merck &amp;</div>
+      <div class="glb-stat">28 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $131.95 (2024-03)</div>
+      
+      <div class="glb-detail"><b>GLB от 14.08</b>, 10.3% над линията ($131.95)</div>
+      
+      <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 18.75% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.7× средния · 1.8× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">WAT</span>
+        <span class="glb-price">$433.77</span>
+      </div>
+      <div class="glb-company">Waters</div>
+      <div class="glb-stat">19 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $415.48 (2025-01)</div>
+      
+      <div class="glb-detail"><b>GLB от 17.09</b>, 4.4% над линията ($415.48)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 19.5% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.9× средния · 1.5× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">VRTX</span>
+        <span class="glb-price">$510.08</span>
+      </div>
+      <div class="glb-company">Vertex Pharmaceuticals</div>
+      <div class="glb-stat">15 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $509.50 (2025-04)</div>
+      
+      <div class="glb-detail"><b>GLB от 17.08</b>, 0.1% над линията ($509.50)</div>
+      
+      <div class="glb-detail">band_hold 95.2% · диапазон на 63 дни 24.76% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.7× средния · 1.3× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">FAST</span>
+        <span class="glb-price">$50.75</span>
+      </div>
+      <div class="glb-company">Fastenal</div>
+      <div class="glb-stat">12 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $49.66 (2025-08)</div>
+      
+      <div class="glb-detail"><b>GLB от 23.09</b>, 2.2% над линията ($49.66)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.84% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 1.3× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">FCX</span>
+        <span class="glb-price">$73.69</span>
+      </div>
+      <div class="glb-company">Freeport-McMoRan</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $68.08 (2026-02)</div>
+      
+      <div class="glb-detail"><b>GLB от 19.08</b>, 8.2% над линията ($68.08)</div>
+      
+      <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 23.91% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.2× средния · 1.9× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">ETN</span>
+        <span class="glb-price">$429.65</span>
+      </div>
+      <div class="glb-company">Eaton</div>
+      <div class="glb-stat">4 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $433.01 (2026-04)</div>
+      
+      <div class="glb-detail"><b>GLB от 22.09</b>, 0.8% под линията ($433.01)</div>
+      
+      <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 27.68% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.9× средния · 1.4× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">ADI</span>
+        <span class="glb-price">$406.19</span>
+      </div>
+      <div class="glb-company">Analog Devices</div>
+      <div class="glb-stat">4 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $413.85 (2026-05)</div>
+      
+      <div class="glb-detail"><b>GLB от 05.10</b>, 1.9% под линията ($413.85)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.81% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.6× средния · 1.8× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">WCC</span>
+        <span class="glb-price">$365.69</span>
+      </div>
+      <div class="glb-company">WESCO International</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $361.17 (2026-05)</div>
+      
+      <div class="glb-detail"><b>GLB от 23.09</b>, 1.3% над линията ($361.17)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 23.74% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.6× средния · 1.8× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">SNX</span>
+        <span class="glb-price">$273.37</span>
+      </div>
+      <div class="glb-company">TD SYNNEX</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $267.34 (2026-06)</div>
+      
+      <div class="glb-detail"><b>GLB от 01.10</b>, 2.3% над линията ($267.34)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 24.22% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.5× средния · 1.9× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">WSM</span>
+        <span class="glb-price">$241.78</span>
+      </div>
+      <div class="glb-company">Williams-Sonoma</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $233.10 (2026-06)</div>
+      
+      <div class="glb-detail"><b>GLB от 05.10</b>, 3.7% над линията ($233.10)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.46% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 1.5× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">CTVA</span>
+        <span class="glb-price">$13.24</span>
+      </div>
+      <div class="glb-company">Corteva</div>
+      <div class="glb-stat">3 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $12.71 (2026-06)</div>
+      
+      <div class="glb-detail"><b>GLB от 06.10</b>, 4.2% над линията ($12.71)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 25.65% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.2× средния · 1.5× от 52-седм. дъно</div>
+      
+      <div class="corp-warn">⚠ корпоративно действие на 01.10 (коефициент 6.665 — отделяне или сплит с нецял коефициент) — историята около датата е приблизителна</div>
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+  <div class="glb-group-label momentum">Momentum GLB (6)</div>
+  <div class="glb-grid">
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">TMO</span>
+        <span class="glb-price">$658.02</span>
+      </div>
+      <div class="glb-company">Thermo Fisher Scientific</div>
+      <div class="glb-stat">56 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $667.24 (2021-12)</div>
+      
+      <div class="glb-detail"><b>GLB от 24.09</b>, 1.4% под линията ($667.24)</div>
+      
+      <div class="glb-detail">band_hold 66.7% · диапазон на 63 дни 26.82% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.0× средния · 1.5× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">QLYS</span>
+        <span class="glb-price">$202.42</span>
+      </div>
+      <div class="glb-company">Qualys</div>
+      <div class="glb-stat">33 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $196.28 (2023-12)</div>
+      
+      <div class="glb-detail"><b>GLB от 05.10</b>, 3.1% над линията ($196.28)</div>
+      
+      <div class="glb-detail">band_hold 63.5% · диапазон на 63 дни 35.94% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 2.7× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">PLTR</span>
+        <span class="glb-price">$209.05</span>
+      </div>
+      <div class="glb-company">Palantir Technologies</div>
+      <div class="glb-stat">11 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $200.47 (2025-10)</div>
+      
+      <div class="glb-detail"><b>GLB от 09.10</b>, 4.3% над линията ($200.47)</div>
+      
+      <div class="glb-detail">band_hold 61.9% · диапазон на 63 дни 43.17% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 2.0× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">P</span>
+        <span class="glb-price">$154.49</span>
+      </div>
+      <div class="glb-company">Everpure</div>
+      <div class="glb-stat">10 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $98.70 (2025-10)</div>
+      
+      <div class="glb-detail"><b>GLB от 17.09</b>, 56.5% над линията ($98.70)</div>
+      
+      <div class="glb-detail">band_hold 47.6% · диапазон на 63 дни 54.05% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 2.7× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">MEDP</span>
+        <span class="glb-price">$612.05</span>
+      </div>
+      <div class="glb-company">Medpace</div>
+      <div class="glb-stat">8 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $592.46 (2025-11)</div>
+      
+      <div class="glb-detail"><b>GLB от 19.08</b>, 3.3% над линията ($592.46)</div>
+      
+      <div class="glb-detail">band_hold 61.9% · диапазон на 63 дни 46.32% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.5× средния · 1.6× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">CVX</span>
+        <span class="glb-price">$211.98</span>
+      </div>
+      <div class="glb-company">Chevron</div>
+      <div class="glb-stat">5 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $206.90 (2026-03)</div>
+      
+      <div class="glb-detail"><b>GLB от 01.09</b>, 2.5% над линията ($206.90)</div>
+      
+      <div class="glb-detail">band_hold 81.0% · диапазон на 63 дни 21.36% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.0× средния · 1.4× от 52-седм. дъно</div>
+      
+      
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+</section>
+
+
+
+
+
+
+<section>
+  <h2>GLB по Уиш · книга (измерване, не препоръка)</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    <b>Буквалното правило на Eric Wish без нашите филтри:</b> вход при затваряне над зелената линия (най-високият месечен close, непробит поне 3 месеца), изход при първото затваряне под същата линия (замразена при входа).
+    Няма Classic / Momentum филтър (типът е само етикет), няма хистерезис +1% / −3% и няма стоп — затова доходността е в %, не в R. Две граници: <b>literal</b> = и вход, и изход на затварянето на сигналния ден;
+    <b>exec</b> = отварянето на следващата сесия (първото изпълнимо след брифа). <b>Таванът на държане от 252 сесии е НАШ — при Уиш няма такъв:</b> без него печелившите остават отворени с години, а затворените са само загубилите; след тавана позицията се оценява по затварянето на последния ден.
+    Записва се само пробив на последния цял бар, от 2026-10-12 нататък (чист старт). Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.
+    Реплей върху историята (1962–2026, 26116 сделки, <b>днешният универс — оцелели</b>): печеливши 9.3% (literal) / 16.3% (exec), медиана -1.59% на сделка,
+    алфа спрямо SPY за същите дати +1.36% [0.94; 1.83] — почти цялата доходност е в най-добрите 5% от сделките.
+  </div>
+  <details class="gw-book" open>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани 4 · затворени 0 / отворени по текуща цена 0 · чакат първата цена 4 · статистика след 20 записа (затворени + отворени)</summary>
+  <div class="prose" style="margin-top:8px">
+    
+    <b>Записани: 4</b> · <b>затворени 0</b> (изход по линията 0 · изтекли по нашия таван 0) / <b>отворени по текуща цена 0</b> · чакат първата цена 4<br>
+    
+    
+    Печеливши, медиана и сравнение със SPY се показват след 20 записа с резултат (сега 0) — при по-малко е шум.<br>
+    
+    По наш етикет (записани / с резултат):
+    momentum 3 / 0 · classic 1 / 0
+    · по режим на деня на пробива:
+    Defensive 4 / 0
+    
+  </div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи (4):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
+      <tbody>
+        
+        <tr><td class="sym">WCC</td>
+          <td>2026-10-09</td><td>classic</td>
+          <td class="n">$361.17</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">QLYS</td>
+          <td>2026-10-09</td><td>momentum</td>
+          <td class="n">$196.28</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">PLTR</td>
+          <td>2026-10-09</td><td>momentum</td>
+          <td class="n">$200.47</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">MSFT</td>
+          <td>2026-10-09</td><td>momentum</td>
+          <td class="n">$533.50</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+  </details>
+</section>
+
+
+
+
+
+
+
+
+
+<section>
+  <h2>Сплитове · тази седмица</h2>
+  
+  
+  <div class="splits-empty">Няма предстоящи сплитове тази седмица по нашите критерии
+    (цена над $10, пазарна стойност над $500 млн).</div>
+  <div class="splits-funnel">
+    Източникът върна 6 за седмицата:
+    6 под $10,
+    0 под $500 млн,
+    0 без данни
+    · общо 8 в хоризонта до 23.10.
+  </div>
+  
+</section>
+
+
+
+
+
+
+<section>
+  <h2>COT Екстремуми · Managed Money Positioning</h2>
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px">Обобщение (в посока на сигнала, 19 пазара, 335 седмици в 60 епизода): след 2/4/8 седмици -0.6% (50%) / -0.4% (52%) / -1.3% (53%). С пресичане на SMA10: n=80, след 4 седм. +0.4% (57% успех); без пресичане: n=255, след 4 седм. -0.6% (51% успех) (SMA10 = 10-седмична средна на седмичните затваряния). Седмиците се припокриват и историята е ~2–3 години — ориентир, не доказателство.</div>
+  
+  <div class="theses">
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Sugar No. 11</span>
+        <span class="cot-percentile">100.0. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е над нея); цена 20.25 срещу SMA10 17.948 (+12.8%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 8 седмици с екстремум в тази посока (1 епизода); доходност на инструмента след 2/4/8 седмици: +4.8% (33% в посоката на сигнала) / +5.0% (50% в посоката на сигнала) / —. Малка извадка — не е за изводи.</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">CANE (Teucrium Sugar Fund ETV) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Sugar No. 11 НАДОЛУ: CANE губи (фонд върху фючърси на захар).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">BG (Bunge) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  KO (Coca-Cola Company (The)) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PEP (Pepsico) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ BG ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Bunge преработва захарна тръстика и закупува суровина захар като входящ материал в своите агропреработвателни операции.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ KO ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Coca-Cola използва захар (включително суровина захар No. 11) като основна съставка в производството на безалкохолни напитки.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ PEP ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">PepsiCo купува захар като ключова суровина за производството на напитки и снаки в глобален мащаб.</span></div>
+        
+        <div class="opp-note">⚠ обратни сигнали: BG ГУБИ — цената на Soybean Meal НАДОЛУ (цена на продукта: по-ниска цена на продукта = по-ниски приходи)</div>
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">RBOB Gasoline</span>
+        <span class="cot-percentile">99.4. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); цена 3.2952 срещу SMA10 3.3058 (-0.3%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 18 седмици с екстремум в тази посока (4 епизода); доходност на инструмента след 2/4/8 седмици: +5.1% (56% в посоката на сигнала) / +11.2% (50% в посоката на сигнала) / +20.2% (27% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">UGA (United States Gasoline Fund LP) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  VLO (Valero Energy) <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span> <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  MPC (Marathon Petroleum) <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span> <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на RBOB Gasoline НАДОЛУ: UGA губи (фонд върху бензинови фючърси); VLO губи (рафинер (бензин е основен продукт); частична експозиция); MPC губи (рафинер (бензин е основен продукт); частична експозиция).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">PSX (Phillips 66)<span class="markers"><span class="marker" title="В днешния скрийнър (кандидат за Action/Watchlist) — слага се от кода." tabindex="0" onclick="this.classList.toggle('open')">SCR✓<span class="marker-tip">В днешния скрийнър (кандидат за Action/Watchlist) — слага се от кода.</span></span></span> <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  PBF (PBF Energy) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  DINO (HF Sinclair) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PSX ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Phillips 66 произвежда и продава RBOB бензин като краен продукт от своите рафинерийни операции.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PBF ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">PBF Logistics транспортира и съхранява RBOB бензин, чиято цена пряко влияе върху приходите от логистични услуги.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ DINO ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">HF Sinclair продава RBOB бензин като основен рафинерен продукт, чиято пазарна цена определя приходите от рафиниране.</span></div>
+        
+        <div class="opp-note">⚠ обратен залог: PSX е кандидат за покупка в Watchlist, а тази теза казва ГУБИ (цена на продукта: по-ниска цена на продукта = по-ниски приходи).</div>
+        
+        
+        
+        
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Soybeans</span>
+        <span class="cot-percentile">99.4. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е над нея); цена 1292 срещу SMA10 1259.83 (+2.5%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 35 седмици с екстремум в тази посока (4 епизода); доходност на инструмента след 2/4/8 седмици: -0.2% (48% в посоката на сигнала) / -0.9% (48% в посоката на сигнала) / -0.8% (54% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">SOYB (Teucrium Soybean Fund ETV) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Soybeans НАДОЛУ: SOYB губи (фонд върху фючърси на соя).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">ADM (Archer-Daniels-Midland) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  BG (Bunge) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  CF (CF Industries) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Soybeans НАДОЛУ ADM ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">ADM закупува соя в мащабни количества като основна суровина за смилане, преработка и производство на соево масло и брашно.</span></div><div class="thesis-chain">При цената на Soybeans НАДОЛУ BG ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Bunge смила соя и я закупува като основна входяща суровина за своите агропреработвателни мощности.</span></div><div class="thesis-chain">При цената на Soybeans НАДОЛУ CF ГУБИ (механизъм: заместител). <span class="small" style="color:var(--muted)">CF Industries произвежда азотни торове, които са заместител на соята като протеинов източник за почвата, а промяна в цената на соята влияе върху фермерското търсене на алтернативни хранителни решения.</span></div>
+        
+        <div class="opp-note">⚠ обратни сигнали: ADM ГУБИ — цената на Soybean Meal НАДОЛУ (цена на продукта: по-ниска цена на продукта = по-ниски приходи)</div><div class="opp-note">⚠ обратни сигнали: BG ГУБИ — цената на Soybean Meal НАДОЛУ (цена на продукта: по-ниска цена на продукта = по-ниски приходи)</div>
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Soybean Meal</span>
+        <span class="cot-percentile">99.4. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е над нея); цена 368.7 срещу SMA10 340.69 (+8.2%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 16 седмици с екстремум в тази посока (2 епизода); доходност на инструмента след 2/4/8 седмици: +0.1% (57% в посоката на сигнала) / -1.2% (50% в посоката на сигнала) / -2.0% (60% в посоката на сигнала). Малка извадка — не е за изводи.</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
+          Няма директна теза — няма листнат продукт или чист производител върху соевото брашно; преработвателите (BG, ADM) и потребителите на фураж са cross тикъри.
+        </div>
+        
+        
+        
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">ADM (Archer-Daniels-Midland) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  BG (Bunge) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  TSN (Tyson Foods) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Soybean Meal НАДОЛУ ADM ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">ADM продава соево брашно като основен страничен продукт от смилането на соя, чиято цена пряко определя приходите от преработвателния сегмент.</span></div><div class="thesis-chain">При цената на Soybean Meal НАДОЛУ BG ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Bunge реализира соево брашно като ключов краен продукт от своите мелнични операции и приходите му следват пазарната цена на Soybean Meal.</span></div><div class="thesis-chain">При цената на Soybean Meal НАДОЛУ TSN ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Tyson Foods закупува соево брашно като основен компонент на фуражните дажби за отглеждане на птици и говеда в своите животновъдни операции.</span></div>
+        
+        <div class="opp-note">⚠ обратни сигнали: ADM ПЕЧЕЛИ — цената на Soybeans НАДОЛУ (разход за суровина: по-ниска цена на суровината = по-ниски разходи)</div><div class="opp-note">⚠ обратни сигнали: BG ПЕЧЕЛИ — цената на Sugar No. 11 НАДОЛУ (разход за суровина: по-ниска цена на суровината = по-ниски разходи)</div><div class="opp-note">⚠ обратни сигнали: BG ПЕЧЕЛИ — цената на Soybeans НАДОЛУ (разход за суровина: по-ниска цена на суровината = по-ниски разходи)</div>
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Natural Gas</span>
+        <span class="cot-percentile">1.3. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (над нея, преди 3 седмици); цена 3.22 срещу SMA10 2.9225 (+10.2%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 13 седмици с екстремум в тази посока (5 епизода); доходност на инструмента след 2/4/8 седмици: +6.2% (82% в посоката на сигнала) / +10.7% (82% в посоката на сигнала) / +13.7% (64% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">UNG (United States Natural Gas Fund, LP) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  EQT (EQT) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  AR (Antero Resources) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Natural Gas НАГОРЕ: UNG печели (фонд върху фючърси на природен газ); EQT печели (производител на природен газ); AR печели (производител на природен газ).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">CF (CF Industries) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  LNG (Cheniere Energy) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Natural Gas НАГОРЕ CF ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">CF Industries използва природен газ като основна суровина и енергиен източник при производството на амоняк и азотни торове.</span></div><div class="thesis-chain">При цената на Natural Gas НАГОРЕ LNG ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Cheniere Energy втечнява и продава природен газ (LNG) като основен продукт, чиято пазарна цена влияе върху приходите от дългосрочни и спот договори.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: SWN — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">XRP</span>
+        <span class="cot-percentile">98.3. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е над нея); цена 1.4017 срещу SMA10 1.3516 (+3.7%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 6 седмици с екстремум в тази посока (1 епизода); доходност на инструмента след 2/4/8 седмици: +9.4% (50% в посоката на сигнала) / +11.5% (33% в посоката на сигнала) / +41.3% (0% в посоката на сигнала). Малка извадка — не е за изводи.</div>
+      <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:6px">История само 61 седмици (под стандартните ~156) — percentile-ът тук е по-малко статистически сигурен от обичайното.</div>
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">GXRP (Grayscale XRP Trust ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  XRP (Bitwise XRP ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  XRPC (Canary XRP ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на XRP НАДОЛУ: GXRP губи (XRP trust); XRP губи (Bitwise XRP ETF); XRPC губи (Canary XRP ETF).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">COIN (Coinbase Global) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  MARA (MARA) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  HOOD (Robinhood Markets) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на XRP НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Coinbase е централизирана крипто борса, чиито обеми и приходи от транзакции са пряко свързани с активността на крипто пазара, включително XRP търговията.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ MARA ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">MARA Holdings държи криптоактиви в баланса си и приходите му зависят от общото крипто пазарно настроение и цените на дигиталните активи.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ HOOD ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Robinhood предлага търговия с XRP и други криптовалути, като транзакционните приходи от крипто сегмента следват крипто пазарната активност.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Lean Hogs</span>
+        <span class="cot-percentile">1.9. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 75.05 срещу SMA10 82.675 (-9.2%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 19 седмици с екстремум в тази посока (1 епизода); доходност на инструмента след 2/4/8 седмици: -2.1% (35% в посоката на сигнала) / -4.6% (33% в посоката на сигнала) / -12.3% (27% в посоката на сигнала). Малка извадка — не е за изводи.</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">SFD (Smithfield Foods) <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span> <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Lean Hogs НАГОРЕ: SFD печели (производител на свинско (разходите за фураж също влияят); частична експозиция).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">HRL (Hormel Foods) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  PPC (Pilgrim&#39;s Pride) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Lean Hogs НАГОРЕ HRL ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Hormel Foods закупува свинско месо като основна суровина за производството на преработени меса и продукти като SPAM и Applegate.</span></div><div class="thesis-chain">При цената на Lean Hogs НАГОРЕ PPC ПЕЧЕЛИ (механизъм: заместител). <span class="small" style="color:var(--muted)">Pilgrim&#39;s Pride продава пилешко месо, което е директен заместител на свинското в потребителската кошница.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: TSN — mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−); WH — няма механизъм.
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">2-Year Treasury Note</span>
+        <span class="cot-percentile">98.1. percentile
+          (екстремно дълги) · очакване: цена ↓ · доходност ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената е под SMA10 от 8 седмици — пресичането в посоката на сигнала не е скорошно (над 4); цена 101.836 срещу SMA10 102.441 (-0.6%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 10 седмици с екстремум в тази посока (1 епизода); доходност на инструмента след 2/4/8 седмици: -0.3% (100% в посоката на сигнала) / -0.7% (100% в посоката на сигнала) / -1.2% (100% в посоката на сигнала). Малка извадка — не е за изводи.</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">SHY (iShares 1-3 Year Treasury Bond ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  SCHO (Schwab Short-Term U.S. Treasury ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на 2-Year Treasury Note НАДОЛУ (= доходността нагоре): SHY губи (1–3г. съкровищни облигации); SCHO губи (краткосрочни съкровищни облигации).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">JPM (JP Morgan Chase &amp;) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  SCHW (Charles Schwab Corporation (The) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на 2-Year Treasury Note НАДОЛУ (= доходността нагоре) JPM ПЕЧЕЛИ (механизъм: доходност на активите). <span class="small" style="color:var(--muted)">JPMorgan Chase инвестира значителна част от депозитната си база в краткосрочни ДЦК и инструменти, чиято доходност е пряко обвързана с 2-годишната лихва.</span></div><div class="thesis-chain">При цената на 2-Year Treasury Note НАДОЛУ (= доходността нагоре) SCHW ПЕЧЕЛИ (механизъм: доходност на активите). <span class="small" style="color:var(--muted)">Schwab реинвестира клиентски парични средства в краткосрочни ДЦК и лихвените му приходи са обвързани с доходността на 2-годишния сектор.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: BK — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">30-Year Treasury Bond</span>
+        <span class="cot-percentile">98.1. percentile
+          (екстремно дълги) · очакване: цена ↓ · доходност ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената е под SMA10 от 15 седмици — пресичането в посоката на сигнала не е скорошно (над 4); цена 103.125 срещу SMA10 107.128 (-3.7%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 27 седмици с екстремум в тази посока (5 епизода); доходност на инструмента след 2/4/8 седмици: -0.3% (44% в посоката на сигнала) / -0.8% (61% в посоката на сигнала) / -0.9% (70% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">TLT (iShares 20+ Year Treasury Bond ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  VGLT (Vanguard Long-Term Treasury ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  TBF (ProShares Short 20+ Year Treasury) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре): TLT губи (20+г. съкровищни облигации); VGLT губи (дългосрочни съкровищни облигации); TBF печели (обратен (−1×) на 20+г. облигации).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">MET (MetLife) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  PRU (Prudential Financial) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  LNC (Lincoln National) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) MET ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">MetLife съпоставя дългосрочни застрахователни задължения с портфейл от 30-годишни ДЦК, чиято оценка се влияе от движението на дълготрайните доходности.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) PRU ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">Prudential Financial поддържа голям портфейл от дълготрайни облигации за покриване на задължения по животозастраховане и анюитети с висока дюрация.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) LNC ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">Lincoln National управлява дългосрочни анюитетни и застрахователни задължения, подкрепени с портфейл от дълготрайни ДЦК с висока дюрация.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">VIX Futures</span>
+        <span class="cot-percentile">96.8. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); цена 14.84 срещу SMA10 14.891 (-0.3%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 9 седмици с екстремум в тази посока (5 епизода); доходност на инструмента след 2/4/8 седмици: +10.1% (25% в посоката на сигнала) / -0.8% (75% в посоката на сигнала) / -1.1% (62% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">VIXY (VIX Short-Term Futures ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  VXX (iPath Series B S&amp;P 500 VIX Short-Term Futures ETN) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  SVXY (ProShares Short VIX Short Term) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на VIX Futures НАДОЛУ: VIXY губи (краткосрочни VIX фючърси); VXX губи (краткосрочни VIX фючърси (ETN)); SVXY печели (обратен (−0.5×) на краткосрочните VIX фючърси).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">CBOE (Cboe Global Markets)  ·  MS (Morgan Stanley) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  GS (Goldman Sachs Group, Inc. (The)) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">Cboe Global Markets е собственик и оператор на VIX индекса и на фючърсния пазар за VIX, като приходите от търговия с VIX продукти зависят от обемите, свързани с волатилността.</span></div><div class="thesis-chain">При цената на VIX Futures НАДОЛУ MS ГУБИ (механизъм: защитен актив). <span class="small" style="color:var(--muted)">Morgan Stanley генерира приходи от пазарна търговия и управление на активи, чиято динамика е обратно свързана с периоди на пазарен стрес и завишена волатилност.</span></div><div class="thesis-chain">При цената на VIX Futures НАДОЛУ GS ГУБИ (механизъм: защитен актив). <span class="small" style="color:var(--muted)">Goldman Sachs реализира приходи от trading и investment banking, чиято активност е обратно свързана с периоди на пазарен стрес и висока системна волатилност.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Mexican Peso</span>
+        <span class="cot-percentile">95.5. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (под нея, преди 3 седмици); цена 0.0544 срещу SMA10 0.0578 (-5.9%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 28 седмици с екстремум в тази посока (6 епизода); доходност на инструмента след 2/4/8 седмици: +0.1% (38% в посоката на сигнала) / +0.3% (29% в посоката на сигнала) / +0.9% (40% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
+          Няма директна теза — няма листнат американски продукт върху мексиканското песо (FXM е делистнат).
+        </div>
+        
+        
+        
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
+          Няма cross-sector теза — всички предложени тикъри бяха изключени при проверката (2): KOF — отчита в MXN, не в USD — валутният механизъм по таблицата важи за компании с отчет в USD; BSMX — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+        
+        
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">E-mini Russell 2000</span>
+        <span class="cot-percentile">5.2. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 2822.1 срещу SMA10 2940.27 (-4.0%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 14 седмици с екстремум в тази посока (3 епизода); доходност на инструмента след 2/4/8 седмици: +0.7% (42% в посоката на сигнала) / +1.0% (50% в посоката на сигнала) / +6.5% (83% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">IWM (iShares Russell 2000 Index Fund) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  VTWO (Vanguard Russell 2000 ETF) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на E-mini Russell 2000 НАГОРЕ: IWM печели (ETF върху Russell 2000); VTWO печели (ETF върху Russell 2000).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">SFBS (ServisFirst Bancshares) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PIPR (Piper Sandler Companies) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на E-mini Russell 2000 НАГОРЕ SFBS ПЕЧЕЛИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">ServisFirst Bancshares е малка регионална банка, чиято акция се движи в синхрон с широкия апетит за риск при малки компании, отразен от Russell 2000.</span></div><div class="thesis-chain">При цената на E-mini Russell 2000 НАГОРЕ PIPR ПЕЧЕЛИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Piper Sandler е инвестиционна банка, фокусирана върху малки и средни компании, чиято активност по сделки и IPO е пряко свързана с риск апетита в сегмента на малките компании.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: CSWI — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Euro FX</span>
+        <span class="cot-percentile">5.2. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 1.1206 срещу SMA10 1.1498 (-2.5%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 25 седмици с екстремум в тази посока (4 епизода); доходност на инструмента след 2/4/8 седмици: -0.2% (48% в посоката на сигнала) / -0.3% (57% в посоката на сигнала) / -0.3% (45% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">FXE (Invesco CurrencyShares Euro Currency Trust) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Euro FX НАГОРЕ: FXE печели (trust върху еврото).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">JNJ (Johnson &amp; Johnson) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PFE (Pfizer) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  MCD (McDonald&#39;s) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Euro FX НАГОРЕ JNJ ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">Johnson &amp; Johnson реализира значителна част от продажбите си в Европа и ги отчита в евро, след което превежда в USD при консолидация на финансовите резултати.</span></div><div class="thesis-chain">При цената на Euro FX НАГОРЕ PFE ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">Pfizer генерира съществен дял от глобалните си фармацевтични приходи в еврозоната, изразени в евро, които се превеждат в USD при консолидирано отчитане.</span></div><div class="thesis-chain">При цената на Euro FX НАГОРЕ MCD ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">McDonald&#39;s събира роялти и приходи от франчайз операции в редица европейски държави, деноминирани в евро, и ги превежда в USD при консолидация.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Bitcoin Futures (CME)</span>
+        <span class="cot-percentile">94.8. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е над нея); цена 82912.2 срещу SMA10 77526.8 (+7.0%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 12 седмици с екстремум в тази посока (3 епизода); доходност на инструмента след 2/4/8 седмици: +5.2% (30% в посоката на сигнала) / +8.9% (22% в посоката на сигнала) / +19.5% (22% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">IBIT (iShares Bitcoin Trust ETF) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  FBTC (Fidelity Wise Origin Bitcoin Fund) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Bitcoin Futures (CME) НАДОЛУ: IBIT губи (спот биткойн ETF); FBTC губи (спот биткойн ETF).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">MSTR (Strategy) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  COIN (Coinbase Global) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ MSTR ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">MicroStrategy държи биткойн като основен корпоративен актив в баланса си и стойността на компанията е пряко обвързана с цената на биткойн.</span></div><div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Coinbase генерира транзакционни приходи от търговия с криптоактиви, включително биткойн, а обемите на търговия и оценката на платформата са чувствителни към цената на биткойн.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: MARA — невалидна схема: типът &#39;output_price&#39; не важи за пазар от вид &#39;crypto&#39;.
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Corn</span>
+        <span class="cot-percentile">93.5. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); цена 479.75 срещу SMA10 494.925 (-3.1%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 37 седмици с екстремум в тази посока (4 епизода); доходност на инструмента след 2/4/8 седмици: -0.3% (49% в посоката на сигнала) / -0.1% (48% в посоката на сигнала) / +1.7% (50% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">CORN (Teucrium Corn Fund ETV) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Corn НАДОЛУ: CORN губи (фонд върху фючърси на царевица).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">MOS (Mosaic Company (The)) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  INGR (Ingredion) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Corn НАДОЛУ MOS ГУБИ (механизъм: заместител). <span class="small" style="color:var(--muted)">The Mosaic продава фосфатни и калиеви торове, търсенето на които от зърнопроизводителите е свързано с рентабилността на царевичното производство и съответно с цената на царевицата.</span></div><div class="thesis-chain">При цената на Corn НАДОЛУ INGR ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Ingredion закупува царевица като основна суровина за производството на нишесте, подсладители и специализирани съставки за хранително-вкусовата промишленост.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: ADM — mixed: противоположен ефект — цена на продукта (+) срещу разход за суровина (−).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Coffee C</span>
+        <span class="cot-percentile">7.7. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 286.95 срещу SMA10 316.5 (-9.3%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 8 седмици с екстремум в тази посока (3 епизода); доходност на инструмента след 2/4/8 седмици: +5.6% (83% в посоката на сигнала) / +14.5% (75% в посоката на сигнала) / +15.9% (100% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
+          Няма директна теза — няма листнат американски продукт върху кафето (iPath JO е делистнат).
+        </div>
+        
+        
+        
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">SBUX (Starbucks) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Coffee C НАГОРЕ SBUX ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Starbucks купува кафе на зърна (Arabica) като основна суровина за напитките си в глобалната мрежа от магазини.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: DNKN, GMCR — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Australian Dollar</span>
+        <span class="cot-percentile">91.6. percentile
+          (екстремно дълги) · очакване: цена ↓</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената пресече SMA10 в посоката на сигнала (под нея, преди 2 седмици); цена 0.6968 срещу SMA10 0.7095 (-1.8%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 40 седмици с екстремум в тази посока (3 епизода); доходност на инструмента след 2/4/8 седмици: -0.0% (53% в посоката на сигнала) / -0.0% (53% в посоката на сигнала) / +0.1% (53% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">FXA (Invesco CurrencyShares Australian Dollar Trust) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Australian Dollar НАДОЛУ: FXA губи (trust върху австралийския долар).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">BHP (BHP Group) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  RIO (Rio Tinto) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  WDS (Woodside Energy Group) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Australian Dollar НАДОЛУ BHP ПЕЧЕЛИ (механизъм: разходи в чужда валута). <span class="small" style="color:var(--muted)">BHP добива желязна руда, въглища и мед основно в Австралия, с оперативни разходи в AUD, докато приходите от продажби на суровини са деноминирани в USD.</span></div><div class="thesis-chain">При цената на Australian Dollar НАДОЛУ RIO ПЕЧЕЛИ (механизъм: разходи в чужда валута). <span class="small" style="color:var(--muted)">Rio Tinto извършва значителна добивна дейност в Австралия (желязна руда, алуминий), с разходи за труд и операции в AUD, а продажбите са предимно в USD.</span></div><div class="thesis-chain">При цената на Australian Dollar НАДОЛУ WDS ПЕЧЕЛИ (механизъм: разходи в чужда валута). <span class="small" style="color:var(--muted)">Woodside Energy е австралийски производител на LNG и петрол с оперативни разходи в AUD, докато приходите от продажба на енергийни суровини са в USD.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">British Pound</span>
+        <span class="cot-percentile">9.7. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 1.3243 срещу SMA10 1.3444 (-1.5%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 9 седмици с екстремум в тази посока (4 епизода); доходност на инструмента след 2/4/8 седмици: +0.7% (71% в посоката на сигнала) / +1.2% (100% в посоката на сигнала) / +2.1% (86% в посоката на сигнала).</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">FXB (Invesco CurrencyShares British Pound Sterling Trust) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на British Pound НАГОРЕ: FXB печели (trust върху паунда).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">AZN (AstraZeneca) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  DEO (Diageo) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на British Pound НАГОРЕ AZN ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">AstraZeneca е базирана в Обединеното кралство фармацевтична компания с разходи за R&amp;D и операции частично в GBP, а ADR котировката превежда резултатите в USD.</span></div><div class="thesis-chain">При цената на British Pound НАГОРЕ DEO ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">Diageo е базирана в Лондон компания за алкохолни напитки, чиито приходи и разходи за производство на Scotch уиски и други продукти частично са деноминирани в GBP.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: UL — отчита в EUR, не в USD — валутният механизъм по таблицата важи за компании с отчет в USD.
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+    <div class="thesis watch">
+      <div class="thesis-head">
+        <span class="thesis-name">Silver</span>
+        <span class="cot-percentile">9.7. percentile
+          (екстремно къси) · очакване: цена ↑</span>
+      </div>
+
+      
+      <div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">Цената не е пресякла SMA10 в посоката на сигнала (още е под нея); цена 60.67 срещу SMA10 64.683 (-6.2%).</div>
+      <div class="small" style="font-size:12px;color:var(--muted)">История: 1 седмици с екстремум в тази посока (1 епизода); доходност на инструмента след 2/4/8 седмици: — / — / —. Малка извадка — не е за изводи.</div>
+      
+      
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Директна теза
+          
+        </div>
+        
+        <div class="cot-tickers">SLV (iShares Silver Trust) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  SIVR (abrdn Physical Silver Shares ETF) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PAAS (Pan American Silver) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        
+        
+        
+        <div class="thesis-chain">Фиксирана таблица с директни тикъри (не е AI). При очакваното движение — цената на Silver НАГОРЕ: SLV печели (физическо сребро); SIVR печели (физическо сребро); PAAS печели (добивач на сребро).</div>
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+      </div>
+
+      
+      
+      <div class="cot-sub">
+        
+        <div class="cot-sub-label">Cross-sector теза
+          
+        </div>
+        
+        <div class="cot-tickers">WPM (Wheaton Precious Metals) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  HL (Hecla Mining) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
+        
+        
+        <div class="thesis-chain">При цената на Silver НАГОРЕ WPM ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Wheaton Precious Metals притежава потоци (streaming agreements) за сребро от множество мини и продава среброто по пазарна цена.</span></div><div class="thesis-chain">При цената на Silver НАГОРЕ HL ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Hecla Mining е един от най-големите производители на сребро в САЩ, добивайки и продавайки сребро от мини в Аляска, Айдахо и Невада.</span></div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Тези тикъри не са в текущия CANSLIM скрийнър.
+        </div>
+        
+        
+        
+        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
+          Изключени: MAG — няма име в Yahoo (вероятно делистнат или преименуван).
+        </div>
+        
+      </div>
+
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section>
+  
+  <h2>Track Record v2 · 0 Action сигнала от 05.10 · 0 резолвирани</h2>
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    v1 методология: n=51, win rate 25.5%,
+    среден R -0.42 (3 изтекли — оценени по Close при изтичането)
+    · архивирана на 2026-10-05 (отворените v1 позиции затворени по последния Close, mark-to-market);
+    Track Record v2 започва от нула.</div>
+  
+  <div class="prose">
+    
+    
+    <b>Още няма затворени сделки по v2</b> — win rate и среден R се показват от първата резолюция.<br>
+    
+    
+    Все още отворени: 0 (преди цел 1) + 0 (след частична продажба на цел 1, trailing)<br>
+    
+    Чакат buy-stop: 0 · не се задействаха: 0 (извън статистиката)<br>
+    
+    
+    
+  </div>
+  
+  
+  
+</section>
+
+
+
+
+
+
+
+<section>
+  <h2>Buy-stop кандидати — измерване, не препоръка</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
+    5 сесии, по max(Open, buy-stop), не над +5%; стоп и цел от картата) във всички режими.
+    Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
+  <div class="prose">
+    
+    <b>Записани: 2</b> · чакат buy-stop 0 · отворени 2 · затворени 0
+    · не се задействаха 0 (0.0% от приключилите прозорци)<br>
+    
+    
+    Win rate се показва след 20 затворени (сега 0) — при по-малко е шум.<br>
+    
+    По режим на деня на картата (записани / затворени):
+    Defensive 2 / 0
+    
+  </div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (2):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Buy-stop</th><th class="n">Стоп</th><th class="n">Цел 1</th>
+        <th>Валиден до</th><th>Режим</th></tr></thead>
+      <tbody>
+        
+        <tr><td class="sym">ANET</td>
+          <td>2026-10-09</td>
+          <td>отворена от 2026-10-09 · +0.1R
+            </td>
+          <td class="n">$214.89</td><td class="n">$197.7</td><td class="n">$249.27</td>
+          <td>2026-10-15</td><td>Defensive</td></tr>
+        
+        <tr><td class="sym">EXPD</td>
+          <td>2026-10-09</td>
+          <td>отворена от 2026-10-09 · -0.1R
+            </td>
+          <td class="n">$194.59</td><td class="n">$181.53</td><td class="n">$220.71</td>
+          <td>2026-10-15</td><td>Defensive</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+</section>
+
+
+
+<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  
+  <div class="si-grid">
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">GOOGL</span>
+        <span><span class="si-val">$28.2 млрд</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">ALPHABET INC</div>
+      <div class="si-mgr">5 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">UBER</span>
+        <span><span class="si-val">$2.5 млрд</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">UBER TECHNOLOGIES INC</div>
+      <div class="si-mgr">2 мениджъра · Бил Акман · Pershing Square · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">MSFT</span>
+        <span><span class="si-val">$2.3 млрд</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">MICROSOFT CORP</div>
+      <div class="si-mgr">Бил Акман · Pershing Square · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AMZN</span>
+        <span><span class="si-val">$1.2 млрд</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">AMAZON COM INC</div>
+      <div class="si-mgr">3 мениджъра · Сет Кларман · Baupost Group · 13F · 2026-08-13</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">NBIS</span>
+        <span><span class="si-val">$1.2 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">NEBIUS GROUP N.V.</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">STT</span>
+        <span><span class="si-val">$1.0 млрд</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">STATE STREET CORP</div>
+      <div class="si-mgr">Хауърд Маркс · Oaktree Capital Management · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">SEAGATE TECHNOLOGY</span>
+        <span><span class="si-val">$965.1 млн</span> <span class="si-action">нова позиция</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">SEAGATE TECHNOLOGY HLDNGS PL</div>
+      <div class="si-mgr">Стивън Мандел · Lone Pine Capital · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym">AMPHENOL CORP</span>
+        <span><span class="si-val">$858.1 млн</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">AMPHENOL CORP</div>
+      <div class="si-mgr">Джон Армитидж · Egerton Capital · 13F · 2026-07-21</div>
+      
+    </div>
+    
+  </div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
+    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  </div>
+</section>
+
+
+
+
+
+
+
+
+<section>
+  <h2>📉 Major Position Exits</h2>
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма големи изходи (15 мениджъра със сравнение с предходния 13F, праг 10% от портфейла).</div>
+</section>
+
+
+
+
+
+
+<section>
+  <h2>Исторически архив</h2>
+  <div class="calendar">
+    <label for="hist-date">Избери дата:</label>
+    <input type="date" id="hist-date">
+    <button id="hist-open" type="button">Отвори бриф</button>
+    <span class="hint" id="hist-avail">зареждам наличните дати…</span>
+  </div>
+  <div id="history-msg" hidden></div>
+  <iframe id="history-frame" title="Исторически бриф" hidden></iframe>
+</section>
+
+<footer>
+  Само за информационни цели. Не представлява финансов съвет, инвестиционна препоръка
+  или предложение за покупка/продажба на ценни книжа. Данните идват от публични API-та
+  и могат да съдържат грешки или закъснения. Всяко инвестиционно решение е лична отговорност.
+  <br>Генерирано автоматично · Персонален AI Инвестиционен Бриф v2.0
+</footer>
+
+</div>
+<script>
+// Оразмеряване на позиция — ЧИСТА функция, без DOM и без мрежа (07.10.2026). Работи в браузъра (глобален MBSizing) и в node (module.exports) — един и същи файл, който се вгражда
+// в страницата и който проверва test_sizing_js.py. Баланс, риск и таван са лични: стоят САМО в localStorage на устройството (виж sizing_ui.js) и никога не се изпращат никъде.
+(function (root) {
+  "use strict";
+
+  function num(x) {                                              // строго: "80 000" или "12abc" не са числа (parseFloat би ги прочел като 80 и 12); запетаята е десетичен знак
+    if (typeof x === "number") return isFinite(x) ? x : NaN;
+    if (x === null || x === undefined) return NaN;
+    var s = String(x).trim().replace(",", ".");
+    if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    var n = parseFloat(s);
+    return isFinite(n) ? n : NaN;
+  }
+
+  // o: { balance, riskPct, capPct, applyRegime, regimeFactor, entry, stop, adrPct, strategy }
+  // → { ok:false, reason:"data"|"balance"|"settings" } или { ok:true, shares, value, pctOfAccount, lossAtStop, effRiskPct, ... }
+  function sizePosition(o) {
+    var entry = num(o.entry), stop = num(o.stop);
+    // липсващи данни или стоп на/над входа → без брой акции
+    if (!(entry > 0) || !(stop > 0) || !(stop < entry)) return { ok: false, reason: "data" };
+    var balance = num(o.balance);
+    if (!(balance > 0)) return { ok: false, reason: "balance" };
+    var risk = num(o.riskPct), cap = num(o.capPct);
+    if (!(risk > 0) || !(cap > 0)) return { ok: false, reason: "settings" };
+
+    var rf = num(o.regimeFactor);
+    var factor = (o.applyRegime && rf > 0) ? rf : 1;            // режимният фактор е върху ВЪВЕДЕНИЯ риск, само ако отметката е включена
+    var effRisk = risk * factor;                                 // % от сметката
+    var perShare = entry - stop;
+    var riskBudget = balance * effRisk / 100;
+    var EPS = 1e-9;
+    var shares = Math.floor(riskBudget / perShare + EPS);
+    var value = shares * entry;
+    var capValue = balance * cap / 100;
+    var capped = false;
+    if (value > capValue + EPS) {                                // позицията надвишава тавана → свива се до тавана
+      shares = Math.floor(capValue / entry + EPS);
+      value = shares * entry;
+      capped = true;
+    }
+    var lossAtStop = shares * perShare;                          // реалният риск при стопа (след свиване може да е под бюджета)
+    var stopPct = perShare / entry * 100;
+    var adr = num(o.adrPct);
+    return {
+      ok: true,
+      shares: shares,
+      value: value,
+      pctOfAccount: value / balance * 100,
+      lossAtStop: lossAtStop,
+      effRiskPct: effRisk,                                       // въведеният риск × режимния фактор
+      factor: factor,
+      realRiskPct: lossAtStop / balance * 100,                   // реалният риск при стопа, % от сметката
+      capped: capped,
+      capPct: cap,
+      gap10: value * 0.10,                                       // загуба при гап −10% / −15% (стойност на позицията × 0.10 / 0.15)
+      gap15: value * 0.15,
+      perShare: perShare,
+      stopPct: stopPct,
+      tooSmall: shares < 1,
+      // стратегия Kullamagi (qm_breakout/qm_ep): стопът е по-далеч от 1 ADR под входа → акцията е избягала, входът е преследване. Допуск: ADR е закръглен до 0.01 п.п., а стопът — до цент
+      // (иначе публикуваният стоп = вход × (1 − ADR) би дал фалшиво предупреждение: 7.193% > 7.19%)
+      chase: o.strategy === "kullamagi" && adr > 0 && stopPct > adr + 0.005 + 0.005 / entry * 100 + 1e-9
+    };
+  }
+
+  // Серия загуби (09.10.2026): колко от сметката губиш след n поредни загуби по пълния стоп, ако рискът на сделка е ефективният (въведеният риск × режимния фактор, когато е включен).
+  // Линейно (n × риска) — без натрупване/компаундиране: редът в настройките е за ориентир на характера на риска, не прогноза.
+  // o: { riskPct, applyRegime, regimeFactor, n } → { ok:false } или { ok:true, n, riskPct, factor, effRiskPct, lossPct, lossPctFull }
+  function losingStreak(o) {
+    var risk = num(o.riskPct);
+    if (!(risk > 0)) return { ok: false };
+    var n = num(o.n);
+    if (!(n > 0)) n = 10;
+    var rf = num(o.regimeFactor);
+    var factor = (o.applyRegime && rf > 0) ? rf : 1;
+    return { ok: true, n: n, riskPct: risk, factor: factor, effRiskPct: risk * factor, lossPct: n * risk * factor, lossPctFull: n * risk };
+  }
+
+  function money(n) {                                            // "$5,466" — без locale, за да е еднакво на всяко устройство
+    var s = String(Math.round(Math.abs(n)));
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return (n < 0 ? "−$" : "$") + s;
+  }
+
+  function pct(n, d) {                                           // 0.5 → "0.5%", 25 → "25%", 0.25 → "0.25%"
+    if (!isFinite(n)) return "—";
+    return String(parseFloat(n.toFixed(d === undefined ? 1 : d))) + "%";
+  }
+
+  var api = { sizePosition: sizePosition, losingStreak: losingStreak, money: money, pct: pct, num: num };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.MBSizing = api;
+})(typeof window !== "undefined" ? window : this);
+
+</script>
+<script>
+// Оразмеряване на позиция в браузъра (07.10.2026): настройки (баланс, риск %, таван %, режимен фактор) само в localStorage на устройството; всеки достъп е в try/catch, а без
+// localStorage страницата работи нормално (настройките важат до затваряне на страницата). Нищо не се изпраща и не се записва никъде другаде. Математиката е в sizing_core.js (MBSizing).
+(function () {
+  "use strict";
+  var S = window.MBSizing;
+  if (!S) return;
+
+  var KEY = "mb_settings_v1";
+  var DEFAULTS = { balance: "", risk: "0.5", cap: "25", regime: true };
+  var state = { balance: DEFAULTS.balance, risk: DEFAULTS.risk, cap: DEFAULTS.cap, regime: DEFAULTS.regime };
+  var persisted = true;
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (o && typeof o === "object") {
+        if (o.balance !== undefined) state.balance = String(o.balance);
+        if (o.risk !== undefined) state.risk = String(o.risk);
+        if (o.cap !== undefined) state.cap = String(o.cap);
+        if (o.regime !== undefined) state.regime = !!o.regime;
+      }
+    } catch (e) { persisted = false; }
+  }
+
+  function save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { persisted = false; }
+  }
+
+  function el(tag, text, cls) {
+    var n = document.createElement(tag);
+    if (text !== undefined) n.textContent = text;
+    if (cls) n.className = cls;
+    return n;
+  }
+
+  function line(parts, cls) {                       // parts: низове или [болд текст]
+    var d = el("div", undefined, cls);
+    parts.forEach(function (p) {
+      if (Array.isArray(p)) d.appendChild(el("b", p[0]));
+      else d.appendChild(document.createTextNode(p));
+    });
+    return d;
+  }
+
+  function cardInputs(card) {
+    var entry = card.getAttribute("data-entry"), stop = card.getAttribute("data-stop");
+    var adj = card.querySelector(".lv-adj");
+    if (adj && !adj.hidden) {                       // "коригирай": реален вход/стоп само за тази карта (не се записват)
+      entry = adj.querySelector(".lv-in-entry").value;
+      stop = adj.querySelector(".lv-in-stop").value;
+    }
+    return { entry: entry, stop: stop };
+  }
+
+  function renderCard(card) {
+    var box = card.querySelector(".lv-size");
+    if (!box) return;
+    var inp = cardInputs(card);
+    var factor = S.num(card.getAttribute("data-factor"));
+    var res = S.sizePosition({
+      balance: state.balance, riskPct: state.risk, capPct: state.cap,
+      applyRegime: state.regime, regimeFactor: factor,
+      entry: inp.entry, stop: inp.stop, adrPct: card.getAttribute("data-adr"),
+      strategy: card.getAttribute("data-strategy")
+    });
+    while (box.firstChild) box.removeChild(box.firstChild);
+    box.setAttribute("data-state", res.ok ? "ok" : res.reason);
+    if (!res.ok) {
+      if (res.reason === "balance") box.appendChild(el("div", "въведи баланса в настройките, за да видиш размера на позицията", "lv-hint"));
+      else if (res.reason === "settings") box.appendChild(el("div", "провери настройките: рискът и таванът трябва да са положителни числа", "lv-hint"));
+      else box.appendChild(el("div", "няма достатъчно данни", "lv-hint"));
+      return;
+    }
+    var label = card.getAttribute("data-regime-label") || "режимен фактор";
+    var note = card.getAttribute("data-regime-note") || "";
+    var riskTxt = "риск " + S.pct(S.num(state.risk), 2);
+    if (res.factor !== 1) riskTxt += " × " + res.factor + " " + label + " = " + S.pct(res.effRiskPct, 2);
+    else if (state.regime && note) riskTxt += " (" + note + ")";
+    box.appendChild(line([riskTxt + " от сметката"], "lv-risk"));
+    if (res.tooSmall) {
+      box.appendChild(line(["0 акции — рисковият бюджет не стига за 1 акция при този стоп"], "lv-warn"));
+    } else {
+      box.appendChild(line([[res.shares + " акции"], " · " + S.money(res.value) + " (" + S.pct(res.pctOfAccount) + " от сметката)"], "lv-main"));
+    }
+    if (res.capped) {
+      box.appendChild(line(["ограничено от тавана (" + S.pct(res.capPct) + " от сметката) — реален риск при стопа " + S.money(res.lossAtStop) + " (" + S.pct(res.realRiskPct, 2) + " от сметката)"], "lv-warn"));
+    }
+    box.appendChild(line(["загуба при стоп: ", [S.money(res.lossAtStop)]], "lv-loss"));
+    box.appendChild(line(["при гап −10%: ", [S.money(res.gap10)], " · при гап −15%: ", [S.money(res.gap15)]], "lv-loss"));
+    if (res.chase) box.appendChild(line(["⚠ акцията е избягала над 1 ADR — входът е преследване"], "lv-warn"));
+  }
+
+  function renderStreak() {                           // "10 поредни загуби ≈ −X% от сметката" — 10 × ефективния риск (виж MBSizing.losingStreak)
+    var box = document.getElementById("mb-streak"), panel = document.getElementById("mb-settings");
+    if (!box) return;
+    var pf = panel ? S.num(panel.getAttribute("data-regime-factor")) : NaN;
+    var r = S.losingStreak({ riskPct: state.risk, applyRegime: state.regime, regimeFactor: pf, n: 10 });
+    if (!r.ok) { box.textContent = "10 поредни загуби ≈ — (въведи риск на сделка)"; return; }
+    var txt = "10 поредни загуби ≈ −" + S.pct(r.lossPct, 2) + " от сметката (10 × риск " + S.pct(r.riskPct, 2);
+    if (r.factor !== 1) txt += " × " + r.factor + " защитен режим; за QM и EP, които са без режимен фактор: −" + S.pct(r.lossPctFull, 2);
+    box.textContent = txt + ")";
+  }
+
+  function renderAll() {
+    var cards = document.querySelectorAll(".lv");
+    for (var i = 0; i < cards.length; i++) renderCard(cards[i]);
+    renderStreak();
+    var n = document.getElementById("mb-persist-note");
+    if (n) n.hidden = persisted;
+  }
+
+  function initSettings() {
+    var btn = document.getElementById("mb-settings-btn"), panel = document.getElementById("mb-settings");
+    var fb = document.getElementById("mb-balance"), fr = document.getElementById("mb-risk"), fc = document.getElementById("mb-cap"), fg = document.getElementById("mb-regime");
+    if (!btn || !panel || !fb || !fr || !fc || !fg) return;
+    fb.value = state.balance; fr.value = state.risk; fc.value = state.cap; fg.checked = !!state.regime;
+    function toggle(open) {
+      var show = open === undefined ? panel.hidden : open;
+      panel.hidden = !show;
+      btn.setAttribute("aria-expanded", show ? "true" : "false");
+    }
+    btn.addEventListener("click", function () { toggle(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") toggle(false); });
+    function onChange() {
+      state.balance = fb.value; state.risk = fr.value; state.cap = fc.value; state.regime = fg.checked;
+      save();
+      renderAll();
+    }
+    [fb, fr, fc].forEach(function (f) { f.addEventListener("input", onChange); });
+    fg.addEventListener("change", onChange);
+    var hints = document.querySelectorAll(".lv-hint-open");
+    for (var i = 0; i < hints.length; i++) hints[i].addEventListener("click", function () { toggle(true); });
+  }
+
+  function initCards() {
+    var cards = document.querySelectorAll(".lv");
+    Array.prototype.forEach.call(cards, function (card) {
+      var adjBtn = card.querySelector(".lv-adjust-btn"), adj = card.querySelector(".lv-adj");
+      if (!adjBtn || !adj) return;
+      var fe = adj.querySelector(".lv-in-entry"), fs = adj.querySelector(".lv-in-stop"), rs = adj.querySelector(".lv-reset");
+      function reset() { fe.value = card.getAttribute("data-entry"); fs.value = card.getAttribute("data-stop"); }
+      adjBtn.addEventListener("click", function () {
+        var open = adj.hidden;
+        if (open) reset();
+        adj.hidden = !open;
+        adjBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        adjBtn.textContent = open ? "скрий" : "коригирай";
+        renderCard(card);
+      });
+      fe.addEventListener("input", function () { renderCard(card); });
+      fs.addEventListener("input", function () { renderCard(card); });
+      if (rs) rs.addEventListener("click", function () { reset(); renderCard(card); });
+    });
+  }
+
+  load();
+  initSettings();
+  initCards();
+  renderAll();
+  window.MBSizingUI = { renderAll: renderAll, state: state };
+})();
+
+</script>
+<script>
+// ── Исторически календар: отваря docs/archive/<date>.html в iframe ────────
+(function () {
+  var input = document.getElementById("hist-date");
+  var btn = document.getElementById("hist-open");
+  var avail = document.getElementById("hist-avail");
+  var frame = document.getElementById("history-frame");
+  var msg = document.getElementById("history-msg");
+  if (!input || !btn) return;
+
+  var dates = [];
+  fetch("data/index.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (list) {
+      dates = Array.isArray(list) ? list.sort() : [];
+      if (dates.length) {
+        input.min = dates[0];
+        input.max = dates[dates.length - 1];
+        input.value = dates[dates.length - 1];
+        avail.textContent = dates.length + " налични дни (" + dates[0] + " → " + dates[dates.length - 1] + ")";
+      } else {
+        avail.textContent = "няма архивирани брифове все още";
+      }
+    })
+    .catch(function () { avail.textContent = "архивът е недостъпен"; });
+
+  function open() {
+    var d = input.value;
+    msg.hidden = true; frame.hidden = true; frame.style.height = "0";
+    if (!d) return;
+    if (dates.length && dates.indexOf(d) === -1) {
+      msg.hidden = false;
+      msg.textContent = "Няма бриф за " + d + " (уикенд, празник или извън архива).";
+      return;
+    }
+    frame.src = "archive/" + d + ".html";
+    frame.hidden = false;
+    frame.style.height = "1400px";
+  }
+  btn.addEventListener("click", open);
+})();
+
+(function () {
+  // Earnings Season Recap модал — НЕ position:fixed, position:absolute с
+  // top позициониран спрямо window.scrollY при отваряне (виж CSS коментара).
+  function closeAll() {
+    document.querySelectorAll(".earn-modal").forEach(function (m) { m.hidden = true; });
+  }
+  document.querySelectorAll(".earn-icon").forEach(function (icon) {
+    icon.addEventListener("click", function () {
+      var id = icon.getAttribute("data-modal");
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      closeAll();
+      modal.style.top = (window.scrollY || window.pageYOffset || 0) + "px";
+      modal.hidden = false;
+    });
+  });
+  document.querySelectorAll(".earn-modal").forEach(function (modal) {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal || e.target.closest(".earn-modal-close")) {
+        modal.hidden = true;
+      }
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,37 +1,37 @@
 {
- "date": "2026-10-09",
+ "date": "2026-10-12",
  "news": [
   {
-   "headline": "US 10-year Treasury yields risk hitting 6% for first time since 2000, Pimco says",
-   "why": "Pimco предупреждава, че допълнително покачване на yields е 'feasible', което директно притиска оценките на акции и увеличава разходите по дълга за корпорациите."
+   "headline": "Oil falls after Trump declares 'energy ceasefire' between Russia and Ukraine",
+   "why": "Потенциалното спиране на атаките срещу енергийна инфраструктура намалява рисковата премия в петрола и натиска върху цените надолу, директно засягайки energy сектора и инфлационните очаквания."
   },
   {
-   "headline": "Inflation on many everyday items was entirely due to tariffs, NY Fed says",
-   "why": "NY Fed установява, че тарифите са добавили 2.9 процентни пункта към инфлацията в 67 категории стоки, което усложнява позицията на Fed и очакванията за лихвени намаления."
+   "headline": "Gold gains on weaker oil, dollar; US inflation data in focus",
+   "why": "Пазарът очаква ключов макро release — инфлационни данни (CPI/PCE), което движи gold и dollar positioning преди публикуването."
   },
   {
-   "headline": "Treasury yields are lower after reaching multiyear highs, traders weigh latest bond auction",
-   "why": "Движението на Treasury yields след дългосрочния bond auction е ключов индикатор за апетита към риск и посоката на equity пазарите в краткосрочен план."
+   "headline": "Dollar steady near 18-month high as Mideast conflict, US inflation in focus",
+   "why": "DXY на 18-месечен връх влияе върху целия asset mix — commodities, EM активи и мултинационални корпоративни приходи, с поглед към предстоящите инфлационни данни."
   },
   {
-   "headline": "Gold rises more than 1%, Fed outlook in focus",
-   "why": "Покачването на злато с над 1% отразява нарастваща несигурност около Fed политиката и реалните лихвени нива, сигнализирайки defensive позициониране."
+   "headline": "US Republicans and Democrats want Trump to reverse course on Russia diesel deal",
+   "why": "Двупартийната опозиция в Конгреса срещу дизеловата сделка с Русия създава риск от законодателна намеса и санкционни усложнения, засягащи energy пазарите."
   },
   {
-   "headline": "Oil prices jump as Iran steps up tanker attacks, hurricane threatens U.S. Gulf production",
-   "why": "Двоен supply shock — иранска ескалация срещу танкери и hurricane Isaias към Gulf Coast — директно движи crude prices и свързаните енергийни акции."
+   "headline": "US threatens to block arms for Ukraine over attacks on Russian refineries",
+   "why": "Геополитическият натиск върху Украйна да спре ударите по рафинерии директно засяга петролните фючърси и енергийната инфраструктура в региона."
   },
   {
-   "headline": "Trump says U.S. will not attack Iran before midterm election; Treasury sanctions 17 tankers linked to Iran's shadow fleet",
-   "why": "Комбинацията от дипломатическа де-ескалация и нови санкции срещу shadow fleet формира oil supply outlook и геополитическата рискова премия за пазарите."
+   "headline": "Iran says US response to its proposal to reopen Hormuz was 'insufficient'",
+   "why": "Задънена улица по Hormuz преговорите поддържа геополитическа рискова премия в петрола и засяга глобалните доставки на суровини."
   },
   {
-   "headline": "OpenAI annualised revenues $20bn less than previously signalled, AI stocks sink",
-   "why": "Реалните приходи на OpenAI от ~$50bn вместо очакваните $70bn разклатиха AI growth нарратива и предизвикаха разпродажба в Nvidia, Oracle и CoreWeave."
+   "headline": "Houthi attacks on Saudi airport — BP and oil chiefs pull out of Riyadh energy congress; FAA warns US airlines",
+   "why": "Повтарящите се удари по саудитска инфраструктура ескалират Middle East риска, движат петролните цени и засягат авиационния сектор."
   },
   {
-   "headline": "SpaceX deal to acquire spectrum license hammers shares of AT&T, Verizon and T-Mobile",
-   "why": "SpaceX навлиза директно в US telecom пазара чрез spectrum придобиване, което е регулаторно и конкурентно събитие с незабавен негативен ефект върху incumbent carriers."
+   "headline": "TSMC expected to report sixth straight quarter of record profit thanks to AI boom",
+   "why": "Резултатите на TSMC са водещ индикатор за целия semiconductor и AI сектор и ще задават тона на tech earnings сезона."
   }
  ]
 }
