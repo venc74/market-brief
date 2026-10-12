@@ -1088,6 +1088,9 @@ IEI_HYG_LOOKBACK_DAYS = int(os.getenv("IEI_HYG_LOOKBACK_DAYS", 504))
 IEI_HYG_LEVEL_PERCENTILE_LOW = float(os.getenv("IEI_HYG_LEVEL_PERCENTILE_LOW", 10))
 IEI_HYG_ROC_WINDOW_DAYS = int(os.getenv("IEI_HYG_ROC_WINDOW_DAYS", 10))
 IEI_HYG_ROC_SPIKE_PERCENTILE = float(os.getenv("IEI_HYG_ROC_SPIKE_PERCENTILE", 90))
+# 12.10.2026: посоката на 10-дневната RoC (сега срещу преди N сесии) се смята от кода и се подава на модела — на 12.10 текстът за XLV казваше "ускоряваща се RoC",
+# а RoC беше +0.41% срещу +1.03% преди 5 сесии (връх +1.17% на 01.10). Само текст към промпта, без ефект върху режима.
+IEI_HYG_ROC_TREND_SESSIONS = int(os.getenv("IEI_HYG_ROC_TREND_SESSIONS", 5))
 # FIX 2026-10-03 (пакет 2 т.10): хистерезисът държи override (MOVE spike / IEI-HYG spike) при СКРИТ индикатор — скритите дни не
 # са спокойни (замразява се streak-ът). Без таван това е безкрайно: ^MOVE беше скрит 22 поредни дни през юли 2026 (27 общо от 78
 # брифа), а override, повдигнал режима до Defensive, би стоял толкова, колкото тече повредата на източника. След този брой

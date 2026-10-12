@@ -610,6 +610,16 @@ def _distribution_cap_note(thermometer: dict) -> str:
             "индикаторите по броенето (\"regime_by_count\" е по-добрият режим) и не измисляй други условия за изход.")
 
 
+def _credit_roc_note(thermometer: dict) -> str:
+    """12.10.2026: посоката на IEI/HYG RoC е от кода (thermometer._evaluate_credit_spread → roc_trend_text). Потвърден случай 12.10: веригата за XLV казваше
+    "ускоряваща се RoC (84.3-ти percentile)", а RoC беше +0.41% срещу +1.03% преди 5 сесии — percentile-ът е ниво, не посока."""
+    for ind in (thermometer or {}).get("indicators") or []:
+        if str(ind.get("name", "")).startswith("IEI/HYG") and ind.get("roc_trend_text"):
+            return ("\nВАЖНО за IEI/HYG: посоката на RoC е от кода — " + ind["roc_trend_text"] + ". Ако пишеш за посоката на RoC (ускорява се / забавя се), "
+                    "ползвай САМО това; \"roc_percentile\" е колко висока е RoC спрямо историята си, не дали расте.")
+    return ""
+
+
 def _hysteresis_release_note(thermometer: dict) -> str:
     """Пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да не се чете като подобрение на пазара."""
     rel = (thermometer or {}).get("hysteresis_released") or []
@@ -701,7 +711,7 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     """
     user = f"""Днешни данни:
 
-ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}{_distribution_cap_note(thermometer)}
+ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}{_distribution_cap_note(thermometer)}{_credit_roc_note(thermometer)}
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 

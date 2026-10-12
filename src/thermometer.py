@@ -390,10 +390,19 @@ def _evaluate_credit_spread(ratio) -> dict:
 
     note = (" ⚠ рязък credit spread spike" if spike else
            (" (late-cycle complacency)" if complacency else ""))
+    # 12.10.2026: посоката на RoC от кода (сега срещу преди IEI_HYG_ROC_TREND_SESSIONS сесии) — за промпта; моделът пишеше "ускоряваща се", когато RoC спадаше
+    n_back = config.IEI_HYG_ROC_TREND_SESSIONS
+    roc_valid = roc.dropna()
+    roc_prev = float(roc_valid.iloc[-1 - n_back]) if len(roc_valid) > n_back else None
+    trend = None if roc_prev is None else ("rising" if round(current_roc, 2) > round(roc_prev, 2) else "falling" if round(current_roc, 2) < round(roc_prev, 2) else "flat")
+    trend_text = None if trend is None else (
+        f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC е {current_roc:+.2f}% срещу {roc_prev:+.2f}% преди {n_back} сесии — "
+        + {"rising": "расте (ускорява се)", "falling": "спада (забавя се)", "flat": "без промяна"}[trend])
     return {
         "name": "IEI/HYG (Credit Spread)", "value": round(current, 4),
         "level_percentile": level_pct, "roc_10d_pct": round(current_roc, 2),
         "roc_percentile": roc_pct, "spike": spike, "status": status,
+        "roc_10d_pct_prev": round(roc_prev, 2) if roc_prev is not None else None, "roc_trend": trend, "roc_trend_text": trend_text,
         "label": f"IEI/HYG {current:.3f} ({level_pct:.0f}. percentile) · "
                  f"{config.IEI_HYG_ROC_WINDOW_DAYS}д RoC {current_roc:+.1f}% "
                  f"({_pct_ord(roc_pct)} percentile){note}",
