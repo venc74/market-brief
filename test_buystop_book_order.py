@@ -85,11 +85,29 @@ print("  ✓ EXPD:", se["trigger_text"])
 print("  ✓ ANET (сетъп no_volume):", sa["trigger_text"])
 
 print()
-print("── 4. confirmed не се пипа (СИНТЕТИЧНА карта: ANET с обем над прага) ──")
+print("── 4. confirmed: неутрален ред, без забрана (СИНТЕТИЧНА карта: ANET с обем 2.0× над прага; записът в книгата е РЕАЛНИЯТ) ──")
 c = fresh("ANET"); c["volume_ratio"] = 2.0; c.pop("breakout_volume", None)
 setup_rules.annotate([c], D("2026-10-12"), backtest.live_buystop_by_ticker())
 assert c["setup"]["kind"] == "confirmed" and c["setup"]["eligible"] is True and "triggered" not in c["setup"] and c["setup"]["trigger_text"].startswith("Потвърден пробив")
-print("  ✓ confirmed с жив запис в книгата остава 'Потвърден пробив' (може да стане Action — книгите са независими)")
+assert c["setup"]["book_note"] == "в buy-stop книгата: отворена от 09.10 по $215.38" and "не нов вход" not in c["setup"]["trigger_text"]
+tr_rec = backtest.live_buystop_by_ticker()["ANET"]
+c_tr = fresh("ANET"); c_tr["volume_ratio"] = 2.0; c_tr.pop("breakout_volume", None)
+setup_rules.annotate([c_tr], D("2026-10-12"), {"ANET": {**tr_rec, "status": "trailing"}})                    # СИНТЕТИЧНО: след частична продажба
+assert c_tr["setup"]["book_note"] == "в buy-stop книгата: отворена от 09.10 по $215.38 (след частична продажба на 2R)"
+seen = {}
+from src import ai_brief
+ai_brief._call_claude = lambda system, user, **k: seen.setdefault("user", user) and "[]"                       # СИНТЕТИЧНО: записва промпта
+ai_brief.ticker_narratives([c], [], "Defensive")
+assert "Потвърден пробив" in seen["user"] and "buy-stop книгата" not in seen["user"] and "не нов вход" not in seen["user"]
+b0 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
+c["ai"] = B12["ANET"].get("ai") or {}
+c["plan"] = sizing.position_plan_v2(c, 0.5, D("2026-10-12"))                                                    # за Action картата
+for where in ("watchlist", "action"):
+    bb = copy.deepcopy(b0); bb["watchlist"], bb["action"] = ([c], []) if where == "watchlist" else ([], [c])
+    pg = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(bb))))
+    assert "в buy-stop книгата: отворена от 09.10 по $215.38" in pg and "не нов вход" not in pg, where
+print("  ✓ confirmed остава 'Потвърден пробив' (може да стане Action); картата (Watchlist и Action) носи 'в buy-stop книгата: отворена от 09.10 по $215.38';")
+print("    в промпта (setup + setup_reason) няма нито реда, нито 'не нов вход'")
 
 print()
 print("── 5. plan_preview.valid_through = прозорецът на картата ──")

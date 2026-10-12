@@ -197,13 +197,14 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     от първия ден). Изтекъл запис (valid_through < днес, още нерезолвиран) или запис от бъдеща дата се игнорира. Само показване; връща същия setup.
     12.10.2026: ЗАДЕЙСТВАН запис (open / trailing) има предимство пред всеки kind, не само below_pivot — ANET (вход 09.10 по $215.38 при отварянето над buy-stop $214.89)
     беше на 12.10 компактен ред "над pivot без обем" без дума за книгата. Изключение: confirmed — единственият kind, който може да стане Action; книгите са независими
-    (отметката "и Action" в книгата), а текстът "не нов вход" отива и в промпта (setup_reason) и би могъл да свали кодово допустим Action през AI класификацията.
+    (отметката "и Action" в книгата), а текстът "не нов вход" отива и в промпта (setup_reason) и би могъл да свали кодово допустим Action през AI класификацията —
+    там картата получава само неутрален ред (_book_note), извън промпта.
     """
     if not rec:
         return setup
     today_iso = (today or dt.date.today()).isoformat() if not isinstance(today, str) else today
     if rec.get("status") in ("open", "trailing"):
-        return setup if setup.get("kind") == "confirmed" else _apply_triggered(setup, rec, today_iso)
+        return _book_note(setup, rec) if setup.get("kind") == "confirmed" else _apply_triggered(setup, rec, today_iso)
     if setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
         return setup
     through, start = rec.get("valid_through"), rec.get("entry_date")
@@ -221,6 +222,18 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
         setup["book_level"] = level
         text += f" Книгата следи ниво ${level:.2f} от {_dm(start)} (записът пази плана от първия ден)."
     setup["trigger_text"] = text
+    return setup
+
+
+def _book_note(setup: dict, rec: dict) -> dict:
+    """
+    12.10.2026: потвърден пробив (confirmed) с жив запис в buy-stop книгата — НЕУТРАЛЕН ред "в buy-stop книгата: отворена от 09.10 по $215.38" (setup["book_note"]).
+    trigger_text и класификацията не се пипат: само kind и trigger_text влизат в промпта (setup_reason), а confirmed може да стане Action — бележката не е забрана.
+    """
+    fill, fdate = rec.get("fill_price"), rec.get("fill_date")
+    if isinstance(fill, (int, float)) and fdate:
+        setup["book_note"] = (f"в buy-stop книгата: отворена от {_dm(fdate)} по ${fill:.2f}"
+                              + (" (след частична продажба на 2R)" if rec.get("status") == "trailing" else ""))
     return setup
 
 
