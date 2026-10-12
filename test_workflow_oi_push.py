@@ -32,8 +32,8 @@ assert "for attempt in 1 2 3 4" in SCRIPT and "git rebase --abort" in SCRIPT and
 assert SCRIPT.index("git stash push") < SCRIPT.index("git pull --rebase")
 assert "git add data/unusual_options_oi_snapshot.json" in SCRIPT and "git add data/\n" not in SCRIPT and "git add -A" not in SCRIPT   # кешовете НЕ се качват оттук
 live = [l for l in YML.splitlines() if not l.strip().startswith("#")]
-assert any(l.strip() == "group: daily-brief" for l in live) and 'cron: "0 15 * * 1-5"' in YML and "workflow_dispatch" in YML
-print("  ✓ stash -u преди pull --rebase, до 4 опита, само снимката се add-ва; обща concurrency група, cron и dispatch непипнати")
+assert any(l.strip() == "group: oi-snapshot" for l in live) and 'cron: "0 15 * * 1-5"' in YML and "workflow_dispatch" in YML   # 12.10: собствена група (test_workflow_concurrency.py)
+print("  ✓ stash -u преди pull --rebase, до 4 опита, само снимката се add-ва; собствена concurrency група (от 12.10), cron \"0 15\" и dispatch на място")
 
 ENV = {**{k: v for k, v in os.environ.items() if k in ("PATH", "LANG")}, "GIT_TERMINAL_PROMPT": "0", "RETRY_DELAY": "0", "HOME": tempfile.gettempdir(),
        "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}

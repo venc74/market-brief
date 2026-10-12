@@ -31,9 +31,12 @@ on:
 permissions:
   contents: write
 
-# същата група като брифа — двата job-а никога не push-ват едновременно
+# 12.10.2026: СОБСТВЕНА група (досега "daily-brief", общата с брифа). В обща група нов чакащ run отменя по-стария чакащ — закъснял OI run около 05:30 UTC
+# (GitHub пуска schedule тригерите с часове закъснение) можеше да отмени ЧАКАЩ бриф. Сега OI run не може да отмени бриф; два OI run-а пак не вървят едновременно.
+# Едновременно качване с брифа се покрива от повторните опити в двата job-а: тук stash + pull --rebase (commit-ва се САМО снимката), в брифа pull --rebase
+# (docs/ и data/ — снимката той само чете) → различни файлове, rebase без конфликт (test_workflow_concurrency.py пуска двата скрипта и паралелно).
 concurrency:
-  group: daily-brief
+  group: oi-snapshot
   cancel-in-progress: false
 
 jobs:
