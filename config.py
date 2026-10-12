@@ -671,11 +671,14 @@ UNUSUAL_OPTIONS_MIN_RATIOS = int(os.getenv("UNUSUAL_OPTIONS_MIN_RATIOS", 5))
 # остана) — вече не е скрейпваем източник. Обнови ръчно при промяна в индекса:
 # отвори https://www.nasdaq.com/market-activity/quotes/Nasdaq-100-Index-Components,
 # копирай тикърите. Снимка към 2026-07-10 (103 компонента, вкл. GOOG/GOOGL dual-class).
+# 12.10.2026: махната EA — Electronic Arts е изкупена (PIF, Silver Lake, Affinity Partners) и делистната от Nasdaq на 04.08.2026; извадена от Nasdaq-100
+# без заместник (индексът става 102) — thewrap.com ("Electronic Arts Goes Private as $55 Billion Buyout Closes"), esportsadvocate.net (08/2026),
+# marketscreener.com ("Electronic Arts Inc. dropped from NASDAQ-100 Index"), github.com/jmccarrell/n100tickers (changelog). Yahoo не връща цени за EA от август.
 NDX100_STATIC_TICKERS = [
     "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "ALAB", "ALNY", "AMAT",
     "AMD", "AMGN", "AMZN", "APP", "ARM", "ASML", "AVGO", "AXON", "BKNG", "BKR",
     "CCEP", "CDNS", "CEG", "CMCSA", "COST", "CPRT", "CRWD", "CRWV", "CSCO", "CSX",
-    "CTAS", "DASH", "DDOG", "DXCM", "EA", "EXC", "FANG", "FAST", "FER", "FTNT",
+    "CTAS", "DASH", "DDOG", "DXCM", "EXC", "FANG", "FAST", "FER", "FTNT",
     "GEHC", "GILD", "GOOG", "GOOGL", "HON", "HONA", "IDXX", "INTC", "INTU", "ISRG",
     "KDP", "KHC", "KLAC", "LIN", "LITE", "LRCX", "MAR", "MCHP", "MDLZ", "MELI",
     "META", "MNST", "MPWR", "MRVL", "MSFT", "MSTR", "MU", "NBIS", "NFLX", "NVDA",
