@@ -936,7 +936,8 @@ def _net_liquidity_indicator(nl: dict) -> dict:
     """
     name = "Fed Net Liquidity"
     if nl.get("value") is None:
-        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": ""}
+        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": "",
+                "hide_reason": nl.get("hide_reason") or "няма данни"}                         # 13.10.2026: причината — за реда "Скрити днес" в картата
     if nl.get("change_4w_pct") is None:                                   # исторически формат
         status = ("green" if nl.get("trend") == "up" else "red" if nl.get("trend") == "down" else "yellow")
         label = f"${nl.get('value', '?')} млрд ({'↑' if nl.get('trend') == 'up' else '↓'}) · само информативен"

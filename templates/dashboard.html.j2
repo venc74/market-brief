@@ -566,6 +566,13 @@
     </div>
     {% endif %}
   </div>
+  {# 13.10.2026: скрит индикатор не изчезва без следа — ред с причината (Fed Net Liquidity на 13.10: RRP с последна точка 09.10, Columbus Day) #}
+  {% set hidden = thermometer.indicators|selectattr('hide')|list %}
+  {% if hidden %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Скрити днес:</b>
+    {% for ind in hidden %}{{ ind.name }} — {{ ind.hide_reason or "няма данни" }}{% if ind.get('informational') %} (информативен, не влиза в режима){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+  </div>
+  {% endif %}
 </section>
 
 {% if news %}

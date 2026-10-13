@@ -126,26 +126,33 @@ def fed_net_liquidity() -> dict:
     FIX 2026-08-18: staleness guard — WALCL/WDTGAL са седмични (config.FED_LIQUIDITY_STALENESS_DAYS),
     RRPONTSYD е дневна (config.STALENESS_THRESHOLD_DAYS). Застояли/липсващи данни → value=None, hide=True.
     """
-    hide = {"value": None, "trend": "unknown", "history": [], "hide": True}
+    # 13.10.2026: скритият индикатор носи ПРИЧИНАТА (hide_reason) — картата на термометъра я показва; до 13.10 изчезваше без ред и без банер
+    hide = lambda why: {"value": None, "trend": "unknown", "history": [], "hide": True, "hide_reason": why}
     days = config.NET_LIQ_HISTORY_DAYS
     walcl = _fred_series("WALCL", days=days)                       # млн $, седмична, сряда
     tga = _fred_series(config.NET_LIQ_TGA_SERIES, days=days)       # млн $, седмична, сряда
     rrp = _fred_series("RRPONTSYD", days=days)                     # млрд $, дневна
     if not (walcl and rrp and tga):
-        return hide
+        missing = [n for n, sr in (("WALCL", walcl), (config.NET_LIQ_TGA_SERIES, tga), ("RRPONTSYD", rrp)) if not sr]
+        return hide(f"FRED не върна данни за {', '.join(missing)}")
+    from src.setup_rules import sessions_between
     for label, series, threshold in (
         ("WALCL", walcl, config.FED_LIQUIDITY_STALENESS_DAYS),
         (config.NET_LIQ_TGA_SERIES, tga, config.FED_LIQUIDITY_STALENESS_DAYS),
-        ("RRPONTSYD", rrp, config.STALENESS_THRESHOLD_DAYS),
+        ("RRPONTSYD", rrp, None),
     ):
         d = dt.date.fromisoformat(series[-1][0])
-        if _is_stale(d, threshold):
-            print(f"[macro] Net Liquidity: {label} stale (последно наблюдение {d}, праг {threshold}д)")
-            return hide
+        # 13.10.2026: RRP (дневна) — по сесии като 2s10s (допуск config.FRED_DAILY_MAX_LAG_SESSIONS = 2), не 3 календарни дни: на 13.10 последната точка беше
+        # 09.10 (Columbus Day 12.10 — облигационен празник, NYSE работи) → 4 дни > 3 → индикаторът изчезна. Седмичните — непроменени (календарни дни).
+        stale = (sessions_between(d, dt.date.today()) > config.FRED_DAILY_MAX_LAG_SESSIONS) if threshold is None else _is_stale(d, threshold)
+        if stale:
+            limit = f"{config.FRED_DAILY_MAX_LAG_SESSIONS} сесии" if threshold is None else f"{threshold}д"
+            print(f"[macro] Net Liquidity: {label} stale (последно наблюдение {d}, праг {limit})")
+            return hide(f"{label} застояла — последно наблюдение {d.strftime('%d.%m')} (праг {limit})")
     points = _wednesday_points(walcl, tga, rrp)
     if points and _is_stale(dt.date.fromisoformat(points[-1]["date"]), config.FED_LIQUIDITY_STALENESS_DAYS):
         print(f"[macro] Net Liquidity: няма цяла сряда с трите компонента след {points[-1]['date']}")
-        return hide
+        return hide(f"няма цяла сряда с трите компонента след {dt.date.fromisoformat(points[-1]['date']).strftime('%d.%m')}")
     return liquidity_signal(points)
 
 
