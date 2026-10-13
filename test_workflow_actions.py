@@ -33,4 +33,9 @@ assert not has("daily_brief.yml", "schedule") and has("daily_brief.yml", "workfl
 assert has("oi_snapshot.yml", "schedule") and has("oi_snapshot.yml", "workflow_dispatch")
 assert not has("tests.yml", "schedule") and 'branches: ["**"]' in t["tests.yml"]
 print("  ✓ daily_brief.yml — без schedule: (workflow_dispatch от cron-job.org); oi_snapshot.yml — със schedule:; tests.yml — при push")
+
+print("── образът на runner-а (13.10.2026) ──")
+runs_on = {p.name: re.findall(r"^\s*runs-on:\s*(\S+)", t[p.name], re.M) for p in wf}
+assert all(v == ["ubuntu-24.04"] for v in runs_on.values()), runs_on                                  # ubuntu-latest минава на Ubuntu 26 от 19.10.2026
+print("  ✓ и трите workflow-а — runs-on: ubuntu-24.04 (без ubuntu-latest)")
 print("\n✅ test_workflow_actions: всичко мина")

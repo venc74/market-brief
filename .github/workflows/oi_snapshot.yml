@@ -41,7 +41,8 @@ concurrency:
 
 jobs:
   snapshot:
-    runs-on: ubuntu-latest
+    # 13.10.2026: закрепено на 24.04 — ubuntu-latest минава на Ubuntu 26 от 19.10.2026 (анотация на GitHub в run-овете)
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
