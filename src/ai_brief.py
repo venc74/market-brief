@@ -24,6 +24,7 @@ from src import backtest
 from src import net_utils
 from src import names
 from src import regime_claims
+from src import sector_claims           # 13.10.2026: "единственият сектор с положителна RS" — факт от кода + проверка
 from src import cot_theses as _cot_table     # пакет 3: таблиците за директните тикъри и знака (без AI)
 
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -661,10 +662,63 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     """
     out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news)
     try:
-        return _apply_regime_claims(out, thermometer)
+        out = _apply_regime_claims(out, thermometer)
     except Exception as e:
         print(f"[ai] проверка на твърденията за режима пропусната: {type(e).__name__}: {e}")
+    try:
+        out = _apply_sector_claims(out, rotation)
+    except Exception as e:
+        print(f"[ai] проверка на твърденията за секторите пропусната: {type(e).__name__}: {e}")
+    return out
+
+
+def _apply_sector_claims(out: dict, rotation: list[dict] | None) -> dict:
+    """
+    13.10.2026: "X е единственият сектор с положителна RS {на двата хоризонта | 4W | 12W}", което противоречи на ротацията, се заменя с текст от кода (sector_claims) в macro_brief,
+    regime_comment и във веригите на sector_logic (подлог по подразбиране — ETF-ът на веригата). Веригите стигат до промпта на тикърите — поправката е ПРЕДИ него.
+    """
+    if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
         return out
+    f = sector_claims.facts(rotation)
+    out = dict(out)
+    fixed = []
+    for field in ("macro_brief", "regime_comment"):
+        if isinstance(out.get(field), str) and out[field]:
+            new, probs = sector_claims.clean(out[field], f)
+            if probs:
+                out[field] = new
+                fixed += [{"field": field, "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
+    chains = []
+    for x in out.get("sector_logic") or []:
+        if isinstance(x, dict) and isinstance(x.get("chain"), str):
+            new, probs = sector_claims.clean(x["chain"], f, x.get("etf"))
+            if probs:
+                x = {**x, "chain": new}
+                fixed += [{"field": f"sector_logic:{x.get('etf')}", "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
+        chains.append(x)
+    if out.get("sector_logic") is not None:
+        out["sector_logic"] = chains
+    if fixed:
+        out["sector_claims_fixed"] = fixed
+        for x in fixed:
+            print(f"[ai] сектори: {x['field']} — «{x['sentence'][:120]}» → «{x['replacement']}»")
+    return out
+
+
+def apply_sector_claims_to_narratives(candidates: list[dict], rotation: list[dict] | None) -> list[dict]:
+    """13.10.2026: същата проверка върху why_now на картите (наративът на ANET беше преписал изречението от веригата). Връща поправените [{ticker, sentence, replacement}]."""
+    f = sector_claims.facts(rotation)
+    fixed = []
+    for c in candidates or []:
+        ai = c.get("ai") if isinstance(c, dict) else None
+        if isinstance(ai, dict) and isinstance(ai.get("why_now"), str) and ai["why_now"]:
+            new, probs = sector_claims.clean(ai["why_now"], f)
+            if probs:
+                ai["why_now"] = new
+                fixed += [{"ticker": c.get("ticker"), "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
+    for x in fixed:
+        print(f"[ai] сектори: why_now {x['ticker']} — «{x['sentence'][:120]}» → «{x['replacement']}»")
+    return fixed
 
 
 def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
@@ -716,6 +770,8 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
+ГОТОВО ОТ КОДА за RS на секторите (13.10.2026): {sector_claims.facts(rotation)['text']} Ако пишеш, че сектор е "единственият"/"само той" с положителна RS, \
+сверявай с тези списъци — твърдение, което им противоречи, кодът заменя.
 
 {_news_block(news)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \

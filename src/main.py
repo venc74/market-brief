@@ -578,6 +578,12 @@ def run() -> dict:
     narratives = ai_brief.ticker_narratives(
         candidates, ai_macro.get("sector_logic", []), thermo["regime"])
     candidates = ai_brief.merge_narratives(candidates, narratives)
+    # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
+    try:
+        sector_claims_fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
+    except Exception as e:
+        print(f"[main] проверката на твърденията за секторите пропусната: {type(e).__name__}: {e}")
+        sector_claims_fixed = []
     # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
     candidates = inject_split_catalysts(candidates)
     print("      COT екстремуми…")
@@ -924,7 +930,8 @@ def run() -> dict:
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,
-        "corp_excluded": corp_excluded,                                  # 13.10.2026: редове "X — изключена: …" под секциите (Watchlist, GLB, QM)
+        "corp_excluded": corp_excluded,
+        "sector_claims_fixed": sector_claims_fixed,                      # 13.10.2026: поправени "единствен сектор с положителна RS" (макро, вериги, why_now)                                  # 13.10.2026: редове "X — изключена: …" под секциите (Watchlist, GLB, QM)
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
