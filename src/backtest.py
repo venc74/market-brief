@@ -236,6 +236,52 @@ def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
     }
 
 
+# 13.10.2026 (решение на Венци): между датата на запис и датата на разпределение на предстоящо отделяне (EDGAR 8-K, spinoff_watch — прозорците идват от дневника, за да важат
+# и при повторния ingest на стари snapshot-и) НЯМА нов запис в никоя книга; причината е в LAST_SPINOFF_SKIPS (→ brief["spinoff"]["skipped_entries"]).
+SPINOFF_WINDOWS: dict[str, list[tuple[str, str]]] = {}
+LAST_SPINOFF_SKIPS: list[dict] = []
+
+
+def _spinoff_skip(ticker: str, entry_date: str, category: str) -> bool:
+    for rec, dist in SPINOFF_WINDOWS.get(ticker, []):
+        if rec <= entry_date <= dist:
+            row = {"ticker": ticker, "category": category, "entry_date": entry_date, "record": rec, "distribution": dist,
+                   "reason": f"предстоящо отделяне: запис {rec}, разпределение {dist} — нов вход не се записва"}
+            if row not in LAST_SPINOFF_SKIPS:
+                LAST_SPINOFF_SKIPS.append(row)
+                print(f"[backtest] {ticker} ({category}, {entry_date}): {row['reason']}")
+            return True
+    return False
+
+
+def apply_spinoff_notes(active: dict[str, dict], today: dt.date | None = None) -> int:
+    """
+    13.10.2026 (решение на Венци): отворен / чакащ запис в книгите на тикър с активно предупреждение за отделяне получава САМО бележка "предстои отделяне на ДД.ММ (запис ДД.ММ)"
+    (spinoff_note) — ръчният преглед остава от деня на отделянето (_flag_spin_off). Бележка с минала дата на разпределение или на затворен запис се маха. Връща броя бележки. Не вдига.
+    """
+    try:
+        from src import spinoff_watch
+        today_iso = (today or dt.date.today()).isoformat()
+        tracker = _load_tracker()
+        n, changed = 0, False
+        for rec in tracker.values():
+            t, st = rec.get("ticker"), rec.get("status")
+            h = (active or {}).get(t)
+            if h and st in ("pending", "open", "trailing"):
+                note = {"text": spinoff_watch.note_text(h), "record": h["record"], "distribution": h["distribution"]}
+                if rec.get("spinoff_note") != note:
+                    rec["spinoff_note"], changed = note, True
+                n += 1
+            elif rec.get("spinoff_note") and (st not in ("pending", "open", "trailing") or rec["spinoff_note"].get("distribution", "") < today_iso):
+                rec.pop("spinoff_note"); changed = True          # затворен запис / минало отделяне; провал на EDGAR (active = {}) НЕ маха бележката
+        if changed:
+            _save_tracker(tracker)
+        return n
+    except Exception as e:
+        print(f"[backtest] бележките за отделяне пропуснати: {type(e).__name__}: {e}")
+        return 0
+
+
 def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict]) -> None:
     """Ingest-ва ЕДИН ден's Action списък (от snapshot файл ИЛИ директно in-memory) в tracker-а."""
     for c in action_list or []:
@@ -246,6 +292,8 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
                 continue
             key = f"{ticker}_{entry_date}"
             if key in tracker or _is_continuation(tracker, ticker, entry_date):
+                continue
+            if _spinoff_skip(ticker, entry_date, CATEGORY_ACTION):
                 continue
             tracker[key] = _new_v2_record(ticker, entry_date, plan)
             continue
@@ -302,7 +350,7 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
                 and all(plan.get(k) is not None for k in _V2_PLAN_KEYS)):
             continue
         key = f"{ticker}_{entry_date}_{CATEGORY_BUYSTOP}"
-        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_BUYSTOP):
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_BUYSTOP) or _spinoff_skip(ticker, entry_date, CATEGORY_BUYSTOP):
             continue
         rec = _new_v2_record(ticker, entry_date, plan)
         rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot")})
@@ -329,7 +377,7 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         if not (ticker and isinstance(c.get("trigger"), (int, float)) and isinstance(c.get("adr"), (int, float)) and c["trigger"] > 0 and c["adr"] > 0):
             continue
         key = f"{ticker}_{entry_date}_qm"
-        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM):
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
             continue
         rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime,
                "buy_stop": round(float(c["trigger"]), 4), "adr": round(float(c["adr"]), 2), "signal_price": c.get("close"), "entry_price": c.get("close"),
@@ -360,7 +408,7 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
         if not (ticker and c.get("signal_date") and num("line") and num("close") and c["close"] > c["line"]):
             continue
         key = f"{ticker}_{entry_date}_gw"
-        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_GLB_WISH):
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_GLB_WISH) or _spinoff_skip(ticker, entry_date, CATEGORY_GLB_WISH):
             continue
         rec = {"method": "v2", "category": CATEGORY_GLB_WISH, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime,
                "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),
@@ -1051,6 +1099,7 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     today_watchlist/today_regime (пакет 1б): днешният Watchlist и режимът — buy-stop кандидатите се записват като отделна книга.
     """
     tracker = _load_tracker()
+    LAST_SPINOFF_SKIPS.clear()
     try:
         _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
@@ -1126,6 +1175,21 @@ def pending_buystop_by_ticker() -> dict[str, dict]:
     except Exception as e:
         print(f"[backtest] чакащите buy-stop записи не се прочетоха: {type(e).__name__}: {e}")
         return {}
+
+
+def live_tickers() -> list[str]:
+    """
+    13.10.2026 (spinoff_watch): тикърите с ЖИВ запис (pending / open / trailing) във всички книги по приоритет — Action, buy-stop, qm_breakout, "GLB по Уиш" (последната расте до стотици;
+    при изчерпан бюджет за EDGAR остават последни). Чисто локално четене; всяка грешка → [].
+    """
+    try:
+        order = {CATEGORY_ACTION: 0, CATEGORY_BUYSTOP: 1, CATEGORY_QM: 2, CATEGORY_GLB_WISH: 3}
+        live = [(order.get(record_category(r), 4), r["ticker"]) for r in _load_tracker().values()
+                if r.get("ticker") and r.get("status") in ("pending", "open", "trailing")]
+        return list(dict.fromkeys(t for _, t in sorted(live)))
+    except Exception as e:
+        print(f"[backtest] живите тикъри не се прочетоха: {type(e).__name__}: {e}")
+        return []
 
 
 def live_buystop_by_ticker() -> dict[str, dict]:
@@ -1215,7 +1279,7 @@ def get_buystop_summary() -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "buy_stop": r.get("buy_stop"),
                 "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
-                "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r)}
+                "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note")}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),
@@ -1336,6 +1400,7 @@ def get_qm_summary() -> dict:
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
                 "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_R_RISK_FLOOR_ADR,          # 12.10: флаг — R е смятан от пода 0.25×ADR (ELF 09.10: 0.09×ADR)
                 "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
+                "spinoff_note": r.get("spinoff_note"),                                                       # 13.10: предстоящо отделяне
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -1428,7 +1493,7 @@ def get_glb_wish_summary() -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "signal_date": r.get("signal_date"), "status": r.get("status"), "glb_type": r.get("glb_type"), "regime": r.get("regime"),
                 "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
                 "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
-                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb)}
+                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note")}
     live_all = sorted((r for r in records if r.get("status") in ("open", "pending")), key=lambda r: (r["entry_date"], r["ticker"]), reverse=True)
     live = [_row(r) for r in live_all[:15]]
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "return_pct": r.get("return_pct"), "return_pct_exec": r.get("return_pct_exec"),
@@ -1548,6 +1613,7 @@ def get_backtest_summary() -> dict:
                 "spy_return_pct": r.get("spy_return_pct"),
                 "alpha_pct": r.get("alpha_pct"),
                 "needs_manual_review": needs_review,
+                "spinoff_note": r.get("spinoff_note"),                  # 13.10.2026: "предстои отделяне на ДД.ММ (запис ДД.ММ)"
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
                 # docstring-а, дискусията 2026-08-13).
@@ -1571,7 +1637,7 @@ def get_backtest_summary() -> dict:
     pending_positions = sorted(
         ({"ticker": r["ticker"], "entry_date": r["entry_date"], "buy_stop": r.get("buy_stop"),
           "max_chase": r.get("max_chase"), "valid_through": r.get("valid_through"),
-          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1")}
+          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"), "spinoff_note": r.get("spinoff_note")}
          for r in records if r.get("status") == "pending"),
         key=lambda r: r["entry_date"])
 
