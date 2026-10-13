@@ -653,7 +653,8 @@ def run() -> dict:
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
     # 09.10: "Излязоха от вчера" — тикърите от Watchlist на предишния бриф, които днес ги няма, с причината от кода (само информация)
     wl_exits = watchlist_exits.run(today, action, watchlist, candidates, explain=screener.explain_exits,
-                                   expired=watchlist_expiry.LAST_EXPIRED)       # В2: изтекъл прозорец → тази причина, не "извън 10-те карти"
+                                   expired=watchlist_expiry.LAST_EXPIRED,       # В2: изтекъл прозорец → тази причина, не "извън 10-те карти"
+                                   corp_excluded={e["ticker"]: e["text"] for e in corp_ex_screener})   # 13.10.2026: изключен заради корпоративно действие — тази причина
     print(f"      Излязоха от Watchlist ({wl_exits.get('from', 'няма предишен бриф')}): {[r['ticker'] for r in wl_exits.get('rows', [])]}")
     # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +
     # предупреждение за тикъри без ценови данни — виж thesis_context.py. ТУК:

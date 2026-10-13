@@ -57,15 +57,18 @@ def prior_watchlist(today_iso: str, data_dir=None) -> tuple[str | None, list[dic
     return None, []
 
 
-def compute(prior_cards: list[dict], action: list[dict], watchlist: list[dict], candidates: list[dict], explain=None, expired: dict | None = None) -> list[dict]:
+def compute(prior_cards: list[dict], action: list[dict], watchlist: list[dict], candidates: list[dict], explain=None, expired: dict | None = None,
+            corp_excluded: dict | None = None) -> list[dict]:
     """
     Редовете {ticker, reason, yesterday, kind} за тикърите от предишния Watchlist, които днес не са в Action/Watchlist (в реда от вчера). explain(tickers) -> {тикър: причина} за тези извън кандидатите
-    (screener.explain_exits); без нея/при провал причината е "не е в днешния технически списък".
+    (screener.explain_exits); без нея/при провал причината е "не е в днешния технически списък". corp_excluded (13.10.2026): {тикър: текстът от реда под секцията} — изключен заради
+    корпоративно действие носи тази причина, не общата.
     """
     now = {c.get("ticker") for c in (action or [])} | {c.get("ticker") for c in (watchlist or [])}
     cands = {c.get("ticker"): c for c in (candidates or []) if c.get("ticker")}
     gone = [c for c in prior_cards if c["ticker"] not in now]
-    outside = sorted({c["ticker"] for c in gone if c["ticker"] not in cands})
+    corp = corp_excluded or {}
+    outside = sorted({c["ticker"] for c in gone if c["ticker"] not in cands and c["ticker"] not in corp})
     reasons: dict = {}
     if outside and explain is not None:
         try:
@@ -75,7 +78,9 @@ def compute(prior_cards: list[dict], action: list[dict], watchlist: list[dict], 
     rows = []
     for c in gone:
         t = c["ticker"]
-        if t in (expired or {}):
+        if t in corp:
+            reason, kind = corp[t], "corp_action"                                   # 13.10.2026: същият текст като реда "Изключени (корпоративно действие)" под Watchlist
+        elif t in (expired or {}):
             # В2 (10.10): изключен от watchlist_expiry — потвърден сетъп, чакал режима N сесии; до 10.10 тук излизаше "извън 10-те карти"
             first = (expired[t] or {}).get("first_seen_date") or "?"
             reason, kind = (f"изтекъл прозорец за промяна в режима ({config.WATCHLIST_STALENESS_DAYS} сесии от {first}, "
@@ -89,13 +94,14 @@ def compute(prior_cards: list[dict], action: list[dict], watchlist: list[dict], 
     return rows
 
 
-def run(today_iso: str, action: list[dict], watchlist: list[dict], candidates: list[dict], explain=None, data_dir=None, expired: dict | None = None) -> dict:
+def run(today_iso: str, action: list[dict], watchlist: list[dict], candidates: list[dict], explain=None, data_dir=None, expired: dict | None = None,
+        corp_excluded: dict | None = None) -> dict:
     """{"from": дата на предишния бриф, "rows": [...]} или {} (няма предишен бриф / грешка)."""
     try:
         d, prior = prior_watchlist(today_iso, data_dir)
         if d is None:
             return {}
-        return {"from": d, "rows": compute(prior, action, watchlist, candidates, explain, expired)}
+        return {"from": d, "rows": compute(prior, action, watchlist, candidates, explain, expired, corp_excluded)}
     except Exception as e:
         print(f"[watchlist_exits] пропуснато: {type(e).__name__}: {e}")
         return {}
