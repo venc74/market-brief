@@ -705,6 +705,48 @@ def _apply_sector_claims(out: dict, rotation: list[dict] | None) -> dict:
     return out
 
 
+_TRIGGER_ECHO = re.compile(r"задейств\w*\s+на\s+\d{1,2}\.\d{1,2}\s+по\s+\$\s?\d", re.I)
+
+
+def strip_trigger_echo(text: str) -> str:
+    """
+    13.10.2026: моделът преписва текста на кода за задействан запис в книгата ("…задействан на 09.10 по $194.59 · стоп … — изпълнен сигнал от книгата, не нов вход.") в why_now —
+    на картата се чете два пъти (EXPD и ANET на 13.10; в историята — 2 от 2 карти със задействан запис). Маха клаузата от началото на изречението ("; " или ". ") до "не нов вход"
+    (или до края на изречението); "; " преди нея става ".". Текстът на кода на картата (setup.trigger_text) не се пипа. Чиста функция.
+    """
+    m = _TRIGGER_ECHO.search(text or "")
+    if not m:
+        return text
+    starts = [i + 2 for i in (text.rfind(". ", 0, m.start()), text.rfind("; ", 0, m.start())) if i >= 0]
+    start = max(starts) if starts else 0
+    e = text.find("не нов вход", m.end())
+    if e >= 0:
+        end = e + len("не нов вход") + (1 if text[e + len("не нов вход"):e + len("не нов вход") + 1] == "." else 0)
+    else:
+        mm = re.search(r"\.(?=\s|$)", text[m.end():])
+        end = m.end() + (mm.end() if mm else len(text) - m.end())
+    before, after = text[:start].rstrip(), text[end:].lstrip()
+    if before.endswith(";"):
+        before = before[:-1].rstrip() + "."
+    return (before + (" " + after if after else "")).strip()
+
+
+def strip_trigger_echo_in_narratives(candidates: list[dict]) -> list[str]:
+    """Върху why_now на картите със задействан запис в buy-stop книгата (setup.triggered); връща тикърите с махнато повторение."""
+    done = []
+    for c in candidates or []:
+        ai, setup = (c.get("ai") or {}) if isinstance(c, dict) else {}, (c.get("setup") or {}) if isinstance(c, dict) else {}
+        w = ai.get("why_now")
+        if setup.get("triggered") and isinstance(w, str) and w:
+            new = strip_trigger_echo(w)
+            if new != w:
+                ai["why_now"] = new
+                done.append(c.get("ticker"))
+    if done:
+        print(f"[ai] why_now: махнато повторение на текста за задействане (той е на картата от кода): {done}")
+    return done
+
+
 def apply_sector_claims_to_narratives(candidates: list[dict], rotation: list[dict] | None) -> list[dict]:
     """13.10.2026: същата проверка върху why_now на картите (наративът на ANET беше преписал изречението от веригата). Връща поправените [{ticker, sentence, replacement}]."""
     f = sector_claims.facts(rotation)

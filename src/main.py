@@ -581,6 +581,7 @@ def run() -> dict:
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
     try:
         sector_claims_fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
+        ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
     except Exception as e:
         print(f"[main] проверката на твърденията за секторите пропусната: {type(e).__name__}: {e}")
         sector_claims_fixed = []
