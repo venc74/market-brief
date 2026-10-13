@@ -114,12 +114,13 @@ with contextlib.redirect_stdout(io.StringIO()):
     dg = ca.annotate([cards3], "2026-10-09", fetch=boom)
 assert dg["ok"] is False and "RuntimeError" in dg["error"] and "corp_action" not in cards3[0]
 w = data_warnings._corp_warning(dg)
-assert len(w) == 1 and w[0]["source"] == "corp_actions" and "НЕ значи" in w[0]["message"] and data_warnings._corp_warning({"ok": True}) == [] and data_warnings._corp_warning(None) == []
+assert len(w) == 1 and w[0]["source"] == "corp_actions" and "днес НИЩО не е изключено" in w[0]["message"] and data_warnings._corp_warning({"ok": True}) == [] and data_warnings._corp_warning(None) == []
 assert ca.annotate([[]], "2026-10-09")["checked"] == 0
 dnone = ca.annotate([[{"ticker": "X"}]], "2026-10-09", fetch=lambda ts: {})
 assert dnone["ok"] and dnone["flagged"] == []
-print("  ✓ падналото теглене → ok=False, карти без маркер, предупреждение «… липсата на маркер … НЕ значи, че няма …»; празен списък / тикър без данни — без грешка")
+print("  ✓ падналото теглене → ok=False, карти без маркер, предупреждение «… днес НИЩО не е изключено …» (от 13.10); празен списък / тикър без данни — без грешка")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)" in src and "corp_diag=corp_diag" in src and '"corp_actions": corp_diag' in src
-print("  ✓ main.run: маркерът се слага върху Action, Watchlist, GLB и QM картите преди сглобяването на брифа; diag е в brief['corp_actions'] и в data_warnings")
+# 13.10.2026: маркерът вече не се вика от main — изключване вместо маркер (test_corp_action_exclude.py); annotate() остава като чиста функция
+assert "corp_actions.annotate(" not in src and "corp_diag=corp_diag" in src and '"corp_actions": corp_diag' in src
+print("  ✓ main.run: от 13.10 маркерът не се вика (изключване — test_corp_action_exclude.py); diag е в brief['corp_actions'] и в data_warnings")
 print("\n✅ test_corp_action_marker: всичко мина")

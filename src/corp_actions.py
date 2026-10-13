@@ -8,6 +8,7 @@ from __future__ import annotations
 import datetime as dt
 
 import numpy as np
+import pandas as pd
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -108,3 +109,166 @@ def annotate(cards_groups: list[list[dict]], today: str | dt.date, fetch=None, s
         diag.update(ok=False, error=f"{type(e).__name__}: {e}")
         print(f"[corp_actions] проверката за корпоративни действия пропусната: {diag['error']}")
     return diag
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 13.10.2026 (решение на Венци): ИЗКЛЮЧВАНЕ вместо маркер. Тикър със събитие с НЕЦЯЛ коефициент (отделяне / сплит с оценъчен коефициент от Yahoo) не е карта, сигнал или запис в модул,
+# чийто прозорец назад обхваща датата — докато прозорецът се изчисти. Повод: CTVA в GLB на 13.10 ("пробив над историческия връх" +4.6% над линия $12.71 = юнското затваряне ~$85 ÷ 6.665;
+# грешката на коефициента е по-голяма от "пробива"). Прозорците (config): скрийнър — CORP_ACTION_SCREENER_SESSIONS (52 седмици, RS 12 месеца, pivot); QM — CORP_ACTION_QM_SESSIONS
+# (6-месечният ръст); GLB и книгата "GLB по Уиш" — месецът на линията е ПРЕДИ събитието. Цели сплитове — без промяна. Изключените излизат като ред под секцията (brief["corp_excluded"]).
+# Graceful: провал на тегленето → нищо не се изключва, LAST_DIAG ok=False (банер в data_warnings — липсата на изключване тогава не значи "няма събитие").
+# ══════════════════════════════════════════════════════════════════════════
+LAST_DIAG: dict = {"ok": True, "checked": 0, "excluded": [], "error": None}
+_SERIES: dict = {}                                   # тикър → {"dates", "ratios", "close"} — едно теглене на тикър за run-а
+
+
+def reset() -> None:
+    """Нов run: празен кеш и диагностика."""
+    _SERIES.clear()
+    LAST_DIAG.clear()
+    LAST_DIAG.update(ok=True, checked=0, excluded=[], error=None)
+
+
+def fetch_actions(tickers: list[str], period: str | None = None) -> dict[str, dict]:
+    """{тикър: {"dates": [...], "ratios": [...], "close": pd.Series}} от ЕДНА партида yf.download(…, actions=True). Провал → вдига (exclude го хваща)."""
+    if yf is None:
+        raise RuntimeError("yfinance не е наличен")
+    tickers = list(tickers)
+    data = yf.download(tickers, period=period or config.CORP_ACTION_FETCH_PERIOD, progress=False, auto_adjust=False, actions=True, group_by="ticker", threads=True)
+    if data is None or len(data) == 0:
+        raise ValueError("празен резултат")
+    multi = hasattr(data.columns, "levels") and getattr(data.columns, "nlevels", 1) > 1
+    out = {}
+    for t in tickers:
+        try:
+            f = data[t] if multi else data
+            sp = f["Stock Splits"].dropna()
+            sp = sp[sp != 0]
+            out[t] = {"dates": [x.date().isoformat() for x in sp.index], "ratios": [float(v) for v in sp.to_numpy()], "close": f["Close"].dropna()}
+        except Exception:
+            continue
+    return out
+
+
+def _sessions_after(day: dt.date, n: int) -> dt.date:
+    """Датата, на която се навършват n NYSE сесии след `day` (без самия ден) — краят на прозореца."""
+    d, k = day, 0
+    while k < n:
+        d += dt.timedelta(days=1)
+        if d.weekday() < 5 and d.isoformat() not in config.NYSE_HOLIDAYS:
+            k += 1
+    return d
+
+
+def is_exact_ratio(r: float) -> bool:
+    """
+    13.10.2026: точна корекция — цял коефициент (is_whole_ratio) или проста дроб p/q с q ≤ config.CORP_ACTION_EXACT_MAX_DENOM (1.5 = 3:2, 1.25 = 5:4, 0.6667 = 2:3). Отделянията
+    (6.665, 1.243, 1.241, 1.327 …) не са. Чиста функция.
+    """
+    try:
+        r = float(r)
+        if not r > 0 or r == 1:
+            return False
+        if is_whole_ratio(r):
+            return True
+        for q in range(2, config.CORP_ACTION_EXACT_MAX_DENOM + 1):
+            pq = round(r * q)
+            if pq >= 1 and pq != q and abs(r * q - pq) <= config.CORP_ACTION_INTEGER_TOL:      # абсолютно върху числителя: 6.665 × 3 = 19.995 → не е 20/3
+                return True
+        return False
+    except (TypeError, ValueError):
+        return False
+
+
+def window_hit(module: str, row: dict, events: list[dict]) -> dict | None:
+    """Събитието (най-новото), което попада в прозореца назад на модула, или None. events — от uncertain_events (с sessions_ago)."""
+    for ev in events:
+        if module == "screener" and 0 <= ev["sessions_ago"] < config.CORP_ACTION_SCREENER_SESSIONS:
+            return ev
+        if module == "qm" and 0 <= ev["sessions_ago"] < config.CORP_ACTION_QM_SESSIONS:
+            return ev
+        if module in ("glb", "glb_wish"):
+            month = str(row.get("prior_high_month") or "")[:7]
+            if (ev["date"][:7] > month) if month else (0 <= ev["sessions_ago"] < config.CORP_ACTION_SCREENER_SESSIONS):
+                return ev
+    return None
+
+
+def _close_before(close, day: str):
+    try:
+        c = close[close.index.tz_localize(None) < pd.Timestamp(day)] if getattr(close.index, "tz", None) is not None else close[close.index < pd.Timestamp(day)]
+        return float(c.iloc[-1]) if len(c) else None
+    except Exception:
+        return None
+
+
+def _last_close(close):
+    try:
+        idx = close.index.tz_localize(None) if getattr(close.index, "tz", None) is not None else close.index
+        return float(close.iloc[-1]), pd.Timestamp(idx[-1]).date()
+    except Exception:
+        return None, None
+
+
+def exclusion_text(ticker: str, ev: dict, module: str) -> str:
+    """Редът под секцията. Известно отделяне (config.CORP_ACTIONS_KNOWN) — с новата компания и сбора; иначе — общо описание. Цената преди = затварянето преди датата × коефициента на Yahoo."""
+    d = dt.date.fromisoformat(ev["date"])
+    known = config.CORP_ACTIONS_KNOWN.get(ticker) or {}
+    if known.get("date") and known["date"] != ev["date"]:
+        known = {}
+    what = (f"{known.get('kind', 'отделяне')} на {known['new_name']} ({known.get('ratio_text', '')}) на {d:%d.%m}" if known.get("new_name")
+            else f"корпоративно действие на {d:%d.%m} (нецял коефициент {ev['ratio']:g} — отделяне или сплит с нецял коефициент)")
+    parts = [f"{ticker} — изключена: {what}", f"историята преди датата е оценка на Yahoo (коефициент {ev['ratio']:g})"]
+    s = _SERIES.get(ticker) or {}
+    pre = _close_before(s.get("close"), ev["date"]) if s.get("close") is not None else None
+    if known.get("new_ticker") and pre:
+        now, when = _last_close(s["close"])
+        new = (_SERIES.get(known["new_ticker"]) or {}).get("close")
+        new_now, new_when = _last_close(new) if new is not None else (None, None)
+        if now and new_now and when == new_when:
+            total = now + known.get("new_per_share", 1.0) * new_now
+            pre_raw = pre * ev["ratio"]
+            parts.append(f"{ticker} + {known['new_ticker']} = ${total:.2f} към {when:%d.%m} спрямо ${pre_raw:.2f} преди ({(total / pre_raw - 1) * 100:+.1f}%)")
+    if module == "screener":
+        parts.append(f"извън скрийнъра до {_sessions_after(d, config.CORP_ACTION_SCREENER_SESSIONS):%d.%m.%Y} ({config.CORP_ACTION_SCREENER_SESSIONS} сесии — 52 седмици, RS, pivot)")
+    elif module == "qm":
+        parts.append(f"извън скенера до {_sessions_after(d, config.CORP_ACTION_QM_SESSIONS):%d.%m.%Y} ({config.CORP_ACTION_QM_SESSIONS} сесии — ръстът за 6 месеца)")
+    else:
+        parts.append(f"връща се, когато линията е от месец след {d:%m.%Y}")
+    return "; ".join(parts)
+
+
+def exclude(rows: list[dict], module: str, today, fetch=None) -> tuple[list[dict], list[dict]]:
+    """
+    (останали, изключени) за редовете на един модул ("screener" | "qm" | "glb" | "glb_wish"). Тегли (веднъж за run-а) колоната "Stock Splits" и Close за тикърите + новите компании от
+    config.CORP_ACTIONS_KNOWN. Изключеният ред е {ticker, module, date, ratio, text}. Не вдига: провал → нищо не се изключва, LAST_DIAG ok=False.
+    """
+    day = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today)[:10])
+    rows = list(rows or [])
+    tickers = sorted({r.get("ticker") for r in rows if isinstance(r, dict) and r.get("ticker")})
+    if not tickers:
+        return rows, []
+    try:
+        need = [t for t in tickers if t not in _SERIES]
+        need += [k["new_ticker"] for t, k in config.CORP_ACTIONS_KNOWN.items() if t in tickers and k.get("new_ticker") and k["new_ticker"] not in _SERIES]
+        if need:
+            _SERIES.update((fetch or fetch_actions)(sorted(set(need))))
+        LAST_DIAG["checked"] = LAST_DIAG.get("checked", 0) + len(tickers)
+        kept, out = [], []
+        for r in rows:
+            s = _SERIES.get(r.get("ticker")) if isinstance(r, dict) else None
+            evs = [] if not s or r.get("ticker") in config.CORP_ACTION_EXACT_TICKERS else \
+                [e for e in uncertain_events(s["dates"], s["ratios"], day, sessions=10 ** 6) if not is_exact_ratio(e["ratio"])]
+            ev = window_hit(module, r, evs) if evs else None
+            if ev:
+                out.append({"ticker": r["ticker"], "module": module, "date": ev["date"], "ratio": ev["ratio"], "text": exclusion_text(r["ticker"], ev, module)})
+            else:
+                kept.append(r)
+        LAST_DIAG.setdefault("excluded", []).extend(out)
+        for e in out:
+            print(f"[corp_actions] {e['module']}: {e['text']}")
+        return kept, out
+    except Exception as e:
+        LAST_DIAG.update(ok=False, error=f"{type(e).__name__}: {e}")
+        print(f"[corp_actions] изключването за '{module}' пропуснато: {LAST_DIAG['error']}")
+        return rows, []

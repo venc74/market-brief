@@ -210,6 +210,24 @@ QM_MAX_DIST_RULE_FROM = os.getenv("QM_MAX_DIST_RULE_FROM", "2026-10-09")
 # са приблизителни. Цял коефициент (2:1, 4:1, 1:5) е точна корекция и не се маркира. Маркер (не изключване) на Action, Watchlist, GLB и QM картите за събития в последните CORP_ACTION_WARN_SESSIONS сесии.
 CORP_ACTION_WARN_SESSIONS = int(os.getenv("CORP_ACTION_WARN_SESSIONS", 60))
 CORP_ACTION_INTEGER_TOL = 1e-3          # относителен допуск, при който коефициентът (или обратният му) се счита за цял
+# 13.10.2026 (решение на Венци): ИЗКЛЮЧВАНЕ, не маркер. Повод — CTVA в GLB на 13.10: "Classic", "пробив над историческия връх" +4.6% над линия $12.71 = юнското затваряне ~$85 ÷ 6.665
+# (оценката на Yahoo за отделянето на Vylor); грешката на коефициента (+7.9% в деня при σ 1.9%) е по-голяма от "пробива". След събитие с НЕЦЯЛ коефициент тикърът не е карта / сигнал / запис
+# в модул, чийто прозорец назад обхваща датата — докато прозорецът се изчисти (corp_actions.exclude). Цели сплитове — без промяна.
+CORP_ACTION_SCREENER_SESSIONS = int(os.getenv("CORP_ACTION_SCREENER_SESSIONS", 252))     # Action/Watchlist: 52 седмици (52w high/low, RS rating 12 месеца, pivot 65 бара)
+CORP_ACTION_QM_SESSIONS = int(os.getenv("CORP_ACTION_QM_SESSIONS", 130))                 # Qullamaggie: ръстът за 6 месеца (126 бара) и признаците (qm_breakout.MIN_BARS = 130)
+CORP_ACTION_FETCH_PERIOD = os.getenv("CORP_ACTION_FETCH_PERIOD", "5y")                    # GLB: месецът на линията може да е години назад — събитие след него в последните 5 г.
+# Точни корекции освен целите: проста дроб със знаменател ≤ CORP_ACTION_EXACT_MAX_DENOM (3:2, 4:3, 5:4 — SF 27.02.2026 и APG 01.07.2025 са сплитове 3 за 2) и тикърите с известен
+# дивидент в акции (CBSH: 5% всеки декември, коефициент 1.05). Измерено 13.10 върху универса (903 тикъра, 2 години): 18 събития с нецял коефициент; дробите хващат точно SF и APG, а сред
+# останалите 16 (отделяния и разпределения на акции — CTVA, MIDD, SPGI, HON×2, FDX, BDX, CMCSA, FNF, DD, FTV, J, WDC, LEN) нито едно не е проста дроб. J 1.01 е разпределение на Amentum (оценка),
+# не дивидент в акции — затова "два знака след запетаята" НЕ е правило за точност.
+CORP_ACTION_EXACT_MAX_DENOM = int(os.getenv("CORP_ACTION_EXACT_MAX_DENOM", 4))
+CORP_ACTION_EXACT_TICKERS = {"CBSH": "5% дивидент в акции всеки декември — точна корекция"}
+# Известни отделяния: текстът на реда ("отделяне на Vylor (1:1)") и сборът родител + нова компания. Yahoo дава само коефициента — останалото е от документите на компанията.
+# new_per_share = акции на новата компания за една акция на родителя.
+CORP_ACTIONS_KNOWN = {
+    "CTVA": {"date": "2026-10-01", "kind": "отделяне", "new_ticker": "VYLR", "new_name": "Vylor", "new_per_share": 1.0, "ratio_text": "1:1",
+             "source": "Corteva 8-K, Date of Report 12.09.2026 (прессъобщение 14.09.2026): запис 24.09, разпределение преди отварянето на 01.10, 1 VYLR за 1 CTVA"},
+}
 QM_TRIGGER_BARS = 10                                             # ниво на пробив = най-високият High на последните 10 сесии (върхът на флага)
 QM_ADR_MIN = float(os.getenv("QM_ADR_MIN", 3.0))                 # ADR20 ≥ 3% (негово е само "стопът ≤ ADR"; минималният ADR е мой)
 QM_DOLLAR_VOLUME_MIN = float(os.getenv("QM_DOLLAR_VOLUME_MIN", 10_000_000))   # среден 20-дневен долар обем (мое; универсът е >$60M)

@@ -535,6 +535,9 @@ def run() -> dict:
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
+    # 13.10.2026: корпоративно действие с нецял коефициент (отделяне) в прозореца на скрийнъра (52 седмици) → кандидатът отпада ПРЕДИ AI синтеза и книгите (corp_actions.exclude)
+    corp_actions.reset()
+    candidates, corp_ex_screener = corp_actions.exclude(candidates, "screener", today)
     # 12.10.2026: ранната резолюция на книгите (виж FIX 2026-09-17 по-долу) е ПРЕДИ setup_rules.annotate — картата в Watchlist чете
     # състоянието на buy-stop книгата (live_buystop_by_ticker), а до 12.10 го четеше от диска преди резолюцията: EXPD беше "open, вход 09.10
     # по $194.59" в книгата и "чака buy-stop" на картата в същия бриф. Резолюцията чете само tracker-а и цените (без кандидатите) — нищо
@@ -697,12 +700,16 @@ def run() -> dict:
             glb_screener.LAST_STATUS = {"ok": False, "error": f"{type(e).__name__}: {e}"}      # С3: банер + ред в секцията вместо тишина
     else:
         glb_candidates = []
+    # 13.10.2026: GLB карта / сигнал на книгата "GLB по Уиш", чиято линия е от месец ПРЕДИ отделяне (нецял коефициент) → не се показва и не се записва (CTVA 13.10)
+    glb_candidates, corp_ex_glb = corp_actions.exclude(glb_candidates, "glb", today)
+    glb_wish_signals, corp_ex_gw = corp_actions.exclude(glb_wish_signals, "glb_wish", today)
     for row in glb_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
 
     # Qullamaggie breakout скенер (06.10.2026) — ОТДЕЛНА стратегия: механичен (без AI), собствено теглене на данни, независим от CANSLIM и GLB. Не е препоръка — измерване.
     # Explicit try/except, същият дух като GLB блока: неочакван провал не чупи брифа (празният списък се придружава от предупреждение в data_warnings).
     qm_rows, qm_diag, qm_cards, qm_ep_out = [], {}, [], {}
+    corp_ex_qm: list[dict] = []
     qm_universe: list[str] = []
     if config.ENABLE_QM or config.ENABLE_QM_EP:
         try:
@@ -713,6 +720,7 @@ def run() -> dict:
     if config.ENABLE_QM and qm_universe:
         try:
             qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
+            qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)      # 13.10.2026: отделяне в прозореца на 6-месечния ръст → не е кандидат (нито карта, нито запис)
             qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
             try:                                                     # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
                 import yfinance as _yf
@@ -883,8 +891,11 @@ def run() -> dict:
             print(f"[splits] отчетът се провали: {e}")
 
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
-    corp_diag = corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)
-    print(f"      Корпоративни действия: проверени {corp_diag['checked']} тикъра, маркирани {[f['ticker'] for f in corp_diag['flagged']]}" + ("" if corp_diag["ok"] else f" — ПРОВАЛ: {corp_diag['error']}"))
+    # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
+    corp_diag = dict(corp_actions.LAST_DIAG)
+    corp_excluded = {"screener": corp_ex_screener, "glb": corp_ex_glb + [e for e in corp_ex_gw if e["ticker"] not in {x["ticker"] for x in corp_ex_glb}], "qm": corp_ex_qm}
+    print(f"      Корпоративни действия: проверени {corp_diag.get('checked', 0)} тикъра, изключени {[(e['ticker'], e['module']) for e in corp_diag.get('excluded', [])]}"
+          + ("" if corp_diag.get("ok", True) else f" — ПРОВАЛ: {corp_diag.get('error')}"))
 
     # С5 (втори преглед, 10.10.2026): канарче за split корекцията на Yahoo — една заявка; провал на тегленето → неизвестно, без банер
     canary = data_canary.check() if config.ENABLE_DATA_CANARY else None
@@ -913,6 +924,7 @@ def run() -> dict:
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,
+        "corp_excluded": corp_excluded,                                  # 13.10.2026: редове "X — изключена: …" под секциите (Watchlist, GLB, QM)
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +

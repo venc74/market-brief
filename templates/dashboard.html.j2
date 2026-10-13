@@ -940,8 +940,12 @@
 </div>
 {% endif %}
 
+{# 13.10.2026: изключени заради корпоративно действие с нецял коефициент (отделяне) — ред под секцията; текстът е от кода (corp_actions.exclusion_text) #}
+{% macro corp_excluded_line(rows) %}{% if rows %}<div class="small corp-excluded" style="font-size:12.5px;color:var(--yellow);margin:0 0 10px"><b>Изключени (корпоративно действие):</b>
+  {% for e in rows %}{{ e.text }}{{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}{% endmacro %}
 <section>
   <h2>Watchlist · {{ watchlist|length }}{% if watchlist_compact %} <span style="font-size:13px;color:var(--muted);font-weight:400">(+{{ watchlist_compact|length }} без сетъп за вход)</span>{% endif %}</h2>
+  {{ corp_excluded_line(corp_excluded.get("screener")) }}
   {# 09.10: "Излязоха от вчера" — тикърите от предишния Watchlist, които днес ги няма, с причината от кода (само информация) #}
   {% if watchlist_exits and watchlist_exits.get("from") %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от {{ watchlist_exits_label }}:</b>
@@ -1019,6 +1023,7 @@
     Отделна стратегия, механичен скенер (без AI), независим от CANSLIM скрийнъра, GLB и от Action/Watchlist; не влиза в Action и не променя размера на позициите ни.
     <b>Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</b>
   </div>
+  {{ corp_excluded_line(corp_excluded.get("qm")) }}
   {% if qm_diag and qm_diag.ok is sameas false %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
   {% else %}
@@ -1192,6 +1197,7 @@
     <b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията ·
     <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
   </div>
+  {{ corp_excluded_line(corp_excluded.get("glb")) }}
   {% if glb_classic %}
   <div class="glb-group-label classic">Classic GLB ({{ glb_classic|length }})</div>
   <div class="glb-grid">
@@ -1275,6 +1281,7 @@
   {% else %}
   <div class="small" style="font-size:12.5px;color:var(--muted)">Няма GLB кандидати днес — проверени {{ glb_status.with_history }} от {{ glb_status.universe }} тикъра{% if glb_status.batches_failed %} ({{ glb_status.batches_failed }} партиди не се изтеглиха){% endif %}.</div>
   {% endif %}
+  {{ corp_excluded_line(corp_excluded.get("glb")) }}
 </section>
 {% endif %}
 
