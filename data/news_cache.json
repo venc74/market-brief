@@ -1,37 +1,37 @@
 {
- "date": "2026-10-12",
+ "date": "2026-10-13",
  "news": [
   {
-   "headline": "Oil falls after Trump declares 'energy ceasefire' between Russia and Ukraine",
-   "why": "Потенциалното спиране на атаките срещу енергийна инфраструктура намалява рисковата премия в петрола и натиска върху цените надолу, директно засягайки energy сектора и инфлационните очаквания."
+   "headline": "IMF warns bond yields could see a 'disorderly' spike as debt, inflation risks worsen",
+   "why": "Рязък и неконтролиран скок на доходностите би предизвикал разпродажба в облигации и акции глобално, увеличавайки разходите по финансиране за правителства и корпорации."
   },
   {
-   "headline": "Gold gains on weaker oil, dollar; US inflation data in focus",
-   "why": "Пазарът очаква ключов макро release — инфлационни данни (CPI/PCE), което движи gold и dollar positioning преди публикуването."
+   "headline": "Top economies heading for biggest budget deficits since Covid, IMF warns",
+   "why": "Нарастващите фискални дефицити в G7 повишават риска от по-висока дългосрочна инфлация и натиск върху суверенните облигации, което засяга цената на капитала."
   },
   {
-   "headline": "Dollar steady near 18-month high as Mideast conflict, US inflation in focus",
-   "why": "DXY на 18-месечен връх влияе върху целия asset mix — commodities, EM активи и мултинационални корпоративни приходи, с поглед към предстоящите инфлационни данни."
+   "headline": "IMF cites AI slowdown, spiking yields as looming global market risks",
+   "why": "IMF официално идентифицира AI разочарованието и скока на доходностите като системни рискове, което валидира текущата разпродажба в tech и bond пазарите."
   },
   {
-   "headline": "US Republicans and Democrats want Trump to reverse course on Russia diesel deal",
-   "why": "Двупартийната опозиция в Конгреса срещу дизеловата сделка с Русия създава риск от законодателна намеса и санкционни усложнения, засягащи energy пазарите."
+   "headline": "Oil prices fall as traders assess Russian diesel supply prospects and Saudi-Houthi conflict",
+   "why": "Противоречиви сигнали — руски дизел на пазара срещу рискове от ескалация в Персийския залив — движат волатилността в crude и засягат енергийния сектор."
   },
   {
-   "headline": "US threatens to block arms for Ukraine over attacks on Russian refineries",
-   "why": "Геополитическият натиск върху Украйна да спре ударите по рафинерии директно засяга петролните фючърси и енергийната инфраструктура в региона."
+   "headline": "Houthi assault on Saudi airports strikes at MBS's economic vision",
+   "why": "Атаките срещу летище Рияд дестабилизират ключов петролен производител и увеличават геополитическата премия в цените на суровия петрол."
   },
   {
-   "headline": "Iran says US response to its proposal to reopen Hormuz was 'insufficient'",
-   "why": "Задънена улица по Hormuz преговорите поддържа геополитическа рискова премия в петрола и засяга глобалните доставки на суровини."
+   "headline": "EU sanctions nearly 1,600 Russian people and firms linked to drone and missile parts",
+   "why": "Новите санкции на ЕС разширяват ограниченията върху руския износ и вериги за доставки, което влияе на европейски компании с експозиция към Русия."
   },
   {
-   "headline": "Houthi attacks on Saudi airport — BP and oil chiefs pull out of Riyadh energy congress; FAA warns US airlines",
-   "why": "Повтарящите се удари по саудитска инфраструктура ескалират Middle East риска, движат петролните цени и засягат авиационния сектор."
+   "headline": "China's carmakers export more as EU caps hybrid vehicle imports at 350,000 a year",
+   "why": "Регулаторната квота на ЕК върху китайски хибридни автомобили е директна търговска мярка с ефект върху европейски и китайски автопроизводители."
   },
   {
-   "headline": "TSMC expected to report sixth straight quarter of record profit thanks to AI boom",
-   "why": "Резултатите на TSMC са водещ индикатор за целия semiconductor и AI сектор и ще задават тона на tech earnings сезона."
+   "headline": "Higher rates could be needed to avoid 'inflationary mindset' taking hold, says Fed's Hammack",
+   "why": "Hawkish коментар от управител на Cleveland Fed засилва очакванията за по-дълго задържане на лихвите, натискайки акции и облигации надолу."
   }
  ]
 }

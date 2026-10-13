@@ -1,5 +1,5 @@
 {
- "date": "2026-10-12",
+ "date": "2026-10-13",
  "rows": [],
  "horizon": [
   {
@@ -51,6 +51,14 @@
    "date_human": "Oct 12, 2026"
   },
   {
+   "ticker": "FMFC",
+   "company": "Kandal M Venture Limited",
+   "date": "2026-10-13",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Oct 13, 2026"
+  },
+  {
    "ticker": "AMTD",
    "company": "AMTD IDEA Group",
    "date": "2026-10-19",
@@ -70,17 +78,18 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 8,
+  "source_rows": 9,
   "horizon_from": "2026-10-12",
   "horizon_to": "2026-10-23",
-  "in_week": 6,
+  "in_week": 7,
   "dropped_price": [
    "DFLI",
    "MDCX",
    "NIVF",
    "NXGL",
    "POAS",
-   "ZBAO"
+   "ZBAO",
+   "FMFC"
   ],
   "dropped_cap": [],
   "dropped_no_data": [],

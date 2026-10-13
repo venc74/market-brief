@@ -473,5 +473,34 @@
   "discovered_date": "2026-10-12",
   "realized_r": -1.0,
   "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.4%, 4.4× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "SITC_2026-09-15": {
+  "ticker": "SITC",
+  "entry_date": "2026-09-15",
+  "status": "stopped",
+  "entry_price": 2.82,
+  "target_1": 2.18,
+  "stop_loss": 3.14,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 3,
+  "target1_hit_date": null,
+  "resolution_date": "2026-09-30",
+  "discovered_date": "2026-10-13",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+8.4%, 4.5× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "NLOP_2026-10-13": {
+  "ticker": "NLOP",
+  "entry_date": "2026-10-13",
+  "status": "open",
+  "entry_price": 9.65,
+  "target_1": 7.19,
+  "stop_loss": 10.88,
+  "lagging_sector": "Недвижими имоти",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null
  }
 }

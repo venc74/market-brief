@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-12",
+ "updated": "2026-10-13",
  "enter": 0.97,
  "stay": 0.94,
  "tickers": [
@@ -8,6 +8,7 @@
   "ANET",
   "BIIB",
   "DDOG",
+  "DINO",
   "EXEL",
   "EXPD",
   "FFIV",
@@ -18,8 +19,9 @@
   "NTAP",
   "PANW",
   "PSX",
-  "QLYS",
   "RGA",
+  "SN",
+  "VLO",
   "ZBRA"
  ]
 }

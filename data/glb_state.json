@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-12",
+ "updated": "2026-10-13",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -340,6 +340,46 @@
    "since": "2026-10-09",
    "since_close": 209.05,
    "since_bar": "2026-10-09"
+  },
+  "MSFT": {
+   "ticker": "MSFT",
+   "company": "Microsoft Corporation",
+   "glb_type": "momentum",
+   "prior_high": 533.5,
+   "prior_high_month": "2025-07",
+   "months_unpenetrated": 14,
+   "ath_label": "all_time_high",
+   "history_years": 40.6,
+   "breakout_volume_ratio": 0.73,
+   "tightness": {
+    "band_hold_pct": 79.4,
+    "tightness_range_pct": 29.96,
+    "meets_tightness": false
+   },
+   "line": 533.5,
+   "since": "2026-10-13",
+   "since_close": 541.15,
+   "since_bar": "2026-10-12"
+  },
+  "XOM": {
+   "ticker": "XOM",
+   "company": "ExxonMobil Holdings Corporation",
+   "glb_type": "classic",
+   "prior_high": 169.66,
+   "prior_high_month": "2026-03",
+   "months_unpenetrated": 6,
+   "ath_label": "all_time_high",
+   "history_years": 64.8,
+   "breakout_volume_ratio": 0.64,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 16.66,
+    "meets_tightness": true
+   },
+   "line": 169.66,
+   "since": "2026-10-13",
+   "since_close": 172.15,
+   "since_bar": "2026-10-12"
   }
  },
  "seed": {
