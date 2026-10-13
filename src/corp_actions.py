@@ -189,10 +189,23 @@ def is_material(ticker: str | None, ratio: float, date: str | None = None) -> bo
     if ticker in config.CORP_ACTION_EXACT_TICKERS or is_exact_ratio(ratio):
         return False
     k = config.CORP_ACTIONS_KNOWN.get(ticker or "") or {}
-    if k.get("material") and date and k.get("date") == str(date)[:10]:
-        return True
+    confirmed = bool(k) and bool(date) and k.get("date") == str(date)[:10]
+    if confirmed and "material" in k:
+        return bool(k["material"])                                     # потвърдено в таблицата — нейната преценка
     try:
-        return float(ratio) >= config.CORP_ACTION_MATERIAL_RATIO
+        r = float(ratio)
+    except (TypeError, ValueError):
+        return False
+    if r < 1:
+        return True                    # 13.10.2026: под 1 и не е проста дроб (HON 0.9535 — отделяне, слято с обратен сплит) → съществено по подразбиране, докато не се потвърди в таблицата
+    return r >= config.CORP_ACTION_MATERIAL_RATIO
+
+
+def needs_check(ticker: str | None, ratio: float, date: str | None) -> bool:
+    """13.10.2026: съществено САМО по подразбирането за коефициент под 1 (не е проста дроб, няма запис за датата в CORP_ACTIONS_KNOWN) → редът казва "нужна проверка"."""
+    k = config.CORP_ACTIONS_KNOWN.get(ticker or "") or {}
+    try:
+        return float(ratio) < 1 and not is_exact_ratio(ratio) and not (k and date and k.get("date") == str(date)[:10])
     except (TypeError, ValueError):
         return False
 
@@ -241,8 +254,13 @@ def exclusion_text(ticker: str, ev: dict, module: str) -> str:
     known = config.CORP_ACTIONS_KNOWN.get(ticker) or {}
     if known.get("date") and known["date"] != ev["date"]:
         known = {}
-    what = (f"{known.get('kind', 'отделяне')} на {known['new_name']}" + (f" ({known['ratio_text']})" if known.get("ratio_text") else "") + f" на {d:%d.%m}" if known.get("new_name")
-            else f"корпоративно действие на {d:%d.%m} (нецял коефициент {ev['ratio']:g} — отделяне или сплит с нецял коефициент)")
+    if known.get("new_name"):
+        what = f"{known.get('kind', 'отделяне')} на {known['new_name']}" + (f" ({known['ratio_text']})" if known.get("ratio_text") else "") + f" на {d:%d.%m}"
+    elif needs_check(ticker, ev["ratio"], ev["date"]):
+        what = (f"корпоративно действие на {d:%d.%m} (коефициент {ev['ratio']:g} — под 1 и не е проста дроб: вероятно отделяне, слято с обратен сплит) — "
+                f"нужна проверка, докато не бъде потвърдено в CORP_ACTIONS_KNOWN")
+    else:
+        what = f"корпоративно действие на {d:%d.%m} (нецял коефициент {ev['ratio']:g} — отделяне или сплит с нецял коефициент)"
     parts = [f"{ticker} — изключена: {what}", f"историята преди датата е оценка на Yahoo (коефициент {ev['ratio']:g})"]
     s = _SERIES.get(ticker) or {}
     pre = _close_before(s.get("close"), ev["date"]) if s.get("close") is not None else None

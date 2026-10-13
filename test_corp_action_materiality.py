@@ -44,7 +44,7 @@ EV = [("CTVA", "2026-10-01", 6.665, True), ("MIDD", "2026-07-07", 1.243, True), 
       ("WDC", "2025-02-24", 1.323, True), ("LEN", "2025-01-21", 1.033, False), ("CBSH", "2024-12-03", 1.05, False)]
 for t, d, r, want in EV:
     assert ca.is_material(t, r, d) is want, (t, d, r)
-assert config.CORP_ACTION_MATERIAL_RATIO == 1.10 and not ca.is_material("HON", 0.9535, "2025-01-01")             # HON — само за датата от таблицата
+assert config.CORP_ACTION_MATERIAL_RATIO == 1.10 and ca.is_material("HON", 0.9535, "2025-01-01") and ca.needs_check("HON", 0.9535, "2025-01-01")   # 13.10: под 1 без запис за датата — съществен по подразбиране, "нужна проверка"
 print(f"  ✓ съществени ({sum(w for *_, w in EV)}): CTVA, MIDD, HON 29.06 (по таблицата), FDX, BDX, DD, FTV, WDC; под прага — SPGI, CMCSA, FNF, HON 30.10, J, LEN; точни — SF, APG, CBSH×2")
 
 print()
