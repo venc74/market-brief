@@ -28,6 +28,7 @@ from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
 from src import correlation_check
 from src import backtest
+from src import spinoff_watch
 from src import tracker_switch
 from src import cot
 from src import cot_track
@@ -787,8 +788,22 @@ def run() -> dict:
     # "ден+1" прозорец, в който днешен Action тикър не се разпознаваше като жива
     # позиция утре (потвърдени случаи: FITB, JPM, HWM). Подаваме днешния action
     # списък директно, за да е налично в tracker-а от утрешния run нататък.
+    # 13.10.2026: предупреждение за ПРЕДСТОЯЩО отделяне от EDGAR 8-K (spinoff_watch) — само нашите тикъри (карти първо, после живите записи в книгите); преди книгите, защото
+    # нов вход между датата на запис и разпределението не се записва (прозорците — от дневника data/spinoff_log.json, за да важат и за повторния ingest на snapshot-и)
+    spinoff_active: dict = {}
+    try:
+        card_tickers = [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])]
+        spinoff_active = spinoff_watch.check(card_tickers + (backtest.live_tickers() if config.ENABLE_BACKTEST else []), today, budget_sec=config.SPINOFF_BUDGET_SEC)
+        n_sp = spinoff_watch.annotate([action, watchlist, qm_cards, glb_candidates], spinoff_active)
+        backtest.SPINOFF_WINDOWS = spinoff_watch.windows()
+        print(f"      Предстоящо отделяне (EDGAR 8-K): проверени {spinoff_watch.LAST_DIAG.get('checked', 0)} тикъра, нови 8-K прочетени {spinoff_watch.LAST_DIAG.get('fetched', 0)}, "
+              f"активни {sorted(spinoff_active)}, карти с предупреждение {n_sp}")
+    except Exception as e:
+        print(f"[main] предупреждението за отделяне пропуснато: {type(e).__name__}: {e}")
+        spinoff_watch.LAST_DIAG.update(ok=False, error=f"{type(e).__name__}: {e}")
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+        backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
         try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
@@ -930,7 +945,7 @@ def run() -> dict:
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
-                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag,
+                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                                canary=canary, health=health),
         "health": health,                                                # здравният монитор (10.10)
@@ -938,6 +953,7 @@ def run() -> dict:
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,
         "corp_excluded": corp_excluded,
+        "spinoff": {**spinoff_watch.LAST_DIAG, "skipped_entries": list(backtest.LAST_SPINOFF_SKIPS)},     # 13.10.2026: предстоящо отделяне (EDGAR 8-K) + пропуснатите нови записи в книгите
         "sector_claims_fixed": sector_claims_fixed,                      # 13.10.2026: поправени "единствен сектор с положителна RS" (макро, вериги, why_now)                                  # 13.10.2026: редове "X — изключена: …" под секциите (Watchlist, GLB, QM)
         "ai_macro": ai_macro,
         "model_info": model_info,

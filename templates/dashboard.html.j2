@@ -674,6 +674,8 @@
 
 {# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}
 {# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
+{# 13.10.2026: бележка "предстои отделяне на ДД.ММ (запис ДД.ММ)" под тикъра в таблиците на книгите (backtest.apply_spinoff_notes) — само бележка; ръчният преглед е от деня на отделянето #}
+{% macro spinoff_note_html(p) %}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% endmacro %}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
 
 {# 07.10.2026 (стоп и размер): нива на вход, стоп, ADR и предупреждения — ЕДНАКВИ за всички зрители (от брифа); размерът (акции, сума, загуба при стоп/гап) се смята в браузъра от настройките на читателя
@@ -854,6 +856,7 @@
     {% endif %}
     {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
     {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
+    {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}
     {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
     {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
     <div class="stock-body">
@@ -955,7 +958,7 @@
   {# опростяване (втори преглед, 10.10.2026): too_wide / extended / no_volume — един ред, причината и стопът от кода, без AI наратив #}
   {% if watchlist_compact %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
-    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{% if r.spinoff %}, <span style="color:var(--yellow)">⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }} (запис {{ r.spinoff.record[8:10] }}.{{ r.spinoff.record[5:7] }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
   </div>
   {% endif %}
   <div class="watch-grid">
@@ -975,6 +978,7 @@
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
       {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
+      {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}
       {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       {# 12.10: потвърден пробив с жив запис в buy-stop книгата — неутрален ред (без "не нов вход") #}
       {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
@@ -1036,6 +1040,7 @@
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
+      {% if c.get("spinoff_warning") %}<div class="corp-warn">{{ c.spinoff_warning.text }}</div>{% endif %}
       {% for n in c.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <div class="qm-kv">
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
@@ -1102,7 +1107,7 @@
       <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in qb.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}</td>
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% if p.return_pct is not none %} ({{ "%+.1f"|format(p.return_pct) }}%){% endif %}{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
           <td class="n">${{ p.trigger }}</td><td class="n">{% if p.fill_price is not none %}${{ p.fill_price }}{% if p.trigger is not none and p.fill_price > p.trigger %} <span style="color:var(--muted)" title="Отвори над нивото — входът е по отварянето">(гап)</span>{% endif %}{% else %}—{% endif %}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
@@ -1221,6 +1226,7 @@
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
       {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
+      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
@@ -1255,6 +1261,7 @@
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
       {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
+      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
@@ -1333,7 +1340,7 @@
       <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in gw.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}</td>
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.glb_type or "н/д" }}</td>
           <td class="n">{% if p.line is not none %}${{ "%.2f"|format(p.line) }}{% else %}—{% endif %}</td>
           <td class="n">{% if p.fill_price is not none %}${{ "%.2f"|format(p.fill_price) }}{% else %}—{% endif %}</td>
@@ -1573,7 +1580,7 @@
         <th class="n">Стоп</th><th>Валиден до</th></tr></thead>
       <tbody>
         {% for p in backtest.pending_positions %}
-        <tr><td class="sym">{{ p.ticker }}{{ markers_html(p.markers) }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
+        <tr><td class="sym">{{ p.ticker }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
           <td class="n">${{ p.max_chase }}</td><td class="n">${{ p.stop_loss }}</td><td>{{ p.valid_through or "—" }}</td></tr>
         {% endfor %}
       </tbody>
@@ -1603,7 +1610,7 @@
         {% for p in backtest.open_positions[:100] %}
         {% set track_modal_id = "earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date %}
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
-          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}</td>
+          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}</td>
           <td class="n">${{ p.entry_price }}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
@@ -1674,7 +1681,7 @@
         <th>Валиден до</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in bs.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}</td>
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}
             {% if p.screener_exit %}<div style="font-size:11.5px;color:var(--yellow)">излезе от скрийнъра: {{ p.screener_exit }}</div>{% endif %}</td>
