@@ -1306,6 +1306,7 @@
     <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.
     {% else %}
     <b>Записани: {{ gw.records }}</b> · <b>затворени {{ gw.line_exit + gw.expired }}</b> (изход по линията {{ gw.line_exit }} · изтекли по нашия таван {{ gw.expired }}) / <b>отворени по текуща цена {{ gw.open }}</b>{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
+    {% if gw.needs_review %}<span style="color:var(--yellow)">⚠ {{ gw.needs_review }} запис(а) с отделяне след сигнала — линията не се мащабира, нужен е ръчен преглед.</span><br>{% endif %}
     {% if gw.with_result %}
     Записи с резултат: <b>{{ gw.with_result }} = затворени {{ gw.closed_result }} / отворени по текуща цена {{ gw.open_result }}</b> · средна доходност <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
     {% if gw.line_exit_group.n %}Изход по линията ({{ gw.line_exit_group.n }}): средно {{ "%+.2f"|format(gw.line_exit_group.avg_return_pct) }}% — по построение загуби (вход над линията, изход под нея).<br>{% endif %}
@@ -1608,8 +1609,8 @@
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
           {% if p.needs_manual_review %}
           <td class="n pct" style="color:var(--yellow)"
-              title="{{ p.needs_manual_review.reason }} · {{ p.needs_manual_review.split_ratio|int }}:1 split на {{ p.needs_manual_review.split_date }}">
-            ⚠ split — нужен ръчен преглед{% if p.needs_manual_review.frozen_days is defined %}
+              title="{{ p.needs_manual_review.reason }} · {% if p.needs_manual_review.reason == 'spin_off_after_entry' %}отделяне, коефициент {{ p.needs_manual_review.split_ratio }}{% else %}{{ p.needs_manual_review.split_ratio|int }}:1 split{% endif %} на {{ p.needs_manual_review.split_date }}">
+            ⚠ {{ "отделяне" if p.needs_manual_review.reason == 'spin_off_after_entry' else "split" }} — нужен ръчен преглед{% if p.needs_manual_review.frozen_days is defined %}
             · замразена от {{ p.needs_manual_review.frozen_days }} дни{% endif %}
           </td>
           {% else %}
@@ -1651,6 +1652,7 @@
     <b>Записани: {{ bs.records }}</b> · чакат buy-stop {{ bs.pending }} · отворени {{ bs.open }} · затворени {{ bs.closed }}
     · не се задействаха {{ bs.not_triggered }}{% if bs.not_triggered_pct is not none %} ({{ bs.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if bs.skipped %}
     · над тавана за вход {{ bs.skipped }}{% endif %}{% if bs.also_action %} · и в Action: {{ bs.also_action }}{% endif %}<br>
+    {% if bs.needs_review %}<span style="color:var(--yellow)">⚠ {{ bs.needs_review }} запис(а) с отделяне след входа — не се коригират като сплит, нужен е ръчен преглед.</span><br>{% endif %}
     {% if bs.closed %}Затворени: {{ bs.closed }} · среден R: {{ "%+.2f"|format(bs.avg_realized_r) }}<br>{% endif %}
     {% if bs.stats_visible %}
     <b>Win rate: {{ bs.win_rate_pct }}%</b> ({{ bs.wins }} win / {{ bs.losses }} loss; 95% интервал {{ bs.win_ci_pct[0] }}–{{ bs.win_ci_pct[1] }}%)

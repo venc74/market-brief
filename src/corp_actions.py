@@ -197,6 +197,14 @@ def is_material(ticker: str | None, ratio: float, date: str | None = None) -> bo
         return False
 
 
+def is_material_between(ticker: str | None, ratio: float, start: str | None, end: str | None) -> bool:
+    """Като is_material, когато датата не е известна (книгата "GLB по Уиш" вижда само общия коефициент): изричен запис "material" в CORP_ACTIONS_KNOWN с дата в (start, end] → съществено."""
+    k = config.CORP_ACTIONS_KNOWN.get(ticker or "") or {}
+    if k.get("material") and k.get("date") and start and end and str(start)[:10] < k["date"] <= str(end)[:10]:
+        return True
+    return is_material(ticker, ratio)
+
+
 def window_hit(module: str, row: dict, events: list[dict]) -> dict | None:
     """Събитието (най-новото), което попада в прозореца назад на модула, или None. events — от uncertain_events (с sessions_ago)."""
     for ev in events:

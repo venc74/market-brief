@@ -68,6 +68,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
 from src import enrich
+from src import corp_actions           # 13.10.2026: съществено отделяне след входа → needs_manual_review
 from src import trade_sim
 from src import setup_rules
 
@@ -714,6 +715,16 @@ def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: d
             rec["discovered_date"] = today.isoformat()
 
 
+def _flag_spin_off(rec: dict, spin: list[dict], today: dt.date) -> None:
+    """13.10.2026: съществено отделяне след входа → needs_manual_review (reason "spin_off_after_entry"); нивата и резултатът не се пипат. Идемпотентно (пази "since")."""
+    prev = rec.get("needs_manual_review") or {}
+    ratio = 1.0
+    for sp in spin:
+        ratio *= sp["ratio"]
+    rec["needs_manual_review"] = {"reason": "spin_off_after_entry", "split_date": spin[0]["date"], "split_ratio": round(ratio, 4), "since": prev.get("since") or today.isoformat()}
+    print(f"[backtest] {rec['ticker']}: отделяне (коефициент {ratio:g}) на {spin[0]['date']} след входа — записът не се коригира като сплит, остава needs_manual_review")
+
+
 def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date) -> None:
     """
     Резолюция на запис от книгата "glb_wish": trade_sim.simulate_glb_wish върху дневните барове (чиста функция на записа и баровете — без памет от сигнала, затова пропуснат run не губи нищо). Сплитът се
@@ -723,8 +734,18 @@ def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date)
     if opens is None or t not in getattr(opens, "columns", []) or t not in getattr(closes, "columns", []):
         print(f"[backtest] {t}: няма Open/Close в batch резултата — пропускам GLB по Уиш резолюцията")
         return
+    if rec.get("needs_manual_review"):                                             # 13.10.2026: съществено отделяне след сигнала — не се резолвира автоматично
+        return
     bars = pd.DataFrame({"Open": opens[t], "Close": closes[t]}).dropna()
     res = trade_sim.simulate_glb_wish(rec, bars, today)
+    scale = res.get("split_scale")
+    if scale and corp_actions.is_material_between(t, scale, rec.get("signal_date"), today.isoformat()):
+        # 13.10.2026: симулацията открива "сплит" като съхранения срещу сегашния close на сигналния ден и мащабира линията — при отделяне това е оценката на Yahoo (6.665 при CTVA);
+        # линията и изходът по нея наследяват грешката → ръчен преглед, както QM; резултатът не се записва
+        prev = rec.get("needs_manual_review") or {}
+        rec["needs_manual_review"] = {"reason": "spin_off_after_entry", "split_ratio": round(float(scale), 4), "since": prev.get("since") or today.isoformat()}
+        print(f"[backtest] {t}: GLB по Уиш — отделяне след сигнала (коефициент {float(scale):g}) — линията не се мащабира, остава needs_manual_review")
+        return
     for k in _GW_RESULT_KEYS:
         rec[k] = res.get(k)
     rec["spy_return_pct"] = trade_sim.spy_return_pct_gw(res, spy_bars, False) if spy_bars is not None else None
@@ -870,6 +891,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
             if rec.get("needs_manual_review"):
                 continue
         elif new_splits:
+            # 13.10.2026 (решение на Венци): СЪЩЕСТВЕНО отделяне след входа (нецял коефициент ≥ config.CORP_ACTION_MATERIAL_RATIO или "material" в CORP_ACTIONS_KNOWN) не се коригира като
+            # сплит: санитарната проверка минава (историята на Yahoo е в същата оценка), а стойността на новата компания не се брои → needs_manual_review, както QM. Под прага — както досега.
+            spin = [sp for sp in new_splits if corp_actions.is_material(ticker, sp["ratio"], sp["date"])]
+            if spin:
+                _flag_spin_off(rec, spin, today)
+                continue
             adjust = _apply_split_adjustment_v2 if rec.get("method") == "v2" else _apply_split_adjustment
             if not adjust(rec, new_splits, closes[ticker].dropna(), today):
                 continue
@@ -1206,7 +1233,7 @@ def get_buystop_summary() -> dict:
         "win_rate_pct": round(100 * wins / len(rs), 1) if visible else None,
         "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
-        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent,
+        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
     }
 
 
@@ -1413,7 +1440,7 @@ def get_glb_wish_summary() -> dict:
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
-        "live": live, "live_total": len(live_all), "recent": recent,
+        "live": live, "live_total": len(live_all), "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
     }
 
 
