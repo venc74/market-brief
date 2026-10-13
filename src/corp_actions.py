@@ -97,7 +97,8 @@ def annotate(cards_groups: list[list[dict]], today: str | dt.date, fetch=None, s
         series = fetch(tickers)
         found = {}
         for t, (dates, ratios) in series.items():
-            ev = uncertain_events(dates, ratios, day, sessions)
+            ev = [e for e in uncertain_events(dates, ratios, day, sessions)
+                  if t not in config.CORP_ACTION_EXACT_TICKERS and not is_exact_ratio(e["ratio"])]     # 13.10: 3:2 и дивидентът в акции на CBSH са точни — без маркер
             if ev:
                 found[t] = {**ev[0], "text": warning_text(ev[0])}
         for g in cards_groups:
@@ -180,6 +181,22 @@ def is_exact_ratio(r: float) -> bool:
         return False
 
 
+def is_material(ticker: str | None, ratio: float, date: str | None = None) -> bool:
+    """
+    13.10.2026: събитието е СЪЩЕСТВЕНО (изключване от модулите, ръчен преглед в книгите), ако НЕ е точна корекция и коефициентът е ≥ config.CORP_ACTION_MATERIAL_RATIO
+    (1.10 ≈ отделени 9% от стойността), или е изрично отбелязано в config.CORP_ACTIONS_KNOWN ("material": True за тази дата). Под прага — само маркер.
+    """
+    if ticker in config.CORP_ACTION_EXACT_TICKERS or is_exact_ratio(ratio):
+        return False
+    k = config.CORP_ACTIONS_KNOWN.get(ticker or "") or {}
+    if k.get("material") and date and k.get("date") == str(date)[:10]:
+        return True
+    try:
+        return float(ratio) >= config.CORP_ACTION_MATERIAL_RATIO
+    except (TypeError, ValueError):
+        return False
+
+
 def window_hit(module: str, row: dict, events: list[dict]) -> dict | None:
     """Събитието (най-новото), което попада в прозореца назад на модула, или None. events — от uncertain_events (с sessions_ago)."""
     for ev in events:
@@ -216,7 +233,7 @@ def exclusion_text(ticker: str, ev: dict, module: str) -> str:
     known = config.CORP_ACTIONS_KNOWN.get(ticker) or {}
     if known.get("date") and known["date"] != ev["date"]:
         known = {}
-    what = (f"{known.get('kind', 'отделяне')} на {known['new_name']} ({known.get('ratio_text', '')}) на {d:%d.%m}" if known.get("new_name")
+    what = (f"{known.get('kind', 'отделяне')} на {known['new_name']}" + (f" ({known['ratio_text']})" if known.get("ratio_text") else "") + f" на {d:%d.%m}" if known.get("new_name")
             else f"корпоративно действие на {d:%d.%m} (нецял коефициент {ev['ratio']:g} — отделяне или сплит с нецял коефициент)")
     parts = [f"{ticker} — изключена: {what}", f"историята преди датата е оценка на Yahoo (коефициент {ev['ratio']:g})"]
     s = _SERIES.get(ticker) or {}
@@ -257,8 +274,8 @@ def exclude(rows: list[dict], module: str, today, fetch=None) -> tuple[list[dict
         kept, out = [], []
         for r in rows:
             s = _SERIES.get(r.get("ticker")) if isinstance(r, dict) else None
-            evs = [] if not s or r.get("ticker") in config.CORP_ACTION_EXACT_TICKERS else \
-                [e for e in uncertain_events(s["dates"], s["ratios"], day, sessions=10 ** 6) if not is_exact_ratio(e["ratio"])]
+            evs = [] if not s else [e for e in uncertain_events(s["dates"], s["ratios"], day, sessions=10 ** 6)
+                                    if is_material(r.get("ticker"), e["ratio"], e["date"])]        # 13.10: под прага 1.10 — само маркер (annotate), картата остава
             ev = window_hit(module, r, evs) if evs else None
             if ev:
                 out.append({"ticker": r["ticker"], "module": module, "date": ev["date"], "ratio": ev["ratio"], "text": exclusion_text(r["ticker"], ev, module)})

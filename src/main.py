@@ -900,8 +900,13 @@ def run() -> dict:
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
     corp_diag = dict(corp_actions.LAST_DIAG)
+    # 13.10.2026 (праг на същественост): събитие с нецял коефициент ПОД config.CORP_ACTION_MATERIAL_RATIO не изключва — картата остава с маркера от 09.10 (последните 60 сесии)
+    corp_marker = corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)
+    corp_diag.update(flagged=corp_marker.get("flagged", []), ok=bool(corp_diag.get("ok", True) and corp_marker.get("ok", True)),
+                     error=corp_diag.get("error") or corp_marker.get("error"))
     corp_excluded = {"screener": corp_ex_screener, "glb": corp_ex_glb + [e for e in corp_ex_gw if e["ticker"] not in {x["ticker"] for x in corp_ex_glb}], "qm": corp_ex_qm}
-    print(f"      Корпоративни действия: проверени {corp_diag.get('checked', 0)} тикъра, изключени {[(e['ticker'], e['module']) for e in corp_diag.get('excluded', [])]}"
+    print(f"      Корпоративни действия: проверени {corp_diag.get('checked', 0)} тикъра, изключени {[(e['ticker'], e['module']) for e in corp_diag.get('excluded', [])]}, "
+          f"маркирани (под прага) {[f['ticker'] for f in corp_diag.get('flagged', [])]}"
           + ("" if corp_diag.get("ok", True) else f" — ПРОВАЛ: {corp_diag.get('error')}"))
 
     # С5 (втори преглед, 10.10.2026): канарче за split корекцията на Yahoo — една заявка; провал на тегленето → неизвестно, без банер

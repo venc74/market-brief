@@ -121,6 +121,6 @@ assert dnone["ok"] and dnone["flagged"] == []
 print("  ✓ падналото теглене → ok=False, карти без маркер, предупреждение «… днес НИЩО не е изключено …» (от 13.10); празен списък / тикър без данни — без грешка")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 # 13.10.2026: маркерът вече не се вика от main — изключване вместо маркер (test_corp_action_exclude.py); annotate() остава като чиста функция
-assert "corp_actions.annotate(" not in src and "corp_diag=corp_diag" in src and '"corp_actions": corp_diag' in src
+assert "corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)" in src and "corp_diag=corp_diag" in src and '"corp_actions": corp_diag' in src   # 13.10: под прага 1.10
 print("  ✓ main.run: от 13.10 маркерът не се вика (изключване — test_corp_action_exclude.py); diag е в brief['corp_actions'] и в data_warnings")
 print("\n✅ test_corp_action_marker: всичко мина")

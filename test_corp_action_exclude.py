@@ -122,7 +122,7 @@ i_glb, i_gw = src.index('glb_candidates, corp_ex_glb = corp_actions.exclude(glb_
 i_qm = src.index('qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)')
 i_book = src.index("backtest.update_backtest_tracker(action, today, watchlist_before_expiry")
 assert max(i_glb, i_gw, i_qm) < i_book and i_qm < src.index("qm_cards = qm_breakout.cards(")
-assert "corp_actions.annotate(" not in src and '"corp_excluded": corp_excluded' in src
-print("  ✓ скрийнър → преди setup_rules.annotate и AI; GLB, сигналите на Уиш и QM → преди записа в книгите; corp_actions.annotate (маркерът) вече не се вика")
+assert "corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)" in src and '"corp_excluded": corp_excluded' in src     # 13.10 (праг): маркерът под прага се вика отново
+print("  ✓ скрийнър → преди setup_rules.annotate и AI; GLB, сигналите на Уиш и QM → преди записа в книгите; маркерът (под прага) — след тях")
 print()
 print("Всички тестове минаха.")

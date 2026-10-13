@@ -222,11 +222,18 @@ CORP_ACTION_FETCH_PERIOD = os.getenv("CORP_ACTION_FETCH_PERIOD", "5y")          
 # не дивидент в акции — затова "два знака след запетаята" НЕ е правило за точност.
 CORP_ACTION_EXACT_MAX_DENOM = int(os.getenv("CORP_ACTION_EXACT_MAX_DENOM", 4))
 CORP_ACTION_EXACT_TICKERS = {"CBSH": "5% дивидент в акции всеки декември — точна корекция"}
+# 13.10.2026 (решение на Венци): праг на СЪЩЕСТВЕНОСТ — изключване (модулите) и ръчен преглед (книгите) само при коефициент ≥ 1.10 (отделени ≥ ~9% от стойността: 1 − 1/1.10).
+# Под прага — маркерът от 09.10 (картата остава, CORP_ACTION_WARN_SESSIONS). Запис в CORP_ACTIONS_KNOWN с "material": True е съществен независимо от коефициента (HON 29.06.2026: Yahoo е слял
+# отделянето на Honeywell Aerospace с обратен сплит 1:2 в един коефициент 0.9535, а отделени са ~48% от стойността).
+CORP_ACTION_MATERIAL_RATIO = float(os.getenv("CORP_ACTION_MATERIAL_RATIO", 1.10))
 # Известни отделяния: текстът на реда ("отделяне на Vylor (1:1)") и сборът родител + нова компания. Yahoo дава само коефициента — останалото е от документите на компанията.
 # new_per_share = акции на новата компания за една акция на родителя.
 CORP_ACTIONS_KNOWN = {
     "CTVA": {"date": "2026-10-01", "kind": "отделяне", "new_ticker": "VYLR", "new_name": "Vylor", "new_per_share": 1.0, "ratio_text": "1:1",
              "source": "Corteva 8-K, Date of Report 12.09.2026 (прессъобщение 14.09.2026): запис 24.09, разпределение преди отварянето на 01.10, 1 VYLR за 1 CTVA"},
+    "HON": {"date": "2026-06-29", "kind": "отделяне", "new_name": "Honeywell Aerospace (HONA, 1 за 2 HON) заедно с обратен сплит 1:2 — Yahoo ги записва като един коефициент",
+            "ratio_text": "", "material": True,
+            "source": "Honeywell 8-K / Honeywell Aerospace information statement (06.2026): запис 15.06, разпределение 29.06, 1 HONA за 2 HON; обратен сплит 1:2 в същия ден"},
 }
 QM_TRIGGER_BARS = 10                                             # ниво на пробив = най-високият High на последните 10 сесии (върхът на флага)
 QM_ADR_MIN = float(os.getenv("QM_ADR_MIN", 3.0))                 # ADR20 ≥ 3% (негово е само "стопът ≤ ADR"; минималният ADR е мой)
