@@ -1,6 +1,17 @@
 {
- "date": "2026-10-13",
- "rows": [],
+ "date": "2026-10-14",
+ "rows": [
+  {
+   "ticker": "SKIN",
+   "company": "SkinHealth Systems Inc.",
+   "date": "2026-10-14",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Oct 14, 2026",
+   "price": 10.81,
+   "market_cap": 1407081965.300228
+  }
+ ],
  "horizon": [
   {
    "ticker": "DFLI",
@@ -59,6 +70,14 @@
    "date_human": "Oct 13, 2026"
   },
   {
+   "ticker": "SKIN",
+   "company": "SkinHealth Systems Inc.",
+   "date": "2026-10-14",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Oct 14, 2026"
+  },
+  {
    "ticker": "AMTD",
    "company": "AMTD IDEA Group",
    "date": "2026-10-19",
@@ -78,10 +97,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 9,
+  "source_rows": 10,
   "horizon_from": "2026-10-12",
   "horizon_to": "2026-10-23",
-  "in_week": 7,
+  "in_week": 8,
   "dropped_price": [
    "DFLI",
    "MDCX",
@@ -93,7 +112,7 @@
   ],
   "dropped_cap": [],
   "dropped_no_data": [],
-  "passed": 0,
-  "state": "empty"
+  "passed": 1,
+  "state": "ok"
  }
 }

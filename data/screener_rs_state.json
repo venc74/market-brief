@@ -1,27 +1,23 @@
 {
- "updated": "2026-10-13",
+ "updated": "2026-10-14",
  "enter": 0.97,
  "stay": 0.94,
  "tickers": [
   "ABBV",
   "AMG",
-  "ANET",
   "BIIB",
   "DDOG",
-  "DINO",
   "EXEL",
   "EXPD",
   "FFIV",
   "FTNT",
   "HUM",
-  "KEYS",
+  "MET",
   "MSM",
   "NTAP",
-  "PANW",
   "PSX",
   "RGA",
   "SN",
-  "VLO",
   "ZBRA"
  ]
 }

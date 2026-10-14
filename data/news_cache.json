@@ -1,37 +1,37 @@
 {
- "date": "2026-10-13",
+ "date": "2026-10-14",
  "news": [
   {
-   "headline": "IMF warns bond yields could see a 'disorderly' spike as debt, inflation risks worsen",
-   "why": "Рязък и неконтролиран скок на доходностите би предизвикал разпродажба в облигации и акции глобално, увеличавайки разходите по финансиране за правителства и корпорации."
+   "headline": "US CPI за септември се очаква да покаже ускорение на инфлацията до 3.6% г/г",
+   "why": "Ключов макро release, който ще определи очакванията за следващото Fed решение и посоката на щатски акции, облигации и долара днес."
   },
   {
-   "headline": "Top economies heading for biggest budget deficits since Covid, IMF warns",
-   "why": "Нарастващите фискални дефицити в G7 повишават риска от по-висока дългосрочна инфлация и натиск върху суверенните облигации, което засяга цената на капитала."
+   "headline": "Dollar languishes като фокусът се насочва към CPI и Fed speakers",
+   "why": "Слабият долар преди CPI данните сигнализира за позициониране на пазара — резултатът може да причини рязко движение в USD pairs и treasuries."
   },
   {
-   "headline": "IMF cites AI slowdown, spiking yields as looming global market risks",
-   "why": "IMF официално идентифицира AI разочарованието и скока на доходностите като системни рискове, което валидира текущата разпродажба в tech и bond пазарите."
+   "headline": "Fed Governor Cook's lawyer denounces Trump's latest attempt to remove her",
+   "why": "Атаката върху независимостта на Fed повдига институционален риск, който може да разколебае доверието в монетарната политика и да натисне пазарите."
   },
   {
-   "headline": "Oil prices fall as traders assess Russian diesel supply prospects and Saudi-Houthi conflict",
-   "why": "Противоречиви сигнали — руски дизел на пазара срещу рискове от ескалация в Персийския залив — движат волатилността в crude и засягат енергийния сектор."
+   "headline": "Bank of America fined $1.2 billion за нарушения на anti-money laundering и санкционни закони",
+   "why": "Регулаторен удар върху голяма банка точно преди нейните тримесечни резултати — директен ефект върху BAC акцията и sentiment в банковия сектор."
   },
   {
-   "headline": "Houthi assault on Saudi airports strikes at MBS's economic vision",
-   "why": "Атаките срещу летище Рияд дестабилизират ключов петролен производител и увеличават геополитическата премия в цените на суровия петрол."
+   "headline": "China's September exports surge 36%, imports accelerate; PPI beats expectations",
+   "why": "Силните китайски търговски данни и ускорената factory-gate инфлация влияят на глобалните supply chains, commodities и emerging markets позициите."
   },
   {
-   "headline": "EU sanctions nearly 1,600 Russian people and firms linked to drone and missile parts",
-   "why": "Новите санкции на ЕС разширяват ограниченията върху руския износ и вериги за доставки, което влияе на европейски компании с експозиция към Русия."
+   "headline": "Iran increases threats to Strait of Hormuz shipping, Saudi Aramco HQ attacked in suspected Houthi strike",
+   "why": "Ескалацията в Близкия изток директно заплашва ~20% от глобалния петролен трафит, тласкайки цените на oil нагоре и засягайки energy сектора."
   },
   {
-   "headline": "China's carmakers export more as EU caps hybrid vehicle imports at 350,000 a year",
-   "why": "Регулаторната квота на ЕК върху китайски хибридни автомобили е директна търговска мярка с ефект върху европейски и китайски автопроизводители."
+   "headline": "Oil prices climb като Iran deploy нови тактики за атаки на кораби преди US vote",
+   "why": "Геополитическата премия в петрола нараства, което засяга инфлационните очаквания, транспортните разходи и energy stocks глобално."
   },
   {
-   "headline": "Higher rates could be needed to avoid 'inflationary mindset' taking hold, says Fed's Hammack",
-   "why": "Hawkish коментар от управител на Cleveland Fed засилва очакванията за по-дълго задържане на лихвите, натискайки акции и облигации надолу."
+   "headline": "Delaware jury finds Arm breached license agreement с Qualcomm, awards $2 в damages",
+   "why": "Съдебното решение има стратегически последици за лицензионния модел на Arm и chipmaker сектора, засягайки QCOM, ARM и полупроводниковия индекс."
   }
  ]
 }

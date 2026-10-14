@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-13",
+ "updated": "2026-10-14",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -20,26 +20,6 @@
    "since": "2026-08-14",
    "since_close": 135.84,
    "since_bar": "2026-08-14"
-  },
-  "VRTX": {
-   "ticker": "VRTX",
-   "company": "Vertex Pharmaceuticals Incorporated",
-   "glb_type": "classic",
-   "prior_high": 509.5,
-   "prior_high_month": "2025-04",
-   "months_unpenetrated": 15,
-   "ath_label": "all_time_high",
-   "history_years": 35.1,
-   "breakout_volume_ratio": 0.69,
-   "tightness": {
-    "band_hold_pct": 95.2,
-    "tightness_range_pct": 24.76,
-    "meets_tightness": true
-   },
-   "line": 509.5,
-   "since": "2026-08-17",
-   "since_close": 515.55,
-   "since_bar": "2026-08-17"
   },
   "FCX": {
    "ticker": "FCX",
@@ -380,6 +360,26 @@
    "since": "2026-10-13",
    "since_close": 172.15,
    "since_bar": "2026-10-12"
+  },
+  "MA": {
+   "ticker": "MA",
+   "company": "Mastercard Incorporated",
+   "glb_type": "classic",
+   "prior_high": 595.29,
+   "prior_high_month": "2025-08",
+   "months_unpenetrated": 13,
+   "ath_label": "all_time_high",
+   "history_years": 20.4,
+   "breakout_volume_ratio": 1.34,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 13.04,
+    "meets_tightness": true
+   },
+   "line": 595.29,
+   "since": "2026-10-14",
+   "since_close": 604.8,
+   "since_bar": "2026-10-13"
   }
  },
  "seed": {
