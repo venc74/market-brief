@@ -198,7 +198,9 @@ def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
     e = c.get("earnings") or {}
     days = e.get("days_to_earnings")
     if e.get("in_blackout") or (isinstance(days, (int, float)) and 0 <= days <= 7):
-        when = "ДНЕС" if days == 0 else (f"на {e.get('next_earnings')} ({int(days)} дни)" if isinstance(days, (int, float)) and e.get("next_earnings") else f"на {e.get('next_earnings') or 'неизвестна дата'}")
+        ne = str(e.get("next_earnings") or "")
+        ne = f"{ne[8:10]}.{ne[5:7]}" if len(ne) >= 10 and ne[4] == "-" else ne                  # 16.10.2026: ДД.ММ, не ISO ("Отчет на 2026-11-03")
+        when = "ДНЕС" if days == 0 else (f"на {ne} ({int(days)} дни)" if isinstance(days, (int, float)) and ne else f"на {ne or 'неизвестна дата'}")
         parts.append(f"Отчет {when} — нов Action най-рано след отчета.")
     setup = c.get("setup") or {}
     if setup.get("trigger_text"):

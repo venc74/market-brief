@@ -66,7 +66,7 @@ base = {"ticker": "XYZ", "pct_from_pivot": -2.0, "volume_ratio": 1.0, "breakout_
 t0 = brief_main._watchlist_trigger_text(base, "Offensive")
 assert t0 == "Чака пробив: buy-stop $10.00 (валиден 5 сесии, до 14.10)."
 c1 = copy.deepcopy(base); c1["earnings"] = {"next_earnings": "2026-10-12", "days_to_earnings": 4, "in_blackout": True}
-assert brief_main._watchlist_trigger_text(c1, "Offensive") == "Отчет на 2026-10-12 (4 дни) — нов Action най-рано след отчета. " + base["setup"]["trigger_text"]
+assert brief_main._watchlist_trigger_text(c1, "Offensive") == "Отчет на 12.10 (4 дни) — нов Action най-рано след отчета. " + base["setup"]["trigger_text"]          # 16.10.2026: ДД.ММ
 c2 = copy.deepcopy(base); c2["earnings"] = {"next_earnings": "2026-10-08", "days_to_earnings": 0, "in_blackout": True}
 assert brief_main._watchlist_trigger_text(c2, "Offensive").startswith("Отчет ДНЕС — нов Action най-рано след отчета.")
 c3 = copy.deepcopy(base); c3["earnings"] = {"next_earnings": None, "days_to_earnings": None, "in_blackout": True}

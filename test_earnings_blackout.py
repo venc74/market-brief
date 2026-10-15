@@ -42,7 +42,7 @@ c["setup"] = {**c["setup"], "kind": "confirmed", "eligible": True}              
 c["ai"] = {"classification": "Action", "warning": "изключителен setup", "why_now": "x"}        # СИНТЕТИЧНО: AI решение, което не е минало през merge
 action, watch = brief_main.apply_hard_rules([c], 1.0, "Offensive")
 assert not action and watch and watch[0]["ticker"] == "EXPD" and watch[0]["ai"]["watchlist_reason_type"] == "earnings_blackout"
-assert watch[0]["ai"]["watchlist_trigger"].startswith("Отчет на 2026-10-09 (4 дни) — нов Action най-рано след отчета.")
+assert watch[0]["ai"]["watchlist_trigger"].startswith("Отчет на 09.10 (4 дни) — нов Action най-рано след отчета.")          # 16.10.2026: ДД.ММ, не ISO
 c2 = copy.deepcopy(EXPD); c2["earnings"] = {"next_earnings": "2026-11-20", "days_to_earnings": 30, "in_blackout": False}      # наново от реалната карта (apply_hard_rules пипа c на място)
 c2["setup"] = {**c2["setup"], "kind": "confirmed", "eligible": True}; c2["ai"] = {"classification": "Action", "why_now": "x"}
 action, watch = brief_main.apply_hard_rules([c2], 1.0, "Offensive")
@@ -56,7 +56,7 @@ ai_brief.merge_narratives([c], [{"ticker": "EXPD", "classification": "Watchlist"
 assert "watchlist_trigger" not in c["ai"]                                                     # до 10.10: setdefault("След earnings на 2026-10-09")
 _, watch = brief_main.apply_hard_rules([c], 1.0, "Defensive")
 t = watch[0]["ai"]["watchlist_trigger"]
-assert t.startswith("Отчет на 2026-10-09 (4 дни) — нов Action най-рано след отчета.") and EXPD["setup"]["trigger_text"] in t and "$194.59" in t and "Режим Defensive" in t
+assert t.startswith("Отчет на 09.10 (4 дни) — нов Action най-рано след отчета.") and EXPD["setup"]["trigger_text"] in t and "$194.59" in t and "Режим Defensive" in t
 assert "След earnings на" not in t
 print("  ✓ реалната EXPD (05.10) + СИНТЕТИЧЕН отчет: текстът пази buy-stop $194.59 и режима (до 10.10 беше само «След earnings на 2026-10-09»)")
 print("    " + t[:200] + "…")
