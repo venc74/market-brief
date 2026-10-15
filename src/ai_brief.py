@@ -306,6 +306,29 @@ def _fix_homoglyphs(s: str) -> str:
     return _WORD_RE.sub(repl, s)
 
 
+# 15.10.2026: кратка служебна дума на ЛАТИНИЦА между две изцяло кирилски думи ("да se влошава" на 14.10). Само потвърдените случаи и само с малки букви
+# ("SE" е тикър). Измерено върху 87 брифа (13.06–15.10): "se" ×3 (25.06, 24.08, 14.10), всичките грешни; самотното "e" вече се поправя от _fix_homoglyphs.
+_LATIN_WORD_FIX = {"se": "се"}
+
+
+def _fix_latin_words(s: str) -> str:
+    def repl(m):
+        w = m.group(0)
+        fixed = _LATIN_WORD_FIX.get(w)
+        if fixed is None:
+            return w
+        prev = list(_WORD_RE.finditer(s[:m.start()]))
+        nxt = _WORD_RE.search(s[m.end():])
+        gap_before = s[prev[-1].end():m.start()] if prev else ""
+        gap_after = s[m.end():m.end() + nxt.start()] if nxt else ""
+        if (prev and nxt and _is_pure_cyrillic(prev[-1].group(0)) and _is_pure_cyrillic(nxt.group(0))
+                and gap_before.strip() == "" and gap_after.strip() == ""):
+            print(f"[ai] латинска дума заменена: '{w}' → '{fixed}' (между '{prev[-1].group(0)}' и '{nxt.group(0)}')")
+            return fixed
+        return w
+    return re.sub(r"(?<![A-Za-zА-Яа-яЁё])[a-z]{2}(?![A-Za-zА-Яа-яЁё])", repl, s)
+
+
 _SCRIPT_RUN_RE = re.compile(r"[A-Za-z]+|[А-Яа-яЁё]+")
 
 
@@ -409,6 +432,7 @@ def _fix_translit(obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
     _check_po_suffix(obj)
     obj = _fix_homoglyphs(obj)
+    obj = _fix_latin_words(obj)                   # 15.10: "да se влошава" → "да се влошава"
     obj = _fix_glued(obj)
     obj = _fix_broken_phrases(obj)                # 09.10: «мулти плиер» → «мултипликатор» (фраза от две думи — преди проверката по отделни думи)
     def cyr_repl(m):
