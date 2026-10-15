@@ -46,8 +46,14 @@ CATALYSTS = {
 }
 SURPRISE = ("yes", "no", "unclear")
 NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
-NOTE_BG = ("Само наблюдение (без Track Record): after-hours гап в 01:55 Берлин, не гарантира гап на отварянето; After-hours обемът в Yahoo е нула в повечето бар-ове — "
-           "\"огромният обем\" не може да се провери; входът (opening range high) и стопът (low of day) са в сесията.")
+def note_bg(day=None) -> str:
+    """16.10.2026: краят на after-hours (19:55 ET) в берлинско време се смята от часовите зони — "01:55" е грешно в седмицата 25.10–01.11 (00:55 CET). Текстът не се показва в брифа."""
+    from src.setup_rules import ny_time_in_berlin
+    return (f"Само наблюдение (без Track Record): after-hours гап в {ny_time_in_berlin(day or dt.date.today(), 19, 55)}, не гарантира гап на отварянето; After-hours обемът в Yahoo е нула "
+            "в повечето бар-ове — \"огромният обем\" не може да се провери; входът (opening range high) и стопът (low of day) са в сесията.")
+
+
+NOTE_BG = note_bg()
 
 
 # ──────────────────────────────────────────────────────────────────────────

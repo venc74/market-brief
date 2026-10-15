@@ -78,6 +78,20 @@ def session_window(brief_date, sessions: int | None = None) -> list[dt.date]:
     return out
 
 
+def ny_time_in_berlin(day, hour: int, minute: int = 0) -> str:
+    """
+    16.10.2026: час по Ню Йорк в даден ден, преведен в берлинско време с етикета ("15:30 CEST"). Твърдото "15:30 CEST" беше грешно в седмицата 25.10–01.11 (Европа вече на зимно, САЩ още
+    на лятно време → 14:30 CET) и цялата зима ("CET"). Без tz база → "HH:MM ET" (честно, без превод).
+    """
+    d = _as_date(day)
+    try:
+        from zoneinfo import ZoneInfo
+        t = dt.datetime(d.year, d.month, d.day, hour, minute, tzinfo=ZoneInfo("America/New_York")).astimezone(ZoneInfo("Europe/Berlin"))
+        return f"{t:%H:%M} {t.tzname()}"
+    except Exception:
+        return f"{hour:02d}:{minute:02d} ET"
+
+
 def valid_through(brief_date, sessions: int | None = None) -> str:
     return session_window(brief_date, sessions)[-1].isoformat()
 

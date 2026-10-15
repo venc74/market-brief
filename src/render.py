@@ -13,6 +13,7 @@ import config
 from src import names
 from src import watchlist_exits
 from src import cot_theses
+from src import setup_rules
 
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
                "петък", "събота", "неделя"]
@@ -209,6 +210,7 @@ def render_dashboard(brief: dict) -> str:
         generated_at=gen_time,
         generated_tz=gen_tz,
         premarket_note=premarket_note(),
+        ny_open_berlin=setup_rules.ny_time_in_berlin(today, 9, 30),            # 16.10.2026: "Проверката е отварянето (15:30 CEST / 09:30 ET)" — от часовите зони
         regime=brief["thermometer"]["regime"],
         regime_reason=brief["thermometer"]["regime_reason"],
         thermometer=brief["thermometer"],
@@ -352,7 +354,7 @@ def _qm_email_block(brief: dict) -> str:
             else:
                 body += '<div style="color:#6b7280;font-size:12.5px">Няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри.</div>'
             yd = (ep.get("log") or {}).get("yesterday") or []
-            line = "<b>Проверката е отварянето</b> (15:30 CEST): гапът се доказва едва тогава."
+            line = f"<b>Проверката е отварянето</b> ({setup_rules.ny_time_in_berlin(dt.date.today(), 9, 30)}): гапът се доказва едва тогава."     # 16.10.2026: от часовите зони
             if yd:
                 line += " Вчера, AH срещу отваряне: " + "; ".join(
                     f'{_e(y["ticker"])} {y["ah_gap_pct"]:+.1f}% → {y["open_gap_pct"]:+.1f}% ({"издържа" if y.get("held") else "не издържа"})' for y in yd) + "."

@@ -160,7 +160,8 @@ for frag in ("SYNA", "Synaptics", f"+{r['gap_pct']:.1f}%", f"${r['prev_close']:.
     assert frag in body_row, (frag, body_row)
 assert not any(k in r for k in ("shares", "risk_usd", "total_investment", "pct_of_portfolio")) and "акции при" not in body_row           # 07.10: размерът е в браузъра
 assert (r["levels"]["entry"], r["levels"]["stop"], r["levels"]["strategy"]) == (round(r["ah_price"], 2), r["max_stop"], "kullamagi")    # вход = after-hours цената, стоп = 1×ADR под нея
-assert "Проверката е отварянето (15:30 CEST / 09:30 ET)" in et
+OPEN_BER = __import__("src.setup_rules", fromlist=["x"]).ny_time_in_berlin(dt.date.today(), 9, 30)          # 16.10.2026: от часовите зони (15:30 CEST лете, 14:30 CET в седмицата 25.10–01.11)
+assert f"Проверката е отварянето ({OPEN_BER} / 09:30 ET)" in et
 assert "Вчерашният дневник — after-hours срещу отваряне: SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)" in et
 assert "Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%)" in et and "решение за второ пускане — след 4–6 седмици" in et
 print(f"  ✓ колони: {head_row}; SYNA: AH +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), реалното заглавие на Yahoo, 'Придобиване (оферта)', ръст 3 м. {r['ret63_pct']:+.0f}%, стоп лимит ${r['max_stop']:.2f} (1×ADR), вход = after-hours цената; без брой акции")
@@ -241,7 +242,7 @@ for c in CARDS:
     assert f"очакван стоп (0.55×ADR) ≈ ${c['expected_stop']:.2f}" in emt and "акции при" not in emt
     assert f"ръст +{c['runup_pct']:.0f}% преди базата · консолидация {c['base_days']} дни" in emt and f"ADR {c['adr']:.1f}%" in emt
 assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 (−4.5%)" in emt and "91 акции" not in emt and SUMMARY in emt
-assert "Проверката е отварянето (15:30 CEST): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
+assert f"Проверката е отварянето ({OPEN_BER}): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
 assert "Измерване: 3 записа · затворени 0 · win rate след 20 затворени" in emt
 assert emt.index("Watchlist:") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
 assert "Qullamaggie сетъпи" not in emt

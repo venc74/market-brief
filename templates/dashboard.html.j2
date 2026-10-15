@@ -1182,7 +1182,7 @@
     {% for x in qm_ep.not_neglected %}<span style="font-family:'IBM Plex Mono',monospace;color:var(--text)">{{ x.ticker }} +{{ "%.1f"|format(x.gap_pct) }}%</span> ({{ x.why }}){{ "; " if not loop.last else "" }}{% endfor %}</div>
   {% endif %}
   <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
-    <b>Проверката е отварянето</b> (15:30 CEST / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
+    <b>Проверката е отварянето</b> ({{ ny_open_berlin }} / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
     {% set yd = (qm_ep.log or {}).get("yesterday") %}
     {% if yd %}<br><b>Вчерашният дневник — after-hours срещу отваряне:</b>
     {% for y in yd %}<span style="font-family:'IBM Plex Mono',monospace">{{ y.ticker }}</span> AH {{ "%+.1f"|format(y.ah_gap_pct) }}% → отваряне {{ "%+.1f"|format(y.open_gap_pct) }}% ({{ "издържа ≥ " ~ (qm_ep_gap|round|int) ~ "%" if y.held else "не издържа" }}){{ "; " if not loop.last else "" }}{% endfor %}.
