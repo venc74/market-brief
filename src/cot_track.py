@@ -55,6 +55,15 @@ def weekly_closes(symbol: str, fetch=None):
         return None
 
 
+def week_close_date(ts) -> str:
+    """15.10.2026: датата на седмичното затваряне — последната сесия от седмицата на бара (Yahoo етикетира седмичния бар с понеделника): петък, назад през уикенд и NYSE празник."""
+    d = ts.date() if hasattr(ts, "date") else ts
+    end = d + dt.timedelta(days=max(0, 4 - d.weekday()))
+    while end.weekday() >= 5 or end.isoformat() in config.NYSE_HOLIDAYS:
+        end -= dt.timedelta(days=1)
+    return end.isoformat()
+
+
 def confirmation(close, direction: str) -> dict | None:
     """
     Потвърждение от цената към последния бар на `close` (седмични затваряния, най-старото първо).
@@ -70,7 +79,8 @@ def confirmation(close, direction: str) -> dict | None:
     n = len(close)
     last = float(close.iloc[-1]); ma = float(sma.iloc[-1])
     out = {"close": round(last, 4), "sma": round(ma, 4), "gap_pct": round((last / ma - 1) * 100, 2),
-           "side": "below" if last < ma else "above", "want": "below" if want == -1 else "above"}
+           "side": "below" if last < ma else "above", "want": "below" if want == -1 else "above",
+           "close_date": week_close_date(close.index[-1])}                       # 15.10.2026: към коя дата е седмичното затваряне
     if int(side.iloc[-1]) != want:
         return {**out, "confirmed": False, "state": "not_crossed", "weeks_on_side": 0, "crossed": False}
     j = n - 1
@@ -94,7 +104,10 @@ def confirmation_text(c: dict | None, direction: str) -> str:
         return "SMA10: няма достатъчно ценови данни."
     side_bg = "под" if c["want"] == "below" else "над"
     other_bg = "над" if c["want"] == "below" else "под"
-    gap = f"цена {c['close']:g} срещу SMA10 {c['sma']:g} ({c['gap_pct']:+.1f}%)"
+    cd = c.get("close_date")
+    # 15.10.2026: цената носи датата — "седмично затваряне 6.492 към 02.10" (без дата не се виждаше, че това е миналата седмица, а не вчера)
+    what = f"седмично затваряне {c['close']:g} към {cd[8:10]}.{cd[5:7]}" if cd else f"цена {c['close']:g}"
+    gap = f"{what} срещу SMA10 {c['sma']:g} ({c['gap_pct']:+.1f}%)"
     if c["state"] == "confirmed":
         ago = "тази седмица" if c["weeks_on_side"] <= 1 else f"преди {c['weeks_on_side'] - 1} седмици"
         return f"Цената пресече SMA10 в посоката на сигнала ({side_bg} нея, {ago}); {gap}."

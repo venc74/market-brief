@@ -99,7 +99,7 @@ conf = [m for m, r in by.items() if r["price_confirmation"]["confirmed"]]
 assert conf == ["Copper", "Mexican Peso", "Australian Dollar", "Cotton", "Wheat"]
 assert [(m, by[m]["price_confirmation"]["state"], by[m]["price_confirmation"]["weeks_on_side"]) for m in ("30-Year Treasury Bond", "5-Year Treasury Note", "2-Year Treasury Note", "Soybeans")] == \
        [("30-Year Treasury Bond", "stale_cross", 14), ("5-Year Treasury Note", "stale_cross", 14), ("2-Year Treasury Note", "stale_cross", 7), ("Soybeans", "not_crossed", 0)]
-assert by["Copper"]["price_confirmation"]["text"] == "Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); цена 6.492 срещу SMA10 6.5617 (-1.1%)."
+assert by["Copper"]["price_confirmation"]["text"] == "Цената пресече SMA10 в посоката на сигнала (под нея, тази седмица); седмично затваряне 6.492 към 02.10 срещу SMA10 6.5617 (-1.1%)."   # 15.10: + датата
 assert by["Cotton"]["price_confirmation"]["text"].startswith("Цената пресече SMA10 в посоката на сигнала (под нея, преди 3 седмици)")
 assert by["30-Year Treasury Bond"]["price_confirmation"]["text"].startswith("Цената е под SMA10 от 14 седмици — пресичането в посоката на сигнала не е скорошно (над 4)")
 assert by["Soybeans"]["price_confirmation"]["text"].startswith("Цената не е пресякла SMA10 в посоката на сигнала (още е над нея)")
