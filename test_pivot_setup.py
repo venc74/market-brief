@@ -206,10 +206,10 @@ with tempfile.TemporaryDirectory() as tmp:
         html = render.render_dashboard(brief)
     finally:
         config.DOCS_DIR = orig_docs
-assert "Buy-stop $107.99" in html and "валиден до 2026-10-05" in html, "buy-stop редът липсва на Watchlist картата"
+assert "Buy-stop $107.99" in html and "валиден до 05.10" in html, "buy-stop редът липсва на Watchlist картата"
 assert html.count("🎯 Buy-stop") == 1                                     # само за below_pivot, не за TWLO/AMD
 assert "В скрийнъра, без сетъп за вход днес:" in html and "над +5% от pivot" in html                       # опростяване (10.10): extended → компактният ред
-print("  ✓ dashboard: Watchlist картата на BELOW показва 'Buy-stop $107.99 · валиден до 2026-10-05' (само тя); extended/no_volume — компактният ред с причината")
+print("  ✓ dashboard: Watchlist картата на BELOW показва 'Buy-stop $107.99 · валиден до 05.10' (само тя); extended/no_volume — компактният ред с причината")
 
 config.ENABLE_BACKTEST = True
 print()

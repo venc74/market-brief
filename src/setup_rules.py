@@ -180,7 +180,7 @@ def classify_setup(c: dict, today=None) -> dict:
     else:
         out.update(kind="below_pivot", gate="below_pivot", buy_stop=round(pivot, 2), trigger_text=(
             f"Чака пробив: buy-stop ${pivot:.2f} (валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, "
-            f"до {through}); сега {abs(pct):.1f}% под pivot. Купува се само ако High ≥ ${pivot:.2f}, "
+            f"до {_dm(through)}); сега {abs(pct):.1f}% под pivot. Купува се само ако High ≥ ${pivot:.2f}, "
             f"до ${chase:.2f}; обем ≥ {mult:g}× среден за потвърждение."))
     return out
 
@@ -211,11 +211,14 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     if not through or not start or through < today_iso or start > today_iso:
         return setup
     sessions = rec.get("window_sessions") or config.BUY_STOP_WINDOW_SESSIONS
-    old = f"(валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, до {setup.get('valid_through')})"
+    vt = setup.get("valid_through") or ""
     new = f"(валиден до {_dm(through)}, от {_dm(start)} — {sessions} сесии от първия ден)"
     text = setup.get("trigger_text") or ""
-    if old in text:
-        text = text.replace(old, new, 1)
+    for old in (f"(валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, до {_dm(vt)})" if vt else None,      # 15.10.2026: текстът е с ДД.ММ
+                f"(валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, до {vt})"):                            # стар формат (ISO)
+        if old and old in text:
+            text = text.replace(old, new, 1)
+            break
     setup.update(valid_through=through, valid_from=start, valid_label=f"до {_dm(through)}, от {_dm(start)}", book_status="pending")
     level = rec.get("buy_stop")
     if isinstance(level, (int, float)) and abs(level - setup["buy_stop"]) >= 0.005:

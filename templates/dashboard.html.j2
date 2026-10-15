@@ -912,7 +912,7 @@
              структурен стоп с процент, цел 1 е за половината позиция #}
           {% if p.method == 'v2' %}
           <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}</b></div>
-          <div class="kv"><span>Валиден до</span><b>{{ p.valid_through }} ({{ p.window_sessions }} сесии)</b></div>
+          <div class="kv"><span>Валиден до</span><b>{{ p.valid_through[8:10] ~ '.' ~ p.valid_through[5:7] if p.valid_through else '—' }} ({{ p.window_sessions }} сесии)</b></div>
           {% else %}
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
           {% endif %}
@@ -1002,7 +1002,7 @@
       {% if st.setup and st.setup.triggered %}
       <div class="buy-stop" style="color:var(--green)">{{ st.setup.trigger_text }}</div>
       {% elif st.setup and st.setup.buy_stop %}
-      <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ st.setup.valid_through) }}
+      <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ (st.setup.valid_through[8:10] ~ '.' ~ st.setup.valid_through[5:7] if st.setup.valid_through else '—')) }}
         · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
       {% set pp = st.plan_preview %}
