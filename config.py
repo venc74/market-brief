@@ -972,6 +972,9 @@ COT_KIND_TEXT = {
 COT_THESES_CACHE_FILE = DATA_DIR / "cot_theses_cache.json"
 COT_SCHEMA_VERSION = os.getenv("COT_SCHEMA_VERSION", "1")
 COT_THESES_MAX_AGE_DAYS = int(os.getenv("COT_THESES_MAX_AGE_DAYS", 8))
+# 15.10.2026: намерената подсказка за нов символ (сменен тикър, по company_claim) се помни — търсенето в Yahoo я дава един ден и не я дава на следващия (GMCR → KDP: 13.10 да, 14.10 не,
+# 15.10 да). Зарежда/записва се от main (ai_brief.SUCCESSOR_MEMORY), тестовете не го пипат.
+COT_SUCCESSOR_CACHE_FILE = DATA_DIR / "cot_successor_cache.json"
 COT_THESES_CACHE_KEEP_DAYS = int(os.getenv("COT_THESES_CACHE_KEEP_DAYS", 30))
 FORCE_COT_REGEN = os.getenv("FORCE_COT_REGEN", "0") == "1"
 # COT: дали работи (пакет 3 т.з) — ценово потвърждение и track record (src/cot_track.py).

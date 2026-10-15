@@ -633,9 +633,12 @@ def run() -> dict:
         for t, rec in sorted(_last_resolved_positions().items()) if t not in cot_live
     ] if config.ENABLE_BACKTEST else []
     # пакет 3 т.а/т.ж: кеш на тезите; при остарели COT данни (cot.LAST_STATUS["stale"]) нищо не се регенерира
+    ai_brief.load_successor_memory()                                   # 15.10.2026: намерените подсказки за нов символ (GMCR → KDP) не изчезват в ден без резултат от търсенето
     cot_with_theses = ai_brief.cot_theses(
         cot_extremes, screener_universe, cot_open_positions, cot_closed_positions,
         data_stale=bool(config.ENABLE_COT and cot.LAST_STATUS.get("stale"))) if cot_extremes else []
+    if ai_brief.SUCCESSOR_MEMORY:
+        ai_brief.save_successor_memory()
     # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване, не влияе на тезите
     cot_summary = None
     if config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses:

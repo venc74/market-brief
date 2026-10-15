@@ -1889,6 +1889,51 @@ def _successor_by_claim(ticker: str, claim: str | None) -> dict | None:
     return None
 
 
+# 15.10.2026: тикър → {ticker, name, claim, first_found, last_found} — намерените подсказки за нов символ (виж config.COT_SUCCESSOR_CACHE_FILE); main зарежда и записва.
+SUCCESSOR_MEMORY: dict[str, dict] = {}
+
+
+def load_successor_memory(path=None) -> int:
+    """Зарежда паметта от файла (липсващ/повреден → празна); връща броя записи. Не вдига."""
+    SUCCESSOR_MEMORY.clear()
+    try:
+        p = pathlib.Path(path or config.COT_SUCCESSOR_CACHE_FILE)
+        if p.exists():
+            data = json.loads(p.read_text(encoding="utf-8"))
+            SUCCESSOR_MEMORY.update({k: v for k, v in (data.get("tickers") or {}).items() if isinstance(v, dict) and v.get("ticker")})
+    except Exception as e:
+        print(f"[ai] паметта за нови символи не се зареди ({type(e).__name__}: {e}) — започвам празна")
+    return len(SUCCESSOR_MEMORY)
+
+
+def save_successor_memory(path=None) -> bool:
+    try:
+        p = pathlib.Path(path or config.COT_SUCCESSOR_CACHE_FILE)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"version": 1, "tickers": SUCCESSOR_MEMORY}, ensure_ascii=False, indent=1), encoding="utf-8")
+        return True
+    except Exception as e:
+        print(f"[ai] паметта за нови символи не се записа: {type(e).__name__}: {e}")
+        return False
+
+
+def _remember_successor(ticker: str, claim: str | None, found: dict | None, today: str | None = None) -> dict | None:
+    """
+    15.10.2026: намерена подсказка → записва се в паметта; ненамерена днес → подсказката от паметта, ако е за същата компания (company_claim съвпада с името ѝ; без твърдение — също).
+    GMCR → KDP (Keurig Dr Pepper): търсенето в Yahoo я даде на 13.10 и 15.10, но не и на 14.10.
+    """
+    today = today or dt.date.today().isoformat()
+    if found:
+        prev = SUCCESSOR_MEMORY.get(ticker) or {}
+        first = prev.get("first_found") if prev.get("ticker") == found["ticker"] else today
+        SUCCESSOR_MEMORY[ticker] = {"ticker": found["ticker"], "name": found.get("name"), "claim": claim, "first_found": first or today, "last_found": today}
+        return found
+    m = SUCCESSOR_MEMORY.get(ticker)
+    if m and (not str(claim or "").strip() or _cot_table.claim_matches(claim, {"name": m.get("name")})):
+        return {"ticker": m["ticker"], "name": m.get("name"), "remembered_from": m.get("last_found")}
+    return None
+
+
 def _unverified_reason(t: dict) -> tuple[dict, dict | None]:
     """
     12.10.2026: тикър без име в Yahoo → (lookup след повторен опит, изключване или None). Повторен опит (lru_cache пази провала — вика се самата функция);
@@ -1905,10 +1950,11 @@ def _unverified_reason(t: dict) -> tuple[dict, dict | None]:
     if bars is None:
         return lookup, {"ticker": tk, "code": "unverified_today", "reason": "не можа да се провери днес (Yahoo не върна нито име, нито цени)"}
     reason = "няма котировка в Yahoo (нито име, нито цени за последните 5 сесии) — делистнат или сменен символ"
-    succ = _successor_by_claim(tk, t.get("company_claim"))
+    succ = _remember_successor(tk, t.get("company_claim"), _successor_by_claim(tk, t.get("company_claim")))      # 15.10.2026: + паметта
     if succ:
         reason += f"; по името „{t.get('company_claim')}“ Yahoo води {succ['ticker']} ({succ['name']}) — вероятно новият символ"
-    return lookup, {"ticker": tk, "code": "unverified", "reason": reason, **({"successor": succ["ticker"]} if succ else {})}
+    return lookup, {"ticker": tk, "code": "unverified", "reason": reason, **({"successor": succ["ticker"]} if succ else {}),
+                    **({"successor_remembered_from": succ["remembered_from"]} if succ and succ.get("remembered_from") else {})}
 
 
 _CYRILLIC = re.compile(r"[Ѐ-ӿ]")
