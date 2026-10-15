@@ -1367,7 +1367,7 @@
       <tbody>
         {% for p in gw.recent %}
         <tr><td class="sym">{{ p.ticker }}</td><td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.resolution_date }}</td><td>{{ gw_st.get(p.resolution, p.resolution) }}</td>
-          <td class="n">{{ "%+.1f"|format(p.return_pct) }}%</td><td class="n">{% if p.return_pct_exec is not none %}{{ "%+.1f"|format(p.return_pct_exec) }}%{% else %}…{% endif %}</td>
+          <td class="n">{{ "%+.1f"|format(p.return_pct) }}%</td><td class="n">{% if p.return_pct_exec is not none %}{{ "%+.1f"|format(p.return_pct_exec) }}%{% elif p.exec_note %}<span style="font-size:11.5px;color:var(--muted)" title="exec: изход по отварянето на следващата сесия след затварянето под линията — брифът е преди нея, числото идва в следващия бриф">{{ p.exec_note.text }}</span>{% else %}…{% endif %}</td>
           <td class="n">{% if p.alpha_pct is not none %}{{ "%+.1f"|format(p.alpha_pct) }}%{% else %}—{% endif %}</td><td class="n">{{ p.hold_sessions if p.hold_sessions is not none else "—" }}</td></tr>
         {% endfor %}
       </tbody>

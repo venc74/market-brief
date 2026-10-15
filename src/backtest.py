@@ -1425,6 +1425,20 @@ def get_qm_summary() -> dict:
     }
 
 
+def gw_exec_note(r: dict, today_iso: str) -> dict | None:
+    """
+    15.10.2026: затворен запис на "GLB по Уиш" без exec резултат — exec изходът е по отварянето на следващата сесия след затварянето под линията (trade_sim.simulate_glb_wish),
+    а брифът е преди нея. {"date", "text"}: "изход по отварянето на 15.10 — утре" (числото идва в следващия бриф); сесия преди днес без резултат → "— чака данни". Иначе None.
+    """
+    if r.get("return_pct_exec") is not None or not r.get("resolution_date"):
+        return None
+    try:
+        d = setup_rules.session_window(dt.date.fromisoformat(r["resolution_date"]) + dt.timedelta(days=1), 1)[0].isoformat()
+    except (ValueError, TypeError):
+        return None
+    return {"date": d, "text": f"изход по отварянето на {d[8:10]}.{d[5:7]} — {'утре' if d >= today_iso else 'чака данни'}"}
+
+
 def get_glb_wish_summary() -> dict:
     """
     GLB по Уиш: обобщение на ОТДЕЛНАТА книга "glb_wish" (буквалното правило на Wish, без нашите филтри — измерване, не препоръка). Чисто локално четене (без мрежа). Доходност в % (няма стоп → няма R) на две граници:
@@ -1496,8 +1510,10 @@ def get_glb_wish_summary() -> dict:
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note")}
     live_all = sorted((r for r in records if r.get("status") in ("open", "pending")), key=lambda r: (r["entry_date"], r["ticker"]), reverse=True)
     live = [_row(r) for r in live_all[:15]]
+    today_iso = dt.date.today().isoformat()
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "return_pct": r.get("return_pct"), "return_pct_exec": r.get("return_pct_exec"),
-                      "alpha_pct": r.get("alpha_pct")} for r in with_result if r["status"] in trade_sim.GW_TERMINAL), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
+                      "alpha_pct": r.get("alpha_pct"), "exec_note": gw_exec_note(r, today_iso)}
+                     for r in with_result if r["status"] in trade_sim.GW_TERMINAL), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
     return {
         "enabled": True, "track_from": config.GLB_WISH_TRACK_FROM or None, "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
         "pending": by_status.get("pending", 0), "open": by_status.get("open", 0), "line_exit": by_status.get("line_exit", 0), "expired": by_status.get("expired", 0), "invalid": by_status.get("invalid_signal", 0),
