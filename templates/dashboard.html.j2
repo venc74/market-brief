@@ -586,7 +586,9 @@
     {% for n in news %}
     <div class="news-item">
       <span class="news-dot"></span>
-      <div><span class="news-head">{{ n.headline }}</span>
+      {# 15.10.2026: заглавието е ДОСЛОВНО от източника (news_aggregator.pick_verbatim); преводът е отделно, в скоби #}
+      <div><span class="news-head">{{ n.headline }}</span>{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}
+        {% if n.headline_bg %}<span class="news-why"> ({{ n.headline_bg }})</span>{% endif %}
         {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
     </div>
     {% endfor %}

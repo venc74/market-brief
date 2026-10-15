@@ -1,0 +1,715 @@
+{
+ "_note": "РЕАЛНО: суровият пул заглавия от news_aggregator.gather_raw(hours=24), свален на 15.10.2026 15:31 (Берлин) от config.NEWS_RSS_FEEDS (+ scrape fallback при мъртъв източник). Заглавията са дословно от източниците. Ползва се от test_news_verbatim.py.",
+ "items": [
+  {
+   "source": "Reuters Business",
+   "title": "Kremlin says Russia restarts diesel exports after deal with Trump - Reuters",
+   "summary": "Kremlin says Russia restarts diesel exports after deal with Trump Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Wholesale prices jumped 6.3% annually in September, biggest gain since 2022",
+   "summary": "September producer prices were expected to increase 0.6% month-over-month and 5.5% annually, according to the consensus estimate by Dow Jones."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Zelenskyy defies Trump as Ukraine resumes strikes on Russian refineries",
+   "summary": "Ukrainian president expresses anger in FT interview at ‘dangerous’ withdrawal of US intelligence sharing"
+  },
+  {
+   "source": "AP Business",
+   "title": "US stocks drop to their worst day since July as inflation worsens - AP News",
+   "summary": "US stocks drop to their worst day since July as inflation worsens AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Swedish parliament votes against Social Democrats leader as PM, as expected - Reuters",
+   "summary": "Swedish parliament votes against Social Democrats leader as PM, as expected Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "U.S. reportedly considers use of 'mother of all bombs' as Iran vows to fight on",
+   "summary": "The U.S. military has reportedly drawn up options for strikes on Iran that include the potential use of one of the biggest non-nuclear bombs in its arsenal."
+  },
+  {
+   "source": "Financial Times",
+   "title": "EU leaders to urge Zelenskyy to rein in criticism of Trump",
+   "summary": "Ukrainian leader’s comments about US president alarm European capitals"
+  },
+  {
+   "source": "AP Business",
+   "title": "Rubio urges restraint over Ethiopia-Eritrea tensions as rights group reports civilians killed - AP News",
+   "summary": "Rubio urges restraint over Ethiopia-Eritrea tensions as rights group reports civilians killed AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "EU and Gulf states postpone summit due in Saudi Arabia - Reuters",
+   "summary": "EU and Gulf states postpone summit due in Saudi Arabia Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Memory stocks are getting hammered. China and a 2029 oversupply are the big worries",
+   "summary": "SK Hynix, Samsung and Micron have been some of the hardest-hit names in the latest tech sell-off."
+  },
+  {
+   "source": "Financial Times",
+   "title": "US floats unfreezing some Russian assets",
+   "summary": "European officials balked at proposal made by Donald Trump’s negotiators during meeting in Miami"
+  },
+  {
+   "source": "AP Business",
+   "title": "Iran-backed Houthis strike Saudi oil company Aramco’s headquarters, officials say - AP News",
+   "summary": "Iran-backed Houthis strike Saudi oil company Aramco’s headquarters, officials say AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Israeli firm used online ads to run vast spy operation, researchers say - Reuters",
+   "summary": "Israeli firm used online ads to run vast spy operation, researchers say Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Nvidia, AMD, Micron fall as AI stock sell-off deepens",
+   "summary": "A sell-off in global technology hardware stocks deepened Thursday."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Germany’s Merz vows to fight on: ‘We are the firewall’",
+   "summary": "Defiant chancellor tells the FT he is determined to drive through unpopular reforms and equip Europe for an age of upheaval"
+  },
+  {
+   "source": "AP Business",
+   "title": "Cornell president pressed by faculty frustrated by his handling of fraternity rape allegations - AP News",
+   "summary": "Cornell president pressed by faculty frustrated by his handling of fraternity rape allegations AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "How Iran's precision strikes picked apart Gulf infrastructure - Reuters",
+   "summary": "How Iran's precision strikes picked apart Gulf infrastructure Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Treasury yields slide as investors flee to safety of bonds amid tech rout",
+   "summary": "Investors rotated into bonds amid a broader flight to safety."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Is the K-shaped economy really more of an E?",
+   "summary": "America remains a very unequal place, but on many metrics inequality is not increasing"
+  },
+  {
+   "source": "AP Business",
+   "title": "Zimbabwe’s Caine Prize winner rejects claim he used AI to write his story - AP News",
+   "summary": "Zimbabwe’s Caine Prize winner rejects claim he used AI to write his story AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Prince Harry and wife Meghan make first joint appearance since UK return - Reuters",
+   "summary": "Prince Harry and wife Meghan make first joint appearance since UK return Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Here are Thursday's biggest analyst calls: Nvidia, CoreWeave, Walmart, Crocs, CarMax, Regeneron & more",
+   "summary": "Here are Thursday's biggest calls on Wall Street."
+  },
+  {
+   "source": "Financial Times",
+   "title": "London’s gold market enjoys the Trump effect",
+   "summary": "The City’s dominance of physical trading in the metal is being reinforced by global instability"
+  },
+  {
+   "source": "AP Business",
+   "title": "Trump press secretary Katie Zacharia faces scrutiny over claims she’s a lawyer - AP News",
+   "summary": "Trump press secretary Katie Zacharia faces scrutiny over claims she’s a lawyer AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Albania's leader defies calls to resign as student protesters rampage in capital - Reuters",
+   "summary": "Albania's leader defies calls to resign as student protesters rampage in capital Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "U.S. Treasury dismisses IMF debt warning and 'messy' forecasting",
+   "summary": "The exchange comes as U.S. debt exceeds $40 trillion and 10-year Treasury yields remain above 5%, intensifying scrutiny of the fiscal outlook."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Global chip stocks sink as AI debt fears intensify",
+   "summary": "Treasuries rally as investors flee to safety of bonds"
+  },
+  {
+   "source": "AP Business",
+   "title": "The first new sunscreen type in 25 years has arrived on US store shelves - AP News",
+   "summary": "The first new sunscreen type in 25 years has arrived on US store shelves AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Warsh's quest for quiet Fed gets vocal pushback - Reuters",
+   "summary": "Warsh's quest for quiet Fed gets vocal pushback Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Analysis: Why a $2 trillion deficit and 5% Treasury yields are becoming America's biggest economic challenge",
+   "summary": "Treasury yields above 5% are raising borrowing costs for households and the federal government, highlighting the challenge of financing $2 trillion deficits."
+  },
+  {
+   "source": "Financial Times",
+   "title": "CoreWeave’s bonds scream financial distress",
+   "summary": "The company better hurry up figuring out how to tap insurers for cash"
+  },
+  {
+   "source": "AP Business",
+   "title": "Inflation worsened last month to 3.7% in sign that prices remain elevated as midterm elections near - AP News",
+   "summary": "Inflation worsened last month to 3.7% in sign that prices remain elevated as midterm elections near AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Why is the haze so bad in Southeast Asia this year? - Reuters",
+   "summary": "Why is the haze so bad in Southeast Asia this year? Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Cboe to expand options trading hours for major stocks and ETFs",
+   "summary": "Cboe will offer trading on 24 of the most actively traded companies and five ETFs between 7:30 a.m. and 9:25 a.m. ET and 4:00 p.m. to 4:15 p.m. ET."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Credit Suisse bankers denied bonuses stripped after UBS takeover",
+   "summary": "Switzerland’s top court sides with government decision, overturning ruling of lower court"
+  },
+  {
+   "source": "AP Business",
+   "title": "North Korea holds first underwater-launched missile tests in nearly 3 years - AP News",
+   "summary": "North Korea holds first underwater-launched missile tests in nearly 3 years AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Russia builds major new drone attack base in six weeks, satellite images show - Reuters",
+   "summary": "Russia builds major new drone attack base in six weeks, satellite images show Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Amazon launches new Bee 'personal AI' devices that listen to conversations",
+   "summary": "The $75 Bee Frontier is an upgraded version of Amazon's wearable bracelet, while the $100 Bee Eclipse attaches to a user's smartphone."
+  },
+  {
+   "source": "Financial Times",
+   "title": "Credit Suisse secured $800mn from insurers in Greensill settlement",
+   "summary": "Broker Marsh to shoulder largest share rather than insurers who wrote policies"
+  },
+  {
+   "source": "AP Business",
+   "title": "ICE rejects suggestion that its officers wear body cameras that automatically activate - AP News",
+   "summary": "ICE rejects suggestion that its officers wear body cameras that automatically activate AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "AstraZeneca strikes $40 million AI drug discovery deal with insitro - Reuters",
+   "summary": "AstraZeneca strikes $40 million AI drug discovery deal with insitro Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "The problem with 'good debt': Why borrowers should think twice about the label",
+   "summary": "Mortgages and student loans are often called \"good debt.\" Experts say that label can hide the real question: Can you actually afford the risk?"
+  },
+  {
+   "source": "Financial Times",
+   "title": "New ‘zero-click’ spyware hacked phones using targeted ads",
+   "summary": "Citizen Lab researchers uncover Israeli-developed ‘AdFection’ technique that requires no interaction from victim to infect devices"
+  },
+  {
+   "source": "AP Business",
+   "title": "Photos of Ukrainian residents escaping their burning homes after deadly Russian attacks - AP News",
+   "summary": "Photos of Ukrainian residents escaping their burning homes after deadly Russian attacks AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Venezuela's Maduro due in court over new US torture charge - Reuters",
+   "summary": "Venezuela's Maduro due in court over new US torture charge Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "College was supposed to be ‘good debt.’ For many borrowers, it isn’t paying off",
+   "summary": "Rising college costs, growing student debt, changing repayment rules and a tougher job market are challenging the idea that student loans are \"good debt.\""
+  },
+  {
+   "source": "Financial Times",
+   "title": "Republicans fund midterms ad blitz as Democrats gain in polls",
+   "summary": "The president’s party is shifting spending on advertising to previously safe seats as election day approaches"
+  },
+  {
+   "source": "AP Business",
+   "title": "Ukraine resumes attacks on Russian oil refineries, officials say, as US relations teeter - AP News",
+   "summary": "Ukraine resumes attacks on Russian oil refineries, officials say, as US relations teeter AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Northern Ireland's Donaldson jailed for 15 years for child sex offences - Reuters",
+   "summary": "Northern Ireland's Donaldson jailed for 15 years for child sex offences Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Jim Cramer's top 10 things to watch in the stock market Thursday",
+   "summary": "This is a fulcrum day for the market."
+  },
+  {
+   "source": "AP Business",
+   "title": "Rep. Ilhan Omar's phone seized and relatives subpoenaed in criminal probe, AP source says - AP News",
+   "summary": "Rep. Ilhan Omar's phone seized and relatives subpoenaed in criminal probe, AP source says AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Two ships ablaze off Romanian Black Sea coast, 7 sailors missing - Reuters",
+   "summary": "Two ships ablaze off Romanian Black Sea coast, 7 sailors missing Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Ukraine to resume strikes on Russian refineries, shattering hopes of an 'energy ceasefire'",
+   "summary": "Ukraine will now resume attacks on Russian energy targets after Moscow hasn't held up its end of the proposed deal brokered by Trump."
+  },
+  {
+   "source": "AP Business",
+   "title": "Pope Leo is eating, celebrating Mass and walking after cancer surgery, but trip is in question - AP News",
+   "summary": "Pope Leo is eating, celebrating Mass and walking after cancer surgery, but trip is in question AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Oil shipping costs spike, lifting prices from pump to grocery - Reuters",
+   "summary": "Oil shipping costs spike, lifting prices from pump to grocery Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "What to know about Starshield, SpaceX's military-focused Starlink service",
+   "summary": "Elon Musk distinguished Starshield from Starlink, which he said could not be used for offensive military operations."
+  },
+  {
+   "source": "AP Business",
+   "title": "A wall of screens, 32 teams and 1 mission: How NHL Player Safety tracks trouble in real time - AP News",
+   "summary": "A wall of screens, 32 teams and 1 mission: How NHL Player Safety tracks trouble in real time AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "CoreWeave shares, bonds slide further as AI debt fears mount - Reuters",
+   "summary": "CoreWeave shares, bonds slide further as AI debt fears mount Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "How lower fuel economy targets could boost pickups and V-8 engines",
+   "summary": "An analyst who follows the industry says there are four ways recent changes to fuel economy rules will shift investment toward the most profitable segments."
+  },
+  {
+   "source": "AP Business",
+   "title": "Tokyo protests Russia’s arrest of Japanese journalist on suspicion of spying - AP News",
+   "summary": "Tokyo protests Russia’s arrest of Japanese journalist on suspicion of spying AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Tesla set to unveil next generation Roadster sports EV after years of delay - Reuters",
+   "summary": "Tesla set to unveil next generation Roadster sports EV after years of delay Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Nvidia CEO Jensen Huang urges U.S.-China dialogue on 'potentially dangerous' AI",
+   "summary": "Huang told CNBC he has ongoing \"dialogs\" with researchers in China."
+  },
+  {
+   "source": "AP Business",
+   "title": "Trump says oil, gas and mineral exploration in Greenland is set to begin. It’s not that simple - AP News",
+   "summary": "Trump says oil, gas and mineral exploration in Greenland is set to begin. It’s not that simple AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Russia arrests Swedish man it says planned 'terrorist acts' for Ukraine - Reuters",
+   "summary": "Russia arrests Swedish man it says planned 'terrorist acts' for Ukraine Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Walmart is a buy as inflation attracts more customers, says Deutsche Bank",
+   "summary": "The investment bank upgraded the retail giant to buy from hold."
+  },
+  {
+   "source": "AP Business",
+   "title": "Kamala Harris adds stops to her final midterm campaign stretch. Her decision about 2028 comes later - AP News",
+   "summary": "Kamala Harris adds stops to her final midterm campaign stretch. Her decision about 2028 comes later AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Nasdaq futures fall 1% as AI rout deepens on debt concerns - Reuters",
+   "summary": "Nasdaq futures fall 1% as AI rout deepens on debt concerns Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "TSMC posts record profit for a sixth straight quarter, beating estimates on AI boom",
+   "summary": "TSMC reported its third-quarter earnings on Thursday."
+  },
+  {
+   "source": "AP Business",
+   "title": "Inflation anxiety drags on AI stocks for a second day as markets point to a mixed open - AP News",
+   "summary": "Inflation anxiety drags on AI stocks for a second day as markets point to a mixed open AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "US FTC subpoenas OpenAI and Anthropic over consumer harms, Axios reports - Reuters",
+   "summary": "US FTC subpoenas OpenAI and Anthropic over consumer harms, Axios reports Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Elon Musk says Trump is 'ultimately' responsible for any curbs on Ukraine's Starshield systems",
+   "summary": "\"Any limits on speed or usage are decided by the US military and ultimately POTUS,\" Musk wrote."
+  },
+  {
+   "source": "AP Business",
+   "title": "Iran says a ship sank after striking a mine in Strait of Hormuz, and other Middle East developments - AP News",
+   "summary": "Iran says a ship sank after striking a mine in Strait of Hormuz, and other Middle East developments AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Russia's oil and gas revenue seen up 10% y/y in October to $12 billion - Reuters",
+   "summary": "Russia's oil and gas revenue seen up 10% y/y in October to $12 billion Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Lisa Cook lawyer doubts Trump committee's fairness as president calls her 'automatic no vote'",
+   "summary": "White House spokesman Matthew Middleton said in response to Cook's lawyer that Trump \"is performing his constitutional duty.\""
+  },
+  {
+   "source": "AP Business",
+   "title": "Houston Astros do not renew Joe Espada’s contract, part ways with their manager - AP News",
+   "summary": "Houston Astros do not renew Joe Espada’s contract, part ways with their manager AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Cohere moves to buy AI cybersecurity startup AISLE - Reuters",
+   "summary": "Cohere moves to buy AI cybersecurity startup AISLE Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "What is the Citi trifecta? Boost your rewards and maximize redemptions for under $100 in annual fees",
+   "summary": "You can maximize your Citi ThankYou® Points with this combination of Citi credit cards."
+  },
+  {
+   "source": "AP Business",
+   "title": "China’s trade surplus nears record as pressure mounts from trading partners - AP News",
+   "summary": "China’s trade surplus nears record as pressure mounts from trading partners AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Chinese automaker Chery to launch new EV model in UK in early 2027 - Reuters",
+   "summary": "Chinese automaker Chery to launch new EV model in UK in early 2027 Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Bank of America hired 1,000 contractors to patch software flaws exposed by Anthropic's Mythos",
+   "summary": "Bank of America hired 1,000 contractors to patch software flaws exposed by Anthropic’s Mythos, offering a rare look at costs involved in defending against AI."
+  },
+  {
+   "source": "AP Business",
+   "title": "Police seize robot that groped 16-year-old girl, investigate whether young men were at the controls - AP News",
+   "summary": "Police seize robot that groped 16-year-old girl, investigate whether young men were at the controls AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "India says first phase of US trade deal nearly done, insists on edge over rivals - Reuters",
+   "summary": "India says first phase of US trade deal nearly done, insists on edge over rivals Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "You can take it with you: Five tax tips before selling your business",
+   "summary": "Business owners can leave millions of dollars on the table by delaying tax planning. Here are five tips for entrepreneurs to maximize their windfall."
+  },
+  {
+   "source": "AP Business",
+   "title": "Ukrainian drones are forced to slow down by sudden restrictions on use of Starlink - AP News",
+   "summary": "Ukrainian drones are forced to slow down by sudden restrictions on use of Starlink AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Drone attack causes fire at Russia's Ryazan refinery, regional governor says - Reuters",
+   "summary": "Drone attack causes fire at Russia's Ryazan refinery, regional governor says Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "OpenAI bugging suspect booked one-way ticket to Saudi Arabia with family before arrest",
+   "summary": "\"Like countless Americans, Mr. Alfozan came to this country years ago as a young person with a dream,\" his criminal defense lawyer said Wednesday."
+  },
+  {
+   "source": "AP Business",
+   "title": "UN peacekeeping chief says major questions hang over southern Lebanon as UNIFIL exit nears - AP News",
+   "summary": "UN peacekeeping chief says major questions hang over southern Lebanon as UNIFIL exit nears AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Pakistan school roof collapse kills at least 32 children and a teacher - Reuters",
+   "summary": "Pakistan school roof collapse kills at least 32 children and a teacher Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Merck CEO tells CNBC he expects breakthrough cancer vaccine will become faster to make",
+   "summary": "His comments come after Merck officially opened its new 120,000-square-foot research facility in the Greater Philadelphia area."
+  },
+  {
+   "source": "AP Business",
+   "title": "Artificial intelligence - AP News",
+   "summary": "Artificial intelligence AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Ukraine hits Russian refinery as Zelenskiy says 'we're done' with Trump's energy truce - Reuters",
+   "summary": "Ukraine hits Russian refinery as Zelenskiy says 'we're done' with Trump's energy truce Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Anthropic's third-quarter revenue is said to hit $16.8 billion ahead of IPO",
+   "summary": "Anthropic reports third-quarter stands at $16.8 billion ahead of its IPO."
+  },
+  {
+   "source": "AP Business",
+   "title": "Tennis Scores, News & Stats - AP News",
+   "summary": "Tennis Scores, News & Stats AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Lufthansa tells jets to carry extra fuel into Frankfurt as supplies tighten - Reuters",
+   "summary": "Lufthansa tells jets to carry extra fuel into Frankfurt as supplies tighten Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Anduril employee tender offer would value the defense tech startup at $90 billion",
+   "summary": "Anduril has been a major winner of the growing U.S. defense tech boom and President Donald Trump's plans to reindustrialize the U.S. military"
+  },
+  {
+   "source": "AP Business",
+   "title": "Israeli rights groups report a surge of Palestinian inmates being shot with rubber bullets - AP News",
+   "summary": "Israeli rights groups report a surge of Palestinian inmates being shot with rubber bullets AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Bollywood actor Imran Khan asked to leave India after participating in protest, media says - Reuters",
+   "summary": "Bollywood actor Imran Khan asked to leave India after participating in protest, media says Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "France is ‘putting the house in order’ and can slash deficit to 3% in three years, central bank governor tells CNBC",
+   "summary": "France is able to slash its huge budget deficit troubling investors across the globe, according to the head of the country's central bank."
+  },
+  {
+   "source": "AP Business",
+   "title": "Appeals court judges question the government about Trump's DC National Guard deployment - AP News",
+   "summary": "Appeals court judges question the government about Trump's DC National Guard deployment AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Setback for TikTok as EU court adviser backs gatekeeper label - Reuters",
+   "summary": "Setback for TikTok as EU court adviser backs gatekeeper label Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "India’s IDBI Bank falls 7% as government announces $5.5 billion stake sale to Canada's Fairfax",
+   "summary": "The Indian government has been divesting its stake in several state-owned companies this year as it tries to keep its growth engine running amid deepening fiscal pressures."
+  },
+  {
+   "source": "AP Business",
+   "title": "Texas prosecutor says ICE officer appeared to intentionally strike a man with a vehicle in Houston - AP News",
+   "summary": "Texas prosecutor says ICE officer appeared to intentionally strike a man with a vehicle in Houston AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Chinese startup DexForce trains humanoid robots using virtual data to slash costs - Reuters",
+   "summary": "Chinese startup DexForce trains humanoid robots using virtual data to slash costs Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Brazil’s Senate approves a shorter workweek in major win for Lula ahead of runoff - AP News",
+   "summary": "Brazil’s Senate approves a shorter workweek in major win for Lula ahead of runoff AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "COMMENTARY: Oil's long view darkens as Iran war refuses to end - Reuters",
+   "summary": "COMMENTARY: Oil's long view darkens as Iran war refuses to end Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Hot weather and winds raise California wildfire threat as power shutoffs start - AP News",
+   "summary": "Hot weather and winds raise California wildfire threat as power shutoffs start AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "India's RBI has spent half of $140 billion FX capital haul in rupee defence, bankers estimate - Reuters",
+   "summary": "India's RBI has spent half of $140 billion FX capital haul in rupee defence, bankers estimate Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "IMF chief urges US and wealthy nations to rein in debt to ease global economic pressure - AP News",
+   "summary": "IMF chief urges US and wealthy nations to rein in debt to ease global economic pressure AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "This Chinese export boom really has legs – and wings - Reuters",
+   "summary": "This Chinese export boom really has legs – and wings Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "How major US stock indexes fared Wednesday 10/14/2026 - AP News",
+   "summary": "How major US stock indexes fared Wednesday 10/14/2026 AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "AI-boosted UK economy beats forecasts, giving Healey pre-budget lift - Reuters",
+   "summary": "AI-boosted UK economy beats forecasts, giving Healey pre-budget lift Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Judge extends order blocking Trump from banning CNN, MS NOW and Politico reporters from White House - AP News",
+   "summary": "Judge extends order blocking Trump from banning CNN, MS NOW and Politico reporters from White House AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Hyundai to recall over 94,600 US vehicles over fire risk from overheating, NHTSA says - Reuters",
+   "summary": "Hyundai to recall over 94,600 US vehicles over fire risk from overheating, NHTSA says Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Teen accused of plotting mass shooting at Chicago-area Hindu temple - AP News",
+   "summary": "Teen accused of plotting mass shooting at Chicago-area Hindu temple AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "TomTom shares fall as revenue miss outweighs higher margin forecast - Reuters",
+   "summary": "TomTom shares fall as revenue miss outweighs higher margin forecast Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Netflix is cutting nearly 1,000 jobs in biggest layoffs in years - AP News",
+   "summary": "Netflix is cutting nearly 1,000 jobs in biggest layoffs in years AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "US Treasury pushes global partners to rename AI as 'super intelligence' - Reuters",
+   "summary": "US Treasury pushes global partners to rename AI as 'super intelligence' Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Study says global warming did more than El Niño to turbocharge Hurricane Polo - AP News",
+   "summary": "Study says global warming did more than El Niño to turbocharge Hurricane Polo AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "South Korea's KOSPI closes at 6-month low as chipmakers slump on AI worries - Reuters",
+   "summary": "South Korea's KOSPI closes at 6-month low as chipmakers slump on AI worries Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Fuel crisis hits Indonesia’s Bali, triggers long lines in gas stations for days - AP News",
+   "summary": "Fuel crisis hits Indonesia’s Bali, triggers long lines in gas stations for days AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "US military weighs use of ‘mother of all bombs’ in potential future strikes on Iran, CNN says - Reuters",
+   "summary": "US military weighs use of ‘mother of all bombs’ in potential future strikes on Iran, CNN says Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "‘Cockroach’ movement leaders jailed for 5 days after scaling barricades at New Delhi protest - AP News",
+   "summary": "‘Cockroach’ movement leaders jailed for 5 days after scaling barricades at New Delhi protest AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Apollo's easyJet buyout faces union pushback ahead of first quarter 2027 close - Reuters",
+   "summary": "Apollo's easyJet buyout faces union pushback ahead of first quarter 2027 close Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Riots erupt in Albania’s capital as students join anti-government movement - AP News",
+   "summary": "Riots erupt in Albania’s capital as students join anti-government movement AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Is the AI rout making bonds safe again? - Reuters",
+   "summary": "Is the AI rout making bonds safe again? Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Frustrated with Trump, voters overwhelmingly want change in Washington, an AP-NORC poll finds - AP News",
+   "summary": "Frustrated with Trump, voters overwhelmingly want change in Washington, an AP-NORC poll finds AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Hormuz shipping disruption is starting to hit harvests, UN agency says - Reuters",
+   "summary": "Hormuz shipping disruption is starting to hit harvests, UN agency says Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Everyone has the same question in the midterms — where's the beef? (And how much does it cost?) - AP News",
+   "summary": "Everyone has the same question in the midterms — where's the beef? (And how much does it cost?) AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Taiwan president calls for Micron, workers to negotiate 'sincerely' ahead of possible strike - Reuters",
+   "summary": "Taiwan president calls for Micron, workers to negotiate 'sincerely' ahead of possible strike Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Kelly Clarkson and a Brooklyn store clashed on social media. Behind it, power dynamics loomed - AP News",
+   "summary": "Kelly Clarkson and a Brooklyn store clashed on social media. Behind it, power dynamics loomed AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "AI credit jitters drive US tech default insurance to record highs - Reuters",
+   "summary": "AI credit jitters drive US tech default insurance to record highs Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Pope Leo XIV has lung cancer called adenocarcinoma. Here’s what that means - AP News",
+   "summary": "Pope Leo XIV has lung cancer called adenocarcinoma. Here’s what that means AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "EU leaders kick off summit with wrangles over high energy prices and spending - Reuters",
+   "summary": "EU leaders kick off summit with wrangles over high energy prices and spending Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Shohei Ohtani batting 6th, a lone single, and the Dodgers staring at playoff elimination - AP News",
+   "summary": "Shohei Ohtani batting 6th, a lone single, and the Dodgers staring at playoff elimination AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Bessent calls for World Bank reforms, including upstream oil and gas financing - Reuters",
+   "summary": "Bessent calls for World Bank reforms, including upstream oil and gas financing Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "The Phillies are keeping Don Mattingly as manager on a 2-year deal - AP News",
+   "summary": "The Phillies are keeping Don Mattingly as manager on a 2-year deal AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Cartier-owner Richemont in talks to join bid for diamond giant De Beers, source says - Reuters",
+   "summary": "Cartier-owner Richemont in talks to join bid for diamond giant De Beers, source says Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "Rays and Guardians to play ALCS Game 3 in afternoon to beat rain. NLCS game also moved up - AP News",
+   "summary": "Rays and Guardians to play ALCS Game 3 in afternoon to beat rain. NLCS game also moved up AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Morning Bid: CoreWeave at the heart of wipeout as AI rout deepens - Reuters",
+   "summary": "Morning Bid: CoreWeave at the heart of wipeout as AI rout deepens Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "As Kimberly Guilfoyle leaves Athens post, Greece feels further from Trump orbit - AP News",
+   "summary": "As Kimberly Guilfoyle leaves Athens post, Greece feels further from Trump orbit AP News"
+  },
+  {
+   "source": "Reuters Business",
+   "title": "Trump says advanced defense test range to be located in Montana - Reuters",
+   "summary": "Trump says advanced defense test range to be located in Montana Reuters"
+  },
+  {
+   "source": "AP Business",
+   "title": "School roof collapse in Pakistan kills at least 35 and injures more than 50 - AP News",
+   "summary": "School roof collapse in Pakistan kills at least 35 and injures more than 50 AP News"
+  }
+ ]
+}

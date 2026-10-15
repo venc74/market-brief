@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime as dt
 import itertools
 import json
+import re
 import time
 import requests
 
@@ -245,10 +246,64 @@ _SYSTEM = ("Ти си макро редактор за суинг търгове
            "термини на английски.")
 
 
+_NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
+_SCALE_EN = re.compile(r"\b(million|billion|trillion|mln|bn|tn)\b", re.I)
+_SCALE_BG = re.compile(r"млн|млрд|трлн|милион|милиард|трилион", re.I)
+
+
+def _translation_ok(bg: str, title: str) -> bool:
+    """
+    15.10.2026: преводът на заглавието (headline_bg) не бива да носи числа, които ги няма в оригинала, нито да губи мащаба ("awards $2 в damages" на 14.10 —
+    в оригинала сумата е с мащаб). Всяко число в превода трябва да е в оригинала; оригинал с million/billion/trillion → преводът трябва да има млн/млрд/трлн.
+    """
+    nums = {n.replace(",", ".") for n in _NUM_RE.findall(title)}
+    if any(n.replace(",", ".") not in nums for n in _NUM_RE.findall(bg)):
+        return False
+    return not (_SCALE_EN.search(title) and not _SCALE_BG.search(bg))
+
+
+def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], list[dict]]:
+    """
+    15.10.2026: заглавието е ДОСЛОВНО от източника — моделът връща само индекса "i" в пула, "why" и по желание превод "headline_bg"; кодът взема
+    заглавието и източника от пула (до 15.10 моделът пишеше заглавието сам и го превеждаше наполовина: "Dollar languishes като…", "Iran deploy нови тактики",
+    "awards $2 в damages" на 14.10; 88 от 688 заглавия в историята са смесени). Ред без валиден индекс, повторен индекс или празно "why" отпада (в причините).
+    Превод с число, което го няма в оригинала, или без мащаба му се маха (_translation_ok). Чиста функция → (новини, отпаднали).
+    """
+    out, seen, dropped = [], set(), []
+    for n in items or []:
+        if not isinstance(n, dict):
+            continue
+        i = n.get("i")
+        if isinstance(i, bool) or not isinstance(i, int) or not 0 <= i < len(pool):
+            dropped.append({"i": i, "reason": "няма валиден индекс в пула", "headline": n.get("headline")})
+            continue
+        if i in seen:
+            dropped.append({"i": i, "reason": "повторен индекс"})
+            continue
+        why = (n.get("why") or "").strip()
+        if not why:
+            dropped.append({"i": i, "reason": "празно why"})
+            continue
+        seen.add(i)
+        r = pool[i]
+        row = {"headline": r["title"], "source": r.get("source"), "why": why}
+        bg = (n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) else ""
+        if bg and re.search(r"[А-Яа-я]", bg) and bg != r["title"]:
+            if _translation_ok(bg, r["title"]):
+                row["headline_bg"] = bg
+            else:
+                dropped.append({"i": i, "reason": "преводът на заглавието е махнат (число или мащаб, различни от оригинала)", "headline_bg": bg})
+        out.append(row)
+    return out[:max_items], dropped
+
+
+LAST_DIAG: dict = {}
+
+
 def significant_news(max_items: int = 8) -> list[dict]:
     """
-    Връща [{headline, why}] — до max_items пазарно значими новини. Кешира за деня.
-    Празен списък при провал (graceful degradation).
+    Връща [{headline, source, why, headline_bg?}] — до max_items пазарно значими новини; headline е ДОСЛОВНО от източника (15.10.2026, pick_verbatim).
+    Кешира за деня. Празен списък при провал (graceful degradation).
     """
     today = dt.date.today().isoformat()
     if _CACHE.exists():
@@ -264,8 +319,9 @@ def significant_news(max_items: int = 8) -> list[dict]:
         print("[news] нула източници върнаха данни — пропускам секцията")
         return []
 
-    # ограничаваме промпта
-    compact = [{"s": r["source"], "t": r["title"], "d": r["summary"]} for r in raw[:config.NEWS_MAX_TO_FILTER]]
+    # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
+    pool = raw[:config.NEWS_MAX_TO_FILTER]
+    compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r["summary"]} for k, r in enumerate(pool)]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
         "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "
@@ -277,16 +333,21 @@ def significant_news(max_items: int = 8) -> list[dict]:
         "регулаторни и законодателни събития с пазарен ефект (решения и правила "
         "на SEC/CFTC/FTC/ЕК, гласувания в Конгреса, антитръст, тарифи, санкции). "
         f"Максимум {max_items} новини, всяка с едно "
-        "изречение защо е важна за пазарите днес.\n\n"
+        "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
+        "заглавие дословно по индекса \"i\" от списъка. По желание дай кратък превод на заглавието на български в \"headline_bg\" "
+        "(само превод — без нови факти, със същите числа и мащаб: million → млн, billion → млрд).\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
-        'Върни само JSON: {"news": [{"headline": "...", "why": "..."}]}'
+        'Върни само JSON: {"news": [{"i": 0, "why": "...", "headline_bg": "..."}]}'
     )
     try:
         from src import ai_brief
         text = ai_brief._call_claude(_SYSTEM, user, max_tokens=2000)
         data = ai_brief._parse_json(text)
-        news = data.get("news", []) if isinstance(data, dict) else []
-        news = [n for n in news if n.get("headline")][:max_items]
+        news, dropped = pick_verbatim(data.get("news", []) if isinstance(data, dict) else [], pool, max_items)
+        LAST_DIAG.clear()
+        LAST_DIAG.update(returned=len(data.get("news", []) if isinstance(data, dict) else []), kept=len(news), dropped=dropped)
+        for d in dropped:
+            print(f"[news] ⚠ {d['reason']}: {d}")
     except Exception as ex:
         print(f"[news] Claude филтър неуспешен: {ex}")
         return []

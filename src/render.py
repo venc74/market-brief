@@ -476,8 +476,9 @@ def render_email(brief: dict) -> str:
     news_block = ""
     if news:
         items = "".join(
-            f'<li style="margin-bottom:6px"><b>{_e(n.get("headline",""))}</b>'
-            f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
+            f'<li style="margin-bottom:6px"><b>{_e(n.get("headline",""))}</b>'                         # 15.10.2026: дословно от източника
+            + (f'<span style="color:#6b7280"> ({_e(n["headline_bg"])})</span>' if n.get("headline_bg") else "")
+            + f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
         news_block = (
             '<tr><td style="padding:16px 28px 4px">'
             '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;'
