@@ -30,6 +30,7 @@ from src import correlation_check
 from src import backtest
 from src import spinoff_watch
 from src import regime_claims
+from src import bar_freshness
 from src import tracker_switch
 from src import cot
 from src import cot_track
@@ -478,6 +479,13 @@ def run() -> dict:
     except Exception as e:
         print(f"[model] resolve_model се провали изцяло, оставам на "
               f"{config.CLAUDE_MODEL}: {e}")
+
+    # 16.10.2026: застоял дневен бар — в 6 от 60 брифа Yahoo нямаше бара за последната сесия в 07:30; изчакване и нов опит ПРЕДИ първото теглене (виж src/bar_freshness.py)
+    if config.ENABLE_BAR_FRESHNESS:
+        try:
+            bar_freshness.wait_for_fresh(dt.date.fromisoformat(today))
+        except Exception as e:
+            print(f"[bars] проверката на дневните барове пропусната: {type(e).__name__}: {e}")
 
     print("[1/7] Слой 1: макро контекст…")
     macro = collect_macro_layer()
@@ -937,7 +945,10 @@ def run() -> dict:
     canary = data_canary.check() if config.ENABLE_DATA_CANARY else None
     # Здравен монитор (втори преглед, 10.10.2026): очакваните артефакти — OI снимка, предишен бриф, книги, GLB състояние, дневни кешове
     try:
-        health = health_monitor.check(today, resolution=backtest.LAST_RESOLUTION, glb_status=glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None)
+        if config.ENABLE_BAR_FRESHNESS and screener.LAST_BAR_DATES:       # 16.10.2026: делът на универса със стар бар + засегнатите карти
+            bar_freshness.universe(screener.LAST_BAR_DATES, [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])], dt.date.fromisoformat(today))
+        health = health_monitor.check(today, resolution=backtest.LAST_RESOLUTION, glb_status=glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None,
+                                      freshness=dict(bar_freshness.LAST_DIAG) if config.ENABLE_BAR_FRESHNESS else None)
         print(f"[health] {len(health)} проблема" + (": " + " | ".join(h["check"] for h in health) if health else " — всичко очаквано е налице"))
     except Exception as e:
         print(f"[health] мониторът пропуснат: {type(e).__name__}: {e}")
@@ -957,6 +968,7 @@ def run() -> dict:
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                                canary=canary, health=health),
         "health": health,                                                # здравният монитор (10.10)
+        "bar_freshness": dict(bar_freshness.LAST_DIAG),                 # 16.10.2026: застоял дневен бар (изчакване, дял на универса, засегнати карти)
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
         "corp_actions": corp_diag,

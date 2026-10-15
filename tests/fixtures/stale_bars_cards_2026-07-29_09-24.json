@@ -1,0 +1,401 @@
+{
+ "_note": "РЕАЛНО: цените на Action/Watchlist картите (поле price) от брифовете data/<дата>.json и затварянията на Yahoo за последната (d1) и предпоследната (d2) NYSE сесия преди брифа, свалени на 15.10.2026 (auto_adjust=False). 6 дни със застоял бар (29.07, 04.08, 18.08, 19.08, 04.09, 23.09) + 2 контролни (30.07, 24.09). Ползва се от test_bar_freshness.py.",
+ "days": {
+  "2026-07-29": {
+   "d1": "2026-07-28",
+   "d2": "2026-07-27",
+   "cards": [
+    {
+     "ticker": "INCY",
+     "price": 118.87,
+     "close_d1": 129.93,
+     "close_d2": 118.87
+    },
+    {
+     "ticker": "AFL",
+     "price": 126.56,
+     "close_d1": 129.55,
+     "close_d2": 126.56
+    },
+    {
+     "ticker": "ROST",
+     "price": 243.35,
+     "close_d1": 251.03,
+     "close_d2": 243.35
+    },
+    {
+     "ticker": "ALL",
+     "price": 261.27,
+     "close_d1": 272.42,
+     "close_d2": 261.27
+    },
+    {
+     "ticker": "TRV",
+     "price": 390.35,
+     "close_d1": 397.22,
+     "close_d2": 390.35
+    },
+    {
+     "ticker": "JPM",
+     "price": 356.2,
+     "close_d1": 357.31,
+     "close_d2": 356.2
+    },
+    {
+     "ticker": "BAC",
+     "price": 62.13,
+     "close_d1": 62.62,
+     "close_d2": 62.13
+    },
+    {
+     "ticker": "WELL",
+     "price": 248.34,
+     "close_d1": 243.57,
+     "close_d2": 248.34
+    },
+    {
+     "ticker": "HWM",
+     "price": 287.94,
+     "close_d1": 286.04,
+     "close_d2": 287.94
+    },
+    {
+     "ticker": "AIZ",
+     "price": 276.87,
+     "close_d1": 283.08,
+     "close_d2": 276.87
+    }
+   ]
+  },
+  "2026-08-04": {
+   "d1": "2026-08-03",
+   "d2": "2026-07-31",
+   "cards": [
+    {
+     "ticker": "ROST",
+     "price": 251.07,
+     "close_d1": 252.91,
+     "close_d2": 251.07
+    },
+    {
+     "ticker": "VLO",
+     "price": 312.9,
+     "close_d1": 307.54,
+     "close_d2": 312.9
+    },
+    {
+     "ticker": "DINO",
+     "price": 91.47,
+     "close_d1": 88.65,
+     "close_d2": 91.47
+    },
+    {
+     "ticker": "RS",
+     "price": 406.1,
+     "close_d1": 409.39,
+     "close_d2": 406.1
+    },
+    {
+     "ticker": "GRMN",
+     "price": 293.78,
+     "close_d1": 304.76,
+     "close_d2": 293.78
+    }
+   ]
+  },
+  "2026-08-18": {
+   "d1": "2026-08-17",
+   "d2": "2026-08-14",
+   "cards": [
+    {
+     "ticker": "DINO",
+     "price": 93.67,
+     "close_d1": 94.99,
+     "close_d2": 93.67
+    },
+    {
+     "ticker": "ROKU",
+     "price": 157.68,
+     "close_d1": 158.31,
+     "close_d2": 157.68
+    },
+    {
+     "ticker": "MOG-A",
+     "price": 441.21,
+     "close_d1": 445.38,
+     "close_d2": 441.21
+    },
+    {
+     "ticker": "IVZ",
+     "price": 32.55,
+     "close_d1": 32.57,
+     "close_d2": 32.55
+    },
+    {
+     "ticker": "PSX",
+     "price": 233.61,
+     "close_d1": 240.55,
+     "close_d2": 233.61
+    },
+    {
+     "ticker": "RS",
+     "price": 426.54,
+     "close_d1": 428.02,
+     "close_d2": 426.54
+    },
+    {
+     "ticker": "VLO",
+     "price": 341.67,
+     "close_d1": 347.19,
+     "close_d2": 341.67
+    },
+    {
+     "ticker": "GRMN",
+     "price": 310.2,
+     "close_d1": 307.5,
+     "close_d2": 310.2
+    },
+    {
+     "ticker": "MPC",
+     "price": 355.42,
+     "close_d1": 358.18,
+     "close_d2": 355.42
+    },
+    {
+     "ticker": "ABNB",
+     "price": 184.06,
+     "close_d1": 179.29,
+     "close_d2": 184.06
+    }
+   ]
+  },
+  "2026-08-19": {
+   "d1": "2026-08-18",
+   "d2": "2026-08-17",
+   "cards": [
+    {
+     "ticker": "PSX",
+     "price": 243.49,
+     "close_d1": 243.49,
+     "close_d2": 240.55
+    },
+    {
+     "ticker": "MPC",
+     "price": 366.21,
+     "close_d1": 366.21,
+     "close_d2": 358.18
+    },
+    {
+     "ticker": "AMGN",
+     "price": 425.28,
+     "close_d1": 425.28,
+     "close_d2": 419.38
+    },
+    {
+     "ticker": "DINO",
+     "price": 94.99,
+     "close_d1": 95.7,
+     "close_d2": 94.99
+    },
+    {
+     "ticker": "EXPD",
+     "price": 188.27,
+     "close_d1": 185.95,
+     "close_d2": 188.27
+    },
+    {
+     "ticker": "VLO",
+     "price": 347.19,
+     "close_d1": 350.05,
+     "close_d2": 347.19
+    },
+    {
+     "ticker": "ROKU",
+     "price": 157.78,
+     "close_d1": 157.78,
+     "close_d2": 158.31
+    },
+    {
+     "ticker": "IVZ",
+     "price": 32.38,
+     "close_d1": 32.38,
+     "close_d2": 32.57
+    },
+    {
+     "ticker": "ABNB",
+     "price": 183.25,
+     "close_d1": 183.25,
+     "close_d2": 179.29
+    },
+    {
+     "ticker": "NTRS",
+     "price": 191.47,
+     "close_d1": 190.58,
+     "close_d2": 191.47
+    }
+   ]
+  },
+  "2026-09-04": {
+   "d1": "2026-09-03",
+   "d2": "2026-09-02",
+   "cards": [
+    {
+     "ticker": "DELL",
+     "price": 492.2,
+     "close_d1": 516.39,
+     "close_d2": 492.2
+    },
+    {
+     "ticker": "AMGN",
+     "price": 442.84,
+     "close_d1": 444.12,
+     "close_d2": 442.84
+    },
+    {
+     "ticker": "ROKU",
+     "price": 157.7,
+     "close_d1": 158.31,
+     "close_d2": 157.7
+    },
+    {
+     "ticker": "EXPD",
+     "price": 186.16,
+     "close_d1": 187.13,
+     "close_d2": 186.16
+    }
+   ]
+  },
+  "2026-09-23": {
+   "d1": "2026-09-22",
+   "d2": "2026-09-21",
+   "cards": [
+    {
+     "ticker": "AMD",
+     "price": 615.52,
+     "close_d1": 623.77,
+     "close_d2": 615.52
+    },
+    {
+     "ticker": "TWLO",
+     "price": 266.06,
+     "close_d1": 284.53,
+     "close_d2": 266.06
+    },
+    {
+     "ticker": "FTNT",
+     "price": 175.23,
+     "close_d1": 174.26,
+     "close_d2": 175.23
+    },
+    {
+     "ticker": "ANET",
+     "price": 205.42,
+     "close_d1": 205.19,
+     "close_d2": 205.42
+    }
+   ]
+  },
+  "2026-07-30": {
+   "d1": "2026-07-29",
+   "d2": "2026-07-28",
+   "cards": [
+    {
+     "ticker": "ROST",
+     "price": 251.96,
+     "close_d1": 251.96,
+     "close_d2": 251.03
+    },
+    {
+     "ticker": "ONB",
+     "price": 26.68,
+     "close_d1": 26.68,
+     "close_d2": 26.89
+    },
+    {
+     "ticker": "UMBF",
+     "price": 148.27,
+     "close_d1": 148.27,
+     "close_d2": 143.98
+    },
+    {
+     "ticker": "THG",
+     "price": 232.34,
+     "close_d1": 232.34,
+     "close_d2": 224.15
+    },
+    {
+     "ticker": "PSA",
+     "price": 329.44,
+     "close_d1": 329.44,
+     "close_d2": 330.47
+    },
+    {
+     "ticker": "TRV",
+     "price": 389.01,
+     "close_d1": 389.01,
+     "close_d2": 397.22
+    },
+    {
+     "ticker": "INCY",
+     "price": 127.1,
+     "close_d1": 127.1,
+     "close_d2": 129.93
+    },
+    {
+     "ticker": "CPAY",
+     "price": 392.85,
+     "close_d1": 392.85,
+     "close_d2": 384.32
+    },
+    {
+     "ticker": "ALL",
+     "price": 274.39,
+     "close_d1": 274.39,
+     "close_d2": 272.42
+    },
+    {
+     "ticker": "AFL",
+     "price": 128.67,
+     "close_d1": 128.67,
+     "close_d2": 129.55
+    },
+    {
+     "ticker": "AIZ",
+     "price": 281.0,
+     "close_d1": 281.0,
+     "close_d2": 283.08
+    },
+    {
+     "ticker": "NBIX",
+     "price": 180.79,
+     "close_d1": 180.79,
+     "close_d2": 182.83
+    }
+   ]
+  },
+  "2026-09-24": {
+   "d1": "2026-09-23",
+   "d2": "2026-09-22",
+   "cards": [
+    {
+     "ticker": "FTNT",
+     "price": 178.74,
+     "close_d1": 178.74,
+     "close_d2": 174.26
+    },
+    {
+     "ticker": "AVT",
+     "price": 101.15,
+     "close_d1": 101.15,
+     "close_d2": 98.25
+    },
+    {
+     "ticker": "AMD",
+     "price": 614.61,
+     "close_d1": 614.61,
+     "close_d2": 623.77
+    }
+   ]
+  }
+ }
+}

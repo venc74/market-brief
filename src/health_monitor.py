@@ -9,7 +9,8 @@
   3. книгите: резолюцията на живите записи (backtest.LAST_RESOLUTION) — цени няма / до по-стара дата / тикъри без цени;
   4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал;
   5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата;
-  6. таблицата NYSE_HOLIDAYS не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни.
+  6. таблицата NYSE_HOLIDAYS не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни;
+  7. (16.10.2026) дневните барове са за последната NYSE сесия (bar_freshness: изчакването преди run-а и делът на универса със стар бар).
 Всяка проверка е в собствен try — грешка в монитора не чупи брифа и не вдига фалшив банер.
 """
 from __future__ import annotations
@@ -50,11 +51,19 @@ def _fmt(d) -> str:
         return str(d)
 
 
-def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_status: dict | None = None) -> list[dict]:
+def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_status: dict | None = None, freshness: dict | None = None) -> list[dict]:
     """[{"check", "message"}] — само проблемите; празен списък = всичко очаквано е налице."""
     d = pathlib.Path(data_dir or config.DATA_DIR)
     prev = prev_session(today).isoformat()
     out: list[dict] = []
+
+    try:                                     # 16.10.2026: застоял дневен бар (src/bar_freshness.py) — единственият банер за него
+        from src import bar_freshness
+        msg = bar_freshness.message(freshness)
+        if msg:
+            out.append({"check": "daily_bars", "message": msg})
+    except Exception as e:
+        print(f"[health] дневните барове не се провериха: {type(e).__name__}: {e}")
 
     if config.ENABLE_UNUSUAL_OPTIONS:
         try:

@@ -66,6 +66,7 @@ RS_LINE_NEW_HIGH, RS_LINE_NEAR_HIGH = 0.999, config.RS_LINE_ENTER
 RS_LINE_STAY = config.RS_LINE_STAY                       # 09.10: оставане при хистерезис (вход ≥ RS_LINE_NEAR_HIGH, оставане ≥ RS_LINE_STAY)
 LAST_RS_HELD: set[str] = set()                           # тикърите със състояние от предишния run (за explain_exclusion) в последния run_screen
 LAST_RS_EVALUATED: set[str] = set()                      # тикърите с данни в последния technical_screen (останалите пазят състоянието си)
+LAST_BAR_DATES: dict[str, str] = {}                      # 16.10.2026: последната дата с бар на всеки тикър в последния technical_screen (bar_freshness.universe — застоял бар)
 
 
 def load_rs_state(path=None) -> set[str]:
@@ -211,6 +212,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     held = set(held or ())                                       # 09.10: хистерезис на RS линията — тикърите от предишния успешен run остават до RS_LINE_STAY
     LAST_RS_HELD.clear(); LAST_RS_HELD.update(held)
     LAST_RS_EVALUATED.clear()
+    LAST_BAR_DATES.clear()
     # втори преглед (10.10.2026): seed_prev — състоянието липсва (първи run / изтрит файл) → предишният технически списък се гради от СЪЩИТЕ данни
     # без последния бар (правилото за вход, RS rating върху вчерашните доходности); днешният ред на всеки тикър се избира по него. Без нова заявка.
     prev_survivors: list[dict] = []
@@ -244,6 +246,8 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         for sym in batch:
             try:
                 df = data[sym].dropna() if len(batch) > 1 else data.dropna()
+                if len(df):
+                    LAST_BAR_DATES[sym] = df.index[-1].date().isoformat()
                 score = rs_score(df["Close"])
                 if score is not None:
                     rs_scores[sym] = score

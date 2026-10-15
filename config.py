@@ -1167,6 +1167,16 @@ STALENESS_THRESHOLD_DAYS = int(os.getenv("STALENESS_THRESHOLD_DAYS", 3))   # о�
 # с една назад на 23.09. При 0 тези дни щяха да скрият индикатори (23.09: два наведнъж, 8 → 6 видими). Цена на допуска: при замръзнала
 # серия първият ден със стара стойност още се показва (юли: 07.07 — старото правило я скри от 07.07, новото от 08.07).
 STALENESS_MAX_LAG_SESSIONS = int(os.getenv("STALENESS_MAX_LAG_SESSIONS", 1))
+# 16.10.2026: предпазител за ЗАСТОЯЛ дневен бар (src/bar_freshness.py). В 6 от 60 брифа (29.07, 04.08, 18.08, 19.08, 04.09, 23.09) барът в 07:30 беше от ПРЕДИШНАТА сесия — скрийнърът и
+# картите вървяха върху D−2 без предупреждение. Преди първото теглене: SPY + кошницата по-долу трябва да имат бар за последната NYSE сесия; ако не — нов опит на BAR_FRESHNESS_RETRY_SEC
+# до BAR_FRESHNESS_MAX_WAIT_SEC (най-лошият run досега 29 мин + 25 мин изчакване < 60 мин лимит на workflow-а); ако и тогава липсва — брифът тръгва с банер (здравната проверка).
+ENABLE_BAR_FRESHNESS = os.getenv("ENABLE_BAR_FRESHNESS", "1") == "1"
+BAR_FRESHNESS_PROBE = ("SPY", "QQQ", "IWM", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "XOM", "UNH", "HD", "CAT", "LIN", "NEE", "PLD", "PG", "V", "BRK-B")
+BAR_FRESHNESS_MIN_SHARE = float(os.getenv("BAR_FRESHNESS_MIN_SHARE", 0.95))     # дял от кошницата с пресен бар (SPY — задължително)
+BAR_FRESHNESS_RETRY_SEC = int(os.getenv("BAR_FRESHNESS_RETRY_SEC", 300))
+BAR_FRESHNESS_MAX_WAIT_SEC = int(os.getenv("BAR_FRESHNESS_MAX_WAIT_SEC", 1500))
+# след скрийнъра: банер, ако повече от този дял от универса е с бар отпреди последната сесия. Фон на обикновен ден (15.10): 2 от 519 (EA делистната, WBD) = 0.4%.
+BAR_FRESHNESS_UNIVERSE_WARN_SHARE = float(os.getenv("BAR_FRESHNESS_UNIVERSE_WARN_SHARE", 0.02))
 # втори преглед (10.10.2026): дневните FRED серии (T10Y2Y) — допуск 2 NYSE сесии: облигационният пазар не работи в част от дните, в които NYSE работи
 # (Columbus Day, Veterans Day — напр. 12.10.2026 няма стойност), а FRED публикува със закъснение; повече пропуснати сесии → скрит индикатор
 FRED_DAILY_MAX_LAG_SESSIONS = int(os.getenv("FRED_DAILY_MAX_LAG_SESSIONS", 2))
