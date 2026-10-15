@@ -15,7 +15,13 @@ print("── файлът ──")
 live = [l for l in YML.splitlines() if not l.strip().startswith("#")]
 assert "NEWS_API_KEY" not in YML and not any(l.strip().startswith("schedule:") for l in live)         # няма NewsAPI; все още няма schedule: тригер (виж CLAUDE.md)
 assert "workflow_dispatch" in YML and "CLAUDE_MODEL: claude-sonnet-4-6" in YML and "ANTHROPIC_API_KEY" in YML and "contents: write" in YML
-assert "    timeout-minutes: 60\n" in YML                                                      # С8 (10.10): 45 → 60 (кошницата + новото GLB състояние от 12.10)
+assert "    timeout-minutes: 90\n" in YML                                                      # С8 (10.10): 45 → 60; 16.10.2026: 60 → 90 (изчакването за застоял бар)
+sys.path.insert(0, str(ROOT))
+import config
+LONGEST_RUN_MIN = 29.1                                                                        # РЕАЛНО: най-дългият run на брифа досега (07.10.2026, GitHub API, 16 run-а 24.09–15.10)
+timeout = int(re.search(r"^    timeout-minutes: (\d+)$", YML, re.M).group(1))
+assert timeout - (LONGEST_RUN_MIN + config.BAR_FRESHNESS_MAX_WAIT_SEC / 60) >= 30, timeout          # най-лошият досегашен run + пълното изчакване, с поне 30 мин резерв
+print(f"  ✓ timeout-minutes: {timeout} — най-дългият run {LONGEST_RUN_MIN} мин + изчакване до {config.BAR_FRESHNESS_MAX_WAIT_SEC // 60} мин, резерв {timeout - LONGEST_RUN_MIN - config.BAR_FRESHNESS_MAX_WAIT_SEC / 60:.1f} мин")
 m = re.search(r"      - name: Commit dashboard \+ data\n        run: \|\n((?:          .*\n|\n)+)", YML)
 assert m, "стъпката не е намерена"
 SCRIPT = textwrap.dedent(m.group(1))

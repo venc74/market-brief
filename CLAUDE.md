@@ -221,7 +221,7 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
 - Четвъртъчен пакет (15.10.2026) — параметри: `REGIME_MARGIN_VIX_NEAR = 25`, `REGIME_MARGIN_MOVE_NEAR = 120`, `REGIME_MARGIN_MOVE_DELTA_NEAR = 10`, `REGIME_MARGIN_TERM_NEAR = 0.95` (близките прагове в
   "Запас до смяна на режима" се показват само когато са близо; мерено върху 87 брифа), `COT_SUCCESSOR_CACHE_FILE` (`data/cot_successor_cache.json` — паметта за нов символ, зарежда/записва се от main)
 - Пакет от 16.10.2026 — параметри: `ENABLE_BAR_FRESHNESS = 1`, `BAR_FRESHNESS_PROBE` (SPY + 19 ликвидни), `BAR_FRESHNESS_MIN_SHARE = 0.95`, `BAR_FRESHNESS_RETRY_SEC = 300`, `BAR_FRESHNESS_MAX_WAIT_SEC = 1500`
-  (най-лошият run 29 мин + 25 мин < 60 мин лимит), `BAR_FRESHNESS_UNIVERSE_WARN_SHARE = 0.02` (фон 2 от 519 = 0.4%); `ENABLE_FUNDING_STRESS = 1`, `FUNDING_STRESS_FROM = 2018-04-02`, `FUNDING_STRESS_IORB_FROM = 2021-07-29`,
+  (най-лошият run 29 мин + 25 мин; лимитът на workflow-а е 90 мин от 16.10), `BAR_FRESHNESS_UNIVERSE_WARN_SHARE = 0.02` (фон 2 от 519 = 0.4%); `ENABLE_FUNDING_STRESS = 1`, `FUNDING_STRESS_FROM = 2018-04-02`, `FUNDING_STRESS_IORB_FROM = 2021-07-29`,
   `FUNDING_STRESS_PCT_YELLOW/RED = 80/95` (НАШИ прагове — P80 = 0 б.п., P95 = +7 б.п. от историята), `FUNDING_STRESS_RESEARCH_TEXT` (числата от проучването crisis-research — не се смятат в кода)
 
 ## Известни особености / история на решенията
@@ -449,7 +449,7 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
     секцията (загубеният ден на книгата на Уиш не се допълва по-късно); `risk_note` — от текущия код, не от състоянието.
   • Track Record v2 (Action): win rate / win-loss / SPY чак при ≥ `TRACK_RECORD_MIN_CLOSED_FOR_WINRATE = 20` затворени.
   • `requirements.txt`: yfinance==1.7.0, pandas==3.0.6 (версиите на production); канарчето (`data_canary`) пази от смяна на split корекцията.
-  • `daily_brief.yml`: timeout 60 мин (кошницата до 600 s + новото GLB състояние); Tests workflow: `ubuntu-24.04`.
+  • `daily_brief.yml`: timeout 60 мин (кошницата до 600 s + новото GLB състояние); Tests workflow: `ubuntu-24.04`. От 16.10.2026 — 90 мин (изчакването за застоял бар до 25 мин; `test_workflow_push.py` пази резерв ≥ 30 мин).
   • Скрийнърът — цени само за сплитове (`SCREENER_AUTO_ADJUST = False`, както книгите/GLB/QM); измерено: pivot > 1% по-нисък при 79 от 898 тикъра.
   • RS хистерезисът тръгва от историята, ако `data/screener_rs_state.json` липсва (`technical_screen(seed_prev=True)`).
   • Watchlist: too_wide / extended / no_volume — един компактен ред (тикър, причина, стоп %, отчет) без AI наратив; AI наративи само за
