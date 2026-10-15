@@ -517,5 +517,20 @@
   "resolution_date": "2026-09-29",
   "discovered_date": "2026-10-14",
   "realized_r": -1.0
+ },
+ "FWRG_2026-09-22": {
+  "ticker": "FWRG",
+  "entry_date": "2026-09-22",
+  "status": "stopped",
+  "entry_price": 10.14,
+  "target_1": 6.08,
+  "stop_loss": 12.17,
+  "lagging_sector": "Потребителски (циклични)",
+  "distress_signal_count": 5,
+  "target1_hit_date": null,
+  "resolution_date": "2026-10-13",
+  "discovered_date": "2026-10-15",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+6.9%, 2.1× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
  }
 }

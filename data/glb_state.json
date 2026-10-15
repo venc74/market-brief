@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-14",
+ "updated": "2026-10-15",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -121,26 +121,6 @@
    "since_close": 429.72,
    "since_bar": "2026-09-17"
   },
-  "ETN": {
-   "ticker": "ETN",
-   "company": "Eaton Corporation, PLC",
-   "glb_type": "classic",
-   "prior_high": 433.01,
-   "prior_high_month": "2026-04",
-   "months_unpenetrated": 4,
-   "ath_label": "all_time_high",
-   "history_years": 54.3,
-   "breakout_volume_ratio": 0.86,
-   "tightness": {
-    "band_hold_pct": 98.4,
-    "tightness_range_pct": 27.68,
-    "meets_tightness": true
-   },
-   "line": 433.01,
-   "since": "2026-09-22",
-   "since_close": 442.49,
-   "since_bar": "2026-09-22"
-  },
   "FAST": {
    "ticker": "FAST",
    "company": "Fastenal Company",
@@ -239,26 +219,6 @@
    "line": 413.85,
    "since": "2026-10-05",
    "since_close": 419.1,
-   "since_bar": "2026-10-05"
-  },
-  "QLYS": {
-   "ticker": "QLYS",
-   "company": "Qualys, Inc.",
-   "glb_type": "momentum",
-   "prior_high": 196.28,
-   "prior_high_month": "2023-12",
-   "months_unpenetrated": 33,
-   "ath_label": "all_time_high",
-   "history_years": 14.0,
-   "breakout_volume_ratio": 1.07,
-   "tightness": {
-    "band_hold_pct": 63.5,
-    "tightness_range_pct": 35.94,
-    "meets_tightness": false
-   },
-   "line": 196.28,
-   "since": "2026-10-05",
-   "since_close": 198.68,
    "since_bar": "2026-10-05"
   },
   "WSM": {
@@ -380,6 +340,26 @@
    "since": "2026-10-14",
    "since_close": 604.8,
    "since_bar": "2026-10-13"
+  },
+  "CAH": {
+   "ticker": "CAH",
+   "company": "Cardinal Health, Inc.",
+   "glb_type": "classic",
+   "prior_high": 237.56,
+   "prior_high_month": "2026-06",
+   "months_unpenetrated": 3,
+   "ath_label": "all_time_high",
+   "history_years": 43.2,
+   "breakout_volume_ratio": 1.12,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 17.51,
+    "meets_tightness": true
+   },
+   "line": 237.56,
+   "since": "2026-10-15",
+   "since_close": 247.74,
+   "since_bar": "2026-10-14"
   }
  },
  "seed": {
