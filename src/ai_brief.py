@@ -763,6 +763,16 @@ def apply_sector_claims_to_narratives(candidates: list[dict], rotation: list[dic
     return fixed
 
 
+def _margin_block(thermometer: dict | None) -> str:
+    """15.10.2026: "Запас до смяна на режима" от кода (regime_claims.margin) като факт в макро промпта; без него → празно."""
+    text = (((thermometer or {}).get("regime_margin") or {}).get("text") or "").strip()
+    if not text:
+        return ""
+    return (f"\nЗАПАС ДО СМЯНА НА РЕЖИМА (готово от кода, 15.10.2026): {text}. Ако пишеш колко е далеч режимът от смяна или какво би го сменило, ползвай САМО "
+            "тези числа и правилото по-горе — не формулирай свои прагове. Потвърден случай 15.10.2026: текстът твърдеше, че ако един зелен стане червен, режимът "
+            "остава Offensive и за Defensive са нужни 2 червени — по правилото един червен е достатъчен; кодът заменя такова изречение с правилото.\n")
+
+
 def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
     if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
         return out
@@ -844,7 +854,7 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 индикатори (Fed Net Liquidity) не са в нито една група. Не твърди, че един единичен индикатор (вкл. Market Breadth) "сам по \
 себе си" дава Defensive или Offensive. Потвърден случай 08.10.2026: Fed Net Liquidity беше изброен сред жълтите, а Market Breadth \
 — като сам определящ Defensive; кодът поправя такова изречение.
-
+{_margin_block(thermometer)}
 ВАЖНО за единиците на MOVE: "delta_1w" в термометъра и прагът за override са в \
 ПУНКТОВЕ на индекса (напр. "+15.4 пункта"), НЕ в проценти. Процентната промяна \
 е отделно поле — "chg_5d_pct" в МАКРО global_signals.MOVE. Пиши винаги с единица \

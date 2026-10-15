@@ -1140,6 +1140,12 @@ IEI_HYG_ROC_SPIKE_PERCENTILE = float(os.getenv("IEI_HYG_ROC_SPIKE_PERCENTILE", 9
 # 12.10.2026: посоката на 10-дневната RoC (сега срещу преди N сесии) се смята от кода и се подава на модела — на 12.10 текстът за XLV казваше "ускоряваща се RoC",
 # а RoC беше +0.41% срещу +1.03% преди 5 сесии (връх +1.17% на 01.10). Само текст към промпта, без ефект върху режима.
 IEI_HYG_ROC_TREND_SESSIONS = int(os.getenv("IEI_HYG_ROC_TREND_SESSIONS", 5))
+# 15.10.2026: ред "Запас до смяна на режима" (regime_claims.margin) — близките прагове се показват САМО когато са близо. Измерено върху 87 брифа (13.06–15.10): VIX ≥ 25 — 0 дни (макс. 20.7),
+# MOVE ≥ 120 — 0 (макс. 113.6), седмична делта на MOVE ≥ +10 — 10 дни, VIX term structure ≥ 0.95 — 0 (макс. 0.948). VIX 25 = прагът за risk-off (VIX_RISK_OFF), 5 под override-а.
+REGIME_MARGIN_VIX_NEAR = float(os.getenv("REGIME_MARGIN_VIX_NEAR", 25))
+REGIME_MARGIN_MOVE_NEAR = float(os.getenv("REGIME_MARGIN_MOVE_NEAR", 120))
+REGIME_MARGIN_MOVE_DELTA_NEAR = float(os.getenv("REGIME_MARGIN_MOVE_DELTA_NEAR", 10))
+REGIME_MARGIN_TERM_NEAR = float(os.getenv("REGIME_MARGIN_TERM_NEAR", 0.95))
 # FIX 2026-10-03 (пакет 2 т.10): хистерезисът държи override (MOVE spike / IEI-HYG spike) при СКРИТ индикатор — скритите дни не
 # са спокойни (замразява се streak-ът). Без таван това е безкрайно: ^MOVE беше скрит 22 поредни дни през юли 2026 (27 общо от 78
 # брифа), а override, повдигнал режима до Defensive, би стоял толкова, колкото тече повредата на източника. След този брой

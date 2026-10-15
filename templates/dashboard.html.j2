@@ -566,6 +566,10 @@
     </div>
     {% endif %}
   </div>
+  {# 15.10.2026: запас до смяна на режима — от кода (regime_claims.margin): колко червени сменят режима, distribution days, IEI/HYG спрямо прага, близките прагове #}
+  {% if thermometer.regime_margin and thermometer.regime_margin.text %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> {{ thermometer.regime_margin.parts|join(" · ") }}</div>
+  {% endif %}
   {# 13.10.2026: скрит индикатор не изчезва без следа — ред с причината (Fed Net Liquidity на 13.10: RRP с последна точка 09.10, Columbus Day) #}
   {% set hidden = thermometer.indicators|selectattr('hide')|list %}
   {% if hidden %}

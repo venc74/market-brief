@@ -29,6 +29,7 @@ from src import insider_buying
 from src import correlation_check
 from src import backtest
 from src import spinoff_watch
+from src import regime_claims
 from src import tracker_switch
 from src import cot
 from src import cot_track
@@ -505,6 +506,10 @@ def run() -> dict:
         except Exception as e:
             print(f"[thermo] ⚠ apply_distribution_cap пропадна ({type(e).__name__}: {e}) — режимът е без този блок")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
+    # 15.10.2026: "Запас до смяна на режима" от кода (карта на термометъра + макро промпт) — след distribution days, преди макро брифа
+    thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days)
+    if thermo["regime_margin"]["text"]:
+        print(f"      {thermo['regime_margin']['text']}")
 
     # v2 · Секция 5 — кои геополитически тези са активни при текущото макро
     theses = thesis_monitor(macro)

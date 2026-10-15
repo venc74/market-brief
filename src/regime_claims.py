@@ -14,6 +14,8 @@
 а по thermometer._count_regime Offensive иска 0 червени — един червен → Defensive. Хващат се: (а) "нужни са N червени за Defensive/Cash/Offensive" с N, различно от правилото (1 / 3 / 0);
 (б) "един … стане червен … остава Offensive"; (в) праг на зелените за Offensive, различен от 4 ("изисква повече от 7/9 зелени", "8/8 зелени за Offensive"); (г) "би дало Offensive" при посочен
 в изречението червен. Изречението се заменя с rule_text. Мерено върху 173 реални текста (13.06–15.10): 5 флага — 23.07, 20.08, 10.09 и двата на 15.10 (едно изречение); 0 фалшиви.
+  • margin(thermo, distribution_days) — "Запас до смяна на режима" от кода: колко червени сменят режима по правилото, distribution days спрямо прага, IEI/HYG RoC спрямо прага за override
+    (с посоката), и близките прагове на VIX / MOVE / VIX term structure (само когато са близо).
 """
 from __future__ import annotations
 
@@ -244,3 +246,85 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
             rule_replaced = True
     return (" ".join(out) if problems else str(text or "")), problems
 
+
+def _plural(n: int, one: str, many: str) -> str:
+    return f"{n} {one if n == 1 else many}"
+
+
+def margin(thermo: dict | None, distribution_days: dict | None = None) -> dict:
+    """
+    15.10.2026 · "Запас до смяна на режима" — готово от кода (за картата на термометъра и за макро промпта): {"text", "parts"}. Части:
+      • броенето: колко червени сменят режима по правилото (Offensive → 1 червен → Defensive; Defensive → до Offensive / до Cash; Cash → до Defensive) + зелени/видими спрямо минимума;
+        активен override → режимът е Defensive независимо от броенето;
+      • distribution days: SPY и QQQ спрямо DISTRIBUTION_DAYS_RED (при прага Offensive се блокира; блокът пада след 2 поредни нечервени дни);
+      • IEI/HYG: 10д RoC percentile спрямо прага за override (≥ прага → червен + override Defensive) и посоката (roc_trend_text);
+      • близки прагове, само ако са близо (config.REGIME_MARGIN_*): VIX към 30, MOVE към 150 / седмична делта към +15, VIX term structure към 1.0.
+    Без индикатори → {"text": "", "parts": []}. Чиста функция, не вдига.
+    """
+    try:
+        t = thermo or {}
+        inds = t.get("indicators") or []
+        if not inds:
+            return {"text": "", "parts": []}
+        f = facts(t)
+        g = f["groups"]
+        G, R = len(g["green"]), len(g["red"])
+        V = G + len(g["yellow"]) + R
+        mv = config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE
+        parts = []
+        trig = [o.get("trigger") for o in t.get("overrides") or [] if o.get("trigger")]
+        if trig:
+            parts.append(f"активен override ({', '.join(trig)}) — режимът е Defensive независимо от броенето")
+        reds = f": {', '.join(g['red'])}" if R else ""
+        if R == 0 and G >= 4 and V >= mv:
+            parts.append(f"по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени {G}, минимум 4; видими {V}, минимум {mv})")
+        elif R == 0:
+            need = ([f"още {_plural(4 - G, 'зелен', 'зелени')}"] if G < 4 else []) + ([f"още {_plural(mv - V, 'видим', 'видими')}"] if V < mv else [])
+            parts.append(f"по броенето до Offensive: {' и '.join(need)} при 0 червени; до Cash: 3 червени")
+        elif R < 3:
+            extra = f" и още {_plural(4 - G, 'зелен', 'зелени')}" if G < 4 else ""
+            parts.append(f"по броенето до Offensive: 0 червени (сега {R}{reds}){extra}; до Cash: още {_plural(3 - R, 'червен', 'червени')}")
+        else:
+            parts.append(f"по броенето до Defensive: под 3 червени (сега {R}{reds})")
+        dd = distribution_days or {}
+        red = config.DISTRIBUTION_DAYS_RED
+        sc, qc = dd.get("spy_count"), dd.get("qqq_count")
+        if sc is not None or qc is not None:
+            nums = ", ".join(f"{n} {c}/{red}" for n, c in (("SPY", sc), ("QQQ", qc)) if c is not None)
+            top = max(c for c in (sc, qc) if c is not None)
+            if top >= red:
+                parts.append(f"distribution days {nums} — червени: Offensive е блокиран; блокът пада след {config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS} поредни дни под {red}")
+            elif t.get("distribution_cap"):
+                parts.append(f"distribution days {nums} — под прага, но блокът на Offensive се държи по хистерезис")
+            else:
+                parts.append(f"distribution days {nums} — при {red} Offensive се блокира (липсва{'т' if red - top > 1 else ''} {red - top})")
+        by = {i.get("name"): i for i in inds if not i.get("hide")}
+        cr = next((i for n, i in by.items() if str(n).startswith("IEI/HYG")), None)
+        if cr and cr.get("roc_percentile") is not None:
+            from src.thermometer import _pct_ord
+            thr = config.IEI_HYG_ROC_SPIKE_PERCENTILE
+            p = float(cr["roc_percentile"])
+            held = next((o for o in t.get("overrides") or [] if o.get("trigger") == "IEI/HYG"), None)
+            if p >= thr:
+                head = f"IEI/HYG 10д RoC {_pct_ord(p)} percentile — над прага {thr:.0f}: override"
+            elif held:
+                head = f"IEI/HYG 10д RoC {_pct_ord(p)} percentile — под прага {thr:.0f}, но override-ът се държи по хистерезис (2 поредни дни под прага)"
+            else:
+                head = f"IEI/HYG 10д RoC {_pct_ord(p)} percentile при праг {thr:.0f} (≥ {thr:.0f} → червен и override Defensive)"
+            parts.append(head + (f"; {cr['roc_trend_text']}" if cr.get("roc_trend_text") else ""))
+        vix = (by.get("VIX") or {}).get("value")
+        if isinstance(vix, (int, float)) and config.REGIME_MARGIN_VIX_NEAR <= vix <= config.VIX_DEFENSIVE_THRESHOLD:
+            parts.append(f"VIX {vix:.1f} (override над {config.VIX_DEFENSIVE_THRESHOLD:.0f})")
+        mo = next((i for n, i in by.items() if str(n).startswith("MOVE")), None) or {}
+        mval, mdel = mo.get("value"), mo.get("delta_1w")
+        if isinstance(mval, (int, float)) and config.REGIME_MARGIN_MOVE_NEAR <= mval <= config.MOVE_RED_THRESHOLD:
+            parts.append(f"MOVE {mval:.0f} (override над {config.MOVE_RED_THRESHOLD:.0f})")
+        if isinstance(mdel, (int, float)) and config.REGIME_MARGIN_MOVE_DELTA_NEAR <= mdel < config.MOVE_SPIKE_WEEKLY_DELTA:
+            parts.append(f"MOVE {mdel:+.1f} пункта за седмица (override при +{config.MOVE_SPIKE_WEEKLY_DELTA:.0f})")
+        term = (by.get("VIX Term Structure") or {}).get("value")
+        if isinstance(term, (int, float)) and config.REGIME_MARGIN_TERM_NEAR <= term < config.VIX_TERM_WARNING_THRESHOLD:
+            parts.append(f"VIX term structure {term:.2f} (жълт от {config.VIX_TERM_WARNING_THRESHOLD:.2f}, червен от {config.VIX_TERM_BACKWARDATION_THRESHOLD:.2f})")
+        return {"text": "Запас до смяна на режима: " + " · ".join(parts), "parts": parts}
+    except Exception as e:
+        print(f"[regime_claims] запасът до смяна на режима не се смята: {type(e).__name__}: {e}")
+        return {"text": "", "parts": []}
