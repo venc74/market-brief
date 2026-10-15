@@ -7,8 +7,8 @@
 Claude API, рендерира dashboard (GitHub Pages) + имейл.
 
 Пуска се **само** през cron-job.org (external trigger към GitHub Actions
-`workflow_dispatch`) — веднъж дневно. Workflow файлът (`daily_brief.yml`)
-**няма** `schedule:` тригер нарочно.
+`workflow_dispatch`) — веднъж дневно, в 07:30 Europe/Berlin (часовата зона на задачата в cron-job.org е Europe/Berlin — часът не се мести при смяната
+на часа; потвърдено от Венци 15.10.2026). Workflow файлът (`daily_brief.yml`) **няма** `schedule:` тригер нарочно.
 
 ## Работни правила (важно — спазвай стриктно)
 
@@ -63,12 +63,15 @@ src/thermometer.py     — 9 индикатора (SPY, VIX, P/C, spread, Net
                         Breadth, IEI/HYG Credit Spread) +
                         Offensive/Defensive/Cash режим; Net Liquidity е
                         САМО информативен (не се брои), Offensive иска ≥ 6
-                        видими от 8 броени
+                        видими от 8 броени; от 16.10 и "SOFR − IORB (финансиране)" — САМО информативен
+                        (б.п., перцентил и z-score от 04.2018, "термометър, не предсказание")
 src/sector_layer.py    — RS ротация 16 секторни ETF-а vs SPY
 src/series_utils.py    — last_and_week_ago(): седмица назад по ДАТА + NaN guard (VIX, global signals)
 src/data_warnings.py   — предупреждения за данни в брифа (паднал Yahoo → brief["data_warnings"])
 src/health_monitor.py  — здравен монитор в края на run-а: OI снимка за предишната сесия, предишен бриф, книги (backtest.LAST_RESOLUTION), GLB състояние,
                         дневни кешове, края на NYSE_HOLIDAYS → банер "Здравна проверка: …" (brief["health"])
+src/bar_freshness.py   — предпазител за застоял дневен бар (16.10): преди първото теглене SPY + кошница от 20 тикъра трябва да имат бара за последната NYSE сесия, иначе нов опит
+                        на 5 мин до 25 мин; след скрийнъра — дял на универса със стар бар и засегнатите карти; един банер през здравната проверка (brief["bar_freshness"])
 src/data_canary.py     — дневно канарче за split корекцията на Yahoo (NVDA 07.06.2024 ≈ $120.888) → банер при отклонение
 src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rating
                         (втори проход върху целия универс) + CANSLIM скрийнър;
@@ -217,6 +220,9 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   `CORP_ACTION_WARN_SESSIONS = 60`, `CORP_ACTION_INTEGER_TOL = 1e-3` (маркер за корпоративно действие); `QM_MAX_DIST_RULE_FROM = 2026-10-09` (записите на книгата qm_breakout от преди правилото `QM_MAX_DIST_ADR` и по-далеч от границата са "преди правилото": пазят се, но са извън статистиката — `backtest.qm_before_rule`)
 - Четвъртъчен пакет (15.10.2026) — параметри: `REGIME_MARGIN_VIX_NEAR = 25`, `REGIME_MARGIN_MOVE_NEAR = 120`, `REGIME_MARGIN_MOVE_DELTA_NEAR = 10`, `REGIME_MARGIN_TERM_NEAR = 0.95` (близките прагове в
   "Запас до смяна на режима" се показват само когато са близо; мерено върху 87 брифа), `COT_SUCCESSOR_CACHE_FILE` (`data/cot_successor_cache.json` — паметта за нов символ, зарежда/записва се от main)
+- Пакет от 16.10.2026 — параметри: `ENABLE_BAR_FRESHNESS = 1`, `BAR_FRESHNESS_PROBE` (SPY + 19 ликвидни), `BAR_FRESHNESS_MIN_SHARE = 0.95`, `BAR_FRESHNESS_RETRY_SEC = 300`, `BAR_FRESHNESS_MAX_WAIT_SEC = 1500`
+  (най-лошият run 29 мин + 25 мин < 60 мин лимит), `BAR_FRESHNESS_UNIVERSE_WARN_SHARE = 0.02` (фон 2 от 519 = 0.4%); `ENABLE_FUNDING_STRESS = 1`, `FUNDING_STRESS_FROM = 2018-04-02`, `FUNDING_STRESS_IORB_FROM = 2021-07-29`,
+  `FUNDING_STRESS_PCT_YELLOW/RED = 80/95` (НАШИ прагове — P80 = 0 б.п., P95 = +7 б.п. от историята), `FUNDING_STRESS_RESEARCH_TEXT` (числата от проучването crisis-research — не се смятат в кода)
 
 ## Известни особености / история на решенията
 
@@ -498,6 +504,15 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
     гап над тавана — 0; изхода — в 4 от 22 стопа (гап през стопа); обемът в 07:30 е окончателен в 89% от картите, а в 8% (6 дни) барът е от ПРЕДИШНАТА сесия; наш тикър е отчитал преди
     отварянето в деня на брифа 5 пъти (19 — след затварянето предната вечер); от заглавията за последните 24 ч 43% са публикувани 07:30–14:45, но PPI от 14:30 се появи в RSS чак в 15:06/15:46;
     безплатни очаквания — ForexFactory седмичен JSON (forecast/previous), Nasdaq API (consensus/actual, но с разминаване в датите); run-ът — 9.7–29.1 мин при лимит 60.
+- Пакет от 16.10.2026 (по прегледа на 15.10; всичко с РЕАЛНИ fixture-и):
+  • Застоял дневен бар (`src/bar_freshness.py`): в 6 от 60 брифа (29.07, 04.08, 18.08, 19.08, 04.09, 23.09) картите бяха върху бара от ПРЕДИШНАТА сесия без предупреждение (19.08 — частично:
+    SPY пресен, 4 от 10 карти стари); SPY тренд скрит в 5 от 6 (собствената проверка за давност), distribution days — с D−1 на 19.08/04.09/23.09; в тези дни няма Action карти и записи
+    в книгите (резолюцията изостава с ден и се наваксва). Сега: изчакване и нов опит преди run-а, банер "Здравна проверка: дневните данни са от ДД.ММ (Yahoo не е обновил …)" и при частично застоял
+    универс (> 2% или засегната карта). Грешки при тегленето — най-много 3 опита (паднал Yahoo има свои банери).
+  • Часовете по Берлин в текстовете се смятат от часовите зони (`setup_rules.ny_time_in_berlin`): отварянето 15:30 CEST лете, 14:30 CET в седмиците, когато САЩ и Европа са на различно време (25.10–01.11.2026; 14.03–28.03.2027),
+    15:30 CET зиме; краят на after-hours в `qm_ep.note_bg`. Отчетът в Trigger на Watchlist — ДД.ММ.
+  • SOFR − IORB: FRED (SOFR, IOER до 28.07.2021, IORB) — fixture-ът е от първоизточниците, които FRED препубликува (NY Fed SOFR, Fed Board PRATES), защото fred.stlouisfed.org не се отваря
+    извън CI и API-то иска ключа; 14.10.2026: −2.0 б.п., 68. перцентил, z +0.22; 17.09.2019: +315 б.п. Месечните и тримесечните краища дават обичайни скокове.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
