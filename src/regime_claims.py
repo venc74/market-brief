@@ -9,6 +9,11 @@
   • check(text, facts) — открива в прозата (а) брой "N зелени/жълти/червени", който не съвпада с кода, или посочен в скоби индикатор от друг цвят/информативен; (б) твърдение, че индикатор,
     който НЕ може да форсира режим, го определя "сам по себе си".
   • clean(text, facts) — маха изреченията с такива твърдения; връща (нов текст, [{sentence, code, why}]).
+
+15.10.2026 · твърдения за ПРАВИЛОТО (код "rule"): макро текстът на 15.10 написа "ако един зелен стане червен при 0 червени сега, системата пак остава Offensive; нужни са 2 червени за Defensive",
+а по thermometer._count_regime Offensive иска 0 червени — един червен → Defensive. Хващат се: (а) "нужни са N червени за Defensive/Cash/Offensive" с N, различно от правилото (1 / 3 / 0);
+(б) "един … стане червен … остава Offensive"; (в) праг на зелените за Offensive, различен от 4 ("изисква повече от 7/9 зелени", "8/8 зелени за Offensive"); (г) "би дало Offensive" при посочен
+в изречението червен. Изречението се заменя с rule_text. Мерено върху 173 реални текста (13.06–15.10): 5 флага — 23.07, 20.08, 10.09 и двата на 15.10 (едно изречение); 0 фалшиви.
 """
 from __future__ import annotations
 
@@ -96,10 +101,61 @@ def facts(thermo: dict) -> dict:
         counts += f"; скрити (невалидни/застояли данни): {', '.join(groups['hidden'])}"
     if groups["informational"]:
         counts += f"; НЕ се броят (информативни): {', '.join(groups['informational'])}"
-    rule = (f"Правило по броенето: Offensive = поне 4 зелени, 0 червени и поне {config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE} видими индикатора; "
-            f"2 червени → Defensive; 3 или повече червени → Cash; всичко друго → Defensive (недостатъчно потвърждение). Нито един единичен индикатор не определя режима сам по броенето; "
-            f"режимът се форсира САМО от override-ите ({', '.join(FORCING)}) и се ограничава до Defensive от червените distribution days.")
+    # 15.10.2026: "един червен е достатъчен" е изрично — с "2 червени → Defensive" моделът написа, че при един червен режимът остава Offensive
+    rule = (f"Правило по броенето: Offensive = поне 4 зелени, 0 червени и поне {config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE} видими индикатора — ЕДИН червен е достатъчен, "
+            f"за да не е Offensive (1 или 2 червени → Defensive); 3 или повече червени → Cash; всичко друго → Defensive (недостатъчно потвърждение). "
+            f"Единичен индикатор не дава Offensive или Cash сам; режимът се форсира до Defensive от override-ите ({', '.join(FORCING)}) и се ограничава до Defensive "
+            f"от червените distribution days.")
     return {"groups": groups, "counts_text": counts, "rule_text": rule}
+
+
+_NUMW = {"нула": 0, "един": 1, "една": 1, "едно": 1, "два": 2, "две": 2, "три": 3, "четири": 4, "пет": 5, "шест": 6, "седем": 7, "осем": 8, "девет": 9}
+_N = r"(\d+|нула|един|една|едно|два|две|три|четири|пет|шест|седем|осем|девет)"
+_NEED = r"(?:нужн\w*|необходим\w*|трябва(?:т)?|изисква\w*|иска)"
+_AT_LEAST = r"(?:поне\s+|най-малко\s+|минимум\s+|само\s+)?"
+# (а) "нужни са 2 червени за Defensive" / "за Cash са нужни 2 червени"
+_RED_FOR = re.compile(_NEED + r"\s+(?:са\s+|е\s+)?" + _AT_LEAST + _N + r"\s+червен\w*\s+(?:индикатор\w*\s+)?(?:,?\s*за(?:\s+да)?\s+(?:\w+\s+){0,2}?)(?:режим\s+)?(Defensive|Cash|Offensive)", re.I)
+_FOR_RED = re.compile(r"\bза\s+(Defensive|Cash)\s+(?:са\s+|е\s+)?" + _NEED + r"\s+(?:са\s+)?" + _AT_LEAST + _N + r"\s+червен", re.I)
+# (б) "ако един зелен стане червен …, системата пак остава Offensive"
+_STAYS = re.compile(r"\b(?:един|една|1)\s+(?:\w+\s+){0,2}?(?:стане|станат|премине|мине|се обърне|е)\s+(?:в\s+)?червен\w*[^.;]{0,120}?"
+                    r"(?:остава|запазва|пак|все още|продължава|не се (?:сменя|променя))[^.;]{0,40}?Offensive", re.I)
+# (в) прагът на зелените за Offensive
+_GREENS_A = re.compile(r"Offensive[^.;]{0,60}?" + _NEED + r"\s+(?:са\s+)?(?:само\s+|например\s+)?(поне\s+|най-малко\s+|минимум\s+|повече от\s+|над\s+)?(\d+)(?:\s*/\s*\d+)?\s+зелен", re.I)
+_GREENS_B = re.compile(_NEED + r"[^.;]{0,30}?(поне\s+|най-малко\s+|минимум\s+|повече от\s+|над\s+)?(\d+)(?:\s*/\s*\d+)?\s+зелен\w*\s+за\s+(?:режим\s+)?Offensive", re.I)
+# (г) "… 1 червен … нормалното правило би дало Offensive"
+_WOULD = re.compile(r"би(?:ха)?\s+(?:\w+\s+){0,2}?(?:дал\w*|довел\w*\s+до|задействал\w*)\s+(?:режим\s+)?Offensive", re.I)
+_MIN_RED = {"defensive": 1, "cash": 3, "offensive": 0}
+
+
+def _num(w: str) -> int:
+    w = w.lower()
+    return int(w) if w.isdigit() else _NUMW[w]
+
+
+def rule_problems(sentence: str) -> list[dict]:
+    """
+    15.10.2026: твърдения за ПРАВИЛОТО по броенето, които му противоречат (thermometer._count_regime: Offensive = ≥ 4 зелени и 0 червени; 1–2 червени → Defensive; ≥ 3 → Cash).
+    Не зависи от днешното броене, освен (г), където червеният е посочен в самото изречение. Чиста функция.
+    """
+    out = []
+    for m in _RED_FOR.finditer(sentence):
+        n, regime = _num(m.group(1)), m.group(2).lower()
+        if n != _MIN_RED[regime]:
+            out.append({"code": "rule", "why": f"твърди, че за {m.group(2)} са нужни {n} червени — по правилото {'Offensive иска 0 червени' if regime == 'offensive' else ('един червен вече не е Offensive (→ Defensive)' if regime == 'defensive' else 'Cash е при 3 или повече червени')}"})
+    for m in _FOR_RED.finditer(sentence):
+        n, regime = _num(m.group(2)), m.group(1).lower()
+        if n != _MIN_RED[regime]:
+            out.append({"code": "rule", "why": f"твърди, че за {m.group(1)} са нужни {n} червени — по правилото {'един червен вече не е Offensive (→ Defensive)' if regime == 'defensive' else 'Cash е при 3 или повече червени'}"})
+    if _STAYS.search(sentence):
+        out.append({"code": "rule", "why": "твърди, че при един червен режимът остава Offensive — Offensive иска 0 червени"})
+    for rx in (_GREENS_A, _GREENS_B):
+        for m in rx.finditer(sentence):
+            n = int(m.group(2)) + (1 if (m.group(1) or "").strip().lower() in ("повече от", "над") else 0)
+            if n != 4:
+                out.append({"code": "rule", "why": f"твърди, че Offensive иска {n} зелени — правилото иска поне 4 зелени и 0 червени"})
+    if _WOULD.search(sentence) and any(_COLOR_WORD[c.group(2).lower()] == "red" and int(c.group(1)) >= 1 for c in _COUNT.finditer(sentence)):
+        out.append({"code": "rule", "why": "твърди, че правилото би дало Offensive при червен индикатор — Offensive иска 0 червени"})
+    return out
 
 
 def _sentences(text: str) -> list[str]:
@@ -130,11 +186,14 @@ def check_sentence(sentence: str, f: dict) -> list[dict]:
                 where = _group_of_by_name(g, key) if key else None
                 if key and where and where != color:
                     problems.append({"code": "member", "why": f"{key} е посочен сред {_COLOR_BG[color]}, а кодът го води като {_GROUP_BG.get(where, where)}"})
+    problems += rule_problems(sentence)                       # 15.10.2026: твърдения за правилото
     m = _SOLO.search(sentence)
     if m and _REGIME_WORD.search(sentence) and not _negated(sentence, m):
         named = indicators_in(sentence)
-        # само ако в изречението няма индикатор, който МОЖЕ да форсира режима (VIX, MOVE, IEI/HYG), и има поне един, който не може
-        if named and not any(n.startswith(FORCING) for n in named):
+        # само ако в изречението няма индикатор, който МОЖЕ да форсира режима (VIX, MOVE, IEI/HYG), и има поне един, който не може.
+        # 15.10.2026: ЧЕРВЕН индикатор сам по себе си наистина прави режима Defensive (Offensive иска 0 червени) — такова твърдение е вярно
+        red_def = bool(re.search(r"Defensive", sentence)) and all(_group_of_by_name(g, n) == "red" for n in named)
+        if named and not any(n.startswith(FORCING) for n in named) and not red_def:
             problems.append({"code": "solo", "why": f"твърди, че индикатор ({named[0]}) определя режима сам по себе си — по броенето нито един не го прави (форсират само {', '.join(FORCING)})"})
     return problems
 
@@ -165,11 +224,12 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
     """
     Поправя изреченията с проблем и връща (нов текст, проблемите):
       • count / member (грешно броене или индикатор в грешна група) — първото такова изречение се ЗАМЕНЯ с броенето от кода ("По броенето: …."), следващите се махат;
+      • rule (15.10.2026: твърдение, противоречащо на правилото) — първото такова изречение се ЗАМЕНЯ с rule_text, следващите се махат;
       • solo (индикатор "сам по себе си" определя режима) — изречението се маха.
     Нищо за поправяне → същият текст.
     """
     sents = _sentences(text)
-    out, problems, replaced = [], [], False
+    out, problems, replaced, rule_replaced = [], [], False, False
     for s in sents:
         p = check_sentence(s, f)
         if not p:
@@ -179,4 +239,8 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
         if any(x["code"] in ("count", "member") for x in p) and not replaced and f.get("counts_text") and "не е налично" not in f["counts_text"]:
             out.append(f"По броенето: {f['counts_text']}.")
             replaced = True
+        if any(x["code"] == "rule" for x in p) and not rule_replaced and f.get("rule_text"):
+            out.append(f["rule_text"])
+            rule_replaced = True
     return (" ".join(out) if problems else str(text or "")), problems
+

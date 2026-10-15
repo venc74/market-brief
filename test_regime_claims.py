@@ -39,7 +39,7 @@ def mk(g, y, r, hidden=0):
 assert th._count_regime(mk(4, 4, 0))[0] == "Offensive" and th._count_regime(mk(4, 3, 1))[0] == "Defensive" and th._count_regime(mk(4, 1, 2))[0] == "Defensive"
 assert th._count_regime(mk(2, 3, 3))[0] == "Cash" and th._count_regime(mk(4, 1, 0, hidden=3))[0] == "Defensive" and th._count_regime(mk(4, 2, 0, hidden=2))[0] == "Offensive" and th._count_regime(mk(8, 0, 0))[0] == "Offensive"
 r = f["rule_text"]
-assert "поне 4 зелени, 0 червени и поне 6 видими" in r and "2 червени → Defensive" in r and "3 или повече червени → Cash" in r and "VIX, MOVE, IEI/HYG" in r
+assert "поне 4 зелени, 0 червени и поне 6 видими" in r and "1 или 2 червени → Defensive" in r and "ЕДИН червен е достатъчен" in r and "3 или повече червени → Cash" in r and "VIX, MOVE, IEI/HYG" in r
 assert config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE == 6
 print("  ✓ Offensive = 4+ зелени, 0 червени, ≥ 6 видими; 2 червени → Defensive; 3+ → Cash — същото казва rule_text (прагът 6 идва от config)")
 
@@ -67,8 +67,10 @@ for day, b in FX.items():
         if b.get(field):
             n += 1
             hits += [(day, field, p["code"]) for p in rc.check(b[field], fb)]
-assert n == 163 and hits == [("2026-10-08", "regime_comment", "member"), ("2026-10-08", "regime_comment", "solo")], (n, hits)
-print(f"  ✓ {n} реални текста от 82 брифа: точно 2 флага — двата реални дефекта от 08.10; 0 фалшиви положителни (дроби '7/8 зелени', отрицания 'не … сам по себе си', правила 'Offensive изисква 4 зелени' не се вземат за твърдения)")
+# 15.10.2026: проверката за ПРАВИЛОТО (код "rule", test_regime_rule_claims.py) добавя трите реални грешни твърдения за правилото от този период
+assert n == 163 and hits == [("2026-07-23", "regime_comment", "rule"), ("2026-08-20", "regime_comment", "rule"), ("2026-09-10", "regime_comment", "rule"),
+                             ("2026-10-08", "regime_comment", "member"), ("2026-10-08", "regime_comment", "solo")], (n, hits)
+print(f"  ✓ {n} реални текста от 82 брифа: двата реални дефекта от 08.10 + трите грешни твърдения за правилото (23.07, 20.08, 10.09); 0 фалшиви положителни (дроби '7/8 зелени', отрицания 'не … сам по себе си', правила 'Offensive изисква 4 зелени' не се вземат за твърдения)")
 
 print()
 print("── 5. граници (СИНТЕТИЧНИ изречения) ──")
