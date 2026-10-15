@@ -29,6 +29,7 @@ FORCING = ("VIX", "MOVE", "IEI/HYG")
 # Ключови думи за разпознаване на индикатор в прозата (по нормализиран ключ) → име на индикатора започва с…
 _ALIASES = (
     ("net liquidity", "Fed Net Liquidity"), ("нет ликвидност", "Fed Net Liquidity"), ("fed nl", "Fed Net Liquidity"),
+    ("sofr", "SOFR − IORB"), ("iorb", "SOFR − IORB"),                                     # 16.10.2026: информативен
     ("put/call", "Put/Call"), ("put call", "Put/Call"), ("p/c", "Put/Call"),
     ("term structure", "VIX Term Structure"), ("term-structure", "VIX Term Structure"), ("contango", "VIX Term Structure"),
     ("iei/hyg", "IEI/HYG"), ("credit spread", "IEI/HYG"), ("кредитен спред", "IEI/HYG"),

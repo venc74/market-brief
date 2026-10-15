@@ -955,6 +955,25 @@ def _net_liquidity_indicator(nl: dict) -> dict:
     }
 
 
+def _funding_stress_indicator(fs: dict | None) -> dict | None:
+    """
+    16.10.2026: SOFR − IORB — САМО информативен ("informational": True), като Fed Net Liquidity: показва се с цвят по перцентила (НАШ праг), не влиза в броенето. Текстът казва изрично
+    "термометър, не предсказание" с числата от проучването (config.FUNDING_STRESS_RESEARCH_TEXT). Скрит → причина за реда "Скрити днес". None (изключен) → няма карта.
+    """
+    if fs is None:
+        return None
+    name = "SOFR − IORB (финансиране)"
+    if fs.get("value") is None:
+        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": "", "hide_reason": fs.get("hide_reason") or "няма данни"}
+    d = fs["as_of"]
+    z = f", z {fs['zscore']:+.1f}" if fs.get("zscore") is not None else ""
+    w = f" · {fs['chg_1w_bp']:+.1f} б.п. за седмица" if fs.get("chg_1w_bp") is not None else ""
+    hf = fs.get("history_from") or config.FUNDING_STRESS_FROM
+    return {"name": name, "value": fs["value"], "status": fs.get("status", "yellow"), "informational": True, "percentile": fs.get("percentile"), "zscore": fs.get("zscore"),
+            "as_of": d, "label": (f"{fs['value']:+.1f} б.п. към {d[8:10]}.{d[5:7]} (SOFR {fs['sofr']:.2f}% − IORB {fs['iorb']:.2f}%){w} · {fs['percentile']:.0f}. percentile{z} спрямо историята от "
+                                  f"{hf[5:7]}.{hf[:4]} · термометър, не предсказание: в проучването ни {config.FUNDING_STRESS_RESEARCH_TEXT} · само информативен, не влиза в режима")}
+
+
 _COLOR_BG = {"green": "зелена", "yellow": "жълта", "red": "червена"}
 
 
@@ -976,7 +995,8 @@ def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tup
     if hidden_count:
         counts += f" ({hidden_count} скрити — невалидни/застояли данни)"
     if len(counted) != len(indicators):
-        counts += " · не се броят: " + ", ".join(i["name"] for i in indicators if i.get("informational")) + " (информативен)"
+        info = [i["name"] for i in indicators if i.get("informational")]
+        counts += " · не се броят: " + ", ".join(info) + (" (информативен)" if len(info) == 1 else " (информативни)")
 
     # FIX 2026-07-15: премахнат недокументиран fallback "greens >= 3 → Offensive"; Offensive = 4+ зелени и 0 червени.
     if greens >= 4 and reds == 0:
@@ -1036,6 +1056,9 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
 
     indicators = [spy_trend(), vix_level(), market_put_call(), spread_ind,
                   nl_ind, move_index(), vix_term_structure(), credit_spread_proxy()]
+    fs_ind = _funding_stress_indicator(macro.get("funding_stress"))     # 16.10.2026: само информативен, до Fed Net Liquidity
+    if fs_ind:
+        indicators.insert(indicators.index(nl_ind) + 1, fs_ind)
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
         _breadth_divergence(indicators)

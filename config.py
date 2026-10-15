@@ -1207,6 +1207,16 @@ NET_LIQ_TGA_SERIES = os.getenv("NET_LIQ_TGA_SERIES", "WDTGAL")        # Treasury
 NET_LIQ_WINDOW_WEEKS = int(os.getenv("NET_LIQ_WINDOW_WEEKS", 4))
 NET_LIQ_DEAD_ZONE_PCT = float(os.getenv("NET_LIQ_DEAD_ZONE_PCT", 1.0))
 NET_LIQ_CONFIRM_WEEKS = int(os.getenv("NET_LIQ_CONFIRM_WEEKS", 2))
+# 16.10.2026: стрес във финансирането — SOFR − IORB (до 28.07.2021 IOER) от FRED, в б.п.; САМО информативен като Fed Net Liquidity (не влиза в броенето). Перцентил и z-score спрямо
+# собствената история (SOFR е от 02.04.2018). Реално (NY Fed SOFR + Fed Board PRATES, първоизточниците на FRED; 2 132 дни до 14.10.2026): медиана −6 б.п., P80 0, P90 +4, P95 +7, P99 +20,
+# максимум +315 (17.09.2019); 14.10.2026: −2 б.п. (68. перцентил, z +0.22). Цветът е НАШ: под P80 — зелен, P80–P95 — жълт, над P95 — червен. Термометър, не предсказание —
+# FUNDING_STRESS_RESEARCH_TEXT са числата от проучването crisis-research (Венци, 16.10.2026), не се смятат тук.
+ENABLE_FUNDING_STRESS = os.getenv("ENABLE_FUNDING_STRESS", "1") == "1"
+FUNDING_STRESS_FROM = "2018-04-02"
+FUNDING_STRESS_IORB_FROM = "2021-07-29"
+FUNDING_STRESS_PCT_YELLOW = float(os.getenv("FUNDING_STRESS_PCT_YELLOW", 80))
+FUNDING_STRESS_PCT_RED = float(os.getenv("FUNDING_STRESS_PCT_RED", 95))
+FUNDING_STRESS_RESEARCH_TEXT = "ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали"
 NET_LIQ_HISTORY_DAYS = int(os.getenv("NET_LIQ_HISTORY_DAYS", 300))
 # RRPONTSYD е ДНЕВНА (работни дни) компонента — same клас серия като VIX/MOVE
 # (публикува се всеки работен ден), затова reuse-ва STALENESS_THRESHOLD_DAYS

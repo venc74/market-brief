@@ -156,6 +156,59 @@ def fed_net_liquidity() -> dict:
     return liquidity_signal(points)
 
 
+def funding_spread(sofr: list[tuple[str, float]], ioer: list[tuple[str, float]], iorb: list[tuple[str, float]], today: dt.date | None = None) -> dict:
+    """
+    16.10.2026 · SOFR − IORB (до config.FUNDING_STRESS_IORB_FROM — IOER) в б.п. — чиста функция върху (дата, %) сериите. Ставката на Fed е стъпаловидна: за всеки ден на SOFR се взема
+    последната известна стойност ≤ датата. Перцентил и z-score на последната точка спрямо всички предишни (от config.FUNDING_STRESS_FROM); промяна за седмица — по ДАТА (last_and_week_ago).
+    Застояла SOFR (> FRED_DAILY_MAX_LAG_SESSIONS NYSE сесии — SOFR за D−1 излиза в 08:00 ET на D, т.е. в 07:30 Берлин последната е D−2) или липсващ IORB → hide с причина.
+    """
+    import statistics as st
+    import pandas as pd
+    from src.setup_rules import sessions_between
+    hide = lambda why: {"value": None, "hide": True, "hide_reason": why}
+    if not sofr:
+        return hide("FRED не върна SOFR")
+    if not iorb:
+        return hide("FRED не върна IORB")
+    today = today or dt.date.today()
+    last_d = dt.date.fromisoformat(sofr[-1][0])
+    if sessions_between(last_d, today) > config.FRED_DAILY_MAX_LAG_SESSIONS:
+        return hide(f"SOFR застояла — последно наблюдение {last_d.strftime('%d.%m')} (праг {config.FRED_DAILY_MAX_LAG_SESSIONS} сесии)")
+    rate = sorted([(d, v) for d, v in ioer if d < config.FUNDING_STRESS_IORB_FROM] + [(d, v) for d, v in iorb if d >= config.FUNDING_STRESS_IORB_FROM])
+    if not rate or rate[-1][0] < config.FUNDING_STRESS_IORB_FROM:
+        return hide("IORB липсва след 29.07.2021")
+    pts, j, cur = [], 0, None
+    for d, v in sofr:
+        if d < config.FUNDING_STRESS_FROM:
+            continue
+        while j < len(rate) and rate[j][0] <= d:
+            cur = rate[j][1]; j += 1
+        if cur is not None:
+            pts.append((d, round((v - cur) * 100, 2), v, cur))
+    if len(pts) < 260:
+        return hide(f"историята е твърде къса ({len(pts)} дни)")
+    vals = [p[1] for p in pts]
+    last, hist = vals[-1], vals[:-1]
+    pct = round(100.0 * sum(1 for x in hist if x <= last) / len(hist), 1)
+    sd = st.pstdev(hist)
+    z = round((last - st.mean(hist)) / sd, 2) if sd else None
+    s = pd.Series(vals, index=pd.to_datetime([p[0] for p in pts]))
+    _, week_ago, _ = last_and_week_ago(s)
+    status = "red" if pct >= config.FUNDING_STRESS_PCT_RED else "yellow" if pct >= config.FUNDING_STRESS_PCT_YELLOW else "green"
+    return {"value": round(last, 1), "as_of": pts[-1][0], "sofr": pts[-1][2], "iorb": pts[-1][3], "percentile": pct, "zscore": z,
+            "chg_1w_bp": round(last - week_ago, 1) if week_ago is not None else None, "n_history": len(hist), "history_from": pts[0][0], "status": status, "hide": False}
+
+
+def funding_stress() -> dict:
+    """SOFR, IOER и IORB от FRED (един път, от config.FUNDING_STRESS_FROM) → funding_spread. Graceful: провал → hide с причина."""
+    try:
+        days = (dt.date.today() - dt.date.fromisoformat(config.FUNDING_STRESS_FROM)).days + 5
+        return funding_spread(_fred_series("SOFR", days=days), _fred_series("IOER", days=days), _fred_series("IORB", days=days))
+    except Exception as e:
+        print(f"[macro] SOFR − IORB: {type(e).__name__}: {e}")
+        return {"value": None, "hide": True, "hide_reason": f"грешка ({type(e).__name__})"}
+
+
 def treasury_spread_2s10s() -> dict:
     """T10Y2Y от FRED — директно спредът в %."""
     obs = _fred_series("T10Y2Y", days=30)
@@ -348,6 +401,7 @@ def collect_macro_layer() -> dict:
         "global_signals": global_market_signals(),
         # промптът реже macro JSON-а на 6000 знака — core_inflation е последна преди края
         "core_inflation": core_inflation() if config.ENABLE_CORE_INFLATION else None,
+        "funding_stress": funding_stress() if config.ENABLE_FUNDING_STRESS else None,     # 16.10.2026: след core_inflation — в термометъра е целият (промптът реже macro на 6000 знака)
         # 2026-10-03 (пакет 2 т.4): NewsAPI е махнат (macro.headlines беше празен във всичките 78 брифа);
         # новините са curated (news_aggregator.significant_news) и влизат в макро промпта отделно, ПРЕДИ брифа.
     }
