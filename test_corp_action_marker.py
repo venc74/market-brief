@@ -92,8 +92,9 @@ def around(h, marker, before=3000):
 assert "CTVA" in around(page[page.index("GLB Watchlist"):], WARN) and "EXPD" in around(page[page.index("<h2>Watchlist"):], WARN)
 qm_i = page.index('class="corp-warn"', page.index('<div class="qm-grid">')); assert "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", page[qm_i - 3000:qm_i]))
 print("  ✓ страница: ред «⚠ корпоративно действие на 01.10 …» точно на трите карти — реалната карта на CTVA в GLB (P няма), Watchlist (EXPD) и QM (SN)")
-assert mail.count(WARN) == 1 and "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", mail[mail.index(WARN) - 900:mail.index(WARN)]))
-print("  ✓ имейл: редът е под QM картата SN")
+w1 = mail.index(WARN); w2 = mail.index(WARN, w1 + 1)
+assert mail.count(WARN) == 2 and "EXPD" in htmllib.unescape(re.sub(r"<[^>]+>", " ", mail[w1 - 900:w1])) and "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", mail[w2 - 900:w2]))
+print("  ✓ имейл: редът е под Watchlist картата EXPD (трети преглед, 16.10 — Watchlist в имейла носи предупрежденията като на страницата) и под QM картата SN")
 b2 = copy.deepcopy(B2)
 t0 = b2["action"][0]["ticker"]
 ca.annotate([b2["action"], b2["watchlist"]], "2026-10-09", fetch=series_for(t0))

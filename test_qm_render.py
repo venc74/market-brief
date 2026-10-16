@@ -244,7 +244,7 @@ for c in CARDS:
 assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 (−4.5%)" in emt and "91 акции" not in emt and SUMMARY in emt
 assert f"Проверката е отварянето ({OPEN_BER}): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
 assert "Измерване: 3 записа · затворени 0 · win rate след 20 затворени" in emt
-assert emt.index("Watchlist:") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
+assert emt.index("Watchlist ·") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
 assert "Qullamaggie сетъпи" not in emt
 print("  ✓ в имейла: веднага след реда Watchlist — 'Пробиви по Kullamägi (Breakout)' (3-те карти: ниво, стоп за оразмеряване и %, ADR, очакван стоп, ръст, дни консолидация; без брой акции) и 'Епизодични пивоти (EP)' (SYNA: AH гап, заглавие, ръст, стоп и %; ред за отварянето и вчерашния дневник)")
 em_q = render.render_email({**brief_with(), "watchlist": [{"ticker": "DOCN"}] + brief_with()["watchlist"]})

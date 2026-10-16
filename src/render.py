@@ -115,6 +115,55 @@ def _lv_warn_html(lv) -> str:
     return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(w)}</span>' for w in ((lv or {}).get("warnings") or []))
 
 
+def _book_note_html(card: dict) -> str:
+    """12.10: потвърден пробив с жив запис в buy-stop книгата — неутралният ред от картата и в имейла (трети преглед, 16.10: EXPD "в buy-stop книгата: отворена от 09.10 по $194.59")."""
+    note = (card.get("setup") or {}).get("book_note")
+    return f'<br><span style="color:#6b7280;font-size:12px">{_e(note)}</span>' if note else ""
+
+
+def _watchlist_email_html(watchlist: list[dict]) -> str:
+    """
+    Watchlist в имейла (трети преглед, 16.10): както обещава CLAUDE.md (07.10: "Имейлът: само вход, стоп, стоп % и предупрежденията"; 4б: отчетът и в имейла) — до 16.10 имейлът
+    даваше само тикърите. Карта с buy-stop → buy-stop, таван, валидност, стоп и стоп %; задействан запис в книгата → текстът на кода; отчет / корпоративно действие / отделяне /
+    обратен COT залог / бележка за книгата — както при Action. Компактните (too_wide / extended / no_volume) — един ред с причината от кода и отчета, като на страницата.
+    """
+    cards, compact = split_watchlist(watchlist)
+    if not cards and not compact:
+        return ' <span style="font-family:monospace">—</span>'
+    out = ""
+    for st in cards:
+        setup, lv, ew = st.get("setup") or {}, st.get("levels") or {}, st.get("earnings_warning")
+        if setup.get("triggered"):
+            txt = f'<span style="color:#0e9f6e">{_e(setup.get("trigger_text"))}</span>'
+        elif setup.get("buy_stop") and isinstance(lv.get("stop"), (int, float)):
+            valid = setup.get("valid_label") or (f'до {setup["valid_through"][8:10]}.{setup["valid_through"][5:7]}' if setup.get("valid_through") else "")
+            txt = (f'Buy-stop ${setup["buy_stop"]:.2f}' + (f' (таван ${setup["max_chase"]:.2f}' + (f', валиден {_e(valid)}' if valid else "") + ")" if setup.get("max_chase") else "")
+                   + f' · Stop ${lv["stop"]:.2f} (−{lv.get("stop_pct")}%)' + _lv_warn_html(lv))
+        else:
+            txt = _e((st.get("ai") or {}).get("watchlist_trigger") or setup.get("trigger_text") or "")
+        if ew:
+            txt += f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>'
+        txt += _corp_html(st) + _spinoff_html(st) + _cot_html(st) + _book_note_html(st)
+        out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'
+                f'<td style="padding:6px 0;font-size:12.5px;font-family:monospace">{txt}</td></tr>')
+    html = f'<table cellpadding="0" cellspacing="0" style="margin-top:6px">{out}</table>' if out else ""
+    if compact:
+        rows = []
+        for r in compact:
+            t = f'<b>{_e(r["ticker"])}</b> — {_e(r["reason"])}'
+            if r.get("kind") != "too_wide" and isinstance(r.get("stop_pct"), (int, float)):
+                t += f', стоп {r["stop_pct"]:.1f}%'
+            if r.get("earnings"):
+                d = r["earnings"]["date"]
+                t += f', отчет {d[8:10]}.{d[5:7]}' + (f' (±{r["earnings"]["pct"]}%)' if r["earnings"].get("pct") is not None else "")
+            if r.get("spinoff"):
+                sp = r["spinoff"]
+                t += f', ⚠ отделяне {sp["distribution"][8:10]}.{sp["distribution"][5:7]} (запис {sp["record"][8:10]}.{sp["record"][5:7]})'
+            rows.append(t)
+        html += f'<div style="margin-top:6px;font-size:12.5px;color:#6b7280">Без сетъп за вход днес: {" · ".join(rows)}</div>'
+    return html
+
+
 def _e(x) -> str:
     """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
     return _html.escape("" if x is None else str(x), quote=True)
@@ -408,7 +457,7 @@ def render_email(brief: dict) -> str:
         mk = f'<div style="margin-top:4px">{mk}</div>' if mk else ""
         ew = st.get("earnings_warning")
         earn_line = f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>' if ew else ""
-        earn_line += _corp_html(st) + _spinoff_html(st)
+        earn_line += _corp_html(st) + _spinoff_html(st) + _book_note_html(st)
         rows += f"""
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
@@ -436,7 +485,7 @@ def render_email(brief: dict) -> str:
                 """<tr><td colspan="3" style="padding:14px;color:#6b7280">
                   Днес няма Action кандидати. Кешът е позиция.</td></tr>""")
 
-    watch = ", ".join(_e(st["ticker"]) for st in brief["watchlist"]) or "—"
+    watch = _watchlist_email_html(brief.get("watchlist") or [])
     wx = brief.get("watchlist_exits") or {}
     watch_exits = ("" if not wx.get("from") else
                    f'<br><b>Излязоха от {_e(watchlist_exits.label(wx, brief.get("date") or ""))}:</b> '
@@ -448,7 +497,12 @@ def render_email(brief: dict) -> str:
         f'border-radius:50%;margin-right:5px;'
         + (f'border:2px solid {dot_color.get(i["status"], "#d97706")};background:#ffffff"' if i.get("informational")
            else f'background:{dot_color.get(i["status"], "#d97706")}"') + '></span>'
-        for i in t["indicators"])
+        for i in t["indicators"] if not i.get("hide"))        # трети преглед (16.10): скрит индикатор (status "yellow" е само запълване) НЕ е жълта точка — ред "Скрити днес"
+    hidden = [i for i in t["indicators"] if i.get("hide")]
+    hidden_line = ("" if not hidden else
+                   '<div style="color:#6b7280;font-size:12px;margin-top:6px">Скрити днес: '
+                   + " · ".join(f'{_e(i["name"])} — {_e(i.get("hide_reason") or "няма данни")}' + (" (информативен, не влиза в режима)" if i.get("informational") else "")
+                                for i in hidden) + "</div>")
 
     # v2 · компактна секция „Сигнали днес" (Секции 3.3 + 3.4) — само ако има данни
     # FIX 2026-09-27: заглавието казваше "30 дни", а списъкът е само текущата
@@ -523,6 +577,7 @@ def render_email(brief: dict) -> str:
       {_e(regime.upper())}</span>
     <span style="margin-left:12px">{thermo_dots}</span>
     <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
+    {hidden_line}
     {(f'<div style="color:#b45309;font-size:13px;margin-top:8px">📅 {_e(brief["market_calendar_note"])}</div>') if brief.get("market_calendar_note") else ""}
   </td></tr>
 
@@ -542,7 +597,7 @@ def render_email(brief: dict) -> str:
   </td></tr>
 
   <tr><td style="padding:14px 28px;font-size:13px;color:#374151">
-    <b>Watchlist:</b> <span style="font-family:monospace">{watch}</span>{watch_exits}
+    <b>Watchlist · {len(brief['watchlist'])}:</b>{watch}{watch_exits}
   </td></tr>
 
   {qm_block}
