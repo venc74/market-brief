@@ -636,9 +636,23 @@ def run() -> dict:
     # fetch — gather_raw мемоизира в процеса.
     theses = ai_brief.thesis_reality_check(
         theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
-    narratives = ai_brief.ticker_narratives(
-        candidates, ai_macro.get("sector_logic", []), thermo["regime"])
-    candidates = ai_brief.merge_narratives(candidates, narratives)
+    # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
+    try:
+        narratives = ai_brief.ticker_narratives(
+            candidates, ai_macro.get("sector_logic", []), thermo["regime"])
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[main] ⚠ наративите пропаднаха изцяло ({type(e).__name__}: {e}) — класификацията е от кода, картите са без AI текст")
+        narratives = []
+        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)]
+    try:
+        candidates = ai_brief.merge_narratives(candidates, narratives)
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[main] ⚠ сливането на наративите пропадна ({type(e).__name__}: {e}) — класификацията е от кода, картите са без AI текст")
+        for c in candidates:
+            c["ai"] = {"classification": "Action" if (c.get("setup") or {}).get("eligible") else "Watchlist", "why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}
+        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates]
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
     try:
         sector_claims_fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
@@ -1013,6 +1027,7 @@ def run() -> dict:
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                                superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                                dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
+                                               ai_lost=list(ai_brief.NARRATIVES_LOST),
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                                canary=canary, health=health),
         "health": health,                                                # здравният монитор (10.10)

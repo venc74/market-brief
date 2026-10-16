@@ -115,6 +115,15 @@ def _corp_warning(diag: dict | None) -> list[dict]:
                          f"тикър с такова събитие може да е на картите с приблизителна история.")}]                   # 13.10.2026: изключване вместо маркер
 
 
+def _ai_lost_warning(lost: list | None) -> list[dict]:
+    """16.10.2026 (В7): тикъри без AI наратив днес (паднал batch / пропуснати от модела) — класификацията им е от кода."""
+    if not lost:
+        return []
+    return [{"source": "ai", "level": "warn",
+             "message": (f"AI наративи: моделът не върна текст за {len(lost)} тикъра ({', '.join(lost)}) — класификацията им е от кода (потвърден пробив → Action, "
+                         "останалите → Watchlist), картите са без AI текст днес.")}]
+
+
 def _dd_warning(status: dict | None) -> list[dict]:
     """16.10.2026 (В8, трети преглед): distribution days — failed (нито SPY, нито QQQ) / partial (единият липсва). Липсата НЕ е нечервен ден за блока на Offensive."""
     st = status or {}
@@ -169,7 +178,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
-            dd_status: dict | None = None) -> list[dict]:
+            dd_status: dict | None = None, ai_lost: list | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -215,6 +224,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_corp_warning(corp_diag))
     out.extend(_spinoff_warning(spinoff_diag))
     out.extend(_dd_warning(dd_status))
+    out.extend(_ai_lost_warning(ai_lost))
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)

@@ -1028,6 +1028,14 @@ days_to_earnings=0 означава earnings Е ДНЕС — пиши го из�
 Връщай само JSON: {{"tickers": [...]}}"""
 
 
+# 16.10.2026 (В7, трети преглед): тикърите, изпратени за наратив в този run, и тези, за които модел не върна нищо (паднал batch или пропуснат тикър) — класификацията им е от
+# кода (merge_narratives), картата казва "без AI текст днес", банер source "ai". РЕАЛНО: на 10.07.2026 NBIX, INCY, AMG, EXEL, AIZ останаха без наратив (само "Изчаква потвърждение.")
+# — без банер; тогавашният default беше Watchlist за всеки без AI (и за потвърден пробив).
+NARRATIVES_SENT: list[str] = []
+NARRATIVES_LOST: list[str] = []
+NO_AI_TEXT = "Без AI текст днес — AI не върна наратив за тикъра; класификацията е от кода."
+
+
 def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
                           regime: str, tag: str) -> list[dict]:
     """
@@ -1066,6 +1074,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     """
     slim = []
     skipped = []
+    NARRATIVES_SENT.clear(); NARRATIVES_LOST.clear()
     for c in candidates:
         kind = (c.get("setup") or {}).get("kind")
         if kind and kind not in config.AI_NARRATIVE_SETUPS:
@@ -1101,13 +1110,35 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     merged: list[dict] = []
     for idx, batch in enumerate(batches, 1):
         merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}")
+    NARRATIVES_SENT.extend(c.get("ticker") for c in slim)
+    got = {n.get("ticker") for n in merged if isinstance(n, dict)}
+    NARRATIVES_LOST.extend(t for t in NARRATIVES_SENT if t not in got)
+    if NARRATIVES_LOST:
+        print(f"[ai] ⚠ без наратив (паднал batch / пропуснат от модела): {NARRATIVES_LOST} — класификацията им е от кода")
     return merged
 
 
 def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dict]:
-    by_ticker = {n["ticker"]: n for n in narratives}
+    by_ticker = {}
+    for n in narratives or []:                              # 16.10.2026 (т. 6): един лош елемент (не dict / без тикър) се прескача с ред в лога, денят не се губи
+        if isinstance(n, dict) and n.get("ticker"):
+            by_ticker[n["ticker"]] = n
+        else:
+            print(f"[ai] ⚠ наратив без тикър или в лош формат — прескочен: {str(n)[:120]!r}")
+    lost = set(NARRATIVES_LOST)
     for c in candidates:
-        c["ai"] = by_ticker.get(c["ticker"], {})
+        c["ai"] = dict(by_ticker.get(c["ticker"], {}))
+        if not c["ai"] and c.get("ticker") in lost:          # 16.10.2026 (В7): без наратив → класификацията е на кода (потвърден пробив → Action), картата го казва
+            setup = c.get("setup") or {}
+            c["ai"] = {"classification": "Action" if setup.get("eligible") else "Watchlist", "why_now": NO_AI_TEXT, "ai_missing": True}
+        for k in ("why_now", "business_bg", "earnings_call"):        # 16.10.2026 (т. 6): поле в лош формат (не низ) → махнато с ред в лога, не срив по-надолу
+            if k in c["ai"] and c["ai"][k] is not None and not isinstance(c["ai"][k], str):
+                print(f"[ai] ⚠ {c.get('ticker')}: полето {k} не е текст ({type(c['ai'][k]).__name__}) — махнато")
+                c["ai"].pop(k)
+        for k in ("catalysts", "risks"):
+            if k in c["ai"] and not isinstance(c["ai"][k], list):
+                print(f"[ai] ⚠ {c.get('ticker')}: полето {k} не е списък — махнато")
+                c["ai"].pop(k)
         c["ai"].pop("watchlist_trigger", None)           # 08.10 (2б): текстът е на кода — ако моделът въпреки всичко върне такова поле, то се изхвърля
         # Твърдите правила бият AI преценката (Секция 8). В1 (втори преглед, 10.10): БЕЗУСЛОВНО — до 10.10 условието беше
         # "in_blackout and not warning" и промптът разрешаваше Action с поле "warning" → моделът можеше да държи Action 0–7 дни
