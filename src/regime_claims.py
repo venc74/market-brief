@@ -174,12 +174,25 @@ def _members(sentence: str, start: int) -> list[str]:
     return [p.strip() for p in re.split(r",|;|\s+и\s+", m.group(1)) if p.strip()]
 
 
+# 16.10.2026 (т. 5, трети преглед): ХИПОТЕТИЧЕН брой не е днешният — "само 1 червен индикатор е достатъчен за преход към Defensive (сега 0 червени)" (16.10) беше заменен като
+# "твърди 1 червени, а кодът брои 0". Брой, последван от "е достатъчен / за преход / за смяна / би / ще / стига", или предшестван от "ако / при / още / нов", не се сверява с броенето;
+# "(сега 0 червени)" в същото изречение — се сверява.
+_HYPO_AFTER = re.compile(r"^\W{0,3}(?:[\w-]+\s+){0,3}?(?:е\s+|са\s+)?(?:достатъч\w*|за\s+(?:преход|смяна|промяна)|би\b|биха\b|ще\b|стига\w*)", re.I)
+_HYPO_BEFORE = re.compile(r"(?:\bако|\bпри|\bоще|\bнов\w*|\bвтори|\bпоне)\s+(?:[\w-]+\s+){0,1}$", re.I)
+
+
+def _hypothetical(sentence: str, m: re.Match) -> bool:
+    return bool(_HYPO_AFTER.search(sentence[m.end():m.end() + 60]) or _HYPO_BEFORE.search(sentence[max(0, m.start() - 30):m.start()]))
+
+
 def check_sentence(sentence: str, f: dict) -> list[dict]:
     """Проблемите в едно изречение (празен списък = чисто)."""
     g = f["groups"]
     problems = []
     if f.get("counts_text") and "не е налично" not in f["counts_text"] and not _RULE_WORDS.search(sentence):
         for m in _COUNT.finditer(sentence):
+            if _hypothetical(sentence, m):
+                continue
             n, color = int(m.group(1)), _COLOR_WORD[m.group(2).lower()]
             if n != len(g[color]):
                 problems.append({"code": "count", "why": f"твърди {n} {_COLOR_BG[color]}, а кодът брои {len(g[color])}"})
