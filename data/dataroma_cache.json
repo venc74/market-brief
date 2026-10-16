@@ -1,5 +1,5 @@
 {
- "date": "2026-10-15",
+ "date": "2026-10-16",
  "bundle": {
   "moves": [
    {
@@ -501,7 +501,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-15",
+   "data_date": "2026-10-16",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,

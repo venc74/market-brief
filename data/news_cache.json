@@ -1,37 +1,53 @@
 {
- "date": "2026-10-15",
+ "date": "2026-10-16",
  "news": [
   {
-   "headline": "CPI September 2026: инфлацията се ускорява до 3.7%, по-горещо от очакваното",
-   "why": "Горещият CPI доклад директно удари акциите и предизвика глобален разпродаж, засилвайки очакванията за допълнителни Fed повишения на лихвите."
+   "headline": "Retail sales up 0.8% in September, but a big chunk of spending went to paying gasoline bills - AP News",
+   "source": "AP Business",
+   "why": "Retail sales +0.8% за септември е ключов макро показател за потребителското търсене и ще влияе на очакванията за следващото решение на Fed.",
+   "headline_bg": "Продажбите на дребно нагоре с 0.8% през септември, но голяма част от харченето отиде за бензин"
   },
   {
-   "headline": "Fed's Daly: повишения на лихвите вероятно са необходими, но не спешно",
-   "why": "Коментарът на Fed официал калибрира пазарните очаквания за темпото на затягане след горещите инфлационни данни."
+   "headline": "Dollar weakens as Fed’s Warsh declines to hint at October rate rise",
+   "source": "Financial Times",
+   "why": "Отказът на Warsh да сигнализира за октомврийско повишение отслаби долара, директен ефект върху FX пазарите и очакванията за лихвения път.",
+   "headline_bg": "Доларът отслабва, след като Warsh от Fed отказа да намекне за повишение на лихвата през октомври"
   },
   {
-   "headline": "Азиатски пазари в разпродаж: Kospi спира търговия, Nikkei пада 5%",
-   "why": "Глобалният технологичен и AI разпродаж, задвижен от CPI данните, се разпространи в Азия с double-digit загуби при semiconductor акции."
+   "headline": "Fed's Warsh withholds Fed rate signal, praises recent global tightening with 'no free riders'",
+   "source": "CNBC",
+   "why": "Коментарите на Warsh за 'синхронно затягане' от централните банки засягат глобалните лихвени очаквания и позициониране в облигации.",
+   "headline_bg": "Warsh от Fed задържа сигнал за лихвен курс, похвали скорошното глобално затягане без 'безплатни ездачи'"
   },
   {
-   "headline": "SK Hynix поставя условие за нов завод в САЩ: повече chip exports към Китай",
-   "why": "Geopolitically чувствително условие, което обвързва US semiconductor policy и export controls с решения за вътрешни инвестиции."
+   "headline": "MSCI gets set to remove Indonesia from global indexes, sparks market slide to six-year low - Reuters",
+   "source": "Reuters Business",
+   "why": "Предстоящото премахване на Индонезия от глобалните индекси на MSCI предизвика срив до шестгодишно дъно и ще принуди пасивните фондове към масирани продажби.",
+   "headline_bg": "MSCI се готви да премахне Индонезия от глобалните индекси, което предизвика пазарен срив до шестгодишно дъно"
   },
   {
-   "headline": "Хусите атакуват Saudi Aramco HQ; кораб потъва в Хормузкия проток след мина",
-   "why": "Ескалацията в Близкия изток застрашава петролни доставки и корабоплаване — директен натиск върху петролните цени и freight markets."
+   "headline": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
+   "source": "CNBC",
+   "why": "CoreWeave CDS достигнаха нива на дистрес, сигнализирайки за сериозно преоценяване на риска в AI инфраструктурния дълг с ефект върху целия сектор.",
+   "headline_bg": "Credit default swaps на CoreWeave достигнаха нива на дистрес, тъй като инвеститорите охладяха към AI дълга"
   },
   {
-   "headline": "САЩ разглеждат размразяване на руски активи за рестарт на мирни преговори за Украйна",
-   "why": "Потенциална промяна в санкционния режим би имала значителен ефект върху руски активи, европейски пазари и geopolitical risk premium."
+   "headline": "Oil heads for weekly gain with Mideast supply risks - Reuters",
+   "source": "Reuters Business",
+   "why": "Нефтът върви към седмична печалба заради рисковете за доставките от Близкия изток, което влияе директно на енергийния сектор и инфлационните очаквания.",
+   "headline_bg": "Нефтът върви към седмична печалба заради рисковете за доставките от Близкия изток"
   },
   {
-   "headline": "САЩ обмислят облекчаване на санкциите срещу shadow fleet vessels за намаляване на freight rates",
-   "why": "Промяна в санкционната политика би повлияла директно на петролни цени, shipping stocks и глобални supply chain разходи."
+   "headline": "Trump weighs easing restrictions on Russian and Iranian ‘shadow fleet’",
+   "source": "Financial Times",
+   "why": "Евентуалното облекчаване на ограниченията върху руския и иранския 'shadow fleet' би повлияло на петролните цени, санкционния режим и отношенията с европейските съюзници.",
+   "headline_bg": "Тръмп обмисля облекчаване на ограниченията върху руския и иранския 'shadow fleet'"
   },
   {
-   "headline": "Fannie Mae рязко повишава прогнозата за ипотечни лихви за 2027",
-   "why": "Ревизията нагоре сигнализира продължителен натиск върху housing market, mortgage-backed securities и потребителското търсене."
+   "headline": "Average long-term US mortgage rate holds at 7.4%, remaining at highest level in nearly 3 years - AP News",
+   "source": "AP Business",
+   "why": "Средната дългосрочна ипотечна лихва в САЩ задържа при 7.4% — най-високото ниво от почти 3 години — с директен натиск върху пазара на имоти и потребителското търсене.",
+   "headline_bg": "Средната дългосрочна ипотечна лихва в САЩ задържа при 7.4%, оставайки на най-високото ниво от близо 3 години"
   }
  ]
 }

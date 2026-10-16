@@ -1,0 +1,26 @@
+{
+ "version": 1,
+ "tickers": {
+  "BK": {
+   "ticker": "BNY",
+   "name": "The Bank of New York Mellon Cor",
+   "claim": "The Bank of New York Mellon Corporation",
+   "first_found": "2026-10-16",
+   "last_found": "2026-10-16"
+  },
+  "CSWI": {
+   "ticker": "CSW",
+   "name": "CSW Industrials, Inc.",
+   "claim": "CSW Industrials, Inc.",
+   "first_found": "2026-10-16",
+   "last_found": "2026-10-16"
+  },
+  "GMCR": {
+   "ticker": "KDP",
+   "name": "Keurig Dr Pepper Inc.",
+   "claim": "Keurig Dr Pepper Inc.",
+   "first_found": "2026-10-16",
+   "last_found": "2026-10-16"
+  }
+ }
+}

@@ -1,5 +1,5 @@
 {
- "date": "2026-10-15",
+ "date": "2026-10-16",
  "rows": [],
  "horizon": [
   {
@@ -75,6 +75,14 @@
    "date_human": "Oct 15, 2026"
   },
   {
+   "ticker": "KNDI",
+   "company": "Kandi Technologies Group, Inc.",
+   "date": "2026-10-16",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 16, 2026"
+  },
+  {
    "ticker": "AMTD",
    "company": "AMTD IDEA Group",
    "date": "2026-10-19",
@@ -89,15 +97,55 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 23, 2026"
+  },
+  {
+   "ticker": "EFG",
+   "company": "iShares MSCI EAFE Growth ETF",
+   "date": "2026-11-05",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "EFV",
+   "company": "iShares MSCI EAFE Value ETF",
+   "date": "2026-11-05",
+   "ratio": "2:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "MTUM",
+   "company": "iShares MSCI USA Momentum Factor ETF",
+   "date": "2026-11-05",
+   "ratio": "4:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "QUAL",
+   "company": "iShares MSCI USA Quality Factor ETF",
+   "date": "2026-11-05",
+   "ratio": "4:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "ITA",
+   "company": "iShares U.S. Aerospace & Defense ETF",
+   "date": "2026-11-05",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 11,
+  "source_rows": 17,
   "horizon_from": "2026-10-12",
-  "horizon_to": "2026-10-23",
-  "in_week": 9,
+  "horizon_to": "2026-11-05",
+  "in_week": 10,
   "dropped_price": [
    "DFLI",
    "MDCX",
@@ -106,7 +154,8 @@
    "POAS",
    "ZBAO",
    "FMFC",
-   "BTOC"
+   "BTOC",
+   "KNDI"
   ],
   "dropped_cap": [
    "SKIN"
