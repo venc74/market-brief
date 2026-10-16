@@ -83,14 +83,14 @@ assert hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cac
 print("  ✓ липсващ предишен бриф, стари кешове (4) и незаписано GLB състояние → редове; при паднал GLB мониторът не дублира банера на С3")
 
 print()
-print("── 4б. таблицата NYSE_HOLIDAYS (РЕАЛНАТА — покрива до 2027) ──")
-assert max(int(h[:4]) for h in config.NYSE_HOLIDAYS) == 2027
-w_ok = world(cache_date="2027-10-01", glb_updated="2027-10-01", briefs=("2027-09-30",), sessions=["2027-09-30"])
-assert "holidays" not in {i["check"] for i in hm.check("2027-10-01", w_ok, resolution={"ok": True, "live": 0}, glb_status={"ok": True})}
-w_late = world(cache_date="2027-11-15", glb_updated="2027-11-15", briefs=("2027-11-12",), sessions=["2027-11-12"])
-hol = [i for i in hm.check("2027-11-15", w_late, resolution={"ok": True, "live": 0}, glb_status={"ok": True}) if i["check"] == "holidays"]
-assert len(hol) == 1 and "покрива до 2027 г. (остават 46 дни)" in hol[0]["message"] and "празниците за 2028" in hol[0]["message"]
-print("  ✓ СИНТЕТИЧНА 'днес' 01.10.2027 (91 дни до края) → нищо; 15.11.2027 (46 дни) → «покрива до 2027 г. (остават 46 дни) — добави празниците за 2028»")
+print("── 4б. таблицата NYSE_HOLIDAYS (РЕАЛНАТА — покрива до 2028 от 16.10.2026) ──")
+assert max(int(h[:4]) for h in config.NYSE_HOLIDAYS) == 2028
+w_ok = world(cache_date="2028-10-02", glb_updated="2028-10-02", briefs=("2028-09-29",), sessions=["2028-09-29"])
+assert "holidays" not in {i["check"] for i in hm.check("2028-10-02", w_ok, resolution={"ok": True, "live": 0}, glb_status={"ok": True})}
+w_late = world(cache_date="2028-11-15", glb_updated="2028-11-15", briefs=("2028-11-14",), sessions=["2028-11-14"])
+hol = [i for i in hm.check("2028-11-15", w_late, resolution={"ok": True, "live": 0}, glb_status={"ok": True}) if i["check"] == "holidays"]
+assert len(hol) == 1 and "покрива до 2028 г. (остават 46 дни)" in hol[0]["message"] and "празниците за 2029" in hol[0]["message"]
+print("  ✓ СИНТЕТИЧНА 'днес' 02.10.2028 (90 дни до края) → нищо; 15.11.2028 (46 дни) → «покрива до 2028 г. (остават 46 дни) — добави празниците за 2029»")
 
 print()
 print("── 5. main ──")

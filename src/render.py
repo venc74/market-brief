@@ -201,11 +201,17 @@ def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     return cards, compact
 
 
-def render_dashboard(brief: dict) -> str:
-    today = dt.date.today()
+def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: bool = True, as_of: dt.date | None = None) -> str:
+    """
+    16.10.2026 (В2а): closed_notice — банер "Борсата е затворена днес …" върху последния бриф; publish=False — пише САМО docs/index.html (без архив за деня и без
+    огледалото в docs/data — денят не е бриф); as_of — датата в заглавието (датата на показания бриф).
+    """
+    today = as_of or dt.date.today()
     tpl = env.get_template("dashboard.html.j2")
     gen_time, gen_tz = berlin_clock()                      # един вик — часът и етикетът са от един и същи момент
     html = tpl.render(
+        closed_notice=closed_notice,
+        calendar_note=brief.get("market_calendar_note"),      # 16.10.2026 (В2б): утре / в понеделник борсата не работи или затваря рано
         date_human=f"{today.strftime('%d.%m.%Y')}, {WEEKDAYS_BG[today.weekday()]}",
         generated_at=gen_time,
         generated_tz=gen_tz,
@@ -266,6 +272,8 @@ def render_dashboard(brief: dict) -> str:
     )
     config.DOCS_DIR.mkdir(exist_ok=True)
     (config.DOCS_DIR / "index.html").write_text(html, encoding="utf-8")
+    if not publish:
+        return html
     archive = config.DOCS_DIR / "archive"
     archive.mkdir(exist_ok=True)
     (archive / f"{today.isoformat()}.html").write_text(html, encoding="utf-8")
@@ -514,6 +522,7 @@ def render_email(brief: dict) -> str:
       {_e(regime.upper())}</span>
     <span style="margin-left:12px">{thermo_dots}</span>
     <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
+    {(f'<div style="color:#b45309;font-size:13px;margin-top:8px">📅 {_e(brief["market_calendar_note"])}</div>') if brief.get("market_calendar_note") else ""}
   </td></tr>
 
   {warn_block}

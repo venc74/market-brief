@@ -78,6 +78,36 @@ def session_window(brief_date, sessions: int | None = None) -> list[dt.date]:
     return out
 
 
+def next_weekday(d) -> dt.date:
+    d = _as_date(d) + dt.timedelta(days=1)
+    while d.weekday() >= 5:
+        d += dt.timedelta(days=1)
+    return d
+
+
+def market_calendar_note(today) -> str | None:
+    """
+    16.10.2026 (В2б, трети преглед): ред в брифа за календара на NYSE — днес ранно затваряне; следващият работен ден (утре или в понеделник, ако днес е петък) е празник или с
+    ранно затваряне (config.NYSE_HOLIDAYS / NYSE_EARLY_CLOSES). Без такова → None. Чиста функция.
+    """
+    t = _as_date(today)
+    nxt = next_weekday(t)
+    when = "В понеделник" if t.weekday() == 4 else "Утре"
+    dm = f"{nxt.day:02d}.{nxt.month:02d}"
+    parts = []
+    ec_today = config.NYSE_EARLY_CLOSES.get(t.isoformat())
+    if ec_today:
+        h, m = (int(x) for x in ec_today.split(":"))
+        parts.append(f"Днес борсата затваря рано — в {ec_today} ET ({ny_time_in_berlin(t, h, m)}).")
+    if nxt.isoformat() in config.NYSE_HOLIDAYS:
+        parts.append(f"{when} ({dm}) борсата няма да работи — празник в САЩ.")
+    elif config.NYSE_EARLY_CLOSES.get(nxt.isoformat()):
+        ec = config.NYSE_EARLY_CLOSES[nxt.isoformat()]
+        h, m = (int(x) for x in ec.split(":"))
+        parts.append(f"{when} ({dm}) борсата затваря рано — в {ec} ET ({ny_time_in_berlin(nxt, h, m)}).")
+    return " ".join(parts) or None
+
+
 def ny_time_in_berlin(day, hour: int, minute: int = 0) -> str:
     """
     16.10.2026: час по Ню Йорк в даден ден, преведен в берлинско време с етикета ("15:30 CEST"). Твърдото "15:30 CEST" беше грешно в седмицата 25.10–01.11 (Европа вече на зимно, САЩ още

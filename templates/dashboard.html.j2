@@ -490,6 +490,9 @@
     </div>
   </div>
 </header>
+{# 16.10.2026 (В2а/б): затворена борса днес (страницата показва последния бриф) и календарът за следващия работен ден #}
+{% if closed_notice %}<div class="model-banner rejected">🛑 <strong>{{ closed_notice }}</strong></div>{% endif %}
+{% if calendar_note %}<div class="model-banner">📅 {{ calendar_note }}</div>{% endif %}
 
 {# 07.10.2026: настройки за оразмеряване — само в localStorage на устройството на читателя; в брифа няма размер на сметка и брой акции #}
 <div id="mb-settings" class="mb-settings" data-regime-factor="{{ thermometer.sizing_factor if thermometer.sizing_factor is defined else 1 }}" hidden>

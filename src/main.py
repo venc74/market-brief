@@ -481,9 +481,35 @@ def _short_global_context(short_candidates: list[dict], laggards: list[dict], ne
     return out
 
 
+def _market_closed(today: str, data_dir=None) -> dict:
+    """
+    16.10.2026 (В2а, трети преглед): NYSE е затворена днес (празник от config.NYSE_HOLIDAYS или уикенд) → брифът НЕ върви: без AI, без имейл, без запис в книгите,
+    състоянието и data/; страницата (само docs/index.html) показва последния бриф с банер "Борсата е затворена днес — последният бриф е от ДД.ММ". Досега брифът вървеше
+    изцяло и в празници (РЕАЛНО: 19.06, 03.07, 07.09.2026 — run-ове "success", AI и записи с данните от предишната сесия). Без предишен бриф → само ред в лога.
+    """
+    d = pathlib.Path(data_dir or config.DATA_DIR)
+    snaps = sorted(p for p in d.glob("20??-??-??.json") if p.stem < today)
+    dm = lambda iso: f"{iso[8:10]}.{iso[5:7]}"
+    if not snaps:
+        print("[main] няма предишен бриф за показване — страницата не се пипа")
+        return {"date": today, "market_closed": True, "last_brief": None}
+    last = snaps[-1]
+    try:
+        b = json.loads(last.read_text(encoding="utf-8"))
+        text = f"Борсата (NYSE) е затворена днес ({dm(today)}) — последният бриф е от {dm(last.stem)}."
+        render_dashboard(b, closed_notice=text, publish=False, as_of=dt.date.fromisoformat(last.stem))
+        print(f"[main] {text} Страницата е обновена само с банера.")
+    except Exception as e:
+        print(f"[main] страницата за затворена борса не се обнови: {type(e).__name__}: {e}")
+    return {"date": today, "market_closed": True, "last_brief": last.stem}
+
+
 def run() -> dict:
     today = dt.date.today().isoformat()
     print(f"═══ AI Инвестиционен Бриф · {today} ═══")
+    if config.ENABLE_MARKET_CLOSED_SKIP and not setup_rules.is_session(dt.date.fromisoformat(today)):
+        print(f"[main] NYSE е затворена днес ({today}) — брифът не върви: без AI, без имейл, без записи в книгите и състоянието")
+        return _market_closed(today)
 
     # Кой Claude модел ползваме днес — ВЕДНЪЖ, преди всяка AI стъпка. Резултатът
     # се присвоява на config.CLAUDE_MODEL и се наследява от всички извиквания,
@@ -989,6 +1015,7 @@ def run() -> dict:
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                                canary=canary, health=health),
         "health": health,                                                # здравният монитор (10.10)
+        "market_calendar_note": setup_rules.market_calendar_note(dt.date.fromisoformat(today)),     # 16.10.2026 (В2б): утре / в понеделник NYSE не работи или затваря рано
         "bar_freshness": dict(bar_freshness.LAST_DIAG),                 # 16.10.2026: застоял дневен бар (изчакване, дял на универса, засегнати карти)
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
         "glb_status": dict(glb_screener.LAST_STATUS) if config.ENABLE_GLB_SCREENER else None,     # С3: изпълнен ли е, колко партиди/тикъра
