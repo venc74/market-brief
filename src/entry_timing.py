@@ -116,6 +116,9 @@ METHODOLOGY_NOTE = (f"Подобно на distribution days на IBD: сесия
                     "няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.")
 
 
+LAST_BAR: dict[str, str] = {}             # 16.10.2026: последната дата на бара на SPY/QQQ в последното броене (денят на блока — В2в)
+
+
 def _count_distribution_days(sym: str, lookback: int) -> int | None:
     """
     Тегли дневен OHLCV за sym (lookback + буфер дни, за да има "предходен ден"
@@ -135,6 +138,7 @@ def _count_distribution_days(sym: str, lookback: int) -> int | None:
         lambda: yf.Ticker(sym).history(period=f"{lookback + 15}d"))
     if hist is None or hist.empty or len(hist) < lookback + 1:
         return None
+    LAST_BAR[sym] = hist.index[-1].date().isoformat()
     close, volume = hist["Close"], hist["Volume"]
     pct_chg = close.pct_change() * 100
     is_dd = (pct_chg <= -config.DISTRIBUTION_DAYS_MIN_DECLINE_PCT) & (volume > volume.shift(1))
@@ -203,6 +207,7 @@ def evaluate_distribution_days() -> dict | None:
     Graceful: провал на fetch за ДВАТА индекса → None (dashboard-ът скрива
     целия елемент). Провал само на единия → продължава с наличния.
     """
+    LAST_BAR.clear()
     spy_count = _count_distribution_days("SPY", config.DISTRIBUTION_DAYS_LOOKBACK)
     qqq_count = _count_distribution_days("QQQ", config.DISTRIBUTION_DAYS_LOOKBACK)
     if spy_count is None and qqq_count is None:
@@ -225,7 +230,8 @@ def evaluate_distribution_days() -> dict | None:
             f"{config.DISTRIBUTION_DAYS_LOOKBACK} сесии)")
 
     return {"count": gate_count, "spy_count": spy_count, "qqq_count": qqq_count,
-            "status": status, "label": label, "methodology_note": METHODOLOGY_NOTE}
+            "status": status, "label": label, "methodology_note": METHODOLOGY_NOTE,
+            "as_of": LAST_BAR.get("SPY") or LAST_BAR.get("QQQ")}
 
 
 if __name__ == "__main__":

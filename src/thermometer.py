@@ -41,6 +41,7 @@ def spy_trend() -> dict:
         high_52w = float(close.iloc[-252:].max())
         return {
             "name": "SPY тренд", "value": round(price, 2),
+            "as_of": hist.index[-1].date().isoformat(),                 # 16.10.2026 (В2в): датата на последния бар — денят на броячите за скрит индикатор
             "pct_from_high": round((1 - price / high_52w) * 100, 2),
             "ma50": round(ma50, 2), "ma200": round(ma200, 2),
             "above_50dma": above50, "above_200dma": above200, "status": status,
@@ -266,6 +267,7 @@ def move_index() -> dict:
         spike_note = " ⚠ рязък скок" if spike else ""
         return {
             "name": "MOVE (Bond Vol)", "value": round(val, 1),
+            "as_of": hist.index[-1].date().isoformat(),                 # 16.10.2026 (В2в): денят на хистерезиса — повторената стойност (облигационен празник) не е нов ден
             "delta_1w": round(delta, 1), "spike": spike, "status": status,
             # FIX 2026-09-28: изрично "пункта" — на 28.09 макро текстът цитира
             # делтата (+15.4 пункта) като "+15.4%" (реалната % промяна е +19.05%)
@@ -400,6 +402,7 @@ def _evaluate_credit_spread(ratio) -> dict:
         + {"rising": "расте (ускорява се)", "falling": "спада (забавя се)", "flat": "без промяна"}[trend])
     return {
         "name": "IEI/HYG (Credit Spread)", "value": round(current, 4),
+        "as_of": ratio.index[-1].date().isoformat() if hasattr(ratio.index[-1], "date") else None,     # 16.10.2026 (В2в): денят на хистерезиса
         "level_percentile": level_pct, "roc_10d_pct": round(current_roc, 2),
         "roc_percentile": roc_pct, "spike": spike, "status": status,
         "roc_10d_pct_prev": round(roc_prev, 2) if roc_prev is not None else None, "roc_trend": trend, "roc_trend_text": trend_text,
@@ -885,7 +888,7 @@ def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: 
     if not config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE or not isinstance(thermo, dict) or "distribution_cap" in thermo:
         return thermo
     today_iso = (today or dt.date.today()).isoformat()
-    blk = _distribution_block(distribution_days, today_iso, history)
+    blk = _distribution_block(distribution_days, (distribution_days or {}).get("as_of") or today_iso, history)     # 16.10.2026 (В2в): денят е датата на бара
     if not blk["blocked"]:
         return thermo
     count_regime = thermo.get("regime_by_count") or thermo.get("regime")
@@ -1085,17 +1088,22 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # над build_thermometer) — VIX и MOVE-ниво нямат "ages out" артефакт, не
     # се пипат
     today_iso = (today or dt.date.today()).isoformat()  # today — само за тестове
+    # 16.10.2026 (В2в, трети преглед): броячите се движат по ДАТАТА НА ДАННИТЕ, не по деня на брифа — повторена стойност не е нов ден. РЕАЛНО: ^MOVE няма бар за
+    # 12.10 (облигационен празник) → брифовете от 12.10 и 13.10 четат същото 09.10 (98.5 / −8.8), а move_spike отчете 7 → 8; на 07.09 (Labor Day) и 08.09 — същото 04.09.
+    # Видим индикатор → датата на неговия последен бар; скрит → датата на последния бар на SPY (денят на пазара).
+    spy_ind = next((i for i in indicators if i["name"] == "SPY тренд"), {}) or {}
+    market_day = spy_ind.get("as_of") or today_iso
     HYSTERESIS_RELEASED.clear()
     if move_visible:
-        move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, today_iso)
+        move_spike, move_spike_streak = _hysteresis_effective("move_spike", move_spike_raw, move_ind.get("as_of") or today_iso)
         move_frozen = 0
     else:
-        move_spike, move_spike_streak, move_frozen = _hysteresis_hidden("move_spike", today_iso)
+        move_spike, move_spike_streak, move_frozen = _hysteresis_hidden("move_spike", market_day)
     if credit_visible:
-        credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, today_iso)
+        credit_spike, credit_spike_streak = _hysteresis_effective("credit_spike", credit_spike_raw, credit_ind.get("as_of") or today_iso)
         credit_frozen = 0
     else:
-        credit_spike, credit_spike_streak, credit_frozen = _hysteresis_hidden("credit_spike", today_iso)
+        credit_spike, credit_spike_streak, credit_frozen = _hysteresis_hidden("credit_spike", market_day)
 
     vix_forces_defensive = vix_val is not None and vix_val > config.VIX_DEFENSIVE_THRESHOLD
     move_forces_defensive = ((move_visible and (move_val > config.MOVE_RED_THRESHOLD or move_spike))
