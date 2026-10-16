@@ -547,6 +547,11 @@
     </div>
     {% endif %}
     {% endfor %}
+    {% if not distribution_days and distribution_days_status and distribution_days_status.status == "failed" %}
+    {# 16.10.2026 (В8): тегленето не успя — картата не изчезва, казва го #}
+    <div class="t-card yellow"><div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div><div class="t-val">—</div>
+      <div class="t-label">не се изтеглиха днес (нито SPY, нито QQQ) — блокът на Offensive не е проверен</div></div>
+    {% endif %}
     {% if distribution_days %}
     <div class="t-card {{ distribution_days.status }}" title="{{ distribution_days.methodology_note or 'Подобно на distribution days на IBD: SPY/QQQ, без правилото за изтриване при +5%.' }}">
       <div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div>

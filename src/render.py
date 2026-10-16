@@ -266,6 +266,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         cot_summary=brief.get("cot_summary"),
         correlation_flags=brief.get("correlation_flags", []),
         distribution_days=brief.get("distribution_days"),
+        distribution_days_status=brief.get("distribution_days_status"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),
         backtest=brief.get("backtest", {}),
         available_dates=brief.get("date") and [brief.get("date")],

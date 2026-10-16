@@ -117,6 +117,7 @@ METHODOLOGY_NOTE = (f"Подобно на distribution days на IBD: сесия
 
 
 LAST_BAR: dict[str, str] = {}             # 16.10.2026: последната дата на бара на SPY/QQQ в последното броене (денят на блока — В2в)
+LAST_STATUS: dict = {}                    # 16.10.2026 (В8): ok / partial / failed + кой индекс липсва
 
 
 def _count_distribution_days(sym: str, lookback: int) -> int | None:
@@ -207,11 +208,25 @@ def evaluate_distribution_days() -> dict | None:
     Graceful: провал на fetch за ДВАТА индекса → None (dashboard-ът скрива
     целия елемент). Провал само на единия → продължава с наличния.
     """
-    LAST_BAR.clear()
-    spy_count = _count_distribution_days("SPY", config.DISTRIBUTION_DAYS_LOOKBACK)
-    qqq_count = _count_distribution_days("QQQ", config.DISTRIBUTION_DAYS_LOOKBACK)
+    LAST_BAR.clear(); LAST_STATUS.clear()
+    spy_count, qqq_count = None, None
+    errors = {}
+    for sym in ("SPY", "QQQ"):
+        try:
+            n = _count_distribution_days(sym, config.DISTRIBUTION_DAYS_LOOKBACK)
+        except Exception as e:                    # 16.10.2026 (В8): провал на единия не сваля другия
+            n, errors[sym] = None, f"{type(e).__name__}: {e}"
+        if sym == "SPY":
+            spy_count = n
+        else:
+            qqq_count = n
+    missing = [s for s, n in (("SPY", spy_count), ("QQQ", qqq_count)) if n is None]
+    LAST_STATUS.update(ok=not missing, status="ok" if not missing else ("failed" if len(missing) == 2 else "partial"), missing=missing, errors=errors)
     if spy_count is None and qqq_count is None:
+        print(f"[entry_timing] ⚠ distribution days: нито SPY, нито QQQ не се изтеглиха ({errors or 'празна история'})")
         return None
+    if missing:
+        print(f"[entry_timing] ⚠ distribution days: {missing[0]} не се изтегли — броенето е само по {'QQQ' if missing[0] == 'SPY' else 'SPY'}")
 
     gate_count = max(c for c in (spy_count, qqq_count) if c is not None)
     if gate_count >= config.DISTRIBUTION_DAYS_RED:
@@ -229,9 +244,11 @@ def evaluate_distribution_days() -> dict | None:
     label = (f"{' / '.join(parts)} (последни "
             f"{config.DISTRIBUTION_DAYS_LOOKBACK} сесии)")
 
+    if missing:
+        label += f" · {missing[0]} не се изтегли днес — само по {'QQQ' if missing[0] == 'SPY' else 'SPY'}"
     return {"count": gate_count, "spy_count": spy_count, "qqq_count": qqq_count,
             "status": status, "label": label, "methodology_note": METHODOLOGY_NOTE,
-            "as_of": LAST_BAR.get("SPY") or LAST_BAR.get("QQQ")}
+            "as_of": LAST_BAR.get("SPY") or LAST_BAR.get("QQQ"), "fetch_status": LAST_STATUS["status"], "missing": missing}
 
 
 if __name__ == "__main__":

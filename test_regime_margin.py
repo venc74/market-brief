@@ -66,6 +66,6 @@ sec = page[page.index("Пазарен термометър"):]
 assert sec.index("Запас до смяна на режима") < sec.index("Значими новини") if "Значими новини" in sec else True
 assert "Запас до смяна" not in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(copy.deepcopy(B15)))))      # стар бриф без ключа
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert src.index("thermo = apply_distribution_cap(thermo, distribution_days") < src.index('thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days)') < src.index("ai_macro = ai_brief.macro_and_sector_brief(")
+assert src.index("thermo = apply_distribution_cap(thermo, distribution_days") < src.index('thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days') < src.index("ai_macro = ai_brief.macro_and_sector_brief(")
 print("  ✓ страницата (РЕАЛНИЯТ бриф от 15.10): редът е в картата на термометъра; стар бриф без ключа — без реда; main: след distribution days, преди макро брифа")
 print("\n✅ test_regime_margin: всичко мина")

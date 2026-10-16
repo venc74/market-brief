@@ -252,7 +252,7 @@ def _plural(n: int, one: str, many: str) -> str:
     return f"{n} {one if n == 1 else many}"
 
 
-def margin(thermo: dict | None, distribution_days: dict | None = None) -> dict:
+def margin(thermo: dict | None, distribution_days: dict | None = None, dd_status: dict | None = None) -> dict:
     """
     15.10.2026 · "Запас до смяна на режима" — готово от кода (за картата на термометъра и за макро промпта): {"text", "parts"}. Части:
       • броенето: колко червени сменят режима по правилото (Offensive → 1 червен → Defensive; Defensive → до Offensive / до Cash; Cash → до Defensive) + зелени/видими спрямо минимума;
@@ -290,8 +290,12 @@ def margin(thermo: dict | None, distribution_days: dict | None = None) -> dict:
         dd = distribution_days or {}
         red = config.DISTRIBUTION_DAYS_RED
         sc, qc = dd.get("spy_count"), dd.get("qqq_count")
+        if (dd_status or {}).get("status") == "failed" and sc is None and qc is None:          # 16.10.2026 (В8)
+            parts.append("distribution days: не се изтеглиха днес (нито SPY, нито QQQ) — блокът на Offensive не е проверен")
         if sc is not None or qc is not None:
             nums = ", ".join(f"{n} {c}/{red}" for n, c in (("SPY", sc), ("QQQ", qc)) if c is not None)
+            if dd.get("missing"):                                                             # 16.10.2026 (В8): единият индекс липсва — изрично
+                nums += f" ({dd['missing'][0]} не се изтегли днес)"
             top = max(c for c in (sc, qc) if c is not None)
             if top >= red:
                 parts.append(f"distribution days {nums} — червени: Offensive е блокиран; блокът пада след {config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS} поредни дни под {red}")

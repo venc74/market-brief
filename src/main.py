@@ -562,7 +562,7 @@ def run() -> dict:
             print(f"[thermo] ⚠ apply_distribution_cap пропадна ({type(e).__name__}: {e}) — режимът е без този блок")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
     # 15.10.2026: "Запас до смяна на режима" от кода (карта на термометъра + макро промпт) — след distribution days, преди макро брифа
-    thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days)
+    thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days, dict(entry_timing.LAST_STATUS))
     if thermo["regime_margin"]["text"]:
         print(f"      {thermo['regime_margin']['text']}")
 
@@ -1012,6 +1012,7 @@ def run() -> dict:
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                                superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
+                                               dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                                canary=canary, health=health),
         "health": health,                                                # здравният монитор (10.10)
@@ -1067,6 +1068,7 @@ def run() -> dict:
         "thesis_check_diag": dict(ai_brief.THESIS_CHECK_DIAG),
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
+        "distribution_days_status": dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,     # 16.10.2026 (В8): ok / partial / failed
         "backtest": backtest_summary,
         "short_candidates": short_candidates,
         "short_tracker": short_tracker_summary,

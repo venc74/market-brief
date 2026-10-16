@@ -115,6 +115,20 @@ def _corp_warning(diag: dict | None) -> list[dict]:
                          f"тикър с такова събитие може да е на картите с приблизителна история.")}]                   # 13.10.2026: изключване вместо маркер
 
 
+def _dd_warning(status: dict | None) -> list[dict]:
+    """16.10.2026 (В8, трети преглед): distribution days — failed (нито SPY, нито QQQ) / partial (единият липсва). Липсата НЕ е нечервен ден за блока на Offensive."""
+    st = status or {}
+    if not st or st.get("status") in (None, "ok"):
+        return []
+    if st["status"] == "failed":
+        return [{"source": "distribution_days", "level": "warn",
+                 "message": "Distribution days: нито SPY, нито QQQ не се изтеглиха днес — броят и блокът на Offensive не са проверени (липсата не е нечервен ден)."}]
+    miss = (st.get("missing") or ["?"])[0]
+    other = "QQQ" if miss == "SPY" else "SPY"
+    return [{"source": "distribution_days", "level": "warn",
+             "message": f"Distribution days: {miss} не се изтегли днес — броят и блокът на Offensive са само по {other}."}]
+
+
 def _spinoff_warning(diag: dict | None) -> list[dict]:
     """
     13.10.2026: предупреждението за ПРЕДСТОЯЩО отделяне (EDGAR 8-K, spinoff_watch). Паднала проверка или непроверени тикъри (бюджет / грешки) не бива да се четат като
@@ -154,7 +168,8 @@ def _13f_warnings(status: dict | None) -> list[dict]:
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
-            glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None) -> list[dict]:
+            glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
+            dd_status: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -199,6 +214,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_13f_warnings(superinvestor_status))
     out.extend(_corp_warning(corp_diag))
     out.extend(_spinoff_warning(spinoff_diag))
+    out.extend(_dd_warning(dd_status))
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
