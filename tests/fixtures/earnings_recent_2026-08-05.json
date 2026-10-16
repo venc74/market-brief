@@ -1,0 +1,290 @@
+{
+ "_note": "РЕАЛНО: картата на ANET от Action в брифа на 05.08.2026 и картата на INCY от Watchlist на 29.07.2026 (data/<дата>.json, без промени); earnings_dates — индексът на yfinance Ticker.get_earnings_dates(limit=8) за ANET и INCY, свален на 15.10.2026 (часовете на отчетите по Yahoo: ANET 04.08.2026 16:00 ET, INCY 28.07.2026 07:00 ET). Ползва се от test_earnings_recent.py.",
+ "anet_action_2026_08_05": {
+  "ticker": "ANET",
+  "price": 190.51,
+  "pivot": 194.35,
+  "pct_from_pivot": -1.98,
+  "base_type": "cup with handle",
+  "base_depth_pct": 29.8,
+  "weinstein_stage": 2,
+  "rs_status": "near_high",
+  "ma50": 168.31,
+  "ma200": 146.31,
+  "above_ma50": true,
+  "above_ma200": true,
+  "avg_volume_50d": 8310652,
+  "last_volume": 14005100,
+  "volume_ratio": 1.69,
+  "breakout_volume": true,
+  "base_low": 136.43,
+  "company": "Arista Networks, Inc.",
+  "sector": "Technology",
+  "industry": "Computer Hardware",
+  "business_summary": "Arista Networks, Inc. engages in the development, marketing, and sale of data-driven, client to cloud networking solutions for AI, data center, campus, and routing environments in the Americas, Europe, the Middle East, Africa, and the Asia-Pacific. Its cloud networking solutions consist of Extensible Operating System (EOS), a publish-subscribe state-sharing networking operating system offered in combination with a set of network applications. The company offers data center, cloud and AI networking, cognitive adjacencies, and cognitive network software and services. It also provides post contra",
+  "market_cap": 239884353536,
+  "eps_growth_yoy": 25.7,
+  "revenue_growth_yoy": 35.1,
+  "roe": 31.5,
+  "pe": 63.715717,
+  "forward_pe": 42.40104,
+  "debt_to_equity": null,
+  "inst_ownership_pct": 73.1,
+  "analyst_target": 192.31033,
+  "short_pct_float": 1.91,
+  "shares_short": 19887856,
+  "short_ratio_dtc": 2.27,
+  "macro_tailwind": false,
+  "earnings": {
+   "next_earnings": null,
+   "days_to_earnings": null,
+   "in_blackout": false,
+   "eps_estimate": 3.63631
+  },
+  "options": {
+   "iv": null,
+   "iv_rank": null,
+   "iv_rank_quality": null,
+   "put_call_ratio": null,
+   "oi_near_money": [
+    {
+     "strike": 180.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 185.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 190.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 195.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 200.0,
+     "call_oi": 0
+    }
+   ],
+   "strategy": "акции",
+   "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+  },
+  "short_view": {
+   "short_pct_float": 1.91,
+   "days_to_cover": 2.27,
+   "interpretation": "Нисък short interest (1.91%) — без squeeze динамика, но и без активна опозиция."
+  },
+  "borrow": {
+   "available": false,
+   "fee_rate": null,
+   "available_shares": null,
+   "fee_trend": null,
+   "interpretation": null
+  },
+  "markers": [],
+  "ai": {
+   "ticker": "ANET",
+   "why_now": "DXY -1.64% директно намалява FX хеджинг разходите за ANET, която генерира значителна приходна база извън САЩ. US10Y нисходяща траектория от 4.63% компресира дисконтовия процент за дългодюрейшън growth акция с PE 63x → forward PE 42x изглежда по-поносимо. XLK RS +5.74% за 12W потвърждава институционална акумулация в сектора. ANET специфично: cup with handle на 1.98% под pivot $194.35, RS near_high, volume_ratio 1.69 с breakout_volume=true — последното е ключово разграничение от останалите кандидати. AI networking spend cycle (hyperscalers капекс) остава структурен tailwind. ПРЕДУПРЕЖДЕНИЕ: earnings дата е неизвестна (null) — не може да се изключи blackout риск; следи внимателно.",
+   "business_bg": "Arista Networks разработва и продава cloud networking решения за AI, data center и campus среди. Ключовият им продукт е EOS (Extensible Operating System) — програмируема мрежова операционна система. Компанията е директен бенефициент от растящите капиталови разходи на hyperscalers за AI инфраструктура.",
+   "catalysts": [
+    "Потвърждаване на breakout над pivot $194.35 с обем — volume_ratio 1.69 вече показва натрупване под пробива",
+    "Продължаващи hyperscaler AI capex анонси (Meta, Microsoft, Google) като demand signal за Ethernet networking",
+    "DXY слабост → подобрени прогнози за международни приходи при следващо guidance",
+    "XLK секторна ротация при запазване на US10Y нисходяща траектория"
+   ],
+   "risks": [
+    "Earnings дата е неизвестна — ако отчетът е в рамките на 1-2 седмици, позицията носи gap риск",
+    "Analyst target $192.31 е ПОД текущата цена $190.51 — консенсусът не вижда значителен upside на тези нива",
+    "Base depth 29.8% е дълбока чаша — по-дълбоките бази имат по-висок failure rate",
+    "Reversal на DXY нагоре или ребаунд на US10Y над 4.7% обръща макро тезата за growth акции"
+   ],
+   "earnings_call": "не сега — earnings дата е неизвестна (null); не може да се потвърди липса на blackout риск, мониторирай активно преди добавяне на пълна позиция",
+   "classification": "Action",
+   "watchlist_trigger": null
+  },
+  "plan": {
+   "valid": true,
+   "entry_range": [
+    190.46,
+    198.24
+   ],
+   "entry_mid": 194.35,
+   "stop_loss": 166.63,
+   "stop_basis": "под 50DMA",
+   "risk_per_share": 27.72,
+   "max_risk_usd": 500.0,
+   "sizing_factor": 0.5,
+   "shares": 18,
+   "total_investment": 3498.0,
+   "pct_of_portfolio": 3.5,
+   "target_1": 249.79,
+   "target_2": "trailing stop под 10DMA след достигане на $249.79",
+   "reward_risk": 2.0,
+   "time_horizon": "8–12 седмици"
+  }
+ },
+ "incy_watchlist_2026_07_29": {
+  "ticker": "INCY",
+  "price": 118.87,
+  "pivot": 120.71,
+  "pct_from_pivot": -1.52,
+  "base_type": "cup with handle",
+  "base_depth_pct": 23.6,
+  "weinstein_stage": 2,
+  "rs_status": "near_high",
+  "ma50": 106.44,
+  "ma200": 100.3,
+  "above_ma50": true,
+  "above_ma200": true,
+  "avg_volume_50d": 1816868,
+  "last_volume": 2728900,
+  "volume_ratio": 1.5,
+  "breakout_volume": true,
+  "base_low": 92.24,
+  "company": "Incyte Corporation",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "business_summary": "Incyte Corporation, a biopharmaceutical company, engages in the discovery, development, and commercialization of therapeutics in the United States, Europe, Canada, and Japan. The company offers JAKAFI for the treatment of myelofibrosis (MF), polycythemia vera, and steroid-refractory acute graft-versus-host disease; ICLUSIG, a kinase inhibitor to treat chronic myeloid leukemia and Philadelphia-chromosome positive acute lymphoblastic leukemia; MONJUVI/ MINJUVI for the treatment of diffuse large B-cell lymphoma and Follicular Lymphoma; NIKTIMVO for the treatment of chronic graft-versus-host disea",
+  "market_cap": 25957695488,
+  "eps_growth_yoy": 91.7,
+  "revenue_growth_yoy": 20.9,
+  "roe": 30.8,
+  "pe": 16.808537,
+  "forward_pe": 14.586764,
+  "debt_to_equity": 0.701,
+  "inst_ownership_pct": 106.7,
+  "analyst_target": 115.47619,
+  "short_pct_float": 9.06,
+  "shares_short": 10512123,
+  "short_ratio_dtc": 5.32,
+  "macro_tailwind": false,
+  "earnings": {
+   "next_earnings": null,
+   "days_to_earnings": null,
+   "in_blackout": false,
+   "eps_estimate": 3.15833
+  },
+  "options": {
+   "iv": null,
+   "iv_rank": null,
+   "iv_rank_quality": null,
+   "put_call_ratio": 1.52,
+   "oi_near_money": [
+    {
+     "strike": 115.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 120.0,
+     "call_oi": 0
+    },
+    {
+     "strike": 125.0,
+     "call_oi": 0
+    }
+   ],
+   "strategy": "акции",
+   "strategy_reason": "Опционните котировки още не са активни (pre-market, bid/ask=0) — IV данните ще са надеждни след отварянето на US пазара."
+  },
+  "short_view": {
+   "short_pct_float": 9.06,
+   "days_to_cover": 5.32,
+   "interpretation": "Умерен short interest (9.06%) — гориво при пробив с обем."
+  },
+  "borrow": {
+   "available": false,
+   "fee_rate": null,
+   "available_shares": null,
+   "fee_trend": null,
+   "interpretation": null
+  },
+  "markers": [
+   {
+    "tag": "MF✓",
+    "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."
+   },
+   {
+    "tag": "OPEN✓",
+    "title": "Отворена позиция от 2026-07-06 @ $118.69 — не е нов вход."
+   }
+  ],
+  "ai": {
+   "ticker": "INCY",
+   "why_now": "Setup е предимно технически — биотехнологията не е директен бенефициент на rising yields. Индиректна връзка: XLV показва 12w RS +10.41% (най-силен сектор), което означава институционален интерес към quality healthcare с pricing power и earnings. INCY предоставя точно това — 91.7% EPS ръст YoY, forward P/E 14.6 (евтино за biotech), cup with handle на 1.52% от pivot, RS near_high. Макро логиката е сектор-ниво, не директна macro chain.",
+   "business_bg": "Incyte е биофармацевтична компания, фокусирана върху онкологични и имунологични заболявания. Основният им продукт JAKAFI лекува миелофиброза и полицитемия вера, а портфолиото включва множество одобрени и pipeline терапии. Компанията генерира устойчиви приходи от комерсиализирани продукти в САЩ и Европа.",
+   "catalysts": [
+    "Технически пробив над pivot 120.71 при обем >1.5x — текущо volume_ratio 1.5 вече показва натрупване.",
+    "EPS ръст 91.7% YoY — институционалните инвеститори търсят именно такива качествени имена в XLV ротацията.",
+    "Short interest 9.06% — при пробив с обем е налично short squeeze гориво.",
+    "Earnings дата неизвестна/null — липсва краткосрочен blackout риск за момента, но трябва мониторинг."
+   ],
+   "risks": [
+    "Earnings дата е неизвестна (null) — потенциален изненадващ blackout или earnings събитие без предупреждение.",
+    "Analyst target 115.47 е ПОД текущата цена 118.87 — Wall Street консенсусът не подкрепя upside.",
+    "Base depth 23.6% е близо до горната граница за здравословна cup with handle — по-дълбоки бази имат по-висок failure rate.",
+    "XLV в краткосрочно охлаждане (4w RS +0.52%) — секторният вятър временно отслабва."
+   ],
+   "earnings_call": "не сега — earnings дата е неизвестна (null), невалидна/непотвърдена дата; мониторирай активно за обявяване.",
+   "classification": "Watchlist",
+   "watchlist_trigger": "Вече в портфейла от 2026-07-06 (entry $118.69). Повторният breakout сигнал потвърждава тезата — управлявай съществуващата позиция, не добавяй риск."
+  }
+ },
+ "earnings_dates": {
+  "ANET": [
+   "2026-11-03T15:00:00-05:00",
+   "2026-08-04T16:00:00-04:00",
+   "2026-05-05T16:00:00-04:00",
+   "2026-02-12T16:00:00-05:00",
+   "2025-11-04T16:00:00-05:00",
+   "2025-08-05T16:00:00-04:00",
+   "2025-05-06T16:00:00-04:00",
+   "2025-02-18T16:00:00-05:00",
+   "2024-11-07T16:00:00-05:00",
+   "2024-07-30T16:00:00-04:00",
+   "2024-05-07T16:00:00-04:00",
+   "2024-02-12T16:00:00-05:00",
+   "2023-10-30T16:00:00-04:00",
+   "2023-07-31T16:00:00-04:00",
+   "2023-05-01T16:00:00-04:00",
+   "2023-02-13T16:00:00-05:00",
+   "2022-10-31T16:00:00-04:00",
+   "2022-08-01T16:00:00-04:00",
+   "2022-05-02T16:00:00-04:00",
+   "2022-02-14T16:00:00-05:00",
+   "2021-11-01T16:00:00-04:00",
+   "2021-08-02T16:00:00-04:00",
+   "2021-05-04T16:00:00-04:00",
+   "2021-02-18T16:00:00-05:00",
+   "2020-11-02T16:00:00-05:00"
+  ],
+  "INCY": [
+   "2026-10-29T08:00:00-04:00",
+   "2026-07-28T07:00:00-04:00",
+   "2026-04-28T07:00:00-04:00",
+   "2026-02-10T07:00:00-05:00",
+   "2025-10-28T07:00:00-04:00",
+   "2025-07-29T07:00:00-04:00",
+   "2025-04-29T07:00:00-04:00",
+   "2025-02-10T07:00:00-05:00",
+   "2024-10-29T07:00:00-04:00",
+   "2024-07-30T07:00:00-04:00",
+   "2024-04-30T07:00:00-04:00",
+   "2024-02-13T07:00:00-05:00",
+   "2023-10-31T07:00:00-04:00",
+   "2023-08-01T07:00:00-04:00",
+   "2023-05-02T07:00:00-04:00",
+   "2023-02-07T07:00:00-05:00",
+   "2022-11-01T07:00:00-04:00",
+   "2022-08-02T07:00:00-04:00",
+   "2022-05-03T07:00:00-04:00",
+   "2022-02-08T07:00:00-05:00",
+   "2021-11-02T07:00:00-04:00",
+   "2021-08-03T07:00:00-04:00",
+   "2021-05-04T07:00:00-04:00",
+   "2021-02-09T07:00:00-05:00",
+   "2020-11-05T07:00:00-05:00"
+  ]
+ }
+}

@@ -21,6 +21,7 @@ from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
 from src.enrich import enrich, inject_split_catalysts, uov_marker
+from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import ai_brief
@@ -197,6 +198,10 @@ def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
     parts: list[str] = []
     e = c.get("earnings") or {}
     days = e.get("days_to_earnings")
+    if (e.get("recent_report") or {}).get("text"):                 # 16.10.2026 (В1): отчет в последната сесия — нивата са отпреди реакцията
+        parts.append(e["recent_report"]["text"])
+    elif e.get("earnings_status") == "failed":                        # 16.10.2026 (В1): датата е неизвестна, защото тегленето не успя
+        parts.append(enrich_mod.UNKNOWN_EARNINGS_TEXT)
     if e.get("in_blackout") or (isinstance(days, (int, float)) and 0 <= days <= 7):
         ne = str(e.get("next_earnings") or "")
         ne = f"{ne[8:10]}.{ne[5:7]}" if len(ne) >= 10 and ne[4] == "-" else ne                  # 16.10.2026: ДД.ММ, не ISO ("Отчет на 2026-11-03")
@@ -219,8 +224,13 @@ def _code_reason_type(c: dict, regime: str | None) -> str:
     earnings_blackout; потвърден сетъп, спрян от режима (_regime_gate) → regime_gate (само той участва в 10-сесийното изтичане); непотвърден
     сетъп → technical_gate; иначе → other (потвърден пробив, който AI не е избрал). Чиста функция.
     """
-    if (c.get("earnings") or {}).get("in_blackout"):
+    e = c.get("earnings") or {}
+    if e.get("in_blackout"):
         return "earnings_blackout"
+    if e.get("recent_report"):                                          # 16.10.2026 (В1)
+        return "earnings_recent"
+    if e.get("earnings_status") == "failed":
+        return "earnings_unknown"
     setup = c.get("setup") or {}
     if setup.get("kind") == "confirmed" and _regime_gate(c, regime):
         return "regime_gate"
@@ -343,6 +353,15 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             c.setdefault("ai", {})
             c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
+            forced = True
+        # 16.10.2026 (В1, трети преглед): отчет в ПОСЛЕДНАТА сесия (нивата са отпреди реакцията — ANET 05.08: Action по затварянето отпреди отчета от 04.08 след затварянето)
+        # или неизвестна дата, защото тегленето не успя → не е Action. Текстът — в _watchlist_trigger_text.
+        _e = c.get("earnings") or {}
+        if cls == "Action" and (_e.get("recent_report") or _e.get("earnings_status") == "failed"):
+            cls = "Watchlist"
+            c.setdefault("ai", {})
+            c["ai"]["classification"] = "Watchlist"
+            c["ai"]["watchlist_reason_type"] = "earnings_recent" if _e.get("recent_report") else "earnings_unknown"
             forced = True
 
         # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — кодът има

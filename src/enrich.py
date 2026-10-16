@@ -138,9 +138,51 @@ def _quality(eps_surprise_pct, reaction_pct) -> str | None:
     return "yellow"
 
 
-def earnings_info(sym: str) -> dict:
+def recent_report(last_ts, today: dt.date) -> dict | None:
+    """
+    16.10.2026 (В1, трети преглед): отчет в ПОСЛЕДНАТА NYSE сесия преди брифа (или след нея — снощи) → {date, when, text}; иначе None. Брифът е в 07:30 Берлин (~01:30 ET): отчетът снощи
+    (AMC) или вчера сутринта (BMO) вече е минал и Yahoo връща следващото тримесечие — или нищо — като "next" (ANET 05.08.2026: отчет 04.08 в 16:00 ET, на 05.08 Action по $190.51 —
+    затварянето ОТПРЕДИ реакцията, next_earnings празно; INCY 29.07: отчет 28.07 в 07:00 ET, на 29.07 датата изчезна). Отчетът днес (BMO по-късно сутринта) е в бъдещето → прозорецът
+    преди отчет го хваща. `last_ts` — tz-aware Timestamp на последния минал отчет. Чиста функция.
+    """
+    if last_ts is None:
+        return None
+    try:
+        from zoneinfo import ZoneInfo
+        from src.bar_freshness import expected_session
+        ny = last_ts.tz_convert(ZoneInfo("America/New_York")) if getattr(last_ts, "tzinfo", None) else last_ts
+        d = ny.date()
+        last_session = dt.date.fromisoformat(expected_session(today))
+        if not (last_session <= d <= today):
+            return None
+        hm = (ny.hour, ny.minute)
+        when = "amc" if hm >= (16, 0) else ("bmo" if hm < (9, 30) else "intraday")
+        dm = f"{d.day:02d}.{d.month:02d}"
+        if when == "amc":
+            text = f"Отчет снощи ({dm}, след затварянето) — нивата са отпреди реакцията на отчета; Action най-рано утре."
+        elif when == "bmo":
+            text = f"Отчет на {dm} преди отварянето — последният бар е денят на реакцията, сетъпът още не е преминал през нея; Action най-рано утре."
+        else:
+            text = f"Отчет на {dm} по време на сесията — нивата може да са отпреди реакцията; Action най-рано утре."
+        return {"date": d.isoformat(), "when": when, "text": text}
+    except Exception as e:
+        print(f"[enrich] отчетът в последната сесия не се провери: {type(e).__name__}: {e}")
+        return None
+
+
+UNKNOWN_EARNINGS_TEXT = "Датата на отчета не е известна (тегленето от Yahoo не успя) — Watchlist вместо Action, докато не се провери."
+
+
+def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
+    """
+    16.10.2026 (В1): + earnings_status ("ok" — има бъдеща дата; "no_date" — тегленето мина, бъдеща дата няма; "failed" — тегленето не успя), last_report (последният минал отчет)
+    и recent_report (отчет в последната сесия — виж recent_report). `now` — за тестове.
+    """
     out = {"next_earnings": None, "days_to_earnings": None,
-           "in_blackout": False, "eps_estimate": None, "recap": None}
+           "in_blackout": False, "eps_estimate": None, "recap": None,
+           "earnings_status": "failed", "last_report": None, "recent_report": None}
+    now = now or dt.datetime.now(dt.timezone.utc)
+    today = now.date()
     try:
         tk = yf.Ticker(sym)
         cal = tk.calendar
@@ -155,7 +197,7 @@ def earnings_info(sym: str) -> dict:
         if ed is not None:
             if isinstance(ed, dt.datetime):
                 ed = ed.date()
-            if ed < dt.date.today():
+            if ed < today:
                 print(f"[enrich] earnings {sym}: календарът върна минала дата "
                       f"{ed} — падам към get_earnings_dates()")
                 ed = None
@@ -166,14 +208,21 @@ def earnings_info(sym: str) -> dict:
         # валидна бъдеща дата.
         df = net_utils.fetch_with_timeout(lambda: tk.get_earnings_dates(limit=8))
         if ed is None and df is not None and len(df):
-            future = df[df.index > dt.datetime.now(df.index.tz)]
+            future = df[df.index > now.astimezone(df.index.tz) if df.index.tz is not None else df.index > now.replace(tzinfo=None)]
             if len(future):
                 # .min() = най-близката бъдеща дата, независимо от реда на сортиране
                 ed = future.index.min().date()
+        if df is not None and len(df):                   # 16.10.2026 (В1): последният МИНАЛ отчет — "изчезва" от next сутринта след него
+            past = df[df.index <= now.astimezone(df.index.tz) if df.index.tz is not None else df.index <= now.replace(tzinfo=None)]
+            if len(past):
+                last_ts = past.index.max()
+                out["last_report"] = last_ts.isoformat()
+                out["recent_report"] = recent_report(last_ts, today)
+        out["earnings_status"] = "ok" if ed is not None else ("no_date" if (df is not None or isinstance(cal, dict)) else "failed")
         if ed is not None:
             if isinstance(ed, dt.datetime):
                 ed = ed.date()
-            days = (ed - dt.date.today()).days
+            days = (ed - today).days
             # 5 РАБОТНИ дни ≈ 7 календарни
             out.update({
                 "next_earnings": ed.isoformat(),
