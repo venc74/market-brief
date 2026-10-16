@@ -33,7 +33,9 @@ dataroma._ticker_map = lambda: {}
 today = dt.date.today()
 OLD = "2025-11-03"                                    # както Scion: последен filing преди >165 дни
 FRESH = (today - dt.timedelta(days=30)).isoformat()
-FILINGS = {"0000000001": [("a-new", FRESH), ("a-old", "2026-05-01")],
+QF = dataroma._quarter_end_before(dt.date.fromisoformat(FRESH)).isoformat()     # СИНТЕТИЧНО: reportDate-и на ПОРЕДНИ тримесечия (трети преглед, 16.10 — предишното тримесечие е по reportDate;
+QP = dataroma._prev_quarter_end(dt.date.fromisoformat(QF)).isoformat()             # без тях FRESH = днес − 30 срещу 2026-05-01 ставаше непоредно от 31.10)
+FILINGS = {"0000000001": [("a-new", FRESH, QF), ("a-old", "2026-05-01", QP)],
            "0000000002": [("b-last", OLD)]}
 HOLD = {"a-new": [{"issuer": "NEWCO INC", "value": 50_000_000.0, "cusip": "N1", "shares": 1000.0},
                   {"issuer": "OLDCO INC", "value": 50_000_000.0, "cusip": "O1", "shares": 1000.0}],
@@ -95,7 +97,8 @@ print("    филър в хиляди след 2023 → цената печел�
 tmp2 = tempfile.TemporaryDirectory(prefix="market_brief_dr2_")
 dataroma._CACHE = pathlib.Path(tmp2.name) / "c.json"
 FRESH2 = (dt.date.today() - dt.timedelta(days=30)).isoformat()
-dataroma._recent_13f_filings = lambda cik, n=2: [("s-new", FRESH2), ("s-old", "2026-05-01")]
+QF2 = dataroma._quarter_end_before(dt.date.fromisoformat(FRESH2)).isoformat()   # СИНТЕТИЧНО: поредни тримесечия (виж по-горе)
+dataroma._recent_13f_filings = lambda cik, n=2: [("s-new", FRESH2, QF2), ("s-old", "2026-05-01", dataroma._prev_quarter_end(dt.date.fromisoformat(QF2)).isoformat())]
 rows_new = [{"issuer": f"CO{i}", "value": v, "cusip": f"C{i}", "shares": s} for i, (v, s) in enumerate(
     [(8_000_000, 40_000), (6_000_000, 100_000), (5_000_000, 12_500), (4_500_000, 50_000), (3_500_000, 70_000), (3_000_000, 15_000), (1_000_000, 8_000)])]
 rows_old = [dict(r) for r in rows_new[:6]]

@@ -207,10 +207,11 @@ def _ticker_map() -> dict[str, str]:
     return out
 
 
-def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str]]:
+def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str, str]]:
     """
-    Връща до n най-нови (accessionNumber, filingDate) 13F-HR за CIK, сортирани
-    низходящо по дата (filings[0] = последно, filings[1] = предходно тримесечие).
+    Връща до n най-нови (accessionNumber, filingDate, reportDate) 13F-HR за CIK, сортирани
+    низходящо по дата на подаване. reportDate е краят на тримесечието, за което е филингът (трети преглед, 16.10:
+    предишното тримесечие се избира по него, не по реда на подаване — виж _manager_snapshot); липсва ли — "".
     Ако мениджърът има само 1 филинг (нов CIK / фонд без история) — връща списък
     с 1 елемент; извикващият код третира липсата на предходно тримесечие gracefully.
     """
@@ -222,13 +223,47 @@ def _recent_13f_filings(cik: str, n: int = 2) -> list[tuple[str, str]]:
         forms = rec.get("form", [])
         accs = rec.get("accessionNumber", [])
         dates = rec.get("filingDate", [])
-        filings = [(accs[i], dates[i] if i < len(dates) else "")
+        reports = rec.get("reportDate", [])
+        filings = [(accs[i], dates[i] if i < len(dates) else "", reports[i] if i < len(reports) else "")
                    for i, f in enumerate(forms) if f == "13F-HR"]
         filings.sort(key=lambda x: x[1], reverse=True)
         return filings[:n]
     except Exception as e:
         print(f"[edgar] submissions {cik}: {e}")
         return []
+
+
+# ── тримесечия (трети преглед, 16.10) ──
+def _quarter_end_before(d: dt.date) -> dt.date:
+    """Последният край на тримесечие строго преди d (31.03 / 30.06 / 30.09 / 31.12)."""
+    ends = [dt.date(d.year - 1, 12, 31), dt.date(d.year, 3, 31), dt.date(d.year, 6, 30), dt.date(d.year, 9, 30), dt.date(d.year, 12, 31)]
+    return max(q for q in ends if q < d)
+
+
+def _prev_quarter_end(q: dt.date) -> dt.date:
+    return _quarter_end_before(q)
+
+
+def _quarter_label(q: str | dt.date) -> str:
+    q = dt.date.fromisoformat(str(q)[:10]) if not isinstance(q, dt.date) else q
+    return f"Q{(q.month - 1) // 3 + 1} {q.year}"
+
+
+def _filing_period(f: tuple) -> tuple[str | None, str]:
+    """
+    (край на тримесечието ISO, основание) за филинг (acc, filingDate[, reportDate]): reportDate от EDGAR; без него (стар формат) — тримесечието преди датата на подаване
+    (за навременен филинг е същото; основание "filing_date"). Без нито едно → (None, "unknown").
+    """
+    rep = f[2] if len(f) > 2 else ""
+    if rep:
+        try:
+            return dt.date.fromisoformat(str(rep)[:10]).isoformat(), "report_date"
+        except ValueError:
+            pass
+    try:
+        return _quarter_end_before(dt.date.fromisoformat(str(f[1])[:10])).isoformat(), "filing_date"
+    except (ValueError, IndexError):
+        return None, "unknown"
 
 
 def _nt_other_managers(xml_text: str) -> list[tuple[str, str]]:
@@ -292,6 +327,8 @@ def _parse_info_table(xml_text: str) -> list[dict]:
     ПАКЕТ 13F (07.10.2026): таговете се търсят БЕЗ значение на регистъра. Реалният тег за броя акции е `sshPrnamt` (малко "amt"), а кодът четеше
     `sshPrnAmt` — акциите бяха 0 за ВСЕКИ ред и всеки мениджър (от 08.07 всяка позиция беше "нова позиция", проверката на мащаба по цена/акция в 4а
     никога не се задействаше). `stype` е sshPrnamtType: SH (акции) или PRN (главница на облигация — не е брой акции).
+    `putcall` (трети преглед, 16.10): "PUT" / "CALL" за опционен ред (стойността и броят са на базовия актив), "" за дълга позиция — опциите НЕ са дълги
+    позиции (виж _aggregate_by_cusip / _options_by_cusip; PUT на State Street на Oaktree излизаше като "нова позиция" 14% от портфейла).
     """
     root = ET.fromstring(xml_text)
     rows = []
@@ -300,11 +337,12 @@ def _parse_info_table(xml_text: str) -> list[dict]:
             d = {ch.tag.split("}")[-1].lower(): ch for ch in el.iter()}
             issuer, val, cusip = d.get("nameofissuer"), d.get("value"), d.get("cusip")
             if issuer is not None and val is not None:
-                stype = d.get("sshprnamttype")
+                stype, pc = d.get("sshprnamttype"), d.get("putcall")
                 rows.append({"issuer": (issuer.text or "").strip(), "value": _num(val),
                              "cusip": (cusip.text or "").strip() if cusip is not None else "",
                              "shares": _num(d.get("sshprnamt")),
-                             "stype": ((stype.text or "SH").strip().upper() if stype is not None else "SH")})
+                             "stype": ((stype.text or "SH").strip().upper() if stype is not None else "SH"),
+                             "putcall": ((pc.text or "").strip().upper() if pc is not None else "")})
     return rows
 
 
@@ -342,11 +380,14 @@ def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
     липсата му означава повреден/нечетим ред, а той е единствената надеждна
     ключ за съпоставка между тримесечия (имената на емитента могат леко да
     се различават между подавания).
+    Трети преглед (16.10): САМО дълги позиции — редовете с putCall (PUT / CALL) не влизат (виж _options_by_cusip): реалният 2020 файл
+    (EMCORE) има акции и call с един CUSIP и се сумираха; Oaktree Q2 2026 — 4 PUT (STT $1.01 млрд, QQQ …) = 24% от отчетената стойност.
+    Така опциите са извън "нова/увеличена", SI✓, Major Exits и знаменателя на % от портфейла.
     """
     agg: dict[str, dict] = {}
     for h in holdings:
         cusip = h.get("cusip") or ""
-        if not cusip:
+        if not cusip or h.get("putcall"):
             continue
         a = agg.setdefault(cusip, {"issuer": h["issuer"], "value": 0.0, "shares": 0.0, "priced_shares": 0.0})
         a["value"] += h.get("value", 0.0)
@@ -354,6 +395,22 @@ def _aggregate_by_cusip(holdings: list[dict]) -> dict[str, dict]:
         if h.get("stype", "SH") != "PRN":                       # главница на облигация (PRN) не е брой акции — не участва в "цената" за мащаба
             a["priced_shares"] += h.get("shares", 0.0)
     return agg
+
+
+def _options_by_cusip(holdings: list[dict]) -> dict[tuple[str, str], dict]:
+    """
+    Опционните редове (putCall) отделно от дългите позиции — ключ (CUSIP, "PUT" / "CALL"), стойността и броят са на базовия актив.
+    Показват се само като информация с етикет (тип), не са "покупки" и не влизат в % от портфейла.
+    """
+    out: dict[tuple[str, str], dict] = {}
+    for h in holdings:
+        pc, cusip = h.get("putcall") or "", h.get("cusip") or ""
+        if not pc or not cusip:
+            continue
+        a = out.setdefault((cusip, pc), {"issuer": h["issuer"], "type": pc, "value": 0.0, "shares": 0.0})
+        a["value"] += h.get("value", 0.0)
+        a["shares"] += h.get("shares", 0.0)
+    return out
 
 
 def shares_coverage(agg: dict[str, dict]) -> float | None:
@@ -407,13 +464,25 @@ def _value_scale(agg: dict[str, dict], filing_date: str | None) -> tuple[int, st
     return 1, "default_dollars"                 # без дата и без достатъчно позиции: след 2023 е в долари
 
 
+def filing_deadline(quarter_end: dt.date) -> dt.date:
+    """
+    Срокът за 13F на тримесечие: край + THIRTEENF_FILING_DEADLINE_DAYS дни; падне ли се в събота, неделя или празник — следващият работен ден (правилото на SEC).
+    Трети преглед (16.10): 14.11.2026 е събота → 16.11; Q4 2025: 14.02.2026 (събота) → 16.02 (Presidents' Day) → 17.02 — реално 11 от 15-те мениджъра са подали точно на 17.02.2026.
+    Празниците са от config.NYSE_HOLIDAYS: федералният празник, който може да се падне до срок (Presidents' Day през февруари), е и празник на NYSE; Columbus Day и Veterans Day не се падат до срок.
+    """
+    d = quarter_end + dt.timedelta(days=config.THIRTEENF_FILING_DEADLINE_DAYS)
+    while d.weekday() >= 5 or d.isoformat() in config.NYSE_HOLIDAYS:
+        d += dt.timedelta(days=1)
+    return d
+
+
 def last_quarter_deadline(today: dt.date | None = None) -> tuple[dt.date, dt.date]:
-    """(край на тримесечието, срок за подаване) за НАЙ-СКОРОШНОТО тримесечие, чийто срок (край + THIRTEENF_FILING_DEADLINE_DAYS дни) вече е минал."""
+    """(край на тримесечието, срок за подаване) за НАЙ-СКОРОШНОТО тримесечие, чийто срок (filing_deadline — с почивните дни) вече е минал."""
     today = today or dt.date.today()
     ends = []
     for y in (today.year - 1, today.year):
         ends += [dt.date(y, 3, 31), dt.date(y, 6, 30), dt.date(y, 9, 30), dt.date(y, 12, 31)]
-    due = [(q, q + dt.timedelta(days=config.THIRTEENF_FILING_DEADLINE_DAYS)) for q in ends]
+    due = [(q, filing_deadline(q)) for q in ends]
     q, deadline = max((x for x in due if x[1] < today), key=lambda x: x[0])
     return q, deadline
 
@@ -457,18 +526,38 @@ def _manager_snapshot(cik: str, name: str) -> dict:
                      потвърден случай, фондът закрит 2025, не единична
                      продажба на позиция)
       "active"     — нормален случай
+
+    Трети преглед (16.10) — тримесечията са по reportDate, от ВСИЧКИ CIK-ове на мениджъра (конфигурирания и родителя по 13F-NT):
+      • текущо = последното тримесечие; предишно = ПОРЕДНОТО преди него (не "предишният филинг по дата на подаване");
+      • тримесечие, подадено от няколко CIK-а, е сборът им (по последния филинг на всеки CIK). Реално: за Q1 2026 Pershing Square Capital Management (1336528)
+        подаде 11 позиции (HHH 18 852 064), а PERSHING SQUARE INC. (2026053) — отделен 13F-HR само с HHH 9 000 000; за Q2 родителят подава всичко (HHH 18 852 064 +
+        9 000 000, otherManager 6 = Pershing Square HHH Holdings, LLC). Сравнение само с CIK 1336528 правеше HHH "увеличена" (+48%) — обхват, не покупка;
+      • "без сравнение" (snap["comparison"] = {reason, text}): няма филинг за предишното тримесечие (no_prev_filing), предишният е за по-старо тримесечие
+        (not_consecutive) или е там, но не се изтегли (prev_fetch_failed) — тогава няма нова/увеличена, SI✓ и Major Exits за мениджъра (иначе ВСЯКА позиция
+        ставаше "нова"). Ноември 2026 без това: текущо = Q3 на родителя, предишно = Q1 на стария CIK (Q2 е само при родителя) — непоредни.
     """
-    filings = _recent_13f_filings(cik, n=2)
-    cur_cik = prev_cik = cik
+    filings = _recent_13f_filings(cik, n=FILINGS_LOOKBACK)
     followed = _nt_successor(cik, filings[0][1] if filings else "")          # 13F-NT → холдингите са в доклада на родител (Pershing, 14.08.2026)
+    sources = [(cik, f) for f in filings]
     if followed:
-        filings = [(followed["acc"], followed["date"])] + filings[:1]        # текущо = родителят; предишно тримесечие = последният 13F-HR на стария CIK (сравнението е по CUSIP)
-        cur_cik = followed["cik"]
+        sources += [(followed["cik"], f) for f in (_recent_13f_filings(followed["cik"], n=FILINGS_LOOKBACK) or [(followed["acc"], followed["date"])])]
         print(f"[edgar] {name}: 13F-NT от {followed['nt_date']} → холдингите са в доклада на {followed['name']} (CIK {followed['cik']})")
-    if not filings:
+    by_q: dict[str, dict[str, tuple[str, str]]] = {}                         # тримесечие → {CIK: (accession, дата на подаване)} — последният филинг на CIK
+    period_basis = set()
+    for c, f in sources:
+        q, basis = _filing_period(f)
+        if q is None:
+            continue
+        period_basis.add(basis)
+        have = by_q.setdefault(q, {}).get(c)
+        if have is None or (f[1] or "") > (have[1] or ""):
+            by_q[q][c] = (f[0], f[1])
+    if not by_q:
         return {"manager": name, "cik": cik, "filing_status": "no_filings"}
 
-    acc, fdate = filings[0]
+    quarter = max(by_q)
+    cur_src = by_q[quarter]
+    fdate = max(d for _, d in cur_src.values())
     days_since = None
     if fdate:
         try:
@@ -479,36 +568,79 @@ def _manager_snapshot(cik: str, name: str) -> dict:
                                    and days_since > config.DATAROMA_STALE_FILER_DAYS)
                      else "active")
     period = f"13F · {fdate}" if fdate else "13F"
+    base = {"manager": name, "cik": cik, "filing_status": filing_status, "period": period, "last_filing_date": fdate,
+            "days_since_filing": days_since, "followed_nt": followed, "quarter": quarter,
+            "sources": {q: sorted(src.items()) for q, src in by_q.items() if q == quarter}, "period_basis": sorted(period_basis)}
 
-    holdings = _info_table(cur_cik, acc)
-    if not holdings:
-        return {"manager": name, "cik": cik, "filing_status": filing_status,
-                "period": period, "last_filing_date": fdate, "days_since_filing": days_since, "followed_nt": followed}
-    current_agg = _aggregate_by_cusip(holdings)
-    cur_scale, cur_basis = _value_scale(current_agg, fdate)        # т.9: дата на филинга + проверка по цена/акция
+    current_agg, cur_scale, cur_basis, cur_opts = _load_quarter(cur_src)
+    if not current_agg:
+        return base
     current_total = sum(a["value"] for a in current_agg.values()) * cur_scale
 
+    prev_q = _prev_quarter_end(dt.date.fromisoformat(quarter)).isoformat()
     prev_agg: dict[str, dict] = {}
-    prev_scale = 1
-    prev_basis = None
-    prev_total = 0.0
-    if len(filings) >= 2:
-        prev_acc, prev_fdate = filings[1]
-        prev_holdings = _info_table(prev_cik, prev_acc)
-        if prev_holdings:
-            prev_agg = _aggregate_by_cusip(prev_holdings)
-            prev_scale, prev_basis = _value_scale(prev_agg, prev_fdate)
+    prev_scale, prev_basis, prev_total = 1, None, 0.0
+    comparison = None
+    if prev_q not in by_q:
+        older = [q for q in by_q if q < quarter]
+        comparison = ({"reason": "not_consecutive", "text": f"предишният 13F е за {_quarter_label(max(older))}, а не за {_quarter_label(prev_q)}"} if older
+                      else {"reason": "no_prev_filing", "text": f"няма 13F за {_quarter_label(prev_q)}"})
+    else:
+        prev_agg, prev_scale, prev_basis, _ = _load_quarter(by_q[prev_q])
+        if prev_agg:
             prev_total = sum(a["value"] for a in prev_agg.values()) * prev_scale
+        else:
+            prev_agg = {}
+            comparison = {"reason": "prev_fetch_failed", "text": f"13F за {_quarter_label(prev_q)} не се изтегли днес"}
+    if comparison:
+        print(f"[edgar] {name}: без сравнение с предходното тримесечие — {comparison['text']}")
+    base["sources"][prev_q] = sorted(by_q.get(prev_q, {}).items())
 
     return {
-        "manager": name, "cik": cik, "filing_status": filing_status,
-        "period": period, "last_filing_date": fdate, "days_since_filing": days_since, "followed_nt": followed,
+        **base,
         "late": late_filer(fdate) if filing_status == "active" else None,
         "current_agg": current_agg, "current_scale": cur_scale, "current_scale_basis": cur_basis,
         "current_total": current_total, "current_shares_coverage": shares_coverage(current_agg),
+        "current_options": {k: {**v, "value": v["value"] * cur_scale} for k, v in cur_opts.items()},
+        "prev_quarter": prev_q, "comparison": comparison,
         "prev_agg": prev_agg, "prev_scale": prev_scale, "prev_scale_basis": prev_basis, "prev_total": prev_total,
         "prev_shares_coverage": shares_coverage(prev_agg),
     }
+
+
+FILINGS_LOOKBACK = 8                         # последните 13F-HR на CIK — достатъчно, за да се намери поредното тримесечие и при 13F-NT към родител
+
+
+def _load_quarter(src: dict[str, tuple[str, str]]) -> tuple[dict, int, str | None, dict]:
+    """
+    Холдингите на едно тримесечие от един или няколко CIK-а → (дълги позиции по CUSIP, мащаб, основание, опции). Мащабът е ПО ФИЛИНГ (различни филъри могат да подават в
+    различни единици): при един филинг — както досега (агрегат + мащаб); при няколко — всеки филинг се обръща в долари и се сумира (мащаб 1, основанията с "+").
+    Провал на кой да е филинг → ({}, 1, None, {}): частичен сбор би дал фалшиви "нови" позиции и изходи.
+    """
+    parts = []
+    for c, (acc, fdate) in sorted(src.items()):
+        holdings = _info_table(c, acc)
+        if not holdings:
+            print(f"[edgar] info table {c}/{acc}: празна или не се изтегли")
+            return {}, 1, None, {}
+        agg = _aggregate_by_cusip(holdings)
+        scale, basis = _value_scale(agg, fdate)
+        parts.append((agg, scale, basis, _options_by_cusip(holdings)))
+    if len(parts) == 1:
+        return parts[0]
+    merged: dict[str, dict] = {}
+    opts: dict[tuple[str, str], dict] = {}
+    for agg, scale, _, op in parts:
+        for cusip, a in agg.items():
+            m = merged.setdefault(cusip, {"issuer": a["issuer"], "value": 0.0, "shares": 0.0, "priced_shares": 0.0})
+            m["value"] += a["value"] * scale
+            m["shares"] += a["shares"]
+            m["priced_shares"] += a.get("priced_shares", 0.0)
+        for k, o in op.items():
+            m = opts.setdefault(k, {**o, "value": 0.0, "shares": 0.0})
+            m["value"] += o["value"] * scale
+            m["shares"] += o["shares"]
+    return merged, 1, "+".join(p[2] for p in parts), opts
 
 
 def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]:
@@ -521,6 +653,8 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
     prev_agg = snap.get("prev_agg") or {}
     cur_scale = snap.get("current_scale", 1)
     if low_coverage(snap):                          # без прочетени акции "нова/увеличена" е измислица (08.07–06.10: всичко беше "нова позиция") — мениджърът не дава редове, банер
+        return rows
+    if not compared(snap):                          # трети преглед (16.10): без предходно тримесечие ВСЯКА позиция би била "нова" — мениджърът е "без сравнение" (ред + банер)
         return rows
     late = _late_label(snap.get("late"))
     for cusip, cur in current_agg.items():
@@ -542,6 +676,14 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
             **({"late": late} if late else {}),
         })
     return rows
+
+
+def compared(snap: dict) -> bool:
+    """
+    Има ли сравнение с ПОРЕДНОТО предходно тримесечие (трети преглед, 16.10). Без него (snap["comparison"] — причина и текст, или празен prev_agg) мениджърът не дава
+    нова/увеличена, SI✓ и Major Exits: празен prev_agg правеше ВСЯКА позиция "нова позиция" (тестът на 07.10 го приемаше за редно).
+    """
+    return not snap.get("comparison") and bool(snap.get("prev_agg"))
 
 
 def low_coverage(snap: dict) -> dict | None:
@@ -568,7 +710,7 @@ def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]
     prev_agg = snap.get("prev_agg") or {}
     cur_scale = snap.get("current_scale", 1)
     total = snap.get("current_total") or 0
-    if not total:
+    if not total or not compared(snap):             # без сравнение няма "нова" (SI✓) — виж compared()
         return out
     for cusip, cur in current_agg.items():
         if cusip in prev_agg:
@@ -603,7 +745,7 @@ def _major_exits_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
     prev_agg = snap.get("prev_agg") or {}
     prev_scale = snap.get("prev_scale", 1)
     prev_total = snap.get("prev_total") or 0
-    if not prev_total:
+    if not prev_total or not compared(snap):
         return out
     for cusip, prev in prev_agg.items():
         if cusip in current_agg:
@@ -655,6 +797,20 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
     return out
 
 
+def _options_summary(manager: str, snap: dict, top: int = 4) -> dict:
+    """
+    Опциите на мениджъра за секцията (трети преглед, 16.10): брой и стойност (базов актив, в долари) по тип и до `top` най-големи реда на тип. Не са дълги позиции и не
+    влизат в % от портфейла — етикетът го казва. Името е както е в 13F, с CUSIP — БЕЗ тикър по име: реално PUT-ът на Oaktree "STATE STREET CORP" е с CUSIP 78462F103 (SPDR S&P 500 ETF,
+    $1.01 млрд ÷ 1 355 000 = $746.8 — цената на SPY), а картата по име го правеше STT.
+    """
+    out = {"manager": manager, "period": snap.get("period")}
+    for kind in ("PUT", "CALL"):
+        rows = sorted(((c, o) for (c, t), o in (snap.get("current_options") or {}).items() if t == kind), key=lambda x: x[1]["value"], reverse=True)
+        out[kind.lower()] = {"count": len(rows), "value": sum(o["value"] for _, o in rows),
+                             "top": [{"company": o["issuer"], "cusip": c, "value": o["value"]} for c, o in rows[:top]]}
+    return out
+
+
 # ══════════════════════════════════════════════════════════════════════════
 _MEMO: dict = {}          # един fetch на процес: без кеш на диска (празен/провален ден) всяко извикване би теглило EDGAR наново
 
@@ -702,6 +858,8 @@ def _fetch_all_uncached(min_value: float) -> dict:
     late_managers: list[dict] = []                    # мениджъри без 13F за последното просрочено тримесечие
     followed_nt: list[dict] = []                      # мениджъри, чийто 13F-NT сочи към родител (холдингите са в неговия 13F-HR)
     scale_basis: dict[str, str] = {}                  # мениджър → основание на мащаба (price / price_override / size / size_override / date) — за диагностика
+    no_comparison: list[dict] = []                    # трети преглед (16.10): мениджъри без поредното предходно тримесечие — причина и текст
+    options: list[dict] = []                          # опционни редове (PUT / CALL) по мениджър — информация, не покупки
 
     for cik, name in config.DATAROMA_CIK.items():
         snap = _manager_snapshot(cik, name)
@@ -720,7 +878,12 @@ def _fetch_all_uncached(min_value: float) -> dict:
 
         any_active_data = True
         n_active += 1
-        n_compared += 1 if snap.get("prev_agg") else 0
+        n_compared += 1 if compared(snap) else 0
+        if not compared(snap):
+            why = snap.get("comparison") or {"reason": "prev_fetch_failed", "text": "предходният 13F не се изтегли днес"}
+            no_comparison.append({"manager": name, "quarter": snap.get("quarter"), **why})
+        if snap.get("current_options"):
+            options.append(_options_summary(name, snap))
         scale_basis[name] = f"{snap.get('current_scale')}×:{snap.get('current_scale_basis')}"
         lc = low_coverage(snap)
         if lc:
@@ -771,7 +934,8 @@ def _fetch_all_uncached(min_value: float) -> dict:
         note = f"{n_active} от {total} мениджъра с данни: нито една нова/увеличена позиция и нито един голям изход"
     meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
             "managers_total": total, "managers_without_filings": n_no_filings,
-            "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "followed_nt": followed_nt, "scale_basis": scale_basis}
+            "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "followed_nt": followed_nt, "scale_basis": scale_basis,
+            "no_comparison": no_comparison, "options": options}
 
     if moves or new_positions or major_exits or stopped_managers:
         bundle["meta"] = meta

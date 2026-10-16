@@ -725,6 +725,12 @@
 {% elif st.kind in ['ok_partial', 'fallback_allact'] %}<div class="data-note warn">⚠ {{ label }}: {{ st.note }}.</div>
 {% elif st.kind == 'legit_zero' %}<div class="data-note">{{ label }}: {{ st.note }}.</div>
 {% endif %}{% endif %}{% endmacro %}
+{# трети преглед (16.10): 13F — мениджъри без поредното предходно тримесечие (причината по мениджър) и опциите (PUT / CALL) — извън дългите позиции и % от портфейла #}
+{% macro si_nocmp(st) %}{% if st and st.no_comparison %}<div class="data-note warn">⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за:
+  {% for x in st.no_comparison %}{{ x.manager }} ({{ x.text }}){{ "; " if not loop.last else "." }}{% endfor %}</div>{% endif %}{% endmacro %}
+{% macro si_opt_kind(label, k) %}{% if k and k.count %}{{ label }} {{ k.count }} ({{ k.value|money_short }}): {% for t in k.top %}<span title="CUSIP {{ t.cusip }}">{{ t.company|cname(28, false) }}</span> {{ t.value|money_short }}{{ ", " if not loop.last }}{% endfor %}{% if k.count > k.top|length %}, …{% endif %}{% endif %}{% endmacro %}
+{% macro si_options(st) %}{% if st and st.options %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; името е както е в 13F, CUSIP — при посочване):
+  {% for o in st.options %}<div style="margin-top:3px">{{ o.manager }} — {{ si_opt_kind("PUT", o.put) }}{% if o.put and o.put.count and o.call and o.call.count %}; {% endif %}{{ si_opt_kind("CALL", o.call) }}</div>{% endfor %}</div>{% endif %}{% endmacro %}
 {% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
 {% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
 {% macro ctx_meta(ctx_regime, sector) %}
@@ -1724,6 +1730,7 @@
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
   {{ data_note(superinvestor_status, "13F") }}
+  {{ si_nocmp(superinvestor_status) }}
   <div class="si-grid">
     {% for s in superinvestor_moves %}
     <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
@@ -1741,6 +1748,7 @@
     13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
     Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
   </div>
+  {{ si_options(superinvestor_status) }}
 </section>
 {% endif %}
 
@@ -1750,7 +1758,7 @@
 {% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
 <section>
   <h2>📉 Major Position Exits</h2>
-  {% if not superinvestor_moves %}{{ data_note(superinvestor_status, "13F") }}{% endif %}
+  {% if not superinvestor_moves %}{{ data_note(superinvestor_status, "13F") }}{{ si_nocmp(superinvestor_status) }}{{ si_options(superinvestor_status) }}{% endif %}
   {% if superinvestor_exits.exits %}
   <div class="si-grid">
     {% for s in superinvestor_exits.exits %}
@@ -1795,6 +1803,8 @@
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
   {{ data_note(superinvestor_status, "13F") }}
+  {{ si_nocmp(superinvestor_status) }}
+  {{ si_options(superinvestor_status) }}
 </section>
 {% endif %}
 

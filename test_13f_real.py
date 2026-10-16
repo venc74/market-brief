@@ -3,6 +3,7 @@
 позиция в "Moves" беше "нова позиция", "увеличена" не се появи нито веднъж; (2) проверката на мащаба по цена/акция (4а т.9) никога не се задействаше → Triple Frond, Duquesne и Baupost (подават в
 хиляди и след 2023) излязоха 1000× по-малки на 06.10 и ходовете им паднаха под прага от $10M. Поправка: таг независим от регистъра; покритие на акциите (под 80% → без "нова/увеличена" + банер);
 трета проверка на мащаба по размера на портфейла (праг $100M на SEC); етикет за давност на мениджър без 13F за последното просрочено тримесечие; постоянен ред за Exits.
+Трети преглед (16.10): празен предходен 13F → мениджърът е „без сравнение“ (до 16.10 тестът приемаше „нова позиция“ за ВСИЧКО); PUT/CALL редовете не са дълги позиции; срокът отчита почивните дни.
 
 РЕАЛНО: два реални SEC infotable.xml, свалени от sec.gov (tests/fixtures/sec_13f_infotable_*.xml: 1279913/0001641172-25-000336 — 2025, в долари, 9 реда, вкл. put опции и облигация; 1619125/0000921895-20-002240 — 2020,
 в хиляди, 10 реда, вкл. два реда с един CUSIP — акции и call) и РЕАЛНИТЕ редове на брифа от 06.10 (tests/fixtures/13f_brief_rows_2026-10-06.json).
@@ -58,8 +59,11 @@ assert dataroma._parse_info_table(XML25.replace("sshPrnamt", "SSHPRNAMT")) == r2
 print(f"  ✓ 2025 файл: {len(r25)} реда, акции {[int(x['shares']) for x in r25][:4]}…; 2020 файл: {len(r20)} реда; старият код чете 0 акции на всички {len(r25) + len(r20)} реда; тагът е независим от регистъра")
 agg25, agg20 = dataroma._aggregate_by_cusip(r25), dataroma._aggregate_by_cusip(r20)
 em = agg20["290846203"]
-assert len(agg20) == 9 and em["value"] == 6463 + 431 and em["shares"] == 2032468 + 135400                                       # акции + call с един CUSIP се сумират
-print("  ✓ реален случай на два реда с един CUSIP (EMCORE: акции + call) → една позиция: стойност 6894, акции 2 167 868")
+assert len(agg20) == 9 and em["value"] == 6463 and em["shares"] == 2032468                                                      # трети преглед (16.10): call-ът НЕ се сумира с акциите (до 16.10: 6463 + 431)
+assert dataroma._options_by_cusip(r20) == {("290846203", "CALL"): {"issuer": "EMCORE CORP", "type": "CALL", "value": 431.0, "shares": 135400.0}}
+assert len(agg25) == 7 and "464287655" not in agg25 and "78462F103" not in agg25                                                # двата PUT реда (ISHARES TR, SPDR S&P 500) не са дълги позиции
+assert set(dataroma._options_by_cusip(r25)) == {("464287655", "PUT"), ("78462F103", "PUT")}
+print("  ✓ реален случай на два реда с един CUSIP (EMCORE: акции + call) → дълга позиция 6463 / 2 032 468, call отделно (ключ CUSIP + CALL: 431 / 135 400); двата PUT реда на 2025 файла — извън дългите позиции")
 
 print()
 print("── мащаб (три проверки) ──")
@@ -103,7 +107,8 @@ print()
 print("── давност на мениджър (срок: край на тримесечието + 45 дни) ──")
 assert dataroma.last_quarter_deadline(D("2026-10-07")) == (D("2026-06-30"), D("2026-08-14"))
 assert dataroma.last_quarter_deadline(D("2026-08-14"))[0] == D("2026-03-31") and dataroma.last_quarter_deadline(D("2026-08-15"))[0] == D("2026-06-30")
-assert dataroma.last_quarter_deadline(D("2026-11-15"))[0] == D("2026-09-30") and dataroma.last_quarter_deadline(D("2027-01-10"))[0] == D("2026-09-30")
+assert dataroma.last_quarter_deadline(D("2026-11-16"))[0] == D("2026-06-30") and dataroma.last_quarter_deadline(D("2026-11-17")) == (D("2026-09-30"), D("2026-11-16"))   # 14.11.2026 е събота → срокът е 16.11 (трети преглед)
+assert dataroma.last_quarter_deadline(D("2027-01-10"))[0] == D("2026-09-30")
 assert dataroma.late_filer("2026-05-15", TODAY) == {"quarter_end": "2026-06-30", "deadline": "2026-08-14", "last_filing_date": "2026-05-15"}
 assert dataroma.late_filer("2026-06-30", TODAY) is not None and dataroma.late_filer("2026-07-01", TODAY) is None and dataroma.late_filer(None, TODAY) is None and dataroma.late_filer("боклук", TODAY) is None
 periods = {}
@@ -149,7 +154,8 @@ a_rows = {c: r["action"] for (m, c), r in mv.items() if m == "Тест A"}
 assert a_rows == {"FRONTIER COMMUNICATIONS PARE": "увеличена", "HERTZ GLOBAL HLDGS INC": "увеличена", "JETBLUE AIRWAYS CORP": "нова позиция"} or len(a_rows) >= 2
 assert any(a == "увеличена" for a in a_rows.values())
 b_rows = {c: r for (m, c), r in mv.items() if m == "Тест B"}
-assert b_rows["A10 NETWORKS INC"]["value"] == 53_688_000.0 and b_rows["IMMERSION CORP"]["value"] == 23_337_000.0 and b_rows["A10 NETWORKS INC"]["action"] == "нова позиция"
+assert b_rows == {} and not [r for r in bundle["new_positions"] if r["manager"].startswith("Тест B")]                              # трети преглед (16.10): празен предходен 13F → "без сравнение" (до 16.10: всичко "нова позиция" — A10 NETWORKS $53 688 000)
+assert meta["no_comparison"] == [{"manager": "Тест B · хиляди (реален файл от 2020, дата 2026)", "quarter": "2026-06-30", "reason": "prev_fetch_failed", "text": "13F за Q1 2026 не се изтегли днес"}]
 assert meta["scale_basis"]["Тест B · хиляди (реален файл от 2020, дата 2026)"] == "1000×:price_override" and meta["scale_basis"]["Тест A · долари (реален файл от 2025)"] == "1×:price"
 assert meta["low_coverage"] == [{"manager": "Тест D · счупен таг (реален файл, тагът преименуван)", "current": 0.0, "prev": 1.0}] and not [1 for (m, c) in mv if m == "Тест D"]
 assert [x["manager"] for x in meta["late_managers"]] == ["Тест C · закъснява (реален файл от 2025, дата 2026-05-15)"] and meta["late_managers"][0]["quarter_end"] == "2026-06-30"
@@ -157,12 +163,13 @@ c_late = [r for (m, c), r in mv.items() if m == "Тест C"]
 assert c_late and all("закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)" in r["late"] for r in c_late)
 assert not [r for (m, c), r in mv.items() if m != "Тест C" and r.get("late")]                                                       # само редовете на закъснелия мениджър носят етикета
 assert meta["managers_with_data"] == 4 and meta["managers_with_comparison"] == 3 and bundle["major_exits"] == [] and meta["kind"] == "ok"
-print(f"  ✓ A (долари): 'увеличена' за Frontier и Hertz; B (хиляди, СИНТЕТИЧНА дата 2026 — като Duquesne): стойностите са ×1000 (A10 NETWORKS $53 688 000, основание price_override) и редовете СЕ ВРЪЩАТ; "
+print(f"  ✓ A (долари): 'увеличена' за Frontier и Hertz; B (хиляди, СИНТЕТИЧНА дата 2026 — като Duquesne): основание price_override; празен предходен 13F → 'без сравнение' (няма 'нова позиция' за всичко); "
       f"D (счупен таг): 0% покритие → без редове; C: 'закъснява … срок 14.08.2026'; сравнение имат {meta['managers_with_comparison']} от {meta['managers_with_data']}")
 w = data_warnings.collect(None, None, superinvestor_status=meta)
-assert [x["source"] for x in w] == ["13f"] and "броят акции не е прочетен надеждно за Тест D" in w[0]["message"] and not any("закъсн" in x["message"] for x in w)     # 08.10: без банер за давност — етикетът е само в секцията на 13F
+assert [x["source"] for x in w] == ["13f", "13f"] and "броят акции не е прочетен надеждно за Тест D" in w[0]["message"] and not any("закъсн" in x["message"] for x in w)     # 08.10: без банер за давност — етикетът е само в секцията на 13F
+assert w[1]["message"].startswith("13F: без сравнение с предходното тримесечие — Тест B · хиляди (реален файл от 2020, дата 2026): 13F за Q1 2026 не се изтегли днес.")
 assert data_warnings.collect(None, None, superinvestor_status={"kind": "ok", "low_coverage": [], "late_managers": []}) == [] and data_warnings.collect(None, None, superinvestor_status=None) == []
-print("  ✓ банер: само 'броят акции не е прочетен надеждно за … — нова/увеличена не се показва'; за закъснелия мениджър (Тест C) НЯМА банер в 'Проблем с данните днес' (етикетът остава в секцията на 13F); нищо при чист статус")
+print("  ✓ банери: 'броят акции не е прочетен надеждно за … — нова/увеличена не се показва' и 'без сравнение … Тест B: 13F за Q1 2026 не се изтегли днес'; за закъснелия мениджър (Тест C) НЯМА банер в 'Проблем с данните днес' (етикетът остава в секцията на 13F); нищо при чист статус")
 
 merged = dataroma._dedupe_by_ticker([{"ticker": "AAPL", "manager": "Уорън Бъфет · Berkshire Hathaway", "value": 10.0, "company": "APPLE"},
                                      {"ticker": "AAPL", "manager": "Бил Акман · Pershing Square", "value": 20.0, "company": "APPLE", "late": "⚠ закъснява: …"},
@@ -180,6 +187,7 @@ page = re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))
 assert "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)" in page
 assert "Major Position Exits" in page and "Няма големи изходи (3 мениджъра със сравнение с предходния 13F, праг 10% от портфейла)" in page
 assert "13F: броят акции не е прочетен надеждно за Тест D" in page
+assert "⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за: Тест B · хиляди (реален файл от 2020, дата 2026) (13F за Q1 2026 не се изтегли днес)." in page
 brief["superinvestor_exits"] = {"exits": [], "stopped_managers": [{"manager": "М", "last_filing_date": "2025-11-03", "days_since_filing": 339}]}
 assert "Няма големи изходи" not in re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))                           # има стопиран мениджър → старата секция, без дублиране
 brief["superinvestor_exits"] = {"exits": [], "stopped_managers": []}; brief["superinvestor_status"] = {**meta, "kind": "failed"}

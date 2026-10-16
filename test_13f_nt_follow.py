@@ -5,6 +5,9 @@
 
 РЕАЛНО (правило 9, свалени от sec.gov на 08.10.2026 през браузъра, байт по байт — размерите съвпадат с листинга на SEC): 13F-NT primary_doc.xml (2492 B), infotable.xml на Q2 на родителя (8054 B), infotable.xml на Q1 на
 стария CIK (5520 B) и submissions/index.json отговорите (tests/fixtures/sec_submissions_pershing_2026-10-08.json — първите 8 записа от recent[], форматът е същият).
+Трети преглед (16.10): РЕАЛНАТА пълна извадка на 13F редовете от submissions (tests/fixtures/sec_submissions_13f_2026-10-16.json) показва, че родителят е подал 13F-HR и за Q1 2026
+(0001172661-26-002339, 15.05 — същия ден като стария CIK; само HHH 9 000 000 — tests/fixtures/sec_13f_infotable_2026053_0001172661-26-002339.xml). Старата извадка (първите 8 записа)
+не го съдържаше. Предишното тримесечие = сборът на двата Q1 филинга → HHH 27 852 064 и в двете тримесечия — НЕ е "увеличена" (обхват, не покупка; до 16.10 тестът твърдеше "увеличена").
 СИНТЕТИЧНО (маркирано): само "днес" (фиксирана дата), граничните случаи за известие без родителски филинг в прозореца, нечетим XML и мрежови отказ.
 Пускане: python test_13f_nt_follow.py
 """
@@ -20,8 +23,10 @@ NT_XML = (FX / "sec_13f_nt_1336528_0001172661-26-003777.xml").read_text(encoding
 Q2_XML = (FX / "sec_13f_infotable_2026053_0001172661-26-003790.xml").read_text(encoding="utf-8")
 Q1_XML = (FX / "sec_13f_infotable_1336528_0001172661-26-002336.xml").read_text(encoding="utf-8")
 SUB = json.loads((FX / "sec_submissions_pershing_2026-10-08.json").read_text(encoding="utf-8"))
+SUB16 = json.loads((FX / "sec_submissions_13f_2026-10-16.json").read_text(encoding="utf-8"))                  # пълните 13F редове на двата CIK-а (16.10)
+Q1P_XML = (FX / "sec_13f_infotable_2026053_0001172661-26-002339.xml").read_text(encoding="utf-8")            # Q1 2026 на родителя — само HHH 9 000 000
 OLD, NEW = "0001336528", "0002026053"
-assert len(NT_XML.encode()) == 2492 and len(Q2_XML.encode()) == 8054 and len(Q1_XML.encode()) == 5520      # като в листинга на SEC
+assert len(NT_XML.encode()) == 2492 and len(Q2_XML.encode()) == 8054 and len(Q1_XML.encode()) == 5520 and len(Q1P_XML.encode()) == 831      # като в листинга на SEC
 
 _tmp = tempfile.TemporaryDirectory(prefix="mb_nt_")
 config.DATA_DIR = pathlib.Path(_tmp.name)
@@ -47,9 +52,9 @@ FAIL = {"nt": False}
 
 def fake_get(url, **kw):
     CALLS.append(url)
-    for cik, sub in SUB["submissions"].items():
+    for cik in (OLD, NEW):
         if url == f"https://data.sec.gov/submissions/CIK{cik}.json":
-            return Resp(js=sub)
+            return Resp(js=SUB16["submissions"][cik])
     if url.endswith("/1336528/000117266126003777/primary_doc.xml"):
         if FAIL["nt"]:
             raise ConnectionError("SEC недостъпен")                                                           # СИНТЕТИЧНО
@@ -62,6 +67,10 @@ def fake_get(url, **kw):
         return Resp(js=SUB["index_json_1336528_0001172661-26-002336"])
     if url.endswith("/1336528/000117266126002336/infotable.xml"):
         return Resp(Q1_XML)
+    if url.endswith("/2026053/000117266126002339/index.json"):
+        return Resp(js=SUB16["index_json_2026053_0001172661-26-002339"])
+    if url.endswith("/2026053/000117266126002339/infotable.xml"):
+        return Resp(Q1P_XML)
     raise AssertionError(f"неочакван URL: {url}")
 
 
@@ -75,9 +84,9 @@ print("  ✓ РЕАЛЕН 13F-NT на Pershing → [('0002026053', 'PERSHING SQU
 
 print()
 print("── 2. старото поведение (пропуска): само 13F-HR на стария CIK ──")
-assert dataroma._recent_13f_filings(OLD, n=2) == [("0001172661-26-002336", "2026-05-15")]                                                                  # 13F-NT от 14.08 не се брои → "закъснява"
+assert dataroma._recent_13f_filings(OLD, n=2) == [("0001172661-26-002336", "2026-05-15", "2026-03-31"), ("0001172661-26-001091", "2026-02-17", "2025-12-31")]   # 13F-NT от 14.08 не се брои → "закъснява"
 assert dataroma.late_filer("2026-05-15", dt.date(2026, 10, 8))
-print("  ✓ _recent_13f_filings(1336528) = само 13F-HR от 15.05 (13F-NT от 14.08 не се брои) → без следване Pershing 'закъснява'")
+print("  ✓ _recent_13f_filings(1336528) = 13F-HR от 15.05 (Q1) и 17.02 (Q4) с reportDate (13F-NT от 14.08 не се брои) → без следване Pershing 'закъснява'")
 
 print()
 print("── 3. _nt_successor ──")
@@ -103,10 +112,13 @@ with contextlib.redirect_stdout(io.StringIO()):
     snap = dataroma._manager_snapshot(OLD, "Бил Акман · Pershing Square")
 assert snap["filing_status"] == "active" and snap["last_filing_date"] == "2026-08-14" and snap["period"] == "13F · 2026-08-14" and snap["followed_nt"]["cik"] == NEW
 assert snap["late"] is None                                                                                                                                # вече не "закъснява"
-assert len(snap["current_agg"]) == 14 and len(snap["prev_agg"]) == 11                                                                                      # Q2 (родителят) и Q1 (стария CIK)
+assert (snap["quarter"], snap["prev_quarter"], snap["comparison"]) == ("2026-06-30", "2026-03-31", None)                                                  # поредните тримесечия по reportDate
+assert len(snap["current_agg"]) == 14 and len(snap["prev_agg"]) == 11                                                                                      # Q2 (родителят) и Q1 (стария CIK + родителя: HHH е и в двата)
 assert snap["current_agg"]["44267T102"]["shares"] == 18852064 + 9000000 and snap["current_scale"] == 1                                                    # двата реда на Howard Hughes се сумират по CUSIP
-assert any("/2026053/000117266126003790/" in u for u in CALLS) and any("/1336528/000117266126002336/" in u for u in CALLS)                                  # текущото от родителя, предишното — от стария CIK
-print(f"  ✓ РЕАЛНО: текущо = Q2 от PERSHING SQUARE INC. ({len(snap['current_agg'])} CUSIP-а, подадено 14.08), предишно = Q1 от стария CIK ({len(snap['prev_agg'])} CUSIP-а); 'закъснява' няма")
+assert snap["prev_agg"]["44267T102"]["shares"] == 18852064 + 9000000 and snap["prev_scale_basis"] == "price+date"                                         # Q1: 18 852 064 (1336528) + 9 000 000 (2026053) — същото
+assert any("/2026053/000117266126003790/" in u for u in CALLS) and any("/1336528/000117266126002336/" in u for u in CALLS) and any("/2026053/000117266126002339/" in u for u in CALLS)
+print(f"  ✓ РЕАЛНО: текущо = Q2 от PERSHING SQUARE INC. ({len(snap['current_agg'])} CUSIP-а, подадено 14.08), предишно = Q1 = стария CIK + родителя ({len(snap['prev_agg'])} CUSIP-а; "
+      f"HHH 18 852 064 + 9 000 000 и в двете тримесечия); 'закъснява' няма")
 
 D = dt.date
 class _Date(dt.date):
@@ -127,10 +139,12 @@ rows = dataroma._moves_from_snapshot(snap, 10_000_000, {})                      
 moves = {r["company"]: r["action"] for r in rows}
 for new_pos in ("MASTERCARD INCORPORATED", "NETFLIX INC.", "S&P GLOBAL INC", "VISA INC"):
     assert moves.get(new_pos) == "нова позиция", (new_pos, moves)                                                                                          # нови в Q2 (ги нямаше в Q1)
-for inc in ("META PLATFORMS INC", "MICROSOFT CORP", "UBER TECHNOLOGIES INC", "HOWARD HUGHES HOLDINGS INC"):
+for inc in ("META PLATFORMS INC", "MICROSOFT CORP", "UBER TECHNOLOGIES INC"):
     assert moves.get(inc) == "увеличена", (inc, moves)
+assert "HOWARD HUGHES HOLDINGS INC" not in moves                                                                                                           # трети преглед: +9 млн е обхват (Q1 на родителя), не покупка — до 16.10 "увеличена"
+assert moves.get("PERSHING SQUARE USA LTD") == "нова позиция"                                                                                              # РЕАЛНО: в нито един от двата Q1 филинга (otherManager 3, 4, 5)
 assert {r["action"] for r in bundle["moves"]} <= {"нова позиция", "увеличена"} and bundle["moves"]                                                         # и през целия бандъл има редове за Pershing
-print(f"  ✓ meta: late_managers = [], followed_nt = [Pershing → PERSHING SQUARE INC.]; нови позиции: Mastercard, Netflix, S&P Global, Visa; увеличени: Meta, Microsoft, Uber, Howard Hughes")
+print(f"  ✓ meta: late_managers = [], followed_nt = [Pershing → PERSHING SQUARE INC.]; нови позиции: Mastercard, Netflix, S&P Global, Visa; увеличени: Meta, Microsoft, Uber; Howard Hughes — НЕ (обхват)")
 w = data_warnings.collect(None, None, superinvestor_status={"kind": "ok", "low_coverage": [], "late_managers": [{"manager": "Тест", "quarter_end": "2026-06-30", "deadline": "2026-08-14", "last_filing_date": "2026-05-15"}]})
 assert w == []                                                                                                                                              # СИНТЕТИЧЕН закъснял мениджър: пак няма банер в "Проблем с данните днес"
 print("  ✓ банерът за давност го няма в 'Проблем с данните днес' (етикетът е само в секцията на 13F)")
