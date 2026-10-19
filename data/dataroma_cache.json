@@ -1,5 +1,5 @@
 {
- "date": "2026-10-16",
+ "date": "2026-10-19",
  "bundle": {
   "moves": [
    {
@@ -74,19 +74,6 @@
     "count": 1
    },
    {
-    "ticker": "STT",
-    "company": "STATE STREET CORP",
-    "manager": "Хауърд Маркс · Oaktree Capital Management",
-    "action": "нова позиция",
-    "value": 1011873350.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": true,
-    "managers": [
-     "Хауърд Маркс · Oaktree Capital Management"
-    ],
-    "count": 1
-   },
-   {
     "ticker": "SEAGATE TECHNOLOGY",
     "company": "SEAGATE TECHNOLOGY HLDNGS PL",
     "manager": "Стивън Мандел · Lone Pine Capital",
@@ -111,25 +98,28 @@
      "Джон Армитидж · Egerton Capital"
     ],
     "count": 1
+   },
+   {
+    "ticker": "PDD",
+    "company": "PDD HOLDINGS INC",
+    "manager": "Ли Лу · Himalaya Capital Management",
+    "action": "увеличена",
+    "value": 820858157.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "managers": [
+     "Ли Лу · Himalaya Capital Management"
+    ],
+    "count": 1
    }
   ],
   "new_positions": [
-   {
-    "ticker": "STT",
-    "company": "STATE STREET CORP",
-    "manager": "Хауърд Маркс · Oaktree Capital Management",
-    "value": 1011873350.0,
-    "pct_of_portfolio": 14.0,
-    "period": "13F · 2026-08-14",
-    "filing_date": "2026-08-14",
-    "_resolved": true
-   },
    {
     "ticker": "WBD",
     "company": "WARNER BROS DISCOVERY INC",
     "manager": "Даниел Лоуб · Third Point",
     "value": 533200000.0,
-    "pct_of_portfolio": 11.4,
+    "pct_of_portfolio": 11.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
     "_resolved": true
@@ -235,6 +225,16 @@
     "_resolved": true
    },
    {
+    "ticker": "INDV",
+    "company": "INDIVIOR PHARMACEUTICALS INC",
+    "manager": "Хауърд Маркс · Oaktree Capital Management",
+    "value": 251399508.0,
+    "pct_of_portfolio": 4.7,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": true
+   },
+   {
     "ticker": "MASTERCARD INCORPORATED",
     "company": "MASTERCARD INCORPORATED",
     "manager": "Тери Смит · Fundsmith",
@@ -325,31 +325,11 @@
     "_resolved": false
    },
    {
-    "ticker": "INDV",
-    "company": "INDIVIOR PHARMACEUTICALS INC",
-    "manager": "Хауърд Маркс · Oaktree Capital Management",
-    "value": 251399508.0,
-    "pct_of_portfolio": 3.5,
-    "period": "13F · 2026-08-14",
-    "filing_date": "2026-08-14",
-    "_resolved": true
-   },
-   {
     "ticker": "GEV",
     "company": "GE VERNOVA INC",
     "manager": "Тери Смит · Fundsmith",
     "value": 481498748.0,
     "pct_of_portfolio": 3.5,
-    "period": "13F · 2026-08-14",
-    "filing_date": "2026-08-14",
-    "_resolved": true
-   },
-   {
-    "ticker": "AAPL",
-    "company": "APPLE INC",
-    "manager": "Дейвид Тепър · Appaloosa Management",
-    "value": 241615600.0,
-    "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
     "_resolved": true
@@ -385,6 +365,16 @@
     "_resolved": false
    },
    {
+    "ticker": "GOOGL",
+    "company": "Alphabet Inc",
+    "manager": "Стенли Дракенмилър · Duquesne Family Office",
+    "value": 120184000.0,
+    "pct_of_portfolio": 2.8,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": true
+   },
+   {
     "ticker": "CBRS",
     "company": "CEREBRAS SYSTEMS INC",
     "manager": "Чейс Коулман · Tiger Global Management",
@@ -395,11 +385,11 @@
     "_resolved": true
    },
    {
-    "ticker": "CDW",
-    "company": "Cdw Corp",
+    "ticker": "FOXA",
+    "company": "Fox Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 139789000.0,
-    "pct_of_portfolio": 2.7,
+    "value": 114992000.0,
+    "pct_of_portfolio": 2.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
     "_resolved": true
@@ -445,10 +435,20 @@
     "_resolved": false
    },
    {
-    "ticker": "GOOGL",
-    "company": "Alphabet Inc",
+    "ticker": "CDW",
+    "company": "Cdw Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 120184000.0,
+    "value": 104629000.0,
+    "pct_of_portfolio": 2.4,
+    "period": "13F · 2026-08-14",
+    "filing_date": "2026-08-14",
+    "_resolved": true
+   },
+   {
+    "ticker": "BA",
+    "company": "BOEING CO",
+    "manager": "Дейвид Тепър · Appaloosa Management",
+    "value": 173176000.0,
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
@@ -462,26 +462,6 @@
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-07-21",
     "filing_date": "2026-07-21",
-    "_resolved": true
-   },
-   {
-    "ticker": "FOXA",
-    "company": "Fox Corp",
-    "manager": "Стенли Дракенмилър · Duquesne Family Office",
-    "value": 114992000.0,
-    "pct_of_portfolio": 2.2,
-    "period": "13F · 2026-08-14",
-    "filing_date": "2026-08-14",
-    "_resolved": true
-   },
-   {
-    "ticker": "BA",
-    "company": "BOEING CO",
-    "manager": "Дейвид Тепър · Appaloosa Management",
-    "value": 173176000.0,
-    "pct_of_portfolio": 2.2,
-    "period": "13F · 2026-08-14",
-    "filing_date": "2026-08-14",
     "_resolved": true
    },
    {
@@ -501,7 +481,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-16",
+   "data_date": "2026-10-19",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -533,7 +513,141 @@
     "Стивън Мандел · Lone Pine Capital": "1×:price",
     "Тери Смит · Fundsmith": "1×:price",
     "Triple Frond Partners": "1000×:price_override"
-   }
+   },
+   "no_comparison": [],
+   "options": [
+    {
+     "manager": "Стенли Дракенмилър · Duquesne Family Office",
+     "period": "13F · 2026-08-14",
+     "put": {
+      "count": 0,
+      "value": 0,
+      "top": []
+     },
+     "call": {
+      "count": 9,
+      "value": 856636000.0,
+      "top": [
+       {
+        "company": "Invesco Exchange Traded Fd T",
+        "cusip": "46137V357",
+        "value": 174684000.0
+       },
+       {
+        "company": "Ishares Inc",
+        "cusip": "464286400",
+        "value": 145866000.0
+       },
+       {
+        "company": "Insmed Inc",
+        "cusip": "457669307",
+        "value": 143937000.0
+       },
+       {
+        "company": "Amazon Com Inc",
+        "cusip": "023135106",
+        "value": 109470000.0
+       }
+      ]
+     }
+    },
+    {
+     "manager": "Даниел Лоуб · Third Point",
+     "period": "13F · 2026-08-14",
+     "put": {
+      "count": 1,
+      "value": 28800000.0,
+      "top": [
+       {
+        "company": "STATE STR SPDR S&P 500 ETF T",
+        "cusip": "78462F103",
+        "value": 28800000.0
+       }
+      ]
+     },
+     "call": {
+      "count": 0,
+      "value": 0,
+      "top": []
+     }
+    },
+    {
+     "manager": "Дейвид Тепър · Appaloosa Management",
+     "period": "13F · 2026-08-14",
+     "put": {
+      "count": 2,
+      "value": 254125350.0,
+      "top": [
+       {
+        "company": "APPLE INC",
+        "cusip": "037833100",
+        "value": 241615600.0
+       },
+       {
+        "company": "BERKSHIRE HATHAWAY INC DEL",
+        "cusip": "084670702",
+        "value": 12509750.0
+       }
+      ]
+     },
+     "call": {
+      "count": 0,
+      "value": 0,
+      "top": []
+     }
+    },
+    {
+     "manager": "Хауърд Маркс · Oaktree Capital Management",
+     "period": "13F · 2026-08-14",
+     "put": {
+      "count": 4,
+      "value": 1750656350.0,
+      "top": [
+       {
+        "company": "STATE STREET CORP",
+        "cusip": "78462F103",
+        "value": 1011873350.0
+       },
+       {
+        "company": "INVESCO QQQ TRUST SERIES 1",
+        "cusip": "46090E103",
+        "value": 651714000.0
+       },
+       {
+        "company": "LYONDELLBASELL INDUSTRIES NV",
+        "cusip": "N53745100",
+        "value": 47385000.0
+       },
+       {
+        "company": "VISTEON CORP",
+        "cusip": "92839U206",
+        "value": 39684000.0
+       }
+      ]
+     },
+     "call": {
+      "count": 3,
+      "value": 144582500.0,
+      "top": [
+       {
+        "company": "CORE SCIENTIFIC INC",
+        "cusip": "21874A106",
+        "value": 127950000.0
+       },
+       {
+        "company": "BITDEER TECHNOLOGIES GROUP",
+        "cusip": "G11448100",
+        "value": 11902500.0
+       },
+       {
+        "company": "MAGNACHIP SEMICONDUCTOR CORP",
+        "cusip": "55933J203",
+        "value": 4730000.0
+       }
+      ]
+     }
+    }
+   ]
   }
  }
 }

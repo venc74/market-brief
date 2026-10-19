@@ -1,92 +1,44 @@
 {
- "date": "2026-10-16",
+ "date": "2026-10-19",
  "rows": [],
  "horizon": [
-  {
-   "ticker": "DFLI",
-   "company": "Dragonfly Energy Holdings Corp",
-   "date": "2026-10-12",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "MDCX",
-   "company": "Medicus Pharma Ltd.",
-   "date": "2026-10-12",
-   "ratio": "1:50",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "NIVF",
-   "company": "NewGenIvf Group Limited",
-   "date": "2026-10-12",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "NXGL",
-   "company": "NexGel, Inc",
-   "date": "2026-10-12",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "POAS",
-   "company": "Phaos Technology Holdings (Cayman) Limited",
-   "date": "2026-10-12",
-   "ratio": "1:15",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "ZBAO",
-   "company": "Zhibao Technology Inc.",
-   "date": "2026-10-12",
-   "ratio": "1:50",
-   "split_type": "reverse",
-   "date_human": "Oct 12, 2026"
-  },
-  {
-   "ticker": "FMFC",
-   "company": "Kandal M Venture Limited",
-   "date": "2026-10-13",
-   "ratio": "1:40",
-   "split_type": "reverse",
-   "date_human": "Oct 13, 2026"
-  },
-  {
-   "ticker": "SKIN",
-   "company": "SkinHealth Systems Inc.",
-   "date": "2026-10-14",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Oct 14, 2026"
-  },
-  {
-   "ticker": "BTOC",
-   "company": "Armlogi Holding Corp.",
-   "date": "2026-10-15",
-   "ratio": "1:16",
-   "split_type": "reverse",
-   "date_human": "Oct 15, 2026"
-  },
-  {
-   "ticker": "KNDI",
-   "company": "Kandi Technologies Group, Inc.",
-   "date": "2026-10-16",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 16, 2026"
-  },
   {
    "ticker": "AMTD",
    "company": "AMTD IDEA Group",
    "date": "2026-10-19",
    "ratio": "1:60",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026"
+  },
+  {
+   "ticker": "CAPS",
+   "company": "Capstone Holding Corp.",
+   "date": "2026-10-19",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026"
+  },
+  {
+   "ticker": "FRGT",
+   "company": "Freight Technologies, Inc.",
+   "date": "2026-10-19",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026"
+  },
+  {
+   "ticker": "GP",
+   "company": "GreenPower Motor Company Inc.",
+   "date": "2026-10-19",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026"
+  },
+  {
+   "ticker": "OBAI",
+   "company": "Our Bond, Inc.",
+   "date": "2026-10-19",
+   "ratio": "1:20",
    "split_type": "reverse",
    "date_human": "Oct 19, 2026"
   },
@@ -142,24 +94,19 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 17,
-  "horizon_from": "2026-10-12",
+  "source_rows": 11,
+  "horizon_from": "2026-10-19",
   "horizon_to": "2026-11-05",
-  "in_week": 10,
+  "in_week": 6,
   "dropped_price": [
-   "DFLI",
-   "MDCX",
-   "NIVF",
-   "NXGL",
-   "POAS",
-   "ZBAO",
-   "FMFC",
-   "BTOC",
-   "KNDI"
+   "AMTD",
+   "CAPS",
+   "FRGT",
+   "GP",
+   "OBAI",
+   "LU"
   ],
-  "dropped_cap": [
-   "SKIN"
-  ],
+  "dropped_cap": [],
   "dropped_no_data": [],
   "passed": 0,
   "state": "empty"

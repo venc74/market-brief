@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-16",
+ "updated": "2026-10-19",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -161,26 +161,6 @@
    "since_close": 678.39,
    "since_bar": "2026-09-24"
   },
-  "ADI": {
-   "ticker": "ADI",
-   "company": "Analog Devices, Inc.",
-   "glb_type": "classic",
-   "prior_high": 413.85,
-   "prior_high_month": "2026-05",
-   "months_unpenetrated": 4,
-   "ath_label": "all_time_high",
-   "history_years": 46.6,
-   "breakout_volume_ratio": 0.59,
-   "tightness": {
-    "band_hold_pct": 100.0,
-    "tightness_range_pct": 17.81,
-    "meets_tightness": true
-   },
-   "line": 413.85,
-   "since": "2026-10-05",
-   "since_close": 419.1,
-   "since_bar": "2026-10-05"
-  },
   "WSM": {
    "ticker": "WSM",
    "company": "Williams-Sonoma, Inc.",
@@ -220,26 +200,6 @@
    "since": "2026-10-06",
    "since_close": 13.91,
    "since_bar": "2026-10-06"
-  },
-  "PLTR": {
-   "ticker": "PLTR",
-   "company": "Palantir Technologies Inc.",
-   "glb_type": "momentum",
-   "prior_high": 200.47,
-   "prior_high_month": "2025-10",
-   "months_unpenetrated": 11,
-   "ath_label": "all_time_high",
-   "history_years": 6.0,
-   "breakout_volume_ratio": 1.11,
-   "tightness": {
-    "band_hold_pct": 61.9,
-    "tightness_range_pct": 43.17,
-    "meets_tightness": false
-   },
-   "line": 200.47,
-   "since": "2026-10-09",
-   "since_close": 209.05,
-   "since_bar": "2026-10-09"
   },
   "MSFT": {
    "ticker": "MSFT",
@@ -400,6 +360,46 @@
    "since": "2026-10-16",
    "since_close": 998.64,
    "since_bar": "2026-10-15"
+  },
+  "AFG": {
+   "ticker": "AFG",
+   "company": "American Financial Group, Inc.",
+   "glb_type": "classic",
+   "prior_high": 146.86,
+   "prior_high_month": "2024-11",
+   "months_unpenetrated": 22,
+   "ath_label": "all_time_high",
+   "history_years": 46.6,
+   "breakout_volume_ratio": 1.18,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 8.64,
+    "meets_tightness": true
+   },
+   "line": 146.86,
+   "since": "2026-10-19",
+   "since_close": 149.13,
+   "since_bar": "2026-10-16"
+  },
+  "COKE": {
+   "ticker": "COKE",
+   "company": "Coca-Cola Consolidated, Inc.",
+   "glb_type": "classic",
+   "prior_high": 205.07,
+   "prior_high_month": "2026-04",
+   "months_unpenetrated": 5,
+   "ath_label": "all_time_high",
+   "history_years": 53.6,
+   "breakout_volume_ratio": 0.94,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 18.22,
+    "meets_tightness": true
+   },
+   "line": 205.07,
+   "since": "2026-10-19",
+   "since_close": 210.33,
+   "since_bar": "2026-10-16"
   }
  },
  "seed": {

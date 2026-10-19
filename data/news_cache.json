@@ -1,53 +1,53 @@
 {
- "date": "2026-10-16",
+ "date": "2026-10-19",
  "news": [
   {
-   "headline": "Retail sales up 0.8% in September, but a big chunk of spending went to paying gasoline bills - AP News",
-   "source": "AP Business",
-   "why": "Retail sales +0.8% за септември е ключов макро показател за потребителското търсене и ще влияе на очакванията за следващото решение на Fed.",
-   "headline_bg": "Продажбите на дребно нагоре с 0.8% през септември, но голяма част от харченето отиде за бензин"
-  },
-  {
-   "headline": "Dollar weakens as Fed’s Warsh declines to hint at October rate rise",
-   "source": "Financial Times",
-   "why": "Отказът на Warsh да сигнализира за октомврийско повишение отслаби долара, директен ефект върху FX пазарите и очакванията за лихвения път.",
-   "headline_bg": "Доларът отслабва, след като Warsh от Fed отказа да намекне за повишение на лихвата през октомври"
-  },
-  {
-   "headline": "Fed's Warsh withholds Fed rate signal, praises recent global tightening with 'no free riders'",
+   "headline": "China's third-quarter economic growth quickens to 4.5% as exports surge, beating estimates",
    "source": "CNBC",
-   "why": "Коментарите на Warsh за 'синхронно затягане' от централните банки засягат глобалните лихвени очаквания и позициониране в облигации.",
-   "headline_bg": "Warsh от Fed задържа сигнал за лихвен курс, похвали скорошното глобално затягане без 'безплатни ездачи'"
+   "why": "China Q3 GDP от 4.5% надмина очакванията, сигнализирайки за по-силно глобално търсене и укрепвайки позицията на китански активи и суровини.",
+   "headline_bg": "Китайският икономически ръст се ускорява до 4.5% за третото тримесечие, тъй като износът скача, надминавайки прогнозите"
   },
   {
-   "headline": "MSCI gets set to remove Indonesia from global indexes, sparks market slide to six-year low - Reuters",
+   "headline": "Oil tumbles as Trump's Russia sanctions waiver may lead to more fuel supplies - Reuters",
    "source": "Reuters Business",
-   "why": "Предстоящото премахване на Индонезия от глобалните индекси на MSCI предизвика срив до шестгодишно дъно и ще принуди пасивните фондове към масирани продажби.",
-   "headline_bg": "MSCI се готви да премахне Индонезия от глобалните индекси, което предизвика пазарен срив до шестгодишно дъно"
+   "why": "Спадът в петролните цени заради евентуалното премахване на санкциите срещу Русия директно засяга енергийния сектор, инфлационните очаквания и Fed политиката.",
+   "headline_bg": "Петролът се срива, тъй като освобождаването от руските санкции от страна на Тръмп може да доведе до повече петролни доставки"
   },
   {
-   "headline": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
+   "headline": "Dollar firmer, euro weakens as French protests turn violent - Reuters",
+   "source": "Reuters Business",
+   "why": "Еврото отслабва спрямо долара заради политическата нестабилност във Франция, което влияе на валутните позиции и европейските активи.",
+   "headline_bg": "Доларът поскъпва, еврото отслабва заради насилствените протести във Франция"
+  },
+  {
+   "headline": "France hit by worst unrest in years as attempts to rein in government spending meet citizen ire",
    "source": "CNBC",
-   "why": "CoreWeave CDS достигнаха нива на дистрес, сигнализирайки за сериозно преоценяване на риска в AI инфраструктурния дълг с ефект върху целия сектор.",
-   "headline_bg": "Credit default swaps на CoreWeave достигнаха нива на дистрес, тъй като инвеститорите охладяха към AI дълга"
+   "why": "Политическата криза във Франция около бюджетните разходи и предстоящото гласуване заплашва фискалната стабилност на еврозоната и повишава суверенния риск.",
+   "headline_bg": "Франция е засегната от най-тежките вълнения от години, тъй като опитите за ограничаване на правителствените разходи предизвикват гнева на гражданите"
   },
   {
-   "headline": "Oil heads for weekly gain with Mideast supply risks - Reuters",
+   "headline": "Putin reportedly suggests summit with Trump and Xi to decide fate of Ukraine",
+   "source": "CNBC",
+   "why": "Предложението на Путин за среща на върха с Тръмп и Си относно Украйна може да промени геополитическия пейзаж и да повлияе на цените на суровините и отбранителния сектор.",
+   "headline_bg": "Путин предлага среща на върха с Тръмп и Си за решаване на съдбата на Украйна"
+  },
+  {
+   "headline": "Indonesian stocks slide to six-year low as MSCI warning weighs - Reuters",
    "source": "Reuters Business",
-   "why": "Нефтът върви към седмична печалба заради рисковете за доставките от Близкия изток, което влияе директно на енергийния сектор и инфлационните очаквания.",
-   "headline_bg": "Нефтът върви към седмична печалба заради рисковете за доставките от Близкия изток"
+   "why": "Индонезийските акции са на шестгодишно дъно заради предупреждение от MSCI за евентуална деградация, което може да предизвика принудителни разпродажби от пасивни фондове.",
+   "headline_bg": "Индонезийските акции се плъзгат до шестгодишно дъно под натиска на предупреждението на MSCI"
   },
   {
-   "headline": "Trump weighs easing restrictions on Russian and Iranian ‘shadow fleet’",
+   "headline": "US threatens Europe over Starlink restrictions",
    "source": "Financial Times",
-   "why": "Евентуалното облекчаване на ограниченията върху руския и иранския 'shadow fleet' би повлияло на петролните цени, санкционния режим и отношенията с европейските съюзници.",
-   "headline_bg": "Тръмп обмисля облекчаване на ограниченията върху руския и иранския 'shadow fleet'"
+   "why": "Заплахата на САЩ за ответни мерки срещу ЕС заради ограниченията на Starlink засяга регулаторната среда за технологичния сектор и трансатлантическите търговски отношения.",
+   "headline_bg": "САЩ заплашват Европа заради ограниченията върху Starlink"
   },
   {
-   "headline": "Average long-term US mortgage rate holds at 7.4%, remaining at highest level in nearly 3 years - AP News",
-   "source": "AP Business",
-   "why": "Средната дългосрочна ипотечна лихва в САЩ задържа при 7.4% — най-високото ниво от почти 3 години — с директен натиск върху пазара на имоти и потребителското търсене.",
-   "headline_bg": "Средната дългосрочна ипотечна лихва в САЩ задържа при 7.4%, оставайки на най-високото ниво от близо 3 години"
+   "headline": "Global food inflation is expected to intensify as supply shocks pile up - Reuters",
+   "source": "Reuters Business",
+   "why": "Задълбочаването на глобалната хранителна инфлация заради натрупващи се шокове в предлагането добавя инфлационен натиск, усложнявайки задачата на централните банки.",
+   "headline_bg": "Глобалната хранителна инфлация се очаква да се засили с натрупването на шокове в предлагането"
   }
  ]
 }

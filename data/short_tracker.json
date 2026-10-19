@@ -86,16 +86,16 @@
  "BHR_2026-08-31": {
   "ticker": "BHR",
   "entry_date": "2026-08-31",
-  "status": "trailing",
+  "status": "trailing_stop_exit",
   "entry_price": 2.03,
   "target_1": 1.89,
   "stop_loss": 2.1,
   "lagging_sector": "Недвижими имоти",
   "distress_signal_count": 4,
   "target1_hit_date": "2026-09-03",
-  "resolution_date": null,
-  "discovered_date": null,
-  "realized_r": null
+  "resolution_date": "2026-10-16",
+  "discovered_date": "2026-10-19",
+  "realized_r": 8.57
  },
  "AIV_2026-09-01": {
   "ticker": "AIV",
@@ -547,5 +547,34 @@
   "discovered_date": "2026-10-16",
   "realized_r": -1.0,
   "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+6.9%, 2.1× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "FWRG_2026-09-24": {
+  "ticker": "FWRG",
+  "entry_date": "2026-09-24",
+  "status": "stopped",
+  "entry_price": 10.2,
+  "target_1": 6.34,
+  "stop_loss": 12.13,
+  "lagging_sector": "Потребителски (циклични)",
+  "distress_signal_count": 5,
+  "target1_hit_date": null,
+  "resolution_date": "2026-10-13",
+  "discovered_date": "2026-10-19",
+  "realized_r": -1.0,
+  "unusual_move_disclosure": "Резолюцията се случи при необичайно голямо движение (+6.9%, 2.1× средния обем) — възможно corporate event (bankruptcy filing, M&A, и т.н.). Механичният stop не диференцира между фундаментално-грешна теза и post-event спекулативна volatility — виж SPWR 05.08.2024 случая. Прегледай ръчно преди да третираш като чист сигнал за тезата."
+ },
+ "NWN_2026-10-06": {
+  "ticker": "NWN",
+  "entry_date": "2026-10-06",
+  "status": "stopped",
+  "entry_price": 47.19,
+  "target_1": 43.27,
+  "stop_loss": 49.15,
+  "lagging_sector": "Комунални услуги",
+  "distress_signal_count": 4,
+  "target1_hit_date": null,
+  "resolution_date": "2026-10-13",
+  "discovered_date": "2026-10-19",
+  "realized_r": -1.0
  }
 }
