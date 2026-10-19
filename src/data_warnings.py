@@ -171,6 +171,13 @@ def _13f_warnings(status: dict | None) -> list[dict]:
         out.append({"source": "13f", "level": "warn",
                     "message": ("13F: броят акции не е прочетен надеждно за " + ", ".join(x["manager"] for x in lc)
                                 + " — „нова/увеличена позиция“ не се показва за тях днес; това НЕ значи, че няма покупки.")})
+    # 19.10.2026 (етап 2, т. 3): тикърите по CUSIP (OpenFIGI) — грешка или недовършени (бюджет) → видимо, не тиха липса на тикъри
+    ct = st.get("cusip_tickers") or {}
+    if ct.get("error") or ct.get("skipped"):
+        why = f"OpenFIGI не отговори ({ct['error']})" if ct.get("error") else f"{ct['skipped']} CUSIP-а не стигнаха бюджета на run-а"
+        out.append({"source": "13f", "level": "warn",
+                    "message": (f"13F: тикърите по CUSIP не са пълни днес — {why}; {ct.get('no_ticker', 0)} от {ct.get('rows', 0)} реда са „без тикър“, "
+                                f"{ct.get('by_name', 0)} — по името на емитента (може да е грешно: SPY, подаден като STATE STREET CORP).")})
     # трети преглед (16.10): мениджър без поредното предходно тримесечие — причината по мениджър ("няма 13F за …" ≠ "13F за … не се изтегли днес")
     nc = st.get("no_comparison") or []
     if nc:

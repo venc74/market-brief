@@ -129,4 +129,28 @@ assert "без тикър" in page and "Хауърд Маркс · Oaktree Capit
 mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_email(b))))
 assert "без тикър (OTHER)" in mail                                                                                     # display_name маха правното окончание "CO"
 print("  ✓ 'без тикър' на картата; 'PUT 4 ($1.8 млрд): SPY $1.0 млрд, QQQ $651.7 млн …' (беше 'STATE STREET CORP $1.0 млрд'); в имейла 'без тикър (OTHER)'")
+print()
+print("── 6. видимост (етап 2, т. 3): грешка / недовършени / празен отговор → ред, не тиха липса (СИНТЕТИЧЕН провал) ──")
+from src import data_warnings
+cusip_map.cache_path().unlink(missing_ok=True)
+rows = [{"ticker": "MASTERCARD INCORPORATED", "_resolved": False, "cusip": "57636Q104", "company": "MASTERCARD INCORPORATED", "manager": "M", "value": 1.0},
+        {"ticker": "STT", "_resolved": True, "cusip": "78462F103", "company": "STATE STREET CORP", "manager": "M", "value": 1.0}]
+cusip_map._post = boom
+try:
+    with quiet():
+        dataroma._apply_cusip_tickers(rows)
+finally:
+    cusip_map._post = orig
+st = dict(dataroma.CUSIP_STATUS)
+assert "ConnectionError" in st["error"] and (st["rows"], st["by_cusip"], st["by_name"], st["no_ticker"]) == (2, 0, 1, 1) and rows[1]["ticker"] == "STT"
+w = data_warnings.collect(None, None, superinvestor_status={"kind": "ok", "cusip_tickers": st})
+assert len(w) == 1 and w[0]["message"].startswith("13F: тикърите по CUSIP не са пълни днес — OpenFIGI не отговори (ConnectionError") and "1 от 2 реда са „без тикър“" in w[0]["message"]
+b = copy.deepcopy(B19); b["superinvestor_status"] = {**b["superinvestor_status"], "cusip_tickers": st}
+page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
+assert "⚠ Тикърите по CUSIP (OpenFIGI) не се изтеглиха днес (ConnectionError" in page and "по CUSIP 0, по име 1, без тикър 1 от 2 реда" in page
+ok = {"requested": 2, "from_cache": 0, "fetched": 1, "not_found": 1, "skipped": 0, "error": None, "rows": 2, "by_cusip": 1, "by_name": 0, "no_ticker": 1}      # празен отговор за единия
+assert data_warnings.collect(None, None, superinvestor_status={"kind": "ok", "cusip_tickers": ok}) == []
+b["superinvestor_status"]["cusip_tickers"] = ok
+assert "Тикърите: по CUSIP 1, по име 0, без тикър 1 от 2 реда." in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
+print("  ✓ провал на OpenFIGI → банер '13F: тикърите по CUSIP не са пълни днес — OpenFIGI не отговори …' и ред в секцията; без провал — ред 'Тикърите: по CUSIP 1, по име 0, без тикър 1 от 2 реда.'")
 print("\n✅ test_cusip_tickers: всичко мина")

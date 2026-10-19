@@ -790,12 +790,15 @@ def _apply_cusip_tickers(rows: list[dict], options: list[dict] | None = None) ->
         for kind in ("put", "call"):
             cusips += [t.get("cusip") for t in (o.get(kind) or {}).get("top", []) if t.get("cusip")]
     cmap: dict = {}
+    CUSIP_STATUS.clear()
     if cusips:
         try:
             from src import cusip_map
             cmap = cusip_map.resolve(cusips)
+            CUSIP_STATUS.update(cusip_map.LAST_STATUS)
         except Exception as e:
             print(f"[dataroma] CUSIP → тикър пропуснато: {type(e).__name__}: {e}")
+            CUSIP_STATUS.update({"error": f"{type(e).__name__}: {e}"})
     for r in rows:
         m = cmap.get(r.get("cusip") or "")
         if m:
@@ -812,6 +815,12 @@ def _apply_cusip_tickers(rows: list[dict], options: list[dict] | None = None) ->
                 m = cmap.get(t.get("cusip") or "")
                 if m:
                     t.update(ticker=m["ticker"], figi_name=m.get("name"))
+    if cusips:                                                            # 19.10.2026 (етап 2, т. 3): видимо — колко са по CUSIP / по име / без тикър, грешка, недовършени
+        CUSIP_STATUS.update(rows=len(rows), by_cusip=sum(1 for r in rows if r.get("ticker_source") == "cusip"),
+                            by_name=sum(1 for r in rows if r.get("ticker_source") == "name"), no_ticker=sum(1 for r in rows if not r.get("ticker")))
+
+
+CUSIP_STATUS: dict = {}           # 19.10.2026: статусът на тикърите по CUSIP за последното теглене (meta["cusip_tickers"], банер при грешка / недовършени)
 
 
 def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
@@ -985,7 +994,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
     meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
             "managers_total": total, "managers_without_filings": n_no_filings,
             "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "followed_nt": followed_nt, "scale_basis": scale_basis,
-            "no_comparison": no_comparison, "options": options}
+            "no_comparison": no_comparison, "options": options, "cusip_tickers": dict(CUSIP_STATUS)}
 
     if moves or new_positions or major_exits or stopped_managers:
         bundle["meta"] = meta
