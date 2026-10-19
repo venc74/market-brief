@@ -264,12 +264,33 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
             text = text.replace(old, new, 1)
             break
     setup.update(valid_through=through, valid_from=start, valid_label=f"до {_dm(through)}, от {_dm(start)}", book_status="pending")
+    # 19.10.2026 (т. 18б): планът на записа (стоп / цел от първия ден) — картата смята свой стоп всеки ден (ZBRA 16.10: картата $360.30 / $451.80, книгата $359.54 / $453.32)
+    setup["book_plan"] = {"from": start, "level": rec.get("buy_stop"), "stop": rec.get("stop_loss"), "target": rec.get("target_1")}
     level = rec.get("buy_stop")
     if isinstance(level, (int, float)) and abs(level - setup["buy_stop"]) >= 0.005:
         setup["book_level"] = level
         text += f" Книгата следи ниво ${level:.2f} от {_dm(start)} (записът пази плана от първия ден)."
     setup["trigger_text"] = text
     return setup
+
+
+def book_plan_note(setup: dict | None, pp: dict | None, lv: dict | None = None) -> str | None:
+    """
+    19.10.2026 (трети преглед, т. 18б): buy-stop карта с ЧАКАЩ запис в книгата, чийто стоп или цел се различават от днешния план на картата → ред "Книгата пази плана от
+    ДД.ММ: стоп $X, цел 2R $Y (картата днес: стоп $A, цел $B)". Реално: ZBRA 16.10 — картата стоп $360.30 / цел $451.80, книгата (от 14.10) $359.54 / $453.32. Иначе None.
+    """
+    bp = (setup or {}).get("book_plan") or {}
+    stop, target = bp.get("stop"), bp.get("target")
+    if not isinstance(stop, (int, float)) or not isinstance(target, (int, float)) or not pp:
+        return None
+    c_stop = (lv or {}).get("stop") if isinstance((lv or {}).get("stop"), (int, float)) else pp.get("stop_loss")
+    c_target = pp.get("target_1")
+    if not isinstance(c_stop, (int, float)) or not isinstance(c_target, (int, float)):
+        return None
+    if abs(c_stop - stop) < 0.005 and abs(c_target - target) < 0.005:
+        return None
+    return (f"Книгата пази плана от {_dm(bp.get('from'))}: стоп ${stop:.2f}, цел 2R ${target:.2f} (картата днес: стоп ${c_stop:.2f}, цел ${c_target:.2f}) — "
+            f"резултатът в книгата е по нейния план.")
 
 
 def _book_note(setup: dict, rec: dict) -> dict:

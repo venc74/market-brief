@@ -30,6 +30,7 @@ env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
 env.filters["group_dropped"] = cot_theses.group_dropped   # 08.10: изключените тикъри с еднаква причина — на един ред
 env.filters["field_words"] = sector_claims.field_words     # 19.10.2026 (т. 18): сурови имена на полета в прозата на модела → думи
 env.filters["horizon_text"] = sector_claims.horizon_text   # 19.10.2026 (т. 18): хоризонтът на модела ([4, 12], "2-6", 4) → текст
+env.globals["book_plan_note"] = setup_rules.book_plan_note   # 19.10.2026 (т. 18б): планът на книгата, когато се различава от днешния на картата
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
@@ -142,6 +143,9 @@ def _watchlist_email_html(watchlist: list[dict]) -> str:
             valid = setup.get("valid_label") or (f'до {setup["valid_through"][8:10]}.{setup["valid_through"][5:7]}' if setup.get("valid_through") else "")
             txt = (f'Buy-stop ${setup["buy_stop"]:.2f}' + (f' (таван ${setup["max_chase"]:.2f}' + (f', валиден {_e(valid)}' if valid else "") + ")" if setup.get("max_chase") else "")
                    + f' · Stop ${lv["stop"]:.2f} (−{lv.get("stop_pct")}%)' + _lv_warn_html(lv))
+            bn = setup_rules.book_plan_note(setup, st.get("plan_preview"), lv)              # 19.10.2026 (т. 18б)
+            if bn:
+                txt += f'<br><span style="color:#6b7280;font-size:12px">{_e(bn)}</span>'
         else:
             txt = _e((st.get("ai") or {}).get("watchlist_trigger") or setup.get("trigger_text") or "")
         if ew:

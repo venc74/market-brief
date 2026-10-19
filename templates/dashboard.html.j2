@@ -1050,6 +1050,7 @@
       <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
         {% if not st.levels %}вход ≈ ${{ "%.2f"|format(pp.entry_mid) }} · Stop ${{ "%.2f"|format(pp.stop_loss) }} (−{{ pp.risk_pct }}%) · {% endif %}Цел 1 (2R, {{ (pp.target_1_fraction * 100)|round|int }}% от позицията) ${{ "%.2f"|format(pp.target_1) }}
         {% if pp.sizing_factor < 1 %}· режимен фактор {{ regime }} ×{{ pp.sizing_factor }}{% endif %}{% if regime == 'Cash' %} · режим Cash: нов Action не се дава, планът е само ориентир{% endif %}</div>
+      {% set bpn = book_plan_note(st.setup, pp, st.levels) %}{% if bpn %}<div class="lv-note" style="margin-top:4px">{{ bpn }}</div>{% endif %}
       {{ levels_block(st.levels) }}
       {% endif %}
       {% endif %}
