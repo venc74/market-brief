@@ -1,0 +1,40 @@
+{
+ "_source": "Реални GLB карти от data/2026-08-25.json (PR, линия 09.2018) и data/2026-09-25.json (TMO, линия 12.2021) — glb_candidates, без промяна; извадени на 19.10.2026 за т. 16 (Н4).",
+ "PR_2026-08-25": {
+  "ticker": "PR",
+  "company": "Permian Resources Corporation",
+  "glb_type": "classic",
+  "price": 23.69,
+  "prior_high": 21.85,
+  "prior_high_month": "2018-09",
+  "months_unpenetrated": 94,
+  "ath_label": "all_time_high",
+  "history_years": 10.4,
+  "tightness": {
+   "band_hold_pct": 88.9,
+   "tightness_range_pct": 28.33,
+   "meets_tightness": true
+  },
+  "risk_note": "Тесен, добре удържан base преди пробива (band_hold>=85% от последните 63 дни) — по-нисък очакван volatility профил, най-близък до класически Stage 2 setup.",
+  "in_screener": false
+ },
+ "TMO_2026-09-25": {
+  "ticker": "TMO",
+  "company": "Thermo Fisher Scientific Inc",
+  "glb_type": "momentum",
+  "price": 678.39,
+  "prior_high": 667.24,
+  "prior_high_month": "2021-12",
+  "months_unpenetrated": 56,
+  "ath_label": "all_time_high",
+  "history_years": 46.5,
+  "tightness": {
+   "band_hold_pct": 65.1,
+   "tightness_range_pct": 29.67,
+   "meets_tightness": false
+  },
+  "risk_note": "Дълъг ATH unpenetrated период, но БЕЗ тесен daily base преди пробива — бърз/волатилен момentum move, не тиха консолидация. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.",
+  "in_screener": false,
+  "already_open_position": false
+ }
+}

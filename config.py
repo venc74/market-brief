@@ -221,7 +221,8 @@ CORP_ACTION_INTEGER_TOL = 1e-3          # относителен допуск, �
 # в модул, чийто прозорец назад обхваща датата — докато прозорецът се изчисти (corp_actions.exclude). Цели сплитове — без промяна.
 CORP_ACTION_SCREENER_SESSIONS = int(os.getenv("CORP_ACTION_SCREENER_SESSIONS", 252))     # Action/Watchlist: 52 седмици (52w high/low, RS rating 12 месеца, pivot 65 бара)
 CORP_ACTION_QM_SESSIONS = int(os.getenv("CORP_ACTION_QM_SESSIONS", 130))                 # Qullamaggie: ръстът за 6 месеца (126 бара) и признаците (qm_breakout.MIN_BARS = 130)
-CORP_ACTION_FETCH_PERIOD = os.getenv("CORP_ACTION_FETCH_PERIOD", "5y")                    # GLB: месецът на линията може да е години назад — събитие след него в последните 5 г.
+CORP_ACTION_FETCH_PERIOD = os.getenv("CORP_ACTION_FETCH_PERIOD", "5y")                    # GLB: месецът на линията може да е години назад — събитие след него в последните 5 г.;
+                                                                                            # 19.10.2026 (Н4): за GLB / Уиш — от месеца на най-старата линия, ако е по-стара (corp_actions.fetch_start; PR 09.2018)
 # Точни корекции освен целите: проста дроб със знаменател ≤ CORP_ACTION_EXACT_MAX_DENOM (3:2, 4:3, 5:4 — SF 27.02.2026 и APG 01.07.2025 са сплитове 3 за 2) и тикърите с известен
 # дивидент в акции (CBSH: 5% всеки декември, коефициент 1.05). Измерено 13.10 върху универса (903 тикъра, 2 години): 18 събития с нецял коефициент; дробите хващат точно SF и APG, а сред
 # останалите 16 (отделяния и разпределения на акции — CTVA, MIDD, SPGI, HON×2, FDX, BDX, CMCSA, FNF, DD, FTV, J, WDC, LEN) нито едно не е проста дроб. J 1.01 е разпределение на Amentum (оценка),

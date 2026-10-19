@@ -6,6 +6,8 @@
 """
 from __future__ import annotations
 import datetime as dt
+import inspect
+import re
 
 import numpy as np
 import pandas as pd
@@ -130,12 +132,16 @@ def reset() -> None:
     LAST_DIAG.update(ok=True, checked=0, excluded=[], error=None)
 
 
-def fetch_actions(tickers: list[str], period: str | None = None) -> dict[str, dict]:
-    """{тикър: {"dates": [...], "ratios": [...], "close": pd.Series}} от ЕДНА партида yf.download(…, actions=True). Провал → вдига (exclude го хваща)."""
+def fetch_actions(tickers: list[str], period: str | None = None, start: dt.date | None = None) -> dict[str, dict]:
+    """
+    {тикър: {"dates": [...], "ratios": [...], "close": pd.Series, "from": "YYYY-MM-DD" | None}} от ЕДНА партида yf.download(…, actions=True). Провал → вдига (exclude го хваща).
+    start (19.10.2026, Н4) — от тази дата вместо периода; "from" казва откъде е изтеглено (кешът на run-а тегли наново, ако модул иска по-стара дата).
+    """
     if yf is None:
         raise RuntimeError("yfinance не е наличен")
     tickers = list(tickers)
-    data = yf.download(tickers, period=period or config.CORP_ACTION_FETCH_PERIOD, progress=False, auto_adjust=False, actions=True, group_by="ticker", threads=True)
+    span = {"start": start.isoformat()} if start else {"period": period or config.CORP_ACTION_FETCH_PERIOD}
+    data = yf.download(tickers, **span, progress=False, auto_adjust=False, actions=True, group_by="ticker", threads=True)
     if data is None or len(data) == 0:
         raise ValueError("празен резултат")
     multi = hasattr(data.columns, "levels") and getattr(data.columns, "nlevels", 1) > 1
@@ -145,10 +151,46 @@ def fetch_actions(tickers: list[str], period: str | None = None) -> dict[str, di
             f = data[t] if multi else data
             sp = f["Stock Splits"].dropna()
             sp = sp[sp != 0]
-            out[t] = {"dates": [x.date().isoformat() for x in sp.index], "ratios": [float(v) for v in sp.to_numpy()], "close": f["Close"].dropna()}
+            out[t] = {"dates": [x.date().isoformat() for x in sp.index], "ratios": [float(v) for v in sp.to_numpy()], "close": f["Close"].dropna(),
+                      "from": start.isoformat() if start else None}
         except Exception:
             continue
     return out
+
+
+def fetch_start(rows: list[dict], module: str, day: dt.date) -> dt.date:
+    """
+    19.10.2026 (трети преглед, Н4): откъде да се теглят събитията — по-старото от (днес − CORP_ACTION_FETCH_PERIOD) и първия ден на месеца на най-старата линия (GLB / "GLB по Уиш":
+    прозорецът е "събитие след месеца на линията", а линията може да е години назад). Реално: PR в GLB на 25.08–01.09.2026 с линия от 09.2018 (5 г. назад стигаха до 08.2021 —
+    събитие от 10.2018 до 08.2021 не се виждаше); TMO с линия 12.2021 щеше да излезе от прозореца около 20.12.2026.
+    """
+    m = re.fullmatch(r"(\d+)(y|mo|d)", str(config.CORP_ACTION_FETCH_PERIOD).strip())
+    n, unit = (int(m.group(1)), m.group(2)) if m else (5, "y")
+    base = (dt.date(day.year - n, day.month, min(day.day, 28)) if unit == "y" else day - dt.timedelta(days=n * 31 if unit == "mo" else n))
+    if module not in ("glb", "glb_wish"):
+        return base
+    months = []
+    for r in rows or []:
+        mm = re.fullmatch(r"(\d{4})-(\d{2})", str((r or {}).get("prior_high_month") or "")[:7]) if isinstance(r, dict) else None
+        if mm:
+            months.append(dt.date(int(mm.group(1)), int(mm.group(2)), 1))
+    return min([base] + months)
+
+
+def _covered(ticker: str, start: dt.date) -> bool:
+    """Кешът на run-а стига ли до `start`. Без "from" (подменено теглене в тестовете, по-стар формат) — да."""
+    s = _SERIES.get(ticker)
+    if not s:
+        return False
+    f = s.get("from")
+    return f is None or f <= start.isoformat()
+
+
+def _takes_start(fn) -> bool:
+    try:
+        return "start" in inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return False
 
 
 def _sessions_after(day: dt.date, n: int) -> dt.date:
@@ -292,10 +334,13 @@ def exclude(rows: list[dict], module: str, today, fetch=None) -> tuple[list[dict
     if not tickers:
         return rows, []
     try:
-        need = [t for t in tickers if t not in _SERIES]
-        need += [k["new_ticker"] for t, k in config.CORP_ACTIONS_KNOWN.items() if t in tickers and k.get("new_ticker") and k["new_ticker"] not in _SERIES]
+        start = fetch_start(rows, module, day)                                  # 19.10.2026 (Н4): GLB — от месеца на най-старата линия, ако е преди 5-те години
+        need = [t for t in tickers if not _covered(t, start)]
+        need += [k["new_ticker"] for t, k in config.CORP_ACTIONS_KNOWN.items() if t in tickers and k.get("new_ticker") and not _covered(k["new_ticker"], start)]
         if need:
-            _SERIES.update((fetch or fetch_actions)(sorted(set(need))))
+            fn = fetch or fetch_actions
+            _SERIES.update(fn(sorted(set(need)), start=start) if _takes_start(fn) else fn(sorted(set(need))))
+            LAST_DIAG["fetch_from"] = min(filter(None, [LAST_DIAG.get("fetch_from"), start.isoformat()]))
         LAST_DIAG["checked"] = LAST_DIAG.get("checked", 0) + len(tickers)
         kept, out = [], []
         for r in rows:
