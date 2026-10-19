@@ -128,7 +128,18 @@ print("  ✓ РЕАЛНИЯТ отговор от 08.10 (fx_revenue_translation 
 OLD_SIGN = ct.mechanism_sign("fx_revenue_translation", "fx_foreign")
 assert OLD_SIGN == 1 and ct.effect_from_sign(OLD_SIGN, "down") == "loses"                                                                 # така BHP/RIO бяха "губят" на 08.10
 SIDES = {"BHP": ("foreign_cost", ["AUD"]), "RIO": ("foreign_cost", ["AUD"]), "WPM": ("foreign_cost", ["AUD"])}                            # СИНТЕТИЧНО: според икономиката (продават в USD, разходи в AUD)
-th = run("Australian Dollar", raw_of("Australian Dollar", **SIDES))
+th = run("Australian Dollar", raw_of("Australian Dollar", **SIDES))                                                                       # 19.10 (В6): реалните описания от 08.10 са за ПРИХОДИ (BHP) / "разходи и приходи" (RIO)
+assert kept(th) == {"WPM": "gains"} and dropped(th) == {"BHP": "fx_side_mismatch", "RIO": "fx_both"}, (kept(th), dropped(th))
+COSTQ = {"BHP": "значителна част от оперативните разходи на BHP са в австралийски долари (добив, работна ръка, инфраструктура в Австралия), докато приходите са предимно в USD",
+         "RIO": "голяма част от производствените разходи на Rio Tinto са в австралийски долари заради мащабните австралийски операции по добив на желязна руда и мед, докато продажбите са деноминирани в USD"}   # РЕАЛНИ: кешът на тезите (29.09), страна foreign_cost
+def raw_cost(**kw):
+    r = raw_of("Australian Dollar", **kw)
+    for t in r:
+        if t["ticker"] in COSTQ:
+            for m in t["mechanisms"]:
+                m["quote"] = COSTQ[t["ticker"]]
+    return r
+th = run("Australian Dollar", raw_cost(**SIDES))
 assert kept(th) == {"BHP": "gains", "RIO": "gains", "WPM": "gains"}, (kept(th), dropped(th))
 assert all(t["mechanisms"][0]["type"] == "fx_cost_local" and t["mechanisms"][0]["exposure_side"] == "foreign_cost" for t in th["tickers"])
 assert sorted(ai_brief.COT_DIAG["fx_corrected"]) == ["Australian Dollar/BHP", "Australian Dollar/RIO"]                                   # BHP и RIO бяха с типа fx_revenue_translation; WPM вече с fx_cost_local
@@ -139,10 +150,10 @@ print("  ✓ СИНТЕТИЧНО: foreign_revenue в AUD → 'губи' (ста
 th = run("Australian Dollar", raw_of("Australian Dollar", BHP=("foreign_cost", []), RIO=("някъде", ["AUD"])))
 assert dropped(th) == {"BHP": "fx_exposure", "RIO": "fx_exposure", "WPM": "fx_exposure"}                                         # WPM остава с реалния отговор от 08.10 — без страна
 print("  ✓ СИНТЕТИЧНО: без валути / невалидна страна → 'fx_exposure'")
-th = run("Australian Dollar", raw_of("Australian Dollar", **SIDES), direction="extreme_short")
+th = run("Australian Dollar", raw_cost(**SIDES), direction="extreme_short")
 assert kept(th) == {"BHP": "loses", "RIO": "loses", "WPM": "loses"}
 print("  ✓ AUD ↑ (extreme_short) — обратният ефект (разходи в AUD растат): губят")
-usd = [{"ticker": "MCD", "company": "McDonald's", "company_claim": "McDonald's Corporation", "mechanisms": [{"type": "fx_revenue_translation", "quote": "франчайз такси в чужбина", "exposure_side": "foreign_revenue", "currencies": ["EUR", "GBP"]}]}]   # СИНТЕТИЧНО (РЕАЛЕН lookup на MCD)
+usd = [{"ticker": "MCD", "company": "McDonald's", "company_claim": "McDonald's Corporation", "mechanisms": [{"type": "fx_revenue_translation", "quote": "приходи от франчайз такси в чужбина", "exposure_side": "foreign_revenue", "currencies": ["EUR", "GBP"]}]}]   # СИНТЕТИЧНО (РЕАЛЕН lookup на MCD)
 th = run("US Dollar Index", usd, direction="extreme_short")
 assert kept(th) == {"MCD": "loses"}                                                                                                       # DXY ↑: приходи в чужда валута → по-малко USD
 usd[0]["mechanisms"][0]["currencies"] = ["USD"]

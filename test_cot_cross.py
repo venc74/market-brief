@@ -87,7 +87,8 @@ for (typ, kind), sign in EXPECT.items():
         row = tk("ZZ", (typ, Q))
         if typ in config.COT_FX_TYPES:                                                  # 08.10: валутният механизъм носи страната на експозицията (типът му се извежда от нея)
             row["mechanisms"][0].update(exposure_side={"fx_revenue_translation": "foreign_revenue", "fx_cost_local": "foreign_cost"}[typ],
-                                        currencies=[config.COT_FX_MARKET_CURRENCY.get(KIND_MARKET[kind], "EUR")])
+                                        currencies=[config.COT_FX_MARKET_CURRENCY.get(KIND_MARKET[kind], "EUR")],
+                                        quote={"fx_revenue_translation": "приходи в чуждата валута", "fx_cost_local": "разходи в чуждата валута"}[typ])   # 19.10 (В6): описанието съвпада със страната
         th, _ = ev(KIND_MARKET[kind], [row], mv)
         want = "gains" if sign * (1 if mv["move"] == "up" else -1) > 0 else "loses"
         assert th["tickers"][0]["effect"] == want, (typ, kind, mv["move"])

@@ -213,6 +213,41 @@ def claim_matches(claim, lookup: dict) -> bool:
     return any(_token_match(c, n) for c in strong for n in names)
 
 
+# 19.10.2026 (етап 2, т. 9 / В6): сверка на ОПИСАНИЕТО (quote) със страната на експозицията. Измерено върху всички 31 различни валутни описания (кешът + брифовете от 09.10):
+# "приходи и разходи … в GBP" при foreign_revenue (AZN, DEO, ASML) → и двете → като both; foreign_revenue без дума за приходи ("разходи за R&D … в GBP" — AZN) → разминаване;
+# описание с ТРЕТА валута (YUMC на Euro FX: "… заплащани частично в евро, докато приходите са в юани и USD" — Yum China приходва и харчи в юани) → механизмът по таблицата е за
+# двойката валута на пазара / USD. Описанията "разходи в AUD, докато приходите са в USD" (BHP, RIO, WDS, CNQ, LIN, WPM, SU) са верни foreign_cost и остават.
+_FX_BOTH_RE = re.compile(r"(?:приход\w*|продажб\w*|revenue\w*)\s*(?:,|\s+и|\s+and)\s+(?:\w+\s+){0,2}?(?:разход\w*|cost\w*)"
+                         r"|(?:разход\w*|cost\w*)\s*(?:,|\s+и|\s+and)\s+(?:\w+\s+){0,2}?(?:приход\w*|продажб\w*|revenue\w*)", re.I)
+_FX_REV_RE = re.compile(r"приход|продажб|продава|генерира|реализира|роялти|revenue|sales", re.I)
+_FX_COST_RE = re.compile(r"разход|закупува|купува|плаща|cost|заплат", re.I)
+_FX_CUR_NAMES = {"EUR": r"\bевро\b|\bEUR\b", "GBP": r"британск\w*\s+(?:лир|паунд)|\bпаунд|стерлинг|\bGBP\b", "JPY": r"\bйен|\bJPY\b",
+                 "CHF": r"швейцарск\w*\s+франк|\bCHF\b", "CAD": r"канадск\w*\s+долар|\bCAD\b", "AUD": r"австралийск\w*\s+долар|\bAUD\b",
+                 "MXN": r"мексиканск\w*\s+песо|\bMXN\b", "NZD": r"новозеландск\w*\s+долар|\bNZD\b", "CNY": r"\bюан|ренминби|\bCNY\b|\bRMB\b",
+                 "BRL": r"бразилск\w*\s+реал|\bBRL\b", "INR": r"\bрупи|\bINR\b", "KRW": r"корейск\w*\s+вон|\bKRW\b", "HKD": r"хонконгск\w*\s+долар|\bHKD\b",
+                 "ZAR": r"\bранд|\bZAR\b", "SEK": r"шведск\w*\s+крон|\bSEK\b", "NOK": r"норвежк\w*\s+крон|\bNOK\b", "DKK": r"датск\w*\s+крон|\bDKK\b"}
+_FX_CUR_BG = {"EUR": "евро", "GBP": "британски лири", "JPY": "йени", "CHF": "швейцарски франкове", "CAD": "канадски долари", "AUD": "австралийски долари", "MXN": "мексикански песо",
+              "NZD": "новозеландски долари", "CNY": "юани", "BRL": "бразилски реали", "INR": "рупии", "KRW": "корейски вони", "HKD": "хонконгски долари", "ZAR": "ранда",
+              "SEK": "шведски крони", "NOK": "норвежки крони", "DKK": "датски крони"}
+
+
+def _fx_text_problem(quote: str, side: str, market_cur: str | None) -> str | None:
+    """Описанието срещу exposure_side и валутата на пазара (19.10.2026) → текст на грешката или None. Чиста функция."""
+    q = str(quote or "")
+    if _FX_BOTH_RE.search(q):
+        return "валутен механизъм: и приходи, и разходи в чужда валута — нетният ефект не се определя от таблицата (по описанието)"
+    if side == "foreign_revenue" and not _FX_REV_RE.search(q):
+        return "валутен механизъм: описанието не е за приходи в чуждата валута, а exposure_side е foreign_revenue"
+    if side == "foreign_cost" and not _FX_COST_RE.search(q):
+        return "валутен механизъм: описанието не е за разходи в чуждата валута, а exposure_side е foreign_cost"
+    if market_cur:
+        third = [c for c, pat in _FX_CUR_NAMES.items() if c != market_cur and re.search(pat, q, re.I)]
+        if third:
+            return (f"валутен механизъм: трета валута в описанието ({', '.join(_FX_CUR_BG[c] for c in third)}) — механизмът по таблицата е за "
+                    f"{market_cur}/USD при компания с приходи или разходи в USD")
+    return None
+
+
 def _derive_fx(m: dict, typ: str, market: str | None, kind: str) -> tuple[str | None, dict | None, str | None]:
     """
     Валутен механизъм: кодът извежда типа от СТРАНАТА на експозицията (exposure_side), не от типа, който е избрал моделът.
@@ -229,18 +264,22 @@ def _derive_fx(m: dict, typ: str, market: str | None, kind: str) -> tuple[str | 
         return None, None, "валутен механизъм: и приходи, и разходи в чужда валута — нетният ефект не се определя от таблицата"
     if not cur:
         return None, None, "валутен механизъм без валути на експозицията (currencies)"
+    mc = config.COT_FX_MARKET_CURRENCY.get(market or "") if kind == "fx_foreign" else None
     if kind == "fx_foreign":
-        mc = config.COT_FX_MARKET_CURRENCY.get(market or "")
         if mc and mc not in cur:
             return None, None, f"валутата на пазара ({mc}) не е сред валутите на експозицията ({', '.join(cur)})"
     elif all(c == "USD" for c in cur):
         return None, None, "валутен механизъм към US Dollar Index, но експозицията е само в USD"
+    why = _fx_text_problem(m.get("quote"), side, mc)                    # 19.10.2026 (В6): описанието срещу страната и валутата
+    if why:
+        return None, None, why
     derived = config.COT_FX_SIDE_TYPE[side]
     return derived, {"exposure_side": side, "currencies": cur, "type_corrected": derived != typ, "model_type": typ}, None
 
 
 # Кодът на причината за изключване по началото на текста на грешката (parse_mechanisms връща само текст)
 _ERR_CODES = (("твърдение за членство", "index_claim"), ("валутен механизъм: и приходи", "fx_both"),
+              ("валутен механизъм: описанието", "fx_side_mismatch"), ("валутен механизъм: трета валута", "fx_third_currency"),       # 19.10.2026 (В6)
               ("валутата на пазара", "fx_currency"), ("валутен механизъм", "fx_exposure"))
 
 
