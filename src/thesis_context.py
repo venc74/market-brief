@@ -25,6 +25,7 @@ import datetime as dt
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import setup_rules
 
 try:
     import pandas as pd
@@ -85,11 +86,14 @@ def _next_earnings(sym: str, today: dt.date) -> str | None:
 
 
 def _business_days(a: dt.date, b: dt.date) -> int:
-    """Работни дни от a до b (без a) — същата мярка като EARNINGS_BLACKOUT_DAYS."""
+    """
+    NYSE сесии от a до b (без a, с b) — същата мярка като EARNINGS_BLACKOUT_DAYS. 19.10.2026 (трети преглед, Н1): с празниците (setup_rules.is_session); до 19.10 — делничните
+    дни (реално: AVGO с отчет 09.12 на 30.09, 06.10 и 07.10 — 50 вместо 49, през Thanksgiving; флагът "скоро" в историята не се е сменял).
+    """
     n, d = 0, a
     while d < b:
         d += dt.timedelta(days=1)
-        if d.weekday() < 5:
+        if setup_rules.is_session(d):
             n += 1
     return n
 

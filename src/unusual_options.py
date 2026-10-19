@@ -43,6 +43,7 @@ import requests
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import bar_freshness
 
 try:
     import pandas as pd
@@ -225,7 +226,7 @@ def _stock_vol_ratio(tk) -> float | None:
 # FIX 2026-09-29: OI от следобедна снимка (src/oi_snapshot.py, отделен Actions job)
 # ──────────────────────────────────────────────────────────────────────────
 def last_session_date() -> dt.date | None:
-    """Датата на последната (или текущата) US сесия — последният дневен бар на SPY."""
+    """Датата на последната (или текущата) US сесия — последният дневен бар на SPY. Ползва я следобедната снимка (oi_snapshot: днес има ли сесия); сутрин — календарът (Н2)."""
     if yf is None:
         return None
     try:
@@ -327,20 +328,16 @@ def _snapshot_for_yesterday(today: dt.date) -> tuple[dict | None, str, str]:
     """
     Сутрешният обем е от последната сесия → OI трябва да е снимката от СЪЩАТА
     сесия (началото ѝ). Връща (снимка, сесия, причина при липса).
+    19.10.2026 (трети преглед, Н2): сесията е от NYSE календара (bar_freshness.expected_session — последната сесия преди деня на брифа), не от последния
+    дневен бар на SPY: в 5 от 60 брифа (29.07–23.09) барът на SPY в 07:30 беше от D−2 → щеше да се вземе снимката на D−2 срещу обема на D−1. Без мрежа.
     """
     snaps = load_oi_snapshots()
-    session = last_session_date()
-    if session is not None:
-        snap = snaps.get(session.isoformat())
-        if snap:
-            return snap, session.isoformat(), ""
-        return None, session.isoformat(), (f"следобедната OI снимка за сесията "
-                                           f"{session.strftime('%d.%m')} липсва")
-    # без дата на сесията — най-новата снимка отпреди днес, ако е до 4 дни стара
-    older = sorted(d for d in snaps if d < today.isoformat())
-    if older and (today - dt.date.fromisoformat(older[-1])).days <= 4:
-        return snaps[older[-1]], older[-1], ""
-    return None, "", "следобедната OI снимка липсва (датата на сесията не е известна)"
+    session = dt.date.fromisoformat(bar_freshness.expected_session(today))
+    snap = snaps.get(session.isoformat())
+    if snap:
+        return snap, session.isoformat(), ""
+    return None, session.isoformat(), (f"следобедната OI снимка за сесията "
+                                       f"{session.strftime('%d.%m')} липсва")
 
 
 def _yf_unusual(symbols: list[str], top_n: int) -> list[dict]:
