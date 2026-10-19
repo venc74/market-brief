@@ -8,6 +8,7 @@
   • sec_13f_infotable_1656456_0001656456-26-000003.xml / -000002.xml — Appaloosa Q2 / Q1 2026 (Q2: PUT на AAPL $241.6 млн и на BRK-B);
   • sec_13f_infotable_2026053_0001172661-26-002339.xml — Q1 2026 на PERSHING SQUARE INC. (само HHH 9 000 000); Q2 на родителя и Q1 на стария CIK — fixture-ите от 08.10;
   • tests/fixtures/brief_2026-10-16.json — реалният бриф: SI✓ "STT 14.0% · Oaktree" и "AAPL 3.1% · Appaloosa" (и двете са PUT), "STT нова позиция $1.01 млрд" в Moves.
+Етап 2 (19.10): late_filer по reportDate — раздел 8.
 СИНТЕТИЧНО (маркирано): Q3 2026 филингите на Pershing (ноември — още ги няма; съдържанието е реалното Q2), мениджър с махнат реален ред (пропуснато тримесечие), малката таблица за
 мениджърите без свален infotable (само за избора на тримесечие), "днес".
 Пускане: python test_13f_quarters_options.py
@@ -193,5 +194,19 @@ assert sum(bool(dataroma.late_filer(last_before(c, "2026-02-17"), day)) for c in
 assert sum(bool(dataroma.late_filer(last_before(c, "2026-02-18"), D("2026-02-18"))) for c in config.DATAROMA_CIK) == 0
 assert dataroma.last_quarter_deadline(D("2026-11-16")) == (D("2026-06-30"), D("2026-08-14")) and dataroma.last_quarter_deadline(D("2026-11-17")) == (D("2026-09-30"), D("2026-11-16"))
 print("  ✓ Q3 2026 → 16.11; Q4 2025 → 17.02.2026 (събота + Presidents' Day): 11 от 15 подадоха точно тогава — старото правило ги бележеше 'закъснява' сутринта на 17.02, новото — никого")
+
+print()
+print("── 8. late_filer по reportDate (етап 2, решение от 16.10) ──")
+d19 = D("2026-10-19")
+assert all(got[c]["late"] is None for c in config.DATAROMA_CIK)                                                               # РЕАЛНО: днес никой не закъснява (всички са с Q2 2026)
+late_by_date = sum(bool(dataroma.late_filer(got[c]["last_filing_date"], d19)) for c in config.DATAROMA_CIK)
+late_by_rep = sum(bool(dataroma.late_filer(got[c]["last_filing_date"], d19, report_date=got[c]["quarter"])) for c in config.DATAROMA_CIK)
+assert late_by_date == late_by_rep == 0
+assert dataroma.late_filer("2026-07-10", d19) is None                                                                          # СИНТЕТИЧНО: 13F за Q1, подаден КЪСНО (10.07) — по дата не "закъснява"
+lf = dataroma.late_filer("2026-07-10", d19, report_date="2026-03-31")
+assert lf == {"quarter_end": "2026-06-30", "deadline": "2026-08-14", "last_filing_date": "2026-07-10", "last_report_date": "2026-03-31"}
+assert dataroma._late_label(lf) == "⚠ закъснява: последен 13F от 2026-07-10 (за Q1 2026), няма за Q2 2026 (срок 14.08.2026)"
+assert dataroma.late_filer("2026-08-14", d19, report_date="2026-06-30") is None and dataroma.late_filer("2026-05-15", d19, report_date="боклук") is not None   # лош reportDate → по дата
+print("  ✓ РЕАЛНО 19.10: 0 от 15 закъсняват и по двете правила; СИНТЕТИЧНО: 13F за Q1, подаден на 10.07 — по дата 'в срок', по reportDate '⚠ закъснява: … (за Q1 2026), няма за Q2 2026 …'")
 
 print("\n✅ test_13f_quarters_options: всичко мина")

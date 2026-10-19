@@ -160,7 +160,7 @@ assert meta["scale_basis"]["Тест B · хиляди (реален файл о
 assert meta["low_coverage"] == [{"manager": "Тест D · счупен таг (реален файл, тагът преименуван)", "current": 0.0, "prev": 1.0}] and not [1 for (m, c) in mv if m == "Тест D"]
 assert [x["manager"] for x in meta["late_managers"]] == ["Тест C · закъснява (реален файл от 2025, дата 2026-05-15)"] and meta["late_managers"][0]["quarter_end"] == "2026-06-30"
 c_late = [r for (m, c), r in mv.items() if m == "Тест C"]
-assert c_late and all("закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)" in r["late"] for r in c_late)
+assert c_late and all("закъснява: последен 13F от 2026-05-15 (за Q1 2026), няма за Q2 2026 (срок 14.08.2026)" in r["late"] for r in c_late)
 assert not [r for (m, c), r in mv.items() if m != "Тест C" and r.get("late")]                                                       # само редовете на закъснелия мениджър носят етикета
 assert meta["managers_with_data"] == 4 and meta["managers_with_comparison"] == 3 and bundle["major_exits"] == [] and meta["kind"] == "ok"
 print(f"  ✓ A (долари): 'увеличена' за Frontier и Hertz; B (хиляди, СИНТЕТИЧНА дата 2026 — като Duquesne): основание price_override; празен предходен 13F → 'без сравнение' (няма 'нова позиция' за всичко); "
@@ -184,7 +184,7 @@ print("── страницата: етикет за давност, посто
 brief = copy.deepcopy(B05)
 brief.update(superinvestor_moves=bundle["moves"], superinvestor_exits={"exits": [], "stopped_managers": []}, superinvestor_status=meta, data_warnings=w)
 page = re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))
-assert "⚠ закъснява: последен 13F от 2026-05-15, няма за Q2 2026 (срок 14.08.2026)" in page
+assert "⚠ закъснява: последен 13F от 2026-05-15 (за Q1 2026), няма за Q2 2026 (срок 14.08.2026)" in page
 assert "Major Position Exits" in page and "Няма големи изходи (3 мениджъра със сравнение с предходния 13F, праг 10% от портфейла)" in page
 assert "13F: броят акции не е прочетен надеждно за Тест D" in page
 assert "⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за: Тест B · хиляди (реален файл от 2020, дата 2026) (13F за Q1 2026 не се изтегли днес)." in page

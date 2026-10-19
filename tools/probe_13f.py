@@ -53,7 +53,7 @@ def main(argv: list[str]) -> int:
             print(f"   {form:<9} подадено {fdate} за период {rdate or '?'}  {acc}  {doc}")
         hr = sorted((x for x in f13 if x[0] == "13F-HR"), key=lambda x: x[1], reverse=True)
         if hr:
-            late = dataroma.late_filer(hr[0][1], today)
+            late = dataroma.late_filer(hr[0][1], today, report_date=hr[0][2])          # етап 2: по reportDate
             print(f"   → последен 13F-HR: {hr[0][1]} — {'ЗАКЪСНЯВА (няма подаване след ' + str(q_end) + ')' if late else 'в срок'}")
             if late:
                 other = [x for x in f13 if x[1] > str(q_end) and x[0] != "13F-HR"]

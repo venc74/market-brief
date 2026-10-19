@@ -487,10 +487,12 @@ def last_quarter_deadline(today: dt.date | None = None) -> tuple[dt.date, dt.dat
     return q, deadline
 
 
-def late_filer(last_filing_date: str | None, today: dt.date | None = None) -> dict | None:
+def late_filer(last_filing_date: str | None, today: dt.date | None = None, report_date: str | None = None) -> dict | None:
     """
     13F пакет (07.10): мениджър, чийто последен 13F е подаден НА или ПРЕДИ края на последното вече просрочено тримесечие, закъснява — етикет за давност, различен от "спрял да подава"
-    (DATAROMA_STALE_FILER_DAYS = 165 би маркирал Pershing чак на 27.10). {quarter_end, deadline, last_filing_date} или None.
+    (DATAROMA_STALE_FILER_DAYS = 165 би маркирал Pershing чак на 27.10). {quarter_end, deadline, last_filing_date[, last_report_date]} или None.
+    Етап 2 (решение 16.10): с `report_date` (reportDate на последното тримесечие) закъснява, ако ТО е преди просроченото тримесечие — независимо кога е подадено (13F за Q1, подаден
+    късно след края на Q2, иначе маскираше липсата на Q2). Без report_date — по датата на подаване, както преди.
     """
     if not last_filing_date:
         return None
@@ -499,14 +501,25 @@ def late_filer(last_filing_date: str | None, today: dt.date | None = None) -> di
     except ValueError:
         return None
     q, deadline = last_quarter_deadline(today)
-    return {"quarter_end": q.isoformat(), "deadline": deadline.isoformat(), "last_filing_date": last.isoformat()} if last <= q else None
+    rep = None
+    if report_date:
+        try:
+            rep = dt.date.fromisoformat(str(report_date)[:10])
+        except ValueError:
+            rep = None
+    late = (rep < q) if rep is not None else (last <= q)
+    if not late:
+        return None
+    return {"quarter_end": q.isoformat(), "deadline": deadline.isoformat(), "last_filing_date": last.isoformat(),
+            **({"last_report_date": rep.isoformat()} if rep is not None else {})}
 
 
 def _late_label(late: dict | None) -> str | None:
     if not late:
         return None
     q = dt.date.fromisoformat(late["quarter_end"]); d = dt.date.fromisoformat(late["deadline"])
-    return (f"⚠ закъснява: последен 13F от {late['last_filing_date']}, няма за Q{(q.month - 1) // 3 + 1} {q.year} "
+    rep = f" (за {_quarter_label(late['last_report_date'])})" if late.get("last_report_date") else ""
+    return (f"⚠ закъснява: последен 13F от {late['last_filing_date']}{rep}, няма за Q{(q.month - 1) // 3 + 1} {q.year} "
             f"(срок {d.day:02d}.{d.month:02d}.{d.year})")
 
 
@@ -598,7 +611,7 @@ def _manager_snapshot(cik: str, name: str) -> dict:
 
     return {
         **base,
-        "late": late_filer(fdate) if filing_status == "active" else None,
+        "late": late_filer(fdate, report_date=quarter) if filing_status == "active" else None,      # етап 2: по reportDate на последното тримесечие
         "current_agg": current_agg, "current_scale": cur_scale, "current_scale_basis": cur_basis,
         "current_total": current_total, "current_shares_coverage": shares_coverage(current_agg),
         "current_options": {k: {**v, "value": v["value"] * cur_scale} for k, v in cur_opts.items()},
