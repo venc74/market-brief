@@ -262,6 +262,47 @@ def _translation_ok(bg: str, title: str) -> bool:
     return not (_SCALE_EN.search(title) and not _SCALE_BG.search(bg))
 
 
+_WORD_RE = re.compile(r"[\w$%€£¥]+(?:[.,'’-][\w$%]+)*")
+# 19.10.2026 (С3): числа, които са част от име или срок, не са твърдение ("Russell 2000", "S&P 500", "10-годишните", "Q3", "G7")
+# Само в "why": срокът е с тире или слят ("10-year", "10-годишните", "19-годишен"); "3 години" е твърдение и се проверява (16.10: "почти 3 години" е в заглавието).
+_NUM_NAME_RE = re.compile(r"(?:S&P|Russell|Nasdaq|Stoxx|FTSE|DAX|Nikkei|CAC|MSCI|Euro Stoxx)\s*\d+|\d+-?(?:годиш\w*|year\w*|месеч\w*|month\w*|седмич\w*|днев\w*)"
+                          r"|\b\d+Y\b|\b[QG]\d\b", re.I)
+
+
+def _first_words(s: str, n: int = 6) -> list[str]:
+    return [w.casefold().strip("'’") for w in _WORD_RE.findall(s or "")][:n]
+
+
+def _echo_index(h, i: int, pool: list[dict], seen: set) -> tuple[int | None, str]:
+    """
+    19.10.2026 (трети преглед, С3): моделът повтаря първите ~6 думи на заглавието ("h"); кодът ги сверява с pool[i]. Съвпадение → i. Разминаване → еднозначният ред в пула
+    със същото начало (индексът е объркан — заглавието и "why" са за него) или None. Без "h" (стар отговор) → i, без проверка.
+    """
+    if not isinstance(h, str) or not h.strip():
+        return i, "без ехо"
+    want = _first_words(h)
+    if len(want) < 3 and want != _first_words(pool[i]["title"]):
+        return None, "ехото е по-кратко от 3 думи"
+    if _first_words(pool[i]["title"])[:len(want)] == want:
+        return i, ""
+    hits = [j for j, r in enumerate(pool) if j not in seen and _first_words(r["title"])[:len(want)] == want]
+    return (hits[0], f"индексът поправен по заглавието: {i} → {hits[0]}") if len(hits) == 1 else (None, "индексът не съвпада със заглавието")
+
+
+def _why_numbers(why: str, source: str) -> tuple[str, list[str]]:
+    """
+    19.10.2026 (С3): изречение в "why" с число, което го няма в заглавието и резюмето на източника (pool[i]: t, d — това вижда моделът) → махнато; (остатък, махнати).
+    Числата от име или срок не се броят (_NUM_NAME_RE). Измерено върху 704 реда в 89 брифа: 38 "why" с число извън заглавието (резюмето не се пази в брифа — горна граница),
+    най-често "~20% от световния петролен трафик" за Ормузкия проток (8 пъти) — фон на модела, не факт от новината.
+    """
+    have = {x.replace(",", ".") for x in _NUM_RE.findall(source or "")}                      # източникът — всичките му числа (и "19-year high")
+    kept, removed = [], []
+    for sent in re.split(r"(?<=[.!?])\s+", (why or "").strip()):
+        extra = [x for x in _NUM_RE.findall(_NUM_NAME_RE.sub(" ", sent)) if x.replace(",", ".") not in have]
+        (removed if extra else kept).append(sent)
+    return " ".join(kept).strip(), removed
+
+
 def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], list[dict]]:
     """
     15.10.2026: заглавието е ДОСЛОВНО от източника — моделът връща само индекса "i" в пула, "why" и по желание превод "headline_bg"; кодът взема
@@ -284,8 +325,21 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         if not why:
             dropped.append({"i": i, "reason": "празно why"})
             continue
+        j, note = _echo_index(n.get("h"), i, pool, seen)                 # 19.10.2026 (С3): ехото на заглавието срещу pool[i]
+        if j is None:
+            dropped.append({"i": i, "reason": note, "h": n.get("h"), "pool_title": pool[i]["title"]})
+            continue
+        if j != i:
+            dropped.append({"i": i, "reason": note, "h": n.get("h")})        # не отпада — информация за дневника
+            i = j
+        if i in seen:
+            dropped.append({"i": i, "reason": "повторен индекс"})
+            continue
         seen.add(i)
         r = pool[i]
+        why, cut = _why_numbers(why, f"{r['title']} {r.get('summary') or ''}")
+        if cut:
+            dropped.append({"i": i, "reason": "изречение в why с число, което го няма в заглавието и резюмето — махнато", "removed": cut})
         row = {"headline": r["title"], "source": r.get("source"), "why": why}
         bg = (n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) else ""
         if bg and re.search(r"[А-Яа-я]", bg) and bg != r["title"]:
@@ -335,9 +389,13 @@ def significant_news(max_items: int = 8) -> list[dict]:
         f"Максимум {max_items} новини, всяка с едно "
         "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
         "заглавие дословно по индекса \"i\" от списъка. По желание дай кратък превод на заглавието на български в \"headline_bg\" "
-        "(само превод — без нови факти, със същите числа и мащаб: million → млн, billion → млрд).\n\n"
+        "(само превод — без нови факти, със същите числа и мащаб: million → млн, billion → млрд).\n"
+        # 19.10.2026 (трети преглед, С3 + "why" = заглавието): ехо на заглавието за проверка на индекса; why — само ефектът, без преразказ и без числа извън източника
+        "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен. "
+        "\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието (то е в headline_bg) и не носи числа, "
+        "които ги няма в \"t\" или \"d\" на същата новина.\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
-        'Върни само JSON: {"news": [{"i": 0, "why": "...", "headline_bg": "..."}]}'
+        'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "headline_bg": "..."}]}'
     )
     try:
         from src import ai_brief
@@ -345,7 +403,9 @@ def significant_news(max_items: int = 8) -> list[dict]:
         data = ai_brief._parse_json(text)
         news, dropped = pick_verbatim(data.get("news", []) if isinstance(data, dict) else [], pool, max_items)
         LAST_DIAG.clear()
-        LAST_DIAG.update(returned=len(data.get("news", []) if isinstance(data, dict) else []), kept=len(news), dropped=dropped)
+        got = data.get("news", []) if isinstance(data, dict) else []
+        LAST_DIAG.update(returned=len(got), kept=len(news), dropped=dropped,
+                         no_echo=sum(1 for n in got if isinstance(n, dict) and not (isinstance(n.get("h"), str) and n["h"].strip())))   # 19.10.2026 (С3)
         for d in dropped:
             print(f"[news] ⚠ {d['reason']}: {d}")
     except Exception as ex:

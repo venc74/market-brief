@@ -63,7 +63,7 @@ with contextlib.redirect_stdout(io.StringIO()) as out:
 assert [n["headline"] for n in got] == [T[67], T[72], T[40], T[13]]
 compact = json.loads(prompts[0].split("НОВИНИ:\n", 1)[1].split("\n\n", 1)[0])
 assert len(compact) == config.NEWS_MAX_TO_FILTER and compact[67] == {"i": 67, "s": POOL[67]["source"], "t": T[67], "d": POOL[67]["summary"]}
-assert "Заглавието НЕ го пишеш" in prompts[0] and '{"news": [{"i": 0, "why": "...", "headline_bg": "..."}]}' in prompts[0]
+assert "Заглавието НЕ го пишеш" in prompts[0] and '{"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "headline_bg": "..."}]}' in prompts[0]   # 19.10: + ехото "h" (С3)
 assert na.LAST_DIAG["kept"] == 4 and len(na.LAST_DIAG["dropped"]) == 5 and "няма валиден индекс в пула" in out.getvalue()
 assert json.loads(na._CACHE.read_text(encoding="utf-8"))["news"] == got
 print("  ✓ всеки ред на пула е с 'i'; резултатът и кешът носят оригиналните заглавия; отпадналите са в LAST_DIAG и в лога")
