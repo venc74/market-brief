@@ -1480,6 +1480,11 @@ EARNINGS_YOY_TOLERANCE_DAYS = int(os.getenv("EARNINGS_YOY_TOLERANCE_DAYS", 60))
 # + 2023-2025 smoke test (TAN/XLRE потвърдени срещу documented real-world
 # events, вкл. SPWR Chapter 11 август 2024, хванат от universe expansion-а).
 ENABLE_SHORT_SCREENER = os.getenv("ENABLE_SHORT_SCREENER", "1") == "1"
+# 19.10.2026 (трети преглед, т. 19 — решение на Венци): short скрийнърът и tracker-ът са ЗАМРАЗЕНИ — без теглене и без запис (резолюцията също спира); кодът и
+# data/short_tracker.json остават. Числата при замразяването (затворени, win, среден R, отворени) и датата се пишат ЕДНОКРАТНО в SHORT_FROZEN_FILE от tracker-а
+# (без мрежа); страницата показва един ред. На 16.10: 23 затворени, win 8.7%, среден R −0.73; на 19.10: 26, 11.5%, −0.39 (BHR +8.57R). SHORT_FROZEN=0 връща модула.
+SHORT_FROZEN = os.getenv("SHORT_FROZEN", "1") == "1"
+SHORT_FROZEN_FILE = DATA_DIR / "short_frozen.json"
 
 # ── Sector persistence gate (sector_layer.py: laggard_sectors()) ─────────
 # FIX 2026-08-2x: наивен single-day "chg_4w<0 AND chg_12w<0" дава false

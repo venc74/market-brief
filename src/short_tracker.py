@@ -379,6 +379,35 @@ def update_short_tracker(today_candidates: list[dict] | None = None,
         print(f"[short_tracker] update_short_tracker failed: {e}")
 
 
+def frozen_summary(today: str) -> dict:
+    """
+    19.10.2026 (т. 19): замразеният модул — {"frozen_on", "closed", "wins", "win_rate_pct", "avg_realized_r", "open_at_freeze"}. Първият run със SHORT_FROZEN смята числата от
+    tracker-а (без мрежа — последната резолюция преди замразяването) и ги записва в config.SHORT_FROZEN_FILE; следващите ги четат оттам (датата и числата не мърдат).
+    Провал → {} (редът не се показва).
+    """
+    try:
+        st = json.loads(config.SHORT_FROZEN_FILE.read_text(encoding="utf-8"))
+        if isinstance(st, dict) and st.get("frozen_on"):
+            return st
+    except Exception:
+        pass
+    try:
+        records = list(_load_tracker().values())
+        resolved = [r for r in records if r.get("realized_r") is not None]
+        wins = sum(1 for r in resolved if r["realized_r"] > 0)
+        st = {"frozen_on": today, "closed": len(resolved), "wins": wins,
+              "win_rate_pct": round(wins / len(resolved) * 100, 1) if resolved else None,
+              "avg_realized_r": round(sum(r["realized_r"] for r in resolved) / len(resolved), 2) if resolved else None,
+              "open_at_freeze": sum(1 for r in records if r.get("status") in _LIVE_STATUSES)}
+        config.SHORT_FROZEN_FILE.parent.mkdir(exist_ok=True)
+        config.SHORT_FROZEN_FILE.write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+        print(f"[short_tracker] замразен на {today}: {st}")
+        return st
+    except Exception as e:
+        print(f"[short_tracker] замразяването не се записа: {type(e).__name__}: {e}")
+        return {}
+
+
 def get_short_tracker_summary() -> dict:
     """
     "Win" тук = realized_r > 0, ЗАЩОТО цената реално падна достатъчно (за

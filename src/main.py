@@ -837,7 +837,7 @@ def run() -> dict:
     # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
     # short_screener.py docstring за пълния feasibility/backtest trail).
     # Explicit try/except, same дух като GLB блока по-горе.
-    if config.ENABLE_SHORT_SCREENER:
+    if config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN:             # 19.10.2026 (т. 19): замразен — без теглене
         try:
             short_candidates = short_screener.run_short_screen(laggards)
         except Exception as e:
@@ -947,10 +947,13 @@ def run() -> dict:
     # Единственият начин да измерим реален hit rate занапред (виж
     # short_screener.py docstring-а за структурния лимит на историческата
     # валидация на survival-risk критериите).
-    if config.ENABLE_SHORT_SCREENER:
+    if config.ENABLE_SHORT_SCREENER and config.SHORT_FROZEN:
+        short_tracker_summary = {"frozen": short_tracker.frozen_summary(today)}       # 19.10.2026 (т. 19): без запис и резолюция — един ред на страницата
+    elif config.ENABLE_SHORT_SCREENER:
         short_tracker.update_short_tracker(short_candidates, today)
-    short_tracker_summary = (short_tracker.get_short_tracker_summary()
-                             if config.ENABLE_SHORT_SCREENER else {})
+        short_tracker_summary = short_tracker.get_short_tracker_summary()
+    else:
+        short_tracker_summary = {}
 
     # 🔎 Наблюдавани тикъри — ръчно куриран per-ticker монитор (watch_monitor.py).
     # ТУК, а не по-рано: `theses`, `cot_with_theses` и `leaders` вече са готови

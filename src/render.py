@@ -349,6 +349,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         cot_status=brief.get("cot_status") or {},
         cot_summary=brief.get("cot_summary"),
         correlation_flags=brief.get("correlation_flags", []),
+        short_frozen=(brief.get("short_tracker") or {}).get("frozen") or {},     # 19.10.2026 (т. 19): замразеният short модул — един ред
         distribution_days=brief.get("distribution_days"),
         distribution_days_status=brief.get("distribution_days_status"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),

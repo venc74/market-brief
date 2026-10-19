@@ -1816,6 +1816,11 @@
 {% endif %}
 
 {# Пакет 4б т.в: секцията "Insider Buying" отпадна — остава маркерът INS✓ (кой, кога, колко — hover/клик) върху кандидатите и позициите #}
+{% if short_frozen and short_frozen.frozen_on %}
+<div class="small" style="color:var(--muted);margin:10px 0 0">Short скрийнър (Stage 4) и книгата му — замразени на {{ short_frozen.frozen_on[8:10] }}.{{ short_frozen.frozen_on[5:7] }}.{{ short_frozen.frozen_on[:4] }}:
+  {{ short_frozen.closed }} затворени{% if short_frozen.win_rate_pct is not none %}, win {{ short_frozen.win_rate_pct }}%, среден R {{ "%+.2f"|format(short_frozen.avg_realized_r) }}{% endif %}{% if short_frozen.open_at_freeze %}; {{ short_frozen.open_at_freeze }} отворени при замразяването — не се следят{% endif %}.
+  Без теглене и без нови записи; кодът и данните остават.</div>
+{% endif %}
 
 <section>
   <h2>Исторически архив</h2>
