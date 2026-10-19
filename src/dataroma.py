@@ -683,7 +683,7 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
             continue
         ticker = tmap.get(_norm(cur["issuer"]))
         rows.append({
-            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
+            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(), "cusip": cusip,
             "company": cur["issuer"], "manager": snap["manager"], "action": action,
             "value": value, "period": snap["period"], "_resolved": bool(ticker),
             **({"late": late} if late else {}),
@@ -734,7 +734,7 @@ def _new_position_highlights_from_snapshot(snap: dict, tmap: dict) -> list[dict]
             continue
         ticker = tmap.get(_norm(cur["issuer"]))
         out.append({
-            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(),
+            "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(), "cusip": cusip,
             "company": cur["issuer"], "manager": snap["manager"], "value": value,
             "pct_of_portfolio": round(pct, 1), "period": snap["period"],
             "filing_date": snap.get("last_filing_date"),
@@ -769,13 +769,49 @@ def _major_exits_from_snapshot(snap: dict, tmap: dict) -> list[dict]:
             continue
         ticker = tmap.get(_norm(prev["issuer"]))
         out.append({
-            "ticker": ticker or _truncate_words(prev["issuer"], 24).upper(),
+            "ticker": ticker or _truncate_words(prev["issuer"], 24).upper(), "cusip": cusip,
             "company": prev["issuer"], "manager": snap["manager"],
             "prior_value": value, "prior_pct_of_portfolio": round(pct, 1),
             "period": snap["period"], "_resolved": bool(ticker),
             **({"late": _late_label(snap.get("late"))} if snap.get("late") else {}),
         })
     return out
+
+
+def _apply_cusip_tickers(rows: list[dict], options: list[dict] | None = None) -> None:
+    """
+    19.10.2026 (етап 2, доп. т. 8 + т. 17а): тикърът на 13F реда е по CUSIP (cusip_map → OpenFIGI), после по име (SEC company_tickers); неразпознат → None ("без тикър" на страницата —
+    не името на емитента с главни букви, което изглеждаше като тикър: "SEAGATE TECHNOLOGY"). Реално 19.10: 8 от 36 нови позиции без тикър по име (Seagate → STX, Mastercard → MA,
+    Applied Materials → AMAT, TSMC → TSM, On Holding → ONON, TJX → TJX); PUT-ът на Oaktree "STATE STREET CORP" (CUSIP 78462F103) е SPY, не STT. Опциите (summary на мениджъра)
+    получават тикъра и името по CUSIP. Провал на cusip_map → както преди по име, само неразпознатите стават "без тикър". На място.
+    """
+    cusips = [r.get("cusip") for r in rows if r.get("cusip")]
+    for o in options or []:
+        for kind in ("put", "call"):
+            cusips += [t.get("cusip") for t in (o.get(kind) or {}).get("top", []) if t.get("cusip")]
+    cmap: dict = {}
+    if cusips:
+        try:
+            from src import cusip_map
+            cmap = cusip_map.resolve(cusips)
+        except Exception as e:
+            print(f"[dataroma] CUSIP → тикър пропуснато: {type(e).__name__}: {e}")
+    for r in rows:
+        m = cmap.get(r.get("cusip") or "")
+        if m:
+            if r.get("_resolved") and r.get("ticker") != m["ticker"]:
+                r["ticker_by_name"] = r["ticker"]                 # за диагностика: "STATE STREET CORP" → STT по име, SPY по CUSIP
+            r.update(ticker=m["ticker"], _resolved=True, ticker_source="cusip")
+        elif r.get("_resolved"):
+            r["ticker_source"] = "name"
+        else:
+            r.update(ticker=None, _resolved=False, ticker_source=None)
+    for o in options or []:
+        for kind in ("put", "call"):
+            for t in (o.get(kind) or {}).get("top", []):
+                m = cmap.get(t.get("cusip") or "")
+                if m:
+                    t.update(ticker=m["ticker"], figi_name=m.get("name"))
 
 
 def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
@@ -785,7 +821,7 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
     """
     best: dict[str, dict] = {}
     for r in rows:
-        key = r["ticker"]
+        key = r["ticker"] or ("CUSIP:" + (r.get("cusip") or r.get("company") or ""))      # 19.10.2026: "без тикър" не слива различни емитенти
         cur = best.get(key)
         if cur is None:
             best[key] = {**r, "managers": [r["manager"]], "count": 1, "_late_by": ({r["manager"]: r["late"]} if r.get("late") else {})}
@@ -914,6 +950,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
         major_exits += _major_exits_from_snapshot(snap, tmap)
 
     pooled = [r for rows in manager_top.values() for r in rows]
+    _apply_cusip_tickers(pooled + new_positions + major_exits, options)          # 19.10.2026: тикърът по CUSIP (OpenFIGI) преди дедупа — виж _apply_cusip_tickers
     moves = _dedupe_by_ticker(pooled)
     moves = sorted(moves, key=lambda r: (r.get("value") or 0),
                    reverse=True)[:config.DATAROMA_MOVES_DISPLAY_LIMIT]
@@ -1061,6 +1098,8 @@ def superinvestor_map(rows: list[dict] | None = None) -> dict[str, dict]:
     rows = rows if rows is not None else fetch_superinvestor_buys()
     out: dict[str, dict] = {}
     for r in rows:
+        if not r.get("ticker"):
+            continue                                    # 19.10.2026: без тикър (неразпознат CUSIP и име) — не може да съвпадне с наш кандидат
         out[r["ticker"]] = {
             **r,
             "managers": r.get("managers", [r["manager"]]),

@@ -528,7 +528,7 @@ def render_email(brief: dict) -> str:
             f'<span style="font-family:monospace;color:#111827">{sp_txt}</span></div>')
     si = brief.get("superinvestor_moves", [])[:8]
     if si:
-        si_txt = ", ".join(dict.fromkeys(_e(r["ticker"]) for r in si))
+        si_txt = ", ".join(dict.fromkeys(_e(r.get("ticker") or f'без тикър ({names.display_name(r.get("company") or "")})') for r in si))     # 19.10.2026: неразпознат CUSIP/име
         signals_rows += (
             '<div style="margin-top:6px"><span style="color:#6b7280">Superinvestor покупки (13F):</span> '
             f'<span style="font-family:monospace;color:#111827">{si_txt}</span></div>')

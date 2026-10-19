@@ -728,8 +728,8 @@
 {# трети преглед (16.10): 13F — мениджъри без поредното предходно тримесечие (причината по мениджър) и опциите (PUT / CALL) — извън дългите позиции и % от портфейла #}
 {% macro si_nocmp(st) %}{% if st and st.no_comparison %}<div class="data-note warn">⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за:
   {% for x in st.no_comparison %}{{ x.manager }} ({{ x.text }}){{ "; " if not loop.last else "." }}{% endfor %}</div>{% endif %}{% endmacro %}
-{% macro si_opt_kind(label, k) %}{% if k and k.count %}{{ label }} {{ k.count }} ({{ k.value|money_short }}): {% for t in k.top %}<span title="CUSIP {{ t.cusip }}">{{ t.company|cname(28, false) }}</span> {{ t.value|money_short }}{{ ", " if not loop.last }}{% endfor %}{% if k.count > k.top|length %}, …{% endif %}{% endif %}{% endmacro %}
-{% macro si_options(st) %}{% if st and st.options %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; името е както е в 13F, CUSIP — при посочване):
+{% macro si_opt_kind(label, k) %}{% if k and k.count %}{{ label }} {{ k.count }} ({{ k.value|money_short }}): {% for t in k.top %}<span title="CUSIP {{ t.cusip }}{% if t.figi_name %} · по CUSIP (OpenFIGI): {{ t.figi_name }}{% endif %} · в 13F: {{ t.company }}">{{ t.ticker or (t.company|cname(28, false)) }}</span> {{ t.value|money_short }}{{ ", " if not loop.last }}{% endfor %}{% if k.count > k.top|length %}, …{% endif %}{% endif %}{% endmacro %}
+{% macro si_options(st) %}{% if st and st.options %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; тикърът е по CUSIP — името от 13F и CUSIP-ът са при посочване):
   {% for o in st.options %}<div style="margin-top:3px">{{ o.manager }} — {{ si_opt_kind("PUT", o.put) }}{% if o.put and o.put.count and o.call and o.call.count %}; {% endif %}{{ si_opt_kind("CALL", o.call) }}</div>{% endfor %}</div>{% endif %}{% endmacro %}
 {% macro pct_cell(v) %}{% if v is none %}—{% else %}<span class="{{ 'neg' if v < 0 else 'pos' }}">{{ "%+.1f"|format(v) }}%</span>{% endif %}{% endmacro %}
 {% macro ma_cell(v, days, need) %}{% if v is none %}{% if days and days < need %}<span class="na">&lt;{{ need }} дни</span>{% else %}—{% endif %}{% elif v %}<span class="pos">над</span>{% else %}<span class="neg">под</span>{% endif %}{% endmacro %}
@@ -1737,7 +1737,7 @@
     {% for s in superinvestor_moves %}
     <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
       <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-sym"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}</span>
         <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
       </div>
       {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}
@@ -1766,7 +1766,7 @@
     {% for s in superinvestor_exits.exits %}
     <div class="si-card exit {{ 'in-screen' if s.ticker in our_tickers else '' }}">
       <div class="si-top">
-        <span class="si-sym">{{ s.ticker }}</span>
+        <span class="si-sym"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}</span>
         <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
       </div>
       {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}

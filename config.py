@@ -861,6 +861,17 @@ DATAROMA_MIN_SHARE_INCREASE_PCT = float(os.getenv("DATAROMA_MIN_SHARE_INCREASE_P
 THIRTEENF_MIN_SHARES_COVERAGE = float(os.getenv("THIRTEENF_MIN_SHARES_COVERAGE", 0.8))
 THIRTEENF_MIN_PORTFOLIO_USD = float(os.getenv("THIRTEENF_MIN_PORTFOLIO_USD", 100_000_000))
 THIRTEENF_FILING_DEADLINE_DAYS = int(os.getenv("THIRTEENF_FILING_DEADLINE_DAYS", 45))
+# 19.10.2026 (етап 2, доп. т. 8 + т. 17а): CUSIP → тикър през OpenFIGI (src/cusip_map.py) — по име не може (SPY подаден като "STATE STREET CORP"; 8 от 36 нови позиции на 19.10 без тикър:
+# Seagate, Mastercard, Applied Materials, TSMC, On Holding, TJX). Без API ключ: до 10 задачи в заявка и 25 заявки в минута → пауза 2.5 s. Кешът е по CUSIP (data/), намереното се
+# опреснява след 90 дни, ненамереното — след 30; бюджет на run-а 60 s. Провал → тикърът по име, както досега; неразпознат → "без тикър" (не името на емитента като тикър).
+CUSIP_MAP_ENABLED = os.getenv("CUSIP_MAP_ENABLED", "1") == "1"
+CUSIP_MAP_CACHE_NAME = "cusip_map_cache.json"          # в config.DATA_DIR — пътят се смята при извикване (тестовете подменят DATA_DIR)
+CUSIP_MAP_URL = "https://api.openfigi.com/v3/mapping"
+CUSIP_MAP_BATCH = 10
+CUSIP_MAP_PAUSE_SEC = 2.5
+CUSIP_MAP_BUDGET_SEC = 60
+CUSIP_MAP_REFRESH_DAYS = 90
+CUSIP_MAP_NOTFOUND_DAYS = 30
 
 # ── COT (Commitments of Traders) ──────────────────────────────────────────
 ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"

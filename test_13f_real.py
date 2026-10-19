@@ -136,8 +136,8 @@ prev_rows = copy.deepcopy(r25)
 for x in prev_rows:
     if x["cusip"] in ("35909D109", "42806J700"): x["shares"] *= 0.8
 prev_rows = [x for x in prev_rows if x["cusip"] != "477143AP6"]
-c_rows = [{**x, "issuer": "LATE " + x["issuer"]} for x in r25]                                                                  # СИНТЕТИЧНО: други имена → други тикъри, за да не се слеят с A при дедупа
-c_prev = [{**x, "issuer": "LATE " + x["issuer"]} for x in prev_rows]
+c_rows = [{**x, "issuer": "LATE " + x["issuer"], "cusip": "Z" + x["cusip"][1:]} for x in r25]                                    # СИНТЕТИЧНО: други имена и CUSIP-и, за да не се слеят с A при дедупа
+c_prev = [{**x, "issuer": "LATE " + x["issuer"], "cusip": "Z" + x["cusip"][1:]} for x in prev_rows]                               # (19.10: неразпознатите се дедупликират по CUSIP)
 TABLES = {"a1": r25, "a0": prev_rows, "b1": r20, "b0": [], "c1": c_rows, "c0": c_prev,
           "d1": tab(XML25.replace("sshPrnamt", "sshPrnamtZZ")), "d0": prev_rows}
 dataroma._recent_13f_filings = lambda cik, n=2: FILINGS[cik]
