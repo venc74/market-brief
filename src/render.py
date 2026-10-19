@@ -164,6 +164,14 @@ def _watchlist_email_html(watchlist: list[dict]) -> str:
     return html
 
 
+def _futures_line(brief: dict) -> str | None:
+    try:
+        from src import macro_layer
+        return macro_layer.futures_quotes_line(((brief.get("macro") or {}).get("global_signals")))
+    except Exception:
+        return None
+
+
 def _e(x) -> str:
     """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
     return _html.escape("" if x is None else str(x), quote=True)
@@ -270,6 +278,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         regime_reason=brief["thermometer"]["regime_reason"],
         thermometer=brief["thermometer"],
         macro_brief=brief["ai_macro"]["macro_brief"],
+        futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         regime_comment=brief["ai_macro"].get("regime_comment", ""),
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         action=brief["action"],
@@ -587,6 +596,7 @@ def render_email(brief: dict) -> str:
 
   <tr><td style="padding:20px 28px;font-size:14px;color:#111827;line-height:1.6">
     {_e(brief['ai_macro']['macro_brief'])}
+    {(f'<div style="color:#6b7280;font-size:12px;margin-top:8px">{_e(_futures_line(brief))}</div>') if _futures_line(brief) else ""}
   </td></tr>
 
   <tr><td style="padding:0 28px 8px">

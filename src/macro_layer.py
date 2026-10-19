@@ -333,6 +333,30 @@ def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
 # сигналите, които са ДОХОДНОСТИ (ниво в %, промяна в базисни пунктове — не относителен %)
 _YIELD_SIGNALS = {"US10Y"}
 
+# 19.10.2026 (етап 2, доп. т. 9): кой фючърсен договор е "=F" символът днес. Yahoo сменя договора сам: CL=F в 07:30 на 16.10 вече беше декемврийският (CLZ26), а Reuters котира
+# ноемврийския (CLX26) — на 19.10 брифът показа $97.45 (дек., жива цена в нощната сесия) срещу $101.41 (ноем., затварянето в петък). Месецът и часът на цената се показват до нея.
+_MONTH_CODES = {c: i for i, c in enumerate("FGHJKMNQUVXZ", 1)}
+_BG_MONTHS = ("ян.", "февр.", "март", "апр.", "май", "юни", "юли", "авг.", "септ.", "окт.", "ноем.", "дек.")
+
+
+def futures_contract(info: dict | None) -> dict | None:
+    """yfinance .info на "=F" символ → {"contract": "CLZ26", "contract_month": "дек. 2026"} по underlyingSymbol ("CLZ26.NYM"); иначе None. Чиста функция."""
+    import re
+    sym = str((info or {}).get("underlyingSymbol") or "").split(".")[0].upper()
+    m = re.fullmatch(r"([A-Z]{1,3})([FGHJKMNQUVXZ])(\d{2})", sym)
+    if not m:
+        return None
+    month, year = _MONTH_CODES[m.group(2)], 2000 + int(m.group(3))
+    return {"contract": sym, "contract_month": f"{_BG_MONTHS[month - 1]} {year}"}
+
+
+def _price_time(info: dict | None) -> str | None:
+    """regularMarketTime (epoch) → ISO UTC — кога е цената (в 07:30 Берлин това е нощната сесия на Globex, не затварянето от вчера)."""
+    try:
+        return dt.datetime.fromtimestamp(int((info or {})["regularMarketTime"]), tz=dt.timezone.utc).isoformat(timespec="minutes")
+    except Exception:
+        return None
+
 
 def global_market_signals() -> dict:
     """
@@ -386,10 +410,44 @@ def global_market_signals() -> dict:
                 out[name] = {
                     "value": round(last, 2),
                     "chg_5d_pct": round((last / wk - 1) * 100, 2),
+                    "bar_date": hist.index[-1].date().isoformat(),
                 }
+                if symbol.endswith("=F"):                       # 19.10.2026: кой договор и кога е цената — отделно, без да сваля сигнала
+                    try:
+                        info = yf.Ticker(symbol).info
+                        out[name].update(futures_contract(info) or {})
+                        if _price_time(info):
+                            out[name]["price_time_utc"] = _price_time(info)
+                    except Exception as e:
+                        print(f"[macro] {name}: договорът не се прочете ({type(e).__name__}: {e})")
         except Exception as e:
             print(f"[macro] {name} failed: {e}")
     return out
+
+
+_FUT_LABELS = (("Oil_WTI", "WTI", 2), ("Gold", "злато", 0), ("Copper", "мед", 2))
+
+
+def futures_quotes_line(global_signals: dict | None) -> str | None:
+    """
+    19.10.2026: ред от кода под макро текста — фючърсите с договора и часа на цената: "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET". Без данни за договора → None.
+    """
+    from zoneinfo import ZoneInfo
+    parts = []
+    for key, label, nd in _FUT_LABELS:
+        g = (global_signals or {}).get(key) or {}
+        if not g.get("contract") or g.get("value") is None:
+            continue
+        t = ""
+        if g.get("price_time_utc"):
+            try:
+                et = dt.datetime.fromisoformat(g["price_time_utc"]).astimezone(ZoneInfo("America/New_York"))
+                t = f", цена от {et:%d.%m %H:%M} ET"
+            except ValueError:
+                t = ""
+        v = f"{g['value']:,.{nd}f}".replace(",", " ")                    # хиляди с интервал (българският запис)
+        parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}){t}")
+    return ("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): " + " · ".join(parts) + ".") if parts else None
 
 
 def collect_macro_layer() -> dict:

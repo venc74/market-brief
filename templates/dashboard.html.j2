@@ -609,6 +609,8 @@
   <div class="prose">{{ macro_brief }}
   {% if regime_comment %}<br><br><span style="color:var(--muted)">{{ regime_comment }}</span>{% endif %}
   </div>
+  {# 19.10.2026: договорът и часът на цената на фючърсите — от кода (CL=F в Yahoo вече е декемврийският, Reuters котира ноемврийския) #}
+  {% if futures_line %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">{{ futures_line }}</div>{% endif %}
 </section>
 
 {# 08.10: секцията остава и при празен списък (data/watch_list.json) — иначе изчезва мълчаливо и не личи дали е проверена #}
