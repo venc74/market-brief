@@ -826,9 +826,9 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
         if cur is None:
             best[key] = {**r, "managers": [r["manager"]], "count": 1, "_late_by": ({r["manager"]: r["late"]} if r.get("late") else {})}
         else:
-            cur["count"] += 1
             if r["manager"] not in cur["managers"]:
                 cur["managers"].append(r["manager"])
+            cur["count"] = len(cur["managers"])                  # 19.10.2026 (т. 17б): мениджъри, не редове — GOOGL беше "5 мениджъра" при 4 (два реда на един мениджър — два класа на Alphabet)
             if r.get("late"):
                 cur["_late_by"][r["manager"]] = r["late"]
             if (r.get("value") or 0) > (cur.get("value") or 0):
