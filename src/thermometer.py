@@ -750,7 +750,7 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
         reason = (f"{count_reason} — {'; '.join(parts)}; те сами биха "
                  f"форсирали само Defensive, но броенето вече е по-строго ({count_regime}).")
         exit_rule = (
-            f"Регимът в момента се определя от броенето ({count_reason}), не от "
+            f"Режимът в момента се определя от броенето ({count_reason}), не от "
             f"override-ите — те сами биха дали само Defensive. За подобрение трябва "
             f"ИЛИ броенето да падне под 3 червени, ИЛИ override-ите да паднат: "
             f"{override_exit_desc}.")
@@ -1151,7 +1151,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             exits.append(
                 f"седмичната делта (сега {move_ind.get('delta_1w'):+.1f} пункта) да е под "
                 f"+{config.MOVE_SPIKE_WEEKLY_DELTA:.0f} пункта два поредни дни (хистерезис — "
-                f"в момента {min(move_spike_streak, 2)}/2); без нов скок това става до около "
+                f"дни под прага: {min(move_spike_streak, 2)}/2); без нов скок това става до около "
                 "седмица — това е прозорецът, не непременно реално успокояване на стреса")
         # FIX 2026-10-02 (т.1 от прегледа на 02.10): текстът описва РЕАЛНОТО
         # състояние. Преди, при хистерезис (raw spike=False, ниво под 150), падаше
@@ -1171,7 +1171,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         else:
             move_text = (f"MOVE {move_val:.0f}: спайкът отшумява (делта "
                          f"{move_ind.get('delta_1w'):+.1f} пункта, под прага +"
-                         f"{config.MOVE_SPIKE_WEEKLY_DELTA:.0f}), хистерезис "
+                         f"{config.MOVE_SPIKE_WEEKLY_DELTA:.0f}), хистерезис — дни под прага: "
                          f"{min(move_spike_streak, 2)}/2 — override още активен, sizing −50%")
             move_state = "hysteresis"
         overrides.append({
@@ -1201,7 +1201,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         else:
             credit_text = (f"IEI/HYG: spike-ът отшумява ({credit_ind['roc_10d_pct']:+.1f}% за "
                            f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {_pct_ord(credit_ind['roc_percentile'])} percentile, "
-                           f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}.), хистерезис "
+                           f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}.), хистерезис — дни под прага: "
                            f"{min(credit_spike_streak, 2)}/2 — override още активен, sizing −50%")
             credit_state = "hysteresis"
         overrides.append({
@@ -1211,7 +1211,7 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             "exit_condition": (
                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}-дневната RoC percentile (сега "
                 f"{_pct_ord(credit_ind['roc_percentile'])}) да е под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}. "
-                f"percentile два поредни дни (хистерезис — в момента {min(credit_spike_streak, 2)}/2); "
+                f"percentile два поредни дни (хистерезис — дни под прага: {min(credit_spike_streak, 2)}/2); "
                 f"без нов скок това става до около {config.IEI_HYG_ROC_WINDOW_DAYS} дни — това е "
                 "прозорецът на изчислението, не непременно реално успокояване"),
         })

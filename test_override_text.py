@@ -59,7 +59,7 @@ assert by["MOVE"]["state"] == "hysteresis" and by["IEI/HYG"]["state"] == "active
 assert [o["trigger"] for o in t["overrides"]] == ["IEI/HYG", "MOVE"], "активният първо"
 assert t["regime_reason"].startswith("IEI/HYG credit spread spike (+1.2% за 10д, 96. percentile)")
 assert "> 150" not in t["regime_reason"] and "> 150" not in by["MOVE"]["text"], "невярно '> 150'"
-assert "спайкът отшумява (делта +3.5 пункта" in by["MOVE"]["text"] and "хистерезис 1/2" in by["MOVE"]["text"]
+assert "спайкът отшумява (делта +3.5 пункта" in by["MOVE"]["text"] and "хистерезис — дни под прага: 1/2" in by["MOVE"]["text"]
 assert t["regime_reason"].index("IEI/HYG") < t["regime_reason"].index("MOVE")
 print("  ✓ първо активният IEI/HYG (96. percentile), после MOVE в хистерезис 1/2, без '> 150'")
 print()
