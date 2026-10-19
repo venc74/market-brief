@@ -216,7 +216,9 @@ def take_snapshot() -> dict | None:
     with_oi = sum(1 for v in oi.values() if sum(v.values()) >= 50)
     # пакет 4б т.д: сурови ATM straddle-и около отчетите (падеж след и преди) за тикърите с отчет в следващите ~32 дни; провал → празно, снимката на OI не страда
     try:
-        straddles = earnings_move.snapshot_straddles(own, session, uo.yf)
+        # 19.10.2026 (етап 2, доп. т. 2): и за референтната кошница (веригите ѝ вече се теглят за OI), щом отчетът е в прозореца — AAPL беше в кошницата на 16.10 (оттам UOV✓
+        # на картата от 19.10), но без straddle → "тикърът не е в опционната снимка" на същата карта
+        straddles = earnings_move.snapshot_straddles(own + [t for t in reference if t not in own], session, uo.yf)
     except Exception as e:
         print(f"[oi_snapshot] straddle-ите за отчети пропуснати: {type(e).__name__}: {e}")
         straddles = {}

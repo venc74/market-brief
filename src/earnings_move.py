@@ -254,10 +254,17 @@ def annotate(cards: list[dict], today: dt.date | None = None, snapshot_loader=No
         missing = snap_why or "опционната снимка липсва"
     elif straddles is None:
         missing = "снимката още няма данни за отчети (стар формат)"
+    in_snap = set((snap or {}).get("tickers") or {}) | set((snap or {}).get("reference") or [])
+    sd = (snap or {}).get("session_date") or str(session or "")
     n = 0
     for c in due:
+        why = missing
+        if not why and c["ticker"] not in (straddles or {}):
+            # 19.10.2026 (етап 2, доп. т. 2): вярната причина — нова карта (не е била сред тикърите на снимката) ≠ тикър в снимката без straddle за отчета
+            why = (f"картата е нова — при снимката на {_dm(sd)} не беше сред кандидатите" if c["ticker"] not in in_snap and sd[:4].isdigit()
+                   else f"при снимката на {_dm(sd)} няма straddle за този отчет" if sd[:4].isdigit() else "")
         try:
-            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), missing)
+            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), why)
         except Exception as e:
             print(f"[earnings_move] {c.get('ticker')}: {type(e).__name__}: {e}")
             continue

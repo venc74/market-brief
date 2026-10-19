@@ -1,0 +1,390 @@
+{
+"_note": "РЕАЛНО: data/unusual_options_oi_snapshot.json от бот commit-а на 16.10 (2ac7303, 'oi snapshot: 2026-10-16') — снимката за сесия 16.10: session_date, имената в tickers (OI по падежи е махнат — не се ползва тук), reference (кошницата, 55) и straddles (14, само за нашите тикъри).",
+"session_date": "2026-10-16",
+"tickers": {
+"HUM": {},
+"PSX": {},
+"BBY": {},
+"LLY": {},
+"EBAY": {},
+"GAP": {},
+"FTNT": {},
+"DDOG": {},
+"ANET": {},
+"VLO": {},
+"DOCU": {},
+"INTC": {},
+"NVDA": {},
+"SPCX": {},
+"NKE": {},
+"T": {},
+"F": {},
+"PSKY": {},
+"BAC": {},
+"CRWV": {},
+"AAPL": {},
+"NFLX": {},
+"PCG": {},
+"AMZN": {},
+"SMCI": {},
+"TSLA": {},
+"CMCSA": {},
+"PFE": {},
+"MDT": {},
+"ORCL": {},
+"VZ": {},
+"MU": {},
+"CCL": {},
+"GOOGL": {},
+"PLTR": {},
+"AVGO": {},
+"RKLB": {},
+"MSFT": {},
+"WMT": {},
+"AMD": {},
+"MSTR": {},
+"META": {},
+"NCLH": {},
+"HPE": {},
+"HOOD": {},
+"KVUE": {},
+"MRVL": {},
+"CMG": {},
+"CSCO": {},
+"BSX": {},
+"NBIS": {},
+"MRNA": {},
+"GOOG": {},
+"BE": {},
+"KO": {},
+"UBER": {},
+"WFC": {},
+"KHC": {},
+"BMY": {},
+"HPQ": {},
+"SLB": {},
+"QCOM": {},
+"XOM": {},
+"KMI": {},
+"NEE": {},
+"ON": {}
+},
+"reference": [
+"INTC",
+"NVDA",
+"SPCX",
+"NKE",
+"T",
+"F",
+"PSKY",
+"BAC",
+"CRWV",
+"AAPL",
+"NFLX",
+"PCG",
+"AMZN",
+"SMCI",
+"TSLA",
+"CMCSA",
+"PFE",
+"MDT",
+"ORCL",
+"VZ",
+"MU",
+"CCL",
+"GOOGL",
+"PLTR",
+"AVGO",
+"RKLB",
+"MSFT",
+"WMT",
+"AMD",
+"MSTR",
+"META",
+"NCLH",
+"HPE",
+"HOOD",
+"KVUE",
+"MRVL",
+"CMG",
+"CSCO",
+"BSX",
+"NBIS",
+"MRNA",
+"GOOG",
+"BE",
+"KO",
+"UBER",
+"WFC",
+"KHC",
+"BMY",
+"HPQ",
+"SLB",
+"QCOM",
+"XOM",
+"KMI",
+"NEE",
+"ON"
+],
+"straddles": {
+"EXPD": {
+"earnings_date": "2026-11-03",
+"session": "2026-10-16",
+"spot": 198.91,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 200.0,
+"call_mid": 7.8,
+"call_spread_pct": 33.3,
+"put_mid": 6.8,
+"put_spread_pct": 32.4
+}
+},
+"ZBRA": {
+"earnings_date": "2026-11-03",
+"session": "2026-10-16",
+"spot": 375.56,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 380.0,
+"call_mid": 22.0,
+"call_spread_pct": 20.9,
+"put_mid": 22.8,
+"put_spread_pct": 23.7
+}
+},
+"HUM": {
+"earnings_date": "2026-11-06",
+"session": "2026-10-16",
+"spot": 421.18,
+"after": {
+"expiry": "2026-11-13",
+"sessions": 20,
+"strike": 420.0,
+"call_mid": 24.95,
+"call_spread_pct": 15.6,
+"put_mid": 20.5,
+"put_spread_pct": 21.5
+},
+"before": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 420.0,
+"call_mid": 15.6,
+"call_spread_pct": 23.1,
+"put_mid": 11.9,
+"put_spread_pct": 37.0
+}
+},
+"PSX": {
+"earnings_date": "2026-10-28",
+"session": "2026-10-16",
+"spot": 292.0,
+"after": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 290.0,
+"call_mid": 11.0,
+"call_spread_pct": 23.6,
+"put_mid": 10.5,
+"put_spread_pct": 24.8
+},
+"before": {
+"expiry": "2026-10-23",
+"sessions": 5,
+"strike": 292.5,
+"call_mid": 6.95,
+"call_spread_pct": 30.2,
+"put_mid": 8.55,
+"put_spread_pct": 40.9
+}
+},
+"AMG": {
+"earnings_date": "2026-11-02",
+"session": "2026-10-16",
+"spot": 386.52,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 380.0,
+"call_mid": 22.85,
+"call_spread_pct": 17.1,
+"put_mid": 37.4,
+"put_spread_pct": 10.2
+}
+},
+"THC": {
+"earnings_date": "2026-10-29",
+"session": "2026-10-16",
+"spot": 272.63,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 270.0,
+"call_mid": 19.9,
+"call_spread_pct": 9.0,
+"put_mid": 13.9,
+"put_spread_pct": 21.6
+}
+},
+"LLY": {
+"earnings_date": "2026-10-29",
+"session": "2026-10-16",
+"spot": 1262.62,
+"after": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 1265.0,
+"call_mid": 49.35,
+"call_spread_pct": 16.8,
+"put_mid": 51.45,
+"put_spread_pct": 21.4
+},
+"before": {
+"expiry": "2026-10-23",
+"sessions": 5,
+"strike": 1265.0,
+"call_mid": 22.325,
+"call_spread_pct": 22.2,
+"put_mid": 24.875,
+"put_spread_pct": 23.1
+}
+},
+"EBAY": {
+"earnings_date": "2026-10-28",
+"session": "2026-10-16",
+"spot": 121.93,
+"after": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 122.0,
+"call_mid": 6.225,
+"call_spread_pct": 23.3,
+"put_mid": 4.45,
+"put_spread_pct": 42.7
+},
+"before": {
+"expiry": "2026-10-23",
+"sessions": 5,
+"strike": 121.0,
+"call_mid": 3.975,
+"call_spread_pct": 23.9,
+"put_mid": 1.295,
+"put_spread_pct": 39.4
+}
+},
+"FTNT": {
+"earnings_date": "2026-10-28",
+"session": "2026-10-16",
+"spot": 174.88,
+"after": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 175.0,
+"call_mid": 9.525,
+"call_spread_pct": 10.0,
+"put_mid": 11.175,
+"put_spread_pct": 21.0
+},
+"before": {
+"expiry": "2026-10-23",
+"sessions": 5,
+"strike": 175.0,
+"call_mid": 3.45,
+"call_spread_pct": 37.7,
+"put_mid": 4.925,
+"put_spread_pct": 27.4
+}
+},
+"DDOG": {
+"earnings_date": "2026-11-05",
+"session": "2026-10-16",
+"spot": 253.47,
+"after": {
+"expiry": "2026-11-06",
+"sessions": 15,
+"strike": 255.0,
+"call_mid": 19.8,
+"call_spread_pct": 23.7,
+"put_mid": 20.55,
+"put_spread_pct": 23.4
+},
+"before": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 255.0,
+"call_mid": 11.75,
+"call_spread_pct": 35.7,
+"put_mid": 13.35,
+"put_spread_pct": 24.7
+}
+},
+"CORT": {
+"earnings_date": "2026-11-04",
+"session": "2026-10-16",
+"spot": 110.74,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 110.0,
+"call_mid": 9.9,
+"call_spread_pct": 26.3,
+"put_mid": 7.6,
+"put_spread_pct": 34.2
+}
+},
+"SN": {
+"earnings_date": "2026-11-04",
+"session": "2026-10-16",
+"spot": 191.92,
+"after": {
+"expiry": "2026-11-20",
+"sessions": 25,
+"strike": 190.0,
+"call_mid": 16.3,
+"call_spread_pct": 17.2,
+"put_mid": 11.5,
+"put_spread_pct": 20.9
+}
+},
+"ANET": {
+"earnings_date": "2026-11-03",
+"session": "2026-10-16",
+"spot": 182.68,
+"after": {
+"expiry": "2026-11-06",
+"sessions": 15,
+"strike": 185.0,
+"call_mid": 10.025,
+"call_spread_pct": 20.4,
+"put_mid": 12.525,
+"put_spread_pct": 16.4
+},
+"before": {
+"expiry": "2026-10-30",
+"sessions": 10,
+"strike": 185.0,
+"call_mid": 5.6,
+"call_spread_pct": 12.5,
+"put_mid": 8.975,
+"put_spread_pct": 15.0
+}
+},
+"VLO": {
+"earnings_date": "2026-10-22",
+"session": "2026-10-16",
+"spot": 445.12,
+"after": {
+"expiry": "2026-10-23",
+"sessions": 5,
+"strike": 445.0,
+"call_mid": 13.1,
+"call_spread_pct": 15.3,
+"put_mid": 16.75,
+"put_spread_pct": 16.1
+}
+}
+}
+}

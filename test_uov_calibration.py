@@ -201,6 +201,6 @@ with contextlib.redirect_stdout(io.StringIO()):
 oi_snapshot.dt = orig_dt
 assert snap["session_date"] == SESSION and snap["horizon_days"] == 28
 assert snap["reference"] == [t for t in BASKET if t in snap["tickers"]] and len(snap["reference"]) == 59 and "AAA" in snap["tickers"] and "AAA" not in snap["reference"]
-assert seen["straddle_tickers"] == ["PLTR", "AAA"], seen
-print("  ✓ снимката: нашите тикъри (PLTR, AAA) + кошницата от 60 (59 с вериги) → snap['reference'] = 59 тикъра; straddle-ите за отчети са поискани САМО за PLTR и AAA")
+assert seen["straddle_tickers"] == ["PLTR", "AAA"] + [x for x in list(BASKET)[:60] if x not in ("PLTR", "AAA")], seen       # 19.10.2026 (етап 2, доп. т. 2): и кошницата
+print("  ✓ снимката: нашите тикъри (PLTR, AAA) + кошницата от 60 (59 с вериги) → snap['reference'] = 59 тикъра; straddle-ите за отчети — за нашите И за кошницата (от 19.10; дотогава само за нашите)")
 print("\n✅ test_uov_calibration: всичко мина")
