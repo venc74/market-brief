@@ -44,7 +44,6 @@ jobs:
           # Махни този ред, за да се върне автоматичният избор.
           CLAUDE_MODEL: claude-sonnet-4-6
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          NASDAQ_API_KEY: ${{ secrets.NASDAQ_API_KEY }}
           EDGAR_UA: ${{ secrets.EDGAR_UA }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}

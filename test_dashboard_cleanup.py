@@ -11,7 +11,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
-from src import render, thermometer, enrich, ai_brief, borrow_data
+from src import render, thermometer, enrich, ai_brief
 
 
 def render_brief(**over):
@@ -64,7 +64,8 @@ if __name__ == "__main__":
     # enrich() не вика опции и не слага "options" на реда
     enrich.earnings_info = lambda sym: {"next_earnings": None, "days_to_earnings": None, "in_blackout": False}
     enrich._build_crosscheck_sets = lambda tickers: {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
-    borrow_data.borrow_info = lambda sym: (_ for _ in ()).throw(AssertionError("borrow не се тегли за кандидатите (пакет 4б т.ж)"))
+    assert not (ROOT / "src" / "borrow_data.py").exists() and not any("import" in l and "borrow_data" in l for f in (ROOT / "src").glob("*.py")
+                                                                       for l in f.read_text(encoding="utf-8").splitlines())    # 19.10: модулът е махнат (т. 19)
     row = {"ticker": "ABCD", "price": 100.0}
     out = enrich.enrich([row])[0]
     assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and "borrow" not in out and "borrow" not in out["short_view"]

@@ -491,8 +491,8 @@ def enrich(candidates: list[dict]) -> list[dict]:
         row["earnings"] = earnings_info(sym)
         row["short_view"] = short_interest_view(row)
 
-        # пакет 4б т.ж (06.10.2026): borrow rate вече не се тегли за кандидатите и не се показва върху картите (дълги swing позиции) — модулът
-        # src/borrow_data.py остава непипнат
+        # пакет 4б т.ж (06.10.2026): borrow rate вече не се тегли за кандидатите и не се показва върху картите (дълги swing позиции); src/borrow_data.py
+        # (без нито един вик оттогава) е махнат на 19.10.2026 (трети преглед, т. 19)
 
         # 3.1 / 3.3 / 3.4 convergence маркери
         _apply_markers(row, sets)
