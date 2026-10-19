@@ -413,13 +413,22 @@ def global_market_signals() -> dict:
                     "bar_date": hist.index[-1].date().isoformat(),
                 }
                 if symbol.endswith("=F"):                       # 19.10.2026: кой договор и кога е цената — отделно, без да сваля сигнала
+                    out[name]["chg_5d_basis"] = "continuous"
                     try:
                         info = yf.Ticker(symbol).info
                         out[name].update(futures_contract(info) or {})
                         if _price_time(info):
                             out[name]["price_time_utc"] = _price_time(info)
+                        # 19.10.2026 (етап 2, т. 4): 5-дневната промяна по СЪЩИЯ договор — "=F" е спойка: на 19.10 CL=F (дек.) срещу CL=F отпреди седмица (ноем.) даде +3.96%,
+                        # по декемврийския договор е +4.9%. Без серията на договора — по непрекъснатия символ, изрично отбелязано (chg_5d_basis "continuous").
+                        und = str(info.get("underlyingSymbol") or "")
+                        if und:
+                            ch = yf.Ticker(und).history(period="1mo")
+                            if len(ch) >= 6 and not _is_stale(ch.index[-1]):
+                                l2, w2, _ = last_and_week_ago(ch["Close"])
+                                out[name].update(chg_5d_pct=round((l2 / w2 - 1) * 100, 2), chg_5d_basis="contract")
                     except Exception as e:
-                        print(f"[macro] {name}: договорът не се прочете ({type(e).__name__}: {e})")
+                        print(f"[macro] {name}: договорът не се прочете ({type(e).__name__}: {e}) — 5-дневната промяна е по непрекъснатия символ")
         except Exception as e:
             print(f"[macro] {name} failed: {e}")
     return out
@@ -446,7 +455,11 @@ def futures_quotes_line(global_signals: dict | None) -> str | None:
             except ValueError:
                 t = ""
         v = f"{g['value']:,.{nd}f}".replace(",", " ")                    # хиляди с интервал (българският запис)
-        parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}){t}")
+        chg = g.get("chg_5d_pct")
+        five = ("" if not isinstance(chg, (int, float)) else
+                f", {chg:+.1f}% за 5 дни по същия договор" if g.get("chg_5d_basis") == "contract" else
+                f", {chg:+.1f}% за 5 дни по непрекъснатия символ (може да смесва договори)")
+        parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}){t}{five}")
     return ("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): " + " · ".join(parts) + ".") if parts else None
 
 

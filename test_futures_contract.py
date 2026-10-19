@@ -2,6 +2,7 @@
 19.10.2026 · етап 2, доп. т. 9 (WTI — проверка + етикет): кой договор дава Yahoo "CL=F" и кога е цената. CL=F е спойка: дневният ред за 16.10 е 101.41 = CLX26 (ноем.), а за 19.10 —
 CLZ26 (дек.); в 07:30 Берлин брифът чете ЖИВАТА цена от нощната сесия (19.10: $97.45, декемврийският), а Reuters цитира затварянето на ноемврийския ($101.41 в петък). Сега до цената:
 месецът на договора и часът ("WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET") — ред от кода под макро текста и на страницата, и в имейла.
+Т. 4 (отговорите от 19.10): 5-дневната промяна е по СЪЩИЯ договор (CLZ26: +4.76%, а CL=F смесва дек. и ноем.: +3.78%); без серията на договора — изрично "по непрекъснатия символ".
 
 РЕАЛНО: tests/fixtures/yahoo_futures_2026-10-19.json — .info и дневните Close на CL=F, GC=F, HG=F, CLX26.NYM, CLZ26.NYM (yfinance, 19.10.2026 следобед);
 tests/fixtures/brief_2026-10-19.json — global_signals от брифа (Oil_WTI 97.45). СИНТЕТИЧНО (маркирано): подмененият yf.Ticker, часът на цената за брифа (01:30 ET).
@@ -49,7 +50,11 @@ finally:
     ml.yf.Ticker, ml._is_stale = real_tk, real_stale
 assert g["Oil_WTI"]["contract"] == "CLZ26" and g["Oil_WTI"]["contract_month"] == "дек. 2026" and g["Oil_WTI"]["bar_date"] == "2026-10-19" and g["Oil_WTI"]["price_time_utc"].startswith("2026-10-19")
 assert g["Gold"]["contract"] == "GCZ26" and "DXY" not in g                                                             # без данни за DXY в fixture-а — пропуснат, без срив
-print(f"  ✓ Oil_WTI: {g['Oil_WTI']['value']} — CLZ26 / дек. 2026, бар {g['Oil_WTI']['bar_date']}, цена {g['Oil_WTI']['price_time_utc']}")
+dz = dict(zip(FX["daily"]["CLZ26.NYM"]["dates"], FX["daily"]["CLZ26.NYM"]["close"])); dc = dict(zip(FX["daily"]["CL=F"]["dates"], FX["daily"]["CL=F"]["close"]))
+assert g["Oil_WTI"]["chg_5d_basis"] == "contract" and g["Oil_WTI"]["chg_5d_pct"] == round((dz["2026-10-19"] / dz["2026-10-12"] - 1) * 100, 2) == 4.76      # т. 4: по CLZ26
+assert round((dc["2026-10-19"] / dc["2026-10-12"] - 1) * 100, 2) == 3.78                                                # по CL=F (дек. срещу ноем.) — смесено
+assert g["Gold"]["chg_5d_basis"] == "continuous"                                                                         # без серия на GCZ26 във fixture-а → изрично "непрекъснат"
+print(f"  ✓ Oil_WTI: {g['Oil_WTI']['value']} — CLZ26 / дек. 2026, бар {g['Oil_WTI']['bar_date']}, цена {g['Oil_WTI']['price_time_utc']}; 5 дни по CLZ26 +4.76% (по CL=F смесено +3.78%)")
 
 print()
 print("── 3. редът под макро текста (РЕАЛНИЯТ бриф от 19.10 + договорът; часът 01:30 ET е СИНТЕТИЧЕН) ──")
@@ -59,7 +64,10 @@ assert gs["Oil_WTI"]["value"] == 97.45
 gs["Oil_WTI"].update(contract="CLZ26", contract_month="дек. 2026", price_time_utc="2026-10-19T05:30+00:00")
 gs["Gold"].update(contract="GCZ26", contract_month="дек. 2026")
 line = ml.futures_quotes_line(gs)
-assert line.startswith("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET · злато $4 197 — дек. 2026 (GCZ26)")
+assert line.startswith("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET, +4.0% за 5 дни по непрекъснатия символ "
+                       "(може да смесва договори) · злато $4 197 — дек. 2026 (GCZ26)")                                  # брифът от 19.10 е без chg_5d_basis
+gs["Oil_WTI"].update(chg_5d_pct=4.76, chg_5d_basis="contract")
+assert "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET, +4.8% за 5 дни по същия договор" in ml.futures_quotes_line(gs)
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 assert "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET" in flat(render.render_dashboard(copy.deepcopy(b)))
 assert "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET" in flat(render.render_email(b))
