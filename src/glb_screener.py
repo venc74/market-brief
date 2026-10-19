@@ -437,6 +437,14 @@ def replay_state(replays: dict[str, dict]) -> tuple[dict, list[dict], dict]:
     return events, rows, ch
 
 
+def _complete_bars(df, today: str):
+    """Баровете с дата < today (днешният бар при повторен run в хода на сесията е частичен — както wish_signal и trade_sim.complete_bars)."""
+    if df is None or not len(df) or not today:
+        return df
+    idx = df.index.tz_localize(None) if getattr(df.index, "tz", None) is not None else df.index
+    return df[idx < pd.Timestamp(today)]
+
+
 def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=None, today: str | None = None) -> list[dict]:
     """
     Главна входна точка. universe=None -> reuse-ва screener.build_universe()
@@ -480,6 +488,7 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
             try:
                 df = (data[sym] if len(batch) > 1 else data).dropna(
                     subset=["Close", "High", "Low"])
+                df = _complete_bars(df, today)                       # 19.10.2026 (С1): картите и наблюденията — без частичния бар на днешната сесия
                 with_history += bool(len(df))
                 if config.TRACK_GLB_WISH:
                     w = wish_signal(df, today)                       # книгата "GLB по Уиш": сигналът върху същите цени като картите

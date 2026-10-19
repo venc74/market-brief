@@ -429,6 +429,8 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
             print(f"[backtest] snapshot {path.name} нечетим, пропускам: {e}")
             continue
         entry_date = snap.get("date") or path.stem
+        if today_date and str(entry_date)[:10] == str(today_date)[:10]:
+            continue                # 19.10.2026 (С2): днешният snapshot е от ПО-РАННИЯ run в същия ден (22.06: 5 run-а, всеки с различни Action) — днешните карти са in-memory по-долу
         _ingest_action_list(tracker, entry_date, snap.get("action", []))
         # пакет 1б: Watchlist картите със заснет plan_preview (по-старите snapshot-и нямат такъв → не влизат); чисто временно правило —
         # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action

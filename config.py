@@ -410,6 +410,10 @@ RS_LINE_STATE_FILE = DATA_DIR / "screener_rs_state.json"          # състоя
 DOCS_DIR = ROOT / "docs"
 QM_EP_LOG_FILE = DATA_DIR / "ep_ah_log.json"       # пакет QM: after-hours гапът срещу реалния гап на отварянето — за решение след 4–6 седмици дали си струва второ пускане
 PUTCALL_HISTORY_FILE = DATA_DIR / "put_call_history.json"
+# 19.10.2026 (трети преглед, т. 13): повторен run в същия ден не праща втори имейл (22.06.2026: 5 run-а — 05:36 … 19:02 UTC, пет имейла с различни Action списъци).
+# Записът е след УСПЕШНО изпращане; FORCE_EMAIL=1 праща въпреки него (ръчно пускане, когато имейлът наистина трябва да излезе отново).
+EMAIL_STATE_FILE = DATA_DIR / "email_state.json"
+FORCE_EMAIL = os.getenv("FORCE_EMAIL", "0") == "1"
 
 # ── Секторни ETF-и за ротационен анализ (Слой 2) ─────────────────────────
 SECTOR_ETFS = {

@@ -61,7 +61,7 @@ tr = {}
 backtest._ingest_buystop_list(tr, "2026-10-05", [c], "Defensive")
 backtest._save_tracker(tr)
 tr = backtest._load_tracker()
-backtest._resolve_open_positions(tr, D("2026-10-06"))
+backtest._resolve_open_positions(tr, D("2026-10-07"))             # run-ът на 07.10 вижда бара от 06.10 (С1, 19.10: барът на деня на run-а не е завършен и се реже)
 backtest._save_tracker(tr)
 rec = backtest._load_tracker()["EXPD_2026-10-05_buystop"]
 assert (rec["status"], rec["fill_date"], rec["fill_price"], rec["stop_loss"], rec["target_1"], rec["current_r"]) == ("open", "2026-10-05", 194.59, 181.53, 220.71, -0.21)

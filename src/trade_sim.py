@@ -59,8 +59,22 @@ def _as_date(d) -> dt.date:
     return dt.date.fromisoformat(str(d)[:10])
 
 
+def complete_bars(bars: pd.DataFrame | None, today=None) -> pd.DataFrame | None:
+    """
+    19.10.2026 (трети преглед, С1): баровете с дата >= today не са завършени сесии — брифът е преди отварянето, а повторен run в хода на деня получава ЧАСТИЧЕН бар за днес
+    (19.10 в 18:55 UTC: SPY с обем 22 млн при 64 млн на 16.10). Без today (реплеят) — баровете както са.
+    """
+    if bars is None or today is None or len(bars) == 0:
+        return bars
+    idx = pd.DatetimeIndex(bars.index)
+    if idx.tz is not None:
+        idx = idx.tz_localize(None)
+    return bars[idx < pd.Timestamp(_as_date(today))]
+
+
 def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
     out = _blank()
+    bars = complete_bars(bars, today)
     if bars is None or len(bars) == 0:
         return out
     idx = pd.DatetimeIndex(bars.index)
@@ -234,6 +248,7 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     trailing_stop_exit|expired; за живи — current_r (mark-to-market), за затворени — realized_r / realized_r_pess.
     """
     out = _blank_qm()
+    bars = complete_bars(bars, today)                        # С1: без частичния днешен бар
     if bars is None or len(bars) == 0:
         return out
     idx = pd.DatetimeIndex(bars.index)
@@ -361,6 +376,7 @@ def simulate_glb_wish(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     Статуси: pending (сигналният бар още не е в данните) | open | line_exit | expired | invalid_signal (няма бар за деня или close не е над линията).
     """
     out = _blank_gw()
+    bars = complete_bars(bars, today)                        # С1: без частичния днешен бар
     if bars is None or len(bars) == 0:
         return out
     idx = pd.DatetimeIndex(bars.index)

@@ -53,7 +53,7 @@ from src import watch_monitor
 from src import model_selector
 from src import thesis_context
 from src.render import render_dashboard, render_email
-from src.emailer import send_brief
+from src.emailer import send_brief, send_once
 
 
 def _live_positions() -> dict[str, dict]:
@@ -1104,7 +1104,7 @@ def run() -> dict:
     email_html = render_email(brief)
     subject = (f"[{thermo['regime']}] AI Бриф {dt.date.today().strftime('%d.%m')} · "
                f"{len(action)} Action: {', '.join(a['ticker'] for a in action) or '—'}")
-    send_brief(email_html, subject)
+    send_once(email_html, subject, today)                 # 19.10.2026 (т. 13): повторен run в същия ден не праща втори имейл
 
     print("═══ Готово ═══")
     return brief

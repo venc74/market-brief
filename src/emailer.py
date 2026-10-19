@@ -3,6 +3,8 @@
 зависимости) или SendGrid API (free tier, 100 имейла/ден).
 """
 from __future__ import annotations
+import datetime as dt
+import json
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -12,6 +14,39 @@ import requests
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+
+
+def sent_on(day: str) -> dict | None:
+    """19.10.2026 (т. 13): записът за изпратения имейл, ако е за деня `day` (ISO), иначе None. Нечетим файл → None (по-добре втори имейл, отколкото никакъв)."""
+    try:
+        st = json.loads(config.EMAIL_STATE_FILE.read_text(encoding="utf-8"))
+        return st if isinstance(st, dict) and st.get("date") == day else None
+    except Exception:
+        return None
+
+
+def mark_sent(day: str, subject: str) -> None:
+    try:
+        config.EMAIL_STATE_FILE.parent.mkdir(exist_ok=True)
+        config.EMAIL_STATE_FILE.write_text(json.dumps({"date": day, "at_utc": dt.datetime.now(dt.timezone.utc).strftime("%H:%M"), "subject": subject},
+                                                      ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        print(f"[email] записът за изпратения имейл не се записа: {e}")
+
+
+def send_once(html: str, subject: str, day: str) -> dict:
+    """
+    Един имейл на ден на брифа. Вече изпратен днес (и не FORCE_EMAIL) → не праща, ред в лога. Връща {"sent": bool, "skipped": причина | None}.
+    """
+    prev = sent_on(day)
+    if prev and not config.FORCE_EMAIL:
+        why = f"имейлът за {day} вече е изпратен в {prev.get('at_utc', '?')} UTC — повторен run в същия ден, втори не се праща (FORCE_EMAIL=1 за изрично)"
+        print(f"[email] {why}")
+        return {"sent": False, "skipped": why}
+    ok = send_brief(html, subject)
+    if ok:
+        mark_sent(day, subject)
+    return {"sent": bool(ok), "skipped": None}
 
 
 def send_brief(html: str, subject: str) -> bool:
