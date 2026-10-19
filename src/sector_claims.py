@@ -141,3 +141,85 @@ def clean(text: str, f: dict, default_etf: str | None = None) -> tuple[str, list
     for p in sorted(probs, key=lambda x: x["start"], reverse=True):
         new = new[:p["start"]] + p["replacement"] + new[p["end"]:]
     return new, probs
+
+
+# ── 19.10.2026 (трети преглед, т. 18): секторната карта от КОДА ─────────────────────────────────────────────────────────────────────────────────────────
+# Изборът кои сектори са на картата е на кода (водещите: RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх — същото правило като sector_layer.leading_sectors,
+# до 6), не на модела: в 394 реда на картата (89 брифа) 132 бяха сектори, които кодът не смята за водещи (19.10: GDX с RS −8.33% за 4 седмици), а 26 пъти водещ липсваше.
+# Веригата (chain) е на модела — показва се само за водещ сектор; моделът е върнал верига и за неводещ → един ред под картата. Хоризонтът — форматиран от кода
+# (16.10: моделът върна [4, 12], [4], [12] — прозорците на RS, не хоризонт). Сурови имена на полета в прозата (rs_chg_4w_pct, laggard_persistence_pct …) → думи.
+_FIELD_WORDS = [
+    (re.compile(r"\brs_at_6m_high\s*[=:]\s*false\b", re.I), "RS не е на 6-месечен връх"),
+    (re.compile(r"\brs_at_6m_high\s*[=:]\s*true\b", re.I), "RS е на 6-месечен връх"),
+    (re.compile(r"\brs_at_6m_high\b", re.I), "6-месечният връх по RS"),
+    (re.compile(r"\bconfirmed_laggard\s*[=:]\s*true\b", re.I), "потвърдено изоставащ"),
+    (re.compile(r"\bconfirmed_laggard\s*[=:]\s*false\b", re.I), "не е потвърдено изоставащ"),
+    (re.compile(r"\bconfirmed_laggard\b", re.I), "потвърденото изоставане"),
+    (re.compile(r"\bleading\s*[=:]\s*true\b", re.I), "водещ"),
+    (re.compile(r"\bleading\s*[=:]\s*false\b", re.I), "не е водещ"),
+    (re.compile(r"\brs_chg_4w(?:_pct)?\b", re.I), "RS за 4 седмици"),
+    (re.compile(r"\brs_chg_12w(?:_pct)?\b", re.I), "RS за 12 седмици"),
+    (re.compile(r"\babs_chg_4w(?:_pct)?\b", re.I), "абсолютната промяна за 4 седмици"),
+    (re.compile(r"\blaggard_persistence(?:_pct)?\b", re.I), "дял на изоставането (12 седмици)"),
+    (re.compile(r"\bsizing_factor\b", re.I), "режимният фактор"),
+    (re.compile(r"\blevel_percentile\b", re.I), "перцентилът на нивото"),
+    (re.compile(r"\broc_percentile\b", re.I), "перцентилът на RoC"),
+    (re.compile(r"\bavg_recent\b", re.I), "средното за последните месеци"),
+    (re.compile(r"\bavg_prior\b", re.I), "средното за предишните"),
+]
+
+
+def field_words(text: str) -> str:
+    """Сурови имена на полета от данните в прозата на модела → думи (само показване)."""
+    out = text or ""
+    for rx, word in _FIELD_WORDS:
+        out = rx.sub(word, out)
+    return out
+
+
+def horizon_text(h) -> str:
+    """horizon_weeks на модела → текст: 4 → "4 седмици"; [4, 12] → "4–12 седмици"; "2-6" → "2–6 седмици"; друго / празно → ""."""
+    try:
+        if isinstance(h, bool):
+            return ""
+        if isinstance(h, (int, float)):
+            return f"{int(h)} седмици" if h > 0 else ""
+        if isinstance(h, (list, tuple)):
+            xs = sorted({int(x) for x in h if isinstance(x, (int, float)) and not isinstance(x, bool) and x > 0})
+            return "" if not xs else f"{xs[0]} седмици" if len(xs) == 1 else f"{xs[0]}–{xs[-1]} седмици"
+        m = re.fullmatch(r"\s*(\d+)\s*(?:[-–]\s*(\d+))?\s*(?:седм\w*|w\w*)?\s*", str(h))
+        if m:
+            return f"{m.group(1)} седмици" if not m.group(2) else f"{m.group(1)}–{m.group(2)} седмици"
+    except Exception:
+        pass
+    return ""
+
+
+def _rs_line(r: dict) -> str:
+    f = lambda v: f"{v:+.2f}%" if isinstance(v, (int, float)) else "н/д"
+    s = f"RS спрямо SPY: 4 седмици {f(r.get('rs_chg_4w_pct'))}, 12 седмици {f(r.get('rs_chg_12w_pct'))}"
+    return s + (" · RS на 6-месечен връх" if r.get("rs_at_6m_high") is True else "")
+
+
+def sector_card(sector_logic: list[dict] | None, rotation: list[dict] | None, top_n: int = 6) -> dict:
+    """
+    {"rows": [{etf, sector, rs_line, chain, horizon}], "omitted": [{etf, sector, rs_line}]} или {} без ротация (старият бриф — шаблонът показва веригите на модела).
+    rows — водещите по кода в реда на ротацията; omitted — сектори с верига от модела, които не са водещи.
+    """
+    rows = [r for r in (rotation or []) if isinstance(r, dict) and r.get("etf")]
+    if not rows:
+        return {}
+    leaders = [r for r in rows if r.get("leading") or r.get("rs_at_6m_high") is True][:top_n]
+    ai = {str(x.get("etf")): x for x in (sector_logic or []) if isinstance(x, dict) and x.get("etf")}
+    by_etf = {r["etf"]: r for r in rows}
+    out = {"rows": [], "omitted": []}
+    for r in leaders:
+        x = ai.get(r["etf"]) or {}
+        out["rows"].append({"etf": r["etf"], "sector": r.get("sector") or x.get("sector") or r["etf"], "rs_line": _rs_line(r),
+                            "chain": field_words(x.get("chain") or ""), "horizon": horizon_text(x.get("horizon_weeks"))})
+    lead = {r["etf"] for r in leaders}
+    for etf, x in ai.items():
+        if etf not in lead:
+            r = by_etf.get(etf) or {}
+            out["omitted"].append({"etf": etf, "sector": r.get("sector") or x.get("sector") or etf, "rs_line": _rs_line(r) if r else "няма го в ротацията"})
+    return out

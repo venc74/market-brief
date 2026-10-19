@@ -673,6 +673,25 @@
 <section>
   <h2>Секторна карта · следващите 2–6 седмици</h2>
   <div class="sectors">
+    {% if sector_card and sector_card.rows is defined %}
+    {# 19.10.2026 (т. 18): секторите — водещите по кода (RS > 0 на 4 и 12 седмици или RS на 6-месечен връх); веригата — на модела #}
+    {% for s in sector_card.rows %}
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">{{ s.sector }}</div>
+        <div class="sector-etf">{{ s.etf }}</div>
+      </div>
+      <div>
+        <div class="sector-chain">{% if s.chain %}{{ s.chain }}{% else %}<span style="color:var(--muted)">AI не даде верига за този сектор днес.</span>{% endif %}</div>
+        <div class="sector-meta">{{ s.rs_line }}{% if s.horizon %} · хоризонт (AI): {{ s.horizon }}{% endif %}</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="small" style="color:var(--muted)">Няма водещ сектор по RS днес (RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх).</div>
+    {% endfor %}
+    {% if sector_card.omitted %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Не са на картата (AI даде верига, но не са водещи по RS):
+      {% for o in sector_card.omitted %}{{ o.etf }} ({{ o.rs_line|replace("RS спрямо SPY: ", "") }}){{ "; " if not loop.last else "." }}{% endfor %}</div>{% endif %}
+    {% else %}
     {% for s in sector_logic %}
     <div class="sector-row">
       <div>
@@ -680,11 +699,12 @@
         <div class="sector-etf">{{ s.etf }}</div>
       </div>
       <div>
-        <div class="sector-chain">{{ s.chain }}</div>
-        <div class="sector-meta">Хоризонт: {{ s.horizon_weeks }} седмици</div>
+        <div class="sector-chain">{{ s.chain|field_words }}</div>
+        {% if s.horizon_weeks|horizon_text %}<div class="sector-meta">Хоризонт: {{ s.horizon_weeks|horizon_text }}</div>{% endif %}
       </div>
     </div>
     {% endfor %}
+    {% endif %}
   </div>
 </section>
 

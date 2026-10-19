@@ -25,6 +25,7 @@ from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import ai_brief
+from src import sector_claims
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
 from src import correlation_check
@@ -1023,11 +1024,17 @@ def run() -> dict:
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
+    try:
+        sector_card = sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation)
+    except Exception as e:
+        print(f"[main] секторната карта от кода пропусната ({type(e).__name__}: {e}) — шаблонът показва веригите на модела")
+        sector_card = {}
     brief = {
         "date": today,
         "macro": macro,
         "thermometer": thermo,
         "rotation": rotation,
+        "sector_card": sector_card,                                     # 19.10.2026 (т. 18): секторите на картата — от кода, веригите — от модела
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                                cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,

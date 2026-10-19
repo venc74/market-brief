@@ -821,6 +821,12 @@ def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
     return out
 
 
+def _leaders_text(rotation: list[dict] | None) -> str:
+    """19.10.2026 (т. 18): водещите сектори по кода (правилото на sector_layer.leading_sectors, до 6) — за промпта; без такива — изрично."""
+    xs = [r.get("etf") for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and (r.get("leading") or r.get("rs_at_6m_high") is True)][:6]
+    return ", ".join(xs) if xs else "няма водещ сектор днес — върни \"sector_logic\": []"
+
+
 def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
                                thermometer: dict, news: list[dict] | None = None) -> dict:
     """
@@ -905,7 +911,10 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 днешната сесия. Конкретика, не общи приказки.
 2. "sector_logic": за топ 3-5 сектора с положителна динамика — пълната верижна \
 логика (макро събитие → механизъм → сектор), както изисква спекът: документирай \
-веригата, не само заключението. Поле "chain" за всяка.
+веригата, не само заключението. Поле "chain" за всяка. Секторите са САМО водещите по \
+кода (RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх): {_leaders_text(rotation)} — картата показва само тях. \
+"horizon_weeks" е ЕДНО число от 2 до 6 (хоризонтът на картата), не прозорците на RS. В "chain" пиши с думи, не с имената \
+на полетата (не "rs_chg_4w_pct", а "RS за 4 седмици"; не "laggard_persistence_pct", а "дял на изоставането").
 3. "regime_comment": провери дали режимът {thermometer.get('regime')} е оправдан \
 от данните. Ако индикатори липсват, са скрити или съдържат невалидни стойности \
 (null/nan), кажи го изрично и оцени как това променя увереността в режима. НЕ \

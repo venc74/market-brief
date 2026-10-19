@@ -14,6 +14,7 @@ from src import names
 from src import watchlist_exits
 from src import cot_theses
 from src import setup_rules
+from src import sector_claims
 
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
                "петък", "събота", "неделя"]
@@ -27,6 +28,8 @@ WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четв
 env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
                   autoescape=True)
 env.filters["group_dropped"] = cot_theses.group_dropped   # 08.10: изключените тикъри с еднаква причина — на един ред
+env.filters["field_words"] = sector_claims.field_words     # 19.10.2026 (т. 18): сурови имена на полета в прозата на модела → думи
+env.filters["horizon_text"] = sector_claims.horizon_text   # 19.10.2026 (т. 18): хоризонтът на модела ([4, 12], "2-6", 4) → текст
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
@@ -307,6 +310,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         regime_comment=brief["ai_macro"].get("regime_comment", ""),
         sector_logic=brief["ai_macro"].get("sector_logic", []),
+        sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
         action=brief["action"],
         watchlist=split_watchlist(brief["watchlist"])[0],
         watchlist_compact=split_watchlist(brief["watchlist"])[1],             # опростяване (10.10): too_wide/extended/no_volume — един ред
