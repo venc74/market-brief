@@ -179,7 +179,7 @@ action, watch = brief_main.apply_hard_rules([cand], 1.0)
 assert not action and watch and watch[0]["ticker"] == "EXEL"
 mk = watch[0]["markers"][0]
 assert mk["tag"] == "OPEN✓" and "2026-09-30" in mk["title"] and "$59.72" in mk["title"] and "2026-09-25" not in mk["title"], mk
-assert "от 2026-09-30" in watch[0]["ai"]["watchlist_trigger"]
+assert "от 30.09" in watch[0]["ai"]["watchlist_trigger"] and "25.09" not in watch[0]["ai"]["watchlist_trigger"]          # 19.10.2026: ДД.ММ ("Запис в книгата Action v2 от 30.09 …")
 only_pending = {k: v for k, v in tr.items() if v["status"] == "pending"}
 backtest._save_tracker(only_pending)
 assert brief_main._live_positions() == {}                       # pending → няма жива позиция

@@ -277,10 +277,12 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             # expiry механизма).
             c["ai"]["watchlist_reason_type"] = "existing_position"
             forced = True
+            # 19.10.2026 (етап 2, т. 6): неутрално — това е запис в книгата (не портфейл), повторен пробив може и да няма (EXPD 19.10: no_volume), датата ДД.ММ.
+            # До 19.10: "Вече в портфейла от 2026-10-16 (entry $199.77). Повторният breakout сигнал потвърждава тезата — …".
+            ep = rec.get("entry_price")
             c["ai"]["watchlist_trigger"] = (
-                f"Вече в портфейла от {held_since} "
-                f"(entry ${rec.get('entry_price')}). Повторният breakout сигнал "
-                "потвърждава тезата — управлявай съществуващата позиция, не добавяй риск.")
+                f"Запис в книгата Action v2 от {setup_rules._dm(str(held_since))}"
+                + (f" (вход ${float(ep):.2f})" if isinstance(ep, (int, float)) else "") + " — не е нов вход.")
         elif pending.get(c.get("ticker")):
             # втори преглед (10.10.2026): Action планът от предишен бриф още чака buy-stop → без втори план (рядко, но тогава картата показваше
             # нов вход с нов риск, докато старият е в сила)
