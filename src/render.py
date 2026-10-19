@@ -192,6 +192,32 @@ def _money_short(v):
 env.filters["money_short"] = _money_short
 
 
+_QWORD = __import__("re").compile(r"[A-Za-zА-Яа-я0-9&'.-]+")
+_QLEGAL = {"inc", "corp", "corporation", "company", "holdings", "group", "plc", "ltd", "limited", "the", "co", "sa", "nv", "ag", "se", "lp", "llc"}
+
+
+def cot_quote(t: dict) -> str:
+    """
+    19.10.2026 (етап 2, доп. т. 7): цитатът на модела за механизма в COT cross тезата — с името на компанията отпред, ако в първите 4 думи няма дума от името (≥ 4 букви) или тикъра
+    ("Закупува оборудване …" → "Yum China: Закупува оборудване …"). Измерено върху всички реални брифове: 106 от 167 различни цитата без подлог (глагол или "компанията/банката/фондът").
+    Само показване — данните и проверките не се пипат.
+    """
+    q = (t or {}).get("quote") or ""
+    if not q:
+        return ""
+    first = [w.lower().strip(".,'") for w in _QWORD.findall(q)[:4]]
+    co = (t or {}).get("company") or ""
+    keys = {w.lower().strip(".,'") for w in _QWORD.findall(co) + _QWORD.findall(names.display_name(co)) if len(w) >= 4 and w.lower().strip(".,") not in _QLEGAL}
+    keys.add(((t or {}).get("ticker") or "").lower())
+    if any(k and (f == k or (len(k) >= 6 and f.startswith(k[:6]))) for k in keys for f in first):
+        return q
+    name = names.display_name(co) or (t or {}).get("ticker") or ""
+    return f"{name}: {q}" if name else q
+
+
+env.filters["cot_quote"] = cot_quote
+
+
 def _publish_history(brief: dict) -> None:
     """
     GitHub Pages сервира от /docs, затова data/ в root-а НЕ е достъпен по HTTP.
