@@ -628,16 +628,15 @@ def run() -> dict:
         print(f"[main] significant_news пропадна, макро брифът е без новини: {e}")
         news = []
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news)
-    # FIX 2026-09-16: тезите се сверяват срещу днешните новини — виж
-    # ai_brief.thesis_reality_check(). САМО анотация (news_status/news_note);
-    # `status` остава trigger-driven, `chain` остава конфиг.
+    # FIX 2026-09-16: тезите и днешните новини. 19.10.2026 (т. 10, решение "в"): без AI етикети — до тезата дословното заглавие на свързаната новина
+    # (ai_brief.thesis_news_pick: кандидатите по котвите от кода, моделът само отсява); `status` остава trigger-driven, `chain` остава конфиг.
     #
     # FIX 2026-09-18: подава се СУРОВИЯТ пул, не филтрираните ~8 — те се
     # подбират по обща пазарна значимост за деня и системно изпускат тезово-
     # релевантни новини в тесни домейни (потвърдено с SEC tokenized-stock
     # историята на 18.09). Виж news_aggregator.raw_pool(). Нула допълнителен
     # fetch — gather_raw мемоизира в процеса.
-    theses = ai_brief.thesis_reality_check(
+    theses = ai_brief.thesis_news_pick(
         theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
     try:

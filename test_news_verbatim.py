@@ -69,16 +69,10 @@ assert json.loads(na._CACHE.read_text(encoding="utf-8"))["news"] == got
 print("  ✓ всеки ред на пула е с 'i'; резултатът и кешът носят оригиналните заглавия; отпадналите са в LAST_DIAG и в лога")
 
 print()
-print("── 3. гейтът G4 продължава да работи върху дословните заглавия ──")
-thesis = {"name": "Полупроводници и AI инфраструктура"}
-heads = [r["title"] for r in POOL]
-assert ai_brief._headline_gate(thesis, {"headline_quote": T[67]}, heads) == (None, "")
-assert ai_brief._headline_gate(thesis, {"headline_quote": T[67]}, heads + [n["headline"] for n in got]) == (None, "")
-rule, why = ai_brief._headline_gate(thesis, {"headline_quote": "TSMC отчита рекордна печалба за шесто поредно тримесечие"}, heads + [n["headline"] for n in got])
-assert rule == "G4" and "не е дословно" in why
-rule2, why2 = ai_brief._headline_gate(thesis, {"headline_quote": POOL[72]["title"]}, heads)
-assert rule2 == "G4" and "няма тикър" in why2
-print("  ✓ дословно заглавие от пула → прието; преводът → G4 'не е дословно'; заглавие без котва на тезата → G4")
+print("── 3. тезите: кандидатите са дословни заглавия от пула с котва на тезата (19.10, т. 10 — вместо гейта G4) ──")
+semis = next(b for b in config.THESIS_BASKETS if b["name"] == "Полупроводници и AI инфраструктура")
+assert ai_brief._anchor_match(semis, T[67]) and not ai_brief._anchor_match(semis, POOL[72]["title"])
+print("  ✓ TSMC (дословно от пула) е кандидат на тезата за полупроводниците; приходите на Русия от петрол — не")
 
 print()
 print("── 4. страницата и имейлът (РЕАЛНИЯТ бриф от 15.10 като рамка) ──")

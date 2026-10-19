@@ -57,47 +57,19 @@ assert all(BKH.startswith(h[:40]) or "Black Hills" in h for h in bad[0][2][:1])
 print(f"  ✓ от 14 реални маркирания G4 отхвърля точно едно — това от 07.10 (ядрена, BKH + «Robust AI spending…»); останалите 13 имат поне едно цитирано заглавие с котва на тезата (0 фалшиви положителни)")
 
 print()
-print("── 3. _news_gate с headline_quote (СИНТЕТИЧНИ структурни полета, РЕАЛНИ заглавия) ──")
-nuc_thesis = {"name": "Ядрена енергия", "tickers": NUC["tickers"], "chain": NUC["chain"], "status": "structural"}
+print("── 3–4. от 19.10 (т. 10, решение \"в\"): G1–G4 и етикетите отпадат — кандидатите са по котвите, моделът само избира (РЕАЛНИ заглавия, СИНТЕТИЧЕН модел) ──")
 HEADS = [BKH, CEG, "Oil rises as concerns over Houthi attacks on Saudi Arabia eclipse supply recovery"]
-base = {"basis": "chain_step", "event_type": "contract", "affected_tickers": ["VST", "CEG"], "effect": "positive", "subject_ticker": None,
-        "chain_quote": "AI data center-ите гладуват за стабилна базова мощност 24/7"}
-g = lambda **kw: ai_brief._news_gate(nuc_thesis, {**base, **kw}, "confirmed", HEADS)
-assert ai_brief._news_gate(nuc_thesis, base, "confirmed") == (None, "")                                                    # без заглавия (старият подпис) — G4 не работи
-r, why = g(headline_quote=BKH)
-assert r == "G4" and "Black Hills" in why and "няма тикър, име на компания или термин на механизма" in why
-assert g(headline_quote=CEG) == (None, "")
-assert g(headline_quote="Google, Constellation near deal")[0] is None                                                      # частичен дословен цитат
-assert g(headline_quote=None)[0] == "G4" and g(headline_quote="кратко")[0] == "G4"
-r, why = g(headline_quote="Google and Vistra near a nuclear deal")
-assert r == "G4" and "дословно" in why
-tk_event = {"basis": "ticker_event", "event_type": "contract", "subject_ticker": "CEG", "affected_tickers": ["CEG"], "effect": "positive"}
-assert ai_brief._news_gate(nuc_thesis, {**tk_event, "headline_quote": CEG}, "confirmed", HEADS) == (None, "")
-assert ai_brief._news_gate(nuc_thesis, {**tk_event, "headline_quote": BKH}, "confirmed", HEADS)[0] == "G4"
-assert ai_brief._news_gate({"name": "Нова теза без котви", "tickers": ["AAA"], "chain": "x y z", "status": "watch"}, {**tk_event, "subject_ticker": "AAA", "affected_tickers": ["AAA"], "headline_quote": BKH}, "confirmed", HEADS) == (None, "")
-print("  ✓ BKH → G4 («няма тикър, име на компания или термин на механизма»); Constellation → приет (и частичен дословен цитат); без/кратко/недословно заглавие → G4; ticker_event също минава през G4; теза без котви в конфига — само проверката на цитата")
-
-print()
-print("── 4. през thesis_reality_check (подменен модел, РЕАЛНИ заглавия) ──")
-news = [{"headline": h, "why": "x"} for h in HEADS]
-answer = {"checks": [
-    {"name": "Ядрена енергия", "news_status": "confirmed", "note": f"„{BKH}“ показва търсене на базова мощност за AI.", "basis": "chain_step", "subject_ticker": None,
-     "affected_tickers": ["VST", "CEG"], "effect": "positive", "chain_quote": "AI data center-ите гладуват за стабилна базова мощност 24/7", "headline_quote": BKH, "event_type": "contract"}]}
-seen = {}
-ai_brief._call_claude = lambda system, user, **k: (seen.setdefault("user", user), json.dumps(answer, ensure_ascii=False))[1]
+pool = [{"title": h, "source": "Reuters Business"} for h in HEADS]
 th = [{"name": n, "chain": b["chain"], "tickers": b["tickers"], "status": b["default_status"]} for n, b in BASKETS.items()]
+seen = {}
+ai_brief._call_claude = lambda system, user, **k: (seen.setdefault("user", user), json.dumps({"picks": [{"name": "Ядрена енергия", "i": [0, 1]}]}))[1]   # СИНТЕТИЧНО: моделът сочи и BKH
 with contextlib.redirect_stdout(io.StringIO()):
-    out = ai_brief.thesis_reality_check(copy.deepcopy(th), news)
+    out = ai_brief.thesis_news_pick(copy.deepcopy(th), pool)
 nuc = next(t for t in out if t["name"] == "Ядрена енергия")
-assert "news_status" not in nuc
-rej = ai_brief.THESIS_CHECK_DIAG["rejected"]
-assert [(r["thesis"], r["rule"], r["headline_quote"]) for r in rej] == [("Ядрена енергия", "G4", BKH)] and "accepted" not in ai_brief.THESIS_CHECK_DIAG
-assert '"headline_quote"' in seen["user"] and "газова централа за data center" in seen["user"]
-answer["checks"][0].update(headline_quote=CEG, note=f"„{CEG}“ — стъпка от веригата.")
-with contextlib.redirect_stdout(io.StringIO()):
-    out2 = ai_brief.thesis_reality_check(copy.deepcopy(th), news)
-assert next(t for t in out2 if t["name"] == "Ядрена енергия")["news_status"] == "confirmed" and ai_brief.THESIS_CHECK_DIAG["accepted"] == [{"thesis": "Ядрена енергия", "status": "confirmed"}]
-print("  ✓ СИНТЕТИЧЕН отговор на модела с РЕАЛНОТО заглавие на BKH → отхвърлен (G4, с цитираното заглавие в диагностиката, без news_status); с заглавието за Constellation → приет")
+assert nuc["news_headlines"] == [{"headline": CEG, "source": "Reuters Business"}] and "news_status" not in nuc
+assert ai_brief.THESIS_CHECK_DIAG["candidates"]["Ядрена енергия"] == 1 and ai_brief.THESIS_CHECK_DIAG["rejected"] == [{"thesis": "Ядрена енергия", "i": 0, "reason": "индексът не е сред кандидатите на тезата"}]
+assert BKH not in seen["user"].split("Ядрена енергия", 1)[1].split('"name"', 1)[0]                         # BKH (без котва) не е кандидат на ядрената теза
+print("  ✓ BKH няма котва → не е кандидат и индексът му се отхвърля; Constellation → заглавието до тезата, без етикет и без бележка на модела")
 
 print()
 print("── 5. подгрупи в каре «Контекст» (РЕАЛНА ротация на 08.10, СИНТЕТИЧНИ цени) ──")

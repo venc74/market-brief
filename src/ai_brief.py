@@ -63,7 +63,7 @@ _SECTION_LABELS = {
     "_macro_and_sector_brief_ai": "Макро бриф и секторна карта",      # 08.10: същото тяло под ново име (обвивка с проверка на твърденията за режима)
     "_narratives_for_batch": "Тикър наративи",
     "_cot_theses_for_batch": "COT тези",
-    "thesis_reality_check": "Проверка на тезите срещу новините",
+    "thesis_news_pick": "Тези: свързани новини",                # 19.10.2026: вместо проверката на тезите (т. 10)
     "watch_ticker_digest": "Наблюдавани тикъри",
     "short_thesis_global_context": "Short контекст",
     "significant_news": "Значими новини",
@@ -1390,37 +1390,13 @@ def _check_price_mentions(ticker: str, text: str, real_price: float | None,
 # COT (Commitments of Traders) — Секция [нова] — Шапиро тези
 # ══════════════════════════════════════════════════════════════════════════
 
-SYSTEM_THESIS_CHECK = """Ти си скептичен редактор-факт-чекър. Задачата ти НЕ е \
-да намираш връзки, а да намираш ПРОТИВОРЕЧИЯ между дълготрайна теза и това, \
-което вече се е случило. По подразбиране отговорът е "unchanged" — отклоняваш \
-се от него само при конкретна новина, която материално разрешава или \
-опровергава механизма. Пишеш на български, тикери и термини на английски. \
+SYSTEM_THESIS_PICK = """Ти подбираш новини към дълготрайни инвестиционни тези. Не оценяваш дали новината \
+потвърждава или опровергава тезата — само избираш заглавията, които са ПРЯКО за механизма или тикърите ѝ. \
 Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
 
 
-# FIX 2026-09-30: дневна диагностика на проверката — приети и отхвърлени
-# маркирания с правилото (G0–G3) и причината, по модела на COT_DIAG → брифа.
+# 19.10.2026 (т. 10): дневна диагностика — кандидати по котвите, избрани от модела, отхвърлени индекси (извън кандидатите на тезата) → брифа (thesis_check_diag)
 THESIS_CHECK_DIAG: dict = {}
-_NEWS_EVENT_TYPES = {"contract", "order", "budget", "legislation", "policy",
-                     "macro_data", "price_move", "topic"}
-
-
-_ARROWS = ("->", "=>", "⟶", "➔", "➜", "⇒")
-
-
-def _norm_quote(s) -> str:
-    """
-    FIX 2026-09-30: и двете страни за G3 — моделът цитира почти дословно
-    (други кавички, "->" вместо "→", тирета, главни букви, двойни интервали).
-    Малки букви, стрелките уеднаквени до "→", кавички/тирета/скоби/пунктуация
-    → интервал, един интервал.
-    """
-    s = str(s or "").lower()
-    for a in _ARROWS:
-        s = s.replace(a, "→")
-    s = re.sub(r"[^\w\s→]", " ", s)
-    s = re.sub(r"\s*→\s*", " → ", s)
-    return re.sub(r"\s+", " ", s).strip()
 
 
 def _anchor_match(basket: dict, headline: str) -> str | None:
@@ -1442,297 +1418,60 @@ def _anchor_match(basket: dict, headline: str) -> str | None:
     return None
 
 
-def _headline_gate(thesis: dict, c: dict, headlines: list[str]) -> tuple[str | None, str]:
+def thesis_news_pick(theses: list[dict], pool: list[dict]) -> list[dict]:
     """
-    Гейт G4 (08.10.2026): за confirmed/challenged моделът връща и ДОСЛОВНОТО заглавие (headline_quote); кодът изисква (а) то да е част от днешните новини и (б) цялото заглавие да съдържа
-    тикър, име на компания от тезата или термин на механизма ѝ. Реален случай 07.10: "Black Hills plans $1.8 billion investment to power Google's data center" беше "потвърждение" на
-    ядрената теза през chain_step — стъпката "AI data center-ите гладуват за базова мощност" е изпълнена и от газова централа, а G3 проверява само цитата от веригата.
-    """
-    q = _norm_quote(c.get("headline_quote"))
-    if len(q) < 12:
-        return "G4", f"headline_quote липсва или е твърде кратко ({c.get('headline_quote')!r})"
-    src = next((h for h in headlines if q in _norm_quote(h)), None)
-    if src is None:
-        return "G4", f"заглавието не е дословно от днешните новини ({c.get('headline_quote')!r})"
-    basket = next((b for b in config.THESIS_BASKETS if b.get("name") == thesis.get("name")), None)
-    if basket is None or not (basket.get("terms") or basket.get("names")):
-        return None, ""                                                   # тези без котви в конфига (нови/ръчни) — само проверката на цитата
-    if _anchor_match(basket, src) is None:
-        return "G4", f"заглавието «{src}» няма тикър, име на компания или термин на механизма на тезата — не е за нея"
-    return None, ""
-
-
-def _news_gate(thesis: dict, c: dict, status: str, headlines: list[str] | None = None) -> tuple[str | None, str]:
-    """
-    FIX 2026-09-30: кодови проверки за confirmed/challenged. Първия ден на
-    "confirmed" (30.09) 3 от 6 тези бяха "потвърдени" и 1 "опровергана" —
-    промптът вече казваше "в типичен ден всички са unchanged". Същият подход
-    като COT Release 2: моделът попълва структурни полета, кодът ги проверява.
-    Връща (правило, причина) при отказ или (None, "") при приемане.
-
-      G0 — схемата: basis липсва/невалиден.
-      G1 — event_type е ценово движение / новина по темата (или невалиден).
-      G2 — affected_tickers не са непразно подмножество на тикърите на тезата,
-           effect не съвпада със статуса, или при ticker_event subject_ticker
-           е ИЗВЪН тезата (Boeing срещу NOC, 30.09; DeepSeek/Huawei/Nvidia).
-      G3 — chain_step: chain_quote не е дословно от chain, или тезата има
-           макро тригер (config.THESIS_BASKETS "trigger"), който НЕ е сработил
-           (status != "active") — кодът вече мери тази стъпка и казва, че не
-           се е случила (въглища 30.09 "потвърдена" при несработил oil_shock;
-           23 и 24.09 "опровергана" на теза, която и без това не е активна).
-           Тези без тригер (ядрена, крипто/CLARITY, полупроводници) минават
-           само проверката на цитата.
-      G4 — (08.10, само ако са подадени `headlines`) headline_quote е дословно заглавие от днешните новини И съдържа тикър, име на компания или термин на механизма на тезата
-           (виж _headline_gate); важи и за двата basis.
-    """
-    basis = c.get("basis")
-    if basis not in ("ticker_event", "chain_step"):
-        return "G0", f"basis липсва или е невалиден ({basis!r})"
-    ev = c.get("event_type")
-    if ev not in _NEWS_EVENT_TYPES:
-        return "G1", f"event_type липсва или е невалиден ({ev!r})"
-    if ev in ("price_move", "topic"):
-        return "G1", f"event_type='{ev}' — ценово движение/новина по темата не е {status}"
-
-    tickers = {str(x).upper() for x in (thesis.get("tickers") or [])}
-    affected = [str(x).upper() for x in (c.get("affected_tickers") or [])
-                if isinstance(x, str) and x.strip()]
-    want = "positive" if status == "confirmed" else "negative"
-    if not affected:
-        return "G2", "affected_tickers е празен"
-    outside = [x for x in affected if x not in tickers]
-    if outside:
-        return "G2", f"affected_tickers извън тезата: {outside}"
-    if c.get("effect") != want:
-        return "G2", f"effect={c.get('effect')!r}, а {status} изисква '{want}'"
-    if basis == "ticker_event":
-        subj = str(c.get("subject_ticker") or "").upper()
-        if subj not in tickers:
-            return "G2", (f"събитието е за {subj or '(не е посочено)'}, а то не е "
-                          f"в тезата {sorted(tickers)}")
-        return _headline_gate(thesis, c, headlines) if headlines is not None else (None, "")
-
-    q = _norm_quote(c.get("chain_quote"))
-    if len(q) < 12 or q not in _norm_quote(thesis.get("chain")):
-        return "G3", f"chain_quote не е дословно от веригата ({c.get('chain_quote')!r})"
-    trigger = next((b.get("trigger") for b in config.THESIS_BASKETS
-                    if b.get("name") == thesis.get("name")), None)
-    if trigger and thesis.get("status") != "active":
-        return "G3", (f"макро тригерът '{trigger}' не е сработил (статус "
-                      f"'{thesis.get('status')}') — стъпката от веригата не се е случила "
-                      f"по собственото ни мерене")
-    return _headline_gate(thesis, c, headlines) if headlines is not None else (None, "")
-
-
-def thesis_reality_check(theses: list[dict], news: list[dict]) -> list[dict]:
-    """
-    FIX 2026-09-16: свереност на геополитическите тези срещу днешните новини.
-
-    Потвърденият случай: Senate cloture гласуването за CLARITY Act се провали
-    на 15.09.2026 (49-50, под 60-гласовия праг). Брифът на 16.09 продължи да
-    показва "Ясна законодателна рамка (CLARITY Act) → институциите получават
-    регулаторна сигурност → ...", без нито дума, че гласуването вече се е
-    случило и е паднало. Не е неточност — активно подвеждащ текст.
-
-    Защо изобщо е нужна НОВА стъпка: thesis_monitor() е чист код + статичен
-    конфиг (config.THESIS_BASKETS). `chain` е hardcoded низ, `status` идва от
-    _trigger_fires() върху макро серии. AI-то никога не е виждало тези тези —
-    нямаше промпт, към който да се добави инструкция.
-
-    Съзнателно САМО анотация. Не пипа `status` (остава trigger-driven), не
-    пипа `chain` (остава конфиг), не изисква нищо от trigger дизайна. Новата
-    информация седи ДО тезата, не я замества — "кодът има последната дума"
-    остава непокътнат, а промяната е напълно адитивна и обратима. Пълният
-    Layer 3 redesign (структуриран trigger за насрочени binary събития) е
-    отделна тема, съзнателно извън обхвата тук.
-
-    Предпоставка: config.NEWS_PER_SOURCE_LIMIT / NEWS_MAX_TO_FILTER. Преди тях
-    проверката би била инертна — заглавието за провала стоеше на ранг 17 при
-    limit=15 и изобщо не влизаше в събраното (виж config.py измерванията).
-
-    Добавя "news_status" (challenged|resolved|evolving|confirmed|unchanged) и "news_note" към
-    всяка теза. Graceful: провал навсякъде тук → връща theses непроменени.
+    19.10.2026 (трети преглед, т. 10 — решение "в" на Венци): до тезата — ДОСЛОВНОТО заглавие на свързаната новина, БЕЗ етикет; AI етикетите ("потвърдена от новина",
+    "опровергана", "друг път", "разрешена") и бележката на модела отпадат (кой съди — читателят); карето "Контекст" с числата от кода остава.
+    Кандидатите за всяка теза — от КОДА: заглавията от суровия пул с котва на тезата (_anchor_match: тикър, име на компания, термин на механизма), най-много
+    THESIS_PICK_MAX_CANDIDATES; моделът само отсява шума и връща индексите; кодът приема индекс само от кандидатите на СЪЩАТА теза и взема заглавието и източника от пула.
+    Добавя "news_headlines" [{headline, source}] (до THESIS_PICK_MAX_PER_THESIS). Без кандидати — без извикване. Graceful: провал → тезите непроменени.
     """
     THESIS_CHECK_DIAG.clear()
-    if not theses or not news:
+    if not theses or not pool:
         return theses
     try:
-        compact_theses = [{"name": t.get("name"), "chain": t.get("chain"),
-                           "tickers": t.get("tickers")} for t in theses]
-        # FIX 2026-09-18: приема И двете форми — филтрираните новини
-        # ({headline, why}) и суровия пул от news_aggregator.raw_pool()
-        # ({source, title, summary}). Суровият е реалният вход след тази
-        # промяна, но подписът остава съвместим с филтрирания списък.
-        compact_news = [
-            {"headline": n.get("headline") or n.get("title"),
-             "why": n.get("why") or (n.get("summary") or "")[:200]}
-            for n in news if (n.get("headline") or n.get("title"))
-        ]
-        if not compact_news:
+        heads = [(i, n.get("title") or n.get("headline"), n.get("source")) for i, n in enumerate(pool) if isinstance(n, dict) and (n.get("title") or n.get("headline"))]
+        cand: dict[str, list[int]] = {}
+        for t in theses:
+            basket = next((b for b in config.THESIS_BASKETS if b.get("name") == t.get("name")), None) or {"tickers": t.get("tickers") or []}
+            cand[t.get("name")] = [i for i, h, _ in heads if _anchor_match(basket, h)][:config.THESIS_PICK_MAX_CANDIDATES]
+        THESIS_CHECK_DIAG.update(candidates={k: len(v) for k, v in cand.items()}, picked={}, rejected=[])
+        if not any(cand.values()):
+            print(f"[ai] thesis_news_pick: нито едно заглавие от {len(heads)} няма котва на теза — без извикване")
             return theses
-        user = f"""ТЕЗИ (дълготрайни, от конфигурация — механизмът е описан в "chain"):
-{json.dumps(compact_theses, ensure_ascii=False, default=str)}
+        title = {i: h for i, h, _ in heads}
+        payload = [{"name": t.get("name"), "chain": t.get("chain"), "tickers": t.get("tickers"),
+                    "candidates": [{"i": i, "t": title[i]} for i in cand[t.get("name")]]} for t in theses if cand.get(t.get("name"))]
+        user = f"""ТЕЗИ И КАНДИДАТИ (за всяка теза — заглавия от днешните новини, в които има неин тикър, име на компания или термин на механизма):
+{json.dumps(payload, ensure_ascii=False, default=str)}
 
-ДНЕШНИ НОВИНИ:
-{json.dumps(compact_news, ensure_ascii=False, default=str)}
-
-За всяка теза прецени дали КОНКРЕТНА днешна новина материално променя \
-механизма, описан в "chain":
-
-- "challenged" — новина опровергава, блокира или проваля механизма. Пример: \
-теза "законодателна рамка X → регулаторна сигурност → приток на капитал", а \
-новина съобщава, че гласуването за X се е провалило. Механизмът не просто \
-още не се е случил — конкретно събитие го е спряло. САМО ако новината \
-блокира механизма ЗА ТИКЪРИТЕ НА ТЕЗАТА, не за съседна компания. Потвърден \
-случай 30.09.2026: "DeepSeek partners with Huawei … reducing reliance on \
-Nvidia" беше маркирано като опровержение на теза с AVGO/AMAT/MCHP \
-(оборудване и mature-node чипове) — Nvidia не е в тезата и механизмът за \
-тези тикъри не е блокиран. Ценово движение (петролът пада) не е challenged.
-- "resolved" — механизмът е ИЗЦЯЛО приключил и тезата вече няма какво да \
-предложи занапред (напр. законът е приет и в сила, събитието е минало и \
-ефектът е изчерпан). Едно потвърждаващо събитие по пътя НЕ е resolved — то е \
-"confirmed".
-- "confirmed" — конкретно днешно събитие показва, че механизмът от "chain" \
-работи както е описан: стъпка от веригата се е случила (напр. договор, \
-поръчка, бюджетно решение, законодателна стъпка напред), а тезата остава в \
-сила занапред. Потвърден случай 29.09.2026: договор за $20.7 млрд за RTX беше \
-маркиран "resolved", а е потвърждение на тезата за отбраната, не неин край. \
-Новина само по темата или ценово движение НЕ е confirmed. "confirmed" САМО ако: \
-(а) събитието засяга ПРЯКО и ПОЛОЖИТЕЛНО компания от "tickers" на тезата \
-(договор, поръчка, бюджет за НЕЯ), или (б) е конкретна макро стъпка, дословно \
-описана в "chain" (напр. дългият край на кривата расте при теза за стръмна \
-крива). НИКОГА, когато компания ИЗВЪН тезата печели нещо, за което се е \
-състезавала компания от тезата — за компанията от тезата това е ЗАГУБА. \
-Потвърден случай 30.09.2026: "Boeing wins US Navy's next-generation fighter \
-contract" беше маркирано като потвърждение на тезата за отбраната, а Boeing \
-не е в тезата и е спечелил срещу Northrop Grumman (NOC), който е в нея. \
-Еднодневно ценово движение (петролът поскъпна днес) НИКОГА не е confirmed.
-- "evolving" — назованото в тезата СРЕДСТВО е спряно/забавено, но конкретен \
-АЛТЕРНАТИВЕН път напредва към СЪЩАТА крайна цел. Използвай го САМО когато \
-можеш да назовеш и ДВЕТЕ страни поименно: (1) кой точно оригинален път се е \
-провалил или забавил, и (2) кой точно алтернативен път напредва вместо него. \
-Ако можеш да посочиш само едното, това не е "evolving" — то е "challenged" \
-(ако само оригиналът е спрян) или "unchanged" (ако само има някаква свързана \
-новина). Пример за ВАЛИДНО evolving: теза "законодателна рамка X → регулаторна \
-сигурност"; гласуването за X се проваля, НО регулаторът подава собствени \
-правила към същата цел — оригиналът е спрян, алтернативата е конкретна и \
-назована. Пример за НЕВАЛИДНО: "регулаторната среда изглежда по-благоприятна" \
-— няма назован провалил се път, няма назована алтернатива, това е unchanged.
-- "unchanged" — ВСИЧКО ОСТАНАЛО. Това е отговорът по подразбиране.
-
-КРИТИЧНО — кога НЕ се отклоняваш от "unchanged":
-- новината е по същата обща тема, но не казва нищо за механизма \
-(теза за ядрена енергия + новина "петролът пада" → unchanged);
-- новината движи цените на тикърите от тезата, но не пипа механизма \
-(акциите паднали днес → unchanged, това е шум, не разрешаване);
-- новината е свързана само косвено, през 2+ стъпки макро верига → unchanged;
-- не си сигурен → unchanged.
-
-Тезите са дълготрайни по замисъл. В типичен ден ВСИЧКИ са "unchanged" — това \
-е нормалният, очакван резултат, не пропуск от твоя страна. Не търси връзки.
-
-"note": САМО при challenged/resolved/evolving/confirmed — едно изречение, което ЦИТИРА \
-конкретното заглавие, задействало преценката. При "evolving" бележката трябва \
-да назове И ДВАТА пътя: спрения оригинал и конкретната алтернатива. Ако не \
-можеш да посочиш точно заглавие (или при evolving — и двата пътя), върни \
-"unchanged" с празен note.
-
-При "confirmed" и "challenged" (и САМО при тях — за останалите не ги пиши) \
-добави и полета, които кодът проверява; липсващо или невалидно поле → \
-маркирането се отхвърля:
-- "basis": "ticker_event" (събитието е за конкретна компания) или "chain_step" \
-(макро/законодателна стъпка от веригата);
-- "subject_ticker": тикърът на компанията, за която е новината (кой печели \
-договора, кой е обект на решението) — или null при chain_step;
-- "affected_tickers": тикъри ОТ "tickers" на тезата, засегнати пряко;
-- "effect": "positive" (при confirmed) или "negative" (при challenged) — за \
-affected_tickers;
-- "chain_quote": при chain_step — ДОСЛОВЕН откъс от "chain" на тезата за \
-стъпката, която се е случила или е блокирана; иначе null;
-- "headline_quote": ДОСЛОВНОТО заглавие от ДНЕШНИТЕ НОВИНИ, което задейства преценката \
-(копирай го знак по знак; кодът го търси в новините и изисква то да съдържа тикър, име \
-на компания или термин на механизма на ТЕЗАТА — новина за друг сектор, която само \
-удовлетворява общата стъпка, не потвърждава тезата; потвърден случай 07.10.2026: \
-газова централа за data center беше маркирана като потвърждение на ядрената теза);
-- "event_type": "contract" | "order" | "budget" | "legislation" | "policy" | \
-"macro_data" | "price_move" | "topic".
-
-Върни JSON за ВСЯКА теза, в същия ред: \
-{{"checks": [{{"name": "...", "news_status": "...", "note": "...", \
-"basis": "...", "subject_ticker": "...", "affected_tickers": [...], \
-"effect": "...", "chain_quote": "...", "headline_quote": "...", "event_type": "..."}}]}} — \
-последните седем полета само при confirmed/challenged."""
-
-        out = _parse_json(_call_claude(SYSTEM_THESIS_CHECK, user,
-                                       max_tokens=config.THESIS_CHECK_MAX_TOKENS))
-        by_name = {c.get("name"): c for c in out.get("checks", [])
-                   if isinstance(c, dict)}
+За всяка теза избери най-много {config.THESIS_PICK_MAX_PER_THESIS} заглавия от НЕЙНИТЕ кандидати, които са пряко за механизма в "chain" или за тикърите ѝ. \
+Обща дума не стига: заглавие, в което "AI", "oil" или "bank" е за нещо друго (литературна награда, банков анализатор за друга компания), не е за тезата. \
+Не оценяваш дали новината потвърждава или опровергава тезата. Ако няма такова заглавие — празен списък.
+Върни JSON: {{"picks": [{{"name": "...", "i": [0, 1]}}]}}"""
+        out = _parse_json(_call_claude(SYSTEM_THESIS_PICK, user, max_tokens=config.THESIS_PICK_MAX_TOKENS))
+        src = {i: s_ for i, _, s_ in heads}
+        picks = {}
+        for p_ in (out.get("picks") or []) if isinstance(out, dict) else []:
+            if not isinstance(p_, dict) or p_.get("name") not in cand:
+                continue
+            ok = []
+            for i in p_.get("i") or []:
+                if isinstance(i, int) and not isinstance(i, bool) and i in cand[p_["name"]] and i not in ok:
+                    ok.append(i)
+                else:
+                    THESIS_CHECK_DIAG["rejected"].append({"thesis": p_.get("name"), "i": i, "reason": "индексът не е сред кандидатите на тезата"})
+            picks[p_["name"]] = ok[:config.THESIS_PICK_MAX_PER_THESIS]
         annotated = []
         for t in theses:
-            c = by_name.get(t.get("name")) or {}
-            status = c.get("news_status")
-            # FIX 2026-09-29: + "confirmed" (потвърдена от новина) — същото
-            # изискване за цитирано заглавие; "resolved" остава само за край.
-            if status not in ("challenged", "resolved", "evolving", "confirmed"):
-                annotated.append(t)
-                continue
-            note = (c.get("note") or "").strip()
-            if not note:
-                # изрично изискване на промпта — без цитирано заглавие не се
-                # отклоняваме от unchanged
-                print(f"[ai] thesis_reality_check: '{t.get('name')}' върна "
-                      f"{status} без note — игнорирам")
-                annotated.append(t)
-                continue
-            # FIX 2026-09-18: "evolving" е по-мек праг от "challenged" и затова
-            # по-лесен за злоупотреба. Промптът изисква бележката да назове И
-            # ДВАТА пътя (спрян оригинал + конкретна алтернатива), а това по
-            # необходимост е по-дълго от едно изречение с едно твърдение.
-            # Едноредова бележка при evolving почти сигурно назовава само едната
-            # страна → третира се като неизпълнено изискване. Кодът не може да
-            # провери семантиката, но може да провери, че изобщо е даден
-            # достатъчно материал — същият дух като note-задължителността.
-            if status == "evolving" and len(note) < config.THESIS_EVOLVING_MIN_NOTE_CHARS:
-                print(f"[ai] thesis_reality_check: '{t.get('name')}' върна evolving "
-                      f"с твърде кратка бележка ({len(note)} знака) — вероятно не "
-                      "назовава и двата пътя, игнорирам")
-                annotated.append(t)
-                continue
-            # FIX 2026-09-30: G1–G3 (08.10: + G4) — виж _news_gate(). Само confirmed/challenged.
-            if status in ("confirmed", "challenged"):
-                rule, why = _news_gate(t, c, status, [h["headline"] for h in compact_news])
-                if rule:
-                    print(f"[ai] thesis_reality_check: '{t.get('name')}' {status} "
-                          f"ОТХВЪРЛЕНО ({rule}) — {why}")
-                    entry = {"thesis": t.get("name"), "status": status, "rule": rule,
-                             "reason": why, "note": note}
-                    if rule == "G3":  # цитатът на модела — за да се вижда разликата
-                        entry["chain_quote"] = c.get("chain_quote")
-                        entry["chain_quote_norm"] = _norm_quote(c.get("chain_quote"))
-                    if rule == "G4":  # заглавието, което моделът цитира
-                        entry["headline_quote"] = c.get("headline_quote")
-                    THESIS_CHECK_DIAG.setdefault("rejected", []).append(entry)
-                    annotated.append(t)
-                    continue
-            print(f"[ai] thesis_reality_check: '{t.get('name')}' → {status} — {note}")
-            THESIS_CHECK_DIAG.setdefault("accepted", []).append(
-                {"thesis": t.get("name"), "status": status})
-            annotated.append({**t, "news_status": status, "news_note": note})
-        # FIX 2026-09-17: успехът трябва да е ВИДИМ в лога. Дотук функцията
-        # логваше само при маркиране или при провал — а "всичко unchanged"
-        # (нормалният, очакван изход) мълчеше, което го правеше неразличимо
-        # от тихо паднало извикване: и в двата случая нито една теза няма
-        # news_status. Същото сляпо петно като мъртвите news източници преди
-        # FIX 2026-09-15 — успех и провал изглеждаха еднакво отвън.
-        flagged = sum(1 for t in annotated if t.get("news_status"))
-        rejected = THESIS_CHECK_DIAG.get("rejected", [])
-        print(f"[ai] thesis_reality_check: {len(annotated)} тези проверени "
-              f"срещу {len(news)} новини — {flagged} маркирани, "
-              f"{len(rejected)} отхвърлени от G0–G4"
-              + (f" {[(r['thesis'], r['rule']) for r in rejected]}" if rejected else ""))
+            sel = picks.get(t.get("name")) or []
+            THESIS_CHECK_DIAG["picked"][t.get("name")] = [title[i] for i in sel]
+            annotated.append({**t, "news_headlines": [{"headline": title[i], "source": src.get(i)} for i in sel]} if sel else t)
+        print(f"[ai] thesis_news_pick: {len(theses)} тези, кандидати {THESIS_CHECK_DIAG['candidates']}, избрани "
+              f"{ {k: len(v) for k, v in THESIS_CHECK_DIAG['picked'].items() if v} }, отхвърлени индекси {len(THESIS_CHECK_DIAG['rejected'])}")
         return annotated
     except Exception as e:
-        print(f"[ai] thesis_reality_check неуспешен: {type(e).__name__}: {e}")
+        print(f"[ai] thesis_news_pick неуспешен: {type(e).__name__}: {e}")
         return theses
 
 

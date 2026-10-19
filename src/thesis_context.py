@@ -36,7 +36,7 @@ try:
 except Exception:
     yf = None
 
-# статуси от ai_brief.thesis_reality_check(), при които тезата получава каре
+# статуси от старата ai_brief.thesis_reality_check() (до 19.10.2026), при които тезата получаваше каре; от 19.10 — свързано заглавие (news_headlines, thesis_news_pick)
 FLAGGED_NEWS = ("challenged", "resolved", "evolving", "confirmed")
 
 
@@ -186,7 +186,7 @@ def annotate(theses: list[dict], rotation: list[dict], regime: str,
                       f"{missing} — вероятно делистнат/сменен тикър, провери "
                       f"config.THESIS_BASKETS")
                 th["missing_price"] = missing
-            if th.get("news_status") in FLAGGED_NEWS or th.get("status") == "active":
+            if th.get("news_headlines") or th.get("news_status") in FLAGGED_NEWS or th.get("status") == "active":
                 th["context"] = _context(th, baskets.get(th.get("name"), {}), closes,
                                          rotation, regime, positions, action, watchlist, today)
             out.append(th)
