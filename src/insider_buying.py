@@ -76,6 +76,20 @@ _CIK_MAP_CACHE = config.DATA_DIR / "insider_ticker_cik_cache.json"
 LAST_STATUS: dict = {}
 
 _OFFICER_TITLE_KEYWORDS = ("ceo", "cfo", "president", "coo")
+# 19.10.2026 (етап 2, т. 17в): подниз "ceo/cfo/president/coo" пропускаше ИЗПИСАНИТЕ титли ("Chief Financial Officer" — няма "cfo" в низа) и броеше всеки "Vice President" (заради
+# "president") и "Special Advisor to CEO". Измерено върху 153 РЕАЛНИ officerTitle (Form 4, 01.09–16.10.2026; tests/fixtures/form4_officer_titles_2026-10-19.json): старото правило —
+# 72 ключови роли пропуснати (изписаните Chief Financial/Operating/Executive Officer), 20 фалшиви (VP/SVP/EVP ×19, Special Advisor to CEO); новото — 0 и 0 в извадката.
+_KEY_ROLE_RE = re.compile(
+    r"(?<!to )\b(?:ceo|cfo|coo)\b"                                   # съкращенията (не "Advisor to CEO")
+    r"|chief\s+(?:executive|financial|operating)\s+officer"          # изписаните
+    r"|principal\s+(?:executive|financial)\s+officer"
+    r"|(?<!vice )(?<!vice-)\bpres(?:ident)?\b",                     # президент, но не вицепрезидент
+    re.I)
+
+
+def is_key_role(title: str | None) -> bool:
+    """CEO / CFO / COO / президент по officerTitle — изписано или съкратено; Vice President и подобните не са (19.10.2026)."""
+    return bool(_KEY_ROLE_RE.search(" ".join(str(title or "").split())))
 _LOOKBACK_DAYS = config.INSIDER_CLUSTER_WINDOW_DAYS + 16  # ≈30д: cluster прозорец + filing lag буфер
 _SLEEP = 0.12  # ~10 заявки/сек SEC fair-use лимит с коректен UA
 
@@ -367,10 +381,7 @@ def _fetch_raw_transactions(universe: list[str], since: dt.date) -> tuple[list[d
             parsed = _parse_form4(xml_text)
             if not parsed:
                 continue
-            is_officer_role = any(
-                o["is_officer"] and any(k in o["title"].lower() for k in _OFFICER_TITLE_KEYWORDS)
-                for o in parsed["owners"]
-            )
+            is_officer_role = any(o["is_officer"] and is_key_role(o["title"]) for o in parsed["owners"])      # 19.10.2026: изписаните титли; без "Vice President"
             primary_owner = parsed["owners"][0] if parsed["owners"] else {"name": "", "title": ""}
             for txn in parsed["transactions"]:
                 raw.append({

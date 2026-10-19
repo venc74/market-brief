@@ -1,0 +1,617 @@
+{
+"_note": "РЕАЛНИ стойности на officerTitle (isOfficer = 1) от 153 записа в реални Form 4 XML-и (EDGAR, подадени 01.09–16.10.2026), прочетени на 19.10.2026 през вградения браузър: по първите 40 резултата от пълнотекстовото търсене на EDGAR (efts.sec.gov) за \"Chief Executive Officer\", \"Chief Financial Officer\", \"Chief Operating Officer\", \"Vice President\" и \"CEO\" във форма 4 — извадка за проверка на правилото, НЕ представителна честота. Двойки [officerTitle, accession].",
+"titles": [
+[
+"Chief Executive Officer",
+"0001628280-26-065874"
+],
+[
+"Executive Chairman",
+"0001214659-26-011758"
+],
+[
+"Executive Chairman",
+"0001214659-26-011836"
+],
+[
+"Executive Chairman",
+"0001214659-26-011648"
+],
+[
+"Executive Chairman",
+"0001214659-26-011956"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001279"
+],
+[
+"Executive Chairman",
+"0001214659-26-011476"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001310"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001260"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001299"
+],
+[
+"Executive Chairman",
+"0001214659-26-011678"
+],
+[
+"Executive Chairman",
+"0001214659-26-011988"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001271"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001201"
+],
+[
+"SEE REMARKS",
+"0000912282-26-001303"
+],
+[
+"Executive Chairman",
+"0001214659-26-012383"
+],
+[
+"Chief Executive Officer",
+"0002001557-26-000185"
+],
+[
+"Chief Executive Officer",
+"0001493152-26-042397"
+],
+[
+"Chief Executive Officer",
+"0001104659-26-112844"
+],
+[
+"See remarks",
+"0001193125-26-399423"
+],
+[
+"Chief Executive Officer",
+"0001753926-26-001698"
+],
+[
+"Chairman, President & CEO",
+"0001413614-26-000014"
+],
+[
+"Chairman, President & CEO",
+"0001413614-26-000013"
+],
+[
+"Chairman, President & CEO",
+"0001413614-26-000015"
+],
+[
+"Chief Executive Officer",
+"0001913038-26-000012"
+],
+[
+"Chief Executive Officer",
+"0001493152-26-044536"
+],
+[
+"Chief Executive Officer",
+"0001437749-26-032825"
+],
+[
+"Chief Executive Officer",
+"0000919574-26-006683"
+],
+[
+"Chief Executive Officer",
+"0001493152-26-042512"
+],
+[
+"EVP & Chief Financial Officer",
+"0001327749-26-000006"
+],
+[
+"Chief Financial Officer",
+"0001515156-26-000129"
+],
+[
+"Chief Financial Officer",
+"0001493152-26-042650"
+],
+[
+"Chief Financial Officer",
+"0001493152-26-043559"
+],
+[
+"Chief Financial Officer",
+"0001104659-26-114715"
+],
+[
+"Chief Financial Officer",
+"0001515156-26-000125"
+],
+[
+"Chief Financial Officer",
+"0001515156-26-000127"
+],
+[
+"Chief Financial Officer",
+"0001236215-26-000005"
+],
+[
+"Chief Financial Officer",
+"0001437749-26-032827"
+],
+[
+"Chief Financial Officer",
+"0001437749-26-029485"
+],
+[
+"CHIEF FINANCIAL OFFICER",
+"0001808471-26-000025"
+],
+[
+"Chief  Financial Officer",
+"0001628280-26-066186"
+],
+[
+"Chief Financial Officer",
+"0001193125-26-417841"
+],
+[
+"EVP, Chief Financial Officer",
+"0000318300-26-000220"
+],
+[
+"Chief Financial Officer",
+"0001213900-26-096386"
+],
+[
+"EVP, Chief Financial Officer",
+"0001908422-26-000021"
+],
+[
+"Chief Financial Officer",
+"0001730168-26-000084"
+],
+[
+"EVP - Chief Financial Officer",
+"0001193125-26-381792"
+],
+[
+"Chief Financial Officer",
+"0001927715-26-000010"
+],
+[
+"EVP & Chief Financial Officer",
+"0000821189-26-000181"
+],
+[
+"Chief Financial Officer",
+"0001723433-26-000037"
+],
+[
+"SVP & Chief Financial Officer",
+"0001193125-26-388171"
+],
+[
+"Chief Financial Officer",
+"0001225208-26-008334"
+],
+[
+"Chief Financial Officer",
+"0001225208-26-007480"
+],
+[
+"CHIEF FINANCIAL OFFICER",
+"0001628280-26-064690"
+],
+[
+"Chief Financial Officer",
+"0002141866-26-000006"
+],
+[
+"CHIEF FINANCIAL OFFICER",
+"0001705407-26-000010"
+],
+[
+"Chief Financial Officer",
+"0001193125-26-414220"
+],
+[
+"Chief Financial Officer",
+"0001493152-26-046380"
+],
+[
+"Chief Financial Officer",
+"0001171843-26-006009"
+],
+[
+"Chief Financial Officer",
+"0001193125-26-410001"
+],
+[
+"Chief Financial Officer",
+"0001631325-26-000002"
+],
+[
+"Chief Operating Officer",
+"0001213900-26-110404"
+],
+[
+"Pres & Chief Operating Officer",
+"0001628280-26-064959"
+],
+[
+"Chief Operating Officer",
+"0002025977-26-000012"
+],
+[
+"Chief Operating Officer",
+"0001011438-26-000562"
+],
+[
+"EVP-Chief Operating Officer",
+"0001225208-26-007951"
+],
+[
+"Chief Operating Officer",
+"0001193125-26-401356"
+],
+[
+"Chief Operating Officer, HHC",
+"0001104659-26-110504"
+],
+[
+"Chief Operating Officer",
+"0000945621-26-001136"
+],
+[
+"EVP, Chief Operating Officer",
+"0001807459-26-000022"
+],
+[
+"Chief Operating Officer",
+"0001653558-26-000139"
+],
+[
+"EVP & Chief Operating Officer",
+"0001193125-26-390619"
+],
+[
+"Chief Operating Officer",
+"0001213900-26-096385"
+],
+[
+"Chief Operating Officer",
+"0001750155-26-000121"
+],
+[
+"Chief Operating Officer",
+"0002094766-26-000006"
+],
+[
+"Chief Operating Officer",
+"0002151892-26-000005"
+],
+[
+"Chief Operating Officer",
+"0002130035-26-000004"
+],
+[
+"Chief Operating Officer",
+"0001877939-26-000079"
+],
+[
+"Chief Operating Officer",
+"0000897069-26-001768"
+],
+[
+"Chief Operating Officer",
+"0001493152-26-042739"
+],
+[
+"CHIEF OPERATING OFFICER",
+"0001628280-26-060496"
+],
+[
+"Chief Operating Officer",
+"0001040470-26-000293"
+],
+[
+"Chief Operating Officer",
+"0001805284-26-000116"
+],
+[
+"Chief Operating Officer",
+"0001965903-26-000008"
+],
+[
+"CHIEF OPERATING OFFICER",
+"0001628280-26-064689"
+],
+[
+"EVP, Chief Operating Officer",
+"0001193125-26-409171"
+],
+[
+"Chief Operating Officer",
+"0001193125-26-383708"
+],
+[
+"CHIEF OPERATING OFFICER",
+"0001628280-26-065478"
+],
+[
+"Chief Operating Officer",
+"0001628280-26-060398"
+],
+[
+"EVP,  Chief Operating Officer",
+"0001193125-26-414166"
+],
+[
+"Chief Operating Officer",
+"0001193125-26-385544"
+],
+[
+"Vice President",
+"0001193125-26-410476"
+],
+[
+"Senior Vice President",
+"0001193125-26-380625"
+],
+[
+"Executive Vice President",
+"0001628280-26-062003"
+],
+[
+"Senior Vice President, Life",
+"0001628280-26-059735"
+],
+[
+"VICE PRESIDENT",
+"0001675457-26-000015"
+],
+[
+"Vice President - CFO",
+"0001317945-26-000010"
+],
+[
+"Vice President of Exploration",
+"0000912282-26-001331"
+],
+[
+"Executive Vice President",
+"0002110304-26-000021"
+],
+[
+"Executive Vice President",
+"0002110304-26-000023"
+],
+[
+"Sr. Vice President",
+"0001437749-26-030874"
+],
+[
+"Vice President",
+"0000104918-26-000062"
+],
+[
+"Sr. Vice President",
+"0000813672-26-000106"
+],
+[
+"Senior Vice President",
+"0001437749-26-031937"
+],
+[
+"SENIOR VICE PRESIDENT",
+"0001626240-26-000016"
+],
+[
+"Executive Vice President",
+"0000909832-26-000098"
+],
+[
+"See Remarks",
+"0002014632-26-000020"
+],
+[
+"Sr Vice President Operations",
+"0001742758-26-000010"
+],
+[
+"CFO & Executive Vice President",
+"0001628280-26-064505"
+],
+[
+"Executive Vice President",
+"0001628280-26-062492"
+],
+[
+"Senior Vice President",
+"0001225208-26-007729"
+],
+[
+"Executive Vice President",
+"0001628280-26-060179"
+],
+[
+"Sr. Executive Vice President",
+"0000909832-26-000090"
+],
+[
+"Executive Vice President, CFO",
+"0000055135-26-000165"
+],
+[
+"Interim President and CEO",
+"0000007536-26-000144"
+],
+[
+"CEO Worldwide Amazon Stores",
+"0001936006-26-000024"
+],
+[
+"Chairman and CEO",
+"0000943819-26-000052"
+],
+[
+"Chairman and CEO",
+"0000943819-26-000085"
+],
+[
+"CEO Worldwide Amazon Stores",
+"0001936006-26-000026"
+],
+[
+"Special Advisor to CEO",
+"0000929638-26-003399"
+],
+[
+"President & CEO",
+"0001477932-26-005811"
+],
+[
+"CEO; Chairman",
+"0001391935-26-000007"
+],
+[
+"CEO and Chairman",
+"0001855767-26-000018"
+],
+[
+"CEO",
+"0001225208-26-008248"
+],
+[
+"CEO & President",
+"0001437749-26-030539"
+],
+[
+"President & CEO",
+"0000708955-26-000147"
+],
+[
+"PRESIDENT & CEO C&F FINANCE",
+"0001601269-26-000006"
+],
+[
+"CEO",
+"0001193125-26-417970"
+],
+[
+"CEO",
+"0001229771-26-000020"
+],
+[
+"President",
+"0000906304-26-000164"
+],
+[
+"CEO & President",
+"0001209992-26-000050"
+],
+[
+"CEO & President",
+"0001493152-26-043073"
+],
+[
+"CEO and President",
+"0001437749-26-029617"
+],
+[
+"CEO",
+"0001096906-26-001365"
+],
+[
+"CEO",
+"0001437749-26-029522"
+],
+[
+"President and CEO",
+"0001104659-26-113261"
+],
+[
+"Chairman & CEO",
+"0001242648-26-000026"
+],
+[
+"CEO & President",
+"0001437749-26-030775"
+],
+[
+"CEO",
+"0001035422-26-000011"
+],
+[
+"CEO",
+"0001035422-26-000016"
+],
+[
+"President and CEO",
+"0001437749-26-030475"
+],
+[
+"EXECUTIVE CHAIRMAN & CEO",
+"0001136478-26-000010"
+],
+[
+"CEO",
+"0001096906-26-001463"
+],
+[
+"CEO/CIO",
+"0001251824-26-000010"
+],
+[
+"President and CEO",
+"0001472653-26-000002"
+],
+[
+"President",
+"0000906304-26-000162"
+],
+[
+"President & CEO",
+"0001437749-26-031188"
+],
+[
+"President/CEO",
+"0001322325-26-000004"
+],
+[
+"Chair, President and CEO",
+"0001225208-26-007524"
+],
+[
+"Chair, President and CEO",
+"0001225208-26-008099"
+],
+[
+"CEO",
+"0001972724-26-000012"
+],
+[
+"CEO",
+"0001035422-26-000014"
+],
+[
+"CEO, President, BOD Chair",
+"0001193125-26-382261"
+]
+]
+}
