@@ -1428,7 +1428,8 @@ def get_qm_summary() -> dict:
 def gw_exec_note(r: dict, today_iso: str) -> dict | None:
     """
     15.10.2026: затворен запис на "GLB по Уиш" без exec резултат — exec изходът е по отварянето на следващата сесия след затварянето под линията (trade_sim.simulate_glb_wish),
-    а брифът е преди нея. {"date", "text"}: "изход по отварянето на 15.10 — утре" (числото идва в следващия бриф); сесия преди днес без резултат → "— чака данни". Иначе None.
+    а брифът е преди нея. {"date", "text"}: "изход по отварянето на 19.10 — днес" (сесията е днес — брифът е ПРЕДИ отварянето; числото идва в следващия бриф), "— утре" за сесия след днес,
+    "— чака данни" за сесия преди днес без резултат. Иначе None. 19.10.2026: до тогава сесията ДНЕС се показваше "утре" (PLTR, MSFT, A — под линията на 16.10, изход по отварянето на 19.10).
     """
     if r.get("return_pct_exec") is not None or not r.get("resolution_date"):
         return None
@@ -1436,7 +1437,8 @@ def gw_exec_note(r: dict, today_iso: str) -> dict | None:
         d = setup_rules.session_window(dt.date.fromisoformat(r["resolution_date"]) + dt.timedelta(days=1), 1)[0].isoformat()
     except (ValueError, TypeError):
         return None
-    return {"date": d, "text": f"изход по отварянето на {d[8:10]}.{d[5:7]} — {'утре' if d >= today_iso else 'чака данни'}"}
+    when = "днес" if d == today_iso else ("утре" if d > today_iso else "чака данни")
+    return {"date": d, "text": f"изход по отварянето на {d[8:10]}.{d[5:7]} — {when}"}
 
 
 def get_glb_wish_summary() -> dict:
