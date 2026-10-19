@@ -968,7 +968,18 @@ SYSTEM_TICKERS = """Ти си портфолио стратег за суинг 
 # позициите бяха архивирани). Сега моделът изобщо не пише watchlist_trigger — текстът на Watchlist картата се сглобява от кода (main._watchlist_trigger_text).
 
 
-def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime: str) -> str:
+def _ticker_news_block(news: list[dict] | None) -> str:
+    """19.10.2026 (етап 2, спекулативна проза): дословните заглавия на деня за промпта на тикърите — събитие като двигател се назовава само ако е тук или във веригите."""
+    heads = [str(n.get("headline") or "").strip() for n in (news or []) if isinstance(n, dict) and n.get("headline")]
+    if not heads:
+        return ""
+    return ("\nДНЕШНИ НОВИНИ (дословни заглавия): " + json.dumps(heads, ensure_ascii=False) + "\n"
+            "Назовавай събитие, място или политика като двигател (геополитика, мита/тарифи, санкции, война, бедствие, стачка, кибератака) САМО ако е в тези заглавия "
+            "или в секторната логика по-горе. Иначе не го споменавай — кажи, че връзката е техническа. Потвърден случай 16.10.2026: why_now на EXPD назова "
+            "'морски маршрути през Червено море', а в новините и данните на деня нямаше нищо такова.\n")
+
+
+def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime: str, news: list[dict] | None = None) -> str:
     """
     Изгражда user prompt-а за един batch кандидати. Логиката е идентична на
     оригинала — само `slim` тук е подмножество (batch), не целият списък.
@@ -980,7 +991,7 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime
     """
     return f"""Пазарен режим: {regime}
 Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False, default=str)}
-
+{_ticker_news_block(news)}
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
 
 Полето "base_type" е само ДЪЛБОЧИНАТА на 13-седмичната база ("база X% дълбочина") — кодът не \
@@ -1040,13 +1051,13 @@ NO_AI_TEXT = "Без AI текст днес — AI не върна нарати�
 
 
 def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
-                          regime: str, tag: str) -> list[dict]:
+                          regime: str, tag: str, news: list[dict] | None = None) -> list[dict]:
     """
     Един batch → едно Claude извикване → парснат JSON. 1 retry при API/JSON грешка
     (преходни сривове). При провал и на двата опита: логва и връща [] (губим само
     тикърите от ТОЗИ batch), без да чупи останалите batch-ове или pipeline-а.
     """
-    user = _build_ticker_user_prompt(slim, sector_logic, regime)
+    user = _build_ticker_user_prompt(slim, sector_logic, regime, news)
     for attempt in (1, 2):  # 1 опит + 1 retry
         try:
             out = _parse_json(_call_claude(SYSTEM_TICKERS, user,
@@ -1063,7 +1074,7 @@ def _narratives_for_batch(slim: list[dict], sector_logic: list[dict],
 
 
 def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
-                      regime: str) -> list[dict]:
+                      regime: str, news: list[dict] | None = None) -> list[dict]:
     """
     За всеки кандидат Claude връща:
     why_now (верижна логика макро→сектор→акция), business_bg (2-3 изречения),
@@ -1112,7 +1123,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
 
     merged: list[dict] = []
     for idx, batch in enumerate(batches, 1):
-        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}")
+        merged += _narratives_for_batch(batch, sector_logic, regime, f"{idx}/{n}", news)
     NARRATIVES_SENT.extend(c.get("ticker") for c in slim)
     got = {n.get("ticker") for n in merged if isinstance(n, dict)}
     NARRATIVES_LOST.extend(t for t in NARRATIVES_SENT if t not in got)
@@ -1264,6 +1275,64 @@ def verify_narrative_numbers(candidates: list[dict]) -> list[dict]:
     except Exception as e:
         print(f"[ai] проверката на числата в наративите пропусната: {type(e).__name__}: {e}")
     return NARRATIVE_DIAG
+
+
+# 19.10.2026 (етап 2, "спекулативна проза"): назовано събитие като ДВИГАТЕЛ (why_now, catalysts), което го няма в новините, макро текста и веригите на деня → изречението /
+# катализаторът се маха (като чуждите числа). Затворен речник — събития, места, политики; рисковете не се пипат ("ураганният сезон" за застраховател е общ риск, не двигател).
+# Измерено върху 89 реални брифа (740 карти): 6 махнати — тарифи ×4, кибератака ×1, Червено море ×1 (EXPD 16.10). Не са събитие и не се пипат: "тарифни повишения" при
+# застрахователи (ALL, TRV — премиите, не мита) и "военни" като описание на продукта/клиента (WWD, HWM) — затова "война" е само съществителното.
+_EVENT_TERMS = {"Червено море": r"червено\w* море|red sea", "Суецкия канал": r"\bсуец|suez", "хутите": r"\bхути|houthi", "Близкия изток": r"близкия изток|близък изток|middle east|mideast",
+                "Израел": r"\bизраел|israel", "Иран": r"\bиран(?:а|ски\w*|\b)|\biran", "Газа": r"\bгаза\b|gaza", "Украйна": r"\bукрайн|ukrain", "Русия": r"\bрусия\b|\bруск\w*|russia",
+                "Тайван": r"\bтайван|taiwan", "тарифи": r"\bтариф(?!н\w*\s+(?:повишени|увеличени|корекци))|\bмит(?:о|а|ата|ото)\b|tariff", "санкции": r"\bсанкци|sanction", "стачка": r"\bстачк", "ураган": r"\bураган|hurricane",
+                "война": r"\bвойн(?:а|и|ата|ите)\b|\bwar\b", "ОПЕК": r"\bопек|opec", "избори": r"\bизбор(?:и|а)\b|election", "ембарго": r"\bембарго|embargo",
+                "Панамския канал": r"\bпанамск|panama", "суша": r"\bсуша\b|drought", "пожари": r"\bпожар|wildfire", "кибератака": r"\bкибератак|cyberattack"}
+NARRATIVE_EVENTS_DIAG: list[dict] = []
+
+
+def narrative_event_sources(ai_macro: dict | None, news: list[dict] | None) -> str:
+    """Текстът, срещу който се сверяват събитията: заглавията на деня (и преводите, "why"), макро текстът, коментарът за режима и веригите на секторите."""
+    am = ai_macro or {}
+    parts = [am.get("macro_brief") or "", am.get("regime_comment") or ""] + [x.get("chain", "") for x in am.get("sector_logic") or [] if isinstance(x, dict)]
+    parts += [" ".join(str(n.get(k) or "") for k in ("headline", "headline_bg", "why")) for n in news or [] if isinstance(n, dict)]
+    return " ".join(parts)
+
+
+def _unsupported_events(text: str, sources: str) -> list[str]:
+    return [name for name, pat in _EVENT_TERMS.items() if re.search(pat, text or "", re.I) and not re.search(pat, sources or "", re.I)]
+
+
+def verify_narrative_events(candidates: list[dict], sources: str) -> list[dict]:
+    """Маха изреченията (why_now) и катализаторите с назовано събитие без опора в източниците на деня. NARRATIVE_EVENTS_DIAG [{ticker, field, events, removed}]; грешка → нищо (graceful)."""
+    NARRATIVE_EVENTS_DIAG.clear()
+    try:
+        for c in candidates or []:
+            ai = c.get("ai") if isinstance(c, dict) else None
+            if not isinstance(ai, dict):
+                continue
+            t = c.get("ticker")
+            if isinstance(ai.get("why_now"), str) and ai["why_now"]:
+                kept = []
+                for sent in re.split(r"(?<=[.!?])\s+", ai["why_now"]):
+                    ev = _unsupported_events(sent, sources)
+                    if ev:
+                        NARRATIVE_EVENTS_DIAG.append({"ticker": t, "field": "why_now", "events": ev, "removed": sent})
+                        continue
+                    kept.append(sent)
+                ai["why_now"] = " ".join(kept)
+            if isinstance(ai.get("catalysts"), list):
+                kept = []
+                for it in ai["catalysts"]:
+                    ev = _unsupported_events(it, sources) if isinstance(it, str) else []
+                    if ev:
+                        NARRATIVE_EVENTS_DIAG.append({"ticker": t, "field": "catalysts", "events": ev, "removed": it})
+                        continue
+                    kept.append(it)
+                ai["catalysts"] = kept
+        for d in NARRATIVE_EVENTS_DIAG:
+            print(f"[ai] {d['ticker']}: събитие без опора в новините/макрото на деня ({', '.join(d['events'])}) в {d['field']} — махнато: «{d['removed'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на събитията в наративите пропусната: {type(e).__name__}: {e}")
+    return NARRATIVE_EVENTS_DIAG
 
 
 # FIX 2026-10-01 (т.3 от прегледа на 01.10): batch-ов cross-contamination —

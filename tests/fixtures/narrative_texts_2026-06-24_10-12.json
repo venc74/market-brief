@@ -1,0 +1,125 @@
+{
+ "_source": "Реални AI текстове (why_now + catalysts) от data/<дата>.json, извадени на 19.10.2026 — само картите от измерването на спекулативната проза; без промяна.",
+ "cards": [
+  {
+   "date": "2026-06-24",
+   "section": "watchlist",
+   "ticker": "WWD",
+   "why_now": "Директна макро верига: Oil WTI -14.42% → input costs за aerospace производство падат → margin expansion за WWD, която прави fuel systems и actuation systems за турбинни двигатели. XLI е активен сектор (Industrials, horizon 2 седмици), а WWD попада в Aerospace & Defense — подсектор с по-структурен demand от reshoring и defense capex, за разлика от cyclical industrials. Revenue +23.4% и EPS +23% YoY показват реален оперативен momentum, не само macro leverage. Cup with handle с RS near high и volume ratio 1.36 е по-силен технически setup от AMG.",
+   "catalysts": [
+    "Oil collapse → директно намаление на input costs за aerospace manufacturing → margin beat при Q3 earnings (2026-07-27)",
+    "Defense capex цикъл — геополитически tailwind поддържа военни поръчки за WWD компоненти",
+    "Пробив над pivot $445.29 с обем ще генерира технически сигнал при акция в cup with handle близо до pivot",
+    "Volume ratio 1.36 вече показва нарастващ интерес — по-вероятен breakout с обем от AMG"
+   ]
+  },
+  {
+   "date": "2026-07-27",
+   "section": "action",
+   "ticker": "HWM",
+   "why_now": "Геополитически риск premium (oil spike + Gold независима сила) → defense/aerospace spending visibility → HWM е Tier-1 supplier на двигателни компоненти (airfoils, rings) за военни и комерсиални двигатели. Секторната логика на ITA/отбрана се припокрива частично — HWM е Industrials/Aerospace & Defense с government contract visibility. Setup-ът е технически силен: cup with handle, RS new_high, 1.28% под pivot, EPS growth 68.6%, revenue growth 19.1%. КРИТИЧНО ПРЕДУПРЕЖДЕНИЕ: earnings са след 10 дни (2026-08-06) — риск от gap при miss.",
+   "catalysts": [
+    "Earnings на 2026-08-06 — силен EPS track record (68.6% YoY growth) може да бъде price catalyst при beat + raise",
+    "Геополитическа ескалация → увеличени defense budget очаквания → по-висок order backlog visibility",
+    "Комерсиална авиация recovery → Boeing/Airbus production ramp-up → структурно търсене на engine components",
+    "RS new_high при 94.7% institutional ownership → tight float, малко нужно buying за продължение"
+   ]
+  },
+  {
+   "date": "2026-07-28",
+   "section": "watchlist",
+   "ticker": "HWM",
+   "why_now": "Геополитическо напрежение → NATO бюджетни ангажименти → ръст на defense производство → HWM доставя прецизни aerospace компоненти (airfoils, fastening systems) директно за военни и граждански двигатели. ITA rs_chg_12w +8.98% потвърждава секторния trend. EPS ръст 68.6%, ROE 33.8% — отлична fundamentalna база. НО: earnings са на 06.08.2026, само 9 дни — влизаме директно в earnings събитие.",
+   "catalysts": [
+    "Earnings на 06.08.2026 — beat може да катализира пробив над 295.28",
+    "NATO разходи за отбрана продължават да нарастват → backlog растеж",
+    "ITA структурен trend продължава → секторен tailwind",
+    "Analyst target 311.68 предлага ~8% upside от pivot"
+   ]
+  },
+  {
+   "date": "2026-07-29",
+   "section": "watchlist",
+   "ticker": "ALL",
+   "why_now": "Директна macro chain: US10Y 4.64% → P&C застрахователите инвестират премиите в bonds и получават по-висока доходност при reinvestment → ROE 45.2% е изключителен за сектора → EPS ръст 312.9% YoY (дори adjusting за база ефект — силен). RS_status: new_high. Проблем критичен: in_blackout: true, earnings след само 7 дни (2026-08-05) — автоматично Watchlist по правилата.",
+   "catalysts": [
+    "Rising yields 4.64% → инвестиционен портфейл от bonds генерира структурно по-висок инвестиционен доход.",
+    "EPS ръст 312.9% — следствие от успешни тарифни повишения и нормализация на загубите.",
+    "RS new_high — цената е на нови върхове, институционалните потоци са активни.",
+    "Cup with handle с RS на нови върхове при Offensive режим — технически силен setup."
+   ]
+  },
+  {
+   "date": "2026-07-29",
+   "section": "watchlist",
+   "ticker": "ROST",
+   "why_now": "Setup е предимно технически — Consumer Cyclical/Apparel Retail не фигурира в активната секторна логика. Macro връзка е индиректна и слаба: rising yields натискат consumer discretionary, а не го подкрепят. ROST е off-price ретейлър (защитен при рецесионни опасения), но текущият Offensive режим фаворизира директни beneficiaries на macro темите. Технически: 0.36% от pivot, flat base 14.5%, RS near_high, ROE 39% — качествен setup, но без секторна подкрепа.",
+   "catalysts": [
+    "Off-price модел се усилва при потребителски натиск от тарифи и инфлация — trade-down ефект.",
+    "EPS ръст 35.6% YoY и ROE 39% — институционалните инвеститори търсят quality при Offensive режим.",
+    "Flat base 14.5% и 0.36% от pivot — технически готов за пробив.",
+    "Earnings 2026-08-20 (22 дни) — достатъчно прозорец за swing trade преди следващия earnings event."
+   ]
+  },
+  {
+   "date": "2026-07-29",
+   "section": "watchlist",
+   "ticker": "TRV",
+   "why_now": "Директна macro chain: US10Y 4.64% при нормализирана крива → P&C застрахователите (TRV е pure-play commercial P&C) реинвестират float в по-доходни bonds → Net Investment Income нараства структурно. XLF 12w RS +6.33% потвърждава трайна ротация. TRV: RS new_high, cup with handle, 0.42% от pivot, earnings след 78 дни — оптимален прозорец за swing. ROE 26.5%, P/E 10.49 е атрактивно. Основен проблем: volume ratio 0.75, breakout_volume: false.",
+   "catalysts": [
+    "Rising 10Y yields → TRV инвестира значителен float предимно в investment-grade bonds, директен NII beneficiary.",
+    "EPS ръст 46.3% YoY — underwriting резултатите се подобряват след тарифни повишения.",
+    "RS new_high при Offensive режим — институционалните пари са в акцията сега.",
+    "78 дни до earnings — максимален прозорец за swing trade без earnings риск."
+   ]
+  },
+  {
+   "date": "2026-08-12",
+   "section": "watchlist",
+   "ticker": "AVT",
+   "why_now": "Вчерашният trigger НЕ е изпълнен: цената ($95.96) остава под pivot $100.00, volume_ratio е 0.87 (под изискуемите ≥1.8x), breakout_volume=false. Trigger остава валиден от предходния анализ. Макро веригата е частична: като electronics distributor AVT печели от semiconductor supply chain recovery и DXY слабост (international operations). Revenue growth +47.7% YoY е изключително (тарифен front-loading ефект вероятно). Forward PE 8.7x е екстремно ниско — value trap или genuine undervaluation. Inst_ownership 110% (short-heavy) + short interest 10.96% = squeeze потенциал при breakout.",
+   "catalysts": [
+    "EPS surprise +28.81% на 2026-08-05 с +5.07% reaction и 2.43x volume — институционалите реагираха",
+    "Forward PE 8.7x при 1978.8% EPS growth YoY — ако не е аномалия, компанията е масивно undervalued",
+    "Short interest 10.96% + inst_ownership 110% — squeeze сценарий при breakout над $100",
+    "Semiconductor cycle recovery + DXY слабост подкрепя international distribution volumes"
+   ]
+  },
+  {
+   "date": "2026-09-16",
+   "section": "watchlist",
+   "ticker": "EXPD",
+   "why_now": "Вчерашният сигнал потвърждава съществуваща позиция от $187.74 — повторният пробив потвърждава тезата, но не добавя нов риск. Макро верига: глобалната търговия се ускорява при по-силен WTI (енергийните разходи за freight са частично хеджирани), докато air/ocean freight rates остават подкрепени от inventory restocking цикъла. Setup-ът е чисто технически (cup with handle, RS new_high) в сектор извън топ секторната логика — Industrials не е в активната ротация, но EXPD е индивидуален лидер с ROE 42.7% и EPS +45% YoY. Позицията се управлява, не се разширява.",
+   "catalysts": [
+    "Цена на 0.35% от pivot $194.59 — минимален ценови импулс може да задейства пробив",
+    "Ускоряване на глобалния търговски обем при намаляване на тарифна несигурност (US-China trade talks)",
+    "Следващи earnings 2026-11-03 (48 дни) — достатъчен хоризонт за swing trade без earnings риск",
+    "RS line вече на new_high — потвърждава relative лидерство в Industrials"
+   ]
+  },
+  {
+   "date": "2026-09-16",
+   "section": "watchlist",
+   "ticker": "FTNT",
+   "why_now": "Вчерашният trigger НЕ е изпълнен: цена $172.37 е под pivot $174.05, volume ratio 0.91 (под изискваните 1.4x), RS статус е new_high (условието за near_high→new_high не се прилага тук, но пробивът не е потвърден). Analyst target $163.125 е ПОД текущата цена — блокиращ фактор остава активен. Няма нов катализатор, фундаментална ревизия нагоре или price action, оправдаващ промоция към Action. Макро верига: XLC секторна логика (Comms) не обхваща директно cybersecurity/infra software — FTNT е Technology/Software-Infrastructure, извън активната секторна ротация. EPS +37.8% и ROE 117.4% са изключителни, но не компенсират техническата и валуационна слабост при настоящия setup.",
+   "catalysts": [
+    "Потенциална ревизия на analyst target нагоре над $174 — би премахнала блокиращия фактор",
+    "Пробив над $174.05 с volume ≥1.4x среден — технически потвържден breakout",
+    "Ескалация на геополитически кибератаки → увеличено enterprise security spending",
+    "Следващи earnings 2026-11-04 (49 дни) — хоризонтът позволява swing trade"
+   ]
+  },
+  {
+   "date": "2026-10-12",
+   "section": "watchlist",
+   "ticker": "EXPD",
+   "why_now": "Setup-ът е чисто технически — EXPD е в сектор Industrials (Freight & Logistics), който не фигурира в активната секторна логика за Defensive режим. Няма директна макро верига към текущите катализатори (AI boom, TSMC earnings, defensive rotation). RS rating 90 и near_high RS статус са силни сигнали, но секторът не е в play при текущия режим.",
+   "catalysts": [
+    "Следващи earnings на 03.11.2026 — 22 дни напред, без blackout риск в момента; положителна изненада може да ускори пробива",
+    "Съживяване на глобалната търговия при стабилизиране на геополитическото напрежение (тарифен режим)",
+    "RS rating 90 привлича институционален интерес при пробив — 99.7% институционална собственост вече е висока база",
+    "Пробив над $194.59 с обем ≥ 1.5× среден би потвърдил натрупаната сила"
+   ]
+  }
+ ]
+}

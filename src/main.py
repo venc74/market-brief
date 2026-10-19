@@ -641,7 +641,7 @@ def run() -> dict:
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
     try:
         narratives = ai_brief.ticker_narratives(
-            candidates, ai_macro.get("sector_logic", []), thermo["regime"])
+            candidates, ai_macro.get("sector_logic", []), thermo["regime"], news=news)            # 19.10.2026: и дословните заглавия на деня
     except Exception as e:
         traceback.print_exc()
         print(f"[main] ⚠ наративите пропаднаха изцяло ({type(e).__name__}: {e}) — класификацията е от кода, картите са без AI текст")
@@ -659,6 +659,7 @@ def run() -> dict:
     try:
         sector_claims_fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
         ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
+        ai_brief.verify_narrative_events(candidates, ai_brief.narrative_event_sources(ai_macro, news))   # 19.10.2026: събитие без опора в новините/макрото на деня → махнато
     except Exception as e:
         print(f"[main] проверката на твърденията за секторите пропусната: {type(e).__name__}: {e}")
         sector_claims_fixed = []
@@ -1080,6 +1081,7 @@ def run() -> dict:
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
+        "narrative_events": list(ai_brief.NARRATIVE_EVENTS_DIAG),        # 19.10.2026: събития без опора в новините/макрото на деня, махнати от наративите
         # FIX 2026-09-30: приети/отхвърлени маркирания от проверката на тезите
         # срещу новините — правило (G0–G3) и причина
         "thesis_check_diag": dict(ai_brief.THESIS_CHECK_DIAG),
