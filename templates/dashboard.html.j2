@@ -1135,7 +1135,7 @@
         {% for p in qb.live %}
         <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}</td>
-          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% if p.return_pct is not none %} ({{ "%+.1f"|format(p.return_pct) }}%){% endif %}{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
+          <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% if p.get("return_pct") is not none %} ({{ "%+.1f"|format(p.return_pct) }}%){% endif %}{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
           <td class="n">${{ p.trigger }}</td><td class="n">{% if p.fill_price is not none %}${{ p.fill_price }}{% if p.trigger is not none and p.fill_price > p.trigger %} <span style="color:var(--muted)" title="Отвори над нивото — входът е по отварянето">(гап)</span>{% endif %}{% else %}—{% endif %}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
           <td>{{ p.regime or "н/д" }}</td></tr>
         {% endfor %}
