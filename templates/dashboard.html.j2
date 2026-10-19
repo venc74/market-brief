@@ -919,7 +919,8 @@
         <div class="kv"><span>Inst. ownership</span><b>{{ st.inst_ownership_pct }}%</b></div>
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
-        <div class="kv"><span>Препоръка</span><b>{{ st.ai.earnings_call }}</b></div>
+        {# 19.10.2026 (етап 2, т. 11): текстът е на модела — не е "Препоръка"; датата и предупреждението за отчета са от кода (earnings_warning) #}
+        {% if st.ai.earnings_call %}<div class="kv"><span title="Текстът е на модела, не е препоръка; датата и предупреждението за отчета горе са от кода">Бележка на AI за отчета</span><b>{{ st.ai.earnings_call }}</b></div>{% endif %}
         <div class="plan">
           <h3 style="color:var(--regime)">План{% if p.sizing_factor < 1 %} · режимен фактор ×{{ p.sizing_factor }} (Defensive){% endif %}</h3>
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
