@@ -655,7 +655,9 @@ def _hysteresis_effective(key: str, raw_today: bool, today_iso: str) -> tuple[bo
               f"fail-safe reset само за този ключ")
         raw_entry = None
     entry = raw_entry or {"streak_below": 0, "last_date": None}
-    if entry.get("last_date") != today_iso:
+    # 19.10.2026 (поправка): скок ДНЕС нулира брояча винаги — дедупликират се само спокойните дни. При прехода към датата на данните (етап 1) last_date пазеше ДАТАТА НА
+    # БРИФА от 16.10, данните на 19.10 бяха от 16.10 → "същият ден" и скокът (95. percentile) не нулира streak_below (остана 5) — един спокоен ден би освободил override-а.
+    if entry.get("last_date") != today_iso or (raw_today and entry.get("streak_below", 0)):
         prev_streak = entry.get("streak_below", 0)
         entry = {"streak_below": 0 if raw_today else prev_streak + 1, "last_date": today_iso}
         state[key] = entry
@@ -834,7 +836,7 @@ def _distribution_block(distribution_days: dict | None, today_iso: str, history=
     red = known and distribution_days.get("status") == "red"
     dirty = False
     if known:
-        if entry.get("last_date") != today_iso:
+        if entry.get("last_date") != today_iso or (red and not entry.get("blocked")):          # 19.10.2026: червен ден блокира веднага и при "същата" дата (виж _hysteresis_effective)
             if red:
                 if not entry.get("blocked"):
                     print("[thermo] distribution days: първи червен ден — Offensive се блокира веднага")
