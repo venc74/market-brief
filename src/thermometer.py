@@ -347,7 +347,7 @@ def _percentile_rank(history: list[float], current: float) -> float:
     return round(100.0 * below_or_eq / len(history), 1)
 
 
-def _evaluate_credit_spread(ratio) -> dict:
+def _evaluate_credit_spread(ratio, legs: dict | None = None) -> dict:
     """
     Чисто изчисление върху вече изтеглена, дата-сортирана IEI/HYG ratio
     серия — разделено от credit_spread_proxy() (fetch+orchestration), за да
@@ -390,8 +390,19 @@ def _evaluate_credit_spread(ratio) -> dict:
     else:
         status = "green"
 
-    note = (" ⚠ рязък credit spread spike" if spike else
+    note = (" ⚠ рязък скок (лихви + кредит)" if spike else
            (" (late-cycle complacency)" if complacency else ""))
+    # 19.10.2026 (етап 2, доп. т. 3): RoC на отношението ≈ промяната на IEI минус промяната на HYG (ln R = ln IEI − ln HYG) — кой крак движи "скока". 19.10: +1.0% = IEI +0.95%
+    # (лихвите падат) и HYG −0.07% (кредитът почти неподвижен) — не "разширяване на credit risk premium". `legs` = {"IEI": Close, "HYG": Close} по същите дати като ratio.
+    leg = {}
+    for k in ("IEI", "HYG"):
+        try:
+            c = (legs or {})[k].reindex(ratio.index).dropna()
+            if len(c) > config.IEI_HYG_ROC_WINDOW_DAYS:
+                leg[k] = round((float(c.iloc[-1]) / float(c.iloc[-1 - config.IEI_HYG_ROC_WINDOW_DAYS]) - 1) * 100, 2)
+        except Exception:
+            pass
+    legs_txt = f" (IEI {leg['IEI']:+.1f}%, HYG {leg['HYG']:+.1f}%)" if len(leg) == 2 else ""
     # 12.10.2026: посоката на RoC от кода (сега срещу преди IEI_HYG_ROC_TREND_SESSIONS сесии) — за промпта; моделът пишеше "ускоряваща се", когато RoC спадаше
     n_back = config.IEI_HYG_ROC_TREND_SESSIONS
     roc_valid = roc.dropna()
@@ -406,8 +417,9 @@ def _evaluate_credit_spread(ratio) -> dict:
         "level_percentile": level_pct, "roc_10d_pct": round(current_roc, 2),
         "roc_percentile": roc_pct, "spike": spike, "status": status,
         "roc_10d_pct_prev": round(roc_prev, 2) if roc_prev is not None else None, "roc_trend": trend, "roc_trend_text": trend_text,
+        **({"iei_10d_pct": leg["IEI"], "hyg_10d_pct": leg["HYG"]} if len(leg) == 2 else {}),
         "label": f"IEI/HYG {current:.3f} ({level_pct:.0f}. percentile) · "
-                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}д RoC {current_roc:+.1f}% "
+                 f"{config.IEI_HYG_ROC_WINDOW_DAYS}д RoC {current_roc:+.1f}%{legs_txt} "
                  f"({_pct_ord(roc_pct)} percentile){note}",
     }
 
@@ -448,7 +460,7 @@ def credit_spread_proxy() -> dict:
 
         common = iei.index.intersection(hyg.index)
         ratio = (iei.loc[common, "Close"] / hyg.loc[common, "Close"]).sort_index()
-        return _evaluate_credit_spread(ratio)
+        return _evaluate_credit_spread(ratio, {"IEI": iei.loc[common, "Close"], "HYG": hyg.loc[common, "Close"]})     # 19.10.2026: и двата крака за разлагането
     except Exception as e:
         print(f"[thermo] IEI/HYG credit spread failed: {e}")
         return {"name": "IEI/HYG (Credit Spread)", "value": None, "status": "yellow",
@@ -771,6 +783,12 @@ def _merge_regime(count_regime: str, count_reason: str, counts: str,
             f"След това режимът се определя от броенето — в момента то дава "
             f"{count_regime} ({counts}).")
     return regime, reason, exit_rule
+
+
+def _credit_legs(ind: dict) -> str:
+    """": IEI +0.9%, HYG −0.1%" — приносът на двата крака към 10д RoC (19.10.2026), ако индикаторът ги носи; иначе ""."""
+    i, h = ind.get("iei_10d_pct"), ind.get("hyg_10d_pct")
+    return f": IEI {i:+.1f}%, HYG {h:+.1f}%" if isinstance(i, (int, float)) and isinstance(h, (int, float)) else ""
 
 
 _DISTRIBUTION_KEY = "distribution_block"
@@ -1195,12 +1213,12 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     elif credit_spike:
         if credit_spike_raw:
             credit_text = (f"IEI/HYG credit spread spike ({credit_ind['roc_10d_pct']:+.1f}% за "
-                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {_pct_ord(credit_ind['roc_percentile'])} percentile) — "
-                           "рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%")
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д{_credit_legs(credit_ind)}, {_pct_ord(credit_ind['roc_percentile'])} percentile) — "
+                           "рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%")      # 19.10.2026: не "разширяване на credit risk premium"
             credit_state = "active"
         else:
             credit_text = (f"IEI/HYG: spike-ът отшумява ({credit_ind['roc_10d_pct']:+.1f}% за "
-                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д, {_pct_ord(credit_ind['roc_percentile'])} percentile, "
+                           f"{config.IEI_HYG_ROC_WINDOW_DAYS}д{_credit_legs(credit_ind)}, {_pct_ord(credit_ind['roc_percentile'])} percentile, "
                            f"под {config.IEI_HYG_ROC_SPIKE_PERCENTILE:.0f}.), хистерезис — дни под прага: "
                            f"{min(credit_spike_streak, 2)}/2 — override още активен, sizing −50%")
             credit_state = "hysteresis"
