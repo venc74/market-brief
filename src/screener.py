@@ -17,6 +17,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import sessions as _sessions               # 20.10.2026: без частичния днешен бар (cut_today)
 from src import net_utils
 from src import setup_rules
 from src import trade_levels
@@ -177,11 +178,11 @@ def explain_exits(tickers: list[str]) -> dict[str, str]:
     if not tickers:
         return out
     try:
-        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST)["Close"]
+        spy = _sessions.cut_today(yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST))["Close"]
         if isinstance(spy, pd.DataFrame):
             spy = spy.iloc[:, 0]
         spy = spy.dropna()
-        data = yf.download(list(tickers), period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True)
+        data = _sessions.cut_today(yf.download(list(tickers), period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True))
         for sym in tickers:
             try:
                 df = _frame_for(data, sym, len(tickers)).dropna()
@@ -219,7 +220,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     prev_scores: dict[str, float] = {}
     variants: dict[str, tuple] = {}
     try:
-        spy = yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST)["Close"]
+        spy = _sessions.cut_today(yf.download("SPY", period="2y", progress=False, auto_adjust=config.SCREENER_AUTO_ADJUST))["Close"]
         if isinstance(spy, pd.DataFrame):
             spy = spy.iloc[:, 0]
         spy = spy.dropna()
@@ -236,8 +237,8 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         batch = universe[i:i + batch_size]
         LAST_STATUS["batches"] += 1
         try:
-            data = yf.download(batch, period="2y", progress=False,
-                               auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True)
+            data = _sessions.cut_today(yf.download(batch, period="2y", progress=False,
+                                                   auto_adjust=config.SCREENER_AUTO_ADJUST, group_by="ticker", threads=True))
         except Exception as e:
             LAST_STATUS["batches_failed"] += 1
             print(f"[screener] batch {i} failed: {e}")

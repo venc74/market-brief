@@ -23,6 +23,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import trade_levels
+from src import sessions as _sessions
 
 try:
     import yfinance as yf
@@ -200,6 +201,7 @@ def fetch_frames(universe: list[str], batch_size: int = 100, now_utc: dt.datetim
         st["batches"] += 1
         try:
             data = yf.download(batch, period="1y", progress=False, auto_adjust=False, group_by="ticker", threads=True)
+            data = _sessions.cut_today(data) if data is not None else data         # 20.10.2026: без частичния днешен бар
             if data is None or data.empty:
                 raise ValueError("празен резултат")
         except Exception as e:

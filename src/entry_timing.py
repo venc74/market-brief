@@ -31,6 +31,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import net_utils
+from src import sessions as _sessions
 
 
 def evaluate_pivot_volume(candidate: dict) -> dict | None:
@@ -136,7 +137,7 @@ def _count_distribution_days(sym: str, lookback: int) -> int | None:
     да проверим").
     """
     hist = net_utils.fetch_with_timeout(
-        lambda: yf.Ticker(sym).history(period=f"{lookback + 15}d"))
+        lambda: _sessions.cut_today(yf.Ticker(sym).history(period=f"{lookback + 15}d")))      # 20.10.2026: без частичния днешен бар
     if hist is None or hist.empty or len(hist) < lookback + 1:
         return None
     LAST_BAR[sym] = hist.index[-1].date().isoformat()
@@ -172,7 +173,7 @@ def distribution_history(n_sessions: int, fetch=None) -> list[dict]:
     Статусите на последните n_sessions сесии ПРЕДИ последната (последната е днешната — смята се от evaluate_distribution_days и се прилага от самия блок). Мрежата е един fetch на SPY и QQQ
     (~150 календарни дни = пълният прозорец + n сесии); провал → [] (началното състояние остава празно, както преди). `fetch(sym)` е за тестове.
     """
-    fetch = fetch or (lambda sym: net_utils.fetch_with_timeout(lambda: yf.Ticker(sym).history(period="150d")))
+    fetch = fetch or (lambda sym: net_utils.fetch_with_timeout(lambda: _sessions.cut_today(yf.Ticker(sym).history(period="150d"))))
     try:
         spy, qqq = fetch("SPY"), fetch("QQQ")
         if spy is None or qqq is None or spy.empty or qqq.empty:

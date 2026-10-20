@@ -94,6 +94,7 @@ print("  ✓ празна серия / твърде къса / None / NaN в п�
 print()
 
 print("── СИНТЕТИЧНО: флагът за скок на VIX не зависи от празник ──")
+th._sessions.cut_today = lambda x: x          # 20.10.2026: синтетичните дати са в бъдещето (Thanksgiving 2026) — рязането на днешния бар има свой тест (test_partial_bar_cut)
 # 7 календарни дни = 5 бара без празник; с празник в прозореца позиционната котва е 1 бар по-стара
 vix_idx = pd.bdate_range("2026-11-16", "2026-12-04").drop(pd.Timestamp("2026-11-26"))      # Thanksgiving: няма бар
 vals = pd.Series([15.0] * len(vix_idx), index=vix_idx)

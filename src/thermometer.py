@@ -14,6 +14,7 @@ import yfinance as yf
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import sessions as _sessions               # 20.10.2026: без частичния днешен бар (cut_today)
 from src.screener import build_universe
 from src.series_utils import last_and_week_ago
 
@@ -25,7 +26,7 @@ def spy_trend() -> dict:
     липсващи/NaN данни → hide=True (unknown), НЕ фалшив сигнал в нито посока.
     """
     try:
-        hist = yf.Ticker("SPY").history(period="1y")
+        hist = _sessions.cut_today(yf.Ticker("SPY").history(period="1y"))
         if hist.empty or len(hist) < 200:
             raise ValueError("insufficient SPY history")
         close = hist["Close"]
@@ -68,7 +69,7 @@ def vix_level() -> dict:
     прозорец (calendar days, не trading days), новото е точно 5 търговски дни.
     """
     try:
-        hist = yf.Ticker("^VIX").history(period="1mo")
+        hist = _sessions.cut_today(yf.Ticker("^VIX").history(period="1mo"))
         if hist.empty or len(hist) < 6:
             raise ValueError("insufficient VIX history")
         # FIX 2026-10-03 (пакет 2 т.9): прозорецът е по ДАТА (последният бар на или преди 7 календарни дни от
@@ -226,7 +227,7 @@ def move_index() -> dict:
     скоростта на промяна, не само нивото, е ранният сигнал.
     """
     try:
-        hist = yf.Ticker("^MOVE").history(period="1mo")
+        hist = _sessions.cut_today(yf.Ticker("^MOVE").history(period="1mo"))
         if hist.empty or len(hist) < 6:
             raise ValueError("insufficient history")
         if _is_stale(hist.index[-1]):
@@ -290,9 +291,9 @@ def vix_term_structure() -> dict:
     резки корекции). Следим ratio = VIX9D / VIX3M вместо самите нива.
     """
     try:
-        hist9d = yf.Ticker("^VIX9D").history(period="5d")
-        hist_mid = yf.Ticker("^VIX").history(period="5d")
-        hist3m = yf.Ticker("^VIX3M").history(period="5d")
+        hist9d = _sessions.cut_today(yf.Ticker("^VIX9D").history(period="5d"))
+        hist_mid = _sessions.cut_today(yf.Ticker("^VIX").history(period="5d"))
+        hist3m = _sessions.cut_today(yf.Ticker("^VIX3M").history(period="5d"))
         if hist9d.empty or hist_mid.empty or hist3m.empty:
             raise ValueError("insufficient VIX9D/VIX/VIX3M data")
         if _is_stale(hist9d.index[-1]) or _is_stale(hist3m.index[-1]):
@@ -442,8 +443,8 @@ def credit_spread_proxy() -> dict:
     — затова е трети независим тригер, не redundant echo на MOVE.
     """
     try:
-        iei = yf.Ticker("IEI").history(period="3y")
-        hyg = yf.Ticker("HYG").history(period="3y")
+        iei = _sessions.cut_today(yf.Ticker("IEI").history(period="3y"))
+        hyg = _sessions.cut_today(yf.Ticker("HYG").history(period="3y"))
         if iei.empty or hyg.empty:
             raise ValueError("insufficient IEI/HYG history")
         if _is_stale(iei.index[-1]) or _is_stale(hyg.index[-1]):
@@ -516,8 +517,8 @@ def market_breadth() -> dict:
         for i in range(0, len(universe), config.BREADTH_BATCH_SIZE):
             batch = universe[i:i + config.BREADTH_BATCH_SIZE]
             try:
-                data = yf.download(batch, period="3mo", progress=False,
-                                   auto_adjust=True, group_by="ticker", threads=True)
+                data = _sessions.cut_today(yf.download(batch, period="3mo", progress=False,
+                                                       auto_adjust=True, group_by="ticker", threads=True))
             except Exception as e:
                 print(f"[thermo] breadth batch {i} fetch грешка: {e}")
                 continue
