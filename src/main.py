@@ -778,38 +778,44 @@ def run() -> dict:
     qm_rows, qm_diag, qm_cards, qm_ep_out = [], {}, [], {}
     corp_ex_qm: list[dict] = []
     qm_universe: list[str] = []
-    if config.ENABLE_QM or config.ENABLE_QM_EP:
-        try:
-            qm_universe = screener.build_universe()                  # същият универс като скрийнъра (без малки акции); един път за скенера и за EP наблюдението
-        except Exception as e:
-            print(f"[main] универсът за Qullamaggie не се зареди: {e}")
-            qm_diag = {"ok": False, "error": f"универсът не се зареди ({type(e).__name__})"}
-    if config.ENABLE_QM and qm_universe:
-        try:
-            qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
-            qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)      # 13.10.2026: отделяне в прозореца на 6-месечния ръст → не е кандидат (нито карта, нито запис)
-            qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
-            def _qm_earnings():                                      # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
-                import yfinance as _yf
-                d0 = dt.date.today()
-                for c in qm_cards:
-                    c["earnings"] = {"next_earnings": earnings_move.next_earnings_date(c["ticker"], _yf, d0)}
-                n_qm_warn = earnings_move.annotate(qm_cards, d0)
-                print(f"      QM карти с отчет в следващите ~{config.EARNINGS_WARNING_SESSIONS} сесии: {n_qm_warn}")
-            steps.step("earnings_warnings_qm", _qm_earnings, label="Предупрежденията за отчет върху картите по Kullamägi",
-                       consequence="QM картите днес може да нямат ред за предстоящ отчет; провери датата сам")
-        except Exception as e:
-            print(f"[main] Qullamaggie скенерът пропадна: {e}")
-            qm_diag = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+    # 20.10.2026 (етап 3б, обвивката — стъпка 2): универсът, скенерът и EP — в обвивката; статусът (qm_diag / qm_ep_out) е същият като досега, банерът — собственият (data_warnings)
+    qm_universe = steps.step("qm_universe", screener.build_universe, fallback=[], enabled=bool(config.ENABLE_QM or config.ENABLE_QM_EP), source="qm_breakout",
+                             label="Универсът за Qullamaggie", consequence="без скан за пробив и без EP наблюдение днес")     # същият универс като скрийнъра; един път за скенера и за EP
+    if steps.result("qm_universe").status == "failed":
+        qm_diag = {"ok": False, "error": f"универсът не се зареди ({steps.result('qm_universe').error_type})"}
+    qm = {"rows": qm_rows, "diag": qm_diag, "cards": qm_cards, "corp_ex": corp_ex_qm}       # частично изпълненото остава при провал по-късно в стъпката (както в try блока до 20.10)
+
+    def _qm_scan():
+        qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
+        qm.update(rows=qm_rows, diag=qm_diag)
+        qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)      # 13.10.2026: отделяне в прозореца на 6-месечния ръст → не е кандидат (нито карта, нито запис)
+        qm.update(rows=qm_rows, corp_ex=corp_ex_qm)
+        qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
+        qm.update(cards=qm_cards)
+
+        def _qm_earnings():                                      # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
+            import yfinance as _yf
+            d0 = dt.date.today()
+            for c in qm_cards:
+                c["earnings"] = {"next_earnings": earnings_move.next_earnings_date(c["ticker"], _yf, d0)}
+            n_qm_warn = earnings_move.annotate(qm_cards, d0)
+            print(f"      QM карти с отчет в следващите ~{config.EARNINGS_WARNING_SESSIONS} сесии: {n_qm_warn}")
+        steps.step("earnings_warnings_qm", _qm_earnings, label="Предупрежденията за отчет върху картите по Kullamägi",
+                   consequence="QM картите днес може да нямат ред за предстоящ отчет; провери датата сам")
+
+    steps.step("qm_scan", _qm_scan, enabled=bool(config.ENABLE_QM and qm_universe), source="qm_breakout",
+               on_fail=lambda e: qm.__setitem__("diag", {"ok": False, "error": f"{type(e).__name__}: {e}"}),
+               partial=lambda _: (f"{qm['diag']['batches_failed']} от {qm['diag'].get('batches')} партиди не се изтеглиха", {}) if (qm["diag"] or {}).get("batches_failed") else None,
+               label="Скенерът за пробиви по Kullamägi", consequence="празният списък НЕ значи, че няма кандидати за пробив днес")
+    qm_rows, qm_diag, qm_cards, corp_ex_qm = qm["rows"], qm["diag"], qm["cards"], qm["corp_ex"]
     qm_by_ticker = {r["ticker"]: r for r in qm_rows}
     attach_qm_markers(action + watchlist, qm_by_ticker)             # QM✓ върху нашите карти, ако са и кандидати за пробив
     # EP наблюдение (САМО информация, без Track Record): after-hours гапове ≥ 10% при "пренебрегване"; AI само класифицира катализатора от заглавията; дневник на AH гап срещу реалния гап
-    if config.ENABLE_QM_EP and qm_universe:
-        try:
-            qm_ep_out = qm_ep.run(qm_universe, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
-        except Exception as e:
-            print(f"[main] EP наблюдението пропадна: {e}")
-            qm_ep_out = {"ok": False, "notes": [f"{type(e).__name__}: {e}"], "rows": []}
+    qm_ep_out = steps.step("qm_ep", lambda: qm_ep.run(qm_universe, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"]), fallback=qm_ep_out,
+                           enabled=bool(config.ENABLE_QM_EP and qm_universe), source="qm_ep",
+                           on_fail=lambda e: {"ok": False, "notes": [f"{type(e).__name__}: {e}"], "rows": []},
+                           partial=lambda v: (f"{(v.get('diag') or {})['batches_failed']} партиди не се изтеглиха", {}) if (v.get("diag") or {}).get("batches_failed") else None,
+                           label="EP наблюдението (after-hours гапове)", consequence="празният списък НЕ значи, че няма гапове след затваряне")
 
     # Short/Stage 4 screener — Модул 1, Short/Reversal тема (2026-08-2x).
     # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
@@ -898,12 +904,10 @@ def run() -> dict:
         uov_diag["positions"] = attach_position_uov(pos_rows)
     steps.step("uov_positions", _uov_positions, enabled=bool(config.ENABLE_UNUSUAL_OPTIONS and pos_rows),
                label="UOV✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че няма необичайна опционна активност")
-    try:
-        if config.ENABLE_INSIDER_BUYING and pos_rows:
-            ins_pos_status = attach_position_insider(pos_rows)
-    except Exception as e:
-        print(f"[main] INS✓ маркерите за позициите пропуснати: {e}")
-        ins_pos_status = {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"}      # 19.10.2026 (т. 12): видимо, не тихо {}
+    ins_pos_status = steps.step("ins_positions", lambda: attach_position_insider(pos_rows), fallback=ins_pos_status, enabled=bool(config.ENABLE_INSIDER_BUYING and pos_rows),
+                                source="insider", on_fail=lambda e: {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"},      # 19.10.2026 (т. 12): видимо, не тихо {}
+                                partial=lambda v: (v.get("note") or "частично", {}) if (v or {}).get("kind") == "ok_partial" else None,
+                                label="INS✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че няма insider покупки")
     steps.step("qm_positions", lambda: attach_qm_markers(pos_rows, qm_by_ticker), enabled=bool(qm_by_ticker and pos_rows),       # QM✓ и върху позициите (v2 отворени/чакащи и buy-stop книгата)
                label="QM✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че тикърът не е кандидат за пробив")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
@@ -972,16 +976,16 @@ def run() -> dict:
     # С5 (втори преглед, 10.10.2026): канарче за split корекцията на Yahoo — една заявка; провал на тегленето → неизвестно, без банер
     canary = data_canary.check() if config.ENABLE_DATA_CANARY else None
     # Здравен монитор (втори преглед, 10.10.2026): очакваните артефакти — OI снимка, предишен бриф, книги, GLB състояние, дневни кешове
-    try:
+    def _health():
         if config.ENABLE_BAR_FRESHNESS and screener.LAST_BAR_DATES:       # 16.10.2026: делът на универса със стар бар + засегнатите карти
             bar_freshness.universe(screener.LAST_BAR_DATES, [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])], dt.date.fromisoformat(today))
         health = health_monitor.check(today, resolution=backtest.LAST_RESOLUTION, glb_status=glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None,
                                       freshness=dict(bar_freshness.LAST_DIAG) if config.ENABLE_BAR_FRESHNESS else None)
         print(f"[health] {len(health)} проблема" + (": " + " | ".join(h["check"] for h in health) if health else " — всичко очаквано е налице"))
-    except Exception as e:
-        print(f"[health] мониторът пропуснат: {type(e).__name__}: {e}")
-        # 19.10.2026 (т. 12): паднал монитор не е "всичко е наред" — ред в банера
-        health = [{"check": "health_monitor", "message": f"мониторът не се изпълни ({type(e).__name__}: {e}) — липсата на други редове тук днес НЕ значи, че всичко очаквано е налице."}]
+        return health
+    # 19.10.2026 (т. 12): паднал монитор не е "всичко е наред" — ред в банера (source "health:health_monitor")
+    health = steps.step("health", _health, source="health:health_monitor", label="Здравният монитор", consequence="липсата на други редове днес НЕ значи, че всичко очаквано е налице",
+                        on_fail=lambda e: [{"check": "health_monitor", "message": f"мониторът не се изпълни ({type(e).__name__}: {e}) — липсата на други редове тук днес НЕ значи, че всичко очаквано е налице."}])
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")

@@ -193,7 +193,7 @@ assert len(epc) == 1 and ast.unparse(epc[0].args[0]) == "qm_universe" and any(k.
 keys = [k.value for n in ast.walk(run_fn) if isinstance(n, ast.Dict) for k in n.keys if isinstance(k, ast.Constant) and isinstance(k.value, str)]
 assert "qm_ep" in keys
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "qm_breakout.scan(universe=qm_universe)" in src and src.count("screener.build_universe()") == 1 and "qm_ep=qm_ep_out" in src
+assert "qm_breakout.scan(universe=qm_universe)" in src and src.count("screener.build_universe") == 1 and "qm_ep=qm_ep_out" in src
 print("  ✓ провал на after-hours тегленето → банер ('празният списък НЕ значи, че няма гапове'); run(): ЕДИН универс за скенера и за EP, EP се вика с име на компания, brief има 'qm_ep'")
 print()
 print("Всички тестове минаха.")

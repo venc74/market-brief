@@ -86,7 +86,7 @@ assert '"check": "health_monitor", "message": f"мониторът не се и�
 i = src.index('sent = send_once(email_html, subject, today)')
 tail = src[i:i + 1200]
 assert 'if not sent["sent"] and not sent["skipped"]:' in tail and '"source": "email"' in tail and "render_dashboard(brief)" in tail
-assert 'ins_pos_status = {"kind": "failed"' in src and '"screener_status": dict(screener.LAST_STATUS)' in src
+assert 'on_fail=lambda e: {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"}' in src and '"screener_status": dict(screener.LAST_STATUS)' in src       # 20.10.2026 (етап 3б): в обвивката
 assert "news_status=dict(news_aggregator.LAST_STATUS)" in src and "fred_key_missing=not config.FRED_API_KEY" in src
 print("  ✓ паднал монитор → ред; неизпратен имейл (не повторен run) → банер + страницата наново; паднал INS✓ за позициите → 'failed'; screener_status в брифа")
 print("\n✅ test_silent_failures: всичко мина")

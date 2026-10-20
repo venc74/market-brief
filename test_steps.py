@@ -46,9 +46,10 @@ run = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef)
 names = [ast.literal_eval(c.args[0]) for c in ast.walk(run) if isinstance(c, ast.Call) and ast.unparse(c.func) == "steps.step"]
 STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "cot_track", "earnings_warnings", "earnings_warnings_qm", "cot_opposites", "book_buystop", "book_qm",
          "book_glb_wish", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_card", "short_screener"}
-assert set(names) == STEP1 and len(names) == len(STEP1), sorted(set(names) ^ STEP1)
+STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
+assert set(names) == STEP1 | STEP2 and len(names) == len(STEP1 | STEP2), sorted(set(names) ^ (STEP1 | STEP2))
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]
-assert len(tries) == 14, len(tries)                    # останалите имат собствен статус и банер (стъпки 2–3 на обвивката: модулните LAST_STATUS и локалните diag) + банерът за имейла
+assert len(tries) == 9, len(tries)                     # останалите имат модулен статус и собствен банер (стъпка 3: LAST_STATUS / LAST_DIAG) + банерът за имейла
 assert "steps.reset()" in src and '"run_steps": steps.summary()' in src and "data_warns += steps.warnings({w.get(\"source\") for w in data_warns})" in src
 print(f"  ✓ {len(names)} стъпки в обвивката; останалите try в run() — {len(tries)} (собствен статус и банер); run_steps в брифа; банерите след тези на модулите")
 
@@ -61,7 +62,8 @@ FAULTS = {"model": "src.model_selector.resolve_model", "bar_freshness": "src.bar
           "news": "src.news_aggregator.significant_news", "prose_checks": "src.ai_brief.apply_sector_claims_to_narratives", "earnings_warnings": "src.earnings_move.annotate",
           "cot_opposites": "src.cot_opposites.annotate", "book_buystop": "src.backtest.get_buystop_summary", "book_qm": "src.backtest.get_qm_summary",
           "book_glb_wish": "src.backtest.get_glb_wish_summary", "si_positions": "src.dataroma.new_position_markers", "watch": "src.watch_monitor.collect",
-          "splits_report": "src.splits_calendar.splits_report", "sector_card": "src.sector_claims.sector_card"}
+          "splits_report": "src.splits_calendar.splits_report", "sector_card": "src.sector_claims.sector_card", "health": "src.health_monitor.check"}
+OWN_SOURCE = {"health": "health:health_monitor"}                                         # стъпка 2: собственият ред на монитора, не втори банер
 for spec in FAULTS.values():
     mod, attr = spec.rsplit(".", 1)
     setattr(importlib.import_module(mod), attr, lambda *a, _n=spec, **k: (_ for _ in ()).throw(RuntimeError(f"инжектиран провал {_n}")))
@@ -74,11 +76,13 @@ enabled = {"bar_freshness": config.ENABLE_BAR_FRESHNESS, "distribution_cap": con
 want_failed = {k for k in FAULTS if enabled.get(k, True)}
 assert {k for k, r in rs.items() if r["status"] == "failed"} == want_failed, {k: r["status"] for k, r in rs.items()}
 sources = {w["source"] for w in brief["data_warnings"]}
-assert want_failed <= sources, want_failed - sources
+assert {OWN_SOURCE.get(k, k) for k in want_failed} <= sources, {OWN_SOURCE.get(k, k) for k in want_failed} - sources
+assert not any(w["source"] == "health" for w in brief["data_warnings"])                  # без втори банер за монитора
 for k in want_failed:
     assert "инжектиран провал" in rs[k]["reason"]
 gen = [w for w in brief["data_warnings"] if w["source"] in want_failed]
-assert all(w["level"] == "error" and ": провал днес (RuntimeError: инжектиран провал" in w["message"] for w in gen if w["source"] in FAULTS)
+assert all(w["level"] == "error" and ": провал днес (RuntimeError: инжектиран провал" in w["message"] for w in gen if w["source"] in FAULTS and w["source"] not in OWN_SOURCE)
+assert any(w["source"] == "health:health_monitor" and "мониторът не се изпълни (RuntimeError" in w["message"] for w in brief["data_warnings"])
 assert (config.DATA_DIR / f"{brief['date']}.json").exists() and json.loads((config.DATA_DIR / f"{brief['date']}.json").read_text(encoding="utf-8"))["run_steps"]
 print(f"  ✓ run-ът завършва; {len(want_failed)} инжектирани провала → статус 'failed' и банер за всеки; брифът носи run_steps ({len(rs)} стъпки)")
 ex = next(w for w in brief["data_warnings"] if w["source"] == "earnings_warnings")

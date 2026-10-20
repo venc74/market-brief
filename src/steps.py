@@ -6,6 +6,7 @@
   step(name, fn, …) — fn() в try/except, с време; изключение → fallback, статус "failed", ред в лога; partial(value) → (причина, детайл) или None; critical=True — изключението
   се вдига (рендерът и записът — там провалът и днес сваля run-а). Стъпка с enabled=False е "skipped" (изключена в config) — без банер.
   summary() → brief["run_steps"]; warnings(present) → банерите за провалените / частичните стъпки, чийто source още НЯМА банер (стъпка със собствен точен банер не получава втори).
+Стъпка 2 (20.10): местата с ЛОКАЛЕН статус (qm_diag, статусът на INS✓ за позициите, EP, здравният монитор) — on_fail(exc) връща същия статус като досега, собственият банер остава.
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ class StepResult:
     consequence: str = ""
     source: str = ""
     reason: str | None = None
+    error_type: str | None = None
     detail: dict = field(default_factory=dict)
     seconds: float = 0.0
 
@@ -36,8 +38,9 @@ def reset() -> None:
 
 
 def step(name: str, fn: Callable[[], Any], *, fallback: Any = None, label: str, consequence: str, source: str | None = None,
-         partial: Callable[[Any], tuple[str, dict] | None] | None = None, critical: bool = False, enabled: bool = True, trace: bool = False) -> Any:
-    """Изпълнява fn() и записва резултата в RUN; връща стойността (или fallback при провал / пропусната стъпка)."""
+         partial: Callable[[Any], tuple[str, dict] | None] | None = None, critical: bool = False, enabled: bool = True, trace: bool = False,
+         on_fail: Callable[[Exception], Any] | None = None) -> Any:
+    """Изпълнява fn() и записва резултата в RUN; връща стойността (или fallback при провал / пропусната стъпка; при провал с on_fail — on_fail(exc))."""
     res = StepResult(name=name, status="ok", label=label, consequence=consequence, source=source or name)
     if not enabled:
         res.status = "skipped"
@@ -48,14 +51,14 @@ def step(name: str, fn: Callable[[], Any], *, fallback: Any = None, label: str, 
         value = fn()
     except Exception as e:
         res.seconds = round(time.monotonic() - t0, 1)
-        res.status, res.reason = "failed", f"{type(e).__name__}: {e}"[:300]
+        res.status, res.reason, res.error_type = "failed", f"{type(e).__name__}: {e}"[:300], type(e).__name__
         RUN.append(res)
         if trace:
             traceback.print_exc()
         print(f"[step] {name}: ПРОВАЛ — {res.reason} ({label}: {consequence})")
         if critical:
             raise
-        return fallback
+        return on_fail(e) if on_fail is not None else fallback
     res.seconds = round(time.monotonic() - t0, 1)
     if partial is not None:
         try:
@@ -68,6 +71,11 @@ def step(name: str, fn: Callable[[], Any], *, fallback: Any = None, label: str, 
             print(f"[step] {name}: ЧАСТИЧНО — {res.reason}")
     RUN.append(res)
     return value
+
+
+def result(name: str) -> StepResult | None:
+    """Последният запис на стъпката (None, ако не е изпълнявана)."""
+    return next((r for r in reversed(RUN) if r.name == name), None)
 
 
 def summary() -> list[dict]:
