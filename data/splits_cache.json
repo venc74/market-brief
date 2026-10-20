@@ -1,6 +1,17 @@
 {
- "date": "2026-10-19",
- "rows": [],
+ "date": "2026-10-20",
+ "rows": [
+  {
+   "ticker": "AMTD",
+   "company": "AMTD IDEA Group",
+   "date": "2026-10-19",
+   "ratio": "1:60",
+   "split_type": "reverse",
+   "date_human": "Oct 19, 2026",
+   "price": 28.5,
+   "market_cap": 2286513618.0
+  }
+ ],
  "horizon": [
   {
    "ticker": "AMTD",
@@ -43,12 +54,36 @@
    "date_human": "Oct 19, 2026"
   },
   {
+   "ticker": "MBRX",
+   "company": "Moleculin Biotech, Inc.",
+   "date": "2026-10-20",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Oct 20, 2026"
+  },
+  {
+   "ticker": "REVB",
+   "company": "Revelation Biosciences, Inc.",
+   "date": "2026-10-20",
+   "ratio": "1:7",
+   "split_type": "reverse",
+   "date_human": "Oct 20, 2026"
+  },
+  {
    "ticker": "LU",
    "company": "Lufax Holding Ltd",
    "date": "2026-10-23",
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 23, 2026"
+  },
+  {
+   "ticker": "NYSX",
+   "company": "Global X Funds Global X NYSE 100 ETF",
+   "date": "2026-10-30",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Oct 30, 2026"
   },
   {
    "ticker": "EFG",
@@ -94,21 +129,22 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 11,
+  "source_rows": 14,
   "horizon_from": "2026-10-19",
   "horizon_to": "2026-11-05",
-  "in_week": 6,
+  "in_week": 8,
   "dropped_price": [
-   "AMTD",
    "CAPS",
    "FRGT",
    "GP",
    "OBAI",
+   "MBRX",
+   "REVB",
    "LU"
   ],
   "dropped_cap": [],
   "dropped_no_data": [],
-  "passed": 0,
-  "state": "empty"
+  "passed": 1,
+  "state": "ok"
  }
 }

@@ -1,53 +1,53 @@
 {
- "date": "2026-10-19",
+ "date": "2026-10-20",
  "news": [
   {
-   "headline": "China's third-quarter economic growth quickens to 4.5% as exports surge, beating estimates",
-   "source": "CNBC",
-   "why": "China Q3 GDP от 4.5% надмина очакванията, сигнализирайки за по-силно глобално търсене и укрепвайки позицията на китански активи и суровини.",
-   "headline_bg": "Китайският икономически ръст се ускорява до 4.5% за третото тримесечие, тъй като износът скача, надминавайки прогнозите"
-  },
-  {
-   "headline": "Oil tumbles as Trump's Russia sanctions waiver may lead to more fuel supplies - Reuters",
-   "source": "Reuters Business",
-   "why": "Спадът в петролните цени заради евентуалното премахване на санкциите срещу Русия директно засяга енергийния сектор, инфлационните очаквания и Fed политиката.",
-   "headline_bg": "Петролът се срива, тъй като освобождаването от руските санкции от страна на Тръмп може да доведе до повече петролни доставки"
-  },
-  {
-   "headline": "Dollar firmer, euro weakens as French protests turn violent - Reuters",
-   "source": "Reuters Business",
-   "why": "Еврото отслабва спрямо долара заради политическата нестабилност във Франция, което влияе на валутните позиции и европейските активи.",
-   "headline_bg": "Доларът поскъпва, еврото отслабва заради насилствените протести във Франция"
-  },
-  {
-   "headline": "France hit by worst unrest in years as attempts to rein in government spending meet citizen ire",
-   "source": "CNBC",
-   "why": "Политическата криза във Франция около бюджетните разходи и предстоящото гласуване заплашва фискалната стабилност на еврозоната и повишава суверенния риск.",
-   "headline_bg": "Франция е засегната от най-тежките вълнения от години, тъй като опитите за ограничаване на правителствените разходи предизвикват гнева на гражданите"
-  },
-  {
-   "headline": "Putin reportedly suggests summit with Trump and Xi to decide fate of Ukraine",
-   "source": "CNBC",
-   "why": "Предложението на Путин за среща на върха с Тръмп и Си относно Украйна може да промени геополитическия пейзаж и да повлияе на цените на суровините и отбранителния сектор.",
-   "headline_bg": "Путин предлага среща на върха с Тръмп и Си за решаване на съдбата на Украйна"
-  },
-  {
-   "headline": "Indonesian stocks slide to six-year low as MSCI warning weighs - Reuters",
-   "source": "Reuters Business",
-   "why": "Индонезийските акции са на шестгодишно дъно заради предупреждение от MSCI за евентуална деградация, което може да предизвика принудителни разпродажби от пасивни фондове.",
-   "headline_bg": "Индонезийските акции се плъзгат до шестгодишно дъно под натиска на предупреждението на MSCI"
-  },
-  {
-   "headline": "US threatens Europe over Starlink restrictions",
+   "headline": "Iran war tilts balance of global oil power towards Americas",
    "source": "Financial Times",
-   "why": "Заплахата на САЩ за ответни мерки срещу ЕС заради ограниченията на Starlink засяга регулаторната среда за технологичния сектор и трансатлантическите търговски отношения.",
-   "headline_bg": "САЩ заплашват Европа заради ограниченията върху Starlink"
+   "why": "Войната в Иран е преориентирала глобалните петролни потоци към Америките, което засяга цените на суровините и енергийния сектор дългосрочно.",
+   "headline_bg": "Войната в Иран измества баланса на глобалната петролна мощ към Америките"
   },
   {
-   "headline": "Global food inflation is expected to intensify as supply shocks pile up - Reuters",
+   "headline": "Brent crude holds near five-month high on Middle East tension - Reuters",
    "source": "Reuters Business",
-   "why": "Задълбочаването на глобалната хранителна инфлация заради натрупващи се шокове в предлагането добавя инфлационен натиск, усложнявайки задачата на централните банки.",
-   "headline_bg": "Глобалната хранителна инфлация се очаква да се засили с натрупването на шокове в предлагането"
+   "why": "Brent crude се задържа близо до петмесечен връх заради геополитическото напрежение на Близкия изток, което директно влияе на енергийния сектор и инфлационните очаквания.",
+   "headline_bg": "Brent crude се задържа близо до петмесечен връх заради напрежението на Близкия изток"
+  },
+  {
+   "headline": "China leaves loan rates steady for 17th consecutive month - Reuters",
+   "source": "Reuters Business",
+   "why": "Китай запазва лихвените проценти по заемите непроменени за 17-и пореден месец, което сигнализира ограничено монетарно стимулиране и влияе на глобалните очаквания за растеж.",
+   "headline_bg": "Китай запазва лихвените нива непроменени за 17-и пореден месец"
+  },
+  {
+   "headline": "China’s economy accelerated in the July-September quarter on robust exports - AP News",
+   "source": "AP Business",
+   "why": "Китайската икономика се ускорява в третото тримесечие благодарение на силния износ — ключов макро показател за глобалното търсене и азиатските пазари.",
+   "headline_bg": "Китайската икономика се ускорява през юли-септември на гръб на силния износ"
+  },
+  {
+   "headline": "Trump says Mexico and US are close to trade deal - Reuters",
+   "source": "Reuters Business",
+   "why": "Търговска сделка между САЩ и Мексико е в напреднал етап, което е пряко свързано с тарифната политика и пазарите на двете страни.",
+   "headline_bg": "Тръмп казва, че Мексико и САЩ са близо до търговска сделка"
+  },
+  {
+   "headline": "Gold inches up on softer dollar as investors assess Fed rate outlook - Reuters",
+   "source": "Reuters Business",
+   "why": "Златото поскъпва заради по-слабия долар и преоценката на очакванията за лихвена политика на Fed, което е важен сигнал за настроенията на пазарите.",
+   "headline_bg": "Златото леко поскъпва заради по-слабия долар и преоценката на лихвената политика на Fed"
+  },
+  {
+   "headline": "Bank Indonesia faces mounting pressure to hike after MSCI threat fuels market rout",
+   "source": "CNBC",
+   "why": "Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI да понижи пазара до standalone статус, предизвиквайки сериозна разпродажба и отслабване на рупията.",
+   "headline_bg": "Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI и пазарния срив"
+  },
+  {
+   "headline": "Supreme Court won't review Trump's firing of labor board member",
+   "source": "CNBC",
+   "why": "Върховният съд отказа да преразгледа уволнението на член на трудовия съвет от Тръмп, потвърждавайки президентския контрол върху независимите агенции с регулаторен ефект за пазарите.",
+   "headline_bg": "Върховният съд отказа да преразгледа уволнението на члена на трудовия съвет от Тръмп"
   }
  ]
 }

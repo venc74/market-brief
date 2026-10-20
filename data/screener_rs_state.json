@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-19",
+ "updated": "2026-10-20",
  "enter": 0.97,
  "stay": 0.94,
  "tickers": [
@@ -8,7 +8,6 @@
   "ABBV",
   "AMG",
   "AMGN",
-  "BBY",
   "BIIB",
   "CAH",
   "CNC",
@@ -29,10 +28,13 @@
   "PSX",
   "RGA",
   "RNR",
+  "ROKU",
   "SN",
   "TRGP",
+  "V",
   "VTRS",
   "WSM",
-  "WST"
+  "WST",
+  "ZBRA"
  ]
 }
