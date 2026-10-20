@@ -96,10 +96,8 @@ def week_close_date(ts, crypto: bool = False) -> str:
     d = ts.date() if hasattr(ts, "date") else ts
     if crypto:
         return (d + dt.timedelta(days=6 - d.weekday())).isoformat()
-    end = d + dt.timedelta(days=max(0, 4 - d.weekday()))
-    while end.weekday() >= 5 or end.isoformat() in config.NYSE_HOLIDAYS:
-        end -= dt.timedelta(days=1)
-    return end.isoformat()
+    from src import sessions
+    return sessions.week_last_session(d).isoformat()               # 20.10.2026: src/sessions.py
 
 
 def confirmation(close, direction: str, crypto: bool = False) -> dict | None:

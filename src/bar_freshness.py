@@ -27,6 +27,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src.setup_rules import is_session
+from src import sessions as _sessions
 
 LAST_DIAG: dict = {}
 _MAX_ERRORS = 3
@@ -37,10 +38,8 @@ def _dm(iso: str | None) -> str:
 
 
 def expected_session(today) -> str:
-    d = (today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today)[:10])) - dt.timedelta(days=1)
-    while not is_session(d):
-        d -= dt.timedelta(days=1)
-    return d.isoformat()
+    """Последната NYSE сесия преди деня на брифа (src/sessions.prev_session)."""
+    return _sessions.prev_session(today).isoformat()
 
 
 def _download(tickers):

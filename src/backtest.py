@@ -1198,9 +1198,8 @@ def _is_late_discovery(rec: dict) -> bool:
     if not disc or not res:
         return False
     try:
-        d = dt.date.fromisoformat(res) + dt.timedelta(days=1)
-        while not setup_rules.is_session(d):          # уикенд / NYSE празник → следващата сесия (19.10.2026, Н1: до 19.10 — само уикендът;
-            d += dt.timedelta(days=1)                 # стоп на 25.11, открит на 27.11 след Thanksgiving, щеше да е "открит със закъснение")
+        from src import sessions                      # 19.10.2026 (Н1): първата СЕСИЯ след резолюцията (стоп 25.11 → открит 27.11 след Thanksgiving — навреме)
+        d = sessions.next_session(dt.date.fromisoformat(res))
         return dt.date.fromisoformat(disc) > d
     except ValueError:
         return False

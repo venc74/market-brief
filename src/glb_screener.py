@@ -438,11 +438,9 @@ def replay_state(replays: dict[str, dict]) -> tuple[dict, list[dict], dict]:
 
 
 def _complete_bars(df, today: str):
-    """Баровете с дата < today (днешният бар при повторен run в хода на сесията е частичен — както wish_signal и trade_sim.complete_bars)."""
-    if df is None or not len(df) or not today:
-        return df
-    idx = df.index.tz_localize(None) if getattr(df.index, "tz", None) is not None else df.index
-    return df[idx < pd.Timestamp(today)]
+    """Баровете с дата < today (днешният бар при повторен run в хода на сесията е частичен) — src/sessions.complete_bars (20.10.2026)."""
+    from src import sessions
+    return sessions.complete_bars(df, today or None)
 
 
 def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=None, today: str | None = None) -> list[dict]:

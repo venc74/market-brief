@@ -313,10 +313,8 @@ LOG_MAX = 500
 
 
 def next_session(d: dt.date) -> dt.date:
-    d = d + dt.timedelta(days=1)
-    while not setup_rules.is_session(d):
-        d += dt.timedelta(days=1)
-    return d
+    from src import sessions
+    return sessions.next_session(d)                               # 20.10.2026: src/sessions.py
 
 
 def load_log(path=None) -> dict:

@@ -31,30 +31,13 @@ import config
 # ──────────────────────────────────────────────────────────────────────────
 # Търговски сесии (за "валиден до")
 # ──────────────────────────────────────────────────────────────────────────
-def _as_date(d) -> dt.date:
-    if isinstance(d, dt.datetime):
-        return d.date()
-    if isinstance(d, dt.date):
-        return d
-    return dt.date.fromisoformat(str(d)[:10])
+# 20.10.2026 (етап 3, част Б): сесиите са в src/sessions.py — тук са старите имена (ползват се навсякъде)
+from src import sessions as _sessions
 
-
-def is_session(d) -> bool:
-    d = _as_date(d)
-    return d.weekday() < 5 and d.isoformat() not in config.NYSE_HOLIDAYS
-
-
-def sessions_between(last_date, today) -> int:
-    """
-    С1 (10.10.2026): брой NYSE сесии СТРОГО между last_date и today (без двата края). Последният бар от предишната сесия → 0; брифът е преди
-    отваряне, затова днешната сесия не се брои. Празниците и уикендите не са сесии (NYSE_HOLIDAYS).
-    """
-    a, b = _as_date(last_date), _as_date(today)
-    n, d = 0, a + dt.timedelta(days=1)
-    while d < b:
-        n += is_session(d)
-        d += dt.timedelta(days=1)
-    return n
+_as_date = _sessions.as_date
+is_session = _sessions.is_session
+# С1 (10.10.2026): брой NYSE сесии СТРОГО между last_date и today (без двата края) — последният бар от предишната сесия → 0; днешната сесия не се брои
+sessions_between = _sessions.sessions_between
 
 
 def is_stale_daily(last_date, today=None) -> bool:
@@ -68,21 +51,10 @@ def session_window(brief_date, sessions: int | None = None) -> list[dt.date]:
     в 05:30 UTC, преди US отваряне — сесията на деня на брифа е първата, в която
     може да се търгува). Събота/неделя/празник → следващата търговска сесия.
     """
-    n = sessions if sessions is not None else config.BUY_STOP_WINDOW_SESSIONS
-    d = _as_date(brief_date)
-    out: list[dt.date] = []
-    while len(out) < n:
-        if is_session(d):
-            out.append(d)
-        d += dt.timedelta(days=1)
-    return out
+    return _sessions.session_window(brief_date, sessions if sessions is not None else config.BUY_STOP_WINDOW_SESSIONS)
 
 
-def next_weekday(d) -> dt.date:
-    d = _as_date(d) + dt.timedelta(days=1)
-    while d.weekday() >= 5:
-        d += dt.timedelta(days=1)
-    return d
+next_weekday = _sessions.next_weekday
 
 
 def market_calendar_note(today) -> str | None:

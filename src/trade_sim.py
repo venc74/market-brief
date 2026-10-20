@@ -60,16 +60,9 @@ def _as_date(d) -> dt.date:
 
 
 def complete_bars(bars: pd.DataFrame | None, today=None) -> pd.DataFrame | None:
-    """
-    19.10.2026 (трети преглед, С1): баровете с дата >= today не са завършени сесии — брифът е преди отварянето, а повторен run в хода на деня получава ЧАСТИЧЕН бар за днес
-    (19.10 в 18:55 UTC: SPY с обем 22 млн при 64 млн на 16.10). Без today (реплеят) — баровете както са.
-    """
-    if bars is None or today is None or len(bars) == 0:
-        return bars
-    idx = pd.DatetimeIndex(bars.index)
-    if idx.tz is not None:
-        idx = idx.tz_localize(None)
-    return bars[idx < pd.Timestamp(_as_date(today))]
+    """19.10.2026 (С1): без частичния бар с дата >= today; без today (реплеят) — както са. 20.10.2026: src/sessions.complete_bars."""
+    from src import sessions
+    return sessions.complete_bars(bars, today)
 
 
 def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:

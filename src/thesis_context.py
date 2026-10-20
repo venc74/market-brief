@@ -90,12 +90,8 @@ def _business_days(a: dt.date, b: dt.date) -> int:
     NYSE сесии от a до b (без a, с b) — същата мярка като EARNINGS_BLACKOUT_DAYS. 19.10.2026 (трети преглед, Н1): с празниците (setup_rules.is_session); до 19.10 — делничните
     дни (реално: AVGO с отчет 09.12 на 30.09, 06.10 и 07.10 — 50 вместо 49, през Thanksgiving; флагът "скоро" в историята не се е сменял).
     """
-    n, d = 0, a
-    while d < b:
-        d += dt.timedelta(days=1)
-        if setup_rules.is_session(d):
-            n += 1
-    return n
+    from src import sessions
+    return sessions.sessions_in(a, b)                             # 20.10.2026: src/sessions.py
 
 
 def _sector(basket: dict, rotation: list[dict]) -> dict:

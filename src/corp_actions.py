@@ -35,11 +35,9 @@ def is_whole_ratio(r: float) -> bool:
 
 
 def sessions_since(event: dt.date, today: dt.date) -> int:
-    """Работни дни (без NYSE празниците от config) от датата на събитието до today; събитие в бъдещето → отрицателно."""
-    hol = sorted(config.NYSE_HOLIDAYS)
-    if event <= today:
-        return int(np.busday_count(event, today, holidays=hol))
-    return -int(np.busday_count(today, event, holidays=hol))
+    """Работни дни (без NYSE празниците от config) от датата на събитието до today; събитие в бъдещето → отрицателно (src/sessions.busday_count)."""
+    from src import sessions
+    return sessions.busday_count(event, today)
 
 
 def uncertain_events(dates, ratios, today: dt.date, sessions: int | None = None) -> list[dict]:
@@ -194,13 +192,9 @@ def _takes_start(fn) -> bool:
 
 
 def _sessions_after(day: dt.date, n: int) -> dt.date:
-    """Датата, на която се навършват n NYSE сесии след `day` (без самия ден) — краят на прозореца."""
-    d, k = day, 0
-    while k < n:
-        d += dt.timedelta(days=1)
-        if d.weekday() < 5 and d.isoformat() not in config.NYSE_HOLIDAYS:
-            k += 1
-    return d
+    """Датата, на която се навършват n NYSE сесии след `day` (без самия ден) — краят на прозореца (src/sessions.add_sessions)."""
+    from src import sessions
+    return sessions.add_sessions(day, n)
 
 
 def is_exact_ratio(r: float) -> bool:

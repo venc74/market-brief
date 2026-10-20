@@ -22,6 +22,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src.setup_rules import is_session
+from src import sessions as _sessions
 
 # кеш → (флаг в config, човешко име)
 DAILY_CACHES = {
@@ -33,10 +34,7 @@ DAILY_CACHES = {
 
 
 def prev_session(today) -> dt.date:
-    d = dt.date.fromisoformat(str(today)) - dt.timedelta(days=1)
-    while not is_session(d):
-        d -= dt.timedelta(days=1)
-    return d
+    return _sessions.prev_session(today)                          # 20.10.2026: src/sessions.py
 
 
 def _read(p: pathlib.Path):

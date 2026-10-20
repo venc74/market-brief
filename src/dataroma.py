@@ -470,10 +470,8 @@ def filing_deadline(quarter_end: dt.date) -> dt.date:
     Трети преглед (16.10): 14.11.2026 е събота → 16.11; Q4 2025: 14.02.2026 (събота) → 16.02 (Presidents' Day) → 17.02 — реално 11 от 15-те мениджъра са подали точно на 17.02.2026.
     Празниците са от config.NYSE_HOLIDAYS: федералният празник, който може да се падне до срок (Presidents' Day през февруари), е и празник на NYSE; Columbus Day и Veterans Day не се падат до срок.
     """
-    d = quarter_end + dt.timedelta(days=config.THIRTEENF_FILING_DEADLINE_DAYS)
-    while d.weekday() >= 5 or d.isoformat() in config.NYSE_HOLIDAYS:
-        d += dt.timedelta(days=1)
-    return d
+    from src import sessions
+    return sessions.roll_forward(quarter_end + dt.timedelta(days=config.THIRTEENF_FILING_DEADLINE_DAYS))     # 20.10.2026: src/sessions.py
 
 
 def last_quarter_deadline(today: dt.date | None = None) -> tuple[dt.date, dt.date]:

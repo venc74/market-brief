@@ -25,13 +25,9 @@ _DAY = dt.timedelta(days=1)
 
 
 def sessions_after(start: dt.date, end: dt.date) -> int:
-    """Брой търговски сесии d със start < d <= end (NYSE празници от config). 0, ако end <= start."""
-    n, d = 0, start + _DAY
-    while d <= end and (d - start).days < 400:
-        if setup_rules.is_session(d):
-            n += 1
-        d += _DAY
-    return n
+    """Брой търговски сесии d със start < d <= end (NYSE празници от config). 0, ако end <= start (src/sessions.sessions_in, до 400 дни)."""
+    from src import sessions
+    return sessions.sessions_in(start, end, cap_days=400)
 
 
 # ──────────────────────────────────────────────────────────────────────────
