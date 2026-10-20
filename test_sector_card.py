@@ -77,6 +77,6 @@ print("── 5. промптът и main ──")
 assert ai_brief._leaders_text(B19["rotation"]) == "XLE, XLP, XLV" and "няма водещ сектор днес" in ai_brief._leaders_text([])
 src = (ROOT / "src" / "ai_brief.py").read_text(encoding="utf-8")
 assert "{_leaders_text(rotation)}" in src and '"horizon_weeks" е ЕДНО число от 2 до 6' in src
-assert "sector_card = sector_claims.sector_card((ai_macro or {}).get(\"sector_logic\"), rotation)" in (ROOT / "src" / "main.py").read_text(encoding="utf-8")
+assert "sector_card = steps.step(\"sector_card\", lambda: sector_claims.sector_card((ai_macro or {}).get(\"sector_logic\"), rotation)" in (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 print("  ✓ промптът носи водещите по кода (19.10: XLE, XLP, XLV), хоризонт — едно число 2–6, думи вместо имена на полета; main записва sector_card")
 print("\n✅ test_sector_card: всичко мина")

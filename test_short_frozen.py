@@ -39,7 +39,7 @@ print(f"  ✓ замразен на 20.10: {st['closed']} затворени, wi
 print()
 print("── 2. main: без теглене и без запис ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "if config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN:" in src
+assert "enabled=bool(config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN)" in src        # 20.10.2026 (етап 3б): в обвивката
 i_frozen, i_update = src.index('short_tracker_summary = {"frozen": short_tracker.frozen_summary(today)}'), src.index("short_tracker.update_short_tracker(short_candidates, today)")
 assert i_frozen < i_update and "elif config.ENABLE_SHORT_SCREENER:" in src[i_frozen:i_update]
 print("  ✓ скрийнърът се вика само без SHORT_FROZEN; при замразяване — frozen_summary вместо update_short_tracker / get_short_tracker_summary")

@@ -29,8 +29,8 @@ summ = call("get_buystop_summary")
 base = call("get_backtest_summary")
 assert len(summ) == 1 and len(base) == 1 and summ[0].lineno > base[0].lineno
 src = SRC.read_text(encoding="utf-8").splitlines()
-block = "\n".join(src[summ[0].lineno - 4: summ[0].lineno + 3])
-assert "config.TRACK_BUYSTOP" in block and "try:" in block and 'backtest_summary["buystop"]' in block and "except Exception" in block
-print("  ✓ backtest_summary['buystop'] = get_buystop_summary() — след get_backtest_summary(), под TRACK_BUYSTOP, в try/except (провал → празно, run-ът не пада)")
+block = "\n".join(src[summ[0].lineno - 4: summ[0].lineno + 6])
+assert "config.TRACK_BUYSTOP" in block and 'steps.step("book_buystop"' in block and 'backtest_summary["buystop"]' in block       # 20.10.2026 (етап 3б): в обвивката на стъпките
+print("  ✓ backtest_summary['buystop'] = get_buystop_summary() — след get_backtest_summary(), под TRACK_BUYSTOP, в обвивката (провал → празно + банер, run-ът не пада)")
 print()
 print("Всички тестове минаха.")

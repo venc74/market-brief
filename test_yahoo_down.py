@@ -184,7 +184,7 @@ i = main_src.index("rotation = sector_rotation()")
 assert "try:" in main_src[i - 120:i] and "except Exception" in main_src[i:i + 200]
 j = main_src.index("candidates = run_screen(")
 assert "try:" in main_src[j - 120:j] and "except Exception" in main_src[j:j + 260] and "candidates = []" in main_src[j:j + 400]
-assert '"data_warnings": data_warnings.collect(' in main_src
+assert "data_warns = data_warnings.collect(" in main_src and '"data_warnings": data_warns' in main_src        # 20.10.2026 (етап 3б): + банерите на стъпките
 print("  ✓ sector_rotation() и run_screen() са в try/except (при срив: [] + LAST_STATUS), а брифът носи data_warnings")
 print()
 print("Всички тестове минаха.")

@@ -82,6 +82,7 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 src/main.py            — оркестратор: календар → свеж бар → macro → thermometer → sectors → screener → enrich → корпоративни действия → AI synthesis
                          → Track Record (ensure v2, резолюция) → hard rules (технически + режимен gate) → GLB / QM / EP → маркери → ingest → render → имейл
 config.py              — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
+src/steps.py           — обвивката на стъпките в main.run (20.10): step() → ok / частично / провал / пропусната, brief["run_steps"], банер за провал без собствен банер
 src/sessions.py        — NYSE сесии и празници — ЕДНО място (20.10); cut_today / complete_bars — без частичния днешен бар
 src/macro_layer.py     — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
 src/thermometer.py     — 9 индикатора + Offensive/Defensive/Cash; Net Liquidity и SOFR − IORB — САМО информативни; Offensive иска ≥ 6 видими от 8 броени

@@ -265,8 +265,8 @@ i_dd, i_cap = src.index("entry_timing.evaluate_distribution_days()"), src.index(
 i_thermo, i_macro, i_hard = src.index("thermo = build_thermometer(macro)"), src.index("ai_brief.macro_and_sector_brief("), src.index("apply_hard_rules(candidates, thermo[")
 assert i_thermo < i_dd < i_cap < i_macro < i_hard
 seg = src[i_dd - 200:i_cap + 400]
-assert seg.count("try:") >= 2 and seg.count("except Exception") >= 2
-print("  ✓ термометър → distribution days (try/except) → apply_distribution_cap (try/except) → макро бриф → apply_hard_rules; един fetch")
+assert seg.count("try:") >= 1 and seg.count("except Exception") >= 1 and 'steps.step("distribution_cap"' in seg      # 20.10.2026 (етап 3б): ограничението — в обвивката
+print("  ✓ термометър → distribution days (try/except) → apply_distribution_cap (обвивката на стъпките) → макро бриф → apply_hard_rules; един fetch")
 print()
 
 fp_after = (REAL_STATE.stat().st_size, REAL_STATE.stat().st_mtime_ns) if REAL_STATE.exists() else None

@@ -53,6 +53,7 @@ from src import watchlist_expiry
 from src import watch_monitor
 from src import model_selector
 from src import thesis_context
+from src import steps
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief, send_once
 
@@ -499,6 +500,7 @@ def run() -> dict:
     if config.ENABLE_MARKET_CLOSED_SKIP and not setup_rules.is_session(dt.date.fromisoformat(today)):
         print(f"[main] NYSE е затворена днес ({today}) — брифът не върви: без AI, без имейл, без записи в книгите и състоянието")
         return _market_closed(today)
+    steps.reset()                                                      # 20.10.2026 (етап 3б): обвивката на стъпките — ok / частично / провал / пропусната + банер (src/steps.py)
 
     # Кой Claude модел ползваме днес — ВЕДНЪЖ, преди всяка AI стъпка. Резултатът
     # се присвоява на config.CLAUDE_MODEL и се наследява от всички извиквания,
@@ -509,19 +511,16 @@ def run() -> dict:
     ai_brief.AI_USAGE.clear()
     model_info = {"model": config.CLAUDE_MODEL, "source": "static",
                   "rejected": None, "rejected_reason": "", "banner": {}}
-    try:
-        model_info = model_selector.resolve_model(today)
-        config.CLAUDE_MODEL = model_info["model"]
-    except Exception as e:
-        print(f"[model] resolve_model се провали изцяло, оставам на "
-              f"{config.CLAUDE_MODEL}: {e}")
+    def _model():
+        info = model_selector.resolve_model(today)
+        config.CLAUDE_MODEL = info["model"]
+        return info
+    model_info = steps.step("model", _model, fallback=model_info, label="Изборът на Claude модел",
+                            consequence=f"ползва се моделът по подразбиране {config.CLAUDE_MODEL}")
 
     # 16.10.2026: застоял дневен бар — в 6 от 60 брифа Yahoo нямаше бара за последната сесия в 07:30; изчакване и нов опит ПРЕДИ първото теглене (виж src/bar_freshness.py)
-    if config.ENABLE_BAR_FRESHNESS:
-        try:
-            bar_freshness.wait_for_fresh(dt.date.fromisoformat(today))
-        except Exception as e:
-            print(f"[bars] проверката на дневните барове пропусната: {type(e).__name__}: {e}")
+    steps.step("bar_freshness", lambda: bar_freshness.wait_for_fresh(dt.date.fromisoformat(today)), enabled=config.ENABLE_BAR_FRESHNESS,
+               label="Проверката за свеж дневен бар", consequence="ако Yahoo не е обновил последната сесия, картите може да са върху стария бар без предупреждение")
 
     print("[1/7] Слой 1: макро контекст…")
     macro = collect_macro_layer()
@@ -545,10 +544,9 @@ def run() -> dict:
             distribution_days = entry_timing.evaluate_distribution_days()
         except Exception as e:
             print(f"[entry_timing] distribution days пропаднаха: {type(e).__name__}: {e}")
-        try:
-            thermo = apply_distribution_cap(thermo, distribution_days, history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS))
-        except Exception as e:
-            print(f"[thermo] ⚠ apply_distribution_cap пропадна ({type(e).__name__}: {e}) — режимът е без този блок")
+        thermo = steps.step("distribution_cap", lambda: apply_distribution_cap(thermo, distribution_days, history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS)),
+                            fallback=thermo, label="Ограничението на режима от distribution days",
+                            consequence="режимът днес е без този блок; може да е по-висок, отколкото правилото позволява")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
     # 15.10.2026: "Запас до смяна на режима" от кода (карта на термометъра + макро промпт) — след distribution days, преди макро брифа
     thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days, dict(entry_timing.LAST_STATUS))
@@ -608,11 +606,8 @@ def run() -> dict:
     # FIX 2026-10-03 (пакет 2 т.4): значимите новини (RSS + nitter → Claude филтър) се подбират ПРЕДИ макро
     # брифа и му се подават с обяснението защо са значими — преди брифът се пишеше без тях, а NewsAPI
     # заглавията бяха празни във всичките 78 брифа. Graceful: провал на новините → празен списък.
-    try:
-        news = news_aggregator.significant_news() if config.ENABLE_NEWS else []
-    except Exception as e:
-        print(f"[main] significant_news пропадна, макро брифът е без новини: {e}")
-        news = []
+    news = steps.step("news", news_aggregator.significant_news, fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
+                      consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news)
     # FIX 2026-09-16: тезите и днешните новини. 19.10.2026 (т. 10, решение "в"): без AI етикети — до тезата дословното заглавие на свързаната новина
     # (ai_brief.thesis_news_pick: кандидатите по котвите от кода, моделът само отсява); `status` остава trigger-driven, `chain` остава конфиг.
@@ -642,13 +637,13 @@ def run() -> dict:
             c["ai"] = {"classification": "Action" if (c.get("setup") or {}).get("eligible") else "Watchlist", "why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates]
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
-    try:
-        sector_claims_fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
+    def _prose_checks():
+        fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
         ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
         ai_brief.verify_narrative_events(candidates, ai_brief.narrative_event_sources(ai_macro, news))   # 19.10.2026: събитие без опора в новините/макрото на деня → махнато
-    except Exception as e:
-        print(f"[main] проверката на твърденията за секторите пропусната: {type(e).__name__}: {e}")
-        sector_claims_fixed = []
+        return fixed
+    sector_claims_fixed = steps.step("prose_checks", _prose_checks, fallback=[], label="Проверките на AI текста на картите (сектори, преписан текст, събития без опора)",
+                                     consequence="AI текстът на картите днес не е проверен от кода")
     # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
     candidates = inject_split_catalysts(candidates)
     print("      COT екстремуми…")
@@ -698,12 +693,9 @@ def run() -> dict:
     if ai_brief.SUCCESSOR_MEMORY:
         ai_brief.save_successor_memory()
     # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване, не влияе на тезите
-    cot_summary = None
-    if config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses:
-        try:
-            cot_with_theses, cot_summary = cot_track.annotate(cot_with_theses, cot.LAST_SERIES)
-        except Exception as e:
-            print(f"[cot] ценово потвърждение/track record пропаднаха: {type(e).__name__}: {e}")
+    cot_with_theses, cot_summary = steps.step("cot_track", lambda: cot_track.annotate(cot_with_theses, cot.LAST_SERIES), fallback=(cot_with_theses, None),
+                                              enabled=bool(config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses),
+                                              label="COT: потвърждение от цената и track record", consequence="COT секцията е без тях днес")
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
@@ -711,11 +703,11 @@ def run() -> dict:
     watchlist_before_expiry = list(watchlist)     # В2: buy-stop книгата се захранва ПРЕДИ изтичането (иначе изтичането решава кои кандидати се измерват)
     watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
     # пакет 4б т.д: отчет в следващите ~20 сесии → предупреждение върху картата с датата и очакваното движение от опциите (само информация)
-    try:
+    def _earnings_warnings():
         n_warn = earnings_move.annotate(action + watchlist)
         print(f"      Предупреждения за отчет: {n_warn} ({sum(1 for c in action + watchlist if (c.get('earnings_warning') or {}).get('implied_move_pct') is not None)} с очаквано движение)")
-    except Exception as e:
-        print(f"[main] предупрежденията за отчети пропуснати: {type(e).__name__}: {e}")
+    steps.step("earnings_warnings", _earnings_warnings, label="Предупрежденията за отчет (Action / Watchlist)",
+               consequence="картите днес може да нямат ред за предстоящ отчет; провери датата сам")
     print(f"      Action: {[a['ticker'] for a in action]}")
     print(f"      Watchlist: {[w['ticker'] for w in watchlist]}")
     # 09.10: "Излязоха от вчера" — тикърите от Watchlist на предишния бриф, които днес ги няма, с причината от кода (само информация)
@@ -797,15 +789,15 @@ def run() -> dict:
             qm_rows, qm_diag = qm_breakout.scan(universe=qm_universe)
             qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)      # 13.10.2026: отделяне в прозореца на 6-месечния ръст → не е кандидат (нито карта, нито запис)
             qm_cards = qm_breakout.cards(qm_rows, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"])
-            try:                                                     # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
+            def _qm_earnings():                                      # 08.10: предупреждение за отчет и върху QM картите (като Watchlist): дата + очаквано движение от опциите, ако тикърът е в следобедната снимка
                 import yfinance as _yf
                 d0 = dt.date.today()
                 for c in qm_cards:
                     c["earnings"] = {"next_earnings": earnings_move.next_earnings_date(c["ticker"], _yf, d0)}
                 n_qm_warn = earnings_move.annotate(qm_cards, d0)
                 print(f"      QM карти с отчет в следващите ~{config.EARNINGS_WARNING_SESSIONS} сесии: {n_qm_warn}")
-            except Exception as e:
-                print(f"[main] предупрежденията за отчет върху QM картите пропуснати: {type(e).__name__}: {e}")
+            steps.step("earnings_warnings_qm", _qm_earnings, label="Предупрежденията за отчет върху картите по Kullamägi",
+                       consequence="QM картите днес може да нямат ред за предстоящ отчет; провери датата сам")
         except Exception as e:
             print(f"[main] Qullamaggie скенерът пропадна: {e}")
             qm_diag = {"ok": False, "error": f"{type(e).__name__}: {e}"}
@@ -823,14 +815,9 @@ def run() -> dict:
     # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
     # short_screener.py docstring за пълния feasibility/backtest trail).
     # Explicit try/except, same дух като GLB блока по-горе.
-    if config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN:             # 19.10.2026 (т. 19): замразен — без теглене
-        try:
-            short_candidates = short_screener.run_short_screen(laggards)
-        except Exception as e:
-            print(f"[main] Short screener failed: {e}")
-            short_candidates = []
-    else:
-        short_candidates = []
+    short_candidates = steps.step("short_screener", lambda: short_screener.run_short_screen(laggards), fallback=[],          # 19.10.2026 (т. 19): замразен — без теглене
+                                  enabled=bool(config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN), label="Short скрийнърът",
+                                  consequence="списъкът с short кандидати е празен днес заради провала, не защото няма")
     # Global-vs-regional context (Аспект 2) — СПРЯН на 2026-10-03 (config.ENABLE_SHORT_AI_CONTEXT=0):
     # резултатът не се визуализира. Виж _short_global_context().
     global_context = _short_global_context(short_candidates, laggards, news)
@@ -838,11 +825,11 @@ def run() -> dict:
         row["in_screener"] = row["ticker"] in our_tickers
         row["global_context"] = global_context.get(row.get("lagging_sector"))
     # 08.10: бележка за ОБРАТЕН ЗАЛОГ между COT тезите и нашите карти (Action/Watchlist/Qullamaggie — покупки, Short — шорт) и между COT пазарите; сглобена от кода, нищо не се маха
-    try:
+    def _cot_opposites():
         cot_opp_diag = cot_opposites.annotate(cot_with_theses, {"action": action, "watchlist": watchlist, "qm": qm_cards}, short_candidates)
         print(f"      обратен залог (COT): карти {cot_opp_diag['cards']} · тези {cot_opp_diag['theses']} · между пазари {cot_opp_diag['cross_market']}")
-    except Exception as e:
-        print(f"[main] бележките за обратен залог пропуснати: {type(e).__name__}: {e}")
+    steps.step("cot_opposites", _cot_opposites, label="Бележките за обратен залог (COT ↔ картите)",
+               consequence="липсата на бележка днес не значи, че няма обратен залог")
 
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
@@ -871,22 +858,20 @@ def run() -> dict:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
-    if config.ENABLE_BACKTEST and config.TRACK_BUYSTOP:
-        try:                                                                   # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
-            backtest_summary["buystop"] = backtest.get_buystop_summary()
-            _annotate_screener_exits(backtest_summary["buystop"], {c.get("ticker") for c in candidates})      # защо жив запис е излязъл от скрийнъра
-        except Exception as e:
-            print(f"[main] обобщението на buy-stop кандидатите пропуснато: {e}")
-    if config.ENABLE_BACKTEST and config.TRACK_QM:
-        try:                                                                   # Qullamaggie: отделната книга qm_breakout (чисто локално четене)
-            backtest_summary["qm_breakout"] = backtest.get_qm_summary()
-        except Exception as e:
-            print(f"[main] обобщението на qm_breakout книгата пропуснато: {e}")
-    if config.ENABLE_BACKTEST and config.TRACK_GLB_WISH:
-        try:                                                                   # GLB по Уиш: отделната книга glb_wish (чисто локално четене)
-            backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()
-        except Exception as e:
-            print(f"[main] обобщението на glb_wish книгата пропуснато: {e}")
+    def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
+        backtest_summary["buystop"] = backtest.get_buystop_summary()
+        _annotate_screener_exits(backtest_summary["buystop"], {c.get("ticker") for c in candidates})      # защо жив запис е излязъл от скрийнъра
+    _book_consequence = "секцията е празна днес; записите на диска са непокътнати"
+    steps.step("book_buystop", _book_buystop, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_BUYSTOP), label="Обобщението на книгата на buy-stop кандидатите",
+               consequence=_book_consequence)
+    def _book_qm():                                                            # Qullamaggie: отделната книга qm_breakout (чисто локално четене)
+        backtest_summary["qm_breakout"] = backtest.get_qm_summary()
+    steps.step("book_qm", _book_qm, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_QM),
+               label="Обобщението на книгата на пробивите по Kullamägi", consequence=_book_consequence)
+    def _book_glb_wish():                                                      # GLB по Уиш: отделната книга glb_wish (чисто локално четене)
+        backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()
+    steps.step("book_glb_wish", _book_glb_wish, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_GLB_WISH),
+               label="Обобщението на книгата „GLB по Уиш“", consequence=_book_consequence)
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap
@@ -897,34 +882,30 @@ def run() -> dict:
     # наличен по-рано, при самия GLB блок).
     # FIX 2026-10-03 (пакет 4а т.2): SI✓ върху v2 позициите (отворени и чакащи buy-stop), когато
     # мениджър от списъка е открил нова позиция в тикъра — вместо секцията-списък
-    try:
+    def _si_positions():
         si_markers = dataroma.new_position_markers(superinvestor_new_positions)
         for p in (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])):
             if p["ticker"] in si_markers:
                 p["markers"] = [si_markers[p["ticker"]]]
-    except Exception as e:
-        print(f"[main] SI✓ маркери за позициите пропуснати: {e}")
+    steps.step("si_positions", _si_positions, label="SI✓ върху позициите в книгите",
+               consequence="липсата на маркер днес не значи, че мениджър от списъка няма нова позиция")
     # пакет 4б т.б: UOV✓ и върху позициите — v2 отворени/чакащи и книгата на buy-stop кандидатите. diag на кандидатите е от enrich (LAST_MARKER_DIAG).
     uov_diag = dict(unusual_options.LAST_MARKER_DIAG) if config.ENABLE_UNUSUAL_OPTIONS else {}
     ins_pos_status: dict = {}
     pos_rows = (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])
                 + (backtest_summary.get("buystop") or {}).get("live", []))
-    try:
-        if config.ENABLE_UNUSUAL_OPTIONS and pos_rows:
-            uov_diag["positions"] = attach_position_uov(pos_rows)
-    except Exception as e:
-        print(f"[main] UOV✓ маркерите за позициите пропуснати: {e}")
+    def _uov_positions():
+        uov_diag["positions"] = attach_position_uov(pos_rows)
+    steps.step("uov_positions", _uov_positions, enabled=bool(config.ENABLE_UNUSUAL_OPTIONS and pos_rows),
+               label="UOV✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че няма необичайна опционна активност")
     try:
         if config.ENABLE_INSIDER_BUYING and pos_rows:
             ins_pos_status = attach_position_insider(pos_rows)
     except Exception as e:
         print(f"[main] INS✓ маркерите за позициите пропуснати: {e}")
         ins_pos_status = {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"}      # 19.10.2026 (т. 12): видимо, не тихо {}
-    try:
-        if qm_by_ticker and pos_rows:
-            attach_qm_markers(pos_rows, qm_by_ticker)            # QM✓ и върху позициите (v2 отворени/чакащи и buy-stop книгата)
-    except Exception as e:
-        print(f"[main] QM✓ маркерите за позициите пропуснати: {e}")
+    steps.step("qm_positions", lambda: attach_qm_markers(pos_rows, qm_by_ticker), enabled=bool(qm_by_ticker and pos_rows),       # QM✓ и върху позициите (v2 отворени/чакащи и buy-stop книгата)
+               label="QM✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че тикърът не е кандидат за пробив")
     open_position_tickers = {p["ticker"] for p in backtest_summary.get("open_positions", [])}
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers
@@ -951,37 +932,30 @@ def run() -> dict:
     # Form 4) изобщо не стига до AI-то — кодът му слага текста сам. Така
     # изричното "нищо" е гарантирано, не зависи от това дали моделът ще се
     # сети да го каже, и не се плащат токени за празен вход.
-    watch_rows = []
-    if config.ENABLE_WATCH_MONITOR:
-        try:
-            watch_rows = watch_monitor.collect()
-            active = [r for r in watch_rows if not r["quiet"]]
-            if active:
-                market_context = {
-                    "active_theses": [t["name"] for t in theses
-                                      if t.get("status") in ("active", "structural")],
-                    "cot_markets": [c["market"] for c in cot_with_theses][:10],
-                    "leading_sectors": [s["sector"] for s in leaders],
-                }
-                active = ai_brief.watch_ticker_digest(active, market_context)
-            by_ticker = {r["ticker"]: r for r in active}
-            watch_rows = [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in watch_rows]
-        except Exception as e:
-            print(f"[watch] секцията се провали изцяло: {e}")
-            watch_rows = []
+    def _watch():
+        rows = watch_monitor.collect()
+        active = [r for r in rows if not r["quiet"]]
+        if active:
+            market_context = {
+                "active_theses": [t["name"] for t in theses
+                                  if t.get("status") in ("active", "structural")],
+                "cot_markets": [c["market"] for c in cot_with_theses][:10],
+                "leading_sectors": [s["sector"] for s in leaders],
+            }
+            active = ai_brief.watch_ticker_digest(active, market_context)
+        by_ticker = {r["ticker"]: r for r in active}
+        return [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in rows]
+    watch_rows = steps.step("watch", _watch, fallback=[], enabled=config.ENABLE_WATCH_MONITOR, label="Секцията „Наблюдавани тикъри“",
+                            consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини")
 
     # FIX 2026-09-27: пълен отчет за сплитовете — секцията вече не се скрива
     # (ok / empty с фуния по филтри / source_failed), + сплитове на отворени
     # позиции и наблюдавани в целия хоризонт на източника, без филтри. ТУК,
     # след update_backtest_tracker(): днешните нови позиции вече са в tracker-а.
-    splits_rep = None
-    if config.ENABLE_SPLITS_CALENDAR:
-        try:
-            splits_rep = splits_calendar.splits_report(
-                positions=set(_live_positions()) if config.ENABLE_BACKTEST else set(),
-                watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set())
-        except Exception as e:
-            print(f"[splits] отчетът се провали: {e}")
+    splits_rep = steps.step("splits_report", lambda: splits_calendar.splits_report(
+                                positions=set(_live_positions()) if config.ENABLE_BACKTEST else set(),
+                                watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set()),
+                            enabled=config.ENABLE_SPLITS_CALENDAR, label="Отчетът за сплитовете", consequence="секцията за сплитове е без отчет днес")
 
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
@@ -1011,11 +985,21 @@ def run() -> dict:
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
-    try:
-        sector_card = sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation)
-    except Exception as e:
-        print(f"[main] секторната карта от кода пропусната ({type(e).__name__}: {e}) — шаблонът показва веригите на модела")
-        sector_card = {}
+    sector_card = steps.step("sector_card", lambda: sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation), fallback={},
+                             label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
+    data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
+                                       cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
+                                       superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
+                                       dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
+                                       ai_lost=list(ai_brief.NARRATIVES_LOST),
+                                       glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
+                                       canary=canary, health=health,
+                                       ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
+                                       news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
+                                       fred_key_missing=not config.FRED_API_KEY,
+                                       breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
+    data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
+    print(steps.log_line())
     brief = {
         "date": today,
         "macro": macro,
@@ -1023,17 +1007,8 @@ def run() -> dict:
         "rotation": rotation,
         "sector_card": sector_card,                                     # 19.10.2026 (т. 18): секторите на картата — от кода, веригите — от модела
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
-        "data_warnings": data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                               cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
-                                               superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
-                                               dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
-                                               ai_lost=list(ai_brief.NARRATIVES_LOST),
-                                               glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
-                                               canary=canary, health=health,
-                                               ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
-                                               news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
-                                               fred_key_missing=not config.FRED_API_KEY,
-                                               breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None)),   # 20.10.2026: частичен провал
+        "data_warnings": data_warns,
+        "run_steps": steps.summary(),                                    # 20.10.2026 (етап 3б): ok / частично / провал / пропусната за всяка стъпка в обвивката
         "health": health,                                                # здравният монитор (10.10)
         "screener_status": dict(screener.LAST_STATUS),                  # 19.10.2026 (т. 12): с история / универс / партиди — нормата за прага на банера
         "market_calendar_note": setup_rules.market_calendar_note(dt.date.fromisoformat(today)),     # 16.10.2026 (В2б): утре / в понеделник NYSE не работи или затваря рано

@@ -124,8 +124,8 @@ print("  ✓ имейлът: СИНТЕТИЧНА теза срещу РЕАЛН
 print()
 print("── 5. свързване в main.run ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-i_ann, i_short, i_brief = src.index("cot_opposites.annotate(cot_with_theses"), src.index("short_candidates = short_screener.run_short_screen"), src.index('"cot": cot_with_theses')
+i_ann, i_short, i_brief = src.index("cot_opposites.annotate(cot_with_theses"), src.index('short_candidates = steps.step("short_screener"'), src.index('"cot": cot_with_theses')
 i_qm, i_track = src.index("qm_cards = qm_breakout.cards("), src.index("backtest.update_backtest_tracker(action, today")
 assert i_short < i_ann < i_brief and i_qm < i_ann and i_ann < i_track
-print("  ✓ анотацията е СЛЕД QM картите и шорт кандидатите, ПРЕДИ записа в Track Record и ПРЕДИ сглобяването на брифа; в try/except (бележките са информация)")
+print("  ✓ анотацията е СЛЕД QM картите и шорт кандидатите, ПРЕДИ записа в Track Record и ПРЕДИ сглобяването на брифа; в обвивката на стъпките (бележките са информация)")
 print("\n✅ test_cot_opposites: всичко мина")

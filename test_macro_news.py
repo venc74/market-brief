@@ -30,14 +30,12 @@ print()
 
 print("── редът в main.py: новини → макро бриф ──")
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-i_news = main_src.index("news_aggregator.significant_news()")
+i_news = main_src.index('news = steps.step("news", news_aggregator.significant_news, fallback=[]')     # 20.10.2026 (етап 3б): в обвивката на стъпките
 i_macro = main_src.index("ai_brief.macro_and_sector_brief(")
 assert i_news < i_macro, "новините трябва да се подберат ПРЕДИ макро брифа"
 assert "macro_and_sector_brief(macro, rotation, thermo, news=news)" in main_src
-assert main_src.count("news_aggregator.significant_news()") == 1                  # не се вика втори път след брифа
-seg = main_src[i_news - 400:i_macro]
-assert "try:" in seg and "except Exception" in seg and "news = []" in seg         # graceful: провал → без новини
-print("  ✓ significant_news() е преди macro_and_sector_brief(), вика се веднъж, в try/except (при провал news = [])")
+assert main_src.count("news_aggregator.significant_news") == 1                    # не се вика втори път след брифа
+print("  ✓ significant_news() е преди macro_and_sector_brief(), вика се веднъж, в обвивката (при провал news = [] и банер)")
 print()
 
 print("── промптът (подменен _call_claude, РЕАЛНИ новини от 02.10) ──")
