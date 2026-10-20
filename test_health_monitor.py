@@ -57,6 +57,7 @@ def boom(*a, **k):
 
 
 backtest.yf.download = boom
+backtest._unapplied_splits = lambda rec: []                                          # СИНТЕТИЧНО: проверката за сплит след входа е мрежа (yf.Ticker(...).splits)
 backtest._resolve_open_positions(dict(tr), today=pd.Timestamp("2026-10-12").date())
 assert backtest.LAST_RESOLUTION["ok"] is False and backtest.LAST_RESOLUTION["live"] == 2
 i3 = hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-12", glb_updated="2026-10-12", briefs=("2026-10-09",)),

@@ -51,6 +51,7 @@ def fake_download(tickers, start=None, progress=False, auto_adjust=False, **kw):
 
 backtest.yf.download = fake_download
 backtest._unapplied_splits = lambda rec: []
+backtest.enrich.earnings_recap = lambda sym: None                                     # СИНТЕТИЧНО: отчетите на отворените позиции в обобщението са мрежа (None = провал, graceful)
 plan = {"method": "v2", "buy_stop": 59.72, "max_chase": 62.71, "stop_loss": 54.94, "target_1": 69.28, "entry_mid": 59.0, "window_sessions": 5}
 tr = {"EXEL_2026-09-25": backtest._new_v2_record("EXEL", "2026-09-25", plan),
       "OLD_closed": {"method": "v2", "category": "buystop", "ticker": "EXEL", "entry_date": "2026-09-08", "fill_date": "2026-09-30", "status": "stopped",
