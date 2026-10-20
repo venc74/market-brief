@@ -49,7 +49,7 @@ def compute_features(df: pd.DataFrame) -> dict:
     cs, hs, ls, vs = pd.Series(c), pd.Series(h), pd.Series(l), pd.Series(v)
     return {
         "idx": df.index, "o": o, "h": h, "l": l, "c": c, "v": v, "n": len(df),
-        "adr": (100 * ((hs / ls).rolling(20).mean() - 1)).to_numpy(),                 # ADR20 в % (формулата от qullamaggie.com/faq)
+        "adr": trade_levels.adr_rolling(hs, ls).to_numpy(),                           # ADR20 в % — trade_levels (едно място, 20.10.2026)
         "s10": cs.rolling(10).mean().to_numpy(), "s20": cs.rolling(20).mean().to_numpy(),
         "v5": vs.rolling(5).mean().to_numpy(), "v50": vs.rolling(50).mean().to_numpy(),
         "dv20": (cs * vs).rolling(20).mean().to_numpy(),

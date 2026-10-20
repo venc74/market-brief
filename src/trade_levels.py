@@ -33,6 +33,20 @@ def _ok(x) -> bool:
     return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x)
 
 
+# 20.10.2026 (етап 3, част Б): ADR е ТУК — формулата (qullamaggie.com/faq: 100 × (средно(high/low) − 1)) и дължината ADR_BARS; qm_breakout (поредица за всеки бар)
+# и qm_ep (стойност към сесията) викат тези функции със същия числов метод като досега (np.mean за прозорец, pandas rolling за поредица) — реплеят върху 34 реални
+# серии от fixture-ите: 0 разлики.
+def adr_window(high, low) -> float:
+    """ADR% върху подадения прозорец, без закръгляне и без проверки (викащият подава вече избрания прозорец)."""
+    return float(100 * (np.mean(np.asarray(high, dtype=float) / np.asarray(low, dtype=float)) - 1))
+
+
+def adr_rolling(high, low, n: int = ADR_BARS):
+    """ADR% за всеки бар (pandas Series): rolling средно на high/low за n бара; първите n−1 — NaN."""
+    import pandas as pd
+    return 100 * ((pd.Series(high) / pd.Series(low)).rolling(n).mean() - 1)
+
+
 def adr_pct(high, low, n: int = ADR_BARS) -> float | None:
     """ADR% за последните n бара: 100 × (средно(high/low) − 1). None при по-малко от n бара, NaN/нули или low <= 0 (не гадаем)."""
     try:
@@ -40,7 +54,7 @@ def adr_pct(high, low, n: int = ADR_BARS) -> float | None:
         l = np.asarray(low, dtype=float)[-n:]
         if len(h) < n or len(l) < n or not (np.isfinite(h).all() and np.isfinite(l).all()) or (l <= 0).any():
             return None
-        return round(float(100 * (np.mean(h / l) - 1)), 2)
+        return round(adr_window(h, l), 2)
     except Exception:
         return None
 

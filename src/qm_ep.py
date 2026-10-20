@@ -163,7 +163,8 @@ def enrich_gappers(rows: list[dict], daily: dict[str, pd.DataFrame]) -> list[dic
                 e["prev_close"] = official
                 e["gap_pct"] = (r["ah_price"] / official - 1) * 100
                 e["ret63_pct"] = float((c[i] / c[i - 63] - 1) * 100)
-                e["adr"] = float(100 * (np.mean(h[i - 19:i + 1] / l[i - 19:i + 1]) - 1))
+                n_adr = trade_levels.ADR_BARS
+                e["adr"] = trade_levels.adr_window(h[i - n_adr + 1:i + 1], l[i - n_adr + 1:i + 1])     # ADR20 — trade_levels (едно място, 20.10.2026)
                 e["dollar_volume"] = float(np.mean(c[i - 19:i + 1] * v[i - 19:i + 1]))
                 e["neglect"] = bool(e["ret63_pct"] <= config.QM_EP_NEGLECT_RET63_PCT)
                 e["max_stop_pct"] = round(config.QM_EP_STOP_ADR * e["adr"], 1)
