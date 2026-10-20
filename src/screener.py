@@ -27,6 +27,9 @@ UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
 # Състоянието на последния technical_screen(): {"ok", "kind" (ok/partial/spy_failed/no_history/universe_empty), "reason",
 # "universe", "with_history", "batches", "batches_failed"} — main.py го превръща в предупреждение в брифа.
 LAST_STATUS: dict = {}
+# 20.10.2026 (етап 3б): тикър → {"result": passed | criteria | small | unavailable | not_checked, "text"} от последния fundamental_screen — причината за изхода (explain_exits)
+# и банерът за неизтеглени фундаменти. Пробното пускане на 20.10: LLY (технически преминат) — "fundamentals LLY failed: curl: (28) … 935065 ms" → отпадна с общия текст.
+LAST_FUNDAMENTALS: dict[str, dict] = {}
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -191,7 +194,10 @@ def explain_exits(tickers: list[str]) -> dict[str, str]:
             if df is None or not len(df):
                 out[sym] = "няма ценови данни"
                 continue
-            out[sym] = explain_exclusion(sym, df, spy, LAST_RS_SCORES, held=sym in LAST_RS_HELD) or "техническите филтри са преминати — отпаднал по-късно (CANSLIM фундаментите или лимитът на финалистите)"
+            fund = LAST_FUNDAMENTALS.get(sym) or {}
+            out[sym] = (explain_exclusion(sym, df, spy, LAST_RS_SCORES, held=sym in LAST_RS_HELD)
+                        or (f"техническите филтри са преминати; {fund['text']}" if fund.get("text")        # 20.10.2026: каква е причината при фундаментите, не "или … или"
+                            else "техническите филтри са преминати — отпаднал по-късно (CANSLIM фундаментите или лимитът на финалистите)"))
     except Exception as e:
         print(f"[screener] причините за излизане от списъка не се смятаха: {type(e).__name__}: {e}")
     return out
@@ -493,6 +499,9 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series, held: bool 
 # ──────────────────────────────────────────────────────────────────────────
 def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dict]:
     passed = []
+    LAST_FUNDAMENTALS.clear()
+    for row in candidates[max_checks:]:
+        LAST_FUNDAMENTALS[row["ticker"]] = {"result": "not_checked", "text": f"извън първите {max_checks} за проверка на фундаментите (CANSLIM)"}
     for row in candidates[:max_checks]:
         sym = row["ticker"]
         try:
@@ -500,7 +509,11 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
             info = net_utils.fetch_with_timeout(lambda: tk.info) or {}
 
             mcap = info.get("marketCap") or 0
+            if not mcap:                                             # 20.10.2026: празен .info (таймаут / Yahoo не върна) — не е оценен, не е "малка компания"
+                LAST_FUNDAMENTALS[sym] = {"result": "unavailable", "text": "фундаментите (Yahoo .info) не се изтеглиха днес — празен отговор; CANSLIM не е проверен"}
+                continue
             if mcap < config.MIN_MARKET_CAP:
+                LAST_FUNDAMENTALS[sym] = {"result": "small", "text": f"пазарна капитализация ${mcap / 1e9:.1f} млрд под прага ${config.MIN_MARKET_CAP / 1e9:g} млрд"}
                 continue
 
             eps_g = (info.get("earningsQuarterlyGrowth") or 0) * 100
@@ -513,6 +526,8 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
                       rev_g >= config.MIN_REVENUE_GROWTH_YOY,
                       roe >= config.MIN_ROE]
             if sum(checks) < 2 or eps_g < 0:
+                LAST_FUNDAMENTALS[sym] = {"result": "criteria", "text": (f"CANSLIM: EPS {eps_g:+.0f}%, приходи {rev_g:+.0f}%, ROE {roe:.0f}% — {sum(checks)} от 3 критерия"
+                                                                         + (" (нужни 2)" if sum(checks) < 2 else "") + (", EPS спада" if eps_g < 0 else ""))}
                 continue
 
             row.update({
@@ -535,12 +550,17 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
                 "short_ratio_dtc": info.get("shortRatio"),   # days to cover
             })
             passed.append(row)
+            LAST_FUNDAMENTALS[sym] = {"result": "passed", "text": ""}
             time.sleep(0.5)
         except Exception as e:
             print(f"[screener] fundamentals {sym} failed: {e}")
+            LAST_FUNDAMENTALS[sym] = {"result": "unavailable", "text": f"фундаментите (Yahoo .info) не се изтеглиха днес ({type(e).__name__}) — CANSLIM не е проверен"}
             continue
 
-    print(f"[screener] CANSLIM филтър: {len(passed)} финалисти")
+    LAST_STATUS["fundamentals_checked"] = min(len(candidates), max_checks)
+    LAST_STATUS["fundamentals_unavailable"] = sorted(t for t, v in LAST_FUNDAMENTALS.items() if v["result"] == "unavailable")
+    print(f"[screener] CANSLIM филтър: {len(passed)} финалисти"
+          + (f"; фундаментите не се изтеглиха за {LAST_STATUS['fundamentals_unavailable']}" if LAST_STATUS["fundamentals_unavailable"] else ""))
     return passed
 
 

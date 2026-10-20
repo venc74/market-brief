@@ -214,6 +214,11 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
         out.append({"source": "screener", "level": "warn",
                     "message": (f"Скрийнър: за {nb} от {sc['universe']} тикъра Yahoo не върна нито един бар днес ({names}) — без грешка в партидата; нормално е 0. "
                                 f"Скринингът е върху {sc.get('with_history')} тикъра — RS rating перцентилът и кандидатите може да са непълни; липсващите НЕ са оценени.")})
+    fu = sc.get("fundamentals_unavailable") or []
+    if fu:                                                       # 20.10.2026 (етап 3б): LLY в пробното пускане — таймаут на .info, отпадна с общия текст и без банер
+        out.append({"source": "screener", "level": "warn",
+                    "message": (f"CANSLIM: фундаментите (Yahoo .info) на {len(fu)} от {sc.get('fundamentals_checked') or '?'} проверени кандидата не се изтеглиха днес "
+                                f"({', '.join(fu[:8])}{' …' if len(fu) > 8 else ''}) — те НЕ са оценени и липсват в Action/Watchlist; това не значи, че не минават CANSLIM.")})
     si = superinvestor_status or {}
     if si.get("kind") in ("ok", "legit_zero") and si.get("managers_total") and (si.get("managers_with_data") or 0) < si["managers_total"]:
         out.append({"source": "13f", "level": "warn",
