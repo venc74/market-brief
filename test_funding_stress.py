@@ -61,12 +61,13 @@ print("  ✓ режимът и броенето (РЕАЛНИЯТ термоме
 
 print()
 print("── 5. теглене от FRED (подменено с РЕАЛНИТЕ серии), промптът и страницата ──")
-real = ml._fred_series
+real, real_spread = ml._fred_series, ml.funding_spread
 ml._fred_series = lambda sid, days=90: {"SOFR": S["sofr"], "IOER": S["ioer"], "IORB": S["iorb"]}[sid]
+ml.funding_spread = lambda a, b, c, today=None: real_spread(a, b, c, today=D("2026-10-15"))     # 20.10.2026: денят е фиксиран (СИНТЕТИЧНО) — с днешната дата серията до 14.10 е "застояла" от 20.10 и тестът падаше
 try:
     fs = ml.funding_stress()
 finally:
-    ml._fred_series = real
+    ml._fred_series, ml.funding_spread = real, real_spread
 assert fs["value"] == -2.0 and fs["as_of"] == "2026-10-14"
 prompts = []
 ai_brief._call_claude = lambda system, user, **k: (prompts.append(user), json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"}))[1]
