@@ -26,11 +26,40 @@ def _pd():
     return pd
 
 
-def completed(close, today: dt.date | None = None):
-    """Само завършените седмични бари: барът (дата = понеделник) е завършен, ако е минала петъчната му сесия (≥ 5 дни след него)."""
+def is_crypto(symbol: str | None) -> bool:
+    """20.10.2026 (етап 3, т. 3): крипто двойките на Yahoo ("BTC-USD", "XRP-USD") се търгуват 7 дни — седмицата свършва в неделя (UTC), не в петък."""
+    return bool(symbol) and str(symbol).upper().endswith("-USD")
+
+
+def completed(close, today: dt.date | None = None, crypto: bool = False):
+    """
+    Само завършените седмични бари: барът (дата = понеделник) е завършен, ако е минала петъчната му сесия (≥ 5 дни след него).
+    Крипто (20.10.2026): седмицата е понеделник–неделя → завършена от понеделника след нея (≥ 7 дни); серията от crypto_weekly_closes пази само седмици с неделен бар.
+    """
     today = today or dt.date.today()
-    keep = [(today - ts.date()).days >= 5 for ts in close.index]
+    keep = [(today - ts.date()).days >= (7 if crypto else 5) for ts in close.index]
     return close[keep]
+
+
+def crypto_weekly_closes(daily):
+    """
+    20.10.2026 (етап 3, т. 3): седмичните затваряния за крипто от ДНЕВНИТЕ — последното затваряне понеделник–неделя, етикет = понеделникът (като седмичния бар на Yahoo,
+    за да не се мести връзката с COT датите в track_rows). Седмица без неделен бар (още не е свършила или Yahoo още не го е дал) отпада. Причина: седмичният бар на Yahoo
+    за BTC-USD / XRP-USD в понеделник сутрин още носеше затварянето от СЪБОТА — брифът от 19.10: BTC 81382.1 / XRP 1.2926 (= 17.10), от 20.10: 82017.6 / 1.305 (= неделя 18.10).
+    """
+    pd = _pd()
+    s = daily.dropna()
+    if getattr(s.index, "tz", None) is not None:
+        s.index = s.index.tz_localize(None)
+    s.index = s.index.normalize()
+    if not len(s):
+        return s
+    weeks = s.groupby(s.index.to_period("W-SUN"))
+    out = {}
+    for per, g in weeks:
+        if g.index[-1].weekday() == 6:                                   # неделният бар е налице → седмицата е завършена в данните
+            out[per.start_time.normalize()] = float(g.iloc[-1])
+    return pd.Series(out, dtype=float).sort_index()
 
 
 def weekly_closes(symbol: str, fetch=None):
@@ -41,8 +70,12 @@ def weekly_closes(symbol: str, fetch=None):
         else:
             import yfinance as yf
             from src import net_utils
-            h = net_utils.fetch_with_timeout(lambda: yf.Ticker(symbol).history(period="5y", interval="1wk"))
-            s = None if h is None or h.empty else h["Close"]
+            if is_crypto(symbol):                                          # 20.10.2026 (т. 3): от дневните — седмицата свършва в неделя
+                h = net_utils.fetch_with_timeout(lambda: yf.Ticker(symbol).history(period="5y", interval="1d"))
+                s = None if h is None or h.empty else crypto_weekly_closes(h["Close"])
+            else:
+                h = net_utils.fetch_with_timeout(lambda: yf.Ticker(symbol).history(period="5y", interval="1wk"))
+                s = None if h is None or h.empty else h["Close"]
         if s is None:
             return None
         s = s.dropna()
@@ -55,16 +88,21 @@ def weekly_closes(symbol: str, fetch=None):
         return None
 
 
-def week_close_date(ts) -> str:
-    """15.10.2026: датата на седмичното затваряне — последната сесия от седмицата на бара (Yahoo етикетира седмичния бар с понеделника): петък, назад през уикенд и NYSE празник."""
+def week_close_date(ts, crypto: bool = False) -> str:
+    """
+    15.10.2026: датата на седмичното затваряне — последната сесия от седмицата на бара (Yahoo етикетира седмичния бар с понеделника): петък, назад през уикенд и NYSE празник.
+    Крипто (20.10.2026): неделята на седмицата (търгува се 7 дни; до 20.10 етикетът казваше петък, а затварянето беше от неделя/събота).
+    """
     d = ts.date() if hasattr(ts, "date") else ts
+    if crypto:
+        return (d + dt.timedelta(days=6 - d.weekday())).isoformat()
     end = d + dt.timedelta(days=max(0, 4 - d.weekday()))
     while end.weekday() >= 5 or end.isoformat() in config.NYSE_HOLIDAYS:
         end -= dt.timedelta(days=1)
     return end.isoformat()
 
 
-def confirmation(close, direction: str) -> dict | None:
+def confirmation(close, direction: str, crypto: bool = False) -> dict | None:
     """
     Потвърждение от цената към последния бар на `close` (седмични затваряния, най-старото първо).
     {"confirmed", "side" (below/above SMA10), "weeks_on_side", "crossed" (имало ли е пресичане), "close", "sma", "gap_pct",
@@ -80,7 +118,7 @@ def confirmation(close, direction: str) -> dict | None:
     last = float(close.iloc[-1]); ma = float(sma.iloc[-1])
     out = {"close": round(last, 4), "sma": round(ma, 4), "gap_pct": round((last / ma - 1) * 100, 2),
            "side": "below" if last < ma else "above", "want": "below" if want == -1 else "above",
-           "close_date": week_close_date(close.index[-1])}                       # 15.10.2026: към коя дата е седмичното затваряне
+           "close_date": week_close_date(close.index[-1], crypto)}               # 15.10.2026: към коя дата е седмичното затваряне (крипто — неделята, 20.10)
     if int(side.iloc[-1]) != want:
         return {**out, "confirmed": False, "state": "not_crossed", "weeks_on_side": 0, "crossed": False}
     j = n - 1
@@ -275,11 +313,12 @@ def annotate(cot_rows: list[dict], series_by_market: dict[str, list[dict]], toda
         try:
             symbol = config.COT_PRICE_SYMBOLS.get(m)
             close = weekly_closes(symbol, fetch) if symbol else None
+            crypto = is_crypto(symbol)
             if close is not None:
-                close = completed(close, today)
+                close = completed(close, today, crypto)
             pts = series_by_market.get(m)
             if close is not None and len(close) >= config.COT_SMA_WEEKS + 1:
-                conf = confirmation(close, c["direction"])
+                conf = confirmation(close, c["direction"], crypto)
                 row["price_confirmation"] = {**(conf or {}), "symbol": symbol, "text": confirmation_text(conf, c["direction"])}
                 if pts:
                     rows = [{**r, "market": m} for r in track_rows(pts, close)]
