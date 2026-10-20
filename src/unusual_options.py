@@ -631,7 +631,8 @@ def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple
         snap, session, snap_missing = _snapshot_for_yesterday(today)
     except Exception as e:
         snap, session, snap_missing = None, "", f"снимката не се зареди: {type(e).__name__}"
-    diag.update(snapshot_session=session or None, snapshot_fetched_at_utc=(snap or {}).get("fetched_at_utc"), snapshot_missing_reason=snap_missing)
+    diag.update(snapshot_session=session or None, snapshot_fetched_at_utc=(snap or {}).get("fetched_at_utc"), snapshot_missing_reason=snap_missing,
+                snapshot_tickers=len((snap or {}).get("tickers") or {}), snapshot_failed=list((snap or {}).get("failed") or []))      # 19.10.2026 (т. 12): n от N на снимката
     try:
         basket = reference_basket(snap, session or today.isoformat(), today, snap_missing)
     except Exception as e:

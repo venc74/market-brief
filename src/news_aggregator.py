@@ -352,6 +352,8 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
 
 
 LAST_DIAG: dict = {}
+# 19.10.2026 (трети преглед, т. 12): празните новини не са тиха липса — {"ok", "reason", "count"} → банер в брифа (data_warnings)
+LAST_STATUS: dict = {}
 
 
 def significant_news(max_items: int = 8) -> list[dict]:
@@ -360,10 +362,13 @@ def significant_news(max_items: int = 8) -> list[dict]:
     Кешира за деня. Празен списък при провал (graceful degradation).
     """
     today = dt.date.today().isoformat()
+    LAST_STATUS.clear()
+    LAST_STATUS.update(ok=False, reason="не завърши", count=0)
     if _CACHE.exists():
         try:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today:
+                LAST_STATUS.update(ok=bool(cached.get("news")), reason="" if cached.get("news") else "кешът за деня е празен", count=len(cached.get("news") or []))
                 return cached.get("news", [])
         except Exception:
             pass
@@ -371,6 +376,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
     raw = gather_raw(hours=24)
     if not raw:
         print("[news] нула източници върнаха данни — пропускам секцията")
+        LAST_STATUS.update(reason="нито един RSS източник не върна заглавия")
         return []
 
     # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
@@ -410,6 +416,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
             print(f"[news] ⚠ {d['reason']}: {d}")
     except Exception as ex:
         print(f"[news] Claude филтър неуспешен: {ex}")
+        LAST_STATUS.update(reason=f"подборът (AI) не успя: {type(ex).__name__}")
         return []
 
     try:
@@ -419,6 +426,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
     except Exception as ex:
         print(f"[news] cache write: {ex}")
 
+    LAST_STATUS.update(ok=bool(news), reason="" if news else f"подборът не върна нито една новина от {len(pool)} заглавия", count=len(news))
     return news
 
 

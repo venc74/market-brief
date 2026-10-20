@@ -187,11 +187,66 @@ def _13f_warnings(status: dict | None) -> list[dict]:
     return out
 
 
+def _partial_warnings(sector_status: dict | None, screener_status: dict | None, superinvestor_status: dict | None, glb_status: dict | None,
+                      uov_diag: dict | None, ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
+    """
+    19.10.2026 (трети преглед, т. 12): ТИХИТЕ частични провали — всеки е видим ред, не тиха липса. Пълните провали вече имаха банер; тук е "част от данните липсва".
+    Измерено в 89 брифа: секторите винаги 17 от 17, 13F — 15 от 15, GLB — 903 от 903, канарчето — проверено, новините — никога празни, OI снимката — 0 неуспешни тикъра;
+    пътищата в кода бяха тихи. Скрийнърът не пазеше броя тикъри с история → праг 90% от универса (голям спад; нормата се записва от днес — screener_status в брифа).
+    """
+    out: list[dict] = []
+    ss = sector_status or {}
+    if ss.get("ok") and ss.get("etfs_total") and (ss.get("etfs_ok") or 0) < ss["etfs_total"]:
+        out.append({"source": "sector_rotation", "level": "warn",
+                    "message": (f"Секторна ротация: {ss.get('etfs_ok')} от {ss['etfs_total']} секторни ETF-а — без данни днес: {', '.join(ss.get('missing') or []) or '?'}; "
+                                "картата и водещите сектори са без тях.")})
+    sc = screener_status or {}
+    if sc.get("kind") in ("ok", "partial") and sc.get("universe") and not sc.get("batches_failed") \
+            and (sc.get("with_history") or 0) < 0.90 * sc["universe"]:
+        out.append({"source": "screener", "level": "warn",
+                    "message": (f"Скрийнър: само {sc.get('with_history')} от {sc['universe']} тикъра имат ценова история днес — Yahoo не върна данни за останалите "
+                                "без грешка в партидата; RS rating перцентилът и кандидатите може да са непълни.")})
+    si = superinvestor_status or {}
+    if si.get("kind") in ("ok", "legit_zero") and si.get("managers_total") and (si.get("managers_with_data") or 0) < si["managers_total"]:
+        out.append({"source": "13f", "level": "warn",
+                    "message": (f"13F: {si.get('managers_with_data')} от {si['managers_total']} мениджъра с данни днес — за останалите ходовете, SI✓ и изходите липсват; "
+                                "това НЕ значи, че нямат промени.")})
+    g = glb_status or {}
+    if g.get("ok") and g.get("universe") and not g.get("batches_failed") and (g.get("with_history") or 0) < 0.99 * g["universe"]:
+        out.append({"source": "glb", "level": "warn",
+                    "message": (f"GLB скрийнър: {g['universe'] - (g.get('with_history') or 0)} от {g['universe']} тикъра без история днес (Yahoo не върна данни без грешка) — "
+                                "списъкът и сигналите за книгата „GLB по Уиш“ може да са непълни.")})
+    u = uov_diag or {}
+    if u.get("snapshot_failed"):
+        f = u["snapshot_failed"]
+        out.append({"source": "unusual_options", "level": "warn",
+                    "message": (f"Unusual options: следобедната OI снимка за {u.get('snapshot_session') or '?'} не взе {len(f)} тикъра ({', '.join(map(str, f[:8]))}"
+                                + (" …" if len(f) > 8 else "") + ") — за тях UOV✓ липсва, това НЕ значи нормален обем.")})
+    ip = ins_pos_status or {}
+    if ip.get("kind") in ("failed", "ok_partial"):
+        out.append({"source": "insider", "level": "warn",
+                    "message": f"Insider buying (позициите в книгите): {ip.get('note')} — INS✓ върху позициите може да липсва; това НЕ значи, че няма insider покупки."})
+    ns = news_status or {}
+    if ns and not ns.get("ok"):
+        out.append({"source": "news", "level": "warn",
+                    "message": (f"Значими новини: няма днес ({ns.get('reason') or 'неизвестна причина'}) — макро текстът, тезите и проверката на AI текста на картите са без "
+                                "новинарски фон; това НЕ значи, че няма новини.")})
+    c = canary or {}
+    if c and c.get("ok") is None:
+        out.append({"source": "data_canary", "level": "warn",
+                    "message": f"Данни: канарчето за split корекцията на Yahoo не провери днес ({c.get('error') or 'няма данни'}) — корекцията не е сверена."})
+    if fred_key_missing:
+        out.append({"source": "fred", "level": "warn",
+                    "message": "FRED: липсва FRED_API_KEY — серийте от FRED (2s10s, Net Liquidity, SOFR − IORB, ядрената инфлация) са празни днес; скритите индикатори не са „без данни на пазара“."})
+    return out
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
-            dd_status: dict | None = None, ai_lost: list | None = None) -> list[dict]:
+            dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
+            fred_key_missing: bool = False) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -240,6 +295,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_ai_lost_warning(ai_lost))
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
+    out.extend(_partial_warnings(sector_status, screener_status, superinvestor_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
         out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})
     return out

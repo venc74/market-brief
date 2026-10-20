@@ -933,6 +933,7 @@ def run() -> dict:
             ins_pos_status = attach_position_insider(pos_rows)
     except Exception as e:
         print(f"[main] INS✓ маркерите за позициите пропуснати: {e}")
+        ins_pos_status = {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"}      # 19.10.2026 (т. 12): видимо, не тихо {}
     try:
         if qm_by_ticker and pos_rows:
             attach_qm_markers(pos_rows, qm_by_ticker)            # QM✓ и върху позициите (v2 отворени/чакащи и buy-stop книгата)
@@ -1019,7 +1020,8 @@ def run() -> dict:
         print(f"[health] {len(health)} проблема" + (": " + " | ".join(h["check"] for h in health) if health else " — всичко очаквано е налице"))
     except Exception as e:
         print(f"[health] мониторът пропуснат: {type(e).__name__}: {e}")
-        health = []
+        # 19.10.2026 (т. 12): паднал монитор не е "всичко е наред" — ред в банера
+        health = [{"check": "health_monitor", "message": f"мониторът не се изпълни ({type(e).__name__}: {e}) — липсата на други редове тук днес НЕ значи, че всичко очаквано е налице."}]
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
@@ -1041,8 +1043,12 @@ def run() -> dict:
                                                dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
                                                ai_lost=list(ai_brief.NARRATIVES_LOST),
                                                glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
-                                               canary=canary, health=health),
+                                               canary=canary, health=health,
+                                               ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
+                                               news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
+                                               fred_key_missing=not config.FRED_API_KEY),
         "health": health,                                                # здравният монитор (10.10)
+        "screener_status": dict(screener.LAST_STATUS),                  # 19.10.2026 (т. 12): с история / универс / партиди — нормата за прага на банера
         "market_calendar_note": setup_rules.market_calendar_note(dt.date.fromisoformat(today)),     # 16.10.2026 (В2б): утре / в понеделник NYSE не работи или затваря рано
         "bar_freshness": dict(bar_freshness.LAST_DIAG),                 # 16.10.2026: застоял дневен бар (изчакване, дял на универса, засегнати карти)
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)
@@ -1113,7 +1119,16 @@ def run() -> dict:
     email_html = render_email(brief)
     subject = (f"[{thermo['regime']}] AI Бриф {dt.date.today().strftime('%d.%m')} · "
                f"{len(action)} Action: {', '.join(a['ticker'] for a in action) or '—'}")
-    send_once(email_html, subject, today)                 # 19.10.2026 (т. 13): повторен run в същия ден не праща втори имейл
+    sent = send_once(email_html, subject, today)          # 19.10.2026 (т. 13): повторен run в същия ден не праща втори имейл
+    if not sent["sent"] and not sent["skipped"]:
+        # 19.10.2026 (т. 12): неуспешно изпращане — банер на днешната страница (тя е рендерирана преди изпращането) и в JSON-а на брифа
+        try:
+            brief["data_warnings"].append({"source": "email", "level": "warn",
+                                           "message": "Имейл: брифът не беше изпратен днес (SMTP / SendGrid не прие — причината е в лога на run-а); страницата е актуална."})
+            (config.DATA_DIR / f"{today}.json").write_text(json.dumps(brief, indent=1, ensure_ascii=False, default=str), encoding="utf-8")
+            render_dashboard(brief)
+        except Exception as e:
+            print(f"[email] банерът за неизпратения имейл не се записа: {type(e).__name__}: {e}")
 
     print("═══ Готово ═══")
     return brief

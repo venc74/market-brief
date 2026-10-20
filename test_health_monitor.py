@@ -95,7 +95,8 @@ print("  ✓ СИНТЕТИЧНА 'днес' 02.10.2028 (90 дни до края
 print()
 print("── 5. main ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "health_monitor.check(today, resolution=backtest.LAST_RESOLUTION" in src and "canary=canary, health=health)," in src and '"health": health,' in src
+assert "health_monitor.check(today, resolution=backtest.LAST_RESOLUTION" in src and "canary=canary, health=health," in src and '"health": health,' in src   # 19.10: + още аргументи след health (т. 12)
+assert '"check": "health_monitor"' in src                                     # 19.10 (т. 12): паднал монитор → ред в банера, не тихо []
 print("  ✓ main пуска монитора в края, подава го на data_warnings и го записва в брифа (health)")
 print()
 print("Всички тестове минаха.")

@@ -213,11 +213,12 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
         t0 = time.monotonic()
         for i, t in enumerate(tickers):
             if budget_sec is not None and time.monotonic() - t0 > budget_sec:
-                LAST_DIAG["unchecked"] = tickers[i:]
+                LAST_DIAG["unchecked"] += tickers[i:]                # 19.10.2026: + тикърите без CIK отпреди
                 print(f"[spinoff] бюджетът от {budget_sec} s изтече — непроверени {len(tickers) - i}: {', '.join(tickers[i:i + 20])}")
                 break
             cik = cik_map.get(t)
             if not cik:
+                LAST_DIAG["unchecked"].append(t)          # 19.10.2026 (т. 12): без CIK в EDGAR — непроверен (до 19.10 тихо прескачане: checked < requested без банер)
                 continue
             LAST_DIAG["checked"] += 1
             try:

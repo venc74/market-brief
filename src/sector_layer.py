@@ -117,7 +117,8 @@ def sector_rotation() -> list[dict]:
 
     results.sort(key=lambda x: x["rs_chg_4w_pct"], reverse=True)
     LAST_STATUS.update(ok=bool(results), etfs_ok=len(results),
-                       reason="" if results else "нито един секторен ETF няма достатъчно история")
+                       reason="" if results else "нито един секторен ETF няма достатъчно история",
+                       missing=sorted(set(etfs) - {r["etf"] for r in results}))          # 19.10.2026 (т. 12): частичната ротация — видимо
     if not results:
         print(f"[sector] ⚠ секторната ротация е празна — {LAST_STATUS['reason']}")
     return results

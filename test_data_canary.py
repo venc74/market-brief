@@ -43,10 +43,11 @@ assert raw["ok"] is False and raw["close"] == 1208.88
 near = data_canary.check(fake(1.004))
 assert near["ok"] is True                                                                 # 0.4% (дивидентна корекция ≈ −0.3% е под толеранса 1%)
 fail = data_canary.check(lambda *a, **k: (_ for _ in ()).throw(RuntimeError("YFRateLimitError (СИНТЕТИЧНО)")))
-assert fail["ok"] is None and "YFRateLimitError" in fail["error"] and data_warnings.collect(None, None, canary=fail) == []
+fw = data_warnings.collect(None, None, canary=fail)                                       # 19.10 (т. 12): канарче без проверка — ред "warn", не тишина (до 19.10 — без банер)
+assert fail["ok"] is None and "YFRateLimitError" in fail["error"] and [(w["source"], w["level"]) for w in fw] == [("data_canary", "warn")] and "не провери днес" in fw[0]["message"]
 nobar = data_canary.check(fake(drop="2024-06-07"))
 assert nobar["ok"] is None and "няма бар" in nobar["error"]
-print("  ✓ РЕАЛНИТЕ стойности → OK, без банер; СИНТЕТИЧНО двойна корекция ($12.089) / липсваща ($1208.88) → банер 'error'; 0.4% → OK; паднало теглене / липсващ бар → неизвестно, без банер")
+print("  ✓ РЕАЛНИТЕ стойности → OK, без банер; СИНТЕТИЧНО двойна корекция ($12.089) / липсваща ($1208.88) → банер 'error'; 0.4% → OK; паднало теглене / липсващ бар → неизвестно, ред 'warn' (не провери днес)")
 
 print()
 print("── 3. main записва канарчето и го подава на банерите ──")
