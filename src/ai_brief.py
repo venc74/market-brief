@@ -404,6 +404,19 @@ def _log_known_defects(s: str) -> None:
                   f"«…{s[max(0, m.start() - 35):m.end() + 25]}…»")
 
 
+# 20.10.2026 (етап 3, т. 4): позоваване на позиция в промпта — "(новина 1)" във веригата на XLE (20.10; новините се подават като JSON без номера, моделът ги брои сам).
+# За читателя няма "новина 1" → скобата се маха. В историята (90 брифа, всички AI текстове): 1 случай.
+_PROMPT_REF_RE = re.compile(r"\s*\((?:новина|новини|news)\s*№?\s*\d+(?:\s*(?:,|и|-|–)\s*\d+)*\)", re.I)
+
+
+def _strip_prompt_refs(s: str) -> str:
+    if not _PROMPT_REF_RE.search(s):
+        return s
+    for m in _PROMPT_REF_RE.finditer(s):
+        print(f"[ai] махнато позоваване на промпта '{m.group(0).strip()}' — «…{s[max(0, m.start() - 40):m.end() + 10]}…»")
+    return _PROMPT_REF_RE.sub("", s)
+
+
 def _fix_translit(obj):
     """
     Обхожда всички низове в парснатия JSON (всички AI отговори минават през
@@ -421,6 +434,7 @@ def _fix_translit(obj):
         i = obj.index(_SOFT_HYPHEN)
         print(f"[ai] премахнат soft hyphen (U+00AD) ×{n} — «…{obj[max(0, i - 25):i + 25].replace(_SOFT_HYPHEN, '·')}…»")
         obj = obj.replace(_SOFT_HYPHEN, "")
+    obj = _strip_prompt_refs(obj)                 # 20.10.2026 (етап 3, т. 4): "(новина 1)"
     obj = _fix_latin_prefix(obj)                  # 08.10: ПРЕДИ лога на известните дефекти и буквите-двойници — иначе поправена дума ("expозиция") пак се води като неподправена хибридна
     _log_known_defects(obj)
     if _CJK_RE.search(obj):

@@ -178,11 +178,15 @@ def _members(sentence: str, start: int) -> list[str]:
 # "твърди 1 червени, а кодът брои 0". Брой, последван от "е достатъчен / за преход / за смяна / би / ще / стига", или предшестван от "ако / при / още / нов", не се сверява с броенето;
 # "(сега 0 червени)" в същото изречение — се сверява.
 _HYPO_AFTER = re.compile(r"^\W{0,3}(?:[\w-]+\s+){0,3}?(?:е\s+|са\s+)?(?:достатъч\w*|за\s+(?:преход|смяна|промяна)|би\b|биха\b|ще\b|стига\w*)", re.I)
+# 20.10.2026 (етап 3, т. 4): брой, последван от "(сега N" — ЦЕЛ и текущото състояние ("До Offensive по броенето: 0 червени (сега 2) и още 1 зелен", 20.10 — преписано от реда
+# "Запас до смяна на режима" на самия код); беше заменено като "твърди 0 червени, а кодът брои 2" и броенето излезе два пъти в коментара. В историята: 1 от 2 замени "count".
+_TARGET_AFTER = re.compile(r"^\W{0,3}(?:[\w-]+\s+){0,2}?\(сега\b", re.I)
 _HYPO_BEFORE = re.compile(r"(?:\bако|\bпри|\bоще|\bнов\w*|\bвтори|\bпоне)\s+(?:[\w-]+\s+){0,1}$", re.I)
 
 
 def _hypothetical(sentence: str, m: re.Match) -> bool:
-    return bool(_HYPO_AFTER.search(sentence[m.end():m.end() + 60]) or _HYPO_BEFORE.search(sentence[max(0, m.start() - 30):m.start()]))
+    after = sentence[m.end():m.end() + 60]
+    return bool(_HYPO_AFTER.search(after) or _TARGET_AFTER.search(after) or _HYPO_BEFORE.search(sentence[max(0, m.start() - 30):m.start()]))
 
 
 def check_sentence(sentence: str, f: dict) -> list[dict]:
