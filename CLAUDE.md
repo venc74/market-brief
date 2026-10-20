@@ -65,7 +65,8 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 - Брифът: cron-job.org → `workflow_dispatch` на `daily_brief.yml` (без `schedule:` нарочно — вграденият scheduler на GitHub беше ненадежден); лимит 90 мин.
 - OI снимката: отделен job `oi_snapshot.yml` (~16:00 UTC от cron-job.org + 5 резервни `schedule` тригера), собствена concurrency група `oi-snapshot`; подробно — docs/HISTORY.md.
 - Страницата: GitHub Pages сервира `/docs` от `main`; `data/*.json` не е публичен → `render.py` огледалва в `docs/data/`. Червени "Pages build and deployment" от застъпени deploy-и
-  са безобидни. `docs/HISTORY.md` също се публикува (Jekyll) — без Liquid синтаксис в него (пази го `test_history_doc.py`).
+  са безобидни. `docs/.nojekyll` (от 20.10): Pages сервира docs/ както е, без Jekyll (страницата не разчита на него — живите файлове бяха байт по байт същите като в репото);
+  `docs/HISTORY.md` се вижда като текст. Пази го `test_history_doc.py`.
 - Връщане към v1 — `tracker_switch.revert_to_v1()` възстановява точния v1 tracker, v2 записите
   отиват в `data/backtest_tracker_v2_backup_<дата>.json`, методологията става v1:
   ```bash
