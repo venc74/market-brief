@@ -134,12 +134,12 @@ def snapshot_tickers(max_briefs: int | None = None) -> list[str]:
         for c in (brief.get("action") or []) + (brief.get("watchlist") or []) + (brief.get("qm_breakout") or []):      # 08.10: + QM картите (очакваното движение при отчет)
             add(c.get("ticker"))
     try:
-        tracker = json.loads((config.DATA_DIR / "backtest_tracker.json").read_text(encoding="utf-8"))
-        for rec in tracker.values():
-            if rec.get("category") == "glb_wish":          # книгата "GLB по Уиш" може да държи стотици позиции (до година) и няма опционен маркер — не влиза в снимката
+        from src import backtest
+        tracker = json.loads((config.DATA_DIR / "backtest_tracker.json").read_text(encoding="utf-8"))     # пътят — по config.DATA_DIR при извикването (отделният job)
+        for rec in backtest.book_records(None, statuses=backtest.LIVE, method=None, tracker=tracker):
+            if backtest.record_category(rec) == backtest.CATEGORY_GLB_WISH:          # книгата "GLB по Уиш" може да държи стотици позиции (до година) и няма опционен маркер — не влиза в снимката
                 continue
-            if rec.get("status") in ("pending", "open", "trailing"):
-                add(rec.get("ticker"))
+            add(rec.get("ticker"))
     except FileNotFoundError:
         pass
     except Exception as e:

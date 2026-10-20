@@ -149,6 +149,51 @@ def is_action_record(rec: dict) -> bool:
     return record_category(rec) == CATEGORY_ACTION
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# Четене на книгите — ЕДНО място (етап 3, част Б, 20.10.2026). До 20.10 всеки четец (main._live_positions / _pending_action_plans / _last_resolved_positions,
+# чакащите и живите buy-stop записи, живите тикъри, четирите обобщения, следобедната OI снимка) повтаряше филтъра "книга + методология + статус", "най-скорошният
+# запис на тикъра" и интервалите за отметките "и Action / и buy-stop / и QM". Поведението е същото (реплеят: 24 брифа — обобщенията и четците, стар ↔ нов код).
+# ──────────────────────────────────────────────────────────────────────────
+LIVE = trade_sim.LIVE                 # ("pending", "open", "trailing") — записът още тече
+POSITION = _LIVE_STATUSES             # ("open", "trailing") — задействан вход (позиция)
+
+
+def book_records(category: str | None = CATEGORY_ACTION, *, statuses: tuple | None = None, method: str | None = "v2", tracker: dict | None = None) -> list[dict]:
+    """
+    Записите на една книга в реда на tracker-а. category=None — всички книги; method=None — и v1 (архивът); statuses — кортеж от статуси или None (всички).
+    tracker — вече прочетен dict (обобщенията го ползват повторно; OI снимката чете файла по своя път); иначе — _load_tracker().
+    """
+    tr = _load_tracker() if tracker is None else tracker
+    return [r for r in tr.values()
+            if (method is None or r.get("method") == method) and (category is None or record_category(r) == category)
+            and (statuses is None or r.get("status") in statuses)]
+
+
+def latest_by_ticker(records: list[dict], key: str = "entry_date") -> dict[str, dict]:
+    """Тикър → записът с най-голям `key` (при равенство — първият в реда на tracker-а). Записите трябва да имат ticker и key."""
+    out: dict[str, dict] = {}
+    for rec in records:
+        cur = out.get(rec["ticker"])
+        if cur is None or rec[key] > cur[key]:
+            out[rec["ticker"]] = rec
+    return out
+
+
+def book_intervals(category: str, tracker: dict, exclude: tuple = ()) -> dict[str, list[tuple[str, str]]]:
+    """Тикър → интервалите [entry_date, resolution_date | 9999-12-31] на v2 записите на книгата (без статусите в exclude — записи, които не са станали позиция)."""
+    d: dict = {}
+    for a_ in book_records(category, tracker=tracker):
+        if a_.get("entry_date") and a_.get("status") not in exclude:
+            d.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
+    return d
+
+
+def overlaps(rec: dict, intervals: dict) -> bool:
+    """Отметката "и Action / и buy-stop / и QM": интервалът на записа се застъпва с интервал на същия тикър в другата книга."""
+    s0, e0 = rec["entry_date"], rec.get("resolution_date") or "9999-12-31"
+    return any(a0 <= e0 and s0 <= b0 for a0, b0 in intervals.get(rec["ticker"], []))
+
+
 def _snapshot_files() -> list[pathlib.Path]:
     """Само YYYY-MM-DD.json — изключва кеш файлове (cot_cache.json и т.н.)."""
     return sorted(p for p in config.DATA_DIR.glob("*.json") if _SNAPSHOT_RE.match(p.name))
@@ -267,12 +312,12 @@ def apply_spinoff_notes(active: dict[str, dict], today: dt.date | None = None) -
         for rec in tracker.values():
             t, st = rec.get("ticker"), rec.get("status")
             h = (active or {}).get(t)
-            if h and st in ("pending", "open", "trailing"):
+            if h and st in LIVE:
                 note = {"text": spinoff_watch.note_text(h), "record": h["record"], "distribution": h["distribution"]}
                 if rec.get("spinoff_note") != note:
                     rec["spinoff_note"], changed = note, True
                 n += 1
-            elif rec.get("spinoff_note") and (st not in ("pending", "open", "trailing") or rec["spinoff_note"].get("distribution", "") < today_iso):
+            elif rec.get("spinoff_note") and (st not in LIVE or rec["spinoff_note"].get("distribution", "") < today_iso):
                 rec.pop("spinoff_note"); changed = True          # затворен запис / минало отделяне; провал на EDGAR (active = {}) НЕ маха бележката
         if changed:
             _save_tracker(tracker)
@@ -1222,16 +1267,8 @@ def pending_buystop_by_ticker() -> dict[str, dict]:
     ползва се само за ПОКАЗВАНЕ — картата в Watchlist казва прозореца на записа ("валиден до 09.10, от 05.10"), а не плаваща рамка от днес. Всяка грешка → {}.
     """
     try:
-        out: dict[str, dict] = {}
-        for rec in _load_tracker().values():
-            if rec.get("method") != "v2" or record_category(rec) != CATEGORY_BUYSTOP or rec.get("status") != "pending":
-                continue
-            if not rec.get("ticker") or not rec.get("entry_date") or not rec.get("valid_through"):
-                continue
-            cur = out.get(rec["ticker"])
-            if cur is None or rec["entry_date"] > cur["entry_date"]:
-                out[rec["ticker"]] = rec
-        return out
+        return latest_by_ticker([r for r in book_records(CATEGORY_BUYSTOP, statuses=("pending",))
+                                 if r.get("ticker") and r.get("entry_date") and r.get("valid_through")])
     except Exception as e:
         print(f"[backtest] чакащите buy-stop записи не се прочетоха: {type(e).__name__}: {e}")
         return {}
@@ -1244,8 +1281,7 @@ def live_tickers() -> list[str]:
     """
     try:
         order = {CATEGORY_ACTION: 0, CATEGORY_BUYSTOP: 1, CATEGORY_QM: 2, CATEGORY_GLB_WISH: 3}
-        live = [(order.get(record_category(r), 4), r["ticker"]) for r in _load_tracker().values()
-                if r.get("ticker") and r.get("status") in ("pending", "open", "trailing")]
+        live = [(order.get(record_category(r), 4), r["ticker"]) for r in book_records(None, statuses=LIVE, method=None) if r.get("ticker")]
         return list(dict.fromkeys(t for _, t in sorted(live)))
     except Exception as e:
         print(f"[backtest] живите тикъри не се прочетоха: {type(e).__name__}: {e}")
@@ -1259,18 +1295,8 @@ def live_buystop_by_ticker() -> dict[str, dict]:
     При няколко записа за тикъра — най-скорошният по entry_date. Чисто локално четене; всяка грешка → {}.
     """
     try:
-        out: dict[str, dict] = {}
-        for rec in _load_tracker().values():
-            if rec.get("method") != "v2" or record_category(rec) != CATEGORY_BUYSTOP or rec.get("status") not in ("pending", "open", "trailing"):
-                continue
-            if not rec.get("ticker") or not rec.get("entry_date"):
-                continue
-            if rec["status"] == "pending" and not rec.get("valid_through"):
-                continue
-            cur = out.get(rec["ticker"])
-            if cur is None or rec["entry_date"] > cur["entry_date"]:
-                out[rec["ticker"]] = rec
-        return out
+        return latest_by_ticker([r for r in book_records(CATEGORY_BUYSTOP, statuses=LIVE)
+                                 if r.get("ticker") and r.get("entry_date") and not (r["status"] == "pending" and not r.get("valid_through"))])
     except Exception as e:
         print(f"[backtest] живите buy-stop записи не се прочетоха: {type(e).__name__}: {e}")
         return {}
@@ -1288,18 +1314,13 @@ def get_buystop_summary() -> dict:
     if not config.TRACK_BUYSTOP:
         return {}
     tracker = _load_tracker()
-    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_BUYSTOP]
+    records = book_records(CATEGORY_BUYSTOP, tracker=tracker)
     # "и Action": същият тикър е и в Action книгата — интервалите [entry_date, resolution_date | ∞) на двата записа се застъпват. Action записи,
     # които никога не са станали позиция (не се задействаха / над тавана), не се броят. Книгите са независими — отметката НЕ слива статистиките.
-    action_by_ticker: dict = {}
-    for a_ in tracker.values():
-        if (a_.get("method") == "v2" and is_action_record(a_) and a_.get("entry_date")
-                and a_.get("status") not in trade_sim.NOT_A_POSITION):
-            action_by_ticker.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
+    action_by_ticker = book_intervals(CATEGORY_ACTION, tracker, trade_sim.NOT_A_POSITION)
 
     def _also_action(r: dict) -> bool:
-        b_start, b_end = r["entry_date"], r.get("resolution_date") or "9999-12-31"
-        return any(a_start <= b_end and b_start <= a_end for a_start, a_end in action_by_ticker.get(r["ticker"], []))
+        return overlaps(r, action_by_ticker)
 
     by_status: dict = {}
     for r in records:
@@ -1397,22 +1418,11 @@ def get_qm_summary() -> dict:
     if not config.TRACK_QM:
         return {}
     tracker = _load_tracker()
-    all_records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_QM]
+    all_records = book_records(CATEGORY_QM, tracker=tracker)
     before_rule = [(r, qm_before_rule(r)) for r in all_records]
     records = [r for r, d in before_rule if d is None]                       # записите "преди правилото за 1×ADR" са извън статистиката (пазят се в tracker-а)
-
-    def intervals(cat_fn, exclude=()):
-        d: dict = {}
-        for a_ in tracker.values():
-            if a_.get("method") == "v2" and cat_fn(a_) and a_.get("entry_date") and a_.get("status") not in exclude:
-                d.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
-        return d
-    act = intervals(is_action_record, trade_sim.NOT_A_POSITION)
-    bst = intervals(lambda r: record_category(r) == CATEGORY_BUYSTOP, trade_sim.NOT_A_POSITION)
-
-    def overlaps(r: dict, other: dict) -> bool:
-        s0, e0 = r["entry_date"], r.get("resolution_date") or "9999-12-31"
-        return any(a0 <= e0 and s0 <= b0 for a0, b0 in other.get(r["ticker"], []))
+    act = book_intervals(CATEGORY_ACTION, tracker, trade_sim.NOT_A_POSITION)
+    bst = book_intervals(CATEGORY_BUYSTOP, tracker, trade_sim.NOT_A_POSITION)
 
     by_status: dict = {}
     for r in records:
@@ -1513,21 +1523,10 @@ def get_glb_wish_summary() -> dict:
     if not config.TRACK_GLB_WISH:
         return {}
     tracker = _load_tracker()
-    records = [r for r in tracker.values() if r.get("method") == "v2" and record_category(r) == CATEGORY_GLB_WISH]
-
-    def intervals(cat_fn, exclude=()):
-        d: dict = {}
-        for a_ in tracker.values():
-            if a_.get("method") == "v2" and cat_fn(a_) and a_.get("entry_date") and a_.get("status") not in exclude:
-                d.setdefault(a_["ticker"], []).append((a_["entry_date"], a_.get("resolution_date") or "9999-12-31"))
-        return d
-    act = intervals(is_action_record, trade_sim.NOT_A_POSITION)
-    bst = intervals(lambda r: record_category(r) == CATEGORY_BUYSTOP, trade_sim.NOT_A_POSITION)
-    qmb = intervals(lambda r: record_category(r) == CATEGORY_QM, trade_sim.QM_NOT_A_POSITION)
-
-    def overlaps(r: dict, other: dict) -> bool:
-        s0, e0 = r["entry_date"], r.get("resolution_date") or "9999-12-31"
-        return any(a0 <= e0 and s0 <= b0 for a0, b0 in other.get(r["ticker"], []))
+    records = book_records(CATEGORY_GLB_WISH, tracker=tracker)
+    act = book_intervals(CATEGORY_ACTION, tracker, trade_sim.NOT_A_POSITION)
+    bst = book_intervals(CATEGORY_BUYSTOP, tracker, trade_sim.NOT_A_POSITION)
+    qmb = book_intervals(CATEGORY_QM, tracker, trade_sim.QM_NOT_A_POSITION)
 
     by_status: dict = {}
     for r in records:
@@ -1604,7 +1603,7 @@ def get_backtest_summary() -> dict:
     tracker = _load_tracker()
     # пакет 1, т.7: Track Record-ът е само v2; v1 записите (ако още са в tracker-а) са
     # извън статистиката — v1 е един архивен ред (виж по-долу и tracker_switch.py)
-    records = [r for r in tracker.values() if r.get("method") == "v2" and is_action_record(r)]   # пакет 1б: buy-stop книгата е отделна
+    records = book_records(CATEGORY_ACTION, tracker=tracker)   # пакет 1б: buy-stop книгата е отделна
 
     resolved = [r for r in records if r.get("realized_r") is not None]
     total_resolved = len(resolved)

@@ -62,8 +62,14 @@ def collect_day(date: str) -> dict:
         from src import main
         out["readers"]["main._live_positions"] = _safe(main._live_positions)
         out["readers"]["main._last_resolved_positions"] = _safe(main._last_resolved_positions)
+        out["readers"]["main._pending_action_plans"] = _safe(main._pending_action_plans)
     except Exception as e:
         out["readers"]["main"] = f"ГРЕШКА {type(e).__name__}"
+    try:
+        from src import oi_snapshot
+        out["readers"]["oi_snapshot.snapshot_tickers"] = _safe(oi_snapshot.snapshot_tickers)
+    except Exception as e:
+        out["readers"]["oi_snapshot"] = f"ГРЕШКА {type(e).__name__}"
     out["sessions"] = sessions_for(D(date))
     setups = {}
     live = _safe(backtest.live_buystop_by_ticker) or {}

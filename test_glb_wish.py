@@ -228,7 +228,7 @@ assert list(brief_main._live_positions()) == [] or all(backtest.is_action_record
 t3["AAPL_2024-06-12_gw"]["status"] = "open"
 live = {k: v for k, v in t3.items() if backtest.is_action_record(v) and v.get("status") in ("open", "trailing")}
 assert "AAPL_2024-06-12_gw" not in live
-assert "glb_wish" in (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8")
+assert "CATEGORY_GLB_WISH" in (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8")          # 20.10 (етап 3): през слоя за четене на книгите (backtest.CATEGORY_GLB_WISH = "glb_wish")
 print("  ✓ Action и glb_wish за един и същи тикър са независими записи; is_action_record е False за книгата → _live_positions / OPEN✓ / обобщението на Action я не броят")
 
 print()

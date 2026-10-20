@@ -65,11 +65,8 @@ def _live_positions() -> dict[str, dict]:
     позиции от седмици, представени като нови входове с нов риск $1000.
     """
     try:
-        tracker = backtest._load_tracker()
-        # пакет 1, т.7: само v2 позиции — v1 е архив, не „държа" и не пречи на нов вход
-        return {rec["ticker"]: rec for rec in tracker.values()
-                if rec.get("method") == "v2" and backtest.is_action_record(rec)      # пакет 1б: buy-stop кандидатите не са позиции
-                and rec.get("status") in ("open", "trailing")}
+        # пакет 1, т.7: само v2 позиции — v1 е архив, не „държа" и не пречи на нов вход; пакет 1б: само Action книгата — buy-stop кандидатите не са позиции
+        return {rec["ticker"]: rec for rec in backtest.book_records(backtest.CATEGORY_ACTION, statuses=backtest.POSITION)}
     except Exception as e:
         print(f"[main] live positions check failed: {e}")
         return {}
@@ -81,8 +78,7 @@ def _pending_action_plans() -> dict[str, dict]:
     и "вече в портфейла" не го броят), но нов Action план за същия тикър би дублирал чакащия — apply_hard_rules го връща във Watchlist.
     """
     try:
-        return {rec["ticker"]: rec for rec in backtest._load_tracker().values()
-                if rec.get("method") == "v2" and backtest.is_action_record(rec) and rec.get("status") == "pending"}
+        return {rec["ticker"]: rec for rec in backtest.book_records(backtest.CATEGORY_ACTION, statuses=("pending",))}
     except Exception as e:
         print(f"[main] pending plans check failed: {e}")
         return {}
@@ -154,19 +150,9 @@ def _last_resolved_positions() -> dict[str, dict]:
     релевантността сам.
     """
     try:
-        tracker = backtest._load_tracker()
-        out: dict[str, dict] = {}
-        for rec in tracker.values():
-            if rec.get("method") != "v2":        # т.7: v1 историята е архив
-                continue
-            if not backtest.is_action_record(rec):   # пакет 1б: затворен buy-stop кандидат не е "предишна позиция"
-                continue
-            if rec.get("realized_r") is None or not rec.get("resolution_date"):
-                continue
-            cur = out.get(rec["ticker"])
-            if cur is None or rec["resolution_date"] > cur["resolution_date"]:
-                out[rec["ticker"]] = rec
-        return out
+        # т.7: v1 историята е архив; пакет 1б: затворен buy-stop кандидат не е "предишна позиция" — само v2 записите на Action книгата
+        return backtest.latest_by_ticker([r for r in backtest.book_records(backtest.CATEGORY_ACTION)
+                                          if r.get("realized_r") is not None and r.get("resolution_date")], key="resolution_date")
     except Exception as e:
         print(f"[main] resolved positions check failed: {e}")
         return {}
