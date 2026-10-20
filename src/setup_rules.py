@@ -224,8 +224,8 @@ def classify_setup(c: dict, today=None) -> dict:
     else:
         out.update(kind="below_pivot", gate="below_pivot", buy_stop=round(pivot, 2), trigger_text=(
             f"Чака пробив: buy-stop ${pivot:.2f} (валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, "
-            f"до {_dm(through)}); сега {abs(pct):.1f}% под pivot. Купува се само ако High ≥ ${pivot:.2f}, "
-            f"до ${chase:.2f}; обем ≥ {mult:g}× среден за потвърждение."))
+            f"до {_dm(through)}); сега {abs(pct):.1f}% под pivot. Buy-stop поръчката се изпълнява при докосване (High ≥ ${pivot:.2f}), "
+            f"до ${chase:.2f}; обемът се вижда едва при затварянето — книгата отбелязва дали денят на входа затвори с ≥ {mult:g}× среден обем."))
     return out
 
 

@@ -18,6 +18,12 @@ import pandas as pd
 import config
 from src import setup_rules, backtest, sizing, render
 
+# 20.10.2026 (етап 3, т. 1): реалните брифове до 20.10 носят старата формулировка ("Купува се само ако … обем ≥ 1.5× среден за потвърждение") — превежда се в новата
+import re as _re
+_OLD_TAIL = _re.compile(r"Купува се само ако High ≥ \$([\d.]+), до \$([\d.]+); обем ≥ ([\d.]+)× среден за потвърждение\.")
+new_wording = lambda t: _OLD_TAIL.sub(lambda m: (f"Buy-stop поръчката се изпълнява при докосване (High ≥ ${m[1]}), до ${m[2]}; обемът се вижда едва при затварянето — "
+                                                  f"книгата отбелязва дали денят на входа затвори с ≥ {m[3]}× среден обем."), t or "")
+
 D = dt.date.fromisoformat
 FX = json.loads((ROOT / "tests" / "fixtures" / "buystop_book_2026-10-12.json").read_text(encoding="utf-8"))
 B12 = FX["cards"]
@@ -52,7 +58,7 @@ backtest._save_tracker(copy.deepcopy(FX["tracker_before"]))
 old = {t: fresh(t) for t in ("EXPD", "ANET")}
 setup_rules.annotate(list(old.values()), D("2026-10-12"), backtest.live_buystop_by_ticker())
 assert old["EXPD"]["setup"]["book_status"] == "pending" and old["EXPD"]["setup"]["trigger_text"].startswith("Чака пробив: buy-stop $194.59 (валиден до 15.10, от 09.10")
-assert old["EXPD"]["setup"]["trigger_text"] == B12["EXPD"]["setup"]["trigger_text"]                          # дословно като в РЕАЛНИЯ бриф
+assert old["EXPD"]["setup"]["trigger_text"] == new_wording(B12["EXPD"]["setup"]["trigger_text"])                          # дословно като в РЕАЛНИЯ бриф
 assert old["ANET"]["setup"]["kind"] == "no_volume" and "triggered" not in old["ANET"]["setup"]
 print("  ✓ с tracker-а от диска (преди run-а): EXPD 'Чака пробив … валиден до 15.10, от 09.10' — дословно като в брифа; ANET без дума за книгата")
 

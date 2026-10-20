@@ -558,6 +558,52 @@ _V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "targe
                    "current_r", "return_pct", "last_close", "last_close_date")
 
 
+# 20.10.2026 (етап 3, т. 1): buy-stop поръчката се изпълнява при ДОКОСВАНЕ — обемът на деня се знае чак при затварянето. Всеки Action / buy-stop запис с вход
+# носи обема на деня на входа спрямо средния за 50 бара (както volume_ratio в скрийнъра) и отметка ≥ BREAKOUT_VOLUME_MULT — за отделни резултати в книгата.
+# Реално (книгата от 07.10): 4 входа, всички под 1.5× (EXPD 09.10 1.25×, ANET 09.10 0.73×, Action EXPD 16.10 1.32×, AAPL 19.10 0.86×).
+ENTRY_VOLUME_BARS = 50
+ENTRY_VOLUME_LOOKBACK_DAYS = 80              # календарни дни преди най-ранния вход — 50 сесии за средния обем
+
+
+def entry_volume(fill_date: str | None, bars: "pd.DataFrame | None") -> dict:
+    """{"entry_volume_ratio": обем на деня на входа ÷ средния за 50 бара до него вкл. | None, "entry_volume_ok": ≥ BREAKOUT_VOLUME_MULT | None}. Под 50 бара или без обем — None."""
+    out = {"entry_volume_ratio": None, "entry_volume_ok": None}
+    try:
+        if not fill_date or bars is None or "Volume" not in bars:
+            return out
+        v = bars["Volume"].dropna()
+        idx = pd.DatetimeIndex(v.index)
+        idx = idx.tz_localize(None) if idx.tz is not None else idx
+        v.index = idx
+        upto = v[v.index <= pd.Timestamp(fill_date)]
+        if not len(upto) or upto.index[-1] != pd.Timestamp(fill_date) or len(upto) < ENTRY_VOLUME_BARS:
+            return out
+        avg = float(upto.iloc[-ENTRY_VOLUME_BARS:].mean())
+        if avg <= 0:
+            return out
+        ratio = round(float(upto.iloc[-1]) / avg, 2)
+        return {"entry_volume_ratio": ratio, "entry_volume_ok": ratio >= config.BREAKOUT_VOLUME_MULT}
+    except Exception:
+        return out
+
+
+def entry_volume_groups(records: list[dict], visible: bool) -> dict:
+    """Записите с вход по отметката: {"high", "low", "unknown"} + среден R на затворените във всяка група (само при stats_visible)."""
+    g = {"high": 0, "low": 0, "unknown": 0, "high_avg_r": None, "low_avg_r": None, "high_closed": 0, "low_closed": 0, "mult": config.BREAKOUT_VOLUME_MULT}
+    rs = {"high": [], "low": []}
+    for r in records:
+        if not r.get("fill_date"):
+            continue
+        k = "high" if r.get("entry_volume_ok") is True else "low" if r.get("entry_volume_ok") is False else "unknown"
+        g[k] += 1
+        if k != "unknown" and r.get("realized_r") is not None:
+            rs[k].append(r["realized_r"])
+    for k in ("high", "low"):
+        g[f"{k}_closed"] = len(rs[k])
+        g[f"{k}_avg_r"] = round(sum(rs[k]) / len(rs[k]), 2) if (visible and rs[k]) else None
+    return g
+
+
 def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date,
                          spy_bars: "pd.DataFrame | None" = None) -> None:
     """
@@ -569,6 +615,7 @@ def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date,
     res = trade_sim.simulate(rec, bars, today)
     for k in _V2_RESULT_KEYS:
         rec[k] = res.get(k)
+    rec.update(entry_volume(res.get("fill_date"), bars))                 # 20.10.2026 (етап 3, т. 1)
     # т.8: SPY за същите периоди (graceful: без SPY барове → None, останалото не се засяга)
     rec["spy_return_pct"] = trade_sim.spy_return_pct(res, spy_bars) if spy_bars is not None else None
     rec["alpha_pct"] = (round(res["return_pct"] - rec["spy_return_pct"], 2)
@@ -877,8 +924,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
     tickers = sorted({rec["ticker"] for _, rec in live_items})
     # 30 календарни дни ПРЕДИ най-ранния запис: 10DMA на trailing-а трябва да е пълна от
     # първия ден след входа (v2 симулацията ползва същата серия, както реплеят)
-    earliest = (dt.date.fromisoformat(min(rec["entry_date"] for _, rec in live_items))
-                - dt.timedelta(days=30)).isoformat()
+    # 20.10.2026 (етап 3, т. 1): ENTRY_VOLUME_LOOKBACK_DAYS — средният обем за 50 сесии преди входа; по-дългата история не мени симулациите (входът е от entry_date)
+    vol_backfill = [(k, r) for k, r in tracker.items() if r.get("method") == "v2" and r.get("fill_date") and "entry_volume_ratio" not in r
+                    and record_category(r) in (CATEGORY_ACTION, CATEGORY_BUYSTOP) and (k, r) not in live_items]
+    tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill})
+    earliest = (dt.date.fromisoformat(min([rec["entry_date"] for _, rec in live_items] + [r["fill_date"] for _, r in vol_backfill]))
+                - dt.timedelta(days=max(30, ENTRY_VOLUME_LOOKBACK_DAYS))).isoformat()
     # т.8: SPY за сравнението със v2 позициите — във ВСЕКИ случай в същия batch (нула втори fetch)
     dl = tickers + (["SPY"] if "SPY" not in tickers and any(r.get("method") == "v2" for _, r in live_items) else [])
     try:
@@ -892,8 +943,9 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         LAST_RESOLUTION = {"ok": False, "live": len(live_items), "error": "празен резултат от Yahoo"}
         return
 
-    cols = _normalize_price_columns(data, dl, ("Open", "High", "Low", "Close"))
+    cols = _normalize_price_columns(data, dl, ("Open", "High", "Low", "Close", "Volume"))
     opens, highs, lows, closes = cols.get("Open"), cols.get("High"), cols.get("Low"), cols.get("Close")
+    volumes = cols.get("Volume")
     if highs is None or lows is None or closes is None:
         print("[backtest] price fetch не върна High/Low/Close колони")
         LAST_RESOLUTION = {"ok": False, "live": len(live_items), "error": "няма High/Low/Close колони"}
@@ -961,6 +1013,8 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
                     continue
                 bars = pd.DataFrame({"Open": opens[ticker], "High": highs[ticker],
                                      "Low": lows[ticker], "Close": closes[ticker]}).dropna()
+                if volumes is not None and ticker in getattr(volumes, "columns", []):
+                    bars["Volume"] = volumes[ticker].reindex(bars.index)              # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
                 _resolve_position_v2(rec, bars, today, spy_bars)
             else:
                 _resolve_position(rec, highs[ticker].dropna(), lows[ticker].dropna(),
@@ -968,6 +1022,11 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         except Exception as e:
             print(f"[backtest] {ticker}: резолюция неуспешна, остава {rec['status']}: {e}")
             continue
+    # 20.10.2026 (етап 3, т. 1): еднократно — записите с вход отпреди отметката (вкл. затворените) получават обема на деня на входа от същото теглене
+    for _, rec in vol_backfill:
+        t = rec["ticker"]
+        if volumes is not None and t in getattr(volumes, "columns", []):
+            rec.update(entry_volume(rec["fill_date"], pd.DataFrame({"Volume": volumes[t]})))
 
 
 def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
@@ -1281,7 +1340,8 @@ def get_buystop_summary() -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "buy_stop": r.get("buy_stop"),
                 "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
-                "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note")}
+                "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
+                "entry_volume_ratio": r.get("entry_volume_ratio")}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),
@@ -1300,6 +1360,7 @@ def get_buystop_summary() -> dict:
         "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
+        "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
     }
 
 
@@ -1634,6 +1695,7 @@ def get_backtest_summary() -> dict:
                 "alpha_pct": r.get("alpha_pct"),
                 "needs_manual_review": needs_review,
                 "spinoff_note": r.get("spinoff_note"),                  # 13.10.2026: "предстои отделяне на ДД.ММ (запис ДД.ММ)"
+                "entry_volume_ratio": r.get("entry_volume_ratio"),      # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
                 # docstring-а, дискусията 2026-08-13).
@@ -1692,6 +1754,7 @@ def get_backtest_summary() -> dict:
         "avg_realized_r": avg_r,
         "recent": recent,
         "open_positions": open_positions,
+        "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
     }
 
 

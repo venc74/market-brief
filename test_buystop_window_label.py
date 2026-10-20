@@ -15,6 +15,12 @@ sys.path.insert(0, str(ROOT))
 import config
 from src import setup_rules, backtest, sizing, render
 
+# 20.10.2026 (етап 3, т. 1): реалните брифове до 20.10 носят старата формулировка ("Купува се само ако … обем ≥ 1.5× среден за потвърждение") — превежда се в новата
+import re as _re
+_OLD_TAIL = _re.compile(r"Купува се само ако High ≥ \$([\d.]+), до \$([\d.]+); обем ≥ ([\d.]+)× среден за потвърждение\.")
+new_wording = lambda t: _OLD_TAIL.sub(lambda m: (f"Buy-stop поръчката се изпълнява при докосване (High ≥ ${m[1]}), до ${m[2]}; обемът се вижда едва при затварянето — "
+                                                  f"книгата отбелязва дали денят на входа затвори с ≥ {m[3]}× среден обем."), t or "")
+
 D = dt.date.fromisoformat
 B05 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 C05 = next(c for c in B05["watchlist"] if c["ticker"] == "EXPD")
@@ -40,7 +46,7 @@ print("── записът в книгата от РЕАЛНАТА карта 
 c = copy.deepcopy(C05)
 setup_rules.annotate([c], D("2026-10-05"))
 # кодът възпроизвежда реалната карта; 15.10.2026: датата в текста е ДД.ММ (реалната карта от 05.10 е с ISO)
-assert c["setup"]["trigger_text"] == C05["setup"]["trigger_text"].replace("до 2026-10-09", "до 09.10") and c["setup"]["valid_through"] == "2026-10-09"
+assert c["setup"]["trigger_text"] == new_wording(C05["setup"]["trigger_text"]).replace("до 2026-10-09", "до 09.10") and c["setup"]["valid_through"] == "2026-10-09"
 c["plan_preview"] = sizing.buy_stop_preview(c, 0.5, D("2026-10-05"))
 tr = {}
 backtest._ingest_buystop_list(tr, "2026-10-05", [c], "Defensive")
@@ -54,7 +60,7 @@ print("  ✓ EXPD_2026-10-05_buystop: pending, ниво $194.59, валиден 
 print()
 print("── картата от 06.10: без книга — нов прозорец; с книга — прозорецът на записа ──")
 c0 = fresh(C06, "06"); setup_rules.annotate([c0], D("2026-10-06"))
-assert c0["setup"]["valid_through"] == "2026-10-12" and "valid_label" not in c0["setup"] and c0["setup"]["trigger_text"] == C06["setup"]["trigger_text"].replace("до 2026-10-12", "до 12.10")
+assert c0["setup"]["valid_through"] == "2026-10-12" and "valid_label" not in c0["setup"] and c0["setup"]["trigger_text"] == new_wording(C06["setup"]["trigger_text"]).replace("до 2026-10-12", "до 12.10")
 c1 = fresh(C06, "06"); setup_rules.annotate([c1], D("2026-10-06"), book)
 s1 = c1["setup"]
 assert (s1["valid_through"], s1["valid_from"], s1["valid_label"], s1["book_status"]) == ("2026-10-09", "2026-10-05", "до 09.10, от 05.10", "pending") and "book_level" not in s1

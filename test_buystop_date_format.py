@@ -15,6 +15,12 @@ config.DOCS_DIR, config.DATA_DIR = pathlib.Path(_tmp.name) / "docs", pathlib.Pat
 config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 from src import setup_rules, render, main
 
+# 20.10.2026 (етап 3, т. 1): реалните брифове до 20.10 носят старата формулировка ("Купува се само ако … обем ≥ 1.5× среден за потвърждение") — превежда се в новата
+import re as _re
+_OLD_TAIL = _re.compile(r"Купува се само ако High ≥ \$([\d.]+), до \$([\d.]+); обем ≥ ([\d.]+)× среден за потвърждение\.")
+new_wording = lambda t: _OLD_TAIL.sub(lambda m: (f"Buy-stop поръчката се изпълнява при докосване (High ≥ ${m[1]}), до ${m[2]}; обемът се вижда едва при затварянето — "
+                                                  f"книгата отбелязва дали денят на входа затвори с ≥ {m[3]}× среден обем."), t or "")
+
 B14 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-14.json").read_text(encoding="utf-8"))
 REAL = next(c for c in B14["watchlist"] if c["ticker"] == "ZBRA")
 assert "(валиден 5 сесии, до 2026-10-20)" in REAL["setup"]["trigger_text"]                     # дефектът в публикувания бриф
@@ -22,7 +28,7 @@ assert "(валиден 5 сесии, до 2026-10-20)" in REAL["setup"]["trigge
 print("── 1. РЕАЛНАТА карта на ZBRA от 14.10, сметната наново ──")
 z = copy.deepcopy(REAL)
 setup_rules.annotate([z], dt.date(2026, 10, 14))
-assert z["setup"]["trigger_text"] == REAL["setup"]["trigger_text"].replace("до 2026-10-20", "до 20.10") and z["setup"]["valid_through"] == "2026-10-20"
+assert z["setup"]["trigger_text"] == new_wording(REAL["setup"]["trigger_text"]).replace("до 2026-10-20", "до 20.10") and z["setup"]["valid_through"] == "2026-10-20"
 print("  ✓", z["setup"]["trigger_text"])
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 z["ai"]["watchlist_trigger"] = main._watchlist_trigger_text(z, B14["thermometer"]["regime"])           # текстът "Trigger" се сглобява от кода (2б) — наново от новия setup
