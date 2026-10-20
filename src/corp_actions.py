@@ -2,7 +2,8 @@
 Корпоративни действия върху картите (09.10.2026). Yahoo записва отделяне (spin-off) като "сплит" с НЕЦЯЛ коефициент и коригира историята с оценъчен коефициент: CTVA на 01.10 (отделянето на Vylor) = 6.665; в деня цената
 скача +7.9% при обичайно дневно отклонение 1.9% — историята около датата е приблизителна. Цял коефициент (2:1, 4:1, 10:1, обратен 1:5) е точна корекция. Затова картите на Action, Watchlist, GLB и QM получават МАРКЕР
 (не изключване) "⚠ корпоративно действие на ДД.ММ …", ако в последните config.CORP_ACTION_WARN_SESSIONS сесии има събитие с нецял коефициент. Само информация; нищо не се променя в избора на карти.
-Данни: една партида yf.download(…, period="6mo", actions=True) за всички тикъри на картите (колоната "Stock Splits"). Graceful: провал → без маркери, diag.ok=False и предупреждение в брифа (липсата на маркер тогава не значи "няма събитие").
+Данни: кешът на run-а (_SERIES) от ЕДНОТО теглене fetch_actions (колоната "Stock Splits" и Close), което exclude() прави за скрийнъра, GLB и QM — от 20.10.2026 маркерът не тегли втори път (етап 3, част Б).
+Graceful: провал → без маркери, diag.ok=False и предупреждение в брифа (липсата на маркер тогава не значи "няма събитие").
 """
 from __future__ import annotations
 import datetime as dt
@@ -63,38 +64,18 @@ def warning_text(ev: dict) -> str:
             f"историята около датата е приблизителна")
 
 
-def fetch_splits(tickers: list[str]) -> dict[str, tuple[list[str], list[float]]]:
-    """{тикър: (дати, коефициенти)} от колоната "Stock Splits" на ЕДНА партида от Yahoo. Провал на тегленето → вдига (annotate го хваща); тикър без колона/данни просто липсва."""
-    if yf is None:
-        raise RuntimeError("yfinance не е наличен")
-    data = yf.download(list(tickers), period="6mo", progress=False, auto_adjust=False, actions=True, group_by="ticker", threads=True)
-    if data is None or len(data) == 0:
-        raise ValueError("празен резултат")
-    out = {}
-    multi = hasattr(data.columns, "levels") and getattr(data.columns, "nlevels", 1) > 1
-    for t in tickers:
-        try:
-            f = data[t] if multi else data
-            col = f["Stock Splits"].dropna()
-            out[t] = ([x.date().isoformat() for x in col.index], [float(v) for v in col.to_numpy()])
-        except Exception:
-            continue
-    return out
-
-
 def annotate(cards_groups: list[list[dict]], today: str | dt.date, fetch=None, sessions: int | None = None) -> dict:
     """
     Слага card["corp_action"] = {date, ratio, sessions_ago, text} върху картите (по тикър, във всички списъци), за които има събитие с нецял коефициент в последните `sessions` сесии. Връща diag
     {ok, checked, flagged: [{ticker, date, ratio}], error}. Не вдига изключения (graceful): провал → ok=False, без маркери.
     """
-    fetch = fetch or fetch_splits
     day = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today)[:10])
     tickers = sorted({c.get("ticker") for g in cards_groups for c in (g or []) if isinstance(c, dict) and c.get("ticker")})
     diag = {"ok": True, "checked": len(tickers), "flagged": [], "error": None}
     if not tickers:
         return diag
     try:
-        series = fetch(tickers)
+        series = fetch(tickers) if fetch else _marker_series(tickers, day)       # fetch — подменено теглене {тикър: (дати, коефициенти)} в тестовете
         found = {}
         for t, (dates, ratios) in series.items():
             ev = [e for e in uncertain_events(dates, ratios, day, sessions)
@@ -189,6 +170,29 @@ def _takes_start(fn) -> bool:
         return "start" in inspect.signature(fn).parameters
     except (TypeError, ValueError):
         return False
+
+
+def _has_series(ticker: str) -> bool:
+    s = _SERIES.get(ticker)
+    return bool(s) and s.get("close") is not None and len(s["close"]) > 0
+
+
+def _marker_series(tickers: list[str], day: dt.date) -> dict[str, tuple[list[str], list[float]]]:
+    """
+    20.10.2026 (етап 3, част Б): ЕДНО теглене за корпоративните действия. Маркерът (annotate) чете кеша на run-а, който exclude() вече е напълнил за скрийнъра, GLB и QM — картите
+    на маркера (Action, Watchlist, GLB, QM) са подмножество на тези редове. До 20.10 маркерът теглеше втори път yf.download(period="6mo") за същите тикъри; прозорецът му
+    (60 сесии) е в двете тегления. Тикър без серия в кеша (провал на тегленето в exclude, празен отговор) → една партида fetch_actions от същото начало. Провал на нея → вдига
+    (annotate го хваща: ok=False, без маркери) само ако нито един тикър няма серия — както старото отделно теглене падаше само при празна партида; иначе липсващите просто нямат маркер.
+    """
+    need = [t for t in tickers if not _has_series(t)]
+    if need:
+        try:
+            _SERIES.update(fetch_actions(need, start=fetch_start([], "marker", day)))
+        except Exception as e:
+            if not any(_has_series(t) for t in tickers):
+                raise
+            print(f"[corp_actions] маркерът: без данни за {', '.join(need)} ({type(e).__name__}: {e}) — останалите тикъри са от тегленето на run-а")
+    return {t: (_SERIES[t]["dates"], _SERIES[t]["ratios"]) for t in tickers if t in _SERIES}
 
 
 def _sessions_after(day: dt.date, n: int) -> dt.date:
