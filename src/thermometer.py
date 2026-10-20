@@ -514,13 +514,16 @@ def market_breadth() -> dict:
             raise ValueError("празен universe")
 
         above, total = 0, 0
+        batches = batches_failed = 0                                 # 20.10.2026 (етап 3б): частичен провал → банер (data_warnings), не тих по-малък универс
         for i in range(0, len(universe), config.BREADTH_BATCH_SIZE):
             batch = universe[i:i + config.BREADTH_BATCH_SIZE]
+            batches += 1
             try:
                 data = _sessions.cut_today(yf.download(batch, period="3mo", progress=False,
                                                        auto_adjust=True, group_by="ticker", threads=True))
             except Exception as e:
                 print(f"[thermo] breadth batch {i} fetch грешка: {e}")
+                batches_failed += 1
                 continue
             for sym in batch:
                 try:
@@ -564,6 +567,7 @@ def market_breadth() -> dict:
     return {
         "name": "Market Breadth (% над 40dMA)", "value": round(pct, 1),
         "universe_size": total, "status": status,
+        "universe_total": len(universe), "missing_n": len(universe) - total, "batches": batches, "batches_failed": batches_failed,     # 20.10.2026: фон 0–3 от 903 (48 брифа)
         "label": f"{pct:.1f}% над 40dMA ({note})",
         "methodology_note": ("Inspired by T2108 методология (Worden/TC2000), но изчислено "
                              "върху собствен universe (S&P500+Nasdaq100+MidCap400) — "

@@ -191,6 +191,23 @@ def _13f_warnings(status: dict | None) -> list[dict]:
     return out
 
 
+def _breadth_warning(ind: dict | None) -> list[dict]:
+    """
+    20.10.2026 (етап 3б, обвивката, стъпка 1): Market Breadth върху НЕПЪЛЕН универс — паднала партида или тикъри без данни ≥ config.PARTIAL_DATA_WARN_SHARE (фон: 0–3 от 903
+    липсващи в 48 реални брифа; пробното пускане при ограничение — 12). Скрит индикатор (пълен провал) има свой ред "Скрити днес" — тук не.
+    """
+    b = ind or {}
+    if b.get("hide") or not b.get("universe_total"):
+        return []
+    miss, failed = b.get("missing_n") or 0, b.get("batches_failed") or 0
+    if not failed and miss < config.PARTIAL_DATA_WARN_SHARE * b["universe_total"]:
+        return []
+    why = f"{failed} от {b.get('batches')} партиди не се изтеглиха" if failed else "Yahoo не върна данни без грешка в партидата"
+    return [{"source": "breadth", "level": "warn",
+             "message": (f"Market Breadth: изчислен върху {b.get('universe_size')} от {b['universe_total']} тикъра ({why}; нормално липсват 0–3) — процентът над 40dMA "
+                         "и статусът на индикатора са върху непълен универс.")}]
+
+
 def _partial_warnings(sector_status: dict | None, screener_status: dict | None, superinvestor_status: dict | None, glb_status: dict | None,
                       uov_diag: dict | None, ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
     """
@@ -259,7 +276,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
-            fred_key_missing: bool = False) -> list[dict]:
+            fred_key_missing: bool = False, breadth: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -308,6 +325,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_ai_lost_warning(ai_lost))
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
+    out.extend(_breadth_warning(breadth))
     out.extend(_partial_warnings(sector_status, screener_status, superinvestor_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
         out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})

@@ -1032,7 +1032,8 @@ def run() -> dict:
                                                canary=canary, health=health,
                                                ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
                                                news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
-                                               fred_key_missing=not config.FRED_API_KEY),
+                                               fred_key_missing=not config.FRED_API_KEY,
+                                               breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None)),   # 20.10.2026: частичен провал
         "health": health,                                                # здравният монитор (10.10)
         "screener_status": dict(screener.LAST_STATUS),                  # 19.10.2026 (т. 12): с история / универс / партиди — нормата за прага на банера
         "market_calendar_note": setup_rules.market_calendar_note(dt.date.fromisoformat(today)),     # 16.10.2026 (В2б): утре / в понеделник NYSE не работи или затваря рано
