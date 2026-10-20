@@ -39,7 +39,7 @@ config.DATA_DIR = pathlib.Path(TMP.name)
 config.DOCS_DIR = pathlib.Path(TMP.name) / "docs"
 config.DOCS_DIR.mkdir()
 REAL_CACHE = ROOT / "data" / "cot_theses_cache.json"
-real_before = REAL_CACHE.read_bytes() if REAL_CACHE.exists() else None
+real_before = (REAL_CACHE.stat().st_size, REAL_CACHE.stat().st_mtime_ns) if REAL_CACHE.exists() else None          # 20.10.2026 (етап 3б): stat, не четене — run_tests не допуска отваряне на реалните data/
 D = dt.date.fromisoformat
 
 state = {"calls": [], "omit": {}, "fail": set(), "tokens": [1688, 1985, 569, 1631, 400, 400, 400, 400, 400]}
@@ -163,6 +163,6 @@ call = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Call) and a
 assert {k.arg: ast.unparse(k.value) for k in call.keywords}["cot_diag"] == "ai_brief.COT_DIAG"                 # по аргумент, не по точния низ: други пакети добавят свои аргументи към същото извикване
 print("  ✓ main подава ai_brief.COT_DIAG на data_warnings.collect")
 
-assert (REAL_CACHE.read_bytes() if REAL_CACHE.exists() else None) == real_before
+assert ((REAL_CACHE.stat().st_size, REAL_CACHE.stat().st_mtime_ns) if REAL_CACHE.exists() else None) == real_before
 print()
 print("Всички тестове минаха.")

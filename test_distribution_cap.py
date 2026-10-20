@@ -23,7 +23,7 @@ from src import main as brief_main
 
 config.ENABLE_BACKTEST = False
 REAL_STATE = ROOT / "data" / "regime_override_state.json"
-fp_before = hashlib.md5(REAL_STATE.read_bytes()).hexdigest() if REAL_STATE.exists() else None
+fp_before = (REAL_STATE.stat().st_size, REAL_STATE.stat().st_mtime_ns) if REAL_STATE.exists() else None          # 20.10.2026 (етап 3б): stat, не четене — run_tests не допуска отваряне на реалните data/
 _tmp = tempfile.TemporaryDirectory(prefix="mb_dist_")
 STATE = pathlib.Path(_tmp.name) / "state.json"
 th._OVERRIDE_STATE_FILE = STATE                                  # реалният data/regime_override_state.json не се пипа
@@ -269,9 +269,9 @@ assert seg.count("try:") >= 2 and seg.count("except Exception") >= 2
 print("  ✓ термометър → distribution days (try/except) → apply_distribution_cap (try/except) → макро бриф → apply_hard_rules; един fetch")
 print()
 
-fp_after = hashlib.md5(REAL_STATE.read_bytes()).hexdigest() if REAL_STATE.exists() else None
+fp_after = (REAL_STATE.stat().st_size, REAL_STATE.stat().st_mtime_ns) if REAL_STATE.exists() else None
 assert fp_before == fp_after, "реалният data/regime_override_state.json е пипнат!"
-print("  ✓ реалният data/regime_override_state.json не е пипнат (md5 преди = след)")
+print("  ✓ реалният data/regime_override_state.json не е пипнат (размер и mtime преди = след)")
 _tmp.cleanup()
 print()
 print("Всички тестове минаха.")

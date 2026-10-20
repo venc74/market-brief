@@ -484,10 +484,13 @@ _BG_TRANSLIT = ([("sht", "щ"), ("zh", "ж"), ("ts", "ц"), ("ch", "ч"), ("sh",
 
 @lru_cache(maxsize=1)
 def _bg_vocab() -> tuple[dict, dict]:
-    """(кирилска дума → брой, латинска дума → брой) в българските текстове."""
+    """(кирилска дума → брой, латинска дума → брой) в българските текстове. config.BG_VOCAB_FILE (тестовете) — готовият речник от файл вместо docs/data/."""
     from collections import Counter
     cyr, lat = Counter(), Counter()
     try:
+        if getattr(config, "BG_VOCAB_FILE", ""):
+            d = json.loads(pathlib.Path(config.BG_VOCAB_FILE).read_text(encoding="utf-8"))
+            return dict(d["cyr"]), dict(d["lat"])
         def walk(o):
             if isinstance(o, dict):
                 for v in o.values(): yield from walk(v)

@@ -6,7 +6,9 @@
      забранява връзки извън loopback — Claude/Yahoo/SEC извикване в тест гърми, не харчи пари;
   2. БЕЗ ЗАПИС в docs/ и data/: преди и след се снема отпечатък на двете папки (пътища + sha1); разлика = провал
      (докладва кои файлове са променени);
-  3. ненулев изход при провал на който и да е тест.
+  3. ненулев изход при провал на който и да е тест;
+  4. (20.10.2026, етап 3б) БЕЗ ЧЕТЕНЕ на реалните данни: всеки тест получава временни data/ и docs/ (MB_DATA_DIR / MB_DOCS_DIR → config.DATA_DIR / DOCS_DIR и всички пътища от тях),
+     замразения речник на езиковия филтър (BG_VOCAB_FILE) и дневник на отварянията под data/ и docs/data/ (tests/_nonet/sitecustomize.py) — отваряне там = провал.
 Употреба: python run_tests.py [част-от-име ...]   (напр. python run_tests.py trade_sim escape)
 """
 from __future__ import annotations
@@ -16,12 +18,14 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = pathlib.Path(__file__).parent
 GUARD = ROOT / "tests" / "_nonet"
 GUARDED_DIRS = ("docs", "data")
 TIMEOUT = 300
+VOCAB_FIXTURE = pathlib.Path("tests") / "fixtures" / "bg_vocab_2026-10-20.json"      # замразеният речник (РЕАЛЕН — от 89-те публикувани брифа до 20.10)
 _SECRET_RE = re.compile(r"(_API_KEY|PASSWORD|SECRET)$")
 _SECRET_NAMES = {"GITHUB_TOKEN", "EDGAR_UA", "GMAIL_USER"}
 # втори преглед (10.10.2026): прокси на loopback (HTTPS_PROXY=http://127.0.0.1:…) заобикаляше защитата — връзката е към 127.0.0.1 (разрешено), а проксито
@@ -36,6 +40,29 @@ def clean_env(env: dict[str, str] | None = None) -> dict[str, str]:
     out["PYTHONPATH"] = os.pathsep.join(filter(None, [str(GUARD), str(ROOT), out.get("PYTHONPATH", "")]))
     out["PYTHONDONTWRITEBYTECODE"] = "1"
     return out
+
+
+def test_env(env: dict[str, str], tmp: pathlib.Path) -> dict[str, str]:
+    """
+    Средата на ЕДИН тестов процес (20.10.2026, етап 3б): временни data/ и docs/ в tmp, коренът за дневника на четенията, самият дневник и замразеният речник (ако го има в ROOT).
+    До 20.10 7 теста четяха реални файлове в data/ (tracker-а, кешове, състояния), а 25 — публикуваните брифове в docs/data/ (речника на езиковия филтър).
+    """
+    (tmp / "data").mkdir(exist_ok=True)
+    (tmp / "docs").mkdir(exist_ok=True)
+    out = {**env, "MB_DATA_DIR": str(tmp / "data"), "MB_DOCS_DIR": str(tmp / "docs"), "MB_GUARD_ROOT": str(ROOT.resolve()), "MB_TEST_READ_LOG": str(tmp / "reads.log")}
+    vocab = ROOT / VOCAB_FIXTURE
+    if vocab.exists():
+        out["BG_VOCAB_FILE"] = str(vocab)
+    return out
+
+
+def guarded_reads(tmp: pathlib.Path) -> list[str]:
+    """Реалните файлове под data/ и docs/data/, които тестът е отворил (от дневника на sitecustomize), относително към ROOT."""
+    log = tmp / "reads.log"
+    if not log.exists():
+        return []
+    root = str(ROOT.resolve()) + os.sep
+    return sorted({l[len(root):] if l.startswith(root) else l for l in log.read_text(encoding="utf-8").split("\n") if l})
 
 
 def fingerprint(root: pathlib.Path | None = None, dirs=GUARDED_DIRS) -> dict[str, str]:
@@ -87,11 +114,18 @@ def main(argv: list[str]) -> int:
     failures, started = [], time.time()
     for t in tests:
         t0 = time.time()
-        try:
-            r = subprocess.run([sys.executable, str(t)], cwd=t.parent, env=env, capture_output=True, text=True, timeout=TIMEOUT)
-            ok, out = r.returncode == 0, (r.stdout + r.stderr)
-        except subprocess.TimeoutExpired as e:
-            ok, out = False, f"таймаут след {TIMEOUT}s\n{e.stdout or ''}"
+        with tempfile.TemporaryDirectory(prefix="mb_test_") as td:
+            tmp = pathlib.Path(td)
+            try:
+                r = subprocess.run([sys.executable, str(t)], cwd=t.parent, env=test_env(env, tmp), capture_output=True, text=True, timeout=TIMEOUT)
+                ok, out = r.returncode == 0, (r.stdout + r.stderr)
+            except subprocess.TimeoutExpired as e:
+                ok, out = False, f"таймаут след {TIMEOUT}s\n{e.stdout or ''}"
+            reads = guarded_reads(tmp)
+        if reads:
+            ok = False
+            out += ("\n✗ тестът чете реалните данни (data/ и docs/data/ се ротират — ползвай fixture или временна папка): "
+                    + ", ".join(reads[:10]) + (f" … (+{len(reads) - 10})" if len(reads) > 10 else ""))
         print(f"{'OK  ' if ok else 'FAIL'} {t.stem:<28} {time.time() - t0:5.1f}s")
         if not ok:
             failures.append((t.stem, out))

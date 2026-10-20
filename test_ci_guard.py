@@ -1,6 +1,6 @@
 """
 Пакет 4а · т.10 (2026-10-03): самият run_tests.py — секретите се чистят, мрежата е забранена, запис в docs/ или
-data/ е провал, ненулев изход при провал. Всичко е СИНТЕТИЧНО (временни папки и малки тестови скриптове).
+data/ е провал, ненулев изход при провал; 20.10.2026 (етап 3б) — и ЧЕТЕНЕ на data/ и docs/data/, временни папки за всеки тест. Всичко е СИНТЕТИЧНО (временни папки и малки тестови скриптове).
 Пускане: python test_ci_guard.py (или през python run_tests.py)
 """
 import sys, pathlib, tempfile, socket, subprocess, io, contextlib
@@ -77,6 +77,27 @@ write("test_net.py", "import socket; socket.create_connection(('8.8.8.8', 53), t
 code, out = run()
 assert code == 1 and "FAIL test_net" in out and "забранен" in out
 (T / "test_net.py").unlink()
+write("test_reads_data.py", "import pathlib; pathlib.Path('data/x.json').read_text()\n")                 # 20.10.2026 (етап 3б): четене на реалните данни е провал
+code, out = run()
+assert code == 1 and "FAIL test_reads_data" in out and "тестът чете реалните данни" in out and "data/x.json" in out
+(T / "test_reads_data.py").unlink()
+(T / "docs" / "data").mkdir(); (T / "docs" / "data" / "2026-10-20.json").write_text("{}")
+write("test_reads_briefs.py", "import json, pathlib; json.loads(pathlib.Path('docs/data/2026-10-20.json').read_text())\n")
+code, out = run("test_reads_briefs")
+assert code == 1 and "docs/data/2026-10-20.json" in out
+(T / "test_reads_briefs.py").unlink()
+write("test_reads_index.py", "import pathlib; pathlib.Path('docs/index.html').read_text()\n")              # docs/index.html не е данни (само docs/data/ и data/)
+code, out = run("test_reads_index")
+assert code == 0, out
+(T / "test_reads_index.py").unlink()
+write("test_tmp_dirs.py", "import os, pathlib; d = pathlib.Path(os.environ['MB_DATA_DIR']); assert d.is_dir() and 'data' == d.name and str(d) != str(pathlib.Path('data').resolve()); "
+                          "(d / 'state.json').write_text('{}'); assert pathlib.Path(os.environ['MB_DOCS_DIR']).is_dir()\n")
+code, out = run("test_tmp_dirs")
+assert code == 0 and not (T / "data" / "state.json").exists(), out                                       # пише във временната data/, не в реалната
+(T / "test_tmp_dirs.py").unlink()
+env_t = run_tests.test_env({"PATH": "/usr/bin"}, pathlib.Path(tempfile.mkdtemp()))
+assert {"MB_DATA_DIR", "MB_DOCS_DIR", "MB_GUARD_ROOT", "MB_TEST_READ_LOG"} <= set(env_t) and "BG_VOCAB_FILE" not in env_t     # в T няма замразен речник
+print("  ✓ СИНТЕТИЧНО: четене на data/ или docs/data/ → провал с името на файла; docs/index.html — разрешено; всеки тест има временни MB_DATA_DIR / MB_DOCS_DIR")
 write("test_fails.py", "raise SystemExit(3)\n")
 code, out = run()
 assert code == 1 and "FAIL test_fails" in out and "1 провал" in out

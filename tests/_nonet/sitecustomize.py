@@ -73,3 +73,24 @@ class _CurlGuard(importlib.abc.MetaPathFinder):
 
 
 sys.meta_path.insert(0, _CurlGuard())
+
+
+# 20.10.2026 (етап 3б, т. 4): тест, който ЧЕТЕ реалните данни — data/ или публикуваните брифове в docs/data/ — е провал. run_tests.py дава MB_GUARD_ROOT (коренът на репото) и
+# MB_TEST_READ_LOG (файл във временната папка на теста); всяко отваряне на файл под двете папки се записва там и run_tests маркира теста FAIL. Изключение тук не се вдига:
+# graceful кодът би го погълнал и тестът би минал тихо. Записът го пази отпечатъкът на run_tests. Одит на 20.10: 25 теста четяха docs/data/ (речника), 7 — data/.
+_READ_LOG, _GUARD_ROOT = os.environ.get("MB_TEST_READ_LOG"), os.environ.get("MB_GUARD_ROOT")
+if _READ_LOG and _GUARD_ROOT:
+    _GUARDED = tuple(os.path.join(os.path.realpath(_GUARD_ROOT), d) + os.sep for d in ("data", os.path.join("docs", "data")))
+
+    def _read_hook(event, args):
+        if event != "open" or not args or not isinstance(args[0], (str, bytes, os.PathLike)):
+            return
+        try:
+            p = os.path.realpath(os.fsdecode(args[0]))
+        except Exception:
+            return
+        if p.startswith(_GUARDED):
+            with open(_READ_LOG, "a", encoding="utf-8") as f:              # логът е извън защитените папки — не се записва сам
+                f.write(p + "\n")
+
+    sys.addaudithook(_read_hook)

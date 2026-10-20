@@ -32,7 +32,7 @@ assert (len(EX1), len(EX2)) == (17, 18) and {e["as_of"] for e in EX1} == {"2026-
 TMP = tempfile.TemporaryDirectory(prefix="mb_cotcache_")
 CACHE = pathlib.Path(TMP.name) / "cache.json"
 REAL_CACHE = ROOT / "data" / "cot_theses_cache.json"
-real_before = REAL_CACHE.read_bytes() if REAL_CACHE.exists() else None
+real_before = (REAL_CACHE.stat().st_size, REAL_CACHE.stat().st_mtime_ns) if REAL_CACHE.exists() else None          # 20.10.2026 (етап 3б): stat, не четене — run_tests не допуска отваряне на реалните data/
 
 company = {t: r["name"] for t, r in CHK.items() if r["name"]}
 for c in WK1 + WK2:
@@ -238,7 +238,7 @@ pruned = ct.prune_cache(cache, D("2026-10-04"))
 assert pruned == 1 and "стар" not in cache["entries"] and "единствен" in cache["entries"] and len(cache["entries"]) == n_before - 1
 print("  ✓ записи по-стари от 30 дни се чистят, освен най-новия за всеки пазар (1 махнат, единственият за 'Измислен пазар' остава)")
 
-after = REAL_CACHE.read_bytes() if REAL_CACHE.exists() else None
+after = (REAL_CACHE.stat().st_size, REAL_CACHE.stat().st_mtime_ns) if REAL_CACHE.exists() else None
 assert after == real_before
 print("  ✓ реалният data/cot_theses_cache.json не е пипнат")
 print()

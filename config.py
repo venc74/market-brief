@@ -405,9 +405,14 @@ AI_NARRATIVE_SETUPS = ("confirmed", "below_pivot")
 # ── Пътища ────────────────────────────────────────────────────────────────
 import pathlib
 ROOT = pathlib.Path(__file__).parent
-DATA_DIR = ROOT / "data"
+# 20.10.2026 (етап 3б, т. 4): run_tests.py дава на всеки тестов процес ВРЕМЕННИ папки през MB_DATA_DIR / MB_DOCS_DIR — така и пътищата, които се смятат още при импорта
+# (кешовете и състоянията по-долу, backtest._TRACKER_PATH, thermometer._OVERRIDE_STATE_FILE …), не сочат реалните data/ и docs/. Production не задава нито едната.
+DATA_DIR = pathlib.Path(os.getenv("MB_DATA_DIR") or ROOT / "data")
 RS_LINE_STATE_FILE = DATA_DIR / "screener_rs_state.json"          # състоянието на хистерезиса на RS линията (screener.load_rs_state), виж RS_LINE_ENTER
-DOCS_DIR = ROOT / "docs"
+DOCS_DIR = pathlib.Path(os.getenv("MB_DOCS_DIR") or ROOT / "docs")
+# 20.10.2026 (етап 3б, т. 4): речникът на езиковия филтър (ai_brief._bg_vocab) — от файл вместо от публикуваните брифове в docs/data/. Тестовете (run_tests.py) ползват замразения
+# tests/fixtures/bg_vocab_2026-10-20.json; production — празно (речникът се строи от docs/data/ както досега).
+BG_VOCAB_FILE = os.getenv("BG_VOCAB_FILE", "")
 QM_EP_LOG_FILE = DATA_DIR / "ep_ah_log.json"       # пакет QM: after-hours гапът срещу реалния гап на отварянето — за решение след 4–6 седмици дали си струва второ пускане
 PUTCALL_HISTORY_FILE = DATA_DIR / "put_call_history.json"
 # 19.10.2026 (трети преглед, т. 13): повторен run в същия ден не праща втори имейл (22.06.2026: 5 run-а — 05:36 … 19:02 UTC, пет имейла с различни Action списъци).
