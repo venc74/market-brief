@@ -7,6 +7,10 @@ brief["data_warnings"] — [{"source", "level", "message"}]; render ги пок�
 """
 from __future__ import annotations
 
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+import config
+
 
 def _cot_warning(cot_diag: dict | None) -> list[dict]:
     """COT: пазари, за които моделът не върна теза нито след повторното извикване (виж ai_brief.cot_theses) — без ред в диагностиката те бяха мълчалива загуба (06.10: 4 от 20)."""
@@ -201,11 +205,15 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
                     "message": (f"Секторна ротация: {ss.get('etfs_ok')} от {ss['etfs_total']} секторни ETF-а — без данни днес: {', '.join(ss.get('missing') or []) or '?'}; "
                                 "картата и водещите сектори са без тях.")})
     sc = screener_status or {}
-    if sc.get("kind") in ("ok", "partial") and sc.get("universe") and not sc.get("batches_failed") \
-            and (sc.get("with_history") or 0) < 0.90 * sc["universe"]:
+    # 20.10.2026 (етап 3б): прагът е спрямо нормалния фон — тикъри БЕЗ НИТО ЕДИН бар ≥ config.PARTIAL_DATA_WARN_SHARE от универса (фон 0 от 903; пробното пускане при
+    # ограничение — 34 при 865 от 903 с история, а старият праг "с история < 90%" не сработи). Късата история (нови листинги) не се брои.
+    nb = sc.get("no_bars_n")
+    if sc.get("kind") in ("ok", "partial") and sc.get("universe") and not sc.get("batches_failed") and nb is not None \
+            and nb >= config.PARTIAL_DATA_WARN_SHARE * sc["universe"]:
+        names = ", ".join((sc.get("no_bars") or [])[:8]) + (" …" if nb > 8 else "")
         out.append({"source": "screener", "level": "warn",
-                    "message": (f"Скрийнър: само {sc.get('with_history')} от {sc['universe']} тикъра имат ценова история днес — Yahoo не върна данни за останалите "
-                                "без грешка в партидата; RS rating перцентилът и кандидатите може да са непълни.")})
+                    "message": (f"Скрийнър: за {nb} от {sc['universe']} тикъра Yahoo не върна нито един бар днес ({names}) — без грешка в партидата; нормално е 0. "
+                                f"Скринингът е върху {sc.get('with_history')} тикъра — RS rating перцентилът и кандидатите може да са непълни; липсващите НЕ са оценени.")})
     si = superinvestor_status or {}
     if si.get("kind") in ("ok", "legit_zero") and si.get("managers_total") and (si.get("managers_with_data") or 0) < si["managers_total"]:
         out.append({"source": "13f", "level": "warn",

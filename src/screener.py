@@ -272,6 +272,9 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         time.sleep(1)  # не дразним Yahoo
 
     LAST_STATUS["with_history"] = len(rs_scores)
+    # 20.10.2026 (етап 3б): тикъри БЕЗ НИТО ЕДИН бар (Yahoo не върна нищо, без грешка в партидата) — отделно от късата история (нов листинг, структурно); банерът мери първото
+    no_bars = sorted(set(universe) - set(LAST_BAR_DATES))
+    LAST_STATUS.update(with_bars=len(universe) - len(no_bars), no_bars_n=len(no_bars), no_bars=no_bars[:30])
     LAST_RS_SCORES.clear(); LAST_RS_SCORES.update(rs_scores)           # за explain_exclusion: перцентилът на RS rating е спрямо СЪЩИЯ универс на този run
     if universe and not rs_scores:
         LAST_STATUS.update(kind="no_history", reason="нито един тикър от универса не върна ценова история")

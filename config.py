@@ -1279,6 +1279,10 @@ CORE_PCE_STALENESS_DAYS = int(os.getenv("CORE_PCE_STALENESS_DAYS", 75))
 ENABLE_MARKET_BREADTH = os.getenv("ENABLE_MARKET_BREADTH", "1") == "1"
 BREADTH_BATCH_SIZE = int(os.getenv("BREADTH_BATCH_SIZE", 50))
 BREADTH_MIN_VALID_TICKERS = int(os.getenv("BREADTH_MIN_VALID_TICKERS", 200))  # sanity floor преди да се доверим на %-а
+# 20.10.2026 (етап 3б, обвивката, стъпка 1): банер за ЧАСТИЧНО теглене, без грешка в партидата — тикъри без данни ≥ този дял от универса. Мерено спрямо нормалния фон:
+# скрийнърът — тикъри БЕЗ НИТО ЕДИН бар: 0 от 903 на 16.10, 19.10 и 20.10 (късата история — 5 нови листинга — е структурна и не се брои), пробното пускане при ограничение
+# на 20.10 — 34; Market Breadth — 0–3 от 903 липсващи в 48 реални брифа, пробното пускане — 12. 1% = 9 тикъра: не би сработил нито веднъж в историята, хваща двата случая.
+PARTIAL_DATA_WARN_SHARE = float(os.getenv("PARTIAL_DATA_WARN_SHARE", 0.01))
 BREADTH_OVERBOUGHT_THRESHOLD = float(os.getenv("BREADTH_OVERBOUGHT_THRESHOLD", 80.0))
 BREADTH_HEALTHY_LOW = float(os.getenv("BREADTH_HEALTHY_LOW", 20.0))
 BREADTH_CAPITULATION_THRESHOLD = float(os.getenv("BREADTH_CAPITULATION_THRESHOLD", 10.0))

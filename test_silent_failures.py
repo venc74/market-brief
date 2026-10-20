@@ -1,7 +1,7 @@
 """
 19.10.2026 · етап 2, т. 12 (трети преглед): тихи частични провали → ред / банер. Пълните провали вече имаха банер; тук е "част от данните липсва днес".
 
-  • сектори (n от 17), скрийнър (тикъри без история без паднала партида — праг 90% от универса; нормата се записва от днес в brief["screener_status"]),
+  • сектори (n от 17), скрийнър (тикъри без история без паднала партида; от 20.10 — тикъри БЕЗ бар ≥ 1% от универса, спрямо фона 0 от 903),
     OI снимка (неуспешни тикъри), 13F (n от 15 мениджъра), GLB (тикъри без история без паднала партида — праг 99%; 19.10: 903 от 903), INS✓ за позициите,
     празни новини, канарче без проверка, липсващ FRED_API_KEY — data_warnings._partial_warnings;
   • spinoff_watch: тикър без CIK → "непроверен" (до 19.10 — тихо прескачане, checked < requested без банер);
@@ -38,9 +38,12 @@ print()
 print("── 2. частичните провали (СИНТЕТИЧНИ варианти на реалните статуси) ──")
 w = pw(sector_status={**SECT, "etfs_ok": 15, "missing": ["TAN", "URA"]})
 assert src_of(w) == ["sector_rotation"] and "15 от 17 секторни ETF-а — без данни днес: TAN, URA" in w[0]["message"]
-w = pw(screener_status={"kind": "ok", "universe": 903, "with_history": 700, "batches_failed": 0})
-assert src_of(w) == ["screener"] and "само 700 от 903 тикъра" in w[0]["message"]
-assert pw(screener_status={"kind": "ok", "universe": 903, "with_history": 890, "batches_failed": 0}) == []          # под прага — норма (нови листинги)
+# 20.10.2026 (етап 3б): прагът е спрямо нормалния фон — тикъри БЕЗ НИТО ЕДИН бар ≥ 1% от универса. РЕАЛНИ броеве: пробното пускане при ограничение на 20.10 (12:54) —
+# 903 / 869 с бар / 865 с история (старият праг 90% мълчеше); чист run (16.10, 19.10, 20.10) — 903 с бар, 898 с история (5 нови листинга). Имената са СИНТЕТИЧНИ (не са записвани).
+w = pw(screener_status={"kind": "ok", "universe": 903, "with_history": 865, "with_bars": 869, "no_bars_n": 34, "no_bars": ["T1", "T2", "T3"], "batches_failed": 0})
+assert src_of(w) == ["screener"] and "за 34 от 903 тикъра Yahoo не върна нито един бар" in w[0]["message"] and "върху 865 тикъра" in w[0]["message"]
+assert pw(screener_status={"kind": "ok", "universe": 903, "with_history": 898, "with_bars": 903, "no_bars_n": 0, "no_bars": [], "batches_failed": 0}) == []    # нормата
+assert pw(screener_status={"kind": "ok", "universe": 903, "with_history": 890, "with_bars": 895, "no_bars_n": 8, "no_bars": [], "batches_failed": 0}) == []    # под 1% (9)
 w = pw(superinvestor_status={**B["superinvestor_status"], "managers_with_data": 14})
 assert src_of(w) == ["13f"] and "14 от 15 мениджъра" in w[0]["message"]
 w = pw(glb_status={**B["glb_status"], "with_history": 880})
