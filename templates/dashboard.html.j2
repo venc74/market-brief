@@ -1459,6 +1459,7 @@
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
         {%- else %}по Уиш (High): при входа няма зелена линия — върхът ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) е непробит {{ wl.months_unpen }} мес. (нужни ≥ {{ glb_min_months }}); цената е {{ "%.1f"|format(wl.pct|abs) }}% {{ 'над' if wl.pct >= 0 else 'под' }} него{% endif %}</div>{% endif %}
+      {% if g.get("closes_below_line") is not none %}<div class="glb-detail" title="Хистерезисът държи картата до −3% под линията; по правилото на Уиш първото затваряне под линията е изход.">затваряния под линията от входа: {{ g.closes_below_line }}{% if g.closes_below_line %} — по правилото на Уиш първото е изход{% endif %}</div>{% endif %}
       {% if g.tightness %}
       <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
       {% endif %}
@@ -1498,6 +1499,7 @@
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
         {%- else %}по Уиш (High): при входа няма зелена линия — върхът ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) е непробит {{ wl.months_unpen }} мес. (нужни ≥ {{ glb_min_months }}); цената е {{ "%.1f"|format(wl.pct|abs) }}% {{ 'над' if wl.pct >= 0 else 'под' }} него{% endif %}</div>{% endif %}
+      {% if g.get("closes_below_line") is not none %}<div class="glb-detail" title="Хистерезисът държи картата до −3% под линията; по правилото на Уиш първото затваряне под линията е изход.">затваряния под линията от входа: {{ g.closes_below_line }}{% if g.closes_below_line %} — по правилото на Уиш първото е изход{% endif %}</div>{% endif %}
       {% if g.tightness %}
       <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
       {% endif %}

@@ -365,6 +365,9 @@ def _row(ev: dict, close: float, low52=None, ob: dict | None = None) -> dict:
     wl = (ob or {}).get("wish_high")                        # 21.10 (етап 4): линията на Уиш (High) към деня на входа — само информация; без наблюдение (seed) полето го няма
     if wl:
         row["wish_high"] = {**wl, "pct": round((float(close) / wl["line"] - 1) * 100, 1)}
+    cs = (ob or {}).get("closes_since")                     # 21.10 (етап 4): затварянията под НАШАТА линия от входа (хистерезисът ги търпи до −3%; по правилото на Уиш първото е изход)
+    if cs is not None:
+        row["closes_below_line"] = int(sum(1 for c in cs if c < ev["line"]))
     return row
 
 
@@ -536,6 +539,7 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                     since_bar = (events.get(sym) or {}).get("since_bar") or (ob["last_date"] if ob["entry"] else None)
                     if since_bar:                                                                 # 21.10 (етап 4): линията на Уиш (High) към деня на входа — за картата
                         ob["wish_high"] = wish_high_line(df, since_bar)
+                        ob["closes_since"] = [float(x) for x in df["Close"][df.index >= pd.Timestamp(since_bar)]]   # затварянията от бара на входа (сегашната скала)
                     observations[sym] = ob
                     continue
                 r = _evaluate_ticker(sym, df)
