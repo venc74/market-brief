@@ -50,7 +50,7 @@ src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 run = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "run")
 names = [ast.literal_eval(c.args[0]) for c in ast.walk(run) if isinstance(c, ast.Call) and ast.unparse(c.func) == "steps.step"]
 STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "cot_track", "earnings_warnings", "earnings_warnings_qm", "cot_opposites", "book_buystop", "book_qm",
-         "book_glb_wish", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_card", "short_screener"}
+         "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_card", "short_screener"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
 ALL = STEP1 | STEP2 | STEP3
@@ -68,7 +68,7 @@ config.SPINOFF_BUDGET_SEC = config.UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = 5
 FAULTS = {"model": "src.model_selector.resolve_model", "bar_freshness": "src.bar_freshness.wait_for_fresh", "distribution_cap": "src.main.apply_distribution_cap",
           "news": "src.news_aggregator.significant_news", "prose_checks": "src.ai_brief.apply_sector_claims_to_narratives", "earnings_warnings": "src.earnings_move.annotate",
           "cot_opposites": "src.cot_opposites.annotate", "book_buystop": "src.backtest.get_buystop_summary", "book_qm": "src.backtest.get_qm_summary",
-          "book_glb_wish": "src.backtest.get_glb_wish_summary", "si_positions": "src.dataroma.new_position_markers", "watch": "src.watch_monitor.collect",
+          "book_glb_wish": "src.backtest.get_glb_wish_summary", "book_glb_wish_high": "src.backtest.get_glb_wish_summary", "si_positions": "src.dataroma.new_position_markers", "watch": "src.watch_monitor.collect",
           "splits_report": "src.splits_calendar.splits_report", "sector_card": "src.sector_claims.sector_card", "health": "src.health_monitor.check"}
 OWN_SOURCE = {"health": "health:health_monitor"}                                         # стъпка 2: собственият ред на монитора, не втори банер
 for spec in FAULTS.values():
@@ -79,7 +79,7 @@ with q():
 rs = {r["name"]: r for r in brief["run_steps"]}
 enabled = {"bar_freshness": config.ENABLE_BAR_FRESHNESS, "distribution_cap": config.ENABLE_ENTRY_TIMING, "news": config.ENABLE_NEWS,
            "book_buystop": config.ENABLE_BACKTEST and config.TRACK_BUYSTOP, "book_qm": config.ENABLE_BACKTEST and config.TRACK_QM,
-           "book_glb_wish": config.ENABLE_BACKTEST and config.TRACK_GLB_WISH, "watch": config.ENABLE_WATCH_MONITOR, "splits_report": config.ENABLE_SPLITS_CALENDAR}
+           "book_glb_wish": config.ENABLE_BACKTEST and config.TRACK_GLB_WISH, "book_glb_wish_high": config.ENABLE_BACKTEST and config.TRACK_GLB_WISH_HIGH, "watch": config.ENABLE_WATCH_MONITOR, "splits_report": config.ENABLE_SPLITS_CALENDAR}
 # стъпка 3: без мрежа източниците наистина падат — модулният статус го казва (failed_if), банерът е собственият (sector_rotation, screener, glb, distribution_days)
 NATURAL = {"sector_rotation", "screener", "glb", "distribution_days"}
 want_failed = {k for k in FAULTS if enabled.get(k, True)} | {k for k in NATURAL if enabled.get(k, True) and (k != "glb" or config.ENABLE_GLB_SCREENER)}

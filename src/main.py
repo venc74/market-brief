@@ -759,19 +759,22 @@ def run() -> dict:
     # glb_screener.py docstring). Explicit try/except тук, въпреки че
     # screen() вече е graceful вътрешно (batch+per-ticker) — не искаме и
     # неочакван bug в нов модул да чупи целия дневен run.
-    glb_wish_signals: list[dict] = []            # книгата "GLB по Уиш": свежите пробиви на последния цял бар (измерване, не препоръка)
+    glb_wish_signals: list[dict] = []            # книгата "GLB — наш вариант (close)": свежите пробиви на последния цял бар (измерване, не препоръка)
+    glb_wish_high_signals: list[dict] = []       # 21.10.2026: книгата "GLB по Уиш" (линия по месечния High) — същото
     def _glb_failed(e):
         glb_screener.LAST_STATUS = {"ok": False, "error": f"{type(e).__name__}: {e}"}      # С3: банер + ред в секцията вместо тишина
-        return [], []
+        return [], [], []
     _gs = lambda: glb_screener.LAST_STATUS or {}
-    glb_candidates, glb_wish_signals = steps.step("glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS)), fallback=([], glb_wish_signals),
+    glb_candidates, glb_wish_signals, glb_wish_high_signals = steps.step(
+        "glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS), list(glb_screener.LAST_WISH_HIGH_SIGNALS)), fallback=([], glb_wish_signals, glb_wish_high_signals),
                                                   enabled=config.ENABLE_GLB_SCREENER, on_fail=_glb_failed, label="GLB скрийнърът",
-                                                  consequence=f"празният списък и липсващите сигнали за книгата „{config.GLB_CLOSE_BOOK_NAME}“ днес НЕ значат, че няма пробиви",
+                                                  consequence=f"празният списък и липсващите сигнали за книгата „{config.GLB_WISH_BOOK_NAME}“ днес НЕ значат, че няма пробиви",
                                                   failed_if=lambda v: (_gs().get("error") or "не се изпълни") if _gs().get("ok") is False else None,
                                                   partial=lambda v: (f"{_gs()['batches_failed']} от {_gs().get('batches')} партиди", {}) if _gs().get("batches_failed") else None)
     # 13.10.2026: GLB карта / сигнал на книгата "GLB по Уиш", чиято линия е от месец ПРЕДИ отделяне (нецял коефициент) → не се показва и не се записва (CTVA 13.10)
     glb_candidates, corp_ex_glb = corp_actions.exclude(glb_candidates, "glb", today)
     glb_wish_signals, corp_ex_gw = corp_actions.exclude(glb_wish_signals, "glb_wish", today)
+    glb_wish_high_signals, corp_ex_gwh = corp_actions.exclude(glb_wish_high_signals, "glb_wish_high", today)
     for row in glb_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
 
@@ -869,7 +872,7 @@ def run() -> dict:
                failed_if=lambda v: (_sd.get("error") or "EDGAR не отговори") if not _sd.get("ok", True) else None,
                partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+        backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
@@ -882,10 +885,14 @@ def run() -> dict:
         backtest_summary["qm_breakout"] = backtest.get_qm_summary()
     steps.step("book_qm", _book_qm, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_QM),
                label="Обобщението на книгата на пробивите по Kullamägi", consequence=_book_consequence)
-    def _book_glb_wish():                                                      # GLB по Уиш: отделната книга glb_wish (чисто локално четене)
+    def _book_glb_wish():                                                      # "GLB — наш вариант (close)": отделната книга glb_wish (чисто локално четене)
         backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()
     steps.step("book_glb_wish", _book_glb_wish, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_GLB_WISH),
                label=f"Обобщението на книгата „{config.GLB_CLOSE_BOOK_NAME}“", consequence=_book_consequence)
+    def _book_glb_wish_high():                                                 # 21.10.2026: "GLB по Уиш" — книгата glb_wish_high (линия по месечния High)
+        backtest_summary["glb_wish_high"] = backtest.get_glb_wish_summary(backtest.CATEGORY_GLB_WISH_HIGH)
+    steps.step("book_glb_wish_high", _book_glb_wish_high, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_GLB_WISH_HIGH),
+               label=f"Обобщението на книгата „{config.GLB_WISH_BOOK_NAME}“", consequence=_book_consequence)
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap
@@ -976,7 +983,8 @@ def run() -> dict:
     corp_marker = corp_actions.annotate([action, watchlist, glb_candidates, qm_cards], today)
     corp_diag.update(flagged=corp_marker.get("flagged", []), ok=bool(corp_diag.get("ok", True) and corp_marker.get("ok", True)),
                      error=corp_diag.get("error") or corp_marker.get("error"))
-    corp_excluded = {"screener": corp_ex_screener, "glb": corp_ex_glb + [e for e in corp_ex_gw if e["ticker"] not in {x["ticker"] for x in corp_ex_glb}], "qm": corp_ex_qm}
+    _gx = corp_ex_glb + [e for e in corp_ex_gw if e["ticker"] not in {x["ticker"] for x in corp_ex_glb}]
+    corp_excluded = {"screener": corp_ex_screener, "glb": _gx + [e for e in corp_ex_gwh if e["ticker"] not in {x["ticker"] for x in _gx}], "qm": corp_ex_qm}
     print(f"      Корпоративни действия: проверени {corp_diag.get('checked', 0)} тикъра, изключени {[(e['ticker'], e['module']) for e in corp_diag.get('excluded', [])]}, "
           f"маркирани (под прага) {[f['ticker'] for f in corp_diag.get('flagged', [])]}"
           + ("" if corp_diag.get("ok", True) else f" — ПРОВАЛ: {corp_diag.get('error')}"))
@@ -1057,6 +1065,7 @@ def run() -> dict:
         "superinvestor_status": superinvestor_status,
         "glb_candidates": glb_candidates,
         "glb_wish": glb_wish_signals,        # свежите пробиви за книгата "GLB по Уиш" — snapshot-ът ги пази, за да се възстанови пропуснат run
+        "glb_wish_high": glb_wish_high_signals,   # 21.10.2026: същото за книгата "GLB по Уиш" по неговата линия (месечен High)
         # Qullamaggie (отделна стратегия — измерване, не препоръка): до 8 карти за пробив + диагностика на скана
         "qm_breakout": qm_cards,
         "qm_diag": qm_diag,

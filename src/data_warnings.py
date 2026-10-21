@@ -93,11 +93,11 @@ def _glb_warning(status: dict | None) -> list[dict]:
     if st.get("ok") is False:
         return [{"source": "glb", "level": "warn",
                  "message": (f"GLB скрийнър: не се изпълни ({st.get('error') or 'Yahoo не върна данни'}) — празният списък НЕ значи, че няма GLB кандидати; "
-                             f"книгата „{config.GLB_CLOSE_BOOK_NAME}“ не получи сигнали за днешния бар (той не се записва по-късно).")}]
+                             f"книгата „{config.GLB_WISH_BOOK_NAME}“ не получи сигнали за днешния бар (той не се записва по-късно).")}]
     if st.get("batches_failed"):
         return [{"source": "glb", "level": "warn",
                  "message": (f"GLB скрийнър: {st['batches_failed']} от {st.get('batches')} партиди тикъри не се изтеглиха — списъкът (и сигналите за книгата "
-                             f"„{config.GLB_CLOSE_BOOK_NAME}“) е върху {st.get('with_history')} от {st.get('universe')} тикъра и може да е непълен.")}]
+                             f"„{config.GLB_WISH_BOOK_NAME}“) е върху {st.get('with_history')} от {st.get('universe')} тикъра и може да е непълен.")}]
     return []
 
 
@@ -245,7 +245,7 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
     if g.get("ok") and g.get("universe") and not g.get("batches_failed") and (g.get("with_history") or 0) < 0.99 * g["universe"]:
         out.append({"source": "glb", "level": "warn",
                     "message": (f"GLB скрийнър: {g['universe'] - (g.get('with_history') or 0)} от {g['universe']} тикъра без история днес (Yahoo не върна данни без грешка) — "
-                                f"списъкът и сигналите за книгата „{config.GLB_CLOSE_BOOK_NAME}“ може да са непълни.")})
+                                f"списъкът и сигналите за книгата „{config.GLB_WISH_BOOK_NAME}“ може да са непълни.")})
     u = uov_diag or {}
     if u.get("snapshot_failed"):
         f = u["snapshot_failed"]

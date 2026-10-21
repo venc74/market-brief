@@ -146,7 +146,7 @@ def fetch_start(rows: list[dict], module: str, day: dt.date) -> dt.date:
     m = re.fullmatch(r"(\d+)(y|mo|d)", str(config.CORP_ACTION_FETCH_PERIOD).strip())
     n, unit = (int(m.group(1)), m.group(2)) if m else (5, "y")
     base = (dt.date(day.year - n, day.month, min(day.day, 28)) if unit == "y" else day - dt.timedelta(days=n * 31 if unit == "mo" else n))
-    if module not in ("glb", "glb_wish"):
+    if module not in ("glb", "glb_wish", "glb_wish_high"):
         return base
     months = []
     for r in rows or []:
@@ -265,7 +265,7 @@ def window_hit(module: str, row: dict, events: list[dict]) -> dict | None:
             return ev
         if module == "qm" and 0 <= ev["sessions_ago"] < config.CORP_ACTION_QM_SESSIONS:
             return ev
-        if module in ("glb", "glb_wish"):
+        if module in ("glb", "glb_wish", "glb_wish_high"):
             month = str(row.get("prior_high_month") or "")[:7]
             if (ev["date"][:7] > month) if month else (0 <= ev["sessions_ago"] < config.CORP_ACTION_SCREENER_SESSIONS):
                 return ev

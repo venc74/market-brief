@@ -1444,6 +1444,19 @@ GLB_WISH_SPLIT_TOLERANCE = 0.005               # съхраненият close н
 GLB_WISH_REPLAY_STATS = {"trades": 26116, "with_spy": 21735, "win_literal_pct": 9.3, "win_exec_pct": 16.3, "median_literal_pct": -1.59, "median_exec_pct": -1.49,
                          "alpha_literal_pct": 1.36, "alpha_literal_ci": [0.94, 1.83], "alpha_exec_pct": 1.41, "alpha_exec_ci": [1.00, 1.88], "top5_share_pct": 149, "median_hold_sessions": 5}
 
+# ── Книга "GLB по Уиш" по НЕГОВОТО правило (решение от 21.10.2026, етап 4) — отделна категория "glb_wish_high" в същия tracker; измерване, не препоръка ──
+# Линията е най-високата цена (High) на месечен бар от предходните месеци, непробита поне GLB_MIN_MONTHS_UNPENETRATED месеца (постовете му от 16.01.2023, 05.11.2025, 02.12.2025);
+# вход при СВЕЖО затваряне над нея, изход при ПЪРВОТО затваряне под нея (замразена) — същата симулация като close книгата (trade_sim.simulate_glb_wish), същият таван GLB_WISH_MAX_HOLD_SESSIONS (наш).
+# Чист старт от деня на качването: GLB_WISH_HIGH_TRACK_FROM = първият бриф след push-а (задава се в push commit-а). Същият ден спира close книгата ("GLB — наш вариант (close)"):
+# нови записи в нея няма от тази дата, отворените ѝ се затварят по правилото си, а секцията остава като архив. Празна дата → новата книга не записва и close книгата не спира.
+GLB_WISH_BOOK_NAME = "GLB по Уиш"
+TRACK_GLB_WISH_HIGH = os.getenv("TRACK_GLB_WISH_HIGH", "1") == "1"
+GLB_WISH_HIGH_TRACK_FROM = os.getenv("GLB_WISH_HIGH_TRACK_FROM", "")
+# Реплей на правилото (21.10.2026, РЕАЛНИ дневни цени от Yahoo, 903 тикъра = ДНЕШНИЯТ универс → оцелели: абсолютната алфа е надута, сравнението с другите правила е честно; без дивиденти;
+# без плъзгане и комисионни; таван 252 сесии; една позиция на тикър): 13 162 сделки (10 691 със SPY, 1993+); алфа на година позиция +11.0% [6.2; 16.9] срещу +8.8% [6.2; 11.9] на close книгата
+GLB_WISH_HIGH_REPLAY_STATS = {"trades": 13162, "with_spy": 10691, "win_literal_pct": 10.0, "win_exec_pct": 15.6, "median_literal_pct": -1.68, "median_exec_pct": -1.63,
+                              "alpha_literal_pct": 1.69, "alpha_literal_ci": [0.91, 2.63], "alpha_py_pct": 11.0, "alpha_py_ci": [6.2, 16.9], "top5_share_pct": 140, "median_hold_sessions": 5}
+
 
 # ══════════════════════════════════════════════════════════════════════════
 # v2.1 · Поправки 2026-07-15 (виж FIXES_2026-07-15.md)

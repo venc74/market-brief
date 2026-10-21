@@ -53,7 +53,7 @@ def run(state_name, seeded):
     orig_wish = g.wish_signal
     g._evaluate_ticker = lambda sym, hist, m=0.0: cap["eval"].setdefault(sym, hist.copy()) is None and None
     g.replay_observations = lambda sym, hist, n, m: (cap["replay"].setdefault(sym, hist.copy()), {})[1]
-    g.wish_signal = lambda df, today=None: (cap["wish"].setdefault(id(df), df.copy()), orig_wish(df, today))[1]
+    g.wish_signal = lambda df, today=None, **kw: (cap["wish"].setdefault(id(df), df.copy()), orig_wish(df, today, **kw))[1]     # 21.10: и kind="high" (книгата „GLB по Уиш“)
     state = pathlib.Path(tmp.name) / state_name
     if seeded:                                                                 # СИНТЕТИЧНО: празно състояние на хистерезиса с актуалния белег → обикновен дневен run
         state.write_text(json.dumps({"updated": "2026-10-08", "events": {}, "seed": {"version": config.GLB_SEED_VERSION, "sessions": 40, "from": None, "to": None}}), encoding="utf-8")

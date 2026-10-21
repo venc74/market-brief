@@ -151,13 +151,15 @@ def x_from_low52(close: float, low52) -> float | None:
 # Книга "GLB по Уиш" (09.10.2026): БУКВАЛНОТО правило, без нашите филтри — сигнал, разделен от картите (хистерезис, Classic/Momentum)
 # ──────────────────────────────────────────────────────────────────────────
 LAST_WISH_SIGNALS: list[dict] = []          # свежите пробиви от последния screen() (main ги подава на книгата); [] при провал
+LAST_WISH_HIGH_SIGNALS: list[dict] = []     # 21.10.2026: същото за книгата "GLB по Уиш" (линия по месечния High)
 LAST_STATUS: dict = {}                      # С3 (10.10): {"ok", "error", "universe", "batches", "batches_failed", "with_history", "candidates", "wish_signals"}
 
 
-def wish_table(close: "pd.Series") -> "pd.DataFrame":
+def wish_table(close: "pd.Series", high: "pd.Series | None" = None) -> "pd.DataFrame":
     """
     Дневна таблица на буквалното правило на Wish върху дневните затваряния (ЕДНА векторизирана функция за живия сигнал и за историческия реплей):
-      line          — най-високият месечен close на ПРЕДХОДНИТЕ календарни месеци (не включва месеца на деня);
+      line          — най-високият месечен close на ПРЕДХОДНИТЕ календарни месеци (не включва месеца на деня); с high (21.10.2026, книгата "GLB по Уиш" по неговото правило) — най-високият
+                      месечен High (месец без High → close-ът му);
       months_unpen  — месеци между месеца на този максимум и текущия (същото като `months_unpenetrated` в _monthly_duration_check);
       signal        — close > линията (БЕЗ буфер, за разлика от хистерезисния вход) И months_unpen >= GLB_MIN_MONTHS_UNPENETRATED (при >= GLB_MIN_MONTHS_UNPENETRATED + 1 предходни месеца);
       fresh         — сигнал в този бар, който не е продължение (предишният бар не е бил сигнал при същата линия): само пробивът, не седмиците над линията.
@@ -170,6 +172,8 @@ def wish_table(close: "pd.Series") -> "pd.DataFrame":
     mc = c.resample("ME").last().dropna()
     n = len(mc)
     vals = mc.to_numpy(dtype=float)
+    if high is not None:
+        vals = high.dropna().resample("ME").max().reindex(mc.index).fillna(mc).to_numpy(dtype=float)
     line_m = np.full(n, np.nan)
     pos_m = np.full(n, -1)
     best, bpos = -np.inf, -1
@@ -193,10 +197,11 @@ def wish_table(close: "pd.Series") -> "pd.DataFrame":
     return pd.DataFrame({"close": cv, "line": line, "months_unpen": unpen, "prior_high_month": names[np.where(pos >= 0, pos, n)], "signal": signal, "fresh": fresh}, index=c.index)
 
 
-def wish_signal(hist, today: str | None = None) -> dict | None:
+def wish_signal(hist, today: str | None = None, kind: str = "close") -> dict | None:
     """
     Свеж пробив на ПОСЛЕДНИЯ ЦЯЛ бар по буквалното правило на Wish (wish_table) → речник за книгата, иначе None. Бар с дата >= today (частичната сесия при ръчно пускане в хода на деня) не е затваряне и се
     отрязва. Типът (classic/momentum/insufficient_history) е САМО таг (нашият overlay), не филтър. Грешка → None (graceful).
+    kind (21.10.2026): "close" — линията по месечния close (книгата "GLB — наш вариант (close)"); "high" — линията по месечния High (книгата "GLB по Уиш", неговото правило).
     """
     try:
         close = hist["Close"].dropna()
@@ -204,7 +209,7 @@ def wish_signal(hist, today: str | None = None) -> dict | None:
             close = close[close.index < pd.Timestamp(today)]
         if len(close) < 60:
             return None
-        t = wish_table(close)
+        t = wish_table(close, hist["High"].loc[:close.index[-1]] if kind == "high" else None)
         last = t.iloc[-1]
         if not bool(last["fresh"]):
             return None
@@ -213,7 +218,7 @@ def wish_signal(hist, today: str | None = None) -> dict | None:
         return {"signal_date": close.index[-1].date().isoformat(), "close": round(float(last["close"]), 4), "line": round(float(last["line"]), 4),
                 "prior_high_month": str(last["prior_high_month"]), "months_unpenetrated": int(last["months_unpen"]),
                 "glb_type": "insufficient_history" if ov is None else ("classic" if ov["meets_tightness"] else "momentum"),
-                "band_hold_pct": None if ov is None else ov["band_hold_pct"]}
+                "band_hold_pct": None if ov is None else ov["band_hold_pct"], "line_kind": kind}
     except Exception as e:
         print(f"[glb_screener] wish_signal: {type(e).__name__}: {e}")
         return None
@@ -525,10 +530,12 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     ("classic"/"momentum") — Двата типа остават заедно в резултата,
     разделянето/визуализацията е грижа на извикващия код (dashboard).
     """
-    global LAST_WISH_SIGNALS, LAST_STATUS
-    LAST_WISH_SIGNALS = []                       # книгата "GLB по Уиш": нов списък на всяко извикване (при провал остава празен)
+    global LAST_WISH_SIGNALS, LAST_WISH_HIGH_SIGNALS, LAST_STATUS
+    LAST_WISH_SIGNALS = []                       # книгата "GLB — наш вариант (close)": нов списък на всяко извикване (при провал остава празен)
+    LAST_WISH_HIGH_SIGNALS = []                  # 21.10.2026: книгата "GLB по Уиш" (линия по месечния High) — същото
     LAST_STATUS = {"ok": False, "error": "не завърши"}      # С3: презаписва се в края; main го слага и при изключение
     wish_signals: list[dict] = []
+    wish_high_signals: list[dict] = []
     if universe is None:
         universe = build_universe()
 
@@ -566,6 +573,10 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                     w = wish_signal(df, today)                       # книгата "GLB по Уиш": сигналът върху същите цени като картите
                     if w:
                         wish_signals.append({"ticker": sym, **w})
+                if config.TRACK_GLB_WISH_HIGH:
+                    wh = wish_signal(df, today, kind="high")                 # 21.10.2026: книгата "GLB по Уиш" — неговата линия (месечен High), същите цени
+                    if wh:
+                        wish_high_signals.append({"ticker": sym, **wh})
                 if hyst and seed:
                     replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
                     if any(o.get("entry") for o in replays[sym].values()):
@@ -618,12 +629,15 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
               f"пазени без данни днес {len(ch['held_unseen'])}")
 
     LAST_WISH_SIGNALS = wish_signals
+    LAST_WISH_HIGH_SIGNALS = wish_high_signals
     # С3 (втори преглед, 10.10): празен списък от провал не бива да изглежда като "няма кандидати" (банер в data_warnings, ред в секцията)
     LAST_STATUS = {"ok": with_history > 0, "error": None if with_history else "Yahoo не върна ценови данни",
                    "universe": len(universe), "batches": batches, "batches_failed": failed, "with_history": with_history,
-                   "candidates": len(results), "wish_signals": len(wish_signals)}
+                   "candidates": len(results), "wish_signals": len(wish_signals), "wish_high_signals": len(wish_high_signals)}
     if config.TRACK_GLB_WISH:
         print(f"[glb_screener] {config.GLB_CLOSE_BOOK_NAME}: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
+    if config.TRACK_GLB_WISH_HIGH:
+        print(f"[glb_screener] {config.GLB_WISH_BOOK_NAME} (линия по High): {len(wish_high_signals)} свежи пробива " + (f"({', '.join(w['ticker'] for w in wish_high_signals[:12])}{'…' if len(wish_high_signals) > 12 else ''})" if wish_high_signals else ""))
     classic = [r for r in results if r["glb_type"] == "classic"]
     momentum = [r for r in results if r["glb_type"] == "momentum"]
     insufficient = [r for r in results if r["glb_type"] == "insufficient_history"]

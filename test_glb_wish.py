@@ -228,7 +228,7 @@ assert list(brief_main._live_positions()) == [] or all(backtest.is_action_record
 t3["AAPL_2024-06-12_gw"]["status"] = "open"
 live = {k: v for k, v in t3.items() if backtest.is_action_record(v) and v.get("status") in ("open", "trailing")}
 assert "AAPL_2024-06-12_gw" not in live
-assert "CATEGORY_GLB_WISH" in (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8")          # 20.10 (етап 3): през слоя за четене на книгите (backtest.CATEGORY_GLB_WISH = "glb_wish")
+assert "GW_CATEGORIES" in (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8") and backtest.GW_CATEGORIES == ("glb_wish", "glb_wish_high")   # 20.10 (етап 3): през слоя за четене; 21.10: и двете GLB книги
 print("  ✓ Action и glb_wish за един и същи тикър са независими записи; is_action_record е False за книгата → _live_positions / OPEN✓ / обобщението на Action я не броят")
 
 print()
@@ -337,7 +337,8 @@ print("  ✓ празната книга казва, че още няма зап
 print()
 print("── 10. свързването: screen() → main → tracker → snapshot; OI снимката не взема позициите на книгата ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert 'steps.step("glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS))' in src and "update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get(\"regime\"), qm_cards, glb_wish_signals)" in src
+assert '"glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS), list(glb_screener.LAST_WISH_HIGH_SIGNALS))' in src     # 21.10: + книгата „GLB по Уиш“ (High)
+assert "update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get(\"regime\"), qm_cards, glb_wish_signals, glb_wish_high_signals)" in src and '"glb_wish_high": glb_wish_high_signals' in src
 assert '"glb_wish": glb_wish_signals' in src and 'backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()' in src
 print("  ✓ main.run: сигналите от screen() отиват в update_backtest_tracker, snapshot-ът носи 'glb_wish', обобщението е в backtest['glb_wish']")
 g._verified_company_name = lambda s: {"name": s, "verified": True}

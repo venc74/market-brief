@@ -80,6 +80,10 @@ _LIVE_STATUSES = ("open", "trailing")
 CATEGORY_ACTION, CATEGORY_BUYSTOP = "action", "buystop"
 CATEGORY_QM = "qm_breakout"        # Qullamaggie breakout кандидатите (отделна стратегия — измерване, не препоръка); същото правило: никой четец на позиции не я брои
 CATEGORY_GLB_WISH = "glb_wish"   # GLB по Уиш (буквалното правило, без нашите филтри — измерване, не препоръка); същото правило: никой четец на позиции не я брои
+# 21.10.2026 (етап 4): "glb_wish" се показва като "GLB — наш вариант (close)" (линията е нашата) и спира от GLB_WISH_HIGH_TRACK_FROM; "glb_wish_high" е книгата "GLB по Уиш" по НЕГОВОТО
+# правило (линия по месечния High). Двете имат една и съща симулация (trade_sim.simulate_glb_wish), резолюция и обобщение — различават се само по линията на сигнала.
+CATEGORY_GLB_WISH_HIGH = "glb_wish_high"
+GW_CATEGORIES = (CATEGORY_GLB_WISH, CATEGORY_GLB_WISH_HIGH)
 # v2: "pending" още няма позиция (чака buy-stop), но трябва да се резолвира всеки run
 _RESOLVABLE_STATUSES = _LIVE_STATUSES + ("pending",)
 
@@ -437,25 +441,37 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
 _GW_RESULT_KEYS = tuple(k for k in trade_sim._blank_gw() if k != "resolution_date")      # полетата, които резолюцията презаписва на всеки run (resolution_date се слага отделно)
 
 
-def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], regime: str | None = None) -> None:
+def _gw_book_open(category: str, entry_date: str) -> bool:
+    """
+    21.10.2026: записва ли книгата сигнал с дата на брифа entry_date. "GLB по Уиш" (glb_wish_high) — от GLB_WISH_HIGH_TRACK_FROM (празно → не записва); close книгата (glb_wish) —
+    от GLB_WISH_TRACK_FROM до деня преди GLB_WISH_HIGH_TRACK_FROM (после е архив: нови записи няма, отворените се затварят по правилото си).
+    """
+    start_high = config.GLB_WISH_HIGH_TRACK_FROM if config.TRACK_GLB_WISH_HIGH else ""
+    if category == CATEGORY_GLB_WISH_HIGH:
+        return bool(start_high) and entry_date >= start_high
+    if not config.TRACK_GLB_WISH or (config.GLB_WISH_TRACK_FROM and entry_date < config.GLB_WISH_TRACK_FROM):
+        return False
+    return not (start_high and entry_date >= start_high)
+
+
+def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], regime: str | None = None, category: str = CATEGORY_GLB_WISH) -> None:
     """
     GLB по Уиш: ингестира СВЕЖИТЕ пробиви на последния цял бар (glb_screener.wish_signal) като НЕЗАВИСИМА книга "glb_wish" — ЕДИН запис на (тикър, ден на брифа), дедуп в рамките на категорията
     (_is_continuation: докато предишната позиция е жива, нов запис за същия тикър не се прави). Записва се във всички режими с таг. Линията е замразена в записа; входът/изходът се определят
     при резолюцията от дневните барове (trade_sim.simulate_glb_wish). Не е позиция и не е препоръка — четците на позиции я игнорират. TRACK_GLB_WISH=0 я изключва; GLB_WISH_TRACK_FROM е чистият старт.
     """
-    if not config.TRACK_GLB_WISH:
+    if not _gw_book_open(category, entry_date):                                   # чист старт / архив (виж _gw_book_open и config.GLB_WISH_HIGH_TRACK_FROM)
         return
-    if config.GLB_WISH_TRACK_FROM and entry_date < config.GLB_WISH_TRACK_FROM:        # чист старт: без ретроактивни записи (виж config.GLB_WISH_TRACK_FROM)
-        return
+    suffix = "_gwh" if category == CATEGORY_GLB_WISH_HIGH else "_gw"
     for c in signals or []:
         ticker = c.get("ticker")
         num = lambda k: isinstance(c.get(k), (int, float)) and not isinstance(c.get(k), bool) and c[k] > 0
         if not (ticker and c.get("signal_date") and num("line") and num("close") and c["close"] > c["line"]):
             continue
-        key = f"{ticker}_{entry_date}_gw"
-        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_GLB_WISH) or _spinoff_skip(ticker, entry_date, CATEGORY_GLB_WISH):
+        key = f"{ticker}_{entry_date}{suffix}"
+        if key in tracker or _is_continuation(tracker, ticker, entry_date, category) or _spinoff_skip(ticker, entry_date, category):
             continue
-        rec = {"method": "v2", "category": CATEGORY_GLB_WISH, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime,
+        rec = {"method": "v2", "category": category, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime,
                "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),
                "months_unpenetrated": c.get("months_unpenetrated"), "band_hold_pct": c.get("band_hold_pct"), "resolution_date": None, "discovered_date": None,
                "spy_return_pct": None, "spy_return_pct_exec": None, "alpha_pct": None, "alpha_pct_exec": None}
@@ -466,7 +482,7 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
                           today_date: str | None = None, today_watchlist: list[dict] | None = None,
                           today_regime: str | None = None, today_qm: list[dict] | None = None,
-                          today_glb_wish: list[dict] | None = None) -> None:
+                          today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None) -> None:
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -482,6 +498,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_buystop_list(tracker, entry_date, snap.get("watchlist", []), (snap.get("thermometer") or {}).get("regime"))
         _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish") or [], (snap.get("thermometer") or {}).get("regime"))   # GLB по Уиш: само snapshot-и с glb_wish (нов код)
+        _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish_high") or [], (snap.get("thermometer") or {}).get("regime"), CATEGORY_GLB_WISH_HIGH)   # 21.10: книгата по неговата линия
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -500,6 +517,8 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_qm_list(tracker, today_date, today_qm, today_regime)
     if today_glb_wish and today_date:
         _ingest_glb_wish_list(tracker, today_date, today_glb_wish, today_regime)
+    if today_glb_wish_high and today_date:
+        _ingest_glb_wish_list(tracker, today_date, today_glb_wish_high, today_regime, CATEGORY_GLB_WISH_HIGH)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -908,7 +927,7 @@ def _gw_needs_exec_fill(rec: dict, today: dt.date) -> bool:
     Затворен запис от GLB по Уиш, на който изпълнимият изход (отварянето на сесията СЛЕД затварянето под линията) още не е известен: денят на откриване е първата сутрин след затварянето, а отварянето
     на тази сесия още не съществува → записът се резолвира още веднъж (най-много 10 дни след затварянето, за да не се опитва вечно при делистван тикър).
     """
-    if rec.get("category") != CATEGORY_GLB_WISH or rec.get("status") not in trade_sim.GW_TERMINAL or rec.get("exit_exec_date") or not rec.get("resolution_date"):
+    if rec.get("category") not in GW_CATEGORIES or rec.get("status") not in trade_sim.GW_TERMINAL or rec.get("exit_exec_date") or not rec.get("resolution_date"):
         return False
     try:
         return (today - dt.date.fromisoformat(rec["resolution_date"])).days <= 10
@@ -1013,7 +1032,7 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         if ticker not in getattr(highs, "columns", []):
             print(f"[backtest] {ticker}: няма данни в batch резултата — пропускам (остава {rec['status']})")
             continue
-        if rec.get("category") == CATEGORY_GLB_WISH:                                   # GLB по Уиш: собствена симулация; сплитът се открива от самия бар (без мрежа)
+        if rec.get("category") in GW_CATEGORIES:                                      # двете GLB книги: собствена симулация; сплитът се открива от самия бар (без мрежа)
             try:
                 _resolve_glb_wish_record(rec, opens, closes, spy_bars, today)
             except Exception as e:
@@ -1193,7 +1212,7 @@ def resolve_positions_only() -> None:
 def update_backtest_tracker(today_action: list[dict] | None = None,
                             today_date: str | None = None, today_watchlist: list[dict] | None = None,
                             today_regime: str | None = None, today_qm: list[dict] | None = None,
-                            today_glb_wish: list[dict] | None = None) -> None:
+                            today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None) -> None:
     """
     Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
@@ -1207,7 +1226,7 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     tracker = _load_tracker()
     LAST_SPINOFF_SKIPS.clear()
     try:
-        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish)
+        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish, today_glb_wish_high)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
         # не плащаме втори yf.download(). Днес ingest-натите позиции остават
         # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла
@@ -1280,7 +1299,7 @@ def live_tickers() -> list[str]:
     при изчерпан бюджет за EDGAR остават последни). Чисто локално четене; всяка грешка → [].
     """
     try:
-        order = {CATEGORY_ACTION: 0, CATEGORY_BUYSTOP: 1, CATEGORY_QM: 2, CATEGORY_GLB_WISH: 3}
+        order = {CATEGORY_ACTION: 0, CATEGORY_BUYSTOP: 1, CATEGORY_QM: 2, CATEGORY_GLB_WISH_HIGH: 3, CATEGORY_GLB_WISH: 4}
         live = [(order.get(record_category(r), 4), r["ticker"]) for r in book_records(None, statuses=LIVE, method=None) if r.get("ticker")]
         return list(dict.fromkeys(t for _, t in sorted(live)))
     except Exception as e:
@@ -1513,17 +1532,19 @@ def gw_exec_note(r: dict, today_iso: str) -> dict | None:
     return {"date": d, "text": f"изход по отварянето на {d[8:10]}.{d[5:7]} — {when}"}
 
 
-def get_glb_wish_summary() -> dict:
+def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
     """
     GLB по Уиш: обобщение на ОТДЕЛНАТА книга "glb_wish" (буквалното правило на Wish, без нашите филтри — измерване, не препоръка). Чисто локално четене (без мрежа). Доходност в % (няма стоп → няма R) на две граници:
     literal (вход и изход на затварянето) и exec (отварянето на следващата сесия), спрямо SPY за същите дати. Записите с резултат са затворените (изход по линията / изтекли след
     config.GLB_WISH_MAX_HOLD_SESSIONS) И отворените по mark-to-market — само затворените биха били структурно негативни (изходът по линията е загуба по построение). Статистиката (win rate, медиана, алфа) се
     попълва чак при >= config.GLB_WISH_MIN_ENTRIES_FOR_STATS такива записа (затворените и отворените се показват ОТДЕЛНО: closed_result / open_result и групите); дотогава — броят и средната доходност. Редовете носят отметка also_action / also_buystop / also_qm. Изключено → {}.
     """
-    if not config.TRACK_GLB_WISH:
+    high = category == CATEGORY_GLB_WISH_HIGH                                     # 21.10.2026: "GLB по Уиш" (линия по High) или close книгата (архив от GLB_WISH_HIGH_TRACK_FROM)
+    if not (config.TRACK_GLB_WISH_HIGH if high else config.TRACK_GLB_WISH):
         return {}
     tracker = _load_tracker()
-    records = book_records(CATEGORY_GLB_WISH, tracker=tracker)
+    records = book_records(category, tracker=tracker)
+    stop = config.GLB_WISH_HIGH_TRACK_FROM if (config.TRACK_GLB_WISH_HIGH and not high) else ""
     act = book_intervals(CATEGORY_ACTION, tracker, trade_sim.NOT_A_POSITION)
     bst = book_intervals(CATEGORY_BUYSTOP, tracker, trade_sim.NOT_A_POSITION)
     qmb = book_intervals(CATEGORY_QM, tracker, trade_sim.QM_NOT_A_POSITION)
@@ -1578,7 +1599,8 @@ def get_glb_wish_summary() -> dict:
                       "alpha_pct": r.get("alpha_pct"), "exec_note": gw_exec_note(r, today_iso)}
                      for r in with_result if r["status"] in trade_sim.GW_TERMINAL), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
     return {
-        "enabled": True, "track_from": config.GLB_WISH_TRACK_FROM or None, "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
+        "enabled": True, "category": category, "track_from": (config.GLB_WISH_HIGH_TRACK_FROM if high else config.GLB_WISH_TRACK_FROM) or None, "archived_from": stop or None,
+        "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
         "pending": by_status.get("pending", 0), "open": by_status.get("open", 0), "line_exit": by_status.get("line_exit", 0), "expired": by_status.get("expired", 0), "invalid": by_status.get("invalid_signal", 0),
         "with_result": len(with_result), "closed_result": len(closed_res), "open_result": len(open_res), "min_entries": min_n, "stats_visible": visible,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
