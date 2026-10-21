@@ -905,7 +905,7 @@
     {% endif %}
     {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
     {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
-    {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}
+    {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}
     {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
     {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
     <div class="stock-body">
@@ -1008,7 +1008,7 @@
   {# опростяване (втори преглед, 10.10.2026): too_wide / extended / no_volume — един ред, причината и стопът от кода, без AI наратив #}
   {% if watchlist_compact %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
-    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{% if r.spinoff %}, <span style="color:var(--yellow)">⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }} (запис {{ r.spinoff.record[8:10] }}.{{ r.spinoff.record[5:7] }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{% if r.spinoff %}, <span style="color:var(--yellow)">⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }} (запис {{ r.spinoff.record[8:10] }}.{{ r.spinoff.record[5:7] }})</span>{% endif %}{% if r.merger %}, <span style="color:var(--yellow)">⚠ цел на придобиване ({{ r.merger.buyer }}, {{ r.merger.announced[8:10] }}.{{ r.merger.announced[5:7] }}.{{ r.merger.announced[:4] }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
   </div>
   {% endif %}
   <div class="watch-grid">
@@ -1028,7 +1028,7 @@
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
       {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
-      {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}
+      {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}
       {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       {# 12.10: потвърден пробив с жив запис в buy-stop книгата — неутрален ред (без "не нов вход") #}
       {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
@@ -1278,7 +1278,7 @@
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
-      {% if c.get("spinoff_warning") %}<div class="corp-warn">{{ c.spinoff_warning.text }}</div>{% endif %}
+      {% if c.get("spinoff_warning") %}<div class="corp-warn">{{ c.spinoff_warning.text }}</div>{% endif %}{% if c.get("merger_target") %}<div class="corp-warn">{{ c.merger_target.text }}</div>{% endif %}
       {% for n in c.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
       <div class="qm-kv">
         <span>ADR</span><b>{{ "%.1f"|format(c.adr) }}%</b>
@@ -1464,7 +1464,7 @@
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
       {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
-      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}
+      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}{% if g.get("merger_target") %}<div class="corp-warn">{{ g.merger_target.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
@@ -1499,7 +1499,7 @@
       <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
       {% endif %}
       {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
-      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}
+      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}{% if g.get("merger_target") %}<div class="corp-warn">{{ g.merger_target.text }}</div>{% endif %}
       <div class="glb-note">{{ g.risk_note }}</div>
       {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
       {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}

@@ -856,11 +856,13 @@ def run() -> dict:
     def _spinoff():
         nonlocal spinoff_active                                            # частично изпълненото (check преди провал в annotate) остава — както в try блока до 20.10
         card_tickers = [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])]
-        spinoff_active = spinoff_watch.check(card_tickers + (backtest.live_tickers() if config.ENABLE_BACKTEST else []), today, budget_sec=config.SPINOFF_BUDGET_SEC)
+        spinoff_active = spinoff_watch.check(card_tickers + (backtest.live_tickers() if config.ENABLE_BACKTEST else []), today, budget_sec=config.SPINOFF_BUDGET_SEC,
+                                             merger_tickers=card_tickers)            # 21.10.2026: и цел на придобиване — само за тикърите на картите (маркерът е на картата)
         n_sp = spinoff_watch.annotate([action, watchlist, qm_cards, glb_candidates], spinoff_active)
+        n_mg = spinoff_watch.annotate_mergers([action, watchlist, qm_cards, glb_candidates])     # само маркер — картата остава (решение на Венци, 21.10)
         backtest.SPINOFF_WINDOWS = spinoff_watch.windows()
         print(f"      Предстоящо отделяне (EDGAR 8-K): проверени {spinoff_watch.LAST_DIAG.get('checked', 0)} тикъра, нови 8-K прочетени {spinoff_watch.LAST_DIAG.get('fetched', 0)}, "
-              f"активни {sorted(spinoff_active)}, карти с предупреждение {n_sp}")
+              f"активни {sorted(spinoff_active)}, карти с предупреждение {n_sp}; цели на придобиване {sorted(spinoff_watch.LAST_MERGERS)} (карти {n_mg})")
     _sd = spinoff_watch.LAST_DIAG
     steps.step("spinoff", _spinoff, on_fail=lambda e: _sd.update(ok=False, error=f"{type(e).__name__}: {e}"), label="Предупреждението за предстоящо отделяне (EDGAR 8-K)",
                consequence="липсата на предупреждение днес НЕ значи, че няма предстоящо отделяне",

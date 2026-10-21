@@ -104,7 +104,7 @@ src/insider_buying.py  — Form 4 покупки → INS✓ за нашите т
 src/qm_breakout.py     — Qullamaggie breakout (механичен, без AI, отделна стратегия); src/qm_ep.py — Episodic Pivot, само наблюдение
 src/glb_screener.py    — GLB карти (Classic/Momentum, хистерезис) и сигналът на книгата "GLB по Уиш"
 src/corp_actions.py    — корпоративни действия: изключване при съществено отделяне, маркер под прага; ЕДНО теглене на run (_SERIES)
-src/spinoff_watch.py   — предстоящо отделяне от EDGAR 8-K за нашите тикъри
+src/spinoff_watch.py   — предстоящо отделяне от EDGAR 8-K за нашите тикъри; от 21.10 и маркер „цел на придобиване (купувач, дата)“ — 8-K т. 1.01, в който подателят е целта (картата остава)
 src/watchlist_exits.py — "Излязоха от вчера"; src/names.py — имена за показване
 src/sizing.py          — position_plan_v2() (вход, стоп, цел, sizing_factor) — БЕЗ брой акции / сума; src/trade_levels.py — нивата + ADR (формулата е само тук)
 templates/sizing_core.js, sizing_ui.js — оразмеряване в браузъра (localStorage на читателя)
