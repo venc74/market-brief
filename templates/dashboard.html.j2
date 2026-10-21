@@ -1802,6 +1802,11 @@
 {% endif %}
 
 
+{# 21.10.2026 (етап 4, ритъм на данните): без нов 13F спрямо предишния бриф — един ред, а секциите за 13F са свити #}
+{% if thirteenf_rhythm.compact %}<section>
+  <h2>Superinvestor Positions — Last 13F</h2>
+  <div class="prose">{{ thirteenf_rhythm.text }}</div>
+  <details class="si-full"><summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Секциите за 13F (без промяна от последното подаване)</summary>{% endif %}
 {% if superinvestor_moves %}
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
@@ -1884,6 +1889,8 @@
   {{ si_options(superinvestor_status) }}
 </section>
 {% endif %}
+{% if thirteenf_rhythm.compact %}</details>
+</section>{% endif %}
 
 {# Пакет 4б т.в: секцията "Insider Buying" отпадна — остава маркерът INS✓ (кой, кога, колко — hover/клик) върху кандидатите и позициите #}
 {% if short_frozen and short_frozen.frozen_on %}

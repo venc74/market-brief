@@ -164,6 +164,7 @@ c_late = [r for (m, c), r in mv.items() if m == "Тест C"]
 assert c_late and all("закъснява: последен 13F от 2026-05-15 (за Q1 2026), няма за Q2 2026 (срок 14.08.2026)" in r["late"] for r in c_late)
 assert not [r for (m, c), r in mv.items() if m != "Тест C" and r.get("late")]                                                       # само редовете на закъснелия мениджър носят етикета
 assert meta["managers_with_data"] == 4 and meta["managers_with_comparison"] == 3 and bundle["major_exits"] == [] and meta["kind"] == "ok"
+assert len(meta["filings"]) == 4 and meta["filings"]["Тест C · закъснява (реален файл от 2025, дата 2026-05-15)"] == "2026-05-15"     # 21.10 (етап 4): датите за ритъма на 13F
 print(f"  ✓ A (долари): 'увеличена' за Frontier и Hertz; B (хиляди, СИНТЕТИЧНА дата 2026 — като Duquesne): основание price_override; празен предходен 13F → 'без сравнение' (няма 'нова позиция' за всичко); "
       f"D (счупен таг): 0% покритие → без редове; C: 'закъснява … срок 14.08.2026'; сравнение имат {meta['managers_with_comparison']} от {meta['managers_with_data']}")
 w = data_warnings.collect(None, None, superinvestor_status=meta)

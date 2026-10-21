@@ -1021,6 +1021,7 @@ def run() -> dict:
                                        breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
     data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
     print(steps.log_line())
+    prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     brief = {
         "date": today,
         "macro": macro,
@@ -1064,6 +1065,7 @@ def run() -> dict:
         "insider_buying_status": insider_status,
         "insider_buying_positions_status": ins_pos_status,
         "superinvestor_status": superinvestor_status,
+        "thirteenf_rhythm": data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {},   # 21.10 (етап 4): цялата секция при нов 13F
         "glb_candidates": glb_candidates,
         "glb_wish": glb_wish_signals,        # свежите пробиви за книгата "GLB по Уиш" — snapshot-ът ги пази, за да се възстанови пропуснат run
         "glb_wish_high": glb_wish_high_signals,   # 21.10.2026: същото за книгата "GLB по Уиш" по неговата линия (месечен High)
@@ -1077,7 +1079,7 @@ def run() -> dict:
         "cot_summary": cot_summary,
         # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
         "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
-        "cot_rhythm": data_rhythm.cot_rhythm(cot.LAST_STATUS, data_rhythm.previous_brief(today), today) if config.ENABLE_COT else {},   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
+        "cot_rhythm": data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {},   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите

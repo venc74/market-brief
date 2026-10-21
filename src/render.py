@@ -346,6 +346,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
+        thirteenf_rhythm=brief.get("thirteenf_rhythm") or {},          # 21.10 (етап 4): ред и свити секции без нов 13F
         glb_candidates=brief.get("glb_candidates", []),
         glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
         corp_excluded=brief.get("corp_excluded") or {},                # 13.10: изключени заради отделяне — ред под секциите

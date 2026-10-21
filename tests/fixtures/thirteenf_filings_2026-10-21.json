@@ -1,0 +1,37 @@
+{
+ "_note": "РЕАЛНИ дати на 13F от брифовете на origin/main (superinvestor_moves[].period = датата на подаване на 13F, от който е редът) за 19, 20 и 21.10.2026 — само мениджърите с редове в секцията (6 / 6 / 5 от 15). На 20.10 Egerton Capital подава нов 13F (предишният е от 21.07) — брифът от 21.10 е първият с него. Полето superinvestor_status.filings е ново (21.10, етап 4); тук то е построено от тези дати.",
+ "filings": {
+  "2026-10-19": {
+   "kind": "ok",
+   "filings": {
+    "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",
+    "Бил Акман · Pershing Square": "2026-08-14",
+    "Сет Кларман · Baupost Group": "2026-08-13",
+    "Стивън Мандел · Lone Pine Capital": "2026-08-14",
+    "Джон Армитидж · Egerton Capital": "2026-07-21",
+    "Ли Лу · Himalaya Capital Management": "2026-08-14"
+   }
+  },
+  "2026-10-20": {
+   "kind": "ok",
+   "filings": {
+    "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",
+    "Бил Акман · Pershing Square": "2026-08-14",
+    "Сет Кларман · Baupost Group": "2026-08-13",
+    "Стивън Мандел · Lone Pine Capital": "2026-08-14",
+    "Джон Армитидж · Egerton Capital": "2026-07-21",
+    "Ли Лу · Himalaya Capital Management": "2026-08-14"
+   }
+  },
+  "2026-10-21": {
+   "kind": "ok",
+   "filings": {
+    "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",
+    "Бил Акман · Pershing Square": "2026-08-14",
+    "Сет Кларман · Baupost Group": "2026-08-13",
+    "Стивън Мандел · Lone Pine Capital": "2026-08-14",
+    "Джон Армитидж · Egerton Capital": "2026-10-20"
+   }
+  }
+ }
+}

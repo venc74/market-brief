@@ -916,6 +916,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
     scale_basis: dict[str, str] = {}                  # мениджър → основание на мащаба (price / price_override / size / size_override / date) — за диагностика
     no_comparison: list[dict] = []                    # трети преглед (16.10): мениджъри без поредното предходно тримесечие — причина и текст
     options: list[dict] = []                          # опционни редове (PUT / CALL) по мениджър — информация, не покупки
+    filings: dict[str, str] = {}                      # 21.10.2026 (етап 4, ритъм на данните): мениджър → датата на последния му 13F (нов 13F → цялата секция)
 
     for cik, name in config.DATAROMA_CIK.items():
         snap = _manager_snapshot(cik, name)
@@ -934,6 +935,8 @@ def _fetch_all_uncached(min_value: float) -> dict:
 
         any_active_data = True
         n_active += 1
+        if snap.get("last_filing_date"):
+            filings[name] = str(snap["last_filing_date"])[:10]
         n_compared += 1 if compared(snap) else 0
         if not compared(snap):
             why = snap.get("comparison") or {"reason": "prev_fetch_failed", "text": "предходният 13F не се изтегли днес"}
@@ -992,7 +995,7 @@ def _fetch_all_uncached(min_value: float) -> dict:
     meta = {"kind": kind, "note": note, "stale": False, "data_date": today, "managers_with_data": n_active,
             "managers_total": total, "managers_without_filings": n_no_filings,
             "managers_with_comparison": n_compared, "low_coverage": low_cov, "late_managers": late_managers, "followed_nt": followed_nt, "scale_basis": scale_basis,
-            "no_comparison": no_comparison, "options": options, "cusip_tickers": dict(CUSIP_STATUS)}
+            "no_comparison": no_comparison, "options": options, "cusip_tickers": dict(CUSIP_STATUS), "filings": filings}
 
     if moves or new_positions or major_exits or stopped_managers:
         bundle["meta"] = meta
