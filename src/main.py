@@ -526,24 +526,18 @@ def run() -> dict:
     macro = collect_macro_layer()
 
     print("[2/7] Пазарен термометър…")
-    try:
-        thermo = build_thermometer(macro)
-    except Exception as e:
-        # термометърът не бива да сваля целия бриф (класът KeyError при скрит
-        # индикатор в хистерезис) — Defensive по подразбиране, виж thermometer_unavailable
-        traceback.print_exc()
-        print(f"[thermo] ⚠ build_thermometer пропадна ({type(e).__name__}: {e}) — "
-              f"fallback Defensive")
-        thermo = thermometer_unavailable(e)
+    # термометърът не бива да сваля целия бриф (класът KeyError при скрит индикатор в хистерезис) — Defensive по подразбиране, виж thermometer_unavailable
+    thermo = steps.step("thermometer", lambda: build_thermometer(macro), on_fail=thermometer_unavailable, trace=True, label="Пазарният термометър",
+                        consequence="режимът е Defensive по подразбиране, индикаторите не са изчислени")
     # Допълнение към пакет 2 (2026-10-05): distribution days (пазарно-глобален сигнал, SPY + QQQ) се смятат ТУК, преди
     # макро брифа и режимния gate на Action — червени → режимът е най-много Defensive (виж apply_distribution_cap).
     # Преди се смятаха по-надолу, само за информативна карта; сега се ползва същият резултат (един fetch).
     distribution_days = None
     if config.ENABLE_ENTRY_TIMING:
-        try:
-            distribution_days = entry_timing.evaluate_distribution_days()
-        except Exception as e:
-            print(f"[entry_timing] distribution days пропаднаха: {type(e).__name__}: {e}")
+        distribution_days = steps.step("distribution_days", entry_timing.evaluate_distribution_days, fallback=None, label="Distribution days (SPY / QQQ)",
+                                       consequence="броят и блокът на Offensive не са проверени днес (липсата не е нечервен ден)",
+                                       failed_if=lambda v: "нито SPY, нито QQQ" if entry_timing.LAST_STATUS.get("status") == "failed" else None,
+                                       partial=lambda v: (f"липсва {', '.join(entry_timing.LAST_STATUS.get('missing') or [])}", {}) if entry_timing.LAST_STATUS.get("status") == "partial" else None)
         thermo = steps.step("distribution_cap", lambda: apply_distribution_cap(thermo, distribution_days, history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS)),
                             fallback=thermo, label="Ограничението на режима от distribution days",
                             consequence="режимът днес е без този блок; може да е по-висок, отколкото правилото позволява")
@@ -559,13 +553,15 @@ def run() -> dict:
     print("[3/7] Слой 2: секторна ротация…")
     # FIX 2026-10-03 (пакет 2 т.6): паднал Yahoo не сваля run-а — sector_rotation() връща [] и записва причината
     # в sector_layer.LAST_STATUS; в брифа излиза предупреждение (data_warnings), а не тих празен резултат.
-    try:
-        rotation = sector_rotation()
-    except Exception as e:
-        traceback.print_exc()
+    def _rotation_failed(e):
         sector_layer.LAST_STATUS.clear()
         sector_layer.LAST_STATUS.update(ok=False, reason=f"{type(e).__name__}: {e}")
-        rotation = []
+        return []
+    _ss = sector_layer.LAST_STATUS
+    rotation = steps.step("sector_rotation", sector_rotation, on_fail=_rotation_failed, trace=True, label="Секторната ротация",
+                          consequence="секторната карта, водещите сектори и SECT✓ са празни днес",
+                          failed_if=lambda v: (_ss.get("reason") or "Yahoo не върна данни") if not _ss.get("ok", True) else None,
+                          partial=lambda v: (f"{_ss.get('etfs_ok')} от {_ss['etfs_total']} ETF-а", {}) if _ss.get("etfs_total") and (_ss.get("etfs_ok") or 0) < _ss["etfs_total"] else None)
     leaders = leading_sectors(rotation)
     # Short/Stage 4 screener вход — persistence-gated (не еднодневен snapshot),
     # виж laggard_sectors() docstring-а. Реалният screening (мрежово скъп) се
@@ -573,13 +569,21 @@ def run() -> dict:
     laggards = laggard_sectors(rotation)
 
     print("[4/7] Слой 3: скрининг…")
-    try:
-        candidates = run_screen([s["sector"] for s in leaders], leaders=leaders)
-    except Exception as e:
-        traceback.print_exc()
+    def _screen_failed(e):
         screener.LAST_STATUS.clear()
         screener.LAST_STATUS.update(ok=False, kind="crashed", reason=f"{type(e).__name__}: {e}")
-        candidates = []
+        return []
+
+    def _screen_partial(v):
+        sc = screener.LAST_STATUS
+        parts = ([f"{sc['batches_failed']} от {sc.get('batches')} партиди"] if sc.get("batches_failed") else []) \
+            + ([f"{sc['no_bars_n']} тикъра без бар"] if (sc.get("no_bars_n") or 0) >= config.PARTIAL_DATA_WARN_SHARE * (sc.get("universe") or 0) > 0 else []) \
+            + ([f"фундаменти: {', '.join(sc['fundamentals_unavailable'][:5])}"] if sc.get("fundamentals_unavailable") else [])
+        return ("; ".join(parts), {}) if parts else None
+    candidates = steps.step("screener", lambda: run_screen([s["sector"] for s in leaders], leaders=leaders), on_fail=_screen_failed, trace=True,
+                            label="Скрийнърът", consequence="празните Action/Watchlist днес НЕ значат 'няма сетъпи'",
+                            failed_if=lambda v: (screener.LAST_STATUS.get("reason") or screener.LAST_STATUS.get("kind")) if screener.LAST_STATUS.get("kind") in ("spy_failed", "no_history", "universe_empty") else None,
+                            partial=_screen_partial)
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
@@ -620,22 +624,21 @@ def run() -> dict:
     theses = ai_brief.thesis_news_pick(
         theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
-    try:
-        narratives = ai_brief.ticker_narratives(
-            candidates, ai_macro.get("sector_logic", []), thermo["regime"], news=news)            # 19.10.2026: и дословните заглавия на деня
-    except Exception as e:
-        traceback.print_exc()
-        print(f"[main] ⚠ наративите пропаднаха изцяло ({type(e).__name__}: {e}) — класификацията е от кода, картите са без AI текст")
-        narratives = []
+    def _narratives_failed(e):
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)]
-    try:
-        candidates = ai_brief.merge_narratives(candidates, narratives)
-    except Exception as e:
-        traceback.print_exc()
-        print(f"[main] ⚠ сливането на наративите пропадна ({type(e).__name__}: {e}) — класификацията е от кода, картите са без AI текст")
+        return []
+    _ai_consequence = "класификацията е от кода, картите са без AI текст"
+    narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, ai_macro.get("sector_logic", []), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
+                            on_fail=_narratives_failed, trace=True, source="ai", label="AI наративите на картите", consequence=_ai_consequence,
+                            partial=lambda v: (f"без AI текст: {', '.join(ai_brief.NARRATIVES_LOST[:8])}", {}) if ai_brief.NARRATIVES_LOST else None)
+
+    def _merge_failed(e):
         for c in candidates:
             c["ai"] = {"classification": "Action" if (c.get("setup") or {}).get("eligible") else "Watchlist", "why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates]
+        return candidates
+    candidates = steps.step("narratives_merge", lambda: ai_brief.merge_narratives(candidates, narratives), on_fail=_merge_failed, trace=True, source="ai",
+                            label="Сливането на AI наративите с картите", consequence=_ai_consequence)
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
     def _prose_checks():
         fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
@@ -757,16 +760,15 @@ def run() -> dict:
     # screen() вече е graceful вътрешно (batch+per-ticker) — не искаме и
     # неочакван bug в нов модул да чупи целия дневен run.
     glb_wish_signals: list[dict] = []            # книгата "GLB по Уиш": свежите пробиви на последния цял бар (измерване, не препоръка)
-    if config.ENABLE_GLB_SCREENER:
-        try:
-            glb_candidates = glb_screener.screen()
-            glb_wish_signals = list(glb_screener.LAST_WISH_SIGNALS)
-        except Exception as e:
-            print(f"[main] GLB screener failed: {e}")
-            glb_candidates = []
-            glb_screener.LAST_STATUS = {"ok": False, "error": f"{type(e).__name__}: {e}"}      # С3: банер + ред в секцията вместо тишина
-    else:
-        glb_candidates = []
+    def _glb_failed(e):
+        glb_screener.LAST_STATUS = {"ok": False, "error": f"{type(e).__name__}: {e}"}      # С3: банер + ред в секцията вместо тишина
+        return [], []
+    _gs = lambda: glb_screener.LAST_STATUS or {}
+    glb_candidates, glb_wish_signals = steps.step("glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS)), fallback=([], glb_wish_signals),
+                                                  enabled=config.ENABLE_GLB_SCREENER, on_fail=_glb_failed, label="GLB скрийнърът",
+                                                  consequence="празният списък и липсващите сигнали за книгата „GLB по Уиш“ днес НЕ значат, че няма пробиви",
+                                                  failed_if=lambda v: (_gs().get("error") or "не се изпълни") if _gs().get("ok") is False else None,
+                                                  partial=lambda v: (f"{_gs()['batches_failed']} от {_gs().get('batches')} партиди", {}) if _gs().get("batches_failed") else None)
     # 13.10.2026: GLB карта / сигнал на книгата "GLB по Уиш", чиято линия е от месец ПРЕДИ отделяне (нецял коефициент) → не се показва и не се записва (CTVA 13.10)
     glb_candidates, corp_ex_glb = corp_actions.exclude(glb_candidates, "glb", today)
     glb_wish_signals, corp_ex_gw = corp_actions.exclude(glb_wish_signals, "glb_wish", today)
@@ -850,16 +852,20 @@ def run() -> dict:
     # 13.10.2026: предупреждение за ПРЕДСТОЯЩО отделяне от EDGAR 8-K (spinoff_watch) — само нашите тикъри (карти първо, после живите записи в книгите); преди книгите, защото
     # нов вход между датата на запис и разпределението не се записва (прозорците — от дневника data/spinoff_log.json, за да важат и за повторния ingest на snapshot-и)
     spinoff_active: dict = {}
-    try:
+
+    def _spinoff():
+        nonlocal spinoff_active                                            # частично изпълненото (check преди провал в annotate) остава — както в try блока до 20.10
         card_tickers = [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])]
         spinoff_active = spinoff_watch.check(card_tickers + (backtest.live_tickers() if config.ENABLE_BACKTEST else []), today, budget_sec=config.SPINOFF_BUDGET_SEC)
         n_sp = spinoff_watch.annotate([action, watchlist, qm_cards, glb_candidates], spinoff_active)
         backtest.SPINOFF_WINDOWS = spinoff_watch.windows()
         print(f"      Предстоящо отделяне (EDGAR 8-K): проверени {spinoff_watch.LAST_DIAG.get('checked', 0)} тикъра, нови 8-K прочетени {spinoff_watch.LAST_DIAG.get('fetched', 0)}, "
               f"активни {sorted(spinoff_active)}, карти с предупреждение {n_sp}")
-    except Exception as e:
-        print(f"[main] предупреждението за отделяне пропуснато: {type(e).__name__}: {e}")
-        spinoff_watch.LAST_DIAG.update(ok=False, error=f"{type(e).__name__}: {e}")
+    _sd = spinoff_watch.LAST_DIAG
+    steps.step("spinoff", _spinoff, on_fail=lambda e: _sd.update(ok=False, error=f"{type(e).__name__}: {e}"), label="Предупреждението за предстоящо отделяне (EDGAR 8-K)",
+               consequence="липсата на предупреждение днес НЕ значи, че няма предстоящо отделяне",
+               failed_if=lambda v: (_sd.get("error") or "EDGAR не отговори") if not _sd.get("ok", True) else None,
+               partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето

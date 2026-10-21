@@ -260,13 +260,13 @@ print()
 
 print("── main.py ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert src.count("entry_timing.evaluate_distribution_days()") == 1                                    # един fetch
-i_dd, i_cap = src.index("entry_timing.evaluate_distribution_days()"), src.index("apply_distribution_cap(thermo, distribution_days")                      # 08.10: + history= (начално състояние от историята)
-i_thermo, i_macro, i_hard = src.index("thermo = build_thermometer(macro)"), src.index("ai_brief.macro_and_sector_brief("), src.index("apply_hard_rules(candidates, thermo[")
+assert src.count("entry_timing.evaluate_distribution_days") == 1                                      # един fetch
+i_dd, i_cap = src.index("entry_timing.evaluate_distribution_days"), src.index("apply_distribution_cap(thermo, distribution_days")                      # 08.10: + history= (начално състояние от историята)
+i_thermo, i_macro, i_hard = src.index('thermo = steps.step("thermometer", lambda: build_thermometer(macro)'), src.index("ai_brief.macro_and_sector_brief("), src.index("apply_hard_rules(candidates, thermo[")
 assert i_thermo < i_dd < i_cap < i_macro < i_hard
 seg = src[i_dd - 200:i_cap + 400]
-assert seg.count("try:") >= 1 and seg.count("except Exception") >= 1 and 'steps.step("distribution_cap"' in seg      # 20.10.2026 (етап 3б): ограничението — в обвивката
-print("  ✓ термометър → distribution days (try/except) → apply_distribution_cap (обвивката на стъпките) → макро бриф → apply_hard_rules; един fetch")
+assert 'steps.step("distribution_days"' in seg and 'steps.step("distribution_cap"' in seg      # 20.10.2026 (етап 3б): и двете — в обвивката на стъпките
+print("  ✓ термометър → distribution days → apply_distribution_cap (всяко в обвивката на стъпките) → макро бриф → apply_hard_rules; един fetch")
 print()
 
 fp_after = (REAL_STATE.stat().st_size, REAL_STATE.stat().st_mtime_ns) if REAL_STATE.exists() else None

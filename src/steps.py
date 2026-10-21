@@ -6,6 +6,8 @@
   step(name, fn, …) — fn() в try/except, с време; изключение → fallback, статус "failed", ред в лога; partial(value) → (причина, детайл) или None; critical=True — изключението
   се вдига (рендерът и записът — там провалът и днес сваля run-а). Стъпка с enabled=False е "skipped" (изключена в config) — без банер.
   summary() → brief["run_steps"]; warnings(present) → банерите за провалените / частичните стъпки, чийто source още НЯМА банер (стъпка със собствен точен банер не получава втори).
+Стъпка 3 (20.10): местата с МОДУЛЕН статус (LAST_STATUS / LAST_DIAG — термометър, сектори, скрийнър, AI наративите, distribution days, GLB, отделяне) — on_fail прави същото като
+досега; failed_if(value) / partial(value) четат модулния статус (провал без изключение — празен резултат от паднал Yahoo — също е "failed" в run_steps), банерът е собственият.
 Стъпка 2 (20.10): местата с ЛОКАЛЕН статус (qm_diag, статусът на INS✓ за позициите, EP, здравният монитор) — on_fail(exc) връща същия статус като досега, собственият банер остава.
 """
 from __future__ import annotations
@@ -39,7 +41,7 @@ def reset() -> None:
 
 def step(name: str, fn: Callable[[], Any], *, fallback: Any = None, label: str, consequence: str, source: str | None = None,
          partial: Callable[[Any], tuple[str, dict] | None] | None = None, critical: bool = False, enabled: bool = True, trace: bool = False,
-         on_fail: Callable[[Exception], Any] | None = None) -> Any:
+         on_fail: Callable[[Exception], Any] | None = None, failed_if: Callable[[Any], str | None] | None = None) -> Any:
     """Изпълнява fn() и записва резултата в RUN; връща стойността (или fallback при провал / пропусната стъпка; при провал с on_fail — on_fail(exc))."""
     res = StepResult(name=name, status="ok", label=label, consequence=consequence, source=source or name)
     if not enabled:
@@ -60,6 +62,16 @@ def step(name: str, fn: Callable[[], Any], *, fallback: Any = None, label: str, 
             raise
         return on_fail(e) if on_fail is not None else fallback
     res.seconds = round(time.monotonic() - t0, 1)
+    if failed_if is not None:
+        try:
+            why = failed_if(value)
+        except Exception as e:
+            why = None
+        if why:
+            res.status, res.reason = "failed", str(why)[:300]
+            print(f"[step] {name}: ПРОВАЛ — {res.reason}")
+            RUN.append(res)
+            return value
     if partial is not None:
         try:
             p = partial(value)

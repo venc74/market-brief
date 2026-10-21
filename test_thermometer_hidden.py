@@ -129,8 +129,8 @@ print("  ✓ fallback има формата на нормалния резулт
 
 # main.run: build_thermometer, който хвърля → run продължава (проверка на try в кода)
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "thermo = thermometer_unavailable(e)" in src
-print("  ✓ main.py опакова build_thermometer в try с fallback")
+assert 'thermo = steps.step("thermometer", lambda: build_thermometer(macro), on_fail=thermometer_unavailable' in src     # 20.10.2026 (етап 3б): в обвивката
+print("  ✓ main.py опакова build_thermometer в обвивката на стъпките с fallback thermometer_unavailable")
 
 print()
 print("── т.2: минимум видими индикатори за Offensive ──")

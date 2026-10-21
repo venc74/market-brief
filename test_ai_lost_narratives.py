@@ -76,10 +76,10 @@ assert ai_brief.NARRATIVES_LOST == [CARDS[-1]["ticker"]] and next(c for c in mer
 print(f"  ✓ пропуснатият {CARDS[-1]['ticker']} → изгубен, без AI текст; останалите — с наратива си")
 
 print()
-print("── 4. main: стъпките са в try ──")
+print("── 4. main: стъпките са в обвивката (20.10.2026, етап 3б) ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-i = src.index("narratives = ai_brief.ticker_narratives(")
-assert src.rfind("try:", 0, i) > i - 200 and "candidates = ai_brief.merge_narratives(candidates, narratives)" in src and "сливането на наративите пропадна" in src
-assert "ai_lost=list(ai_brief.NARRATIVES_LOST)" in src
-print("  ✓ ticker_narratives и merge_narratives — всяка в try; при срив класификацията е от кода; банерът получава изгубените")
+assert 'narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(' in src and "on_fail=_narratives_failed" in src
+assert 'candidates = steps.step("narratives_merge", lambda: ai_brief.merge_narratives(candidates, narratives), on_fail=_merge_failed' in src
+assert "ai_brief.NARRATIVES_LOST[:] = [c.get(\"ticker\") for c in candidates]" in src and "ai_lost=list(ai_brief.NARRATIVES_LOST)" in src
+print("  ✓ ticker_narratives и merge_narratives — всяка в обвивката (on_fail); при срив класификацията е от кода; банерът получава изгубените")
 print("\n✅ test_ai_lost_narratives: всичко мина")
