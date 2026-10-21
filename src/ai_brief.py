@@ -840,7 +840,8 @@ def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
 
 def _leaders_text(rotation: list[dict] | None) -> str:
     """19.10.2026 (т. 18): водещите сектори по кода (правилото на sector_layer.leading_sectors, до 6) — за промпта; без такива — изрично."""
-    xs = [r.get("etf") for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and (r.get("leading") or r.get("rs_at_6m_high") is True)][:6]
+    from src.sector_layer import is_leader                                     # 21.10.2026: едното правило (без потвърдено изоставащите)
+    xs = [r.get("etf") for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and is_leader(r)][:6]
     return ", ".join(xs) if xs else "няма водещ сектор днес — върни \"sector_logic\": []"
 
 

@@ -29,14 +29,15 @@ flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)
 
 print("── 1. кои сектори — от кода (РЕАЛНИТЕ брифове) ──")
 c19 = sc.sector_card(B19["ai_macro"]["sector_logic"], B19["rotation"])
-assert [r["etf"] for r in c19["rows"]] == ["XLE", "XLP", "XLV"] and all(r["chain"] for r in c19["rows"])
-assert c19["omitted"] == [{"etf": "GDX", "sector": "Златодобив", "rs_line": "RS спрямо SPY: 4 седмици -8.33%, 12 седмици +15.62%"}]
+assert [r["etf"] for r in c19["rows"]] == ["XLE", "XLV"] and all(r["chain"] for r in c19["rows"])          # 21.10 (етап 4): XLP е потвърдено изоставащ (85%) — не е водещ
+assert c19["omitted"][1] == {"etf": "GDX", "sector": "Златодобив", "rs_line": "RS спрямо SPY: 4 седмици -8.33%, 12 седмици +15.62%"}
+assert [o["etf"] for o in c19["omitted"]] == ["XLP", "GDX"] and c19["omitted"][0]["rs_line"].endswith("не е водещ: потвърдено изоставане — 85% от последните 20 сесии")
 assert c19["rows"][0]["rs_line"] == "RS спрямо SPY: 4 седмици +6.52%, 12 седмици +14.76% · RS на 6-месечен връх"
 c16 = sc.sector_card(B16["ai_macro"]["sector_logic"], B16["rotation"])
-assert [r["etf"] for r in c16["rows"]] == [r["etf"] for r in B16["rotation"] if r["leading"] or r["rs_at_6m_high"]][:6]
+assert [r["etf"] for r in c16["rows"]] == [r["etf"] for r in B16["rotation"] if (r["leading"] or r["rs_at_6m_high"]) and not r.get("confirmed_laggard")][:6]
 assert {o["etf"] for o in c16["omitted"]} == {e["etf"] for e in B16["ai_macro"]["sector_logic"]} - {r["etf"] for r in c16["rows"]}
 assert sc.sector_card([], []) == {} and sc.sector_card(None, None) == {}
-print(f"  ✓ 19.10: картата е {', '.join(r['etf'] for r in c19['rows'])} (водещите), GDX — под картата с RS −8.33% / +15.62%; 16.10: {', '.join(r['etf'] for r in c16['rows'])}, "
+print(f"  ✓ 19.10: картата е {', '.join(r['etf'] for r in c19['rows'])} (водещите; XLP — под картата, потвърдено изоставане 85%), GDX — под картата с RS −8.33% / +15.62%; 16.10: {', '.join(r['etf'] for r in c16['rows'])}, "
       f"под картата {', '.join(o['etf'] for o in c16['omitted'])}")
 
 print()
@@ -64,7 +65,7 @@ b = copy.deepcopy(B19); b["sector_card"] = c19
 with q():
     page = flat(render.render_dashboard(b, publish=False))
 sec = page.split("Секторна карта · следващите 2–6 седмици", 1)[1].split("Геополитически тези", 1)[0]
-assert "RS спрямо SPY: 4 седмици +6.52%, 12 седмици +14.76% · RS на 6-месечен връх" in sec and "Не са на картата (AI даде верига, но не са водещи по RS): GDX (4 седмици -8.33%, 12 седмици +15.62%)." in sec
+assert "RS спрямо SPY: 4 седмици +6.52%, 12 седмици +14.76% · RS на 6-месечен връх" in sec and "Не са на картата (AI даде верига, но не са водещи по RS): XLP (4 седмици +6.30%, 12 седмици +2.61% · не е водещ: потвърдено изоставане — 85% от последните 20 сесии); GDX (4 седмици -8.33%, 12 седмици +15.62%)." in sec
 assert "Златодобив" not in sec.split("Не са на картата")[0]
 old = copy.deepcopy(B16); old.pop("sector_card", None)                                  # стар бриф: веригите на модела, хоризонтът — форматиран
 with q():
@@ -74,9 +75,9 @@ print("  ✓ 19.10: водещите с RS реда от кода, GDX в ред
 
 print()
 print("── 5. промптът и main ──")
-assert ai_brief._leaders_text(B19["rotation"]) == "XLE, XLP, XLV" and "няма водещ сектор днес" in ai_brief._leaders_text([])
+assert ai_brief._leaders_text(B19["rotation"]) == "XLE, XLV" and "няма водещ сектор днес" in ai_brief._leaders_text([])
 src = (ROOT / "src" / "ai_brief.py").read_text(encoding="utf-8")
 assert "{_leaders_text(rotation)}" in src and '"horizon_weeks" е ЕДНО число от 2 до 6' in src
 assert "sector_card = steps.step(\"sector_card\", lambda: sector_claims.sector_card((ai_macro or {}).get(\"sector_logic\"), rotation)" in (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-print("  ✓ промптът носи водещите по кода (19.10: XLE, XLP, XLV), хоризонт — едно число 2–6, думи вместо имена на полета; main записва sector_card")
+print("  ✓ промптът носи водещите по кода (19.10: XLE, XLV — XLP е потвърдено изоставащ), хоризонт — едно число 2–6, думи вместо имена на полета; main записва sector_card")
 print("\n✅ test_sector_card: всичко мина")

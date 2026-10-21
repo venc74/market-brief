@@ -1,0 +1,251 @@
+{
+ "_note": "РЕАЛНО: rotation и ai_macro.sector_logic от брифа на 21.10.2026 (origin/main data/2026-10-21.json) и картата sector_card от същия бриф (по стария код: XLE, XLP, XLV, XLY).",
+ "rotation": [
+  {
+   "etf": "XLE",
+   "sector": "Енергетика",
+   "rs_chg_4w_pct": 10.64,
+   "rs_chg_12w_pct": 10.25,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 10.02,
+   "leading": true,
+   "laggard_persistence_pct": 0.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLP",
+   "sector": "Потребителски (защитни)",
+   "rs_chg_4w_pct": 6.67,
+   "rs_chg_12w_pct": 1.64,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 6.07,
+   "leading": true,
+   "laggard_persistence_pct": 75.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLV",
+   "sector": "Здравеопазване",
+   "rs_chg_4w_pct": 6.44,
+   "rs_chg_12w_pct": 7.06,
+   "rs_at_6m_high": true,
+   "abs_chg_4w_pct": 5.84,
+   "leading": true,
+   "laggard_persistence_pct": 15.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLU",
+   "sector": "Комунални услуги",
+   "rs_chg_4w_pct": 3.91,
+   "rs_chg_12w_pct": -12.55,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 3.33,
+   "leading": false,
+   "laggard_persistence_pct": 85.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLY",
+   "sector": "Потребителски (циклични)",
+   "rs_chg_4w_pct": 3.4,
+   "rs_chg_12w_pct": 1.91,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.82,
+   "leading": true,
+   "laggard_persistence_pct": 80.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLF",
+   "sector": "Финанси",
+   "rs_chg_4w_pct": 2.25,
+   "rs_chg_12w_pct": -4.1,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 1.68,
+   "leading": false,
+   "laggard_persistence_pct": 95.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLB",
+   "sector": "Материали",
+   "rs_chg_4w_pct": 1.96,
+   "rs_chg_12w_pct": -2.01,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 1.39,
+   "leading": false,
+   "laggard_persistence_pct": 85.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLRE",
+   "sector": "Недвижими имоти",
+   "rs_chg_4w_pct": 0.28,
+   "rs_chg_12w_pct": -8.97,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.28,
+   "leading": false,
+   "laggard_persistence_pct": 95.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLI",
+   "sector": "Индустрия",
+   "rs_chg_4w_pct": -1.49,
+   "rs_chg_12w_pct": -11.98,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -2.04,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLC",
+   "sector": "Комуникации",
+   "rs_chg_4w_pct": -2.4,
+   "rs_chg_12w_pct": 0.45,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -2.94,
+   "leading": false,
+   "laggard_persistence_pct": 70.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "ITA",
+   "sector": "Отбрана",
+   "rs_chg_4w_pct": -3.13,
+   "rs_chg_12w_pct": -17.05,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -3.67,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XBI",
+   "sector": "Биотех",
+   "rs_chg_4w_pct": -4.8,
+   "rs_chg_12w_pct": -3.62,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -5.33,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLK",
+   "sector": "Технологии",
+   "rs_chg_4w_pct": -4.99,
+   "rs_chg_12w_pct": -0.39,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -5.52,
+   "leading": false,
+   "laggard_persistence_pct": 5.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "SMH",
+   "sector": "Полупроводници",
+   "rs_chg_4w_pct": -9.55,
+   "rs_chg_12w_pct": -9.83,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -10.06,
+   "leading": false,
+   "laggard_persistence_pct": 20.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "TAN",
+   "sector": "Соларна",
+   "rs_chg_4w_pct": -9.71,
+   "rs_chg_12w_pct": -24.36,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -10.22,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "GDX",
+   "sector": "Златодобив",
+   "rs_chg_4w_pct": -11.49,
+   "rs_chg_12w_pct": 9.89,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -11.99,
+   "leading": false,
+   "laggard_persistence_pct": 0.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "URA",
+   "sector": "Уран/ядрена",
+   "rs_chg_4w_pct": -19.12,
+   "rs_chg_12w_pct": -18.1,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -19.57,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  }
+ ],
+ "sector_logic": [
+  {
+   "sector": "Енергетика",
+   "etf": "XLE",
+   "chain": "Близкоизточни рискове за доставките + US inventory drawdowns → петролът (CLZ26) +5.41% за 5 дни до $98.98 → производителите на петрол и газ реализират по-висока маржа директно → XLE RS за 4 седмици +10.64% и RS за 12 седмици +10.25%, абсолютна промяна +10.02% за 4 седмици → единственият сектор с убедено лидерство и на двата хоризонта и без история на изоставане (дял на изоставането 0%); United Airlines снижава прогнозата заради jet fuel, което потвърждава, че петролният шок е реален и вече се усеща надолу по веригата — потребителите на горива губят, производителите печелят.",
+   "horizon_weeks": 6
+  },
+  {
+   "sector": "Здравеопазване",
+   "etf": "XLV",
+   "chain": "Defensive режим (IEI/HYG override) → ротация към нециклични сектори с устойчиви приходи → здравеопазването исторически задържа маржа при кредитно стресиране → XLV RS за 4 седмици +6.44% и RS за 12 седмици +7.06%, единственият сектор на 6-месечен връх по RS → Novo Nordisk CagriSema данни за 25% загуба на тегло при жени потвърждават GLP-1 pipeline стойността и привличат секторен капитал независимо от макро режима; дял на изоставането 15% — чисто лидерство без хроничен laggard характер.",
+   "horizon_weeks": 5
+  },
+  {
+   "sector": "Потребителски (защитни)",
+   "etf": "XLP",
+   "chain": "Defensive режим + credit spread разширяване → инвеститорите намаляват експозиция към циклично и търсят некорелирани с кредита cashflow-генератори → XLP RS за 4 седмици +6.67% и RS за 12 седмици +1.64%, абсолютна промяна +6.07% за 4 седмици → логиката е ротационна, не секторно-специфична (нито петрол, нито фарма катализатор); внимание: дял на изоставането е 75% исторически — секторът е потвърден laggard в по-дълъг хоризонт, 4-седмичното RS движение е позиционна ротация в Defensive, не структурно лидерство.",
+   "horizon_weeks": 4
+  },
+  {
+   "sector": "Потребителски (циклични)",
+   "etf": "XLY",
+   "chain": "US10Y пада −10 б.п. за седмицата до 5.12% → намалява дисконтовия натиск върху discretionary потребление с дълги duration приходи → в комбинация с 54% пазарна ширина (% акции над 40-дневна MA) потребителят все още харчи въпреки по-скъпото финансиране → XLY RS за 4 седмици +3.40% и RS за 12 седмици +1.91%; предупреждение: дял на изоставането е 80% и секторът е потвърден laggard — 4-седмичното движение е вероятно техническо, не фундаментално лидерство; United Airlines данни за „travelers keep booking despite higher fares\" поддържат нарратива за устойчиво потребление, но горивният инфлационен ефект е насрещен вятър.",
+   "horizon_weeks": 4
+  }
+ ],
+ "sector_card": {
+  "rows": [
+   {
+    "etf": "XLE",
+    "sector": "Енергетика",
+    "rs_line": "RS спрямо SPY: 4 седмици +10.64%, 12 седмици +10.25%",
+    "chain": "Близкоизточни рискове за доставките + US inventory drawdowns → петролът (CLZ26) +5.41% за 5 дни до $98.98 → производителите на петрол и газ реализират по-висока маржа директно → XLE RS за 4 седмици +10.64% и RS за 12 седмици +10.25%, абсолютна промяна +10.02% за 4 седмици → единственият сектор с убедено лидерство и на двата хоризонта и без история на изоставане (дял на изоставането 0%); United Airlines снижава прогнозата заради jet fuel, което потвърждава, че петролният шок е реален и вече се усеща надолу по веригата — потребителите на горива губят, производителите печелят.",
+    "horizon": "6 седмици"
+   },
+   {
+    "etf": "XLP",
+    "sector": "Потребителски (защитни)",
+    "rs_line": "RS спрямо SPY: 4 седмици +6.67%, 12 седмици +1.64%",
+    "chain": "Defensive режим + credit spread разширяване → инвеститорите намаляват експозиция към циклично и търсят некорелирани с кредита cashflow-генератори → XLP RS за 4 седмици +6.67% и RS за 12 седмици +1.64%, абсолютна промяна +6.07% за 4 седмици → логиката е ротационна, не секторно-специфична (нито петрол, нито фарма катализатор); внимание: дял на изоставането е 75% исторически — секторът е потвърден laggard в по-дълъг хоризонт, 4-седмичното RS движение е позиционна ротация в Defensive, не структурно лидерство.",
+    "horizon": "4 седмици"
+   },
+   {
+    "etf": "XLV",
+    "sector": "Здравеопазване",
+    "rs_line": "RS спрямо SPY: 4 седмици +6.44%, 12 седмици +7.06% · RS на 6-месечен връх",
+    "chain": "Defensive режим (IEI/HYG override) → ротация към нециклични сектори с устойчиви приходи → здравеопазването исторически задържа маржа при кредитно стресиране → XLV RS за 4 седмици +6.44% и RS за 12 седмици +7.06%, единственият сектор на 6-месечен връх по RS → Novo Nordisk CagriSema данни за 25% загуба на тегло при жени потвърждават GLP-1 pipeline стойността и привличат секторен капитал независимо от макро режима; дял на изоставането 15% — чисто лидерство без хроничен laggard характер.",
+    "horizon": "5 седмици"
+   },
+   {
+    "etf": "XLY",
+    "sector": "Потребителски (циклични)",
+    "rs_line": "RS спрямо SPY: 4 седмици +3.40%, 12 седмици +1.91%",
+    "chain": "US10Y пада −10 б.п. за седмицата до 5.12% → намалява дисконтовия натиск върху discretionary потребление с дълги duration приходи → в комбинация с 54% пазарна ширина (% акции над 40-дневна MA) потребителят все още харчи въпреки по-скъпото финансиране → XLY RS за 4 седмици +3.40% и RS за 12 седмици +1.91%; предупреждение: дял на изоставането е 80% и секторът е потвърден laggard — 4-седмичното движение е вероятно техническо, не фундаментално лидерство; United Airlines данни за „travelers keep booking despite higher fares\" поддържат нарратива за устойчиво потребление, но горивният инфлационен ефект е насрещен вятър.",
+    "horizon": "4 седмици"
+   }
+  ],
+  "omitted": []
+ }
+}

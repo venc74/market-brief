@@ -124,9 +124,18 @@ def sector_rotation() -> list[dict]:
     return results
 
 
+def is_leader(row: dict) -> bool:
+    """
+    21.10.2026 (етап 4): ЕДНОТО правило за „водещ сектор“ — RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх, И да НЕ е потвърдено изоставащ
+    (confirmed_laggard — both-negative в поне SECTOR_PERSISTENCE_MIN_DAYS от последните SECTOR_PERSISTENCE_WINDOW_DAYS дни). Реално на 21.10: XLP (75%) и XLY (80%) бяха „водещи“
+    по снимката на деня, а текстът им ги наричаше потвърдено изоставащи. Ползват го leading_sectors (подредба и SECT✓), картата и промптът.
+    """
+    return bool((row.get("leading") or row.get("rs_at_6m_high") is True) and not row.get("confirmed_laggard"))
+
+
 def leading_sectors(rotation: list[dict], top_n: int = 6) -> list[dict]:
-    """Секторите с положителна RS динамика — входът за скрининга (Слой 3)."""
-    leaders = [s for s in rotation if s["leading"] or s["rs_at_6m_high"]]
+    """Секторите с положителна RS динамика — входът за скрининга (Слой 3). 21.10.2026: по is_leader (без потвърдено изоставащите)."""
+    leaders = [s for s in rotation if is_leader(s)]
     return leaders[:top_n] if leaders else rotation[:3]
 
 

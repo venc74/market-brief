@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import re
 
+import config
+
 _ETF = r"\b(XL[A-Z]{1,2}|SMH|XBI|ITA|TAN|GDX|URA)\b"
 _CLAIM = re.compile(r"(?P<pre>\bе\s+)?(?P<word>единствени(?:ят|я)|единственото|единствената|единствен)\s+(?P<adj>(?:[\w-]+\s+){0,2}?)(?:сектор|ETF)\s+с\s+"
                     r"(?:потвърдена\s+|устойчива\s+)?(?:положителна|позитивна)\s+(?P<mid>[^;→(),:]{0,40}?)\bRS\b(?P<tail>(?:\s+(?:и\s+)?(?:на|за|по)\s+[^;→(),:.—]{1,40})?)", re.I)
@@ -209,7 +211,8 @@ def sector_card(sector_logic: list[dict] | None, rotation: list[dict] | None, to
     rows = [r for r in (rotation or []) if isinstance(r, dict) and r.get("etf")]
     if not rows:
         return {}
-    leaders = [r for r in rows if r.get("leading") or r.get("rs_at_6m_high") is True][:top_n]
+    from src.sector_layer import is_leader                                     # 21.10.2026: едното правило — без потвърдено изоставащите (XLP, XLY на 21.10)
+    leaders = [r for r in rows if is_leader(r)][:top_n]
     ai = {str(x.get("etf")): x for x in (sector_logic or []) if isinstance(x, dict) and x.get("etf")}
     by_etf = {r["etf"]: r for r in rows}
     out = {"rows": [], "omitted": []}
@@ -221,5 +224,9 @@ def sector_card(sector_logic: list[dict] | None, rotation: list[dict] | None, to
     for etf, x in ai.items():
         if etf not in lead:
             r = by_etf.get(etf) or {}
-            out["omitted"].append({"etf": etf, "sector": r.get("sector") or x.get("sector") or etf, "rs_line": _rs_line(r) if r else "няма го в ротацията"})
+            line = _rs_line(r) if r else "няма го в ротацията"
+            if r and r.get("confirmed_laggard") and (r.get("leading") or r.get("rs_at_6m_high") is True):
+                line += (f" · не е водещ: потвърдено изоставане — {r['laggard_persistence_pct']:.0f}% от последните {config.SECTOR_PERSISTENCE_WINDOW_DAYS} сесии"
+                         if isinstance(r.get("laggard_persistence_pct"), (int, float)) else " · не е водещ: потвърдено изоставане")
+            out["omitted"].append({"etf": etf, "sector": r.get("sector") or x.get("sector") or etf, "rs_line": line})
     return out
