@@ -811,6 +811,7 @@
       <div class="thesis-head">
         <span class="thesis-name">{{ th.name }}</span>
         <span class="thesis-status {{ th.status }}">{{ "активна" if th.status == "active" else "структурна" if th.status == "structural" else "наблюдава се" }}</span>
+        {% if th.overdue_text %}<span class="thesis-status watch" style="color:var(--yellow)" title="Срокът за преглед беше {{ th.review_by }}">⚠ {{ th.overdue_text }}</span>{% endif %}
         {# 19.10.2026 (т. 10, решение "в"): без AI етикети ("потвърдена / опровергана от новина", "друг път", "разрешена") и без бележката на модела #}
       </div>
       <div class="thesis-tickers">{{ th.tickers|join("  ·  ") }}</div>

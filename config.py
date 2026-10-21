@@ -480,9 +480,13 @@ MAGIC_FORMULA_UNIVERSE = [
 # FIX 2026-09-29: "sector_etf" — секторът за карето "Контекст" (src/
 # thesis_context.py); трябва да е ключ от SECTOR_ETFS, иначе "—".
 # "sector_etf_label" — изричен надпис, когато ETF-ът е прокси.
+# 21.10.2026 (етап 4, ритъм на данните): всяка теза носи "reviewed" — датата на последния преглед; след "reviewed" + THESIS_REVIEW_DAYS (или изричното "review_by")
+# картата казва "остаряла, не е преглеждана от ДД.ММ.ГГГГ". Началните дати са последната промяна на блока в config (git blame към 21.10) — до първия истински преглед.
+THESIS_REVIEW_DAYS = int(os.getenv("THESIS_REVIEW_DAYS", 90))
 THESIS_BASKETS = [
     {
         "name": "Въглища и LNG",
+        "reviewed": "2026-10-08",
         # FIX 2026-09-29: CEIX → CNR (CONSOL + Arch = Core Natural Resources от
         # 15.01.2025); TELL махнат (купена от Woodside, сделката приключи 08.10.2024).
         # И двата мълчаха месеци без ценови данни.
@@ -500,6 +504,7 @@ THESIS_BASKETS = [
     },
     {
         "name": "Ядрена енергия",
+        "reviewed": "2026-10-08",
         "tickers": ["VST", "CEG", "OKLO", "CCJ", "DNN", "NNE"],
         "sector_etf": "URA",
         # 08.10 (2в): подгрупи със СОБСТВЕН ориентир — добивът на уран и операторите/реакторите не се движат заедно (общият URA е ориентир само за добива); каре "Контекст" по група
@@ -519,6 +524,7 @@ THESIS_BASKETS = [
     },
     {
         "name": "Отбрана и дронове",
+        "reviewed": "2026-10-08",
         "tickers": ["LMT", "RTX", "NOC", "SWMR"],
         "sector_etf": "ITA",
         "names": ["Lockheed", "Raytheon", "Northrop", "Swarmer"],
@@ -531,6 +537,8 @@ THESIS_BASKETS = [
     },
     {
         "name": "Крипто регулация (CLARITY Act)",
+        # маха се, когато тръгне крипто секцията (решение от 21.10.2026)
+        "reviewed": "2026-10-08",
         "tickers": ["CRCL", "COIN", "HOOD", "BLSH"],
         "sector_etf": None,  # няма крипто ETF в SECTOR_ETFS → "—"
         "names": ["Circle", "Coinbase", "Robinhood", "Bullish"],
@@ -543,6 +551,7 @@ THESIS_BASKETS = [
     },
     {
         "name": "Полупроводници и AI инфраструктура",
+        "reviewed": "2026-10-08",
         "tickers": ["AVGO", "AMAT", "MCHP"],
         "sector_etf": "SMH",
         "names": ["Broadcom", "Applied Materials", "Microchip"],
@@ -555,6 +564,7 @@ THESIS_BASKETS = [
     },
     {
         "name": "Финанси при стръмна крива",
+        "reviewed": "2026-09-29",
         "tickers": ["JPM", "BAC"],
         "sector_etf": "XLF",
         "names": ["JPMorgan", "Bank of America"],

@@ -514,10 +514,24 @@ def _trigger_fires(trigger: str | None, macro: dict) -> tuple[bool, str]:
     return False, ""
 
 
-def thesis_monitor(macro: dict) -> list[dict]:
+def thesis_review(b: dict, today: dt.date | None = None) -> dict:
+    """21.10.2026 (етап 4): {"reviewed", "review_by", "overdue", "overdue_text"} — срокът е "review_by" или "reviewed" + THESIS_REVIEW_DAYS; без дата → без етикет. Чиста функция."""
+    try:
+        rev = b.get("reviewed")
+        if not rev:
+            return {"reviewed": None, "review_by": None, "overdue": False, "overdue_text": None}
+        by = b.get("review_by") or (dt.date.fromisoformat(rev) + dt.timedelta(days=config.THESIS_REVIEW_DAYS)).isoformat()
+        overdue = (today or dt.date.today()).isoformat() > by
+        return {"reviewed": rev, "review_by": by, "overdue": overdue,
+                "overdue_text": f"остаряла, не е преглеждана от {rev[8:10]}.{rev[5:7]}.{rev[:4]}" if overdue else None}
+    except (ValueError, TypeError):
+        return {"reviewed": b.get("reviewed"), "review_by": None, "overdue": False, "overdue_text": None}
+
+
+def thesis_monitor(macro: dict, today: dt.date | None = None) -> list[dict]:
     """
     Връща списък активни/структурни/наблюдавани тези с обяснение на веригата.
-    Подава се на секторния бриф и dashboard-а (нов раздел).
+    Подава се на секторния бриф и dashboard-а (нов раздел). 21.10.2026: + датите на прегледа (thesis_review).
     """
     out = []
     for b in config.THESIS_BASKETS:
@@ -531,6 +545,7 @@ def thesis_monitor(macro: dict) -> list[dict]:
             "status": status,          # active | structural | watch
             "chain": b["chain"],
             "trigger_reason": why,
+            **thesis_review(b, today),
         })
     # активните най-отгоре, после структурните, после наблюдаваните
     order = {"active": 0, "structural": 1, "watch": 2}
