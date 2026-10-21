@@ -874,7 +874,7 @@ def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date)
     """
     t = rec["ticker"]
     if opens is None or t not in getattr(opens, "columns", []) or t not in getattr(closes, "columns", []):
-        print(f"[backtest] {t}: няма Open/Close в batch резултата — пропускам GLB по Уиш резолюцията")
+        print(f"[backtest] {t}: няма Open/Close в batch резултата — пропускам резолюцията на {config.GLB_CLOSE_BOOK_NAME}")
         return
     if rec.get("needs_manual_review"):                                             # 13.10.2026: съществено отделяне след сигнала — не се резолвира автоматично
         return
@@ -886,7 +886,7 @@ def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date)
         # линията и изходът по нея наследяват грешката → ръчен преглед, както QM; резултатът не се записва
         prev = rec.get("needs_manual_review") or {}
         rec["needs_manual_review"] = {"reason": "spin_off_after_entry", "split_ratio": round(float(scale), 4), "since": prev.get("since") or today.isoformat()}
-        print(f"[backtest] {t}: GLB по Уиш — отделяне след сигнала (коефициент {float(scale):g}) — линията не се мащабира, остава needs_manual_review")
+        print(f"[backtest] {t}: {config.GLB_CLOSE_BOOK_NAME} — отделяне след сигнала (коефициент {float(scale):g}) — линията не се мащабира, остава needs_manual_review")
         return
     for k in _GW_RESULT_KEYS:
         rec[k] = res.get(k)
@@ -1017,7 +1017,7 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
             try:
                 _resolve_glb_wish_record(rec, opens, closes, spy_bars, today)
             except Exception as e:
-                print(f"[backtest] {ticker}: GLB по Уиш резолюцията неуспешна, остава {rec['status']}: {e}")
+                print(f"[backtest] {ticker}: резолюцията на {config.GLB_CLOSE_BOOK_NAME} неуспешна, остава {rec['status']}: {e}")
             continue
         if rec.get("category") == CATEGORY_QM:                                        # Qullamaggie книгата има собствена симулация и собствена политика за сплитове
             try:

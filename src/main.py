@@ -766,7 +766,7 @@ def run() -> dict:
     _gs = lambda: glb_screener.LAST_STATUS or {}
     glb_candidates, glb_wish_signals = steps.step("glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS)), fallback=([], glb_wish_signals),
                                                   enabled=config.ENABLE_GLB_SCREENER, on_fail=_glb_failed, label="GLB скрийнърът",
-                                                  consequence="празният списък и липсващите сигнали за книгата „GLB по Уиш“ днес НЕ значат, че няма пробиви",
+                                                  consequence=f"празният списък и липсващите сигнали за книгата „{config.GLB_CLOSE_BOOK_NAME}“ днес НЕ значат, че няма пробиви",
                                                   failed_if=lambda v: (_gs().get("error") or "не се изпълни") if _gs().get("ok") is False else None,
                                                   partial=lambda v: (f"{_gs()['batches_failed']} от {_gs().get('batches')} партиди", {}) if _gs().get("batches_failed") else None)
     # 13.10.2026: GLB карта / сигнал на книгата "GLB по Уиш", чиято линия е от месец ПРЕДИ отделяне (нецял коефициент) → не се показва и не се записва (CTVA 13.10)
@@ -885,7 +885,7 @@ def run() -> dict:
     def _book_glb_wish():                                                      # GLB по Уиш: отделната книга glb_wish (чисто локално четене)
         backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()
     steps.step("book_glb_wish", _book_glb_wish, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_GLB_WISH),
-               label="Обобщението на книгата „GLB по Уиш“", consequence=_book_consequence)
+               label=f"Обобщението на книгата „{config.GLB_CLOSE_BOOK_NAME}“", consequence=_book_consequence)
 
     # FIX 2026-09-12 (findings log 04-11.09, т.3): GLB кандидатите нямаха
     # cross-reference срещу Track Record отворени позиции — потвърден gap

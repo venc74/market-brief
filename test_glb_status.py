@@ -54,7 +54,7 @@ print("  ✓ всички партиди паднали → ok False, 2/2 пад
 print()
 print("── 2. банерът ──")
 w = data_warnings.collect(None, None, glb_status=st)
-assert len(w) == 1 and w[0]["source"] == "glb" and "НЕ значи, че няма GLB кандидати" in w[0]["message"] and "„GLB по Уиш“ не получи сигнали" in w[0]["message"]
+assert len(w) == 1 and w[0]["source"] == "glb" and "НЕ значи, че няма GLB кандидати" in w[0]["message"] and f"„{config.GLB_CLOSE_BOOK_NAME}“ не получи сигнали" in w[0]["message"] and "по Уиш" not in w[0]["message"]
 w2 = data_warnings.collect(None, None, glb_status=st2)
 assert len(w2) == 1 and "1 от 2 партиди" in w2[0]["message"] and "върху 1 от 3 тикъра" in w2[0]["message"]
 ok0 = {"ok": True, "error": None, "universe": 903, "batches": 19, "batches_failed": 0, "with_history": 901, "candidates": 0, "wish_signals": 0}

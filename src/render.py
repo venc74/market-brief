@@ -350,7 +350,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
         corp_excluded=brief.get("corp_excluded") or {},                # 13.10: изключени заради отделяне — ред под секциите
         glb_min_months=config.GLB_MIN_MONTHS_UNPENETRATED, glb_band_hold=f"{config.GLB_MIN_BAND_HOLD_PCT:.0f}", glb_days=config.GLB_MIN_CONSOLIDATION_DAYS,
-        glb_approach=f"{config.GLB_APPROACH_PCT:.0f}", glb_vol_bars=config.GLB_VOLUME_AVG_BARS, glb_wish_replay=config.GLB_WISH_REPLAY_STATS,
+        glb_approach=f"{config.GLB_APPROACH_PCT:.0f}", glb_vol_bars=config.GLB_VOLUME_AVG_BARS, glb_wish_replay=config.GLB_WISH_REPLAY_STATS, glb_book_name=config.GLB_CLOSE_BOOK_NAME,
         # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)
         sizing_core_js=_asset("sizing_core.js"), sizing_ui_js=_asset("sizing_ui.js"),      # 07.10: оразмеряването е в браузъра (localStorage), не в брифа
         qm_cards=brief.get("qm_breakout") or [],

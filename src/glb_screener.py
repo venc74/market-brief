@@ -529,7 +529,7 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                    "universe": len(universe), "batches": batches, "batches_failed": failed, "with_history": with_history,
                    "candidates": len(results), "wish_signals": len(wish_signals)}
     if config.TRACK_GLB_WISH:
-        print(f"[glb_screener] GLB по Уиш: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
+        print(f"[glb_screener] {config.GLB_CLOSE_BOOK_NAME}: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
     classic = [r for r in results if r["glb_type"] == "classic"]
     momentum = [r for r in results if r["glb_type"] == "momentum"]
     insufficient = [r for r in results if r["glb_type"] == "insufficient_history"]

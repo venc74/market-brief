@@ -313,15 +313,15 @@ print("── 9. страницата ──")
 B05 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 with contextlib.redirect_stdout(io.StringIO()):
     page_old = render.render_dashboard(copy.deepcopy(B05))
-assert "GLB по Уиш · книга" not in page_old
+assert f"{config.GLB_CLOSE_BOOK_NAME} · книга" not in page_old and "GLB по Уиш · книга" not in page_old
 print("  ✓ стар бриф без ключа 'glb_wish' в backtest → секцията я няма и страницата се рендерира")
 b = copy.deepcopy(B05)
 b.setdefault("backtest", {})["glb_wish"] = SL
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b)
-sec = page[page.index("GLB по Уиш · книга"):]
+sec = page[page.index(f"{config.GLB_CLOSE_BOOK_NAME} · книга"):]          # 21.10: честното име — линията е нашата (close)
 sec = sec[:sec.index("</section>")]
-assert "измерване, не препоръка" in page[page.index("GLB по Уиш · книга"):][:200] and "Буквалното правило на Eric Wish без нашите филтри" in sec and "оцелели" in sec and "тесен" not in sec.lower()
+assert "GLB по Уиш · книга" not in page and "измерване, не препоръка" in page[page.index(f"{config.GLB_CLOSE_BOOK_NAME} · книга"):][:200] and "Правилото за вход и изход е на Eric Wish, линията е наша" in sec and "най-високата цена (High)" in sec and "оцелели" in sec and "тесен" not in sec.lower()
 assert "Измерване — книга glb_wish: записани 37" in sec and f"win rate {SL['all']['win_rate_pct']}%" in sec and "по построение загуби" in sec and "затворени 20 / отворени по текуща цена 17" in sec and "затворени 20 (изход по линията 19 · изтекли по нашия таван 1) / отворени по текуща цена 17" in re.sub(r"<[^>]+>", "", sec) and "Отворени по текуща цена (17)" in sec and "Изтекли по нашия таван (1" in sec
 assert "НАШ — при Уиш няма такъв" in sec and "от 252 сесии" in sec and "изтекла по нашия таван" in sec
 assert sec.count("<tr><td class=\"sym\">T1") >= 10 and "от 17, най-новите" in sec and "и Action" not in sec
