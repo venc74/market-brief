@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20",
+ "updated": "2026-10-21",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -400,6 +400,26 @@
    "since": "2026-10-19",
    "since_close": 210.33,
    "since_bar": "2026-10-16"
+  },
+  "BRK-B": {
+   "ticker": "BRK-B",
+   "company": "Berkshire Hathaway Inc. New",
+   "glb_type": "classic",
+   "prior_high": 533.25,
+   "prior_high_month": "2025-04",
+   "months_unpenetrated": 17,
+   "ath_label": "all_time_high",
+   "history_years": 30.4,
+   "breakout_volume_ratio": 1.21,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 9.69,
+    "meets_tightness": true
+   },
+   "line": 533.25,
+   "since": "2026-10-21",
+   "since_close": 539.82,
+   "since_bar": "2026-10-20"
   }
  },
  "seed": {

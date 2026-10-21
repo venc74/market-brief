@@ -1,31 +1,51 @@
 {
- "date": "2026-10-20",
+ "date": "2026-10-21",
  "bundle": {
   "moves": [
    {
     "ticker": "GOOGL",
+    "cusip": "02079K305",
     "company": "ALPHABET INC",
     "manager": "Уорън Бъфет · Berkshire Hathaway",
     "action": "увеличена",
     "value": 28157599351.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "ticker_source": "cusip",
+    "managers": [
+     "Уорън Бъфет · Berkshire Hathaway",
+     "Даниел Лоуб · Third Point"
+    ],
+    "count": 2
+   },
+   {
+    "ticker": "GOOG",
+    "cusip": "02079K107",
+    "company": "ALPHABET INC",
+    "manager": "Уорън Бъфет · Berkshire Hathaway",
+    "action": "увеличена",
+    "value": 9606489032.0,
+    "period": "13F · 2026-08-14",
+    "_resolved": true,
+    "ticker_by_name": "GOOGL",
+    "ticker_source": "cusip",
     "managers": [
      "Уорън Бъфет · Berkshire Hathaway",
      "Сет Кларман · Baupost Group",
-     "Крис Хон · TCI Fund Management",
-     "Даниел Лоуб · Third Point"
+     "Крис Хон · TCI Fund Management"
     ],
-    "count": 5
+    "count": 3
    },
    {
     "ticker": "UBER",
+    "cusip": "90353T100",
     "company": "UBER TECHNOLOGIES INC",
     "manager": "Бил Акман · Pershing Square",
     "action": "увеличена",
     "value": 2476978592.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Бил Акман · Pershing Square",
      "Тери Смит · Fundsmith"
@@ -34,12 +54,14 @@
    },
    {
     "ticker": "MSFT",
+    "cusip": "594918104",
     "company": "MICROSOFT CORP",
     "manager": "Бил Акман · Pershing Square",
     "action": "увеличена",
     "value": 2315234425.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Бил Акман · Pershing Square"
     ],
@@ -47,12 +69,14 @@
    },
    {
     "ticker": "AMZN",
+    "cusip": "023135106",
     "company": "AMAZON COM INC",
     "manager": "Сет Кларман · Baupost Group",
     "action": "увеличена",
     "value": 1191700000.0,
     "period": "13F · 2026-08-13",
     "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Сет Кларман · Baupost Group",
      "Дейвид Тепър · Appaloosa Management",
@@ -62,53 +86,46 @@
    },
    {
     "ticker": "NBIS",
+    "cusip": "N97284108",
     "company": "NEBIUS GROUP N.V.",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "action": "нова позиция",
     "value": 1175934069.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Стивън Мандел · Lone Pine Capital"
     ],
     "count": 1
    },
    {
-    "ticker": "SEAGATE TECHNOLOGY",
+    "ticker": "STX",
+    "cusip": "G7997R103",
     "company": "SEAGATE TECHNOLOGY HLDNGS PL",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "action": "нова позиция",
     "value": 965105185.0,
     "period": "13F · 2026-08-14",
-    "_resolved": false,
+    "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Стивън Мандел · Lone Pine Capital"
     ],
     "count": 1
    },
    {
-    "ticker": "AMPHENOL CORP",
+    "ticker": "APH",
+    "cusip": "032095101",
     "company": "AMPHENOL CORP",
     "manager": "Джон Армитидж · Egerton Capital",
     "action": "увеличена",
-    "value": 858094428.0,
-    "period": "13F · 2026-07-21",
-    "_resolved": false,
+    "value": 902744506.0,
+    "period": "13F · 2026-10-20",
+    "_resolved": true,
+    "ticker_source": "cusip",
     "managers": [
      "Джон Армитидж · Egerton Capital"
-    ],
-    "count": 1
-   },
-   {
-    "ticker": "PDD",
-    "company": "PDD HOLDINGS INC",
-    "manager": "Ли Лу · Himalaya Capital Management",
-    "action": "увеличена",
-    "value": 820858157.0,
-    "period": "13F · 2026-08-14",
-    "_resolved": true,
-    "managers": [
-     "Ли Лу · Himalaya Capital Management"
     ],
     "count": 1
    }
@@ -116,363 +133,423 @@
   "new_positions": [
    {
     "ticker": "WBD",
+    "cusip": "934423104",
     "company": "WARNER BROS DISCOVERY INC",
     "manager": "Даниел Лоуб · Third Point",
     "value": 533200000.0,
     "pct_of_portfolio": 11.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "name"
    },
    {
     "ticker": "NBIS",
+    "cusip": "N97284108",
     "company": "NEBIUS GROUP N.V.",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 1175934069.0,
     "pct_of_portfolio": 7.2,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "SEAGATE TECHNOLOGY",
+    "ticker": "STX",
+    "cusip": "G7997R103",
     "company": "SEAGATE TECHNOLOGY HLDNGS PL",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 965105185.0,
     "pct_of_portfolio": 5.9,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "V",
+    "cusip": "92826C839",
     "company": "VISA INC",
     "manager": "Бил Акман · Pershing Square",
     "value": 1122065552.0,
     "pct_of_portfolio": 5.8,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "MASTERCARD INCORPORATED",
+    "ticker": "MA",
+    "cusip": "57636Q104",
     "company": "MASTERCARD INCORPORATED",
     "manager": "Бил Акман · Pershing Square",
     "value": 1091218186.0,
     "pct_of_portfolio": 5.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "HD",
+    "cusip": "437076102",
     "company": "HOME DEPOT INC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 918092697.0,
     "pct_of_portfolio": 5.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "SPGI",
+    "cusip": "78409V104",
     "company": "S&P GLOBAL INC",
     "manager": "Бил Акман · Pershing Square",
     "value": 1056088305.0,
     "pct_of_portfolio": 5.4,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "APPLIED MATLS INC",
+    "ticker": "AMAT",
+    "cusip": "038222105",
     "company": "APPLIED MATLS INC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 873193851.0,
     "pct_of_portfolio": 5.3,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "LIN",
+    "cusip": "G54950103",
     "company": "LINDE PLC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 808550554.0,
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "DASH",
+    "cusip": "25809K105",
     "company": "DOORDASH INC",
     "manager": "Triple Frond Partners",
     "value": 55404000.0,
     "pct_of_portfolio": 4.9,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "NFLX",
+    "cusip": "64110L106",
     "company": "NETFLIX INC.",
     "manager": "Бил Акман · Pershing Square",
     "value": 934016601.0,
     "pct_of_portfolio": 4.8,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "INDV",
+    "cusip": "45579U109",
     "company": "INDIVIOR PHARMACEUTICALS INC",
     "manager": "Хауърд Маркс · Oaktree Capital Management",
     "value": 251399508.0,
     "pct_of_portfolio": 4.7,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "MASTERCARD INCORPORATED",
+    "ticker": "MA",
+    "cusip": "57636Q104",
     "company": "MASTERCARD INCORPORATED",
     "manager": "Тери Смит · Fundsmith",
     "value": 639458194.0,
     "pct_of_portfolio": 4.7,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "UBER",
+    "cusip": "90353T100",
     "company": "UBER TECHNOLOGIES INC",
     "manager": "Тери Смит · Fundsmith",
     "value": 645337776.0,
     "pct_of_portfolio": 4.7,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "KEYS",
+    "cusip": "49338L103",
     "company": "KEYSIGHT TECHNOLOGIES INC",
     "manager": "Даниел Лоуб · Third Point",
     "value": 204790950.0,
     "pct_of_portfolio": 4.4,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "XYZ",
+    "cusip": "852234103",
     "company": "BLOCK INC",
     "manager": "Даниел Лоуб · Third Point",
     "value": 194479668.0,
     "pct_of_portfolio": 4.2,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "SPGI",
+    "cusip": "78409V104",
     "company": "S&P GLOBAL INC",
     "manager": "Triple Frond Partners",
     "value": 47527000.0,
     "pct_of_portfolio": 4.2,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "TAIWAN SEMICONDUCTOR",
+    "ticker": "TSM",
+    "cusip": "874039100",
     "company": "TAIWAN SEMICONDUCTOR MANUFAC",
     "manager": "Тери Смит · Fundsmith",
     "value": 548464789.0,
     "pct_of_portfolio": 4.0,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "NFLX",
+    "cusip": "64110L106",
     "company": "NETFLIX INC.",
     "manager": "Тери Смит · Fundsmith",
     "value": 499110633.0,
     "pct_of_portfolio": 3.7,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "FLEX",
+    "cusip": "Y2573F102",
     "company": "FLEX LTD",
     "manager": "Даниел Лоуб · Third Point",
     "value": 166932100.0,
     "pct_of_portfolio": 3.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
-   },
-   {
-    "ticker": "APPLIED MATLS INC",
-    "company": "APPLIED MATLS INC",
-    "manager": "Джон Армитидж · Egerton Capital",
-    "value": 376729995.0,
-    "pct_of_portfolio": 3.6,
-    "period": "13F · 2026-07-21",
-    "filing_date": "2026-07-21",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "GEV",
+    "cusip": "36828A101",
     "company": "GE VERNOVA INC",
     "manager": "Тери Смит · Fundsmith",
     "value": 481498748.0,
     "pct_of_portfolio": 3.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "STRL",
+    "cusip": "859241101",
     "company": "STERLING INFRASTRUCTURE INC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 511709948.0,
     "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "TTMI",
+    "cusip": "87305R109",
     "company": "TTM TECHNOLOGIES INC",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 512074787.0,
     "pct_of_portfolio": 3.1,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "ON HLDG AG",
+    "ticker": "ONON",
+    "cusip": "H5919C104",
     "company": "ON HLDG AG",
     "manager": "Стивън Мандел · Lone Pine Capital",
     "value": 470378663.0,
     "pct_of_portfolio": 2.9,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "GOOGL",
+    "cusip": "02079K305",
     "company": "Alphabet Inc",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
     "value": 120184000.0,
     "pct_of_portfolio": 2.8,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "CBRS",
+    "cusip": "15675D103",
     "company": "CEREBRAS SYSTEMS INC",
     "manager": "Чейс Коулман · Tiger Global Management",
     "value": 662779000.0,
     "pct_of_portfolio": 2.8,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "FOXA",
+    "cusip": "35137L105",
     "company": "Fox Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
     "value": 114992000.0,
     "pct_of_portfolio": 2.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "APP",
+    "cusip": "03831W108",
     "company": "APPLOVIN CORP",
     "manager": "Тери Смит · Fundsmith",
     "value": 358892731.0,
     "pct_of_portfolio": 2.6,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "CME",
+    "cusip": "12572Q105",
     "company": "CME GROUP INC",
     "manager": "Сет Кларман · Baupost Group",
     "value": 136694000.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-13",
     "filing_date": "2026-08-13",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "NXT",
+    "cusip": "65290E101",
     "company": "NEXTPOWER INC",
     "manager": "Тери Смит · Fundsmith",
     "value": 340274801.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "TJX COS INC NEW",
+    "ticker": "TJX",
+    "cusip": "872540109",
     "company": "TJX COS INC NEW",
     "manager": "Тери Смит · Fundsmith",
     "value": 344297688.0,
     "pct_of_portfolio": 2.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": false
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "CDW",
+    "cusip": "12514G108",
     "company": "Cdw Corp",
     "manager": "Стенли Дракенмилър · Duquesne Family Office",
     "value": 104629000.0,
     "pct_of_portfolio": 2.4,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "BA",
+    "cusip": "097023105",
     "company": "BOEING CO",
     "manager": "Дейвид Тепър · Appaloosa Management",
     "value": 173176000.0,
     "pct_of_portfolio": 2.3,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
-    "ticker": "EFX",
-    "company": "EQUIFAX INC",
+    "ticker": "ICE",
+    "cusip": "45866F104",
+    "company": "INTERCONTINENTAL EXCHANGE IN",
     "manager": "Джон Армитидж · Egerton Capital",
-    "value": 235094159.0,
+    "value": 223100072.0,
     "pct_of_portfolio": 2.3,
-    "period": "13F · 2026-07-21",
-    "filing_date": "2026-07-21",
-    "_resolved": true
+    "period": "13F · 2026-10-20",
+    "filing_date": "2026-10-20",
+    "_resolved": true,
+    "ticker_source": "cusip"
    },
    {
     "ticker": "TTMI",
+    "cusip": "87305R109",
     "company": "TTM TECHNOLOGIES INC",
     "manager": "Даниел Лоуб · Third Point",
     "value": 94445100.0,
     "pct_of_portfolio": 2.0,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true
+    "_resolved": true,
+    "ticker_source": "cusip"
    }
   ],
   "major_exits": [],
@@ -481,7 +558,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-20",
+   "data_date": "2026-10-21",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -531,22 +608,30 @@
        {
         "company": "Invesco Exchange Traded Fd T",
         "cusip": "46137V357",
-        "value": 174684000.0
+        "value": 174684000.0,
+        "ticker": "RSP",
+        "figi_name": "INVESCO S&P 500 EQUAL WEIGHT"
        },
        {
         "company": "Ishares Inc",
         "cusip": "464286400",
-        "value": 145866000.0
+        "value": 145866000.0,
+        "ticker": "EWZ",
+        "figi_name": "ISHARES MSCI BRAZIL ETF"
        },
        {
         "company": "Insmed Inc",
         "cusip": "457669307",
-        "value": 143937000.0
+        "value": 143937000.0,
+        "ticker": "INSM",
+        "figi_name": "INSMED INC"
        },
        {
         "company": "Amazon Com Inc",
         "cusip": "023135106",
-        "value": 109470000.0
+        "value": 109470000.0,
+        "ticker": "AMZN",
+        "figi_name": "AMAZON.COM INC"
        }
       ]
      }
@@ -561,7 +646,9 @@
        {
         "company": "STATE STR SPDR S&P 500 ETF T",
         "cusip": "78462F103",
-        "value": 28800000.0
+        "value": 28800000.0,
+        "ticker": "SPY",
+        "figi_name": "SS SPDR S&P 500 ETF TRUST-US"
        }
       ]
      },
@@ -581,12 +668,16 @@
        {
         "company": "APPLE INC",
         "cusip": "037833100",
-        "value": 241615600.0
+        "value": 241615600.0,
+        "ticker": "AAPL",
+        "figi_name": "APPLE INC"
        },
        {
         "company": "BERKSHIRE HATHAWAY INC DEL",
         "cusip": "084670702",
-        "value": 12509750.0
+        "value": 12509750.0,
+        "ticker": "BRK-B",
+        "figi_name": "BERKSHIRE HATHAWAY INC-CL B"
        }
       ]
      },
@@ -606,22 +697,30 @@
        {
         "company": "STATE STREET CORP",
         "cusip": "78462F103",
-        "value": 1011873350.0
+        "value": 1011873350.0,
+        "ticker": "SPY",
+        "figi_name": "SS SPDR S&P 500 ETF TRUST-US"
        },
        {
         "company": "INVESCO QQQ TRUST SERIES 1",
         "cusip": "46090E103",
-        "value": 651714000.0
+        "value": 651714000.0,
+        "ticker": "QQQ",
+        "figi_name": "INVESCO QQQ TRUST SERIES 1"
        },
        {
         "company": "LYONDELLBASELL INDUSTRIES NV",
         "cusip": "N53745100",
-        "value": 47385000.0
+        "value": 47385000.0,
+        "ticker": "LYB",
+        "figi_name": "LYONDELLBASELL INDU-CL A"
        },
        {
         "company": "VISTEON CORP",
         "cusip": "92839U206",
-        "value": 39684000.0
+        "value": 39684000.0,
+        "ticker": "VC",
+        "figi_name": "VISTEON CORP"
        }
       ]
      },
@@ -632,22 +731,40 @@
        {
         "company": "CORE SCIENTIFIC INC",
         "cusip": "21874A106",
-        "value": 127950000.0
+        "value": 127950000.0,
+        "ticker": "CORZ",
+        "figi_name": "CORE SCIENTIFIC INC"
        },
        {
         "company": "BITDEER TECHNOLOGIES GROUP",
         "cusip": "G11448100",
-        "value": 11902500.0
+        "value": 11902500.0,
+        "ticker": "BTDR",
+        "figi_name": "BITDEER TECHNOLOGIES GROUP-A"
        },
        {
         "company": "MAGNACHIP SEMICONDUCTOR CORP",
         "cusip": "55933J203",
-        "value": 4730000.0
+        "value": 4730000.0,
+        "ticker": "MX",
+        "figi_name": "MAGNACHIP SEMICONDUCTOR CORP"
        }
       ]
      }
     }
-   ]
+   ],
+   "cusip_tickers": {
+    "requested": 52,
+    "from_cache": 0,
+    "fetched": 51,
+    "not_found": 1,
+    "skipped": 0,
+    "error": null,
+    "rows": 63,
+    "by_cusip": 61,
+    "by_name": 2,
+    "no_ticker": 0
+   }
   }
  }
 }

@@ -1,0 +1,311 @@
+{
+"02079K107": {
+"date": "2026-10-21",
+"name": "ALPHABET INC-CL C",
+"ticker": "GOOG",
+"type": "Common Stock"
+},
+"02079K305": {
+"date": "2026-10-21",
+"name": "ALPHABET INC-CL A",
+"ticker": "GOOGL",
+"type": "Common Stock"
+},
+"023135106": {
+"date": "2026-10-21",
+"name": "AMAZON.COM INC",
+"ticker": "AMZN",
+"type": "Common Stock"
+},
+"032095101": {
+"date": "2026-10-21",
+"name": "AMPHENOL CORP-CL A",
+"ticker": "APH",
+"type": "Common Stock"
+},
+"037833100": {
+"date": "2026-10-21",
+"name": "APPLE INC",
+"ticker": "AAPL",
+"type": "Common Stock"
+},
+"038222105": {
+"date": "2026-10-21",
+"name": "APPLIED MATERIALS INC",
+"ticker": "AMAT",
+"type": "Common Stock"
+},
+"03831W108": {
+"date": "2026-10-21",
+"name": "APPLOVIN CORP-CLASS A",
+"ticker": "APP",
+"type": "Common Stock"
+},
+"084670702": {
+"date": "2026-10-21",
+"name": "BERKSHIRE HATHAWAY INC-CL B",
+"ticker": "BRK-B",
+"type": "Common Stock"
+},
+"097023105": {
+"date": "2026-10-21",
+"name": "BOEING CO/THE",
+"ticker": "BA",
+"type": "Common Stock"
+},
+"12514G108": {
+"date": "2026-10-21",
+"name": "CDW CORP/DE",
+"ticker": "CDW",
+"type": "Common Stock"
+},
+"12572Q105": {
+"date": "2026-10-21",
+"name": "CME GROUP INC",
+"ticker": "CME",
+"type": "Common Stock"
+},
+"15675D103": {
+"date": "2026-10-21",
+"name": "CEREBRAS SYSTEMS INC - A",
+"ticker": "CBRS",
+"type": "Common Stock"
+},
+"21874A106": {
+"date": "2026-10-21",
+"name": "CORE SCIENTIFIC INC",
+"ticker": "CORZ",
+"type": "Common Stock"
+},
+"219948106": {
+"date": "2026-10-21",
+"name": "CORPAY INC",
+"ticker": "CPAY",
+"type": "Common Stock"
+},
+"25809K105": {
+"date": "2026-10-21",
+"name": "DOORDASH INC - A",
+"ticker": "DASH",
+"type": "Common Stock"
+},
+"35137L105": {
+"date": "2026-10-21",
+"name": "FOX CORP - CLASS A",
+"ticker": "FOXA",
+"type": "Common Stock"
+},
+"36828A101": {
+"date": "2026-10-21",
+"name": "GE VERNOVA INC",
+"ticker": "GEV",
+"type": "Common Stock"
+},
+"437076102": {
+"date": "2026-10-21",
+"name": "HOME DEPOT INC",
+"ticker": "HD",
+"type": "Common Stock"
+},
+"45579U109": {
+"date": "2026-10-21",
+"name": "INDIVIOR PHARMACEUTICALS INC",
+"ticker": "INDV",
+"type": "Common Stock"
+},
+"457669307": {
+"date": "2026-10-21",
+"name": "INSMED INC",
+"ticker": "INSM",
+"type": "Common Stock"
+},
+"45866F104": {
+"date": "2026-10-21",
+"name": "INTERCONTINENTAL EXCHANGE IN",
+"ticker": "ICE",
+"type": "Common Stock"
+},
+"46090E103": {
+"date": "2026-10-21",
+"name": "INVESCO QQQ TRUST SERIES 1",
+"ticker": "QQQ",
+"type": "ETP"
+},
+"46137V357": {
+"date": "2026-10-21",
+"name": "INVESCO S&P 500 EQUAL WEIGHT",
+"ticker": "RSP",
+"type": "ETP"
+},
+"464286400": {
+"date": "2026-10-21",
+"name": "ISHARES MSCI BRAZIL ETF",
+"ticker": "EWZ",
+"type": "ETP"
+},
+"49338L103": {
+"date": "2026-10-21",
+"name": "KEYSIGHT TECHNOLOGIES IN",
+"ticker": "KEYS",
+"type": "Common Stock"
+},
+"55933J203": {
+"date": "2026-10-21",
+"name": "MAGNACHIP SEMICONDUCTOR CORP",
+"ticker": "MX",
+"type": "Common Stock"
+},
+"573284106": {
+"date": "2026-10-21",
+"name": "MARTIN MARIETTA MATERIALS",
+"ticker": "MLM",
+"type": "Common Stock"
+},
+"57636Q104": {
+"date": "2026-10-21",
+"name": "MASTERCARD INC - A",
+"ticker": "MA",
+"type": "Common Stock"
+},
+"594918104": {
+"date": "2026-10-21",
+"name": "MICROSOFT CORP",
+"ticker": "MSFT",
+"type": "Common Stock"
+},
+"64110L106": {
+"date": "2026-10-21",
+"name": "NETFLIX INC",
+"ticker": "NFLX",
+"type": "Common Stock"
+},
+"65290E101": {
+"date": "2026-10-21",
+"name": "NEXTPOWER INC",
+"ticker": "NXT",
+"type": "Common Stock"
+},
+"722304102": {
+"date": "2026-10-21",
+"name": "PDD HOLDINGS INC",
+"ticker": "PDD",
+"type": "ADR"
+},
+"78409V104": {
+"date": "2026-10-21",
+"name": "S&P GLOBAL INC",
+"ticker": "SPGI",
+"type": "Common Stock"
+},
+"78462F103": {
+"date": "2026-10-21",
+"name": "SS SPDR S&P 500 ETF TRUST-US",
+"ticker": "SPY",
+"type": "ETP"
+},
+"852234103": {
+"date": "2026-10-21",
+"name": "BLOCK INC",
+"ticker": "XYZ",
+"type": "Common Stock"
+},
+"859241101": {
+"date": "2026-10-21",
+"name": "STERLING INFRASTRUCTURE INC",
+"ticker": "STRL",
+"type": "Common Stock"
+},
+"861012102": {
+"date": "2026-10-21",
+"name": "STMICROELECTRONICS NV-NY SHS",
+"ticker": "STM",
+"type": "NY Reg Shrs"
+},
+"872540109": {
+"date": "2026-10-21",
+"name": "TJX COMPANIES INC",
+"ticker": "TJX",
+"type": "Common Stock"
+},
+"87305R109": {
+"date": "2026-10-21",
+"name": "TTM TECHNOLOGIES",
+"ticker": "TTMI",
+"type": "Common Stock"
+},
+"874039100": {
+"date": "2026-10-21",
+"name": "TAIWAN SEMICONDUCTOR-SP ADR",
+"ticker": "TSM",
+"type": "ADR"
+},
+"879433829": {
+"date": "2026-10-21",
+"name": "TELEPHONE AND DATA SYSTEMS",
+"ticker": "TDS",
+"type": "Common Stock"
+},
+"90353T100": {
+"date": "2026-10-21",
+"name": "UBER TECHNOLOGIES INC",
+"ticker": "UBER",
+"type": "Common Stock"
+},
+"92826C839": {
+"date": "2026-10-21",
+"name": "VISA INC-CLASS A SHARES",
+"ticker": "V",
+"type": "Common Stock"
+},
+"92839U206": {
+"date": "2026-10-21",
+"name": "VISTEON CORP",
+"ticker": "VC",
+"type": "Common Stock"
+},
+"934423104": {
+"date": "2026-10-21"
+},
+"G11448100": {
+"date": "2026-10-21",
+"name": "BITDEER TECHNOLOGIES GROUP-A",
+"ticker": "BTDR",
+"type": "Common Stock"
+},
+"G54950103": {
+"date": "2026-10-21",
+"name": "LINDE PLC",
+"ticker": "LIN",
+"type": "Common Stock"
+},
+"G7997R103": {
+"date": "2026-10-21",
+"name": "SEAGATE TECHNOLOGY HOLDINGS",
+"ticker": "STX",
+"type": "Common Stock"
+},
+"H5919C104": {
+"date": "2026-10-21",
+"name": "ON HOLDING AG-CLASS A",
+"ticker": "ONON",
+"type": "Common Stock"
+},
+"N53745100": {
+"date": "2026-10-21",
+"name": "LYONDELLBASELL INDU-CL A",
+"ticker": "LYB",
+"type": "Common Stock"
+},
+"N97284108": {
+"date": "2026-10-21",
+"name": "NEBIUS GROUP NV",
+"ticker": "NBIS",
+"type": "Common Stock"
+},
+"Y2573F102": {
+"date": "2026-10-21",
+"name": "FLEX LTD",
+"ticker": "FLEX",
+"type": "Common Stock"
+}
+}

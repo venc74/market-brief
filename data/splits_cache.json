@@ -1,17 +1,6 @@
 {
- "date": "2026-10-20",
- "rows": [
-  {
-   "ticker": "AMTD",
-   "company": "AMTD IDEA Group",
-   "date": "2026-10-19",
-   "ratio": "1:60",
-   "split_type": "reverse",
-   "date_human": "Oct 19, 2026",
-   "price": 28.5,
-   "market_cap": 2286513618.0
-  }
- ],
+ "date": "2026-10-21",
+ "rows": [],
  "horizon": [
   {
    "ticker": "AMTD",
@@ -70,12 +59,36 @@
    "date_human": "Oct 20, 2026"
   },
   {
+   "ticker": "EHGO",
+   "company": "Eshallgo Inc.",
+   "date": "2026-10-21",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Oct 21, 2026"
+  },
+  {
    "ticker": "LU",
    "company": "Lufax Holding Ltd",
    "date": "2026-10-23",
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 23, 2026"
+  },
+  {
+   "ticker": "BUUU",
+   "company": "BUUU Group Limited",
+   "date": "2026-10-27",
+   "ratio": "10:1",
+   "split_type": "normal",
+   "date_human": "Oct 27, 2026"
+  },
+  {
+   "ticker": "ENHA",
+   "company": "Enhanced Group Inc.",
+   "date": "2026-10-29",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 29, 2026"
   },
   {
    "ticker": "NYSX",
@@ -118,6 +131,14 @@
    "date_human": "Nov 05, 2026"
   },
   {
+   "ticker": "SOXX",
+   "company": "iShares PHLX SOX Semiconductor Sector Index Fund",
+   "date": "2026-11-05",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 05, 2026"
+  },
+  {
    "ticker": "ITA",
    "company": "iShares U.S. Aerospace & Defense ETF",
    "date": "2026-11-05",
@@ -129,10 +150,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 14,
+  "source_rows": 18,
   "horizon_from": "2026-10-19",
   "horizon_to": "2026-11-05",
-  "in_week": 8,
+  "in_week": 9,
   "dropped_price": [
    "CAPS",
    "FRGT",
@@ -140,11 +161,14 @@
    "OBAI",
    "MBRX",
    "REVB",
+   "EHGO",
    "LU"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "AMTD"
+  ],
   "dropped_no_data": [],
-  "passed": 1,
-  "state": "ok"
+  "passed": 0,
+  "state": "empty"
  }
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Бриф · 20.10.2026, вторник</title>
+<title>AI Бриф · 21.10.2026, сряда</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -77,6 +77,9 @@
   .sector-name { font-weight: 600; }
   .sector-etf { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--regime); }
   .sector-chain { font-size: 14px; color: var(--text); }
+  .canslim-book > summary { cursor: pointer; list-style-position: inside; }
+  .canslim-book > summary h2 { display: inline; }
+  .canslim-book > summary .book-hint { font-size: 12.5px; color: var(--muted); margin-left: 8px; }
   .sector-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
   /* ── Action карти ── */
@@ -213,6 +216,7 @@
   /* 2026-09-18: "evolving" — оригиналният път спрян, алтернативен напредва */
   .thesis-news.evolving { color: var(--yellow); background: rgba(251,191,36,.12); }
   .thesis-newsnote { font-size: 12.5px; color: var(--red); margin-top: 6px; }
+  .thesis-headline { font-size: 12.5px; color: var(--text); margin-top: 6px; }   /* 19.10.2026 (т. 10): дословното заглавие до тезата — без етикет и без цвят на оценка */
   .thesis-newsnote.evolving { color: var(--yellow); }
   /* 2026-09-29: "confirmed" — събитие потвърждава механизма; тезата продължава */
   .thesis-news.confirmed { color: var(--green); background: rgba(52,211,153,.12); }
@@ -468,18 +472,18 @@
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
-      <div class="date mono">20.10.2026, вторник · генериран 07:44 CEST · 2 ч 15 мин до US pre-market (04:00 ET)</div>
+      <div class="date mono">21.10.2026, сряда · генериран 07:40 CEST · 2 ч 19 мин до US pre-market (04:00 ET)</div>
     </div>
     <div>
       <div class="regime-badge">Defensive</div>
       
       
-        <div class="regime-reason" style="color:var(--yellow)">⚡ IEI/HYG credit spread spike (+0.9% за 10д, 94. percentile) — рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%</div>
+        <div class="regime-reason" style="color:var(--yellow)">⚡ IEI/HYG credit spread spike (+1.2% за 10д: IEI +0.6%, HYG -0.6%, 96. percentile) — рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%</div>
         
         
         
         
-        <div class="regime-reason">3 зелени / 3 жълти / 2 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни) · по броене: Defensive</div>
+        <div class="regime-reason">5 зелени / 2 жълти / 1 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни) · по броене: Defensive</div>
       
     </div>
   </div>
@@ -514,34 +518,34 @@
   <div class="thermo">
     
     
-    <div class="t-card yellow">
+    <div class="t-card green">
       <div class="t-name">SPY тренд</div>
-      <div class="t-val">766.48</div>
-      <div class="t-label">SPY 766 | под 50DMA, над 200DMA</div>
+      <div class="t-val">769.05</div>
+      <div class="t-label">SPY 769 | над 50DMA, над 200DMA</div>
     </div>
     
     
     
-    <div class="t-card red">
+    <div class="t-card green">
       <div class="t-name">VIX</div>
-      <div class="t-val">18.44</div>
-      <div class="t-label">VIX 18.4 (risk-off) ⚠ рязък скок</div>
+      <div class="t-val">17.31</div>
+      <div class="t-label">VIX 17.3 (risk-on)</div>
     </div>
     
     
     
     <div class="t-card yellow">
       <div class="t-name">Put/Call (SPY)</div>
-      <div class="t-val">1.11</div>
-      <div class="t-label">P/C 1.11 (42. percentile от 89 дни; в нормалния диапазон)</div>
+      <div class="t-val">0.97</div>
+      <div class="t-label">P/C 0.97 (16. percentile от 90 дни; в нормалния диапазон)</div>
     </div>
     
     
     
     <div class="t-card green">
       <div class="t-name">2Y/10Y спред</div>
-      <div class="t-val">0.38</div>
-      <div class="t-label">0.38% (нормален, flattening)</div>
+      <div class="t-val">0.33</div>
+      <div class="t-label">0.33% (нормален, flattening)</div>
     </div>
     
     
@@ -556,40 +560,40 @@
     
     <div class="t-card green info">
       <div class="t-name">SOFR − IORB (финансиране)</div>
-      <div class="t-val">-2.0</div>
-      <div class="t-label">-2.0 б.п. към 16.10 (SOFR 3.88% − IORB 3.90%) · +1.0 б.п. за седмица · 68. percentile, z +0.2 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима</div>
+      <div class="t-val">-3.0</div>
+      <div class="t-label">-3.0 б.п. към 19.10 (SOFR 3.87% − IORB 3.90%) · +0.0 б.п. за седмица · 62. percentile, z +0.1 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима</div>
     </div>
     
     
     
     <div class="t-card yellow">
       <div class="t-name">MOVE (Bond Vol)</div>
-      <div class="t-val">101.3</div>
-      <div class="t-label">MOVE 101 (+3 пункта/седмица)</div>
+      <div class="t-val">101.7</div>
+      <div class="t-label">MOVE 102 (+1 пункта/седмица)</div>
     </div>
     
     
     
     <div class="t-card green">
       <div class="t-name">VIX Term Structure</div>
-      <div class="t-val">0.915</div>
-      <div class="t-label">VIX9D 17.9 / VIX 18.4 / VIX3M 19.6 → ratio 0.91 (contango, нормално)</div>
+      <div class="t-val">0.857</div>
+      <div class="t-label">VIX9D 16.3 / VIX 17.3 / VIX3M 19.0 → ratio 0.86 (contango, нормално)</div>
     </div>
     
     
     
     <div class="t-card red">
       <div class="t-name">IEI/HYG (Credit Spread)</div>
-      <div class="t-val">1.4838</div>
-      <div class="t-label">IEI/HYG 1.484 (21. percentile) · 10д RoC +0.9% (94. percentile) ⚠ рязък credit spread spike</div>
+      <div class="t-val">1.4841</div>
+      <div class="t-label">IEI/HYG 1.484 (21. percentile) · 10д RoC +1.2% (IEI +0.6%, HYG -0.6%) (96. percentile) ⚠ рязък скок (лихви + кредит)</div>
     </div>
     
     
     
     <div class="t-card green" title="Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&amp;P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.">
       <div class="t-name">Market Breadth (% над 40dMA)</div>
-      <div class="t-val">45.4</div>
-      <div class="t-label">45.4% над 40dMA (здравословна ширина)</div>
+      <div class="t-val">54.0</div>
+      <div class="t-label">54.0% над 40dMA (здравословна ширина)</div>
     </div>
     
     
@@ -597,8 +601,8 @@
     
     <div class="t-card yellow" title="Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.">
       <div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div>
-      <div class="t-val">8</div>
-      <div class="t-label">SPY 8 / QQQ 6 (последни 25 сесии)</div>
+      <div class="t-val">7</div>
+      <div class="t-label">SPY 7 / QQQ 6 (последни 25 сесии)</div>
     </div>
     
     
@@ -615,7 +619,7 @@
   </div>
   
   
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> активен override (IEI/HYG) — режимът е Defensive независимо от броенето · по броенето до Offensive: 0 червени (сега 2: VIX, IEI/HYG (Credit Spread)) и още 1 зелен; до Cash: още 1 червен · distribution days SPY 8/9, QQQ 6/9 — при 9 Offensive се блокира (липсва 1) · IEI/HYG 10д RoC 94. percentile — над прага 90: override; 10-дневната RoC е +0.93% срещу +0.24% преди 5 сесии — расте (ускорява се)</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> активен override (IEI/HYG) — режимът е Defensive независимо от броенето · по броенето до Offensive: 0 червени (сега 1: IEI/HYG (Credit Spread)); до Cash: още 2 червени · distribution days SPY 7/9, QQQ 6/9 — при 9 Offensive се блокира (липсват 2) · IEI/HYG 10д RoC 96. percentile — над прага 90: override; 10-дневната RoC е +1.19% срещу +0.30% преди 5 сесии — расте (ускорява се)</div>
   
   
   
@@ -630,65 +634,65 @@
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Iran war tilts balance of global oil power towards Americas</span> <span class="news-why" style="font-size:12px">· Financial Times</span>
-        <span class="news-why"> (Войната в Иран измества баланса на глобалната петролна мощ към Америките)</span>
-        <span class="news-why"> — Войната в Иран е преориентирала глобалните петролни потоци към Америките, което засяга цените на суровините и енергийния сектор дългосрочно.</span></div>
+      <div><span class="news-head">SpaceX and Tesla boards explore potential merger</span> <span class="news-why" style="font-size:12px">· Financial Times</span>
+        <span class="news-why"> (Бордовете на SpaceX и Tesla проучват възможно сливане)</span>
+        <span class="news-why"> — Потенциалното сливане би засегнало директно акциите на Tesla (TSLA) и оценката на SpaceX, с вторичен ефект върху целия технологичен и космически сектор.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Brent crude holds near five-month high on Middle East tension - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
-        <span class="news-why"> (Brent crude се задържа близо до петмесечен връх заради напрежението на Близкия изток)</span>
-        <span class="news-why"> — Brent crude се задържа близо до петмесечен връх заради геополитическото напрежение на Близкия изток, което директно влияе на енергийния сектор и инфлационните очаквания.</span></div>
+      <div><span class="news-head">FAA clears the way for airlines to put Boeing’s long-delayed 737 Max 10 into service - AP News</span> <span class="news-why" style="font-size:12px">· AP Business</span>
+        <span class="news-why"> (FAA открива пътя за авиокомпаниите да въведат дългоочакван Boeing 737 Max 10 в експлоатация)</span>
+        <span class="news-why"> — FAA сертификацията отваря нов приходен поток за Boeing (BA) и авиокомпаниите-клиенти, позитивно за акциите на Boeing и авиационния сектор.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">China leaves loan rates steady for 17th consecutive month - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
-        <span class="news-why"> (Китай запазва лихвените нива непроменени за 17-и пореден месец)</span>
-        <span class="news-why"> — Китай запазва лихвените проценти по заемите непроменени за 17-и пореден месец, което сигнализира ограничено монетарно стимулиране и влияе на глобалните очаквания за растеж.</span></div>
+      <div><span class="news-head">Oil rises on Middle East supply fears, US inventory drawdowns - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
+        <span class="news-why"> (Петролът поскъпва заради страхове за доставките от Близкия изток и спад на запасите в САЩ)</span>
+        <span class="news-why"> — Ескалацията на рисковете за доставките от Близкия изток натиска петрола нагоре, което засяга енергийния сектор, инфлационните очаквания и транспортни компании.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">China’s economy accelerated in the July-September quarter on robust exports - AP News</span> <span class="news-why" style="font-size:12px">· AP Business</span>
-        <span class="news-why"> (Китайската икономика се ускорява през юли-септември на гръб на силния износ)</span>
-        <span class="news-why"> — Китайската икономика се ускорява в третото тримесечие благодарение на силния износ — ключов макро показател за глобалното търсене и азиатските пазари.</span></div>
+      <div><span class="news-head">United Airlines slashes 2026 profit outlook on fuel prices, but travelers keep booking despite higher fares</span> <span class="news-why" style="font-size:12px">· CNBC</span>
+        <span class="news-why"> (United Airlines срязва прогнозата за печалба за 2026 г. заради цените на горивото, въпреки че пътниците продължават да резервират)</span>
+        <span class="news-why"> — Понижената прогноза на United Airlines заради горивните разходи оказва натиск върху авиационния сектор и сигнализира за по-широк инфлационен проблем с jet fuel.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Trump says Mexico and US are close to trade deal - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
-        <span class="news-why"> (Тръмп казва, че Мексико и САЩ са близо до търговска сделка)</span>
-        <span class="news-why"> — Търговска сделка между САЩ и Мексико е в напреднал етап, което е пряко свързано с тарифната политика и пазарите на двете страни.</span></div>
+      <div><span class="news-head">Musk says SpaceX-Tesla merger is &#39;a good idea&#39; as companies form deal committees - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
+        <span class="news-why"> (Мъск казва, че сливането SpaceX-Tesla е &#39;добра идея&#39;, докато компаниите формират комитети по сделката)</span>
+        <span class="news-why"> — Потвърждението от Мъск за формиране на комитети по сделката е директен катализатор за волатилност в TSLA и свързаните технологични активи.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Gold inches up on softer dollar as investors assess Fed rate outlook - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
-        <span class="news-why"> (Златото леко поскъпва заради по-слабия долар и преоценката на лихвената политика на Fed)</span>
-        <span class="news-why"> — Златото поскъпва заради по-слабия долар и преоценката на очакванията за лихвена политика на Fed, което е важен сигнал за настроенията на пазарите.</span></div>
+      <div><span class="news-head">Trump sued over 50% tariffs on Canada in latest trade challenge</span> <span class="news-why" style="font-size:12px">· CNBC</span>
+        <span class="news-why"> (Тръмп е съден заради 50% тарифи върху Канада в поредното търговско предизвикателство)</span>
+        <span class="news-why"> — Правното оспорване на 50% тарифите върху канадски стоки създава несигурност за търговската политика и засяга сектори с верига на доставки от Канада.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Bank Indonesia faces mounting pressure to hike after MSCI threat fuels market rout</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI и пазарния срив)</span>
-        <span class="news-why"> — Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI да понижи пазара до standalone статус, предизвиквайки сериозна разпродажба и отслабване на рупията.</span></div>
+      <div><span class="news-head">Anthropic logged net loss of over $80 billion in first half of 2026 - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
+        <span class="news-why"> (Anthropic отчита нетна загуба от над 80 млрд. долара за първото полугодие на 2026 г.)</span>
+        <span class="news-why"> — Загуба от над 80 млрд. долара за полугодие при Anthropic поставя под въпрос устойчивостта на AI разходите и засяга оценките на AI компании и инвеститори в сектора.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Supreme Court won&#39;t review Trump&#39;s firing of labor board member</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Върховният съд отказа да преразгледа уволнението на члена на трудовия съвет от Тръмп)</span>
-        <span class="news-why"> — Върховният съд отказа да преразгледа уволнението на член на трудовия съвет от Тръмп, потвърждавайки президентския контрол върху независимите агенции с регулаторен ефект за пазарите.</span></div>
+      <div><span class="news-head">Novo&#39;s next-generation obesity drug shows 25% weight loss in women in late-stage analysis</span> <span class="news-why" style="font-size:12px">· CNBC</span>
+        <span class="news-why"> (Новото поколение лекарство на Novo срещу затлъстяване показва 25% загуба на тегло при жени в анализ от късна фаза)</span>
+        <span class="news-why"> — Данните за 25% загуба на тегло при CagriSema укрепват позицията на Novo Nordisk в GLP-1 пространството и оказват натиск върху конкурентите в сектора на затлъстяването.</span></div>
     </div>
     
   </div>
@@ -697,9 +701,11 @@
 
 <section>
   <h2>Макро бриф</h2>
-  <div class="prose">SPY затваря под 50DMA (766.48 срещу MA50 767.3) при VIX скочил 21.2% за 5 дни до 18.44 — двойно потвърждение за risk-off, като IEI/HYG 10-дневната RoC ускорява от +0.24% до +0.93% (94-ти percentile) и задейства автоматичния Defensive override. Brent се задържа близо до петмесечен връх заради Иран, WTI +4.97% за седмица до $98.82 — петролният импулс е реален, но Oil-driven inflation risk се сблъсква с Dallas Fed Trimmed Mean PCE за август 2.19% г/г, тренд надолу (avg_recent 2.25% срещу avg_prior 2.39%), тоест пазарният сигнал за инфлационен натиск засега не е потвърден от базовата инфлация. US10Y падна 10.4 б.п. за седмицата до 5.14% — облигациите поемат bid при equity разпродажбата, а 2s10s спредът се сви с 6 б.п. до 38 б.п. (flattening). Китай ускори БВП в Q3 на гърба на износа, но остави лихвите непроменени за 17-ти пореден месец — ограничено вътрешно стимулиране, Copper -1.81% потвърждава скептицизма за industrial demand. Distribution days SPY 8/9, QQQ 6/9 — институционалното предлагане е плътно, а пространството преди блокиране на Offensive режима е минимално.
-  <br><br><span style="color:var(--muted)">Defensive режимът е оправдан и добре подкрепен от данните. Първичният trigger е IEI/HYG override: 10-дневната RoC +0.93% е на 94-ти percentile и ускорява (преди 5 сесии беше +0.24%) — credit risk premium се разширява с нарастваща скорост, не забавя. Override пада единствено когато 10-дневната RoC percentile слезе под 90-ти percentile два поредни дни (хистерезис в момента 0/2); без нов скок exit_rule посочва около 10 дни прозорец — тоест прозорецът е на изчислението, не непременно реално успокояване на кредитния пазар. По броенето: 3 зелени (2Y/10Y спред, VIX Term Structure, Market Breadth) / 3 жълти (SPY тренд, Put/Call, MOVE) / 2 червени (VIX, IEI/HYG) от 8 видими — дори без override, 2 червени индикатора са достатъчни за Defensive по правилото (нужни са 0 червени и минимум 4 зелени за Offensive). По броенето: 3 зелени (2Y/10Y спред, VIX Term Structure, Market Breadth (% над 40dMA)) / 3 жълти (SPY тренд, Put/Call (SPY), MOVE (Bond Vol)) / 2 червени (VIX, IEI/HYG (Credit Spread)) от 8 видими; НЕ се броят (информативни): Fed Net Liquidity, SOFR − IORB (финансиране). До Cash: още 1 червен. Distribution days SPY 8/9 — при 9 Offensive се блокира дори ако останалите условия се изпълнят. Няма противоречия в данните: VIX term structure в contango (ratio 0.91) и Market Breadth 45.4% са конструктивни сигнали, но те не отменят двата червени индикатора — системата изисква консенсус, не мнозинство. Fed Net Liquidity (+2.09% за 4 седмици към 14.10) и SOFR−IORB (-2.0 б.п., 68-ми percentile към 16.10) са информативни и не влизат в броенето. Увереността в Defensive е висока — режимът е форсиран от активен override с ускоряваща RoC, потвърден от броенето и от distribution day картината.</span>
+  <div class="prose">SPY затваря на 769 — само 1.29% под своя 52-седмичен връх — с 5 зелени индикатора срещу 2 жълти и 1 червен, но IEI/HYG 10-дневната RoC скача до 96-ия percentile (+1.19% срещу +0.30% преди 5 сесии, ускорява се), което задейства автоматичен Defensive override и sizing −50%. US10Y пада с 10 б.п. за седмицата до 5.12%, но спредът IEI/HYG разширява, защото HYG губи −0.57% за 10 дни — пазарът диференцира между правителствен риск и кредитен риск, не търси убежище в облигации изобщо. Петролът (CLZ26) скача +5.41% за 5 дни до $98.98 на фона на Близкоизточни рискове за доставките — директна подкрепа за XLE; United Airlines едновременно снижава прогнозата за 2026 заради горивни разходи, което потвърждава механизма от двете страни (производители печелят, авиация губи). TSLA/SpaceX merger комитети и Anthropic загуба от $80+ млрд. за полугодие добавят волатилност в технологичния сектор, докато SMH и XLK вече губят −9.55% и −4.99% RS за 4 седмици. Dallas Fed Trimmed Mean PCE за август е 2.19% г/г (средно за юни–август 2.25%, срещу 2.39% за март–май) — основната инфлация се забавя, което е разминаване с инфлационния натиск, внушен от петрола и XLE лидерството; тарифното дело срещу 50% канадски мита добавя неопределеност за веригите на доставки, но засега пазарът не е включил това в credit spreads.
+  <br><br><span style="color:var(--muted)">Defensive режимът е оправдан с висока увереност. Задействащият механизъм е еднозначен: IEI/HYG 10-дневната RoC е на 96-ия percentile — ускорява се от +0.30% преди 5 сесии до +1.19% сега, IEI +0.61%, HYG −0.57% за 10 дни. Съставът на движението (Treasury-та поскъпват, HY облигации поевтиняват) означава, че пазарът излиза от кредитен риск, не просто реагира на лихвен шок — override-ът е адекватен. Останалите 5 от 8 видими индикатора са зелени (SPY тренд, VIX, 2Y/10Y спред, VIX Term Structure, Market Breadth), което означава, че широкият пазар все още не е в разпределение — но именно това е моментът, когато credit lead signal има стойност: кредитните spreads исторически водят equity. IEI/HYG level percentile е само на 21.2-ия percentile — абсолютното ниво не е екстремно — но скоростта на движение (96-ия percentile на RoC) е сигналът, не нивото. Единственото противоречие: market breadth 54% и SPY само 1.29% под върха не показват видим equity стрес, VIX 17.31 е в risk-on зона, а 2s10s се flattening нормално. Но режимът не изисква всички индикатори да са червени — достатъчно е един override да е активен. За отмяна: 10-дневната RoC percentile трябва да слезе под 90-ия percentile два поредни дни (хистерезис — в момента 0 от 2 дни под прага са изпълнени); след това режимът се определя от броенето, което в момента също дава Defensive (1 червен). За Offensive е необходимо: 0 червени по броенето и distribution days SPY под 9 (сега 7/9, липсват 2). Без нов скок в RoC override-ът пада в рамките на около 10 дни — но това е прозорецът на изчислението, не гаранция за реално успокояване на credit spreads.</span>
   </div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Фючърси (Yahoo, договорът, който символът „=F“ дава днес): WTI $98.98 — дек. 2026 (CLZ26), цена от 21.10 01:20 ET, +5.4% за 5 дни по същия договор · злато $4 139 — дек. 2026 (GCZ26), цена от 21.10 01:20 ET, +0.8% за 5 дни по същия договор · мед $6.61 — дек. 2026 (HGZ26), цена от 21.10 01:20 ET, -0.8% за 5 дни по същия договор.</div>
 </section>
 
 
@@ -721,14 +727,16 @@
   <h2>Секторна карта · следващите 2–6 седмици</h2>
   <div class="sectors">
     
+    
+    
     <div class="sector-row">
       <div>
         <div class="sector-name">Енергетика</div>
         <div class="sector-etf">XLE</div>
       </div>
       <div>
-        <div class="sector-chain">Войната в Иран преориентира глобалните петролни потоци към Америките (новина 1) → Brent близо до петмесечен връх, WTI +4.97% за седмица до $98.82 → приходите на upstream E&amp;P и интегрираните мейджъри се ревизират нагоре → XLE RS +9.54% за 4 седмици и +12.06% за 12 седмици — единственият сектор с потвърдено лидерство и на двата хоризонта. Геополитическата premium е структурна, не само momentum; в Defensive режим XLE е допустима позиция при редуциран sizing (x0.5), тъй като директно отразява supply-side шока.</div>
-        <div class="sector-meta">Хоризонт: 12 седмици</div>
+        <div class="sector-chain">Близкоизточни рискове за доставките + US inventory drawdowns → петролът (CLZ26) +5.41% за 5 дни до $98.98 → производителите на петрол и газ реализират по-висока маржа директно → XLE RS за 4 седмици +10.64% и RS за 12 седмици +10.25%, абсолютна промяна +10.02% за 4 седмици → единственият сектор с убедено лидерство и на двата хоризонта и без история на изоставане (дял на изоставането 0%); United Airlines снижава прогнозата заради jet fuel, което потвърждава, че петролният шок е реален и вече се усеща надолу по веригата — потребителите на горива губят, производителите печелят.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +10.64%, 12 седмици +10.25% · хоризонт (AI): 6 седмици</div>
       </div>
     </div>
     
@@ -738,8 +746,8 @@
         <div class="sector-etf">XLP</div>
       </div>
       <div>
-        <div class="sector-chain">Risk-off контекст (VIX +21.2% за 5 дни, SPY под 50DMA) → ротация към defensive equity → XLP RS +7.43% за 4 седмици. Внимание: laggard_persistence 80% — секторът е бил хроничен изоставащ и 4-седмичният импулс е рязък, но 12-седмичният RS е едва +1.19%, без потвърждение на двата хоризонта. Позицията е тактическа — убежище при продължаваща разпродажба, не структурно лидерство.</div>
-        <div class="sector-meta">Хоризонт: 4 седмици</div>
+        <div class="sector-chain">Defensive режим + credit spread разширяване → инвеститорите намаляват експозиция към циклично и търсят некорелирани с кредита cashflow-генератори → XLP RS за 4 седмици +6.67% и RS за 12 седмици +1.64%, абсолютна промяна +6.07% за 4 седмици → логиката е ротационна, не секторно-специфична (нито петрол, нито фарма катализатор); внимание: дял на изоставането е 75% исторически — секторът е потвърден laggard в по-дълъг хоризонт, 4-седмичното RS движение е позиционна ротация в Defensive, не структурно лидерство.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +6.67%, 12 седмици +1.64% · хоризонт (AI): 4 седмици</div>
       </div>
     </div>
     
@@ -749,35 +757,28 @@
         <div class="sector-etf">XLV</div>
       </div>
       <div>
-        <div class="sector-chain">Defensive режим + risk-off flow → нецикличните сектори с относително стабилни earnings получават bid → XLV RS +4.88% за 4 седмици и +7.58% за 12 седмици — положителна RS на двата хоризонта, без confirmed laggard статус. Механизмът е класически flight-to-quality в late-cycle среда: US10Y на 5.14% поддържа discount rate натиск върху growth, което прави defensive earnings по-атрактивни на относителна база.</div>
-        <div class="sector-meta">Хоризонт: 12 седмици</div>
+        <div class="sector-chain">Defensive режим (IEI/HYG override) → ротация към нециклични сектори с устойчиви приходи → здравеопазването исторически задържа маржа при кредитно стресиране → XLV RS за 4 седмици +6.44% и RS за 12 седмици +7.06%, единственият сектор на 6-месечен връх по RS → Novo Nordisk CagriSema данни за 25% загуба на тегло при жени потвърждават GLP-1 pipeline стойността и привличат секторен капитал независимо от макро режима; дял на изоставането 15% — чисто лидерство без хроничен laggard характер.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +6.44%, 12 седмици +7.06% · RS на 6-месечен връх · хоризонт (AI): 5 седмици</div>
       </div>
     </div>
     
     <div class="sector-row">
       <div>
-        <div class="sector-name">Материали</div>
-        <div class="sector-etf">XLB</div>
+        <div class="sector-name">Потребителски (циклични)</div>
+        <div class="sector-etf">XLY</div>
       </div>
       <div>
-        <div class="sector-chain">Краткосрочен RS импулс +3.43% за 4 седмици, но 12-седмичният RS е -2.03% и laggard_persistence е 90% — секторът е confirmed laggard. Copper -1.81% за седмицата отразява слабото вътрешно търсене в Китай (без монетарно стимулиране — 17-ти пореден месец без промяна в лихвите). XLB 4-седмичният импулс е вероятно tactical bounce в downtrend, не ротационен лидер; не е приоритет за нова позиция в Defensive режим.</div>
-        <div class="sector-meta">Хоризонт: 4 седмици</div>
+        <div class="sector-chain">US10Y пада −10 б.п. за седмицата до 5.12% → намалява дисконтовия натиск върху discretionary потребление с дълги duration приходи → в комбинация с 54% пазарна ширина (% акции над 40-дневна MA) потребителят все още харчи въпреки по-скъпото финансиране → XLY RS за 4 седмици +3.40% и RS за 12 седмици +1.91%; предупреждение: дял на изоставането е 80% и секторът е потвърден laggard — 4-седмичното движение е вероятно техническо, не фундаментално лидерство; United Airlines данни за „travelers keep booking despite higher fares&#34; поддържат нарратива за устойчиво потребление, но горивният инфлационен ефект е насрещен вятър.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +3.40%, 12 седмици +1.91% · хоризонт (AI): 4 седмици</div>
       </div>
     </div>
     
-    <div class="sector-row">
-      <div>
-        <div class="sector-name">Златодобив</div>
-        <div class="sector-etf">GDX</div>
-      </div>
-      <div>
-        <div class="sector-chain">Злато +0% приблизително за седмицата (-0.55% за 5 дни до $4154), DXY -0.4% — по-слабият долар дава номинален support на precious metals, Fed rate outlook преоценяван (US10Y -10.4 б.п.). GDX обаче показва RS -7.59% за 4 седмици въпреки положителните +9.69% за 12 седмици — рязко краткосрочно underperformance спрямо широкия пазар в момент, когато би трябвало да печели от risk-off. Разминаването сигнализира или profit-taking след силен Q3 run, или sector-specific фактори; 12-седмичното лидерство е реално, но краткосрочният momentum е отрицателен — изчакване на стабилизация преди нова позиция.</div>
-        <div class="sector-meta">Хоризонт: 12 седмици</div>
-      </div>
-    </div>
+    
     
   </div>
 </section>
+
+
 
 
 
@@ -804,11 +805,69 @@
   <h2>Геополитически тези · мониторинг</h2>
   <div class="theses">
     
+    <div class="thesis active">
+      <div class="thesis-head">
+        <span class="thesis-name">Въглища и LNG</span>
+        <span class="thesis-status active">активна</span>
+        
+      </div>
+      <div class="thesis-tickers">BTU  ·  HCC  ·  AMR  ·  CNR  ·  LNG</div>
+      <div class="thesis-chain">Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.</div>
+      <div class="thesis-headline">📰 Oil rises on Middle East supply fears, US inventory drawdowns - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 Netanyahu pushes to resume strikes against Iran <span style="color:var(--muted)">· Financial Times</span></div>
+      <div class="thesis-trigger">▲ Тригер активен: Петролът (WTI) +5.4% за 5 дни — енергиен шок в развитие.</div>
+      
+      
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
+        
+        
+        <div class="ctx-summary">4/5 под 200DMA · секторът води · отчет след 8 дни (LNG)</div>
+        
+        <div class="ctx-meta">Режим: <b>Defensive</b> ·
+          Сектор XLE (прокси: енергетика):
+            RS <span class="pos">+10.6%</span> (4с) / <span class="pos">+10.2%</span> (12с) · <span class="pos">водещ</span>
+          </div>
+
+        
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
+          
+          <tr><td class="mono">BTU</td>
+            <td class="num"><span class="neg">-9.7%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">04.11 (14 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">HCC</td>
+            <td class="num"><span class="neg">-4.9%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">04.11 (14 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">AMR</td>
+            <td class="num"><span class="neg">-9.5%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">06.11 (16 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">CNR</td>
+            <td class="num"><span class="neg">-3.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">05.11 (15 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">LNG</td>
+            <td class="num"><span class="pos">+3.0%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td><span class="">29.10 (8 дни)</span></td>
+            <td>—</td></tr>
+          
+        </table>
+
+        
+      </div>
+
+    </div>
+    
     <div class="thesis structural">
       <div class="thesis-head">
         <span class="thesis-name">Ядрена енергия</span>
         <span class="thesis-status structural">структурна</span>
-        
         
       </div>
       <div class="thesis-tickers">VST  ·  CEG  ·  OKLO  ·  CCJ  ·  DNN  ·  NNE</div>
@@ -824,29 +883,48 @@
         <span class="thesis-name">Полупроводници и AI инфраструктура</span>
         <span class="thesis-status structural">структурна</span>
         
-        
       </div>
       <div class="thesis-tickers">AVGO  ·  AMAT  ·  MCHP</div>
       <div class="thesis-chain">AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.</div>
+      <div class="thesis-headline">📰 Super Micro sees quarterly revenue soaring on AI server boom - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 SpaceX and Tesla&#39;s Terafab targets 2028 for volume chip production, Musk says - Reuters <span style="color:var(--muted)">· Reuters Business</span></div>
       
       
       
-      
-    </div>
-    
-    <div class="thesis watch">
-      <div class="thesis-head">
-        <span class="thesis-name">Въглища и LNG</span>
-        <span class="thesis-status watch">наблюдава се</span>
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
         
+        
+        <div class="ctx-summary">3/3 под 200DMA · секторът неутрален · отчет след 15 дни (MCHP)</div>
+        
+        <div class="ctx-meta">Режим: <b>Defensive</b> ·
+          Сектор SMH:
+            RS <span class="neg">-9.6%</span> (4с) / <span class="neg">-9.8%</span> (12с)
+          </div>
+
+        
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
+          
+          <tr><td class="mono">AVGO</td>
+            <td class="num"><span class="neg">-7.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">09.12 (49 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">AMAT</td>
+            <td class="num"><span class="neg">-12.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">12.11 (22 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">MCHP</td>
+            <td class="num"><span class="pos">+1.4%</span></td><td><span class="pos">над</span></td><td><span class="neg">под</span></td>
+            <td><span class="">05.11 (15 дни)</span></td>
+            <td>—</td></tr>
+          
+        </table>
+
         
       </div>
-      <div class="thesis-tickers">BTU  ·  HCC  ·  AMR  ·  CNR  ·  LNG</div>
-      <div class="thesis-chain">Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.</div>
-      
-      
-      
-      
+
     </div>
     
     <div class="thesis watch">
@@ -854,21 +932,59 @@
         <span class="thesis-name">Отбрана и дронове</span>
         <span class="thesis-status watch">наблюдава се</span>
         
-        
       </div>
       <div class="thesis-tickers">LMT  ·  RTX  ·  NOC  ·  SWMR</div>
       <div class="thesis-chain">Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.</div>
+      <div class="thesis-headline">📰 NATO to send planes and drones to Black Sea after attacks on shipping - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 UK expands military support for Saudi Arabia against Houthis with ‘defensive’ air patrols - AP News <span style="color:var(--muted)">· AP Business</span></div>
       
       
       
-      
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
+        
+        
+        <div class="ctx-summary">3/3 под 200DMA · секторът изостава · отчет след 1 дни (LMT)</div>
+        
+        <div class="ctx-meta">Режим: <b>Defensive</b> ·
+          Сектор ITA:
+            RS <span class="neg">-3.1%</span> (4с) / <span class="neg">-17.1%</span> (12с) · <span class="neg">изоставащ</span>
+          </div>
+
+        
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
+          
+          <tr><td class="mono">LMT</td>
+            <td class="num"><span class="pos">+2.5%</span></td><td><span class="pos">над</span></td><td><span class="neg">под</span></td>
+            <td><span class="warn-txt">22.10 (1 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">RTX</td>
+            <td class="num"><span class="neg">-0.5%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td>—</td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">NOC</td>
+            <td class="num"><span class="pos">+1.4%</span></td><td><span class="pos">над</span></td><td><span class="neg">под</span></td>
+            <td>—</td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">SWMR</td>
+            <td class="num"><span class="neg">-61.5%</span></td><td><span class="neg">под</span></td><td><span class="na">&lt;200 дни</span></td>
+            <td><span class="">12.11 (22 дни)</span></td>
+            <td>—</td></tr>
+          
+        </table>
+
+        
+      </div>
+
     </div>
     
     <div class="thesis watch">
       <div class="thesis-head">
         <span class="thesis-name">Крипто регулация (CLARITY Act)</span>
         <span class="thesis-status watch">наблюдава се</span>
-        
         
       </div>
       <div class="thesis-tickers">CRCL  ·  COIN  ·  HOOD  ·  BLSH</div>
@@ -884,14 +1000,43 @@
         <span class="thesis-name">Финанси при стръмна крива</span>
         <span class="thesis-status watch">наблюдава се</span>
         
-        
       </div>
       <div class="thesis-tickers">JPM  ·  BAC</div>
       <div class="thesis-chain">Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.</div>
+      <div class="thesis-headline">📰 Dollar on back foot as US yields, crude prices dip; Aussie buoyed by hawkish RBA - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 Housing is flashing warning signs just as the Fed weighs more interest rate hikes <span style="color:var(--muted)">· CNBC</span></div>
       
       
       
-      
+      <div class="thesis-ctx">
+        <div class="ctx-title">Контекст · само данни</div>
+        
+        
+        <div class="ctx-summary">1/2 под 200DMA · секторът изостава · отчет след 85 дни (JPM)</div>
+        
+        <div class="ctx-meta">Режим: <b>Defensive</b> ·
+          Сектор XLF:
+            RS <span class="pos">+2.2%</span> (4с) / <span class="neg">-4.1%</span> (12с) · <span class="neg">изоставащ</span>
+          </div>
+
+        
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
+          
+          <tr><td class="mono">JPM</td>
+            <td class="num"><span class="neg">-4.3%</span></td><td><span class="neg">под</span></td><td><span class="pos">над</span></td>
+            <td><span class="">14.01 (85 дни)</span></td>
+            <td>—</td></tr>
+          
+          <tr><td class="mono">BAC</td>
+            <td class="num"><span class="neg">-12.6%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">15.01 (86 дни)</span></td>
+            <td>—</td></tr>
+          
+        </table>
+
+        
+      </div>
+
     </div>
     
   </div>
@@ -924,121 +1069,42 @@
   
   
   
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от вчера (19.10):</b>
-    <b>BBY</b>: цената е 5.6% под pivot $96.53 (над допустимите 5%) <span style="opacity:.8">(вчера: структурен стоп 14.2% &gt; 10%)</span>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от вчера (20.10):</b>
+    няма
   </div>
   
   
   
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
-    <b>PSX</b> — структурен стоп 15.3% &gt; 10%, отчет 28.10 (±2.4%) SECT✓ · <b>EBAY</b> — структурен стоп 14.0% &gt; 10%, отчет 28.10 · <b>WSM</b> — структурен стоп 12.5% &gt; 10% · <b>LLY</b> — структурен стоп 13.4% &gt; 10%, отчет 29.10 (±6.1%) SECT✓ · <b>AMGN</b> — структурен стоп 12.3% &gt; 10%, отчет 03.11 (±3.7%) SECT✓
+    <b>WSM</b> — структурен стоп 12.5% &gt; 10%, отчет 18.11 SECT✓ · <b>PSX</b> — структурен стоп 14.6% &gt; 10%, отчет 28.10 SECT✓ · <b>LLY</b> — структурен стоп 13.4% &gt; 10%, отчет 29.10 SECT✓ · <b>AMGN</b> — структурен стоп 12.3% &gt; 10%, отчет 03.11 (±3.2%) SECT✓ · <b>EBAY</b> — структурен стоп 14.5% &gt; 10%, отчет 28.10 SECT✓
   </div>
   
   <div class="watch-grid">
     
     <div class="watch-card">
-      <span class="ticker">AAPL</span>
-      <span class="company">Apple</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 78</span>
-      <span class="markers"><span class="marker" title="Необичаен опционен обем вчера: ≈ 0.86× OI — над 90-ия перцентил на 54 ликвидни тикъра за деня (праг 0.77×); върху 6 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 418,216 / OI 483,903 договора; calls 47% от обема — Балансиран call/put обем. OI е от следобедната снимка на сесията 19.10." tabindex="0" onclick="this.classList.toggle('open')">UOV✓<span class="marker-tip">Необичаен опционен обем вчера: ≈ 0.86× OI — над 90-ия перцентил на 54 ликвидни тикъра за деня (праг 0.77×); върху 6 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 418,216 / OI 483,903 договора; calls 47% от обема — Балансиран call/put обем. OI е от следобедната снимка на сесията 19.10.</span></span></span>
-      
-      
-      <div class="earn-warn">⚠ Отчет на 02.11 (след 9 сесии) — пазарът очаква ±3.5% при отчета (оценка от straddle-ите на 30.10 и 06.11 с извадена базова волатилност; цена $341.46, опции от 19.10).</div>
-      
-      
-      
-      
-      
-      <p>Чисто технически setup — Technology секторът няма активна секторна логика в Defensive режим и няма директна макро верига. AAPL е задействан buy-stop сигнал от 19.10 по $345.34 (изпълнен), текущо -0.1R. RS статус near_high, RS rating 78 — умерено, но не водещ в сегашния режим.</p>
-      
-      
-      
-      
-      
-      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 19.10 по $345.34 (buy-stop от 19.10) · стоп $322.55 · цел 2R $390.92 · текущо -0.1R — изпълнен сигнал от книгата, не нов вход.</div>
-      
-    </div>
-    
-    <div class="watch-card">
-      <span class="ticker">AMG</span>
-      <span class="company">Affiliated Managers Group</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 91</span>
-      
-      
-      
-      <div class="earn-warn">⚠ Отчет на 02.11 (след 9 сесии) — няма данни за очаквано движение (първият падеж след отчета е 2026-11-20, 18 дни след него — премията е предимно времева стойност).</div>
-      
-      
-      
-      
-      
-      <p>Чисто технически setup — Financial Services няма активна секторна логика. AMG обаче показва RS rating 91 и RS статус new_high — относителна сила на нови върхове е рядкост в Defensive режим. Forward P/E 8.9 при EPS ръст +120.5% е изключително привлекателна оценка. Setup е below_pivot: buy-stop $395.00, валиден до 26.10, сега 2.5% под pivot — чака пробив с обем ≥1.5×.</p>
-      
-      
-      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $395.00 (валиден 5 сесии, до 26.10); сега 2.5% под pivot. Купува се само ако High ≥ $395.00, до $414.75; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 2.5% под pivot — не е пробил още, изчакай реален пробив.
-        · pivot $395.0 (-2.5%)</div>
-      
-      
-      
-      
-      <div class="buy-stop">🎯 Buy-stop $395.00 · валиден до 26.10
-        · таван за вход $414.75</div>
-      
-      
-      
-      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
-        Цел 1 (2R, 50% от позицията) $458.20
-        · режимен фактор Defensive ×0.5</div>
-      
-
-<div class="lv" data-strategy="canslim" data-entry="395.0" data-stop="363.4" data-adr="2.94" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
-  <div class="lv-info">
-    <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$395.00</b></div>
-    <div class="lv-row"><span>Стоп</span><b>$363.40 <i>(−8.0%)</i></b></div>
-    
-    <div class="lv-row"><span>ADR (20 бара)</span><b>2.9%</b></div>
-  </div>
-  <div class="lv-note">източник на стопа: таван 8% под входа (структурният е 8.8%)</div>
-  
-  
-  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
-  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
-  <div class="lv-adj" hidden>
-    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
-    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
-    <button type="button" class="lv-reset">върни</button>
-    <div class="lv-note">само за тази карта — не се записва</div>
-  </div>
-</div>
-
-
-      
-      
-    </div>
-    
-    <div class="watch-card">
       <span class="ticker">ROKU</span>
       <span class="company">Roku</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 89</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 90</span>
+      <span class="markers"><span class="marker" title="Необичаен опционен обем вчера: ≈ 1.90× OI — над 90-ия перцентил на 55 ликвидни тикъра за деня (праг 0.74×); върху 3 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 3,627 / OI 1,910 договора; calls 93% от обема — Обемът е предимно в кол опции — bullish наклон. OI е от следобедната снимка на сесията 20.10." tabindex="0" onclick="this.classList.toggle('open')">UOV✓ (calls)<span class="marker-tip">Необичаен опционен обем вчера: ≈ 1.90× OI — над 90-ия перцентил на 55 ликвидни тикъра за деня (праг 0.74×); върху 3 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 3,627 / OI 1,910 договора; calls 93% от обема — Обемът е предимно в кол опции — bullish наклон. OI е от следобедната снимка на сесията 20.10.</span></span></span>
       
       
-      
-      <div class="earn-warn">⚠ Отчет на 02.11 (след 9 сесии) — няма данни за очаквано движение (тикърът не е в опционната снимка).</div>
-      
-      
-      
-      
-      
-      <p>Чисто технически setup — Communication Services / Entertainment няма макро верига в текущата секторна логика. ROKU показва RS rating 89 и near_high статус, EPS ръст +1463.5% (база ефект от загуба към печалба). Setup below_pivot: buy-stop $159.89, валиден до 26.10, сега 2.7% под pivot — чака пробив с обем ≥1.5×.</p>
-      
-      
-      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $159.89 (валиден 5 сесии, до 26.10); сега 2.7% под pivot. Купува се само ако High ≥ $159.89, до $167.88; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 2.7% под pivot — не е пробил още, изчакай реален пробив.
-        · pivot $159.89 (-2.7%)</div>
+      <div class="earn-warn">⚠ Отчет на 02.11 (след 8 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-06) е твърде широк).</div>
       
       
       
       
-      <div class="buy-stop">🎯 Buy-stop $159.89 · валиден до 26.10
+      
+      <p>Сетъпът е чисто технически — Communication Services не е активен сектор в настоящия Defensive режим и няма директна макро верига от днешните новини към Roku. RS рейтинг 90 и near_high статус показват относителна сила, но секторът не е в ротационния поток.</p>
+      
+      
+      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $159.89 (валиден до 26.10, от 20.10 — 5 сесии от първия ден); сега 1.5% под pivot. Купува се само ако High ≥ $159.89, до $167.88; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 1.4% под pivot — не е пробил още, изчакай реален пробив.
+        · pivot $159.89 (-1.4%)</div>
+      
+      
+      
+      
+      
+      <div class="buy-stop">🎯 Buy-stop $159.89 · валиден до 26.10, от 20.10
         · таван за вход $167.88</div>
       
       
@@ -1047,8 +1113,9 @@
         Цел 1 (2R, 50% от позицията) $182.61
         · режимен фактор Defensive ×0.5</div>
       
+      
 
-<div class="lv" data-strategy="canslim" data-entry="159.89" data-stop="148.53" data-adr="1.17" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
+<div class="lv" data-strategy="canslim" data-entry="159.89" data-stop="148.53" data-adr="1.19" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
   <div class="lv-info">
     <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$159.89</b></div>
     <div class="lv-row"><span>Стоп</span><b>$148.53 <i>(−7.1%)</i></b></div>
@@ -1074,28 +1141,88 @@
     </div>
     
     <div class="watch-card">
+      <span class="ticker">AMG</span>
+      <span class="company">Affiliated Managers Group</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 91</span>
+      
+      
+      
+      <div class="earn-warn">⚠ Отчет на 02.11 (след 8 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
+      
+      
+      
+      
+      
+      <p>Сетъпът е предимно технически — Financial Services не е в активната секторна логика. Частична косвена връзка: Defensive режим с credit spread разширяване исторически натиска AUM-базирани мениджъри при изтичане на капитал от рискови активи, което е насрещен вятър. RS в new_high обаче показва, че пазарът не наказва AMG въпреки режима — вероятно заради ниското P/E (13.6) и forward P/E (9.0), което привлича value ротация.</p>
+      
+      
+      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $395.00 (валиден до 26.10, от 20.10 — 5 сесии от първия ден); сега 1.6% под pivot. Купува се само ако High ≥ $395.00, до $414.75; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 1.6% под pivot — не е пробил още, изчакай реален пробив.
+        · pivot $395.0 (-1.6%)</div>
+      
+      
+      
+      
+      
+      <div class="buy-stop">🎯 Buy-stop $395.00 · валиден до 26.10, от 20.10
+        · таван за вход $414.75</div>
+      
+      
+      
+      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
+        Цел 1 (2R, 50% от позицията) $458.20
+        · режимен фактор Defensive ×0.5</div>
+      
+      
+
+<div class="lv" data-strategy="canslim" data-entry="395.0" data-stop="363.4" data-adr="2.91" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
+  <div class="lv-info">
+    <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$395.00</b></div>
+    <div class="lv-row"><span>Стоп</span><b>$363.40 <i>(−8.0%)</i></b></div>
+    
+    <div class="lv-row"><span>ADR (20 бара)</span><b>2.9%</b></div>
+  </div>
+  <div class="lv-note">източник на стопа: таван 8% под входа (структурният е 8.8%)</div>
+  
+  
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+
+
+      
+      
+    </div>
+    
+    <div class="watch-card">
       <span class="ticker">ZBRA</span>
       <span class="company">Zebra Technologies</span>
       <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 93</span>
       
       
       
-      <div class="earn-warn">⚠ Отчет на 03.11 (след 10 сесии) — няма данни за очаквано движение (първият падеж след отчета е 2026-11-20, 17 дни след него — премията е предимно времева стойност).</div>
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 9 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
       
       
       
       
       
-      <p>Чисто технически setup — Technology / Communication Equipment няма активна макро верига в Defensive режим. ZBRA има RS rating 93 — най-висок в списъка, EPS ръст +108% YoY. Сериозен проблем: базата е 34.3% дълбочина — необичайно широка. Setup below_pivot: buy-stop $390.80, валиден до 20.10 (5 сесии от 14.10) — прозорецът вероятно е изтекъл или почти изтекъл.</p>
+      <p>Сетъпът е чисто технически — Technology/Communication Equipment не е в активната секторна логика за Defensive режим. Няма директна верига от днешните новини към Zebra Technologies. RS рейтинг 93 в new_high статус е забележителен, но setup-ът чака потвърждение.</p>
       
       
-      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $390.80 (валиден до 20.10, от 14.10 — 5 сесии от първия ден); сега 3.8% под pivot. Купува се само ако High ≥ $390.80, до $410.34; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 3.9% под pivot — не е пробил още, изчакай реален пробив.
-        · pivot $390.8 (-3.9%)</div>
+      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $390.80 (валиден 5 сесии, до 27.10); сега 1.7% под pivot. Купува се само ако High ≥ $390.80, до $410.34; обем ≥ 1.5× среден за потвърждение. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 1.7% под pivot — не е пробил още, изчакай реален пробив.
+        · pivot $390.8 (-1.7%)</div>
       
       
       
       
-      <div class="buy-stop">🎯 Buy-stop $390.80 · валиден до 20.10, от 14.10
+      
+      <div class="buy-stop">🎯 Buy-stop $390.80 · валиден до 27.10
         · таван за вход $410.34</div>
       
       
@@ -1104,13 +1231,14 @@
         Цел 1 (2R, 50% от позицията) $448.20
         · режимен фактор Defensive ×0.5</div>
       
+      
 
-<div class="lv" data-strategy="canslim" data-entry="390.8" data-stop="362.1" data-adr="2.66" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
+<div class="lv" data-strategy="canslim" data-entry="390.8" data-stop="362.1" data-adr="2.63" data-factor="0.5" data-regime-label="защитен режим" data-regime-note="">
   <div class="lv-info">
     <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$390.80</b></div>
     <div class="lv-row"><span>Стоп</span><b>$362.10 <i>(−7.3%)</i></b></div>
     
-    <div class="lv-row"><span>ADR (20 бара)</span><b>2.7%</b></div>
+    <div class="lv-row"><span>ADR (20 бара)</span><b>2.6%</b></div>
   </div>
   <div class="lv-note">източник на стопа: структурен: 15-барен low −1%</div>
   
@@ -1131,13 +1259,37 @@
     </div>
     
     <div class="watch-card">
+      <span class="ticker">AAPL</span>
+      <span class="company">Apple</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 75</span>
+      
+      
+      
+      <div class="earn-warn">⚠ Отчет на 02.11 (след 8 сесии) — пазарът очаква ±3.4% при отчета (оценка от straddle-ите на 30.10 и 06.11 с извадена базова волатилност; цена $341.98, опции от 20.10).</div>
+      
+      
+      
+      
+      
+      <p>Сетъпът е изпълнен сигнал от книгата — не е нов вход. Technology/Consumer Electronics не е в активната секторна логика за Defensive режим; няма директна макро верига от днешните новини. RS рейтинг 75 (near_high) е по-слаб спрямо останалите кандидати. Аналитичната цел $328.35 е под текущата цена — консенсусът не подкрепя upside.</p>
+      
+      
+      
+      
+      
+      
+      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 19.10 по $345.34 (buy-stop от 19.10) · стоп $322.55 · цел 2R $390.92 · текущо -0.3R — изпълнен сигнал от книгата, не нов вход.</div>
+      
+    </div>
+    
+    <div class="watch-card">
       <span class="ticker">EXPD</span>
       <span class="company">Expeditors International of Washington</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 91</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 90</span>
       <span class="markers"><span class="marker" title="Отворена позиция от 2026-10-16 @ $199.77 — не е нов вход." tabindex="0" onclick="this.classList.toggle('open')">OPEN✓<span class="marker-tip">Отворена позиция от 2026-10-16 @ $199.77 — не е нов вход.</span></span></span>
       
       
-      <div class="earn-warn">⚠ Отчет на 03.11 (след 10 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 9 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
       
       
       
@@ -1148,15 +1300,172 @@
       
       
       
-      <div class="watch-trigger"><b>Сетъп:</b> ✅ Задействан на 09.10 по $194.59 (buy-stop от 09.10) · стоп $181.53 · цел 2R $220.71 · текущо +0.2R — изпълнен сигнал от книгата, не нов вход.</div>
       
       
-      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 09.10 по $194.59 (buy-stop от 09.10) · стоп $181.53 · цел 2R $220.71 · текущо +0.2R — изпълнен сигнал от книгата, не нов вход.</div>
+      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 09.10 по $194.59 (buy-stop от 09.10) · стоп $181.53 · цел 2R $220.71 · текущо +0.3R — изпълнен сигнал от книгата, не нов вход.</div>
       
     </div>
     
   </div>
 </section>
+
+
+<section>
+  
+  <details class="canslim-book">
+  <summary>
+  
+  <h2>Track Record v2 · 1 Action сигнал от 05.10 · 0 резолвирани</h2>
+  <span class="book-hint">книга Action · измерване — разгъни</span>
+  </summary>
+  
+  
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    v1 методология: n=51, win rate 25.5%,
+    среден R -0.42 (3 изтекли — оценени по Close при изтичането)
+    · архивирана на 2026-10-05 (отворените v1 позиции затворени по последния Close, mark-to-market);
+    Track Record v2 започва от нула.</div>
+  
+  <div class="prose">
+    
+    
+    <b>Още няма затворени сделки по v2</b> — win rate и среден R се показват от първата резолюция.<br>
+    
+    
+    Все още отворени: 1 (преди цел 1) + 0 (след частична продажба на цел 1, trailing)<br>
+    
+    Чакат buy-stop: 0 · не се задействаха: 0 (извън статистиката)<br>
+    
+    
+    
+  </div>
+  
+  
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции (1):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Дата на вход</th><th class="n">Entry цена</th>
+        <th class="n">Текуща цена</th><th class="n">% промяна</th><th class="n">SPY, същия период</th></tr></thead>
+      <tbody>
+        
+        
+        <tr class="pos-row-down">
+          <td class="sym">EXPD
+
+</td>
+          <td>2026-10-16</td>
+          <td class="n">$199.77</td>
+          <td class="n">$198.41</td>
+          
+          <td class="n pct">-0.7%</td>
+          
+          <td class="n pct">-0.5%</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+
+
+  
+  
+  
+  </details>
+</section>
+
+
+
+
+
+
+
+<section>
+  <details class="canslim-book">
+  <summary>
+  <h2>Buy-stop кандидати — измерване, не препоръка</h2>
+  <span class="book-hint">книга buy-stop · записани 7 — разгъни</span>
+  </summary>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+    Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
+    5 сесии, по max(Open, buy-stop), не над +5%; стоп и цел от картата) във всички режими.
+    Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
+  <div class="prose">
+    
+    <b>Записани: 7</b> · чакат buy-stop 3 · отворени 2 · затворени 1
+    · не се задействаха 1 (25.0% от приключилите прозорци) · и в Action: 1<br>
+    
+    Затворени: 1 · среден R: -1.00<br>
+    
+    Win rate се показва след 20 затворени (сега 1) — при по-малко е шум.<br>
+    
+    По режим на деня на картата (записани / затворени):
+    Defensive 6 / 1 · Offensive 1 / 0
+    
+  </div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (5):</div>
+  <div class="card" style="padding:6px 4px;margin-top:6px">
+    <table class="pos-table">
+      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Buy-stop</th><th class="n">Стоп</th><th class="n">Цел 1</th>
+        <th>Валиден до</th><th>Режим</th></tr></thead>
+      <tbody>
+        
+        <tr><td class="sym">EXPD<span class="markers"><span class="marker" title="Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират." tabindex="0" onclick="this.classList.toggle('open')">и Action<span class="marker-tip">Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират.</span></span></span></td>
+          <td>2026-10-09</td>
+          <td>отворена от 2026-10-09 · +0.3R
+            </td>
+          <td class="n">$194.59</td><td class="n">$181.53</td><td class="n">$220.71</td>
+          <td>2026-10-15</td><td>Defensive</td></tr>
+        
+        <tr><td class="sym">AAPL</td>
+          <td>2026-10-19</td>
+          <td>отворена от 2026-10-19 · -0.3R
+            </td>
+          <td class="n">$345.34</td><td class="n">$322.55</td><td class="n">$390.92</td>
+          <td>2026-10-23</td><td>Defensive</td></tr>
+        
+        <tr><td class="sym">AMG</td>
+          <td>2026-10-20</td>
+          <td>чака buy-stop
+            </td>
+          <td class="n">$395.0</td><td class="n">$363.4</td><td class="n">$458.2</td>
+          <td>2026-10-26</td><td>Defensive</td></tr>
+        
+        <tr><td class="sym">ROKU<span class="markers"><span class="marker" title="Необичаен опционен обем вчера: ≈ 1.90× OI — над 90-ия перцентил на 55 ликвидни тикъра за деня (праг 0.74×); върху 3 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 3,627 / OI 1,910 договора; calls 93% от обема — Обемът е предимно в кол опции — bullish наклон. OI е от следобедната снимка на сесията 20.10." tabindex="0" onclick="this.classList.toggle('open')">UOV✓ (calls)<span class="marker-tip">Необичаен опционен обем вчера: ≈ 1.90× OI — над 90-ия перцентил на 55 ликвидни тикъра за деня (праг 0.74×); върху 3 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 3,627 / OI 1,910 договора; calls 93% от обема — Обемът е предимно в кол опции — bullish наклон. OI е от следобедната снимка на сесията 20.10.</span></span></span></td>
+          <td>2026-10-20</td>
+          <td>чака buy-stop
+            </td>
+          <td class="n">$159.89</td><td class="n">$148.53</td><td class="n">$182.61</td>
+          <td>2026-10-26</td><td>Defensive</td></tr>
+        
+        <tr><td class="sym">ZBRA</td>
+          <td>2026-10-21</td>
+          <td>чака buy-stop
+            </td>
+          <td class="n">$390.8</td><td class="n">$362.1</td><td class="n">$448.2</td>
+          <td>2026-10-27</td><td>Defensive</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени (1):</div>
+  <div class="watch-grid" style="margin-top:6px">
+    
+    <div class="watch-card">
+      <span class="ticker" style="color: var(--red)">ANET</span>
+      <p>2026-10-09 → 2026-10-13 · стоп · R=-1.0 · Defensive</p>
+    </div>
+    
+  </div>
+  
+  </details>
+</section>
+
 
 
 
@@ -1178,63 +1487,25 @@
   <div class="qm-grid">
     
     <div class="qm-card">
-      <div class="qm-top"><span class="qm-sym">CBOE</span><span class="qm-price">$306.47</span></div>
-      <div class="qm-company">Cboe Global Markets</div>
-      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +3.0% над затварянето">Вход над $315.56 <span class="qm-sm">(+3.0%)</span> <span class="qm-sm">· до нивото 0.73 ADR</span></div>
-      <div class="earn-warn">⚠ Отчет на 30.10 (след 8 сесии) — няма данни за очаквано движение (тикърът не е в опционната снимка).</div>
+      <div class="qm-top"><span class="qm-sym">RVTY</span><span class="qm-price">$156.01</span></div>
+      <div class="qm-company">Revvity</div>
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +1.3% над затварянето">Вход над $158.00 <span class="qm-sm">(+1.3%)</span> <span class="qm-sm">· до нивото 0.32 ADR</span></div>
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 9 сесии) — няма данни за очаквано движение (картата е нова — при снимката на 20.10 не беше сред кандидатите).</div>
       
       
       
       <div class="qm-kv">
         <span>ADR</span><b>4.0%</b>
-        <span>Предходен ръст</span><b>+32%</b>
-        <span>Консолидация</span><b title="дълбочина 20.4% · стягане 0.80× ADR · обем 1.03× от 50-дневния · цена +2.9% от 10 MA, +8.4% от 20 MA">36 дни</b>
+        <span>Предходен ръст</span><b>+48%</b>
+        <span>Консолидация</span><b title="дълбочина 11.8% · стягане 0.99× ADR · обем 0.90× от 50-дневния · цена +1.5% от 10 MA, +2.3% от 20 MA">10 дни</b>
       </div>
       
 
-<div class="lv" data-strategy="kullamagi" data-entry="315.56" data-stop="302.79" data-adr="4.05" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
+<div class="lv" data-strategy="kullamagi" data-entry="158.0" data-stop="151.67" data-adr="4.0" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
   <div class="lv-info">
     
-    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$302.79 <i>(−4.0%)</i></b></div>
-    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $308.53 <i>(−2.2%)</i></b></div>
-    
-  </div>
-  
-  <div class="lv-note">ориентировъчен — реалният стоп е дъното на деня на влизане</div>
-  
-  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
-  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
-  <div class="lv-adj" hidden>
-    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
-    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
-    <button type="button" class="lv-reset">върни</button>
-    <div class="lv-note">само за тази карта — не се записва</div>
-  </div>
-</div>
-
-
-    </div>
-    
-    <div class="qm-card">
-      <div class="qm-top"><span class="qm-sym">UTHR</span><span class="qm-price">$543.15</span></div>
-      <div class="qm-company">United Therapeutics</div>
-      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +3.1% над затварянето">Вход над $560.00 <span class="qm-sm">(+3.1%)</span> <span class="qm-sm">· до нивото 0.76 ADR</span></div>
-      <div class="earn-warn">⚠ Отчет на 28.10 (след 6 сесии) — няма данни за очаквано движение (тикърът не е в опционната снимка).</div>
-      
-      
-      
-      <div class="qm-kv">
-        <span>ADR</span><b>4.1%</b>
-        <span>Предходен ръст</span><b>+25%</b>
-        <span>Консолидация</span><b title="дълбочина 10.6% · стягане 0.88× ADR · обем 0.84× от 50-дневния · цена +0.2% от 10 MA, +3.3% от 20 MA">12 дни</b>
-      </div>
-      
-
-<div class="lv" data-strategy="kullamagi" data-entry="560.0" data-stop="537.09" data-adr="4.09" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
-  <div class="lv-info">
-    
-    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$537.09 <i>(−4.1%)</i></b></div>
-    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $547.40 <i>(−2.2%)</i></b></div>
+    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$151.67 <i>(−4.0%)</i></b></div>
+    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $154.52 <i>(−2.2%)</i></b></div>
     
   </div>
   
@@ -1255,8 +1526,8 @@
     
   </div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
-    Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (181 от 899 тикъра към
-    19.10), кандидати 2. Още 2 кандидат(а) са на повече от 1×ADR от нивото (ADSK, MORN) — не се показват и не се записват. 
+    Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (184 от 900 тикъра към
+    20.10), кандидати 1. 
     Задръж курсора върху консолидацията за подробности (дълбочина на базата, стягане, позиция спрямо 10/20 MA). Стопът за оразмеряване е максималният (1×ADR); реалният стоп е дъното на деня на влизане.
   </div>
   
@@ -1265,7 +1536,7 @@
   
   
   <details class="qm-book" style="margin-top:14px">
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани 13 · затворени 2 · win rate след 20 затворени</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани 14 · затворени 2 · win rate след 20 затворени</summary>
   
   
   
@@ -1280,21 +1551,21 @@
     Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     
-    <b>Записани: 13</b> · чакат вход 2 · отворени 1 · затворени 2
-    · не се задействаха 8 (72.7% от приключилите прозорци) · <span style="color:var(--yellow)">с риск на входа под 0.25×ADR: 1 (R от пода)</span><br>
+    <b>Записани: 14</b> · чакат вход 1 · отворени 3 · затворени 2
+    · не се задействаха 8 (61.5% от приключилите прозорци) · <span style="color:var(--yellow)">с риск на входа под 0.25×ADR: 1 (R от пода)</span><br>
     Затворени: 2 · среден R: <b>+0.32</b> (opt) / <b>-0.68</b> (pess) · средна доходност на сделка +0.62% / -0.97%<br>
     
     Win rate се показва след 20 затворени (сега 2) — при по-малко е шум.<br>
     
     По режим на деня на картата (записани / затворени):
-    Defensive 8 / 2 · Offensive 5 / 0
+    Defensive 9 / 2 · Offensive 5 / 0
     
     
     <br><span style="color:var(--muted)">Извън статистиката: 2 запис(а) от преди правилото „нивото най-много 1×ADR над затварянето“ (в сила от 2026-10-09) — пазят се, но не влизат в броя, процентите и средните:
       SANM (08.10, 1.27 ADR до нивото, не се задейства), SITM (08.10, 1.81 ADR до нивото, не се задейства).</span>
   </div>
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (3):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (4):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
@@ -1302,20 +1573,26 @@
         
         <tr><td class="sym">DOCU</td>
           <td>2026-10-13</td>
-          <td>след частична продажба (trailing) от 2026-10-13 · +2.1R (+5.4%) · SMA20</td>
+          <td>след частична продажба (trailing) от 2026-10-13 · +3.2R (+8.3%) · SMA20</td>
           <td class="n">$72.76</td><td class="n">$72.76</td><td class="n">$70.885</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">CBOE</td>
           <td>2026-10-20</td>
-          <td>чака пробива</td>
-          <td class="n">$315.56</td><td class="n">—</td><td class="n">—</td>
+          <td>отворена от 2026-10-20 · -0.1R (-0.2%) · SMA20</td>
+          <td class="n">$315.56</td><td class="n">$315.56</td><td class="n">$306.47</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">UTHR</td>
           <td>2026-10-20</td>
+          <td>отворена от 2026-10-20 · -0.4R (-1.1%) · SMA20</td>
+          <td class="n">$560.0</td><td class="n">$560.0</td><td class="n">$545.58</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">RVTY</td>
+          <td>2026-10-21</td>
           <td>чака пробива</td>
-          <td class="n">$560.0</td><td class="n">—</td><td class="n">—</td>
+          <td class="n">$158.0</td><td class="n">—</td><td class="n">—</td>
           <td>Defensive</td></tr>
         
       </tbody>
@@ -1357,14 +1634,54 @@
     стоп лимитът е информация (най-много 1×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
   </div>
   
-  <div class="small" style="font-size:12.5px;color:var(--muted)">няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри (проверени 903 тикъра с after-hours бар)</div>
+  <div class="card" style="padding:6px 4px">
+    <table class="pos-table qm-ep-table">
+      <thead><tr><th>Тикър</th><th class="n">AH гап</th><th>Новина</th><th class="n">Ръст 3 м.</th><th class="n">Стоп лимит (1×ADR)</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="sym">SMCI</td>
+          <td class="n">+15.5%<div class="qm-sm">$32.47 → $37.51</div></td>
+          <td>Dow Jones Futures: SpaceX, Supermicro Revive AI Stocks; Tesla, Meta On Deck
+            <div class="qm-ep-hl">Отчет / guidance · изненада · <span style="color:var(--yellow)">⚠ обем в AH: н/д</span></div>
+            <div class="qm-ep-sum">Super Micro Computer отчете предварителни приходи за Q1, които смазиха прогнозите, подкрепени от силно търсене на AI.</div></td>
+          <td class="n">+6%</td>
+          <td class="n">$35.40 <span class="qm-sm">(−5.6%)</span></td>
+        </tr>
+        <tr class="qm-lv-row"><td colspan="5">
+
+<div class="lv" data-strategy="kullamagi" data-entry="37.51" data-stop="35.4" data-adr="5.63" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
+  <div class="lv-info">
+    <div class="lv-row"><span>after-hours цена</span><b>$37.51</b></div>
+    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$35.40 <i>(−5.6%)</i></b></div>
+    
+    <div class="lv-row"><span>ADR (20 бара)</span><b>5.6%</b></div>
+  </div>
+  
+  <div class="lv-note">ориентировъчен — реалният стоп е дъното на деня на влизане</div>
+  
+  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
+  <div class="lv-adj" hidden>
+    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
+    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
+    <button type="button" class="lv-reset">върни</button>
+    <div class="lv-note">само за тази карта — не се записва</div>
+  </div>
+</div>
+
+</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
   
   
   <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
     <b>Проверката е отварянето</b> (15:30 CEST / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
     
     <br><span style="color:var(--muted)">Вчера няма гапове за проверка срещу отварянето.</span>
-    <span style="color:var(--muted)"> Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%) · медианно разминаване +3.6 пр.п.; решение за второ пускане — след 4–6 седмици.</span>
+    <span style="color:var(--muted)"> Общо в дневника: записи 2, разрешени 1; 1 от тях отварят ≥ 10% (100%) · медианно разминаване +3.6 пр.п.; решение за второ пускане — след 4–6 седмици.</span>
   </div>
 </section>
 
@@ -1386,21 +1703,21 @@
     <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
   </div>
   <div class="small corp-excluded" style="font-size:12.5px;color:var(--yellow);margin:0 0 10px"><b>Изключени (корпоративно действие):</b>
-  CTVA — изключена: отделяне на Vylor (1:1) на 01.10; историята преди датата е оценка на Yahoo (коефициент 6.665); CTVA + VYLR = $85.04 към 19.10 спрямо $77.65 преди (+9.5%); връща се, когато линията е от месец след 10.2026</div>
+  CTVA — изключена: отделяне на Vylor (1:1) на 01.10; историята преди датата е оценка на Yahoo (коефициент 6.665); CTVA + VYLR = $86.03 към 20.10 спрямо $77.65 преди (+10.8%); връща се, когато линията е от месец след 10.2026</div>
   
-  <div class="glb-group-label classic">Classic GLB (14)</div>
+  <div class="glb-group-label classic">Classic GLB (15)</div>
   <div class="glb-grid">
     
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">MRK</span>
-        <span class="glb-price">$143.63</span>
+        <span class="glb-price">$148.30</span>
       </div>
       <div class="glb-company">Merck &amp;</div>
       <div class="glb-stat">28 месеца unpenetrated</div>
       <div class="glb-detail">prior high $131.95 (2024-03)</div>
       
-      <div class="glb-detail"><b>GLB от 14.08</b>, 8.9% над линията ($131.95)</div>
+      <div class="glb-detail"><b>GLB от 14.08</b>, 12.4% над линията ($131.95)</div>
       
       <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 18.75% от линията</div>
       
@@ -1417,13 +1734,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">AFG</span>
-        <span class="glb-price">$148.08</span>
+        <span class="glb-price">$149.24</span>
       </div>
       <div class="glb-company">American Financial Group</div>
       <div class="glb-stat">22 месеца unpenetrated</div>
       <div class="glb-detail">prior high $146.86 (2024-11)</div>
       
-      <div class="glb-detail"><b>GLB от 19.10</b>, 0.8% над линията ($146.86)</div>
+      <div class="glb-detail"><b>GLB от 19.10</b>, 1.6% над линията ($146.86)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 8.64% от линията</div>
       
@@ -1440,18 +1757,41 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">WAT</span>
-        <span class="glb-price">$434.27</span>
+        <span class="glb-price">$442.83</span>
       </div>
       <div class="glb-company">Waters</div>
       <div class="glb-stat">19 месеца unpenetrated</div>
       <div class="glb-detail">prior high $415.48 (2025-01)</div>
       
-      <div class="glb-detail"><b>GLB от 17.09</b>, 4.5% над линията ($415.48)</div>
+      <div class="glb-detail"><b>GLB от 17.09</b>, 6.6% над линията ($415.48)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 19.5% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.9× средния · 1.5× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.9× средния · 1.6× от 52-седм. дъно</div>
+      
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">BRK-B</span>
+        <span class="glb-price">$539.82</span>
+      </div>
+      <div class="glb-company">Berkshire Hathaway Inc. New</div>
+      <div class="glb-stat">17 месеца unpenetrated</div>
+      <div class="glb-detail">prior high $533.25 (2025-04)</div>
+      
+      <div class="glb-detail"><b>GLB от 21.10</b>, 1.2% над линията ($533.25)</div>
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 9.69% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.2× средния · 1.2× от 52-седм. дъно</div>
       
       
       
@@ -1463,13 +1803,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">MA</span>
-        <span class="glb-price">$616.40</span>
+        <span class="glb-price">$620.42</span>
       </div>
       <div class="glb-company">Mastercard</div>
       <div class="glb-stat">13 месеца unpenetrated</div>
       <div class="glb-detail">prior high $595.29 (2025-08)</div>
       
-      <div class="glb-detail"><b>GLB от 14.10</b>, 3.5% над линията ($595.29)</div>
+      <div class="glb-detail"><b>GLB от 14.10</b>, 4.2% над линията ($595.29)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 13.04% от линията</div>
       
@@ -1486,13 +1826,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">FAST</span>
-        <span class="glb-price">$51.02</span>
+        <span class="glb-price">$51.65</span>
       </div>
       <div class="glb-company">Fastenal</div>
       <div class="glb-stat">12 месеца unpenetrated</div>
       <div class="glb-detail">prior high $49.66 (2025-08)</div>
       
-      <div class="glb-detail"><b>GLB от 23.09</b>, 2.7% над линията ($49.66)</div>
+      <div class="glb-detail"><b>GLB от 23.09</b>, 4.0% над линията ($49.66)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.84% от линията</div>
       
@@ -1509,13 +1849,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">MCK</span>
-        <span class="glb-price">$1010.43</span>
+        <span class="glb-price">$1030.12</span>
       </div>
       <div class="glb-company">McKesson</div>
       <div class="glb-stat">7 месеца unpenetrated</div>
       <div class="glb-detail">prior high $987.37 (2026-02)</div>
       
-      <div class="glb-detail"><b>GLB от 16.10</b>, 2.3% над линията ($987.37)</div>
+      <div class="glb-detail"><b>GLB от 16.10</b>, 4.3% над линията ($987.37)</div>
       
       <div class="glb-detail">band_hold 88.9% · диапазон на 63 дни 17.35% от линията</div>
       
@@ -1532,13 +1872,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">XOM</span>
-        <span class="glb-price">$178.28</span>
+        <span class="glb-price">$177.86</span>
       </div>
       <div class="glb-company">ExxonMobil</div>
       <div class="glb-stat">6 месеца unpenetrated</div>
       <div class="glb-detail">prior high $169.66 (2026-03)</div>
       
-      <div class="glb-detail"><b>GLB от 13.10</b>, 5.1% над линията ($169.66)</div>
+      <div class="glb-detail"><b>GLB от 13.10</b>, 4.8% над линията ($169.66)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 16.66% от линията</div>
       
@@ -1555,13 +1895,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">FCX</span>
-        <span class="glb-price">$69.75</span>
+        <span class="glb-price">$68.87</span>
       </div>
       <div class="glb-company">Freeport-McMoRan</div>
       <div class="glb-stat">5 месеца unpenetrated</div>
       <div class="glb-detail">prior high $68.08 (2026-02)</div>
       
-      <div class="glb-detail"><b>GLB от 19.08</b>, 2.5% над линията ($68.08)</div>
+      <div class="glb-detail"><b>GLB от 19.08</b>, 1.2% над линията ($68.08)</div>
       
       <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 23.91% от линията</div>
       
@@ -1578,13 +1918,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">COKE</span>
-        <span class="glb-price">$209.92</span>
+        <span class="glb-price">$213.19</span>
       </div>
       <div class="glb-company">Coca-Cola Consolidated</div>
       <div class="glb-stat">5 месеца unpenetrated</div>
       <div class="glb-detail">prior high $205.07 (2026-04)</div>
       
-      <div class="glb-detail"><b>GLB от 19.10</b>, 2.4% над линията ($205.07)</div>
+      <div class="glb-detail"><b>GLB от 19.10</b>, 4.0% над линията ($205.07)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 18.22% от линията</div>
       
@@ -1601,18 +1941,18 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">MAR</span>
-        <span class="glb-price">$390.70</span>
+        <span class="glb-price">$397.31</span>
       </div>
       <div class="glb-company">Marriott International</div>
       <div class="glb-stat">4 месеца unpenetrated</div>
       <div class="glb-detail">prior high $375.60 (2026-05)</div>
       
-      <div class="glb-detail"><b>GLB от 16.10</b>, 4.0% над линията ($375.60)</div>
+      <div class="glb-detail"><b>GLB от 16.10</b>, 5.8% над линията ($375.60)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 16.86% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.3× средния · 1.5× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.3× средния · 1.6× от 52-седм. дъно</div>
       
       
       
@@ -1624,13 +1964,13 @@
     <div class="glb-card classic in-screen">
       <div class="glb-top">
         <span class="glb-sym">WSM</span>
-        <span class="glb-price">$249.43</span>
+        <span class="glb-price">$253.99</span>
       </div>
       <div class="glb-company">Williams-Sonoma</div>
       <div class="glb-stat">3 месеца unpenetrated</div>
       <div class="glb-detail">prior high $233.10 (2026-06)</div>
       
-      <div class="glb-detail"><b>GLB от 05.10</b>, 7.0% над линията ($233.10)</div>
+      <div class="glb-detail"><b>GLB от 05.10</b>, 9.0% над линията ($233.10)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.46% от линията</div>
       
@@ -1647,18 +1987,18 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">CAH</span>
-        <span class="glb-price">$252.65</span>
+        <span class="glb-price">$257.55</span>
       </div>
       <div class="glb-company">Cardinal Health</div>
       <div class="glb-stat">3 месеца unpenetrated</div>
       <div class="glb-detail">prior high $237.56 (2026-06)</div>
       
-      <div class="glb-detail"><b>GLB от 15.10</b>, 6.4% над линията ($237.56)</div>
+      <div class="glb-detail"><b>GLB от 15.10</b>, 8.4% над линията ($237.56)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 17.51% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 1.7× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.1× средния · 1.6× от 52-седм. дъно</div>
       
       
       
@@ -1670,13 +2010,13 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">HLT</span>
-        <span class="glb-price">$346.04</span>
+        <span class="glb-price">$359.29</span>
       </div>
       <div class="glb-company">Hilton Worldwide</div>
       <div class="glb-stat">3 месеца unpenetrated</div>
       <div class="glb-detail">prior high $330.46 (2026-06)</div>
       
-      <div class="glb-detail"><b>GLB от 16.10</b>, 4.7% над линията ($330.46)</div>
+      <div class="glb-detail"><b>GLB от 16.10</b>, 8.7% над линията ($330.46)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 10.83% от линията</div>
       
@@ -1693,13 +2033,13 @@
     <div class="glb-card classic in-screen">
       <div class="glb-top">
         <span class="glb-sym">LLY</span>
-        <span class="glb-price">$1240.34</span>
+        <span class="glb-price">$1283.66</span>
       </div>
       <div class="glb-company">Eli Lilly and</div>
       <div class="glb-stat">3 месеца unpenetrated</div>
       <div class="glb-detail">prior high $1199.43 (2026-06)</div>
       
-      <div class="glb-detail"><b>GLB от 16.10</b>, 3.4% над линията ($1199.43)</div>
+      <div class="glb-detail"><b>GLB от 16.10</b>, 7.0% над линията ($1199.43)</div>
       
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 15.3% от линията</div>
       
@@ -1722,13 +2062,13 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">TMO</span>
-        <span class="glb-price">$679.38</span>
+        <span class="glb-price">$687.37</span>
       </div>
       <div class="glb-company">Thermo Fisher Scientific</div>
       <div class="glb-stat">56 месеца unpenetrated</div>
       <div class="glb-detail">prior high $667.24 (2021-12)</div>
       
-      <div class="glb-detail"><b>GLB от 24.09</b>, 1.8% над линията ($667.24)</div>
+      <div class="glb-detail"><b>GLB от 24.09</b>, 3.0% над линията ($667.24)</div>
       
       <div class="glb-detail">band_hold 66.7% · диапазон на 63 дни 26.82% от линията</div>
       
@@ -1745,13 +2085,13 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">MSFT</span>
-        <span class="glb-price">$533.52</span>
+        <span class="glb-price">$531.87</span>
       </div>
       <div class="glb-company">Microsoft</div>
       <div class="glb-stat">14 месеца unpenetrated</div>
       <div class="glb-detail">prior high $533.50 (2025-07)</div>
       
-      <div class="glb-detail"><b>GLB от 13.10</b>, 0.0% над линията ($533.50)</div>
+      <div class="glb-detail"><b>GLB от 13.10</b>, 0.3% под линията ($533.50)</div>
       
       <div class="glb-detail">band_hold 79.4% · диапазон на 63 дни 29.96% от линията</div>
       
@@ -1768,13 +2108,13 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">P</span>
-        <span class="glb-price">$127.09</span>
+        <span class="glb-price">$126.52</span>
       </div>
       <div class="glb-company">Everpure</div>
       <div class="glb-stat">10 месеца unpenetrated</div>
       <div class="glb-detail">prior high $98.70 (2025-10)</div>
       
-      <div class="glb-detail"><b>GLB от 17.09</b>, 28.8% над линията ($98.70)</div>
+      <div class="glb-detail"><b>GLB от 17.09</b>, 28.2% над линията ($98.70)</div>
       
       <div class="glb-detail">band_hold 47.6% · диапазон на 63 дни 54.05% от линията</div>
       
@@ -1791,13 +2131,13 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">MEDP</span>
-        <span class="glb-price">$619.66</span>
+        <span class="glb-price">$622.43</span>
       </div>
       <div class="glb-company">Medpace</div>
       <div class="glb-stat">8 месеца unpenetrated</div>
       <div class="glb-detail">prior high $592.46 (2025-11)</div>
       
-      <div class="glb-detail"><b>GLB от 19.08</b>, 4.6% над линията ($592.46)</div>
+      <div class="glb-detail"><b>GLB от 19.08</b>, 5.1% над линията ($592.46)</div>
       
       <div class="glb-detail">band_hold 61.9% · диапазон на 63 дни 46.32% от линията</div>
       
@@ -1814,13 +2154,13 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">CVX</span>
-        <span class="glb-price">$224.37</span>
+        <span class="glb-price">$225.71</span>
       </div>
       <div class="glb-company">Chevron</div>
       <div class="glb-stat">5 месеца unpenetrated</div>
       <div class="glb-detail">prior high $206.90 (2026-03)</div>
       
-      <div class="glb-detail"><b>GLB от 01.09</b>, 8.4% над линията ($206.90)</div>
+      <div class="glb-detail"><b>GLB от 01.09</b>, 9.1% над линията ($206.90)</div>
       
       <div class="glb-detail">band_hold 81.0% · диапазон на 63 дни 21.36% от линията</div>
       
@@ -1855,36 +2195,45 @@
     алфа спрямо SPY за същите дати +1.36% [0.94; 1.83] — почти цялата доходност е в най-добрите 5% от сделките.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани 16 · затворени 7 / отворени по текуща цена 8 · чакат първата цена 1 · статистика след 20 записа (затворени + отворени)</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: записани 18 · затворени 8 / отворени по текуща цена 8 · чакат първата цена 2 · статистика след 20 записа (затворени + отворени)</summary>
   <div class="prose" style="margin-top:8px">
     
-    <b>Записани: 16</b> · <b>затворени 7</b> (изход по линията 7 · изтекли по нашия таван 0) / <b>отворени по текуща цена 8</b> · чакат първата цена 1<br>
+    <b>Записани: 18</b> · <b>затворени 8</b> (изход по линията 8 · изтекли по нашия таван 0) / <b>отворени по текуща цена 8</b> · чакат първата цена 2<br>
     
     
-    Записи с резултат: <b>15 = затворени 7 / отворени по текуща цена 8</b> · средна доходност <b>-1.38%</b> literal / <b>-1.78%</b> exec<br>
-    Изход по линията (7): средно -4.46% — по построение загуби (вход над линията, изход под нея).<br>
+    Записи с резултат: <b>16 = затворени 8 / отворени по текуща цена 8</b> · средна доходност <b>-0.44%</b> literal / <b>-1.07%</b> exec<br>
+    Изход по линията (8): средно -3.94% — по построение загуби (вход над линията, изход под нея).<br>
     
-    Отворени по текуща цена (8): средно +1.32% — още не са затворени, цената им може да се върне под линията.<br>
+    Отворени по текуща цена (8): средно +3.06% — още не са затворени, цената им може да се върне под линията.<br>
     
     
-    Печеливши, медиана и сравнение със SPY се показват след 20 записа с резултат (сега 15) — при по-малко е шум.<br>
+    Печеливши, медиана и сравнение със SPY се показват след 20 записа с резултат (сега 16) — при по-малко е шум.<br>
     
     По наш етикет (записани / с резултат):
-    momentum 4 / 4 · classic 12 / 11
+    momentum 4 / 4 · classic 14 / 12
     · по режим на деня на пробива:
-    Defensive 7 / 6 · Offensive 9 / 9
+    Defensive 9 / 7 · Offensive 9 / 9
     
   </div>
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи (9):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи (10):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
       <tbody>
         
-        <tr><td class="sym">MSFT</td>
-          <td>2026-10-19</td><td>classic</td>
-          <td class="n">$533.50</td>
+        <tr><td class="sym">DRI</td>
+          <td>2026-10-20</td><td>classic</td>
+          <td class="n">$217.97</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Defensive</td></tr>
+        
+        <tr><td class="sym">BRK-B</td>
+          <td>2026-10-20</td><td>classic</td>
+          <td class="n">$533.25</td>
           <td class="n">—</td>
           <td class="n">—</td>
           <td class="n">—</td>
@@ -1895,72 +2244,72 @@
           <td>2026-10-16</td><td>classic</td>
           <td class="n">$205.07</td>
           <td class="n">$210.33</td>
-          <td class="n">$209.92</td>
-          <td class="n">-0.2%</td>
-          <td class="n">+2.4%</td>
+          <td class="n">$213.19</td>
+          <td class="n">+1.4%</td>
+          <td class="n">+4.0%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">AFG</td>
           <td>2026-10-16</td><td>classic</td>
           <td class="n">$146.86</td>
           <td class="n">$149.13</td>
-          <td class="n">$148.08</td>
-          <td class="n">-0.7%</td>
-          <td class="n">+0.8%</td>
+          <td class="n">$149.24</td>
+          <td class="n">+0.1%</td>
+          <td class="n">+1.6%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">MCK</td>
           <td>2026-10-15</td><td>classic</td>
           <td class="n">$987.37</td>
           <td class="n">$998.64</td>
-          <td class="n">$1010.43</td>
-          <td class="n">+1.2%</td>
-          <td class="n">+2.3%</td>
+          <td class="n">$1030.12</td>
+          <td class="n">+3.1%</td>
+          <td class="n">+4.3%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">MAR</td>
           <td>2026-10-15</td><td>classic</td>
           <td class="n">$375.60</td>
           <td class="n">$385.71</td>
-          <td class="n">$390.70</td>
-          <td class="n">+1.3%</td>
-          <td class="n">+4.0%</td>
+          <td class="n">$397.31</td>
+          <td class="n">+3.0%</td>
+          <td class="n">+5.8%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">HLT</td>
           <td>2026-10-15</td><td>classic</td>
           <td class="n">$330.46</td>
           <td class="n">$342.98</td>
-          <td class="n">$346.04</td>
-          <td class="n">+0.9%</td>
-          <td class="n">+4.7%</td>
+          <td class="n">$359.29</td>
+          <td class="n">+4.8%</td>
+          <td class="n">+8.7%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">LLY</td>
           <td>2026-10-14</td><td>classic</td>
           <td class="n">$1199.43</td>
           <td class="n">$1208.74</td>
-          <td class="n">$1240.34</td>
-          <td class="n">+2.6%</td>
-          <td class="n">+3.4%</td>
+          <td class="n">$1283.66</td>
+          <td class="n">+6.2%</td>
+          <td class="n">+7.0%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">MA</td>
           <td>2026-10-13</td><td>classic</td>
           <td class="n">$595.29</td>
           <td class="n">$604.80</td>
-          <td class="n">$616.40</td>
-          <td class="n">+1.9%</td>
-          <td class="n">+3.5%</td>
+          <td class="n">$620.42</td>
+          <td class="n">+2.6%</td>
+          <td class="n">+4.2%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">XOM</td>
           <td>2026-10-12</td><td>classic</td>
           <td class="n">$169.66</td>
           <td class="n">$172.15</td>
-          <td class="n">$178.28</td>
-          <td class="n">+3.6%</td>
-          <td class="n">+5.1%</td>
+          <td class="n">$177.86</td>
+          <td class="n">+3.3%</td>
+          <td class="n">+4.8%</td>
           <td>Offensive</td></tr>
         
       </tbody>
@@ -1968,14 +2317,18 @@
   </div>
   
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени (7):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени (8):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Пробив на</th><th>Затворена</th><th>Как</th><th class="n">literal</th><th class="n">exec</th><th class="n">Алфа (literal)</th><th class="n">Сесии</th></tr></thead>
       <tbody>
         
+        <tr><td class="sym">MSFT</td><td>2026-10-19</td><td>2026-10-20</td><td>изход по линията</td>
+          <td class="n">-0.3%</td><td class="n"><span style="font-size:11.5px;color:var(--muted)" title="exec: изход по отварянето на следващата сесия след затварянето под линията — брифът е преди нея, числото идва в следващия бриф">изход по отварянето на 21.10 — днес</span></td>
+          <td class="n">-0.7%</td><td class="n">1</td></tr>
+        
         <tr><td class="sym">EHC</td><td>2026-10-15</td><td>2026-10-19</td><td>изход по линията</td>
-          <td class="n">-4.7%</td><td class="n"><span style="font-size:11.5px;color:var(--muted)" title="exec: изход по отварянето на следващата сесия след затварянето под линията — брифът е преди нея, числото идва в следващия бриф">изход по отварянето на 20.10 — утре</span></td>
+          <td class="n">-4.7%</td><td class="n">-5.0%</td>
           <td class="n">-4.0%</td><td class="n">2</td></tr>
         
         <tr><td class="sym">PLTR</td><td>2026-10-09</td><td>2026-10-16</td><td>изход по линията</td>
@@ -2023,23 +2376,14 @@
   <div class="splits-funnel" style="margin-bottom:10px">Отворени позиции и наблюдавани (1): няма сплитове в хоризонта до 05.11.</div>
   
   
-  <div class="signal-grid">
-    
-    <div class="signal-chip  ">
-      <div class="sym">AMTD
-        <span class="split-tag rev">reverse</span>
-        
-      </div>
-      <div class="note">
-        <b>1:60</b>
-         · $28.50
-         · Oct 19, 2026
-      </div>
-      <div class="note" style="color:var(--muted);font-size:12px">AMTD IDEA Group</div>
-      
-      
-    </div>
-
+  <div class="splits-empty">Няма предстоящи сплитове тази седмица по нашите критерии
+    (цена над $10, пазарна стойност над $500 млн).</div>
+  <div class="splits-funnel">
+    Източникът върна 9 за седмицата:
+    8 под $10,
+    1 под $500 млн,
+    0 без данни
+    · общо 18 в хоризонта до 05.11.
   </div>
   
 </section>
@@ -2104,10 +2448,10 @@
           
         </div>
         
-        <div class="cot-tickers">MCD (McDonald&#39;s) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  YUMC (Yum China) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
+        <div class="cot-tickers">MCD (McDonald&#39;s) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на Euro FX НАГОРЕ MCD ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">Генерира значителна част от приходите си в евро от европейските си ресторанти, които се превеждат в USD при консолидацията.</span></div><div class="thesis-chain">При цената на Euro FX НАГОРЕ YUMC ГУБИ (механизъм: разходи в чужда валута). <span class="small" style="color:var(--muted)">Закупува оборудване и съставки от европейски доставчици, заплащани частично в евро, докато приходите са в юани и USD.</span></div>
+        <div class="thesis-chain">При цената на Euro FX НАГОРЕ MCD ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">McDonald&#39;s: Генерира значителна част от приходите си в евро от европейските си ресторанти, които се превеждат в USD при консолидацията.</span></div>
         
         
         
@@ -2122,7 +2466,7 @@
         
         
         <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Изключени: ASML — отчита в EUR, не в USD — валутният механизъм по таблицата важи за компании с отчет в USD.
+          Изключени: ASML — валутен механизъм: и приходи, и разходи в чужда валута — нетният ефект не се определя от таблицата (по описанието); YUMC — валутен механизъм: трета валута в описанието (юани) — механизмът по таблицата е за EUR/USD при компания с приходи или разходи в USD.
         </div>
         
       </div>
@@ -2180,7 +2524,7 @@
         <div class="cot-tickers">BAC (Bank of America) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  MET (MetLife) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  PRU (Prudential Financial) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) BAC ПЕЧЕЛИ (механизъм: доходност на активите). <span class="small" style="color:var(--muted)">Притежава голям портфейл от дългосрочни ценни книжа и отпуска дългосрочни заеми, чиято доходност е функция на нивото на дългосрочните лихвени проценти.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) MET ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">Застрахователна компания с живот, чиито дългосрочни задължения и активи имат висока дюрация, свързана с нивото на 30-годишните лихвени проценти.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) PRU ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">Управлява пенсионни и животозастрахователни продукти с дълги падежи, чиято актюерска оценка е функция на дългосрочните дисконтови лихви.</span></div>
+        <div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) BAC ПЕЧЕЛИ (механизъм: доходност на активите). <span class="small" style="color:var(--muted)">Bank of America: Притежава голям портфейл от дългосрочни ценни книжа и отпуска дългосрочни заеми, чиято доходност е функция на нивото на дългосрочните лихвени проценти.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) MET ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">MetLife: Застрахователна компания с живот, чиито дългосрочни задължения и активи имат висока дюрация, свързана с нивото на 30-годишните лихвени проценти.</span></div><div class="thesis-chain">При цената на 30-Year Treasury Bond НАДОЛУ (= доходността нагоре) PRU ГУБИ (механизъм: оценка при дълга дюрация). <span class="small" style="color:var(--muted)">Prudential Financial: Управлява пенсионни и животозастрахователни продукти с дълги падежи, чиято актюерска оценка е функция на дългосрочните дисконтови лихви.</span></div>
         
         
         
@@ -2249,7 +2593,7 @@
         <div class="cot-tickers">RIOT (Riot Platforms) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  COIN (Coinbase Global) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  MARA (MARA) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на XRP НАДОЛУ RIOT ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Компания за крипто инфраструктура и майнинг, чиято пазарна оценка следва широкото настроение към крипто пазара, включително XRP екосистемата.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Борса за криптовалути, която листва и осигурява търговия с XRP, генерирайки такси от обема на търговията с токена.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ MARA ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Компания за крипто майнинг и инвестиции, чиято стойност на активите и пазарно настроение са свързани с широкото движение на крипто пазара.</span></div>
+        <div class="thesis-chain">При цената на XRP НАДОЛУ RIOT ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Riot Platforms: Компания за крипто инфраструктура и майнинг, чиято пазарна оценка следва широкото настроение към крипто пазара, включително XRP екосистемата.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Coinbase Global: Борса за криптовалути, която листва и осигурява търговия с XRP, генерирайки такси от обема на търговията с токена.</span></div><div class="thesis-chain">При цената на XRP НАДОЛУ MARA ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">MARA: Компания за крипто майнинг и инвестиции, чиято стойност на активите и пазарно настроение са свързани с широкото движение на крипто пазара.</span></div>
         
         
         
@@ -2318,7 +2662,7 @@
         <div class="cot-tickers">KO (Coca-Cola Company (The)) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PEP (Pepsico) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  MDLZ (Mondelez International) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ KO ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Използва захар и захарни сиропи като ключова суровина в производството на безалкохолни напитки по целия свят.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ PEP ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Консумира значителни количества захар в производството на напитки и снаки, като разходите за суровина са директно свързани с цената на захарта.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ MDLZ ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Производител на бисквити, шоколад и бонбони, за чието производство захарта е основна суровина с материален дял в себестойността.</span></div>
+        <div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ KO ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Coca-Cola Company (The): Използва захар и захарни сиропи като ключова суровина в производството на безалкохолни напитки по целия свят.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ PEP ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Pepsico: Консумира значителни количества захар в производството на напитки и снаки, като разходите за суровина са директно свързани с цената на захарта.</span></div><div class="thesis-chain">При цената на Sugar No. 11 НАДОЛУ MDLZ ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Mondelez International: Производител на бисквити, шоколад и бонбони, за чието производство захарта е основна суровина с материален дял в себестойността.</span></div>
         
         <div class="opp-note">⚠ обратни сигнали: MDLZ ГУБИ — цената на Cocoa НАГОРЕ (разход за суровина: по-висока цена на суровината = по-високи разходи)</div>
         
@@ -2387,7 +2731,7 @@
         <div class="cot-tickers">COIN (Coinbase Global) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  MSTR (Strategy) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  RIOT (Riot Platforms) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Борса за криптовалути с Bitcoin като най-търгуван актив, чиито приходи от транзакционни такси са пряко свързани с активността на Bitcoin пазара.</span></div><div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ MSTR ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Притежава Bitcoin като основен корпоративен актив в баланса си, което прави пазарната оценка на компанията силно зависима от цената на Bitcoin.</span></div><div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ RIOT ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Добива Bitcoin чрез специализирани ASIC машини, като рентабилността на майнинг операциите е пряко свързана с пазарната цена на Bitcoin.</span></div>
+        <div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ COIN ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Coinbase Global: Борса за криптовалути с Bitcoin като най-търгуван актив, чиито приходи от транзакционни такси са пряко свързани с активността на Bitcoin пазара.</span></div><div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ MSTR ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Strategy: Притежава Bitcoin като основен корпоративен актив в баланса си, което прави пазарната оценка на компанията силно зависима от цената на Bitcoin.</span></div><div class="thesis-chain">При цената на Bitcoin Futures (CME) НАДОЛУ RIOT ГУБИ (механизъм: бета към пазара). <span class="small" style="color:var(--muted)">Riot Platforms: Добива Bitcoin чрез специализирани ASIC машини, като рентабилността на майнинг операциите е пряко свързана с пазарната цена на Bitcoin.</span></div>
         
         
         
@@ -2456,7 +2800,7 @@
         <div class="cot-tickers">PSX (Phillips 66)<span class="markers"><span class="marker" title="В днешния скрийнър (кандидат за Action/Watchlist) — слага се от кода." tabindex="0" onclick="this.classList.toggle('open')">SCR✓<span class="marker-tip">В днешния скрийнър (кандидат за Action/Watchlist) — слага се от кода.</span></span></span> <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  PBF (PBF Energy) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  DINO (HF Sinclair) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PSX ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">рафинира суров нефт и продава RBOB бензин и други нефтени продукти на едро и дребно.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PBF ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">операционните приходи идват от продажба на RBOB бензин и дистилати, произведени в рафинериите му.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ DINO ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">продава RBOB бензин и дизелово гориво като основни рафинерийни продукти от собствените си рафинерии.</span></div>
+        <div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PSX ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Phillips 66: рафинира суров нефт и продава RBOB бензин и други нефтени продукти на едро и дребно.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ PBF ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">PBF Energy: операционните приходи идват от продажба на RBOB бензин и дистилати, произведени в рафинериите му.</span></div><div class="thesis-chain">При цената на RBOB Gasoline НАДОЛУ DINO ГУБИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">HF Sinclair: продава RBOB бензин и дизелово гориво като основни рафинерийни продукти от собствените си рафинерии.</span></div>
         
         <div class="opp-note">⚠ обратен залог: PSX е кандидат за покупка в Watchlist, а тази теза казва ГУБИ (цена на продукта: по-ниска цена на продукта = по-ниски приходи).</div>
         
@@ -2521,7 +2865,7 @@
         <div class="cot-tickers">TSN (Tyson Foods) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  HRL (Hormel Foods) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на Lean Hogs НАГОРЕ TSN ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">закупува живи свине като основна суровина за преработка и опаковане на свинско месо.</span></div><div class="thesis-chain">При цената на Lean Hogs НАГОРЕ HRL ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">използва свинско месо като ключова суровина за производство на преработени меса и консерви.</span></div>
+        <div class="thesis-chain">При цената на Lean Hogs НАГОРЕ TSN ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Tyson Foods: закупува живи свине като основна суровина за преработка и опаковане на свинско месо.</span></div><div class="thesis-chain">При цената на Lean Hogs НАГОРЕ HRL ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Hormel Foods: използва свинско месо като ключова суровина за производство на преработени меса и консерви.</span></div>
         
         <div class="opp-note">⚠ обратни сигнали: TSN ПЕЧЕЛИ — цената на Soybean Meal НАДОЛУ (разход за суровина: по-ниска цена на суровината = по-ниски разходи)</div>
         
@@ -2588,7 +2932,7 @@
         <div class="cot-tickers">TSN (Tyson Foods) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  PPC (Pilgrim&#39;s Pride) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на Soybean Meal НАДОЛУ TSN ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">използва соево брашно като компонент в храненето на животните, отглеждани за месопреработка.</span></div><div class="thesis-chain">При цената на Soybean Meal НАДОЛУ PPC ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">соевото брашно е основна съставка в фуражите за отглеждането на бройлери в производствените мощности на компанията.</span></div>
+        <div class="thesis-chain">При цената на Soybean Meal НАДОЛУ TSN ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Tyson Foods: използва соево брашно като компонент в храненето на животните, отглеждани за месопреработка.</span></div><div class="thesis-chain">При цената на Soybean Meal НАДОЛУ PPC ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Pilgrim&#39;s Pride: соевото брашно е основна съставка в фуражите за отглеждането на бройлери в производствените мощности на компанията.</span></div>
         
         <div class="opp-note">⚠ обратни сигнали: TSN ГУБИ — цената на Lean Hogs НАГОРЕ (разход за суровина: по-висока цена на суровината = по-високи разходи)</div>
         
@@ -2661,7 +3005,7 @@
         <div class="cot-tickers">INGR (Ingredion) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на Soybeans НАДОЛУ INGR ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">използва соя и соеви деривати като суровини при производството на специализирани хранителни съставки.</span></div>
+        <div class="thesis-chain">При цената на Soybeans НАДОЛУ INGR ПЕЧЕЛИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Ingredion: използва соя и соеви деривати като суровини при производството на специализирани хранителни съставки.</span></div>
         
         
         
@@ -2732,7 +3076,7 @@
         <div class="cot-tickers">SBUX (Starbucks) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на Coffee C НАГОРЕ SBUX ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">закупува зелено кафе Arabica като основна суровина за веригата от кафенета по целия свят.</span></div>
+        <div class="thesis-chain">При цената на Coffee C НАГОРЕ SBUX ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Starbucks: закупува зелено кафе Arabica като основна суровина за веригата от кафенета по целия свят.</span></div>
         
         
         
@@ -2805,7 +3149,7 @@
         <div class="cot-tickers">WPM (Wheaton Precious Metals) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  HL (Hecla Mining) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на Silver НАГОРЕ WPM ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">продава сребро по стрийминг договори, при които реализираната цена следва спот цената на среброто</span></div><div class="thesis-chain">При цената на Silver НАГОРЕ HL ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">добива и продава сребро като основен продукт от мини в САЩ, Мексико и Канада</span></div>
+        <div class="thesis-chain">При цената на Silver НАГОРЕ WPM ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Wheaton Precious Metals: продава сребро по стрийминг договори, при които реализираната цена следва спот цената на среброто</span></div><div class="thesis-chain">При цената на Silver НАГОРЕ HL ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Hecla Mining: добива и продава сребро като основен продукт от мини в САЩ, Мексико и Канада</span></div>
         
         
         
@@ -2878,7 +3222,7 @@
         <div class="cot-tickers">CF (CF Industries) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  LNG (Cheniere Energy) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span>  ·  OLN (Olin) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на Natural Gas НАГОРЕ CF ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">използва природен газ като основна суровина за производство на азотни торове (амоняк, урея)</span></div><div class="thesis-chain">При цената на Natural Gas НАГОРЕ LNG ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">втечнява природен газ и го продава като LNG, при което реализираните приходи са свързани с цената на природния газ</span></div><div class="thesis-chain">При цената на Natural Gas НАГОРЕ OLN ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">използва природен газ като енергиен разход в хлор-алкалните и химическите производствени процеси</span></div>
+        <div class="thesis-chain">При цената на Natural Gas НАГОРЕ CF ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">CF Industries: използва природен газ като основна суровина за производство на азотни торове (амоняк, урея)</span></div><div class="thesis-chain">При цената на Natural Gas НАГОРЕ LNG ПЕЧЕЛИ (механизъм: цена на продукта). <span class="small" style="color:var(--muted)">Cheniere Energy: втечнява природен газ и го продава като LNG, при което реализираните приходи са свързани с цената на природния газ</span></div><div class="thesis-chain">При цената на Natural Gas НАГОРЕ OLN ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Olin: използва природен газ като енергиен разход в хлор-алкалните и химическите производствени процеси</span></div>
         
         
         
@@ -2945,7 +3289,7 @@
         <div class="cot-tickers">HSY (Hershey) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  MDLZ (Mondelez International) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span>  ·  TR (Tootsie Roll Industries) <span class="cot-direction bearish" title="губи от очакваното движение">bearish</span></div>
         
         
-        <div class="thesis-chain">При цената на Cocoa НАГОРЕ HSY ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">купува какаови зърна и какаови продукти като основна суровина за производство на шоколад и сладкарски изделия</span></div><div class="thesis-chain">При цената на Cocoa НАГОРЕ MDLZ ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">купува какао като ключова суровина за шоколадови марки като Cadbury и Milka</span></div><div class="thesis-chain">При цената на Cocoa НАГОРЕ TR ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">купува какао като съставка в производството на шоколадови бонбони и сладкарски продукти</span></div>
+        <div class="thesis-chain">При цената на Cocoa НАГОРЕ HSY ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Hershey: купува какаови зърна и какаови продукти като основна суровина за производство на шоколад и сладкарски изделия</span></div><div class="thesis-chain">При цената на Cocoa НАГОРЕ MDLZ ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Mondelez International: купува какао като ключова суровина за шоколадови марки като Cadbury и Milka</span></div><div class="thesis-chain">При цената на Cocoa НАГОРЕ TR ГУБИ (механизъм: разход за суровина). <span class="small" style="color:var(--muted)">Tootsie Roll Industries: купува какао като съставка в производството на шоколадови бонбони и сладкарски продукти</span></div>
         
         <div class="opp-note">⚠ обратни сигнали: MDLZ ПЕЧЕЛИ — цената на Sugar No. 11 НАДОЛУ (разход за суровина: по-ниска цена на суровината = по-ниски разходи)</div>
         
@@ -3014,7 +3358,7 @@
         <div class="cot-tickers">CBOE (Cboe Global Markets)  ·  IBKR (Interactive Brokers Group)  ·  VIRT (Virtu Financial)</div>
         
         
-        <div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">оперира борсата, на която се търгуват VIX фючърси и опции — по-висока волатилност увеличава обемите на търговия и съответно приходите от такси</span></div><div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">брокер с висок дял на деривативна търговия — по-висока пазарна волатилност генерира по-голям обем клиентски транзакции с опции и фючърси</span></div><div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">market maker, чиито приходи от спред арбитраж зависят от нивото на пазарна волатилност и търговски обеми</span></div>
+        <div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">Cboe Global Markets: оперира борсата, на която се търгуват VIX фючърси и опции — по-висока волатилност увеличава обемите на търговия и съответно приходите от такси</span></div><div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">Interactive Brokers Group: брокер с висок дял на деривативна търговия — по-висока пазарна волатилност генерира по-голям обем клиентски транзакции с опции и фючърси</span></div><div class="thesis-chain">Механизъм: друг механизъм — без изчислена посока. <span class="small" style="color:var(--muted)">Virtu Financial: market maker, чиито приходи от спред арбитраж зависят от нивото на пазарна волатилност и търговски обеми</span></div>
         
         
         
@@ -3083,7 +3427,7 @@
         <div class="cot-tickers">FLUT (Flutter Entertainment) <span class="cot-direction bullish" title="печели от очакваното движение">bullish</span></div>
         
         
-        <div class="thesis-chain">При цената на British Pound НАГОРЕ FLUT ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">генерира значителна част от приходите си в британски паунди от операции на UK пазара за залози и хазарт</span></div>
+        <div class="thesis-chain">При цената на British Pound НАГОРЕ FLUT ПЕЧЕЛИ (механизъм: валутен превод на приходи). <span class="small" style="color:var(--muted)">Flutter Entertainment: генерира значителна част от приходите си в британски паунди от операции на UK пазара за залози и хазарт</span></div>
         
         
         
@@ -3251,152 +3595,6 @@
 
 
 
-<section>
-  
-  <h2>Track Record v2 · 1 Action сигнал от 05.10 · 0 резолвирани</h2>
-  
-  
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
-    v1 методология: n=51, win rate 25.5%,
-    среден R -0.42 (3 изтекли — оценени по Close при изтичането)
-    · архивирана на 2026-10-05 (отворените v1 позиции затворени по последния Close, mark-to-market);
-    Track Record v2 започва от нула.</div>
-  
-  <div class="prose">
-    
-    
-    <b>Още няма затворени сделки по v2</b> — win rate и среден R се показват от първата резолюция.<br>
-    
-    
-    Все още отворени: 1 (преди цел 1) + 0 (след частична продажба на цел 1, trailing)<br>
-    
-    Чакат buy-stop: 0 · не се задействаха: 0 (извън статистиката)<br>
-    
-    
-    
-  </div>
-  
-  
-  
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции (1):</div>
-  <div class="card" style="padding:6px 4px;margin-top:6px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Дата на вход</th><th class="n">Entry цена</th>
-        <th class="n">Текуща цена</th><th class="n">% промяна</th><th class="n">SPY, същия период</th></tr></thead>
-      <tbody>
-        
-        
-        <tr class="pos-row-down">
-          <td class="sym">EXPD
-
-</td>
-          <td>2026-10-16</td>
-          <td class="n">$199.77</td>
-          <td class="n">$196.81</td>
-          
-          <td class="n pct">-1.5%</td>
-          
-          <td class="n pct">-0.9%</td>
-        </tr>
-        
-      </tbody>
-    </table>
-  </div>
-  
-  
-
-
-  
-  
-  
-</section>
-
-
-
-
-
-
-
-<section>
-  <h2>Buy-stop кандидати — измерване, не препоръка</h2>
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
-    Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
-    5 сесии, по max(Open, buy-stop), не над +5%; стоп и цел от картата) във всички режими.
-    Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
-  <div class="prose">
-    
-    <b>Записани: 6</b> · чакат buy-stop 3 · отворени 2 · затворени 1
-    · не се задействаха 0 (0.0% от приключилите прозорци) · и в Action: 1<br>
-    
-    Затворени: 1 · среден R: -1.00<br>
-    
-    Win rate се показва след 20 затворени (сега 1) — при по-малко е шум.<br>
-    
-    По режим на деня на картата (записани / затворени):
-    Defensive 5 / 1 · Offensive 1 / 0
-    
-  </div>
-  
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (5):</div>
-  <div class="card" style="padding:6px 4px;margin-top:6px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Buy-stop</th><th class="n">Стоп</th><th class="n">Цел 1</th>
-        <th>Валиден до</th><th>Режим</th></tr></thead>
-      <tbody>
-        
-        <tr><td class="sym">EXPD<span class="markers"><span class="marker" title="Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират." tabindex="0" onclick="this.classList.toggle('open')">и Action<span class="marker-tip">Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират.</span></span></span></td>
-          <td>2026-10-09</td>
-          <td>отворена от 2026-10-09 · +0.2R
-            </td>
-          <td class="n">$194.59</td><td class="n">$181.53</td><td class="n">$220.71</td>
-          <td>2026-10-15</td><td>Defensive</td></tr>
-        
-        <tr><td class="sym">ZBRA</td>
-          <td>2026-10-14</td>
-          <td>чака buy-stop
-            </td>
-          <td class="n">$390.8</td><td class="n">$359.54</td><td class="n">$453.32</td>
-          <td>2026-10-20</td><td>Offensive</td></tr>
-        
-        <tr><td class="sym">AAPL<span class="markers"><span class="marker" title="Необичаен опционен обем вчера: ≈ 0.86× OI — над 90-ия перцентил на 54 ликвидни тикъра за деня (праг 0.77×); върху 6 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 418,216 / OI 483,903 договора; calls 47% от обема — Балансиран call/put обем. OI е от следобедната снимка на сесията 19.10." tabindex="0" onclick="this.classList.toggle('open')">UOV✓<span class="marker-tip">Необичаен опционен обем вчера: ≈ 0.86× OI — над 90-ия перцентил на 54 ликвидни тикъра за деня (праг 0.77×); върху 6 падежа до 06.11 (без изтеклите и изтичащите днес). Обем 418,216 / OI 483,903 договора; calls 47% от обема — Балансиран call/put обем. OI е от следобедната снимка на сесията 19.10.</span></span></span></td>
-          <td>2026-10-19</td>
-          <td>отворена от 2026-10-19 · -0.1R
-            </td>
-          <td class="n">$345.34</td><td class="n">$322.55</td><td class="n">$390.92</td>
-          <td>2026-10-23</td><td>Defensive</td></tr>
-        
-        <tr><td class="sym">AMG</td>
-          <td>2026-10-20</td>
-          <td>чака buy-stop
-            </td>
-          <td class="n">$395.0</td><td class="n">$363.4</td><td class="n">$458.2</td>
-          <td>2026-10-26</td><td>Defensive</td></tr>
-        
-        <tr><td class="sym">ROKU</td>
-          <td>2026-10-20</td>
-          <td>чака buy-stop
-            </td>
-          <td class="n">$159.89</td><td class="n">$148.53</td><td class="n">$182.61</td>
-          <td>2026-10-26</td><td>Defensive</td></tr>
-        
-      </tbody>
-    </table>
-  </div>
-  
-  
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени (1):</div>
-  <div class="watch-grid" style="margin-top:6px">
-    
-    <div class="watch-card">
-      <span class="ticker" style="color: var(--red)">ANET</span>
-      <p>2026-10-09 → 2026-10-13 · стоп · R=-1.0 · Defensive</p>
-    </div>
-    
-  </div>
-  
-</section>
-
-
 
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
@@ -3406,17 +3604,27 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">GOOGL</span>
+        <span class="si-sym" title="тикърът е по CUSIP 02079K305 (OpenFIGI)">GOOGL</span>
         <span><span class="si-val">$28.2 млрд</span> <span class="si-action">увеличена</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">ALPHABET INC</div>
-      <div class="si-mgr">5 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
+      <div class="si-mgr">2 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
       
     </div>
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">UBER</span>
+        <span class="si-sym" title="тикърът е по CUSIP 02079K107 (OpenFIGI)">GOOG</span>
+        <span><span class="si-val">$9.6 млрд</span> <span class="si-action">увеличена</span></span>
+      </div>
+      <div class="si-mgr" style="color:var(--text)">ALPHABET INC</div>
+      <div class="si-mgr">3 мениджъра · Уорън Бъфет · Berkshire Hathaway · 13F · 2026-08-14</div>
+      
+    </div>
+    
+    <div class="si-card ">
+      <div class="si-top">
+        <span class="si-sym" title="тикърът е по CUSIP 90353T100 (OpenFIGI)">UBER</span>
         <span><span class="si-val">$2.5 млрд</span> <span class="si-action">увеличена</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">UBER TECHNOLOGIES INC</div>
@@ -3426,7 +3634,7 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">MSFT</span>
+        <span class="si-sym" title="тикърът е по CUSIP 594918104 (OpenFIGI)">MSFT</span>
         <span><span class="si-val">$2.3 млрд</span> <span class="si-action">увеличена</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">MICROSOFT CORP</div>
@@ -3436,7 +3644,7 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">AMZN</span>
+        <span class="si-sym" title="тикърът е по CUSIP 023135106 (OpenFIGI)">AMZN</span>
         <span><span class="si-val">$1.2 млрд</span> <span class="si-action">увеличена</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">AMAZON COM INC</div>
@@ -3446,7 +3654,7 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">NBIS</span>
+        <span class="si-sym" title="тикърът е по CUSIP N97284108 (OpenFIGI)">NBIS</span>
         <span><span class="si-val">$1.2 млрд</span> <span class="si-action">нова позиция</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">NEBIUS GROUP N.V.</div>
@@ -3456,7 +3664,7 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">SEAGATE TECHNOLOGY</span>
+        <span class="si-sym" title="тикърът е по CUSIP G7997R103 (OpenFIGI)">STX</span>
         <span><span class="si-val">$965.1 млн</span> <span class="si-action">нова позиция</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">SEAGATE TECHNOLOGY HLDNGS PL</div>
@@ -3466,21 +3674,11 @@
     
     <div class="si-card ">
       <div class="si-top">
-        <span class="si-sym">AMPHENOL CORP</span>
-        <span><span class="si-val">$858.1 млн</span> <span class="si-action">увеличена</span></span>
+        <span class="si-sym" title="тикърът е по CUSIP 032095101 (OpenFIGI)">APH</span>
+        <span><span class="si-val">$902.7 млн</span> <span class="si-action">увеличена</span></span>
       </div>
       <div class="si-mgr" style="color:var(--text)">AMPHENOL CORP</div>
-      <div class="si-mgr">Джон Армитидж · Egerton Capital · 13F · 2026-07-21</div>
-      
-    </div>
-    
-    <div class="si-card ">
-      <div class="si-top">
-        <span class="si-sym">PDD</span>
-        <span><span class="si-val">$820.9 млн</span> <span class="si-action">увеличена</span></span>
-      </div>
-      <div class="si-mgr" style="color:var(--text)">PDD HOLDINGS INC</div>
-      <div class="si-mgr">Ли Лу · Himalaya Capital Management · 13F · 2026-08-14</div>
+      <div class="si-mgr">Джон Армитидж · Egerton Capital · 13F · 2026-10-20</div>
       
     </div>
     
@@ -3489,8 +3687,9 @@
     13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
     Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
   </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; името е както е в 13F, CUSIP — при посочване):
-  <div style="margin-top:3px">Стенли Дракенмилър · Duquesne Family Office — CALL 9 ($856.6 млн): <span title="CUSIP 46137V357">Invesco Exchange Traded Fd T</span> $174.7 млн, <span title="CUSIP 464286400">Ishares Inc</span> $145.9 млн, <span title="CUSIP 457669307">Insmed Inc</span> $143.9 млн, <span title="CUSIP 023135106">Amazon Com Inc</span> $109.5 млн, …</div><div style="margin-top:3px">Даниел Лоуб · Third Point — PUT 1 ($28.8 млн): <span title="CUSIP 78462F103">STATE STR SPDR S&amp;P 500 ETF T</span> $28.8 млн</div><div style="margin-top:3px">Дейвид Тепър · Appaloosa Management — PUT 2 ($254.1 млн): <span title="CUSIP 037833100">APPLE INC</span> $241.6 млн, <span title="CUSIP 084670702">BERKSHIRE HATHAWAY INC DEL</span> $12.5 млн</div><div style="margin-top:3px">Хауърд Маркс · Oaktree Capital Management — PUT 4 ($1.8 млрд): <span title="CUSIP 78462F103">STATE STREET CORP</span> $1.0 млрд, <span title="CUSIP 46090E103">INVESCO QQQ TRUST SERIES 1</span> $651.7 млн, <span title="CUSIP N53745100">LYONDELLBASELL INDUSTRIES NV</span> $47.4 млн, <span title="CUSIP 92839U206">VISTEON CORP</span> $39.7 млн; CALL 3 ($144.6 млн): <span title="CUSIP 21874A106">CORE SCIENTIFIC INC</span> $128.0 млн, <span title="CUSIP G11448100">BITDEER TECHNOLOGIES GROUP</span> $11.9 млн, <span title="CUSIP 55933J203">MAGNACHIP SEMICONDUCTOR CORP</span> $4.7 млн</div></div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; тикърът е по CUSIP — името от 13F и CUSIP-ът са при посочване):
+  <div style="margin-top:3px">Стенли Дракенмилър · Duquesne Family Office — CALL 9 ($856.6 млн): <span title="CUSIP 46137V357 · по CUSIP (OpenFIGI): INVESCO S&amp;P 500 EQUAL WEIGHT · в 13F: Invesco Exchange Traded Fd T">RSP</span> $174.7 млн, <span title="CUSIP 464286400 · по CUSIP (OpenFIGI): ISHARES MSCI BRAZIL ETF · в 13F: Ishares Inc">EWZ</span> $145.9 млн, <span title="CUSIP 457669307 · по CUSIP (OpenFIGI): INSMED INC · в 13F: Insmed Inc">INSM</span> $143.9 млн, <span title="CUSIP 023135106 · по CUSIP (OpenFIGI): AMAZON.COM INC · в 13F: Amazon Com Inc">AMZN</span> $109.5 млн, …</div><div style="margin-top:3px">Даниел Лоуб · Third Point — PUT 1 ($28.8 млн): <span title="CUSIP 78462F103 · по CUSIP (OpenFIGI): SS SPDR S&amp;P 500 ETF TRUST-US · в 13F: STATE STR SPDR S&amp;P 500 ETF T">SPY</span> $28.8 млн</div><div style="margin-top:3px">Дейвид Тепър · Appaloosa Management — PUT 2 ($254.1 млн): <span title="CUSIP 037833100 · по CUSIP (OpenFIGI): APPLE INC · в 13F: APPLE INC">AAPL</span> $241.6 млн, <span title="CUSIP 084670702 · по CUSIP (OpenFIGI): BERKSHIRE HATHAWAY INC-CL B · в 13F: BERKSHIRE HATHAWAY INC DEL">BRK-B</span> $12.5 млн</div><div style="margin-top:3px">Хауърд Маркс · Oaktree Capital Management — PUT 4 ($1.8 млрд): <span title="CUSIP 78462F103 · по CUSIP (OpenFIGI): SS SPDR S&amp;P 500 ETF TRUST-US · в 13F: STATE STREET CORP">SPY</span> $1.0 млрд, <span title="CUSIP 46090E103 · по CUSIP (OpenFIGI): INVESCO QQQ TRUST SERIES 1 · в 13F: INVESCO QQQ TRUST SERIES 1">QQQ</span> $651.7 млн, <span title="CUSIP N53745100 · по CUSIP (OpenFIGI): LYONDELLBASELL INDU-CL A · в 13F: LYONDELLBASELL INDUSTRIES NV">LYB</span> $47.4 млн, <span title="CUSIP 92839U206 · по CUSIP (OpenFIGI): VISTEON CORP · в 13F: VISTEON CORP">VC</span> $39.7 млн; CALL 3 ($144.6 млн): <span title="CUSIP 21874A106 · по CUSIP (OpenFIGI): CORE SCIENTIFIC INC · в 13F: CORE SCIENTIFIC INC">CORZ</span> $128.0 млн, <span title="CUSIP G11448100 · по CUSIP (OpenFIGI): BITDEER TECHNOLOGIES GROUP-A · в 13F: BITDEER TECHNOLOGIES GROUP">BTDR</span> $11.9 млн, <span title="CUSIP 55933J203 · по CUSIP (OpenFIGI): MAGNACHIP SEMICONDUCTOR CORP · в 13F: MAGNACHIP SEMICONDUCTOR CORP">MX</span> $4.7 млн</div></div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:6px">Тикърите: по CUSIP 61, по име 2, без тикър 0 от 63 реда.</div>
 </section>
 
 
@@ -3508,6 +3707,11 @@
 
 
 
+
+
+<div class="small" style="color:var(--muted);margin:10px 0 0">Short скрийнър (Stage 4) и книгата му — замразени на 21.10.2026:
+  29 затворени, win 13.8%, среден R -0.16; 14 отворени при замразяването — не се следят.
+  Без теглене и без нови записи; кодът и данните остават.</div>
 
 
 <section>

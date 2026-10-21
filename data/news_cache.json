@@ -1,53 +1,53 @@
 {
- "date": "2026-10-20",
+ "date": "2026-10-21",
  "news": [
   {
-   "headline": "Iran war tilts balance of global oil power towards Americas",
+   "headline": "SpaceX and Tesla boards explore potential merger",
    "source": "Financial Times",
-   "why": "Войната в Иран е преориентирала глобалните петролни потоци към Америките, което засяга цените на суровините и енергийния сектор дългосрочно.",
-   "headline_bg": "Войната в Иран измества баланса на глобалната петролна мощ към Америките"
+   "why": "Потенциалното сливане би засегнало директно акциите на Tesla (TSLA) и оценката на SpaceX, с вторичен ефект върху целия технологичен и космически сектор.",
+   "headline_bg": "Бордовете на SpaceX и Tesla проучват възможно сливане"
   },
   {
-   "headline": "Brent crude holds near five-month high on Middle East tension - Reuters",
-   "source": "Reuters Business",
-   "why": "Brent crude се задържа близо до петмесечен връх заради геополитическото напрежение на Близкия изток, което директно влияе на енергийния сектор и инфлационните очаквания.",
-   "headline_bg": "Brent crude се задържа близо до петмесечен връх заради напрежението на Близкия изток"
-  },
-  {
-   "headline": "China leaves loan rates steady for 17th consecutive month - Reuters",
-   "source": "Reuters Business",
-   "why": "Китай запазва лихвените проценти по заемите непроменени за 17-и пореден месец, което сигнализира ограничено монетарно стимулиране и влияе на глобалните очаквания за растеж.",
-   "headline_bg": "Китай запазва лихвените нива непроменени за 17-и пореден месец"
-  },
-  {
-   "headline": "China’s economy accelerated in the July-September quarter on robust exports - AP News",
+   "headline": "FAA clears the way for airlines to put Boeing’s long-delayed 737 Max 10 into service - AP News",
    "source": "AP Business",
-   "why": "Китайската икономика се ускорява в третото тримесечие благодарение на силния износ — ключов макро показател за глобалното търсене и азиатските пазари.",
-   "headline_bg": "Китайската икономика се ускорява през юли-септември на гръб на силния износ"
+   "why": "FAA сертификацията отваря нов приходен поток за Boeing (BA) и авиокомпаниите-клиенти, позитивно за акциите на Boeing и авиационния сектор.",
+   "headline_bg": "FAA открива пътя за авиокомпаниите да въведат дългоочакван Boeing 737 Max 10 в експлоатация"
   },
   {
-   "headline": "Trump says Mexico and US are close to trade deal - Reuters",
+   "headline": "Oil rises on Middle East supply fears, US inventory drawdowns - Reuters",
    "source": "Reuters Business",
-   "why": "Търговска сделка между САЩ и Мексико е в напреднал етап, което е пряко свързано с тарифната политика и пазарите на двете страни.",
-   "headline_bg": "Тръмп казва, че Мексико и САЩ са близо до търговска сделка"
+   "why": "Ескалацията на рисковете за доставките от Близкия изток натиска петрола нагоре, което засяга енергийния сектор, инфлационните очаквания и транспортни компании.",
+   "headline_bg": "Петролът поскъпва заради страхове за доставките от Близкия изток и спад на запасите в САЩ"
   },
   {
-   "headline": "Gold inches up on softer dollar as investors assess Fed rate outlook - Reuters",
+   "headline": "United Airlines slashes 2026 profit outlook on fuel prices, but travelers keep booking despite higher fares",
+   "source": "CNBC",
+   "why": "Понижената прогноза на United Airlines заради горивните разходи оказва натиск върху авиационния сектор и сигнализира за по-широк инфлационен проблем с jet fuel.",
+   "headline_bg": "United Airlines срязва прогнозата за печалба за 2026 г. заради цените на горивото, въпреки че пътниците продължават да резервират"
+  },
+  {
+   "headline": "Musk says SpaceX-Tesla merger is 'a good idea' as companies form deal committees - Reuters",
    "source": "Reuters Business",
-   "why": "Златото поскъпва заради по-слабия долар и преоценката на очакванията за лихвена политика на Fed, което е важен сигнал за настроенията на пазарите.",
-   "headline_bg": "Златото леко поскъпва заради по-слабия долар и преоценката на лихвената политика на Fed"
+   "why": "Потвърждението от Мъск за формиране на комитети по сделката е директен катализатор за волатилност в TSLA и свързаните технологични активи.",
+   "headline_bg": "Мъск казва, че сливането SpaceX-Tesla е 'добра идея', докато компаниите формират комитети по сделката"
   },
   {
-   "headline": "Bank Indonesia faces mounting pressure to hike after MSCI threat fuels market rout",
+   "headline": "Trump sued over 50% tariffs on Canada in latest trade challenge",
    "source": "CNBC",
-   "why": "Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI да понижи пазара до standalone статус, предизвиквайки сериозна разпродажба и отслабване на рупията.",
-   "headline_bg": "Bank Indonesia е под нарастващ натиск да вдигне лихвите след заплахата на MSCI и пазарния срив"
+   "why": "Правното оспорване на 50% тарифите върху канадски стоки създава несигурност за търговската политика и засяга сектори с верига на доставки от Канада.",
+   "headline_bg": "Тръмп е съден заради 50% тарифи върху Канада в поредното търговско предизвикателство"
   },
   {
-   "headline": "Supreme Court won't review Trump's firing of labor board member",
+   "headline": "Anthropic logged net loss of over $80 billion in first half of 2026 - Reuters",
+   "source": "Reuters Business",
+   "why": "Загуба от над 80 млрд. долара за полугодие при Anthropic поставя под въпрос устойчивостта на AI разходите и засяга оценките на AI компании и инвеститори в сектора.",
+   "headline_bg": "Anthropic отчита нетна загуба от над 80 млрд. долара за първото полугодие на 2026 г."
+  },
+  {
+   "headline": "Novo's next-generation obesity drug shows 25% weight loss in women in late-stage analysis",
    "source": "CNBC",
-   "why": "Върховният съд отказа да преразгледа уволнението на член на трудовия съвет от Тръмп, потвърждавайки президентския контрол върху независимите агенции с регулаторен ефект за пазарите.",
-   "headline_bg": "Върховният съд отказа да преразгледа уволнението на члена на трудовия съвет от Тръмп"
+   "why": "Данните за 25% загуба на тегло при CagriSema укрепват позицията на Novo Nordisk в GLP-1 пространството и оказват натиск върху конкурентите в сектора на затлъстяването.",
+   "headline_bg": "Новото поколение лекарство на Novo срещу затлъстяване показва 25% загуба на тегло при жени в анализ от късна фаза"
   }
  ]
 }

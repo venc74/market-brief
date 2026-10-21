@@ -16,6 +16,23 @@
    "close_pct": 11.56,
    "high_pct": 17.92,
    "resolved_on": "2026-10-12"
+  },
+  {
+   "ticker": "SMCI",
+   "session": "2026-10-20",
+   "brief_date": "2026-10-21",
+   "gap_session": "2026-10-21",
+   "prev_close": 32.47,
+   "ah_price": 37.51,
+   "ah_gap_pct": 15.52,
+   "ah_bars": 48,
+   "ah_volume": 0.0,
+   "neglect": true,
+   "ret63_pct": 6.3,
+   "open_gap_pct": null,
+   "close_pct": null,
+   "high_pct": null,
+   "resolved_on": null
   }
  ]
 }

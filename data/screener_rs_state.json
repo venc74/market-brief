@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20",
+ "updated": "2026-10-21",
  "enter": 0.97,
  "stay": 0.94,
  "tickers": [
@@ -10,7 +10,9 @@
   "AMGN",
   "BIIB",
   "CAH",
+  "CART",
   "CNC",
+  "CPAY",
   "EBAY",
   "ELV",
   "EXEL",
@@ -29,6 +31,8 @@
   "RGA",
   "RNR",
   "ROKU",
+  "RS",
+  "SJM",
   "SN",
   "TRGP",
   "V",
