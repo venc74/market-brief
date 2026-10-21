@@ -221,7 +221,7 @@ def form4_line(cards: dict | None, positions: dict | None) -> str | None:
     parts, found, bad = [], 0, []
     for st, what in ((cards, "от картите"), (positions, "позиции")):
         st = st or {}
-        if not st:
+        if not st or (st.get("kind") != "failed" and not st.get("requested")):   # няма тикъри за проверка (реално 06–08.10: без карти) — без част в реда
             continue
         if st.get("kind") == "failed":
             bad.append(f"{what}: {st.get('note') or 'тегленето не мина'}")

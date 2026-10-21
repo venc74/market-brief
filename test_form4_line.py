@@ -36,6 +36,8 @@ assert fail == "Form 4: проверката не мина днес (от кар
 part = render.form4_line({"kind": "ok_partial", "requested": 11, "found": 0, "note": "2 от 11 заявки към SEC не успяха"}, {"kind": "legit_zero", "requested": 5, "found": 0})
 assert part.endswith("(от картите, непълно: 2 от 11 заявки към SEC не успяха)") and "нулата не значи" not in part
 assert render.form4_line(None, None) is None and render.form4_line({}, {}) is None
+assert render.form4_line({"kind": "legit_zero", "requested": 0, "found": 0}, {"kind": "legit_zero", "requested": 2, "found": 0}).startswith("Form 4: проверени 2 позиции — 0 покупки")
+assert render.form4_line({"kind": "legit_zero", "requested": 0, "found": 0}, None) is None              # нищо за проверка (06–08.10 без карти) — без ред
 print("  ✓ „1 покупка … — маркерът INS✓“; провал — „нулата не значи, че няма покупки“; непълно — бележката; без статуси — без ред")
 
 print()
