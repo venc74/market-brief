@@ -219,6 +219,33 @@ def wish_signal(hist, today: str | None = None) -> dict | None:
         return None
 
 
+def wish_high_line(hist, day: str | None = None) -> dict | None:
+    """
+    21.10.2026 (етап 4): линията на Уиш за картата — най-високата цена (High) на месечен бар от месеците ПРЕДИ месеца на `day` (неговото правило: постовете от 16.01.2023,
+    05.11.2025, 02.12.2025; нашата линия е по close и е по-ниска) и колко месеца е непробита — по позиция в месечната серия, както _monthly_duration_check.
+    valid = поне GLB_MIN_MONTHS_UNPENETRATED месеца; иначе по неговото правило зелена линия няма (най-високият бар още не е „почивал“ 3 месеца).
+    Само информация на картата — не филтрира и не мести входа. Чиста функция; липсващи данни или грешка → None.
+    """
+    try:
+        h = hist["High"].dropna()
+        if day:
+            h = h[h.index <= pd.Timestamp(day)]
+        if not len(h):
+            return None
+        mh = h.resample("ME").max().dropna()
+        i = len(mh) - 1                                       # месецът на деня (последният в серията до деня)
+        if i < 1:
+            return None
+        prior = mh.iloc[:i]
+        pos = int(prior.values.argmax())                      # при равенство — първият, както argmax в _monthly_duration_check
+        unpen = i - pos - 1
+        return {"line": round(float(prior.iloc[pos]), 2), "month": prior.index[pos].strftime("%Y-%m"), "months_unpen": unpen,
+                "valid": unpen >= config.GLB_MIN_MONTHS_UNPENETRATED}
+    except Exception as e:
+        print(f"[glb_screener] wish_high_line: {type(e).__name__}: {e}")
+        return None
+
+
 # Цени за GLB: yf.download(..., auto_adjust=False) — БЕЗ ръчна корекция за сплитове.
 # История (2026-08-24, GLB dividend-drift одит): auto_adjust=True ретроактивно dividend-adjust-ва ЦЯЛАТА историческа Close/High/Low серия при всяко ex-div събитие (NWE ex-div 17.08.2026: prior_high $71.66→$70.99
 # в същия ден; SO 1981 close $0.27 срещу реалните $3.67 — 13.6× изкривяване). За price-breakout искаме цени, коригирани за сплитове, а НЕ за дивиденти → auto_adjust=False.
@@ -328,13 +355,17 @@ def _close_on(df, day) -> float | None:
         return None
 
 
-def _row(ev: dict, close: float, low52=None) -> dict:
+def _row(ev: dict, close: float, low52=None, ob: dict | None = None) -> dict:
     """Редът за показване: събитието от входа + днешната цена, разстоянието до линията и (информативно, 09.10) "× от 52-седмичното дъно"."""
     # втори преглед (10.10.2026): текстът (risk_note) е от ТЕКУЩИЯ код, не замразен в събитието — иначе промяна на текста не стига до картите
     # (реално на 10.10: и 17-те събития пазеха старото "Тесен, добре удържан base…" / "Дълъг ATH unpenetrated период…")
-    return {**ev, "risk_note": RISK_NOTES.get(ev.get("glb_type"), ev.get("risk_note")),
-            "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
-            "x_from_52w_low": x_from_low52(close, low52)}
+    row = {**ev, "risk_note": RISK_NOTES.get(ev.get("glb_type"), ev.get("risk_note")),
+           "price": round(float(close), 2), "pct_vs_line": round((float(close) / ev["line"] - 1) * 100, 1),
+           "x_from_52w_low": x_from_low52(close, low52)}
+    wl = (ob or {}).get("wish_high")                        # 21.10 (етап 4): линията на Уиш (High) към деня на входа — само информация; без наблюдение (seed) полето го няма
+    if wl:
+        row["wish_high"] = {**wl, "pct": round((float(close) / wl["line"] - 1) * 100, 1)}
+    return row
 
 
 def _rescale_for_split(sym: str, ev: dict, ob: dict, today: str) -> dict:
@@ -380,7 +411,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
             ch["held_unseen"].append(sym)
         elif ob["close"] >= ev["line"] * (1 - exit_m / 100):
             new[sym] = ev
-            rows.append(_row(ev, ob["close"], ob.get("low52")))
+            rows.append(_row(ev, ob["close"], ob.get("low52"), ob))
         else:
             ch["dropped"].append(sym)
     for sym, ob in observations.items():
@@ -391,7 +422,7 @@ def apply_hysteresis(events: dict, observations: dict, today: str, exit_margin_p
         if ob.get("last_date"):            # С2: close-ът и ДАТАТА НА БАРА му (since е датата на брифа — друг бар) → откриване на сплит след входа
             ev.update(since_close=round(float(ob["close"]), 4), since_bar=ob["last_date"])
         new[sym] = ev
-        rows.append(_row(ev, ob["close"], ob.get("low52")))
+        rows.append(_row(ev, ob["close"], ob.get("low52"), ob))
         ch["entered"].append(sym)
     return new, rows, ch
 
@@ -498,10 +529,14 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                 if hyst:
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
-                    observations[sym] = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT),
-                                         "low52": float(df["Low"].iloc[-252:].min()) if len(df) else None,
-                                         "last_date": _bar_date(df),                                           # С2: датата на бара на close-а
-                                         "close_at_since": _close_on(df, (events.get(sym) or {}).get("since_bar"))}  # С2: сплит след входа
+                    ob = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT),
+                          "low52": float(df["Low"].iloc[-252:].min()) if len(df) else None,
+                          "last_date": _bar_date(df),                                           # С2: датата на бара на close-а
+                          "close_at_since": _close_on(df, (events.get(sym) or {}).get("since_bar"))}  # С2: сплит след входа
+                    since_bar = (events.get(sym) or {}).get("since_bar") or (ob["last_date"] if ob["entry"] else None)
+                    if since_bar:                                                                 # 21.10 (етап 4): линията на Уиш (High) към деня на входа — за картата
+                        ob["wish_high"] = wish_high_line(df, since_bar)
+                    observations[sym] = ob
                     continue
                 r = _evaluate_ticker(sym, df)
             except Exception as e:
