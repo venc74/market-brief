@@ -24,6 +24,7 @@ from src.enrich import enrich, inject_split_catalysts, uov_marker
 from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
+from src import data_rhythm
 from src import ai_brief
 from src import sector_claims
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
@@ -1076,6 +1077,7 @@ def run() -> dict:
         "cot_summary": cot_summary,
         # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
         "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
+        "cot_rhythm": data_rhythm.cot_rhythm(cot.LAST_STATUS, data_rhythm.previous_brief(today), today) if config.ENABLE_COT else {},   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите

@@ -366,6 +366,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news=brief.get("news", []),
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},
+        cot_rhythm=brief.get("cot_rhythm") or {},                   # 21.10 (етап 4): ред „без нови данни“ в дните след първия бриф с отчета
         cot_summary=brief.get("cot_summary"),
         correlation_flags=brief.get("correlation_flags", []),
         short_frozen=(brief.get("short_tracker") or {}).get("frozen") or {},     # 19.10.2026 (т. 19): замразеният short модул — един ред
