@@ -31,6 +31,14 @@ def parse(h):
     p = P(); p.feed(h); return p
 
 
+# 21.10.2026: часовникът на страницата е замразен — "генериран HH:MM" и броячът до US pre-market са с точност до минута; двете рендерирания (с и без escape) понякога
+# попадаха от двете страни на минутата и тестът падаше случайно (21.10, при паралелна проверка по commit: 187/188, после 3 от 3 минаха). СИНТЕТИЧНО: фиксираното време.
+import datetime as _dt, functools as _ft
+_FIXED = _dt.datetime(2026, 10, 21, 5, 30, tzinfo=_dt.timezone.utc)
+render.berlin_clock = _ft.partial(render.berlin_clock, now=_FIXED)
+render.premarket_note = _ft.partial(render.premarket_note, now=_FIXED)
+
+
 def dash(brief, autoescape=True):
     render.env.autoescape = autoescape
     render.env.cache.clear()                                    # Jinja компилира autoescape в шаблона — без това превключването е мнимо
