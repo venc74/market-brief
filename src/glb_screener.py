@@ -456,6 +456,42 @@ def replay_observations(sym: str, hist, n_sessions: int, entry_margin_pct: float
     return out
 
 
+def episode_start(sym: str, hist, ev: dict, entry_margin_pct: float | None = None, exit_margin_pct: float | None = None) -> dict | None:
+    """
+    21.10.2026 (етап 4, т. 5): реалният ден на входа за събитие, което е било „вътре“ още в първата сесия на възстановяването от историята. replay_observations вижда само
+    последните GLB_SEED_SESSIONS сесии, затова такова събитие получава since = първия ден на прозореца (MRK: 14.08 вместо 13.08, когато close-ът вече е +2.73% над линията).
+    Назад от since_bar: последното затваряне под линията x (1 − EXIT%) е границата на епизода; първият ден след нея, в който правилото за вход държи със СЪЩАТА линия
+    (close >= линията x (1 + ENTRY%) при валиден месечен гейт — wish_table дава линията и месеците), е входът. Детайлите (тип, обем, band_hold) — от _evaluate_ticker към този ден,
+    както при възстановяването; линията остава същата. Връща новото събитие или None (няма по-ранен вход със същата линия, липсват данни, грешка).
+    """
+    try:
+        entry_m = config.GLB_ENTRY_MARGIN_PCT if entry_margin_pct is None else entry_margin_pct
+        exit_m = config.GLB_EXIT_MARGIN_PCT if exit_margin_pct is None else exit_margin_pct
+        sb, L = ev.get("since_bar"), float(ev["line"])
+        if not sb:
+            return None
+        c = hist["Close"].dropna()
+        t = wish_table(c)
+        before = t[t.index < pd.Timestamp(sb)]
+        viol = before.index[before["close"] < L * (1 - exit_m / 100)]
+        win = before[before.index > viol[-1]] if len(viol) else before
+        ok = (win["close"] >= win["line"] * (1 + entry_m / 100)) & (win["months_unpen"] >= config.GLB_MIN_MONTHS_UNPENETRATED) & ((win["line"] - L).abs() <= 0.01)
+        if not ok.any():
+            return None
+        d0 = ok[ok].index[0]
+        e = _evaluate_ticker(sym, hist.loc[:d0], entry_m)
+        if not e or abs(float(e["prior_high"]) - L) > 0.01:
+            return None
+        out = {**{k: v for k, v in e.items() if k not in ("price", "risk_note")}, "line": ev["line"], "since": d0.date().isoformat(),
+               "since_close": round(float(c.loc[d0]), 4), "since_bar": d0.date().isoformat(), "since_backtraced_from": sb}
+        if ev.get("split_scales"):
+            out["split_scales"] = ev["split_scales"]
+        return out
+    except Exception as e:
+        print(f"[glb_screener] {sym}: episode_start: {type(e).__name__}: {e}")
+        return None
+
+
 def replay_state(replays: dict[str, dict]) -> tuple[dict, list[dict], dict]:
     """
     Ден по ден apply_hysteresis (същата чиста функция като в дневния run) върху replays {тикър: {дата: {close, entry}}}, от най-старата към най-новата сесия. Връща (събития, редове за последния ден,
@@ -500,6 +536,8 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     events = load_state(state_path) if (hyst and not seed) else {}
     replays: dict = {}
     observations: dict = {}
+    first_in: dict = {}                          # 21.10 (етап 4, т. 5): при възстановяване — тикърите, които са "вътре" още в първата сесия на прозореца (историята им за episode_start)
+    seed_from = None if seed else load_seed_meta(state_path).get("from")                   # първата сесия на последното възстановяване
     today = today or dt.date.today().isoformat()
     results = []
     batches = failed = with_history = 0
@@ -528,8 +566,17 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                         wish_signals.append({"ticker": sym, **w})
                 if hyst and seed:
                     replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
+                    r0 = replays[sym]
+                    if r0 and r0[min(r0)]["entry"]:
+                        first_in[sym] = df
                     continue
                 if hyst:
+                    ev0 = events.get(sym)
+                    if ev0 and seed_from and ev0.get("since_bar") == seed_from and not ev0.get("since_backtraced_from"):
+                        ne = episode_start(sym, df, ev0)                                      # 21.10 (етап 4, т. 5): датата на първия ден на прозореца → реалният вход
+                        if ne:
+                            print(f"[glb_screener] {sym}: входът е {ne['since']}, не {seed_from} (първата сесия на възстановяването)")
+                            events[sym] = ne
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
                     ob = {"close": last, "entry": None if sym in events else _evaluate_ticker(sym, df, config.GLB_ENTRY_MARGIN_PCT),
@@ -552,6 +599,13 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
 
     if hyst and seed:
         events, results, ch = replay_state(replays)
+        for sym, hist_in in first_in.items():                                                  # 21.10 (етап 4, т. 5): "вътре" в първата сесия → реалният ден на входа
+            ev = events.get(sym)
+            if ev and ev.get("since_bar") == min(replays[sym]):
+                ne = episode_start(sym, hist_in, ev)
+                if ne:
+                    events[sym] = ne
+                    results = [{**r, **ne} if r.get("ticker") == sym else r for r in results]
         dates = sorted({d for r in replays.values() for d in r})
         save_state(events, today, state_path, seed={"version": config.GLB_SEED_VERSION, "sessions": len(dates), "from": dates[0] if dates else None, "to": dates[-1] if dates else None})
         print(f"[glb_screener] НАЧАЛНО състояние от историята ({len(dates)} сесии {dates[0] if dates else '?'} → {dates[-1] if dates else '?'}): {len(events)} събития, "
