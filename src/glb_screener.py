@@ -458,8 +458,9 @@ def replay_observations(sym: str, hist, n_sessions: int, entry_margin_pct: float
 
 def episode_start(sym: str, hist, ev: dict, entry_margin_pct: float | None = None, exit_margin_pct: float | None = None) -> dict | None:
     """
-    21.10.2026 (етап 4, т. 5): реалният ден на входа за събитие, което е било „вътре“ още в първата сесия на възстановяването от историята. replay_observations вижда само
-    последните GLB_SEED_SESSIONS сесии, затова такова събитие получава since = първия ден на прозореца (MRK: 14.08 вместо 13.08, когато close-ът вече е +2.73% над линията).
+    21.10.2026 (етап 4, т. 5): реалният ден на входа за събитие от възстановяването от историята. replay_observations вижда само последните GLB_SEED_SESSIONS сесии и тръгва от празно
+    състояние, затова събитие, започнало преди прозореца, получава since = първия ден на прозореца (MRK: 14.08 вместо 13.08) или първия close >= +1% в него (FCX, MEDP: 19.08 вместо 05.08 / 10.08 —
+    на 14.08 бяха между −3% и +1% от линията).
     Назад от since_bar: последното затваряне под линията x (1 − EXIT%) е границата на епизода; първият ден след нея, в който правилото за вход държи със СЪЩАТА линия
     (close >= линията x (1 + ENTRY%) при валиден месечен гейт — wish_table дава линията и месеците), е входът. Детайлите (тип, обем, band_hold) — от _evaluate_ticker към този ден,
     както при възстановяването; линията остава същата. Връща новото събитие или None (няма по-ранен вход със същата линия, липсват данни, грешка).
@@ -536,8 +537,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     events = load_state(state_path) if (hyst and not seed) else {}
     replays: dict = {}
     observations: dict = {}
-    first_in: dict = {}                          # 21.10 (етап 4, т. 5): при възстановяване — тикърите, които са "вътре" още в първата сесия на прозореца (историята им за episode_start)
-    seed_from = None if seed else load_seed_meta(state_path).get("from")                   # първата сесия на последното възстановяване
+    seeded_hist: dict = {}                       # 21.10 (етап 4, т. 5): при възстановяване — историята на тикърите с вход в прозореца (за episode_start)
+    seed_meta = {} if seed else load_seed_meta(state_path)
+    seed_from, seed_to = seed_meta.get("from"), seed_meta.get("to")                         # прозорецът на последното възстановяване
     today = today or dt.date.today().isoformat()
     results = []
     batches = failed = with_history = 0
@@ -566,16 +568,15 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                         wish_signals.append({"ticker": sym, **w})
                 if hyst and seed:
                     replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
-                    r0 = replays[sym]
-                    if r0 and r0[min(r0)]["entry"]:
-                        first_in[sym] = df
+                    if any(o.get("entry") for o in replays[sym].values()):
+                        seeded_hist[sym] = df
                     continue
                 if hyst:
                     ev0 = events.get(sym)
-                    if ev0 and seed_from and ev0.get("since_bar") == seed_from and not ev0.get("since_backtraced_from"):
-                        ne = episode_start(sym, df, ev0)                                      # 21.10 (етап 4, т. 5): датата на първия ден на прозореца → реалният вход
+                    if ev0 and seed_from and seed_to and seed_from <= (ev0.get("since_bar") or "") <= seed_to and not ev0.get("since_backtraced_from"):
+                        ne = episode_start(sym, df, ev0)                                      # 21.10 (етап 4, т. 5): вход от възстановяването → реалният вход (празно състояние в началото на прозореца)
                         if ne:
-                            print(f"[glb_screener] {sym}: входът е {ne['since']}, не {seed_from} (първата сесия на възстановяването)")
+                            print(f"[glb_screener] {sym}: входът е {ne['since']}, не {ev0['since_bar']} (възстановяването {seed_from} → {seed_to} започва от празно състояние)")
                             events[sym] = ne
                     last = float(df["Close"].iloc[-1]) if len(df) else None
                     # тикър със събитие не се оценява наново (линията е замразена); нов вход — само с буфера над линията
@@ -599,9 +600,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
 
     if hyst and seed:
         events, results, ch = replay_state(replays)
-        for sym, hist_in in first_in.items():                                                  # 21.10 (етап 4, т. 5): "вътре" в първата сесия → реалният ден на входа
+        for sym, hist_in in seeded_hist.items():                                               # 21.10 (етап 4, т. 5): празното състояние в началото на прозореца → реалният ден на входа
             ev = events.get(sym)
-            if ev and ev.get("since_bar") == min(replays[sym]):
+            if ev:
                 ne = episode_start(sym, hist_in, ev)
                 if ne:
                     events[sym] = ne

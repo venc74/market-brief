@@ -58,9 +58,10 @@ got = {s: (r["wish_high"]["line"], r["wish_high"]["valid"], r["wish_high"]["pct"
 assert got == {"MSFT": (555.45, True, -4.2), "WAT": (428.22, True, 3.4), "MRK": (135.05, False, 9.8), "MEDP": (677.9, False, -8.2)}, got
 assert {s: r["line"] for s, r in rows.items()} == {s: FX["events"][s]["line"] for s in T}                 # нашата линия не се пипа
 print("  ✓ картите носят линията на Уиш към деня на входа: MSFT −4.2% под $555.45, WAT +3.4% над $428.22; MRK и MEDP — без зелена линия при входа; нашата линия е същата")
-# 21.10 (етап 4, т. 4): затварянията под НАШАТА линия от входа до 20.10 — MEDP 6 (най-ниско −1.57% на 10.09), MSFT 2 (16.10, 20.10), WAT и MRK — 0 (измерено в доклада от 21.10)
-assert {s: r["closes_below_line"] for s, r in rows.items()} == {"MEDP": 6, "MSFT": 2, "WAT": 0, "MRK": 0}, {s: r.get("closes_below_line") for s, r in rows.items()}
-print("  ✓ затваряния под линията от входа: MEDP 6, MSFT 2, WAT 0, MRK 0 — същите като в доклада")
+# 21.10 (етап 4, т. 4): затварянията под НАШАТА линия от входа до 20.10 — MSFT 2 (16.10, 20.10), WAT и MRK 0; MEDP 9 — от реалния вход 10.08 (episode_start, т. 5; от 19.08 са 6, както в доклада)
+assert rows["MEDP"]["since_bar"] == "2026-08-10" and rows["MRK"]["since_bar"] == "2026-08-13"
+assert {s: r["closes_below_line"] for s, r in rows.items()} == {"MEDP": 9, "MSFT": 2, "WAT": 0, "MRK": 0}, {s: r.get("closes_below_line") for s, r in rows.items()}
+print("  ✓ затваряния под линията от входа: MEDP 9 (от 10.08), MSFT 2, WAT 0, MRK 0")
 
 print()
 print("── 3. страницата (РЕАЛНИЯТ бриф от 16.10 с тези карти) ──")
@@ -73,7 +74,7 @@ sec = sec[:sec.index("</section>")]
 assert "линия по Уиш (High): $555.45 (07.2025) — под нея с 4.2%" in sec and "линия по Уиш (High): $428.22 (09.2021) — над нея с 3.4%" in sec
 assert "по Уиш (High): при входа няма зелена линия — върхът $135.05 (07.2026) е непробит 0 мес. (нужни ≥ 3); цената е 9.8% над него" in sec
 assert "върхът $677.90 (07.2026) е непробит 0 мес. (нужни ≥ 3); цената е 8.2% под него" in sec
-assert sec.count("затваряния под линията от входа: 6 — по правилото на Уиш първото е изход") == 1 and sec.count("затваряния под линията от входа: 0<") == 2
+assert sec.count("затваряния под линията от входа: 9 — по правилото на Уиш първото е изход") == 1 and sec.count("затваряния под линията от входа: 0<") == 2
 old = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-16.json").read_text(encoding="utf-8"))
 with q():
     page_old = render.render_dashboard(old)
