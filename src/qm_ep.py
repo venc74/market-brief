@@ -215,6 +215,77 @@ def fetch_headlines(sym: str, since: dt.datetime | None = None) -> list[dict]:
         return []
 
 
+# 21.10.2026 (етап 4): новината за самата компания пред общите прегледи. Реално на 21.10: и трите заглавия на Yahoo за SMCI бяха прегледи на пазара („Dow Jones Futures: …“,
+# „Asia stocks rebound …“), а катализаторът — 8-K с т. 2.02 (резултати), приет на 20.10 в 20:44 ET. Точките на 8-K → (английското име за AI, българският текст за картата); 9.01 (приложения) не се показва.
+ITEMS_8K = {"1.01": ("Entry into a Material Definitive Agreement", "съществено споразумение"), "1.02": ("Termination of a Material Definitive Agreement", "прекратено съществено споразумение"),
+            "2.01": ("Completion of Acquisition or Disposition of Assets", "придобиване или продажба на активи"), "2.02": ("Results of Operations and Financial Condition", "резултати от дейността"),
+            "2.03": ("Creation of a Direct Financial Obligation", "ново финансово задължение"), "2.05": ("Costs Associated with Exit or Disposal Activities", "разходи по преструктуриране"),
+            "2.06": ("Material Impairments", "обезценка"), "3.01": ("Notice of Delisting or Failure to Satisfy a Listing Rule", "уведомление за отписване от борсата"),
+            "5.02": ("Departure or Election of Directors or Officers", "смяна в ръководството"), "5.07": ("Submission of Matters to a Vote of Security Holders", "гласуване на акционерите"),
+            "7.01": ("Regulation FD Disclosure", "оповестяване по Reg FD"), "8.01": ("Other Events", "други събития")}
+# „stocks rally“ (множествено — пазарът), не „Humana Stock Surges“ (единствено — самата акция; реално заглавие от 09.10)
+OVERVIEW_RE = re.compile(r"\b(futures|stock market|stocks (?:rebound|rally|rallies|rise|fall|slip|surge|jump|to watch)|dow jones|s&p 500|nasdaq composite|wall street|"
+                         r"premarket|pre-market|midday|movers|asian? (?:chip )?stocks|chip stocks|market (?:today|wrap|update))\b", re.I)
+
+
+def filings_after_close(sub: dict, session: str, now_utc: dt.datetime | None = None) -> list[dict]:
+    """
+    8-K / 8-K/A на компанията, приети от 15:30 ET в деня на сесията до now_utc (часът на брифа) — [{"accepted_et", "date", "items": [(точка, английски, български)], "acc"}], най-новото първо.
+    Чиста функция върху submissions JSON на EDGAR.
+    """
+    from zoneinfo import ZoneInfo
+    et = ZoneInfo("America/New_York")
+    start = dt.datetime.combine(dt.date.fromisoformat(session), dt.time(15, 30), tzinfo=et)
+    now = now_utc or dt.datetime.now(dt.timezone.utc)
+    r = (sub or {}).get("filings", {}).get("recent", {})
+    out = []
+    for i, f in enumerate(r.get("form", [])):
+        if f not in ("8-K", "8-K/A"):
+            continue
+        try:
+            acc = dt.datetime.fromisoformat(str(r["acceptanceDateTime"][i]).replace("Z", "+00:00"))
+        except (ValueError, KeyError, IndexError):
+            continue
+        if not (start <= acc <= now):
+            continue
+        codes = [x.strip() for x in str((r.get("items") or [""] * len(r["form"]))[i] or "").split(",") if x.strip() and x.strip() != "9.01"]
+        out.append({"accepted_et": acc.astimezone(et).strftime("%Y-%m-%d %H:%M"), "date": r["filingDate"][i], "acc": r["accessionNumber"][i],
+                    "items": [(c, *ITEMS_8K.get(c, (f"Item {c}", f"т. {c}"))) for c in codes]})
+    return sorted(out, key=lambda x: x["accepted_et"], reverse=True)
+
+
+def company_filings(sym: str, session: str, get=None, cik_map=None, now_utc: dt.datetime | None = None) -> list[dict]:
+    """8-K-тата на компанията след затварянето (EDGAR submissions, config.EDGAR_UA — както 13F / Form 4 / отделянията). Graceful: изключено, без CIK, провал → []."""
+    if not config.QM_EP_EDGAR_8K or not session:
+        return []
+    try:
+        from src import insider_buying, spinoff_watch
+        cik = (cik_map if cik_map is not None else insider_buying._ticker_cik_map()).get(sym)
+        if not cik:
+            return []
+        sub = json.loads((get or spinoff_watch._http_get)(f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"))
+        return filings_after_close(sub, session, now_utc)
+    except Exception as e:
+        print(f"[qm_ep] 8-K {sym}: {type(e).__name__}: {e}")
+        return []
+
+
+def filing_headline(f: dict) -> dict:
+    """Редът за картата: „8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността“ (source = SEC)."""
+    when = f["accepted_et"]
+    items = "; ".join(f"т. {c} — {bg}" for c, _, bg in f["items"]) or "без точки"
+    return {"title": f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {items}", "published": when, "source": "SEC"}
+
+
+def rank_headlines(headlines: list[dict], ticker: str, company: str | None = None) -> list[dict]:
+    """Заглавията за самата компания (тикърът или дума от името ≥ 4 букви, и не общ преглед на пазара) — първи; прегледите (OVERVIEW_RE) — след тях. Редът вътре в групите се пази."""
+    words = [w for w in re.findall(r"[A-Za-z]{4,}", company or "") if w.lower() not in ("inc", "corp", "corporation", "company", "holdings", "group", "technologies", "computer")]
+    def own(h):
+        t = h.get("title") or ""
+        return not OVERVIEW_RE.search(t) and (re.search(rf"\b{re.escape(ticker)}\b", t) or any(re.search(rf"\b{re.escape(w)}\b", t, re.I) for w in words))
+    return sorted(headlines or [], key=lambda h: 0 if own(h) else (2 if OVERVIEW_RE.search(h.get("title") or "") else 1))
+
+
 def _nums(text: str) -> set[str]:
     return {m.replace(",", ".") for m in NUM_RE.findall(text or "")}
 
@@ -246,9 +317,12 @@ SYSTEM_EP = ("Ти си помощник, който връща САМО вал�
 
 def _build_prompt(batch: list[dict]) -> str:
     cats = "\n".join(f'- "{k}": {v}' for k, v in CATALYSTS.items())
-    payload = [{"ticker": r["ticker"], "headlines": [h["title"] for h in r["headlines"]]} for r in batch]
+    payload = [{"ticker": r["ticker"], "headlines": [h["title"] for h in r["headlines"] if h.get("source") != "SEC"],
+                **({"sec_8k_after_close": [f"{f['accepted_et']} ET — " + "; ".join(f"Item {c} {en}" for c, en, _ in f["items"]) for f in r["filings_8k"]]} if r.get("filings_8k") else {})}
+               for r in batch]
     return (f"АКЦИИ С ГАП НАГОРЕ СЛЕД ЗАТВАРЯНЕ (заглавия от Yahoo Finance): {json.dumps(payload, ensure_ascii=False)}\n\nКАТАЛИЗАТОРИ (ползвай САМО тези ключове; "
-            f"ако заглавията не дават ясна причина — \"unknown\"):\n{cats}\n\nЗа ВСЯКА акция върни: \"catalyst\" (ключ), \"summary_bg\" (ЕДНО изречение на български до 200 знака, САМО по "
+            f"ако заглавията не дават ясна причина — \"unknown\"):\n{cats}\n\n"
+            f"\"sec_8k_after_close\" (ако го има) е 8-K, подаден от самата компания след затварянето — най-прякото доказателство за причината; общите прегледи на пазара (фючърси, борсите в Азия) не са причина.\n\nЗа ВСЯКА акция върни: \"catalyst\" (ключ), \"summary_bg\" (ЕДНО изречение на български до 200 знака, САМО по "
             f"заглавията, БЕЗ числа и проценти освен ако са дословно в заглавията), \"surprise\" (\"yes\"/\"no\"/\"unclear\" — изненада ли е новината за пазара според заглавията).\n\n"
             f"Връщай само JSON: {{\"items\": [{{\"ticker\": \"...\", \"catalyst\": \"...\", \"summary_bg\": \"...\", \"surprise\": \"...\"}}]}}")
 
@@ -399,7 +473,7 @@ def summarize_log(entries: list[dict]) -> dict:
 # ──────────────────────────────────────────────────────────────────────────
 # Оркестрация
 # ──────────────────────────────────────────────────────────────────────────
-def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None) -> dict:
+def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None, filings_fn=None) -> dict:
     """
     След затваряне → гапове ≥ 10% → (нейният) ръст за 3 месеца, ADR, максимален стоп → заглавия + AI класификация на катализатора за показаните → дневник. Връща
     {"ok", "session", "rows" (показаните — "пренебрегнати", най-много QM_EP_MAX_ROWS), "not_neglected" (останалите гапове ≥ 10%), "diag", "log" (обобщение), "notes"}. Не вдига.
@@ -419,12 +493,14 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
                                 for r in allrows if r not in shown and (r["neglect"] is not True or not r["liquid"])]
         since = dt.datetime.combine(dt.date.fromisoformat(diag["session"]) if diag.get("session") else today, dt.time(0, 0)) - dt.timedelta(days=1)
         for r in shown:
-            r["headlines"] = (headlines_fn or fetch_headlines)(r["ticker"], since)
             if name_lookup:
                 try:
                     r["company"] = name_lookup(r["ticker"]) or r["ticker"]
                 except Exception:
                     r["company"] = r["ticker"]
+            # 21.10.2026 (етап 4): новината за самата компания — 8-K след затварянето (първи ред), после нейните заглавия, общите прегледи на пазара — последни
+            r["filings_8k"] = (filings_fn or company_filings)(r["ticker"], diag.get("session"))
+            r["headlines"] = [filing_headline(f) for f in r["filings_8k"]] + rank_headlines((headlines_fn or fetch_headlines)(r["ticker"], since), r["ticker"], r.get("company"))
         cls, notes = classify_catalysts(shown, ai_call)
         out["notes"] += notes
         for r in shown:
