@@ -212,6 +212,36 @@ _QWORD = __import__("re").compile(r"[A-Za-zА-Яа-я0-9&'.-]+")
 _QLEGAL = {"inc", "corp", "corporation", "company", "holdings", "group", "plc", "ltd", "limited", "the", "co", "sa", "nv", "ag", "se", "lp", "llc"}
 
 
+def form4_line(cards: dict | None, positions: dict | None) -> str | None:
+    """
+    21.10.2026 (етап 4, ритъм на данните): видим ред за Form 4 и при нула покупки — „Form 4: проверени N тикъра от картите и M позиции — X покупки ≥ $100 000 от ключови лица
+    за 30 дни“. Провал → „проверката не мина днес (…) — нулата не значи, че няма покупки“; непълно (ok_partial) → бележката в скоби. Без статуси → None.
+    """
+    from src import insider_buying
+    parts, found, bad = [], 0, []
+    for st, what in ((cards, "от картите"), (positions, "позиции")):
+        st = st or {}
+        if not st:
+            continue
+        if st.get("kind") == "failed":
+            bad.append(f"{what}: {st.get('note') or 'тегленето не мина'}")
+            continue
+        parts.append(f"{st.get('requested', 0)} {'тикъра ' + what if what == 'от картите' else what}")
+        found += int(st.get("found") or 0)
+        if st.get("kind") == "ok_partial" and st.get("note"):
+            bad.append(f"{what}, непълно: {st['note']}")
+    if not parts and not bad:
+        return None
+    word = "покупка" if found == 1 else "покупки"
+    head = (f"Form 4: проверени {' и '.join(parts)} — {found} {word} ≥ ${config.INSIDER_MIN_VALUE:,.0f} от ключови лица (officers / клъстер) за {insider_buying._LOOKBACK_DAYS} дни"
+            .replace(",", " ") if parts else "Form 4: проверката не мина днес")
+    if found:
+        head += " — маркерът INS✓ на картите"
+    if bad:
+        head += " (" + "; ".join(bad) + (" — нулата не значи, че няма покупки" if not parts or any("непълно" not in b for b in bad) else "") + ")"
+    return head
+
+
 def cot_quote(t: dict) -> str:
     """
     19.10.2026 (етап 2, доп. т. 7): цитатът на модела за механизма в COT cross тезата — с името на компанията отпред, ако в първите 4 думи няма дума от името (≥ 4 букви) или тикъра
@@ -347,6 +377,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         thirteenf_rhythm=brief.get("thirteenf_rhythm") or {},          # 21.10 (етап 4): ред и свити секции без нов 13F
+        form4_line=form4_line(brief.get("insider_buying_status"), brief.get("insider_buying_positions_status")),   # 21.10 (етап 4): видим ред и при нула
         glb_candidates=brief.get("glb_candidates", []),
         glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
         corp_excluded=brief.get("corp_excluded") or {},                # 13.10: изключени заради отделяне — ред под секциите
