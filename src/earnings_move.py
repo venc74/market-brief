@@ -206,7 +206,17 @@ def _dm(iso: str) -> str:
     return f"{iso[8:10]}.{iso[5:7]}"
 
 
-def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_reason: str = "") -> dict | None:
+def _snap_time(fetched_utc: str | None) -> str:
+    """22.10.2026: „в 10:41 ET“ от fetched_at_utc на снимката („ГГГГ-ММ-ДД ЧЧ:ММ“ UTC); нечетимо / липсва → празно."""
+    try:
+        from zoneinfo import ZoneInfo
+        t = dt.datetime.strptime(str(fetched_utc)[:16], "%Y-%m-%d %H:%M").replace(tzinfo=dt.timezone.utc).astimezone(ZoneInfo("America/New_York"))
+        return f" в {t.strftime('%H:%M')} ET"
+    except (ValueError, TypeError):
+        return ""
+
+
+def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_reason: str = "", fetched_utc: str | None = None) -> dict | None:
     """Предупреждението за карта с отчет на earnings_date; None ако отчетът е минал или е след EARNINGS_WARNING_SESSIONS сесии."""
     d = dt.date.fromisoformat(earnings_date[:10])
     if d < today:
@@ -221,7 +231,8 @@ def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_rea
         out.update(spot=res["spot"], straddle_after=res["straddle_after"], straddle_before=res["straddle_before"], after_expiry=res["after_expiry"],
                    before_expiry=res["before_expiry"], naive_pct=res["naive_pct"], snapshot_session=res["session"])
         out["text"] = (f"⚠ Отчет на {_dm(d.isoformat())} ({when}) — пазарът очаква ±{res['pct']}% при отчета (оценка от straddle-ите на "
-                       f"{_dm(res['before_expiry'])} и {_dm(res['after_expiry'])} с извадена базова волатилност; цена ${res['spot']:.2f}, опции от {_dm(res['session'])}).")
+                       f"{_dm(res['before_expiry'])} и {_dm(res['after_expiry'])} с извадена базова волатилност; цена ${res['spot']:.2f} при снимката на опциите "
+                       f"на {_dm(res['session'])}{_snap_time(fetched_utc)}).")          # 22.10.2026: с часа — до нея на картата е close-ът (AAPL: $339.95 в 10:41 ET срещу $343.99)
     else:
         out["text"] = f"⚠ Отчет на {_dm(d.isoformat())} ({when}) — няма данни за очаквано движение ({res['reason']})."
     return out
@@ -260,7 +271,7 @@ def annotate(cards: list[dict], today: dt.date | None = None, snapshot_loader=No
             why = (f"картата е нова — при снимката на {_dm(sd)} не беше сред кандидатите" if c["ticker"] not in in_snap and sd[:4].isdigit()
                    else f"при снимката на {_dm(sd)} няма straddle за този отчет" if sd[:4].isdigit() else "")
         try:
-            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), why)
+            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), why, (snap or {}).get("fetched_at_utc"))
         except Exception as e:
             print(f"[earnings_move] {c.get('ticker')}: {type(e).__name__}: {e}")
             continue
