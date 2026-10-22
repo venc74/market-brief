@@ -25,6 +25,7 @@ from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import data_rhythm
+from src import crypto_news
 from src import ai_brief
 from src import sector_claims
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
@@ -1009,6 +1010,12 @@ def run() -> dict:
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
     sector_card = steps.step("sector_card", lambda: sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation), fallback={},
                              label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
+    prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
+    cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
+    # 22.10.2026 (етап 4): крипто секцията — Cointelegraph (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
+    crypto = steps.step("crypto", lambda: crypto_news.build(today, cot_fresh=bool(cot_rhythm.get("fresh")), cot_series=cot.LAST_SERIES), fallback={},
+                        enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
+                        failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                        cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
@@ -1022,7 +1029,6 @@ def run() -> dict:
                                        breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
     data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
     print(steps.log_line())
-    prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     brief = {
         "date": today,
         "macro": macro,
@@ -1080,7 +1086,8 @@ def run() -> dict:
         "cot_summary": cot_summary,
         # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
         "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
-        "cot_rhythm": data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {},   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
+        "cot_rhythm": cot_rhythm,
+        "crypto": crypto,                                              # 22.10.2026 (етап 4): крипто секцията   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите

@@ -536,20 +536,7 @@ THESIS_BASKETS = [
                   "поръчки с многогодишен backlog за големите изпълнители → предвидим "
                   "приходен поток независим от икономическия цикъл."),
     },
-    {
-        "name": "Крипто регулация (CLARITY Act)",
-        # маха се, когато тръгне крипто секцията (решение от 21.10.2026)
-        "reviewed": "2026-10-08",
-        "tickers": ["CRCL", "COIN", "HOOD", "BLSH"],
-        "sector_etf": None,  # няма крипто ETF в SECTOR_ETFS → "—"
-        "names": ["Circle", "Coinbase", "Robinhood", "Bullish"],
-        "terms": ["crypto*", "clarity act", "bitcoin", "stablecoin*", "digital asset*", "cftc", "market structure"],
-        "default_status": "watch",
-        "trigger": None,
-        "chain": ("Ясна законодателна рамка (CLARITY Act) → институциите получават "
-                  "регулаторна сигурност → приток на капитал към регулирани крипто "
-                  "борси и custody → борсите и брокерите печелят на обем."),
-    },
+    # 22.10.2026: тезата „Крипто регулация (CLARITY Act)“ (CRCL, COIN, HOOD, BLSH) отпадна с крипто секцията (решение от 21.10) — новините и тикърите ѝ са там (src/crypto_news.py)
     {
         "name": "Полупроводници и AI инфраструктура",
         "reviewed": "2026-10-08",
@@ -670,6 +657,13 @@ NEWS_RSS_FEEDS = {
 # Цена: ~3100 → ~5600 входни токена за едно извикване на дневния news филтър.
 NEWS_PER_SOURCE_LIMIT = int(os.getenv("NEWS_PER_SOURCE_LIMIT", 50))
 NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
+# ── Крипто секция (22.10.2026, етап 4 — решения от 21–22.10) — виж src/crypto_news.py ──
+ENABLE_CRYPTO_SECTION = os.getenv("ENABLE_CRYPTO_SECTION", "1") == "1"
+CRYPTO_RSS_URL = os.getenv("CRYPTO_RSS_URL", "https://cointelegraph.com/rss")      # „?format=rss“ връща HTML страницата; фийдът държи 30 заглавия ≈ 25 часа
+CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))
+CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 4))                             # най-много 4, от тях най-много 1 за ETF потоци
+CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
+CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC
 # Тезите и днешните новини (ai_brief.thesis_news_pick) — 19.10.2026 (трети преглед, т. 10, решение "в" на Венци): без AI етикети ("потвърдена / опровергана / evolving /
 # resolved"); до тезата — ДОСЛОВНОТО заглавие на свързаната новина, без етикет (кой съди — читателят). Кандидатите за всяка теза ги избира КОДЪТ по котвите ѝ
 # (THESIS_BASKETS: тикъри, names, terms) от суровия пул; моделът само отсява шума ("AI" в заглавие за литературна награда — 15.10) и връща индексите. Котвите сами не стигат:

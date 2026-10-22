@@ -25,6 +25,8 @@ config.DATA_DIR.mkdir()
 
 FX = json.loads((ROOT / "tests" / "fixtures" / "thesis_markings_2026-10-08.json").read_text(encoding="utf-8"))
 BASKETS = {b["name"]: b for b in config.THESIS_BASKETS}
+# 22.10.2026: „Крипто регулация (CLARITY Act)“ отпадна от config с крипто секцията; историческите маркирания по нея се проверяват по котвите ѝ, както бяха в config до 22.10 (РЕАЛНО — от git)
+REMOVED = {"Крипто регулация (CLARITY Act)": {"name": "Крипто регулация (CLARITY Act)", "tickers": ["CRCL", "COIN", "HOOD", "BLSH"], "names": ["Circle", "Coinbase", "Robinhood", "Bullish"], "terms": ["crypto*", "clarity act", "bitcoin", "stablecoin*", "digital asset*", "cftc", "market structure"]}}
 NUC = BASKETS["Ядрена енергия"]
 BKH = "Black Hills plans $1.8 billion investment to power Google's data center"
 CEG = "Google, Constellation near deal for nuclear power"
@@ -49,7 +51,7 @@ quoted = re.compile(r"""["“„'‘]([^"”“„'’]{12,200})["”“'’]"""
 res = []
 for m in FX["markings"]:
     heads = [h for h in quoted.findall(m["note"] or "") if " " in h]
-    ok = any(am(BASKETS[m["thesis"]], h) for h in heads)
+    ok = any(am(BASKETS.get(m["thesis"]) or REMOVED[m["thesis"]], h) for h in heads)
     res.append((m["date"], m["thesis"], m["status"], ok, heads))
 bad = [(d, t, h) for d, t, s, ok, h in res if not ok]
 assert len(res) == 14 and [(d, t) for d, t, _ in bad] == [("2026-10-07", "Ядрена енергия")], bad

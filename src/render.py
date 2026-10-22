@@ -405,6 +405,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_replay=config.QM_REPLAY_STATS,                                  # 12.10: числата от реплея с новата формула (банерът на секцията)
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
+        crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},
         cot_rhythm=brief.get("cot_rhythm") or {},                   # 21.10 (етап 4): ред „без нови данни“ в дните след първия бриф с отчета

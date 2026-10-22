@@ -53,7 +53,8 @@ STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "
          "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_card", "short_screener"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
-ALL = STEP1 | STEP2 | STEP3
+STEP4 = {"crypto"}                                                                  # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един
+ALL = STEP1 | STEP2 | STEP3 | STEP4
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]
 assert len(tries) == 1 and "email" in ast.unparse(tries[0]), len(tries)       # остава само банерът за неизпратения имейл (след рендера — той е самият банер)
@@ -82,15 +83,17 @@ enabled = {"bar_freshness": config.ENABLE_BAR_FRESHNESS, "distribution_cap": con
            "book_glb_wish": config.ENABLE_BACKTEST and config.TRACK_GLB_WISH, "book_glb_wish_high": config.ENABLE_BACKTEST and config.TRACK_GLB_WISH_HIGH, "watch": config.ENABLE_WATCH_MONITOR, "splits_report": config.ENABLE_SPLITS_CALENDAR}
 # стъпка 3: без мрежа източниците наистина падат — модулният статус го казва (failed_if), банерът е собственият (sector_rotation, screener, glb, distribution_days)
 NATURAL = {"sector_rotation", "screener", "glb", "distribution_days"}
-want_failed = {k for k in FAULTS if enabled.get(k, True)} | {k for k in NATURAL if enabled.get(k, True) and (k != "glb" or config.ENABLE_GLB_SCREENER)}
+NATURAL_WRAPPED = {"crypto"} if config.ENABLE_CRYPTO_SECTION else set()             # без мрежа фийдът е празен → провал с банера на обвивката (не инжектиран)
+want_failed = {k for k in FAULTS if enabled.get(k, True)} | {k for k in NATURAL if enabled.get(k, True) and (k != "glb" or config.ENABLE_GLB_SCREENER)} | NATURAL_WRAPPED
 assert {k for k, r in rs.items() if r["status"] == "failed"} == want_failed, {k: r["status"] for k, r in rs.items()}
 sources = {w["source"] for w in brief["data_warnings"]}
 assert {OWN_SOURCE.get(k, k) for k in want_failed} <= sources, {OWN_SOURCE.get(k, k) for k in want_failed} - sources
 assert not any(w["source"] == "health" for w in brief["data_warnings"])                  # без втори банер за монитора
 for k in NATURAL & want_failed:                                                           # собственият банер на модула — без втори от обвивката
     assert not any(w["source"] == k and w["message"].startswith(("Секторната ротация:", "Скрийнърът:", "GLB скрийнърът:", "Distribution days (SPY / QQQ):")) for w in brief["data_warnings"]), k
-for k in want_failed - NATURAL:
+for k in want_failed - NATURAL - NATURAL_WRAPPED:
     assert "инжектиран провал" in rs[k]["reason"]
+assert all(any(w["source"] == k and ": провал днес (" in w["message"] for w in brief["data_warnings"]) for k in NATURAL_WRAPPED)
 gen = [w for w in brief["data_warnings"] if w["source"] in want_failed]
 assert all(w["level"] == "error" and ": провал днес (RuntimeError: инжектиран провал" in w["message"] for w in gen if w["source"] in FAULTS and w["source"] not in OWN_SOURCE)
 assert any(w["source"] == "health:health_monitor" and "мониторът не се изпълни (RuntimeError" in w["message"] for w in brief["data_warnings"])

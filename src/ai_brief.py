@@ -69,6 +69,7 @@ _SECTION_LABELS = {
     "significant_news": "Значими новини",
     "_probe": "Проверка на модела",
     "ep_catalyst_call": "EP катализатор",                    # 09.10: qm_ep.ep_catalyst_call (преди — lambda → "<lambda>")
+    "crypto_news_call": "Крипто новини",                     # 22.10.2026: src/crypto_news.py
 }
 
 
