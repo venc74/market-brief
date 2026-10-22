@@ -932,7 +932,8 @@
         {% if st.rs_rating is not none and st.rs_rating is defined %}<div class="kv"><span>RS rating (перцентил)</span><b>{{ st.rs_rating }}</b></div>{% endif %}
         {% if st.pct_above_52w_low is defined %}<div class="kv"><span>52-седмичен диапазон</span><b>+{{ st.pct_above_52w_low }}% над дъното · −{{ st.pct_below_52w_high }}% под върха</b></div>{% endif %}
         <div class="kv"><span>50DMA / 200DMA</span><b>${{ st.ma50 }} / ${{ st.ma200 }}</b></div>
-        <div class="kv"><span>Обем (vs 50d avg)</span><b>{{ st.volume_ratio }}x{{ " ✓ пробивен" if st.breakout_volume else "" }}</b></div>
+        {# 22.10.2026 (етап 4): „пробивен“ само над pivot — флагът е само обем ≥ 1.5× (ROKU 22.10: 3.5x при −1.32% под pivot) #}
+        <div class="kv"><span>Обем (vs 50d avg)</span><b>{{ st.volume_ratio }}x{% if st.breakout_volume %}{{ " ✓ пробивен" if (st.pct_from_pivot or 0) >= 0 else " · над 1.5× средния, без пробив (под pivot)" }}{% endif %}</b></div>
         {% if st.entry_timing %}
         <div class="kv"><span>Entry Timing</span>
           <b style="color: {{ 'var(--green)' if st.entry_timing.verdict == 'good' else 'var(--red)' if st.entry_timing.verdict == 'wait' else 'var(--yellow)' }}">

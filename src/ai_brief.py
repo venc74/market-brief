@@ -1124,7 +1124,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         slim.append({k: c.get(k) for k in (
             "ticker", "company", "sector", "industry", "business_summary",
             "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
-            "rs_status", "rs_rating", "volume_ratio", "breakout_volume",
+            "rs_status", "rs_rating", "volume_ratio",
             "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
             "inst_ownership_pct", "analyst_target")})
         slim[-1]["earnings"] = c.get("earnings")
@@ -1135,6 +1135,10 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         # беше обяснено с дълбочината на базата (FTNT 18.1%, AMD 33.4%), докато кодът го определя по разстоянието до структурния
         # стоп (12.6%, 25.6%) — две различни числа.
         slim[-1]["setup_reason"] = (c.get("setup") or {}).get("trigger_text")
+        # 22.10.2026 (етап 4): флагът на скрийнъра breakout_volume значи само „обем ≥ BREAKOUT_VOLUME_MULT× средния“ — и при цена под pivot (ROKU 22.10: true при −1.32%).
+        # За модела — честното име; дали има пробив казват pct_from_pivot и setup / setup_reason (кодът), не обемът.
+        if "breakout_volume" in c:
+            slim[-1]["volume_spike"] = bool(c.get("breakout_volume"))
         slim[-1]["short"] = c.get("short_view", {}).get("interpretation")
 
     if skipped:
