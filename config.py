@@ -664,6 +664,13 @@ CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))
 CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 4))                             # най-много 4, от тях най-много 1 за ETF потоци
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
 CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC
+# ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──
+ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "0") == "1"             # включва се, когато се потвърди часът с пълния дневен обем (проверката 22–23.10)
+OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))                  # топ по оборот (close × обем, 20 сесии); измерено 21.10: 200 вериги × 2 падежа = 70 s, 0 грешки
+OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
+OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%
+OPTIONS_RECORD_VOL_X = float(os.getenv("OPTIONS_RECORD_VOL_X", 2.0))                # (а) обем ≥ 2× средния за 50 сесии; измерено 23.09–20.10: 4.6 кандидата на ден (1–9)
+OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 30))                      # сесии в data/options_daily.json
 # Тезите и днешните новини (ai_brief.thesis_news_pick) — 19.10.2026 (трети преглед, т. 10, решение "в" на Венци): без AI етикети ("потвърдена / опровергана / evolving /
 # resolved"); до тезата — ДОСЛОВНОТО заглавие на свързаната новина, без етикет (кой съди — читателят). Кандидатите за всяка теза ги избира КОДЪТ по котвите ѝ
 # (THESIS_BASKETS: тикъри, names, terms) от суровия пул; моделът само отсява шума ("AI" в заглавие за литературна награда — 15.10) и връща индексите. Котвите сами не стигат:

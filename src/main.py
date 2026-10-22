@@ -26,6 +26,7 @@ from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import data_rhythm
 from src import crypto_news
+from src import options_record
 from src import ai_brief
 from src import sector_claims
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
@@ -1010,6 +1011,10 @@ def run() -> dict:
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
     sector_card = steps.step("sector_card", lambda: sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation), fallback={},
                              label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
+    # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; изключено до проверката на часа с пълния обем
+    steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and qm_universe),      # универсът е веднъж на run (QM)
+               label="Записът на опционните данни", consequence="днешната сесия липсва в историята за необичайна активност (нищо в брифа не зависи от нея)",
+               failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
