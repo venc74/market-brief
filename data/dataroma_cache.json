@@ -1,5 +1,5 @@
 {
- "date": "2026-10-21",
+ "date": "2026-10-22",
  "bundle": {
   "moves": [
    {
@@ -558,7 +558,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-21",
+   "data_date": "2026-10-22",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -755,9 +755,9 @@
    ],
    "cusip_tickers": {
     "requested": 52,
-    "from_cache": 0,
-    "fetched": 51,
-    "not_found": 1,
+    "from_cache": 52,
+    "fetched": 0,
+    "not_found": 0,
     "skipped": 0,
     "error": null,
     "rows": 63,

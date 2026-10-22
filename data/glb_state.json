@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-21",
+ "updated": "2026-10-22",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -420,6 +420,26 @@
    "since": "2026-10-21",
    "since_close": 539.82,
    "since_bar": "2026-10-20"
+  },
+  "A": {
+   "ticker": "A",
+   "company": "Agilent Technologies, Inc.",
+   "glb_type": "momentum",
+   "prior_high": 175.47,
+   "prior_high_month": "2021-08",
+   "months_unpenetrated": 61,
+   "ath_label": "all_time_high",
+   "history_years": 26.9,
+   "breakout_volume_ratio": 0.91,
+   "tightness": {
+    "band_hold_pct": 65.1,
+    "tightness_range_pct": 23.76,
+    "meets_tightness": false
+   },
+   "line": 175.47,
+   "since": "2026-10-22",
+   "since_close": 177.75,
+   "since_bar": "2026-10-21"
   }
  },
  "seed": {

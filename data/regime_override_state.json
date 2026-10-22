@@ -1,16 +1,16 @@
 {
  "move_spike": {
-  "streak_below": 13,
-  "last_date": "2026-10-20"
+  "streak_below": 14,
+  "last_date": "2026-10-21"
  },
  "credit_spike": {
   "streak_below": 0,
-  "last_date": "2026-10-20"
+  "last_date": "2026-10-21"
  },
  "distribution_block": {
   "blocked": false,
   "streak_nonred": 0,
-  "last_date": "2026-10-20",
+  "last_date": "2026-10-21",
   "seed": {
    "version": 1,
    "sessions": 15,

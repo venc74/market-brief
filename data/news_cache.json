@@ -1,53 +1,53 @@
 {
- "date": "2026-10-21",
+ "date": "2026-10-22",
  "news": [
   {
-   "headline": "SpaceX and Tesla boards explore potential merger",
-   "source": "Financial Times",
-   "why": "Потенциалното сливане би засегнало директно акциите на Tesla (TSLA) и оценката на SpaceX, с вторичен ефект върху целия технологичен и космически сектор.",
-   "headline_bg": "Бордовете на SpaceX и Tesla проучват възможно сливане"
-  },
-  {
-   "headline": "FAA clears the way for airlines to put Boeing’s long-delayed 737 Max 10 into service - AP News",
-   "source": "AP Business",
-   "why": "FAA сертификацията отваря нов приходен поток за Boeing (BA) и авиокомпаниите-клиенти, позитивно за акциите на Boeing и авиационния сектор.",
-   "headline_bg": "FAA открива пътя за авиокомпаниите да въведат дългоочакван Boeing 737 Max 10 в експлоатация"
-  },
-  {
-   "headline": "Oil rises on Middle East supply fears, US inventory drawdowns - Reuters",
-   "source": "Reuters Business",
-   "why": "Ескалацията на рисковете за доставките от Близкия изток натиска петрола нагоре, което засяга енергийния сектор, инфлационните очаквания и транспортни компании.",
-   "headline_bg": "Петролът поскъпва заради страхове за доставките от Близкия изток и спад на запасите в САЩ"
-  },
-  {
-   "headline": "United Airlines slashes 2026 profit outlook on fuel prices, but travelers keep booking despite higher fares",
+   "headline": "Oil prices jump on Middle East worries as U.S., Israel reportedly weigh fresh Iran strikes",
    "source": "CNBC",
-   "why": "Понижената прогноза на United Airlines заради горивните разходи оказва натиск върху авиационния сектор и сигнализира за по-широк инфлационен проблем с jet fuel.",
-   "headline_bg": "United Airlines срязва прогнозата за печалба за 2026 г. заради цените на горивото, въпреки че пътниците продължават да резервират"
+   "why": "Рискът от директен удар срещу Иран натиска петрола нагоре, засяга авиационни, транспортни и енергийни акции, и подсилва инфлационните очаквания, което усложнява позицията на Fed.",
+   "headline_bg": "Цените на петрола скачат заради опасения за Близкия изток докато САЩ и Израел обмислят нови удари срещу Иран"
   },
   {
-   "headline": "Musk says SpaceX-Tesla merger is 'a good idea' as companies form deal committees - Reuters",
+   "headline": "Oil rises as US orders diplomats to leave Saudi Arabia amid escalating tensions - Reuters",
    "source": "Reuters Business",
-   "why": "Потвърждението от Мъск за формиране на комитети по сделката е директен катализатор за волатилност в TSLA и свързаните технологични активи.",
-   "headline_bg": "Мъск казва, че сливането SpaceX-Tesla е 'добра идея', докато компаниите формират комитети по сделката"
+   "why": "Евакуацията на дипломати сигнализира сериозен геополитически риск в региона; петролът и енергийните акции са под директно покачващо налягане, а по-скъпото гориво засяга авиокомпании и транспортен сектор.",
+   "headline_bg": "Петролът расте след като САЩ нареждат на дипломати да напуснат Саудитска Арабия сред ескалиращо напрежение"
   },
   {
-   "headline": "Trump sued over 50% tariffs on Canada in latest trade challenge",
-   "source": "CNBC",
-   "why": "Правното оспорване на 50% тарифите върху канадски стоки създава несигурност за търговската политика и засяга сектори с верига на доставки от Канада.",
-   "headline_bg": "Тръмп е съден заради 50% тарифи върху Канада в поредното търговско предизвикателство"
-  },
-  {
-   "headline": "Anthropic logged net loss of over $80 billion in first half of 2026 - Reuters",
+   "headline": "Gold drops over 1% as oil rally reinforces higher-for-longer rate outlook - Reuters",
    "source": "Reuters Business",
-   "why": "Загуба от над 80 млрд. долара за полугодие при Anthropic поставя под въпрос устойчивостта на AI разходите и засяга оценките на AI компании и инвеститори в сектора.",
-   "headline_bg": "Anthropic отчита нетна загуба от над 80 млрд. долара за първото полугодие на 2026 г."
+   "why": "Рали в петрола преосмисля траектория на Fed — злато и облигации под натиск надолу, докато реалните лихви остават повишени.",
+   "headline_bg": "Златото пада с над 1% тъй като поскъпването на петрола засилва очакванията за по-дълго високи лихви"
   },
   {
-   "headline": "Novo's next-generation obesity drug shows 25% weight loss in women in late-stage analysis",
+   "headline": "Dip in the dollar takes a breather with Fed in focus - Reuters",
+   "source": "Reuters Business",
+   "why": "Стабилизирането на долара влияе директно върху суровини, EM акции и мултинационални приходи — важен индикатор пред следващото решение на Fed.",
+   "headline_bg": "Спадът на долара прави пауза с фокус върху Fed"
+  },
+  {
+   "headline": "China's stock market sinks into bear territory as CSI 300 extends 10-week rout",
    "source": "CNBC",
-   "why": "Данните за 25% загуба на тегло при CagriSema укрепват позицията на Novo Nordisk в GLP-1 пространството и оказват натиск върху конкурентите в сектора на затлъстяването.",
-   "headline_bg": "Новото поколение лекарство на Novo срещу затлъстяване показва 25% загуба на тегло при жени в анализ от късна фаза"
+   "why": "CSI 300 с 20% спад от юнския връх генерира негативен сентимент към EM активи, суровини и компании с голяма китайска експозиция.",
+   "headline_bg": "Китайският фондов пазар влиза в мечи територия тъй като CSI 300 удължава 10-седмичния си спад"
+  },
+  {
+   "headline": "Meta reports third-quarter revenue beat and issues strong guidance",
+   "source": "CNBC",
+   "why": "Силните резултати и прогнози на Meta движат нагоре технологичния сектор и рекламния пазар, задавайки тон за останалата част от сезона с отчети.",
+   "headline_bg": "Meta отчита приходи над очакванията за третото тримесечие и дава силни прогнози"
+  },
+  {
+   "headline": "Tesla beats on earnings and sales even as auto revenue declines",
+   "source": "CNBC",
+   "why": "По-добри от очакваните резултати при Tesla поддържат сентимента към EV и широкия технологичен сектор след закриването на пазарите.",
+   "headline_bg": "Tesla надминава очакванията за печалба и продажби въпреки спад в автомобилните приходи"
+  },
+  {
+   "headline": "Southwest Airlines cuts 2026 profit forecast on higher fuel",
+   "source": "CNBC",
+   "why": "Третата голяма американска авиокомпания за месеца, която свали прогнозата си заради горивни разходи — секторен сигнал за натиск върху маржовете на авиационния бранш.",
+   "headline_bg": "Southwest Airlines намалява прогнозата за печалба за 2026 г. заради по-скъпо гориво"
   }
  ]
 }
