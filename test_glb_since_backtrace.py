@@ -14,6 +14,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import pandas as pd
 import config
+config.GLB_CARDS_RULE = "close_hysteresis"          # 22.10.2026: тестът е за старото правило на картите (close линия + хистерезис), което остава зад GLB_CARDS_RULE
 
 _tmp = tempfile.TemporaryDirectory(prefix="mb_glbbt_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"

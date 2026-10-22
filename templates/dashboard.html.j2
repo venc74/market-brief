@@ -1439,8 +1439,16 @@
 <section>
   <h2>GLB Watchlist · Green Line Breakout</h2>
   <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
+    {# 22.10.2026 (етап 4): картите по правилото на Уиш + свежест (GLB_CARDS_RULE = "wish_high"); старите брифове (без "rule") — старият текст #}
+    {% set g0 = glb_candidates[0] %}
+    {% if g0.get("rule") == "wish_high" %}
+    <b>Правилото е на Eric Wish:</b> „зелена линия“ = най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; вход при затваряне над нея, край при първото затваряне под нея.
+    <b>Наши са:</b> свежестта — картата се вижда до {{ g0.max_sessions }}-ата сесия от входа и докато е до +{{ "%.0f"|format(g0.max_above_pct) }}% над линията (книгата „{{ glb_wish_book_name }}“ следи всеки пробив до изхода),
+    разделянето Classic / Momentum и филтърът за близост до линията (band_hold) — само етикет. Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+    {% else %}
     <b>Идеята е на Eric Wish:</b> „зелена линия“ = най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; сигнал — затваряне над нея. <b>Наши са:</b> линията по най-високия месечен close
     (по-ниска от неговата, затова влизаме по-рано и по-често), разделянето Classic / Momentum, филтърът за близост до линията (band_hold) и хистерезисът (вход ≥ +1% над линията, остава до −3%). Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+    {% endif %}
     <b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията ·
     <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
   </div>
@@ -1456,9 +1464,10 @@
       </div>
       {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
-      <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
+      {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
+      {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
+      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
@@ -1496,9 +1505,10 @@
       </div>
       {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
       <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
-      <div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>
+      {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
+      {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
+      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%

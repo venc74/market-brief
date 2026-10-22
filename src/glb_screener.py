@@ -498,6 +498,49 @@ def episode_start(sym: str, hist, ev: dict, entry_margin_pct: float | None = Non
         return None
 
 
+def wish_card(sym: str, hist, today: str | None = None) -> dict | None:
+    """
+    22.10.2026 (етап 4): GLB картата по правилото на Уиш (config.GLB_CARDS_RULE = "wish_high"). Последният СВЕЖ пробив по линията на месечния High (wish_table с high) — ако след
+    него няма close под линията, епизодът е отворен (картата); нов свеж пробив на по-висока линия заменя стария (затова се гледа само последният). Видимост: сесия ≤ GLB_CARD_MAX_SESSIONS
+    от входа (денят на входа е 1-ва) и close ≤ линията x (1 + GLB_CARD_MAX_ABOVE_PCT/100). Тип (Classic / Momentum), обем на пробива и диапазонът — към деня на входа, както при
+    _evaluate_ticker. Връща картата с "visible" (и невидимите — за броя в статуса) или None (няма отворен епизод / кратка история). Бар с дата >= today се отрязва.
+    """
+    try:
+        h = hist.dropna(subset=["Close", "High", "Low"])
+        if today:
+            h = h[h.index < pd.Timestamp(today)]
+        close = h["Close"]
+        if len(close) < 64:
+            return None
+        t = wish_table(close, h["High"])
+        fresh = t.index[t["fresh"].to_numpy(bool)]
+        if not len(fresh):
+            return None
+        s = fresh[-1]
+        L = float(t.loc[s, "line"])
+        after = close[close.index > s]
+        if bool((after < L).any()):
+            return None                                                      # последният пробив вече е затворен (close под линията)
+        age = int(len(close[close.index >= s]))
+        last = float(close.iloc[-1])
+        pct = (last / L - 1) * 100
+        upto = h.loc[:s]
+        ov = _tightness_overlay(upto["Close"], upto["High"], upto["Low"], L)
+        glb_type = "insufficient_history" if ov is None else ("classic" if ov["meets_tightness"] else "momentum")
+        years = (h.index[-1] - h.index[0]).days / 365.25
+        low = h["Low"].iloc[-252:].min()
+        return {"ticker": sym, "rule": "wish_high", "glb_type": glb_type, "line": round(L, 2), "prior_high": round(L, 2), "prior_high_month": str(t.loc[s, "prior_high_month"]),
+                "months_unpenetrated": int(t.loc[s, "months_unpen"]), "since": s.date().isoformat(), "since_bar": s.date().isoformat(), "since_close": round(float(close.loc[s]), 4),
+                "sessions": age, "max_sessions": config.GLB_CARD_MAX_SESSIONS, "max_above_pct": config.GLB_CARD_MAX_ABOVE_PCT,
+                "price": round(last, 2), "pct_vs_line": round(pct, 1), "tightness": ov, "breakout_volume_ratio": breakout_volume_ratio(upto),
+                "x_from_52w_low": x_from_low52(last, None if low != low else float(low)), "history_years": round(years, 1),
+                "ath_label": "all_time_high" if years >= config.GLB_MIN_ATH_HISTORY_YEARS else "new_high_since_listing", "risk_note": RISK_NOTES[glb_type],
+                "visible": age <= config.GLB_CARD_MAX_SESSIONS and pct <= config.GLB_CARD_MAX_ABOVE_PCT}
+    except Exception as e:
+        print(f"[glb_screener] {sym}: wish_card: {type(e).__name__}: {e}")
+        return None
+
+
 def replay_state(replays: dict[str, dict]) -> tuple[dict, list[dict], dict]:
     """
     Ден по ден apply_hysteresis (същата чиста функция като в дневния run) върху replays {тикър: {дата: {close, entry}}}, от най-старата към най-новата сесия. Връща (събития, редове за последния ден,
@@ -539,7 +582,9 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     if universe is None:
         universe = build_universe()
 
-    hyst = config.GLB_HYSTERESIS
+    wish_cards = config.GLB_CARDS_RULE == "wish_high"                         # 22.10.2026: картите по правилото на Уиш + свежест (без glb_state.json)
+    open_episodes = 0
+    hyst = config.GLB_HYSTERESIS and not wish_cards
     seed = bool(hyst and config.GLB_SEED_SESSIONS and load_seed_meta(state_path).get("version", 0) < config.GLB_SEED_VERSION)   # еднократно: състоянието се гради от историята
     events = load_state(state_path) if (hyst and not seed) else {}
     replays: dict = {}
@@ -577,6 +622,14 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
                     wh = wish_signal(df, today, kind="high")                 # 21.10.2026: книгата "GLB по Уиш" — неговата линия (месечен High), същите цени
                     if wh:
                         wish_high_signals.append({"ticker": sym, **wh})
+                if wish_cards:
+                    card = wish_card(sym, df, today)
+                    if card:
+                        open_episodes += 1
+                        if card.pop("visible"):
+                            card["company"] = _verified_company_name(sym)["name"]
+                            results.append(card)
+                    continue
                 if hyst and seed:
                     replays[sym] = replay_observations(sym, df, config.GLB_SEED_SESSIONS, config.GLB_ENTRY_MARGIN_PCT)
                     if any(o.get("entry") for o in replays[sym].values()):
@@ -633,7 +686,8 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     # С3 (втори преглед, 10.10): празен списък от провал не бива да изглежда като "няма кандидати" (банер в data_warnings, ред в секцията)
     LAST_STATUS = {"ok": with_history > 0, "error": None if with_history else "Yahoo не върна ценови данни",
                    "universe": len(universe), "batches": batches, "batches_failed": failed, "with_history": with_history,
-                   "candidates": len(results), "wish_signals": len(wish_signals), "wish_high_signals": len(wish_high_signals)}
+                   "candidates": len(results), "wish_signals": len(wish_signals), "wish_high_signals": len(wish_high_signals),
+                   "rule": config.GLB_CARDS_RULE, **({"open_episodes": open_episodes} if wish_cards else {})}
     if config.TRACK_GLB_WISH:
         print(f"[glb_screener] {config.GLB_CLOSE_BOOK_NAME}: {len(wish_signals)} свежи пробива на последния цял бар " + (f"({', '.join(w['ticker'] for w in wish_signals[:12])}{'…' if len(wish_signals) > 12 else ''})" if wish_signals else ""))
     if config.TRACK_GLB_WISH_HIGH:

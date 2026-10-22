@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import config
+config.GLB_CARDS_RULE = "close_hysteresis"          # 22.10.2026: тестът е за старото правило на картите (close линия + хистерезис), което остава зад GLB_CARDS_RULE
 from src import glb_screener as g
 
 FX = json.loads((ROOT / "tests" / "fixtures" / "yahoo_splits_2026-10-08.json").read_text(encoding="utf-8"))["tickers"]
