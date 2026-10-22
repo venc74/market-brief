@@ -98,7 +98,7 @@ def regime(d, min_visible, informational):
 # 20.08.2026: 7 зелени, единственият червен е Net Liquidity ($5795.7 млрд) → досега Defensive
 old, old_reason, _ = regime("2026-08-20", 7, False)
 new, new_reason, new_counts = regime("2026-08-20", 6, True)
-assert old == "Defensive" and "7 зелени / 0 жълти / 1 червени от 8 видими" in old_reason
+assert old == "Defensive" and "7 зелени / 0 жълти / 1 червен от 8 видими" in old_reason          # 22.10: „1 червен“ (единствено число)
 assert new == "Offensive" and new_counts == "7 зелени / 0 жълти / 0 червени от 7 видими · не се броят: Fed Net Liquidity (информативен)", new_counts
 print("  ✓ 20.08.2026 (РЕАЛНО): 7 зелени и само Net Liquidity червен → преди Defensive, сега Offensive:", new_counts)
 # другите реални дни не се променят

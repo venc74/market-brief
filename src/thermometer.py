@@ -1019,7 +1019,8 @@ def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tup
     greens = sum(1 for i in visible if i["status"] == "green")
     yellows = sum(1 for i in visible if i["status"] == "yellow")
     reds = sum(1 for i in visible if i["status"] == "red")
-    counts = f"{greens} зелени / {yellows} жълти / {reds} червени от {visible_count} видими"
+    _n = lambda k, one, many: f"{k} {one if k == 1 else many}"                  # 22.10.2026: „1 жълт“, не „1 жълти“ (брифът от 22.10)
+    counts = f"{_n(greens, 'зелен', 'зелени')} / {_n(yellows, 'жълт', 'жълти')} / {_n(reds, 'червен', 'червени')} от {_n(visible_count, 'видим', 'видими')}"
     if hidden_count:
         counts += f" ({hidden_count} скрити — невалидни/застояли данни)"
     if len(counted) != len(indicators):
