@@ -1601,6 +1601,8 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
     return {
         "enabled": True, "category": category, "track_from": (config.GLB_WISH_HIGH_TRACK_FROM if high else config.GLB_WISH_TRACK_FROM) or None, "archived_from": stop or None,
         "max_hold_sessions": config.GLB_WISH_MAX_HOLD_SESSIONS or None, "records": len(records),
+        "tickers": len({r.get("ticker") for r in records if r.get("ticker")}),           # 22.10.2026: „N записа / M тикъра“ — повторните входове (MSFT ×2) се виждат до прага за статистика
+        "result_tickers": len({r.get("ticker") for r in with_result if r.get("ticker")}),
         "pending": by_status.get("pending", 0), "open": by_status.get("open", 0), "line_exit": by_status.get("line_exit", 0), "expired": by_status.get("expired", 0), "invalid": by_status.get("invalid_signal", 0),
         "with_result": len(with_result), "closed_result": len(closed_res), "open_result": len(open_res), "min_entries": min_n, "stats_visible": visible,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),

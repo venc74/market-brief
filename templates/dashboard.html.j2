@@ -1558,7 +1558,7 @@
     <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно</b> — те са върху едни и същи тикъри, дати и цени.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга {{ book_key }}: записани {{ gw.records }} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа (затворени + отворени){% endif %}</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга {{ book_key }}: {{ gw.records }} записа{% if gw.tickers is defined %} / {{ gw.tickers }} тикъра{% endif %} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}{% if gw.result_tickers is defined %} в {{ gw.result_tickers }} тикъра{% endif %}){% endif %}</summary>
   <div class="prose" style="margin-top:8px">
     {% if not gw.records %}
     <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.

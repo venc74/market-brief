@@ -98,6 +98,7 @@ for k, r in (("MA_2026-10-14_gwh", r_ma), ("HLT_2026-10-21_gwh", r_hl)):
 backtest._save_tracker(tr)
 sh, sc = backtest.get_glb_wish_summary(backtest.CATEGORY_GLB_WISH_HIGH), backtest.get_glb_wish_summary()
 assert (sh["records"], sh["open"], sh["track_from"], sh["archived_from"], sh["category"]) == (2, 2, "2026-10-14", None, "glb_wish_high")
+assert (sh["tickers"], sh["result_tickers"]) == (2, 2)                                                  # 22.10: „N записа / M тикъра“
 assert (sc["records"], sc["track_from"], sc["archived_from"], sc["category"]) == (1, "2026-10-12", "2026-10-14", "glb_wish")
 assert [p["ticker"] for p in sh["live"]] == ["HLT", "MA"]
 print("  ✓ MA: отворена от $604.80, +3.1% над $601.77; HLT: отворена от $359.29; обобщението на „GLB по Уиш“ — 2 записа от 14.10; close книгата — архив от 14.10")
@@ -111,7 +112,8 @@ with q():
 i_h, i_c = page.index(f"{config.GLB_WISH_BOOK_NAME} · книга (измерване, не препоръка)"), page.index(f"{config.GLB_CLOSE_BOOK_NAME} · архив · книга (измерване, не препоръка)")
 assert i_h < i_c
 sec_h, sec_c = page[i_h:page.index("</section>", i_h)], page[i_c:page.index("</section>", i_c)]
-assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 162 сделки" in sec_h and "Измерване — книга glb_wish_high:" in sec_h
+assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 162 сделки" in sec_h and "Измерване — книга glb_wish_high: 2 записа / 2 тикъра" in sec_h
+assert "статистика след 20 записа с резултат (сега 2 в 2 тикъра)" in sec_h
 assert "Архив:</b> нови записи няма от 14.10.2026" in sec_c and "линията е наша" in sec_c and "26 116 сделки" in sec_c and "Архив" not in sec_h
 for sec in (sec_h, sec_c):
     assert "Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно" in sec
