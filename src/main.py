@@ -875,6 +875,7 @@ def run() -> dict:
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
+        backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
         backtest_summary["buystop"] = backtest.get_buystop_summary()

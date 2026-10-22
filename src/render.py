@@ -242,6 +242,15 @@ def form4_line(cards: dict | None, positions: dict | None) -> str | None:
     return head
 
 
+def _qm_open_html(c: dict) -> str:
+    """22.10.2026: имейлът — QM карта с жив запис в книгата (както на страницата)."""
+    b = (c or {}).get("book_open")
+    if not b or not b.get("since"):
+        return ""
+    price = f" @ ${b['price']:.2f}" if isinstance(b.get("price"), (int, float)) else ""
+    return f'<br><span style="color:#1d4ed8;font-size:12px">📈 вече отворена в книгата от {b["since"][8:10]}.{b["since"][5:7]}{price} — новото ниво не е нов вход</span>'
+
+
 def cot_quote(t: dict) -> str:
     """
     19.10.2026 (етап 2, доп. т. 7): цитатът на модела за механизма в COT cross тезата — с името на компанията отпред, ако в първите 4 думи няма дума от името (≥ 4 букви) или тикъра
@@ -470,7 +479,7 @@ def _qm_email_block(brief: dict) -> str:
                          f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
-                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_ew_html(c)}{_corp_html(c)}{_spinoff_html(c)}{_merger_html(c)}{_cot_html(c)}</td></tr>')
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_qm_open_html(c)}{_ew_html(c)}{_corp_html(c)}{_spinoff_html(c)}{_merger_html(c)}{_cot_html(c)}</td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'

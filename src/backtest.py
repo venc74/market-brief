@@ -1307,6 +1307,25 @@ def live_tickers() -> list[str]:
         return []
 
 
+def qm_open_marks(cards: list[dict], today: str, tracker: dict | None = None) -> int:
+    """
+    22.10.2026 (етап 4): QM карта на тикър с ЖИВ запис в книгата qm_breakout отпреди днес → card["book_open"] = {since, price, status} — както OPEN✓ при CANSLIM. Новото ниво не е нов
+    вход (_is_continuation не прави втори запис). Реално на 22.10: RVTY с ново ниво $159.48, а в книгата — вход $158.00 на 21.10. Връща броя маркирани; всяка грешка → 0.
+    """
+    try:
+        live = latest_by_ticker([r for r in book_records(CATEGORY_QM, statuses=LIVE, tracker=tracker) if r.get("ticker") and (r.get("entry_date") or "") < today])
+        n = 0
+        for c in cards or []:
+            r = live.get(c.get("ticker"))
+            if r:
+                c["book_open"] = {"since": r.get("fill_date") or r.get("entry_date"), "price": r.get("fill_price") or r.get("buy_stop"), "status": r.get("status")}
+                n += 1
+        return n
+    except Exception as e:
+        print(f"[backtest] qm_open_marks: {type(e).__name__}: {e}")
+        return 0
+
+
 def live_buystop_by_ticker() -> dict[str, dict]:
     """
     Картата в Watchlist чете СЪСТОЯНИЕТО на жив запис от buy-stop книгата: pending (чака пробив), open (задействан), trailing (след частична продажба на 2R). Тикър с жив запис не е нов

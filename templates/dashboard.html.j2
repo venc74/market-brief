@@ -1277,6 +1277,8 @@
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
       <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company|cname(34) }}</div>{% endif %}
+      {# 22.10.2026 (етап 4): жив запис в книгата qm_breakout — новото ниво не е нов вход (RVTY 22.10) #}
+      {% if c.get("book_open") %}<div class="si-flag" title="Книгата не прави втори запис, докато този е отворен.">📈 OPEN — вече отворена в книгата qm_breakout от {{ c.book_open.since[8:10] }}.{{ c.book_open.since[5:7] }}{% if c.book_open.price %} @ ${{ "%.2f"|format(c.book_open.price) }}{% endif %} — новото ниво не е нов вход</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
