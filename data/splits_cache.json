@@ -1,5 +1,5 @@
 {
- "date": "2026-10-22",
+ "date": "2026-10-23",
  "rows": [],
  "horizon": [
   {
@@ -91,6 +91,14 @@
    "date_human": "Oct 22, 2026"
   },
   {
+   "ticker": "HCAI",
+   "company": "Huachen AI Parking Management Technology Holding Co., Ltd.",
+   "date": "2026-10-23",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Oct 23, 2026"
+  },
+  {
    "ticker": "LU",
    "company": "Lufax Holding Ltd",
    "date": "2026-10-23",
@@ -99,12 +107,28 @@
    "date_human": "Oct 23, 2026"
   },
   {
+   "ticker": "NIVF",
+   "company": "NewGenIvf Group Limited",
+   "date": "2026-10-23",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Oct 23, 2026"
+  },
+  {
+   "ticker": "PASW",
+   "company": "Ping An Biomedical Co., Ltd.",
+   "date": "2026-10-23",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Oct 23, 2026"
+  },
+  {
    "ticker": "BUUU",
    "company": "BUUU Group Limited",
-   "date": "2026-10-27",
+   "date": "2026-10-26",
    "ratio": "10:1",
    "split_type": "normal",
-   "date_human": "Oct 27, 2026"
+   "date_human": "Oct 26, 2026"
   },
   {
    "ticker": "ENHA",
@@ -174,10 +198,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 21,
+  "source_rows": 24,
   "horizon_from": "2026-10-19",
   "horizon_to": "2026-11-05",
-  "in_week": 12,
+  "in_week": 15,
   "dropped_price": [
    "CAPS",
    "FRGT",
@@ -189,7 +213,10 @@
    "POM",
    "AXNX",
    "DKI",
-   "LU"
+   "HCAI",
+   "LU",
+   "NIVF",
+   "PASW"
   ],
   "dropped_cap": [
    "AMTD"

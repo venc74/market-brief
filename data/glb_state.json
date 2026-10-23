@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22",
+ "updated": "2026-10-23",
  "events": {
   "MRK": {
    "ticker": "MRK",
@@ -20,26 +20,6 @@
    "since": "2026-08-14",
    "since_close": 135.84,
    "since_bar": "2026-08-14"
-  },
-  "FCX": {
-   "ticker": "FCX",
-   "company": "Freeport-McMoRan, Inc.",
-   "glb_type": "classic",
-   "prior_high": 68.08,
-   "prior_high_month": "2026-02",
-   "months_unpenetrated": 5,
-   "ath_label": "all_time_high",
-   "history_years": 31.1,
-   "breakout_volume_ratio": 1.17,
-   "tightness": {
-    "band_hold_pct": 98.4,
-    "tightness_range_pct": 23.91,
-    "meets_tightness": true
-   },
-   "line": 68.08,
-   "since": "2026-08-19",
-   "since_close": 69.09,
-   "since_bar": "2026-08-19"
   },
   "MEDP": {
    "ticker": "MEDP",
@@ -440,6 +420,66 @@
    "since": "2026-10-22",
    "since_close": 177.75,
    "since_bar": "2026-10-21"
+  },
+  "ED": {
+   "ticker": "ED",
+   "company": "Consolidated Edison, Inc.",
+   "glb_type": "classic",
+   "prior_high": 113.18,
+   "prior_high_month": "2026-03",
+   "months_unpenetrated": 6,
+   "ath_label": "all_time_high",
+   "history_years": 64.8,
+   "breakout_volume_ratio": 1.07,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 11.12,
+    "meets_tightness": true
+   },
+   "line": 113.18,
+   "since": "2026-10-23",
+   "since_close": 116.26,
+   "since_bar": "2026-10-22"
+  },
+  "NWSA": {
+   "ticker": "NWSA",
+   "company": "News Corporation",
+   "glb_type": "classic",
+   "prior_high": 30.71,
+   "prior_high_month": "2025-09",
+   "months_unpenetrated": 12,
+   "ath_label": "all_time_high",
+   "history_years": 13.3,
+   "breakout_volume_ratio": 0.84,
+   "tightness": {
+    "band_hold_pct": 100.0,
+    "tightness_range_pct": 17.29,
+    "meets_tightness": true
+   },
+   "line": 30.71,
+   "since": "2026-10-23",
+   "since_close": 31.08,
+   "since_bar": "2026-10-22"
+  },
+  "QLYS": {
+   "ticker": "QLYS",
+   "company": "Qualys, Inc.",
+   "glb_type": "momentum",
+   "prior_high": 196.28,
+   "prior_high_month": "2023-12",
+   "months_unpenetrated": 33,
+   "ath_label": "all_time_high",
+   "history_years": 14.1,
+   "breakout_volume_ratio": 1.81,
+   "tightness": {
+    "band_hold_pct": 84.1,
+    "tightness_range_pct": 38.34,
+    "meets_tightness": false
+   },
+   "line": 196.28,
+   "since": "2026-10-23",
+   "since_close": 208.2,
+   "since_bar": "2026-10-22"
   }
  },
  "seed": {

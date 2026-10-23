@@ -1,53 +1,52 @@
 {
- "date": "2026-10-22",
+ "date": "2026-10-23",
  "news": [
   {
-   "headline": "Oil prices jump on Middle East worries as U.S., Israel reportedly weigh fresh Iran strikes",
-   "source": "CNBC",
-   "why": "Рискът от директен удар срещу Иран натиска петрола нагоре, засяга авиационни, транспортни и енергийни акции, и подсилва инфлационните очаквания, което усложнява позицията на Fed.",
-   "headline_bg": "Цените на петрола скачат заради опасения за Близкия изток докато САЩ и Израел обмислят нови удари срещу Иран"
+   "headline": "Global tech sell-off sparks flight to safety",
+   "source": "Financial Times",
+   "why": "Бягство към сигурност натиска японски йени и облигации нагоре, докато акциите в Азия следват Wall Street надолу — негативно за рискови активи, позитивно за bonds и yen.",
+   "headline_bg": "Глобалната разпродажба в техно сектора предизвиква бягство към сигурност"
   },
   {
-   "headline": "Oil rises as US orders diplomats to leave Saudi Arabia amid escalating tensions - Reuters",
+   "headline": "Asian shares wobble as tech rout boosts bonds, dents rate hike bets - Reuters",
    "source": "Reuters Business",
-   "why": "Евакуацията на дипломати сигнализира сериозен геополитически риск в региона; петролът и енергийните акции са под директно покачващо налягане, а по-скъпото гориво засяга авиокомпании и транспортен сектор.",
-   "headline_bg": "Петролът расте след като САЩ нареждат на дипломати да напуснат Саудитска Арабия сред ескалиращо напрежение"
+   "why": "Технологичната разпродажба намалява залозите за повишения на лихвите, което натиска bond yields надолу и подкрепя облигациите, но тежи на акциите в региона.",
+   "headline_bg": "Азиатските акции се колебаят, тъй като технологичният срив подкрепя облигациите и намалява очакванията за повишение на лихвите"
   },
   {
-   "headline": "Gold drops over 1% as oil rally reinforces higher-for-longer rate outlook - Reuters",
+   "headline": "10-year Treasury yield tumbles below 5% to lowest level in nearly a month",
+   "source": "CNBC",
+   "why": "Спадът под 5% на 10-годишния Treasury yield сигнализира засилено търсене на безопасни активи и облекчава финансовите условия, което влияе върху оценките на акциите и валутите.",
+   "headline_bg": "Доходността на 10-годишните Treasuries пада под 5% до най-ниското ниво от близо месец"
+  },
+  {
+   "headline": "Japan's core inflation exceeds BOJ target, cements near-term rate hike chance - Reuters",
    "source": "Reuters Business",
-   "why": "Рали в петрола преосмисля траектория на Fed — злато и облигации под натиск надолу, докато реалните лихви остават повишени.",
-   "headline_bg": "Златото пада с над 1% тъй като поскъпването на петрола засилва очакванията за по-дълго високи лихви"
+   "why": "По-високата от очакваното инфлация циментира вероятността от скорошно повишение на лихвите от BOJ, което е позитивно за йената и японските финансови акции, но негативно за японските облигации.",
+   "headline_bg": "Основната инфлация в Япония надвишава целта на BOJ, укрепвайки шансовете за скорошно повишение на лихвите"
   },
   {
-   "headline": "Dip in the dollar takes a breather with Fed in focus - Reuters",
+   "headline": "Trump invokes Cold War-era Defense Production Act for oil production, refining - Reuters",
    "source": "Reuters Business",
-   "why": "Стабилизирането на долара влияе директно върху суровини, EM акции и мултинационални приходи — важен индикатор пред следващото решение на Fed.",
-   "headline_bg": "Спадът на долара прави пауза с фокус върху Fed"
+   "why": "Използването на Defense Production Act за петролен добив и рафиниране сигнализира регулаторен натиск върху енергийния сектор и може да повлияе на петролните цени и акциите на енергийни компании.",
+   "headline_bg": "Тръмп задейства Закона за военно производство от епохата на Студената война за добив и рафиниране на петрол"
   },
   {
-   "headline": "China's stock market sinks into bear territory as CSI 300 extends 10-week rout",
-   "source": "CNBC",
-   "why": "CSI 300 с 20% спад от юнския връх генерира негативен сентимент към EM активи, суровини и компании с голяма китайска експозиция.",
-   "headline_bg": "Китайският фондов пазар влиза в мечи територия тъй като CSI 300 удължава 10-седмичния си спад"
+   "headline": "Moderna sheds about $24 billion as cancer vaccine data triggers 'sell-the-news' retreat - Reuters",
+   "source": "Reuters Business",
+   "why": "Разпродажбата тип 'sell-the-news' заличи около $24 млрд пазарна капитализация от Moderna, оказвайки натиск върху биотех сектора и акциите на Merck.",
+   "headline_bg": "Moderna губи около $24 млрд, тъй като данните за ваксината срещу рак предизвикват разпродажба"
   },
   {
-   "headline": "Meta reports third-quarter revenue beat and issues strong guidance",
-   "source": "CNBC",
-   "why": "Силните резултати и прогнози на Meta движат нагоре технологичния сектор и рекламния пазар, задавайки тон за останалата част от сезона с отчети.",
-   "headline_bg": "Meta отчита приходи над очакванията за третото тримесечие и дава силни прогнози"
+   "headline": "US jobless claims fell to 194,000 last week, lowest since July - AP News",
+   "source": "AP Business",
+   "why": ""
   },
   {
-   "headline": "Tesla beats on earnings and sales even as auto revenue declines",
+   "headline": "Meta stock sinks nearly 7% as AI spend pushes free cash flow negative",
    "source": "CNBC",
-   "why": "По-добри от очакваните резултати при Tesla поддържат сентимента към EV и широкия технологичен сектор след закриването на пазарите.",
-   "headline_bg": "Tesla надминава очакванията за печалба и продажби въпреки спад в автомобилните приходи"
-  },
-  {
-   "headline": "Southwest Airlines cuts 2026 profit forecast on higher fuel",
-   "source": "CNBC",
-   "why": "Третата голяма американска авиокомпания за месеца, която свали прогнозата си заради горивни разходи — секторен сигнал за натиск върху маржовете на авиационния бранш.",
-   "headline_bg": "Southwest Airlines намалява прогнозата за печалба за 2026 г. заради по-скъпо гориво"
+   "why": "Отрицателният свободен паричен поток заради AI разходите тласка Meta надолу с близо 7% и покачва суаповете за кредитен риск до рекордни нива, оказвайки системен натиск върху mega-cap tech.",
+   "headline_bg": "Акциите на Meta потъват с близо 7%, тъй като AI разходите превръщат свободния паричен поток в отрицателен"
   }
  ]
 }
