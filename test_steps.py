@@ -65,6 +65,7 @@ print()
 print("── 3. целият main.run без мрежа, с инжектирани провали (СИНТЕТИЧНО) ──")
 from src import main
 config.BAR_FRESHNESS_RETRY_SEC, config.BAR_FRESHNESS_MAX_WAIT_SEC = 1, 2
+config.ENABLE_MARKET_CLOSED_SKIP = 0                                                # 24.10: тестът върви и в почивен ден (иначе run() спира преди стъпките)
 config.SPINOFF_BUDGET_SEC = config.UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = 5
 FAULTS = {"model": "src.model_selector.resolve_model", "bar_freshness": "src.bar_freshness.wait_for_fresh", "distribution_cap": "src.main.apply_distribution_cap",
           "news": "src.news_aggregator.significant_news", "prose_checks": "src.ai_brief.apply_sector_claims_to_narratives", "earnings_warnings": "src.earnings_move.annotate",
