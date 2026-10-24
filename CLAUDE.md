@@ -82,6 +82,9 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 src/main.py            — оркестратор: календар → свеж бар → macro → thermometer → sectors → screener → enrich → корпоративни действия → AI synthesis
                          → Track Record (ensure v2, резолюция) → hard rules (технически + режимен gate) → GLB / QM / EP → маркери → ingest → render → имейл
 config.py              — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
+src/data_rhythm.py     — ритъмът на редките източници: COT цял само след нов отчет, 13F — само при нов 13F (24.10)
+src/crypto_news.py     — крипто секцията: Cointelegraph през AI подбор (дословни заглавия), COIN/HOOD/CRCL/BLSH, COT Bitcoin при нов отчет (24.10)
+src/options_record.py  — САМО запис на опционните данни (топ 200 + кандидатите от (а)); изключен, докато не се потвърди часът с пълния обем (24.10)
 src/steps.py           — обвивката на стъпките в main.run (20.10): step() → ok / частично / провал / пропусната, brief["run_steps"], банер за провал без собствен банер
 src/sessions.py        — NYSE сесии и празници — ЕДНО място (20.10); cut_today / complete_bars — без частичния днешен бар
 src/macro_layer.py     — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()
@@ -102,7 +105,7 @@ src/oi_snapshot.py     — следобедната OI снимка за наш�
 src/dataroma.py        — 13F (15 мениджъра, SEC EDGAR): Moves, SI✓, Major Exits; src/cusip_map.py — CUSIP → тикър (OpenFIGI); tools/probe_13f.py — диагностика на ръка
 src/insider_buying.py  — Form 4 покупки → INS✓ за нашите тикъри
 src/qm_breakout.py     — Qullamaggie breakout (механичен, без AI, отделна стратегия); src/qm_ep.py — Episodic Pivot, само наблюдение
-src/glb_screener.py    — GLB карти (Classic/Momentum, хистерезис) и сигналът на книгата "GLB по Уиш"
+src/glb_screener.py    — GLB карти по правилото на Уиш (линия по месечния High) + свежест (≤ 20 сесии, ≤ +10%) и сигналите на книгите "GLB по Уиш" (High) и "наш вариант (close)" (архив от 26.10)
 src/corp_actions.py    — корпоративни действия: изключване при съществено отделяне, маркер под прага; ЕДНО теглене на run (_SERIES)
 src/spinoff_watch.py   — предстоящо отделяне от EDGAR 8-K за нашите тикъри; от 21.10 и маркер „цел на придобиване (купувач, дата)“ — 8-K т. 1.01, в който подателят е целта (картата остава)
 src/watchlist_exits.py — "Излязоха от вчера"; src/names.py — имена за показване

@@ -1472,7 +1472,7 @@ GLB_WISH_REPLAY_STATS = {"trades": 26116, "with_spy": 21735, "win_literal_pct": 
 # нови записи в нея няма от тази дата, отворените ѝ се затварят по правилото си, а секцията остава като архив. Празна дата → новата книга не записва и close книгата не спира.
 GLB_WISH_BOOK_NAME = "GLB по Уиш"
 TRACK_GLB_WISH_HIGH = os.getenv("TRACK_GLB_WISH_HIGH", "1") == "1"
-GLB_WISH_HIGH_TRACK_FROM = os.getenv("GLB_WISH_HIGH_TRACK_FROM", "")
+GLB_WISH_HIGH_TRACK_FROM = os.getenv("GLB_WISH_HIGH_TRACK_FROM", "2026-10-26")    # първият бриф с етап 4 (push в събота 24.10) — същия ден close книгата става архив
 # Реплей на правилото (21.10.2026, РЕАЛНИ дневни цени от Yahoo, 903 тикъра = ДНЕШНИЯТ универс → оцелели: абсолютната алфа е надута, сравнението с другите правила е честно; без дивиденти;
 # без плъзгане и комисионни; таван 252 сесии; една позиция на тикър): 13 162 сделки (10 691 със SPY, 1993+); алфа на година позиция +11.0% [6.2; 16.9] срещу +8.8% [6.2; 11.9] на close книгата
 GLB_WISH_HIGH_REPLAY_STATS = {"trades": 13162, "with_spy": 10691, "win_literal_pct": 10.0, "win_exec_pct": 15.6, "median_literal_pct": -1.68, "median_exec_pct": -1.63,
