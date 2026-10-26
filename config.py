@@ -671,7 +671,9 @@ OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))              
 OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
 OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%
 OPTIONS_RECORD_VOL_X = float(os.getenv("OPTIONS_RECORD_VOL_X", 2.0))                # (а) обем ≥ 2× средния за 50 сесии; измерено 23.09–20.10: 4.6 кандидата на ден (1–9)
-OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 30))                      # сесии в data/options_daily.json
+# 26.10.2026 (решение по етап 4б, т. 4): плъзгащ се прозорец — последните 90 сесии, по-старите се трият при всеки запис (файлът не расте завинаги; ~4.7 MB при 90 сесии — оценка
+# върху записи с размера на реалния). Историята на git пази предишните версии — тя продължава да расте с дневния commit (оценка ~25–70 KB на ден след компресия)
+OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 90))                      # сесии в data/options_daily.json
 # Тезите и днешните новини (ai_brief.thesis_news_pick) — 19.10.2026 (трети преглед, т. 10, решение "в" на Венци): без AI етикети ("потвърдена / опровергана / evolving /
 # resolved"); до тезата — ДОСЛОВНОТО заглавие на свързаната новина, без етикет (кой съди — читателят). Кандидатите за всяка теза ги избира КОДЪТ по котвите ѝ
 # (THESIS_BASKETS: тикъри, names, terms) от суровия пул; моделът само отсява шума ("AI" в заглавие за литературна награда — 15.10) и връща индексите. Котвите сами не стигат:

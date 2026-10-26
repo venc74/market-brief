@@ -106,10 +106,13 @@ steps.step("options_record", lambda: st2, enabled=True, label="Записът н
            partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
 assert steps.summary()[-1]["status"] == "partial" and "денят е непълен" in steps.summary()[-1]["reason"]
 print("  ✓ стъпката в main: непълен ден → 'partial' с причината")
-for k in range(40):                                                                          # пазят се последните OPTIONS_RECORD_KEEP сесии
-    data = orc.merge(data, f"2026-09-{k % 28 + 1:02d}" if k < 28 else f"2026-08-{k - 27:02d}", {"tickers": {}})
+import datetime as _dt
+assert config.OPTIONS_RECORD_KEEP == 90                                                      # 26.10.2026: плъзгащ се прозорец от 90 сесии
+for k in range(120):                                                                         # СИНТЕТИЧНО: 120 по-стари сесии → остават последните 90, по-старите са изтрити
+    data = orc.merge(data, (_dt.date(2026, 5, 1) + _dt.timedelta(days=k)).isoformat(), {"tickers": {}})
 assert len(data["sessions"]) == config.OPTIONS_RECORD_KEEP and "2026-10-21" in data["sessions"] and "2026-10-20" in data["incomplete"]
+assert min(data["sessions"]) > "2026-05-31" and "2026-05-01" not in data["sessions"]
 bad = orc.record(list(FR), "2026-10-21", download=lambda ts: (_ for _ in ()).throw(RuntimeError("Yahoo down")), ticker=ticker, path=path)
 assert bad["ok"] is False and "Yahoo down" in bad["reason"]
-print("  ✓ пазят се последните 30 сесии (и непълните отделно); провал на тегленето → причина, без грешка")
+print("  ✓ пазят се последните 90 сесии, по-старите се трият (и непълните отделно); провал на тегленето → причина, без грешка")
 print("\n✅ test_options_record: всичко мина")
