@@ -127,13 +127,25 @@ def next_earnings_date(sym: str, yf_mod, today: dt.date) -> str | None:
     return None
 
 
+def yahoo_lookup(today: dt.date):
+    """Датата на следващия отчет по календара на Yahoo (next_earnings_date) — за book_marks; yfinance се зарежда при първото извикване."""
+    def look(sym: str) -> str | None:
+        import yfinance as yf
+        return next_earnings_date(sym, yf, today)
+    return look
+
+
 def book_marks(rows: list[dict], today: dt.date, dates: dict | None = None, lookup=None, statuses=("open", "trailing")) -> int:
     """
     26.10.2026 (етап 4б, т. 10): отворена позиция в книга (QM) с отчет в следващите EARNINGS_WARNING_SESSIONS сесии → row["earnings_next"] = {"date", "sessions"} — ред в таблицата
     на книгата (CBOE и UTHR: отворени от 20.10, отчети тази седмица). Датата — от картите на последните брифове (dates_from_briefs), иначе lookup(тикър) (календарът на Yahoo). Връща броя.
     """
     n = 0
-    dates = dates_from_briefs() if dates is None else dates
+    try:
+        dates = dates_from_briefs() if dates is None else dates
+    except Exception as e:
+        print(f"[earnings_move] датите от брифовете: {type(e).__name__}: {e}")
+        dates = {}
     for r in rows or []:
         if r.get("status") not in statuses or not r.get("ticker"):
             continue
