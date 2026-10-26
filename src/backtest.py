@@ -940,12 +940,30 @@ def _resolve_glb_wish_record(rec: dict, opens, closes, spy_bars, today: dt.date)
     rec["alpha_pct"] = round(res["return_pct"] - rec["spy_return_pct"], 2) if res.get("return_pct") is not None and rec["spy_return_pct"] is not None else None
     rec["alpha_pct_exec"] = round(res["return_pct_exec"] - rec["spy_return_pct_exec"], 2) if res.get("return_pct_exec") is not None and rec["spy_return_pct_exec"] is not None else None
     rec["entry_price"] = res["fill_price"] if res.get("fill_price") is not None else rec.get("signal_close")
+    hz = trade_sim.gw_horizons(bars, spy_bars, res.get("fill_date"), today=today)              # 26.10.2026 (етап 4б, т. 3): 5/10/20 сесии след входа, независимо от изхода
+    if hz or rec.get("horizons"):
+        rec["horizons"] = {**(rec.get("horizons") or {}), **hz}
     if res["status"] in ("pending", "open"):
         rec["resolution_date"] = None
     else:
         rec["resolution_date"] = res.get("resolution_date")
         if not rec.get("discovered_date"):
             rec["discovered_date"] = today.isoformat()
+
+
+def _gw_needs_horizons(rec: dict, today: dt.date) -> bool:
+    """
+    26.10.2026 (етап 4б, т. 3): затворен запис от книгите тип Уиш, на който последният фиксиран срок (config.GLB_WISH_HORIZONS[-1] сесии след входа) още не е попълнен — изходът по линията
+    често е след 1–3 сесии, а доходността на срок е независима от изхода → записът се резолвира, докато срокът мине (най-много 45 дни след входа).
+    """
+    if rec.get("category") not in GW_CATEGORIES or rec.get("status") not in trade_sim.GW_TERMINAL or not rec.get("fill_date"):
+        return False
+    if str(config.GLB_WISH_HORIZONS[-1]) in (rec.get("horizons") or {}):
+        return False
+    try:
+        return (today - dt.date.fromisoformat(rec["fill_date"])).days <= 45
+    except ValueError:
+        return False
 
 
 def _gw_needs_exec_fill(rec: dict, today: dt.date) -> bool:
@@ -1006,7 +1024,7 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         _migrate_qm_r_floor(tracker, today)
     except Exception as e:
         print(f"[backtest] qm_breakout: преизчисляването на R не успя: {type(e).__name__}: {e}")
-    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today)]
+    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today) or _gw_needs_horizons(rec, today)]
     LAST_RESOLUTION = {"ok": True, "live": len(live_items)}
     if not live_items:
         return
@@ -1582,7 +1600,8 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
     """
     GLB по Уиш: обобщение на ОТДЕЛНАТА книга "glb_wish" (буквалното правило на Wish, без нашите филтри — измерване, не препоръка). Чисто локално четене (без мрежа). Доходност в % (няма стоп → няма R) на две граници:
     literal (вход и изход на затварянето) и exec (отварянето на следващата сесия), спрямо SPY за същите дати. Записите с резултат са затворените (изход по линията / изтекли след
-    config.GLB_WISH_MAX_HOLD_SESSIONS) И отворените по mark-to-market — само затворените биха били структурно негативни (изходът по линията е загуба по построение). Статистиката (win rate, медиана, алфа) се
+    config.GLB_WISH_MAX_HOLD_SESSIONS) И отворените по mark-to-market — само затворените биха били структурно негативни (изходът по линията е загуба по построение). 26.10.2026 (етап 4б, т. 3): без
+    % печеливши, интервал и медиана; средната доходност на всички записи, доходността 5/10/20 сесии след входа спрямо SPY (horizons) и сравнението по тип / режим на един срок. Алфата се
     попълва чак при >= config.GLB_WISH_MIN_ENTRIES_FOR_STATS такива записа (затворените и отворените се показват ОТДЕЛНО: closed_result / open_result и групите); дотогава — броят и средната доходност. Редовете носят отметка also_action / also_buystop / also_qm. Изключено → {}.
     """
     high = category == CATEGORY_GLB_WISH_HIGH                                     # 21.10.2026: "GLB по Уиш" (линия по High) или close книгата (архив от GLB_WISH_HIGH_TRACK_FROM)
@@ -1605,32 +1624,49 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
     closed_res = line_exit + expired                                        # затворени: изход по линията ИЛИ изтекли по нашия таван (оценка по затварянето му)
     min_n = config.GLB_WISH_MIN_ENTRIES_FOR_STATS
     visible = len(with_result) >= min_n
-    med = lambda xs: round((xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2), 2)
+    avg = lambda xs: round(sum(xs) / len(xs), 2) if xs else None
 
+    # 26.10.2026 (етап 4б, т. 3 — решение от 26.10): без % печеливши, интервал и медиана — затворените по линията са загуби по построение (вход над линията, изход под нея), затова
+    # "печеливши 40.7%" беше делът на отворените. Остават средната доходност на всички записи (отворените по текуща цена) и алфата; добавени — доходността 5/10/20 сесии след входа
     def stats(group: list[dict]) -> dict:
-        rl = sorted(r["return_pct"] for r in group)
-        re_ = sorted(r["return_pct_exec"] for r in group if r.get("return_pct_exec") is not None)
+        rl = [r["return_pct"] for r in group]
+        re_ = [r["return_pct_exec"] for r in group if r.get("return_pct_exec") is not None]
         al = [r["alpha_pct"] for r in group if r.get("alpha_pct") is not None]
         ae = [r["alpha_pct_exec"] for r in group if r.get("alpha_pct_exec") is not None]
-        wins = sum(1 for x in rl if x > 0)
-        return {"n": len(group), "avg_return_pct": round(sum(rl) / len(rl), 2) if rl else None, "median_return_pct": med(rl) if (visible and rl) else None,
-                "avg_return_pct_exec": round(sum(re_) / len(re_), 2) if re_ else None, "n_exec": len(re_), "median_return_pct_exec": med(re_) if (visible and re_) else None,
-                "win_rate_pct": round(100 * wins / len(rl), 1) if (visible and rl) else None, "win_ci_pct": _wilson_ci_pct(wins, len(rl)) if (visible and rl) else None,
-                "win_rate_exec_pct": round(100 * sum(1 for x in re_ if x > 0) / len(re_), 1) if (visible and re_) else None,
-                "avg_alpha_pct": round(sum(al) / len(al), 2) if (visible and al) else None, "avg_alpha_pct_exec": round(sum(ae) / len(ae), 2) if (visible and ae) else None,
-                "beat_spy_pct": round(100 * sum(1 for x in al if x > 0) / len(al), 1) if (visible and al) else None}
+        return {"n": len(group), "avg_return_pct": avg(rl), "avg_return_pct_exec": avg(re_), "n_exec": len(re_),
+                "avg_alpha_pct": avg(al) if visible else None, "avg_alpha_pct_exec": avg(ae) if visible else None}
+
+    valid = [r for r in records if r.get("status") not in trade_sim.GW_NOT_A_POSITION]
+
+    def horizons(group: list[dict]) -> dict:
+        """Доходността h сесии след входа (literal, независимо от изхода) и SPY за същите дати — средно по записите, на които срокът е минал."""
+        out = {}
+        for h in config.GLB_WISH_HORIZONS:
+            xs = [(r.get("horizons") or {}).get(str(h)) for r in group]
+            xs = [x for x in xs if x and x.get("ret") is not None]
+            sp = [x["spy"] for x in xs if x.get("spy") is not None]
+            al = [x["alpha"] for x in xs if x.get("alpha") is not None]
+            out[str(h)] = {"n": len(xs), "avg_ret": avg([x["ret"] for x in xs]), "avg_spy": avg(sp), "avg_alpha": avg(al)}
+        return out
+
+    hz = horizons(valid)
+    H = str(config.GLB_WISH_COMPARE_HORIZON)
+    visible_h = hz.get(H, {}).get("n", 0) >= min_n
 
     def by_key(key_fn):
+        """26.10.2026 (т. 3): сравнението по тип / режим — на ЕДИН срок (GLB_WISH_COMPARE_HORIZON сесии след входа), не средното на записи с различна давност."""
         out: dict = {}
         for r in records:
-            g = out.setdefault(key_fn(r) or "н/д", {"records": 0, "_rs": []})
+            g = out.setdefault(key_fn(r) or "н/д", {"records": 0, "_x": []})
             g["records"] += 1
-            if r in with_result:
-                g["_rs"].append(r["return_pct"])
+            x = (r.get("horizons") or {}).get(H)
+            if r in valid and x and x.get("ret") is not None:
+                g["_x"].append(x)
         for g in out.values():
-            x = g.pop("_rs")
+            x = g.pop("_x")
             g["n"] = len(x)
-            g["avg_return_pct"] = round(sum(x) / len(x), 2) if (visible and x) else None
+            g["avg_ret"] = avg([v["ret"] for v in x]) if visible_h else None
+            g["avg_alpha"] = avg([v["alpha"] for v in x if v.get("alpha") is not None]) if visible_h else None
         return out
 
     def _row(r: dict) -> dict:
@@ -1654,6 +1690,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "with_result": len(with_result), "closed_result": len(closed_res), "open_result": len(open_res), "min_entries": min_n, "stats_visible": visible,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
+        "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
         "live": live, "live_total": len(live_all), "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
     }

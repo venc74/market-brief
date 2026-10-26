@@ -1598,7 +1598,7 @@
     <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно</b> — те са върху едни и същи тикъри, дати и цени.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга {{ book_key }}: {{ gw.records }} записа{% if gw.tickers is defined %} / {{ gw.tickers }} тикъра{% endif %} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.stats_visible %} · win rate {{ gw["all"].win_rate_pct }}%{% else %} · статистика след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}{% if gw.result_tickers is defined %} в {{ gw.result_tickers }} тикъра{% endif %}){% endif %}</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга {{ book_key }}: {{ gw.records }} записа{% if gw.tickers is defined %} / {{ gw.tickers }} тикъра{% endif %} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.with_result and gw["all"].avg_return_pct is not none %} · средно {{ "%+.2f"|format(gw["all"].avg_return_pct) }}% (всички записи){% endif %}{% if not gw.stats_visible %} · статистика след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}{% if gw.result_tickers is defined %} в {{ gw.result_tickers }} тикъра{% endif %}){% endif %}</summary>
   <div class="prose" style="margin-top:8px">
     {% if not gw.records %}
     <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.
@@ -1606,22 +1606,25 @@
     <b>Записани: {{ gw.records }}</b> · <b>затворени {{ gw.line_exit + gw.expired }}</b> (изход по линията {{ gw.line_exit }} · изтекли по нашия таван {{ gw.expired }}) / <b>отворени по текуща цена {{ gw.open }}</b>{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
     {% if gw.needs_review %}<span style="color:var(--yellow)">⚠ {{ gw.needs_review }} запис(а) с отделяне след сигнала — линията не се мащабира, нужен е ръчен преглед.</span><br>{% endif %}
     {% if gw.with_result %}
-    Записи с резултат: <b>{{ gw.with_result }} = затворени {{ gw.closed_result }} / отворени по текуща цена {{ gw.open_result }}</b> · средна доходност <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
+    Записи с резултат: <b>{{ gw.with_result }} = затворени {{ gw.closed_result }} / отворени по текуща цена {{ gw.open_result }}</b> · средна доходност на всички <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
     {% if gw.line_exit_group.n %}Изход по линията ({{ gw.line_exit_group.n }}): средно {{ "%+.2f"|format(gw.line_exit_group.avg_return_pct) }}% — по построение загуби (вход над линията, изход под нея).<br>{% endif %}
     {% if gw.expired_group.n %}Изтекли по нашия таван ({{ gw.expired_group.n }}, оценка по затварянето на последния ден): средно {{ "%+.2f"|format(gw.expired_group.avg_return_pct) }}%.<br>{% endif %}
     {% if gw.open_group.n %}Отворени по текуща цена ({{ gw.open_group.n }}): средно {{ "%+.2f"|format(gw.open_group.avg_return_pct) }}% — още не са затворени, цената им може да се върне под линията.<br>{% endif %}
     {% endif %}
-    {% if gw.stats_visible %}
-    <b>Печеливши: {{ gw["all"].win_rate_pct }}%</b> literal{% if gw["all"].win_rate_exec_pct is not none %} / {{ gw["all"].win_rate_exec_pct }}% exec{% endif %} (95% интервал {{ gw["all"].win_ci_pct[0] }}–{{ gw["all"].win_ci_pct[1] }}%)
-    · медиана {{ "%+.2f"|format(gw["all"].median_return_pct) }}%{% if gw["all"].median_return_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].median_return_pct_exec) }}%{% endif %}<br>
-    {% if gw["all"].avg_alpha_pct is not none %}Спрямо SPY (същите дати): алфа средно {{ "%+.2f"|format(gw["all"].avg_alpha_pct) }}% literal{% if gw["all"].avg_alpha_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}% exec{% endif %}{% if gw["all"].beat_spy_pct is not none %} · бие SPY в {{ gw["all"].beat_spy_pct }}% от записите{% endif %}<br>{% endif %}
-    {% else %}
-    Печеливши, медиана и сравнение със SPY се показват след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}) — при по-малко е шум.<br>
-    {% endif %}
-    По наш етикет (записани / с резултат{% if gw.stats_visible %}, средна доходност{% endif %}):
-    {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.stats_visible and g.avg_return_pct is not none %} ({{ "%+.2f"|format(g.avg_return_pct) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {# 26.10.2026 (етап 4б, т. 3): без % печеливши, интервал и медиана — затворените по линията са загуби по построение; доходността на срок и сравнението по тип / режим на един срок #}
+    {% if gw.horizons is defined %}
+    <span style="color:var(--muted)">Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея), затова делът на печелившите е просто делът на отворените.</span><br>
+    Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати:
+    {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n %}{{ "%+.2f"|format(x.avg_ret) }}%{% if x.avg_spy is not none %} (SPY {{ "%+.2f"|format(x.avg_spy) }}%, алфа {{ "%+.2f"|format(x.avg_alpha) }}%){% endif %}, {{ x.n }} записа{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.<br>
+    {% if gw["all"].avg_alpha_pct is not none %}Спрямо SPY до изхода (същите дати): алфа средно {{ "%+.2f"|format(gw["all"].avg_alpha_pct) }}% literal{% if gw["all"].avg_alpha_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}% exec{% endif %}<br>{% elif not gw.stats_visible %}Алфата до изхода се показва след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}) — при по-малко е шум.<br>{% endif %}
+    По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност за {{ gw.compare_horizon }} сесии{% endif %}):
+    {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret is not none %} ({{ "%+.2f"|format(g.avg_ret) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
     · по режим на деня на пробива:
-    {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.stats_visible and g.avg_return_pct is not none %} ({{ "%+.2f"|format(g.avg_return_pct) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret is not none %} ({{ "%+.2f"|format(g.avg_ret) }}%{% if g.avg_alpha is not none %}, алфа {{ "%+.2f"|format(g.avg_alpha) }}%{% endif %}){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}{% if not gw.horizons_visible %} — средните по тип и режим се показват при {{ gw.min_entries }} записа с {{ gw.compare_horizon }} сесии{% endif %}
+    {% else %}
+    По наш етикет (записани / с резултат): {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{{ " · " if not loop.last else "" }}{% endfor %}
+    · по режим на деня на пробива: {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% endif %}
     {% endif %}
   </div>
   {% if gw.live %}

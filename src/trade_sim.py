@@ -424,6 +424,43 @@ def simulate_glb_wish(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     return out
 
 
+def gw_horizons(bars: pd.DataFrame, spy: pd.DataFrame | None, fill_date: str | None, horizons=None, today=None) -> dict:
+    """
+    26.10.2026 (етап 4б, т. 3): доходността ФИКСИРАН брой сесии след входа на книгите тип Уиш — от затварянето на сигналния ден (literal входът) до затварянето h сесии по-късно,
+    НЕЗАВИСИМО от изхода по линията — и SPY за същите дати: {"5": {"date", "ret", "spy", "alpha"}, …} само за сроковете, които вече са минали (цели барове). Чиста функция.
+    """
+    out: dict = {}
+    if not fill_date or bars is None or len(bars) == 0:
+        return out
+    bars = complete_bars(bars, today)
+    if bars is None or len(bars) == 0:
+        return out
+    idx = pd.DatetimeIndex(bars.index)
+    idx = idx.tz_localize(None) if idx.tz is not None else idx
+    c = bars["Close"].to_numpy(dtype=float)
+    s = int(idx.searchsorted(pd.Timestamp(fill_date), side="left"))
+    if s >= len(idx) or idx[s] != pd.Timestamp(fill_date):
+        return out
+    sp = None
+    if spy is not None and len(spy):
+        sp = spy["Close"].copy()
+        si = pd.DatetimeIndex(sp.index)
+        sp.index = si.tz_localize(None) if si.tz is not None else si
+    for h in (horizons or config.GLB_WISH_HORIZONS):
+        j = s + int(h)
+        if j >= len(idx):
+            continue
+        ret = round((c[j] / c[s] - 1) * 100, 2)
+        spy_r = None
+        try:
+            if sp is not None:
+                spy_r = round((float(sp.loc[idx[j]]) / float(sp.loc[idx[s]]) - 1) * 100, 2)
+        except (KeyError, ValueError, TypeError):
+            spy_r = None
+        out[str(int(h))] = {"date": idx[j].date().isoformat(), "ret": ret, "spy": spy_r, "alpha": round(ret - spy_r, 2) if spy_r is not None else None}
+    return out
+
+
 def spy_return_pct_gw(res: dict, spy: pd.DataFrame, exec_leg: bool = False) -> float | None:
     """
     SPY за СЪЩИТЕ дати на записа от книгата "GLB по Уиш": literal — от Close на деня на входа до Close на деня на изхода (за отворена — на последния Close); exec_leg — от Open на деня на входа до Open на деня на

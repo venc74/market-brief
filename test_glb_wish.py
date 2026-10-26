@@ -285,18 +285,32 @@ for i in range(19):
     rows[f"T{i}_gw"] = mk(i, "line_exit", -2.0 - i * 0.1, typ="momentum" if i % 2 else "classic")
 rows["T19_gw"] = mk(19, "expired", 30.0, typ="classic")
 S19 = (lambda: (backtest._save_tracker({k: v for k, v in rows.items() if k != "T19_gw"}), backtest.get_glb_wish_summary())[1])()
-assert S19["with_result"] == 19 and not S19["stats_visible"] and S19["all"]["win_rate_pct"] is None and S19["all"]["median_return_pct"] is None and S19["all"]["avg_alpha_pct"] is None and S19["all"]["avg_return_pct"] is not None
-assert all(g_["avg_return_pct"] is None for g_ in S19["by_type"].values())
+assert S19["with_result"] == 19 and not S19["stats_visible"] and S19["all"]["avg_alpha_pct"] is None and S19["all"]["avg_return_pct"] is not None
+assert not {"win_rate_pct", "win_ci_pct", "median_return_pct", "win_rate_exec_pct", "median_return_pct_exec", "beat_spy_pct"} & set(S19["all"])        # 26.10.2026 (етап 4б, т. 3)
+assert all(g_["avg_ret"] is None for g_ in S19["by_type"].values()) and S19["horizons"]["20"]["n"] == 0 and not S19["horizons_visible"]
+for i, v in enumerate(rows.values()):                                                 # СИНТЕТИЧНО: доходността 5 и 20 сесии след входа (независимо от изхода) и SPY за същите дати
+    v["horizons"] = {"5": {"date": "2026-08-10", "ret": round(1.0 + i * 0.1, 2), "spy": 0.5, "alpha": round(0.5 + i * 0.1, 2)},
+                     **({"20": {"date": "2026-08-31", "ret": round(-1.0 + i * 0.2, 2), "spy": 1.0, "alpha": round(-2.0 + i * 0.2, 2)}} if i < 19 else {})}
 backtest._save_tracker(rows)
 S20 = backtest.get_glb_wish_summary()
 rl = sorted(v["return_pct"] for v in rows.values())
 assert S20["with_result"] == 20 and S20["stats_visible"] and S20["records"] == 20 and S20["line_exit"] == 19 and S20["expired"] == 1 and S20["open"] == 0
-assert S20["all"]["n"] == 20 and S20["all"]["avg_return_pct"] == round(sum(rl) / 20, 2) and S20["all"]["win_rate_pct"] == 5.0 and S20["all"]["win_ci_pct"] is not None
-assert S20["all"]["median_return_pct"] == round((rl[9] + rl[10]) / 2, 2) and S20["line_exit_group"]["n"] == 19 and S20["line_exit_group"]["win_rate_pct"] == 0.0 and S20["expired_group"]["n"] == 1 and S20["open_group"]["n"] == 0 and S20["closed_group"]["n"] == 20 and (S20["closed_result"], S20["open_result"]) == (20, 0)
-assert S20["all"]["avg_alpha_pct"] == round(sum(v["alpha_pct"] for v in rows.values()) / 20, 2) and S20["all"]["beat_spy_pct"] == 5.0
-assert S20["by_type"]["classic"]["records"] == 11 and S20["by_type"]["momentum"]["records"] == 9 and S20["by_regime"]["Offensive"]["records"] == 20
-print(f"  ✓ при 19 записа с резултат: само броят и средната доходност ({S19['all']['avg_return_pct']:+.2f}%); при 20-я: win rate {S20['all']['win_rate_pct']}%, медиана {S20['all']['median_return_pct']:+.2f}%, алфа {S20['all']['avg_alpha_pct']:+.2f}%, групите (изход по линията n=19 → 0% печеливши; изтекли по тавана n=1; отворени n=0) — всичко сверено независимо")
-assert S20["line_exit_group"]["win_rate_pct"] == 0.0
+assert S20["all"]["n"] == 20 and S20["all"]["avg_return_pct"] == round(sum(rl) / 20, 2) and "win_rate_pct" not in S20["all"] and "median_return_pct" not in S20["all"]
+assert S20["line_exit_group"]["n"] == 19 and S20["expired_group"]["n"] == 1 and S20["open_group"]["n"] == 0 and S20["closed_group"]["n"] == 20 and (S20["closed_result"], S20["open_result"]) == (20, 0)
+assert S20["all"]["avg_alpha_pct"] == round(sum(v["alpha_pct"] for v in rows.values()) / 20, 2) and "beat_spy_pct" not in S20["all"]
+h5, h20 = S20["horizons"]["5"], S20["horizons"]["20"]
+assert (h5["n"], h5["avg_ret"], h5["avg_spy"], h5["avg_alpha"]) == (20, round(sum(1.0 + i * 0.1 for i in range(20)) / 20, 2), 0.5, round(sum(0.5 + i * 0.1 for i in range(20)) / 20, 2))
+assert h20["n"] == 19 and S20["horizons"]["10"]["n"] == 0 and not S20["horizons_visible"] and S20["compare_horizon"] == 20      # 19 < 20 → сравнението по тип / режим още не
+assert S20["by_type"]["classic"]["records"] == 11 and S20["by_type"]["momentum"]["records"] == 9 and S20["by_regime"]["Offensive"]["records"] == 20 and S20["by_regime"]["Offensive"]["avg_ret"] is None
+rows["T19_gw"]["horizons"]["20"] = {"date": "2026-08-31", "ret": 2.8, "spy": 1.0, "alpha": 1.8}
+backtest._save_tracker(rows)
+S20b = backtest.get_glb_wish_summary()
+assert S20b["horizons_visible"] and S20b["by_regime"]["Offensive"]["n"] == 20 and S20b["by_regime"]["Offensive"]["avg_ret"] == S20b["horizons"]["20"]["avg_ret"] == round((sum(-1.0 + i * 0.2 for i in range(19)) + 2.8) / 20, 2)
+classic = [i for i in range(20) if i % 2 == 0 or i == 19]                                # T0, T2 … T18 (classic) + T19 (classic)
+assert S20b["by_type"]["classic"]["n"] == 11 and S20b["by_type"]["classic"]["avg_ret"] == round(sum(-1.0 + i * 0.2 if i < 19 else 2.8 for i in classic) / 11, 2)
+print(f"  ✓ без % печеливши / интервал / медиана; средна доходност на всички {S20['all']['avg_return_pct']:+.2f}%, алфа {S20['all']['avg_alpha_pct']:+.2f}%; 5 сесии след входа {h5['avg_ret']:+.2f}% "
+      f"(SPY {h5['avg_spy']:+.2f}%, n=20); сравнението по тип / режим — на 20 сесии, при 20 записа с толкова сесии ({S20b['by_regime']['Offensive']['avg_ret']:+.2f}%) — сверено независимо")
+rows["T19_gw"]["horizons"].pop("20")
 live_rows = {f"L{i}_gw": mk(100 + i, "open", 5.0 + i, entry=f"2026-09-{1 + i:02d}") for i in range(17)}
 rows.update(live_rows)
 backtest._save_tracker(rows)
@@ -323,7 +337,11 @@ HEAD = f"{config.GLB_CLOSE_BOOK_NAME}{' · архив' if SL.get('archived_from'
 sec = page[page.index(HEAD):]          # 21.10: честното име — линията е нашата (close)
 sec = sec[:sec.index("</section>")]
 assert "GLB по Уиш · книга" not in page and "измерване, не препоръка" in page[page.index(HEAD):][:200] and "Правилото за вход и изход е на Eric Wish, линията е наша" in sec and "най-високата цена (High)" in sec and "оцелели" in sec and "тесен" not in sec.lower()
-assert "Измерване — книга glb_wish: 37 записа" in sec and f"win rate {SL['all']['win_rate_pct']}%" in sec and "по построение загуби" in sec and "затворени 20 / отворени по текуща цена 17" in sec and "затворени 20 (изход по линията 19 · изтекли по нашия таван 1) / отворени по текуща цена 17" in re.sub(r"<[^>]+>", "", sec) and "Отворени по текуща цена (17)" in sec and "Изтекли по нашия таван (1" in sec
+assert "Измерване — книга glb_wish: 37 записа" in sec and f"средно {SL['all']['avg_return_pct']:+.2f}% (всички записи)" in sec
+assert "win rate" not in sec and "Печеливши:" not in sec and "95% интервал" not in sec and "· медиана" not in sec          # 26.10.2026 (етап 4б, т. 3)
+flat_sec = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", sec))
+assert "Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати: 5 сесии — +1.95% (SPY +0.50%, алфа +1.45%), 20 записа · 10 сесии — още няма записи с толкова сесии" in flat_sec
+assert "Без % печеливши и медиана: всяка затворена по линията е загуба по построение" in sec and "по построение загуби" in sec and "затворени 20 / отворени по текуща цена 17" in sec and "затворени 20 (изход по линията 19 · изтекли по нашия таван 1) / отворени по текуща цена 17" in re.sub(r"<[^>]+>", "", sec) and "Отворени по текуща цена (17)" in sec and "Изтекли по нашия таван (1" in sec
 assert "НАШ — при Уиш няма такъв" in sec and "от 252 сесии" in sec and "изтекла по нашия таван" in sec
 assert sec.count("<tr><td class=\"sym\">T1") >= 10 and "от 17, най-новите" in sec and "и Action" not in sec
 print("  ✓ СИНТЕТИЧНИ записи от точка 8 в РЕАЛНАТА страница от 05.10: секция «GLB по Уиш · книга (измерване, не препоръка)» с честното описание (буквално правило, оцелели, без тесен), реда за 37 записа, win rate от обобщението, обяснението за групите, 15 отворени «от 17, най-новите»")
