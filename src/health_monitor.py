@@ -7,7 +7,7 @@
   1. OI снимката за предишната NYSE сесия (job "Unusual Options OI snapshot");
   2. брифът (data/<дата>.json) за предишната NYSE сесия — пропуснат сутрешен run;
   3. книгите: резолюцията на живите записи (backtest.LAST_RESOLUTION) — цени няма / до по-стара дата / тикъри без цени;
-  4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал;
+  4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал — само при стария хистерезис (GLB_CARDS_RULE = close_hysteresis);
   5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата;
   6. таблицата NYSE_HOLIDAYS не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни;
   7. (16.10.2026) дневните барове са за последната NYSE сесия (bar_freshness: изчакването преди run-а и делът на универса със стар бар).
@@ -95,7 +95,8 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
         except Exception as e:
             print(f"[health] книгите не се провериха: {type(e).__name__}: {e}")
 
-    if config.ENABLE_GLB_SCREENER and (glb_status or {}).get("ok"):
+    # 26.10.2026 (етап 4б, т. 6): картите по правилото на Уиш (GLB_CARDS_RULE = "wish_high") не пазят състояние — файлът е само на стария хистерезис; на 26.10 проверката даде фалшив банер
+    if config.ENABLE_GLB_SCREENER and (glb_status or {}).get("ok") and config.GLB_CARDS_RULE != "wish_high":
         try:
             upd = _read(d / "glb_state.json").get("updated")
             if upd != today:

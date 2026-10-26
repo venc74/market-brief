@@ -76,11 +76,16 @@ print("  ✓ паднало теглене → «книгите не са обн
 
 print()
 print("── 4. GLB състояние, предишен бриф, кешове ──")
+config.GLB_CARDS_RULE = "close_hysteresis"                                            # проверката на файла е само при стария хистерезис
 i5 = hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-09", glb_updated="2026-10-09", briefs=()),
               resolution={"ok": True, "live": 0}, glb_status={"ok": True})
 assert sorted({i["check"] for i in i5}) == ["cache", "glb_state", "prior_brief"] and sum(i["check"] == "cache" for i in i5) == 4
 assert hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-12", glb_updated="2026-10-09", briefs=("2026-10-09",)),
                 resolution={"ok": True, "live": 0}, glb_status={"ok": False}) == []                    # GLB падна → банерът е от С3, не от монитора
+config.GLB_CARDS_RULE = "wish_high"                                                   # 26.10.2026 (етап 4б, т. 6): картите не пазят състояние — без проверка (на 26.10 — фалшив банер)
+i5w = hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-09", glb_updated="2026-10-09", briefs=()),
+               resolution={"ok": True, "live": 0}, glb_status={"ok": True})
+assert "glb_state" not in {i["check"] for i in i5w} and {"cache", "prior_brief"} <= {i["check"] for i in i5w}
 print("  ✓ липсващ предишен бриф, стари кешове (4) и незаписано GLB състояние → редове; при паднал GLB мониторът не дублира банера на С3")
 
 print()
