@@ -91,16 +91,30 @@ mixed = copy.deepcopy(G26); mixed["Gold"].update(contract="GCZ26", contract_mont
 assert "злато $4 019 — дек. 2026 (GCZ26), цена от 26.10 02:20 ET" in ml.futures_quotes_line(mixed) and "WTI $100.97, цена от 26.10 02:20 ET — договорът не е известен днес" in ml.futures_quotes_line(mixed)
 print("  ✓", l26[:150], "…")
 no_und = {k: v for k, v in FX["info"]["CL=F"].items() if k != "underlyingSymbol"}                                     # СИНТЕТИЧНО: РЕАЛНОТО .info от 19.10 без underlyingSymbol
-class Tk2(Tk):
-    @property
-    def info(self): return no_und if self.s == "CL=F" else FX["info"].get(self.s, {})
-ml.yf.Ticker, ml._is_stale = Tk2, (lambda ts: False)
-try:
-    with contextlib.redirect_stdout(io.StringIO()):
-        g2 = ml.global_market_signals()
-finally:
-    ml.yf.Ticker, ml._is_stale = real_tk, real_stale
-assert "contract" not in g2["Oil_WTI"] and g2["Oil_WTI"]["chg_5d_basis"] == "continuous" and g2["Oil_WTI"]["contract_reason"] == "Yahoo не върна underlyingSymbol"
-assert g2["Oil_WTI"]["price_time_utc"].startswith("2026-10-19") and "contract_reason" not in g2["Gold"]
-print("  ✓ .info без underlyingSymbol → без договор, chg_5d_basis continuous, contract_reason 'Yahoo не върна underlyingSymbol'; часът на цената остава")
+no_name = {k: v for k, v in no_und.items() if k != "shortName"}                                                       # СИНТЕТИЧНО: и без името на договора
+
+
+def signals_with(info_cl):
+    class Tk2(Tk):
+        @property
+        def info(self): return info_cl if self.s == "CL=F" else FX["info"].get(self.s, {})
+    ml.yf.Ticker, ml._is_stale = Tk2, (lambda ts: False)
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            return ml.global_market_signals()
+    finally:
+        ml.yf.Ticker, ml._is_stale = real_tk, real_stale
+
+
+# 26.10.2026 (решение по етап 4б, т. 3): резервът по името на договора ("Crude Oil Dec 26" + корена "CL")
+assert ml.futures_contract(no_und, "CL=F") == {"contract": "CLZ26", "contract_month": "дек. 2026", "contract_source": "shortName"}
+assert ml.futures_contract({"shortName": "Gold Feb 27"}, "GC=F")["contract"] == "GCG27" and ml.futures_contract({"shortName": "Crude Oil"}, "CL=F") is None
+g2 = signals_with(no_und)
+assert g2["Oil_WTI"]["contract"] == "CLZ26" and g2["Oil_WTI"]["contract_source"] == "shortName" and "contract_reason" not in g2["Oil_WTI"]
+assert g2["Oil_WTI"]["chg_5d_basis"] == "contract" and g2["Oil_WTI"]["chg_5d_pct"] == 4.76                                # серията CLZ26.NYM от fixture-а
+assert "WTI $97.45 — дек. 2026 (CLZ26, по името на договора)" in (ml.futures_quotes_line({**g2, "Oil_WTI": {**g2["Oil_WTI"], "value": 97.45}}) or "")
+g3 = signals_with(no_name)
+assert "contract" not in g3["Oil_WTI"] and g3["Oil_WTI"]["chg_5d_basis"] == "continuous" and g3["Oil_WTI"]["contract_reason"] == "Yahoo не върна underlyingSymbol"
+assert g3["Oil_WTI"]["price_time_utc"].startswith("2026-10-19") and "contract_reason" not in g3["Gold"]
+print("  ✓ без underlyingSymbol → договорът по името („Crude Oil Dec 26“ → CLZ26), 5 дни по CLZ26 (+4.76%), редът казва „по името на договора“; без име — непрекъснатият символ и причината")
 print("\n✅ test_futures_contract: всичко мина")

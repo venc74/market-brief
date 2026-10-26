@@ -339,15 +339,28 @@ _MONTH_CODES = {c: i for i, c in enumerate("FGHJKMNQUVXZ", 1)}
 _BG_MONTHS = ("ян.", "февр.", "март", "апр.", "май", "юни", "юли", "авг.", "септ.", "окт.", "ноем.", "дек.")
 
 
-def futures_contract(info: dict | None) -> dict | None:
-    """yfinance .info на "=F" символ → {"contract": "CLZ26", "contract_month": "дек. 2026"} по underlyingSymbol ("CLZ26.NYM"); иначе None. Чиста функция."""
+_EN_MONTHS = {m: i for i, m in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), 1)}
+
+
+def futures_contract(info: dict | None, symbol: str | None = None) -> dict | None:
+    """
+    yfinance .info на "=F" символ → {"contract": "CLZ26", "contract_month": "дек. 2026"} по underlyingSymbol ("CLZ26.NYM"); иначе None. Чиста функция.
+    26.10.2026 (решение по етап 4б, т. 3): без underlyingSymbol (26.10 в 06:20 UTC — и за трите фючърса) — резерв по името на договора (shortName "Crude Oil Dec 26") и корена на
+    символа ("CL=F" → "CL"): {"contract": "CLZ26", …, "contract_source": "shortName"}.
+    """
     import re
     sym = str((info or {}).get("underlyingSymbol") or "").split(".")[0].upper()
     m = re.fullmatch(r"([A-Z]{1,3})([FGHJKMNQUVXZ])(\d{2})", sym)
-    if not m:
-        return None
-    month, year = _MONTH_CODES[m.group(2)], 2000 + int(m.group(3))
-    return {"contract": sym, "contract_month": f"{_BG_MONTHS[month - 1]} {year}"}
+    if m:
+        month, year = _MONTH_CODES[m.group(2)], 2000 + int(m.group(3))
+        return {"contract": sym, "contract_month": f"{_BG_MONTHS[month - 1]} {year}"}
+    root = re.fullmatch(r"([A-Z]{1,3})=F", str(symbol or "").upper())
+    n = re.search(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+'?(\d{2})\s*$", str((info or {}).get("shortName") or ""))
+    if root and n:
+        month, year = _EN_MONTHS[n.group(1)], 2000 + int(n.group(2))
+        code = "FGHJKMNQUVXZ"[month - 1]
+        return {"contract": f"{root.group(1)}{code}{year % 100:02d}", "contract_month": f"{_BG_MONTHS[month - 1]} {year}", "contract_source": "shortName"}
+    return None
 
 
 def _price_time(info: dict | None) -> str | None:
@@ -416,7 +429,7 @@ def global_market_signals() -> dict:
                     out[name]["chg_5d_basis"] = "continuous"
                     try:
                         info = yf.Ticker(symbol).info
-                        out[name].update(futures_contract(info) or {})
+                        out[name].update(futures_contract(info, symbol) or {})
                         if not out[name].get("contract"):              # 26.10.2026 (етап 4б, т. 7): защо договорът липсва — за реда под макро текста
                             u = (info or {}).get("underlyingSymbol")
                             out[name]["contract_reason"] = (f"непознат underlyingSymbol ({u})" if u else "Yahoo не върна underlyingSymbol")
@@ -425,6 +438,9 @@ def global_market_signals() -> dict:
                         # 19.10.2026 (етап 2, т. 4): 5-дневната промяна по СЪЩИЯ договор — "=F" е спойка: на 19.10 CL=F (дек.) срещу CL=F отпреди седмица (ноем.) даде +3.96%,
                         # по декемврийския договор е +4.9%. Без серията на договора — по непрекъснатия символ, изрично отбелязано (chg_5d_basis "continuous").
                         und = str(info.get("underlyingSymbol") or "")
+                        if not und and out[name].get("contract_source") == "shortName":     # 26.10.2026: договорът по името — серията му е "<договор>.<борса>"
+                            ex = {"CL": "NYM", "GC": "CMX", "HG": "CMX"}.get(symbol.split("=")[0])
+                            und = f"{out[name]['contract']}.{ex}" if ex else ""
                         if und:
                             ch = yf.Ticker(und).history(period="1mo")
                             if len(ch) >= 6 and not _is_stale(ch.index[-1]):
@@ -469,7 +485,8 @@ def futures_quotes_line(global_signals: dict | None) -> str | None:
             parts.append(f"{label} ${v}{t} — договорът не е известен днес, промяната е по непрекъснатия символ"
                          + (f": {chg:+.1f}% за 5 дни" if isinstance(chg, (int, float)) else ""))
             continue
-        parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}){t}{five}")
+        by_name = ", по името на договора" if g.get("contract_source") == "shortName" else ""        # 26.10.2026: резервът (без underlyingSymbol)
+        parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}{by_name}){t}{five}")
     return ("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): " + " · ".join(parts) + ".") if parts else None
 
 
