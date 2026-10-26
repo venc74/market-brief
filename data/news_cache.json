@@ -1,52 +1,53 @@
 {
- "date": "2026-10-23",
+ "date": "2026-10-26",
  "news": [
   {
-   "headline": "Global tech sell-off sparks flight to safety",
-   "source": "Financial Times",
-   "why": "Бягство към сигурност натиска японски йени и облигации нагоре, докато акциите в Азия следват Wall Street надолу — негативно за рискови активи, позитивно за bonds и yen.",
-   "headline_bg": "Глобалната разпродажба в техно сектора предизвиква бягство към сигурност"
-  },
-  {
-   "headline": "Asian shares wobble as tech rout boosts bonds, dents rate hike bets - Reuters",
-   "source": "Reuters Business",
-   "why": "Технологичната разпродажба намалява залозите за повишения на лихвите, което натиска bond yields надолу и подкрепя облигациите, но тежи на акциите в региона.",
-   "headline_bg": "Азиатските акции се колебаят, тъй като технологичният срив подкрепя облигациите и намалява очакванията за повишение на лихвите"
-  },
-  {
-   "headline": "10-year Treasury yield tumbles below 5% to lowest level in nearly a month",
+   "headline": "Oil slides over 2% as traders weigh Saudi attack risks, demand destruction",
    "source": "CNBC",
-   "why": "Спадът под 5% на 10-годишния Treasury yield сигнализира засилено търсене на безопасни активи и облекчава финансовите условия, което влияе върху оценките на акциите и валутите.",
-   "headline_bg": "Доходността на 10-годишните Treasuries пада под 5% до най-ниското ниво от близо месец"
+   "why": "Спадът натиска надолу енергийния сектор и акциите на петролни компании, облекчава инфлационния натиск върху пазарите, но сигнализира за опасения около търсенето.",
+   "headline_bg": "Петролът пада над 2% докато търговците претеглят рисковете от атака срещу Саудитска Арабия и разрушаване на търсенето"
   },
   {
-   "headline": "Japan's core inflation exceeds BOJ target, cements near-term rate hike chance - Reuters",
+   "headline": "Houthis say they attacked East-West oil pumping stations; No Saudi confirmation - Reuters",
    "source": "Reuters Business",
-   "why": "По-високата от очакваното инфлация циментира вероятността от скорошно повишение на лихвите от BOJ, което е позитивно за йената и японските финансови акции, но негативно за японските облигации.",
-   "headline_bg": "Основната инфлация в Япония надвишава целта на BOJ, укрепвайки шансовете за скорошно повишение на лихвите"
+   "why": "Геополитически риск за петролната инфраструктура в Персийския залив движи волатилността на суровините и енергийните акции нагоре.",
+   "headline_bg": "Хусите твърдят, че са атакували нефтопроводни станции Изток-Запад; Саудитска Арабия не потвърждава"
   },
   {
-   "headline": "Trump invokes Cold War-era Defense Production Act for oil production, refining - Reuters",
-   "source": "Reuters Business",
-   "why": "Използването на Defense Production Act за петролен добив и рафиниране сигнализира регулаторен натиск върху енергийния сектор и може да повлияе на петролните цени и акциите на енергийни компании.",
-   "headline_bg": "Тръмп задейства Закона за военно производство от епохата на Студената война за добив и рафиниране на петрол"
-  },
-  {
-   "headline": "Moderna sheds about $24 billion as cancer vaccine data triggers 'sell-the-news' retreat - Reuters",
-   "source": "Reuters Business",
-   "why": "Разпродажбата тип 'sell-the-news' заличи около $24 млрд пазарна капитализация от Moderna, оказвайки натиск върху биотех сектора и акциите на Merck.",
-   "headline_bg": "Moderna губи около $24 млрд, тъй като данните за ваксината срещу рак предизвикват разпродажба"
-  },
-  {
-   "headline": "US jobless claims fell to 194,000 last week, lowest since July - AP News",
-   "source": "AP Business",
-   "why": ""
-  },
-  {
-   "headline": "Meta stock sinks nearly 7% as AI spend pushes free cash flow negative",
+   "headline": "Stock futures climb as traders try to recover from the S&P 500's losing week: Live updates",
    "source": "CNBC",
-   "why": "Отрицателният свободен паричен поток заради AI разходите тласка Meta надолу с близо 7% и покачва суаповете за кредитен риск до рекордни нива, оказвайки системен натиск върху mega-cap tech.",
-   "headline_bg": "Акциите на Meta потъват с близо 7%, тъй като AI разходите превръщат свободния паричен поток в отрицателен"
+   "why": "Очакваното решение на Fed в сряда е основният катализатор за посоката на широкия пазар тази седмица.",
+   "headline_bg": "Фючърсите на акции растат докато търговците се опитват да се възстановят от губещата седмица на S&P 500"
+  },
+  {
+   "headline": "Investors expect Brazilian stocks, currency to fall after Lula reelected - Reuters",
+   "source": "Reuters Business",
+   "why": "Преизбирането на леви политики в Бразилия натиска надолу бразилския реал и акции на EWZ, с ефект върху EM портфейли и суровинни компании.",
+   "headline_bg": "Инвеститорите очакват спад на бразилските акции и валута след преизбирането на Лула"
+  },
+  {
+   "headline": "Audi defends plans for a $4 billion Georgia plant amid VW restructuring, tariffs",
+   "source": "CNBC",
+   "why": "Тарифната политика на САЩ директно влияе на автомобилния сектор и решенията за капиталови инвестиции на европейски производители.",
+   "headline_bg": "Audi защитава плановете за завод за 4 млрд. долара в Джорджия на фона на преструктурирането на VW и тарифите"
+  },
+  {
+   "headline": "Currency markets subdued ahead of pivotal central bank week - Reuters",
+   "source": "Reuters Business",
+   "why": "Очакванията за решения на множество централни банки едновременно пораждат повишена волатилност в USD, EUR и EM валути.",
+   "headline_bg": "Валутните пазари са сдържани преди ключовата седмица на централните банки"
+  },
+  {
+   "headline": "Trump says Canada tariff deal coming 'soon' at Michigan border rally - Reuters",
+   "source": "Reuters Business",
+   "why": "Потенциална промяна в тарифния режим с Канада засяга CAD, стоманения и автомобилния сектор, както и широки търговски потоци.",
+   "headline_bg": "Тръмп казва, че тарифна сделка с Канада идва 'скоро' на митинг в Мичиган"
+  },
+  {
+   "headline": "What next for France as riots rattle markets? Three questions facing investors ahead of more protests",
+   "source": "CNBC",
+   "why": "Френските протести са избутали доходността на облигациите до 24-годишен връх, с директен риск за европейски банки, бюджетна стабилност и растеж.",
+   "headline_bg": "Какво следва за Франция докато бунтовете разтърсват пазарите? Три въпроса пред инвеститорите"
   }
  ]
 }

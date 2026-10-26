@@ -1,5 +1,5 @@
 {
- "date": "2026-10-23",
+ "date": "2026-10-26",
  "bundle": {
   "moves": [
    {
@@ -558,7 +558,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-23",
+   "data_date": "2026-10-26",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -764,6 +764,23 @@
     "by_cusip": 61,
     "by_name": 2,
     "no_ticker": 0
+   },
+   "filings": {
+    "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",
+    "Бил Акман · Pershing Square": "2026-08-14",
+    "Сет Кларман · Baupost Group": "2026-08-13",
+    "Стенли Дракенмилър · Duquesne Family Office": "2026-08-14",
+    "Чейс Коулман · Tiger Global Management": "2026-08-14",
+    "Крис Хон · TCI Fund Management": "2026-08-14",
+    "Даниел Лоуб · Third Point": "2026-08-14",
+    "Дейвид Тепър · Appaloosa Management": "2026-08-14",
+    "Хауърд Маркс · Oaktree Capital Management": "2026-08-14",
+    "Джон Армитидж · Egerton Capital": "2026-10-20",
+    "Ли Лу · Himalaya Capital Management": "2026-08-14",
+    "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)": "2026-08-13",
+    "Стивън Мандел · Lone Pine Capital": "2026-08-14",
+    "Тери Смит · Fundsmith": "2026-08-14",
+    "Triple Frond Partners": "2026-08-13"
    }
   }
  }
