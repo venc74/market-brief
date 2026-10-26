@@ -417,6 +417,9 @@ def global_market_signals() -> dict:
                     try:
                         info = yf.Ticker(symbol).info
                         out[name].update(futures_contract(info) or {})
+                        if not out[name].get("contract"):              # 26.10.2026 (етап 4б, т. 7): защо договорът липсва — за реда под макро текста
+                            u = (info or {}).get("underlyingSymbol")
+                            out[name]["contract_reason"] = (f"непознат underlyingSymbol ({u})" if u else "Yahoo не върна underlyingSymbol")
                         if _price_time(info):
                             out[name]["price_time_utc"] = _price_time(info)
                         # 19.10.2026 (етап 2, т. 4): 5-дневната промяна по СЪЩИЯ договор — "=F" е спойка: на 19.10 CL=F (дек.) срещу CL=F отпреди седмица (ноем.) даде +3.96%,
@@ -428,6 +431,7 @@ def global_market_signals() -> dict:
                                 l2, w2, _ = last_and_week_ago(ch["Close"])
                                 out[name].update(chg_5d_pct=round((l2 / w2 - 1) * 100, 2), chg_5d_basis="contract")
                     except Exception as e:
+                        out[name].setdefault("contract_reason", f"договорът не се прочете ({type(e).__name__})")
                         print(f"[macro] {name}: договорът не се прочете ({type(e).__name__}: {e}) — 5-дневната промяна е по непрекъснатия символ")
         except Exception as e:
             print(f"[macro] {name} failed: {e}")
@@ -440,12 +444,14 @@ _FUT_LABELS = (("Oil_WTI", "WTI", 2), ("Gold", "злато", 0), ("Copper", "м�
 def futures_quotes_line(global_signals: dict | None) -> str | None:
     """
     19.10.2026: ред от кода под макро текста — фючърсите с договора и часа на цената: "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET". Без данни за договора → None.
+    26.10.2026 (етап 4б, т. 7): договорът неизвестен днес (на 26.10 в 06:20 UTC .info на Yahoo нямаше underlyingSymbol за CL=F, GC=F и HG=F; следобед — пак имаше), а сигналът е от
+    кода от 21.10 насам (chg_5d_basis) → изрично "договорът не е известен днес, промяната е по непрекъснатия символ", не тишина. Стар бриф без chg_5d_basis — без ред, както досега.
     """
     from zoneinfo import ZoneInfo
     parts = []
     for key, label, nd in _FUT_LABELS:
         g = (global_signals or {}).get(key) or {}
-        if not g.get("contract") or g.get("value") is None:
+        if g.get("value") is None or (not g.get("contract") and not g.get("chg_5d_basis")):
             continue
         t = ""
         if g.get("price_time_utc"):
@@ -459,6 +465,10 @@ def futures_quotes_line(global_signals: dict | None) -> str | None:
         five = ("" if not isinstance(chg, (int, float)) else
                 f", {chg:+.1f}% за 5 дни по същия договор" if g.get("chg_5d_basis") == "contract" else
                 f", {chg:+.1f}% за 5 дни по непрекъснатия символ (може да смесва договори)")
+        if not g.get("contract"):
+            parts.append(f"{label} ${v}{t} — договорът не е известен днес, промяната е по непрекъснатия символ"
+                         + (f": {chg:+.1f}% за 5 дни" if isinstance(chg, (int, float)) else ""))
+            continue
         parts.append(f"{label} ${v} — {g['contract_month']} ({g['contract']}){t}{five}")
     return ("Фючърси (Yahoo, договорът, който символът „=F“ дава днес): " + " · ".join(parts) + ".") if parts else None
 

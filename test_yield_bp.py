@@ -46,7 +46,7 @@ old = lambda d: {k: d[k] for k in ("value", "chg_5d_pct")}
 assert old(g["VIX"]) == rec["VIX"] and old(g["MOVE"]) == rec["MOVE"]        # РЕАЛНО: непроменени и съвпадат с брифа
 for n in ("DXY", "Gold", "Oil_WTI", "Copper", "VIX", "MOVE"):
     assert {"value", "chg_5d_pct"} <= set(g[n]) and "chg_5d_bp" not in g[n], n                # само доходността е в б.п.
-    assert set(g[n]) <= {"value", "chg_5d_pct", "bar_date", "contract", "contract_month", "price_time_utc", "chg_5d_basis"}, n   # 19.10: + датата на бара / договорът (WTI)
+    assert set(g[n]) <= {"value", "chg_5d_pct", "bar_date", "contract", "contract_month", "price_time_utc", "chg_5d_basis", "contract_reason"}, n   # 19.10: + датата на бара / договорът (WTI); 26.10: + защо договорът липсва
 print("  ✓ US10Y: 5.24 → {'value': 5.24, 'chg_5d_bp': 7.5}  (стария формат: chg_5d_pct 1.45, същото движение)")
 print("  ✓ VIX 16.39/+4.59% и MOVE 108.13/+3.39% са идентични със записаните в брифа от 02.10; DXY/злато/петрол/мед още са в %")
 

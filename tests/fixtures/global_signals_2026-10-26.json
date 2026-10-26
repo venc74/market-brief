@@ -1,0 +1,45 @@
+{
+ "_note": "РЕАЛНО: macro.global_signals от data/2026-10-26.json — брифът от 26.10.2026 (06:20 UTC): CL=F, GC=F, HG=F без договор (Yahoo .info без underlyingSymbol), chg_5d_basis continuous; извадено на 26.10.2026 (етап 4б, т. 7).",
+ "global_signals": {
+  "DXY": {
+   "value": 101.69,
+   "chg_5d_pct": -0.29,
+   "bar_date": "2026-10-26"
+  },
+  "VIX": {
+   "value": 19.45,
+   "chg_5d_pct": -2.7,
+   "bar_date": "2026-10-23"
+  },
+  "Gold": {
+   "value": 4019.2,
+   "chg_5d_pct": -3.39,
+   "bar_date": "2026-10-26",
+   "chg_5d_basis": "continuous",
+   "price_time_utc": "2026-10-26T06:20+00:00"
+  },
+  "Oil_WTI": {
+   "value": 100.97,
+   "chg_5d_pct": -2.6,
+   "bar_date": "2026-10-26",
+   "chg_5d_basis": "continuous",
+   "price_time_utc": "2026-10-26T06:20+00:00"
+  },
+  "Copper": {
+   "value": 6.49,
+   "chg_5d_pct": -0.74,
+   "bar_date": "2026-10-26",
+   "chg_5d_basis": "continuous",
+   "price_time_utc": "2026-10-26T06:20+00:00"
+  },
+  "US10Y": {
+   "value": 4.99,
+   "chg_5d_bp": -11.0
+  },
+  "MOVE": {
+   "value": 103.31,
+   "chg_5d_pct": 2.19,
+   "bar_date": "2026-10-23"
+  }
+ }
+}

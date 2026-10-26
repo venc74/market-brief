@@ -4,7 +4,11 @@ CLZ26 (дек.); в 07:30 Берлин брифът чете ЖИВАТА цен
 месецът на договора и часът ("WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET") — ред от кода под макро текста и на страницата, и в имейла.
 Т. 4 (отговорите от 19.10): 5-дневната промяна е по СЪЩИЯ договор (CLZ26: +4.76%, а CL=F смесва дек. и ноем.: +3.78%); без серията на договора — изрично "по непрекъснатия символ".
 
-РЕАЛНО: tests/fixtures/yahoo_futures_2026-10-19.json — .info и дневните Close на CL=F, GC=F, HG=F, CLX26.NYM, CLZ26.NYM (yfinance, 19.10.2026 следобед);
+26.10.2026 (етап 4б, т. 7): на 26.10 (06:20 UTC) .info на Yahoo нямаше underlyingSymbol за CL=F, GC=F и HG=F (regularMarketTime — имаше; следобед полето пак беше там: CLZ26.NYM) →
+редът мълчеше, а промяната беше по непрекъснатия символ. Сега: "WTI $100.97, цена от 26.10 02:20 ET — договорът не е известен днес, промяната е по непрекъснатия символ: −2.6% за 5 дни"
+и причината в данните (contract_reason).
+
+РЕАЛНО: tests/fixtures/global_signals_2026-10-26.json — global_signals на брифа от 26.10; tests/fixtures/yahoo_futures_2026-10-19.json — .info и дневните Close на CL=F, GC=F, HG=F, CLX26.NYM, CLZ26.NYM (yfinance, 19.10.2026 следобед);
 tests/fixtures/brief_2026-10-19.json — global_signals от брифа (Oil_WTI 97.45). СИНТЕТИЧНО (маркирано): подмененият yf.Ticker, часът на цената за брифа (01:30 ET).
 Пускане: python test_futures_contract.py
 """
@@ -73,4 +77,30 @@ assert "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET" in fl
 assert "WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET" in flat(render.render_email(b))
 assert ml.futures_quotes_line(B19["macro"]["global_signals"]) is None and "Фючърси (Yahoo" not in flat(render.render_dashboard(copy.deepcopy(B19)))   # стар бриф без договора — без ред
 print("  ✓ 'WTI $97.45 — дек. 2026 (CLZ26), цена от 19.10 01:30 ET · злато …' на страницата и в имейла; стар бриф — без ред")
+
+print()
+print("── 4. договорът не е известен днес (РЕАЛНИЯТ бриф от 26.10) ──")
+G26 = json.loads((ROOT / "tests" / "fixtures" / "global_signals_2026-10-26.json").read_text(encoding="utf-8"))["global_signals"]
+assert G26["Oil_WTI"]["chg_5d_basis"] == "continuous" and "contract" not in G26["Oil_WTI"] and G26["Oil_WTI"]["value"] == 100.97
+l26 = ml.futures_quotes_line(G26)
+assert ("WTI $100.97, цена от 26.10 02:20 ET — договорът не е известен днес, промяната е по непрекъснатия символ: -2.6% за 5 дни · злато $4 019, цена от 26.10 02:20 ET — договорът "
+        "не е известен днес") in l26
+b26 = copy.deepcopy(B19); b26["macro"]["global_signals"] = G26
+assert "WTI $100.97, цена от 26.10 02:20 ET — договорът не е известен днес" in flat(render.render_dashboard(copy.deepcopy(b26))) and "договорът не е известен днес" in flat(render.render_email(b26))
+mixed = copy.deepcopy(G26); mixed["Gold"].update(contract="GCZ26", contract_month="дек. 2026", chg_5d_basis="contract")      # СИНТЕТИЧНО: единият с договор
+assert "злато $4 019 — дек. 2026 (GCZ26), цена от 26.10 02:20 ET" in ml.futures_quotes_line(mixed) and "WTI $100.97, цена от 26.10 02:20 ET — договорът не е известен днес" in ml.futures_quotes_line(mixed)
+print("  ✓", l26[:150], "…")
+no_und = {k: v for k, v in FX["info"]["CL=F"].items() if k != "underlyingSymbol"}                                     # СИНТЕТИЧНО: РЕАЛНОТО .info от 19.10 без underlyingSymbol
+class Tk2(Tk):
+    @property
+    def info(self): return no_und if self.s == "CL=F" else FX["info"].get(self.s, {})
+ml.yf.Ticker, ml._is_stale = Tk2, (lambda ts: False)
+try:
+    with contextlib.redirect_stdout(io.StringIO()):
+        g2 = ml.global_market_signals()
+finally:
+    ml.yf.Ticker, ml._is_stale = real_tk, real_stale
+assert "contract" not in g2["Oil_WTI"] and g2["Oil_WTI"]["chg_5d_basis"] == "continuous" and g2["Oil_WTI"]["contract_reason"] == "Yahoo не върна underlyingSymbol"
+assert g2["Oil_WTI"]["price_time_utc"].startswith("2026-10-19") and "contract_reason" not in g2["Gold"]
+print("  ✓ .info без underlyingSymbol → без договор, chg_5d_basis continuous, contract_reason 'Yahoo не върна underlyingSymbol'; часът на цената остава")
 print("\n✅ test_futures_contract: всичко мина")
