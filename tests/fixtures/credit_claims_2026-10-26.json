@@ -1,0 +1,851 @@
+{
+ "_note": "РЕАЛНО: термометърът (indicators, overrides) и макро текстът (ai_macro.macro_brief, regime_comment) от data/<дата>.json на брифовете 08.09, 15.10, 19.10, 20.10, 21.10, 22.10, 23.10 и 26.10.2026 (извадено на 26.10.2026, етап 4б, т. 4). От 21.10 индикаторът IEI/HYG носи iei_10d_pct / hyg_10d_pct; за 08.09, 15.10, 19.10 и 20.10 те са ДОБАВЕНИ от реалните дневни Close на IEI и HYG от Yahoo (yf.Ticker(...).history, свалени 26.10.2026, 10 сесии до as_of / предишната сесия) — същата формула като thermometer._evaluate_credit_spread; на 21–26.10 сметката съвпада с полето до 0.01. Ключ legs_added: true отбелязва добавените.",
+ "briefs": {
+  "2026-09-08": {
+   "thermometer": {
+    "regime": "Offensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 770.19,
+      "ma50": 756.86,
+      "ma200": 709.87,
+      "above_50dma": true,
+      "above_200dma": true,
+      "status": "green",
+      "label": "SPY 770 | над 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 15.3,
+      "chg_5d": 0.38,
+      "pct_5d": 2.5,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 15.3 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.47,
+      "status": "green",
+      "label": "P/C 1.47"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.41,
+      "status": "green",
+      "label": "0.41% (нормален, steepening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": null,
+      "status": "yellow",
+      "hide": true,
+      "label": ""
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": null,
+      "status": "yellow",
+      "hide": true,
+      "label": ""
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": null,
+      "status": "yellow",
+      "hide": true,
+      "label": ""
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": null,
+      "status": "yellow",
+      "hide": true,
+      "label": "",
+      "iei_10d_pct": -0.33,
+      "hyg_10d_pct": -0.02
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 43.9,
+      "universe_size": 902,
+      "status": "green",
+      "label": "43.9% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": []
+   },
+   "legs_added": true,
+   "macro_brief": "Oil WTI скочи с 8.69% за 5 дни до $93.21 — движение от тази магнитуда сигнализира или геополитически supply shock, или агресивно OPEC+ орязване, и директно boost-ва XLE и енергийните earnings estimates. Паралелно Gold е на $4476 (+1.01% за 5д) при слаб DXY (98.81, -0.62% за 5д) — класическата комбинация от dollar debasement + risk hedging, която задвижва GDX и precious metals miners. Copper +2.98% за 5д затвърждава, че това не е pure fear trade — има реална cyclical demand компонента, особено от Китай и electrification. SPY на 770 е над 50DMA (756.86) и 200DMA (709.87), VIX на 15.3 е в risk-on зона без spike, 2s10s спредът е +0.41% и steepening — macro backdrop остава конструктивен за риск активи въпреки energy инфлационния натиск. Breadth на 43.9% над 40DMA от 902-акционен universe потвърждава, че ралито не е тесен mega-cap феномен. Основният риск за деня: oil-driven инфлационни опасения могат да притиснат growth/tech и да накарат пазара да преосмисли Fed pivot timeline.",
+   "regime_comment": "Offensive режимът е оправдан от петте видими индикатора — SPY над двете движещи средни, VIX в risk-on зона без spike, P/C ratio на 1.47 (стандартно elevated, не extreme fear), steepening 2s10s, и breadth на 43.9% над 40DMA. Увереността в режима обаче е намалена с ~20-25% поради четири скрити/null индикатора: Fed Net Liquidity, MOVE (Bond Vol), VIX Term Structure, и IEI/HYG Credit Spread. Критично: MOVE би потвърдил или опровергал дали oil spike транслира в bond market stress; IEI/HYG е единственият real-time credit stress gauge, и без него не може да се изключи скрита deterioration под повърхността. VIX Term Structure при contango потвърждава risk-on; при backwardation — пазарът pricing near-term hedging demand, което би влошило картината. Специфично притеснение: oil WTI +8.69% за 5д при GPT-forward inflation re-pricing може да е incipient stagflation signal — ситуация, при която SPY остава над moving averages краткосрочно, но Offensive режимът се разгражда отвътре. При пълни данни е възможно режимът да е по-точно Neutral-to-Offensive, не full Offensive. Sizing factor 1.0 е приемлив, но позиционирането трябва да фаворизира commodity/defensives (XLE, GDX, XLV) и да избягва growth/duration longs (SMH, XLRE, TAN) до потвърждение от credit spreads."
+  },
+  "2026-10-15": {
+   "thermometer": {
+    "regime": "Offensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 769.6,
+      "pct_from_high": 1.22,
+      "ma50": 767.39,
+      "ma200": 721.02,
+      "above_50dma": true,
+      "above_200dma": true,
+      "status": "green",
+      "label": "SPY 770 | над 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 16.87,
+      "chg_5d": 1.79,
+      "pct_5d": 11.9,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 16.9 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.09,
+      "percentile": 39.5,
+      "history_days": 86,
+      "status": "yellow",
+      "label": "P/C 1.09 (40. percentile от 86 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.37,
+      "status": "green",
+      "label": "0.37% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5859.4,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": -0.63,
+      "as_of": "2026-10-07",
+      "label": "$5,859 млрд към 2026-10-07 · -0.6% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 99.1,
+      "delta_1w": -3.5,
+      "spike": false,
+      "status": "green",
+      "label": "MOVE 99 (-4 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.776,
+      "status": "green",
+      "label": "VIX9D 14.6 / VIX 16.9 / VIX3M 18.8 → ratio 0.78 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4792,
+      "level_percentile": 18.7,
+      "roc_10d_pct": 0.56,
+      "roc_percentile": 87.7,
+      "spike": false,
+      "status": "green",
+      "roc_10d_pct_prev": 0.79,
+      "roc_trend": "falling",
+      "roc_trend_text": "10-дневната RoC е +0.56% срещу +0.79% преди 5 сесии — спада (забавя се)",
+      "label": "IEI/HYG 1.479 (19. percentile) · 10д RoC +0.6% (88. percentile)",
+      "iei_10d_pct": 0.48,
+      "hyg_10d_pct": -0.08
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 34.6,
+      "universe_size": 902,
+      "status": "yellow",
+      "label": "34.6% над 40dMA (слаба/тясна ширина) · ⚠ разминаване: SPY е на 1.2% от 52-седм. връх, а ширината е под 40%",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.",
+      "divergence": true
+     }
+    ],
+    "overrides": []
+   },
+   "legs_added": true,
+   "macro_brief": "Септемврийският CPI удари 3.7% — над консенсуса — и задейства глобален разпродаж: Nikkei -5%, Kospi спря търговия, semiconductor акции с двуцифрени загуби в Азия. Fed's Daly сигнализира допълнителни повишения на лихвите, но без спешност, което смекчи краткосрочната паника, без да я погаси — US10Y стои на 5.19% след спад от само 8.7 б.п. за седмицата, а 2s10s се сплескаот 0.51 на 0.37% (−14 б.п. за седмица), т.е. кривата реагира с flattening, не с нормализация. Хусите атакуваха Saudi Aramco HQ и кораб потъна в Хормузкия проток — геополитическата ескалация натиска петрола нагоре (WTI +2.85% за 5 дни, на $94.1), а XLE RS е на 6-месечен връх. Dallas Fed Trimmed Mean PCE за август е 2.19% г/г и средното за юни–август (2.25%) пада спрямо март–май (2.39%) — основната инфлация се движи надолу, което прави скока в CPI headline тревожен, но не окончателно потвърден структурен обрат; пазарът обаче го цени като такъв. Fannie Mae рязко вдигна прогнозата за ипотечни лихви за 2027, а 10-годишната доходност от 5.19% задържа натиска върху XLRE и rate-sensitive сектори.",
+   "regime_comment": "Режимът Offensive е технически оправдан от броенето: 6 зелени / 2 жълти / 0 червени от 8 видими индикатора — правилото изисква поне 4 зелени, 0 червени и поне 6 видими, и всички условия са изпълнени. Нито един override (VIX, MOVE, IEI/HYG) не е активен. Увереността обаче носи две реални пукнатини. Първо, Market Breadth е на 34.6% над 40dMA при SPY само на 1.2% от 52-седмичния връх — разминаването е флагирано директно в данните: ралито е тясно и концентрирано, не широко, което исторически намалява издръжливостта на тренда. Второ, горещият CPI (3.7%) предизвика глобален разпродаж и Fed hawkish рекалибриране — ако напрежението се пренесе в US сесията и задвижи credit spreads или VIX нагоре, системата може да получи нови жълти или дори червени показания, но към момента на данните IEI/HYG е на 18.7-и percentile (ниско ниво на credit stress) с RoC, която се забавя (+0.56% срещу +0.79% преди 5 сесии), а MOVE падна с 3.5 пункта за седмица. Режимът се поддържа, но работи с намален запас от сигурност: широчината е слаба, макро шумът е висок, и exit_rule не изисква нищо повече от броенето — ако един зелен стане червен при 0 червени сега, системата пак остава Offensive; нужни са 2 червени за Defensive."
+  },
+  "2026-10-19": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 763.25,
+      "as_of": "2026-10-16",
+      "pct_from_high": 2.03,
+      "ma50": 767.4,
+      "ma200": 721.88,
+      "above_50dma": false,
+      "above_200dma": true,
+      "status": "yellow",
+      "label": "SPY 763 | под 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 19.99,
+      "chg_5d": 5.15,
+      "pct_5d": 34.7,
+      "spike": true,
+      "status": "red",
+      "label": "VIX 20.0 (risk-off) ⚠ рязък скок"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.26,
+      "percentile": 78.4,
+      "history_days": 88,
+      "status": "yellow",
+      "label": "P/C 1.26 (78. percentile от 88 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.35,
+      "status": "green",
+      "label": "0.35% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5869.6,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 2.09,
+      "as_of": "2026-10-14",
+      "label": "$5,870 млрд към 2026-10-14 · +2.1% за 4 седмици (над +1%) · седмицата е зелена, цветът се сменя след 2 поредни · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": -1.0,
+      "status": "green",
+      "informational": true,
+      "percentile": 75.3,
+      "zscore": 0.33,
+      "as_of": "2026-10-15",
+      "label": "-1.0 б.п. към 15.10 (SOFR 3.89% − IORB 3.90%) · +2.0 б.п. за седмица · 75. percentile, z +0.3 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 101.1,
+      "as_of": "2026-10-16",
+      "delta_1w": 2.6,
+      "spike": false,
+      "status": "yellow",
+      "label": "MOVE 101 (+3 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.981,
+      "status": "green",
+      "label": "VIX9D 20.1 / VIX 20.0 / VIX3M 20.5 → ratio 0.98 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4863,
+      "as_of": "2026-10-16",
+      "level_percentile": 22.6,
+      "roc_10d_pct": 1.01,
+      "roc_percentile": 94.6,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 0.41,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +1.01% срещу +0.41% преди 5 сесии — расте (ускорява се)",
+      "label": "IEI/HYG 1.486 (23. percentile) · 10д RoC +1.0% (95. percentile) ⚠ рязък credit spread spike",
+      "iei_10d_pct": 0.95,
+      "hyg_10d_pct": -0.07
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 45.8,
+      "universe_size": 902,
+      "status": "green",
+      "label": "45.8% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+1.0% за 10д, 95. percentile) — рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 95.) да е под 90. percentile два поредни дни (хистерезис — в момента 2/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": true,
+   "macro_brief": "SPY е под 50DMA (763 срещу 767), но над 200DMA (722) — пазарът е в корекционна фаза, не в мечи тренд. Ключовият стрес идва от кредитните спредове: IEI/HYG 10-дневната RoC е на 95. percentile и се ускорява (+1.01% срещу +0.41% преди 5 сесии), а VIX скочи с 34.7% за 5 дни до 19.99 — комбинация, която сигнализира засилено risk-off преструктуриране. US10Y падна с 14.6 б.п. за седмицата до 5.1% — bid в трежъритата съпътства flight-to-quality, но MOVE е на 101 (+3 пункта за седмицата), което показва, че пазарите на облигации остават нервни. Геополитически: Reuters съобщава за потенциален Trump waiver на санкциите срещу Русия, което натисна петрола въпреки WTI в момента на 97.45 (+3.96% за 5 дни) — тук има вътрешно напрежение между по-ниски геополитически рискове и реалното ниво на цените. Политическата криза във Франция (насилствени протести срещу бюджетни съкращения) натиска еврото и повишава суверенния риск в еврозоната, докато China Q3 GDP от 4.5% надмина очакванията — позитивен сигнал за глобалното търсене, но Copper е -1.29% за 5 дни, което засега не потвърждава оптимизма. Основната инфлация (Dallas Fed Trimmed Mean PCE) е 2.19% за август и посоката е надолу (средно юни–август 2.25% срещу март–май 2.39%), което дава на Fed пространство, но задълбочаващата се глобална хранителна инфлация и петролните нива усложняват картината.",
+   "regime_comment": "Defensive режимът е напълно оправдан от данните. Основният trigger е IEI/HYG credit spread spike: 10-дневната RoC е на 95. percentile и се ускорява (+1.01% срещу +0.41% преди 5 сесии) — автоматичен override, независим от броенето. VIX е втори червен индикатор (скок от 34.7% за 5 дни). По броенето: 3 зелени / 3 жълти / 2 червени от 8 видими — правилото изисква 0 червени за Offensive, така че дори без override-а режимът по броенето е Defensive. Смекчаващи фактори съществуват: Market Breadth е здравословна (45.8% над 40DMA), VIX term structure е в contango (0.98), 2Y/10Y спредът е нормален (0.35%), а основната инфлация върви надолу (2.19%, август). SPY е над 200DMA — не е мечи тренд. Override пада само когато IEI/HYG 10-дневната RoC percentile е под 90. percentile два поредни дни; при текущото ускоряване на RoC това не е близо. Distribution days (SPY 8/9, QQQ 7/9) допълнително блокират евентуален Offensive. Няма индикатори с null/nan стойности — увереността в режима е висока. Единственото напрежение в оценката е, че breadth и term structure не потвърждават системен стрес, но override-ът не изисква системен стрес — достатъчен е credit spread spike от тази величина."
+  },
+  "2026-10-20": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 766.48,
+      "as_of": "2026-10-19",
+      "pct_from_high": 1.62,
+      "ma50": 767.3,
+      "ma200": 722.33,
+      "above_50dma": false,
+      "above_200dma": true,
+      "status": "yellow",
+      "label": "SPY 766 | под 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 18.44,
+      "chg_5d": 3.23,
+      "pct_5d": 21.2,
+      "spike": true,
+      "status": "red",
+      "label": "VIX 18.4 (risk-off) ⚠ рязък скок"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.11,
+      "percentile": 41.6,
+      "history_days": 89,
+      "status": "yellow",
+      "label": "P/C 1.11 (42. percentile от 89 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.38,
+      "status": "green",
+      "label": "0.38% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5869.6,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 2.09,
+      "as_of": "2026-10-14",
+      "label": "$5,870 млрд към 2026-10-14 · +2.1% за 4 седмици (над +1%) · седмицата е зелена, цветът се сменя след 2 поредни · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": -2.0,
+      "status": "green",
+      "informational": true,
+      "percentile": 68.2,
+      "zscore": 0.22,
+      "as_of": "2026-10-16",
+      "label": "-2.0 б.п. към 16.10 (SOFR 3.88% − IORB 3.90%) · +1.0 б.п. за седмица · 68. percentile, z +0.2 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 101.3,
+      "as_of": "2026-10-19",
+      "delta_1w": 2.8,
+      "spike": false,
+      "status": "yellow",
+      "label": "MOVE 101 (+3 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.915,
+      "status": "green",
+      "label": "VIX9D 17.9 / VIX 18.4 / VIX3M 19.6 → ratio 0.91 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4838,
+      "as_of": "2026-10-19",
+      "level_percentile": 20.8,
+      "roc_10d_pct": 0.93,
+      "roc_percentile": 93.7,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 0.24,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +0.93% срещу +0.24% преди 5 сесии — расте (ускорява се)",
+      "label": "IEI/HYG 1.484 (21. percentile) · 10д RoC +0.9% (94. percentile) ⚠ рязък credit spread spike",
+      "iei_10d_pct": 0.73,
+      "hyg_10d_pct": -0.19
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 45.4,
+      "universe_size": 901,
+      "status": "green",
+      "label": "45.4% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+0.9% за 10д, 94. percentile) — рязко разширяване на credit risk premium, автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 94.) да е под 90. percentile два поредни дни (хистерезис — в момента 0/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": true,
+   "macro_brief": "SPY затваря под 50DMA (766.48 срещу MA50 767.3) при VIX скочил 21.2% за 5 дни до 18.44 — двойно потвърждение за risk-off, като IEI/HYG 10-дневната RoC ускорява от +0.24% до +0.93% (94-ти percentile) и задейства автоматичния Defensive override. Brent се задържа близо до петмесечен връх заради Иран, WTI +4.97% за седмица до $98.82 — петролният импулс е реален, но Oil-driven inflation risk се сблъсква с Dallas Fed Trimmed Mean PCE за август 2.19% г/г, тренд надолу (avg_recent 2.25% срещу avg_prior 2.39%), тоест пазарният сигнал за инфлационен натиск засега не е потвърден от базовата инфлация. US10Y падна 10.4 б.п. за седмицата до 5.14% — облигациите поемат bid при equity разпродажбата, а 2s10s спредът се сви с 6 б.п. до 38 б.п. (flattening). Китай ускори БВП в Q3 на гърба на износа, но остави лихвите непроменени за 17-ти пореден месец — ограничено вътрешно стимулиране, Copper -1.81% потвърждава скептицизма за industrial demand. Distribution days SPY 8/9, QQQ 6/9 — институционалното предлагане е плътно, а пространството преди блокиране на Offensive режима е минимално.",
+   "regime_comment": "Defensive режимът е оправдан и добре подкрепен от данните. Първичният trigger е IEI/HYG override: 10-дневната RoC +0.93% е на 94-ти percentile и ускорява (преди 5 сесии беше +0.24%) — credit risk premium се разширява с нарастваща скорост, не забавя. Override пада единствено когато 10-дневната RoC percentile слезе под 90-ти percentile два поредни дни (хистерезис в момента 0/2); без нов скок exit_rule посочва около 10 дни прозорец — тоест прозорецът е на изчислението, не непременно реално успокояване на кредитния пазар. По броенето: 3 зелени (2Y/10Y спред, VIX Term Structure, Market Breadth) / 3 жълти (SPY тренд, Put/Call, MOVE) / 2 червени (VIX, IEI/HYG) от 8 видими — дори без override, 2 червени индикатора са достатъчни за Defensive по правилото (нужни са 0 червени и минимум 4 зелени за Offensive). По броенето: 3 зелени (2Y/10Y спред, VIX Term Structure, Market Breadth (% над 40dMA)) / 3 жълти (SPY тренд, Put/Call (SPY), MOVE (Bond Vol)) / 2 червени (VIX, IEI/HYG (Credit Spread)) от 8 видими; НЕ се броят (информативни): Fed Net Liquidity, SOFR − IORB (финансиране). До Cash: още 1 червен. Distribution days SPY 8/9 — при 9 Offensive се блокира дори ако останалите условия се изпълнят. Няма противоречия в данните: VIX term structure в contango (ratio 0.91) и Market Breadth 45.4% са конструктивни сигнали, но те не отменят двата червени индикатора — системата изисква консенсус, не мнозинство. Fed Net Liquidity (+2.09% за 4 седмици към 14.10) и SOFR−IORB (-2.0 б.п., 68-ми percentile към 16.10) са информативни и не влизат в броенето. Увереността в Defensive е висока — режимът е форсиран от активен override с ускоряваща RoC, потвърден от броенето и от distribution day картината."
+  },
+  "2026-10-21": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 769.05,
+      "as_of": "2026-10-20",
+      "pct_from_high": 1.29,
+      "ma50": 767.26,
+      "ma200": 722.78,
+      "above_50dma": true,
+      "above_200dma": true,
+      "status": "green",
+      "label": "SPY 769 | над 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 17.31,
+      "chg_5d": 2.04,
+      "pct_5d": 13.4,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 17.3 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 0.97,
+      "percentile": 15.6,
+      "history_days": 90,
+      "status": "yellow",
+      "label": "P/C 0.97 (16. percentile от 90 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.33,
+      "status": "green",
+      "label": "0.33% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5869.6,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 2.09,
+      "as_of": "2026-10-14",
+      "label": "$5,870 млрд към 2026-10-14 · +2.1% за 4 седмици (над +1%) · седмицата е зелена, цветът се сменя след 2 поредни · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": -3.0,
+      "status": "green",
+      "informational": true,
+      "percentile": 62.4,
+      "zscore": 0.12,
+      "as_of": "2026-10-19",
+      "label": "-3.0 б.п. към 19.10 (SOFR 3.87% − IORB 3.90%) · +0.0 б.п. за седмица · 62. percentile, z +0.1 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 101.7,
+      "as_of": "2026-10-20",
+      "delta_1w": 0.6,
+      "spike": false,
+      "status": "yellow",
+      "label": "MOVE 102 (+1 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.857,
+      "status": "green",
+      "label": "VIX9D 16.3 / VIX 17.3 / VIX3M 19.0 → ratio 0.86 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4841,
+      "as_of": "2026-10-20",
+      "level_percentile": 21.2,
+      "roc_10d_pct": 1.19,
+      "roc_percentile": 96.2,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 0.3,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +1.19% срещу +0.30% преди 5 сесии — расте (ускорява се)",
+      "iei_10d_pct": 0.61,
+      "hyg_10d_pct": -0.57,
+      "label": "IEI/HYG 1.484 (21. percentile) · 10д RoC +1.2% (IEI +0.6%, HYG -0.6%) (96. percentile) ⚠ рязък скок (лихви + кредит)"
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 54.0,
+      "universe_size": 902,
+      "status": "green",
+      "label": "54.0% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+1.2% за 10д: IEI +0.6%, HYG -0.6%, 96. percentile) — рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 96.) да е под 90. percentile два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": false,
+   "macro_brief": "SPY затваря на 769 — само 1.29% под своя 52-седмичен връх — с 5 зелени индикатора срещу 2 жълти и 1 червен, но IEI/HYG 10-дневната RoC скача до 96-ия percentile (+1.19% срещу +0.30% преди 5 сесии, ускорява се), което задейства автоматичен Defensive override и sizing −50%. US10Y пада с 10 б.п. за седмицата до 5.12%, но спредът IEI/HYG разширява, защото HYG губи −0.57% за 10 дни — пазарът диференцира между правителствен риск и кредитен риск, не търси убежище в облигации изобщо. Петролът (CLZ26) скача +5.41% за 5 дни до $98.98 на фона на Близкоизточни рискове за доставките — директна подкрепа за XLE; United Airlines едновременно снижава прогнозата за 2026 заради горивни разходи, което потвърждава механизма от двете страни (производители печелят, авиация губи). TSLA/SpaceX merger комитети и Anthropic загуба от $80+ млрд. за полугодие добавят волатилност в технологичния сектор, докато SMH и XLK вече губят −9.55% и −4.99% RS за 4 седмици. Dallas Fed Trimmed Mean PCE за август е 2.19% г/г (средно за юни–август 2.25%, срещу 2.39% за март–май) — основната инфлация се забавя, което е разминаване с инфлационния натиск, внушен от петрола и XLE лидерството; тарифното дело срещу 50% канадски мита добавя неопределеност за веригите на доставки, но засега пазарът не е включил това в credit spreads.",
+   "regime_comment": "Defensive режимът е оправдан с висока увереност. Задействащият механизъм е еднозначен: IEI/HYG 10-дневната RoC е на 96-ия percentile — ускорява се от +0.30% преди 5 сесии до +1.19% сега, IEI +0.61%, HYG −0.57% за 10 дни. Съставът на движението (Treasury-та поскъпват, HY облигации поевтиняват) означава, че пазарът излиза от кредитен риск, не просто реагира на лихвен шок — override-ът е адекватен. Останалите 5 от 8 видими индикатора са зелени (SPY тренд, VIX, 2Y/10Y спред, VIX Term Structure, Market Breadth), което означава, че широкият пазар все още не е в разпределение — но именно това е моментът, когато credit lead signal има стойност: кредитните spreads исторически водят equity. IEI/HYG level percentile е само на 21.2-ия percentile — абсолютното ниво не е екстремно — но скоростта на движение (96-ия percentile на RoC) е сигналът, не нивото. Единственото противоречие: market breadth 54% и SPY само 1.29% под върха не показват видим equity стрес, VIX 17.31 е в risk-on зона, а 2s10s се flattening нормално. Но режимът не изисква всички индикатори да са червени — достатъчно е един override да е активен. За отмяна: 10-дневната RoC percentile трябва да слезе под 90-ия percentile два поредни дни (хистерезис — в момента 0 от 2 дни под прага са изпълнени); след това режимът се определя от броенето, което в момента също дава Defensive (1 червен). За Offensive е необходимо: 0 червени по броенето и distribution days SPY под 9 (сега 7/9, липсват 2). Без нов скок в RoC override-ът пада в рамките на около 10 дни — но това е прозорецът на изчислението, не гаранция за реално успокояване на credit spreads."
+  },
+  "2026-10-22": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 773.09,
+      "as_of": "2026-10-21",
+      "pct_from_high": 0.77,
+      "ma50": 767.35,
+      "ma200": 723.24,
+      "above_50dma": true,
+      "above_200dma": true,
+      "status": "green",
+      "label": "SPY 773 | над 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 16.68,
+      "chg_5d": -0.19,
+      "pct_5d": -1.1,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 16.7 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.04,
+      "percentile": 31.9,
+      "history_days": 91,
+      "status": "yellow",
+      "label": "P/C 1.04 (32. percentile от 91 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.32,
+      "status": "green",
+      "label": "0.32% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5869.6,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 2.09,
+      "as_of": "2026-10-14",
+      "label": "$5,870 млрд към 2026-10-14 · +2.1% за 4 седмици (над +1%) · седмицата е зелена, цветът се сменя след 2 поредни · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": -2.0,
+      "status": "green",
+      "informational": true,
+      "percentile": 68.3,
+      "zscore": 0.22,
+      "as_of": "2026-10-20",
+      "label": "-2.0 б.п. към 20.10 (SOFR 3.88% − IORB 3.90%) · -1.0 б.п. за седмица · 68. percentile, z +0.2 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 95.9,
+      "as_of": "2026-10-21",
+      "delta_1w": -3.1,
+      "spike": false,
+      "status": "green",
+      "label": "MOVE 96 (-3 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.827,
+      "status": "green",
+      "label": "VIX9D 15.5 / VIX 16.7 / VIX3M 18.7 → ratio 0.83 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4805,
+      "as_of": "2026-10-21",
+      "level_percentile": 19.6,
+      "roc_10d_pct": 0.78,
+      "roc_percentile": 90.3,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 0.56,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +0.78% срещу +0.56% преди 5 сесии — расте (ускорява се)",
+      "iei_10d_pct": 0.52,
+      "hyg_10d_pct": -0.26,
+      "label": "IEI/HYG 1.481 (20. percentile) · 10д RoC +0.8% (IEI +0.5%, HYG -0.3%) (90.3 percentile) ⚠ рязък скок (лихви + кредит)"
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 56.5,
+      "universe_size": 902,
+      "status": "green",
+      "label": "56.5% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+0.8% за 10д: IEI +0.5%, HYG -0.3%, 90.3 percentile) — рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 90.3) да е под 90. percentile два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": false,
+   "macro_brief": "Геополитическото напрежение около Иран — евакуация на американски дипломати от Саудитска Арабия и информация за обмисляни удари срещу Иран — изстреля WTI с +2.52% за 5 дни до $98.93 (декемврийски контракт), което директно натиска инфлационните очаквания нагоре и усложнява позицията на Fed; US10Y падна с 4.4 б.п. до 5.15%, но остава на исторически повишено ниво. Рали в петрола потисна златото с -1.59% (GCZ26 до $4,103.9) — пазарът преценява, че по-скъпото гориво задържа реалните лихви нагоре, логика потвърдена от Reuters. Разминаване: Dallas Fed Trimmed Mean PCE за август е 2.19% г/г, с посока надолу (средно юни–август 2.25% срещу март–май 2.39%), т.е. основната инфлация реално пада — петролният шок е пазарен сигнал за бъдещ риск, не потвърдена ускоряваща се инфлация. Meta отчете силен приход и прогноза след затваряне, Tesla победи очакванията, но Southwest срязва прогнозата за 2026 заради горивни разходи — трета голяма авиокомпания с такъв ход за месеца, секторен сигнал за свиване на маржовете в авиацията. CSI 300 е в мечи пазар (-20% от юнския връх), което добавя негативен фон за EM и суровини с китайска експозиция като медта (-1.17%, HGZ26 $6.48). DXY се стабилизира на 101.6 след пауза в спада (-0.4% за 5 дни), а MOVE се свали с 3.15% до 95.94 — bond vol вече не е в режим на паника, но IEI/HYG credit spread RoC ускорява (+0.78% срещу +0.56% преди 5 сесии, 90.3 percentile), което поддържа Defensive режима активен.",
+   "regime_comment": "Defensive режимът е оправдан и конкретно произтича от един механизъм: IEI/HYG 10-дневната RoC е на 90.3 percentile и освен това ускорява (+0.78% срещу +0.56% преди 5 сесии) — override-ът е активен и режимът е Defensive независимо от броенето по останалите индикатори. Броенето само по себе си също дава Defensive: 6 зелени, 1 жълт (Put/Call), 1 червен (IEI/HYG) от 8 видими — един червен е достатъчен за Defensive по правилото. Останалите индикатори не противоречат на режима: SPY е над 50DMA и 200DMA, VIX е на 16.7 в contango, MOVE падна с 3.1 пункта до 95.9, Market Breadth е 56.5% над 40DMA, 2Y/10Y спред е нормален на 0.32% — всичко това е конструктивен фон, но не отменя override-а. Потенциалното противоречие е там: фундаменталният equity фон е здравословен, а credit spread скокът идва от покачване на IEI (лихвен компонент, +0.52% за 10 дни) при лек спад на HYG (-0.26%), не от класическо кредитно влошаване — може да отразява лихвена волатилност повече от реален credit stress. Override-ът пада, когато RoC percentile e под 90 два поредни дни (хистерезис — изминали дни под прага: 0 от нужните 2); след това режимът се определя от броенето, което в момента дава Defensive (1 червен). За Offensive са нужни: 0 червени индикатора, поне 4 зелени, поне 6 видими, и distribution days SPY под 9 (сега 6/9 — липсват 3 за блокиране). Увереността в Defensive е висока: и override-ът, и броенето, и distribution days конвергират в една посока; единственото смекчаващо обстоятелство е, че IEI/HYG кредитното движение е лихвено по природа, а не класически credit spread разширяващ се от корпоративен риск — факт, който не отменя сигнала, но задава контекст при интерпретацията."
+  },
+  "2026-10-23": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 763.96,
+      "as_of": "2026-10-22",
+      "pct_from_high": 1.94,
+      "ma50": 767.22,
+      "ma200": 723.62,
+      "above_50dma": false,
+      "above_200dma": true,
+      "status": "yellow",
+      "label": "SPY 764 | под 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 19.03,
+      "chg_5d": 2.57,
+      "pct_5d": 15.6,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 19.0 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.07,
+      "percentile": 35.9,
+      "history_days": 92,
+      "status": "yellow",
+      "label": "P/C 1.07 (36. percentile от 92 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.31,
+      "status": "green",
+      "label": "0.31% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5808.2,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 0.14,
+      "as_of": "2026-10-21",
+      "label": "$5,808 млрд към 2026-10-21 · +0.1% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": -2.0,
+      "status": "green",
+      "informational": true,
+      "percentile": 68.3,
+      "zscore": 0.22,
+      "as_of": "2026-10-21",
+      "label": "-2.0 б.п. към 21.10 (SOFR 3.88% − IORB 3.90%) · +0.0 б.п. за седмица · 68. percentile, z +0.2 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 106.8,
+      "as_of": "2026-10-22",
+      "delta_1w": 4.3,
+      "spike": false,
+      "status": "yellow",
+      "label": "MOVE 107 (+4 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.937,
+      "status": "green",
+      "label": "VIX9D 18.9 / VIX 19.0 / VIX3M 20.1 → ratio 0.94 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4888,
+      "as_of": "2026-10-22",
+      "level_percentile": 24.2,
+      "roc_10d_pct": 1.13,
+      "roc_percentile": 95.6,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 0.31,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +1.13% срещу +0.31% преди 5 сесии — расте (ускорява се)",
+      "iei_10d_pct": 1.07,
+      "hyg_10d_pct": -0.05,
+      "label": "IEI/HYG 1.489 (24. percentile) · 10д RoC +1.1% (IEI +1.1%, HYG -0.1%) (96. percentile) ⚠ рязък скок (лихви + кредит)"
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 61.9,
+      "universe_size": 902,
+      "status": "green",
+      "universe_total": 903,
+      "missing_n": 1,
+      "batches": 19,
+      "batches_failed": 0,
+      "label": "61.9% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+1.1% за 10д: IEI +1.1%, HYG -0.1%, 96. percentile) — рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 96.) да е под 90. percentile два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": false,
+   "macro_brief": "Глобалната tech разпродажба — ускорена от Meta (-7% на отрицателен FCF при AI разходи) и широкия азиатски sell-off — изпрати капитали към безопасни активи: 10-годишният Treasury yield падна под 5% (сега 4.95%, -13.6 б.п. за 5 дни), което облекчава финансовите условия, но сигнализира defensive позициониране, а не risk-on. IEI/HYG 10-дневната RoC е +1.13% срещу +0.31% преди 5 сесии — ускорява се и стои на 96-ти percentile — кредитният пазар потвърждава стреса, не го опровергава, въпреки спада на yields. Злато -3.62% и мед -2.00% за 5 дни при DXY стабилен (-0.15%) изглежда като разпродажба на позиции в commodities, не като нов risk-on импулс; WTI +1.36% е подкрепен от Defense Production Act за нефтен добив, но регулаторният контекст добавя несигурност за енергийния сектор. Японската core инфлация над целта на BOJ циментира очакванията за скорошно повишение, което укрепва йената и може допълнително да притиска carry trades, финансиращи tech позиции. Основната инфлация в САЩ (Dallas Fed Trimmed Mean PCE, август 2026) е 2.19% г/г с посока надолу — средно 2.25% за юни–август срещу 2.39% за март–май — така пазарният инфлационен страх от петрола и bond volatility (MOVE 106.8, +4.3 пункта за седмица) не е потвърден от основната инфлационна тенденция и трябва да се чете като позиционно разминаване, не като структурен натиск. Днешната сесия ще тества дали bond bid е устойчив или е само flight-to-safety флаш: ако tech стабилизира и yields задържат под 5%, credit spread може да спре да ускорява — но exit от Defensive изисква RoC percentile под 90-ти два поредни дни, а той в момента се движи в обратна посока.",
+   "regime_comment": "Defensive режимът е напълно оправдан и подкрепен от множество независими потвърждения. Ключовият override — IEI/HYG 10-дневна RoC на 96-ти percentile — не само не отслабва, но ускорява: +1.13% сега срещу +0.31% преди 5 сесии, при движение предимно от IEI (лихвен компонент +1.07%) — кредитният пазар сигнализира бягство към качество, не компресия на спредове. Exit от override изисква RoC percentile под 90-ти два поредни дни; в момента броят дни под прага е 0 от 2. По броенето режимът би останал Defensive дори без override: 4 зелени, 3 жълти, 1 червен от 8 видими — един червен е достатъчен за Defensive. Distribution days SPY 7/9 и QQQ 7/9 блокират Offensive независимо от override-а (нужни са още 2 до лимита от 9). Единственото частично противоречие: Market Breadth е на 61.9% над 40-дневната MA — здравословна ширина — а VIX Term Structure е в contango (0.937), което показва, че пазарът не е в паника. Тези сигнали не опровергават Defensive, а само показват, че разпродажбата е секторно концентрирана (tech, биотех), не широка. Увереността в режима е висока — всички условия за Defensive са изпълнени едновременно, а exit условията се движат в грешната посока."
+  },
+  "2026-10-26": {
+   "thermometer": {
+    "regime": "Defensive",
+    "indicators": [
+     {
+      "name": "SPY тренд",
+      "value": 759.97,
+      "as_of": "2026-10-23",
+      "pct_from_high": 2.45,
+      "ma50": 766.9,
+      "ma200": 724.0,
+      "above_50dma": false,
+      "above_200dma": true,
+      "status": "yellow",
+      "label": "SPY 760 | под 50DMA, над 200DMA"
+     },
+     {
+      "name": "VIX",
+      "value": 19.45,
+      "chg_5d": -0.54,
+      "pct_5d": -2.7,
+      "spike": false,
+      "status": "green",
+      "label": "VIX 19.5 (risk-on)"
+     },
+     {
+      "name": "Put/Call (SPY)",
+      "value": 1.2,
+      "percentile": 66.7,
+      "history_days": 93,
+      "status": "yellow",
+      "label": "P/C 1.20 (67. percentile от 93 дни; в нормалния диапазон)"
+     },
+     {
+      "name": "2Y/10Y спред",
+      "value": 0.31,
+      "status": "green",
+      "label": "0.31% (нормален, flattening)"
+     },
+     {
+      "name": "Fed Net Liquidity",
+      "value": 5808.2,
+      "status": "yellow",
+      "informational": true,
+      "change_4w_pct": 0.14,
+      "as_of": "2026-10-21",
+      "label": "$5,808 млрд към 2026-10-21 · +0.1% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+     },
+     {
+      "name": "SOFR − IORB (финансиране)",
+      "value": 0.0,
+      "status": "yellow",
+      "informational": true,
+      "percentile": 82.5,
+      "zscore": 0.43,
+      "as_of": "2026-10-22",
+      "label": "+0.0 б.п. към 22.10 (SOFR 3.90% − IORB 3.90%) · +1.0 б.п. за седмица · 82. percentile, z +0.4 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+     },
+     {
+      "name": "MOVE (Bond Vol)",
+      "value": 103.3,
+      "as_of": "2026-10-23",
+      "delta_1w": 2.2,
+      "spike": false,
+      "status": "yellow",
+      "label": "MOVE 103 (+2 пункта/седмица)"
+     },
+     {
+      "name": "VIX Term Structure",
+      "value": 0.913,
+      "status": "green",
+      "label": "VIX9D 18.7 / VIX 19.5 / VIX3M 20.5 → ratio 0.91 (contango, нормално)"
+     },
+     {
+      "name": "IEI/HYG (Credit Spread)",
+      "value": 1.4883,
+      "as_of": "2026-10-23",
+      "level_percentile": 23.8,
+      "roc_10d_pct": 1.28,
+      "roc_percentile": 96.6,
+      "spike": true,
+      "status": "red",
+      "roc_10d_pct_prev": 1.01,
+      "roc_trend": "rising",
+      "roc_trend_text": "10-дневната RoC е +1.28% срещу +1.01% преди 5 сесии — расте (ускорява се)",
+      "iei_10d_pct": 1.04,
+      "hyg_10d_pct": -0.23,
+      "label": "IEI/HYG 1.488 (24. percentile) · 10д RoC +1.3% (IEI +1.0%, HYG -0.2%) (97. percentile) ⚠ рязък скок (лихви + кредит)"
+     },
+     {
+      "name": "Market Breadth (% над 40dMA)",
+      "value": 58.9,
+      "universe_size": 902,
+      "status": "green",
+      "universe_total": 903,
+      "missing_n": 1,
+      "batches": 19,
+      "batches_failed": 0,
+      "label": "58.9% над 40dMA (здравословна ширина)",
+      "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+     }
+    ],
+    "overrides": [
+     {
+      "trigger": "IEI/HYG",
+      "state": "active",
+      "text": "IEI/HYG credit spread spike (+1.3% за 10д: IEI +1.0%, HYG -0.2%, 97. percentile) — рязък скок на IEI/HYG (лихви + кредит), автоматичен Defensive режим, sizing −50%",
+      "exit_condition": "10-дневната RoC percentile (сега 97.) да е под 90. percentile два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около 10 дни — това е прозорецът на изчислението, не непременно реално успокояване"
+     }
+    ]
+   },
+   "legs_added": false,
+   "macro_brief": "SPY затваря седмицата под 50DMA (760 срещу 766.9), което поставя индекса в техническа слабост въпреки солидната ширина от 58.9% над 40DMA. Централно събитие за седмицата е очакваното решение на Fed в сряда — валутните пазари са в изчаквателен режим (DXY 101.69, -0.29% за 5 дни), а фючърсите показват опит за възстановяване след губещата седмица. Петролът пада над 2% (WTI 100.97, -2.6% за 5 дни) на фона на опасения за разрушаване на търсенето, докато геополитическият риск от хуситките удари по Саудитска петролна инфраструктура поддържа волатилността на суровините двупосочна — тези два противоположни натиска директно се отразяват в енергийния сектор. Жълтото злато отстъпва рязко (4019, -3.39% за 5 дни), което в комбинация с доходност по 10Y от 4.99% (-11 б.п. за 5 дни) и нормализиращ се 2s10s спред (0.31%, -4 б.п. за седмица) рисува среда на намаляващи ставки, но с активен кредитен стрес. Ключовият проблем остава IEI/HYG: 10-дневната RoC е +1.28% срещу +1.01% преди 5 сесии — ускорява се, при percentile 96.6 спрямо историята; MOVE е 103.3 (+2.2 пункта за седмица), а основната инфлация (Dallas Fed Trimmed Mean PCE) е 2.19% за август и е с посока надолу (средно юни–август 2.25% срещу март–май 2.39%), което означава, че кредитният и лихвен стрес не е инфлационно задвижван, а е по-скоро свързан с глобалната несигурност — включително 24-годишен връх на доходностите по френски облигации и потенциални тарифни промени с Канада.",
+   "regime_comment": "Defensive режимът е оправдан и добре поддържан от данните. Задействащият override е IEI/HYG: 10-дневната RoC е +1.28% при percentile 96.6 спрямо историята, като ускоряването е потвърдено от кода (+1.28% срещу +1.01% преди 5 сесии). Нивото само по себе си е на 23.8-и percentile — не тревожно — но скоростта на промяната е тревожна. MOVE е 103.3 (+2.2 пункта за седмица), без override праг, но добавя контекст на облигационна нестабилност. SPY е под 50DMA при distribution days 7/9 за SPY и 7/9 за QQQ — при 9 Offensive се блокира, а в момента до блокажа липсват само 2 дни. Четирите зелени (VIX 19.45 в contango, 2s10s 0.31% нормален, VIX term structure 0.91, Market Breadth 58.9%) са реални, но по правилото на системата един червен е достатъчен за Defensive — броенето е 4 зелени / 3 жълти / 1 червен, и дори без override режимът по броенето щеше да е Defensive. За излизане от override-а: 10-дневната RoC percentile трябва да е под 90-и percentile два поредни дни; в момента е на 0/2 дни под прага и RoC се ускорява — излизането не е близо. Единствената точка на несигурност е, че IEI/HYG нивото (23.8-и percentile) не сигнализира системен кредитен срив, само рязко движение — което е точно това, което override-ът измерва: скорост, не абсолютно ниво. Режимът е коректен."
+  }
+ }
+}

@@ -14,6 +14,11 @@
 а по thermometer._count_regime Offensive иска 0 червени — един червен → Defensive. Хващат се: (а) "нужни са N червени за Defensive/Cash/Offensive" с N, различно от правилото (1 / 3 / 0);
 (б) "един … стане червен … остава Offensive"; (в) праг на зелените за Offensive, различен от 4 ("изисква повече от 7/9 зелени", "8/8 зелени за Offensive"); (г) "би дало Offensive" при посочен
 в изречението червен. Изречението се заменя с rule_text. Мерено върху 173 реални текста (13.06–15.10): 5 флага — 23.07, 20.08, 10.09 и двата на 15.10 (едно изречение); 0 фалшиви.
+26.10.2026 (етап 4б, т. 4) · твърдения за КРЕДИТЕН стрес (код "credit"): "кредитният пазар потвърждава стреса" (23.10), "ключовият стрес идва от кредитните спредове" (19.10), "credit risk
+premium се разширява" (20.10) при HYG част на 10-дневната RoC над config.CREDIT_CLAIM_HYG_CONFIRM_PCT (−0.2%) — скокът на IEI/HYG е от IEI (лихвите), HYG почти не мърда. Първото такова
+изречение се заменя с разлагането от кода (credit_text), следващите се махат — както при правилото. Отрицание / контраст преди фразата ("не от класическо кредитно влошаване", "повече от
+реален credit stress", "ниско ниво на credit stress"), условие ("ако … задвижи credit spreads") и описание на индикатора ("credit stress gauge") не са твърдение. Без разлагане (HYG
+липсва в индикатора — брифовете преди 19.10) проверката не се прави.
   • margin(thermo, distribution_days) — "Запас до смяна на режима" от кода: колко червени сменят режима по правилото, distribution days спрямо прага, IEI/HYG RoC спрямо прага за override
     (с посоката), и близките прагове на VIX / MOVE / VIX term structure (само когато са близо).
 """
@@ -45,6 +50,17 @@ _RULE_WORDS = re.compile(r"изисква|иска|нужн|необходим|�
 _SOLO = re.compile(r"само\s+по\s+себе\s+си|сам(?:а|о)?\s+по\s+себе\s+си|сам(?:а|о)?\s+(?:е\s+достатъчн|определя|дава|води|форсира|задейства)"
                    r"|единствен(?:о|ият|ата)\s+(?:причин|довод|фактор)|е\s+достатъчн\w*\s+сам", re.I)
 _REGIME_WORD = re.compile(r"Defensive|Offensive|Cash|режим", re.I)
+# 26.10.2026 (етап 4б, т. 4): твърдение за кредитен стрес / разширяване на кредитния риск; отрицание, контраст или условие в 40–60 знака преди фразата — не е твърдение
+_C = r"(?:кредит\w*|credit)"
+_CREDIT = re.compile(
+    rf"{_C}\s+(?:\w+\s+){{0,1}}?(?:стрес\w*|stress|криза|срив\w*|влошаване|напрежение|distress)(?!\s+(?:gauge|индикатор\w*|мярка|измерител\w*|proxy|прокси))"
+    rf"|(?:стрес\w*|stress|напрежение\w*)\s+(?:\w+\s+){{0,2}}?(?:в|на|от)\s+(?:\w+\s+){{0,1}}?{_C}"
+    rf"|{_C}\s+пазар\w*\s+(?:[\w-]+\s+){{0,3}}?(?:потвържд\w*|сигнализ\w*|регистрир\w*)\s+(?:[\w-]+,?\s+){{0,3}}?(?:стрес\w*|влошаване|разширяване)"
+    rf"|(?:credit\s+risk\s+premium|кредитн\w+\s+риск\w*(?:\s+premium)?)\s+(?:\w+\s+){{0,1}}?(?:се\s+)?разширява"
+    rf"|разширяване\s+на\s+(?:кредитн\w+\s+риск\w*|credit\s+risk\s+premium)|spike\s+в\s+credit\s+risk\s+premium"
+    rf"|(?:излиза|бяга|бягство)\w*\s+от\s+кредит\w*\s+риск", re.I)
+_CREDIT_NEG = re.compile(r"(?:\bне\b|\bняма\b|\bнито\b|\bбез\b|повече\s+от|отколкото|вместо|\bниск\w*|\bслаб\w*|липс\w*)[^.;,—]{0,40}$", re.I)
+_CREDIT_HYPO = re.compile(r"(?:\bако\b|\bби\b|\bще\b|\bкогато\b)[^.;]{0,60}$", re.I)
 
 
 def _norm(s: str) -> str:
@@ -109,7 +125,20 @@ def facts(thermo: dict) -> dict:
             f"за да не е Offensive (1 или 2 червени → Defensive); 3 или повече червени → Cash; всичко друго → Defensive (недостатъчно потвърждение). "
             f"Единичен индикатор не дава Offensive или Cash сам; режимът се форсира до Defensive от override-ите ({', '.join(FORCING)}) и се ограничава до Defensive "
             f"от червените distribution days.")
-    return {"groups": groups, "counts_text": counts, "rule_text": rule}
+    return {"groups": groups, "counts_text": counts, "rule_text": rule, "credit": _credit_legs(inds)}
+
+
+def _credit_legs(inds: list[dict]) -> dict | None:
+    """26.10.2026 (етап 4б, т. 4): разлагането на IEI/HYG от индикатора ({roc, iei, hyg, text}) или None без двата крака / скрит индикатор."""
+    cr = next((i for i in inds if str(i.get("name", "")).startswith("IEI/HYG") and not i.get("hide")), None) or {}
+    roc, iei, hyg = cr.get("roc_10d_pct"), cr.get("iei_10d_pct"), cr.get("hyg_10d_pct")
+    if not all(isinstance(x, (int, float)) for x in (roc, iei, hyg)):
+        return None
+    thr = config.CREDIT_CLAIM_HYG_CONFIRM_PCT
+    return {"roc": roc, "iei": iei, "hyg": hyg,
+            "text": (f"Разлагане на IEI/HYG от кода: 10-дневната RoC {roc:+.2f}% — IEI {iei:+.2f}% (лихвеният крак), HYG {hyg:+.2f}% (кредитният крак); "
+                     + ("скокът е от лихвите, кредитен стрес не е потвърден (иска HYG " + f"{thr:+.1f}% или по-малко за 10 сесии)." if hyg > thr
+                        else "кредитният крак потвърждава движението."))}
 
 
 _NUMW = {"нула": 0, "един": 1, "една": 1, "едно": 1, "два": 2, "две": 2, "три": 3, "четири": 4, "пет": 5, "шест": 6, "седем": 7, "осем": 8, "девет": 9}
@@ -207,6 +236,15 @@ def check_sentence(sentence: str, f: dict) -> list[dict]:
                 if key and where and where != color:
                     problems.append({"code": "member", "why": f"{key} е посочен сред {_COLOR_BG[color]}, а кодът го води като {_GROUP_BG.get(where, where)}"})
     problems += rule_problems(sentence)                       # 15.10.2026: твърдения за правилото
+    cr = f.get("credit")
+    if cr and cr["hyg"] > config.CREDIT_CLAIM_HYG_CONFIRM_PCT:                 # 26.10.2026 (етап 4б, т. 4): кредитен стрес при HYG, който почти не мърда
+        for m in _CREDIT.finditer(sentence):
+            pre = sentence[:m.start()]
+            if _CREDIT_NEG.search(pre) or _CREDIT_HYPO.search(pre):
+                continue
+            problems.append({"code": "credit", "why": f"твърди кредитен стрес («{m.group(0)}»), а HYG е {cr['hyg']:+.2f}% за 10 сесии (над {config.CREDIT_CLAIM_HYG_CONFIRM_PCT:+.1f}%) — "
+                                                      f"скокът на IEI/HYG е от IEI ({cr['iei']:+.2f}%)"})
+            break
     m = _SOLO.search(sentence)
     if m and _REGIME_WORD.search(sentence) and not _negated(sentence, m):
         named = indicators_in(sentence)
@@ -245,11 +283,12 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
     Поправя изреченията с проблем и връща (нов текст, проблемите):
       • count / member (грешно броене или индикатор в грешна група) — първото такова изречение се ЗАМЕНЯ с броенето от кода ("По броенето: …."), следващите се махат;
       • rule (15.10.2026: твърдение, противоречащо на правилото) — първото такова изречение се ЗАМЕНЯ с rule_text, следващите се махат;
+      • credit (26.10.2026: кредитен стрес при HYG над прага) — първото такова изречение се ЗАМЕНЯ с разлагането от кода (credit.text), следващите се махат;
       • solo (индикатор "сам по себе си" определя режима) — изречението се маха.
     Нищо за поправяне → същият текст.
     """
     sents = _sentences(text)
-    out, problems, replaced, rule_replaced = [], [], False, False
+    out, problems, replaced, rule_replaced, credit_replaced = [], [], False, False, False
     for s in sents:
         p = check_sentence(s, f)
         if not p:
@@ -262,6 +301,9 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
         if any(x["code"] == "rule" for x in p) and not rule_replaced and f.get("rule_text"):
             out.append(f["rule_text"])
             rule_replaced = True
+        if any(x["code"] == "credit" for x in p) and not credit_replaced and (f.get("credit") or {}).get("text"):
+            out.append(f["credit"]["text"])
+            credit_replaced = True
     return (" ".join(out) if problems else str(text or "")), problems
 
 
