@@ -34,6 +34,16 @@ env.globals["book_plan_note"] = setup_rules.book_plan_note   # 19.10.2026 (т. 1
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
+def cot_label(c: dict) -> str:
+    """26.10.2026 (етап 4б, т. 8): етикетът на COT реда по знака на нетната позиция (cot.position_label) — и за стар бриф без полето."""
+    from src import cot
+    c = c or {}
+    return c.get("position_label") or cot.position_label(c.get("direction"), c.get("net_position", c.get("net")), c.get("percentile"), c.get("weeks_of_history", c.get("weeks")))
+
+
+env.filters["cot_label"] = cot_label
+
+
 def berlin_clock(now: dt.datetime | None = None) -> tuple[str, str]:
     """
     ("HH:MM", "CET"|"CEST") по берлинско време.

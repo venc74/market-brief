@@ -1,0 +1,146 @@
+{
+ "_note": "РЕАЛНО: COT редовете (полетата за етикета) и crypto.cot_btc от data/2026-10-26.json — брифът от 26.10.2026 (отчет към 20.10), извадено на 26.10.2026 (етап 4б, т. 8).",
+ "cot": [
+  {
+   "market": "Euro FX",
+   "category": "financial",
+   "net_position": -68840,
+   "percentile": 0.0,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Bitcoin Futures (CME)",
+   "category": "financial",
+   "net_position": -4942,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "XRP",
+   "category": "financial",
+   "net_position": 273,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 63,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Sugar No. 11",
+   "category": "commodity",
+   "net_position": 264530,
+   "percentile": 100.0,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Natural Gas",
+   "category": "commodity",
+   "net_position": -157409,
+   "percentile": 0.6,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "30-Year Treasury Bond",
+   "category": "financial",
+   "net_position": -162757,
+   "percentile": 98.7,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Lean Hogs",
+   "category": "commodity",
+   "net_position": -46813,
+   "percentile": 1.3,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Soybean Meal",
+   "category": "commodity",
+   "net_position": 200878,
+   "percentile": 98.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Silver",
+   "category": "commodity",
+   "net_position": 3505,
+   "percentile": 3.2,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "2-Year Treasury Note",
+   "category": "financial",
+   "net_position": -1285548,
+   "percentile": 96.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "RBOB Gasoline",
+   "category": "commodity",
+   "net_position": 93712,
+   "percentile": 96.1,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Nasdaq-100",
+   "category": "financial",
+   "net_position": 950,
+   "percentile": 93.5,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Canadian Dollar",
+   "category": "financial",
+   "net_position": -91113,
+   "percentile": 6.5,
+   "direction": "extreme_short",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Soybeans",
+   "category": "commodity",
+   "net_position": 221325,
+   "percentile": 93.5,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  },
+  {
+   "market": "Mexican Peso",
+   "category": "financial",
+   "net_position": 63814,
+   "percentile": 90.3,
+   "direction": "extreme_long",
+   "weeks_of_history": 156,
+   "as_of": "2026-10-20"
+  }
+ ],
+ "cot_btc": {
+  "as_of": "2026-10-20",
+  "net": -4942,
+  "percentile": 100.0,
+  "weeks": 156
+ }
+}

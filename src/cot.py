@@ -275,6 +275,36 @@ def _percentile_rank(history: list[float], current: float) -> float:
     return round(100.0 * below_or_eq / len(history), 1)
 
 
+def _span_text(weeks) -> str:
+    """Прозорецът на перцентила с думи: 156 → "3 години", 52 → "година", 62 → "62 седмици"."""
+    w = int(weeks or 0)
+    return ("година" if w == 52 else f"{w // 52} години") if w and w % 52 == 0 else f"{w} седмици"
+
+
+def position_label(direction: str | None, net, percentile, weeks) -> str:
+    """
+    26.10.2026 (етап 4б, т. 8): етикетът на екстремума по ЗНАКА на нетната позиция, не само по перцентила. Bitcoin на 26.10: нетно −4 942 на 100-и перцентил за 156 седмици беше
+    "екстремно дълги" — managed money са НЕТНО КЪСИ, само най-малко къси от 3 години. В историята: 79 от 336 екстремума (пазар, отчет, посока) с такова разминаване (2Y и 30Y
+    Treasury, Bitcoin, XRP, Coffee, Silver, British Pound …). Посоката на contrarian сигнала не се мени — горният край на диапазона си остава горен край.
+      • extreme_long:  нетно > 0 → "екстремно дълги"; иначе на 100-и перцентил → "най-малко къси от <прозореца>", под него → "нетно къси, близо до най-малко късите за <прозореца>";
+      • extreme_short: нетно < 0 → "екстремно къси"; иначе на 0-и → "най-малко дълги от <прозореца>", над него → "нетно дълги, близо до най-малко дългите за <прозореца>".
+    direction None → по прага на перцентила (config.COT_PERCENTILE_LOW / HIGH); извън екстремум → "". Чиста функция.
+    """
+    try:
+        pct = float(percentile)
+        if direction is None:
+            direction = "extreme_long" if pct >= config.COT_PERCENTILE_HIGH else "extreme_short" if pct <= config.COT_PERCENTILE_LOW else None
+        n = float(net)
+    except (TypeError, ValueError):
+        return {"extreme_long": "екстремно дълги", "extreme_short": "екстремно къси"}.get(direction, "")
+    span = _span_text(weeks)
+    if direction == "extreme_long":
+        return "екстремно дълги" if n > 0 else (f"най-малко къси от {span}" if pct >= 100 else f"нетно къси, близо до най-малко късите за {span}")
+    if direction == "extreme_short":
+        return "екстремно къси" if n < 0 else (f"най-малко дълги от {span}" if pct <= 0 else f"нетно дълги, близо до най-малко дългите за {span}")
+    return ""
+
+
 def _market_extreme(label: str, pts: list[dict], category: str,
                     low: float, high: float) -> dict | None:
     if len(pts) < 10:
@@ -297,6 +327,7 @@ def _market_extreme(label: str, pts: list[dict], category: str,
         "net_position": int(current),
         "percentile": pct,
         "direction": direction,
+        "position_label": position_label(direction, current, pct, len(window)),      # 26.10.2026 (етап 4б, т. 8): по знака на нетната позиция
         "weeks_of_history": len(window),
         "as_of": window[-1]["date"],
         "history": [{"date": p["date"], "net": int(p["net"])} for p in window[-52:]],
