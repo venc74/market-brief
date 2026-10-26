@@ -1122,6 +1122,9 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
         if kind and kind not in config.AI_NARRATIVE_SETUPS:
             skipped.append(f"{c.get('ticker')} ({kind})")       # опростяване (10.10): без наратив — компактен ред във Watchlist
             continue
+        if (c.get("setup") or {}).get("triggered"):              # 26.10.2026 (етап 4б, т. 10): задействан запис в книгата — компактен ред, без наратив
+            skipped.append(f"{c.get('ticker')} (задействан в книгата)")
+            continue
         slim.append({k: c.get(k) for k in (
             "ticker", "company", "sector", "industry", "business_summary",
             "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",

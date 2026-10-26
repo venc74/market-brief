@@ -127,6 +127,29 @@ def next_earnings_date(sym: str, yf_mod, today: dt.date) -> str | None:
     return None
 
 
+def book_marks(rows: list[dict], today: dt.date, dates: dict | None = None, lookup=None, statuses=("open", "trailing")) -> int:
+    """
+    26.10.2026 (етап 4б, т. 10): отворена позиция в книга (QM) с отчет в следващите EARNINGS_WARNING_SESSIONS сесии → row["earnings_next"] = {"date", "sessions"} — ред в таблицата
+    на книгата (CBOE и UTHR: отворени от 20.10, отчети тази седмица). Датата — от картите на последните брифове (dates_from_briefs), иначе lookup(тикър) (календарът на Yahoo). Връща броя.
+    """
+    n = 0
+    dates = dates_from_briefs() if dates is None else dates
+    for r in rows or []:
+        if r.get("status") not in statuses or not r.get("ticker"):
+            continue
+        try:
+            d = dates.get(r["ticker"]) or (lookup(r["ticker"]) if lookup else None)
+            if not d:
+                continue
+            k = sessions_after(today, dt.date.fromisoformat(str(d)[:10]))
+            if dt.date.fromisoformat(str(d)[:10]) >= today and k <= config.EARNINGS_WARNING_SESSIONS:
+                r["earnings_next"] = {"date": str(d)[:10], "sessions": k}
+                n += 1
+        except Exception as e:
+            print(f"[earnings_move] {r.get('ticker')}: отчетът за книгата: {type(e).__name__}: {e}")
+    return n
+
+
 def snapshot_straddles(tickers: list[str], session: dt.date, yf_mod, today: dt.date | None = None) -> dict[str, dict]:
     """
     За снимката: straddle-и за тикърите с отчет в (session, session + EARNINGS_SNAPSHOT_WINDOW_DAYS]. Датите са от картите на последните брифове,

@@ -137,9 +137,11 @@ config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 brief = json.loads((FIX / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 brief["glb_candidates"] = [{**r2[0], "in_screener": False}]
 page = " ".join(htmllib.unescape(render.render_dashboard(brief)).split())
-assert "<b>GLB от 01.09</b>, 1.0% под линията ($100.00)" in page
+sb = r2[0].get("since_bar") or r2[0]["since"]                                                        # 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (бара), не на брифа
+assert f"<b>GLB от {sb[8:10]}.{sb[5:7]}</b>, 1.0% под линията ($100.00)" in page
 brief["glb_candidates"] = [{**r1[0], "in_screener": False}]
-assert "<b>GLB от 01.09</b>, 1.5% над линията ($100.00)" in " ".join(htmllib.unescape(render.render_dashboard(brief)).split())
+sb1 = r1[0].get("since_bar") or r1[0]["since"]
+assert f"<b>GLB от {sb1[8:10]}.{sb1[5:7]}</b>, 1.5% над линията ($100.00)" in " ".join(htmllib.unescape(render.render_dashboard(brief)).split())
 old_row = {k: v for k, v in r1[0].items() if k not in ("since", "pct_vs_line", "line")}                                  # стар бриф без полетата — без реда и без грешка
 brief["glb_candidates"] = [old_row]
 assert "GLB от" not in " ".join(htmllib.unescape(render.render_dashboard(brief)).split())

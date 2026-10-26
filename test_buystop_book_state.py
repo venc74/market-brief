@@ -108,12 +108,15 @@ def page_with(card, summary=None):
         b.setdefault("backtest", {})["buystop"] = summary
     return render.render_dashboard(b)
 p1 = page_with(c1)
-exp1 = text(next(x for x in cards_of(p1) if "EXPD" in x[:300]))
-assert WANT in exp1 and "Чака пробив" not in exp1 and "Buy-stop $194.59 · валиден" not in exp1 and "Ако се задейства" not in exp1 and "Trigger:" not in exp1
+assert not any("EXPD" in x[:300] for x in cards_of(p1))                                                    # 26.10.2026 (етап 4б, т. 10): задействаният запис — компактен ред, не карта
+row1 = text(p1)[text(p1).index("В скрийнъра, без сетъп за вход днес:"):]
+row1 = row1[row1.index("EXPD —"):][:260]
+assert row1.startswith("EXPD — ✅ задействан в buy-stop книгата на 05.10 по $194.59, стоп $181.53") and "текущо -0.2R" in row1 and "Чака пробив" not in row1 and "Buy-stop $194.59 · валиден" not in row1
+assert WANT in c1["setup"]["trigger_text"]                                                                 # текстът на кода за задействания запис остава в сетъпа (имейлът, книгата)
 p0 = page_with(c0)
 exp0 = text(next(x for x in cards_of(p0) if "EXPD" in x[:300]))
 assert "Чака пробив" in exp0 and "Buy-stop $194.59 · валиден" in exp0 and "Trigger:" in exp0 and "✅ Задействан" not in exp0
-print("  ✓ с жив запис: '✅ Задействан на 05.10 по $194.59 · стоп $181.53 · цел 2R $220.71 · текущо -0.2R' и НИТО 'Чака пробив', 'Buy-stop … валиден', 'Ако се задейства', 'Trigger:'; без запис — както преди")
+print("  ✓ с жив запис: компактен ред 'EXPD — ✅ задействан в buy-stop книгата на 05.10 по $194.59, стоп $181.53 … текущо -0.2R' и НИТО 'Чака пробив', 'Buy-stop … валиден'; без запис — карта, както преди")
 
 print()
 print("── излезе от скрийнъра: причина с числата ──")

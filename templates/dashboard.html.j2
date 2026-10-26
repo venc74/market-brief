@@ -1269,7 +1269,7 @@
   </div>
   {% endif %}
   {% if bs.recent %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({{ bs.recent|length }}):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({% if bs.closed and bs.closed > bs.recent|length %}последните {{ bs.recent|length }} от {{ bs.closed }}{% else %}{{ bs.recent|length }}{% endif %}):</div>
   <div class="watch-grid" style="margin-top:6px">
     {% for r in bs.recent %}
     <div class="watch-card">
@@ -1381,7 +1381,7 @@
       <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in qb.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
+        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}{% if p.earnings_next %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет {{ p.earnings_next.date[8:10] }}.{{ p.earnings_next.date[5:7] }} ({% if p.earnings_next.sessions == 0 %}днес{% else %}след {{ p.earnings_next.sessions }} {{ "сесия" if p.earnings_next.sessions == 1 else "сесии" }}{% endif %}) — позицията държи през отчета; стопът не пази от гап</div>{% endif %}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% if p.get("return_pct") is not none %} ({{ "%+.1f"|format(p.return_pct) }}%){% endif %}{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
           <td class="n">${{ p.trigger }}</td><td class="n">{% if p.fill_price is not none %}${{ p.fill_price }}{% if p.trigger is not none and p.fill_price > p.trigger %} <span style="color:var(--muted)" title="Отвори над нивото — входът е по отварянето">(гап)</span>{% endif %}{% else %}—{% endif %}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% else %}—{% endif %}</td>
@@ -1392,7 +1392,7 @@
   </div>
   {% endif %}
   {% if qb.recent %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({{ qb.recent|length }}):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени ({% if qb.closed and qb.closed > qb.recent|length %}последните {{ qb.recent|length }} от {{ qb.closed }}{% else %}{{ qb.recent|length }}{% endif %}):</div>
   <div class="watch-grid" style="margin-top:6px">
     {% for r in qb.recent %}
     <div class="watch-card">
@@ -1499,7 +1499,8 @@
       {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
       {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
+      {# 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (since_bar), не на брифа — NWSA и ED на 23.10 бяха „GLB от 23.10“ при пробив на 22.10 (старият хистерезис) #}
+      {% set g_day = g.since_bar or g.since %}{% if g.since %}<div class="glb-detail"><b>GLB от {{ g_day[8:10] }}.{{ g_day[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
@@ -1540,7 +1541,8 @@
       {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
       {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
       {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {% if g.since %}<div class="glb-detail"><b>GLB от {{ g.since[8:10] }}.{{ g.since[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
+      {# 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (since_bar), не на брифа — NWSA и ED на 23.10 бяха „GLB от 23.10“ при пробив на 22.10 (старият хистерезис) #}
+      {% set g_day = g.since_bar or g.since %}{% if g.since %}<div class="glb-detail"><b>GLB от {{ g_day[8:10] }}.{{ g_day[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
       {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
       {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
         {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
@@ -1654,7 +1656,7 @@
   </div>
   {% endif %}
   {% if gw.recent %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени ({{ gw.recent|length }}):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени ({% set gw_closed = (gw.line_exit or 0) + (gw.expired or 0) %}{% if gw_closed > gw.recent|length %}последните {{ gw.recent|length }} от {{ gw_closed }}{% else %}{{ gw.recent|length }}{% endif %}):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Пробив на</th><th>Затворена</th><th>Как</th><th class="n">literal</th><th class="n">exec</th><th class="n">Алфа (literal)</th><th class="n">Сесии</th></tr></thead>

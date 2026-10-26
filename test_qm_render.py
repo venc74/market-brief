@@ -202,7 +202,7 @@ assert QB25["stats_visible"] and QB25["closed"] == 25
 s25 = section(page_raw(brief_with(qb=QB25)))
 t25 = txt_of(s25)
 assert txt_of(re.search(r"<summary.*?</summary>", s25, re.S).group(0)) == "Измерване — книга qm_breakout: записани 25 · затворени 25 · win rate 28.0%"
-assert "Win rate: 28.0% opt / 28.0% pess (7 win / 18 loss; 95% интервал" in t25 and "медиана R -1.00 / -1.00" in t25 and "Спрямо SPY (същите периоди, 25 затворени)" in t25 and "Последни затворени (10)" in t25
+assert "Win rate: 28.0% opt / 28.0% pess (7 win / 18 loss; 95% интервал" in t25 and "медиана R -1.00 / -1.00" in t25 and "Спрямо SPY (същите периоди, 25 затворени)" in t25 and "Последни затворени (последните 10 от 25)" in t25
 print("  ✓ СИНТЕТИЧНИ 25 затворени: заглавният ред казва 'win rate 28.0%', вътре — интервал, медиана, SPY, последни затворени")
 QB19 = copy.deepcopy(QB25); QB19.update(closed=19, stats_visible=False, win_rate_pct=None, win_rate_pess_pct=None, win_ci_pct=None, median_realized_r=None, median_realized_r_pess=None, spy_compare=None, wins=None, losses=None, big_winners_5r=None)
 for g in QB19["by_regime"].values():

@@ -133,7 +133,7 @@ for t in ("EXPD", "ANET"):
     new[t]["ai"] = B12[t].get("ai") or {}
 b["watchlist"] = [new["EXPD"], new["ANET"]]
 page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
-assert "✅ Задействан на 09.10 по $194.59" in page and "Чака пробив: buy-stop $194.59" not in page
+assert "EXPD — ✅ задействан в buy-stop книгата на 09.10 по $194.59" in page and "Чака пробив: buy-stop $194.59" not in page        # 26.10.2026 (етап 4б, т. 10): компактен ред
 row = page[page.index("В скрийнъра, без сетъп за вход днес:"):][:400]
 assert "ANET — ✅ задействан в buy-stop книгата на 09.10 по $215.38, стоп $197.70 (8.2% под входа), текущо +0.1R; днес: над pivot без обем ≥ 1.5×" in row and "стоп 9.2%" not in row
 cards, compact = render.split_watchlist([new["ANET"]])

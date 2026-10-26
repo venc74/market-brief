@@ -329,7 +329,9 @@ def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     for c in watchlist or []:
         setup = c.get("setup") or {}
         kind = setup.get("kind")
-        if not kind or kind in config.AI_NARRATIVE_SETUPS or (c.get("ai") or {}).get("watchlist_reason_type") == "existing_position":
+        # 26.10.2026 (етап 4б, т. 10): ЗАДЕЙСТВАН запис в buy-stop книгата — винаги компактен ред (до 26.10 ZBRA below_pivot беше пълна карта, а AAPL / AMG no_volume — ред,
+        # и един и същ тикър сменяше вида си ден за ден: ZBRA 22.10 ред, 23.10 карта); входът е изпълнен сигнал от книгата, не нов сетъп
+        if not kind or (kind in config.AI_NARRATIVE_SETUPS and not setup.get("triggered")) or (c.get("ai") or {}).get("watchlist_reason_type") == "existing_position":
             cards.append(c)
             continue
         ew = c.get("earnings_warning") or {}

@@ -641,7 +641,8 @@ def run() -> dict:
         theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
     def _narratives_failed(e):
-        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)]
+        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)
+                                       and not (c.get("setup") or {}).get("triggered")]
         return []
     _ai_consequence = "класификацията е от кода, картите са без AI текст"
     narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, ai_macro.get("sector_logic", []), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
@@ -908,6 +909,12 @@ def run() -> dict:
                consequence=_book_consequence)
     def _book_qm():                                                            # Qullamaggie: отделната книга qm_breakout (чисто локално четене)
         backtest_summary["qm_breakout"] = backtest.get_qm_summary()
+        try:                                                                   # 26.10.2026 (етап 4б, т. 10): отворените позиции с отчет в следващите сесии (CBOE, UTHR)
+            import yfinance as _yf
+            earnings_move.book_marks((backtest_summary["qm_breakout"] or {}).get("live"), dt.date.fromisoformat(today),
+                                     lookup=lambda t: earnings_move.next_earnings_date(t, _yf, dt.date.fromisoformat(today)))
+        except Exception as e:
+            print(f"[main] отчетите на позициите в qm_breakout пропуснати: {type(e).__name__}: {e}")
     steps.step("book_qm", _book_qm, enabled=bool(config.ENABLE_BACKTEST and config.TRACK_QM),
                label="Обобщението на книгата на пробивите по Kullamägi", consequence=_book_consequence)
     def _book_glb_wish():                                                      # "GLB — наш вариант (close)": отделната книга glb_wish (чисто локално четене)
