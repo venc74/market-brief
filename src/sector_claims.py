@@ -15,6 +15,11 @@
   • 19.10.2026 (етап 2, т. 5): при противоречие се заменя ЦЯЛОТО изречение с изречение от кода (subject_sentence / table_sentence) — частичната замяна оставяше разбито изречение
     (19.10 XLE: "… е сред секторите с положителна RS за 4 седмици (XLE, XLP, XLV, XLU, XLB, XLY) (+6.52%), и на 12-седмичен хоризонт (+14.76%), и на 6-месечен връх …"); "12-седмичен
     хоризонт" като втори хоризонт; "… положителна 4W RS ПРИ отрицателна 12W RS" е твърдение за "само 4 седмици" (05.08: XLE — вярно, а кодът го "поправяше").
+  • 26.10.2026 (етап 4б, т. 5): и "единственият сектор с (потвърдено) лидерство [на двата хоризонта | на 4 / 12 седмици] [и на 6-месечния връх]" / "единственият водещ сектор" —
+    _CLAIM търси само "положителна … RS" и ги пропускаше (23.10 и 26.10 XLE, а XLV беше положителен и на двата хоризонта). Хоризонтът е като в промпта ("лидерство на двата хоризонта"
+    = положителна RS и на 4, и на 12 седмици); без хоризонт — водещите по кода (sector_layer.is_leader); "и на 6-месечния връх" — сечение със секторите на връх. Измерено върху 94 брифа
+    с ротация: 7 такива твърдения — 4 грешни (13.08 XLE при 5 сектора, 20.10, 23.10, 26.10), 2 верни като съчетание "двата хоризонта И 6-месечен връх" (15.10 XLE, 16.10 XLV),
+    1 с условие, което кодът не проверява ("… и без история на изоставане", 21.10) — не се пипа.
 """
 from __future__ import annotations
 
@@ -37,6 +42,14 @@ _12W = re.compile(r"\b12\s*[wW]\b|12-седм|12\s+седм|средносроч
 _SCOPE_BG = {"both": "на двата хоризонта (4 и 12 седмици)", "4w": "за 4 седмици", "12w": "за 12 седмици",
              "only_4w": "само за 4 седмици (при отрицателна за 12)", "only_12w": "само за 12 седмици (при отрицателна за 4)"}
 _SCOPE_KEY = {"both": "both", "4w": "pos_4w", "12w": "pos_12w", "only_4w": "only_4w", "only_12w": "only_12w"}
+# 26.10.2026 (етап 4б, т. 5): "единственият сектор с … лидерство …" / "единственият водещ сектор"; думите пред "лидерство" — само усилващи (иначе е друго твърдение)
+_LEAD = re.compile(r"(?P<word>единствени(?:ят|я)|единственото|единствената|единствен)\s+(?:водещ(?:ият|ия)?\s+(?:сектор|ETF)\b|(?:сектор|ETF)\s+с\s+(?P<q>(?:[\w-]+\s+){0,3}?)лидерство)", re.I)
+_LEAD_Q = re.compile(r"^(?:(?:потвърдено|убедено|двойно|ясно|устойчиво|категорично|RS)\s+)*$", re.I)
+_PAREN = re.compile(r"^\s*\([^)]{0,40}\)")
+_H_BOTH = re.compile(r"^\s*,?\s*(?:и\s+)?(?:на|по)\s+(?:двата|двете)\s+(?:времеви\s+)?хоризонт\w*", re.I)
+_H_ONE = re.compile(r"^\s*,?\s*(?:и\s+)?(?:на|за)\s+(4|12)\s*(?:седмици|седм\.|[wW]\b)\s*(?:\([^)]{0,30}\))?", re.I)
+_H_HIGH = re.compile(r"^\s*,?\s*(?:и|И)\s+(?:на\s+)?(?:6-?\s*месеч\w*|6\s*m)\s+(?:RS\s+)?(?:връх|high)(?:\s+по\s+RS)?", re.I)
+_H_MORE = re.compile(r"^\s*,?\s*(?:и|И)\s+(?:без|със?|при|на)\b", re.I)    # друго условие ("… и без история на изоставане") — кодът не го проверява
 
 
 def facts(rotation: list[dict] | None) -> dict:
@@ -45,8 +58,9 @@ def facts(rotation: list[dict] | None) -> dict:
     p4, p12 = pos("rs_chg_4w_pct"), pos("rs_chg_12w_pct")
     both = [e for e in p4 if e in p12]
     high = [r["etf"] for r in rows if r.get("rs_at_6m_high") is True]
+    from src.sector_layer import is_leader                                     # 26.10.2026 (етап 4б, т. 5): водещите по кода — за "единственият водещ сектор"
     lst = lambda xs: ", ".join(xs) if xs else "нито един"
-    return {"pos_4w": p4, "pos_12w": p12, "both": both, "at_6m_high": high,
+    return {"pos_4w": p4, "pos_12w": p12, "both": both, "at_6m_high": high, "leaders": [r["etf"] for r in rows if is_leader(r)],
             "only_4w": [e for e in p4 if e not in both], "only_12w": [e for e in p12 if e not in both],
             "text": (f"Сектори с положителна RS и на 4, и на 12 седмици: {lst(both)}; само за 4 седмици: {lst([e for e in p4 if e not in both])}; "
                      f"само за 12 седмици: {lst([e for e in p12 if e not in both])}. "
@@ -74,8 +88,9 @@ def _lst(xs: list[str]) -> str:
     return ", ".join(xs) if xs else "нито един"
 
 
-def subject_sentence(subject: str, f: dict) -> str:
-    """Изречение от кода за сектора `subject` (без крайна точка): RS на двата хоризонта / само на единия / без, и 6-месечният връх — всичко по таблицата на ротацията."""
+def subject_sentence(subject: str, f: dict, lead: bool = False) -> str:
+    """Изречение от кода за сектора `subject` (без крайна точка): RS на двата хоризонта / само на единия / без, и 6-месечният връх — всичко по таблицата на ротацията.
+    lead — твърдението беше за лидерство (26.10.2026): и водещите по кода."""
     others = lambda xs: [x for x in xs if x != subject]
     if subject in f["both"]:
         rs = "положителна RS и на 4, и на 12 седмици" + (f" — заедно с {', '.join(others(f['both']))}" if others(f["both"]) else " — единственият на двата хоризонта")
@@ -88,13 +103,52 @@ def subject_sentence(subject: str, f: dict) -> str:
     hi = ""
     if subject in f.get("at_6m_high", []):
         hi = "; на 6-месечен връх по RS" + (f" — заедно с {', '.join(others(f['at_6m_high']))}" if others(f["at_6m_high"]) else "")
-    return f"{subject}: {rs}{hi} (по таблицата на ротацията)"
+    ld = f"; водещи по кода: {_lst(f.get('leaders') or [])}" if lead else ""
+    return f"{subject}: {rs}{hi}{ld} (по таблицата на ротацията)"
 
 
-def table_sentence(f: dict) -> str:
+def table_sentence(f: dict, lead: bool = False) -> str:
     """Изречение от кода без подлог (без крайна точка)."""
     return (f"По таблицата на ротацията положителна RS и на 4, и на 12 седмици имат {_lst(f['both'])}; само за 4 седмици — {_lst(f['only_4w'])}; "
-            f"само за 12 седмици — {_lst(f['only_12w'])}")
+            f"само за 12 седмици — {_lst(f['only_12w'])}" + (f"; водещи по кода: {_lst(f.get('leaders') or [])}" if lead else ""))
+
+
+def _lead_hit(seg: str, f: dict, default_etf: str | None) -> dict | None:
+    """26.10.2026 (етап 4б, т. 5): първото противоречащо твърдение за лидерство в сегмента — {subject, scope, listed, lead} — или None."""
+    for m in _LEAD.finditer(seg):
+        if m.group("q") is not None and not _LEAD_Q.match(m.group("q")):
+            continue                                                         # "единственият сектор с дефанзивно лидерство" — друго твърдение
+        if _QUAL.search(seg[m.start():m.end() + 30]):
+            continue
+        rest = seg[m.end():]
+        rest = rest[_PAREN.match(rest).end():] if _PAREN.match(rest) else rest
+        scope = "both" if re.search(r"двойно", m.group("q") or "", re.I) else None
+        hb = _H_BOTH.match(rest)
+        if hb:
+            scope, rest = "both", rest[hb.end():]
+        else:
+            h1 = _H_ONE.match(rest)
+            if h1:
+                rest = rest[h1.end():]
+                h2 = _H_ONE.match(rest)
+                if h2 and h2.group(1) != h1.group(1):
+                    scope, rest = "both", rest[h2.end():]
+                else:
+                    scope = scope or ("4w" if h1.group(1) == "4" else "12w")
+        hh = _H_HIGH.match(rest)
+        if hh:
+            rest = rest[hh.end():]
+        if _H_MORE.match(rest):
+            continue                                                         # условие, което кодът не проверява
+        listed = list(f[_SCOPE_KEY[scope]] if scope else f.get("leaders") or [])
+        if hh:
+            listed = [e for e in listed if e in f.get("at_6m_high", [])]
+        before = re.findall(_ETF, seg[:m.start()])
+        subject = before[-1] if before else default_etf
+        if len(listed) == 1 and (subject is None or subject == listed[0]):
+            continue
+        return {"subject": subject, "scope": (scope or "lead") + ("+6m" if hh else ""), "listed": listed, "lead": True}
+    return None
 
 
 def check(text: str, f: dict, default_etf: str | None = None) -> list[dict]:
@@ -127,11 +181,13 @@ def check(text: str, f: dict, default_etf: str | None = None) -> list[dict]:
                 continue                                                     # вярно (или подлогът не е известен при единствен в таблицата)
             hit = {"subject": subject, "scope": scope, "listed": listed}
             break
+        hit = hit or _lead_hit(seg, f, default_etf)
         if not hit:
             continue
         body = seg.rstrip()
         term = body[-1] if body[-1:] in ".!?;" else ""
-        rep = (subject_sentence(hit["subject"], f) if hit["subject"] else table_sentence(f)) + (term or ".")
+        lead = bool(hit.pop("lead", False))
+        rep = (subject_sentence(hit["subject"], f, lead) if hit["subject"] else table_sentence(f, lead)) + (term or ".")
         out.append({"start": a, "end": a + len(body), **hit, "replacement": rep, "sentence": seg.strip()})
     return out
 

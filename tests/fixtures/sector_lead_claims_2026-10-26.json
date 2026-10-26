@@ -1,0 +1,1093 @@
+{
+ "_note": "РЕАЛНО: ротацията (полетата за RS и водещ сектор) и веригите на sector_logic с твърдение 'единственият … лидерство' от data/<дата>.json на брифовете 15.10, 16.10, 20.10, 21.10, 23.10 и 26.10.2026 (извадено на 26.10.2026, етап 4б, т. 5). Веригите са текстът СЛЕД проверката на деня (тогава тези твърдения не се проверяваха).",
+ "briefs": {
+  "2026-10-15": {
+   "rotation": [
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 3.85,
+     "rs_chg_12w_pct": 13.63,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 1.73,
+     "rs_chg_12w_pct": 4.44,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 1.6,
+     "rs_chg_12w_pct": -2.03,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 95.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": 1.31,
+     "rs_chg_12w_pct": 4.61,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": 1.17,
+     "rs_chg_12w_pct": -2.24,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 5.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": -0.59,
+     "rs_chg_12w_pct": -10.36,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": -0.87,
+     "rs_chg_12w_pct": -6.74,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -2.97,
+     "rs_chg_12w_pct": -10.06,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": -3.16,
+     "rs_chg_12w_pct": -4.86,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -3.83,
+     "rs_chg_12w_pct": -3.19,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 50.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": -4.39,
+     "rs_chg_12w_pct": -6.31,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": -4.48,
+     "rs_chg_12w_pct": -11.25,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -6.6,
+     "rs_chg_12w_pct": -23.78,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -6.96,
+     "rs_chg_12w_pct": -8.34,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 80.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -7.27,
+     "rs_chg_12w_pct": -14.62,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -12.16,
+     "rs_chg_12w_pct": 12.66,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -16.04,
+     "rs_chg_12w_pct": -11.59,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLE",
+     "chain": "Хусите атакуваха Saudi Aramco HQ + кораб потъна в Хормузкия проток → заплаха за петролни доставки и корабоплаване → петролни цени под геополитически premium (WTI +2.85% за 5 дни, $94.1) → приходите на E&P и интегрираните компании растат директно с цената → XLE RS +3.85% за 4 седмици и +13.63% за 12 седмици, RS на 6-месечен връх, абсолютно представяне +6.25% за 4 седмици → единственият сектор с потвърдено лидерство на двата времеви хоризонта и на 6m RS high."
+    }
+   ]
+  },
+  "2026-10-16": {
+   "rotation": [
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 3.85,
+     "rs_chg_12w_pct": 7.13,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 3.0,
+     "rs_chg_12w_pct": -1.38,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 90.0
+    },
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 2.35,
+     "rs_chg_12w_pct": 10.84,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": 0.57,
+     "rs_chg_12w_pct": -4.88,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 95.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": -0.73,
+     "rs_chg_12w_pct": 3.39,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": -0.81,
+     "rs_chg_12w_pct": -10.45,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -1.03,
+     "rs_chg_12w_pct": -2.35,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 55.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": -1.27,
+     "rs_chg_12w_pct": -2.62,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": -1.75,
+     "rs_chg_12w_pct": -4.08,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 5.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -1.83,
+     "rs_chg_12w_pct": -9.35,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": -2.17,
+     "rs_chg_12w_pct": -5.07,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 90.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": -2.8,
+     "rs_chg_12w_pct": -10.21,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -4.64,
+     "rs_chg_12w_pct": -13.34,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -6.71,
+     "rs_chg_12w_pct": -4.82,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -9.11,
+     "rs_chg_12w_pct": -22.18,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -10.58,
+     "rs_chg_12w_pct": 17.99,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -16.59,
+     "rs_chg_12w_pct": -10.41,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLV",
+     "chain": "RS на 6-месечен връх; rs_chg_4w +3.85%, rs_chg_12w +7.13% — единственият сектор с потвърдено лидерство на двата хоризонта И на 6-месечен RS връх. Механизъм: Warsh задържа пауза → US10Y пада 14.2 б.п. → дюрационно-чувствителните defensive сектори с ценова мощ (фармация, managed care) получават двоен tailwind — по-ниски дисконтиращи лихви и rotation от growth към качество. Retail sales силни, но ипотечна лихва 7.4% ограничава disposable income → потребителите пазят здравни разходи за сметка на дискреционни, което структурно облагодетелства XLV. Без корпоративен кредитен стрес (IEI/HYG 19-ти percentile) — балансите в сектора не са под натиск."
+    }
+   ]
+  },
+  "2026-10-20": {
+   "rotation": [
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 9.54,
+     "rs_chg_12w_pct": 12.06,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 7.43,
+     "rs_chg_12w_pct": 1.19,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 80.0
+    },
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 4.88,
+     "rs_chg_12w_pct": 7.58,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": 3.43,
+     "rs_chg_12w_pct": -2.03,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 90.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": 2.92,
+     "rs_chg_12w_pct": -2.14,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": 2.65,
+     "rs_chg_12w_pct": -11.76,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 90.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": -0.6,
+     "rs_chg_12w_pct": -4.11,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -1.04,
+     "rs_chg_12w_pct": -9.1,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": -1.26,
+     "rs_chg_12w_pct": -9.19,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -3.0,
+     "rs_chg_12w_pct": -12.46,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -3.18,
+     "rs_chg_12w_pct": -1.61,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 65.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": -3.69,
+     "rs_chg_12w_pct": 0.46,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -5.7,
+     "rs_chg_12w_pct": -5.45,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 95.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": -7.14,
+     "rs_chg_12w_pct": -9.1,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -7.59,
+     "rs_chg_12w_pct": 9.69,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -10.75,
+     "rs_chg_12w_pct": -25.2,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -17.19,
+     "rs_chg_12w_pct": -16.26,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLE",
+     "chain": "Войната в Иран преориентира глобалните петролни потоци към Америките (новина 1) → Brent близо до петмесечен връх, WTI +4.97% за седмица до $98.82 → приходите на upstream E&P и интегрираните мейджъри се ревизират нагоре → XLE RS +9.54% за 4 седмици и +12.06% за 12 седмици — единственият сектор с потвърдено лидерство и на двата хоризонта. Геополитическата premium е структурна, не само momentum; в Defensive режим XLE е допустима позиция при редуциран sizing (x0.5), тъй като директно отразява supply-side шока."
+    }
+   ]
+  },
+  "2026-10-21": {
+   "rotation": [
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 10.64,
+     "rs_chg_12w_pct": 10.25,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 6.67,
+     "rs_chg_12w_pct": 1.64,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 75.0
+    },
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 6.44,
+     "rs_chg_12w_pct": 7.06,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": 3.91,
+     "rs_chg_12w_pct": -12.55,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": 3.4,
+     "rs_chg_12w_pct": 1.91,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 80.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": 2.25,
+     "rs_chg_12w_pct": -4.1,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 95.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": 1.96,
+     "rs_chg_12w_pct": -2.01,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": 0.28,
+     "rs_chg_12w_pct": -8.97,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 95.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -1.49,
+     "rs_chg_12w_pct": -11.98,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -2.4,
+     "rs_chg_12w_pct": 0.45,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 70.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -3.13,
+     "rs_chg_12w_pct": -17.05,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -4.8,
+     "rs_chg_12w_pct": -3.62,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": -4.99,
+     "rs_chg_12w_pct": -0.39,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 5.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": -9.55,
+     "rs_chg_12w_pct": -9.83,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 20.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -9.71,
+     "rs_chg_12w_pct": -24.36,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -11.49,
+     "rs_chg_12w_pct": 9.89,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -19.12,
+     "rs_chg_12w_pct": -18.1,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLE",
+     "chain": "Близкоизточни рискове за доставките + US inventory drawdowns → петролът (CLZ26) +5.41% за 5 дни до $98.98 → производителите на петрол и газ реализират по-висока маржа директно → XLE RS за 4 седмици +10.64% и RS за 12 седмици +10.25%, абсолютна промяна +10.02% за 4 седмици → единственият сектор с убедено лидерство и на двата хоризонта и без история на изоставане (дял на изоставането 0%); United Airlines снижава прогнозата заради jet fuel, което потвърждава, че петролният шок е реален и вече се усеща надолу по веригата — потребителите на горива губят, производителите печелят."
+    },
+    {
+     "etf": "XLV",
+     "chain": "Defensive режим (IEI/HYG override) → ротация към нециклични сектори с устойчиви приходи → здравеопазването исторически задържа маржа при кредитно стресиране → XLV RS за 4 седмици +6.44% и RS за 12 седмици +7.06%, единственият сектор на 6-месечен връх по RS → Novo Nordisk CagriSema данни за 25% загуба на тегло при жени потвърждават GLP-1 pipeline стойността и привличат секторен капитал независимо от макро режима; дял на изоставането 15% — чисто лидерство без хроничен laggard характер."
+    }
+   ]
+  },
+  "2026-10-23": {
+   "rotation": [
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 10.61,
+     "rs_chg_12w_pct": 2.41,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 65.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": 9.38,
+     "rs_chg_12w_pct": -8.77,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 75.0
+    },
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 8.39,
+     "rs_chg_12w_pct": 12.4,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 7.18,
+     "rs_chg_12w_pct": 7.49,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": 4.69,
+     "rs_chg_12w_pct": 0.36,
+     "rs_at_6m_high": false,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 70.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": 4.48,
+     "rs_chg_12w_pct": -2.48,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 75.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": 4.33,
+     "rs_chg_12w_pct": -3.55,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": 2.52,
+     "rs_chg_12w_pct": -9.57,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 90.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -0.83,
+     "rs_chg_12w_pct": -11.93,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -2.42,
+     "rs_chg_12w_pct": -2.82,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -3.49,
+     "rs_chg_12w_pct": -19.0,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -4.48,
+     "rs_chg_12w_pct": -22.61,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -5.37,
+     "rs_chg_12w_pct": -3.39,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 80.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": -5.96,
+     "rs_chg_12w_pct": 1.07,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 5.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -11.17,
+     "rs_chg_12w_pct": 4.1,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": -12.48,
+     "rs_chg_12w_pct": -7.93,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 30.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -16.22,
+     "rs_chg_12w_pct": -18.41,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLE",
+     "chain": "WTI +1.36% за 5 дни (дек. 2026 контракт) поддържа приходните очаквания за енергийните компании; Defense Production Act за нефтен добив и рафиниране добавя краткосрочна несигурност около регулаторната среда, но не е негативен за spot ценообразуване при настоящото ниво от $100.37. XLE е единственият сектор с лидерство и на 4 седмици (+8.39% RS), и на 12 седмици (+12.40% RS), което го прави структурен лидер при настоящата Defensive ротация. Дял на изоставането е 0% — секторът не е изоставал в наблюдавания прозорец — което укрепва картата. При Defensive режим с sizing -50% XLE предлага реална стопанска покривка срещу геополитически/петролен шок."
+    },
+    {
+     "etf": "XLV",
+     "chain": "RS линията на XLV е на 6-месечен връх — единственият сектор с това постижение в момента — което сигнализира устойчива институционална акумулация. Разпродажбата в биотех (Moderna -$24 млрд при 'sell-the-news' на ваксинни данни) засяга XBI, не XLV, чийто по-широк профил (фарма, медицински изделия) го изолира от биотех-специфичния шок. RS за 4 седмици +7.18% и RS за 12 седмици +7.49% показват равномерно лидерство без акселерация/дезелерация — стабилен тренд. Дял на изоставането е 15%, което е минимално и не опровергава лидерството. При Defensive позициониране нецикличният характер на здравеопазването го прави предпочитана дестинация наред с XLP."
+    }
+   ]
+  },
+  "2026-10-26": {
+   "rotation": [
+    {
+     "etf": "XLE",
+     "sector": "Енергетика",
+     "rs_chg_4w_pct": 13.42,
+     "rs_chg_12w_pct": 17.8,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "XLU",
+     "sector": "Комунални услуги",
+     "rs_chg_4w_pct": 9.33,
+     "rs_chg_12w_pct": -8.41,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 70.0
+    },
+    {
+     "etf": "XLP",
+     "sector": "Потребителски (защитни)",
+     "rs_chg_4w_pct": 9.17,
+     "rs_chg_12w_pct": -0.77,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 60.0
+    },
+    {
+     "etf": "XLV",
+     "sector": "Здравеопазване",
+     "rs_chg_4w_pct": 6.6,
+     "rs_chg_12w_pct": 4.63,
+     "rs_at_6m_high": true,
+     "leading": true,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 15.0
+    },
+    {
+     "etf": "XLB",
+     "sector": "Материали",
+     "rs_chg_4w_pct": 4.57,
+     "rs_chg_12w_pct": -4.23,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 70.0
+    },
+    {
+     "etf": "XLRE",
+     "sector": "Недвижими имоти",
+     "rs_chg_4w_pct": 3.96,
+     "rs_chg_12w_pct": -9.27,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLY",
+     "sector": "Потребителски (циклични)",
+     "rs_chg_4w_pct": 3.83,
+     "rs_chg_12w_pct": -2.0,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 65.0
+    },
+    {
+     "etf": "XLF",
+     "sector": "Финанси",
+     "rs_chg_4w_pct": 3.46,
+     "rs_chg_12w_pct": -5.29,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 80.0
+    },
+    {
+     "etf": "XLI",
+     "sector": "Индустрия",
+     "rs_chg_4w_pct": -1.96,
+     "rs_chg_12w_pct": -12.04,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XBI",
+     "sector": "Биотех",
+     "rs_chg_4w_pct": -2.1,
+     "rs_chg_12w_pct": -2.91,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "ITA",
+     "sector": "Отбрана",
+     "rs_chg_4w_pct": -4.0,
+     "rs_chg_12w_pct": -19.63,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "XLC",
+     "sector": "Комуникации",
+     "rs_chg_4w_pct": -5.2,
+     "rs_chg_12w_pct": -6.14,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 85.0
+    },
+    {
+     "etf": "XLK",
+     "sector": "Технологии",
+     "rs_chg_4w_pct": -5.25,
+     "rs_chg_12w_pct": 4.27,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 5.0
+    },
+    {
+     "etf": "TAN",
+     "sector": "Соларна",
+     "rs_chg_4w_pct": -5.39,
+     "rs_chg_12w_pct": -18.66,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    },
+    {
+     "etf": "SMH",
+     "sector": "Полупроводници",
+     "rs_chg_4w_pct": -11.78,
+     "rs_chg_12w_pct": -3.2,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 35.0
+    },
+    {
+     "etf": "GDX",
+     "sector": "Златодобив",
+     "rs_chg_4w_pct": -12.35,
+     "rs_chg_12w_pct": 5.09,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": false,
+     "laggard_persistence_pct": 0.0
+    },
+    {
+     "etf": "URA",
+     "sector": "Уран/ядрена",
+     "rs_chg_4w_pct": -15.37,
+     "rs_chg_12w_pct": -14.84,
+     "rs_at_6m_high": false,
+     "leading": false,
+     "confirmed_laggard": true,
+     "laggard_persistence_pct": 100.0
+    }
+   ],
+   "chains": [
+    {
+     "etf": "XLE",
+     "chain": "Петролът (WTI 100.97) пада над 2% за сесията на фона на опасения за разрушаване на търсенето — краткосрочен натиск върху абсолютните цени на XLE. Едновременно хуситките удари по Саудитска петролна инфраструктура поддържат геополитическа рискова премия, която не позволява пълна капитулация в цените. RS на XLE е на 6-месечен връх: +13.42% за 4 седмици и +17.8% за 12 седмици — единственият сектор с потвърдено лидерство и на двата хоризонта, и на 6-месечния връх по RS. В Defensive режим с sizing фактор 0.5 позиционирането в XLE е защитно-опортюнистично: реалните активи с ценова сила доминират при кредитен стрес, докато цикличните сектори (XLI, SMH) капитулират. Двупосочен ценови сигнал (търсене надолу, геополитика нагоре) прави XLE по-волатилен краткосрочно, но структурното RS лидерство на 12-седмичен хоризонт остава непокътнато."
+    }
+   ]
+  }
+ }
+}
