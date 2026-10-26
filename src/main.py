@@ -606,6 +606,19 @@ def run() -> dict:
         backtest.resolve_positions_only()
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
+    # 26.10.2026 (етап 4б, т. 1): цел на придобиване сред кандидатите — ПРЕДИ класификацията: такава карта е сделка (setup.kind "deal" — без buy-stop, план, Action и AI текст).
+    # ROKU 21–26.10: маркерът беше на картата, а сетъпът — "confirmed", eligible, "купува се до $167.88"; от Action я спираше само моделът. Списъците с подавания се споделят с
+    # проверката на картите по-долу (edgar_subs) — тегли се веднъж.
+    edgar_subs: dict = {}
+
+    def _merger_pre():
+        ts = [c.get("ticker") for c in candidates if c.get("ticker")]
+        spinoff_watch.check(ts, today, budget_sec=config.SPINOFF_BUDGET_SEC, merger_tickers=ts, subs=edgar_subs)
+        return spinoff_watch.annotate_mergers([candidates])
+    steps.step("merger_pre", _merger_pre, fallback=0, enabled=bool(config.ENABLE_SPINOFF_WATCH and config.ENABLE_MERGER_MARKER and candidates),
+               label="Целите на придобиване сред кандидатите (EDGAR 8-K, преди класификацията)",
+               consequence="цел на придобиване се класифицира по цената (маркерът идва по-късно, само върху картата)",
+               failed_if=lambda v: (spinoff_watch.LAST_DIAG.get("error") or "EDGAR не отговори") if not spinoff_watch.LAST_DIAG.get("ok", True) else None)
     candidates = setup_rules.annotate(candidates, today, backtest.live_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис / състоянието на задействания, не нов от днес
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
@@ -862,8 +875,10 @@ def run() -> dict:
     def _spinoff():
         nonlocal spinoff_active                                            # частично изпълненото (check преди провал в annotate) остава — както в try блока до 20.10
         card_tickers = [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])]
-        spinoff_active = spinoff_watch.check(card_tickers + (backtest.live_tickers() if config.ENABLE_BACKTEST else []), today, budget_sec=config.SPINOFF_BUDGET_SEC,
-                                             merger_tickers=card_tickers)            # 21.10.2026: и цел на придобиване — само за тикърите на картите (маркерът е на картата)
+        live_t = backtest.live_tickers() if config.ENABLE_BACKTEST else []
+        spinoff_active = spinoff_watch.check(card_tickers + live_t, today, budget_sec=config.SPINOFF_BUDGET_SEC,
+                                             merger_tickers=card_tickers + live_t,     # 21.10.2026: цел на придобиване за картите; 26.10.2026 (етап 4б, т. 1): и за живите записи (етикет "deal")
+                                             subs=edgar_subs)
         n_sp = spinoff_watch.annotate([action, watchlist, qm_cards, glb_candidates], spinoff_active)
         n_mg = spinoff_watch.annotate_mergers([action, watchlist, qm_cards, glb_candidates])     # само маркер — картата остава (решение на Венци, 21.10)
         backtest.SPINOFF_WINDOWS = spinoff_watch.windows()
@@ -877,6 +892,7 @@ def run() -> dict:
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
+        backtest.apply_deal_labels(spinoff_watch.LAST_MERGERS, dt.date.fromisoformat(today))   # 26.10.2026 (етап 4б, т. 1): етикет "deal" върху живите записи на цели на придобиване
         backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)

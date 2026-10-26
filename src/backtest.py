@@ -331,6 +331,32 @@ def apply_spinoff_notes(active: dict[str, dict], today: dt.date | None = None) -
         return 0
 
 
+def apply_deal_labels(mergers: dict[str, dict], today: dt.date | None = None) -> int:
+    """
+    26.10.2026 (етап 4б, т. 1 — решение от 26.10): жив запис (чакащ / отворен) в която и да е книга на тикър — цел на висяща сделка (spinoff_watch.LAST_MERGERS) — получава етикет
+    "deal" {buyer, announced, filing_date, seen}: резултатът му следва условията на сделката, не сетъпа (ROKU: buy-stop запис от 20.10, задействан на 22.10, при сделка от 21.10).
+    Етикетът остава и след затварянето (статистиката се показва с и без такива записи); провал на EDGAR (празен речник) нищо не маха. Връща броя етикетирани днес. Не вдига.
+    """
+    try:
+        if not mergers:
+            return 0
+        today_iso = (today or dt.date.today()).isoformat()
+        tracker = _load_tracker()
+        n = 0
+        for rec in tracker.values():
+            h = mergers.get(rec.get("ticker"))
+            if h and rec.get("status") in LIVE and not rec.get("deal"):
+                rec["deal"] = {"buyer": h.get("buyer"), "announced": h.get("announced"), "filing_date": h.get("filing_date"), "seen": today_iso}
+                n += 1
+        if n:
+            _save_tracker(tracker)
+            print(f"[backtest] етикет deal (цел на придобиване) върху {n} живи записа: {sorted({r['ticker'] for r in tracker.values() if (r.get('deal') or {}).get('seen') == today_iso})}")
+        return n
+    except Exception as e:
+        print(f"[backtest] етикетите deal пропуснати: {type(e).__name__}: {e}")
+        return 0
+
+
 def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict]) -> None:
     """Ingest-ва ЕДИН ден's Action списък (от snapshot файл ИЛИ директно in-memory) в tracker-а."""
     for c in action_list or []:
@@ -1399,7 +1425,7 @@ def get_buystop_summary() -> dict:
                 "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
-                "entry_volume_ratio": r.get("entry_volume_ratio")}
+                "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal")}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),
@@ -1511,6 +1537,7 @@ def get_qm_summary() -> dict:
                 "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_R_RISK_FLOOR_ADR,          # 12.10: флаг — R е смятан от пода 0.25×ADR (ELF 09.10: 0.09×ADR)
                 "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
                 "spinoff_note": r.get("spinoff_note"),                                                       # 13.10: предстоящо отделяне
+                "deal": r.get("deal"),                                                                       # 26.10: цел на придобиване
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -1610,7 +1637,8 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "signal_date": r.get("signal_date"), "status": r.get("status"), "glb_type": r.get("glb_type"), "regime": r.get("regime"),
                 "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
                 "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
-                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note")}
+                "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note"),
+                "deal": r.get("deal")}                                                                       # 26.10.2026: цел на придобиване
     live_all = sorted((r for r in records if r.get("status") in ("open", "pending")), key=lambda r: (r["entry_date"], r["ticker"]), reverse=True)
     live = [_row(r) for r in live_all[:15]]
     today_iso = dt.date.today().isoformat()
@@ -1736,6 +1764,7 @@ def get_backtest_summary() -> dict:
                 "alpha_pct": r.get("alpha_pct"),
                 "needs_manual_review": needs_review,
                 "spinoff_note": r.get("spinoff_note"),                  # 13.10.2026: "предстои отделяне на ДД.ММ (запис ДД.ММ)"
+                "deal": r.get("deal"),                                  # 26.10.2026 (етап 4б, т. 1): цел на придобиване
                 "entry_volume_ratio": r.get("entry_volume_ratio"),      # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap

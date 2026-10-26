@@ -343,6 +343,8 @@ def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
                       f"стоп ${bk['stop_loss']:.2f} ({(bk['fill_price'] - bk['stop_loss']) / bk['fill_price'] * 100:.1f}% под входа)"
                       + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; днес: {reason}")
             stop_pct = None                                                         # стопът на сетъпа от днес не е стопът на позицията
+        elif setup.get("book_note"):                                                # 26.10.2026 (етап 4б, т. 1): сделка със задействан запис — "в buy-stop книгата: отворена от …"
+            reason += f"; {setup['book_note']}"
         compact.append({"ticker": c.get("ticker"), "kind": kind, "reason": reason,
                         "stop_pct": stop_pct, "markers": c.get("markers") or [], "book": bk, "spinoff": c.get("spinoff_warning"),   # 13.10.2026: предстоящо отделяне
                         "merger": c.get("merger_target"),                                        # 21.10.2026: цел на придобиване (маркер)

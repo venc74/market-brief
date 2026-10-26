@@ -342,12 +342,14 @@ def _merger_scan(t: str, cik, sub: dict, cache: dict, today: dt.date, get) -> di
     return first
 
 
-def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None = None, merger_tickers=None) -> dict[str, dict]:
+def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None = None, merger_tickers=None, subs: dict | None = None) -> dict[str, dict]:
     """
     {тикър: засичане} за тикърите с АКТИВНО предупреждение: 8-K в последните config.SPINOFF_LOOKBACK_DAYS дни с пълно засичане и дата на разпределение ≥ днес (най-новият такъв 8-K).
     get(url) -> текст и cik_map {тикър: CIK} се подменят в тестовете. Записва кеша по документ и дневника. budget_sec: след него останалите тикъри (по реда на подаване) не се
     проверяват — LAST_DIAG["unchecked"]. Не вдига: провал → {} и LAST_DIAG ok=False.
     merger_tickers (21.10.2026): за тях се търси и висяща сделка, в която тикърът е ЦЕЛТА → LAST_MERGERS (маркер само върху картите — main подава тикърите на картите).
+    subs (26.10.2026, етап 4б, т. 1): речник {url: списъкът с подавания}, споделен между двете проверки на run-а (кандидатите преди класификацията и картите след нея) —
+    списъкът на един тикър се тегли веднъж.
     """
     LAST_DIAG.clear()
     LAST_DIAG.update(ok=True, requested=0, checked=0, filings=0, fetched=0, active=[], logged=0, errors=[], unchecked=[], error=None, mergers=[], merger_fetched=0)
@@ -384,7 +386,10 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
                 continue
             LAST_DIAG["checked"] += 1
             try:
-                sub = json.loads(get(f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"))
+                url = f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"
+                sub = subs[url] if subs is not None and url in subs else json.loads(get(url))
+                if subs is not None:
+                    subs[url] = sub
                 fs = recent_8k(sub, since, today.isoformat())
             except Exception as e:
                 LAST_DIAG["errors"].append({"ticker": t, "error": f"submissions: {type(e).__name__}"})

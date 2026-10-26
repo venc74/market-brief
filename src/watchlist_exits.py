@@ -33,6 +33,8 @@ def setup_text(setup: dict | None) -> str | None:
             return "под pivot — чака buy-stop"
         if kind == "confirmed":
             return "потвърден пробив"
+        if kind == "deal":                                                    # 26.10.2026 (етап 4б, т. 1)
+            return "сделка — цената следва условията, не е сетъп"
     except (TypeError, ValueError):
         pass
     return None

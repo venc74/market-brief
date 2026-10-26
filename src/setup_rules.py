@@ -205,6 +205,22 @@ def _dm(iso: str) -> str:
     return f"{iso[8:10]}.{iso[5:7]}"
 
 
+DEAL_TEXT = "Сделка — цената следва условията, не е сетъп."
+
+
+def deal_setup(setup: dict, merger: dict | None = None) -> dict:
+    """
+    26.10.2026 (етап 4б, т. 1 — решение от 26.10): цел на висяща сделка (маркерът „цел на придобиване“ от spinoff_watch) НЕ е сетъп — kind "deal": без buy-stop, план и Action,
+    без AI текст (сетъпът е извън AI_NARRATIVE_SETUPS). ROKU 21–26.10: маркерът беше на картата, а сетъпът — "confirmed", eligible, "купува се до $167.88"; от Action я спираше само
+    моделът. price_kind пази класификацията по цената (за проследимост). Чиста функция.
+    """
+    out = {**(setup or {}), "kind": "deal", "eligible": False, "gate": "deal", "buy_stop": None, "max_chase": None, "valid_through": None,
+           "struct_stop": None, "struct_risk_pct": None, "stop": None, "risk_pct": None, "price_kind": (setup or {}).get("kind"), "trigger_text": DEAL_TEXT}
+    if merger:
+        out["deal"] = {k: merger.get(k) for k in ("buyer", "announced", "filing_date")}
+    return out
+
+
 def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     """
     Пакет 1б (б): за buy-stop кандидат (kind "below_pivot") със ЧАКАЩ запис в книгата картата показва прозореца на записа, не нов от днес. Записът брои 5-те сесии от ПЪРВИЯ ден
@@ -219,6 +235,8 @@ def apply_book_window(setup: dict, rec: dict | None, today=None) -> dict:
     if not rec:
         return setup
     today_iso = (today or dt.date.today()).isoformat() if not isinstance(today, str) else today
+    if setup.get("kind") == "deal":                                           # 26.10.2026 (етап 4б, т. 1): сделка — само неутрален ред за задействания запис, не прозорец / план
+        return _book_note(setup, rec) if rec.get("status") in ("open", "trailing") else setup
     if rec.get("status") in ("open", "trailing"):
         return _book_note(setup, rec) if setup.get("kind") == "confirmed" else _apply_triggered(setup, rec, today_iso)
     if setup.get("kind") != "below_pivot" or not setup.get("buy_stop"):
@@ -306,6 +324,8 @@ def annotate(candidates: list[dict], today=None, buystop_book: dict | None = Non
     for c in candidates:
         try:
             c["setup"] = classify_setup(c, today)
+            if c.get("merger_target"):                                        # 26.10.2026 (етап 4б, т. 1): цел на придобиване → сделка, не сетъп
+                c["setup"] = deal_setup(c["setup"], c["merger_target"])
             if buystop_book:
                 apply_book_window(c["setup"], buystop_book.get(c.get("ticker")), today)
         except Exception as e:                       # graceful: един счупен кандидат не чупи run-а
@@ -335,7 +355,7 @@ def screen_priority(row: dict) -> tuple:
 # Watchlist картите са най-много 10: потвърден пробив, спрян от лимит/режим/earnings,
 # е по-силен от buy-stop кандидат, а той — от "над pivot без обем"; extended най-накрая.
 _WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3, "too_wide": 3,
-                "no_data": 4}
+                "no_data": 4, "deal": 4}
 
 
 def watchlist_sort_key(c: dict) -> tuple:
