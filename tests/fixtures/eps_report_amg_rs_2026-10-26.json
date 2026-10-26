@@ -1,0 +1,470 @@
+{
+ "_note": "РЕАЛНО: yf.Ticker(sym).get_earnings_dates(limit=8) за AMG и RS (Yahoo), свалени на 26.10.2026; и .info earningsQuarterlyGrowth (AMG 1.205, RS 1.126) към същия ден. Решение по етап 4б, т. 2 (EPS на картата). И картата на AMG от Watchlist на брифа от 26.10 (data/2026-10-26.json).",
+ "rows": {
+  "AMG": [
+   {
+    "ts": "2026-11-02T07:00:00-05:00",
+    "EPS Estimate": 8.79,
+    "Reported EPS": null,
+    "Surprise(%)": null
+   },
+   {
+    "ts": "2026-07-30T06:00:00-04:00",
+    "EPS Estimate": 7.92,
+    "Reported EPS": 8.29,
+    "Surprise(%)": 4.69
+   },
+   {
+    "ts": "2026-05-01T06:00:00-04:00",
+    "EPS Estimate": 8.07,
+    "Reported EPS": 8.23,
+    "Surprise(%)": 1.93
+   },
+   {
+    "ts": "2026-02-12T06:00:00-05:00",
+    "EPS Estimate": 8.84,
+    "Reported EPS": 9.48,
+    "Surprise(%)": 7.28
+   },
+   {
+    "ts": "2025-11-03T06:00:00-05:00",
+    "EPS Estimate": 5.88,
+    "Reported EPS": 6.1,
+    "Surprise(%)": 3.72
+   },
+   {
+    "ts": "2025-07-31T07:00:00-04:00",
+    "EPS Estimate": 5.29,
+    "Reported EPS": 5.39,
+    "Surprise(%)": 1.96
+   },
+   {
+    "ts": "2025-05-08T06:00:00-04:00",
+    "EPS Estimate": 5.09,
+    "Reported EPS": 5.2,
+    "Surprise(%)": 2.08
+   },
+   {
+    "ts": "2025-02-06T06:00:00-05:00",
+    "EPS Estimate": 6.03,
+    "Reported EPS": 6.53,
+    "Surprise(%)": 8.38
+   },
+   {
+    "ts": "2024-11-04T07:00:00-05:00",
+    "EPS Estimate": 4.84,
+    "Reported EPS": 4.82,
+    "Surprise(%)": -0.4
+   },
+   {
+    "ts": "2024-07-29T07:00:00-04:00",
+    "EPS Estimate": 4.6,
+    "Reported EPS": 4.67,
+    "Surprise(%)": 1.43
+   },
+   {
+    "ts": "2024-05-06T07:00:00-04:00",
+    "EPS Estimate": 5.24,
+    "Reported EPS": 5.37,
+    "Surprise(%)": 2.54
+   },
+   {
+    "ts": "2024-02-05T07:00:00-05:00",
+    "EPS Estimate": 6.0,
+    "Reported EPS": 6.86,
+    "Surprise(%)": 14.24
+   },
+   {
+    "ts": "2023-11-06T07:00:00-05:00",
+    "EPS Estimate": 3.74,
+    "Reported EPS": 4.08,
+    "Surprise(%)": 9.06
+   },
+   {
+    "ts": "2023-07-26T07:00:00-04:00",
+    "EPS Estimate": 4.23,
+    "Reported EPS": 4.45,
+    "Surprise(%)": 5.11
+   },
+   {
+    "ts": "2023-05-01T07:00:00-04:00",
+    "EPS Estimate": 4.15,
+    "Reported EPS": 4.18,
+    "Surprise(%)": 0.6
+   },
+   {
+    "ts": "2023-02-06T07:00:00-05:00",
+    "EPS Estimate": 7.04,
+    "Reported EPS": 7.28,
+    "Surprise(%)": 3.4
+   },
+   {
+    "ts": "2022-11-07T07:00:00-05:00",
+    "EPS Estimate": 3.91,
+    "Reported EPS": 4.21,
+    "Surprise(%)": 7.73
+   },
+   {
+    "ts": "2022-08-01T07:00:00-04:00",
+    "EPS Estimate": 3.97,
+    "Reported EPS": 4.03,
+    "Surprise(%)": 1.63
+   },
+   {
+    "ts": "2022-05-02T07:00:00-04:00",
+    "EPS Estimate": 4.34,
+    "Reported EPS": 4.65,
+    "Surprise(%)": 7.04
+   },
+   {
+    "ts": "2022-02-07T07:00:00-05:00",
+    "EPS Estimate": 5.81,
+    "Reported EPS": 6.1,
+    "Surprise(%)": 5.05
+   },
+   {
+    "ts": "2021-11-01T07:00:00-04:00",
+    "EPS Estimate": 3.91,
+    "Reported EPS": 4.0,
+    "Surprise(%)": 2.26
+   },
+   {
+    "ts": "2021-07-28T07:00:00-04:00",
+    "EPS Estimate": 3.85,
+    "Reported EPS": 4.03,
+    "Surprise(%)": 4.62
+   },
+   {
+    "ts": "2021-05-03T07:00:00-04:00",
+    "EPS Estimate": 4.24,
+    "Reported EPS": 4.28,
+    "Surprise(%)": 0.97
+   },
+   {
+    "ts": "2021-02-08T07:00:00-05:00",
+    "EPS Estimate": 3.68,
+    "Reported EPS": 4.22,
+    "Surprise(%)": 14.68
+   },
+   {
+    "ts": "2020-10-26T07:00:00-04:00",
+    "EPS Estimate": 2.85,
+    "Reported EPS": 3.27,
+    "Surprise(%)": 14.93
+   }
+  ],
+  "RS": [
+   {
+    "ts": "2027-02-17T15:00:00-05:00",
+    "EPS Estimate": 7.62,
+    "Reported EPS": null,
+    "Surprise(%)": null
+   },
+   {
+    "ts": "2026-10-21T16:00:00-04:00",
+    "EPS Estimate": 6.83,
+    "Reported EPS": 8.02,
+    "Surprise(%)": 17.43
+   },
+   {
+    "ts": "2026-07-22T16:00:00-04:00",
+    "EPS Estimate": 5.47,
+    "Reported EPS": 6.27,
+    "Surprise(%)": 14.72
+   },
+   {
+    "ts": "2026-04-22T16:00:00-04:00",
+    "EPS Estimate": 4.66,
+    "Reported EPS": 5.16,
+    "Surprise(%)": 10.66
+   },
+   {
+    "ts": "2026-02-18T16:00:00-05:00",
+    "EPS Estimate": 2.82,
+    "Reported EPS": 2.4,
+    "Surprise(%)": -14.84
+   },
+   {
+    "ts": "2025-10-22T16:00:00-04:00",
+    "EPS Estimate": 3.73,
+    "Reported EPS": 3.64,
+    "Surprise(%)": -2.38
+   },
+   {
+    "ts": "2025-07-23T16:00:00-04:00",
+    "EPS Estimate": 4.71,
+    "Reported EPS": 4.43,
+    "Surprise(%)": -5.84
+   },
+   {
+    "ts": "2025-04-23T16:00:00-04:00",
+    "EPS Estimate": 3.69,
+    "Reported EPS": 3.77,
+    "Surprise(%)": 2.06
+   },
+   {
+    "ts": "2025-02-19T16:00:00-05:00",
+    "EPS Estimate": 2.73,
+    "Reported EPS": 2.22,
+    "Surprise(%)": -18.53
+   },
+   {
+    "ts": "2024-10-24T06:00:00-04:00",
+    "EPS Estimate": 3.66,
+    "Reported EPS": 3.64,
+    "Surprise(%)": -0.68
+   },
+   {
+    "ts": "2024-07-25T06:00:00-04:00",
+    "EPS Estimate": 4.72,
+    "Reported EPS": 4.65,
+    "Surprise(%)": -1.39
+   },
+   {
+    "ts": "2024-04-25T06:00:00-04:00",
+    "EPS Estimate": 5.51,
+    "Reported EPS": 5.3,
+    "Surprise(%)": -3.75
+   },
+   {
+    "ts": "2024-02-15T06:00:00-05:00",
+    "EPS Estimate": 3.91,
+    "Reported EPS": 4.73,
+    "Surprise(%)": 20.87
+   },
+   {
+    "ts": "2023-10-26T06:00:00-04:00",
+    "EPS Estimate": 4.94,
+    "Reported EPS": 5.0,
+    "Surprise(%)": 1.16
+   },
+   {
+    "ts": "2023-07-27T06:00:00-04:00",
+    "EPS Estimate": 6.54,
+    "Reported EPS": 6.49,
+    "Surprise(%)": -0.82
+   },
+   {
+    "ts": "2023-04-27T06:00:00-04:00",
+    "EPS Estimate": 5.68,
+    "Reported EPS": 6.37,
+    "Surprise(%)": 12.15
+   },
+   {
+    "ts": "2023-02-16T06:00:00-05:00",
+    "EPS Estimate": 4.47,
+    "Reported EPS": 5.87,
+    "Surprise(%)": 31.38
+   },
+   {
+    "ts": "2022-10-27T06:00:00-04:00",
+    "EPS Estimate": 6.19,
+    "Reported EPS": 6.48,
+    "Surprise(%)": 4.75
+   },
+   {
+    "ts": "2022-07-28T06:00:00-04:00",
+    "EPS Estimate": 9.02,
+    "Reported EPS": 9.15,
+    "Surprise(%)": 1.49
+   },
+   {
+    "ts": "2022-04-28T06:00:00-04:00",
+    "EPS Estimate": 7.18,
+    "Reported EPS": 8.42,
+    "Surprise(%)": 17.33
+   },
+   {
+    "ts": "2022-02-17T06:00:00-05:00",
+    "EPS Estimate": 5.22,
+    "Reported EPS": 6.83,
+    "Surprise(%)": 30.91
+   },
+   {
+    "ts": "2021-10-28T06:00:00-04:00",
+    "EPS Estimate": 5.93,
+    "Reported EPS": 6.15,
+    "Surprise(%)": 3.63
+   },
+   {
+    "ts": "2021-07-22T06:00:00-04:00",
+    "EPS Estimate": 4.89,
+    "Reported EPS": 5.06,
+    "Surprise(%)": 3.41
+   },
+   {
+    "ts": "2021-04-22T06:00:00-04:00",
+    "EPS Estimate": 3.57,
+    "Reported EPS": 4.1,
+    "Surprise(%)": 14.84
+   },
+   {
+    "ts": "2021-02-18T06:00:00-05:00",
+    "EPS Estimate": 2.0,
+    "Reported EPS": 2.01,
+    "Surprise(%)": 0.6
+   }
+  ]
+ },
+ "eqg": {
+  "AMG": 1.205,
+  "RS": 1.126
+ },
+ "card_amg_2026_10_26": {
+  "ticker": "AMG",
+  "price": 383.42,
+  "pivot": 395.0,
+  "pct_from_pivot": -2.93,
+  "pivot_bars_excluded": 5,
+  "base_type": "база 14.1% дълбочина",
+  "base_depth_pct": 14.1,
+  "weinstein_stage": 2,
+  "rs_status": "near_high",
+  "rs_line_pct": 97.4,
+  "rs_held": false,
+  "ma50": 368.95,
+  "ma200": 330.51,
+  "above_ma50": true,
+  "above_ma200": true,
+  "avg_volume_50d": 286970,
+  "last_volume": 389400,
+  "volume_ratio": 1.36,
+  "breakout_volume": false,
+  "base_low": 342.82,
+  "struct_low": 369.71,
+  "adr_pct": 3.0,
+  "pct_above_52w_low": 63.1,
+  "pct_below_52w_high": 3.9,
+  "trend_template_applied": true,
+  "rs_score": 0.1244,
+  "rs_rating": 89,
+  "company": "Affiliated Managers Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "business_summary": "Affiliated Managers Group, Inc., through its affiliates, operates as an investment management company providing investment management services to mutual funds, institutional clients,retails and high net worth individuals in the United States. It provides advisory or sub-advisory services to mutual funds. These funds are distributed to retail, high net worth and institutional clients directly and through intermediaries, including independent investment advisors, retirement plan sponsors, broker-dealers, major fund marketplaces, and bank trust departments. The company also offers investment prod",
+  "market_cap": 9915215872,
+  "eps_growth_yoy": 120.5,
+  "revenue_growth_yoy": 29.9,
+  "roe": 24.3,
+  "pe": 13.434478,
+  "forward_pe": 8.885638,
+  "debt_to_equity": 76.096,
+  "inst_ownership_pct": 100.6,
+  "analyst_target": 445.7143,
+  "short_pct_float": 5.25,
+  "shares_short": 1009113,
+  "short_ratio_dtc": 3.31,
+  "macro_tailwind": false,
+  "tailwind_etfs": [],
+  "earnings": {
+   "next_earnings": "2026-11-02",
+   "days_to_earnings": 7,
+   "in_blackout": true,
+   "eps_estimate": 37.19493,
+   "recap": null,
+   "earnings_status": "ok",
+   "last_report": "2026-07-30T06:00:00-04:00",
+   "recent_report": null
+  },
+  "short_view": {
+   "short_pct_float": 5.25,
+   "days_to_cover": 3.31,
+   "interpretation": "Нисък short interest (5.25%) — без squeeze динамика, но и без активна опозиция."
+  },
+  "markers": [],
+  "setup": {
+   "kind": "below_pivot",
+   "eligible": false,
+   "gate": "below_pivot",
+   "pct_from_pivot": -2.93,
+   "volume_ok": false,
+   "buy_stop": 395.0,
+   "max_chase": 414.75,
+   "valid_through": "2026-10-30",
+   "struct_stop": 366.01,
+   "struct_risk_pct": 7.34,
+   "stop": 366.01,
+   "risk_pct": 7.34,
+   "trigger_text": "✅ Задействан на 21.10 по $395.00 (buy-stop от 20.10) · стоп $363.40 · цел 2R $458.20 · текущо -0.4R — изпълнен сигнал от книгата, не нов вход.",
+   "triggered": true,
+   "book_status": "open",
+   "valid_label": null,
+   "book": {
+    "fill_date": "2026-10-21",
+    "fill_price": 395.0,
+    "entry_date": "2026-10-20",
+    "stop_loss": 363.4,
+    "target_1": 458.2,
+    "current_r": -0.37,
+    "status": "open"
+   }
+  },
+  "ai": {
+   "ticker": "AMG",
+   "why_now": "Setup-ът е чисто технически — AMG е в Financial Services/Asset Management. При кредитен стрес (IEI/HYG override, Defensive режим) asset managers са под натиск от outflows и компресия на AUM, което прави макро средата неблагоприятна за сектора въпреки силните фундаментали. Задействан buy-stop на 21.10 по $395.00, текущо -0.4R.",
+   "business_bg": "Affiliated Managers Group управлява инвестиционни активи чрез мрежа от партньорски независими мениджъри за институционални, retail и high-net-worth клиенти. Бизнес моделът е базиран на споделяне на приходи с афилираните мениджъри. EPS ръст 120.5% YoY и forward P/E 8.9 са изключително атрактивни.",
+   "catalysts": [
+    "Analyst target $445.71 — ~16.2% upside от текущата цена",
+    "Forward P/E 8.9 при EPS ръст 120.5% — значително undervalued спрямо ръста",
+    "Обем ratio 1.36× — над средния, показва активен интерес",
+    "Earnings на 02.11.2026 — потенциален катализатор след резултата"
+   ],
+   "risks": [
+    "Earnings на 02.11 са само след 7 дни — blackout риск и гап риск",
+    "Defensive режим с кредитен стрес е неблагоприятен за asset managers",
+    "Setup: задействан по $395.00, текущо -0.4R, стоп $363.40 — позицията е в червено",
+    "Financial Services не е в активната секторна логика при текущия режим"
+   ],
+   "earnings_call": "преди earnings — отчетът е на 02.11.2026, само 7 дни напред, позицията е отворена с активен blackout риск.",
+   "classification": "Watchlist",
+   "watchlist_reason_type": "earnings_blackout",
+   "watchlist_trigger": "Отчет на 02.11 (7 дни) — нов Action най-рано след отчета. ✅ Задействан на 21.10 по $395.00 (buy-stop от 20.10) · стоп $363.40 · цел 2R $458.20 · текущо -0.4R — изпълнен сигнал от книгата, не нов вход. Режим Defensive — Action само при добър entry timing (0…+2% над pivot, с обем): Все още 2.9% под pivot — не е пробил още, изчакай реален пробив."
+  },
+  "plan_preview": {
+   "valid": true,
+   "method": "v2",
+   "entry_range": [
+    395.0,
+    414.75
+   ],
+   "entry_mid": 395.0,
+   "buy_stop": 395.0,
+   "max_chase": 414.75,
+   "valid_through": "2026-10-30",
+   "window_sessions": 5,
+   "stop_loss": 366.01,
+   "stop_basis": "структурен: 15-барен low −1%",
+   "stop_capped": false,
+   "struct_stop": 366.01,
+   "struct_risk_pct": 7.34,
+   "risk_pct": 7.34,
+   "risk_per_share": 28.99,
+   "sizing_factor": 0.5,
+   "target_1": 452.98,
+   "target_1_fraction": 0.5,
+   "target_2": "остатъкът (50%): trailing под 10DMA след $452.98; стопът $366.01 остава активен",
+   "reward_risk": 2.0,
+   "time_horizon": "4–8 седмици",
+   "preview": true
+  },
+  "levels": {
+   "strategy": "canslim",
+   "entry": 395.0,
+   "entry_label": "вход при задействане (buy-stop)",
+   "stop": 366.01,
+   "stop_source": "structural",
+   "stop_source_text": "структурен: 15-барен low −1%",
+   "stop_pct": 7.34,
+   "adr_pct": 3.0,
+   "regime_factor": 0.5,
+   "warnings": []
+  },
+  "earnings_warning": {
+   "date": "2026-11-02",
+   "sessions": 5,
+   "implied_move_pct": null,
+   "reason": "спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк",
+   "text": "⚠ Отчет на 02.11 (след 5 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк)."
+  }
+ }
+}

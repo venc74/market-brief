@@ -1129,8 +1129,11 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
             "ticker", "company", "sector", "industry", "business_summary",
             "price", "pivot", "pct_from_pivot", "base_type", "base_depth_pct",
             "rs_status", "rs_rating", "volume_ratio",
-            "eps_growth_yoy", "revenue_growth_yoy", "roe", "pe", "forward_pe",
+            "revenue_growth_yoy", "roe", "pe", "forward_pe",
             "inst_ownership_pct", "analyst_target")})
+        # 26.10.2026 (решение по етап 4б, т. 2): честните имена — EPS от отчета г/г и ръстът на нетната печалба (earningsQuarterlyGrowth на Yahoo, до 26.10 подаван като "eps_growth_yoy")
+        slim[-1]["eps_growth_report_pct"] = ((c.get("earnings") or {}).get("eps_report_yoy") or {}).get("pct")
+        slim[-1]["net_income_growth_yoy_yahoo_pct"] = c.get("eps_growth_yoy")
         slim[-1]["earnings"] = c.get("earnings")
         # код-изчислена техническа класификация (виж setup_rules): confirmed |
         # no_volume | below_pivot | extended — Action е допустим само при confirmed

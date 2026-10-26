@@ -39,7 +39,7 @@ with contextlib.redirect_stdout(io.StringIO()) as log:
 F = screener.LAST_FUNDAMENTALS
 assert passed == []                                                                                 # РЕАЛНО: при праговете (EPS ≥ 25%, приходи ≥ 20%, ROE ≥ 17%) никой от трите не минава
 assert {t: F[t]["result"] for t in F} == {"CORT": "criteria", "DOCN": "criteria", "CRL": "criteria", "LLY": "unavailable", "EMPTY": "unavailable", "AMD": "not_checked"}, F
-assert F["CORT"]["text"] == "CANSLIM: EPS +22%, приходи +32%, ROE 8% — 1 от 3 критерия (нужни 2)" and "EPS спада" in F["DOCN"]["text"] and "RuntimeError" in F["LLY"]["text"] and "празен отговор" in F["EMPTY"]["text"]
+assert F["CORT"]["text"] == "CANSLIM: нетна печалба г/г +22% (Yahoo), приходи +32%, ROE 8% — 1 от 3 критерия (нужни 2)" and "нетната печалба спада" in F["DOCN"]["text"] and "RuntimeError" in F["LLY"]["text"] and "празен отговор" in F["EMPTY"]["text"]
 assert screener.LAST_STATUS["fundamentals_unavailable"] == ["EMPTY", "LLY"] and screener.LAST_STATUS["fundamentals_checked"] == 5
 assert "фундаментите не се изтеглиха за ['EMPTY', 'LLY']" in log.getvalue()
 for t in ("CORT", "DOCN", "CRL", "LLY", "EMPTY", "AMD"):
@@ -58,7 +58,7 @@ try:
 finally:
     screener.explain_exclusion = real_ex
 assert why["LLY"].startswith("техническите филтри са преминати; фундаментите (Yahoo .info) не се изтеглиха днес (RuntimeError)")
-assert why["DOCN"].startswith("техническите филтри са преминати; CANSLIM: EPS -4%")
+assert why["DOCN"].startswith("техническите филтри са преминати; CANSLIM: нетна печалба г/г -4% (Yahoo)")
 assert "CANSLIM фундаментите или лимитът" in why["PASSED"]                                            # минал CANSLIM → отпаднал по-късно (общият текст остава)
 print(f"  ✓ LLY → «{why['LLY']}»")
 

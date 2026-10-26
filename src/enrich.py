@@ -46,6 +46,28 @@ def _quarter_dict(date_ts, row) -> dict:
     }
 
 
+def eps_report_yoy(past) -> dict | None:
+    """
+    26.10.2026 (решение по етап 4б, т. 2): ръстът на EPS ОТ ОТЧЕТА — последното отчетено тримесечие (Reported EPS) срещу същото тримесечие година по-рано (_find_yoy_row) — основното
+    число на картата. Полето eps_growth_yoy (earningsQuarterlyGrowth на Yahoo) е ръстът на НЕТНАТА ПЕЧАЛБА: AMG +120.5% ($185.9 / $84.3 млн), а EPS от отчета е +53.8% ($8.29 / $5.39).
+    past — миналите редове на get_earnings_dates(). {"pct", "current", "yoy", "date", "yoy_date"} или None (няма две отчетени тримесечия / EPS година по-рано е 0). Чиста функция.
+    """
+    try:
+        rows = past[past["Reported EPS"].notna()].sort_index(ascending=False) if past is not None and len(past) else None
+        if rows is None or not len(rows):
+            return None
+        ts = rows.index[0]
+        yts = _find_yoy_row(rows, ts.date())
+        if yts is None:
+            return None
+        cur, yoy = float(rows.loc[ts, "Reported EPS"]), float(rows.loc[yts, "Reported EPS"])
+        if not yoy:
+            return None
+        return {"pct": round((cur - yoy) / abs(yoy) * 100, 1), "current": round(cur, 2), "yoy": round(yoy, 2), "date": ts.date().isoformat(), "yoy_date": yts.date().isoformat()}
+    except Exception:
+        return None
+
+
 def _find_yoy_row(past_sorted, ref_date: "dt.date"):
     """
     Намира TIMESTAMP-а на реда в past_sorted (МИНАЛИ редове), чиято дата е
@@ -180,7 +202,7 @@ def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
     """
     out = {"next_earnings": None, "days_to_earnings": None,
            "in_blackout": False, "eps_estimate": None, "recap": None,
-           "earnings_status": "failed", "last_report": None, "recent_report": None}
+           "earnings_status": "failed", "last_report": None, "recent_report": None, "eps_report_yoy": None}
     now = now or dt.datetime.now(dt.timezone.utc)
     today = now.date()
     try:
@@ -218,6 +240,7 @@ def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
                 last_ts = past.index.max()
                 out["last_report"] = last_ts.isoformat()
                 out["recent_report"] = recent_report(last_ts, today)
+                out["eps_report_yoy"] = eps_report_yoy(past)                 # 26.10.2026: EPS от отчета г/г — основното число на картата
         out["earnings_status"] = "ok" if ed is not None else ("no_date" if (df is not None or isinstance(cal, dict)) else "failed")
         if ed is not None:
             if isinstance(ed, dt.datetime):

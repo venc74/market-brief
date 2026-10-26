@@ -526,8 +526,9 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
                       rev_g >= config.MIN_REVENUE_GROWTH_YOY,
                       roe >= config.MIN_ROE]
             if sum(checks) < 2 or eps_g < 0:
-                LAST_FUNDAMENTALS[sym] = {"result": "criteria", "text": (f"CANSLIM: EPS {eps_g:+.0f}%, приходи {rev_g:+.0f}%, ROE {roe:.0f}% — {sum(checks)} от 3 критерия"
-                                                                         + (" (нужни 2)" if sum(checks) < 2 else "") + (", EPS спада" if eps_g < 0 else ""))}
+                # 26.10.2026: earningsQuarterlyGrowth е ръстът на нетната печалба, не EPS от отчета — честният етикет
+                LAST_FUNDAMENTALS[sym] = {"result": "criteria", "text": (f"CANSLIM: нетна печалба г/г {eps_g:+.0f}% (Yahoo), приходи {rev_g:+.0f}%, ROE {roe:.0f}% — {sum(checks)} от 3 критерия"
+                                                                         + (" (нужни 2)" if sum(checks) < 2 else "") + (", нетната печалба спада" if eps_g < 0 else ""))}
                 continue
 
             row.update({
