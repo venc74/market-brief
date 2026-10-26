@@ -665,7 +665,8 @@ CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 4))                        
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
 CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC
 # ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──
-ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "0") == "1"             # включва се, когато се потвърди часът с пълния дневен обем (проверката 22–23.10)
+# 26.10.2026 (етап 4б, т. 9): включено в сутрешния run със самопроверка (options_record.completeness) — денят влиза в историята само ако последната сделка е от затварянето
+ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "1") == "1"
 OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))                  # топ по оборот (close × обем, 20 сесии); измерено 21.10: 200 вериги × 2 падежа = 70 s, 0 грешки
 OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
 OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%

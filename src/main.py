@@ -1011,10 +1011,12 @@ def run() -> dict:
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
     sector_card = steps.step("sector_card", lambda: sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation), fallback={},
                              label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
-    # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; изключено до проверката на часа с пълния обем
+    # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; 26.10.2026 (етап 4б, т. 9): включено, със самопроверка —
+    # непълен ден (последната сделка не е от затварянето на сесията) не влиза в историята и стъпката е частична
     steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and qm_universe),      # универсът е веднъж на run (QM)
                label="Записът на опционните данни", consequence="днешната сесия липсва в историята за необичайна активност (нищо в брифа не зависи от нея)",
-               failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
+               failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None,
+               partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
