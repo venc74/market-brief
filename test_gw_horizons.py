@@ -62,4 +62,18 @@ assert h5["n"] == 2 and h5["avg_ret"] == round((p["horizons"]["5"]["ret"] + r["h
 assert not S["horizons_visible"] and all(g["avg_ret"] is None for g in S["by_regime"].values())
 assert not {"win_rate_pct", "median_return_pct", "win_ci_pct"} & set(S["all"])
 print(f"  ✓ 5 сесии: средно {h5['avg_ret']:+.2f}% (n=2); 10 сесии: n=1; 20 сесии: n=0 — сравнението по режим чака {config.GLB_WISH_MIN_ENTRIES_FOR_STATS} записа с 20 сесии")
+
+print()
+print("── 4. изречението за реплея над книгите (решение по етап 4б, т. 1) ──")
+from src import render
+import re, html as htmllib
+for key, rep in (("glb_wish", config.GLB_WISH_REPLAY_STATS), ("glb_wish_high", config.GLB_WISH_HIGH_REPLAY_STATS)):
+    assert not {"win_literal_pct", "win_exec_pct", "median_literal_pct", "median_exec_pct"} & set(rep) and set(rep["horizons"]) == {"5", "10", "20"}
+B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
+b = copy.deepcopy(B19); b.setdefault("backtest", {})["glb_wish"] = S
+with contextlib.redirect_stdout(io.StringIO()):
+    page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
+assert "Реплей върху историята (1962–2026, 26 183 сделки; SPY от 1993): алфа на година позиция +8.8% [6.2; 11.9]; доходност N сесии след входа" in page
+assert "20 — +0.69% срещу +0.47% (алфа +0.22% [-0.00; 0.44])" in page and "оцелели" in page and "печеливши 9.3%" not in page and "медиана -1.59%" not in page
+print("  ✓ „Реплей … алфа на година позиция +8.8% [6.2; 11.9]; … 20 — +0.69% срещу +0.47% (алфа +0.22% …)“; без % печеливши и медиана; бележката за оцелелите остава")
 print("\n✅ test_gw_horizons: всичко мина")

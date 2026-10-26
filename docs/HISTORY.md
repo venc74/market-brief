@@ -424,6 +424,12 @@
   • Дребни: GLB дата = сесията на пробива (NWSA / ED 23.10); задействаните buy-stop записи — винаги компактен ред без AI текст (ZBRA беше карта, AAPL / AMG — ред); „последните 10
     от 14“; отворена позиция в qm_breakout с отчет до 20 сесии — ред в книгата (CBOE 30.10, UTHR 04.11, RVTY 03.11). EPS +120.5% (AMG) и +120.3% (RS) — съвпадение: AMG е
     `earningsQuarterlyGrowth` на Yahoo (нетна печалба $185.9 / $84.3 млн), RS — нашият преглед на отчетите (EPS $8.02 / $3.64).
+  • Решения от 26.10 (след доклада): (1) изречението за реплея над книгите тип Уиш — без % печеливши и медиана; остават алфа на година позиция (21.10: по Уиш +11.0% [6.2; 16.9],
+    close +8.8% [6.2; 11.9]) и 5 / 10 / 20 сесии след входа спрямо SPY (нов реплей 26.10, 903 тикъра, до 23.10, оцелели: по Уиш алфа +0.02 / +0.17 / +0.38%, само на 20 сесии
+    интервалът е над нулата; close — 0.00 / +0.05 / +0.22%; сделките 13 168 / 26 183 — същите като на 21.10 и 09.10, проверката Σ алфа / Σ години дава пак +11.0% / +8.9%);
+    (2) EPS на картата — „EPS ръст (от отчета)“ (последното тримесечие срещу година по-рано, от get_earnings_dates — за всяка карта), ръстът на нетната печалба на Yahoo — с изричен етикет;
+    моделът получава двете под честни имена; (3) договорът на фючърса — резерв по името (shortName „Crude Oil Dec 26“ → CLZ26); (4) `data/options_daily.json` — последните 90 сесии
+    (~4.7 MB, оценка); историята на git пази дневните версии (~25–70 KB на ден след компресия, оценка).
 
 ## Структура — подробните описания (към 20.10.2026)
 
@@ -614,4 +620,4 @@ tests/fixtures/        — реални входове: OHLC (AMD, TWLO, LNTH, E
   `CRYPTO_NEWS_HOURS = 30`, `CRYPTO_MAX_ITEMS = 4`, `CRYPTO_TICKERS`, `CRYPTO_COT_MARKET`; `ENABLE_OPTIONS_RECORD = 0`, `OPTIONS_RECORD_TOP_N = 200`, `OPTIONS_RECORD_EXPIRIES = 2`,
   `OPTIONS_RECORD_MOVE_PCT = 5`, `OPTIONS_RECORD_VOL_X = 2`, `OPTIONS_RECORD_KEEP = 30`.
 - Етап 4б (26.10.2026) — параметри: `ENABLE_OPTIONS_RECORD = 1` (със самопроверка); `CREDIT_CLAIM_HYG_CONFIRM_PCT = -0.2`; `GLB_WISH_HORIZONS = (5, 10, 20)`,
-  `GLB_WISH_COMPARE_HORIZON = 20`; `ENABLE_EVENT_LABEL = 1`, `EVENT_JUMP_PCT = 8`, `EVENT_VOL_X = 3`, `EVENT_VOL_AVG_SESSIONS = 50`, `EVENT_NEWS_DAYS_BEFORE = 2`, `EVENT_NEWS_DAYS_AFTER = 1`.
+  `GLB_WISH_COMPARE_HORIZON = 20`; `OPTIONS_RECORD_KEEP = 90`; `GLB_WISH_REPLAY_STATS` / `GLB_WISH_HIGH_REPLAY_STATS` — само алфа на година позиция и horizons; `ENABLE_EVENT_LABEL = 1`, `EVENT_JUMP_PCT = 8`, `EVENT_VOL_X = 3`, `EVENT_VOL_AVG_SESSIONS = 50`, `EVENT_NEWS_DAYS_BEFORE = 2`, `EVENT_NEWS_DAYS_AFTER = 1`.
