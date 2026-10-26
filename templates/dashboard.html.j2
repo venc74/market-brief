@@ -742,7 +742,9 @@
 {# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
 {# 13.10.2026: бележка "предстои отделяне на ДД.ММ (запис ДД.ММ)" под тикъра в таблиците на книгите (backtest.apply_spinoff_notes) — само бележка; ръчният преглед е от деня на отделянето #}
 {# 20.10.2026 (етап 3, т. 1): buy-stop се изпълнява при докосване — обемът на деня на входа се вижда при затварянето; групите са за отделни резултати #}
-{% macro entry_vol_line(ev) %}{% if ev and (ev.high + ev.low + ev.unknown) %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ {{ ev.mult|round(1) }}× среден — {{ ev.high }}{% if ev.high_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.high_avg_r) }} при {{ ev.high_closed }} затворени){% endif %} · под {{ ev.mult|round(1) }}× — {{ ev.low }}{% if ev.low_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.low_avg_r) }} при {{ ev.low_closed }} затворени){% endif %}{% if ev.unknown %} · без данни за обема — {{ ev.unknown }}{% endif %}. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>{% endif %}{% endmacro %}
+{% macro entry_vol_line(ev) %}{% if ev and (ev.high + ev.low + ev.unknown) %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ {{ ev.mult|round(1) }}× среден — {{ ev.high }}{% if ev.high_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.high_avg_r) }} при {{ ev.high_closed }} затворени){% endif %} · под {{ ev.mult|round(1) }}× — {{ ev.low }}{% if ev.low_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.low_avg_r) }} при {{ ev.low_closed }} затворени){% endif %}{% if ev.unknown %} · без данни за обема — {{ ev.unknown }}{% endif %}{% if ev.excluded %} · без {{ ev.excluded }} с етикет deal / събитие{% endif %}. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>{% endif %}{% endmacro %}
+{# 26.10.2026 (етап 4б, т. 2): записите с етикет deal / „събитие/M&A“ и статистиката с тях и без тях (backtest.events_block) #}
+{% macro events_line(ev, unit) %}{% if ev %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): {% for l in ev.labels %}<b>{{ l.ticker }}</b> {{ l.entry_date[8:10] }}.{{ l.entry_date[5:7] }} — {% if l.kind == "deal" %}deal ({{ l.text }}){% else %}събитие/M&amp;A{% if l.ret_pct is not none %} ({{ "%+.1f"|format(l.ret_pct) }}% при {{ "%.1f"|format(l.vol_x) }}× обем на {{ l.day[8:10] }}.{{ l.day[5:7] }}: «{{ l.text }}»){% endif %}{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.{% if ev.n_all %} Средно {{ unit }}: с тях {{ "%+.2f"|format(ev.avg_all) }} ({{ ev.n_all }}){% if ev.avg_rest is not none %} · без тях {{ "%+.2f"|format(ev.avg_rest) }} ({{ ev.n_rest }}){% else %} · без тях — още няма{% endif %}.{% endif %}</div>{% endif %}{% endmacro %}
 {# 26.10.2026 (етап 4б, т. 1): етикет "deal" — записът е на цел на висяща сделка (backtest.apply_deal_labels): резултатът следва условията, не сетъпа #}
 {% macro spinoff_note_html(p) %}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
@@ -1166,6 +1168,7 @@
   </div>
   {% endif %}
   {{ entry_vol_line(backtest.entry_volume) }}
+  {{ events_line(backtest.events, "R") }}
   {% if backtest.open_positions %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени позиции ({{ backtest.open_positions|length }}):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
@@ -1245,6 +1248,7 @@
     {% endif %}
   </div>
   {{ entry_vol_line(bs.entry_volume) }}
+  {{ events_line(bs.events, "R") }}
   {% if bs.live %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени ({{ bs.live|length }}):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
@@ -1354,6 +1358,7 @@
     · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
     · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}{% if qb.tight_risk %} · <span style="color:var(--yellow)">с риск на входа под {{ qb.tight_risk_adr }}×ADR: {{ qb.tight_risk }} (R от пода)</span>{% endif %}<br>
     {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: <b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess){% if qb.avg_return_pct is not none %} · средна доходност на сделка {{ "%+.2f"|format(qb.avg_return_pct) }}% / {{ "%+.2f"|format(qb.avg_return_pct_pess) }}%{% endif %}<br>{% endif %}
+    {{ events_line(qb.events, "R (opt)") }}
     {% if qb.stats_visible %}
     <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
     · медиана R {{ "%+.2f"|format(qb.median_realized_r) }} / {{ "%+.2f"|format(qb.median_realized_r_pess) }} · над 5R: {{ qb.big_winners_5r }}<br>
@@ -1616,6 +1621,7 @@
     <span style="color:var(--muted)">Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея), затова делът на печелившите е просто делът на отворените.</span><br>
     Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати:
     {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n %}{{ "%+.2f"|format(x.avg_ret) }}%{% if x.avg_spy is not none %} (SPY {{ "%+.2f"|format(x.avg_spy) }}%, алфа {{ "%+.2f"|format(x.avg_alpha) }}%){% endif %}, {{ x.n }} записа{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.<br>
+    {{ events_line(gw.events, "доходност %") }}
     {% if gw["all"].avg_alpha_pct is not none %}Спрямо SPY до изхода (същите дати): алфа средно {{ "%+.2f"|format(gw["all"].avg_alpha_pct) }}% literal{% if gw["all"].avg_alpha_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}% exec{% endif %}<br>{% elif not gw.stats_visible %}Алфата до изхода се показва след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}) — при по-малко е шум.<br>{% endif %}
     По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност за {{ gw.compare_horizon }} сесии{% endif %}):
     {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret is not none %} ({{ "%+.2f"|format(g.avg_ret) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}

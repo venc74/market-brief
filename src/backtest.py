@@ -677,12 +677,52 @@ def entry_volume(fill_date: str | None, bars: "pd.DataFrame | None") -> dict:
         return out
 
 
+def label_of(rec: dict) -> str | None:
+    """26.10.2026 (етап 4б, т. 1–2): "deal" (цел на подписана сделка) / "event" (скок с новина за продажба / придобиване) / None."""
+    return "deal" if rec.get("deal") else "event" if rec.get("event") else None
+
+
+def events_block(records: list[dict], value_key: str) -> dict | None:
+    """
+    26.10.2026 (етап 4б, т. 2 — решение от 26.10): записите с етикет "deal" / "event" и средното на value_key (R или %) С тях и БЕЗ тях — статистиката на книгата се показва и по двата
+    начина (записите остават). Без етикетирани записи → None. Чиста функция.
+    """
+    lab = [r for r in records if label_of(r)]
+    if not lab:
+        return None
+    avg = lambda xs: round(sum(xs) / len(xs), 2) if xs else None
+    allv = [r[value_key] for r in records if r.get(value_key) is not None]
+    rest = [r[value_key] for r in records if r.get(value_key) is not None and not label_of(r)]
+    rows = [{"ticker": r.get("ticker"), "entry_date": r.get("entry_date"), "kind": label_of(r),
+             "text": (r["deal"].get("buyer") if label_of(r) == "deal" else r["event"].get("headline")),
+             "day": (r.get("event") or {}).get("day"), "ret_pct": (r.get("event") or {}).get("ret_pct"), "vol_x": (r.get("event") or {}).get("vol_x")}
+            for r in sorted(lab, key=lambda x: (x.get("entry_date") or "", x.get("ticker") or ""))]
+    return {"n": len(lab), "labels": rows, "value": value_key, "n_all": len(allv), "avg_all": avg(allv), "n_rest": len(rest), "avg_rest": avg(rest)}
+
+
+def apply_event_labels(today: str, download=None, fetch=None, name_lookup=None) -> dict:
+    """26.10.2026 (етап 4б, т. 2): етикетът „събитие/M&A“ (src/event_label.py) върху непроверените записи на всички книги; записва tracker-а, ако нещо е проверено. Не вдига."""
+    try:
+        from src import event_label
+        if not config.ENABLE_EVENT_LABEL:
+            return {"ok": True, "checked": 0, "skipped": True}
+        tracker = _load_tracker()
+        st = event_label.label_records(tracker, today, download=download, fetch=fetch, name_lookup=name_lookup)
+        if st.get("checked"):
+            _save_tracker(tracker)
+        return st
+    except Exception as e:
+        print(f"[backtest] етикетите „събитие/M&A“ пропуснати: {type(e).__name__}: {e}")
+        return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
+
+
 def entry_volume_groups(records: list[dict], visible: bool) -> dict:
-    """Записите с вход по отметката: {"high", "low", "unknown"} + среден R на затворените във всяка група (само при stats_visible)."""
-    g = {"high": 0, "low": 0, "unknown": 0, "high_avg_r": None, "low_avg_r": None, "high_closed": 0, "low_closed": 0, "mult": config.BREAKOUT_VOLUME_MULT}
+    """Записите с вход по отметката: {"high", "low", "unknown"} + среден R на затворените във всяка група (само при stats_visible). 26.10.2026 (етап 4б, т. 2): без "deal" / "event"."""
+    g = {"high": 0, "low": 0, "unknown": 0, "high_avg_r": None, "low_avg_r": None, "high_closed": 0, "low_closed": 0, "mult": config.BREAKOUT_VOLUME_MULT,
+         "excluded": sum(1 for r in records if r.get("fill_date") and label_of(r))}
     rs = {"high": [], "low": []}
     for r in records:
-        if not r.get("fill_date"):
+        if not r.get("fill_date") or label_of(r):
             continue
         k = "high" if r.get("entry_volume_ok") is True else "low" if r.get("entry_volume_ok") is False else "unknown"
         g[k] += 1
@@ -1463,6 +1503,7 @@ def get_buystop_summary() -> dict:
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
+        "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 
 
@@ -1575,6 +1616,7 @@ def get_qm_summary() -> dict:
         "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_R_RISK_FLOOR_ADR),
         "avg_return_pct": _avg_pct(closed, "return_pct"), "avg_return_pct_pess": _avg_pct(closed, "return_pct_pess", "return_pct"),
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
+        "events": events_block(records, "realized_r"),                                                 # 26.10.2026 (етап 4б, т. 2)
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
     }
@@ -1691,6 +1733,8 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
+        "events": events_block(with_result, "return_pct"),                                           # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
+        "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
         "live": live, "live_total": len(live_all), "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
     }
@@ -1862,6 +1906,7 @@ def get_backtest_summary() -> dict:
         "recent": recent,
         "open_positions": open_positions,
         "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
+        "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 
 

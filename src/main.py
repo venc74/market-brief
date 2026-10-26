@@ -894,6 +894,11 @@ def run() -> dict:
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
         backtest.apply_deal_labels(spinoff_watch.LAST_MERGERS, dt.date.fromisoformat(today))   # 26.10.2026 (етап 4б, т. 1): етикет "deal" върху живите записи на цели на придобиване
         backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)
+    # 26.10.2026 (етап 4б, т. 2): етикет „събитие/M&A“ (скок ≥ 8% при ≥ 3× обем + заглавие за продажба / придобиване) — преди обобщенията на книгите (с и без етикетираните)
+    steps.step("event_labels", lambda: backtest.apply_event_labels(today, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"]), fallback={},
+               enabled=bool(config.ENABLE_BACKTEST and config.ENABLE_EVENT_LABEL), label="Етикетът „събитие/M&A“ върху записите в книгите",
+               consequence="днешните нови записи не са проверени за скок с новина за сделка — статистиката „без тях“ може да ги съдържа",
+               failed_if=lambda v: (v.get("reason") or "не се изпълни") if v.get("ok") is False else None)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
         backtest_summary["buystop"] = backtest.get_buystop_summary()

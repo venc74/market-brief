@@ -53,7 +53,7 @@ STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "
          "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_card", "short_screener"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
-STEP4 = {"crypto", "options_record", "merger_pre"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
+STEP4 = {"crypto", "options_record", "merger_pre", "event_labels"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
 ALL = STEP1 | STEP2 | STEP3 | STEP4
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]
