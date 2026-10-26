@@ -100,6 +100,15 @@ def week_close_date(ts, crypto: bool = False) -> str:
     return sessions.week_last_session(d).isoformat()               # 20.10.2026: src/sessions.py
 
 
+def report_week_close(as_of: str, crypto: bool = False) -> str:
+    """26.10.2026 (етап 4б, т. 8): датата на затварянето на седмицата на COT отчета (as_of е вторник): крипто — неделята, иначе последната сесия на седмицата."""
+    d = dt.date.fromisoformat(str(as_of)[:10])
+    if crypto:
+        return (d + dt.timedelta(days=6 - d.weekday())).isoformat()
+    from src import sessions
+    return sessions.week_last_session(d).isoformat()
+
+
 def confirmation(close, direction: str, crypto: bool = False) -> dict | None:
     """
     Потвърждение от цената към последния бар на `close` (седмични затваряния, най-старото първо).
@@ -143,6 +152,9 @@ def confirmation_text(c: dict | None, direction: str) -> str:
     cd = c.get("close_date")
     # 15.10.2026: цената носи датата — "седмично затваряне 6.492 към 02.10" (без дата не се виждаше, че това е миналата седмица, а не вчера)
     what = f"седмично затваряне {c['close']:g} към {cd[8:10]}.{cd[5:7]}" if cd else f"цена {c['close']:g}"
+    rw = c.get("report_week_close")
+    if rw:                                                                # 26.10.2026 (етап 4б, т. 8): седмицата на отчета вече е свършила, но затварянето ѝ липсва в данните
+        what += f" (предишната седмица — затварянето на седмицата на отчета, към {rw[8:10]}.{rw[5:7]}, още липсва в данните на Yahoo)"
     gap = f"{what} срещу SMA10 {c['sma']:g} ({c['gap_pct']:+.1f}%)"
     if c["state"] == "confirmed":
         ago = "тази седмица" if c["weeks_on_side"] <= 1 else f"преди {c['weeks_on_side'] - 1} седмици"
@@ -317,6 +329,12 @@ def annotate(cot_rows: list[dict], series_by_market: dict[str, list[dict]], toda
             pts = series_by_market.get(m)
             if close is not None and len(close) >= config.COT_SMA_WEEKS + 1:
                 conf = confirmation(close, c["direction"], crypto)
+                # 26.10.2026 (етап 4б, т. 8): BTC в понеделник 26.10 (06:20 UTC) — "към 18.10", защото неделният бар 25.10 още го нямаше в дневните на Yahoo (и на 19.10 —
+                # съботата); седмицата на отчета (към 20.10) е свършила, а затварянето ѝ липсва → етикетът го казва, вместо да мълчи
+                if conf and c.get("as_of") and conf.get("close_date"):
+                    rw = report_week_close(c["as_of"], crypto)
+                    if conf["close_date"] < rw < today.isoformat():
+                        conf["report_week_close"] = rw
                 row["price_confirmation"] = {**(conf or {}), "symbol": symbol, "text": confirmation_text(conf, c["direction"])}
                 if pts:
                     rows = [{**r, "market": m} for r in track_rows(pts, close)]
