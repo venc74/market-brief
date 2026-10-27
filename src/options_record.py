@@ -185,8 +185,9 @@ def record(universe: list[str], today: str | None = None, *, download=None, tick
 def skip_reason(now_utc, history: dict | None = None) -> str | None:
     """
     27.10.2026: отделният job преди отварянето — причина да пропусне или None. Денят е по Ню Йорк: не е сесия (уикенд / празник) → пропуска; часът в Ню Йорк ≥
-    config.OPTIONS_RECORD_OPEN_NY (09:30) → пропуска (веригата вече носи новия ден — самопроверката би го отхвърлила); предишната сесия вече е пълна в историята → пропуска
-    (повторен dispatch). Чиста функция.
+    config.OPTIONS_RECORD_OPEN_NY (09:30) → пропуска (веригата вече носи новия ден — самопроверката би го отхвърлила); часът < config.OPTIONS_RECORD_START_NY (09:00) → пропуска
+    (графикът в cron-job.org е по Берлин, "5 14,15 * * 1-5" — от двете пускания на ден точно едното е в 09:05 Ню Йорк, другото е 08:05 или 10:05); предишната сесия вече е пълна
+    в историята → пропуска (повторен dispatch). Чиста функция.
     """
     import pandas as pd
     from src import sessions
@@ -198,6 +199,10 @@ def skip_reason(now_utc, history: dict | None = None) -> str | None:
     oh, om = map(int, config.OPTIONS_RECORD_OPEN_NY.split(":"))
     if (ny.hour, ny.minute) >= (oh, om):
         return f"{ny.strftime('%H:%M %Z')} — след отварянето ({config.OPTIONS_RECORD_OPEN_NY} Ню Йорк); обемът във веригата е на новия ден — пропускам"
+    sh, sm = map(int, config.OPTIONS_RECORD_START_NY.split(":"))
+    if (ny.hour, ny.minute) < (sh, sm):
+        return (f"{ny.strftime('%H:%M %Z')} — преди прозореца ({config.OPTIONS_RECORD_START_NY}–{config.OPTIONS_RECORD_OPEN_NY} Ню Йорк); правилното е другото пускане "
+                f"от графика по Берлин — пропускам")
     session = sessions.prev_session(day).isoformat()
     if session in ((history or {}).get("sessions") or {}):
         return f"сесия {session} вече е записана пълна — пропускам, не презаписвам"

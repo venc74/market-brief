@@ -128,6 +128,21 @@ assert "след отварянето" in orc.skip_reason("2026-10-30 14:05", {}
 assert orc.skip_reason("2026-11-02 14:05", {}) is None                                                     # 02.11 (след 01.11): 14:05 UTC = 09:05 EST — тригерът по Ню Йорк
 assert orc.skip_reason("2026-11-02 14:31", {}).startswith("09:31 EST — след отварянето")
 assert "не е сесия" in orc.skip_reason("2026-10-31 13:05", {}) and "не е сесия" in orc.skip_reason("2026-11-26 14:05", {})   # събота; Thanksgiving
+# 27.10.2026: задачата в cron-job.org е по Берлин — "5 14,15 * * 1-5" (часовата зона не се сменя там); 02.11 в 14:05 Берлин = 13:05 UTC = 08:05 EST → преди прозореца
+assert orc.skip_reason("2026-11-02 13:05", {}).startswith("08:05 EST — преди прозореца (09:00–09:30 Ню Йорк)")
+from zoneinfo import ZoneInfo
+import pandas as _pd
+from src import sessions as _ses
+_d, _odd = _dt.date(2026, 10, 28), []
+while _d <= _dt.date(2027, 12, 31):                                                        # година напред: и двете смени на часа (САЩ и Европа), с разминаванията им
+    if _ses.is_session(_d):
+        runs = [_pd.Timestamp(_dt.datetime(_d.year, _d.month, _d.day, h, 5, tzinfo=ZoneInfo("Europe/Berlin"))).tz_convert("UTC") for h in (14, 15)]
+        ok = [r for r in runs if orc.skip_reason(r, {}) is None]
+        if len(ok) != 1 or ok[0].tz_convert("America/New_York").strftime("%H:%M") != "09:05":
+            _odd.append((_d, [r.tz_convert("America/New_York").strftime("%H:%M") for r in runs]))
+    _d += _dt.timedelta(days=1)
+assert _odd == [], _odd[:5]
+print("  ✓ графикът по Берлин „5 14,15 * * 1-5“ до края на 2027: всяка сесия — точно едно пускане записва и то е в 09:05 Ню Йорк; другото (08:05 или 10:05) пропуска")
 import re as _re
 YML = (ROOT / ".github" / "workflows" / "options_record.yml").read_text(encoding="utf-8")
 live = "\n".join(l for l in YML.splitlines() if not l.lstrip().startswith("#"))

@@ -671,6 +671,9 @@ ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "1") == "1"
 # смяната на часа в САЩ (01.11) не мести часа в Ню Йорк); в 06:30 UTC (сутрешният бриф) веригите са без lastTradeDate → "непълен" (27.10). Сутрешният run НЕ записва.
 OPTIONS_RECORD_IN_MORNING_RUN = os.getenv("OPTIONS_RECORD_IN_MORNING_RUN", "0") == "1"
 OPTIONS_RECORD_OPEN_NY = os.getenv("OPTIONS_RECORD_OPEN_NY", "09:30")                # след отварянето (Ню Йорк) job-ът пропуска — обемът във веригата вече е на новия ден
+# 27.10.2026: и ПРЕДИ прозореца пропуска — задачата в cron-job.org е по Берлин (часовата зона не се сменя там), "5 14,15 * * 1-5": едното пускане е 09:05 Ню Йорк, другото е 10:05
+# (лете / в разминаването на смяната на часа) или 08:05 (зиме / при летен час и в двете) — 08:05 не е проверявано пълно (06:30 UTC: веригите бяха без lastTradeDate; 09:12 ET: пълни)
+OPTIONS_RECORD_START_NY = os.getenv("OPTIONS_RECORD_START_NY", "09:00")
 OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))                  # топ по оборот (close × обем, 20 сесии); измерено 21.10: 200 вериги × 2 падежа = 70 s, 0 грешки
 OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
 OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%
