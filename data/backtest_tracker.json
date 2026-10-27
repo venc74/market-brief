@@ -42,7 +42,8 @@
   "last_close": null,
   "last_close_date": null,
   "how": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "SANM_2026-10-08_qm": {
   "method": "v2",
@@ -87,7 +88,8 @@
   "last_close": null,
   "last_close_date": null,
   "how": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "SITM_2026-10-08_qm": {
   "method": "v2",
@@ -132,7 +134,8 @@
   "last_close": null,
   "last_close_date": null,
   "how": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "CORT_2026-10-08_qm": {
   "method": "v2",
@@ -177,7 +180,8 @@
   "last_close": null,
   "last_close_date": null,
   "how": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "EXPD_2026-10-09_buystop": {
   "method": "v2",
@@ -203,17 +207,18 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": 0.12,
-  "return_pct": 0.83,
-  "spy_return_pct": -2.1,
-  "alpha_pct": 2.93,
+  "current_r": 0.14,
+  "return_pct": 0.95,
+  "spy_return_pct": -1.4,
+  "alpha_pct": 2.35,
   "category": "buystop",
   "regime": "Defensive",
   "pct_from_pivot": -0.45,
-  "last_close": 196.21,
-  "last_close_date": "2026-10-23",
+  "last_close": 196.43,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 1.25,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "ANET_2026-10-09_buystop": {
   "method": "v2",
@@ -249,7 +254,8 @@
   "last_close": 204.52,
   "last_close_date": "2026-10-13",
   "entry_volume_ratio": 0.73,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "SN_2026-10-09_qm": {
   "method": "v2",
@@ -304,7 +310,8 @@
    "current_r": -0.45
   },
   "r_note": "R проверен на 2026-10-13 по новата формула (печалба ÷ max(вход − low на входния ден, 0.25×ADR)) — без промяна: рискът на входа е над пода",
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "ELF_2026-10-09_qm": {
   "method": "v2",
@@ -359,7 +366,8 @@
    "current_r": 5.19
   },
   "r_note": "R преизчислен на 2026-10-13: печалба ÷ max(вход − low на входния ден, 0.25×ADR); стопът и изходът не са променени (беше 5.19R)",
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "CORT_2026-10-09_qm": {
   "method": "v2",
@@ -404,7 +412,8 @@
   "last_close": null,
   "last_close_date": null,
   "how": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "CORT_2026-10-12_qm": {
   "method": "v2",
@@ -451,7 +460,8 @@
   "how": null,
   "r_method": "floor_adr",
   "r_risk": null,
-  "r_floored": null
+  "r_floored": null,
+  "event_checked": "2026-10-27"
  },
  "MSFT_2026-10-12_gw": {
   "method": "v2",
@@ -491,7 +501,22 @@
   "dist_to_line_pct": -0.83,
   "hold_sessions": 5,
   "how": "line",
-  "entry_price": 535.07
+  "entry_price": 535.07,
+  "horizons": {
+   "5": {
+    "date": "2026-10-16",
+    "ret": -1.13,
+    "spy": -1.97,
+    "alpha": 0.84
+   },
+   "10": {
+    "date": "2026-10-23",
+    "ret": -1.97,
+    "spy": -2.39,
+    "alpha": 0.42
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "PLTR_2026-10-12_gw": {
   "method": "v2",
@@ -531,7 +556,22 @@
   "dist_to_line_pct": -7.2,
   "hold_sessions": 5,
   "how": "line",
-  "entry_price": 209.05
+  "entry_price": 209.05,
+  "horizons": {
+   "5": {
+    "date": "2026-10-16",
+    "ret": -11.01,
+    "spy": -1.97,
+    "alpha": -9.04
+   },
+   "10": {
+    "date": "2026-10-23",
+    "ret": -5.88,
+    "spy": -2.39,
+    "alpha": -3.49
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "QLYS_2026-10-12_gw": {
   "method": "v2",
@@ -571,7 +611,22 @@
   "dist_to_line_pct": -3.39,
   "hold_sessions": 3,
   "how": "line",
-  "entry_price": 202.42
+  "entry_price": 202.42,
+  "horizons": {
+   "5": {
+    "date": "2026-10-16",
+    "ret": -10.56,
+    "spy": -1.97,
+    "alpha": -8.59
+   },
+   "10": {
+    "date": "2026-10-23",
+    "ret": 7.05,
+    "spy": -2.39,
+    "alpha": 9.44
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "WCC_2026-10-12_gw": {
   "method": "v2",
@@ -611,7 +666,22 @@
   "dist_to_line_pct": -2.68,
   "hold_sessions": 3,
   "how": "line",
-  "entry_price": 365.69
+  "entry_price": 365.69,
+  "horizons": {
+   "5": {
+    "date": "2026-10-16",
+    "ret": -6.78,
+    "spy": -1.97,
+    "alpha": -4.81
+   },
+   "10": {
+    "date": "2026-10-23",
+    "ret": -13.04,
+    "spy": -2.39,
+    "alpha": -10.65
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "CORT_2026-10-13_qm": {
   "method": "v2",
@@ -658,7 +728,8 @@
   "how": null,
   "r_risk": null,
   "r_floored": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "DOCU_2026-10-13_qm": {
   "method": "v2",
@@ -681,8 +752,8 @@
   "valid_through": "2026-10-13",
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.9,
-  "alpha_pct": 14.36,
+  "spy_return_pct": -1.48,
+  "alpha_pct": 13.63,
   "fill_date": "2026-10-13",
   "fill_price": 72.76,
   "stop_loss": 70.885,
@@ -697,15 +768,16 @@
   "R_pess": -1.0,
   "realized_r": null,
   "realized_r_pess": null,
-  "current_r": 4.84,
-  "return_pct": 12.46,
+  "current_r": 4.71,
+  "return_pct": 12.15,
   "return_pct_pess": -2.58,
-  "last_close": 85.27,
-  "last_close_date": "2026-10-23",
+  "last_close": 84.89,
+  "last_close_date": "2026-10-26",
   "how": null,
   "r_risk": 1.875,
   "r_floored": false,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "XOM_2026-10-13_gw": {
   "method": "v2",
@@ -723,10 +795,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -2.33,
-  "spy_return_pct_exec": -2.23,
-  "alpha_pct": 8.75,
-  "alpha_pct_exec": 7.86,
+  "spy_return_pct": -1.64,
+  "spy_return_pct_exec": -1.54,
+  "alpha_pct": 8.84,
+  "alpha_pct_exec": 7.93,
   "fill_date": "2026-10-12",
   "fill_price": 172.15,
   "fill_exec_date": "2026-10-13",
@@ -737,15 +809,30 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 6.42,
-  "return_pct_exec": 5.63,
-  "current_return_pct": 6.42,
-  "last_close": 183.21,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 7.99,
-  "hold_sessions": 9,
+  "return_pct": 7.2,
+  "return_pct_exec": 6.39,
+  "current_return_pct": 7.2,
+  "last_close": 184.54,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 8.77,
+  "hold_sessions": 10,
   "how": null,
-  "entry_price": 172.15
+  "entry_price": 172.15,
+  "horizons": {
+   "5": {
+    "date": "2026-10-19",
+    "ret": 3.56,
+    "spy": -1.49,
+    "alpha": 5.05
+   },
+   "10": {
+    "date": "2026-10-26",
+    "ret": 7.2,
+    "spy": -1.64,
+    "alpha": 8.84
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "ZBRA_2026-10-14_buystop": {
   "method": "v2",
@@ -779,7 +866,8 @@
   "regime": "Offensive",
   "pct_from_pivot": -1.08,
   "last_close": null,
-  "last_close_date": null
+  "last_close_date": null,
+  "event_checked": "2026-10-27"
  },
  "SNX_2026-10-14_qm": {
   "method": "v2",
@@ -826,7 +914,8 @@
   "how": null,
   "r_risk": null,
   "r_floored": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "CORT_2026-10-14_qm": {
   "method": "v2",
@@ -873,7 +962,8 @@
   "how": null,
   "r_risk": null,
   "r_floored": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "ADI_2026-10-14_gw": {
   "method": "v2",
@@ -913,7 +1003,16 @@
   "dist_to_line_pct": -2.48,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 414.7
+  "entry_price": 414.7,
+  "horizons": {
+   "5": {
+    "date": "2026-10-20",
+    "ret": -4.26,
+    "spy": -1.15,
+    "alpha": -3.11
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "MA_2026-10-14_gw": {
   "method": "v2",
@@ -931,10 +1030,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -2.32,
-  "spy_return_pct_exec": -1.93,
-  "alpha_pct": 5.43,
-  "alpha_pct_exec": 4.92,
+  "spy_return_pct": -1.62,
+  "spy_return_pct_exec": -1.23,
+  "alpha_pct": 3.06,
+  "alpha_pct_exec": 2.55,
   "fill_date": "2026-10-13",
   "fill_price": 604.8,
   "fill_exec_date": "2026-10-14",
@@ -945,15 +1044,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 3.11,
-  "return_pct_exec": 2.99,
-  "current_return_pct": 3.11,
-  "last_close": 623.6,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 4.76,
-  "hold_sessions": 8,
+  "return_pct": 1.44,
+  "return_pct_exec": 1.32,
+  "current_return_pct": 1.44,
+  "last_close": 613.5,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 3.06,
+  "hold_sessions": 9,
   "how": null,
-  "entry_price": 604.8
+  "entry_price": 604.8,
+  "horizons": {
+   "5": {
+    "date": "2026-10-20",
+    "ret": 2.58,
+    "spy": -1.15,
+    "alpha": 3.73
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "LLY_2026-10-15_gw": {
   "method": "v2",
@@ -971,10 +1079,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.25,
-  "spy_return_pct_exec": -0.82,
-  "alpha_pct": 6.6,
-  "alpha_pct_exec": 3.93,
+  "spy_return_pct": -0.55,
+  "spy_return_pct_exec": -0.11,
+  "alpha_pct": 6.37,
+  "alpha_pct_exec": 3.68,
   "fill_date": "2026-10-14",
   "fill_price": 1208.74,
   "fill_exec_date": "2026-10-15",
@@ -985,15 +1093,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 5.35,
-  "return_pct_exec": 3.11,
-  "current_return_pct": 5.35,
-  "last_close": 1273.46,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 6.17,
-  "hold_sessions": 7,
+  "return_pct": 5.82,
+  "return_pct_exec": 3.57,
+  "current_return_pct": 5.82,
+  "last_close": 1279.14,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 6.65,
+  "hold_sessions": 8,
   "how": null,
-  "entry_price": 1208.74
+  "entry_price": 1208.74,
+  "horizons": {
+   "5": {
+    "date": "2026-10-21",
+    "ret": 5.13,
+    "spy": 0.45,
+    "alpha": 4.68
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "EXPD_2026-10-16": {
   "method": "v2",
@@ -1019,14 +1136,15 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": -0.21,
-  "return_pct": -1.78,
-  "spy_return_pct": -1.72,
-  "alpha_pct": -0.06,
-  "last_close": 196.21,
-  "last_close_date": "2026-10-23",
+  "current_r": -0.2,
+  "return_pct": -1.67,
+  "spy_return_pct": -1.02,
+  "alpha_pct": -0.65,
+  "last_close": 196.43,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 1.32,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "GAP_2026-10-16_qm": {
   "method": "v2",
@@ -1073,7 +1191,8 @@
   "how": null,
   "r_risk": null,
   "r_floored": null,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "A_2026-10-16_gw": {
   "method": "v2",
@@ -1113,7 +1232,16 @@
   "dist_to_line_pct": -1.42,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 175.55
+  "entry_price": 175.55,
+  "horizons": {
+   "5": {
+    "date": "2026-10-22",
+    "ret": -0.95,
+    "spy": -1.01,
+    "alpha": 0.06
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "EHC_2026-10-16_gw": {
   "method": "v2",
@@ -1153,7 +1281,16 @@
   "dist_to_line_pct": -4.18,
   "hold_sessions": 2,
   "how": "line",
-  "entry_price": 127.77
+  "entry_price": 127.77,
+  "horizons": {
+   "5": {
+    "date": "2026-10-22",
+    "ret": -1.38,
+    "spy": -1.01,
+    "alpha": -0.37
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "HLT_2026-10-16_gw": {
   "method": "v2",
@@ -1171,10 +1308,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.53,
-  "spy_return_pct_exec": -1.72,
-  "alpha_pct": 3.47,
-  "alpha_pct_exec": 2.99,
+  "spy_return_pct": -0.83,
+  "spy_return_pct_exec": -1.02,
+  "alpha_pct": 3.43,
+  "alpha_pct_exec": 2.94,
   "fill_date": "2026-10-15",
   "fill_price": 342.98,
   "fill_exec_date": "2026-10-16",
@@ -1185,15 +1322,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 1.94,
-  "return_pct_exec": 1.27,
-  "current_return_pct": 1.94,
-  "last_close": 349.63,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 5.8,
-  "hold_sessions": 6,
+  "return_pct": 2.6,
+  "return_pct_exec": 1.92,
+  "current_return_pct": 2.6,
+  "last_close": 351.89,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 6.48,
+  "hold_sessions": 7,
   "how": null,
-  "entry_price": 342.98
+  "entry_price": 342.98,
+  "horizons": {
+   "5": {
+    "date": "2026-10-22",
+    "ret": 4.4,
+    "spy": -1.01,
+    "alpha": 5.41
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "MAR_2026-10-16_gw": {
   "method": "v2",
@@ -1211,10 +1357,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.53,
-  "spy_return_pct_exec": -1.72,
-  "alpha_pct": 2.83,
-  "alpha_pct_exec": 2.23,
+  "spy_return_pct": -0.83,
+  "spy_return_pct_exec": -1.02,
+  "alpha_pct": 3.17,
+  "alpha_pct_exec": 2.57,
   "fill_date": "2026-10-15",
   "fill_price": 385.71,
   "fill_exec_date": "2026-10-16",
@@ -1225,15 +1371,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 1.3,
-  "return_pct_exec": 0.51,
-  "current_return_pct": 1.3,
-  "last_close": 390.71,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 4.02,
-  "hold_sessions": 6,
+  "return_pct": 2.34,
+  "return_pct_exec": 1.55,
+  "current_return_pct": 2.34,
+  "last_close": 394.75,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 5.1,
+  "hold_sessions": 7,
   "how": null,
-  "entry_price": 385.71
+  "entry_price": 385.71,
+  "horizons": {
+   "5": {
+    "date": "2026-10-22",
+    "ret": 2.88,
+    "spy": -1.01,
+    "alpha": 3.89
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "MCK_2026-10-16_gw": {
   "method": "v2",
@@ -1251,10 +1406,10 @@
   "band_hold_pct": 88.9,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.53,
-  "spy_return_pct_exec": -1.72,
-  "alpha_pct": 1.74,
-  "alpha_pct_exec": 0.59,
+  "spy_return_pct": -0.83,
+  "spy_return_pct_exec": -1.02,
+  "alpha_pct": 0.25,
+  "alpha_pct_exec": -0.89,
   "fill_date": "2026-10-15",
   "fill_price": 998.64,
   "fill_exec_date": "2026-10-16",
@@ -1265,15 +1420,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 0.21,
-  "return_pct_exec": -1.13,
-  "current_return_pct": 0.21,
-  "last_close": 1000.77,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 1.36,
-  "hold_sessions": 6,
+  "return_pct": -0.58,
+  "return_pct_exec": -1.91,
+  "current_return_pct": -0.58,
+  "last_close": 992.87,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 0.56,
+  "hold_sessions": 7,
   "how": null,
-  "entry_price": 998.64
+  "entry_price": 998.64,
+  "horizons": {
+   "5": {
+    "date": "2026-10-22",
+    "ret": 1.37,
+    "spy": -1.01,
+    "alpha": 2.38
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "AAPL_2026-10-19_buystop": {
   "method": "v2",
@@ -1299,17 +1463,18 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": 0.1,
-  "return_pct": 0.69,
-  "spy_return_pct": -0.95,
-  "alpha_pct": 1.64,
+  "current_r": -0.06,
+  "return_pct": -0.41,
+  "spy_return_pct": -0.24,
+  "alpha_pct": -0.17,
   "category": "buystop",
   "regime": "Defensive",
   "pct_from_pivot": -0.54,
-  "last_close": 347.73,
-  "last_close_date": "2026-10-23",
+  "last_close": 343.91,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 0.86,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "AFG_2026-10-19_gw": {
   "method": "v2",
@@ -1327,10 +1492,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.43,
-  "spy_return_pct_exec": -0.95,
-  "alpha_pct": 1.43,
-  "alpha_pct_exec": 2.47,
+  "spy_return_pct": 0.28,
+  "spy_return_pct_exec": -0.24,
+  "alpha_pct": 0.7,
+  "alpha_pct_exec": 1.74,
   "fill_date": "2026-10-16",
   "fill_price": 149.13,
   "fill_exec_date": "2026-10-19",
@@ -1341,15 +1506,24 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 1.0,
-  "return_pct_exec": 1.52,
-  "current_return_pct": 1.0,
-  "last_close": 150.62,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 2.56,
-  "hold_sessions": 5,
+  "return_pct": 0.98,
+  "return_pct_exec": 1.5,
+  "current_return_pct": 0.98,
+  "last_close": 150.59,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 2.54,
+  "hold_sessions": 6,
   "how": null,
-  "entry_price": 149.13
+  "entry_price": 149.13,
+  "horizons": {
+   "5": {
+    "date": "2026-10-23",
+    "ret": 1.0,
+    "spy": -0.43,
+    "alpha": 1.43
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "COKE_2026-10-19_gw": {
   "method": "v2",
@@ -1368,9 +1542,9 @@
   "resolution_date": "2026-10-23",
   "discovered_date": "2026-10-26",
   "spy_return_pct": -0.43,
-  "spy_return_pct_exec": null,
+  "spy_return_pct_exec": -0.65,
   "alpha_pct": -2.91,
-  "alpha_pct_exec": null,
+  "alpha_pct_exec": -1.02,
   "fill_date": "2026-10-16",
   "fill_price": 210.33,
   "fill_exec_date": "2026-10-19",
@@ -1379,17 +1553,26 @@
   "split_scale": null,
   "exit_date": "2026-10-23",
   "exit_price": 203.31,
-  "exit_exec_date": null,
-  "exit_exec_price": null,
+  "exit_exec_date": "2026-10-26",
+  "exit_exec_price": 203.31,
   "return_pct": -3.34,
-  "return_pct_exec": null,
+  "return_pct_exec": -1.67,
   "current_return_pct": -3.34,
   "last_close": 203.31,
   "last_close_date": "2026-10-23",
   "dist_to_line_pct": -0.86,
   "hold_sessions": 5,
   "how": "line",
-  "entry_price": 210.33
+  "entry_price": 210.33,
+  "horizons": {
+   "5": {
+    "date": "2026-10-23",
+    "ret": -3.34,
+    "spy": -0.43,
+    "alpha": -2.91
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "AMG_2026-10-20_buystop": {
   "method": "v2",
@@ -1415,17 +1598,18 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": -0.37,
-  "return_pct": -2.93,
-  "spy_return_pct": -1.45,
-  "alpha_pct": -1.48,
+  "current_r": -0.13,
+  "return_pct": -1.02,
+  "spy_return_pct": -0.75,
+  "alpha_pct": -0.27,
   "category": "buystop",
   "regime": "Defensive",
   "pct_from_pivot": -2.51,
-  "last_close": 383.42,
-  "last_close_date": "2026-10-23",
+  "last_close": 390.97,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 0.93,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "ROKU_2026-10-20_buystop": {
   "method": "v2",
@@ -1451,24 +1635,31 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": -0.12,
-  "return_pct": -0.82,
-  "spy_return_pct": -0.84,
-  "alpha_pct": 0.02,
+  "current_r": -0.23,
+  "return_pct": -1.66,
+  "spy_return_pct": -0.13,
+  "alpha_pct": -1.53,
   "category": "buystop",
   "regime": "Defensive",
   "pct_from_pivot": -2.72,
-  "last_close": 158.58,
-  "last_close_date": "2026-10-23",
+  "last_close": 157.23,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 2.4,
-  "entry_volume_ok": true
+  "entry_volume_ok": true,
+  "deal": {
+   "buyer": "Fox Corporation",
+   "announced": "2026-06-14",
+   "filing_date": "2026-06-15",
+   "seen": "2026-10-27"
+  },
+  "event_checked": "2026-10-27"
  },
  "CBOE_2026-10-20_qm": {
   "method": "v2",
   "category": "qm_breakout",
   "ticker": "CBOE",
   "entry_date": "2026-10-20",
-  "status": "open",
+  "status": "trailing",
   "regime": "Defensive",
   "buy_stop": 315.56,
   "adr": 4.05,
@@ -1484,15 +1675,15 @@
   "valid_through": "2026-10-20",
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.77,
-  "alpha_pct": 8.65,
+  "spy_return_pct": -0.06,
+  "alpha_pct": 6.3,
   "fill_date": "2026-10-20",
   "fill_price": 315.56,
   "stop_loss": 306.47,
   "risk_per_share": 9.09,
-  "target1_hit_date": null,
-  "partial_price": null,
-  "partial_fraction": 0.0,
+  "target1_hit_date": "2026-10-26",
+  "partial_price": 335.25,
+  "partial_fraction": 0.4,
   "trail_ma": 20,
   "exit_date": null,
   "exit_price": null,
@@ -1500,22 +1691,23 @@
   "R_pess": -1.0,
   "realized_r": null,
   "realized_r_pess": null,
-  "current_r": 2.73,
-  "return_pct": 7.88,
+  "current_r": 2.17,
+  "return_pct": 6.24,
   "return_pct_pess": -2.88,
-  "last_close": 340.42,
-  "last_close_date": "2026-10-23",
+  "last_close": 335.25,
+  "last_close_date": "2026-10-26",
   "how": null,
   "r_risk": 9.09,
   "r_floored": false,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "UTHR_2026-10-20_qm": {
   "method": "v2",
   "category": "qm_breakout",
   "ticker": "UTHR",
   "entry_date": "2026-10-20",
-  "status": "open",
+  "status": "trailing",
   "regime": "Defensive",
   "buy_stop": 560.0,
   "adr": 4.09,
@@ -1531,15 +1723,15 @@
   "valid_through": "2026-10-20",
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.77,
-  "alpha_pct": 5.68,
+  "spy_return_pct": -0.06,
+  "alpha_pct": 5.92,
   "fill_date": "2026-10-20",
   "fill_price": 560.0,
   "stop_loss": 545.58,
   "risk_per_share": 14.42,
-  "target1_hit_date": null,
-  "partial_price": null,
-  "partial_fraction": 0.0,
+  "target1_hit_date": "2026-10-26",
+  "partial_price": 592.84,
+  "partial_fraction": 0.4,
   "trail_ma": 20,
   "exit_date": null,
   "exit_price": null,
@@ -1547,15 +1739,16 @@
   "R_pess": -1.0,
   "realized_r": null,
   "realized_r_pess": null,
-  "current_r": 1.91,
-  "return_pct": 4.91,
+  "current_r": 2.28,
+  "return_pct": 5.86,
   "return_pct_pess": -2.57,
-  "last_close": 587.5,
-  "last_close_date": "2026-10-23",
+  "last_close": 592.84,
+  "last_close_date": "2026-10-26",
   "how": null,
   "r_risk": 14.42,
   "r_floored": false,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "MSFT_2026-10-20_gw": {
   "method": "v2",
@@ -1595,7 +1788,16 @@
   "dist_to_line_pct": -0.31,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 533.52
+  "entry_price": 533.52,
+  "horizons": {
+   "5": {
+    "date": "2026-10-26",
+    "ret": -0.17,
+    "spy": -0.14,
+    "alpha": -0.03
+   }
+  },
+  "event_checked": "2026-10-27"
  },
  "ZBRA_2026-10-21_buystop": {
   "method": "v2",
@@ -1621,17 +1823,18 @@
   "resolution_date": null,
   "discovered_date": null,
   "realized_r": null,
-  "current_r": -0.15,
-  "return_pct": -1.11,
-  "spy_return_pct": -1.45,
-  "alpha_pct": 0.34,
+  "current_r": -0.23,
+  "return_pct": -1.7,
+  "spy_return_pct": -0.75,
+  "alpha_pct": -0.95,
   "category": "buystop",
   "regime": "Defensive",
   "pct_from_pivot": -1.72,
-  "last_close": 386.45,
-  "last_close_date": "2026-10-23",
+  "last_close": 384.15,
+  "last_close_date": "2026-10-26",
   "entry_volume_ratio": 0.56,
-  "entry_volume_ok": false
+  "entry_volume_ok": false,
+  "event_checked": "2026-10-27"
  },
  "RVTY_2026-10-21_qm": {
   "method": "v2",
@@ -1654,8 +1857,8 @@
   "valid_through": "2026-10-21",
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.45,
-  "alpha_pct": 1.94,
+  "spy_return_pct": -0.75,
+  "alpha_pct": 2.26,
   "fill_date": "2026-10-21",
   "fill_price": 158.0,
   "stop_loss": 152.71,
@@ -1670,15 +1873,16 @@
   "R_pess": -1.0,
   "realized_r": null,
   "realized_r_pess": null,
-  "current_r": 0.15,
-  "return_pct": 0.49,
+  "current_r": 0.45,
+  "return_pct": 1.51,
   "return_pct_pess": -3.35,
-  "last_close": 158.77,
-  "last_close_date": "2026-10-23",
+  "last_close": 160.39,
+  "last_close_date": "2026-10-26",
   "how": null,
   "r_risk": 5.29,
   "r_floored": false,
-  "r_method": "floor_adr"
+  "r_method": "floor_adr",
+  "event_checked": "2026-10-27"
  },
  "BRK-B_2026-10-21_gw": {
   "method": "v2",
@@ -1696,10 +1900,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.18,
-  "spy_return_pct_exec": -1.45,
-  "alpha_pct": 1.62,
-  "alpha_pct_exec": 1.95,
+  "spy_return_pct": -0.48,
+  "spy_return_pct_exec": -0.75,
+  "alpha_pct": 2.1,
+  "alpha_pct_exec": 2.43,
   "fill_date": "2026-10-20",
   "fill_price": 539.82,
   "fill_exec_date": "2026-10-21",
@@ -1710,15 +1914,16 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 0.44,
-  "return_pct_exec": 0.5,
-  "current_return_pct": 0.44,
-  "last_close": 542.19,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 1.68,
-  "hold_sessions": 3,
+  "return_pct": 1.62,
+  "return_pct_exec": 1.68,
+  "current_return_pct": 1.62,
+  "last_close": 548.56,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 2.87,
+  "hold_sessions": 4,
   "how": null,
-  "entry_price": 539.82
+  "entry_price": 539.82,
+  "event_checked": "2026-10-27"
  },
  "DRI_2026-10-21_gw": {
   "method": "v2",
@@ -1758,7 +1963,8 @@
   "dist_to_line_pct": -1.58,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 217.99
+  "entry_price": 217.99,
+  "event_checked": "2026-10-27"
  },
  "A_2026-10-22_gw": {
   "method": "v2",
@@ -1798,7 +2004,8 @@
   "dist_to_line_pct": -0.9,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 177.75
+  "entry_price": 177.75,
+  "event_checked": "2026-10-27"
  },
  "PLTR_2026-10-22_gw": {
   "method": "v2",
@@ -1838,7 +2045,8 @@
   "dist_to_line_pct": -2.13,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 201.72
+  "entry_price": 201.72,
+  "event_checked": "2026-10-27"
  },
  "QLYS_2026-10-22_gw": {
   "method": "v2",
@@ -1856,10 +2064,10 @@
   "band_hold_pct": 82.5,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -1.7,
-  "spy_return_pct_exec": -0.84,
-  "alpha_pct": 11.87,
-  "alpha_pct_exec": 10.81,
+  "spy_return_pct": -1.0,
+  "spy_return_pct_exec": -0.13,
+  "alpha_pct": 15.46,
+  "alpha_pct_exec": 14.38,
   "fill_date": "2026-10-21",
   "fill_price": 196.7,
   "fill_exec_date": "2026-10-22",
@@ -1870,15 +2078,16 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 10.17,
-  "return_pct_exec": 9.97,
-  "current_return_pct": 10.17,
-  "last_close": 216.7,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 10.4,
-  "hold_sessions": 2,
+  "return_pct": 14.46,
+  "return_pct_exec": 14.25,
+  "current_return_pct": 14.46,
+  "last_close": 225.15,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 14.71,
+  "hold_sessions": 3,
   "how": null,
-  "entry_price": 196.7
+  "entry_price": 196.7,
+  "event_checked": "2026-10-27"
  },
  "RS_2026-10-23_buystop": {
   "method": "v2",
@@ -1933,9 +2142,9 @@
   "resolution_date": "2026-10-23",
   "discovered_date": "2026-10-26",
   "spy_return_pct": -0.52,
-  "spy_return_pct_exec": null,
+  "spy_return_pct_exec": 0.31,
   "alpha_pct": -3.58,
-  "alpha_pct_exec": null,
+  "alpha_pct_exec": -2.08,
   "fill_date": "2026-10-22",
   "fill_price": 35.59,
   "fill_exec_date": "2026-10-23",
@@ -1944,17 +2153,18 @@
   "split_scale": null,
   "exit_date": "2026-10-23",
   "exit_price": 34.13,
-  "exit_exec_date": null,
-  "exit_exec_price": null,
+  "exit_exec_date": "2026-10-26",
+  "exit_exec_price": 34.39,
   "return_pct": -4.1,
-  "return_pct_exec": null,
+  "return_pct_exec": -1.77,
   "current_return_pct": -4.1,
   "last_close": 34.13,
   "last_close_date": "2026-10-23",
   "dist_to_line_pct": -4.02,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 35.59
+  "entry_price": 35.59,
+  "event_checked": "2026-10-27"
  },
  "ED_2026-10-23_gw": {
   "method": "v2",
@@ -1972,10 +2182,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.52,
-  "spy_return_pct_exec": 0.01,
-  "alpha_pct": 0.07,
-  "alpha_pct_exec": -0.23,
+  "spy_return_pct": 0.18,
+  "spy_return_pct_exec": 0.72,
+  "alpha_pct": -0.9,
+  "alpha_pct_exec": -1.22,
   "fill_date": "2026-10-22",
   "fill_price": 116.26,
   "fill_exec_date": "2026-10-23",
@@ -1986,15 +2196,16 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": -0.45,
-  "return_pct_exec": -0.22,
-  "current_return_pct": -0.45,
-  "last_close": 115.74,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 2.26,
-  "hold_sessions": 1,
+  "return_pct": -0.72,
+  "return_pct_exec": -0.5,
+  "current_return_pct": -0.72,
+  "last_close": 115.42,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 1.98,
+  "hold_sessions": 2,
   "how": null,
-  "entry_price": 116.26
+  "entry_price": 116.26,
+  "event_checked": "2026-10-27"
  },
  "NWE_2026-10-23_gw": {
   "method": "v2",
@@ -2012,10 +2223,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.52,
-  "spy_return_pct_exec": 0.01,
-  "alpha_pct": 1.12,
-  "alpha_pct_exec": 1.07,
+  "spy_return_pct": 0.18,
+  "spy_return_pct_exec": 0.72,
+  "alpha_pct": 1.53,
+  "alpha_pct_exec": 1.48,
   "fill_date": "2026-10-22",
   "fill_price": 77.13,
   "fill_exec_date": "2026-10-23",
@@ -2026,15 +2237,22 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 0.6,
-  "return_pct_exec": 1.08,
-  "current_return_pct": 0.6,
-  "last_close": 77.59,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 0.81,
-  "hold_sessions": 1,
+  "return_pct": 1.71,
+  "return_pct_exec": 2.2,
+  "current_return_pct": 1.71,
+  "last_close": 78.45,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 1.92,
+  "hold_sessions": 2,
   "how": null,
-  "entry_price": 77.13
+  "entry_price": 77.13,
+  "deal": {
+   "buyer": "Black Hills Corporation",
+   "announced": "2025-08-18",
+   "filing_date": "2025-08-19",
+   "seen": "2026-10-27"
+  },
+  "event_checked": "2026-10-27"
  },
  "NWSA_2026-10-23_gw": {
   "method": "v2",
@@ -2042,7 +2260,7 @@
   "ticker": "NWSA",
   "entry_date": "2026-10-23",
   "signal_date": "2026-10-22",
-  "status": "open",
+  "status": "line_exit",
   "regime": "Defensive",
   "glb_type": "classic",
   "line": 30.71,
@@ -2050,31 +2268,32 @@
   "prior_high_month": "2025-09",
   "months_unpenetrated": 12,
   "band_hold_pct": 100.0,
-  "resolution_date": null,
-  "discovered_date": null,
-  "spy_return_pct": -0.52,
-  "spy_return_pct_exec": 0.01,
-  "alpha_pct": -0.57,
-  "alpha_pct_exec": -0.62,
+  "resolution_date": "2026-10-26",
+  "discovered_date": "2026-10-27",
+  "spy_return_pct": 0.18,
+  "spy_return_pct_exec": null,
+  "alpha_pct": -1.76,
+  "alpha_pct_exec": null,
   "fill_date": "2026-10-22",
   "fill_price": 31.08,
   "fill_exec_date": "2026-10-23",
   "fill_exec_price": 30.93,
   "line_used": 30.71,
   "split_scale": null,
-  "exit_date": null,
-  "exit_price": null,
+  "exit_date": "2026-10-26",
+  "exit_price": 30.59,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": -1.09,
-  "return_pct_exec": -0.61,
-  "current_return_pct": -1.09,
-  "last_close": 30.74,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 0.1,
-  "hold_sessions": 1,
-  "how": null,
-  "entry_price": 31.08
+  "return_pct": -1.58,
+  "return_pct_exec": null,
+  "current_return_pct": -1.58,
+  "last_close": 30.59,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": -0.39,
+  "hold_sessions": 2,
+  "how": "line",
+  "entry_price": 31.08,
+  "event_checked": "2026-10-27"
  },
  "PKG_2026-10-23_gw": {
   "method": "v2",
@@ -2093,9 +2312,9 @@
   "resolution_date": "2026-10-23",
   "discovered_date": "2026-10-26",
   "spy_return_pct": -0.52,
-  "spy_return_pct_exec": null,
+  "spy_return_pct_exec": 0.31,
   "alpha_pct": -0.13,
-  "alpha_pct_exec": null,
+  "alpha_pct_exec": 0.18,
   "fill_date": "2026-10-22",
   "fill_price": 248.92,
   "fill_exec_date": "2026-10-23",
@@ -2104,17 +2323,18 @@
   "split_scale": null,
   "exit_date": "2026-10-23",
   "exit_price": 247.29,
-  "exit_exec_date": null,
-  "exit_exec_price": null,
+  "exit_exec_date": "2026-10-26",
+  "exit_exec_price": 248.45,
   "return_pct": -0.65,
-  "return_pct_exec": null,
+  "return_pct_exec": 0.49,
   "current_return_pct": -0.65,
   "last_close": 247.29,
   "last_close_date": "2026-10-23",
   "dist_to_line_pct": -0.63,
   "hold_sessions": 1,
   "how": "line",
-  "entry_price": 248.92
+  "entry_price": 248.92,
+  "event_checked": "2026-10-27"
  },
  "R_2026-10-23_gw": {
   "method": "v2",
@@ -2132,10 +2352,10 @@
   "band_hold_pct": 100.0,
   "resolution_date": null,
   "discovered_date": null,
-  "spy_return_pct": -0.52,
-  "spy_return_pct_exec": 0.01,
-  "alpha_pct": 2.54,
-  "alpha_pct_exec": 0.32,
+  "spy_return_pct": 0.18,
+  "spy_return_pct_exec": 0.72,
+  "alpha_pct": 6.06,
+  "alpha_pct_exec": 3.77,
   "fill_date": "2026-10-22",
   "fill_price": 265.53,
   "fill_exec_date": "2026-10-23",
@@ -2146,15 +2366,16 @@
   "exit_price": null,
   "exit_exec_date": null,
   "exit_exec_price": null,
-  "return_pct": 2.02,
-  "return_pct_exec": 0.33,
-  "current_return_pct": 2.02,
-  "last_close": 270.9,
-  "last_close_date": "2026-10-23",
-  "dist_to_line_pct": 2.7,
-  "hold_sessions": 1,
+  "return_pct": 6.24,
+  "return_pct_exec": 4.49,
+  "current_return_pct": 6.24,
+  "last_close": 282.11,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 6.95,
+  "hold_sessions": 2,
   "how": null,
-  "entry_price": 265.53
+  "entry_price": 265.53,
+  "event_checked": "2026-10-27"
  },
  "CART_2026-10-26_gwh": {
   "method": "v2",
@@ -2162,7 +2383,7 @@
   "ticker": "CART",
   "entry_date": "2026-10-26",
   "signal_date": "2026-10-23",
-  "status": "pending",
+  "status": "open",
   "regime": "Defensive",
   "glb_type": "momentum",
   "line": 53.5,
@@ -2170,6 +2391,133 @@
   "prior_high_month": "2025-08",
   "months_unpenetrated": 13,
   "band_hold_pct": 69.8,
+  "resolution_date": null,
+  "discovered_date": null,
+  "spy_return_pct": 0.71,
+  "spy_return_pct_exec": 0.41,
+  "alpha_pct": 7.16,
+  "alpha_pct_exec": 11.69,
+  "fill_date": "2026-10-23",
+  "fill_price": 56.44,
+  "fill_exec_date": "2026-10-26",
+  "fill_exec_price": 54.31,
+  "line_used": 53.5,
+  "split_scale": null,
+  "exit_date": null,
+  "exit_price": null,
+  "exit_exec_date": null,
+  "exit_exec_price": null,
+  "return_pct": 7.87,
+  "return_pct_exec": 12.1,
+  "current_return_pct": 7.87,
+  "last_close": 60.88,
+  "last_close_date": "2026-10-26",
+  "dist_to_line_pct": 13.79,
+  "hold_sessions": 1,
+  "how": null,
+  "entry_price": 56.44,
+  "event_checked": "2026-10-27",
+  "event": {
+   "day": "2026-10-23",
+   "ret_pct": 9.21,
+   "vol_x": 4.38,
+   "headline": "Delivery Firm Instacart Reportedly Explores Sale Options With Uber, DoorDash As Potential Buyers - Yahoo Finance",
+   "source": "Google News",
+   "headlines": 5
+  }
+ },
+ "WSM_2026-10-27_buystop": {
+  "method": "v2",
+  "ticker": "WSM",
+  "entry_date": "2026-10-27",
+  "status": "pending",
+  "signal_price": 255.33,
+  "entry_price": 255.33,
+  "buy_stop": 255.33,
+  "max_chase": 268.1,
+  "stop_loss": 234.9,
+  "target_1": 296.19,
+  "window_sessions": 5,
+  "valid_through": "2026-11-02",
+  "fill_date": null,
+  "fill_price": null,
+  "risk_per_share": null,
+  "target1_hit_date": null,
+  "partial_price": null,
+  "partial_fraction": 0.0,
+  "exit_date": null,
+  "exit_price": null,
+  "resolution_date": null,
+  "discovered_date": null,
+  "realized_r": null,
+  "current_r": null,
+  "return_pct": null,
+  "spy_return_pct": null,
+  "alpha_pct": null,
+  "category": "buystop",
+  "regime": "Defensive",
+  "pct_from_pivot": -2.1
+ },
+ "CRM_2026-10-27_qm": {
+  "method": "v2",
+  "category": "qm_breakout",
+  "ticker": "CRM",
+  "entry_date": "2026-10-27",
+  "status": "pending",
+  "regime": "Defensive",
+  "buy_stop": 252.42,
+  "adr": 3.43,
+  "signal_price": 247.61000061035156,
+  "entry_price": 247.61000061035156,
+  "signal_date": "2026-10-26",
+  "expected_stop": 247.66,
+  "max_stop": 243.76,
+  "base_days": 36,
+  "runup_pct": 72.9100867336552,
+  "tight": 0.9677632087578554,
+  "window_sessions": 1,
+  "valid_through": "2026-10-27",
+  "resolution_date": null,
+  "discovered_date": null,
+  "spy_return_pct": null,
+  "alpha_pct": null,
+  "fill_date": null,
+  "fill_price": null,
+  "stop_loss": null,
+  "risk_per_share": null,
+  "target1_hit_date": null,
+  "partial_price": null,
+  "partial_fraction": null,
+  "trail_ma": null,
+  "exit_date": null,
+  "exit_price": null,
+  "R": null,
+  "R_pess": null,
+  "realized_r": null,
+  "realized_r_pess": null,
+  "current_r": null,
+  "return_pct": null,
+  "return_pct_pess": null,
+  "last_close": null,
+  "last_close_date": null,
+  "how": null,
+  "r_risk": null,
+  "r_floored": null
+ },
+ "GILD_2026-10-27_gwh": {
+  "method": "v2",
+  "category": "glb_wish_high",
+  "ticker": "GILD",
+  "entry_date": "2026-10-27",
+  "signal_date": "2026-10-26",
+  "status": "pending",
+  "regime": "Defensive",
+  "glb_type": "classic",
+  "line": 157.29,
+  "signal_close": 158.69,
+  "prior_high_month": "2026-02",
+  "months_unpenetrated": 7,
+  "band_hold_pct": 87.3,
   "resolution_date": null,
   "discovered_date": null,
   "spy_return_pct": null,
@@ -2193,6 +2541,7 @@
   "last_close_date": null,
   "dist_to_line_pct": null,
   "hold_sessions": null,
-  "how": null
+  "how": null,
+  "event_checked": "2026-10-27"
  }
 }

@@ -1,7 +1,15 @@
 {
- "date": "2026-10-26",
+ "date": "2026-10-27",
  "rows": [],
  "horizon": [
+  {
+   "ticker": "AZTR",
+   "company": "Azitra Inc",
+   "date": "2026-10-26",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 26, 2026"
+  },
   {
    "ticker": "BDRX",
    "company": "Biodexa Pharmaceuticals plc",
@@ -31,6 +39,14 @@
    "company": "China SXT Pharmaceuticals, Inc.",
    "date": "2026-10-26",
    "ratio": "1:100",
+   "split_type": "reverse",
+   "date_human": "Oct 26, 2026"
+  },
+  {
+   "ticker": "CHOW",
+   "company": "ChowChow Cloud International Holdings Limited",
+   "date": "2026-10-26",
+   "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 26, 2026"
   },
@@ -97,6 +113,38 @@
    "ratio": "1:100",
    "split_type": "reverse",
    "date_human": "Oct 26, 2026"
+  },
+  {
+   "ticker": "PARA",
+   "company": "Banzai International, Inc.",
+   "date": "2026-10-27",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 27, 2026"
+  },
+  {
+   "ticker": "ENLV",
+   "company": "Enlivex Ltd.",
+   "date": "2026-10-27",
+   "ratio": "1:16",
+   "split_type": "reverse",
+   "date_human": "Oct 27, 2026"
+  },
+  {
+   "ticker": "NUWE",
+   "company": "Nuwellis, Inc.",
+   "date": "2026-10-27",
+   "ratio": "1:9",
+   "split_type": "reverse",
+   "date_human": "Oct 27, 2026"
+  },
+  {
+   "ticker": "SCAG",
+   "company": "Scage Future",
+   "date": "2026-10-27",
+   "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Oct 27, 2026"
   },
   {
    "ticker": "ENHA",
@@ -166,15 +214,17 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 20,
+  "source_rows": 26,
   "horizon_from": "2026-10-26",
   "horizon_to": "2026-11-05",
-  "in_week": 14,
+  "in_week": 20,
   "dropped_price": [
+   "AZTR",
    "BDRX",
    "BUUU",
    "HKPD",
    "SXTC",
+   "CHOW",
    "COCH",
    "GCTK",
    "HCTI",
@@ -183,6 +233,10 @@
    "PPCB",
    "SBFM",
    "TWG",
+   "PARA",
+   "ENLV",
+   "NUWE",
+   "SCAG",
    "ENHA"
   ],
   "dropped_cap": [],
