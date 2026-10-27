@@ -90,6 +90,12 @@ with q():
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", render.render_dashboard(b, publish=False))))
 assert "С етикет (цената следва сделка или слух за сделка, не сетъпа): CART 26.10 — събитие/M&A (+9.2% при" in page and "Средно доходност %: с тях -4.28 (1) · без тях — още няма." in page
 print("  ✓ „С етикет …: CART 26.10 — събитие/M&A (+9.2% при 4.x× обем на 23.10: «…»). Средно доходност %: с тях −4.28 (1) · без тях — още няма.“")
+# 27.10.2026: етикетираните без затворена сделка (buy-stop 27.10: ROKU отворена, "с тях −1.00 (1) · без тях −1.00 (1)") → ред вместо две еднакви числа
+b2 = copy.deepcopy(b); b2["backtest"]["glb_wish_high"]["events"].update(n_all=1, avg_all=-1.0, n_rest=1, avg_rest=-1.0)   # СИНТЕТИЧНО: етикетираният без резултат
+with q():
+    page2 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", render.render_dashboard(b2, publish=False))))
+assert "Средно доходност %: етикетираните още нямат затворени сделки." in page2 and "с тях -1.00" not in page2
+print("  ✓ етикетираните без затворени → „Средно …: етикетираните още нямат затворени сделки.“ (не „с тях −1.00 (1) · без тях −1.00 (1)“)")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert src.index('steps.step("event_labels"') < src.index("backtest_summary = backtest.get_backtest_summary()") and src.index("backtest.update_backtest_tracker(") < src.index('steps.step("event_labels"')
 print("  ✓ main: етикетите — след записа и резолюцията, преди обобщенията на книгите")
