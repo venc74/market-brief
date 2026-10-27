@@ -1037,7 +1037,7 @@ def run() -> dict:
                              label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
     # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; 26.10.2026 (етап 4б, т. 9): включено, със самопроверка —
     # непълен ден (последната сделка не е от затварянето на сесията) не влиза в историята и стъпката е частична
-    steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and qm_universe),      # универсът е веднъж на run (QM)
+    steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and config.OPTIONS_RECORD_IN_MORNING_RUN and qm_universe),   # 27.10: записът е в options_record.yml (~09:05 ET)
                label="Записът на опционните данни", consequence="днешната сесия липсва в историята за необичайна активност (нищо в брифа не зависи от нея)",
                failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None,
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)

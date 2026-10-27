@@ -13,6 +13,11 @@ Yahoo дава само текущата верига, без история н�
 на следващата сесия. Тогава денят е пълен и влиза
 в "sessions"; иначе — "incomplete" (само дата, час, причина и броят вериги — без данните), не влиза в историята и стъпката е частична. Реално на 22.10 (09:12 ET): последната сделка
 21.10 19:59:59–20:00:00 UTC = 15:59:59–16:00:00 ET.
+
+27.10.2026: записът — ПРЕДИ ОТВАРЯНЕТО, в отделен job (.github/workflows/options_record.yml → python src/options_record.py), не в сутрешния бриф. В 06:30 UTC (брифът, 27.10)
+веригите бяха без lastTradeDate → самопроверката даде "непълен"; на 22.10 в 09:12 ET бяха пълни. Тригерът: cron-job.org → workflow_dispatch в 09:05 America/New_York, пон–пет —
+закотвен по Ню Йорк, затова смяната на часа в САЩ (01.11) не го мести (09:05 ET = 13:05 UTC лете, 14:05 UTC зиме). Вграденият scheduler на GitHub не става: прозорецът е 25 мин,
+а закъсненията му в това репо са часове (oi_snapshot.yml). Самопроверката остава; skip_reason() пропуска ден без сесия, run след отварянето и вече пълна сесия (повторен dispatch).
 """
 from __future__ import annotations
 
@@ -20,6 +25,8 @@ import datetime as dt
 import json
 import time
 
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))                 # 27.10.2026: пуска се и като скрипт (options_record.yml)
 import config
 
 LAST_STATUS: dict = {}
@@ -175,6 +182,52 @@ def record(universe: list[str], today: str | None = None, *, download=None, tick
     return st
 
 
+def skip_reason(now_utc, history: dict | None = None) -> str | None:
+    """
+    27.10.2026: отделният job преди отварянето — причина да пропусне или None. Денят е по Ню Йорк: не е сесия (уикенд / празник) → пропуска; часът в Ню Йорк ≥
+    config.OPTIONS_RECORD_OPEN_NY (09:30) → пропуска (веригата вече носи новия ден — самопроверката би го отхвърлила); предишната сесия вече е пълна в историята → пропуска
+    (повторен dispatch). Чиста функция.
+    """
+    import pandas as pd
+    from src import sessions
+    t = pd.Timestamp(now_utc)
+    ny = (t.tz_localize("UTC") if t.tzinfo is None else t).tz_convert("America/New_York")
+    day = ny.date()
+    if not sessions.is_session(day):
+        return f"{day.strftime('%d.%m')} не е сесия на NYSE — няма запис"
+    oh, om = map(int, config.OPTIONS_RECORD_OPEN_NY.split(":"))
+    if (ny.hour, ny.minute) >= (oh, om):
+        return f"{ny.strftime('%H:%M %Z')} — след отварянето ({config.OPTIONS_RECORD_OPEN_NY} Ню Йорк); обемът във веригата е на новия ден — пропускам"
+    session = sessions.prev_session(day).isoformat()
+    if session in ((history or {}).get("sessions") or {}):
+        return f"сесия {session} вече е записана пълна — пропускам, не презаписвам"
+    return None
+
+
+def main() -> int:
+    """27.10.2026: входната точка на options_record.yml. Изход 1 само при провал (нито една верига / грешка); непълен ден — ::warning:: и изход 0."""
+    import pandas as pd
+    now = dt.datetime.now(dt.timezone.utc)
+    p = config.DATA_DIR / "options_daily.json"
+    try:
+        hist = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    except Exception:
+        hist = {}
+    why = skip_reason(now, hist)
+    if why:
+        print(f"::notice::{why}")
+        return 0
+    from src import screener
+    today = pd.Timestamp(now).tz_convert("America/New_York").date().isoformat()     # денят по Ню Йорк, не по часовника на runner-а
+    st = record(screener.build_universe(), today, path=p)
+    if not st.get("ok"):
+        print(f"::error::записът на опционните данни не мина: {st.get('reason')}")
+        return 1
+    if not st.get("complete"):
+        print(f"::warning::сесия {st['session']} — непълен ден, не влиза в историята: {st.get('reason')}")
+    return 0
+
+
 def _yf_frames(yf, tickers: list[str], today: str) -> dict:
     """Дневни барове за 3 месеца на батчове; само цели сесии (дата < today)."""
     import pandas as pd
@@ -193,3 +246,7 @@ def _yf_frames(yf, tickers: list[str], today: str) -> dict:
             except Exception:
                 continue
     return out
+
+
+if __name__ == "__main__":
+    sys.exit(main())

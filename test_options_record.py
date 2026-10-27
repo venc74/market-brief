@@ -115,4 +115,24 @@ assert min(data["sessions"]) > "2026-05-31" and "2026-05-01" not in data["sessio
 bad = orc.record(list(FR), "2026-10-21", download=lambda ts: (_ for _ in ()).throw(RuntimeError("Yahoo down")), ticker=ticker, path=path)
 assert bad["ok"] is False and "Yahoo down" in bad["reason"]
 print("  ✓ пазят се последните 90 сесии, по-старите се трият (и непълните отделно); провал на тегленето → причина, без грешка")
+
+print()
+print("── 5. отделният job преди отварянето (27.10.2026): кога пропуска; сутрешният бриф не записва ──")
+assert config.OPTIONS_RECORD_IN_MORNING_RUN is False
+assert "config.OPTIONS_RECORD_IN_MORNING_RUN" in src[src.index('steps.step("options_record"'):][:300]
+H = {"sessions": {"2026-10-21": {}}}
+assert orc.skip_reason("2026-10-22 13:12", {}) is None                                                     # РЕАЛНИЯТ час от 22.10: 09:12 EDT — пълна верига
+assert orc.skip_reason("2026-10-22 13:12", H).startswith("сесия 2026-10-21 вече е записана пълна")          # повторен dispatch
+assert orc.skip_reason("2026-10-30 13:05", {}) is None                                                     # 09:05 EDT (лятно време до 01.11)
+assert "след отварянето" in orc.skip_reason("2026-10-30 14:05", {})                                        # 14:05 UTC = 10:05 EDT — веригата вече е на новия ден
+assert orc.skip_reason("2026-11-02 14:05", {}) is None                                                     # 02.11 (след 01.11): 14:05 UTC = 09:05 EST — тригерът по Ню Йорк
+assert orc.skip_reason("2026-11-02 14:31", {}).startswith("09:31 EST — след отварянето")
+assert "не е сесия" in orc.skip_reason("2026-10-31 13:05", {}) and "не е сесия" in orc.skip_reason("2026-11-26 14:05", {})   # събота; Thanksgiving
+import re as _re
+YML = (ROOT / ".github" / "workflows" / "options_record.yml").read_text(encoding="utf-8")
+live = "\n".join(l for l in YML.splitlines() if not l.lstrip().startswith("#"))
+assert not _re.search(r"^\s*schedule:", live, _re.M) and "workflow_dispatch" in live and "group: options-record" in live
+assert "python src/options_record.py" in live and "git add data/options_daily.json" in live and "git add data/\n" not in live and "git stash push --include-untracked" in live
+print("  ✓ 09:05 EDT (30.10) и 09:05 EST (02.11) → запис; 10:05 EDT / 09:31 EST → пропуска; събота, Thanksgiving, вече пълна сесия → пропуска; брифът не записва; "
+      "options_record.yml — само workflow_dispatch, собствена група, качва само options_daily.json")
 print("\n✅ test_options_record: всичко мина")

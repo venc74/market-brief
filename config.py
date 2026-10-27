@@ -667,6 +667,10 @@ CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                     
 # ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──
 # 26.10.2026 (етап 4б, т. 9): включено в сутрешния run със самопроверка (options_record.completeness) — денят влиза в историята само ако последната сделка е от затварянето
 ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "1") == "1"
+# 27.10.2026: записът е преди отварянето (~09:05 ET), в отделен job (.github/workflows/options_record.yml, workflow_dispatch от cron-job.org в часова зона America/New_York —
+# смяната на часа в САЩ (01.11) не мести часа в Ню Йорк); в 06:30 UTC (сутрешният бриф) веригите са без lastTradeDate → "непълен" (27.10). Сутрешният run НЕ записва.
+OPTIONS_RECORD_IN_MORNING_RUN = os.getenv("OPTIONS_RECORD_IN_MORNING_RUN", "0") == "1"
+OPTIONS_RECORD_OPEN_NY = os.getenv("OPTIONS_RECORD_OPEN_NY", "09:30")                # след отварянето (Ню Йорк) job-ът пропуска — обемът във веригата вече е на новия ден
 OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))                  # топ по оборот (close × обем, 20 сесии); измерено 21.10: 200 вериги × 2 падежа = 70 s, 0 грешки
 OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
 OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%

@@ -64,6 +64,8 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 
 - Брифът: cron-job.org → `workflow_dispatch` на `daily_brief.yml` (без `schedule:` нарочно — вграденият scheduler на GitHub беше ненадежден); лимит 90 мин.
 - OI снимката: отделен job `oi_snapshot.yml` (~16:00 UTC от cron-job.org + 5 резервни `schedule` тригера), собствена concurrency група `oi-snapshot`; подробно — docs/HISTORY.md.
+- Записът на опционните данни: отделен job `options_record.yml` (от 27.10) — cron-job.org → `workflow_dispatch` в 09:05 пон–пет, часова зона America/New_York (преди отварянето;
+  без `schedule:` нарочно — прозорецът е 25 мин), собствена група `options-record`, качва само `data/options_daily.json`. Сутрешният бриф не записва (`OPTIONS_RECORD_IN_MORNING_RUN = 0`).
 - Страницата: GitHub Pages сервира `/docs` от `main`; `data/*.json` не е публичен → `render.py` огледалва в `docs/data/`. Червени "Pages build and deployment" от застъпени deploy-и
   са безобидни. `docs/.nojekyll` (от 20.10): Pages сервира docs/ както е, без Jekyll (страницата не разчита на него — живите файлове бяха байт по байт същите като в репото);
   `docs/HISTORY.md` се вижда като текст. Пази го `test_history_doc.py`.
@@ -84,7 +86,7 @@ src/main.py            — оркестратор: календар → свеж
 config.py              — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
 src/data_rhythm.py     — ритъмът на редките източници: COT цял само след нов отчет, 13F — само при нов 13F (24.10)
 src/crypto_news.py     — крипто секцията: Cointelegraph през AI подбор (дословни заглавия), COIN/HOOD/CRCL/BLSH, COT Bitcoin при нов отчет (24.10)
-src/options_record.py  — САМО запис на опционните данни (топ 200 + кандидатите от (а)); в сутрешния run със самопроверка — непълен ден не влиза в историята (26.10)
+src/options_record.py  — САМО запис на опционните данни (топ 200 + кандидатите от (а)); със самопроверка — непълен ден не влиза в историята (26.10); от 27.10 — options_record.yml, ~09:05 ET
 src/steps.py           — обвивката на стъпките в main.run (20.10): step() → ok / частично / провал / пропусната, brief["run_steps"], банер за провал без собствен банер
 src/sessions.py        — NYSE сесии и празници — ЕДНО място (20.10); cut_today / complete_bars — без частичния днешен бар
 src/macro_layer.py     — FRED, DXY/VIX/gold/oil/MOVE, thesis_monitor()

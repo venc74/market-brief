@@ -1,0 +1,57 @@
+name: Options record (pre-open)
+
+# 27.10.2026: записът на опционните данни (src/options_record.py) — ПРЕДИ ОТВАРЯНЕТО, отделно от брифа. В 06:30 UTC (сутрешният бриф) веригите на Yahoo са без
+# lastTradeDate → самопроверката дава "непълен" (27.10); в 09:12 ET (22.10) веригите бяха пълни — целият обем на предишната сесия, последна сделка 16:00 ET.
+#
+# Пуска се САМО през cron-job.org (workflow_dispatch) в 09:05 пон–пет, часова зона на задачата America/New_York — закотвено по Ню Йорк, затова смяната на часа
+# в САЩ (01.11) не мести часа: 09:05 ET = 13:05 UTC лете (EDT), 14:05 UTC зиме (EST). Без schedule: нарочно — прозорецът е 09:05–09:30 ET (25 мин), а вграденият
+# scheduler на GitHub закъснява в това репо с часове (виж oi_snapshot.yml). Run извън прозореца, в ден без сесия или при вече пълна сесия прескача за секунди
+# (options_record.skip_reason, ред ::notice::). Run-ът трае ~3–4 мин (200 вериги ≈ 70 s, измерено 21.10).
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# Собствена група: не чака зад OI снимката и не отменя бриф.
+concurrency:
+  group: options-record
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Record option chains
+        run: python src/options_record.py
+
+      - name: Commit record
+        run: |
+          git config user.name "brief-bot"
+          git config user.email "actions@github.com"
+          git add data/options_daily.json 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "options record: $(date -u +%F)"
+          # Само записът се качва оттук; всичко друго, писано по време на run-а, се слага настрана (както в oi_snapshot.yml), после pull --rebase с до 4 опита.
+          git stash push --include-untracked -q -m "options-record: локални файлове" || true
+          for attempt in 1 2 3 4; do
+            if git pull --rebase && git push; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "push опит $attempt от 4 неуспешен — повторен опит след пауза"
+            sleep $((attempt * ${RETRY_DELAY:-5}))
+          done
+          echo "::error::записът на опционните данни не успя да се качи след 4 опита (pull --rebase / push)"
+          exit 1
