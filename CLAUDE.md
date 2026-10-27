@@ -64,8 +64,9 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 
 - Брифът: cron-job.org → `workflow_dispatch` на `daily_brief.yml` (без `schedule:` нарочно — вграденият scheduler на GitHub беше ненадежден); лимит 90 мин.
 - OI снимката: отделен job `oi_snapshot.yml` (~16:00 UTC от cron-job.org + 5 резервни `schedule` тригера), собствена concurrency група `oi-snapshot`; подробно — docs/HISTORY.md.
-- Записът на опционните данни: отделен job `options_record.yml` (от 27.10) — cron-job.org → `workflow_dispatch` в 09:05 пон–пет, часова зона America/New_York (преди отварянето;
-  без `schedule:` нарочно — прозорецът е 25 мин), собствена група `options-record`, качва само `data/options_daily.json`. Сутрешният бриф не записва (`OPTIONS_RECORD_IN_MORNING_RUN = 0`).
+- Записът на опционните данни: отделен job `options_record.yml` (от 27.10) — cron-job.org → `workflow_dispatch`, „5 14,15 * * 1-5“ по Europe/Berlin (часовата зона там не се
+  сменя): точно едното пускане е в 09:05 Ню Йорк (до 01.11 — 14:05, после 15:05), другото прескача в `skip_reason` (извън 09:00–09:30 Ню Йорк); без `schedule:` нарочно —
+  прозорецът е 25 мин; собствена група `options-record`, качва само `data/options_daily.json`. Сутрешният бриф не записва (`OPTIONS_RECORD_IN_MORNING_RUN = 0`).
 - Страницата: GitHub Pages сервира `/docs` от `main`; `data/*.json` не е публичен → `render.py` огледалва в `docs/data/`. Червени "Pages build and deployment" от застъпени deploy-и
   са безобидни. `docs/.nojekyll` (от 20.10): Pages сервира docs/ както е, без Jekyll (страницата не разчита на него — живите файлове бяха байт по байт същите като в репото);
   `docs/HISTORY.md` се вижда като текст. Пази го `test_history_doc.py`.
