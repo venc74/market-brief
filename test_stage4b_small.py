@@ -52,7 +52,9 @@ assert sorted((c["ticker"], c["setup"]["kind"], c["setup"]["triggered"]) for c i
 cards, compact = render.split_watchlist(wl)
 assert cards == [] and sorted(r["ticker"] for r in compact) == ["AAPL", "AMG", "ZBRA"]
 z = next(r for r in compact if r["ticker"] == "ZBRA")
-assert z["reason"].startswith("✅ задействан в buy-stop книгата на 21.10 по $390.80") and z["reason"].endswith("днес: под pivot — чака buy-stop")
+assert z["reason"].startswith("✅ задействан в buy-stop книгата на 21.10 по $390.80") and z["reason"].endswith("в позиция от 21.10; днес под pivot")   # 27.10.2026: не "чака buy-stop"
+a = next(r for r in compact if r["ticker"] == "AAPL")
+assert a["reason"].endswith("днес: над pivot без обем ≥ 1.5×") and "в позиция от" not in a["reason"]                          # друг сетъп днес — причината остава
 sent = []
 real = ai_brief._call_claude
 ai_brief._call_claude = lambda system, user, **k: (sent.append(user), '{"tickers": []}')[1]                       # СИНТЕТИЧНО

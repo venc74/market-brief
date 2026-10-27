@@ -341,9 +341,12 @@ def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
             # 12.10.2026: задействан запис в buy-stop книгата има предимство пред причината на сетъпа (ANET: "над pivot без обем, стоп 9.2%" беше единственото на реда,
             # а книгата държеше вход 09.10 по $215.38 със стоп $197.70) — стопът е на книгата, днешният сетъп остава като допълнение
             r = bk.get("current_r")
-            reason = (f"✅ задействан в buy-stop книгата на {bk['fill_date'][8:10]}.{bk['fill_date'][5:7]} по ${bk['fill_price']:.2f}, "
+            fd = f"{bk['fill_date'][8:10]}.{bk['fill_date'][5:7]}"
+            # 27.10.2026: под pivot след входа не е "чака buy-stop" — позицията вече е отворена (AAPL, AMG, ZBRA 27.10)
+            today_txt = f"в позиция от {fd}; днес под pivot" if kind == "below_pivot" else f"днес: {reason}"
+            reason = (f"✅ задействан в buy-stop книгата на {fd} по ${bk['fill_price']:.2f}, "
                       f"стоп ${bk['stop_loss']:.2f} ({(bk['fill_price'] - bk['stop_loss']) / bk['fill_price'] * 100:.1f}% под входа)"
-                      + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; днес: {reason}")
+                      + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; {today_txt}")
             stop_pct = None                                                         # стопът на сетъпа от днес не е стопът на позицията
         elif setup.get("book_note"):                                                # 26.10.2026 (етап 4б, т. 1): сделка със задействан запис — "в buy-stop книгата: отворена от …"
             reason += f"; {setup['book_note']}"
