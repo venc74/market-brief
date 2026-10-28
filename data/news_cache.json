@@ -1,53 +1,47 @@
 {
- "date": "2026-10-27",
+ "date": "2026-10-28",
  "news": [
   {
-   "headline": "Anthropic files for potentially the biggest IPO ever as CEO warns of risk to humanity from AI - AP News",
-   "source": "AP Business",
-   "why": "IPO-то на Anthropic раздвижва AI сектора нагоре и повлича технологичните акции и venture-свързани активи.",
-   "headline_bg": "Anthropic подава документи за потенциално най-голямото IPO някога, докато CEO предупреждава за риск за човечеството от AI"
-  },
-  {
-   "headline": "Wall Street banks, Blackstone line up $63 billion to finance Broadcom AI chips for Anthropic - Reuters",
-   "source": "Reuters Business",
-   "why": "Финансиране от $63 млрд за AI чипове директно движи акциите на Broadcom, Blackstone и банковия сектор нагоре.",
-   "headline_bg": "Уолстрийт банки и Blackstone наредиха $63 млрд за финансиране на AI чипове на Broadcom за Anthropic"
-  },
-  {
-   "headline": "Federal Reserve is likely to hold interest rates steady in October. Here's what that means for consumers",
+   "headline": "Stock futures are mixed as traders await Fed decision, Big Tech earnings: Live updates",
    "source": "CNBC",
-   "why": "Очакваното задържане на лихвите от Fed дава временна подкрепа на рисковите активи и облигациите.",
-   "headline_bg": "Федералният резерв вероятно ще задържи лихвите непроменени през октомври — какво означава това за потребителите"
+   "why": "Fed решението движи краткосрочните лихви и задава посоката за целия пазар — акции, облигации и долар реагират директно.",
+   "headline_bg": "Фючърсите са смесени, докато търговците очакват решението на Fed и резултатите на Big Tech: Живи актуализации"
   },
   {
-   "headline": "Bank of Japan is expected to hold rates this week — but stay hawkish: CNBC survey",
+   "headline": "How investors can position ahead of the Fed's next policy decision",
    "source": "CNBC",
-   "why": "Очакваното задържане на BOJ с hawkish тон влияе на йената и японските активи, с ефект върху carry trade глобално.",
-   "headline_bg": "Очаква се Японската централна банка да задържи лихвите тази седмица — но да остане hawkish, сочи проучване на CNBC"
+   "why": "Позиционирането преди Fed решението е ключово за облигации, долар и лихвочувствителни сектори като недвижими имоти и финансови акции.",
+   "headline_bg": "Как инвеститорите могат да се позиционират преди следващото политическо решение на Fed"
   },
   {
-   "headline": "EXCLUSIVE: US, Canada working on deal to ease steel, auto tariffs, sources say - Reuters",
+   "headline": "Oil rises over 1% after Saudi Arabian refinery attack reignites supply risk - Reuters",
    "source": "Reuters Business",
-   "why": "Потенциалното облекчаване на стоманените и автомобилните тарифи между САЩ и Канада е позитивно за металургичния и автомобилния сектор.",
-   "headline_bg": "ЕКСКЛУЗИВНО: САЩ и Канада работят по споразумение за облекчаване на тарифите за стомана и автомобили"
+   "why": "Атаката над саудитска рафинерия засяга петролното предлагане и вдига цените на суровия петрол, с директен ефект върху енергийния сектор и инфлацията.",
+   "headline_bg": "Петролът поскъпва с над 1% след атаката над саудитска рафинерия, която разпали отново риска за доставките"
   },
   {
-   "headline": "Oil eases on Middle East diplomacy hopes, Saudi attacks keep supply worries alive - Reuters",
+   "headline": "US costs of Iran war rise to over $47 billion, according to Pentagon estimate - Reuters",
    "source": "Reuters Business",
-   "why": "Дипломатическите усилия в Близкия изток натискат петрола надолу, но атаките срещу Саудитска Арабия поддържат риска от прекъсване на доставките.",
-   "headline_bg": "Петролът поевтинява с надеждите за дипломация на Близкия изток, но атаките срещу Саудитска Арабия поддържат притесненията за доставките"
+   "why": "Разходите от $47 млрд. за войната с Иран натискат бюджетния дефицит и могат да повлияят на доходността на американските ДЦК и долара.",
+   "headline_bg": "Разходите на САЩ за войната с Иран нарастват до над $47 млрд. според оценка на Пентагона"
   },
   {
-   "headline": "Dollar General is sued by the FTC and 20 states for what's being described as deceptive pricing - AP News",
-   "source": "AP Business",
-   "why": "Съдебен иск от FTC и 20 щата срещу Dollar General е регулаторен удар, натискащ акцията на DG надолу и засягащ сектора на дребно.",
-   "headline_bg": "FTC и 20 щата заведоха дело срещу Dollar General за описано като измамно ценообразуване"
-  },
-  {
-   "headline": "EU seeks to widen market access to counter trade restrictions, Germany's Merz says - Reuters",
+   "headline": "SK Hynix unveils $75 billion shareholder return plan after posting record profit - Reuters",
    "source": "Reuters Business",
-   "why": "Стремежът на ЕС за по-широк пазарен достъп в отговор на търговски ограничения влияе на европейските акции и валутата.",
-   "headline_bg": "ЕС търси разширяване на пазарния достъп в противовес на търговските ограничения, заяви германският канцлер Мерц"
+   "why": "Рекорден buyback план от $75 млрд. и рекордна печалба при SK Hynix вдигат целия memory/AI chip сектор, включително Micron и свързаните ETF-и.",
+   "headline_bg": "SK Hynix обявява план за $75 млрд. възвращаемост към акционерите след рекордна печалба"
+  },
+  {
+   "headline": "Stocks get AI lift, kiwi slides on RBNZ's surprise hold - Reuters",
+   "source": "Reuters Business",
+   "why": "Изненадващото задържане на лихвите от RBNZ срива новозеландския долар и сигнализира по-широко преосмисляне на централнобанковите цикли в развитите пазари.",
+   "headline_bg": "Акциите получават тласък от AI, новозеландският долар се срива след изненадващото задържане на RBNZ"
+  },
+  {
+   "headline": "Polymarket faces renewed CFTC probe over U.S. access to offshore platform",
+   "source": "CNBC",
+   "why": "Новото разследване на CFTC срещу Polymarket за достъп на американски потребители до офшор платформа носи регулаторен риск за крипто и prediction markets сектора.",
+   "headline_bg": "Polymarket е изправен пред ново разследване на CFTC относно достъпа на американски потребители до офшор платформата"
   }
  ]
 }

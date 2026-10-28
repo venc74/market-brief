@@ -1,6 +1,17 @@
 {
- "date": "2026-10-27",
- "rows": [],
+ "date": "2026-10-28",
+ "rows": [
+  {
+   "ticker": "ENHA",
+   "company": "Enhanced Group Inc.",
+   "date": "2026-10-29",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 29, 2026",
+   "price": 10.8,
+   "market_cap": 1477616789.695651
+  }
+ ],
  "horizon": [
   {
    "ticker": "AZTR",
@@ -115,14 +126,6 @@
    "date_human": "Oct 26, 2026"
   },
   {
-   "ticker": "PARA",
-   "company": "Banzai International, Inc.",
-   "date": "2026-10-27",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 27, 2026"
-  },
-  {
    "ticker": "ENLV",
    "company": "Enlivex Ltd.",
    "date": "2026-10-27",
@@ -135,6 +138,14 @@
    "company": "Nuwellis, Inc.",
    "date": "2026-10-27",
    "ratio": "1:9",
+   "split_type": "reverse",
+   "date_human": "Oct 27, 2026"
+  },
+  {
+   "ticker": "PARA",
+   "company": "Parabolic Technologies, Inc.",
+   "date": "2026-10-27",
+   "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Oct 27, 2026"
   },
@@ -209,14 +220,22 @@
    "ratio": "3:1",
    "split_type": "normal",
    "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "MMT",
+   "company": "Aberdeen Multi-Market Income Fund",
+   "date": "2026-11-09",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 26,
+  "source_rows": 27,
   "horizon_from": "2026-10-26",
-  "horizon_to": "2026-11-05",
+  "horizon_to": "2026-11-09",
   "in_week": 20,
   "dropped_price": [
    "AZTR",
@@ -233,17 +252,16 @@
    "PPCB",
    "SBFM",
    "TWG",
-   "PARA",
    "ENLV",
    "NUWE",
-   "SCAG",
-   "ENHA"
+   "PARA",
+   "SCAG"
   ],
   "dropped_cap": [],
   "dropped_no_data": [
    "NYSX"
   ],
-  "passed": 0,
-  "state": "empty"
+  "passed": 1,
+  "state": "ok"
  }
 }

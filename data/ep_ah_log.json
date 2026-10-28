@@ -33,6 +33,23 @@
    "close_pct": 9.55,
    "high_pct": 15.34,
    "resolved_on": "2026-10-22"
+  },
+  {
+   "ticker": "MANH",
+   "session": "2026-10-27",
+   "brief_date": "2026-10-28",
+   "gap_session": "2026-10-28",
+   "prev_close": 233.98,
+   "ah_price": 258.0,
+   "ah_gap_pct": 10.27,
+   "ah_bars": 15,
+   "ah_volume": 0.0,
+   "neglect": true,
+   "ret63_pct": 14.7,
+   "open_gap_pct": null,
+   "close_pct": null,
+   "high_pct": null,
+   "resolved_on": null
   }
  ]
 }
