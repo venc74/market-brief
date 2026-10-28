@@ -106,8 +106,9 @@ ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res = ai_brief.macro_and_sector_brief({}, [], THERMO)
 assert f["counts_text"] in prompts[0] and "НЕ преброявай" in prompts[0] and f["rule_text"] in prompts[0]
-assert res["macro_brief"] == B["macro_brief"] and res["regime_comment"] == new
-assert [(x["field"], x["code"]) for x in res["regime_claims_fixed"]] == [("regime_comment", "member"), ("regime_comment", "solo")]
+new_meta = rc.clean(rc.strip_meta(B["regime_comment"])[0], f)[0]                              # 28.10.2026: и клаузата-проверка „никакви null/nan стойности …“ (РЕАЛНА, 08.10) се маха
+assert res["macro_brief"] == B["macro_brief"] and res["regime_comment"] == new_meta and "null/nan" not in new_meta
+assert [(x["field"], x["code"]) for x in res["regime_claims_fixed"]] == [("regime_comment", "meta"), ("regime_comment", "member"), ("regime_comment", "solo")]
 assert "режим: regime_comment" in out.getvalue()
 print("  ✓ промптът носи броенето и правилото от кода; отговорът на модела е поправен (regime_comment), с протокол в regime_claims_fixed и ред в лога")
 clean_answer = {"macro_brief": "Кратък текст.", "sector_logic": [], "regime_comment": "Defensive е оправдан от override-а."}

@@ -828,6 +828,11 @@ def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
         text = out.get(field)
         if not isinstance(text, str) or not text:
             continue
+        text, meta = regime_claims.strip_meta(text)                                   # 28.10.2026: клаузите-проверки на данните („без null/nan“) — от промпта, не за читателя
+        if meta:
+            out[field] = text
+            fixed += [{"field": field, "sentence": m["sentence"], "code": "meta", "why": "проверка на данните от промпта (null/nan, валидни стойности) — махната",
+                       "kept": m["kept"]} for m in meta]
         new, problems = regime_claims.clean(text, f)
         if problems:
             out[field] = new

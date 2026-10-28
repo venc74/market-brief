@@ -307,6 +307,48 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
     return (" ".join(out) if problems else str(text or "")), problems
 
 
+# 28.10.2026: изтекла проверка от промпта — „Никоя от наличните стойности не е null/nan.“ (28.10). Промптът казва: ако индикатори липсват / са скрити / съдържат null/nan — кажи го;
+# когато няма такива, моделът пише, че няма. Клауза (разделители „ — “, „; “, „, но “), която твърди, че данните са без null/nan / валидни / пълни, се маха; клаузата за СКРИТ или
+# ЛИПСВАЩ индикатор („MOVE е скрит поради null стойности“) е информация и остава. Измерено върху всичките брифове: виж strip_meta и test_meta_sentences.
+_META_NULL = re.compile(r"\bnull\b|\bnan\b|невалидни\s+стойност|наличните\s+стойност", re.I)
+_META_NEG = re.compile(r"\b(?:няма|нито|никоя|никой|никакви|без|не\s+е|не\s+съдържа|не\s+показва|не\s+компрометират|валидни|пълни|присъстват|попълнени)\b", re.I)   # „невалидни“ не е „валидни“
+_META_VALID = re.compile(r"(?:\bвсички(?:те)?\s+(?:\d+\s+)?(?:\w+\s+)?|\b(?:индикаторите|данните|стойностите)\s+)(?:са\s+|имат\s+)(?:с\s+)?(?:присъстващи\s+и\s+)?"
+                         r"(?:валидни|налични|попълнени|пълни|присъстващи)\b", re.I)
+_META_HIDDEN = re.compile(r"(?<!няма )(?<!без )(?<!нито )\bскрит\w*|(?<!няма )\bлипсва\w*|\bотсъств\w*", re.I)
+_META_SEP = re.compile(r"( — |; |, но )")
+
+
+def _meta_clause(c: str) -> bool:
+    if _META_HIDDEN.search(c):
+        return False                                                             # скрит / липсващ индикатор — информация, не проверка
+    return bool((_META_NULL.search(c) and _META_NEG.search(c)) or _META_VALID.search(c))
+
+
+def strip_meta(text: str) -> tuple[str, list[dict]]:
+    """28.10.2026: маха клаузите-проверки на данните („без null/nan“, „всички индикатори са валидни“); изречение само от такива клаузи пада цяло. (нов текст, [{sentence, removed, kept}])."""
+    out, probs = [], []
+    for s in _sentences(text):
+        parts = _META_SEP.split(s)
+        clauses, seps = parts[0::2], parts[1::2]
+        drop = [_meta_clause(c) for c in clauses]
+        if not any(drop):
+            out.append(s)
+            continue
+        kept = ""
+        for i, c in enumerate(clauses):
+            if drop[i]:
+                continue
+            kept += (seps[i - 1] if kept and i > 0 else "") + c
+        kept = kept.strip()
+        if kept and kept[-1] not in ".!?":
+            kept += "."
+        if kept:
+            kept = kept[0].upper() + kept[1:]
+            out.append(kept)
+        probs.append({"sentence": s, "removed": [c for c, d in zip(clauses, drop) if d], "kept": kept or None})
+    return (" ".join(out) if probs else str(text or "")), probs
+
+
 def _plural(n: int, one: str, many: str) -> str:
     return f"{n} {one if n == 1 else many}"
 
