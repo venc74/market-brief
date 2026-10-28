@@ -99,6 +99,9 @@ def attach_position_uov(rows: list[dict]) -> dict:
     uov, diag = unusual_options.candidate_markers(tickers)
     for r in rows:
         if r.get("ticker") in uov:
+            if r.get("deal"):                                                    # 28.10.2026: запис на цел на сделка — без UOV✓ (ROKU 28.10: calls 92% при цена по офертата)
+                r["uov_hidden"] = "сделка — опционният обем следва условията на сделката"
+                continue
             r.setdefault("markers", []).append(uov_marker(uov[r["ticker"]]))
     return {k: diag.get(k) for k in ("requested", "with_ratio", "marked", "missing", "ratios")}
 

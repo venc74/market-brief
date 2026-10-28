@@ -469,8 +469,23 @@ def annotate_mergers(cards_groups, mergers: dict[str, dict] | None = None) -> in
             h = mergers.get(c.get("ticker")) if isinstance(c, dict) else None
             if h:
                 c["merger_target"] = {"text": merger_text(h), **{k: h.get(k) for k in ("buyer", "announced", "filing_date")}}
+                drop_uov(c)
                 n += 1
     return n
+
+
+def drop_uov(row: dict) -> bool:
+    """
+    28.10.2026: при сделка UOV✓ не се показва — опционният обем следва условията на сделката, не сетъпа (ROKU 28.10: calls 92% върху цена, привързана към офертата на Fox).
+    Маха маркера от реда / картата и пази защо (uov_hidden); връща дали е махнат.
+    """
+    ms = row.get("markers") or []
+    keep = [m for m in ms if not (isinstance(m, dict) and str(m.get("tag", "")).startswith("UOV"))]
+    if len(keep) == len(ms):
+        return False
+    row["markers"] = keep
+    row["uov_hidden"] = "сделка — опционният обем следва условията на сделката"
+    return True
 
 
 def annotate(cards_groups, active: dict[str, dict]) -> int:

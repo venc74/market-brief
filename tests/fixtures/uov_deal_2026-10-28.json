@@ -1,0 +1,70 @@
+{
+ "_note": "РЕАЛНО: редовете на buy-stop книгата от data/2026-10-28.json (брифът от 28.10.2026) — ROKU с етикет deal (Fox Corporation) и маркер UOV✓ (calls), и два реда без сделка; извадено 28.10.2026.",
+ "roku_row": {
+  "ticker": "ROKU",
+  "entry_date": "2026-10-20",
+  "status": "open",
+  "buy_stop": 159.89,
+  "max_chase": 167.88,
+  "stop_loss": 148.53,
+  "target_1": 182.61,
+  "valid_through": "2026-10-26",
+  "fill_date": "2026-10-22",
+  "fill_price": 159.89,
+  "current_r": -0.28,
+  "regime": "Defensive",
+  "also_action": false,
+  "spinoff_note": null,
+  "entry_volume_ratio": 2.4,
+  "deal": {
+   "buyer": "Fox Corporation",
+   "announced": "2026-06-14",
+   "filing_date": "2026-06-15",
+   "seen": "2026-10-27"
+  },
+  "markers": [
+   {
+    "tag": "UOV✓ (calls)",
+    "title": "Необичаен опционен обем вчера: ≈ 0.67× OI — над 90-ия перцентил на 54 ликвидни тикъра за деня (праг 0.60×); върху 3 падежа до 13.11 (без изтеклите и изтичащите днес). Обем 1,680 / OI 2,508 договора; calls 92% от обема — Обемът е предимно в кол опции — bullish наклон. OI е от следобедната снимка на сесията 27.10."
+   }
+  ]
+ },
+ "other_rows": [
+  {
+   "ticker": "EXPD",
+   "entry_date": "2026-10-09",
+   "status": "open",
+   "buy_stop": 194.59,
+   "max_chase": 204.32,
+   "stop_loss": 181.53,
+   "target_1": 220.71,
+   "valid_through": "2026-10-15",
+   "fill_date": "2026-10-09",
+   "fill_price": 194.59,
+   "current_r": 0.39,
+   "regime": "Defensive",
+   "also_action": true,
+   "spinoff_note": null,
+   "entry_volume_ratio": 1.25,
+   "deal": null
+  },
+  {
+   "ticker": "AAPL",
+   "entry_date": "2026-10-19",
+   "status": "open",
+   "buy_stop": 345.34,
+   "max_chase": 362.61,
+   "stop_loss": 322.55,
+   "target_1": 390.92,
+   "valid_through": "2026-10-23",
+   "fill_date": "2026-10-19",
+   "fill_price": 345.34,
+   "current_r": 0.08,
+   "regime": "Defensive",
+   "also_action": false,
+   "spinoff_note": null,
+   "entry_volume_ratio": 0.86,
+   "deal": null
+  }
+ ]
+}
