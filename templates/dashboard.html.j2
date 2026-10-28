@@ -1437,7 +1437,7 @@
           <td class="sym">{{ r.ticker }}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф."}]) }}{% endif %}{% if r.company and r.company != r.ticker %}<div class="qm-sm" style="font-family:inherit;font-weight:400">{{ r.company|cname(28) }}</div>{% endif %}</td>
           <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div class="qm-sm">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
           <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
-            <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: н/д</span>{% endif %}</div>
+            <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: няма данни за обема</span>{% endif %}</div>
             {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}</td>
           <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
           <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span></td>

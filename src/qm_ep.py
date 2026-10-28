@@ -63,6 +63,7 @@ def extract_ah(df: pd.DataFrame) -> dict | None:
     """
     За ЕДИН тикър (5-минутни барове с prepost, индекс с часова зона): най-новата сесия, която има и редовни, и post-market (≥ 16:00 ET) барове. Връща {session, prev_close (последният
     редовен бар), ah_price (последният post-market бар), ah_high, ah_low, ah_bars, ah_volume, ah_last_et} или None.
+    28.10.2026: ah_volume None, когато баровете са без обем — цена с ход и нулев обем е липсващи данни, не нула (MANH 27.10: 15 бара, $233.98 → $258.00, обем 0; в дневника — 2 от 3 така).
     """
     if df is None or df.empty:
         return None
@@ -74,7 +75,7 @@ def extract_ah(df: pd.DataFrame) -> dict | None:
         ah = df[m & (mins >= 960)]
         if len(ah) and len(reg):
             return {"session": d.isoformat(), "prev_close": float(reg["Close"].iloc[-1]), "ah_price": float(ah["Close"].iloc[-1]), "ah_high": float(ah["High"].max()),
-                    "ah_low": float(ah["Low"].min()), "ah_bars": int(len(ah)), "ah_volume": float(ah["Volume"].fillna(0).sum()),
+                    "ah_low": float(ah["Low"].min()), "ah_bars": int(len(ah)), "ah_volume": (float(ah["Volume"].fillna(0).sum()) or None),
                     "ah_last_et": ix[m][-1].strftime("%H:%M")}
     return None
 
@@ -95,7 +96,7 @@ def scan_after_hours(frames5: dict[str, pd.DataFrame], gap_pct: float | None = N
             rows.append({"ticker": t, **e, "gap_pct": g})
     rows.sort(key=lambda r: -r["gap_pct"])
     return rows, {"session": session, "tickers_with_ah": len(ext), "in_session": sessions.count(session) if session else 0, "gappers": len(rows),
-                  "zero_volume_share": round(float(np.mean([e["ah_volume"] == 0 for e in ext.values()])), 2) if ext else None}
+                  "zero_volume_share": round(float(np.mean([not e["ah_volume"] for e in ext.values()])), 2) if ext else None}
 
 
 def fetch_5m(universe: list[str], batch_size: int | None = None) -> tuple[dict[str, pd.DataFrame], dict]:

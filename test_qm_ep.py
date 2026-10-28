@@ -41,7 +41,7 @@ FR_0210 = {t: m5(t) for t in TICKERS}
 
 print("── after-hours гап от 5-минутни барове (РЕАЛНИ) ──")
 e = ep.extract_ah(FR_0110["SYNA"])
-assert (e["session"], e["prev_close"], e["ah_price"], e["ah_bars"], e["ah_last_et"]) == ("2026-10-01", 106.16, 122.04, 46, "19:55") and e["ah_volume"] == 0.0
+assert (e["session"], e["prev_close"], e["ah_price"], e["ah_bars"], e["ah_last_et"]) == ("2026-10-01", 106.16, 122.04, 46, "19:55") and e["ah_volume"] is None          # 28.10.2026: 46 бара с ход в цената и обем 0 — липсващи данни, не нула
 print(f"  ✓ SYNA: сесия 01.10, затваряне $106.16 → последен after-hours бар (19:55 ET = 01:55 Берлин) $122.04 = {100 * (e['ah_price'] / e['prev_close'] - 1):+.2f}%; 46 after-hours бара, обем 0 (Yahoo не дава обем)")
 rows, diag = ep.scan_after_hours(FR_0110)
 assert [r["ticker"] for r in rows] == ["SYNA"] and round(rows[0]["gap_pct"], 2) == 14.96 and diag["session"] == "2026-10-01" and diag["gappers"] == 1 and diag["tickers_with_ah"] == 4
