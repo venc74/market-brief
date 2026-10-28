@@ -61,6 +61,13 @@ _CREDIT = re.compile(
     rf"|(?:излиза|бяга|бягство)\w*\s+от\s+кредит\w*\s+риск", re.I)
 _CREDIT_NEG = re.compile(r"(?:\bне\b|\bняма\b|\bнито\b|\bбез\b|повече\s+от|отколкото|вместо|\bниск\w*|\bслаб\w*|липс\w*)[^.;,—]{0,40}$", re.I)
 _CREDIT_HYPO = re.compile(r"(?:\bако\b|\bби\b|\bще\b|\bкогато\b)[^.;]{0,60}$", re.I)
+# 28.10.2026: distribution days под прага „блокират Offensive“ / „държат Defensive“ — 19.10, 23.10, 27.10, 28.10 („Defensive-ът се държи изцяло от два механизма: … distribution days 7/9“).
+# Условното „при 9 Offensive се блокира“ е вярно и остава (праг или „при достигане на 9“ непосредствено преди глагола).
+_DD = re.compile(r"distribution\s+days?", re.I)
+_DD_VERB = re.compile(r"distribution\s+days?\b[^.;]{0,90}?\b(?:блокират|блокира|държат|държи|поддържат|поддържа)\b", re.I)
+_DD_BLOCKED = re.compile(r"\b(?:Offensive|режимът)\s+(?:е|остава)\s+блокиран", re.I)
+_DD_MECH = re.compile(r"(?:държи|държат|поддържа\w*)\s+(?:се\s+)?(?:изцяло\s+)?от\s+(?:два|двата|три|трите)\s+механизма", re.I)
+_DD_COND = re.compile(r"при\s+(?:достигане\s+на\s+)?(?:\d+|девет)\b[^.;]{0,25}$", re.I)
 
 
 def _norm(s: str) -> str:
@@ -125,7 +132,15 @@ def facts(thermo: dict) -> dict:
             f"за да не е Offensive (1 или 2 червени → Defensive); 3 или повече червени → Cash; всичко друго → Defensive (недостатъчно потвърждение). "
             f"Единичен индикатор не дава Offensive или Cash сам; режимът се форсира до Defensive от override-ите ({', '.join(FORCING)}) и се ограничава до Defensive "
             f"от червените distribution days.")
-    return {"groups": groups, "counts_text": counts, "rule_text": rule, "credit": _credit_legs(inds)}
+    return {"groups": groups, "counts_text": counts, "rule_text": rule, "credit": _credit_legs(inds), "dd": _dd_state(thermo)}
+
+
+def _dd_state(thermo: dict | None) -> dict | None:
+    """28.10.2026: distribution days от реда на кода („Запас до смяна на режима“) — {"line", "blocking"}; blocking — червени (≥ прага) или блок, държан по хистерезис. Без реда → None."""
+    part = next((p for p in (((thermo or {}).get("regime_margin") or {}).get("parts") or []) if str(p).startswith("distribution days")), None)
+    if not part or "не се изтеглиха" in part:
+        return None
+    return {"line": part, "blocking": "Offensive е блокиран" in part or "по хистерезис" in part}
 
 
 def _credit_legs(inds: list[dict]) -> dict | None:
@@ -245,6 +260,18 @@ def check_sentence(sentence: str, f: dict) -> list[dict]:
             problems.append({"code": "credit", "why": f"твърди кредитен стрес («{m.group(0)}»), а HYG е {cr['hyg']:+.2f}% за 10 сесии (над {config.CREDIT_CLAIM_HYG_CONFIRM_PCT:+.1f}%) — "
                                                       f"скокът на IEI/HYG е от IEI ({cr['iei']:+.2f}%)"})
             break
+    dd = f.get("dd")
+    if dd and not dd["blocking"] and _DD.search(sentence):                         # 28.10.2026: distribution days под прага не блокират и не държат режима
+        hit = None
+        for rx in (_DD_VERB, _DD_BLOCKED, _DD_MECH):
+            for m in rx.finditer(sentence):
+                if not _DD_COND.search(sentence[max(0, m.end() - 60):m.end() - len(m.group(0).split()[-1])]):
+                    hit = m.group(0)
+                    break
+            if hit:
+                break
+        if hit:
+            problems.append({"code": "dd", "why": f"твърди, че distribution days блокират / държат режима («{hit[:60]}»), а по кода: {dd['line']}"})
     m = _SOLO.search(sentence)
     if m and _REGIME_WORD.search(sentence) and not _negated(sentence, m):
         named = indicators_in(sentence)
@@ -288,7 +315,7 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
     Нищо за поправяне → същият текст.
     """
     sents = _sentences(text)
-    out, problems, replaced, rule_replaced, credit_replaced = [], [], False, False, False
+    out, problems, replaced, rule_replaced, credit_replaced, dd_replaced = [], [], False, False, False, False
     for s in sents:
         p = check_sentence(s, f)
         if not p:
@@ -304,6 +331,9 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
         if any(x["code"] == "credit" for x in p) and not credit_replaced and (f.get("credit") or {}).get("text"):
             out.append(f["credit"]["text"])
             credit_replaced = True
+        if any(x["code"] == "dd" for x in p) and not dd_replaced and (f.get("dd") or {}).get("line"):          # 28.10.2026: редът на кода
+            out.append(f"По кода: {f['dd']['line']}; под прага distribution days не блокират Offensive и не държат Defensive.")
+            dd_replaced = True
     return (" ".join(out) if problems else str(text or "")), problems
 
 
