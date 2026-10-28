@@ -46,7 +46,8 @@ print()
 print("── 3. заявката към EDGAR и AI ──")
 calls = []
 got = qm_ep.company_filings("SMCI", "2026-10-20", get=lambda u: (calls.append(u), json.dumps(FX["submissions"]["SMCI"]))[1], cik_map={"SMCI": "1375365"}, now_utc=brief_time("2026-10-21"))
-assert got == smci and calls == ["https://data.sec.gov/submissions/CIK0001375365.json"]
+assert got == smci and calls[0] == "https://data.sec.gov/submissions/CIK0001375365.json"
+assert all(u.startswith("https://www.sec.gov/Archives/edgar/data/1375365/") for u in calls[1:]) and len(calls) == 1 + len(smci)   # 28.10.2026: и документът на всяко 8-K (проверката на точките)
 with contextlib.redirect_stdout(io.StringIO()):
     assert qm_ep.company_filings("SMCI", "2026-10-20", get=lambda u: (_ for _ in ()).throw(TimeoutError("SEC")), cik_map={"SMCI": "1375365"}) == []
 assert qm_ep.company_filings("ZZZZ", "2026-10-20", get=lambda u: "{}", cik_map={}) == []

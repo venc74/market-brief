@@ -222,7 +222,41 @@ ITEMS_8K = {"1.01": ("Entry into a Material Definitive Agreement", "същест
             "2.03": ("Creation of a Direct Financial Obligation", "ново финансово задължение"), "2.05": ("Costs Associated with Exit or Disposal Activities", "разходи по преструктуриране"),
             "2.06": ("Material Impairments", "обезценка"), "3.01": ("Notice of Delisting or Failure to Satisfy a Listing Rule", "уведомление за отписване от борсата"),
             "5.02": ("Departure or Election of Directors or Officers", "смяна в ръководството"), "5.07": ("Submission of Matters to a Vote of Security Holders", "гласуване на акционерите"),
-            "7.01": ("Regulation FD Disclosure", "оповестяване по Reg FD"), "8.01": ("Other Events", "други събития")}
+            "7.01": ("Regulation FD Disclosure", "оповестяване по Reg FD"), "8.01": ("Other Events", "други събития"),
+            # 28.10.2026: останалите точки на Form 8-K — MANH 27.10 показа „т. 3.03 — т. 3.03“ и „т. 5.03 — т. 5.03“
+            "1.03": ("Bankruptcy or Receivership", "фалит или синдик"), "1.05": ("Material Cybersecurity Incidents", "съществен киберинцидент"),
+            "2.04": ("Triggering Events That Accelerate a Direct Financial Obligation", "събитие, ускоряващо финансово задължение"),
+            "3.02": ("Unregistered Sales of Equity Securities", "нерегистрирана продажба на акции"), "3.03": ("Material Modification to Rights of Security Holders", "промяна в правата на акционерите"),
+            "4.01": ("Changes in Registrant's Certifying Accountant", "смяна на одитора"), "4.02": ("Non-Reliance on Previously Issued Financial Statements", "отказ от предишни отчети"),
+            "5.01": ("Changes in Control of Registrant", "смяна на контрола"), "5.03": ("Amendments to Articles of Incorporation or Bylaws; Change in Fiscal Year", "промяна в устава / финансовата година"),
+            "5.05": ("Amendments to the Code of Ethics", "промяна в етичния кодекс"), "5.08": ("Shareholder Director Nominations", "номинации на акционери за борда")}
+# 28.10.2026: заглавията на точките в САМИЯ документ (официалното начало) — заглавката на EDGAR може да е грешна: MANH 8-K 0001193125-26-434178 (27.10, 16:02 ET) е тагнат „2.01“
+# (придобиване на активи), а в документа е „Item 2.02 Results of Operations and Financial Condition“ — отчетът. Измерено 28.10 върху 198 реални 8-K (60 случайни тикъра от универса,
+# 07–10.2026): 190 съвпадат напълно, 8 — документът показва по-малко точки (различно форматирани заглавия), 0 — точка в документа, която я няма в заглавката; MANH е единственият видян.
+_DOC_HEADINGS = {"1.01": "Entry into a Material", "1.02": "Termination of a Material", "1.03": "Bankruptcy", "1.05": "Material Cybersecurity", "2.01": "Completion of Acquisition",
+                 "2.02": "Results of Operations", "2.03": "Creation of a Direct", "2.04": "Triggering Events", "2.05": "Costs Associated", "2.06": "Material Impairments",
+                 "3.01": "Notice of Delisting", "3.02": "Unregistered Sales", "3.03": "Material Modification", "4.01": "Changes in Registrant", "4.02": "Non-Reliance",
+                 "5.01": "Changes in Control", "5.02": "Departure of Directors", "5.03": "Amendments to Articles", "5.05": "Amendments to the Registrant", "5.07": "Submission of Matters",
+                 "5.08": "Shareholder Director", "7.01": "Regulation FD", "8.01": "Other Events", "9.01": "Financial Statements"}
+
+
+def document_items(text: str) -> list[str]:
+    """28.10.2026: точките, чиито заглавия („Item 2.02 Results of Operations …“) са в текста на 8-K — по реда на номерата; без разчетени заглавия → []. Чиста функция."""
+    t = re.sub(r"[\u00a0\s]+", " ", text or "")
+    return sorted(c for c, h in _DOC_HEADINGS.items() if re.search(r"\bItem\s*" + re.escape(c) + r"\.?\s*[:.\-–—]?\s*" + re.escape(h), t, re.I))
+
+
+def reconcile_items(header: list[str], doc: list[str]) -> tuple[list[str], str | None]:
+    """
+    28.10.2026: точките за показване — заглавката на EDGAR, освен ако документът има точка, която я няма в заглавката (противоречие): тогава точките от документа. Документ с по-малко
+    разчетени точки (8 от 198) не е противоречие. Връща (точки без 9.01, бележка за картата или None). Чиста функция.
+    """
+    h = [c for c in header if c != "9.01"]
+    d = [c for c in doc if c != "9.01"]
+    if d and set(d) - set(h):
+        extra = [c for c in h if c not in d]
+        return d, ("по текста на документа" + (f"; в заглавката на EDGAR: т. {', '.join(extra)}" if extra else ""))
+    return h, None
 # „stocks rally“ (множествено — пазарът), не „Humana Stock Surges“ (единствено — самата акция; реално заглавие от 09.10)
 OVERVIEW_RE = re.compile(r"\b(futures|stock market|stocks (?:rebound|rally|rallies|rise|fall|slip|surge|jump|to watch)|dow jones|s&p 500|nasdaq composite|wall street|"
                          r"premarket|pre-market|midday|movers|asian? (?:chip )?stocks|chip stocks|market (?:today|wrap|update))\b", re.I)
@@ -250,6 +284,7 @@ def filings_after_close(sub: dict, session: str, now_utc: dt.datetime | None = N
             continue
         codes = [x.strip() for x in str((r.get("items") or [""] * len(r["form"]))[i] or "").split(",") if x.strip() and x.strip() != "9.01"]
         out.append({"accepted_et": acc.astimezone(et).strftime("%Y-%m-%d %H:%M"), "date": r["filingDate"][i], "acc": r["accessionNumber"][i],
+                    "doc": (r.get("primaryDocument") or [""] * len(r["form"]))[i],                 # 28.10.2026: за проверката на точките в документа
                     "items": [(c, *ITEMS_8K.get(c, (f"Item {c}", f"т. {c}"))) for c in codes]})
     return sorted(out, key=lambda x: x["accepted_et"], reverse=True)
 
@@ -263,8 +298,23 @@ def company_filings(sym: str, session: str, get=None, cik_map=None, now_utc: dt.
         cik = (cik_map if cik_map is not None else insider_buying._ticker_cik_map()).get(sym)
         if not cik:
             return []
-        sub = json.loads((get or spinoff_watch._http_get)(f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"))
-        return filings_after_close(sub, session, now_utc)
+        get = get or spinoff_watch._http_get
+        sub = json.loads(get(f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"))
+        fs = filings_after_close(sub, session, now_utc)
+        for f in fs:                                                                 # 28.10.2026: точките по текста на документа, когато заглавката им противоречи
+            if not f.get("doc"):
+                continue
+            try:
+                text = spinoff_watch.text_of(get(f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{f['acc'].replace('-', '')}/{f['doc']}"))
+                codes, note = reconcile_items([c for c, *_ in f["items"]], document_items(text))
+                if note:
+                    f["items_header"] = [c for c, *_ in f["items"]]
+                    f["items"] = [(c, *ITEMS_8K.get(c, (f"Item {c}", f"т. {c}"))) for c in codes]
+                    f["items_note"] = note
+                    print(f"[qm_ep] 8-K {sym} {f['acc']}: точките по документа {codes} (в заглавката на EDGAR: {f['items_header']})")
+            except Exception as e:
+                print(f"[qm_ep] 8-K {sym} {f['acc']}: документът не се прочете ({type(e).__name__}) — точките са от заглавката на EDGAR")
+        return fs
     except Exception as e:
         print(f"[qm_ep] 8-K {sym}: {type(e).__name__}: {e}")
         return []
@@ -274,7 +324,8 @@ def filing_headline(f: dict) -> dict:
     """Редът за картата: „8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността“ (source = SEC)."""
     when = f["accepted_et"]
     items = "; ".join(f"т. {c} — {bg}" for c, _, bg in f["items"]) or "без точки"
-    return {"title": f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {items}", "published": when, "source": "SEC"}
+    note = f" ({f['items_note']})" if f.get("items_note") else ""                        # 28.10.2026: точките са по документа, заглавката им противоречи
+    return {"title": f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {items}{note}", "published": when, "source": "SEC"}
 
 
 def rank_headlines(headlines: list[dict], ticker: str, company: str | None = None) -> list[dict]:
