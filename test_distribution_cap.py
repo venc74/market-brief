@@ -229,9 +229,9 @@ print()
 
 print("── макро промптът и рендерът ──")
 seen = {}
-ai_brief._call_claude = lambda system, user, max_tokens=0: (seen.setdefault("u", user), json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"}))[1]
+ai_brief._call_claude = lambda system, user, max_tokens=0: (seen.setdefault("u", user), json.dumps({"macro_brief": "x", "sector_logic": []}))[1]
 ai_brief.macro_and_sector_brief({}, [], out)
-assert "блокът от distribution days" in seen["u"] and "не позволява Offensive" in seen["u"]
+assert "блокът от distribution days" not in seen["u"] and "distribution_cap" not in seen["u"]                     # 29.10.2026 (разходката, т. 5): бележката беше за абзаца за режима — махнат
 seen.clear(); ai_brief.macro_and_sector_brief({}, [], src_t)
 assert "блокът от distribution days" not in seen["u"]
 import html as htmllib

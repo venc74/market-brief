@@ -708,13 +708,11 @@ def _macro_brief_fallback(thermometer: dict) -> dict:
     да продължи останалата част от брифа (screening, sizing, render) напълно
     нормално, вместо целият pipeline да се събори заради един AI hiccup.
     """
-    regime = thermometer.get("regime", "?")
     return {
         "macro_brief": ("⚠ AI синтез неуспешен днес — Claude върна невалиден JSON "
                         "и след автоматична поправка, и след retry. Показваме "
                         "суровите данни от термометъра/скрийнъра без AI наратив."),
         "sector_logic": [],
-        "regime_comment": f"Режим: {regime} — виж пазарния термометър по-горе за пълните индикатори.",
         "ai_synthesis_failed": True,
     }
 
@@ -730,8 +728,8 @@ def _core_inflation_block(macro: dict) -> str:
         return ""
     return f"""
 ОСНОВНА ИНФЛАЦИЯ — котва (Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г; \
-месечна серия с ~1 месец закъснение, НЕ днешни данни; информативна, НЕ е част \
-от термометъра и НЕ влияе на режима): {json.dumps(ci, ensure_ascii=False, default=str)}
+месечна серия, излиза с ~6 седмици закъснение — в края на следващия месец, НЕ днешни данни; \
+информативна): {json.dumps(ci, ensure_ascii=False, default=str)}
 
 ВАЖНО за инфлацията: всяко твърдение за "инфлационен натиск" (засилващ се, \
 отслабващ, упорит) сверявай с тази стойност и полето "direction" — посоката е \
@@ -747,16 +745,6 @@ def _core_inflation_block(macro: dict) -> str:
 """
 
 
-def _distribution_cap_note(thermometer: dict) -> str:
-    """Допълнение към пакет 2: червени distribution days блокират Offensive — причината е в кода, не в броенето."""
-    cap = (thermometer or {}).get("distribution_cap") or {}
-    if not cap.get("active"):
-        return ""
-    return ("\nВАЖНО за режима: блокът от distribution days (полето \"distribution_cap\") не позволява Offensive — кодът "
-            "ограничава режима до Defensive. Кажи го като причина в regime_comment; не го представяй като слабост на "
-            "индикаторите по броенето (\"regime_by_count\" е по-добрият режим) и не измисляй други условия за изход.")
-
-
 def _credit_roc_note(thermometer: dict) -> str:
     """12.10.2026: посоката на IEI/HYG RoC е от кода (thermometer._evaluate_credit_spread → roc_trend_text). Потвърден случай 12.10: веригата за XLV казваше
     "ускоряваща се RoC (84.3-ти percentile)", а RoC беше +0.41% срещу +1.03% преди 5 сесии — percentile-ът е ниво, не посока."""
@@ -765,17 +753,6 @@ def _credit_roc_note(thermometer: dict) -> str:
             return ("\nВАЖНО за IEI/HYG: посоката на RoC е от кода — " + ind["roc_trend_text"] + ". Ако пишеш за посоката на RoC (ускорява се / забавя се), "
                     "ползвай САМО това; \"roc_percentile\" е колко висока е RoC спрямо историята си, не дали расте.")
     return ""
-
-
-def _hysteresis_release_note(thermometer: dict) -> str:
-    """Пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да не се чете като подобрение на пазара."""
-    rel = (thermometer or {}).get("hysteresis_released") or []
-    if not rel:
-        return ""
-    names = ", ".join(f"{r.get('trigger')} ({r.get('hidden_days')} поредни дни без данни)" for r in rel)
-    return ("\nВАЖНО за режима: днес override-ът за " + names + " е ОСВОБОДЕН от кода — индикаторът е без данни, а "
-            "хистерезисът не се държи безкрайно. Това НЕ е подобрение на пазарните условия: кажи го изрично в "
-            "regime_comment и не представяй по-мекия режим като успокояване на стреса.")
 
 
 def _rotation_unavailable_note(rotation: list[dict] | None) -> str:
@@ -800,17 +777,18 @@ def _news_block(news: list[dict] | None) -> str:
 
 
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
-                           thermometer: dict, news: list[dict] | None = None) -> dict:
+                           thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None) -> dict:
     """
-    AI макро бриф + проверка на числовите твърдения за режима срещу кода (08.10.2026, виж src/regime_claims.py): броят зелени/жълти/червени, индикаторите по
-    групи и "един индикатор определя режима сам" се сверяват с термометъра; изречение със грешно твърдение се заменя с броенето от кода или се маха
-    (`regime_claims_fixed` в резултата). Graceful: всяка грешка в проверката връща отговора на модела непроменен.
+    AI макро бриф. 29.10.2026 (разходката, т. 5): "macro_brief" е разказ в 2–3 абзаца (разделени с празен ред) — какво стана през нощта и как се свързват нещата; абзацът
+    за режима (regime_comment) и проверките, които бяха само за него (regime_claims.clean: броене, правило, distribution days, кредитен стрес), са махнати — режимът е в
+    термометъра, от кода. Остават общите: изтеклите клаузи-проверки (regime_claims.strip_meta) и секторните твърдения (sector_claims) — по абзаци, за да не се слеят;
+    отрязването + повторният опит и чуждите символи са в _parse_json / _fix_text. Graceful: грешка в проверка връща отговора на модела непроменен.
     """
-    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news)
+    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social)
     try:
-        out = _apply_regime_claims(out, thermometer)
+        out = _apply_meta_check(out)
     except Exception as e:
-        print(f"[ai] проверка на твърденията за режима пропусната: {type(e).__name__}: {e}")
+        print(f"[ai] проверката за изтекли клаузи пропусната: {type(e).__name__}: {e}")
     try:
         out = _apply_sector_claims(out, rotation)
     except Exception as e:
@@ -818,22 +796,37 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     return out
 
 
+def paragraphs(text: str) -> list[str]:
+    """29.10.2026: абзаците на разказа — разделени с празен ред; празните отпадат."""
+    return [x.strip() for x in re.split(r"\n\s*\n", text or "") if x.strip()]
+
+
+def _per_paragraph(text: str, fn) -> tuple[str, list]:
+    """fn(абзац) → (нов абзац, проблеми) върху всеки абзац; абзаците остават разделени с празен ред."""
+    outs, probs = [], []
+    for para in paragraphs(text):
+        new, pr = fn(para)
+        if new:
+            outs.append(new)
+        probs += pr
+    return "\n\n".join(outs), probs
+
+
 def _apply_sector_claims(out: dict, rotation: list[dict] | None) -> dict:
     """
-    13.10.2026: "X е единственият сектор с положителна RS {на двата хоризонта | 4W | 12W}", което противоречи на ротацията, се заменя с текст от кода (sector_claims) в macro_brief,
-    regime_comment и във веригите на sector_logic (подлог по подразбиране — ETF-ът на веригата). Веригите стигат до промпта на тикърите — поправката е ПРЕДИ него.
+    13.10.2026: "X е единственият сектор с положителна RS {на двата хоризонта | 4W | 12W}", което противоречи на ротацията, се заменя с текст от кода (sector_claims) в macro_brief
+    (от 29.10 — по абзаци) и във веригите на sector_logic (подлог по подразбиране — ETF-ът на веригата). Веригите стигат до промпта на тикърите — поправката е ПРЕДИ него.
     """
     if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
         return out
     f = sector_claims.facts(rotation)
     out = dict(out)
     fixed = []
-    for field in ("macro_brief", "regime_comment"):
-        if isinstance(out.get(field), str) and out[field]:
-            new, probs = sector_claims.clean(out[field], f)
-            if probs:
-                out[field] = new
-                fixed += [{"field": field, "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
+    if isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+        new, probs = _per_paragraph(out["macro_brief"], lambda para: sector_claims.clean(para, f))
+        if probs:
+            out["macro_brief"] = new
+            fixed += [{"field": "macro_brief", "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
     chains = []
     for x in out.get("sector_logic") or []:
         if isinstance(x, dict) and isinstance(x.get("chain"), str):
@@ -909,39 +902,22 @@ def apply_sector_claims_to_narratives(candidates: list[dict], rotation: list[dic
     return fixed
 
 
-def _margin_block(thermometer: dict | None) -> str:
-    """15.10.2026: "Запас до смяна на режима" от кода (regime_claims.margin) като факт в макро промпта; без него → празно."""
-    text = (((thermometer or {}).get("regime_margin") or {}).get("text") or "").strip()
-    if not text:
-        return ""
-    return (f"\nЗАПАС ДО СМЯНА НА РЕЖИМА (готово от кода, 15.10.2026): {text}. Ако пишеш колко е далеч режимът от смяна или какво би го сменило, ползвай САМО "
-            "тези числа и правилото по-горе — не формулирай свои прагове. Потвърден случай 15.10.2026: текстът твърдеше, че ако един зелен стане червен, режимът "
-            "остава Offensive и за Defensive са нужни 2 червени — по правилото един червен е достатъчен; кодът заменя такова изречение с правилото.\n")
-
-
-def _apply_regime_claims(out: dict, thermometer: dict) -> dict:
-    if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
+def _apply_meta_check(out: dict) -> dict:
+    """
+    28.10.2026: изтеклите клаузи-проверки от промпта („без null/nan“, „всички индикатори са валидни“) се махат (regime_claims.strip_meta) — запис в "regime_claims_fixed"
+    (code "meta"). 29.10.2026: само тази проверка остава за макро текста; броенето / правилото / distribution days / кредитният стрес (regime_claims.clean) бяха за абзаца за
+    режима, който е махнат (разходката, т. 5).
+    """
+    if not isinstance(out, dict) or out.get("ai_synthesis_failed") or not isinstance(out.get("macro_brief"), str) or not out["macro_brief"]:
         return out
-    f = regime_claims.facts(thermometer)
-    fixed = []
-    out = dict(out)
-    for field in ("macro_brief", "regime_comment"):
-        text = out.get(field)
-        if not isinstance(text, str) or not text:
-            continue
-        text, meta = regime_claims.strip_meta(text)                                   # 28.10.2026: клаузите-проверки на данните („без null/nan“) — от промпта, не за читателя
-        if meta:
-            out[field] = text
-            fixed += [{"field": field, "sentence": m["sentence"], "code": "meta", "why": "проверка на данните от промпта (null/nan, валидни стойности) — махната",
-                       "kept": m["kept"]} for m in meta]
-        new, problems = regime_claims.clean(text, f)
-        if problems:
-            out[field] = new
-            fixed += [{"field": field, **p} for p in problems]
-    if fixed:
-        out["regime_claims_fixed"] = fixed
-        for x in fixed:
-            print(f"[ai] режим: {x['field']} — {x['why']} → изречението е поправено от кода: «{x['sentence'][:140]}»")
+    new, meta = _per_paragraph(out["macro_brief"], regime_claims.strip_meta)
+    if not meta:
+        return out
+    out = {**out, "macro_brief": new}
+    out["regime_claims_fixed"] = [{"field": "macro_brief", "sentence": m["sentence"], "code": "meta", "why": "проверка на данните от промпта (null/nan, валидни стойности) — махната",
+                                   "kept": m["kept"]} for m in meta]
+    for x in out["regime_claims_fixed"]:
+        print(f"[ai] макро текст: {x['why']}: «{x['sentence'][:140]}»")
     return out
 
 
@@ -952,30 +928,12 @@ def _leaders_text(rotation: list[dict] | None) -> str:
     return ", ".join(xs) if xs else "няма водещ сектор днес — върни \"sector_logic\": []"
 
 
-def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
-                               thermometer: dict, news: list[dict] | None = None) -> dict:
-    """
-    Връща:
-    {
-      "macro_brief": "4-6 изречения какво се случи и какво значи",
-      "sector_logic": [
-        {"sector": ..., "etf": ..., "chain": "конкретната верижна логика",
-         "horizon_weeks": "2-6"}
-      ],
-      "regime_comment": "1-2 изречения коментар към режима"
-    }
+def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
+                      social: dict | None = None) -> str:
+    """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API)."""
+    return f"""Днешни данни:
 
-    FIX 2026-08-17 (production crash — json.decoder.JSONDecodeError необхванат
-    чак до run(), сборил целия pipeline): 3 нива защита, в ред на разходна
-    ефективност — Ниво 0 (json_repair, вътре в _parse_json(), нулева цена),
-    Ниво 1 (тук долу — smart retry: подаваме malformed отговора обратно на
-    Claude с explicit инструкция да го поправи, ЕДНА допълнителна AI заявка),
-    Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
-    никога не позволяваме на изключението да стигне до run()).
-    """
-    user = f"""Днешни данни:
-
-ТЕРМОМЕТЪР: {json.dumps(thermometer, ensure_ascii=False, default=str)}{_hysteresis_release_note(thermometer)}{_distribution_cap_note(thermometer)}{_credit_roc_note(thermometer)}
+УРЕДИТЕ НА ТЕРМОМЕТЪРА (контекст за разказа): {json.dumps(_thermo_context(thermometer), ensure_ascii=False, default=str)}{_credit_roc_note(thermometer)}
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
@@ -984,44 +942,24 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
 сверявай с тези списъци — твърдение, което им противоречи, кодът заменя. Същото за "лидерство на двата хоризонта" (= положителна RS и на 4, и на 12 седмици — \
 списъкът по-горе) и за 6-месечния връх по RS: "единственият" важи само когато списъкът е с един сектор; потвърден случай 15.10.2026 — "единственият с потвърдено \
 лидерство на двата хоризонта" за XLE, а на двата хоризонта бяха XLE, XLV и XLK (само 6-месечният връх беше на XLE).
+ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
 
-{_news_block(news)}
+{_news_block(news)}{_crypto_block(crypto)}{_social_block(social)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
-(проценти, percentile, нива, delta-и) в prose текста — копирай Я ТОЧНО както е \
+(проценти, percentile, нива, delta-и) — копирай Я ТОЧНО както е \
 в JSON-а, никога не я преизчислявай или приблизителствай наум. Специфично за \
 percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") — те са \
 прецизни изчислени стойности, не грубa оценка; върни числото директно от полето, \
 не генерирай "правдоподобно звучащо" число от паметта си (потвърден случай \
 2026-08-26: level_percentile=0.2 цитирано в текста като "20-ти percentile").
 
-ВАЖНО за условия за смяна на режима: ако пишеш какво би отменило или сменило \
-режима, цитирай САМО полето "exit_rule" от термометъра по-горе (и "overrides" / \
-"regime_by_count", ако ти трябват детайли). НЕ формулирай собствени прагове, \
-нива или дати, които не са там. Потвърден случай 2026-09-25: текстът твърдеше \
-"единственото, което би отменило Defensive, е MOVE под 85" — 85 не е праг никъде \
-в системата, а реалното условие дори не изисква MOVE да падне, само да спре да \
-расте. Ако exit_rule не казва нещо, ти също не го казвай.
+ВАЖНО за SOFR − IORB (16.10.2026): информативен уред — термометър за напрежение във финансирането, не предсказание (в проучването ни: \
+{config.FUNDING_STRESS_RESEARCH_TEXT}). Цитирай стойността в б.п., перцентила и "as_of" точно; не го представяй като сигнал за криза.
 
-ВАЖНО за SOFR − IORB (16.10.2026): САМО информативен ("informational": true) — не влиза в броенето и не е причина за режима; термометър за напрежение във финансирането, \
-не предсказание (в проучването ни: {config.FUNDING_STRESS_RESEARCH_TEXT}). Цитирай стойността в б.п., перцентила и "as_of" точно; не го представяй като сигнал за криза.
+ВАЖНО за Fed Net Liquidity: информативен уред. Цитирай "change_4w_pct" и "as_of" точно; промяна в мъртвата зона (±1%) е "без значима промяна", не растеж или спад.
 
-ВАЖНО за Fed Net Liquidity: индикаторът е САМО информативен ("informational": true) — \
-показва се, но НЕ влиза в броенето за режима и не е причина за него; не го представяй \
-като довод за Offensive/Defensive. Цитирай "change_4w_pct" и "as_of" точно; промяна \
-в мъртвата зона (±1%) е "без значима промяна", не растеж или спад.
-
-ВАЖНО за броенето на индикаторите (08.10.2026): броенето и правилото за режима са ГОТОВИ от кода — НЕ преброявай и \
-НЕ групирай индикаторите по цвят сам. Броене: {regime_claims.facts(thermometer)['counts_text']}. \
-{regime_claims.facts(thermometer)['rule_text']} Ако споменаваш броенето, ползвай ТОЧНО тези числа и групи (или само общия \
-брой, напр. "4 зелени срещу 3 жълти и 1 червен"); не слагай индикатор в група, която не го съдържа тук — информативните \
-индикатори (Fed Net Liquidity) не са в нито една група. Не твърди, че един единичен индикатор (вкл. Market Breadth) "сам по \
-себе си" дава Defensive или Offensive. Потвърден случай 08.10.2026: Fed Net Liquidity беше изброен сред жълтите, а Market Breadth \
-— като сам определящ Defensive; кодът поправя такова изречение.
-{_margin_block(thermometer)}
-ВАЖНО за единиците на MOVE: "delta_1w" в термометъра и прагът за override са в \
-ПУНКТОВЕ на индекса (напр. "+15.4 пункта"), НЕ в проценти. Процентната промяна \
-е отделно поле — "chg_5d_pct" в МАКРО global_signals.MOVE. Пиши винаги с единица \
-("пункта" или "%") и никога не слагай % на delta_1w. Потвърден случай 28.09.2026: \
+ВАЖНО за единиците на MOVE: седмичната делта е в ПУНКТОВЕ на индекса (напр. "+15.4 пункта"), НЕ в проценти. Процентната промяна \
+е отделно поле — "chg_5d_pct" в МАКРО global_signals.MOVE. Пиши винаги с единица ("пункта" или "%"). Потвърден случай 28.09.2026: \
 делтата +15.4 пункта беше цитирана като "+15.4%" (реалната % промяна беше +19.05%).
 
 ВАЖНО за доходностите: "US10Y" в МАКРО global_signals е доходност в % годишно \
@@ -1032,21 +970,96 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 спреда в б.п. (value и prev_week са в процентни пунктове: 0.46 = 46 б.п.).
 {_core_inflation_block(macro)}
 Задачи:
-1. "macro_brief": 4-6 изречения — какво се случи в света и какво означава за \
-днешната сесия. Конкретика, не общи приказки.
+1. "macro_brief": {NARRATIVE_RULES}
 2. "sector_logic": за топ 3-5 сектора с положителна динамика — пълната верижна \
 логика (макро събитие → механизъм → сектор), както изисква спекът: документирай \
 веригата, не само заключението. Поле "chain" за всяка. Секторите са САМО водещите по \
 кода (RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх): {_leaders_text(rotation)} — картата показва само тях. \
 "horizon_weeks" е ЕДНО число от 2 до 6 (хоризонтът на картата), не прозорците на RS. В "chain" пиши с думи, не с имената \
 на полетата (не "rs_chg_4w_pct", а "RS за 4 седмици"; не "laggard_persistence_pct", а "дял на изоставането").
-3. "regime_comment": провери дали режимът {thermometer.get('regime')} е оправдан \
-от данните. Ако индикатори липсват, са скрити или съдържат невалидни стойности \
-(null/nan), кажи го изрично и оцени как това променя увереността в режима. НЕ \
-оправдавай режима на всяка цена — ако данните му противоречат, напиши го директно.
 
 Връщай само JSON с ключове: macro_brief, sector_logic (списък от обекти със \
-sector, etf, chain, horizon_weeks), regime_comment."""
+sector, etf, chain, horizon_weeks)."""
+
+
+def _thermo_context(thermometer: dict | None) -> list[dict]:
+    """29.10.2026 (разходката, т. 5): уредите на термометъра като КОНТЕКСТ за разказа — видимите, с име, стойност и надпис; без режима, броенето, override-ите и правилото."""
+    out = []
+    for i in (thermometer or {}).get("indicators") or []:
+        if isinstance(i, dict) and not i.get("hide") and i.get("value") is not None:
+            row = {"name": i.get("name"), "value": i.get("value"), "label": i.get("label")}
+            if i.get("informational"):
+                row["informational"] = True
+            out.append(row)
+    return out
+
+
+def _crypto_block(crypto: dict | None) -> str:
+    """29.10.2026: крипто секцията (т. 4) за разказа — дословните заглавия с „защо“ и COIN / HOOD / CRCL / BLSH за сесията."""
+    c = crypto or {}
+    items = [{"headline": x.get("headline"), "why": x.get("why")} for x in c.get("items") or [] if isinstance(x, dict) and x.get("headline")]
+    ticks = [{"ticker": t.get("ticker"), "chg_1d_pct": t.get("chg_1d_pct"), "chg_5d_pct": t.get("chg_5d_pct")} for t in c.get("tickers") or [] if isinstance(t, dict)]
+    if not items and not ticks:
+        return "КРИПТО: няма подбрани крипто новини днес — не пиши за крипто, освен ако е в новините по-горе.\n"
+    return (f"КРИПТО (подбрани от кода): новини {json.dumps(items, ensure_ascii=False)}; акции, свързани с крипто, за последната сесия {json.dumps(ticks, ensure_ascii=False)}\n")
+
+
+def _leaders_names(rotation: list[dict] | None) -> str:
+    """29.10.2026: водещите сектори по кода (същото правило като _leaders_text) с имената им — за последното изречение на разказа."""
+    from src.sector_layer import is_leader
+    xs = [f"{r.get('sector')} ({r.get('etf')})" for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and is_leader(r)][:6]
+    return ", ".join(xs) if xs else "няма водещ сектор днес"
+
+
+# 29.10.2026 (разходката, т. 5, решение 3): секцията за социалните мрежи (пакетът след разходката) — споменава се само при ясен случай
+SOCIAL_RULE = ("СОЦИАЛНИ МРЕЖИ — спомени ги САМО при ясен случай: рязко изкачване в обсъжданията И новина зад него в данните по-горе; тогава с формулировката "
+               "„в социалните мрежи се говори за …“. Иначе не ги споменавай.")
+
+
+def _social_block(social: dict | None) -> str:
+    """29.10.2026: блокът за социалните мрежи — празен, докато секцията я няма (None / празна)."""
+    if not social:
+        return ""
+    return f"\nСОЦИАЛНИ МРЕЖИ (от кода): {json.dumps(social, ensure_ascii=False, default=str)}\n{SOCIAL_RULE}\n"
+
+
+# 29.10.2026 (разходката, т. 5, решение 2): разказът за нощта — тонът е от примера на Венци за 29.10 (кратки изречения, причина → следствие, числа само когато помагат,
+# „под повърхността“ с мярка, последното изречение „За нас: …“). Самият пример НЕ е в промпта: съдържанието му (Alphabet, Microsoft, Бесънт) би изтекло в други дни.
+NARRATIVE_RULES = (
+    "Разказ за нощта на човешки език — 2 или 3 кратки абзаца, разделени с празен ред (\\n\\n в JSON низа):\n"
+    "- Започни с това, което определи нощта, и свържи нещата: кое с кое е свързано и защо (новините, крипто, глобалните сигнали). Уредите на термометъра са контекст — "
+    "кажи с думи какво показват („VIX е нисък“, „над половината акции са над средните си нива“), не ги изброявай.\n"
+    "- Кратки изречения, причина → следствие („затова…“, „пазарът го чу като…“). Числа само там, където помагат на историята — точно както са в данните.\n"
+    "- Без изброяване на уреди, без броене на зелени / жълти / червени, без думата „режим“ и без Offensive / Defensive / Cash — режимът е горе, в термометъра, от кода.\n"
+    "- Нещо „под повърхността“, което си заслужава да се следи, може да се каже — с мярка колко е силно; информативните уреди не са сигнал за криза.\n"
+    "- САМО от подадените данни: никаква причина, събитие или число, които ги няма тук. Ако няма новини — разказът е за пазарните сигнали.\n"
+    "- Последното изречение започва с „За нас:“ и казва какво значи нощта за водещите ни сектори; без препоръка за покупка или продажба.")
+
+
+def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
+                               thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None) -> dict:
+    """
+    Връща:
+    {
+      "macro_brief": "разказ в 2–3 абзаца (разделени с празен ред)",
+      "sector_logic": [
+        {"sector": ..., "etf": ..., "chain": "конкретната верижна логика",
+         "horizon_weeks": "2-6"}
+      ]
+    }
+    29.10.2026 (разходката, т. 5): без "regime_comment"; моделът вижда уредите на термометъра само като контекст (_thermo_context), крипто секцията (_crypto_block) и — когато я има —
+    секцията за социалните мрежи (_social_block). Махнати от промпта: броенето и правилото за режима, "exit_rule", "Запас до смяна на режима", бележките за блока от
+    distribution days и за освободен override — те бяха само за абзаца за режима.
+
+    FIX 2026-08-17 (production crash — json.decoder.JSONDecodeError необхванат
+    чак до run(), сборил целия pipeline): 3 нива защита, в ред на разходна
+    ефективност — Ниво 0 (json_repair, вътре в _parse_json(), нулева цена),
+    Ниво 1 (тук долу — smart retry: подаваме malformed отговора обратно на
+    Claude с explicit инструкция да го поправи, ЕДНА допълнителна AI заявка),
+    Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
+    никога не позволяваме на изключението да стигне до run()).
+    """
+    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social)
 
     # Ниво 0 (json_repair, вътре в _parse_json) + първи опит. try/except обхваща
     # И _call_claude, И _parse_json — мрежова/API грешка тук е РАВНОСИЛНА на
@@ -1434,9 +1447,9 @@ NARRATIVE_EVENTS_DIAG: list[dict] = []
 
 
 def narrative_event_sources(ai_macro: dict | None, news: list[dict] | None) -> str:
-    """Текстът, срещу който се сверяват събитията: заглавията на деня (и преводите, "why"), макро текстът, коментарът за режима и веригите на секторите."""
+    """Текстът, срещу който се сверяват събитията: заглавията на деня (и преводите, "why"), макро текстът и веригите на секторите (29.10.2026: коментарът за режима е махнат)."""
     am = ai_macro or {}
-    parts = [am.get("macro_brief") or "", am.get("regime_comment") or ""] + [x.get("chain", "") for x in am.get("sector_logic") or [] if isinstance(x, dict)]
+    parts = [am.get("macro_brief") or ""] + [x.get("chain", "") for x in am.get("sector_logic") or [] if isinstance(x, dict)]
     parts += [" ".join(str(n.get(k) or "") for k in ("headline", "headline_bg", "why")) for n in news or [] if isinstance(n, dict)]
     return " ".join(parts)
 

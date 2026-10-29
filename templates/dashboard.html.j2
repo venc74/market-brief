@@ -666,9 +666,8 @@
 
 <section>
   <h2>Макро бриф</h2>
-  <div class="prose">{{ macro_brief }}
-  {% if regime_comment %}<br><br><span style="color:var(--muted)">{{ regime_comment }}</span>{% endif %}
-  </div>
+  {# 29.10.2026 (разходката, т. 5): разказ в 2–3 абзаца (празен ред между тях); абзацът на AI за режима е махнат — режимът е в термометъра, от кода #}
+  <div class="prose">{% for para in macro_paragraphs %}<p style="margin:0{% if not loop.last %} 0 10px{% endif %}">{{ para }}</p>{% else %}{{ macro_brief }}{% endfor %}</div>
   {# 19.10.2026: договорът и часът на цената на фючърсите — от кода (CL=F в Yahoo вече е декемврийският, Reuters котира ноемврийския) #}
   {% if futures_line %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">{{ futures_line }}</div>{% endif %}
 </section>

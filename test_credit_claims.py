@@ -74,9 +74,8 @@ assert rc.facts(hid)["credit"] is None
 print("  ✓ без iei_10d_pct / hyg_10d_pct или при скрит индикатор — нищо не се пипа")
 
 print()
-print("── 4. ai_brief: поправката е в _apply_regime_claims (протокол в regime_claims_fixed) ──")
-res = ai_brief._apply_regime_claims({"macro_brief": mb, "regime_comment": FX["2026-10-23"]["regime_comment"], "sector_logic": []}, FX["2026-10-23"]["thermometer"])
-assert bad not in res["macro_brief"] and [x["code"] for x in res["regime_claims_fixed"]] == ["credit"] and res["regime_claims_fixed"][0]["field"] == "macro_brief"
-assert res["regime_comment"] == FX["2026-10-23"]["regime_comment"]
-print("  ✓ macro_brief поправен, regime_comment непокътнат, regime_claims_fixed: [credit]")
+print("── 4. ai_brief: от 29.10 проверката не се прилага върху макро текста (29.10.2026 (разходката, т. 5): абзацът за режима и тази проверка в макро текста са махнати — macro_and_sector_brief вече не вика regime_claims.clean) ──")
+res = ai_brief._apply_meta_check({"macro_brief": mb, "sector_logic": []})
+assert res["macro_brief"] == mb and "regime_claims_fixed" not in res and not hasattr(ai_brief, "_apply_regime_claims")
+print("  ✓ macro_brief минава непокътнат през общите проверки; функциите на regime_claims (по-горе) остават")
 print("\n✅ test_credit_claims: всичко мина")

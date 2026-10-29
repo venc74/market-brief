@@ -64,14 +64,14 @@ assert [p["code"] for p in rc.check_sentence("Market Breadth сам по себ�
 print("  ✓ верни правила — без флаг; грешен брой червени за режим, грешен праг на зелените, 'остава Offensive' — флаг; червен индикатор 'сам по себе си → Defensive' е вярно")
 
 print()
-print("── 4. през macro_and_sector_brief: РЕАЛНИЯТ текст от 15.10 през подменен модел ──")
+print("── 4. през macro_and_sector_brief (29.10.2026, разходката, т. 5): правилото вече не е в промпта, абзацът за режима е махнат ──")
 prompts = []
 def fake_claude(system, user, **k):
     prompts.append(user)
-    return json.dumps({"macro_brief": "Кратко.", "sector_logic": [], "regime_comment": rcm}, ensure_ascii=False)
+    return json.dumps({"macro_brief": "Кратко.", "sector_logic": []}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()):
     res = ai_brief.macro_and_sector_brief({}, [], copy.deepcopy(B15["thermometer"]))
-assert f15["rule_text"] in prompts[0] and bad not in res["regime_comment"] and [x["code"] for x in res["regime_claims_fixed"]] == ["rule", "rule"]
-print("  ✓ промптът носи правилото; отговорът е поправен, протоколът е в regime_claims_fixed")
+assert f15["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0] and res == {"macro_brief": "Кратко.", "sector_logic": []}
+print("  ✓ промптът е без правилото; отговорът е непроменен (функциите на regime_claims — т. 1–3 — остават)")
 print("\n✅ test_regime_rule_claims: всичко мина")

@@ -97,38 +97,35 @@ assert rc.facts(None)["groups"]["green"] == []
 print("  ✓ празен/липсващ термометър, скрити индикатори, None текст — без изключение; скритите са назовани")
 
 print()
-print("── 6. през macro_and_sector_brief: подменен модел връща РЕАЛНИТЕ текстове от 08.10 ──")
-prompts, answers = [], {}
+print("── 6. през macro_and_sector_brief (29.10.2026, разходката, т. 5): абзацът за режима и тази проверка в макро текста са махнати ──")
+prompts = []
 def fake_claude(system, user, **k):
     prompts.append(user)
-    return json.dumps({"macro_brief": B["macro_brief"], "sector_logic": [], "regime_comment": B["regime_comment"]}, ensure_ascii=False)
+    return json.dumps({"macro_brief": B["macro_brief"], "sector_logic": []}, ensure_ascii=False)          # РЕАЛНИЯТ macro_brief от 08.10
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res = ai_brief.macro_and_sector_brief({}, [], THERMO)
-assert f["counts_text"] in prompts[0] and "НЕ преброявай" in prompts[0] and f["rule_text"] in prompts[0]
-new_meta = rc.clean(rc.strip_meta(B["regime_comment"])[0], f)[0]                              # 28.10.2026: и клаузата-проверка „никакви null/nan стойности …“ (РЕАЛНА, 08.10) се маха
-assert res["macro_brief"] == B["macro_brief"] and res["regime_comment"] == new_meta and "null/nan" not in new_meta
-assert [(x["field"], x["code"]) for x in res["regime_claims_fixed"]] == [("regime_comment", "meta"), ("regime_comment", "member"), ("regime_comment", "solo")]
-assert "режим: regime_comment" in out.getvalue()
-print("  ✓ промптът носи броенето и правилото от кода; отговорът на модела е поправен (regime_comment), с протокол в regime_claims_fixed и ред в лога")
-clean_answer = {"macro_brief": "Кратък текст.", "sector_logic": [], "regime_comment": "Defensive е оправдан от override-а."}
+assert f["counts_text"] not in prompts[0] and "НЕ преброявай" not in prompts[0] and f["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0]
+assert res["macro_brief"] == B["macro_brief"] and "regime_claims_fixed" not in res and "regime_comment" not in res
+print("  ✓ промптът е без броенето и правилото; macro_brief минава непокътнат (функциите на regime_claims — т. 1–5 — остават, но не се викат върху него)")
+clean_answer = {"macro_brief": "Кратък текст.", "sector_logic": []}
 ai_brief._call_claude = lambda *a, **k: json.dumps(clean_answer, ensure_ascii=False)
 with contextlib.redirect_stdout(io.StringIO()):
     res2 = ai_brief.macro_and_sector_brief({}, [], THERMO)
-assert res2 == clean_answer and "regime_claims_fixed" not in res2
-print("  ✓ чист отговор — непроменен, без ключ regime_claims_fixed")
-orig_clean = rc.clean
-rc.clean = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("СИНТЕТИЧНА повреда"))
+assert res2 == clean_answer
+print("  ✓ чист отговор — непроменен")
+orig_meta = rc.strip_meta
+rc.strip_meta = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("СИНТЕТИЧНА повреда"))
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res3 = ai_brief.macro_and_sector_brief({}, [], THERMO)
-rc.clean = orig_clean
-assert res3["regime_comment"] == B["regime_comment"] and "проверка на твърденията за режима пропусната" in out.getvalue()
+rc.strip_meta = orig_meta
+assert res3["macro_brief"] == B["macro_brief"] and "проверката за изтекли клаузи пропусната" in out.getvalue()
 print("  ✓ СИНТЕТИЧНО: повреда в проверката → отговорът на модела се връща непроменен (graceful), редът в лога го казва")
 ai_brief._call_claude = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("СИНТЕТИЧНО: API недостъпен"))
 with contextlib.redirect_stdout(io.StringIO()):
     res4 = ai_brief.macro_and_sector_brief({}, [], THERMO)
-assert res4.get("ai_synthesis_failed") and "regime_claims_fixed" not in res4
+assert res4.get("ai_synthesis_failed") and "regime_claims_fixed" not in res4 and "regime_comment" not in res4
 print("  ✓ СИНТЕТИЧНО: недостъпен модел → старият fallback (ai_synthesis_failed), без проверка")
 assert ai_brief._SECTION_LABELS["_macro_and_sector_brief_ai"] == ai_brief._SECTION_LABELS["macro_and_sector_brief"]
 print("  ✓ етикетът на секцията в AI_USAGE е същият за новото име на функцията")

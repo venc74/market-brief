@@ -172,12 +172,12 @@ with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as dat
 for page_name, page in (("dashboard", dash), ("имейл", mail)):
     assert "Override-ът за MOVE е ОСВОБОДЕН: 10 поредни дни без данни" in page, page_name
 seen = {}
-ai_brief._call_claude = lambda system, user, max_tokens=0: (seen.setdefault("u", user), json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"}))[1]
+ai_brief._call_claude = lambda system, user, max_tokens=0: (seen.setdefault("u", user), json.dumps({"macro_brief": "x", "sector_logic": []}))[1]
 ai_brief.macro_and_sector_brief({}, [], t_rel)
-assert "override-ът за MOVE (10 поредни дни без данни) е ОСВОБОДЕН" in seen["u"] and "НЕ е подобрение на пазарните условия" in seen["u"]
+assert "ОСВОБОДЕН от кода" not in seen["u"] and "hysteresis_released" not in seen["u"]                             # 29.10.2026 (разходката, т. 5): бележката беше за абзаца за режима — махнат
 seen.clear()
 ai_brief.macro_and_sector_brief({}, [], day(START, D(1), hide=(MOVE,), patch={CRED: CALM[CRED]})[0])
 assert "ОСВОБОДЕН от кода" not in seen["u"]
-print("  ✓ dashboard и имейл показват изречението в заглавието на режима; макро промптът казва 'НЕ е подобрение на пазара'; в обикновен ден бележката я няма")
+print("  ✓ dashboard и имейл показват изречението в заглавието на режима (от кода); от 29.10 макро промптът не носи бележката — абзацът за режима е махнат")
 print()
 print("Всички тестове минаха.")

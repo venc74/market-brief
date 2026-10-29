@@ -631,7 +631,12 @@ def run() -> dict:
     # заглавията бяха празни във всичките 78 брифа. Graceful: провал на новините → празен списък.
     news = steps.step("news", news_aggregator.significant_news, fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
                       consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
-    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news)
+    # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
+    # макро брифа — разказът за нощта я вижда; COT за Bitcoin (само при нов отчет на CFTC) се добавя по-долу, след COT модула (cot_btc).
+    crypto = steps.step("crypto", lambda: crypto_news.build(today), fallback={},
+                        enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
+                        failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
+    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto)
     # FIX 2026-09-16: тезите и днешните новини. 19.10.2026 (т. 10, решение "в"): без AI етикети — до тезата дословното заглавие на свързаната новина
     # (ai_brief.thesis_news_pick: кандидатите по котвите от кода, моделът само отсява); `status` остава trigger-driven, `chain` остава конфиг.
     #
@@ -1046,10 +1051,10 @@ def run() -> dict:
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
-    # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
-    crypto = steps.step("crypto", lambda: crypto_news.build(today, cot_fresh=bool(cot_rhythm.get("fresh")), cot_series=cot.LAST_SERIES), fallback={},
-                        enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
-                        failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
+    # COT за Bitcoin — само в първия бриф след нов отчет на CFTC (29.10.2026: крипто секцията вече е построена преди макро брифа, тук се добавя само COT)
+    if crypto and cot_rhythm.get("fresh"):
+        crypto["cot_btc"] = steps.step("crypto_cot", lambda: crypto_news.cot_reading((cot.LAST_SERIES or {}).get(config.CRYPTO_COT_MARKET)), fallback=None,
+                                       label="COT за Bitcoin в крипто секцията", consequence="редът за COT Bitcoin липсва днес")
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                        cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),

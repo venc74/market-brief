@@ -56,9 +56,7 @@ for s, n in (("Distribution days 7/9 за SPY и 7/9 за QQQ.", 1),
 print("  ✓ брой до тикъра, „сега N/9“, „липсват N при …“, без тикър, условното, изречение без distribution days")
 
 print()
-print("── 4. през _apply_regime_claims (както в main) ──")
-out = ai_brief._apply_regime_claims({"macro_brief": "Кратък текст.", "regime_comment": FX["regime_comment"]}, FX["thermometer"])
-fx = [x for x in out["regime_claims_fixed"] if x["code"] == "dd_count"]
-assert len(fx) == 1 and fx[0]["field"] == "regime_comment" and f"По кода: {LINE}." in out["regime_comment"]
-print("  ✓ regime_claims_fixed: dd_count, regime_comment")
+print("── 4. от 29.10 не се прилага в main (29.10.2026 (разходката, т. 5): абзацът за режима и тази проверка в макро текста са махнати — macro_and_sector_brief вече не вика regime_claims.clean) ──")
+assert not hasattr(ai_brief, "_apply_regime_claims") and "regime_claims.clean(" not in (ROOT / "src" / "ai_brief.py").read_text(encoding="utf-8")
+print("  ✓ функцията остава в regime_claims (т. 1–3), макро текстът не минава през нея")
 print("\n✅ test_dd_count_claims: всичко мина")

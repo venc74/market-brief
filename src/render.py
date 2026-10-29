@@ -5,6 +5,7 @@
 from __future__ import annotations
 import datetime as dt
 import html as _html
+import re
 from jinja2 import Environment, FileSystemLoader
 
 import sys, pathlib
@@ -198,6 +199,11 @@ def _futures_line(brief: dict) -> str | None:
         return None
 
 
+def _paragraphs(text: str) -> list[str]:
+    """29.10.2026: абзаците на макро разказа — разделени с празен ред (същото като ai_brief.paragraphs; тук без зависимост от ai_brief)."""
+    return [x.strip() for x in re.split(r"\n\s*\n", text or "") if x.strip()]
+
+
 def _e(x) -> str:
     """HTML escape на външен/AI текст за имейла (f-string HTML, където Jinja autoescape не важи)."""
     return _html.escape("" if x is None else str(x), quote=True)
@@ -378,7 +384,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         thermometer=brief["thermometer"],
         macro_brief=brief["ai_macro"]["macro_brief"],
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
-        regime_comment=brief["ai_macro"].get("regime_comment", ""),
+        macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
         action=brief["action"],
@@ -707,7 +713,7 @@ def render_email(brief: dict) -> str:
   {news_block}
 
   <tr><td style="padding:20px 28px;font-size:14px;color:#111827;line-height:1.6">
-    {_e(brief['ai_macro']['macro_brief'])}
+    {"<br><br>".join(_e(x) for x in _paragraphs(brief['ai_macro']['macro_brief'] or "")) or _e(brief['ai_macro']['macro_brief'])}
     {(f'<div style="color:#6b7280;font-size:12px;margin-top:8px">{_e(_futures_line(brief))}</div>') if _futures_line(brief) else ""}
   </td></tr>
 

@@ -51,14 +51,14 @@ print("── 2. промптът, страницата и main.run ──")
 prompts = []
 def fake_claude(system, user, **k):
     prompts.append(user)
-    return json.dumps({"macro_brief": "Кратко.", "sector_logic": [], "regime_comment": rcm}, ensure_ascii=False)
+    return json.dumps({"macro_brief": "Кратко.", "sector_logic": []}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 th = copy.deepcopy(B15["thermometer"]); th["regime_margin"] = m15
 with contextlib.redirect_stdout(io.StringIO()):
     res = ai_brief.macro_and_sector_brief({}, [], th)
-assert "ЗАПАС ДО СМЯНА НА РЕЖИМА (готово от кода, 15.10.2026): " + m15["text"] in prompts[0] and f15["rule_text"] in prompts[0]
-assert bad not in res["regime_comment"] and [x["code"] for x in res["regime_claims_fixed"]] == ["rule", "rule"]
-print("  ✓ промптът носи запаса и правилото; отговорът (РЕАЛНИЯТ текст от 15.10 през подменен модел) е поправен")
+assert "ЗАПАС ДО СМЯНА НА РЕЖИМА" not in prompts[0] and m15["text"] not in prompts[0] and f15["rule_text"] not in prompts[0]        # 29.10.2026 (разходката, т. 5): за абзаца за режима
+assert res == {"macro_brief": "Кратко.", "sector_logic": []}
+print("  ✓ от 29.10 промптът е без запаса и правилото (абзацът за режима е махнат); редът „Запас до смяна на режима“ остава на страницата — от кода")
 b = copy.deepcopy(B15); b["thermometer"]["regime_margin"] = m15
 page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
 assert "Запас до смяна на режима: " + " · ".join(WANT15) in page

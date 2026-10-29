@@ -33,8 +33,8 @@ print("── 2. заменя се с реда на кода ──")
 new, probs = rc.clean(FX["2026-10-28"]["regime_comment"], f28)
 assert "се държи изцяло от два механизма" not in new and new.count("По кода: distribution days SPY 7/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2); "
                                                                  "под прага distribution days не блокират Offensive и не държат Defensive.") == 1
-res = ai_brief._apply_regime_claims({"macro_brief": FX["2026-10-27"]["macro_brief"], "regime_comment": FX["2026-10-27"]["regime_comment"], "sector_logic": []}, FX["2026-10-27"]["thermometer"])
-assert "Offensive е блокиран (липсват 2" not in res["regime_comment"] and any(x["code"] == "dd" for x in res["regime_claims_fixed"])
+res = ai_brief._apply_meta_check({"macro_brief": FX["2026-10-27"]["macro_brief"], "sector_logic": []})                 # 29.10.2026 (разходката, т. 5): абзацът за режима и тази проверка в макро текста са махнати — macro_and_sector_brief вече не вика regime_claims.clean
+assert res["macro_brief"] == FX["2026-10-27"]["macro_brief"] and not hasattr(ai_brief, "_apply_regime_claims")
 print("  ✓ 28.10 и 27.10 — изречението → „По кода: distribution days SPY 7/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2); под прага …“")
 
 print()

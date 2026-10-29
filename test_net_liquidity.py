@@ -129,9 +129,10 @@ print()
 print("── макро промптът ──")
 from src import ai_brief
 seen = {}
-ai_brief._call_claude = lambda system, user, max_tokens=0: seen.setdefault("user", user) and json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"})
+ai_brief._call_claude = lambda system, user, max_tokens=0: seen.setdefault("user", user) and json.dumps({"macro_brief": "x", "sector_logic": []})
 ai_brief.macro_and_sector_brief({"net_liquidity": one}, [], {"regime": "Defensive", "indicators": [ind]})
-assert "Fed Net Liquidity: индикаторът е САМО информативен" in seen["user"] and "НЕ влиза в броенето за режима" in seen["user"]
-print("  ✓ промптът казва, че Net Liquidity е само информативен и не е довод за режима")
+assert "Fed Net Liquidity: информативен уред" in seen["user"] and "мъртвата зона" in seen["user"]               # 29.10.2026 (разходката, т. 5): без думата „режим“ в промпта
+assert '"name": "Fed Net Liquidity"' in seen["user"] and '"informational": true' in seen["user"]
+print("  ✓ промптът казва, че Net Liquidity е информативен уред (и го подава като контекст с \"informational\")")
 print()
 print("Всички тестове минаха.")

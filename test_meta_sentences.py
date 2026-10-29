@@ -38,11 +38,11 @@ for d, b in FX.items():
 print("  ✓ 03.08 („те са null защото данните са невалидни“) и 04.09 („IEI/HYG данните са невалидни (NaN за level)“) — непокътнати; macro_brief — непокътнат")
 
 print()
-print("── 2. ai_brief: поправката в _apply_regime_claims (протокол в regime_claims_fixed, код meta) ──")
-th = {"regime": "Defensive", "indicators": [{"name": "VIX", "status": "green"}]}                  # СИНТЕТИЧЕН термометър (броенето не е предмет тук)
-res = ai_brief._apply_regime_claims({"macro_brief": "", "regime_comment": c28, "sector_logic": []}, th)
-assert "Никоя от наличните стойности" not in res["regime_comment"] and any(x["code"] == "meta" and x["kept"] is None for x in res["regime_claims_fixed"])
-print("  ✓ regime_comment без изречението; regime_claims_fixed: meta")
+print("── 2. ai_brief: поправката в _apply_meta_check (протокол в regime_claims_fixed, код meta) — 29.10.2026: върху разказа (macro_brief), по абзаци ──")
+res = ai_brief._apply_meta_check({"macro_brief": "Първи абзац без проверки.\n\n" + c28, "sector_logic": []})                  # РЕАЛНИЯТ текст от 28.10 като втори абзац
+assert "Никоя от наличните стойности" not in res["macro_brief"] and any(x["code"] == "meta" and x["kept"] is None for x in res["regime_claims_fixed"])
+assert res["macro_brief"].startswith("Първи абзац без проверки.\n\n")                                          # абзаците остават разделени
+print("  ✓ macro_brief без изречението, абзаците — разделени; regime_claims_fixed: meta")
 
 print()
 print("── 3. гранични (СИНТЕТИЧНИ) ──")
