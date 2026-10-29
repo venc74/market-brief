@@ -1074,6 +1074,7 @@ def run() -> dict:
         "run_steps": steps.summary(),                                    # 20.10.2026 (етап 3б): ok / частично / провал / пропусната за всяка стъпка в обвивката
         "health": health,                                                # здравният монитор (10.10)
         "screener_status": dict(screener.LAST_STATUS),                  # 19.10.2026 (т. 12): с история / универс / партиди — нормата за прага на банера
+        "news_diag": dict(news_aggregator.LAST_DIAG) if config.ENABLE_NEWS else None,     # 29.10.2026: какво махнаха проверките на новините (празното "защо" на 29.10 не се виждаше)
         "market_calendar_note": setup_rules.market_calendar_note(dt.date.fromisoformat(today)),     # 16.10.2026 (В2б): утре / в понеделник NYSE не работи или затваря рано
         "bar_freshness": dict(bar_freshness.LAST_DIAG),                 # 16.10.2026: застоял дневен бар (изчакване, дял на универса, засегнати карти)
         "data_canary": canary,                                           # С5: split корекцията на Yahoo (NVDA 07.06.2024)

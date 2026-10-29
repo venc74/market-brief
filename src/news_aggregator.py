@@ -299,17 +299,89 @@ def _echo_index(h, i: int, pool: list[dict], seen: set) -> tuple[int | None, str
     return (hits[0], f"индексът поправен по заглавието: {i} → {hits[0]}") if len(hits) == 1 else (None, "индексът не съвпада със заглавието")
 
 
+# 29.10.2026 (разходката, т. 3, решение 3): число в "why", което го няма в източника, маха САМО частта с него — числото с мярката и количествения предлог ("до 20% от", "с 25 bps",
+# "над 5 месеца", "на 24 септември"), не цялото изречение. Предлог без количествено значение ("за", "на", "в", "с") остава пред съществително ("коридор за ~20% от световния петрол" →
+# "коридор за световния петрол", "AMD с 107% ръст" → "AMD с ръст") и пада пред служебна дума или запетая ("лихвата с 25 bps под Warsh" → "лихвата под Warsh").
+_WHY_MONTHS = (r"(?:януари|февруари|март|април|май|юни|юли|август|септември|октомври|ноември|декември"
+               r"|January|February|March|April|May|June|July|August|September|October|November|December)")
+_WHY_UNIT = (r"(?:\s?%\+?|\s?(?:bps|bp|б\.\s?п\.|базисни\s+пункта|процентни\s+пункта|пункта|пункт|млрд\.?|млн\.?|трлн\.?|bn|B|M|долара|евро|месеца|години|седмици|дни|пъти|г\.)(?![\w]))*")
+_WHY_NUM = r"[~≈+\-−]?[$€£¥]?\d+(?:[.,]\d+)*(?:\s\d{3})*(?:\s?[–-]\s?[$€£¥]?\d+(?:[.,]\d+)*)?"
+_WHY_ADV = r"(?:около|над|под|близо\s+до|почти|едва|повече\s+от|по-малко\s+от)"                     # количествени — падат с числото винаги
+_WHY_PREP = r"(?:от|до|при|с|със|за|на|във|в)"                                                      # "от", "до", "при" падат; "с", "за", "на", "в" — само пред служебна дума
+_WHY_FUNC = r"(?:под|над|в|във|на|за|от|до|с|със|при|след|преди|през|и|или|но|а|което|която|които|че|като|вместо|срещу|въпреки|заради|поради|докато|когато|ако|защото|понеже|макар|дори|също|още)\b"
+_WHY_PHRASE = re.compile(
+    rf"(?<!\S)(?:(?:на|от|до|през|в|след|преди)\s+)?(?P<d>\d{{1,2}}\s+{_WHY_MONTHS}|\d{{4}}\s?г\.)(?![\w])"
+    rf"|(?<!\S)(?:{_WHY_ADV}\s+)*(?P<p>{_WHY_PREP}\s+(?:{_WHY_ADV}\s+)*)?(?P<n>(?<![\w-]){_WHY_NUM}{_WHY_UNIT})(?![\w])(?P<of>\s+от(?=\s))?", re.I)
+_WHY_COPULA = {"е", "са", "беше", "бяха", "бъде", "бил", "била", "били", "достига", "достигна", "възлиза", "възлизат", "стига", "стигна"}
+_WHY_SENT = re.compile(r"(?<=[.!?…])\s+(?=[A-ZА-Я„\"(\d])")                                        # не след "млрд. долара", "2024 г. усилва"
+_WHY_CLAUSE = re.compile(r"(\s[—–]\s|;\s|,\s)")
+_WHY_NAME = re.compile(_NUM_NAME_RE.pattern + r"|\b[A-Za-z]+-?\d+\b", re.I)                          # + слети с име: FY2028, Mag7, GLP-1
+
+
+def _why_extra(s: str, have: set) -> list[str]:
+    return [x for x in _NUM_RE.findall(_WHY_NAME.sub(" ", s)) if x.replace(",", ".") not in have]
+
+
+def _why_trim_sentence(sent: str, have: set) -> tuple[str, list[str]]:
+    """Едно изречение → (изречението без частите с числа извън източника, махнатите части). Нечетимо (под 4 думи) или с останало число → ("", [цялото изречение])."""
+    if not _why_extra(sent, have):
+        return sent, []
+    masks: list[str] = []
+    s = _WHY_NAME.sub(lambda m: (masks.append(m.group(0)), f"\x00{len(masks) - 1}\x00")[1], sent)       # имената ("S&P 500", "10-year") не се пипат
+    removed: list[str] = []
+
+    def repl(m):
+        if m.group("d"):
+            if not _why_extra(m.group("d"), have):
+                return m.group(0)
+            removed.append(m.group(0).strip())
+            return " "
+        if not _why_extra(m.group("n"), have):
+            return m.group(0)
+        removed.append(m.group(0).strip())
+        head = (m.group("p") or "").split()[0] if m.group("p") else ""
+        nxt = m.string[m.end():]
+        if head.lower() in ("с", "със", "за", "на", "в", "във") and (m.group("of") or (re.match(r"\s+\w", nxt) and not re.match(rf"\s+{_WHY_FUNC}", nxt, re.I))):
+            if head.lower() not in ("с", "със"):
+                return f" {head} "
+            w = re.match(r"\s+(\w)", nxt).group(1).lower() if re.match(r"\s+\w", nxt) else ""
+            return " " + ("С" if head[0] == "С" else "с") + ("ъс" if w and w in "сз" else "") + " "         # "със спад"
+        return " "
+    out = re.sub(r"\x00(\d+)\x00", lambda m: masks[int(m.group(1))], _WHY_PHRASE.sub(repl, s))
+    parts, orig = _WHY_CLAUSE.split(out), _WHY_CLAUSE.split(sent)
+    if removed and len(parts) > 1 and len(parts) == len(orig):                                         # клауза, чийто предикат беше числото ("Печалбата е +40% — …"), пада цяла
+        segs, seps = parts[0::2], parts[1::2]
+        keep = [(seps[k - 1] if k else "", seg) for k, seg in enumerate(segs)
+                if not (_why_extra(orig[0::2][k], have) and (len(re.findall(r"\w+", seg)) < 2 or re.findall(r"\w+", seg)[-1].lower() in _WHY_COPULA))]
+        out = "".join((sep if i else "") + seg for i, (sep, seg) in enumerate(keep))
+    out = re.sub(r"\s{2,}", " ", out).strip()
+    out = re.sub(r"\s+([,.;:!?])", r"\1", out)
+    out = re.sub(r"^[,;—–\s]+", "", re.sub(r"\(\s*\)", "", out))
+    out = re.sub(r"[,;]\s*([.!?])$", r"\1", out)
+    if out[:1].islower():
+        out = out[0].upper() + out[1:]
+    if _why_extra(out, have) or len(re.findall(r"\w+", out)) < 4:
+        return "", [sent]
+    return out, removed
+
+
 def _why_numbers(why: str, source: str) -> tuple[str, list[str]]:
     """
-    19.10.2026 (С3): изречение в "why" с число, което го няма в заглавието и резюмето на източника (pool[i]: t, d — това вижда моделът) → махнато; (остатък, махнати).
-    Числата от име или срок не се броят (_NUM_NAME_RE). Измерено върху 704 реда в 89 брифа: 38 "why" с число извън заглавието (резюмето не се пази в брифа — горна граница),
+    19.10.2026 (С3): число в "why", което го няма в заглавието и резюмето на източника (pool[i]: t, d — това вижда моделът); (остатък, махнати). Числата от име или срок не се броят
+    (_NUM_NAME_RE, от 29.10 и слетите с име — FY2028, Mag7, GLP-1). Измерено върху 704 реда в 89 брифа: 38 "why" с число извън заглавието (резюмето не се пази в брифа — горна граница),
     най-често "~20% от световния петролен трафик" за Ормузкия проток (8 пъти) — фон на модела, не факт от новината.
+    29.10.2026 (разходката, т. 3): до 29.10 падаше цялото изречение — "why" е обикновено едно изречение и оставаше празно (3 от 767 новини: 23.10 AP за jobless claims, 29.10 CNBC и FT
+    за Fed). Сега пада само частта с числото (_why_trim_sentence); цялото изречение — само ако остатъкът е под 4 думи или пак носи число. Върху историята (39 "why" с число извън
+    заглавието, 13.06–29.10): 39 изрязани, 0 празни; 2 от 39 се четат накъсо ("приходи на OpenAI вместо очакваните разклатиха…", "добавили към инфлацията в категории стоки").
+    Изреченията се делят само пред главна буква / цифра / кавичка — не след "млрд. долара" (до 29.10 там се делеше).
     """
     have = {x.replace(",", ".") for x in _NUM_RE.findall(source or "")}                      # източникът — всичките му числа (и "19-year high")
     kept, removed = [], []
-    for sent in re.split(r"(?<=[.!?])\s+", (why or "").strip()):
-        extra = [x for x in _NUM_RE.findall(_NUM_NAME_RE.sub(" ", sent)) if x.replace(",", ".") not in have]
-        (removed if extra else kept).append(sent)
+    for sent in _WHY_SENT.split((why or "").strip()):
+        t, r = _why_trim_sentence(sent, have)
+        if t:
+            kept.append(t)
+        removed += r
     return " ".join(kept).strip(), removed
 
 
@@ -349,7 +421,7 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         r = pool[i]
         why, cut = _why_numbers(why, f"{r['title']} {r.get('summary') or ''}")
         if cut:
-            dropped.append({"i": i, "reason": "изречение в why с число, което го няма в заглавието и резюмето — махнато", "removed": cut})
+            dropped.append({"i": i, "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него", "removed": cut})
         row = {"headline": r["title"], "source": r.get("source"), "why": why}
         if r.get("link"):
             row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс

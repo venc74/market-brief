@@ -1,0 +1,420 @@
+{
+ "_note": "РЕАЛНО: news[] от публикуваните брифове data/2026-06-13.json … data/2026-10-29.json, извадени на 29.10.2026 без промяна — всички 39 \"why\" с число, което го няма в ЗАГЛАВИЕТО (резюмето на източника не се пази в брифа, затова източникът тук е само заглавието), и трите реда с празно \"why\" (23.10, 29.10 ×2). \"expected\"/\"removed\" са изходът на _why_numbers от 29.10, прегледан на ръка (2 от 39 се четат накъсо — OpenAI 09.10, NY Fed 09.10).",
+ "cases": [
+  {
+   "date": "2026-06-24",
+   "source": null,
+   "headline": "South Korea's stock market just had one of its worst days ever",
+   "why": "Kospi -10% е системен сигнал за стрес в emerging markets и може да предизвика contagion към свързани ETF-и и валути.",
+   "expected": "Kospi е системен сигнал за стрес в emerging markets и може да предизвика contagion към свързани ETF-и и валути.",
+   "removed": [
+    "-10%"
+   ]
+  },
+  {
+   "date": "2026-06-29",
+   "source": null,
+   "headline": "Freight shipping costs surge as companies race to beat new Trump tariffs",
+   "why": "Поскъпването на фрахта до нива от кризата в Червено море през 2024 г. усилва инфлационните очаквания и притиска маржовете на вносозависимите компании.",
+   "expected": "Поскъпването на фрахта до нива от кризата в Червено море усилва инфлационните очаквания и притиска маржовете на вносозависимите компании.",
+   "removed": [
+    "през 2024 г."
+   ]
+  },
+  {
+   "date": "2026-07-03",
+   "source": null,
+   "headline": "U.S. job creation cools in June with payrolls growth of just 57,000; unemployment rate at 4.2%",
+   "why": "Силно разминаване с очакваните 115,000 нови работни места сигнализира за охлаждане на икономиката и повишава вероятността за по-ранни Fed cuts.",
+   "expected": "Силно разминаване с очакваните нови работни места сигнализира за охлаждане на икономиката и повишава вероятността за по-ранни Fed cuts.",
+   "removed": [
+    "115,000"
+   ]
+  },
+  {
+   "date": "2026-07-09",
+   "source": null,
+   "headline": "Why the U.S. and Iran are stuck in tit-for-tat strikes over Strait of Hormuz",
+   "why": "Strait of Hormuz е транзитен коридор за ~20% от световния петрол — всяка ескалация е директен supply shock за пазарите.",
+   "expected": "Strait of Hormuz е транзитен коридор за световния петрол — всяка ескалация е директен supply shock за пазарите.",
+   "removed": [
+    "за ~20% от"
+   ]
+  },
+  {
+   "date": "2026-07-15",
+   "source": null,
+   "headline": "Oil rises after U.S. strikes Iran, naval blockade of Hormuz ports reinstated",
+   "why": "Блокадата на Ормузкия проток застрашава до 20% от световните петролни доставки, което директно движи цените на суровия петрол и енергийния сектор.",
+   "expected": "Блокадата на Ормузкия проток застрашава световните петролни доставки, което директно движи цените на суровия петрол и енергийния сектор.",
+   "removed": [
+    "до 20% от"
+   ]
+  },
+  {
+   "date": "2026-07-16",
+   "source": null,
+   "headline": "U.S. slaps 25% tariff on most Brazilian goods over 'unfair trade practices'",
+   "why": "Нов търговски конфликт с потенциален допълнителен 12.5% duty следващата седмица — директен натиск върху суровинния и аграрен сектор, движи USD и EM активи.",
+   "expected": "Нов търговски конфликт с потенциален допълнителен duty следващата седмица — директен натиск върху суровинния и аграрен сектор, движи USD и EM активи.",
+   "removed": [
+    "12.5%"
+   ]
+  },
+  {
+   "date": "2026-07-21",
+   "source": null,
+   "headline": "Kospi to 10,000: South Korean equities poised to rebound after brutal sell-off, says Citi",
+   "why": "Прогнозата на Citi за 50%+ ръст на KOSPI индикира потенциален риск-он импулс в азиатските пазари с отражение върху глобалните настроения.",
+   "expected": "Прогнозата на Citi за ръст на KOSPI индикира потенциален риск-он импулс в азиатските пазари с отражение върху глобалните настроения.",
+   "removed": [
+    "за 50%+"
+   ]
+  },
+  {
+   "date": "2026-07-22",
+   "source": null,
+   "headline": "Samsung in talks to invest in Mistral at €20bn valuation",
+   "why": "Потенциална сделка за €1 млрд. в европейски AI играч сигнализира за глобална консолидация в сектора и засяга sentiment около AI акциите.",
+   "expected": "Потенциална сделка в европейски AI играч сигнализира за глобална консолидация в сектора и засяга sentiment около AI акциите.",
+   "removed": [
+    "за €1 млрд."
+   ]
+  },
+  {
+   "date": "2026-08-03",
+   "source": null,
+   "headline": "AMD and Sandisk are two of the big chip stocks with earnings momentum in the new week",
+   "why": "Над 130 S&P 500 компании отчитат резултати тази седмица, а чип секторът остава ключов двигател на пазарната посока.",
+   "expected": "S&P 500 компании отчитат резултати тази седмица, а чип секторът остава ключов двигател на пазарната посока.",
+   "removed": [
+    "Над 130"
+   ]
+  },
+  {
+   "date": "2026-08-05",
+   "source": null,
+   "headline": "AMD's revenue climbs 50% and data center sales doubled, but the stock is down",
+   "why": "Силни резултати при AMD с 107% ръст в data center сегмента, но негативната реакция на акцията сигнализира завишени очаквания и потенциален натиск върху целия AI/chip сектор.",
+   "expected": "Силни резултати при AMD с ръст в data center сегмента, но негативната реакция на акцията сигнализира завишени очаквания и потенциален натиск върху целия AI/chip сектор.",
+   "removed": [
+    "с 107%"
+   ]
+  },
+  {
+   "date": "2026-08-07",
+   "source": null,
+   "headline": "The July jobs numbers are due out Friday — Nonfarm payrolls expected at 83,000",
+   "why": "Слабото очаквано число от 83 000 за nonfarm payrolls е ключов макро катализатор, който ще определи посоката на пазарите и очакванията за Fed днес.",
+   "expected": "Слабото очаквано число за nonfarm payrolls е ключов макро катализатор, който ще определи посоката на пазарите и очакванията за Fed днес.",
+   "removed": [
+    "от 83 000"
+   ]
+  },
+  {
+   "date": "2026-08-10",
+   "source": null,
+   "headline": "U.S. reaffirms grip on Hormuz blockade, turning away 55 ships as talks stall",
+   "why": "Блокадата на Хормуз продължава над 5 месеца и директно ограничава петролния износ, поддържайки енергийните цени под натиск нагоре.",
+   "expected": "Блокадата на Хормуз продължава и директно ограничава петролния износ, поддържайки енергийните цени под натиск нагоре.",
+   "removed": [
+    "над 5 месеца"
+   ]
+  },
+  {
+   "date": "2026-08-10",
+   "source": null,
+   "headline": "German economy minister warns AfD's rise could deter investors",
+   "why": "Политическата нестабилност в Германия и рискът за привличане на €3.75 трлн частен капитал до 2040 г. засяга европейските пазари и EUR активите.",
+   "expected": "Политическата нестабилност в Германия и рискът за привличане на частен капитал засяга европейските пазари и EUR активите.",
+   "removed": [
+    "на €3.75 трлн",
+    "до 2040 г."
+   ]
+  },
+  {
+   "date": "2026-08-11",
+   "source": null,
+   "headline": "Shein IPO pitched to investors at sub-$30bn valuation",
+   "why": "70% срив в оценката на Shein е индикатор за охлаждане на апетита към consumer discretionary и cross-border e-commerce в текущата macro среда.",
+   "expected": "Срив в оценката на Shein е индикатор за охлаждане на апетита към consumer discretionary и cross-border e-commerce в текущата macro среда.",
+   "removed": [
+    "70%"
+   ]
+  },
+  {
+   "date": "2026-08-13",
+   "source": null,
+   "headline": "Strait of Hormuz remains blocked, ship traffic near 3-month lows",
+   "why": "Блокадата на Hormuz застрашава ~20% от световния петролен транзит и може да изстреля цените на суровия петрол рязко нагоре.",
+   "expected": "Блокадата на Hormuz застрашава световния петролен транзит и може да изстреля цените на суровия петрол рязко нагоре.",
+   "removed": [
+    "~20% от"
+   ]
+  },
+  {
+   "date": "2026-08-18",
+   "source": null,
+   "headline": "Ship attacked in Hormuz Strait as U.S.-Iran ceasefire expiry risks prolonged conflict",
+   "why": "Атака в Ормузкия проток заплашва около 20% от световния петролен трафит и е директен катализатор за spike в цените на суровия петрол.",
+   "expected": "Атака в Ормузкия проток заплашва световния петролен трафит и е директен катализатор за spike в цените на суровия петрол.",
+   "removed": [
+    "около 20% от"
+   ]
+  },
+  {
+   "date": "2026-08-24",
+   "source": null,
+   "headline": "As U.S.-Canada trade talks collapse, Carney says retaliatory tariffs will start Sept. 8",
+   "why": "50% мита върху канадски износ и реципрочни мерки от 8 септември засягат секторите стомана, алуминий, енергия и авто — инфлационен риск за американската икономика.",
+   "expected": "Мита върху канадски износ и реципрочни мерки от 8 септември засягат секторите стомана, алуминий, енергия и авто — инфлационен риск за американската икономика.",
+   "removed": [
+    "50%"
+   ]
+  },
+  {
+   "date": "2026-08-24",
+   "source": null,
+   "headline": "Alibaba plunges after announcing $10.2 billion share placement to fund AI push",
+   "why": "10% спад в Alibaba след мащабно вторично предлагане оказва натиск върху азиатските tech индекси и засяга ETF-и с експозиция към китайски акции.",
+   "expected": "Спад в Alibaba след мащабно вторично предлагане оказва натиск върху азиатските tech индекси и засяга ETF-и с експозиция към китайски акции.",
+   "removed": [
+    "10%"
+   ]
+  },
+  {
+   "date": "2026-08-26",
+   "source": null,
+   "headline": "Dick's Sporting Goods just had its worst day ever",
+   "why": "Рекордният спад от 30% сигнализира за сериозно влошаване в потребителските разходи за дискреционни стоки, с импликации за целия retail сектор.",
+   "expected": "Рекордният спад сигнализира за сериозно влошаване в потребителските разходи за дискреционни стоки, с импликации за целия retail сектор.",
+   "removed": [
+    "от 30%"
+   ]
+  },
+  {
+   "date": "2026-08-26",
+   "source": null,
+   "headline": "China challenges Korean champions in flash memory race",
+   "why": "YMTC's $5bn IPO и амбициите в NAND производството заплашват пазарните позиции на Samsung и SK Hynix, с последствия за semiconductor сектора глобално.",
+   "expected": "YMTC's IPO и амбициите в NAND производството заплашват пазарните позиции на Samsung и SK Hynix, с последствия за semiconductor сектора глобално.",
+   "removed": [
+    "$5bn"
+   ]
+  },
+  {
+   "date": "2026-08-28",
+   "source": null,
+   "headline": "Iran links Hormuz reopening to ending regional wars as Trump reportedly rejects return to June deal",
+   "why": "Блокадата на Ормуз засяга ~20% от световния петролен трафик — ескалацията или де-ескалацията директно движи петролните фючърси и енергийния сектор.",
+   "expected": "Блокадата на Ормуз засяга световния петролен трафик — ескалацията или де-ескалацията директно движи петролните фючърси и енергийния сектор.",
+   "removed": [
+    "~20% от"
+   ]
+  },
+  {
+   "date": "2026-09-01",
+   "source": null,
+   "headline": "Tanker struck in Hormuz, Trump vows to hit Iran 'hard'",
+   "why": "Удар в Ормузкия проток застрашава ~20% от световния петролен транзит и директно натиска oil prices нагоре.",
+   "expected": "Удар в Ормузкия проток застрашава световния петролен транзит и директно натиска oil prices нагоре.",
+   "removed": [
+    "~20% от"
+   ]
+  },
+  {
+   "date": "2026-09-03",
+   "source": null,
+   "headline": "Yen strengthens as traders bet on Japan interest rate rises",
+   "why": "Йената пада под ¥157 след залози за повишение на лихвите от Bank of Japan, което влияе на carry trade позициите и глобалното рисково настроение.",
+   "expected": "Йената пада след залози за повишение на лихвите от Bank of Japan, което влияе на carry trade позициите и глобалното рисково настроение.",
+   "removed": [
+    "под ¥157"
+   ]
+  },
+  {
+   "date": "2026-09-08",
+   "source": null,
+   "headline": "Bombardier points out U.S. footprint after Trump says aerospace giant must build in America",
+   "why": "Канадските ответни мита от $20 млрд. влизат в сила — ескалацията в търговския конфликт CAD/USA директно засяга секторите aerospace, energy и agriculture.",
+   "expected": "Канадските ответни мита влизат в сила — ескалацията в търговския конфликт CAD/USA директно засяга секторите aerospace, energy и agriculture.",
+   "removed": [
+    "от $20 млрд."
+   ]
+  },
+  {
+   "date": "2026-09-11",
+   "source": null,
+   "headline": "Scott Bessent fails to break 'fever' in US bond market",
+   "why": "Неуспехът на $6B bond операцията да спре ръста на доходностите сигнализира структурен проблем с търсенето на UST, което натиска акциите с висока дюрация.",
+   "expected": "Неуспехът на bond операцията да спре ръста на доходностите сигнализира структурен проблем с търсенето на UST, което натиска акциите с висока дюрация.",
+   "removed": [
+    "на $6B"
+   ]
+  },
+  {
+   "date": "2026-09-14",
+   "source": null,
+   "headline": "Global AI stocks slip on concerns over risks",
+   "why": "Секторна разпродажба при AI акциите, включително SoftBank с -13%, сигнализира за прекалено позициониране и регулаторен риск в технологичния сектор.",
+   "expected": "Секторна разпродажба при AI акциите, включително SoftBank, сигнализира за прекалено позициониране и регулаторен риск в технологичния сектор.",
+   "removed": [
+    "с -13%"
+   ]
+  },
+  {
+   "date": "2026-09-16",
+   "source": null,
+   "headline": "Treasury yields hitting 5% may not break markets now — but the clock is ticking",
+   "why": "10-year yield на най-високо ниво от 2007 г. увеличава borrowing costs и оказва натиск върху акции, особено growth сектора.",
+   "expected": "10-year yield на най-високо ниво увеличава borrowing costs и оказва натиск върху акции, особено growth сектора.",
+   "removed": [
+    "от 2007 г."
+   ]
+  },
+  {
+   "date": "2026-09-17",
+   "source": null,
+   "headline": "Federal Reserve hikes key rate for 1st time in 3 years, defying Trump demands for a cut",
+   "why": "Централното събитие за деня — Fed повиши лихвата с 25 bps под Warsh, което директно удря equity valuations, bond yields и USD.",
+   "expected": "Централното събитие за деня — Fed повиши лихвата под Warsh, което директно удря equity valuations, bond yields и USD.",
+   "removed": [
+    "с 25 bps"
+   ]
+  },
+  {
+   "date": "2026-09-18",
+   "source": null,
+   "headline": "BOJ raises interest rates to 31-year high, yen slumps after move",
+   "why": "BOJ вдигна лихвата с 25 bps до 1.25% при разделено гласуване 7-2, но йената парадоксално падна, което сигнализира за carry trade динамика и влияе върху глобалните валутни и equity позиции.",
+   "expected": "BOJ вдигна лихвата при разделено гласуване, но йената парадоксално падна, което сигнализира за carry trade динамика и влияе върху глобалните валутни и equity позиции.",
+   "removed": [
+    "с 25 bps",
+    "до 1.25%",
+    "7-2"
+   ]
+  },
+  {
+   "date": "2026-09-21",
+   "source": null,
+   "headline": "Trump-Xi summit: Bessent нарече срещата с китайския вицепремиер He Lifeng 'успешна'",
+   "why": "Позитивният тон преди Trump-Xi срещата на 24 септември намалява trade war риска и подкрепя risk-on настроения в equity и FX пазарите.",
+   "expected": "Позитивният тон преди Trump-Xi срещата намалява trade war риска и подкрепя risk-on настроения в equity и FX пазарите.",
+   "removed": [
+    "на 24 септември"
+   ]
+  },
+  {
+   "date": "2026-09-22",
+   "source": null,
+   "headline": "Paramount and state AGs settle lawsuit, allowing Warner Bros. Discovery merger to proceed",
+   "why": "Антитръстното уреждане за $81 млрд. мегасделка е регулаторно събитие с директен ефект върху акциите на Paramount и медийния сектор.",
+   "expected": "Антитръстното уреждане за мегасделка е регулаторно събитие с директен ефект върху акциите на Paramount и медийния сектор.",
+   "removed": [
+    "за $81 млрд."
+   ]
+  },
+  {
+   "date": "2026-09-23",
+   "source": null,
+   "headline": "Oil price on track for longest losing streak in more than 12 months",
+   "why": "Продължителен спад на Brent под $99 сигнализира за пазарни очаквания за деескалация и по-слабо търсене, влияещо на енергийния сектор.",
+   "expected": "Продължителен спад на Brent сигнализира за пазарни очаквания за деескалация и по-слабо търсене, влияещо на енергийния сектор.",
+   "removed": [
+    "под $99"
+   ]
+  },
+  {
+   "date": "2026-10-05",
+   "source": null,
+   "headline": "Iran says Strait of Hormuz will not reopen until conditions are met",
+   "why": "Затварянето на Ормузкия проток засяга ~20% от световния петролен транзит и може да предизвика рязък spike в цените на суровините и енергийните акции.",
+   "expected": "Затварянето на Ормузкия проток засяга световния петролен транзит и може да предизвика рязък spike в цените на суровините и енергийните акции.",
+   "removed": [
+    "~20% от"
+   ]
+  },
+  {
+   "date": "2026-10-05",
+   "source": null,
+   "headline": "Surging Treasury yields don't signal a U.S. 'fiscal apocalypse' — yet",
+   "why": "Treasury yields над 5% повишават cost of capital за корпорациите и оказват натиск върху оценките на акциите, особено в growth и tech секторите.",
+   "expected": "Treasury yields повишават cost of capital за корпорациите и оказват натиск върху оценките на акциите, особено в growth и tech секторите.",
+   "removed": [
+    "над 5%"
+   ]
+  },
+  {
+   "date": "2026-10-09",
+   "source": null,
+   "headline": "Inflation on many everyday items was entirely due to tariffs, NY Fed says",
+   "why": "NY Fed установява, че тарифите са добавили 2.9 процентни пункта към инфлацията в 67 категории стоки, което усложнява позицията на Fed и очакванията за лихвени намаления.",
+   "expected": "NY Fed установява, че тарифите са добавили към инфлацията в категории стоки, което усложнява позицията на Fed и очакванията за лихвени намаления.",
+   "removed": [
+    "2.9 процентни пункта",
+    "в 67"
+   ]
+  },
+  {
+   "date": "2026-10-09",
+   "source": null,
+   "headline": "OpenAI annualised revenues $20bn less than previously signalled, AI stocks sink",
+   "why": "Реалните приходи на OpenAI от ~$50bn вместо очакваните $70bn разклатиха AI growth нарратива и предизвикаха разпродажба в Nvidia, Oracle и CoreWeave.",
+   "expected": "Реалните приходи на OpenAI вместо очакваните разклатиха AI growth нарратива и предизвикаха разпродажба в Nvidia, Oracle и CoreWeave.",
+   "removed": [
+    "от ~$50bn",
+    "$70bn"
+   ]
+  },
+  {
+   "date": "2026-10-14",
+   "source": null,
+   "headline": "Iran increases threats to Strait of Hormuz shipping, Saudi Aramco HQ attacked in suspected Houthi strike",
+   "why": "Ескалацията в Близкия изток директно заплашва ~20% от глобалния петролен трафит, тласкайки цените на oil нагоре и засягайки energy сектора.",
+   "expected": "Ескалацията в Близкия изток директно заплашва глобалния петролен трафит, тласкайки цените на oil нагоре и засягайки energy сектора.",
+   "removed": [
+    "~20% от"
+   ]
+  },
+  {
+   "date": "2026-10-22",
+   "source": "CNBC",
+   "headline": "China's stock market sinks into bear territory as CSI 300 extends 10-week rout",
+   "why": "CSI 300 с 20% спад от юнския връх генерира негативен сентимент към EM активи, суровини и компании с голяма китайска експозиция.",
+   "expected": "CSI 300 със спад от юнския връх генерира негативен сентимент към EM активи, суровини и компании с голяма китайска експозиция.",
+   "removed": [
+    "с 20%"
+   ]
+  },
+  {
+   "date": "2026-10-29",
+   "source": "CNBC",
+   "headline": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
+   "why": "Сделка при оценка от около 17 млрд. долара разчупва вялия M&A пазар и движи акциите на delivery и grocery tech сектора.",
+   "expected": "Сделка при оценка разчупва вялия M&A пазар и движи акциите на delivery и grocery tech сектора.",
+   "removed": [
+    "от около 17 млрд. долара"
+   ]
+  }
+ ],
+ "empty_why": [
+  {
+   "date": "2026-10-23",
+   "source": "AP Business",
+   "headline": "US jobless claims fell to 194,000 last week, lowest since July - AP News",
+   "why": ""
+  },
+  {
+   "date": "2026-10-29",
+   "source": "CNBC",
+   "headline": "Fed meeting recap: Warsh says central bank will host fewer rate-setting meetings in future years",
+   "why": ""
+  },
+  {
+   "date": "2026-10-29",
+   "source": "Financial Times",
+   "headline": "Fed holds fire on interest rates despite intensifying inflation",
+   "why": ""
+  }
+ ]
+}
