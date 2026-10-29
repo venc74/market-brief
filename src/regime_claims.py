@@ -68,6 +68,14 @@ _DD_VERB = re.compile(r"distribution\s+days?\b[^.;]{0,90}?\b(?:блокират|
 _DD_BLOCKED = re.compile(r"\b(?:Offensive|режимът)\s+(?:е|остава)\s+блокиран", re.I)
 _DD_MECH = re.compile(r"(?:държи|държат|поддържа\w*)\s+(?:се\s+)?(?:изцяло\s+)?от\s+(?:два|двата|три|трите)\s+механизма", re.I)
 _DD_COND = re.compile(r"при\s+(?:достигане\s+на\s+)?(?:\d+|девет)\b[^.;]{0,25}$", re.I)
+# 29.10.2026: грешен брой distribution days — „SPY 6/9, QQQ 7/9 — … за SPY липсват само 2, за QQQ — само 2“ (29.10; за SPY липсват 3). Проверяват се броят („SPY 6/9“, „7/9 за QQQ“,
+# „SPY под 9 (сега 7/9“) и колко липсват до прага („за SPY липсват 2“, „липсват 2 при SPY, 3 при QQQ“, „за QQQ — само 2“; без тикър — вярно, ако е така за SPY или за QQQ) спрямо реда на кода.
+_DDN_COUNT = re.compile(r"\b(SPY|QQQ)\b\s*(?:[:=]\s*|на\s+|под\s+\d+\s*\(сега\s+)?(\d+)\s*/\s*(\d+)|\b(\d+)\s*/\s*(\d+)\s+(?:за|при)\s+(SPY|QQQ)\b")
+_DDN_MISS_WORD = r"(?:липсва|липсват|остава|остават|нужни\s+са\s+още|трябват\s+още)\s+(?:само\s+|още\s+)?"
+_DDN_MISS = re.compile(r"\bза\s+(SPY|QQQ)\s+" + _DDN_MISS_WORD + r"(\d+)\b|\b" + _DDN_MISS_WORD + r"(\d+)\s+(?:дни\s+|дена\s+)?(?:при|за)\s+(SPY|QQQ)\b", re.I)
+_DDN_MISS_MORE = re.compile(r",\s*(?:(\d+)\s+(?:при|за)\s+(SPY|QQQ)\b|за\s+(SPY|QQQ)\s*[—–-]\s*(?:само\s+|още\s+)?(\d+)\b)", re.I)
+_DDN_MISS_ANY = re.compile(r"\b" + _DDN_MISS_WORD + r"(\d+)(?=\s*(?:дни\b|дена\b|distribution|до\b|\)|,|;|\.|$))", re.I)
+_DDN_HYPO = re.compile(r"\b(?:ако|стигне|достигне|достигнат|стигнат)\b[^.;]{0,60}$", re.I)
 
 
 def _norm(s: str) -> str:
@@ -140,7 +148,34 @@ def _dd_state(thermo: dict | None) -> dict | None:
     part = next((p for p in (((thermo or {}).get("regime_margin") or {}).get("parts") or []) if str(p).startswith("distribution days")), None)
     if not part or "не се изтеглиха" in part:
         return None
-    return {"line": part, "blocking": "Offensive е блокиран" in part or "по хистерезис" in part}
+    m = re.search(r"/(\d+)", part)
+    return {"line": part, "blocking": "Offensive е блокиран" in part or "по хистерезис" in part,
+            "counts": {t: int(n) for t, n in re.findall(r"\b(SPY|QQQ) (\d+)/\d+", part)}, "red": int(m.group(1)) if m else config.DISTRIBUTION_DAYS_RED}
+
+
+def dd_count_problems(sentence: str, dd: dict | None) -> list[str]:
+    """29.10.2026: грешен брой distribution days или колко липсват до прага — спрямо реда на кода. Връща описанията ([] — чисто)."""
+    if not dd or not dd.get("counts") or not _DD.search(sentence):
+        return []
+    c, red, out = dd["counts"], dd["red"], []
+    for m in _DDN_COUNT.finditer(sentence):
+        t, n, of = (m.group(1), m.group(2), m.group(3)) if m.group(1) else (m.group(6), m.group(4), m.group(5))
+        if t in c and int(of) == red and int(n) != c[t] and not _DDN_HYPO.search(sentence[:m.start()]):
+            out.append(f"{t} {n}/{red}, а по кода {t} {c[t]}/{red}")
+    claims = []
+    for m in _DDN_MISS.finditer(sentence):
+        claims.append((m.group(1), m.group(2)) if m.group(1) else (m.group(4), m.group(3)))
+        mm = _DDN_MISS_MORE.match(sentence, m.end())                                  # непосредствено след твърдението: „…, 3 при QQQ“, „…, за QQQ — само 2“
+        if mm:
+            claims.append((mm.group(2), mm.group(1)) if mm.group(2) else (mm.group(3), mm.group(4)))
+    for t, n in claims:
+        if t in c and int(n) != red - c[t]:
+            out.append(f"за {t} липсват {n}, а по кода {red - c[t]} ({t} {c[t]}/{red})")
+    if not claims:
+        for m in _DDN_MISS_ANY.finditer(sentence):
+            if int(m.group(1)) not in {red - x for x in c.values()} and not _DDN_HYPO.search(sentence[:m.start()]):
+                out.append(f"липсват {m.group(1)}, а по кода {' / '.join(f'{t} {red - x}' for t, x in c.items())}")
+    return out
 
 
 def _credit_legs(inds: list[dict]) -> dict | None:
@@ -272,6 +307,8 @@ def check_sentence(sentence: str, f: dict) -> list[dict]:
                 break
         if hit:
             problems.append({"code": "dd", "why": f"твърди, че distribution days блокират / държат режима («{hit[:60]}»), а по кода: {dd['line']}"})
+    for why in dd_count_problems(sentence, dd):                                       # 29.10.2026: грешен брой / колко липсват
+        problems.append({"code": "dd_count", "why": f"грешен брой distribution days: {why}"})
     m = _SOLO.search(sentence)
     if m and _REGIME_WORD.search(sentence) and not _negated(sentence, m):
         named = indicators_in(sentence)
@@ -333,6 +370,9 @@ def clean(text: str, f: dict) -> tuple[str, list[dict]]:
             credit_replaced = True
         if any(x["code"] == "dd" for x in p) and not dd_replaced and (f.get("dd") or {}).get("line"):          # 28.10.2026: редът на кода
             out.append(f"По кода: {f['dd']['line']}; под прага distribution days не блокират Offensive и не държат Defensive.")
+            dd_replaced = True
+        if any(x["code"] == "dd_count" for x in p) and not dd_replaced and (f.get("dd") or {}).get("line"):    # 29.10.2026: грешният брой → редът на кода
+            out.append(f"По кода: {f['dd']['line']}.")
             dd_replaced = True
     return (" ".join(out) if problems else str(text or "")), problems
 

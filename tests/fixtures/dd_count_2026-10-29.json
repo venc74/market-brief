@@ -1,0 +1,133 @@
+{
+ "_note": "РЕАЛНО: термометърът (с regime_margin), distribution days и макро текстовете (regime_comment; macro_brief — публикуваният, изрязан от json_repair) от брифа на 29.10.2026 (data/2026-10-29.json, commit 234c3c5). Извадено на 29.10.2026.",
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 772.31,
+    "as_of": "2026-10-28",
+    "pct_from_high": 0.87,
+    "ma50": 766.83,
+    "ma200": 725.23,
+    "above_50dma": true,
+    "above_200dma": true,
+    "status": "green",
+    "label": "SPY 772 | над 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 16.91,
+    "chg_5d": 0.23,
+    "pct_5d": 1.4,
+    "spike": false,
+    "status": "green",
+    "label": "VIX 16.9 (risk-on)"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 0.96,
+    "percentile": 14.6,
+    "history_days": 96,
+    "status": "yellow",
+    "label": "P/C 0.96 (15. percentile от 96 дни; в нормалния диапазон)"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.38,
+    "status": "green",
+    "label": "0.38% (нормален, steepening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": 5808.2,
+    "status": "yellow",
+    "informational": true,
+    "change_4w_pct": 0.14,
+    "as_of": "2026-10-21",
+    "label": "$5,808 млрд към 2026-10-21 · +0.1% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+   },
+   {
+    "name": "SOFR − IORB (финансиране)",
+    "value": 5.0,
+    "status": "yellow",
+    "informational": true,
+    "percentile": 93.1,
+    "zscore": 0.93,
+    "as_of": "2026-10-27",
+    "label": "+5.0 б.п. към 27.10 (SOFR 3.95% − IORB 3.90%) · +7.0 б.п. за седмица · 93. percentile, z +0.9 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+   },
+   {
+    "name": "MOVE (Bond Vol)",
+    "value": 94.6,
+    "as_of": "2026-10-28",
+    "delta_1w": -1.4,
+    "spike": false,
+    "status": "green",
+    "label": "MOVE 95 (-1 пункта/седмица)"
+   },
+   {
+    "name": "VIX Term Structure",
+    "value": 0.812,
+    "status": "green",
+    "label": "VIX9D 15.6 / VIX 16.9 / VIX3M 19.2 → ratio 0.81 (contango, нормално)"
+   },
+   {
+    "name": "IEI/HYG (Credit Spread)",
+    "value": 1.4758,
+    "as_of": "2026-10-28",
+    "level_percentile": 14.1,
+    "roc_10d_pct": -0.23,
+    "roc_percentile": 43.1,
+    "spike": false,
+    "status": "green",
+    "roc_10d_pct_prev": 0.78,
+    "roc_trend": "falling",
+    "roc_trend_text": "10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)",
+    "iei_10d_pct": 0.78,
+    "hyg_10d_pct": 1.02,
+    "label": "IEI/HYG 1.476 (14. percentile) · 10д RoC -0.2% (IEI +0.8%, HYG +1.0%) (43. percentile)"
+   },
+   {
+    "name": "Market Breadth (% над 40dMA)",
+    "value": 60.2,
+    "universe_size": 902,
+    "status": "green",
+    "universe_total": 903,
+    "missing_n": 1,
+    "batches": 19,
+    "batches_failed": 0,
+    "label": "60.2% над 40dMA (здравословна ширина)",
+    "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+   }
+  ],
+  "regime": "Offensive",
+  "regime_reason": "7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)",
+  "sizing_factor": 1.0,
+  "counts": "7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)",
+  "overrides": [],
+  "regime_by_count": "Offensive",
+  "exit_rule": "Режимът е по броенето (7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)). Няма активен автоматичен override.",
+  "hysteresis_released": [],
+  "regime_margin": {
+   "text": "Запас до смяна на режима: по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6) · distribution days SPY 6/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2) · IEI/HYG 10д RoC 43. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)",
+   "parts": [
+    "по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6)",
+    "distribution days SPY 6/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2)",
+    "IEI/HYG 10д RoC 43. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)"
+   ]
+  }
+ },
+ "distribution_days": {
+  "count": 7,
+  "spy_count": 6,
+  "qqq_count": 7,
+  "status": "yellow",
+  "label": "SPY 6 / QQQ 7 (последни 25 сесии)",
+  "methodology_note": "Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.",
+  "as_of": "2026-10-28",
+  "fetch_status": "ok",
+  "missing": []
+ },
+ "regime_comment": "Режимът Offensive е оправдан от данните при текущото броене: 7 зелени, 1 жълт (Put/Call SPY на 14.6-и percentile от 96 дни — в нормален диапазон, без тревожен сигнал), 0 червени от 8 видими индикатора. Fed Net Liquidity и SOFR−IORB са информативни и не влизат в броенето. Запасът до смяна е ограничен, но измерим: достатъчен е един червен индикатор, за да падне режимът до Defensive — сега няма червени. Distribution days са натрупани (SPY 6/9, QQQ 7/9) — при достигане на 9 Offensive се блокира и за SPY липсват само 2, за QQQ — само 2; това е най-близкото автоматично ограничение. IEI/HYG 10-дневната RoC е -0.23% (спада спрямо +0.78% преди 5 сесии), далеч от прага от 90-и percentile, при който би задействала override Defensive. Тревожният елемент извън броенето: SOFR−IORB е на 93.1-и percentile (5.0 б.п. към 27.10, +7 б.п. за седмица) — висок percentile, но системата го третира като термометър с висока честота на фалшиви сигнали (47–72%) и ранен сигнал само в 1 от 3 исторически кризи. Earnings разцеплението (Alphabet vs Microsoft) добавя несигурност в XLK/XLC, но не е термометърен входящ сигнал. Заключение: Offensive е коректен по правилото, но маржът на безопасност е тесен — две distribution days или един нов червен индикатор биха го сменили.",
+ "macro_brief": "Earnings сезонът разцепва технологичния сектор: Alphabet се срина ~10% след замразен capex за 2026 и $51 млрд. AI outlay, потискайки Nasdaq futures и рекламния онлайн сегмент; Microsoft скочи ~4% на облачен beat, частично компенсирайки натиска. Fed задържа лихвите, но изявлението на Bessent, че ново покачване „не би било грешка"
+}

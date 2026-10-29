@@ -21,7 +21,8 @@ print("── 1. РЕАЛНИТЕ текстове: 4 грешни, вернит
 hits = {d: dd_hits(d) for d in FX}
 assert sorted(d for d, h in hits.items() if h) == ["2026-10-19", "2026-10-23", "2026-10-27", "2026-10-28"] and all(len(h) == 1 for h in hits.values() if h)
 f28 = rc.facts(FX["2026-10-28"]["thermometer"])
-assert f28["dd"] == {"line": "distribution days SPY 7/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2)", "blocking": False}
+assert f28["dd"] == {"line": "distribution days SPY 7/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2)", "blocking": False,
+                     "counts": {"SPY": 7, "QQQ": 7}, "red": 9}                                              # 29.10.2026: и броят (test_dd_count_claims)
 assert hits["2026-10-28"][0]["sentence"].startswith("Defensive-ът се държи изцяло от два механизма")
 assert "при 9 Offensive се блокира автоматично" in FX["2026-10-16"]["regime_comment"] and not hits["2026-10-16"]
 assert "при 9 Offensive се блокира, а в момента до блокажа липсват само 2 дни" in FX["2026-10-26"]["regime_comment"] and not hits["2026-10-26"]
