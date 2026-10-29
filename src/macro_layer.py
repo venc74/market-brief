@@ -196,7 +196,27 @@ def funding_spread(sofr: list[tuple[str, float]], ioer: list[tuple[str, float]],
     _, week_ago, _ = last_and_week_ago(s)
     status = "red" if pct >= config.FUNDING_STRESS_PCT_RED else "yellow" if pct >= config.FUNDING_STRESS_PCT_YELLOW else "green"
     return {"value": round(last, 1), "as_of": pts[-1][0], "sofr": pts[-1][2], "iorb": pts[-1][3], "percentile": pct, "zscore": z,
-            "chg_1w_bp": round(last - week_ago, 1) if week_ago is not None else None, "n_history": len(hist), "history_from": pts[0][0], "status": status, "hide": False}
+            "chg_1w_bp": round(last - week_ago, 1) if week_ago is not None else None, "n_history": len(hist), "history_from": pts[0][0], "status": status, "hide": False,
+            "streak": report_streak(vals)}
+
+
+def report_streak(vals: list[float]) -> dict:
+    """
+    29.10.2026 (разходката, т. 2, добавка към т. 5): колко поредни отчета (дневни стойности) поред спредът е ПО-ВИСОК (или по-нисък) от предишния — броят завършва с последния.
+    {"dir": "up" | "down" | "flat", "n"}; равен на предишния → {"dir": "flat", "n": 0}. Стойностите са закръглени до 0.1 б.п. (SOFR и IORB са с 2 знака). Чиста функция.
+    РЕАЛНО (брифовете): към 27.10 — −2, −2, 0, +2, +3, +5 б.п. (20.10 → 27.10) → "up", 4.
+    """
+    v = [round(float(x), 1) for x in vals or []]
+    if len(v) < 2 or v[-1] == v[-2]:
+        return {"dir": "flat", "n": 0}
+    up = v[-1] > v[-2]
+    n = 0
+    for a, b in zip(reversed(v[:-1]), reversed(v[1:])):
+        if (b > a) if up else (b < a):
+            n += 1
+        else:
+            break
+    return {"dir": "up" if up else "down", "n": n}
 
 
 def funding_stress() -> dict:

@@ -996,13 +996,24 @@ def _funding_stress_indicator(fs: dict | None) -> dict | None:
     d = fs["as_of"]
     z = f", z {fs['zscore']:+.1f}" if fs.get("zscore") is not None else ""
     w = f" · {fs['chg_1w_bp']:+.1f} б.п. за седмица" if fs.get("chg_1w_bp") is not None else ""
+    sk = fs.get("streak") or {}
+    if sk.get("n", 0) >= 2 and sk.get("dir") in ("up", "down"):                       # 29.10.2026: „расте 4-ти пореден отчет“ — броят е от кода (macro_layer.report_streak)
+        w += f" · {'расте' if sk['dir'] == 'up' else 'пада'} {_ordinal(sk['n'])} пореден отчет"
     hf = fs.get("history_from") or config.FUNDING_STRESS_FROM
     return {"name": name, "value": fs["value"], "status": fs.get("status", "yellow"), "informational": True, "percentile": fs.get("percentile"), "zscore": fs.get("zscore"),
+            **({"streak": fs["streak"]} if fs.get("streak") else {}),
             "as_of": d, "label": (f"{fs['value']:+.1f} б.п. към {d[8:10]}.{d[5:7]} (SOFR {fs['sofr']:.2f}% − IORB {fs['iorb']:.2f}%){w} · {fs['percentile']:.0f}. percentile{z} спрямо историята от "
                                   f"{hf[5:7]}.{hf[:4]} · термометър, не предсказание: в проучването ни {config.FUNDING_STRESS_RESEARCH_TEXT} · само информативен, не влиза в режима")}
 
 
 _COLOR_BG = {"green": "зелена", "yellow": "жълта", "red": "червена"}
+
+
+def _ordinal(n: int) -> str:
+    """29.10.2026: българско поредно с цифри — 2-ри, 3-ти, 4-ти, 5-и … 11-и … 21-ви, 22-ри."""
+    if 11 <= n % 100 <= 19:
+        return f"{n}-и"
+    return f"{n}-" + {1: "ви", 2: "ри", 3: "ти", 4: "ти"}.get(n % 10, "и")
 
 
 def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tuple[str, str, str]:
