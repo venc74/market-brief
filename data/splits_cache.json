@@ -1,15 +1,15 @@
 {
- "date": "2026-10-28",
+ "date": "2026-10-29",
  "rows": [
   {
-   "ticker": "ENHA",
-   "company": "Enhanced Group Inc.",
+   "ticker": "OMEX",
+   "company": "Odyssey Marine Exploration, Inc.",
    "date": "2026-10-29",
-   "ratio": "1:10",
+   "ratio": "1:25",
    "split_type": "reverse",
    "date_human": "Oct 29, 2026",
-   "price": 10.8,
-   "market_cap": 1477616789.695651
+   "price": 13.55,
+   "market_cap": 795268332.144494
   }
  ],
  "horizon": [
@@ -158,10 +158,34 @@
    "date_human": "Oct 27, 2026"
   },
   {
+   "ticker": "ATYR",
+   "company": "aTyr Pharma, Inc.",
+   "date": "2026-10-29",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Oct 29, 2026"
+  },
+  {
    "ticker": "ENHA",
    "company": "Enhanced Group Inc.",
    "date": "2026-10-29",
    "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 29, 2026"
+  },
+  {
+   "ticker": "OMEX",
+   "company": "Odyssey Marine Exploration, Inc.",
+   "date": "2026-10-29",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Oct 29, 2026"
+  },
+  {
+   "ticker": "AXG",
+   "company": "Solowin Holdings",
+   "date": "2026-10-29",
+   "ratio": "1:200",
    "split_type": "reverse",
    "date_human": "Oct 29, 2026"
   },
@@ -233,10 +257,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 27,
+  "source_rows": 30,
   "horizon_from": "2026-10-26",
   "horizon_to": "2026-11-09",
-  "in_week": 20,
+  "in_week": 23,
   "dropped_price": [
    "AZTR",
    "BDRX",
@@ -255,7 +279,10 @@
    "ENLV",
    "NUWE",
    "PARA",
-   "SCAG"
+   "SCAG",
+   "ATYR",
+   "ENHA",
+   "AXG"
   ],
   "dropped_cap": [],
   "dropped_no_data": [

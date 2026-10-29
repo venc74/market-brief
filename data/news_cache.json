@@ -1,47 +1,53 @@
 {
- "date": "2026-10-28",
+ "date": "2026-10-29",
  "news": [
   {
-   "headline": "Stock futures are mixed as traders await Fed decision, Big Tech earnings: Live updates",
+   "headline": "Alphabet sinks 10% as it holds 2026 capex unchanged, expects significant increase in 2027",
    "source": "CNBC",
-   "why": "Fed решението движи краткосрочните лихви и задава посоката за целия пазар — акции, облигации и долар реагират директно.",
-   "headline_bg": "Фючърсите са смесени, докато търговците очакват решението на Fed и резултатите на Big Tech: Живи актуализации"
+   "why": "Технологичният сектор и Nasdaq futures под натиск; рекламните и cloud акции поевтиняват, а капиталовите разходи в AI сектора влизат под съмнение.",
+   "headline_bg": "Alphabet потъва с 10% тъй като запазва capex за 2026 непроменен, очаква значително увеличение през 2027 г."
   },
   {
-   "headline": "How investors can position ahead of the Fed's next policy decision",
+   "headline": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
    "source": "CNBC",
-   "why": "Позиционирането преди Fed решението е ключово за облигации, долар и лихвочувствителни сектори като недвижими имоти и финансови акции.",
-   "headline_bg": "Как инвеститорите могат да се позиционират преди следващото политическо решение на Fed"
+   "why": "Microsoft скача и частично компенсира натиска от Alphabet; облачният и AI сектор получава позитивен импулс, а neocloud доставчиците остават под въпрос заради по-нисък capex.",
+   "headline_bg": "Microsoft акциите скачат с 4% тъй като ръстът в облака движи по-добри от очакваните приходи и печалба."
   },
   {
-   "headline": "Oil rises over 1% after Saudi Arabian refinery attack reignites supply risk - Reuters",
-   "source": "Reuters Business",
-   "why": "Атаката над саудитска рафинерия засяга петролното предлагане и вдига цените на суровия петрол, с директен ефект върху енергийния сектор и инфлацията.",
-   "headline_bg": "Петролът поскъпва с над 1% след атаката над саудитска рафинерия, която разпали отново риска за доставките"
-  },
-  {
-   "headline": "US costs of Iran war rise to over $47 billion, according to Pentagon estimate - Reuters",
-   "source": "Reuters Business",
-   "why": "Разходите от $47 млрд. за войната с Иран натискат бюджетния дефицит и могат да повлияят на доходността на американските ДЦК и долара.",
-   "headline_bg": "Разходите на САЩ за войната с Иран нарастват до над $47 млрд. според оценка на Пентагона"
-  },
-  {
-   "headline": "SK Hynix unveils $75 billion shareholder return plan after posting record profit - Reuters",
-   "source": "Reuters Business",
-   "why": "Рекорден buyback план от $75 млрд. и рекордна печалба при SK Hynix вдигат целия memory/AI chip сектор, включително Micron и свързаните ETF-и.",
-   "headline_bg": "SK Hynix обявява план за $75 млрд. възвращаемост към акционерите след рекордна печалба"
-  },
-  {
-   "headline": "Stocks get AI lift, kiwi slides on RBNZ's surprise hold - Reuters",
-   "source": "Reuters Business",
-   "why": "Изненадващото задържане на лихвите от RBNZ срива новозеландския долар и сигнализира по-широко преосмисляне на централнобанковите цикли в развитите пазари.",
-   "headline_bg": "Акциите получават тласък от AI, новозеландският долар се срива след изненадващото задържане на RBNZ"
-  },
-  {
-   "headline": "Polymarket faces renewed CFTC probe over U.S. access to offshore platform",
+   "headline": "Fed meeting recap: Warsh says central bank will host fewer rate-setting meetings in future years",
    "source": "CNBC",
-   "why": "Новото разследване на CFTC срещу Polymarket за достъп на американски потребители до офшор платформа носи регулаторен риск за крипто и prediction markets сектора.",
-   "headline_bg": "Polymarket е изправен пред ново разследване на CFTC относно достъпа на американски потребители до офшор платформата"
+   "why": "",
+   "headline_bg": "Обзор от заседанието на Fed: Warsh казва, че централната банка ще провежда по-малко заседания за лихвени решения в бъдеще."
+  },
+  {
+   "headline": "Bessent says 'not necessarily' a mistake if the Fed hikes again",
+   "source": "CNBC",
+   "why": "Изявление на финансовия министър, че ново повишение на лихвата не би било грешка, засилва hawkish очакванията и натиска върху облигациите и акциите с висока оценка.",
+   "headline_bg": "Безент казва, че не е непременно грешка ако Fed повиши лихвите отново."
+  },
+  {
+   "headline": "Google shares tumble 10% after $51bn AI outlay deepens cash burn",
+   "source": "Financial Times",
+   "why": "Спад в традиционното търсене заради AI mode удря рекламните приходи и сигнализира структурна заплаха за целия онлайн рекламен сектор.",
+   "headline_bg": "Google акциите падат с 10% след като разходите от 51 млрд. долара за AI задълбочават изгарянето на кеш."
+  },
+  {
+   "headline": "EXCLUSIVE: US DOJ is inquiring about Nvidia's purchase of Hugging Face, sources say - Reuters",
+   "source": "Reuters Business",
+   "why": "Антитръстово разследване на DOJ срещу Nvidia заради придобиването на Hugging Face може да ограничи M&A активността в AI сектора и оказва натиск върху NVDA.",
+   "headline_bg": "ЕКСКЛУЗИВНО: Министерството на правосъдието на САЩ разследва покупката на Hugging Face от Nvidia."
+  },
+  {
+   "headline": "Fed holds fire on interest rates despite intensifying inflation",
+   "source": "Financial Times",
+   "why": "",
+   "headline_bg": "Fed задържа огъня върху лихвените проценти въпреки засилващата се инфлация."
+  },
+  {
+   "headline": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
+   "source": "CNBC",
+   "why": "Сделка при оценка от около 17 млрд. долара разчупва вялия M&A пазар и движи акциите на delivery и grocery tech сектора.",
+   "headline_bg": "Сделката на DoorDash за покупка на Instacart може да се случи още в четвъртък сутринта, казват източници на CNBC."
   }
  ]
 }
