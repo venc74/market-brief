@@ -66,12 +66,22 @@ def _fetch_rss(url: str, source: str, hours: int, limit: int = 15) -> list[dict]
                 continue
             summary = (e.get("summary") or e.get("description") or "").strip()
             summary = _strip_html(summary)[:300]
-            out.append({"source": source, "title": title, "summary": summary})
+            row = {"source": source, "title": title, "summary": summary}
+            link = _safe_link(e.get("link"))                       # 29.10.2026 (разходката, т. 3–4): заглавието в брифа е линк към статията
+            if link:
+                row["link"] = link
+            out.append(row)
             if len(out) >= limit:
                 break
     except Exception as ex:
         print(f"[news] RSS {source} failed: {ex}")
     return out
+
+
+def _safe_link(link) -> str | None:
+    """29.10.2026: линкът от фийда — само http(s) (не javascript: и подобни); иначе None."""
+    link = link.strip() if isinstance(link, str) else ""
+    return link if re.match(r"https?://[^\s\"'<>]+$", link) else None
 
 
 def _strip_html(s: str) -> str:
@@ -341,7 +351,9 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         if cut:
             dropped.append({"i": i, "reason": "изречение в why с число, което го няма в заглавието и резюмето — махнато", "removed": cut})
         row = {"headline": r["title"], "source": r.get("source"), "why": why}
-        bg = (n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) else ""
+        if r.get("link"):
+            row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс
+        bg =(n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) else ""
         if bg and re.search(r"[А-Яа-я]", bg) and bg != r["title"]:
             if _translation_ok(bg, r["title"]):
                 row["headline_bg"] = bg

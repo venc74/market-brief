@@ -370,6 +370,9 @@
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
   .news-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--regime); margin-top: 8px; }
   .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
+  /* 29.10.2026 (разходката, т. 3–4): заглавието е линк към статията — без отделен ред */
+  a.news-head { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+  a.news-head:hover { text-decoration-color: var(--muted); }
   .news-why { font-size: 13.5px; color: var(--muted); }
 
   /* ── Track Record: Open Positions таблица ── */
@@ -614,6 +617,8 @@
   {% endif %}
 </section>
 
+{# 29.10.2026 (разходката, т. 3–4): заглавието е линк към статията, когато фийдът дава линк (само http/https) #}
+{% macro news_head(n) %}{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a class="news-head" href="{{ n.link }}" target="_blank" rel="noopener noreferrer">{{ n.headline }}</a>{% else %}<span class="news-head">{{ n.headline }}</span>{% endif %}{% endmacro %}
 {% if news %}
 <section>
   <h2>Значими новини · последните 24ч</h2>
@@ -622,7 +627,7 @@
     <div class="news-item">
       <span class="news-dot"></span>
       {# 15.10.2026: заглавието е ДОСЛОВНО от източника (news_aggregator.pick_verbatim); преводът е отделно, в скоби #}
-      <div><span class="news-head">{{ n.headline }}</span>{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}
+      <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}
         {% if n.headline_bg %}<span class="news-why"> ({{ n.headline_bg }})</span>{% endif %}
         {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
     </div>
@@ -639,7 +644,7 @@
   <div class="news-list">
     {% for n in crypto["items"] %}
     <div class="news-item"><span class="news-dot"></span>
-      <div><span class="news-head">{{ n.headline }}</span>{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}
+      <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}
         <span class="news-why" style="font-size:12px">· {{ n.cat_label }}</span>{% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
     </div>
     {% endfor %}

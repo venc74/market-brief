@@ -655,8 +655,11 @@ def render_email(brief: dict) -> str:
     news = brief.get("news", [])[:8]
     news_block = ""
     if news:
+        link = lambda n: n.get("link") if isinstance(n.get("link"), str) and n["link"].startswith(("https://", "http://")) else None
         items = "".join(
-            f'<li style="margin-bottom:6px"><b>{_e(n.get("headline",""))}</b>'                         # 15.10.2026: дословно от източника
+            f'<li style="margin-bottom:6px">'
+            + (f'<a href="{_e(link(n))}" style="color:#111827;font-weight:bold">{_e(n.get("headline",""))}</a>' if link(n)      # 29.10.2026: заглавието е линк към статията
+               else f'<b>{_e(n.get("headline",""))}</b>')                                         # 15.10.2026: дословно от източника
             + (f'<span style="color:#6b7280"> ({_e(n["headline_bg"])})</span>' if n.get("headline_bg") else "")
             + f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
         news_block = (
