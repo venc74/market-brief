@@ -160,17 +160,18 @@ def _parse_json(text: str, _retried: bool = False):
         if clean.startswith("json"):
             clean = clean[4:]
     clean = clean.strip()
+    last = dict(_LAST_CALL)
+    own = last.get("text") == text
+    caller = sys._getframe(1).f_code.co_name
+    section = last.get("section") if own else _SECTION_LABELS.get(caller, caller)
     try:
-        return _fix_text(json.loads(clean))
+        return _fix_text(json.loads(clean), section)
     except json.JSONDecodeError as e:
         repaired = json_repair.loads(clean)
         if isinstance(repaired, (dict, list)) and repaired:
             print(f"[ai] _parse_json: json_repair поправи malformed JSON ({e})")
             cuts = repair_cuts(clean, repaired, extra_data=e.msg == "Extra data")
             if cuts:
-                last = dict(_LAST_CALL)
-                own = last.get("text") == text
-                section = last.get("section") if own else _SECTION_LABELS.get(sys._getframe(1).f_code.co_name, sys._getframe(1).f_code.co_name)
                 print(f"[ai] ⚠ json_repair изряза текст — {section}: " + "; ".join(f"{c['field'] or 'отговорът'} свършва на «…{c['tail']}», изпуснато «{c['lost']}…»"
                                                                                   for c in cuts))
                 if own and not _retried:
@@ -187,7 +188,7 @@ def _parse_json(text: str, _retried: bool = False):
                         parent[key] = parent[key].rstrip() + CUT_MARK                 # видимо там, където е изрязано (страницата и имейлът)
                 print(f"[ai] ⚠ {section}: текстът е непълен днес (json_repair — и след повторния опит)" if own else
                       f"[ai] ⚠ {section}: текстът е непълен днес (json_repair)")
-            return _fix_text(repaired)
+            return _fix_text(repaired, section)
         raise
 
 
@@ -237,11 +238,15 @@ def repair_cuts(raw: str, repaired, extra_data: bool = False) -> list[dict]:
     return cuts
 
 
-def _fix_text(obj):
-    """_fix_translit + един обобщен лог ред за хибридните думи в отговора."""
+def _fix_text(obj, section: str | None = None):
+    """_fix_translit + един обобщен лог ред за хибридните думи в отговора; махнатите изречения с чужди символи → ai_truncations (kind "cjk")."""
     _HYBRIDS.clear()
     _HYBRID_CTX.clear()
+    _CJK_DROPPED.clear()
     out = _fix_translit(obj)
+    if _CJK_DROPPED:
+        TRUNCATIONS.append({"section": section or "AI текст", "kind": "cjk", "model": config.CLAUDE_MODEL,
+                            "chars": "".join(d["chars"] for d in _CJK_DROPPED), "removed": [d["sentence"][:200] for d in _CJK_DROPPED]})
     if _HYBRIDS:
         print(f"[ai] смесено писмо (само лог, {len(_HYBRIDS)}): "
               f"{', '.join(dict.fromkeys(_HYBRIDS))}")
@@ -277,6 +282,23 @@ _TRANSLIT_PAT = re.compile(
 # в историята (損害, 底, 升级, 映射, 催化剂 в DXCM 21.09, 純 в Cocoa 28.09).
 # Никога не са легитимни тук → премахват се и се логват.
 _CJK_RE = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯豈-﫿]+")
+# 29.10.2026: махането САМО на символите оставя счупено изречение — WSM на 29.10: „технически cataly за momentum“ (моделът е продължил „cataly…“ с китайски, както на 21.09
+# „потенциален催化剂“ = catalyst). В историята CJK е винаги дума насред изречението (6 появи 06.07–28.09, преди филтъра: 損害, 底, 升级, 映射, 催化剂, 純) → маха се ЦЯЛОТО изречение;
+# низ, който е само това изречение, става празен (в списък — елементът пада). Махнатите изречения → ai_truncations (kind "cjk", _fix_text) и ред в банера.
+_CJK_DROPPED: list[dict] = []
+_SENT_SPLIT_RE = re.compile(r"(?<=[.!?…])\s+")
+
+
+def _drop_cjk_sentences(s: str) -> str:
+    kept = []
+    for x in _SENT_SPLIT_RE.split(s):
+        if _CJK_RE.search(x):
+            chars = "".join(_CJK_RE.findall(x))
+            print(f"[ai] ⚠ чужди символи '{chars}' — махнато цялото изречение: «{x[:160]}»")
+            _CJK_DROPPED.append({"sentence": x, "chars": chars})
+        else:
+            kept.append(x)
+    return " ".join(kept)
 # FIX 2026-09-29: руски букви, които ги няма в българския (ы, э, ё) — "по-высоката"
 # (Lean Hogs), "по-высоки" (5Y) на 29.09. Измерено върху 74 дни (123 745 низа):
 # 10 появи, 8 различни думи (высок-×6, события×2, это, экспанзия), всичките
@@ -502,7 +524,8 @@ def _fix_translit(obj):
     if isinstance(obj, dict):
         return {k: _fix_translit(v) for k, v in obj.items()}
     if isinstance(obj, list):
-        return [_fix_translit(v) for v in obj]
+        out = [_fix_translit(v) for v in obj]
+        return [x for v, x in zip(obj, out) if not (x == "" and isinstance(v, str) and _CJK_RE.search(v))]      # 29.10.2026: елемент само от изречение с CJK пада
     if not isinstance(obj, str):
         return obj
     if _SOFT_HYPHEN in obj:
@@ -514,10 +537,9 @@ def _fix_translit(obj):
     obj = _fix_latin_prefix(obj)                  # 08.10: ПРЕДИ лога на известните дефекти и буквите-двойници — иначе поправена дума ("expозиция") пак се води като неподправена хибридна
     _log_known_defects(obj)
     if _CJK_RE.search(obj):
-        for m in _CJK_RE.finditer(obj):
-            print(f"[ai] ⚠ премахнати чужди символи '{m.group(0)}' в "
-                  f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
-        obj = re.sub(r" {2,}", " ", _CJK_RE.sub("", obj))
+        obj = _drop_cjk_sentences(obj)                # 29.10.2026: цялото изречение, не само символите
+        if not obj:
+            return obj
     for m in _RU_ONLY_RE.finditer(obj):
         print(f"[ai] ⚠ руска буква (ы/э/ё) в '{m.group(0)}' — "
               f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")

@@ -522,9 +522,10 @@
 <div class="model-banner rejected">✂ <strong>Отрязан AI отговор</strong> — следните секции
   са непълни или празни:
   <ul class="tight" style="margin:6px 0 0 18px">
-  {# 29.10.2026: и рязане от нашата поправка на JSON-а (json_repair), не само лимитът за изход #}
+  {# 29.10.2026: и рязане от наш филтър — поправката на JSON-а (json_repair) и махнатите изречения с чужди символи (cjk), не само лимитът за изход #}
   {% for t in ai_truncations %}<li><strong>{{ t.section }}</strong> — {% if t.kind == "json_repair" %}текстът е непълен днес: JSON-ът на модела
-    беше счупен (най-често кавичка в текста) и поправката изряза част{% if t.tail %} — свършва на «…{{ t.tail }}»{% endif %}{% if t.retried %}; и повторният опит не помогна{% endif %}{% else %}моделът
+    беше счупен (най-често кавичка в текста) и поправката изряза част{% if t.tail %} — свършва на «…{{ t.tail }}»{% endif %}{% if t.retried %}; и повторният опит не помогна{% endif %}{% elif t.kind == "cjk" %}махнато изречение с чужди символи ({{ t.chars }}){% for r in t.removed %}
+    «{{ r }}»{% endfor %}{% else %}моделът
     достигна лимита си за изход ({{ t.max_tokens }} токена, {{ t.model }}){% endif %}</li>{% endfor %}
   </ul></div>
 {% endif %}
