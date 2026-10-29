@@ -660,6 +660,9 @@ def render_email(brief: dict) -> str:
             f'<li style="margin-bottom:6px">'
             + (f'<a href="{_e(link(n))}" style="color:#111827;font-weight:bold">{_e(n.get("headline",""))}</a>' if link(n)      # 29.10.2026: заглавието е линк към статията
                else f'<b>{_e(n.get("headline",""))}</b>')                                         # 15.10.2026: дословно от източника
+            + ('<span style="color:#6b7280;font-size:12px"> · също: ' + ", ".join(                    # 29.10.2026: една история — една новина
+                (f'<a href="{_e(link(a))}" style="color:#6b7280">{_e(a.get("source"))}</a>' if link(a) else _e(a.get("source"))) for a in n["also"]) + "</span>"
+               if isinstance(n.get("also"), list) and n["also"] else "")
             + (f'<span style="color:#6b7280"> ({_e(n["headline_bg"])})</span>' if n.get("headline_bg") else "")
             + f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
         news_block = (

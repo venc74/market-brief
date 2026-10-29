@@ -385,12 +385,41 @@ def _why_numbers(why: str, source: str) -> tuple[str, list[str]]:
     return " ".join(kept).strip(), removed
 
 
+def _source_rank(source) -> int:
+    """Мястото на източника в config.NEWS_SOURCE_PRIORITY (по-малко = по-надежден); непознат — след всички."""
+    order = config.NEWS_SOURCE_PRIORITY
+    return order.index(source) if source in order else len(order)
+
+
+def _also_group(also, i: int, pool: list[dict], seen: set, dropped: list) -> list[int]:
+    """
+    29.10.2026 (разходката, т. 3–4, решение 2): "also" от модела — другите заглавия в пула за СЪЩОТО събитие ([{"i", "h"}] или индекси). Всяко минава проверките на основното
+    (валиден индекс, неизползван, ехото на първите 6 думи — _echo_index, но БЕЗ поправка на индекса: ехо на друго заглавие = друга история); неминалите са в причините.
+    Връща групата: [i] + приетите. Чиста функция.
+    """
+    group = [i]
+    for a in also if isinstance(also, list) else []:
+        k, h = (a.get("i"), a.get("h")) if isinstance(a, dict) else (a, None)
+        if isinstance(k, bool) or not isinstance(k, int) or not 0 <= k < len(pool) or k in seen or k in group:
+            dropped.append({"i": k, "reason": "също: невалиден или вече използван индекс", "of": i})
+            continue
+        j, note = _echo_index(h, k, pool, seen | set(group))
+        if j != k:                                                           # за "също" — без поправка по ехото: друго заглавие значи друга история
+            dropped.append({"i": k, "reason": "също: ехото не съвпада със заглавието", "of": i, "h": h})
+            continue
+        group.append(k)
+    return group
+
+
 def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], list[dict]]:
     """
     15.10.2026: заглавието е ДОСЛОВНО от източника — моделът връща само индекса "i" в пула, "why" и по желание превод "headline_bg"; кодът взема
     заглавието и източника от пула (до 15.10 моделът пишеше заглавието сам и го превеждаше наполовина: "Dollar languishes като…", "Iran deploy нови тактики",
     "awards $2 в damages" на 14.10; 88 от 688 заглавия в историята са смесени). Ред без валиден индекс, повторен индекс или празно "why" отпада (в причините).
     Превод с число, което го няма в оригинала, или без мащаба му се маха (_translation_ok). Чиста функция → (новини, отпаднали).
+    29.10.2026: една история — една новина. "also" (_also_group) слива заглавията за същото събитие в един ред: основното е от най-надеждния източник в групата
+    (config.NEWS_SOURCE_PRIORITY; ако не е "i" на модела, преводът отпада — той е на другото заглавие), "why" е за събитието (числата се сверяват с всички заглавия в групата),
+    останалите са в row["also"] = [{source, headline, link}] — „също: FT, Reuters“. Заглавие, вече влязло в група, не може да е отделна новина ("повторен индекс").
     """
     out, seen, dropped = [], set(), []
     for n in items or []:
@@ -418,14 +447,22 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
             dropped.append({"i": i, "reason": "повторен индекс"})
             continue
         seen.add(i)
-        r = pool[i]
-        why, cut = _why_numbers(why, f"{r['title']} {r.get('summary') or ''}")
+        group = _also_group(n.get("also"), i, pool, seen, dropped)          # 29.10.2026: една история — една новина (заглавията за същото събитие)
+        seen.update(group)
+        main = min(group, key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))
+        if main != i:
+            dropped.append({"i": i, "reason": f"основното заглавие — от по-надеждния източник ({pool[main].get('source')}), преводът отпада", "main": main})
+        r = pool[main]
+        why, cut = _why_numbers(why, " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group))
         if cut:
             dropped.append({"i": i, "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него", "removed": cut})
         row = {"headline": r["title"], "source": r.get("source"), "why": why}
         if r.get("link"):
             row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс
-        bg =(n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) else ""
+        others = sorted((k for k in group if k != main), key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))
+        if others:
+            row["also"] = [{"source": pool[k].get("source"), "headline": pool[k]["title"], **({"link": pool[k]["link"]} if pool[k].get("link") else {})} for k in others]
+        bg = (n.get("headline_bg") or "").strip() if isinstance(n.get("headline_bg"), str) and main == i else ""
         if bg and re.search(r"[А-Яа-я]", bg) and bg != r["title"]:
             if _translation_ok(bg, r["title"]):
                 row["headline_bg"] = bg
@@ -435,6 +472,13 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
     return out[:max_items], dropped
 
 
+# 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина. Същото събитие = същото решение, данни, сделка, изказване или пазарно движение със същата причина;
+# същата тема (две различни новини за Fed) НЕ е. Разпознава го моделът — проверката по общи думи не стига: на 29.10 „Alphabet sinks 10%…“ (CNBC) и „Google shares tumble 10%…“ (FT)
+# нямат обща дума освен „10%“, а „Fed“ стои в различни новини (измерено на ръка в последните 24 брифа — виж config.NEWS_SOURCE_PRIORITY). Кодът проверява индексите и ехото.
+ALSO_RULE = ("Една история — една новина: ако няколко заглавия (от различни източници или от един) са за СЪЩОТО събитие — същото решение, същите данни, същата сделка, "
+             "същото изказване или същото пазарно движение със същата причина — върни ги като ЕДНА новина: \"i\" е заглавието за събитието, в \"also\" са останалите "
+             "([{\"i\": …, \"h\": първите 6 думи}]), а \"why\" е за събитието като цяло. Същата тема НЕ е същото събитие (две различни новини за Fed са две новини). "
+             "Без дубли — \"also\" е празно или липсва.")
 LAST_DIAG: dict = {}
 # 19.10.2026 (трети преглед, т. 12): празните новини не са тиха липса — {"ok", "reason", "count"} → банер в брифа (data_warnings)
 LAST_STATUS: dict = {}
@@ -483,9 +527,11 @@ def significant_news(max_items: int = 8) -> list[dict]:
         # 19.10.2026 (трети преглед, С3 + "why" = заглавието): ехо на заглавието за проверка на индекса; why — само ефектът, без преразказ и без числа извън източника
         "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен. "
         "\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието (то е в headline_bg) и не носи числа, "
-        "които ги няма в \"t\" или \"d\" на същата новина.\n\n"
+        "които ги няма в \"t\" или \"d\" на същата новина.\n"
+        # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина
+        f"{ALSO_RULE}\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
-        'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "headline_bg": "..."}]}'
+        'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "headline_bg": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}'
     )
     try:
         from src import ai_brief

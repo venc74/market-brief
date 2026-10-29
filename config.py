@@ -657,6 +657,11 @@ NEWS_RSS_FEEDS = {
 # Цена: ~3100 → ~5600 входни токена за едно извикване на дневния news филтър.
 NEWS_PER_SOURCE_LIMIT = int(os.getenv("NEWS_PER_SOURCE_LIMIT", 50))
 NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
+# 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина. Заглавията за същото събитие се сливат в един ред (news_aggregator.pick_verbatim, "also" от модела);
+# основното е от най-надеждния източник по този ред (агенциите първо — първоизточник; после FT, CNBC; при крипто CoinDesk пред Cointelegraph), останалите — „също: …“.
+# Измерено на ръка в последните 24 брифа (28.09–29.10, 191 новини): 8 сигурни двойки за едно събитие в 7 дни (29.10 ×2: Alphabet/Google, Fed; 23.10 tech разпродажбата;
+# 22.10 петролът; 21.10 SpaceX–Tesla; 16.10 Warsh; 13.10 МВФ; 28.09 САЩ–Китай) + 4 гранични (реакция на пазара на същото събитие: 08.10, 14.10, 19.10, 28.10).
+NEWS_SOURCE_PRIORITY = ["Reuters Business", "AP Business", "Financial Times", "CNBC", "Reuters", "CoinDesk", "Cointelegraph"]
 # ── Крипто секция (22.10.2026, етап 4 — решения от 21–22.10) — виж src/crypto_news.py ──
 ENABLE_CRYPTO_SECTION = os.getenv("ENABLE_CRYPTO_SECTION", "1") == "1"
 CRYPTO_RSS_URL = os.getenv("CRYPTO_RSS_URL", "https://cointelegraph.com/rss")      # „?format=rss“ връща HTML страницата; фийдът държи 30 заглавия ≈ 25 часа

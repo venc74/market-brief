@@ -51,6 +51,10 @@ def select(data, pool: list[dict], max_items: int | None = None) -> tuple[list[d
     for n in raw:
         if isinstance(n, dict) and isinstance(n.get("i"), int) and not isinstance(n.get("i"), bool) and 0 <= n["i"] < len(pool):
             cat_by_title.setdefault(pool[n["i"]]["title"], n.get("cat"))
+            for a in n.get("also") if isinstance(n.get("also"), list) else []:                 # 29.10.2026: основното заглавие може да е от "also" (по-надеждният източник)
+                k = a.get("i") if isinstance(a, dict) else a
+                if isinstance(k, int) and not isinstance(k, bool) and 0 <= k < len(pool):
+                    cat_by_title.setdefault(pool[k]["title"], n.get("cat"))
     out, etf = [], 0
     for p in picked:
         cat = cat_by_title.get(p["headline"])
@@ -63,7 +67,8 @@ def select(data, pool: list[dict], max_items: int | None = None) -> tuple[list[d
                 dropped.append({"headline": p["headline"], "reason": "второ заглавие за ETF потоци"})
                 continue
         src = next((r for r in pool if r["title"] == p["headline"]), {})
-        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "cat": cat, "cat_label": CATEGORIES[cat], "why": p["why"]})
+        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "cat": cat, "cat_label": CATEGORIES[cat], "why": p["why"],
+                    **({"also": p["also"]} if p.get("also") else {})})
     return out[:max_items], dropped
 
 
