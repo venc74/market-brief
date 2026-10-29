@@ -706,6 +706,12 @@ THESIS_PICK_MAX_TOKENS = int(os.getenv("THESIS_PICK_MAX_TOKENS", 600))
 ENABLE_WATCH_MONITOR = os.getenv("ENABLE_WATCH_MONITOR", "1") == "1"
 WATCH_NEWS_WINDOW_HOURS = int(os.getenv("WATCH_NEWS_WINDOW_HOURS", 24))
 WATCH_MAX_NEWS_PER_TICKER = int(os.getenv("WATCH_MAX_NEWS_PER_TICKER", 6))
+# 29.10.2026 (разходката, т. 6): новините — от RSS на Yahoo Finance по тикър (yfinance .news връща нищо: 0 и за AAPL на 29.10; в историята BLSH е с новини само 22–23.09).
+# Фийдът по тикър носи и чужди статии (за "AI" на 29.10: SoundHound, BigBear.ai, Palantir, „3 unpopular stocks“) — новина минава само ако споменава компанията
+# (името без "Inc." и т.н., тикъра в скоби / "NYSE:" / "$", или — за тикър от 3+ букви — самия тикър с главни букви). Измерено 29.10 върху 14-те фийда: 171 от 262 заглавия минават;
+# при "AI" минават 13 от 20 — всичките за C3.ai.
+WATCH_NEWS_RSS = os.getenv("WATCH_NEWS_RSS", "https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&region=US&lang=en-US")
+WATCH_RS_SESSIONS = (20, 60)                       # 29.10.2026 (т. 6): RS спрямо SPY за 4 и 12 седмици — както секторната карта (sector_layer)
 # Form 4 подаването изостава от самата сделка с дни — 30д прозорец улавя и
 # закъснели filings, AI-то вижда датата на транзакцията и преценява сам.
 WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))

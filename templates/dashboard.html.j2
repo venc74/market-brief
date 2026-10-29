@@ -173,18 +173,6 @@
   /* ── 🔎 Наблюдавани тикъри (2026-09-18) ── */
   .wm-note { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
   .wm-note code { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
-  .wm-grid { display: grid; gap: 12px; }
-  .wm-card { background: var(--panel); border: 1px solid var(--line);
-                border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--regime); }
-  .wm-card.quiet { border-left-color: var(--line); }
-  .wm-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .wm-ticker { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 15px; }
-  .wm-badge { font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
-                 padding: 2px 7px; border-radius: 4px; }
-  .wm-badge.cluster { color: var(--red); background: rgba(248,113,113,.14); }
-  .wm-badge.insider { color: var(--yellow); background: rgba(251,191,36,.12); }
-  .wm-badge.news { color: var(--muted); background: rgba(133,147,179,.12); }
-  .wm-quiet { color: var(--muted); font-size: 13px; margin-top: 8px; }
   .wm-summary { font-size: 13.5px; margin-top: 9px; }
   .wm-news { margin: 8px 0 0 0; padding-left: 18px; font-size: 13px; }
   .wm-news li { margin-bottom: 3px; }
@@ -198,6 +186,29 @@
   .wm-insider td.sell { color: var(--red); }
   .wm-read { font-size: 13px; margin-top: 9px; }
   .wm-xref { font-size: 12.5px; color: var(--regime); margin-top: 7px; }
+  /* 29.10.2026 (разходката, т. 6): една таблица — ред на тикър с факти от кода; новините, Form 4 и AI резюмето се разгъват с клик под реда */
+  .wt { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .wt-row { display: grid; grid-template-columns: 1.35fr 1fr .95fr 1fr .85fr 1.75fr 1.05fr; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line);
+    font-size: 12.5px; align-items: baseline; }
+  .wt-head { font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+  .wt > :last-child, .wt > :last-child .wt-row { border-bottom: 0; }
+  .wt-t { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 13.5px; }
+  .wt-name { display: block; font-size: 11px; color: var(--muted); font-weight: 400; font-family: "IBM Plex Sans", sans-serif; }
+  .wt-num { font-family: "IBM Plex Mono", monospace; }
+  .wt-up { color: var(--green); } .wt-dn { color: var(--red); } .wt-mu { color: var(--muted); }
+  .wt-mark { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; padding: 1px 6px; border-radius: 4px; background: rgba(133,147,179,.14); margin: 0 3px 3px 0; display: inline-block; }
+  details.wt-item > summary { list-style: none; cursor: pointer; }
+  details.wt-item > summary::-webkit-details-marker { display: none; }
+  details.wt-item > summary .wt-t::before { content: "▸ "; color: var(--regime); }
+  details.wt-item[open] > summary .wt-t::before { content: "▾ "; }
+  .wt-plain .wt-t::before { content: "  "; white-space: pre; }
+  .wt-detail { padding: 2px 14px 12px 30px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 760px) {
+    .wt-row { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+    .wt-head { display: none; }
+    .wt-row > [data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-size: 11px; }
+    .wt-detail { padding-left: 14px; }
+  }
 
   /* ── v2: thesis monitor ── */
   .theses { display: grid; gap: 12px; }
@@ -681,23 +692,31 @@
   {% if not watch %}
   <div class="small" style="font-size:12.5px;color:var(--muted)">Списъкът е празен — тикъри се добавят в <code>data/watch_list.json</code>; ефектът е видим в следващия дневен бриф.</div>
   {% endif %}
-  <div class="wm-grid">
+  {# 29.10.2026 (разходката, т. 6): ред с факти от кода (без AI); тикър със събития (новини / Form 4) се разгъва с клик; без събития — само редът #}
+  {% macro wt_cells(w) %}{% set f = w.facts or {} %}{% set p = f.price or {} %}{% set sh = f.short or {} %}{% set e = f.earnings or {} %}
+    <span class="wt-t">{{ w.ticker }}{% if w.name %}<span class="wt-name">{{ w.name }}</span>{% endif %}</span>
+    <span data-l="Цена · ден" class="wt-num">{% if p.close is defined %}${{ "%.2f"|format(p.close) }} <span class="{{ 'wt-up' if p.chg_1d_pct > 0 else ('wt-dn' if p.chg_1d_pct < 0 else 'wt-mu') }}">{{ "%+.1f"|format(p.chg_1d_pct) }}%</span>{% else %}—{% endif %}</span>
+    <span data-l="50 / 200DMA">{% if p.above_50 is defined %}<span class="{{ 'wt-up' if p.above_50 else 'wt-dn' }}">{{ 'над' if p.above_50 else 'под' }}</span>{% else %}<span class="wt-mu">—</span>{% endif %} / {% if p.above_200 is defined %}<span class="{{ 'wt-up' if p.above_200 else 'wt-dn' }}">{{ 'над' if p.above_200 else 'под' }}</span>{% else %}<span class="wt-mu" title="под 200 сесии история">—</span>{% endif %}</span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1">{% for n in [20, 60] %}{% set v = p.get('rs_' ~ n) %}{% if v is not none %}<span class="{{ 'wt-up' if v > 0 else ('wt-dn' if v < 0 else 'wt-mu') }}">{{ "%+.1f"|format(v) }}%</span>{% else %}<span class="wt-mu">—</span>{% endif %}{{ " / " if loop.first else "" }}{% endfor %}</span>
+    <span data-l="Отчет">{% if e.next %}{{ e.next[8:10] }}.{{ e.next[5:7] }}{% if e.days is not none %} <span class="wt-mu">({{ "днес" if e.days == 0 else ("след " ~ e.days ~ " дни" if e.days > 1 else "утре") }})</span>{% endif %}{% elif e.status == "no_date" %}<span class="wt-mu">няма дата</span>{% else %}<span class="wt-mu">—</span>{% endif %}</span>
+    <span data-l="Short interest">{% if sh.pct_float is defined %}<span class="wt-num">{{ "%.1f"|format(sh.pct_float) }}%</span> от float{% if sh.days_to_cover is defined %} · {{ "%.1f"|format(sh.days_to_cover) }} дни{% endif %}{% if sh.chg_pct is defined %} · <span class="wt-num">{{ "%+.1f"|format(sh.chg_pct) }}%</span>{% if sh.prior_as_of %} <span class="wt-mu">спрямо {{ sh.prior_as_of[8:10] }}.{{ sh.prior_as_of[5:7] }}</span>{% endif %}{% endif %}{% if sh.as_of %} <span class="wt-mu">· към {{ sh.as_of[8:10] }}.{{ sh.as_of[5:7] }}</span>{% endif %}{% else %}<span class="wt-mu">—</span>{% endif %}</span>
+    <span data-l="В брифа">{% for m in w.in_brief or [] %}<span class="wt-mark">{{ m }}</span>{% endfor %}{% if w.news %}<span class="wt-mark">{{ w.news|length }} новини</span>{% endif %}{% if w.insider %}<span class="wt-mark" style="color:var(--yellow)">Form 4 · {{ w.insider|length }}</span>{% endif %}{% if w.insider_cluster %}<span class="wt-mark" style="color:var(--red)">CLUSTER</span>{% endif %}</span>
+  {% endmacro %}
+  {% if watch %}
+  <div class="wt">
+    <div class="wt-row wt-head"><span>Тикър</span><span>Цена · ден</span><span>50 / 200DMA</span><span>RS 4 / 12 седм.</span><span>Отчет</span><span>Short interest</span><span>В брифа · събития</span></div>
     {% for w in watch %}
-    <div class="wm-card{% if w.quiet %} quiet{% endif %}">
-      <div class="wm-head">
-        <span class="wm-ticker">{{ w.ticker }}</span>
-        {% if w.insider_cluster %}<span class="wm-badge cluster">CLUSTER</span>{% endif %}
-        {% if w.insider %}<span class="wm-badge insider">Form 4 · {{ w.insider|length }}</span>{% endif %}
-        {% if w.news %}<span class="wm-badge news">{{ w.news|length }} новини</span>{% endif %}
-      </div>
-      {% if w.quiet %}
-        <div class="wm-quiet">Няма значими събития за последните 24 часа — нито новини, нито Form 4 подавания.</div>
-      {% else %}
+    {% if w.quiet %}
+    <div class="wt-row wt-plain">{{ wt_cells(w) }}</div>
+    {% else %}
+    <details class="wt-item">
+      <summary class="wt-row">{{ wt_cells(w) }}</summary>
+      <div class="wt-detail">
         {% if w.ai and w.ai.summary %}<div class="wm-summary">{{ w.ai.summary }}</div>{% endif %}
         {% if w.news %}
         <ul class="wm-news">
           {% for n in w.news %}
-          <li>{{ n.title }}{% if n.publisher %} <span class="wm-src">· {{ n.publisher }}</span>{% endif %}</li>
+          <li>{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a href="{{ n.link }}" target="_blank" rel="noopener noreferrer" style="color:var(--text)">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}{% if n.publisher %} <span class="wm-src">· {{ n.publisher }}</span>{% endif %}{% if n.when %} <span class="wm-src">· {{ n.when[8:10] }}.{{ n.when[5:7] }} {{ n.when[11:16] }} UTC</span>{% endif %}</li>
           {% endfor %}
         </ul>
         {% endif %}
@@ -722,10 +741,12 @@
         {% endif %}
         {% if w.ai and w.ai.insider_read %}<div class="wm-read">{{ w.ai.insider_read }}</div>{% endif %}
         {% if w.ai and w.ai.cross_reference %}<div class="wm-xref">🔗 {{ w.ai.cross_reference }}</div>{% endif %}
-      {% endif %}
-    </div>
+      </div>
+    </details>
+    {% endif %}
     {% endfor %}
   </div>
+  {% endif %}
 </section>
 {% endif %}
 

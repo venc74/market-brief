@@ -9,7 +9,8 @@ GLB и Short Screener ТЪРСЯТ нови кандидати по критер
 24 часа".
 
 Източници — само вече налична инфраструктура, нула нови зависимости:
-  • новини: yfinance .news, keyed по ТИКЪР. Съзнателно НЕ Google News по име
+  • новини (29.10.2026): RSS на Yahoo Finance по ТИКЪР (config.WATCH_NEWS_RSS) + проверка, че новината е за компанията (about_company);
+    yfinance .news — само резерва (на 29.10 връща нищо). До 29.10: yfinance .news, keyed по ТИКЪР. Съзнателно НЕ Google News по име
     на компанията — тествано на 18.09.2026 и се чупи при двусмислени имена:
     заявка за BLSH ("Bullish") върна "Why Democrats are starting to feel
     bullish about a midterm wave" и "AI trade rebound sparks flurry of
@@ -32,12 +33,16 @@ Graceful degradation навсякъде: провал за един тикър �
 на целия модул → празен списък и брифът продължава без секцията.
 """
 from __future__ import annotations
+import calendar
 import datetime as dt
 import json
+import re
+import time
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+import requests
 import yfinance as yf
 from src import net_utils
 from src import insider_buying
@@ -58,8 +63,75 @@ def load_watch_list() -> list[str]:
         return []
 
 
-def _recent_news(ticker: str, hours: int) -> list[dict]:
-    """yfinance .news, орязан до прозореца. Провал → празен списък."""
+_NAME_SUFFIX = re.compile(r"(?:,?\s+(?:Inc\.?|Incorporated|Corporation|Corp\.?|plc|PLC|SE|N\.V\.|NV|S\.A\.|AG|Ltd\.?|Limited|Holdings?|Group|Companies|Company|Co\.?"
+                          r"|Technologies|Technology))+\.?$")
+_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+
+
+def company_keys(name: str | None) -> set[str]:
+    """29.10.2026 (т. 6): имената, по които новината се разпознава като за компанията — пълното име без "Inc." и т.н. и първата му дума (3+ знака). "C3.ai, Inc." → {"C3.ai"}."""
+    n = _NAME_SUFFIX.sub("", (name or "").strip()).strip(" ,")
+    keys = {n} if n else set()
+    first = n.split()[0] if n.split() else ""
+    if len(first) >= 3:
+        keys.add(first)
+    return keys
+
+
+def about_company(ticker: str, keys: set[str], title: str, summary: str = "") -> str | None:
+    """
+    29.10.2026 (т. 6, решение 4): за компанията ли е новината — "symbol" (тикърът в скоби, след "NYSE:" / "Nasdaq:", или с "$"), "ticker" (тикър от 3+ букви, с главни, като дума),
+    "name" (името — с главните му букви, като дума) или None. Тикър от 1–2 букви ("AI", "SN") се приема само като символ: "AI" като дума е изкуственият интелект. Чиста функция.
+    """
+    text = f"{title or ''} {summary or ''}"
+    t = re.escape(ticker)
+    if re.search(rf"\({t}\)|\b(?:NYSE|NASDAQ|Nasdaq|NYSEAMERICAN)\s*:\s*{t}\b|\${t}\b", text):
+        return "symbol"
+    if len(ticker) >= 3 and re.search(rf"(?<![\w$]){t}(?![\w])", text):
+        return "ticker"
+    if any(re.search(rf"(?<![\w.]){re.escape(k)}(?![\w])", text) for k in keys or ()):
+        return "name"
+    return None
+
+
+def _rss_news(ticker: str, hours: int, keys: set[str], fetch=None) -> list[dict] | None:
+    """Новините от RSS на Yahoo Finance в прозореца, само за компанията (about_company); None — фийдът не се изтегли. fetch(url) → bytes (за тестове)."""
+    try:
+        import feedparser
+        url = config.WATCH_NEWS_RSS.format(ticker=ticker)
+        raw = fetch(url) if fetch else requests.get(url, timeout=15, headers=_UA).content
+        feed = feedparser.parse(raw)
+        if not feed.entries and getattr(feed, "bozo", False):
+            return None
+    except Exception as e:
+        print(f"[watch] {ticker} RSS новини: {type(e).__name__}: {e}")
+        return None
+    cutoff = time.time() - hours * 3600
+    out = []
+    for e in feed.entries:
+        pt = e.get("published_parsed") or e.get("updated_parsed")
+        ts = calendar.timegm(pt) if pt else None
+        if ts is not None and ts < cutoff:
+            continue
+        title, summary = (e.get("title") or "").strip(), re.sub(r"<[^>]+>", "", e.get("summary") or "").strip()
+        if not title or not about_company(ticker, keys, title, summary):
+            continue
+        link = e.get("link") if isinstance(e.get("link"), str) and e["link"].startswith(("https://", "http://")) else None
+        out.append({"title": title, "publisher": (e.get("source") or {}).get("title", "") if isinstance(e.get("source"), dict) else "",
+                    "when": dt.datetime.fromtimestamp(ts, dt.timezone.utc).isoformat() if ts else None, "summary": summary[:300], **({"link": link} if link else {})})
+    return out[:config.WATCH_MAX_NEWS_PER_TICKER]
+
+
+def _recent_news(ticker: str, hours: int, keys: set[str] | None = None) -> list[dict]:
+    """29.10.2026: RSS на Yahoo по тикър, само за компанията; провал на RSS → yfinance .news (също филтрирани). Провал → празен списък."""
+    got = _rss_news(ticker, hours, keys or set())
+    if got is not None:
+        return got
+    return [n for n in _yf_news(ticker, hours) if about_company(ticker, keys or set(), n["title"], n.get("summary") or "")]
+
+
+def _yf_news(ticker: str, hours: int) -> list[dict]:
+    """yfinance .news, орязан до прозореца. Провал → празен списък. (29.10.2026: само резерва — връща нищо.)"""
     try:
         items = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).news) or []
     except Exception as e:
@@ -93,6 +165,122 @@ def _recent_news(ticker: str, hours: int) -> list[dict]:
     return out[:config.WATCH_MAX_NEWS_PER_TICKER]
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# 29.10.2026 (разходката, т. 6, решение 2): компактен ред с факти от кода (без AI) за всеки тикър
+# ──────────────────────────────────────────────────────────────────────────
+def price_facts(closes, spy=None) -> dict:
+    """
+    Дневни затваряния (pandas Series, без днешния частичен бар) → цена, промяна за сесията, над/под 50DMA и 200DMA, RS спрямо SPY за 4 и 12 седмици
+    (config.WATCH_RS_SESSIONS; (1 + r) / (1 + r_SPY) − 1, както секторната ротация). Къса история → None за съответното поле. Чиста функция.
+    """
+    c = closes.dropna() if closes is not None else None
+    if c is None or len(c) < 2:
+        return {}
+    last, prev = float(c.iloc[-1]), float(c.iloc[-2])
+    out = {"date": c.index[-1].date().isoformat(), "close": round(last, 2), "chg_1d_pct": round((last / prev - 1) * 100, 2)}
+    for n in (50, 200):
+        if len(c) >= n:
+            ma = float(c.iloc[-n:].mean())
+            out[f"ma{n}"] = round(ma, 2)
+            out[f"above_{n}"] = last > ma
+    s = spy.dropna().reindex(c.index).dropna() if spy is not None else None
+    for n in config.WATCH_RS_SESSIONS:
+        if s is not None and len(c) > n and len(s) > n:
+            r, rs_ = last / float(c.iloc[-1 - n]) - 1, float(s.iloc[-1]) / float(s.iloc[-1 - n]) - 1
+            out[f"rs_{n}"] = round(((1 + r) / (1 + rs_) - 1) * 100, 1)
+    return out
+
+
+def short_facts(info: dict | None) -> dict:
+    """
+    Short interest от Yahoo .info: % от float, дни за покриване, промяна спрямо предишното отчитане (sharesShort / sharesShortPriorMonth − 1) и ДАТИТЕ на двете отчитания
+    (dateShortInterest, sharesShortPreviousMonthDate). Липсващо поле → без него. Чиста функция.
+    """
+    i = info or {}
+    day = lambda ts: dt.datetime.fromtimestamp(int(ts), dt.timezone.utc).date().isoformat() if isinstance(ts, (int, float)) and ts > 0 else None
+    out = {}
+    if isinstance(i.get("shortPercentOfFloat"), (int, float)):
+        out["pct_float"] = round(i["shortPercentOfFloat"] * 100, 1)
+    if isinstance(i.get("shortRatio"), (int, float)):
+        out["days_to_cover"] = round(i["shortRatio"], 1)
+    now, prior = i.get("sharesShort"), i.get("sharesShortPriorMonth")
+    if isinstance(now, (int, float)) and isinstance(prior, (int, float)) and prior > 0:
+        out["chg_pct"] = round((now / prior - 1) * 100, 1)
+    if day(i.get("dateShortInterest")):
+        out["as_of"] = day(i.get("dateShortInterest"))
+    if day(i.get("sharesShortPreviousMonthDate")):
+        out["prior_as_of"] = day(i.get("sharesShortPreviousMonthDate"))
+    return out
+
+
+# 29.10.2026 (т. 6): маркер, ако тикърът е и в наш скрийнър / книга — по реда на показване
+MARKER_ORDER = ("Action", "Watchlist", "QM", "GLB", "EP", "книга Action", "книга buy-stop", "книга QM", "книга GLB по Уиш")
+
+
+def brief_markers(tickers: list[str], sources: dict[str, set]) -> dict[str, list[str]]:
+    """{тикър: [маркери]} — sources: {маркер: множество тикъри} (Action, Watchlist, QM, GLB, EP, отворените записи в книгите). Чиста функция."""
+    return {t: [m for m in MARKER_ORDER if t in (sources.get(m) or set())] for t in tickers}
+
+
+def attach_markers(rows: list[dict], cards: dict[str, list | None], books: bool = True, book_records=None) -> None:
+    """
+    29.10.2026 (т. 6): row["in_brief"] = маркерите (brief_markers) — cards: {маркер: списък карти / редове с "ticker"} (Action, Watchlist, QM, GLB, EP); books → и отворените /
+    чакащите записи в книгите (Action, buy-stop, QM, GLB по Уиш). Грешка → без маркери, ред в лога (graceful).
+    """
+    try:
+        src = {k: {c.get("ticker") for c in v or [] if isinstance(c, dict)} for k, v in (cards or {}).items()}
+        if books:
+            from src import backtest
+            br = book_records or backtest.book_records
+            for label, cat in (("книга Action", backtest.CATEGORY_ACTION), ("книга buy-stop", backtest.CATEGORY_BUYSTOP), ("книга QM", backtest.CATEGORY_QM),
+                               ("книга GLB по Уиш", backtest.CATEGORY_GLB_WISH_HIGH)):
+                src[label] = {r.get("ticker") for r in br(cat, statuses=("open", "trailing", "pending"))}
+        marks = brief_markers([r["ticker"] for r in rows], src)
+        for r in rows:
+            r["in_brief"] = marks.get(r["ticker"], [])
+    except Exception as e:
+        print(f"[watch] маркерите (скрийнър / книги) пропуснати: {type(e).__name__}: {e}")
+
+
+def facts(tickers: list[str], download=None, info_fn=None, earnings_fn=None) -> dict[str, dict]:
+    """
+    {тикър: {name, price: price_facts, short: short_facts, earnings: {next, days}}} — цените с ЕДНО теглене (тикърите + SPY, 1 година, без днешния частичен бар),
+    .info и следващият отчет (enrich.earnings_info — същата логика като картите) по тикър. Провал за тикър → празните полета само за него; провал на тегленето → без цени.
+    download(tickers) → DataFrame като yf.download(group_by="ticker"); info_fn(t) → dict; earnings_fn(t) → dict (за тестове).
+    """
+    from src import sessions as _sessions
+    out = {t: {"name": None, "price": {}, "short": {}, "earnings": {}} for t in tickers}
+    if not tickers:
+        return out
+    try:
+        dl = download or (lambda ts: yf.download(ts, period="1y", auto_adjust=False, group_by="ticker", progress=False, threads=True))
+        df = _sessions.cut_today(dl(list(tickers) + ["SPY"]))
+        spy = df["SPY"]["Close"] if "SPY" in df.columns.get_level_values(0) else None
+        for t in tickers:
+            try:
+                out[t]["price"] = price_facts(df[t]["Close"], spy)
+            except Exception as e:
+                print(f"[watch] {t} цени: {type(e).__name__}: {e}")
+    except Exception as e:
+        print(f"[watch] цените не се изтеглиха: {type(e).__name__}: {e}")
+    for t in tickers:
+        try:
+            info = (info_fn or (lambda x: net_utils.fetch_with_timeout(lambda: yf.Ticker(x).info) or {}))(t) or {}
+            out[t]["name"] = info.get("longName") or info.get("shortName")
+            out[t]["short"] = short_facts(info)
+        except Exception as e:
+            print(f"[watch] {t} .info: {type(e).__name__}: {e}")
+        try:
+            if earnings_fn is None:
+                from src import enrich
+                earnings_fn = enrich.earnings_info
+            e = earnings_fn(t) or {}
+            out[t]["earnings"] = {"next": e.get("next_earnings"), "days": e.get("days_to_earnings"), "status": e.get("earnings_status")}
+        except Exception as e:
+            print(f"[watch] {t} отчет: {type(e).__name__}: {e}")
+    return out
+
+
 def _insider_cluster(txns: list[dict]) -> bool:
     """≥ INSIDER_CLUSTER_MIN_COUNT РАЗЛИЧНИ инсайдъри в клъстер прозореца."""
     if not txns:
@@ -106,17 +294,22 @@ def _insider_cluster(txns: list[dict]) -> bool:
     return False
 
 
-def collect(tickers: list[str] | None = None) -> list[dict]:
+def collect(tickers: list[str] | None = None, facts_fn=None) -> list[dict]:
     """
     Суровите данни за всеки watched тикър, БЕЗ AI слой.
 
-    Връща [{ticker, news: [...], insider: [...], insider_cluster: bool,
+    Връща [{ticker, name, facts, news: [...], insider: [...], insider_cluster: bool,
              quiet: bool}], в реда на списъка. `quiet=True` значи нула новини и
-    нула Form 4 — извикващият не бива да праща такъв тикър към AI-то.
+    нула Form 4 — извикващият не бива да праща такъв тикър към AI-то (29.10.2026: фактите на реда не са събитие).
     """
     tickers = tickers if tickers is not None else load_watch_list()
     if not tickers:
         return []
+    try:
+        fx = (facts_fn or facts)(tickers)
+    except Exception as e:
+        print(f"[watch] фактите не се изчислиха: {type(e).__name__}: {e}")
+        fx = {}
     try:
         insider = insider_buying.fetch_insider_transactions(tickers)
     except Exception as e:
@@ -125,10 +318,13 @@ def collect(tickers: list[str] | None = None) -> list[dict]:
 
     rows = []
     for tk in tickers:
-        news = _recent_news(tk, config.WATCH_NEWS_WINDOW_HOURS)
+        f = fx.get(tk) or {}
+        news = _recent_news(tk, config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
         txns = insider.get(tk, [])
         rows.append({
             "ticker": tk,
+            "name": f.get("name"),
+            "facts": {k: f.get(k) or {} for k in ("price", "short", "earnings")},
             "news": news,
             "insider": [{**t, "date": t["date"].isoformat()} for t in txns],
             "insider_cluster": _insider_cluster(txns),
