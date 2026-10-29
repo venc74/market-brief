@@ -1,0 +1,496 @@
+{
+ "_note": "РЕАЛНО: от брифа на 29.10.2026 (data/2026-10-29.json, commit 234c3c5 'brief: 2026-10-29', run от 07:30 CET) — публикуваният ai_macro (macro_brief е изрязан от json_repair на 329 знака, след «„не би било грешка»), записът в ai_usage за макро извикването (stop_reason end_turn), и входовете на макро промпта (thermometer, macro, rotation). Суровият отговор на модела НЕ е запазен никъде — продължението след кавичката в теста е СИНТЕТИЧНО и е означено там. Извадено на 29.10.2026.",
+ "ai_macro": {
+  "macro_brief": "Earnings сезонът разцепва технологичния сектор: Alphabet се срина ~10% след замразен capex за 2026 и $51 млрд. AI outlay, потискайки Nasdaq futures и рекламния онлайн сегмент; Microsoft скочи ~4% на облачен beat, частично компенсирайки натиска. Fed задържа лихвите, но изявлението на Bessent, че ново покачване „не би било грешка",
+  "сигнал": "WTI +1.74%, мед +3.72% за 5 дни — разминаване спрямо Dallas Fed Trimmed Mean PCE за август от 2.19% г/г с посока „надолу\" (средно юни–август 2.25% срещу 2.39% март–май), което означава, че пазарният натиск засега не е потвърден от измерената основна инфлация. DXY +0.63% за седмицата оказва допълнителен натиск върху чувствителни към долар активи, а антитръстовото разследване на DOJ срещу Nvidia/Hugging Face добавя регулаторен риск за AI M&A. За днешната сесия: очакват се отворени дупки в XLK/XLC; XLE и XLV остават структурно по-защитени от тези рискове.",
+  "sector_logic": [
+   {
+    "sector": "Енергетика",
+    "etf": "XLE",
+    "chain": "WTI поскъпна с 1.74% за последните 5 дни, а медта — с 3.72%, сигнализирайки глобално търсене на суровини и потенциален инфлационен рефлекс. Hawkish тон от Bessent (ново покачване на лихвата не е изключено) и steepening крива (2s10s до 0.38%, +6 б.п. за седмицата) обичайно предхождат среда, в която цените на енергоносителите остават повишени. XLE: положителна RS и на 4, и на 12 седмици — заедно с XLV; водещи по кода: XLE, XLV (по таблицата на ротацията). Механизмът: по-висок WTI директно подпомага приходите на E&P компаниите, а инфлационният рефлекс намалява относителната привлекателност на growth/tech — капиталът ротира към реални активи.",
+    "horizon_weeks": 6
+   },
+   {
+    "sector": "Здравеопазване",
+    "etf": "XLV",
+    "chain": "Hawkish Fed сигнали (Bessent: ново покачване не е грешка) и повишена несигурност около AI capex (Alphabet -10%) изтеглят капитал от висококатирани growth сектори към дефанзивно-качествени имена. XLV показва положителна RS и на двата хоризонта (4 седмици: +5.37%, 12 седмици: +7.09%) с нисък дял на исторически изоставане (15%), което го позиционира като структурен бенефициент от ротацията. Механизмът: здравеопазването генерира предвидими парични потоци, относително нечувствителни към равнището на лихвите и към цикъла на AI capex — при hawkish обрат пазарът плаща премия за тази предвидимост. Разминаването между проинфлационните сурови суровини (мед, петрол) и все още низходящата измерена инфлация не пречи на сектора, тъй като ценовата му мощ идва от структурата на търсенето, а не от commodity input costs.",
+    "horizon_weeks": 6
+   }
+  ],
+  "regime_comment": "Режимът Offensive е оправдан от данните при текущото броене: 7 зелени, 1 жълт (Put/Call SPY на 14.6-и percentile от 96 дни — в нормален диапазон, без тревожен сигнал), 0 червени от 8 видими индикатора. Fed Net Liquidity и SOFR−IORB са информативни и не влизат в броенето. Запасът до смяна е ограничен, но измерим: достатъчен е един червен индикатор, за да падне режимът до Defensive — сега няма червени. Distribution days са натрупани (SPY 6/9, QQQ 7/9) — при достигане на 9 Offensive се блокира и за SPY липсват само 2, за QQQ — само 2; това е най-близкото автоматично ограничение. IEI/HYG 10-дневната RoC е -0.23% (спада спрямо +0.78% преди 5 сесии), далеч от прага от 90-и percentile, при който би задействала override Defensive. Тревожният елемент извън броенето: SOFR−IORB е на 93.1-и percentile (5.0 б.п. към 27.10, +7 б.п. за седмица) — висок percentile, но системата го третира като термометър с висока честота на фалшиви сигнали (47–72%) и ранен сигнал само в 1 от 3 исторически кризи. Earnings разцеплението (Alphabet vs Microsoft) добавя несигурност в XLK/XLC, но не е термометърен входящ сигнал. Заключение: Offensive е коректен по правилото, но маржът на безопасност е тесен — две distribution days или един нов червен индикатор биха го сменили."
+ },
+ "ai_usage_macro": {
+  "section": "Макро бриф и секторна карта",
+  "model": "claude-sonnet-4-6",
+  "input_tokens": 9394,
+  "output_tokens": 1735,
+  "max_tokens": 8000,
+  "stop_reason": "end_turn"
+ },
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 772.31,
+    "as_of": "2026-10-28",
+    "pct_from_high": 0.87,
+    "ma50": 766.83,
+    "ma200": 725.23,
+    "above_50dma": true,
+    "above_200dma": true,
+    "status": "green",
+    "label": "SPY 772 | над 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 16.91,
+    "chg_5d": 0.23,
+    "pct_5d": 1.4,
+    "spike": false,
+    "status": "green",
+    "label": "VIX 16.9 (risk-on)"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 0.96,
+    "percentile": 14.6,
+    "history_days": 96,
+    "status": "yellow",
+    "label": "P/C 0.96 (15. percentile от 96 дни; в нормалния диапазон)"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.38,
+    "status": "green",
+    "label": "0.38% (нормален, steepening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": 5808.2,
+    "status": "yellow",
+    "informational": true,
+    "change_4w_pct": 0.14,
+    "as_of": "2026-10-21",
+    "label": "$5,808 млрд към 2026-10-21 · +0.1% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+   },
+   {
+    "name": "SOFR − IORB (финансиране)",
+    "value": 5.0,
+    "status": "yellow",
+    "informational": true,
+    "percentile": 93.1,
+    "zscore": 0.93,
+    "as_of": "2026-10-27",
+    "label": "+5.0 б.п. към 27.10 (SOFR 3.95% − IORB 3.90%) · +7.0 б.п. за седмица · 93. percentile, z +0.9 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+   },
+   {
+    "name": "MOVE (Bond Vol)",
+    "value": 94.6,
+    "as_of": "2026-10-28",
+    "delta_1w": -1.4,
+    "spike": false,
+    "status": "green",
+    "label": "MOVE 95 (-1 пункта/седмица)"
+   },
+   {
+    "name": "VIX Term Structure",
+    "value": 0.812,
+    "status": "green",
+    "label": "VIX9D 15.6 / VIX 16.9 / VIX3M 19.2 → ratio 0.81 (contango, нормално)"
+   },
+   {
+    "name": "IEI/HYG (Credit Spread)",
+    "value": 1.4758,
+    "as_of": "2026-10-28",
+    "level_percentile": 14.1,
+    "roc_10d_pct": -0.23,
+    "roc_percentile": 43.1,
+    "spike": false,
+    "status": "green",
+    "roc_10d_pct_prev": 0.78,
+    "roc_trend": "falling",
+    "roc_trend_text": "10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)",
+    "iei_10d_pct": 0.78,
+    "hyg_10d_pct": 1.02,
+    "label": "IEI/HYG 1.476 (14. percentile) · 10д RoC -0.2% (IEI +0.8%, HYG +1.0%) (43. percentile)"
+   },
+   {
+    "name": "Market Breadth (% над 40dMA)",
+    "value": 60.2,
+    "universe_size": 902,
+    "status": "green",
+    "universe_total": 903,
+    "missing_n": 1,
+    "batches": 19,
+    "batches_failed": 0,
+    "label": "60.2% над 40dMA (здравословна ширина)",
+    "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+   }
+  ],
+  "regime": "Offensive",
+  "regime_reason": "7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)",
+  "sizing_factor": 1.0,
+  "counts": "7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)",
+  "overrides": [],
+  "regime_by_count": "Offensive",
+  "exit_rule": "Режимът е по броенето (7 зелени / 1 жълт / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране) (информативни)). Няма активен автоматичен override.",
+  "hysteresis_released": [],
+  "regime_margin": {
+   "text": "Запас до смяна на режима: по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6) · distribution days SPY 6/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2) · IEI/HYG 10д RoC 43. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)",
+   "parts": [
+    "по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6)",
+    "distribution days SPY 6/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2)",
+    "IEI/HYG 10д RoC 43. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)"
+   ]
+  }
+ },
+ "macro": {
+  "date": "2026-10-29",
+  "net_liquidity": {
+   "value": 5808.2,
+   "prev": 5799.9,
+   "as_of": "2026-10-21",
+   "change_4w_pct": 0.14,
+   "window_weeks": 4,
+   "dead_zone_pct": 1.0,
+   "raw_color": "yellow",
+   "color": "yellow",
+   "trend": "flat",
+   "components": {
+    "fed_balance_bn": 6753.6,
+    "rrp_bn": 0.2,
+    "tga_bn": 945.2
+   },
+   "history": [
+    {
+     "date": "2026-09-02",
+     "nl_bn": 5792.3,
+     "walcl_bn": 6737.2,
+     "tga_bn": 944.4,
+     "rrp_bn": 0.5
+    },
+    {
+     "date": "2026-09-09",
+     "nl_bn": 5896.5,
+     "walcl_bn": 6740.6,
+     "tga_bn": 843.7,
+     "rrp_bn": 0.4
+    },
+    {
+     "date": "2026-09-16",
+     "nl_bn": 5749.5,
+     "walcl_bn": 6746.5,
+     "tga_bn": 991.7,
+     "rrp_bn": 5.4
+    },
+    {
+     "date": "2026-09-23",
+     "nl_bn": 5799.9,
+     "walcl_bn": 6747.7,
+     "tga_bn": 947.3,
+     "rrp_bn": 0.5
+    },
+    {
+     "date": "2026-09-30",
+     "nl_bn": 5747.4,
+     "walcl_bn": 6743.0,
+     "tga_bn": 984.0,
+     "rrp_bn": 11.5
+    },
+    {
+     "date": "2026-10-07",
+     "nl_bn": 5859.4,
+     "walcl_bn": 6747.6,
+     "tga_bn": 885.8,
+     "rrp_bn": 2.3
+    },
+    {
+     "date": "2026-10-14",
+     "nl_bn": 5869.6,
+     "walcl_bn": 6755.6,
+     "tga_bn": 885.8,
+     "rrp_bn": 0.2
+    },
+    {
+     "date": "2026-10-21",
+     "nl_bn": 5808.2,
+     "walcl_bn": 6753.6,
+     "tga_bn": 945.2,
+     "rrp_bn": 0.2
+    }
+   ],
+   "informational": true
+  },
+  "spread_2s10s": {
+   "value": 0.38,
+   "prev_week": 0.32,
+   "as_of": "2026-10-28",
+   "change_1w_bp": 6.0,
+   "status": "normal",
+   "direction": "steepening"
+  },
+  "global_signals": {
+   "DXY": {
+    "value": 102.25,
+    "chg_5d_pct": 0.63,
+    "bar_date": "2026-10-29"
+   },
+   "VIX": {
+    "value": 16.91,
+    "chg_5d_pct": 1.38,
+    "bar_date": "2026-10-28"
+   },
+   "Gold": {
+    "value": 4037.0,
+    "chg_5d_pct": -0.58,
+    "bar_date": "2026-10-29",
+    "chg_5d_basis": "contract",
+    "contract": "GCZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-10-29T06:21+00:00"
+   },
+   "Oil_WTI": {
+    "value": 101.2,
+    "chg_5d_pct": 1.74,
+    "bar_date": "2026-10-29",
+    "chg_5d_basis": "contract",
+    "contract": "CLZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-10-29T06:21+00:00"
+   },
+   "Copper": {
+    "value": 6.64,
+    "chg_5d_pct": 3.72,
+    "bar_date": "2026-10-29",
+    "chg_5d_basis": "contract",
+    "contract": "HGZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-10-29T06:21+00:00"
+   },
+   "US10Y": {
+    "value": 5.05,
+    "chg_5d_bp": -10.1
+   },
+   "MOVE": {
+    "value": 94.55,
+    "chg_5d_pct": -1.45,
+    "bar_date": "2026-10-28"
+   }
+  },
+  "core_inflation": {
+   "value": 2.19,
+   "date": "2026-08-01",
+   "month": "август",
+   "age_days": 59,
+   "avg_recent": 2.25,
+   "avg_prior": 2.39,
+   "change_pp": -0.14,
+   "recent_span": "юни–август",
+   "prior_span": "март–май",
+   "direction": "down",
+   "flat_threshold_pp": 0.1
+  },
+  "funding_stress": {
+   "value": 5.0,
+   "as_of": "2026-10-27",
+   "sofr": 3.95,
+   "iorb": 3.9,
+   "percentile": 93.1,
+   "zscore": 0.93,
+   "chg_1w_bp": 7.0,
+   "n_history": 2139,
+   "history_from": "2018-04-03",
+   "status": "yellow",
+   "hide": false
+  }
+ },
+ "rotation": [
+  {
+   "etf": "XLE",
+   "sector": "Енергетика",
+   "rs_chg_4w_pct": 9.91,
+   "rs_chg_12w_pct": 11.57,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 11.3,
+   "leading": true,
+   "laggard_persistence_pct": 0.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLP",
+   "sector": "Потребителски (защитни)",
+   "rs_chg_4w_pct": 6.39,
+   "rs_chg_12w_pct": -0.83,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 7.74,
+   "leading": false,
+   "laggard_persistence_pct": 45.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLU",
+   "sector": "Комунални услуги",
+   "rs_chg_4w_pct": 6.38,
+   "rs_chg_12w_pct": -6.88,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 7.73,
+   "leading": false,
+   "laggard_persistence_pct": 55.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLV",
+   "sector": "Здравеопазване",
+   "rs_chg_4w_pct": 5.37,
+   "rs_chg_12w_pct": 7.09,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 6.71,
+   "leading": true,
+   "laggard_persistence_pct": 15.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLB",
+   "sector": "Материали",
+   "rs_chg_4w_pct": 5.15,
+   "rs_chg_12w_pct": -0.32,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 6.49,
+   "leading": false,
+   "laggard_persistence_pct": 55.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLY",
+   "sector": "Потребителски (циклични)",
+   "rs_chg_4w_pct": 4.63,
+   "rs_chg_12w_pct": -3.93,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 5.96,
+   "leading": false,
+   "laggard_persistence_pct": 50.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLF",
+   "sector": "Финанси",
+   "rs_chg_4w_pct": 3.79,
+   "rs_chg_12w_pct": -4.55,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 5.11,
+   "leading": false,
+   "laggard_persistence_pct": 65.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLRE",
+   "sector": "Недвижими имоти",
+   "rs_chg_4w_pct": 1.69,
+   "rs_chg_12w_pct": -9.05,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 2.98,
+   "leading": false,
+   "laggard_persistence_pct": 70.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "XLI",
+   "sector": "Индустрия",
+   "rs_chg_4w_pct": -0.36,
+   "rs_chg_12w_pct": -9.36,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.9,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "ITA",
+   "sector": "Отбрана",
+   "rs_chg_4w_pct": -0.99,
+   "rs_chg_12w_pct": -16.27,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": 0.27,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XBI",
+   "sector": "Биотех",
+   "rs_chg_4w_pct": -1.36,
+   "rs_chg_12w_pct": 3.38,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -0.11,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLK",
+   "sector": "Технологии",
+   "rs_chg_4w_pct": -3.65,
+   "rs_chg_12w_pct": 5.22,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -2.43,
+   "leading": false,
+   "laggard_persistence_pct": 5.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "GDX",
+   "sector": "Златодобив",
+   "rs_chg_4w_pct": -5.58,
+   "rs_chg_12w_pct": 9.31,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -4.38,
+   "leading": false,
+   "laggard_persistence_pct": 0.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "SMH",
+   "sector": "Полупроводници",
+   "rs_chg_4w_pct": -7.95,
+   "rs_chg_12w_pct": 1.33,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -6.79,
+   "leading": false,
+   "laggard_persistence_pct": 40.0,
+   "confirmed_laggard": false
+  },
+  {
+   "etf": "TAN",
+   "sector": "Соларна",
+   "rs_chg_4w_pct": -7.97,
+   "rs_chg_12w_pct": -19.85,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -6.8,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "XLC",
+   "sector": "Комуникации",
+   "rs_chg_4w_pct": -8.22,
+   "rs_chg_12w_pct": -7.76,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -7.06,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  },
+  {
+   "etf": "URA",
+   "sector": "Уран/ядрена",
+   "rs_chg_4w_pct": -9.43,
+   "rs_chg_12w_pct": -9.74,
+   "rs_at_6m_high": false,
+   "abs_chg_4w_pct": -8.28,
+   "leading": false,
+   "laggard_persistence_pct": 100.0,
+   "confirmed_laggard": true
+  }
+ ]
+}

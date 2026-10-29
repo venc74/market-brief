@@ -55,6 +55,9 @@ class TruncatedResponse(RuntimeError):
 # без него реалните token числа по секции нямаше откъде да се видят.
 TRUNCATIONS: list[dict] = []
 AI_USAGE: list[dict] = []
+# 29.10.2026: последното извикване (отговорът, етикетът, аргументите) — за ЕДИНИЯ повторен опит в _parse_json, когато json_repair е изрязал текст.
+# Повтаря се само ако текстът за парсване е точно този отговор (иначе — подменено извикване в тест или чужд текст — няма повторение).
+_LAST_CALL: dict = {}
 
 # Име на извикващата функция → четим етикет за лога и брифа. Извличат се от
 # стека, за да не се пипат шестте call site-а само заради етикет.
@@ -70,12 +73,13 @@ _SECTION_LABELS = {
     "_probe": "Проверка на модела",
     "ep_catalyst_call": "EP катализатор",                    # 09.10: qm_ep.ep_catalyst_call (преди — lambda → "<lambda>")
     "crypto_news_call": "Крипто новини",                     # 22.10.2026: src/crypto_news.py
+    "_parse_json": "Повторен опит (изрязан JSON)",            # 29.10.2026: само резерва — повторният опит подава етикета на първото извикване (_section)
 }
 
 
 def _call_claude(system: str, user: str, max_tokens: int = 4000,
                  extra_messages: list[dict] | None = None,
-                 allow_truncation: bool = False) -> str:
+                 allow_truncation: bool = False, _section: str | None = None) -> str:
     """
     extra_messages: FIX 2026-08-17 (macro brief crash) — опционални допълнителни
     turns СЛЕД началния user съобщение (напр. [{"role": "assistant", "content":
@@ -103,7 +107,7 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000,
 
     # FIX 2026-09-23: stop_reason и usage се четат при ВСЯКО извикване.
     caller = sys._getframe(1).f_code.co_name
-    section = _SECTION_LABELS.get(caller, caller)
+    section = _section or _SECTION_LABELS.get(caller, caller)               # 29.10.2026: повторният опит от _parse_json носи етикета на първото извикване
     usage = resp.get("usage") or {}
     stop = resp.get("stop_reason")
     out_tok = usage.get("output_tokens")
@@ -121,11 +125,15 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000,
               f"токена ({config.CLAUDE_MODEL}). Отговорът НЕ се подава на парсера.")
         raise TruncatedResponse(f"{section}: stop_reason=max_tokens при {max_tokens}")
 
-    return "".join(b.get("text", "") for b in resp["content"]
+    text = "".join(b.get("text", "") for b in resp["content"]
                    if b.get("type") == "text")
+    _LAST_CALL.clear()
+    _LAST_CALL.update(text=text, section=section, args={"system": system, "user": user, "max_tokens": max_tokens,
+                                                        "extra_messages": extra_messages, "allow_truncation": allow_truncation})
+    return text
 
 
-def _parse_json(text: str):
+def _parse_json(text: str, _retried: bool = False):
     """
     Ниво 0 защита (FIX 2026-08-17 — крашнат production run: macro_and_sector_
     brief() нямаше НИКАКВА защита срещу malformed JSON от Claude, изключението
@@ -158,8 +166,75 @@ def _parse_json(text: str):
         repaired = json_repair.loads(clean)
         if isinstance(repaired, (dict, list)) and repaired:
             print(f"[ai] _parse_json: json_repair поправи malformed JSON ({e})")
+            cuts = repair_cuts(clean, repaired, extra_data=e.msg == "Extra data")
+            if cuts:
+                last = dict(_LAST_CALL)
+                own = last.get("text") == text
+                section = last.get("section") if own else _SECTION_LABELS.get(sys._getframe(1).f_code.co_name, sys._getframe(1).f_code.co_name)
+                print(f"[ai] ⚠ json_repair изряза текст — {section}: " + "; ".join(f"{c['field'] or 'отговорът'} свършва на «…{c['tail']}», изпуснато «{c['lost']}…»"
+                                                                                  for c in cuts))
+                if own and not _retried:
+                    print(f"[ai] {section}: един повторен опит на извикването")
+                    try:
+                        return _parse_json(_call_claude(**last["args"], _section=section), _retried=True)
+                    except Exception as e2:
+                        print(f"[ai] {section}: повторният опит не мина ({type(e2).__name__}: {e2}) — остава поправеният отговор")
+                TRUNCATIONS.append({"section": section, "kind": "json_repair", "model": config.CLAUDE_MODEL,
+                                    "fields": [c["field"] for c in cuts if c["field"]], "tail": cuts[0]["tail"], "retried": own})
+                for c in cuts:
+                    if c["ref"]:
+                        parent, key = c["ref"]
+                        parent[key] = parent[key].rstrip() + CUT_MARK                 # видимо там, където е изрязано (страницата и имейлът)
+                print(f"[ai] ⚠ {section}: текстът е непълен днес (json_repair — и след повторния опит)" if own else
+                      f"[ai] ⚠ {section}: текстът е непълен днес (json_repair)")
             return _fix_text(repaired)
         raise
+
+
+# 29.10.2026: json_repair поправя счупения JSON, като РЕЖЕ: ASCII кавичка в текста, последвана от запетая, затваря низа — останалото се губи без грешка. Макро текстът на 29.10
+# свърши на «…ново покачване „не би било грешка» (329 знака; stop_reason end_turn) — моделът е затворил българския цитат с ASCII ". Проверката: низ от поправения JSON, който в
+# суровия отговор продължава след кавичката с текст, а не с JSON синтаксис (, } ] :) — изрязан; низ с отворена „ без затваряща; или поправеният JSON е с ≥ REPAIR_LOSS_CHARS знака
+# (без интервалите) по-къс от суровия отговор. Измерено върху историята (13.06–29.10, 3322 текстови полета): 1 изрязано поле — 29.10.
+REPAIR_LOSS_CHARS = 40
+_JSON_AFTER_COMMA = re.compile(r'\s*(?:["{\[\]}\-\d]|true\b|false\b|null\b)')
+
+
+CUT_MARK = " … ✂ текстът е непълен днес"
+
+
+def _strings(o, path: str = ""):
+    """(път, родител, ключ, низ) за всеки низ в JSON-а."""
+    items = o.items() if isinstance(o, dict) else enumerate(o) if isinstance(o, list) else ()
+    for k, v in items:
+        p = (f"{path}.{k}" if path else str(k)) if isinstance(o, dict) else f"{path}[{k}]"
+        if isinstance(v, str):
+            yield p, o, k, v
+        else:
+            yield from _strings(v, p)
+
+
+def repair_cuts(raw: str, repaired, extra_data: bool = False) -> list[dict]:
+    """Изрязаните от json_repair низове: [{field, tail, lost, ref}] (field None — загуба само по дължината; ref = (родител, ключ) за маркера). Не пипа repaired."""
+    cuts = []
+    for path, parent, key, s in _strings(repaired):
+        if len(s) < 10:
+            continue
+        enc = json.dumps(s, ensure_ascii=False)[1:-1]
+        i = raw.find(enc)
+        j = i + len(enc)
+        cut = False
+        if i >= 0 and raw[j:j + 1] == '"':
+            rest = raw[j + 1:].lstrip()
+            cut = bool(rest) and not (rest[0] in '}]:"' or (rest[0] == "," and _JSON_AFTER_COMMA.match(rest[1:])))      # '"' — липсваща запетая преди следващия низ
+        if cut or s.count("„") > s.count("“") + s.count("”") + s.count('"'):
+            lost = raw[j + 1:j + 61].strip() if cut else ""
+            cuts.append({"field": path, "tail": s[-60:], "lost": lost, "ref": (parent, key)})
+    if not cuts and not extra_data:
+        n_raw = len(re.sub(r"\s", "", re.sub(r"\\u[0-9a-fA-F]{4}", "u", raw)))
+        n_rep = len(re.sub(r"\s", "", json.dumps(repaired, ensure_ascii=False)))
+        if n_raw - n_rep >= REPAIR_LOSS_CHARS:
+            cuts.append({"field": None, "tail": "", "lost": f"{n_raw - n_rep} знака", "ref": None})
+    return cuts
 
 
 def _fix_text(obj):
@@ -591,11 +666,15 @@ def _latin_as_bg(w: str) -> str | None:
     return out if cyr.get(out, 0) >= 2 else None
 
 
+# 29.10.2026: цитат в текста, затворен с ASCII кавичка („не би било грешка" в макро текста на 29.10), чупи JSON-а и json_repair реже низа там — правилото е в двата промпта
+# с най-много проза; проверката и повторният опит са в _parse_json (repair_cuts).
+QUOTES_RULE = (" Цитат в текста — само с български кавички „…“ (затварящата е “); ASCII кавичка \" вътре в JSON низ затваря низа и чупи JSON-а.")
+
 SYSTEM_MACRO = """Ти си макро аналитик, който пише за опитен суинг търговец \
 (8+ години, познава Weinstein, CANSLIM, GMMA, RS Line, GLB). Системата е \
 оперативна, не образователна — без дефиниции на базови понятия, без hedging \
 фрази. Пишеш на български, тикерите и техническите термини остават на английски. \
-Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
+Връщаш САМО валиден JSON, без markdown огради, без преамбюл.""" + QUOTES_RULE
 
 
 def _macro_brief_fallback(thermometer: dict) -> dict:
@@ -993,7 +1072,7 @@ sector, etf, chain, horizon_weeks), regime_comment."""
 SYSTEM_TICKERS = """Ти си портфолио стратег за суинг търговия. Потребителят е \
 опитен (Weinstein Stage Analysis, CANSLIM, O'Neil bases, RS Line). Пишеш на \
 български, тикери и термини на английски. Бъди директен — ако setup-ът е слаб, \
-кажи го. Връщаш САМО валиден JSON."""
+кажи го. Връщаш САМО валиден JSON.""" + QUOTES_RULE
 
 
 # 08.10.2026 (2б): блокът "ВЧЕРАШНИ WATCHLIST TRIGGER-И" и всичко около него (_load_prior_watchlist_triggers, prior_trigger_usable, _live_v2_positions, _POSITION_WORDING)
