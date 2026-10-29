@@ -67,6 +67,36 @@ def select(data, pool: list[dict], max_items: int | None = None) -> tuple[list[d
     return out[:max_items], dropped
 
 
+def pool_record(pool: list[dict], data, items: list[dict], dropped: list[dict]) -> list[dict]:
+    """
+    29.10.2026: целият пул в данните на брифа — [{i, title, status, cat?, reason?}]; status: "избрана" / "махната от кода" (AI я избра, проверката я махна — reason) /
+    "не е избрана от AI". Причината: на 29.10 не се виждаше дали „DTCC unit launches tokenization services“ (28.10, 13:19 UTC) е била в пула и е отсята, или фийдът не я е дал. Чиста функция.
+    """
+    picked = {x.get("headline") for x in items or []}
+    ai = {}
+    for n in (data.get("news", []) if isinstance(data, dict) else []):
+        if isinstance(n, dict) and isinstance(n.get("i"), int) and not isinstance(n.get("i"), bool) and 0 <= n["i"] < len(pool):
+            ai.setdefault(n["i"], n.get("cat"))
+    why = {}
+    for d in dropped or []:
+        k = d.get("i") if isinstance(d.get("i"), int) else next((j for j, r in enumerate(pool) if r["title"] == d.get("headline")), None)
+        if k is not None:
+            why.setdefault(k, d.get("reason"))
+    out = []
+    for k, r in enumerate(pool):
+        row = {"i": k, "title": r["title"]}
+        if r["title"] in picked:
+            row["status"] = "избрана"
+        elif k in ai:
+            row.update(status="махната от кода", reason=why.get(k) or "след проверките")
+        else:
+            row["status"] = "не е избрана от AI"
+        if k in ai:
+            row["cat"] = ai[k]
+        out.append(row)
+    return out
+
+
 def cot_reading(pts: list[dict] | None) -> dict | None:
     """COT за Bitcoin (CME, managed money net) — последният отчет и перцентилът му спрямо прозореца на COT модула (същата сметка като екстремумите). < 10 точки → None."""
     from src import cot
@@ -108,7 +138,7 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
     """
     LAST_STATUS.clear()
     LAST_STATUS.update(ok=False, reason="не завърши", count=0)
-    out = {"ok": False, "items": [], "pool": 0, "reason": None, "tickers": [], "cot_btc": None}
+    out = {"ok": False, "items": [], "pool": 0, "pool_items": [], "reason": None, "tickers": [], "cot_btc": None}
     path = cache_path or (config.DATA_DIR / "crypto_news_cache.json")
     try:
         cached = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -116,7 +146,7 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
         cached = {}
     try:
         if cached.get("date") == today and "items" in cached:
-            out.update(ok=True, items=cached["items"], pool=cached.get("pool", 0), reason=cached.get("reason"))
+            out.update(ok=True, items=cached["items"], pool=cached.get("pool", 0), pool_items=cached.get("pool_items", []), reason=cached.get("reason"))
         else:
             from src import news_aggregator
             pool = (fetch or (lambda: news_aggregator._fetch_rss(config.CRYPTO_RSS_URL, "Cointelegraph", config.CRYPTO_NEWS_HOURS, limit=50)))()
@@ -130,9 +160,10 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
                 items, dropped = select(data, pool)
                 for d in dropped:
                     print(f"[crypto] ⚠ {d.get('reason')}: {d.get('headline') or d.get('h') or d.get('i')}")
-                out.update(ok=True, items=items)
+                pool_items = pool_record(pool, data, items, dropped)                    # 29.10.2026: целият пул и какво стана с всяко заглавие
+                out.update(ok=True, items=items, pool_items=pool_items)
                 try:
-                    path.write_text(json.dumps({"date": today, "items": items, "pool": len(pool)}, ensure_ascii=False), encoding="utf-8")
+                    path.write_text(json.dumps({"date": today, "items": items, "pool": len(pool), "pool_items": pool_items}, ensure_ascii=False), encoding="utf-8")
                 except Exception as e:
                     print(f"[crypto] кешът не се записа: {type(e).__name__}")
     except Exception as e:
