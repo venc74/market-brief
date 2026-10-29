@@ -1,9 +1,11 @@
 """
 22.10.2026 (етап 4 — решения от 21–22.10): крипто секция. Новините са от RSS на Cointelegraph (config.CRYPTO_RSS_URL — https://cointelegraph.com/rss; адресът „?format=rss“
 връща HTML страница) през същия начин като новините: AI избира по индекс и дава само „защо“, а заглавието и източникът са ДОСЛОВНИ от фийда (news_aggregator.pick_verbatim).
-Минава: регулация, ETF потоци и одобрения, големи хакове и фалити, решения на големи борси и банки, макро с ефект върху крипто. Не минава: прогнози и дневни отчети за цената,
-малки монети, мнения на анализатори, обзори. Измерено 21.10 върху 304 реални заглавия (30.09–21.10, моя преценка по критериите): минават 50, т.е. 0–6 на ден; истинският
-филтър се проверява на живо първите дни. Под новините: COIN, HOOD, CRCL, BLSH (последен close и промяна) и COT за Bitcoin — само в първия бриф след нов отчет на CFTC.
+29.10.2026 (разходката, т. 4, решение (а)): мерилото вече не е списък с категории, а въпросът „би ли променила тази новина решението на институционален инвеститор в крипто след
+седмица?“ с изрични примери — да: навлизането на традиционните финанси (токенизация на ценни книжа, DTCC, големи банки, стейбълкойни, регулатори); не: прогнози за цената, малки
+монети, мнения. Таван config.CRYPTO_MAX_ITEMS (5), дневните потоци в ETF — най-много един ред ("etf_flows": true). Повод: на 28.10 „DTCC unit launches tokenization services“ беше
+в пула и не мина. До 29.10 кодът махаше и избраното с категория извън списъка (DTCC с „tokenization“ щеше да падне и при избор).
+Под новините: COIN, HOOD, CRCL, BLSH (последен close и промяна) и COT за Bitcoin — само в първия бриф след нов отчет на CFTC.
 Без значими новини — един ред. Всяка грешка → празен резултат с причина (graceful); кеш по ден (повторен run не вика AI втори път).
 """
 from __future__ import annotations
@@ -13,26 +15,31 @@ import json
 
 import config
 
-CATEGORIES = {"regulation": "регулация", "etf_flows": "ETF потоци", "hack": "голям хак / фалит", "exchange_bank": "решение на голяма борса / банка", "macro": "макро с ефект върху крипто"}
 LAST_STATUS: dict = {}
 
 _SYSTEM = ("Ти си редактор на крипто новини за суинг търговец. Връщаш САМО валиден JSON. Избираш по индекс от дадените заглавия; не пишеш и не превеждаш заглавия, "
            "не измисляш факти и не добавяш числа, които ги няма в заглавието или резюмето. Не даваш препоръка за покупка или продажба.")
+# 29.10.2026 (разходката, т. 4а): въпросът и примерите — вместо затворения списък с категории
+QUESTION = "би ли променила тази новина решението на институционален инвеститор в крипто след седмица?"
+IMPORTANT = ("навлизането на традиционните финанси — токенизация на ценни книжа и фондове, DTCC, NYSE / ICE, Nasdaq, CME, големи банки и управители на активи "
+             "(JPMorgan, BlackRock, Fidelity …), стейбълкойни и техните емитенти; решения на регулатори (SEC, CFTC, OCC, Fed, ЕК / MiCA) и закони; одобрения на ETF "
+             "и необичайни потоци в тях; големи хакове и фалити (над около $50 млн. или голяма борса / доставчик); решения на големи борси")
+NOT_IMPORTANT = ("прогнози и дневни отчети за цената (дори когато се обясняват с макро — макрото е другаде в брифа), малки монети и технически ъпгрейди, мнения и анализи, "
+                 "проучвания, обзори")
 
 
 def _prompt(pool: list[dict], max_items: int) -> str:
-    compact = [{"i": k, "t": r["title"], "d": r.get("summary") or ""} for k, r in enumerate(pool)]
-    cats = "\n".join(f'- "{k}": {v}' for k, v in CATEGORIES.items())
-    return ("От тези крипто новини избери САМО значимите за пазара:\n"
-            f"{cats}\n"
-            "Голям хак или фалит = над около $50 млн. или голяма борса / доставчик; регулация = голяма юрисдикция (САЩ, ЕС, Обединеното кралство, Азия) или правило, което засяга голяма борса или стейбълкойн.\n"
-            "НЕ избирай: прогнози и дневни отчети за цената (дори когато се обясняват с макро — макрото е другаде в брифа), малки монети и технически ъпгрейди, мнения и анализи, "
-            "проучвания, обзори, повторение на вече избрано събитие.\n"
-            f"Най-много {max_items} новини и най-много 1 за ETF потоци. Ако няма значима — върни празен списък.\n"
-            "За всяка: \"i\" (индексът), \"h\" (ДОСЛОВНО първите 6 думи на заглавието \"t\" — кодът проверява индекса), \"cat\" (ключ от списъка), "
-            "\"why\" (ЕДНО изречение на български — ефектът за крипто пазара или за COIN / HOOD / CRCL / BLSH; без числа, които ги няма в \"t\" или \"d\").\n\n"
+    from src import news_aggregator
+    compact = [{"i": k, "s": r.get("source"), "t": r["title"], "d": r.get("summary") or ""} for k, r in enumerate(pool)]
+    return (f"От тези крипто новини избери САМО тези, за които отговорът на въпроса е „да“: {QUESTION}\n"
+            f"Важно — да: {IMPORTANT}.\n"
+            f"Не: {NOT_IMPORTANT}.\n"
+            f"Най-много {max_items} новини; дневните потоци в ETF — най-много една (отбележи я с \"etf_flows\": true). Ако няма такава — върни празен списък.\n"
+            f"{news_aggregator.ALSO_RULE}\n"
+            "За всяка: \"i\" (индексът), \"h\" (ДОСЛОВНО първите 6 думи на заглавието \"t\" — кодът проверява индекса), "
+            "\"why\" (ЕДНО изречение на български — какво променя за институционалния инвеститор в крипто или за COIN / HOOD / CRCL / BLSH; без числа, които ги няма в \"t\" или \"d\").\n\n"
             f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False)}\n\n"
-            'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи", "cat": "regulation", "why": "..."}]}')
+            'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи", "why": "...", "etf_flows": false, "also": [{"i": 3, "h": "първите шест думи"}]}]}')
 
 
 def crypto_news_call(system: str, user: str) -> str:
@@ -42,46 +49,46 @@ def crypto_news_call(system: str, user: str) -> str:
 
 
 def select(data, pool: list[dict], max_items: int | None = None) -> tuple[list[dict], list[dict]]:
-    """Отговорът на AI → [{headline, source, link, cat, cat_label, why}]: индекс и ехо през news_aggregator.pick_verbatim; категория от списъка; най-много 1 за ETF потоци. Чиста функция."""
+    """
+    Отговорът на AI → [{headline, source, link, why, also?}]: индекс и ехо през news_aggregator.pick_verbatim (и сливането на дублите — "also"); най-много 1 ред за дневни потоци
+    в ETF ("etf_flows": true от модела). 29.10.2026: без проверка по категории — мерилото е въпросът в промпта. Чиста функция.
+    """
     from src import news_aggregator
     max_items = max_items or config.CRYPTO_MAX_ITEMS
     raw = data.get("news", []) if isinstance(data, dict) else []
     picked, dropped = news_aggregator.pick_verbatim(raw, pool, len(pool))
-    cat_by_title = {}
+    flows_by_title = {}
     for n in raw:
         if isinstance(n, dict) and isinstance(n.get("i"), int) and not isinstance(n.get("i"), bool) and 0 <= n["i"] < len(pool):
-            cat_by_title.setdefault(pool[n["i"]]["title"], n.get("cat"))
-            for a in n.get("also") if isinstance(n.get("also"), list) else []:                 # 29.10.2026: основното заглавие може да е от "also" (по-надеждният източник)
-                k = a.get("i") if isinstance(a, dict) else a
+            ks = [n["i"]] + [a.get("i") if isinstance(a, dict) else a for a in (n.get("also") if isinstance(n.get("also"), list) else [])]
+            for k in ks:                                                                       # основното заглавие може да е от "also" (по-надеждният източник)
                 if isinstance(k, int) and not isinstance(k, bool) and 0 <= k < len(pool):
-                    cat_by_title.setdefault(pool[k]["title"], n.get("cat"))
+                    flows_by_title.setdefault(pool[k]["title"], n.get("etf_flows") is True)
     out, etf = [], 0
     for p in picked:
-        cat = cat_by_title.get(p["headline"])
-        if cat not in CATEGORIES:
-            dropped.append({"headline": p["headline"], "reason": f"категория извън списъка ({cat})"})
-            continue
-        if cat == "etf_flows":
+        if flows_by_title.get(p["headline"]):
             etf += 1
             if etf > 1:
-                dropped.append({"headline": p["headline"], "reason": "второ заглавие за ETF потоци"})
+                dropped.append({"headline": p["headline"], "reason": "второ заглавие за дневни потоци в ETF"})
                 continue
         src = next((r for r in pool if r["title"] == p["headline"]), {})
-        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "cat": cat, "cat_label": CATEGORIES[cat], "why": p["why"],
-                    **({"also": p["also"]} if p.get("also") else {})})
+        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "why": p["why"], **({"also": p["also"]} if p.get("also") else {})})
+    if len(out) > max_items:
+        dropped += [{"headline": x["headline"], "reason": f"над тавана от {max_items}"} for x in out[max_items:]]
     return out[:max_items], dropped
 
 
 def pool_record(pool: list[dict], data, items: list[dict], dropped: list[dict]) -> list[dict]:
     """
-    29.10.2026: целият пул в данните на брифа — [{i, title, status, cat?, reason?}]; status: "избрана" / "махната от кода" (AI я избра, проверката я махна — reason) /
-    "не е избрана от AI". Причината: на 29.10 не се виждаше дали „DTCC unit launches tokenization services“ (28.10, 13:19 UTC) е била в пула и е отсята, или фийдът не я е дал. Чиста функция.
+    29.10.2026: целият пул в данните на брифа — [{i, title, status, reason?}]; status: "избрана" / "слята с избрана" (същото събитие — в „също“) / "махната от кода" (AI я избра,
+    проверката я махна — reason) / "не е избрана от AI". Причината: на 29.10 не се виждаше дали „DTCC unit launches tokenization services“ (28.10, 13:19 UTC) е била в пула и е отсята, или фийдът не я е дал. Чиста функция.
     """
     picked = {x.get("headline") for x in items or []}
+    merged = {a.get("headline") for x in items or [] for a in x.get("also") or []}
     ai = {}
     for n in (data.get("news", []) if isinstance(data, dict) else []):
         if isinstance(n, dict) and isinstance(n.get("i"), int) and not isinstance(n.get("i"), bool) and 0 <= n["i"] < len(pool):
-            ai.setdefault(n["i"], n.get("cat"))
+            ai.setdefault(n["i"], True)
     why = {}
     for d in dropped or []:
         k = d.get("i") if isinstance(d.get("i"), int) else next((j for j, r in enumerate(pool) if r["title"] == d.get("headline")), None)
@@ -92,12 +99,12 @@ def pool_record(pool: list[dict], data, items: list[dict], dropped: list[dict]) 
         row = {"i": k, "title": r["title"]}
         if r["title"] in picked:
             row["status"] = "избрана"
+        elif r["title"] in merged:
+            row["status"] = "слята с избрана"
         elif k in ai:
             row.update(status="махната от кода", reason=why.get(k) or "след проверките")
         else:
             row["status"] = "не е избрана от AI"
-        if k in ai:
-            row["cat"] = ai[k]
         out.append(row)
     return out
 

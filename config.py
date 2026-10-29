@@ -666,7 +666,7 @@ NEWS_SOURCE_PRIORITY = ["Reuters Business", "AP Business", "Financial Times", "C
 ENABLE_CRYPTO_SECTION = os.getenv("ENABLE_CRYPTO_SECTION", "1") == "1"
 CRYPTO_RSS_URL = os.getenv("CRYPTO_RSS_URL", "https://cointelegraph.com/rss")      # „?format=rss“ връща HTML страницата; фийдът държи 30 заглавия ≈ 25 часа
 CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))
-CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 4))                             # най-много 4, от тях най-много 1 за ETF потоци
+CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 5))                             # 29.10.2026 (разходката, т. 4а): таван 4–5 → 5; най-много 1 ред за дневни потоци в ETF
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
 CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC
 # ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──

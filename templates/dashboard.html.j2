@@ -647,7 +647,7 @@
     {% for n in crypto["items"] %}
     <div class="news-item"><span class="news-dot"></span>
       <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}{{ news_also(n) }}
-        <span class="news-why" style="font-size:12px">· {{ n.cat_label }}</span>{% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
+        {% if n.cat_label %}<span class="news-why" style="font-size:12px">· {{ n.cat_label }}</span>{% endif %}{% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
     </div>
     {% endfor %}
   </div>
@@ -660,7 +660,7 @@
     {% for t in crypto.tickers %}<b>{{ t.ticker }}</b> ${{ "%.2f"|format(t.close) }} ({{ "%+.1f"|format(t.chg_1d_pct) }}% за сесията, {{ "%+.1f"|format(t.chg_5d_pct) }}% за 5){{ " · " if not loop.last else "" }}{% endfor %}
     <span style="color:var(--muted)"> — close към {{ crypto.tickers[0].date[8:10] }}.{{ crypto.tickers[0].date[5:7] }}</span></div>{% endif %}
   {% if crypto.get("cot_btc") %}<div class="small" style="font-size:12.5px;margin-top:6px">COT Bitcoin (CME, managed money): нетна позиция {{ "{:,}".format(crypto.cot_btc.net).replace(",", " ") }} договора към {{ crypto.cot_btc.as_of[8:10] }}.{{ crypto.cot_btc.as_of[5:7] }} — перцентил {{ "%.0f"|format(crypto.cot_btc.percentile) }} за {{ crypto.cot_btc.weeks }} седмици{% if crypto.cot_btc|cot_label %}: {{ crypto.cot_btc|cot_label }}{% endif %} (нов отчет).</div>{% endif %}
-  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI по критерии (регулация, ETF потоци, големи хакове и фалити, решения на големи борси и банки, макро с ефект върху крипто; без прогнози за цената, малки монети и мнения). Заглавието и източникът са дословни. Информация, не препоръка.</div>
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI по въпроса „би ли променила тази новина решението на институционален инвеститор в крипто след седмица?“ (важни: навлизането на традиционните финанси — токенизация, DTCC, големи банки, стейбълкойни, регулатори; не: прогнози за цената, малки монети, мнения). Заглавието и източникът са дословни. Информация, не препоръка.</div>
 </section>
 {% endif %}
 

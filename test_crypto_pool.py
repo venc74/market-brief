@@ -8,6 +8,7 @@
 РЕАЛНО: tests/fixtures/cointelegraph_rss_2026-10-29.xml — фийдът https://cointelegraph.com/rss, свален на 29.10.2026 в 10:27 UTC (30 заглавия, 27.10 15:59 → 29.10 07:32 UTC;
 SHA-256 549dc6b86857b560…); двете избрани заглавия и броят 21 — от брифа на 29.10 (data/2026-10-29.json).
 СИНТЕТИЧНО (означено): часът на run-а (06:30 UTC — 07:30 Берлин), отговорът на AI (възпроизвежда публикуваното: двете заглавия), махнатото от кода в т. 3, цените.
+29.10.2026 (разходката, т. 4а): без категории — т. 3 вече показва DTCC като избрана при избор (до 29.10 кодът я махаше заради етикета).
 Пускане: python test_crypto_pool.py
 """
 import sys, json, pathlib, tempfile, calendar, datetime as dt
@@ -33,14 +34,14 @@ h6 = lambda i: " ".join(POOL[i]["title"].split()[:6])
 px = pd.concat({t: pd.DataFrame({"Close": [100.0 + k for k in range(10)]}, index=pd.date_range("2026-10-15", periods=10, freq="B")) for t in config.CRYPTO_TICKERS}, axis=1)   # СИНТЕТИЧНИ
 
 print("── 1. пулът на 29.10 (РЕАЛНИЯТ фийд, прозорецът преди run-а) ──")
-ans = {"news": [{"i": pick["Bitcoin ETF inflows climb to $176M"], "h": h6(pick["Bitcoin ETF inflows climb to $176M"]), "cat": "etf_flows", "why": "Приток към спот Bitcoin ETF-ите."},
-                {"i": pick["Google Cloud outlines MPC service"], "h": h6(pick["Google Cloud outlines MPC service"]), "cat": "exchange_bank", "why": "Google Cloud влиза в съхранението."}]}   # СИНТЕТИЧНО
+ans = {"news": [{"i": pick["Bitcoin ETF inflows climb to $176M"], "h": h6(pick["Bitcoin ETF inflows climb to $176M"]), "etf_flows": True, "why": "Приток към спот Bitcoin ETF-ите."},
+                {"i": pick["Google Cloud outlines MPC service"], "h": h6(pick["Google Cloud outlines MPC service"]), "why": "Google Cloud влиза в съхранението."}]}   # СИНТЕТИЧНО
 out = cn.build("2026-10-29", fetch=lambda: POOL, ai_call=lambda s, u: json.dumps(ans), download=lambda t: px)
 P = out["pool_items"]
 assert out["pool"] == 21 and len(P) == 21 and [r["title"] for r in P] == [r["title"] for r in POOL]
 assert [x["headline"] for x in out["items"]] == ["Bitcoin ETF inflows climb to $176M as BTC rebounds above $80K", "Google Cloud outlines MPC service for institutional Bitcoin custody"]
 assert P[dtcc] == {"i": dtcc, "title": "DTCC unit launches tokenization services", "status": "не е избрана от AI"}
-assert [r["status"] for r in P].count("избрана") == 2 and P[pick["Google Cloud outlines MPC service"]]["cat"] == "exchange_bank"
+assert [r["status"] for r in P].count("избрана") == 2 and all("cat" not in r for r in P)                     # 29.10 (т. 4а): без категории
 print(f"  ✓ 21 заглавия в pool_items; DTCC (№ {dtcc}) — «не е избрана от AI»; двете избрани — «избрана»")
 
 print()
@@ -50,10 +51,11 @@ assert again["pool_items"] == P
 print("  ✓ повторен run — същият pool_items от кеша, без теглене и без AI")
 
 print()
-print("── 3. махнатото от кода — с причината (СИНТЕТИЧЕН отговор: DTCC с категория извън списъка) ──")
-ans2 = {"news": ans["news"] + [{"i": dtcc, "h": h6(dtcc), "cat": "tokenization", "why": "Токенизация от DTCC."}]}
+print("── 3. махнатото от кода — с причината (СИНТЕТИЧЕН отговор: втори ред за потоци в ETF); DTCC с етикет извън стария списък вече минава ──")
+etf2 = next(k for k, r in enumerate(POOL) if k not in (dtcc, *pick.values()))
+ans2 = {"news": ans["news"] + [{"i": dtcc, "h": h6(dtcc), "cat": "tokenization", "why": "Токенизация от DTCC."}, {"i": etf2, "h": h6(etf2), "etf_flows": True, "why": "Втори за потоци."}]}
 out2 = cn.build("2026-10-30", fetch=lambda: POOL, ai_call=lambda s, u: json.dumps(ans2), download=lambda t: px)
-assert out2["pool_items"][dtcc] == {"i": dtcc, "title": "DTCC unit launches tokenization services", "status": "махната от кода", "reason": "категория извън списъка (tokenization)",
-                                    "cat": "tokenization"}
-print(f"  ✓ «{out2['pool_items'][dtcc]['status']}: {out2['pool_items'][dtcc]['reason']}»")
+assert out2["pool_items"][dtcc] == {"i": dtcc, "title": "DTCC unit launches tokenization services", "status": "избрана"}                  # до 29.10: „категория извън списъка (tokenization)“
+assert out2["pool_items"][etf2] == {"i": etf2, "title": POOL[etf2]["title"], "status": "махната от кода", "reason": "второ заглавие за дневни потоци в ETF"}
+print(f"  ✓ DTCC — «избрана»; вторият за потоци — «{out2['pool_items'][etf2]['status']}: {out2['pool_items'][etf2]['reason']}»")
 print("\n✅ test_crypto_pool: всичко мина")
