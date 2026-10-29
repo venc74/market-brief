@@ -666,6 +666,11 @@ NEWS_SOURCE_PRIORITY = ["Reuters Business", "AP Business", "Financial Times", "C
 ENABLE_CRYPTO_SECTION = os.getenv("ENABLE_CRYPTO_SECTION", "1") == "1"
 CRYPTO_RSS_URL = os.getenv("CRYPTO_RSS_URL", "https://cointelegraph.com/rss")      # „?format=rss“ връща HTML страницата; фийдът държи 30 заглавия ≈ 25 часа
 CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))
+# 29.10.2026 (разходката, т. 4б): втори източник — RSS на CoinDesk (https://www.coindesk.com/arc/outboundfeeds/rss/ → 308 към адреса без наклонената черта, requests го следва).
+# Проверено 29.10 в 16:16 UTC: достъпен, 25 заглавия за 12.8 часа (29.10 03:21 → 16:11 UTC), без резюме, с директни линкове; ?size= не дава повече, секционните фийдове са 404.
+# 25 заглавия може да не покриват 30-те часа преди сутрешния run — покритието се пише в brief["crypto"]["pool_sources"] (брой и най-старото заглавие). Google News
+# (site:coindesk.com) дава ~97 за 30 часа, но с пренаписани заглавия (12 от 97 дословно като в RSS) и линкове през news.google.com — затова не е избран.
+CRYPTO_RSS_FEEDS = {"Cointelegraph": CRYPTO_RSS_URL, "CoinDesk": os.getenv("CRYPTO_COINDESK_RSS_URL", "https://www.coindesk.com/arc/outboundfeeds/rss/")}
 CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 5))                             # 29.10.2026 (разходката, т. 4а): таван 4–5 → 5; най-много 1 ред за дневни потоци в ETF
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
 CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC

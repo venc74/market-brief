@@ -1,6 +1,6 @@
 """
 22.10.2026 (етап 4 — решения от 21–22.10): крипто секция. Новините са от RSS на Cointelegraph (config.CRYPTO_RSS_URL — https://cointelegraph.com/rss; адресът „?format=rss“
-връща HTML страница) през същия начин като новините: AI избира по индекс и дава само „защо“, а заглавието и източникът са ДОСЛОВНИ от фийда (news_aggregator.pick_verbatim).
+връща HTML страница), от 29.10 и на CoinDesk (config.CRYPTO_RSS_FEEDS — разходката, т. 4б), през същия начин като новините: AI избира по индекс и дава само „защо“, а заглавието и източникът са ДОСЛОВНИ от фийда (news_aggregator.pick_verbatim).
 29.10.2026 (разходката, т. 4, решение (а)): мерилото вече не е списък с категории, а въпросът „би ли променила тази новина решението на институционален инвеститор в крипто след
 седмица?“ с изрични примери — да: навлизането на традиционните финанси (токенизация на ценни книжа, DTCC, големи банки, стейбълкойни, регулатори); не: прогнози за цената, малки
 монети, мнения. Таван config.CRYPTO_MAX_ITEMS (5), дневните потоци в ETF — най-много един ред ("etf_flows": true). Повод: на 28.10 „DTCC unit launches tokenization services“ беше
@@ -109,6 +109,35 @@ def pool_record(pool: list[dict], data, items: list[dict], dropped: list[dict]) 
     return out
 
 
+def fetch_pool() -> list[dict]:
+    """29.10.2026 (разходката, т. 4б): пулът — Cointelegraph и CoinDesk (config.CRYPTO_RSS_FEEDS), заглавията на редуване (news_aggregator._interleave); дубълът по заглавие отпада.
+    Източник без заглавия — ред в лога (останалият стига)."""
+    from src import news_aggregator
+    per = []
+    for name, url in config.CRYPTO_RSS_FEEDS.items():
+        got = news_aggregator._fetch_rss(url, name, config.CRYPTO_NEWS_HOURS, limit=50)
+        if not got:
+            print(f"[crypto] ⚠ {name}: фийдът не върна заглавия")
+        per.append(got)
+    seen, pool = set(), []
+    for r in news_aggregator._interleave(per):
+        k = r["title"].casefold()[:90]
+        if k not in seen:
+            seen.add(k); pool.append(r)
+    return pool
+
+
+def pool_sources(pool: list[dict]) -> dict:
+    """{източник: {"count", "oldest"}} — oldest е най-старото заглавие в пула (UTC), за да се види дали фийдът покрива прозореца (CRYPTO_NEWS_HOURS). Чиста функция."""
+    out = {name: {"count": 0, "oldest": None} for name in config.CRYPTO_RSS_FEEDS}
+    for r in pool:
+        o = out.setdefault(r.get("source"), {"count": 0, "oldest": None})
+        o["count"] += 1
+        if r.get("published") and (o["oldest"] is None or r["published"] < o["oldest"]):
+            o["oldest"] = r["published"]
+    return out
+
+
 def cot_reading(pts: list[dict] | None) -> dict | None:
     """COT за Bitcoin (CME, managed money net) — последният отчет и перцентилът му спрямо прозореца на COT модула (същата сметка като екстремумите). < 10 точки → None."""
     from src import cot
@@ -150,7 +179,7 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
     """
     LAST_STATUS.clear()
     LAST_STATUS.update(ok=False, reason="не завърши", count=0)
-    out = {"ok": False, "items": [], "pool": 0, "pool_items": [], "reason": None, "tickers": [], "cot_btc": None}
+    out = {"ok": False, "items": [], "pool": 0, "pool_items": [], "pool_sources": {}, "reason": None, "tickers": [], "cot_btc": None}
     path = cache_path or (config.DATA_DIR / "crypto_news_cache.json")
     try:
         cached = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -158,13 +187,15 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
         cached = {}
     try:
         if cached.get("date") == today and "items" in cached:
-            out.update(ok=True, items=cached["items"], pool=cached.get("pool", 0), pool_items=cached.get("pool_items", []), reason=cached.get("reason"))
+            out.update(ok=True, items=cached["items"], pool=cached.get("pool", 0), pool_items=cached.get("pool_items", []), pool_sources=cached.get("pool_sources", {}),
+                       reason=cached.get("reason"))
         else:
             from src import news_aggregator
-            pool = (fetch or (lambda: news_aggregator._fetch_rss(config.CRYPTO_RSS_URL, "Cointelegraph", config.CRYPTO_NEWS_HOURS, limit=50)))()
+            pool = (fetch or fetch_pool)()
             out["pool"] = len(pool)
+            out["pool_sources"] = pool_sources(pool)                            # 29.10.2026: колко заглавия и колко назад — по източник
             if not pool:
-                out["reason"] = "фийдът на Cointelegraph не върна заглавия"
+                out["reason"] = f"фийдовете ({', '.join(config.CRYPTO_RSS_FEEDS)}) не върнаха заглавия"
             else:
                 ai_call = ai_call or crypto_news_call
                 from src import ai_brief as _ab
@@ -175,7 +206,7 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
                 pool_items = pool_record(pool, data, items, dropped)                    # 29.10.2026: целият пул и какво стана с всяко заглавие
                 out.update(ok=True, items=items, pool_items=pool_items)
                 try:
-                    path.write_text(json.dumps({"date": today, "items": items, "pool": len(pool), "pool_items": pool_items}, ensure_ascii=False), encoding="utf-8")
+                    path.write_text(json.dumps({"date": today, "items": items, "pool": len(pool), "pool_items": pool_items, "pool_sources": out["pool_sources"]}, ensure_ascii=False), encoding="utf-8")
                 except Exception as e:
                     print(f"[crypto] кешът не се записа: {type(e).__name__}")
     except Exception as e:

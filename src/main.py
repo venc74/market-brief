@@ -1046,7 +1046,7 @@ def run() -> dict:
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
-    # 22.10.2026 (етап 4): крипто секцията — Cointelegraph (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
+    # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH, COT за Bitcoin само при нов отчет на CFTC
     crypto = steps.step("crypto", lambda: crypto_news.build(today, cot_fresh=bool(cot_rhythm.get("fresh")), cot_series=cot.LAST_SERIES), fallback={},
                         enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
                         failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)

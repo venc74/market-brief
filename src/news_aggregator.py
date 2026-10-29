@@ -70,6 +70,9 @@ def _fetch_rss(url: str, source: str, hours: int, limit: int = 15) -> list[dict]
             link = _safe_link(e.get("link"))                       # 29.10.2026 (разходката, т. 3–4): заглавието в брифа е линк към статията
             if link:
                 row["link"] = link
+            pt = e.get("published_parsed") or e.get("updated_parsed")
+            if pt:
+                row["published"] = time.strftime("%Y-%m-%dT%H:%MZ", pt)     # 29.10.2026: колко назад стига фийдът (CoinDesk държи 25); feedparser дава UTC
             out.append(row)
             if len(out) >= limit:
                 break

@@ -638,7 +638,7 @@
 </section>
 {% endif %}
 
-{# 22.10.2026 (етап 4): крипто секцията — Cointelegraph през AI подбор по индекс; заглавието и източникът — дословни; под новините цените и COT за Bitcoin при нов отчет #}
+{# 22.10.2026 (етап 4): крипто секцията — Cointelegraph (от 29.10 и CoinDesk) през AI подбор по индекс; заглавието и източникът — дословни; под новините цените и COT за Bitcoin при нов отчет #}
 {% if crypto %}
 <section>
   <h2>Крипто · последните 24ч</h2>
@@ -652,7 +652,7 @@
     {% endfor %}
   </div>
   {% elif crypto.get("ok") %}
-  <div class="prose">Няма значими крипто новини{% if crypto.pool %} (проверени {{ crypto.pool }} заглавия от Cointelegraph){% endif %}.</div>
+  <div class="prose">Няма значими крипто новини{% if crypto.pool %} (проверени {{ crypto.pool }} заглавия от {% set srcs = [] %}{% for k, v in (crypto.pool_sources or {}).items() if v.count %}{% set _ = srcs.append(k) %}{% endfor %}{{ srcs|join(' и ') if srcs else 'Cointelegraph' }}){% endif %}.</div>
   {% else %}
   <div class="prose" style="color:var(--muted)">Крипто новините не се изтеглиха днес{% if crypto.reason %} ({{ crypto.reason }}){% endif %} — празното НЕ значи, че няма новини.</div>
   {% endif %}

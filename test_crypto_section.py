@@ -57,7 +57,7 @@ assert len(calls) == 1 and again["items"] == out["items"]                       
 assert again["cot_btc"] == {"as_of": btc[-1]["date"], "net": btc[-1]["net"], "percentile": 100.0, "weeks": len(btc)}
 none = cn.build("2026-10-23", fetch=lambda: POOL, ai_call=lambda s, u: json.dumps({"news": []}), download=lambda t: px)
 fail = cn.build("2026-10-24", fetch=lambda: [], ai_call=ai, download=lambda t: (_ for _ in ()).throw(RuntimeError("Yahoo")))
-assert none["ok"] and none["items"] == [] and not fail["ok"] and fail["reason"] == "фийдът на Cointelegraph не върна заглавия" and fail["tickers"] == []
+assert none["ok"] and none["items"] == [] and not fail["ok"] and fail["reason"] == "фийдовете (Cointelegraph, CoinDesk) не върнаха заглавия" and fail["tickers"] == []
 print("  ✓ 4 новини, цените — от последния цял бар преди деня; втори run същия ден — от кеша; COT за Bitcoin — само при нов отчет; празен фийд → причина, без грешка")
 
 print()
