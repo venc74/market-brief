@@ -588,14 +588,17 @@
     {# 2026-09-27: основна инфлация — информативна, не влиза в броенето/режима #}
     {% if core_inflation is not none %}
     {% set ci = core_inflation %}
-    <div class="t-card info" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
+    {# 29.10.2026 (разходката, т. 2, решение 2): за кой месец са данните (с годината) и закъснението — в самия надпис. Измерено в брифовете: августовските данни излязоха на 30.09 #}
+    {# (брифът от 30.09 още показва юли, от 01.10 — август), т.е. в края на следващия месец — ~6 седмици след средата на отчетния, ~4 седмици след края му #}
+    {% set ci_lag = "излизат с ~6 седмици закъснение (в края на следващия месец)" %}
+    <div class="t-card info" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна серия: данните за един месец излизат в края на следващия (~6 седмици след средата на месеца, ~4 седмици след края му); брифът ги взима на следващата сутрин.">
       <div class="t-name">Основна инфлация</div>
       {% if ci.value is not none %}
       <div class="t-val">{{ "%.2f"|format(ci.value) }}%</div>
-      <div class="t-label">за {{ ci.month }}{% if ci.avg_recent is defined %} · <span title="Средно {{ ci.recent_span }} срещу {{ ci.prior_span }}; под ±{{ ci.flat_threshold_pp }} пп = стабилна">{{ {'up': '↑ расте', 'down': '↓ пада', 'flat': '→ стабилна'}[ci.direction] }}: 3м средно {{ "%.2f"|format(ci.avg_recent) }}% срещу {{ "%.2f"|format(ci.avg_prior) }}%</span>{% elif ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
+      <div class="t-label"><b>данни за {{ ci.month }}{% if ci.date %} {{ ci.date[:4] }}{% endif %}</b> · {{ ci_lag }}{% if ci.avg_recent is defined %} · <span title="Средно {{ ci.recent_span }} срещу {{ ci.prior_span }}; под ±{{ ci.flat_threshold_pp }} пп = стабилна">{{ {'up': '↑ расте', 'down': '↓ пада', 'flat': '→ стабилна'}[ci.direction] }}: 3м средно {{ "%.2f"|format(ci.avg_recent) }}% срещу {{ "%.2f"|format(ci.avg_prior) }}%</span>{% elif ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
       {% else %}
       <div class="t-val">—</div>
-      <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · информативно, не влиза в режима</div>
+      <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }}{% if ci.last_date %} {{ ci.last_date[:4] }}{% endif %} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · {{ ci_lag }} · информативно, не влиза в режима</div>
       {% endif %}
     </div>
     {% endif %}

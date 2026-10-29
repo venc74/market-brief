@@ -1,0 +1,44 @@
+{
+ "_note": "РЕАЛНО: macro.core_inflation от публикуваните брифове data/2026-09-29.json, 2026-09-30.json, 2026-10-01.json (Dallas Fed Trimmed Mean PCE, FRED PCETRIM12M159SFRBDAL), извадени на 29.10.2026 без промяна. Брифът от 30.09 още показва юли, от 01.10 — август: августовските данни са излезли на 30.09 (след сутрешния бриф).",
+ "briefs": {
+  "2026-09-29": {
+   "value": 2.28,
+   "date": "2026-07-01",
+   "month": "юли",
+   "age_days": 60,
+   "avg_recent": 2.32,
+   "avg_prior": 2.35,
+   "change_pp": -0.03,
+   "recent_span": "май–юли",
+   "prior_span": "февруари–април",
+   "direction": "flat",
+   "flat_threshold_pp": 0.1
+  },
+  "2026-09-30": {
+   "value": 2.28,
+   "date": "2026-07-01",
+   "month": "юли",
+   "age_days": 61,
+   "avg_recent": 2.32,
+   "avg_prior": 2.35,
+   "change_pp": -0.03,
+   "recent_span": "май–юли",
+   "prior_span": "февруари–април",
+   "direction": "flat",
+   "flat_threshold_pp": 0.1
+  },
+  "2026-10-01": {
+   "value": 2.19,
+   "date": "2026-08-01",
+   "month": "август",
+   "age_days": 31,
+   "avg_recent": 2.25,
+   "avg_prior": 2.39,
+   "change_pp": -0.14,
+   "recent_span": "юни–август",
+   "prior_span": "март–май",
+   "direction": "down",
+   "flat_threshold_pp": 0.1
+  }
+ }
+}
