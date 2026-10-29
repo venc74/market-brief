@@ -62,6 +62,14 @@
     padding: 14px 16px; border-top: 3px solid var(--line);
   }
   .t-card.info { border-style: dashed; }   /* пакет 2 т.2: информативен индикатор — показва се, не се брои */
+  /* 29.10.2026 (разходката, т. 2): информативните — отделно под уредите, които решават; по-малки и по-бледи, не сгънати */
+  .thermo-info { margin-top: 16px; opacity: .72; }
+  .thermo-info-head { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .thermo-info .thermo { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .thermo-info .t-card { padding: 10px 12px; border-top-width: 2px; }
+  .thermo-info .t-name { font-size: 10px; }
+  .thermo-info .t-val { font-size: 16px; margin-top: 4px; }
+  .thermo-info .t-label { font-size: 11.5px; }
   .t-card.green { border-top-color: var(--green); }
   .t-card.yellow { border-top-color: var(--yellow); }
   .t-card.red { border-top-color: var(--red); }
@@ -544,16 +552,16 @@
 
 <section>
   <h2>Пазарен термометър</h2>
-  <div class="thermo">
-    {% for ind in thermometer.indicators %}
-    {% if not ind.get('hide') %}
+  {% macro t_card(ind) %}
     <div class="t-card {{ ind.status }}{% if ind.get('informational') %} info{% endif %}"{% if ind.get('methodology_note') %} title="{{ ind.methodology_note }}"{% endif %}>
       <div class="t-name">{{ ind.name }}</div>
       <div class="t-val">{{ ind.value if ind.value is not none else "—" }}</div>
       <div class="t-label">{{ ind.label }}</div>
     </div>
-    {% endif %}
-    {% endfor %}
+  {% endmacro %}
+  <div class="thermo">
+    {# 29.10.2026 (разходката, т. 2): горе — само уредите, които решават (броените + Distribution Days); информативните — в отделния блок по-долу #}
+    {% for ind in thermometer.indicators if not ind.get('hide') and not ind.get('informational') %}{{ t_card(ind) }}{% endfor %}
     {% if not distribution_days and distribution_days_status and distribution_days_status.status == "failed" %}
     {# 16.10.2026 (В8): тегленето не успя — картата не изчезва, казва го #}
     <div class="t-card yellow"><div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div><div class="t-val">—</div>
@@ -566,10 +574,21 @@
       <div class="t-label">{{ distribution_days.label }}</div>
     </div>
     {% endif %}
+  </div>
+  {# 15.10.2026: запас до смяна на режима — от кода (regime_claims.margin): колко червени сменят режима, distribution days, IEI/HYG спрямо прага, близките прагове #}
+  {% if thermometer.regime_margin and thermometer.regime_margin.text %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> {{ thermometer.regime_margin.parts|join(" · ") }}</div>
+  {% endif %}
+  {% set info_inds = thermometer.indicators|rejectattr('hide')|selectattr('informational')|list %}
+  {% if info_inds or core_inflation is not none %}
+  <div class="thermo-info">
+  <div class="thermo-info-head">Информативни — не влизат в режима</div>
+  <div class="thermo">
+    {% for ind in info_inds %}{{ t_card(ind) }}{% endfor %}
     {# 2026-09-27: основна инфлация — информативна, не влиза в броенето/режима #}
     {% if core_inflation is not none %}
     {% set ci = core_inflation %}
-    <div class="t-card" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
+    <div class="t-card info" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
       <div class="t-name">Основна инфлация</div>
       {% if ci.value is not none %}
       <div class="t-val">{{ "%.2f"|format(ci.value) }}%</div>
@@ -581,9 +600,7 @@
     </div>
     {% endif %}
   </div>
-  {# 15.10.2026: запас до смяна на режима — от кода (regime_claims.margin): колко червени сменят режима, distribution days, IEI/HYG спрямо прага, близките прагове #}
-  {% if thermometer.regime_margin and thermometer.regime_margin.text %}
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> {{ thermometer.regime_margin.parts|join(" · ") }}</div>
+  </div>
   {% endif %}
   {# 13.10.2026: скрит индикатор не изчезва без следа — ред с причината (Fed Net Liquidity на 13.10: RRP с последна точка 09.10, Columbus Day) #}
   {% set hidden = thermometer.indicators|selectattr('hide')|list %}
