@@ -716,6 +716,8 @@ WATCH_RS_SESSIONS = (20, 60)                       # 29.10.2026 (т. 6): RS сп
 # закъснели filings, AI-то вижда датата на транзакцията и преценява сам.
 WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))
 WATCH_MAX_TOKENS = int(os.getenv("WATCH_MAX_TOKENS", 2000))
+# 30.10.2026 (поправки от брифа): AI резюметата на групи по 4 тикъра — 14 наведнъж спряха на 2000 токена (max_tokens) и резюмета нямаше; лимитът е на група
+WATCH_AI_BATCH_SIZE = int(os.getenv("WATCH_AI_BATCH_SIZE", 4))
 # nitter е нестабилен — изключен по подразбиране (Поправка 4)
 NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
 NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]

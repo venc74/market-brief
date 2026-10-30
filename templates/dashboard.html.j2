@@ -746,6 +746,9 @@
     {% endif %}
     {% endfor %}
   </div>
+  {# 30.10.2026: AI резюметата са на групи по 4 — група, която не мина, е изписана; останалите са с резюме #}
+  {% set ai_miss = [] %}{% for w in watch if w.ai and w.ai.missing %}{% set _ = ai_miss.append(w.ticker ~ " (" ~ w.ai.missing ~ ")") %}{% endfor %}
+  {% if ai_miss %}<div class="small" style="font-size:12px;color:var(--yellow);margin-top:8px">AI резюме днес няма за: {{ ai_miss|join(", ") }} — групата им не мина; фактите, новините и Form 4 са от кода.</div>{% endif %}
   {% endif %}
 </section>
 {% endif %}

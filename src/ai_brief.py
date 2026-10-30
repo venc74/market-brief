@@ -68,6 +68,7 @@ _SECTION_LABELS = {
     "_cot_theses_for_batch": "COT тези",
     "thesis_news_pick": "Тези: свързани новини",                # 19.10.2026: вместо проверката на тезите (т. 10)
     "watch_ticker_digest": "Наблюдавани тикъри",
+    "_watch_digest_batch": "Наблюдавани тикъри",               # 30.10.2026: на групи по 4
     "short_thesis_global_context": "Short контекст",
     "significant_news": "Значими новини",
     "_probe": "Проверка на модела",
@@ -1651,22 +1652,39 @@ def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
 
     Graceful: провал → празен dict за всеки тикър, секцията показва суровите
     данни без тълкуване.
+    29.10.2026 → 30.10.2026 (поправки от брифа): на ГРУПИ по config.WATCH_AI_BATCH_SIZE (4) тикъра — отделни извиквания (_watch_digest_batch), резултатите се
+    събират; провалена група → само нейните тикъри са без резюме, с причина в ai["missing"] (секцията го казва с ред). 30.10: 14 тикъра наведнъж → отговорът спря на
+    2000 токена (max_tokens) и резюмета нямаше за нито един.
     """
     if not rows:
         return rows
-    try:
-        compact = [{
-            "ticker": r["ticker"],
-            "news": [{"title": n["title"], "publisher": n["publisher"]} for n in r["news"]],
-            "insider": [{"code": t["code"], "date": t["date"],
-                         "owner": t["owner_name"], "title": t["owner_title"],
-                         "value_usd": round(t["value"]),
-                         "pct_of_holdings": t["pct_of_holdings"],
-                         "planned_10b5_1": t["planned_10b5_1"]} for t in r["insider"]],
-            "insider_cluster": r["insider_cluster"],
-        } for r in rows]
+    n = max(1, config.WATCH_AI_BATCH_SIZE)
+    out = []
+    for k in range(0, len(rows), n):
+        group = rows[k:k + n]
+        try:
+            out += _watch_digest_batch(group, market_context)
+        except Exception as e:
+            why = "отговорът е отрязан (лимитът за изход)" if isinstance(e, TruncatedResponse) else f"грешка ({type(e).__name__})"
+            print(f"[ai] watch_ticker_digest: групата {', '.join(r['ticker'] for r in group)} не мина — {why}: {e}")
+            out += [{**r, "ai": {"missing": why}} for r in group]
+    return out
 
-        user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 24 часа):
+
+def _watch_digest_batch(rows: list[dict], market_context: dict) -> list[dict]:
+    """Една група наблюдавани тикъри → [{**ред, "ai": {summary, insider_read, cross_reference}}]. Хвърля при провал (watch_ticker_digest го хваща за групата)."""
+    compact = [{
+        "ticker": r["ticker"],
+        "news": [{"title": n["title"], "publisher": n["publisher"]} for n in r["news"]],
+        "insider": [{"code": t["code"], "date": t["date"],
+                     "owner": t["owner_name"], "title": t["owner_title"],
+                     "value_usd": round(t["value"]),
+                     "pct_of_holdings": t["pct_of_holdings"],
+                     "planned_10b5_1": t["planned_10b5_1"]} for t in r["insider"]],
+        "insider_cluster": r["insider_cluster"],
+    } for r in rows]
+
+    user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 24 часа):
 {json.dumps(compact, ensure_ascii=False, default=str)}
 
 ТЕМИ, АКТИВНИ ДРУГАДЕ В ДНЕШНИЯ БРИФ:
@@ -1702,25 +1720,21 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
 Върни JSON: {{"digests": [{{"ticker": "...", "summary": "...", \
 "insider_read": "...", "cross_reference": "..."}}]}}"""
 
-        out = _parse_json(_call_claude(SYSTEM_WATCH, user,
-                                       max_tokens=config.WATCH_MAX_TOKENS))
-        by_ticker = {d.get("ticker"): d for d in out.get("digests", [])
-                     if isinstance(d, dict)}
-        annotated = []
-        for r in rows:
-            d = by_ticker.get(r["ticker"]) or {}
-            annotated.append({**r, "ai": {
-                "summary": (d.get("summary") or "").strip(),
-                "insider_read": (d.get("insider_read") or "").strip(),
-                "cross_reference": (d.get("cross_reference") or "").strip(),
-            }})
-        linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
-        print(f"[ai] watch_ticker_digest: {len(annotated)} тикъра обработени, "
-              f"{linked} с cross-reference")
-        return annotated
-    except Exception as e:
-        print(f"[ai] watch_ticker_digest неуспешен: {type(e).__name__}: {e}")
-        return [{**r, "ai": {}} for r in rows]
+    out = _parse_json(_call_claude(SYSTEM_WATCH, user,
+                                   max_tokens=config.WATCH_MAX_TOKENS))
+    by_ticker = {d.get("ticker"): d for d in out.get("digests", [])
+                 if isinstance(d, dict)}
+    annotated = []
+    for r in rows:
+        d = by_ticker.get(r["ticker"]) or {}
+        annotated.append({**r, "ai": {
+            "summary": (d.get("summary") or "").strip(),
+            "insider_read": (d.get("insider_read") or "").strip(),
+            "cross_reference": (d.get("cross_reference") or "").strip(),
+        }})
+    linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
+    print(f"[ai] watch_ticker_digest: група {', '.join(r['ticker'] for r in rows)} — {len(annotated)} тикъра, {linked} с cross-reference")
+    return annotated
 
 
 SYSTEM_COT = """Ти си анализатор на бизнес механизми: за даден финансов инструмент (борсов \
