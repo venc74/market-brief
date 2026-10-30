@@ -85,14 +85,14 @@ def run_macro(responses):
 out, log = run_macro([RAW_CUT, RAW_OK])
 assert len(sent) == 2 and sent[0] == sent[1]                                                                # същото извикване
 assert out["macro_brief"] == FULL and ai_brief.TRUNCATIONS == []
-assert [u["section"] for u in ai_brief.AI_USAGE] == ["Макро бриф и секторна карта"] * 2                    # повторният опит носи етикета на секцията
-assert "json_repair изряза текст — Макро бриф и секторна карта" in log and "един повторен опит" in log
+assert [u["section"] for u in ai_brief.AI_USAGE] == ["Макро разказ"] * 2                    # повторният опит носи етикета на секцията
+assert "json_repair изряза текст — Макро разказ" in log and "един повторен опит" in log
 print("  ✓ първият отговор — изрязан, повторният — цял: macro_brief е пълният текст, ai_truncations празен; 2 записа в ai_usage със същия етикет")
 
 out, log = run_macro([RAW_CUT, RAW_CUT])
 assert len(sent) == 2 and out["macro_brief"] == CUT + ai_brief.CUT_MARK
 T = copy.deepcopy(ai_brief.TRUNCATIONS)                                                                      # копие — следващият run_macro го нулира
-assert len(T) == 1 and T[0]["kind"] == "json_repair" and T[0]["section"] == "Макро бриф и секторна карта" and T[0]["fields"] == ["macro_brief"] and T[0]["retried"]
+assert len(T) == 1 and T[0]["kind"] == "json_repair" and T[0]["section"] == "Макро разказ" and T[0]["fields"] == ["macro_brief"] and T[0]["retried"]
 assert "текстът е непълен днес (json_repair — и след повторния опит)" in log
 print(f"  ✓ и двата изрязани: «…{out['macro_brief'][-60:]}»; запис в ai_truncations (json_repair, macro_brief, след повторен опит)")
 
@@ -109,7 +109,7 @@ b["ai_macro"]["macro_brief"] = CUT + ai_brief.CUT_MARK                          
 with q():
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
     mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_email(b))))
-assert "Макро бриф и секторна карта — текстът е непълен днес: JSON-ът на модела беше счупен (най-често кавичка в текста) и поправката изряза част — свършва на «…" in page
+assert "Макро разказ — текстът е непълен днес: JSON-ът на модела беше счупен (най-често кавичка в текста) и поправката изряза част — свършва на «…" in page
 assert "; и повторният опит не помогна" in page and "COT тези — моделът достигна лимита си за изход (6000 токена, claude-sonnet-4-6)" in page
 assert "„не би било грешка … ✂ текстът е непълен днес" in page and "„не би било грешка … ✂ текстът е непълен днес" in mail
 assert ai_brief.QUOTES_RULE in ai_brief.SYSTEM_MACRO and ai_brief.QUOTES_RULE in ai_brief.SYSTEM_TICKERS and "„…“" in ai_brief.QUOTES_RULE
