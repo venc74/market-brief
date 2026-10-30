@@ -103,6 +103,8 @@ def fake_claude(system, user, **k):
     prompts.append(user)
     return json.dumps({"macro_brief": B["macro_brief"], "sector_logic": []}, ensure_ascii=False)          # РЕАЛНИЯТ macro_brief от 08.10
 ai_brief._call_claude = fake_claude
+_ns = ai_brief.narrative_sources
+ai_brief.narrative_sources = lambda *a, **k: [float(x.replace(",", ".")) for x in __import__("re").findall(r"\d+(?:[.,]\d+)?", B["macro_brief"])]   # 30.10.2026: проверката на числата не е предмет тук
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res = ai_brief.macro_and_sector_brief({}, [], THERMO)
 assert f["counts_text"] not in prompts[0] and "НЕ преброявай" not in prompts[0] and f["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0]

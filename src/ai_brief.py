@@ -790,11 +790,116 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
         out = _apply_meta_check(out)
     except Exception as e:
         print(f"[ai] проверката за изтекли клаузи пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 30.10.2026 (поправки от брифа, т. 4): числата в разказа — срещу входовете
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            new, fixed = check_narrative_numbers(out["macro_brief"], narrative_sources(macro, rotation, thermometer, news, crypto, social))
+            if fixed:
+                out = {**out, "macro_brief": new, "numbers_fixed": fixed}
+                for f in fixed:
+                    print(f"[ai] разказ: число без опора във входовете — махнато {f['removed']}: «{f['sentence'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на числата в разказа пропусната: {type(e).__name__}: {e}")
     try:
         out = _apply_sector_claims(out, rotation)
     except Exception as e:
         print(f"[ai] проверка на твърденията за секторите пропусната: {type(e).__name__}: {e}")
     return out
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# 30.10.2026 (поправки от брифа, т. 4): всяко число в разказа трябва да го има във входовете на деня (новини, уреди, макро / фючърси, ротация, крипто) с разумна точност —
+# иначе частта с него се маха (news_aggregator._why_trim_sentence — същата машинария като за "why" в новините), а при нечетим остатък — цялото изречение; запис в
+# ai_macro["numbers_fixed"]. „Разумна точност“: числото в текста съвпада с входно число, закръглено до толкова знака, колкото има в текста (17.2 ← 17.21; 13 ← 12.9),
+# без знак (−13 пункта ↔ "падна с 13 пункта"); "1,016" с три цифри след запетаята е хиляди.
+# ──────────────────────────────────────────────────────────────────────────
+def _num_value(tok: str) -> tuple[float, int] | None:
+    """Число от текста → (стойност, брой знаци след десетичния разделител); "1,016" → (1016, 0); "2,26" → (2.26, 2)."""
+    t = tok.strip()
+    if re.fullmatch(r"\d{1,3}(?:,\d{3})+", t):
+        return float(t.replace(",", "")), 0
+    t = t.replace(",", ".")
+    try:
+        return float(t), (len(t.split(".")[1]) if "." in t else 0)
+    except ValueError:
+        return None
+
+
+_THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")
+_ISO_DATE = re.compile(r"\b(\d{4})-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:[+-]\d{2}:\d{2}|Z)?)?\b")
+
+
+def narrative_sources(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
+                      social: dict | None = None, thermo_full: bool = False) -> list[float]:
+    """
+    Всички числа във входовете на разказа (данните, не инструкциите на промпта) — стойности без знак. thermo_full — целият JSON на термометъра (така, както го виждаше
+    промптът до 29.10 — за мерене върху старите текстове); по подразбиране — контекстът на новия промпт (_thermo_context).
+    """
+    from src import news_aggregator as na
+    th = thermometer or {} if thermo_full else _thermo_context(thermometer)
+    parts = []
+
+    def walk(o):                                                                 # само стойностите — имената на полетата ("rs_chg_12w_pct") не са числа от данните
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, (list, tuple)):
+            for v in o:
+                walk(v)
+        elif isinstance(o, bool) or o is None:
+            return
+        elif isinstance(o, (int, float)):
+            parts.append(repr(o))
+        else:
+            parts.append(_ISO_DATE.sub(lambda m: m.group(1), str(o)))            # от датата остава годината: денят и месецът не са твърдения
+    for x in (macro or {}, rotation or [], th, social or {}):
+        walk(x)
+    parts.append(sector_claims.facts(rotation)["text"] if rotation else "")
+    parts += [" ".join(str(n.get(k) or "") for k in ("headline", "why", "summary")) for n in news or [] if isinstance(n, dict)]
+    c = crypto or {}
+    parts += [" ".join(str(x.get(k) or "") for k in ("headline", "why")) for x in c.get("items") or [] if isinstance(x, dict)]
+    parts.append(json.dumps(c.get("tickers") or [], ensure_ascii=False))
+    vals = []
+    for tok in na._NUM_RE.findall(_THOUSANDS.sub("", " ".join(parts))):
+        v = _num_value(tok)
+        if v:
+            vals.append(abs(v[0]))
+    return vals
+
+
+def _supported(tok: str, vals: list[float]) -> bool:
+    v = _num_value(tok)
+    if v is None:
+        return True
+    x, d = abs(v[0]), v[1]
+    eq = lambda y: abs(round(y, d) - x) < 10 ** -(d + 3)
+    return any(eq(y) or eq(y * 100) for y in vals)                                 # и % ↔ б.п. (2s10s 0.44 = 44 б.п.)
+
+
+def check_narrative_numbers(text: str, vals: list[float]) -> tuple[str, list[dict]]:
+    """
+    Разказът (абзаци) → (поправеният текст, [{sentence, removed}]): число без опора във входовете (vals) — частта с него пада (_why_trim_sentence); при 2+ такива
+    числа в изречението — цялото изречение (остатъкът е нечетим). Имената ("S&P 500", "Q3", "40-дневни", "CLZ26") не се броят. Чиста функция.
+    """
+    from src import news_aggregator as na
+    fixed = []
+
+    def one(para: str):
+        kept = []
+        for sent in na._WHY_SENT.split(para):
+            toks = na._NUM_RE.findall(na._WHY_NAME.sub(" ", _THOUSANDS.sub("", sent)))
+            have = {t.replace(",", ".") for t in toks if _supported(t, vals)}
+            if len(have) == len({t.replace(",", ".") for t in toks}):
+                kept.append(sent)
+                continue
+            new, removed = na._why_trim_sentence(_THOUSANDS.sub("", sent), have)              # хилядите без запетая — "4,103.9" е едно число
+            if new and len(removed) >= 2:                                                       # 2+ махнати числа — остатъкът е нечетим ("(WTI, но )"): пада изречението
+                new, removed = "", [sent]
+            fixed.append({"sentence": sent, "removed": removed, "kept": new or None})
+            if new:
+                kept.append(new)
+        return " ".join(kept), []
+    out, _ = _per_paragraph(text, one)
+    return out, fixed
 
 
 def paragraphs(text: str) -> list[str]:
@@ -983,12 +1088,19 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 sector, etf, chain, horizon_weeks)."""
 
 
+# 30.10.2026 (поправки от брифа, т. 4): разказът не цитира нашите проучвания — 30.10: „в нашето проучване … ранен сигнал само в 1 от 3 кризи и 47–72% фалшиви сигнали“ (от надписа
+# на SOFR − IORB); надписите в контекста са без тази част и без „само информативен, не влиза в режима“ (думата „режим“ не е за разказа)
+_RESEARCH_IN_LABEL = re.compile(r"\s*·\s*термометър, не предсказание:[^·]*")
+_INFO_SUFFIX = re.compile(r"\s*·\s*само информативен, не влиза в режима")
+
+
 def _thermo_context(thermometer: dict | None) -> list[dict]:
     """29.10.2026 (разходката, т. 5): уредите на термометъра като КОНТЕКСТ за разказа — видимите, с име, стойност и надпис; без режима, броенето, override-ите и правилото."""
     out = []
     for i in (thermometer or {}).get("indicators") or []:
         if isinstance(i, dict) and not i.get("hide") and i.get("value") is not None:
-            row = {"name": i.get("name"), "value": i.get("value"), "label": i.get("label")}
+            label = _RESEARCH_IN_LABEL.sub("", _INFO_SUFFIX.sub("", str(i.get("label") or "")))    # 30.10.2026: без цитата от проучването и без „… не влиза в режима“
+            row = {"name": i.get("name"), "value": i.get("value"), "label": label}
             if i.get("informational"):
                 row["informational"] = True
             out.append(row)
