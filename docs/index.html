@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Бриф · 29.10.2026, четвъртък</title>
+<title>AI Бриф · 30.10.2026, петък</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -61,6 +61,14 @@
     padding: 14px 16px; border-top: 3px solid var(--line);
   }
   .t-card.info { border-style: dashed; }   /* пакет 2 т.2: информативен индикатор — показва се, не се брои */
+  /* 29.10.2026 (разходката, т. 2): информативните — отделно под уредите, които решават; по-малки и по-бледи, не сгънати */
+  .thermo-info { margin-top: 16px; opacity: .72; }
+  .thermo-info-head { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .thermo-info .thermo { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .thermo-info .t-card { padding: 10px 12px; border-top-width: 2px; }
+  .thermo-info .t-name { font-size: 10px; }
+  .thermo-info .t-val { font-size: 16px; margin-top: 4px; }
+  .thermo-info .t-label { font-size: 11.5px; }
   .t-card.green { border-top-color: var(--green); }
   .t-card.yellow { border-top-color: var(--yellow); }
   .t-card.red { border-top-color: var(--red); }
@@ -164,18 +172,6 @@
   /* ── 🔎 Наблюдавани тикъри (2026-09-18) ── */
   .wm-note { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
   .wm-note code { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
-  .wm-grid { display: grid; gap: 12px; }
-  .wm-card { background: var(--panel); border: 1px solid var(--line);
-                border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--regime); }
-  .wm-card.quiet { border-left-color: var(--line); }
-  .wm-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .wm-ticker { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 15px; }
-  .wm-badge { font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
-                 padding: 2px 7px; border-radius: 4px; }
-  .wm-badge.cluster { color: var(--red); background: rgba(248,113,113,.14); }
-  .wm-badge.insider { color: var(--yellow); background: rgba(251,191,36,.12); }
-  .wm-badge.news { color: var(--muted); background: rgba(133,147,179,.12); }
-  .wm-quiet { color: var(--muted); font-size: 13px; margin-top: 8px; }
   .wm-summary { font-size: 13.5px; margin-top: 9px; }
   .wm-news { margin: 8px 0 0 0; padding-left: 18px; font-size: 13px; }
   .wm-news li { margin-bottom: 3px; }
@@ -189,6 +185,29 @@
   .wm-insider td.sell { color: var(--red); }
   .wm-read { font-size: 13px; margin-top: 9px; }
   .wm-xref { font-size: 12.5px; color: var(--regime); margin-top: 7px; }
+  /* 29.10.2026 (разходката, т. 6): една таблица — ред на тикър с факти от кода; новините, Form 4 и AI резюмето се разгъват с клик под реда */
+  .wt { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .wt-row { display: grid; grid-template-columns: 1.35fr 1fr .95fr 1fr .85fr 1.75fr 1.05fr; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line);
+    font-size: 12.5px; align-items: baseline; }
+  .wt-head { font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+  .wt > :last-child, .wt > :last-child .wt-row { border-bottom: 0; }
+  .wt-t { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 13.5px; }
+  .wt-name { display: block; font-size: 11px; color: var(--muted); font-weight: 400; font-family: "IBM Plex Sans", sans-serif; }
+  .wt-num { font-family: "IBM Plex Mono", monospace; }
+  .wt-up { color: var(--green); } .wt-dn { color: var(--red); } .wt-mu { color: var(--muted); }
+  .wt-mark { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; padding: 1px 6px; border-radius: 4px; background: rgba(133,147,179,.14); margin: 0 3px 3px 0; display: inline-block; }
+  details.wt-item > summary { list-style: none; cursor: pointer; }
+  details.wt-item > summary::-webkit-details-marker { display: none; }
+  details.wt-item > summary .wt-t::before { content: "▸ "; color: var(--regime); }
+  details.wt-item[open] > summary .wt-t::before { content: "▾ "; }
+  .wt-plain .wt-t::before { content: "  "; white-space: pre; }
+  .wt-detail { padding: 2px 14px 12px 30px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 760px) {
+    .wt-row { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+    .wt-head { display: none; }
+    .wt-row > [data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-size: 11px; }
+    .wt-detail { padding-left: 14px; }
+  }
 
   /* ── v2: thesis monitor ── */
   .theses { display: grid; gap: 12px; }
@@ -361,6 +380,9 @@
     background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
   .news-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--regime); margin-top: 8px; }
   .news-head { font-weight: 600; font-size: 14px; color: var(--text); }
+  /* 29.10.2026 (разходката, т. 3–4): заглавието е линк към статията — без отделен ред */
+  a.news-head { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+  a.news-head:hover { text-decoration-color: var(--muted); }
   .news-why { font-size: 13.5px; color: var(--muted); }
 
   /* ── Track Record: Open Positions таблица ── */
@@ -473,7 +495,7 @@
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
-      <div class="date mono">29.10.2026, четвъртък · генериран 07:41 CET · 1 ч 18 мин до US pre-market (04:00 ET)</div>
+      <div class="date mono">30.10.2026, петък · генериран 07:44 CET · 1 ч 15 мин до US pre-market (04:00 ET)</div>
     </div>
     <div>
       <div class="regime-badge">Offensive</div>
@@ -510,122 +532,128 @@
 
 
 
+<div class="model-banner rejected">✂ <strong>Отрязан AI отговор</strong> — следните секции
+  са непълни или празни:
+  <ul class="tight" style="margin:6px 0 0 18px">
+  
+  <li><strong>Наблюдавани тикъри</strong> — моделът
+    достигна лимита си за изход (2000 токена, claude-sonnet-4-6)</li>
+  </ul></div>
+
 
 
 
 
 <section>
   <h2>Пазарен термометър</h2>
+  
   <div class="thermo">
     
     
     <div class="t-card green">
       <div class="t-name">SPY тренд</div>
-      <div class="t-val">772.31</div>
-      <div class="t-label">SPY 772 | над 50DMA, над 200DMA</div>
+      <div class="t-val">769.36</div>
+      <div class="t-label">SPY 769 | над 50DMA, над 200DMA</div>
     </div>
-    
-    
-    
+  
     <div class="t-card green">
       <div class="t-name">VIX</div>
-      <div class="t-val">16.91</div>
-      <div class="t-label">VIX 16.9 (risk-on)</div>
+      <div class="t-val">17.2</div>
+      <div class="t-label">VIX 17.2 (risk-on)</div>
     </div>
-    
-    
-    
+  
     <div class="t-card yellow">
       <div class="t-name">Put/Call (SPY)</div>
-      <div class="t-val">0.96</div>
-      <div class="t-label">P/C 0.96 (15. percentile от 96 дни; в нормалния диапазон)</div>
+      <div class="t-val">1.23</div>
+      <div class="t-label">P/C 1.23 (76. percentile от 97 дни; в нормалния диапазон)</div>
     </div>
-    
-    
-    
+  
     <div class="t-card green">
       <div class="t-name">2Y/10Y спред</div>
-      <div class="t-val">0.38</div>
-      <div class="t-label">0.38% (нормален, steepening)</div>
+      <div class="t-val">0.37</div>
+      <div class="t-label">0.37% (нормален, steepening)</div>
     </div>
-    
-    
-    
-    <div class="t-card yellow info">
-      <div class="t-name">Fed Net Liquidity</div>
-      <div class="t-val">5808.2</div>
-      <div class="t-label">$5,808 млрд към 2026-10-21 · +0.1% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима</div>
-    </div>
-    
-    
-    
-    <div class="t-card yellow info">
-      <div class="t-name">SOFR − IORB (финансиране)</div>
-      <div class="t-val">5.0</div>
-      <div class="t-label">+5.0 б.п. към 27.10 (SOFR 3.95% − IORB 3.90%) · +7.0 б.п. за седмица · 93. percentile, z +0.9 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима</div>
-    </div>
-    
-    
-    
+  
     <div class="t-card green">
       <div class="t-name">MOVE (Bond Vol)</div>
-      <div class="t-val">94.6</div>
-      <div class="t-label">MOVE 95 (-1 пункта/седмица)</div>
+      <div class="t-val">93.5</div>
+      <div class="t-label">MOVE 94 (-13 пункта/седмица)</div>
     </div>
-    
-    
-    
+  
     <div class="t-card green">
       <div class="t-name">VIX Term Structure</div>
-      <div class="t-val">0.812</div>
-      <div class="t-label">VIX9D 15.6 / VIX 16.9 / VIX3M 19.2 → ratio 0.81 (contango, нормално)</div>
+      <div class="t-val">0.819</div>
+      <div class="t-label">VIX9D 15.9 / VIX 17.2 / VIX3M 19.4 → ratio 0.82 (contango, нормално)</div>
     </div>
-    
-    
-    
+  
     <div class="t-card green">
       <div class="t-name">IEI/HYG (Credit Spread)</div>
-      <div class="t-val">1.4758</div>
-      <div class="t-label">IEI/HYG 1.476 (14. percentile) · 10д RoC -0.2% (IEI +0.8%, HYG +1.0%) (43. percentile)</div>
+      <div class="t-val">1.4805</div>
+      <div class="t-label">IEI/HYG 1.481 (20. percentile) · 10д RoC +0.1% (IEI +0.7%, HYG +0.6%) (68. percentile)</div>
     </div>
-    
-    
-    
+  
     <div class="t-card green" title="Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&amp;P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.">
       <div class="t-name">Market Breadth (% над 40dMA)</div>
-      <div class="t-val">60.2</div>
-      <div class="t-label">60.2% над 40dMA (здравословна ширина)</div>
+      <div class="t-val">68.0</div>
+      <div class="t-label">68.0% над 40dMA (здравословна ширина)</div>
     </div>
-    
-    
+  
     
     
     <div class="t-card yellow" title="Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.">
       <div class="t-name">Distribution Days <span style="opacity:.6">(подобно на IBD)</span></div>
-      <div class="t-val">7</div>
-      <div class="t-label">SPY 6 / QQQ 7 (последни 25 сесии)</div>
-    </div>
-    
-    
-    
-    
-    <div class="t-card" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна, ~1 месец закъснение.">
-      <div class="t-name">Основна инфлация</div>
-      
-      <div class="t-val">2.19%</div>
-      <div class="t-label">за август · <span title="Средно юни–август срещу март–май; под ±0.1 пп = стабилна">↓ пада: 3м средно 2.25% срещу 2.39%</span> · информативно, не влиза в режима</div>
-      
+      <div class="t-val">8</div>
+      <div class="t-label">SPY 7 / QQQ 8 (последни 25 сесии)</div>
     </div>
     
   </div>
   
   
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6) · distribution days SPY 6/9, QQQ 7/9 — при 9 Offensive се блокира (липсват 2) · IEI/HYG 10д RoC 43. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.23% срещу +0.78% преди 5 сесии — спада (забавя се)</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 7, минимум 4; видими 8, минимум 6) · distribution days SPY 7/9, QQQ 8/9 — при 9 Offensive се блокира (липсва 1) · IEI/HYG 10д RoC 68. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е +0.09% срещу +1.13% преди 5 сесии — спада (забавя се)</div>
+  
+  
+  
+  <div class="thermo-info">
+  <div class="thermo-info-head">Информативни — не влизат в режима</div>
+  <div class="thermo">
+    
+    <div class="t-card yellow info">
+      <div class="t-name">Fed Net Liquidity</div>
+      <div class="t-val">5729.8</div>
+      <div class="t-label">$5,730 млрд към 2026-10-28 · -0.3% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима</div>
+    </div>
+  
+    <div class="t-card yellow info">
+      <div class="t-name">SOFR − IORB (финансиране)</div>
+      <div class="t-val">4.0</div>
+      <div class="t-label">+4.0 б.п. към 28.10 (SOFR 3.94% − IORB 3.90%) · +6.0 б.п. за седмица · 91. percentile, z +0.8 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима</div>
+    </div>
+  
+    
+    
+    
+    
+    
+    
+    <div class="t-card info" title="Dallas Fed Trimmed Mean PCE, 12 месеца, % г/г (FRED PCETRIM12M159SFRBDAL). Месечна серия: данните за един месец излизат в края на следващия (~6 седмици след средата на месеца, ~4 седмици след края му); брифът ги взима на следващата сутрин.">
+      <div class="t-name">Основна инфлация</div>
+      
+      <div class="t-val">2.26%</div>
+      <div class="t-label"><b>данни за септември 2026</b> · излизат с ~6 седмици закъснение (в края на следващия месец) · <span title="Средно юли–септември срещу април–юни; под ±0.1 пп = стабилна">↓ пада: 3м средно 2.25% срещу 2.37%</span> · информативно, не влиза в режима</div>
+      
+    </div>
+    
+  </div>
+  </div>
   
   
   
   
 </section>
+
+
+
+
 
 
 <section>
@@ -635,65 +663,65 @@
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Alphabet sinks 10% as it holds 2026 capex unchanged, expects significant increase in 2027</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Alphabet потъва с 10% тъй като запазва capex за 2026 непроменен, очаква значително увеличение през 2027 г.)</span>
-        <span class="news-why"> — Технологичният сектор и Nasdaq futures под натиск; рекламните и cloud акции поевтиняват, а капиталовите разходи в AI сектора влизат под съмнение.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMixAFBVV95cUxQc01IcXZiYm9zemhhbHhBenBOeFE4NDlHMC1TNGxUOHNlVFJIQmY3QTF1cnpqZmRBcGlic184TnhyRVEtSEVkSTNGdzBxejNaUVlqSEkyMllicG50YkY1TURzUWtnVE5nVlhSYk1ROWwwdDdwQWg2NlZVVEgxc2NuQVZwUWxrOVBmRzNHb2dYUUJiQ2tmTFhfT3NGblYtTjhPdDNmUE5VVFJ1RnRTbnJnRXdSNm55VzRBSVBySTc2Wnc3aDJ2?oc=5" target="_blank" rel="noopener noreferrer">Blockchain analysis firm TRM says North Korea behind Binance crypto theft - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span> <span class="news-why" style="font-size:12px">· също: <a href="https://news.google.com/rss/articles/CBMivAFBVV95cUxQUklCT0Zncjc4TE93UXRGOFczR29GTTg1WllYUXVhWko5YWpRZ05DcXZKb0ZSMnhWS3VnNnBBUzJtRThXSHdYUlRPdC1scGtPb1BCb3hJM0JRWFVpVE1rUGFiUFBtV2hleHVVdl8wRW03eDdLdGc3TkpvdzY4UFNiTXJ3ZkEzZmNIY0ZUVkt4WHdYQVBtQkZhcm9GU2xiRXVUaUVndXlpYmxKQnpXamZiUV83OHZpU3U3Z2tFLQ?oc=5" target="_blank" rel="noopener noreferrer" title="Where Binance&#39;s $6.3 billion breach ranks in crypto&#39;s biggest hacks and heists - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxOUTg2OTFfWjhaMHRyQVFuRHhFalRRM2d3VnBkOGFnOHRtVGpRWHdIa0x3ZnhqbDEwZmh5X0s2NGZzbTJodXU5YWhTVjZEYW11TnI5cHU1SUZJMUVIbDJSRGNhMkd3dTZublJuU3BtUzNHME16aFd1UG9BYnNfQThSdzFSVUlsSVpoTXExcS1vMUUyRkNkcjRieGpZUnNrNjVfWTBQbVNmWDlZS2VHWWhlaG5lb2wyWHFuS3BtNGxveU1HUGxXc1dV?oc=5" target="_blank" rel="noopener noreferrer" title="Analysts react as Binance freezes assets after $6.3 billion security breach - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxQbl9LV3Z6eEFpLVBKcmR2ZG9YM1lNRmZBTGRQUF9qeVRLVmlaYnc2ZDdkNERRd3VPTTNtQ0dkRGluRG56czhmbUJKaFNYU1NSX1k0VllaY2l3bGxpNTBOOG1acWdmcW90ZW5UMVF1OU11OG1HOXhZaEF3b0lucWZpLUpQaldUMEV0V1BXU3lKUXBndXBBMGtyMzJDLVFzSzZ0MGViYlNhMGJETXFUd1l0Q0s2TmNGeDFHS2c?oc=5" target="_blank" rel="noopener noreferrer" title="Bitcoin, cryptocurrency prices fall after Binance reports security issue - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxPT3g4aktSMUNOUXJpZ0NMa2hicVFaR28zZjd6NWF5Qkp5U1RfbURlMWRoc2oxa2wzb24yNUowQWNSSmhsanVLWUFfdUJYalF6b2l5eHFTSzctV0VPQlE0UEpBZm9BdkpJSFo5OTdXWDJINE1JWXVILUhvYk1JVlpKVzFvTGJTYzJGSlQ4VXB2ZnRnNHFORmRDTmdtOG1kam9wNTh3TWYyX1VFVmp4bzMxQ096eUdCTzNIRkVHNDZZelNjWkhpVWlV?oc=5" target="_blank" rel="noopener noreferrer" title="Binance freezes assets after $6.3 billion heist, crypto industry&#39;s biggest - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxQWmNFOVU3dkJheHFpZnlQZ0d2RVd2dDZFdjBlVldUczQteU5yUUlIeldzeVR6d2lJem9aWkh6RV94Uko1cXpZS2RhV2FGR2E2djNHZGJaNG5BOTFvSnZkLWp5c2tSanlNalhnaTJ6RFlxVWNNMHo1NnpzNGVQWHdJZkw0ZkxkWUNQdnRnZGU1Y1JCQ3NuRGc?oc=5" target="_blank" rel="noopener noreferrer" title="Binance flags ‘potential security issue,’ says approximately $6.3 billion impacted - AP News" style="color:var(--muted)">AP Business</a>, <a href="https://www.ft.com/content/c7f5e395-c3a9-430e-b757-5014527b4d49?syn-25a6b1a6=1" target="_blank" rel="noopener noreferrer" title="Binance halts withdrawals after $6.3bn hack" style="color:var(--muted)">Financial Times</a>, <a href="https://www.cnbc.com/2026/10/29/circle-tether-freeze-funds-impacted-by-potential-binance-security-issue.html" target="_blank" rel="noopener noreferrer" title="Biggest-ever crypto hack impacts $6.3 billion as Binance works to contain fallout" style="color:var(--muted)">CNBC</a></span>
+        
+        <span class="news-why"> — Криптовалутният сектор е под натиск — BTC и алткойните падат, доверието в централизираните борси е разклатено, а замразяването на активи на най-голямата борса в света може да предизвика верижна ликвидация.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Microsoft акциите скачат с 4% тъй като ръстът в облака движи по-добри от очакваните приходи и печалба.)</span>
-        <span class="news-why"> — Microsoft скача и частично компенсира натиска от Alphabet; облачният и AI сектор получава позитивен импулс, а neocloud доставчиците остават под въпрос заради по-нисък capex.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMiswFBVV95cUxPckM0NUFNY0hHSVN5Y3Z2OWR6Zk9yLTVIdEtxX1JIMkR2Sjd2c2VCY01BT3QzOWQ5WmF5QmNyTC03X1VsV2V1SVZRbk9mc2lxZG9FNnBaVm1fSWVpeFdJRUxnTXJTbFdxZnFNUEtBMjRxc2FpTFJVdk0yTkxmSFM2a3Njek9JcExYRldGRFVXSEpTY1hRam1CMVBpZ3Vrc1h1MGQ2UXdScnR4dUNlUzBOamEzcw?oc=5" target="_blank" rel="noopener noreferrer">BOJ keeps interest rates steady, signals further rate hikes - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span> <span class="news-why" style="font-size:12px">· също: <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxPUVJOQjlQV2RMWlM5UDhDcTIxN1RCOFVwYWxOOElaZGxWRTRJajZ2YzNLM2wzeGlBNW9KYkxiVW1LZUNrbjlpNUdFeGJQQmYxdnhDZXR0TTRSWkpGUGdxdFA4RUtOdWJMUmdQR0lmd1RIQVAxa2FaMURNaVVkZEZzTkg3X0pnY1d0MEhLOVhDVkxzS2p1VWpkbjkxTjcxSG1VYW90cg?oc=5" target="_blank" rel="noopener noreferrer" title="Tokyo core inflation exceeds BOJ target in October - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNQU9uNjhpN1dHMHNxdDR0SlBWa1VGV0Q5MkxrVWxKYWk0YWhtd2ZBZFM4dkYwaFNocVBfYmR2czM3VU9aUlV5SVMwRGtOWUJicTV4VFlZODRZRC1IMUw2aFZyYzcxUWpjWFNJbWY0YWFyaHJaRloxM1BWTlZzc1NzRkoyUm45aVNBM1hNODNWbkY4ZmpreWVmMXc4b2FGbkc5NzdWQkwwaWVCYm8?oc=5" target="_blank" rel="noopener noreferrer" title="Japan&#39;s Nikkei slumps 3% as tech stocks tumble on AI worries - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://www.cnbc.com/2026/10/30/boj-inflation-target-rates.html" target="_blank" rel="noopener noreferrer" title="BOJ holds rates as underlying inflation aligns with 2% target for first time since 2013" style="color:var(--muted)">CNBC</a></span>
+        
+        <span class="news-why"> — Потвърждението на 2% инфлационна цел от BOJ и сигналите за бъдещи повишения укрепват йената и оказват натиск върху японските акции и глобалните carry trade позиции.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Fed meeting recap: Warsh says central bank will host fewer rate-setting meetings in future years</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Обзор от заседанието на Fed: Warsh казва, че централната банка ще провежда по-малко заседания за лихвени решения в бъдеще.)</span>
-        </div>
+      <div><a class="news-head" href="https://www.cnbc.com/2026/10/29/alphabet-google-microsoft-msft-shares-today-earnings.html" target="_blank" rel="noopener noreferrer">Alphabet tanks nearly 13% for worst day ever, losing $500 billion in value</a> <span class="news-why" style="font-size:12px">· CNBC</span> <span class="news-why" style="font-size:12px">· също: <a href="https://www.cnbc.com/2026/10/29/alphabet-google-search-ai-earnings.html" target="_blank" rel="noopener noreferrer" title="Alphabet earnings miss reflects first real sign that AI is taking a bite out of search" style="color:var(--muted)">CNBC</a></span>
+        <span class="news-why"> (Alphabet се срива с близо 13% в най-лошия си ден, губейки $500 млрд от стойността си)</span>
+        <span class="news-why"> — Историческият срив на Alphabet влачи надолу целия технологичен сектор и S&amp;P 500, засилвайки опасенията, че AI конкуренцията подяжда приходите от търсене.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Bessent says &#39;not necessarily&#39; a mistake if the Fed hikes again</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Безент казва, че не е непременно грешка ако Fed повиши лихвите отново.)</span>
-        <span class="news-why"> — Изявление на финансовия министър, че ново повишение на лихвата не би било грешка, засилва hawkish очакванията и натиска върху облигациите и акциите с висока оценка.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxPbEgxampOc0U5RENJWVd0a09uQjlFSkxueGxGVzVPX2NwdElzNDN3WXdjVFpvelNULXVObnMzTTJzb0ZfeFBtN1ZOQ0FVNXRuN0ZINkF0dWZkZlR6ZlkzUE5wQWpPTWg3dGtDLURwRl9OU0ZEb1UtejNBbC1KMnVWbmJ5OHQxWTBoU1I3cFduaXAyOHFBVkFIYjhCNXR1c0EyM2xlZFZNWFM?oc=5" target="_blank" rel="noopener noreferrer">Intel shares tumble after hours, hit by chip supply constraints, big cash burn - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span> <span class="news-why" style="font-size:12px">· също: <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxNcXEzUmpkSHEwZWtxM2cwVjMwQkJXMVZqVUJrWk8xejY0TzkyZmtvN0E2Z3Q3MDJfNkRLOXRKUW5xR2QzLVM5WjQzSVp2OVBhQldOMVJKZkJ2ZC1qMm04dWFSVjExd1h2bXV2emx1dmkwTVFzT29DamloeVhPZUdwZEhuUmhvem92VG9MQzFIZU1ibDR1MWNaZ0o2ZVBOYzhodHdyQVY4T1U?oc=5" target="_blank" rel="noopener noreferrer" title="Amazon burns cash, Intel flags weak PC demand as AI boom&#39;s costs ripple across markets - Reuters" style="color:var(--muted)">Reuters Business</a>, <a href="https://www.ft.com/content/d7540e89-08db-43d3-92e0-3c15dd3a60cb?syn-25a6b1a6=1" target="_blank" rel="noopener noreferrer" title="Intel shares fall 22% as weak sales outlook dents turnaround" style="color:var(--muted)">Financial Times</a>, <a href="https://www.cnbc.com/2026/10/29/intel-intc-q3-earnings-report-2026-.html" target="_blank" rel="noopener noreferrer" title="Intel stock plunges 21% as chipmaker blames PC slowdown for weak guidance" style="color:var(--muted)">CNBC</a>, <a href="https://www.cnbc.com/investingclub/2026/10/29/intel-plunges-on-a-major-guidance-miss-what-went-wrong-how-to-proceed.html" target="_blank" rel="noopener noreferrer" title="Intel plunges on a major guidance miss. What went wrong — and how to proceed" style="color:var(--muted)">CNBC</a></span>
+        
+        <span class="news-why"> — Срив от 22% при Intel удря полупроводниковия сектор и Nasdaq, сигнализирайки за продължаваща слабост в PC пазара и компресия на маржовете.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Google shares tumble 10% after $51bn AI outlay deepens cash burn</span> <span class="news-why" style="font-size:12px">· Financial Times</span>
-        <span class="news-why"> (Google акциите падат с 10% след като разходите от 51 млрд. долара за AI задълбочават изгарянето на кеш.)</span>
-        <span class="news-why"> — Спад в традиционното търсене заради AI mode удря рекламните приходи и сигнализира структурна заплаха за целия онлайн рекламен сектор.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMiswFBVV95cUxNQXhDSjU4RmlrZmUyT0E5dzJNbmJNaXBBdGhndktXeGUtZVItTWlpNDBZcXR5LTZDMjFOdzdXenRpTnhNd01pZXBXX0V0OTVlYkMtVlJnN2l4YS1QeENxeWlzUUN6bDZkeThpc1VBMUZDQjFYcGxrQWFrVzBVOXdueV9Tb0drZjZ4T3JYWmRXS2MwWnMwMGpoT05FU1lUVWhRbXlPZEpYUjZQbnlrQWh3SGdsTQ?oc=5" target="_blank" rel="noopener noreferrer">Amazon sinks as AI spending eclipses fastest cloud growth in five years - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span> <span class="news-why" style="font-size:12px">· също: <a href="https://www.ft.com/content/8affd8dd-b783-48c8-86e2-ac4a647fa0f3?syn-25a6b1a6=1" target="_blank" rel="noopener noreferrer" title="Amazon shares slide on lower Christmas sales forecast" style="color:var(--muted)">Financial Times</a>, <a href="https://www.cnbc.com/2026/10/29/amazon-amzn-q3-earnings-report-2026.html" target="_blank" rel="noopener noreferrer" title="Amazon posts negative free cash flow of $42.4 billion, holds 2026 capex unchanged" style="color:var(--muted)">CNBC</a>, <a href="https://www.cnbc.com/2026/10/29/aws-q3-earnings-report-2026.html" target="_blank" rel="noopener noreferrer" title="Amazon AWS posts 39% revenue growth as cloud rivals also accelerate" style="color:var(--muted)">CNBC</a></span>
+        
+        <span class="news-why"> — Разочароващите финансови резултати и прогнози на Amazon потискат акцията и засилват притесненията за устойчивостта на разходите за AI инфраструктура сред мегакап технологичните компании.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">EXCLUSIVE: US DOJ is inquiring about Nvidia&#39;s purchase of Hugging Face, sources say - Reuters</span> <span class="news-why" style="font-size:12px">· Reuters Business</span>
-        <span class="news-why"> (ЕКСКЛУЗИВНО: Министерството на правосъдието на САЩ разследва покупката на Hugging Face от Nvidia.)</span>
-        <span class="news-why"> — Антитръстово разследване на DOJ срещу Nvidia заради придобиването на Hugging Face може да ограничи M&amp;A активността в AI сектора и оказва натиск върху NVDA.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxOWE5IUkRJTVJvTFE5SUdOdFFCM2tVN1lKcDI3ci01cjlleVVuXzB1SjI0MDhuWkhwakZFSzl3SGNUZk9uUUYwdHNfMGJOUXExaW1RdmRRVy1Cd0tHb3RqblJCQWczeXdORDVKbVMxMGFrbnVMM3FCY2h5Xzl6T0ZoeTBtbGdnbW9jdWF6VEtqNi14ZnlFaVVpb0xZcHlGTDhtM0ZmY2RYZ2Q?oc=5" target="_blank" rel="noopener noreferrer">Oil set for fourth monthly gain as Hormuz tanker attack highlights supply risks from war - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span> <span class="news-why" style="font-size:12px">· също: <a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPODlXY2RDRGVPYkNGQ20xbjVsN01Vdzl0NWItMlVkOFJzTnRjNU1GRW9vdzBOckdWVjNhdHdfa3RLV0VETGxWOVVCVWFSbVUxSUJnQ2lKaUFrdFNoU1gyNHdyQVhoc3h4MFNTaXRoOEl0aHRmZGpfb2txSEpXS1M1WWR3UmoxZXVwNWV3Y080emJWX1pNSWJLMlYxNXhVOHNPeUNOV0ZWT0oxZ3pMYUN2c2VlR1Y?oc=5" target="_blank" rel="noopener noreferrer" title="Iran says 3 oil tankers struck mines, and other Mideast news - AP News" style="color:var(--muted)">AP Business</a></span>
+        <span class="news-why"> (Петролът е на път за четвърти пореден месечен ръст, тъй като атаката срещу танкер в Ормуз подчертава рисковете за доставките)</span>
+        <span class="news-why"> — Атаката срещу танкер в Ормузкия проток засилва геополитическата рискова премия в петрола, натискайки енергийните акции нагоре и засилвайки инфлационния натиск.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">Fed holds fire on interest rates despite intensifying inflation</span> <span class="news-why" style="font-size:12px">· Financial Times</span>
-        <span class="news-why"> (Fed задържа огъня върху лихвените проценти въпреки засилващата се инфлация.)</span>
-        </div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMirgFBVV95cUxOMFY2WEZOWHhyVDVPMkM2ZVUxM01TR09lcUZ0RlBWNF96QkJzWXhUZWpIbmlRSUlxN3FiZ0pEYWVXOW1YcVBQcHQ4cjU1NFpCQVlnS3pneWlKeTZIRjJzWkJuek9OeDhNSGxTU1ozV1g0czltbldNNkJORWRWS0ZBU25WdURjNWNpREdpdmZoV1c2ZzBnUmM5cm5HTG16OFpEdVhLWC13RkxHM3IxX1E?oc=5" target="_blank" rel="noopener noreferrer">Gold slips as higher oil, US inflation data bolster Fed hike bets - Reuters</a> <span class="news-why" style="font-size:12px">· Reuters Business</span>
+        <span class="news-why"> (Златото поевтинява, тъй като по-високите цени на петрола и инфлационните данни в САЩ подкрепят очакванията за повишение от Fed)</span>
+        <span class="news-why"> — По-силните от очакваното инфлационни данни укрепват долара и очакванията за още повишения на Fed, което потиска златото и облигациите.</span></div>
     </div>
     
     <div class="news-item">
       <span class="news-dot"></span>
       
-      <div><span class="news-head">DoorDash&#39;s deal to buy Instacart coming as early as Thursday morning, sources tell CNBC</span> <span class="news-why" style="font-size:12px">· CNBC</span>
-        <span class="news-why"> (Сделката на DoorDash за покупка на Instacart може да се случи още в четвъртък сутринта, казват източници на CNBC.)</span>
-        <span class="news-why"> — Сделка при оценка от около 17 млрд. долара разчупва вялия M&amp;A пазар и движи акциите на delivery и grocery tech сектора.</span></div>
+      <div><a class="news-head" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxNd0t1M2lJYVRDeHhmSWRYc01ONFJxdlNybDhYZWpzNzJBdFd6OGJ0TEh2SkdwTndiRzVsM3B5eERhaG10eng3MDZzM0JpMko2dnFiQkZSc0tNVXppX0xyck5wNmxQMV9LcmJuOEQ3cFpveldnRlRkcHh2MFkwRjVOU0JYTjdIV0JQTHVBYmo0ZkNyUQ?oc=5" target="_blank" rel="noopener noreferrer">European Central Bank head resigns, allowing EU leaders to choose successor before French election - AP News</a> <span class="news-why" style="font-size:12px">· AP Business</span>
+        <span class="news-why"> (Шефът на Европейската централна банка подава оставка, позволявайки на лидерите на ЕС да изберат наследник преди френските избори)</span>
+        <span class="news-why"> — Неочакваната смяна на ръководството на ЕЦБ внася несигурност в еврото и европейските лихвени пазари в чувствителен политически момент.</span></div>
     </div>
     
   </div>
@@ -708,32 +736,46 @@
   <div class="news-list">
     
     <div class="news-item"><span class="news-dot"></span>
-      <div><span class="news-head">Bitcoin ETF inflows climb to $176M as BTC rebounds above $80K</span> <span class="news-why" style="font-size:12px">· Cointelegraph</span>
-        <span class="news-why" style="font-size:12px">· ETF потоци</span><span class="news-why"> — Значителен приток към спот Bitcoin ETF-и сигнализира за възстановяване на институционалния интерес след период на нетни изходящи потоци.</span></div>
+      <div><a class="news-head" href="https://www.coindesk.com/business/2026/10/29/potential-multi-billion-binance-hack-hitting-crypto-markets" target="_blank" rel="noopener noreferrer">Binance loses over $6 billion in &#39;biggest crypto hack in history&#39;</a> <span class="news-why" style="font-size:12px">· CoinDesk</span> <span class="news-why" style="font-size:12px">· също: <a href="https://www.coindesk.com/markets/2026/10/30/coindcx-halts-new-crypto-futures-bets-as-binance-incident-disrupts-liquidity" target="_blank" rel="noopener noreferrer" title="Binance hack bites India&#39;s largest crypto exchange as it curbs futures trading" style="color:var(--muted)">CoinDesk</a>, <a href="https://www.coindesk.com/markets/2026/10/30/binance-hacker-splits-usd1-4-billion-of-bitcoin-into-19-wallets-that-no-one-can-freeze" target="_blank" rel="noopener noreferrer" title="Binance hacker splits $1.4 billion of bitcoin into 19 wallets that no one can freeze" style="color:var(--muted)">CoinDesk</a>, <a href="https://www.coindesk.com/markets/2026/10/30/usd6-billion-binance-hack-sends-bitcoin-ether-tumbling-standard-chartered-sees-more-losses-ahead" target="_blank" rel="noopener noreferrer" title="$6 billion Binance hack sends bitcoin, ether tumbling; Standard Chartered expects more pain" style="color:var(--muted)">CoinDesk</a>, <a href="https://www.coindesk.com/markets/2026/10/30/institutional-crypto-investors-rush-to-pull-funds-from-exchanges-after-binance-hack" target="_blank" rel="noopener noreferrer" title="Institutional crypto investors rush to pull funds from exchanges after Binance hack" style="color:var(--muted)">CoinDesk</a>, <a href="https://www.coindesk.com/policy/2026/10/29/crypto-s-longtime-foe-north-korea-s-lazarus-group-likely-behind-binance-hack-blockchain-sleuths" target="_blank" rel="noopener noreferrer" title="Crypto&#39;s longtime foe, North Korea&#39;s Lazarus Group, likely behind Binance hack: blockchain sleuths" style="color:var(--muted)">CoinDesk</a>, <a href="https://www.coindesk.com/business/2026/10/30/binance-hack-drained-wallets-backing-customer-assets-reserve-data-shows" target="_blank" rel="noopener noreferrer" title="Binance hack drained wallets backing customer assets, reserve data shows" style="color:var(--muted)">CoinDesk</a>, <a href="https://cointelegraph.com/markets/binance-hack-rattles-crypto-markets-bnb-bitcoin-slide?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer" title="Binance hack rattles markets as BNB falls 8%, Bitcoin nears $77K" style="color:var(--muted)">Cointelegraph</a>, <a href="https://cointelegraph.com/news/binance-linked-wallet-faces-possible-exploit-blockchain-researcher-warns?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer" title="Live updates: Binance $6.3B hack linked to North Korea’s TraderTraitor" style="color:var(--muted)">Cointelegraph</a></span>
+        <span class="news-why"> — Хакът на Binance за над $6 млрд. е най-голямото крипто пробиване в историята и директно засяга сигурността на борсова инфраструктура, резервите на клиентски активи и доверието в централизираните платформи, което е критично за институционалните инвеститори.</span></div>
     </div>
     
     <div class="news-item"><span class="news-dot"></span>
-      <div><span class="news-head">Google Cloud outlines MPC service for institutional Bitcoin custody</span> <span class="news-why" style="font-size:12px">· Cointelegraph</span>
-        <span class="news-why" style="font-size:12px">· решение на голяма борса / банка</span><span class="news-why"> — Навлизането на Google Cloud в институционалното съхранение на Bitcoin легитимира пазара и може да увеличи институционалното търсене.</span></div>
+      <div><a class="news-head" href="https://www.coindesk.com/business/2026/10/29/tokenized-stock-venue-on-canton-could-beat-okx-ice-to-first-trade-under-sec-framework" target="_blank" rel="noopener noreferrer">Tokenized stock venue on Canton could beat OKX–ICE to first trade under SEC framework</a> <span class="news-why" style="font-size:12px">· CoinDesk</span> <span class="news-why" style="font-size:12px">· също: <a href="https://cointelegraph.com/news/canton-strategic-holdings-tokenized-stock-trading-november-2026?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer" title="Nasdaq-listed Canton Strategic Holdings plans tokenized stock trading from Nov. 2" style="color:var(--muted)">Cointelegraph</a></span>
+        <span class="news-why"> — Nasdaq-листната компания планира токенизирана търговия с акции с пълни акционерни права и незабавен сетълмент под SEC иновационно изключение, което е пряко свързано с регулаторната рамка за токенизация на ценни книжа.</span></div>
+    </div>
+    
+    <div class="news-item"><span class="news-dot"></span>
+      <div><a class="news-head" href="https://www.coindesk.com/business/2026/10/29/walmart-eli-lilly-join-growing-pushback-against-okx-ice-tokenized-stock-plans" target="_blank" rel="noopener noreferrer">Walmart, Eli Lilly join growing pushback against OKX–ICE tokenized stock plans</a> <span class="news-why" style="font-size:12px">· CoinDesk</span> <span class="news-why" style="font-size:12px">· също: <a href="https://cointelegraph.com/markets/hype-price-all-time-high-ice-us-hyperliquid-perps?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer" title="HYPE teases all-time high as NYSE owner ICE eyes US Hyperliquid perps" style="color:var(--muted)">Cointelegraph</a></span>
+        <span class="news-why"> — NYSE собственикът ICE проявява интерес към предлагане на деривати върху Hyperliquid, което сигнализира навлизане на традиционните финансови инфраструктури в децентрализираните деривативни пазари.</span></div>
+    </div>
+    
+    <div class="news-item"><span class="news-dot"></span>
+      <div><a class="news-head" href="https://cointelegraph.com/news/bank-of-england-opens-consultation-on-tokenized-collateral-for-clearing?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer">Bank of England opens consultation on tokenized collateral for clearing</a> <span class="news-why" style="font-size:12px">· Cointelegraph</span>
+        <span class="news-why"> — Банката на Англия открива консултация за използване на токенизирано обезпечение при клиринг, което може да промени регулаторната рамка за институционалното използване на дигитални активи в традиционната финансова инфраструктура.</span></div>
+    </div>
+    
+    <div class="news-item"><span class="news-dot"></span>
+      <div><a class="news-head" href="https://cointelegraph.com/markets/bitcoin-etf-137-million-october-back-green?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound" target="_blank" rel="noopener noreferrer">Bitcoin ETFs add $137M, pushing October back into the green</a> <span class="news-why" style="font-size:12px">· Cointelegraph</span>
+        <span class="news-why"> — Положителните потоци в Bitcoin ETF-ите, върнали октомври на плюс въпреки рестриктивния Fed, са важен индикатор за устойчивото институционално търсене.</span></div>
     </div>
     
   </div>
   
   <div class="small" style="font-size:12.5px;margin-top:10px">
-    <b>COIN</b> $162.32 (+0.8% за сесията, -8.3% за 5) · <b>HOOD</b> $91.43 (-3.3% за сесията, -10.3% за 5) · <b>CRCL</b> $81.71 (+0.2% за сесията, -8.9% за 5) · <b>BLSH</b> $28.73 (-0.7% за сесията, -3.5% за 5)
-    <span style="color:var(--muted)"> — close към 28.10</span></div>
+    <b>COIN</b> $160.59 (-1.1% за сесията, -5.0% за 5) · <b>HOOD</b> $91.59 (+0.2% за сесията, -5.2% за 5) · <b>CRCL</b> $79.99 (-2.1% за сесията, -7.7% за 5) · <b>BLSH</b> $28.47 (-0.9% за сесията, -2.5% за 5)
+    <span style="color:var(--muted)"> — close към 29.10</span></div>
   
-  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI по критерии (регулация, ETF потоци, големи хакове и фалити, решения на големи борси и банки, макро с ефект върху крипто; без прогнози за цената, малки монети и мнения). Заглавието и източникът са дословни. Информация, не препоръка.</div>
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI по въпроса „би ли променила тази новина решението на институционален инвеститор в крипто след седмица?“ (важни: навлизането на традиционните финанси — токенизация, DTCC, големи банки, стейбълкойни, регулатори; не: прогнози за цената, малки монети, мнения). Заглавието и източникът са дословни. Информация, не препоръка.</div>
 </section>
 
 
 <section>
   <h2>Макро бриф</h2>
-  <div class="prose">Earnings сезонът разцепва технологичния сектор: Alphabet се срина ~10% след замразен capex за 2026 и $51 млрд. AI outlay, потискайки Nasdaq futures и рекламния онлайн сегмент; Microsoft скочи ~4% на облачен beat, частично компенсирайки натиска. Fed задържа лихвите, но изявлението на Bessent, че ново покачване „не би било грешка
-  <br><br><span style="color:var(--muted)">Режимът Offensive е оправдан от данните при текущото броене: 7 зелени, 1 жълт (Put/Call SPY на 14.6-и percentile от 96 дни — в нормален диапазон, без тревожен сигнал), 0 червени от 8 видими индикатора. Fed Net Liquidity и SOFR−IORB са информативни и не влизат в броенето. Запасът до смяна е ограничен, но измерим: достатъчен е един червен индикатор, за да падне режимът до Defensive — сега няма червени. Distribution days са натрупани (SPY 6/9, QQQ 7/9) — при достигане на 9 Offensive се блокира и за SPY липсват само 2, за QQQ — само 2; това е най-близкото автоматично ограничение. IEI/HYG 10-дневната RoC е -0.23% (спада спрямо +0.78% преди 5 сесии), далеч от прага от 90-и percentile, при който би задействала override Defensive. Тревожният елемент извън броенето: SOFR−IORB е на 93.1-и percentile (5.0 б.п. към 27.10, +7 б.п. за седмица) — висок percentile, но системата го третира като термометър с висока честота на фалшиви сигнали (47–72%) и ранен сигнал само в 1 от 3 исторически кризи. Earnings разцеплението (Alphabet vs Microsoft) добавя несигурност в XLK/XLC, но не е термометърен входящ сигнал. Заключение: Offensive е коректен по правилото, но маржът на безопасност е тесен — две distribution days или един нов червен индикатор биха го сменили.</span>
-  </div>
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Фючърси (Yahoo, договорът, който символът „=F“ дава днес): WTI $101.20 — дек. 2026 (CLZ26), цена от 29.10 02:21 ET, +1.7% за 5 дни по същия договор · злато $4 037 — дек. 2026 (GCZ26), цена от 29.10 02:21 ET, -0.6% за 5 дни по същия договор · мед $6.64 — дек. 2026 (HGZ26), цена от 29.10 02:21 ET, +3.7% за 5 дни по същия договор.</div>
+  <div class="prose"><p style="margin:0 0 10px">Нощта я определиха мегакап технологиите — Alphabet с историческия си срив от близо 13% и загуба на над $500 млрд. пазарна стойност, Intel надолу с 22% след резултатите, Amazon под натиск заради AI разходи. Това означава силен отлив от XLK и SMH, докато останалата ширина на пазара остава здравословна — 68% от акциите са над своите 40-дневни средни. VIX се успокои до 17.2, MOVE падна с 13 пункта за седмицата, кредитните спредове (IEI/HYG на 20-ти перцентил) остават стегнати и contango структурата на VIX потвърждава, че системата не е в паника — техническата разпродажба е секторна, не пазарна.</p><p style="margin:0 0 10px">Геополитиката натовари енергийния фронт — атака срещу танкер в Ормузкия проток изпрати WTI (декемврийски контракт CLZ26) до $103.31, а XLE поддържа положителна RS и на двата хоризонта с +15.5% за 12 седмици. BOJ потвърди курса на повишения — йената се укрепва, глобалните carry trade позиции се свиват, което обяснява и натиска върху Nasdaq. Основната инфлация (Dallas Fed Trimmed Mean PCE) за септември е 2.26%, с низходяща посока — средното за юли–септември е 2.25% срещу 2.37% за април–юни. Новините за петрол и данни за инфлация може да внушават ескалиращ ценови натиск, но котвата показва противоположното — разминаването си заслужава да се следи. Крипто пространството е под тежък удар след хака на Binance за над $6 млрд. — COIN −1.1% за деня, CRCL −2.1%; Bitcoin ETF-ите добавиха $137 млн., което показва, че институционалното търсене не е спряло, но доверието в централизираните борси е разклатено.</p><p style="margin:0">Под повърхността SOFR − IORB стои на +4.0 б.п. с 91-ви перцентил спрямо историята от 2018 г. — термометърът се покачи с 6 б.п. за седмица. Напомняме, че в нашето проучване това е ранен сигнал само в 1 от 3 кризи и носи 47–72% фалшиви сигнали, т.е. следим, не алармираме. TGA нарасна до $1,016 млрд. — ликвидността е в мъртвата зона с промяна от −0.3% за 4 седмици, без значима промяна. За нас: водещите сектори XLV, XLP, XLE и XLB са на правилната страна на тази нощ — отбранителното лидерство на здравеопазването и защитните потребители се задълбочава, докато енергетиката получава геополитическа премия.</p></div>
+  
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Фючърси (Yahoo, договорът, който символът „=F“ дава днес): WTI $103.31 — дек. 2026 (CLZ26), цена от 30.10 02:21 ET, +0.0% за 5 дни по същия договор · злато $3 999 — дек. 2026 (GCZ26), цена от 30.10 02:20 ET, -0.2% за 5 дни по същия договор · мед $6.55 — дек. 2026 (HGZ26), цена от 30.10 02:20 ET, +0.7% за 5 дни по същия договор.</div>
 </section>
 
 
@@ -743,11 +785,1404 @@
   <div class="wm-note">Ръчно поддържан списък (<code>data/watch_list.json</code>) —
     независим от скрийнъра, GLB и COT секциите.</div>
   
-  <div class="small" style="font-size:12.5px;color:var(--muted)">Списъкът е празен — тикъри се добавят в <code>data/watch_list.json</code>; ефектът е видим в следващия дневен бриф.</div>
   
-  <div class="wm-grid">
+  
+  
+  <div class="wt">
+    <div class="wt-row wt-head"><span>Тикър</span><span>Цена · ден</span><span>50 / 200DMA</span><span>RS 4 / 12 седм.</span><span>Отчет</span><span>Short interest</span><span>В брифа · събития</span></div>
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">TDOC<span class="wt-name">Teladoc Health, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$8.73 <span class="wt-up">+26.9%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+52.9%</span> / <span class="wt-up">+26.0%</span></span>
+    <span data-l="Отчет">24.02 <span class="wt-mu">(след 117 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">17.7%</span> от float · 8.8 дни · <span class="wt-num">+16.1%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">4 новини</span><span class="wt-mark" style="color:var(--yellow)">Form 4 · 1</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/teladoc-health-tdoc-stock-rebounds-032026255.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Teladoc Health (TDOC) Stock Rebounds On Q3 Results As Cash Flow Improves</a> <span class="wm-src">· 30.10 03:20 UTC</span></li>
+          
+          <li><a href="https://www.tikr.com/blog/teladoc-soars-11-on-q3-beat-and-raised-outlook-as-insurance-revenue-exceeded-our-expectations?ref=yahoofinance&amp;.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Teladoc Soars 11% on Q3 Beat and Raised Outlook as “Insurance Revenue Exceeded Our Expectations”</a> <span class="wm-src">· 29.10 19:00 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/teladoc-tdoc-stock-trades-why-175234839.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Teladoc (TDOC) stock trades up, here is why</a> <span class="wm-src">· 29.10 17:52 UTC</span></li>
+          
+          <li><a href="https://www.marketbeat.com/instant-alerts/transcript-teladoc-health-q3-earnings-call-highlights-2026-10-29/?utm_source=yahoofinance&amp;utm_medium=yahoofinance&amp;.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Teladoc Health Q3 Earnings Call Highlights</a> <span class="wm-src">· 29.10 08:04 UTC</span></li>
+          
+        </ul>
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Catapano Joseph Ronald <span class="wm-src">· Chief Accounting Officer</span></td>
+            <td class="num">$3,703</td>
+            <td class="num">4.4%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">BHC<span class="wt-name">Bausch Health Companies Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$8.91 <span class="wt-up">+28.8%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+54.4%</span> / <span class="wt-up">+41.7%</span></span>
+    <span data-l="Отчет">17.02 <span class="wt-mu">(след 110 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">2.8%</span> от float · 4.5 дни · <span class="wt-num">-4.5%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">1 новини</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/healthcare/articles/bhc-q3-earnings-beat-salix-134300174.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">BHC Q3 Earnings Beat on Salix Growth, Stock Gains 9% as Outlook Rises</a> <span class="wm-src">· 29.10 13:43 UTC</span></li>
+          
+        </ul>
+        
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">SAP<span class="wt-name">SAP SE</span></span>
+    <span data-l="Цена · ден" class="wt-num">$234.07 <span class="wt-dn">-1.2%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+10.3%</span> / <span class="wt-up">+18.7%</span></span>
+    <span data-l="Отчет">28.01 <span class="wt-mu">(след 90 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">0.4%</span> от float · 2.2 дни · <span class="wt-num">-18.0%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">4 новини</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/technology/ai/articles/sap-xtra-sap-really-building-170823699.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">What Is SAP (XTRA:SAP) Really Building With Its New AI Push?</a> <span class="wm-src">· 29.10 17:08 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/technology/articles/sap-selects-addison-north-texas-170000654.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">SAP Selects Addison for North Texas Regional Offices</a> <span class="wm-src">· 29.10 17:00 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/sap-stock-drops-servicenow-fortinet-124916890.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">SAP stock drops after ServiceNow, Fortinet results weigh</a> <span class="wm-src">· 29.10 12:49 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/rimini-street-announces-fiscal-third-200100435.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Rimini Street Announces Fiscal Third Quarter 2026 Financial and Operating Results</a> <span class="wm-src">· 29.10 20:01 UTC</span></li>
+          
+        </ul>
+        
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <div class="wt-row wt-plain">
+    <span class="wt-t">BLSH<span class="wt-name">Bullish</span></span>
+    <span data-l="Цена · ден" class="wt-num">$28.47 <span class="wt-dn">-0.9%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-dn">под</span> / <span class="wt-dn">под</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-dn">-18.7%</span> / <span class="wt-up">+19.5%</span></span>
+    <span data-l="Отчет">18.11 <span class="wt-mu">(след 19 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">13.8%</span> от float · 5.5 дни · <span class="wt-num">-8.5%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"></span>
+  </div>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">CRCL<span class="wt-name">Circle Internet Group</span></span>
+    <span data-l="Цена · ден" class="wt-num">$79.99 <span class="wt-dn">-2.1%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-dn">под</span> / <span class="wt-dn">под</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-dn">-4.2%</span> / <span class="wt-up">+26.5%</span></span>
+    <span data-l="Отчет">04.11 <span class="wt-mu">(след 5 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">12.0%</span> от float · 2.1 дни · <span class="wt-num">+25.8%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">2 новини</span><span class="wt-mark" style="color:var(--yellow)">Form 4 · 25</span><span class="wt-mark" style="color:var(--red)">CLUSTER</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://beincrypto.com/binance-hack-circle-tether-freeze-hot-wallets/?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Binance Hack: $6.3 Billion Impacted, Circle and Tether Freeze, Crypto Markets React</a> <span class="wm-src">· 29.10 21:35 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/crypto/articles/circle-stock-2-payment-plays-231554418.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Circle Stock And 2 Payment Plays After The Stablecoin Freeze</a> <span class="wm-src">· 29.10 23:15 UTC</span></li>
+          
+        </ul>
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-21</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Fox-Geen Jeremy <span class="wm-src">· Chief Financial Officer</span></td>
+            <td class="num">$1,350,000</td>
+            <td class="num">4.7%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-08</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Chandhok Nikhil <span class="wm-src">· Chief Product &amp; Tech. Officer</span></td>
+            <td class="num">$2,122,506</td>
+            <td class="num">3.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$1,078,646</td>
+            <td class="num">3.9%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$2,770,922</td>
+            <td class="num">10.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$732,624</td>
+            <td class="num">3.0%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$115,415</td>
+            <td class="num">0.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$29,045</td>
+            <td class="num">0.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$74,738</td>
+            <td class="num">1.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$19,782</td>
+            <td class="num">0.4%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$3,154</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$29,128</td>
+            <td class="num">0.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$74,738</td>
+            <td class="num">1.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$19,782</td>
+            <td class="num">0.4%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$3,069</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$29,128</td>
+            <td class="num">0.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$74,738</td>
+            <td class="num">1.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$19,698</td>
+            <td class="num">0.4%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$3,154</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$29,128</td>
+            <td class="num">0.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$74,822</td>
+            <td class="num">1.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$19,698</td>
+            <td class="num">0.4%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Allaire Jeremy <span class="wm-src">· Chairman and CEO · директор</span></td>
+            <td class="num">$3,069</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Fox-Geen Jeremy <span class="wm-src">· Chief Financial Officer</span></td>
+            <td class="num">$363,536</td>
+            <td class="num">1.4%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Razzaghi Hossein <span class="wm-src">· Chief Commercial Officer</span></td>
+            <td class="num">$156,977</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Schulz Tamara L <span class="wm-src">· Chief Accounting Officer</span></td>
+            <td class="num">$102,421</td>
+            <td class="num">1.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">AI<span class="wt-name">C3.ai, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$12.17 <span class="wt-dn">-1.3%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+8.8%</span> / <span class="wt-up">+22.9%</span></span>
+    <span data-l="Отчет">09.12 <span class="wt-mu">(след 40 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">28.4%</span> от float · 8.6 дни · <span class="wt-num">-0.6%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark" style="color:var(--yellow)">Form 4 · 2</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-13</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>SIEBEL THOMAS M <span class="wm-src">· CEO and Chairman of the Board · директор</span></td>
+            <td class="num">$5,145,076</td>
+            <td class="num">37.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Lath Hitesh <span class="wm-src">· CHIEF FINANCIAL OFFICER</span></td>
+            <td class="num">$247,400</td>
+            <td class="num">6.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">CRBG<span class="wt-name">Corebridge Financial, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$35.29 <span class="wt-dn">-0.1%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+4.1%</span> / <span class="wt-up">+5.1%</span></span>
+    <span data-l="Отчет">02.11 <span class="wt-mu">(след 3 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">5.8%</span> от float · 2.9 дни · <span class="wt-num">+20.1%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark" style="color:var(--yellow)">Form 4 · 27</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-27</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$6,259,186</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-26</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$6,390,299</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-23</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$13,883,110</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-23</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$6,347,563</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-22</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$8,662,933</td>
+            <td class="num">0.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-21</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$7,684,334</td>
+            <td class="num">0.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-20</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$6,769,545</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-19</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$5,591,238</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-16</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$12,052,562</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-15</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$4,026,974</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-15</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$12,121,553</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-15</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$927,675</td>
+            <td class="num">0.0%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-14</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$20,487,096</td>
+            <td class="num">0.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-13</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$8,801,941</td>
+            <td class="num">0.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$4,938,652</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-09</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$11,473,645</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-08</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$8,958,804</td>
+            <td class="num">0.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-07</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$20,880,079</td>
+            <td class="num">0.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-06</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$4,099,102</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-05</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$2,283,648</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$6,414,045</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$5,001,053</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$4,001,420</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-09-30</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$11,716,077</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-09-29</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$7,300,934</td>
+            <td class="num">0.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-09-28</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$25,122,558</td>
+            <td class="num">0.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-09-28</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>NIPPON LIFE INSURANCE CO</td>
+            <td class="num">$2,397,059</td>
+            <td class="num">0.1%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">BFLY<span class="wt-name">Butterfly Network, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$7.51 <span class="wt-dn">-3.8%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-dn">под</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-dn">-12.6%</span> / <span class="wt-dn">-10.8%</span></span>
+    <span data-l="Отчет"><span class="wt-mu">няма дата</span></span>
+    <span data-l="Short interest"><span class="wt-num">15.7%</span> от float · 5.5 дни · <span class="wt-num">-6.0%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">5 новини</span><span class="wt-mark" style="color:var(--yellow)">Form 4 · 2</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/butterfly-network-bfly-bargain-following-211610348.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Is Butterfly Network (BFLY) A Bargain Following Raised Guidance And New Federal Wins?</a> <span class="wm-src">· 29.10 21:16 UTC</span></li>
+          
+          <li><a href="https://www.fool.com/earnings/call-transcripts/2026/10/29/butterfly-bfly-q3-2026-earnings-call-transcript/?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Butterfly (BFLY) Q3 2026 Earnings Call Transcript</a> <span class="wm-src">· 29.10 17:58 UTC</span></li>
+          
+          <li><a href="https://app.moby.co/home/research/tools/earningsCalendar/earnings-butterfly-network-inc-q3-2026-earnings-call-summary?utm_source=yahoo_finance&amp;utm_medium=rss&amp;.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Butterfly Network, Inc. Q3 2026 Earnings Call Summary</a> <span class="wm-src">· 29.10 16:52 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/butterfly-network-inc-bfly-reports-104503025.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Butterfly Network, Inc. (BFLY) Reports Q3 Loss, Beats Revenue Estimates</a> <span class="wm-src">· 29.10 10:45 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/healthcare/articles/butterfly-network-reports-third-quarter-103000977.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Butterfly Network Reports Third Quarter 2026 Financial Results</a> <span class="wm-src">· 29.10 10:30 UTC</span></li>
+          
+        </ul>
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-06</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>DEVIVO JOSEPH <span class="wm-src">· President &amp; CEO · директор</span></td>
+            <td class="num">$358,616</td>
+            <td class="num">0.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-02</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Carlson Megan <span class="wm-src">· CAO and SVP, Finance</span></td>
+            <td class="num">$88,447</td>
+            <td class="num">2.5%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">ELF<span class="wt-name">e.l.f. Beauty, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$112.95 <span class="wt-dn">-2.1%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+7.8%</span> / <span class="wt-up">+30.8%</span></span>
+    <span data-l="Отчет">04.11 <span class="wt-mu">(след 5 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">8.8%</span> от float · 3.5 дни · <span class="wt-num">+4.2%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark" style="color:var(--yellow)">Form 4 · 5</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-15</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Franks Joshua Allen <span class="wm-src">· SVP, Operations</span></td>
+            <td class="num">$873,072</td>
+            <td class="num">6.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Franks Joshua Allen <span class="wm-src">· SVP, Operations</span></td>
+            <td class="num">$920,310</td>
+            <td class="num">6.2%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>AMIN TARANG <span class="wm-src">· Chief Executive Officer · директор</span></td>
+            <td class="num">$2,372,611</td>
+            <td class="num">12.7%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>AMIN TARANG <span class="wm-src">· Chief Executive Officer · директор</span></td>
+            <td class="num">$2,270,304</td>
+            <td class="num">13.8%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>AMIN TARANG <span class="wm-src">· Chief Executive Officer · директор</span></td>
+            <td class="num">$212,746</td>
+            <td class="num">1.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">DOCU<span class="wt-name">DocuSign, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$81.54 <span class="wt-dn">-2.5%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+16.1%</span> / <span class="wt-up">+41.9%</span></span>
+    <span data-l="Отчет">03.12 <span class="wt-mu">(след 34 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">8.5%</span> от float · 3.9 дни · <span class="wt-num">-13.2%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">книга QM</span><span class="wt-mark">1 новини</span><span class="wt-mark" style="color:var(--yellow)">Form 4 · 8</span><span class="wt-mark" style="color:var(--red)">CLUSTER</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/docusign-inc-docu-attracting-investor-120003418.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Docusign Inc. (DOCU) is Attracting Investor Attention: Here is What You Should Know</a> <span class="wm-src">· 29.10 12:00 UTC</span></li>
+          
+        </ul>
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hansen Paula <span class="wm-src">· Chief Revenue Officer</span></td>
+            <td class="num">$206,250</td>
+            <td class="num">2.7%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hansen Paula <span class="wm-src">· Chief Revenue Officer</span></td>
+            <td class="num">$20,811</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Shaughnessy James P <span class="wm-src">· Chief Legal Officer</span></td>
+            <td class="num">$797,732</td>
+            <td class="num">18.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Shaughnessy James P <span class="wm-src">· Chief Legal Officer</span></td>
+            <td class="num">$27,820</td>
+            <td class="num">0.8%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Thygesen Allan C. <span class="wm-src">· President and CEO · директор</span></td>
+            <td class="num">$512,262</td>
+            <td class="num">3.9%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Thygesen Allan C. <span class="wm-src">· President and CEO · директор</span></td>
+            <td class="num">$944,381</td>
+            <td class="num">7.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Thygesen Allan C. <span class="wm-src">· President and CEO · директор</span></td>
+            <td class="num">$362,286</td>
+            <td class="num">3.0%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-01</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Wilderotter Mary Agnes <span class="wm-src">· директор</span></td>
+            <td class="num">$68,800</td>
+            <td class="num">31.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">SN<span class="wt-name">SharkNinja, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$209.12 <span class="wt-up">+5.5%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+15.5%</span> / <span class="wt-up">+14.9%</span></span>
+    <span data-l="Отчет">04.11 <span class="wt-mu">(след 5 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">13.9%</span> от float · 5.0 дни · <span class="wt-num">+24.3%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">1 новини</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/sharkninja-inc-sn-5-29-150003242.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">SharkNinja, Inc. (SN) Is Up 5.29% in One Week: What You Should Know</a> <span class="wm-src">· 29.10 15:00 UTC</span></li>
+          
+        </ul>
+        
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">CRM<span class="wt-name">Salesforce, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$230.90 <span class="wt-dn">-4.6%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-dn">под</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-dn">-3.1%</span> / <span class="wt-up">+19.7%</span></span>
+    <span data-l="Отчет">02.12 <span class="wt-mu">(след 33 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">3.9%</span> от float · 2.8 дни · <span class="wt-num">-13.6%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">6 новини</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/salesforce-crm-stock-sees-modest-181354019.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Salesforce (CRM) Stock Sees Modest Fair Value Lift As AI And Braze Views Evolve</a> <span class="wm-src">· 29.10 18:13 UTC</span></li>
+          
+          <li><a href="https://www.fool.com/coverage/better-buy/2026/10/29/salesforce-vs-synopsys-which-technology-stock-is-a-better-buy-in-2026/?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Salesforce vs. Synopsys: Which Technology Stock Is a Better Buy in 2026?</a> <span class="wm-src">· 29.10 17:36 UTC</span></li>
+          
+          <li><a href="https://www.fool.com/coverage/better-buy/2026/10/29/salesforce-vs-datadog-which-technology-stock-is-a-better-buy-in-2026/?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Salesforce vs. Datadog: Which Technology Stock Is a Better Buy in 2026?</a> <span class="wm-src">· 29.10 16:20 UTC</span></li>
+          
+          <li><a href="https://www.trefis.com/stock/crm/articles/621321/can-you-still-buy-salesforce-stock-today/2026-10-29?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Can You Still Buy Salesforce Stock Today?</a> <span class="wm-src">· 29.10 14:03 UTC</span></li>
+          
+          <li><a href="https://247wallst.com/investing/2026/10/29/servicenow-tumbles-19-as-slower-contract-growth-overshadows-raised-ai-target-salesforce-slides-6-workday-drops-5/?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">ServiceNow Tumbles 19% as Slower Contract Growth Overshadows Raised AI Target; Salesforce Slides 6%, Workday Drops 5%</a> <span class="wm-src">· 29.10 13:09 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/technology/articles/practifi-announces-continued-partnership-dynasty-130000841.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Practifi Announces Continued Partnership with Dynasty Financial Partners to Deliver Purpose-Built CRM</a> <span class="wm-src">· 29.10 13:00 UTC</span></li>
+          
+        </ul>
+        
+        
+        
+        
+      </div>
+    </details>
+    
+    
+    
+    <div class="wt-row wt-plain">
+    <span class="wt-t">BMNR<span class="wt-name">Bitmine Immersion Technologies, Inc.</span></span>
+    <span data-l="Цена · ден" class="wt-num">$21.66 <span class="wt-dn">-1.8%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-dn">под</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-dn">-19.5%</span> / <span class="wt-up">+17.6%</span></span>
+    <span data-l="Отчет">20.11 <span class="wt-mu">(след 21 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">6.6%</span> от float · 1.1 дни · <span class="wt-num">-1.7%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"></span>
+  </div>
+    
+    
+    
+    <details class="wt-item">
+      <summary class="wt-row">
+    <span class="wt-t">ACN<span class="wt-name">Accenture plc</span></span>
+    <span data-l="Цена · ден" class="wt-num">$247.22 <span class="wt-up">+1.6%</span></span>
+    <span data-l="50 / 200DMA"><span class="wt-up">над</span> / <span class="wt-up">над</span></span>
+    <span data-l="RS 4 / 12 седм." class="wt-num" title="RS спрямо SPY: (1 + доходността) / (1 + доходността на SPY) − 1"><span class="wt-up">+15.6%</span> / <span class="wt-up">+44.9%</span></span>
+    <span data-l="Отчет">17.12 <span class="wt-mu">(след 48 дни)</span></span>
+    <span data-l="Short interest"><span class="wt-num">3.7%</span> от float · 2.7 дни · <span class="wt-num">-18.5%</span> <span class="wt-mu">спрямо 15.09</span> <span class="wt-mu">· към 15.10</span></span>
+    <span data-l="В брифа"><span class="wt-mark">3 новини</span><span class="wt-mark" style="color:var(--yellow)">Form 4 · 12</span><span class="wt-mark" style="color:var(--red)">CLUSTER</span></span>
+  </summary>
+      <div class="wt-detail">
+        
+        
+        <ul class="wm-news">
+          
+          <li><a href="https://www.trefis.com/stock/acn/articles/621274/what-needs-to-be-true-to-buy-accenture-stock-now/2026-10-29?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">What Needs To Be True To Buy Accenture Stock Now?</a> <span class="wm-src">· 29.10 21:55 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/markets/stocks/articles/accenture-acn-increases-despite-market-205002098.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Accenture (ACN) Increases Despite Market Slip: Here&#39;s What You Need to Know</a> <span class="wm-src">· 29.10 20:50 UTC</span></li>
+          
+          <li><a href="https://finance.yahoo.com/technology/ai/articles/innodata-vs-accenture-ai-stock-163400857.html?.tsrc=rss" target="_blank" rel="noopener noreferrer" style="color:var(--text)">Innodata vs. Accenture: Which AI Stock Has More Growth Potential?</a> <span class="wm-src">· 29.10 16:34 UTC</span></li>
+          
+        </ul>
+        
+        
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          
+          <tr>
+            <td>2026-10-26</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>Sweet Julie Spellman <span class="wm-src">· Chair and CEO · директор</span></td>
+            <td class="num">$514,723</td>
+            <td class="num">5.1%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-26</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>Sweet Julie Spellman <span class="wm-src">· Chair and CEO · директор</span></td>
+            <td class="num">$2,486,318</td>
+            <td class="num">17.1%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-26</td>
+            <td class="buy">покупка</td>
+            
+            
+            
+            <td>Price Paula A <span class="wm-src">· директор</span></td>
+            <td class="num">$199,848</td>
+            <td class="num">7.9%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-22</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Burgum Melissa A <span class="wm-src">· Chief Accounting Officer</span></td>
+            <td class="num">$202,750</td>
+            <td class="num">7.6%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-22</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Sekido Ryoji <span class="wm-src">· Co-CEO Asia Pacific</span></td>
+            <td class="num">$1,160,529</td>
+            <td class="num">67.4%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-22</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Sekido Ryoji <span class="wm-src">· Co-CEO Asia Pacific</span></td>
+            <td class="num">$270,297</td>
+            <td class="num">48.0%</td>
+            <td>извънпланова</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$211</td>
+            <td class="num">0.0%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$46,692</td>
+            <td class="num">1.7%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$51,822</td>
+            <td class="num">2.0%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$44,317</td>
+            <td class="num">1.7%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-12</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$6,924</td>
+            <td class="num">0.3%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+          <tr>
+            <td>2026-10-08</td>
+            <td class="sell">продажба</td>
+            
+            
+            
+            <td>Hogan Catherine Kiernan <span class="wm-src">· Chief Operating Officer</span></td>
+            <td class="num">$264,000</td>
+            <td class="num">9.5%</td>
+            <td>10b5-1</td>
+          </tr>
+          
+        </table>
+        
+        
+        
+      </div>
+    </details>
+    
     
   </div>
+  
 </section>
 
 
@@ -759,23 +2194,45 @@
     
     <div class="sector-row">
       <div>
-        <div class="sector-name">Енергетика</div>
-        <div class="sector-etf">XLE</div>
+        <div class="sector-name">Здравеопазване</div>
+        <div class="sector-etf">XLV</div>
       </div>
       <div>
-        <div class="sector-chain">WTI поскъпна с 1.74% за последните 5 дни, а медта — с 3.72%, сигнализирайки глобално търсене на суровини и потенциален инфлационен рефлекс. Hawkish тон от Bessent (ново покачване на лихвата не е изключено) и steepening крива (2s10s до 0.38%, +6 б.п. за седмицата) обичайно предхождат среда, в която цените на енергоносителите остават повишени. XLE: положителна RS и на 4, и на 12 седмици — заедно с XLV; водещи по кода: XLE, XLV (по таблицата на ротацията). Механизмът: по-висок WTI директно подпомага приходите на E&amp;P компаниите, а инфлационният рефлекс намалява относителната привлекателност на growth/tech — капиталът ротира към реални активи.</div>
-        <div class="sector-meta">RS спрямо SPY: 4 седмици +9.91%, 12 седмици +11.57% · хоризонт (AI): 6 седмици</div>
+        <div class="sector-chain">Alphabet срина технологичния сектор исторически, а BOJ сигнализира за по-нататъшни повишения — рискът от carry trade разпродажби и AI-свиване на маржовете кара капитала да търси убежища без технологична или лихвена чувствителност. Здравеопазването е точно там: приходите му са нечувствителни към лихвения цикъл, а с RS за 4 седмици +9.96% и за 12 седмици +11.86% — единственият сектор на 6-месечен връх по RS — ротацията е измерима и продължаваща. Хоризонтът е кратък до среден.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +9.96%, 12 седмици +11.86% · RS на 6-месечен връх · хоризонт (AI): 4 седмици</div>
       </div>
     </div>
     
     <div class="sector-row">
       <div>
-        <div class="sector-name">Здравеопазване</div>
-        <div class="sector-etf">XLV</div>
+        <div class="sector-name">Потребителски (защитни)</div>
+        <div class="sector-etf">XLP</div>
       </div>
       <div>
-        <div class="sector-chain">Hawkish Fed сигнали (Bessent: ново покачване не е грешка) и повишена несигурност около AI capex (Alphabet -10%) изтеглят капитал от висококатирани growth сектори към дефанзивно-качествени имена. XLV показва положителна RS и на двата хоризонта (4 седмици: +5.37%, 12 седмици: +7.09%) с нисък дял на исторически изоставане (15%), което го позиционира като структурен бенефициент от ротацията. Механизмът: здравеопазването генерира предвидими парични потоци, относително нечувствителни към равнището на лихвите и към цикъла на AI capex — при hawkish обрат пазарът плаща премия за тази предвидимост. Разминаването между проинфлационните сурови суровини (мед, петрол) и все още низходящата измерена инфлация не пречи на сектора, тъй като ценовата му мощ идва от структурата на търсенето, а не от commodity input costs.</div>
-        <div class="sector-meta">RS спрямо SPY: 4 седмици +5.37%, 12 седмици +7.09% · хоризонт (AI): 6 седмици</div>
+        <div class="sector-chain">Когато мегакап технологиите губят $500 млрд. пазарна капитализация за ден и BOJ затяга, исторически следва ротация към нечувствителни към икономическия цикъл сектори. XLP показва RS за 4 седмици +9.01% — силен абсолютен ход от +9.77% — и основната инфлация пада (2.25% средно за юли–септември срещу 2.37% преди), което означава, че маржовете на защитните потребители не се компресират от разходната страна. Комбинацията от сигурни парични потоци и дезинфлационна среда прави XLP предпочитан получател на капитал при технологична турбуленция.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +9.01%, 12 седмици +2.75% · хоризонт (AI): 4 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Енергетика</div>
+        <div class="sector-etf">XLE</div>
+      </div>
+      <div>
+        <div class="sector-chain">Атаката срещу танкер в Ормузкия проток директно ескалира геополитическата рискова премия в суровия петрол — WTI декемврийски контракт е на $103.31. Енергийните акции са директен бенефициент: по-висока реализирана цена увеличава свободния паричен поток на upstream компаниите. RS за 12 седмици е +15.5% — най-силният 12-седмичен тренд сред всички водещи сектори — а 10-годишната доходност стои на 4.99% с +3.6 б.п. за седмицата, което потвърждава инфлационните очаквания на пазара за по-дълго. Геополитиката и стоковата динамика се подкрепят взаимно.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +8.82%, 12 седмици +15.50% · хоризонт (AI): 5 седмици</div>
+      </div>
+    </div>
+    
+    <div class="sector-row">
+      <div>
+        <div class="sector-name">Материали</div>
+        <div class="sector-etf">XLB</div>
+      </div>
+      <div>
+        <div class="sector-chain">Медта (декемврийски контракт HGZ26) е нагоре +0.69% за седмицата — традиционен индикатор за глобално индустриално търсене. 2s10s спредът се стеепени с 6 б.п. до 37 б.п. — нормализирането на кривата исторически предшества ускоряване на реалната икономическа активност, което е директна подкрепа за суровинните сектори. XLB поддържа RS за 4 седмици +7.46% и RS за 12 седмици +1.63%, т.е. лидерството е потвърдено и на двата хоризонта. DXY е практически непроменен (−0.01% за 5 дни), което не носи валутен насрещен вятър за материалите.</div>
+        <div class="sector-meta">RS спрямо SPY: 4 седмици +7.46%, 12 седмици +1.63% · хоризонт (AI): 5 седмици</div>
       </div>
     </div>
     
@@ -826,19 +2283,19 @@
       </div>
       <div class="thesis-tickers">JPM  ·  BAC</div>
       <div class="thesis-chain">Кривата се разкривява (дълъг край нагоре) → банките заемат евтино на късо и кредитират скъпо на дълго → нетният лихвен марж се разширява → пряко по-висока доходност за банковия сектор.</div>
-      <div class="thesis-headline">📰 10-year Treasury yield creeps higher even as Fed keeps rates the same <span style="color:var(--muted)">· CNBC</span></div><div class="thesis-headline">📰 Bessent says &#39;not necessarily&#39; a mistake if the Fed hikes again <span style="color:var(--muted)">· CNBC</span></div>
-      <div class="thesis-trigger">▲ Тригер активен: 2s10s спредът се разкривява (0.38%).</div>
+      <div class="thesis-headline">📰 BOJ keeps interest rates steady, signals further rate hikes - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 Gold slips as higher oil, US inflation data bolster Fed hike bets - Reuters <span style="color:var(--muted)">· Reuters Business</span></div>
+      <div class="thesis-trigger">▲ Тригер активен: 2s10s спредът се разкривява (0.37%).</div>
       
       
       <div class="thesis-ctx">
         <div class="ctx-title">Контекст · само данни</div>
         
         
-        <div class="ctx-summary">1/2 под 200DMA · секторът неутрален · отчет след 77 дни (JPM)</div>
+        <div class="ctx-summary">1/2 под 200DMA · секторът неутрален · отчет след 76 дни (JPM)</div>
         
         <div class="ctx-meta">Режим: <b>Offensive</b> ·
           Сектор XLF:
-            RS <span class="pos">+3.8%</span> (4с) / <span class="neg">-4.5%</span> (12с)
+            RS <span class="pos">+5.8%</span> (4с) / <span class="neg">-2.2%</span> (12с)
           </div>
 
         
@@ -846,13 +2303,13 @@
           <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
           
           <tr><td class="mono">JPM</td>
-            <td class="num"><span class="pos">+1.8%</span></td><td><span class="neg">под</span></td><td><span class="pos">над</span></td>
-            <td><span class="">14.01 (77 дни)</span></td>
+            <td class="num"><span class="pos">+4.4%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td><span class="">14.01 (76 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">BAC</td>
-            <td class="num"><span class="neg">-7.5%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="">15.01 (78 дни)</span></td>
+            <td class="num"><span class="neg">-6.0%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">15.01 (77 дни)</span></td>
             <td>—</td></tr>
           
         </table>
@@ -886,7 +2343,7 @@
       </div>
       <div class="thesis-tickers">AVGO  ·  AMAT  ·  MCHP</div>
       <div class="thesis-chain">AI build-out → търсене не само на GPU, а на цялата верига: mature-node чипове, оборудване за производство, liquid cooling, мрежи и захранване → вторичните доставчици печелят с по-малко конкуренция.</div>
-      <div class="thesis-headline">📰 Samsung sees AI chip shortage worsening, keeps investors in suspense on returns - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 EXCLUSIVE: US DOJ is inquiring about Nvidia&#39;s purchase of Hugging Face, sources say - Reuters <span style="color:var(--muted)">· Reuters Business</span></div>
+      <div class="thesis-headline">📰 Samsung keeps shattering profit records as AI boom lifts chip demand - AP News <span style="color:var(--muted)">· AP Business</span></div><div class="thesis-headline">📰 Intel shares tumble after hours, hit by chip supply constraints, big cash burn - Reuters <span style="color:var(--muted)">· Reuters Business</span></div>
       
       
       
@@ -894,11 +2351,11 @@
         <div class="ctx-title">Контекст · само данни</div>
         
         
-        <div class="ctx-summary">2/3 под 200DMA · секторът неутрален · отчет след 7 дни (MCHP)</div>
+        <div class="ctx-summary">2/3 под 200DMA · секторът неутрален · отчет след 6 дни (MCHP)</div>
         
         <div class="ctx-meta">Режим: <b>Offensive</b> ·
           Сектор SMH:
-            RS <span class="neg">-8.0%</span> (4с) / <span class="pos">+1.3%</span> (12с)
+            RS <span class="neg">-9.7%</span> (4с) / <span class="pos">+1.2%</span> (12с)
           </div>
 
         
@@ -906,18 +2363,18 @@
           <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
           
           <tr><td class="mono">AVGO</td>
-            <td class="num"><span class="neg">-0.9%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="">09.12 (41 дни)</span></td>
+            <td class="num"><span class="neg">-1.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">09.12 (40 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">AMAT</td>
-            <td class="num"><span class="neg">-18.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="">12.11 (14 дни)</span></td>
+            <td class="num"><span class="neg">-17.5%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="">12.11 (13 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">MCHP</td>
-            <td class="num"><span class="pos">+1.1%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
-            <td><span class="warn-txt">05.11 (7 дни)</span></td>
+            <td class="num"><span class="pos">+4.3%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td><span class="warn-txt">05.11 (6 дни)</span></td>
             <td>—</td></tr>
           
         </table>
@@ -936,7 +2393,7 @@
       </div>
       <div class="thesis-tickers">BTU  ·  HCC  ·  AMR  ·  CNR  ·  LNG</div>
       <div class="thesis-chain">Петролен шок или напрежение в Близкия изток → скок в цената на енергията → въглищата и LNG поемат търсенето, което петролът не може → маржовете на тези производители се разширяват рязко.</div>
-      <div class="thesis-headline">📰 UK seeks to give households ‘breathing space’ this winter over Iran war energy price spike - AP News <span style="color:var(--muted)">· AP Business</span></div><div class="thesis-headline">📰 US warns allies to prepare for possible Iran strikes, retaliation after elections, AP sources say - AP News <span style="color:var(--muted)">· AP Business</span></div>
+      <div class="thesis-headline">📰 Oil set for fourth monthly gain as Hormuz tanker attack highlights supply risks from war - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 Iran says 3 oil tankers struck mines, and other Mideast news - AP News <span style="color:var(--muted)">· AP Business</span></div>
       
       
       
@@ -944,11 +2401,11 @@
         <div class="ctx-title">Контекст · само данни</div>
         
         
-        <div class="ctx-summary">4/5 под 200DMA · секторът води · отчет след 0 дни (LNG)</div>
+        <div class="ctx-summary">4/5 под 200DMA · секторът води · отчет след 5 дни (BTU, HCC)</div>
         
         <div class="ctx-meta">Режим: <b>Offensive</b> ·
           Сектор XLE (прокси: енергетика):
-            RS <span class="pos">+9.9%</span> (4с) / <span class="pos">+11.6%</span> (12с) · <span class="pos">водещ</span>
+            RS <span class="pos">+8.8%</span> (4с) / <span class="pos">+15.5%</span> (12с) · <span class="pos">водещ</span>
           </div>
 
         
@@ -956,28 +2413,28 @@
           <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
           
           <tr><td class="mono">BTU</td>
-            <td class="num"><span class="neg">-7.6%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="warn-txt">04.11 (6 дни)</span></td>
+            <td class="num"><span class="neg">-8.9%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="warn-txt">04.11 (5 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">HCC</td>
-            <td class="num"><span class="neg">-5.2%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="warn-txt">04.11 (6 дни)</span></td>
+            <td class="num"><span class="neg">-2.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="warn-txt">04.11 (5 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">AMR</td>
-            <td class="num"><span class="neg">-1.7%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="">06.11 (8 дни)</span></td>
+            <td class="num"><span class="neg">-3.8%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="warn-txt">06.11 (7 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">CNR</td>
-            <td class="num"><span class="pos">+2.2%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
-            <td><span class="warn-txt">05.11 (7 дни)</span></td>
+            <td class="num"><span class="pos">+1.5%</span></td><td><span class="neg">под</span></td><td><span class="neg">под</span></td>
+            <td><span class="warn-txt">05.11 (6 дни)</span></td>
             <td>—</td></tr>
           
           <tr><td class="mono">LNG</td>
-            <td class="num"><span class="pos">+11.4%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
-            <td><span class="warn-txt">29.10 (0 дни)</span></td>
+            <td class="num"><span class="pos">+18.6%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td>—</td>
             <td>—</td></tr>
           
         </table>
@@ -996,7 +2453,7 @@
       </div>
       <div class="thesis-tickers">LMT  ·  RTX  ·  NOC  ·  SWMR</div>
       <div class="thesis-chain">Геополитическа ескалация → държавите вдигат отбранителни бюджети → поръчки с многогодишен backlog за големите изпълнители → предвидим приходен поток независим от икономическия цикъл.</div>
-      <div class="thesis-headline">📰 Inside India newsletter: New Delhi approves $22 billion in military spending amid China border tensions <span style="color:var(--muted)">· CNBC</span></div><div class="thesis-headline">📰 Drone attack hits container ship off Bulgaria’s Black Sea coast; all crew members rescued - AP News <span style="color:var(--muted)">· AP Business</span></div>
+      <div class="thesis-headline">📰 North Korea&#39;s Kim urges drone dominance, greater military AI use amid border tensions - Reuters <span style="color:var(--muted)">· Reuters Business</span></div><div class="thesis-headline">📰 Ukraine&#39;s Zelenskiy: We have intelligence of new Russian ballistic missile strikes - Reuters <span style="color:var(--muted)">· Reuters Business</span></div>
       
       
       
@@ -1004,11 +2461,11 @@
         <div class="ctx-title">Контекст · само данни</div>
         
         
-        <div class="ctx-summary">1/3 под 200DMA · секторът изостава · отчет след 12 дни</div>
+        <div class="ctx-summary">1/3 под 200DMA · секторът изостава · отчет след 11 дни</div>
         
         <div class="ctx-meta">Режим: <b>Offensive</b> ·
           Сектор ITA:
-            RS <span class="neg">-1.0%</span> (4с) / <span class="neg">-16.3%</span> (12с) · <span class="neg">изоставащ</span>
+            RS <span class="pos">+2.3%</span> (4с) / <span class="neg">-14.3%</span> (12с) · <span class="neg">изоставащ</span>
           </div>
 
         
@@ -1016,23 +2473,23 @@
           <tr><th>Тикър</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th><th>Статус</th></tr>
           
           <tr><td class="mono">LMT</td>
-            <td class="num"><span class="pos">+22.9%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td class="num"><span class="pos">+26.4%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
             <td>—</td>
             <td>—</td></tr>
           
           <tr><td class="mono">RTX</td>
-            <td class="num"><span class="pos">+4.8%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
+            <td class="num"><span class="pos">+7.4%</span></td><td><span class="pos">над</span></td><td><span class="pos">над</span></td>
             <td>—</td>
             <td>—</td></tr>
           
           <tr><td class="mono">NOC</td>
-            <td class="num"><span class="pos">+9.5%</span></td><td><span class="pos">над</span></td><td><span class="neg">под</span></td>
+            <td class="num"><span class="pos">+16.3%</span></td><td><span class="pos">над</span></td><td><span class="neg">под</span></td>
             <td>—</td>
             <td>—</td></tr>
           
           <tr><td class="mono">SWMR</td>
-            <td class="num"><span class="neg">-43.4%</span></td><td><span class="neg">под</span></td><td><span class="na">&lt;200 дни</span></td>
-            <td><span class="">10.11 (12 дни)</span></td>
+            <td class="num"><span class="neg">-41.3%</span></td><td><span class="neg">под</span></td><td><span class="na">&lt;200 дни</span></td>
+            <td><span class="">10.11 (11 дни)</span></td>
             <td>—</td></tr>
           
         </table>
@@ -1068,18 +2525,18 @@
 
 
 <section>
-  <h2>Watchlist · 2 <span style="font-size:13px;color:var(--muted);font-weight:400">(+8 без сетъп за вход)</span></h2>
+  <h2>Watchlist · 1 <span style="font-size:13px;color:var(--muted);font-weight:400">(+9 без сетъп за вход)</span></h2>
   
   
   
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от вчера (28.10):</b>
-    <b>PR</b>: в скрийнъра, но извън 10-те карти (структурен стоп 12.5% &gt; 10%) <span style="opacity:.8">(вчера: структурен стоп 14.7% &gt; 10%)</span>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от вчера (29.10):</b>
+    <b>URI</b>: в скрийнъра, но извън 10-те карти (структурен стоп 16.9% &gt; 10%) <span style="opacity:.8">(вчера: структурен стоп 15.6% &gt; 10%)</span> · <b>AMGN</b>: в скрийнъра, но извън 10-те карти (структурен стоп 13.2% &gt; 10%) <span style="opacity:.8">(вчера: структурен стоп 12.3% &gt; 10%)</span>
   </div>
   
   
   
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
-    <b>AMG</b> — ✅ задействан в buy-stop книгата на 21.10 по $395.00, стоп $363.40 (8.0% под входа), текущо -0.1R; в позиция от 21.10; днес под pivot, отчет 02.11 · <b>AAPL</b> — ✅ задействан в buy-stop книгата на 19.10 по $345.34, стоп $322.55 (6.6% под входа), текущо -0.1R; в позиция от 19.10; днес под pivot, отчет 02.11 · <b>ZBRA</b> — ✅ задействан в buy-stop книгата на 21.10 по $390.80, стоп $362.10 (7.3% под входа), текущо -0.2R; в позиция от 21.10; днес под pivot, отчет 03.11 · <b>URI</b> — структурен стоп 15.6% &gt; 10% UOV✓ (puts) · <b>BBY</b> — структурен стоп 13.5% &gt; 10%, отчет 24.11 · <b>OVV</b> — структурен стоп 13.1% &gt; 10%, отчет 03.11 SECT✓ MF✓ · <b>RS</b> — ✅ задействан в buy-stop книгата на 27.10 по $433.02, стоп $398.38 (8.0% под входа), текущо +0.1R; днес: структурен стоп 10.6% &gt; 10% · <b>AMGN</b> — структурен стоп 12.3% &gt; 10%, отчет 03.11 SECT✓
+    <b>ZBRA</b> — ✅ задействан в buy-stop книгата на 21.10 по $390.80, стоп $362.10 (7.3% под входа), текущо -0.5R; в позиция от 21.10; днес под pivot, отчет 03.11 · <b>AAPL</b> — ✅ задействан в buy-stop книгата на 19.10 по $345.34, стоп $322.55 (6.6% под входа), текущо +0.2R; днес: над pivot без обем ≥ 1.5×, отчет 02.11 · <b>AMG</b> — ✅ задействан в buy-stop книгата на 21.10 по $395.00, стоп $363.40 (8.0% под входа), текущо +0.1R; днес: над pivot без обем ≥ 1.5×, отчет 02.11 · <b>BBY</b> — структурен стоп 16.3% &gt; 10%, отчет 24.11 · <b>WSM</b> — ✅ задействан в buy-stop книгата на 29.10 по $255.33, стоп $234.90 (8.0% под входа), текущо +0.2R; днес: структурен стоп 10.6% &gt; 10%, отчет 18.11 · <b>OVV</b> — структурен стоп 12.5% &gt; 10%, отчет 03.11 SECT✓ MF✓ · <b>RS</b> — ✅ задействан в buy-stop книгата на 27.10 по $433.02, стоп $398.38 (8.0% под входа), текущо +0.2R; днес: структурен стоп 10.8% &gt; 10% SECT✓ · <b>CVLT</b> — структурен стоп 15.2% &gt; 10% · <b>PR</b> — структурен стоп 11.4% &gt; 10%, отчет 04.11 SECT✓
   </div>
   
   <div class="watch-grid">
@@ -1087,11 +2544,11 @@
     <div class="watch-card">
       <span class="ticker">EXPD</span>
       <span class="company">Expeditors International of Washington</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 92</span>
+      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 93</span>
       <span class="markers"><span class="marker" title="Отворена позиция от 2026-10-16 @ $199.77 — не е нов вход." tabindex="0" onclick="this.classList.toggle('open')">OPEN✓<span class="marker-tip">Отворена позиция от 2026-10-16 @ $199.77 — не е нов вход.</span></span></span>
       
       
-      <div class="earn-warn">⚠ Отчет на 03.11 (след 3 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 2 сесии) — няма данни за очаквано движение (спредът bid/ask на падежа след отчета (2026-11-20) е твърде широк).</div>
       
       
       
@@ -1104,66 +2561,7 @@
       
       
       
-      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 09.10 по $194.59 (buy-stop от 09.10) · стоп $181.53 · цел 2R $220.71 · текущо +0.2R — изпълнен сигнал от книгата, не нов вход.</div>
-      
-    </div>
-    
-    <div class="watch-card">
-      <span class="ticker">WSM</span>
-      <span class="company">Williams-Sonoma</span>
-      <span class="rs-badge" title="RS rating — перцентил на претеглената 12-месечна доходност в универса">RS 79</span>
-      
-      
-      
-      <div class="earn-warn">⚠ Отчет на 18.11 (след 14 сесии) — няма данни за очаквано движение (няма падеж преди отчета — базовата волатилност не може да се извади).</div>
-      
-      
-      
-      
-      
-      <p>Setup-ът е чисто технически — WSM не е в Енергетика или Здравеопазване, а Consumer Cyclical не фигурира в активната секторна логика. Пробивът над $256.86 би бил технически cataly за momentum, но макро подкрепа от текущата ротация липсва.</p>
-      
-      
-      <div class="watch-trigger"><b>Trigger:</b> Чака пробив: buy-stop $256.86 (валиден до 02.11, от 27.10 — 5 сесии от първия ден); сега 2.6% под pivot. Buy-stop поръчката се изпълнява при докосване (High ≥ $256.86), до $269.70; обемът се вижда едва при затварянето — книгата отбелязва дали денят на входа затвори с ≥ 1.5× среден обем. Книгата следи ниво $255.33 от 27.10 (записът пази плана от първия ден).
-        · pivot $256.86 (-2.6%)</div>
-      
-      
-      
-      
-      
-      <div class="buy-stop">🎯 Buy-stop $256.86 · валиден до 02.11, от 27.10
-        · таван за вход $269.70</div>
-      
-      
-      
-      <div class="buy-stop" style="margin-top:4px">📐 Ако се задейства:
-        Цел 1 (2R, 50% от позицията) $297.96
-        </div>
-      <div class="lv-note" style="margin-top:4px">Книгата пази плана от 27.10: стоп $234.90, цел 2R $296.19 (картата днес: стоп $236.31, цел $297.96) — резултатът в книгата е по нейния план.</div>
-      
-
-<div class="lv" data-strategy="canslim" data-entry="256.86" data-stop="236.31" data-adr="2.68" data-factor="1.0" data-regime-label="" data-regime-note="">
-  <div class="lv-info">
-    <div class="lv-row"><span>вход при задействане (buy-stop)</span><b>$256.86</b></div>
-    <div class="lv-row"><span>Стоп</span><b>$236.31 <i>(−8.0%)</i></b></div>
-    
-    <div class="lv-row"><span>ADR (20 бара)</span><b>2.7%</b></div>
-  </div>
-  <div class="lv-note">източник на стопа: таван 8% под входа (структурният е 9.5%)</div>
-  
-  
-  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
-  <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
-  <div class="lv-adj" hidden>
-    <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
-    <label>реален стоп<input class="lv-in-stop" type="number" step="any" inputmode="decimal"></label>
-    <button type="button" class="lv-reset">върни</button>
-    <div class="lv-note">само за тази карта — не се записва</div>
-  </div>
-</div>
-
-
-      
+      <div class="buy-stop" style="color:var(--green)">✅ Задействан на 09.10 по $194.59 (buy-stop от 09.10) · стоп $181.53 · цел 2R $220.71 · текущо +0.3R — изпълнен сигнал от книгата, не нов вход.</div>
       
     </div>
     
@@ -1219,11 +2617,11 @@
 </td>
           <td>2026-10-16 <span style="color:var(--muted);font-size:11.5px" title="Обемът на деня на входа спрямо средния за 50 бара — buy-stop се изпълнява при докосване, обемът се вижда при затварянето">(обем 1.32×)</span></td>
           <td class="n">$199.77</td>
-          <td class="n">$197.15</td>
+          <td class="n">$198.39</td>
           
-          <td class="n pct">-1.3%</td>
+          <td class="n pct">-0.7%</td>
           
-          <td class="n pct">-0.1%</td>
+          <td class="n pct">-0.5%</td>
         </tr>
         
       </tbody>
@@ -1257,8 +2655,8 @@
     Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     
-    <b>Записани: 9</b> · чакат buy-stop 1 · отворени 6 · затворени 1
-    · не се задействаха 1 (12.5% от приключилите прозорци) · и в Action: 1<br>
+    <b>Записани: 9</b> · чакат buy-stop 0 · отворени 7 · затворени 1
+    · не се задействаха 1 (11.1% от приключилите прозорци) · и в Action: 1<br>
     
     Затворени: 1 · среден R: -1.00<br>
     
@@ -1268,7 +2666,7 @@
     Defensive 8 / 1 · Offensive 1 / 0
     
   </div>
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ 1.5× среден — 0 · под 1.5× — 6 · без 1 с етикет deal / събитие. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ 1.5× среден — 0 · под 1.5× — 7 · без 1 с етикет deal / събитие. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>
   <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): <b>ROKU</b> 20.10 — deal (Fox Corporation). Средно R: етикетираните още нямат затворени сделки.</div>
   
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (7):</div>
@@ -1280,49 +2678,49 @@
         
         <tr><td class="sym">EXPD<span class="markers"><span class="marker" title="Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират." tabindex="0" onclick="this.classList.toggle('open')">и Action<span class="marker-tip">Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират.</span></span></span></td>
           <td>2026-10-09</td>
-          <td>отворена от 2026-10-09 · +0.2R · обем при входа 1.25×
+          <td>отворена от 2026-10-09 · +0.3R · обем при входа 1.25×
             </td>
           <td class="n">$194.59</td><td class="n">$181.53</td><td class="n">$220.71</td>
           <td>2026-10-15</td><td>Defensive</td></tr>
         
         <tr><td class="sym">AAPL</td>
           <td>2026-10-19</td>
-          <td>отворена от 2026-10-19 · -0.1R · обем при входа 0.86×
+          <td>отворена от 2026-10-19 · +0.2R · обем при входа 0.86×
             </td>
           <td class="n">$345.34</td><td class="n">$322.55</td><td class="n">$390.92</td>
           <td>2026-10-23</td><td>Defensive</td></tr>
         
         <tr><td class="sym">AMG</td>
           <td>2026-10-20</td>
-          <td>отворена от 2026-10-21 · -0.1R · обем при входа 0.93×
+          <td>отворена от 2026-10-21 · +0.1R · обем при входа 0.93×
             </td>
           <td class="n">$395.0</td><td class="n">$363.4</td><td class="n">$458.2</td>
           <td>2026-10-26</td><td>Defensive</td></tr>
         
         <tr><td class="sym">ROKU<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване (Fox Corporation, 14.06.2026) — резултатът следва условията на сделката</div></td>
           <td>2026-10-20</td>
-          <td>отворена от 2026-10-22 · -0.4R · обем при входа 2.40×
+          <td>отворена от 2026-10-22 · -0.3R · обем при входа 2.40×
             </td>
           <td class="n">$159.89</td><td class="n">$148.53</td><td class="n">$182.61</td>
           <td>2026-10-26</td><td>Defensive</td></tr>
         
         <tr><td class="sym">ZBRA</td>
           <td>2026-10-21</td>
-          <td>отворена от 2026-10-21 · -0.2R · обем при входа 0.56×
+          <td>отворена от 2026-10-21 · -0.5R · обем при входа 0.56×
             </td>
           <td class="n">$390.8</td><td class="n">$362.1</td><td class="n">$448.2</td>
           <td>2026-10-27</td><td>Defensive</td></tr>
         
         <tr><td class="sym">RS</td>
           <td>2026-10-23</td>
-          <td>отворена от 2026-10-27 · +0.1R · обем при входа 1.22×
+          <td>отворена от 2026-10-27 · +0.2R · обем при входа 1.22×
             </td>
           <td class="n">$433.02</td><td class="n">$398.38</td><td class="n">$502.3</td>
           <td>2026-10-29</td><td>Defensive</td></tr>
         
         <tr><td class="sym">WSM</td>
           <td>2026-10-27</td>
-          <td>чака buy-stop
+          <td>отворена от 2026-10-29 · +0.2R · обем при входа 0.93×
             </td>
           <td class="n">$255.33</td><td class="n">$234.9</td><td class="n">$296.19</td>
           <td>2026-11-02</td><td>Defensive</td></tr>
@@ -1366,27 +2764,27 @@
   <div class="qm-grid">
     
     <div class="qm-card">
-      <div class="qm-top"><span class="qm-sym">ELF</span><span class="qm-price">$115.41</span></div>
+      <div class="qm-top"><span class="qm-sym">MTDR</span><span class="qm-price">$59.83</span></div>
+      <div class="qm-company">Matador Resources</div>
       
       
-      
-      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +2.5% над затварянето">Вход над $118.29 <span class="qm-sm">(+2.5%)</span> <span class="qm-sm">· до нивото 0.72 ADR</span></div>
-      <div class="earn-warn">⚠ Отчет на 04.11 (след 4 сесии) — няма данни за очаквано движение (картата е нова — при снимката на 28.10 не беше сред кандидатите).</div>
+      <div class="qm-stat" title="Ниво на пробива = най-високият High на последните 10 сесии; +1.9% над затварянето">Вход над $60.95 <span class="qm-sm">(+1.9%)</span> <span class="qm-sm">· до нивото 0.60 ADR</span></div>
+      <div class="earn-warn">⚠ Отчет на 03.11 (след 2 сесии) — няма данни за очаквано движение (картата е нова — при снимката на 29.10 не беше сред кандидатите).</div>
       
       
       
       <div class="qm-kv">
-        <span>ADR</span><b>3.5%</b>
-        <span>Предходен ръст</span><b>+29%</b>
-        <span>Консолидация</span><b title="дълбочина 7.3% · стягане 1.02× ADR · обем 0.93× от 50-дневния · цена +1.0% от 10 MA, +4.7% от 20 MA">8 дни</b>
+        <span>ADR</span><b>3.1%</b>
+        <span>Предходен ръст</span><b>+40%</b>
+        <span>Консолидация</span><b title="дълбочина 21.0% · стягане 1.09× ADR · обем 0.94× от 50-дневния · цена +2.1% от 10 MA, +6.2% от 20 MA">32 дни</b>
       </div>
       
 
-<div class="lv" data-strategy="kullamagi" data-entry="118.29" data-stop="114.17" data-adr="3.48" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
+<div class="lv" data-strategy="kullamagi" data-entry="60.95" data-stop="59.05" data-adr="3.11" data-factor="1.0" data-regime-label="" data-regime-note="отделна стратегия — без режимен фактор">
   <div class="lv-info">
     
-    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$114.17 <i>(−3.5%)</i></b></div>
-    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $116.03 <i>(−1.9%)</i></b></div>
+    <div class="lv-row"><span>Стоп за оразмеряване (макс. 1×ADR)</span><b>$59.05 <i>(−3.1%)</i></b></div>
+    <div class="lv-row"><span>Очакван стоп (0.55×ADR)</span><b>≈ $59.91 <i>(−1.7%)</i></b></div>
     
   </div>
   
@@ -1407,8 +2805,8 @@
     
   </div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
-    Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (177 от 900 тикъра към
-    28.10), кандидати 1. Още 2 кандидат(а) са на повече от 1×ADR от нивото (ADSK, CRM) — не се показват и не се записват. 
+    Подредени по стягане на базата (най-стегнатите първи); лидери: горните 10% по ръст за 1, 3 и 6 месеца (180 от 900 тикъра към
+    29.10), кандидати 1. 
     Задръж курсора върху консолидацията за подробности (дълбочина на базата, стягане, позиция спрямо 10/20 MA). Стопът за оразмеряване е максималният (1×ADR); реалният стоп е дъното на деня на влизане.
   </div>
   
@@ -1417,7 +2815,7 @@
   
   
   <details class="qm-book" style="margin-top:14px">
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани 16 · затворени 2 · win rate след 20 затворени</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга qm_breakout: записани 17 · затворени 3 · win rate след 20 затворени</summary>
   
   
   
@@ -1432,22 +2830,22 @@
     Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     
-    <b>Записани: 16</b> · чакат вход 1 · отворени 4 · затворени 2
-    · не се задействаха 9 (60.0% от приключилите прозорци) · <span style="color:var(--yellow)">с риск на входа под 0.25×ADR: 1 (R от пода)</span><br>
-    Затворени: 2 · среден R: <b>+0.32</b> (opt) / <b>-0.68</b> (pess) · средна доходност на сделка +0.62% / -0.97%<br>
+    <b>Записани: 17</b> · чакат вход 1 · отворени 3 · затворени 3
+    · не се задействаха 10 (62.5% от приключилите прозорци) · <span style="color:var(--yellow)">с риск на входа под 0.25×ADR: 1 (R от пода)</span><br>
+    Затворени: 3 · среден R: <b>+0.50</b> (opt) / <b>-0.78</b> (pess) · средна доходност на сделка +1.25% / -1.60%<br>
     
     
-    Win rate се показва след 20 затворени (сега 2) — при по-малко е шум.<br>
+    Win rate се показва след 20 затворени (сега 3) — при по-малко е шум.<br>
     
     По режим на деня на картата (записани / затворени):
-    Defensive 10 / 2 · Offensive 6 / 0
+    Defensive 10 / 3 · Offensive 7 / 0
     
     
     <br><span style="color:var(--muted)">Извън статистиката: 2 запис(а) от преди правилото „нивото най-много 1×ADR над затварянето“ (в сила от 2026-10-09) — пазят се, но не влизат в броя, процентите и средните:
       SANM (08.10, 1.27 ADR до нивото, не се задейства), SITM (08.10, 1.81 ADR до нивото, не се задейства).</span>
   </div>
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (5):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Чакащи и отворени (4):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (low на входния ден)</th><th>Режим</th></tr></thead>
@@ -1455,32 +2853,26 @@
         
         <tr><td class="sym">DOCU</td>
           <td>2026-10-13</td>
-          <td>след частична продажба (trailing) от 2026-10-13 · +4.3R (+11.1%) · SMA20</td>
+          <td>след частична продажба (trailing) от 2026-10-13 · +3.6R (+9.4%) · SMA20</td>
           <td class="n">$72.76</td><td class="n">$72.76</td><td class="n">$70.885</td>
           <td>Offensive</td></tr>
         
-        <tr><td class="sym">CBOE<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет 30.10 (след 1 сесия) — позицията държи през отчета; стопът не пази от гап</div></td>
+        <tr><td class="sym">UTHR<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет 04.11 (след 3 сесии) — позицията държи през отчета; стопът не пази от гап</div></td>
           <td>2026-10-20</td>
-          <td>след частична продажба (trailing) от 2026-10-20 · +1.2R (+3.4%) · SMA20</td>
-          <td class="n">$315.56</td><td class="n">$315.56</td><td class="n">$306.47</td>
-          <td>Defensive</td></tr>
-        
-        <tr><td class="sym">UTHR<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет 04.11 (след 4 сесии) — позицията държи през отчета; стопът не пази от гап</div></td>
-          <td>2026-10-20</td>
-          <td>след частична продажба (trailing) от 2026-10-20 · +2.0R (+5.2%) · SMA20</td>
+          <td>след частична продажба (trailing) от 2026-10-20 · +2.3R (+5.9%) · SMA20</td>
           <td class="n">$560.0</td><td class="n">$560.0</td><td class="n">$545.58</td>
           <td>Defensive</td></tr>
         
-        <tr><td class="sym">RVTY<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет 03.11 (след 3 сесии) — позицията държи през отчета; стопът не пази от гап</div></td>
+        <tr><td class="sym">RVTY<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет 03.11 (след 2 сесии) — позицията държи през отчета; стопът не пази от гап</div></td>
           <td>2026-10-21</td>
-          <td>след частична продажба (trailing) от 2026-10-21 · +1.1R (+3.8%) · SMA20</td>
+          <td>след частична продажба (trailing) от 2026-10-21 · +1.2R (+3.9%) · SMA20</td>
           <td class="n">$158.0</td><td class="n">$158.0</td><td class="n">$152.71</td>
           <td>Defensive</td></tr>
         
-        <tr><td class="sym">ELF</td>
-          <td>2026-10-29</td>
+        <tr><td class="sym">MTDR</td>
+          <td>2026-10-30</td>
           <td>чака пробива</td>
-          <td class="n">$118.29</td><td class="n">—</td><td class="n">—</td>
+          <td class="n">$60.95</td><td class="n">—</td><td class="n">—</td>
           <td>Offensive</td></tr>
         
       </tbody>
@@ -1488,8 +2880,13 @@
   </div>
   
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени (2):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последни затворени (3):</div>
   <div class="watch-grid" style="margin-top:6px">
+    
+    <div class="watch-card">
+      <span class="ticker" style="color: var(--green)">CBOE</span>
+      <p>2026-10-20 → 2026-10-29 · стоп · R=0.87 opt / -1.0 pess (+2.5% / -2.9%) · Defensive</p>
+    </div>
     
     <div class="watch-card">
       <span class="ticker" style="color: var(--green)">SN</span>
@@ -1528,9 +2925,7 @@
   <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
     <b>Проверката е отварянето</b> (14:30 CET / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
     
-    <br><b>Вчерашният дневник — after-hours срещу отваряне:</b>
-    <span style="font-family:'IBM Plex Mono',monospace">MANH</span> AH +10.3% → отваряне +7.1% (не издържа).
-    
+    <br><span style="color:var(--muted)">Вчера няма гапове за проверка срещу отварянето.</span>
     <span style="color:var(--muted)"> Общо в дневника: записи 3, разрешени 3; 2 от тях отварят ≥ 10% (67%) · медианно разминаване -3.2 пр.п. · корелация 0.52; решение за второ пускане — след 4–6 седмици.</span>
   </div>
 </section>
@@ -1557,15 +2952,44 @@
     <b style="color:var(--green)">Classic</b> = поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията ·
     <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
   </div>
+  <div class="small corp-excluded" style="font-size:12.5px;color:var(--yellow);margin:0 0 10px"><b>Изключени (корпоративно действие):</b>
+  FTV — изключена: корпоративно действие на 30.06 (нецял коефициент 1.327 — отделяне или сплит с нецял коефициент); историята преди датата е оценка на Yahoo (коефициент 1.327); връща се, когато линията е от месец след 06.2025</div>
   
-  
-  <div class="glb-group-label classic">Classic GLB (4)</div>
+  <div class="glb-group-label classic">Classic GLB (7)</div>
   <div class="glb-grid">
     
     <div class="glb-card classic">
       <div class="glb-top">
+        <span class="glb-sym">AFG</span>
+        <span class="glb-price">$153.10</span>
+      </div>
+      <div class="glb-company">American Financial Group</div>
+      <div class="glb-stat">53 месеца unpenetrated</div>
+      <div class="glb-detail">линия (High) $152.29 (04.2022)</div>
+      
+      
+      
+      <div class="glb-detail"><b>GLB от 29.10</b> · сесия 1 от 20, 0.5% над линията ($152.29)</div>
+      
+      
+      
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 12.46% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.3× средния · 1.2× от 52-седм. дъно</div>
+      
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
         <span class="glb-sym">MA</span>
-        <span class="glb-price">$610.31</span>
+        <span class="glb-price">$635.70</span>
       </div>
       <div class="glb-company">Mastercard</div>
       <div class="glb-stat">13 месеца unpenetrated</div>
@@ -1573,7 +2997,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 13.10</b> · сесия 12 от 20, 1.4% над линията ($601.77)</div>
+      <div class="glb-detail"><b>GLB от 13.10</b> · сесия 13 от 20, 5.6% над линията ($601.77)</div>
       
       
       
@@ -1581,7 +3005,35 @@
       <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 12.9% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.3× средния · 1.3× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.3× средния · 1.4× от 52-седм. дъно</div>
+      
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">EHC</span>
+        <span class="glb-price">$131.49</span>
+      </div>
+      <div class="glb-company">Encompass Health</div>
+      <div class="glb-stat">11 месеца unpenetrated</div>
+      <div class="glb-detail">линия (High) $127.99 (10.2025)</div>
+      
+      
+      
+      <div class="glb-detail"><b>GLB от 29.10</b> · сесия 1 от 20, 2.7% над линията ($127.99)</div>
+      
+      
+      
+      
+      <div class="glb-detail">band_hold 100.0% · диапазон на 63 дни 16.35% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 2.3× средния · 1.4× от 52-седм. дъно</div>
       
       
       
@@ -1593,7 +3045,7 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">NDAQ</span>
-        <span class="glb-price">$105.55</span>
+        <span class="glb-price">$105.60</span>
       </div>
       <div class="glb-company">Nasdaq</div>
       <div class="glb-stat">8 месеца unpenetrated</div>
@@ -1601,7 +3053,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 22.10</b> · сесия 5 от 20, 3.7% над линията ($101.79)</div>
+      <div class="glb-detail"><b>GLB от 22.10</b> · сесия 6 от 20, 3.7% над линията ($101.79)</div>
       
       
       
@@ -1621,7 +3073,7 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">GILD</span>
-        <span class="glb-price">$159.20</span>
+        <span class="glb-price">$165.61</span>
       </div>
       <div class="glb-company">Gilead Sciences</div>
       <div class="glb-stat">7 месеца unpenetrated</div>
@@ -1629,7 +3081,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 26.10</b> · сесия 3 от 20, 1.2% над линията ($157.29)</div>
+      <div class="glb-detail"><b>GLB от 26.10</b> · сесия 4 от 20, 5.3% над линията ($157.29)</div>
       
       
       
@@ -1649,7 +3101,7 @@
     <div class="glb-card classic">
       <div class="glb-top">
         <span class="glb-sym">XOM</span>
-        <span class="glb-price">$182.02</span>
+        <span class="glb-price">$183.29</span>
       </div>
       <div class="glb-company">ExxonMobil</div>
       <div class="glb-stat">6 месеца unpenetrated</div>
@@ -1657,7 +3109,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 16.10</b> · сесия 9 от 20, 3.2% над линията ($176.41)</div>
+      <div class="glb-detail"><b>GLB от 16.10</b> · сесия 10 от 20, 3.9% над линията ($176.41)</div>
       
       
       
@@ -1674,16 +3126,44 @@
       
     </div>
     
+    <div class="glb-card classic">
+      <div class="glb-top">
+        <span class="glb-sym">EBAY</span>
+        <span class="glb-price">$121.19</span>
+      </div>
+      <div class="glb-company">eBay</div>
+      <div class="glb-stat">4 месеца unpenetrated</div>
+      <div class="glb-detail">линия (High) $119.31 (05.2026)</div>
+      
+      
+      
+      <div class="glb-detail"><b>GLB от 29.10</b> · сесия 1 от 20, 1.6% над линията ($119.31)</div>
+      
+      
+      
+      
+      <div class="glb-detail">band_hold 98.4% · диапазон на 63 дни 20.74% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.7× средния · 1.6× от 52-седм. дъно</div>
+      
+      
+      
+      <div class="glb-note">Наш филтър (не на Wish): поне 85% от последните 63 затваряния преди пробива са не по-ниско от 15% под линията (band_hold). Диапазонът на тези дни е показан като число — не е доказателство за &#34;тесен&#34; base.</div>
+      
+      
+    </div>
+    
   </div>
   
   
-  <div class="glb-group-label momentum">Momentum GLB (3)</div>
+  <div class="glb-group-label momentum">Momentum GLB (4)</div>
   <div class="glb-grid">
     
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">A</span>
-        <span class="glb-price">$181.48</span>
+        <span class="glb-price">$181.15</span>
       </div>
       <div class="glb-company">Agilent Technologies</div>
       <div class="glb-stat">60 месеца unpenetrated</div>
@@ -1691,7 +3171,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 28.10</b> · сесия 1 от 20, 1.1% над линията ($179.57)</div>
+      <div class="glb-detail"><b>GLB от 28.10</b> · сесия 2 от 20, 0.9% над линията ($179.57)</div>
       
       
       
@@ -1710,24 +3190,24 @@
     
     <div class="glb-card momentum">
       <div class="glb-top">
-        <span class="glb-sym">QLYS</span>
-        <span class="glb-price">$223.52</span>
+        <span class="glb-sym">MTD</span>
+        <span class="glb-price">$1718.61</span>
       </div>
-      <div class="glb-company">Qualys</div>
-      <div class="glb-stat">33 месеца unpenetrated</div>
-      <div class="glb-detail">линия (High) $206.35 (12.2023)</div>
+      <div class="glb-company">Mettler-Toledo International, I</div>
+      <div class="glb-stat">57 месеца unpenetrated</div>
+      <div class="glb-detail">линия (High) $1714.75 (12.2021)</div>
       
       
       
-      <div class="glb-detail"><b>GLB от 22.10</b> · сесия 5 от 20, 8.3% над линията ($206.35)</div>
+      <div class="glb-detail"><b>GLB от 29.10</b> · сесия 1 от 20, 0.2% над линията ($1714.75)</div>
       
       
       
       
-      <div class="glb-detail">band_hold 69.8% · диапазон на 63 дни 36.47% от линията</div>
+      <div class="glb-detail">band_hold 42.9% · диапазон на 63 дни 26.61% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.8× средния · 3.0× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 0.6× средния · 1.7× от 52-седм. дъно</div>
       
       
       
@@ -1739,7 +3219,7 @@
     <div class="glb-card momentum">
       <div class="glb-top">
         <span class="glb-sym">CART</span>
-        <span class="glb-price">$58.42</span>
+        <span class="glb-price">$57.11</span>
       </div>
       <div class="glb-company">Maplebear</div>
       <div class="glb-stat">13 месеца unpenetrated</div>
@@ -1747,7 +3227,7 @@
       
       
       
-      <div class="glb-detail"><b>GLB от 23.10</b> · сесия 4 от 20, 9.2% над линията ($53.50)</div>
+      <div class="glb-detail"><b>GLB от 23.10</b> · сесия 5 от 20, 6.7% над линията ($53.50)</div>
       
       
       
@@ -1755,7 +3235,35 @@
       <div class="glb-detail">band_hold 69.8% · диапазон на 63 дни 19.91% от линията</div>
       
       
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 4.4× средния · 1.8× от 52-седм. дъно</div>
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 4.4× средния · 1.7× от 52-седм. дъно</div>
+      
+      
+      <div class="corp-warn">⚠ Цел на придобиване (DoorDash, Inc., обявено 28.10.2026) — цената следва условията на сделката</div>
+      <div class="glb-note">Дълъг период без нов връх, но по-малко от 85% от последните 63 затваряния преди пробива са близо до линията (наш филтър, не на Wish) — бърз/волатилен пробив. По-висок очакван drawdown риск спрямо стандартните Action кандидати — обмисли намален size.</div>
+      
+      
+    </div>
+    
+    <div class="glb-card momentum">
+      <div class="glb-top">
+        <span class="glb-sym">ALLE</span>
+        <span class="glb-price">$187.06</span>
+      </div>
+      <div class="glb-company">Allegion</div>
+      <div class="glb-stat">7 месеца unpenetrated</div>
+      <div class="glb-detail">линия (High) $183.11 (02.2026)</div>
+      
+      
+      
+      <div class="glb-detail"><b>GLB от 29.10</b> · сесия 1 от 20, 2.2% над линията ($183.11)</div>
+      
+      
+      
+      
+      <div class="glb-detail">band_hold 50.8% · диапазон на 63 дни 22.21% от линията</div>
+      
+      
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните 50 бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива 1.2× средния · 1.5× от 52-седм. дъно</div>
       
       
       
@@ -1793,63 +3301,108 @@
     <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно</b> — те са върху едни и същи тикъри, дати и цени.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish_high: 3 записа / 3 тикъра · затворени 0 / отворени по текуща цена 2 · чакат първата цена 1 · средно +1.91% (всички записи) · статистика след 20 записа с резултат (сега 2 в 2 тикъра)</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish_high: 8 записа / 8 тикъра · затворени 0 / отворени по текуща цена 3 · чакат първата цена 5 · средно +1.79% (всички записи) · статистика след 20 записа с резултат (сега 3 в 3 тикъра)</summary>
   <div class="prose" style="margin-top:8px">
     
-    <b>Записани: 3</b> · <b>затворени 0</b> (изход по линията 0 · изтекли по нашия таван 0) / <b>отворени по текуща цена 2</b> · чакат първата цена 1<br>
+    <b>Записани: 8</b> · <b>затворени 0</b> (изход по линията 0 · изтекли по нашия таван 0) / <b>отворени по текуща цена 3</b> · чакат първата цена 5<br>
     
     
-    Записи с резултат: <b>2 = затворени 0 / отворени по текуща цена 2</b> · средна доходност на всички <b>+1.91%</b> literal / <b>+4.79%</b> exec<br>
+    Записи с резултат: <b>3 = затворени 0 / отворени по текуща цена 3</b> · средна доходност на всички <b>+1.79%</b> literal / <b>+3.61%</b> exec<br>
     
     
-    Отворени по текуща цена (2): средно +1.91% — още не са затворени, цената им може да се върне под линията.<br>
+    Отворени по текуща цена (3): средно +1.79% — още не са затворени, цената им може да се върне под линията.<br>
     
     
     
     <span style="color:var(--muted)">Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея), затова делът на печелившите е просто делът на отворените.</span><br>
     Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати:
     <b>5 сесии</b> — още няма записи с толкова сесии · <b>10 сесии</b> — още няма записи с толкова сесии · <b>20 сесии</b> — още няма записи с толкова сесии.<br>
-    <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): <b>CART</b> 26.10 — събитие/M&amp;A (+9.2% при 4.4× обем на 23.10: «Delivery Firm Instacart Reportedly Explores Sale Options With Uber, DoorDash As Potential Buyers - Yahoo Finance»). Средно доходност %: с тях +1.91 (2) · без тях +0.32 (1).</div>
-    Алфата до изхода се показва след 20 записа с резултат (сега 2) — при по-малко е шум.<br>
+    <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): <b>CART</b> 26.10 — deal (DoorDash, Inc.). Средно доходност %: с тях +1.79 (3) · без тях +2.09 (2).</div>
+    Алфата до изхода се показва след 20 записа с резултат (сега 3) — при по-малко е шум.<br>
     По наш етикет (записани / с 20 сесии след входа):
-    momentum 2 / 0 · classic 1 / 0
+    momentum 4 / 0 · classic 4 / 0
     · по режим на деня на пробива:
-    Defensive 2 / 0 · Offensive 1 / 0 — средните по тип и режим се показват при 20 записа с 20 сесии
+    Defensive 2 / 0 · Offensive 6 / 0 — средните по тип и режим се показват при 20 записа с 20 сесии
     
     
   </div>
   
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи (3):</div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи (8):</div>
   <div class="card" style="padding:6px 4px;margin-top:6px">
     <table class="pos-table">
       <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
       <tbody>
         
-        <tr><td class="sym">A</td>
-          <td>2026-10-28</td><td>momentum</td>
-          <td class="n">$179.57</td>
+        <tr><td class="sym">MTD</td>
+          <td>2026-10-29</td><td>momentum</td>
+          <td class="n">$1714.75</td>
           <td class="n">—</td>
           <td class="n">—</td>
           <td class="n">—</td>
           <td class="n">—</td>
           <td>Offensive</td></tr>
         
+        <tr><td class="sym">EHC</td>
+          <td>2026-10-29</td><td>classic</td>
+          <td class="n">$127.99</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Offensive</td></tr>
+        
+        <tr><td class="sym">EBAY</td>
+          <td>2026-10-29</td><td>classic</td>
+          <td class="n">$119.31</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Offensive</td></tr>
+        
+        <tr><td class="sym">ALLE</td>
+          <td>2026-10-29</td><td>momentum</td>
+          <td class="n">$183.11</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Offensive</td></tr>
+        
+        <tr><td class="sym">AFG</td>
+          <td>2026-10-29</td><td>classic</td>
+          <td class="n">$152.29</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td class="n">—</td>
+          <td>Offensive</td></tr>
+        
+        <tr><td class="sym">A</td>
+          <td>2026-10-28</td><td>momentum</td>
+          <td class="n">$179.57</td>
+          <td class="n">$181.48</td>
+          <td class="n">$181.15</td>
+          <td class="n">-0.2%</td>
+          <td class="n">+0.9%</td>
+          <td>Offensive</td></tr>
+        
         <tr><td class="sym">GILD</td>
           <td>2026-10-26</td><td>classic</td>
           <td class="n">$157.29</td>
           <td class="n">$158.69</td>
-          <td class="n">$159.20</td>
-          <td class="n">+0.3%</td>
-          <td class="n">+1.2%</td>
+          <td class="n">$165.61</td>
+          <td class="n">+4.4%</td>
+          <td class="n">+5.3%</td>
           <td>Defensive</td></tr>
         
-        <tr><td class="sym">CART</td>
+        <tr><td class="sym">CART<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване (DoorDash, Inc., 28.10.2026) — резултатът следва условията на сделката</div></td>
           <td>2026-10-23</td><td>momentum</td>
           <td class="n">$53.50</td>
           <td class="n">$56.44</td>
-          <td class="n">$58.42</td>
-          <td class="n">+3.5%</td>
-          <td class="n">+9.2%</td>
+          <td class="n">$57.11</td>
+          <td class="n">+1.2%</td>
+          <td class="n">+6.8%</td>
           <td>Defensive</td></tr>
         
       </tbody>
@@ -1881,24 +3434,24 @@
     <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно</b> — те са върху едни и същи тикъри, дати и цени.
   </div>
   <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: 27 записа / 23 тикъра · затворени 16 / отворени по текуща цена 11 · средно -0.56% (всички записи)</summary>
+    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга glb_wish: 27 записа / 23 тикъра · затворени 16 / отворени по текуща цена 11 · средно +0.37% (всички записи)</summary>
   <div class="prose" style="margin-top:8px">
     
     <b>Записани: 27</b> · <b>затворени 16</b> (изход по линията 16 · изтекли по нашия таван 0) / <b>отворени по текуща цена 11</b><br>
     
     
-    Записи с резултат: <b>27 = затворени 16 / отворени по текуща цена 11</b> · средна доходност на всички <b>-0.56%</b> literal / <b>-0.86%</b> exec<br>
+    Записи с резултат: <b>27 = затворени 16 / отворени по текуща цена 11</b> · средна доходност на всички <b>+0.37%</b> literal / <b>+0.05%</b> exec<br>
     Изход по линията (16): средно -3.18% — по построение загуби (вход над линията, изход под нея).<br>
     
-    Отворени по текуща цена (11): средно +3.26% — още не са затворени, цената им може да се върне под линията.<br>
+    Отворени по текуща цена (11): средно +5.53% — още не са затворени, цената им може да се върне под линията.<br>
     
     
     
     <span style="color:var(--muted)">Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея), затова делът на печелившите е просто делът на отворените.</span><br>
     Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати:
-    <b>5 сесии</b> — -0.32% (SPY -0.83%, алфа +0.51%), 21 записа · <b>10 сесии</b> — +0.42% (SPY -1.62%, алфа +2.04%), 8 записа · <b>20 сесии</b> — още няма записи с толкова сесии.<br>
-    <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): <b>NWE</b> 23.10 — deal (Black Hills Corporation). Средно доходност %: с тях -0.56 (27) · без тях -0.65 (26).</div>
-    Спрямо SPY до изхода (същите дати): алфа средно -0.25% literal / -0.72% exec<br>
+    <b>5 сесии</b> — -0.10% (SPY -0.49%, алфа +0.39%), 27 записа · <b>10 сесии</b> — +1.18% (SPY -1.12%, алфа +2.30%), 13 записа · <b>20 сесии</b> — още няма записи с толкова сесии.<br>
+    <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): <b>NWE</b> 23.10 — deal (Black Hills Corporation). Средно доходност %: с тях +0.37 (27) · без тях +0.28 (26).</div>
+    Спрямо SPY до изхода (същите дати): алфа средно +0.83% literal / +0.35% exec<br>
     По наш етикет (записани / с 20 сесии след входа):
     momentum 7 / 0 · classic 20 / 0
     · по режим на деня на пробива:
@@ -1917,99 +3470,99 @@
           <td>2026-10-22</td><td>classic</td>
           <td class="n">$263.77</td>
           <td class="n">$265.53</td>
-          <td class="n">$275.61</td>
-          <td class="n">+3.8%</td>
-          <td class="n">+4.5%</td>
+          <td class="n">$280.68</td>
+          <td class="n">+5.7%</td>
+          <td class="n">+6.4%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">NWE<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване (Black Hills Corporation, 18.08.2025) — резултатът следва условията на сделката</div></td>
           <td>2026-10-22</td><td>classic</td>
           <td class="n">$76.97</td>
           <td class="n">$77.13</td>
-          <td class="n">$78.65</td>
-          <td class="n">+2.0%</td>
-          <td class="n">+2.2%</td>
+          <td class="n">$79.22</td>
+          <td class="n">+2.7%</td>
+          <td class="n">+2.9%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">ED</td>
           <td>2026-10-22</td><td>classic</td>
           <td class="n">$113.18</td>
           <td class="n">$116.26</td>
-          <td class="n">$114.15</td>
-          <td class="n">-1.8%</td>
-          <td class="n">+0.9%</td>
+          <td class="n">$115.49</td>
+          <td class="n">-0.7%</td>
+          <td class="n">+2.0%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">QLYS</td>
           <td>2026-10-21</td><td>momentum</td>
           <td class="n">$196.28</td>
           <td class="n">$196.70</td>
-          <td class="n">$223.52</td>
-          <td class="n">+13.6%</td>
-          <td class="n">+13.9%</td>
+          <td class="n">$230.29</td>
+          <td class="n">+17.1%</td>
+          <td class="n">+17.3%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">BRK-B</td>
           <td>2026-10-20</td><td>classic</td>
           <td class="n">$533.25</td>
           <td class="n">$539.82</td>
-          <td class="n">$540.34</td>
-          <td class="n">+0.1%</td>
-          <td class="n">+1.3%</td>
+          <td class="n">$541.96</td>
+          <td class="n">+0.4%</td>
+          <td class="n">+1.6%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">AFG</td>
           <td>2026-10-16</td><td>classic</td>
           <td class="n">$146.86</td>
           <td class="n">$149.13</td>
-          <td class="n">$150.29</td>
-          <td class="n">+0.8%</td>
-          <td class="n">+2.3%</td>
+          <td class="n">$153.10</td>
+          <td class="n">+2.7%</td>
+          <td class="n">+4.2%</td>
           <td>Defensive</td></tr>
         
         <tr><td class="sym">MAR</td>
           <td>2026-10-15</td><td>classic</td>
           <td class="n">$375.60</td>
           <td class="n">$385.71</td>
-          <td class="n">$394.40</td>
-          <td class="n">+2.2%</td>
-          <td class="n">+5.0%</td>
+          <td class="n">$399.65</td>
+          <td class="n">+3.6%</td>
+          <td class="n">+6.4%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">HLT</td>
           <td>2026-10-15</td><td>classic</td>
           <td class="n">$330.46</td>
           <td class="n">$342.98</td>
-          <td class="n">$349.63</td>
-          <td class="n">+1.9%</td>
-          <td class="n">+5.8%</td>
+          <td class="n">$356.93</td>
+          <td class="n">+4.1%</td>
+          <td class="n">+8.0%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">LLY</td>
           <td>2026-10-14</td><td>classic</td>
           <td class="n">$1199.43</td>
           <td class="n">$1208.74</td>
-          <td class="n">$1288.30</td>
-          <td class="n">+6.6%</td>
-          <td class="n">+7.4%</td>
+          <td class="n">$1373.70</td>
+          <td class="n">+13.7%</td>
+          <td class="n">+14.5%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">MA</td>
           <td>2026-10-13</td><td>classic</td>
           <td class="n">$595.29</td>
           <td class="n">$604.80</td>
-          <td class="n">$610.31</td>
-          <td class="n">+0.9%</td>
-          <td class="n">+2.5%</td>
+          <td class="n">$635.70</td>
+          <td class="n">+5.1%</td>
+          <td class="n">+6.8%</td>
           <td>Offensive</td></tr>
         
         <tr><td class="sym">XOM</td>
           <td>2026-10-12</td><td>classic</td>
           <td class="n">$169.66</td>
           <td class="n">$172.15</td>
-          <td class="n">$182.02</td>
-          <td class="n">+5.7%</td>
-          <td class="n">+7.3%</td>
+          <td class="n">$183.29</td>
+          <td class="n">+6.5%</td>
+          <td class="n">+8.0%</td>
           <td>Offensive</td></tr>
         
       </tbody>
@@ -2082,26 +3635,17 @@
 <section>
   <h2>Сплитове · тази седмица</h2>
   
-  <div class="splits-funnel" style="margin-bottom:10px">Отворени позиции и наблюдавани (1): няма сплитове в хоризонта до 09.11.</div>
+  <div class="splits-funnel" style="margin-bottom:10px">Отворени позиции и наблюдавани (15): няма сплитове в хоризонта до 09.11.</div>
   
   
-  <div class="signal-grid">
-    
-    <div class="signal-chip  ">
-      <div class="sym">OMEX
-        <span class="split-tag rev">reverse</span>
-        
-      </div>
-      <div class="note">
-        <b>1:25</b>
-         · $13.55
-         · Oct 29, 2026
-      </div>
-      <div class="note" style="color:var(--muted);font-size:12px">Odyssey Marine Exploration, Inc.</div>
-      
-      
-    </div>
-
+  <div class="splits-empty">Няма предстоящи сплитове тази седмица по нашите критерии
+    (цена над $10, пазарна стойност над $500 млн).</div>
+  <div class="splits-funnel">
+    Източникът върна 30 за седмицата:
+    27 под $10,
+    2 под $500 млн,
+    1 без данни (NYSX)
+    · общо 38 в хоризонта до 09.11.
   </div>
   
 </section>
@@ -3310,7 +4854,7 @@
 
 
 
-<div class="small" style="font-size:12.5px;color:var(--muted);margin:10px 0 0">Form 4: проверени 14 тикъра от картите и 7 позиции — 0 покупки ≥ $100 000 от ключови лица (officers / клъстер) за 30 дни</div>
+<div class="small" style="font-size:12.5px;color:var(--muted);margin:10px 0 0">Form 4: проверени 16 тикъра от картите и 7 позиции — 0 покупки ≥ $100 000 от ключови лица (officers / клъстер) за 30 дни</div>
 
 <div class="small" style="color:var(--muted);margin:10px 0 0">Short скрийнър (Stage 4) и книгата му — замразени на 21.10.2026:
   29 затворени, win 13.8%, среден R -0.16; 14 отворени при замразяването — не се следят.

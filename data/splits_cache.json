@@ -1,17 +1,6 @@
 {
- "date": "2026-10-29",
- "rows": [
-  {
-   "ticker": "OMEX",
-   "company": "Odyssey Marine Exploration, Inc.",
-   "date": "2026-10-29",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Oct 29, 2026",
-   "price": 13.55,
-   "market_cap": 795268332.144494
-  }
- ],
+ "date": "2026-10-30",
+ "rows": [],
  "horizon": [
   {
    "ticker": "AZTR",
@@ -190,11 +179,67 @@
    "date_human": "Oct 29, 2026"
   },
   {
+   "ticker": "MASK",
+   "company": "3 E Network Technology Group Ltd",
+   "date": "2026-10-30",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
    "ticker": "NYSX",
    "company": "Global X Funds Global X NYSE 100 ETF",
    "date": "2026-10-30",
    "ratio": "5:1",
    "split_type": "normal",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "IVF",
+   "company": "INVO Fertility, Inc.",
+   "date": "2026-10-30",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "NXXT",
+   "company": "NextNRG, Inc.",
+   "date": "2026-10-30",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "RUBI",
+   "company": "Rubico Inc.",
+   "date": "2026-10-30",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "WFF",
+   "company": "WF Holding Limited",
+   "date": "2026-10-30",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "WHLR",
+   "company": "Wheeler Real Estate Investment Trust, Inc.",
+   "date": "2026-10-30",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Oct 30, 2026"
+  },
+  {
+   "ticker": "ZONE",
+   "company": "Zone Frontier Inc.",
+   "date": "2026-10-30",
+   "ratio": "1:60",
+   "split_type": "reverse",
    "date_human": "Oct 30, 2026"
   },
   {
@@ -246,6 +291,14 @@
    "date_human": "Nov 05, 2026"
   },
   {
+   "ticker": "TOPS",
+   "company": "TOP Ships Inc.",
+   "date": "2026-11-06",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
    "ticker": "MMT",
    "company": "Aberdeen Multi-Market Income Fund",
    "date": "2026-11-09",
@@ -257,10 +310,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 30,
+  "source_rows": 38,
   "horizon_from": "2026-10-26",
   "horizon_to": "2026-11-09",
-  "in_week": 23,
+  "in_week": 30,
   "dropped_price": [
    "AZTR",
    "BDRX",
@@ -281,14 +334,23 @@
    "PARA",
    "SCAG",
    "ATYR",
-   "ENHA",
-   "AXG"
+   "AXG",
+   "MASK",
+   "IVF",
+   "NXXT",
+   "RUBI",
+   "WFF",
+   "WHLR",
+   "ZONE"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "ENHA",
+   "OMEX"
+  ],
   "dropped_no_data": [
    "NYSX"
   ],
-  "passed": 1,
-  "state": "ok"
+  "passed": 0,
+  "state": "empty"
  }
 }
