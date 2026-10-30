@@ -28,7 +28,6 @@ from src import data_rhythm
 from src import crypto_news
 from src import options_record
 from src import ai_brief
-from src import sector_claims
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
 from src import insider_buying
 from src import correlation_check
@@ -658,7 +657,7 @@ def run() -> dict:
                                        and not (c.get("setup") or {}).get("triggered")]
         return []
     _ai_consequence = "класификацията е от кода, картите са без AI текст"
-    narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, ai_macro.get("sector_logic", []), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
+    narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, sector_layer.board_context(sector_board), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
                             on_fail=_narratives_failed, trace=True, source="ai", label="AI наративите на картите", consequence=_ai_consequence,
                             partial=lambda v: (f"без AI текст: {', '.join(ai_brief.NARRATIVES_LOST[:8])}", {}) if ai_brief.NARRATIVES_LOST else None)
 
@@ -671,11 +670,11 @@ def run() -> dict:
                             label="Сливането на AI наративите с картите", consequence=_ai_consequence)
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
     def _prose_checks():
-        fixed = ai_brief.apply_sector_claims_to_narratives(candidates, rotation) + (ai_macro.get("sector_claims_fixed") or [])
+        fixed = []                                                    # 30.10.2026 (т. 7): без проверките на секторните твърдения (sector_claims) — нямат какво да проверяват
         ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
         ai_brief.verify_narrative_events(candidates, ai_brief.narrative_event_sources(ai_macro, news))   # 19.10.2026: събитие без опора в новините/макрото на деня → махнато
         return fixed
-    sector_claims_fixed = steps.step("prose_checks", _prose_checks, fallback=[], label="Проверките на AI текста на картите (сектори, преписан текст, събития без опора)",
+    sector_claims_fixed = steps.step("prose_checks", _prose_checks, fallback=[], label="Проверките на AI текста на картите (преписан текст, събития без опора)",
                                      consequence="AI текстът на картите днес не е проверен от кода")
     # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
     candidates = inject_split_catalysts(candidates)
@@ -1049,8 +1048,6 @@ def run() -> dict:
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
-    sector_card = steps.step("sector_card", lambda: sector_claims.sector_card((ai_macro or {}).get("sector_logic"), rotation), fallback={},
-                             label="Секторната карта от кода", consequence="показват се веригите на модела без сверката на секторите с ротацията")
     # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; 26.10.2026 (етап 4б, т. 9): включено, със самопроверка —
     # непълен ден (последната сделка не е от затварянето на сесията) не влиза в историята и стъпката е частична
     steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and config.OPTIONS_RECORD_IN_MORNING_RUN and qm_universe),   # 27.10: записът е в options_record.yml (~09:05 ET)
@@ -1081,8 +1078,7 @@ def run() -> dict:
         "macro": macro,
         "thermometer": thermo,
         "rotation": rotation,
-        "sector_card": sector_card,                                     # 19.10.2026 (т. 18): секторите на картата — от кода, веригите — от модела
-        "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода
+        "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода (до 30.10 — "sector_card": водещите по кода, веригите — от модела)
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warns,
         "run_steps": steps.summary(),                                    # 20.10.2026 (етап 3б): ok / частично / провал / пропусната за всяка стъпка в обвивката

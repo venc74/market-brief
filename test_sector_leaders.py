@@ -20,7 +20,7 @@ print("── 1. правилото върху РЕАЛНАТА ротация �
 snap = [r["etf"] for r in rot if r.get("leading") or r.get("rs_at_6m_high")]
 assert snap == ["XLE", "XLP", "XLV", "XLY"]                                                    # по снимката на деня (старото правило)
 assert [r["etf"] for r in sector_layer.leading_sectors(rot)] == ["XLE", "XLV"]
-assert ai_brief._leaders_text(rot) == "XLE, XLV"
+assert ai_brief._leaders_names(rot) == "Енергетика (XLE), Здравеопазване (XLV)"                  # 30.10.2026: _leaders_text (за веригите) отпадна — правилото е същото
 assert [r["etf"] for r in FX["sector_card"]["rows"]] == ["XLE", "XLP", "XLV", "XLY"]           # картата в брифа (стар код)
 print("  ✓ по снимката на деня — XLE, XLP, XLV, XLY; по правилото — XLE и XLV (XLP 75%, XLY 80% изоставане); промптът — „XLE, XLV“")
 

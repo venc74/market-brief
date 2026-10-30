@@ -29,9 +29,9 @@ print("  ✓ ротация без полето → 'нито един' (без 
 print()
 print("── 2. промптът ──")
 prompts = []
-ai_brief._call_claude = lambda system, user, **k: (prompts.append(user), json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"}))[1]
+ai_brief._call_claude = lambda system, user, **k: (prompts.append(user), json.dumps({"macro_brief": "x"}))[1]
 with contextlib.redirect_stdout(io.StringIO()):
     ai_brief.macro_and_sector_brief({}, ROT, copy.deepcopy(B15["thermometer"]))
-assert f["text"] in prompts[0] and '"единственият" важи само когато списъкът е с един сектор' in prompts[0] and "лидерство на двата хоризонта" in prompts[0]
-print("  ✓ промптът носи 6-месечния връх и правилото за 'единственият' (лидерство на двата хоризонта, 6-месечен връх)")
+assert f["text"] not in prompts[0] and '"единственият" важи само когато списъкът е с един сектор' not in prompts[0]          # 30.10.2026 (разходката, т. 7): без веригите — и без правилото
+print("  ✓ от 30.10 промптът е без фактите и правилото за 'единственият' (веригите по сектори отпаднаха); facts() по-горе остава")
 print("\n✅ test_sector_6m_high: всичко мина")

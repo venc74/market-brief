@@ -763,7 +763,7 @@ def _rotation_unavailable_note(rotation: list[dict] | None) -> str:
     if rotation:
         return ""
     return ('\nСЕКТОРНИТЕ ДАННИ НЕ СА НАЛИЧНИ днес (Yahoo Finance не върна ценови данни) — НЕ измисляй водещи сектори, '
-            'RS стойности или ETF-и; върни "sector_logic": [] и кажи в macro_brief, че ротацията не е изчислена.')
+            'RS стойности или ETF-и; кажи в macro_brief, че ротацията не е изчислена.')                # 30.10.2026 (т. 7): без веригите (sector_logic)
 
 
 def _news_block(news: list[dict] | None) -> str:
@@ -784,7 +784,8 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     """
     AI макро бриф. 29.10.2026 (разходката, т. 5): "macro_brief" е разказ в 2–3 абзаца (разделени с празен ред) — какво стана през нощта и как се свързват нещата; абзацът
     за режима (regime_comment) и проверките, които бяха само за него (regime_claims.clean: броене, правило, distribution days, кредитен стрес), са махнати — режимът е в
-    термометъра, от кода. Остават общите: изтеклите клаузи-проверки (regime_claims.strip_meta) и секторните твърдения (sector_claims) — по абзаци, за да не се слеят;
+    термометъра, от кода. Остават общите: изтеклите клаузи-проверки (regime_claims.strip_meta) — по абзаци, за да не се слеят; 30.10.2026 (т. 7): без веригите по сектори
+    и без проверките на секторните твърдения (sector_claims — в историята са сработвали 4 пъти, всичките във веригите);
     отрязването + повторният опит и чуждите символи са в _parse_json / _fix_text. Graceful: грешка в проверка връща отговора на модела непроменен.
     """
     out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social)
@@ -801,10 +802,6 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
                     print(f"[ai] разказ: число без опора във входовете — махнато {f['removed']}: «{f['sentence'][:120]}»")
     except Exception as e:
         print(f"[ai] проверката на числата в разказа пропусната: {type(e).__name__}: {e}")
-    try:
-        out = _apply_sector_claims(out, rotation)
-    except Exception as e:
-        print(f"[ai] проверка на твърденията за секторите пропусната: {type(e).__name__}: {e}")
     return out
 
 
@@ -855,7 +852,6 @@ def narrative_sources(macro: dict | None, rotation: list | None, thermometer: di
             parts.append(_ISO_DATE.sub(lambda m: m.group(1), str(o)))            # от датата остава годината: денят и месецът не са твърдения
     for x in (macro or {}, rotation or [], th, social or {}):
         walk(x)
-    parts.append(sector_claims.facts(rotation)["text"] if rotation else "")
     parts += [" ".join(str(n.get(k) or "") for k in ("headline", "why", "summary")) for n in news or [] if isinstance(n, dict)]
     c = crypto or {}
     parts += [" ".join(str(x.get(k) or "") for k in ("headline", "why")) for x in c.get("items") or [] if isinstance(x, dict)]
@@ -920,38 +916,6 @@ def _per_paragraph(text: str, fn) -> tuple[str, list]:
     return "\n\n".join(outs), probs
 
 
-def _apply_sector_claims(out: dict, rotation: list[dict] | None) -> dict:
-    """
-    13.10.2026: "X е единственият сектор с положителна RS {на двата хоризонта | 4W | 12W}", което противоречи на ротацията, се заменя с текст от кода (sector_claims) в macro_brief
-    (от 29.10 — по абзаци) и във веригите на sector_logic (подлог по подразбиране — ETF-ът на веригата). Веригите стигат до промпта на тикърите — поправката е ПРЕДИ него.
-    """
-    if not isinstance(out, dict) or out.get("ai_synthesis_failed"):
-        return out
-    f = sector_claims.facts(rotation)
-    out = dict(out)
-    fixed = []
-    if isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
-        new, probs = _per_paragraph(out["macro_brief"], lambda para: sector_claims.clean(para, f))
-        if probs:
-            out["macro_brief"] = new
-            fixed += [{"field": "macro_brief", "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
-    chains = []
-    for x in out.get("sector_logic") or []:
-        if isinstance(x, dict) and isinstance(x.get("chain"), str):
-            new, probs = sector_claims.clean(x["chain"], f, x.get("etf"))
-            if probs:
-                x = {**x, "chain": new}
-                fixed += [{"field": f"sector_logic:{x.get('etf')}", "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
-        chains.append(x)
-    if out.get("sector_logic") is not None:
-        out["sector_logic"] = chains
-    if fixed:
-        out["sector_claims_fixed"] = fixed
-        for x in fixed:
-            print(f"[ai] сектори: {x['field']} — «{x['sentence'][:120]}» → «{x['replacement']}»")
-    return out
-
-
 _TRIGGER_ECHO = re.compile(r"задейств\w*\s+на\s+\d{1,2}\.\d{1,2}\s+по\s+\$\s?\d", re.I)
 
 
@@ -994,22 +958,6 @@ def strip_trigger_echo_in_narratives(candidates: list[dict]) -> list[str]:
     return done
 
 
-def apply_sector_claims_to_narratives(candidates: list[dict], rotation: list[dict] | None) -> list[dict]:
-    """13.10.2026: същата проверка върху why_now на картите (наративът на ANET беше преписал изречението от веригата). Връща поправените [{ticker, sentence, replacement}]."""
-    f = sector_claims.facts(rotation)
-    fixed = []
-    for c in candidates or []:
-        ai = c.get("ai") if isinstance(c, dict) else None
-        if isinstance(ai, dict) and isinstance(ai.get("why_now"), str) and ai["why_now"]:
-            new, probs = sector_claims.clean(ai["why_now"], f)
-            if probs:
-                ai["why_now"] = new
-                fixed += [{"ticker": c.get("ticker"), "sentence": p["sentence"], "replacement": p["replacement"]} for p in probs]
-    for x in fixed:
-        print(f"[ai] сектори: why_now {x['ticker']} — «{x['sentence'][:120]}» → «{x['replacement']}»")
-    return fixed
-
-
 def _apply_meta_check(out: dict) -> dict:
     """
     28.10.2026: изтеклите клаузи-проверки от промпта („без null/nan“, „всички индикатори са валидни“) се махат (regime_claims.strip_meta) — запис в "regime_claims_fixed"
@@ -1029,13 +977,6 @@ def _apply_meta_check(out: dict) -> dict:
     return out
 
 
-def _leaders_text(rotation: list[dict] | None) -> str:
-    """19.10.2026 (т. 18): водещите сектори по кода (правилото на sector_layer.leading_sectors, до 6) — за промпта; без такива — изрично."""
-    from src.sector_layer import is_leader                                     # 21.10.2026: едното правило (без потвърдено изоставащите)
-    xs = [r.get("etf") for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and is_leader(r)][:6]
-    return ", ".join(xs) if xs else "няма водещ сектор днес — върни \"sector_logic\": []"
-
-
 def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
                       social: dict | None = None) -> str:
     """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API)."""
@@ -1046,10 +987,6 @@ def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
-ГОТОВО ОТ КОДА за RS на секторите (13.10.2026): {sector_claims.facts(rotation)['text']} Ако пишеш, че сектор е "единственият"/"само той" с положителна RS, \
-сверявай с тези списъци — твърдение, което им противоречи, кодът заменя. Същото за "лидерство на двата хоризонта" (= положителна RS и на 4, и на 12 седмици — \
-списъкът по-горе) и за 6-месечния връх по RS: "единственият" важи само когато списъкът е с един сектор; потвърден случай 15.10.2026 — "единственият с потвърдено \
-лидерство на двата хоризонта" за XLE, а на двата хоризонта бяха XLE, XLV и XLK (само 6-месечният връх беше на XLE).
 ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
 
 {_news_block(news)}{_crypto_block(crypto)}{_social_block(social)}
@@ -1077,17 +1014,10 @@ percentile полета (напр. IEI/HYG "level_percentile"/"roc_percentile") 
 превръщай б.п. наново. Същото за 2s10s: "change_1w_bp" е седмичната промяна на \
 спреда в б.п. (value и prev_week са в процентни пунктове: 0.46 = 46 б.п.).
 {_core_inflation_block(macro)}
-Задачи:
-1. "macro_brief": {NARRATIVE_RULES}
-2. "sector_logic": за топ 3-5 сектора с положителна динамика — пълната верижна \
-логика (макро събитие → механизъм → сектор), както изисква спекът: документирай \
-веригата, не само заключението. Поле "chain" за всяка. Секторите са САМО водещите по \
-кода (RS > 0 и на 4, и на 12 седмици, или RS на 6-месечен връх): {_leaders_text(rotation)} — картата показва само тях. \
-"horizon_weeks" е ЕДНО число от 2 до 6 (хоризонтът на картата), не прозорците на RS. В "chain" пиши с думи, не с имената \
-на полетата (не "rs_chg_4w_pct", а "RS за 4 седмици"; не "laggard_persistence_pct", а "дял на изоставането").
+Задача — "macro_brief": {NARRATIVE_RULES}
+(30.10.2026, разходката, т. 7: веригите по сектори вече не се пишат — секторната карта е от кода.)
 
-Връщай само JSON с ключове: macro_brief, sector_logic (списък от обекти със \
-sector, etf, chain, horizon_weeks)."""
+Връщай само JSON с ключ macro_brief."""
 
 
 # 30.10.2026 (поправки от брифа, т. 4): разказът не цитира нашите проучвания — 30.10: „в нашето проучване … ранен сигнал само в 1 от 3 кризи и 47–72% фалшиви сигнали“ (от надписа
@@ -1120,7 +1050,7 @@ def _crypto_block(crypto: dict | None) -> str:
 
 
 def _leaders_names(rotation: list[dict] | None) -> str:
-    """29.10.2026: водещите сектори по кода (същото правило като _leaders_text) с имената им — за последното изречение на разказа."""
+    """29.10.2026: водещите сектори по кода (sector_layer.is_leader) с имената им — за последното изречение на разказа."""
     from src.sector_layer import is_leader
     xs = [f"{r.get('sector')} ({r.get('etf')})" for r in (rotation or []) if isinstance(r, dict) and r.get("etf") and is_leader(r)][:6]
     return ", ".join(xs) if xs else "няма водещ сектор днес"
@@ -1163,12 +1093,9 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     """
     Връща:
     {
-      "macro_brief": "разказ в 2–3 абзаца (разделени с празен ред)",
-      "sector_logic": [
-        {"sector": ..., "etf": ..., "chain": "конкретната верижна логика",
-         "horizon_weeks": "2-6"}
-      ]
+      "macro_brief": "разказ в 2–3 абзаца (разделени с празен ред)"
     }
+    30.10.2026 (разходката, т. 7): без веригите на секторите ("sector_logic") — секторната карта е от кода (sector_layer.sector_board).
     29.10.2026 (разходката, т. 5): без "regime_comment"; моделът вижда уредите на термометъра само като контекст (_thermo_context), крипто секцията (_crypto_block) и — когато я има —
     секцията за социалните мрежи (_social_block). Махнати от промпта: броенето и правилото за режима, "exit_rule", "Запас до смяна на режима", бележките за блока от
     distribution days и за освободен override — те бяха само за абзаца за режима.
@@ -1243,8 +1170,7 @@ def _ticker_news_block(news: list[dict] | None) -> str:
     if not heads:
         return ""
     return ("\nДНЕШНИ НОВИНИ (дословни заглавия): " + json.dumps(heads, ensure_ascii=False) + "\n"
-            "Назовавай събитие, място или политика като двигател (геополитика, мита/тарифи, санкции, война, бедствие, стачка, кибератака) САМО ако е в тези заглавия "
-            "или в секторната логика по-горе. Иначе не го споменавай — кажи, че връзката е техническа. Потвърден случай 16.10.2026: why_now на EXPD назова "
+            "Назовавай събитие, място или политика като двигател (геополитика, мита/тарифи, санкции, война, бедствие, стачка, кибератака) САМО ако е в тези заглавия. Иначе не го споменавай — кажи, че връзката е техническа. Потвърден случай 16.10.2026: why_now на EXPD назова "
             "'морски маршрути през Червено море', а в новините и данните на деня нямаше нищо такова.\n")
 
 
@@ -1259,7 +1185,7 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime
     08.10.2026 (2б): няма блок с вчерашни watchlist_trigger-и и моделът не връща watchlist_trigger — текстът на Watchlist картата е на кода.
     """
     return f"""Пазарен режим: {regime}
-Активна секторна логика: {json.dumps(sector_logic, ensure_ascii=False, default=str)}
+Секторите по кода (RS спрямо SPY за 4 / 12 седмици и думата): {json.dumps(sector_logic, ensure_ascii=False, default=str)}
 {_ticker_news_block(news)}
 КАНДИДАТИ: {json.dumps(slim, ensure_ascii=False, default=str)}
 

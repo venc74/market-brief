@@ -140,11 +140,11 @@ print("── макро промптът ──")
 seen = {}
 ai_brief._call_claude = lambda system, user, max_tokens=0: (seen.setdefault("u", user), json.dumps({"macro_brief": "x", "sector_logic": [], "regime_comment": "y"}))[1]
 ai_brief.macro_and_sector_brief({}, [], {"regime": "Defensive", "indicators": []})
-assert "СЕКТОРНИТЕ ДАННИ НЕ СА НАЛИЧНИ" in seen["u"] and 'НЕ измисляй водещи сектори' in seen["u"] and '"sector_logic": []' in seen["u"]
+assert "СЕКТОРНИТЕ ДАННИ НЕ СА НАЛИЧНИ" in seen["u"] and 'НЕ измисляй водещи сектори' in seen["u"] and "sector_logic" not in seen["u"]   # 30.10.2026 (т. 7): без веригите
 seen.clear()
 ai_brief.macro_and_sector_brief({}, [{"etf": "XLK", "sector": "Технологии", "rs_chg_4w_pct": 3.1}], {"regime": "Defensive", "indicators": []})
 assert "СЕКТОРНИТЕ ДАННИ НЕ СА НАЛИЧНИ" not in seen["u"]
-print("  ✓ празна ротация → промптът забранява измислени сектори (sector_logic []); непразна → бележката я няма")
+print("  ✓ празна ротация → промптът забранява измислени сектори; непразна → бележката я няма")
 print()
 
 print("── рендер: dashboard и имейл (РЕАЛЕН бриф от 02.10 + СИНТЕТИЧНИ предупреждения) ──")

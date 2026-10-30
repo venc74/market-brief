@@ -74,10 +74,10 @@ assert "Хоризонт: 4–12 седмици" in page_old and "[4, 12]" not i
 print("  ✓ 19.10: водещите с RS реда от кода, GDX в реда под картата; стар бриф (16.10) — веригите на модела с 'Хоризонт: 4–12 седмици' вместо '[4, 12] седмици'")
 
 print()
-print("── 5. промптът и main ──")
-assert ai_brief._leaders_text(B19["rotation"]) == "XLE, XLV" and "няма водещ сектор днес" in ai_brief._leaders_text([])
+print("── 5. от 30.10.2026 (разходката, т. 7): без веригите — промптът и main ──")
 src = (ROOT / "src" / "ai_brief.py").read_text(encoding="utf-8")
-assert "{_leaders_text(rotation)}" in src and '"horizon_weeks" е ЕДНО число от 2 до 6' in src
-assert "sector_card = steps.step(\"sector_card\", lambda: sector_claims.sector_card((ai_macro or {}).get(\"sector_logic\"), rotation)" in (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-print("  ✓ промптът носи водещите по кода (19.10: XLE, XLV — XLP е потвърдено изоставащ), хоризонт — едно число 2–6, думи вместо имена на полета; main записва sector_card")
+assert "{_leaders_text(rotation)}" not in src and '"horizon_weeks" е ЕДНО число от 2 до 6' not in src and not hasattr(ai_brief, "_leaders_text")
+main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
+assert "sector_claims.sector_card" not in main_src and 'sector_board = steps.step("sector_board"' in main_src
+print("  ✓ промптът е без веригите и хоризонта; main строи sector_board (кодът), не sector_card; старата карта остава само за стари брифове")
 print("\n✅ test_sector_card: всичко мина")

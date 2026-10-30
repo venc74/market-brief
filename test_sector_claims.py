@@ -122,18 +122,14 @@ assert sc.check(why, fs) == [] and sc.check(chain, fs, "XLK") == []
 print("  ✓ при един-единствен положителен сектор, който е подлогът — без замяна")
 
 print()
-print("── 5. ai_brief: веригите се поправят в макро стъпката, наративите — след сливането ──")
-out = ai_brief._apply_sector_claims({"macro_brief": "", "regime_comment": "", "sector_logic": [{"etf": "XLK", "chain": chain}]}, FX["2026-10-13"]["rotation"])
-assert "единствен" not in out["sector_logic"][0]["chain"] and out["sector_claims_fixed"][0]["field"] == "sector_logic:XLK"
-cards = [{"ticker": "ANET", "ai": {"why_now": why}}, {"ticker": "EXPD", "ai": {"why_now": "Без твърдения."}}]
-fixed = ai_brief.apply_sector_claims_to_narratives(cards, FX["2026-10-13"]["rotation"])
-assert [x["ticker"] for x in fixed] == ["ANET"] and "единствен" not in cards[0]["ai"]["why_now"] and cards[1]["ai"]["why_now"] == "Без твърдения."
+print("── 5. от 30.10.2026 (разходката, т. 7) проверките не се прилагат — веригите отпаднаха, а в историята са сработвали само в тях (4 от 4) ──")
+assert not hasattr(ai_brief, "_apply_sector_claims") and not hasattr(ai_brief, "apply_sector_claims_to_narratives")
 seen = {}
-ai_brief._call_claude = lambda system, user, **k: seen.setdefault("user", user) and '{"macro_brief": "", "sector_logic": [], "regime_comment": ""}'   # СИНТЕТИЧНО
+ai_brief._call_claude = lambda system, user, **k: seen.setdefault("user", user) and '{"macro_brief": ""}'   # СИНТЕТИЧНО
 ai_brief._macro_and_sector_brief_ai({}, FX["2026-10-13"]["rotation"], {"regime": "Defensive", "indicators": []}, news=[])
-assert "ГОТОВО ОТ КОДА за RS на секторите (13.10.2026): Сектори с положителна RS и на 4, и на 12 седмици: XLK, XLV, XLE;" in seen["user"]
+assert "ГОТОВО ОТ КОДА за RS на секторите" not in seen["user"] and '"sector_logic"' not in seen["user"]
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert src.index("ai_brief.merge_narratives(candidates, narratives)") < src.index("ai_brief.apply_sector_claims_to_narratives(candidates, rotation)")
-print("  ✓ фактът е в макро промпта; веригата е поправена преди промпта на тикърите; why_now — след merge_narratives; brief['sector_claims_fixed']")
+assert "apply_sector_claims_to_narratives" not in src and "sector_claims.sector_card" not in src
+print("  ✓ промптът е без фактите и без веригите; main не вика проверките; функциите на sector_claims (т. 1–4) остават")
 print()
 print("Всички тестове минаха.")
