@@ -29,7 +29,7 @@ q = lambda: contextlib.redirect_stdout(io.StringIO())
 
 print("── 1. промптът върху РЕАЛНИТЕ входове от 29.10 ──")
 p = ai_brief.macro_user_prompt(FX["macro"], FX["rotation"], FX["thermometer"], FX["news"], FX["crypto"])
-assert ai_brief.NARRATIVE_RULES in p and "„За нас:“" in p and "2 или 3 кратки абзаца" in p and "без думата „режим“" in p
+assert ai_brief.NARRATIVE_RULES in p and "„За нас:“" in p and "обикновено 2–3 абзаца" in p and "без думата „режим“" in p
 assert "ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): Енергетика (XLE), Здравеопазване (XLV)" in p
 assert "Bitcoin ETF inflows climb to $176M as BTC rebounds above $80K" in p and '"ticker": "HOOD", "chg_1d_pct": -3.3' in p              # крипто секцията (т. 4)
 assert "Alphabet sinks 10% as it holds 2026 capex unchanged" in p                                                                        # новините (т. 3)
@@ -76,4 +76,14 @@ p2 = ai_brief.macro_user_prompt(FX["macro"], FX["rotation"], FX["thermometer"], 
 assert ai_brief.SOCIAL_RULE in p2 and "„в социалните мрежи се говори за …“" in p2 and '"mentions": 610' in p2
 assert ai_brief._social_block(None) == "" and ai_brief._social_block({}) == ""
 print("  ✓ със секцията — правилото и данните; без нея — нищо")
+print()
+print("── 5. правилата от 30.10 (поправки от брифа, т. 4) — РЕАЛНИТЕ входове на 30.10 ──")
+B30 = json.loads((ROOT / "tests" / "fixtures" / "narrative_numbers_2026-10-30.json").read_text(encoding="utf-8"))["b30"]
+p30 = ai_brief.macro_user_prompt(B30["macro"], B30["rotation"], B30["thermometer"], B30["news"], B30["crypto"])
+for want in ("дължината не е строго ограничена", "без преразказ на уредите един по един", "само с обяснение на прост език в скоби, напр. „contango (",
+             "Без цитати от нашите проучвания", "само с двете мерки ЗАЕДНО: основната инфлация (Dallas Fed Trimmed Mean PCE) и базовият PCE", "двете мерки заедно, всяка с месеца си, или изобщо не"):
+    assert want in p30, want
+for gone in ("проучването ни", "47–72", "1 от 3 кризи", "не влиза в режима"):
+    assert gone not in p30, gone                                                                                              # 30.10: разказът цитира „1 от 3 кризи … 47–72%“
+print("  ✓ без таван на дължината, жаргон с обяснение, без цитати от проучванията (и без числата им в промпта), инфлацията — двете мерки заедно или нищо")
 print("\n✅ test_macro_story: всичко мина")
