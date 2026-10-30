@@ -195,12 +195,32 @@ def price_facts(closes, spy=None) -> dict:
     return out
 
 
+def rs_sign(v: float | None) -> int | None:
+    """30.10.2026 (т. 7): +1 / −1 извън мъртвата зона (±config.RS_WORD_DEAD_ZONE пункта), 0 в нея — „в крак с пазара“."""
+    if v is None:
+        return None
+    dz = config.RS_WORD_DEAD_ZONE
+    return 1 if v > dz else (-1 if v < -dz else 0)
+
+
 def rs_word(rs_4w: float | None, rs_12w: float | None) -> str | None:
-    """30.10.2026 (т. 3): думата до RS — "води пазара" (+ и за двата), "набира сила" (− за 12, + за 4 седмици), "отслабва" (+ за 12, − за 4), "изостава" (− и за двата); 0 е „не +“."""
+    """
+    Думата до RS (30.10.2026, т. 3) — с мъртва зона от 30.10.2026 (т. 7): RS между −1 и +1 пункта е „в крак с пазара“, не плюс / минус. 4 седмици решават посоката,
+    12 — дали е трайно:
+                            12 седм. > +1     ±1               < −1
+        4 седм. > +1        води пазара       набира сила      набира сила
+        4 седм. ±1          в крак с пазара   в крак с пазара  в крак с пазара
+        4 седм. < −1        отслабва          отслабва         изостава
+    До 30.10 (т. 7) знакът беше спрямо 0: XLI +0.2 / −8.5 излизаше „набира сила“ заради +0.2.
+    """
     if rs_4w is None or rs_12w is None:
         return None
-    up4, up12 = rs_4w > 0, rs_12w > 0
-    return {(True, True): "води пазара", (True, False): "набира сила", (False, True): "отслабва", (False, False): "изостава"}[(up4, up12)]
+    s4, s12 = rs_sign(rs_4w), rs_sign(rs_12w)
+    if s4 == 0:
+        return "в крак с пазара"
+    if s4 > 0:
+        return "води пазара" if s12 > 0 else "набира сила"
+    return "изостава" if s12 < 0 else "отслабва"
 
 
 def short_facts(info: dict | None) -> dict:

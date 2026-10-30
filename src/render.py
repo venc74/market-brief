@@ -387,6 +387,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
+        rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)
         action=brief["action"],
         watchlist=split_watchlist(brief["watchlist"])[0],
         watchlist_compact=split_watchlist(brief["watchlist"])[1],             # опростяване (10.10): too_wide/extended/no_volume — един ред

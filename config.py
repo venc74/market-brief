@@ -712,6 +712,8 @@ WATCH_MAX_NEWS_PER_TICKER = int(os.getenv("WATCH_MAX_NEWS_PER_TICKER", 6))
 # при "AI" минават 13 от 20 — всичките за C3.ai.
 WATCH_NEWS_RSS = os.getenv("WATCH_NEWS_RSS", "https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&region=US&lang=en-US")
 WATCH_RS_SESSIONS = (20, 60)                       # 29.10.2026 (т. 6): RS спрямо SPY за 4 и 12 седмици — както секторната карта (sector_layer)
+RS_WORD_DEAD_ZONE = 1.0                            # 30.10.2026 (т. 7): RS между −1 и +1 пункта е „в крак с пазара“ — не се брои за плюс / минус в думите (watch_monitor.rs_word):
+                                                   # измерено върху 98 брифа (13.06–30.10, 11-те сектора): 225 от 1078 реда сменят думата; 0 от 14 наблюдавани тикъра на 30.10
 # Form 4 подаването изостава от самата сделка с дни — 30д прозорец улавя и
 # закъснели filings, AI-то вижда датата на транзакцията и преценява сам.
 WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))
