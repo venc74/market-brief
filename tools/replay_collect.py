@@ -22,7 +22,7 @@ def _safe(fn, *a, **k):
 
 
 def sessions_for(d: dt.date) -> dict:
-    from src import setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, cot_track, thesis_context, backtest
+    from src import setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, cot_track, sessions, backtest
     iso = d.isoformat()
     return {
         "is_session": _safe(setup_rules.is_session, d),
@@ -38,7 +38,7 @@ def sessions_for(d: dt.date) -> dict:
         "sessions_after_60": str(_safe(corp_actions._sessions_after, d, 60)),
         "earn_sessions_after_p20": _safe(earnings_move.sessions_after, d, d + dt.timedelta(days=20)),
         "week_close_date": _safe(cot_track.week_close_date, d - dt.timedelta(days=d.weekday())),
-        "thesis_bdays_p30": _safe(thesis_context._business_days, d, d + dt.timedelta(days=30)),
+        "sessions_in_p30": _safe(sessions.sessions_in, d, d + dt.timedelta(days=30)),          # 30.10.2026 (т. 8): thesis_context._business_days е махнат — същата сметка
         "late_discovery": _safe(backtest._is_late_discovery, {"resolution_date": iso, "discovered_date": (d + dt.timedelta(days=3)).isoformat()}),
     }
 

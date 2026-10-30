@@ -495,105 +495,14 @@ MAGIC_FORMULA_UNIVERSE = [
     "CCJ", "VST", "CEG", "F", "GM", "UPS", "FDX",
 ]
 
-# ── 5. Геополитически тематични кошници (thesis monitor) ──────────────────
-# status: "active" — макро тригер е налице; "structural" — дългосрочен попътен
-# вятър без нужда от тригер; "watch" — следи се ръчно (законодателство/събитие).
-# FIX 2026-09-29: "sector_etf" — секторът за карето "Контекст" (src/
-# thesis_context.py); трябва да е ключ от SECTOR_ETFS, иначе "—".
-# "sector_etf_label" — изричен надпис, когато ETF-ът е прокси.
-# 21.10.2026 (етап 4, ритъм на данните): всяка теза носи "reviewed" — датата на последния преглед; след "reviewed" + THESIS_REVIEW_DAYS (или изричното "review_by")
-# картата казва "остаряла, не е преглеждана от ДД.ММ.ГГГГ". Началните дати са последната промяна на блока в config (git blame към 21.10) — до първия истински преглед.
-THESIS_REVIEW_DAYS = int(os.getenv("THESIS_REVIEW_DAYS", 90))
-THESIS_BASKETS = [
-    {
-        "name": "Въглища и LNG",
-        "reviewed": "2026-10-08",
-        # FIX 2026-09-29: CEIX → CNR (CONSOL + Arch = Core Natural Resources от
-        # 15.01.2025); TELL махнат (купена от Woodside, сделката приключи 08.10.2024).
-        # И двата мълчаха месеци без ценови данни.
-        "tickers": ["BTU", "HCC", "AMR", "CNR", "LNG"],
-        # една акция (BTU) не измерва сектор → енергетиката като прокси
-        "sector_etf": "XLE", "sector_etf_label": "прокси: енергетика",
-        # 08.10 (2в, гейт G4): котви за заглавието на новината — имена на компаниите и термини на механизма; новина без нито една котва не може да "потвърди" или "опровергава" тезата
-        "names": ["Peabody", "Warrior Met", "Alpha Metallurgical", "Core Natural", "Cheniere"],
-        "terms": ["coal", "lng", "liquefied natural gas", "natural gas", "oil", "crude", "brent", "hormuz", "iran", "opec", "energy"],
-        "default_status": "watch",
-        "trigger": "oil_shock",
-        "chain": ("Петролен шок или напрежение в Близкия изток → скок в цената на "
-                  "енергията → въглищата и LNG поемат търсенето, което петролът не "
-                  "може → маржовете на тези производители се разширяват рязко."),
-    },
-    {
-        "name": "Ядрена енергия",
-        "reviewed": "2026-10-08",
-        "tickers": ["VST", "CEG", "OKLO", "CCJ", "DNN", "NNE"],
-        "sector_etf": "URA",
-        # 08.10 (2в): подгрупи със СОБСТВЕН ориентир — добивът на уран и операторите/реакторите не се движат заедно (общият URA е ориентир само за добива); каре "Контекст" по група
-        "groups": [
-            {"name": "Уран и добив", "tickers": ["CCJ", "DNN"], "sector_etf": "URA"},
-            {"name": "Оператори и реактори", "tickers": ["VST", "CEG", "OKLO", "NNE"], "sector_etf": "XLU", "sector_etf_label": "прокси: комунални услуги"},
-        ],
-        # 08.10 (2в, гейт G4): котви за заглавието. Реален случай 07.10: "Black Hills plans $1.8 billion investment to power Google's data center" (газова централа, BKH не е в тезата)
-        # беше "потвърждение" чрез chain_step — стъпката "AI data center-ите гладуват за базова мощност" е изпълнена и от газова централа; без термин на ядрената верига или компания от тезата — отхвърля се
-        "names": ["Vistra", "Constellation", "Oklo", "Cameco", "Denison", "NANO Nuclear"],
-        "terms": ["nuclear", "uranium", "reactor*", "smr*", "small modular", "enrichment", "fission", "atomic"],
-        "default_status": "structural",
-        "trigger": None,
-        "chain": ("AI data center-ите гладуват за стабилна базова мощност 24/7 → "
-                  "ядрената е единственият въглеродно-неутрален източник, който я "
-                  "дава → дългосрочно търсене на уран и реакторни оператори."),
-    },
-    {
-        "name": "Отбрана и дронове",
-        "reviewed": "2026-10-08",
-        "tickers": ["LMT", "RTX", "NOC", "SWMR"],
-        "sector_etf": "ITA",
-        "names": ["Lockheed", "Raytheon", "Northrop", "Swarmer"],
-        "terms": ["defense", "defence", "pentagon", "military", "missile*", "drone*", "navy", "army", "air force", "munition*", "weapon*", "nato", "warfare", "autowarcom"],
-        "default_status": "watch",
-        "trigger": "geopolitical_stress",
-        "chain": ("Геополитическа ескалация → държавите вдигат отбранителни бюджети → "
-                  "поръчки с многогодишен backlog за големите изпълнители → предвидим "
-                  "приходен поток независим от икономическия цикъл."),
-    },
-    # 22.10.2026: тезата „Крипто регулация (CLARITY Act)“ (CRCL, COIN, HOOD, BLSH) отпадна с крипто секцията (решение от 21.10) — новините и тикърите ѝ са там (src/crypto_news.py)
-    {
-        "name": "Полупроводници и AI инфраструктура",
-        "reviewed": "2026-10-08",
-        "tickers": ["AVGO", "AMAT", "MCHP"],
-        "sector_etf": "SMH",
-        "names": ["Broadcom", "Applied Materials", "Microchip"],
-        "terms": ["chip*", "semiconductor*", "ai", "data center*", "gpu*", "foundr*", "wafer*", "lithograph*", "accelerator*", "nvidia", "build-out", "buildout"],
-        "default_status": "structural",
-        "trigger": None,
-        "chain": ("AI build-out → търсене не само на GPU, а на цялата верига: mature-"
-                  "node чипове, оборудване за производство, liquid cooling, мрежи и "
-                  "захранване → вторичните доставчици печелят с по-малко конкуренция."),
-    },
-    {
-        "name": "Финанси при стръмна крива",
-        "reviewed": "2026-09-29",
-        "tickers": ["JPM", "BAC"],
-        "sector_etf": "XLF",
-        "names": ["JPMorgan", "Bank of America"],
-        "terms": ["yield*", "treasur*", "bond*", "curve", "steepen*", "interest rate*", "rate hike*", "fed", "bank*", "lending", "net interest"],
-        "default_status": "watch",
-        "trigger": "curve_steepening",
-        "chain": ("Кривата се разкривява (дълъг край нагоре) → банките заемат евтино "
-                  "на късо и кредитират скъпо на дълго → нетният лихвен марж се "
-                  "разширява → пряко по-висока доходност за банковия сектор."),
-    },
-]
+# ── 5. Геополитически тези — махнати на 30.10.2026 (разходката, т. 8): кошниците (THESIS_BASKETS), тригерите им (macro_layer.thesis_monitor), каре „Контекст“
+# (thesis_context.py) и AI подборът на свързани новини (ai_brief.thesis_news_pick). Брифовете до 30.10 пазят brief["theses"]; страницата вече не ги показва.
 
 # ── Toggle-и за новите скрейпъри (за лесно изключване при проблем) ─────────
 ENABLE_MAGIC_FORMULA = os.getenv("ENABLE_MAGIC_FORMULA", "1") == "1"
 ENABLE_BORROW_DATA = os.getenv("ENABLE_BORROW_DATA", "1") == "1"
 ENABLE_UNUSUAL_OPTIONS = os.getenv("ENABLE_UNUSUAL_OPTIONS", "1") == "1"
 ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
-# FIX 2026-09-29: каре "Контекст" към маркираните тези (src/thesis_context.py)
-# — само данни от кода, без AI текст. Проверката за липсващи ценови данни
-# важи за ВСИЧКИ тези (CEIX/TELL мълчаха месеци).
-ENABLE_THESIS_CONTEXT = os.getenv("ENABLE_THESIS_CONTEXT", "1") == "1"
 
 
 # ── Dataroma · Superinvestor Moves ────────────────────────────────────────
@@ -711,15 +620,6 @@ OPTIONS_RECORD_VOL_X = float(os.getenv("OPTIONS_RECORD_VOL_X", 2.0))            
 # 26.10.2026 (решение по етап 4б, т. 4): плъзгащ се прозорец — последните 90 сесии, по-старите се трият при всеки запис (файлът не расте завинаги; ~4.7 MB при 90 сесии — оценка
 # върху записи с размера на реалния). Историята на git пази предишните версии — тя продължава да расте с дневния commit (оценка ~25–70 KB на ден след компресия)
 OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 90))                      # сесии в data/options_daily.json
-# Тезите и днешните новини (ai_brief.thesis_news_pick) — 19.10.2026 (трети преглед, т. 10, решение "в" на Венци): без AI етикети ("потвърдена / опровергана / evolving /
-# resolved"); до тезата — ДОСЛОВНОТО заглавие на свързаната новина, без етикет (кой съди — читателят). Кандидатите за всяка теза ги избира КОДЪТ по котвите ѝ
-# (THESIS_BASKETS: тикъри, names, terms) от суровия пул; моделът само отсява шума ("AI" в заглавие за литературна награда — 15.10) и връща индексите. Котвите сами не стигат:
-# на пула от 15.10 — 57 кандидата в 4 тези, повечето не са за механизма. Разход (оценка върху пула от 15.10): вход ≈ 2 250 вместо 9 651 токена/ден (18 брифа от 24.09),
-# изход — индекси (≈ 80 вместо 462); ≈ $0.008 вместо $0.036 на ден.
-THESIS_PICK_MAX_CANDIDATES = int(os.getenv("THESIS_PICK_MAX_CANDIDATES", 25))    # кандидати на теза към модела (по реда в пула)
-THESIS_PICK_MAX_PER_THESIS = int(os.getenv("THESIS_PICK_MAX_PER_THESIS", 2))     # показани заглавия до теза
-THESIS_PICK_MAX_TOKENS = int(os.getenv("THESIS_PICK_MAX_TOKENS", 600))
-
 # ── 🔎 Наблюдавани тикъри (watch_monitor.py) ──────────────────────────────
 # Ръчно куриран, per-ticker дневен монитор. Списъкът е в data/watch_list.json
 # и се редактира НА РЪКА — сайтът е статичен, няма backend за интерактивен бутон.

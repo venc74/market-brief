@@ -132,14 +132,14 @@ bb = copy.deepcopy(B19); bb["sector_board"] = b
 with q():
     page = render.render_dashboard(bb, publish=False)
 txt = lambda h: re.sub(r"\s+\)", ")", re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h))))
-sec = txt(page.split("Секторна карта · кои сектори водят", 1)[1].split("Геополитически тези", 1)[0])
+sec = txt(page.split("Секторна карта · кои сектори водят", 1)[1].split("</section>", 1)[0])
 assert "Водят Енергетика, Здравеопазване и Потребителски (защитни)" in sec and "хоризонт" not in sec.lower()
 assert sec.index("XLE") < sec.index("XLV") < sec.index("XLC") and "APA · MPC · VAL" in sec and "RS на 6м връх" in sec
 assert "Тикър RS рейтинг 1 месец 50DMA 200DMA Отчет APA 98 +24.0% над над 04.11 (5 дни) MPC 97 +9.4% над над 03.11 (4 дни)" in sec
 assert "Най-силни подсектори: Добив на нефт и газ (XOP ↑)" in sec and "Киберсигурност (CIBR →) · Софтуер (IGV →)" in sec
 assert "Най-слаби: Соларна (TAN ↓) · Уран/ядрена (URA ↓) · Авиокомпании (JETS ↓)" in sec
 assert "↑ 2" in sec and "↓ 3" in sec and "Данни към 29.10." in sec and "между −1 и +1 е „в крак с пазара“" in sec
-html_sec = page.split("Секторна карта · кои сектори водят", 1)[1].split("Геополитически тези", 1)[0]
+html_sec = page.split("Секторна карта · кои сектори водят", 1)[1].split("</section>", 1)[0]
 opened = re.findall(r'<details class="wt-item"( open)?>\s*<summary class="wt-row sb-row">\s*<span class="wt-t">([A-Z]+)', html_sec)
 assert [e for o, e in opened if o] == ["XLE", "XLV", "XLP", "XLB"] and len(opened) == 11                                        # отворени — само „води пазара“
 assert '<span class="wt-mu">+0.2</span> / <span class="wt-dn">-8.5</span>' in html_sec                                            # XLI: +0.2 — сиво (в зоната)

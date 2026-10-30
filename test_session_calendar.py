@@ -1,7 +1,7 @@
 """
 19.10.2026 · етап 2, т. 15 (трети преглед, Н1/Н2): сесиите по NYSE календара (setup_rules.is_session — уикенд и NYSE_HOLIDAYS), не по делничните дни / последния бар на SPY.
 
-  • Н1 thesis_context._business_days (флагът "отчет скоро" в карето "Контекст"): до 19.10 — делничните дни. Реално (89 брифа, 71 реда с отчет): броят беше с 1 повече в 3 реда
+  • Н1 thesis_context._business_days (флагът "отчет скоро" в карето "Контекст"; от 30.10.2026 карето е махнато — същата сметка е sessions.sessions_in, флагът "скоро" на лидерите в секторната карта): до 19.10 — делничните дни. Реално (89 брифа, 71 реда с отчет): броят беше с 1 повече в 3 реда
     (AVGO с отчет 09.12 на 30.09, 06.10 и 07.10 — през Thanksgiving); флагът в историята не се е сменял.
   • Н1 backtest._is_late_discovery ("открито със закъснение"): до 19.10 — първият делничен ден след резолюцията. В реалната книга (80 записа с двете дати) — 0 засегнати; първият
     случай щеше да е Thanksgiving: стоп в сряда 25.11, открит в петък 27.11 (в четвъртък брифът не върви) → погрешно "със закъснение".
@@ -16,15 +16,15 @@ import sys, json, pathlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import config
-from src import thesis_context as tc, backtest as bt, unusual_options as uo
+from src import sessions as tc, backtest as bt, unusual_options as uo          # 30.10.2026 (т. 8): thesis_context е махнат — sessions.sessions_in
 
 D = dt.date.fromisoformat
 assert "2026-11-26" in config.NYSE_HOLIDAYS and "2026-09-07" in config.NYSE_HOLIDAYS
 
-print("── 1. Н1: карето 'Контекст' — сесии до отчета ──")
-assert tc._business_days(D("2026-10-07"), D("2026-12-09")) == 44                     # РЕАЛНИТЕ дати на AVGO (07.10 → 09.12); делничните дни бяха 45
-assert tc._business_days(D("2026-11-20"), D("2026-11-30")) == 5                      # СИНТЕТИЧНО: 23, 24, 25, 27, 30.11 — Thanksgiving не е сесия → "скоро" (делнични: 6)
-assert tc._business_days(D("2026-10-16"), D("2026-10-19")) == 1                      # уикендът — както досега
+print("── 1. Н1: сесии до отчета (до 30.10 — карето 'Контекст', от 30.10 — лидерите в секторната карта) ──")
+assert tc.sessions_in(D("2026-10-07"), D("2026-12-09")) == 44                     # РЕАЛНИТЕ дати на AVGO (07.10 → 09.12); делничните дни бяха 45
+assert tc.sessions_in(D("2026-11-20"), D("2026-11-30")) == 5                      # СИНТЕТИЧНО: 23, 24, 25, 27, 30.11 — Thanksgiving не е сесия → "скоро" (делнични: 6)
+assert tc.sessions_in(D("2026-10-16"), D("2026-10-19")) == 1                      # уикендът — както досега
 print("  ✓ AVGO 07.10 → 09.12: 44 сесии (беше 45); 20.11 → 30.11: 5 (беше 6 — Thanksgiving); петък → понеделник: 1")
 
 print()

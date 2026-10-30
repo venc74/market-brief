@@ -23,7 +23,7 @@ from src import crypto_news as cn, render
 
 feed = feedparser.parse((ROOT / "tests" / "fixtures" / "cointelegraph_rss_2026-10-21.xml").read_bytes())
 POOL = [{"source": "Cointelegraph", "title": e.title.strip(), "summary": (e.get("summary") or "")[:300]} for e in feed.entries]
-assert len(POOL) == 30 and "Крипто регулация (CLARITY Act)" not in [b["name"] for b in config.THESIS_BASKETS]
+assert len(POOL) == 30                                                            # 30.10.2026 (т. 8): тезите (THESIS_BASKETS) са махнати
 idx = {k: next(i for i, r in enumerate(POOL) if r["title"].startswith(k)) for k in ("OCC finalizes GENIUS", "Ether ETF outflows", "Drift exploiter", "Standard Chartered signs", "Treasury Secretary Bessent")}
 h6 = lambda i: " ".join(POOL[i]["title"].split()[:6])
 

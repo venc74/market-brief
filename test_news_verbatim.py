@@ -6,7 +6,7 @@
 
 РЕАЛНО: tests/fixtures/news_raw_pool_2026-10-15.json — суровият пул (142 заглавия от Reuters Business, CNBC, Financial Times, AP Business), свален на 15.10.2026 ~15:30 Берлин;
 tests/fixtures/brief_2026-10-14.json и brief_2026-10-15.json — рамка за страницата и имейла (+ реалните смесени заглавия от 14.10).
-СИНТЕТИЧНО (маркирано): отговорът на модела (индекси, why, преводи), подмененият _call_claude, тезата за гейта G4 е от config.THESIS_BASKETS.
+СИНТЕТИЧНО (маркирано): отговорът на модела (индекси, why, преводи), подмененият _call_claude. 30.10.2026 (т. 8): разделът за котвите на тезите (гейт G4) — махнат с тезите.
 Пускане: python test_news_verbatim.py
 """
 import sys, json, pathlib, contextlib, io, re, copy, tempfile, html as htmllib
@@ -69,13 +69,7 @@ assert json.loads(na._CACHE.read_text(encoding="utf-8"))["news"] == got
 print("  ✓ всеки ред на пула е с 'i'; резултатът и кешът носят оригиналните заглавия; отпадналите са в LAST_DIAG и в лога")
 
 print()
-print("── 3. тезите: кандидатите са дословни заглавия от пула с котва на тезата (19.10, т. 10 — вместо гейта G4) ──")
-semis = next(b for b in config.THESIS_BASKETS if b["name"] == "Полупроводници и AI инфраструктура")
-assert ai_brief._anchor_match(semis, T[67]) and not ai_brief._anchor_match(semis, POOL[72]["title"])
-print("  ✓ TSMC (дословно от пула) е кандидат на тезата за полупроводниците; приходите на Русия от петрол — не")
-
-print()
-print("── 4. страницата и имейлът (РЕАЛНИЯТ бриф от 15.10 като рамка) ──")
+print("── 3. страницата и имейлът (РЕАЛНИЯТ бриф от 15.10 като рамка) ──")
 b = copy.deepcopy(B15); b["news"] = got
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 page, mail = flat(render.render_dashboard(b)), flat(render.render_email(copy.deepcopy(b)))

@@ -394,7 +394,6 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         watchlist_compact=split_watchlist(brief["watchlist"])[1],             # опростяване (10.10): too_wide/extended/no_volume — един ред
         watchlist_exits=brief.get("watchlist_exits") or {}, watchlist_exits_label=watchlist_exits.label(brief.get("watchlist_exits") or {}, brief.get("date") or ""),
         # v2 нови блокове
-        theses=brief.get("theses", []),
         watch=brief.get("watch", []),
         watch_enabled=config.ENABLE_WATCH_MONITOR,           # празен списък ≠ изключен модул: секцията остава с ред
         model_info=brief.get("model_info", {}),

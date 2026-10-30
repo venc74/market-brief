@@ -15,7 +15,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
-from src.macro_layer import collect_macro_layer, thesis_monitor
+from src.macro_layer import collect_macro_layer
 from src.thermometer import build_thermometer, thermometer_unavailable, apply_distribution_cap
 from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
 from src.screener import run_screen
@@ -54,7 +54,6 @@ from src import short_tracker
 from src import watchlist_expiry
 from src import watch_monitor
 from src import model_selector
-from src import thesis_context
 from src import steps
 from src.render import render_dashboard, render_email
 from src.emailer import send_brief, send_once
@@ -552,9 +551,6 @@ def run() -> dict:
     if thermo["regime_margin"]["text"]:
         print(f"      {thermo['regime_margin']['text']}")
 
-    # v2 · Секция 5 — кои геополитически тези са активни при текущото макро
-    theses = thesis_monitor(macro)
-
     print("[3/7] Слой 2: секторна ротация…")
     # FIX 2026-10-03 (пакет 2 т.6): паднал Yahoo не сваля run-а — sector_rotation() връща [] и записва причината
     # в sector_layer.LAST_STATUS; в брифа излиза предупреждение (data_warnings), а не тих празен резултат.
@@ -641,16 +637,6 @@ def run() -> dict:
                         enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
                         failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto)
-    # FIX 2026-09-16: тезите и днешните новини. 19.10.2026 (т. 10, решение "в"): без AI етикети — до тезата дословното заглавие на свързаната новина
-    # (ai_brief.thesis_news_pick: кандидатите по котвите от кода, моделът само отсява); `status` остава trigger-driven, `chain` остава конфиг.
-    #
-    # FIX 2026-09-18: подава се СУРОВИЯТ пул, не филтрираните ~8 — те се
-    # подбират по обща пазарна значимост за деня и системно изпускат тезово-
-    # релевантни новини в тесни домейни (потвърдено с SEC tokenized-stock
-    # историята на 18.09). Виж news_aggregator.raw_pool(). Нула допълнителен
-    # fetch — gather_raw мемоизира в процеса.
-    theses = ai_brief.thesis_news_pick(
-        theses, news_aggregator.raw_pool() if config.ENABLE_NEWS else [])
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
     def _narratives_failed(e):
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)
@@ -747,14 +733,6 @@ def run() -> dict:
                                    expired=watchlist_expiry.LAST_EXPIRED,       # В2: изтекъл прозорец → тази причина, не "извън 10-те карти"
                                    corp_excluded={e["ticker"]: e["text"] for e in corp_ex_screener})   # 13.10.2026: изключен заради корпоративно действие — тази причина
     print(f"      Излязоха от Watchlist ({wl_exits.get('from', 'няма предишен бриф')}): {[r['ticker'] for r in wl_exits.get('rows', [])]}")
-    # FIX 2026-09-29: каре "Контекст" (само данни) към маркираните тези +
-    # предупреждение за тикъри без ценови данни — виж thesis_context.py. ТУК:
-    # новините, ротацията, action/watchlist и резолвираните позиции са готови.
-    if config.ENABLE_THESIS_CONTEXT:
-        theses = thesis_context.annotate(
-            theses, rotation, thermo["regime"],
-            positions=set(cot_live), action={a["ticker"] for a in action},
-            watchlist={w["ticker"] for w in watchlist})
     # чисто информационен badge на картата — не пипа classification/plan/sizing,
     # screening и timing остават разделени, виж entry_timing.py docstring-а
     if config.ENABLE_ENTRY_TIMING:
@@ -983,7 +961,7 @@ def run() -> dict:
         short_tracker_summary = {}
 
     # 🔎 Наблюдавани тикъри — ръчно куриран per-ticker монитор (watch_monitor.py).
-    # ТУК, а не по-рано: `theses`, `cot_with_theses` и `leaders` вече са готови
+    # ТУК, а не по-рано: `cot_with_theses` и `leaders` вече са готови (30.10.2026, т. 8: без тезите)
     # и се подават като market_context за cross-referencing-а — reuse на вече
     # наличното в паметта, не нов източник.
     #
@@ -999,8 +977,6 @@ def run() -> dict:
         active = [r for r in rows if not r["quiet"]]
         if active:
             market_context = {
-                "active_theses": [t["name"] for t in theses
-                                  if t.get("status") in ("active", "structural")],
                 "cot_markets": [c["market"] for c in cot_with_theses][:10],
                 "leading_sectors": [s["sector"] for s in leaders],
             }
@@ -1104,8 +1080,6 @@ def run() -> dict:
         "action": action,
         "watchlist": watchlist,
         "watchlist_exits": wl_exits,
-        # v2 нови блокове
-        "theses": theses,
         # пакет 4б т.б: покритие на маркера UOV✓ (колко кандидата/позиции имат съотношение, причини, съотношенията за калибриране)
         "uov_diag": uov_diag,
         "splits": splits_month,
@@ -1137,9 +1111,6 @@ def run() -> dict:
         "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
         "narrative_events": list(ai_brief.NARRATIVE_EVENTS_DIAG),        # 19.10.2026: събития без опора в новините/макрото на деня, махнати от наративите
-        # FIX 2026-09-30: приети/отхвърлени маркирания от проверката на тезите
-        # срещу новините — правило (G0–G3) и причина
-        "thesis_check_diag": dict(ai_brief.THESIS_CHECK_DIAG),
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
         "distribution_days_status": dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,     # 16.10.2026 (В8): ok / partial / failed

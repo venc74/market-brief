@@ -66,7 +66,6 @@ _SECTION_LABELS = {
     "_macro_and_sector_brief_ai": "Макро бриф и секторна карта",      # 08.10: същото тяло под ново име (обвивка с проверка на твърденията за режима)
     "_narratives_for_batch": "Тикър наративи",
     "_cot_theses_for_batch": "COT тези",
-    "thesis_news_pick": "Тези: свързани новини",                # 19.10.2026: вместо проверката на тезите (т. 10)
     "watch_ticker_digest": "Наблюдавани тикъри",
     "_watch_digest_batch": "Наблюдавани тикъри",               # 30.10.2026: на групи по 4
     "short_thesis_global_context": "Short контекст",
@@ -1586,89 +1585,7 @@ def _check_price_mentions(ticker: str, text: str, real_price: float | None,
 # COT (Commitments of Traders) — Секция [нова] — Шапиро тези
 # ══════════════════════════════════════════════════════════════════════════
 
-SYSTEM_THESIS_PICK = """Ти подбираш новини към дълготрайни инвестиционни тези. Не оценяваш дали новината \
-потвърждава или опровергава тезата — само избираш заглавията, които са ПРЯКО за механизма или тикърите ѝ. \
-Връщаш САМО валиден JSON, без markdown огради, без преамбюл."""
-
-
-# 19.10.2026 (т. 10): дневна диагностика — кандидати по котвите, избрани от модела, отхвърлени индекси (извън кандидатите на тезата) → брифа (thesis_check_diag)
-THESIS_CHECK_DIAG: dict = {}
-
-
-def _anchor_match(basket: dict, headline: str) -> str | None:
-    """
-    Първата котва от тезата, намерена в заглавието (08.10, гейт G4): тикър (главни букви, цяла дума), име на компания (config "names") или термин на механизма
-    (config "terms"; "*" в края = всяка наставка: "yield*" → yield, yields). Цели думи/фрази, без разлика в регистъра за имена и термини. None → заглавието няма връзка с тезата.
-    """
-    for t in basket.get("tickers") or []:
-        if re.search(rf"(?<![A-Za-z0-9]){re.escape(t)}(?![A-Za-z0-9])", headline):
-            return t
-    low = headline.lower()
-    for n in basket.get("names") or []:
-        if re.search(rf"(?<!\w){re.escape(n.lower())}(?!\w)", low):
-            return n
-    for term in basket.get("terms") or []:
-        pat = re.escape(term.lower().rstrip("*")) + (r"\w*" if term.endswith("*") else "")
-        if re.search(rf"(?<!\w){pat}(?!\w)", low):
-            return term
-    return None
-
-
-def thesis_news_pick(theses: list[dict], pool: list[dict]) -> list[dict]:
-    """
-    19.10.2026 (трети преглед, т. 10 — решение "в" на Венци): до тезата — ДОСЛОВНОТО заглавие на свързаната новина, БЕЗ етикет; AI етикетите ("потвърдена от новина",
-    "опровергана", "друг път", "разрешена") и бележката на модела отпадат (кой съди — читателят); карето "Контекст" с числата от кода остава.
-    Кандидатите за всяка теза — от КОДА: заглавията от суровия пул с котва на тезата (_anchor_match: тикър, име на компания, термин на механизма), най-много
-    THESIS_PICK_MAX_CANDIDATES; моделът само отсява шума и връща индексите; кодът приема индекс само от кандидатите на СЪЩАТА теза и взема заглавието и източника от пула.
-    Добавя "news_headlines" [{headline, source}] (до THESIS_PICK_MAX_PER_THESIS). Без кандидати — без извикване. Graceful: провал → тезите непроменени.
-    """
-    THESIS_CHECK_DIAG.clear()
-    if not theses or not pool:
-        return theses
-    try:
-        heads = [(i, n.get("title") or n.get("headline"), n.get("source")) for i, n in enumerate(pool) if isinstance(n, dict) and (n.get("title") or n.get("headline"))]
-        cand: dict[str, list[int]] = {}
-        for t in theses:
-            basket = next((b for b in config.THESIS_BASKETS if b.get("name") == t.get("name")), None) or {"tickers": t.get("tickers") or []}
-            cand[t.get("name")] = [i for i, h, _ in heads if _anchor_match(basket, h)][:config.THESIS_PICK_MAX_CANDIDATES]
-        THESIS_CHECK_DIAG.update(candidates={k: len(v) for k, v in cand.items()}, picked={}, rejected=[])
-        if not any(cand.values()):
-            print(f"[ai] thesis_news_pick: нито едно заглавие от {len(heads)} няма котва на теза — без извикване")
-            return theses
-        title = {i: h for i, h, _ in heads}
-        payload = [{"name": t.get("name"), "chain": t.get("chain"), "tickers": t.get("tickers"),
-                    "candidates": [{"i": i, "t": title[i]} for i in cand[t.get("name")]]} for t in theses if cand.get(t.get("name"))]
-        user = f"""ТЕЗИ И КАНДИДАТИ (за всяка теза — заглавия от днешните новини, в които има неин тикър, име на компания или термин на механизма):
-{json.dumps(payload, ensure_ascii=False, default=str)}
-
-За всяка теза избери най-много {config.THESIS_PICK_MAX_PER_THESIS} заглавия от НЕЙНИТЕ кандидати, които са пряко за механизма в "chain" или за тикърите ѝ. \
-Обща дума не стига: заглавие, в което "AI", "oil" или "bank" е за нещо друго (литературна награда, банков анализатор за друга компания), не е за тезата. \
-Не оценяваш дали новината потвърждава или опровергава тезата. Ако няма такова заглавие — празен списък.
-Върни JSON: {{"picks": [{{"name": "...", "i": [0, 1]}}]}}"""
-        out = _parse_json(_call_claude(SYSTEM_THESIS_PICK, user, max_tokens=config.THESIS_PICK_MAX_TOKENS))
-        src = {i: s_ for i, _, s_ in heads}
-        picks = {}
-        for p_ in (out.get("picks") or []) if isinstance(out, dict) else []:
-            if not isinstance(p_, dict) or p_.get("name") not in cand:
-                continue
-            ok = []
-            for i in p_.get("i") or []:
-                if isinstance(i, int) and not isinstance(i, bool) and i in cand[p_["name"]] and i not in ok:
-                    ok.append(i)
-                else:
-                    THESIS_CHECK_DIAG["rejected"].append({"thesis": p_.get("name"), "i": i, "reason": "индексът не е сред кандидатите на тезата"})
-            picks[p_["name"]] = ok[:config.THESIS_PICK_MAX_PER_THESIS]
-        annotated = []
-        for t in theses:
-            sel = picks.get(t.get("name")) or []
-            THESIS_CHECK_DIAG["picked"][t.get("name")] = [title[i] for i in sel]
-            annotated.append({**t, "news_headlines": [{"headline": title[i], "source": src.get(i)} for i in sel]} if sel else t)
-        print(f"[ai] thesis_news_pick: {len(theses)} тези, кандидати {THESIS_CHECK_DIAG['candidates']}, избрани "
-              f"{ {k: len(v) for k, v in THESIS_CHECK_DIAG['picked'].items() if v} }, отхвърлени индекси {len(THESIS_CHECK_DIAG['rejected'])}")
-        return annotated
-    except Exception as e:
-        print(f"[ai] thesis_news_pick неуспешен: {type(e).__name__}: {e}")
-        return theses
+# 30.10.2026 (разходката, т. 8): thesis_news_pick (AI подборът на свързани новини към геополитическите тези), _anchor_match и THESIS_CHECK_DIAG — махнати заедно с тезите.
 
 
 SYSTEM_WATCH = """Ти си анализатор, който следи конкретни компании за инвеститор, \
@@ -1684,8 +1601,8 @@ def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
 
     rows: изходът на watch_monitor.collect(), БЕЗ тихите тикъри — те не стигат
     дотук изобщо (кодът им слага текста сам, виж main.py).
-    market_context: {active_theses, cot_markets, leading_sectors} — вече
-    налични в паметта на run-а, не нов източник.
+    market_context: {cot_markets, leading_sectors} — вече налични в паметта на run-а, не нов източник (30.10.2026, т. 8: без active_theses — тезите
+    са махнати).
 
     Insider продажбите се тълкуват по СТРУКТУРНИ сигнали, не по усещане:
     planned_10b5_1 (SEC aff10b5One флагът), pct_of_holdings

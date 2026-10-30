@@ -29,13 +29,13 @@ print("  ✓ сесия / следваща / предишна / напред / �
 
 print()
 print("── 2. старите имена са обвивки на модула ──")
-from src import setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, cot_track, dataroma, thesis_context
+from src import setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, cot_track, dataroma          # 30.10.2026 (т. 8): без thesis_context (махнат)
 assert setup_rules.is_session is s.is_session and setup_rules.sessions_between is s.sessions_between and setup_rules.next_weekday is s.next_weekday
 assert bar_freshness.expected_session("2026-11-27") == "2026-11-25" and health_monitor.prev_session("2026-11-27") == D("2026-11-25") and qm_ep.next_session(D("2026-11-25")) == D("2026-11-27")
 assert corp_actions.sessions_since(D("2026-11-23"), D("2026-11-30")) == 4 and corp_actions._sessions_after(D("2026-11-24"), 2) == D("2026-11-27")
-assert earnings_move.sessions_after(D("2026-11-20"), D("2026-11-30")) == 5 and thesis_context._business_days(D("2026-11-20"), D("2026-11-30")) == 5
+assert earnings_move.sessions_after(D("2026-11-20"), D("2026-11-30")) == 5
 assert cot_track.week_close_date(pd.Timestamp("2026-03-30")) == "2026-04-02" and dataroma.filing_deadline(D("2025-12-31")) == D("2026-02-17")
-print("  ✓ setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, thesis_context, cot_track, dataroma — през src/sessions")
+print("  ✓ setup_rules, bar_freshness, health_monitor, qm_ep, corp_actions, earnings_move, cot_track, dataroma — през src/sessions")
 
 print()
 print("── 3. частичният днешен бар (СИНТЕТИЧНО) ──")

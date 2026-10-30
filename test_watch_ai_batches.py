@@ -39,7 +39,7 @@ def fake(system, user, max_tokens=0, **k):
 ai_brief._call_claude = fake
 fail = {"on": False}
 with q():
-    out = ai_brief.watch_ticker_digest(rows, {"active_theses": [], "cot_markets": [], "leading_sectors": []})
+    out = ai_brief.watch_ticker_digest(rows, {"cot_markets": [], "leading_sectors": []})
 assert config.WATCH_AI_BATCH_SIZE == 4 and [len(c) for c in calls] == [4] * (len(rows) // 4) + ([len(rows) % 4] if len(rows) % 4 else [])
 assert [r["ticker"] for r in out] == [r["ticker"] for r in rows] and all(r["ai"]["summary"] == f"Резюме за {r['ticker']}." for r in out)
 print(f"  ✓ {len(rows)} тикъра → {len(calls)} извиквания ({', '.join(str(len(c)) for c in calls)}); всеки — със своето резюме, в реда на списъка")
@@ -48,7 +48,7 @@ print()
 print("── 2. една група не минава — само нейните тикъри са без резюме, с причина; редът в секцията ──")
 calls.clear(); fail["on"] = True
 with q():
-    out = ai_brief.watch_ticker_digest(rows, {"active_theses": [], "cot_markets": [], "leading_sectors": []})
+    out = ai_brief.watch_ticker_digest(rows, {"cot_markets": [], "leading_sectors": []})
 bad = next(c for c in calls if "CRCL" in c)
 assert all(r["ai"] == {"missing": "отговорът е отрязан (лимитът за изход)"} for r in out if r["ticker"] in bad)
 assert all(r["ai"]["summary"] for r in out if r["ticker"] not in bad)

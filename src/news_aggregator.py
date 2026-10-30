@@ -38,7 +38,7 @@ _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 _CACHE = config.DATA_DIR / "news_cache.json"
 # FIX 2026-09-18: (hours, заглавия) от последния gather_raw В ТОЗИ ПРОЦЕС —
-# двама потребители в един run (significant_news + raw_pool), един fetch.
+# повече от едно извикване в един run, един fetch (30.10.2026: raw_pool за тезите отпадна; остава significant_news).
 _RAW_MEMO: tuple[int, list[dict]] | None = None
 
 
@@ -218,37 +218,8 @@ def gather_raw(hours: int = 24) -> list[dict]:
     return dedup
 
 
-def raw_pool(hours: int = 24) -> list[dict]:
-    """
-    Суровият, НЕфилтриран пул заглавия — за потребители, на които филтрираните
-    ~8 „значими" новини не стигат.
-
-    FIX 2026-09-18: thesis_reality_check() работеше върху изхода на
-    significant_news(), а той се подбира по ПАЗАРНА ЗНАЧИМОСТ ЗА ДЕНЯ —
-    оптимизация за макро секцията. Тезите обаче имат тесни домейни (крипто,
-    ядрена енергия, полупроводници, отбрана, въглища, финанси), затова общият
-    макро филтър системно ги подценява.
-
-    Потвърдено на 18.09.2026: Reuters публикува "US securities regulator rolls
-    out five-year exemption for tokenized stock trading" (SEC Innovation
-    Exemption, пряко релевантна за Крипто регулация тезата) 14.5ч преди run-а,
-    т.е. ВЪТРЕ в прозореца; CNBC даде и свързаната "Tokenization is set to
-    change stock trading". И двете стигнаха до суровия gather. Нито една не
-    влезе в осемте — те бяха изцяло Fed/BOJ/петрол/доходности, което за самата
-    макро секция е правилен подбор. Тезовата проверка обаче остана сляпа.
-
-    Разширяване на филтърните категории (виж regulatory категорията в
-    significant_news) помага, но не решава структурно: осем места на ден са
-    тясно гърло, каквито и категории да има. Затова тезовата проверка вече
-    получава целия пул.
-
-    Graceful: провал → празен списък, извикващият продължава без проверка.
-    """
-    try:
-        return gather_raw(hours)
-    except Exception as e:
-        print(f"[news] raw_pool failed: {e}")
-        return []
+# 30.10.2026 (разходката, т. 8): raw_pool() (суровият пул за проверката на тезите, FIX 2026-09-18) — махнат заедно с тезите; единственият му потребител беше
+# ai_brief.thesis_news_pick.
 
 
 # ──────────────────────────────────────────────────────────────────────────
