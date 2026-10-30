@@ -6,11 +6,13 @@ RS Line на всеки секторен ETF спрямо SPY — кои сек�
 тук са само измеримите данни.
 """
 from __future__ import annotations
+import datetime as dt
 import yfinance as yf
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
+from src import net_utils
 
 
 def _laggard_persistence(rs) -> tuple[float | None, bool]:
@@ -122,6 +124,130 @@ def sector_rotation() -> list[dict]:
     if not results:
         print(f"[sector] ⚠ секторната ротация е празна — {LAST_STATUS['reason']}")
     return results
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# 30.10.2026 (разходката, т. 7): секторната карта — от кода, без AI
+# ──────────────────────────────────────────────────────────────────────────
+def rs_word(rs_4w, rs_12w) -> str | None:
+    """Думата до RS — същите като при наблюдаваните тикъри (watch_monitor.rs_word): води пазара / набира сила / отслабва / изостава."""
+    from src.watch_monitor import rs_word as _w
+    return _w(rs_4w, rs_12w)
+
+
+def board_rows(data, spy, etfs: dict, lag: int | None = None) -> list[dict]:
+    """
+    Затварянията (DataFrame, колона на ETF) и SPY → редове за картата, подредени по сила: RS 4 / 12 седм. (RS линията ETF/SPY — промяна за 21 и 63 сесии, както
+    sector_rotation), думата, RS на 6-месечен връх, силата = средното на двете RS и мястото преди `lag` сесии (същата сметка) → rank_change (+ = нагоре). Чиста функция.
+    """
+    lag = config.SECTOR_BOARD_RANK_LAG if lag is None else lag
+    rows = []
+    for sym, name in etfs.items():
+        try:
+            if sym not in data.columns:
+                continue
+            rs = (data[sym].dropna() / spy).dropna()
+            if len(rs) < 64 + lag:
+                continue
+            chg = lambda i, n: (float(rs.iloc[i]) / float(rs.iloc[i - n]) - 1) * 100
+            r4, r12, p4, p12 = chg(-1, 20), chg(-1, 62), chg(-1 - lag, 20), chg(-1 - lag, 62)
+            rows.append({"etf": sym, "sector": name, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
+                         "strength": round((r4 + r12) / 2, 2), "strength_prev": (p4 + p12) / 2, "rs_at_6m_high": bool(float(rs.iloc[-1]) >= float(rs.max()) * 0.99)})          # както sector_rotation (данните са 6 месеца)
+        except Exception as e:
+            print(f"[sector] карта: {sym} пропуснат: {type(e).__name__}: {e}")
+    prev_rank = {r["etf"]: k for k, r in enumerate(sorted(rows, key=lambda r: r["strength_prev"], reverse=True), 1)}
+    rows.sort(key=lambda r: r["strength"], reverse=True)
+    for k, r in enumerate(rows, 1):
+        r["rank"] = k
+        r["rank_change"] = prev_rank[r["etf"]] - k
+        r.pop("strength_prev")
+    return rows
+
+
+def sector_leaders(etf: str, universe_sector: dict, trend: dict, ratings: dict, n: int | None = None) -> list[dict]:
+    """
+    Лидерите от нашия универс за секторен ETF: същият GICS сектор, над 50DMA и 200DMA, подредени по RS рейтинга (1–99) — с 1 месец, 50DMA и 200DMA от скрийнинга
+    (за таблицата под реда на сектора). Чиста функция.
+    """
+    n = config.SECTOR_BOARD_LEADERS if n is None else n
+    trend = trend or {}
+    xs = [(t, ratings[t]) for t, sec in (universe_sector or {}).items()
+          if config.GICS_SECTOR_ETF.get(sec) == etf and trend.get(t, {}).get("above_50") and trend.get(t, {}).get("above_200") and t in (ratings or {})]
+    return [{"ticker": t, "rs_rating": min(99, r), "chg_1m_pct": trend[t].get("chg_1m_pct"), "above_50": trend[t]["above_50"], "above_200": trend[t]["above_200"]}
+            for t, r in sorted(xs, key=lambda x: (-x[1], x[0]))[:n]]
+
+
+def next_earnings(sym: str, today: dt.date) -> dict:
+    """
+    Следващият отчет за лидер — tk.calendar (~0.1 с на тикър); минала дата се отхвърля и тогава — get_earnings_dates (както enrich.earnings_info; без recap — той е за
+    картите на кандидатите). Реално 30.10: 8 от 33 лидера с календар на току-що минал отчет (ILMN 29.10, TRV 16.10 …) — резервът дава следващия (ILMN 04.02.2027, TRV 20.01.2027).
+    {next_earnings, days_to_earnings, earnings_soon} (скоро = до config.EARNINGS_BLACKOUT_DAYS сесии) или {} — провал / няма дата (graceful).
+    """
+    try:
+        tk = yf.Ticker(sym)
+        cal = net_utils.fetch_with_timeout(lambda: tk.calendar)
+        dates = cal.get("Earnings Date") if isinstance(cal, dict) else None
+        days = [d.date() if isinstance(d, dt.datetime) else d for d in (dates or []) if isinstance(d, dt.date)]
+        future = sorted(d for d in days if d >= today)
+        if not future:
+            df = net_utils.fetch_with_timeout(lambda: tk.get_earnings_dates(limit=4))
+            future = sorted(d for d in (ts.date() for ts in (df.index if df is not None else [])) if d >= today)
+        if not future:
+            return {}
+        from src import sessions as _sessions
+        d = future[0]
+        return {"next_earnings": d.isoformat(), "days_to_earnings": (d - today).days, "earnings_soon": _sessions.sessions_in(today, d) <= config.EARNINGS_BLACKOUT_DAYS}
+    except Exception as e:
+        print(f"[sector] {sym}: календар за отчет неуспешен: {type(e).__name__}: {e}")
+        return {}
+
+
+def board_summary(rows: list[dict]) -> str:
+    """
+    Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
+    иначе „смесена картина“. Чиста функция.
+    """
+    if not rows:
+        return ""
+    lead = [r["sector"] for r in rows if r.get("word") == "води пазара"][:3]
+    lag = [r["sector"] for r in reversed(rows) if r.get("word") == "изостава"][:3]
+    top3 = {r["etf"] for r in rows[:3]}
+    meaning = next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2), "смесена картина — няма ясна посока на ротацията")
+    lst = lambda xs: ", ".join(xs[:-1]) + " и " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "")
+    parts = [f"Водят {lst(lead)}" if lead else "Нито един сектор не води и на двата периода", f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
+    return f"{parts[0]}; {parts[1]} — {meaning}."
+
+
+def sector_board(download=None, universe_sector: dict | None = None, trend: dict | None = None, ratings: dict | None = None,
+                 earnings_fn=None, today: dt.date | None = None) -> dict:
+    """
+    30.10.2026 (т. 7): {"sectors": [...редове + leaders], "subsectors": [...], "top_sub": 5, "bottom_sub": 3, "summary", "as_of"} — едно теглене (11-те секторни ETF-а,
+    подсекторите и SPY, 6 месеца). Лидерите — от последния скрийнинг (screener.LAST_UNIVERSE_SECTOR / LAST_TREND / rs_ratings), подадени отвън; следващият отчет — next_earnings
+    (earnings_fn(sym, today) за тестове). Провал → {} (graceful).
+    """
+    etfs = {e: config.SECTOR_ETFS.get(e, e) for e in config.SECTOR_BOARD_ETFS}
+    subs = dict(config.SUBSECTOR_ETFS)
+    try:
+        from src import sessions as _sessions
+        dl = download or (lambda syms: yf.download(syms, period="6mo", progress=False, auto_adjust=True)["Close"])
+        data = _sessions.cut_today(dl(list(etfs) + list(subs) + ["SPY"]))                 # без днешния частичен бар (сутрин няма такъв — повторен run в сесията)
+        spy = data["SPY"].dropna()
+        sectors, subsectors = board_rows(data, spy, etfs), board_rows(data, spy, subs)
+    except Exception as e:
+        print(f"[sector] секторната карта не е изчислена: {type(e).__name__}: {e}")
+        return {}
+    today = today or dt.date.today()
+    for r in sectors:
+        r["leaders"] = sector_leaders(r["etf"], universe_sector or {}, trend or {}, ratings or {})
+        for l in r["leaders"]:
+            l.update((earnings_fn or next_earnings)(l["ticker"], today) or {})
+    return {"sectors": sectors, "subsectors": subsectors, "summary": board_summary(sectors), "as_of": spy.index[-1].date().isoformat(),
+            "top_sub": subsectors[:config.SECTOR_BOARD_SUB_TOP], "bottom_sub": subsectors[-config.SECTOR_BOARD_SUB_BOTTOM:][::-1] if len(subsectors) > config.SECTOR_BOARD_SUB_TOP else []}
+
+
+def board_context(board: dict | None) -> list[dict]:
+    """30.10.2026 (т. 7): секторите по кода за текста на картите (вместо веригите на AI) — водещите и набиращите сила: [{etf, sector, rs_4w, rs_12w, word}]."""
+    return [{k: r.get(k) for k in ("etf", "sector", "rs_4w", "rs_12w", "word")} for r in (board or {}).get("sectors") or [] if r.get("word") in ("води пазара", "набира сила")]
 
 
 def is_leader(row: dict) -> bool:

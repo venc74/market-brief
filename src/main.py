@@ -590,6 +590,11 @@ def run() -> dict:
                             label="Скрийнърът", consequence="празните Action/Watchlist днес НЕ значат 'няма сетъпи'",
                             failed_if=lambda v: (screener.LAST_STATUS.get("reason") or screener.LAST_STATUS.get("kind")) if screener.LAST_STATUS.get("kind") in ("spy_failed", "no_history", "universe_empty") else None,
                             partial=_screen_partial)
+    # 30.10.2026 (разходката, т. 7): секторната карта — таблица с 11-те секторни ETF-а по сила, лидерите им от универса (данните на скрийнинга току-що), подсекторите
+    sector_board = steps.step("sector_board", lambda: sector_layer.sector_board(universe_sector=screener.LAST_UNIVERSE_SECTOR, trend=screener.LAST_TREND,
+                                                                                ratings=screener.rs_ratings(screener.LAST_RS_SCORES)), fallback={},
+                              label="Секторната карта", consequence="секторната карта липсва днес",
+                              failed_if=lambda v: "Yahoo не върна цените на секторните ETF-и" if not v else None)
 
     print(f"[5/7] Обогатяване на {len(candidates)} кандидата…")
     candidates = enrich(candidates)
@@ -1077,6 +1082,7 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         "sector_card": sector_card,                                     # 19.10.2026 (т. 18): секторите на картата — от кода, веригите — от модела
+        "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warns,
         "run_steps": steps.summary(),                                    # 20.10.2026 (етап 3б): ok / частично / провал / пропусната за всяка стъпка в обвивката

@@ -203,6 +203,10 @@
   details.wt-item[open] > summary .wt-t::before { content: "▾ "; }
   .wt-plain .wt-t::before { content: "  "; white-space: pre; }
   .wt-detail { padding: 2px 14px 12px 30px; border-bottom: 1px solid var(--line); }
+  .sb-row { grid-template-columns: 1.4fr 1.3fr .7fr .9fr 2.2fr; }                /* 30.10.2026 (т. 7): секторната карта */
+  .sb-leaders .ctx-table { width: 100%; max-width: 680px; margin-top: 4px; }   /* лидерите под реда — таблицата на карето „Контекст“ (една ширина за всички сектори) */
+  .sb-leaders { overflow-x: auto; }
+  .sb-leaders .pos { color: var(--green); } .sb-leaders .neg { color: var(--red); } .sb-leaders .warn-txt { color: var(--yellow); }
   @media (max-width: 760px) {
     .wt-row { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
     .wt-head { display: none; }
@@ -768,8 +772,48 @@
 </section>
 {% endif %}
 
+{# 30.10.2026 (т. 7): RS число и стрелка с мъртвата зона (config.RS_WORD_DEAD_ZONE) — в нея сиво, „в крак с пазара“ #}
+{% macro rs_num(v) %}<span class="{{ 'wt-up' if v > rs_dz else ('wt-dn' if v < -rs_dz else 'wt-mu') }}">{{ "%+.1f"|format(v) }}</span>{% endmacro %}
+{% macro rs_arrow(v) %}<span class="{{ 'wt-up' if v > rs_dz else ('wt-dn' if v < -rs_dz else 'wt-mu') }}">{{ '↑' if v > rs_dz else ('↓' if v < -rs_dz else '→') }}</span>{% endmacro %}
 <section>
-  <h2>Секторна карта · следващите 2–6 седмици</h2>
+  {# 30.10.2026 (разходката, т. 7): таблица с 11-те секторни ETF-а по сила, лидерите им от универса, подсекторите — от кода, без AI. Стар бриф без sector_board — старата карта. #}
+  {% if sector_board and sector_board.sectors %}
+  <h2>Секторна карта · кои сектори водят</h2>
+  {% if sector_board.summary %}<div class="prose" style="margin-bottom:12px">{{ sector_board.summary }}</div>{% endif %}
+  <div class="wt sb">
+    <div class="wt-row sb-row wt-head"><span>ETF · сектор</span><span>RS спрямо SPY 4 / 12 седм.</span><span>Място</span><span>6м връх</span><span>Лидери</span></div>
+    {# 30.10.2026: лидерите — таблица под реда на сектора (като карето „Контекст“), разгъва се с клик; отворени по подразбиране — само секторите с „води пазара“ #}
+    {% for r in sector_board.sectors %}
+    <details class="wt-item"{% if r.word == "води пазара" %} open{% endif %}>
+      <summary class="wt-row sb-row">
+        <span class="wt-t">{{ r.etf }}<span class="wt-name">{{ r.sector }}</span></span>
+        <span data-l="RS 4 / 12 седм."><span class="wt-num">{{ rs_num(r.rs_4w) }} / {{ rs_num(r.rs_12w) }}</span>{% if r.word %}<span class="wt-name">{{ r.word }}</span>{% endif %}</span>
+        <span data-l="Място" class="wt-num">{{ r.rank }}{% if r.rank_change > 0 %} <span class="wt-up">↑ {{ r.rank_change }}</span>{% elif r.rank_change < 0 %} <span class="wt-dn">↓ {{ -r.rank_change }}</span>{% else %} <span class="wt-mu">—</span>{% endif %}</span>
+        <span data-l="6м връх">{% if r.rs_at_6m_high %}<span class="wt-mark" style="color:var(--green)">RS на 6м връх</span>{% else %}<span class="wt-mu">—</span>{% endif %}</span>
+        <span data-l="Лидери">{% for l in r.leaders or [] %}<span class="wt-num">{{ l.ticker }}</span>{{ " · " if not loop.last else "" }}{% else %}<span class="wt-mu">няма над 50 и 200DMA</span>{% endfor %}</span>
+      </summary>
+      <div class="wt-detail sb-leaders">
+        {% if r.leaders %}
+        <table class="ctx-table">
+          <tr><th>Тикър</th><th class="num">RS рейтинг</th><th class="num">1 месец</th><th>50DMA</th><th>200DMA</th><th>Отчет</th></tr>
+          {% for l in r.leaders %}
+          <tr><td class="mono">{{ l.ticker }}</td><td class="num">{{ l.rs_rating }}</td>
+            <td class="num">{% if l.chg_1m_pct is defined and l.chg_1m_pct is not none %}<span class="{{ 'neg' if l.chg_1m_pct < 0 else 'pos' }}">{{ "%+.1f"|format(l.chg_1m_pct) }}%</span>{% else %}—{% endif %}</td>
+            <td>{% if l.above_50 is defined %}<span class="{{ 'pos' if l.above_50 else 'neg' }}">{{ 'над' if l.above_50 else 'под' }}</span>{% else %}—{% endif %}</td>
+            <td>{% if l.above_200 is defined %}<span class="{{ 'pos' if l.above_200 else 'neg' }}">{{ 'над' if l.above_200 else 'под' }}</span>{% else %}—{% endif %}</td>
+            <td>{% if l.next_earnings %}<span class="{{ 'warn-txt' if l.earnings_soon else '' }}">{{ l.next_earnings[8:10] }}.{{ l.next_earnings[5:7] }} ({{ l.days_to_earnings }} дни)</span>{% else %}—{% endif %}</td></tr>
+          {% endfor %}
+        </table>
+        {% else %}<div class="small" style="color:var(--muted)">Няма тикър от универса в сектора над 50DMA и 200DMA.</div>{% endif %}
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+  {% if sector_board.top_sub %}<div class="small" style="font-size:12.5px;margin-top:10px"><b>Най-силни подсектори:</b> {% for r in sector_board.top_sub %}{{ r.sector }} ({{ r.etf }} {{ rs_arrow(r.rs_4w) }}){{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}
+  {% if sector_board.bottom_sub %}<div class="small" style="font-size:12.5px;margin-top:4px"><b>Най-слаби:</b> {% for r in sector_board.bottom_sub %}{{ r.sector }} ({{ r.etf }} {{ rs_arrow(r.rs_4w) }}){{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">RS спрямо SPY — колко се е променило отношението ETF / SPY за 4 и за 12 седмици (в %): + значи, че секторът бие пазара; между −{{ "%g"|format(rs_dz) }} и +{{ "%g"|format(rs_dz) }} е „в крак с пазара“ (сиво). Думите — както при наблюдаваните тикъри. Подредбата е по средното на двете RS; „място“ — спрямо преди {{ sector_board_lag }} сесии. Лидерите — от нашия универс (S&amp;P 500 и S&amp;P 400): същият сектор, над 50DMA и 200DMA, по RS рейтинг (1–99); таблицата се разгъва с клик върху сектора. Стрелката при подсекторите — посоката на RS за 4 седмици (→ — в крак с пазара). Данни към {{ sector_board.as_of[8:10] }}.{{ sector_board.as_of[5:7] }}.</div>
+  {% else %}
+  <h2>Секторна карта · кои сектори водят</h2>
   <div class="sectors">
     {% if sector_card and sector_card.rows is defined %}
     {# 19.10.2026 (т. 18): секторите — водещите по кода (RS > 0 на 4 и 12 седмици или RS на 6-месечен връх); веригата — на модела #}
@@ -804,6 +848,7 @@
     {% endfor %}
     {% endif %}
   </div>
+  {% endif %}
 </section>
 
 {# FIX 2026-09-29: каре "Контекст" — само данни от кода (src/thesis_context.py) #}

@@ -35,13 +35,20 @@ LAST_FUNDAMENTALS: dict[str, dict] = {}
 # ──────────────────────────────────────────────────────────────────────────
 # Универс
 # ──────────────────────────────────────────────────────────────────────────
+# 30.10.2026 (разходката, т. 7): GICS секторът на всеки тикър от универса — от същите таблици в Wikipedia (колона "GICS Sector"), без нова заявка; за лидерите в секторната карта
+LAST_UNIVERSE_SECTOR: dict[str, str] = {}
+
+
 def _wiki_tickers(url: str, column: str) -> list[str]:
     try:
         html = requests.get(url, timeout=30, headers=UA).text
         tables = pd.read_html(io.StringIO(html))
         for t in tables:
             if column in t.columns:
-                return [str(s).replace(".", "-").strip() for s in t[column].tolist()]
+                syms = [str(s).replace(".", "-").strip() for s in t[column].tolist()]
+                if "GICS Sector" in t.columns:
+                    LAST_UNIVERSE_SECTOR.update({sym: str(sec).strip() for sym, sec in zip(syms, t["GICS Sector"].tolist()) if isinstance(sec, str)})
+                return syms
     except Exception as e:
         print(f"[screener] universe fetch failed {url}: {e}")
     return []
@@ -71,6 +78,7 @@ RS_LINE_STAY = config.RS_LINE_STAY                       # 09.10: оставан
 LAST_RS_HELD: set[str] = set()                           # тикърите със състояние от предишния run (за explain_exclusion) в последния run_screen
 LAST_RS_EVALUATED: set[str] = set()                      # тикърите с данни в последния technical_screen (останалите пазят състоянието си)
 LAST_BAR_DATES: dict[str, str] = {}                      # 16.10.2026: последната дата с бар на всеки тикър в последния technical_screen (bar_freshness.universe — застоял бар)
+LAST_TREND: dict[str, dict] = {}                          # 30.10.2026 (т. 7): над / под 50DMA и 200DMA и промяната за 1 месец на всеки тикър в последния technical_screen — за лидерите в секторната карта
 
 
 def load_rs_state(path=None) -> set[str]:
@@ -220,6 +228,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     LAST_RS_HELD.clear(); LAST_RS_HELD.update(held)
     LAST_RS_EVALUATED.clear()
     LAST_BAR_DATES.clear()
+    LAST_TREND.clear()
     # втори преглед (10.10.2026): seed_prev — състоянието липсва (първи run / изтрит файл) → предишният технически списък се гради от СЪЩИТЕ данни
     # без последния бар (правилото за вход, RS rating върху вчерашните доходности); днешният ред на всеки тикър се избира по него. Без нова заявка.
     prev_survivors: list[dict] = []
@@ -255,6 +264,11 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
                 df = data[sym].dropna() if len(batch) > 1 else data.dropna()
                 if len(df):
                     LAST_BAR_DATES[sym] = df.index[-1].date().isoformat()
+                if len(df) >= 200:
+                    c = df["Close"]
+                    last = float(c.iloc[-1])
+                    LAST_TREND[sym] = {"above_50": last > float(c.iloc[-50:].mean()), "above_200": last > float(c.iloc[-200:].mean()),
+                                       "chg_1m_pct": round((last / float(c.iloc[-22]) - 1) * 100, 1)}          # 1 месец = 21 сесии (както карето „Контекст“)
                 score = rs_score(df["Close"])
                 if score is not None:
                     rs_scores[sym] = score
