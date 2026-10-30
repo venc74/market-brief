@@ -170,8 +170,9 @@ def _yf_news(ticker: str, hours: int) -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────
 def price_facts(closes, spy=None) -> dict:
     """
-    Дневни затваряния (pandas Series, без днешния частичен бар) → цена, промяна за сесията, над/под 50DMA и 200DMA, RS спрямо SPY за 4 и 12 седмици
-    (config.WATCH_RS_SESSIONS; (1 + r) / (1 + r_SPY) − 1, както секторната ротация). Къса история → None за съответното поле. Чиста функция.
+    Дневни затваряния (pandas Series, без днешния частичен бар) → цена, промяна за сесията, над/под 50DMA и 200DMA, RS спрямо S&P 500 за 4 и 12 седмици
+    (config.WATCH_RS_SESSIONS). 30.10.2026 (поправки от брифа, т. 3): RS е РАЗЛИКАТА в ръста — ръстът на акцията минус ръстът на SPY, в процентни пунктове (до 30.10 —
+    (1 + r) / (1 + r_SPY) − 1) — и "rs_word" от кода (rs_word). Къса история → None за съответното поле. Чиста функция.
     """
     c = closes.dropna() if closes is not None else None
     if c is None or len(c) < 2:
@@ -187,8 +188,19 @@ def price_facts(closes, spy=None) -> dict:
     for n in config.WATCH_RS_SESSIONS:
         if s is not None and len(c) > n and len(s) > n:
             r, rs_ = last / float(c.iloc[-1 - n]) - 1, float(s.iloc[-1]) / float(s.iloc[-1 - n]) - 1
-            out[f"rs_{n}"] = round(((1 + r) / (1 + rs_) - 1) * 100, 1)
+            out[f"rs_{n}"] = round((r - rs_) * 100, 1)
+    w = rs_word(out.get(f"rs_{config.WATCH_RS_SESSIONS[0]}"), out.get(f"rs_{config.WATCH_RS_SESSIONS[1]}"))
+    if w:
+        out["rs_word"] = w
     return out
+
+
+def rs_word(rs_4w: float | None, rs_12w: float | None) -> str | None:
+    """30.10.2026 (т. 3): думата до RS — "води пазара" (+ и за двата), "набира сила" (− за 12, + за 4 седмици), "отслабва" (+ за 12, − за 4), "изостава" (− и за двата); 0 е „не +“."""
+    if rs_4w is None or rs_12w is None:
+        return None
+    up4, up12 = rs_4w > 0, rs_12w > 0
+    return {(True, True): "води пазара", (True, False): "набира сила", (False, True): "отслабва", (False, False): "изостава"}[(up4, up12)]
 
 
 def short_facts(info: dict | None) -> dict:

@@ -54,20 +54,24 @@ print()
 print("── 2. фактите от кода (РЕАЛНИТЕ затваряния и .info) ──")
 cl = {t: pd.Series(list(v.values()), index=pd.to_datetime(list(v.keys()))) for t, v in FX["closes"].items()}
 for t in T:
-    assert wm.price_facts(cl[t], cl["SPY"]) == FX["expected_price"][t], t
+    got = wm.price_facts(cl[t], cl["SPY"])
+    assert {k: v for k, v in got.items() if not k.startswith("rs")} == {k: v for k, v in FX["expected_price"][t].items() if not k.startswith("rs")}, t
+    for n in (20, 60):                                                                                     # 30.10.2026: RS = ръстът на акцията минус ръстът на SPY (пунктове)
+        r = cl[t].iloc[-1] / cl[t].iloc[-1 - n] - 1; rs = cl["SPY"].iloc[-1] / cl["SPY"].iloc[-1 - n] - 1
+        assert got[f"rs_{n}"] == round((r - rs) * 100, 1), (t, n)
 tdoc = wm.price_facts(cl["TDOC"], cl["SPY"])
-assert tdoc["date"] == "2026-10-28" and tdoc["close"] == 6.88 and tdoc["chg_1d_pct"] == 6.67 and tdoc["above_50"] and tdoc["above_200"] and tdoc["rs_20"] == 17.1
+assert tdoc["date"] == "2026-10-28" and tdoc["close"] == 6.88 and tdoc["chg_1d_pct"] == 6.67 and tdoc["above_50"] and tdoc["above_200"] and (tdoc["rs_20"], tdoc["rs_60"], tdoc["rs_word"]) == (17.4, 2.4, "води пазара")
 sh = wm.short_facts(FX["info"]["TDOC"])
 assert sh == {"pct_float": 17.7, "days_to_cover": 8.8, "chg_pct": 16.1, "as_of": "2026-10-15", "prior_as_of": "2026-09-15"}, sh            # Yahoo: предишното е отпреди месец (15.09), не 30.09
 assert wm.short_facts({}) == {} and wm.price_facts(cl["TDOC"].iloc[-30:], None).get("above_200") is None                             # кратка история — без 200DMA
-print(f"  ✓ TDOC: $6.88 +6.67% (28.10), над 50 и 200DMA, RS 4 седм. +17.1%; short 17.7% · 8.8 дни · +16.1% спрямо 15.09 · към 15.10")
+print(f"  ✓ TDOC: $6.88 +6.67% (28.10), над 50 и 200DMA, RS спрямо S&P +17.4 / +2.4 пункта — „води пазара“; short 17.7% · 8.8 дни · +16.1% спрямо 15.09 · към 15.10")
 
 print()
 print("── 3. collect() → таблицата: ред на тикър, разгъване при събития, маркерите ──")
 def facts_fn(tickers):
     out = {}
     for t in tickers:
-        out[t] = {"name": FX["info"][t]["longName"], "price": FX["expected_price"][t], "short": wm.short_facts(FX["info"][t]), "earnings": FX["earnings"][t]}
+        out[t] = {"name": FX["info"][t]["longName"], "price": wm.price_facts(cl[t], cl["SPY"]), "short": wm.short_facts(FX["info"][t]), "earnings": FX["earnings"][t]}
     return out
 wm.insider_buying.fetch_insider_transactions = lambda ts: {t: [{**x, "date": pd.Timestamp(x["date"]).date()} for x in FX["insider"].get(t, [])] for t in ts}
 wm.requests.get = lambda url, timeout=None, headers=None: type("R", (), {"content": rss(re.search(r"s=([A-Z]+)", url).group(1))})()     # СИНТЕТИЧНО: мрежата → РЕАЛНИЯТ фийд
@@ -91,7 +95,7 @@ sec = page[page.index("<h2>🔎 Наблюдавани тикъри"):]; sec = s
 assert sec.count('<div class="wt-row wt-head">') == 1 and sec.count('<span class="wt-t">') == 14
 assert sec.count('<details class="wt-item">') == sum(1 for r in rows if not r["quiet"]) and sec.count('<div class="wt-row wt-plain">') == sum(1 for r in rows if r["quiet"])
 t_tdoc = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", sec[sec.index('<span class="wt-t">TDOC'):sec.index("</details>", sec.index('<span class="wt-t">TDOC'))])))
-assert "TDOC Teladoc Health, Inc. $6.88 +6.7% над / над +17.1% / +2.4% 24.02 (след 118 дни) 17.7% от float · 8.8 дни · +16.1% спрямо 15.09 · към 15.10" in t_tdoc, t_tdoc[:300]
+assert "TDOC Teladoc Health, Inc. $6.88 +6.7% над / над +17.4 / +2.4 води пазара 24.02 (след 118 дни) 17.7% от float · 8.8 дни · +16.1% спрямо 15.09 · към 15.10" in t_tdoc, t_tdoc[:300]
 assert "Catapano Joseph Ronald" in t_tdoc and "Teladoc" in t_tdoc
 elf = sec[sec.index('<span class="wt-t">ELF'):]; elf = elf[:elf.index("</summary>")]
 assert '<span class="wt-mark">QM</span><span class="wt-mark">книга QM</span>' in elf
@@ -115,4 +119,12 @@ with q():
     page = render.render_dashboard(b, publish=False)
 assert "Списъкът е празен" in page and 'class="wt-row wt-head"' not in page                                                # без празна таблица — само редът
 print("  ✓ „Списъкът е празен …“")
+
+print()
+print("── 5. RS: думата от кода и бележката под таблицата (30.10.2026) ──")
+assert [wm.rs_word(a, b) for a, b in ((1, 1), (1, -1), (-1, 1), (-1, -1))] == ["води пазара", "набира сила", "отслабва", "изостава"]
+blsh = wm.price_facts(cl["BLSH"], cl["SPY"]); bfly = wm.price_facts(cl["BFLY"], cl["SPY"])
+assert (blsh["rs_20"], blsh["rs_60"], blsh["rs_word"]) == (-18.9, 20.6, "отслабва") and bfly["rs_word"] == "изостава"                    # РЕАЛНО (28.10)
+assert "RS 4 / 12 седм. — ръстът на акцията минус ръстът на S&amp;P 500 (SPY) за 4 и за 12 седмици" in page1 and "за 4 и за 12 седмици" not in page          # празен списък — без бележката
+print("  ✓ BLSH −18.9 / +20.6 → „отслабва“, BFLY → „изостава“; бележката под таблицата")
 print("\n✅ test_watch_table: всичко мина")
