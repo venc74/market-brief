@@ -76,15 +76,14 @@ assert [x["reason"] for x in dropped2] == ["също: ехото не съвпа
 print(f"  ✓ причините: {[x['reason'] for x in dropped2]}")
 
 print()
-print("── 4. страницата и имейлът: „· също: Financial Times, CNBC“ с линкове ──")
+print("── 4. страницата и имейлът: „· +2 източника“ (30.10.2026: само броят, без линкове; основното заглавие — линк) ──")
 b = copy.deepcopy(B19); b["news"] = news
 with q():
     page = render.render_dashboard(b, publish=False)
     mail = render.render_email(b)
-also_html = (f'· също: <a href="{esc(d["also"][0]["link"])}" target="_blank" rel="noopener noreferrer" title="{esc(d["also"][0]["headline"])}" style="color:var(--muted)">Financial Times</a>, '
-             f'<a href="{esc(d["also"][1]["link"])}" target="_blank" rel="noopener noreferrer" title="{esc(d["also"][1]["headline"])}" style="color:var(--muted)">CNBC</a>')
-assert also_html in page
-assert f' · също: <a href="{esc(d["also"][0]["link"])}" style="color:#6b7280">Financial Times</a>, <a href="{esc(d["also"][1]["link"])}" style="color:#6b7280">CNBC</a>' in mail
+assert '<span class="news-why" style="font-size:12px" title="Financial Times, CNBC">· +2 източника</span>' in page
+assert ' · +2 източника</span>' in mail and d["also"][0]["link"] not in page and d["also"][0]["link"] not in mail
+assert f'href="{esc(d["link"])}"' in page                                                                                   # основното заглавие остава линк
 print("  ✓ страница и имейл")
 import inspect
 assert "{ALSO_RULE}" in inspect.getsource(na.significant_news) and "Същата тема НЕ е същото събитие" in na.ALSO_RULE and '"also": [{"i": 5' in inspect.getsource(na.significant_news)

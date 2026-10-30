@@ -63,7 +63,7 @@ with contextlib.redirect_stdout(io.StringIO()) as out:
 assert [n["headline"] for n in got] == [T[67], T[72], T[40], T[13]]
 compact = json.loads(prompts[0].split("НОВИНИ:\n", 1)[1].split("\n\n", 1)[0])
 assert len(compact) == config.NEWS_MAX_TO_FILTER and compact[67] == {"i": 67, "s": POOL[67]["source"], "t": T[67], "d": POOL[67]["summary"]}
-assert "Заглавието НЕ го пишеш" in prompts[0] and '{"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "headline_bg": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' in prompts[0]   # 19.10: + ехото "h" (С3); 29.10: + "also"
+assert "Заглавието НЕ го пишеш" in prompts[0] and '{"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' in prompts[0] and "headline_bg" not in prompts[0]   # 19.10: + ехото "h" (С3); 29.10: + "also"; 30.10: без превод
 assert na.LAST_DIAG["kept"] == 4 and len(na.LAST_DIAG["dropped"]) == 5 and "няма валиден индекс в пула" in out.getvalue()
 assert json.loads(na._CACHE.read_text(encoding="utf-8"))["news"] == got
 print("  ✓ всеки ред на пула е с 'i'; резултатът и кешът носят оригиналните заглавия; отпадналите са в LAST_DIAG и в лога")
@@ -79,10 +79,10 @@ print("── 4. страницата и имейлът (РЕАЛНИЯТ бри
 b = copy.deepcopy(B15); b["news"] = got
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 page, mail = flat(render.render_dashboard(b)), flat(render.render_email(copy.deepcopy(b)))
-assert f"{T[67]} · {POOL[67]['source']} (TSMC отчита рекордна печалба за шесто поредно тримесечие) — Рекордната печалба" in page
+assert f"{T[67]} · {POOL[67]['source']} — Рекордната печалба" in page and "TSMC отчита рекордна печалба за шесто поредно тримесечие" not in page   # 30.10.2026: преводът не се показва
 assert T[13] in page and "Nvidia, AMD, Micron падат" not in page
-assert f"{T[67]} (TSMC отчита рекордна печалба за шесто поредно тримесечие) — Рекордната печалба" in mail
+assert f"{T[67]} — Рекордната печалба" in mail and "TSMC отчита рекордна печалба за шесто поредно тримесечие" not in mail
 old = flat(render.render_dashboard(copy.deepcopy(B15)))                          # старият формат (без source / headline_bg) се рендерира както преди
 assert B15["news"][0]["headline"] in old
-print("  ✓ оригинал · източник (превод) — защо; старият формат се рендерира както преди")
+print("  ✓ оригинал · източник — защо (от 30.10 без превода в скоби); старият формат се рендерира както преди")
 print("\n✅ test_news_verbatim: всичко мина")

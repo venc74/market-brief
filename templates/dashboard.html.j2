@@ -630,8 +630,8 @@
 
 {# 29.10.2026 (разходката, т. 3–4): заглавието е линк към статията, когато фийдът дава линк (само http/https) #}
 {% macro news_head(n) %}{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a class="news-head" href="{{ n.link }}" target="_blank" rel="noopener noreferrer">{{ n.headline }}</a>{% else %}<span class="news-head">{{ n.headline }}</span>{% endif %}{% endmacro %}
-{# 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина; другите източници за същото събитие — „също: FT, Reuters“ (името е линк към тяхната статия) #}
-{% macro news_also(n) %}{% if n.also %} <span class="news-why" style="font-size:12px">· също: {% for a in n.also %}{% if a.link and (a.link.startswith('https://') or a.link.startswith('http://')) %}<a href="{{ a.link }}" target="_blank" rel="noopener noreferrer" title="{{ a.headline }}" style="color:var(--muted)">{{ a.source }}</a>{% else %}<span title="{{ a.headline }}">{{ a.source }}</span>{% endif %}{{ ", " if not loop.last else "" }}{% endfor %}</span>{% endif %}{% endmacro %}
+{# 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина; 30.10.2026 (поправки от брифа, т. 5): другите източници — само „+N източника“, без линкове #}
+{% macro news_also(n) %}{% if n.also %} <span class="news-why" style="font-size:12px" title="{% for a in n.also %}{{ a.source }}{{ ', ' if not loop.last else '' }}{% endfor %}">· +{{ n.also|length }} {{ 'източник' if n.also|length == 1 else 'източника' }}</span>{% endif %}{% endmacro %}
 {% if news %}
 <section>
   <h2>Значими новини · последните 24ч</h2>
@@ -641,7 +641,6 @@
       <span class="news-dot"></span>
       {# 15.10.2026: заглавието е ДОСЛОВНО от източника (news_aggregator.pick_verbatim); преводът е отделно, в скоби #}
       <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}{{ news_also(n) }}
-        {% if n.headline_bg %}<span class="news-why"> ({{ n.headline_bg }})</span>{% endif %}
         {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
     </div>
     {% endfor %}
