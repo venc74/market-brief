@@ -594,7 +594,7 @@
   <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> {{ thermometer.regime_margin.parts|join(" · ") }}</div>
   {% endif %}
   {% set info_inds = thermometer.indicators|rejectattr('hide')|selectattr('informational')|list %}
-  {% if info_inds or core_inflation is not none %}
+  {% if info_inds or core_inflation is not none or pce_core is not none %}
   <div class="thermo-info">
   <div class="thermo-info-head">Информативни — не влизат в режима</div>
   <div class="thermo">
@@ -613,6 +613,20 @@
       {% else %}
       <div class="t-val">—</div>
       <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }}{% if ci.last_date %} {{ ci.last_date[:4] }}{% endif %} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · {{ ci_lag }} · информативно, не влиза в режима</div>
+      {% endif %}
+    </div>
+    {% endif %}
+    {# 30.10.2026 (поправки от брифа, т. 6): базов PCE (без храни и енергия, FRED PCEPILFE) — до основната инфлация #}
+    {% if pce_core is not none %}
+    {% set pc = pce_core %}
+    <div class="t-card info" title="Базов PCE ценови индекс (без храни и енергия), FRED PCEPILFE: годишно изменение. Излиза заедно с основната инфлация — в края на следващия месец.">
+      <div class="t-name">Базов PCE</div>
+      {% if pc.value is not none %}
+      <div class="t-val">{{ "%.1f"|format(pc.value) }}%</div>
+      <div class="t-label"><b>данни за {{ pc.month }} {{ pc.year }}</b> · г/г{% if pc.direction %} · {{ {'up': '↑ ускорява', 'down': '↓ забавя', 'flat': '→ без промяна'}[pc.direction] }} спрямо {{ pc.prev_month }} ({{ "%.1f"|format(pc.prev_value) }}%){% endif %} · {{ ci_lag if ci_lag is defined else "излизат с ~6 седмици закъснение (в края на следващия месец)" }} · информативно, не влиза в режима</div>
+      {% else %}
+      <div class="t-val">—</div>
+      <div class="t-label">{% if pc.stale %}застояли данни — последно за {{ pc.last_month }} ({{ pc.age_days }} дни){% else %}няма данни{% endif %} · информативно, не влиза в режима</div>
       {% endif %}
     </div>
     {% endif %}

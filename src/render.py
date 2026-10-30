@@ -438,6 +438,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         distribution_days=brief.get("distribution_days"),
         distribution_days_status=brief.get("distribution_days_status"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),
+        pce_core=(brief.get("macro") or {}).get("pce_core"),                  # 30.10.2026 (поправки от брифа, т. 6): базов PCE — в „Информативни“
         backtest=brief.get("backtest", {}),
         available_dates=brief.get("date") and [brief.get("date")],
     )

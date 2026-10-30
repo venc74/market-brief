@@ -330,6 +330,44 @@ def core_inflation() -> dict:
         return empty
 
 
+def pce_core_signal(obs: list[tuple[str, float]], today: dt.date | None = None) -> dict:
+    """
+    30.10.2026 (поправки от брифа, т. 6): базов PCE (FRED PCEPILFE — индекс без храни и енергия) → годишно изменение за последния месец, за кой месец е, и посоката
+    спрямо предишния месец: "up" (ускорява) / "down" (забавя) / "flat" — по закръглените до 0.1 стойности, както ги публикува BEA. Чиста функция върху (дата, индекс).
+    Застояла серия (> CORE_PCE_STALENESS_DAYS от края на месеца) → {"value": None, "stale": True, ...}; под 14 месеца история → {"value": None}.
+    """
+    today = today or dt.date.today()
+    obs = sorted((d, float(v)) for d, v in obs or [] if v is not None)
+    by = dict(obs)
+    if len(obs) < 14:
+        return {"value": None}
+    last_d = dt.date.fromisoformat(obs[-1][0])
+    nxt = (last_d.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    age = (today - (nxt - dt.timedelta(days=1))).days
+    if age > config.CORE_PCE_STALENESS_DAYS:
+        return {"value": None, "stale": True, "last_date": last_d.isoformat(), "last_month": _MONTHS_BG[last_d.month - 1], "age_days": age}
+
+    def yoy(d: dt.date):
+        a, b = by.get(d.isoformat()), by.get(d.replace(year=d.year - 1).isoformat())
+        return round((a / b - 1) * 100, 2) if a and b else None
+    prev_d = (last_d.replace(day=1) - dt.timedelta(days=1)).replace(day=1)
+    cur, prev = yoy(last_d), yoy(prev_d)
+    if cur is None:
+        return {"value": None}
+    direction = None if prev is None else ("up" if round(cur, 1) > round(prev, 1) else "down" if round(cur, 1) < round(prev, 1) else "flat")
+    return {"value": cur, "date": last_d.isoformat(), "month": _MONTHS_BG[last_d.month - 1], "year": last_d.year, "age_days": age,
+            "prev_value": prev, "prev_month": _MONTHS_BG[prev_d.month - 1], "direction": direction, "series": config.PCE_CORE_SERIES}
+
+
+def pce_core() -> dict:
+    """30.10.2026: базовият PCE от FRED (PCEPILFE, ~16 месеца) → pce_core_signal. Graceful: провал → {"value": None}."""
+    try:
+        return pce_core_signal(_fred_series(config.PCE_CORE_SERIES, days=500))
+    except Exception as e:
+        print(f"[macro] базов PCE: {type(e).__name__}: {e}")
+        return {"value": None}
+
+
 def _is_stale(last_ts, threshold_days: int | None = None) -> bool:
     """
     Огледало на thermometer._is_stale (дублирано локално, за да няма
@@ -519,6 +557,7 @@ def collect_macro_layer() -> dict:
         "global_signals": global_market_signals(),
         # промптът реже macro JSON-а на 6000 знака — core_inflation е последна преди края
         "core_inflation": core_inflation() if config.ENABLE_CORE_INFLATION else None,
+        "pce_core": pce_core() if config.ENABLE_PCE_CORE else None,                # 30.10.2026 (поправки от брифа, т. 6): базов PCE — до основната инфлация
         "funding_stress": funding_stress() if config.ENABLE_FUNDING_STRESS else None,     # 16.10.2026: след core_inflation — в термометъра е целият (промптът реже macro на 6000 знака)
         # 2026-10-03 (пакет 2 т.4): NewsAPI е махнат (macro.headlines беше празен във всичките 78 брифа);
         # новините са curated (news_aggregator.significant_news) и влизат в макро промпта отделно, ПРЕДИ брифа.
