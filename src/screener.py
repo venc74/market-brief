@@ -39,30 +39,55 @@ LAST_FUNDAMENTALS: dict[str, dict] = {}
 LAST_UNIVERSE_SECTOR: dict[str, str] = {}
 
 
-def _wiki_tickers(url: str, column: str) -> list[str]:
+# 30.10.2026: какво върна всеки източник на универса в този run — {име: {name, n, min, ok, reason, url}}. build_universe се вика няколко пъти в run-а (скрийнър, breadth,
+# QM, GLB, опциите) — пази се най-лошото (най-малко тикъри): банерът (data_warnings) казва, ако в някое от тях източникът е липсвал.
+LAST_UNIVERSE_SOURCES: dict[str, dict] = {}
+
+
+def _wiki_table(url: str, column: str) -> tuple[list[str], str | None]:
+    """(тикърите от таблицата с колоната, причина при провал): страницата не се зареди / няма таблица с колоната. "." → "-" (BRK.B → BRK-B); GICS — в LAST_UNIVERSE_SECTOR."""
     try:
         html = requests.get(url, timeout=30, headers=UA).text
         tables = pd.read_html(io.StringIO(html))
-        for t in tables:
-            if column in t.columns:
-                syms = [str(s).replace(".", "-").strip() for s in t[column].tolist()]
-                if "GICS Sector" in t.columns:
-                    LAST_UNIVERSE_SECTOR.update({sym: str(sec).strip() for sym, sec in zip(syms, t["GICS Sector"].tolist()) if isinstance(sec, str)})
-                return syms
     except Exception as e:
-        print(f"[screener] universe fetch failed {url}: {e}")
-    return []
+        return [], f"страницата не се зареди ({type(e).__name__}: {e})"
+    for t in tables:
+        if column in t.columns:
+            syms = [str(s).replace(".", "-").strip() for s in t[column].tolist()]
+            if "GICS Sector" in t.columns:
+                LAST_UNIVERSE_SECTOR.update({sym: str(sec).strip() for sym, sec in zip(syms, t["GICS Sector"].tolist()) if isinstance(sec, str)})
+            return syms, None
+    return [], f"на страницата няма таблица с колона „{column}“"
+
+
+def _wiki_tickers(url: str, column: str) -> list[str]:
+    syms, why = _wiki_table(url, column)
+    if why:
+        print(f"[screener] universe fetch failed {url}: {why}")
+    return syms
 
 
 def build_universe() -> list[str]:
-    sp500 = _wiki_tickers(
-        "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "Symbol")
-    ndx = _wiki_tickers(
-        "https://en.wikipedia.org/wiki/Nasdaq-100", "Ticker")
-    mid400 = _wiki_tickers(
-        "https://en.wikipedia.org/wiki/List_of_S%26P_400_companies", "Symbol")
-    universe = sorted(set(sp500) | set(ndx) | set(mid400))
-    print(f"[screener] универс: {len(universe)} тикъра")
+    """
+    S&P 500 + Nasdaq-100 + S&P 400 от Wikipedia (config.UNIVERSE_SOURCES). 30.10.2026: на 09.07.2026 таблицата на Nasdaq-100 беше преместена в „List of NASDAQ-100
+    companies“ и до 30.10 универсът тихо беше без нея — _wiki_tickers връщаше [] без ред в лога (колоната я нямаше, изключение нямаше). Сега всеки източник — в
+    LAST_UNIVERSE_SOURCES; празен или под минимума → ред „⚠“ в лога и банер в брифа.
+    """
+    lists = []
+    for src in config.UNIVERSE_SOURCES:
+        syms, why = _wiki_table(src["url"], src["column"])
+        n = len(set(syms))
+        if why is None and n < src["min"]:
+            why = f"{n} тикъра (очаквани поне {src['min']})"
+        if why:
+            print(f"[screener] ⚠ универс: {src['name']} — {why}")
+        prev = LAST_UNIVERSE_SOURCES.get(src["name"])
+        if prev is None or n < prev["n"]:
+            LAST_UNIVERSE_SOURCES[src["name"]] = {"name": src["name"], "n": n, "min": src["min"], "ok": why is None, "reason": why, "url": src["url"]}
+        lists.append(syms)
+    universe = sorted(set().union(*lists))
+    per = ", ".join(f"{src['name']} {len(set(x))}" for src, x in zip(config.UNIVERSE_SOURCES, lists))
+    print(f"[screener] универс: {len(universe)} тикъра ({per})")
     return universe
 
 

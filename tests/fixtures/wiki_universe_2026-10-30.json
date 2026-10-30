@@ -1,0 +1,29 @@
+{
+ "_note": "РЕАЛНО: свалено от en.wikipedia.org на 30.10.2026 (~21:00 CET) с requests и User-Agent-а на скрийнъра (screener.UA). Статията „Nasdaq-100“ е без таблицата с компонентите от ревизия 1363378934 (09.07.2026 20:57 UTC, „move to [[List of NASDAQ-100 companies]]“) — затова е цялата страница; страницата „List of NASDAQ-100 companies“ — цялата; от S&P 500 и S&P 400 — само първата таблица (компонентите, дословно, с колоната GICS Sector), за размера. Файловете са gzip; sha256 е на разкомпресирания HTML.",
+ "files": {
+  "wiki_sp500_2026-10-30.html.gz": {
+   "url": "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+   "what": "първата таблица на страницата (списъкът с компонентите), дословно",
+   "sha256_of_html": "51b321d782f73df7015e21e82cc4ad94271dd96b40c313be00f44fb9858ec3ff",
+   "rows_in_symbol_table": 503
+  },
+  "wiki_sp400_2026-10-30.html.gz": {
+   "url": "https://en.wikipedia.org/wiki/List_of_S%26P_400_companies",
+   "what": "първата таблица на страницата (списъкът с компонентите), дословно",
+   "sha256_of_html": "3cf27d396d353ab4161af79b67607df670c1d852fec8e92a99f36e20e01ee023",
+   "rows_in_symbol_table": 400
+  },
+  "wiki_ndx100_list_2026-10-30.html.gz": {
+   "url": "https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies",
+   "what": "цялата страница, дословно",
+   "sha256_of_html": "96205dca773e7b8fbcc1b7d61bdc9366fbf6520f4baa2199e170dbb1b34b39bb",
+   "rows_in_symbol_table": 101
+  },
+  "wiki_ndx100_article_2026-10-30.html.gz": {
+   "url": "https://en.wikipedia.org/wiki/Nasdaq-100",
+   "what": "цялата страница, дословно",
+   "sha256_of_html": "76cd31f6ab5b09e08210b1697e360701de5bac3c92a1d446ece58f0b14104314",
+   "rows_in_symbol_table": 0
+  }
+ }
+}

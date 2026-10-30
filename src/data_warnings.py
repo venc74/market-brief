@@ -271,12 +271,25 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
     return out
 
 
+def _universe_warning(universe_sources: dict | None) -> list[dict]:
+    """
+    30.10.2026: източник на универса (screener.LAST_UNIVERSE_SOURCES) — не се зареди, няма таблицата или върна под минимума. От 10.07 до 30.10 Nasdaq-100 липсваше тихо
+    (таблицата беше преместена в друга статия на Wikipedia) — без ред в лога и без банер.
+    """
+    bad = [s for s in (universe_sources or {}).values() if not s.get("ok", True)]
+    if not bad:
+        return []
+    return [{"source": "universe", "level": "warn",
+             "message": ("Универс: " + "; ".join(f"{s['name']} — {s.get('reason') or 'не се зареди'}" for s in bad)
+                         + " — скрийнърът, QM, GLB и breadth днес са без тези тикъри (източникът е Wikipedia; адресът е в config.UNIVERSE_SOURCES).")}]
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
-            fred_key_missing: bool = False, breadth: dict | None = None) -> list[dict]:
+            fred_key_missing: bool = False, breadth: dict | None = None, universe_sources: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -309,6 +322,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"скринингът е върху {sc.get('with_history')} от {sc.get('universe')} тикъра; RS rating перцентилът "
                         f"и списъкът с кандидати са непълни."),
         })
+    out.extend(_universe_warning(universe_sources))                   # 30.10.2026: източник на универса без тикъри / под минимума
     out += _cot_warning(cot_diag)
     markers = _marker_warnings(insider_status, uov_diag)
     if any(h.get("check") == "oi_snapshot" for h in health or []) and (uov_diag or {}).get("snapshot_missing_reason"):

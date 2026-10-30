@@ -1045,7 +1045,7 @@ def run() -> dict:
                                        canary=canary, health=health,
                                        ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
                                        news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
-                                       fred_key_missing=not config.FRED_API_KEY,
+                                       fred_key_missing=not config.FRED_API_KEY, universe_sources=dict(screener.LAST_UNIVERSE_SOURCES),   # 30.10.2026: Nasdaq-100 липсваше тихо от 10.07
                                        breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
     data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
     print(steps.log_line())
@@ -1057,6 +1057,7 @@ def run() -> dict:
         "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода (до 30.10 — "sector_card": водещите по кода, веригите — от модела)
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warns,
+        "universe_sources": dict(screener.LAST_UNIVERSE_SOURCES),       # 30.10.2026: тикъри по източник на универса (S&P 500 / Nasdaq-100 / S&P 400) — до 30.10 липсата на Nasdaq-100 не се виждаше
         "run_steps": steps.summary(),                                    # 20.10.2026 (етап 3б): ok / частично / провал / пропусната за всяка стъпка в обвивката
         "health": health,                                                # здравният монитор (10.10)
         "screener_status": dict(screener.LAST_STATUS),                  # 19.10.2026 (т. 12): с история / универс / партиди — нормата за прага на банера
