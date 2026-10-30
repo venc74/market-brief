@@ -1006,6 +1006,43 @@ def _funding_stress_indicator(fs: dict | None) -> dict | None:
                                   f"{hf[5:7]}.{hf[:4]} · термометър, не предсказание: в проучването ни {config.FUNDING_STRESS_RESEARCH_TEXT} · само информативен, не влиза в режима")}
 
 
+def equal_weight_signal(rsp, spy) -> dict:
+    """
+    30.10.2026 (поправки от брифа, т. 7): RSP (S&P 500 с равни тегла) спрямо SPY за config.EQUAL_WEIGHT_SESSIONS (5 и 10) сесии — разликата в ръста, в пунктове. Информативен
+    уред (не влиза в режима). И двете + → "средната акция бие гигантите" (зелено); и двете − → "гигантите дърпат индекса" (червено); смесено → жълто, с двете думи.
+    rsp, spy — дневни затваряния (pandas Series, без днешния частичен бар). Чиста функция.
+    """
+    name = "RSP спрямо SPY (широчина)"
+    df = rsp.dropna().to_frame("rsp").join(spy.dropna().to_frame("spy"), how="inner")
+    short, long_ = config.EQUAL_WEIGHT_SESSIONS
+    if len(df) <= long_:
+        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": "", "hide_reason": f"под {long_ + 1} общи сесии"}
+    d = {}
+    for n in (short, long_):
+        r = (df["rsp"].iloc[-1] / df["rsp"].iloc[-1 - n] - 1) * 100
+        sp = (df["spy"].iloc[-1] / df["spy"].iloc[-1 - n] - 1) * 100
+        d[n] = (round(float(r), 2), round(float(sp), 2), round(float(r - sp), 1))
+    beat = lambda x: "средната акция бие гигантите" if x > 0 else "гигантите дърпат индекса"
+    a, b = d[short][2], d[long_][2]
+    status = "green" if a > 0 and b > 0 else "red" if a < 0 and b < 0 else "yellow"
+    word = beat(a) if (a > 0) == (b > 0) else f"за {short} сесии {beat(a)}, за {long_} — {beat(b)}"
+    return {"name": name, "value": a, "status": status, "informational": True, "as_of": df.index[-1].date().isoformat(),
+            "diff_5": a, "diff_10": b, "rsp_5": d[short][0], "spy_5": d[short][1], "rsp_10": d[long_][0], "spy_10": d[long_][1],
+            "label": (f"{short} сесии: RSP {d[short][0]:+.1f}% срещу SPY {d[short][1]:+.1f}% ({a:+.1f} п.) · {long_} сесии: {b:+.1f} п. — {word} · "
+                      f"само информативен, не влиза в режима")}
+
+
+def equal_weight_vs_cap() -> dict:
+    """30.10.2026: RSP и SPY от Yahoo (3 месеца, без днешния бар) → equal_weight_signal. Graceful: провал → скрит, с причина."""
+    try:
+        get = lambda t: _sessions.cut_today(yf.Ticker(t).history(period="3mo", auto_adjust=False))["Close"]
+        return equal_weight_signal(get("RSP"), get("SPY"))
+    except Exception as e:
+        print(f"[thermo] RSP спрямо SPY: {type(e).__name__}: {e}")
+        return {"name": "RSP спрямо SPY (широчина)", "value": None, "status": "yellow", "hide": True, "informational": True, "label": "",
+                "hide_reason": f"грешка ({type(e).__name__})"}
+
+
 _COLOR_BG = {"green": "зелена", "yellow": "жълта", "red": "червена"}
 
 
@@ -1099,6 +1136,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     fs_ind = _funding_stress_indicator(macro.get("funding_stress"))     # 16.10.2026: само информативен, до Fed Net Liquidity
     if fs_ind:
         indicators.insert(indicators.index(nl_ind) + 1, fs_ind)
+    if config.ENABLE_EQUAL_WEIGHT:                                      # 30.10.2026 (поправки от брифа, т. 7): информативен — след SOFR − IORB
+        indicators.insert(indicators.index(fs_ind or nl_ind) + 1, equal_weight_vs_cap())
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
         _breadth_divergence(indicators)
