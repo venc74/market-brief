@@ -281,6 +281,38 @@ def facts(tickers: list[str], download=None, info_fn=None, earnings_fn=None) -> 
     return out
 
 
+def insider_flags(txns: list[dict]) -> list[dict]:
+    """
+    30.10.2026 (поправки от брифа, т. 2): флаг за всяка посока поотделно — покупки ("P") и продажби ("S") — {dir, label, n, owners, value, cluster, plan, top_offplan?}.
+    cluster — ≥ INSIDER_CLUSTER_MIN_COUNT различни инсайдъри в прозореца в ТАЗИ посока (_insider_cluster); plan — "по план (10b5-1)" / "извънпланови" / "частично по план" /
+    "планът неизвестен" (aff10b5One: True / False / null); top_offplan — най-голямата извънпланова сума на един инсайдър за един ден (owner, title, date, value).
+    До 30.10 CLUSTER беше общ: ACN на 30.10 го носеше заради продажбите, а под него беше извънплановата покупка на CEO за ~$3 млн. Чиста функция.
+    """
+    out = []
+    for code, label in (("P", "покупки"), ("S", "продажби")):
+        xs = [t for t in txns or [] if t.get("code") == code]
+        if not xs:
+            continue
+        pl = [t.get("planned_10b5_1") for t in xs]
+        plan = ("по план (10b5-1)" if all(x is True for x in pl) else "извънпланови" if all(x is False for x in pl)
+                else "частично по план" if any(x is True for x in pl) and any(x is False for x in pl) else
+                "планът неизвестен" if all(x is None for x in pl) else "частично по план")
+        groups: dict = {}
+        for t in xs:
+            if t.get("planned_10b5_1") is False:
+                k = (t.get("owner_name"), str(t.get("date"))[:10])
+                g = groups.setdefault(k, {"owner": t.get("owner_name"), "title": t.get("owner_title") or ("директор" if t.get("is_director") else ""),
+                                          "date": str(t.get("date"))[:10], "value": 0.0})
+                g["value"] += float(t.get("value") or 0)
+        f = {"dir": code, "label": label, "n": len(xs), "owners": len({t.get("owner_name") for t in xs}), "value": round(sum(float(t.get("value") or 0) for t in xs)),
+             "cluster": _insider_cluster(xs), "plan": plan}
+        if groups:
+            top = max(groups.values(), key=lambda g: g["value"])
+            f["top_offplan"] = {**top, "value": round(top["value"])}
+        out.append(f)
+    return out
+
+
 def _insider_cluster(txns: list[dict]) -> bool:
     """≥ INSIDER_CLUSTER_MIN_COUNT РАЗЛИЧНИ инсайдъри в клъстер прозореца."""
     if not txns:
@@ -328,6 +360,7 @@ def collect(tickers: list[str] | None = None, facts_fn=None) -> list[dict]:
             "news": news,
             "insider": [{**t, "date": t["date"].isoformat()} for t in txns],
             "insider_cluster": _insider_cluster(txns),
+            "insider_flags": insider_flags(txns),                   # 30.10.2026: по посока — покупки / продажби, с плана
             "quiet": not news and not txns,
         })
     quiet = [r["ticker"] for r in rows if r["quiet"]]

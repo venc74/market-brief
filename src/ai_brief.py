@@ -1682,6 +1682,7 @@ def _watch_digest_batch(rows: list[dict], market_context: dict) -> list[dict]:
                      "pct_of_holdings": t["pct_of_holdings"],
                      "planned_10b5_1": t["planned_10b5_1"]} for t in r["insider"]],
         "insider_cluster": r["insider_cluster"],
+        "insider_flags": [{k: f.get(k) for k in ("label", "n", "owners", "cluster", "plan")} for f in r.get("insider_flags") or []],   # 30.10.2026: по посока, с плана
     } for r in rows]
 
     user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 24 часа):
