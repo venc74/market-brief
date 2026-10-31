@@ -168,12 +168,12 @@ for w in watch:
 assert "buy-stop $107.99" in below["ai"]["watchlist_trigger"]
 print("  ✓ Action: LNTH, EXEL (потвърдени). Watchlist по ред: BELOW (buy-stop $107.99) → TWLO (без обем) → AMD (extended)")
 
-# AI-то казва Watchlist за потвърден кандидат → остава Watchlist (кодът само ограничава)
+# 30.10.2026 (т. 9–10): AI-то казва Watchlist за потвърден кандидат → без значение, класът е на кода (до 30.10 оставаше Watchlist)
 c2 = cand(lnth, "Healthcare"); c2["ai"]["classification"] = "Watchlist"; c2["ai"]["watchlist_trigger"] = "AI: чака"
 c2["setup"] = setup_rules.classify_setup(c2, dt.date(2026, 6, 29))
 a2, w2 = brief_main.apply_hard_rules([c2], 1.0)
-assert not a2 and w2[0]["ai"]["watchlist_trigger"] == "AI: чака"
-print("  ✓ потвърден кандидат, който AI е сложило във Watchlist, остава Watchlist (кодът само ограничава)")
+assert [a["ticker"] for a in a2] == ["LNTH"] and not w2
+print("  ✓ потвърден кандидат, който AI е нарекло Watchlist, е Action — класът е само на кода (до 30.10 оставаше Watchlist)")
 
 # Watchlist лимит 10: подредбата решава кои 10 влизат (СИНТЕТИЧНО: 12 кандидата)
 many = []

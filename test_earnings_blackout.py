@@ -22,18 +22,17 @@ BLACKOUT = {"next_earnings": "2026-10-09", "days_to_earnings": 4, "in_blackout":
 print("── 1. промптът няма изключение ──")
 p = ai_brief._build_ticker_user_prompt([{"ticker": "AAA"}], [], "Offensive")
 assert 'поле "warning"' not in p and "Action с \\\nизрично предупреждение" not in p and "Action с изрично предупреждение" not in p
-assert "Кодът го налага безусловно" in p and "няма изключение" in p
-print("  ✓ промптът вече не позволява Action с поле \"warning\"; казва, че кодът налага Watchlist безусловно")
+assert "се решава САМО от кода" in p and '"classification"' in p.split("Класът на кандидата")[1] and "Earnings в рамките на 5" not in p      # 30.10.2026 (т. 9–10): моделът не класифицира
+print("  ✓ промптът не позволява Action с поле \"warning\"; от 30.10 казва, че класът е само на кода (моделът не връща classification)")
 
 print()
-print("── 2. merge_narratives: Action + warning от модела → Watchlist ──")
+print("── 2. merge_narratives: класът от модела се изхвърля; прозорецът — в apply_hard_rules (30.10.2026, т. 9–10) ──")
 c = copy.deepcopy(EXPD); c.pop("ai", None); c["earnings"] = dict(BLACKOUT)
-out = ai_brief.merge_narratives([c], [{"ticker": "EXPD", "classification": "Action", "warning": "изключителен setup (СИНТЕТИЧЕН отговор)", "why_now": "x"}])
-assert out[0]["ai"]["classification"] == "Watchlist" and out[0]["ai"]["watchlist_reason_type"] == "earnings_blackout"
-c = copy.deepcopy(EXPD); c.pop("ai", None); c["earnings"] = dict(BLACKOUT)
-out = ai_brief.merge_narratives([c], [{"ticker": "EXPD", "classification": "Action", "why_now": "x"}])
-assert out[0]["ai"]["classification"] == "Watchlist"
-print("  ✓ реалната карта EXPD (05.10) + СИНТЕТИЧЕН отчет след 4 дни: Action с warning → Watchlist / earnings_blackout; без warning — също")
+out = ai_brief.merge_narratives([c], [{"ticker": "EXPD", "classification": "Action", "watchlist_reason_type": "other", "warning": "изключителен setup (СИНТЕТИЧЕН отговор)", "why_now": "x"}])
+assert "classification" not in out[0]["ai"] and "watchlist_reason_type" not in out[0]["ai"]
+_, watch = brief_main.apply_hard_rules(out, 1.0, "Offensive")
+assert watch[0]["ai"]["watchlist_reason_type"] == "earnings_blackout"
+print("  ✓ реалната карта EXPD (05.10) + СИНТЕТИЧЕН отчет след 4 дни: „Action“ и причината от модела са изхвърлени; кодът → Watchlist / earnings_blackout")
 
 print()
 print("── 3. apply_hard_rules: последната дума е на кода, дори ако merge е заобиколен ──")

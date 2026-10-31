@@ -34,8 +34,8 @@ finally:
     ai_brief._call_claude = real_call
 assert nar == [] and ai_brief.NARRATIVES_LOST == [c["ticker"] for c in CARDS]
 e = next(c for c in merged if c["ticker"] == "EXPD")
-assert e["ai"] == {"classification": "Action", "why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}
-assert all(c["ai"]["classification"] == "Watchlist" and c["ai"]["ai_missing"] for c in merged if c["ticker"] != "EXPD")
+assert e["ai"] == {"why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}                                   # 30.10.2026 (т. 9–10): без класификация — класът е на кода
+assert all(c["ai"]["ai_missing"] and "classification" not in c["ai"] for c in merged if c["ticker"] != "EXPD")
 with quiet():
     action, watch = brief_main.apply_hard_rules(copy.deepcopy(merged), 1.0, "Offensive")
 assert [c["ticker"] for c in action] == ["EXPD"] and action[0]["ai"]["why_now"] == ai_brief.NO_AI_TEXT

@@ -1177,9 +1177,8 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime
     """
     Изгражда user prompt-а за един batch кандидати. Логиката е идентична на
     оригинала — само `slim` тук е подмножество (batch), не целият списък.
-    Глобалните Action лимити (MAX_ACTION_TICKERS / MAX_PER_SECTOR) остават в
-    prompt-а непроменени; реалното им налагане е в main.apply_hard_rules СЛЕД
-    merge, така че batch-ването не нарушава глобалния cap (кодът има последната дума).
+    30.10.2026 (т. 9–10): без Action лимитите и без класификация в промпта — класът и лимитите (MAX_ACTION_TICKERS / MAX_PER_SECTOR) са само в
+    main.apply_hard_rules; моделът пише текста на картата.
 
     08.10.2026 (2б): няма блок с вчерашни watchlist_trigger-и и моделът не връща watchlist_trigger — текстът на Watchlist картата е на кода.
     """
@@ -1207,31 +1206,13 @@ def _build_ticker_user_prompt(slim: list[dict], sector_logic: list[dict], regime
 - "catalysts": списък от 2-4 катализатора в следващите 4-8 седмици.
 - "risks": списък от 2-4 конкретни риска — какво обръща trade-а.
 - "earnings_call": "преди earnings" / "след earnings" / "не сега" + защо (1 изр.).
-- "classification": "Action" или "Watchlist". pivot = най-високият High на базата БЕЗ \
-последните {config.PIVOT_EXCLUDE_LAST_BARS} бара. Полето "setup" е изчислено от кода: Action е \
-допустим САМО при "confirmed" (close над pivot, до +{config.BUYABLE_ZONE_MAX_PCT:g}% над него, обем ≥ \
-{config.BREAKOUT_VOLUME_MULT:g}× среден, структурен стоп ≤ {config.STOP_REJECT_STRUCT_RISK_PCT:g}% под входа) — \
-кодът връща във Watchlist всичко останало ("below_pivot" = чака buy-stop пробив, "no_volume" = над \
-pivot без обем, "extended" = над buyable zone, "too_wide" = твърде разтегнато, стопът е прекалено \
-далеч), независимо от твоята класификация; ти избираш най-силните сред "confirmed". Watchlist ако: \
-setup не е "confirmed", в earnings blackout, RS слабее, или секторът противоречи на режима.
-- "watchlist_reason_type": ако Watchlist — категория на причината: "regime_gate" \
-(чака конкретна промяна в пазарния режим ЗАЕДНО с цена/обем условие), \
-"earnings_blackout" (в earnings прозорец), "other" (RS/обем/друга техническа причина, \
-без regime зависимост). НЕ пиши "existing_position" — това полето се override-ва от \
-кода за вече отворени позиции, не е твоя преценка. НЕ пиши "watchlist_trigger" и \
-не описвай какво трябва да се случи (цена/обем/дата) — тази част на картата се \
-сглобява от кода по сетъпа, режима и отчетите; ти обясни само в "why_now" защо \
-кандидатът е интересен или слаб.
 
-Правила: максимум {config.MAX_ACTION_TICKERS} Action общо — избери най-силните. \
-Максимум {config.MAX_PER_SECTOR} Action от един сектор. Earnings в рамките на 5 \
-работни дни (0 ≤ days_to_earnings ≤ 7) = Watchlist. Кодът го налага безусловно, \
-независимо от класификацията ти — няма изключение и няма поле, което да го отмени. \
-days_to_earnings=0 означава earnings Е ДНЕС — пиши го изрично така, НЕ като \
-"неизвестна дата". Само ако days_to_earnings ЛИПСВА (null) или е ОТРИЦАТЕЛЕН, \
-датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ твърди, \
-че няма blackout риск.
+Класът на кандидата (купува се днес / чака пробив / на радара) се решава САМО от кода — по полето "setup", \
+отчета и режима; ти не класифицираш и не избираш кой е най-силен. НЕ пиши "classification", "watchlist_reason_type" и "watchlist_trigger" \
+(кодът ги игнорира) и не описвай какво трябва да се случи (цена/обем/дата) — тази част на картата се сглобява от \
+кода; ти обясни в "why_now" защо кандидатът е интересен или слаб. За отчета: days_to_earnings=0 означава earnings \
+Е ДНЕС — пиши го изрично така, НЕ като "неизвестна дата". Само ако days_to_earnings ЛИПСВА (null) или е ОТРИЦАТЕЛЕН, \
+датата е неизвестна/невалидна — напиши "earnings дата неизвестна" и НЕ твърди, че няма blackout риск.
 
 Връщай само JSON: {{"tickers": [...]}}"""
 
@@ -1273,7 +1254,7 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
     За всеки кандидат Claude връща:
     why_now (верижна логика макро→сектор→акция), business_bg (2-3 изречения),
     catalysts (4-8 седмици), risks, earnings_call (преди/след/не сега),
-    classification (Action/Watchlist) + watchlist_reason_type ако е Watchlist (текстът на картата е на кода — main._watchlist_trigger_text).
+    30.10.2026 (т. 9–10): БЕЗ classification / watchlist_reason_type — класът е на кода (main.apply_hard_rules); моделът пише само текста на картата.
 
     Извикванията са на batch-ове по config.AI_BATCH_SIZE тикъра — отделно API
     извикване + отделно JSON парсване на batch, после обединяване. Така token
@@ -1346,9 +1327,10 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
     lost = set(NARRATIVES_LOST)
     for c in candidates:
         c["ai"] = dict(by_ticker.get(c["ticker"], {}))
-        if not c["ai"] and c.get("ticker") in lost:          # 16.10.2026 (В7): без наратив → класификацията е на кода (потвърден пробив → Action), картата го казва
-            setup = c.get("setup") or {}
-            c["ai"] = {"classification": "Action" if setup.get("eligible") else "Watchlist", "why_now": NO_AI_TEXT, "ai_missing": True}
+        for k in ("classification", "watchlist_reason_type"):     # 30.10.2026 (т. 9–10): класът и причината са на кода — ако моделът ги върне, се изхвърлят
+            c["ai"].pop(k, None)
+        if not c["ai"] and c.get("ticker") in lost:          # 16.10.2026 (В7): без наратив — картата го казва (класът винаги е на кода)
+            c["ai"] = {"why_now": NO_AI_TEXT, "ai_missing": True}
         for k in ("why_now", "business_bg", "earnings_call"):        # 16.10.2026 (т. 6): поле в лош формат (не низ) → махнато с ред в лога, не срив по-надолу
             if k in c["ai"] and c["ai"][k] is not None and not isinstance(c["ai"][k], str):
                 print(f"[ai] ⚠ {c.get('ticker')}: полето {k} не е текст ({type(c['ai'][k]).__name__}) — махнато")
@@ -1358,14 +1340,7 @@ def merge_narratives(candidates: list[dict], narratives: list[dict]) -> list[dic
                 print(f"[ai] ⚠ {c.get('ticker')}: полето {k} не е списък — махнато")
                 c["ai"].pop(k)
         c["ai"].pop("watchlist_trigger", None)           # 08.10 (2б): текстът е на кода — ако моделът въпреки всичко върне такова поле, то се изхвърля
-        # Твърдите правила бият AI преценката (Секция 8). В1 (втори преглед, 10.10): БЕЗУСЛОВНО — до 10.10 условието беше
-        # "in_blackout and not warning" и промптът разрешаваше Action с поле "warning" → моделът можеше да държи Action 0–7 дни
-        # преди отчет (латентно: 0 от 40 карти в прозореца в историята). Същото правило и в main.apply_hard_rules (кодът има последната дума).
-        if c.get("earnings", {}).get("in_blackout"):
-            c["ai"]["classification"] = "Watchlist"
-            c["ai"]["watchlist_reason_type"] = "earnings_blackout"
-            # С7 (втори преглед, 10.10): БЕЗ setdefault("След earnings на …") — той блокираше main._watchlist_trigger_text и картата губеше
-            # buy-stop нивото и текста за режима; текстът от кода вече започва с "Отчет на … — нов Action най-рано след отчета."
+        # прозорецът преди отчет (В1, 10.10) и класът — в main.apply_hard_rules (кодът); до 30.10 тук имаше и AI класификация "Watchlist" при отчет в прозореца
         _check_price_mentions(c.get("ticker", "?"), c["ai"].get("why_now") or "", c.get("price"))
     verify_narrative_numbers(candidates)
     return candidates

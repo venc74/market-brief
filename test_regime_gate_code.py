@@ -60,7 +60,7 @@ print("  ✓ ZBRA/EXPD → technical_gate (AI етикетът остава са
       " реалните броячи (ZBRA до 09.10, EXPD до 19.10) са изчистени")
 
 print()
-print("── 3. потвърден сетъп, спрян от режима → regime_gate от кода → изтича след 10 сесии; «Излязоха от вчера» казва защо ──")
+print("── 3. потвърден сетъп, спрян от режима → regime_block от кода (30.10.2026: класът е на кода); изтичането на regime_gate — СИНТЕТИЧЕН етикет ──")
 watchlist_expiry._STATE_PATH.write_text("{}")
 conf = card(EXPD, "other")                                                         # СИНТЕТИЧНО: потвърден пробив, AI казва "other"
 conf["setup"] = {**conf["setup"], "kind": "confirmed", "eligible": True}
@@ -68,7 +68,9 @@ conf.update({"pct_from_pivot": 4.0, "breakout_volume": True, "volume_ratio": 1.8
 assert brief_main._regime_gate(conf, "Defensive")
 with contextlib.redirect_stdout(io.StringIO()):
     _, watch = brief_main.apply_hard_rules([conf], 0.5, "Defensive")
-assert watch[0]["ai"]["watchlist_reason_type"] == "regime_gate"
+assert watch[0]["ai"]["watchlist_reason_type"] == "regime_block" and watch[0]["ai"]["watchlist_trigger"].startswith("Режим Defensive")
+# до 30.10 тук излизаше regime_gate, защото AI казваше "Watchlist"; сега класът е на кода → regime_block (не изтича). Механизмът на изтичането — върху СИНТЕТИЧЕН етикет:
+watch = copy.deepcopy(watch); watch[0]["ai"]["watchlist_reason_type"] = "regime_gate"
 d0 = watchlist_expiry.apply_regime_gate_expiry(watch, "Defensive", "2026-10-12")
 exp = watchlist_expiry._expiry_for("2026-10-12")
 assert exp == "2026-10-26" and [c["ticker"] for c in d0] == ["EXPD"]             # 12.10 + 10 сесии (13…23.10) → 26.10 (сесия № 11)
@@ -80,7 +82,7 @@ assert d_n == [] and set(watchlist_expiry.LAST_EXPIRED) == {"EXPD"}
 rows = watchlist_exits.compute([{"ticker": "EXPD", "setup": conf["setup"]}], [], d_n, [conf], expired=watchlist_expiry.LAST_EXPIRED)
 assert rows[0]["kind"] == "expired" and rows[0]["reason"].startswith("изтекъл прозорец за промяна в режима (10 сесии от 2026-10-12")
 assert "извън 10-те карти" not in rows[0]["reason"]
-print(f"  ✓ потвърден сетъп (+4% над pivot) в Defensive → regime_gate от кода; срок {exp} (10 NYSE сесии), на 23.10 още е тук, на {exp} изтича;"
+print(f"  ✓ потвърден сетъп (+4% над pivot) в Defensive → regime_block от кода; СИНТЕТИЧЕН regime_gate: срок {exp} (10 NYSE сесии), на 23.10 още е тук, на {exp} изтича;"
       f" «Излязоха»: «{rows[0]['reason']}» (до 10.10: «в скрийнъра, но извън 10-те карти»)")
 with contextlib.redirect_stdout(io.StringIO()):
     _, w_off = brief_main.apply_hard_rules([copy.deepcopy(conf) | {"ai": {"classification": "Watchlist", "why_now": "x"}}], 1.0, "Offensive")

@@ -184,7 +184,7 @@ def _regime_gate(c: dict, regime: str | None) -> str | None:
 def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
     """
     Текстът "Trigger" на Watchlist картата, сглобен от КОДА (08.10.2026, 2б) — моделът не пише watchlist_trigger. Части, в ред: отчет (earnings.in_blackout / дни до отчета),
-    сетъпът (setup.trigger_text — buy-stop, обем, extended, твърде разтегнато; за потвърден пробив, който AI не е избрал за Action, също), режимният gate (_regime_gate).
+    сетъпът (setup.trigger_text — buy-stop, обем, extended, твърде разтегнато), режимният gate (_regime_gate).
     Без нито една част → кратко пояснение, че потвърденият сетъп не е избран. Чиста функция.
     """
     parts: list[str] = []
@@ -214,7 +214,8 @@ def _code_reason_type(c: dict, regime: str | None) -> str:
     """
     В2 (10.10.2026): причината на Watchlist картата от кода, за картите без код-наложена причина в apply_hard_rules. Отчет в прозореца →
     earnings_blackout; потвърден сетъп, спрян от режима (_regime_gate) → regime_gate (само той участва в 10-сесийното изтичане); непотвърден
-    сетъп → technical_gate; иначе → other (потвърден пробив, който AI не е избрал). Чиста функция.
+    сетъп → technical_gate; иначе → other. Чиста функция. 30.10.2026 (т. 9–10): класът е на кода — потвърден пробив стига дотук само принудено (позиция, отчет,
+    режим → regime_block, лимит); клонът regime_gate (до 30.10 — потвърден пробив, който AI е нарекъл Watchlist при режимен gate) вече не се достига.
     """
     e = c.get("earnings") or {}
     if e.get("in_blackout"):
@@ -234,9 +235,10 @@ def _code_reason_type(c: dict, regime: str | None) -> str:
 def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                      regime: str | None = None) -> tuple[list, list]:
     """
-    Твърдите правила от Секция 8, наложени СЛЕД AI класификацията —
-    кодът има последната дума, не моделът. `regime` (термометърът) включва и
-    режимния gate (т.6); без него режимът не ограничава Action.
+    Твърдите правила от Секция 8. 30.10.2026 (разходката, т. 9–10): класът е САМО на кода — потвърден пробив (setup.eligible) е кандидат за Action
+    („Купува се днес“), всичко друго е Watchlist; AI не класифицира (до 30.10 отправната точка беше ai.classification: потвърден пробив, който моделът
+    е нарекъл Watchlist, оставаше Watchlist — реално 1 път в 20 брифа с кодов сетъп, ROKU 23.10, цел на придобиване; от 26.10 кодът я прави "deal").
+    `regime` (термометърът) включва и режимния gate (т.6); без него режимът не ограничава Action.
     """
     action, watchlist = [], []
     sector_count: dict[str, int] = {}
@@ -261,7 +263,6 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                           f"@ ${rec.get('entry_price')} — не е нов вход."),
             })
             c.setdefault("ai", {})
-            c["ai"]["classification"] = "Watchlist"
             # FIX 2026-09-12 (findings log 04-11.09, т.2): explicit override, не
             # оставяй каквото AI-то е предложило (ако въобще) — watchlist_expiry.py
             # разчита на този таг да НЕ третира вече отворени позиции като
@@ -285,7 +286,6 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                           f"до {pr.get('valid_through')} — не е нов вход."),
             })
             c.setdefault("ai", {})
-            c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "existing_position"
             forced = True
             c["ai"]["watchlist_trigger"] = (
@@ -318,7 +318,6 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                         "title": f"{detail} Нов вход в същия ден не се планира.",
                     })
                     c.setdefault("ai", {})
-                    c["ai"]["classification"] = "Watchlist"
                     c["ai"]["watchlist_reason_type"] = "other"
                     forced = True
                     c["ai"]["watchlist_trigger"] = (
@@ -336,7 +335,11 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                         "outcome": outcome,
                         "realized_r": r,
                     }
-        cls = c.get("ai", {}).get("classification", "Watchlist")
+        # 30.10.2026 (т. 9–10): сетъпът — преди класа (класът идва от него); принудените по-горе (позиция, чакащ план, затворена днес) са Watchlist
+        setup = c.get("setup") or setup_rules.classify_setup(c, today)
+        c["setup"] = setup
+        c.setdefault("ai", {})
+        cls = "Watchlist" if forced else ("Action" if setup.get("eligible") else "Watchlist")
         sector = c.get("sector", "Unknown")
 
         # В1 (втори преглед, 10.10.2026): прозорецът преди отчет (EARNINGS_BLACKOUT_DAYS) е БЕЗУСЛОВЕН — без изключение за AI поле
@@ -344,8 +347,6 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
         # (_watchlist_trigger_text: отчет + сетъп + режим), за да не се губи buy-stop нивото.
         if cls == "Action" and (c.get("earnings") or {}).get("in_blackout"):
             cls = "Watchlist"
-            c.setdefault("ai", {})
-            c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_blackout"
             forced = True
         # 16.10.2026 (В1, трети преглед): отчет в ПОСЛЕДНАТА сесия (нивата са отпреди реакцията — ANET 05.08: Action по затварянето отпреди отчета от 04.08 след затварянето)
@@ -353,26 +354,11 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
         _e = c.get("earnings") or {}
         if cls == "Action" and (_e.get("recent_report") or _e.get("earnings_status") == "failed"):
             cls = "Watchlist"
-            c.setdefault("ai", {})
-            c["ai"]["classification"] = "Watchlist"
             c["ai"]["watchlist_reason_type"] = "earnings_recent" if _e.get("recent_report") else "earnings_unknown"
             forced = True
 
-        # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — кодът има
-        # последната дума. Action е допустим САМО при потвърден пробив: close над
-        # pivot (най-високия High на базата без последните N бара), до +5% над него,
-        # с обем >= BREAKOUT_VOLUME_MULT × среден. Всичко останало (под pivot →
-        # buy-stop ниво, над pivot без обем, extended) отива във Watchlist, колкото и
-        # силно да го е оценило AI-то. Проверява се ПРЕДИ лимитите по-долу, за да не
-        # заема Action слот кандидат, който така или иначе е върнат.
-        setup = c.get("setup") or setup_rules.classify_setup(c, today)
-        c["setup"] = setup
-        if cls == "Action" and not setup["eligible"]:
-            cls = "Watchlist"
-            c.setdefault("ai", {})
-            c["ai"]["watchlist_reason_type"] = "technical_gate"
-            forced = True
-            c["ai"]["watchlist_trigger"] = setup["trigger_text"]
+        # FIX 2026-10-02 (пакет 1, т.1): технически Action gate — Action е допустим САМО при потвърден пробив (close над pivot, до +5%, обем ≥ 1.5×);
+        # под pivot → buy-stop, над pivot без обем, extended, твърде разтегнато → Watchlist. От 30.10.2026 (т. 9–10) това е самият клас (по-горе), не поправка върху AI класа.
 
         # FIX 2026-10-03 (пакет 1, т.6): режимен gate СЛЕД техническия и ПРЕДИ лимитите —
         # блокиран кандидат не заема Action слот. reason_type "regime_block" е код-наложена
@@ -381,7 +367,6 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
             gate_text = _regime_gate(c, regime)
             if gate_text:
                 cls = "Watchlist"
-                c.setdefault("ai", {})
                 c["ai"]["watchlist_reason_type"] = "regime_block"
                 forced = True
                 c["ai"]["watchlist_trigger"] = gate_text
@@ -642,14 +627,14 @@ def run() -> dict:
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)
                                        and not (c.get("setup") or {}).get("triggered")]
         return []
-    _ai_consequence = "класификацията е от кода, картите са без AI текст"
+    _ai_consequence = "картите са без AI текст (класът винаги е от кода)"
     narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, sector_layer.board_context(sector_board), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
                             on_fail=_narratives_failed, trace=True, source="ai", label="AI наративите на картите", consequence=_ai_consequence,
                             partial=lambda v: (f"без AI текст: {', '.join(ai_brief.NARRATIVES_LOST[:8])}", {}) if ai_brief.NARRATIVES_LOST else None)
 
     def _merge_failed(e):
         for c in candidates:
-            c["ai"] = {"classification": "Action" if (c.get("setup") or {}).get("eligible") else "Watchlist", "why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}
+            c["ai"] = {"why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}                 # 30.10.2026 (т. 9–10): класът е на кода (apply_hard_rules)
         ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates]
         return candidates
     candidates = steps.step("narratives_merge", lambda: ai_brief.merge_narratives(candidates, narratives), on_fail=_merge_failed, trace=True, source="ai",

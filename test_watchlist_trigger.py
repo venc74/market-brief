@@ -26,7 +26,7 @@ print("── 1. промптът: няма блок с вчерашни три�
 slim = [{"ticker": "AAA"}]
 prompt = ai_brief._build_ticker_user_prompt(slim, [], "Defensive")
 assert "ВЧЕРАШНИ WATCHLIST TRIGGER" not in prompt and '- "watchlist_trigger"' not in prompt and "prior" not in prompt.lower()
-assert 'НЕ пиши "watchlist_trigger"' in prompt and '"watchlist_reason_type"' in prompt
+assert 'НЕ пиши "classification", "watchlist_reason_type" и "watchlist_trigger"' in prompt                 # 30.10.2026 (т. 9–10): и класът е на кода
 for gone in ("_load_prior_watchlist_triggers", "prior_trigger_usable", "_live_v2_positions", "_POSITION_WORDING"):
     assert not hasattr(ai_brief, gone), gone
 import inspect
@@ -37,8 +37,8 @@ print()
 print("── 2. изходът на модела: полето се изхвърля, ако все пак дойде ──")
 cand = [{"ticker": "AAA", "earnings": {}}]
 out = ai_brief.merge_narratives(cand, [{"ticker": "AAA", "classification": "Watchlist", "watchlist_reason_type": "other", "watchlist_trigger": "Вчерашният trigger НЕ е изпълнен (СИНТЕТИЧЕН отговор на модела)", "why_now": "x"}])
-assert "watchlist_trigger" not in out[0]["ai"] and out[0]["ai"]["watchlist_reason_type"] == "other"
-print("  ✓ СИНТЕТИЧНО: отговор на модела с watchlist_trigger → полето е изхвърлено в merge_narratives; reason_type (за regime_gate изтичането) остава")
+assert not {"watchlist_trigger", "classification", "watchlist_reason_type"} & set(out[0]["ai"])
+print("  ✓ СИНТЕТИЧНО: отговор на модела с watchlist_trigger, classification, watchlist_reason_type → изхвърлени в merge_narratives (от 30.10 и класът, и причината са на кода)")
 
 print()
 print("── 3. РЕАЛНИТЕ осем Watchlist карти от 08.10: текстът от кода срещу публикувания на модела ──")
@@ -93,8 +93,8 @@ print("  ✓ ZBRA (реалната карта от 08.10, too_wide) през ap
 override = {**copy.deepcopy(CARDS[1]), "sector": "Technology", "ai": {"classification": "Action", "why_now": "x"}}
 with contextlib.redirect_stdout(io.StringIO()):
     _, w2 = brief_main.apply_hard_rules([override], 0.5, "Defensive")
-assert w2[0]["ai"]["watchlist_reason_type"] == "technical_gate" and w2[0]["ai"]["watchlist_trigger"] == CARDS[1]["setup"]["trigger_text"]
-print("  ✓ AI казва Action, кодът връща в Watchlist (technical_gate): текстът е setup.trigger_text — както преди")
+assert w2[0]["ai"]["watchlist_reason_type"] == "technical_gate" and w2[0]["ai"]["watchlist_trigger"] == brief_main._watchlist_trigger_text(CARDS[1], "Defensive")
+print("  ✓ AI казва Action — без значение (30.10.2026: класът е на кода): Watchlist / technical_gate, текстът — от кода (сетъп + режим), както за всяка Watchlist карта")
 tpl = (ROOT / "templates" / "dashboard.html.j2").read_text(encoding="utf-8")
 assert "st.setup.trigger_text not in (st.ai.watchlist_trigger or '')" in tpl
 print("  ✓ шаблонът не повтаря реда «Сетъп:», когато Trigger-ът вече съдържа setup.trigger_text")
