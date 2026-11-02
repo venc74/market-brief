@@ -129,14 +129,14 @@ assert all(f'data-strategy="kullamagi" data-entry="{c["trigger"]}" data-stop="{c
 assert "Ниво на пробива" not in txt and "Акции при" not in txt and "брой акции" not in txt.lower() and "риск $" not in txt                  # старият подробен вид и размерът по сметка ги няма
 assert "дълбочина" in cards_html[0] and "от 10 MA" in cards_html[0]                                                                # подробностите за базата са в подсказката (title)
 assert "QM✓" not in doc                                                                                                            # DOCN не е в Watchlist на 05.10
-assert raw.index("Watchlist ·") < raw.index('<section id="qm">') < raw.index('<section id="qm-ep">')
+assert raw.index('<section id="canslim">') < raw.index('<section id="qm">') < raw.index('<section id="qm-ep">')
 print(f"  ✓ карти по реда на стягане {order}; DOCN: {doc}")
 print("  ✓ банерът 'Измерване, не препоръка…' е НАД картите; стоп за оразмеряване (макс. 1×ADR) + очакван стоп (0.55×ADR) като втори ред, без брой акции; подробности (дълбочина, 10/20 MA) — в подсказката; HTML-ът е балансиран")
 glb = copy.deepcopy(B05)
 glb["glb_candidates"] = [{"ticker": "ZZZ", "glb_type": "classic", "months_unpenetrated": 40, "price": 10.0, "prior_high": 9.0, "prior_high_month": "2020-01", "tightness": None, "company": "ZZZ", "risk_note": "x"}]   # СИНТЕТИЧНО: GLB кандидат, за да има секция GLB
 glb["qm_breakout"], glb["qm_diag"], glb["qm_ep"] = copy.deepcopy(CARDS), copy.deepcopy(DIAG), copy.deepcopy(EP)
 gp = page_raw(glb)
-assert gp.index("Watchlist ·") < gp.index('<section id="qm">') < gp.index('<section id="qm-ep">') < gp.index("GLB Watchlist")
+assert gp.index('<section id="canslim">') < gp.index('<section id="qm">') < gp.index('<section id="qm-ep">') < gp.index("GLB Watchlist")
 print("  ✓ позиция: веднага след Watchlist и ПРЕДИ GLB Watchlist (СИНТЕТИЧЕН GLB кандидат върху реалния бриф от 05.10)")
 mal = brief_with()
 mal["watchlist"] = [{**mal["watchlist"][0], "ticker": "DOCN"}] + mal["watchlist"][1:]                                              # СИНТЕТИЧНО: DOCN е на нашата Watchlist
@@ -244,7 +244,7 @@ for c in CARDS:
 assert HL[0]["title"] in emt and "AH +15.0%" in emt and "3 м. -11%" in emt and "стоп $116.56 (−4.5%)" in emt and "91 акции" not in emt and SUMMARY in emt
 assert f"Проверката е отварянето ({OPEN_BER}): гапът се доказва едва тогава. Вчера, AH срещу отваряне: SYNA +15.0% → +14.7% (издържа)." in emt
 assert "Измерване: 3 записа · затворени 0 · win rate след 20 затворени" in emt
-assert emt.index("Watchlist ·") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
+assert emt.index("Чака пробив ·") < emt.index("Пробиви по Kullamägi (Breakout)") < emt.index("Епизодични пивоти (EP)") < emt.index("Отвори пълния dashboard")
 assert "Qullamaggie сетъпи" not in emt
 print("  ✓ в имейла: веднага след реда Watchlist — 'Пробиви по Kullamägi (Breakout)' (3-те карти: ниво, стоп за оразмеряване и %, ADR, очакван стоп, ръст, дни консолидация; без брой акции) и 'Епизодични пивоти (EP)' (SYNA: AH гап, заглавие, ръст, стоп и %; ред за отварянето и вчерашния дневник)")
 em_q = render.render_email({**brief_with(), "watchlist": [{"ticker": "DOCN"}] + brief_with()["watchlist"]})

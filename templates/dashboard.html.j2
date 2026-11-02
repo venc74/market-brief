@@ -88,6 +88,16 @@
   .sector-etf { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--regime); }
   .sector-chain { font-size: 14px; color: var(--text); }
   .canslim-book > summary { cursor: pointer; list-style-position: inside; }
+  /* 30.10.2026 (т. 9–10): разделът CANSLIM — подзаглавията, „На радара“ (сгъната таблица) */
+  .cs-sub { font-size: 11.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; margin: 18px 0 8px; }
+  .cs-none { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+  details.cs-radar { margin-top: 18px; }
+  details.cs-radar > summary { cursor: pointer; font-size: 13px; color: var(--text); font-weight: 600; }
+  details.cs-radar .cs-hint { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }
+  .cs-radar-wrap { overflow-x: auto; margin-top: 6px; }
+  .cs-radar td.mono { white-space: nowrap; } .cs-radar .markers { margin-left: 6px; flex-wrap: nowrap; }
+  .cs-radar .ctx-table { min-width: 860px; } .cs-radar .ctx-table td:nth-child(5) { min-width: 360px; } .cs-radar .ctx-table td.num { white-space: nowrap; }
+  .cs-mu, .cs-mk { color: var(--muted); font-size: 11.5px; } .cs-warn { color: var(--yellow); font-size: 11.5px; }
   .canslim-book > summary h2 { display: inline; }
   .canslim-book > summary .book-hint { font-size: 12.5px; color: var(--muted); margin-left: 8px; }
   .sector-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -922,8 +932,16 @@
 {% endif %}
 {% endmacro %}
 
-<section>
-  <h2>Action · {{ action|length }} тикъра</h2>
+{# 13.10.2026: изключени заради корпоративно действие с нецял коефициент (отделяне) — ред под секцията; текстът е от кода (corp_actions.exclusion_text) #}
+{% macro corp_excluded_line(rows) %}{% if rows %}<div class="small corp-excluded" style="font-size:12.5px;color:var(--yellow);margin:0 0 10px"><b>Изключени (корпоративно действие):</b>
+  {% for e in rows %}{{ e.text }}{{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}{% endmacro %}
+{# 30.10.2026 (разходката, т. 9–10): един раздел „CANSLIM“ вместо Action и Watchlist. Класът е само на кода (main.apply_hard_rules); AI пише текста на картите.
+   Отгоре надолу: „Купува се днес“ (пълни карти с плана) → „Чака пробив“ (под pivot с buy-stop — пълни карти) → „На радара (N)“ (сгъната таблица, причината от кода)
+   → „Излязоха от вчера“; книгите (Track Record v2, buy-stop) — сгънати, под раздела. #}
+<section id="canslim">
+  <h2>CANSLIM</h2>
+  {{ corp_excluded_line(corp_excluded.get("screener")) }}
+  <div class="cs-sub">Купува се днес · {{ action|length }}</div>
   {% for st in action %}
   {% set p = st.plan %}
   {% set earn_modal_id = "earn-modal-action-" ~ st.ticker %}
@@ -1020,42 +1038,23 @@
   {% if data_warnings and data_warnings|selectattr('source', 'equalto', 'screener')|selectattr('level', 'equalto', 'error')|list %}
   <div class="prose">Скринингът днес не се изпълни (липсват данни — виж предупреждението най-горе). Празният списък НЕ значи, че няма сетъпи.</div>
   {% else %}
-  <div class="prose">Днес нито един кандидат не покрива всички критерии за Action. Това е информация, не провал — кешът също е позиция.</div>
+  <div class="small cs-none">Днес няма потвърден пробив.</div>
   {% endif %}
   {% endfor %}
-</section>
-
-{% if correlation_flags %}
-<div class="prose" style="border-left-color: var(--yellow); margin-top: 16px">
-  <b>⚠ Корелационен риск:</b>
-  {% for f in correlation_flags %}
-  {{ f.tickers[0] }} ↔ {{ f.tickers[1] }} (корелация {{ f.correlation }}){{ ", " if not loop.last else "" }}
-  {% endfor %}
-  — движат се силно синхронно; обмисли намалена експозиция в единия при
-  едновременно държане на двата.
-</div>
-{% endif %}
-
-{# 13.10.2026: изключени заради корпоративно действие с нецял коефициент (отделяне) — ред под секцията; текстът е от кода (corp_actions.exclusion_text) #}
-{% macro corp_excluded_line(rows) %}{% if rows %}<div class="small corp-excluded" style="font-size:12.5px;color:var(--yellow);margin:0 0 10px"><b>Изключени (корпоративно действие):</b>
-  {% for e in rows %}{{ e.text }}{{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}{% endmacro %}
-<section>
-  <h2>Watchlist · {{ watchlist|length }}{% if watchlist_compact %} <span style="font-size:13px;color:var(--muted);font-weight:400">(+{{ watchlist_compact|length }} без сетъп за вход)</span>{% endif %}</h2>
-  {{ corp_excluded_line(corp_excluded.get("screener")) }}
-  {# 09.10: "Излязоха от вчера" — тикърите от предишния Watchlist, които днес ги няма, с причината от кода (само информация) #}
-  {% if watchlist_exits and watchlist_exits.get("from") %}
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от {{ watchlist_exits_label }}:</b>
-    {% for r in watchlist_exits.get("rows", []) %}<b>{{ r.ticker }}</b>: {{ r.reason }}{% if r.yesterday %} <span style="opacity:.8">(вчера: {{ r.yesterday }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% else %}няма{% endfor %}
+  {% if correlation_flags %}
+  <div class="prose" style="border-left-color: var(--yellow); margin-top: 16px">
+    <b>⚠ Корелационен риск:</b>
+    {% for f in correlation_flags %}
+    {{ f.tickers[0] }} ↔ {{ f.tickers[1] }} (корелация {{ f.correlation }}){{ ", " if not loop.last else "" }}
+    {% endfor %}
+    — движат се силно синхронно; обмисли намалена експозиция в единия при
+    едновременно държане на двата.
   </div>
   {% endif %}
-  {# опростяване (втори преглед, 10.10.2026): too_wide / extended / no_volume — един ред, причината и стопът от кода, без AI наратив #}
-  {% if watchlist_compact %}
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 12px"><b>В скрийнъра, без сетъп за вход днес:</b>
-    {% for r in watchlist_compact %}<b>{{ r.ticker }}</b> — {{ r.reason }}{% if r.kind != 'too_wide' and r.stop_pct is not none %}, стоп {{ "%.1f"|format(r.stop_pct) }}%{% endif %}{% if r.earnings %}, отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}{% endif %}{% if r.markers %} {{ r.markers|map(attribute='tag')|join(' ') }}{% endif %}{% if r.spinoff %}, <span style="color:var(--yellow)">⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }} (запис {{ r.spinoff.record[8:10] }}.{{ r.spinoff.record[5:7] }})</span>{% endif %}{% if r.merger %}, <span style="color:var(--yellow)">⚠ цел на придобиване ({{ r.merger.buyer }}, {{ r.merger.announced[8:10] }}.{{ r.merger.announced[5:7] }}.{{ r.merger.announced[:4] }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
-  </div>
-  {% endif %}
+  <div class="cs-sub">Чака пробив · {{ waiting|length }}</div>
+  {% if waiting %}
   <div class="watch-grid">
-    {% for st in watchlist %}
+    {% for st in waiting %}
     <div class="watch-card">
       <span class="ticker">{{ st.ticker }}</span>
       <span class="company">{{ st.company|cname }}</span>
@@ -1105,6 +1104,34 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <div class="small cs-none">Няма кандидат под pivot с buy-stop.</div>
+  {% endif %}
+  {% if radar %}
+  <details class="cs-radar">
+    <summary>На радара ({{ radar|length }}) <span class="cs-hint">разтегнати, без обем, спрени от режима или отчета — без вход днес</span></summary>
+    <div class="cs-radar-wrap">
+      <table class="ctx-table">
+        <tr><th>Тикър</th><th>Сектор</th><th class="num">Цена</th><th class="num">Спрямо pivot</th><th>Причина</th><th class="num">RS</th><th class="num" title="поредни брифове в раздела (брифовете са по сесии)">Дни</th></tr>
+        {% for r in radar %}
+        <tr><td class="mono">{{ r.ticker }}{{ markers_html(r.markers) }}</td>
+          <td>{{ r.sector or "—" }}</td>
+          <td class="num">{{ "$%.2f"|format(r.price) if r.price is number else "—" }}</td>
+          <td class="num">{{ "%+.1f%%"|format(r.pct_from_pivot) if r.pct_from_pivot is number else "—" }}</td>
+          <td>{{ r.reason }}{% if r.earnings %} <span class="cs-mu">· отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}</span>{% endif %}{% if r.spinoff %} <span class="cs-warn">· ⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }}</span>{% endif %}{% if r.merger and r.kind != 'deal' %} <span class="cs-warn">· ⚠ цел на придобиване ({{ r.merger.buyer }})</span>{% endif %}</td>
+          <td class="num">{{ r.rs_rating if r.rs_rating is not none else "—" }}</td>
+          <td class="num">{{ r.days or "—" }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </details>
+  {% endif %}
+  {# 09.10: "Излязоха от вчера" — тикърите от предишния Watchlist, които днес ги няма, с причината от кода (само информация) #}
+  {% if watchlist_exits and watchlist_exits.get("from") %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Излязоха от {{ watchlist_exits_label }}:</b>
+    {% for r in watchlist_exits.get("rows", []) %}<b>{{ r.ticker }}</b>: {{ r.reason }}{% if r.yesterday %} <span style="opacity:.8">(вчера: {{ r.yesterday }})</span>{% endif %}{{ " · " if not loop.last else "" }}{% else %}няма{% endfor %}
+  </div>
+  {% endif %}
 </section>
 
 {% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions or backtest.v1_archive) %}

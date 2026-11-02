@@ -127,20 +127,20 @@ print("  ✓ с чакащ запис от 09.10: setup и plan_preview — 15.1
 backtest._save_tracker(tr)
 
 print()
-print("── 6. страницата: картата на EXPD и компактният ред на ANET ──")
+print("── 6. страницата: редовете на EXPD и ANET в „На радара“ (30.10.2026, т. 9–10; до 30.10 — компактни редове) ──")
 b = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))           # РЕАЛЕН бриф (05.10) като рамка; Watchlist = РЕАЛНИТЕ карти от 12.10 с новия setup
 for t in ("EXPD", "ANET"):
     new[t]["ai"] = B12[t].get("ai") or {}
 b["watchlist"] = [new["EXPD"], new["ANET"]]
 page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
-assert "EXPD — ✅ задействан в buy-stop книгата на 09.10 по $194.59" in page and "Чака пробив: buy-stop $194.59" not in page        # 26.10.2026 (етап 4б, т. 10): компактен ред
-row = page[page.index("В скрийнъра, без сетъп за вход днес:"):][:400]
-assert "ANET — ✅ задействан в buy-stop книгата на 09.10 по $215.38, стоп $197.70 (8.2% под входа), текущо +0.1R; днес: над pivot без обем ≥ 1.5×" in row and "стоп 9.2%" not in row
-cards, compact = render.split_watchlist([new["ANET"]])
-assert not cards and compact[0]["stop_pct"] is None and compact[0]["book"]["fill_price"] == 215.38
-cards, compact = render.split_watchlist([old["ANET"]])
-assert compact[0]["reason"] == "над pivot без обем ≥ 1.5×" and compact[0]["stop_pct"] == old["ANET"]["setup"]["struct_risk_pct"]   # без запис — както преди
-print("  ✓", row[:row.index(", отчет")])
+assert "✅ задействан в buy-stop книгата на 09.10 по $194.59" in page and "Чака пробив: buy-stop $194.59" not in page        # 26.10.2026 (етап 4б, т. 10): ред, не карта
+row = page[page.index("На радара (2)"):][:900]
+assert "ANET" in row and "✅ задействан в buy-stop книгата на 09.10 по $215.38, стоп $197.70 (8.2% под входа), текущо +0.1R; днес: над pivot без обем ≥ 1.5×" in row and "стоп 9.2%" not in row
+waiting, radar = render.split_canslim([new["ANET"]])
+assert not waiting and radar[0]["reason"].startswith("✅ задействан в buy-stop книгата на 09.10 по $215.38")
+waiting, radar = render.split_canslim([old["ANET"]])
+assert radar[0]["reason"] == f"пробив без обем · {old['ANET']['volume_ratio']:.1f}× (< 1.5×)"            # без запис — обемът е числото на причината
+print("  ✓ ANET:", radar[0]["reason"], "| със запис —", "✅ задействан в buy-stop книгата на 09.10 по $215.38 …")
 
 print()
 print("── 7. редът в main.run(): резолюцията е преди setup_rules.annotate ──")

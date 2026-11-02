@@ -718,6 +718,11 @@ def run() -> dict:
                                    expired=watchlist_expiry.LAST_EXPIRED,       # В2: изтекъл прозорец → тази причина, не "извън 10-те карти"
                                    corp_excluded={e["ticker"]: e["text"] for e in corp_ex_screener})   # 13.10.2026: изключен заради корпоративно действие — тази причина
     print(f"      Излязоха от Watchlist ({wl_exits.get('from', 'няма предишен бриф')}): {[r['ticker'] for r in wl_exits.get('rows', [])]}")
+    # 30.10.2026 (разходката, т. 9–10): „от колко дни е на радара“ — поредните брифове в Action / Watchlist (за реда в „На радара“; само показване)
+    _days = watchlist_exits.radar_days([c["ticker"] for c in action + watchlist], today)
+    for c in action + watchlist:
+        if c["ticker"] in _days:
+            c["radar_days"] = _days[c["ticker"]]
     # чисто информационен badge на картата — не пипа classification/plan/sizing,
     # screening и timing остават разделени, виж entry_timing.py docstring-а
     if config.ENABLE_ENTRY_TIMING:

@@ -208,8 +208,8 @@ with tempfile.TemporaryDirectory() as tmp:
         config.DOCS_DIR = orig_docs
 assert "Buy-stop $107.99" in html and "валиден до 05.10" in html, "buy-stop редът липсва на Watchlist картата"
 assert html.count("🎯 Buy-stop") == 1                                     # само за below_pivot, не за TWLO/AMD
-assert "В скрийнъра, без сетъп за вход днес:" in html and "над +5% от pivot" in html                       # опростяване (10.10): extended → компактният ред
-print("  ✓ dashboard: Watchlist картата на BELOW показва 'Buy-stop $107.99 · валиден до 05.10' (само тя); extended/no_volume — компактният ред с причината")
+assert "На радара (2)" in html and "над зоната за покупка · +" in html and "пробив без обем · " in html     # 30.10.2026 (т. 9–10): extended / no_volume → „На радара“
+print("  ✓ dashboard: картата на BELOW („Чака пробив“) показва 'Buy-stop $107.99 · валиден до 05.10' (само тя); extended/no_volume — редове в „На радара“ с причината")
 
 config.ENABLE_BACKTEST = True
 print()

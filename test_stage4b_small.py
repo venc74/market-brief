@@ -46,10 +46,10 @@ assert pg.count("GLB от 22.10") == 2 and "GLB от 23.10" not in pg
 print("  ✓ ED и NWSA: „GLB от 22.10“ (сесията), не 23.10 (брифът)")
 
 print()
-print("── (б) задействаните записи — компактен ред, без AI текст ──")
+print("── (б) задействаните записи — ред (от 30.10.2026 — в „На радара“), без AI текст ──")
 wl = copy.deepcopy(FX["watchlist_2026_10_23"])
 assert sorted((c["ticker"], c["setup"]["kind"], c["setup"]["triggered"]) for c in wl) == [("AAPL", "no_volume", True), ("AMG", "no_volume", True), ("ZBRA", "below_pivot", True)]
-cards, compact = render.split_watchlist(wl)
+cards, compact = render.split_canslim(wl)
 assert cards == [] and sorted(r["ticker"] for r in compact) == ["AAPL", "AMG", "ZBRA"]
 z = next(r for r in compact if r["ticker"] == "ZBRA")
 assert z["reason"].startswith("✅ задействан в buy-stop книгата на 21.10 по $390.80") and z["reason"].endswith("в позиция от 21.10; днес под pivot")   # 27.10.2026: не "чака buy-stop"
@@ -65,7 +65,8 @@ finally:
     ai_brief._call_claude = real
 assert sent == []
 pw = page_of(watchlist=wl)
-assert "ZBRA — ✅ задействан в buy-stop книгата на 21.10 по $390.80" in pw and "AAPL — ✅ задействан в buy-stop книгата" in pw
+pw_r = pw[pw.index("На радара (3)"):]
+assert "✅ задействан в buy-stop книгата на 21.10 по $390.80" in pw_r and pw_r.count("✅ задействан в buy-stop книгата") == 3
 print(f"  ✓ ZBRA (below_pivot), AAPL и AMG (no_volume) — все ред „без сетъп“: «{z['reason'][:90]}…»; без AI извикване")
 
 print()

@@ -192,7 +192,7 @@ b22 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-09-22.json").read_te
 sw.annotate([b22["action"][:1]], {b22["action"][0]["ticker"]: act2["CTVA"]})
 assert WANT in flat(render.render_dashboard(copy.deepcopy(b22))) and WANT in flat(render.render_email(b22))
 wl = [{"ticker": "CTVA", "setup": {"kind": "too_wide", "struct_risk_pct": 12.0}, "spinoff_warning": cards[0]["spinoff_warning"]}]      # СИНТЕТИЧЕН компактен ред
-assert render.split_watchlist(wl)[1][0]["spinoff"]["distribution"] == "2026-10-01"
+assert render.split_canslim(wl)[1][0]["spinoff"]["distribution"] == "2026-10-01"                  # 30.10.2026 (т. 9–10): ред в „На радара“
 print("  ✓ QM и GLB карти (09.10), Action карта и имейл (22.09), бележка в таблицата на buy-stop книгата, компактен ред на Watchlist")
 
 print()

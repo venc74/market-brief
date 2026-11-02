@@ -67,17 +67,17 @@ assert act == [] and [x["ticker"] for x in wl] == ["ROKU"]
 w = wl[0]
 assert w["ai"]["watchlist_reason_type"] == "technical_gate" and w["ai"]["watchlist_trigger"] == setup_rules.DEAL_TEXT
 assert "plan" not in w and "plan_preview" not in w and "levels" not in w
-cards, compact = render.split_watchlist(wl)
-assert cards == [] and compact[0]["kind"] == "deal" and compact[0]["merger"]["buyer"] == "Fox Corporation"
-assert compact[0]["reason"] == "сделка — цената следва условията, не е сетъп; в buy-stop книгата: отворена от 22.10 по $159.89"
+waiting, radar = render.split_canslim(wl)                                                                          # 30.10.2026 (т. 9–10): ред в „На радара“
+assert waiting == [] and radar[0]["kind"] == "deal" and radar[0]["merger"]["buyer"] == "Fox Corporation"
+assert radar[0]["reason"] == "сделка — цел на придобиване (Fox Corporation); в buy-stop книгата: отворена от 22.10 по $159.89"
 assert watchlist_exits.setup_text(s) == "сделка — цената следва условията, не е сетъп"
 b = copy.deepcopy(B19); b["watchlist"] = [w] + b["watchlist"]                                                       # СИНТЕТИЧНО: картата в брифа от 19.10
 with q():
     flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", h)))
     page, mail = flat(render.render_dashboard(b, publish=False)), flat(render.render_email(b))
-row = "ROKU — сделка — цената следва условията, не е сетъп; в buy-stop книгата: отворена от 22.10 по $159.89, отчет 02.11, ⚠ цел на придобиване (Fox Corporation, 14.06.2026)"
-assert row in page and row in mail
-print("  ✓ без AI извикване; Action от модела → Watchlist (technical_gate), без план / нива; ред „без сетъп“: «" + row[:110] + "…» (страница и имейл)")
+row = "ROKU — сделка — цел на придобиване (Fox Corporation); в buy-stop книгата: отворена от 22.10 по $159.89, отчет 02.11"
+assert row in mail and "сделка — цел на придобиване (Fox Corporation); в buy-stop книгата: отворена от 22.10 по $159.89 · отчет 02.11" in page
+print("  ✓ без AI извикване; Action от модела не значи нищо → Watchlist (technical_gate), без план / нива; ред „На радара“: «" + row[:110] + "…» (страница и имейл)")
 
 print()
 print("── 3. проверката преди класификацията: EDGAR веднъж на run (subs) ──")

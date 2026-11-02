@@ -142,15 +142,14 @@ def _book_note_html(card: dict) -> str:
     return f'<br><span style="color:#6b7280;font-size:12px">{_e(note)}</span>' if note else ""
 
 
-def _watchlist_email_html(watchlist: list[dict]) -> str:
+def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
     """
     Watchlist в имейла (трети преглед, 16.10): както обещава историята (docs/HISTORY.md, 07.10: "Имейлът: само вход, стоп, стоп % и предупрежденията"; 4б: отчетът и в имейла) — до 16.10 имейлът
     даваше само тикърите. Карта с buy-stop → buy-stop, таван, валидност, стоп и стоп %; задействан запис в книгата → текстът на кода; отчет / корпоративно действие / отделяне /
-    обратен COT залог / бележка за книгата — както при Action. Компактните (too_wide / extended / no_volume) — един ред с причината от кода и отчета, като на страницата.
+    обратен COT залог / бележка за книгата — както при Action. 30.10.2026 (т. 9–10): (HTML на „Чака пробив“, HTML на „На радара“) — split_canslim, както на страницата;
+    редът на радара е „тикър — причината от кода“ (radar_reason) и отчетът.
     """
-    cards, compact = split_watchlist(watchlist)
-    if not cards and not compact:
-        return ' <span style="font-family:monospace">—</span>'
+    cards, compact = split_canslim(watchlist)
     out = ""
     for st in cards:
         setup, lv, ew = st.get("setup") or {}, st.get("levels") or {}, st.get("earnings_warning")
@@ -170,25 +169,24 @@ def _watchlist_email_html(watchlist: list[dict]) -> str:
         txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _cot_html(st) + _book_note_html(st)
         out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'
                 f'<td style="padding:6px 0;font-size:12.5px;font-family:monospace">{txt}</td></tr>')
-    html = f'<table cellpadding="0" cellspacing="0" style="margin-top:6px">{out}</table>' if out else ""
+    html = f'<table cellpadding="0" cellspacing="0" style="margin-top:6px">{out}</table>' if out else ' <span style="font-family:monospace">—</span>'
+    radar = ' <span style="font-family:monospace">—</span>'
     if compact:
         rows = []
         for r in compact:
             t = f'<b>{_e(r["ticker"])}</b> — {_e(r["reason"])}'
-            if r.get("kind") != "too_wide" and isinstance(r.get("stop_pct"), (int, float)):
-                t += f', стоп {r["stop_pct"]:.1f}%'
             if r.get("earnings"):
                 d = r["earnings"]["date"]
                 t += f', отчет {d[8:10]}.{d[5:7]}' + (f' (±{r["earnings"]["pct"]}%)' if r["earnings"].get("pct") is not None else "")
             if r.get("spinoff"):
                 sp = r["spinoff"]
                 t += f', ⚠ отделяне {sp["distribution"][8:10]}.{sp["distribution"][5:7]} (запис {sp["record"][8:10]}.{sp["record"][5:7]})'
-            if r.get("merger"):
+            if r.get("merger") and r.get("kind") != "deal":
                 mg = r["merger"]
                 t += f', ⚠ цел на придобиване ({_e(mg["buyer"])}, {mg["announced"][8:10]}.{mg["announced"][5:7]}.{mg["announced"][:4]})'
             rows.append(t)
-        html += f'<div style="margin-top:6px;font-size:12.5px;color:#6b7280">Без сетъп за вход днес: {" · ".join(rows)}</div>'
-    return html
+        radar = f'<div style="margin-top:4px;font-size:12.5px;color:#6b7280">{" · ".join(rows)}</div>'
+    return html, radar
 
 
 def _futures_line(brief: dict) -> str | None:
@@ -325,42 +323,85 @@ def _qm_replay_line() -> str:
             f"({q['floored_trades']} сделки = {q['floored_share_of_sum_r_pct']}% от ΣR). ")
 
 
-def split_watchlist(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
+def _dm(iso) -> str:
+    iso = str(iso or "")
+    return f"{iso[8:10]}.{iso[5:7]}" if len(iso) >= 10 and iso[4] == "-" else iso
+
+
+def radar_reason(c: dict) -> str:
     """
-    Опростяване (втори преглед, 10.10.2026): (карти, компактни редове). Карти: сетъп в config.AI_NARRATIVE_SETUPS (потвърден пробив, buy-stop кандидат),
-    без сетъп (стар бриф) или отворена позиция (OPEN✓ — информацията за позицията остава видима). Останалите (too_wide / extended / no_volume) →
-    {ticker, reason, stop_pct} — причината от кода (watchlist_exits.setup_text), без AI текст.
+    30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „разтегната · стоп 15.3%“, „пробив без обем · 0.9×“, „блокирана от режима“,
+    отчет в прозореца, запис в книгата, сделка; неутралният ред за жив запис в buy-stop книгата (setup.book_note) — след нея, както в досегашния компактен ред. Чиста функция.
     """
-    cards, compact = [], []
+    why = _radar_reason(c)
+    note = (c.get("setup") or {}).get("book_note")
+    return f"{why}; {note}" if note and note not in why else why
+
+
+def _radar_reason(c: dict) -> str:
+    setup, ai = c.get("setup") or {}, c.get("ai") or {}
+    kind, rt = setup.get("kind"), ai.get("watchlist_reason_type")
+    if rt == "existing_position":
+        return ai.get("watchlist_trigger") or "запис в книгата — не е нов вход"
+    bk = setup.get("book") if setup.get("triggered") else None
+    if bk and isinstance(bk.get("fill_price"), (int, float)) and isinstance(bk.get("stop_loss"), (int, float)) and bk["fill_price"] > 0:
+        # същият текст като досегашния компактен ред (12.10 / 27.10): стопът е на книгата, днешният сетъп — допълнение
+        r, fd = bk.get("current_r"), _dm(bk.get("fill_date"))
+        today_txt = f"в позиция от {fd}; днес под pivot" if kind == "below_pivot" else f"днес: {watchlist_exits.setup_text(setup) or kind}"
+        return (f"✅ задействан в buy-stop книгата на {fd} по ${bk['fill_price']:.2f}, стоп ${bk['stop_loss']:.2f} "
+                f"({(bk['fill_price'] - bk['stop_loss']) / bk['fill_price'] * 100:.1f}% под входа)" + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; {today_txt}")
+    if kind == "deal":
+        d = setup.get("deal") or {}
+        return "сделка — цел на придобиване" + (f" ({d['buyer']})" if d.get("buyer") else "")
+    if kind == "too_wide":
+        sr = setup.get("struct_risk_pct")
+        return "разтегната" + (f" · стоп {sr:.1f}%" if isinstance(sr, (int, float)) else "")
+    if kind == "extended":
+        pct = setup.get("pct_from_pivot", c.get("pct_from_pivot"))
+        return "над зоната за покупка" + (f" · {pct:+.1f}% (> +{config.BUYABLE_ZONE_MAX_PCT:g}%)" if isinstance(pct, (int, float)) else "")
+    if kind == "no_volume":
+        vr = c.get("volume_ratio")
+        return "пробив без обем · " + (f"{vr:.1f}×" if isinstance(vr, (int, float)) else "?") + f" (< {config.BREAKOUT_VOLUME_MULT:g}×)"
+    if kind == "confirmed":
+        e = c.get("earnings") or {}
+        if rt in ("regime_block", "regime_gate"):
+            return "блокирана от режима"
+        if rt == "earnings_blackout":
+            d = e.get("days_to_earnings")
+            return f"отчет на {_dm(e.get('next_earnings'))}" + (f" ({int(d)} дни)" if isinstance(d, (int, float)) else "") + " — вход след отчета"
+        if rt == "earnings_recent":
+            return "отчет в последната сесия — нивата са отпреди реакцията"
+        if rt == "earnings_unknown":
+            return "датата на отчета не се изтегли"
+        return ai.get("watchlist_trigger") or "потвърден пробив"                     # лимит на Action / сектора, невалиден план, затворена днес
+    if kind == "below_pivot":
+        return "под pivot — чака buy-stop"
+    if kind == "no_data":
+        return "няма цена / pivot"
+    return ai.get("watchlist_trigger") or "—"                                          # стар бриф без сетъп
+
+
+def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
+    """
+    30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план
+    в книгата Action (те са на радара със своята причина). Останалото — по един ред {ticker, sector, price, pct_from_pivot, reason, rs_rating, days, …} с причината от кода
+    (radar_reason); без AI текст и без отделни карти.
+    """
+    waiting, radar = [], []
     for c in watchlist or []:
-        setup = c.get("setup") or {}
-        kind = setup.get("kind")
-        # 26.10.2026 (етап 4б, т. 10): ЗАДЕЙСТВАН запис в buy-stop книгата — винаги компактен ред (до 26.10 ZBRA below_pivot беше пълна карта, а AAPL / AMG no_volume — ред,
-        # и един и същ тикър сменяше вида си ден за ден: ZBRA 22.10 ред, 23.10 карта); входът е изпълнен сигнал от книгата, не нов сетъп
-        if not kind or (kind in config.AI_NARRATIVE_SETUPS and not setup.get("triggered")) or (c.get("ai") or {}).get("watchlist_reason_type") == "existing_position":
-            cards.append(c)
+        setup, ai = c.get("setup") or {}, c.get("ai") or {}
+        if setup.get("kind") == "below_pivot" and setup.get("buy_stop") and not setup.get("triggered") and ai.get("watchlist_reason_type") != "existing_position":
+            waiting.append(c)
             continue
         ew = c.get("earnings_warning") or {}
-        reason, stop_pct = watchlist_exits.setup_text(setup) or kind, setup.get("struct_risk_pct")
-        bk = setup.get("book") if setup.get("triggered") else None
-        if bk and isinstance(bk.get("fill_price"), (int, float)) and isinstance(bk.get("stop_loss"), (int, float)) and bk["fill_price"] > 0:
-            # 12.10.2026: задействан запис в buy-stop книгата има предимство пред причината на сетъпа (ANET: "над pivot без обем, стоп 9.2%" беше единственото на реда,
-            # а книгата държеше вход 09.10 по $215.38 със стоп $197.70) — стопът е на книгата, днешният сетъп остава като допълнение
-            r = bk.get("current_r")
-            fd = f"{bk['fill_date'][8:10]}.{bk['fill_date'][5:7]}"
-            # 27.10.2026: под pivot след входа не е "чака buy-stop" — позицията вече е отворена (AAPL, AMG, ZBRA 27.10)
-            today_txt = f"в позиция от {fd}; днес под pivot" if kind == "below_pivot" else f"днес: {reason}"
-            reason = (f"✅ задействан в buy-stop книгата на {fd} по ${bk['fill_price']:.2f}, "
-                      f"стоп ${bk['stop_loss']:.2f} ({(bk['fill_price'] - bk['stop_loss']) / bk['fill_price'] * 100:.1f}% под входа)"
-                      + (f", текущо {r:+.1f}R" if isinstance(r, (int, float)) else "") + f"; {today_txt}")
-            stop_pct = None                                                         # стопът на сетъпа от днес не е стопът на позицията
-        elif setup.get("book_note"):                                                # 26.10.2026 (етап 4б, т. 1): сделка със задействан запис — "в buy-stop книгата: отворена от …"
-            reason += f"; {setup['book_note']}"
-        compact.append({"ticker": c.get("ticker"), "kind": kind, "reason": reason,
-                        "stop_pct": stop_pct, "markers": c.get("markers") or [], "book": bk, "spinoff": c.get("spinoff_warning"),   # 13.10.2026: предстоящо отделяне
-                        "merger": c.get("merger_target"),                                        # 21.10.2026: цел на придобиване (маркер)
-                        "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})   # отчет в ~20 сесии: дата (и ±%)
-    return cards, compact
+        radar.append({"ticker": c.get("ticker"), "sector": c.get("sector"), "price": c.get("price"), "pct_from_pivot": c.get("pct_from_pivot"),
+                      "reason": radar_reason(c), "rs_rating": c.get("rs_rating"), "days": c.get("radar_days"), "kind": setup.get("kind"),
+                      "markers": c.get("markers") or [], "spinoff": c.get("spinoff_warning"), "merger": c.get("merger_target"),
+                      "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})
+    return waiting, radar
+
+
+# 30.10.2026 (т. 9–10): split_watchlist (карти / компактни редове, 10.10) → split_canslim (Чака пробив / На радара).
 
 
 def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: bool = True, as_of: dt.date | None = None) -> str:
@@ -390,8 +431,9 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
         action=brief["action"],
-        watchlist=split_watchlist(brief["watchlist"])[0],
-        watchlist_compact=split_watchlist(brief["watchlist"])[1],             # опростяване (10.10): too_wide/extended/no_volume — един ред
+        watchlist=brief["watchlist"],                                          # 30.10.2026 (т. 9–10): целият Watchlist (за „наш“ при QM / GLB — до 30.10 без компактните редове)
+        waiting=split_canslim(brief["watchlist"])[0],                         # 30.10.2026 (т. 9–10): „Чака пробив“ — карти с buy-stop
+        radar=split_canslim(brief["watchlist"])[1],                           # „На радара (N)“ — сгъната таблица, причината от кода
         watchlist_exits=brief.get("watchlist_exits") or {}, watchlist_exits_label=watchlist_exits.label(brief.get("watchlist_exits") or {}, brief.get("date") or ""),
         # v2 нови блокове
         watch=brief.get("watch", []),
@@ -606,9 +648,10 @@ def render_email(brief: dict) -> str:
                   Скринингът днес не се изпълни (липсват данни) — празният списък НЕ значи, че няма сетъпи.</td></tr>"""
                 if screener_failed else
                 """<tr><td colspan="3" style="padding:14px;color:#6b7280">
-                  Днес няма Action кандидати. Кешът е позиция.</td></tr>""")
+                  Днес няма потвърден пробив.</td></tr>""")
 
-    watch = _watchlist_email_html(brief.get("watchlist") or [])
+    waiting, radar = _watchlist_email_html(brief.get("watchlist") or [])          # 30.10.2026 (т. 9–10): „Чака пробив“ и „На радара“
+    n_wait, n_radar = (len(x) for x in split_canslim(brief.get("watchlist") or []))
     wx = brief.get("watchlist_exits") or {}
     watch_exits = ("" if not wx.get("from") else
                    f'<br><b>Излязоха от {_e(watchlist_exits.label(wx, brief.get("date") or ""))}:</b> '
@@ -720,12 +763,13 @@ def render_email(brief: dict) -> str:
   <tr><td style="padding:0 28px 8px">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;
                 color:#6b7280;font-weight:bold;margin-bottom:6px">
-      Action · {len(brief['action'])} тикъра</div>
+      CANSLIM · купува се днес · {len(brief['action'])}</div>
     <table width="100%" cellpadding="0" cellspacing="0">{rows}</table>
   </td></tr>
 
   <tr><td style="padding:14px 28px;font-size:13px;color:#374151">
-    <b>Watchlist · {len(brief['watchlist'])}:</b>{watch}{watch_exits}
+    <b>Чака пробив · {n_wait}:</b>{waiting}
+    <br><b>На радара ({n_radar}):</b>{radar}{watch_exits}
   </td></tr>
 
   {qm_block}

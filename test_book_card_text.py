@@ -26,8 +26,10 @@ flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)
 
 print("── (а) trigger_text веднъж на картата (РЕАЛНИЯТ бриф от 19.10) ──")
 page = flat(render.render_dashboard(copy.deepcopy(B19)))
-assert page.count(TT[:60]) == 1 and "Сетъп: ✅ Задействан" not in page
-print("  ✓ '✅ Задействан на 09.10 по $194.59 …' — веднъж (до 19.10: два пъти, 'Сетъп: …' + зеленият ред)")
+assert page.count(TT[:60]) <= 1 and "Сетъп: ✅ Задействан" not in page
+# 30.10.2026 (т. 9–10): записът в Action книгата е ред в „На радара“ с причината от кода, не карта — trigger_text не се показва на реда
+assert "EXPD" not in [c["ticker"] for c in render.split_canslim(B19["watchlist"])[0]] and "EXPD OPEN✓" in page and "Industrials $195.91 +0.1% Вече в портфейла от 2026-10-16" in page
+print("  ✓ '✅ Задействан на 09.10 по $194.59 …' — най-много веднъж (до 19.10: два пъти); от 30.10 EXPD е ред в „На радара“")
 
 print()
 print("── (б) текстът на кода за запис в Action книгата ──")

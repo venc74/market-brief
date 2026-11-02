@@ -59,6 +59,38 @@ def prior_watchlist(today_iso: str, data_dir=None) -> tuple[str | None, list[dic
     return None, []
 
 
+def radar_days(tickers: list[str], today_iso: str, data_dir=None, max_back: int = 120) -> dict[str, int]:
+    """
+    30.10.2026 (разходката, т. 9–10): „от колко дни е на радара“ — за всеки тикър поредните брифове (днешният е 1), в които е бил в Action или Watchlist
+    (картите, buy-stop и компактните редове — целият CANSLIM раздел). Брифовете са по сесии (уикенд / празник няма бриф), затова „дни“ = поредни брифове.
+    Брои назад от най-новия записан бриф преди today_iso, докато тикърът липсва; нечетим бриф се прескача (не прекъсва поредицата). Провал → {} (graceful).
+    """
+    out = {t: 1 for t in tickers or [] if t}
+    try:
+        alive = set(out)
+        d = pathlib.Path(data_dir or config.DATA_DIR)
+        for p in sorted((x for x in d.glob("*.json") if _SNAP.match(x.name) and x.stem < today_iso), reverse=True)[:max_back]:
+            if not alive:
+                break
+            try:
+                snap = json.loads(p.read_text(encoding="utf-8"))
+            except Exception as e:
+                print(f"[watchlist_exits] {p.name} нечетим, пропускам: {type(e).__name__}: {e}")
+                continue
+            if not isinstance(snap, dict):
+                continue
+            there = {c.get("ticker") for c in (snap.get("action") or []) + (snap.get("watchlist") or []) if isinstance(c, dict)}
+            for t in list(alive):
+                if t in there:
+                    out[t] += 1
+                else:
+                    alive.discard(t)
+    except Exception as e:
+        print(f"[watchlist_exits] дните на радара не се преброиха: {type(e).__name__}: {e}")
+        return {}
+    return out
+
+
 def compute(prior_cards: list[dict], action: list[dict], watchlist: list[dict], candidates: list[dict], explain=None, expired: dict | None = None,
             corp_excluded: dict | None = None) -> list[dict]:
     """

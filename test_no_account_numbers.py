@@ -71,7 +71,7 @@ print("  ✓ страницата (без <script>) и имейлът: без '�
 assert 'id="mb-balance"' in page and not re.search(r'id="mb-balance"[^>]*\bvalue=', page) and not re.search(r'id="mb-(risk|cap)"[^>]*\bvalue="\d', page)
 assert "въведи баланса в настройките, за да видиш размера на позицията" in txt
 print("  ✓ полетата за баланс/риск/таван са празни в HTML-а (стойности се четат само от localStorage в браузъра)")
-assert "Вход ≈" in mtxt and "Stop $50.39" in mtxt and "акции" not in mtxt.split("Action")[1].split("Watchlist")[0]
+assert "Вход ≈" in mtxt and "Stop $50.39" in mtxt and "акции" not in mtxt.split("CANSLIM · купува се днес")[1].split("Чака пробив ·")[0]
 print("  ✓ имейлът: само вход, стоп, стоп % и предупрежденията (EXEL: 'Вход ≈ $54.77 · Stop $50.39 (−8.0%)')")
 
 print()

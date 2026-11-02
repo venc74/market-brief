@@ -154,8 +154,8 @@ txt = " ".join(re.sub(r"<[^>]+>", " ", html).split())
 assert "източник на стопа: таван 8% под входа (структурният е 8.2%)" in txt and "$50.39 (−8.0%)" in txt and "Цел 1 (2:1) · 50%" in html and "$63.53" in html
 assert 'data-strategy="canslim" data-entry="54.77" data-stop="50.39"' in html and not any(w in txt for w in ("Брой акции", "Инвестиция", "риск $"))
 assert "риск/акция = цена − $50.39" in html
-assert "Buy-stop $53.93 (таван $56.63)" in email and "Вход ≈ $54.77 · Stop $50.39 (−8.0%)" in email and "Цел $63.53 (50%)" in email and "акции" not in email.split("Action")[1].split("Watchlist")[0]
-assert "В скрийнъра, без сетъп за вход днес:" in html and html.count("структурен стоп") >= 3          # опростяване (10.10): too_wide → компактният ред
+assert "Buy-stop $53.93 (таван $56.63)" in email and "Вход ≈ $54.77 · Stop $50.39 (−8.0%)" in email and "Цел $63.53 (50%)" in email and "акции" not in email.split("CANSLIM · купува се днес")[1].split("Чака пробив ·")[0]
+assert "На радара (3)" in html and html.count("разтегната · стоп") == 3                              # опростяване (10.10) → от 30.10.2026 (т. 9–10): too_wide → ред в „На радара“
 print(f"  ✓ Action картата: 'Вход (buy-stop) $53.93 · таван $56.63', 'Валиден до {vt[8:10]}.{vt[5:7]} (5 сесии)' (от днешната дата), стоп с процент,")
 print("    'Цел 1 (2:1) · 50%'; блок с нивата: източник 'таван 8% под входа', стоп $50.39 (−8.0%); имейлът: 'Buy-stop $53.93 (таван $56.63) / Вход ≈ $54.77 · Stop $50.39 (−8.0%) / Цел $63.53 (50%)', без брой акции'")
 
