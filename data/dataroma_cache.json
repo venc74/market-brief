@@ -1,5 +1,5 @@
 {
- "date": "2026-10-30",
+ "date": "2026-11-02",
  "bundle": {
   "moves": [
    {
@@ -132,7 +132,7 @@
   ],
   "new_positions": [
    {
-    "ticker": "WBD",
+    "ticker": null,
     "cusip": "934423104",
     "company": "WARNER BROS DISCOVERY INC",
     "manager": "Даниел Лоуб · Third Point",
@@ -140,8 +140,8 @@
     "pct_of_portfolio": 11.5,
     "period": "13F · 2026-08-14",
     "filing_date": "2026-08-14",
-    "_resolved": true,
-    "ticker_source": "name"
+    "_resolved": false,
+    "ticker_source": null
    },
    {
     "ticker": "NBIS",
@@ -558,7 +558,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-10-30",
+   "data_date": "2026-11-02",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -762,8 +762,8 @@
     "error": null,
     "rows": 63,
     "by_cusip": 61,
-    "by_name": 2,
-    "no_ticker": 0
+    "by_name": 0,
+    "no_ticker": 2
    },
    "filings": {
     "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",

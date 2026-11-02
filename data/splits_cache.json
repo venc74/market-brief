@@ -1,246 +1,22 @@
 {
- "date": "2026-10-30",
+ "date": "2026-11-02",
  "rows": [],
  "horizon": [
   {
-   "ticker": "AZTR",
-   "company": "Azitra Inc",
-   "date": "2026-10-26",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "BDRX",
-   "company": "Biodexa Pharmaceuticals plc",
-   "date": "2026-10-26",
+   "ticker": "RETO",
+   "company": "ReTo Eco-Solutions, Inc.",
+   "date": "2026-11-02",
    "ratio": "1:8",
    "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
+   "date_human": "Nov 02, 2026"
   },
   {
-   "ticker": "BUUU",
-   "company": "BUUU Group Limited",
-   "date": "2026-10-26",
-   "ratio": "10:1",
-   "split_type": "normal",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "HKPD",
-   "company": "Cellyan Biotechnology Co., Ltd",
-   "date": "2026-10-26",
-   "ratio": "1:20",
+   "ticker": "VCIG",
+   "company": "VCI Global Limited",
+   "date": "2026-11-02",
+   "ratio": "1:18",
    "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "SXTC",
-   "company": "China SXT Pharmaceuticals, Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:100",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "CHOW",
-   "company": "ChowChow Cloud International Holdings Limited",
-   "date": "2026-10-26",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "COCH",
-   "company": "Envoy Medical, Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "GCTK",
-   "company": "GlucoTrack, Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "HCTI",
-   "company": "Healthcare Triangle, Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "IPW",
-   "company": "iPower Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:12",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "LHSW",
-   "company": "Lianhe Sowell International Group Ltd",
-   "date": "2026-10-26",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "PPCB",
-   "company": "Propanc Biopharma, Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "SBFM",
-   "company": "Sunshine Biopharma Inc.",
-   "date": "2026-10-26",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "TWG",
-   "company": "Top Wealth Group Holding Limited",
-   "date": "2026-10-26",
-   "ratio": "1:100",
-   "split_type": "reverse",
-   "date_human": "Oct 26, 2026"
-  },
-  {
-   "ticker": "ENLV",
-   "company": "Enlivex Ltd.",
-   "date": "2026-10-27",
-   "ratio": "1:16",
-   "split_type": "reverse",
-   "date_human": "Oct 27, 2026"
-  },
-  {
-   "ticker": "NUWE",
-   "company": "Nuwellis, Inc.",
-   "date": "2026-10-27",
-   "ratio": "1:9",
-   "split_type": "reverse",
-   "date_human": "Oct 27, 2026"
-  },
-  {
-   "ticker": "PARA",
-   "company": "Parabolic Technologies, Inc.",
-   "date": "2026-10-27",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 27, 2026"
-  },
-  {
-   "ticker": "SCAG",
-   "company": "Scage Future",
-   "date": "2026-10-27",
-   "ratio": "1:15",
-   "split_type": "reverse",
-   "date_human": "Oct 27, 2026"
-  },
-  {
-   "ticker": "ATYR",
-   "company": "aTyr Pharma, Inc.",
-   "date": "2026-10-29",
-   "ratio": "1:40",
-   "split_type": "reverse",
-   "date_human": "Oct 29, 2026"
-  },
-  {
-   "ticker": "ENHA",
-   "company": "Enhanced Group Inc.",
-   "date": "2026-10-29",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 29, 2026"
-  },
-  {
-   "ticker": "OMEX",
-   "company": "Odyssey Marine Exploration, Inc.",
-   "date": "2026-10-29",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Oct 29, 2026"
-  },
-  {
-   "ticker": "AXG",
-   "company": "Solowin Holdings",
-   "date": "2026-10-29",
-   "ratio": "1:200",
-   "split_type": "reverse",
-   "date_human": "Oct 29, 2026"
-  },
-  {
-   "ticker": "MASK",
-   "company": "3 E Network Technology Group Ltd",
-   "date": "2026-10-30",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "NYSX",
-   "company": "Global X Funds Global X NYSE 100 ETF",
-   "date": "2026-10-30",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "IVF",
-   "company": "INVO Fertility, Inc.",
-   "date": "2026-10-30",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "NXXT",
-   "company": "NextNRG, Inc.",
-   "date": "2026-10-30",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "RUBI",
-   "company": "Rubico Inc.",
-   "date": "2026-10-30",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "WFF",
-   "company": "WF Holding Limited",
-   "date": "2026-10-30",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "WHLR",
-   "company": "Wheeler Real Estate Investment Trust, Inc.",
-   "date": "2026-10-30",
-   "ratio": "1:6",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
-  },
-  {
-   "ticker": "ZONE",
-   "company": "Zone Frontier Inc.",
-   "date": "2026-10-30",
-   "ratio": "1:60",
-   "split_type": "reverse",
-   "date_human": "Oct 30, 2026"
+   "date_human": "Nov 02, 2026"
   },
   {
    "ticker": "EFG",
@@ -310,45 +86,23 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 38,
-  "horizon_from": "2026-10-26",
+  "source_rows": 10,
+  "horizon_from": "2026-11-02",
   "horizon_to": "2026-11-09",
-  "in_week": 30,
+  "in_week": 9,
   "dropped_price": [
-   "AZTR",
-   "BDRX",
-   "BUUU",
-   "HKPD",
-   "SXTC",
-   "CHOW",
-   "COCH",
-   "GCTK",
-   "HCTI",
-   "IPW",
-   "LHSW",
-   "PPCB",
-   "SBFM",
-   "TWG",
-   "ENLV",
-   "NUWE",
-   "PARA",
-   "SCAG",
-   "ATYR",
-   "AXG",
-   "MASK",
-   "IVF",
-   "NXXT",
-   "RUBI",
-   "WFF",
-   "WHLR",
-   "ZONE"
+   "RETO",
+   "VCIG",
+   "TOPS"
   ],
-  "dropped_cap": [
-   "ENHA",
-   "OMEX"
-  ],
+  "dropped_cap": [],
   "dropped_no_data": [
-   "NYSX"
+   "EFG",
+   "EFV",
+   "MTUM",
+   "QUAL",
+   "SOXX",
+   "ITA"
   ],
   "passed": 0,
   "state": "empty"
