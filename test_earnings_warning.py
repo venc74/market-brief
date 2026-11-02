@@ -151,7 +151,7 @@ page = " ".join(htmllib.unescape(render.render_dashboard(brief)).split())
 txt = " ".join(re.sub(r"<[^>]+>", " ", page).split())
 # 30.10.2026 (т. 9–10): редът е в „На радара“ — колона „Причина“ с отчета след нея
 row = lambda t: txt[txt.index(t + " ", txt.index("На радара (")):][:160]
-assert "разтегната · стоп 12.6% · отчет 28.10 (±10.7%)" in row("FTNT"), row("FTNT")
+assert "широк стоп · 12.6% · отчет 28.10 (±10.7%)" in row("FTNT"), row("FTNT")
 assert "· отчет 28.10 " in row("AVT") and "(±" not in row("AVT").split("· отчет 28.10")[1][:6] and "· отчет 29.10" in row("ARW")
 print("  ✓ редът на FTNT/AVT/ARW (too_wide) в „На радара“ носи отчета: FTNT «отчет 28.10 (±10.7%)», AVT «отчет 28.10», ARW «отчет 29.10» (без ±%, когато няма данни)")
 act = copy.deepcopy(CARDS["FTNT"])                                                                                  # СИНТЕТИЧНО: РЕАЛНАТА карта на FTNT като Action (за да се види и Action картата и имейлът)

@@ -54,8 +54,8 @@ print("── 2. „Чака пробив“ и „На радара“ — РЕ
 waiting, radar = render.split_canslim(B16["watchlist"])
 assert [c["ticker"] for c in waiting] == ["ZBRA"] and [r["ticker"] for r in radar] == ["HUM", "WSM", "PSX", "BBY", "AMG", "THC", "LLY", "EBAY"]
 h = radar[0]
-assert (h["sector"], h["price"], h["pct_from_pivot"], h["reason"], h["rs_rating"]) == ("Healthcare", 432.2, 0.77, "разтегната · стоп 13.9%", 94)
-print("  ✓ Чака пробив: ZBRA (buy-stop $390.80); На радара (8): HUM Healthcare $432.20 +0.8% „разтегната · стоп 13.9%“ RS 94, WSM, PSX, …")
+assert (h["sector"], h["price"], h["pct_from_pivot"], h["reason"], h["rs_rating"]) == ("Healthcare", 432.2, 0.77, "широк стоп · 13.9%", 94)
+print("  ✓ Чака пробив: ZBRA (buy-stop $390.80); На радара (8): HUM Healthcare $432.20 +0.8% „широк стоп · 13.9%“ RS 94, WSM, PSX, …")
 e19 = next(c for c in B["2026-10-19"]["watchlist"] if c["ticker"] == "EXPD")                                       # РЕАЛНО: запис в Action книгата + задействан buy-stop
 assert render.radar_reason(e19).startswith("Вече в портфейла от 2026-10-16")
 nv = {"setup": {"kind": "no_volume"}, "volume_ratio": 0.93}                                                       # СИНТЕТИЧНИ числа
@@ -94,7 +94,7 @@ t = flat(sec)
 order = [t.index(x) for x in ("CANSLIM", "Купува се днес · 1", "EXPD", "Чака пробив · 1", "ZBRA", "На радара (8)", "Излязоха от")]
 assert order == sorted(order) and "<h2>Action" not in page and "<h2>Watchlist" not in page
 assert '<details class="cs-radar">' in sec and '<details class="cs-radar" open' not in sec                           # сгънат
-assert "Тикър Сектор Цена Спрямо pivot Причина RS Дни HUM SECT✓" in t and "Healthcare $432.20 +0.8% разтегната · стоп 13.9% · отчет 06.11 94 3 WSM" in t   # маркерът — с подсказката
+assert "Тикър Сектор Цена Спрямо pivot Причина RS Дни HUM SECT✓" in t and "Healthcare $432.20 +0.8% широк стоп · 13.9% · отчет 06.11 94 3 WSM" in t   # маркерът — с подсказката
 assert page.index('<section id="canslim">') < page.index("Track Record v2") and page.index("Track Record v2") < page.index("Buy-stop кандидати — измерване")
 empty = copy.deepcopy(B16); empty["action"] = []; empty["watchlist"] = []                                            # СИНТЕТИЧНО: празен ден
 with q():
@@ -107,9 +107,9 @@ print()
 print("── 5. имейлът — същият ред ──")
 with q():
     m = flat(render.render_email(copy.deepcopy(B16)))
-order = [m.index(x) for x in ("CANSLIM · купува се днес · 1", "EXPD", "Чака пробив · 1: ZBRA Buy-stop $390.80", "На радара (8): HUM — разтегната · стоп 13.9%, отчет 06.11", "Излязоха от")]
+order = [m.index(x) for x in ("CANSLIM · купува се днес · 1", "EXPD", "Чака пробив · 1: ZBRA Buy-stop $390.80", "На радара (8): HUM — широк стоп · 13.9%, отчет 06.11", "Излязоха от")]
 assert order == sorted(order)
-print("  ✓ „CANSLIM · купува се днес · 1“ → „Чака пробив · 1: ZBRA Buy-stop $390.80 …“ → „На радара (8): HUM — разтегната · стоп 13.9% …“ → „Излязоха от …“")
+print("  ✓ „CANSLIM · купува се днес · 1“ → „Чака пробив · 1: ZBRA Buy-stop $390.80 …“ → „На радара (8): HUM — широк стоп · 13.9% …“ → „Излязоха от …“")
 print()
 print("── 6. 31.10.2026 (решения): без таван на Watchlist; таван само на картите „Чака пробив“ (config); без изтичане на regime_gate ──")
 many = []

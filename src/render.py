@@ -330,7 +330,7 @@ def _dm(iso) -> str:
 
 def radar_reason(c: dict) -> str:
     """
-    30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „разтегната · стоп 15.3%“, „пробив без обем · 0.9×“, „блокирана от режима“,
+    30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „широк стоп · 15.3%“ (too_wide; до 02.11 „разтегната · стоп“), „пробив без обем · 0.9×“, „блокирана от режима“,
     отчет в прозореца, запис в книгата, сделка; неутралният ред за жив запис в buy-stop книгата (setup.book_note) — след нея, както в досегашния компактен ред. Чиста функция.
     """
     why = _radar_reason(c)
@@ -355,7 +355,7 @@ def _radar_reason(c: dict) -> str:
         return "сделка — цел на придобиване" + (f" ({d['buyer']})" if d.get("buyer") else "")
     if kind == "too_wide":
         sr = setup.get("struct_risk_pct")
-        return "разтегната" + (f" · стоп {sr:.1f}%" if isinstance(sr, (int, float)) else "")
+        return "широк стоп" + (f" · {sr:.1f}%" if isinstance(sr, (int, float)) else "")        # 02.11.2026 (т. 5): до 02.11 „разтегната · стоп X%“ — „над зоната“ е extended
     if kind == "extended":
         pct = setup.get("pct_from_pivot", c.get("pct_from_pivot"))
         return "над зоната за покупка" + (f" · {pct:+.1f}% (> +{config.BUYABLE_ZONE_MAX_PCT:g}%)" if isinstance(pct, (int, float)) else "")

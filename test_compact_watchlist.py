@@ -41,8 +41,8 @@ waiting, radar = render.split_canslim(B05["watchlist"])
 assert [c["ticker"] for c in waiting] == ["EXPD"] and len(radar) == 8 and all(r["kind"] == "too_wide" for r in radar)
 page = " ".join(re.sub(r"<[^>]+>", " ", htmllib.unescape(render.render_dashboard(copy.deepcopy(B05)))).split())
 assert "Чака пробив · 1" in page and "На радара (8)" in page and "Купува се днес · 0 Днес няма потвърден пробив." in page
-assert "разтегната · стоп 12.6%" in page and "разтегната · стоп 25.6%" in page and next(r for r in radar if r["ticker"] == "FTNT")["reason"] == "разтегната · стоп 12.6%"
-print("  ✓ «Чака пробив · 1» (EXPD), «На радара (8)» — FTNT «разтегната · стоп 12.6%», AMD «разтегната · стоп 25.6%» …; картата е само на EXPD")
+assert "широк стоп · 12.6%" in page and "широк стоп · 25.6%" in page and next(r for r in radar if r["ticker"] == "FTNT")["reason"] == "широк стоп · 12.6%"
+print("  ✓ «Чака пробив · 1» (EXPD), «На радара (8)» — FTNT «широк стоп · 12.6%», AMD «широк стоп · 25.6%» …; картата е само на EXPD")
 
 print()
 print("── 3. отворена позиция — ред на радара с причината; extended — с процента над pivot ──")
