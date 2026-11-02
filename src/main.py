@@ -974,8 +974,10 @@ def run() -> dict:
             active = ai_brief.watch_ticker_digest(active, market_context)
         by_ticker = {r["ticker"]: r for r in active}
         return [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in rows]
+    _wi = watch_monitor.LAST_INFO                                       # 02.11.2026: .info празно за над половината → "частично" (банерът — data_warnings)
     watch_rows = steps.step("watch", _watch, fallback=[], enabled=config.ENABLE_WATCH_MONITOR, label="Секцията „Наблюдавани тикъри“",
-                            consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини")
+                            consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини",
+                            partial=lambda v: (f"Yahoo .info празно за {len(_wi['empty'])} от {_wi['checked']}", {}) if _wi.get("checked") and len(_wi.get("empty") or {}) * 2 > _wi["checked"] else None)
 
     # FIX 2026-09-27: пълен отчет за сплитовете — секцията вече не се скрива
     # (ok / empty с фуния по филтри / source_failed), + сплитове на отворени
@@ -1037,6 +1039,7 @@ def run() -> dict:
                                        ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
                                        news_status=dict(news_aggregator.LAST_STATUS) if config.ENABLE_NEWS else None,
                                        fred_key_missing=not config.FRED_API_KEY, universe_sources=dict(screener.LAST_UNIVERSE_SOURCES),   # 30.10.2026: Nasdaq-100 липсваше тихо от 10.07
+                                       watch_info=dict(watch_monitor.LAST_INFO),                              # 02.11.2026: .info на наблюдаваните
                                        breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
     data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
     print(steps.log_line())
@@ -1069,6 +1072,7 @@ def run() -> dict:
         "ai_truncations": list(ai_brief.TRUNCATIONS),
         "ai_usage": list(ai_brief.AI_USAGE),
         "watch": watch_rows,
+        "watch_info": dict(watch_monitor.LAST_INFO),                    # 02.11.2026: {checked, empty: {тикър: причина}}
         "action": action,
         "watchlist": watchlist,
         "watchlist_exits": wl_exits,

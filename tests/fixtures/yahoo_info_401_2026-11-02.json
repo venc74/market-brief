@@ -1,0 +1,26 @@
+{
+ "_note": "РЕАЛНО: лог на GitHub Actions — run 41400345849 (daily_brief.yml, брифът от 02.11.2026, commit c6ad300); изтеглен на 02.11.2026 (едно GET към /actions/runs/41400345849/logs с разрешение на потребителя). Редове 334–405, 06:42:37–06:43:09 UTC — стъпката \"watch\" (watch_monitor.facts → .info на 14-те наблюдавани). 72 реда „HTTP Error 401“: 44 × „Invalid Crumb“ (quoteSummary) и 28 × „User is unable to access this feature“ (v7/finance/quote) — редът в лога (проверен): 2 × C в 06:42:37–38, после 14 × „C U C C U“ от 06:42:45 (C = Invalid Crumb, U = unable to access) — на тикър .info в facts (quoteSummary C + v7 U), calendar в enrich.earnings_info (C) и .info там (C U). yfinance 1.7.0 с hide_exceptions=True: грешката е само ред в stderr, .info връща без име — в нашия лог нямаше ред за .info (stdout на стъпката е в log_stdout_watch). Скрийнърът (06:31–06:38) и проверката на COT тикърите (до 06:39:04, 404 Not Found — crumb-ът тогава е бил валиден) минаха; между 06:39:04 и 06:42:37 няма грешка от Yahoo. log_line_404 — ред 261 (06:38:50 UTC, проверката на COT тикърите: NESN не е в Yahoo).",
+ "bodies": {
+  "quoteSummary": "{\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+  "v7_quote": "{\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback\"}}}"
+ },
+ "log_lines_first": [
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback\"}}}",
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+  "HTTP Error 401: {\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}"
+ ],
+ "log_stdout_watch": [
+  "[watch] 14 наблюдавани тикъра — 7 със събития, 7 без (BHC, SAP, BLSH, DOCU, SN, CRM, BMNR)"
+ ],
+ "counts": {
+  "http_401": 72,
+  "invalid_crumb": 44,
+  "unable_to_access": 28,
+  "watch_tickers": 14
+ },
+ "pattern": "CCCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCUCUCCU",
+ "log_line_404": "HTTP Error 404: {\"quoteSummary\":{\"result\":null,\"error\":{\"code\":\"Not Found\",\"description\":\"Quote not found for symbol: NESN\"}}}"
+}

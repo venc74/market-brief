@@ -36,6 +36,7 @@ from __future__ import annotations
 import calendar
 import datetime as dt
 import json
+import logging
 import re
 import time
 
@@ -274,14 +275,60 @@ def attach_markers(rows: list[dict], cards: dict[str, list | None], books: bool 
         print(f"[watch] маркерите (скрийнър / книги) пропуснати: {type(e).__name__}: {e}")
 
 
+# 02.11.2026 (поправки след брифа, т. 1): .info за наблюдаваните — {checked, empty: {тикър: причина}} от последното facts(); main → brief["watch_info"] и банер (data_warnings)
+LAST_INFO: dict = {}
+_HTTP_ERR = re.compile(r"HTTP Error (\d+): (.*)", re.S)
+
+
+class _YfErrors(logging.Handler):
+    """Грешките, които yfinance само логва (hide_exceptions=True: HTTP 4xx → ред в stderr и празен .info, без изключение) — за реда в нашия лог."""
+    def __init__(self):
+        super().__init__(level=logging.ERROR)
+        self.messages: list[str] = []
+
+    def emit(self, record):
+        try:
+            self.messages.append(record.getMessage())
+        except Exception:
+            pass
+
+
+def info_reason(messages: list[str]) -> str | None:
+    """
+    Причината от грешките на yfinance: "HTTP Error 401: {…"description":"Invalid Crumb"…}" → "HTTP 401 · Invalid Crumb"; различните описания — с " / ", без адреса след " - ".
+    Чиста функция.
+    """
+    codes, descs = [], []
+    for m in messages or []:
+        hit = _HTTP_ERR.match(str(m).strip())
+        if not hit:
+            continue
+        codes.append(hit.group(1))
+        try:
+            d = (json.loads(hit.group(2)) or {})
+            err = ((d.get("finance") or d.get("quoteSummary") or {}).get("error") or {})
+            desc = str(err.get("description") or err.get("code") or "").split(" - http")[0].strip()
+        except Exception:
+            desc = ""
+        if desc and desc not in descs:
+            descs.append(desc)
+    if not codes:
+        return None
+    return "HTTP " + "/".join(dict.fromkeys(codes)) + (" · " + " / ".join(descs) if descs else "")
+
+
 def facts(tickers: list[str], download=None, info_fn=None, earnings_fn=None) -> dict[str, dict]:
     """
     {тикър: {name, price: price_facts, short: short_facts, earnings: {next, days}}} — цените с ЕДНО теглене (тикърите + SPY, 1 година, без днешния частичен бар),
     .info и следващият отчет (enrich.earnings_info — същата логика като картите) по тикър. Провал за тикър → празните полета само за него; провал на тегленето → без цени.
-    download(tickers) → DataFrame като yf.download(group_by="ticker"); info_fn(t) → dict; earnings_fn(t) → dict (за тестове).
+    download(tickers) → DataFrame като yf.download(group_by="ticker"); info_fn(t) → dict (None = таймаут); earnings_fn(t) → dict (за тестове).
+    02.11.2026: .info без име (празен отговор, HTTP грешка, която yfinance само логва, таймаут, изключение) → ред "[watch] T .info празно — причина" и LAST_INFO["empty"].
+    На 02.11 Yahoo върна HTTP 401 (Invalid Crumb / User is unable to access this feature) на всяко .info в стъпката — име и short interest липсваха за 14 от 14 без ред и банер.
     """
     from src import sessions as _sessions
     out = {t: {"name": None, "price": {}, "short": {}, "earnings": {}} for t in tickers}
+    LAST_INFO.clear()
+    LAST_INFO.update({"checked": len(tickers), "empty": {}})
     if not tickers:
         return out
     try:
@@ -295,13 +342,27 @@ def facts(tickers: list[str], download=None, info_fn=None, earnings_fn=None) -> 
                 print(f"[watch] {t} цени: {type(e).__name__}: {e}")
     except Exception as e:
         print(f"[watch] цените не се изтеглиха: {type(e).__name__}: {e}")
+    yf_log = logging.getLogger("yfinance")
     for t in tickers:
+        why = None
+        errs = _YfErrors()
+        yf_log.addHandler(errs)
         try:
-            info = (info_fn or (lambda x: net_utils.fetch_with_timeout(lambda: yf.Ticker(x).info) or {}))(t) or {}
+            raw = (info_fn or (lambda x: net_utils.fetch_with_timeout(lambda: yf.Ticker(x).info)))(t)
+            info = raw or {}
             out[t]["name"] = info.get("longName") or info.get("shortName")
             out[t]["short"] = short_facts(info)
+            if not out[t]["name"]:
+                why = (info_reason(errs.messages) or (f"таймаут ({config.YF_INFO_TIMEOUT_SEC:g} s)" if raw is None else None)
+                       or "Yahoo върна отговор без име и short interest")
         except Exception as e:
             print(f"[watch] {t} .info: {type(e).__name__}: {e}")
+            why = info_reason(errs.messages) or f"{type(e).__name__}: {e}"[:160]
+        finally:
+            yf_log.removeHandler(errs)
+        if why:
+            LAST_INFO["empty"][t] = why
+            print(f"[watch] {t} .info празно — {why} (името и short interest липсват днес)")
         try:
             if earnings_fn is None:
                 from src import enrich
@@ -310,6 +371,11 @@ def facts(tickers: list[str], download=None, info_fn=None, earnings_fn=None) -> 
             out[t]["earnings"] = {"next": e.get("next_earnings"), "days": e.get("days_to_earnings"), "status": e.get("earnings_status")}
         except Exception as e:
             print(f"[watch] {t} отчет: {type(e).__name__}: {e}")
+    if LAST_INFO["empty"]:
+        why = {}
+        for w in LAST_INFO["empty"].values():
+            why[w] = why.get(w, 0) + 1
+        print(f"[watch] ⚠ .info: {len(LAST_INFO['empty'])} от {len(tickers)} празни — " + "; ".join(f"{w} ×{n}" for w, n in why.items()))
     return out
 
 

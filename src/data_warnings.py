@@ -284,12 +284,27 @@ def _universe_warning(universe_sources: dict | None) -> list[dict]:
                          + " — скрийнърът, QM, GLB и breadth днес са без тези тикъри (източникът е Wikipedia; адресът е в config.UNIVERSE_SOURCES).")}]
 
 
+def _watch_info_warning(watch_info: dict | None) -> list[dict]:
+    """
+    02.11.2026 (поправки след брифа, т. 1): Yahoo .info празно за над половината наблюдавани (watch_monitor.LAST_INFO). На 02.11 — 14 от 14 (HTTP 401 · Invalid Crumb в стъпката),
+    стъпката "watch" беше "ok", без ред в лога и без банер; името и short interest липсваха.
+    """
+    wi = watch_info or {}
+    empty, n = wi.get("empty") or {}, wi.get("checked") or 0
+    if not n or len(empty) * 2 <= n:
+        return []
+    why = list(dict.fromkeys(empty.values()))
+    return [{"source": "watch", "level": "warn",
+             "message": (f"Наблюдавани тикъри: Yahoo .info не върна данни за {len(empty)} от {n} тикъра ({'; '.join(why[:2])}) — името и short interest липсват днес; "
+                         "цените, отчетите, новините и Form 4 са от други източници.")}]
+
+
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
-            fred_key_missing: bool = False, breadth: dict | None = None, universe_sources: dict | None = None) -> list[dict]:
+            fred_key_missing: bool = False, breadth: dict | None = None, universe_sources: dict | None = None, watch_info: dict | None = None) -> list[dict]:
     out: list[dict] = []
     ss = sector_status or {}
     if ss and not ss.get("ok", True):
@@ -340,6 +355,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
     out.extend(_breadth_warning(breadth))
+    out.extend(_watch_info_warning(watch_info))                       # 02.11.2026: .info празно за над половината наблюдавани
     out.extend(_partial_warnings(sector_status, screener_status, superinvestor_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
         out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})
