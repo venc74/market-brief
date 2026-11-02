@@ -1,7 +1,8 @@
 """
 22.10.2026 · етап 4 (решения от 21–22.10): крипто секцията. Новини от RSS на Cointelegraph (https://cointelegraph.com/rss — „?format=rss“ връща HTML) през AI подбор по индекс:
 заглавието и източникът са ДОСЛОВНИ (news_aggregator.pick_verbatim + ехо на първите 6 думи), AI дава „защо“; най-много 1 ред за дневни потоци в ETF; без значими — един ред.
-29.10.2026 (разходката, т. 4а): затвореният списък с категории отпадна — мерилото е въпросът в промпта (виж test_crypto_criterion), таванът е 5; кодът вече не маха по категория. Под тях COIN / HOOD / CRCL / BLSH (последен цял бар) и COT за Bitcoin само в първия бриф след нов отчет. Тезата „Крипто регулация (CLARITY Act)“
+29.10.2026 (разходката, т. 4а): затвореният списък с категории отпадна — мерилото е въпросът в промпта (виж test_crypto_criterion), таванът е 5; кодът вече не маха по категория. Под тях COIN / HOOD / CRCL / BLSH (последен цял бар) и COT за Bitcoin само в първия бриф след нов отчет — на страницата до 02.11.2026 (поправки след брифа, т. 7: двата реда
+махнати; данните остават в brief["crypto"], цените — и за макро разказа; обяснението за подбора — едно сиво изречение). Тезата „Крипто регулация (CLARITY Act)“
 отпадна със секцията. Измерено 21.10: 50 от 304 реални заглавия минават по критериите (моя преценка); истинският филтър се проверява на живо.
 
 РЕАЛНО: tests/fixtures/cointelegraph_rss_2026-10-21.xml — фийдът https://cointelegraph.com/rss, свален на 21.10.2026 в ~20:00 Берлин (30 заглавия, 20.10 16:14 → 21.10 17:57 UTC;
@@ -67,7 +68,11 @@ page = lambda c: (b.__setitem__("crypto", c), render.render_dashboard(copy.deepc
 with contextlib.redirect_stdout(io.StringIO()):
     p1, p2, p3 = page(again), page(none), page(fail)
 sec = p1[p1.index("Крипто · последните 24ч"):]; sec = sec[:sec.index("</section>")]
-assert POOL[idx["OCC finalizes GENIUS"]]["title"] in sec and "· Cointelegraph" in sec and "· регулация" not in sec and "решението на институционален инвеститор в крипто след седмица" in sec and "<b>COIN</b>" in sec and "COT Bitcoin (CME, managed money)" in sec
+assert POOL[idx["OCC finalizes GENIUS"]]["title"] in sec and "· Cointelegraph" in sec and "· регулация" not in sec
+# 02.11.2026 (поправки след брифа, т. 7): без реда с цените и без „COT Bitcoin“ на страницата (данните остават — again ги има); обяснението — едно сиво изречение
+assert again["tickers"] and again["cot_btc"] and "<b>COIN</b>" not in sec and "за сесията" not in sec and "COT Bitcoin" not in sec and "managed money" not in sec
+assert ("Подборът е на AI — по това дали новината би променила решението на институционален инвеститор в крипто след седмица; заглавието и източникът са дословни.</div>" in sec
+        and "токенизация" not in sec and "Информация, не препоръка" not in sec)
 assert "Няма значими крипто новини (проверени 30 заглавия от Cointelegraph)." in p2 and "празното НЕ значи, че няма новини" in p3
-print("  ✓ новините, цените и COT; „няма значими“ с броя проверени; провал — не изглежда като „няма“")
+print("  ✓ новините и едно сиво изречение за подбора (без цените на COIN / HOOD / CRCL / BLSH и без COT Bitcoin — от 02.11); „няма значими“ с броя проверени; провал — не изглежда като „няма“")
 print("\n✅ test_crypto_section: всичко мина")

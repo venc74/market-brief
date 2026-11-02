@@ -635,7 +635,7 @@
 </section>
 {% endif %}
 
-{# 22.10.2026 (етап 4): крипто секцията — Cointelegraph (от 29.10 и CoinDesk) през AI подбор по индекс; заглавието и източникът — дословни; под новините цените и COT за Bitcoin при нов отчет #}
+{# 22.10.2026 (етап 4): крипто секцията — Cointelegraph (от 29.10 и CoinDesk) през AI подбор по индекс; заглавието и източникът — дословни (цените и COT за Bitcoin под новините — до 02.11) #}
 {% if crypto %}
 <section>
   <h2>Крипто · последните 24ч</h2>
@@ -653,11 +653,9 @@
   {% else %}
   <div class="prose" style="color:var(--muted)">Крипто новините не се изтеглиха днес{% if crypto.reason %} ({{ crypto.reason }}){% endif %} — празното НЕ значи, че няма новини.</div>
   {% endif %}
-  {% if crypto.get("tickers") %}<div class="small" style="font-size:12.5px;margin-top:10px">
-    {% for t in crypto.tickers %}<b>{{ t.ticker }}</b> ${{ "%.2f"|format(t.close) }} ({{ "%+.1f"|format(t.chg_1d_pct) }}% за сесията, {{ "%+.1f"|format(t.chg_5d_pct) }}% за 5){{ " · " if not loop.last else "" }}{% endfor %}
-    <span style="color:var(--muted)"> — close към {{ crypto.tickers[0].date[8:10] }}.{{ crypto.tickers[0].date[5:7] }}</span></div>{% endif %}
-  {% if crypto.get("cot_btc") %}<div class="small" style="font-size:12.5px;margin-top:6px">COT Bitcoin (CME, managed money): нетна позиция {{ "{:,}".format(crypto.cot_btc.net).replace(",", " ") }} договора към {{ crypto.cot_btc.as_of[8:10] }}.{{ crypto.cot_btc.as_of[5:7] }} — перцентил {{ "%.0f"|format(crypto.cot_btc.percentile) }} за {{ crypto.cot_btc.weeks }} седмици{% if crypto.cot_btc|cot_label %}: {{ crypto.cot_btc|cot_label }}{% endif %} (нов отчет).</div>{% endif %}
-  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI по въпроса „би ли променила тази новина решението на институционален инвеститор в крипто след седмица?“ (важни: навлизането на традиционните финанси — токенизация, DTCC, големи банки, стейбълкойни, регулатори; не: прогнози за цената, малки монети, мнения). Заглавието и източникът са дословни. Информация, не препоръка.</div>
+  {# 02.11.2026 (поправки след брифа, т. 7): без реда с цените на COIN / HOOD / CRCL / BLSH и без реда „COT Bitcoin“ — COT е в собствения си раздел, CRCL и BLSH — в ръчно
+     поддържания списък; данните остават в brief["crypto"] (цените — и в промпта на макро разказа). Обяснението — едно сиво изречение. #}
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">Подборът е на AI — по това дали новината би променила решението на институционален инвеститор в крипто след седмица; заглавието и източникът са дословни.</div>
 </section>
 {% endif %}
 
