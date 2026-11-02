@@ -50,11 +50,13 @@ g.yf = type("Y", (), {"download": staticmethod(fake_download)})
 tmp = tempfile.TemporaryDirectory(prefix="mb_split_")
 
 def run(state_name, seeded):
-    cap = {"eval": {}, "replay": {}, "wish": {}}
+    cap = {"eval": {}, "replay": {}, "wish": []}
     orig_wish = g.wish_signal
     g._evaluate_ticker = lambda sym, hist, m=0.0: cap["eval"].setdefault(sym, hist.copy()) is None and None
     g.replay_observations = lambda sym, hist, n, m: (cap["replay"].setdefault(sym, hist.copy()), {})[1]
-    g.wish_signal = lambda df, today=None, **kw: (cap["wish"].setdefault(id(df), df.copy()), orig_wish(df, today, **kw))[1]     # 21.10: и kind="high" (книгата „GLB по Уиш“)
+    # 21.10: и kind="high" (книгата „GLB по Уиш“). 02.11.2026: всяко извикване — в списък; до 02.11 речник по id(df) — screen() освобождава df на предишния тикър и новият
+    # можеше да получи същия id → setdefault не записваше тикъра (2 вместо 3; 3 от 80 пускания локално, Tests на GitHub 41496445531, локално 30.10 ×2)
+    g.wish_signal = lambda df, today=None, **kw: (cap["wish"].append((kw.get("kind", "close"), df.copy())), orig_wish(df, today, **kw))[1]
     state = pathlib.Path(tmp.name) / state_name
     if seeded:                                                                 # СИНТЕТИЧНО: празно състояние на хистерезиса с актуалния белег → обикновен дневен run
         state.write_text(json.dumps({"updated": "2026-10-08", "events": {}, "seed": {"version": config.GLB_SEED_VERSION, "sessions": 40, "from": None, "to": None}}), encoding="utf-8")
@@ -70,8 +72,10 @@ for label, got in (("обикновен дневен run", cap_daily["eval"]), (
         for col, key in (("Close", "c"), ("High", "h"), ("Low", "l"), ("Open", "o")):
             assert list(h[col]) == FX[t][key], (label, t, col)
     print(f"  ✓ {label}: Close/High/Low/Open на NVDA, AAPL и AMZN са идентични с реалните отговори на Yahoo (нито едно деление)")
-wish_dfs = list(cap_daily["wish"].values())
-assert len(wish_dfs) == 3 and all(list(df["Close"]) == FX[t]["c"] for df, t in zip(wish_dfs, FX))
+wish_calls = cap_daily["wish"]
+kinds = ["close"] * config.TRACK_GLB_WISH + ["high"] * config.TRACK_GLB_WISH_HIGH                        # на тикър: книгата „наш вариант (close)“ и „GLB по Уиш“ (High)
+assert [k for k, _ in wish_calls] == kinds * len(FX), [k for k, _ in wish_calls]
+assert [next((t for t in FX if list(df["Close"]) == FX[t]["c"]), None) for _, df in wish_calls] == [t for t in FX for _ in kinds]     # всяко извикване — с реалните цени на своя тикър
 print("  ✓ и сигналът за книгата «GLB по Уиш» получава същите цени")
 assert all("actions" not in kw and kw.get("auto_adjust") is False for kw in calls)
 print(f"  ✓ теглене: auto_adjust=False, без actions=True (колоната 'Stock Splits' вече не е нужна) — {len(calls)} извиквания")
