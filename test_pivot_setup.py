@@ -175,7 +175,7 @@ a2, w2 = brief_main.apply_hard_rules([c2], 1.0)
 assert [a["ticker"] for a in a2] == ["LNTH"] and not w2
 print("  ✓ потвърден кандидат, който AI е нарекло Watchlist, е Action — класът е само на кода (до 30.10 оставаше Watchlist)")
 
-# Watchlist лимит 10: подредбата решава кои 10 влизат (СИНТЕТИЧНО: 12 кандидата)
+# 31.10.2026 (т. 9–10): без таван от 10 — подредбата решава реда, не кой изпада (СИНТЕТИЧНО: 12 кандидата)
 many = []
 for i in range(12):
     kind_price = {0: 90.0, 1: 102.0, 2: 108.0}[i % 3]     # под pivot / над без обем / extended
@@ -186,8 +186,8 @@ for i in range(12):
     many.append(c)
 _, wl = brief_main.apply_hard_rules(many, 1.0)
 kinds = [w["setup"]["kind"] for w in wl]
-assert len(wl) == 10 and kinds.count("extended") == 2 and kinds[:4] == ["below_pivot"] * 4, kinds
-print("  ✓ при 12 кандидата Watchlist е 10: четирите buy-stop първи, extended най-отзад (изрязват се първи)")
+assert len(wl) == 12 and kinds[:4] == ["below_pivot"] * 4 and kinds[-4:] == ["extended"] * 4, kinds
+print("  ✓ 12 кандидата → Watchlist 12 (до 31.10 — 10): четирите buy-stop първи, extended най-отзад")
 print()
 
 print("── screener приоритет и dashboard (СИНТЕТИЧНО за подредбата, РЕАЛНИ за картите) ──")

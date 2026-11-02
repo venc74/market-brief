@@ -385,17 +385,23 @@ def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план
     в книгата Action (те са на радара със своята причина). Останалото — по един ред {ticker, sector, price, pct_from_pivot, reason, rs_rating, days, …} с причината от кода
-    (radar_reason); без AI текст и без отделни карти.
+    (radar_reason); без AI текст и без отделни карти. 31.10.2026: картите „Чака пробив“ са най-много config.CANSLIM_WAITING_MAX (в реда на Watchlist — най-близките до pivot);
+    над тавана — ред на радара с нивото и срока (не изчезват).
     """
     waiting, radar = [], []
     for c in watchlist or []:
         setup, ai = c.get("setup") or {}, c.get("ai") or {}
+        over = None
         if setup.get("kind") == "below_pivot" and setup.get("buy_stop") and not setup.get("triggered") and ai.get("watchlist_reason_type") != "existing_position":
-            waiting.append(c)
-            continue
+            if len(waiting) < config.CANSLIM_WAITING_MAX:
+                waiting.append(c)
+                continue
+            vt = setup.get("valid_through")
+            over = (f"под pivot — buy-stop ${setup['buy_stop']:.2f}" + (f" до {_dm(vt)}" if vt else "")
+                    + f" (извън първите {config.CANSLIM_WAITING_MAX} карти „Чака пробив“)")
         ew = c.get("earnings_warning") or {}
         radar.append({"ticker": c.get("ticker"), "sector": c.get("sector"), "price": c.get("price"), "pct_from_pivot": c.get("pct_from_pivot"),
-                      "reason": radar_reason(c), "rs_rating": c.get("rs_rating"), "days": c.get("radar_days"), "kind": setup.get("kind"),
+                      "reason": over or radar_reason(c), "rs_rating": c.get("rs_rating"), "days": c.get("radar_days"), "kind": setup.get("kind"),
                       "markers": c.get("markers") or [], "spinoff": c.get("spinoff_warning"), "merger": c.get("merger_target"),
                       "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})
     return waiting, radar

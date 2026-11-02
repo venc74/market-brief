@@ -15,6 +15,10 @@ EARNINGS_BLACKOUT_DAYS = 5        # без препоръки 5 работни �
 VIX_DEFENSIVE_THRESHOLD = 30.0    # над това → Defensive + sizing × 0.5
 DEFENSIVE_SIZING_FACTOR = 0.5
 MAX_PER_SECTOR = 2                # макс 2 акции от един сектор
+# 31.10.2026 (разходката, т. 9–10, решение): Watchlist е без таван — „На радара“ (сгъната таблица) показва всички кандидати, без тихо изпадане (до 31.10: 10 карти;
+# „извън 10-те карти“ в 10 реда на 7 брифа от 12.10, 9 от тях твърде разтегнати). Таванът е само за пълните карти „Чака пробив“ — под pivot с buy-stop; над него
+# най-далечните от pivot стават редове в „На радара“ със своето ниво. Измерено (20 брифа с кодов сетъп, 05–30.10): 0–3 карти на ден — таванът не би се задействал.
+CANSLIM_WAITING_MAX = int(os.getenv("CANSLIM_WAITING_MAX", 5))
 MIN_PRICE = 10.0                  # без акции под $10
 MIN_MARKET_CAP = 500_000_000      # без mcap под $500M
 # FIX 2026-09-12 (findings log 04-11.09, т.2): "regime_gate" watchlist
@@ -30,6 +34,10 @@ MIN_MARKET_CAP = 500_000_000      # без mcap под $500M
 # кратък pivot/price нивата, изчислени спрямо конкретна историческа база,
 # да не остареят прекалено. Tunable.
 WATCHLIST_STALENESS_DAYS = int(os.getenv("WATCHLIST_STALENESS_DAYS", 10))
+# 31.10.2026 (разходката, т. 9–10, решение): без отделно изтичане на regime_gate — кодът преценява всеки кандидат всеки ден наново, а колоната „Дни“ в „На радара“
+# казва колко дълго стои там. Кодът на изтичането (src/watchlist_expiry.py) остава, изключен; от 30.10 класът е на кода и regime_gate и без това не се дава
+# (потвърден пробив, спрян от режима, е regime_block). REGIME_GATE_EXPIRY=1 връща старото поведение.
+REGIME_GATE_EXPIRY = os.getenv("REGIME_GATE_EXPIRY", "0") == "1"
 # FIX 2026-08-02 (timeout guard): максимално чакане на извикващия код за
 # yf.Ticker(sym).info fetch, през net_utils.fetch_with_timeout() (ai_brief.py,
 # magic_formula.py, screener.py). yfinance вече слага собствен default

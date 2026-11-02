@@ -352,8 +352,8 @@ def screen_priority(row: dict) -> tuple:
     return (_SCREEN_GROUP[kind], abs(row.get("pct_from_pivot") or 0.0))
 
 
-# Watchlist картите са най-много 10: потвърден пробив, спрян от лимит/режим/earnings,
-# е по-силен от buy-stop кандидат, а той — от "над pivot без обем"; extended най-накрая.
+# Подредбата на Watchlist: потвърден пробив, спрян от лимит/режим/earnings, е по-силен от buy-stop кандидат, а той — от "над pivot без обем"; extended най-накрая.
+# 31.10.2026 (т. 9–10): без таван от 10 — подредбата решава реда в „Чака пробив“ / „На радара“, не кой изпада.
 _WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3, "too_wide": 3,
                 "no_data": 4, "deal": 4}
 

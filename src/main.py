@@ -417,11 +417,11 @@ def apply_hard_rules(candidates: list[dict], sizing_factor: float,
                 c["levels"] = lv
         watchlist.append(c)
 
-    # Watchlist е най-много 10 карти: потвърден пробив, спрян от лимит/режим/earnings,
-    # първи; после buy-stop кандидатите (най-близките до pivot), после "над pivot без
-    # обем", extended най-накрая. Стабилна сортировка — вътре в групата остава AI редът.
+    # Подредбата: потвърден пробив, спрян от лимит/режим/earnings, първи; после buy-stop кандидатите (най-близките до pivot), после "над pivot без
+    # обем", extended / твърде разтегнато най-накрая. Стабилна сортировка — вътре в групата остава редът на скрийнъра. 31.10.2026 (т. 9–10): без таван
+    # (до 31.10 — първите 10); „На радара“ показва всички, таванът на пълните карти „Чака пробив“ е в config.CANSLIM_WAITING_MAX (render.split_canslim).
     watchlist.sort(key=setup_rules.watchlist_sort_key)
-    return action, watchlist[:10]
+    return action, watchlist
 
 
 def _annotate_screener_exits(buystop_summary: dict, present: set) -> None:
@@ -704,7 +704,8 @@ def run() -> dict:
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
     # чист AI prose, датата "измисляна" наново всеки ден).
     watchlist_before_expiry = list(watchlist)     # В2: buy-stop книгата се захранва ПРЕДИ изтичането (иначе изтичането решава кои кандидати се измерват)
-    watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
+    if config.REGIME_GATE_EXPIRY:                 # 31.10.2026 (т. 9–10): изключено — без отделно изтичане; „Дни“ в „На радара“ казва колко дълго стои
+        watchlist = watchlist_expiry.apply_regime_gate_expiry(watchlist, thermo["regime"], today)
     # пакет 4б т.д: отчет в следващите ~20 сесии → предупреждение върху картата с датата и очакваното движение от опциите (само информация)
     def _earnings_warnings():
         n_warn = earnings_move.annotate(action + watchlist)

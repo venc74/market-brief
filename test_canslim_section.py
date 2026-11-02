@@ -5,6 +5,8 @@
     брифа с кодов сетъп (05–30.10): AI е свалил потвърден пробив веднъж — ROKU 23.10 (цел на придобиване; от 26.10 кодът я прави "deal"); вдигане не е възможно (кодовият gate).
   • Подредба: „Купува се днес“ (пълни карти с плана; празно → „Днес няма потвърден пробив.“) → „Чака пробив“ (под pivot с buy-stop ниво и срок — пълни карти) → „На радара (N)“
     (сгъната таблица: тикър, сектор, цена, % спрямо pivot, причината с числото, RS рейтинг, от колко брифа е в раздела) → „Излязоха от вчера“; книгите — сгънати, под раздела.
+  • 31.10.2026 (решения): Watchlist без таван (до 31.10 — 10); таван само на картите „Чака пробив“ (config.CANSLIM_WAITING_MAX = 5 — над него ред на радара);
+    без отделно изтичане на regime_gate (config.REGIME_GATE_EXPIRY = 0 — „Дни“ казва колко дълго стои).
 
 РЕАЛНО: tests/fixtures/brief_2026-10-14.json, brief_2026-10-15.json, brief_2026-10-16.json (16.10: Action EXPD, ZBRA с buy-stop, 8 too_wide), brief_2026-10-19.json
 (EXPD — запис в Action книгата), brief_2026-10-05.json (EXPD под pivot).
@@ -108,4 +110,22 @@ with q():
 order = [m.index(x) for x in ("CANSLIM · купува се днес · 1", "EXPD", "Чака пробив · 1: ZBRA Buy-stop $390.80", "На радара (8): HUM — разтегната · стоп 13.9%, отчет 06.11", "Излязоха от")]
 assert order == sorted(order)
 print("  ✓ „CANSLIM · купува се днес · 1“ → „Чака пробив · 1: ZBRA Buy-stop $390.80 …“ → „На радара (8): HUM — разтегната · стоп 13.9% …“ → „Излязоха от …“")
+print()
+print("── 6. 31.10.2026 (решения): без таван на Watchlist; таван само на картите „Чака пробив“ (config); без изтичане на regime_gate ──")
+many = []
+for i in range(14):                                                                                              # СИНТЕТИЧНО: 7 под pivot + 7 твърде разтегнати
+    c = copy.deepcopy(B16["watchlist"][0] if i % 2 == 0 else B16["watchlist"][1])
+    c["ticker"] = f"T{i:02d}"; c["pct_from_pivot"] = -1.0 - i; c.pop("radar_days", None)
+    many.append(c)
+with q():
+    _, wl = brief_main.apply_hard_rules(many, 1.0, "Offensive")
+assert len(wl) == 14                                                                                             # до 31.10 — първите 10
+assert config.CANSLIM_WAITING_MAX == 5
+waiting, radar = render.split_canslim(wl)
+assert len(waiting) == 5 and len(radar) == 9 and [c["ticker"] for c in waiting] == ["T00", "T02", "T04", "T06", "T08"]
+over = [r for r in radar if r["kind"] == "below_pivot"]
+assert [r["ticker"] for r in over] == ["T10", "T12"] and over[0]["reason"].startswith("под pivot — buy-stop $") and "(извън първите 5 карти „Чака пробив“)" in over[0]["reason"]
+assert "return action, watchlist\n" in body and "watchlist[:10]" not in body
+assert config.REGIME_GATE_EXPIRY is False and "    if config.REGIME_GATE_EXPIRY:" in src
+print("  ✓ 14 кандидата → Watchlist 14; „Чака пробив“ — 5 карти (най-близките до pivot), другите 2 под pivot — редове на радара с нивото; изтичането на regime_gate е изключено")
 print("\n✅ test_canslim_section: всичко мина")
