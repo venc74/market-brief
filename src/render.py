@@ -350,10 +350,11 @@ def news_window_hours(nw: dict | None, key: str = "hours", default: int = 24) ->
 
 def news_window_note(nw: dict | None) -> str | None:
     """
-    02.11.2026 (поправки след брифа, т. 4): бележката под новините — откъде започва прозорецът (предишният бриф) и докъде назад стига всеки източник днес (най-старото
-    заглавие в пула). Източник, чието най-старо заглавие е след началото с над 10% от прозореца (72 ч → 7.2 ч; 24 ч → 2.4 ч), „не стига до началото“ (FT държи ~12 заглавия
-    ≈ 13 ч; CNBC — 30; Google News — по 100 на заявка, денят му започва ≈ 07:00 UTC).
-    Без прозорец (стар бриф) → None. Чиста функция.
+    02.11.2026 (поправки след брифа, т. 4): бележката под новините. Всички източници стигат до началото на прозореца → само „Прозорец: 72 ч (от предишния бриф)“; иначе —
+    и началото, и САМО източниците, които не стигат до него, с докъде стигат (най-старото заглавие в пула): по-късно от началото с над config.NEWS_REACH_TOLERANCE_MIN минути,
+    или без нито едно заглавие в прозореца (източник от config.NEWS_RSS_FEEDS, който липсва в обхвата). До прегледа на 02.11 прагът беше 10% от прозореца (72 ч → 7.2 ч) и
+    Reuters (най-старото — пт 08:46 при начало 06:30: денят на Google започва в полунощ тихоокеанско време — 07:00 UTC до 01.11, 08:00 UTC след това — и от заявката за деня
+    влизат първите 50 от 100 заглавия) не беше отбелязан. Без прозорец (стар бриф) → None. Чиста функция.
     """
     nw = nw or {}
     start = _utc_short(nw.get("since"))
@@ -363,16 +364,20 @@ def news_window_note(nw: dict | None) -> str | None:
         since = dt.datetime.fromisoformat(str(nw["since"]).replace("Z", "+00:00"))
     except Exception:
         return None
-    parts = []
-    for name, v in (nw.get("sources") or {}).items():
+    src = nw.get("sources") or {}
+    tol = dt.timedelta(minutes=config.NEWS_REACH_TOLERANCE_MIN)
+    short = []
+    for name, v in src.items():
         old = _utc_short(v.get("oldest"))
         if not old:
-            parts.append(f"{name} — {v.get('count', 0)} заглавия без дата")
-            continue
-        late = dt.datetime.fromisoformat(str(v["oldest"]).replace("Z", "+00:00")) - since > dt.timedelta(hours=0.1 * float(nw.get("hours") or 24))
-        parts.append(f"{name} — до {old}" + (" (не стига до началото)" if late else ""))
-    head = f"Прозорецът на новините: от {start} UTC (предишният бриф) — {news_window_hours(nw)} ч."
-    return head + (" Докъде назад стига всеки източник днес: " + " · ".join(parts) + "." if parts else "")
+            short.append(f"{name} — заглавията са без дата")
+        elif dt.datetime.fromisoformat(str(v["oldest"]).replace("Z", "+00:00")) - since > tol:
+            short.append(f"{name} — до {old}")
+    short += [f"{name} — без заглавия в прозореца" for name in config.NEWS_RSS_FEEDS if name not in src]
+    head = f"Прозорец: {news_window_hours(nw)} ч (от предишния бриф"
+    if not short:
+        return head + ")"
+    return f"{head}, {start} UTC). Не стигат до началото му: " + " · ".join(short) + "."
 
 
 def radar_reason(c: dict) -> str:

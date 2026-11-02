@@ -3,8 +3,8 @@
 в понеделник 02.11 макро разказът и наблюдаваните не видяха петъка (Intel, Amazon). Решение (02.11): от ПРЕДИШНИЯ бриф — 07:30 Берлин в деня на последната NYSE сесия
 (sessions.news_window_start): понеделник 72 ч, след празник 48 ч, иначе 24 ч; крипто — не по-малко от 30 ч.
 Google News (Reuters, AP) връща най-много 100 заглавия: при Reuters „when:3d“ дава СЪЩИТЕ 100 като „when:24h“ (≈ 22 ч назад) — не стига до петъка; при AP — извадка от трите дни.
-Затова при прозорец над 25 ч — по една заявка „after:Д before:Д+1“ за всеки по-ранен ден (news_aggregator.google_day_urls). Бележката под новините казва откъде започва
-прозорецът и докъде назад стига всеки източник днес (FT държи ~12 заглавия).
+Затова при прозорец над 25 ч — по една заявка „after:Д before:Д+1“ за всеки по-ранен ден (news_aggregator.google_day_urls). Бележката под новините казва колко е
+прозорецът и изброява само източниците, които не стигат до началото му (прегледът на 02.11; FT държи ~12 заглавия).
 
 РЕАЛНО: tests/fixtures/news_window_*_2026-11-02.xml.gz — фийдовете, свалени на 02.11.2026 ~15:25 UTC (бележката — news_window_2026-11-02.json): Reuters „when:24h“ и „when:3d“,
 AP „when:3d“, заявките по дни 30.10 / 31.10 / 01.11 за Reuters и AP, CNBC и FT; tests/fixtures/brief_2026-10-19.json — рамката на страницата; календарът — config.NYSE_HOLIDAYS.
@@ -99,9 +99,13 @@ assert set(src) == {"Reuters Business", "CNBC", "Financial Times", "AP Business"
 assert src["Financial Times"]["oldest"] > "2026-11-02"                                                                      # FT държи ~12 заглавия — не стига до началото
 assert "[news] прозорец: от 30.10 06:30 UTC (72.12 ч), заявки по дни: 6; обхват — Reuters Business" in log.getvalue()
 note = render.news_window_note({**w, "hours": 72.13})
-assert note.startswith("Прозорецът на новините: от пт 30.10 06:30 UTC (предишният бриф) — 72 ч. Докъде назад стига всеки източник днес: Reuters Business — до пт 30.10 ")
-assert re.search(r"Financial Times — до пн 02\.11 \d\d:\d\d \(не стига до началото\)", note) and "CNBC — до пт 30.10 20:20 (не стига до началото)" in note     # празнина > 10% от 72 ч
-assert "Reuters Business — до пт 30.10 08:46 ·" in note and note.endswith("AP Business — до пт 30.10 07:06.")                                        # 2.3 ч и 0.6 ч — покриват
+# 02.11.2026 (прегледът): само източниците, които НЕ стигат до началото (над config.NEWS_REACH_TOLERANCE_MIN = 15 мин); всички стигат → само „Прозорец: 72 ч (от предишния бриф)“
+assert note == ("Прозорец: 72 ч (от предишния бриф, пт 30.10 06:30 UTC). Не стигат до началото му: Reuters Business — до пт 30.10 08:46 · CNBC — до пт 30.10 20:20 · "
+                f"Financial Times — до {render._utc_short(src['Financial Times']['oldest'])} · AP Business — до пт 30.10 07:06."), note    # Reuters 2 ч 16 мин, AP 36 мин след началото
+reach = {k: {**v, "oldest": "2026-10-30T06:40Z"} for k, v in src.items()}                                                   # СИНТЕТИЧНО: всички стигат (10 мин след началото)
+assert render.news_window_note({**w, "hours": 72.13, "sources": reach}) == "Прозорец: 72 ч (от предишния бриф)"
+reach.pop("Financial Times")                                                                                                 # СИНТЕТИЧНО: FT без нито едно заглавие
+assert render.news_window_note({**w, "hours": 72.13, "sources": reach}).endswith("Не стигат до началото му: Financial Times — без заглавия в прозореца.")
 print(f"  ✓ {len(raw)} заглавия от петък 06:30 нататък, 6 заявки по дни; обхват: " + " · ".join(f"{k} {v['count']} (до {v['oldest']})" for k, v in src.items()))
 print(f"  ✓ бележката: „{note[:150]}…“")
 
@@ -164,8 +168,8 @@ with q():
     old = txt(render.render_dashboard(copy.deepcopy(b), publish=False))
     b["news_window"] = {**w, "hours": 72.13, "crypto_hours": 72.13}
     new = txt(render.render_dashboard(copy.deepcopy(b), publish=False))
-assert "Значими новини · последните 24ч" in old and "Крипто · последните 24ч" in old and "Прозорецът на новините" not in old              # стар бриф — както беше
-assert "Значими новини · последните 72ч" in new and "Крипто · последните 72ч" in new and "Прозорецът на новините: от пт 30.10 06:30 UTC (предишният бриф) — 72 ч." in new
+assert "Значими новини · последните 24ч" in old and "Крипто · последните 24ч" in old and "Прозорец:" not in old              # стар бриф — както беше
+assert "Значими новини · последните 72ч" in new and "Крипто · последните 72ч" in new and "Прозорец: 72 ч (от предишния бриф, пт 30.10 06:30 UTC). Не стигат до началото му: Reuters Business — до пт 30.10 08:46" in new
 b["news_window"] = {**w, "since": "2026-11-02T06:30:00+00:00", "hours": 24.13, "crypto_hours": 30}
 with q():
     tue = txt(render.render_dashboard(copy.deepcopy(b), publish=False))
