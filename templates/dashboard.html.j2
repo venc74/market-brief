@@ -751,9 +751,10 @@
   {% if sector_board.summary %}<div class="prose" style="margin-bottom:12px">{{ sector_board.summary }}</div>{% endif %}
   <div class="wt sb">
     <div class="wt-row sb-row wt-head"><span>ETF · сектор</span><span>RS спрямо SPY 4 / 12 седм.</span><span>Място</span><span>6м връх</span><span>Лидери</span></div>
-    {# 30.10.2026: лидерите — таблица под реда на сектора (като карето „Контекст“), разгъва се с клик; отворени по подразбиране — само секторите с „води пазара“ #}
+    {# 30.10.2026: лидерите — таблица под реда на сектора (като карето „Контекст“), разгъва се с клик. 02.11.2026 (поправки след брифа, т. 3): всички затворени по подразбиране —
+       един ред на сектор (до 02.11 „води пазара“ беше отворен) #}
     {% for r in sector_board.sectors %}
-    <details class="wt-item"{% if r.word == "води пазара" %} open{% endif %}>
+    <details class="wt-item">
       <summary class="wt-row sb-row">
         <span class="wt-t">{{ r.etf }}<span class="wt-name">{{ r.sector }}</span></span>
         <span data-l="RS 4 / 12 седм."><span class="wt-num">{{ rs_num(r.rs_4w) }} / {{ rs_num(r.rs_12w) }}</span>{% if r.word %}<span class="wt-name">{{ r.word }}</span>{% endif %}</span>
