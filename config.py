@@ -601,7 +601,13 @@ NEWS_RSS_FEEDS = {
 #   limit=50, таван 100, редуване     → 100 загл., 4 източника, целевото МИНАВА ✓
 # Цена: ~3100 → ~5600 входни токена за едно извикване на дневния news филтър.
 NEWS_PER_SOURCE_LIMIT = int(os.getenv("NEWS_PER_SOURCE_LIMIT", 50))
-NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))
+NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))     # 02.11.2026: на 24 часа от прозореца — в понеделник (72 ч) 300, след празник 200
+# 02.11.2026 (поправки след брифа, т. 4): прозорците на новините (главните, наблюдаваните, крипто) започват от ПРЕДИШНИЯ бриф — часът на брифа в деня на последната
+# NYSE сесия (sessions.news_window_start): понеделник 72 ч, след празник 48 ч, иначе 24 ч; крипто — не по-малко от CRYPTO_NEWS_HOURS. До 02.11 — фиксирани 24 / 24 / 30 ч.
+BRIEF_TIME_BERLIN = os.getenv("BRIEF_TIME_BERLIN", "07:30")         # часът на брифа (cron-job.org, Europe/Berlin) — началото на прозореца е този час в деня на последната сесия
+# Google News (Reuters, AP) връща най-много 100 заглавия — при Reuters ≈ 22 ч; „when:3d“ / „when:72h“ дават СЪЩИТЕ 100 (проверено 02.11.2026). При прозорец над
+# NEWS_DAY_QUERY_MIN_HOURS — по една заявка „after:Д before:Д+1“ за всеки по-ранен ден (по 100 заглавия; денят на Google е по тихоокеанско време, ~07:00 UTC).
+NEWS_DAY_QUERY_MIN_HOURS = float(os.getenv("NEWS_DAY_QUERY_MIN_HOURS", 25))
 # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина. Заглавията за същото събитие се сливат в един ред (news_aggregator.pick_verbatim, "also" от модела);
 # основното е от най-надеждния източник по този ред (агенциите първо — първоизточник; после FT, CNBC; при крипто CoinDesk пред Cointelegraph), останалите — „също: …“.
 # Измерено на ръка в последните 24 брифа (28.09–29.10, 191 новини): 8 сигурни двойки за едно събитие в 7 дни (29.10 ×2: Alphabet/Google, Fed; 23.10 tech разпродажбата;
@@ -610,7 +616,7 @@ NEWS_SOURCE_PRIORITY = ["Reuters Business", "AP Business", "Financial Times", "C
 # ── Крипто секция (22.10.2026, етап 4 — решения от 21–22.10) — виж src/crypto_news.py ──
 ENABLE_CRYPTO_SECTION = os.getenv("ENABLE_CRYPTO_SECTION", "1") == "1"
 CRYPTO_RSS_URL = os.getenv("CRYPTO_RSS_URL", "https://cointelegraph.com/rss")      # „?format=rss“ връща HTML страницата; фийдът държи 30 заглавия ≈ 25 часа
-CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))
+CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))     # 02.11.2026: минимумът — прозорецът е от предишния бриф (sessions.news_window_hours), не по-малко от 30 ч
 # 29.10.2026 (разходката, т. 4б): втори източник — RSS на CoinDesk (https://www.coindesk.com/arc/outboundfeeds/rss/ → 308 към адреса без наклонената черта, requests го следва).
 # Проверено 29.10 в 16:16 UTC: достъпен, 25 заглавия за 12.8 часа (29.10 03:21 → 16:11 UTC), без резюме, с директни линкове; ?size= не дава повече, секционните фийдове са 404.
 # 25 заглавия може да не покриват 30-те часа преди сутрешния run — покритието се пише в brief["crypto"]["pool_sources"] (брой и най-старото заглавие). Google News
@@ -640,7 +646,7 @@ OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 90))                 
 # Ръчно куриран, per-ticker дневен монитор. Списъкът е в data/watch_list.json
 # и се редактира НА РЪКА — сайтът е статичен, няма backend за интерактивен бутон.
 ENABLE_WATCH_MONITOR = os.getenv("ENABLE_WATCH_MONITOR", "1") == "1"
-WATCH_NEWS_WINDOW_HOURS = int(os.getenv("WATCH_NEWS_WINDOW_HOURS", 24))
+WATCH_NEWS_WINDOW_HOURS = int(os.getenv("WATCH_NEWS_WINDOW_HOURS", 24))     # 02.11.2026: по подразбиране (тестове); в run-а — от предишния бриф (main)
 WATCH_MAX_NEWS_PER_TICKER = int(os.getenv("WATCH_MAX_NEWS_PER_TICKER", 6))
 # 29.10.2026 (разходката, т. 6): новините — от RSS на Yahoo Finance по тикър (yfinance .news връща нищо: 0 и за AAPL на 29.10; в историята BLSH е с новини само 22–23.09).
 # Фийдът по тикър носи и чужди статии (за "AI" на 29.10: SoundHound, BigBear.ai, Palantir, „3 unpopular stocks“) — новина минава само ако споменава компанията

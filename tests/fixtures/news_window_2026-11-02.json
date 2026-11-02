@@ -1,0 +1,60 @@
+{
+ "_note": "РЕАЛНО: фийдовете на главните новини, свалени на 02.11.2026 около 15:25 UTC (за прозореца на брифа от 02.11 — от предишния бриф, петък 30.10 06:30 UTC). Google News: „when:24h“ (както до 02.11), „when:3d“ и заявките по дни „after:Д before:Д+1“ (news_aggregator.google_day_urls) за Reuters и AP; CNBC и FT — фийдовете както са. gzip; SHA-256 на разархивирания текст — по файл. Фийдовете са от следобеда на 02.11, не от 06:37: заглавията след 06:37 тестът реже.",
+ "files": {
+  "news_window_reuters_when24h_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=when:24h+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 130375,
+   "sha256": "8d93daebfef57b3430903c6e0b4a3d63ec2ddafda9d13d81c15a0ca51ef1918b"
+  },
+  "news_window_reuters_when3d_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=when:3d+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 130339,
+   "sha256": "7000c0163c247b90d5fc113b5dfada8b3b22c465a1c27c446c4d828516a805d5"
+  },
+  "news_window_ap_when3d_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=when:3d+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 123988,
+   "sha256": "4531b5191b0ff91f00e192a10f63f04822213c2494789e9ed2779ff564573d02"
+  },
+  "news_window_reuters_day2026-10-30_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-10-30+before:2026-10-31+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 131708,
+   "sha256": "b0ba7c96e512ecdbda5d2be48b5644011b852823b021b7e5eb07fdb8835554cc"
+  },
+  "news_window_reuters_day2026-10-31_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-10-31+before:2026-11-01+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 122762,
+   "sha256": "2133e1858b71426fab8e8c67ebd490c2bd52f22d3edbd717cbd1f901d6096e13"
+  },
+  "news_window_reuters_day2026-11-01_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-11-01+before:2026-11-02+site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 130356,
+   "sha256": "d1c8646aca0923c47cca3b4887001a8789496760b219d39a6376ce7034d30a82"
+  },
+  "news_window_ap_day2026-10-30_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-10-30+before:2026-10-31+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 123651,
+   "sha256": "b8af3ed726ac52251a31dc40d66e47a8f2575fa04b35b96a1b6d592f3f1b2160"
+  },
+  "news_window_ap_day2026-10-31_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-10-31+before:2026-11-01+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 119630,
+   "sha256": "fa8c6330005cd87927e1966afa8b3b5dfd8d0d94edfd4352c0971121bbbdd4ca"
+  },
+  "news_window_ap_day2026-11-01_2026-11-02.xml.gz": {
+   "url": "https://news.google.com/rss/search?q=after:2026-11-01+before:2026-11-02+site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+   "bytes": 114810,
+   "sha256": "a15287778c72e6b00686ce62875192de57c35b806575b99a2e96d9376748577d"
+  },
+  "news_window_cnbc_2026-11-02.xml.gz": {
+   "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
+   "bytes": 20168,
+   "sha256": "7ec02eadd7e62ded96d9f68633ad465ecf886e8dfdc8ed18c3704e03b298467d"
+  },
+  "news_window_ft_2026-11-02.xml.gz": {
+   "url": "https://www.ft.com/rss/home",
+   "bytes": 8516,
+   "sha256": "056a1f77b62a125a4aa0abb1565acf19c0bf3690d6f052871dfdeac6bb64de29"
+  }
+ }
+}

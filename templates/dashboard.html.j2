@@ -621,7 +621,7 @@
 {% macro news_also(n) %}{% if n.also %} <span class="news-why" style="font-size:12px" title="{% for a in n.also %}{{ a.source }}{{ ', ' if not loop.last else '' }}{% endfor %}">· +{{ n.also|length }} {{ 'източник' if n.also|length == 1 else 'източника' }}</span>{% endif %}{% endmacro %}
 {% if news %}
 <section>
-  <h2>Значими новини · последните 24ч</h2>
+  <h2>Значими новини · последните {{ news_h }}ч</h2>
   <div class="news-list">
     {% for n in news %}
     <div class="news-item">
@@ -632,13 +632,15 @@
     </div>
     {% endfor %}
   </div>
+  {# 02.11.2026 (поправки след брифа, т. 4): откъде започва прозорецът (предишният бриф) и докъде назад стига всеки източник днес #}
+  {% if news_window_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">{{ news_window_note }}</div>{% endif %}
 </section>
 {% endif %}
 
 {# 22.10.2026 (етап 4): крипто секцията — Cointelegraph (от 29.10 и CoinDesk) през AI подбор по индекс; заглавието и източникът — дословни (цените и COT за Bitcoin под новините — до 02.11) #}
 {% if crypto %}
 <section>
-  <h2>Крипто · последните 24ч</h2>
+  <h2>Крипто · последните {{ crypto_h }}ч</h2>
   {% if crypto.get("items") %}
   <div class="news-list">
     {% for n in crypto["items"] %}
@@ -670,7 +672,7 @@
 {# 08.10: секцията остава и при празен списък (data/watch_list.json) — иначе изчезва мълчаливо и не личи дали е проверена #}
 {% if watch or watch_enabled %}
 <section>
-  <h2>🔎 Наблюдавани тикъри · последните 24ч</h2>
+  <h2>🔎 Наблюдавани тикъри · последните {{ news_h }}ч</h2>
   <div class="wm-note">Ръчно поддържан списък (<code>data/watch_list.json</code>) —
     независим от скрийнъра, GLB и COT секциите.</div>
   {% if not watch %}

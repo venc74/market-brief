@@ -1,7 +1,7 @@
 """
 news_aggregator.py — агрегатор за макро и геополитически новини.
 
-Събира заглавия от последните 24 часа от:
+Събира заглавия от последните 24 часа (от 02.11.2026 — от предишния бриф, sessions.news_window_start) от:
   • RSS: Reuters (business + world), Financial Times, CNBC
   • Публични X/Twitter акаунти през nitter mirror: @unusual_whales, @zerohedge, @elerianm
 
@@ -19,6 +19,7 @@ news_aggregator.py — агрегатор за макро и геополити�
 """
 from __future__ import annotations
 import datetime as dt
+import calendar
 import itertools
 import json
 import re
@@ -39,13 +40,17 @@ _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
 _CACHE = config.DATA_DIR / "news_cache.json"
 # FIX 2026-09-18: (hours, заглавия) от последния gather_raw В ТОЗИ ПРОЦЕС —
 # повече от едно извикване в един run, един fetch (30.10.2026: raw_pool за тезите отпадна; остава significant_news).
-_RAW_MEMO: tuple[int, list[dict]] | None = None
+_RAW_MEMO: tuple | None = None
 
 
 # ──────────────────────────────────────────────────────────────────────────
 # RSS
 # ──────────────────────────────────────────────────────────────────────────
-def _fetch_rss(url: str, source: str, hours: int, limit: int = 15) -> list[dict]:
+def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: float | None = None) -> list[dict]:
+    """
+    Заглавията на фийда в прозореца — последните `hours` часа или (02.11.2026) от since_ts (UTC epoch — началото на прозореца, sessions.news_window_start).
+    02.11.2026: времето на заглавието — calendar.timegm (feedparser дава UTC); до 02.11 time.mktime го четеше като местно време — на GitHub runner-а (UTC) същото.
+    """
     if feedparser is None:
         return []
     out = []
@@ -53,12 +58,12 @@ def _fetch_rss(url: str, source: str, hours: int, limit: int = 15) -> list[dict]
         # сваляме сами с requests (по-устойчиво от feedparser.parse(url) зад UA/таймаут)
         raw = requests.get(url, timeout=15, headers=_UA).content
         feed = feedparser.parse(raw)
-        cutoff = time.time() - hours * 3600
+        cutoff = since_ts if since_ts is not None else time.time() - hours * 3600
         for e in feed.entries[:limit * 2]:
             ts = None
             for key in ("published_parsed", "updated_parsed"):
                 if e.get(key):
-                    ts = time.mktime(e[key]); break
+                    ts = calendar.timegm(e[key]); break
             if ts is not None and ts < cutoff:
                 continue  # по-стара от прозореца
             title = (e.get("title") or "").strip()
@@ -159,7 +164,43 @@ def _interleave(per_source: list[list[dict]]) -> list[dict]:
     return [x for tup in itertools.zip_longest(*per_source) for x in tup if x is not None]
 
 
-def gather_raw(hours: int = 24) -> list[dict]:
+_WHEN = re.compile(r"when:\d+[hd]\+?")
+
+
+def google_day_urls(url: str, since: dt.datetime, now: dt.datetime) -> list[tuple[str, str]]:
+    """
+    02.11.2026 (поправки след брифа, т. 4): Google News (Reuters, AP) връща най-много 100 заглавия — при Reuters ≈ 22 ч; „when:3d“ / „when:72h“ дават СЪЩИТЕ 100 като
+    „when:24h“ (проверено 02.11.2026: Reuters 100 = 83 от 02.11 + 17 от 01.11 и при трите). При прозорец над config.NEWS_DAY_QUERY_MIN_HOURS — по една заявка
+    „after:Д before:Д+1“ (100 заглавия за деня; денят на Google е по тихоокеанско време — границата ≈ 07:00 UTC) за всеки ден от началото на прозореца до деня преди
+    последните 24 ч; заглавията извън прозореца отпадат в _fetch_rss. Адрес без „when:“ (не е търсене в Google News) или по-къс прозорец → []. Чиста функция.
+    """
+    if "news.google.com/rss/search" not in url or not _WHEN.search(url) or (now - since).total_seconds() / 3600 <= config.NEWS_DAY_QUERY_MIN_HOURS:
+        return []
+    out, d, last = [], since.date(), (now - dt.timedelta(hours=24)).date()
+    while d <= last:
+        q = f"after:{d.isoformat()}+before:{(d + dt.timedelta(days=1)).isoformat()}+"
+        out.append((d.isoformat(), _WHEN.sub("", url).replace("search?q=", "search?q=" + q, 1)))
+        d += dt.timedelta(days=1)
+    return out
+
+
+def source_reach(items: list[dict]) -> dict:
+    """{източник: {"count", "oldest"}} — oldest е най-старото заглавие в пула (UTC ISO), за бележката „докъде стига всеки източник днес“. Чиста функция."""
+    out: dict = {}
+    for r in items:
+        s = out.setdefault(r.get("source") or "?", {"count": 0, "oldest": None})
+        s["count"] += 1
+        p = r.get("published")
+        if p and (s["oldest"] is None or p < s["oldest"]):
+            s["oldest"] = p
+    return out
+
+
+# 02.11.2026: прозорецът и обхватът на последното gather_raw — {since, hours, day_queries, sources: source_reach} (main → brief["news_window"])
+LAST_WINDOW: dict = {}
+
+
+def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict]:
     """
     FIX 2026-09-15: провалът се засича PER-SOURCE, не агрегатно.
 
@@ -180,17 +221,31 @@ def gather_raw(hours: int = 24) -> list[dict]:
     през raw_pool(). Без това вторият би платил втори пълен fetch на всички
     източници. Мемото живее само колкото процеса, точно като
     backtest._RESOLVED_THIS_RUN — нов run събира наново.
+
+    02.11.2026 (поправки след брифа, т. 4): since (UTC) — началото на прозореца (предишният бриф, sessions.news_window_start); без since — последните `hours` часа (както
+    до 02.11). При прозорец над config.NEWS_DAY_QUERY_MIN_HOURS — и заявките по дни за Google News (google_day_urls), всяка като отделен списък в редуването.
     """
     global _RAW_MEMO
-    if _RAW_MEMO is not None and _RAW_MEMO[0] == hours:
+    key = (hours, since.isoformat()) if since else hours                # без since — ключът е както до 02.11 (часовете)
+    if _RAW_MEMO is not None and _RAW_MEMO[0] == key:
         return _RAW_MEMO[1]
+    now = dt.datetime.now(dt.timezone.utc)
+    since_ts = since.timestamp() if since else None
     per_source: list[list[dict]] = []
     dead: list[str] = []
+    day_queries = 0
     for src, url in config.NEWS_RSS_FEEDS.items():
-        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT)
+        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
         if not got:
             dead.append(src)
         per_source.append(got)
+    for src, url in config.NEWS_RSS_FEEDS.items():                       # 02.11.2026: по-ранните дни на прозореца (Reuters / AP) — след основните, за да не ги изместват
+        for day, u in (google_day_urls(url, since, now) if since else []):
+            day_queries += 1
+            got = _fetch_rss(u, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
+            if not got:
+                print(f"[news] {src}: заявката за {day} не върна заглавия в прозореца")
+            per_source.append(got)
     # FIX 2026-09-16: редуване, не конкатенация — виж config.NEWS_PER_SOURCE_LIMIT
     items: list[dict] = _interleave(per_source)
     if dead:
@@ -214,7 +269,14 @@ def gather_raw(hours: int = 24) -> list[dict]:
         key = it["title"].lower()[:90]
         if key not in seen:
             seen.add(key); dedup.append(it)
-    _RAW_MEMO = (hours, dedup)
+    _RAW_MEMO = (key, dedup)
+    LAST_WINDOW.clear()
+    LAST_WINDOW.update({"since": since.isoformat() if since else (now - dt.timedelta(hours=hours)).isoformat(), "hours": round((now - since).total_seconds() / 3600, 2) if since else hours,
+                        "day_queries": day_queries, "sources": source_reach(dedup)})
+    if since:
+        print(f"[news] прозорец: от {since:%d.%m %H:%M} UTC ({LAST_WINDOW['hours']:g} ч), заявки по дни: {day_queries}; обхват — "
+              + " · ".join(f"{k} {v['count']} (до {v['oldest'][8:10]}.{v['oldest'][5:7]} {v['oldest'][11:16]})" if v.get("oldest") else f"{k} {v['count']}"
+                           for k, v in LAST_WINDOW["sources"].items()))
     return dedup
 
 
@@ -458,10 +520,12 @@ LAST_DIAG: dict = {}
 LAST_STATUS: dict = {}
 
 
-def significant_news(max_items: int = 8) -> list[dict]:
+def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> list[dict]:
     """
     Връща [{headline, source, why, headline_bg?}] — до max_items пазарно значими новини; headline е ДОСЛОВНО от източника (15.10.2026, pick_verbatim).
     Кешира за деня. Празен списък при провал (graceful degradation).
+    02.11.2026 (т. 4): since — началото на прозореца (main: sessions.news_window_start — предишният бриф); без него — последните 24 ч. Таванът на заглавията към филтъра —
+    config.NEWS_MAX_TO_FILTER на всеки 24 ч от прозореца (понеделник 300).
     """
     today = dt.date.today().isoformat()
     LAST_STATUS.clear()
@@ -471,18 +535,20 @@ def significant_news(max_items: int = 8) -> list[dict]:
             cached = json.loads(_CACHE.read_text())
             if cached.get("date") == today:
                 LAST_STATUS.update(ok=bool(cached.get("news")), reason="" if cached.get("news") else "кешът за деня е празен", count=len(cached.get("news") or []))
+                LAST_WINDOW.clear(); LAST_WINDOW.update(cached.get("window") or {})
                 return cached.get("news", [])
         except Exception:
             pass
 
-    raw = gather_raw(hours=24)
+    raw = gather_raw(hours=24, since=since)
     if not raw:
         print("[news] нула източници върнаха данни — пропускам секцията")
         LAST_STATUS.update(reason="нито един RSS източник не върна заглавия")
         return []
 
     # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
-    pool = raw[:config.NEWS_MAX_TO_FILTER]
+    days = max(1, round((dt.datetime.now(dt.timezone.utc) - since).total_seconds() / 86400)) if since else 1     # 02.11.2026: на 24 ч от прозореца
+    pool = raw[:config.NEWS_MAX_TO_FILTER * days]
     compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r["summary"]} for k, r in enumerate(pool)]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
@@ -524,7 +590,7 @@ def significant_news(max_items: int = 8) -> list[dict]:
 
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "news": news},
+        _CACHE.write_text(json.dumps({"date": today, "news": news, "window": dict(LAST_WINDOW)},
                                      ensure_ascii=False, indent=1, default=str))
     except Exception as ex:
         print(f"[news] cache write: {ex}")

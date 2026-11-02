@@ -30,7 +30,7 @@ print()
 
 print("── редът в main.py: новини → макро бриф ──")
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-i_news = main_src.index('news = steps.step("news", news_aggregator.significant_news, fallback=[]')     # 20.10.2026 (етап 3б): в обвивката на стъпките
+i_news = main_src.index('news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since), fallback=[]')     # 20.10.2026 (етап 3б): в обвивката; 02.11.2026: с прозореца
 i_macro = main_src.index("ai_brief.macro_and_sector_brief(")
 assert i_news < i_macro, "новините трябва да се подберат ПРЕДИ макро брифа"
 assert "macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto)" in main_src                 # 29.10.2026 (разходката, т. 5): и крипто секцията

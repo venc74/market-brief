@@ -26,6 +26,7 @@ from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import data_rhythm
 from src import crypto_news
+from src import sessions
 from src import options_record
 from src import ai_brief
 from src import unusual_options, splits_calendar, dataroma, news_aggregator
@@ -614,11 +615,16 @@ def run() -> dict:
     # FIX 2026-10-03 (пакет 2 т.4): значимите новини (RSS + nitter → Claude филтър) се подбират ПРЕДИ макро
     # брифа и му се подават с обяснението защо са значими — преди брифът се пишеше без тях, а NewsAPI
     # заглавията бяха празни във всичките 78 брифа. Graceful: провал на новините → празен списък.
-    news = steps.step("news", news_aggregator.significant_news, fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
+    # 02.11.2026 (поправки след брифа, т. 4): прозорците на новините — от предишния бриф (07:30 Берлин в деня на последната сесия): понеделник 72 ч, след празник 48 ч,
+    # иначе 24 ч; крипто — не по-малко от config.CRYPTO_NEWS_HOURS. До 02.11 — фиксирани 24 / 24 / 30 ч (в понеделник 02.11 разказът не видя петъка).
+    news_since = sessions.news_window_start()
+    news_hours, crypto_hours = sessions.news_window_hours(), sessions.news_window_hours(min_hours=config.CRYPTO_NEWS_HOURS)
+    print(f"[news] прозорец за новините: от {news_since:%d.%m %H:%M} UTC — {news_hours:g} ч (крипто {crypto_hours:g} ч)")
+    news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since), fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
                       consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
     # макро брифа — разказът за нощта я вижда; COT за Bitcoin (само при нов отчет на CFTC) се добавя по-долу, след COT модула (cot_btc).
-    crypto = steps.step("crypto", lambda: crypto_news.build(today), fallback={},
+    crypto = steps.step("crypto", lambda: crypto_news.build(today, hours=crypto_hours), fallback={},
                         enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
                         failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto)
@@ -961,7 +967,7 @@ def run() -> dict:
     # изричното "нищо" е гарантирано, не зависи от това дали моделът ще се
     # сети да го каже, и не се плащат токени за празен вход.
     def _watch():
-        rows = watch_monitor.collect()
+        rows = watch_monitor.collect(window_hours=news_hours)                # 02.11.2026: от предишния бриф
         # 29.10.2026 (разходката, т. 6): маркер, ако тикърът е и в наш скрийнър / книга (Action, Watchlist, QM, GLB, EP, отворените записи в книгите)
         watch_monitor.attach_markers(rows, {"Action": action, "Watchlist": watchlist, "QM": qm_cards, "GLB": glb_candidates, "EP": (qm_ep_out or {}).get("rows")},
                                      books=config.ENABLE_BACKTEST)
@@ -971,7 +977,7 @@ def run() -> dict:
                 "cot_markets": [c["market"] for c in cot_with_theses][:10],
                 "leading_sectors": [s["sector"] for s in leaders],
             }
-            active = ai_brief.watch_ticker_digest(active, market_context)
+            active = ai_brief.watch_ticker_digest(active, market_context, window_hours=news_hours)
         by_ticker = {r["ticker"]: r for r in active}
         return [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in rows]
     _wi = watch_monitor.LAST_INFO                                       # 02.11.2026: .info празно за над половината → "частично" (банерът — data_warnings)
@@ -1096,6 +1102,7 @@ def run() -> dict:
         "qm_diag": qm_diag,
         "qm_ep": qm_ep_out,
         "news": news,
+        "news_window": {**dict(news_aggregator.LAST_WINDOW), "since": news_since.isoformat(), "hours": news_hours, "crypto_hours": crypto_hours},   # 02.11.2026 (т. 4)
         "cot": cot_with_theses,
         # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
         "cot_summary": cot_summary,

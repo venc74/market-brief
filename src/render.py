@@ -328,6 +328,53 @@ def _dm(iso) -> str:
     return f"{iso[8:10]}.{iso[5:7]}" if len(iso) >= 10 and iso[4] == "-" else iso
 
 
+_WD = ["пн", "вт", "ср", "чт", "пт", "сб", "нд"]
+
+
+def _utc_short(iso: str | None) -> str | None:
+    """"2026-10-30T08:46Z" / "...+00:00" → "пт 30.10 08:46" (UTC). Лош вход → None."""
+    try:
+        t = dt.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+    except Exception:
+        return None
+    return f"{_WD[t.weekday()]} {t:%d.%m %H:%M}"
+
+
+def news_window_hours(nw: dict | None, key: str = "hours", default: int = 24) -> int:
+    """02.11.2026 (т. 4): часовете в заглавието на раздела („последните 72ч“) — закръглени; стар бриф без прозорец → default (24). Чиста функция."""
+    try:
+        return int(round(float((nw or {}).get(key))))
+    except Exception:
+        return default
+
+
+def news_window_note(nw: dict | None) -> str | None:
+    """
+    02.11.2026 (поправки след брифа, т. 4): бележката под новините — откъде започва прозорецът (предишният бриф) и докъде назад стига всеки източник днес (най-старото
+    заглавие в пула). Източник, чието най-старо заглавие е след началото с над 10% от прозореца (72 ч → 7.2 ч; 24 ч → 2.4 ч), „не стига до началото“ (FT държи ~12 заглавия
+    ≈ 13 ч; CNBC — 30; Google News — по 100 на заявка, денят му започва ≈ 07:00 UTC).
+    Без прозорец (стар бриф) → None. Чиста функция.
+    """
+    nw = nw or {}
+    start = _utc_short(nw.get("since"))
+    if not start:
+        return None
+    try:
+        since = dt.datetime.fromisoformat(str(nw["since"]).replace("Z", "+00:00"))
+    except Exception:
+        return None
+    parts = []
+    for name, v in (nw.get("sources") or {}).items():
+        old = _utc_short(v.get("oldest"))
+        if not old:
+            parts.append(f"{name} — {v.get('count', 0)} заглавия без дата")
+            continue
+        late = dt.datetime.fromisoformat(str(v["oldest"]).replace("Z", "+00:00")) - since > dt.timedelta(hours=0.1 * float(nw.get("hours") or 24))
+        parts.append(f"{name} — до {old}" + (" (не стига до началото)" if late else ""))
+    head = f"Прозорецът на новините: от {start} UTC (предишният бриф) — {news_window_hours(nw)} ч."
+    return head + (" Докъде назад стига всеки източник днес: " + " · ".join(parts) + "." if parts else "")
+
+
 def radar_reason(c: dict) -> str:
     """
     30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „широк стоп · 15.3%“ (too_wide; до 02.11 „разтегната · стоп“), „пробив без обем · 0.9×“, „блокирана от режима“,
@@ -477,6 +524,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_replay=config.QM_REPLAY_STATS,                                  # 12.10: числата от реплея с новата формула (банерът на секцията)
         qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
+        news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
+        news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},

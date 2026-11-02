@@ -1570,7 +1570,7 @@ SYSTEM_WATCH = """Ти си анализатор, който следи конк
 САМО валиден JSON, без markdown огради, без преамбюл."""
 
 
-def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
+def watch_ticker_digest(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
     """
     AI тълкуване за „🔎 Наблюдавани тикъри" (виж watch_monitor.py).
 
@@ -1602,7 +1602,7 @@ def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
     for k in range(0, len(rows), n):
         group = rows[k:k + n]
         try:
-            out += _watch_digest_batch(group, market_context)
+            out += _watch_digest_batch(group, market_context, window_hours)
         except Exception as e:
             why = "отговорът е отрязан (лимитът за изход)" if isinstance(e, TruncatedResponse) else f"грешка ({type(e).__name__})"
             print(f"[ai] watch_ticker_digest: групата {', '.join(r['ticker'] for r in group)} не мина — {why}: {e}")
@@ -1610,7 +1610,7 @@ def watch_ticker_digest(rows: list[dict], market_context: dict) -> list[dict]:
     return out
 
 
-def _watch_digest_batch(rows: list[dict], market_context: dict) -> list[dict]:
+def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
     """Една група наблюдавани тикъри → [{**ред, "ai": {summary, insider_read, cross_reference}}]. Хвърля при провал (watch_ticker_digest го хваща за групата)."""
     compact = [{
         "ticker": r["ticker"],
@@ -1624,7 +1624,7 @@ def _watch_digest_batch(rows: list[dict], market_context: dict) -> list[dict]:
         "insider_flags": [{k: f.get(k) for k in ("label", "n", "owners", "cluster", "plan")} for f in r.get("insider_flags") or []],   # 30.10.2026: по посока, с плана
     } for r in rows]
 
-    user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 24 часа):
+    user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните {round(window_hours)} часа — от предишния бриф):
 {json.dumps(compact, ensure_ascii=False, default=str)}
 
 ТЕМИ, АКТИВНИ ДРУГАДЕ В ДНЕШНИЯ БРИФ:

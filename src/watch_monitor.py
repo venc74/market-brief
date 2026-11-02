@@ -424,13 +424,14 @@ def _insider_cluster(txns: list[dict]) -> bool:
     return False
 
 
-def collect(tickers: list[str] | None = None, facts_fn=None) -> list[dict]:
+def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float | None = None) -> list[dict]:
     """
     Суровите данни за всеки watched тикър, БЕЗ AI слой.
 
     Връща [{ticker, name, facts, news: [...], insider: [...], insider_cluster: bool,
              quiet: bool}], в реда на списъка. `quiet=True` значи нула новини и
     нула Form 4 — извикващият не бива да праща такъв тикър към AI-то (29.10.2026: фактите на реда не са събитие).
+    02.11.2026 (т. 4): window_hours — прозорецът на новините (main: от предишния бриф — понеделник 72 ч); без него — config.WATCH_NEWS_WINDOW_HOURS.
     """
     tickers = tickers if tickers is not None else load_watch_list()
     if not tickers:
@@ -449,7 +450,7 @@ def collect(tickers: list[str] | None = None, facts_fn=None) -> list[dict]:
     rows = []
     for tk in tickers:
         f = fx.get(tk) or {}
-        news = _recent_news(tk, config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
+        news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
         txns = insider.get(tk, [])
         rows.append({
             "ticker": tk,

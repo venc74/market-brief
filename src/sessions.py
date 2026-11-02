@@ -141,3 +141,23 @@ def complete_bars(bars, today=None):
     if idx.tz is not None:
         idx = idx.tz_localize(None)
     return bars[idx.normalize() < pd.Timestamp(as_date(today))]
+
+
+def news_window_start(now: dt.datetime | None = None) -> dt.datetime:
+    """
+    02.11.2026 (поправки след брифа, т. 4): началото на прозореца за новините (UTC) — предишният бриф: часът на брифа (config.BRIEF_TIME_BERLIN, Europe/Berlin) в деня на
+    последната NYSE сесия преди днес (днес — по Берлин). Понеделник → петък 07:30 (72 ч); след празник → 48 ч; иначе 24 ч. До 02.11 прозорците бяха фиксирани (24 / 24 / 30 ч)
+    и в понеделник 02.11 разказът и наблюдаваните не видяха петъка (Intel, Amazon). now — UTC (за тестове).
+    """
+    from zoneinfo import ZoneInfo
+    berlin = ZoneInfo("Europe/Berlin")
+    now = now or dt.datetime.now(dt.timezone.utc)
+    last = prev_session(now.astimezone(berlin).date())
+    h, m = (int(x) for x in config.BRIEF_TIME_BERLIN.split(":"))
+    return dt.datetime(last.year, last.month, last.day, h, m, tzinfo=berlin).astimezone(dt.timezone.utc)
+
+
+def news_window_hours(now: dt.datetime | None = None, min_hours: float = 0) -> float:
+    """Часовете от news_window_start до now, не по-малко от min_hours (крипто — config.CRYPTO_NEWS_HOURS). Закръглени до 0.01."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    return round(max(min_hours, (now - news_window_start(now)).total_seconds() / 3600), 2)

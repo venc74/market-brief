@@ -109,13 +109,13 @@ def pool_record(pool: list[dict], data, items: list[dict], dropped: list[dict]) 
     return out
 
 
-def fetch_pool() -> list[dict]:
+def fetch_pool(hours: float | None = None) -> list[dict]:
     """29.10.2026 (разходката, т. 4б): пулът — Cointelegraph и CoinDesk (config.CRYPTO_RSS_FEEDS), заглавията на редуване (news_aggregator._interleave); дубълът по заглавие отпада.
-    Източник без заглавия — ред в лога (останалият стига)."""
+    Източник без заглавия — ред в лога (останалият стига). 02.11.2026 (т. 4): hours — прозорецът (main: от предишния бриф, не по-малко от config.CRYPTO_NEWS_HOURS)."""
     from src import news_aggregator
     per = []
     for name, url in config.CRYPTO_RSS_FEEDS.items():
-        got = news_aggregator._fetch_rss(url, name, config.CRYPTO_NEWS_HOURS, limit=50)
+        got = news_aggregator._fetch_rss(url, name, hours or config.CRYPTO_NEWS_HOURS, limit=50)
         if not got:
             print(f"[crypto] ⚠ {name}: фийдът не върна заглавия")
         per.append(got)
@@ -172,7 +172,7 @@ def ticker_rows(tickers: list[str], today: str, download=None) -> list[dict]:
         return []
 
 
-def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, fetch=None, ai_call=None, download=None, cache_path=None) -> dict:
+def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, fetch=None, ai_call=None, download=None, cache_path=None, hours: float | None = None) -> dict:
     """
     {"ok", "items", "pool", "reason", "tickers", "cot_btc"}. fetch() → пулът от RSS; ai_call(system, user) → JSON текст (по подразбиране ai_brief._call_claude). Кеш по ден в
     config.DATA_DIR/crypto_news_cache.json (само новините — цените и COT се смятат всеки път). Не вдига.
@@ -191,7 +191,7 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
                        reason=cached.get("reason"))
         else:
             from src import news_aggregator
-            pool = (fetch or fetch_pool)()
+            pool = fetch() if fetch else fetch_pool(hours)                    # 02.11.2026: прозорецът — от main
             out["pool"] = len(pool)
             out["pool_sources"] = pool_sources(pool)                            # 29.10.2026: колко заглавия и колко назад — по източник
             if not pool:
