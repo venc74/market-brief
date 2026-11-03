@@ -49,9 +49,14 @@ rows = preopen.ep_rows(gaps, daily_fn=lambda ts: {t: daily[t] for t in ts}, fili
 L, A = rows
 assert (L["ticker"], L["gap_pct"], L["neglect"], round(L["ret63_pct"]), L["prev_close"]) == ("LSCC", 13.5, True, -31, 95.44)
 assert (A["prev_close"], A["gap_pct"]) == (217.19, 12.48)                                                                  # показаното — от официалното дневно затваряне
-assert L["filings_8k"][0]["text"] == "8-K (SEC), 02.11 16:27 ET: т. 2.02 — резултати от дейността" and L["filings_8k"][0]["items"] == ["2.02"] and L["headline"] is None
-assert A["gap_pct"] == 12.48 and A["headline"]["title"] == "Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript" and A["filings_8k"][0]["text"].startswith("8-K (SEC), 02.11 16:03 ET: т. 2.02")
+assert L["filings_8k"][0]["text"] == "8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати" and L["filings_8k"][0]["items"] == ["2.02"] and L["headline"] is None
+assert A["gap_pct"] == 12.48 and A["headline"]["title"] == "Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript" and A["filings_8k"][0]["text"] == "8-K (SEC), 02.11 16:03 ET: 2.02 — финансови резултати"
 assert calls == [("LSCC", "2026-11-02"), ("AEIS", "2026-11-02")]
+syn = {"accepted_et": "2026-11-03 07:01", "items": [(c, None, None) for c in ("1.01", "2.01", "7.01", "8.01", "5.02", "6.99")], "items_note": "по документа"}   # СИНТЕТИЧНО
+assert preopen.filing_line(syn) == ("8-K (SEC), 03.11 07:01 ET: 1.01 — съществено споразумение; 2.01 — придобиване или продажба на активи; 7.01 — оповестяване по Reg FD; "
+                                    "8.01 — други събития; 5.02 — смяна в ръководството; 6.99 (по документа)")
+assert preopen.filing_line({"accepted_et": "2026-11-03 07:01", "items": []}).endswith("ET: без точки")
+print("  ✓ 8-K: „2.02 — финансови резултати“; 1.01 / 2.01 / 7.01 / 8.01 с превод, останалите — от общата таблица, непознатата — само номерът")
 print("  ✓ LSCC +13.5% (пренебрегнат, 3 мес. −31%) — 8-K т. 2.02 в 16:27 ET; AEIS +12.5% — 8-K т. 2.02 в 16:03 ET и „Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“; FN — под 10%")
 
 print()
@@ -89,7 +94,7 @@ with q():
     hdr = render.render_dashboard(b, publish=False, generated=preopen.morning_generated("<div>понеделник · генериран 07:34 CET</div>"))
 assert "генериран 07:34 CET · обновено преди отварянето 15:05 CET" in hdr                                                  # заглавието пази часа на сутрешния бриф
 assert preopen.morning_generated(hdr) == ("07:34", "CET") and preopen.morning_generated(None) is None                     # и при второ пускане — пак сутрешният
-assert "LSCC +13.5% ($108.32 в 09:00 Ню Йорк; затваряне $95.44) · пренебрегнат (3 мес. -31%) 8-K (SEC), 02.11 16:27 ET: т. 2.02 — резултати от дейността" in page
+assert "LSCC +13.5% ($108.32 в 09:00 Ню Йорк; затваряне $95.44) · пренебрегнат (3 мес. -31%) 8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати" in page
 assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“" in page
 mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(res))))
 assert mail.startswith(" Преди отварянето · 03.11, 09:05 Ню Йорк (15:05 Берлин)") and "AEIS +12.5% ($244.30; затваряне $217.19) · пренебрегнат (3 мес. -36%)" in mail

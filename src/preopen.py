@@ -133,6 +133,24 @@ def watch_gaps(pts: dict, watched: list[str]) -> list[dict]:
     return sorted(out, key=lambda x: -abs(x["gap_pct"]))
 
 
+# 03.11.2026 (прегледа на т. 10, 2): номерът на точката с превод — „2.02 — финансови резултати“; честите точки — тук, останалите — от qm_ep.ITEMS_8K, непознатите — само номерът.
+# Сутрешната EP карта (qm_ep.filing_headline) не се пипа — там 2.02 остава „резултати от дейността“.
+ITEMS_BG = {"1.01": "съществено споразумение", "2.01": "придобиване или продажба на активи", "2.02": "финансови резултати", "7.01": "оповестяване по Reg FD",
+            "8.01": "други събития"}
+
+
+def filing_line(f: dict) -> str:
+    """„8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати“ (точките с „; “; бележката за разминаване заглавка / документ — в скоби, както сутрин). Чиста функция."""
+    from src import qm_ep
+    when = f["accepted_et"]
+    parts = []
+    for c, *_ in f.get("items") or []:
+        bg = ITEMS_BG.get(c) or (qm_ep.ITEMS_8K.get(c) or (None, None))[1]
+        parts.append(f"{c} — {bg}" if bg else c)
+    note = f" ({f['items_note']})" if f.get("items_note") else ""
+    return f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {'; '.join(parts) or 'без точки'}{note}"
+
+
 def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, now_utc=None) -> list[dict]:
     """
     (а) Гаповете → пренебрегването (qm_ep.enrich_gappers — както сутрин), 8-K след затварянето (точките) и първото заглавие за компанията, ДОСЛОВНО (без AI). Graceful по тикър.
@@ -158,7 +176,7 @@ def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=No
             row["company"] = t
         try:
             fs = (filings_fn or qm_ep.company_filings)(t, e["session"], now_utc=now_utc)
-            row["filings_8k"] = [{"accepted_et": f["accepted_et"], "items": [f"{c}" for c, *_ in f["items"]], "text": qm_ep.filing_headline(f)["title"]} for f in fs]
+            row["filings_8k"] = [{"accepted_et": f["accepted_et"], "items": [f"{c}" for c, *_ in f["items"]], "text": filing_line(f)} for f in fs]
         except Exception as ex:
             print(f"[preopen] 8-K {t}: {type(ex).__name__}: {ex}")
             row["filings_8k"] = []
