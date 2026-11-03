@@ -883,7 +883,7 @@ def run() -> dict:
                partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals,
-                                         today_context={"nasdaq": qm_market})     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+                                         today_context={"nasdaq": qm_market, "hy_oas": backtest.entry_hy_oas(thermo)})     # 03.11.2026: + HY OAS в деня на входа (т. 5)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
         backtest.apply_deal_labels(spinoff_watch.LAST_MERGERS, dt.date.fromisoformat(today))   # 26.10.2026 (етап 4б, т. 1): етикет "deal" върху живите записи на цели на придобиване
         backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)

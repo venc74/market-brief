@@ -75,6 +75,6 @@ with q():
     old = render.render_dashboard(b, publish=False)
 assert "Nasdaq под 10/20 DMA" not in old                                                         # стар бриф без ключа — без реда
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert 'today_context={"nasdaq": qm_market}' in main_src and '"qm_market": qm_market,' in main_src and 'steps.step("qm_market", qm_breakout.fetch_nasdaq_trend' in main_src
+assert 'today_context={"nasdaq": qm_market, ' in main_src and '"qm_market": qm_market,' in main_src and 'steps.step("qm_market", qm_breakout.fetch_nasdaq_trend' in main_src
 print(f"  ✓ „{line}“ — в секцията и в имейла; стар бриф — без реда; main подава състоянието на книгата и го пази в brief[\"qm_market\"]")
 print("\n✅ test_qm_nasdaq: всичко мина")

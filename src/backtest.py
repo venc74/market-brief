@@ -507,11 +507,37 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
         tracker[key] = rec
 
 
+def entry_hy_oas(thermo: dict | None) -> dict | None:
+    """
+    03.11.2026 (прегледът на 02.11, т. 5): HY OAS в деня на входа — от информативната плочка на термометъра („HY / IG OAS“, thermometer._credit_oas_indicator) →
+    {value, as_of, chg_bp, percentile}; скрита / липсва (стар бриф) → None. Чиста функция.
+    """
+    ind = next((i for i in (thermo or {}).get("indicators") or [] if str(i.get("name", "")).startswith("HY / IG OAS")), None)
+    hy = (ind or {}).get("hy") or {}
+    if not ind or ind.get("hide") or hy.get("value") is None:
+        return None
+    return {k: hy.get(k) for k in ("value", "as_of", "chg_bp", "percentile")}
+
+
+def _stamp_entry_context(tracker: dict, keys_before: set, regime: str | None, hy_oas: dict | None) -> None:
+    """
+    03.11.2026 (т. 5): новите записи (ключ, който го нямаше преди ingest-а) получават режима в деня на входа, ако книгата не го е сложила сама (Action — до 03.11 без него), и HY OAS
+    в деня на входа (за всички книги; None — нямаше плочка). Не пипа записите отпреди.
+    """
+    for k in set(tracker) - keys_before:
+        rec = tracker[k]
+        if isinstance(rec, dict):
+            if rec.get("regime") is None and regime:
+                rec["regime"] = regime
+            rec.setdefault("hy_oas", dict(hy_oas) if hy_oas else None)
+
+
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
                           today_date: str | None = None, today_watchlist: list[dict] | None = None,
                           today_regime: str | None = None, today_qm: list[dict] | None = None,
                           today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None, today_context: dict | None = None) -> None:
-    ctx = today_context or {}                                     # 03.11.2026: състоянието на пазара в деня на картата — "nasdaq" (QM)
+    ctx = today_context or {}                                     # 03.11.2026: състоянието на пазара в деня на картата — "nasdaq" (QM), "hy_oas" (всички книги)
+    day_regime: dict[str, str] = {}                               # 03.11.2026 (т. 5): режимът по брифа на деня — за записите без него (Action до 03.11)
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -519,8 +545,11 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
             print(f"[backtest] snapshot {path.name} нечетим, пропускам: {e}")
             continue
         entry_date = snap.get("date") or path.stem
+        if (snap.get("thermometer") or {}).get("regime"):
+            day_regime[str(entry_date)[:10]] = snap["thermometer"]["regime"]
         if today_date and str(entry_date)[:10] == str(today_date)[:10]:
             continue                # 19.10.2026 (С2): днешният snapshot е от ПО-РАННИЯ run в същия ден (22.06: 5 run-а, всеки с различни Action) — днешните карти са in-memory по-долу
+        keys_before = set(tracker)                                    # 03.11.2026 (т. 5): режимът и HY OAS в деня на входа — от snapshot-а на деня
         _ingest_action_list(tracker, entry_date, snap.get("action", []))
         # пакет 1б: Watchlist картите със заснет plan_preview (по-старите snapshot-и нямат такъв → не влизат); чисто временно правило —
         # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action
@@ -528,6 +557,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"), snap.get("qm_market"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish") or [], (snap.get("thermometer") or {}).get("regime"))   # GLB по Уиш: само snapshot-и с glb_wish (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish_high") or [], (snap.get("thermometer") or {}).get("regime"), CATEGORY_GLB_WISH_HIGH)   # 21.10: книгата по неговата линия
+        _stamp_entry_context(tracker, keys_before, (snap.get("thermometer") or {}).get("regime"), entry_hy_oas(snap.get("thermometer")))
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -538,6 +568,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
     # Action избор точно "ден+1" (виж FIXES файла за трите потвърдени случая).
     # Директно ingest-ване на днешния in-memory action списък тук елиминира
     # закъснението — утрешният run вече ще завари тикъра в tracker-а.
+    keys_before = set(tracker)
     if today_action and today_date:
         _ingest_action_list(tracker, today_date, today_action)
     if today_watchlist and today_date:
@@ -548,6 +579,11 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_glb_wish_list(tracker, today_date, today_glb_wish, today_regime)
     if today_glb_wish_high and today_date:
         _ingest_glb_wish_list(tracker, today_date, today_glb_wish_high, today_regime, CATEGORY_GLB_WISH_HIGH)
+    _stamp_entry_context(tracker, keys_before, today_regime, ctx.get("hy_oas"))       # 03.11.2026 (т. 5): режимът (и за Action) и HY OAS в деня на входа
+    for rec in tracker.values():                                  # 03.11.2026 (т. 5): записите отпреди без режим — от брифа на деня на записа (идемпотентно)
+        if isinstance(rec, dict) and rec.get("method") == "v2" and rec.get("regime") is None and day_regime.get(str(rec.get("entry_date"))[:10]):
+            rec["regime"], rec["regime_source"] = day_regime[str(rec["entry_date"])[:10]], "брифът на деня (попълнено 03.11.2026)"
+            print(f"[backtest] {rec.get('ticker')} {rec.get('entry_date')} ({record_category(rec)}): режимът в деня на записа — {rec['regime']} (от брифа на деня)")
 
 
 # ──────────────────────────────────────────────────────────────────────────
