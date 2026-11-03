@@ -227,14 +227,15 @@ _QWORD = __import__("re").compile(r"[A-Za-zА-Яа-я0-9&'.-]+")
 _QLEGAL = {"inc", "corp", "corporation", "company", "holdings", "group", "plc", "ltd", "limited", "the", "co", "sa", "nv", "ag", "se", "lp", "llc"}
 
 
-def form4_line(cards: dict | None, positions: dict | None) -> str | None:
+def form4_line(cards: dict | None, positions: dict | None, watched: dict | None = None) -> str | None:
     """
     21.10.2026 (етап 4, ритъм на данните): видим ред за Form 4 и при нула покупки — „Form 4: проверени N тикъра от картите и M позиции — X покупки ≥ $100 000 от ключови лица
     за 30 дни“. Провал → „проверката не мина днес (…) — нулата не значи, че няма покупки“; непълно (ok_partial) → бележката в скоби. Без статуси → None.
+    03.11.2026 (поправки след брифа, т. 6): и наблюдаваните тикъри — „… и K наблюдавани“ (същата проверка, insider_buying.insider_for).
     """
     from src import insider_buying
     parts, found, bad = [], 0, []
-    for st, what in ((cards, "от картите"), (positions, "позиции")):
+    for st, what in ((cards, "от картите"), (positions, "позиции"), (watched, "наблюдавани")):
         st = st or {}
         if not st or (st.get("kind") != "failed" and not st.get("requested")):   # няма тикъри за проверка (реално 06–08.10: без карти) — без част в реда
             continue
@@ -251,7 +252,10 @@ def form4_line(cards: dict | None, positions: dict | None) -> str | None:
     head = (f"Form 4: проверени {' и '.join(parts)} — {found} {word} ≥ ${config.INSIDER_MIN_VALUE:,.0f} от ключови лица (officers / клъстер) за {insider_buying._LOOKBACK_DAYS} дни"
             .replace(",", " ") if parts else "Form 4: проверката не мина днес")
     if found:
-        head += " — маркерът INS✓ на картите"
+        where = [w for st, w in ((cards, "на картите"), (positions, "на позициите")) if int((st or {}).get("found") or 0)]
+        tf = (watched or {}).get("tickers_found") or []
+        where += [f"на наблюдаваните ({', '.join(tf)})"] if tf else (["на наблюдаваните"] if int((watched or {}).get("found") or 0) else [])
+        head += " — маркерът INS✓ " + " и ".join(where or ["на картите"])
     if bad:
         head += " (" + "; ".join(bad) + (" — нулата не значи, че няма покупки" if not parts or any("непълно" not in b for b in bad) else "") + ")"
     return head
@@ -511,7 +515,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         thirteenf_rhythm=brief.get("thirteenf_rhythm") or {},          # 21.10 (етап 4): ред и свити секции без нов 13F
-        form4_line=form4_line(brief.get("insider_buying_status"), brief.get("insider_buying_positions_status")),   # 21.10 (етап 4): видим ред и при нула
+        form4_line=form4_line(brief.get("insider_buying_status"), brief.get("insider_buying_positions_status"), brief.get("insider_buying_watch_status")),   # 21.10 (етап 4): видим ред и при нула; 03.11: + наблюдаваните
         glb_candidates=brief.get("glb_candidates", []),
         glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
         corp_excluded=brief.get("corp_excluded") or {},                # 13.10: изключени заради отделяне — ред под секциите

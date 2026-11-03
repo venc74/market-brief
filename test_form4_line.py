@@ -46,4 +46,19 @@ with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(copy.deepcopy(b19))
 assert "Form 4: проверени 9 тикъра от картите и" in page and page.index("Form 4: проверени") < page.index("Исторически архив")
 print("  ✓ редът се вижда на страницата")
+
+print()
+print("── 03.11.2026 (поправки след брифа, т. 6): и наблюдаваните ──")
+# РЕАЛНО: статусите от брифа на 03.11 (картите 12, позициите 6 — 0 покупки) и проверката на 14-те наблюдавани на живо на 03.11 (insider_buying.insider_for): ACN — CEO, 26.10, ~$3 млн
+c03 = {"kind": "legit_zero", "requested": 12, "found": 0}
+p03 = {"kind": "legit_zero", "requested": 6, "found": 0}
+w03 = {"kind": "ok", "requested": 14, "found": 1, "tickers_found": ["ACN"]}
+assert render.form4_line(c03, p03, w03) == ("Form 4: проверени 12 тикъра от картите и 6 позиции и 14 наблюдавани — 1 покупка ≥ $100 000 от ключови лица (officers / клъстер) "
+                                            "за 30 дни — маркерът INS✓ на наблюдаваните (ACN)")
+assert render.form4_line(c03, p03, {"kind": "legit_zero", "requested": 14, "found": 0}).startswith("Form 4: проверени 12 тикъра от картите и 6 позиции и 14 наблюдавани — 0 покупки")
+assert render.form4_line(c03, p03) == "Form 4: проверени 12 тикъра от картите и 6 позиции — 0 покупки ≥ $100 000 от ключови лица (officers / клъстер) за 30 дни"   # стар бриф
+assert render.form4_line({**c03, "found": 1}, p03, w03).endswith("— маркерът INS✓ на картите и на наблюдаваните (ACN)")                                # СИНТЕТИЧНО: и на карта
+main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
+assert '"insider_buying_watch_status": ins_watch_status' in main_src and 'r.setdefault("in_brief", []).append("INS✓")' in main_src
+print("  ✓ „… и 14 наблюдавани — 1 покупка … — маркерът INS✓ на наблюдаваните (ACN)“; INS✓ и на реда на наблюдавания; стар бриф — без наблюдаваните")
 print("\n✅ test_form4_line: всичко мина")

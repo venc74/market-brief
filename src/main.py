@@ -987,6 +987,17 @@ def run() -> dict:
         return [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in rows]
     watch_rows = steps.step("watch", _watch, fallback=[], enabled=config.ENABLE_WATCH_MONITOR, label="Секцията „Наблюдавани тикъри“",
                             consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини")     # 03.11.2026: без .info → без следата за нея
+    # 03.11.2026 (поправки след брифа, т. 6): редът „Form 4: … покупки ≥ $100 000“ — и за наблюдаваните (същите правила като за картите и позициите)
+    def _ins_watch():
+        groups, st = insider_buying.insider_for([r["ticker"] for r in watch_rows])
+        for r in watch_rows:                                         # INS✓ и на реда на наблюдавания (както на картите)
+            if r["ticker"] in groups:
+                r.setdefault("in_brief", []).append("INS✓")
+        return {**st, "tickers_found": sorted(groups)}
+    ins_watch_status = steps.step("ins_watch", _ins_watch, fallback={},
+                                  enabled=bool(config.ENABLE_INSIDER_BUYING and watch_rows), source="insider",
+                                  on_fail=lambda e: {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"},
+                                  label="Form 4 покупките за наблюдаваните", consequence="редът „Form 4“ днес не казва нищо за наблюдаваните")
 
     # FIX 2026-09-27: пълен отчет за сплитовете — секцията вече не се скрива
     # (ok / empty с фуния по филтри / source_failed), + сплитове на отворени
@@ -1093,6 +1104,7 @@ def run() -> dict:
         # пакет 4б т.в: статус на тегленето на Form 4 за кандидатите/позициите (kind: ok|ok_partial|legit_zero|failed; stale/data_date от 4а)
         "insider_buying_status": insider_status,
         "insider_buying_positions_status": ins_pos_status,
+        "insider_buying_watch_status": ins_watch_status,              # 03.11.2026 (т. 6): Form 4 покупките за наблюдаваните
         "superinvestor_status": superinvestor_status,
         "thirteenf_rhythm": data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {},   # 21.10 (етап 4): цялата секция при нов 13F
         "glb_candidates": glb_candidates,
