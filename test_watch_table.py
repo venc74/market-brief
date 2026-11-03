@@ -2,7 +2,7 @@
 29.10.2026 · разходката, т. 6 (Наблюдавани тикъри), решения 1–4:
   1. data/watch_list.json — 14 тикъра, без етикети за позиция (брифът е публичен; тестовете не четат data/ — списъкът е проверен на ръка);
   2. ред с факти от кода (без AI): цена и промяна за деня, над/под 50DMA и 200DMA, RS спрямо SPY за 4 и 12 седмици, следващ отчет, short interest (% от float, дни за
-     покриване, промяна спрямо предишното отчитане и ДАТАТА на отчитането), маркер, ако е и в наш скрийнър / книга;
+     покриване, промяна спрямо предишното отчитане и ДАТАТА на отчитането — махнат на 03.11.2026, виж test_watch_no_info), маркер, ако е и в наш скрийнър / книга;
   3. една таблица (ред на тикър); новините, Form 4 и AI резюмето се разгъват с клик под реда (<details>); тикър без събития — само редът; празен списък — един ред;
   4. новините — от RSS на Yahoo по тикър (yfinance .news връща нищо — 0 и за AAPL на 29.10), само за компанията: при "AI" фийдът носи и SoundHound, BigBear.ai, Palantir —
      минават само тези за C3.ai.
@@ -62,17 +62,15 @@ for t in T:
         assert got[f"rs_{n}"] == round((r - rs) * 100, 1), (t, n)
 tdoc = wm.price_facts(cl["TDOC"], cl["SPY"])
 assert tdoc["date"] == "2026-10-28" and tdoc["close"] == 6.88 and tdoc["chg_1d_pct"] == 6.67 and tdoc["above_50"] and tdoc["above_200"] and (tdoc["rs_20"], tdoc["rs_60"], tdoc["rs_word"]) == (17.4, 2.4, "води пазара")
-sh = wm.short_facts(FX["info"]["TDOC"])
-assert sh == {"pct_float": 17.7, "days_to_cover": 8.8, "chg_pct": 16.1, "as_of": "2026-10-15", "prior_as_of": "2026-09-15"}, sh            # Yahoo: предишното е отпреди месец (15.09), не 30.09
-assert wm.short_facts({}) == {} and wm.price_facts(cl["TDOC"].iloc[-30:], None).get("above_200") is None                             # кратка история — без 200DMA
-print(f"  ✓ TDOC: $6.88 +6.67% (28.10), над 50 и 200DMA, RS спрямо S&P +17.4 / +2.4 пункта — „води пазара“; short 17.7% · 8.8 дни · +16.1% спрямо 15.09 · към 15.10")
+assert not hasattr(wm, "short_facts") and wm.price_facts(cl["TDOC"].iloc[-30:], None).get("above_200") is None                     # 03.11.2026: без short interest (без .info); кратка история — без 200DMA
+print(f"  ✓ TDOC: $6.88 +6.67% (28.10), над 50 и 200DMA, RS спрямо S&P +17.4 / +2.4 пункта — „води пазара“ (short interest — махнат на 03.11, виж test_watch_no_info)")
 
 print()
 print("── 3. collect() → таблицата: ред на тикър, разгъване при събития, маркерите ──")
 def facts_fn(tickers):
     out = {}
     for t in tickers:
-        out[t] = {"name": FX["info"][t]["longName"], "price": wm.price_facts(cl[t], cl["SPY"]), "short": wm.short_facts(FX["info"][t]), "earnings": FX["earnings"][t]}
+        out[t] = {"name": FX["info"][t]["longName"], "price": wm.price_facts(cl[t], cl["SPY"]), "earnings": FX["earnings"][t]}
     return out
 wm.insider_buying.fetch_insider_transactions = lambda ts: {t: [{**x, "date": pd.Timestamp(x["date"]).date()} for x in FX["insider"].get(t, [])] for t in ts}
 wm.requests.get = lambda url, timeout=None, headers=None: type("R", (), {"content": rss(re.search(r"s=([A-Z]+)", url).group(1))})()     # СИНТЕТИЧНО: мрежата → РЕАЛНИЯТ фийд
@@ -96,7 +94,7 @@ sec = page[page.index("<h2>🔎 Наблюдавани тикъри"):]; sec = s
 assert sec.count('<div class="wt-row wt-head">') == 1 and sec.count('<span class="wt-t">') == 14
 assert sec.count('<details class="wt-item">') == sum(1 for r in rows if not r["quiet"]) and sec.count('<div class="wt-row wt-plain">') == sum(1 for r in rows if r["quiet"])
 t_tdoc = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", sec[sec.index('<span class="wt-t">TDOC'):sec.index("</details>", sec.index('<span class="wt-t">TDOC'))])))
-assert "TDOC Teladoc Health, Inc. $6.88 +6.7% над / над +17.4 / +2.4 води пазара 24.02 (след 118 дни) 17.7% от float · 8.8 дни · +16.1% спрямо 15.09 · към 15.10" in t_tdoc, t_tdoc[:300]
+assert "TDOC Teladoc Health, Inc. $6.88 +6.7% над / над +17.4 / +2.4 води пазара 24.02 (след 118 дни) ADR —" in t_tdoc, t_tdoc[:300]     # 03.11.2026: само затваряния → без ADR
 assert "Catapano Joseph Ronald" in t_tdoc and "Teladoc" in t_tdoc
 elf = sec[sec.index('<span class="wt-t">ELF'):]; elf = elf[:elf.index("</summary>")]
 assert '<span class="wt-mark">QM</span><span class="wt-mark">книга QM</span>' in elf

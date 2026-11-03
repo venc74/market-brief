@@ -1,5 +1,5 @@
 {
- "_note": "Ръчно поддържан списък за секцията '🔎 Наблюдавани тикъри'. Добавяй/махай тикъри тук и commit-ни — ефектът е видим в следващия дневен бриф. Премахването оттук НЕ влияе на това дали компанията се появява другаде в брифа (GLB / COT / CANSLIM са независими механизми).",
+ "_note": "Ръчно поддържан списък за секцията '🔎 Наблюдавани тикъри'. Добавяй/махай тикъри тук и commit-ни — ефектът е видим в следващия дневен бриф. Премахването оттук НЕ влияе на това дали компанията се появява другаде в брифа (GLB / COT / CANSLIM са независими механизми). Имената (\"names\") — записани веднъж на 03.11.2026 от брифа на 30.10 (Yahoo longName); брифът не ги тегли от Yahoo .info. Нов тикър → добави и името му.",
  "tickers": [
   "TDOC",
   "BHC",
@@ -15,5 +15,21 @@
   "CRM",
   "BMNR",
   "ACN"
- ]
+ ],
+ "names": {
+  "TDOC": "Teladoc Health, Inc.",
+  "BHC": "Bausch Health Companies Inc.",
+  "SAP": "SAP SE",
+  "BLSH": "Bullish",
+  "CRCL": "Circle Internet Group",
+  "AI": "C3.ai, Inc.",
+  "CRBG": "Corebridge Financial, Inc.",
+  "BFLY": "Butterfly Network, Inc.",
+  "ELF": "e.l.f. Beauty, Inc.",
+  "DOCU": "DocuSign, Inc.",
+  "SN": "SharkNinja, Inc.",
+  "CRM": "Salesforce, Inc.",
+  "BMNR": "Bitmine Immersion Technologies, Inc.",
+  "ACN": "Accenture plc"
+ }
 }
