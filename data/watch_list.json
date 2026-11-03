@@ -11,8 +11,6 @@
   "BFLY",
   "ELF",
   "DOCU",
-  "SN",
-  "CRM",
   "BMNR",
   "ACN"
  ],
@@ -27,8 +25,6 @@
   "BFLY": "Butterfly Network, Inc.",
   "ELF": "e.l.f. Beauty, Inc.",
   "DOCU": "DocuSign, Inc.",
-  "SN": "SharkNinja, Inc.",
-  "CRM": "Salesforce, Inc.",
   "BMNR": "Bitmine Immersion Technologies, Inc.",
   "ACN": "Accenture plc"
  }
