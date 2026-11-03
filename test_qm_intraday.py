@@ -141,5 +141,12 @@ qs2 = backtest.get_qm_summary(); b["backtest"]["qm_breakout"] = qs2
 with q():
     page2 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
 assert "— 4 от 5 с 5-минутни бари (там opt = pess), 1 с двете граници" in page2 and "· дневни бари (5-минутните са изтекли)" in page2
-print(f"  ✓ среден R {qs['avg_realized_r']:+.2f} (5-минутни бари), карта „R=-0.76 (5-минутни бари, стоп в деня на входа)“; изтекли → opt / pess с етикет и броя")
+with q():
+    mail = render.render_email(b)
+assert "среден R -0.19 opt / -0.24 pess (4 от 5 с 5-минутни бари)" in mail                                                                 # имейлът — СИНТЕТИЧНО изтеклият SN
+b["backtest"]["qm_breakout"] = qs
+with q():
+    mail = render.render_email(b)
+assert "среден R -0.19 (5-минутни бари)" in mail
+print(f"  ✓ среден R {qs['avg_realized_r']:+.2f} (5-минутни бари), карта „R=-0.76 (5-минутни бари, стоп в деня на входа)“; изтекли → opt / pess с етикет и броя; имейлът — същото")
 print("\n✅ test_qm_intraday: всичко мина")

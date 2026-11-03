@@ -612,7 +612,9 @@ def _qm_email_block(brief: dict) -> str:
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'
         if qb and qb.get("enabled") and qb.get("records"):
-            avg = (f" · среден R {qb['avg_realized_r']:+.2f} opt / {qb['avg_realized_r_pess']:+.2f} pess" if qb.get("closed") and qb.get("avg_realized_r") is not None else "")
+            avg = ("" if not (qb.get("closed") and qb.get("avg_realized_r") is not None) else
+                   f" · среден R {qb['avg_realized_r']:+.2f} (5-минутни бари)" if qb.get("closed_5m") and not qb.get("closed_bounds") else      # 03.11.2026 (т. 11): един R
+                   f" · среден R {qb['avg_realized_r']:+.2f} opt / {qb['avg_realized_r_pess']:+.2f} pess" + (f" ({qb['closed_5m']} от {qb['closed']} с 5-минутни бари)" if qb.get("closed_5m") else ""))
             wr = (f" · win rate {qb['win_rate_pct']}% opt / {qb['win_rate_pess_pct']}% pess" if qb.get("stats_visible") else f" · win rate след {qb.get('min_closed')} затворени")
             body += f'<div style="margin-top:8px;font-size:12px;color:#6b7280">Измерване: {qb["records"]} записа · затворени {qb.get("closed", 0)}{avg}{wr}</div>'
         eprows = ep.get("rows") or []
