@@ -99,9 +99,10 @@ assert set(src) == {"Reuters Business", "CNBC", "Financial Times", "AP Business"
 assert src["Financial Times"]["oldest"] > "2026-11-02"                                                                      # FT държи ~12 заглавия — не стига до началото
 assert "[news] прозорец: от 30.10 06:30 UTC (72.12 ч), заявки по дни: 6; обхват — Reuters Business" in log.getvalue()
 note = render.news_window_note({**w, "hours": 72.13})
-# 02.11.2026 (прегледът): само източниците, които НЕ стигат до началото (над config.NEWS_REACH_TOLERANCE_MIN = 15 мин); всички стигат → само „Прозорец: 72 ч (от предишния бриф)“
+# 02.11.2026 (прегледът): само източниците, които НЕ стигат до началото (над config.NEWS_REACH_TOLERANCE_MIN — от 03.11 60 мин); всички стигат → само „Прозорец: 72 ч (от предишния бриф)“
+assert config.NEWS_REACH_TOLERANCE_MIN == 60
 assert note == ("Прозорец: 72 ч (от предишния бриф, пт 30.10 06:30 UTC). Не стигат до началото му: Reuters Business — до пт 30.10 08:46 · CNBC — до пт 30.10 20:20 · "
-                f"Financial Times — до {render._utc_short(src['Financial Times']['oldest'])} · AP Business — до пт 30.10 07:06."), note    # Reuters 2 ч 16 мин, AP 36 мин след началото
+                f"Financial Times — до {render._utc_short(src['Financial Times']['oldest'])}."), note    # Reuters 2 ч 16 мин след началото; AP — 36 мин (под 1 ч) не се изброява
 reach = {k: {**v, "oldest": "2026-10-30T06:40Z"} for k, v in src.items()}                                                   # СИНТЕТИЧНО: всички стигат (10 мин след началото)
 assert render.news_window_note({**w, "hours": 72.13, "sources": reach}) == "Прозорец: 72 ч (от предишния бриф)"
 reach.pop("Financial Times")                                                                                                 # СИНТЕТИЧНО: FT без нито едно заглавие
