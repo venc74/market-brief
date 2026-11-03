@@ -221,7 +221,30 @@ def _blank_qm(status: str = "pending") -> dict:
             "exit_date": None, "exit_price": None, "resolution_date": None,
             "R": None, "R_pess": None, "realized_r": None, "realized_r_pess": None, "current_r": None,
             "return_pct": None, "return_pct_pess": None, "last_close": None, "last_close_date": None, "how": None,
-            "r_risk": None, "r_floored": None}
+            "r_risk": None, "r_floored": None, "r_basis": None}
+
+
+def qm_intraday_entry(bars5: pd.DataFrame | None, trig: float) -> dict | None:
+    """
+    03.11.2026 (разходката, т. 11): входът и стопът от 5-МИНУТНИТЕ бари на входния ден (редовната сесия) — една истина вместо двете граници opt/pess.
+    Входът — първият бар с High >= нивото: по max(Open на бара, ниво) (отваряне над нивото → по отварянето). Стопът — дъното на деня ДО бара на входа включително (low of day към
+    момента на входа — неговият стоп; в рамките на един бар не се знае дали дъното е преди или след пробива — броим го преди). Стопиран в същия ден — Low на по-късен бар <= стопа.
+    → {entry_time, fill, stop, low_time, low_of_day, stopped, stop_time, bars} (часовете — ЧЧ:ММ по Ню Йорк); без бари / нивото не е достигнато → None. Чиста функция.
+    """
+    if bars5 is None or len(bars5) == 0 or not all(k in bars5 for k in ("Open", "High", "Low")):
+        return None
+    b = bars5.dropna(subset=["Open", "High", "Low"])
+    hi, lo, op = (b[k].to_numpy(dtype=float) for k in ("High", "Low", "Open"))
+    k = next((i for i in range(len(b)) if hi[i] >= trig), None)
+    if k is None:
+        return None
+    hm = lambda i: pd.Timestamp(b.index[i]).strftime("%H:%M")
+    fill = max(float(op[k]), float(trig))
+    stop = float(lo[:k + 1].min())
+    later = [i for i in range(k + 1, len(b)) if lo[i] <= stop]
+    j_low = int(lo.argmin())
+    return {"entry_time": hm(k), "fill": round(fill, 4), "stop": round(stop, 4), "low_time": hm(j_low), "low_of_day": round(float(lo[j_low]), 4),
+            "stopped": bool(later), "stop_time": hm(later[0]) if later else None, "bars": int(len(b))}
 
 
 def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
@@ -235,6 +258,8 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     ЗАТВАРЯНЕ под SMA10 (ADR >= QM_TRAIL_ADR_SWITCH) или SMA20; гап през стопа → по отварянето; максимум QM_MAX_HOLD_SESSIONS (mark-to-market, "expired").
     Две граници за стопа на входния ден: R/return_pct ("opt": low-ът е бил ПРЕДИ входа, стопът на входния ден не се удря) и R_pess/return_pct_pess ("pess": ако денят затваря
     под входа → загуба до стопа). Без плъзгане и комисионни.
+    03.11.2026 (разходката, т. 11): rec["intraday"] (qm_intraday_entry — 5-минутните бари на входния ден, тегли ги backtest веднъж след входа) → входът и стопът са от тях и R е ЕДИН:
+    стопиран в същия ден → "stopped" (how "stop_intraday"); иначе дневната симулация от следващия ден със стопа от 5-минутните; R_pess = R; r_basis "5m". Без тях — r_basis "daily" (двете граници).
     R (12.10.2026, решение на Венци): печалба ÷ max(вход − low на входния ден, QM_R_RISK_FLOOR_ADR × ADR) — r_risk; при гап над нивото дъното на деня може да е на центове от входа
     (ELF 09.10: 0.09×ADR → "+5.2R" при +1.7%; в реплея 30 сделки с риск под 0.25×ADR носеха 69% от ΣR). Стопът (low на деня) и изходът НЕ се променят — само знаменателят;
     risk_per_share остава реалното разстояние до стопа, r_floored казва дали е приложен подът. Връща речник като _blank_qm: статус pending|not_triggered|skipped_extended|skipped_adr|invalid_risk|open|trailing|stopped|
@@ -273,6 +298,12 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
         out.update(status="not_triggered", resolution_date=idx[first + window - 1].date().isoformat())
         return out
     stop0 = float(l[fi])
+    intra = rec.get("intraday") if isinstance(rec.get("intraday"), dict) else None             # 03.11.2026 (т. 11): 5-минутните бари на входния ден, ако ги има за ТОЗИ ден
+    if intra and intra.get("date") == idx[fi].date().isoformat() and isinstance(intra.get("stop"), (int, float)) and isinstance(intra.get("fill"), (int, float)):
+        fill, stop0 = float(intra["fill"]), float(intra["stop"])
+    else:
+        intra = None
+    out["r_basis"] = "5m" if intra else "daily"
     risk = fill - stop0
     if risk <= 0:
         out.update(status="invalid_risk", resolution_date=idx[fi].date().isoformat())
@@ -285,7 +316,13 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
     r_risk = max(risk, config.QM_R_RISK_FLOOR_ADR * adr / 100 * fill)                   # знаменателят на R (под 0.25×ADR); стопът остава stop0
     out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(float(fill), 4), stop_loss=round(stop0, 4), risk_per_share=round(float(risk), 4),
                trail_ma=trail_n, r_risk=round(float(r_risk), 4), r_floored=bool(r_risk > risk))
-    pess_day1 = bool(c[fi] < fill)                                         # граница "pess": денят затваря под входа
+    pess_day1 = bool(c[fi] < fill) and not intra                           # граница "pess": денят затваря под входа (с 5-минутни бари — няма граници, една стойност)
+    if intra and intra.get("stopped"):                                     # 03.11.2026: стопиран в деня на входа (по-късен 5-минутен бар под дъното до пробива)
+        r1, ret1 = (stop0 - fill) / r_risk, (stop0 / fill - 1) * 100
+        out.update(status="stopped", how="stop_intraday", exit_date=idx[fi].date().isoformat(), exit_price=round(stop0, 4), resolution_date=idx[fi].date().isoformat(),
+                   R=float(r1), R_pess=float(r1), realized_r=round(r1, 2), realized_r_pess=round(r1, 2), current_r=round(r1, 2),
+                   return_pct=round(ret1, 2), return_pct_pess=round(ret1, 2), last_close=round(float(c[fi]), 4), last_close_date=idx[fi].date().isoformat())
+        return out
 
     frac, pdays = config.QM_PARTIAL_FRACTION, config.QM_PARTIAL_DAYS
     stop, part, r_part, p_px, p_j = stop0, False, 0.0, None, None

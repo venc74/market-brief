@@ -54,7 +54,7 @@ assert rows["SN"]["tight_risk"] is False and rows["CORT"]["risk_adr"] is None an
 b = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 b.setdefault("backtest", {})["qm_breakout"] = s
 page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
-assert "Ниво Вход Стоп (low на входния ден)" in page and "R = печалба ÷ max(вход − low на входния ден, 0.25×ADR)" in page
+assert "Ниво Вход Стоп (дъното до пробива / low на деня)" in page                                     # 03.11.2026 (т. 11): стопът — от 5-минутните бари, ако ги има and "R = печалба ÷ max(вход − low на входния ден, 0.25×ADR)" in page
 elf = page[page.index("ELF 2026-10-09"):][:400]
 assert "+1.8R (+1.7%)" in elf and "⚠ риск на входа 0.09×ADR — R от пода 0.25×ADR" in elf and "$106.97 $107.36 (гап) $107.0" in elf and "+5.2R" not in elf
 assert "с риск на входа под 0.25×ADR: 1 (R от пода)" in page
@@ -73,7 +73,7 @@ s2 = backtest.get_qm_summary()
 assert s2["recent"][0]["ticker"] == "ELF" and s2["recent"][0]["tight_risk"] is True and s2["avg_return_pct"] == -0.34
 b["backtest"]["qm_breakout"] = s2
 page2 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b))))
-assert "R=-0.35 opt / -0.35 pess (-0.3% / -0.3%) · Defensive ⚠ риск на входа 0.09×ADR — R от пода 0.25×ADR" in page2
+assert "R=-0.35 opt / -0.35 pess (-0.3% / -0.3%) · дневни бари · Defensive ⚠ риск на входа 0.09×ADR — R от пода 0.25×ADR" in page2
 assert "средна доходност на сделка -0.34% / -0.34%" in page2
 print("  ✓ стоп на дъното на деня = −0.35R (не −1R): загубата е $0.36 при знаменател $1.036; доходност −0.3%")
 

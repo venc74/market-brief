@@ -186,7 +186,7 @@ assert '<details class="qm-book"' in sec
 sm = txt_of(re.search(r"<summary.*?</summary>", sec, re.S).group(0))
 assert sm == "Измерване — книга qm_breakout: записани 3 · затворени 0 · win rate след 20 затворени", sm
 assert "Записани: 3" in txt and "чакат вход 3" in txt and "Win rate се показва след 20 затворени (сега 0)" in txt and "Win rate:" not in txt
-assert "Чакащи и отворени (3)" in txt and "$151.83" in txt and "Defensive" in txt and "две граници" in txt
+assert "Чакащи и отворени (3)" in txt and "$151.83" in txt and "Defensive" in txt and "двете граници" in txt and "5-минутните бари на входния ден" in txt     # 03.11.2026 (т. 11)
 for u in ("qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/", "qullamaggie.com/how-to-master-a-setup-episodic-pivots/", "qullamaggie.com/faq/"):
     assert u in sec
 print("  ✓ <details> със заглавен ред 'записани 3 · затворени 0 · win rate след 20 затворени'; вътре — таблицата на 3-те реални чакащи записа, двете граници, линковете към qullamaggie.com")

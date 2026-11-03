@@ -434,7 +434,7 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
 
 _QM_RESULT_KEYS = ("status", "fill_date", "fill_price", "stop_loss", "risk_per_share", "target1_hit_date", "partial_price", "partial_fraction", "trail_ma",
                    "exit_date", "exit_price", "R", "R_pess", "realized_r", "realized_r_pess", "current_r", "return_pct", "return_pct_pess", "last_close",
-                   "last_close_date", "how", "r_risk", "r_floored")
+                   "last_close_date", "how", "r_risk", "r_floored", "r_basis")
 
 
 def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None) -> None:
@@ -907,6 +907,50 @@ def _normalize_price_columns(data: "pd.DataFrame", tickers: list[str],
            for f in fields}
 
 
+def fetch_5m(ticker: str, day: str) -> pd.DataFrame | None:
+    """03.11.2026 (т. 11): 5-минутните бари на редовната сесия за един ден (yfinance; ~60 дни назад). Провал / празно → None."""
+    d = dt.date.fromisoformat(day)
+    df = net_utils.fetch_with_timeout(lambda: yf.download(ticker, start=d.isoformat(), end=(d + dt.timedelta(days=1)).isoformat(), interval="5m",
+                                                          auto_adjust=False, prepost=False, progress=False), timeout=30)
+    if df is None or len(df) == 0:
+        return None
+    if isinstance(df.columns, pd.MultiIndex):
+        df = df.xs(ticker, axis=1, level=1) if ticker in df.columns.get_level_values(1) else df.droplevel(1, axis=1)
+    return df
+
+
+_FETCH_5M = fetch_5m                     # подменя се в тестовете
+
+
+def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
+    """
+    03.11.2026 (разходката, т. 11): 5-минутните бари на входния ден → rec["intraday"] (веднъж — после се пази в записа; yfinance ги държи ~60 дни). True, ако е добавено ново.
+    Вече има / няма вход → False. Входът е по-стар от config.QM_INTRADAY_MAX_DAYS → rec["intraday_status"] = "expired" (остават двете оценки). Провал на тегленето / нивото не е
+    достигнато в 5-минутните → intraday_status с причината (нов опит в следващия бриф, докато е в прозореца). Не вдига.
+    """
+    if not fill_date or (isinstance(rec.get("intraday"), dict) and rec["intraday"].get("date") == fill_date):
+        return False
+    if (today - dt.date.fromisoformat(fill_date)).days > config.QM_INTRADAY_MAX_DAYS:
+        rec["intraday_status"] = "expired"
+        return False
+    try:
+        bars5 = _FETCH_5M(rec["ticker"], fill_date)
+    except Exception as e:
+        rec["intraday_status"] = f"тегленето не успя ({type(e).__name__})"
+        print(f"[backtest] {rec['ticker']}: 5-минутните бари за {fill_date} не се изтеглиха ({type(e).__name__}: {e}) — R остава с двете граници")
+        return False
+    got = trade_sim.qm_intraday_entry(bars5, float(rec["buy_stop"]))
+    if not got:
+        rec["intraday_status"] = "няма 5-минутни бари" if bars5 is None else "5-минутните бари не стигат нивото"
+        print(f"[backtest] {rec['ticker']}: {rec['intraday_status']} за {fill_date} — R остава с двете граници")
+        return False
+    rec["intraday"] = {**got, "date": fill_date, "source": "yfinance 5m", "fetched": today.isoformat()}
+    rec.pop("intraday_status", None)
+    print(f"[backtest] {rec['ticker']}: 5-минутни бари {fill_date} — пробив в {got['entry_time']} по ${got['fill']}, стоп ${got['stop']} (дъното до пробива), "
+          f"дъно на деня ${got['low_of_day']} в {got['low_time']}" + (f", стопиран в {got['stop_time']}" if got["stopped"] else ", не е стопиран в деня"))
+    return True
+
+
 def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: dt.date) -> None:
     """
     Резолюция на запис от книгата "qm_breakout": trade_sim.simulate_qm върху дневните барове (чиста функция на плана и баровете — както buy-stop книгата, без памет от сигнала).
@@ -929,6 +973,8 @@ def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: d
         return
     bars = pd.DataFrame({"Open": opens[t], "High": highs[t], "Low": lows[t], "Close": closes[t]}).dropna()
     res = trade_sim.simulate_qm(rec, bars, today)
+    if config.QM_INTRADAY_MAX_DAYS > 0 and _qm_intraday(rec, res.get("fill_date"), today):          # 03.11.2026 (т. 11): входът и стопът — от 5-минутните бари
+        res = trade_sim.simulate_qm(rec, bars, today)
     for k in _QM_RESULT_KEYS:
         rec[k] = res.get(k)
     rec["spy_return_pct"] = trade_sim.spy_return_pct(res, spy_bars) if spy_bars is not None else None
@@ -1075,8 +1121,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
     # 20.10.2026 (етап 3, т. 1): ENTRY_VOLUME_LOOKBACK_DAYS — средният обем за 50 сесии преди входа; по-дългата история не мени симулациите (входът е от entry_date)
     vol_backfill = [(k, r) for k, r in tracker.items() if r.get("method") == "v2" and r.get("fill_date") and "entry_volume_ratio" not in r
                     and record_category(r) in (CATEGORY_ACTION, CATEGORY_BUYSTOP) and (k, r) not in live_items]
-    tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill})
-    earliest = (dt.date.fromisoformat(min([rec["entry_date"] for _, rec in live_items] + [r["fill_date"] for _, r in vol_backfill]))
+    # 03.11.2026 (т. 11): затворените записи на qm_breakout без 5-минутни бари, докато са в прозореца на yfinance — веднъж, с наново изчислен R
+    qm_backfill = [(k, r) for k, r in tracker.items() if record_category(r) == CATEGORY_QM and r.get("fill_date") and (k, r) not in live_items
+                   and not isinstance(r.get("intraday"), dict) and r.get("intraday_status") != "expired" and not r.get("needs_manual_review")
+                   and config.QM_INTRADAY_MAX_DAYS > 0]
+    tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill} | {r["ticker"] for _, r in qm_backfill})
+    earliest = (dt.date.fromisoformat(min([rec["entry_date"] for _, rec in live_items] + [r["fill_date"] for _, r in vol_backfill] + [r["entry_date"] for _, r in qm_backfill]))
                 - dt.timedelta(days=max(30, ENTRY_VOLUME_LOOKBACK_DAYS))).isoformat()
     # т.8: SPY за сравнението със v2 позициите — във ВСЕКИ случай в същия batch (нула втори fetch)
     dl = tickers + (["SPY"] if "SPY" not in tickers and any(r.get("method") == "v2" for _, r in live_items) else [])
@@ -1175,6 +1225,17 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         t = rec["ticker"]
         if volumes is not None and t in getattr(volumes, "columns", []):
             rec.update(entry_volume(rec["fill_date"], pd.DataFrame({"Volume": volumes[t]})))
+    # 03.11.2026 (т. 11): затворените записи на qm_breakout — 5-минутните бари на входния ден и R наново (симулацията е чиста функция на записа и баровете)
+    for _, rec in qm_backfill:
+        before = (rec.get("status"), rec.get("realized_r"), rec.get("realized_r_pess"))
+        try:
+            _resolve_qm_record(rec, opens, highs, lows, closes, spy_bars, today)
+        except Exception as e:
+            print(f"[backtest] {rec['ticker']}: 5-минутните бари назад — неуспешно: {type(e).__name__}: {e}")
+            continue
+        if isinstance(rec.get("intraday"), dict):
+            print(f"[backtest] qm_breakout {rec['ticker']} {rec['fill_date']}: назад с 5-минутни бари — {before[0]} R {before[1]} / {before[2]} (opt / pess) → "
+                  f"{rec.get('status')} R {rec.get('realized_r') if rec.get('realized_r') is not None else rec.get('current_r')}")
 
 
 def _fetch_current_prices(tickers: list[str]) -> dict[str, float]:
@@ -1536,6 +1597,7 @@ def get_qm_summary() -> dict:
     """
     Qullamaggie: обобщение на ОТДЕЛНАТА книга "qm_breakout" (отделна стратегия — измерване, не препоръка). Чисто локално четене (без мрежа). Win rate (интервал на Wilson), медианата на R и
     сравнението със SPY — чак при ≥ config.QM_MIN_CLOSED_FOR_WINRATE затворени записа; дотогава само броят и средният R (и за двете граници на стопа на входния ден: opt и pess).
+    03.11.2026 (т. 11): записите с 5-минутни бари (r_basis "5m") имат ЕДИН R (R_pess = R); closed_5m / closed_bounds казват колко са всеки вид.
     Редовете носят отметка also_action / also_buystop, когато тикърът е и в Action / buy-stop книгата (застъпване на интервалите). Изключено → {}.
     """
     if not config.TRACK_QM:
@@ -1597,6 +1659,8 @@ def get_qm_summary() -> dict:
                 "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
                 "spinoff_note": r.get("spinoff_note"),                                                       # 13.10: предстоящо отделяне
                 "deal": r.get("deal"),                                                                       # 26.10: цел на придобиване
+                "r_basis": r.get("r_basis"), "entry_time": (r.get("intraday") or {}).get("entry_time") if isinstance(r.get("intraday"), dict) else None,   # 03.11.2026 (т. 11)
+                "stopped_intraday": r.get("how") == "stop_intraday", "intraday_status": r.get("intraday_status"),
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -1607,6 +1671,9 @@ def get_qm_summary() -> dict:
         "not_triggered_pct": round(100 * not_trig / window_done, 1) if window_done else None,
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)),
         "avg_realized_r": round(sum(ro) / len(ro), 2) if ro else None, "avg_realized_r_pess": round(sum(rp) / len(rp), 2) if rp else None,
+        # 03.11.2026 (т. 11): колко от R са от 5-минутните бари (една стойност) и колко — с двете граници (5-минутните са изтекли / не се изтеглиха)
+        "closed_5m": sum(1 for r in closed if r.get("r_basis") == "5m"), "closed_bounds": sum(1 for r in closed if r.get("r_basis") != "5m"),
+        "triggered_5m": sum(1 for r in triggered if r.get("r_basis") == "5m"),
         "min_closed": min_closed, "stats_visible": visible,
         "wins": wins if visible else None, "losses": (len(ro) - wins) if visible else None, "win_rate_pct": round(100 * wins / len(ro), 1) if visible else None,
         "win_rate_pess_pct": round(100 * wins_p / len(rp), 1) if visible else None, "win_ci_pct": _wilson_ci_pct(wins, len(ro)) if visible else None,
