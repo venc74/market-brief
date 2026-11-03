@@ -976,7 +976,7 @@ def run() -> dict:
         # 29.10.2026 (разходката, т. 6): маркер, ако тикърът е и в наш скрийнър / книга (Action, Watchlist, QM, GLB, EP, отворените записи в книгите)
         watch_monitor.attach_markers(rows, {"Action": action, "Watchlist": watchlist, "QM": qm_cards, "GLB": glb_candidates, "EP": (qm_ep_out or {}).get("rows")},
                                      books=config.ENABLE_BACKTEST)
-        active = [r for r in rows if not r["quiet"]]
+        active = [r for r in rows if r.get("event")]                    # 03.11.2026 (т. 5): AI само при новина или нов Form 4 (подаден от предишния бриф)
         if active:
             market_context = {
                 "cot_markets": [c["market"] for c in cot_with_theses][:10],

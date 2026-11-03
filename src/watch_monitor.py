@@ -379,7 +379,9 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
 
     Връща [{ticker, name, facts, news: [...], insider: [...], insider_cluster: bool,
              quiet: bool}], в реда на списъка. `quiet=True` значи нула новини и
-    нула Form 4 — извикващият не бива да праща такъв тикър към AI-то (29.10.2026: фактите на реда не са събитие).
+    нула Form 4 — извикващият не бива да праща такъв тикър към AI-то (29.10.2026: фактите на реда не са събитие). 03.11.2026 (поправки след брифа, т. 5): "event" — новина
+    в прозореца ИЛИ Form 4, подаден в прозореца ("filed" ≥ началото му); само такива редове отиват към AI (на 03.11 BFLY, ELF и ACN получиха „Няма новини … само insider
+    транзакции“ заради Form 4 отпреди 1–5 седмици). Без "filed" (стар запис) → не е нов. "f4_new" — броят им.
     02.11.2026 (т. 4): window_hours — прозорецът на новините (main: от предишния бриф — понеделник 72 ч); без него — config.WATCH_NEWS_WINDOW_HOURS.
     """
     tickers = tickers if tickers is not None else load_watch_list()
@@ -397,10 +399,12 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
         insider = {}
 
     rows = []
+    since_day = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=window_hours or config.WATCH_NEWS_WINDOW_HOURS)).date().isoformat()
     for tk in tickers:
         f = fx.get(tk) or {}
         news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
         txns = insider.get(tk, [])
+        new_f4 = [t for t in txns if str(t.get("filed") or "") >= since_day]          # 03.11.2026 (т. 5): Form 4, подаден в прозореца (от предишния бриф)
         rows.append({
             "ticker": tk,
             "name": f.get("name"),
@@ -410,6 +414,7 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
             "insider_cluster": _insider_cluster(txns),
             "insider_flags": insider_flags(txns),                   # 30.10.2026: по посока — покупки / продажби, с плана
             "quiet": not news and not txns,
+            "event": bool(news or new_f4), "f4_new": len(new_f4),               # 03.11.2026 (т. 5): AI коментар само при новина или нов Form 4
         })
     quiet = [r["ticker"] for r in rows if r["quiet"]]
     print(f"[watch] {len(rows)} наблюдавани тикъра — "

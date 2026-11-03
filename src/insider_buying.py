@@ -288,6 +288,12 @@ def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]] | N
     мина успешно, просто няма скорошни Form 4" за diagnostics в кеша (виж
     fetch_insider_buying: submissions_fetch_errors vs tickers_with_filings).
     """
+    got = _recent_form4_filings(cik, since)
+    return None if got is None else [(a, d) for a, d, _ in got]
+
+
+def _recent_form4_filings(cik: str, since: dt.date) -> list[tuple[str, str, str]] | None:
+    """03.11.2026 (поправки след брифа, т. 5): като _recent_form4_for_cik, но с датата на подаване — [(accessionNumber, primaryDocument, filingDate ISO)]; провал → None."""
     try:
         r = requests.get(f"https://data.sec.gov/submissions/CIK{cik}.json",
                          timeout=20, headers=_EDGAR_UA)
@@ -310,7 +316,7 @@ def _recent_form4_for_cik(cik: str, since: dt.date) -> list[tuple[str, str]] | N
             continue
         if fdate < since:
             continue
-        out.append((accs[i], docs[i] if i < len(docs) else ""))
+        out.append((accs[i], docs[i] if i < len(docs) else "", fdate.isoformat()))
     return out
 
 
@@ -907,11 +913,11 @@ def fetch_insider_transactions(tickers: list[str], days: int | None = None) -> d
         if not cik:
             print(f"[watch] {tk}: няма CIK в SEC мапинга — пропускам insider проверката")
             continue
-        filings = _recent_form4_for_cik(cik, since)
+        filings = _recent_form4_filings(cik, since)
         if not filings:
             continue
         rows = []
-        for acc, doc in filings:
+        for acc, doc, filed in filings:
             url = _form4_xml_url(cik, acc, doc)
             if not url:
                 continue
@@ -927,7 +933,7 @@ def fetch_insider_transactions(tickers: list[str], days: int | None = None) -> d
                 continue
             owner = (parsed["owners"] or [{}])[0]
             for t in parsed["transactions"]:
-                rows.append({**t, "owner_name": owner.get("name", ""),
+                rows.append({**t, "owner_name": owner.get("name", ""), "filed": filed,          # 03.11.2026: датата на подаване (събитие за AI = подадено от предишния бриф)
                              "owner_title": owner.get("title", ""),
                              "is_officer": owner.get("is_officer", False),
                              "is_director": owner.get("is_director", False)})

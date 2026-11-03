@@ -1610,6 +1610,37 @@ def watch_ticker_digest(rows: list[dict], market_context: dict, window_hours: fl
     return out
 
 
+_NAME_SEQ = re.compile(r"(?<![\w-])[A-Z][a-z]+(?:[-'][A-Z]?[a-z]+)*(?:\s+[A-Z](?:[a-z]+(?:[-'][A-Z]?[a-z]+)*|\.?)){1,3}(?![\w-])")
+
+
+def fix_person_names(text: str, owners: list[str], blob: str) -> tuple[str, list[str]]:
+    """
+    03.11.2026 (поправки след брифа, т. 5): имената на хора в AI текста за наблюдаваните — само ДОСЛОВНО от таблицата. EDGAR пише инсайдъра „Фамилия Име Презиме“
+    („Sweet Julie Spellman“, понякога с главни букви); на 03.11 моделът написа „Julie Spellman“ (ACN) и „Ryoji Sekido“ (вместо „Sekido Ryoji“). Последователност от 2–4 думи с главна
+    латинска буква: точно име от Form 4 или дословно в останалия вход (blob — заглавията, източниците, длъжностите, името на компанията) → остава; иначе, ако има поне 2 общи думи
+    (без значение на регистъра) с име на инсайдър → заменя се с дословното име; без общи думи с входа → не се маха (може да е „Wall Street“), само ред в лога. → (текст, бележки).
+    Чиста функция.
+    """
+    notes = []
+    if not text:
+        return text, notes
+    own = [(o, {w.strip(".").lower() for w in o.split()}) for o in owners if o]
+    exact = {o for o, _ in own}
+    blob_words = {w.strip(".,:;()\"'").lower() for w in (blob + " " + " ".join(exact)).split()}
+    for m in list(_NAME_SEQ.finditer(text)):
+        seq = m.group(0).strip()
+        if seq in exact or seq in blob:
+            continue
+        toks = {w.strip(".").lower() for w in seq.split()}
+        best = max(own, key=lambda o: len(toks & o[1]), default=None)
+        if best and len(toks & best[1]) >= 2:
+            text = re.sub(rf"(?<![\w-]){re.escape(seq)}(?![\w-])", best[0], text)
+            notes.append(f"«{seq}» → «{best[0]}» (дословно от Form 4)")
+        elif not (toks & blob_words):
+            notes.append(f"«{seq}» — няма го във входа (само лог)")
+    return text, notes
+
+
 def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
     """Една група наблюдавани тикъри → [{**ред, "ai": {summary, insider_read, cross_reference}}]. Хвърля при провал (watch_ticker_digest го хваща за групата)."""
     compact = [{
@@ -1631,6 +1662,9 @@ def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: fl
 {json.dumps(market_context, ensure_ascii=False, default=str)}
 
 За всеки тикър върни:
+
+ИМЕНА НА ХОРА — САМО дословно от таблицата (полето "owner" — EDGAR ги пише „Фамилия Име Презиме“, напр. „Sweet Julie Spellman“; НЕ ги преподреждай и не ги \
+съкращавай) или от заглавията. Ако не си сигурен — пиши длъжността (CEO, CFO, директор), без име.
 
 - "summary": 1-2 изречения — какво реално се случи. Не преразказвай заглавията \
 едно по едно; кажи какво е същественото. Ако новините са само аналитични \
@@ -1667,11 +1701,15 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
     annotated = []
     for r in rows:
         d = by_ticker.get(r["ticker"]) or {}
-        annotated.append({**r, "ai": {
-            "summary": (d.get("summary") or "").strip(),
-            "insider_read": (d.get("insider_read") or "").strip(),
-            "cross_reference": (d.get("cross_reference") or "").strip(),
-        }})
+        ai = {k: (d.get(k) or "").strip() for k in ("summary", "insider_read", "cross_reference")}
+        owners = list(dict.fromkeys(t.get("owner_name") or "" for t in r.get("insider") or []))          # 03.11.2026 (т. 5): имената — дословно от таблицата
+        blob = " ".join([r.get("ticker") or "", r.get("name") or ""] + [t.get("owner_title") or "" for t in r.get("insider") or []]
+                        + [f"{n.get('title', '')} {n.get('publisher', '')}" for n in r.get("news") or []])          # без имената от Form 4 — те се сверяват точно
+        for k in ai:
+            ai[k], notes = fix_person_names(ai[k], owners, blob)
+            for n in notes:
+                print(f"[ai] watch {r['ticker']} {k}: {n}")
+        annotated.append({**r, "ai": ai})
     linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
     print(f"[ai] watch_ticker_digest: група {', '.join(r['ticker'] for r in rows)} — {len(annotated)} тикъра, {linked} с cross-reference")
     return annotated

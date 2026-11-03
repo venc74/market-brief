@@ -1,0 +1,519 @@
+{
+ "_note": "РЕАЛНО: brief[\"watch\"] от публикувания бриф data/2026-11-03.json — редовете на ACN, ELF, BMNR, BFLY и DOCU (новините, Form 4 записите и AI текстът, който моделът върна в run-а на 03.11); извадено на 03.11.2026. Form 4 записите нямат \"filed\" (полето е от 03.11 вечерта).",
+ "rows": [
+  {
+   "ticker": "BFLY",
+   "name": null,
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 6.14,
+     "chg_1d_pct": -3.91,
+     "ma50": 8.0,
+     "above_50": false,
+     "ma200": 6.05,
+     "above_200": true,
+     "rs_20": -31.6,
+     "rs_60": -27.7,
+     "rs_word": "изостава"
+    },
+    "short": {},
+    "earnings": {
+     "next": "2027-02-25",
+     "days": 114,
+     "status": "ok"
+    }
+   },
+   "news": [],
+   "insider": [
+    {
+     "date": "2026-10-06",
+     "code": "S",
+     "shares": 35790.0,
+     "price": 10.02,
+     "value": 358615.8,
+     "shares_after": 7311930.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 0.5,
+     "owner_name": "DEVIVO JOSEPH",
+     "owner_title": "President & CEO",
+     "is_officer": true,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-02",
+     "code": "S",
+     "shares": 10114.0,
+     "price": 8.745,
+     "value": 88446.93,
+     "shares_after": 401971.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 2.5,
+     "owner_name": "Carlson Megan",
+     "owner_title": "CAO and SVP, Finance",
+     "is_officer": true,
+     "is_director": false
+    }
+   ],
+   "insider_cluster": false,
+   "insider_flags": [
+    {
+     "dir": "S",
+     "label": "продажби",
+     "n": 2,
+     "owners": 2,
+     "value": 447063,
+     "cluster": false,
+     "plan": "частично по план",
+     "top_offplan": {
+      "owner": "Carlson Megan",
+      "title": "CAO and SVP, Finance",
+      "date": "2026-10-02",
+      "value": 88447
+     }
+    }
+   ],
+   "quiet": false,
+   "in_brief": [],
+   "ai": {
+    "summary": "Няма новини за последните 24 часа. Единственото движение е от insider транзакции.",
+    "insider_read": "CEO DeVivo продаде $358K (0.5% от holdings) по план (10b5-1) — рутинно. CAO Carlson продаде $88K, но тази транзакция е извънпланова и представлява 2.5% от holdings — малка абсолютна сума, но липсата на план при финансов директор на операциите заслужава внимание; сама по себе си не е сериозен сигнал, но си струва да се следи при повторение.",
+    "cross_reference": ""
+   }
+  },
+  {
+   "ticker": "ELF",
+   "name": null,
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 110.68,
+     "chg_1d_pct": -0.9,
+     "ma50": 105.7,
+     "above_50": true,
+     "ma200": 81.41,
+     "above_200": true,
+     "rs_20": 9.6,
+     "rs_60": 15.1,
+     "rs_word": "води пазара"
+    },
+    "short": {},
+    "earnings": {
+     "next": "2026-11-04",
+     "days": 1,
+     "status": "ok"
+    }
+   },
+   "news": [],
+   "insider": [
+    {
+     "date": "2026-10-15",
+     "code": "S",
+     "shares": 7926.0,
+     "price": 110.1529,
+     "value": 873071.8854,
+     "shares_after": 119005.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 6.2,
+     "owner_name": "Franks Joshua Allen",
+     "owner_title": "SVP, Operations",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 8366.0,
+     "price": 110.006,
+     "value": 920310.196,
+     "shares_after": 126931.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 6.2,
+     "owner_name": "Franks Joshua Allen",
+     "owner_title": "SVP, Operations",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-01",
+     "code": "S",
+     "shares": 23072.0,
+     "price": 102.8351,
+     "value": 2372611.4272,
+     "shares_after": 158424.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 12.7,
+     "owner_name": "AMIN TARANG",
+     "owner_title": "Chief Executive Officer",
+     "is_officer": true,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-01",
+     "code": "S",
+     "shares": 21902.0,
+     "price": 103.6574,
+     "value": 2270304.3748,
+     "shares_after": 136522.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 13.8,
+     "owner_name": "AMIN TARANG",
+     "owner_title": "Chief Executive Officer",
+     "is_officer": true,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-01",
+     "code": "S",
+     "shares": 2026.0,
+     "price": 105.0077,
+     "value": 212745.6002,
+     "shares_after": 134496.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 1.5,
+     "owner_name": "AMIN TARANG",
+     "owner_title": "Chief Executive Officer",
+     "is_officer": true,
+     "is_director": true
+    }
+   ],
+   "insider_cluster": false,
+   "insider_flags": [
+    {
+     "dir": "S",
+     "label": "продажби",
+     "n": 5,
+     "owners": 2,
+     "value": 6649043,
+     "cluster": false,
+     "plan": "по план (10b5-1)"
+    }
+   ],
+   "quiet": false,
+   "in_brief": [],
+   "ai": {
+    "summary": "Няма новини за последните 24 часа. Единственото движение е от insider транзакции.",
+    "insider_read": "CEO Tarang Amin продаде ~$4.86M в три транзакции на 1 октомври (общо ~27% от holdings в тези лотове), а SVP Operations Franks продаде ~$1.79M в два лота. Всички продажби са по 10b5-1 план — рутинни по дефиниция, плановете са приети месеци по-рано. Процентите изглеждат високи за отделните лотове, но при множество лотове от един и същи план процентите се сумират изкуствено — не е сигнал за изход от позицията. Кластер от различни инсайдъри в координирана посока не е регистриран.",
+    "cross_reference": "ELF е в сектор Потребителски (циклични), който е сред водещите сектори днес — но това е широка секторна тема без пряко събитие, специфично за компанията."
+   }
+  },
+  {
+   "ticker": "DOCU",
+   "name": null,
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 81.65,
+     "chg_1d_pct": -0.63,
+     "ma50": 71.18,
+     "above_50": true,
+     "ma200": 54.69,
+     "above_200": true,
+     "rs_20": 19.5,
+     "rs_60": 38.2,
+     "rs_word": "води пазара"
+    },
+    "short": {},
+    "earnings": {
+     "next": "2026-12-03",
+     "days": 30,
+     "status": "ok"
+    }
+   },
+   "news": [],
+   "insider": [],
+   "insider_cluster": false,
+   "insider_flags": [],
+   "quiet": true,
+   "in_brief": [
+    "книга QM"
+   ],
+   "ai": {}
+  },
+  {
+   "ticker": "BMNR",
+   "name": null,
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 19.54,
+     "chg_1d_pct": -3.17,
+     "ma50": 24.39,
+     "above_50": false,
+     "ma200": 20.88,
+     "above_200": false,
+     "rs_20": -24.1,
+     "rs_60": 6.6,
+     "rs_word": "отслабва"
+    },
+    "short": {},
+    "earnings": {
+     "next": "2026-11-20",
+     "days": 17,
+     "status": "ok"
+    }
+   },
+   "news": [
+    {
+     "title": "BMNR Buys Nearly $20M Worth Of ETH: Tom Lee Calls Market’s Binance Hack Reaction ‘Very Constructive’",
+     "publisher": "",
+     "when": "2026-11-02T17:39:50+00:00",
+     "summary": "The firm's total crypto, cash, and \"moonshot\" holdings dropped to $14.5 billion from $15 billion.",
+     "link": "https://stocktwits.com/news-articles/markets/equity/bmnr-buys-nearly-20-m-worth-of-eth-tom-lee-calls-market-s-binance-hack-reaction-very-constructive/cNGa5GaR9Pm?.tsrc=rss"
+    },
+    {
+     "title": "Bitmine Buys Another 8,573 ETH, Pushes Ethereum Holdings Past $13.7B",
+     "publisher": "",
+     "when": "2026-11-02T16:23:00+00:00",
+     "summary": "Bitmine Immersion Technologies (NYSE: $BMNR) has increased its Ethereum (CRYPTO: $ETH) holdings to more than 6 mill...",
+     "link": "https://www.cryptoprowl.com/releases/bitmine-buys-another-8573-eth-pushes-ethereum-holdings-past-137b-7597?.tsrc=rss"
+    }
+   ],
+   "insider": [],
+   "insider_cluster": false,
+   "insider_flags": [],
+   "quiet": false,
+   "in_brief": [],
+   "ai": {
+    "summary": "Bitmine е купила около 8 573 ETH за близо $20M, увеличавайки общите си Ethereum holdings значително — това е продължение на стратегията за натрупване на ETH като корпоративен резерв. Коментарът на Tom Lee за реакцията на пазара към хака на Binance е аналитичен фон, не ново корпоративно събитие.",
+    "insider_read": "",
+    "cross_reference": "BMNR държи ETH като основен корпоративен актив, а Bitcoin Futures (CME) са активна тема — корелацията между BTC и ETH означава, че движенията в крипто фючърс пазара пряко влияят върху стойността на баланса на компанията."
+   }
+  },
+  {
+   "ticker": "ACN",
+   "name": null,
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 260.94,
+     "chg_1d_pct": 1.05,
+     "ma50": 204.27,
+     "above_50": true,
+     "ma200": 191.25,
+     "above_200": true,
+     "rs_20": 36.7,
+     "rs_60": 51.2,
+     "rs_word": "води пазара"
+    },
+    "short": {},
+    "earnings": {
+     "next": "2026-12-17",
+     "days": 44,
+     "status": "ok"
+    }
+   },
+   "news": [],
+   "insider": [
+    {
+     "date": "2026-10-26",
+     "code": "P",
+     "shares": 2100.0,
+     "price": 245.1063,
+     "value": 514723.23,
+     "shares_after": 38810.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 5.1,
+     "owner_name": "Sweet Julie Spellman",
+     "owner_title": "Chair and CEO",
+     "is_officer": true,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-26",
+     "code": "P",
+     "shares": 10100.0,
+     "price": 246.1701,
+     "value": 2486318.01,
+     "shares_after": 48910.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 17.1,
+     "owner_name": "Sweet Julie Spellman",
+     "owner_title": "Chair and CEO",
+     "is_officer": true,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-26",
+     "code": "P",
+     "shares": 800.0,
+     "price": 249.8097,
+     "value": 199847.75999999998,
+     "shares_after": 9361.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 7.9,
+     "owner_name": "Price Paula A",
+     "owner_title": "",
+     "is_officer": false,
+     "is_director": true
+    },
+    {
+     "date": "2026-10-22",
+     "code": "S",
+     "shares": 811.0,
+     "price": 250.0,
+     "value": 202750.0,
+     "shares_after": 9820.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 7.6,
+     "owner_name": "Burgum Melissa A",
+     "owner_title": "Chief Accounting Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-22",
+     "code": "S",
+     "shares": 4742.0,
+     "price": 244.7341,
+     "value": 1160529.1022,
+     "shares_after": 2296.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 67.4,
+     "owner_name": "Sekido Ryoji",
+     "owner_title": "Co-CEO Asia Pacific",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-22",
+     "code": "S",
+     "shares": 1102.0,
+     "price": 245.2789,
+     "value": 270297.3478,
+     "shares_after": 1194.0,
+     "planned_10b5_1": false,
+     "pct_of_holdings": 48.0,
+     "owner_name": "Sekido Ryoji",
+     "owner_title": "Co-CEO Asia Pacific",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 1.0,
+     "price": 210.8,
+     "value": 210.8,
+     "shares_after": 12555.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 0.0,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 219.0,
+     "price": 213.2052,
+     "value": 46691.938799999996,
+     "shares_after": 12336.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 1.7,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 242.0,
+     "price": 214.1421,
+     "value": 51822.3882,
+     "shares_after": 12094.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 2.0,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 206.0,
+     "price": 215.1296,
+     "value": 44316.6976,
+     "shares_after": 11888.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 1.7,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-12",
+     "code": "S",
+     "shares": 32.0,
+     "price": 216.36,
+     "value": 6923.52,
+     "shares_after": 11856.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 0.3,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    },
+    {
+     "date": "2026-10-08",
+     "code": "S",
+     "shares": 1320.0,
+     "price": 200.0,
+     "value": 264000.0,
+     "shares_after": 12556.0,
+     "planned_10b5_1": true,
+     "pct_of_holdings": 9.5,
+     "owner_name": "Hogan Catherine Kiernan",
+     "owner_title": "Chief Operating Officer",
+     "is_officer": true,
+     "is_director": false
+    }
+   ],
+   "insider_cluster": true,
+   "insider_flags": [
+    {
+     "dir": "P",
+     "label": "покупки",
+     "n": 3,
+     "owners": 2,
+     "value": 3200889,
+     "cluster": false,
+     "plan": "извънпланови",
+     "top_offplan": {
+      "owner": "Sweet Julie Spellman",
+      "title": "Chair and CEO",
+      "date": "2026-10-26",
+      "value": 3001041
+     }
+    },
+    {
+     "dir": "S",
+     "label": "продажби",
+     "n": 9,
+     "owners": 3,
+     "value": 2047542,
+     "cluster": true,
+     "plan": "частично по план",
+     "top_offplan": {
+      "owner": "Sekido Ryoji",
+      "title": "Co-CEO Asia Pacific",
+      "date": "2026-10-22",
+      "value": 1430826
+     }
+    }
+   ],
+   "quiet": false,
+   "in_brief": [],
+   "ai": {
+    "summary": "Няма новини за последните 24 часа — само insider транзакции. Периодът покрива покупки от CEO Julie Spellman и директор Paula Price, както и продажби от няколко ръководители.",
+    "insider_read": "Най-важното: налице е клъстер от продажби — Ryoji Sekido (Co-CEO Asia Pacific) е продал извънпланово акции за ~$1.43M, което представлява 67.4% и 48.0% от съответните му holdings — това е значителна позиция и без план 10b5-1 е сигнал, който заслужава внимание. Срещу него: CEO Julie Spellman е купила извънпланово акции за общо ~$3M (5.1% и 17.1% от holdings), което е силен контрасигнал от най-информирания инсайдър. Продажбите на COO Hogan са по предварителен план 10b5-1 и са рутинни — планът е приет месеци по-рано. Нетното четене: CEO купува агресивно, един регионален ръководител продава тежко — не е еднозначно тревожно, но Sekido заслужава следене.",
+    "cross_reference": ""
+   }
+  }
+ ]
+}
