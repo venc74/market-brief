@@ -318,6 +318,11 @@ QM_EP_MAX_ROWS = int(os.getenv("QM_EP_MAX_ROWS", 10))
 QM_EP_EDGAR_8K = os.getenv("QM_EP_EDGAR_8K", "1") == "1"         # 21.10.2026 (етап 4): 8-K на компанията, приет след затварянето (EDGAR, config.EDGAR_UA) — първият ред и доказателството за катализатора
 QM_EP_MIN_AH_BARS = 3                                            # поне толкова 5-минутни after-hours бара (иначе няма реална търговия)
 QM_EP_BATCH = 100
+# 03.11.2026 (т. 10, решения от 03.11): обновяването преди отварянето (src/preopen.py) — отделна стъпка в options_record.yml в 09:05 Ню Йорк; без AI
+PREOPEN_GAP_PCT = float(os.getenv("PREOPEN_GAP_PCT", 10.0))       # EP — гап нагоре в премаркета спрямо затварянето на предишната сесия
+PREOPEN_WATCH_GAP_PCT = float(os.getenv("PREOPEN_WATCH_GAP_PCT", 3.0))   # наблюдаваните — гап ± в премаркета
+PREOPEN_MIN_PM_BARS = 3                                          # поне толкова 5-минутни бара в премаркета (иначе няма реална търговия)
+PREOPEN_MAX_ROWS = 10
 
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing

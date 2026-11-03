@@ -479,6 +479,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
     html = tpl.render(
         closed_notice=closed_notice,
         calendar_note=brief.get("market_calendar_note"),      # 16.10.2026 (В2б): утре / в понеделник борсата не работи или затваря рано
+        preopen=brief.get("preopen"), preopen_gap=config.PREOPEN_GAP_PCT, preopen_watch_gap=config.PREOPEN_WATCH_GAP_PCT,    # 03.11.2026 (т. 10): карето преди отварянето
         date_human=f"{today.strftime('%d.%m.%Y')}, {WEEKDAYS_BG[today.weekday()]}",
         generated_at=gen_time,
         generated_tz=gen_tz,

@@ -492,6 +492,31 @@
 {# 16.10.2026 (В2а/б): затворена борса днес (страницата показва последния бриф) и календарът за следващия работен ден #}
 {% if closed_notice %}<div class="model-banner rejected">🛑 <strong>{{ closed_notice }}</strong></div>{% endif %}
 {% if calendar_note %}<div class="model-banner">📅 {{ calendar_note }}</div>{% endif %}
+{# 03.11.2026 (т. 10): обновяването преди отварянето (src/preopen.py, 09:05 Ню Йорк) — карето стои до следващия сутрешен бриф; без AI — заглавията и 8-K са дословни #}
+{% if preopen %}
+<section class="preopen" style="border:1px solid var(--regime);border-radius:8px;padding:12px 16px;margin:12px 0">
+  <h2 style="margin-top:0">Преди отварянето ({{ preopen.time_berlin }} Берлин / {{ preopen.time_ny }} Ню Йорк)</h2>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:8px">Само информация, не препоръка. Цените са от премаркета (Yahoo, 5-минутни бари; обемът там често липсва);
+    сравнението е със затварянето на {{ preopen.session[8:10] if preopen.session else "" }}.{{ preopen.session[5:7] if preopen.session else "" }}. Карето стои до следващия сутрешен бриф.</div>
+  {% if not preopen.ok %}<div class="small" style="color:var(--red)">Премаркетът не се изтегли днес{% if preopen.notes %} ({{ preopen.notes|join("; ") }}){% endif %} — празното НЕ значи, че няма гапове.</div>
+  {% elif not (preopen.gaps or preopen.levels or preopen.watch) %}<div class="small">Нищо за отбелязване: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
+  {% else %}
+  {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
+  <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
+    <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }})
+      {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
+      {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
+      {% if g.headline %}<br><span class="small">„{{ g.headline.title }}“{% if g.headline.source %} · {{ g.headline.source }}{% endif %}</span>{% endif %}
+      {% if not g.filings_8k and not g.headline %}<br><span class="small" style="color:var(--muted)">без 8-K и без заглавие за компанията досега</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+  {% if preopen.levels %}<div class="cs-sub">Нивата в премаркета · {{ preopen.levels|length }}</div>
+  <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.levels %}
+    <li><b class="mono">{{ x.ticker }}</b> · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}
+  {% if preopen.watch %}<div class="cs-sub">Наблюдаваните — гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}% · {{ preopen.watch|length }}</div>
+  <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.watch %}
+    <li><b class="mono">{{ x.ticker }}</b> {{ "%+.1f"|format(x.gap_pct) }}% (${{ "%.2f"|format(x.pm_price) }}; затваряне ${{ "%.2f"|format(x.prev_close) }})</li>{% endfor %}</ul>{% endif %}
+  {% endif %}
+</section>
+{% endif %}
 
 {# 07.10.2026: настройки за оразмеряване — само в localStorage на устройството на читателя; в брифа няма размер на сметка и брой акции #}
 <div id="mb-settings" class="mb-settings" data-regime-factor="{{ thermometer.sizing_factor if thermometer.sizing_factor is defined else 1 }}" hidden>
