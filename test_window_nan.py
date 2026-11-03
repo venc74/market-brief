@@ -52,7 +52,7 @@ assert (last, wk, d) == (4.806, 4.796, dt.date(2026, 9, 8))                     
 assert s.iloc[-6] == 4.758 and round((last - s.iloc[-6]) * 100, 1) == 4.8 and round((last - wk) * 100, 1) == 1.0
 print("  ✓ РЕАЛНО ^TNX на 08.09.2026 (07.09 няма бар): котва 01.09 = 4.796 → +1.0 б.п.; позиционната (31.08 = 4.758) даваше +4.8 б.п.")
 g, _ = quiet(lambda: (patch({"^TNX": s}), ml.global_market_signals())[1])
-assert g["US10Y"] == {"value": 4.81, "chg_5d_bp": 1.0}, g
+assert g["US10Y"] == {"value": 4.81, "chg_5d_bp": 1.0, "chg_1d_bp": 2.2, "chg_1d_date": "2026-09-08"}, g     # 03.11.2026: + последната завършена сесия
 print("  ✓ global_market_signals() през същия случай: US10Y {'value': 4.81, 'chg_5d_bp': 1.0}")
 
 v = real("^VIX", "2026-10-01")

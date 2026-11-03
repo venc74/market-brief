@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 import datetime as dt
+
+import pandas as pd
 import requests
 import yfinance as yf
 
@@ -466,6 +468,24 @@ def _price_time(info: dict | None) -> str | None:
         return None
 
 
+def last_session_change(close, today: dt.date | None = None, bp: bool = False) -> dict:
+    """
+    03.11.2026 (поправки след брифа, т. 4): промяната за ПОСЛЕДНАТА ЗАВЪРШЕНА сесия — затварянето ѝ срещу предишното, без днешния частичен бар (фючърсите в 07:30 Берлин са в нощната
+    сесия: последният им бар е днешният, незавършен). → {"chg_1d_pct" (или "chg_1d_bp" за доходностите), "chg_1d_date"}; под 2 завършени бара / NaN → {}. Чиста функция.
+    На 03.11 WTI: 104.12 (30.10) → 96.46 (02.11) = −7.36% — в макро текста липсваше; входът имаше само 5-дневната промяна (−2.34%).
+    """
+    from src import sessions
+    try:
+        c = sessions.complete_bars(close.dropna(), today or dt.date.today())
+    except Exception:
+        return {}
+    if c is None or len(c) < 2 or not (c.iloc[-1] == c.iloc[-1]) or not (c.iloc[-2] == c.iloc[-2]) or float(c.iloc[-2]) == 0:
+        return {}
+    last, prev = float(c.iloc[-1]), float(c.iloc[-2])
+    d = pd.Timestamp(c.index[-1]).date().isoformat()
+    return {"chg_1d_bp": round((last - prev) * 100, 1), "chg_1d_date": d} if bp else {"chg_1d_pct": round((last / prev - 1) * 100, 2), "chg_1d_date": d}
+
+
 def global_market_signals() -> dict:
     """
     DXY, VIX, gold, oil, copper, 10Y yield, MOVE — снимка + 5-дневна промяна.
@@ -513,12 +533,14 @@ def global_market_signals() -> dict:
                     out[name] = {
                         "value": round(last, 2),
                         "chg_5d_bp": round((last - wk) * 100, 1),
+                        **last_session_change(hist["Close"], bp=True),       # 03.11.2026 (т. 4): и последната завършена сесия, с датата ѝ
                     }
                     continue
                 out[name] = {
                     "value": round(last, 2),
                     "chg_5d_pct": round((last / wk - 1) * 100, 2),
                     "bar_date": hist.index[-1].date().isoformat(),
+                    **last_session_change(hist["Close"]),                  # 03.11.2026 (т. 4): и последната завършена сесия, с датата ѝ
                 }
                 if symbol.endswith("=F"):                       # 19.10.2026: кой договор и кога е цената — отделно, без да сваля сигнала
                     out[name]["chg_5d_basis"] = "continuous"
@@ -540,7 +562,7 @@ def global_market_signals() -> dict:
                             ch = yf.Ticker(und).history(period="1mo")
                             if len(ch) >= 6 and not _is_stale(ch.index[-1]):
                                 l2, w2, _ = last_and_week_ago(ch["Close"])
-                                out[name].update(chg_5d_pct=round((l2 / w2 - 1) * 100, 2), chg_5d_basis="contract")
+                                out[name].update(chg_5d_pct=round((l2 / w2 - 1) * 100, 2), chg_5d_basis="contract", **last_session_change(ch["Close"]))
                     except Exception as e:
                         out[name].setdefault("contract_reason", f"договорът не се прочете ({type(e).__name__})")
                         print(f"[macro] {name}: договорът не се прочете ({type(e).__name__}: {e}) — 5-дневната промяна е по непрекъснатия символ")

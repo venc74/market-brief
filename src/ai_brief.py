@@ -976,6 +976,40 @@ def _apply_meta_check(out: dict) -> dict:
     return out
 
 
+_SIGNAL_LABELS = {"Oil_WTI": "Петрол WTI", "Gold": "Злато", "Copper": "Мед", "DXY": "Долар (DXY)", "VIX": "VIX", "US10Y": "10-годишна доходност", "MOVE": "MOVE"}
+
+
+def signal_periods_block(macro: dict | None) -> str:
+    """
+    03.11.2026 (поправки след брифа, т. 4): пазарните сигнали с ИЗРИЧЕН период на всяко число — от кода, за промпта на макро разказа: „Петрол WTI (CLZ26): 97.56 сега · последната сесия
+    (понеделник): −7.36% · 5 сесии: −2.34%“ (денят — без дата: „02.11“ проверката на числата чете като 2.11 и маха изречението). На 03.11 текстът каза „петролът завърши петицата с −2.34%“ (5-дневната промяна) и пропусна −7.36% от понеделник — входът нямаше дневната
+    промяна, а периодът на −2.34% беше само в името на полето (chg_5d_pct). Без сигнали → "". Чиста функция.
+    """
+    gs = (macro or {}).get("global_signals") or {}
+    lines = []
+    for k, label in _SIGNAL_LABELS.items():
+        g = gs.get(k) or {}
+        if g.get("value") is None:
+            continue
+        d = g.get("chg_1d_date") or ""
+        try:                                                     # денят от седмицата, без дата — „(02.11)“ би се хванало от проверката на числата като 2.11
+            dm = ["понеделник", "вторник", "сряда", "четвъртък", "петък", "събота", "неделя"][dt.date.fromisoformat(d).weekday()]
+        except ValueError:
+            dm = "?"
+        unit, c1, c5 = ("б.п.", g.get("chg_1d_bp"), g.get("chg_5d_bp")) if "chg_5d_bp" in g else ("%", g.get("chg_1d_pct"), g.get("chg_5d_pct"))
+        parts = [f"{label}{' (' + g['contract'] + ')' if g.get('contract') else ''}: {g['value']}" + (" сега" if g.get("price_time_utc") else "")]
+        if c1 is not None:
+            parts.append(f"последната сесия ({dm}): {c1:+.2f}{' ' if unit == 'б.п.' else ''}{unit}")
+        if c5 is not None:
+            parts.append(f"5 сесии: {c5:+.2f}{' ' if unit == 'б.п.' else ''}{unit}")
+        lines.append(" · ".join(parts))
+    if not lines:
+        return ""
+    return ("ПАЗАРНИ СИГНАЛИ С ПЕРИОДА (от кода — същите числа като в МАКРО):\n" + "\n".join(lines) + "\n"
+            "ВАЖНО за тези числа: всяко число пиши С ПЕРИОДА си дословно оттук („за последната сесия (понеделник)“, „за 5 сесии“). НЕ пиши „петицата“, „седмицата“, „завърши“ "
+            "без периода; не представяй 5-дневната промяна като дневна или обратно. Ход за последната сесия от ±3% или повече — спомени го, ако пишеш за този актив.\n\n")
+
+
 def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
                       social: dict | None = None) -> str:
     """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API)."""
@@ -985,6 +1019,7 @@ def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news
 
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
+{signal_periods_block(macro)}
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
 ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
 
