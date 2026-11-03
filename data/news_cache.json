@@ -1,89 +1,131 @@
 {
- "date": "2026-11-02",
+ "date": "2026-11-03",
  "news": [
   {
-   "headline": "Oil prices ease 3% on optimism for Qatari-led talks on ending Iran war - Reuters",
+   "headline": "Oil edges up after report of US strike on Iran's Qeshm Island - Reuters",
    "source": "Reuters Business",
-   "why": "Петролните фючърси падат, облекчавайки натиска върху инфлацията и енергийния сектор, като XLE и свързаните акции реагират низходящо, докато авиокомпаниите и транспортният сектор получават подкрепа.",
-   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPeHdxcnVlWmx5T1pjbDZQS19XeXlYTW1xZmNONnJQWHk4YU1EQTRzZFZQVEJxYjd6WEJTN2pfZC10ZGlzXzVURVdHZkg1RjZGY2tjN0ZVRjNRc0p4UmQ1c2F6MUt4eEpHSml6Z3Q4WHpqV094aEo0dTlVbk00OGFBazlmdGhsWGdtckFHQjlBTVU5Q0FRR3hxUnVmcVpPeGZsTHBlWmhTdw?oc=5",
+   "why": "Удар срещу ирански цели вдига цените на петрола и злато, засилва търсенето на защитни активи и натиска на риска върху акциите.",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQTFpzbEJURFlBbkE1RzNfclduVWpDY29HaWY3dnZJNUFuTHFsckZXSU5iTGJHdUFzQkVmeVhvdk9IME9Hdkxwc0NQZzg4dFFzckltYVlzcGdWY2xhYmJWMWlMVmFyNml3YmFoSDBZMGdPZWlpU25IM3UtMW5iR3d1dGZrMGF4SzQ2MklEeG5lWU1iRUZjVDd5Nnhjc0dQamdDdEtUc3NMcFZDMTQ?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Iran, Qatari mediators hold third day of talks to end US-Iran war - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPdXU0aVh0RXlJYm1BOUtMU2FncFZnaDY5dVo4LXR0OFhsUzl1V2s0ZHpoeU5VX2d4cjg0RWRXRkRLLVhRRFJ6QlVKd3dEQ3ZtNVF0c0laVUtZZU1DTFB2bVVpN01abDA1RDRBWXJLRzFSVzZpQmFaWFBVaVdhNG9GdEVranBrT2M5NzlmWFVKSXo5QjJla0JLZ2x3SG9pOE9mb0xOaUNaZmxxbzQ4RlVVY04tZnRxZWNLNVBoby1WMXQ?oc=5"
+     "headline": "US carries out 'defensive' strikes on Iran's Qeshm Island, officials say - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNUW9iaUN1YmNnZlZ0a05YVklpS2I1dFp2UHR0VzNRaXRubGN6ZWczLWNqdlhaTENzcUtZYjQ4OG5Ca19nVmZjZTVEYlNGTTU4QXpZYVVXOXhnMTIzYXJBeWY5ZXdTREpkN1ZCNmNzd0d4eThoOTZmVUtFSEQ1NHg0b2VQU08xaHh5R01MUWhNN0NlY0l3d1gwVDRNM0RUTnZPMjR5TENVRVpETWIxenJ3?oc=5"
     },
+    {
+     "source": "Reuters Business",
+     "headline": "Trump raises doubts about renewed attacks on Iran - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOQndTRnlIMnd2YXYxWE0ySGhhU2lzZldZWGdGNlhUejVqLUxyTkJ3dzVnNWNZaGszckxhWVh3eDdtb1VmWHlpSkdyS1lES2VoYnhfdnVraHV4UE9ScDV3UHo2UVFmb1lHblVhaDdxM0I2QkxNc2x5Q3RybjNEVFRJQXdTbk05N2lxemd5cU1jWHh0aXVvM05rVmJiQm5uY2VmNGc?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "US has conducted defensive strikes on Iranian targets in the Strait of Hormuz, US official says - AP News",
+     "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOSlZQOGFnNWxyTG91ZkxGMkdDdlNhd1RuRUZzblYtZGxfOGpReXI2cE5oazAzZkFQRW96Y3VrUkdfenVFWWtPS1BfaFBYYWQ1WVBMVmpuaTZuU3llOGZNMF85QnVGRHAwZlphVWVoaDFiZWhoMWVjalhyTE5na3BVWjVHcmIyWDFoU0FnU2ZBaFZyOE5GRGJqQzdR?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "U.S. reportedly strikes Iran's Qeshm Island as Vance hopes for ‘negotiated settlement’ with Tehran",
+     "link": "https://www.cnbc.com/2026/11/03/iran-us-vance-trump-strikes.html"
+    }
+   ]
+  },
+  {
+   "headline": "Nvidia orders data centre clients to reduce China exposure",
+   "source": "Financial Times",
+   "why": "Регулаторен натиск върху NVDA и американски cloud доставчици да намалят China exposure ограничава адресируемия пазар и натиска маржовете в AI/semiconductor сектора.",
+   "link": "https://www.ft.com/content/1902df70-1380-4588-bad5-171352b575f2?syn-25a6b1a6=1"
+  },
+  {
+   "headline": "Apple forecasts margin drop in holiday quarter as rising memory costs bite - Reuters",
+   "source": "Reuters Business",
+   "why": "Слабата прогноза за маржове натиска AAPL надолу и влече целия tech/semiconductor сектор, тъй като растящите разходи за памет засягат доходността.",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNTGFsc2NMYXRUbERoRkphY2hPVWNDM0ZRRmw3OHZzNnlfN0h1aEowUG9uaHZraTJPNlcyVFVYZGVjYmx2Ui01d09OTm9YejM3UGF1aUJKcHVUSUxxb0ZGNTktQmVuRVF0X0pKYTF2clJ6YnJpVmNmUEZESHc4ZWRqMkt1d0VyMEV2RVZlUkYtUE9EcW03ZXB5RzFmQk01endLRWtzNFpnVGd4el90TFUxLWhxaXRxYUsyT1lmbjIySjQ2NXcxdVE?oc=5",
+   "also": [
     {
      "source": "Financial Times",
-     "headline": "Gulf braced for escalation of war between US-Israel alliance and Iran",
-     "link": "https://www.ft.com/content/efaa2962-1acb-45cf-afb4-d0088f0a1046?syn-25a6b1a6=1"
+     "headline": "Apple warns ‘unprecedented’ memory chip costs will hit margins",
+     "link": "https://www.ft.com/content/f6ad8c32-cacb-48ad-ad85-a9a7edac3f16?syn-25a6b1a6=1"
     },
     {
      "source": "CNBC",
-     "headline": "Rubio says Trump wants to end Iran war 'peacefully' even as both sides prepare for strikes",
-     "link": "https://www.cnbc.com/2026/11/02/us-iran-war-trump-hormuz-rubio.html"
+     "headline": "Apple's stock drops on weak margin forecast in Ternus’ first earnings report",
+     "link": "https://www.cnbc.com/2026/11/02/apple-aapl-q4-2026-earnings-live-updates.html"
     }
    ]
   },
   {
-   "headline": "Iran's IRGC Navy says two tankers 'exploded' after hitting mines in Hormuz - Reuters",
+   "headline": "Palantir forecasts strong quarterly revenue on AI demand - Reuters",
    "source": "Reuters Business",
-   "why": "Взривове на танкери в Ормузкия проток заплашват ключов маршрут за петрол и газ, което може рязко да обърне спада в цените на суровия петрол и да натисне нагоре енергийния сектор и шипинг акциите.",
-   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNZmk2dmxjdk1sOW96UkZiaUlJVXhzc1pJMjZJUnY2WGtvaXd4aXRJY3d4UTNoUmFJdUVQQjlkb0JPSmxEc2YzS1JOZ2NSWmpTUnhzYzBiU1hfeXBvb2F2WEp2NHc5YkFfUUNKSHc2NW1PMUVKT0xqUTdOa0tfUmZpQWE2SDFtdzJ5TmZleWpLd0Zid1JWR2Z0d0dOeVMwekFzNTNTYndHMmMyV0poZ2h0UmFOVWc2M3o3Z2h6TUR2SQ?oc=5"
-  },
-  {
-   "headline": "OPEC+ keeps December oil output targets steady ahead of tougher call for 2027",
-   "source": "CNBC",
-   "why": "Запазването на целите за производство от OPEC+ поддържа настоящото предлагане без изненади, което стабилизира петролните фючърси и намалява волатилността в енергийния сектор.",
-   "link": "https://www.cnbc.com/2026/10/31/opec-oil-output-targets-december.html"
-  },
-  {
-   "headline": "Goldman raises oil price forecast for December and 2027. Here's why",
-   "source": "CNBC",
-   "why": "Ревизията нагоре на прогнозата за петрол от Goldman Sachs влияе на енергийния сектор, фючърсите на суров петрол и инфлационните очаквания, което е релевантно за Fed и облигационния пазар.",
-   "link": "https://www.cnbc.com/2026/11/02/goldman-raises-oil-price-forecasts.html"
-  },
-  {
-   "headline": "Trump says US, Canada have 'concept' of a new trade deal - Reuters",
-   "source": "Reuters Business",
-   "why": "Сигналът за нова търговска рамка между САЩ и Канада намалява тарифния риск за двустранно свързани сектори като енергетика, автомобили и земеделие, като подкрепя CAD и свързаните акции.",
-   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPYkdVQi1MWlZSQ24xUkR6aC12d0llYjlUWlFDcmVuX1ByZk5tZ3JoQ3NTd01CM2piUFV2MGlEMWdCSnRTV1ExRDFUVGhYNjVVU2ZQT3lIS1UxbEVxSzNfZmdlY2duVXkySm8yNGNpbWRCdXpOMEF4ZFk3NXlJME5yZmRJTVVnVXUwa3VmcVBwWkNIejVkVjYtQWlYblJmdmVZbzI0eHR6YlMwTUJpWTZyR3hwZ1g?oc=5",
+   "why": "Силният ръст на commercial AI приходите и надминаването на government segment за първи път валидира диверсификацията и движи PLTR нагоре.",
+   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxORHl2TXR3V1NLdWxVUGFhNHludjhnOGY2M3g4TnktS19Pakw2dkM4VjAxMHQxcDEya0NtXzlGU29qc25GdEdrQ2o1WEI1MjlSc19ZZTBvVVZwRk1XZm9SQTJ5eEdRMm5mQ1p5aVZILWdXREdNU1d3RTBfSGRRRTJYLWVaZk5oR1U1Q0NSNGJHb2h3RUk5czl6bHJKQnBaTUREOWJmZHNKU2VsNGo3bHpldmo3SjRsbUcyRWc?oc=5",
    "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Trump floats 'concept' of US-Canada deal that includes pipeline talking to Carney - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOU2ZUM3VWU2twNlU5YnJfamYzWWJtaDV3bm5WTFZMNHpWWVdwSk1BY1REWjl2cEsweU5UQ3ZjbkZkWVlkNFZKZFRDb0tNUFJ0bXVBczAwdWNsV19uMFNCUnNWRHZ0T1NNQ1ZoV2lvY0piVFgzY1lJWnN4bWE0eU16cllQUW9WSGJKSUJQY3FGeDhqN2JJdmJnZkt1MjdXc1hscE1zdGxqQ1NIeFJsUVRvLUxjTlA?oc=5"
-    }
-   ]
-  },
-  {
-   "headline": "Tesla, Samsung oppose new US tariffs on Vietnam as probe deadline nears - Reuters",
-   "source": "Reuters Business",
-   "why": "Противопоставянето на Tesla и Samsung на нови тарифи върху Виетнам сигнализира риск за веригите на доставки в технологичния и EV сектор, като засяга директно TSLA и компоненти, произведени в Югоизточна Азия.",
-   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTUJxSGZ6aEZSWjV4VHFHeVBzTXMxVDFKcEg5OG1sbEdjTkliSDZSS2NvYmlRbUxfQks0eUVUbjJRSktzZVFqWnZTWlplTHM5YjVnUkNESHd4ZmgyRk5ib2lHdlNKYlZlQ3VqUHdvcHZvMjAzYXE2NDZLbnFnel9CZ1FoSHI5Nk1zY3NiTy1tSjhrZ1hZdVRnNVB3eHBfVUticXc1ejZ2cWlhUjR6ajRhTGRsVWVDVV9I?oc=5"
-  },
-  {
-   "headline": "China's shift to new policy rate signals easier funding conditions - Reuters",
-   "source": "Reuters Business",
-   "why": "Преходът на Китай към нов бенчмарк лихвен процент сигнализира по-разхлабени условия на финансиране, което е позитивно за китайските акции, суровините и EM активите с експозиция към Китай.",
-   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQR1Y5OGZoNEh2ZzdKN3pfVGlFWG8zT0tUdk9xOXQ2T0JfVlREREdhUWhpaFlTZmJPMV8wZ0h5SUg2YWd1bHA5M3FIaVFBZUdwbG1sbi0xMnNXdDFVNWotcmJTbHpCZWhCV0stcDd2WDFvcTZ6RkxsQ050V2ltZW5UUFgxcUk2ei0xQjROZENtTXdPX1A3ZGJ5RWluMVV5eHdvUThnbVdpb19vaTA0RGR5ZWVyLVg2bVh6Q2c?oc=5"
-  },
-  {
-   "headline": "Binance sees outflows stabilising as exchange returns online after $6.3 billion heist - Reuters",
-   "source": "Reuters Business",
-   "why": "Масивните изходящи потоци от Binance след хака натискат крипто пазара надолу, като Bitcoin и широкият крипто сектор изпитват повишена волатилност и загуба на доверие.",
-   "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNdXY4a011WkVOZHRKb3FKU2lMRzNwbGlwOUFPWFdMWVcycnhkeVd2aDZpc0tfclNqYTFsS1lkR1JGT1dqYXJkU1pIeDhITThrWm43QldpMFEwNnItS0k2a1hSckF4TU5rdlkxMnBjUnRfTThHY1AyVDlkaFFrRElKOUppaDU1NXg3a0dEUmY1VWtCNDVKM3pHLUlyOHV1TjZHdElqRUUzR1g5VThQcDYyV3NQSTNkYkFZMEVzM0ZHV2dYRGFsV1NLWWpWeGxyQQ?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Dollar rangebound ahead of US midterms; bitcoin reels from crypto heist - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPb2NfWVhRd1dsZXVELVl6emxWenVBSzdWTFVpcjlPaUtVNmgwbklnaHctbWF2VjdTTTJxQ3c4NzZZSGpSTG1QaThQQUZHY1RmeENqcTZNend0eDBla0dFNThjejRfM2dTdm1JYW9vd0duUnZFVUNWQUhETi1RVmZxNWxBZ2gzZEdBWTdGNnVqMmxVeUlKVUZPX0ttc3pnLUUxOGpoa1hpdVZNWWZrVkx6c3FoTkluMDRB?oc=5"
-    },
     {
      "source": "CNBC",
-     "headline": "Binance sees $3.64 billion in net outflows as withdrawals resume after massive hack",
-     "link": "https://www.cnbc.com/2026/11/02/binance-outflow-hack-bitcoin.html"
+     "headline": "Palantir reports booming U.S. commercial revenue growth, topping government for first time",
+     "link": "https://www.cnbc.com/2026/11/02/palantir-pltr-earnings-q3-2026.html"
     }
    ]
+  },
+  {
+   "headline": "Anthropic posts $17B quarterly revenue but losses continue in fresh IPO filing - AP News",
+   "source": "AP Business",
+   "why": "IPO-filing на Anthropic с огромни приходи, но продължаващи загуби повлиява оценките в AI сектора и конкурентите MSFT, GOOG, AMZN.",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOa09ReEZKQUZMUjIzWWo4RjlIdU9QWGpYZ3dlV0ZYRmo4WWlPR0tRTzgyUUR4Q0VHdGIzakJid3lRSEhBQmJTaVZQS2dXQ2NEMDhUY21tT2YwT1ZiazZlNmZ2cXNwOTkycUYxWksxbk5oSUMycXVxaHV3QTBIak1haWx0Uk84SHV1LTh1cU9rMGhtRGU2Q1E?oc=5",
+   "also": [
+    {
+     "source": "CNBC",
+     "headline": "Anthropic reports $17 billion in Q3 revenue, purchase commitments of $895.4 billion in revised S-1",
+     "link": "https://www.cnbc.com/2026/11/02/anthropic-ant-s-1-quarter-financials.html"
+    }
+   ]
+  },
+  {
+   "headline": "US to suspend South Africa and Rwanda from duty-free trade access - Reuters",
+   "source": "Reuters Business",
+   "why": "Отнемането на AGOA достъп за ЮАР и Руанда е тарифен шок за техния износ, натиска ZAR и засяга компании с африканска верига на доставки.",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQTXBRdlBrbE5GVUt6UUhpRWFyUUNFTlBtSTAtdXgyaDA1OFl6ajZTQWg1SGlTakZXRXFNc0x4V1QtMHdmc1Vpb0ZWUGxlai1xR2xJTDd5YnVfZXBuY3ZyU1JDQk5tWU5PMEUwZlV2NGpGamg3SEZ0clF1NzA2R25McW52dzk0aGxLUkVnXzFwNlRpYlY3SlR2ckJnNHZPOUx6ZHNzNg?oc=5",
+   "also": [
+    {
+     "source": "AP Business",
+     "headline": "Trump administration will cut South Africa and Rwanda from the AGOA trade program - AP News",
+     "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOM2U1TExENUVLdlpTSE9jMXBrQnY1ZVpuZUIzV3VBNWdJRXkyS0s0czFMRlhUUnlRd0N3S016UWtWdW1jc2dFaDNUWnc5UEltYTRzS250SEMtTGk3d1RYcE9rTGpkUDdzUHlodWYtQTRTaHpEaURfRXR4bDU4VWlPUEdGQWdkZXVrNFZmT0x6dGZBdG05WXlHMGFYSlk2MHNY?oc=5"
+    }
+   ]
+  },
+  {
+   "headline": "China to raise FX reserve requirement to slow yuan's rally - Reuters",
+   "source": "Reuters Business",
+   "why": "Повишаването на FX резервните изисквания забавя юановото поскъпване, влияе на USD/CNY и на позициите в китански активи и суровини.",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPWDB4ZFZKQmtlWTg4RlI1Tng1by1TNV9FMlZCSkFERGc1VmlndWxsUG5kNWFvemN0YXg2VmRneGNvTVh2YU9GdXRlTjJVRXZ3eE82UlZBS1Y5YWJOOUVMQk05elJZRVR6cDBnd3U2eGxHNUZtNFJsR3hqb294LWpHMDh5VmtZUnlPZTZjWFRhMDM3d19ya1pHbW54ZzZZay1uTmkxZlV2NFliV0s2blFSSU9qSTZYTnJi?oc=5"
+  },
+  {
+   "headline": "Automakers back Trump administration's rollback of US fuel economy rules - Reuters",
+   "source": "Reuters Business",
+   "why": "Отмяната на нормите за горивна ефективност намалява compliance разходите за GM, F и Stellantis и е позитивна за сектора.",
+   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPWG9Tc1hYaXEwVVJLTmxpc2VWcDN3NldaTDhfMUtlMGdrNThGYmkzTkl3V0pRdmUwYjRiVDdzMUp4T3BJUnZTSXNHWjM4VUtMcGFQRWJocGpiMmo3MG9UVHptalI2SlgzWWVsejV2Y0drenRCS0xMd0pOSW5Bc0pyR2RMeFlReS1NNE0wcnZPNzg4cUV6REMxbFcwOE1fZU1TbGlZUGxXUXlRUDZoRWNvWDNn?oc=5"
   }
- ]
+ ],
+ "window": {
+  "since": "2026-11-02T06:30:00+00:00",
+  "hours": 24.07,
+  "day_queries": 0,
+  "sources": {
+   "Reuters Business": {
+    "count": 50,
+    "oldest": "2026-11-02T14:48Z"
+   },
+   "CNBC": {
+    "count": 30,
+    "oldest": "2026-11-02T15:30Z"
+   },
+   "Financial Times": {
+    "count": 8,
+    "oldest": "2026-11-02T20:12Z"
+   },
+   "AP Business": {
+    "count": 50,
+    "oldest": "2026-11-02T06:58Z"
+   }
+  }
+ }
 }

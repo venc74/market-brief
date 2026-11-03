@@ -1,5 +1,5 @@
 {
- "date": "2026-11-02",
+ "date": "2026-11-03",
  "rows": [],
  "horizon": [
   {
@@ -17,6 +17,22 @@
    "ratio": "1:18",
    "split_type": "reverse",
    "date_human": "Nov 02, 2026"
+  },
+  {
+   "ticker": "BJDX",
+   "company": "Bluejay Diagnostics, Inc.",
+   "date": "2026-11-03",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 03, 2026"
+  },
+  {
+   "ticker": "UFG",
+   "company": "Uni-Fuels Holdings Limited",
+   "date": "2026-11-03",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 03, 2026"
   },
   {
    "ticker": "EFG",
@@ -81,18 +97,36 @@
    "ratio": "1:4",
    "split_type": "reverse",
    "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "EMBJ",
+   "company": "Embraer S.A.",
+   "date": "2026-11-16",
+   "ratio": "4:1",
+   "split_type": "normal",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "SNDK",
+   "company": "Sandisk Corporation",
+   "date": "2026-11-20",
+   "ratio": "8:1",
+   "split_type": "normal",
+   "date_human": "Nov 20, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 10,
+  "source_rows": 14,
   "horizon_from": "2026-11-02",
-  "horizon_to": "2026-11-09",
-  "in_week": 9,
+  "horizon_to": "2026-11-20",
+  "in_week": 11,
   "dropped_price": [
    "RETO",
    "VCIG",
+   "BJDX",
+   "UFG",
    "TOPS"
   ],
   "dropped_cap": [],
