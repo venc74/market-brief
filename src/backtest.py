@@ -510,13 +510,13 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
 def entry_hy_oas(thermo: dict | None) -> dict | None:
     """
     03.11.2026 (прегледът на 02.11, т. 5): HY OAS в деня на входа — от информативната плочка на термометъра („HY / IG OAS“, thermometer._credit_oas_indicator) →
-    {value, as_of, chg_bp, percentile}; скрита / липсва (стар бриф) → None. Чиста функция.
+    {value, as_of, chg_bp, percentile, chg_pct}; скрита / липсва (стар бриф) → None. Чиста функция.
     """
     ind = next((i for i in (thermo or {}).get("indicators") or [] if str(i.get("name", "")).startswith("HY / IG OAS")), None)
     hy = (ind or {}).get("hy") or {}
     if not ind or ind.get("hide") or hy.get("value") is None:
         return None
-    return {k: hy.get(k) for k in ("value", "as_of", "chg_bp", "percentile")}
+    return {k: hy.get(k) for k in ("value", "as_of", "chg_bp", "percentile", "chg_pct")}                    # 03.11.2026 (т. 8): + перцентилът на 20-дневната промяна
 
 
 def _stamp_entry_context(tracker: dict, keys_before: set, regime: str | None, hy_oas: dict | None) -> None:

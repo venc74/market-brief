@@ -1008,12 +1008,12 @@ def _funding_stress_indicator(fs: dict | None) -> dict | None:
 
 def credit_oas_verdict(hy: dict | None, iei_hyg: dict | None) -> str | None:
     """
-    03.11.2026 (прегледът на 02.11, т. 4): едно изречение от кода — HY OAS спрямо IEI/HYG. HY „се разширява“: промяната за config.CREDIT_OAS_CHG_SESSIONS наблюдения ≥ CREDIT_OAS_WIDENING_BP;
-    IEI/HYG „натиск“: жълт или червен. Скрит единият → None. Чиста функция.
+    03.11.2026 (прегледът на 02.11, т. 4): едно изречение от кода — HY OAS спрямо IEI/HYG. HY „се разширява“: промяната за config.CREDIT_OAS_CHG_SESSIONS наблюдения е на
+    ≥ CREDIT_OAS_WIDENING_PCT-и перцентил сред собствените ѝ предишни промени (03.11.2026, т. 8; до тогава ≥ +25 б.п.); IEI/HYG „натиск“: жълт или червен. Скрит единият → None. Чиста функция.
     """
-    if not hy or hy.get("hide") or hy.get("chg_bp") is None or not iei_hyg or iei_hyg.get("hide") or iei_hyg.get("value") is None:
+    if not hy or hy.get("hide") or hy.get("chg_pct") is None or not iei_hyg or iei_hyg.get("hide") or iei_hyg.get("value") is None:
         return None
-    wide, iei = hy["chg_bp"] >= config.CREDIT_OAS_WIDENING_BP, iei_hyg.get("status") in ("yellow", "red")
+    wide, iei = hy["chg_pct"] >= config.CREDIT_OAS_WIDENING_PCT, iei_hyg.get("status") in ("yellow", "red")
     if iei and not wide:
         return "натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, HY OAS е спокоен)"
     if iei and wide:
@@ -1026,8 +1026,8 @@ def credit_oas_verdict(hy: dict | None, iei_hyg: dict | None) -> str | None:
 def _credit_oas_indicator(oas: dict | None, iei_hyg: dict | None) -> dict | None:
     """
     03.11.2026 (прегледът на 02.11, т. 4): HY OAS и IG OAS (FRED) — САМО информативна плочка ("informational": True), не влиза в броенето. Ниво, промяна за 20 наблюдения, перцентил за
-    наличната история (~3 г.) и изречението спрямо IEI/HYG (credit_oas_verdict). Цветът — по HY: разширяване ≥ CREDIT_OAS_WIDENING_BP или перцентил ≥ CREDIT_OAS_PCT_YELLOW → жълто,
-    двете → червено. HY скрит (застоял / липсва) → скрита карта с причината (етикет, не тишина). None (изключено) → няма карта.
+    наличната история (~3 г.) и изречението спрямо IEI/HYG (credit_oas_verdict). Цветът — по HY: разширяване (перцентилът на 20-дневната промяна ≥ CREDIT_OAS_WIDENING_PCT) или
+    перцентил на нивото ≥ CREDIT_OAS_PCT_YELLOW → жълто, двете → червено. HY скрит (застоял / липсва) → скрита карта с причината (етикет, не тишина). None (изключено) → няма карта.
     """
     if oas is None:
         return None
@@ -1036,9 +1036,9 @@ def _credit_oas_indicator(oas: dict | None, iei_hyg: dict | None) -> dict | None
     if hy.get("value") is None:
         return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": "", "hide_reason": "HY OAS — " + (hy.get("hide_reason") or "няма данни")}
     n = config.CREDIT_OAS_CHG_SESSIONS
-    part = lambda k, x: (f"{k} {x['value']:.2f}% ({x['chg_bp']:+d} б.п. за {n} дни, {x['percentile']:.0f}. percentile)" if x.get("value") is not None
-                         else f"{k} — {x.get('hide_reason') or 'няма данни'}")
-    wide, high = hy["chg_bp"] >= config.CREDIT_OAS_WIDENING_BP, hy["percentile"] >= config.CREDIT_OAS_PCT_YELLOW
+    part = lambda k, x: (f"{k} {x['value']:.2f}% ({x['chg_bp']:+d} б.п. за {n} дни — {x['chg_pct']:.0f}. percentile на промяната; нивото — {x['percentile']:.0f}. percentile)"
+                         if x.get("value") is not None else f"{k} — {x.get('hide_reason') or 'няма данни'}")
+    wide, high = (hy.get("chg_pct") or 0) >= config.CREDIT_OAS_WIDENING_PCT, hy["percentile"] >= config.CREDIT_OAS_PCT_YELLOW
     status = "red" if wide and high else "yellow" if wide or high else "green"
     hf, d = hy.get("history_from") or "", hy["as_of"]
     verdict = credit_oas_verdict(hy, iei_hyg)

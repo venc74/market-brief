@@ -232,8 +232,8 @@ def funding_stress() -> dict:
 def oas_reading(obs: list[tuple[str, float]], today: dt.date | None = None) -> dict:
     """
     03.11.2026 (прегледът на 02.11, т. 4): една серия OAS от FRED (в %) → {value, as_of, chg_bp (за config.CREDIT_OAS_CHG_SESSIONS наблюдения), percentile (спрямо всички предишни
-    наблюдения в историята), n_history, history_from}. Без данни / под CREDIT_OAS_CHG_SESSIONS + 1 наблюдения / застояла (> FRED_DAILY_MAX_LAG_SESSIONS NYSE сесии) → {hide, hide_reason}.
-    Чиста функция.
+    наблюдения в историята), chg_pct (03.11.2026, т. 8: перцентилът на тази промяна сред всички предишни промени за същия брой наблюдения), n_history, history_from}.
+    Без данни / под CREDIT_OAS_CHG_SESSIONS + 1 наблюдения / застояла (> FRED_DAILY_MAX_LAG_SESSIONS NYSE сесии) → {hide, hide_reason}. Чиста функция.
     """
     from src.setup_rules import sessions_between
     hide = lambda why: {"value": None, "hide": True, "hide_reason": why}
@@ -248,7 +248,9 @@ def oas_reading(obs: list[tuple[str, float]], today: dt.date | None = None) -> d
         return hide(f"застояла — последно наблюдение {last_d.strftime('%d.%m')} (праг {config.FRED_DAILY_MAX_LAG_SESSIONS} сесии)")
     vals = [v for _, v in obs]
     last, hist = vals[-1], vals[:-1]
-    return {"value": round(last, 2), "as_of": obs[-1][0], "chg_bp": round((last - vals[-1 - n]) * 100), "percentile": round(100.0 * sum(1 for x in hist if x <= last) / len(hist), 1),
+    chg = [round((vals[k] - vals[k - n]) * 100) for k in range(n, len(vals))]                   # 20-дневните промени в б.п., последната — днешната
+    return {"value": round(last, 2), "as_of": obs[-1][0], "chg_bp": chg[-1], "percentile": round(100.0 * sum(1 for x in hist if x <= last) / len(hist), 1),
+            "chg_pct": round(100.0 * sum(1 for x in chg[:-1] if x <= chg[-1]) / len(chg[:-1]), 1) if len(chg) > 1 else None,
             "n_history": len(hist), "history_from": obs[0][0], "hide": False}
 
 

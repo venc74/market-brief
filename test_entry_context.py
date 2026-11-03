@@ -28,9 +28,9 @@ tile = th._credit_oas_indicator({"hy": hy, "ig": ig}, {"name": "IEI/HYG (Credit 
 
 print("── 1. entry_hy_oas — от плочката на термометъра ──")
 thermo = {"regime": "Defensive", "indicators": [{"name": "VIX", "value": 18}, tile]}
-assert backtest.entry_hy_oas(thermo) == {"value": 3.44, "as_of": "2026-10-30", "chg_bp": 34, "percentile": 87.9}
+assert backtest.entry_hy_oas(thermo) == {"value": 3.44, "as_of": "2026-10-30", "chg_bp": 34, "percentile": 87.9, "chg_pct": 91.2}
 assert backtest.entry_hy_oas({"indicators": [{**tile, "hide": True}]}) is None and backtest.entry_hy_oas(B16["thermometer"]) is None and backtest.entry_hy_oas(None) is None
-print("  ✓ {value 3.44, as_of 30.10, chg_bp +34, percentile 87.9}; скрита плочка / стар бриф без нея → None")
+print("  ✓ {value 3.44, as_of 30.10, chg_bp +34, percentile 87.9, chg_pct 91.2}; скрита плочка / стар бриф без нея → None")
 
 print()
 print("── 2. новите записи във всички книги — режимът и HY OAS в деня на входа (РЕАЛНИТЕ карти от 16.10, СИНТЕТИЧНИТЕ QM / GLB) ──")
@@ -46,7 +46,7 @@ cats = {backtest.record_category(r): r for r in tracker.values()}
 assert set(cats) == {"action", "buystop", "qm_breakout", "glb_wish_high"}, set(cats)                                   # „GLB — наш вариант (close)“ е архив от 26.10 — без нови записи
 assert not backtest._gw_book_open(backtest.CATEGORY_GLB_WISH, "2026-11-03")
 for c, r in cats.items():
-    assert r["regime"] == "Defensive" and r["hy_oas"] == {"value": 3.44, "as_of": "2026-10-30", "chg_bp": 34, "percentile": 87.9}, (c, r.get("regime"), r.get("hy_oas"))
+    assert r["regime"] == "Defensive" and r["hy_oas"] == {"value": 3.44, "as_of": "2026-10-30", "chg_bp": 34, "percentile": 87.9, "chg_pct": 91.2}, (c, r.get("regime"), r.get("hy_oas"))
 print("  ✓ " + ", ".join(sorted(cats)) + " — режим Defensive и HY OAS 3.44% (+34 б.п., 88. percentile) в деня на входа")
 
 print()
