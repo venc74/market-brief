@@ -1645,35 +1645,78 @@ def watch_ticker_digest(rows: list[dict], market_context: dict, window_hours: fl
     return out
 
 
-_NAME_SEQ = re.compile(r"(?<![\w-])[A-Z][a-z]+(?:[-'][A-Z]?[a-z]+)*(?:\s+[A-Z](?:[a-z]+(?:[-'][A-Z]?[a-z]+)*|\.?)){1,3}(?![\w-])")
+_CAP_RUN = re.compile(r"[A-Z][A-Za-z'\-]*\.?(?:\s+[A-Z][A-Za-z'\-]*\.?)*")
+_ENTITY = re.compile(r"\b(CO|CORP|CORPORATION|INC|LLC|L\.?P|LP|LTD|PLC|FUND|TRUST|HOLDINGS?|GROUP|BANK|INSURANCE|PARTNERS|CAPITAL|MANAGEMENT|ADVISORS?|INVESTMENTS?)\b\.?", re.I)
+_ROLE_BEFORE = re.compile(r"(?:\b(?:C[A-Z]{1,3}O|Co-CEO|Chair|Chairman|President|Director|Officer|EVP|SVP|VP)(?:\s+(?:&\s+)?[A-Z][A-Za-z&]+){0,3}|директор\w*|председател\w*|"
+                          r"президент\w*|член\w*\s+на\s+борда|счетоводител\w*|юрисконсулт\w*|вицепрезидент\w*|инсайдър\w*)[\s,]*$")
 
 
-def fix_person_names(text: str, owners: list[str], blob: str) -> tuple[str, list[str]]:
+def role_bg(title: str | None, is_director: bool = False) -> str:
+    """03.11.2026 (прегледът, т. 5): длъжността на инсайдъра от Form 4 на български (без член) — вместо името му. Чиста функция."""
+    t = (title or "").lower()
+    rules = (("co-ceo", "съизпълнителен директор"), ("chief executive", "изпълнителен директор"), ("ceo", "изпълнителен директор"),
+             ("chief financial", "финансов директор"), ("cfo", "финансов директор"), ("chief operating", "оперативен директор"), ("coo", "оперативен директор"),
+             ("chief accounting", "главен счетоводител"), ("principal accounting", "главен счетоводител"), ("general counsel", "главен юрисконсулт"),
+             ("chief legal", "главен юрисконсулт"), ("chief technology", "технически директор"), ("cto", "технически директор"), ("president", "президент"),
+             ("chair", "председател на борда"), ("chief", "член на ръководството"), ("vice president", "вицепрезидент"), ("evp", "вицепрезидент"), ("svp", "вицепрезидент"))
+    for key, bg in rules:
+        if re.search(rf"(?<![a-z]){re.escape(key)}(?![a-z])", t):
+            return bg
+    return "член на борда" if is_director else "инсайдър"
+
+
+def strip_person_names(text: str, insiders: list[dict]) -> tuple[str, list[str]]:
     """
-    03.11.2026 (поправки след брифа, т. 5): имената на хора в AI текста за наблюдаваните — само ДОСЛОВНО от таблицата. EDGAR пише инсайдъра „Фамилия Име Презиме“
-    („Sweet Julie Spellman“, понякога с главни букви); на 03.11 моделът написа „Julie Spellman“ (ACN) и „Ryoji Sekido“ (вместо „Sekido Ryoji“). Последователност от 2–4 думи с главна
-    латинска буква: точно име от Form 4 или дословно в останалия вход (blob — заглавията, източниците, длъжностите, името на компанията) → остава; иначе, ако има поне 2 общи думи
-    (без значение на регистъра) с име на инсайдър → заменя се с дословното име; без общи думи с входа → не се маха (може да е „Wall Street“), само ред в лога. → (текст, бележки).
-    Чиста функция.
+    03.11.2026 (поправки след брифа, т. 5; прегледът 03.11): AI текстът за наблюдаваните — БЕЗ имена на хора, само длъжността (името е в таблицата под реда). EDGAR пише
+    инсайдъра „Фамилия Име Презиме“ („Sweet Julie Spellman“); моделът пишеше „Julie Spellman“, „Ryoji Sekido“, „Catapano Joseph Ronald“ (дословно). Последователност от думи с главна
+    латинска буква, чиито думи (≥ 2; или 1 — фамилията, първата дума в EDGAR, или дума точно след длъжност) са от името на ЧОВЕК-инсайдър (не фирма — NIPPON LIFE INSURANCE CO остава), → махната, ако точно преди нея стои
+    длъжност („CEO Julie Spellman“ → „CEO“), иначе заменена с длъжността му на български (role_bg: „Ryoji Sekido (Co-CEO …)“ → „съизпълнителен директор (Co-CEO …)“). Имена извън
+    Form 4 таблицата не се пипат (може да е „Wall Street“) — правилото в промпта ги забранява. → (текст, бележки). Чиста функция.
     """
     notes = []
     if not text:
         return text, notes
-    own = [(o, {w.strip(".").lower() for w in o.split()}) for o in owners if o]
-    exact = {o for o, _ in own}
-    blob_words = {w.strip(".,:;()\"'").lower() for w in (blob + " " + " ".join(exact)).split()}
-    for m in list(_NAME_SEQ.finditer(text)):
-        seq = m.group(0).strip()
-        if seq in exact or seq in blob:
+    people = []
+    for t in insiders or []:
+        name = (t.get("owner_name") or "").strip()
+        if not name or _ENTITY.search(name):
             continue
-        toks = {w.strip(".").lower() for w in seq.split()}
-        best = max(own, key=lambda o: len(toks & o[1]), default=None)
-        if best and len(toks & best[1]) >= 2:
-            text = re.sub(rf"(?<![\w-]){re.escape(seq)}(?![\w-])", best[0], text)
-            notes.append(f"«{seq}» → «{best[0]}» (дословно от Form 4)")
-        elif not (toks & blob_words):
-            notes.append(f"«{seq}» — няма го във входа (само лог)")
-    return text, notes
+        toks = {w.strip(".,").lower() for w in name.split() if len(w.strip(".,")) > 1}
+        if toks and name not in [p[0] for p in people]:
+            people.append((name, toks, role_bg(t.get("owner_title"), bool(t.get("is_director"))), name.split()[0].strip(".,").lower()))   # EDGAR: фамилията е първа
+    if not people:
+        return text, notes
+    out, pos = [], 0
+    for m in _CAP_RUN.finditer(text):
+        words = list(re.finditer(r"\S+", m.group(0)))
+        i = 0
+        while i < len(words):
+            best = None
+            for name, toks, role, surname in people:
+                j = i
+                while j < len(words) and (words[j].group(0).strip(".,").lower() in toks or (len(words[j].group(0).strip(".")) == 1 and j > i)):
+                    j += 1
+                if j > i and (best is None or j > best[0]):
+                    best = (j, name, role, surname)
+            if best:
+                j, name, role, surname = best
+                start, end = m.start() + words[i].start(), m.start() + words[j - 1].end()
+                before = text[pos:start]
+                one = words[i].group(0).strip(".,").lower()
+                if j - i >= 2 or one == surname or _ROLE_BEFORE.search(text[:start]):           # две думи от името; сама фамилията (първата дума в EDGAR); дума след длъжност
+                    if _ROLE_BEFORE.search(text[:start]):
+                        out.append(before.rstrip(" "))
+                        notes.append(f"«{text[start:end]}» — махнато (длъжността е преди него)")
+                    else:
+                        out.append(before + role)
+                        notes.append(f"«{text[start:end]}» → «{role}»")
+                    pos = end
+                    i = j
+                    continue
+            i += 1
+    out.append(text[pos:])
+    res = re.sub(r"[ \t]{2,}", " ", "".join(out))
+    return res, notes
 
 
 def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
@@ -1698,8 +1741,8 @@ def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: fl
 
 За всеки тикър върни:
 
-ИМЕНА НА ХОРА — САМО дословно от таблицата (полето "owner" — EDGAR ги пише „Фамилия Име Презиме“, напр. „Sweet Julie Spellman“; НЕ ги преподреждай и не ги \
-съкращавай) или от заглавията. Ако не си сигурен — пиши длъжността (CEO, CFO, директор), без име.
+БЕЗ ИМЕНА НА ХОРА — пиши САМО длъжността на български (изпълнителният директор, финансовият директор, член на борда); името е в таблицата под реда. \
+Имена на компании и фондове — може.
 
 - "summary": 1-2 изречения — какво реално се случи. Не преразказвай заглавията \
 едно по едно; кажи какво е същественото. Ако новините са само аналитични \
@@ -1737,11 +1780,8 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
     for r in rows:
         d = by_ticker.get(r["ticker"]) or {}
         ai = {k: (d.get(k) or "").strip() for k in ("summary", "insider_read", "cross_reference")}
-        owners = list(dict.fromkeys(t.get("owner_name") or "" for t in r.get("insider") or []))          # 03.11.2026 (т. 5): имената — дословно от таблицата
-        blob = " ".join([r.get("ticker") or "", r.get("name") or ""] + [t.get("owner_title") or "" for t in r.get("insider") or []]
-                        + [f"{n.get('title', '')} {n.get('publisher', '')}" for n in r.get("news") or []])          # без имената от Form 4 — те се сверяват точно
-        for k in ai:
-            ai[k], notes = fix_person_names(ai[k], owners, blob)
+        for k in ai:                                                # 03.11.2026 (т. 5, прегледът): без имена на хора — длъжността
+            ai[k], notes = strip_person_names(ai[k], r.get("insider") or [])
             for n in notes:
                 print(f"[ai] watch {r['ticker']} {k}: {n}")
         annotated.append({**r, "ai": ai})
