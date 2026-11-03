@@ -24,12 +24,12 @@ brief_time = lambda d: dt.datetime.fromisoformat(d).replace(hour=5, minute=30, t
 print("── 1. 8-K след затварянето (РЕАЛНИТЕ записи на EDGAR) ──")
 smci = qm_ep.filings_after_close(FX["submissions"]["SMCI"], "2026-10-20", brief_time("2026-10-21"))
 assert len(smci) == 1 and smci[0]["accepted_et"] == "2026-10-20 20:44" and [c for c, _, _ in smci[0]["items"]] == ["2.02"]      # 9.01 (приложения) не се показва
-assert qm_ep.filing_headline(smci[0]) == {"title": "8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността", "published": "2026-10-20 20:44", "source": "SEC"}
+assert qm_ep.filing_headline(smci[0]) == {"title": "8-K (SEC), 20.10 20:44 ET: 2.02 — финансови резултати", "published": "2026-10-20 20:44", "source": "SEC"}
 assert qm_ep.filings_after_close(FX["submissions"]["HUM"], "2026-10-08", brief_time("2026-10-09")) == []          # 8-K на HUM е приет на 09.10 в 10:01 ET — след брифа
 late = qm_ep.filings_after_close(FX["submissions"]["HUM"], "2026-10-08", dt.datetime(2026, 10, 9, 15, 0, tzinfo=UTC))
 assert [c for c, _, _ in late[0]["items"]] == ["7.01"] and late[0]["accepted_et"] == "2026-10-09 10:01"
 assert qm_ep.filings_after_close(FX["submissions"]["SMCI"], "2026-10-15", brief_time("2026-10-16")) == []         # 8-K от 15.10 (5.02) е приет в 13:08 ET — преди затварянето
-print("  ✓ SMCI: 8-K т. 2.02, приет 20.10 в 20:44 ET → „8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността“; HUM: 8-K т. 7.01 е от 09.10 10:01 ET — след брифа, не влиза")
+print("  ✓ SMCI: 8-K т. 2.02, приет 20.10 в 20:44 ET → „8-K (SEC), 20.10 20:44 ET: 2.02 — финансови резултати“; HUM: 8-K т. 7.01 е от 09.10 10:01 ET — след брифа, не влиза")
 
 print()
 print("── 2. заглавията: самата компания преди общите прегледи ──")
@@ -72,6 +72,6 @@ ep["rows"][0]["headlines"] = [qm_ep.filing_headline(smci[0])] + smci_h[:2]
 b["qm_ep"] = ep
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b)
-assert "8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността" in page
+assert "8-K (SEC), 20.10 20:44 ET: 2.02 — финансови резултати" in page
 print("  ✓ първият ред на EP картата е 8-K-то на компанията")
 print("\n✅ test_ep_company_news: всичко мина")

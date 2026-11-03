@@ -219,7 +219,7 @@ def fetch_headlines(sym: str, since: dt.datetime | None = None) -> list[dict]:
 # 21.10.2026 (етап 4): новината за самата компания пред общите прегледи. Реално на 21.10: и трите заглавия на Yahoo за SMCI бяха прегледи на пазара („Dow Jones Futures: …“,
 # „Asia stocks rebound …“), а катализаторът — 8-K с т. 2.02 (резултати), приет на 20.10 в 20:44 ET. Точките на 8-K → (английското име за AI, българският текст за картата); 9.01 (приложения) не се показва.
 ITEMS_8K = {"1.01": ("Entry into a Material Definitive Agreement", "съществено споразумение"), "1.02": ("Termination of a Material Definitive Agreement", "прекратено съществено споразумение"),
-            "2.01": ("Completion of Acquisition or Disposition of Assets", "придобиване или продажба на активи"), "2.02": ("Results of Operations and Financial Condition", "резултати от дейността"),
+            "2.01": ("Completion of Acquisition or Disposition of Assets", "придобиване или продажба на активи"), "2.02": ("Results of Operations and Financial Condition", "финансови резултати"),
             "2.03": ("Creation of a Direct Financial Obligation", "ново финансово задължение"), "2.05": ("Costs Associated with Exit or Disposal Activities", "разходи по преструктуриране"),
             "2.06": ("Material Impairments", "обезценка"), "3.01": ("Notice of Delisting or Failure to Satisfy a Listing Rule", "уведомление за отписване от борсата"),
             "5.02": ("Departure or Election of Directors or Officers", "смяна в ръководството"), "5.07": ("Submission of Matters to a Vote of Security Holders", "гласуване на акционерите"),
@@ -322,9 +322,13 @@ def company_filings(sym: str, session: str, get=None, cik_map=None, now_utc: dt.
 
 
 def filing_headline(f: dict) -> dict:
-    """Редът за картата: „8-K (SEC), 20.10 20:44 ET: т. 2.02 — резултати от дейността“ (source = SEC)."""
+    """
+    Редът за картата: „8-K (SEC), 20.10 20:44 ET: 2.02 — финансови резултати“ (source = SEC). 03.11.2026 (разходката, т. 0б): номерът с превода — един и същ текст в сутрешната
+    EP карта и в карето преди отварянето (preopen); до 03.11 — „т. 2.02 — резултати от дейността“. Точка без превод (извън ITEMS_8K) — само номерът.
+    """
     when = f["accepted_et"]
-    items = "; ".join(f"т. {c} — {bg}" for c, _, bg in f["items"]) or "без точки"
+    tr = lambda c, bg: (ITEMS_8K.get(c) or (None, None if bg == f"т. {c}" else bg))[1]          # текущият превод (и за записан 8-K със стария текст)
+    items = "; ".join(f"{c} — {tr(c, bg)}" if tr(c, bg) else c for c, _, bg in f["items"]) or "без точки"
     note = f" ({f['items_note']})" if f.get("items_note") else ""                        # 28.10.2026: точките са по документа, заглавката им противоречи
     return {"title": f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {items}{note}", "published": when, "source": "SEC"}
 

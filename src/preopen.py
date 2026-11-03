@@ -150,22 +150,10 @@ def watch_gaps(pts: dict, watched: list[str], closes: dict | None = None) -> lis
     return sorted(out, key=lambda x: -abs(x["gap_pct"]))
 
 
-# 03.11.2026 (прегледа на т. 10, 2): номерът на точката с превод — „2.02 — финансови резултати“; честите точки — тук, останалите — от qm_ep.ITEMS_8K, непознатите — само номерът.
-# Сутрешната EP карта (qm_ep.filing_headline) не се пипа — там 2.02 остава „резултати от дейността“.
-ITEMS_BG = {"1.01": "съществено споразумение", "2.01": "придобиване или продажба на активи", "2.02": "финансови резултати", "7.01": "оповестяване по Reg FD",
-            "8.01": "други събития"}
-
-
 def filing_line(f: dict) -> str:
-    """„8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати“ (точките с „; “; бележката за разминаване заглавка / документ — в скоби, както сутрин). Чиста функция."""
+    """03.11.2026 (прегледа на т. 10, 2; разходката, т. 0б): „8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати“ — същият ред като в сутрешната EP карта (qm_ep.filing_headline)."""
     from src import qm_ep
-    when = f["accepted_et"]
-    parts = []
-    for c, *_ in f.get("items") or []:
-        bg = ITEMS_BG.get(c) or (qm_ep.ITEMS_8K.get(c) or (None, None))[1]
-        parts.append(f"{c} — {bg}" if bg else c)
-    note = f" ({f['items_note']})" if f.get("items_note") else ""
-    return f"8-K (SEC), {when[8:10]}.{when[5:7]} {when[11:16]} ET: {'; '.join(parts) or 'без точки'}{note}"
+    return qm_ep.filing_headline(f)["title"]
 
 
 def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, now_utc=None) -> list[dict]:

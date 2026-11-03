@@ -17,7 +17,7 @@ import config
 _tmp = tempfile.TemporaryDirectory(prefix="mb_preopen_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()
-from src import preopen, render, options_record
+from src import preopen, render, options_record, qm_ep
 
 FX = json.loads(gzip.decompress((ROOT / "tests" / "fixtures" / "preopen_2026-11-03.json.gz").read_bytes()).decode("utf-8"))
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
@@ -57,7 +57,8 @@ syn = {"accepted_et": "2026-11-03 07:01", "items": [(c, None, None) for c in ("1
 assert preopen.filing_line(syn) == ("8-K (SEC), 03.11 07:01 ET: 1.01 — съществено споразумение; 2.01 — придобиване или продажба на активи; 7.01 — оповестяване по Reg FD; "
                                     "8.01 — други събития; 5.02 — смяна в ръководството; 6.99 (по документа)")
 assert preopen.filing_line({"accepted_et": "2026-11-03 07:01", "items": []}).endswith("ET: без точки")
-print("  ✓ 8-K: „2.02 — финансови резултати“; 1.01 / 2.01 / 7.01 / 8.01 с превод, останалите — от общата таблица, непознатата — само номерът")
+assert preopen.filing_line(FX["filings"]["LSCC"][0]) == qm_ep.filing_headline(FX["filings"]["LSCC"][0])["title"]                 # един текст и в сутрешната EP карта (т. 0б)
+print("  ✓ 8-K: „2.02 — финансови резултати“ — същият ред като в сутрешната EP карта; 1.01 / 2.01 / 7.01 / 8.01 с превод, непознатата — само номерът")
 print("  ✓ LSCC +13.5% (пренебрегнат, 3 мес. −31%) — 8-K т. 2.02 в 16:27 ET; AEIS +12.5% — 8-K т. 2.02 в 16:03 ET и „Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“; FN — под 10%")
 
 print()
