@@ -16,6 +16,7 @@ from src import watchlist_exits
 from src import cot_theses
 from src import setup_rules
 from src import sector_claims
+from src import qm_breakout
 
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
                "петък", "събота", "неделя"]
@@ -521,6 +522,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         sizing_core_js=_asset("sizing_core.js"), sizing_ui_js=_asset("sizing_ui.js"),      # 07.10: оразмеряването е в браузъра (localStorage), не в брифа
         qm_cards=brief.get("qm_breakout") or [],
         qm_diag=brief.get("qm_diag") or {},
+        qm_market=brief.get("qm_market"), qm_market_line=qm_breakout.nasdaq_line(brief.get("qm_market")),     # 03.11.2026 (т. 11, 2)
         qm_ep=brief.get("qm_ep") or {},
         qm_adr_min=config.QM_ADR_MIN, qm_trigger_bars=config.QM_TRIGGER_BARS, qm_expected_stop_adr=config.QM_EXPECTED_STOP_ADR, qm_max_stop_adr=config.QM_MAX_STOP_ADR,
         qm_max_dist_adr=config.QM_MAX_DIST_ADR, qm_chase_adr=config.QM_CHASE_ADR, qm_adr_stop=config.QM_ADR_STOP,
@@ -595,6 +597,10 @@ def _qm_email_block(brief: dict) -> str:
         body = head("Пробиви по Kullamägi (Breakout)").replace("{m}", "0")
         body += ('<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. '
                  'Алфата не е статистически значима.</b> ' + _qm_replay_line() + 'Отделна стратегия. Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>')
+        mk = brief.get("qm_market")                                                                                     # 03.11.2026 (т. 11, 2): QQQ спрямо SMA10 / SMA20
+        if qm_breakout.nasdaq_line(mk):
+            body += (f'<div style="font-size:12.5px;margin-bottom:8px"><b>{_e(qm_breakout.nasdaq_line(mk))}</b> <span style="color:#6b7280">· QQQ ${mk["close"]:.2f} на {mk["date"][8:10]}.{mk["date"][5:7]}, '
+                     f'SMA10 ${mk["sma10"]:.2f}, SMA20 ${mk["sma20"]:.2f} — само информация</span></div>')
         if diag.get("ok") is False:
             body += '<div style="color:#991b1b;font-size:12.5px">Скенерът не се изпълни — празният списък НЕ значи, че няма кандидати за пробив.</div>'
         elif cards:

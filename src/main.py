@@ -817,6 +817,10 @@ def run() -> dict:
                partial=lambda _: (f"{qm['diag']['batches_failed']} от {qm['diag'].get('batches')} партиди не се изтеглиха", {}) if (qm["diag"] or {}).get("batches_failed") else None,
                label="Скенерът за пробиви по Kullamägi", consequence="празният списък НЕ значи, че няма кандидати за пробив днес")
     qm_rows, qm_diag, qm_cards, corp_ex_qm = qm["rows"], qm["diag"], qm["cards"], qm["corp_ex"]
+    # 03.11.2026 (разходката, т. 11, 2): пазарът по правилото на Kullamägi — QQQ над / под SMA10 и SMA20 (последното затваряне); само информация, записва се в новите QM записи
+    qm_market = steps.step("qm_market", qm_breakout.fetch_nasdaq_trend, fallback=None, enabled=bool(config.ENABLE_QM), source="qm_market",
+                           failed_if=lambda v: "QQQ не се изтегли" if v is None else None,
+                           label="Редът „Nasdaq спрямо 10/20 DMA“ в секцията по Kullamägi", consequence="редът липсва днес и новите QM записи са без него")
     qm_by_ticker = {r["ticker"]: r for r in qm_rows}
     attach_qm_markers(action + watchlist, qm_by_ticker)             # QM✓ върху нашите карти, ако са и кандидати за пробив
     # EP наблюдение (САМО информация, без Track Record): after-hours гапове ≥ 10% при "пренебрегване"; AI само класифицира катализатора от заглавията; дневник на AH гап срещу реалния гап
@@ -878,7 +882,8 @@ def run() -> dict:
                failed_if=lambda v: (_sd.get("error") or "EDGAR не отговори") if not _sd.get("ok", True) else None,
                partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
     if config.ENABLE_BACKTEST:
-        backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
+        backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals,
+                                         today_context={"nasdaq": qm_market})     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
         backtest.apply_deal_labels(spinoff_watch.LAST_MERGERS, dt.date.fromisoformat(today))   # 26.10.2026 (етап 4б, т. 1): етикет "deal" върху живите записи на цели на придобиване
         backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)
@@ -1100,6 +1105,7 @@ def run() -> dict:
         # Qullamaggie (отделна стратегия — измерване, не препоръка): до 8 карти за пробив + диагностика на скана
         "qm_breakout": qm_cards,
         "qm_diag": qm_diag,
+        "qm_market": qm_market,                                        # 03.11.2026 (т. 11, 2): QQQ спрямо SMA10 / SMA20
         "qm_ep": qm_ep_out,
         "news": news,
         "news_window": {**dict(news_aggregator.LAST_WINDOW), "since": news_since.isoformat(), "hours": news_hours, "crypto_hours": crypto_hours},   # 02.11.2026 (т. 4)

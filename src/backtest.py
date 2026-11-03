@@ -437,11 +437,12 @@ _QM_RESULT_KEYS = ("status", "fill_date", "fill_price", "stop_loss", "risk_per_s
                    "last_close_date", "how", "r_risk", "r_floored", "r_basis")
 
 
-def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None) -> None:
+def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None, nasdaq: dict | None = None) -> None:
     """
     Qullamaggie: ингестира карти на breakout кандидатите (показаните, най-много 8) като НЕЗАВИСИМА книга "qm_breakout" — ЕДИН запис на (тикър, ден на брифа), дедуп в рамките на
     категорията (_is_continuation), записва се във всички режими с таг. Вход на нивото на пробива (buy_stop = нивото), валиден ЕДНА сесия; стопът = Low на входния ден и изходът се
     определят при резолюцията от дневните барове (trade_sim.simulate_qm). Не е позиция и не е препоръка — четците на позиции я игнорират. TRACK_QM=0 я изключва.
+    03.11.2026 (разходката, т. 11, 2): nasdaq — QQQ спрямо SMA10 / SMA20 в деня на картата (qm_breakout.nasdaq_trend; неговото правило) — в записа, само информация.
     """
     if not config.TRACK_QM:
         return
@@ -455,6 +456,7 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
             continue
         rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime,
+               "nasdaq": dict(nasdaq) if nasdaq else None,
                "buy_stop": round(float(c["trigger"]), 4), "adr": round(float(c["adr"]), 2), "signal_price": c.get("close"), "entry_price": c.get("close"),
                "signal_date": c.get("signal_date"), "expected_stop": c.get("expected_stop"), "max_stop": c.get("max_stop"), "base_days": c.get("base_days"),
                "runup_pct": c.get("runup_pct"), "tight": c.get("tight"), "window_sessions": config.QM_ENTRY_WINDOW_SESSIONS,
@@ -508,7 +510,8 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
 def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
                           today_date: str | None = None, today_watchlist: list[dict] | None = None,
                           today_regime: str | None = None, today_qm: list[dict] | None = None,
-                          today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None) -> None:
+                          today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None, today_context: dict | None = None) -> None:
+    ctx = today_context or {}                                     # 03.11.2026: състоянието на пазара в деня на картата — "nasdaq" (QM)
     for path in _snapshot_files():
         try:
             snap = json.loads(path.read_text(encoding="utf-8"))
@@ -522,7 +525,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         # пакет 1б: Watchlist картите със заснет plan_preview (по-старите snapshot-и нямат такъв → не влизат); чисто временно правило —
         # същият резултат без значение кога се оценява (резолюцията е функция на плана и баровете), както при Action
         _ingest_buystop_list(tracker, entry_date, snap.get("watchlist", []), (snap.get("thermometer") or {}).get("regime"))
-        _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
+        _ingest_qm_list(tracker, entry_date, snap.get("qm_breakout") or [], (snap.get("thermometer") or {}).get("regime"), snap.get("qm_market"))     # Qullamaggie: само snapshot-и с qm_breakout (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish") or [], (snap.get("thermometer") or {}).get("regime"))   # GLB по Уиш: само snapshot-и с glb_wish (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish_high") or [], (snap.get("thermometer") or {}).get("regime"), CATEGORY_GLB_WISH_HIGH)   # 21.10: книгата по неговата линия
 
@@ -540,7 +543,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
     if today_watchlist and today_date:
         _ingest_buystop_list(tracker, today_date, today_watchlist, today_regime)
     if today_qm and today_date:
-        _ingest_qm_list(tracker, today_date, today_qm, today_regime)
+        _ingest_qm_list(tracker, today_date, today_qm, today_regime, ctx.get("nasdaq"))
     if today_glb_wish and today_date:
         _ingest_glb_wish_list(tracker, today_date, today_glb_wish, today_regime)
     if today_glb_wish_high and today_date:
@@ -1357,9 +1360,9 @@ def resolve_positions_only() -> None:
 def update_backtest_tracker(today_action: list[dict] | None = None,
                             today_date: str | None = None, today_watchlist: list[dict] | None = None,
                             today_regime: str | None = None, today_qm: list[dict] | None = None,
-                            today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None) -> None:
+                            today_glb_wish: list[dict] | None = None, today_glb_wish_high: list[dict] | None = None, today_context: dict | None = None) -> None:
     """
-    Ingest на нови Action позиции (с дедупликация) + резолюция на живите.
+    Ingest на нови Action позиции (с дедупликация) + резолюция на живите. today_context (03.11.2026) — състоянието на пазара в деня на картата, записва се в новите записи.
     Провал някъде в средата → tracker-ът на диска остава последното успешно
     записано състояние (не презаписваме частично/счупено).
 
@@ -1371,7 +1374,7 @@ def update_backtest_tracker(today_action: list[dict] | None = None,
     tracker = _load_tracker()
     LAST_SPINOFF_SKIPS.clear()
     try:
-        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish, today_glb_wish_high)
+        _ingest_new_positions(tracker, today_action, today_date, today_watchlist, today_regime, today_qm, today_glb_wish, today_glb_wish_high, today_context)
         # FIX 2026-09-17: ако resolve_positions_only() вече е минал в този run,
         # не плащаме втори yf.download(). Днес ingest-натите позиции остават
         # нерезолвирани до утрешния run — доказуемо безвредно: позиция, влязла

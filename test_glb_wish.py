@@ -357,7 +357,7 @@ print()
 print("── 10. свързването: screen() → main → tracker → snapshot; OI снимката не взема позициите на книгата ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert '"glb", lambda: (glb_screener.screen(), list(glb_screener.LAST_WISH_SIGNALS), list(glb_screener.LAST_WISH_HIGH_SIGNALS))' in src     # 21.10: + книгата „GLB по Уиш“ (High)
-assert "update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get(\"regime\"), qm_cards, glb_wish_signals, glb_wish_high_signals)" in src and '"glb_wish_high": glb_wish_high_signals' in src
+assert "update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get(\"regime\"), qm_cards, glb_wish_signals, glb_wish_high_signals," in src     # 03.11.2026: + today_context and '"glb_wish_high": glb_wish_high_signals' in src
 assert '"glb_wish": glb_wish_signals' in src and 'backtest_summary["glb_wish"] = backtest.get_glb_wish_summary()' in src
 print("  ✓ main.run: сигналите от screen() отиват в update_backtest_tracker, snapshot-ът носи 'glb_wish', обобщението е в backtest['glb_wish']")
 g._verified_company_name = lambda s: {"name": s, "verified": True}

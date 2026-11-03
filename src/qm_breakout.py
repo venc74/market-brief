@@ -237,6 +237,45 @@ def scan(universe: list[str] | None = None, now_utc: dt.datetime | None = None) 
         return [], {"ok": False, "error": f"{type(e).__name__}: {e}", "candidates": 0, "shown": 0}
 
 
+def nasdaq_trend(closes) -> dict | None:
+    """
+    03.11.2026 (разходката, т. 11, 2): пазарът по правилото на Kullamägi — QQQ над / под SMA10 и SMA20 по затварянето на последната сесия. Само информация (не е филтър).
+    → {date, close, sma10, sma20, above10, above20}; под 20 затваряния → None. Чиста функция.
+    """
+    c = pd.Series(closes).dropna()
+    if len(c) < 20:
+        return None
+    last, s10, s20 = float(c.iloc[-1]), float(c.iloc[-10:].mean()), float(c.iloc[-20:].mean())
+    return {"date": pd.Timestamp(c.index[-1]).date().isoformat(), "close": round(last, 2), "sma10": round(s10, 2), "sma20": round(s20, 2),
+            "above10": bool(last > s10), "above20": bool(last > s20)}
+
+
+def nasdaq_line(t: dict | None) -> str | None:
+    """Редът в секцията: „Nasdaq над 10/20 DMA“, „Nasdaq под 10/20 DMA — по неговото правило Kullamägi не би търгувал днес“ или смесеното (без твърдение за правилото). Чиста функция."""
+    if not t:
+        return None
+    if t["above10"] and t["above20"]:
+        return "Nasdaq над 10/20 DMA"
+    if not t["above10"] and not t["above20"]:
+        return "Nasdaq под 10/20 DMA — по неговото правило Kullamägi не би търгувал днес"
+    return "Nasdaq над 20 DMA, под 10 DMA" if t["above20"] else "Nasdaq над 10 DMA, под 20 DMA"
+
+
+def fetch_nasdaq_trend(download=None) -> dict | None:
+    """QQQ — дневни затваряния за 3 месеца (auto_adjust=False, без частичния днешен бар) → nasdaq_trend. download(sym) → DataFrame (за тестове). Провал → None (graceful)."""
+    try:
+        df = _sessions.cut_today((download or (lambda s: yf.download(s, period="3mo", progress=False, auto_adjust=False)))("QQQ"))     # без частичния днешен бар
+        if df is None or len(df) == 0:
+            return None
+        c = df["Close"]
+        if isinstance(c, pd.DataFrame):
+            c = c.iloc[:, 0]
+        return nasdaq_trend(c)
+    except Exception as e:
+        print(f"[qm_breakout] Nasdaq (QQQ) спрямо 10/20 DMA — не се изтегли: {type(e).__name__}: {e}")
+        return None
+
+
 def qm_marker(row: dict) -> dict:
     """Маркерът QM✓ (за нашите CANSLIM карти и позиции): тикърът е и кандидат за пробив на Qullamaggie. Текст при hover/клик — числата и честен надпис за стратегията."""
     return {"tag": "QM✓", "title": (f"Breakout кандидат (Qullamaggie): ниво ${row['trigger']:.2f} (+{row['pct_to_trigger']:.1f}% над затварянето), ADR {row['adr']:.1f}%, "

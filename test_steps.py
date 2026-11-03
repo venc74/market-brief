@@ -54,7 +54,8 @@ STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
 STEP4 = {"crypto", "crypto_cot", "options_record", "merger_pre", "event_labels"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
-ALL = STEP1 | STEP2 | STEP3 | STEP4
+STEP5 = {"qm_market"}                                                                                                               # 03.11.2026 (разходката, т. 11): QQQ спрямо SMA10 / SMA20 — банерът е на обвивката
+ALL = STEP1 | STEP2 | STEP3 | STEP4 | STEP5
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]
 assert len(tries) == 1 and "email" in ast.unparse(tries[0]), len(tries)       # остава само банерът за неизпратения имейл (след рендера — той е самият банер)
@@ -85,6 +86,7 @@ enabled = {"bar_freshness": config.ENABLE_BAR_FRESHNESS, "distribution_cap": con
 # стъпка 3: без мрежа източниците наистина падат — модулният статус го казва (failed_if), банерът е собственият (sector_rotation, screener, glb, distribution_days)
 NATURAL = {"sector_rotation", "screener", "glb", "distribution_days"}
 NATURAL_WRAPPED = {"crypto"} if config.ENABLE_CRYPTO_SECTION else set()             # без мрежа фийдът е празен → провал с банера на обвивката (не инжектиран)
+NATURAL_WRAPPED |= {"qm_market"} if config.ENABLE_QM else set()                     # 03.11.2026: без мрежа QQQ не се изтегля → провал с банера на обвивката
 want_failed = {k for k in FAULTS if enabled.get(k, True)} | {k for k in NATURAL if enabled.get(k, True) and (k != "glb" or config.ENABLE_GLB_SCREENER)} | NATURAL_WRAPPED
 assert {k for k, r in rs.items() if r["status"] == "failed"} == want_failed, {k: r["status"] for k, r in rs.items()}
 sources = {w["source"] for w in brief["data_warnings"]}
