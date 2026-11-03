@@ -1,0 +1,36 @@
+{
+ "_note": "РЕАЛНО: brief[\"splits_report\"] от сутрешния бриф на 03.11.2026 (data/2026-11-03.json, commit bde50b4) — Nasdaq календарът, 14 реда в хоризонта 02.11–20.11, 11 в седмицата, 0 минават филтъра (5 под $10, 6 без данни — ETF-и); позициите и наблюдаваните — 15 проверени, без сплит. За test_splits_section.py.",
+ "splits_report": {
+  "state": "empty",
+  "diag": {
+   "source": "nasdaq",
+   "errors": [],
+   "source_rows": 14,
+   "horizon_from": "2026-11-02",
+   "horizon_to": "2026-11-20",
+   "in_week": 11,
+   "dropped_price": [
+    "RETO",
+    "VCIG",
+    "BJDX",
+    "UFG",
+    "TOPS"
+   ],
+   "dropped_cap": [],
+   "dropped_no_data": [
+    "EFG",
+    "EFV",
+    "MTUM",
+    "QUAL",
+    "SOXX",
+    "ITA"
+   ],
+   "passed": 0,
+   "state": "empty"
+  },
+  "rows": [],
+  "priority": [],
+  "priority_checked": 15,
+  "priority_in_rows": 0
+ }
+}

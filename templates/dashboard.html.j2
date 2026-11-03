@@ -708,6 +708,77 @@
   {% if futures_line %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">{{ futures_line }}</div>{% endif %}
 </section>
 
+{# 03.11.2026 (разходката, т. 16): сплитовете — веднага след макро разказа (до 03.11 — след книгите на GLB) #}
+{% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
+{% macro split_chip(s) %}
+    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }} {{ 'split-pos' if s.badge == 'position' else '' }}">
+      <div class="sym">{{ s.ticker }}
+        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
+        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
+      </div>
+      <div class="note">
+        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
+        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
+        {% if s.date_human %} · {{ s.date_human }}{% endif %}
+      </div>
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
+      {% if s.badge %}
+      {% set d = s.days_to_split %}
+      <div class="split-badge">{{ '📌 отворена позиция' if s.badge == 'position' else '🔎 наблюдаван' }}{% if d is not none %} · {% if d == 0 %}днес{% elif d == 1 %}утре{% elif d > 1 %}след {{ d }} дни{% else %}преди {{ -d }} {{ 'ден' if d == -1 else 'дни' }}{% endif %}{% endif %}</div>
+      {% endif %}
+      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% if splits_report %}
+{% set sr = splits_report %}
+{% set dg = sr.diag or {} %}
+<section>
+  <h2>Сплитове · тази седмица</h2>
+  {# 03.11.2026 (разходката, т. 16): логиката е същата (целият пазар, цена > $X, пазарна стойност > $Y млн); позициите / наблюдаваните — отгоре; провал на източника — червеният ред;
+     без сплитове — един ред; отчетът на филтъра (колко са отпаднали и защо) — само в данните (splits_report.diag) #}
+  {% set horizon = (dg.horizon_to[8:10] ~ "." ~ dg.horizon_to[5:7]) if dg.horizon_to else none %}
+  {% if sr.priority %}
+  <div class="splits-funnel" style="margin-bottom:6px">Отворени позиции и наблюдавани · целият хоризонт на източника, без филтри</div>
+  <div class="signal-grid splits-priority">
+    {% for s in sr.priority %}{{ split_chip(s) }}{% endfor %}
+  </div>
+  {% endif %}
+  {% if sr.state == 'source_failed' %}
+  <div class="splits-warn" style="color:var(--red)">⚠ Календарът на сплитовете не върна данни днес — празното НЕ значи, че няма сплитове.</div>
+  {% elif sr.state == 'empty' %}
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма сплитове тази седмица при акциите над ${{ "%.0f"|format(splits_min_price) }} и ${{ "%.0f"|format(splits_min_cap_m) }} млн{% if not sr.priority and sr.priority_checked %}; при позициите и наблюдаваните — няма{% if horizon %} до {{ horizon }}{% endif %}{% endif %}.</div>
+  {% else %}
+  <div class="signal-grid">
+    {% for s in sr.rows %}{{ split_chip(s) }}{% endfor %}
+  </div>
+  {% if not sr.priority and sr.priority_checked and not sr.priority_in_rows %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:6px">При позициите и наблюдаваните — няма{% if horizon %} до {{ horizon }}{% endif %}.</div>{% endif %}
+  {% endif %}
+</section>
+{% elif splits %}
+<section>
+  <h2>Сплитове · тази седмица</h2>
+  <div class="signal-grid">
+    {% for s in splits %}
+    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }}">
+      <div class="sym">{{ s.ticker }}
+        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
+        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
+      </div>
+      <div class="note">
+        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
+        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
+        {% if s.date_human %} · {{ s.date_human }}{% endif %}
+      </div>
+      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
+      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+
 {# 08.10: секцията остава и при празен списък (data/watch_list.json) — иначе изчезва мълчаливо и не личи дали е проверена #}
 {% if watch or watch_enabled %}
 <section>
@@ -1546,7 +1617,7 @@
 </section>
 {% endif %}
 
-{% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
+{# our_tickers — над сплитовете (03.11.2026) #}
 
 {# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
 
@@ -1724,80 +1795,6 @@
 {% endif %}
 
 {# Пакет 4б т.б: секцията "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ (hover/клик) върху кандидатите и позициите #}
-
-{% macro split_chip(s) %}
-    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }} {{ 'split-pos' if s.badge == 'position' else '' }}">
-      <div class="sym">{{ s.ticker }}
-        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
-        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
-      </div>
-      <div class="note">
-        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
-        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
-        {% if s.date_human %} · {{ s.date_human }}{% endif %}
-      </div>
-      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
-      {% if s.badge %}
-      {% set d = s.days_to_split %}
-      <div class="split-badge">{{ '📌 отворена позиция' if s.badge == 'position' else '🔎 наблюдаван' }}{% if d is not none %} · {% if d == 0 %}днес{% elif d == 1 %}утре{% elif d > 1 %}след {{ d }} дни{% else %}преди {{ -d }} {{ 'ден' if d == -1 else 'дни' }}{% endif %}{% endif %}</div>
-      {% endif %}
-      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
-    </div>
-{% endmacro %}
-
-{% if splits_report %}
-{% set sr = splits_report %}
-{% set dg = sr.diag or {} %}
-<section>
-  <h2>Сплитове · тази седмица</h2>
-  {% if sr.priority %}
-  <div class="splits-funnel" style="margin-bottom:6px">Отворени позиции и наблюдавани · целият хоризонт на източника, без филтри</div>
-  <div class="signal-grid splits-priority">
-    {% for s in sr.priority %}{{ split_chip(s) }}{% endfor %}
-  </div>
-  {% elif sr.priority_checked and sr.state != 'source_failed' and not sr.priority_in_rows %}
-  <div class="splits-funnel" style="margin-bottom:10px">Отворени позиции и наблюдавани ({{ sr.priority_checked }}): няма сплитове в хоризонта{% if dg.horizon_to %} до {{ dg.horizon_to[8:10] }}.{{ dg.horizon_to[5:7] }}{% endif %}.</div>
-  {% endif %}
-  {% if sr.state == 'source_failed' %}
-  <div class="splits-warn">⚠ Календарът на сплитовете не върна данни днес.</div>
-  {% elif sr.state == 'empty' %}
-  <div class="splits-empty">Няма предстоящи сплитове тази седмица по нашите критерии
-    (цена над ${{ "%.0f"|format(splits_min_price) }}, пазарна стойност над ${{ "%.0f"|format(splits_min_cap_m) }} млн).</div>
-  <div class="splits-funnel">
-    Източникът върна {{ dg.in_week }} за седмицата{% if dg.in_week %}:
-    {{ dg.dropped_price|length }} под ${{ "%.0f"|format(splits_min_price) }},
-    {{ dg.dropped_cap|length }} под ${{ "%.0f"|format(splits_min_cap_m) }} млн,
-    {{ dg.dropped_no_data|length }} без данни{% if dg.dropped_no_data %} ({{ dg.dropped_no_data|join(', ') }}){% endif %}{% endif %}
-    · общо {{ dg.source_rows }} в хоризонта{% if dg.horizon_to %} до {{ dg.horizon_to[8:10] }}.{{ dg.horizon_to[5:7] }}{% endif %}.
-  </div>
-  {% else %}
-  <div class="signal-grid">
-    {% for s in sr.rows %}{{ split_chip(s) }}{% endfor %}
-  </div>
-  {% endif %}
-</section>
-{% elif splits %}
-<section>
-  <h2>Сплитове · тази седмица</h2>
-  <div class="signal-grid">
-    {% for s in splits %}
-    <div class="signal-chip {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="sym">{{ s.ticker }}
-        {% if s.split_type == 'reverse' %}<span class="split-tag rev">reverse</span>
-        {% elif s.split_type == 'normal' %}<span class="split-tag fwd">normal</span>{% endif %}
-      </div>
-      <div class="note">
-        {% if s.ratio %}<b>{{ s.ratio }}</b>{% endif %}
-        {% if s.price %} · ${{ "%.2f"|format(s.price) }}{% endif %}
-        {% if s.date_human %} · {{ s.date_human }}{% endif %}
-      </div>
-      {% if s.company %}<div class="note" style="color:var(--muted);font-size:12px">{{ s.company|cname(34, false) }}</div>{% endif %}
-      {% if s.ticker in our_tickers %}<div class="in-screen">✓ и в нашия скрийнър</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
 
 {# FIX 2026-09-28 (Release 2): bullish/bearish вече е ЗА ВСЕКИ ТИКЪР, изведен
    от кода от effect (печели/губи от изчисленото движение на инструмента).
