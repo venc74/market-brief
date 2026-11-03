@@ -105,10 +105,16 @@ with q():
 print("  ✓ карето най-горе (преди термометъра); имейлът — само при нещо; „Нищо за отбелязване“; провал — не изглежда като „нищо“; сутрешният бриф — без каре")
 
 print()
-print("── 6. прозорецът ──")
+print("── 6. прозорецът и задачата ──")
 assert options_record.skip_reason(NOW, None) is None                                                                                # 09:05 EST, вторник → върви
 assert "след отварянето" in options_record.skip_reason(NOW + dt.timedelta(hours=1)) and "не е сесия" in options_record.skip_reason(dt.datetime(2026, 11, 7, 14, 5, tzinfo=dt.timezone.utc))
+yml = (ROOT / ".github" / "workflows" / "options_record.yml").read_text(encoding="utf-8")
+steps = yml.split("- name: ")
+rec, pre, com = (next(s for s in steps if s.startswith(n)) for n in ("Record option chains", "Pre-open update", "Commit record"))
+assert "python src/options_record.py" in rec and "if: always()" not in rec.split("#")[0]                                  # коментарът преди следващата стъпка — не е част от нея
+assert "if: always()" in pre and "python src/preopen.py" in pre and "EDGAR_UA: ${{ secrets.EDGAR_UA }}" in pre and "EMAIL_TO: ${{ secrets.EMAIL_TO }}" in pre
+assert "if: always()" in com and "git add data/preopen docs/index.html" in com and "git add data/options_daily.json" in com
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
 assert "anthropic" not in src.lower() and "_call_claude" not in src                                                            # без AI
-print("  ✓ 09:05 Ню Йорк във вторник — върви; 10:05 / събота — пропуска; без AI")
+print("  ✓ 09:05 Ню Йорк във вторник — върви; 10:05 / събота — пропуска; отделна стъпка с if: always() (и commit-ът), без AI")
 print("\n✅ test_preopen: всичко мина")

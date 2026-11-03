@@ -36,16 +36,32 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Record option chains
+        id: record
         run: python src/options_record.py
 
+      # 03.11.2026 (т. 10): обновяването преди отварянето — ОТДЕЛНА стъпка: върви и когато записът на опциите падне (if: always()), и провалът ѝ не спира записа
+      # (той е преди нея; commit стъпката също е с if: always()). Без AI; имейл само ако има нещо (src/preopen.py).
+      - name: Pre-open update
+        id: preopen
+        if: always()
+        env:
+          EDGAR_UA: ${{ secrets.EDGAR_UA }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+        run: python src/preopen.py
+
       - name: Commit record
+        if: always()
         run: |
           git config user.name "brief-bot"
           git config user.email "actions@github.com"
           git add data/options_daily.json 2>/dev/null || true
+          git add data/preopen docs/index.html 2>/dev/null || true          # 03.11.2026: обновяването преди отварянето (данните и страницата с карето)
           git diff --cached --quiet && exit 0
-          git commit -m "options record: $(date -u +%F)"
-          # Само записът се качва оттук; всичко друго, писано по време на run-а, се слага настрана (както в oi_snapshot.yml), после pull --rebase с до 4 опита.
+          git commit -m "options record / pre-open: $(date -u +%F)"
+          # Само записът и обновяването преди отварянето се качват оттук; всичко друго, писано по време на run-а, се слага настрана (както в oi_snapshot.yml), после pull --rebase с до 4 опита.
           git stash push --include-untracked -q -m "options-record: локални файлове" || true
           for attempt in 1 2 3 4; do
             if git pull --rebase && git push; then
