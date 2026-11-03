@@ -120,15 +120,32 @@ def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: 
     return uniq
 
 
-def watch_gaps(pts: dict, watched: list[str]) -> list[dict]:
-    """(в) Наблюдаваните с гап ≥ ±PREOPEN_WATCH_GAP_PCT в премаркета. Чиста функция."""
+def watch_closes(brief: dict | None) -> dict:
+    """03.11.2026 (прегледа на т. 10, 3): официалното затваряне на наблюдаваните от сутрешния бриф (brief["watch"] → facts.price {date, close}) — без нова заявка. Чиста функция."""
+    out = {}
+    for w in (brief or {}).get("watch") or []:
+        pr = ((w or {}).get("facts") or {}).get("price") or {}
+        if w.get("ticker") and isinstance(pr.get("close"), (int, float)) and pr.get("date"):
+            out[w["ticker"]] = {"close": float(pr["close"]), "date": str(pr["date"])}
+    return out
+
+
+def watch_gaps(pts: dict, watched: list[str], closes: dict | None = None) -> list[dict]:
+    """
+    (в) Наблюдаваните с гап ≥ ±PREOPEN_WATCH_GAP_PCT в премаркета. Базата — официалното затваряне от сутрешния бриф (closes = watch_closes(brief)), когато е за същата сесия
+    (close_src "brief"); иначе — последният редовен 5-минутен бар (close_src "5m", с бележка в реда). Чиста функция.
+    """
     out = []
     for t in watched or []:
         p = pts.get(t)
-        if p and p["prev_close"]:
-            g = _pct(p["pm_price"], p["prev_close"])
+        if not p:
+            continue
+        c = (closes or {}).get(t) or {}
+        base, src = (c["close"], "brief") if c.get("date") == p["session"] and c.get("close") else (p["prev_close"], "5m")
+        if base:
+            g = _pct(p["pm_price"], base)
             if abs(g) >= config.PREOPEN_WATCH_GAP_PCT:
-                out.append({"ticker": t, "gap_pct": g, "pm_price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2), "pm_last_ny": p["pm_last_ny"],
+                out.append({"ticker": t, "gap_pct": g, "pm_price": round(p["pm_price"], 2), "prev_close": round(base, 2), "close_src": src, "pm_last_ny": p["pm_last_ny"],
                             "pm_volume": p["pm_volume"]})
     return sorted(out, key=lambda x: -abs(x["gap_pct"]))
 
@@ -241,7 +258,8 @@ def email_html(res: dict) -> str:
         parts.append(li([f"<b>{e(x['ticker'])}</b> · {e(x['what'])} — {e(x['kind'])} ${x['level']:.2f} (премаркет ${x['pm_price']:.2f}, {x['pct']:+.1f}%)" for x in res["levels"]]))
     if res.get("watch"):
         parts.append("<div><b>Наблюдаваните (гап ≥ ±%g%%)</b></div>" % config.PREOPEN_WATCH_GAP_PCT)
-        parts.append(li([f"<b>{e(x['ticker'])}</b> {x['gap_pct']:+.1f}% (${x['pm_price']:.2f}; затваряне ${x['prev_close']:.2f})" for x in res["watch"]]))
+        parts.append(li([f"<b>{e(x['ticker'])}</b> {x['gap_pct']:+.1f}% (${x['pm_price']:.2f}; затваряне ${x['prev_close']:.2f}"
+                         + (" — последният 5-мин. бар, няма го в сутрешния бриф" if x.get("close_src") == "5m" else "") + ")" for x in res["watch"]]))
     return "".join(parts) + "</div>"
 
 
@@ -297,7 +315,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [])
-        res["watch"] = watch_gaps(pts, watched or [])
+        res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)
     except Exception as e:
         res["notes"].append(f"{type(e).__name__}: {e}")

@@ -21,6 +21,7 @@ from src import preopen, render, options_record
 
 FX = json.loads(gzip.decompress((ROOT / "tests" / "fixtures" / "preopen_2026-11-03.json.gz").read_bytes()).decode("utf-8"))
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
+WB = json.loads((ROOT / "tests" / "fixtures" / "preopen_watch_brief_2026-11-03.json").read_text(encoding="utf-8"))      # РЕАЛНО: brief["watch"] на 03.11 (цената)
 NOW = dt.datetime(2026, 11, 3, 14, 5, tzinfo=dt.timezone.utc)                     # СИНТЕТИЧНО: 09:05 Ню Йорк (EST) = 15:05 Берлин
 q = lambda: contextlib.redirect_stdout(io.StringIO())
 frames = {t: pd.DataFrame({"Open": b["o"], "High": b["h"], "Low": b["l"], "Close": b["c"], "Volume": b["v"]}, index=pd.to_datetime(b["t"], utc=True)) for t, b in FX["bars_5m"].items()}
@@ -64,7 +65,20 @@ print("── 3. наблюдаваните (РЕАЛНО: ELF, CRCL под ±3%
 w = preopen.watch_gaps(pts, ["ELF", "CRCL", "LSCC"])
 assert [x["ticker"] for x in w] == ["LSCC"] and w[0]["gap_pct"] == 13.51                                                  # СИНТЕТИЧНО: LSCC като наблюдаван
 assert preopen.watch_gaps(pts, ["ELF", "CRCL"]) == []
-print("  ✓ ELF и CRCL — под ±3%; наблюдаван с гап (LSCC, синтетично в списъка) — в реда")
+assert w[0]["close_src"] == "5m" and w[0]["prev_close"] == 95.43                                                             # няма го в сутрешния бриф → 5-мин. бар
+cl = preopen.watch_closes(WB)
+assert len(cl) == 14 and cl["ELF"] == {"close": 110.68, "date": "2026-11-02"} and cl["CRCL"]["close"] == 72.08
+_thr, config.PREOPEN_WATCH_GAP_PCT = config.PREOPEN_WATCH_GAP_PCT, 0.1                                                    # СИНТЕТИЧНО: по-нисък праг, за да се видят редовете
+try:
+    w2 = {x["ticker"]: x for x in preopen.watch_gaps(pts, ["ELF", "CRCL"], cl)}
+    assert (w2["ELF"]["prev_close"], w2["ELF"]["gap_pct"], w2["ELF"]["close_src"]) == (110.68, -0.43, "brief")           # официалното $110.68, не барът $110.63
+    assert (w2["CRCL"]["prev_close"], w2["CRCL"]["gap_pct"], w2["CRCL"]["close_src"]) == (72.08, 1.17, "brief")
+    stale = {**cl, "ELF": {"close": 110.68, "date": "2026-10-30"}}                                                             # СИНТЕТИЧНО: затваряне от друга сесия
+    assert {x["ticker"]: x["close_src"] for x in preopen.watch_gaps(pts, ["ELF"], stale)} == {"ELF": "5m"}
+finally:
+    config.PREOPEN_WATCH_GAP_PCT = _thr
+assert preopen.watch_closes(None) == {} and preopen.watch_closes({"watch": [{"ticker": "X", "facts": {}}]}) == {}
+print("  ✓ ELF и CRCL — под ±3%; базата е официалното затваряне от сутрешния бриф (ELF $110.68, не 5-мин. бар $110.63); без него / от друга сесия — 5-мин. бар с бележка")
 
 print()
 print("── 4. нивата — само пресичанията (СИНТЕТИЧНО: картите и записите) ──")
@@ -127,6 +141,13 @@ with q():
     p4 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
 assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in p4 and "⚠ Обемът" not in p4
 assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(v))))
+b["preopen"] = {**res, "gaps": [], "watch": [{"ticker": "ELF", "gap_pct": -3.2, "pm_price": 107.1, "prev_close": 110.63, "close_src": "5m", "pm_last_ny": "09:00", "pm_volume": None},
+                                       {"ticker": "CRCL", "gap_pct": 4.0, "pm_price": 74.96, "prev_close": 72.08, "close_src": "brief", "pm_last_ny": "09:00", "pm_volume": None}]}   # СИНТЕТИЧНО
+with q():
+    p5 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
+m5 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(b["preopen"]))))
+for txt in (p5, m5):
+    assert "ELF -3.2% ($107.10; затваряне $110.63 — последният 5-мин. бар, няма го в сутрешния бриф )" in txt.replace("бриф)", "бриф )") and "CRCL +4.0% ($74.96; затваряне $72.08)" in txt
 b.pop("preopen")
 print("  ✓ без обем при всички — „Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути“; при част — „… за B …“; с обем — числото в реда, без предупреждението")
 

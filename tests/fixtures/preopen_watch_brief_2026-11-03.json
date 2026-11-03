@@ -1,0 +1,131 @@
+{
+ "_note": "РЕАЛНО: brief[\"watch\"] (само тикър + facts.price.date / close) от сутрешния бриф на 03.11.2026 (data/2026-11-03.json, commit bde50b4 „brief: 2026-11-03“; публикуван и в docs/data/). Затварянето на 02.11 — дневните бари на Yahoo от сутринта. За test_preopen.py (т. 3 от прегледа на т. 10).",
+ "watch": [
+  {
+   "ticker": "TDOC",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 8.63
+    }
+   }
+  },
+  {
+   "ticker": "BHC",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 8.02
+    }
+   }
+  },
+  {
+   "ticker": "SAP",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 233.62
+    }
+   }
+  },
+  {
+   "ticker": "BLSH",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 22.54
+    }
+   }
+  },
+  {
+   "ticker": "CRCL",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 72.08
+    }
+   }
+  },
+  {
+   "ticker": "AI",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 11.55
+    }
+   }
+  },
+  {
+   "ticker": "CRBG",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 35.04
+    }
+   }
+  },
+  {
+   "ticker": "BFLY",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 6.14
+    }
+   }
+  },
+  {
+   "ticker": "ELF",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 110.68
+    }
+   }
+  },
+  {
+   "ticker": "DOCU",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 81.65
+    }
+   }
+  },
+  {
+   "ticker": "SN",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 213.22
+    }
+   }
+  },
+  {
+   "ticker": "CRM",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 226.18
+    }
+   }
+  },
+  {
+   "ticker": "BMNR",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 19.54
+    }
+   }
+  },
+  {
+   "ticker": "ACN",
+   "facts": {
+    "price": {
+     "date": "2026-11-02",
+     "close": 260.94
+    }
+   }
+  }
+ ]
+}

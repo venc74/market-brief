@@ -514,7 +514,7 @@
     <li><b class="mono">{{ x.ticker }}</b> · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}
   {% if preopen.watch %}<div class="cs-sub">Наблюдаваните — гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}% · {{ preopen.watch|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.watch %}
-    <li><b class="mono">{{ x.ticker }}</b> {{ "%+.1f"|format(x.gap_pct) }}% (${{ "%.2f"|format(x.pm_price) }}; затваряне ${{ "%.2f"|format(x.prev_close) }})</li>{% endfor %}</ul>{% endif %}
+    <li><b class="mono">{{ x.ticker }}</b> {{ "%+.1f"|format(x.gap_pct) }}% (${{ "%.2f"|format(x.pm_price) }}; затваряне ${{ "%.2f"|format(x.prev_close) }}{% if x.close_src == "5m" %} <span class="small" style="color:var(--muted)">— последният 5-мин. бар, няма го в сутрешния бриф</span>{% endif %})</li>{% endfor %}</ul>{% endif %}
   {% endif %}
 </section>
 {% endif %}
