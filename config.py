@@ -477,6 +477,11 @@ GICS_SECTOR_ETF = {"Information Technology": "XLK", "Communication Services": "X
 SECTOR_GROUPS = {"отбранителна ротация — парите търсят сигурност": ["XLP", "XLU", "XLV"],
                  "растежът води — апетит за риск": ["XLK", "XLC", "XLY"],
                  "циклична ротация — пазарът залага на икономиката": ["XLE", "XLF", "XLI", "XLB"]}
+# 03.11.2026 (поправки след брифа, т. 2): широка ротация — ≥ SECTOR_BROAD_MIN_LEADERS сектора „води пазара“ и XLK или XLC „изостава“ → изречението е за нея (RS е спрямо SPY,
+# който е претеглен по капитализация — когато мега-технологиите изостават, повечето сектори „водят“). Проверява се ПРЕДИ правилото за първите три (SECTOR_GROUPS).
+SECTOR_BROAD_MIN_LEADERS = int(os.getenv("SECTOR_BROAD_MIN_LEADERS", 6))
+SECTOR_MEGA_TECH_ETFS = ["XLK", "XLC"]
+SECTOR_BROAD_TEXT = "широка ротация извън мега-технологиите — средната акция бие индекса (RS е спрямо SPY, претеглен по капитализация)"
 
 
 # 2026-10-03 (пакет 2 т.1): мост секторен ETF → Yahoo "sector"/"industry" на кандидатите. leading_sectors()

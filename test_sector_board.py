@@ -98,14 +98,14 @@ print("  ✓ next_earnings: календарът с минал отчет → ge
 
 print()
 print("── 3. изречението, подсекторите и контекстът за картите ──")
-assert b["summary"] == "Водят Енергетика, Здравеопазване и Потребителски (защитни); изостават Комуникации — отбранителна ротация — парите търсят сигурност."
+assert b["summary"] == "Водят 4 от 11 (първите три: Енергетика, Здравеопазване и Потребителски (защитни)); изостават Комуникации — отбранителна ротация — парите търсят сигурност."   # 03.11.2026: + броят при над 3
 assert [r["etf"] for r in b["top_sub"]] == ["XOP", "IBB", "OIH", "CIBR", "IGV"] and [r["etf"] for r in b["bottom_sub"]] == ["TAN", "URA", "JETS"]
 assert [r["etf"] for r in b["subsectors"]][:5] == ["XOP", "IBB", "OIH", "CIBR", "IGV"] and [r["etf"] for r in b["subsectors"]][-3:] == ["JETS", "URA", "TAN"]
 assert "leaders" not in b["subsectors"][0]
 ctx = sector_layer.board_context(b)
 assert [c["etf"] for c in ctx] == ["XLE", "XLV", "XLP", "XLB", "XLU", "XLF", "XLY", "XLRE"] and set(ctx[0]) == {"etf", "sector", "rs_4w", "rs_12w", "word"}   # XLI — в крак с пазара
 assert sector_layer.board_context({}) == [] and sector_layer.board_context(None) == []
-print("  ✓ „Водят Енергетика, Здравеопазване и Потребителски (защитни); изостават Комуникации — отбранителна ротация …“")
+print("  ✓ „Водят 4 от 11 (първите три: Енергетика, Здравеопазване и Потребителски (защитни)); изостават Комуникации — отбранителна ротация …“")
 print("  ✓ най-силни подсектори XOP, IBB, OIH, CIBR, IGV; най-слаби TAN, URA, JETS; картите виждат само водещите и набиращите сила")
 
 print()
@@ -117,6 +117,20 @@ assert sector_layer.board_summary([row("XLE", "набира сила"), row("XLK
     "Нито един сектор не води и на двата периода; нито един не изостава и на двата — смесена картина — няма ясна посока на ротацията."
 assert sector_layer.board_summary([]) == ""
 print("  ✓ XLK + XLY отгоре → „растежът води“; без група с 2 от първите 3 → „смесена картина“; празно → нищо")
+
+print()
+print("── 5. 03.11.2026 (поправки след брифа, т. 2): широка ротация извън мега-технологиите — РЕАЛНИТЕ редове от 02.11 и 03.11, реплеят 01.06–03.11 ──")
+RB = json.loads((ROOT / "tests" / "fixtures" / "sector_board_rows_2026-11-03.json").read_text(encoding="utf-8"))
+s02, s03 = sector_layer.board_summary(RB["rows"]["2026-11-02"]), sector_layer.board_summary(RB["rows"]["2026-11-03"])
+assert s03 == ("Водят 7 от 11 (първите три: Енергетика, Здравеопазване и Потребителски (защитни)); изостават Технологии и Комуникации — широка ротация извън мега-технологиите — "
+               "средната акция бие индекса (RS е спрямо SPY, претеглен по капитализация)."), s03
+assert s02.endswith("— отбранителна ротация — парите търсят сигурност.") and s02.startswith("Водят 4 от 11")                         # 4 водещи — под прага 6
+six = [row(e, "води пазара") for e in ("XLE", "XLV", "XLP", "XLB", "XLU", "XLF")] + [row("XLK", "изостава")]                              # СИНТЕТИЧНО: точно 6
+assert config.SECTOR_BROAD_TEXT in sector_layer.board_summary(six) and config.SECTOR_BROAD_TEXT not in sector_layer.board_summary(six[:-1] + [row("XLK", "отслабва")])
+changed = [x["day"] for x in RB["replay"] if x["old"] != x["new"]]
+assert len(RB["replay"]) == 109 and changed == ["2026-11-03"] and max(x["lead"] for x in RB["replay"] if x["day"] < "2026-11-03") == 4
+print("  ✓ 03.11: 7 от 11 водят, XLK и XLC изостават → „широка ротация извън мега-технологиите …“; 02.11 (4 водят) — „отбранителна ротация“, както беше")
+print("  ✓ реплей 01.06–03.11 (109 сесии): смисълът се сменя само на 03.11; преди това водещите са най-много 4")
 
 print()
 print("── 5. провал на тегленето → {} (graceful), без картата ──")
@@ -134,7 +148,7 @@ with q():
     page = render.render_dashboard(bb, publish=False)
 txt = lambda h: re.sub(r"\s+\)", ")", re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h))))
 sec = txt(page.split("Секторна карта · кои сектори водят", 1)[1].split("</section>", 1)[0])
-assert "Водят Енергетика, Здравеопазване и Потребителски (защитни)" in sec and "хоризонт" not in sec.lower()
+assert "Водят 4 от 11 (първите три: Енергетика, Здравеопазване и Потребителски (защитни))" in sec and "хоризонт" not in sec.lower()
 assert sec.index("XLE") < sec.index("XLV") < sec.index("XLC") and "APA · MPC · VAL" in sec and "RS на 6м връх" in sec
 assert "Тикър RS рейтинг 1 месец 50DMA 200DMA Отчет APA 98 +24.0% над над 04.11 (5 дни) MPC 97 +9.4% над над 03.11 (4 дни)" in sec
 assert "Най-силни подсектори: Добив на нефт и газ (XOP ↑)" in sec and "Киберсигурност (CIBR →) · Софтуер (IGV →)" in sec

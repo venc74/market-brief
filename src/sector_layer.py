@@ -206,15 +206,22 @@ def board_summary(rows: list[dict]) -> str:
     """
     Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
     иначе „смесена картина“. Чиста функция.
+    03.11.2026 (поправки след брифа, т. 2): ≥ config.SECTOR_BROAD_MIN_LEADERS сектора „води пазара“ и XLK или XLC „изостава“ → config.SECTOR_BROAD_TEXT (широка ротация извън
+    мега-технологиите; RS е спрямо SPY, претеглен по капитализация) — преди правилото за първите три (на 03.11 водеха 7 от 11 и то даваше „отбранителна ротация“). Над 3 водещи
+    → „Водят 7 от 11 (първите три: …)“ — до 03.11 се изреждаха само първите три без броя.
     """
     if not rows:
         return ""
-    lead = [r["sector"] for r in rows if r.get("word") == "води пазара"][:3]
+    lead_all = [r["sector"] for r in rows if r.get("word") == "води пазара"]
+    lead = lead_all[:3]
     lag = [r["sector"] for r in reversed(rows) if r.get("word") == "изостава"][:3]
     top3 = {r["etf"] for r in rows[:3]}
-    meaning = next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2), "смесена картина — няма ясна посока на ротацията")
+    broad = len(lead_all) >= config.SECTOR_BROAD_MIN_LEADERS and any(r.get("etf") in config.SECTOR_MEGA_TECH_ETFS and r.get("word") == "изостава" for r in rows)
+    meaning = config.SECTOR_BROAD_TEXT if broad else next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2),
+                                                          "смесена картина — няма ясна посока на ротацията")
     lst = lambda xs: ", ".join(xs[:-1]) + " и " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "")
-    parts = [f"Водят {lst(lead)}" if lead else "Нито един сектор не води и на двата периода", f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
+    head = (f"Водят {len(lead_all)} от {len(rows)} (първите три: {lst(lead)})" if len(lead_all) > 3 else f"Водят {lst(lead)}") if lead else "Нито един сектор не води и на двата периода"
+    parts = [head, f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
     return f"{parts[0]}; {parts[1]} — {meaning}."
 
 
