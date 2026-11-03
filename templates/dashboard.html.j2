@@ -498,12 +498,13 @@
   <h2 style="margin-top:0">Преди отварянето ({{ preopen.time_berlin }} Берлин / {{ preopen.time_ny }} Ню Йорк)</h2>
   <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:8px">Само информация, не препоръка. Цените са от премаркета (Yahoo, 5-минутни бари; обемът там често липсва);
     сравнението е със затварянето на {{ preopen.session[8:10] if preopen.session else "" }}.{{ preopen.session[5:7] if preopen.session else "" }}. Карето стои до следващия сутрешен бриф.</div>
+  {% if preopen.volume_note %}<div class="small" style="color:var(--yellow);margin-bottom:8px">⚠ {{ preopen.volume_note }}.</div>{% endif %}
   {% if not preopen.ok %}<div class="small" style="color:var(--red)">Премаркетът не се изтегли днес{% if preopen.notes %} ({{ preopen.notes|join("; ") }}){% endif %} — празното НЕ значи, че няма гапове.</div>
   {% elif not (preopen.gaps or preopen.levels or preopen.watch) %}<div class="small">Нищо за отбелязване: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
   {% else %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
-    <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }})
+    <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
       {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
       {% if g.headline %}<br><span class="small">„{{ g.headline.title }}“{% if g.headline.source %} · {{ g.headline.source }}{% endif %}</span>{% endif %}

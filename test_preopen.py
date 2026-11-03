@@ -94,7 +94,7 @@ assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“" in page
 mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(res))))
 assert mail.startswith(" Преди отварянето · 03.11, 09:05 Ню Йорк (15:05 Берлин)") and "AEIS +12.5% ($244.30; затваряне $217.19) · пренебрегнат (3 мес. -36%)" in mail
 assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“ " in mail and "Transcript“ ·" not in mail                  # без празен източник
-quiet = {**res, "gaps": [], "levels": [], "watch": []}
+quiet = {**res, "gaps": [], "levels": [], "watch": [], "volume_note": None}
 b["preopen"] = quiet
 with q():
     p2 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
@@ -106,7 +106,24 @@ assert "Премаркетът не се изтегли днес" in p3
 b.pop("preopen")
 with q():
     assert "Преди отварянето (" not in render.render_dashboard(b, publish=False)                                            # сутрешният бриф — без каре
+VN = "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути"
+assert res["volume_note"] == VN and f"⚠ {VN}." in page and f"⚠ {VN}." in mail                                                # РЕАЛНО: на 03.11 обемът е 0 при всички
 print("  ✓ карето най-горе (преди термометъра); заглавието — „генериран 07:34 CET · обновено преди отварянето 15:05 CET“; имейлът — само при нещо; „Нищо за отбелязване“; провал — не изглежда като „нищо“; сутрешният бриф — без каре")
+
+print()
+print("── 5б. обемът в премаркета (СИНТЕТИЧНО: обемите) ──")
+assert preopen.volume_note({"gaps": [{"ticker": "A", "pm_volume": 12345.0}], "watch": [{"ticker": "B", "pm_volume": None}]}) == \
+    "Обемът в премаркета не е наличен (Yahoo) за B — провери го в първите минути"
+assert preopen.volume_note({"gaps": [{"ticker": "A", "pm_volume": 12345.0}], "levels": [{"ticker": "A", "pm_volume": 12345.0}]}) is None
+assert preopen.volume_note({"gaps": [], "levels": [], "watch": []}) is None                                                   # празно каре — без реда
+v = {**res, "gaps": [{**res["gaps"][0], "pm_volume": 12345.0}], "volume_note": None}
+b["preopen"] = v
+with q():
+    p4 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
+assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in p4 and "⚠ Обемът" not in p4
+assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(v))))
+b.pop("preopen")
+print("  ✓ без обем при всички — „Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути“; при част — „… за B …“; с обем — числото в реда, без предупреждението")
 
 print()
 print("── 6. прозорецът и задачата ──")

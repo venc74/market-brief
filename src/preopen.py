@@ -92,7 +92,8 @@ def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: 
         if p and isinstance(level, (int, float)) and level > 0:
             hit = p["pm_price"] >= level if kind == "над нивото" else p["pm_price"] < level
             if hit:
-                out.append({"ticker": t, "what": what, "kind": kind, "level": round(float(level), 2), "pm_price": round(p["pm_price"], 2), "pct": _pct(p["pm_price"], level)})
+                out.append({"ticker": t, "what": what, "kind": kind, "level": round(float(level), 2), "pm_price": round(p["pm_price"], 2), "pct": _pct(p["pm_price"], level),
+                            "pm_volume": p["pm_volume"]})
 
     for c in waiting or []:
         add(c.get("ticker"), "Чака пробив", "над нивото", (c.get("setup") or {}).get("buy_stop"))
@@ -127,7 +128,8 @@ def watch_gaps(pts: dict, watched: list[str]) -> list[dict]:
         if p and p["prev_close"]:
             g = _pct(p["pm_price"], p["prev_close"])
             if abs(g) >= config.PREOPEN_WATCH_GAP_PCT:
-                out.append({"ticker": t, "gap_pct": g, "pm_price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2), "pm_last_ny": p["pm_last_ny"]})
+                out.append({"ticker": t, "gap_pct": g, "pm_price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2), "pm_last_ny": p["pm_last_ny"],
+                            "pm_volume": p["pm_volume"]})
     return sorted(out, key=lambda x: -abs(x["gap_pct"]))
 
 
@@ -178,6 +180,22 @@ def morning_generated(page_html: str | None) -> tuple[str, str] | None:
     return (m.group(1), m.group(2)) if m else None
 
 
+def volume_note(res: dict) -> str | None:
+    """
+    03.11.2026 (прегледа на т. 10): EP иска обем, а в премаркета Yahoo често дава 0 (на 03.11 — при 682 от 682 тикъра с премаркет). Тикърите в карето без обем → редът
+    „Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути“ (за всички) или „… за X, Y — …“ (за част от тях); с обем при всички / празно каре → None. Чиста функция.
+    """
+    rows = (res.get("gaps") or []) + (res.get("levels") or []) + (res.get("watch") or [])
+    vol = {}
+    for r in rows:
+        vol[r["ticker"]] = vol.get(r["ticker"]) or r.get("pm_volume")
+    missing = [t for t, v in vol.items() if not v]
+    if not missing:
+        return None
+    who = "" if len(missing) == len(vol) else f" за {', '.join(missing)}"
+    return f"Обемът в премаркета не е наличен (Yahoo){who} — провери го в първите минути"
+
+
 def has_news(res: dict) -> bool:
     return bool(res.get("gaps") or res.get("levels") or res.get("watch"))
 
@@ -189,9 +207,12 @@ def email_html(res: dict) -> str:
     parts = [f"<div style='font-family:Arial,sans-serif;font-size:13px;color:#111'><b>Преди отварянето · {e(res['date'][8:10])}.{e(res['date'][5:7])}, "
              f"{e(res.get('time_ny', ''))} Ню Йорк ({e(res.get('time_berlin', ''))} Берлин)</b><br><span style='color:#6b7280'>Само информация, не препоръка. Цените са от премаркета "
              f"(Yahoo, 5-минутни бари); обемът там често липсва.</span>"]
+    if volume_note(res):
+        parts.append(f"<div style='margin-top:6px;color:#92400e'>⚠ {e(volume_note(res))}.</div>")
     if res.get("gaps"):
         parts.append("<div style='margin-top:10px'><b>EP — гапове ≥ +%g%% в премаркета</b></div>" % config.PREOPEN_GAP_PCT)
         parts.append(li([f"<b>{e(g['ticker'])}</b> {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
+                         + (f" · обем в премаркета {g['pm_volume']:,.0f}".replace(",", " ") if g.get("pm_volume") else "")
                          + (f" · {'пренебрегнат' if g.get('neglect') else 'не е пренебрегнат'} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
                          + (f"<br><span style='color:#374151'>„{e(g['headline']['title'])}“" + (f" · {e(g['headline']['source'])}" if g["headline"].get("source") else "") + "</span>"
@@ -259,6 +280,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [])
         res["watch"] = watch_gaps(pts, watched or [])
+        res["volume_note"] = volume_note(res)
     except Exception as e:
         res["notes"].append(f"{type(e).__name__}: {e}")
         print(f"[preopen] пропадна: {type(e).__name__}: {e}")
