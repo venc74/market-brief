@@ -31,7 +31,8 @@ print("── 2. броят редове в заглавието на всяка
 sums = [re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", m.group(2)))).strip()
         for m in re.finditer(r'<details(?![^>]*wt-item)([^>]*)>\s*<summary[^>]*>(.*?)</summary>', page, re.S)]
 assert len(sums) >= 3, sums
-no_count = [s for s in sums if not re.search(r"\d", s)]
+TEXT_ONLY = {"Как се мери"}                                                                           # 03.11.2026 (т. 15): методът на книгата — текст, не редове
+no_count = [s for s in sums if not re.search(r"\d", s) and s not in TEXT_ONLY]
 assert not no_count, no_count
 for s in sums:
     print(f"  · {s[:120]}")

@@ -1892,7 +1892,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
-        "events": events_block(with_result, "return_pct"),                                           # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
+        "events": events_block(with_result, "return_pct_exec"),                                      # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"; 03.11.2026 (т. 15, 6): exec
         "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
         "live": live, "live_total": len(live_all), "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),

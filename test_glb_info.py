@@ -119,8 +119,8 @@ wish_part, ours_part = head.split("Наши са:")[0], head.split("Наши с�
 assert "най-високата цена (High) на месечен бар" in wish_part and "close" not in wish_part and "най-високия месечен close" in ours_part
 assert "обем на пробива н/д · дъно н/д" in sec and "диапазон на 63 дни" in sec and "±" not in sec.split("band_hold")[1][:80]
 print("  ✓ РЕАЛНИТЕ карти от 05.10 (стар формат, без новите ключове): заглавието «Идеята е на Eric Wish … Наши са: …» без «тесен»/«tightness»; редът с новите полета — «н/д» (без изключение); диапазонът е «диапазон на 63 дни X% от линията», не «±»")
-assert "Тесен, добре удържан base" in sec                                                                  # архивният бриф пази СЪХРАНЕНАТА бележка на деня си — не се пренаписва
-print("  ✓ архивният бриф от 05.10 пази съхранената бележка на своя ден («Тесен, добре удържан base …») — старите брифове не се пренаписват")
+assert "Тесен, добре удържан base" not in sec and B05["glb_candidates"][0]["risk_note"].startswith("Тесен")       # 03.11.2026 (разходката, т. 13): бележката за риска — веднъж в инфото, не на всяка карта; данните на деня — непроменени
+print("  ✓ архивният бриф от 05.10: съхранената бележка («Тесен, добре удържан base …») остава в данните, но не се показва на всяка карта — рискът е веднъж в инфото (т. 13)")
 cur = copy.deepcopy(B05)
 cur["glb_candidates"] = [{**r, "company": r.get("company") or r["ticker"]} for r in rows]                  # карти от СЕГАШНИЯ код върху реалните барове от фиксчъра (стъпка 3)
 with contextlib.redirect_stdout(io.StringIO()):
@@ -128,10 +128,9 @@ with contextlib.redirect_stdout(io.StringIO()):
 sec2 = page_cur[page_cur.index("GLB Watchlist · Green Line Breakout"):]
 sec2 = sec2[:sec2.index("</section>")]
 claim2 = re.sub(r"не е доказателство за (&#34;|\")тесен(&#34;|\") base", "", sec2.lower())                      # единственото място с думата е изричното отрицание в бележката на Classic
-assert "тесен" not in claim2 and "tightness" not in claim2 and "Наш филтър (не на Wish)" in sec2 and sec2.count("не е доказателство за") == sum(r["glb_type"] == "classic" for r in rows)
-assert sec2.count("(наш филтър, не на Wish)") == sum(r["glb_type"] == "momentum" for r in rows)
+assert "тесен" not in claim2 and "tightness" not in claim2 and sec2.count("(наш етикет, не на Уиш)") == 1 and "Наш филтър (не на Wish)" not in sec2     # 03.11.2026 (т. 13): определението — веднъж
 assert "обем на пробива н/д" not in sec2 and sec2.count("× от 52-седм. дъно") == len(rows)
-print(f"  ✓ {len(rows)} карти, построени от сегашния код върху реалните барове: бележката «Наш филтър (не на Wish) …», без «тесен»; всяка носи «обем на пробива …× средния · …× от 52-седм. дъно»")
+print(f"  ✓ {len(rows)} карти, построени от сегашния код върху реалните барове: определението на Classic — веднъж («наш етикет, не на Уиш»), без «тесен»; всяка карта носи «обем на пробива …× средния · …× от 52-седм. дъно»")
 b = copy.deepcopy(B05)
 for c in b["glb_candidates"]:
     c["breakout_volume_ratio"], c["x_from_52w_low"] = 1.84, 2.31                                            # СИНТЕТИЧНО

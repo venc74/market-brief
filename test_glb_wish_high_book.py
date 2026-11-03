@@ -109,17 +109,16 @@ b = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-16.json").read_text
 b.setdefault("backtest", {})["glb_wish_high"], b["backtest"]["glb_wish"] = sh, sc
 with q():
     page = render.render_dashboard(copy.deepcopy(b))
-i_h, i_c = page.index(f"{config.GLB_WISH_BOOK_NAME} · книга (измерване, не препоръка)"), page.index(f"{config.GLB_CLOSE_BOOK_NAME} · архив · книга (измерване, не препоръка)")
-assert i_h < i_c
-sec_h, sec_c = page[i_h:page.index("</section>", i_h)], page[i_c:page.index("</section>", i_c)]
-assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 168 сделки" in sec_h and "алфа на година позиция +11.0% [6.2; 16.9]" in sec_h and "печеливши 10.0%" not in sec_h and "медиана -1.68%" not in sec_h and "Измерване — книга glb_wish_high: 2 записа / 2 тикъра" in sec_h
-assert "статистика след 20 записа с резултат (сега 2 в 2 тикъра)" in sec_h
-assert "Архив:</b> нови записи няма от 14.10.2026" in sec_c and "линията е наша" in sec_c and "26 183 сделки" in sec_c and "алфа на година позиция +8.8% [6.2; 11.9]" in sec_c and "Архив" not in sec_h
-for sec in (sec_h, sec_c):
-    assert "Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно" in sec
+# 03.11.2026 (разходката, т. 15): „GLB по Уиш“ — секция с един ред и „▸ Как се мери“; архивът (close) — ред + сгънати записи под нея, докато има отворени
+i_h, i_c = page.index(f"{config.GLB_WISH_BOOK_NAME} · книга (измерване, не препоръка)"), page.index(f"<b>{config.GLB_CLOSE_BOOK_NAME}</b> · архив от 14.10")
+assert i_h < i_c and f"{config.GLB_CLOSE_BOOK_NAME} · архив · книга" not in page
+sec_h, sec_c = page[i_h:page.index("</section>", i_h)], page[i_c:page.index("</div>", page.index("</details>", i_c))]
+assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 168 сделки" in sec_h and "алфа на година позиция +11.0% [6.2; 16.9]" in sec_h and "печеливши 10.0%" not in sec_h and "медиана -1.68%" not in sec_h and "2 записа · затворени 0" in " ".join(sec_h.split())
+assert "статистика от 20 записа (сега 2)" in sec_h and "Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута." in sec_h
+assert "линията по месечния close; нови записи няма" in sec_c and "1 записа" in " ".join(sec_c.split()) and "Записи в архива (1)" in sec_c and "архив" not in sec_h.split("Как се мери")[0]
 old = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-16.json").read_text(encoding="utf-8"))
 with q():
     page_old = render.render_dashboard(old)
 assert f"{config.GLB_WISH_BOOK_NAME} · книга" not in page_old and "книга (измерване, не препоръка)" in page_old       # старият бриф: само неговата (close) книга, без новата секция
-print("  ✓ „GLB по Уиш“ е първа (неговата линия, реплеят 13 168 сделки, алфа на година позиция +11.0%), close книгата — „архив“ от 14.10; и в двете: реплеят е върху оцелелите; старият бриф — без новата секция")
+print("  ✓ „GLB по Уиш“ е първа (неговата линия, реплеят 13 168 сделки, алфа на година позиция +11.0%, оцелелите — в „Как се мери“), close книгата — ред „архив от 14.10“ със сгънатите записи; старият бриф — без новата секция")
 print("\n✅ test_glb_wish_high_book: всичко мина")

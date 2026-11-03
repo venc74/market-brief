@@ -75,7 +75,7 @@ b["glb_candidates"] = [{**r, "in_screener": False, "already_open_position": Fals
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b)
 sec = page[page.index("GLB Watchlist · Green Line Breakout"):]; sec = sec[:sec.index("</section>")]
-assert "Правилото е на Eric Wish:" in sec and "картата се вижда до 20-ата сесия от входа и докато е до +10% над линията" in sec and "хистерезисът" not in sec
+assert "Правилото е на Eric Wish:" in sec and "картата се вижда до 20-ата сесия от пробива и докато цената е до +10% над линията" in sec and "хистерезисът" not in sec
 assert "линия (High) $358.00 (06.2026)" in sec and "сесия 1 от 20" in sec and "prior high" not in sec
 old = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
 with contextlib.redirect_stdout(io.StringIO()):

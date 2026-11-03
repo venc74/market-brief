@@ -28,14 +28,14 @@ def text(brief):
 
 print("── РЕАЛНО 05.10: 5 classic, 0 momentum ──")
 t = text(B05)
-assert "Classic GLB (5)" in t and "Momentum GLB (0) няма Momentum кандидати днес" in t and "Classic кандидати днес" not in t
+assert "Classic GLB (5)" in t and "Momentum GLB (0)" in t and "няма Momentum кандидати днес" in t and "Classic кандидати днес" not in t     # 03.11.2026 (т. 13): между тях — определението на типа
 print("  ✓ 'Momentum GLB (0) — няма Momentum кандидати днес' вместо липсваща група; Classic GLB (5) както преди")
 
 print()
 print("── СИНТЕТИЧНО ──")
 b = json.loads(json.dumps(B05)); b["glb_candidates"] = [dict(g, glb_type="momentum") for g in G[:2]]
 t = text(b)
-assert "Momentum GLB (2)" in t and "Classic GLB (0) няма Classic кандидати днес" in t and "няма Momentum кандидати днес" not in t
+assert "Momentum GLB (2)" in t and "Classic GLB (0)" in t and "няма Classic кандидати днес" in t and "няма Momentum кандидати днес" not in t
 b["glb_candidates"] = []
 t = text(b)
 assert "GLB Watchlist" not in t and "кандидати днес" not in t                                        # без кандидати изобщо секцията е скрита, както досега

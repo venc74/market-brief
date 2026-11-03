@@ -439,6 +439,44 @@ def _radar_reason(c: dict) -> str:
     return ai.get("watchlist_trigger") or "—"                                          # стар бриф без сетъп
 
 
+def glb_groups(cands: list[dict] | None, book: dict | None) -> dict:
+    """
+    03.11.2026 (разходката, т. 13–14): GLB картите по тип → {"classic" | "momentum" | "insufficient": {"cards": [...], "open": [...] | None}}. Картите — по обема на пробива (най-силните
+    горе; без обем — накрая), без филтър. "open" — отворените и чакащите записи на книгата „GLB по Уиш“ от същия тип (book["open_by_type"]; стар бриф без него — book["live"] по glb_type);
+    без книгата → None (няма ред „Отворени в книгата“). Чиста функция.
+    """
+    key = {"classic": "classic", "momentum": "momentum", "insufficient_history": "insufficient"}
+    out = {k: {"cards": [], "open": None} for k in ("classic", "momentum", "insufficient")}
+    for g in cands or []:
+        out[key.get(g.get("glb_type"), "insufficient")]["cards"].append(g)
+    for k in out:
+        out[k]["cards"].sort(key=lambda g: (g.get("breakout_volume_ratio") is None, -(g.get("breakout_volume_ratio") or 0)))
+    if book and book.get("enabled"):
+        obt = book.get("open_by_type")
+        if obt is None:
+            obt = {}
+            for r in book.get("live") or []:
+                obt.setdefault(r.get("glb_type") or "н/д", []).append(r)
+        for t, k in key.items():
+            out[k]["open"] = list(obt.get(t) or [])
+        out["insufficient"]["open"] += list(obt.get("н/д") or [])
+    return out
+
+
+def glb_market_line(t: dict | None) -> str | None:
+    """03.11.2026 (т. 13, 1): редът за пазара в GLB — QQQ спрямо SMA10 / SMA20 (както при Kullamägi), без твърдението за неговото правило. Чиста функция."""
+    if not t:
+        return None
+    if t["above10"] and t["above20"]:
+        return "Nasdaq над 10/20 DMA"
+    if not t["above10"] and not t["above20"]:
+        return "Nasdaq под 10/20 DMA"
+    return "Nasdaq над 20 DMA, под 10 DMA" if t["above20"] else "Nasdaq над 10 DMA, под 20 DMA"
+
+
+env.globals["glb_groups"] = glb_groups
+
+
 def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план
@@ -526,6 +564,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         glb_min_months=config.GLB_MIN_MONTHS_UNPENETRATED, glb_band_hold=f"{config.GLB_MIN_BAND_HOLD_PCT:.0f}", glb_days=config.GLB_MIN_CONSOLIDATION_DAYS,
         glb_approach=f"{config.GLB_APPROACH_PCT:.0f}", glb_vol_bars=config.GLB_VOLUME_AVG_BARS, glb_wish_replay=config.GLB_WISH_REPLAY_STATS, glb_book_name=config.GLB_CLOSE_BOOK_NAME,
         glb_wish_high_replay=config.GLB_WISH_HIGH_REPLAY_STATS, glb_wish_book_name=config.GLB_WISH_BOOK_NAME,
+        glb_card_sessions=config.GLB_CARD_MAX_SESSIONS, glb_card_above=config.GLB_CARD_MAX_ABOVE_PCT,                       # 03.11.2026 (т. 13): свежестта в инфото — веднъж
+        glb_market_line=glb_market_line(brief.get("qm_market")),                                                             # 03.11.2026 (т. 13, 1): QQQ спрямо SMA10 / SMA20
         # Qullamaggie (06.10): отделната секция — карти, диагностика, EP наблюдение; числата в текста са от config (една истина)
         sizing_core_js=_asset("sizing_core.js"), sizing_ui_js=_asset("sizing_ui.js"),      # 07.10: оразмеряването е в браузъра (localStorage), не в брифа
         qm_cards=brief.get("qm_breakout") or [],

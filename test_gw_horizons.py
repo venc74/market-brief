@@ -37,6 +37,10 @@ assert set(h) == {"5", "10"} and h["5"]["date"] == "2026-10-16" and h["10"]["dat
 for k, d in (("5", "2026-10-16"), ("10", "2026-10-23")):
     assert h[k]["ret"] == round((C("PLTR", d) / C("PLTR", "2026-10-09") - 1) * 100, 2) and h[k]["spy"] == round((C("SPY", d) / C("SPY", "2026-10-09") - 1) * 100, 2)
     assert h[k]["alpha"] == round(h[k]["ret"] - h[k]["spy"], 2)
+    O = lambda s, d: float(opens[s].loc[pd.Timestamp(d)])                                       # 03.11.2026 (разходката, т. 15, 6): exec — от отварянето на 12.10 (сесията след входа в петък 09.10)
+    assert h[k]["ret_exec"] == round((C("PLTR", d) / O("PLTR", "2026-10-12") - 1) * 100, 2) and h[k]["spy_exec"] == round((C("SPY", d) / O("SPY", "2026-10-12") - 1) * 100, 2)
+    assert h[k]["alpha_exec"] == round(h[k]["ret_exec"] - h[k]["spy_exec"], 2)
+assert trade_sim.gw_horizons(pd.DataFrame({"Close": closes["PLTR"]}).dropna(), spy, "2026-10-09")["5"]["ret_exec"] is None        # без Open — exec None
 assert backtest._gw_needs_horizons(p, dt.date(2026, 10, 26)) and not backtest._gw_needs_horizons(p, dt.date(2026, 11, 30))     # 20 сесии още не; след 45 дни — не се опитва
 print(f"  ✓ 5 сесии (16.10): {h['5']['ret']:+.2f}% (SPY {h['5']['spy']:+.2f}%), 10 сесии (23.10): {h['10']['ret']:+.2f}% (SPY {h['10']['spy']:+.2f}%); "
       f"изходът по линията ({stored[1]:+.2f}%) не се мени; 20 сесии още няма → записът се резолвира пак (до 45 дни)")
@@ -70,10 +74,15 @@ import re, html as htmllib
 for key, rep in (("glb_wish", config.GLB_WISH_REPLAY_STATS), ("glb_wish_high", config.GLB_WISH_HIGH_REPLAY_STATS)):
     assert not {"win_literal_pct", "win_exec_pct", "median_literal_pct", "median_exec_pct"} & set(rep) and set(rep["horizons"]) == {"5", "10", "20"}
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
-b = copy.deepcopy(B19); b.setdefault("backtest", {})["glb_wish"] = S
+# 03.11.2026 (разходката, т. 15): реплеят и сроковете — в „▸ Как се мери“ на пълната секция („GLB по Уиш“; архивът по close е само ред); сроковете — exec, реплеят — алфа на година (literal)
+b = copy.deepcopy(B19); b.setdefault("backtest", {})["glb_wish_high"] = {**S, "category": "glb_wish_high", "archived_from": None}
 with contextlib.redirect_stdout(io.StringIO()):
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
-assert "Реплей върху историята (1962–2026, 26 183 сделки; SPY от 1993): алфа на година позиция +8.8% [6.2; 11.9]; доходност N сесии след входа" in page
-assert "20 — +0.69% срещу +0.47% (алфа +0.22% [-0.00; 0.44])" in page and "оцелели" in page and "печеливши 9.3%" not in page and "медиана -1.59%" not in page
-print("  ✓ „Реплей … алфа на година позиция +8.8% [6.2; 11.9]; … 20 — +0.69% срещу +0.47% (алфа +0.22% …)“; без % печеливши и медиана; бележката за оцелелите остава")
+rh = config.GLB_WISH_HIGH_REPLAY_STATS
+tr_ = f"{rh['trades']:,}".replace(",", " ")
+assert f"Реплей върху историята (1962–2026, {tr_} сделки; SPY от 1993; literal — по затварянето на сигналния ден): алфа на година позиция {rh['alpha_py_pct']:+.1f}% [{rh['alpha_py_ci'][0]}; {rh['alpha_py_ci'][1]}]" in page
+x5 = S["horizons"]["5"]
+assert f"Доходност N сесии след входа (exec, независимо от изхода) спрямо SPY за същите дати: 5 сесии — {x5['avg_ret_exec']:+.2f}% (SPY {x5['avg_spy_exec']:+.2f}%, алфа {x5['avg_alpha_exec']:+.2f}%), 2 записа" in page
+assert "оцелели" in page and "печеливши 9.3%" not in page and "медиана -1.59%" not in page and "20 — +0.69% срещу +0.47%" not in page
+print(f"  ✓ „Реплей … алфа на година позиция {rh['alpha_py_pct']:+.1f}% …“ (literal, само реплеят); сроковете на книгата — exec: 5 сесии {x5['avg_ret_exec']:+.2f}% (2 записа); без % печеливши и медиана; бележката за оцелелите остава")
 print("\n✅ test_gw_horizons: всичко мина")

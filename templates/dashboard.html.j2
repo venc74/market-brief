@@ -326,6 +326,13 @@
   .glb-caveat { font-size: 11.5px; color: var(--yellow); margin-top: 6px; }
   .glb-note { font-size: 12px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
   .glb-insufficient-note { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; }
+  /* 03.11.2026 (разходката, т. 13–15): GLB — компактна таблица на тип (ред → клик → картата), отворените записи под своя списък, книгата — една таблица */
+  .glb-row { grid-template-columns: 1.5fr .9fr .8fr .9fr 1fr 1.4fr; align-items: baseline; }
+  .glb-t { margin-bottom: 8px; } .glb-t .glb-card { max-width: 520px; margin-top: 6px; }
+  .glb-def { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  details.gw-open, details.gw-book, details.gw-how { margin: 6px 0 14px; } details.gw-open > summary, details.gw-book > summary, details.gw-how > summary { font-size: 12.5px; color: var(--muted); }
+  .gw-table { min-width: 860px; } .gw-table .pos { color: var(--green); } .gw-table .neg { color: var(--red); } .gw-table td.num { white-space: nowrap; }
+  @media (max-width: 760px) { .glb-row { grid-template-columns: 1fr 1fr; } }
 
   /* ── Qullamaggie сетъпи (отделна стратегия — измерване, не препоръка) ── */
   .qm-banner { font-size: 12.5px; color: var(--yellow); background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.35);
@@ -1543,229 +1550,177 @@
 
 {# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
 
-{% if glb_candidates %}
-{% set glb_classic = glb_candidates|selectattr('glb_type', 'equalto', 'classic')|sort(attribute='months_unpenetrated', reverse=True)|list %}
-{% set glb_momentum = glb_candidates|selectattr('glb_type', 'equalto', 'momentum')|sort(attribute='months_unpenetrated', reverse=True)|list %}
-{% set glb_insufficient = glb_candidates|selectattr('glb_type', 'equalto', 'insufficient_history')|list %}
-<section>
+{# ── GLB (03.11.2026, разходката, т. 13–15): заглавие + кратко инфо веднъж (правилото на Уиш, нашата свежест, рискът) и ред за пазара; за всеки тип — едно изречение определение →
+   компактна таблица (подредена по обема на пробива, без филтър; ред → клик → цялата карта) → сгънато „▸ Отворени в книгата — Classic (N)“ (записите на „GLB по Уиш“ от същия тип).
+   До 03.11: карти в мрежа, бележката за риска на всяка карта, отворените записи — накрая, в книгата. Групите и подредбата — render.glb_groups. ── #}
+{% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла по нашия таван", "invalid_signal": "невалиден сигнал"} %}
+{% macro glb_card(g) %}
+    <div class="glb-card {{ g.glb_type }}{{ ' in-screen' if g.in_screener else '' }}">
+      <div class="glb-top">
+        <span class="glb-sym">{{ g.ticker }}</span>
+        <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
+      </div>
+      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
+      <div class="glb-stat">{{ g.months_unpenetrated }} месеца без нов връх</div>
+      {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
+      {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
+      {# 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (since_bar), не на брифа #}
+      {% set g_day = g.since_bar or g.since %}{% if g.since %}<div class="glb-detail"><b>GLB от {{ g_day[8:10] }}.{{ g_day[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
+      {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
+        {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
+        {%- else %}по Уиш (High): при входа няма зелена линия — върхът ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) е непробит {{ wl.months_unpen }} мес. (нужни ≥ {{ glb_min_months }}); цената е {{ "%.1f"|format(wl.pct|abs) }}% {{ 'над' if wl.pct >= 0 else 'под' }} него{% endif %}</div>{% endif %}
+      {% if g.get("closes_below_line") is not none %}<div class="glb-detail" title="Хистерезисът държи картата до −3% под линията; по правилото на Уиш първото затваряне под линията е изход.">затваряния под линията от входа: {{ g.closes_below_line }}{% if g.closes_below_line %} — по правилото на Уиш първото е изход{% endif %}</div>{% endif %}
+      {% if g.tightness %}<div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>{% endif %}
+      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните {{ glb_vol_bars }} бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива {% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.get("breakout_volume_ratio")) }}× средния{% else %}н/д{% endif %} · {% if g.get("x_from_52w_low") is not none %}{{ "%.1f"|format(g.get("x_from_52w_low")) }}× от 52-седм. дъно{% else %}дъно н/д{% endif %}</div>
+      {% if g.ath_label == 'new_high_since_listing' %}<div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>{% endif %}
+      {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
+      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}{% if g.get("merger_target") %}<div class="corp-warn">{{ g.merger_target.text }}</div>{% endif %}
+      {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
+      {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
+    </div>
+{% endmacro %}
+{# записите на книгите тип Уиш — една компактна таблица; доходността е САМО exec (вход по отварянето на следващата сесия — реалистичната); literal остава в данните #}
+{% macro gw_table(rows) %}
+  <div class="cs-radar-wrap"><table class="ctx-table gw-table">
+    <tr><th>Тикър</th><th>Пробив</th><th>Тип</th><th class="num" title="Обем на деня на пробива ÷ средния на предишните {{ glb_vol_bars }} бара">Обем на пробива</th><th class="num">Линия</th><th class="num" title="Отварянето на сесията след пробива — първото изпълнимо">Вход (отваряне)</th><th class="num" title="От отварянето на сесията след пробива; отворените — по последното затваряне">Доходност</th><th>Състояние</th><th class="num">Сесии</th><th>Режим</th></tr>
+    {% for p in rows %}
+    <tr><td class="mono">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
+      {% set sd = p.signal_date or p.entry_date %}<td>{{ sd[8:10] }}.{{ sd[5:7] }}</td>
+      <td>{{ {"classic": "Classic", "momentum": "Momentum", "insufficient_history": "без тип"}.get(p.glb_type, p.glb_type or "н/д") }}</td>
+      <td class="num">{% if p.breakout_volume_ratio is number %}{{ "%.1f"|format(p.breakout_volume_ratio) }}×{% else %}—{% endif %}</td>
+      <td class="num">{% if p.line is number %}${{ "%.2f"|format(p.line) }}{% else %}—{% endif %}</td>
+      <td class="num">{% if p.fill_exec_price is number %}${{ "%.2f"|format(p.fill_exec_price) }}{% else %}<span class="cs-mu">{{ "чака" if p.status in ("pending", "open") else "—" }}</span>{% endif %}</td>
+      <td class="num">{% if p.return_pct_exec is number %}<span class="{{ 'pos' if p.return_pct_exec > 0 else ('neg' if p.return_pct_exec < 0 else '') }}">{{ "%+.1f"|format(p.return_pct_exec) }}%</span>{% elif p.exec_note %}<span class="cs-mu" title="exec: изход по отварянето на следващата сесия след затварянето под линията — брифът е преди нея">{{ p.exec_note.text }}</span>{% else %}—{% endif %}</td>
+      <td>{{ gw_st.get(p.status or p.resolution, p.status or p.resolution) }}{% if p.status == "open" and p.dist_to_line_pct is number %} <span class="cs-mu">· до линията {{ "%+.1f"|format(p.dist_to_line_pct) }}%</span>{% elif p.resolution_date %} <span class="cs-mu">· {{ p.resolution_date[8:10] }}.{{ p.resolution_date[5:7] }}</span>{% endif %}{% if p.needs_review %} <span class="cs-warn">· ръчен преглед</span>{% endif %}</td>
+      <td class="num">{{ p.hold_sessions if p.hold_sessions is not none else "—" }}</td>
+      <td>{{ p.regime or "н/д" }}</td></tr>
+    {% endfor %}
+  </table></div>
+{% endmacro %}
+{% macro glb_list(kind, label, grp) %}
+  <div class="glb-group-label {{ kind }}">{{ label }} GLB ({{ grp.cards|length }})</div>
+  <div class="small glb-def">{{ caller() }}</div>
+  {% if grp.cards %}
+  <div class="wt glb-t">
+    <div class="wt-row glb-row wt-head"><span>Тикър</span><span>Над линията</span><span>Сесии</span><span>Месеци без връх</span><span>Обем на пробива</span><span>Тип</span></div>
+    {% for g in grp.cards %}
+    <details class="wt-item">
+      <summary class="wt-row glb-row">
+        <span class="wt-t">{{ g.ticker }}{% if g.company and g.company != g.ticker %}<span class="wt-name">{{ g.company|cname(28) }}</span>{% endif %}</span>
+        <span data-l="Над линията" class="wt-num">{% if g.pct_vs_line is number %}{{ "%+.1f"|format(g.pct_vs_line) }}%{% else %}<span class="wt-mu">—</span>{% endif %}</span>
+        <span data-l="Сесии" class="wt-num">{% if g.get("sessions") %}{{ g.sessions }} от {{ g.max_sessions }}{% else %}—{% endif %}</span>
+        <span data-l="Месеци без връх" class="wt-num">{{ g.months_unpenetrated if g.months_unpenetrated is defined else "—" }}</span>
+        <span data-l="Обем на пробива" class="wt-num">{% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.breakout_volume_ratio) }}×{% else %}<span class="wt-mu">н/д</span>{% endif %}</span>
+        <span data-l="Тип">{{ label }}{% if g.ath_label == 'new_high_since_listing' %} <span class="wt-mu">· от листването</span>{% endif %}{% if g.in_screener %} <span class="wt-mark">✓ скрийнър</span>{% endif %}{% if g.already_open_position %} <span class="wt-mark">📈 OPEN</span>{% endif %}{% if g.get("corp_action") or g.get("spinoff_warning") or g.get("merger_target") %} <span class="cs-warn">⚠</span>{% endif %}</span>
+      </summary>
+      <div class="wt-detail">{{ glb_card(g) }}</div>
+    </details>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 8px">няма {{ label }} кандидати днес</div>
+  {% endif %}
+  {% if grp.open is not none %}
+  <details class="gw-open"><summary>Отворени в книгата — {{ label }} ({{ grp.open|length }})</summary>
+    {% if grp.open %}{{ gw_table(grp.open) }}{% else %}<div class="small" style="font-size:12px;color:var(--muted);margin:6px 0">няма отворени записи от този тип</div>{% endif %}
+  </details>
+  {% endif %}
+{% endmacro %}
+{% set gwh = backtest.get("glb_wish_high") if backtest else none %}
+{% set glbg = glb_groups(glb_candidates, gwh) %}
+{% if glb_candidates or glb_status or (gwh and gwh.enabled) %}
+<section id="glb">
   <h2>GLB Watchlist · Green Line Breakout</h2>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:14px">
-    {# 22.10.2026 (етап 4): картите по правилото на Уиш + свежест (GLB_CARDS_RULE = "wish_high"); старите брифове (без "rule") — старият текст #}
-    {% set g0 = glb_candidates[0] %}
-    {% if g0.get("rule") == "wish_high" %}
-    <b>Правилото е на Eric Wish:</b> „зелена линия“ = най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; вход при затваряне над нея, край при първото затваряне под нея.
-    <b>Наши са:</b> свежестта — картата се вижда до {{ g0.max_sessions }}-ата сесия от входа и докато е до +{{ "%.0f"|format(g0.max_above_pct) }}% над линията (книгата „{{ glb_wish_book_name }}“ следи всеки пробив до изхода),
-    разделянето Classic / Momentum и филтърът за близост до линията (band_hold) — само етикет. Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+  <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:10px">
+    {% set g0 = glb_candidates[0] if glb_candidates else {} %}
+    {% if not glb_candidates or g0.get("rule") == "wish_high" %}
+    <b>Правилото е на Eric Wish:</b> „зелена линия“ = най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; вход при затваряне над нея, изход при първото затваряне под нея.
+    <b>Наша е свежестта:</b> картата се вижда до {{ glb_card_sessions }}-ата сесия от пробива и докато цената е до +{{ "%.0f"|format(glb_card_above) }}% над линията (книгата „{{ glb_wish_book_name }}“ следи всеки пробив до изхода); разделянето Classic / Momentum е наш етикет, не филтър.
     {% else %}
     <b>Идеята е на Eric Wish:</b> „зелена линия“ = най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; сигнал — затваряне над нея. <b>Наши са:</b> линията по най-високия месечен close
-    (по-ниска от неговата, затова влизаме по-рано и по-често), разделянето Classic / Momentum, филтърът за близост до линията (band_hold) и хистерезисът (вход ≥ +1% над линията, остава до −3%). Механичен скрийнър, изцяло извън основния CANSLIM/Weinstein pipeline — информация, не препоръка.
+    (по-ниска от неговата), разделянето Classic / Momentum, филтърът за близост до линията (band_hold) и хистерезисът (вход ≥ +1% над линията, остава до −3%).
     {% endif %}
-    <b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията ·
-    <b style="color:var(--yellow)">Momentum</b> = по-малко от това (бърз/волатилен пробив, по-висок очакван риск). Обемът на пробива и „× от дъното“ са само информация — не филтрират.
+    <b>Рискът:</b> механичен скрийнър извън CANSLIM, без стоп освен линията — информация, не препоръка.
   </div>
-  {{ corp_excluded_line(corp_excluded.get("glb")) }}
-  {% if glb_classic %}
-  <div class="glb-group-label classic">Classic GLB ({{ glb_classic|length }})</div>
-  <div class="glb-grid">
-    {% for g in glb_classic %}
-    <div class="glb-card classic{{ ' in-screen' if g.in_screener else '' }}">
-      <div class="glb-top">
-        <span class="glb-sym">{{ g.ticker }}</span>
-        <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
-      </div>
-      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
-      <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
-      {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
-      {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
-      {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {# 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (since_bar), не на брифа — NWSA и ED на 23.10 бяха „GLB от 23.10“ при пробив на 22.10 (старият хистерезис) #}
-      {% set g_day = g.since_bar or g.since %}{% if g.since %}<div class="glb-detail"><b>GLB от {{ g_day[8:10] }}.{{ g_day[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
-      {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
-      {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
-        {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
-        {%- else %}по Уиш (High): при входа няма зелена линия — върхът ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) е непробит {{ wl.months_unpen }} мес. (нужни ≥ {{ glb_min_months }}); цената е {{ "%.1f"|format(wl.pct|abs) }}% {{ 'над' if wl.pct >= 0 else 'под' }} него{% endif %}</div>{% endif %}
-      {% if g.get("closes_below_line") is not none %}<div class="glb-detail" title="Хистерезисът държи картата до −3% под линията; по правилото на Уиш първото затваряне под линията е изход.">затваряния под линията от входа: {{ g.closes_below_line }}{% if g.closes_below_line %} — по правилото на Уиш първото е изход{% endif %}</div>{% endif %}
-      {% if g.tightness %}
-      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
-      {% endif %}
-      {# 09.10: информативни полета — не филтрират (виж config.GLB_VOLUME_AVG_BARS) #}
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните {{ glb_vol_bars }} бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива {% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.get("breakout_volume_ratio")) }}× средния{% else %}н/д{% endif %} · {% if g.get("x_from_52w_low") is not none %}{{ "%.1f"|format(g.get("x_from_52w_low")) }}× от 52-седм. дъно{% else %}дъно н/д{% endif %}</div>
-      {% if g.ath_label == 'new_high_since_listing' %}
-      <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
-      {% endif %}
-      {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
-      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}{% if g.get("merger_target") %}<div class="corp-warn">{{ g.merger_target.text }}</div>{% endif %}
-      <div class="glb-note">{{ g.risk_note }}</div>
-      {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-      {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  {# пакет 2 (05.10): празна група има ред, а не липсва — иначе не личи дали е проверена #}
-  <div class="glb-group-label classic">Classic GLB (0)</div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 12px">няма Classic кандидати днес</div>
-  {% endif %}
-  {% if glb_momentum %}
-  <div class="glb-group-label momentum">Momentum GLB ({{ glb_momentum|length }})</div>
-  <div class="glb-grid">
-    {% for g in glb_momentum %}
-    <div class="glb-card momentum{{ ' in-screen' if g.in_screener else '' }}">
-      <div class="glb-top">
-        <span class="glb-sym">{{ g.ticker }}</span>
-        <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
-      </div>
-      {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
-      <div class="glb-stat">{{ g.months_unpenetrated }} месеца unpenetrated</div>
-      {% if g.get("rule") == "wish_high" %}<div class="glb-detail">линия (High) ${{ "%.2f"|format(g.line) }} ({{ g.prior_high_month[5:7] }}.{{ g.prior_high_month[:4] }})</div>
-      {% else %}<div class="glb-detail">prior high ${{ "%.2f"|format(g.prior_high) }} ({{ g.prior_high_month }})</div>{% endif %}
-      {# пакет 4б т.е: събитието (линия + дата на входа) е в data/glb_state.json — оцелява при смяна на месеца #}
-      {# 26.10.2026 (етап 4б, т. 10): датата на СЕСИЯТА на пробива (since_bar), не на брифа — NWSA и ED на 23.10 бяха „GLB от 23.10“ при пробив на 22.10 (старият хистерезис) #}
-      {% set g_day = g.since_bar or g.since %}{% if g.since %}<div class="glb-detail"><b>GLB от {{ g_day[8:10] }}.{{ g_day[5:7] }}</b>{% if g.get("sessions") %} · сесия {{ g.sessions }} от {{ g.max_sessions }}{% endif %}, {{ "%.1f"|format(g.pct_vs_line|abs) }}% {{ 'над' if g.pct_vs_line >= 0 else 'под' }} линията (${{ "%.2f"|format(g.line) }})</div>{% endif %}
-      {# 21.10.2026 (етап 4): линията на Уиш — High на месечния бар към деня на входа; само информация #}
-      {% set wl = g.get("wish_high") %}{% if wl %}<div class="glb-detail" title="Уиш чертае зелената линия при най-високата цена (High) на месечния бар, непробита поне {{ glb_min_months }} месеца; нашата е по месечния close. Към деня на нашия вход. Само информация.">
-        {%- if wl.valid %}линия по Уиш (High): ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) — {{ 'над' if wl.pct >= 0 else 'под' }} нея с {{ "%.1f"|format(wl.pct|abs) }}%
-        {%- else %}по Уиш (High): при входа няма зелена линия — върхът ${{ "%.2f"|format(wl.line) }} ({{ wl.month[5:7] }}.{{ wl.month[:4] }}) е непробит {{ wl.months_unpen }} мес. (нужни ≥ {{ glb_min_months }}); цената е {{ "%.1f"|format(wl.pct|abs) }}% {{ 'над' if wl.pct >= 0 else 'под' }} него{% endif %}</div>{% endif %}
-      {% if g.get("closes_below_line") is not none %}<div class="glb-detail" title="Хистерезисът държи картата до −3% под линията; по правилото на Уиш първото затваряне под линията е изход.">затваряния под линията от входа: {{ g.closes_below_line }}{% if g.closes_below_line %} — по правилото на Уиш първото е изход{% endif %}</div>{% endif %}
-      {% if g.tightness %}
-      <div class="glb-detail">band_hold {{ g.tightness.band_hold_pct }}% · диапазон на {{ glb_days }} дни {{ g.tightness.tightness_range_pct }}% от линията</div>
-      {% endif %}
-      {# 09.10: информативни полета — не филтрират (виж config.GLB_VOLUME_AVG_BARS) #}
-      <div class="glb-detail" title="Обем на деня на пробива ÷ средния обем на предишните {{ glb_vol_bars }} бара; цена ÷ най-ниското Low за 52 седмици. Само информация.">обем на пробива {% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.get("breakout_volume_ratio")) }}× средния{% else %}н/д{% endif %} · {% if g.get("x_from_52w_low") is not none %}{{ "%.1f"|format(g.get("x_from_52w_low")) }}× от 52-седм. дъно{% else %}дъно н/д{% endif %}</div>
-      {% if g.ath_label == 'new_high_since_listing' %}
-      <div class="glb-caveat">⚠ по-кратка налична история — "нов връх откакто имаме данни", не потвърден буквален all-time high</div>
-      {% endif %}
-      {% if g.get("corp_action") %}<div class="corp-warn">{{ g.corp_action.text }}</div>{% endif %}
-      {% if g.get("spinoff_warning") %}<div class="corp-warn">{{ g.spinoff_warning.text }}</div>{% endif %}{% if g.get("merger_target") %}<div class="corp-warn">{{ g.merger_target.text }}</div>{% endif %}
-      <div class="glb-note">{{ g.risk_note }}</div>
-      {% if g.in_screener %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-      {% if g.already_open_position %}<div class="si-flag">📈 OPEN — вече отворена Track Record позиция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="glb-group-label momentum">Momentum GLB (0)</div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 12px">няма Momentum кандидати днес</div>
-  {% endif %}
-  {% if glb_insufficient %}
-  <div class="glb-insufficient-note">
-    Недостатъчна дневна история за tightness оценка (валиден месечен GLB сигнал, но некласифициран Classic/Momentum):
-    {{ glb_insufficient|map(attribute='ticker')|join(', ') }}
-  </div>
-  {% endif %}
-</section>
-{% elif glb_status %}
-{# С3 (10.10.2026): празният списък — провал или наистина няма кандидати; до 10.10 секцията изчезваше и двете изглеждаха еднакво #}
-<section>
-  <h2>GLB Watchlist · Green Line Breakout</h2>
-  {% if glb_status.ok is sameas false %}
-  <div class="small" style="font-size:12.5px;color:var(--yellow)">⚠ Скрийнърът не се изпълни днес ({{ glb_status.error or "Yahoo не върна данни" }}) — празният списък НЕ значи, че няма GLB кандидати.</div>
-  {% else %}
-  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма GLB кандидати днес — проверени {{ glb_status.with_history }} от {{ glb_status.universe }} тикъра{% if glb_status.batches_failed %} ({{ glb_status.batches_failed }} партиди не се изтеглиха){% endif %}.</div>
+  {# 03.11.2026 (т. 13, 1): пазарът — QQQ спрямо SMA10 / SMA20, както при Kullamägi; точното пазарно правило на Уиш (неговият GMI) не е публикувано — затова „наш заместител“ #}
+  {% if glb_market_line %}<div class="small" style="font-size:12.5px;margin:0 0 10px;color:{{ 'var(--green)' if qm_market.above10 and qm_market.above20 else ('var(--red)' if not qm_market.above10 and not qm_market.above20 else 'var(--yellow)') }}"><b>{{ glb_market_line }}</b>
+    <span style="color:var(--muted)">· QQQ ${{ "%.2f"|format(qm_market.close) }} на {{ qm_market.date[8:10] }}.{{ qm_market.date[5:7] }}, SMA10 ${{ "%.2f"|format(qm_market.sma10) }}, SMA20 ${{ "%.2f"|format(qm_market.sma20) }} — наш заместител на пазарното правило на Уиш (неговият индикатор GMI; точното правило не е публикувано), само информация</span></div>{% endif %}
+  {% if glb_status and glb_status.ok is sameas false %}
+  <div class="small" style="font-size:12.5px;color:var(--yellow);margin-bottom:8px">⚠ Скрийнърът не се изпълни днес ({{ glb_status.error or "Yahoo не върна данни" }}) — празният списък НЕ значи, че няма GLB кандидати.</div>
+  {% elif not glb_candidates and glb_status %}
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Няма GLB кандидати днес — проверени {{ glb_status.with_history }} от {{ glb_status.universe }} тикъра{% if glb_status.batches_failed %} ({{ glb_status.batches_failed }} партиди не се изтеглиха){% endif %}.</div>
   {% endif %}
   {{ corp_excluded_line(corp_excluded.get("glb")) }}
+  {% call glb_list("classic", "Classic", glbg.classic) %}<b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията (наш етикет, не на Уиш).{% endcall %}
+  {% call glb_list("momentum", "Momentum", glbg.momentum) %}<b style="color:var(--yellow)">Momentum</b> = по-малко от това — бърз / волатилен пробив; по-висок очакван drawdown от Classic.{% endcall %}
+  {% if glbg.insufficient.cards %}
+  <div class="glb-insufficient-note">Недостатъчна дневна история за Classic / Momentum (валиден месечен пробив, без тип): {{ glbg.insufficient.cards|map(attribute='ticker')|join(', ') }}</div>
+  {% endif %}
+  {% if glbg.insufficient.open %}
+  <details class="gw-open"><summary>Отворени в книгата — без тип ({{ glbg.insufficient.open|length }})</summary>{{ gw_table(glbg.insufficient.open) }}</details>
+  {% endif %}
 </section>
 {% endif %}
 
-{# ── Книгите по правилото на Eric Wish (09.10.2026; 21.10.2026 — две книги): "GLB по Уиш" (glb_wish_high) — НЕГОВАТА линия (месечен High); "GLB — наш вариант (close)" (glb_wish) — НАШАТА линия
-   (месечен close), архив от старта на първата. Измерване, не препоръка. Самостоятелни секции: съществуват и когато списъкът с карти е празен или скринърът е паднал ── #}
-{% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла по нашия таван"} %}
+{# ── Книгите по правилото на Eric Wish: "GLB по Уиш" (glb_wish_high) — НЕГОВАТА линия (месечен High); "GLB — наш вариант (close)" (glb_wish) — архив от 26.10. Измерване, не препоръка.
+   03.11.2026 (разходката, т. 15): един видим ред (записи · затворени (exec) · отворени (exec) · кога статистика); методът, реплеят и сравненията — сгънато „▸ Как се мери“; записите — една
+   компактна таблица (без „Отворени и чакащи“ и „Последно затворени“); доходността — само exec. Старата книга (по close) — един ред + сгънати записи, докато има отворени. ── #}
+{% macro gw_head(gw) %}{{ gw.records }} записа{% if gw.tickers is defined and gw.tickers != gw.records %} / {{ gw.tickers }} тикъра{% endif %}
+  · затворени {{ gw.line_exit + gw.expired }}{% if gw.closed_group and gw.closed_group.avg_return_pct_exec is not none %} ({{ "%+.1f"|format(gw.closed_group.avg_return_pct_exec) }}%{% if gw.closed_group.n_exec < gw.closed_group.n %}, {{ gw.closed_group.n - gw.closed_group.n_exec }} чака изхода на отварянето{% endif %}){% endif %}
+  · отворени {{ gw.open }}{% if gw.open_group and gw.open_group.avg_return_pct_exec is not none %} ({{ "%+.1f"|format(gw.open_group.avg_return_pct_exec) }}%){% endif %}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% endmacro %}
 {% macro gw_section(gw, title, rep, book_key) %}
 <section>
   <h2>{{ title }} · книга (измерване, не препоръка)</h2>
-  <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
+  <div style="font-size:13.5px;margin:0 0 6px">{{ gw_head(gw) }}{% if gw.stats_visible %}{% if gw["all"].avg_alpha_pct_exec is not none %} · алфа спрямо SPY {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}%{% endif %}{% else %} · статистика от {{ gw.min_entries }} записа (сега {{ gw.with_result }}){% endif %}</div>
+  {% if gw.needs_review %}<div class="small" style="color:var(--yellow)">⚠ {{ gw.needs_review }} запис(а) с отделяне след сигнала — линията не се мащабира, нужен е ръчен преглед.</div>{% endif %}
+  <details class="gw-how"><summary>Как се мери</summary>
+  <div class="small" style="font-size:12.5px;color:var(--muted);margin:6px 0 8px">
     {{ caller() }}
-    Няма Classic / Momentum филтър (типът е само етикет), няма хистерезис +1% / −3% и няма стоп — затова доходността е в %, не в R. Две граници: <b>literal</b> = и вход, и изход на затварянето на сигналния ден;
-    <b>exec</b> = отварянето на следващата сесия (първото изпълнимо след брифа). <b>Таванът на държане{% if gw.max_hold_sessions %} от {{ gw.max_hold_sessions }} сесии{% endif %} е НАШ — при Уиш няма такъв:</b> без него печелившите остават отворени с години, а затворените са само загубилите; след тавана позицията се оценява по затварянето на последния ден.
+    Няма Classic / Momentum филтър (типът е само етикет) и няма стоп — затова доходността е в %, не в R.
+    <b>Доходността в таблицата е exec:</b> вход на отварянето на сесията след пробива, изход на отварянето на сесията след първото затваряне под линията — първото изпълнимо след брифа.
+    <b>literal</b> (вход и изход на затварянето на сигналния ден — така е описано правилото) е по-оптимистично и остава само в данните.
+    <b>Таванът на държане{% if gw.max_hold_sessions %} от {{ gw.max_hold_sessions }} сесии{% endif %} е НАШ</b> — при Уиш няма такъв; след него позицията се оценява по затварянето на последния ден.
     Записва се само пробив на последния цял бар, {% if gw.track_from %}от {{ gw.track_from }} нататък (чист старт){% else %}от деня на качването на кода (чист старт){% endif %}. Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.
-    {% if gw.archived_from %}<br><b>Архив:</b> нови записи няма от {{ gw.archived_from[8:10] }}.{{ gw.archived_from[5:7] }}.{{ gw.archived_from[:4] }} — тогава тръгна книгата „{{ glb_wish_book_name }}“ по неговата линия; отворените записи се затварят по правилото си.{% endif %}
-    {# 26.10.2026 (решение по етап 4б, т. 1): без % печеливши и медиана и в реплея — алфа на година позиция и 5 / 10 / 20 сесии след входа спрямо SPY #}
-    <br>Реплей върху историята (1962–2026, {{ "{:,}".format(rep.trades).replace(",", " ") }} сделки; SPY от 1993): алфа на година позиция {{ "%+.1f"|format(rep.alpha_py_pct) }}% [{{ rep.alpha_py_ci[0] }}; {{ rep.alpha_py_ci[1] }}]{% if rep.horizons %};
-    доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати: {% for h, x in rep.horizons.items() %}{{ h }} — {{ "%+.2f"|format(x.ret) }}% срещу {{ "%+.2f"|format(x.spy) }}% (алфа {{ "%+.2f"|format(x.alpha) }}% [{{ "%.2f"|format(x.alpha_ci[0]) }}; {{ "%.2f"|format(x.alpha_ci[1]) }}]){{ " · " if not loop.last else "" }}{% endfor %}{% endif %}.
-    <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута; сравнението между правилата е честно</b> — те са върху едни и същи тикъри, дати и цени.
-  </div>
-  <details class="gw-book" open>
-    <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Измерване — книга {{ book_key }}: {{ gw.records }} записа{% if gw.tickers is defined %} / {{ gw.tickers }} тикъра{% endif %} · затворени {{ gw.line_exit + gw.expired }} / отворени по текуща цена {{ gw.open }}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.with_result and gw["all"].avg_return_pct is not none %} · средно {{ "%+.2f"|format(gw["all"].avg_return_pct) }}% (всички записи){% endif %}{% if not gw.stats_visible %} · статистика след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}{% if gw.result_tickers is defined %} в {{ gw.result_tickers }} тикъра{% endif %}){% endif %}</summary>
-  <div class="prose" style="margin-top:8px">
-    {% if not gw.records %}
-    <b>Още няма записани пробиви</b> — записват се свежите пробиви на последния цял бар{% if gw.track_from %}, от {{ gw.track_from }} нататък{% endif %}.
-    {% else %}
-    <b>Записани: {{ gw.records }}</b> · <b>затворени {{ gw.line_exit + gw.expired }}</b> (изход по линията {{ gw.line_exit }} · изтекли по нашия таван {{ gw.expired }}) / <b>отворени по текуща цена {{ gw.open }}</b>{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% if gw.invalid %} · невалидни сигнали {{ gw.invalid }}{% endif %}{% if gw.also_action %} · и в Action: {{ gw.also_action }}{% endif %}{% if gw.also_buystop %} · и в buy-stop: {{ gw.also_buystop }}{% endif %}{% if gw.also_qm %} · и в QM: {{ gw.also_qm }}{% endif %}<br>
-    {% if gw.needs_review %}<span style="color:var(--yellow)">⚠ {{ gw.needs_review }} запис(а) с отделяне след сигнала — линията не се мащабира, нужен е ръчен преглед.</span><br>{% endif %}
-    {% if gw.with_result %}
-    Записи с резултат: <b>{{ gw.with_result }} = затворени {{ gw.closed_result }} / отворени по текуща цена {{ gw.open_result }}</b> · средна доходност на всички <b>{{ "%+.2f"|format(gw["all"].avg_return_pct) }}%</b> literal{% if gw["all"].avg_return_pct_exec is not none %} / <b>{{ "%+.2f"|format(gw["all"].avg_return_pct_exec) }}%</b> exec{% endif %}<br>
-    {% if gw.line_exit_group.n %}Изход по линията ({{ gw.line_exit_group.n }}): средно {{ "%+.2f"|format(gw.line_exit_group.avg_return_pct) }}% — по построение загуби (вход над линията, изход под нея).<br>{% endif %}
-    {% if gw.expired_group.n %}Изтекли по нашия таван ({{ gw.expired_group.n }}, оценка по затварянето на последния ден): средно {{ "%+.2f"|format(gw.expired_group.avg_return_pct) }}%.<br>{% endif %}
-    {% if gw.open_group.n %}Отворени по текуща цена ({{ gw.open_group.n }}): средно {{ "%+.2f"|format(gw.open_group.avg_return_pct) }}% — още не са затворени, цената им може да се върне под линията.<br>{% endif %}
-    {% endif %}
-    {# 26.10.2026 (етап 4б, т. 3): без % печеливши, интервал и медиана — затворените по линията са загуби по построение; доходността на срок и сравнението по тип / режим на един срок #}
     {% if gw.horizons is defined %}
-    <span style="color:var(--muted)">Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея), затова делът на печелившите е просто делът на отворените.</span><br>
-    Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати:
-    {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n %}{{ "%+.2f"|format(x.avg_ret) }}%{% if x.avg_spy is not none %} (SPY {{ "%+.2f"|format(x.avg_spy) }}%, алфа {{ "%+.2f"|format(x.avg_alpha) }}%){% endif %}, {{ x.n }} записа{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.<br>
-    {{ events_line(gw.events, "доходност %") }}
-    {% if gw["all"].avg_alpha_pct is not none %}Спрямо SPY до изхода (същите дати): алфа средно {{ "%+.2f"|format(gw["all"].avg_alpha_pct) }}% literal{% if gw["all"].avg_alpha_pct_exec is not none %} / {{ "%+.2f"|format(gw["all"].avg_alpha_pct_exec) }}% exec{% endif %}<br>{% elif not gw.stats_visible %}Алфата до изхода се показва след {{ gw.min_entries }} записа с резултат (сега {{ gw.with_result }}) — при по-малко е шум.<br>{% endif %}
-    По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност за {{ gw.compare_horizon }} сесии{% endif %}):
-    {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret is not none %} ({{ "%+.2f"|format(g.avg_ret) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    <br>Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея).
+    <br>Доходност N сесии след входа (exec, независимо от изхода) спрямо SPY за същите дати:
+    {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n_exec %}{{ "%+.2f"|format(x.avg_ret_exec) }}%{% if x.avg_spy_exec is not none %} (SPY {{ "%+.2f"|format(x.avg_spy_exec) }}%, алфа {{ "%+.2f"|format(x.avg_alpha_exec) }}%){% endif %}, {{ x.n_exec }} записа{% elif x.n %}{{ x.n }} записа без exec данни{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.
+    {{ events_line(gw.events, "доходност % (exec)" if gw.events and gw.events.value == "return_pct_exec" else "доходност %") }}
+    <br>По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност exec за {{ gw.compare_horizon }} сесии{% endif %}):
+    {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret_exec is not none %} ({{ "%+.2f"|format(g.avg_ret_exec) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
     · по режим на деня на пробива:
-    {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret is not none %} ({{ "%+.2f"|format(g.avg_ret) }}%{% if g.avg_alpha is not none %}, алфа {{ "%+.2f"|format(g.avg_alpha) }}%{% endif %}){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}{% if not gw.horizons_visible %} — средните по тип и режим се показват при {{ gw.min_entries }} записа с {{ gw.compare_horizon }} сесии{% endif %}
-    {% else %}
-    По наш етикет (записани / с резултат): {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{{ " · " if not loop.last else "" }}{% endfor %}
-    · по режим на деня на пробива: {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{{ " · " if not loop.last else "" }}{% endfor %}
+    {% for name, g in gw.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret_exec is not none %} ({{ "%+.2f"|format(g.avg_ret_exec) }}%{% if g.avg_alpha_exec is not none %}, алфа {{ "%+.2f"|format(g.avg_alpha_exec) }}%{% endif %}){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}{% if not gw.horizons_visible %} — средните по тип и режим се показват при {{ gw.min_entries }} записа с {{ gw.compare_horizon }} сесии{% endif %}
     {% endif %}
-    {% endif %}
+    {% if rep %}<br>Реплей върху историята (1962–2026, {{ "{:,}".format(rep.trades).replace(",", " ") }} сделки; SPY от 1993; literal — по затварянето на сигналния ден): алфа на година позиция {{ "%+.1f"|format(rep.alpha_py_pct) }}% [{{ rep.alpha_py_ci[0] }}; {{ rep.alpha_py_ci[1] }}].
+    <b>Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута.</b>{% endif %}
   </div>
-  {% if gw.live %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Отворени и чакащи ({{ gw.live|length }}{% if gw.live_total > gw.live|length %} от {{ gw.live_total }}, най-новите{% endif %}):</div>
-  <div class="card" style="padding:6px 4px;margin-top:6px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Пробив на</th><th>Тип</th><th class="n">Линия</th><th class="n">Вход (close)</th><th class="n">Сега</th><th class="n">Доходност</th><th class="n">До линията</th><th>Режим</th></tr></thead>
-      <tbody>
-        {% for p in gw.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
-          <td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.glb_type or "н/д" }}</td>
-          <td class="n">{% if p.line is not none %}${{ "%.2f"|format(p.line) }}{% else %}—{% endif %}</td>
-          <td class="n">{% if p.fill_price is not none %}${{ "%.2f"|format(p.fill_price) }}{% else %}—{% endif %}</td>
-          <td class="n">{% if p.last_close is not none %}${{ "%.2f"|format(p.last_close) }}{% else %}—{% endif %}</td>
-          <td class="n">{% if p.current_return_pct is not none %}{{ "%+.1f"|format(p.current_return_pct) }}%{% else %}—{% endif %}</td>
-          <td class="n">{% if p.dist_to_line_pct is not none %}{{ "%+.1f"|format(p.dist_to_line_pct) }}%{% else %}—{% endif %}</td>
-          <td>{{ p.regime or "н/д" }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
-  {% if gw.recent %}
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:14px">Последно затворени ({% set gw_closed = (gw.line_exit or 0) + (gw.expired or 0) %}{% if gw_closed > gw.recent|length %}последните {{ gw.recent|length }} от {{ gw_closed }}{% else %}{{ gw.recent|length }}{% endif %}):</div>
-  <div class="card" style="padding:6px 4px;margin-top:6px">
-    <table class="pos-table">
-      <thead><tr><th>Тикър</th><th>Пробив на</th><th>Затворена</th><th>Как</th><th class="n">literal</th><th class="n">exec</th><th class="n">Алфа (literal)</th><th class="n">Сесии</th></tr></thead>
-      <tbody>
-        {% for p in gw.recent %}
-        <tr><td class="sym">{{ p.ticker }}</td><td>{{ p.signal_date or p.entry_date }}</td><td>{{ p.resolution_date }}</td><td>{{ gw_st.get(p.resolution, p.resolution) }}</td>
-          <td class="n">{{ "%+.1f"|format(p.return_pct) }}%</td><td class="n">{% if p.return_pct_exec is not none %}{{ "%+.1f"|format(p.return_pct_exec) }}%{% elif p.exec_note %}<span style="font-size:11.5px;color:var(--muted)" title="exec: изход по отварянето на следващата сесия след затварянето под линията — брифът е преди нея, числото идва в следващия бриф">{{ p.exec_note.text }}</span>{% else %}…{% endif %}</td>
-          <td class="n">{% if p.alpha_pct is not none %}{{ "%+.1f"|format(p.alpha_pct) }}%{% else %}—{% endif %}</td><td class="n">{{ p.hold_sessions if p.hold_sessions is not none else "—" }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
   </details>
+  {% set rows = gw.rows if gw.rows is defined else (gw.live or []) + (gw.recent or []) %}
+  {% if rows %}<details class="gw-book"><summary>Всички записи ({{ rows|length }})</summary>{{ gw_table(rows) }}</details>
+  {% else %}<div class="small" style="font-size:12.5px;color:var(--muted)">Още няма записани пробиви{% if gw.track_from %} — записват се от {{ gw.track_from }} нататък{% endif %}.</div>{% endif %}
 </section>
 {% endmacro %}
-{% set gwh = backtest.get("glb_wish_high") if backtest else none %}
 {% if gwh and gwh.enabled %}
 {% call gw_section(gwh, glb_wish_book_name, glb_wish_high_replay, "glb_wish_high") %}
-    <b>Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; вход при затваряне над нея, изход при първото затваряне под същата линия (замразена при входа).
-    Линията е като неговата (постовете му от 16.01.2023, 05.11.2025, 02.12.2025); при close под нея той продава и може да купи пак при close обратно над нея — тук всеки нов пробив е нов запис.
+    <b>Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар, непробита поне {{ glb_min_months }} месеца; вход при затваряне над нея, изход при първото затваряне под същата линия (замразена при входа);
+    при close под нея той продава и може да купи пак при close обратно над нея — тук всеки нов пробив е нов запис.
 {% endcall %}
 {% endif %}
 {% set gw = backtest.get("glb_wish") if backtest else none %}
 {% if gw and gw.enabled %}
-{% call gw_section(gw, glb_book_name ~ (" · архив" if gw.archived_from else ""), glb_wish_replay, "glb_wish") %}
+{% if gw.archived_from %}
+{# 03.11.2026 (т. 15, 7): архивът — един ред и сгънатите записи; изчезва сам, когато се затвори последният отворен запис #}
+{% if gw.open or gw.pending %}
+<div class="small gw-archive" style="font-size:12.5px;color:var(--muted);margin:-8px 0 18px"><b>{{ glb_book_name }}</b> · архив от {{ gw.archived_from[8:10] }}.{{ gw.archived_from[5:7] }} (линията по месечния close; нови записи няма, отворените се затварят по правилото си): {{ gw_head(gw) }}
+  {% set rows = gw.rows if gw.rows is defined else (gw.live or []) + (gw.recent or []) %}
+  {% if rows %}<details class="gw-book"><summary>Записи в архива ({{ rows|length }})</summary>{{ gw_table(rows) }}</details>{% endif %}
+</div>
+{% endif %}
+{% else %}
+{% call gw_section(gw, glb_book_name, glb_wish_replay, "glb_wish") %}
     <b>Правилото за вход и изход е на Eric Wish, линията е наша:</b> вход при затваряне над най-високия месечен close (непробит поне {{ glb_min_months }} месеца), изход при първото затваряне под същата линия (замразена при входа).
-    Уиш чертае линията при най-високата цена (High) на месечния бар, т.е. по-високо — неговото правило е книгата „{{ glb_wish_book_name }}“.
 {% endcall %}
+{% endif %}
 {% endif %}
 
 {# Пакет 4б т.б: секцията "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ (hover/клик) върху кандидатите и позициите #}

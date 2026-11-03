@@ -9,7 +9,7 @@ backtest (категория glb_wish, чист старт, дедуп, неза
 праговите записи (24 затворени записа), граничните стойности в обобщението и подменените yf.download.
 Пускане: python test_glb_wish.py
 """
-import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt, importlib, re
+import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt, importlib, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -332,28 +332,42 @@ with contextlib.redirect_stdout(io.StringIO()):
     page_old = render.render_dashboard(copy.deepcopy(B05))
 assert f"{config.GLB_CLOSE_BOOK_NAME} · книга" not in page_old and "GLB по Уиш · книга" not in page_old
 print("  ✓ стар бриф без ключа 'glb_wish' в backtest → секцията я няма и страницата се рендерира")
+# 03.11.2026 (разходката, т. 15): книгата — един видим ред, методът сгънат („Как се мери“), записите — една компактна таблица, доходността — само exec; архивът — ред + сгънати записи
+assert SL["rows"] and len(SL["rows"]) == 37 and [r["status"] for r in SL["rows"][:17]] == ["open"] * 17 and SL["open_by_type"]
+flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 b = copy.deepcopy(B05)
-b.setdefault("backtest", {})["glb_wish"] = SL
+b.setdefault("backtest", {})["glb_wish"] = {**SL, "archived_from": None}                   # пълната секция (неархивирана книга)
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b)
-HEAD = f"{config.GLB_CLOSE_BOOK_NAME}{' · архив' if SL.get('archived_from') else ''} · книга"      # 24.10: от GLB_WISH_HIGH_TRACK_FROM close книгата е архив
-sec = page[page.index(HEAD):]          # 21.10: честното име — линията е нашата (close)
+HEAD = f"{config.GLB_CLOSE_BOOK_NAME} · книга"
+sec = page[page.index(HEAD):]
 sec = sec[:sec.index("</section>")]
-assert "GLB по Уиш · книга" not in page and "измерване, не препоръка" in page[page.index(HEAD):][:200] and "Правилото за вход и изход е на Eric Wish, линията е наша" in sec and "най-високата цена (High)" in sec and "оцелели" in sec and "тесен" not in sec.lower()
-assert "Измерване — книга glb_wish: 37 записа" in sec and f"средно {SL['all']['avg_return_pct']:+.2f}% (всички записи)" in sec
-assert "win rate" not in sec and "Печеливши:" not in sec and "95% интервал" not in sec and "· медиана" not in sec          # 26.10.2026 (етап 4б, т. 3)
-flat_sec = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", sec))
-assert "Доходност N сесии след входа (literal, независимо от изхода) спрямо SPY за същите дати: 5 сесии — +1.95% (SPY +0.50%, алфа +1.45%), 20 записа · 10 сесии — още няма записи с толкова сесии" in flat_sec
-assert "Без % печеливши и медиана: всяка затворена по линията е загуба по построение" in sec and "по построение загуби" in sec and "затворени 20 / отворени по текуща цена 17" in sec and "затворени 20 (изход по линията 19 · изтекли по нашия таван 1) / отворени по текуща цена 17" in re.sub(r"<[^>]+>", "", sec) and "Отворени по текуща цена (17)" in sec and "Изтекли по нашия таван (1" in sec
-assert "НАШ — при Уиш няма такъв" in sec and "от 252 сесии" in sec and "изтекла по нашия таван" in sec
-assert sec.count("<tr><td class=\"sym\">T1") >= 10 and "от 17, най-новите" in sec and "и Action" not in sec
-print("  ✓ СИНТЕТИЧНИ записи от точка 8 в РЕАЛНАТА страница от 05.10: секция «GLB по Уиш · книга (измерване, не препоръка)» с честното описание (буквално правило, оцелели, без тесен), реда за 37 записа, win rate от обобщението, обяснението за групите, 15 отворени «от 17, най-новите»")
+fs = flat(sec)
+assert "GLB по Уиш · книга" not in page and "измерване, не препоръка" in fs[:200] and "Правилото за вход и изход е на Eric Wish, линията е наша" in fs and "оцелели" in fs and "тесен" not in fs.lower()
+line = fs[fs.index("не препоръка)") + 13:fs.index("Как се мери")]
+assert "37 записа · затворени 20 (" in line and "· отворени 17 (" in line and "алфа спрямо SPY" in line and "literal" not in line           # един ред; само exec
+assert "win rate" not in fs and "Печеливши:" not in fs and "95% интервал" not in fs and "· медиана" not in fs and "Последно затворени" not in fs and "Отворени и чакащи" not in fs
+assert "Доходността в таблицата е exec" in fs and "literal (вход и изход на затварянето на сигналния ден" in fs and "остава само в данните" in fs
+assert "Без % печеливши и медиана: всяка затворена по линията е загуба по построение" in fs and "5 сесии — 20 записа без exec данни" in fs     # СИНТЕТИЧНИТЕ срокове нямат ret_exec
+assert "НАШ — при Уиш няма такъв" in fs and "от 252 сесии" in fs and "Всички записи (37)" in fs and sec.count('<tr><td class="mono">T') == 37 and "и Action" not in fs
+print("  ✓ СИНТЕТИЧНИ записи от точка 8 в РЕАЛНАТА страница от 05.10: един ред «37 записа · затворени 20 (exec) · отворени 17 (exec) · алфа …», «▸ Как се мери» (правилото, оцелели, literal срещу exec), «▸ Всички записи (37)» — без «Последно затворени»")
+b["backtest"]["glb_wish"] = SL
+with contextlib.redirect_stdout(io.StringIO()):
+    page_a = render.render_dashboard(b)
+if SL.get("archived_from"):
+    fa = flat(page_a)
+    i = fa.index(f"{config.GLB_CLOSE_BOOK_NAME} · архив от")
+    assert "37 записа · затворени 20 (" in fa[i:i + 400] and "Записи в архива (37)" in fa and f"{HEAD} (измерване" not in fa
+    b["backtest"]["glb_wish"] = {**SL, "open": 0, "pending": 0}                             # СИНТЕТИЧНО: последният отворен запис е затворен → редът изчезва
+    with contextlib.redirect_stdout(io.StringIO()):
+        assert f"{config.GLB_CLOSE_BOOK_NAME} · архив от" not in flat(render.render_dashboard(b))
+    print("  ✓ архивът (по close): един ред + «▸ Записи в архива (37)»; без отворени записи — редът изчезва сам")
 b2 = copy.deepcopy(B05)
 b2.setdefault("backtest", {})["glb_wish"] = {"enabled": True, "track_from": "2026-10-12", "max_hold_sessions": 252, "records": 0, "pending": 0, "open": 0, "line_exit": 0, "expired": 0, "invalid": 0, "with_result": 0, "closed_result": 0, "open_result": 0,
         "min_entries": 20, "stats_visible": False, "also_action": 0, "also_buystop": 0, "also_qm": 0, "all": {}, "closed_group": {}, "line_exit_group": {}, "expired_group": {}, "open_group": {}, "by_type": {}, "by_regime": {}, "live": [], "live_total": 0, "recent": []}
 with contextlib.redirect_stdout(io.StringIO()):
     page_empty = render.render_dashboard(b2)
-assert "Още няма записани пробиви" in page_empty and "от 2026-10-12 нататък" in page_empty and "статистика след 20 записа" in page_empty
+assert "Още няма записани пробиви" in page_empty and "от 2026-10-12 нататък" in page_empty and "статистика от 20 записа" in page_empty
 print("  ✓ празната книга казва, че още няма записи и от коя дата се записва")
 
 print()

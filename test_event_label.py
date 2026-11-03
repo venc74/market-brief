@@ -83,18 +83,18 @@ c.update(status="open", fill_date="2026-10-23", fill_price=56.44, return_pct=-4.
 backtest._save_tracker({"CART_2026-10-26_gwh": c})
 config.TRACK_GLB_WISH_HIGH = True
 S = backtest.get_glb_wish_summary(backtest.CATEGORY_GLB_WISH_HIGH)
-assert S["events"]["n"] == 1 and S["events"]["labels"][0]["ticker"] == "CART" and S["events"]["n_rest"] == 0 and S["events"]["avg_all"] == -4.28
+assert S["events"]["n"] == 1 and S["events"]["labels"][0]["ticker"] == "CART" and S["events"]["n_rest"] == 0 and S["events"]["avg_all"] == -4.0
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
 b = copy.deepcopy(B19); b.setdefault("backtest", {})["glb_wish_high"] = S
 with q():
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", render.render_dashboard(b, publish=False))))
-assert "С етикет (цената следва сделка или слух за сделка, не сетъпа): CART 26.10 — събитие/M&A (+9.2% при" in page and "Средно доходност %: с тях -4.28 (1) · без тях — още няма." in page
-print("  ✓ „С етикет …: CART 26.10 — събитие/M&A (+9.2% при 4.x× обем на 23.10: «…»). Средно доходност %: с тях −4.28 (1) · без тях — още няма.“")
+assert "С етикет (цената следва сделка или слух за сделка, не сетъпа): CART 26.10 — събитие/M&A (+9.2% при" in page and "Средно доходност % (exec): с тях -4.00 (1) · без тях — още няма." in page        # 03.11.2026 (т. 15, 6): exec
+print("  ✓ „С етикет …: CART 26.10 — събитие/M&A (+9.2% при 4.x× обем на 23.10: «…»). Средно доходност % (exec): с тях −4.00 (1) · без тях — още няма.“")
 # 27.10.2026: етикетираните без затворена сделка (buy-stop 27.10: ROKU отворена, "с тях −1.00 (1) · без тях −1.00 (1)") → ред вместо две еднакви числа
 b2 = copy.deepcopy(b); b2["backtest"]["glb_wish_high"]["events"].update(n_all=1, avg_all=-1.0, n_rest=1, avg_rest=-1.0)   # СИНТЕТИЧНО: етикетираният без резултат
 with q():
     page2 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", "", render.render_dashboard(b2, publish=False))))
-assert "Средно доходност %: етикетираните още нямат затворени сделки." in page2 and "с тях -1.00" not in page2
+assert "Средно доходност % (exec): етикетираните още нямат затворени сделки." in page2 and "с тях -1.00" not in page2
 print("  ✓ етикетираните без затворени → „Средно …: етикетираните още нямат затворени сделки.“ (не „с тях −1.00 (1) · без тях −1.00 (1)“)")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert src.index('steps.step("event_labels"') < src.index("backtest_summary = backtest.get_backtest_summary()") and src.index("backtest.update_backtest_tracker(") < src.index('steps.step("event_labels"')
