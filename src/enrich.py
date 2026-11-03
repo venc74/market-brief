@@ -195,19 +195,51 @@ def recent_report(last_ts, today: dt.date) -> dict | None:
 UNKNOWN_EARNINGS_TEXT = "Датата на отчета не е известна (тегленето от Yahoo не успя) — Watchlist вместо Action, докато не се провери."
 
 
-def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
+def calendar_events(tk) -> tuple[dict | None, bool | None]:
+    """
+    03.11.2026 (поправки след брифа, т. 3): календарът на Yahoo (quoteSummary calendarEvents) — ({"Earnings Date": [дати]} като tk.calendar, isEarningsDateEstimate). Това е
+    СЪЩАТА заявка, от която yfinance сглобява tk.calendar, но tk.calendar губи флага за прогнозна дата (AMG: брифовете 09.10–02.11 казваха „Отчет на 02.11“ по прогнозата на
+    Yahoo; компанията обяви 09.11). Частното tk._quote._fetch липсва / се счупи → tk.calendar без флага (None). Провал на заявката → (None, None).
+    """
+    try:
+        raw = tk._quote._fetch(modules=["calendarEvents"])
+    except AttributeError:
+        cal = tk.calendar
+        return (cal if isinstance(cal, dict) else None), None
+    if raw is None:
+        return None, None
+    try:
+        ev = (raw["quoteSummary"]["result"][0] or {}).get("calendarEvents") or {}
+    except (KeyError, IndexError, TypeError):
+        return None, None
+    e = ev.get("earnings") or {}
+    dates = [dt.datetime.fromtimestamp(x, dt.timezone.utc).date() for x in e.get("earningsDate") or [] if isinstance(x, (int, float))]
+    est = e.get("isEarningsDateEstimate")
+    return {"Earnings Date": dates}, (bool(est) if isinstance(est, bool) else None)
+
+
+def earnings_dm(iso: str | None, estimate: bool | None = None) -> str:
+    """03.11.2026 (т. 3): ДД.ММ на отчета; прогнозна дата (isEarningsDateEstimate) → „~ДД.ММ (прогноза)“. Чиста функция."""
+    s = str(iso or "")
+    dm = f"{s[8:10]}.{s[5:7]}" if len(s) >= 10 and s[4] == "-" else s
+    return f"~{dm} (прогноза)" if estimate and dm else dm
+
+
+def earnings_info(sym: str, now: dt.datetime | None = None, with_info: bool = True) -> dict:
     """
     16.10.2026 (В1): + earnings_status ("ok" — има бъдеща дата; "no_date" — тегленето мина, бъдеща дата няма; "failed" — тегленето не успя), last_report (последният минал отчет)
     и recent_report (отчет в последната сесия — виж recent_report). `now` — за тестове.
+    03.11.2026 (поправки след брифа, т. 3): earnings_estimate — True, ако датата е от календара на Yahoo и той я маркира като прогнозна (isEarningsDateEstimate); False — потвърдена;
+    None — неизвестно (датата е от get_earnings_dates или флагът липсва). with_info=False — без tk.info (eps_estimate остава None; наблюдаваните — без .info, т. 1).
     """
     out = {"next_earnings": None, "days_to_earnings": None,
            "in_blackout": False, "eps_estimate": None, "recap": None,
-           "earnings_status": "failed", "last_report": None, "recent_report": None, "eps_report_yoy": None}
+           "earnings_status": "failed", "last_report": None, "recent_report": None, "eps_report_yoy": None, "earnings_estimate": None}
     now = now or dt.datetime.now(dt.timezone.utc)
     today = now.date()
     try:
         tk = yf.Ticker(sym)
-        cal = tk.calendar
+        cal, cal_est = calendar_events(tk)                     # 03.11.2026 (т. 3): същата заявка като tk.calendar + флагът за прогнозна дата
         ed = None
         if isinstance(cal, dict):
             dates = cal.get("Earnings Date") or []
@@ -223,6 +255,7 @@ def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
                 print(f"[enrich] earnings {sym}: календарът върна минала дата "
                       f"{ed} — падам към get_earnings_dates()")
                 ed = None
+        from_calendar = ed is not None
 
         # FIX 2026-08-12 (Earnings Season Recap, Case 1): df се тегли БЕЗУСЛОВНО
         # сега (преди: само при calendar fallback) — recap-ът (миналите редове
@@ -246,14 +279,16 @@ def earnings_info(sym: str, now: dt.datetime | None = None) -> dict:
             if isinstance(ed, dt.datetime):
                 ed = ed.date()
             days = (ed - today).days
+            out["earnings_estimate"] = cal_est if from_calendar else None
             # 5 РАБОТНИ дни ≈ 7 календарни
             out.update({
                 "next_earnings": ed.isoformat(),
                 "days_to_earnings": days,
                 "in_blackout": 0 <= days <= 7,
             })
-        info = tk.info or {}
-        out["eps_estimate"] = info.get("epsCurrentYear") or info.get("forwardEps")
+        if with_info:                                           # 03.11.2026: наблюдаваните — без .info (т. 1)
+            info = tk.info or {}
+            out["eps_estimate"] = info.get("epsCurrentYear") or info.get("forwardEps")
 
         out["recap"] = earnings_recap(sym)
     except Exception as e:

@@ -251,8 +251,8 @@ def _snap_time(fetched_utc: str | None) -> str:
         return ""
 
 
-def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_reason: str = "", fetched_utc: str | None = None) -> dict | None:
-    """Предупреждението за карта с отчет на earnings_date; None ако отчетът е минал или е след EARNINGS_WARNING_SESSIONS сесии."""
+def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_reason: str = "", fetched_utc: str | None = None, estimate: bool | None = None) -> dict | None:
+    """Предупреждението за карта с отчет на earnings_date; None ако отчетът е минал или е след EARNINGS_WARNING_SESSIONS сесии. 03.11.2026: estimate → „~ДД.ММ (прогноза)“."""
     d = dt.date.fromisoformat(earnings_date[:10])
     if d < today:
         return None
@@ -261,15 +261,16 @@ def warning_for(earnings_date: str, today: dt.date, st: dict | None, missing_rea
         return None
     when = "днес" if d == today else "утре" if n == 1 and (d - today).days == 1 else f"след {n} {'сесия' if n == 1 else 'сесии'}"
     res = {"pct": None, "reason": missing_reason} if missing_reason else event_move(st, d.isoformat())
-    out = {"date": d.isoformat(), "sessions": n, "implied_move_pct": res["pct"], "reason": res.get("reason")}
+    out = {"date": d.isoformat(), "sessions": n, "implied_move_pct": res["pct"], "reason": res.get("reason"), "estimate": bool(estimate)}
+    dm = f"~{_dm(d.isoformat())} (прогноза)" if estimate else _dm(d.isoformat())
     if res["pct"] is not None:
         out.update(spot=res["spot"], straddle_after=res["straddle_after"], straddle_before=res["straddle_before"], after_expiry=res["after_expiry"],
                    before_expiry=res["before_expiry"], naive_pct=res["naive_pct"], snapshot_session=res["session"])
-        out["text"] = (f"⚠ Отчет на {_dm(d.isoformat())} ({when}) — пазарът очаква ±{res['pct']}% при отчета (оценка от straddle-ите на "
+        out["text"] = (f"⚠ Отчет на {dm} ({when}) — пазарът очаква ±{res['pct']}% при отчета (оценка от straddle-ите на "
                        f"{_dm(res['before_expiry'])} и {_dm(res['after_expiry'])} с извадена базова волатилност; цена ${res['spot']:.2f} при снимката на опциите "
                        f"на {_dm(res['session'])}{_snap_time(fetched_utc)}).")          # 22.10.2026: с часа — до нея на картата е close-ът (AAPL: $339.95 в 10:41 ET срещу $343.99)
     else:
-        out["text"] = f"⚠ Отчет на {_dm(d.isoformat())} ({when}) — няма данни за очаквано движение ({res['reason']})."
+        out["text"] = f"⚠ Отчет на {dm} ({when}) — няма данни за очаквано движение ({res['reason']})."
     return out
 
 
@@ -306,7 +307,8 @@ def annotate(cards: list[dict], today: dt.date | None = None, snapshot_loader=No
             why = (f"картата е нова — при снимката на {_dm(sd)} не беше сред кандидатите" if c["ticker"] not in in_snap and sd[:4].isdigit()
                    else f"при снимката на {_dm(sd)} няма straddle за този отчет" if sd[:4].isdigit() else "")
         try:
-            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), why, (snap or {}).get("fetched_at_utc"))
+            w = warning_for(c["earnings"]["next_earnings"], today, (straddles or {}).get(c["ticker"]), why, (snap or {}).get("fetched_at_utc"),
+                            estimate=c["earnings"].get("earnings_estimate"))
         except Exception as e:
             print(f"[earnings_move] {c.get('ticker')}: {type(e).__name__}: {e}")
             continue

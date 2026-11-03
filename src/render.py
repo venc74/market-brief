@@ -17,6 +17,7 @@ from src import cot_theses
 from src import setup_rules
 from src import sector_claims
 from src import qm_breakout
+from src import enrich as enrich_mod
 
 WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четвъртък",
                "петък", "събота", "неделя"]
@@ -425,7 +426,7 @@ def _radar_reason(c: dict) -> str:
             return "блокирана от режима"
         if rt == "earnings_blackout":
             d = e.get("days_to_earnings")
-            return f"отчет на {_dm(e.get('next_earnings'))}" + (f" ({int(d)} дни)" if isinstance(d, (int, float)) else "") + " — вход след отчета"
+            return f"отчет на {enrich_mod.earnings_dm(e.get('next_earnings'), e.get('earnings_estimate'))}" + (f" ({int(d)} дни)" if isinstance(d, (int, float)) else "") + " — вход след отчета"
         if rt == "earnings_recent":
             return "отчет в последната сесия — нивата са отпреди реакцията"
         if rt == "earnings_unknown":

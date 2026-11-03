@@ -320,9 +320,10 @@ def facts(tickers: list[str], download=None, earnings_fn=None, names: dict | Non
         try:
             if earnings_fn is None:
                 from src import enrich
-                earnings_fn = enrich.earnings_info
+                earnings_fn = lambda x: enrich.earnings_info(x, with_info=False)        # 03.11.2026: без .info (т. 1)
             e = earnings_fn(t) or {}
-            out[t]["earnings"] = {"next": e.get("next_earnings"), "days": e.get("days_to_earnings"), "status": e.get("earnings_status")}
+            out[t]["earnings"] = {"next": e.get("next_earnings"), "days": e.get("days_to_earnings"), "status": e.get("earnings_status"),
+                                  "estimate": e.get("earnings_estimate")}                 # 03.11.2026 (т. 3): прогнозна дата → „~ДД.ММ (прогноза)“
         except Exception as e:
             print(f"[watch] {t} отчет: {type(e).__name__}: {e}")
     return out

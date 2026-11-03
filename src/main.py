@@ -196,8 +196,7 @@ def _watchlist_trigger_text(c: dict, regime: str | None) -> str:
     elif e.get("earnings_status") == "failed":                        # 16.10.2026 (В1): датата е неизвестна, защото тегленето не успя
         parts.append(enrich_mod.UNKNOWN_EARNINGS_TEXT)
     if e.get("in_blackout") or (isinstance(days, (int, float)) and 0 <= days <= 7):
-        ne = str(e.get("next_earnings") or "")
-        ne = f"{ne[8:10]}.{ne[5:7]}" if len(ne) >= 10 and ne[4] == "-" else ne                  # 16.10.2026: ДД.ММ, не ISO ("Отчет на 2026-11-03")
+        ne = enrich_mod.earnings_dm(e.get("next_earnings"), e.get("earnings_estimate"))       # 16.10.2026: ДД.ММ, не ISO; 03.11.2026: прогнозна → „~ДД.ММ (прогноза)“
         when = "ДНЕС" if days == 0 else (f"на {ne} ({int(days)} дни)" if isinstance(days, (int, float)) and ne else f"на {ne or 'неизвестна дата'}")
         parts.append(f"Отчет {when} — нов Action най-рано след отчета.")
     setup = c.get("setup") or {}
