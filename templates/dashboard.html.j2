@@ -469,7 +469,7 @@
   <div class="header-inner">
     <div class="masthead">
       <h1>Персонален AI Инвестиционен Бриф</h1>
-      <div class="date mono">{{ date_human }} · генериран {{ generated_at }} {{ generated_tz }}{% if premarket_note %} · {{ premarket_note }}{% endif %}</div>
+      <div class="date mono">{{ date_human }} · генериран {{ generated_at }} {{ generated_tz }}{% if preopen %} · обновено преди отварянето {{ preopen.time_berlin }} {{ generated_tz }}{% endif %}{% if premarket_note %} · {{ premarket_note }}{% endif %}</div>
     </div>
     <div>
       <div class="regime-badge">{{ regime }}</div>

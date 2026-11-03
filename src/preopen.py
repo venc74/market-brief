@@ -171,6 +171,13 @@ def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=No
     return out
 
 
+def morning_generated(page_html: str | None) -> tuple[str, str] | None:
+    """Часът „генериран HH:MM CET“ на сутрешния бриф от текущата страница — заглавието го пази, когато карето се добавя наново (иначе би казало 15:05). Чиста функция."""
+    import re
+    m = re.search(r"генериран (\d{2}:\d{2}) (CET|CEST|UTC)", page_html or "")
+    return (m.group(1), m.group(2)) if m else None
+
+
 def has_news(res: dict) -> bool:
     return bool(res.get("gaps") or res.get("levels") or res.get("watch"))
 
@@ -302,7 +309,9 @@ def main() -> int:
     if brief:
         try:
             brief["preopen"] = res
-            render.render_dashboard(brief, publish=False, as_of=dt.date.fromisoformat(day))       # само docs/index.html — карето стои до следващия сутрешен бриф
+            page = config.DOCS_DIR / "index.html"
+            gen = morning_generated(page.read_text(encoding="utf-8") if page.exists() else None)
+            render.render_dashboard(brief, publish=False, as_of=dt.date.fromisoformat(day), generated=gen)   # само docs/index.html — карето стои до следващия сутрешен бриф
         except Exception as e:
             print(f"::warning::[preopen] страницата не се рендерира: {type(e).__name__}: {e}")
     if not res["ok"]:

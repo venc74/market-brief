@@ -85,6 +85,10 @@ b = copy.deepcopy(B19); b["preopen"] = res
 with q():
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
 assert "Преди отварянето (15:05 Берлин / 09:05 Ню Йорк)" in page and page.index("Преди отварянето (") < page.index("Пазарен термометър")
+with q():
+    hdr = render.render_dashboard(b, publish=False, generated=preopen.morning_generated("<div>понеделник · генериран 07:34 CET</div>"))
+assert "генериран 07:34 CET · обновено преди отварянето 15:05 CET" in hdr                                                  # заглавието пази часа на сутрешния бриф
+assert preopen.morning_generated(hdr) == ("07:34", "CET") and preopen.morning_generated(None) is None                     # и при второ пускане — пак сутрешният
 assert "LSCC +13.5% ($108.32 в 09:00 Ню Йорк; затваряне $95.44) · пренебрегнат (3 мес. -31%) 8-K (SEC), 02.11 16:27 ET: т. 2.02 — резултати от дейността" in page
 assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“" in page
 mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(res))))
@@ -102,7 +106,7 @@ assert "Премаркетът не се изтегли днес" in p3
 b.pop("preopen")
 with q():
     assert "Преди отварянето (" not in render.render_dashboard(b, publish=False)                                            # сутрешният бриф — без каре
-print("  ✓ карето най-горе (преди термометъра); имейлът — само при нещо; „Нищо за отбелязване“; провал — не изглежда като „нищо“; сутрешният бриф — без каре")
+print("  ✓ карето най-горе (преди термометъра); заглавието — „генериран 07:34 CET · обновено преди отварянето 15:05 CET“; имейлът — само при нещо; „Нищо за отбелязване“; провал — не изглежда като „нищо“; сутрешният бриф — без каре")
 
 print()
 print("── 6. прозорецът и задачата ──")

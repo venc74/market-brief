@@ -468,14 +468,16 @@ def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
 # 30.10.2026 (т. 9–10): split_watchlist (карти / компактни редове, 10.10) → split_canslim (Чака пробив / На радара).
 
 
-def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: bool = True, as_of: dt.date | None = None) -> str:
+def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: bool = True, as_of: dt.date | None = None,
+                     generated: tuple[str, str] | None = None) -> str:
     """
     16.10.2026 (В2а): closed_notice — банер "Борсата е затворена днес …" върху последния бриф; publish=False — пише САМО docs/index.html (без архив за деня и без
     огледалото в docs/data — денят не е бриф); as_of — датата в заглавието (датата на показания бриф).
+    03.11.2026 (т. 10): generated — ("HH:MM", "CET") на сутрешния бриф, когато страницата се рендерира наново преди отварянето (иначе — сега).
     """
     today = as_of or dt.date.today()
     tpl = env.get_template("dashboard.html.j2")
-    gen_time, gen_tz = berlin_clock()                      # един вик — часът и етикетът са от един и същи момент
+    gen_time, gen_tz = generated or berlin_clock()         # един вик — часът и етикетът са от един и същи момент
     html = tpl.render(
         closed_notice=closed_notice,
         calendar_note=brief.get("market_calendar_note"),      # 16.10.2026 (В2б): утре / в понеделник борсата не работи или затваря рано
