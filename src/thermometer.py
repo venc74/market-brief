@@ -1006,6 +1006,47 @@ def _funding_stress_indicator(fs: dict | None) -> dict | None:
                                   f"{hf[5:7]}.{hf[:4]} · термометър, не предсказание: в проучването ни {config.FUNDING_STRESS_RESEARCH_TEXT} · само информативен, не влиза в режима")}
 
 
+def credit_oas_verdict(hy: dict | None, iei_hyg: dict | None) -> str | None:
+    """
+    03.11.2026 (прегледът на 02.11, т. 4): едно изречение от кода — HY OAS спрямо IEI/HYG. HY „се разширява“: промяната за config.CREDIT_OAS_CHG_SESSIONS наблюдения ≥ CREDIT_OAS_WIDENING_BP;
+    IEI/HYG „натиск“: жълт или червен. Скрит единият → None. Чиста функция.
+    """
+    if not hy or hy.get("hide") or hy.get("chg_bp") is None or not iei_hyg or iei_hyg.get("hide") or iei_hyg.get("value") is None:
+        return None
+    wide, iei = hy["chg_bp"] >= config.CREDIT_OAS_WIDENING_BP, iei_hyg.get("status") in ("yellow", "red")
+    if iei and not wide:
+        return "натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, HY OAS е спокоен)"
+    if iei and wide:
+        return "кредитен стрес — и IEI/HYG, и HY OAS се разширяват"
+    if wide:
+        return "HY OAS се разширява, IEI/HYG още не"
+    return "кредитът е спокоен (IEI/HYG зелен, HY OAS не се разширява)"
+
+
+def _credit_oas_indicator(oas: dict | None, iei_hyg: dict | None) -> dict | None:
+    """
+    03.11.2026 (прегледът на 02.11, т. 4): HY OAS и IG OAS (FRED) — САМО информативна плочка ("informational": True), не влиза в броенето. Ниво, промяна за 20 наблюдения, перцентил за
+    наличната история (~3 г.) и изречението спрямо IEI/HYG (credit_oas_verdict). Цветът — по HY: разширяване ≥ CREDIT_OAS_WIDENING_BP или перцентил ≥ CREDIT_OAS_PCT_YELLOW → жълто,
+    двете → червено. HY скрит (застоял / липсва) → скрита карта с причината (етикет, не тишина). None (изключено) → няма карта.
+    """
+    if oas is None:
+        return None
+    name = "HY / IG OAS (кредитни спредове)"
+    hy, ig = oas.get("hy") or {}, oas.get("ig") or {}
+    if hy.get("value") is None:
+        return {"name": name, "value": None, "status": "yellow", "hide": True, "informational": True, "label": "", "hide_reason": "HY OAS — " + (hy.get("hide_reason") or "няма данни")}
+    n = config.CREDIT_OAS_CHG_SESSIONS
+    part = lambda k, x: (f"{k} {x['value']:.2f}% ({x['chg_bp']:+d} б.п. за {n} дни, {x['percentile']:.0f}. percentile)" if x.get("value") is not None
+                         else f"{k} — {x.get('hide_reason') or 'няма данни'}")
+    wide, high = hy["chg_bp"] >= config.CREDIT_OAS_WIDENING_BP, hy["percentile"] >= config.CREDIT_OAS_PCT_YELLOW
+    status = "red" if wide and high else "yellow" if wide or high else "green"
+    hf, d = hy.get("history_from") or "", hy["as_of"]
+    verdict = credit_oas_verdict(hy, iei_hyg)
+    return {"name": name, "value": hy["value"], "status": status, "informational": True, "as_of": d, "hy": hy, "ig": ig, **({"verdict": verdict} if verdict else {}),
+            "label": (f"{part('HY', hy)} · {part('IG', ig)} · към {d[8:10]}.{d[5:7]}, перцентил спрямо историята от {hf[8:10]}.{hf[5:7]}.{hf[:4]} (FRED дава ~3 г.)"
+                      + (f" · {verdict}" if verdict else "") + " · само информативен, не влиза в режима")}
+
+
 def equal_weight_signal(rsp, spy) -> dict:
     """
     30.10.2026 (поправки от брифа, т. 7): RSP (S&P 500 с равни тегла) спрямо SPY за config.EQUAL_WEIGHT_SESSIONS (5 и 10) сесии — разликата в ръста, в пунктове. Информативен
@@ -1138,6 +1179,9 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         indicators.insert(indicators.index(nl_ind) + 1, fs_ind)
     if config.ENABLE_EQUAL_WEIGHT:                                      # 30.10.2026 (поправки от брифа, т. 7): информативен — след SOFR − IORB
         indicators.insert(indicators.index(fs_ind or nl_ind) + 1, equal_weight_vs_cap())
+    oas_ind = _credit_oas_indicator(macro.get("credit_oas"), next((i for i in indicators if i["name"] == "IEI/HYG (Credit Spread)"), None))   # 03.11.2026: след IEI/HYG
+    if oas_ind:
+        indicators.insert(next(k for k, i in enumerate(indicators) if i["name"] == "IEI/HYG (Credit Spread)") + 1, oas_ind)
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
         _breadth_divergence(indicators)

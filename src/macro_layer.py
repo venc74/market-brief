@@ -229,6 +229,41 @@ def funding_stress() -> dict:
         return {"value": None, "hide": True, "hide_reason": f"грешка ({type(e).__name__})"}
 
 
+def oas_reading(obs: list[tuple[str, float]], today: dt.date | None = None) -> dict:
+    """
+    03.11.2026 (прегледът на 02.11, т. 4): една серия OAS от FRED (в %) → {value, as_of, chg_bp (за config.CREDIT_OAS_CHG_SESSIONS наблюдения), percentile (спрямо всички предишни
+    наблюдения в историята), n_history, history_from}. Без данни / под CREDIT_OAS_CHG_SESSIONS + 1 наблюдения / застояла (> FRED_DAILY_MAX_LAG_SESSIONS NYSE сесии) → {hide, hide_reason}.
+    Чиста функция.
+    """
+    from src.setup_rules import sessions_between
+    hide = lambda why: {"value": None, "hide": True, "hide_reason": why}
+    if not obs:
+        return hide("FRED не върна данни")
+    n = config.CREDIT_OAS_CHG_SESSIONS
+    if len(obs) <= n:
+        return hide(f"историята е твърде къса ({len(obs)} наблюдения)")
+    today = today or dt.date.today()
+    last_d = dt.date.fromisoformat(obs[-1][0])
+    if sessions_between(last_d, today) > config.FRED_DAILY_MAX_LAG_SESSIONS:
+        return hide(f"застояла — последно наблюдение {last_d.strftime('%d.%m')} (праг {config.FRED_DAILY_MAX_LAG_SESSIONS} сесии)")
+    vals = [v for _, v in obs]
+    last, hist = vals[-1], vals[:-1]
+    return {"value": round(last, 2), "as_of": obs[-1][0], "chg_bp": round((last - vals[-1 - n]) * 100), "percentile": round(100.0 * sum(1 for x in hist if x <= last) / len(hist), 1),
+            "n_history": len(hist), "history_from": obs[0][0], "hide": False}
+
+
+def credit_oas() -> dict:
+    """03.11.2026: HY и IG OAS от FRED (config.CREDIT_OAS_SERIES, ~3 години — толкова дава FRED за ICE сериите) → {"hy": oas_reading, "ig": oas_reading}. Graceful: провал → скрити с причина."""
+    out = {}
+    for k, sid in config.CREDIT_OAS_SERIES.items():
+        try:
+            out[k] = {**oas_reading(_fred_series(sid, days=config.CREDIT_OAS_HISTORY_DAYS)), "series": sid}
+        except Exception as e:
+            print(f"[macro] OAS {sid}: {type(e).__name__}: {e}")
+            out[k] = {"value": None, "hide": True, "hide_reason": f"грешка ({type(e).__name__})", "series": sid}
+    return out
+
+
 def treasury_spread_2s10s() -> dict:
     """T10Y2Y от FRED — директно спредът в %."""
     obs = _fred_series("T10Y2Y", days=30)
@@ -559,6 +594,7 @@ def collect_macro_layer() -> dict:
         "core_inflation": core_inflation() if config.ENABLE_CORE_INFLATION else None,
         "pce_core": pce_core() if config.ENABLE_PCE_CORE else None,                # 30.10.2026 (поправки от брифа, т. 6): базов PCE — до основната инфлация
         "funding_stress": funding_stress() if config.ENABLE_FUNDING_STRESS else None,     # 16.10.2026: след core_inflation — в термометъра е целият (промптът реже macro на 6000 знака)
+        "credit_oas": credit_oas() if config.ENABLE_CREDIT_OAS else None,     # 03.11.2026: HY / IG OAS — информативна плочка в термометъра
         # 2026-10-03 (пакет 2 т.4): NewsAPI е махнат (macro.headlines беше празен във всичките 78 брифа);
         # новините са curated (news_aggregator.significant_news) и влизат в макро промпта отделно, ПРЕДИ брифа.
     }

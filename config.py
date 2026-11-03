@@ -1268,6 +1268,15 @@ ENABLE_PCE_CORE = os.getenv("ENABLE_PCE_CORE", "1") == "1"
 # 30.10.2026 (поправки от брифа, т. 7): RSP (S&P 500 с равни тегла) спрямо SPY — разликата в ръста за 5 и 10 сесии, в пунктове; информативен уред (не влиза в режима),
 # подава се и на разказа (уредите са контекст в промпта). Реално към 29.10: +0.1 п. за 5 сесии (RSP +0.83% / SPY +0.71%), +2.7 п. за 10 (+2.34% / −0.31%).
 ENABLE_EQUAL_WEIGHT = os.getenv("ENABLE_EQUAL_WEIGHT", "1") == "1"
+# 03.11.2026 (прегледът на 02.11, т. 4): кредитните спредове от FRED — HY OAS (ICE BofA US High Yield) и IG OAS (US Corporate); САМО информативна плочка в термометъра
+# (не влиза в броенето). FRED дава ICE сериите само за последните ~3 години (лицензът на ICE) — перцентилът е спрямо тях. Изречението спрямо IEI/HYG е от кода:
+# HY се „разширява“ при промяна за CREDIT_OAS_CHG_SESSIONS наблюдения ≥ CREDIT_OAS_WIDENING_BP (нашият праг, не от проучване). Застояли (> FRED_DAILY_MAX_LAG_SESSIONS) → скрита с причина.
+ENABLE_CREDIT_OAS = os.getenv("ENABLE_CREDIT_OAS", "1") == "1"
+CREDIT_OAS_SERIES = {"hy": "BAMLH0A0HYM2", "ig": "BAMLC0A0CM"}
+CREDIT_OAS_HISTORY_DAYS = int(os.getenv("CREDIT_OAS_HISTORY_DAYS", 3 * 365 + 30))
+CREDIT_OAS_CHG_SESSIONS = int(os.getenv("CREDIT_OAS_CHG_SESSIONS", 20))
+CREDIT_OAS_WIDENING_BP = float(os.getenv("CREDIT_OAS_WIDENING_BP", 25))
+CREDIT_OAS_PCT_YELLOW = float(os.getenv("CREDIT_OAS_PCT_YELLOW", 80))
 EQUAL_WEIGHT_SESSIONS = (5, 10)
 PCE_CORE_SERIES = "PCEPILFE"
 
