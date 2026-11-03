@@ -326,17 +326,27 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
     return res
 
 
-def main() -> int:
+def skip_reason(now_utc) -> str | None:
+    """
+    03.11.2026 (прегледа на т. 10, 4): прозорецът е СЪЩИЯТ като на записа на опциите — options_record.skip_reason (ден със сесия, 09:00–09:30 Ню Йорк), без проверката „сесията
+    вече е записана“ (тя е за историята на опциите). Графикът в cron-job.org е по Берлин („5 14,15 * * 1-5“) — от двете пускания на ден точно едното е в 09:05 Ню Йорк, и в
+    седмиците с разминаване на смяната на часа (САЩ / Европа); другото (08:05 или 10:05 Ню Йорк) прескача — второ обновяване няма. Чиста функция.
+    """
+    from src import options_record
+    return options_record.skip_reason(now_utc, None)
+
+
+def main(now_utc=None) -> int:
     """
     Входната точка (options_record.yml, отделна стъпка): прозорецът (09:00–09:30 Ню Йорк, ден със сесия — както записа на опциите) → run → data/preopen/<дата>.json →
     docs/index.html наново (сутрешният бриф + карето) → имейл, ако има нещо и още не е пратен днес. Изход 1 само при провал на тегленето.
     """
-    from src import options_record, screener, backtest, watch_monitor, render, emailer
-    now = dt.datetime.now(dt.timezone.utc)
-    why = options_record.skip_reason(now, None)
+    now = now_utc or dt.datetime.now(dt.timezone.utc)
+    why = skip_reason(now)
     if why:
         print(f"::notice::[preopen] {why}")
         return 0
+    from src import screener, backtest, watch_monitor, render, emailer
     day = _ny(now).date().isoformat()
     path = config.DATA_DIR / "preopen" / f"{day}.json"
     prev = {}

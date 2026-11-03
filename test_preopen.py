@@ -153,8 +153,34 @@ print("  ✓ без обем при всички — „Обемът в прем
 
 print()
 print("── 6. прозорецът и задачата ──")
-assert options_record.skip_reason(NOW, None) is None                                                                                # 09:05 EST, вторник → върви
+assert preopen.skip_reason(NOW) is None and options_record.skip_reason(NOW, None) is None                                                                                # 09:05 EST, вторник → върви
 assert "след отварянето" in options_record.skip_reason(NOW + dt.timedelta(hours=1)) and "не е сесия" in options_record.skip_reason(dt.datetime(2026, 11, 7, 14, 5, tzinfo=dt.timezone.utc))
+from zoneinfo import ZoneInfo
+from src import sessions
+d, odd, closed_ran = dt.date(2026, 10, 1), [], []
+while d <= dt.date(2027, 12, 31):                                                   # и двете смени на часа (САЩ и Европа), с разминаванията им
+    if d.weekday() < 5:                                                              # графикът в cron-job.org: „5 14,15 * * 1-5“ по Берлин
+        runs = [pd.Timestamp(dt.datetime(d.year, d.month, d.day, h, 5, tzinfo=ZoneInfo("Europe/Berlin"))).tz_convert("UTC") for h in (14, 15)]
+        ok = [r for r in runs if preopen.skip_reason(r) is None]
+        if not sessions.is_session(d):
+            closed_ran += [d] if ok else []
+        elif len(ok) != 1 or ok[0].tz_convert("America/New_York").strftime("%H:%M") != "09:05":
+            odd.append((d, [r.tz_convert("America/New_York").strftime("%H:%M") for r in runs]))
+    d += dt.timedelta(days=1)
+assert odd == [] and closed_ran == [], (odd[:5], closed_ran[:5])
+mism = lambda day: [pd.Timestamp(dt.datetime.fromisoformat(day + f" {h}:05").replace(tzinfo=ZoneInfo("Europe/Berlin"))).tz_convert("America/New_York").strftime("%H:%M")
+                    for h in (14, 15) if preopen.skip_reason(pd.Timestamp(dt.datetime.fromisoformat(day + f" {h}:05").replace(tzinfo=ZoneInfo("Europe/Berlin")))) is None]
+assert mism("2026-10-27") == ["09:05"] and mism("2026-11-04") == ["09:05"] and mism("2027-03-16") == ["09:05"] and mism("2027-03-30") == ["09:05"]
+assert "преди прозореца" in preopen.skip_reason(pd.Timestamp("2026-11-04 13:05", tz="UTC"))                                    # 14:05 Берлин = 08:05 EST — без второ обновяване
+assert "след отварянето" in preopen.skip_reason(pd.Timestamp("2026-10-27 14:05", tz="UTC"))                                   # 15:05 Берлин = 10:05 EDT (разминаването)
+import src.screener as _scr
+_bu, _scr.build_universe = _scr.build_universe, lambda *a, **k: (_ for _ in ()).throw(AssertionError("извън прозореца не се тегли нищо"))
+try:
+    with q():
+        assert preopen.main(pd.Timestamp("2026-11-04 13:05", tz="UTC").to_pydatetime()) == 0                                # 08:05 Ню Йорк → изход 0, нищо не пипа
+finally:
+    _scr.build_universe = _bu
+assert not (config.DATA_DIR / "preopen").exists()
 yml = (ROOT / ".github" / "workflows" / "options_record.yml").read_text(encoding="utf-8")
 steps = yml.split("- name: ")
 rec, pre, com = (next(s for s in steps if s.startswith(n)) for n in ("Record option chains", "Pre-open update", "Commit record"))
@@ -163,5 +189,7 @@ assert "if: always()" in pre and "python src/preopen.py" in pre and "EDGAR_UA: $
 assert "if: always()" in com and "git add data/preopen docs/index.html" in com and "git add data/options_daily.json" in com
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
 assert "anthropic" not in src.lower() and "_call_claude" not in src                                                            # без AI
-print("  ✓ 09:05 Ню Йорк във вторник — върви; 10:05 / събота — пропуска; отделна стъпка с if: always() (и commit-ът), без AI")
+print("  ✓ прозорецът — същият като на записа на опциите: до края на 2027 всяка сесия — точно едно обновяване, в 09:05 Ню Йорк (и в седмиците с разминаване на смяната на часа:"
+      " 27.10.2026 и 16.03.2027 — 14:05 Берлин; 04.11.2026 и 30.03.2027 — 15:05); 08:05 / 10:05 Ню Йорк и дните без сесия — пропуска, без теглене;"
+      " отделна стъпка с if: always() (и commit-ът), без AI")
 print("\n✅ test_preopen: всичко мина")
