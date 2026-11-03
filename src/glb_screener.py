@@ -218,7 +218,8 @@ def wish_signal(hist, today: str | None = None, kind: str = "close") -> dict | N
         return {"signal_date": close.index[-1].date().isoformat(), "close": round(float(last["close"]), 4), "line": round(float(last["line"]), 4),
                 "prior_high_month": str(last["prior_high_month"]), "months_unpenetrated": int(last["months_unpen"]),
                 "glb_type": "insufficient_history" if ov is None else ("classic" if ov["meets_tightness"] else "momentum"),
-                "band_hold_pct": None if ov is None else ov["band_hold_pct"], "line_kind": kind}
+                "band_hold_pct": None if ov is None else ov["band_hold_pct"], "line_kind": kind,
+                "breakout_volume_ratio": breakout_volume_ratio(h) if "Volume" in h else None}     # 03.11.2026 (разходката, т. 15, 5): в записа на книгата — както на картата
     except Exception as e:
         print(f"[glb_screener] wish_signal: {type(e).__name__}: {e}")
         return None

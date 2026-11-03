@@ -503,6 +503,8 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
                "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),
                "months_unpenetrated": c.get("months_unpenetrated"), "band_hold_pct": c.get("band_hold_pct"), "resolution_date": None, "discovered_date": None,
                "spy_return_pct": None, "spy_return_pct_exec": None, "alpha_pct": None, "alpha_pct_exec": None}
+        if c.get("breakout_volume_ratio") is not None:                            # 03.11.2026 (т. 15, 5): обемът на пробива; без него (стар snapshot) — попълва се от резолюцията
+            rec["breakout_volume_ratio"] = c["breakout_volume_ratio"]
         rec.update({k: None for k in _GW_RESULT_KEYS if k != "status"})
         tracker[key] = rec
 
@@ -714,6 +716,33 @@ def entry_volume(fill_date: str | None, bars: "pd.DataFrame | None") -> dict:
         return {"entry_volume_ratio": ratio, "entry_volume_ok": ratio >= config.BREAKOUT_VOLUME_MULT}
     except Exception:
         return out
+
+
+def gw_breakout_volume(signal_date: str | None, volume) -> float | None:
+    """
+    03.11.2026 (разходката, т. 15, 5): обемът на пробива за запис от книгите тип Уиш — обемът на сигналния ден ÷ средния на предишните config.GLB_VOLUME_AVG_BARS бара
+    (glb_screener.breakout_volume_ratio — същото като на картата). volume — дневният обем (Series). Без сигналния ден в серията / кратка история → None. Чиста функция.
+    """
+    try:
+        if not signal_date or volume is None:
+            return None
+        v = volume.dropna()
+        idx = pd.DatetimeIndex(v.index)
+        v.index = idx.tz_localize(None) if idx.tz is not None else idx
+        upto = v[v.index <= pd.Timestamp(signal_date)]
+        if not len(upto) or upto.index[-1] != pd.Timestamp(signal_date):
+            return None
+        from src import glb_screener
+        return glb_screener.breakout_volume_ratio(pd.DataFrame({"Volume": upto}))
+    except Exception:
+        return None
+
+
+def _gw_needs_backfill(rec: dict) -> bool:
+    """03.11.2026 (т. 15, 5–6): запис от книгите тип Уиш без обема на пробива или с минал срок без exec доходността (записите отпреди 03.11) — попълва се веднъж от тегленето на резолюцията."""
+    if rec.get("category") not in GW_CATEGORIES or not rec.get("signal_date"):
+        return False
+    return "breakout_volume_ratio" not in rec or any("ret_exec" not in (x or {}) for x in (rec.get("horizons") or {}).values())
 
 
 def label_of(rec: dict) -> str | None:
@@ -1164,8 +1193,11 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
     qm_backfill = [(k, r) for k, r in tracker.items() if record_category(r) == CATEGORY_QM and r.get("fill_date") and (k, r) not in live_items
                    and not isinstance(r.get("intraday"), dict) and r.get("intraday_status") != "expired" and not r.get("needs_manual_review")
                    and config.QM_INTRADAY_MAX_DAYS > 0]
-    tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill} | {r["ticker"] for _, r in qm_backfill})
-    earliest = (dt.date.fromisoformat(min([rec["entry_date"] for _, rec in live_items] + [r["fill_date"] for _, r in vol_backfill] + [r["entry_date"] for _, r in qm_backfill]))
+    # 03.11.2026 (разходката, т. 15, 5–6): книгите тип Уиш — обемът на пробива и exec доходността на срок в записите отпреди 03.11 (веднъж, от същото теглене)
+    gw_backfill = [(k, r) for k, r in tracker.items() if _gw_needs_backfill(r)]
+    tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill} | {r["ticker"] for _, r in qm_backfill} | {r["ticker"] for _, r in gw_backfill})
+    earliest = (dt.date.fromisoformat(min([rec["entry_date"] for _, rec in live_items] + [r["fill_date"] for _, r in vol_backfill] + [r["entry_date"] for _, r in qm_backfill]
+                                          + [r["signal_date"] for _, r in gw_backfill]))
                 - dt.timedelta(days=max(30, ENTRY_VOLUME_LOOKBACK_DAYS))).isoformat()
     # т.8: SPY за сравнението със v2 позициите — във ВСЕКИ случай в същия batch (нула втори fetch)
     dl = tickers + (["SPY"] if "SPY" not in tickers and any(r.get("method") == "v2" for _, r in live_items) else [])
@@ -1264,6 +1296,17 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         t = rec["ticker"]
         if volumes is not None and t in getattr(volumes, "columns", []):
             rec.update(entry_volume(rec["fill_date"], pd.DataFrame({"Volume": volumes[t]})))
+    # 03.11.2026 (разходката, т. 15, 5–6): книгите тип Уиш — обемът на пробива (None, ако Yahoo няма обем за деня) и exec доходността на срок
+    for _, rec in gw_backfill:
+        t = rec["ticker"]
+        if volumes is not None and t in getattr(volumes, "columns", []) and "breakout_volume_ratio" not in rec:
+            rec["breakout_volume_ratio"] = gw_breakout_volume(rec["signal_date"], volumes[t])
+        if rec.get("horizons") and opens is not None and t in getattr(opens, "columns", []) and t in getattr(closes, "columns", []) and not rec.get("needs_manual_review"):
+            try:
+                hz = trade_sim.gw_horizons(pd.DataFrame({"Open": opens[t], "Close": closes[t]}).dropna(), spy_bars, rec.get("fill_date"), today=today)
+                rec["horizons"] = {**rec["horizons"], **{h: x for h, x in hz.items() if h in rec["horizons"]}}
+            except Exception as e:
+                print(f"[backtest] {t}: exec доходността на срок — неуспешно: {type(e).__name__}: {e}")
     # 03.11.2026 (т. 11): затворените записи на qm_breakout — 5-минутните бари на входния ден и R наново (симулацията е чиста функция на записа и баровете)
     for _, rec in qm_backfill:
         before = (rec.get("status"), rec.get("realized_r"), rec.get("realized_r_pess"))
@@ -1794,7 +1837,10 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
             xs = [x for x in xs if x and x.get("ret") is not None]
             sp = [x["spy"] for x in xs if x.get("spy") is not None]
             al = [x["alpha"] for x in xs if x.get("alpha") is not None]
-            out[str(h)] = {"n": len(xs), "avg_ret": avg([x["ret"] for x in xs]), "avg_spy": avg(sp), "avg_alpha": avg(al)}
+            xe = [x for x in xs if x.get("ret_exec") is not None]                  # 03.11.2026 (т. 15, 6): exec — от отварянето на следващата сесия (трябва ret_exec в записа)
+            out[str(h)] = {"n": len(xs), "avg_ret": avg([x["ret"] for x in xs]), "avg_spy": avg(sp), "avg_alpha": avg(al),
+                           "n_exec": len(xe), "avg_ret_exec": avg([x["ret_exec"] for x in xe]), "avg_spy_exec": avg([x["spy_exec"] for x in xe if x.get("spy_exec") is not None]),
+                           "avg_alpha_exec": avg([x["alpha_exec"] for x in xe if x.get("alpha_exec") is not None])}
         return out
 
     hz = horizons(valid)
@@ -1815,6 +1861,8 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
             g["n"] = len(x)
             g["avg_ret"] = avg([v["ret"] for v in x]) if visible_h else None
             g["avg_alpha"] = avg([v["alpha"] for v in x if v.get("alpha") is not None]) if visible_h else None
+            g["avg_ret_exec"] = avg([v["ret_exec"] for v in x if v.get("ret_exec") is not None]) if visible_h else None        # 03.11.2026 (т. 15, 6)
+            g["avg_alpha_exec"] = avg([v["alpha_exec"] for v in x if v.get("alpha_exec") is not None]) if visible_h else None
         return out
 
     def _row(r: dict) -> dict:
@@ -1822,10 +1870,15 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
                 "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
                 "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note"),
-                "deal": r.get("deal")}                                                                       # 26.10.2026: цел на придобиване
+                "deal": r.get("deal"),                                                                       # 26.10.2026: цел на придобиване
+                # 03.11.2026 (разходката, т. 15): компактната таблица — обемът на пробива, вход по отварянето и доходността exec (реалистичната); literal остава в данните
+                "breakout_volume_ratio": r.get("breakout_volume_ratio"), "months_unpenetrated": r.get("months_unpenetrated"),
+                "fill_exec_date": r.get("fill_exec_date"), "fill_exec_price": r.get("fill_exec_price"), "return_pct": r.get("return_pct"), "return_pct_exec": r.get("return_pct_exec"),
+                "resolution_date": r.get("resolution_date"), "exec_note": gw_exec_note(r, today_iso) if r.get("status") in trade_sim.GW_TERMINAL else None,
+                "needs_review": bool(r.get("needs_manual_review"))}
+    today_iso = dt.date.today().isoformat()
     live_all = sorted((r for r in records if r.get("status") in ("open", "pending")), key=lambda r: (r["entry_date"], r["ticker"]), reverse=True)
     live = [_row(r) for r in live_all[:15]]
-    today_iso = dt.date.today().isoformat()
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "return_pct": r.get("return_pct"), "return_pct_exec": r.get("return_pct_exec"),
                       "alpha_pct": r.get("alpha_pct"), "exec_note": gw_exec_note(r, today_iso)}
                      for r in with_result if r["status"] in trade_sim.GW_TERMINAL), key=lambda x: (x["resolution_date"] or "", x["ticker"]), reverse=True)[:10]
@@ -1843,6 +1896,11 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
         "live": live, "live_total": len(live_all), "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
+        # 03.11.2026 (разходката, т. 13–15): всички записи — една компактна таблица (живите първи, после затворените по дата на изхода); отворените и чакащите — по тип,
+        # под своя списък карти (Classic / Momentum)
+        "rows": [_row(r) for r in live_all] + [_row(r) for r in sorted((r for r in records if r.get("status") not in ("open", "pending")),
+                                                                       key=lambda r: (r.get("resolution_date") or "", r["ticker"]), reverse=True)],
+        "open_by_type": {t: [_row(r) for r in live_all if (r.get("glb_type") or "н/д") == t] for t in sorted({(r.get("glb_type") or "н/д") for r in live_all})},
     }
 
 

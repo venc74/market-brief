@@ -96,6 +96,9 @@ s = g.wish_signal(cut, "2024-05-29")
 assert s and s["signal_date"] == "2024-05-28" and s["glb_type"] in ("classic", "momentum", "insufficient_history") and s["close"] > s["line"] > 0 and s["months_unpenetrated"] >= 3
 assert abs(s["close"] - float(cut["Close"].iloc[-1])) < 1e-3 and abs(s["line"] - indep("AA")[list(h_aa.index).index(pd.Timestamp("2024-05-28"))][1]) < 1e-3
 print(f"  ✓ РЕАЛЕН AA на 28.05.2024: пробив над ${s['line']:.2f} (месец {s['prior_high_month']}, {s['months_unpenetrated']} месеца непробит), close ${s['close']:.2f}, наш етикет «{s['glb_type']}» (само етикет, не филтър)")
+assert s["breakout_volume_ratio"] is None                        # 03.11.2026 (т. 15, 5): без колона Volume във fixture-а — None, не грешка
+sv = g.wish_signal(cut.assign(Volume=[1000.0] * (len(cut) - 1) + [2500.0]), "2024-05-29")        # СИНТЕТИЧНО: обемът (реалните цени на AA)
+assert sv["breakout_volume_ratio"] == 2.5 and {k: v for k, v in sv.items() if k != "breakout_volume_ratio"} == {k: v for k, v in s.items() if k != "breakout_volume_ratio"}
 assert g.wish_signal(cut, "2024-05-28") is None                  # частичният бар на днешната сесия не е затваряне: отрязва се, а предишният не е бил пробив
 nxt = g.wish_signal(h_aa.loc[:"2024-05-29"], "2024-05-30")
 assert nxt is None

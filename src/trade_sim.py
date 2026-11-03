@@ -465,6 +465,8 @@ def gw_horizons(bars: pd.DataFrame, spy: pd.DataFrame | None, fill_date: str | N
     """
     26.10.2026 (етап 4б, т. 3): доходността ФИКСИРАН брой сесии след входа на книгите тип Уиш — от затварянето на сигналния ден (literal входът) до затварянето h сесии по-късно,
     НЕЗАВИСИМО от изхода по линията — и SPY за същите дати: {"5": {"date", "ret", "spy", "alpha"}, …} само за сроковете, които вече са минали (цели барове). Чиста функция.
+    03.11.2026 (разходката, т. 15, 6): и exec — от отварянето на следващата сесия (първото изпълнимо, както return_pct_exec) до същото затваряне: "ret_exec", "spy_exec" (SPY от
+    отварянето на същия ден), "alpha_exec"; без Open колона → None.
     """
     out: dict = {}
     if not fill_date or bars is None or len(bars) == 0:
@@ -475,14 +477,18 @@ def gw_horizons(bars: pd.DataFrame, spy: pd.DataFrame | None, fill_date: str | N
     idx = pd.DatetimeIndex(bars.index)
     idx = idx.tz_localize(None) if idx.tz is not None else idx
     c = bars["Close"].to_numpy(dtype=float)
+    o = bars["Open"].to_numpy(dtype=float) if "Open" in bars else None
     s = int(idx.searchsorted(pd.Timestamp(fill_date), side="left"))
     if s >= len(idx) or idx[s] != pd.Timestamp(fill_date):
         return out
-    sp = None
+    sp = spo = None
     if spy is not None and len(spy):
         sp = spy["Close"].copy()
         si = pd.DatetimeIndex(sp.index)
         sp.index = si.tz_localize(None) if si.tz is not None else si
+        if "Open" in spy:
+            spo = spy["Open"].copy()
+            spo.index = sp.index
     for h in (horizons or config.GLB_WISH_HORIZONS):
         j = s + int(h)
         if j >= len(idx):
@@ -494,7 +500,15 @@ def gw_horizons(bars: pd.DataFrame, spy: pd.DataFrame | None, fill_date: str | N
                 spy_r = round((float(sp.loc[idx[j]]) / float(sp.loc[idx[s]]) - 1) * 100, 2)
         except (KeyError, ValueError, TypeError):
             spy_r = None
-        out[str(int(h))] = {"date": idx[j].date().isoformat(), "ret": ret, "spy": spy_r, "alpha": round(ret - spy_r, 2) if spy_r is not None else None}
+        ret_x = round((c[j] / o[s + 1] - 1) * 100, 2) if o is not None and s + 1 <= j and o[s + 1] > 0 else None
+        spy_x = None
+        try:
+            if spo is not None and ret_x is not None:
+                spy_x = round((float(sp.loc[idx[j]]) / float(spo.loc[idx[s + 1]]) - 1) * 100, 2)
+        except (KeyError, ValueError, TypeError):
+            spy_x = None
+        out[str(int(h))] = {"date": idx[j].date().isoformat(), "ret": ret, "spy": spy_r, "alpha": round(ret - spy_r, 2) if spy_r is not None else None,
+                            "ret_exec": ret_x, "spy_exec": spy_x, "alpha_exec": round(ret_x - spy_x, 2) if ret_x is not None and spy_x is not None else None}
     return out
 
 
