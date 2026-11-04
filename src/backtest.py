@@ -466,6 +466,27 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         tracker[key] = rec
 
 
+# 04.11.2026 (прегледът): записите със задна дата в qm_breakout остават, с етикет. Роденият преди самия етикет (04.11, SN от картата на 12.10) — тук; следващите получават полето при записа.
+QM_BACKDATED_KNOWN = {"SN_2026-10-12_qm": "2026-11-04"}
+
+
+def _stamp_backdated(tracker: dict, keys_before: set, today_date: str | None) -> None:
+    """
+    04.11.2026 (прегледът): нов запис в qm_breakout от стар snapshot (entry_date < днес), защото 5-минутните бари скъсиха предишния запис на тикъра (r_basis "5m", изход преди тази дата) —
+    rec["backdated"] = {"created": днес}; страницата показва „записан със задна дата (след поправка ДД.ММ)“. Записът остава и влиза в статистиката. Без тази причина (пропуснат run) — без етикет.
+    """
+    if not today_date:
+        return
+    for k in set(tracker) - keys_before:
+        rec = tracker[k]
+        if not isinstance(rec, dict) or rec.get("category") != CATEGORY_QM or str(rec.get("entry_date"))[:10] >= str(today_date)[:10]:
+            continue
+        if any(isinstance(r, dict) and r.get("category") == CATEGORY_QM and r.get("ticker") == rec.get("ticker") and r.get("r_basis") == "5m"
+               and r.get("exit_date") and r["exit_date"] < rec["entry_date"] for r in tracker.values()):
+            rec["backdated"] = {"created": str(today_date)[:10]}
+            print(f"[backtest] qm_breakout {rec.get('ticker')} {rec.get('entry_date')}: записан със задна дата — 5-минутните бари скъсиха предишния запис на тикъра")
+
+
 _GW_RESULT_KEYS = tuple(k for k in trade_sim._blank_gw() if k != "resolution_date")      # полетата, които резолюцията презаписва на всеки run (resolution_date се слага отделно)
 
 
@@ -560,6 +581,7 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish") or [], (snap.get("thermometer") or {}).get("regime"))   # GLB по Уиш: само snapshot-и с glb_wish (нов код)
         _ingest_glb_wish_list(tracker, entry_date, snap.get("glb_wish_high") or [], (snap.get("thermometer") or {}).get("regime"), CATEGORY_GLB_WISH_HIGH)   # 21.10: книгата по неговата линия
         _stamp_entry_context(tracker, keys_before, (snap.get("thermometer") or {}).get("regime"), entry_hy_oas(snap.get("thermometer")))
+        _stamp_backdated(tracker, keys_before, today_date)                 # 04.11.2026 (прегледът): запис със задна дата след поправка с 5-минутни бари
 
     # FIX 2026-08-01 (ден+1 overlap бъг — FITB/JPM/HWM): main.py вика
     # apply_hard_rules() (→ _live_positions() → чете tracker-а) ПРЕДИ
@@ -582,6 +604,9 @@ def _ingest_new_positions(tracker: dict, today_action: list[dict] | None = None,
     if today_glb_wish_high and today_date:
         _ingest_glb_wish_list(tracker, today_date, today_glb_wish_high, today_regime, CATEGORY_GLB_WISH_HIGH)
     _stamp_entry_context(tracker, keys_before, today_regime, ctx.get("hy_oas"))       # 03.11.2026 (т. 5): режимът (и за Action) и HY OAS в деня на входа
+    for k, day in QM_BACKDATED_KNOWN.items():                     # 04.11.2026 (прегледът): роденият преди самия етикет
+        if isinstance(tracker.get(k), dict) and "backdated" not in tracker[k]:
+            tracker[k]["backdated"] = {"created": day}
     for rec in tracker.values():                                  # 03.11.2026 (т. 5): записите отпреди без режим — от брифа на деня на записа (идемпотентно)
         if isinstance(rec, dict) and rec.get("method") == "v2" and rec.get("regime") is None and day_regime.get(str(rec.get("entry_date"))[:10]):
             rec["regime"], rec["regime_source"] = day_regime[str(rec["entry_date"])[:10]], "брифът на деня (попълнено 03.11.2026)"
@@ -1759,6 +1784,7 @@ def get_qm_summary() -> dict:
                 "deal": r.get("deal"),                                                                       # 26.10: цел на придобиване
                 "r_basis": r.get("r_basis"), "entry_time": (r.get("intraday") or {}).get("entry_time") if isinstance(r.get("intraday"), dict) else None,   # 03.11.2026 (т. 11)
                 "stopped_intraday": r.get("how") == "stop_intraday", "intraday_status": r.get("intraday_status"),
+                "backdated": r.get("backdated"),                                                             # 04.11.2026 (прегледът): записан със задна дата
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
