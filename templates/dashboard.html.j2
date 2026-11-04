@@ -406,6 +406,9 @@
   #history-frame { width: 100%; border: 1px solid var(--line); border-radius: 8px;
     margin-top: 16px; height: 0; transition: height .2s; background: var(--ink); }
   #history-msg { font-size: 13px; color: var(--yellow); margin-top: 10px; }
+  .hist-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 13px; }
+  .hist-nav button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+  .hist-nav button:hover:not(:disabled) { border-color: var(--regime); } .hist-nav button:disabled { opacity: .4; cursor: default; }
 
   footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px;
     font-size: 12px; color: var(--muted); }
@@ -1908,6 +1911,12 @@
     <span class="hint" id="hist-avail">зареждам наличните дати…</span>
   </div>
   <div id="history-msg" hidden></div>
+  {# 03.11.2026 (разходката, т. 20): между брифовете с бутони — само наличните дни (без уикенди и празници); в краищата на архива бутонът е изключен #}
+  <div id="hist-nav" class="hist-nav" hidden>
+    <button id="hist-prev" type="button">← предишен ден</button>
+    <span id="hist-cur" class="mono"></span>
+    <button id="hist-next" type="button">следващ →</button>
+  </div>
   <iframe id="history-frame" title="Исторически бриф" hidden></iframe>
 </section>
 
@@ -1933,6 +1942,10 @@
   var avail = document.getElementById("hist-avail");
   var frame = document.getElementById("history-frame");
   var msg = document.getElementById("history-msg");
+  var nav = document.getElementById("hist-nav");
+  var prev = document.getElementById("hist-prev");
+  var next = document.getElementById("hist-next");
+  var cur = document.getElementById("hist-cur");
   if (!input || !btn) return;
 
   var dates = [];
@@ -1953,7 +1966,7 @@
 
   function open() {
     var d = input.value;
-    msg.hidden = true; frame.hidden = true; frame.style.height = "0";
+    msg.hidden = true; frame.hidden = true; frame.style.height = "0"; nav.hidden = true;
     if (!d) return;
     if (dates.length && dates.indexOf(d) === -1) {
       msg.hidden = false;
@@ -1963,8 +1976,23 @@
     frame.src = "archive/" + d + ".html";
     frame.hidden = false;
     frame.style.height = "1400px";
+    var i = dates.indexOf(d);
+    if (i !== -1) {
+      nav.hidden = false;
+      cur.textContent = d.slice(8, 10) + "." + d.slice(5, 7) + "." + d.slice(0, 4);
+      prev.disabled = i <= 0;
+      next.disabled = i >= dates.length - 1;
+    }
+  }
+  function step(delta) {
+    var j = dates.indexOf(input.value) + delta;
+    if (j < 0 || j >= dates.length) return;
+    input.value = dates[j];
+    open();
   }
   btn.addEventListener("click", open);
+  prev.addEventListener("click", function () { step(-1); });
+  next.addEventListener("click", function () { step(1); });
 })();
 
 (function () {
