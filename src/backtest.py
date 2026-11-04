@@ -988,6 +988,18 @@ def fetch_5m(ticker: str, day: str) -> pd.DataFrame | None:
 
 
 _FETCH_5M = fetch_5m                     # подменя се в тестовете
+QM_INTRADAY_NO_LEVEL = "5-минутните бари не стигат нивото"
+
+
+def qm_intraday_retry(rec: dict) -> bool:
+    """
+    04.11.2026 (четвърти преглед, Н3): нов опит за 5-минутните бари на входния ден? Не — когато барите са изтеглени, но не стигат нивото (дневният High е от принт извън тях —
+    окончателно), или след config.QM_INTRADAY_MAX_TRIES неуспешни опита (празно / провал на тегленето). До 04.11 такъв затворен запис се теглеше и пресимулираше наново всеки ден
+    до 55 дни — затворен резултат можеше да се смени тихо при корекция на дневните бари. Чиста функция.
+    """
+    if rec.get("intraday_status") == QM_INTRADAY_NO_LEVEL:
+        return False
+    return int(rec.get("intraday_tries") or 0) < config.QM_INTRADAY_MAX_TRIES
 
 
 def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
@@ -1001,15 +1013,19 @@ def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
     if (today - dt.date.fromisoformat(fill_date)).days > config.QM_INTRADAY_MAX_DAYS:
         rec["intraday_status"] = "expired"
         return False
+    if not qm_intraday_retry(rec):                                                 # 04.11.2026 (четвърти преглед, Н3): без ежедневно теглене при окончателен неуспех
+        return False
     try:
         bars5 = _FETCH_5M(rec["ticker"], fill_date)
     except Exception as e:
         rec["intraday_status"] = f"тегленето не успя ({type(e).__name__})"
+        rec["intraday_tries"] = int(rec.get("intraday_tries") or 0) + 1
         print(f"[backtest] {rec['ticker']}: 5-минутните бари за {fill_date} не се изтеглиха ({type(e).__name__}: {e}) — R остава с двете граници")
         return False
     got = trade_sim.qm_intraday_entry(bars5, float(rec["buy_stop"]))
     if not got:
-        rec["intraday_status"] = "няма 5-минутни бари" if bars5 is None else "5-минутните бари не стигат нивото"
+        rec["intraday_status"] = "няма 5-минутни бари" if bars5 is None else QM_INTRADAY_NO_LEVEL
+        rec["intraday_tries"] = int(rec.get("intraday_tries") or 0) + 1
         print(f"[backtest] {rec['ticker']}: {rec['intraday_status']} за {fill_date} — R остава с двете граници")
         return False
     rec["intraday"] = {**got, "date": fill_date, "source": "yfinance 5m", "fetched": today.isoformat()}
@@ -1192,7 +1208,7 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
     # 03.11.2026 (т. 11): затворените записи на qm_breakout без 5-минутни бари, докато са в прозореца на yfinance — веднъж, с наново изчислен R
     qm_backfill = [(k, r) for k, r in tracker.items() if record_category(r) == CATEGORY_QM and r.get("fill_date") and (k, r) not in live_items
                    and not isinstance(r.get("intraday"), dict) and r.get("intraday_status") != "expired" and not r.get("needs_manual_review")
-                   and config.QM_INTRADAY_MAX_DAYS > 0]
+                   and config.QM_INTRADAY_MAX_DAYS > 0 and qm_intraday_retry(r)]                  # 04.11.2026 (Н3): окончателен неуспех → затвореният запис не се пресимулира
     # 03.11.2026 (разходката, т. 15, 5–6): книгите тип Уиш — обемът на пробива и exec доходността на срок в записите отпреди 03.11 (веднъж, от същото теглене)
     gw_backfill = [(k, r) for k, r in tracker.items() if _gw_needs_backfill(r)]
     tickers = sorted(set(tickers) | {r["ticker"] for _, r in vol_backfill} | {r["ticker"] for _, r in qm_backfill} | {r["ticker"] for _, r in gw_backfill})

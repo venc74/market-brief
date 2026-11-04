@@ -104,6 +104,22 @@ with q():
     backtest._qm_intraday(high, high["fill_date"], TODAY)
 assert high["intraday_status"] == "5-минутните бари не стигат нивото"
 print("  ✓ UTHR — веднъж, пази се в записа (второ извикване не тегли); вход отпреди 63 дни → „expired“ без теглене; провал / нивото не е в барите → етикет с причината")
+# 04.11.2026 (четвърти преглед, Н3): „не стигат нивото“ — окончателно, без нов опит; провал на тегленето — до config.QM_INTRADAY_MAX_TRIES опита
+n0 = []
+backtest._FETCH_5M = lambda t, d: (n0.append(t), b5(f"{t}_{d}"))[1]
+with q():
+    assert backtest._qm_intraday(high, high["fill_date"], TODAY) is False
+assert n0 == [] and not backtest.qm_intraday_retry(high)
+backtest._FETCH_5M = boom
+with q():
+    backtest._qm_intraday(fail, fail["fill_date"], TODAY)                       # втори неуспешен опит
+assert fail["intraday_tries"] == 2 and not backtest.qm_intraday_retry(fail)
+backtest._FETCH_5M = lambda t, d: (n0.append(t), b5(f"{t}_{d}"))[1]
+with q():
+    assert backtest._qm_intraday(fail, fail["fill_date"], TODAY) is False      # трети — без теглене
+assert n0 == []
+backtest._FETCH_5M = lambda t, d: b5(f"{t}_{d}")
+print("  ✓ Н3: „не стигат нивото“ — без нов опит; провал на тегленето — 2 опита, после без теглене")
 
 print()
 print("── 4. назад: затворените записи (SN, ELF, CBOE, RVTY) и живите (DOCU, UTHR) получават 5-минутните в един run на _resolve_open_positions ──")
