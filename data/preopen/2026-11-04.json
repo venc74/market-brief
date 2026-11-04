@@ -1,0 +1,175 @@
+{
+ "date": "2026-11-04",
+ "time_ny": "09:08",
+ "time_berlin": "15:08",
+ "ok": true,
+ "diag": {
+  "tickers": 925,
+  "with_pm": 767,
+  "gappers": 4,
+  "zero_volume_share": 1.0,
+  "requested": 926
+ },
+ "gaps": [
+  {
+   "ticker": "DUOL",
+   "session": "2026-11-03",
+   "prev_close": 128.0,
+   "pm_price": 155.59,
+   "pm_bars": 36,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 21.55,
+   "ret63_pct": -5.409405060613426,
+   "neglect": true,
+   "liquid": true,
+   "adr": 4.905647500430765,
+   "company": "DUOL",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-03 16:06",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 03.11 16:06 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "headline": {
+    "title": "Why Is DUOL Stock Surging Over 11% Overnight Today?",
+    "source": null,
+    "published": "2026-11-04 08:01",
+    "link": null
+   }
+  },
+  {
+   "ticker": "BRKR",
+   "session": "2026-11-03",
+   "prev_close": 56.5,
+   "pm_price": 64.49,
+   "pm_bars": 16,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 14.14,
+   "ret63_pct": 7.680576873527412,
+   "neglect": true,
+   "liquid": true,
+   "adr": 5.030477739331873,
+   "company": "BRKR",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-04 07:00",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 04.11 07:00 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "headline": {
+    "title": "Bruker (BRKR) Q3 Earnings and Revenues Surpass Estimates",
+    "source": null,
+    "published": "2026-11-04 12:55",
+    "link": null
+   }
+  },
+  {
+   "ticker": "KD",
+   "session": "2026-11-03",
+   "prev_close": 12.9399995803833,
+   "pm_price": 14.6141,
+   "pm_bars": 17,
+   "pm_volume": null,
+   "pm_last_ny": "09:00",
+   "gap_pct": 12.94,
+   "ret63_pct": -6.906475284122915,
+   "neglect": true,
+   "liquid": true,
+   "adr": 4.83595509370871,
+   "company": "KD",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-04 07:16",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 04.11 07:16 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "headline": {
+    "title": "Kyndryl (NYSE:KD) reports Q3 CY2026 in line with expectations, stock jumps 11.2%",
+    "source": null,
+    "published": "2026-11-04 13:07",
+    "link": null
+   }
+  },
+  {
+   "ticker": "LIVN",
+   "session": "2026-11-03",
+   "prev_close": 79.9000015258789,
+   "pm_price": 90.0,
+   "pm_bars": 9,
+   "pm_volume": null,
+   "pm_last_ny": "09:07",
+   "gap_pct": 12.64,
+   "ret63_pct": 2.245831413658661,
+   "neglect": true,
+   "liquid": true,
+   "adr": 2.8165591009438717,
+   "company": "LIVN",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-04 06:01",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 04.11 06:01 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "headline": {
+    "title": "LivaNova (LIVN) Surpasses Q3 Earnings and Revenue Estimates",
+    "source": null,
+    "published": "2026-11-04 11:20",
+    "link": null
+   }
+  }
+ ],
+ "levels": [
+  {
+   "ticker": "WST",
+   "what": "книга Action",
+   "kind": "над нивото",
+   "level": 398.67,
+   "pm_price": 412.72,
+   "pct": 3.52,
+   "pm_volume": null
+  },
+  {
+   "ticker": "SN",
+   "what": "книга QM",
+   "kind": "над нивото",
+   "level": 186.75,
+   "pm_price": 210.5,
+   "pct": 12.72,
+   "pm_volume": null
+  }
+ ],
+ "watch": [
+  {
+   "ticker": "SAP",
+   "gap_pct": 3.72,
+   "pm_price": 238.88,
+   "prev_close": 230.31,
+   "close_src": "brief",
+   "pm_last_ny": "09:07",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "session": "2026-11-03",
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "seconds": 37.7,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 04.11 — 4 гапа, 2 нива, 1 наблюдавани",
+  "at_utc": "14:08"
+ }
+}
