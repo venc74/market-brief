@@ -12,7 +12,8 @@
   "ELF",
   "DOCU",
   "BMNR",
-  "ACN"
+  "ACN",
+  "SIRI"
  ],
  "names": {
   "TDOC": "Teladoc Health, Inc.",
@@ -26,6 +27,7 @@
   "ELF": "e.l.f. Beauty, Inc.",
   "DOCU": "DocuSign, Inc.",
   "BMNR": "Bitmine Immersion Technologies, Inc.",
-  "ACN": "Accenture plc"
+  "ACN": "Accenture plc",
+  "SIRI": "Sirius XM Holdings Inc."
  }
 }
