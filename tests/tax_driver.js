@@ -9,7 +9,7 @@ if (step === 'scenario') {
   const ing = TC.ingest(sc.files);
   const st = sc.settings || {};
   const res = TC.fifo(ing.records, TC.rateLookup(ing.rates), st);
-  const de = {}; (sc.years || []).forEach(y => { de[y] = TC.computeDE(res, { ...st, year: y, records: ing.records, info: ing.info, warnings: ing.warnings }); });
+  const de = {}; (sc.years || []).forEach(y => { de[y] = TC.computeDE(res, { ...st, year: y, records: ing.records, info: ing.info, warnings: ing.warnings, skipped: ing.skipped }); });
   process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de }));
   process.exit(0);
 }

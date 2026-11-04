@@ -77,4 +77,16 @@ d24 = scenario([{"name": "U7777777_2024.csv", "text": f}], years=[2024])["de"][2
 assert [(m["sym"], m["reported"], m["computed"], m["date"]) for m in d24["reconcile"]] == [("AAA", 150, 100, "2024-12-31")] and not d24["complete"], d24["reconcile"]
 print("  ✓ къса продажба: 2024 = +1 000 (не +3 000), НЕПЪЛНО; липсващ стар отчет: 2024 без резултат; Open Positions: AAA 150 ≠ 100 → НЕПЪЛНО, BBB 10 = 10 — без бележка")
 
+# ── 7. complete = false при потенциално облагаеми редове в „не е сметнато“ за годината ──
+print("── 7. облагаеми редове в „не е сметнато“ ──")
+rc = "Symbol,Type,Quantity,Price,Value,Fees,Date\n" + "\n".join(['BTC,Buy,1,€10000.00,€10000.00,€0.00,"Jan 2, 2024, 10:00:00 AM"', 'BTC,Exchange,1,€30000.00,€30000.00,€0.00,"Jun 3, 2024, 10:00:00 AM"']) + "\n"
+r = scenario([{"name": "cx.csv", "text": rc}], years=[2023, 2024])
+assert not r["de"][2024]["complete"] and len(r["de"][2024]["skippedTaxable"]) == 1 and r["de"][2023]["complete"] is True, r["de"][2024]["skippedTaxable"]
+ca = IB("Corporate Actions,Header,Asset Category,Currency,Report Date,Date/Time,Description,Quantity,Proceeds,Value,Realized P/L,Code",
+        "Corporate Actions,Data,Stocks,USD,2024-05-02,\"2024-05-01, 20:25:00\",\"TGT(US1234567890) Merged(Acquisition) FOR USD 50.00 PER SHARE (TGT, TARGET CO, US1234567890)\",-100,5000,0,1000,",
+        "Trades,Data,Order,Forex,USD,EUR.USD,\"2024-03-01, 10:00:00\",1000,1.08,1.08,-1080,0,0,0,0,")
+d = scenario([{"name": "ca.csv", "text": ca}], years=[2024])["de"][2024]
+assert [x["section"] for x in d["skippedTaxable"]] == ["Corporate Actions"] and not d["complete"], d["skippedTaxable"]   # Forex — в списъка, но не прави годината непълна
+print("  ✓ размяна BTC → ETH (2024) и сливане с пари (2024) → НЕПЪЛНО за 2024; 2023 — пълна; Forex не брои")
+
 print("\n✅ test_tax_fixes: всичко мина")

@@ -181,7 +181,7 @@ async function recalc() {
 function settings() {
   return { year: Number($('year').value), joint: $('joint').value === '1', kirche: $('kirche').value || null, carriedShareLoss: Number($('carryS').value) || 0,
            carriedOtherLoss: Number($('carryO').value) || 0, creditRate: ($('credit').value === '' ? 15 : Number($('credit').value)) / 100,
-           fundTypes: S.fundTypes, vorab: S.vorab, persons: S.persons, records: S.ing.records, info: S.ing.info };
+           fundTypes: S.fundTypes, vorab: S.vorab, persons: S.persons, records: S.ing.records, info: S.ing.info, skipped: S.ing.skipped };
 }
 const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : 'mut';
 
@@ -207,7 +207,7 @@ function render() {
   const sk = S.ing.skipped;
   if (sk.length) w.push(`<div class="card"><details${sk.length < 6 ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${sk.length} реда</b> (всички години; виж дали някой засяга ${y})</summary><div class="scroll"><table>
     <tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>
-    ${sk.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${esc(s.reason)}</td></tr>`).join('')}</table></div></details></div>`);
+    ${sk.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${s.taxable ? '<b class="neg">може да е облагаем</b> · ' : ''}${esc(s.reason)}</td></tr>`).join('')}</table></div></details></div>`);
   $('warnings').innerHTML = w.join('');
   // разбивка
   const L = TC.LABELS, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
