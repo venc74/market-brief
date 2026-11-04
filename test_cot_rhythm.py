@@ -53,9 +53,9 @@ with q():
     p14, p12, p_old = render.render_dashboard(b14), render.render_dashboard(b12), render.render_dashboard(copy.deepcopy(B["2026-10-14"]))
 s14 = p14[p14.index("COT Екстремуми"):]; s14 = s14[:s14.index("</section>")]
 assert "COT: без нови данни — отчет към 06.10, следващ отчет петък 16.10 (публикуван 21:30 Берлин)" in s14 and '<details class="cot-full">' in s14 and s14.count("</details>") >= 1
-assert s14.index("без нови данни") < s14.index('<details class="cot-full">') < s14.index('class="thesis ')
+assert s14.index("без нови данни") < s14.index('<details class="cot-full">') < s14.index('class="ctx-table cot-table"')        # 03.11.2026 (т. 17): таблицата вместо тезите
 s12 = p12[p12.index("COT Екстремуми"):]; s12 = s12[:s12.index("</section>")]
-assert "без нови данни" not in s12 and "cot-full" not in s12 and 'class="thesis ' in s12
-assert "cot-full" not in p_old                                                         # стар бриф без полето — както досега
+assert "без нови данни" not in s12 and "<details class=\"cot-full\">" not in s12 and 'class="ctx-table cot-table"' in s12 and 'class="thesis ' not in s12
+assert "<details class=\"cot-full\">" not in p_old                                                         # стар бриф без полето — както досега
 print("  ✓ 14.10: редът и свитата секция; 12.10: цялата секция без ред; бриф без полето — както досега")
 print("\n✅ test_cot_rhythm: всичко мина")

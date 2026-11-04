@@ -48,7 +48,6 @@ from src import health_monitor
 from src import watchlist_exits
 from src import corp_actions
 from src import qm_breakout
-from src import cot_opposites
 from src import qm_ep
 from src import short_screener
 from src import short_tracker
@@ -656,54 +655,24 @@ def run() -> dict:
     candidates = inject_split_catalysts(candidates)
     print("      COT екстремуми…")
     cot_extremes = cot.get_extremes() if config.ENABLE_COT else []
-    # FIX 2026-09-15: COT промптът вижда и отворените Track Record позиции, не
-    # само днешния скрийнър — виж ai_brief.cot_theses() docstring-а (RBOB/VLO
-    # случаят). _live_positions() е чист локален прочит на backtest_tracker.json
-    # (без мрежа), затова може да се вика тук, преди backtest блока по-долу —
-    # никакво пренареждане на pipeline-а, за разлика от GLB badge фикса, който
-    # трябваше да живее СЛЕД get_backtest_summary(). apply_hard_rules() по-долу
-    # прави свой собствен такъв прочит; дублирането е евтино и нарочно, за да
-    # не се въвежда споделено състояние между двете места.
-    # Фирменото име е задължително — реалният случай назова "Valero", не "VLO".
-    #
-    # FIX 2026-09-17: резолюцията на живите позиции се изпълнява ТУК, преди
-    # контекстът да се сглоби. Без това _live_positions() четеше вчерашното
-    # състояние от диска — потвърдено на 17.09: FITB/ONB бяха описани от COT-а
-    # като "вече отворени позиции" (с цитирани entry дати), а Track Record-ът
-    # в СЪЩИЯ бриф ги показваше като stopped на 16.09. Виж
-    # backtest.resolve_positions_only() за пълния rationale. Нула допълнителна
-    # мрежова цена — update_backtest_tracker() по-долу пропуска втория fetch.
-    #
-    # Страничен ефект: apply_hard_rules() по-долу също вижда резолвирания
-    # tracker, т.е. току-що стопнат тикър може да получи нов Action план.
-    # Решено на 22.09: _last_resolved_positions() маркира такъв кандидат с
-    # RE-ENTRY (нов вход, не продължение) или ЗАТВОРЕНА ДНЕС (без Action план
-    # в същия ден — Track Record не би го записал като отделна сделка).
-    # 12.10.2026: самото извикване (ensure_v2_methodology + resolve_positions_only) е преместено по-горе, преди setup_rules.annotate.
-    cot_live = _live_positions() if config.ENABLE_BACKTEST else {}
-    cot_open_positions = [
-        {"ticker": t, "company": ai_brief._verified_company_name(t)["name"],
-         "entry_date": rec.get("fill_date") or rec.get("entry_date")}
-        for t, rec in sorted(cot_live.items())
-    ]
-    # пакет 3 т.б: генерацията е сляпа — скрийнърът и позициите служат само за значките при показване
-    # затворените позиции (резолвирани преди този момент — виж resolve_positions_only) → значка CLOSED при показване
-    cot_closed_positions = [
-        {"ticker": t, "resolution_date": rec.get("resolution_date"), "realized_r": rec.get("realized_r"),
-         "outcome": _RESOLUTION_BG.get(rec.get("status"), rec.get("status"))}
-        for t, rec in sorted(_last_resolved_positions().items()) if t not in cot_live
-    ] if config.ENABLE_BACKTEST else []
-    # пакет 3 т.а/т.ж: кеш на тезите; при остарели COT данни (cot.LAST_STATUS["stale"]) нищо не се регенерира
-    ai_brief.load_successor_memory()                                   # 15.10.2026: намерените подсказки за нов символ (GMCR → KDP) не изчезват в ден без резултат от търсенето
-    cot_with_theses = ai_brief.cot_theses(
-        cot_extremes, screener_universe, cot_open_positions, cot_closed_positions,
-        data_stale=bool(config.ENABLE_COT and cot.LAST_STATUS.get("stale"))) if cot_extremes else []
-    if ai_brief.SUCCESSOR_MEMORY:
-        ai_brief.save_successor_memory()
-    # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване, не влияе на тезите
+    # 03.11.2026 (разходката, т. 17): без AI тезите и без списъците с тикъри — секцията е седмична таблица от кода (екстремумите + сгънато всички 40 пазара);
+    # до 03.11 тук бяха ai_brief.cot_theses (кеш data/cot_theses_cache.json, ~5.7 хил. изходни токена седмично) и позициите за значките. История — docs/HISTORY.md.
+    cot_with_theses = list(cot_extremes)
+    # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване
     cot_with_theses, cot_summary = steps.step("cot_track", lambda: cot_track.annotate(cot_with_theses, cot.LAST_SERIES), fallback=(cot_with_theses, None),
                                               enabled=bool(config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses),
                                               label="COT: потвърждение от цената и track record", consequence="COT секцията е без тях днес")
+    # 03.11.2026 (разходката, т. 17): всички 40 пазара за сгънатата таблица (перцентил и позиция от кода); при екстремум — и дали цената потвърждава (SMA10, cot_track)
+    def _cot_all():
+        conf = {c["market"]: (c.get("price_confirmation") or {}) for c in cot_with_theses}
+        rows = cot.all_markets()
+        for r in rows:
+            pc = conf.get(r["market"])
+            if pc is not None and "confirmed" in pc:
+                r["price_confirms"], r["price_text"] = bool(pc["confirmed"]), pc.get("text")
+        return rows
+    cot_all = steps.step("cot_all", _cot_all, fallback=[], enabled=bool(config.ENABLE_COT and cot.LAST_SERIES), label="COT: таблицата с всички пазари",
+                         consequence="сгънатата таблица „Всички пазара“ липсва днес; екстремумите са показани")
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
@@ -842,12 +811,7 @@ def run() -> dict:
     for row in short_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
         row["global_context"] = global_context.get(row.get("lagging_sector"))
-    # 08.10: бележка за ОБРАТЕН ЗАЛОГ между COT тезите и нашите карти (Action/Watchlist/Qullamaggie — покупки, Short — шорт) и между COT пазарите; сглобена от кода, нищо не се маха
-    def _cot_opposites():
-        cot_opp_diag = cot_opposites.annotate(cot_with_theses, {"action": action, "watchlist": watchlist, "qm": qm_cards}, short_candidates)
-        print(f"      обратен залог (COT): карти {cot_opp_diag['cards']} · тези {cot_opp_diag['theses']} · между пазари {cot_opp_diag['cross_market']}")
-    steps.step("cot_opposites", _cot_opposites, label="Бележките за обратен залог (COT ↔ картите)",
-               consequence="липсата на бележка днес не значи, че няма обратен залог")
+    # 03.11.2026 (разходката, т. 17): бележките за обратен залог (cot_opposites) отпаднаха заедно с тикърите на COT тезите — нямат вход
 
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
     # конвергенцията вече е MF✓ ("value confirmed") бадж на самите карти (enrich.py).
@@ -1049,7 +1013,7 @@ def run() -> dict:
         crypto["cot_btc"] = steps.step("crypto_cot", lambda: crypto_news.cot_reading((cot.LAST_SERIES or {}).get(config.CRYPTO_COT_MARKET)), fallback=None,
                                        label="COT за Bitcoin в крипто секцията", consequence="редът за COT Bitcoin липсва днес")
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                       cot_diag=ai_brief.COT_DIAG, insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
+                                       insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                        dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
                                        ai_lost=list(ai_brief.NARRATIVES_LOST),
@@ -1117,6 +1081,7 @@ def run() -> dict:
         "news": news,
         "news_window": {**dict(news_aggregator.LAST_WINDOW), "since": news_since.isoformat(), "hours": news_hours, "crypto_hours": crypto_hours},   # 02.11.2026 (т. 4)
         "cot": cot_with_theses,
+        "cot_all": cot_all,                                            # 03.11.2026 (т. 17): всички 40 пазара — сгънатата таблица
         # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
         "cot_summary": cot_summary,
         # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
@@ -1124,7 +1089,6 @@ def run() -> dict:
         "cot_rhythm": cot_rhythm,
         "crypto": crypto,                                              # 22.10.2026 (етап 4): крипто секцията   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
         # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
-        "cot_diag": dict(ai_brief.COT_DIAG),
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
         "narrative_events": list(ai_brief.NARRATIVE_EVENTS_DIAG),        # 19.10.2026: събития без опора в новините/макрото на деня, махнати от наративите
         "correlation_flags": correlation_flags,

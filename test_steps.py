@@ -49,12 +49,12 @@ print("── 2. main.run: местата 'само лог' са в обвивк
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 run = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "run")
 names = [ast.literal_eval(c.args[0]) for c in ast.walk(run) if isinstance(c, ast.Call) and ast.unparse(c.func) == "steps.step"]
-STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "cot_track", "earnings_warnings", "earnings_warnings_qm", "cot_opposites", "book_buystop", "book_qm",
+STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "cot_track", "earnings_warnings", "earnings_warnings_qm", "book_buystop", "book_qm",
          "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_board", "short_screener"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
 STEP4 = {"crypto", "crypto_cot", "options_record", "merger_pre", "event_labels"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
-STEP5 = {"qm_market", "ins_watch"}                                                                                                               # 03.11.2026 (разходката, т. 11): QQQ спрямо SMA10 / SMA20 — банерът е на обвивката
+STEP5 = {"qm_market", "ins_watch", "cot_all"}                                                                                                               # 03.11.2026 (разходката, т. 11): QQQ спрямо SMA10 / SMA20 — банерът е на обвивката
 ALL = STEP1 | STEP2 | STEP3 | STEP4 | STEP5
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]
@@ -70,7 +70,7 @@ config.ENABLE_MARKET_CLOSED_SKIP = 0                                            
 config.SPINOFF_BUDGET_SEC = config.UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = 5
 FAULTS = {"model": "src.model_selector.resolve_model", "bar_freshness": "src.bar_freshness.wait_for_fresh", "distribution_cap": "src.main.apply_distribution_cap",
           "news": "src.news_aggregator.significant_news", "prose_checks": "src.ai_brief.strip_trigger_echo_in_narratives", "earnings_warnings": "src.earnings_move.annotate",
-          "cot_opposites": "src.cot_opposites.annotate", "book_buystop": "src.backtest.get_buystop_summary", "book_qm": "src.backtest.get_qm_summary",
+          "book_buystop": "src.backtest.get_buystop_summary", "book_qm": "src.backtest.get_qm_summary",
           "book_glb_wish": "src.backtest.get_glb_wish_summary", "book_glb_wish_high": "src.backtest.get_glb_wish_summary", "si_positions": "src.dataroma.new_position_markers", "watch": "src.watch_monitor.collect",
           "splits_report": "src.splits_calendar.splits_report", "sector_board": "src.sector_layer.sector_board", "health": "src.health_monitor.check"}
 OWN_SOURCE = {"health": "health:health_monitor"}                                         # стъпка 2: собственият ред на монитора, не втори банер

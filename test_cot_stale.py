@@ -99,7 +99,7 @@ assert "COT данните са остарели" in h3 and "последния�
 assert h3.count("COT Екстремуми") == 1 and "30-Year Treasury Bond" in h3                                # секцията е една и редовете са на мястото си
 b4 = dict(brief); b4["cot"] = []; b4["cot_status"] = {"as_of": "2026-09-08", "age_days": 24, "stale": True, "threshold_days": 13, "reason": "stale"}
 h4 = page(b4)
-assert "COT данните са остарели" in h4 and "Няма показани екстремуми" in h4                              # банерът се показва и без редове
+assert "COT данните са остарели" in h4 and "Няма пазар в екстремум тази седмица" in h4                              # банерът се показва и без редове
 b5 = dict(brief); b5["cot"] = []; b5["cot_status"] = {"as_of": None, "age_days": None, "stale": True, "threshold_days": 13, "reason": "no_data"}
 h5 = page(b5)
 assert "няма налични данни (кешът е празен или CFTC е недостъпна)" in h5

@@ -331,6 +331,9 @@
   .glb-t { margin-bottom: 8px; } .glb-t .glb-card { max-width: 520px; margin-top: 6px; }
   .glb-def { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
   details.gw-open, details.gw-book, details.gw-how { margin: 6px 0 14px; } details.gw-open > summary, details.gw-book > summary, details.gw-how > summary { font-size: 12.5px; color: var(--muted); }
+  /* 03.11.2026 (т. 17): COT — компактна таблица; групите в „Всички 40 пазара“; екстремумът — с удебелен пазар */
+  .cot-table { min-width: 560px; } .cot-table .pos { color: var(--green); } .cot-table tr.cot-group td { font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); padding-top: 10px; }
+  .cot-table tr.cot-ext td:first-child { font-weight: 600; } details.cot-all { margin-top: 10px; } details.cot-all > summary, details.cot-full > summary { font-size: 12.5px; color: var(--muted); }
   .gw-table { min-width: 860px; } .gw-table .pos { color: var(--green); } .gw-table .neg { color: var(--red); } .gw-table td.num { white-space: nowrap; }
   @media (max-width: 760px) { .glb-row { grid-template-columns: 1fr 1fr; } }
 
@@ -1796,91 +1799,46 @@
 
 {# Пакет 4б т.б: секцията "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ (hover/клик) върху кандидатите и позициите #}
 
-{# FIX 2026-09-28 (Release 2): bullish/bearish вече е ЗА ВСЕКИ ТИКЪР, изведен
-   от кода от effect (печели/губи от изчисленото движение на инструмента).
-   Стар JSON (само th.direction на ниво теза) се рендерира както преди. #}
-{% macro cot_sub(th, label) %}
-      <div class="cot-sub">
-        {% set per_ticker = th.tickers and (th.tickers|selectattr('effect', 'defined')|list) %}
-        <div class="cot-sub-label">{{ label }}
-          {% if th.tickers and not per_ticker and th.direction %}<span class="cot-direction {{ th.direction }}">{{ th.direction }}</span>{% endif %}
-        </div>
-        {% if th.tickers %}
-        <div class="cot-tickers">{% for t in th.tickers %}{{ t.ticker }} ({{ t.company|cname }}){{ markers_html(t.markers) }}{% if t.partial %} <span class="small" style="color:var(--muted)" title="Частична експозиция: компанията е преработвател/диверсифицирана — инструментът е само една част от бизнеса ѝ">~частична</span>{% endif %}{% if per_ticker %}{% if t.conflict %} <span class="cot-direction conflict" title="Моделът дава противоположен ефект за същия тикър в другата под-теза на този пазар">⚠ противоречие</span>{% elif t.direction %} <span class="cot-direction {{ t.direction }}" title="{{ 'печели' if t.effect == 'gains' else 'губи' }} от очакваното движение">{{ t.direction }}</span>{% endif %}{% endif %}{{ "  ·  " if not loop.last else "" }}{% endfor %}</div>
-        {% endif %}
-        {# пакет 3: cross-sector — изречението с посоката е шаблон от кода, прозата на модела описва само механизма #}
-        {% for t in th.tickers or [] %}{% if t.sentence %}<div class="thesis-chain">{{ t.sentence }}{% if t.quote %} <span class="small" style="color:var(--muted)">{{ t|cot_quote }}</span>{% endif %}</div>{% endif %}{% endfor %}
-        {# 08.10: обратен залог (подбран тикър срещу обратния ефект на тезата) и обратни сигнали между COT пазари — бележки от кода #}
-        {% for t in th.tickers or [] %}{% for o in t.opposite or [] %}<div class="opp-note">{{ o.text }}</div>{% endfor %}{% for x in t.cross_market or [] %}<div class="opp-note">{{ x }}</div>{% endfor %}{% endfor %}
-        {% if th.reasoning %}<div class="thesis-chain">{{ th.reasoning }}</div>{% endif %}
-        {% if th.empty_reason %}
-        <div class="small" style="font-size:12px;color:var(--muted);margin-top:4px">
-          Няма {{ label|lower }} — {{ th.empty_reason }}.
-        </div>
-        {% endif %}
-        {% if th.stale_note %}
-        <div class="small" style="font-size:11.5px;color:var(--yellow);margin-top:4px">⚠ {{ th.stale_note }}</div>
-        {% endif %}
-        {% if th.withdrawn_tickers %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Няма пряка връзка — {{ th.withdrawn_tickers|join(', ') }} махнат(и) от списъка.
-        </div>
-        {% endif %}
-        {% if th.outside_screener %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Тези тикъри не са в текущия CANSLIM скрийнър.
-        </div>
-        {% endif %}
-        {# 08.10: празна теза носи списъка на изключените в самата причина ("Няма … — всички предложени тикъри бяха изключени …") — вторият ред "Изключени:" би го повторил; еднаквите причини са на един ред #}
-        {% if th.dropped_tickers and (th.tickers or not th.empty_reason) %}
-        <div class="small" style="font-size:11px;color:var(--muted);margin-top:4px">
-          Изключени: {% for g in th.dropped_tickers|group_dropped %}{{ g.tickers|join(", ") }}{% if g.reason %} — {{ g.reason }}{% else %} (премахнат при верификация){% endif %}{{ "; " if not loop.last else "." }}{% endfor %}
-        </div>
-        {% endif %}
-      </div>
-{% endmacro %}
-
-{% if cot or (cot_status and cot_status.stale) %}
+{# ── COT (03.11.2026, разходката, т. 17): седмична таблица от кода, без AI тези и без списъци с тикъри — Пазар · перцентил · позиция (текст) · цената потвърждава (да / не,
+   пресичане на SMA10 в посоката на сигнала, cot_track) + един ред със собствената статистика на модула (cot_summary). Видими — екстремумите (≤ COT_PERCENTILE_LOW / ≥ COT_PERCENTILE_HIGH);
+   сгънато „▸ Всички 40 пазара“ по групи (config.COT_GROUPS). Ритъмът е седмичен: цялата секция — в първия бриф след нов отчет, иначе ред + сгънато (data_rhythm.cot_rhythm). ── #}
+{% macro cot_conf(c) %}{% set pc = c.price_confirmation if c.price_confirmation is defined else none %}{% if pc and pc.confirmed is defined %}<span class="{{ 'pos' if pc.confirmed else 'cs-mu' }}" title="{{ pc.text }}">{{ 'да' if pc.confirmed else 'не' }}</span>{% elif c.price_confirms is defined %}<span class="{{ 'pos' if c.price_confirms else 'cs-mu' }}" title="{{ c.price_text or '' }}">{{ 'да' if c.price_confirms else 'не' }}</span>{% else %}<span class="cs-mu">—</span>{% endif %}{% endmacro %}
+{% if cot or cot_all or (cot_status and cot_status.stale) %}
 <section>
   <h2>COT Екстремуми · Managed Money Positioning</h2>
-  {# 21.10.2026 (етап 4, ритъм на данните): цялата секция — в първия бриф след нов отчет на CFTC; в другите дни — един ред и секцията свита #}
   {% if cot_rhythm.text %}<div class="prose" style="margin:0 0 10px">{{ cot_rhythm.text }}</div>{% endif %}
-  {% if cot_rhythm.compact %}<details class="cot-full"><summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Секцията с отчета към {{ cot_rhythm.as_of[8:10] }}.{{ cot_rhythm.as_of[5:7] }} — показана изцяло в първия бриф след него</summary>{% endif %}
-  {# пакет 2 т.7: давност на данните — спряна/забавена публикация на CFTC или провалено теглене #}
+  {% if cot_rhythm.compact %}<details class="cot-full"><summary>Таблицата с отчета към {{ cot_rhythm.as_of[8:10] }}.{{ cot_rhythm.as_of[5:7] }} ({{ cot|length }} в екстремум) — показана изцяло в първия бриф след него</summary>{% endif %}
   {% if cot_status and cot_status.stale %}
   <div class="model-banner rejected">⚠ <strong>COT данните са остарели</strong> —
     {% if cot_status.as_of %}последният отчет е към {{ cot_status.as_of }} ({{ cot_status.age_days }} дни назад; нормално 6–10, праг {{ cot_status.threshold_days }}).
     Вероятно CFTC е спряла или забавила публикацията (или теглянето е пропаднало): показаното по-долу е по по-стари позиции, не по днешните.
     {% else %}няма налични данни (кешът е празен или CFTC е недостъпна).{% endif %}</div>
   {% endif %}
-  {% if cot_summary and cot_summary.text %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"{% if cot_summary.market_names %} title="Смятано върху: {{ cot_summary.market_names|join(', ') }}"{% endif %}>{{ cot_summary.text }}</div>{% endif %}
-  {% if not cot %}<div class="prose">Няма показани екстремуми.</div>{% endif %}
-  <div class="theses">
+  <div class="small" style="font-size:12px;color:var(--muted);margin:0 0 8px">Нетната позиция на спекулантите (Managed Money / Leveraged Funds) спрямо собствената ѝ история ({{ cot[0].weeks_of_history if cot and cot[0].weeks_of_history else 156 }} седмици);
+    екстремум = перцентил ≤ {{ cot_low|round|int }} или ≥ {{ cot_high|round|int }} — contrarian сигнал (екстремно дълги → риск надолу за инструмента). „Цената потвърждава“ = седмичното затваряне е пресякло SMA10 в посоката на сигнала. Без AI — числата и текстът са от кода.</div>
+  {% if cot %}
+  <div class="cs-radar-wrap"><table class="ctx-table cot-table">
+    <tr><th>Пазар</th><th class="num">Перцентил</th><th>Позиция</th><th title="Седмичното затваряне е пресякло SMA10 в посоката на сигнала (до {{ cot_confirm_weeks }} седмици назад)">Цената потвърждава</th></tr>
     {% for c in cot %}
-    <div class="thesis {{ 'active' if c.direction == 'extreme_long' else 'watch' }}">
-      <div class="thesis-head">
-        <span class="thesis-name">{{ c.market }}</span>
-        <span class="cot-percentile">{{ c.percentile }}. percentile
-          ({{ c|cot_label }}){% if c.move_short %} · очакване: {{ c.move_short }}{% endif %}</span>
-      </div>
-
-      {# пакет 3 т.з: ценово потвърждение (код) и история на екстремумите — един ред на пазар #}
-      {% if c.price_confirmation and c.price_confirmation.text %}<div class="small" style="font-size:12px;margin-top:6px;color:var(--muted)">{{ c.price_confirmation.text }}</div>{% endif %}
-      {% if c.track_record and c.track_record.text %}<div class="small" style="font-size:12px;color:var(--muted)">{{ c.track_record.text }}</div>{% endif %}
-      {% if c.history_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:6px">{{ c.history_note }}</div>{% endif %}
-      {% if c.thesis_rejected %}
-      <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
-        Тезата е отхвърлена от проверката — {{ c.thesis_rejected }}.
-      </div>
-      {% endif %}
-      {# FIX 2026-09-29: липсваща под-теза (стар JSON без empty_reason) → ред, не нищо #}
-      {% if c.direct_thesis %}{{ cot_sub(c.direct_thesis, "Директна теза") }}
-      {% elif not c.thesis_rejected %}{{ cot_sub({"empty_reason": "причината не е записана"}, "Директна теза") }}{% endif %}
-      {% if c.cross_sector_thesis %}{{ cot_sub(c.cross_sector_thesis, "Cross-sector теза") }}
-      {% elif not c.thesis_rejected %}{{ cot_sub({"empty_reason": "причината не е записана"}, "Cross-sector теза") }}{% endif %}
-    </div>
+    <tr><td>{{ c.market }}</td><td class="num">{{ "%.0f"|format(c.percentile) }}</td><td>{{ c|cot_label }}</td><td>{{ cot_conf(c) }}</td></tr>
     {% endfor %}
-  </div>
+  </table></div>
+  {% else %}
+  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма пазар в екстремум тази седмица (перцентил ≤ {{ cot_low|round|int }} или ≥ {{ cot_high|round|int }}).</div>
+  {% endif %}
+  {% if cot_summary and cot_summary.text %}<div class="small" style="font-size:12px;color:var(--muted);margin:8px 0 0"{% if cot_summary.market_names %} title="Смятано върху: {{ cot_summary.market_names|join(', ') }}"{% endif %}>{{ cot_summary.text }}</div>{% endif %}
+  {% if cot_all %}
+  <details class="cot-all"><summary>Всички {{ cot_all|length }} пазара</summary>
+  <div class="cs-radar-wrap"><table class="ctx-table cot-table">
+    <tr><th>Пазар</th><th class="num">Перцентил</th><th>Позиция</th><th>Цената потвърждава</th></tr>
+    {% set grp = namespace(g=none) %}
+    {% for c in cot_all %}
+    {% if c.group != grp.g %}{% set grp.g = c.group %}<tr class="cot-group"><td colspan="4">{{ c.group }}</td></tr>{% endif %}
+    <tr{% if c.direction %} class="cot-ext"{% endif %}><td>{{ c.market }}</td><td class="num">{{ "%.0f"|format(c.percentile) }}</td><td>{{ c.position_label }}</td><td>{% if c.direction %}{{ cot_conf(c) }}{% else %}<span class="cs-mu">—</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table></div>
+  </details>
+  {% endif %}
   {% if cot_rhythm.compact %}</details>{% endif %}
 </section>
 {% endif %}

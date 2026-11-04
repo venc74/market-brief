@@ -9,7 +9,7 @@ cot_prices_*.json, теглени на 05.10.2026); самите екстрем�
 напред), редовете за статистиката, провалите на теглене.
 Пускане: python test_cot_track.py
 """
-import sys, json, pathlib, io, contextlib, datetime as dt, tempfile, html as htmllib, copy
+import sys, json, pathlib, io, contextlib, datetime as dt, tempfile, html as htmllib, copy, re
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
@@ -161,11 +161,15 @@ with tempfile.TemporaryDirectory() as docs, tempfile.TemporaryDirectory() as dat
         plain = htmllib.unescape(render.render_dashboard(json.loads(json.dumps(BRIEF))))
     finally:
         config.DOCS_DIR, config.DATA_DIR = o1, o2
-assert sm["text"] in page and by["Copper"]["price_confirmation"]["text"] in page and by["Copper"]["track_record"]["text"] in page
-assert "Цената пресече SMA10 в посоката на сигнала" in page and "Цената не е пресякла SMA10" in page
+# 03.11.2026 (разходката, т. 17): таблица — „Цената потвърждава: да / не“ (текстът за SMA10 — в title), обобщението на модула — един ред; историята на пазара — само в данните
+sec = page.split("COT Екстремуми")[1].split("</section>")[0]
+assert sm["text"] in page and f'title="{by["Copper"]["price_confirmation"]["text"]}"' in sec and by["Copper"]["track_record"]["text"] not in page
+conf = re.findall(r'<td>([^<]+)</td><td class="num">[\d.]+</td><td>[^<]*</td><td><span class="[^"]*" title="[^"]*">(да|не)</span></td>', sec)
+assert {m: v for m, v in conf} == {c["market"]: ("да" if c["price_confirmation"].get("confirmed") else "не") for c in out if (c.get("price_confirmation") or {}).get("confirmed") is not None}
+assert "Цената пресече SMA10 в посоката на сигнала" in sec and "Цената не е пресякла SMA10" in sec
 assert "Потвърдено от цената" not in page and "✔" not in page.split("COT Екстремуми")[1].split("</section>")[0]                  # без думата и без отметката
 assert "Потвърдено от цената" not in plain                                                          # стар бриф без полетата — без промяна
-print("  ✓ над картите — един ред обобщение; във всяка карта — неутрален ред за SMA10 и ред за историята; стар бриф без тези полета се рендерира както преди")
+print(f"  ✓ таблицата: „Цената потвърждава“ да / не ({len(conf)} пазара; текстът за SMA10 — при посочване), под нея — един ред обобщение на модула; историята на пазара — само в данните")
 
 print()
 print("Всички тестове минаха.")

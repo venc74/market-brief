@@ -12,17 +12,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 
-def _cot_warning(cot_diag: dict | None) -> list[dict]:
-    """COT: пазари, за които моделът не върна теза нито след повторното извикване (виж ai_brief.cot_theses) — без ред в диагностиката те бяха мълчалива загуба (06.10: 4 от 20)."""
-    nr = (cot_diag or {}).get("not_returned") or []
-    if not nr:
-        return []
-    total = (cot_diag or {}).get("extremes")
-    return [{"source": "cot", "level": "warn",
-             "message": (f"COT: моделът не върна теза за {len(nr)}{f' от {total}' if total else ''} пазара ({', '.join(nr)}) и след повторно извикване — "
-                         f"показват се с директната теза от таблицата (или със стара теза, ако има); следващият run опитва пак.")}]
-
-
 def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list[dict]:
     """
     Пакет 4б т.б/т.в: секциите "Insider Buying" и "Unusual Options" отпаднаха — остават маркерите INS✓/UOV✓. Липсващ маркер, защото тегленето/снимката
@@ -285,7 +274,7 @@ def _universe_warning(universe_sources: dict | None) -> list[dict]:
 
 
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
-            cot_diag: dict | None = None, insider_status: dict | None = None, uov_diag: dict | None = None,
+            insider_status: dict | None = None, uov_diag: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
@@ -323,7 +312,6 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"и списъкът с кандидати са непълни."),
         })
     out.extend(_universe_warning(universe_sources))                   # 30.10.2026: източник на универса без тикъри / под минимума
-    out += _cot_warning(cot_diag)
     markers = _marker_warnings(insider_status, uov_diag)
     if any(h.get("check") == "oi_snapshot" for h in health or []) and (uov_diag or {}).get("snapshot_missing_reason"):
         # 12.10.2026: един банер за липсващата OI снимка — здравната проверка (последната снимка, кой job да се провери); UOV банерът за СЪЩАТА причина

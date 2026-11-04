@@ -334,6 +334,35 @@ def _market_extreme(label: str, pts: list[dict], category: str,
     }
 
 
+def all_markets(series: dict[str, list[dict]] | None = None) -> list[dict]:
+    """
+    03.11.2026 (разходката, т. 17): всички резолвирани пазари от whitelist-а (series = LAST_SERIES от get_extremes) за сгънатата таблица „▸ Всички 40 пазара“ — без AI.
+    → [{market, group, percentile, net_position, direction ("extreme_long" / "extreme_short" / None), position_label, as_of, weeks_of_history}], по групите в config.COT_GROUPS
+    (в групата — редът на MAJOR_MARKETS). Перцентилът и прагът — като _market_extreme; извън екстремум позицията е „нетно дълги“ / „нетно къси“. Под 10 точки история — без ред.
+    Чиста функция.
+    """
+    series = LAST_SERIES if series is None else series
+    group_of = {m: g for g, ms in config.COT_GROUPS for m in ms}
+    order = {g: i for i, (g, _) in enumerate(config.COT_GROUPS)}
+    out = []
+    for i, (label, *_rest) in enumerate(MAJOR_MARKETS):
+        pts = (series or {}).get(label) or []
+        if len(pts) < 10:
+            continue
+        window = pts[-_LOOKBACK_WEEKS:]
+        values = [p["net"] for p in window]
+        cur = values[-1]
+        pct = _percentile_rank(values[:-1] or values, cur)
+        direction = "extreme_long" if pct >= config.COT_PERCENTILE_HIGH else "extreme_short" if pct <= config.COT_PERCENTILE_LOW else None
+        text = position_label(direction, cur, pct, len(window)) if direction else ("нетно дълги" if cur > 0 else "нетно къси" if cur < 0 else "нетно нула")
+        out.append({"market": label, "group": group_of.get(label, "други"), "percentile": pct, "net_position": int(cur), "direction": direction, "position_label": text,
+                    "as_of": window[-1]["date"], "weeks_of_history": len(window), "_i": i})
+    out.sort(key=lambda r: (order.get(r["group"], 99), r["_i"]))
+    for r in out:
+        r.pop("_i")
+    return out
+
+
 # Състоянието на последния get_extremes(): давност на най-новия отчет — main го слага в брифа (cot_status), шаблонът
 # показва банер, ако е стар. {"as_of", "age_days", "stale", "threshold_days", "reason"}
 LAST_STATUS: dict = {}

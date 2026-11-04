@@ -13,7 +13,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import names
 from src import watchlist_exits
-from src import cot_theses
 from src import setup_rules
 from src import sector_claims
 from src import qm_breakout
@@ -30,7 +29,6 @@ WEEKDAYS_BG = ["понеделник", "вторник", "сряда", "четв
 # невалиден HTML, който браузърът прощаваше по късмет.)
 env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
                   autoescape=True)
-env.filters["group_dropped"] = cot_theses.group_dropped   # 08.10: изключените тикъри с еднаква причина — на един ред
 env.filters["field_words"] = sector_claims.field_words     # 19.10.2026 (т. 18): сурови имена на полета в прозата на модела → думи
 env.filters["horizon_text"] = sector_claims.horizon_text   # 19.10.2026 (т. 18): хоризонтът на модела ([4, 12], "2-6", 4) → текст
 env.globals["book_plan_note"] = setup_rules.book_plan_note   # 19.10.2026 (т. 18б): планът на книгата, когато се различава от днешния на картата
@@ -224,8 +222,6 @@ def _money_short(v):
 env.filters["money_short"] = _money_short
 
 
-_QWORD = __import__("re").compile(r"[A-Za-zА-Яа-я0-9&'.-]+")
-_QLEGAL = {"inc", "corp", "corporation", "company", "holdings", "group", "plc", "ltd", "limited", "the", "co", "sa", "nv", "ag", "se", "lp", "llc"}
 
 
 def form4_line(cards: dict | None, positions: dict | None, watched: dict | None = None) -> str | None:
@@ -271,26 +267,7 @@ def _qm_open_html(c: dict) -> str:
     return f'<br><span style="color:#1d4ed8;font-size:12px">📈 вече отворена в книгата от {b["since"][8:10]}.{b["since"][5:7]}{price} — новото ниво не е нов вход</span>'
 
 
-def cot_quote(t: dict) -> str:
-    """
-    19.10.2026 (етап 2, доп. т. 7): цитатът на модела за механизма в COT cross тезата — с името на компанията отпред, ако в първите 4 думи няма дума от името (≥ 4 букви) или тикъра
-    ("Закупува оборудване …" → "Yum China: Закупува оборудване …"). Измерено върху всички реални брифове: 106 от 167 различни цитата без подлог (глагол или "компанията/банката/фондът").
-    Само показване — данните и проверките не се пипат.
-    """
-    q = (t or {}).get("quote") or ""
-    if not q:
-        return ""
-    first = [w.lower().strip(".,'") for w in _QWORD.findall(q)[:4]]
-    co = (t or {}).get("company") or ""
-    keys = {w.lower().strip(".,'") for w in _QWORD.findall(co) + _QWORD.findall(names.display_name(co)) if len(w) >= 4 and w.lower().strip(".,") not in _QLEGAL}
-    keys.add(((t or {}).get("ticker") or "").lower())
-    if any(k and (f == k or (len(k) >= 6 and f.startswith(k[:6]))) for k in keys for f in first):
-        return q
-    name = names.display_name(co) or (t or {}).get("ticker") or ""
-    return f"{name}: {q}" if name else q
-
-
-env.filters["cot_quote"] = cot_quote
+# 03.11.2026 (разходката, т. 17): cot_quote (цитатът на модела в COT cross тезата) — махнат заедно с тезите
 
 
 def _publish_history(brief: dict) -> None:
@@ -586,6 +563,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         cot_status=brief.get("cot_status") or {},
         cot_rhythm=brief.get("cot_rhythm") or {},                   # 21.10 (етап 4): ред „без нови данни“ в дните след първия бриф с отчета
         cot_summary=brief.get("cot_summary"),
+        cot_all=brief.get("cot_all") or [],                         # 03.11.2026 (т. 17): всички 40 пазара — сгънатата таблица
+        cot_low=config.COT_PERCENTILE_LOW, cot_high=config.COT_PERCENTILE_HIGH, cot_confirm_weeks=config.COT_CONFIRM_LOOKBACK_WEEKS,
         correlation_flags=brief.get("correlation_flags", []),
         short_frozen=(brief.get("short_tracker") or {}).get("frozen") or {},     # 19.10.2026 (т. 19): замразеният short модул — един ред
         distribution_days=brief.get("distribution_days"),

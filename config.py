@@ -888,6 +888,15 @@ CUSIP_MAP_NOTFOUND_DAYS = 30
 ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"
 COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 10))
 COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
+# 03.11.2026 (разходката, т. 17): групите на сгънатата таблица „▸ Всички 40 пазара“ — в този ред; пазарите — етикетите от cot.MAJOR_MARKETS (тест: всеки пазар е точно в една група)
+COT_GROUPS = (
+    ("валути", ("US Dollar Index", "Euro FX", "Japanese Yen", "British Pound", "Swiss Franc", "Canadian Dollar", "Australian Dollar", "Mexican Peso")),
+    ("лихви", ("2-Year Treasury Note", "5-Year Treasury Note", "10-Year Treasury Note", "Ultra Treasury Bond", "30-Year Treasury Bond")),
+    ("индекси", ("E-mini S&P 500", "Nasdaq-100", "E-mini Russell 2000", "E-mini Dow (DJIA)", "VIX Futures")),
+    ("крипто", ("Bitcoin Futures (CME)", "XRP")),
+    ("суровини", ("WTI Crude Oil", "Natural Gas", "RBOB Gasoline", "Heating Oil", "Gold", "Silver", "Copper", "Platinum", "Palladium", "Corn", "Soybeans", "Soybean Oil",
+                  "Soybean Meal", "Wheat", "Sugar No. 11", "Coffee C", "Cocoa", "Cotton", "Lean Hogs", "Live Cattle")),
+)
 # FIX 2026-08-20: дизайнерският lookback е 156 седмици (~3г, cot.py:
 # _LOOKBACK_WEEKS), но по-скоро добавени контракти (напр. XRP на CME,
 # launched ~юли 2025) имат много по-кратка налична история — percentile
@@ -905,106 +914,8 @@ COT_SHORT_HISTORY_WEEKS = int(os.getenv("COT_SHORT_HISTORY_WEEKS", 104))
 # най-новият отчет е 23.06, 13 дни. Праг 12 би дал фалшива тревога точно тогава, затова "стар" е СТРОГО повече от 13 дни
 # (= пропуснат цял седмичен отчет, виден от вторника след него). Над прага секцията COT показва банер.
 COT_STALE_DAYS = int(os.getenv("COT_STALE_DAYS", 13))
-COT_BATCH_SIZE = int(os.getenv("COT_BATCH_SIZE", 5))
-# FIX 2026-09-28: 3000 → 4000. На 28.09 batch-овете стигнаха до 2162/3000;
-# Release 2 добавя effect на тикър + assumed_move + no_direct_link (~+300).
-COT_BATCH_MAX_TOKENS = int(os.getenv("COT_BATCH_MAX_TOKENS", 4000))
-# FIX 2026-08-02: горна граница на running seen_tickers речника (soft cross-batch
-# consistency, ai_brief.py: cot_theses) — FIFO, за да не расте prior_context
-# неограничено на дни с много batch-ове/тикъри.
-COT_SEEN_TICKERS_CAP = int(os.getenv("COT_SEEN_TICKERS_CAP", 20))
 
-# ══════════════════════════════════════════════════════════════════════════
-# Пакет 3 (2026-10-05) — COT тези: таблици, които държи КОДЪТ (не моделът)
-# ══════════════════════════════════════════════════════════════════════════
-# Вид на пазара — определя кой знак важи за даден механизъм (виж COT_MECHANISM_SIGN) и как се чете "цената":
-#   equity_index (индекс), volatility (VIX), fx_foreign (чужда валута срещу USD: цена↑ = валутата поскъпва),
-#   fx_usd (US Dollar Index: цена↑ = доларът поскъпва), rate (облигационен фючърс: цена↑ = доходността ПАДА),
-#   crypto, commodity. Записите покриват всичките 40 пазара от cot.MAJOR_MARKETS (тест: test_cot_tables.py).
-COT_MARKET_KINDS = {
-    "E-mini S&P 500": "equity_index", "Nasdaq-100": "equity_index", "E-mini Russell 2000": "equity_index",
-    "E-mini Dow (DJIA)": "equity_index", "VIX Futures": "volatility", "US Dollar Index": "fx_usd",
-    "Euro FX": "fx_foreign", "Japanese Yen": "fx_foreign", "British Pound": "fx_foreign", "Swiss Franc": "fx_foreign",
-    "Canadian Dollar": "fx_foreign", "Australian Dollar": "fx_foreign", "Mexican Peso": "fx_foreign",
-    "2-Year Treasury Note": "rate", "5-Year Treasury Note": "rate", "10-Year Treasury Note": "rate",
-    "Ultra Treasury Bond": "rate", "30-Year Treasury Bond": "rate",
-    "Bitcoin Futures (CME)": "crypto", "XRP": "crypto",
-    "Gold": "commodity", "Silver": "commodity", "Copper": "commodity", "Platinum": "commodity", "Palladium": "commodity",
-    "WTI Crude Oil": "commodity", "Natural Gas": "commodity", "RBOB Gasoline": "commodity", "Heating Oil": "commodity",
-    "Corn": "commodity", "Soybeans": "commodity", "Soybean Oil": "commodity", "Soybean Meal": "commodity",
-    "Wheat": "commodity", "Sugar No. 11": "commodity", "Coffee C": "commodity", "Cocoa": "commodity", "Cotton": "commodity",
-    "Lean Hogs": "commodity", "Live Cattle": "commodity",
-}
-
-# Затворен списък от типове механизъм (пакет 3 т.г): моделът връща за всеки cross тикър 1–2 механизма {type, quote};
-# ЕФЕКТЪТ (печели/губи) се изчислява от кода по тази таблица, не от модела. "sign" = ефектът върху компанията, когато ЦЕНАТА
-# на инструмента РАСТЕ (при падане е обратното): +1 печели, −1 губи; по вид на пазара (виж COT_MARKET_KINDS). Тип, който не е
-# валиден за вида на пазара, се отхвърля като невалидна схема. "direct": пряк механизъм ли е — типове 7, 8, 10 (index_beta,
-# risk_off_hedge, consumer_wallet) и "other" НИКОГА не са пряк механизъм: отворена позиция не влиза в cross теза с тях
-# (значката "отворена позиция" се слага само при пряк механизъм); "other" не показва посока. Два механизма с противоположен
-# знак → "mixed" → тикърът се изключва. "text" е дефиницията, която влиза в промпта (и е част от версията му).
-COT_MECHANISM_SIGN = {
-    "input_cost":              {"label": "разход за суровина", "direct": True,  "sign": {"commodity": -1},
-                                "text": "компанията КУПУВА инструмента като суровина/разход — по-висока цена = по-високи разходи"},
-    "output_price":            {"label": "цена на продукта", "direct": True,  "sign": {"commodity": +1},
-                                "text": "компанията ПРОДАВА инструмента или продукт, чиято цена го следва — по-висока цена = по-високи приходи"},
-    "fx_revenue_translation":  {"label": "валутен превод на приходи", "direct": True,  "sign": {"fx_foreign": +1, "fx_usd": -1},
-                                "text": "значителна част от приходите са в чужда валута и се превеждат в USD — по-силна чужда валута = повече USD приходи"},
-    "fx_cost_local":           {"label": "разходи в чужда валута", "direct": True,  "sign": {"fx_foreign": -1, "fx_usd": +1},
-                                "text": "значителна част от разходите са в чужда валута — по-силна чужда валута = по-високи разходи в USD"},
-    "rate_asset_yield":        {"label": "доходност на активите", "direct": True,  "sign": {"rate": -1},
-                                "text": "компанията печели от по-високи доходности (лихвен марж, реинвестиране) — цена на облигацията НАГОРЕ = доходност НАДОЛУ = по-малко печалба"},
-    "rate_duration_valuation": {"label": "оценка при дълга дюрация", "direct": True,  "sign": {"rate": +1},
-                                "text": "дългосрочни парични потоци/оценка (дълга дюрация) — доходност НАДОЛУ (цена на облигацията НАГОРЕ) = по-висока оценка"},
-    "index_beta":              {"label": "бета към пазара", "direct": False, "sign": {"equity_index": +1, "volatility": -1, "crypto": +1},
-                                "text": "тикърът се движи с широкия пазар/риск апетита (бета), не заради конкретен бизнес механизъм"},
-    "risk_off_hedge":          {"label": "защитен актив", "direct": False, "sign": {"equity_index": -1, "volatility": +1, "crypto": -1},
-                                "text": "тикърът расте, когато пазарът бяга от риск (защитен актив)"},
-    "substitute":              {"label": "заместител", "direct": True,  "sign": {"commodity": +1},
-                                "text": "компанията продава заместител на инструмента — по-висока цена на инструмента = повече търсене на заместителя"},
-    "consumer_wallet":         {"label": "потребителски бюджет", "direct": False, "sign": {"commodity": -1},
-                                "text": "клиентите на компанията харчат по-малко, когато цената на инструмента расте (потребителски бюджет)"},
-    "other":                   {"label": "друг механизъм", "direct": False, "sign": {},
-                                "text": "друг механизъм извън списъка — без изчислена посока"},
-}
-# Таблица "механизъм × посока → причина" (08.10.2026, бележка за обратен залог — виж src/cot_opposites.py): защо компанията печели/губи при дадено движение на
-# инструмента. Текстът е на КОДА (моделът не пише посока); ключът е ефектът, изчислен от COT_MECHANISM_SIGN × движението. "other" няма причина (няма изчислена посока).
-# "tracks_instrument" (само директната таблица) е по страната на записа: long следва цената, short е обратен продукт.
-COT_EFFECT_REASON = {
-    "input_cost":              {"gains": "по-ниска цена на суровината = по-ниски разходи", "loses": "по-висока цена на суровината = по-високи разходи"},
-    "output_price":            {"gains": "по-висока цена на продукта = по-високи приходи", "loses": "по-ниска цена на продукта = по-ниски приходи"},
-    "fx_revenue_translation":  {"gains": "приходите в чужда валута се превеждат в повече USD", "loses": "приходите в чужда валута се превеждат в по-малко USD"},
-    "fx_cost_local":           {"gains": "разходите в чужда валута струват по-малко USD", "loses": "разходите в чужда валута струват повече USD"},
-    "rate_asset_yield":        {"gains": "по-високи доходности = по-висок доход от активите", "loses": "по-ниски доходности = по-нисък доход от активите"},
-    "rate_duration_valuation": {"gains": "по-ниски доходности = по-висока оценка при дълга дюрация", "loses": "по-високи доходности = по-ниска оценка при дълга дюрация"},
-    "index_beta":              {"gains": "пазарът расте, а тикърът следва пазара (бета)", "loses": "пазарът пада, а тикърът следва пазара (бета)"},
-    "risk_off_hedge":          {"gains": "пазарът бяга от риск, а тикърът е защитен актив", "loses": "апетитът към риск се връща, а защитният актив изостава"},
-    "substitute":              {"gains": "по-висока цена на инструмента = повече търсене на заместителя", "loses": "по-ниска цена на инструмента = по-малко търсене на заместителя"},
-    "consumer_wallet":         {"gains": "по-ниска цена на инструмента = повече бюджет на клиентите", "loses": "по-висока цена на инструмента = по-малко бюджет на клиентите"},
-    "tracks_instrument:long":  {"gains": "продуктът следва цената на инструмента, която расте", "loses": "продуктът следва цената на инструмента, която пада"},
-    "tracks_instrument:short": {"gains": "обратен продукт: инструментът пада, продуктът печели", "loses": "обратен продукт: инструментът расте, продуктът губи"},
-}
-# Вид на пазара — как се чете "цената" (влиза в промпта към модела)
-COT_KIND_TEXT = {
-    "equity_index": "борсов индекс (цена↑ = пазарът расте)", "volatility": "волатилност VIX (цена↑ = страх на пазара)",
-    "fx_foreign": "чужда валута срещу USD (цена↑ = валутата поскъпва спрямо долара)", "fx_usd": "US Dollar Index (цена↑ = доларът поскъпва)",
-    "rate": "облигационен фючърс (цена↑ = доходността ПАДА)", "crypto": "криптовалута", "commodity": "стока",
-}
-# Cross-sector (пакет 3 т.г): колко тикъра и механизма, максимална дължина на описанието (quote)
-# Кеш на COT тезите (пакет 3 т.а): data/cot_theses_cache.json. Ключ: (пазар, as_of, посока на екстремума, версия на промпта/схемата,
-# модел). Регенерация само при нов as_of, нова посока, нов екстремум (нов ключ), смяна на версията или модела; иначе тезата се
-# ползва повторно. COT_SCHEMA_VERSION се вдига на ръка при промяна на логиката/схемата, която промптът не отразява; освен него
-# версията включва хеш на системния текст, промпта и таблиците (виж ai_brief.cot_prompt_version) — промяна на промпта или
-# таблицата за знака сама сменя версията. COT_THESES_MAX_AGE_DAYS: при провал на batch се показва СТАРАТА теза на пазара (с
-# флаг stale) само ако е най-много толкова дни стара, иначе — празна с причина. FORCE_COT_REGEN=1 регенерира всичко.
-COT_THESES_CACHE_FILE = DATA_DIR / "cot_theses_cache.json"
-COT_SCHEMA_VERSION = os.getenv("COT_SCHEMA_VERSION", "1")
-COT_THESES_MAX_AGE_DAYS = int(os.getenv("COT_THESES_MAX_AGE_DAYS", 8))
-# 15.10.2026: намерената подсказка за нов символ (сменен тикър, по company_claim) се помни — търсенето в Yahoo я дава един ден и не я дава на следващия (GMCR → KDP: 13.10 да, 14.10 не,
-# 15.10 да). Зарежда/записва се от main (ai_brief.SUCCESSOR_MEMORY), тестовете не го пипат.
-COT_SUCCESSOR_CACHE_FILE = DATA_DIR / "cot_successor_cache.json"
-COT_THESES_CACHE_KEEP_DAYS = int(os.getenv("COT_THESES_CACHE_KEEP_DAYS", 30))
-FORCE_COT_REGEN = os.getenv("FORCE_COT_REGEN", "0") == "1"
+# 03.11.2026 (разходката, т. 17): настройките на COT тезите (партиди, кеш, таблиците за механизмите и директните тикъри) са махнати заедно с тезите — COT е таблица от кода.
 # COT: дали работи (пакет 3 т.з) — ценово потвърждение и track record (src/cot_track.py).
 # Потвърждение: цената ПРЕСИЧА SMA10 на седмичните затваряния в посоката на contrarian сигнала и пресичането е скорошно (≤ 4 седмици).
 # Track record: екстремуми от COT историята (percentile 10/90 спрямо до 156 предишни седмици, поне 52 предишни) и доходността 2/4/8 седмици
@@ -1058,93 +969,6 @@ COT_PRICE_SYMBOLS = {
     "Live Cattle": "LE=F",
 }
 
-# значка CLOSED при тикър на COT теза, чиято позиция е затворена до толкова дни назад (виж cot_theses.ticker_badges)
-COT_CLOSED_BADGE_DAYS = int(os.getenv("COT_CLOSED_BADGE_DAYS", 14))
-COT_CROSS_MAX_TICKERS = int(os.getenv("COT_CROSS_MAX_TICKERS", 3))
-COT_MECHANISMS_PER_TICKER = int(os.getenv("COT_MECHANISMS_PER_TICKER", 2))
-COT_QUOTE_MAX_CHARS = int(os.getenv("COT_QUOTE_MAX_CHARS", 300))
-# Проверки на cross тикъра (08.10.2026, бриф 08.10 РЕАЛНО): кодът има последната дума над идентичността и над валутния механизъм.
-#  • company_claim: моделът казва ЗА КОЯ компания е описанието; името се сверява с Yahoo (cot_theses.claim_matches). Реални случаи:
-#    Lean Hogs "WH (Wyndham Hotels)" — текстът е за WH Group (HK); XRP "SI (Shoulder Innovations)" — текстът е за Silvergate (делистната,
-#    тикърът е преизползван). Без име в Yahoo (sector И industry липсват) идентичността не може да се провери → тикърът се изключва.
-#  • Фондове (quoteType ETF/MUTUALFUND) не влизат в cross: Russell 2000 cross беше три small-cap ETF-а (SCHA, IJR, PSCT), дубликати на IWM,
-#    който директната таблица вече покрива. Директната таблица (source "table") е извън това правило — там ETF е нормален.
-#  • Валутен механизъм: моделът дава СТРАНАТА на експозицията (exposure_side) и валутите; типът (fx_revenue_translation / fx_cost_local) го
-#    извежда кодът. Реален случай: AUD ↓ → BHP и RIO "губят" чрез "валутен превод на приходи", а те продават в USD и имат разходи в AUD
-#    (печелят). "both" → изключен (нетният ефект не се определя от кода). Не-USD отчитащи се (Yahoo financialCurrency ≠ USD: TSM→TWD,
-#    RELX→GBP, KOF→MXN) се изключват от валутните тези — преводът на отчета им не е механизмът от таблицата.
-COT_CROSS_BLOCKED_QUOTE_TYPES = ("ETF", "MUTUALFUND")
-COT_FX_TYPES = ("fx_revenue_translation", "fx_cost_local")                         # типове, които кодът извежда от exposure_side
-COT_FX_SIDE_TYPE = {"foreign_revenue": "fx_revenue_translation", "foreign_cost": "fx_cost_local"}   # "both" няма запис → изключване
-COT_FX_MARKET_CURRENCY = {"Euro FX": "EUR", "Japanese Yen": "JPY", "British Pound": "GBP", "Swiss Franc": "CHF",
-                          "Canadian Dollar": "CAD", "Australian Dollar": "AUD", "Mexican Peso": "MXN"}
-# само за таблицата с директните тикъри: продукт, който пряко следва инструмента (ETF/ETN/trust); знакът е по "side"
-COT_DIRECT_ONLY_TYPES = {"tracks_instrument"}
-
-# Директни тикъри по пазар (пакет 3 т.в) — фиксирана таблица по модела на THESIS_BASKETS; AI пише САМО cross-sector тезите.
-# side: "long" = печели, когато цената на инструмента расте (продукт/производител); "short" = обратно (инверсен продукт,
-# купувач на суровината). mechanism_type: от COT_MECHANISM_SIGN (за производител: output_price) или "tracks_instrument"
-# (ETF/ETN/trust, следващ инструмента). Знакът на типа трябва да съвпада със side (проверява се в теста). "partial": True =
-# частична/непълна експозиция (преработвател, диверсифицирана компания) — показва се с бележка. Празен списък + причина =
-# няма ликвиден американски тикър с чиста директна експозиция (iPath NIB/BAL/JO/COW и CurrencyShares FXM са делистнати).
-# ПРЕДЛОЖЕНИЕ за преглед (проверено срещу Yahoo на 05.10.2026: всички тикъри търгуват; съществуването не е препоръка).
-def _d(ticker, side, mtype, note="", partial=False):
-    return {"ticker": ticker, "side": side, "mechanism_type": mtype, "note": note, "partial": partial}
-
-# ПРАВИЛО за директната таблица (потребител, 05.10): само ПРИТЕЖАТЕЛИ/ПРОИЗВОДИТЕЛИ на инструмента (side long: tracks_instrument за продукт, който го
-# следва, output_price за производител) или ОБРАТНИ продукти (side short + tracks_instrument). Купувачи на суровината, преработватели и потребители
-# (input_cost, substitute, consumer_wallet…) НЕ са директни — те са cross тезата с механизъм. Тестът проверява всеки ред срещу това множество.
-COT_DIRECT_ALLOWED = {("long", "tracks_instrument"), ("long", "output_price"), ("short", "tracks_instrument")}
-COT_DIRECT_TICKERS = {
-    "E-mini S&P 500": {"tickers": [_d("SPY", "long", "tracks_instrument", "ETF върху S&P 500"), _d("VOO", "long", "tracks_instrument", "ETF върху S&P 500")]},
-    "Nasdaq-100": {"tickers": [_d("QQQ", "long", "tracks_instrument", "ETF върху Nasdaq-100"), _d("QQQM", "long", "tracks_instrument", "ETF върху Nasdaq-100")]},
-    "E-mini Russell 2000": {"tickers": [_d("IWM", "long", "tracks_instrument", "ETF върху Russell 2000"), _d("VTWO", "long", "tracks_instrument", "ETF върху Russell 2000")]},
-    "E-mini Dow (DJIA)": {"tickers": [_d("DIA", "long", "tracks_instrument", "ETF върху Dow Jones — единственият чист")]},
-    "VIX Futures": {"tickers": [_d("VIXY", "long", "tracks_instrument", "краткосрочни VIX фючърси"), _d("VXX", "long", "tracks_instrument", "краткосрочни VIX фючърси (ETN)"),
-                                _d("SVXY", "short", "tracks_instrument", "обратен (−0.5×) на краткосрочните VIX фючърси")]},
-    "US Dollar Index": {"tickers": [_d("UUP", "long", "tracks_instrument", "бичи фонд върху USD индекса"), _d("UDN", "short", "tracks_instrument", "мечи фонд върху USD индекса")]},
-    "Euro FX": {"tickers": [_d("FXE", "long", "tracks_instrument", "trust върху еврото")]},
-    "Japanese Yen": {"tickers": [_d("FXY", "long", "tracks_instrument", "trust върху йената")]},
-    "British Pound": {"tickers": [_d("FXB", "long", "tracks_instrument", "trust върху паунда")]},
-    "Swiss Franc": {"tickers": [_d("FXF", "long", "tracks_instrument", "trust върху швейцарския франк")]},
-    "Canadian Dollar": {"tickers": [_d("FXC", "long", "tracks_instrument", "trust върху канадския долар")]},
-    "Australian Dollar": {"tickers": [_d("FXA", "long", "tracks_instrument", "trust върху австралийския долар")]},
-    "Mexican Peso": {"tickers": [], "empty_reason": "няма листнат американски продукт върху мексиканското песо (FXM е делистнат)"},
-    "2-Year Treasury Note": {"tickers": [_d("SHY", "long", "tracks_instrument", "1–3г. съкровищни облигации"), _d("SCHO", "long", "tracks_instrument", "краткосрочни съкровищни облигации")]},
-    "5-Year Treasury Note": {"tickers": [_d("IEI", "long", "tracks_instrument", "3–7г. съкровищни облигации"), _d("VGIT", "long", "tracks_instrument", "3–10г. съкровищни облигации")]},
-    "10-Year Treasury Note": {"tickers": [_d("IEF", "long", "tracks_instrument", "7–10г. съкровищни облигации"), _d("SCHR", "long", "tracks_instrument", "3–10г. съкровищни облигации")]},
-    "Ultra Treasury Bond": {"tickers": [_d("EDV", "long", "tracks_instrument", "облигации с удължена дюрация"), _d("ZROZ", "long", "tracks_instrument", "25+г. нулево-купонни съкровищни облигации")]},
-    "30-Year Treasury Bond": {"tickers": [_d("TLT", "long", "tracks_instrument", "20+г. съкровищни облигации"), _d("VGLT", "long", "tracks_instrument", "дългосрочни съкровищни облигации"),
-                                          _d("TBF", "short", "tracks_instrument", "обратен (−1×) на 20+г. облигации")]},
-    "Bitcoin Futures (CME)": {"tickers": [_d("IBIT", "long", "tracks_instrument", "спот биткойн ETF"), _d("FBTC", "long", "tracks_instrument", "спот биткойн ETF")]},
-    "XRP": {"tickers": [_d("GXRP", "long", "tracks_instrument", "XRP trust"), _d("XRP", "long", "tracks_instrument", "Bitwise XRP ETF"), _d("XRPC", "long", "tracks_instrument", "Canary XRP ETF")]},
-    "Gold": {"tickers": [_d("GLD", "long", "tracks_instrument", "физическо злато"), _d("IAU", "long", "tracks_instrument", "физическо злато"),
-                         _d("NEM", "long", "output_price", "най-големият златодобивач"), _d("AEM", "long", "output_price", "златодобивач")]},
-    "Silver": {"tickers": [_d("SLV", "long", "tracks_instrument", "физическо сребро"), _d("SIVR", "long", "tracks_instrument", "физическо сребро"),
-                           _d("PAAS", "long", "output_price", "добивач на сребро")]},
-    "Copper": {"tickers": [_d("CPER", "long", "tracks_instrument", "фонд върху медни фючърси"), _d("FCX", "long", "output_price", "медодобивач"),
-                           _d("SCCO", "long", "output_price", "медодобивач")]},
-    "Platinum": {"tickers": [_d("PPLT", "long", "tracks_instrument", "физическа платина"), _d("SBSW", "long", "output_price", "платинови/паладиеви метали (и злато, уран)", partial=True)]},
-    "Palladium": {"tickers": [_d("PALL", "long", "tracks_instrument", "физически паладий"), _d("SBSW", "long", "output_price", "платинови/паладиеви метали (и злато, уран)", partial=True)]},
-    "WTI Crude Oil": {"tickers": [_d("USO", "long", "tracks_instrument", "фонд върху WTI фючърси"), _d("OXY", "long", "output_price", "добивач на нефт"),
-                                  _d("COP", "long", "output_price", "добивач на нефт"), _d("EOG", "long", "output_price", "добивач на нефт и газ")]},
-    "Natural Gas": {"tickers": [_d("UNG", "long", "tracks_instrument", "фонд върху фючърси на природен газ"), _d("EQT", "long", "output_price", "производител на природен газ"),
-                                _d("AR", "long", "output_price", "производител на природен газ")]},
-    "RBOB Gasoline": {"tickers": [_d("UGA", "long", "tracks_instrument", "фонд върху бензинови фючърси"), _d("VLO", "long", "output_price", "рафинер (бензин е основен продукт)", partial=True),
-                                  _d("MPC", "long", "output_price", "рафинер (бензин е основен продукт)", partial=True)]},
-    "Heating Oil": {"tickers": [_d("VLO", "long", "output_price", "рафинер (дизел/ULSD е основен продукт)", partial=True), _d("MPC", "long", "output_price", "рафинер (дизел/ULSD е основен продукт)", partial=True)]},
-    "Corn": {"tickers": [_d("CORN", "long", "tracks_instrument", "фонд върху фючърси на царевица")]},
-    "Soybeans": {"tickers": [_d("SOYB", "long", "tracks_instrument", "фонд върху фючърси на соя")]},
-    "Soybean Oil": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху соевото масло; преработвателите (BG, ADM) са cross тикъри"},
-    "Soybean Meal": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху соевото брашно; преработвателите (BG, ADM) и потребителите на фураж са cross тикъри"},
-    "Wheat": {"tickers": [_d("WEAT", "long", "tracks_instrument", "фонд върху фючърси на пшеница")]},
-    "Sugar No. 11": {"tickers": [_d("CANE", "long", "tracks_instrument", "фонд върху фючърси на захар")]},
-    "Coffee C": {"tickers": [], "empty_reason": "няма листнат американски продукт върху кафето (iPath JO е делистнат)"},
-    "Cocoa": {"tickers": [], "empty_reason": "няма листнат американски продукт върху какаото (iPath NIB е делистнат)"},
-    "Cotton": {"tickers": [], "empty_reason": "няма листнат американски продукт върху памука (iPath BAL е делистнат)"},
-    "Lean Hogs": {"tickers": [_d("SFD", "long", "output_price", "производител на свинско (разходите за фураж също влияят)", partial=True)]},
-    "Live Cattle": {"tickers": [], "empty_reason": "няма листнат продукт или чист производител върху говеждия добитък (COW е делистнат); месопреработвателите (TSN) са cross с input_cost"},
-}
 
 # ── MOVE Index (ICE BofA, bond volatility) ────────────────────────────────
 MOVE_YELLOW_THRESHOLD = float(os.getenv("MOVE_YELLOW_THRESHOLD", 100))

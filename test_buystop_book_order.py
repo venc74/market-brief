@@ -147,7 +147,7 @@ print("── 7. редът в main.run(): резолюцията е преди 
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 call = "\n        backtest.resolve_positions_only()\n"                                                       # самото извикване (коментарите също споменават функцията)
 assert src.count(call) == 1
-assert src.index(call) < src.index("setup_rules.annotate(candidates") < src.index("cot_live = _live_positions()")
-print("  ✓ ensure_v2_methodology + resolve_positions_only → setup_rules.annotate → _live_positions (веднъж)")
+assert src.index(call) < src.index("setup_rules.annotate(candidates") < src.index("action, watchlist = apply_hard_rules(candidates")      # 03.11.2026: четенето за COT тезите отпадна (т. 17) — следващото е в apply_hard_rules
+print("  ✓ ensure_v2_methodology + resolve_positions_only → setup_rules.annotate → apply_hard_rules (_live_positions)")
 print()
 print("Всички тестове минаха.")

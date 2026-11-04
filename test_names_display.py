@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
-from src import names, ai_brief, render, cot_theses
+from src import names, ai_brief, render
 
 FIX = ROOT / "tests" / "fixtures"
 N = json.loads((FIX / "yahoo_names_2026-10-08.json").read_text(encoding="utf-8"))["info"]
@@ -69,12 +69,10 @@ config.DOCS_DIR.mkdir(); config.DATA_DIR.mkdir()
 B05 = json.loads((FIX / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 b = copy.deepcopy(B05)
 b["watchlist"][0]["company"] = "Expeditors International of Washington, Inc."
-b["cot"][0]["direct_thesis"] = {"tickers": [{"ticker": "RELX", "company": "RELX PLC PLC", "effect": "gains"}, {"ticker": "TSM", "company": "Taiwan Semiconductor Manufacturing Company Limited", "effect": "gains"}], "source": "table", "reasoning": ""}
 with contextlib.redirect_stdout(io.StringIO()):
     page = htmllib.unescape(render.render_dashboard(b))
 assert '<span class="company">Expeditors International of Washington</span>' in page
-assert "RELX (RELX)" in page and "TSM (Taiwan Semiconductor Manufacturing)" in page and "RELX PLC PLC" not in page
-print("  ✓ Watchlist картата: «Expeditors International of Washington»; COT: «RELX (RELX)», «TSM (Taiwan Semiconductor Manufacturing)» — без «PLC PLC» и без правни окончания")
+print("  ✓ Watchlist картата: «Expeditors International of Washington» (COT тикърите отпаднаха с тезите на 03.11, т. 17)")
 from tests import helpers_page
 hb, _lv = helpers_page.build_brief()                                           # РЕАЛНА Action карта (EXEL) за имейла; пише във временни папки
 hb["action"][0]["company"] = "Northwest Natural Holding Company"             # РЕАЛНОТО име от 08.10 върху картата
@@ -87,22 +85,10 @@ assert "company[:" not in tpl and "name[:26]" not in (ROOT / "src" / "render.py"
 print("  ✓ имейлът (Action реда): «Northwest Natural» без «Holding Company»; в шаблона няма повече company[:N], имейлът не ползва name[:26]")
 
 print()
-print("── 4. еднакви причини на един ред (РЕАЛНАТА 30Y теза от брифа на 08.10) ──")
-reason = "mixed: противоположен ефект — оценка при дълга дюрация (+) срещу доходност на активите (−)"
-dropped30 = [{"ticker": t, "code": "mixed", "reason": reason} for t in ("BAC", "MET", "PFG")]
-assert cot_theses.group_dropped(dropped30) == [{"tickers": ["BAC", "MET", "PFG"], "reason": reason}]
-empty = cot_theses.cross_empty_reason(True, dropped30)
-assert empty == f"всички предложени тикъри бяха изключени при проверката (3): BAC, MET, PFG — {reason}", empty
-assert cot_theses.group_dropped([{"ticker": "A", "reason": "x"}, {"ticker": "B", "reason": "y"}, {"ticker": "C", "reason": "x"}, "OLD"]) == [{"tickers": ["A", "C"], "reason": "x"}, {"tickers": ["B"], "reason": "y"}, {"tickers": ["OLD"], "reason": ""}]
+# 03.11.2026 (разходката, т. 17): т. 4 (изключените тикъри на COT тезите на един ред) отпадна заедно с тезите
 b3 = copy.deepcopy(B05)
-row = next(r for r in b3["cot"] if r.get("cross_sector_thesis") is not None)
-row["cross_sector_thesis"] = {"tickers": [], "no_direct_link": True, "reasoning": "", "dropped_tickers": dropped30, "empty_reason": empty, "outside_screener": False}
 with contextlib.redirect_stdout(io.StringIO()):
     page3 = htmllib.unescape(render.render_dashboard(b3))
-assert page3.count("BAC, MET, PFG") == 1 and page3.count(reason) == 1 and "Изключени: BAC" not in page3
-b3["cot"][0]["cross_sector_thesis"] = {"tickers": [{"ticker": "KEEP", "company": "Keep", "effect": "gains", "sentence": "x", "quote": "y"}], "dropped_tickers": dropped30, "outside_screener": False}
-with contextlib.redirect_stdout(io.StringIO()):
-    page4 = htmllib.unescape(render.render_dashboard(b3))
-assert "Изключени: BAC, MET, PFG — " + reason in page4
-print("  ✓ празната теза: «… (3): BAC, MET, PFG — mixed: …» ЕДНОКРАТНО (преди: три пъти в причината и още веднъж в реда «Изключени:»); при непразна теза редът «Изключени: BAC, MET, PFG — …» е един")
+assert "Изключени:" not in page3 and "Cross-sector теза" not in page3                     # старият бриф с тези — COT е таблица, без тезите
+print("  ✓ старият бриф (05.10) с COT тези — показан като таблица, без тезите и без «Изключени:» (т. 17)")
 print("\n✅ test_names_display: всичко мина")

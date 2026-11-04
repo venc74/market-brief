@@ -54,7 +54,7 @@ assert all("position_label" not in c for c in b19["cot"])
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b19)
 sec = page[page.index("COT Екстремуми"):]; sec = htmllib.unescape(sec[:sec.index("</section>")])
-heads = dict(re.findall(r'class="thesis-name">([^<]+)</span>\s*<span class="cot-percentile">[^(]*\(([^)]+)\)', sec))
+heads = dict(re.findall(r'<tr><td>([^<]+)</td><td class="num">[\d.]+</td><td>([^<]+)</td>', sec))          # 03.11.2026 (т. 17): таблица вместо карти
 assert heads["Bitcoin Futures (CME)"] == "нетно къси, близо до най-малко късите за 3 години"                 # −5 844 на 99.4
 assert heads["30-Year Treasury Bond"] == "най-малко къси от 3 години" and heads["XRP"] == "най-малко къси от 62 седмици"  # −154 020 на 100; XRP −45 на 100 (62 седмици)
 assert heads["Coffee C"] == "нетно дълги, близо до най-малко дългите за 3 години" and heads["Euro FX"] == "екстремно къси"
