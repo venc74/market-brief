@@ -33,24 +33,32 @@
   // ─── Помощни ────────────────────────────────────────────────────────────────
   TC.esc = s => String(s == null ? '' : s).replace(/[&<>"'`]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
 
-  TC.splitCSV = function (line) {
+  TC.splitCSV = function (line, delim) {
+    const d = delim || ',';
     const out = []; let cur = '', q = false;
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
       if (c === '"') { if (q && line[i + 1] === '"') { cur += '"'; i++; } else q = !q; continue; }
-      if (c === ',' && !q) { out.push(cur); cur = ''; continue; }
+      if (c === d && !q) { out.push(cur); cur = ''; continue; }
       cur += c;
     }
     out.push(cur);
     return out.map(s => s.trim());
   };
 
-  // числа във формата на брокера: "1,234.56" (хиляди със запетая) → 1234.56; празно / нечисло → NaN
-  TC.num = function (s) {
+  // числа: "1,234.56" / "1,234" (хиляди със запетая — форматът на брокерите) → 1234.56 / 1234; 05.11.2026: десетична запетая — "0,125" → 0.125 (до 05.11 → 125),
+  // "1,5" → 1.5, "1.234,56" → 1234.56; decimalComma (файл с „;“ — немски Excel) — запетаята винаги е десетична. Двусмислено остава само "1,234" (= 1234). Празно / нечисло → NaN
+  TC.num = function (s, decimalComma) {
     if (s == null) return NaN;
-    const t = String(s).replace(/["\s]/g, '').replace(/,(?=\d{3}(\D|$))/g, '');
-    return t === '' || t === '--' ? NaN : Number(t);
+    let t = String(s).replace(/["\s\u00a0]/g, '');
+    if (t === '' || t === '--') return NaN;
+    if (decimalComma) t = t.replace(/\./g, '').replace(',', '.');
+    else if (/^[-+]?[1-9]\d{0,2}(,\d{3})+(\.\d+)?$/.test(t)) t = t.replace(/,/g, '');
+    else if (/^[-+]?\d{1,3}(\.\d{3})+,\d+$/.test(t)) t = t.replace(/\./g, '').replace(',', '.');
+    else if (/^[-+]?\d+,\d+$/.test(t)) t = t.replace(',', '.');
+    return Number(t);
   };
+  TC.delimOf = first => (first.includes(';') && !first.includes(',')) ? ';' : ',';
 
   // дата/час: "2024-01-10, 10:00:00", "2024-01-10;10:00:00", "20240110;100000", "2024-01-10" → {date, time}
   TC.parseDateTime = function (s) {
@@ -73,7 +81,7 @@
     const t = String(text || '').replace(/^﻿/, '');
     const first = t.split(/\r?\n/).find(l => l.trim()) || '';
     if (/^Statement,Header,/.test(first) || /Statement,Data,BrokerName,Interactive Brokers/.test(t)) return 'ibkr';
-    const h = TC.splitCSV(first).map(x => x.toLowerCase());
+    const h = TC.splitCSV(first, TC.delimOf(first)).map(x => x.toLowerCase());
     if (h[0] === 'date' && h.length > 3 && h.slice(1).filter(x => x).every(x => /^[a-z]{3}$/.test(x))) return 'ecb_rates';
     if (['type', 'ticker', 'date', 'quantity', 'currency'].every(c => h.includes(c)) && h.includes('price') && !h.includes('price per share')) return 'standard';
     if (h.includes('ticker') && h.includes('price per share') && h.includes('total amount')) return 'revolut_stocks';
@@ -89,7 +97,8 @@
   const IBKR_INFO = new Set(['Statement', 'Account Information', 'Net Asset Value', 'Change in NAV', 'Mark-to-Market Performance Summary', 'Realized & Unrealized Performance Summary',
     'Cash Report', 'Open Positions', 'Forex Balances', 'Codes', 'Notes/Legal Notes', 'Notes', 'Base Currency Exchange Rate', 'Change in Dividend Accruals', 'Interest Accruals',
     'Month & Year to Date Performance Summary', 'Location of Customer Assets, Positions and Money', 'Net Stock Position Summary', 'Disclosures', 'Legal Notes',
-    'Change in Position Value', 'Dividend Accruals', 'Complex Position Summary', 'Trade Summary by Asset', 'Commission Details']);
+    'Change in Position Value', 'Dividend Accruals', 'Complex Position Summary', 'Trade Summary by Asset', 'Commission Details',
+    'Deposits & Withdrawals', 'Deposits And Withdrawals']);                    // вноски / тегления на пари — не са доход (05.11.2026: бяха шум в „не е сметнато“)
 
   // тикърът в началото на описание на IBKR: "AAPL(US0378331005) Cash Dividend…" и "AAPL (US0378331005) …"
   TC.ibkrDescSymbol = function (desc) { const m = String(desc || '').match(/^\s*([A-Z0-9][A-Z0-9.\- ]*?)\s*\(([A-Z]{2}[A-Z0-9]{9}\d)\)/); return m ? { sym: m[1].trim(), isin: m[2] } : null; };
@@ -127,9 +136,11 @@
     (info.openPositions || []).forEach(o => { o.account = o.account || info.account || '?'; });
     const base = (r, line, src) => ({ broker: 'IBKR', account: acct(r), src, line });
     // taxable (05.11.2026): редът може да е облагаем доход / продажба — годината му става „НЕПЪЛНО“ (не само ред в списъка)
-    const skip = (sec, r, line, reason, taxable) => skipped.push({ src, line, broker: 'IBKR', account: acct(r), section: sec, what: r['Symbol'] || r['Description'] || '', date: (TC.parseDateTime(r['Date/Time'] || r['Date'] || r['Report Date']) || {}).date || '', reason, taxable: !!taxable });
+    const skip = (sec, r, line, reason, taxable) => skipped.push({ src, line, broker: 'IBKR', account: acct(r), section: sec, what: r['Symbol'] || r['Description'] || '', date: (TC.parseDateTime(r['Date/Time'] || r['Date'] || r['Report Date']) || {}).date || '', reason, taxable: !!taxable,
+                                                                  amount: r['Amount'] || r['Quantity'] || r['Proceeds'] || r['Qty'] || '' });
     rows.forEach(({ sec, r, line }) => {
       if (IBKR_INFO.has(sec) || sec === 'Financial Instrument Information') return;
+      if (Object.values(r).slice(0, 2).some(v => /^Total\b/i.test(String(v || '').trim()))) return;   // „Total“ / „Total in EUR“ — обобщения на същите редове
       if (sec === 'Trades') {
         const disc = r['DataDiscriminator'];
         if (disc && disc !== 'Order' && disc !== 'Trade') return;               // ClosedLot / SubTotal / Total — обобщения на същите сделки
@@ -188,15 +199,17 @@
     const lines = String(text).replace(/^﻿/, '').split(/\r?\n/);
     const recs = [], skipped = [];
     let head = null;
+    const delim = TC.delimOf(lines.find(l => l.trim() && !l.trim().startsWith('#')) || ''), dc = delim === ';';   // „;“ → немски Excel: десетична запетая
+    const num = v => TC.num(v, dc);
     lines.forEach((line, i) => {
       if (!line.trim() || line.trim().startsWith('#')) return;
-      const p = TC.splitCSV(line);
+      const p = TC.splitCSV(line, delim);
       if (!head) { head = p.map(h => h.toLowerCase()); return; }
       const r = {}; head.forEach((h, k) => { r[h] = p[k] !== undefined ? p[k] : ''; });
       const type = (r.type || '').toLowerCase(), at = (r.asset_type || 'stock').toLowerCase();
-      const dt = TC.parseDateTime(r.date), qty = TC.num(r.quantity), price = TC.num(r.price), fee = TC.num(r.fee);
+      const dt = TC.parseDateTime(r.date), qty = num(r.quantity), price = num(r.price), fee = num(r.fee);
       const b = { broker: r.broker || 'CSV', account: r.account || 'default', src, line: i + 1, currency: (r.currency || 'EUR').toUpperCase(), sym: (r.ticker || '').toUpperCase() };
-      const bad = reason => skipped.push({ src, line: i + 1, broker: b.broker, account: b.account, section: 'CSV', what: b.sym, date: dt ? dt.date : r.date, reason, taxable: true });
+      const bad = reason => skipped.push({ src, line: i + 1, broker: b.broker, account: b.account, section: 'CSV', what: b.sym, date: dt ? dt.date : r.date, reason, taxable: true, amount: r.quantity || '' });
       if (!dt) return bad('невалидна дата (YYYY-MM-DD)');
       const cls = { stock: 'stock', etf: 'stock', fund: 'stock', crypto: 'crypto', option: 'option' }[at];
       if (type === 'buy' || type === 'sell') {
@@ -207,7 +220,7 @@
       } else if (type === 'dividend') {
         if (!isFinite(qty)) return bad('невалидна сума на дивидента');
         recs.push({ ...b, kind: 'dividend', date: dt.date, amount: qty });
-        const wh = TC.num(r.withholding_tax);
+        const wh = num(r.withholding_tax);
         if (wh) recs.push({ ...b, kind: 'withholding', date: dt.date, amount: -Math.abs(wh), line: i + 1 });
       } else if (type === 'withholding') {
         if (!isFinite(qty)) return bad('невалидна сума');
@@ -262,7 +275,7 @@
           const res = fmt === 'ibkr' ? TC.parseIBKR(f.text, f.name) : fmt === 'standard' ? TC.parseStandard(f.text, f.name) : TC.parsers[fmt](f.text, f.name, f.owner);
           res.records.forEach(r => { r.owner = f.owner === 'B' ? 'B' : 'A'; });       // чий е файлът (05.11.2026) — по подразбиране за крипто §23 на човек
           perFile.push({ idx: fileIdx, recs: res.records });
-          out.skipped.push(...res.skipped);
+          out.skipped.push(...res.skipped.map(x => ({ ...x, _f: fileIdx })));
           Object.assign(out.instruments, res.instruments || {});
           if (res.info) out.info.push({ file: f.name, ...res.info });
           const dates = res.records.map(r => r.date).sort();
@@ -292,9 +305,15 @@
     // Mutual Funds на IBKR (клас 'fund') — винаги фонд (05.11.2026: смятаха се като акции и не бяха в таблицата с видовете фондове)
     out.records.forEach(x => { if (x.kind === 'trade' && (x.assetClass === 'fund' || (out.instruments[x.sym] && /ETF|FUND/i.test(out.instruments[x.sym].type)))) x.fundHint = true; });
     // „не е сметнато“ — също веднъж за застъпващи се отчети (ключ без името на файла)
-    const seenSkip = new Set();
-    out.skipped = out.skipped.filter(x => { const k = [x.broker, x.account, x.section, x.what, x.date, x.reason].join('|'); if (x.line && seenSkip.has(k)) return false; seenSkip.add(k); return true; });
-    out.records.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')) || (a.kind === 'split' ? -1 : 0) - (b.kind === 'split' ? -1 : 0));
+    // 05.11.2026: ключът е със сумата, а повторенията в ЕДИН файл остават (две еднакви такси в един ден — два реда); между файловете — максимумът, както при записите
+    const skCounts = {}, skOut = [];
+    out.skipped.forEach(x => { if (!x.line) { skOut.push(x); return; } const k = [x.broker, x.account, x.section, x.what, x.date, x.reason, x.amount || ''].join('|');
+                               ((skCounts[k] = skCounts[k] || {})[x._f] = skCounts[k][x._f] || []).push(x); });
+    Object.values(skCounts).forEach(byFile => skOut.push(...Object.values(byFile).sort((a, b) => b.length - a.length)[0]));
+    out.skipped = skOut.map(({ _f, ...x }) => x);
+    // при еднакъв момент (часът липсва): сплитът първи, после покупките, после продажбите (05.11.2026: отчет с най-новите отгоре даваше „липсва покупката“ за дневна сделка)
+    const tie = r => r.kind === 'split' ? 0 : r.kind === 'trade' ? (r.qty > 0 ? 1 : 2) : 3;
+    out.records.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')) || tie(a) - tie(b));
     return out;
   };
 
@@ -331,7 +350,8 @@
       rowsOf(text).forEach(({ r, line }) => {
         const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toUpperCase(), cur = (r['currency'] || '').toUpperCase() || 'USD';
         const price = TC.money(r['price per share'], cur), total = TC.money(r['total amount'], cur), qty = TC.num(r['quantity']);
-        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
+        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable,
+                                                       amount: r['quantity'] || r['total amount'] || '' });
         if (!dt) return skip('без дата', true);
         if (/^(BUY|SELL)/.test(type)) {
           if (!(qty > 0)) return skip('невалидно количество', true);
@@ -343,6 +363,7 @@
           if (!isFinite(total.v)) return skip('дивидент без сума', true);
           recs.push({ ...b, line, kind: 'dividend', sym: r['ticker'], date: dt.date, amount: total.v, currency: total.cur || cur, desc: 'Revolut DIVIDEND (сумата в отчета — да се провери дали е брутна)' });
         } else if (/CASH TOP-UP|CASH WITHDRAWAL|TRANSFER/.test(type)) {
+          if (r['ticker'] && qty > 0) return skip('прехвърляне на акции — цената на придобиване не е в този отчет (при продажба — „липсва покупката“)');   // 05.11.2026: изчезваше тихо
           return;                                                                 // движение на пари — не е доход
         } else if (/SPLIT/.test(type)) skip(`сплит в Revolut — коефициентът не е в отчета; добави стандартен CSV с ред: type=split, ticker=${r['ticker'] || 'тикър'}, date, quantity = нови акции за една стара (без broker / account — важи за всички сметки)`);
         else if (/FEE/.test(type)) skip('такса извън сделките — не се приспада (§20 ал. 9 EStG; да се потвърди)');
@@ -357,7 +378,8 @@
       rowsOf(text).forEach(({ r, line }) => {
         const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toLowerCase(), qty = TC.num(r['quantity']);
         const price = TC.money(r['price'], 'EUR'), value = TC.money(r['value'], price.cur || 'EUR'), fee = TC.money(r['fees'], price.cur || 'EUR');
-        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['symbol'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
+        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['symbol'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable,
+                                                       amount: r['quantity'] || r['value'] || '' });
         if (!dt) return skip('без дата', true);
         if (type === 'buy' || type === 'sell') {
           if (!(qty > 0)) return skip('невалидно количество', true);
@@ -664,9 +686,11 @@
     let total = shareNet + otherPos - otherNeg - cO, otherCarry = 0;
     if (total < 0) { otherCarry = -total; total = 0; }
     // крипто §23 — по човек (сметките, отбелязани като на съпруга / съпругата → 'B')
-    const persons = {};
+    const persons = {}, soloB = new Set();
     R.filter(x => x.assetClass === 'crypto').forEach(x => {
-      const who = (st.persons || {})[x.broker + '|' + x.account] || x.owner || 'A';
+      const who0 = (st.persons || {})[x.broker + '|' + x.account] || x.owner || 'A';
+      if (who0 === 'B' && !st.joint) soloB.add(x.broker + ' ' + x.account);
+      const who = st.joint ? who0 : 'A';                                          // „сам“ — един човек, дори ако някоя сметка е отбелязана като на съпруга
       const o = persons[who] = persons[who] || { person: who, taxable: 0, exempt: 0, sales: 0, unknown: 0 };
       o.sales++;
       if (x.gainEUR == null) { o.unknown++; return; }
@@ -678,6 +702,7 @@
       o.underFreigrenze = o.taxable > 0 && o.taxable < par.freigrenze23;
       o.lossCarry = o.taxable < 0 ? -o.taxable : 0;
     });
+    if (soloB.size) notes.push({ level: 'warn', text: `Подаването е „сам“, а ${[...soloB].join(', ')} е отбелязано като на съпруга — криптото е сметнато към теб; махни файла или избери „съвместно“.` });
     // ориентировъчно: Sparer-Pauschbetrag, Abgeltungsteuer с църковния данък по формулата (e − 4q) / (4 + k), Soli
     const pausch = par.pauschbetrag * (st.joint ? 2 : 1);
     const e = Math.max(0, total - pausch);

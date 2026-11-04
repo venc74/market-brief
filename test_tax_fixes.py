@@ -123,4 +123,29 @@ assert close(r["de"][2024]["shareGains"], 24 - 20) and not r["de"][2024]["unmatc
 assert [x["fee"] for x in r["records"] if x["sym"] == "ETH"] == [1, 2]                                  # една секунда, различна такса — две
 print("  ✓ съпрузите в Revolut — отделни: аз +20 000 освободени, съпругата +1 000 облагаеми; .120 и .480 — две покупки, общата с q1.csv — веднъж; различна такса — две")
 
+# ── 10. тихите загуби и шумът ──
+print("── 10. тихи загуби ──")
+rt = RS + "2023-01-10T14:35:00.000Z,AAPL,TRANSFER FROM REVOLUT TRADING LTD TO REVOLUT SECURITIES EUROPE UAB,10,,,USD,1\n2023-03-01T09:00:00.000Z,,CASH WITHDRAWAL,,,USD -5,USD,1\n"
+r = scenario([{"name": "rt.csv", "text": rt}])
+assert [x["what"] for x in r["skipped"]] == ["AAPL TRANSFER FROM REVOLUT TRADING LTD TO REVOLUT SECURITIES EUROPE UAB"], r["skipped"]   # акциите — в списъка; парите — не
+fees = IB("Fees,Header,Subtitle,Currency,Date,Description,Amount", "Fees,Data,Other Fees,USD,2024-02-01,Market data,-10", "Fees,Data,Other Fees,USD,2024-02-01,Market data,-10",
+          "Fees,Data,Total,,,,-20", "Transfers,Header,Asset Category,Currency,Symbol,Date,Type,Direction,Xfer Company,Qty",
+          "Transfers,Data,Stocks,USD,AAPL,2024-03-01,ACATS,In,X,10", "Transfers,Data,Stocks,USD,AAPL,2024-03-01,ACATS,In,Y,5",
+          "Deposits & Withdrawals,Header,Currency,Settle Date,Description,Amount", "Deposits & Withdrawals,Data,EUR,2024-01-05,Cash Transfer,1000")
+r = scenario([{"name": "a.csv", "text": fees}, {"name": "b.csv", "text": fees}])
+assert sorted((x["section"], x["amount"]) for x in r["skipped"]) == [("Fees", "-10"), ("Fees", "-10"), ("Transfers", "10"), ("Transfers", "5")], r["skipped"]   # без Total и вноската; повторен файл — веднъж
+sc = "type;asset_type;ticker;date;quantity;price;currency;fee;broker;account\nbuy;crypto;BTC;2024-01-10;0,125;40.000,50;EUR;1,5;B;A\nsell;crypto;BTC;2024-05-10;0,125;48.000,50;EUR;0;B;A\n"
+r = scenario([{"name": "de.csv", "text": sc}], years=[2024])
+assert [(x["qty"], x["price"], x["fee"]) for x in r["records"]] == [(0.125, 40000.5, 1.5), (-0.125, 48000.5, 0)], r["records"]
+assert close(r["de"][2024]["crypto"][0]["taxable"], 0.125 * 8000 - 1.5), r["de"][2024]["crypto"]       # 998.5 — под Freigrenze 1 000
+cc = STD + 'buy,crypto,ETH,2024-01-10,"0,125",2000,EUR,0,B,A\n'
+assert [x["qty"] for x in scenario([{"name": "c.csv", "text": cc}])["records"]] == [0.125]                 # до 05.11: 125
+day = std("sell,stock,DAY,2024-03-01,10,12,EUR,0,B,A", "buy,stock,DAY,2024-03-01,10,10,EUR,0,B,A")       # най-новите отгоре, без час
+d = scenario([{"name": "day.csv", "text": day}], years=[2024])["de"][2024]
+assert close(d["shareGains"], 20) and not d["unmatched"], d
+r = scenario([{"name": "crypto.csv", "text": me}, {"name": "crypto.csv", "text": sp_, "owner": "B"}], years=[2024], joint=False)
+c = r["de"][2024]["crypto"]
+assert [x["person"] for x in c] == ["A"] and close(c[0]["taxable"], 1000) and any("„сам“" in n["text"] for n in r["de"][2024]["notes"]), c
+print("  ✓ TRANSFER с акции — в списъка; таксите / трансферите със сумата (две такси — два реда, повторен файл — веднъж); без Total и вноски; 0,125 / „;“ файл; дневна сделка; „сам“ — един човек")
+
 print("\n✅ test_tax_fixes: всичко мина")
