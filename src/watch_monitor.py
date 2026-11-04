@@ -9,8 +9,9 @@ GLB и Short Screener ТЪРСЯТ нови кандидати по критер
 24 часа".
 
 Източници — само вече налична инфраструктура, нула нови зависимости:
-  • новини (29.10.2026): RSS на Yahoo Finance по ТИКЪР (config.WATCH_NEWS_RSS) + проверка, че новината е за компанията (about_company);
-    yfinance .news — само резерва (на 29.10 връща нищо). До 29.10: yfinance .news, keyed по ТИКЪР. Съзнателно НЕ Google News по име
+  • новини (29.10.2026): RSS на Yahoo Finance по ТИКЪР (config.WATCH_NEWS_RSS) + проверка, че новината е за компанията (about_company).
+    04.11.2026 (четвърти преглед, В1): без резервата yfinance .news (от 29.10 връщаше нищо и скриваше провала на RSS); провал на RSS (HTTP статус ≠ 200, нечетим фийд,
+    изключение) → news_checked False на реда + LAST_STATUS (брояч и причина) — стъпката е „частично“ над config.WATCH_PARTIAL_SHARE. До 29.10: yfinance .news, keyed по ТИКЪР. Съзнателно НЕ Google News по име
     на компанията — тествано на 18.09.2026 и се чупи при двусмислени имена:
     заявка за BLSH ("Bullish") върна "Why Democrats are starting to feel
     bullish about a midterm wave" и "AI trade rebound sparks flurry of
@@ -45,10 +46,14 @@ import config
 import requests
 import pandas as pd
 import yfinance as yf
-from src import net_utils
 from src import insider_buying
 
 _LIST_PATH = config.DATA_DIR / "watch_list.json"
+
+# 04.11.2026 (четвърти преглед, В1): какво НЕ се провери в последния collect — {"tickers", "news_failed": {тикър: причина}, "price_missing": [...], "insider_ok"}.
+# До 04.11 провал на RSS, на цените или на Form 4 оставяше само ред в лога, а редът казваше „няма новини“ (тишината не е информация).
+LAST_STATUS: dict = {}
+_NEWS_FAIL: dict = {}
 
 
 def load_watch_list() -> list[str]:
@@ -110,15 +115,29 @@ def about_company(ticker: str, keys: set[str], title: str, summary: str = "") ->
 
 
 def _rss_news(ticker: str, hours: int, keys: set[str], fetch=None) -> list[dict] | None:
-    """Новините от RSS на Yahoo Finance в прозореца, само за компанията (about_company); None — фийдът не се изтегли. fetch(url) → bytes (за тестове)."""
+    """
+    Новините от RSS на Yahoo Finance в прозореца, само за компанията (about_company); None — фийдът не се изтегли (причината — в _NEWS_FAIL[тикър]). fetch(url) → bytes (за тестове).
+    04.11.2026 (В1): HTTP статус ≠ 200 (401 / 429 с HTML тяло) е провал, не празен фийд.
+    """
     try:
         import feedparser
         url = config.WATCH_NEWS_RSS.format(ticker=ticker)
-        raw = fetch(url) if fetch else requests.get(url, timeout=15, headers=_UA).content
+        if fetch:
+            raw = fetch(url)
+        else:
+            r = requests.get(url, timeout=15, headers=_UA)
+            if r.status_code != 200:
+                _NEWS_FAIL[ticker] = f"HTTP {r.status_code}"
+                print(f"[watch] {ticker} RSS новини: HTTP {r.status_code}")
+                return None
+            raw = r.content
         feed = feedparser.parse(raw)
         if not feed.entries and getattr(feed, "bozo", False):
+            _NEWS_FAIL[ticker] = "фийдът не се прочете"
+            print(f"[watch] {ticker} RSS новини: фийдът не се прочете ({type(getattr(feed, 'bozo_exception', None)).__name__})")
             return None
     except Exception as e:
+        _NEWS_FAIL[ticker] = type(e).__name__
         print(f"[watch] {ticker} RSS новини: {type(e).__name__}: {e}")
         return None
     cutoff = time.time() - hours * 3600
@@ -137,47 +156,9 @@ def _rss_news(ticker: str, hours: int, keys: set[str], fetch=None) -> list[dict]
     return out[:config.WATCH_MAX_NEWS_PER_TICKER]
 
 
-def _recent_news(ticker: str, hours: int, keys: set[str] | None = None) -> list[dict]:
-    """29.10.2026: RSS на Yahoo по тикър, само за компанията; провал на RSS → yfinance .news (също филтрирани). Провал → празен списък."""
-    got = _rss_news(ticker, hours, keys or set())
-    if got is not None:
-        return got
-    return [n for n in _yf_news(ticker, hours) if about_company(ticker, keys or set(), n["title"], n.get("summary") or "")]
-
-
-def _yf_news(ticker: str, hours: int) -> list[dict]:
-    """yfinance .news, орязан до прозореца. Провал → празен списък. (29.10.2026: само резерва — връща нищо.)"""
-    try:
-        items = net_utils.fetch_with_timeout(lambda: yf.Ticker(ticker).news) or []
-    except Exception as e:
-        print(f"[watch] {ticker} новини: {e}")
-        return []
-    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours)
-    out = []
-    for it in items:
-        c = it.get("content") or it
-        title = (c.get("title") or "").strip()
-        if not title:
-            continue
-        ts = c.get("pubDate") or c.get("displayTime")
-        when = None
-        if ts:
-            try:
-                when = dt.datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
-            except ValueError:
-                when = None
-        elif it.get("providerPublishTime"):
-            when = dt.datetime.fromtimestamp(it["providerPublishTime"], dt.timezone.utc)
-        if when is not None and when < cutoff:
-            continue
-        out.append({
-            "title": title,
-            "publisher": ((c.get("provider") or {}).get("displayName")
-                          if isinstance(c.get("provider"), dict) else c.get("publisher")) or "",
-            "when": when.isoformat() if when else None,
-            "summary": (c.get("summary") or c.get("description") or "")[:300],
-        })
-    return out[:config.WATCH_MAX_NEWS_PER_TICKER]
+def _recent_news(ticker: str, hours: int, keys: set[str] | None = None) -> list[dict] | None:
+    """29.10.2026: RSS на Yahoo по тикър, само за компанията. 04.11.2026 (В1): провал → None (не „няма новини“); резервата yfinance .news е махната — от 29.10 връщаше нищо."""
+    return _rss_news(ticker, hours, keys or set())
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -386,8 +367,11 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
     02.11.2026 (т. 4): window_hours — прозорецът на новините (main: от предишния бриф — понеделник 72 ч); без него — config.WATCH_NEWS_WINDOW_HOURS.
     """
     tickers = tickers if tickers is not None else load_watch_list()
+    LAST_STATUS.clear()
+    _NEWS_FAIL.clear()
     if not tickers:
         return []
+    insider_ok = True
     try:
         fx = (facts_fn or facts)(tickers)
     except Exception as e:
@@ -397,13 +381,15 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
         insider = insider_buying.fetch_insider_transactions(tickers)
     except Exception as e:
         print(f"[watch] insider блок се провали изцяло: {e}")
-        insider = {}
+        insider, insider_ok = {}, False
 
     rows = []
     since_day = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=window_hours or config.WATCH_NEWS_WINDOW_HOURS)).date().isoformat()
     for tk in tickers:
         f = fx.get(tk) or {}
         news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
+        checked = news is not None                                                     # 04.11.2026 (В1): None — новините не се провериха (не „няма новини“)
+        news = news or []
         txns = insider.get(tk, [])
         new_f4 = [t for t in txns if str(t.get("filed") or "") >= since_day]          # 03.11.2026 (т. 5): Form 4, подаден в прозореца (от предишния бриф)
         rows.append({
@@ -411,14 +397,42 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
             "name": f.get("name"),
             "facts": {k: f.get(k) or {} for k in ("price", "earnings")},                 # 03.11.2026: без short interest (без .info)
             "news": news,
+            "news_checked": checked, **({} if checked else {"news_error": _NEWS_FAIL.get(tk) or "неизвестна причина"}),     # 04.11.2026 (В1)
             "insider": [{**t, "date": t["date"].isoformat()} for t in txns],
             "insider_cluster": _insider_cluster(txns),
             "insider_flags": insider_flags(txns),                   # 30.10.2026: по посока — покупки / продажби, с плана
             "quiet": not news and not txns,
             "event": bool(news or new_f4), "f4_new": len(new_f4),               # 03.11.2026 (т. 5): AI коментар само при новина или нов Form 4
         })
+    LAST_STATUS.update(tickers=len(rows), news_failed={r["ticker"]: r["news_error"] for r in rows if not r["news_checked"]},
+                       price_missing=[r["ticker"] for r in rows if not r["facts"].get("price")], insider_ok=insider_ok)
+    if LAST_STATUS["news_failed"] or LAST_STATUS["price_missing"] or not insider_ok:
+        print(f"[watch] ⚠ не се провери: новини {len(LAST_STATUS['news_failed'])} от {len(rows)} {LAST_STATUS['news_failed']}; без цени {LAST_STATUS['price_missing']}; "
+              f"Form 4 {'ok' if insider_ok else 'ПРОВАЛ'}")
     quiet = [r["ticker"] for r in rows if r["quiet"]]
     print(f"[watch] {len(rows)} наблюдавани тикъра — "
           f"{len(rows) - len(quiet)} със събития, {len(quiet)} без "
           f"({', '.join(quiet) if quiet else '—'})")
     return rows
+
+
+def status_note(status: dict | None = None) -> str | None:
+    """
+    04.11.2026 (четвърти преглед, В1): причината за „частично“ на стъпката watch — новините не се провериха / без цени при ≥ config.WATCH_PARTIAL_SHARE от тикърите, или
+    Form 4 изцяло не се провери; иначе None (единичен провал — само белегът на реда). Чиста функция.
+    """
+    st = LAST_STATUS if status is None else status
+    n = st.get("tickers") or 0
+    if not n:
+        return None
+    parts = []
+    nf = st.get("news_failed") or {}
+    if len(nf) >= config.WATCH_PARTIAL_SHARE * n:
+        why = sorted({v for v in nf.values()})
+        parts.append(f"новините не се провериха за {len(nf)} от {n} ({', '.join(why[:3])})")
+    pm = st.get("price_missing") or []
+    if len(pm) >= config.WATCH_PARTIAL_SHARE * n:
+        parts.append(f"без цени за {len(pm)} от {n}")
+    if st.get("insider_ok") is False:
+        parts.append("Form 4 не се провери")
+    return "; ".join(parts) or None

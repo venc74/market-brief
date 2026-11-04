@@ -665,6 +665,7 @@ OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 90))                 
 ENABLE_WATCH_MONITOR = os.getenv("ENABLE_WATCH_MONITOR", "1") == "1"
 WATCH_NEWS_WINDOW_HOURS = int(os.getenv("WATCH_NEWS_WINDOW_HOURS", 24))     # 02.11.2026: по подразбиране (тестове); в run-а — от предишния бриф (main)
 WATCH_MAX_NEWS_PER_TICKER = int(os.getenv("WATCH_MAX_NEWS_PER_TICKER", 6))
+WATCH_PARTIAL_SHARE = float(os.getenv("WATCH_PARTIAL_SHARE", 0.5))     # 04.11.2026 (четвърти преглед, В1): новини / цени не се провериха за ≥ този дял от наблюдаваните → стъпката „частично“ + банер; под него — белег на реда
 # 29.10.2026 (разходката, т. 6): новините — от RSS на Yahoo Finance по тикър (yfinance .news връща нищо: 0 и за AAPL на 29.10; в историята BLSH е с новини само 22–23.09).
 # Фийдът по тикър носи и чужди статии (за "AI" на 29.10: SoundHound, BigBear.ai, Palantir, „3 unpopular stocks“) — новина минава само ако споменава компанията
 # (името без "Inc." и т.н., тикъра в скоби / "NYSE:" / "$", или — за тикър от 3+ букви — самия тикър с главни букви). Измерено 29.10 върху 14-те фийда: 171 от 262 заглавия минават;

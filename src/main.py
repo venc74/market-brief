@@ -949,7 +949,8 @@ def run() -> dict:
         by_ticker = {r["ticker"]: r for r in active}
         return [by_ticker.get(r["ticker"], {**r, "ai": {}}) for r in rows]
     watch_rows = steps.step("watch", _watch, fallback=[], enabled=config.ENABLE_WATCH_MONITOR, label="Секцията „Наблюдавани тикъри“",
-                            consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини")     # 03.11.2026: без .info → без следата за нея
+                            consequence="секцията е празна днес; това НЕ значи, че при тикърите няма новини",     # 03.11.2026: без .info → без следата за нея
+                            partial=lambda v: (watch_monitor.status_note(), {}) if watch_monitor.status_note() else None)   # 04.11.2026 (В1): новини / цени / Form 4, които не се провериха
     # 03.11.2026 (поправки след брифа, т. 6): редът „Form 4: … покупки ≥ $100 000“ — и за наблюдаваните (същите правила като за картите и позициите)
     def _ins_watch():
         groups, st = insider_buying.insider_for([r["ticker"] for r in watch_rows])
@@ -1054,6 +1055,7 @@ def run() -> dict:
         "ai_truncations": list(ai_brief.TRUNCATIONS),
         "ai_usage": list(ai_brief.AI_USAGE),
         "watch": watch_rows,
+        "watch_status": dict(watch_monitor.LAST_STATUS),                 # 04.11.2026 (В1): какво не се провери при наблюдаваните (брояч и причина)
         "action": action,
         "watchlist": watchlist,
         "watchlist_exits": wl_exits,
