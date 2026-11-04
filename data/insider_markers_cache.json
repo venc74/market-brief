@@ -1,4 +1,29 @@
 {
- "rows": {},
- "fetched": {}
+ "rows": {
+  "ACN": {
+   "ticker": "ACN",
+   "company": "Accenture plc",
+   "total_value": 3001041.2399999998,
+   "cluster": false,
+   "in_screener": false,
+   "insiders": [
+    {
+     "name": "Sweet Julie Spellman",
+     "title": "Chair and CEO",
+     "date": "2026-10-26",
+     "value": 2486318.01
+    },
+    {
+     "name": "Sweet Julie Spellman",
+     "title": "Chair and CEO",
+     "date": "2026-10-26",
+     "value": 514723.23
+    }
+   ],
+   "transfers": []
+  }
+ },
+ "fetched": {
+  "ACN": "2026-11-04"
+ }
 }

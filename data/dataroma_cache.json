@@ -1,5 +1,5 @@
 {
- "date": "2026-11-03",
+ "date": "2026-11-04",
  "bundle": {
   "moves": [
    {
@@ -11,12 +11,34 @@
     "value": 28157599351.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 9.4,
+    "change_pct": 45.2,
     "ticker_source": "cusip",
     "managers": [
      "Уорън Бъфет · Berkshire Hathaway",
      "Даниел Лоуб · Third Point"
     ],
-    "count": 2
+    "count": 2,
+    "by_manager": [
+     {
+      "manager": "Уорън Бъфет · Berkshire Hathaway",
+      "action": "увеличена",
+      "value": 28157599351.0,
+      "pct_of_portfolio": 9.4,
+      "change_pct": 45.2,
+      "period": "13F · 2026-08-14",
+      "late": null
+     },
+     {
+      "manager": "Даниел Лоуб · Third Point",
+      "action": "увеличена",
+      "value": 366304250.0,
+      "pct_of_portfolio": 7.9,
+      "change_pct": 485.7,
+      "period": "13F · 2026-08-14",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "GOOG",
@@ -27,6 +49,8 @@
     "value": 9606489032.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 3.2,
+    "change_pct": 658.3,
     "ticker_by_name": "GOOGL",
     "ticker_source": "cusip",
     "managers": [
@@ -34,7 +58,36 @@
      "Сет Кларман · Baupost Group",
      "Крис Хон · TCI Fund Management"
     ],
-    "count": 3
+    "count": 3,
+    "by_manager": [
+     {
+      "manager": "Уорън Бъфет · Berkshire Hathaway",
+      "action": "увеличена",
+      "value": 9606489032.0,
+      "pct_of_portfolio": 3.2,
+      "change_pct": 658.3,
+      "period": "13F · 2026-08-14",
+      "late": null
+     },
+     {
+      "manager": "Крис Хон · TCI Fund Management",
+      "action": "увеличена",
+      "value": 3511682917.0,
+      "pct_of_portfolio": 6.7,
+      "change_pct": 12.3,
+      "period": "13F · 2026-08-14",
+      "late": null
+     },
+     {
+      "manager": "Сет Кларман · Baupost Group",
+      "action": "увеличена",
+      "value": 484744000.0,
+      "pct_of_portfolio": 9.0,
+      "change_pct": 16.2,
+      "period": "13F · 2026-08-13",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "UBER",
@@ -45,12 +98,34 @@
     "value": 2476978592.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 12.7,
+    "change_pct": 14.6,
     "ticker_source": "cusip",
     "managers": [
      "Бил Акман · Pershing Square",
      "Тери Смит · Fundsmith"
     ],
-    "count": 2
+    "count": 2,
+    "by_manager": [
+     {
+      "manager": "Бил Акман · Pershing Square",
+      "action": "увеличена",
+      "value": 2476978592.0,
+      "pct_of_portfolio": 12.7,
+      "change_pct": 14.6,
+      "period": "13F · 2026-08-14",
+      "late": null
+     },
+     {
+      "manager": "Тери Смит · Fundsmith",
+      "action": "нова позиция",
+      "value": 645337776.0,
+      "pct_of_portfolio": 4.7,
+      "change_pct": null,
+      "period": "13F · 2026-08-14",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "MSFT",
@@ -61,11 +136,24 @@
     "value": 2315234425.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 11.9,
+    "change_pct": 9.8,
     "ticker_source": "cusip",
     "managers": [
      "Бил Акман · Pershing Square"
     ],
-    "count": 1
+    "count": 1,
+    "by_manager": [
+     {
+      "manager": "Бил Акман · Pershing Square",
+      "action": "увеличена",
+      "value": 2315234425.0,
+      "pct_of_portfolio": 11.9,
+      "change_pct": 9.8,
+      "period": "13F · 2026-08-14",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "AMZN",
@@ -76,13 +164,44 @@
     "value": 1191700000.0,
     "period": "13F · 2026-08-13",
     "_resolved": true,
+    "pct_of_portfolio": 16.5,
+    "change_pct": 20.0,
     "ticker_source": "cusip",
     "managers": [
      "Сет Кларман · Baupost Group",
      "Дейвид Тепър · Appaloosa Management",
      "Джон Армитидж · Egerton Capital"
     ],
-    "count": 3
+    "count": 3,
+    "by_manager": [
+     {
+      "manager": "Дейвид Тепър · Appaloosa Management",
+      "action": "увеличена",
+      "value": 1191700000.0,
+      "pct_of_portfolio": 16.0,
+      "change_pct": 15.7,
+      "period": "13F · 2026-08-14",
+      "late": null
+     },
+     {
+      "manager": "Джон Армитидж · Egerton Capital",
+      "action": "увеличена",
+      "value": 1174524742.0,
+      "pct_of_portfolio": 12.0,
+      "change_pct": 31.9,
+      "period": "13F · 2026-10-20",
+      "late": null
+     },
+     {
+      "manager": "Сет Кларман · Baupost Group",
+      "action": "увеличена",
+      "value": 892310000.0,
+      "pct_of_portfolio": 16.5,
+      "change_pct": 20.0,
+      "period": "13F · 2026-08-13",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "NBIS",
@@ -93,11 +212,24 @@
     "value": 1175934069.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 7.2,
+    "change_pct": null,
     "ticker_source": "cusip",
     "managers": [
      "Стивън Мандел · Lone Pine Capital"
     ],
-    "count": 1
+    "count": 1,
+    "by_manager": [
+     {
+      "manager": "Стивън Мандел · Lone Pine Capital",
+      "action": "нова позиция",
+      "value": 1175934069.0,
+      "pct_of_portfolio": 7.2,
+      "change_pct": null,
+      "period": "13F · 2026-08-14",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "STX",
@@ -108,11 +240,24 @@
     "value": 965105185.0,
     "period": "13F · 2026-08-14",
     "_resolved": true,
+    "pct_of_portfolio": 5.9,
+    "change_pct": null,
     "ticker_source": "cusip",
     "managers": [
      "Стивън Мандел · Lone Pine Capital"
     ],
-    "count": 1
+    "count": 1,
+    "by_manager": [
+     {
+      "manager": "Стивън Мандел · Lone Pine Capital",
+      "action": "нова позиция",
+      "value": 965105185.0,
+      "pct_of_portfolio": 5.9,
+      "change_pct": null,
+      "period": "13F · 2026-08-14",
+      "late": null
+     }
+    ]
    },
    {
     "ticker": "APH",
@@ -123,11 +268,24 @@
     "value": 902744506.0,
     "period": "13F · 2026-10-20",
     "_resolved": true,
+    "pct_of_portfolio": 9.2,
+    "change_pct": 120.0,
     "ticker_source": "cusip",
     "managers": [
      "Джон Армитидж · Egerton Capital"
     ],
-    "count": 1
+    "count": 1,
+    "by_manager": [
+     {
+      "manager": "Джон Армитидж · Egerton Capital",
+      "action": "увеличена",
+      "value": 902744506.0,
+      "pct_of_portfolio": 9.2,
+      "change_pct": 120.0,
+      "period": "13F · 2026-10-20",
+      "late": null
+     }
+    ]
    }
   ],
   "new_positions": [
@@ -558,7 +716,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-11-03",
+   "data_date": "2026-11-04",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
