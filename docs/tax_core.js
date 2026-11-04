@@ -550,6 +550,17 @@
     };
   };
 
+  // ─── България (изключена в страницата — SHOW_BG = false; кодът остава от старата версия, само върху новите записи) ─────────────────────
+  TC.computeBG = function (fifoRes, year) {
+    const R = fifoRes.realized.filter(x => x.year === year && x.gainEUR != null), I = fifoRes.incomes.filter(x => x.year === year);
+    const taxableStock = R.filter(x => x.assetClass !== 'crypto' && !x.euExempt).reduce((s, x) => s + x.gainEUR, 0);
+    const exemptStock = R.filter(x => x.assetClass !== 'crypto' && x.euExempt).reduce((s, x) => s + x.gainEUR, 0);
+    const cryptoGain = R.filter(x => x.assetClass === 'crypto').reduce((s, x) => s + x.gainEUR, 0);
+    const div = I.filter(x => x.kind === 'dividend').reduce((s, x) => s + x.eur, 0), wh = -I.filter(x => x.kind === 'withholding').reduce((s, x) => s + x.eur, 0);
+    const divRaw = Math.max(0, div) * 0.05, divCredit = Math.min(Math.max(0, wh), divRaw);
+    return { taxableStock, exemptStock, cryptoGain, dividends: div, stockTax: Math.max(0, taxableStock) * 0.10, cryptoTax: Math.max(0, cryptoGain) * 0.10, divTax: divRaw - divCredit };
+  };
+
   TC.fmt = n => (n < 0 ? '−' : '') + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
 
   root.TaxCore = TC;
