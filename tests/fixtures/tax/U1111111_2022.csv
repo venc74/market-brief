@@ -1,0 +1,12 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,Interactive Brokers Ireland Limited
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"January 1, 2022 - December 31, 2022"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Test Person
+Account Information,Data,Account,U1111111
+Account Information,Data,Base Currency,EUR
+Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,EUR,U1111111,SPLT,"2022-01-10, 10:00:00",10,400,400,-4000,0,4000,0,0,O
+Corporate Actions,Header,Asset Category,Currency,Account,Report Date,Date/Time,Description,Quantity,Proceeds,Value,Realized P/L,Code
+Corporate Actions,Data,Stocks,EUR,U1111111,2022-06-01,"2022-06-01, 20:25:00","SPLT(US00000000S1) Split 4 for 1 (SPLT, SPLIT CORP, US00000000S1)",30,0,0,0,

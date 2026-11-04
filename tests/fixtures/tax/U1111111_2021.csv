@@ -1,0 +1,10 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,Interactive Brokers Ireland Limited
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"January 1, 2021 - December 31, 2021"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Test Person
+Account Information,Data,Account,U1111111
+Account Information,Data,Base Currency,EUR
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,USD,ACME,"2021-05-03, 10:00:00",10,150,150,-1500,-1,1501,0,0,O

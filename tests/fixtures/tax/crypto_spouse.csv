@@ -1,0 +1,3 @@
+type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt,broker,account,fee
+buy,crypto,ETH,2024-01-10,1,2000,EUR,,,Revolut,crypto-spouse,0
+sell,crypto,ETH,2024-06-10,1,2800,EUR,,,Revolut,crypto-spouse,0

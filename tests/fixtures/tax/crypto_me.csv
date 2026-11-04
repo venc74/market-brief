@@ -1,0 +1,6 @@
+type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt,broker,account,fee
+buy,crypto,BTC,2023-03-01,0.1,20000,EUR,,,Revolut,crypto-me,0
+sell,crypto,BTC,2024-03-01,0.05,60000,EUR,,,Revolut,crypto-me,0
+sell,crypto,BTC,2024-03-04,0.05,61000,EUR,,,Revolut,crypto-me,0
+buy,crypto,ETH,2024-01-10,1,2000,EUR,,,Revolut,crypto-me,0
+sell,crypto,ETH,2024-06-10,1,2600,EUR,,,Revolut,crypto-me,0

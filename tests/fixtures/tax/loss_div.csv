@@ -1,0 +1,6 @@
+type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt,broker,account,fee
+buy,stock,LOSSCO,2025-01-10,100,50,EUR,,,Broker3,B3,5
+sell,stock,LOSSCO,2025-06-10,100,40,EUR,,,Broker3,B3,5
+dividend,stock,DIVCO,2025-05-10,3000,,EUR,,,Broker3,B3,
+buy,etf,EQETF,2025-01-15,10,100,EUR,,,Broker3,B3,0
+sell,etf,EQETF,2025-09-15,10,150,EUR,,,Broker3,B3,0

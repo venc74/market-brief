@@ -1,0 +1,4 @@
+type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt,broker,account,fee
+buy,stock,ACME,2022-01-05,5,160,USD,,,Broker2,B2,0
+sell,stock,ACME,2023-06-01,5,210,USD,,,Broker2,B2,0
+sell,stock,GHOST,2023-02-01,3,50,EUR,,,Broker2,B2,0
