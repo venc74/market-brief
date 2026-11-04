@@ -148,4 +148,16 @@ c = r["de"][2024]["crypto"]
 assert [x["person"] for x in c] == ["A"] and close(c[0]["taxable"], 1000) and any("„сам“" in n["text"] for n in r["de"][2024]["notes"]), c
 print("  ✓ TRANSFER с акции — в списъка; таксите / трансферите със сумата (две такси — два реда, повторен файл — веднъж); без Total и вноски; 0,125 / „;“ файл; дневна сделка; „сам“ — един човек")
 
+# ── 11. фондове отпреди 2018, акции отпреди 2009, години преди 2009 ──
+print("── 11. стари покупки и години ──")
+f = std("buy,etf,OLDF,2017-06-01,10,100,EUR,0,B,A", "sell,etf,OLDF,2019-06-01,10,120,EUR,0,B,A", "buy,stock,OLDS,2008-05-01,10,10,EUR,0,B,A", "sell,stock,OLDS,2010-05-01,10,20,EUR,0,B,A",
+        "buy,stock,NEWS,2019-01-02,1,10,EUR,0,B,A", "sell,stock,NEWS,2019-03-01,1,11,EUR,0,B,A", "buy,stock,X08,2008-01-10,10,10,EUR,0,B,A", "sell,stock,X08,2008-06-10,10,12,EUR,0,B,A")
+r = scenario([{"name": "old.csv", "text": f}], years=[2008, 2010, 2019])
+d08, d10, d19 = (r["de"][y] for y in (2008, 2010, 2019))
+assert d08["estimate"] is None and not d08["complete"] and any("преди Abgeltungsteuer" in n["text"] for n in d08["notes"])   # до 05.11: NaN в оценката
+assert not d10["complete"] and any("OLDS" in n["text"] and "Altbestand" in n["text"] for n in d10["notes"])
+assert not d19["complete"] and any("OLDF" in n["text"] and "31.12.2017" in n["text"] for n in d19["notes"]) and not any("NEWS" in n["text"] for n in d19["notes"])
+assert close(d19["total"], 200 * 0.7 + 1), d19["total"]                 # числото е същото (само предупреждение): OLDF 200 × 0.7 + NEWS 1
+print("  ✓ 2008 — без оценка (не NaN), НЕПЪЛНО; акции от 2008, продадени 2010 — Altbestand; фонд от 2017, продаден 2019 — §56 InvStG; новите покупки — без бележка")
+
 print("\n✅ test_tax_fixes: всичко мина")

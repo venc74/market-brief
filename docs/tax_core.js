@@ -704,12 +704,24 @@
     });
     if (soloB.size) notes.push({ level: 'warn', text: `Подаването е „сам“, а ${[...soloB].join(', ')} е отбелязано като на съпруга — криптото е сметнато към теб; махни файла или избери „съвместно“.` });
     // ориентировъчно: Sparer-Pauschbetrag, Abgeltungsteuer с църковния данък по формулата (e − 4q) / (4 + k), Soli
-    const pausch = par.pauschbetrag * (st.joint ? 2 : 1);
+    // 05.11.2026: стари покупки и стари години — правилата се различават; калкулаторът не ги смята, а казва (и годината е „НЕПЪЛНО“)
+    const oldRules = [];
+    if (year < 2009) oldRules.push(`${year} е преди Abgeltungsteuer (2009) — старото право (Halbeinkünfteverfahren, едногодишен срок за акциите); калкулаторът не смята тази година.`);
+    const lotsBefore = (x, d) => (x.lots || []).filter(l => l.date < d).reduce((q, l) => q + l.qty, 0);
+    R.filter(x => x.assetClass !== 'crypto' && x.assetClass !== 'option' && x.gainEUR != null).forEach(x => {
+      const isFund = fundType(x.sym, x.fundHint) !== 'stock';
+      const q09 = lotsBefore(x, '2009-01-01'), q18 = lotsBefore(x, '2018-01-01');
+      if (!isFund && q09 > 0 && year >= 2009) oldRules.push(`${x.sym} (${x.date}): ${+q09.toFixed(6)} бр. са купени преди 2009 (Altbestand) — печалбата от тях по правило е освободена; калкулаторът я е сметнал като облагаема. Да се потвърди.`);
+      if (isFund && q18 > 0 && year >= 2018) oldRules.push(`${x.sym} (${x.date}): ${+q18.toFixed(6)} дяла са купени преди 2018 — фиктивна продажба на 31.12.2017 (§56 InvStG): печалбата до тогава е по старото право, без частично освобождаване${q09 > 0 ? '; дялове отпреди 2009 — освободени до 31.12.2017, след това облагаеми над 100 000 € на човек' : ''}. Калкулаторът е приложил освобождаването към цялата печалба. Да се потвърди.`);
+    });
+    oldRules.forEach(t => notes.push({ level: 'err', text: t + ' НЕПЪЛНО.' }));
+    const pausch = (par.pauschbetrag || 0) * (st.joint ? 2 : 1);
     const e = Math.max(0, total - pausch);
     const k = st.kirche ? (TC.KIRCHE_RATES[st.kirche] || TC.KIRCHE_RATES.other) : 0;
     const q = Math.min(creditable, e / 4);
     const tax = Math.max(0, (e - 4 * q) / (4 + k));
-    const est = { pauschbetrag: pausch, taxableAfterPausch: e, creditUsed: q, kircheRate: k, abgeltung: tax, soli: tax * par.soli, kirche: tax * k, total: tax * (1 + par.soli + k) };
+    par.soli = par.soli || 0;
+    const est = year < 2009 ? null : { pauschbetrag: pausch, taxableAfterPausch: e, creditUsed: q, kircheRate: k, abgeltung: tax, soli: tax * par.soli, kirche: tax * k, total: tax * (1 + par.soli + k) };
     // предупреждения
     const yEnd = `${year - 1}-12-31`;                                               // за Vorabpauschale, която е доход в тази година — държаните в края на предходната
     const held = {};
@@ -750,7 +762,7 @@
       year, params: par, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
       carriedShareLoss: cS, carriedOtherLoss: cO, withheld, creditable, items, crypto: Object.values(persons).sort((a, b) => a.person.localeCompare(b.person)),
       estimate: est, notes, unmatched, missingRates: missing, funds: fundsSeen, heldFunds,
-      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length, reconcile: mism, skippedTaxable,
+      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length && !oldRules.length, reconcile: mism, skippedTaxable,
     };
   };
 

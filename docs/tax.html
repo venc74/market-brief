@@ -196,7 +196,7 @@ function render() {
   const loss = de.total === 0 && (de.shareCarry || de.otherCarry);
   $('headline').innerHTML = `<h2>Доходи от капитал ${y} — за Anlage KAP / KAP-INV</h2>
     <div class="big ${cls(de.headline)}">${fmt(de.headline)}</div>
-    <div class="small">${loss ? 'загуба — пренася се (Finanzamt я установява с решение)' : 'след прихващането на загубите, преди Sparer-Pauschbetrag (' + fmt(de.estimate.pauschbetrag) + ')'}
+    <div class="small">${loss ? 'загуба — пренася се (Finanzamt я установява с решение)' : 'след прихващането на загубите, преди Sparer-Pauschbetrag' + (de.estimate ? ' (' + fmt(de.estimate.pauschbetrag) + ')' : '')}
       ${de.complete ? '' : ' · <span class="neg">НЕПЪЛНО — виж предупрежденията</span>'}</div>
     ${de.crypto.length ? `<div style="margin-top:10px">Крипто — частни продажби (§23, Anlage SO): ${de.crypto.map(c => `<b class="${cls(c.result)}">${fmt(c.result)}</b> ${st.joint ? (c.person === 'B' ? 'съпруг/а' : 'аз') : ''}
       <span class="small">(облагаеми ${fmt(c.taxable)}${c.underFreigrenze ? ' — под Freigrenze ' + fmt(c.freigrenze) + ' → 0' : ''}; над година — освободени ${fmt(c.exempt)})</span>`).join(' · ')}</div>` : ''}`;
@@ -242,7 +242,8 @@ function render() {
       <td class="n">${esc(x.amount)} ${esc(x.currency)}</td><td class="n ${cls(x.eur)}">${fmt(x.eur)}</td></tr>`).join('');
   // ориентировъчен данък
   const e = de.estimate;
-  $('estimate').innerHTML = `<h2>Ориентировъчно — Abgeltungsteuer (Finanzamt смята окончателно)</h2><table>
+  if (!e) $('estimate').innerHTML = `<h2>Ориентировъчно — Abgeltungsteuer</h2><div class="small">Преди 2009 няма Abgeltungsteuer — не е сметнато.</div>`;
+  else $('estimate').innerHTML = `<h2>Ориентировъчно — Abgeltungsteuer (Finanzamt смята окончателно)</h2><table>
     <tr><td>Доходи от капитал след прихващането</td><td class="n">${fmt(de.total)}</td></tr>
     <tr><td>− Sparer-Pauschbetrag ${st.joint ? '(съвместно)' : ''}</td><td class="n">${fmt(-Math.min(de.total, e.pauschbetrag))}</td></tr>
     <tr><td>= Облагаеми</td><td class="n">${fmt(e.taxableAfterPausch)}</td></tr>
