@@ -1,0 +1,1 @@
+{"header": {"id": "synthetic"}, "dataSets": [{"series": {"0:0:0:0:0": {"observations": {"0": [1.0712], "1": [1.0815]}}}}], "structure": {"dimensions": {"series": [], "observation": [{"id": "TIME_PERIOD", "values": [{"id": "2024-06-13"}, {"id": "2024-06-14"}]}]}}}

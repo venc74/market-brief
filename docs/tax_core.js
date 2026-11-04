@@ -285,6 +285,138 @@
     return out;
   };
 
+  // ─── Курсове ───────────────────────────────────────────────────────────────
+  // таблица {CUR: [[дата, курс], …]} — курс = единици валута за 1 EUR (както ЕЦБ и eurofxref-hist.csv). Сумата в EUR = сума ÷ курс.
+  // Ден без курс (уикенд, празник на TARGET) → последният публикуван курс преди него, до maxBack дни назад; по-стар → null (липсва — предупреждение, не NaN).
+  TC.rateLookup = function (table, maxBack) {
+    const back = maxBack == null ? 10 : maxBack;
+    return function (cur, date) {
+      if (!cur || cur === 'EUR') return 1;
+      const a = (table || {})[cur]; if (!a || !a.length) return null;
+      let lo = 0, hi = a.length - 1, ans = -1;
+      while (lo <= hi) { const m = (lo + hi) >> 1; if (a[m][0] <= date) { ans = m; lo = m + 1; } else hi = m - 1; }
+      if (ans < 0 || a[ans][0] < TC.addDays(date, -back)) return null;
+      return a[ans][1];
+    };
+  };
+  // валутите и периодите, за които трябват курсове (всички години — FIFO стига до най-старата покупка)
+  TC.ratesNeeded = function (records) {
+    const out = {};
+    records.forEach(r => { if (!r.currency || r.currency === 'EUR') return; const o = out[r.currency] = out[r.currency] || { from: r.date, to: r.date };
+                           if (r.date < o.from) o.from = r.date; if (r.date > o.to) o.to = r.date; });
+    Object.values(out).forEach(o => { o.from = TC.addDays(o.from, -10); });
+    return out;
+  };
+  TC.mergeRates = function (table, cur, pairs) {
+    const m = new Map((table[cur] || []).map(x => [x[0], x[1]]));
+    pairs.forEach(([d, v]) => { if (v > 0) m.set(d, v); });
+    table[cur] = [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    return table;
+  };
+  TC.ecbUrl = (cur, from, to) => `https://data-api.ecb.europa.eu/service/data/EXR/D.${cur}.EUR.SP00.A?startPeriod=${from}&endPeriod=${to}&format=jsondata`;
+  // ECB SDMX-JSON: датите са в structure.dimensions.observation[0].values (по индекс), стойностите — в series[…].observations[индекс][0]
+  TC.parseECBjson = function (j) {
+    const dates = ((((j || {}).structure || {}).dimensions || {}).observation || [])[0];
+    const series = (((j || {}).dataSets || [])[0] || {}).series || {};
+    const s = series[Object.keys(series)[0]]; if (!dates || !s) return [];
+    return Object.entries(s.observations || {}).map(([i, v]) => [String((dates.values[Number(i)] || {}).id || ''), Number(v[0])]).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x[0]) && x[1] > 0);
+  };
+  // frankfurter.app — заявката е ?from=EUR&to=CUR → единици CUR за 1 EUR (същата посока като ЕЦБ). До 04.11 беше from=CUR&to=EUR и се делеше на обратния курс (сумите — × курс²).
+  TC.frankfurterUrl = (cur, from, to) => `https://api.frankfurter.app/${from}..${to}?from=EUR&to=${cur}`;
+  TC.parseFrankfurter = function (j, cur) {
+    const r = (j || {}).rates || {};
+    return Object.entries(r).map(([d, o]) => [d, Number((o || {})[cur])]).filter(x => x[1] > 0);
+  };
+
+  // ─── FIFO ──────────────────────────────────────────────────────────────────
+  // По брокер / сметка / инструмент (крипто — отделно по портфейл); от най-старата покупка, през всички години; комисионните — в цената на покупката и намаляват продажбата.
+  // Продажба без покупка (акции, фондове, крипто) → unmatched, без резултат за непокритата част (никога цена 0). Опции: продажба без позиция отваря къса позиция (Stillhalter).
+  // Сплит: отворените лотове ×коефициента (цената общо не се мени). Курсът — по датата на всяка сделка (покупка — към деня на покупката, продажба — към деня на продажбата).
+  TC.positionKey = r => [r.broker, r.account, r.assetClass === 'crypto' ? 'crypto' : 'sec', r.sym].join('|');
+
+  TC.fifo = function (records, rate) {
+    const pos = {}, realized = [], unmatched = [], missingRates = [], incomes = [], notes = [];
+    const P = k => (pos[k] = pos[k] || { long: [], short: [] });
+    const eps = 1e-9;
+    records.forEach(r => {
+      if (r.kind === 'split') {
+        Object.keys(pos).forEach(k => {
+          const [b, a, , sym] = k.split('|');
+          if (b === r.broker && a === r.account && sym === r.sym) pos[k].long.concat(pos[k].short).forEach(l => { l.qty *= r.ratio; });
+        });
+        return;
+      }
+      const fx = rate(r.currency, r.date);
+      if (r.kind !== 'trade') {
+        if (fx == null) { missingRates.push({ kind: r.kind, sym: r.sym || '', date: r.date, currency: r.currency, src: r.src }); return; }
+        incomes.push({ kind: r.kind, broker: r.broker, account: r.account, sym: r.sym || '', date: r.date, year: Number(r.date.slice(0, 4)), currency: r.currency, amount: r.amount,
+                       eur: r.amount / fx, rate: fx, desc: r.desc || '', pil: !!r.pil, src: r.src });
+        return;
+      }
+      const k = TC.positionKey(r), p = P(k);
+      const qAbs = Math.abs(r.qty);
+      if (fx == null) missingRates.push({ kind: 'trade', sym: r.sym, date: r.date, currency: r.currency, src: r.src });
+      const eur = v => fx == null ? null : v / fx;
+      if (/(^|;)(A|Ex)(;|$)/.test(r.code || '')) notes.push({ sym: r.sym, date: r.date, text: 'упражнена / възложена опция — премията и акциите са сметнати отделно; да се потвърди' });
+      const base = { broker: r.broker, account: r.account, sym: r.sym, assetClass: r.assetClass, date: r.date, year: Number(r.date.slice(0, 4)), currency: r.currency,
+                     fundHint: !!r.fundHint, euExempt: !!r.euExempt, src: r.src };
+      if (r.qty > 0) {                                                             // покупка: първо затваря къси позиции (опции), остатъкът — нов лот
+        let q = qAbs;
+        const feeEUR = eur(r.fee || 0);
+        const closed = [];
+        while (q > eps && p.short.length) {
+          const l = p.short[0], used = Math.min(l.qty, q);
+          const recv = l.proceedsEUR == null ? null : l.proceedsEUR * used / l.qty;
+          const pay = fx == null ? null : (used * r.price + (r.fee || 0) * used / qAbs) / fx;
+          closed.push({ date: l.date, qty: used, proceedsEUR: recv, costEUR: pay });
+          if (l.proceedsEUR != null) l.proceedsEUR -= recv;
+          l.qty -= used; q -= used;
+          if (l.qty <= eps) p.short.shift();
+        }
+        if (closed.length) {
+          const pr = closed.some(c => c.proceedsEUR == null || c.costEUR == null) ? null : closed.reduce((s, c) => s + c.proceedsEUR, 0);
+          const co = pr == null ? null : closed.reduce((s, c) => s + c.costEUR, 0);
+          realized.push({ ...base, short: true, qty: qAbs - q, proceedsEUR: pr, costEUR: co, gainEUR: pr == null ? null : pr - co,
+                          lots: closed.map(c => ({ date: c.date, qty: c.qty })), openDate: closed[0].date });
+        }
+        if (q > eps) p.long.push({ qty: q, costEUR: fx == null ? null : (q * r.price + (r.fee || 0) * q / qAbs) / fx, date: r.date, feeEUR: feeEUR == null ? null : feeEUR * q / qAbs });
+        return;
+      }
+      // продажба
+      let q = qAbs;
+      const proceedsAll = fx == null ? null : (qAbs * r.price - (r.fee || 0)) / fx;
+      const lots = [];
+      while (q > eps && p.long.length) {
+        const l = p.long[0], used = Math.min(l.qty, q);
+        const cost = l.costEUR == null ? null : l.costEUR * used / l.qty;
+        lots.push({ date: l.date, qty: used, costEUR: cost });
+        if (l.costEUR != null) l.costEUR -= cost;
+        l.qty -= used; q -= used;
+        if (l.qty <= eps) p.long.shift();
+      }
+      const matched = qAbs - q;
+      if (matched > eps) {
+        const pr = proceedsAll == null ? null : proceedsAll * matched / qAbs;
+        const co = lots.some(x => x.costEUR == null) || pr == null ? null : lots.reduce((s, x) => s + x.costEUR, 0);
+        const rec = { ...base, short: false, qty: matched, proceedsEUR: pr, costEUR: co, gainEUR: co == null ? null : pr - co, lots };
+        if (r.assetClass === 'crypto' && co != null) {                             // §23: над една година — освободено; годишнината (същата дата) е още в срока
+          let ex = 0, tx = 0;
+          lots.forEach(x => { const g = pr * x.qty / matched - x.costEUR; x.exempt = r.date > TC.anniversary(x.date); if (x.exempt) ex += g; else tx += g; });
+          rec.exemptGainEUR = ex; rec.taxableGainEUR = tx;
+        }
+        realized.push(rec);
+      }
+      if (q > eps) {
+        if (r.assetClass === 'option') {                                           // Stillhalter: продажба без позиция отваря къса позиция
+          p.short.push({ qty: q, proceedsEUR: proceedsAll == null ? null : proceedsAll * q / qAbs, date: r.date });
+        } else unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, src: r.src });
+      }
+    });
+    const open = Object.entries(pos).map(([k, p]) => ({ key: k, long: p.long.reduce((s, l) => s + l.qty, 0), short: p.short.reduce((s, l) => s + l.qty, 0) }))
+      .filter(o => o.long > eps || o.short > eps);
+    return { realized, unmatched, missingRates, incomes, open, notes };
+  };
+
   root.TaxCore = TC;
   if (typeof module !== 'undefined' && module.exports) module.exports = TC;
 })(typeof window !== 'undefined' ? window : globalThis);

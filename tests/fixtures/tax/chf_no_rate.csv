@@ -1,0 +1,4 @@
+type,asset_type,ticker,date,quantity,price,currency,withholding_tax,eu_exempt,broker,account,fee
+buy,stock,NESX,2023-01-10,10,100,CHF,,,Broker4,B4,0
+sell,stock,NESX,2023-05-10,10,110,CHF,,,Broker4,B4,0
+dividend,stock,NESX,2023-04-10,30,,CHF,10.5,,Broker4,B4,
