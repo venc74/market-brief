@@ -49,8 +49,8 @@ b = copy.deepcopy(b19); b["thirteenf_rhythm"] = d20
 with q():
     page, page_old = render.render_dashboard(b), render.render_dashboard(copy.deepcopy(b19))
 i = page.index("13F: последни 13F от 14.08")
-assert page.index('<details class="si-full">') > i and page.index("Superinvestor Positions — Last 13F", i) > page.index('<details class="si-full">')
+assert page.index("Superinvestor Positions — Last 13F") < i < page.index('<details class="si-full">') and page.count("Superinvestor Positions — Last 13F") == 1     # 03.11.2026 (т. 18–19): една секция — заглавието, редът, сгънатата таблица
 assert page.index("</details>", page.index('<details class="si-full">')) < page.index("Исторически архив")
-assert "si-full" not in page_old and "последни 13F от" not in page_old
+assert '<details class="si-full">' not in page_old and "последни 13F от" not in page_old
 print("  ✓ редът и свитите секции за 13F; бриф без полето — както досега")
 print("\n✅ test_13f_rhythm: всичко мина")

@@ -668,6 +668,7 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
     if not compared(snap):                          # трети преглед (16.10): без предходно тримесечие ВСЯКА позиция би била "нова" — мениджърът е "без сравнение" (ред + банер)
         return rows
     late = _late_label(snap.get("late"))
+    total = snap.get("current_total") or 0                                # 03.11.2026 (разходката, т. 18–19): дял от портфейла и промяна на акциите — за таблицата
     for cusip, cur in current_agg.items():
         prev_shares = (prev_agg.get(cusip) or {}).get("shares")
         if prev_shares is None or prev_shares <= 0:
@@ -684,6 +685,8 @@ def _moves_from_snapshot(snap: dict, min_value: float, tmap: dict) -> list[dict]
             "ticker": ticker or _truncate_words(cur["issuer"], 24).upper(), "cusip": cusip,
             "company": cur["issuer"], "manager": snap["manager"], "action": action,
             "value": value, "period": snap["period"], "_resolved": bool(ticker),
+            "pct_of_portfolio": round(value / total * 100, 1) if total else None,
+            "change_pct": round((cur["shares"] / prev_shares - 1) * 100, 1) if action == "увеличена" else None,
             **({"late": late} if late else {}),
         })
     return rows
@@ -825,14 +828,19 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
     """
     Пази най-голямата стойност на тикър, брои и изброява мениджърите — за конвергенция. Етикетът за давност ("late") е по мениджър: при един мениджър е пълният етикет, при няколко
     сливани — "⚠ закъснява: <кои>" (редът не губи етикета на закъснелия мениджър само защото друг мениджър е държал същия тикър).
+    03.11.2026 (разходката, т. 18–19): "by_manager" — собственият ред на всеки мениджър (действие, стойност, дял, промяна), за таблицата на страницата; два класа акции на един
+    мениджър под един тикър — по-голямата стойност.
     """
     best: dict[str, dict] = {}
     for r in rows:
         key = r["ticker"] or ("CUSIP:" + (r.get("cusip") or r.get("company") or ""))      # 19.10.2026: "без тикър" не слива различни емитенти
         cur = best.get(key)
+        own = {k: r.get(k) for k in ("manager", "action", "value", "pct_of_portfolio", "change_pct", "period", "late")}
         if cur is None:
-            best[key] = {**r, "managers": [r["manager"]], "count": 1, "_late_by": ({r["manager"]: r["late"]} if r.get("late") else {})}
+            best[key] = {**r, "managers": [r["manager"]], "count": 1, "_late_by": ({r["manager"]: r["late"]} if r.get("late") else {}), "by_manager": {r["manager"]: own}}
         else:
+            if (own["value"] or 0) > ((cur["by_manager"].get(r["manager"]) or {}).get("value") or 0):
+                cur["by_manager"][r["manager"]] = own
             if r["manager"] not in cur["managers"]:
                 cur["managers"].append(r["manager"])
             cur["count"] = len(cur["managers"])                  # 19.10.2026 (т. 17б): мениджъри, не редове — GOOGL беше "5 мениджъра" при 4 (два реда на един мениджър — два класа на Alphabet)
@@ -842,6 +850,7 @@ def _dedupe_by_ticker(rows: list[dict]) -> list[dict]:
                 cur["value"] = r["value"]; cur["company"] = r.get("company", cur.get("company"))
     out = []
     for row in best.values():
+        row["by_manager"] = sorted(row["by_manager"].values(), key=lambda m: -(m.get("value") or 0))
         late_by = row.pop("_late_by")
         if not late_by:
             row.pop("late", None)

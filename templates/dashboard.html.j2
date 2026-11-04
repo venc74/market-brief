@@ -331,6 +331,8 @@
   .glb-t { margin-bottom: 8px; } .glb-t .glb-card { max-width: 520px; margin-top: 6px; }
   .glb-def { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
   details.gw-open, details.gw-book, details.gw-how { margin: 6px 0 14px; } details.gw-open > summary, details.gw-book > summary, details.gw-how > summary { font-size: 12.5px; color: var(--muted); }
+  /* 03.11.2026 (т. 18–19): 13F — една таблица; изходите — червена дума */
+  .si-table { min-width: 760px; } .si-table .pos { color: var(--green); font-weight: 600; } .si-table tr.si-exit td:nth-child(3) { color: var(--red); } details.si-full > summary { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
   /* 03.11.2026 (т. 17): COT — компактна таблица; групите в „Всички 40 пазара“; екстремумът — с удебелен пазар */
   .cot-table { min-width: 560px; } .cot-table .pos { color: var(--green); } .cot-table tr.cot-group td { font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); padding-top: 10px; }
   .cot-table tr.cot-ext td:first-child { font-weight: 600; } details.cot-all { margin-top: 10px; } details.cot-all > summary, details.cot-full > summary { font-size: 12.5px; color: var(--muted); }
@@ -1844,95 +1846,49 @@
 {% endif %}
 
 
-{# 21.10.2026 (етап 4, ритъм на данните): без нов 13F спрямо предишния бриф — един ред, а секциите за 13F са свити #}
-{% if thirteenf_rhythm.compact %}<section>
-  <h2>Superinvestor Positions — Last 13F</h2>
-  <div class="prose">{{ thirteenf_rhythm.text }}</div>
-  <details class="si-full"><summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Секциите за 13F (без промяна от последното подаване)</summary>{% endif %}
-{% if superinvestor_moves %}
+{# 13F (03.11.2026, разходката, т. 18–19): ЕДНА секция — компактна таблица Мениджър · Тикър · Действие (нова / увеличена / изход) · Стойност · Промяна % · % от портфейла · в нашия скрийнър ✓;
+   изходите са редове „изход“ (без „Major Position Exits“ и без реда „Няма големи изходи“). Ритъмът е дневен: цялата — при ново подаване (data_rhythm.thirteenf_rhythm), иначе един ред + сгънато.
+   Маркерът SI✓ върху картите и позициите остава (dataroma.new_position_markers). #}
+{% set si_rows = thirteenf_rows(superinvestor_moves, superinvestor_exits, our_tickers) %}
+{% set si_stopped = (superinvestor_exits or {}).get("stopped_managers") or [] %}
+{% if si_rows or si_stopped or thirteenf_rhythm.compact or (superinvestor_status and superinvestor_status.kind in ['failed', 'legit_zero']) %}
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
+  {% if thirteenf_rhythm.compact %}<div class="prose">{{ thirteenf_rhythm.text }}</div>
+  <details class="si-full"><summary>Таблицата от последните 13F ({{ si_rows|length }})</summary>{% endif %}
   {{ data_note(superinvestor_status, "13F") }}
   {{ si_nocmp(superinvestor_status) }}
-  <div class="si-grid">
-    {% for s in superinvestor_moves %}
-    <div class="si-card {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}</span>
-        <span>{% if s.value %}<span class="si-val">{{ s.value|money_short }}</span> {% endif %}<span class="si-action">{{ s.action }}</span></span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}
-      <div class="si-mgr">{% if s.count and s.count > 1 %}{{ s.count }} мениджъра · {% endif %}{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
+  {% if si_rows %}
+  <div class="cs-radar-wrap"><table class="ctx-table si-table">
+    <tr><th>Мениджър</th><th>Тикър</th><th>Действие</th><th class="num">Стойност</th><th class="num" title="Промяна на броя акции спрямо предходния 13F">Промяна</th><th class="num" title="Дял от портфейла на мениджъра; при изход — в предходния 13F">% от портфейла</th><th title="Тикърът е и в нашия скрийнър днес (Action / Watchlist)">Скрийнър</th></tr>
+    {% for s in si_rows %}
+    <tr{% if s.action == "изход" %} class="si-exit"{% endif %}>
+      <td>{{ s.manager }}{% if s.late %} <span class="cs-warn">{{ s.late }}</span>{% endif %}</td>
+      <td class="mono"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}{% if s.company %}<span class="wt-name">{{ s.company|cname(28, false) }}</span>{% endif %}</td>
+      <td>{{ s.action }}</td>
+      <td class="num">{% if s.value %}{{ s.value|money_short }}{% else %}—{% endif %}</td>
+      <td class="num">{% if s.change_pct is number %}{{ "%+.0f"|format(s.change_pct) }}%{% else %}<span class="cs-mu">—</span>{% endif %}</td>
+      <td class="num">{% if s.pct_of_portfolio is number %}{{ "%.1f"|format(s.pct_of_portfolio) }}%{% else %}<span class="cs-mu">—</span>{% endif %}</td>
+      <td>{% if s.in_screener %}<span class="pos">✓</span>{% endif %}</td>
+    </tr>
     {% endfor %}
+  </table></div>
+  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
+    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата. Сила е конвергенцията: акция, която и нашият скрийнър отчита като пробив сега, и superinvestor е купил.
+    Изход = позиция над {{ dataroma_major_exit_pct|round|int }}% от портфейла в предходния 13F, която напълно липсва в текущия.
   </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата.
-    Сила е <b>конвергенцията</b>: акция, която и нашият скрийнър отчита като пробив СЕГА, и superinvestor е купил.
+  {% endif %}
+  {% if si_stopped %}
+  <div class="si-stopped-note">
+    <b>⚠ Мениджъри, спрели да подават 13F</b> (липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
+    {% for m in si_stopped %}<div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>{% endfor %}
   </div>
+  {% endif %}
   {{ si_options(superinvestor_status) }}
   {{ si_cusip(superinvestor_status) }}
+  {% if thirteenf_rhythm.compact %}</details>{% endif %}
 </section>
 {% endif %}
-
-{# 2026-10-03 (пакет 4а т.2): секцията High-Conviction New Positions е махната — нова позиция на мениджър
-   от списъка е маркер SI✓ върху кандидатите и v2 позициите (hover/клик: кой и от коя дата е filing-ът) #}
-
-{% if superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers) %}
-<section>
-  <h2>📉 Major Position Exits</h2>
-  {% if not superinvestor_moves %}{{ data_note(superinvestor_status, "13F") }}{{ si_nocmp(superinvestor_status) }}{{ si_options(superinvestor_status) }}{% endif %}
-  {% if superinvestor_exits.exits %}
-  <div class="si-grid">
-    {% for s in superinvestor_exits.exits %}
-    <div class="si-card exit {{ 'in-screen' if s.ticker in our_tickers else '' }}">
-      <div class="si-top">
-        <span class="si-sym"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}</span>
-        <span class="si-pct exit">−{{ s.prior_pct_of_portfolio }}%</span>
-      </div>
-      {% if s.company %}<div class="si-mgr" style="color:var(--text)">{{ s.company|cname(36, false) }}</div>{% endif %}
-      <div class="si-mgr">{{ s.manager }}{% if s.period %} · {{ s.period }}{% endif %}{% if s.late %} · <span style="color:var(--yellow)">{{ s.late }}</span>{% endif %}</div>
-      {% if s.ticker in our_tickers %}<div class="si-flag">✓ и в нашия скрийнър — конвергенция</div>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:12px">
-    Позиция, която е била над {{ dataroma_major_exit_pct }}% от портфейла на мениджъра в предишния 13F,
-    напълно отсъства в текущия — пълна ликвидация на концентрирана позиция, не частично намаление.
-  </div>
-  {% endif %}
-  {% if superinvestor_exits.stopped_managers %}
-  <div class="si-stopped-note">
-    <b>⚠ Мениджъри, спрели да подават 13F</b> (изключени от Exits по-горе — липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
-    {% for m in superinvestor_exits.stopped_managers %}
-    <div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-</section>
-{% endif %}
-
-{# 13F пакет (07.10): постоянен ред — секцията не изчезва мълчаливо, когато няма изходи ("няма" ≠ "не е проверено") #}
-{% if superinvestor_exits is not none and not (superinvestor_exits.exits or superinvestor_exits.stopped_managers)
-      and superinvestor_status and superinvestor_status.kind in ['ok', 'legit_zero'] and superinvestor_status.managers_with_comparison %}
-<section>
-  <h2>📉 Major Position Exits</h2>
-  <div class="small" style="font-size:12.5px;color:var(--muted)">Няма големи изходи ({{ superinvestor_status.managers_with_comparison }} мениджъра със сравнение с предходния 13F, праг {{ dataroma_major_exit_pct|round|int }}% от портфейла).</div>
-</section>
-{% endif %}
-
-{% if not superinvestor_moves and not (superinvestor_exits and (superinvestor_exits.exits or superinvestor_exits.stopped_managers))
-      and superinvestor_status and superinvestor_status.kind in ['failed', 'legit_zero'] %}
-<section>
-  <h2>Superinvestor Positions — Last 13F</h2>
-  {{ data_note(superinvestor_status, "13F") }}
-  {{ si_nocmp(superinvestor_status) }}
-  {{ si_options(superinvestor_status) }}
-</section>
-{% endif %}
-{% if thirteenf_rhythm.compact %}</details>
-</section>{% endif %}
 
 {# Пакет 4б т.в: секцията "Insider Buying" отпадна — остава маркерът INS✓ (кой, кога, колко — hover/клик) върху кандидатите и позициите #}
 {# 21.10.2026 (етап 4): видим ред за Form 4 — и при нула, вместо тишина #}

@@ -454,6 +454,34 @@ def glb_market_line(t: dict | None) -> str | None:
 env.globals["glb_groups"] = glb_groups
 
 
+def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str] | None) -> list[dict]:
+    """
+    03.11.2026 (разходката, т. 18–19): една таблица за 13F — по ред на (мениджър, тикър): {manager, ticker, company, action ("нова" / "увеличена" / "изход"), value, pct_of_portfolio,
+    change_pct, in_screener, late, period, ticker_source, cusip}. Покупките — по стойност (собственият ред на всеки мениджър, dataroma "by_manager"; стар бриф без него — редът на тикъра,
+    мениджърът с „+N“), после изходите по стойност в предишния 13F (промяна −100%, делът — в предишния портфейл). Чиста функция.
+    """
+    ours = set(ours or [])
+    base = lambda r: {"ticker": r.get("ticker"), "company": r.get("company"), "in_screener": r.get("ticker") in ours, "ticker_source": r.get("ticker_source"), "cusip": r.get("cusip")}
+    word = lambda a: "нова" if a == "нова позиция" else (a or "—")
+    buys = []
+    for r in moves or []:
+        own = r.get("by_manager")
+        if own:
+            buys += [{**base(r), "manager": m.get("manager"), "action": word(m.get("action")), "value": m.get("value"), "pct_of_portfolio": m.get("pct_of_portfolio"),
+                      "change_pct": m.get("change_pct"), "late": m.get("late"), "period": m.get("period")} for m in own]
+        else:
+            extra = (r.get("count") or 1) - 1
+            buys.append({**base(r), "manager": (r.get("manager") or "—") + (f" +{extra}" if extra > 0 else ""), "action": word(r.get("action")), "value": r.get("value"),
+                         "pct_of_portfolio": r.get("pct_of_portfolio"), "change_pct": r.get("change_pct"), "late": r.get("late"), "period": r.get("period")})
+    gone = [{**base(r), "manager": r.get("manager"), "action": "изход", "value": r.get("prior_value"), "pct_of_portfolio": r.get("prior_pct_of_portfolio"), "change_pct": -100.0,
+             "late": r.get("late"), "period": r.get("period")} for r in (exits or {}).get("exits") or []]
+    by_value = lambda x: -(x.get("value") or 0)
+    return sorted(buys, key=by_value) + sorted(gone, key=by_value)
+
+
+env.globals["thirteenf_rows"] = thirteenf_rows
+
+
 def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план

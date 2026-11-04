@@ -187,17 +187,12 @@ brief = copy.deepcopy(B05)
 brief.update(superinvestor_moves=bundle["moves"], superinvestor_exits={"exits": [], "stopped_managers": []}, superinvestor_status=meta, data_warnings=w)
 page = re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))
 assert "⚠ закъснява: последен 13F от 2026-05-15 (за Q1 2026), няма за Q2 2026 (срок 14.08.2026)" in page
-assert "Major Position Exits" in page and "Няма големи изходи (3 мениджъра със сравнение с предходния 13F, праг 10% от портфейла)" in page
+assert "Major Position Exits" not in page and "Няма големи изходи" not in page                                                  # 03.11.2026 (разходката, т. 18–19): една таблица, изходите — редове „изход“
 assert "13F: броят акции не е прочетен надеждно за Тест D" in page
 assert "⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за: Тест B · хиляди (реален файл от 2020, дата 2026) (13F за Q1 2026 не се изтегли днес)." in page
 brief["superinvestor_exits"] = {"exits": [], "stopped_managers": [{"manager": "М", "last_filing_date": "2025-11-03", "days_since_filing": 339}]}
-assert "Няма големи изходи" not in re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))                           # има стопиран мениджър → старата секция, без дублиране
-brief["superinvestor_exits"] = {"exits": [], "stopped_managers": []}; brief["superinvestor_status"] = {**meta, "kind": "failed"}
-assert "Няма големи изходи" not in re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))                           # при провал на тегленето "няма" не се твърди
-old = copy.deepcopy(meta); old.pop("managers_with_comparison")                                                                   # стар кеш без полето → без ред (не измисля N)
-brief["superinvestor_status"] = old
-assert "Няма големи изходи" not in re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))
-print("  ✓ етикетът 'закъснява …' до периода; ред 'Няма големи изходи (3 мениджъра …, праг 10%)' при чист статус; без него при стопиран мениджър, провал на тегленето или стар кеш")
+assert "Мениджъри, спрели да подават 13F" in re.sub(r"\s+", " ", htmllib.unescape(render.render_dashboard(brief)))                  # спрелият мениджър — бележка в секцията
+print("  ✓ етикетът 'закъснява …' до реда на мениджъра; без отделна секция за изходите и без 'Няма големи изходи' (т. 18–19); спрелият мениджър — бележка")
 
 print()
 print("Всички тестове минаха.")
