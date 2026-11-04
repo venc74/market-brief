@@ -186,7 +186,7 @@ tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tr
   (перцентил в целия универс; `RS_RATING_WEIGHTS = 40/20/20/20`, `RS_QUARTER_BARS = 63`,
   `RS_RATING_MIN_UNIVERSE = 150` — под него филтърът се пропуска с предупреждение)
 - Track Record: `TRACK_RECORD_V2 = 1` — автоматично превключване v1→v2 при първия run
-- Преди отварянето: `PREOPEN_GAP_PCT = 10`, `PREOPEN_WATCH_GAP_PCT = 3`, `PREOPEN_MIN_PM_BARS = 3`, `PREOPEN_MAX_ROWS = 10`, `PREOPEN_MIN_PM_SHARE = 0.4`, `PREOPEN_LATE_UNTIL_NY = 10:00`; наблюдаваните: `WATCH_PARTIAL_SHARE = 0.5`; QM 5-минутни бари: `QM_INTRADAY_MAX_DAYS = 55`, `QM_INTRADAY_MAX_TRIES = 2`
+- Преди отварянето: `PREOPEN_GAP_PCT = 10`, `PREOPEN_WATCH_GAP_PCT = 3`, `PREOPEN_MIN_PM_BARS = 3`, `PREOPEN_MAX_ROWS = 10`, `PREOPEN_MIN_PM_SHARE = 0.4`, `PREOPEN_LATE_UNTIL_NY = 10:00`; наблюдаваните: `WATCH_PARTIAL_SHARE = 0.5`; QM 5-минутни бари: `QM_INTRADAY_MAX_DAYS = 55`, `QM_INTRADAY_MAX_TRIES = 5`
 - Останалите (пакет 4б, buy-stop, 13F, Qullamaggie, пакетите от 09–19.10) — в блоковете на config.py; описанията им към 20.10 — docs/HISTORY.md, „Параметри по пакети“.
 
 ## Език

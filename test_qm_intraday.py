@@ -111,15 +111,18 @@ with q():
     assert backtest._qm_intraday(high, high["fill_date"], TODAY) is False
 assert n0 == [] and not backtest.qm_intraday_retry(high)
 backtest._FETCH_5M = boom
+assert config.QM_INTRADAY_MAX_TRIES == 5
 with q():
-    backtest._qm_intraday(fail, fail["fill_date"], TODAY)                       # втори неуспешен опит
-assert fail["intraday_tries"] == 2 and not backtest.qm_intraday_retry(fail)
+    for k in range(2, config.QM_INTRADAY_MAX_TRIES + 1):                        # следващите неуспешни опити — до прага
+        assert backtest.qm_intraday_retry(fail)
+        backtest._qm_intraday(fail, fail["fill_date"], TODAY)
+assert fail["intraday_tries"] == config.QM_INTRADAY_MAX_TRIES and not backtest.qm_intraday_retry(fail)
 backtest._FETCH_5M = lambda t, d: (n0.append(t), b5(f"{t}_{d}"))[1]
 with q():
-    assert backtest._qm_intraday(fail, fail["fill_date"], TODAY) is False      # трети — без теглене
+    assert backtest._qm_intraday(fail, fail["fill_date"], TODAY) is False      # след прага — без теглене
 assert n0 == []
 backtest._FETCH_5M = lambda t, d: b5(f"{t}_{d}")
-print("  ✓ Н3: „не стигат нивото“ — без нов опит; провал на тегленето — 2 опита, после без теглене")
+print("  ✓ Н3: „не стигат нивото“ — без нов опит; провал на тегленето — 5 опита, после без теглене")
 
 print()
 print("── 4. назад: затворените записи (SN, ELF, CBOE, RVTY) и живите (DOCU, UTHR) получават 5-минутните в един run на _resolve_open_positions ──")
