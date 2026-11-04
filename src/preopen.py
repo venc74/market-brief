@@ -179,19 +179,21 @@ def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=No
             row["company"] = (name_lookup(t) if name_lookup else None) or t
         except Exception:
             row["company"] = t
+        since = dt.datetime.combine(dt.date.fromisoformat(e["session"]), dt.time(0, 0)) - dt.timedelta(days=1)
+        src = qm_ep.catalyst_sources(t, e["session"], since, filings_fn=filings_fn, headlines_fn=headlines_fn, now_utc=now_utc)   # 04.11.2026 (С1): „не се провери“ ≠ „няма“
         try:
-            fs = (filings_fn or qm_ep.company_filings)(t, e["session"], now_utc=now_utc)
-            row["filings_8k"] = [{"accepted_et": f["accepted_et"], "items": [f"{c}" for c, *_ in f["items"]], "text": filing_line(f)} for f in fs]
+            row["filings_8k"] = [{"accepted_et": f["accepted_et"], "items": [f"{c}" for c, *_ in f["items"]], "text": filing_line(f)} for f in src["filings_8k"]]
         except Exception as ex:
             print(f"[preopen] 8-K {t}: {type(ex).__name__}: {ex}")
-            row["filings_8k"] = []
+            row["filings_8k"], src["filings_error"] = [], f"8-K не се прочете ({type(ex).__name__})"
+        row["filings_error"] = src["filings_error"]
         try:
-            since = dt.datetime.combine(dt.date.fromisoformat(e["session"]), dt.time(0, 0)) - dt.timedelta(days=1)
-            hl = qm_ep.rank_headlines((headlines_fn or qm_ep.fetch_headlines)(t, since), t, row["company"])
+            hl = qm_ep.rank_headlines(src["headlines_raw"], t, row["company"])
             row["headline"] = {k: hl[0].get(k) for k in ("title", "source", "published", "link")} if hl else None
         except Exception as ex:
             print(f"[preopen] заглавия {t}: {type(ex).__name__}: {ex}")
-            row["headline"] = None
+            row["headline"], src["headlines_error"] = None, f"заглавията не се подредиха ({type(ex).__name__})"
+        row["headlines_error"] = src["headlines_error"]
         out.append(row)
     return out
 
@@ -219,6 +221,12 @@ def volume_note(res: dict) -> str | None:
     return f"Обемът в премаркета не е наличен (Yahoo){who} — провери го в първите минути"
 
 
+def qm_ep_sources_note(row: dict) -> str | None:
+    """04.11.2026 (С1): „8-K: не се провери (…) · заглавия: не се провериха (…)“ — qm_ep.sources_note."""
+    from src import qm_ep
+    return qm_ep.sources_note(row)
+
+
 def has_news(res: dict) -> bool:
     return bool(res.get("gaps") or res.get("levels") or res.get("watch"))
 
@@ -240,6 +248,7 @@ def email_html(res: dict) -> str:
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
                          + (f"<br><span style='color:#374151'>„{e(g['headline']['title'])}“" + (f" · {e(g['headline']['source'])}" if g["headline"].get("source") else "") + "</span>"
                             if g.get("headline") else "")
+                         + (f"<br><span style='color:#92400e'>{e(qm_ep_sources_note(g))}</span>" if qm_ep_sources_note(g) else "")      # 04.11.2026 (С1)
                          for g in res["gaps"]]))
     if res.get("levels"):
         parts.append("<div><b>Нивата в премаркета</b></div>")

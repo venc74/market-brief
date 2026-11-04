@@ -529,7 +529,12 @@
       {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
       {% if g.headline %}<br><span class="small">„{{ g.headline.title }}“{% if g.headline.source %} · {{ g.headline.source }}{% endif %}</span>{% endif %}
-      {% if not g.filings_8k and not g.headline %}<br><span class="small" style="color:var(--muted)">без 8-K и без заглавие за компанията досега</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+      {# 04.11.2026 (четвърти преглед, С1): „не се провери“ (EDGAR / Yahoo паднаха) ≠ „няма“ — до 04.11 провалът излизаше като „без 8-K и без заглавие“ #}
+      {% if g.filings_error %}<br><span class="small" style="color:var(--yellow)">8-K: не се провери ({{ g.filings_error }}) — липсата НЕ значи, че няма</span>{% endif %}
+      {% if g.headlines_error %}<br><span class="small" style="color:var(--yellow)">заглавия: не се провериха ({{ g.headlines_error }})</span>{% endif %}
+      {% if not g.filings_8k and not g.headline and not g.filings_error and not g.headlines_error %}<br><span class="small" style="color:var(--muted)">без 8-K и без заглавие за компанията досега</span>
+      {% elif not g.filings_8k and not g.filings_error and not g.headline %}<br><span class="small" style="color:var(--muted)">без 8-K досега</span>
+      {% elif not g.headline and not g.headlines_error and not g.filings_8k %}<br><span class="small" style="color:var(--muted)">без заглавие за компанията досега</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
   {% if preopen.levels %}<div class="cs-sub">Нивата в премаркета · {{ preopen.levels|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.levels %}
     <li><b class="mono">{{ x.ticker }}</b> · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}
@@ -1601,7 +1606,8 @@
           <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div class="qm-sm">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
           <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
             <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: няма данни за обема</span>{% endif %}</div>
-            {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}</td>
+            {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}
+            {% if r.sources_note %}<div class="qm-sm" style="font-family:inherit;color:var(--yellow)">{{ r.sources_note }} — липсата НЕ значи, че няма</div>{% endif %}</td>
           <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
           <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span></td>
         </tr>

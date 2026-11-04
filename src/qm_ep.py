@@ -204,16 +204,22 @@ def parse_rss(xml_text: str, since: dt.datetime | None = None, limit: int = 6) -
     return out[:limit]
 
 
-def fetch_headlines(sym: str, since: dt.datetime | None = None) -> list[dict]:
-    """Заглавията за тикъра от публичния RSS на Yahoo Finance (graceful: провал → [])."""
+# 04.11.2026 (четвърти преглед, С1): причината, когато 8-K / заглавията НЕ се провериха — {тикър: причина}. До 04.11 провалът връщаше [] и карето казваше „без 8-K и без заглавие“.
+LAST_FILINGS_ERR: dict = {}
+LAST_HEADLINES_ERR: dict = {}
+
+
+def fetch_headlines(sym: str, since: dt.datetime | None = None) -> list[dict] | None:
+    """Заглавията за тикъра от публичния RSS на Yahoo Finance. 04.11.2026 (С1): провал → None (причината — LAST_HEADLINES_ERR[тикър]), не [] — „няма“ и „не се провери“ са различни."""
     try:
         import requests
         r = requests.get(f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={sym}&region=US&lang=en-US", headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
         r.raise_for_status()
         return parse_rss(r.text, since)
     except Exception as e:
+        LAST_HEADLINES_ERR[sym] = f"Yahoo RSS: {type(e).__name__}"
         print(f"[qm_ep] заглавия {sym}: {type(e).__name__}: {e}")
-        return []
+        return None
 
 
 # 21.10.2026 (етап 4): новината за самата компания пред общите прегледи. Реално на 21.10: и трите заглавия на Yahoo за SMCI бяха прегледи на пазара („Dow Jones Futures: …“,
@@ -291,14 +297,18 @@ def filings_after_close(sub: dict, session: str, now_utc: dt.datetime | None = N
 
 
 def company_filings(sym: str, session: str, get=None, cik_map=None, now_utc: dt.datetime | None = None) -> list[dict]:
-    """8-K-тата на компанията след затварянето (EDGAR submissions, config.EDGAR_UA — както 13F / Form 4 / отделянията). Graceful: изключено, без CIK, провал → []."""
+    """
+    8-K-тата на компанията след затварянето (EDGAR submissions, config.EDGAR_UA — както 13F / Form 4 / отделянията). Изключено (config) / без сесия → [].
+    04.11.2026 (четвърти преглед, С1): без CIK или провал на тегленето → None (причината — LAST_FILINGS_ERR[тикър]); до 04.11 — [] и карето казваше „без 8-K“.
+    """
     if not config.QM_EP_EDGAR_8K or not session:
         return []
     try:
         from src import insider_buying, spinoff_watch
         cik = (cik_map if cik_map is not None else insider_buying._ticker_cik_map()).get(sym)
         if not cik:
-            return []
+            LAST_FILINGS_ERR[sym] = "EDGAR: няма CIK за тикъра"
+            return None
         get = get or spinoff_watch._http_get
         sub = json.loads(get(f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json"))
         fs = filings_after_close(sub, session, now_utc)
@@ -317,8 +327,9 @@ def company_filings(sym: str, session: str, get=None, cik_map=None, now_utc: dt.
                 print(f"[qm_ep] 8-K {sym} {f['acc']}: документът не се прочете ({type(e).__name__}) — точките са от заглавката на EDGAR")
         return fs
     except Exception as e:
+        LAST_FILINGS_ERR[sym] = f"EDGAR: {type(e).__name__}"
         print(f"[qm_ep] 8-K {sym}: {type(e).__name__}: {e}")
-        return []
+        return None
 
 
 def filing_headline(f: dict) -> dict:
@@ -374,7 +385,8 @@ SYSTEM_EP = ("Ти си помощник, който връща САМО вал�
 def _build_prompt(batch: list[dict]) -> str:
     cats = "\n".join(f'- "{k}": {v}' for k, v in CATALYSTS.items())
     payload = [{"ticker": r["ticker"], "headlines": [h["title"] for h in r["headlines"] if h.get("source") != "SEC"],
-                **({"sec_8k_after_close": [f"{f['accepted_et']} ET — " + "; ".join(f"Item {c} {en}" for c, en, _ in f["items"]) for f in r["filings_8k"]]} if r.get("filings_8k") else {})}
+                **({"sec_8k_after_close": [f"{f['accepted_et']} ET — " + "; ".join(f"Item {c} {en}" for c, en, _ in f["items"]) for f in r["filings_8k"]]} if r.get("filings_8k") else {}),
+                **({"sec_8k_after_close": "не се провери (EDGAR не отговори) — липсата НЕ значи, че няма 8-K"} if r.get("filings_error") and not r.get("filings_8k") else {})}   # 04.11.2026 (С1)
                for r in batch]
     return (f"АКЦИИ С ГАП НАГОРЕ СЛЕД ЗАТВАРЯНЕ (заглавия от Yahoo Finance): {json.dumps(payload, ensure_ascii=False)}\n\nКАТАЛИЗАТОРИ (ползвай САМО тези ключове; "
             f"ако заглавията не дават ясна причина — \"unknown\"):\n{cats}\n\n"
@@ -555,8 +567,10 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
                 except Exception:
                     r["company"] = r["ticker"]
             # 21.10.2026 (етап 4): новината за самата компания — 8-K след затварянето (първи ред), после нейните заглавия, общите прегледи на пазара — последни
-            r["filings_8k"] = (filings_fn or company_filings)(r["ticker"], diag.get("session"))
-            r["headlines"] = [filing_headline(f) for f in r["filings_8k"]] + rank_headlines((headlines_fn or fetch_headlines)(r["ticker"], since), r["ticker"], r.get("company"))
+            src = catalyst_sources(r["ticker"], diag.get("session"), since, filings_fn=filings_fn, headlines_fn=headlines_fn)     # 04.11.2026 (С1): „не се провери“ ≠ „няма“
+            r["filings_8k"], r["filings_error"], r["headlines_error"] = src["filings_8k"], src["filings_error"], src["headlines_error"]
+            r["headlines"] = [filing_headline(f) for f in r["filings_8k"]] + rank_headlines(src["headlines_raw"], r["ticker"], r.get("company"))
+            r["sources_note"] = sources_note(r)
         cls, notes = classify_catalysts(shown, ai_call)
         out["notes"] += notes
         for r in shown:
@@ -580,3 +594,38 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
         out["ok"] = False
         print(f"[qm_ep] наблюдението пропадна: {type(e).__name__}: {e}")
     return out
+
+
+def catalyst_sources(sym: str, session: str | None, since: dt.datetime, *, filings_fn=None, headlines_fn=None, now_utc: dt.datetime | None = None) -> dict:
+    """
+    04.11.2026 (четвърти преглед, С1): 8-K и заглавията за един тикър с изричен статус — {"filings_8k": [...], "filings_error": str|None, "headlines_raw": [...],
+    "headlines_error": str|None}. None от източника или изключение → празен списък + причината („не се провери“), не „няма“. Ползват го сутрешният EP и обновяването преди отварянето.
+    """
+    out = {"filings_8k": [], "filings_error": None, "headlines_raw": [], "headlines_error": None}
+    LAST_FILINGS_ERR.pop(sym, None); LAST_HEADLINES_ERR.pop(sym, None)
+    try:
+        fs = (filings_fn or company_filings)(sym, session, now_utc=now_utc) if now_utc is not None else (filings_fn or company_filings)(sym, session)
+        if fs is None:
+            out["filings_error"] = LAST_FILINGS_ERR.get(sym) or "EDGAR: не се провери"
+        else:
+            out["filings_8k"] = fs
+    except Exception as e:
+        out["filings_error"] = f"EDGAR: {type(e).__name__}"
+        print(f"[qm_ep] 8-K {sym}: {type(e).__name__}: {e}")
+    try:
+        hl = (headlines_fn or fetch_headlines)(sym, since)
+        if hl is None:
+            out["headlines_error"] = LAST_HEADLINES_ERR.get(sym) or "Yahoo RSS: не се провериха"
+        else:
+            out["headlines_raw"] = hl
+    except Exception as e:
+        out["headlines_error"] = f"Yahoo RSS: {type(e).__name__}"
+        print(f"[qm_ep] заглавия {sym}: {type(e).__name__}: {e}")
+    return out
+
+
+def sources_note(row: dict) -> str | None:
+    """04.11.2026 (С1): „8-K: не се провери (EDGAR: TimeoutError) · заглавия: не се провериха (…)“ за реда; всичко проверено → None. Чиста функция."""
+    parts = ([f"8-K: не се провери ({row['filings_error']})"] if row.get("filings_error") else []) + \
+            ([f"заглавия: не се провериха ({row['headlines_error']})"] if row.get("headlines_error") else [])
+    return " · ".join(parts) or None
