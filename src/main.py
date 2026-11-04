@@ -562,7 +562,7 @@ def run() -> dict:
                             partial=_screen_partial)
     # 30.10.2026 (разходката, т. 7): секторната карта — таблица с 11-те секторни ETF-а по сила, лидерите им от универса (данните на скрийнинга току-що), подсекторите
     sector_board = steps.step("sector_board", lambda: sector_layer.sector_board(universe_sector=screener.LAST_UNIVERSE_SECTOR, trend=screener.LAST_TREND,
-                                                                                ratings=screener.rs_ratings(screener.LAST_RS_SCORES)), fallback={},
+                                                                                ratings=screener.rs_ratings(screener.LAST_RS_SCORES), rotation=rotation), fallback={},      # 04.11.2026 (Н2): водещите по is_leader
                               label="Секторната карта", consequence="секторната карта липсва днес",
                               failed_if=lambda v: "Yahoo не върна цените на секторните ETF-и" if not v else None)
 

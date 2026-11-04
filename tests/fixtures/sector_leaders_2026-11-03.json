@@ -1,0 +1,599 @@
+{
+"_note": "РЕАЛНО: от брифовете на 02.11 и 03.11 (data/2026-11-02.json, data/2026-11-03.json; sector_board.sectors без лидерите и rotation за 11-те секторни ETF-а) — двата дни със записана секторна карта към 04.11. За test_sector_leader_rule.py.",
+"days": {
+"2026-11-02": {
+"sectors": [
+{
+"etf": "XLE",
+"sector": "Енергетика",
+"rs_4w": 13.51,
+"rs_12w": 22.54,
+"word": "води пазара",
+"strength": 18.03,
+"rs_at_6m_high": true,
+"rank": 1,
+"rank_change": 0
+},
+{
+"etf": "XLV",
+"sector": "Здравеопазване",
+"rs_4w": 13.3,
+"rs_12w": 16.56,
+"word": "води пазара",
+"strength": 14.93,
+"rs_at_6m_high": true,
+"rank": 2,
+"rank_change": 0
+},
+{
+"etf": "XLP",
+"sector": "Потребителски (защитни)",
+"rs_4w": 13.08,
+"rs_12w": 7.34,
+"word": "води пазара",
+"strength": 10.21,
+"rs_at_6m_high": true,
+"rank": 3,
+"rank_change": 0
+},
+{
+"etf": "XLB",
+"sector": "Материали",
+"rs_4w": 9.93,
+"rs_12w": 3.74,
+"word": "води пазара",
+"strength": 6.83,
+"rs_at_6m_high": false,
+"rank": 4,
+"rank_change": 2
+},
+{
+"etf": "XLU",
+"sector": "Комунални услуги",
+"rs_4w": 11.05,
+"rs_12w": 0.98,
+"word": "набира сила",
+"strength": 6.01,
+"rs_at_6m_high": false,
+"rank": 5,
+"rank_change": 0
+},
+{
+"etf": "XLF",
+"sector": "Финанси",
+"rs_4w": 7.59,
+"rs_12w": -0.25,
+"word": "набира сила",
+"strength": 3.67,
+"rs_at_6m_high": false,
+"rank": 6,
+"rank_change": 2
+},
+{
+"etf": "XLY",
+"sector": "Потребителски (циклични)",
+"rs_4w": 6.78,
+"rs_12w": -0.47,
+"word": "набира сила",
+"strength": 3.16,
+"rs_at_6m_high": false,
+"rank": 7,
+"rank_change": -3
+},
+{
+"etf": "XLRE",
+"sector": "Недвижими имоти",
+"rs_4w": 7.73,
+"rs_12w": -1.88,
+"word": "набира сила",
+"strength": 2.93,
+"rs_at_6m_high": false,
+"rank": 8,
+"rank_change": 1
+},
+{
+"etf": "XLI",
+"sector": "Индустрия",
+"rs_4w": 0.31,
+"rs_12w": -8.32,
+"word": "в крак с пазара",
+"strength": -4.0,
+"rs_at_6m_high": false,
+"rank": 9,
+"rank_change": 2
+},
+{
+"etf": "XLK",
+"sector": "Технологии",
+"rs_4w": -8.5,
+"rs_12w": -2.1,
+"word": "изостава",
+"strength": -5.3,
+"rs_at_6m_high": false,
+"rank": 10,
+"rank_change": -3
+},
+{
+"etf": "XLC",
+"sector": "Комуникации",
+"rs_4w": -7.78,
+"rs_12w": -8.92,
+"word": "изостава",
+"strength": -8.35,
+"rs_at_6m_high": false,
+"rank": 11,
+"rank_change": -1
+}
+],
+"rotation": [
+{
+"etf": "XLE",
+"sector": "Енергетика",
+"rs_chg_4w_pct": 13.51,
+"rs_chg_12w_pct": 22.54,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 0.0
+},
+{
+"etf": "XLV",
+"sector": "Здравеопазване",
+"rs_chg_4w_pct": 13.3,
+"rs_chg_12w_pct": 16.56,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 10.0
+},
+{
+"etf": "XLP",
+"sector": "Потребителски (защитни)",
+"rs_chg_4w_pct": 13.08,
+"rs_chg_12w_pct": 7.34,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 35.0
+},
+{
+"etf": "XLU",
+"sector": "Комунални услуги",
+"rs_chg_4w_pct": 11.05,
+"rs_chg_12w_pct": 0.98,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 45.0
+},
+{
+"etf": "XLB",
+"sector": "Материали",
+"rs_chg_4w_pct": 9.93,
+"rs_chg_12w_pct": 3.74,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 45.0
+},
+{
+"etf": "XLRE",
+"sector": "Недвижими имоти",
+"rs_chg_4w_pct": 7.73,
+"rs_chg_12w_pct": -1.88,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 60.0
+},
+{
+"etf": "XLF",
+"sector": "Финанси",
+"rs_chg_4w_pct": 7.59,
+"rs_chg_12w_pct": -0.25,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 55.0
+},
+{
+"etf": "XLY",
+"sector": "Потребителски (циклични)",
+"rs_chg_4w_pct": 6.78,
+"rs_chg_12w_pct": -0.47,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 40.0
+},
+{
+"etf": "XBI",
+"sector": "Биотех",
+"rs_chg_4w_pct": 2.86,
+"rs_chg_12w_pct": 4.56,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 90.0
+},
+{
+"etf": "ITA",
+"sector": "Отбрана",
+"rs_chg_4w_pct": 2.8,
+"rs_chg_12w_pct": -14.71,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 90.0
+},
+{
+"etf": "XLI",
+"sector": "Индустрия",
+"rs_chg_4w_pct": 0.31,
+"rs_chg_12w_pct": -8.32,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 90.0
+},
+{
+"etf": "TAN",
+"sector": "Соларна",
+"rs_chg_4w_pct": -7.06,
+"rs_chg_12w_pct": -23.31,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "XLC",
+"sector": "Комуникации",
+"rs_chg_4w_pct": -7.78,
+"rs_chg_12w_pct": -8.92,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "XLK",
+"sector": "Технологии",
+"rs_chg_4w_pct": -8.5,
+"rs_chg_12w_pct": -2.1,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 5.0
+},
+{
+"etf": "GDX",
+"sector": "Златодобив",
+"rs_chg_4w_pct": -10.56,
+"rs_chg_12w_pct": 0.73,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 0.0
+},
+{
+"etf": "URA",
+"sector": "Уран/ядрена",
+"rs_chg_4w_pct": -13.67,
+"rs_chg_12w_pct": -19.18,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "SMH",
+"sector": "Полупроводници",
+"rs_chg_4w_pct": -15.62,
+"rs_chg_12w_pct": -7.6,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 45.0
+}
+]
+},
+"2026-11-03": {
+"sectors": [
+{
+"etf": "XLE",
+"sector": "Енергетика",
+"rs_4w": 9.19,
+"rs_12w": 20.52,
+"word": "води пазара",
+"strength": 14.86,
+"rs_at_6m_high": false,
+"rank": 1,
+"rank_change": 0
+},
+{
+"etf": "XLV",
+"sector": "Здравеопазване",
+"rs_4w": 13.63,
+"rs_12w": 15.25,
+"word": "води пазара",
+"strength": 14.44,
+"rs_at_6m_high": true,
+"rank": 2,
+"rank_change": 0
+},
+{
+"etf": "XLP",
+"sector": "Потребителски (защитни)",
+"rs_4w": 15.47,
+"rs_12w": 9.39,
+"word": "води пазара",
+"strength": 12.43,
+"rs_at_6m_high": true,
+"rank": 3,
+"rank_change": 0
+},
+{
+"etf": "XLB",
+"sector": "Материали",
+"rs_4w": 11.7,
+"rs_12w": 4.58,
+"word": "води пазара",
+"strength": 8.14,
+"rs_at_6m_high": true,
+"rank": 4,
+"rank_change": 3
+},
+{
+"etf": "XLU",
+"sector": "Комунални услуги",
+"rs_4w": 12.56,
+"rs_12w": 2.87,
+"word": "води пазара",
+"strength": 7.72,
+"rs_at_6m_high": false,
+"rank": 5,
+"rank_change": 1
+},
+{
+"etf": "XLY",
+"sector": "Потребителски (циклични)",
+"rs_4w": 10.24,
+"rs_12w": 1.91,
+"word": "води пазара",
+"strength": 6.08,
+"rs_at_6m_high": false,
+"rank": 6,
+"rank_change": -2
+},
+{
+"etf": "XLF",
+"sector": "Финанси",
+"rs_4w": 10.06,
+"rs_12w": 1.68,
+"word": "води пазара",
+"strength": 5.87,
+"rs_at_6m_high": false,
+"rank": 7,
+"rank_change": 1
+},
+{
+"etf": "XLRE",
+"sector": "Недвижими имоти",
+"rs_4w": 10.55,
+"rs_12w": -0.6,
+"word": "набира сила",
+"strength": 4.98,
+"rs_at_6m_high": false,
+"rank": 8,
+"rank_change": 1
+},
+{
+"etf": "XLI",
+"sector": "Индустрия",
+"rs_4w": 2.79,
+"rs_12w": -6.77,
+"word": "набира сила",
+"strength": -1.99,
+"rs_at_6m_high": false,
+"rank": 9,
+"rank_change": 1
+},
+{
+"etf": "XLC",
+"sector": "Комуникации",
+"rs_4w": -7.45,
+"rs_12w": -7.37,
+"word": "изостава",
+"strength": -7.41,
+"rs_at_6m_high": false,
+"rank": 10,
+"rank_change": 1
+},
+{
+"etf": "XLK",
+"sector": "Технологии",
+"rs_4w": -10.67,
+"rs_12w": -4.21,
+"word": "изостава",
+"strength": -7.44,
+"rs_at_6m_high": false,
+"rank": 11,
+"rank_change": -6
+}
+],
+"rotation": [
+{
+"etf": "XLP",
+"sector": "Потребителски (защитни)",
+"rs_chg_4w_pct": 15.47,
+"rs_chg_12w_pct": 9.39,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 30.0
+},
+{
+"etf": "XLV",
+"sector": "Здравеопазване",
+"rs_chg_4w_pct": 13.63,
+"rs_chg_12w_pct": 15.25,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 5.0
+},
+{
+"etf": "XLU",
+"sector": "Комунални услуги",
+"rs_chg_4w_pct": 12.56,
+"rs_chg_12w_pct": 2.87,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 40.0
+},
+{
+"etf": "XLB",
+"sector": "Материали",
+"rs_chg_4w_pct": 11.7,
+"rs_chg_12w_pct": 4.58,
+"rs_at_6m_high": true,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 40.0
+},
+{
+"etf": "XLRE",
+"sector": "Недвижими имоти",
+"rs_chg_4w_pct": 10.55,
+"rs_chg_12w_pct": -0.6,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 55.0
+},
+{
+"etf": "XLY",
+"sector": "Потребителски (циклични)",
+"rs_chg_4w_pct": 10.24,
+"rs_chg_12w_pct": 1.91,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 35.0
+},
+{
+"etf": "XLF",
+"sector": "Финанси",
+"rs_chg_4w_pct": 10.06,
+"rs_chg_12w_pct": 1.68,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 50.0
+},
+{
+"etf": "XLE",
+"sector": "Енергетика",
+"rs_chg_4w_pct": 9.19,
+"rs_chg_12w_pct": 20.52,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 0.0
+},
+{
+"etf": "ITA",
+"sector": "Отбрана",
+"rs_chg_4w_pct": 6.85,
+"rs_chg_12w_pct": -13.02,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 85.0
+},
+{
+"etf": "XLI",
+"sector": "Индустрия",
+"rs_chg_4w_pct": 2.79,
+"rs_chg_12w_pct": -6.77,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 85.0
+},
+{
+"etf": "XBI",
+"sector": "Биотех",
+"rs_chg_4w_pct": 0.29,
+"rs_chg_12w_pct": 1.46,
+"rs_at_6m_high": false,
+"leading": true,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 85.0
+},
+{
+"etf": "TAN",
+"sector": "Соларна",
+"rs_chg_4w_pct": -0.75,
+"rs_chg_12w_pct": -16.22,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "GDX",
+"sector": "Златодобив",
+"rs_chg_4w_pct": -6.72,
+"rs_chg_12w_pct": -3.43,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 0.0
+},
+{
+"etf": "XLC",
+"sector": "Комуникации",
+"rs_chg_4w_pct": -7.45,
+"rs_chg_12w_pct": -7.37,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "XLK",
+"sector": "Технологии",
+"rs_chg_4w_pct": -10.67,
+"rs_chg_12w_pct": -4.21,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 10.0
+},
+{
+"etf": "URA",
+"sector": "Уран/ядрена",
+"rs_chg_4w_pct": -15.59,
+"rs_chg_12w_pct": -21.61,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": true,
+"laggard_persistence_pct": 100.0
+},
+{
+"etf": "SMH",
+"sector": "Полупроводници",
+"rs_chg_4w_pct": -17.39,
+"rs_chg_12w_pct": -8.9,
+"rs_at_6m_high": false,
+"leading": false,
+"confirmed_laggard": false,
+"laggard_persistence_pct": 50.0
+}
+]
+}
+}
+}

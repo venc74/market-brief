@@ -202,6 +202,20 @@ def next_earnings(sym: str, today: dt.date) -> dict:
         return {}
 
 
+def mark_leaders(rows: list[dict], rotation: list[dict] | None) -> list[dict]:
+    """
+    04.11.2026 (четвърти преглед, Н2, вариант (а)): картата показва водещите по is_leader — същото правило като скрийнинга; до 04.11 — по думата „води пазара“ (с мъртва зона ±1).
+    Всеки ред получава "leader" (и "confirmed_laggard") от реда на сектора в ротацията; без такъв ред (ротацията не се изтегли) → по думата. SECT✓ и входът на скрийнинга
+    (leading_sectors) не се пипат. Реално 02.11: XLU RS +11.05 / +0.98 — „набира сила“ заради мъртвата зона, а е водещ и в скрийнинга. Мутира и връща rows.
+    """
+    rot = {r.get("etf"): r for r in rotation or [] if isinstance(r, dict)}
+    for r in rows:
+        src = rot.get(r.get("etf"))
+        r["leader"] = is_leader(src) if src else r.get("word") == "води пазара"
+        r["confirmed_laggard"] = bool((src or {}).get("confirmed_laggard"))
+    return rows
+
+
 def board_summary(rows: list[dict]) -> str:
     """
     Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
@@ -209,10 +223,11 @@ def board_summary(rows: list[dict]) -> str:
     03.11.2026 (поправки след брифа, т. 2): ≥ config.SECTOR_BROAD_MIN_LEADERS сектора „води пазара“ и XLK или XLC „изостава“ → config.SECTOR_BROAD_TEXT (широка ротация извън
     мега-технологиите; RS е спрямо SPY, претеглен по капитализация) — преди правилото за първите три (на 03.11 водеха 7 от 11 и то даваше „отбранителна ротация“). Над 3 водещи
     → „Водят 7 от 11 (първите три: …)“ — до 03.11 се изреждаха само първите три без броя.
+    04.11.2026 (Н2, вариант (а)): „водят“ — по "leader" (mark_leaders → is_leader); ред без полето (стар бриф) — по думата.
     """
     if not rows:
         return ""
-    lead_all = [r["sector"] for r in rows if r.get("word") == "води пазара"]
+    lead_all = [r["sector"] for r in rows if r.get("leader", r.get("word") == "води пазара")]
     lead = lead_all[:3]
     lag = [r["sector"] for r in reversed(rows) if r.get("word") == "изостава"][:3]
     top3 = {r["etf"] for r in rows[:3]}
@@ -226,7 +241,7 @@ def board_summary(rows: list[dict]) -> str:
 
 
 def sector_board(download=None, universe_sector: dict | None = None, trend: dict | None = None, ratings: dict | None = None,
-                 earnings_fn=None, today: dt.date | None = None) -> dict:
+                 earnings_fn=None, today: dt.date | None = None, rotation: list[dict] | None = None) -> dict:
     """
     30.10.2026 (т. 7): {"sectors": [...редове + leaders], "subsectors": [...], "top_sub": 5, "bottom_sub": 3, "summary", "as_of"} — едно теглене (11-те секторни ETF-а,
     подсекторите и SPY, 6 месеца). Лидерите — от последния скрийнинг (screener.LAST_UNIVERSE_SECTOR / LAST_TREND / rs_ratings), подадени отвън; следващият отчет — next_earnings
@@ -239,7 +254,7 @@ def sector_board(download=None, universe_sector: dict | None = None, trend: dict
         dl = download or (lambda syms: yf.download(syms, period="6mo", progress=False, auto_adjust=True)["Close"])
         data = _sessions.cut_today(dl(list(etfs) + list(subs) + ["SPY"]))                 # без днешния частичен бар (сутрин няма такъв — повторен run в сесията)
         spy = data["SPY"].dropna()
-        sectors, subsectors = board_rows(data, spy, etfs), board_rows(data, spy, subs)
+        sectors, subsectors = mark_leaders(board_rows(data, spy, etfs), rotation), board_rows(data, spy, subs)      # 04.11.2026 (Н2): водещите по is_leader
     except Exception as e:
         print(f"[sector] секторната карта не е изчислена: {type(e).__name__}: {e}")
         return {}
