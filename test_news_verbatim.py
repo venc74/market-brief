@@ -57,7 +57,7 @@ def fake_claude(system, user, **k):
     prompts.append(user)
     return json.dumps({"news": answer}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
-na._RAW_MEMO = (24, POOL)                                                        # СИНТЕТИЧНО: без мрежа — РЕАЛНИЯТ пул
+na.gather_raw = lambda hours=24, since=None: POOL                                # СИНТЕТИЧНО: без мрежа — РЕАЛНИЯТ пул (04.11.2026: подмяна на gather_raw вместо мемото)
 with contextlib.redirect_stdout(io.StringIO()) as out:
     got = na.significant_news()
 assert [n["headline"] for n in got] == [T[67], T[72], T[40], T[13]]

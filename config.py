@@ -687,10 +687,7 @@ WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))
 WATCH_MAX_TOKENS = int(os.getenv("WATCH_MAX_TOKENS", 2000))
 # 30.10.2026 (поправки от брифа): AI резюметата на групи по 4 тикъра — 14 наведнъж спряха на 2000 токена (max_tokens) и резюмета нямаше; лимитът е на група
 WATCH_AI_BATCH_SIZE = int(os.getenv("WATCH_AI_BATCH_SIZE", 4))
-# nitter е нестабилен — изключен по подразбиране (Поправка 4)
-NEWS_ENABLE_NITTER = os.getenv("NEWS_ENABLE_NITTER", "0") == "1"
-NITTER_HANDLES = ["unusual_whales", "zerohedge", "elerianm"]
-NITTER_INSTANCES = ["https://nitter.net", "https://nitter.poast.org"]
+# 04.11.2026 (четвърти преглед): NEWS_ENABLE_NITTER / NITTER_HANDLES / NITTER_INSTANCES — махнати заедно с news_aggregator._fetch_nitter (изключени от 2026-09).
 # Fallback: ако RSS върне нищо, scrape-ваме заглавия директно от тези страници (BeautifulSoup)
 NEWS_SCRAPE_FALLBACK = {
     "Reuters":          "https://www.reuters.com/markets/",
@@ -1408,20 +1405,8 @@ SHORT_FROZEN_FILE = DATA_DIR / "short_frozen.json"
 # по това време е твърде късно за нов short anyway.
 SECTOR_PERSISTENCE_WINDOW_DAYS = int(os.getenv("SECTOR_PERSISTENCE_WINDOW_DAYS", 20))
 SECTOR_PERSISTENCE_MIN_DAYS = int(os.getenv("SECTOR_PERSISTENCE_MIN_DAYS", 15))
-# 2023-2025 реален daily co-occurrence тест: медиана 5 сектора едновременно
-# confirmed-laggard, 90-ти percentile 8, max 12 от 17 — detection gate-ът
-# остава широк (полезно за stock-level screening-а), капът е САМО на AI
-# extraction стъпката (short_thesis_global_context(), ai_brief.py), там
-# където реално се плаща cost/latency цената. Сортирано по severity
-# (rs_chg_12w_pct възходящо), same "малко, но значимо" принцип като
-# MAX_ACTION_TICKERS/COT whitelist-а.
-MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT = int(os.getenv("MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT", 3))
-# 2026-10-03 (пакет 4а т.5): AI контекстът "глобално срещу регионално" за short кандидатите е СПРЯН —
-# резултатът не се визуализира никъде (short кандидатите не са в dashboard-а), а плащаме до
-# MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT Claude извиквания на ден. Логиката на short скрийнъра, данните
-# (short_candidates в брифа) и short_tracker остават; ENABLE_SHORT_AI_CONTEXT=1 връща извикванията,
-# когато има визуализация.
-ENABLE_SHORT_AI_CONTEXT = os.getenv("ENABLE_SHORT_AI_CONTEXT", "0") == "1"
+# 04.11.2026 (четвърти преглед): MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT и ENABLE_SHORT_AI_CONTEXT — махнати заедно с AI контекста „глобално срещу регионално“ за short
+# кандидатите (ai_brief.short_thesis_global_context, main._short_global_context): спрян от 03.10, short модулът е замразен (SHORT_FROZEN).
 
 # ── Universe expansion (short_screener.py: short_universe()) ─────────────
 # yf.EquityQuery/yf.screen() — потвърдено на живо, нулева нова dependency.

@@ -440,25 +440,6 @@ def _annotate_screener_exits(buystop_summary: dict, present: set) -> None:
         print(f"[main] причините за излизане от скрийнъра пропуснати: {type(e).__name__}: {e}")
 
 
-def _short_global_context(short_candidates: list[dict], laggards: list[dict], news) -> dict:
-    """
-    Пакет 4а т.5: AI контекстът "глобално срещу регионално" за секторите на short кандидатите.
-    ИЗКЛЮЧЕН по подразбиране (config.ENABLE_SHORT_AI_CONTEXT) — няма визуализация, а всяко
-    извикване е платено. Когато е включен: само за capped подмножество лагиращи сектори,
-    сортирано по severity (MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT — 2023-2025 daily co-occurrence
-    тест: медиана 5, до 12 едновременно; cost/latency контрол на тази стъпка, не на detection gate-а).
-    """
-    if not config.ENABLE_SHORT_AI_CONTEXT or not short_candidates:
-        return {}
-    seen = {c["lagging_sector"] for c in short_candidates}
-    out = {}
-    for sector in laggards[:config.MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT]:
-        if sector["sector"] not in seen:
-            continue
-        out[sector["sector"]] = ai_brief.short_thesis_global_context(sector["sector"], news)
-    return out
-
-
 def preopen_today(today: str, data_dir=None) -> dict | None:
     """04.11.2026 (четвърти преглед, Н7): data/preopen/<днес>.json, ако обновяването преди отварянето вече е минало днес (повторен сутрешен бриф); иначе / нечетим → None."""
     p = (data_dir or config.DATA_DIR) / "preopen" / f"{today}.json"
@@ -815,12 +796,9 @@ def run() -> dict:
     short_candidates = steps.step("short_screener", lambda: short_screener.run_short_screen(laggards), fallback=[],          # 19.10.2026 (т. 19): замразен — без теглене
                                   enabled=bool(config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN), label="Short скрийнърът",
                                   consequence="списъкът с short кандидати е празен днес заради провала, не защото няма")
-    # Global-vs-regional context (Аспект 2) — СПРЯН на 2026-10-03 (config.ENABLE_SHORT_AI_CONTEXT=0):
-    # резултатът не се визуализира. Виж _short_global_context().
-    global_context = _short_global_context(short_candidates, laggards, news)
+    # 04.11.2026 (четвърти преглед): AI контекстът „глобално срещу регионално“ (спрян от 03.10, без визуализация) — махнат
     for row in short_candidates:
         row["in_screener"] = row["ticker"] in our_tickers
-        row["global_context"] = global_context.get(row.get("lagging_sector"))
     # 03.11.2026 (разходката, т. 17): бележките за обратен залог (cot_opposites) отпаднаха заедно с тикърите на COT тезите — нямат вход
 
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —

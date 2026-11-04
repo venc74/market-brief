@@ -73,7 +73,7 @@ print("  ✓ NOCIK: checked 1 от 2, 'unchecked' = ['NOCIK'] → банерът
 
 print()
 print("── 4. новините: статус при празен пул (СИНТЕТИЧНО) ──")
-na._RAW_MEMO = (24, [])
+na.gather_raw = lambda hours=24, since=None: []                     # 04.11.2026: подмяна на gather_raw вместо мемото
 with contextlib.redirect_stdout(io.StringIO()):
     assert na.significant_news() == []
 assert na.LAST_STATUS == {"ok": False, "reason": "нито един RSS източник не върна заглавия", "count": 0}

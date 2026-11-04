@@ -79,7 +79,6 @@ print("  ✓ вторник (24 ч) и CNBC (не е Google News) — без з�
 
 print()
 print("── 3. gather_raw(since): основните фийдове + дните, обхватът по източник и бележката под новините ──")
-na._RAW_MEMO = None
 real_now = na.dt.datetime
 class _FixedNow(dt.datetime):                                                         # СИНТЕТИЧНО: „сега“ = 06:37 UTC на 02.11
     @classmethod
@@ -114,7 +113,8 @@ print()
 print("── 4. significant_news(since): таванът към филтъра — 100 на 24 ч (понеделник 300); без since — както до 02.11 ──")
 prompts = []
 ai_brief._call_claude = lambda system, user, **k: (prompts.append(user), json.dumps({"news": []}))[1]           # СИНТЕТИЧНО: отговорът на AI
-na._RAW_MEMO = ((24, SINCE.isoformat()), [{"source": "Reuters Business", "title": f"СИНТЕТИЧНО заглавие {i}", "summary": "", "published": "2026-10-31T10:00Z"} for i in range(350)])
+_real_gather = na.gather_raw                                                                                     # 04.11.2026: подмяна на gather_raw вместо мемото
+na.gather_raw = lambda hours=24, since=None: [{"source": "Reuters Business", "title": f"СИНТЕТИЧНО заглавие {i}", "summary": "", "published": "2026-10-31T10:00Z"} for i in range(350)]
 na.dt.datetime = _FixedNow
 try:
     with q():
@@ -124,10 +124,11 @@ finally:
 compact = json.loads(prompts[-1].split("НОВИНИ:\n", 1)[1].split("\n\n", 1)[0])
 assert len(compact) == 300
 assert str(na._CACHE).startswith(_tmp.name); na._CACHE.unlink()                                                  # кешът за деня (във временната директория) — иначе вторият път е от кеша
-na._RAW_MEMO = (24, [{"source": "CNBC", "title": f"СИНТЕТИЧНО {i}", "summary": ""} for i in range(350)])
+na.gather_raw = lambda hours=24, since=None: [{"source": "CNBC", "title": f"СИНТЕТИЧНО {i}", "summary": ""} for i in range(350)]
 with q():
     na.significant_news()
 assert len(json.loads(prompts[-1].split("НОВИНИ:\n", 1)[1].split("\n\n", 1)[0])) == config.NEWS_MAX_TO_FILTER == 100
+na.gather_raw = _real_gather
 print("  ✓ 350 заглавия в 72-часов прозорец → 300 към филтъра; без since → 100 (както до 02.11)")
 
 print()

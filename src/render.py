@@ -126,9 +126,6 @@ def _merger_html(card: dict) -> str:
     return f'<br><span style="color:#b45309;font-size:12px">{_e(mt["text"])}</span>' if mt and mt.get("text") else ""
 
 
-def _cot_html(card: dict) -> str:
-    """Бележките за обратен залог (cot_opposites) като редове под картата в имейла; без бележки → празно."""
-    return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(n.get("text"))}</span>' for n in ((card or {}).get("cot_notes") or []) if n.get("text"))
 
 
 def _lv_warn_html(lv) -> str:
@@ -166,7 +163,7 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
             txt = _e((st.get("ai") or {}).get("watchlist_trigger") or setup.get("trigger_text") or "")
         if ew:
             txt += f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>'
-        txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _cot_html(st) + _book_note_html(st)
+        txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
         out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'
                 f'<td style="padding:6px 0;font-size:12.5px;font-family:monospace">{txt}</td></tr>')
     html = f'<table cellpadding="0" cellspacing="0" style="margin-top:6px">{out}</table>' if out else ' <span style="font-family:monospace">—</span>'
@@ -637,7 +634,6 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),
         pce_core=(brief.get("macro") or {}).get("pce_core"),                  # 30.10.2026 (поправки от брифа, т. 6): базов PCE — в „Информативни“
         backtest=brief.get("backtest", {}),
-        available_dates=brief.get("date") and [brief.get("date")],
     )
     config.DOCS_DIR.mkdir(exist_ok=True)
     (config.DOCS_DIR / "index.html").write_text(html, encoding="utf-8")
@@ -705,7 +701,7 @@ def _qm_email_block(brief: dict) -> str:
                          f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
-                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_qm_open_html(c)}{_ew_html(c)}{_corp_html(c)}{_spinoff_html(c)}{_merger_html(c)}{_cot_html(c)}</td></tr>')
+                         f'<span style="color:#6b7280">ръст +{c["runup_pct"]:.0f}% преди базата · консолидация {c["base_days"]} дни</span>{_qm_open_html(c)}{_ew_html(c)}{_corp_html(c)}{_spinoff_html(c)}{_merger_html(c)}</td></tr>')
             body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
         else:
             body += '<div style="color:#6b7280;font-size:12.5px">Няма кандидати за пробив днес.</div>'
@@ -770,10 +766,10 @@ def render_email(brief: dict) -> str:
         if p.get("method") == "v2":
             plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
                         f"Вход ≈ ${(lv or {}).get('entry', p['entry_mid'])} · Stop ${(lv or {}).get('stop', p['stop_loss'])} (−{(lv or {}).get('stop_pct', p['risk_pct'])}%)<br>"
-                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv) + _cot_html(st))
+                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv))
         else:
             plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
-                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv) + _cot_html(st))
+                        f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv))
         mk = "".join(
             f'<span style="display:inline-block;background:#eef2ff;color:#3730a3;'
             f'font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;'
