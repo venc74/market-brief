@@ -96,7 +96,7 @@
 
   TC.parseIBKR = function (text, src) {
     const lines = String(text).replace(/^﻿/, '').split(/\r?\n/);
-    const head = {}, recs = [], skipped = [], info = { broker: 'IBKR', account: '', period: '', baseCurrency: '', nonBaseCash: [] };
+    const head = {}, recs = [], skipped = [], info = { broker: 'IBKR', account: '', period: '', periodEnd: '', baseCurrency: '', nonBaseCash: [], openPositions: null };
     const instruments = {};
     const rows = [];
     lines.forEach((line, i) => {
@@ -108,9 +108,14 @@
       const r = {}; head[sec].forEach((h, k) => { r[h] = p[k + 2] !== undefined ? p[k + 2] : ''; });
       rows.push({ sec, r, line: i + 1, raw: line });
     });
+    if (head['Open Positions']) info.openPositions = [];
     rows.forEach(({ sec, r }) => {
       if (sec === 'Statement' && r['Field Name'] === 'BrokerName') info.brokerName = r['Field Value'];
-      if (sec === 'Statement' && r['Field Name'] === 'Period') info.period = r['Field Value'];
+      if (sec === 'Statement' && r['Field Name'] === 'Period') { info.period = r['Field Value']; const e = TC.parseLooseDate(String(r['Field Value'] || '').split(/\s+-\s+/).pop()); info.periodEnd = e ? e.date : ''; }
+      // 05.11.2026: наличностите в края на периода — за сверка с FIFO (липсващ по-стар отчет, пропуснат ред); само обобщените редове (Summary), не лотовете
+      if (sec === 'Open Positions' && (!r['DataDiscriminator'] || r['DataDiscriminator'] === 'Summary') && IBKR_ASSET[r['Asset Category']] && !['forex', 'other'].includes(IBKR_ASSET[r['Asset Category']])) {
+        const q = TC.num(r['Quantity']); if (isFinite(q)) info.openPositions.push({ account: r['Account'] || '', sym: r['Symbol'], qty: q });
+      }
       if (sec === 'Account Information' && r['Field Name'] === 'Account') info.account = (r['Field Value'] || '').split(/\s/)[0];
       if (sec === 'Account Information' && r['Field Name'] === 'Base Currency') info.baseCurrency = r['Field Value'];
       if (sec === 'Financial Instrument Information' && r['Symbol']) instruments[r['Symbol']] = { type: r['Type'] || '', category: r['Asset Category'] || '', desc: r['Description'] || '' };
@@ -119,6 +124,7 @@
       }
     });
     const acct = r => r['Account'] || info.account || '?';
+    (info.openPositions || []).forEach(o => { o.account = o.account || info.account || '?'; });
     const base = (r, line, src) => ({ broker: 'IBKR', account: acct(r), src, line });
     const skip = (sec, r, line, reason) => skipped.push({ src, line, broker: 'IBKR', account: acct(r), section: sec, what: r['Symbol'] || r['Description'] || '', date: (TC.parseDateTime(r['Date/Time'] || r['Date'] || r['Report Date']) || {}).date || '', reason });
     rows.forEach(({ sec, r, line }) => {
@@ -428,7 +434,8 @@
   TC.fifo = function (records, rate, opts) {
     const stillhalter = ((opts || {}).stillhalter) === 'close' ? 'close' : 'receipt';
     const pos = {}, realized = [], unmatched = [], missingRates = [], incomes = [], notes = [];
-    const P = k => (pos[k] = pos[k] || { long: [], short: [] });
+    const P = k => (pos[k] = pos[k] || { long: [], short: [], deficit: 0, taintedFrom: null });
+    const tainted = {};                                                            // ключ → първата непокрита продажба (резултатите след нея — несигурни)
     const eps = 1e-9;
     records.forEach(r => {
       if (r.kind === 'split') {
@@ -454,6 +461,9 @@
                      fundHint: !!r.fundHint, euExempt: !!r.euExempt, src: r.src };
       if (r.qty > 0) {                                                             // покупка: първо затваря къси позиции (опции), остатъкът — нов лот
         let q = qAbs;
+        // 05.11.2026: след непокрита продажба (акции, фондове, крипто) покупката първо покрива дефицита — не става лот (иначе фантомен лот: при къса продажба
+        // покритието ставаше „покупка“ за следващата продажба). Без резултат — непокритата продажба е в unmatched.
+        if (p.deficit > eps) { const c = Math.min(p.deficit, q); p.deficit -= c; q -= c; notes.push({ sym: r.sym, date: r.date, text: `покупката покрива ${+c.toFixed(6)} бр. от непокрита продажба — не е лот (без резултат); да се потвърди` }); }
         const feeEUR = eur(r.fee || 0);
         const closed = [];
         while (q > eps && p.short.length) {
@@ -490,7 +500,7 @@
       if (matched > eps) {
         const pr = proceedsAll == null ? null : proceedsAll * matched / qAbs;
         const co = lots.some(x => x.costEUR == null) || pr == null ? null : lots.reduce((s, x) => s + x.costEUR, 0);
-        const rec = { ...base, short: false, qty: matched, proceedsEUR: pr, costEUR: co, gainEUR: co == null ? null : pr - co, lots };
+        const rec = { ...base, short: false, qty: matched, proceedsEUR: pr, costEUR: co, gainEUR: co == null ? null : pr - co, lots, tainted: !!tainted[k] };
         if (r.assetClass === 'crypto' && co != null) {                             // §23: над една година — освободено; годишнината (същата дата) е още в срока
           let ex = 0, tx = 0;
           lots.forEach(x => { const g = pr * x.qty / matched - x.costEUR; x.exempt = r.date > TC.anniversary(x.date); if (x.exempt) ex += g; else tx += g; });
@@ -505,12 +515,37 @@
             realized.push({ ...base, short: true, premium: true, qty: q, proceedsEUR: prem, costEUR: prem == null ? null : 0, gainEUR: prem, lots: [] });
             p.short.push({ qty: q, proceedsEUR: 0, date: r.date });
           } else p.short.push({ qty: q, proceedsEUR: prem, date: r.date });
-        } else unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, src: r.src });
+        } else {
+          unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, src: r.src });
+          p.deficit += q;
+          if (!tainted[k]) tainted[k] = { key: k, broker: r.broker, account: r.account, sym: r.sym, from: r.date };
+        }
       }
     });
     const open = Object.entries(pos).map(([k, p]) => ({ key: k, long: p.long.reduce((s, l) => s + l.qty, 0), short: p.short.reduce((s, l) => s + l.qty, 0) }))
       .filter(o => o.long > eps || o.short > eps);
-    return { realized, unmatched, missingRates, incomes, open, notes, stillhalter };
+    return { realized, unmatched, missingRates, incomes, open, notes, stillhalter, tainted: Object.values(tainted) };
+  };
+
+  // ─── Сверка с наличностите от отчета на IBKR (Open Positions в края на периода) ─────────────────────
+  // info: от ingest ([{file, broker, account, periodEnd, openPositions}]); records — всички записи. → [{account, sym, date, year, reported, computed, file}]
+  TC.reconcile = function (records, info) {
+    const out = [];
+    (info || []).filter(i => i.broker === 'IBKR' && i.periodEnd && Array.isArray(i.openPositions)).forEach(i => {
+      const held = {};
+      (records || []).forEach(r => {
+        if (r.broker !== 'IBKR' || r.date > i.periodEnd) return;
+        if (r.kind === 'trade' && r.account === i.account) held[r.sym] = (held[r.sym] || 0) + r.qty;
+        if (r.kind === 'split' && r.account === i.account && held[r.sym] != null) held[r.sym] *= r.ratio;
+      });
+      const rep = {}; i.openPositions.filter(o => o.account === i.account).forEach(o => { rep[o.sym] = (rep[o.sym] || 0) + o.qty; });
+      [...new Set(Object.keys(held).concat(Object.keys(rep)))].forEach(sym => {
+        const a = rep[sym] || 0, b = held[sym] || 0;
+        if (Math.abs(a - b) > 1e-6) out.push({ account: i.account, sym, date: i.periodEnd, year: Number(i.periodEnd.slice(0, 4)), reported: a, computed: +b.toFixed(6), file: i.file });
+      });
+    });
+    const seen = new Set();                                                        // застъпващи се отчети с един край — веднъж
+    return out.filter(m => { const k = [m.account, m.sym, m.date, m.reported, m.computed].join('|'); if (seen.has(k)) return false; seen.add(k); return true; });
   };
 
   // ─── Германия: разбивката за декларацията ────────────────────────────────────
@@ -660,12 +695,20 @@
     if (par.extrapolated) notes.push({ level: 'warn', text: `Параметрите за ${year} не са проверени (таблицата е до ${TC.DE_PARAMS_CHECKED_UNTIL}) — ползвани са последните известни; провери ги.` });
     if ((fifoRes.notes || []).some(n => n.date.startsWith(String(year)))) fifoRes.notes.filter(n => n.date.startsWith(String(year))).forEach(n => notes.push({ level: 'warn', text: `${n.sym} (${n.date}): ${n.text}` }));
     const unmatched = (fifoRes.unmatched || []).filter(u => u.year === year);
+    // 05.11.2026: несигурни резултати — продажби след непокрита продажба на същата позиция (и в следващите години) и разлики с наличностите в отчета на IBKR
+    const taintedSales = R.filter(x => x.tainted);
+    [...new Set(taintedSales.map(x => x.sym))].forEach(sym => {
+      const t = (fifoRes.tainted || []).find(z => z.sym === sym);
+      notes.push({ level: 'err', text: `${sym}: продажби в ${year} след непокрита продажба (${t ? t.from : '?'}) — цената на придобиване може да е грешна (липсващ по-стар отчет?). НЕПЪЛНО.` });
+    });
+    const mism = TC.reconcile(st.records, st.info).filter(m => m.year === year || (m.year < year && R.some(x => x.broker === 'IBKR' && x.account === m.account && x.sym === m.sym)));
+    mism.forEach(m => notes.push({ level: 'err', text: `${m.sym} (${m.account}): в края на ${m.date} отчетът на IBKR показва ${m.reported} бр., сметнатите сделки — ${m.computed} бр. (липсва отчет или ред?). НЕПЪЛНО.` }));
     const missing = (fifoRes.missingRates || []).filter(m => m.date.startsWith(String(year)) || (R.some(x => x.gainEUR == null && x.sym === m.sym)));
     return {
       year, params: par, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
       carriedShareLoss: cS, carriedOtherLoss: cO, withheld, creditable, items, crypto: Object.values(persons).sort((a, b) => a.person.localeCompare(b.person)),
       estimate: est, notes, unmatched, missingRates: missing, funds: fundsSeen, heldFunds,
-      complete: !unmatched.length && !missing.length,
+      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length, reconcile: mism,
     };
   };
 

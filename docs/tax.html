@@ -203,7 +203,7 @@ function render() {
   (S.ing.warnings || []).forEach(t => w.push(`<div class="msg warn small">${esc(t)}</div>`));
   if (de.missingRates.length) w.push(`<div class="msg err"><b>Липсва курс:</b> ${[...new Set(de.missingRates.map(m => `${esc(m.currency)} ${esc(m.date)}`))].join(', ')} — записите не са в числото. Качи eurofxref-hist.csv от ЕЦБ.</div>`);
   Object.entries(S.rateSource).forEach(([c, s]) => w.push(`<div class="msg ${/не се изтеглиха/.test(s) ? 'warn' : 'info'} small">Курсове ${esc(c)} — от ${esc(s)}</div>`));
-  de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));
+  de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'err' ? 'err' : n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));
   const sk = S.ing.skipped;
   if (sk.length) w.push(`<div class="card"><details${sk.length < 6 ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${sk.length} реда</b> (всички години; виж дали някой засяга ${y})</summary><div class="scroll"><table>
     <tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>

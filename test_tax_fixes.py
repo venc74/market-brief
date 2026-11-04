@@ -54,4 +54,27 @@ r = scenario([{"name": "opt.csv", "text": f}], years=[2024, 2025], stillhalter="
 assert close(r["de"][2024]["total"], 0) and close(r["de"][2025]["total"], 300 + 300), (r["de"][2024]["total"], r["de"][2025]["total"])   # старото: нетно при затваряне
 print("  ✓ по подразбиране: 2024 = 300 + 500 = 800, 2025 = −200 (за пренасяне); настройка „при затварянето“: 2024 = 0, 2025 = 300 + 300 = 600")
 
+# ── 6. непокрита продажба: без фантомен лот; „НЕПЪЛНО“ и за следващите години; сверка с Open Positions на IBKR ──
+print("── 6. непокрита продажба, сверка ──")
+f = std("sell,stock,XYZ,2023-03-01,100,50,EUR,0,B,A", "buy,stock,XYZ,2023-04-01,100,40,EUR,0,B,A",       # къса продажба и покритието ѝ
+        "buy,stock,XYZ,2024-02-01,100,60,EUR,0,B,A", "sell,stock,XYZ,2024-05-01,100,70,EUR,0,B,A")
+r = scenario([{"name": "short.csv", "text": f}], years=[2023, 2024])
+d23, d24 = r["de"][2023], r["de"][2024]
+assert close(d24["total"], 100 * (70 - 60)) and not d24["complete"], d24["total"]     # +1 000 (до 05.11: +3 000 от фантомния лот @ 40), НЕПЪЛНО
+assert not d23["complete"] and [u["qty"] for u in d23["unmatched"]] == [100] and r["fifo"]["open"] == [], r["fifo"]["open"]
+assert any("НЕПЪЛНО" in n["text"] and n["level"] == "err" for n in d24["notes"])
+f = std("sell,stock,ABC,2023-03-01,50,150,EUR,0,B,A", "buy,stock,ABC,2023-12-01,50,200,EUR,0,B,A", "sell,stock,ABC,2024-05-01,50,210,EUR,0,B,A")
+d24 = scenario([{"name": "old.csv", "text": f}], years=[2024])["de"][2024]
+assert close(d24["total"], 0) and not d24["complete"] and [u["qty"] for u in d24["unmatched"]] == [50], d24   # липсващ стар отчет: 2024 — без резултат (до 05.11: +500, „пълно“)
+IB = lambda *rows: "\n".join(["Statement,Header,Field Name,Field Value", "Statement,Data,BrokerName,Interactive Brokers", "Statement,Data,Period,\"January 1, 2024 - December 31, 2024\"",
+    "Account Information,Header,Field Name,Field Value", "Account Information,Data,Account,U7777777",
+    "Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code", *rows]) + "\n"
+f = IB("Trades,Data,Order,Stocks,EUR,AAA,\"2024-03-01, 10:00:00\",100,10,10,-1000,0,1000,0,0,O", "Trades,Data,Order,Stocks,EUR,BBB,\"2024-03-01, 10:00:00\",10,20,20,-200,0,200,0,0,O",
+       "Open Positions,Header,DataDiscriminator,Asset Category,Currency,Symbol,Quantity,Mult,Cost Price,Cost Basis,Close Price,Value,Unrealized P/L,Code",
+       "Open Positions,Data,Summary,Stocks,EUR,AAA,150,1,10,1500,10,1500,0,", "Open Positions,Data,Summary,Stocks,EUR,BBB,10,1,20,200,20,200,0,",
+       "Open Positions,Data,Lot,Stocks,EUR,AAA,150,1,10,1500,10,1500,0,")
+d24 = scenario([{"name": "U7777777_2024.csv", "text": f}], years=[2024])["de"][2024]
+assert [(m["sym"], m["reported"], m["computed"], m["date"]) for m in d24["reconcile"]] == [("AAA", 150, 100, "2024-12-31")] and not d24["complete"], d24["reconcile"]
+print("  ✓ къса продажба: 2024 = +1 000 (не +3 000), НЕПЪЛНО; липсващ стар отчет: 2024 без резултат; Open Positions: AAA 150 ≠ 100 → НЕПЪЛНО, BBB 10 = 10 — без бележка")
+
 print("\n✅ test_tax_fixes: всичко мина")
