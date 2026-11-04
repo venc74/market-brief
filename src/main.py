@@ -642,6 +642,7 @@ def run() -> dict:
     # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
     def _prose_checks():
         fixed = []                                                    # 30.10.2026 (т. 7): без проверките на секторните твърдения (sector_claims) — нямат какво да проверяват
+        ai_brief.strip_inst_over_100(candidates)                      # 04.11.2026 (прегледът, т. 6): собственост над 100% — двойно броене в 13F, не се тълкува
         ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
         ai_brief.verify_narrative_events(candidates, ai_brief.narrative_event_sources(ai_macro, news))   # 19.10.2026: събитие без опора в новините/макрото на деня → махнато
         return fixed

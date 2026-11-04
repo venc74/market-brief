@@ -1015,6 +1015,42 @@ def strip_trigger_echo_in_narratives(candidates: list[dict]) -> list[str]:
     return done
 
 
+_INST_WORD = re.compile(r"институц\w*\s+(?:собственост|ownership|притежан\w*|дял\w*|участие)|institutional\s+(?:ownership|holding\w*)|inst\.?\s*ownership|собственост\w*\s+(?:на\s+)?институц\w*|\bownership\b", re.I)
+_INST_OVER = re.compile(r"(?<![\d.,])(?:1\d\d|[2-9]\d\d)(?:[.,]\d+)?\s*%")
+
+
+def strip_inst_over_100(candidates: list[dict]) -> list[str]:
+    """
+    04.11.2026 (прегледът, т. 6): картите с institutional ownership над 100% (обичайно двойно броене в 13F) — махат се риск / катализатор / изречение от why_now и business_bg, които тълкуват числото.
+    Реално 04.11, WST: „Институционална собственост 103.6% — изчерпан buying pool“; измерено върху 871 карти (13.06–04.11): 42 такива текста (200 карти над 100%), от „изчерпан pool“ до „short squeeze“.
+    Само при inst_ownership_pct > 100 и дума за собственост + число ≥ 100% в същото изречение (BAC 17.07: „71.4% … под 100%“ остава). Връща тикърите. Мутира c["ai"]. Чиста върху входа.
+    """
+    done = []
+    hit = lambda s: bool(_INST_WORD.search(s) and _INST_OVER.search(s))
+    for c in candidates or []:
+        ai = c.get("ai") if isinstance(c, dict) else None
+        v = c.get("inst_ownership_pct") if isinstance(c, dict) else None
+        if not isinstance(ai, dict) or not isinstance(v, (int, float)) or v <= 100:
+            continue
+        changed = False
+        for k in ("risks", "catalysts"):
+            xs = ai.get(k)
+            if isinstance(xs, list):
+                keep = [x for x in xs if not (isinstance(x, str) and hit(x))]
+                if len(keep) != len(xs):
+                    ai[k], changed = keep, True
+        for k in ("why_now", "business_bg"):                                           # реално и в описанието на бизнеса (ZBRA 26.10)
+            w = ai.get(k)
+            if isinstance(w, str) and hit(w):
+                ai[k] = " ".join(p for p in re.split(r"(?<=[.!?])\s+", w) if not hit(p)).strip()
+                changed = True
+        if changed:
+            done.append(c.get("ticker"))
+    if done:
+        print(f"[ai] махнат текст, който тълкува институционална собственост над 100%: {done}")
+    return done
+
+
 def _apply_meta_check(out: dict) -> dict:
     """
     28.10.2026: изтеклите клаузи-проверки от промпта („без null/nan“, „всички индикатори са валидни“) се махат (regime_claims.strip_meta) — запис в "regime_claims_fixed"
@@ -1248,7 +1284,9 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
 SYSTEM_TICKERS = """Ти си портфолио стратег за суинг търговия. Потребителят е \
 опитен (Weinstein Stage Analysis, CANSLIM, O'Neil bases, RS Line). Пишеш на \
 български, тикери и термини на английски. Бъди директен — ако setup-ът е слаб, \
-кажи го. Връщаш САМО валиден JSON.""" + QUOTES_RULE
+кажи го. Институционална собственост над 100% не е сигнал — обичайно е двойно броене в 13F \
+(заети акции при двама притежатели): не я тълкувай и не я споменавай (няма „изчерпан buying pool“, \
+„short squeeze“ или „пълно покритие“ от нея). Връщаш САМО валиден JSON.""" + QUOTES_RULE
 
 
 # 08.10.2026 (2б): блокът "ВЧЕРАШНИ WATCHLIST TRIGGER-И" и всичко около него (_load_prior_watchlist_triggers, prior_trigger_usable, _live_v2_positions, _POSITION_WORDING)
@@ -1371,6 +1409,8 @@ def ticker_narratives(candidates: list[dict], sector_logic: list[dict],
             "rs_status", "rs_rating", "volume_ratio",
             "revenue_growth_yoy", "roe", "pe", "forward_pe",
             "inst_ownership_pct", "analyst_target")})
+        if isinstance(slim[-1].get("inst_ownership_pct"), (int, float)) and slim[-1]["inst_ownership_pct"] > 100:      # 04.11.2026 (прегледът, т. 6): над 100% — двойно броене в 13F; моделът не получава числото
+            del slim[-1]["inst_ownership_pct"]
         # 26.10.2026 (решение по етап 4б, т. 2): честните имена — EPS от отчета г/г и ръстът на нетната печалба (earningsQuarterlyGrowth на Yahoo, до 26.10 подаван като "eps_growth_yoy")
         slim[-1]["eps_growth_report_pct"] = ((c.get("earnings") or {}).get("eps_report_yoy") or {}).get("pct")
         slim[-1]["net_income_growth_yoy_yahoo_pct"] = c.get("eps_growth_yoy")
