@@ -1006,25 +1006,46 @@ def _funding_stress_indicator(fs: dict | None) -> dict | None:
                                   f"{hf[5:7]}.{hf[:4]} · термометър, не предсказание: в проучването ни {config.FUNDING_STRESS_RESEARCH_TEXT} · само информативен, не влиза в режима")}
 
 
-def credit_oas_verdict(hy: dict | None, iei_hyg: dict | None) -> str | None:
+def _shown_pct(x) -> int | None:
+    """04.11.2026 (прегледът, т. 4): перцентилът така, както е на екрана (f"{x:.0f}") — прагът се сравнява със същото число: на 04.11 екранът казваше „90.“, сметнато 89.6 → „не се разширява“."""
+    return int(f"{x:.0f}") if isinstance(x, (int, float)) else None
+
+
+def credit_oas_level(hy: dict | None, ig: dict | None = None) -> str | None:
     """
-    03.11.2026 (прегледът на 02.11, т. 4): едно изречение от кода — HY OAS спрямо IEI/HYG. HY „се разширява“: промяната за config.CREDIT_OAS_CHG_SESSIONS наблюдения е на
-    ≥ CREDIT_OAS_WIDENING_PCT-и перцентил сред собствените ѝ предишни промени (03.11.2026, т. 8; до тогава ≥ +25 б.п.); IEI/HYG „натиск“: жълт или червен. Скрит единият → None. Чиста функция.
+    04.11.2026 (прегледът, т. 4): степента по перцентила на 20-дневната промяна (показаното число) — "calm" (спокоен) / "moderate" (разширява се умерено) / "wide" (разширява се).
+    wide: HY ≥ CREDIT_OAS_WIDENING_PCT или IG ≥ него при HY ≥ CREDIT_OAS_MODERATE_PCT; moderate: HY или IG ≥ CREDIT_OAS_MODERATE_PCT; иначе calm. HY е водещият: IG сам вдига само до „умерено“
+    (IG на 100. при HY на 35. — 24.02–07.03.2024). Измерено 26.02.2024–30.10.2026 (703 дни): спокоен 52%, умерено 22%, разширява се 24%. Без HY → None. Чиста функция.
+    """
+    h, i = _shown_pct((hy or {}).get("chg_pct")), _shown_pct((ig or {}).get("chg_pct"))
+    if h is None:
+        return None
+    wide, mod = config.CREDIT_OAS_WIDENING_PCT, config.CREDIT_OAS_MODERATE_PCT
+    if h >= wide or (i is not None and i >= wide and h >= mod):
+        return "wide"
+    return "moderate" if h >= mod or (i is not None and i >= mod) else "calm"
+
+
+def credit_oas_verdict(hy: dict | None, iei_hyg: dict | None, ig: dict | None = None) -> str | None:
+    """
+    03.11.2026 (прегледът на 02.11, т. 4): едно изречение от кода — OAS спрямо IEI/HYG. IEI/HYG „натиск“: жълт или червен. 04.11.2026 (прегледът, т. 4): три степени (credit_oas_level), IG участва;
+    числата в изречението са тези от плочката. Без данни → None. Чиста функция.
     """
     if not hy or hy.get("hide") or hy.get("chg_pct") is None or not iei_hyg or iei_hyg.get("hide") or iei_hyg.get("value") is None:
         return None
-    wide, iei = hy["chg_pct"] >= config.CREDIT_OAS_WIDENING_PCT, iei_hyg.get("status") in ("yellow", "red")
-    if iei and not wide:
-        return "натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, HY OAS е спокоен)"
-    if iei and wide:
-        return "кредитен стрес — и IEI/HYG, и HY OAS се разширяват"
-    if wide:
-        return "HY OAS се разширява, IEI/HYG още не"
-    return "кредитът е спокоен (IEI/HYG зелен, HY OAS не се разширява)"
+    level, iei = credit_oas_level(hy, ig), iei_hyg.get("status") in ("yellow", "red")
+    i = _shown_pct((ig or {}).get("chg_pct"))
+    nums = f"HY {_shown_pct(hy['chg_pct'])}." + (f", IG {i}." if i is not None else "") + " percentile на промяната"
+    if level == "wide":
+        return f"кредитен стрес — и IEI/HYG, и OAS се разширяват ({nums})" if iei else f"OAS се разширява ({nums}), IEI/HYG още не"
+    if level == "moderate":
+        return f"натискът е предимно от лихвите; OAS се разширява умерено ({nums})" if iei else f"OAS се разширява умерено ({nums}), IEI/HYG още не"
+    return f"натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, OAS е спокоен: {nums})" if iei else f"кредитът е спокоен (IEI/HYG зелен, OAS спокоен: {nums})"
 
 
 def _credit_oas_indicator(oas: dict | None, iei_hyg: dict | None) -> dict | None:
     """
+    04.11.2026 (прегледът, т. 4): степента — credit_oas_level (три степени, IG участва, прагът срещу показаното число): „разширява се“ + високо ниво → червено; „разширява се“, „умерено“ или високо ниво → жълто.
     03.11.2026 (прегледът на 02.11, т. 4): HY OAS и IG OAS (FRED) — САМО информативна плочка ("informational": True), не влиза в броенето. Ниво, промяна за 20 наблюдения, перцентил за
     наличната история (~3 г.) и изречението спрямо IEI/HYG (credit_oas_verdict). Цветът — по HY: разширяване (перцентилът на 20-дневната промяна ≥ CREDIT_OAS_WIDENING_PCT) или
     перцентил на нивото ≥ CREDIT_OAS_PCT_YELLOW → жълто, двете → червено. HY скрит (застоял / липсва) → скрита карта с причината (етикет, не тишина). None (изключено) → няма карта.
@@ -1038,11 +1059,12 @@ def _credit_oas_indicator(oas: dict | None, iei_hyg: dict | None) -> dict | None
     n = config.CREDIT_OAS_CHG_SESSIONS
     part = lambda k, x: (f"{k} {x['value']:.2f}% ({x['chg_bp']:+d} б.п. за {n} дни — {x['chg_pct']:.0f}. percentile на промяната; нивото — {x['percentile']:.0f}. percentile)"
                          if x.get("value") is not None else f"{k} — {x.get('hide_reason') or 'няма данни'}")
-    wide, high = (hy.get("chg_pct") or 0) >= config.CREDIT_OAS_WIDENING_PCT, hy["percentile"] >= config.CREDIT_OAS_PCT_YELLOW
-    status = "red" if wide and high else "yellow" if wide or high else "green"
+    level = credit_oas_level(hy, ig)
+    wide, high = level == "wide", hy["percentile"] >= config.CREDIT_OAS_PCT_YELLOW
+    status = "red" if wide and high else "yellow" if wide or high or level == "moderate" else "green"
     hf, d = hy.get("history_from") or "", hy["as_of"]
-    verdict = credit_oas_verdict(hy, iei_hyg)
-    return {"name": name, "value": hy["value"], "status": status, "informational": True, "as_of": d, "hy": hy, "ig": ig, **({"verdict": verdict} if verdict else {}),
+    verdict = credit_oas_verdict(hy, iei_hyg, ig)
+    return {"name": name, "value": hy["value"], "status": status, "informational": True, "as_of": d, "hy": hy, "ig": ig, "level": level, **({"verdict": verdict} if verdict else {}),
             "label": (f"{part('HY', hy)} · {part('IG', ig)} · към {d[8:10]}.{d[5:7]}, перцентил спрямо историята от {hf[8:10]}.{hf[5:7]}.{hf[:4]} (FRED дава ~3 г.)"
                       + (f" · {verdict}" if verdict else "") + " · само информативен, не влиза в режима")}
 

@@ -1117,6 +1117,7 @@ CREDIT_OAS_SERIES = {"hy": "BAMLH0A0HYM2", "ig": "BAMLC0A0CM"}
 CREDIT_OAS_HISTORY_DAYS = int(os.getenv("CREDIT_OAS_HISTORY_DAYS", 3 * 365 + 30))
 CREDIT_OAS_CHG_SESSIONS = int(os.getenv("CREDIT_OAS_CHG_SESSIONS", 20))
 CREDIT_OAS_WIDENING_PCT = float(os.getenv("CREDIT_OAS_WIDENING_PCT", 90))
+CREDIT_OAS_MODERATE_PCT = float(os.getenv("CREDIT_OAS_MODERATE_PCT", 75))   # 04.11.2026 (прегледът, т. 4): „разширява се умерено“ (перцентил на промяната; HY или IG); измерено: спокоен 52%, умерено 22%, разширява се 24% от дните
 CREDIT_OAS_PCT_YELLOW = float(os.getenv("CREDIT_OAS_PCT_YELLOW", 80))
 EQUAL_WEIGHT_SESSIONS = (5, 10)
 PCE_CORE_SERIES = "PCEPILFE"

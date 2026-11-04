@@ -59,17 +59,35 @@ print()
 print("── 3. изречението спрямо IEI/HYG и цветът (СИНТЕТИЧНО: статусите на IEI/HYG) ──")
 iei = lambda st: {"name": "IEI/HYG (Credit Spread)", "value": 1.489, "status": st}
 calm = next(ml.oas_reading(HY[:n], dt.date.fromisoformat(HY[n - 1][0])) for n in range(len(HY), 30, -1)
-            if ml.oas_reading(HY[:n], dt.date.fromisoformat(HY[n - 1][0]))["chg_pct"] < config.CREDIT_OAS_WIDENING_PCT)        # РЕАЛНО: последният ден със спокоен HY
-assert th.credit_oas_verdict(hy, iei("green")) == "HY OAS се разширява, IEI/HYG още не"                                            # днес (РЕАЛНО)
-assert th.credit_oas_verdict(hy, iei("red")) == "кредитен стрес — и IEI/HYG, и HY OAS се разширяват"
-assert th.credit_oas_verdict(calm, iei("yellow")) == "натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, HY OAS е спокоен)"
-assert th.credit_oas_verdict(calm, iei("green")) == "кредитът е спокоен (IEI/HYG зелен, HY OAS не се разширява)"
+            if ml.oas_reading(HY[:n], dt.date.fromisoformat(HY[n - 1][0]))["chg_pct"] < config.CREDIT_OAS_MODERATE_PCT)        # РЕАЛНО: последният ден със спокоен HY
+mod = next(ml.oas_reading(HY[:n], dt.date.fromisoformat(HY[n - 1][0])) for n in range(len(HY), 30, -1)
+           if config.CREDIT_OAS_MODERATE_PCT <= ml.oas_reading(HY[:n], dt.date.fromisoformat(HY[n - 1][0]))["chg_pct"] < config.CREDIT_OAS_WIDENING_PCT)    # РЕАЛНО: последният ден в „умерено“
+# 04.11.2026 (прегледът, т. 4): три степени; IG участва; прагът — срещу показаното число
+HN, CN, MN = (f"HY {x['chg_pct']:.0f}." for x in (hy, calm, mod))
+assert th.credit_oas_level(hy, ig) == "wide" and th.credit_oas_level(mod) == "moderate" and th.credit_oas_level(calm) == "calm" and th.credit_oas_level({}) is None
+assert th.credit_oas_verdict(hy, iei("green"), ig) == f"OAS се разширява ({HN}, IG {ig['chg_pct']:.0f}. percentile на промяната), IEI/HYG още не"       # днес (РЕАЛНО)
+assert th.credit_oas_verdict(hy, iei("red")) == f"кредитен стрес — и IEI/HYG, и OAS се разширяват ({HN} percentile на промяната)"
+assert th.credit_oas_verdict(mod, iei("yellow")) == f"натискът е предимно от лихвите; OAS се разширява умерено ({MN} percentile на промяната)"
+assert th.credit_oas_verdict(mod, iei("green")) == f"OAS се разширява умерено ({MN} percentile на промяната), IEI/HYG още не"
+assert th.credit_oas_verdict(calm, iei("yellow")) == f"натискът е от лихвите, не от кредита (IEI/HYG е жълт/червен, OAS е спокоен: {CN} percentile на промяната)"
+assert th.credit_oas_verdict(calm, iei("green")) == f"кредитът е спокоен (IEI/HYG зелен, OAS спокоен: {CN} percentile на промяната)"
+# РЕАЛНО: плочката от брифа на 04.11 — екранът казваше „90.“, сметнато 89.6 → „не се разширява“, а IG беше на 94.2
+hy0411 = {"value": 3.43, "as_of": "2026-11-02", "chg_bp": 31, "percentile": 87.6, "chg_pct": 89.6, "history_from": "2023-11-06"}
+ig0411 = {"value": 0.94, "as_of": "2026-11-02", "chg_bp": 10, "percentile": 77.2, "chg_pct": 94.2, "history_from": "2023-11-06"}
+t0411 = th._credit_oas_indicator({"hy": hy0411, "ig": ig0411}, iei("green"))
+assert t0411["level"] == "wide" and t0411["status"] == "red" and t0411["verdict"] == "OAS се разширява (HY 90., IG 94. percentile на промяната), IEI/HYG още не" and "HY 3.43% (+31 б.п. за 20 дни — 90. percentile на промяната" in t0411["label"]
+# СИНТЕТИЧНО: границите и IG сам
+assert th.credit_oas_level({"chg_pct": 89.4}) == "moderate" and th.credit_oas_level({"chg_pct": 89.5}) == "wide"           # 89.5 се показва „90.“ (закръгляне до четно, както на екрана)
+assert th.credit_oas_level({"chg_pct": 74.4}) == "calm" and th.credit_oas_level({"chg_pct": 74.6}) == "moderate"
+assert th.credit_oas_level({"chg_pct": 35.0}, {"chg_pct": 100.0}) == "moderate" and th.credit_oas_level({"chg_pct": 76.0}, {"chg_pct": 94.0}) == "wide" and th.credit_oas_level({"chg_pct": 30.0}, {"chg_pct": 76.0}) == "moderate"
+assert th._credit_oas_indicator({"hy": {**hy0411, "chg_pct": 80.0, "percentile": 40.0}, "ig": {}}, iei("green"))["status"] == "yellow"     # умерено при ниско ниво — жълто
+assert th._credit_oas_indicator({"hy": {**hy0411, "chg_pct": 40.0, "percentile": 40.0}, "ig": {**ig0411, "chg_pct": 40.0}}, iei("green"))["status"] == "green"
 assert th.credit_oas_verdict(hy, {"name": "IEI/HYG (Credit Spread)", "value": None, "status": "yellow", "hide": True}) is None
 tile = th._credit_oas_indicator({"hy": hy, "ig": ig}, iei("green"))
 assert tile["status"] == "red" and tile["informational"] and tile["label"] == (
     "HY 3.44% (+34 б.п. за 20 дни — 91. percentile на промяната; нивото — 88. percentile) · IG 0.94% (+9 б.п. за 20 дни — 93. percentile на промяната; нивото — 77. percentile) · "
     "към 30.10, перцентил спрямо историята от 03.11.2023 (FRED дава ~3 г.) · "
-    "HY OAS се разширява, IEI/HYG още не · само информативен, не влиза в режима"), tile["label"]
+    f"OAS се разширява ({HN}, IG {ig['chg_pct']:.0f}. percentile на промяната), IEI/HYG още не · само информативен, не влиза в режима"), tile["label"]
 hidden = th._credit_oas_indicator({"hy": stale, "ig": ig}, iei("green"))
 assert hidden["hide"] and hidden["hide_reason"] == "HY OAS — застояла — последно наблюдение 30.10 (праг 2 сесии)"
 assert th._credit_oas_indicator(None, iei("green")) is None
@@ -83,7 +101,7 @@ assert before[0] == after[0] and after[2].startswith(before[2]) and "HY / IG OAS
 b = copy.deepcopy(B19); b["thermometer"]["indicators"] = B19["thermometer"]["indicators"] + [tile, {**hidden, "name": "HY / IG OAS (кредитни спредове) "}]
 with q():
     page = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
-assert "HY 3.44% (+34 б.п. за 20 дни — 91. percentile на промяната; нивото — 88. percentile)" in page and "HY OAS се разширява, IEI/HYG още не" in page
+assert "HY 3.44% (+34 б.п. за 20 дни — 91. percentile на промяната; нивото — 88. percentile)" in page and "OAS се разширява (HY 91., IG 93. percentile на промяната), IEI/HYG още не" in page
 assert "HY OAS — застояла — последно наблюдение 30.10 (праг 2 сесии) (информативен, не влиза в режима)" in page
 src = (ROOT / "src" / "macro_layer.py").read_text(encoding="utf-8")
 assert '"credit_oas": credit_oas() if config.ENABLE_CREDIT_OAS else None' in src
