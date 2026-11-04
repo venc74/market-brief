@@ -80,7 +80,7 @@ def _pct(a, b) -> float:
     return round((a / b - 1) * 100, 2)
 
 
-def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: list[dict]) -> list[dict]:
+def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: list[dict], today: str | None = None) -> list[dict]:
     """
     (б) Само пресичанията в премаркета: „Чака пробив“ и чакащ запис — цената над buy-stop нивото (ще се задейства на отварянето); карта по Kullamägi — над нивото на пробива;
     отворен запис — под стопа; „GLB по Уиш“ — под линията (изходът е по затваряне — само информация). → [{ticker, what, kind, level, pm_price, pct}]. Чиста функция.
@@ -106,6 +106,11 @@ def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: 
         if not what or r.get("needs_manual_review"):              # 04.11.2026 (С2): сплит / отделяне след входа — нивата са в старата скала, не се сравняват
             continue
         if st == "pending" and cat != "glb_wish_high":
+            # 04.11.2026 (прегледът, т. 5): чакащ запис с изтекъл срок не е ниво за днес. Реално 04.11: SN_2026-10-12_qm (срок 12.10, ниво $186.75, премаркет $210.50) — записът се роди
+            # сутринта от стария snapshot (5-минутните бари скъсиха предишния SN до 09.10) и се резолвира чак в следващия бриф; карето го показа „над нивото“.
+            vt = r.get("valid_through")
+            if today and vt and str(vt) < today:
+                continue
             add(r.get("ticker"), what, "над нивото", r.get("buy_stop"))
         elif st in ("open", "trailing"):
             if cat == "glb_wish_high":
@@ -344,7 +349,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
-        res["levels"] = level_checks(pts, waiting, qm_cards, records or [])
+        res["levels"] = level_checks(pts, waiting, qm_cards, records or [], res["date"])
         res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)
     except Exception as e:
