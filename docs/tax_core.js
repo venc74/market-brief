@@ -417,6 +417,141 @@
     return { realized, unmatched, missingRates, incomes, open, notes };
   };
 
+  // ─── Германия: разбивката за декларацията ────────────────────────────────────
+  // Не е целият данък: числото най-горе е доходът от капитал за Anlage KAP / KAP-INV след прихващането на загубите (преди Sparer-Pauschbetrag); крипто по §23 — отделно (Anlage SO).
+  // Прихващане: загубите от акции — само срещу печалби от акции (отделна „кутия“); другите загуби — срещу всичко. Пренесените загуби (решение на Finanzamt) — по същите правила.
+  // settings: year, joint, kirche (null | 'BY' | 'BW' | 'other'), carriedShareLoss, carriedOtherLoss, fundTypes {тикър: вид}, vorab {тикър: EUR}, creditRate (0.15),
+  //           persons {"брокер|сметка": 'A' | 'B'}, records (всички записи — за позициите в края на годината), info (от ingest — валутата в сметките)
+  TC.LABELS = {
+    shareGains: { bg: 'Печалби от продажба на акции', form: 'Anlage KAP — доходи от капитал без германски данък; от тях печалби от акции' },
+    shareLosses: { bg: 'Загуби от продажба на акции', form: 'Anlage KAP — загуби от продажба на акции (прихващат се само с печалби от акции)' },
+    dividends: { bg: 'Дивиденти (нето след сторно)', form: 'Anlage KAP — доходи от капитал без германски данък' },
+    interest: { bg: 'Лихви от брокера (кредитни)', form: 'Anlage KAP — доходи от капитал без германски данък' },
+    options: { bg: 'Опции — печалби (вкл. премии на Stillhalter)', form: 'Anlage KAP — доходи от капитал без германски данък (Termingeschäfte / Stillhalterprämien)' },
+    optionLosses: { bg: 'Опции — загуби', form: 'Anlage KAP — загуби без загубите от акции' },
+    pil: { bg: 'Плащания вместо дивидент (Payment in Lieu)', form: 'Anlage KAP — доходи от капитал без германски данък' },
+    funds: { bg: 'Фондове (ETF) — след частичното освобождаване', form: 'Anlage KAP-INV — сумите преди освобождаването, по вид фонд (Finanzamt прилага освобождаването)' },
+    fundLosses: { bg: 'Фондове (ETF) — загуби след частичното освобождаване', form: 'Anlage KAP-INV' },
+    otherNeg: { bg: 'Други отрицателни (сторно на дивиденти от минала година и др.)', form: 'Anlage KAP — загуби без загубите от акции' },
+    withholding: { bg: 'Удържан чужд данък — за зачитане', form: 'Anlage KAP — чужди данъци за зачитане (до 15% от дивидента)' },
+    crypto: { bg: 'Крипто — частни продажби (§23 EStG)', form: 'Anlage SO — частни продажби (на човек)' },
+  };
+
+  TC.computeDE = function (fifoRes, settings) {
+    const st = settings || {};
+    const year = Number(st.year);
+    const par = TC.deParams(year);
+    const tfRates = par.teilfreistellung;                                          // null преди 2018
+    const fundType = (sym, hint) => (st.fundTypes || {})[sym] || (hint ? 'equity' : 'stock');
+    const tfOf = t => (t === 'stock' || !tfRates) ? 0 : (tfRates[t] || 0);
+    const R = fifoRes.realized.filter(x => x.year === year);
+    const I = fifoRes.incomes.filter(x => x.year === year);
+    const items = [];                                                              // всеки ред от разбивката: {cat, sym, date, eur, gross, note}
+    const notes = [];
+    const fundsSeen = {};
+    R.forEach(x => {
+      if (x.gainEUR == null) return;                                               // без курс — в предупрежденията
+      if (x.assetClass === 'crypto') return;
+      if (x.assetClass === 'option') { items.push({ cat: x.gainEUR >= 0 ? 'options' : 'optionLosses', sym: x.sym, date: x.date, eur: x.gainEUR, gross: x.gainEUR, account: x.account }); return; }
+      const ft = fundType(x.sym, x.fundHint);
+      if (ft === 'stock') { items.push({ cat: x.gainEUR >= 0 ? 'shareGains' : 'shareLosses', sym: x.sym, date: x.date, eur: x.gainEUR, gross: x.gainEUR, account: x.account }); return; }
+      fundsSeen[x.sym] = ft;
+      const tf = tfOf(ft);
+      items.push({ cat: x.gainEUR >= 0 ? 'funds' : 'fundLosses', sym: x.sym, date: x.date, eur: x.gainEUR * (1 - tf), gross: x.gainEUR, fundType: ft, tf, account: x.account });
+    });
+    // доходи: дивиденти по тикър (нето със сторното), удържан данък по тикър, лихви
+    const div = {}, wh = {};
+    I.forEach(x => {
+      if (x.kind === 'dividend') { const o = div[x.sym + '|' + (x.pil ? 'pil' : 'div')] = div[x.sym + '|' + (x.pil ? 'pil' : 'div')] || { sym: x.sym, pil: x.pil, eur: 0, account: x.account }; o.eur += x.eur; }
+      if (x.kind === 'withholding') wh[x.sym] = (wh[x.sym] || 0) + x.eur;
+    });
+    const instrHint = sym => (fifoRes.realized.find(r => r.sym === sym) || {}).fundHint || ((st.records || []).find(r => r.sym === sym && r.fundHint) ? true : false);
+    Object.values(div).forEach(o => {
+      if (o.pil) { items.push({ cat: o.eur >= 0 ? 'pil' : 'otherNeg', sym: o.sym, eur: o.eur, gross: o.eur }); return; }
+      const ft = fundType(o.sym, instrHint(o.sym));
+      if (ft !== 'stock') { fundsSeen[o.sym] = ft; const tf = tfOf(ft); items.push({ cat: o.eur >= 0 ? 'funds' : 'fundLosses', sym: o.sym, eur: o.eur * (1 - tf), gross: o.eur, fundType: ft, tf, distribution: true }); return; }
+      items.push({ cat: o.eur >= 0 ? 'dividends' : 'otherNeg', sym: o.sym, eur: o.eur, gross: o.eur });
+    });
+    const debit = [];
+    I.filter(x => x.kind === 'interest').forEach(x => {
+      if (x.eur >= 0) items.push({ cat: 'interest', sym: x.desc || 'лихва', date: x.date, eur: x.eur, gross: x.eur });
+      else debit.push(x);
+    });
+    if (debit.length) notes.push({ level: 'info', text: `Дебитна лихва ${TC.fmt(-debit.reduce((s, x) => s + x.eur, 0))} — не се приспада от доходите от капитал (§20 ал. 9 EStG; да се потвърди).` });
+    Object.entries(st.vorab || {}).forEach(([sym, v]) => {
+      const amt = Number(v); if (!(amt > 0)) return;
+      const ft = fundType(sym, true); const tf = tfOf(ft); fundsSeen[sym] = ft;
+      items.push({ cat: 'funds', sym, eur: amt * (1 - tf), gross: amt, fundType: ft, tf, vorab: true });
+    });
+    // удържан чужд данък: до creditRate (15%) от брутния дивидент на същия тикър
+    const rate = st.creditRate == null ? 0.15 : Number(st.creditRate);
+    let withheld = 0, creditable = 0;
+    Object.entries(wh).forEach(([sym, v]) => {
+      const w = Math.max(0, -v);
+      const gross = Object.values(div).filter(o => o.sym === sym && !o.pil).reduce((s, o) => s + o.eur, 0);
+      withheld += w; creditable += Math.min(w, Math.max(0, gross) * rate);
+    });
+    const sum = cat => items.filter(i => i.cat === cat).reduce((s, i) => s + i.eur, 0);
+    const shareGains = sum('shareGains'), shareLosses = -sum('shareLosses');
+    const otherPos = ['dividends', 'interest', 'options', 'pil', 'funds'].reduce((s, c) => s + sum(c), 0);
+    const otherNeg = -['optionLosses', 'fundLosses', 'otherNeg'].reduce((s, c) => s + sum(c), 0);
+    const cS = Math.max(0, Number(st.carriedShareLoss) || 0), cO = Math.max(0, Number(st.carriedOtherLoss) || 0);
+    let shareNet = shareGains - shareLosses - cS, shareCarry = 0;
+    if (shareNet < 0) { shareCarry = -shareNet; shareNet = 0; }
+    let total = shareNet + otherPos - otherNeg - cO, otherCarry = 0;
+    if (total < 0) { otherCarry = -total; total = 0; }
+    // крипто §23 — по човек (сметките, отбелязани като на съпруга / съпругата → 'B')
+    const persons = {};
+    R.filter(x => x.assetClass === 'crypto').forEach(x => {
+      const who = (st.persons || {})[x.broker + '|' + x.account] || 'A';
+      const o = persons[who] = persons[who] || { person: who, taxable: 0, exempt: 0, sales: 0, unknown: 0 };
+      o.sales++;
+      if (x.gainEUR == null) { o.unknown++; return; }
+      o.taxable += x.taxableGainEUR || 0; o.exempt += x.exemptGainEUR || 0;
+    });
+    Object.values(persons).forEach(o => {
+      o.freigrenze = par.freigrenze23;
+      o.result = o.taxable > 0 && o.taxable < par.freigrenze23 ? 0 : o.taxable;           // Freigrenze (не Freibetrag): под нея — 0; на или над нея — цялата сума
+      o.underFreigrenze = o.taxable > 0 && o.taxable < par.freigrenze23;
+      o.lossCarry = o.taxable < 0 ? -o.taxable : 0;
+    });
+    // ориентировъчно: Sparer-Pauschbetrag, Abgeltungsteuer с църковния данък по формулата (e − 4q) / (4 + k), Soli
+    const pausch = par.pauschbetrag * (st.joint ? 2 : 1);
+    const e = Math.max(0, total - pausch);
+    const k = st.kirche ? (TC.KIRCHE_RATES[st.kirche] || TC.KIRCHE_RATES.other) : 0;
+    const q = Math.min(creditable, e / 4);
+    const tax = Math.max(0, (e - 4 * q) / (4 + k));
+    const est = { pauschbetrag: pausch, taxableAfterPausch: e, creditUsed: q, kircheRate: k, abgeltung: tax, soli: tax * par.soli, kirche: tax * k, total: tax * (1 + par.soli + k) };
+    // предупреждения
+    const yEnd = `${year}-12-31`;
+    const held = {};
+    (st.records || []).forEach(r => {
+      if (r.date > yEnd) return;
+      const key = TC.positionKey(r);
+      if (r.kind === 'trade') held[key] = { sym: r.sym, qty: ((held[key] || {}).qty || 0) + r.qty, hint: r.fundHint, cls: r.assetClass, broker: r.broker, account: r.account };
+      if (r.kind === 'split') Object.keys(held).forEach(k2 => { const h = held[k2]; if (h.sym === r.sym && h.broker === r.broker && h.account === r.account) h.qty *= r.ratio; });
+    });
+    const heldFunds = [...new Set(Object.values(held).filter(h => h.qty > 1e-9 && h.cls === 'stock' && fundType(h.sym, h.hint) !== 'stock').map(h => h.sym))];
+    if (heldFunds.length && tfRates) notes.push({ level: 'warn', text: `Фондове, държани в края на ${year}: ${heldFunds.join(', ')}. Ако са натрупващи (без изплащане), за ${year} може да има Vorabpauschale — сметни я и я въведи ръчно в таблицата с фондовете (да се потвърди).` });
+    if (!tfRates && Object.keys(fundsSeen).length) notes.push({ level: 'warn', text: `Преди 2018 фондовете се облагат по стария InvStG — частичното освобождаване не е приложено (да се потвърди).` });
+    const fx = new Set();
+    (st.info || []).forEach(i => (i.nonBaseCash || []).forEach(c => fx.add(c.currency)));
+    (st.records || []).forEach(r => { if (r.year === year || (r.date || '').startsWith(String(year))) { if (r.currency && r.currency !== 'EUR') fx.add(r.currency); } });
+    if (fx.size) notes.push({ level: 'warn', text: `В сметките има суми във валута (${[...fx].join(', ')}). Курсовите разлики при обмяна или теглене на валута може да са облагаеми (частни продажби по §23 EStG при държане под година) — калкулаторът не ги смята; да се потвърди със счетоводител.` });
+    if (par.extrapolated) notes.push({ level: 'warn', text: `Параметрите за ${year} не са проверени (таблицата е до ${TC.DE_PARAMS_CHECKED_UNTIL}) — ползвани са последните известни; провери ги.` });
+    if ((fifoRes.notes || []).some(n => n.date.startsWith(String(year)))) fifoRes.notes.filter(n => n.date.startsWith(String(year))).forEach(n => notes.push({ level: 'warn', text: `${n.sym} (${n.date}): ${n.text}` }));
+    const unmatched = (fifoRes.unmatched || []).filter(u => u.year === year);
+    const missing = (fifoRes.missingRates || []).filter(m => m.date.startsWith(String(year)) || (R.some(x => x.gainEUR == null && x.sym === m.sym)));
+    return {
+      year, params: par, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
+      carriedShareLoss: cS, carriedOtherLoss: cO, withheld, creditable, items, crypto: Object.values(persons).sort((a, b) => a.person.localeCompare(b.person)),
+      estimate: est, notes, unmatched, missingRates: missing, funds: fundsSeen, heldFunds,
+      complete: !unmatched.length && !missing.length,
+    };
+  };
+
+  TC.fmt = n => (n < 0 ? '−' : '') + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+
   root.TaxCore = TC;
   if (typeof module !== 'undefined' && module.exports) module.exports = TC;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -109,4 +109,59 @@ chf = run("fifo", ["chf_no_rate.csv", "ecb_rates_synthetic.csv"])
 assert {(m["kind"], m["sym"], m["currency"]) for m in chf["missingRates"]} == {("trade", "NESX", "CHF"), ("dividend", "NESX", "CHF"), ("withholding", "NESX", "CHF")}, chf["missingRates"]
 assert all(x["gainEUR"] is None for x in chf["realized"])
 print("  ✓ дивидент, сторно, удържан, върнат, лихви — в EUR по датата; CHF без курс → в „липсващ курс“, резултатът е null (не NaN, не 0)")
+
+print("── 7. параметри по години ──")
+P = run("params", ["ecb_rates_synthetic.csv"], {"years": [2020, 2022, 2023, 2024, 2026, 2031]})
+assert [(p["pauschbetrag"], p["freigrenze23"], p["extrapolated"]) for p in P] == [(801, 600, False), (801, 600, False), (1000, 600, False), (1000, 1000, False), (1000, 1000, False), (1000, 1000, True)], P
+assert P[0]["teilfreistellung"]["equity"] == 0.3 and P[0]["abgeltung"] == 0.25 and P[0]["soli"] == 0.055
+print("  ✓ Pauschbetrag 801 → 1 000 (2023); Freigrenze §23 600 → 1 000 (2024); 2031 — последните известни + бележка")
+
+print("── 8. Германия 2023: всички отчети, сам — ръчна сметка ──")
+de = run("de", list(reversed(ALL)), {"year": 2023})
+acme_ib = 2998 / 1.08 - lot1 - lot2 / 2                 # 1 240.51
+acme_b2 = 1050 / 1.08 - 800 / 1.10                      # 244.95
+shares = acme_ib + acme_b2 + 200                        # + SPLT
+fund = 298 * 0.7                                        # XWLD — ETF (подсказката от IBKR → акционерен фонд, 30% освободени)
+option = 248.95 / 1.08
+dividends = (50 - 10) / 1.08                            # със сторното
+interest = 12.34 + 5 / 1.08                             # дебитната лихва (−3) не се приспада
+total = shares + fund + option + dividends + interest
+assert close(de["shareGains"], shares) and close(de["shareLosses"], 0) and close(de["otherPos"], fund + option + dividends + interest), de
+assert close(de["total"], total) and close(de["headline"], total), (de["total"], total)
+cred = min(6 / 1.08, 0.15 * dividends)                  # удържани 7.5 − 1.5 върнати = 6 USD; таван 15% от 37.04 €
+assert close(de["withheld"], 6 / 1.08) and close(de["creditable"], cred)
+e = total - 1000
+assert close(de["estimate"]["abgeltung"], (e - 4 * cred) / 4) and close(de["estimate"]["soli"], (e - 4 * cred) / 4 * 0.055)
+assert [u["sym"] for u in de["unmatched"]] == ["GHOST"] and not de["complete"]
+assert any("USD" in n["text"] for n in de["notes"]) and any("Дебитна лихва" in n["text"] for n in de["notes"])
+print(f"  ✓ числото най-горе {de['headline']:.2f} € = акции {shares:.2f} + ETF {fund:.2f} (след 30%) + опция {option:.2f} + дивиденти {dividends:.2f} + лихви {interest:.2f}; GHOST — непълно")
+
+print("── 9. съвместно и църковен данък (Бавария 8%) ──")
+dj = run("de", list(reversed(ALL)), {"year": 2023, "joint": True})
+assert close(dj["estimate"]["pauschbetrag"], 2000) and close(dj["estimate"]["abgeltung"], (total - 2000 - 4 * cred) / 4)
+dk = run("de", list(reversed(ALL)), {"year": 2023, "kirche": "BY"})
+tk = (e - 4 * cred) / 4.08
+assert close(dk["estimate"]["abgeltung"], tk) and close(dk["estimate"]["kirche"], tk * 0.08) and close(dk["estimate"]["soli"], tk * 0.055), dk["estimate"]
+d9 = run("de", list(reversed(ALL)), {"year": 2023, "kirche": "other"})
+assert close(d9["estimate"]["abgeltung"], (e - 4 * cred) / 4.09)
+print(f"  ✓ съвместно — Pauschbetrag 2 000; Бавария: (e − 4q) / 4.08 = {tk:.2f} €, KiSt 8% = {tk*0.08:.2f} €; другаде — / 4.09")
+
+print("── 10. загуба от акции + дивидент + ETF (2025); пренесени загуби ──")
+d25 = run("de", ["loss_div.csv"], {"year": 2025})
+loss = 3995 - 5005                                       # LOSSCO: 100 @ 50 + 5 → 100 @ 40 − 5
+assert close(d25["shareLosses"], -loss) and close(d25["shareCarry"], 1010) and close(d25["total"], 3000 + 500 * 0.7) and close(d25["headline"], 3350), d25
+c25 = run("de", ["loss_div.csv"], {"year": 2025, "carriedShareLoss": 200, "carriedOtherLoss": 300})
+assert close(c25["shareCarry"], 1210) and close(c25["total"], 3050), c25
+m25 = run("de", ["loss_div.csv"], {"year": 2025, "fundTypes": {"EQETF": "mixed"}})
+assert close(m25["total"], 3000 + 500 * 0.85)
+print("  ✓ загубата от акции (−1 010) НЕ намалява дивидента и ETF-а → пренася се; пренесени 200 (акции) / 300 (други); смесен фонд — 15%")
+
+print("── 11. крипто §23 (2024): годишнината, Freigrenze 1 000 на човек ──")
+cs = run("de", ["crypto_me.csv", "crypto_spouse.csv"], {"year": 2024})
+assert len(cs["crypto"]) == 1 and close(cs["crypto"][0]["taxable"], 2000 + 600 + 800) and close(cs["crypto"][0]["exempt"], 2050) and close(cs["crypto"][0]["result"], 3400), cs["crypto"]
+cj = run("de", ["crypto_me.csv", "crypto_spouse.csv"], {"year": 2024, "joint": True, "persons": {"Revolut|crypto-spouse": "B"}})
+a, b = cj["crypto"]
+assert close(a["result"], 2600) and close(b["taxable"], 800) and b["underFreigrenze"] and close(b["result"], 0), cj["crypto"]
+assert close(cj["total"], 0) and close(cj["headline"], 0)
+print("  ✓ сам: 3 400 € облагаеми (2 050 € — над година); съвместно: аз 2 600 €, съпругата 800 € < 1 000 € Freigrenze → 0")
 print("\n✅ test_tax_core: всичко мина")

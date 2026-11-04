@@ -21,6 +21,8 @@ if (step === 'lookup') {
   out = { realized: res.realized, unmatched: res.unmatched, missingRates: res.missingRates, open: res.open, incomes: res.incomes, notes: res.notes, needed: TC.ratesNeeded(ing.records) };
 } else if (step === 'de') {
   const res = TC.fifo(ing.records, TC.rateLookup(ing.rates));
-  out = TC.computeDE(res, { ...settings, instruments: ing.instruments, info: ing.info });
+  out = TC.computeDE(res, { ...settings, records: ing.records, info: ing.info });
+} else if (step === 'params') {
+  out = (settings.years || []).map(y => TC.deParams(y));
 } else throw new Error('непозната стъпка ' + step);
 process.stdout.write(JSON.stringify(out));
