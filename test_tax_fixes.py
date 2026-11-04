@@ -106,4 +106,21 @@ d = scenario([{"name": "mf.csv", "text": mf}], years=[2024])["de"][2024]
 assert close(d["shareLosses"], 0) and close(d["otherNeg"], 200 * 0.7) and d["funds"] == {"MFX": "equity"}, d   # −200 → загуба от фонд × 0.7 (не загуба от акции)
 print("  ✓ Revolut ZZZ 10 → сплит 2:1 от CSV → продадени 20: +200; заедно с IBKR сплит — веднъж; Mutual Fund −200 → −140 в общите загуби")
 
+# ── 9. Revolut: собственик по файл; дедупликация с милисекунди, сума и такса ──
+print("── 9. Revolut — двамата съпрузи; милисекунди ──")
+RC = "Symbol,Type,Quantity,Price,Value,Fees,Date\n"
+me = RC + 'BTC,Buy,1,€10000.00,€10000.00,€0.00,"Jan 2, 2023, 10:00:00 AM"\nBTC,Sell,1,€30000.00,€30000.00,€0.00,"Jun 3, 2024, 10:00:00 AM"\n'
+sp_ = RC + 'BTC,Buy,1,€60000.00,€60000.00,€0.00,"Mar 1, 2024, 10:00:00 AM"\nBTC,Sell,1,€61000.00,€61000.00,€0.00,"Jun 1, 2024, 10:00:00 AM"\n'
+r = scenario([{"name": "crypto.csv", "text": me}, {"name": "crypto.csv", "text": sp_, "owner": "B"}], years=[2024], joint=True)
+c = {x["person"]: x for x in r["de"][2024]["crypto"]}
+assert close(c["A"]["exempt"], 20000) and close(c["A"]["taxable"], 0) and close(c["B"]["taxable"], 1000) and close(c["B"]["result"], 1000), c   # до 05.11: A −30 000 облагаеми, +51 000 освободени
+RS = "Date,Ticker,Type,Quantity,Price per share,Total Amount,Currency,FX Rate\n"
+two = RS + "2024-02-01T10:00:00.120Z,AAA,BUY - MARKET,1,EUR 10.00,EUR 10.00,EUR,1\n2024-02-01T10:00:00.480Z,AAA,BUY - MARKET,1,EUR 10.00,EUR 10.00,EUR,1\n"
+one = RS + "2024-02-01T10:00:00.480Z,AAA,BUY - MARKET,1,EUR 10.00,EUR 10.00,EUR,1\n2024-03-01T10:00:00.000Z,AAA,SELL - MARKET,2,EUR 12.00,EUR 24.00,EUR,1\n"
+fee = RC + 'ETH,Buy,1,€2000.00,€2000.00,€1.00,"Jan 5, 2024, 10:00:00 AM"\nETH,Buy,1,€2000.00,€2000.00,€2.00,"Jan 5, 2024, 10:00:00 AM"\n'
+r = scenario([{"name": "jan.csv", "text": two}, {"name": "q1.csv", "text": one}, {"name": "fee.csv", "text": fee}], years=[2024])
+assert close(r["de"][2024]["shareGains"], 24 - 20) and not r["de"][2024]["unmatched"], r["de"][2024]   # двете покупки в една секунда — две; общата — веднъж
+assert [x["fee"] for x in r["records"] if x["sym"] == "ETH"] == [1, 2]                                  # една секунда, различна такса — две
+print("  ✓ съпрузите в Revolut — отделни: аз +20 000 освободени, съпругата +1 000 облагаеми; .120 и .480 — две покупки, общата с q1.csv — веднъж; различна такса — две")
+
 print("\n✅ test_tax_fixes: всичко мина")

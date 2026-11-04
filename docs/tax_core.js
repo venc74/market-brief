@@ -54,9 +54,9 @@
 
   // дата/час: "2024-01-10, 10:00:00", "2024-01-10;10:00:00", "20240110;100000", "2024-01-10" → {date, time}
   TC.parseDateTime = function (s) {
-    const m = String(s || '').match(/(\d{4})-?(\d{2})-?(\d{2})(?:[,;T ]+\s*(\d{2}):?(\d{2}):?(\d{2})?)?/);
-    if (!m) return null;
-    return { date: `${m[1]}-${m[2]}-${m[3]}`, time: m[4] ? `${m[4]}:${m[5]}:${m[6] || '00'}` : '' };
+    const m = String(s || '').match(/(\d{4})-?(\d{2})-?(\d{2})(?:[,;T ]+\s*(\d{2}):?(\d{2}):?(\d{2})?(?:\.(\d{1,6}))?)?/);
+    if (!m) return null;                                                          // милисекундите (Revolut) остават в часа — две поръчки в една секунда не са дубликат
+    return { date: `${m[1]}-${m[2]}-${m[3]}`, time: m[4] ? `${m[4]}:${m[5]}:${m[6] || '00'}${m[7] ? '.' + m[7] : ''}` : '' };
   };
 
   TC.addDays = function (date, n) { const d = new Date(date + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
@@ -240,7 +240,7 @@
   // ─── Всички файлове → записи: разпознаване, дедупликация на застъпващи се отчети ─────────────────────────────────
   TC.recordKey = function (r) {
     const n = v => (v == null || !isFinite(v)) ? '' : Number(v).toFixed(6);
-    if (r.kind === 'trade') return ['T', r.broker, r.account, r.sym, r.date, r.time, n(r.qty), n(r.price), r.currency].join('|');
+    if (r.kind === 'trade') return ['T', r.broker, r.account, r.sym, r.date, r.time, n(r.qty), n(r.price), r.currency, n(r.fee), n(r.total)].join('|');   // + такса и сума (05.11.2026)
     return [r.kind[0].toUpperCase(), r.broker, r.account, r.sym || '', r.date, n(r.amount), n(r.ratio), r.currency || '', r.desc || ''].join('|');
   };
 
@@ -251,7 +251,7 @@
     const perFile = [];
     files.forEach((f, fileIdx) => {
       const fmt = TC.detect(f.text);
-      const desc = { name: f.name, format: fmt, broker: '', account: '', from: '', to: '', records: 0, duplicates: 0, skipped: 0, error: null };
+      const desc = { name: f.name, owner: f.owner === 'B' ? 'B' : 'A', format: fmt, broker: '', account: '', from: '', to: '', records: 0, duplicates: 0, skipped: 0, error: null };
       try {
         if (fmt === 'ecb_rates') {
           const r = TC.parseECBcsv(f.text);
@@ -259,7 +259,8 @@
           desc.broker = 'ЕЦБ курсове'; const any = Object.values(r)[0] || []; desc.from = any.length ? any[0][0] : ''; desc.to = any.length ? any[any.length - 1][0] : '';
           desc.records = Object.keys(r).length;
         } else if (fmt === 'ibkr' || fmt === 'standard' || (TC.parsers && TC.parsers[fmt])) {
-          const res = fmt === 'ibkr' ? TC.parseIBKR(f.text, f.name) : fmt === 'standard' ? TC.parseStandard(f.text, f.name) : TC.parsers[fmt](f.text, f.name);
+          const res = fmt === 'ibkr' ? TC.parseIBKR(f.text, f.name) : fmt === 'standard' ? TC.parseStandard(f.text, f.name) : TC.parsers[fmt](f.text, f.name, f.owner);
+          res.records.forEach(r => { r.owner = f.owner === 'B' ? 'B' : 'A'; });       // чий е файлът (05.11.2026) — по подразбиране за крипто §23 на човек
           perFile.push({ idx: fileIdx, recs: res.records });
           out.skipped.push(...res.skipped);
           Object.assign(out.instruments, res.instruments || {});
@@ -323,19 +324,21 @@
                            return L.slice(1).map((l, i) => { const p = TC.splitCSV(l), r = {}; H.forEach((h, k) => { r[h.trim().toLowerCase()] = p[k] || ''; }); return { r, line: i + 2 }; }); };
   TC.parsers = {
     // акции: Date,Ticker,Type,Quantity,Price per share,Total Amount,Currency,FX Rate
-    revolut_stocks(text, src) {
-      const recs = [], skipped = [], b = { broker: 'Revolut', account: 'акции', src };
+    // owner (05.11.2026): отчетите на Revolut нямат номер на сметка — сметката е „акции“ / „крипто“ + собственикът на файла, иначе двамата съпрузи ставаха една FIFO опашка
+    revolut_stocks(text, src, owner) {
+      const acc = 'акции' + (owner === 'B' ? ' · съпруг/а' : '');
+      const recs = [], skipped = [], b = { broker: 'Revolut', account: acc, src };
       rowsOf(text).forEach(({ r, line }) => {
         const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toUpperCase(), cur = (r['currency'] || '').toUpperCase() || 'USD';
         const price = TC.money(r['price per share'], cur), total = TC.money(r['total amount'], cur), qty = TC.num(r['quantity']);
-        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: 'акции', section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
+        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
         if (!dt) return skip('без дата', true);
         if (/^(BUY|SELL)/.test(type)) {
           if (!(qty > 0)) return skip('невалидно количество', true);
           const px = isFinite(price.v) && price.v > 0 ? price.v : Math.abs(total.v / qty);
           const fee = isFinite(total.v) && isFinite(price.v) ? Math.max(0, /^BUY/.test(type) ? Math.abs(total.v) - qty * px : qty * px - Math.abs(total.v)) : 0;
           recs.push({ ...b, line, kind: 'trade', assetClass: 'stock', sym: r['ticker'], date: dt.date, time: dt.time, qty: /^BUY/.test(type) ? qty : -qty, price: px,
-                      currency: price.cur || total.cur || cur, fee: fee > 1e-6 ? fee : 0 });
+                      currency: price.cur || total.cur || cur, fee: fee > 1e-6 ? fee : 0, total: Math.abs(total.v) });
         } else if (type === 'DIVIDEND') {
           if (!isFinite(total.v)) return skip('дивидент без сума', true);
           recs.push({ ...b, line, kind: 'dividend', sym: r['ticker'], date: dt.date, amount: total.v, currency: total.cur || cur, desc: 'Revolut DIVIDEND (сумата в отчета — да се провери дали е брутна)' });
@@ -348,18 +351,19 @@
       return { format: 'revolut_stocks', info: { broker: 'Revolut' }, records: recs, skipped };
     },
     // крипто: Symbol,Type,Quantity,Price,Value,Fees,Date
-    revolut_crypto(text, src) {
-      const recs = [], skipped = [], b = { broker: 'Revolut', account: 'крипто', src };
+    revolut_crypto(text, src, owner) {
+      const acc = 'крипто' + (owner === 'B' ? ' · съпруг/а' : '');
+      const recs = [], skipped = [], b = { broker: 'Revolut', account: acc, src };
       rowsOf(text).forEach(({ r, line }) => {
         const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toLowerCase(), qty = TC.num(r['quantity']);
         const price = TC.money(r['price'], 'EUR'), value = TC.money(r['value'], price.cur || 'EUR'), fee = TC.money(r['fees'], price.cur || 'EUR');
-        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: 'крипто', section: 'Revolut', what: `${r['symbol'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
+        const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['symbol'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable });
         if (!dt) return skip('без дата', true);
         if (type === 'buy' || type === 'sell') {
           if (!(qty > 0)) return skip('невалидно количество', true);
           const px = isFinite(price.v) && price.v > 0 ? price.v : Math.abs(value.v / qty);
           recs.push({ ...b, line, kind: 'trade', assetClass: 'crypto', sym: r['symbol'], date: dt.date, time: dt.time, qty: type === 'buy' ? qty : -qty, price: px,
-                      currency: price.cur || 'EUR', fee: isFinite(fee.v) ? Math.abs(fee.v) : 0 });
+                      currency: price.cur || 'EUR', fee: isFinite(fee.v) ? Math.abs(fee.v) : 0, total: Math.abs(value.v) });
         } else if (/reward|staking|learn/.test(type)) skip('награда / стейкинг — друг доход (§22 т. 3 EStG?), не се смята; да се потвърди', true);
         else if (/send|receive|transfer/.test(type)) skip('прехвърляне между портфейли — цената на придобиване е в другия портфейл');
         else if (/exchange|swap|convert/.test(type)) skip('размяна крипто ↔ крипто — продажба по §23 EStG, не се смята', true);
@@ -464,7 +468,7 @@
       if (fx == null) missingRates.push({ kind: 'trade', sym: r.sym, date: r.date, currency: r.currency, src: r.src });
       const eur = v => fx == null ? null : v / fx;
       if (/(^|;)(A|Ex)(;|$)/.test(r.code || '')) notes.push({ sym: r.sym, date: r.date, text: 'упражнена / възложена опция — премията и акциите са сметнати отделно; да се потвърди' });
-      const base = { broker: r.broker, account: r.account, sym: r.sym, assetClass: r.assetClass, date: r.date, year: Number(r.date.slice(0, 4)), currency: r.currency,
+      const base = { broker: r.broker, account: r.account, owner: r.owner, sym: r.sym, assetClass: r.assetClass, date: r.date, year: Number(r.date.slice(0, 4)), currency: r.currency,
                      fundHint: !!r.fundHint, euExempt: !!r.euExempt, src: r.src };
       if (r.qty > 0) {                                                             // покупка: първо затваря къси позиции (опции), остатъкът — нов лот
         let q = qAbs;
@@ -662,7 +666,7 @@
     // крипто §23 — по човек (сметките, отбелязани като на съпруга / съпругата → 'B')
     const persons = {};
     R.filter(x => x.assetClass === 'crypto').forEach(x => {
-      const who = (st.persons || {})[x.broker + '|' + x.account] || 'A';
+      const who = (st.persons || {})[x.broker + '|' + x.account] || x.owner || 'A';
       const o = persons[who] = persons[who] || { person: who, taxable: 0, exempt: 0, sales: 0, unknown: 0 };
       o.sales++;
       if (x.gainEUR == null) { o.unknown++; return; }

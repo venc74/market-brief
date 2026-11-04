@@ -102,10 +102,13 @@ function removeFile(i) { S.files.splice(i, 1); S.ing = S.files.length ? TC.inges
 function renderFiles() {
   const ing = S.ing;
   if (!ing) { $('files').innerHTML = ''; return; }
-  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map((f, i) => `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
+  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
+    ing.files.map((f, i) => `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td>
+      <td>${f.format === 'ecb_rates' ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
       <td>${esc(f.broker)} ${esc(f.account)}</td><td class="mono">${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</td><td class="n">${f.records}</td><td class="n">${f.duplicates || ''}</td>
       <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.period || '')}</td></tr>`).join('');
+  // чий е файлът (05.11.2026): за Revolut определя сметката (отчетът няма номер), за всички — човека за крипто §23
+  $('files').querySelectorAll('[data-owner]').forEach(el => el.addEventListener('change', () => { S.files[Number(el.dataset.owner)].owner = el.value; S.ing = TC.ingest(S.files); renderFiles(); recalc(); }));
   $('files').querySelectorAll('[data-rm]').forEach(el => el.addEventListener('click', () => removeFile(Number(el.dataset.rm))));
   const years = [...new Set(ing.records.map(r => Number(r.date.slice(0, 4))))].sort((a, b) => b - a);
   const cur = new Date().getFullYear(), sel = $('year'), old = sel.value;
@@ -264,11 +267,12 @@ function renderFunds(de) {
   $('fundsBox').querySelectorAll('[data-vorab]').forEach(el => el.addEventListener('change', () => { (S.vorab[el.dataset.vorab] = S.vorab[el.dataset.vorab] || {})[de.year - 1] = el.value; render(); }));   // по тикър И година
 }
 
+const personOf = a => S.persons[a] || ((S.ing.records.find(r => r.broker + '|' + r.account === a) || {}).owner) || 'A';
 function renderPersons(st) {
   if (!st.joint) { $('personsBox').innerHTML = ''; return; }
   const accts = [...new Set(S.ing.records.filter(r => r.assetClass === 'crypto').map(r => r.broker + '|' + r.account))];
   $('personsBox').innerHTML = accts.length ? `<div class="small" style="margin-bottom:6px"><b>Чия е сметката</b> — Freigrenze по §23 е на човек (крипто); доходите от капитал са общи при съвместното подаване.</div>
-    <table>${accts.map(a => `<tr><td>${esc(a.replace('|', ' '))}</td><td><select data-person="${esc(a)}"><option value="A"${S.persons[a] !== 'B' ? ' selected' : ''}>аз</option><option value="B"${S.persons[a] === 'B' ? ' selected' : ''}>съпруг/а</option></select></td></tr>`).join('')}</table>` : '';
+    <table>${accts.map(a => `<tr><td>${esc(a.replace('|', ' '))}</td><td><select data-person="${esc(a)}"><option value="A"${personOf(a) !== 'B' ? ' selected' : ''}>аз</option><option value="B"${personOf(a) === 'B' ? ' selected' : ''}>съпруг/а</option></select></td></tr>`).join('')}</table>` : '';
   $('personsBox').querySelectorAll('[data-person]').forEach(el => el.addEventListener('change', () => { S.persons[el.dataset.person] = el.value; render(); }));
 }
 
