@@ -459,6 +459,16 @@ def _short_global_context(short_candidates: list[dict], laggards: list[dict], ne
     return out
 
 
+def preopen_today(today: str, data_dir=None) -> dict | None:
+    """04.11.2026 (четвърти преглед, Н7): data/preopen/<днес>.json, ако обновяването преди отварянето вече е минало днес (повторен сутрешен бриф); иначе / нечетим → None."""
+    p = (data_dir or config.DATA_DIR) / "preopen" / f"{today}.json"
+    try:
+        return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+    except Exception as e:
+        print(f"[main] data/preopen/{today}.json не се прочете ({type(e).__name__}) — страницата е без карето преди отварянето")
+        return None
+
+
 def _market_closed(today: str, data_dir=None) -> dict:
     """
     16.10.2026 (В2а, трети преглед): NYSE е затворена днес (празник от config.NYSE_HOLIDAYS или уикенд) → брифът НЕ върви: без AI, без имейл, без запис в книгите,
@@ -1100,6 +1110,12 @@ def run() -> dict:
         "short_candidates": short_candidates,
         "short_tracker": short_tracker_summary,
     }
+
+    # 04.11.2026 (четвърти преглед, Н7): повторен сутрешен бриф СЛЕД обновяването преди отварянето (ръчно, в същия ден) пази карето — до 04.11 страницата се рендерираше без него,
+    # макар data/preopen/<дата>.json да го имаше. В обичайния сутрешен run файлът за деня още не съществува.
+    pre = preopen_today(today)
+    if pre:
+        brief["preopen"] = pre
 
     # исторически JSON за бъдещия backtest модул
     config.DATA_DIR.mkdir(exist_ok=True)
