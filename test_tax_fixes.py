@@ -30,4 +30,17 @@ assert close(d["shareGains"], 100 + 50), d["shareGains"]          # AAA: 10 × (
 assert [f["duplicates"] for f in r["files"]] == [0, 2], r["files"]   # двата AAA реда от втория файл — дубликати на първия
 assert any("export.csv" in w and "различно съдържание" in w for w in r["warnings"]), r["warnings"]
 print("  ✓ AAA +100 веднъж, BBB +50 → 150; предупреждение за еднаквото име")
+# ── 4. Vorabpauschale: по тикър и година; за X → доход в X+1; приспада се при продажба (§19 InvStG) ──
+print("── 4. Vorabpauschale ──")
+f = std("buy,etf,XWD,2022-03-01,100,50,EUR,0,B,A", "sell,etf,XWD,2024-06-01,40,60,EUR,0,B,A", "sell,etf,XWD,2025-02-01,60,70,EUR,0,B,A")
+r = scenario([{"name": "etf.csv", "text": f}], years=[2023, 2024, 2025], vorab={"XWD": {"2023": 60, "2024": 30}})
+d23, d24, d25 = (r["de"][y] for y in (2023, 2024, 2025))
+assert close(d23["total"], 0), d23["total"]                        # Vorab за 2023 НЕ е доход в 2023
+# 2024: Vorab 2023 = 60 → 60 × 0.7 = 42; продажба 40 × (60 − 50) = 400 − 40 × 60/100 = 376 → × 0.7 = 263.2; общо 305.2
+assert close(d24["total"], 42 + 263.2), d24["total"]
+# 2025: Vorab 2024 = 30 → 21; продажба 60 × 20 = 1200 − 60 × 0.6 (2023) − 60 × 30/60 (2024) = 1134 → × 0.7 = 793.8; общо 814.8
+assert close(d25["total"], 21 + 793.8), d25["total"]
+assert any("приспаднати Vorabpauschalen" in n["text"] for n in d25["notes"]) and any("2 януари 2025" in n["text"] for n in d25["notes"])
+print("  ✓ 2023: 0; 2024: 42 + 263.2 = 305.2; 2025: 21 + 793.8 = 814.8 (Vorab за X — доход в X+1, приспадната при продажбата)")
+
 print("\n✅ test_tax_fixes: всичко мина")

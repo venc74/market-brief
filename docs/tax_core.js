@@ -534,6 +534,22 @@
     const fundType = (sym, hint) => (st.fundTypes || {})[sym] || (hint ? 'equity' : 'stock');
     const tfOf = t => (t === 'stock' || !tfRates) ? 0 : (tfRates[t] || 0);
     const R = fifoRes.realized.filter(x => x.year === year);
+    // Vorabpauschale (05.11.2026): st.vorab = {тикър: {година X: EUR}} — сумата за X (всички дялове в края на X) се смята за получена на първия работен ден на X+1
+    // (§18 ал. 3 InvStG) → доход в X+1; при продажба печалбата се намалява с Vorabpauschalen за годините, в чийто край продаденият лот е бил държан (§19 ал. 1),
+    // пропорционално на броя дялове (сумата ÷ дяловете в края на X; сплит след X — превърнат). Да се потвърди за дялове, купени през годината (там се смята по месеци).
+    const recs = st.records || [];
+    const unitsAt = (sym, d) => { let q = 0; recs.forEach(r => { if (r.sym !== sym || r.date > d || r.assetClass === 'crypto') return; if (r.kind === 'trade') q += r.qty; else if (r.kind === 'split') q *= r.ratio; }); return q; };
+    const splitFactor = (sym, after, upTo) => recs.filter(r => r.kind === 'split' && r.sym === sym && r.date > after && r.date <= upTo).reduce((f, r) => f * r.ratio, 1);
+    const vorabOf = sym => { const v = (st.vorab || {})[sym]; return v && typeof v === 'object' ? v : {}; };
+    const vorabDeduction = x => {
+      let red = 0;
+      Object.entries(vorabOf(x.sym)).forEach(([X, amt]) => {
+        const end = `${X}-12-31`, a = Number(amt); if (!(a > 0) || !(x.date > end)) return;
+        const units = unitsAt(x.sym, end); if (!(units > 1e-9)) return;
+        (x.lots || []).forEach(l => { if (l.date <= end) red += a / units * l.qty / splitFactor(x.sym, end, x.date); });
+      });
+      return red;
+    };
     const I = fifoRes.incomes.filter(x => x.year === year);
     const items = [];                                                              // всеки ред от разбивката: {cat, sym, date, eur, gross, note}
     const notes = [];
@@ -546,7 +562,10 @@
       if (ft === 'stock') { items.push({ cat: x.gainEUR >= 0 ? 'shareGains' : 'shareLosses', sym: x.sym, date: x.date, eur: x.gainEUR, gross: x.gainEUR, account: x.account }); return; }
       fundsSeen[x.sym] = ft;
       const tf = tfOf(ft);
-      items.push({ cat: x.gainEUR >= 0 ? 'funds' : 'fundLosses', sym: x.sym, date: x.date, eur: x.gainEUR * (1 - tf), gross: x.gainEUR, fundType: ft, tf, account: x.account });
+      const red = vorabDeduction(x);                                               // §19 ал. 1 InvStG: печалбата − Vorabpauschalen за времето на държане
+      const g = x.gainEUR - red;
+      if (red > 0) notes.push({ level: 'info', text: `${x.sym} (${x.date}): от печалбата при продажбата са приспаднати Vorabpauschalen ${TC.fmt(red)} (§19 ал. 1 InvStG; да се потвърди).` });
+      items.push({ cat: g >= 0 ? 'funds' : 'fundLosses', sym: x.sym, date: x.date, eur: g * (1 - tf), gross: g, fundType: ft, tf, account: x.account, vorabDeducted: red });
     });
     // доходи: дивиденти по тикър (нето със сторното), удържан данък по тикър, лихви
     const div = {}, wh = {};
@@ -567,10 +586,10 @@
       else debit.push(x);
     });
     if (debit.length) notes.push({ level: 'info', text: `Дебитна лихва ${TC.fmt(-debit.reduce((s, x) => s + x.eur, 0))} — не се приспада от доходите от капитал (§20 ал. 9 EStG; да се потвърди).` });
-    Object.entries(st.vorab || {}).forEach(([sym, v]) => {
-      const amt = Number(v); if (!(amt > 0)) return;
+    Object.keys(st.vorab || {}).forEach(sym => {                                    // Vorabpauschale за предходната година → доход в тази
+      const amt = Number(vorabOf(sym)[year - 1]); if (!(amt > 0)) return;
       const ft = fundType(sym, true); const tf = tfOf(ft); fundsSeen[sym] = ft;
-      items.push({ cat: 'funds', sym, eur: amt * (1 - tf), gross: amt, fundType: ft, tf, vorab: true });
+      items.push({ cat: 'funds', sym, date: `${year}-01-02`, eur: amt * (1 - tf), gross: amt, fundType: ft, tf, vorab: true, vorabFor: year - 1 });
     });
     // удържан чужд данък: до creditRate (15%) от брутния дивидент на същия тикър
     const rate = st.creditRate == null ? 0.15 : Number(st.creditRate);
@@ -612,7 +631,7 @@
     const tax = Math.max(0, (e - 4 * q) / (4 + k));
     const est = { pauschbetrag: pausch, taxableAfterPausch: e, creditUsed: q, kircheRate: k, abgeltung: tax, soli: tax * par.soli, kirche: tax * k, total: tax * (1 + par.soli + k) };
     // предупреждения
-    const yEnd = `${year}-12-31`;
+    const yEnd = `${year - 1}-12-31`;                                               // за Vorabpauschale, която е доход в тази година — държаните в края на предходната
     const held = {};
     (st.records || []).forEach(r => {
       if (r.date > yEnd) return;
@@ -621,7 +640,7 @@
       if (r.kind === 'split') Object.keys(held).forEach(k2 => { const h = held[k2]; if (h.sym === r.sym && h.broker === r.broker && h.account === r.account) h.qty *= r.ratio; });
     });
     const heldFunds = [...new Set(Object.values(held).filter(h => h.qty > 1e-9 && h.cls === 'stock' && fundType(h.sym, h.hint) !== 'stock').map(h => h.sym))];
-    if (heldFunds.length && tfRates) notes.push({ level: 'warn', text: `Фондове, държани в края на ${year}: ${heldFunds.join(', ')}. Ако са натрупващи (без изплащане), за ${year} може да има Vorabpauschale — сметни я и я въведи ръчно в таблицата с фондовете (да се потвърди).` });
+    if (heldFunds.length && tfRates && year - 1 >= 2018) notes.push({ level: 'warn', text: `Фондове, държани в края на ${year - 1}: ${heldFunds.join(', ')}. Ако са натрупващи (без изплащане), Vorabpauschale за ${year - 1} се смята за получена на 2 януари ${year} (§18 ал. 3 InvStG) — доход в ${year}; сметни я и я въведи в таблицата с фондовете (колона „за ${year - 1}“). При продажба тя се приспада от печалбата (§19 InvStG). Да се потвърди.` });
     if (!tfRates && Object.keys(fundsSeen).length) notes.push({ level: 'warn', text: `Преди 2018 фондовете се облагат по стария InvStG — частичното освобождаване не е приложено (да се потвърди).` });
     const fx = new Set();
     (st.info || []).forEach(i => (i.nonBaseCash || []).forEach(c => fx.add(c.currency)));
