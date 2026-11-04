@@ -423,6 +423,69 @@ def _plural(n: int, one: str, many: str) -> str:
     return f"{n} {one if n == 1 else many}"
 
 
+_STATUS_BG = {"green": "зелено", "yellow": "жълто", "red": "червено"}
+
+
+def _state(i: dict | None) -> str | None:
+    if not i:
+        return None
+    return "скрит" if i.get("hide") else _STATUS_BG.get(i.get("status"))
+
+
+def regime_change(prev: dict | None, thermo: dict | None, prev_date: str | None = None) -> dict | None:
+    """
+    04.11.2026 (прегледът, т. 3): какво промени режима спрямо предишния бриф — от кода, само когато режимът е различен. → {"from", "to", "prev_date", "changes": [...], "why", "text"}, иначе None.
+    Реално 04.11: Defensive → Offensive: „MOVE жълто → зелено (100) — 4 зелени = минимумът за Offensive“. changes — броените индикатори със сменен цвят (информативните не решават);
+    why — правилото от _count_regime (Offensive: ≥ 4 зелени, 0 червени, ≥ THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE видими; Cash: ≥ 3 червени) или override / блокът от distribution days. Чиста функция, не вдига.
+    """
+    try:
+        p, t = prev or {}, thermo or {}
+        a, b = p.get("regime"), t.get("regime")
+        if not a or not b or a == b:
+            return None
+        old = {i.get("name"): i for i in p.get("indicators") or []}
+        changes = []
+        for i in t.get("indicators") or []:
+            if i.get("informational"):
+                continue
+            x, y = _state(old.get(i.get("name"))), _state(i)
+            if x and y and x != y:
+                short = str(i.get("name")).split(" (")[0]
+                val = f" ({i['value']:g})" if isinstance(i.get("value"), (int, float)) and not i.get("hide") else ""
+                changes.append(f"{short} {x} → {y}{val}")
+        counted = [i for i in t.get("indicators") or [] if not i.get("informational") and not i.get("hide")]
+        G, R_ = sum(i.get("status") == "green" for i in counted), sum(i.get("status") == "red" for i in counted)
+        word = lambda n, one, many: f"{n} {one if n == 1 else many}"
+        mv = config.THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE
+        ov = [o.get("text") for o in t.get("overrides") or [] if isinstance(o, dict) and o.get("text")]
+        cap = (t.get("distribution_cap") or {}).get("text")
+        if ov:
+            why = ov[0]
+        elif cap and b != "Offensive":
+            why = cap
+        elif b == "Offensive":
+            why = word(G, "зелен", "зелени") + (" = минимумът за Offensive" if G == 4 else " при минимум 4 за Offensive") + (", 0 червени" if a == "Cash" else "")
+        elif b == "Cash":
+            why = word(R_, "червен", "червени") + " — Cash е при поне 3"
+        elif a == "Cash":
+            why = word(R_, "червен", "червени") + " — под 3 за Cash"
+        elif R_:
+            why = word(R_, "червен", "червени") + " — Offensive иска 0"
+        elif len(counted) < mv:
+            why = f"видими {len(counted)} — Offensive иска поне {mv}"
+        else:
+            why = word(G, "зелен", "зелени") + " — под минимума 4 за Offensive"
+        if p.get("overrides") and not ov:
+            why += " · override-ът отпадна"
+        if p.get("distribution_cap") and not cap:
+            why += " · блокът от distribution days падна"
+        body = ", ".join(changes)
+        return {"from": a, "to": b, "prev_date": prev_date, "changes": changes, "why": why, "text": f"{a} → {b}: " + (f"{body} — {why}" if body else why)}
+    except Exception as e:
+        print(f"[regime_claims] какво промени режима: {type(e).__name__}: {e}")
+        return None
+
+
 def margin(thermo: dict | None, distribution_days: dict | None = None, dd_status: dict | None = None) -> dict:
     """
     15.10.2026 · "Запас до смяна на режима" — готово от кода (за картата на термометъра и за макро промпта): {"text", "parts"}. Части:

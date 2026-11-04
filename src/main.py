@@ -525,6 +525,11 @@ def run() -> dict:
     thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days, dict(entry_timing.LAST_STATUS))
     if thermo["regime_margin"]["text"]:
         print(f"      {thermo['regime_margin']['text']}")
+    # 04.11.2026 (прегледът, т. 3): какво промени режима спрямо предишния бриф — от кода, само при смяна
+    prev_for_regime = data_rhythm.previous_brief(today) or {}
+    thermo["regime_change"] = regime_claims.regime_change(prev_for_regime.get("thermometer"), thermo, prev_for_regime.get("date"))
+    if thermo["regime_change"]:
+        print(f"      Какво промени режима: {thermo['regime_change']['text']}")
 
     print("[3/7] Слой 2: секторна ротация…")
     # FIX 2026-10-03 (пакет 2 т.6): паднал Yahoo не сваля run-а — sector_rotation() връща [] и записва причината

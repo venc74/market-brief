@@ -903,6 +903,7 @@ def render_email(brief: dict) -> str:
       {_e(regime.upper())}</span>
     <span style="margin-left:12px">{thermo_dots}</span>
     <div style="color:#374151;font-size:13px;margin-top:10px">{regime_line}</div>
+    {(f'<div style="color:#111827;font-size:13px;margin-top:6px"><b>Какво промени режима:</b> {_e(t["regime_change"]["text"])}</div>') if (t.get("regime_change") or {}).get("text") else ""}
     {hidden_line}
     {(f'<div style="color:#b45309;font-size:13px;margin-top:8px">📅 {_e(brief["market_calendar_note"])}</div>') if brief.get("market_calendar_note") else ""}
   </td></tr>

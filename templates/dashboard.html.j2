@@ -618,6 +618,8 @@
     </div>
     {% endif %}
   </div>
+  {# 04.11.2026 (прегледът, т. 3): какво промени режима спрямо предишния бриф — от кода, само при смяна (regime_claims.regime_change) #}
+  {% set rc = thermometer.regime_change %}{% if rc and rc.text %}<div class="small" style="font-size:12.5px;margin-top:8px"><b>Какво промени режима{% if rc.prev_date %} от предишния бриф ({{ rc.prev_date[8:10] }}.{{ rc.prev_date[5:7] }}){% endif %}:</b> {{ rc.text }}</div>{% endif %}
   {# 15.10.2026: запас до смяна на режима — от кода (regime_claims.margin): колко червени сменят режима, distribution days, IEI/HYG спрямо прага, близките прагове #}
   {% if thermometer.regime_margin and thermometer.regime_margin.text %}
   <div class="small" style="font-size:12.5px;color:var(--muted);margin-top:8px"><b>Запас до смяна на режима:</b> {{ thermometer.regime_margin.parts|join(" · ") }}</div>
