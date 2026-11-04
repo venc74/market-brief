@@ -245,6 +245,9 @@ def email_html(res: dict) -> str:
              f"(Yahoo, 5-минутни бари); обемът там често липсва.</span>"]
     if volume_note(res):
         parts.append(f"<div style='margin-top:6px;color:#92400e'>⚠ {e(volume_note(res))}.</div>")
+    cov = res.get("coverage") or {}
+    if cov.get("partial"):                                                          # 04.11.2026 (С3)
+        parts.append(f"<div style='margin-top:6px;color:#991b1b'>⚠ Частично: {e(cov['reason'])} — празното НЕ значи, че няма гапове.</div>")
     if res.get("gaps"):
         parts.append("<div style='margin-top:10px'><b>EP — гапове ≥ +%g%% в премаркета</b></div>" % config.PREOPEN_GAP_PCT)
         parts.append(li([f"<b>{e(g['ticker'])}</b> {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
@@ -265,16 +268,22 @@ def email_html(res: dict) -> str:
     return "".join(parts) + "</div>"
 
 
+LAST_FETCH: dict = {}          # 04.11.2026 (С3): {"batches", "batches_failed"} от последното fetch_5m
+
+
 def fetch_5m(tickers: list[str], batch_size: int | None = None) -> dict:
-    """5-минутни бари с премаркет за последните 2 дни, на партиди (както qm_ep.fetch_5m). Партида с провал — ред в лога, останалите минават."""
+    """5-минутни бари с премаркет за последните 2 дни, на партиди (както qm_ep.fetch_5m). Партида с провал — ред в лога и LAST_FETCH (04.11.2026, С3), останалите минават."""
     import yfinance as yf
     out = {}
     bs = batch_size or config.QM_EP_BATCH
+    LAST_FETCH.clear()
+    LAST_FETCH.update(batches=(len(tickers) + bs - 1) // bs, batches_failed=0)
     for i in range(0, len(tickers), bs):
         batch = tickers[i:i + bs]
         try:
             data = yf.download(batch, period="2d", interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
         except Exception as e:
+            LAST_FETCH["batches_failed"] += 1
             print(f"[preopen] партида {i // bs + 1}: {type(e).__name__}: {e}")
             continue
         for t in batch:
@@ -287,8 +296,25 @@ def fetch_5m(tickers: list[str], batch_size: int | None = None) -> dict:
     return out
 
 
+def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = None) -> dict:
+    """
+    04.11.2026 (четвърти преглед, С3): {"with_pm", "requested", "batches", "batches_failed", "partial", "reason"} — „частично“ при паднала партида, непълен универс или под
+    config.PREOPEN_MIN_PM_SHARE от поисканите с бари в премаркета. До 04.11 ok = „поне един тикър“ и карето казваше „Нищо за отбелязване … в универса“ и при 5 от 918. Чиста функция.
+    """
+    n, k = diag.get("requested") or 0, diag.get("with_pm") or 0
+    fetch = fetch or {}
+    why = []
+    if fetch.get("batches_failed"):
+        why.append(f"{fetch['batches_failed']} от {fetch.get('batches')} партиди не се изтеглиха")
+    if n and k < config.PREOPEN_MIN_PM_SHARE * n:
+        why.append(f"премаркет само за {k} от {n} тикъра")
+    if universe_note:
+        why.append(universe_note)
+    return {"with_pm": k, "requested": n, "batches": fetch.get("batches"), "batches_failed": fetch.get("batches_failed"), "partial": bool(why), "reason": "; ".join(why) or None}
+
+
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
-        universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None) -> dict:
+        universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -309,10 +335,12 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         qm_cards = brief.get("qm_breakout") or []
         extra = [c.get("ticker") for c in waiting + qm_cards] + [r.get("ticker") for r in records or []] + list(watched or [])
         tickers = list(dict.fromkeys([t for t in list(universe or []) + extra if t]))
+        LAST_FETCH.clear()
         if frames5 is None:
             frames5 = (fetch5 or fetch_5m)(tickers)
         pts, gaps, diag = scan(frames5, now)
         res["diag"] = {**diag, "requested": len(tickers)}
+        res["coverage"] = coverage(res["diag"], dict(LAST_FETCH), universe_note)          # 04.11.2026 (С3): „премаркет за N от M“ и „частично“
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
@@ -323,6 +351,8 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["notes"].append(f"{type(e).__name__}: {e}")
         print(f"[preopen] пропадна: {type(e).__name__}: {e}")
     res["seconds"] = round(time.monotonic() - t0, 1)
+    if (res.get("coverage") or {}).get("partial"):
+        print(f"::warning::[preopen] частично: {res['coverage']['reason']}")
     print(f"[preopen] {res['date']} {res['time_ny']} Ню Йорк: тикъри с премаркет {res['diag'].get('with_pm')} от {res['diag'].get('requested')}, гапове ≥ "
           f"{config.PREOPEN_GAP_PCT:g}% {len(res['gaps'])}, нива {len(res['levels'])}, наблюдавани {len(res['watch'])} ({res['seconds']} s)")
     return res
@@ -366,8 +396,17 @@ def main(now_utc=None) -> int:
     except Exception as e:
         print(f"[preopen] книгите не се прочетоха: {type(e).__name__}: {e}")
         records = []
-    res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=screener.build_universe(),
-              name_lookup=lambda t: watch_monitor.load_watch_names().get(t))
+    universe, universe_note = [], None                                             # 04.11.2026 (С3): банерът за универса (както сутрешният бриф — screener.LAST_UNIVERSE_SOURCES)
+    try:
+        universe = screener.build_universe()
+        bad = [v for v in screener.LAST_UNIVERSE_SOURCES.values() if not v.get("ok")]
+        if bad:
+            universe_note = "универсът е непълен — " + "; ".join(f"{v.get('name')}: {v.get('reason')}" for v in bad)
+    except Exception as e:
+        universe_note = f"универсът не се зареди ({type(e).__name__}) — проверени са само картите, книгите и наблюдаваните"
+        print(f"::warning::[preopen] {universe_note}: {e}")
+    res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=universe,
+              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note)
     res["email"] = prev.get("email") or {"sent": False}
     if has_news(res) and not res["email"].get("sent"):
         subj = (f"Преди отварянето · {day[8:10]}.{day[5:7]} — " + ", ".join(x for x in (f"{len(res['gaps'])} гапа" if res["gaps"] else "",
