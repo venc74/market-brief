@@ -792,7 +792,8 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
         print(f"[ai] проверката за изтекли клаузи пропусната: {type(e).__name__}: {e}")
     try:                                                                         # 30.10.2026 (поправки от брифа, т. 4): числата в разказа — срещу входовете
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
-            new, fixed = check_narrative_numbers(out["macro_brief"], narrative_sources(macro, rotation, thermometer, news, crypto, social))
+            new, fixed = check_narrative_numbers(out["macro_brief"], narrative_sources(macro, rotation, thermometer, news, crypto, social),
+                                                 narrative_dates(macro, rotation, thermometer, news, crypto, social))         # 04.11.2026 (С4): датите от входа
             if fixed:
                 out = {**out, "macro_brief": new, "numbers_fixed": fixed}
                 for f in fixed:
@@ -861,6 +862,59 @@ def narrative_sources(macro: dict | None, rotation: list | None, thermometer: di
     return vals
 
 
+_BG_MONTH = {"януари": 1, "февруари": 2, "март": 3, "април": 4, "май": 5, "юни": 6, "юли": 7, "август": 8, "септември": 9, "октомври": 10, "ноември": 11, "декември": 12}
+# 04.11.2026 (четвърти преглед, С4): дата с името на месеца в разказа („към 28 октомври“, „на 3 ноември 2026 г.“) — с предлога пред нея
+_DATE_BG = re.compile(r"(?P<prep>\s*\b(?:към|на|от|до|след|преди|около)\s+)?\b(?P<d>\d{1,2})\s+(?P<m>" + "|".join(_BG_MONTH) + r")\b(?:\s+(?P<y>\d{4})(?:\s*г\.)?)?", re.I)
+
+
+def narrative_dates(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
+                    social: dict | None = None) -> set[tuple[int, int]]:
+    """
+    04.11.2026 (четвърти преглед, С4): датите (ден, месец) от ISO датите във входовете на разказа (as_of на уредите, макрото, ротацията …). narrative_sources оставя от датата само
+    годината — затова на 03.11 „към 28 октомври“ (Net Liquidity, as_of 2026-10-28 — вярно) беше махнато като число без опора и остана „към —“. Чиста функция.
+    """
+    out: set[tuple[int, int]] = set()
+
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, (list, tuple)):
+            for v in o:
+                walk(v)
+        elif isinstance(o, str):
+            for m in re.finditer(r"\b\d{4}-(\d{2})-(\d{2})\b", o):
+                out.add((int(m.group(2)), int(m.group(1))))
+    for x in (macro or {}, rotation or [], _thermo_context(thermometer), thermometer or {}, social or {}, news or [], (crypto or {}).get("items") or []):
+        walk(x)
+    return out
+
+
+def _mask_dates(sent: str, dates: set | None) -> tuple[str, list[str], list[str]]:
+    """
+    04.11.2026 (С4): датите с името на месеца → (изречението с маски за датите от входа, маските, махнатите дати без опора — заедно с предлога). Чиста функция.
+    Дата от входа не е число за проверка; дата без опора пада цялата („ към 27 октомври“), не само числото — иначе остава „към —“.
+    """
+    if dates is None:
+        return sent, [], []
+    masks, removed = [], []
+
+    def repl(m):
+        d, mo = int(m.group("d")), _BG_MONTH[m.group("m").lower()]
+        if (d, mo) in dates:
+            masks.append(m.group(0))
+            return f"\x01{'abcdefghijklmnopqrstuvwxyz'[(len(masks) - 1) % 26]}\x01"
+        removed.append(m.group(0).strip())
+        return ""
+    return _DATE_BG.sub(repl, sent), masks, removed
+
+
+def _unmask_dates(s: str, masks: list[str]) -> str:
+    for k, txt in enumerate(masks):
+        s = s.replace(f"\x01{'abcdefghijklmnopqrstuvwxyz'[k % 26]}\x01", txt, 1)
+    return s
+
+
 def _supported(tok: str, vals: list[float]) -> bool:
     v = _num_value(tok)
     if v is None:
@@ -870,26 +924,33 @@ def _supported(tok: str, vals: list[float]) -> bool:
     return any(eq(y) or eq(y * 100) for y in vals)                                 # и % ↔ б.п. (2s10s 0.44 = 44 б.п.)
 
 
-def check_narrative_numbers(text: str, vals: list[float]) -> tuple[str, list[dict]]:
+def check_narrative_numbers(text: str, vals: list[float], dates: set | None = None) -> tuple[str, list[dict]]:
     """
     Разказът (абзаци) → (поправеният текст, [{sentence, removed}]): число без опора във входовете (vals) — частта с него пада (_why_trim_sentence); при 2+ такива
     числа в изречението — цялото изречение (остатъкът е нечетим). Имената ("S&P 500", "Q3", "40-дневни", "CLZ26") не се броят. Чиста функция.
+    04.11.2026 (четвърти преглед, С4): dates — (ден, месец) от входа (narrative_dates): дата с името на месеца, която я има във входа, не е число за проверка; без опора — пада
+    заедно с предлога. dates=None — както до 04.11 (датата се проверява като число).
     """
     from src import news_aggregator as na
     fixed = []
 
     def one(para: str):
         kept = []
-        for sent in na._WHY_SENT.split(para):
+        for sent0 in na._WHY_SENT.split(para):
+            sent, masks, gone = _mask_dates(sent0, dates)
             toks = na._NUM_RE.findall(na._WHY_NAME.sub(" ", _THOUSANDS.sub("", sent)))
             have = {t.replace(",", ".") for t in toks if _supported(t, vals)}
             if len(have) == len({t.replace(",", ".") for t in toks}):
-                kept.append(sent)
+                if gone:
+                    sent = re.sub(r"\s+([,.;:!?)])", r"\1", re.sub(r"\s{2,}", " ", sent)).strip()
+                    fixed.append({"sentence": sent0, "removed": gone, "kept": _unmask_dates(sent, masks)})
+                kept.append(_unmask_dates(sent, masks))
                 continue
             new, removed = na._why_trim_sentence(_THOUSANDS.sub("", sent), have)              # хилядите без запетая — "4,103.9" е едно число
             if new and len(removed) >= 2:                                                       # 2+ махнати числа — остатъкът е нечетим ("(WTI, но )"): пада изречението
-                new, removed = "", [sent]
-            fixed.append({"sentence": sent, "removed": removed, "kept": new or None})
+                new, removed = "", [sent0]
+            new = _unmask_dates(new, masks) if new else new
+            fixed.append({"sentence": sent0, "removed": gone + removed, "kept": new or None})
             if new:
                 kept.append(new)
         return " ".join(kept), []
