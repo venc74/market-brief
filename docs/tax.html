@@ -253,7 +253,7 @@ function render() {
 }
 
 function renderFunds(de) {
-  const syms = [...new Set(S.fifo.realized.concat(S.ing.records).filter(x => (x.assetClass === 'stock') && x.sym).map(x => x.sym))].sort();
+  const syms = [...new Set(S.fifo.realized.concat(S.ing.records).filter(x => (x.assetClass === 'stock' || x.assetClass === 'fund') && x.sym).map(x => x.sym))].sort();
   const hint = sym => S.ing.records.some(r => r.sym === sym && r.fundHint);
   const opts = (sym) => Object.entries(TC.FUND_TYPES).map(([k, v]) => `<option value="${k}"${(S.fundTypes[sym] || (hint(sym) ? 'equity' : 'stock')) === k ? ' selected' : ''}>${esc(v)}</option>`).join('');
   $('fundsBox').innerHTML = `<div class="small" style="margin-bottom:6px"><b>Акции и фондове</b> — отбележи кои са фондове (ETF) и какви; частичното освобождаване зависи от вида (акционерен 30%, смесен 15%, имотен 60% / 80%). Предложението „фонд“ идва от типа в отчета на IBKR — провери го.</div>

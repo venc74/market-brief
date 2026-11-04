@@ -89,4 +89,21 @@ d = scenario([{"name": "ca.csv", "text": ca}], years=[2024])["de"][2024]
 assert [x["section"] for x in d["skippedTaxable"]] == ["Corporate Actions"] and not d["complete"], d["skippedTaxable"]   # Forex — в списъка, но не прави годината непълна
 print("  ✓ размяна BTC → ETH (2024) и сливане с пари (2024) → НЕПЪЛНО за 2024; 2023 — пълна; Forex не брои")
 
+# ── 8. сплит в Revolut чрез стандартен CSV; Mutual Funds — фонд ──
+print("── 8. сплит в Revolut; Mutual Funds ──")
+rs = "Date,Ticker,Type,Quantity,Price per share,Total Amount,Currency,FX Rate\n" + "\n".join(["2023-01-10T14:35:00.000Z,ZZZ,BUY - MARKET,10,EUR 100.00,EUR 1000.00,EUR,1",
+     "2023-09-01T09:00:00.000Z,ZZZ,STOCK SPLIT,10,,,EUR,1", "2024-01-10T14:35:00.000Z,ZZZ,SELL - MARKET,20,EUR 60.00,EUR 1200.00,EUR,1"]) + "\n"
+sp = "type,asset_type,ticker,date,quantity,price,currency\nsplit,stock,ZZZ,2023-09-01,2,0,EUR\n"
+d = scenario([{"name": "rev.csv", "text": rs}, {"name": "split.csv", "text": sp}], years=[2024])["de"][2024]
+assert close(d["total"], 20 * 60 - 1000) and d["complete"], (d["total"], d["unmatched"])            # +200 (до 05.11: −400 и 10 бр. „липсва покупката“)
+ib = IB("Trades,Data,Order,Stocks,EUR,ZZZ,\"2023-01-10, 10:00:00\",10,100,100,-1000,0,1000,0,0,O", "Trades,Data,Order,Stocks,EUR,ZZZ,\"2024-01-10, 10:00:00\",-20,60,60,1200,0,-1000,200,0,C",
+        "Corporate Actions,Header,Asset Category,Currency,Report Date,Date/Time,Description,Quantity,Proceeds,Value,Realized P/L,Code",
+        "Corporate Actions,Data,Stocks,EUR,2023-09-01,\"2023-09-01, 20:25:00\",\"ZZZ(US0000000ZZ1) Split 2 for 1 (ZZZ, ZED CORP, US0000000ZZ1)\",10,0,0,0,")
+d = scenario([{"name": "rev.csv", "text": rs}, {"name": "split.csv", "text": sp}, {"name": "ib.csv", "text": ib}], years=[2024])["de"][2024]
+assert close(d["total"], 2 * 200) and d["complete"], (d["total"], d["unmatched"])                    # IBKR сплит + ред „за всички сметки“ → веднъж, не 4:1
+mf = IB("Trades,Data,Order,Mutual Funds,EUR,MFX,\"2024-01-10, 10:00:00\",100,10,10,-1000,0,1000,0,0,O", "Trades,Data,Order,Mutual Funds,EUR,MFX,\"2024-06-10, 10:00:00\",-100,8,8,800,0,-1000,-200,0,C")
+d = scenario([{"name": "mf.csv", "text": mf}], years=[2024])["de"][2024]
+assert close(d["shareLosses"], 0) and close(d["otherNeg"], 200 * 0.7) and d["funds"] == {"MFX": "equity"}, d   # −200 → загуба от фонд × 0.7 (не загуба от акции)
+print("  ✓ Revolut ZZZ 10 → сплит 2:1 от CSV → продадени 20: +200; заедно с IBKR сплит — веднъж; Mutual Fund −200 → −140 в общите загуби")
+
 print("\n✅ test_tax_fixes: всичко мина")

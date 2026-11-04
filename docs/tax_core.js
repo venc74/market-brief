@@ -217,7 +217,7 @@
         recs.push({ ...b, kind: 'interest', date: dt.date, amount: qty, desc: 'interest' });
       } else if (type === 'split') {
         if (!(qty > 0)) return bad('сплит без коефициент (quantity = нови акции за една стара)');
-        recs.push({ ...b, kind: 'split', date: dt.date, ratio: qty });
+        recs.push({ ...b, broker: r.broker || '*', account: r.account || '*', kind: 'split', date: dt.date, ratio: qty });
       } else bad(`непознат тип „${r.type}“`);
     });
     if (!head) throw new Error(`${src}: празен файл`);
@@ -288,7 +288,8 @@
     Object.entries(byName).filter(([, t]) => t.size > 1).forEach(([n]) =>
       out.warnings.push(`${t_count(files, n)} файла с име „${n}“ и различно съдържание — сметнати са поотделно; записите, които се повтарят в тях, са броени веднъж (виж колоната „Дубликати“).`));
     // типът на инструмента от IBKR („Financial Instrument Information“ — ETF) важи за всички файлове: застъпващ се отчет без тази секция не губи подсказката
-    out.records.forEach(x => { if (x.kind === 'trade' && out.instruments[x.sym] && /ETF|FUND/i.test(out.instruments[x.sym].type)) x.fundHint = true; });
+    // Mutual Funds на IBKR (клас 'fund') — винаги фонд (05.11.2026: смятаха се като акции и не бяха в таблицата с видовете фондове)
+    out.records.forEach(x => { if (x.kind === 'trade' && (x.assetClass === 'fund' || (out.instruments[x.sym] && /ETF|FUND/i.test(out.instruments[x.sym].type)))) x.fundHint = true; });
     // „не е сметнато“ — също веднъж за застъпващи се отчети (ключ без името на файла)
     const seenSkip = new Set();
     out.skipped = out.skipped.filter(x => { const k = [x.broker, x.account, x.section, x.what, x.date, x.reason].join('|'); if (x.line && seenSkip.has(k)) return false; seenSkip.add(k); return true; });
@@ -340,7 +341,7 @@
           recs.push({ ...b, line, kind: 'dividend', sym: r['ticker'], date: dt.date, amount: total.v, currency: total.cur || cur, desc: 'Revolut DIVIDEND (сумата в отчета — да се провери дали е брутна)' });
         } else if (/CASH TOP-UP|CASH WITHDRAWAL|TRANSFER/.test(type)) {
           return;                                                                 // движение на пари — не е доход
-        } else if (/SPLIT/.test(type)) skip('сплит в Revolut — коефициентът не е в отчета; въведи го като ред „split“ в стандартен CSV');
+        } else if (/SPLIT/.test(type)) skip(`сплит в Revolut — коефициентът не е в отчета; добави стандартен CSV с ред: type=split, ticker=${r['ticker'] || 'тикър'}, date, quantity = нови акции за една стара (без broker / account — важи за всички сметки)`);
         else if (/FEE/.test(type)) skip('такса извън сделките — не се приспада (§20 ал. 9 EStG; да се потвърди)');
         else skip(`непознат тип „${r['type']}“`, true);
       });
@@ -429,6 +430,9 @@
   // По брокер / сметка / инструмент (крипто — отделно по портфейл); от най-старата покупка, през всички години; комисионните — в цената на покупката и намаляват продажбата.
   // Продажба без покупка (акции, фондове, крипто) → unmatched, без резултат за непокритата част (никога цена 0). Опции: продажба без позиция отваря къса позиция (Stillhalter).
   // Сплит: отворените лотове ×коефициента (цената общо не се мени). Курсът — по датата на всяка сделка (покупка — към деня на покупката, продажба — към деня на продажбата).
+  // сплит → позиция: същият брокер и сметка; ред от стандартен CSV без брокер / сметка ('*') важи за тикъра във всички сметки (без крипто) — 05.11.2026,
+  // за сплит в Revolut (отчетът няма коефициента; „не е сметнато“ казва как да се добави)
+  TC.splitApplies = (sp, broker, account, cls) => (sp.broker === '*' ? cls !== 'crypto' : sp.broker === broker) && (sp.account === '*' || sp.account === account);
   TC.positionKey = r => [r.broker, r.account, r.assetClass === 'crypto' ? 'crypto' : 'sec', r.sym].join('|');
 
   // opts.stillhalter (05.11.2026): 'receipt' (по подразбиране) — премията е доход в годината на получаване, обратното изкупуване — отрицателен доход в годината на плащане
@@ -440,10 +444,11 @@
     const tainted = {};                                                            // ключ → първата непокрита продажба (резултатите след нея — несигурни)
     const eps = 1e-9;
     records.forEach(r => {
-      if (r.kind === 'split') {
+      if (r.kind === 'split') {                                                    // веднъж на позиция: ред от IBKR за сметката и ред „за всички сметки“ от стандартен CSV не се натрупват
         Object.keys(pos).forEach(k => {
-          const [b, a, , sym] = k.split('|');
-          if (b === r.broker && a === r.account && sym === r.sym) pos[k].long.concat(pos[k].short).forEach(l => { l.qty *= r.ratio; });
+          const [b, a, c, sym] = k.split('|'), sk = r.date + '|' + r.ratio, P0 = pos[k];
+          if (sym !== r.sym || !TC.splitApplies(r, b, a, c) || (P0.splits = P0.splits || new Set()).has(sk)) return;
+          P0.splits.add(sk); P0.long.concat(P0.short).forEach(l => { l.qty *= r.ratio; });
         });
         return;
       }
@@ -538,10 +543,11 @@
       (records || []).forEach(r => {
         if (r.broker !== 'IBKR' || r.date > i.periodEnd) return;
         if (r.kind === 'trade' && r.account === i.account) held[r.sym] = (held[r.sym] || 0) + r.qty;
-        if (r.kind === 'split' && r.account === i.account && held[r.sym] != null) held[r.sym] *= r.ratio;
+        const sk = r.sym + '|' + r.date + '|' + r.ratio;
+        if (r.kind === 'split' && TC.splitApplies(r, 'IBKR', i.account, 'sec') && held[r.sym] != null && !(held['\u0000' + sk])) { held[r.sym] *= r.ratio; held['\u0000' + sk] = 1; }
       });
       const rep = {}; i.openPositions.filter(o => o.account === i.account).forEach(o => { rep[o.sym] = (rep[o.sym] || 0) + o.qty; });
-      [...new Set(Object.keys(held).concat(Object.keys(rep)))].forEach(sym => {
+      [...new Set(Object.keys(held).concat(Object.keys(rep)))].filter(sym => sym[0] !== '\u0000').forEach(sym => {
         const a = rep[sym] || 0, b = held[sym] || 0;
         if (Math.abs(a - b) > 1e-6) out.push({ account: i.account, sym, date: i.periodEnd, year: Number(i.periodEnd.slice(0, 4)), reported: a, computed: +b.toFixed(6), file: i.file });
       });
@@ -582,8 +588,9 @@
     // (§18 ал. 3 InvStG) → доход в X+1; при продажба печалбата се намалява с Vorabpauschalen за годините, в чийто край продаденият лот е бил държан (§19 ал. 1),
     // пропорционално на броя дялове (сумата ÷ дяловете в края на X; сплит след X — превърнат). Да се потвърди за дялове, купени през годината (там се смята по месеци).
     const recs = st.records || [];
-    const unitsAt = (sym, d) => { let q = 0; recs.forEach(r => { if (r.sym !== sym || r.date > d || r.assetClass === 'crypto') return; if (r.kind === 'trade') q += r.qty; else if (r.kind === 'split') q *= r.ratio; }); return q; };
-    const splitFactor = (sym, after, upTo) => recs.filter(r => r.kind === 'split' && r.sym === sym && r.date > after && r.date <= upTo).reduce((f, r) => f * r.ratio, 1);
+    const uniqSplit = () => { const seen = new Set(); return r => { const k = r.date + '|' + r.ratio; if (seen.has(k)) return false; seen.add(k); return true; }; };   // сплитът — веднъж за тикъра
+    const unitsAt = (sym, d) => { let q = 0; const once = uniqSplit(); recs.forEach(r => { if (r.sym !== sym || r.date > d || r.assetClass === 'crypto') return; if (r.kind === 'trade') q += r.qty; else if (r.kind === 'split' && once(r)) q *= r.ratio; }); return q; };
+    const splitFactor = (sym, after, upTo) => { const once = uniqSplit(); return recs.filter(r => r.kind === 'split' && r.sym === sym && r.date > after && r.date <= upTo && once(r)).reduce((f, r) => f * r.ratio, 1); };
     const vorabOf = sym => { const v = (st.vorab || {})[sym]; return v && typeof v === 'object' ? v : {}; };
     const vorabDeduction = x => {
       let red = 0;
@@ -680,10 +687,11 @@
     (st.records || []).forEach(r => {
       if (r.date > yEnd) return;
       const key = TC.positionKey(r);
-      if (r.kind === 'trade') held[key] = { sym: r.sym, qty: ((held[key] || {}).qty || 0) + r.qty, hint: r.fundHint, cls: r.assetClass, broker: r.broker, account: r.account };
-      if (r.kind === 'split') Object.keys(held).forEach(k2 => { const h = held[k2]; if (h.sym === r.sym && h.broker === r.broker && h.account === r.account) h.qty *= r.ratio; });
+      if (r.kind === 'trade') held[key] = { ...(held[key] || {}), sym: r.sym, qty: ((held[key] || {}).qty || 0) + r.qty, hint: r.fundHint, cls: r.assetClass, broker: r.broker, account: r.account };
+      if (r.kind === 'split') Object.keys(held).forEach(k2 => { const h = held[k2], sk = r.date + '|' + r.ratio;
+        if (h.sym === r.sym && TC.splitApplies(r, h.broker, h.account, h.cls) && !(h.splits = h.splits || new Set()).has(sk)) { h.splits.add(sk); h.qty *= r.ratio; } });
     });
-    const heldFunds = [...new Set(Object.values(held).filter(h => h.qty > 1e-9 && h.cls === 'stock' && fundType(h.sym, h.hint) !== 'stock').map(h => h.sym))];
+    const heldFunds = [...new Set(Object.values(held).filter(h => h.qty > 1e-9 && (h.cls === 'stock' || h.cls === 'fund') && fundType(h.sym, h.hint) !== 'stock').map(h => h.sym))];
     if (heldFunds.length && tfRates && year - 1 >= 2018) notes.push({ level: 'warn', text: `Фондове, държани в края на ${year - 1}: ${heldFunds.join(', ')}. Ако са натрупващи (без изплащане), Vorabpauschale за ${year - 1} се смята за получена на 2 януари ${year} (§18 ал. 3 InvStG) — доход в ${year}; сметни я и я въведи в таблицата с фондовете (колона „за ${year - 1}“). При продажба тя се приспада от печалбата (§19 InvStG). Да се потвърди.` });
     if (!tfRates && Object.keys(fundsSeen).length) notes.push({ level: 'warn', text: `Преди 2018 фондовете се облагат по стария InvStG — частичното освобождаване не е приложено (да се потвърди).` });
     const fx = new Set();
