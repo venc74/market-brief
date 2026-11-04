@@ -51,6 +51,11 @@ jobs:
           DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
         run: python src/main.py
 
+      # 05.11.2026 (tax-fixes): курсовете на ЕЦБ до данъчната страница — браузърът не прави заявки навън; при провал остава предишният файл
+      - name: ECB rates for the tax page
+        continue-on-error: true
+        run: python tools/ecb_rates.py docs/eurofxref-hist.csv
+
       - name: Commit dashboard + data
         run: |
           git config user.name "brief-bot"

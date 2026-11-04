@@ -53,7 +53,7 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
     <h2>Файлове</h2>
     <div class="drop" id="drop"><b>Пусни тук всички отчети — от всички брокери и години</b><div class="small">в произволен ред и с имената от брокера · IBKR Activity Statement (CSV) · Revolut (Trading / Crypto account statement, CSV)* · стандартен CSV · курсове на ЕЦБ (eurofxref-hist.csv)<br>* форматът на Revolut е проверен само със синтетичен файл — сравни сделките с отчета</div>
       <input type="file" id="fi" multiple accept=".csv,.txt" style="display:none"></div>
-    <div class="msg info small">Файловете остават в браузъра — не се качват никъде и не се пазят. Курсовете: ако качиш и <b>eurofxref-hist.csv</b> от сайта на ЕЦБ, страницата не прави нито една заявка; иначе при „Изчисли“ пита ЕЦБ (а ако не отговори — frankfurter.app) само за валутата и периода.</div>
+    <div class="msg info small">Файловете остават в браузъра — не се качват никъде и не се пазят. Курсовете на ЕЦБ са във файл до страницата (обновява се всеки ден) — не се прави заявка навън. Само ако той липсва или не стига, страницата пита ЕЦБ (а ако не отговори — frankfurter.dev) за валутата и годините; можеш да качиш и свой <b>eurofxref-hist.csv</b>.</div>
     <div class="scroll"><table id="files"></table></div>
     <div class="row" style="margin-top:10px"><button class="btn p" id="calc" disabled>Изчисли</button><button class="btn" id="clear">Изчисти</button><span id="status" class="small"></span></div>
   </div>
@@ -112,30 +112,47 @@ function renderFiles() {
   $('status').textContent = `${ing.records.length} записа от ${ing.files.length} файла; „не е сметнато“: ${ing.skipped.length}`;
 }
 
-// ─── курсове: файл на ЕЦБ → ЕЦБ API → frankfurter ───
+// ─── курсове (05.11.2026): качен файл на ЕЦБ → файлът до страницата (docs/eurofxref-hist.csv, обновява го daily_brief.yml) → ЕЦБ API по години → frankfurter.dev ───
+// Към ЕЦБ / frankfurter — само ако файлът до страницата липсва или не стига; всяка заявка с таймаут и един повторен опит.
+const FETCH_TIMEOUT_MS = 15000;
+async function getJSON(url) {
+  let last;
+  for (let i = 0; i < 2; i++) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), FETCH_TIMEOUT_MS);
+    try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); }
+    catch (e) { last = e.name === 'AbortError' ? new Error('таймаут ' + FETCH_TIMEOUT_MS / 1000 + ' s') : e; }
+    finally { clearTimeout(t); }
+  }
+  throw last;
+}
+let siteRates;                                  // undefined — още не е четен; null — липсва
+async function loadSiteRates() {
+  if (siteRates !== undefined) return siteRates;
+  try { const r = await fetch('eurofxref-hist.csv', { cache: 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); siteRates = TC.parseECBcsv(await r.text()); }
+  catch (e) { siteRates = null; }
+  return siteRates;
+}
 async function ensureRates() {
-  S.rates = JSON.parse(JSON.stringify(S.ing.rates || {}));
+  S.rates = JSON.parse(JSON.stringify(S.ing.rates || {})); S.rateSource = {};
   const need = TC.ratesNeeded(S.ing.records);
   for (const [cur, p] of Object.entries(need)) {
-    const have = S.rates[cur];
-    if (have && have.length && have[0][0] <= p.from && have[have.length - 1][0] >= TC.addDays(p.to, -10)) { S.rateSource[cur] = 'файл на ЕЦБ'; continue; }
-    $('status').textContent = `Курсове ${cur} от ЕЦБ (${p.from} … ${p.to})…`;
-    try {
-      const r = await fetch(TC.ecbUrl(cur, p.from, p.to));
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const pairs = TC.parseECBjson(await r.json());
-      if (!pairs.length) throw new Error('празен отговор');
-      TC.mergeRates(S.rates, cur, pairs); S.rateSource[cur] = 'ЕЦБ (data-api.ecb.europa.eu)'; continue;
-    } catch (e) { S.rateSource[cur] = 'ЕЦБ не отговори (' + e.message + ')'; }
-    try {
-      for (let y = Number(p.from.slice(0, 4)); y <= Number(p.to.slice(0, 4)); y++) {        // по година — frankfurter прорежда дългите периоди
-        const a = y === Number(p.from.slice(0, 4)) ? p.from : `${y}-01-01`, b = y === Number(p.to.slice(0, 4)) ? p.to : `${y}-12-31`;
-        const r = await fetch(TC.frankfurterUrl(cur, a, b));
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        TC.mergeRates(S.rates, cur, TC.parseFrankfurter(await r.json(), cur));
-      }
-      S.rateSource[cur] += ' → frankfurter.app (курсовете на ЕЦБ)';
-    } catch (e) { S.rateSource[cur] += ' → frankfurter.app не отговори — качи eurofxref-hist.csv'; }
+    if (TC.ratesCover(S.rates, cur, p)) { S.rateSource[cur] = 'качения файл на ЕЦБ'; continue; }
+    const site = await loadSiteRates();
+    if (site && site[cur]) {
+      TC.mergeRates(S.rates, cur, site[cur]);
+      const last = site[cur][site[cur].length - 1][0];
+      if (TC.ratesCover(S.rates, cur, p)) { S.rateSource[cur] = `файла на ЕЦБ до страницата (eurofxref-hist.csv, до ${last})`; continue; }
+    }
+    const src = { ecb: 0, fr: 0, fail: [] };
+    for (const [a, b] of TC.yearChunks(p.from, p.to)) {
+      $('status').textContent = `Курсове ${cur} ${a.slice(0, 4)}…`;
+      try { const pairs = TC.parseECBjson(await getJSON(TC.ecbUrl(cur, a, b))); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(S.rates, cur, pairs); src.ecb++; continue; }
+      catch (e) { /* към резервата */ }
+      try { const pairs = TC.parseFrankfurter(await getJSON(TC.frankfurterUrl(cur, a, b)), cur); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(S.rates, cur, pairs); src.fr++; }
+      catch (e) { src.fail.push(`${a.slice(0, 4)} (${e.message})`); }
+    }
+    S.rateSource[cur] = [src.ecb ? `ЕЦБ API (${src.ecb} г.)` : '', src.fr ? `frankfurter.dev — курсовете на ЕЦБ (${src.fr} г.)` : '',
+                         src.fail.length ? `не се изтеглиха: ${src.fail.join(', ')} — качи eurofxref-hist.csv` : ''].filter(Boolean).join(' · ');
   }
 }
 
@@ -170,7 +187,7 @@ function render() {
   const w = [];
   if (de.unmatched.length) w.push(`<div class="msg err"><b>Липсва покупката:</b> ${de.unmatched.map(u => `за ${esc(u.sym)} (${esc(u.broker)} ${esc(u.account)}, продажба ${esc(u.date)}, ${+u.qty.toFixed(6)} бр.)`).join('; ')} — качи по-стар отчет. Тези продажби НЕ са в числото.</div>`);
   if (de.missingRates.length) w.push(`<div class="msg err"><b>Липсва курс:</b> ${[...new Set(de.missingRates.map(m => `${esc(m.currency)} ${esc(m.date)}`))].join(', ')} — записите не са в числото. Качи eurofxref-hist.csv от ЕЦБ.</div>`);
-  Object.entries(S.rateSource).forEach(([c, s]) => { if (/не отговори/.test(s)) w.push(`<div class="msg warn small">Курсове ${esc(c)}: ${esc(s)}</div>`); });
+  Object.entries(S.rateSource).forEach(([c, s]) => w.push(`<div class="msg ${/не се изтеглиха/.test(s) ? 'warn' : 'info'} small">Курсове ${esc(c)} — от ${esc(s)}</div>`));
   de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));
   const sk = S.ing.skipped;
   if (sk.length) w.push(`<div class="card"><details${sk.length < 6 ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${sk.length} реда</b> (всички години; виж дали някой засяга ${y})</summary><div class="scroll"><table>

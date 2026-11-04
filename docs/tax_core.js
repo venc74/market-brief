@@ -387,7 +387,7 @@
     table[cur] = [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
     return table;
   };
-  TC.ecbUrl = (cur, from, to) => `https://data-api.ecb.europa.eu/service/data/EXR/D.${cur}.EUR.SP00.A?startPeriod=${from}&endPeriod=${to}&format=jsondata`;
+  TC.ecbUrl = (cur, from, to) => `https://data-api.ecb.europa.eu/service/data/EXR/D.${encodeURIComponent(cur)}.EUR.SP00.A?startPeriod=${from}&endPeriod=${to}&format=jsondata`;
   // ECB SDMX-JSON: датите са в structure.dimensions.observation[0].values (по индекс), стойностите — в series[…].observations[индекс][0]
   TC.parseECBjson = function (j) {
     const dates = ((((j || {}).structure || {}).dimensions || {}).observation || [])[0];
@@ -395,8 +395,17 @@
     const s = series[Object.keys(series)[0]]; if (!dates || !s) return [];
     return Object.entries(s.observations || {}).map(([i, v]) => [String((dates.values[Number(i)] || {}).id || ''), Number(v[0])]).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x[0]) && x[1] > 0);
   };
-  // frankfurter.app — заявката е ?from=EUR&to=CUR → единици CUR за 1 EUR (същата посока като ЕЦБ). До 04.11 беше from=CUR&to=EUR и се делеше на обратния курс (сумите — × курс²).
-  TC.frankfurterUrl = (cur, from, to) => `https://api.frankfurter.app/${from}..${to}?from=EUR&to=${cur}`;
+  // frankfurter — ?base=EUR&symbols=CUR → единици CUR за 1 EUR (същата посока като ЕЦБ). До 04.11 посоката беше обърната (сумите — × курс²).
+  // 05.11.2026: api.frankfurter.dev — .app пренасочва без CORS заглавия (проверено в истински Chrome) и браузърът спира отговора.
+  TC.frankfurterUrl = (cur, from, to) => `https://api.frankfurter.dev/v1/${from}..${to}?base=EUR&symbols=${encodeURIComponent(cur)}`;
+  // периодът по календарни години — заявките към ЕЦБ / frankfurter са по година (кратки отговори, повторен опит само за неуспешната година)
+  TC.yearChunks = function (from, to) {
+    const out = [];
+    for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) out.push([y === Number(from.slice(0, 4)) ? from : `${y}-01-01`, y === Number(to.slice(0, 4)) ? to : `${y}-12-31`]);
+    return out;
+  };
+  // покрива ли таблицата периода (последният курс — до 10 дни преди последната дата: уикенд / празници)
+  TC.ratesCover = (table, cur, p) => { const a = (table || {})[cur]; return !!(a && a.length && a[0][0] <= p.from && a[a.length - 1][0] >= TC.addDays(p.to, -10)); };
   TC.parseFrankfurter = function (j, cur) {
     const r = (j || {}).rates || {};
     return Object.entries(r).map(([d, o]) => [d, Number((o || {})[cur])]).filter(x => x[1] > 0);
