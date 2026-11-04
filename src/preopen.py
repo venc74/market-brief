@@ -387,7 +387,12 @@ def main(now_utc=None) -> int:
     except Exception:
         prev = {}
     bp = config.DATA_DIR / f"{day}.json"
-    brief = json.loads(bp.read_text(encoding="utf-8")) if bp.exists() else {}
+    brief = {}
+    try:                                                                            # 04.11.2026 (четвърти преглед, Н1): повреден JSON не сваля стъпката с traceback
+        brief = json.loads(bp.read_text(encoding="utf-8")) if bp.exists() else {}
+    except Exception as e:
+        print(f"::warning::[preopen] сутрешният бриф за {day} не се прочете ({type(e).__name__}: {e})")
+        brief = {}
     if not brief:
         print(f"::warning::[preopen] няма сутрешен бриф за {day} — без „Чака пробив“ и картите по Kullamägi; карето не се рендерира")
     try:
