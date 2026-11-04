@@ -55,7 +55,7 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
       <input type="file" id="fi" multiple accept=".csv,.txt" style="display:none"></div>
     <div class="msg info small">Файловете остават в браузъра — не се качват никъде и не се пазят. Курсовете на ЕЦБ са във файл до страницата (обновява се всеки ден) — не се прави заявка навън. Само ако той липсва или не стига, страницата пита ЕЦБ (а ако не отговори — frankfurter.dev) за валутата и годините; можеш да качиш и свой <b>eurofxref-hist.csv</b>.</div>
     <div class="scroll"><table id="files"></table></div>
-    <div class="row" style="margin-top:10px"><button class="btn p" id="calc" disabled>Изчисли</button><button class="btn" id="clear">Изчисти</button><span id="status" class="small"></span></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="clear">Изчисти всички</button><span id="status" class="small"></span></div>
   </div>
 
   <div id="out" style="display:none">
@@ -93,23 +93,24 @@ function addFiles(list) {
   const reads = Array.from(list).map(f => f.text().then(text => ({ name: f.name, text })));
   Promise.all(reads).then(fs => {
     fs.forEach(f => { const i = S.files.findIndex(x => x.name === f.name && x.text === f.text); if (i < 0) S.files.push(f); });
-    S.ing = TC.ingest(S.files); S.fifo = null; renderFiles();
+    S.ing = TC.ingest(S.files); renderFiles(); recalc();
   });
 }
+// 05.11.2026: махане на файл → наново ingest и сметка (старото число не остава на екрана)
+function removeFile(i) { S.files.splice(i, 1); S.ing = S.files.length ? TC.ingest(S.files) : null; renderFiles(); recalc(); }
 function renderFiles() {
   const ing = S.ing;
-  if (!ing) { $('files').innerHTML = ''; $('calc').disabled = true; return; }
-  $('files').innerHTML = '<tr><th>Файл</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map(f => `<tr><td>${esc(f.name)}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
+  if (!ing) { $('files').innerHTML = ''; return; }
+  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
+    ing.files.map((f, i) => `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
       <td>${esc(f.broker)} ${esc(f.account)}</td><td class="mono">${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</td><td class="n">${f.records}</td><td class="n">${f.duplicates || ''}</td>
       <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.period || '')}</td></tr>`).join('');
-  $('calc').disabled = !ing.records.length;
+  $('files').querySelectorAll('[data-rm]').forEach(el => el.addEventListener('click', () => removeFile(Number(el.dataset.rm))));
   const years = [...new Set(ing.records.map(r => Number(r.date.slice(0, 4))))].sort((a, b) => b - a);
   const cur = new Date().getFullYear(), sel = $('year'), old = sel.value;
   const all = [...new Set([cur, cur - 1, ...years])].sort((a, b) => b - a);
   sel.innerHTML = all.map(y => `<option value="${y}">${y}</option>`).join('');
   sel.value = old && all.includes(Number(old)) ? old : String(years.includes(cur - 1) ? cur - 1 : years[0] || cur - 1);
-  $('status').textContent = `${ing.records.length} записа от ${ing.files.length} файла; „не е сметнато“: ${ing.skipped.length}`;
 }
 
 // ─── курсове (05.11.2026): качен файл на ЕЦБ → файлът до страницата (docs/eurofxref-hist.csv, обновява го daily_brief.yml) → ЕЦБ API по години → frankfurter.dev ───
@@ -133,34 +134,45 @@ async function loadSiteRates() {
   return siteRates;
 }
 async function ensureRates() {
-  S.rates = JSON.parse(JSON.stringify(S.ing.rates || {})); S.rateSource = {};
+  const rates = JSON.parse(JSON.stringify(S.ing.rates || {})); const source = {};
   const need = TC.ratesNeeded(S.ing.records);
   for (const [cur, p] of Object.entries(need)) {
-    if (TC.ratesCover(S.rates, cur, p)) { S.rateSource[cur] = 'качения файл на ЕЦБ'; continue; }
+    if (TC.ratesCover(rates, cur, p)) { source[cur] = 'качения файл на ЕЦБ'; continue; }
     const site = await loadSiteRates();
     if (site && site[cur]) {
-      TC.mergeRates(S.rates, cur, site[cur]);
+      TC.mergeRates(rates, cur, site[cur]);
       const last = site[cur][site[cur].length - 1][0];
-      if (TC.ratesCover(S.rates, cur, p)) { S.rateSource[cur] = `файла на ЕЦБ до страницата (eurofxref-hist.csv, до ${last})`; continue; }
+      if (TC.ratesCover(rates, cur, p)) { source[cur] = `файла на ЕЦБ до страницата (eurofxref-hist.csv, до ${last})`; continue; }
     }
     const src = { ecb: 0, fr: 0, fail: [] };
     for (const [a, b] of TC.yearChunks(p.from, p.to)) {
       $('status').textContent = `Курсове ${cur} ${a.slice(0, 4)}…`;
-      try { const pairs = TC.parseECBjson(await getJSON(TC.ecbUrl(cur, a, b))); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(S.rates, cur, pairs); src.ecb++; continue; }
+      try { const pairs = TC.parseECBjson(await getJSON(TC.ecbUrl(cur, a, b))); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(rates, cur, pairs); src.ecb++; continue; }
       catch (e) { /* към резервата */ }
-      try { const pairs = TC.parseFrankfurter(await getJSON(TC.frankfurterUrl(cur, a, b)), cur); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(S.rates, cur, pairs); src.fr++; }
+      try { const pairs = TC.parseFrankfurter(await getJSON(TC.frankfurterUrl(cur, a, b)), cur); if (!pairs.length) throw new Error('празен отговор'); TC.mergeRates(rates, cur, pairs); src.fr++; }
       catch (e) { src.fail.push(`${a.slice(0, 4)} (${e.message})`); }
     }
-    S.rateSource[cur] = [src.ecb ? `ЕЦБ API (${src.ecb} г.)` : '', src.fr ? `frankfurter.dev — курсовете на ЕЦБ (${src.fr} г.)` : '',
+    source[cur] = [src.ecb ? `ЕЦБ API (${src.ecb} г.)` : '', src.fr ? `frankfurter.dev — курсовете на ЕЦБ (${src.fr} г.)` : '',
                          src.fail.length ? `не се изтеглиха: ${src.fail.join(', ')} — качи eurofxref-hist.csv` : ''].filter(Boolean).join(' · ');
   }
+  return { rates, source };
 }
 
-async function calculate() {
-  $('calc').disabled = true;
-  try { await ensureRates(); S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates)); render(); $('out').style.display = ''; }
-  catch (e) { $('status').innerHTML = `<span class="neg">${esc(e.message)}</span>`; }
-  finally { $('calc').disabled = false; }
+// 05.11.2026: сметката тръгва сама при добавяне / махане на файл; докато върви, резултатът е скрит (никога старо число). По-стара сметка, свършила след
+// по-нова смяна на файловете, се изхвърля (calcToken). Смяната на година и настройките — само render() върху готовото FIFO.
+let calcToken = 0;
+async function recalc() {
+  const my = ++calcToken;
+  S.fifo = null; S.de = null; $('out').style.display = 'none';
+  if (!S.ing || !S.ing.records.length) { $('status').textContent = S.ing ? 'Няма записи за смятане — виж бележките във файловете.' : ''; return; }
+  $('status').textContent = 'Смята се…';
+  try {
+    const r = await ensureRates();
+    if (my !== calcToken) return;
+    S.rates = r.rates; S.rateSource = r.source;
+    S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates)); render(); $('out').style.display = '';
+    $('status').textContent = `${S.ing.records.length} записа от ${S.ing.files.length} файла; „не е сметнато“: ${S.ing.skipped.length}`;
+  } catch (e) { if (my === calcToken) $('status').innerHTML = `<span class="neg">${esc(e.message)}</span>`; }
 }
 
 // ─── резултат ───
@@ -277,8 +289,7 @@ $('fi').addEventListener('change', e => { addFiles(e.target.files); e.target.val
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); addFiles(e.dataTransfer.files); });
-$('calc').addEventListener('click', calculate);
-$('clear').addEventListener('click', () => { S.files = []; S.ing = null; S.fifo = null; S.de = null; $('out').style.display = 'none'; renderFiles(); $('status').textContent = ''; });
+$('clear').addEventListener('click', () => { S.files = []; S.ing = null; renderFiles(); recalc(); });
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
 renderFiles();

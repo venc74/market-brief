@@ -38,17 +38,24 @@ async function scenario(files, opts) {
   });
   await page.goto('http://tax.test/tax.html');
   const atLoad = reqs.length + site.length;
+  let res0 = null;
   await page.setInputFiles('#fi', files);
-  await page.waitForFunction(() => !document.getElementById('calc').disabled, null, { timeout: 10000 });
-  await page.evaluate(o => { if (o.year) document.getElementById('year').value = String(o.year); if (o.joint) document.getElementById('joint').value = '1';
-                              if (o.kirche) document.getElementById('kirche').value = o.kirche; }, opts);
-  await page.click('#calc');
-  await page.waitForFunction(() => document.getElementById('out').style.display !== 'none', null, { timeout: 15000 });
+  await page.waitForFunction(() => document.getElementById('out').style.display !== 'none', null, { timeout: 15000 });   // 05.11.2026: сметката тръгва сама
+  if (opts.year) await page.selectOption('#year', String(opts.year));
+  if (opts.joint) await page.selectOption('#joint', '1');
+  if (opts.kirche) await page.selectOption('#kirche', opts.kirche);
+  if (opts.remove != null) {                                           // махане на файл: резултатът изчезва веднага, после идва новият
+    res0 = await page.evaluate(i => { const before = S.de.headline; document.querySelector(`[data-rm="${i}"]`).click();
+                                      return { before, hiddenAtOnce: document.getElementById('out').style.display === 'none', deAtOnce: S.de }; }, opts.remove);
+    await page.waitForFunction(() => document.getElementById('out').style.display !== 'none', null, { timeout: 15000 });
+    res0.after = await page.evaluate(() => S.de.headline);
+    if (opts.year2) await page.selectOption('#year', String(opts.year2));
+  }
   const res = await page.evaluate(() => ({ headline: S.de.headline, total: S.de.total, unmatched: S.de.unmatched.map(u => u.sym), big: document.querySelector('#headline .big').textContent,
     warnings: document.getElementById('warnings').innerText, rateSource: S.rateSource, bgVisible: document.getElementById('bg').style.display !== 'none',
-    xss: window.__xss || null, sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
+    xss: window.__xss || null, h2: document.querySelector('#headline h2').textContent, files: S.files.map(f => f.name), sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
   await browser.close();
-  return { ...res, atLoad, requests: reqs, site, tries, errors };
+  return { ...res, res0, atLoad, requests: reqs, site, tries, errors };
 }
 
 (async () => {
@@ -61,6 +68,7 @@ async function scenario(files, opts) {
   out.ecbRetry = await scenario(IB, { year: 2023, mode: 'ecbRetry' });
   out.frankfurter = await scenario(IB, { year: 2023, mode: 'frankfurter' });
   out.noRates = await scenario(IB, { year: 2023, mode: 'none' });
+  out.remove = await scenario([...IB, f('ecb_rates_synthetic.csv')], { year: 2023, mode: 'none', remove: 7, year2: 2026 });   // 7 = broker2_export.csv
   // XSS: опасно име на файла и тикър (СИНТЕТИЧНО)
   const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'taxxss-'));
   const evil = path.join(tmp, '<img src=x onerror=window.__xss=1>.csv');

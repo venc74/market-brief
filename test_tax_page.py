@@ -40,6 +40,13 @@ assert len(fr) == 7 and all(u.startswith("https://api.frankfurter.dev/v1/") and 
 assert not any("frankfurter.app" in u for k in d for u in d[k]["requests"]) and "frankfurter.dev — курсовете на ЕЦБ (7 г.)" in d["frankfurter"]["warnings"]
 print("  ✓ 0 заявки при отваряне; качен файл → 0 заявки; файлът до страницата → 0 заявки навън; ЕЦБ по година (7), повторен опит при 503; frankfurter.dev base=EUR; страницата казва източника")
 
+print("── 2а. преизчисляване при махане на файл и смяна на година (05.11.2026) ──")
+rm = d["remove"]
+assert rm["res0"]["hiddenAtOnce"] and rm["res0"]["deAtOnce"] is None and abs(rm["res0"]["before"] - total23) < 1e-6      # старото число изчезва веднага
+assert "broker2_export.csv" not in rm["files"] and rm["unmatched"] == [] and "2026" in rm["h2"], (rm["files"], rm["h2"])
+assert abs(rm["res0"]["after"] - (total23 - (1050 / 1.08 - 800 / 1.10))) < 1e-6, rm["res0"]      # без печалбата на B2 (ръчно — както в test_tax_core)
+print("  ✓ махане на файл → резултатът се скрива веднага и се смята наново (без GHOST); смяна на годината → числото за новата година")
+
 print("── 3. без курсове; XSS ──")
 nr = d["noRates"]
 assert abs(nr["headline"] - (200 + 298 * 0.7 + 12.34)) < 1e-6 and "Липсва курс" in nr["warnings"] and "NaN" not in nr["big"], nr["big"]
