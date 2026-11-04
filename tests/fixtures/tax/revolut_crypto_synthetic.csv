@@ -1,0 +1,5 @@
+Symbol,Type,Quantity,Price,Value,Fees,Date
+SOL,Buy,10,€20.00,€200.00,€2.00,"Feb 1, 2024, 10:00:00 AM"
+SOL,Sell,4,€30.00,€120.00,€1.00,"Feb 1, 2025, 3:00:00 PM"
+SOL,Sell,6,€35.00,€210.00,€1.00,"Feb 3, 2025, 9:00:00 AM"
+SOL,Staking reward,0.1,€30.00,€3.00,€0.00,"Mar 1, 2024, 1:00:00 AM"

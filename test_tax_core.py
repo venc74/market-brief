@@ -164,4 +164,19 @@ a, b = cj["crypto"]
 assert close(a["result"], 2600) and close(b["taxable"], 800) and b["underFreigrenze"] and close(b["result"], 0), cj["crypto"]
 assert close(cj["total"], 0) and close(cj["headline"], 0)
 print("  ✓ сам: 3 400 € облагаеми (2 050 € — над година); съвместно: аз 2 600 €, съпругата 800 € < 1 000 € Freigrenze → 0")
+
+print("── 12. Revolut (СИНТЕТИЧНИ файлове по публичния формат — не са проверени с реален отчет) ──")
+rv = run("fifo", ["revolut_trading_synthetic.csv", "revolut_crypto_synthetic.csv", "ecb_rates_synthetic.csv"])
+st = [x for x in rv["realized"] if x["sym"] == "ACME"][0]
+assert close(st["costEUR"], 401 / 1.08) and close(st["proceedsEUR"], 519 / 1.08) and close(st["gainEUR"], 118 / 1.08), st     # комисионната = общо − бр. × цена
+assert [round(x["eur"], 6) for x in rv["incomes"]] == [round(2 / 1.08, 6)]
+sol = sorted([x for x in rv["realized"] if x["sym"] == "SOL"], key=lambda x: x["date"])
+assert close(sol[0]["taxableGainEUR"], 119 - 80.8) and close(sol[1]["exemptGainEUR"], 209 - 121.2), sol                     # годишнината 01.02.2025 — още в срока
+ing = run("ingest", ["revolut_trading_synthetic.csv", "revolut_crypto_synthetic.csv"])
+assert {f["format"] for f in ing["files"]} == {"revolut_stocks", "revolut_crypto"}
+why = " | ".join(s["reason"] for s in ing["skipped"])
+assert "сплит в Revolut" in why and "такса извън сделките" in why and "стейкинг" in why, why
+d25 = run("de", ["revolut_crypto_synthetic.csv"], {"year": 2025})
+assert d25["crypto"][0]["underFreigrenze"] and close(d25["crypto"][0]["result"], 0) and close(d25["crypto"][0]["exempt"], 87.8)
+print("  ✓ акции: комисионната от „Total Amount“; дивидент; такса, сплит — в „не е сметнато“; крипто: годишнината, стейкинг — в „не е сметнато“; 2025: 38.20 € < Freigrenze → 0")
 print("\n✅ test_tax_core: всичко мина")

@@ -51,7 +51,7 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
 
   <div class="card">
     <h2>Файлове</h2>
-    <div class="drop" id="drop"><b>Пусни тук всички отчети — от всички брокери и години</b><div class="small">в произволен ред и с имената от брокера · IBKR Activity Statement (CSV) · стандартен CSV · курсове на ЕЦБ (eurofxref-hist.csv)</div>
+    <div class="drop" id="drop"><b>Пусни тук всички отчети — от всички брокери и години</b><div class="small">в произволен ред и с имената от брокера · IBKR Activity Statement (CSV) · Revolut (Trading / Crypto account statement, CSV)* · стандартен CSV · курсове на ЕЦБ (eurofxref-hist.csv)<br>* форматът на Revolut е проверен само със синтетичен файл — сравни сделките с отчета</div>
       <input type="file" id="fi" multiple accept=".csv,.txt" style="display:none"></div>
     <div class="msg info small">Файловете остават в браузъра — не се качват никъде и не се пазят. Курсовете: ако качиш и <b>eurofxref-hist.csv</b> от сайта на ЕЦБ, страницата не прави нито една заявка; иначе при „Изчисли“ пита ЕЦБ (а ако не отговори — frankfurter.app) само за валутата и периода.</div>
     <div class="scroll"><table id="files"></table></div>
@@ -100,7 +100,7 @@ function renderFiles() {
   const ing = S.ing;
   if (!ing) { $('files').innerHTML = ''; $('calc').disabled = true; return; }
   $('files').innerHTML = '<tr><th>Файл</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map(f => `<tr><td>${esc(f.name)}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', unknown: '—' }[f.format] || f.format)}</td>
+    ing.files.map(f => `<tr><td>${esc(f.name)}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
       <td>${esc(f.broker)} ${esc(f.account)}</td><td class="mono">${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</td><td class="n">${f.records}</td><td class="n">${f.duplicates || ''}</td>
       <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.period || '')}</td></tr>`).join('');
   $('calc').disabled = !ing.records.length;

@@ -285,6 +285,80 @@
     return out;
   };
 
+  // ─── Revolut (ПРОВЕРЕН САМО СЪС СИНТЕТИЧЕН ФАЙЛ — по публичното описание на формата; реален отчет може да се различава) ─────────────────────
+  // суми с валута: "USD 150.23", "$1,234.56", "€20,000.00", "-€5.00", "150.23" → {v, cur}
+  TC.money = function (s, dflt) {
+    const t = String(s == null ? '' : s).trim();
+    const sym = { '$': 'USD', '€': 'EUR', '£': 'GBP' };
+    let cur = dflt || '', m = t.match(/[A-Z]{3}/);
+    if (m) cur = m[0]; else { const c = Object.keys(sym).find(k => t.includes(k)); if (c) cur = sym[c]; }
+    const v = TC.num(t.replace(/[A-Z]{3}|[$€£]/g, ''));
+    return { v, cur };
+  };
+  const MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  // "2024-01-10T14:32:11.123Z" / "Jan 10, 2024, 10:00:00 AM" / "10 Jan 2024"
+  TC.parseLooseDate = function (s) {
+    const iso = TC.parseDateTime(s); if (iso) return iso;
+    let m = String(s || '').match(/([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?)?/);
+    if (!m) { const n = String(s || '').match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?\s+(\d{4})/); if (n) m = [n[0], n[2], n[1], n[3]]; }
+    if (!m || !MON[m[1].toLowerCase()]) return null;
+    let h = Number(m[4] || 0); if (m[7] === 'PM' && h < 12) h += 12; if (m[7] === 'AM' && h === 12) h = 0;
+    return { date: `${m[3]}-${String(MON[m[1].toLowerCase()]).padStart(2, '0')}-${String(m[2]).padStart(2, '0')}`, time: m[4] ? `${String(h).padStart(2, '0')}:${m[5]}:${m[6] || '00'}` : '' };
+  };
+  const rowsOf = text => { const L = String(text).replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim()); const H = TC.splitCSV(L[0]);
+                           return L.slice(1).map((l, i) => { const p = TC.splitCSV(l), r = {}; H.forEach((h, k) => { r[h.trim().toLowerCase()] = p[k] || ''; }); return { r, line: i + 2 }; }); };
+  TC.parsers = {
+    // акции: Date,Ticker,Type,Quantity,Price per share,Total Amount,Currency,FX Rate
+    revolut_stocks(text, src) {
+      const recs = [], skipped = [], b = { broker: 'Revolut', account: 'акции', src };
+      rowsOf(text).forEach(({ r, line }) => {
+        const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toUpperCase(), cur = (r['currency'] || '').toUpperCase() || 'USD';
+        const price = TC.money(r['price per share'], cur), total = TC.money(r['total amount'], cur), qty = TC.num(r['quantity']);
+        const skip = reason => skipped.push({ src, line, broker: 'Revolut', account: 'акции', section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason });
+        if (!dt) return skip('без дата');
+        if (/^(BUY|SELL)/.test(type)) {
+          if (!(qty > 0)) return skip('невалидно количество');
+          const px = isFinite(price.v) && price.v > 0 ? price.v : Math.abs(total.v / qty);
+          const fee = isFinite(total.v) && isFinite(price.v) ? Math.max(0, /^BUY/.test(type) ? Math.abs(total.v) - qty * px : qty * px - Math.abs(total.v)) : 0;
+          recs.push({ ...b, line, kind: 'trade', assetClass: 'stock', sym: r['ticker'], date: dt.date, time: dt.time, qty: /^BUY/.test(type) ? qty : -qty, price: px,
+                      currency: price.cur || total.cur || cur, fee: fee > 1e-6 ? fee : 0 });
+        } else if (type === 'DIVIDEND') {
+          if (!isFinite(total.v)) return skip('дивидент без сума');
+          recs.push({ ...b, line, kind: 'dividend', sym: r['ticker'], date: dt.date, amount: total.v, currency: total.cur || cur, desc: 'Revolut DIVIDEND (сумата в отчета — да се провери дали е брутна)' });
+        } else if (/CASH TOP-UP|CASH WITHDRAWAL|TRANSFER/.test(type)) {
+          return;                                                                 // движение на пари — не е доход
+        } else if (/SPLIT/.test(type)) skip('сплит в Revolut — коефициентът не е в отчета; въведи го като ред „split“ в стандартен CSV');
+        else if (/FEE/.test(type)) skip('такса извън сделките — не се приспада (§20 ал. 9 EStG; да се потвърди)');
+        else skip(`непознат тип „${r['type']}“`);
+      });
+      return { format: 'revolut_stocks', info: { broker: 'Revolut' }, records: recs, skipped };
+    },
+    // крипто: Symbol,Type,Quantity,Price,Value,Fees,Date
+    revolut_crypto(text, src) {
+      const recs = [], skipped = [], b = { broker: 'Revolut', account: 'крипто', src };
+      rowsOf(text).forEach(({ r, line }) => {
+        const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toLowerCase(), qty = TC.num(r['quantity']);
+        const price = TC.money(r['price'], 'EUR'), value = TC.money(r['value'], price.cur || 'EUR'), fee = TC.money(r['fees'], price.cur || 'EUR');
+        const skip = reason => skipped.push({ src, line, broker: 'Revolut', account: 'крипто', section: 'Revolut', what: `${r['symbol'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason });
+        if (!dt) return skip('без дата');
+        if (type === 'buy' || type === 'sell') {
+          if (!(qty > 0)) return skip('невалидно количество');
+          const px = isFinite(price.v) && price.v > 0 ? price.v : Math.abs(value.v / qty);
+          recs.push({ ...b, line, kind: 'trade', assetClass: 'crypto', sym: r['symbol'], date: dt.date, time: dt.time, qty: type === 'buy' ? qty : -qty, price: px,
+                      currency: price.cur || 'EUR', fee: isFinite(fee.v) ? Math.abs(fee.v) : 0 });
+        } else if (/reward|staking|learn/.test(type)) skip('награда / стейкинг — друг доход (§22 т. 3 EStG?), не се смята; да се потвърди');
+        else if (/send|receive|transfer/.test(type)) skip('прехвърляне между портфейли — цената на придобиване е в другия портфейл');
+        else skip(`непознат тип „${r['type']}“`);
+      });
+      return { format: 'revolut_crypto', info: { broker: 'Revolut' }, records: recs, skipped };
+    },
+    // стар формат на Revolut (Type,Product,Started Date,…) — не се чете; изрично в „не е сметнато“
+    revolut_crypto_old(text, src) {
+      return { format: 'revolut_crypto_old', info: { broker: 'Revolut' }, records: [], skipped: [{ src, line: 0, broker: 'Revolut', account: '', section: 'файл', what: src, date: '',
+               reason: 'старият формат на извлечението на Revolut (Type, Product, Started Date…) не се чете — свали отчета „Crypto account statement“ / „Trading account statement“ (CSV)' }] };
+    },
+  };
+
   // ─── Курсове ───────────────────────────────────────────────────────────────
   // таблица {CUR: [[дата, курс], …]} — курс = единици валута за 1 EUR (както ЕЦБ и eurofxref-hist.csv). Сумата в EUR = сума ÷ курс.
   // Ден без курс (уикенд, празник на TARGET) → последният публикуван курс преди него, до maxBack дни назад; по-стар → null (липсва — предупреждение, не NaN).
@@ -538,6 +612,7 @@
     (st.info || []).forEach(i => (i.nonBaseCash || []).forEach(c => fx.add(c.currency)));
     (st.records || []).forEach(r => { if (r.year === year || (r.date || '').startsWith(String(year))) { if (r.currency && r.currency !== 'EUR') fx.add(r.currency); } });
     if (fx.size) notes.push({ level: 'warn', text: `В сметките има суми във валута (${[...fx].join(', ')}). Курсовите разлики при обмяна или теглене на валута може да са облагаеми (частни продажби по §23 EStG при държане под година) — калкулаторът не ги смята; да се потвърди със счетоводител.` });
+    if (items.some(i => i.cat === 'options' || i.cat === 'optionLosses')) notes.push({ level: 'info', text: 'Опции (Termingeschäfte): премиите на Stillhalter и резултатите от затворени / изтекли опции са в „друго“; загубите се прихващат с другите доходи от капитал (ограничението до 20 000 € от 2021 г. е отменено — да се потвърди за годината). Упражнени / възложени опции — виж бележките.' });
     if (par.extrapolated) notes.push({ level: 'warn', text: `Параметрите за ${year} не са проверени (таблицата е до ${TC.DE_PARAMS_CHECKED_UNTIL}) — ползвани са последните известни; провери ги.` });
     if ((fifoRes.notes || []).some(n => n.date.startsWith(String(year)))) fifoRes.notes.filter(n => n.date.startsWith(String(year))).forEach(n => notes.push({ level: 'warn', text: `${n.sym} (${n.date}): ${n.text}` }));
     const unmatched = (fifoRes.unmatched || []).filter(u => u.year === year);
