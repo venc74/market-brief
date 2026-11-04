@@ -368,6 +368,44 @@ def skip_reason(now_utc) -> str | None:
     return options_record.skip_reason(now_utc, None)
 
 
+def late_reason(now_utc) -> str | None:
+    """
+    04.11.2026 (четвърти преглед, Н6): закъсняло пускане — ден със сесия и час в Ню Йорк от отварянето (09:30) до config.PREOPEN_LATE_UNTIL_NY → причината; иначе None. Чиста функция.
+    """
+    from src import sessions
+    ny = _ny(now_utc)
+    lh, lm = map(int, config.PREOPEN_LATE_UNTIL_NY.split(":"))
+    if sessions.is_session(ny.date()) and (9, 30) <= (ny.hour, ny.minute) < (lh, lm):
+        return f"пускането стартира в {ny.strftime('%H:%M')} Ню Йорк — след отварянето; премаркетът не е проверен днес"
+    return None
+
+
+def _late_box(now, day: str, why: str) -> None:
+    """04.11.2026 (Н6): закъсняло пускане → data/preopen/<дата>.json с ok False / late True и карето на страницата (без имейл), ако днес още няма успешно обновяване."""
+    from src import render
+    path = config.DATA_DIR / "preopen" / f"{day}.json"
+    try:
+        prev = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    except Exception:
+        prev = {}
+    if prev.get("ok"):
+        return
+    n = _ny(now)
+    res = {"date": day, "time_ny": n.strftime("%H:%M"), "time_berlin": n.tz_convert("Europe/Berlin").strftime("%H:%M"), "ok": False, "late": True, "diag": {},
+           "gaps": [], "levels": [], "watch": [], "notes": [why], "email": prev.get("email") or {"sent": False}}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
+    bp = config.DATA_DIR / f"{day}.json"
+    try:
+        brief = json.loads(bp.read_text(encoding="utf-8")) if bp.exists() else {}
+        if brief:
+            brief["preopen"] = res
+            page = config.DOCS_DIR / "index.html"
+            render.render_dashboard(brief, publish=False, as_of=dt.date.fromisoformat(day), generated=morning_generated(page.read_text(encoding="utf-8") if page.exists() else None))
+    except Exception as e:
+        print(f"::warning::[preopen] страницата не се рендерира: {type(e).__name__}: {e}")
+
+
 def main(now_utc=None) -> int:
     """
     Входната точка (options_record.yml, отделна стъпка): прозорецът (09:00–09:30 Ню Йорк, ден със сесия — както записа на опциите) → run → data/preopen/<дата>.json →
@@ -376,6 +414,14 @@ def main(now_utc=None) -> int:
     now = now_utc or dt.datetime.now(dt.timezone.utc)
     why = skip_reason(now)
     if why:
+        late = late_reason(now)                                                    # 04.11.2026 (Н6): закъсняло пускане — каре, не само ред в лога
+        if late:
+            print(f"::warning::[preopen] {late}")
+            try:
+                _late_box(now, _ny(now).date().isoformat(), late)
+            except Exception as e:
+                print(f"::warning::[preopen] карето за закъснялото пускане не се записа: {type(e).__name__}: {e}")
+            return 0
         print(f"::notice::[preopen] {why}")
         return 0
     from src import screener, backtest, watch_monitor, render, emailer
