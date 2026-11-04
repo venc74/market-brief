@@ -52,5 +52,7 @@ nr = d["noRates"]
 assert abs(nr["headline"] - (200 + 298 * 0.7 + 12.34)) < 1e-6 and "Липсва курс" in nr["warnings"] and "NaN" not in nr["big"], nr["big"]
 assert "не се изтеглиха: 2020" in nr["warnings"] and "качи eurofxref-hist.csv" in nr["warnings"]
 assert d["xss"]["xss"] is None and not d["xss"]["errors"] and abs(d["xss"]["headline"] - 2) < 1e-9
-print("  ✓ без курсове — „Липсва курс“ и само записите в EUR (420.94 €), не NaN; опасно име на файл и тикър — показани като текст, не изпълнени")
+x = d["xss"]
+assert x["csp"] and x["inlineScripts"] == 0 and x["cspProbe"] == "blocked" and not any("evil.test" in r for r in x["requests"]), (x["cspProbe"], x["requests"])
+print("  ✓ без курсове — „Липсва курс“ и само записите в EUR (420.94 €), не NaN; опасно име на файл и тикър — показани като текст, не изпълнени; CSP: без вграден скрипт, заявка към чужд адрес — спряна")
 print("\n✅ test_tax_page: всичко мина")

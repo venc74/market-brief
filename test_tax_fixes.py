@@ -156,8 +156,29 @@ r = scenario([{"name": "old.csv", "text": f}], years=[2008, 2010, 2019])
 d08, d10, d19 = (r["de"][y] for y in (2008, 2010, 2019))
 assert d08["estimate"] is None and not d08["complete"] and any("преди Abgeltungsteuer" in n["text"] for n in d08["notes"])   # до 05.11: NaN в оценката
 assert not d10["complete"] and any("OLDS" in n["text"] and "Altbestand" in n["text"] for n in d10["notes"])
-assert not d19["complete"] and any("OLDF" in n["text"] and "31.12.2017" in n["text"] for n in d19["notes"]) and not any("NEWS" in n["text"] for n in d19["notes"])
+assert not d19["complete"] and any("OLDF" in n["text"] and "31.12.2017" in n["text"] for n in d19["notes"]) and not any("NEWS" in n["text"] for n in d19["notes"] if n["level"] == "err")
 assert close(d19["total"], 200 * 0.7 + 1), d19["total"]                 # числото е същото (само предупреждение): OLDF 200 × 0.7 + NEWS 1
 print("  ✓ 2008 — без оценка (не NaN), НЕПЪЛНО; акции от 2008, продадени 2010 — Altbestand; фонд от 2017, продаден 2019 — §56 InvStG; новите покупки — без бележка")
+
+# ── 12. CSV с формули; спорното — настройки ──
+print("── 12. защита от формули; спорните правила ──")
+p = subprocess.run([NODE, "-e", "const TC = require(process.argv[1]); console.log(JSON.stringify(['=HYPERLINK(\\\"x\\\")', '-12.50', '+1', '@A1', 'AAPL', 7].map(TC.csvCell)))", str(ROOT / "docs" / "tax_core.js")],
+                   capture_output=True, text=True, timeout=30)
+assert json.loads(p.stdout) == ['"\'=HYPERLINK(""x"")"', '"-12.50"', '"+1"', '"\'@A1"', '"AAPL"', '"7"'], p.stdout + p.stderr
+f = std("buy,stock,WIN,2024-01-10,10,100,EUR,0,B,A", "sell,stock,WIN,2024-02-10,10,200,EUR,0,B,A",                 # печалба от акции 1 000
+        "buy,option,OPT,2024-01-10,1,1000,EUR,0,B,A", "sell,option,OPT,2024-03-10,1,0,EUR,0,B,A")                   # загуба от опция 1 000
+a_ = scenario([{"name": "o.csv", "text": f}], years=[2024], carriedShareLoss=1000)["de"][2024]
+b_ = scenario([{"name": "o.csv", "text": f}], years=[2024], carriedShareLoss=1000, offsetOrder="currentFirst")["de"][2024]
+assert close(a_["total"], 0) and close(a_["shareCarry"], 0) and close(a_["otherCarry"], 1000), a_         # по подразбиране: пренесената от акции — първо
+assert close(b_["total"], 0) and close(b_["shareCarry"], 1000) and close(b_["otherCarry"], 0), b_          # „загубите от годината — първо“
+dv = "type,asset_type,ticker,date,quantity,price,currency,withholding_tax,broker,account\ndividend,etf,REIT,2024-05-01,100,0,EUR,15,B,A\n"
+c1 = scenario([{"name": "d.csv", "text": dv}], years=[2024], fundTypes={"REIT": "realestate_foreign"})["de"][2024]
+c0 = scenario([{"name": "d.csv", "text": dv}], years=[2024], fundTypes={"REIT": "realestate_foreign"}, creditPerItem=False)["de"][2024]
+assert close(c1["creditable"], 100 * 0.2 * 0.25) and close(c0["creditable"], 15), (c1["creditable"], c0["creditable"])   # 5 (25% от облагаемите 20) срещу 15
+v = std("buy,stock,VUSA,2024-01-10,10,100,EUR,0,B,A", "sell,stock,VUSA,2024-02-10,10,110,EUR,0,B,A")
+s0 = scenario([{"name": "v.csv", "text": v}], years=[2024])["de"][2024]
+s1 = scenario([{"name": "v.csv", "text": v}], years=[2024], nonIbkrDefault="equity")["de"][2024]
+assert close(s0["shareGains"], 100) and any("VUSA" in n["text"] and "не идва от брокера" in n["text"] for n in s0["notes"]) and close(s1["otherPos"], 70) and close(s1["shareGains"], 0)
+print("  ✓ =/@ → '…, числата остават; ред на прихващане (0 / 1 000 пренос); таван по доход: 5 срещу 15; тикър извън IBKR: акция 100 (с бележка) / ETF 70")
 
 print("\n✅ test_tax_fixes: всичко мина")

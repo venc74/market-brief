@@ -607,7 +607,9 @@
     const year = Number(st.year);
     const par = TC.deParams(year);
     const tfRates = par.teilfreistellung;                                          // null преди 2018
-    const fundType = (sym, hint) => (st.fundTypes || {})[sym] || (hint ? 'equity' : 'stock');
+    // nonIbkrDefault (05.11.2026, спорно — настройка): видът на тикър без подсказка извън IBKR (Revolut / CSV не казват акция ли е или ETF): 'stock' (по подразбиране) | 'equity'
+    const ibkrSyms = new Set((st.records || []).filter(r => r.broker === 'IBKR').map(r => r.sym));
+    const fundType = (sym, hint) => (st.fundTypes || {})[sym] || (hint ? 'equity' : (st.nonIbkrDefault === 'equity' && !ibkrSyms.has(sym) ? 'equity' : 'stock'));
     const tfOf = t => (t === 'stock' || !tfRates) ? 0 : (tfRates[t] || 0);
     const R = fifoRes.realized.filter(x => x.year === year);
     // Vorabpauschale (05.11.2026): st.vorab = {тикър: {година X: EUR}} — сумата за X (всички дялове в края на X) се смята за получена на първия работен ден на X+1
@@ -674,17 +676,35 @@
     Object.entries(wh).forEach(([sym, v]) => {
       const w = Math.max(0, -v);
       const gross = Object.values(div).filter(o => o.sym === sym && !o.pil).reduce((s, o) => s + o.eur, 0);
-      withheld += w; creditable += Math.min(w, Math.max(0, gross) * rate);
+      // creditPerItem (05.11.2026, по подразбиране — да): §32d ал. 5 EStG — и до германския данък по ТОЗИ доход (25% от облагаемата част след частичното освобождаване);
+      // за акции не мени нищо, за фондове с голямо освобождаване — по-малко. Да се потвърди от счетоводител.
+      const tf = st.creditPerItem === false ? 0 : tfOf(fundType(sym, instrHint(sym)));
+      const cap = Math.max(0, gross) * Math.min(rate, st.creditPerItem === false ? Infinity : (par.abgeltung || 0.25) * (1 - tf));
+      withheld += w; creditable += Math.min(w, cap);
     });
     const sum = cat => items.filter(i => i.cat === cat).reduce((s, i) => s + i.eur, 0);
     const shareGains = sum('shareGains'), shareLosses = -sum('shareLosses');
     const otherPos = ['dividends', 'interest', 'options', 'pil', 'funds'].reduce((s, c) => s + sum(c), 0);
     const otherNeg = -['optionLosses', 'fundLosses', 'otherNeg'].reduce((s, c) => s + sum(c), 0);
     const cS = Math.max(0, Number(st.carriedShareLoss) || 0), cO = Math.max(0, Number(st.carriedOtherLoss) || 0);
-    let shareNet = shareGains - shareLosses - cS, shareCarry = 0;
-    if (shareNet < 0) { shareCarry = -shareNet; shareNet = 0; }
-    let total = shareNet + otherPos - otherNeg - cO, otherCarry = 0;
+    // offsetOrder (05.11.2026, спорно — настройка; да се потвърди от счетоводител):
+    //  'carriedShareFirst' (по подразбиране, както до 05.11) — пренесената загуба от акции се прилага към печалбите от акции преди загубите от годината в „друго“;
+    //  'currentFirst' — първо загубите от годината (и „друго“ срещу печалбите от акции), после пренесените загуби.
+    let shareNet, shareCarry = 0, total, otherCarry = 0;
+    if (st.offsetOrder === 'currentFirst') {
+      let s1 = shareGains - shareLosses, o = otherPos - otherNeg;
+      if (s1 < 0) { shareCarry = -s1; s1 = 0; }
+      if (o < 0 && s1 > 0) { const use = Math.min(s1, -o); s1 -= use; o += use; }
+      s1 -= cS; if (s1 < 0) { shareCarry += -s1; s1 = 0; }
+      shareNet = s1; total = s1 + o - cO;
+    } else {
+      shareNet = shareGains - shareLosses - cS;
+      if (shareNet < 0) { shareCarry = -shareNet; shareNet = 0; }
+      total = shareNet + otherPos - otherNeg - cO;
+    }
     if (total < 0) { otherCarry = -total; total = 0; }
+    const unknownKind = [...new Set(R.filter(x => x.assetClass === 'stock' && x.gainEUR != null && !ibkrSyms.has(x.sym) && !x.fundHint && !(st.fundTypes || {})[x.sym]).map(x => x.sym))];
+    if (unknownKind.length) notes.push({ level: 'warn', text: `Видът на ${unknownKind.join(', ')} не идва от брокера (Revolut / CSV) — сметнати като ${st.nonIbkrDefault === 'equity' ? 'акционерни фондове (30% освобождаване)' : 'акции'}; ако някой е ETF / акция, смени го в таблицата с фондовете. Да се потвърди.` });
     // крипто §23 — по човек (сметките, отбелязани като на съпруга / съпругата → 'B')
     const persons = {}, soloB = new Set();
     R.filter(x => x.assetClass === 'crypto').forEach(x => {
@@ -776,6 +796,9 @@
     const divRaw = Math.max(0, div) * 0.05, divCredit = Math.min(Math.max(0, wh), divRaw);
     return { taxableStock, exemptStock, cryptoGain, dividends: div, stockTax: Math.max(0, taxableStock) * 0.10, cryptoTax: Math.max(0, cryptoGain) * 0.10, divTax: divRaw - divCredit };
   };
+
+  // клетка за изтегления CSV: в кавички; текст, започващ с = + - @ (формула в Excel / LibreOffice), получава ' отпред — числата (−12.50) остават числа (05.11.2026)
+  TC.csvCell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t) && !/^[-+]?\d+(\.\d+)?$/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
 
   TC.fmt = n => (n < 0 ? '−' : '') + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
 

