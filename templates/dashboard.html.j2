@@ -327,7 +327,7 @@
   .glb-note { font-size: 12px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
   .glb-insufficient-note { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; }
   /* 03.11.2026 (разходката, т. 13–15): GLB — компактна таблица на тип (ред → клик → картата), отворените записи под своя списък, книгата — една таблица */
-  .glb-row { grid-template-columns: 1.5fr .9fr .8fr .9fr 1fr 1.4fr; align-items: baseline; }
+  .glb-row { grid-template-columns: 2fr .9fr .8fr 1.3fr 1fr; align-items: baseline; }
   .glb-t { margin-bottom: 8px; } .glb-t .glb-card { max-width: 520px; margin-top: 6px; }
   .glb-def { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
   details.gw-open, details.gw-book, details.gw-how { margin: 6px 0 14px; } details.gw-open > summary, details.gw-book > summary, details.gw-how > summary { font-size: 12.5px; color: var(--muted); }
@@ -1630,7 +1630,7 @@
 {# Magic Formula секцията премахната 2026-07-15 — конвергенцията вече е MF✓ бадж на картите (виж FIXES_2026-07-15.md) #}
 
 {# ── GLB (03.11.2026, разходката, т. 13–15): заглавие + кратко инфо веднъж (правилото на Уиш, нашата свежест, рискът) и ред за пазара; за всеки тип — едно изречение определение →
-   компактна таблица (подредена по обема на пробива, без филтър; ред → клик → цялата карта) → сгънато „▸ Отворени в книгата — Classic (N)“ (записите на „GLB по Уиш“ от същия тип).
+   компактна таблица (Тикър · над линията · сесии · месеци без връх · обем на пробива; типът е в заглавието; подредена по обема на пробива, без филтър; ред → клик → цялата карта) → сгънато „▸ Отворени в книгата — Classic (N)“ (записите на „GLB по Уиш“ от същия тип).
    До 03.11: карти в мрежа, бележката за риска на всяка карта, отворените записи — накрая, в книгата. Групите и подредбата — render.glb_groups. ── #}
 {% set gw_st = {"pending": "чака първата цена", "open": "отворена", "line_exit": "изход по линията", "expired": "изтекла по нашия таван", "invalid_signal": "невалиден сигнал"} %}
 {% macro glb_card(g) %}
@@ -1681,16 +1681,15 @@
   <div class="small glb-def">{{ caller() }}</div>
   {% if grp.cards %}
   <div class="wt glb-t">
-    <div class="wt-row glb-row wt-head"><span>Тикър</span><span>Над линията</span><span>Сесии</span><span>Месеци без връх</span><span>Обем на пробива</span><span>Тип</span></div>
+    <div class="wt-row glb-row wt-head"><span>Тикър</span><span>Над линията</span><span>Сесии</span><span>Месеци без връх</span><span>Обем на пробива</span></div>
     {% for g in grp.cards %}
     <details class="wt-item">
       <summary class="wt-row glb-row">
-        <span class="wt-t">{{ g.ticker }}{% if g.company and g.company != g.ticker %}<span class="wt-name">{{ g.company|cname(28) }}</span>{% endif %}</span>
+        <span class="wt-t">{{ g.ticker }}{% if g.in_screener %} <span class="wt-mark">✓ скрийнър</span>{% endif %}{% if g.already_open_position %} <span class="wt-mark">📈 OPEN</span>{% endif %}{% if g.get("corp_action") or g.get("spinoff_warning") or g.get("merger_target") %} <span class="cs-warn">⚠</span>{% endif %}{% if g.company and g.company != g.ticker %}<span class="wt-name">{{ g.company|cname(28) }}</span>{% endif %}</span>
         <span data-l="Над линията" class="wt-num">{% if g.pct_vs_line is number %}{{ "%+.1f"|format(g.pct_vs_line) }}%{% else %}<span class="wt-mu">—</span>{% endif %}</span>
         <span data-l="Сесии" class="wt-num">{% if g.get("sessions") %}{{ g.sessions }} от {{ g.max_sessions }}{% else %}—{% endif %}</span>
-        <span data-l="Месеци без връх" class="wt-num">{{ g.months_unpenetrated if g.months_unpenetrated is defined else "—" }}</span>
+        <span data-l="Месеци без връх" class="wt-num">{% if g.months_unpenetrated is defined %}{{ g.months_unpenetrated }} м{% else %}—{% endif %}{% if g.ath_label == 'new_high_since_listing' %} <span class="wt-mu" title="По-кратка налична история — нов връх откакто имаме данни, не потвърден all-time high">· от листването</span>{% endif %}</span>
         <span data-l="Обем на пробива" class="wt-num">{% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.breakout_volume_ratio) }}×{% else %}<span class="wt-mu">н/д</span>{% endif %}</span>
-        <span data-l="Тип">{{ label }}{% if g.ath_label == 'new_high_since_listing' %} <span class="wt-mu">· от листването</span>{% endif %}{% if g.in_screener %} <span class="wt-mark">✓ скрийнър</span>{% endif %}{% if g.already_open_position %} <span class="wt-mark">📈 OPEN</span>{% endif %}{% if g.get("corp_action") or g.get("spinoff_warning") or g.get("merger_target") %} <span class="cs-warn">⚠</span>{% endif %}</span>
       </summary>
       <div class="wt-detail">{{ glb_card(g) }}</div>
     </details>
