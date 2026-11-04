@@ -331,6 +331,42 @@ def news_window_hours(nw: dict | None, key: str = "hours", default: int = 24) ->
         return default
 
 
+def crypto_window_note(nw: dict | None, pool_sources: dict | None) -> str | None:
+    """
+    04.11.2026 (четвърти преглед, С5): бележката под крипто новините — както news_window_note: само фийдовете, които не стигат до началото на крипто прозореца (най-старото заглавие
+    в пула по-късно от началото с над config.NEWS_REACH_TOLERANCE_MIN минути) или нямат нито едно заглавие. Началото = началото на прозореца на новините + (часовете на новините −
+    часовете на крипто). РЕАЛНО 03.11: прозорец 30 ч от 02.11 00:30 UTC; Cointelegraph (28 заглавия) — до 02.11 01:51, CoinDesk (25) — до 05:18; заглавието казваше „последните 30ч“
+    без уговорка. Без прозорец / без pool_sources (стар бриф) → None. Чиста функция.
+    """
+    nw = nw or {}
+    try:
+        since = dt.datetime.fromisoformat(str(nw["since"]).replace("Z", "+00:00"))
+        hours, c_hours = float(nw["hours"]), float(nw.get("crypto_hours") or nw["hours"])
+    except Exception:
+        return None
+    if not pool_sources:
+        return None
+    start = since + dt.timedelta(hours=hours - c_hours)
+    tol = dt.timedelta(minutes=config.NEWS_REACH_TOLERANCE_MIN)
+    short = []
+    for name, v in pool_sources.items():
+        if not (v or {}).get("count"):
+            short.append(f"{name} — без заглавия в прозореца")
+            continue
+        old = (v or {}).get("oldest")
+        try:
+            t = dt.datetime.fromisoformat(str(old).replace("Z", "+00:00"))
+        except Exception:
+            short.append(f"{name} — заглавията са без дата")
+            continue
+        if t - start > tol:
+            short.append(f"{name} — до {_utc_short(old)} ({v['count']} заглавия)")
+    if not short:
+        return None
+    return (f"Прозорец: {news_window_hours({'hours': c_hours})} ч (от {_utc_short(start.isoformat())} UTC). Не стигат до началото му: " + " · ".join(short)
+            + " — фийдът държи само последните си заглавия; по-старото не е проверено.")
+
+
 def news_window_note(nw: dict | None) -> str | None:
     """
     02.11.2026 (поправки след брифа, т. 4): бележката под новините. Всички източници стигат до началото на прозореца → само „Прозорец: 72 ч (от предишния бриф)“; иначе —
@@ -586,6 +622,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
+        crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
         cot=brief.get("cot", []),
         cot_status=brief.get("cot_status") or {},
