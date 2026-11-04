@@ -67,6 +67,7 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
         <label class="f">Пренесена загуба от акции, €<input type="number" id="carryS" min="0" step="0.01" value="0"></label>
         <label class="f">Пренесена друга загуба, €<input type="number" id="carryO" min="0" step="0.01" value="0"></label>
         <label class="f">Зачитане на чужд данък до, % от дивидента<input type="number" id="credit" min="0" max="100" step="1" value="15"></label>
+        <label class="f">Продадени опции (Stillhalter) — премията<select id="stillhalter"><option value="receipt">в годината на получаване</option><option value="close">нетно при затварянето</option></select></label>
       </div>
       <div class="small" style="margin-top:6px">Пренесена загуба — само сумата, установена с решение на Finanzamt (Verlustfeststellungsbescheid) за предходната година; иначе 0. Таванът 15% е ставката по спогодбата със САЩ; за други държави може да е различен — да се потвърди.</div>
       <div id="fundsBox" style="margin-top:12px"></div>
@@ -161,6 +162,7 @@ async function ensureRates() {
 // 05.11.2026: сметката тръгва сама при добавяне / махане на файл; докато върви, резултатът е скрит (никога старо число). По-стара сметка, свършила след
 // по-нова смяна на файловете, се изхвърля (calcToken). Смяната на година и настройките — само render() върху готовото FIFO.
 let calcToken = 0;
+const fifoOpts = () => ({ stillhalter: $('stillhalter').value });
 async function recalc() {
   const my = ++calcToken;
   S.fifo = null; S.de = null; $('out').style.display = 'none';
@@ -170,7 +172,7 @@ async function recalc() {
     const r = await ensureRates();
     if (my !== calcToken) return;
     S.rates = r.rates; S.rateSource = r.source;
-    S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates)); render(); $('out').style.display = '';
+    S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); $('out').style.display = '';
     $('status').textContent = `${S.ing.records.length} записа от ${S.ing.files.length} файла; „не е сметнато“: ${S.ing.skipped.length}`;
   } catch (e) { if (my === calcToken) $('status').innerHTML = `<span class="neg">${esc(e.message)}</span>`; }
 }
@@ -227,7 +229,7 @@ function render() {
   const R = S.fifo.realized.filter(x => x.year === y);
   $('salesTitle').textContent = `Продажби ${y} (${R.length})`;
   $('sales').innerHTML = '<tr><th>Дата</th><th>Брокер / сметка</th><th>Инструмент</th><th class="n">Бр.</th><th class="n">Приходи €</th><th class="n">Цена на придобиване €</th><th class="n">Резултат €</th><th>Купено</th></tr>' +
-    R.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc(x.broker)} ${esc(x.account)}</td><td>${esc(x.sym)} <span class="small">${esc(x.assetClass)}${x.short ? ' · къса' : ''}</span></td><td class="n">${+x.qty.toFixed(6)}</td>
+    R.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc(x.broker)} ${esc(x.account)}</td><td>${esc(x.sym)} <span class="small">${esc(x.assetClass)}${x.premium ? ' · премия (Stillhalter)' : x.buyback ? ' · обратно изкупуване' : x.short ? ' · къса' : ''}</span></td><td class="n">${+x.qty.toFixed(6)}</td>
       <td class="n">${x.proceedsEUR == null ? '—' : fmt(x.proceedsEUR)}</td><td class="n">${x.costEUR == null ? '—' : fmt(x.costEUR)}</td><td class="n ${cls(x.gainEUR || 0)}">${x.gainEUR == null ? 'няма курс' : fmt(x.gainEUR)}</td>
       <td class="small">${(x.lots || []).map(l => `${esc(l.date)} × ${+l.qty.toFixed(6)}${l.exempt ? ' (над година)' : ''}`).join('<br>')}</td></tr>`).join('');
   const I = S.fifo.incomes.filter(x => x.year === y);
@@ -293,6 +295,7 @@ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('
 $('clear').addEventListener('click', () => { S.files = []; S.ing = null; renderFiles(); recalc(); });
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
+$('stillhalter').addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } });
 renderFiles();
 (function () { const y = new Date().getFullYear(); $('year').innerHTML = [y, y - 1, y - 2].map(v => `<option value="${v}">${v}</option>`).join(''); $('year').value = String(y - 1); })();
 </script>

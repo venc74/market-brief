@@ -43,4 +43,15 @@ assert close(d25["total"], 21 + 793.8), d25["total"]
 assert any("приспаднати Vorabpauschalen" in n["text"] for n in d25["notes"]) and any("2 януари 2025" in n["text"] for n in d25["notes"])
 print("  ✓ 2023: 0; 2024: 42 + 263.2 = 305.2; 2025: 21 + 793.8 = 814.8 (Vorab за X — доход в X+1, приспадната при продажбата)")
 
+# ── 5. Stillhalter: премията в годината на получаване, обратното изкупуване — в годината на плащане (настройка) ──
+print("── 5. Stillhalter ──")
+f = std("sell,option,XYZ P50,2024-12-15,1,300,EUR,0,B,A", "buy,option,XYZ P50,2025-01-17,1,0,EUR,0,B,A",     # изтича без стойност
+        "sell,option,XYZ C80,2024-11-01,1,500,EUR,0,B,A", "buy,option,XYZ C80,2025-01-10,1,200,EUR,0,B,A")     # обратно изкупена за 200
+r = scenario([{"name": "opt.csv", "text": f}], years=[2024, 2025])
+assert close(r["de"][2024]["total"], 300 + 500) and close(r["de"][2025]["total"], 0) and close(r["de"][2025]["otherCarry"], 200), (r["de"][2024]["total"], r["de"][2025])
+assert any("годината на получаване" in n["text"] for n in r["de"][2024]["notes"])
+r = scenario([{"name": "opt.csv", "text": f}], years=[2024, 2025], stillhalter="close")
+assert close(r["de"][2024]["total"], 0) and close(r["de"][2025]["total"], 300 + 300), (r["de"][2024]["total"], r["de"][2025]["total"])   # старото: нетно при затваряне
+print("  ✓ по подразбиране: 2024 = 300 + 500 = 800, 2025 = −200 (за пренасяне); настройка „при затварянето“: 2024 = 0, 2025 = 300 + 300 = 600")
+
 print("\n✅ test_tax_fixes: всичко мина")

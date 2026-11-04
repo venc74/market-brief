@@ -423,7 +423,10 @@
   // Сплит: отворените лотове ×коефициента (цената общо не се мени). Курсът — по датата на всяка сделка (покупка — към деня на покупката, продажба — към деня на продажбата).
   TC.positionKey = r => [r.broker, r.account, r.assetClass === 'crypto' ? 'crypto' : 'sec', r.sym].join('|');
 
-  TC.fifo = function (records, rate) {
+  // opts.stillhalter (05.11.2026): 'receipt' (по подразбиране) — премията е доход в годината на получаване, обратното изкупуване — отрицателен доход в годината на плащане
+  // (§20 ал. 1 т. 11 EStG, принципът на изтичане / Zufluss; да се потвърди); 'close' — нетно при затваряне / изтичане (поведението до 05.11).
+  TC.fifo = function (records, rate, opts) {
+    const stillhalter = ((opts || {}).stillhalter) === 'close' ? 'close' : 'receipt';
     const pos = {}, realized = [], unmatched = [], missingRates = [], incomes = [], notes = [];
     const P = k => (pos[k] = pos[k] || { long: [], short: [] });
     const eps = 1e-9;
@@ -465,7 +468,7 @@
         if (closed.length) {
           const pr = closed.some(c => c.proceedsEUR == null || c.costEUR == null) ? null : closed.reduce((s, c) => s + c.proceedsEUR, 0);
           const co = pr == null ? null : closed.reduce((s, c) => s + c.costEUR, 0);
-          realized.push({ ...base, short: true, qty: qAbs - q, proceedsEUR: pr, costEUR: co, gainEUR: pr == null ? null : pr - co,
+          realized.push({ ...base, short: true, buyback: stillhalter === 'receipt', qty: qAbs - q, proceedsEUR: pr, costEUR: co, gainEUR: pr == null ? null : pr - co,
                           lots: closed.map(c => ({ date: c.date, qty: c.qty })), openDate: closed[0].date });
         }
         if (q > eps) p.long.push({ qty: q, costEUR: fx == null ? null : (q * r.price + (r.fee || 0) * q / qAbs) / fx, date: r.date, feeEUR: feeEUR == null ? null : feeEUR * q / qAbs });
@@ -497,13 +500,17 @@
       }
       if (q > eps) {
         if (r.assetClass === 'option') {                                           // Stillhalter: продажба без позиция отваря къса позиция
-          p.short.push({ qty: q, proceedsEUR: proceedsAll == null ? null : proceedsAll * q / qAbs, date: r.date });
+          const prem = proceedsAll == null ? null : proceedsAll * q / qAbs;
+          if (stillhalter === 'receipt') {                                          // премията — сега; при затварянето остава само цената на обратното изкупуване
+            realized.push({ ...base, short: true, premium: true, qty: q, proceedsEUR: prem, costEUR: prem == null ? null : 0, gainEUR: prem, lots: [] });
+            p.short.push({ qty: q, proceedsEUR: 0, date: r.date });
+          } else p.short.push({ qty: q, proceedsEUR: prem, date: r.date });
         } else unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, src: r.src });
       }
     });
     const open = Object.entries(pos).map(([k, p]) => ({ key: k, long: p.long.reduce((s, l) => s + l.qty, 0), short: p.short.reduce((s, l) => s + l.qty, 0) }))
       .filter(o => o.long > eps || o.short > eps);
-    return { realized, unmatched, missingRates, incomes, open, notes };
+    return { realized, unmatched, missingRates, incomes, open, notes, stillhalter };
   };
 
   // ─── Германия: разбивката за декларацията ────────────────────────────────────
@@ -646,6 +653,9 @@
     (st.info || []).forEach(i => (i.nonBaseCash || []).forEach(c => fx.add(c.currency)));
     (st.records || []).forEach(r => { if (r.year === year || (r.date || '').startsWith(String(year))) { if (r.currency && r.currency !== 'EUR') fx.add(r.currency); } });
     if (fx.size) notes.push({ level: 'warn', text: `В сметките има суми във валута (${[...fx].join(', ')}). Курсовите разлики при обмяна или теглене на валута може да са облагаеми (частни продажби по §23 EStG при държане под година) — калкулаторът не ги смята; да се потвърди със счетоводител.` });
+    if (items.some(i => i.cat === 'options' || i.cat === 'optionLosses')) notes.push({ level: 'info', text: fifoRes.stillhalter === 'close'
+      ? 'Stillhalter: премиите са сметнати нетно при затварянето / изтичането (настройка) — по закона премията е доход в годината на получаване; да се потвърди от счетоводител.'
+      : 'Stillhalter: премията е доход в годината на получаване, обратното изкупуване — отрицателен доход в годината на плащане (§20 ал. 1 т. 11 EStG; да се потвърди от счетоводител).' });
     if (items.some(i => i.cat === 'options' || i.cat === 'optionLosses')) notes.push({ level: 'info', text: 'Опции (Termingeschäfte): премиите на Stillhalter и резултатите от затворени / изтекли опции са в „друго“; загубите се прихващат с другите доходи от капитал (ограничението до 20 000 € от 2021 г. е отменено — да се потвърди за годината). Упражнени / възложени опции — виж бележките.' });
     if (par.extrapolated) notes.push({ level: 'warn', text: `Параметрите за ${year} не са проверени (таблицата е до ${TC.DE_PARAMS_CHECKED_UNTIL}) — ползвани са последните известни; провери ги.` });
     if ((fifoRes.notes || []).some(n => n.date.startsWith(String(year)))) fifoRes.notes.filter(n => n.date.startsWith(String(year))).forEach(n => notes.push({ level: 'warn', text: `${n.sym} (${n.date}): ${n.text}` }));

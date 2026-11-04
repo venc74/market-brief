@@ -91,7 +91,9 @@ xw = R("U1111111", "XWLD", "2023-11-01")[0]
 assert close(xw["gainEUR"], 298) and xw["fundHint"] is True, xw
 # опция (Stillhalter): продадена 1 @ 250 USD − 1.05 (02.05.2023, 1.08), изтекла (16.06.2023) → премията
 op = [x for x in fifo["realized"] if x["assetClass"] == "option"]
-assert len(op) == 1 and op[0]["short"] and close(op[0]["gainEUR"], 248.95 / 1.08), op
+# 05.11.2026: по подразбиране два записа — премията на 02.05 (доход в годината на получаване) и изтичането на 16.06 (обратно изкупуване за 0)
+assert [(x["date"], bool(x.get("premium")), bool(x.get("buyback"))) for x in op] == [("2023-05-02", True, False), ("2023-06-16", False, True)], op
+assert close(op[0]["gainEUR"], 248.95 / 1.08) and close(op[1]["gainEUR"], 0), op
 # продажба без покупка — предупреждение, без резултат
 assert [(u["sym"], u["account"], u["qty"]) for u in fifo["unmatched"]] == [("GHOST", "B2", 3)], fifo["unmatched"]
 assert not R("B2", "GHOST", "2023-02-01")
