@@ -198,6 +198,7 @@ function render() {
   // предупреждения
   const w = [];
   if (de.unmatched.length) w.push(`<div class="msg err"><b>Липсва покупката:</b> ${de.unmatched.map(u => `за ${esc(u.sym)} (${esc(u.broker)} ${esc(u.account)}, продажба ${esc(u.date)}, ${+u.qty.toFixed(6)} бр.)`).join('; ')} — качи по-стар отчет. Тези продажби НЕ са в числото.</div>`);
+  (S.ing.warnings || []).forEach(t => w.push(`<div class="msg warn small">${esc(t)}</div>`));
   if (de.missingRates.length) w.push(`<div class="msg err"><b>Липсва курс:</b> ${[...new Set(de.missingRates.map(m => `${esc(m.currency)} ${esc(m.date)}`))].join(', ')} — записите не са в числото. Качи eurofxref-hist.csv от ЕЦБ.</div>`);
   Object.entries(S.rateSource).forEach(([c, s]) => w.push(`<div class="msg ${/не се изтеглиха/.test(s) ? 'warn' : 'info'} small">Курсове ${esc(c)} — от ${esc(s)}</div>`));
   de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));

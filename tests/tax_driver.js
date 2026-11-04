@@ -3,6 +3,16 @@
 const fs = require('fs'), path = require('path');
 const TC = require(path.join(__dirname, '..', 'docs', 'tax_core.js'));
 const [, , step, cfg, ...names] = process.argv;
+// 05.11.2026: стъпка scenario — СИНТЕТИЧНИ файлове като JSON на stdin {files: [{name, text, owner}], years: [..], settings: {..}} → ingest + fifo + computeDE по години
+if (step === 'scenario') {
+  const sc = JSON.parse(fs.readFileSync(0, 'utf8'));
+  const ing = TC.ingest(sc.files);
+  const st = sc.settings || {};
+  const res = TC.fifo(ing.records, TC.rateLookup(ing.rates), st);
+  const de = {}; (sc.years || []).forEach(y => { de[y] = TC.computeDE(res, { ...st, year: y, records: ing.records, info: ing.info, warnings: ing.warnings }); });
+  process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de }));
+  process.exit(0);
+}
 const settings = cfg ? JSON.parse(cfg) : {};
 const files = names.map(n => ({ name: path.basename(n), text: fs.readFileSync(n, 'utf8') }));
 let out;

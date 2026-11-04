@@ -240,9 +240,9 @@
   // files: [{name, text}] → {files: [описание], records, skipped, rates, warnings}
   // Дедупликация: еднакъв запис в няколко файла (застъпващи се отчети) се брои веднъж; повторение в ЕДИН файл (две еднакви сделки) остава — броят се = максимума по файловете.
   TC.ingest = function (files) {
-    const out = { files: [], records: [], skipped: [], rates: {}, info: [], instruments: {} };
+    const out = { files: [], records: [], skipped: [], rates: {}, info: [], instruments: {}, warnings: [] };
     const perFile = [];
-    files.forEach(f => {
+    files.forEach((f, fileIdx) => {
       const fmt = TC.detect(f.text);
       const desc = { name: f.name, format: fmt, broker: '', account: '', from: '', to: '', records: 0, duplicates: 0, skipped: 0, error: null };
       try {
@@ -253,7 +253,7 @@
           desc.records = Object.keys(r).length;
         } else if (fmt === 'ibkr' || fmt === 'standard' || (TC.parsers && TC.parsers[fmt])) {
           const res = fmt === 'ibkr' ? TC.parseIBKR(f.text, f.name) : fmt === 'standard' ? TC.parseStandard(f.text, f.name) : TC.parsers[fmt](f.text, f.name);
-          perFile.push({ name: f.name, recs: res.records });
+          perFile.push({ idx: fileIdx, recs: res.records });
           out.skipped.push(...res.skipped);
           Object.assign(out.instruments, res.instruments || {});
           if (res.info) out.info.push({ file: f.name, ...res.info });
@@ -268,14 +268,18 @@
       } catch (e) { desc.error = e.message; out.skipped.push({ src: f.name, line: 0, section: 'файл', what: f.name, date: '', reason: 'грешка при четенето: ' + e.message }); }
       out.files.push(desc);
     });
-    // дедупликация
-    const counts = {};                                                         // key → {file → [records]}
-    perFile.forEach(({ name, recs }) => recs.forEach(r => { const k = TC.recordKey(r); ((counts[k] = counts[k] || {})[name] = counts[k][name] || []).push(r); }));
+    // дедупликация — по поредния номер на файла, не по името (05.11.2026: два различни файла с едно име се сливаха в един „файл“ и общите записи се броеха двойно)
+    const counts = {};                                                         // key → {номер на файла → [records]}
+    perFile.forEach(({ idx, recs }) => recs.forEach(r => { const k = TC.recordKey(r); ((counts[k] = counts[k] || {})[idx] = counts[k][idx] || []).push(r); }));
     Object.values(counts).forEach(byFile => {
-      const lists = Object.values(byFile).sort((a, b) => b.length - a.length);
-      out.records.push(...lists[0]);
-      lists.slice(1).forEach(l => { const d = out.files.find(x => x.name === l[0].src); if (d) d.duplicates += l.length; });
+      const lists = Object.entries(byFile).sort((a, b) => b[1].length - a[1].length || a[0] - b[0]);
+      out.records.push(...lists[0][1]);
+      lists.slice(1).forEach(([idx, l]) => { out.files[idx].duplicates += l.length; });
     });
+    const byName = {};
+    files.forEach(f => { (byName[f.name] = byName[f.name] || new Set()).add(f.text); });
+    Object.entries(byName).filter(([, t]) => t.size > 1).forEach(([n]) =>
+      out.warnings.push(`${t_count(files, n)} файла с име „${n}“ и различно съдържание — сметнати са поотделно; записите, които се повтарят в тях, са броени веднъж (виж колоната „Дубликати“).`));
     // типът на инструмента от IBKR („Financial Instrument Information“ — ETF) важи за всички файлове: застъпващ се отчет без тази секция не губи подсказката
     out.records.forEach(x => { if (x.kind === 'trade' && out.instruments[x.sym] && /ETF|FUND/i.test(out.instruments[x.sym].type)) x.fundHint = true; });
     // „не е сметнато“ — също веднъж за застъпващи се отчети (ключ без името на файла)
@@ -284,6 +288,8 @@
     out.records.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')) || (a.kind === 'split' ? -1 : 0) - (b.kind === 'split' ? -1 : 0));
     return out;
   };
+
+  const t_count = (files, n) => files.filter(f => f.name === n).length;
 
   // ─── Revolut (ПРОВЕРЕН САМО СЪС СИНТЕТИЧЕН ФАЙЛ — по публичното описание на формата; реален отчет може да се различава) ─────────────────────
   // суми с валута: "USD 150.23", "$1,234.56", "€20,000.00", "-€5.00", "150.23" → {v, cur}
