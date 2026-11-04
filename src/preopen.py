@@ -90,7 +90,7 @@ def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: 
     def add(t, what, kind, level):
         p = pts.get(t)
         if p and isinstance(level, (int, float)) and level > 0:
-            hit = p["pm_price"] >= level if kind == "над нивото" else p["pm_price"] < level
+            hit = p["pm_price"] >= level if kind == "над нивото" else p["pm_price"] < level      # „под стопа“, „под стопа (break-even)“, „под линията“
             if hit:
                 out.append({"ticker": t, "what": what, "kind": kind, "level": round(float(level), 2), "pm_price": round(p["pm_price"], 2), "pct": _pct(p["pm_price"], level),
                             "pm_volume": p["pm_volume"]})
@@ -103,13 +103,18 @@ def level_checks(pts: dict, waiting: list[dict], qm_cards: list[dict], records: 
     for r in records or []:
         cat, st = r.get("category") or "action", r.get("status")
         what = names.get(cat)
-        if not what:
+        if not what or r.get("needs_manual_review"):              # 04.11.2026 (С2): сплит / отделяне след входа — нивата са в старата скала, не се сравняват
             continue
         if st == "pending" and cat != "glb_wish_high":
             add(r.get("ticker"), what, "над нивото", r.get("buy_stop"))
         elif st in ("open", "trailing"):
             if cat == "glb_wish_high":
                 add(r.get("ticker"), what, "под линията", r.get("line_used") or r.get("line"))
+            elif cat == "qm_breakout" and st == "trailing":
+                # 04.11.2026 (четвърти преглед, С2): след частичната продажба стопът на qm_breakout е break-even = входът (trade_sim.simulate_qm); до 04.11 — първоначалният
+                # stop_loss (DOCU 70.885 срещу 72.76, UTHR 545.58 срещу 560.00 — РЕАЛНО, книгата към 03.11)
+                be = [x for x in (r.get("stop_loss"), r.get("fill_price") or r.get("entry_price")) if isinstance(x, (int, float))]
+                add(r.get("ticker"), what, "под стопа (break-even)", max(be) if be else None)          # = max(стоп, вход) — както trade_sim
             else:
                 add(r.get("ticker"), what, "под стопа", r.get("stop_loss"))
     seen, uniq = set(), []
