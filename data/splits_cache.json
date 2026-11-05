@@ -1,5 +1,5 @@
 {
- "date": "2026-11-04",
+ "date": "2026-11-05",
  "rows": [],
  "horizon": [
   {
@@ -33,6 +33,30 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Nov 03, 2026"
+  },
+  {
+   "ticker": "XXII",
+   "company": "22nd Century Group, Inc",
+   "date": "2026-11-05",
+   "ratio": "1:58",
+   "split_type": "reverse",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "EZGO",
+   "company": "EZGO Technologies Ltd.",
+   "date": "2026-11-05",
+   "ratio": "1:3",
+   "split_type": "reverse",
+   "date_human": "Nov 05, 2026"
+  },
+  {
+   "ticker": "INM",
+   "company": "InMed Pharmaceuticals Inc.",
+   "date": "2026-11-05",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 05, 2026"
   },
   {
    "ticker": "EFG",
@@ -118,18 +142,22 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 14,
+  "source_rows": 17,
   "horizon_from": "2026-11-02",
   "horizon_to": "2026-11-20",
-  "in_week": 11,
+  "in_week": 14,
   "dropped_price": [
    "RETO",
    "VCIG",
    "BJDX",
    "UFG",
+   "XXII",
+   "EZGO",
    "TOPS"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "INM"
+  ],
   "dropped_no_data": [
    "EFG",
    "EFV",

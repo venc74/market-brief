@@ -1,140 +1,159 @@
 {
- "date": "2026-11-04",
+ "date": "2026-11-05",
  "news": [
   {
-   "headline": "Stocks wilt, dollar slides as early midterm results point to blue sweep - Reuters",
-   "source": "Reuters Business",
-   "why": "Демократическото превземане на Конгреса натиска надолу фючърсите на акции, долара и AI/data center сектора, тъй като пазарите залагат на забавяне на инфраструктурните разходи и евентуална регулаторна тежест.",
-   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBWZWFDY2tZeDZfbXdVWnE2QWZwVlNpX3NqVm1OdmR0bDBGTlJjU3dJWG5yWEFpSG4tSHVhY2NEeVBsNnllVFQyb0tWRU1naXZQLWN3Tlk4VE1PV3o2cU1tVHFYX1hDT1ZtRkVWUWtYR3JwWFRyTXZIRldDWQ?oc=5",
+   "headline": "Democrats win the US House and Senate as voters deliver a strong rebuke to Trump and Republicans - AP News",
+   "source": "AP Business",
+   "why": "Демократите поемат контрола над Конгреса, което пренасочва законодателния дневен ред — по-строга регулация за Big Tech и AI, натиск за прекратяване на иранската война и промени в търговската политика, засягащи широк спектър от сектори.",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPRFA3Qk9sWVFFclA5aUMzTVlKenJNX25YTU5oenBmQXVqWjlneGxXUWRyZ3FSNE43TmRRcjJnbVEzLXJFazZJTVVMeDVUSE9FRktPQXh6b1FpeWtrbzYyMmFtYThKN3Y2NE9nTUV4a2RQaXpGblMxM2JycTVkTFQ5cG9hV3NObHpnMnFUQ0lxNlVuaHpOR1lUWkxPZ2NZcUctRnNnNjE1NjZEeUZBTWZaYVg4V2lBaDM0?oc=5",
    "also": [
     {
-     "source": "Reuters Business",
-     "headline": "Market analysts react to US midterm election results - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPalZOQ2dwZlhyRUNiYXBvNzREaUZMUnZlSkZMVDNtLUo2bFI5cTFiZkY1R3BlZXdLVjFselI2WVUxaGJOXzFCUjAzeWNOSW1wVHpaOHZZQ2l4el9ia2VXUE9kaE5NNS1TZ0xpQzdSUnBlWmdBS1ZBaEZNYWRxZjhpRUYwcGFWbUhkMHlDY1dkcks?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Democrats projected to win majority control of US House, US media project - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOMkw3blpJbFhfWi1IRGZZV05IaVBNSmJZNVlPV2J2U3NlMjRkdlN2S3NHcmsxc2Y4SDd0Zm5fNXVoMXZ0eHhkTXpWQjlQLWQ5ME5VaDM2bGhvTDRsTHpMVWxucUVwV0wwZC1iUXZUSGFvOTNWTHF6cEZMLVR2cVo0N1pnNlNBYXJ5MExXcjFIQk10bVBHT2ZiVGc0ZTZsZkhPc0FWcUhGRmlWNWtZVVpGSA?oc=5"
-    },
-    {
      "source": "AP Business",
-     "headline": "Democrats win the US House, taking full control of Congress as voters express frustration with Trump - AP News",
-     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPRFA3Qk9sWVFFclA5aUMzTVlKenJNX25YTU5oenBmQXVqWjlneGxXUWRyZ3FSNE43TmRRcjJnbVEzLXJFazZJTVVMeDVUSE9FRktPQXh6b1FpeWtrbzYyMmFtYThKN3Y2NE9nTUV4a2RQaXpGblMxM2JycTVkTFQ5cG9hV3NObHpnMnFUQ0lxNlVuaHpOR1lUWkxPZ2NZcUctRnNnNjE1NjZEeUZBTWZaYVg4V2lBaDM0?oc=5"
+     "headline": "Takeaways: Voters punish Trump, and the GOP suffers historic losses - AP News",
+     "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOTjkyWmJqMU9FSGNlZDU1XzEzZ2IzTUNlZ25OV1BuYmxTREU5NE41R0tldnU4Z3lCclBGYzltRFJySF9jMldXMDZxTTBaaGtYTU4tbHVJcXNCemdqblJfUXY3QTk0alF6VmJtWjBBS3kwaWVZOV9GTzdrM05aVXFRSlpjZTBPcWY2RHlDbnF6b21kRUVQZDNsUk5ZOUpwNnN0VkNENlhzWnBwQzdzTDkycVpyM1hJa3VYRC1SUWdWbGlGdw?oc=5"
     },
     {
      "source": "Financial Times",
-     "headline": "Global stocks slide as Democratic wins stoke fears for AI boom",
-     "link": "https://www.ft.com/content/a0b18705-3bd8-4886-992c-b6062fdec6ea?syn-25a6b1a6=1"
+     "headline": "Democrats look to reshape America after historic midterm victories",
+     "link": "https://www.ft.com/content/9a4a7357-f783-462f-b5d3-9852daf0f328?syn-25a6b1a6=1"
+    },
+    {
+     "source": "Financial Times",
+     "headline": "How Democrats pulled off the blue wave in maps and charts",
+     "link": "https://www.ft.com/content/f27626ac-8427-45d7-a995-a8dfe8d01bd9?syn-25a6b1a6=1"
     },
     {
      "source": "CNBC",
-     "headline": "Stock futures fall as Democrats win big in midterms with traders betting they slow data center buildout: Live updates",
-     "link": "https://www.cnbc.com/2026/11/03/stock-market-today-live-updates.html"
+     "headline": "What was really behind Wednesday's monster rally? Trump quickly making peace",
+     "link": "https://www.cnbc.com/2026/11/04/stock-market-rally-trump-midterms.html"
     },
     {
      "source": "CNBC",
-     "headline": "Midterm elections 2026 live updates: Democrats flip Senate after winning House",
-     "link": "https://www.cnbc.com/2026/11/03/midterm-elections-2026-live-updates.html"
+     "headline": "Democrats flip dozens of GOP seats. Republicans haven't flipped a single one",
+     "link": "https://www.cnbc.com/2026/11/04/democrats-2026-midterm-election-results.html"
     }
    ]
   },
   {
-   "headline": "Iran's IRGC says four tankers ablaze after hitting mines near Strait of Hormuz - Reuters",
+   "headline": "Stocks surge, and the Dow soars 1,500 points as oil prices tumble following the US midterm elections - AP News",
+   "source": "AP Business",
+   "why": "Dow скача в най-добрата сесия от April 2025, сигнализирайки силно преоценяване на риска след изборния резултат — широк риск-он импулс.",
+   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPSEtETVdDVnpDVFhqVmpJNTdBUURHcFg0YkhsOVdwcFo2YzNqSTl5Q18zUXVZV1Vrck8tLTFtcEYtOEFOX2hMMUo1UXJyMDRPQWp2Qld4Yk9iSWszUEtuMkc0dUo4d003eTN5V0VnRmEwVG9VUjBiMGVxVlc3SWg2TC1YdGFmb0FMMlFuVlVJOE1BalE?oc=5",
+   "also": [
+    {
+     "source": "CNBC",
+     "headline": "Stock futures mixed after big rally following Democrats' decisive midterm wins",
+     "link": "https://www.cnbc.com/2026/11/04/stock-market-today-live-updates.html"
+    }
+   ]
+  },
+  {
+   "headline": "Oil falls for a fourth day on expectations for lower risk of Iran war escalation - Reuters",
    "source": "Reuters Business",
-   "why": "Запалени танкери в близост до Ормузкия пролив директно заплашват петролния транзит и натиска нагоре върху петролните цени и корабоплавателния сектор.",
-   "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQbjcyLUxfeTMxaHFnbENrc2tqdlowSDFqWU5DUWtqOWhVUUdSYWdSbFpBRGQ4VHI3Rm5DbDVsLTV6bkM4d3FjcmVPRnpsQlJ6RkNSLWNZX0ZtWURvUExKaGZ2M2diWUFvZWZfSE5FN01PR2FXc1pSN1kyeXhHX0ZFS0k4S1FjSDJLc2ZfbGx2cm9TYW9JSThiZVZIeFQxTnVBXzAwYnhlaGxsN3lwQkxOZTdFRVVpc3RPa2J2M0JZNVduZXA3Z2pz?oc=5",
+   "why": "Петролът пада под $100, тъй като пазарите залагат на деескалация на иранската война след демократическата победа — натиск върху енергийния сектор и облекчение за потребителски и транспортни акции.",
+   "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQdzM2c3YzcktwU285aS1QaVVzTk51WFR0UnpxMXlnaFdEd2RtZWYzMm81TDZQUTJZS0ZlLXFVV3ZhcGFibkdLZm9Remo3YjlhNHJTd1lxSXNMUFNzejhIMkt0TlFRXy1RZl9TdTkxbDhfdjQxUEIzcUhaYlpOMjZJSVViNmVPV0dRV0RmaTJ3dDJ3QUs4TTFleFlnZnNyUHhVYlQ5NldaZVRZRFd5dU5nVnRKVUQ0UFE?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Oil rises on Iran war uncertainty after Trump's Republicans face election rout - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPQUEyU0pEVG8xTHJtT2xCU0ltcXVTalphM0RNTEZ0UVlCTW5Qbjg4cS1RQnh5QXZnVEZvdnBacmZRM2FhMWJLWXVjU08yNkpvOHZiLTUtSGN0Mk55NGFBNWdxTmR4b3ZBeGNlX3ptUGNaRVFzRzhyNDZodklncGFZaV96cUxHY1Q1ODZWdmpTVWlWRVp4bVdJb0Zrb1pLaXVsUFFySUd4cm40cFphNGZB?oc=5"
+     "headline": "Oil and data centre stocks sink after US midterms - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPUG9ENFo3M0RHNWI0VEdfTlZhWmpjVGR0UjViV3dBQllRVkNha0YzU1FhX2lDaWVUT1U1Ym5DbWRlOFpJZ3JPU3AwZ1Nia3NNWjdKc3Jvd0VXU3otQU83ZjFlQmZwbHcyZmJKZFk4dVJWaXhWQnV6MTF6TUpmaDcxNmdhbFFNaU1N?oc=5"
+    },
+    {
+     "source": "Financial Times",
+     "headline": "Oil tumbles below $100 on post-election peace hopes",
+     "link": "https://www.ft.com/content/b526f876-810a-4e74-8b8d-4ffca04b29c7?syn-25a6b1a6=1"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Crude oil prices fall below $90 a barrel as Vance blames GOP election defeat on Iran war",
+     "link": "https://www.cnbc.com/2026/11/04/oil-price-iran-war-us-election-strait-hormuz.html"
     }
    ]
   },
   {
-   "headline": "Gold rises as dollar weakens; Democrats score early wins in US midterm elections - Reuters",
+   "headline": "Dollar edges lower as US election outcome spurs risk sentiment; sterling gains - Reuters",
    "source": "Reuters Business",
-   "why": "Отслабването на долара след изборните резултати засилва потока към злато като защитен актив.",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQd0lHOUFsbExIR3lscDNTRy14T012UWd6UlBSLUtySlpjSTdFaEtYLW1hbnpOTHdrSm1fM1RGU2V0WmxNSWJGU3AxeV9PUDVRVm1BRjBBNXQxZVVacElvaE5IbGJFU2FZbnN1Tmg4dlVTZ3prY0U0SEh5X1VzWmxUYnQ3VWhtZGpGOXloc1R6X3BvNlprVmw0UGppaFE2VFcyYkl3SzJ3?oc=5"
+   "why": "Доларът отслабва и Treasury yields се понижават след изборния резултат, което поддържа стоки и emerging market активи.",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOS3ZvRzF1aTlTZE9WT0NxYkU4TWFHTi04YnhEVXd1VTJRTXdibGtPdGZtTWkwZEVBLU0xNmtZaEc4R2lWZWVSdGJtY1FSdzhIazR5a2YwdDJoRzFFTHN1Z2FNb2l5b2x5SllyTE9sTTZTNkxFODFJVkhxOGhlblRTXzNiLTZpc3FKcXBqRzZUMjYtY3VXOHlnR0hPOFFYTldZaXpzSGNTbzlPNlhUdHF1amJTcFp1dw?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Gold hits a two-week high as dollar, Treasury yields ease after US midterm elections - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPRGw2bTVBSnBUN1BZcDhwQ0dVSmFIUVhDdGZLazVPNnV2NG5iYkVxXzg5QmRyY21IOWZOcFVRVXJBSU5PT1pXQWh3UHVmVWxhSm15bVh2NTVQZzJGVHpPT2dSSHc2NXlaLUYyQmVGX24xdW84cVN2NXpGcUhGZ0xrNDZSODR1NDNtNW9vc2JJSUVRcGZIMkprZHNONm4wN2VxUzdBX3B1NWxxcDBsWjNnZ05tUzdMRHJNaEJja2oxNC1QLWQt?oc=5"
+    }
+   ]
   },
   {
-   "headline": "Oracle cancels $7bn Tencent AI deal under Trump pressure",
+   "headline": "Asian tech stocks slide on post-midterm AI fears",
    "source": "Financial Times",
-   "why": "Прекратяването на сделката под натиск от Белия дом засилва рисковете за US AI/cloud компании с китайски партньори и може да охлади трансграничните AI инфраструктурни проекти.",
-   "link": "https://www.ft.com/content/c5a6a738-cd78-4a8e-a814-57a7473ebb9c?syn-25a6b1a6=1"
-  },
-  {
-   "headline": "AMD forecast eases AI spending fears as data-center sales surge - Reuters",
-   "source": "Reuters Business",
-   "why": "Силните резултати на AMD с почти удвоени data center приходи успокояват опасенията за AI capex и поддържат полупроводниковия сектор, въпреки политическото налягане след изборите.",
-   "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNM01ic0VHVkhaaTh2RV9KVV8zNHFCNW1TZnRlc29mMDg5T200aGRFZkdhd0JtYmtiZGt4LVJRdTdzWlV4dnhnRk9WVW5NWE1QWEFXSmhnZFVDNHpUVk94b0NFOEt4MXNLRWFmYTQzZnlZN3VvTGNtVzZFNnFHQVJ6NWlISXlsNFFBYnVVMnhXTVlOUHE0MWk2TWhYUFgtQ2Yzc1JzVHVRNmo5RmpvQ3Qwc3E3bkJVQTRnQ2JIX2x5NVg?oc=5",
+   "why": "Демократичният контрол над Конгреса поражда опасения за ограничения върху data center строителство и AI инфраструктура, натискайки технологичните акции надолу.",
+   "link": "https://www.ft.com/content/21755495-c68a-45a9-90d8-64f698cd1952?syn-25a6b1a6=1",
    "also": [
     {
-     "source": "Reuters Business",
-     "headline": "AMD's OpenAI, Meta chip deals trigger $1 billion quarterly charge - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPY3RKZ3JJTFBHVzJUVXg5b3plRk1ia1FPSFhZNE9FUEtPd3pBQ2ZSa2psVmphTk43UEs2cUxxc1ZfMDRYOUFzMHhROXN5WmoxZURqU29xRDVhS05CRnFJZjZwTHNySkJGbzd1Z0ZadDdlcUdxaV9CSE1xUERDQXZ4S1hWT0dZME1mV1VpTW45dXVMRzNiRmcyZHN0Ql9mbHlpdzBZd216czZCY29ydzdZbGtWSFByRDdvcGc?oc=5"
+     "source": "Financial Times",
+     "headline": "Voters have put a helpful chill on the US data centre boom",
+     "link": "https://www.ft.com/content/b7d0761f-e5fb-4746-924f-b15420a57844?syn-25a6b1a6=1"
     },
     {
      "source": "CNBC",
-     "headline": "AMD stock jumps 8% on earnings as data center revenue nearly doubles",
-     "link": "https://www.cnbc.com/2026/11/03/amd-amd-q3-earnings-report-2026-.html"
+     "headline": "Democrats may go after data centers. That's not a reason to dump all your AI stocks",
+     "link": "https://www.cnbc.com/2026/11/04/democratic-data-center-pushback-could-help-ai-stocks.html"
     }
    ]
   },
   {
-   "headline": "Meta raises $15 billion in five-part US bond sale to fund AI expansion - Reuters",
+   "headline": "Democrats gain influence over trade agenda, but tariff repeals to hit Trump veto wall - Reuters",
    "source": "Reuters Business",
-   "why": "Мащабната облигационна емисия на Meta за AI разширяване увеличава предлагането на корпоративен дълг и сигнализира за неотслабващи капиталови разходи в сектора въпреки политическата несигурност.",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOZ0dOQjhPM1A5WmJrZFlkRV9MeFZLNHJZakRnUzQwa0ZpY1J2eXVuZmJ6QkQ3TXpZY3Q0VW9tWlJ1S0tQU25YbHZqS3QwUEFnZmlFcjJMZ2t3V19QX2ttXzNMTFNHS3BsWU9qOFFJamd6R2ttQVE3bnM0MGRlNUJpTzY0WXNzMnlMSS1fRDJzWVpoYUhreERlblhKMA?oc=5",
+   "why": "Демократите могат да оспорват тарифната политика на Тръмп в Конгреса, но президентско вето блокира отменянето им — умерена позитивна сигнализация за търговски партньори, без краткосрочна промяна в тарифния режим.",
+   "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQTzNLUjBwZFJZSVE0U0NxbTVYbVotU0R1ak1zb2g1LTR2a0MtYkxVcGZFOFhZNkcza1hhTlpobGN4bU1hVmZhUGs5UFk5TC1kYWdXS181NHdZZlJGdEJMc0NNcHl5dndpaHo2SXpJcUxjeHkwVkZQTkhBX2xVVlg0eWNkZXRkcGx6NEpRQlFiLWtXdElVcllTWHhGZWxvUEREWXEzM2RocjFjbXBIbm1wOVhUSkEzOGFCb3ZMZ21WdElEU3l3em15cGZtZkdUQQ?oc=5",
    "also": [
     {
      "source": "CNBC",
-     "headline": "Meta seeks to raise up to $25 billion in debt sale as AI spending jumps",
-     "link": "https://www.cnbc.com/2026/11/03/meta-bond-sale-ai-funding.html"
+     "headline": "What Republicans' huge loss means for Trump",
+     "link": "https://www.cnbc.com/2026/11/04/trump-midterm-election-results-congress.html"
     }
    ]
   },
   {
-   "headline": "CVS will split up its pharmacy and insurance business into two companies, WSJ says - Reuters",
-   "source": "Reuters Business",
-   "why": "Разделянето на CVS на две отделни компании е структурно събитие за здравния и застрахователния сектор и може да преначерти пазарните оценки на двата бизнеса.",
-   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNTkhjaUZVT0NOQTI5R2JFdk92UWQxRVpoaF9GX3lTSGxHZFEteEVQYk5FSi1oc0JXUXRycVhLZVNzaVpRUWZReWxpS2dGNEF4VkluUWo2UUVCV0Fmbk5KN1pxN2RrUE1YOGpPaThUcHJGSkpnVXlaUXFhbVZNQzR5UXFTM0ZFYjVpQlZWSHJDRzRhSkloRW9hWlZHWUlqY3lYVlpOanUtQ0tzOFM2TDBXc3c5R3hfUDhXNWpKWWFGdDFzTHdvaVotVGdR?oc=5"
+   "headline": "Analysis: The Democrats have one chance to extract concessions from Trump. Markets will hate it",
+   "source": "CNBC",
+   "why": "Предстоящото сблъсъкване за дълговия таван при обърнати политически роли носи риск от пазарна волатилност и евентуален технически дефолт — ключов tail risk за treasuries и широкия пазар.",
+   "link": "https://www.cnbc.com/2026/11/04/democrats-trump-debt-ceiling-fight.html"
   },
   {
-   "headline": "North Korea fires multiple missiles in fourth weapons launch in a month, Seoul says - Reuters",
+   "headline": "Qualcomm shares slide as smartphone weakness clouds growth push - Reuters",
    "source": "Reuters Business",
-   "why": "Поредният ракетен тест на Северна Корея усилва геополитическото напрежение в Азия и натиска нагоре отбранителните акции и йената като защитен актив.",
-   "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPSGd2b2RVUmtvZUZCMHFtelFwQUV1Umdta1FkSTloenlXeGUxbUhuNVNqaDdHd0IzaU1wcWtUdnNDSVJ0YVJGREIwMTBqZElfcjlNbXp3YWpyNzlodHhXbWp4c0FaSE1iSkh3UUl3SFJsN2lDcHJsdUhzZVVQZE1QTzc5QkswcS1TR3hFMkNrM0RIUWFwekZ3Y1hNS0tIMUpfSjZFQ1E4cFAxVF9HMzRNNXFXbl9VUGlROTJlNkFOR2xaYWdoNGZ5V2FnOU4?oc=5",
+   "why": "Qualcomm дава слаба прогноза заради слабост при смартфони и недостиг на памет, което натиска полупроводниковия сектор независимо от макро фона.",
+   "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPY1J5TU1haGNMUk9CVzZLSmN4d09oZXdTLUFSTEJOMVAxZURhWE5JRVgzVU41TXdHSV92TEJkODQ2Q1NFLUdLSjh6UThlVUVFTUJUS3gxb25ta1VHYjJEMWQ5LUxwTTRzNXpfaUdPOVJxeGhQaDhqMzg5eDRkTENkeUhNa3lwT1k1cEVQQWR6SEl1R1dkVUtFalp2eHVMTDR5VUhiM1JHUjNPRkt5MW1Td2U2UE9SejRBUTJJR0cyaWE?oc=5",
    "also": [
     {
-     "source": "AP Business",
-     "headline": "North Korea launches missiles toward the sea as Pyongyang protests against US claims on Binance hack - AP News",
-     "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOaTQ2OEJBMGZkOXY0S1pkeEpQU1ZEUTAySjQwekdEM0FNY3JickJzSnZOMnNqM1NtbWFnYkNxMXp4S0dvcER5VHRlcVpZb2lSSlRMUm9JdDJrWGVIOVFlUHlFeGQzUlp0bE9sOVpCWVUzbmZmZU9SUWtzN29DMmxITzBwYllTSlFqWG4zVnRabUJJMjQ?oc=5"
+     "source": "CNBC",
+     "headline": "Qualcomm stock drops 7% on weak earnings forecast as memory shortage weighs on smartphone sales",
+     "link": "https://www.cnbc.com/2026/11/04/qualcomm-qcom-earnings-report-q4-2026.html"
     }
    ]
   }
  ],
  "window": {
-  "since": "2026-11-03T06:30:00+00:00",
-  "hours": 24.11,
+  "since": "2026-11-04T06:30:00+00:00",
+  "hours": 24.09,
   "day_queries": 0,
   "sources": {
    "Reuters Business": {
-    "count": 50,
-    "oldest": "2026-11-03T15:53Z"
+    "count": 49,
+    "oldest": "2026-11-04T17:16Z"
    },
    "CNBC": {
-    "count": 29,
-    "oldest": "2026-11-03T17:05Z"
+    "count": 30,
+    "oldest": "2026-11-04T19:37Z"
    },
    "Financial Times": {
-    "count": 9,
-    "oldest": "2026-11-03T23:34Z"
+    "count": 13,
+    "oldest": "2026-11-04T17:42Z"
    },
    "AP Business": {
     "count": 50,
-    "oldest": "2026-11-03T07:10Z"
+    "oldest": "2026-11-04T06:44Z"
    }
   }
  }
