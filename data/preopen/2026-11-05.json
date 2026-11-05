@@ -1,0 +1,160 @@
+{
+ "date": "2026-11-05",
+ "time_ny": "09:07",
+ "time_berlin": "15:07",
+ "ok": true,
+ "diag": {
+  "tickers": 926,
+  "with_pm": 687,
+  "gappers": 3,
+  "zero_volume_share": 1.0,
+  "requested": 926
+ },
+ "gaps": [
+  {
+   "ticker": "APP",
+   "session": "2026-11-04",
+   "prev_close": 271.75,
+   "pm_price": 336.0,
+   "pm_bars": 62,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 23.64,
+   "ret63_pct": -19.042515229468226,
+   "neglect": true,
+   "liquid": true,
+   "adr": 4.565857855773037,
+   "company": "APP",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-04 16:08",
+     "items": [
+      "2.02",
+      "5.07"
+     ],
+     "text": "8-K (SEC), 04.11 16:08 ET: 2.02 — финансови резултати; 5.07 — гласуване на акционерите"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "ETFs Are Net Sellers of AppLovin (APP) on Nov. 3",
+    "source": null,
+    "published": "2026-11-05 11:02",
+    "link": null
+   },
+   "headlines_error": null
+  },
+  {
+   "ticker": "TPR",
+   "session": "2026-11-04",
+   "prev_close": 125.30999755859375,
+   "pm_price": 144.75,
+   "pm_bars": 28,
+   "pm_volume": null,
+   "pm_last_ny": "09:06",
+   "gap_pct": 15.51,
+   "ret63_pct": -22.648149655189044,
+   "neglect": true,
+   "liquid": true,
+   "adr": 2.711883599306897,
+   "company": "TPR",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-05 06:45",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 05.11 06:45 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "Tapestry (NYSE:TPR) beats Q3 CY2026 sales expectations, stock jumps 10.3%",
+    "source": null,
+    "published": "2026-11-05 12:24",
+    "link": null
+   },
+   "headlines_error": null
+  },
+  {
+   "ticker": "VNT",
+   "session": "2026-11-04",
+   "prev_close": 37.58000183105469,
+   "pm_price": 42.0,
+   "pm_bars": 5,
+   "pm_volume": null,
+   "pm_last_ny": "07:40",
+   "gap_pct": 11.76,
+   "ret63_pct": 6.51928325209441,
+   "neglect": true,
+   "liquid": true,
+   "adr": 2.386727500999708,
+   "company": "VNT",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-05 06:43",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 05.11 06:43 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "Vontier (NYSE:VNT) exceeds Q3 2026 expectations, stock jumps 11.3%",
+    "source": null,
+    "published": "2026-11-05 12:20",
+    "link": null
+   },
+   "headlines_error": null
+  }
+ ],
+ "levels": [
+  {
+   "ticker": "G",
+   "what": "Kullamägi",
+   "kind": "над нивото",
+   "level": 41.91,
+   "pm_price": 42.27,
+   "pct": 0.85,
+   "pm_volume": null
+  },
+  {
+   "ticker": "G",
+   "what": "книга QM",
+   "kind": "над нивото",
+   "level": 41.91,
+   "pm_price": 42.27,
+   "pct": 0.85,
+   "pm_volume": null
+  }
+ ],
+ "watch": [
+  {
+   "ticker": "ELF",
+   "gap_pct": 4.0,
+   "pm_price": 118.18,
+   "prev_close": 113.63,
+   "close_src": "brief",
+   "pm_last_ny": "08:50",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "coverage": {
+  "with_pm": 687,
+  "requested": 926,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null
+ },
+ "session": "2026-11-04",
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "seconds": 44.3,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 05.11 — 3 гапа, 2 нива, 1 наблюдавани",
+  "at_utc": "14:07"
+ }
+}
