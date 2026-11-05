@@ -20,6 +20,11 @@ d = json.loads(p.stdout)
 lot1, lot2 = 1001 / 1.10, 1501 / 1.20
 total23 = (2998 / 1.08 - lot1 - lot2 / 2) + (1050 / 1.08 - 800 / 1.10) + 200 + 298 * 0.7 + 248.95 / 1.08 + 40 / 1.08 + 12.34 + 5 / 1.08    # ръчно — както в test_tax_core
 
+print("── 0. жълтият ред най-горе (05.11.2026) ──")
+for k in d:
+    assert d[k]["beta"]["text"] == "В проверка — не ползвай за декларация, докато не е сверено с реални отчети." and d[k]["beta"]["cls"] == "msg warn", (k, d[k]["beta"])
+print(f"  ✓ първият елемент на страницата: „{d['site']['beta']['text']}“ (msg warn, фон {d['site']['beta']['bg']})")
+
 print("── 1. числото най-горе по всички пътища за курсовете ──")
 for k in ("withEcbFile", "site", "ecbApi", "ecbRetry", "frankfurter"):
     s = d[k]
