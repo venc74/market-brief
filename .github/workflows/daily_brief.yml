@@ -51,10 +51,12 @@ jobs:
           DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
         run: python src/main.py
 
-      # 05.11.2026 (tax-fixes): курсовете на ЕЦБ до данъчната страница — браузърът не прави заявки навън; при провал остава предишният файл
+      # 05.11.2026 (tax-fixes): курсовете на ЕЦБ до данъчната страница — браузърът не прави заявки навън. НИКОГА не спира брифа: скриптът винаги
+      # завършва с 0 (провал → ::warning::, старият файл остава); ако все пак падне или увисне — `|| echo`, timeout-minutes и continue-on-error.
       - name: ECB rates for the tax page
         continue-on-error: true
-        run: python tools/ecb_rates.py docs/eurofxref-hist.csv
+        timeout-minutes: 3
+        run: python tools/ecb_rates.py docs/eurofxref-hist.csv || echo "::warning title=ECB rates::tools/ecb_rates.py падна — остава предишният docs/eurofxref-hist.csv"
 
       - name: Commit dashboard + data
         run: |

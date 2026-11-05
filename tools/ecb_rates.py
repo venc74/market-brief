@@ -36,18 +36,24 @@ def extract(data: bytes, today: datetime.date) -> str:
 
 
 def main(out_path: str) -> int:
+    """Винаги код 0: курсовете никога не спират брифа (05.11.2026). Провал / таймаут → ::warning:: в лога на GitHub Actions, старият файл остава непокътнат."""
+    tmp = out_path + ".tmp"
     try:
         req = urllib.request.Request(URL, headers={"User-Agent": "market-brief tax page"})
         with urllib.request.urlopen(req, timeout=60) as r:
             data = r.read()
         text = extract(data, datetime.date.today())
-        tmp = out_path + ".tmp"
         with open(tmp, "w", encoding="utf-8", newline="") as f:
             f.write(text)
         os.replace(tmp, out_path)
         print(f"ecb_rates: {out_path} обновен ({len(text) // 1024} KB)")
     except Exception as e:                                            # старият файл остава — страницата казва докъде стигат курсовете
-        print(f"ecb_rates: НЕ е обновен ({type(e).__name__}: {e}) — остава предишният файл")
+        print(f"::warning title=ECB rates::{out_path} НЕ е обновен ({type(e).__name__}: {e}) — остава предишният файл; брифът продължава")
+        try:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        except OSError:
+            pass
     return 0
 
 
