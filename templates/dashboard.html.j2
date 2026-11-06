@@ -217,7 +217,7 @@
   details.wt-item[open] > summary .wt-t::before { content: "▾ "; }
   .wt-plain .wt-t::before { content: "  "; white-space: pre; }
   .wt-detail { padding: 2px 14px 12px 30px; border-bottom: 1px solid var(--line); }
-  .sb-row { grid-template-columns: 1.4fr 1.3fr .7fr .9fr 2.2fr; align-items: baseline; }   /* 30.10.2026 (т. 7): секторната карта (подравняването — както досега) */
+  .sb-row { grid-template-columns: 1.4fr .6fr 1.3fr .7fr .9fr 2fr; align-items: baseline; }   /* 30.10.2026 (т. 7): секторната карта (подравняването — както досега) */
   .sb-leaders .ctx-table { width: 100%; max-width: 680px; margin-top: 4px; }   /* лидерите под реда — таблицата на карето „Контекст“ (една ширина за всички сектори) */
   .sb-leaders { overflow-x: auto; }
   .sb-leaders .pos { color: var(--green); } .sb-leaders .neg { color: var(--red); } .sb-leaders .warn-txt { color: var(--yellow); }
@@ -885,13 +885,14 @@
   <h2>Секторна карта · кои сектори водят</h2>
   {% if sector_board.summary %}<div class="prose" style="margin-bottom:12px">{{ sector_board.summary }}</div>{% endif %}
   <div class="wt sb">
-    <div class="wt-row sb-row wt-head"><span>ETF · сектор</span><span>RS спрямо SPY 4 / 12 седм.</span><span>Място</span><span>6м връх</span><span>Лидери</span></div>
+    <div class="wt-row sb-row wt-head"><span>ETF · сектор</span><span>Днес</span><span>RS спрямо SPY 4 / 12 седм.</span><span>Място</span><span>6м връх</span><span>Лидери</span></div>
     {# 30.10.2026: лидерите — таблица под реда на сектора (като карето „Контекст“), разгъва се с клик. 02.11.2026 (поправки след брифа, т. 3): всички затворени по подразбиране —
        един ред на сектор (до 02.11 „води пазара“ беше отворен) #}
     {% for r in sector_board.sectors %}
     <details class="wt-item">
       <summary class="wt-row sb-row">
         <span class="wt-t">{{ r.etf }}{% if r.leader %} <span class="wt-mark" style="color:var(--green)" title="Същото правило като скрийнинга и SECT✓">водещ</span>{% elif r.word == "води пазара" and r.confirmed_laggard %} <span class="wt-mark" style="color:var(--yellow)" title="RS е положителна днес, но секторът е потвърдено изоставащ — не влиза във водещите">потвърдено изоставащ</span>{% endif %}<span class="wt-name">{{ r.sector }}</span></span>
+        <span data-l="Днес" class="wt-num">{% if r.chg_1d_pct is defined and r.chg_1d_pct is not none %}<span class="{{ 'neg' if r.chg_1d_pct < 0 else 'pos' }}">{{ "%+.1f"|format(r.chg_1d_pct) }}%</span>{% else %}<span class="wt-mu">—</span>{% endif %}</span>
         <span data-l="RS 4 / 12 седм."><span class="wt-num">{{ rs_num(r.rs_4w) }} / {{ rs_num(r.rs_12w) }}</span>{% if r.word %}<span class="wt-name">{{ r.word }}</span>{% endif %}</span>
         <span data-l="Място" class="wt-num">{{ r.rank }}{% if r.rank_change > 0 %} <span class="wt-up">↑ {{ r.rank_change }}</span>{% elif r.rank_change < 0 %} <span class="wt-dn">↓ {{ -r.rank_change }}</span>{% else %} <span class="wt-mu">—</span>{% endif %}</span>
         <span data-l="6м връх">{% if r.rs_at_6m_high %}<span class="wt-mark" style="color:var(--green)">RS на 6м връх</span>{% else %}<span class="wt-mu">—</span>{% endif %}</span>

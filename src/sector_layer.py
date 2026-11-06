@@ -151,7 +151,9 @@ def board_rows(data, spy, etfs: dict, lag: int | None = None) -> list[dict]:
                 continue
             chg = lambda i, n: (float(rs.iloc[i]) / float(rs.iloc[i - n]) - 1) * 100
             r4, r12, p4, p12 = chg(-1, 20), chg(-1, 62), chg(-1 - lag, 20), chg(-1 - lag, 62)
-            rows.append({"etf": sym, "sector": name, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
+            px = data[sym].dropna()
+            day = round((float(px.iloc[-1]) / float(px.iloc[-2]) - 1) * 100, 2)          # 06.11.2026 (пакет 05–06.11, т. 6): промяната за деня (абсолютна)
+            rows.append({"etf": sym, "sector": name, "chg_1d_pct": day, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
                          "strength": round((r4 + r12) / 2, 2), "strength_prev": (p4 + p12) / 2, "rs_at_6m_high": bool(float(rs.iloc[-1]) >= float(rs.max()) * 0.99)})          # както sector_rotation (данните са 6 месеца)
         except Exception as e:
             print(f"[sector] карта: {sym} пропуснат: {type(e).__name__}: {e}")
@@ -216,7 +218,27 @@ def mark_leaders(rows: list[dict], rotation: list[dict] | None) -> list[dict]:
     return rows
 
 
-def board_summary(rows: list[dict]) -> str:
+def selloff_text(rows: list[dict], spy_1d: float | None) -> str | None:
+    """
+    06.11.2026 (пакет 05–06.11, т. 6): при SPY ≤ SECTOR_SELLOFF_SPY_PCT за деня и мнозинство сектори надолу — „широка разпродажба; относително най-слабо засегнати: …“ (трите с най-малък спад). Иначе None.
+    Реално, 05.11: SPY −4.41%, 11 от 11 надолу, а изречението казваше „широка ротация извън мега-технологиите“ (RS 4 / 12 седмици не вижда деня). Чиста функция.
+    """
+    if not isinstance(spy_1d, (int, float)) or spy_1d > config.SECTOR_SELLOFF_SPY_PCT:
+        return None
+    moved = [r for r in rows if isinstance(r.get("chg_1d_pct"), (int, float))]
+    down = [r for r in moved if r["chg_1d_pct"] < 0]
+    if not moved or len(down) * 2 <= len(moved):
+        return None
+    least = sorted(down, key=lambda r: -r["chg_1d_pct"])[:config.SECTOR_SELLOFF_SHOW]
+    return (f"широка разпродажба (SPY {spy_1d:+.1f}% за деня, надолу {len(down)} от {len(moved)}); относително най-слабо засегнати: "
+            + _lst([f'{r["sector"]} ({r["chg_1d_pct"]:+.1f}%)' for r in least]))
+
+
+def _lst(xs: list[str]) -> str:
+    return ", ".join(xs[:-1]) + " и " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "")
+
+
+def board_summary(rows: list[dict], spy_1d: float | None = None) -> str:
     """
     Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
     иначе „смесена картина“. Чиста функция.
@@ -232,9 +254,9 @@ def board_summary(rows: list[dict]) -> str:
     lag = [r["sector"] for r in reversed(rows) if r.get("word") == "изостава"][:3]
     top3 = {r["etf"] for r in rows[:3]}
     broad = len(lead_all) >= config.SECTOR_BROAD_MIN_LEADERS and any(r.get("etf") in config.SECTOR_MEGA_TECH_ETFS and r.get("word") == "изостава" for r in rows)
-    meaning = config.SECTOR_BROAD_TEXT if broad else next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2),
-                                                          "смесена картина — няма ясна посока на ротацията")
-    lst = lambda xs: ", ".join(xs[:-1]) + " и " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "")
+    meaning = selloff_text(rows, spy_1d) or (config.SECTOR_BROAD_TEXT if broad else next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2),
+                                                                                          "смесена картина — няма ясна посока на ротацията"))
+    lst = _lst
     head = (f"Водят {len(lead_all)} от {len(rows)} (първите три: {lst(lead)})" if len(lead_all) > 3 else f"Водят {lst(lead)}") if lead else "Нито един сектор не води и на двата периода"
     parts = [head, f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
     return f"{parts[0]}; {parts[1]} — {meaning}."
@@ -263,7 +285,8 @@ def sector_board(download=None, universe_sector: dict | None = None, trend: dict
         r["leaders"] = sector_leaders(r["etf"], universe_sector or {}, trend or {}, ratings or {})
         for l in r["leaders"]:
             l.update((earnings_fn or next_earnings)(l["ticker"], today) or {})
-    return {"sectors": sectors, "subsectors": subsectors, "summary": board_summary(sectors), "as_of": spy.index[-1].date().isoformat(),
+    spy_1d = round((float(spy.iloc[-1]) / float(spy.iloc[-2]) - 1) * 100, 2) if len(spy) > 1 else None      # 06.11.2026 (т. 6)
+    return {"sectors": sectors, "subsectors": subsectors, "summary": board_summary(sectors, spy_1d), "as_of": spy.index[-1].date().isoformat(), "spy_1d_pct": spy_1d,
             "top_sub": subsectors[:config.SECTOR_BOARD_SUB_TOP], "bottom_sub": subsectors[-config.SECTOR_BOARD_SUB_BOTTOM:][::-1] if len(subsectors) > config.SECTOR_BOARD_SUB_TOP else []}
 
 
