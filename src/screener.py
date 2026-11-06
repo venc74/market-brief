@@ -598,6 +598,9 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
             continue
 
     LAST_STATUS["fundamentals_checked"] = min(len(candidates), max_checks)
+    # 06.11.2026 (пакет 05–06.11, т. 2): кои не се проверяват заради тавана — броят и тези с най-висок RS (ред в брифа)
+    rest = sorted(candidates[max_checks:], key=lambda r: -(r.get("rs_rating") or 0))
+    LAST_STATUS["fundamentals_not_checked"] = {"n": len(rest), "max": max_checks, "top": [{"ticker": r["ticker"], "rs_rating": r.get("rs_rating")} for r in rest[:config.FUNDAMENTALS_NOT_CHECKED_SHOW]]}
     LAST_STATUS["fundamentals_unavailable"] = sorted(t for t, v in LAST_FUNDAMENTALS.items() if v["result"] == "unavailable")
     print(f"[screener] CANSLIM филтър: {len(passed)} финалисти"
           + (f"; фундаментите не се изтеглиха за {LAST_STATUS['fundamentals_unavailable']}" if LAST_STATUS["fundamentals_unavailable"] else ""))
@@ -631,10 +634,11 @@ def run_screen(leading_sector_names: list[str] | None = None, leaders: list[dict
         print(f"[screener] хистерезис на RS линията: {len(held)} тикъра от предишния run, {len(held_in)} остават между {RS_LINE_STAY * 100:.0f}% и {RS_LINE_NEAR_HIGH * 100:.0f}%"
               + (f": {held_in}" if held_in else ""))
 
-    # сортиране: потвърдени пробиви → над pivot без обем → под pivot (най-близките) →
-    # extended (виж setup_rules.screen_priority); fundamental_screen гледа първите 60
-    tech.sort(key=setup_rules.screen_priority)
+    # 06.11.2026 (пакет 05–06.11, т. 2): fundamental_screen гледа първите 60 — по RS rating (setup_rules.fundamentals_priority). Финалистите остават в реда до 06.11:
+    # потвърдени пробиви → над pivot без обем → под pivot (най-близките) → extended (setup_rules.screen_priority) — надолу по pipeline-а нищо не се мени.
+    tech.sort(key=setup_rules.fundamentals_priority)
     finalists = fundamental_screen(tech)
+    finalists.sort(key=setup_rules.screen_priority)
     return apply_sector_tailwind(finalists, leaders, leading_sector_names)
 
 

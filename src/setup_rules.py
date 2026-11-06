@@ -363,6 +363,16 @@ def screen_priority(row: dict) -> tuple:
     return (_SCREEN_GROUP[kind], abs(row.get("pct_from_pivot") or 0.0))
 
 
+def fundamentals_priority(row: dict) -> tuple:
+    """
+    06.11.2026 (пакет 05–06.11, т. 2): кои влизат в първите 60 за проверка на фундаментите (Yahoo .info — таванът е заради 401) — по RS rating, най-силните първи; при равен RS — screen_priority.
+    До 06.11 редът беше screen_priority (потвърдени → без обем → под pivot → extended) и първите 60 се запълваха преди силните: брифът от 05.11 — PFG RS 74 проверен, а CROX RS 97 и LLY RS 94 — не.
+    Финалистите след това се връщат в реда на screen_priority (screener.run_screen) — само изборът кой се проверява е по RS.
+    """
+    rs = row.get("rs_rating")
+    return (-(rs if isinstance(rs, (int, float)) else -1), *screen_priority(row))
+
+
 # Подредбата на Watchlist: потвърден пробив, спрян от лимит/режим/earnings, е по-силен от buy-stop кандидат, а той — от "над pivot без обем"; extended най-накрая.
 # 31.10.2026 (т. 9–10): без таван от 10 — подредбата решава реда в „Чака пробив“ / „На радара“, не кой изпада.
 _WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3, "too_wide": 3,

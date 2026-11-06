@@ -515,6 +515,17 @@ def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str]
 env.globals["thirteenf_rows"] = thirteenf_rows
 
 
+def fundamentals_note(status: dict | None) -> str | None:
+    """06.11.2026 (пакет 05–06.11, т. 2): редът „фундаментите не са проверени за N имена“ и кои са с най-висок RS (screener.LAST_STATUS["fundamentals_not_checked"]). Няма такива / стар бриф → None. Чиста функция."""
+    nc = (status or {}).get("fundamentals_not_checked") or {}
+    n = nc.get("n")
+    if not n:
+        return None
+    top = ", ".join(f'{x["ticker"]} (RS {x["rs_rating"]})' for x in nc.get("top") or [] if x.get("ticker"))
+    return (f'Фундаментите не са проверени за {n} {"име" if n == 1 else "имена"} (таван {nc.get("max")} заради Yahoo — проверяват се най-силните по RS)'
+            + (f'; с най-висок RS от тях: {top}' if top else "") + " — те не са в списъците по-горе.")
+
+
 def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план
@@ -570,6 +581,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
+        fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
         sector_board=brief.get("sector_board") or {}, sector_board_lag=config.SECTOR_BOARD_RANK_LAG,   # 30.10.2026 (т. 7): секторната карта от кода
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
@@ -812,6 +824,9 @@ def render_email(brief: dict) -> str:
     watch_exits = ("" if not wx.get("from") else
                    f'<br><b>Излязоха от {_e(watchlist_exits.label(wx, brief.get("date") or ""))}:</b> '
                    + ("; ".join(f'{_e(r["ticker"])}: {_e(r["reason"])}' + (f' (вчера: {_e(r["yesterday"])})' if r.get("yesterday") else "") for r in wx.get("rows", [])) or "няма"))
+    fund_note = fundamentals_note(brief.get("screener_status"))                   # 06.11.2026 (т. 2)
+    if fund_note:
+        watch_exits += f'<br><span style="color:#6b7280">{_e(fund_note)}</span>'
     dot_color = {"green": "#0e9f6e", "yellow": "#d97706", "red": "#dc2626"}
     thermo_dots = "".join(
         f'<span title="{_e(i["name"])}{" (информативен, не се брои)" if i.get("informational") else ""}" '
