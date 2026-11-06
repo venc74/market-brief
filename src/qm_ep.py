@@ -541,6 +541,28 @@ def summarize_log(entries: list[dict]) -> dict:
 # ──────────────────────────────────────────────────────────────────────────
 # Оркестрация
 # ──────────────────────────────────────────────────────────────────────────
+def sector_bounce(tickers: list[str], industry: dict | None = None) -> list[dict]:
+    """
+    06.11.2026 (пакет 05–06.11, т. 10): ≥ config.EP_BOUNCE_MIN_GAPS гапа в един ден от една индустрия → [{"group", "tickers", "text"}]: това е отскок на индустрията, не новина за всяка компания поотделно.
+    Реално 06.11, 09:05 Ню Йорк: LRCX, SITM, MKSI, COHR след срива от 05.11 (ABNB — с отчет — не влиза). industry — тикър → GICS Sub-Industry (screener.LAST_UNIVERSE_INDUSTRY); групи — config.EP_INDUSTRY_GROUPS.
+    Тикър без индустрия не се брои. Чиста функция, без industry — от последния build_universe.
+    """
+    if industry is None:
+        from src import screener
+        industry = screener.LAST_UNIVERSE_INDUSTRY
+    groups: dict[str, list[str]] = {}
+    for t in dict.fromkeys(tickers or []):
+        sub = (industry or {}).get(t)
+        if sub:
+            groups.setdefault(config.EP_INDUSTRY_GROUPS.get(sub, sub), []).append(t)
+    out = []
+    for g, ts in groups.items():
+        if len(ts) >= config.EP_BOUNCE_MIN_GAPS:
+            names = ", ".join(ts[:-1]) + " и " + ts[-1]
+            out.append({"group": g, "tickers": ts, "text": f"Секторен отскок: {names} — {len(ts)} гапа от една индустрия ({g}); не е новина за всяка компания поотделно."})
+    return out
+
+
 def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None, filings_fn=None) -> dict:
     """
     След затваряне → гапове ≥ 10% → (нейният) ръст за 3 месеца, ADR, максимален стоп → заглавия + AI класификация на катализатора за показаните → дневник. Връща
@@ -556,6 +578,7 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
         daily = (fetch_daily_fn or fetch_daily)([g["ticker"] for g in gappers]) if gappers else {}
         allrows = enrich_gappers(gappers, daily)
         shown = [r for r in allrows if r["neglect"] and r["liquid"] and r["gap_pct"] >= config.QM_EP_GAP_PCT][:config.QM_EP_MAX_ROWS]
+        out["sector_bounce"] = sector_bounce([r["ticker"] for r in allrows if r["gap_pct"] >= config.QM_EP_GAP_PCT])      # 06.11.2026 (т. 10): всички гапове на деня, не само показаните
         out["not_neglected"] = [{"ticker": r["ticker"], "gap_pct": round(r["gap_pct"], 1), "ret63_pct": None if r["ret63_pct"] is None else round(r["ret63_pct"], 0),
                                  "why": "липсват дневни данни" if r["neglect"] is None else f"ръст {r['ret63_pct']:.0f}% за 3 месеца > {config.QM_EP_NEGLECT_RET63_PCT:g}%"}
                                 for r in allrows if r not in shown and (r["neglect"] is not True or not r["liquid"])]

@@ -528,6 +528,8 @@
   {% elif not (preopen.gaps or preopen.levels or preopen.watch) %}<div class="small">Нищо за отбелязване{% if preopen.coverage and preopen.coverage.partial %} в проверената част{% endif %}: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
   {% else %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
+  {# 06.11.2026 (пакет 05–06.11, т. 10): ≥ 3 гапа от една индустрия — qm_ep.sector_bounce #}
+  {% for x in preopen.sector_bounce or [] %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">{{ x.text }}</div>{% endfor %}
   <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
     <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
       {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
@@ -1618,6 +1620,7 @@
     <b>Само наблюдение — без Track Record, не е препоръка.</b> After-hours гап нагоре ≥ {{ qm_ep_gap|round|int }}% за тикъри от универса при „пренебрегване“ (ръст ≤ {{ qm_ep_neglect|round|int }}% за предходните 3 месеца);
     стоп лимитът е информация (най-много {{ qm_ep_stop_adr|round|int }}×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
   </div>
+  {% for x in qm_ep.sector_bounce or [] %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">{{ x.text }}</div>{% endfor %}
   {% if qm_ep.ok is sameas false and not qm_ep.rows %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
   {% elif qm_ep.rows %}

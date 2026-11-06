@@ -241,6 +241,16 @@ def has_news(res: dict) -> bool:
     return bool(res.get("gaps") or res.get("levels") or res.get("watch"))
 
 
+def qm_ep_sector_bounce(gaps: list[dict]) -> list[dict]:
+    """06.11.2026 (т. 10): етикетът „секторен отскок“ върху всички гапове на деня (и над PREOPEN_MAX_ROWS). Graceful: провал → без етикет."""
+    try:
+        from src import qm_ep
+        return qm_ep.sector_bounce([g["ticker"] for g in gaps or []])
+    except Exception as e:
+        print(f"[preopen] секторен отскок: {type(e).__name__}: {e}")
+        return []
+
+
 def email_html(res: dict) -> str:
     """Краткият имейл — само ако има нещо (has_news). Чиста функция."""
     e = _html.escape
@@ -255,6 +265,7 @@ def email_html(res: dict) -> str:
         parts.append(f"<div style='margin-top:6px;color:#991b1b'>⚠ Частично: {e(cov['reason'])} — празното НЕ значи, че няма гапове.</div>")
     if res.get("gaps"):
         parts.append("<div style='margin-top:10px'><b>EP — гапове ≥ +%g%% в премаркета</b></div>" % config.PREOPEN_GAP_PCT)
+        parts += [f"<div style='margin:4px 0;color:#92400e'>{e(x['text'])}</div>" for x in res.get("sector_bounce") or []]      # 06.11.2026 (т. 10)
         parts.append(li([f"<b>{e(g['ticker'])}</b> {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
                          + (f" · обем в премаркета {g['pm_volume']:,.0f}".replace(",", " ") if g.get("pm_volume") else "")
                          + (f" · {'пренебрегнат' if g.get('neglect') else 'не е пренебрегнат'} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")
@@ -349,6 +360,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
+        res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [], res["date"])
         res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)

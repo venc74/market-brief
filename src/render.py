@@ -732,6 +732,8 @@ def _qm_email_block(brief: dict) -> str:
         if ep:
             body += head("Епизодични пивоти (EP) · гапове след новина").replace("{m}", "16")
             body += '<div style="font-size:11.5px;color:#92400e;margin-bottom:6px"><b>Само наблюдение, не препоръка.</b> Обемът в after-hours не е наличен — гапът не е потвърден до отварянето.</div>'
+            for x in ep.get("sector_bounce") or []:                                   # 06.11.2026 (т. 10)
+                body += f'<div style="font-size:12.5px;color:#92400e;margin-bottom:6px">{_e(x["text"])}</div>'
             if ep.get("ok") is False and not eprows:
                 body += '<div style="color:#991b1b;font-size:12.5px">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>'
             elif eprows:

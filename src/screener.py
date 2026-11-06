@@ -37,6 +37,7 @@ LAST_FUNDAMENTALS: dict[str, dict] = {}
 # ──────────────────────────────────────────────────────────────────────────
 # 30.10.2026 (разходката, т. 7): GICS секторът на всеки тикър от универса — от същите таблици в Wikipedia (колона "GICS Sector"), без нова заявка; за лидерите в секторната карта
 LAST_UNIVERSE_SECTOR: dict[str, str] = {}
+LAST_UNIVERSE_INDUSTRY: dict[str, str] = {}              # 06.11.2026 (пакет 05–06.11, т. 10): GICS Sub-Industry от таблиците на S&P 500 и S&P 400 — за етикета „секторен отскок“ при EP
 
 
 # 30.10.2026: какво върна всеки източник на универса в този run — {име: {name, n, min, ok, reason, url}}. build_universe се вика няколко пъти в run-а (скрийнър, breadth,
@@ -56,6 +57,8 @@ def _wiki_table(url: str, column: str) -> tuple[list[str], str | None]:
             syms = [str(s).replace(".", "-").strip() for s in t[column].tolist()]
             if "GICS Sector" in t.columns:
                 LAST_UNIVERSE_SECTOR.update({sym: str(sec).strip() for sym, sec in zip(syms, t["GICS Sector"].tolist()) if isinstance(sec, str)})
+            if "GICS Sub-Industry" in t.columns:
+                LAST_UNIVERSE_INDUSTRY.update({sym: str(sub).strip() for sym, sub in zip(syms, t["GICS Sub-Industry"].tolist()) if isinstance(sub, str)})
             return syms, None
     return [], f"на страницата няма таблица с колона „{column}“"
 

@@ -320,6 +320,10 @@ QM_EP_EDGAR_8K = os.getenv("QM_EP_EDGAR_8K", "1") == "1"         # 21.10.2026 (�
 QM_EP_MIN_AH_BARS = 3                                            # поне толкова 5-минутни after-hours бара (иначе няма реална търговия)
 QM_EP_BATCH = 100
 # 03.11.2026 (т. 10, решения от 03.11): обновяването преди отварянето (src/preopen.py) — отделна стъпка в options_record.yml в 09:05 Ню Йорк; без AI
+# 06.11.2026 (пакет 05–06.11, т. 10): етикет „секторен отскок“ — толкова гапа в един ден от една индустрия (GICS Sub-Industry от таблиците на универса). Реално само 06.11: LRCX, SITM, MKSI, COHR след срива от 05.11; COHR е
+# „Electronic Components“, затова групата; другите индустрии — поотделно. Измерено: 0 попадения в 7-те after-hours гапа от дневника и в другите 2 пускания преди отварянето.
+EP_BOUNCE_MIN_GAPS = int(os.getenv("EP_BOUNCE_MIN_GAPS", 3))
+EP_INDUSTRY_GROUPS = {"Semiconductors": "полупроводници и компоненти", "Semiconductor Materials & Equipment": "полупроводници и компоненти", "Electronic Components": "полупроводници и компоненти"}
 PREOPEN_GAP_PCT = float(os.getenv("PREOPEN_GAP_PCT", 10.0))       # EP — гап нагоре в премаркета спрямо затварянето на предишната сесия
 PREOPEN_WATCH_GAP_PCT = float(os.getenv("PREOPEN_WATCH_GAP_PCT", 3.0))   # наблюдаваните — гап ± в премаркета
 PREOPEN_MIN_PM_BARS = 3                                          # поне толкова 5-минутни бара в премаркета (иначе няма реална търговия)
