@@ -959,6 +959,8 @@
 {# маркери върху карти/позиции: hover (title) И клик (.marker-tip) — кой мениджър, от коя дата е filing-ът #}
 {# 13.10.2026: бележка "предстои отделяне на ДД.ММ (запис ДД.ММ)" под тикъра в таблиците на книгите (backtest.apply_spinoff_notes) — само бележка; ръчният преглед е от деня на отделянето #}
 {# 20.10.2026 (етап 3, т. 1): buy-stop се изпълнява при докосване — обемът на деня на входа се вижда при затварянето; групите са за отделни резултати #}
+{# 06.11.2026 (пакет 05–06.11, т. 1): реалният риск при входа (стопът спрямо цената на изпълнение) — backtest.fill_risk_block #}
+{% macro fill_risk_line(fr) %}{% if fr %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Реален риск при входа: средно {{ "%.1f"|format(fr.avg) }}% ({{ fr.n }} {{ "вход" if fr.n == 1 else "входа" }}){% if fr.over %} · над {{ "%g"|format(fr.limit) }}%: {% for x in fr.over %}<b>{{ x.ticker }}</b> {{ "%.1f"|format(x.pct) }}%{% if x.target_r is not none %} (цел {{ "%.1f"|format(x.target_r) }}R){% endif %}{{ ", " if not loop.last else "" }}{% endfor %}{% endif %}.</div>{% endif %}{% endmacro %}
 {% macro entry_vol_line(ev) %}{% if ev and (ev.high + ev.low + ev.unknown) %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ {{ ev.mult|round(1) }}× среден — {{ ev.high }}{% if ev.high_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.high_avg_r) }} при {{ ev.high_closed }} затворени){% endif %} · под {{ ev.mult|round(1) }}× — {{ ev.low }}{% if ev.low_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.low_avg_r) }} при {{ ev.low_closed }} затворени){% endif %}{% if ev.unknown %} · без данни за обема — {{ ev.unknown }}{% endif %}{% if ev.excluded %} · без {{ ev.excluded }} с етикет deal / събитие{% endif %}. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>{% endif %}{% endmacro %}
 {# 26.10.2026 (етап 4б, т. 2): записите с етикет deal / „събитие/M&A“ и статистиката с тях и без тях (backtest.events_block) #}
 {# 27.10.2026: етикетираните без затворена сделка (buy-stop 27.10: ROKU отворена) → „с тях“ и „без тях“ са едно и също число — вместо тях ред „още нямат затворени сделки“ #}
@@ -1155,7 +1157,7 @@
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
              структурен стоп с процент, цел 1 е за половината позиция #}
           {% if p.method == 'v2' %}
-          <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}</b></div>
+          <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}{% if p.max_chase_by_risk %} <span style="font-weight:400;color:var(--muted)">(над него рискът до стопа е над 8%)</span>{% endif %}</b></div>
           <div class="kv"><span>Валиден до</span><b>{{ p.valid_through[8:10] ~ '.' ~ p.valid_through[5:7] if p.valid_through else '—' }} ({{ p.window_sessions }} сесии)</b></div>
           {% else %}
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
@@ -1229,7 +1231,7 @@
       <div class="buy-stop" style="color:var(--green)">{{ st.setup.trigger_text }}</div>
       {% elif st.setup and st.setup.buy_stop %}
       <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ (st.setup.valid_through[8:10] ~ '.' ~ st.setup.valid_through[5:7] if st.setup.valid_through else '—')) }}
-        · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
+        · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}{% if st.setup.max_chase_by_risk %} (над него рискът до стопа е над 8%){% endif %}</div>
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
       {% set pp = st.plan_preview %}
       {% if pp and pp.valid %}
@@ -1345,6 +1347,7 @@
     {% endfor %}
   </div>
   {% endif %}
+  {{ fill_risk_line(backtest.fill_risk) }}
   {{ entry_vol_line(backtest.entry_volume) }}
   {{ events_line(backtest.events, "R") }}
   {% if backtest.open_positions %}
@@ -1359,7 +1362,7 @@
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
           <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}{% if p.entry_volume_ratio is defined and p.entry_volume_ratio is not none %} <span style="color:var(--muted);font-size:11.5px" title="Обемът на деня на входа спрямо средния за 50 бара — buy-stop се изпълнява при докосване, обемът се вижда при затварянето">(обем {{ "%.2f"|format(p.entry_volume_ratio) }}×)</span>{% endif %}</td>
-          <td class="n">${{ p.entry_price }}</td>
+          <td class="n">${{ p.entry_price }}{% if p.fill_risk_pct is defined and p.fill_risk_pct is not none %}<div style="color:{{ 'var(--yellow)' if p.fill_risk_pct > 8.05 else 'var(--muted)' }};font-size:11.5px" title="Стопът спрямо цената на изпълнение">риск {{ "%.1f"|format(p.fill_risk_pct) }}%{% if p.fill_target_r is not none %} · цел {{ "%.1f"|format(p.fill_target_r) }}R{% endif %}</div>{% endif %}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
           {% if p.needs_manual_review %}
           <td class="n pct" style="color:var(--yellow)"
@@ -1402,7 +1405,7 @@
   </summary>
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
     Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
-    {{ buy_stop_window }} сесии, по max(Open, buy-stop), не над +{{ buyable_zone_pct|round(0)|int }}%; стоп и цел от картата) във всички режими.
+    {{ buy_stop_window }} сесии, по max(Open, buy-stop), не над тавана — по-ниското от pivot +{{ buyable_zone_pct|round(0)|int }}% и нивото с риск 8% до стопа; стоп и цел от картата) във всички режими.
     Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     {% if not bs.records %}
@@ -1425,6 +1428,7 @@
     {% for name, g in bs.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if bs.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
     {% endif %}
   </div>
+  {{ fill_risk_line(bs.fill_risk) }}
   {{ entry_vol_line(bs.entry_volume) }}
   {{ events_line(bs.events, "R") }}
   {% if bs.live %}

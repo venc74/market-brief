@@ -12,7 +12,7 @@
     дата >= entry_date (деня на брифа; събота/неделя/празник → следващата сесия).
   • Прозорец: window_sessions сесии, ВКЛЮЧИТЕЛНО първата. Вход на първата сесия, в която
     High >= pivot, на цена max(Open, pivot) (гап над pivot = по отварянето).
-  • Ако цената на входа е над max_chase (pivot +5%) → "skipped_extended" (не се гони).
+  • Ако цената на входа е над max_chase (по-ниското от pivot +5% и стоп / 0.92 — setup_rules.max_chase; записите отпреди 06.11 пазят своя таван) → "skipped_extended" (не се гони).
   • Прозорецът изтече без вход → "not_triggered" (извън статистиката); докато още тече
     (няма достатъчно бара) → "pending".
   • Сделка с (вход − стоп) <= 0 → "invalid_risk" (извън статистиката).
@@ -44,7 +44,7 @@ NOT_A_POSITION = ("not_triggered", "skipped_extended", "invalid_risk")   # из�
 
 
 def _blank(status: str = "pending") -> dict:
-    return {"status": status, "fill_date": None, "fill_price": None, "risk_per_share": None,
+    return {"status": status, "fill_date": None, "fill_price": None, "risk_per_share": None, "fill_risk_pct": None, "fill_target_r": None,
             "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0,
             "exit_date": None, "exit_price": None,
             "resolution_date": None, "realized_r": None, "current_r": None, "R": None,
@@ -63,6 +63,20 @@ def complete_bars(bars: pd.DataFrame | None, today=None) -> pd.DataFrame | None:
     """19.10.2026 (С1): без частичния бар с дата >= today; без today (реплеят) — както са. 20.10.2026: src/sessions.complete_bars."""
     from src import sessions
     return sessions.complete_bars(bars, today)
+
+
+def fill_risk(fill, stop, target=None) -> dict:
+    """
+    06.11.2026 (пакет 05–06.11, т. 1): реалният риск при изпълнението — {"fill_risk_pct": % от цената на входа до стопа, "fill_target_r": целта в R от реалния вход}. Планът смята риска от сигналното
+    затваряне; входът е по max(Open, buy-stop). Реално, WST 04.11: план 8.0% и цел 2R, вход $416.46 → 10.09% и 1.32R. Без валидни числа → None-и. Чиста функция.
+    """
+    try:
+        f, s = float(fill), float(stop)
+        if f <= 0 or f <= s:
+            return {"fill_risk_pct": None, "fill_target_r": None}
+        return {"fill_risk_pct": round((f - s) / f * 100, 2), "fill_target_r": round((float(target) - f) / (f - s), 2) if target is not None else None}
+    except (TypeError, ValueError):
+        return {"fill_risk_pct": None, "fill_target_r": None}
 
 
 def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
@@ -112,7 +126,7 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
         out.update(status="invalid_risk", resolution_date=idx[fi].date().isoformat())
         return out
     out.update(fill_date=idx[fi].date().isoformat(), fill_price=round(float(fill), 4),
-               risk_per_share=round(float(risk), 4))
+               risk_per_share=round(float(risk), 4), **fill_risk(fill, stop, t1))
 
     # ── т.4: частична продажба на цел 1, trailing за остатъка, стопът остава ──
     frac = config.TARGET_PARTIAL_FRACTION

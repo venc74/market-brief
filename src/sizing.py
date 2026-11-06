@@ -18,7 +18,8 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     Пакет 1, т.3 (2026-10-03): план за ПОТВЪРДЕН пробив (виж setup_rules).
 
     Вход: buy-stop на pivot — ако инструментът отвори над него, изпълнението е по
-    отварянето, но не по-високо от pivot +BUYABLE_ZONE_MAX_PCT% ("таван за вход").
+    отварянето, но не по-високо от тавана за вход — по-ниското от pivot +BUYABLE_ZONE_MAX_PCT% и
+    стоп / (1 − STOP_MAX_PCT%) (06.11.2026, т. 1: рискът при вход до тавана е ≤ 8%; setup_rules.max_chase).
     Референтният вход за стоп/цел е сигналният close (`price`), както в
     реплея — реалното изпълнение може да е по-високо в рамките на тавана.
     Стоп = най-ниският Low на последните STOP_STRUCT_LOOKBACK_BARS бара −buffer, но не
@@ -54,7 +55,7 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     horizon = ("2–4 седмици" if risk_pct < 6 else
                "4–8 седмици" if risk_pct < 10 else "8–12 седмици")
     buy_stop = round(pivot, 2)
-    chase = setup_rules.max_chase(pivot)
+    chase = setup_rules.max_chase(pivot, stop)
     stop_basis = (f"таван {config.STOP_MAX_PCT:g}% под входа (структурният е {st['struct_risk_pct']:.1f}%)"
                   if st["stop_capped"] else
                   f"структурен: {config.STOP_STRUCT_LOOKBACK_BARS}-барен low −{config.STOP_STRUCT_BUFFER_PCT:g}%")
@@ -66,6 +67,7 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "entry_mid": entry_ref,
         "buy_stop": buy_stop,
         "max_chase": chase,
+        "max_chase_by_risk": chase < setup_rules.max_chase(pivot),
         "valid_through": setup_rules.valid_through(today or dt.date.today()),
         "window_sessions": config.BUY_STOP_WINDOW_SESSIONS,
         "stop_loss": stop,

@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import config
-from src import trade_sim, sizing
+from src import trade_sim, sizing, setup_rules
 
 sim = trade_sim.simulate
 
@@ -192,9 +192,11 @@ TODAY = "2026-10-02"
 
 # 29.06: РЕАЛНИЯТ Action план — гап над pivot, стоп на 12.08
 plan = sizing.position_plan_v2({"price": 54.77, "pivot": 53.93, "struct_low": 50.80}, 1.0, "2026-06-29")
-rec = dict(entry_date="2026-06-29", buy_stop=plan["buy_stop"], max_chase=plan["max_chase"],
+zone = setup_rules.max_chase(plan["buy_stop"])  # 06.11.2026 (т. 1): запис отпреди новото правило пази своя таван (зоната pivot +5%) — тук се проверява симулацията
+rec = dict(entry_date="2026-06-29", buy_stop=plan["buy_stop"], max_chase=zone,
            stop_loss=plan["stop_loss"], target_1=plan["target_1"])
-assert exel.loc["2026-06-29", "Open"] == 55.00 and 53.93 < 55.00 <= plan["max_chase"]      # отваря над pivot, под тавана
+assert exel.loc["2026-06-29", "Open"] == 55.00 and 53.93 < 55.00 <= zone                    # отваря над pivot, под тавана
+assert plan["max_chase"] == 54.77 and sim({**rec, "max_chase": plan["max_chase"]}, exel, TODAY)["status"] == "skipped_extended"      # 06.11.2026: по новия таван $55.00 е над него
 r = sim(rec, exel, TODAY)
 assert (r["status"], r["fill_date"], r["fill_price"]) == ("stopped", "2026-06-29", 55.0), r
 assert (r["exit_date"], r["exit_price"], r["realized_r"]) == ("2026-08-12", 50.39, -1.0), r

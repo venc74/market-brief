@@ -98,9 +98,17 @@ def valid_through(brief_date, sessions: int | None = None) -> str:
     return session_window(brief_date, sessions)[-1].isoformat()
 
 
-def max_chase(pivot: float) -> float:
-    """Най-високата цена, при която входът още е в buyable zone (pivot +5%)."""
-    return round(pivot * (1 + config.BUYABLE_ZONE_MAX_PCT / 100), 2)
+def max_chase(pivot: float, stop: float | None = None) -> float:
+    """
+    Най-високата цена, при която входът още е в buyable zone (pivot +BUYABLE_ZONE_MAX_PCT%). Без `stop` — това е зоната, която решава kind "extended".
+    06.11.2026 (пакет 05–06.11, т. 1): със `stop` — ТАВАНЪТ на картата и на книгите: по-ниското от зоната и stop / (1 − STOP_MAX_PCT%), т.е. рискът при вход до тавана е ≤ 8%.
+    Реално, WST 04.11: стоп $374.43 → таван $406.99, а картата позволяваше $418.60 (вход на отварянето $416.46 = 10.1% риск, цел 1.3R). Не пада под самия pivot (закръгляне на стопа:
+    стоп, сметнат от pivot, дава stop / 0.92 ≈ pivot ± цент, а buy-stop на pivot трябва да може да се изпълни).
+    """
+    zone = round(pivot * (1 + config.BUYABLE_ZONE_MAX_PCT / 100), 2)
+    if not isinstance(stop, (int, float)) or stop <= 0:
+        return zone
+    return min(zone, max(round(pivot, 2), round(stop / (1 - config.STOP_MAX_PCT / 100), 2)))
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -168,6 +176,9 @@ def classify_setup(c: dict, today=None) -> dict:
     if stop:
         out.update(struct_stop=stop["struct_stop"], struct_risk_pct=stop["struct_risk_pct"],
                    stop=stop["stop"], risk_pct=stop["risk_pct"])
+    # 06.11.2026 (т. 1): таванът за вход е и по риска до стопа; зоната (chase) остава границата за "extended" — класификацията не се променя
+    cap = max_chase(pivot, stop["stop"]) if stop else chase
+    out.update(max_chase=cap, max_chase_by_risk=cap < chase)
 
     if stop and stop["too_wide"]:
         also = ""
@@ -188,7 +199,7 @@ def classify_setup(c: dict, today=None) -> dict:
         if out["volume_ok"]:
             out.update(kind="confirmed", eligible=True, gate=None, trigger_text=(
                 f"Потвърден пробив: close ${price:.2f} над pivot ${pivot:.2f} ({pct:+.1f}%), "
-                f"обем {vol_txt} ≥ {mult:g}× — купува се до ${chase:.2f}."))
+                f"обем {vol_txt} ≥ {mult:g}× — купува се до ${cap:.2f}."))
         else:
             out.update(kind="no_volume", gate="no_volume", trigger_text=(
                 f"Над pivot ${pivot:.2f} ({pct:+.1f}%), но обемът е {vol_txt} (< {mult:g}×) — "
@@ -197,7 +208,7 @@ def classify_setup(c: dict, today=None) -> dict:
         out.update(kind="below_pivot", gate="below_pivot", buy_stop=round(pivot, 2), trigger_text=(
             f"Чака пробив: buy-stop ${pivot:.2f} (валиден {config.BUY_STOP_WINDOW_SESSIONS} сесии, "
             f"до {_dm(through)}); сега {abs(pct):.1f}% под pivot. Buy-stop поръчката се изпълнява при докосване (High ≥ ${pivot:.2f}), "
-            f"до ${chase:.2f}; обемът се вижда едва при затварянето — книгата отбелязва дали денят на входа затвори с ≥ {mult:g}× среден обем."))
+            f"до ${cap:.2f}; обемът се вижда едва при затварянето — книгата отбелязва дали денят на входа затвори с ≥ {mult:g}× среден обем."))
     return out
 
 

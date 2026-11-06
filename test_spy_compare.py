@@ -63,7 +63,8 @@ print()
 
 print("── РЕАЛНО: EXEL 29.06.2026 срещу SPY ──")
 plan = sizing.position_plan_v2({"price": 54.77, "pivot": 53.93, "struct_low": 50.80}, 1.0, "2026-06-29")
-rec = dict(entry_date="2026-06-29", buy_stop=plan["buy_stop"], max_chase=plan["max_chase"],
+plan = {**plan, "max_chase": 56.63}  # 06.11.2026 (т. 1): запис отпреди новото правило пази своя таван (зоната pivot +5%) — тук се проверява сравнението със SPY
+rec = dict(entry_date="2026-06-29", buy_stop=plan["buy_stop"], max_chase=56.63,  # 06.11.2026 (т. 1): запис отпреди новото правило пази своя таван (зоната pivot +5%) — тук се проверява симулацията
            stop_loss=plan["stop_loss"], target_1=plan["target_1"])
 r = sim(rec, EXEL, "2026-10-02")
 assert (r["status"], r["fill_price"], r["exit_date"], r["exit_price"]) == ("stopped", 55.0, "2026-08-12", 50.39)

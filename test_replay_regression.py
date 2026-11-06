@@ -33,7 +33,7 @@ def brief_date(signal_bar):
 def replay(template: bool):
     config.TREND_TEMPLATE_ENABLED = template
     try:
-        out = {"bars": 0, "survivors": 0, "kinds": collections.Counter(), "by_ticker": collections.defaultdict(collections.Counter),
+        out = {"bars": 0, "survivors": 0, "kinds": collections.Counter(), "new_cap": {}, "by_ticker": collections.defaultdict(collections.Counter),
                "confirmed": [], "buy_stop": collections.Counter()}
         for sym in ("AMD", "TWLO", "LNTH", "EXEL"):
             df = F(sym)
@@ -51,9 +51,10 @@ def replay(template: bool):
                 if s["kind"] == "confirmed":
                     plan = sizing.position_plan_v2(row, 1.0, b.date())
                     assert plan["valid"], plan
-                    rec = dict(entry_date=b.date().isoformat(), buy_stop=plan["buy_stop"], max_chase=plan["max_chase"],
+                    rec = dict(entry_date=b.date().isoformat(), buy_stop=plan["buy_stop"], max_chase=setup_rules.max_chase(plan["buy_stop"]),      # 06.11.2026 (т. 1): реплеят от 04.10 — със зоната pivot +5%
                                stop_loss=plan["stop_loss"], target_1=plan["target_1"])
                     r = trade_sim.simulate(rec, df, LAST)
+                    out["new_cap"][sym] = trade_sim.simulate({**rec, "max_chase": plan["max_chase"]}, df, LAST)["status"]        # и по новия таван
                     out["confirmed"].append((sym, sub.index[-1].date().isoformat(), r["status"], r["fill_date"], r["fill_price"],
                                              r["exit_date"], r["realized_r"], r["return_pct"]))
                 elif s["kind"] == "below_pivot":                               # ХИПОТЕТИЧЕН buy-stop план (Watchlist)
@@ -87,6 +88,7 @@ conf = on["confirmed"]
 assert conf == off["confirmed"] and len(conf) == 1
 sym, sig, status, fill_d, fill_p, exit_d, r_, ret = conf[0]
 assert (sym, sig, status, fill_d, fill_p, exit_d, r_, ret) == ("EXEL", "2026-06-26", "stopped", "2026-06-29", 55.0, "2026-08-12", -1.0, -8.38)
+assert on["new_cap"] == {"EXEL": "skipped_extended"}                                # 06.11.2026 (т. 1): по новия таван (стоп $50.39 / 0.92 = $54.77) отварянето $55.00 е над него
 print("  ✓ единственият Action: EXEL (сигнал 26.06, бриф 29.06) → вход $55.00 по отварянето, стоп на 12.08 → -1.00R / -8.38%")
 
 assert dict(on["buy_stop"]) == dict(off["buy_stop"]) == {"not_triggered": 10, "open": 5, "pending": 3, "stopped": 1}

@@ -709,7 +709,7 @@ def _resolve_position(rec: dict, h: "pd.Series", l: "pd.Series", c: "pd.Series",
             rec["realized_r"] = round((last_close - entry_price) / (entry_price - original_stop), 2)
 
 
-_V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "target1_hit_date",
+_V2_RESULT_KEYS = ("status", "fill_date", "fill_price", "risk_per_share", "fill_risk_pct", "fill_target_r", "target1_hit_date",
                    "partial_price", "partial_fraction", "exit_date", "exit_price", "realized_r",
                    "current_r", "return_pct", "last_close", "last_close_date")
 
@@ -807,6 +807,26 @@ def apply_event_labels(today: str, download=None, fetch=None, name_lookup=None) 
     except Exception as e:
         print(f"[backtest] етикетите „събитие/M&A“ пропуснати: {type(e).__name__}: {e}")
         return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
+
+
+def backfill_fill_risk(tracker: dict) -> int:
+    """06.11.2026 (т. 1): реалният риск при изпълнението за записите с вход без полето (затворените не минават през резолюцията). Без мрежа, идемпотентно. Връща броя попълнени."""
+    n = 0
+    for r in tracker.values():
+        if isinstance(r, dict) and r.get("method") == "v2" and r.get("fill_price") is not None and "fill_risk_pct" not in r and record_category(r) in (CATEGORY_ACTION, CATEGORY_BUYSTOP):
+            r.update(trade_sim.fill_risk(r["fill_price"], r.get("stop_loss"), r.get("target_1")))
+            n += 1
+    return n
+
+
+def fill_risk_block(records: list[dict]) -> dict | None:
+    """06.11.2026 (т. 1): реалният риск при входа в книгата — {"n", "avg", "over": [{ticker, pct, target_r}]} (над STOP_MAX_PCT, с толеранс за закръгляне на цент). Без вход → None. Чиста функция."""
+    rows = [r for r in records if isinstance(r.get("fill_risk_pct"), (int, float))]
+    if not rows:
+        return None
+    over = [r for r in rows if r["fill_risk_pct"] > config.STOP_MAX_PCT + 0.05]
+    return {"n": len(rows), "avg": round(sum(r["fill_risk_pct"] for r in rows) / len(rows), 2), "limit": config.STOP_MAX_PCT,
+            "over": [{"ticker": r.get("ticker"), "pct": r["fill_risk_pct"], "target_r": r.get("fill_target_r")} for r in sorted(over, key=lambda x: -x["fill_risk_pct"])]}
 
 
 def entry_volume_groups(records: list[dict], visible: bool) -> dict:
@@ -1215,6 +1235,7 @@ def _migrate_qm_r_floor(tracker: dict, today: dt.date) -> int:
 def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None:
     global LAST_RESOLUTION
     today = today or dt.date.today()
+    backfill_fill_risk(tracker)                             # 06.11.2026 (т. 1): реалният риск при входа — и за затворените; без мрежа
     try:                                                    # 12.10.2026: преди мрежата — старите записи на qm_breakout по новата формула за R (идемпотентно)
         _migrate_qm_r_floor(tracker, today)
     except Exception as e:
@@ -1667,6 +1688,7 @@ def get_buystop_summary() -> dict:
                 "max_chase": r.get("max_chase"), "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"),
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
+                "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),          # 06.11.2026 (т. 1): реалният риск при входа
                 "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal")}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
@@ -1686,6 +1708,7 @@ def get_buystop_summary() -> dict:
         "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
+        "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
@@ -2053,6 +2076,7 @@ def get_backtest_summary() -> dict:
                 "spinoff_note": r.get("spinoff_note"),                  # 13.10.2026: "предстои отделяне на ДД.ММ (запис ДД.ММ)"
                 "deal": r.get("deal"),                                  # 26.10.2026 (етап 4б, т. 1): цел на придобиване
                 "entry_volume_ratio": r.get("entry_volume_ratio"),      # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
+                "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),       # 06.11.2026 (т. 1): реалният риск при входа
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
                 # docstring-а, дискусията 2026-08-13).
@@ -2111,6 +2135,7 @@ def get_backtest_summary() -> dict:
         "avg_realized_r": avg_r,
         "recent": recent,
         "open_positions": open_positions,
+        "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }

@@ -63,10 +63,10 @@ backtest._ingest_buystop_list(tr, "2026-10-05", [EXPD, FTNT], "Defensive")
 assert list(tr) == ["EXPD_2026-10-05_buystop"], list(tr)                                                         # FTNT (too_wide, без buy-stop) не влиза
 r = tr["EXPD_2026-10-05_buystop"]
 assert (r["method"], r["category"], r["status"], r["regime"]) == ("v2", "buystop", "pending", "Defensive")
-assert (r["buy_stop"], r["stop_loss"], r["target_1"], r["max_chase"]) == (194.59, 181.53, 220.71, round(194.59 * 1.05, 2))
+assert (r["buy_stop"], r["stop_loss"], r["target_1"], r["max_chase"]) == (194.59, 181.53, 220.71, EXPD["plan_preview"]["max_chase"])
 assert r["window_sessions"] == config.BUY_STOP_WINDOW_SESSIONS == 5 and r["valid_through"] == "2026-10-09" and r["pct_from_pivot"] == EXPD["setup"]["pct_from_pivot"]
 assert r["entry_date"] == "2026-10-05" and r["fill_date"] is None and r["realized_r"] is None
-print("  ✓ запис EXPD_2026-10-05_buystop: pending, buy-stop $194.59, стоп $181.53, цел 1 $220.71, таван $204.32, прозорец 5 сесии до 2026-10-09, режим Defensive;")
+print("  ✓ запис EXPD_2026-10-05_buystop: pending, buy-stop $194.59, стоп $181.53, цел 1 $220.71, таван по плана на картата, прозорец 5 сесии до 2026-10-09, режим Defensive;")
 print("    реалната FTNT (too_wide, без buy-stop) не влиза")
 
 print()

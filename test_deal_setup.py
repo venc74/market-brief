@@ -45,7 +45,7 @@ assert s["deal"] == {"buyer": "Fox Corporation", "announced": "2026-06-14", "fil
 assert s["book_note"] == "в buy-stop книгата: отворена от 22.10 по $159.89" and not s.get("triggered")           # задействаният запис — само неутрален ред
 plain = copy.deepcopy(raw); plain.pop("merger_target")
 setup_rules.annotate([plain], dt.date(2026, 10, 23))
-assert plain["setup"]["kind"] == "confirmed" and "купува се до $167.88" in plain["setup"]["trigger_text"]           # без маркера — както на 23.10
+assert plain["setup"]["kind"] == "confirmed" and f'купува се до ${plain["setup"]["max_chase"]:.2f}' in plain["setup"]["trigger_text"] and plain["setup"]["max_chase"] <= 167.88           # без маркера — както на 23.10
 print(f"  ✓ без маркера: {plain['setup']['trigger_text'][:70]}…; с маркера: kind deal (по цената — confirmed), без buy-stop / стоп / таван, «{s['trigger_text']}»")
 
 print()
