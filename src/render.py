@@ -900,7 +900,7 @@ def render_email(brief: dict) -> str:
                else f'<b>{_e(n.get("headline",""))}</b>')                                         # 15.10.2026: дословно от източника
             + (f'<span style="color:#6b7280;font-size:12px"> · +{len(n["also"])} {"източник" if len(n["also"]) == 1 else "източника"}</span>'   # 30.10.2026: само броят, без линкове
                if isinstance(n.get("also"), list) and n["also"] else "")
-            + f'<span style="color:#6b7280"> — {_e(n.get("why",""))}</span></li>' for n in news)
+            + (f'<span style="color:#6b7280"> — {_e(n["why"])}</span>' if n.get("why") else "") + "</li>" for n in news)      # 06.11.2026 (т. 8): „защо“ може да е празно
         news_block = (
             '<tr><td style="padding:16px 28px 4px">'
             '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;'

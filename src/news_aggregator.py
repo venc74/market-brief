@@ -450,10 +450,11 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         if main != i:
             dropped.append({"i": i, "reason": f"основното заглавие — от по-надеждния източник ({pool[main].get('source')}), преводът отпада", "main": main})
         r = pool[main]
-        why, cut = _why_numbers(why, " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group))
+        source_text = " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group)
+        why, cut = _why_numbers(why, source_text)
         if cut:
             dropped.append({"i": i, "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него", "removed": cut})
-        row = {"headline": r["title"], "source": r.get("source"), "why": why}
+        row = {"headline": r["title"], "source": r.get("source"), "why": why, "source_text": source_text[:2000]}      # 06.11.2026 (т. 8): source_text — за проверката на думите (ai_brief.check_news_why_terms го маха)
         if r.get("link"):
             row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс
         others = sorted((k for k in group if k != main), key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))

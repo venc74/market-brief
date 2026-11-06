@@ -624,6 +624,7 @@ def run() -> dict:
     # 06.11.2026 (пакет 05–06.11, т. 8): дневната промяна на 11-те сектора, SPY, RSP, Russell и Nasdaq и спадът от 52-седмичния връх — за разказа и проверката на думите му
     market_day = steps.step("market_day", lambda: sector_layer.market_day(sector_board), fallback={}, label="Денят на пазара за макро разказа",
                             consequence="разказът е без дневните промени и спада от върха; думите „корекция“ и „мечи пазар“ се проверяват само срещу процента в изречението")
+    news_terms_fixed = ai_brief.check_news_why_terms(news, market_day)         # 06.11.2026 (т. 8): „защо“ на новините — преди разказа, който ги чете
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day)
     # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
     def _narratives_failed(e):
@@ -1034,6 +1035,7 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         "market_day": market_day,                                       # 06.11.2026 (т. 8)
+        "news_terms_fixed": news_terms_fixed,                           # 06.11.2026 (т. 8): какво е махнато от „защо“ на новините
         "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода (до 30.10 — "sector_card": водещите по кода, веригите — от модела)
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"
         "data_warnings": data_warns,

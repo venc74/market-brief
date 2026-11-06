@@ -7,7 +7,7 @@
 СИНТЕТИЧНО (означено): кратките изречения в т. 3, отговорът на модела в т. 4.
 Пускане: python test_macro_terms.py
 """
-import sys, json, pathlib, tempfile, io, contextlib
+import sys, json, copy, pathlib, tempfile, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import pandas as pd
@@ -69,4 +69,26 @@ assert out["macro_brief"] == "RSP падна с 2.89%.\n\nЗа нас: нищо 
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert "ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day)" in main_src and main_src.index('"market_day", lambda') < main_src.index("macro_and_sector_brief(macro")
 print("  ✓ изречението пада, записът е в ai_macro[\"terms_fixed\"]; main подава деня на пазара")
+print("── 5. същата проверка в „защо“ на значимите новини (РЕАЛНИТЕ новини от 06.11; СИНТЕТИЧНИ редове за границите) ──")
+news = copy.deepcopy(TX["news"])
+for n in news:
+    assert n["why"]
+fixed = ab.check_news_why_terms(news, day)
+assert [f["term"] for f in fixed] == ["мечи пазар"] and "Nikkei" in fixed[0]["sentence"]
+by = {n["headline"]: n["why"] for n in news}
+assert by["South Korea stocks hit 9-month low as US midterm results spark AI selloff - Reuters"] == ""               # единственото изречение пада; заглавието стои
+assert "Nasdaq влезе в корекция" in by["Global stocks tumble as Democratic midterm sweep sparks AI rout"]            # QQQ −14.82% от върха
+assert any("концентрирана tech експозиция" in v for v in by.values())                                                # „концентрирано“ — само в разказа: тук думата е за портфолиата
+rows = lambda why, h="H", **k: [{"headline": h, "why": why, **k}]
+w = lambda r, d=day: (ab.check_news_why_terms(r, d), r[0]["why"])[1]
+assert w(rows("Медта е на рекордни нива.", "Copper jumps to its highest level ever")) == "Медта е на рекордни нива."  # РЕАЛНОТО заглавие от 07.08 — рекорд
+assert w(rows("Рекордният дефицит засилва натиска.", "U.S. budget deficit surged in July to highest level since March 2021")) == ""     # РЕАЛНОТО заглавие от 13.08 — не е рекорд
+assert w(rows("Рекордни печалби.", source_text="Samsung posted a record profit")) == "Рекордни печалби."             # думата е в резюмето
+r0 = rows("Рекордни печалби.", source_text="x"); ab.check_news_why_terms(r0, day); assert "source_text" not in r0[0]  # резюмето не влиза в брифа
+assert w(rows("CSI 300 е в мечи пазар (-20% от върха).", "CSI 300 down 20% from its June high")) != ""               # процентът е в изречението
+assert ab.check_news_why_terms(None, day) == [] and ab.check_news_why_terms([{"headline": "x"}], day) == []
+main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
+assert main_src.index("ai_brief.check_news_why_terms(news, market_day)") < main_src.index("ai_brief.macro_and_sector_brief(macro, rotation") and '"news_terms_fixed": news_terms_fixed' in main_src
+print("  ✓ „Nikkei … мечи пазар“ пада и от „защо“ (преди разказа); „Nasdaq влезе в корекция“ и „концентрирана tech експозиция“ остават; „рекорд“ — с дословен източник")
+
 print("\n✅ test_macro_terms: всичко мина")

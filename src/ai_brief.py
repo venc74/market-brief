@@ -799,6 +799,8 @@ _TERM_REC = re.compile(r"рекорд\w*|record[- ]high|all[- ]time\s+high|\bATH
 _TERM_NOT_CLAIM = re.compile(r"(?:\b(?:не|без|няма)\s+(?:(?:е|са|в|е\s+в)\s+)?(?:\w+\s+){0,2}|\b(?:риск\w*\s+от|следващ\w*|евентуал\w*|възможн\w*|потенциал\w*|бъдещ\w*)\s+(?:\w+\s+){0,3})$", re.I)
 _TERM_INDEX = {"SPY": re.compile(r"\bSPY\b|S&P|\bпазар(?:ът|а)\b", re.I), "QQQ": re.compile(r"\bQQQ\b|Nasdaq|Насдак|\bNDX\b", re.I), "IWM": re.compile(r"\bIWM\b|Russell|Ръсел", re.I), "RSP": re.compile(r"\bRSP\b")}
 _TERM_PCT = re.compile(r"(\d+(?:[.,]\d+)?)\s*%")
+# думата „рекорд“ в дословен източник: „Copper jumps to its highest level ever“ е рекорд, „highest since March 2021“ и „biggest since 2010“ — не (реално: „Рекордният дефицит“ 13.08, „Рекордното IPO“ 27.07)
+_TERM_REC_SRC = re.compile(r"\brecord|all[- ]time|highest\s+(?:\w+\s+){0,3}(?:ever|for\s+any)|рекорд", re.I)
 _TERM_NARROW = re.compile(r"концентрир\w*|(?:\bне\s+(?:е\s+)?|\bа\s+не\s+|\bне)системн\w*", re.I)
 
 
@@ -808,7 +810,7 @@ def _term_support(sent: str, kind: str, vals: list[float], day: dict | None, hea
     ix = (day or {}).get("indexes") or {}
     named = [v for k, v in ix.items() if _TERM_INDEX[k].search(sent)]
     if kind == "rec":
-        if any(abs(v["from_high_pct"]) <= config.TERM_RECORD_NEAR_PCT for v in named) or re.search(r"\brecord|all-time|рекорд", headlines, re.I):
+        if any(abs(v["from_high_pct"]) <= config.TERM_RECORD_NEAR_PCT for v in named) or _TERM_REC_SRC.search(headlines):
             return True
         toks = na._NUM_RE.findall(na._WHY_NAME.sub(" ", _THOUSANDS.sub("", sent)))
         return any(_supported(t, vals) for t in toks)
@@ -822,17 +824,17 @@ def _term_support(sent: str, kind: str, vals: list[float], day: dict | None, hea
     return False
 
 
-def check_market_terms(text: str, vals: list[float], day: dict | None = None, news: list | None = None) -> tuple[str, list[dict]]:
+def check_market_terms(text: str, vals: list[float], day: dict | None = None, news: list | None = None, narrow: bool = True) -> tuple[str, list[dict]]:
     """
     06.11.2026 (т. 8): разказът → (поправеният текст, [{sentence, term, why}]). „Мечи пазар“ / „корекция“ / „рекорд“ без опора в числата и „концентрирано / не системно“ при широка разпродажба — цялото изречение пада,
-    както при числата без опора (check_narrative_numbers минава първа). Чиста функция.
+    както при числата без опора (check_narrative_numbers минава първа). narrow=False — без проверката за „концентрирано“ (в „защо“ на новините думата е за друго: „портфолиата с концентрирана tech експозиция“). Чиста функция.
     """
     from src import news_aggregator as na
     fixed = []
     headlines = " ".join(str(n.get("headline") or "") for n in news or [] if isinstance(n, dict))
 
     def problem(sent: str) -> dict | None:
-        if (day or {}).get("selloff") and _TERM_NARROW.search(sent):
+        if narrow and (day or {}).get("selloff") and _TERM_NARROW.search(sent):
             return {"term": _TERM_NARROW.search(sent).group(0), "why": f"широка разпродажба: надолу {(day or {}).get('down')} от {(day or {}).get('total')} сектора"}
         for kind, rx, label in (("bear", _TERM_BEAR, f"спад от върха ≥ {config.TERM_BEAR_MARKET_PCT:g}%"), ("corr", _TERM_CORR, f"спад от върха ≥ {config.TERM_CORRECTION_PCT:g}%"), ("rec", _TERM_REC, "число или заглавие")):
             for m in rx.finditer(sent):
@@ -853,6 +855,35 @@ def check_market_terms(text: str, vals: list[float], day: dict | None = None, ne
         return " ".join(kept), []
     out, _ = _per_paragraph(text, one)
     return out, fixed
+
+
+def check_news_why_terms(news: list[dict] | None, day: dict | None = None) -> list[dict]:
+    """
+    06.11.2026 (пакет 05–06.11, т. 8, решение след прегледа): същата проверка за думите и в „защо“ на значимите новини — оттам „Nikkei 225 влезе в мечи пазар“ стигна и до разказа, затова минава ПРЕДИ макро брифа.
+    Опора: индекс от изречението със спад от върха до прага; процент до прага в изречението (числата в „защо“ вече са сверени с източника — news_aggregator._why_numbers); „рекорд“ — и думата в заглавието или резюмето на самата новина.
+    Без опора — изречението пада; празно „защо“ остава празно, заглавието стои. Мутира news; връща [{headline, sentence, term, why}]. Graceful: грешка на ред не пипа реда.
+    """
+    from src import news_aggregator as na
+    fixed = []
+    for n in news or []:
+        why = n.get("why") if isinstance(n, dict) else None
+        if not isinstance(why, str) or not why:
+            continue
+        try:
+            titles = [n] + [x for x in n.get("also") or [] if isinstance(x, dict)]
+            source = str(n.pop("source_text", "") or "")                       # заглавията и резюметата от пула — само за тази проверка, не влизат в брифа
+            own = " ".join([str(x.get("headline") or x.get("title") or "") for x in titles] + [source, why])
+            vals = [abs(v[0]) for v in (_num_value(t) for t in na._NUM_RE.findall(_THOUSANDS.sub("", own))) if v]
+            new, f = check_market_terms(why, vals, day, [{"headline": str(x.get("headline") or x.get("title") or "")} for x in titles] + [{"headline": source}], narrow=False)
+        except Exception as e:
+            print(f"[ai] „защо“ на новина: проверката на думите пропусната: {type(e).__name__}: {e}")
+            continue
+        if f:
+            n["why"] = new
+            fixed += [{"headline": n.get("headline"), **x} for x in f]
+            for x in f:
+                print(f"[ai] „защо“ на новина: „{x['term']}“ — {x['why']}; махнато: «{x['sentence'][:120]}»")
+    return fixed
 
 
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
