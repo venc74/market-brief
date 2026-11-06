@@ -345,7 +345,7 @@ sec = sec[:sec.index("</section>")]
 fs = flat(sec)
 assert "GLB по Уиш · книга" not in page and "измерване, не препоръка" in fs[:200] and "Правилото за вход и изход е на Eric Wish, линията е наша" in fs and "оцелели" in fs and "тесен" not in fs.lower()
 line = fs[fs.index("не препоръка)") + 13:fs.index("Как се мери")]
-assert "37 записа · затворени 20 (" in line and "· отворени 17 (" in line and "алфа спрямо SPY" in line and "literal" not in line           # един ред; само exec
+assert re.search(r"37 записа · \d+ (?:дни|ден) · затворени 20 \(", line) and "· отворени 17 (" in line and "алфа спрямо SPY" in line and "literal" not in line           # един ред; само exec
 assert "win rate" not in fs and "Печеливши:" not in fs and "95% интервал" not in fs and "· медиана" not in fs and "Последно затворени" not in fs and "Отворени и чакащи" not in fs
 assert "Доходността в таблицата е exec" in fs and "literal (вход и изход на затварянето на сигналния ден" in fs and "остава само в данните" in fs
 assert "Без % печеливши и медиана: всяка затворена по линията е загуба по построение" in fs and "5 сесии — 20 записа без exec данни" in fs     # СИНТЕТИЧНИТЕ срокове нямат ret_exec
@@ -357,7 +357,7 @@ with contextlib.redirect_stdout(io.StringIO()):
 if SL.get("archived_from"):
     fa = flat(page_a)
     i = fa.index(f"{config.GLB_CLOSE_BOOK_NAME} · архив от")
-    assert "37 записа · затворени 20 (" in fa[i:i + 400] and "Записи в архива (37)" in fa and f"{HEAD} (измерване" not in fa
+    assert re.search(r"37 записа · \d+ (?:дни|ден) · затворени 20 \(", fa[i:i + 400]) and "Записи в архива (37)" in fa and f"{HEAD} (измерване" not in fa
     b["backtest"]["glb_wish"] = {**SL, "open": 0, "pending": 0}                             # СИНТЕТИЧНО: последният отворен запис е затворен → редът изчезва
     with contextlib.redirect_stdout(io.StringIO()):
         assert f"{config.GLB_CLOSE_BOOK_NAME} · архив от" not in flat(render.render_dashboard(b))

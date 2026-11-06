@@ -1780,7 +1780,7 @@
 {# ── Книгите по правилото на Eric Wish: "GLB по Уиш" (glb_wish_high) — НЕГОВАТА линия (месечен High); "GLB — наш вариант (close)" (glb_wish) — архив от 26.10. Измерване, не препоръка.
    03.11.2026 (разходката, т. 15): един видим ред (записи · затворени (exec) · отворени (exec) · кога статистика); методът, реплеят и сравненията — сгънато „▸ Как се мери“; записите — една
    компактна таблица (без „Отворени и чакащи“ и „Последно затворени“); доходността — само exec. Старата книга (по close) — един ред + сгънати записи, докато има отворени. ── #}
-{% macro gw_head(gw) %}{{ gw.records }} записа{% if gw.tickers is defined and gw.tickers != gw.records %} / {{ gw.tickers }} тикъра{% endif %}
+{% macro gw_head(gw) %}{{ gw.records }} записа{% if gw.tickers is defined and gw.tickers != gw.records %} / {{ gw.tickers }} тикъра{% endif %}{% if gw.days is defined and gw.days %} · {{ gw.days }} {{ "ден" if gw.days == 1 else "дни" }}{% endif %}
   · затворени {{ gw.line_exit + gw.expired }}{% if gw.closed_group and gw.closed_group.avg_return_pct_exec is not none %} ({{ "%+.1f"|format(gw.closed_group.avg_return_pct_exec) }}%{% if gw.closed_group.n_exec < gw.closed_group.n %}, {{ gw.closed_group.n - gw.closed_group.n_exec }} чака изхода на отварянето{% endif %}){% endif %}
   · отворени {{ gw.open }}{% if gw.open_group and gw.open_group.avg_return_pct_exec is not none %} ({{ "%+.1f"|format(gw.open_group.avg_return_pct_exec) }}%){% endif %}{% if gw.pending %} · чакат първата цена {{ gw.pending }}{% endif %}{% endmacro %}
 {% macro gw_section(gw, title, rep, book_key) %}

@@ -113,7 +113,7 @@ with q():
 i_h, i_c = page.index(f"{config.GLB_WISH_BOOK_NAME} · книга (измерване, не препоръка)"), page.index(f"<b>{config.GLB_CLOSE_BOOK_NAME}</b> · архив от 14.10")
 assert i_h < i_c and f"{config.GLB_CLOSE_BOOK_NAME} · архив · книга" not in page
 sec_h, sec_c = page[i_h:page.index("</section>", i_h)], page[i_c:page.index("</div>", page.index("</details>", i_c))]
-assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 168 сделки" in sec_h and "алфа на година позиция +11.0% [6.2; 16.9]" in sec_h and "печеливши 10.0%" not in sec_h and "медиана -1.68%" not in sec_h and "2 записа · затворени 0" in " ".join(sec_h.split())
+assert "Правилото на Eric Wish:</b> зелената линия е най-високата цена (High) на месечен бар" in sec_h and "13 168 сделки" in sec_h and "алфа на година позиция +11.0% [6.2; 16.9]" in sec_h and "печеливши 10.0%" not in sec_h and "медиана -1.68%" not in sec_h and f"2 записа · {sh['days']} {'ден' if sh['days'] == 1 else 'дни'} · затворени 0" in " ".join(sec_h.split())
 assert "статистика от 20 записа (сега 2)" in sec_h and "Реплеят е върху днешния универс (оцелелите): абсолютната алфа е надута." in sec_h
 assert "линията по месечния close; нови записи няма" in sec_c and "1 записа" in " ".join(sec_c.split()) and "Записи в архива (1)" in sec_c and "архив" not in sec_h.split("Как се мери")[0]
 old = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-16.json").read_text(encoding="utf-8"))

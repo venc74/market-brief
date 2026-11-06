@@ -106,7 +106,7 @@ bk = p[i:p.index("</section>", i)]
 fb = flat(bk)
 line = fb[:fb.index("Как се мери")]
 cg, og = GWH["closed_group"], GWH["open_group"]
-assert f"11 записа · затворени 2 ({cg['avg_return_pct_exec']:+.1f}%) · отворени 9 ({og['avg_return_pct_exec']:+.1f}%) · статистика от 20 записа (сега 11)" in line
+assert GWH["days"] == len({r["signal_date"] for r in FX["records"].values()}) and f"11 записа · {GWH['days']} дни · затворени 2 ({cg['avg_return_pct_exec']:+.1f}%) · отворени 9 ({og['avg_return_pct_exec']:+.1f}%) · статистика от 20 записа (сега 11)" in line
 assert "-3.1%" not in line and cg["avg_return_pct"] == -3.09                                                            # literal — само в данните
 assert "Всички записи (11)" in fb and "Обем на пробива" in fb and "CART" in fb and "4.4×" in fb and bk.count('<tr><td class="mono">') == 11
 assert "Последно затворени" not in fb and "Отворени и чакащи" not in fb and "literal" not in line
