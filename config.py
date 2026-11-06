@@ -496,6 +496,7 @@ SECTOR_BROAD_MIN_LEADERS = int(os.getenv("SECTOR_BROAD_MIN_LEADERS", 6))
 SECTOR_SELLOFF_SPY_PCT = float(os.getenv("SECTOR_SELLOFF_SPY_PCT", -2.0))
 SECTOR_SELLOFF_SHOW = 3                  # колко „относително най-слабо засегнати“ се назовават
 # 06.11.2026 (пакет 05–06.11, т. 8): думите в макро разказа — само с опора в числата: спад от 52-седмичния връх (по затварянията) или процент в самото изречение
+WATCH_BANNED_NAMES = ("Buffett", "Бъфет", "Cathie Wood", "Кати Ууд", "Майкъл Бъри", "Michael Burry", "Ackman", "Акман")      # 06.11.2026 (т. 9): хора извън Form 4 в коментарите на наблюдаваните — имената на инсайдърите маха strip_person_names
 TERM_BEAR_MARKET_PCT = 20.0              # „мечи пазар“
 TERM_CORRECTION_PCT = 10.0               # „корекция“
 TERM_RECORD_NEAR_PCT = 1.0               # „рекорд“ за индекс — на толкова % от 52-седмичния връх

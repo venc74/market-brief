@@ -1789,8 +1789,8 @@ def _check_price_mentions(ticker: str, text: str, real_price: float | None,
 
 
 SYSTEM_WATCH = """Ти си анализатор, който следи конкретни компании за инвеститор, \
-който вече държи позиции в тях. Обясняваш какво се е случило и какво означава \
-то — не преразказваш заглавия. Пишеш на български, тикери и термини на \
+който вече държи позиции в тях. Преразказваш кратко само даденото — новините и Form 4 — \
+без собствени обяснения на причините и без мотиви на хора. Пишеш на български, тикери и термини на \
 английски. Директен си: ако събитието е рутинно, го казваш рутинно. Връщаш \
 САМО валиден JSON, без markdown огради, без преамбюл."""
 
@@ -1909,6 +1909,43 @@ def strip_person_names(text: str, insiders: list[dict]) -> tuple[str, list[str]]
     return res, notes
 
 
+# 06.11.2026 (пакет 05–06.11, т. 9): коментарите на наблюдаваните — само преразказ на новините / Form 4. Реално: CRCL 05.11 „по-вероятното обяснение е координирано ликвидиране след IPO lock-up изтичане“, SIRI 05.11
+# „Buffett продължава да добавя“, CRCL 05.11 „комбинация, която сигнализира фокус върху маржа“. Думата е допустима, ако я има в заглавията от входа. Клауза след „ — “ / „, което“ пада сама; без такава — цялото изречение.
+_WATCH_CAUSE = re.compile(r"lock[- ]?up|локъп|обяснени\w*|мотив\w*|(?<!не )сигнализир\w*|\bзнак\s+за\b|по-вероятн\w*|вероятно\s+(?:е|да)\b|\bза\s+да\s+компенсира\w*", re.I)
+_WATCH_CLAUSE = re.compile(r"\s+—\s+|,\s+(?:което|който|която|които)\s+")
+
+
+def strip_watch_causes(text: str, titles: str = "") -> tuple[str, list[dict]]:
+    """
+    Собствени обяснения на причините и мотивите в коментар за наблюдаван тикър → (текстът без тях, [{term, removed}]). Имената от config.WATCH_BANNED_NAMES (хора извън Form 4) — цялото изречение.
+    Думата без опора: я няма в заглавията (titles). Чиста функция.
+    """
+    if not text:
+        return text, []
+    from src import news_aggregator as na
+    gone, kept = [], []
+    low = titles.lower()
+    for sent in na._WHY_SENT.split(text):
+        name = next((n for n in config.WATCH_BANNED_NAMES if n in sent and n.lower() not in low), None)
+        if name:
+            gone.append({"term": name, "removed": sent})
+            continue
+        m = next((x for x in _WATCH_CAUSE.finditer(sent) if x.group(0).lower() not in low), None)
+        if not m:
+            kept.append(sent)
+            continue
+        cuts = [c for c in _WATCH_CLAUSE.finditer(sent) if c.start() < m.start()]
+        dash = [c for c in cuts if "—" in c.group(0)]                           # „ — комбинация, която сигнализира …“: клаузата започва от тирето
+        cut = (dash or cuts or [None])[-1]
+        head = sent[:cut.start()].rstrip(" ,;:") if cut else ""
+        if len(head) >= 25:                                                     # смислена първа част — остава само тя
+            kept.append(head + ".")
+            gone.append({"term": m.group(0), "removed": sent[cut.start():].strip(" —,")})
+        else:
+            gone.append({"term": m.group(0), "removed": sent})
+    return " ".join(kept), gone
+
+
 def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
     """Една група наблюдавани тикъри → [{**ред, "ai": {summary, insider_read, cross_reference}}]. Хвърля при провал (watch_ticker_digest го хваща за групата)."""
     compact = [{
@@ -1934,6 +1971,9 @@ def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: fl
 БЕЗ ИМЕНА НА ХОРА — пиши САМО длъжността на български (изпълнителният директор, финансовият директор, член на борда); името е в таблицата под реда. \
 Имена на компании и фондове — може.
 
+САМО ПРЕРАЗКАЗ: пиши само онова, което го има в заглавията и Form 4. Без причини и мотиви, които ги няма там (lock-up, „за да…“, „по-вероятното обяснение“, „сигнализира“, какво мислят или целят \
+мениджърите) — кодът маха такива изречения.
+
 - "summary": 1-2 изречения — какво реално се случи. Не преразказвай заглавията \
 едно по едно; кажи какво е същественото. Ако новините са само аналитични \
 коментари/рейтинги без ново събитие, кажи точно това.
@@ -1950,7 +1990,7 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
   • insider_cluster = true → няколко различни инсайдъра в една посока за \
 кратко. Това е най-силният сигнал в набора; кажи го изрично.
   • малък pct_of_holdings при продажба (под ~10%) отслабва тревожността дори \
-при голяма абсолютна сума — ликвидност/данъци, не изход от позицията.
+при голяма абсолютна сума — кажи дела; не гадай защо е продажбата.
   Ако няма транзакции, върни празен низ.
 
 - "cross_reference": САМО ако тикърът е ПРЯКО свързан с тема от списъка \
@@ -1974,7 +2014,13 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
             ai[k], notes = strip_person_names(ai[k], r.get("insider") or [])
             for n in notes:
                 print(f"[ai] watch {r['ticker']} {k}: {n}")
-        annotated.append({**r, "ai": ai})
+        removed = []
+        for k in ai:                                                # 06.11.2026 (пакет 05–06.11, т. 9): без собствени обяснения на причините
+            ai[k], gone = strip_watch_causes(ai[k], " ".join(str(n.get("title") or "") for n in r.get("news") or []))
+            removed += [{"field": k, **g} for g in gone]
+            for g in gone:
+                print(f"[ai] watch {r['ticker']} {k}: „{g['term']}“ без опора — махнато «{g['removed'][:110]}»")
+        annotated.append({**r, "ai": ai, **({"ai_removed": removed} if removed else {})})
     linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
     print(f"[ai] watch_ticker_digest: група {', '.join(r['ticker'] for r in rows)} — {len(annotated)} тикъра, {linked} с cross-reference")
     return annotated
