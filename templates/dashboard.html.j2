@@ -1101,6 +1101,7 @@
       Това е <strong>нов вход</strong>, не продължение на старата теза.</div>
     {% endif %}
     {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+    {% if st.earnings and st.earnings.earnings_status == "no_date" %}<div class="earn-warn">{{ no_date_text }}</div>{% endif %}
     {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
     {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}
     {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
@@ -1210,6 +1211,7 @@
         {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
       {% endif %}
       {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+      {% if st.earnings and st.earnings.earnings_status == "no_date" %}<div class="earn-warn">{{ no_date_text }}</div>{% endif %}
       {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
       {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}
       {% for n in st.cot_notes or [] %}<div class="cot-note">{{ n.text }}</div>{% endfor %}
@@ -1259,7 +1261,7 @@
           <td>{{ r.sector or "—" }}</td>
           <td class="num">{{ "$%.2f"|format(r.price) if r.price is number else "—" }}</td>
           <td class="num">{{ "%+.1f%%"|format(r.pct_from_pivot) if r.pct_from_pivot is number else "—" }}</td>
-          <td>{{ r.reason }}{% if r.earnings %} <span class="cs-mu">· отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}</span>{% endif %}{% if r.spinoff %} <span class="cs-warn">· ⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }}</span>{% endif %}{% if r.merger and r.kind != 'deal' %} <span class="cs-warn">· ⚠ цел на придобиване ({{ r.merger.buyer }})</span>{% endif %}</td>
+          <td>{{ r.reason }}{% if r.earnings %} <span class="cs-mu">· отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}</span>{% endif %}{% if r.earnings_unknown %} <span class="cs-mu">· {{ no_date_text }}</span>{% endif %}{% if r.spinoff %} <span class="cs-warn">· ⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }}</span>{% endif %}{% if r.merger and r.kind != 'deal' %} <span class="cs-warn">· ⚠ цел на придобиване ({{ r.merger.buyer }})</span>{% endif %}</td>
           <td class="num">{{ r.rs_rating if r.rs_rating is not none else "—" }}</td>
           <td class="num">{{ r.days or "—" }}</td></tr>
         {% endfor %}

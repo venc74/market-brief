@@ -192,6 +192,16 @@ def recent_report(last_ts, today: dt.date) -> dict | None:
         return None
 
 
+# 06.11.2026 (пакет 05–06.11, т. 3): earnings_status "no_date" — тегленето мина, бъдеща дата няма; правилото „без Action 5 работни дни преди отчет“ (in_blackout) не може да се провери. Само видимо — класът не се сменя.
+# Реално (164 карти с полето, 03–06.11): 6 такива — AAPL, ROKU, EXPD, AMGN, AIZ, MNST, всичките сутринта след отчета (Yahoo още няма следващата дата).
+NO_DATE_TEXT = "Дата на отчета неизвестна — правилото 5 дни не може да се провери."
+
+
+def no_date(card: dict | None) -> bool:
+    """Картата е без известна дата на отчета (тегленето мина, бъдеща дата няма). Чиста функция."""
+    return ((card or {}).get("earnings") or {}).get("earnings_status") == "no_date"
+
+
 UNKNOWN_EARNINGS_TEXT = "Датата на отчета не е известна (тегленето от Yahoo не успя) — Watchlist вместо Action, докато не се провери."
 
 

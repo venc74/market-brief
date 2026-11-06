@@ -163,6 +163,8 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
             txt = _e((st.get("ai") or {}).get("watchlist_trigger") or setup.get("trigger_text") or "")
         if ew:
             txt += f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>'
+        if enrich_mod.no_date(st):                                                    # 06.11.2026 (т. 3)
+            txt += f'<br><span style="color:#b45309;font-size:12px">{_e(enrich_mod.NO_DATE_TEXT)}</span>'
         txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
         out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'
                 f'<td style="padding:6px 0;font-size:12.5px;font-family:monospace">{txt}</td></tr>')
@@ -175,6 +177,8 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
             if r.get("earnings"):
                 d = r["earnings"]["date"]
                 t += f', отчет {d[8:10]}.{d[5:7]}' + (f' (±{r["earnings"]["pct"]}%)' if r["earnings"].get("pct") is not None else "")
+            if r.get("earnings_unknown"):                                             # 06.11.2026 (т. 3)
+                t += f' · {enrich_mod.NO_DATE_TEXT}'
             if r.get("spinoff"):
                 sp = r["spinoff"]
                 t += f', ⚠ отделяне {sp["distribution"][8:10]}.{sp["distribution"][5:7]} (запис {sp["record"][8:10]}.{sp["record"][5:7]})'
@@ -547,7 +551,7 @@ def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
         ew = c.get("earnings_warning") or {}
         radar.append({"ticker": c.get("ticker"), "sector": c.get("sector"), "price": c.get("price"), "pct_from_pivot": c.get("pct_from_pivot"),
                       "reason": over or radar_reason(c), "rs_rating": c.get("rs_rating"), "days": c.get("radar_days"), "kind": setup.get("kind"),
-                      "markers": c.get("markers") or [], "spinoff": c.get("spinoff_warning"), "merger": c.get("merger_target"),
+                      "markers": c.get("markers") or [], "spinoff": c.get("spinoff_warning"), "merger": c.get("merger_target"), "earnings_unknown": enrich_mod.no_date(c),
                       "earnings": ({"date": ew["date"], "pct": ew.get("implied_move_pct")} if ew.get("date") else None)})
     return waiting, radar
 
@@ -582,6 +586,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
+        no_date_text=enrich_mod.NO_DATE_TEXT,                                # 06.11.2026 (т. 3)
         sector_board=brief.get("sector_board") or {}, sector_board_lag=config.SECTOR_BOARD_RANK_LAG,   # 30.10.2026 (т. 7): секторната карта от кода
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
@@ -790,6 +795,8 @@ def render_email(brief: dict) -> str:
         mk = f'<div style="margin-top:4px">{mk}</div>' if mk else ""
         ew = st.get("earnings_warning")
         earn_line = f'<br><span style="color:#b45309;font-size:12px">{_e(ew["text"])}</span>' if ew else ""
+        if enrich_mod.no_date(st):                                                    # 06.11.2026 (т. 3)
+            earn_line += f'<br><span style="color:#b45309;font-size:12px">{_e(enrich_mod.NO_DATE_TEXT)}</span>'
         earn_line += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
         rows += f"""
         <tr>
