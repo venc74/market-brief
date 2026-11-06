@@ -1037,7 +1037,8 @@
 </tr>
 {% endmacro %}
 
-{% macro earnings_modal(modal_id, recap) %}
+{# 06.11.2026 (пакет 05–06.11, т. 5): consensus=false — в книгата Track Record v2 без реда „Консенсус EPS“ (EXPD 2.34 и WST 2.28 на 06.11: редовете бяха последното в прозореца, веднага под таблицата); картата Action го пази #}
+{% macro earnings_modal(modal_id, recap, consensus=true) %}
 {% if recap %}
 <div class="earn-modal" id="{{ modal_id }}" hidden>
   <div class="earn-modal-content">
@@ -1059,7 +1060,7 @@
     <h3>Следващ отчет</h3>
     <div class="kv"><span>Дата</span><b>{{ recap.forward.next_earnings }} ({{ recap.forward.days_to_earnings }}д)
       {%- if recap.forward.in_blackout %} · blackout{% endif %}</b></div>
-    {% if recap.forward.consensus_eps is not none %}
+    {% if consensus and recap.forward.consensus_eps is not none %}
     <div class="kv"><span>Консенсус EPS</span><b>{{ recap.forward.consensus_eps }}
       {%- if recap.forward.expected_growth_pct is not none %} (спрямо {{ recap.forward.yoy_date }}:
       {{ earnings_pct_cell(recap.forward.expected_growth_pct, '') }} очакван г/г ръст){% endif %}</b></div>
@@ -1376,7 +1377,7 @@
     </table>
   </div>
   {% for p in backtest.open_positions[:100] %}
-  {{ earnings_modal("earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date, p.earnings_recap) }}
+  {{ earnings_modal("earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date, p.earnings_recap, consensus=false) }}
   {% endfor %}
   {% if backtest.open_positions|length > 100 %}
   <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
