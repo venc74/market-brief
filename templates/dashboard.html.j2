@@ -967,7 +967,10 @@
 {% macro events_line(ev, unit) %}{% if ev %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">С етикет (цената следва сделка или слух за сделка, не сетъпа): {% for l in ev.labels %}<b>{{ l.ticker }}</b> {{ l.entry_date[8:10] }}.{{ l.entry_date[5:7] }} — {% if l.kind == "deal" %}deal ({{ l.text }}){% else %}събитие/M&amp;A{% if l.ret_pct is not none %} ({{ "%+.1f"|format(l.ret_pct) }}% при {{ "%.1f"|format(l.vol_x) }}× обем на {{ l.day[8:10] }}.{{ l.day[5:7] }}: «{{ l.text }}»){% endif %}{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.{% if ev.n_all and ev.n_all == ev.n_rest %} Средно {{ unit }}: етикетираните още нямат затворени сделки.{% elif ev.n_all %} Средно {{ unit }}: с тях {{ "%+.2f"|format(ev.avg_all) }} ({{ ev.n_all }}){% if ev.avg_rest is not none %} · без тях {{ "%+.2f"|format(ev.avg_rest) }} ({{ ev.n_rest }}){% else %} · без тях — още няма{% endif %}.{% endif %}</div>{% endif %}{% endmacro %}
 {# 26.10.2026 (етап 4б, т. 1): етикет "deal" — записът е на цел на висяща сделка (backtest.apply_deal_labels): резултатът следва условията, не сетъпа #}
 {% macro backdated_note(p) %}{% if p.backdated and p.backdated.created %}<div style="font-size:11.5px;color:var(--muted);font-weight:400">записан със задна дата (след поправка {{ p.backdated.created[8:10] }}.{{ p.backdated.created[5:7] }})</div>{% endif %}{% endmacro %}
-{% macro spinoff_note_html(p) %}{{ backdated_note(p) }}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
+{# 06.11.2026 (пакет 05–06.11, т. 4): нивата са от затварянето преди реакцията на отчета; статистиката — с и без (backtest.pre_reaction_block) #}
+{% macro pre_reaction_note(p) %}{% if p.pre_reaction %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">преди реакцията на отчета ({{ p.pre_reaction.date[8:10] }}.{{ p.pre_reaction.date[5:7] }}, {{ "след затварянето" if p.pre_reaction.when == "amc" else "преди отварянето" }})</div>{% endif %}{% endmacro %}
+{% macro pre_reaction_line(pr, unit) %}{% if pr %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Преди реакцията на отчета ({{ pr.n }}): {% for x in pr.tickers %}<b>{{ x.ticker }}</b> {{ x.entry_date[8:10] }}.{{ x.entry_date[5:7] }}{{ ", " if not loop.last else "" }}{% endfor %}{% if pr.n_all and pr.n_rest != pr.n_all %}. Среден резултат: с тях {{ "%+.2f"|format(pr.avg_all) }}{{ unit }} ({{ pr.n_all }}) · без тях {% if pr.avg_rest is not none %}{{ "%+.2f"|format(pr.avg_rest) }}{{ unit }} ({{ pr.n_rest }}){% else %}няма затворени{% endif %}{% else %}. Още без затворени резултати при тях{% endif %}.</div>{% endif %}{% endmacro %}
+{% macro spinoff_note_html(p) %}{{ pre_reaction_note(p) }}{{ backdated_note(p) }}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
 
 {# 07.10.2026 (стоп и размер): нива на вход, стоп, ADR и предупреждения — ЕДНАКВИ за всички зрители (от брифа); размерът (акции, сума, загуба при стоп/гап) се смята в браузъра от настройките на читателя
@@ -1352,6 +1355,7 @@
   </div>
   {% endif %}
   {{ fill_risk_line(backtest.fill_risk) }}
+  {{ pre_reaction_line(backtest.pre_reaction, "R") }}
   {{ entry_vol_line(backtest.entry_volume) }}
   {{ events_line(backtest.events, "R") }}
   {% if backtest.open_positions %}
@@ -1433,6 +1437,7 @@
     {% endif %}
   </div>
   {{ fill_risk_line(bs.fill_risk) }}
+  {{ pre_reaction_line(bs.pre_reaction, "R") }}
   {{ entry_vol_line(bs.entry_volume) }}
   {{ events_line(bs.events, "R") }}
   {% if bs.live %}
@@ -1549,6 +1554,7 @@
     · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
     · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}{% if qb.tight_risk %} · <span style="color:var(--yellow)">с риск на входа под {{ qb.tight_risk_adr }}×ADR: {{ qb.tight_risk }} (R от пода)</span>{% endif %}<br>
     {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: {% if not qb.get("closed_bounds") and qb.get("closed_5m") %}<b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (5-минутни бари){% else %}<b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess){% if qb.get("closed_5m") %} — {{ qb.closed_5m }} от {{ qb.closed }} с 5-минутни бари (там opt = pess), {{ qb.closed_bounds }} с двете граници{% endif %}{% endif %}{% if qb.avg_return_pct is not none %} · средна доходност на сделка {{ "%+.2f"|format(qb.avg_return_pct) }}% / {{ "%+.2f"|format(qb.avg_return_pct_pess) }}%{% endif %}<br>{% endif %}
+    {{ pre_reaction_line(qb.pre_reaction, "R") }}
     {{ events_line(qb.events, "R (opt)") }}
     {% if qb.stats_visible %}
     <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
@@ -1790,6 +1796,7 @@
     <br>Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея).
     <br>Доходност N сесии след входа (exec, независимо от изхода) спрямо SPY за същите дати:
     {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n_exec %}{{ "%+.2f"|format(x.avg_ret_exec) }}%{% if x.avg_spy_exec is not none %} (SPY {{ "%+.2f"|format(x.avg_spy_exec) }}%, алфа {{ "%+.2f"|format(x.avg_alpha_exec) }}%){% endif %}, {{ x.n_exec }} записа{% elif x.n %}{{ x.n }} записа без exec данни{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.
+    {{ pre_reaction_line(gw.pre_reaction, "%") }}
     {{ events_line(gw.events, "доходност % (exec)" if gw.events and gw.events.value == "return_pct_exec" else "доходност %") }}
     <br>По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност exec за {{ gw.compare_horizon }} сесии{% endif %}):
     {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret_exec is not none %} ({{ "%+.2f"|format(g.avg_ret_exec) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}

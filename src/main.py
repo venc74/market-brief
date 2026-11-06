@@ -849,6 +849,11 @@ def run() -> dict:
                enabled=bool(config.ENABLE_BACKTEST and config.ENABLE_EVENT_LABEL), label="Етикетът „събитие/M&A“ върху записите в книгите",
                consequence="днешните нови записи не са проверени за скок с новина за сделка — статистиката „без тях“ може да ги съдържа",
                failed_if=lambda v: (v.get("reason") or "не се изпълни") if v.get("ok") is False else None)
+    # 06.11.2026 (пакет 05–06.11, т. 4): етикет „преди реакцията на отчета“ — отчет след затварянето на сигналния ден (MNST 06.11); статистиката на книгите — с и без
+    steps.step("pre_reaction_labels", lambda: backtest.apply_pre_reaction_labels(today), fallback={}, enabled=bool(config.ENABLE_BACKTEST),
+               label="Етикетът „преди реакцията на отчета“ върху записите в книгите",
+               consequence="новите записи не са проверени за отчет след затварянето — статистиката „без тях“ може да ги съдържа",
+               failed_if=lambda v: (v.get("reason") or "не се изпълни") if v.get("ok") is False else None)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
         backtest_summary["buystop"] = backtest.get_buystop_summary()

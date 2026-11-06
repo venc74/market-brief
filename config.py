@@ -492,6 +492,8 @@ SECTOR_GROUPS = {"отбранителна ротация — парите тъ�
 # 03.11.2026 (поправки след брифа, т. 2): широка ротация — ≥ SECTOR_BROAD_MIN_LEADERS сектора „води пазара“ и XLK или XLC „изостава“ → изречението е за нея (RS е спрямо SPY,
 # който е претеглен по капитализация — когато мега-технологиите изостават, повечето сектори „водят“). Проверява се ПРЕДИ правилото за първите три (SECTOR_GROUPS).
 SECTOR_BROAD_MIN_LEADERS = int(os.getenv("SECTOR_BROAD_MIN_LEADERS", 6))
+PRE_REACTION_EARNINGS_ROWS = 12          # 06.11.2026 (т. 4): колко реда от get_earnings_dates (бъдещи + минали) — за етикета „преди реакцията на отчета“
+PRE_REACTION_BUDGET_SEC = float(os.getenv("PRE_REACTION_BUDGET_SEC", 120))    # таван за тегленето в един run; остатъкът — на следващия
 FUNDAMENTALS_NOT_CHECKED_SHOW = int(os.getenv("FUNDAMENTALS_NOT_CHECKED_SHOW", 5))    # 06.11.2026 (т. 2): колко от непроверените (над тавана 60) се назовават в брифа — с най-висок RS
 SECTOR_MEGA_TECH_ETFS = ["XLK", "XLC"]
 SECTOR_BROAD_TEXT = "широка ротация извън мега-технологиите — средната акция бие индекса (RS е спрямо SPY, претеглен по капитализация)"

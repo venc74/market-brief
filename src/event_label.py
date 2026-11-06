@@ -158,3 +158,76 @@ def label_records(tracker: dict, today: str, download=None, fetch=None, name_loo
         print(f"[event] проверката пропусната: {st['reason']}")
     LAST_STATUS.clear(); LAST_STATUS.update(st)
     return st
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# 06.11.2026 (пакет 05–06.11, т. 4): етикет „преди реакцията на отчета“ — запис в книгите, чиито нива са от затварянето преди реакцията: отчетът е след затварянето на
+# сигналния ден (AMC) или преди отварянето на първата сесия на записа (BMO). Реално: MNST 06.11 — buy-stop запис от затварянето на 05.11, отчетът е същата вечер в 16:00 ET.
+# Само етикет — записите остават; статистиката се показва с и без тях (backtest.pre_reaction_block). Важи за всички книги (QM и GLB картите нямат полето earnings, затова се чете от Yahoo).
+# ──────────────────────────────────────────────────────────────────────────
+def report_times(sym: str, fetch=None) -> list | None:
+    """Времената на отчетите (tz-aware Timestamp) от Yahoo get_earnings_dates; провал → None (проверява се пак утре), няма редове → []."""
+    try:
+        if fetch is not None:
+            return list(fetch(sym))
+        import yfinance as yf
+        from src import net_utils
+        df = net_utils.fetch_with_timeout(lambda: yf.Ticker(sym).get_earnings_dates(limit=config.PRE_REACTION_EARNINGS_ROWS))
+        return None if df is None else list(df.index)
+    except Exception as e:
+        print(f"[pre_reaction] {sym}: {type(e).__name__}: {e}")
+        return None
+
+
+def pre_reaction(rec: dict, times: list) -> dict | None:
+    """Отчет между затварянето на сигналния ден и отварянето на първата сесия на записа → {"date", "when": "amc" | "bmo"}; иначе None. Без часова зона на времето — не се преценява. Чиста функция."""
+    import pandas as pd
+    from src import sessions
+    try:
+        entry = sessions.roll_forward(dt.date.fromisoformat(str(rec["entry_date"])[:10]))
+        signal = dt.date.fromisoformat(str(rec["signal_date"])[:10]) if rec.get("signal_date") else sessions.prev_session(entry)
+    except (KeyError, TypeError, ValueError):
+        return None
+    start = pd.Timestamp(dt.datetime.combine(signal, dt.time(16, 0)), tz="America/New_York")
+    end = pd.Timestamp(dt.datetime.combine(entry, dt.time(9, 30)), tz="America/New_York")
+    for t in sorted(times or []):
+        ts = pd.Timestamp(t)
+        if ts.tzinfo is None:
+            continue
+        if start <= ts.tz_convert("America/New_York") < end:
+            ny = ts.tz_convert("America/New_York")
+            return {"date": ny.date().isoformat(), "when": "amc" if ny.date() == signal else "bmo"}
+    return None
+
+
+def label_pre_reaction(tracker: dict, today: str, categories, fetch=None, budget_sec: float | None = None) -> dict:
+    """
+    Непроверените записи в книгите (categories — record_category → bool) се проверяват веднъж: rec["pre_reaction"] при попадение, rec["pre_reaction_checked"] = днес, когато Yahoo е отговорил за тикъра.
+    Записът със запис в бъдеще не се пипа. Провал за тикър → остава непроверен до следващия run; бюджетът спира тегленето, остатъкът — утре. Връща {"ok", "checked", "labelled", "failed", "left"}.
+    """
+    import time
+    st = {"ok": True, "checked": 0, "labelled": [], "failed": 0, "left": 0}
+    todo = [r for r in tracker.values() if isinstance(r, dict) and r.get("ticker") and categories(r) and not r.get("pre_reaction_checked") and str(r.get("entry_date"))[:10] <= str(today)[:10]]
+    budget = config.PRE_REACTION_BUDGET_SEC if budget_sec is None else budget_sec
+    t0, cache = time.monotonic(), {}
+    for r in todo:
+        sym = r["ticker"]
+        if sym not in cache:
+            if time.monotonic() - t0 > budget:
+                st["left"] += 1
+                continue
+            cache[sym] = report_times(sym, fetch)
+        times = cache[sym]
+        if times is None:
+            st["failed"] += 1
+            continue
+        hit = pre_reaction(r, times)
+        if hit:
+            r["pre_reaction"] = hit
+            st["labelled"].append(f'{sym} {str(r.get("entry_date"))[:10]}')
+        r["pre_reaction_checked"] = str(today)[:10]
+        st["checked"] += 1
+    if todo and st["failed"] == len(todo):
+        st.update(ok=False, reason="Yahoo не върна датите на отчетите")
+    return st
+

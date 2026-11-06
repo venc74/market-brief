@@ -793,6 +793,35 @@ def events_block(records: list[dict], value_key: str) -> dict | None:
     return {"n": len(lab), "labels": rows, "value": value_key, "n_all": len(allv), "avg_all": avg(allv), "n_rest": len(rest), "avg_rest": avg(rest)}
 
 
+def pre_reaction_block(records: list[dict], value_key: str) -> dict | None:
+    """06.11.2026 (пакет 05–06.11, т. 4): записите с етикет „преди реакцията на отчета“ и средното на value_key (R или %) с тях и без тях. Без такива записи → None. Чиста функция."""
+    lab = [r for r in records if r.get("pre_reaction")]
+    if not lab:
+        return None
+    avg = lambda xs: round(sum(xs) / len(xs), 2) if xs else None
+    allv = [r[value_key] for r in records if r.get(value_key) is not None]
+    rest = [r[value_key] for r in records if r.get(value_key) is not None and not r.get("pre_reaction")]
+    return {"n": len(lab), "tickers": [{"ticker": r.get("ticker"), "entry_date": r.get("entry_date"), **r["pre_reaction"]} for r in sorted(lab, key=lambda x: (x.get("entry_date") or "", x.get("ticker") or ""))],
+            "value": value_key, "n_all": len(allv), "avg_all": avg(allv), "n_rest": len(rest), "avg_rest": avg(rest)}
+
+
+def apply_pre_reaction_labels(today: str, fetch=None, budget_sec: float | None = None) -> dict:
+    """06.11.2026 (т. 4): етикетът „преди реакцията на отчета“ (event_label.label_pre_reaction) върху непроверените записи на всички книги. Graceful: провал → {"ok": False, "reason"}, tracker-ът не се пипа."""
+    try:
+        from src import event_label
+        tracker = _load_tracker()
+        books = (CATEGORY_ACTION, CATEGORY_BUYSTOP, CATEGORY_QM, CATEGORY_GLB_WISH, CATEGORY_GLB_WISH_HIGH)
+        st = event_label.label_pre_reaction(tracker, today, lambda r: r.get("method") == "v2" or r.get("category") in books, fetch=fetch, budget_sec=budget_sec)
+        if st.get("checked"):
+            _save_tracker(tracker)
+        if st.get("labelled"):
+            print(f"[backtest] „преди реакцията на отчета“: {st['labelled']}")
+        return st
+    except Exception as e:
+        print(f"[backtest] етикетът „преди реакцията на отчета“ пропуснат: {type(e).__name__}: {e}")
+        return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
+
+
 def apply_event_labels(today: str, download=None, fetch=None, name_lookup=None) -> dict:
     """26.10.2026 (етап 4б, т. 2): етикетът „събитие/M&A“ (src/event_label.py) върху непроверените записи на всички книги; записва tracker-а, ако нещо е проверено. Не вдига."""
     try:
@@ -1689,6 +1718,7 @@ def get_buystop_summary() -> dict:
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
                 "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),          # 06.11.2026 (т. 1): реалният риск при входа
+                "pre_reaction": r.get("pre_reaction"),                                                     # 06.11.2026 (т. 4)
                 "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal")}
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
@@ -1710,6 +1740,7 @@ def get_buystop_summary() -> dict:
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
+        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 
@@ -1803,6 +1834,7 @@ def get_qm_summary() -> dict:
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
                 "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_R_RISK_FLOOR_ADR,          # 12.10: флаг — R е смятан от пода 0.25×ADR (ELF 09.10: 0.09×ADR)
                 "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
+                "pre_reaction": r.get("pre_reaction"),                                                       # 06.11.2026 (т. 4)
                 "spinoff_note": r.get("spinoff_note"),                                                       # 13.10: предстоящо отделяне
                 "deal": r.get("deal"),                                                                       # 26.10: цел на придобиване
                 "r_basis": r.get("r_basis"), "entry_time": (r.get("intraday") or {}).get("entry_time") if isinstance(r.get("intraday"), dict) else None,   # 03.11.2026 (т. 11)
@@ -1830,6 +1862,7 @@ def get_qm_summary() -> dict:
         "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_R_RISK_FLOOR_ADR),
         "avg_return_pct": _avg_pct(closed, "return_pct"), "avg_return_pct_pess": _avg_pct(closed, "return_pct_pess", "return_pct"),
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
+        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                                                 # 26.10.2026 (етап 4б, т. 2)
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
@@ -1935,6 +1968,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
                 "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
                 "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note"),
+                "pre_reaction": r.get("pre_reaction"),                                                       # 06.11.2026 (т. 4)
                 "deal": r.get("deal"),                                                                       # 26.10.2026: цел на придобиване
                 # 03.11.2026 (разходката, т. 15): компактната таблица — обемът на пробива, вход по отварянето и доходността exec (реалистичната); literal остава в данните
                 "breakout_volume_ratio": r.get("breakout_volume_ratio"), "months_unpenetrated": r.get("months_unpenetrated"),
@@ -1957,6 +1991,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
+        "pre_reaction": pre_reaction_block(with_result, "return_pct_exec"),                          # 06.11.2026 (т. 4)
         "events": events_block(with_result, "return_pct_exec"),                                      # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"; 03.11.2026 (т. 15, 6): exec
         "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
@@ -2077,6 +2112,7 @@ def get_backtest_summary() -> dict:
                 "deal": r.get("deal"),                                  # 26.10.2026 (етап 4б, т. 1): цел на придобиване
                 "entry_volume_ratio": r.get("entry_volume_ratio"),      # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
                 "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),       # 06.11.2026 (т. 1): реалният риск при входа
+                "pre_reaction": r.get("pre_reaction"),                  # 06.11.2026 (т. 4)
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
                 # docstring-а, дискусията 2026-08-13).
@@ -2100,7 +2136,7 @@ def get_backtest_summary() -> dict:
     pending_positions = sorted(
         ({"ticker": r["ticker"], "entry_date": r["entry_date"], "buy_stop": r.get("buy_stop"),
           "max_chase": r.get("max_chase"), "valid_through": r.get("valid_through"),
-          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"), "spinoff_note": r.get("spinoff_note")}
+          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"), "spinoff_note": r.get("spinoff_note"), "pre_reaction": r.get("pre_reaction")}
          for r in records if r.get("status") == "pending"),
         key=lambda r: r["entry_date"])
 
@@ -2137,6 +2173,7 @@ def get_backtest_summary() -> dict:
         "open_positions": open_positions,
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
+        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 

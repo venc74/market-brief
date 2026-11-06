@@ -53,7 +53,7 @@ STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "
          "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_board", "short_screener"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
-STEP4 = {"crypto", "crypto_cot", "options_record", "merger_pre", "event_labels"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
+STEP4 = {"crypto", "crypto_cot", "options_record", "merger_pre", "event_labels", "pre_reaction_labels"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
 STEP5 = {"qm_market", "ins_watch", "cot_all"}                                                                                                               # 03.11.2026 (разходката, т. 11): QQQ спрямо SMA10 / SMA20 — банерът е на обвивката
 ALL = STEP1 | STEP2 | STEP3 | STEP4 | STEP5
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
