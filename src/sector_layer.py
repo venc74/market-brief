@@ -290,6 +290,31 @@ def sector_board(download=None, universe_sector: dict | None = None, trend: dict
             "top_sub": subsectors[:config.SECTOR_BOARD_SUB_TOP], "bottom_sub": subsectors[-config.SECTOR_BOARD_SUB_BOTTOM:][::-1] if len(subsectors) > config.SECTOR_BOARD_SUB_TOP else []}
 
 
+def market_day(board: dict | None, download=None) -> dict:
+    """
+    06.11.2026 (пакет 05–06.11, т. 8): денят на пазара от кода — за макро разказа и за проверката на думите му: {"as_of", "indexes": {SPY, RSP, IWM, QQQ: {"chg_1d_pct", "from_high_pct"}}, "sectors": [{etf, sector,
+    chg_1d_pct}], "down", "total", "selloff"}. Секторите — от картата (без второ теглене); индексите — 1 година затваряния (спад от 52-седмичния връх). Реално, 05.11: SPY −4.41%, RSP −2.89%, IWM −4.59%, 11 от 11 сектора
+    надолу, а разказът твърдеше „концентрирана в mega-cap tech, а не системна“. Провал на индексите → без тях; без карта и без индекси → {} (graceful).
+    """
+    rows = [r for r in (board or {}).get("sectors") or [] if isinstance(r.get("chg_1d_pct"), (int, float))]
+    out = {"as_of": (board or {}).get("as_of"), "indexes": {}, "sectors": [{"etf": r["etf"], "sector": r["sector"], "chg_1d_pct": r["chg_1d_pct"]} for r in sorted(rows, key=lambda r: r["chg_1d_pct"])],
+           "down": sum(1 for r in rows if r["chg_1d_pct"] < 0), "total": len(rows), "selloff": bool(selloff_text(rows, (board or {}).get("spy_1d_pct")))}
+    try:
+        from src import sessions as _sessions
+        syms = list(config.MARKET_DAY_INDEXES)
+        dl = download or (lambda s: yf.download(s, period="1y", progress=False, auto_adjust=True)["Close"])
+        data = _sessions.cut_today(dl(syms))
+        for s in syms:
+            c = data[s].dropna() if s in data.columns else None
+            if c is None or len(c) < 2:
+                continue
+            out["indexes"][s] = {"chg_1d_pct": round((float(c.iloc[-1]) / float(c.iloc[-2]) - 1) * 100, 2), "from_high_pct": round((float(c.iloc[-1]) / float(c.max()) - 1) * 100, 2)}
+        out["as_of"] = out["as_of"] or data.index[-1].date().isoformat()
+    except Exception as e:
+        print(f"[sector] денят на пазара: индексите не се изтеглиха: {type(e).__name__}: {e}")
+    return out if (out["indexes"] or rows) else {}
+
+
 def board_context(board: dict | None) -> list[dict]:
     """30.10.2026 (т. 7): секторите по кода за текста на картите (вместо веригите на AI) — водещите и набиращите сила: [{etf, sector, rs_4w, rs_12w, word}]."""
     return [{k: r.get(k) for k in ("etf", "sector", "rs_4w", "rs_12w", "word")} for r in (board or {}).get("sectors") or [] if r.get("word") in ("води пазара", "набира сила")]

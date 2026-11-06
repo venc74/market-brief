@@ -495,6 +495,11 @@ SECTOR_BROAD_MIN_LEADERS = int(os.getenv("SECTOR_BROAD_MIN_LEADERS", 6))
 # 06.11.2026 (пакет 05–06.11, т. 6): SPY ≤ този % за деня и мнозинство сектори надолу → „широка разпродажба“ вместо думата „ротация“. Реално за година: 20.01 (−2.04%, 10 от 11), 05.06 (−2.58%, 6 от 11), 05.11 (−4.41%, 11 от 11).
 SECTOR_SELLOFF_SPY_PCT = float(os.getenv("SECTOR_SELLOFF_SPY_PCT", -2.0))
 SECTOR_SELLOFF_SHOW = 3                  # колко „относително най-слабо засегнати“ се назовават
+# 06.11.2026 (пакет 05–06.11, т. 8): думите в макро разказа — само с опора в числата: спад от 52-седмичния връх (по затварянията) или процент в самото изречение
+TERM_BEAR_MARKET_PCT = 20.0              # „мечи пазар“
+TERM_CORRECTION_PCT = 10.0               # „корекция“
+TERM_RECORD_NEAR_PCT = 1.0               # „рекорд“ за индекс — на толкова % от 52-седмичния връх
+MARKET_DAY_INDEXES = {"SPY": "SPY", "RSP": "RSP (равни тегла)", "IWM": "Russell 2000 (IWM)", "QQQ": "Nasdaq-100 (QQQ)"}
 PRE_REACTION_EARNINGS_ROWS = 12          # 06.11.2026 (т. 4): колко реда от get_earnings_dates (бъдещи + минали) — за етикета „преди реакцията на отчета“
 PRE_REACTION_BUDGET_SEC = float(os.getenv("PRE_REACTION_BUDGET_SEC", 120))    # таван за тегленето в един run; остатъкът — на следващия
 FUNDAMENTALS_NOT_CHECKED_SHOW = int(os.getenv("FUNDAMENTALS_NOT_CHECKED_SHOW", 5))    # 06.11.2026 (т. 2): колко от непроверените (над тавана 60) се назовават в брифа — с най-висок RS

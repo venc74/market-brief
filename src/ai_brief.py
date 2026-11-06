@@ -775,8 +775,88 @@ def _news_block(news: list[dict] | None) -> str:
             "факти, които не са в заглавието или в \"why\".\n")
 
 
+def market_day_block(day: dict | None) -> str:
+    """06.11.2026 (пакет 05–06.11, т. 8): денят на пазара от кода за промпта — индексите, всичките 11 сектора и спадът от върха. Без данни → "". Чиста функция."""
+    d = day or {}
+    ix, sec = d.get("indexes") or {}, d.get("sectors") or []
+    if not (ix or sec):
+        return ""
+    names = config.MARKET_DAY_INDEXES
+    lines = [f"ДЕНЯТ НА ПАЗАРА (от кода, последната сесия{' — ' + d['as_of'] if d.get('as_of') else ''}):"]
+    if ix:
+        lines.append("Индексите за деня: " + " · ".join(f"{names.get(k, k)} {v['chg_1d_pct']:+.2f}%" for k, v in ix.items()))
+        lines.append("Спад от 52-седмичния връх (по затварянията): " + " · ".join(f"{k} {v['from_high_pct']:+.2f}%" for k, v in ix.items()))
+    if sec:
+        lines.append(f"Секторите за деня (надолу {d.get('down')} от {d.get('total')}): " + " · ".join(f"{x['etf']} {x['sector']} {x['chg_1d_pct']:+.2f}%" for x in sec))
+    return "\n".join(lines) + "\n"
+
+
+# 06.11.2026 (пакет 05–06.11, т. 8): думите без опора в числата. Реално, 06.11: „Nikkei 225 влезе в мечи пазар“ — без нито едно число във входа (идваше от „why“ на новина, писано от модела).
+# Твърдение е само утвърденото: „не е нормална корекция“, „риск от корекция“, „следващата корекция“ не твърдят състояние и не се пипат.
+_TERM_BEAR = re.compile(r"меч\w*\s+(?:пазар|тренд|територи)\w*|bear\s+market", re.I)
+_TERM_CORR = re.compile(r"корекци\w*|correction", re.I)
+_TERM_REC = re.compile(r"рекорд\w*|record[- ]high|all[- ]time\s+high|\bATH\b|историческ\w+\s+(?:връх|максимум|дъно|минимум)", re.I)
+_TERM_NOT_CLAIM = re.compile(r"(?:\b(?:не|без|няма)\s+(?:(?:е|са|в|е\s+в)\s+)?(?:\w+\s+){0,2}|\b(?:риск\w*\s+от|следващ\w*|евентуал\w*|възможн\w*|потенциал\w*|бъдещ\w*)\s+(?:\w+\s+){0,3})$", re.I)
+_TERM_INDEX = {"SPY": re.compile(r"\bSPY\b|S&P|\bпазар(?:ът|а)\b", re.I), "QQQ": re.compile(r"\bQQQ\b|Nasdaq|Насдак|\bNDX\b", re.I), "IWM": re.compile(r"\bIWM\b|Russell|Ръсел", re.I), "RSP": re.compile(r"\bRSP\b")}
+_TERM_PCT = re.compile(r"(\d+(?:[.,]\d+)?)\s*%")
+_TERM_NARROW = re.compile(r"концентрир\w*|(?:\bне\s+(?:е\s+)?|\bа\s+не\s+|\bне)системн\w*", re.I)
+
+
+def _term_support(sent: str, kind: str, vals: list[float], day: dict | None, headlines: str) -> bool:
+    """Има ли опора думата в изречението: индекс от изречението със спад от върха до прага, процент до прага в самото изречение (подкрепен от входа); за „рекорд“ — и заглавие с думата или число от входа в изречението."""
+    from src import news_aggregator as na
+    ix = (day or {}).get("indexes") or {}
+    named = [v for k, v in ix.items() if _TERM_INDEX[k].search(sent)]
+    if kind == "rec":
+        if any(abs(v["from_high_pct"]) <= config.TERM_RECORD_NEAR_PCT for v in named) or re.search(r"\brecord|all-time|рекорд", headlines, re.I):
+            return True
+        toks = na._NUM_RE.findall(na._WHY_NAME.sub(" ", _THOUSANDS.sub("", sent)))
+        return any(_supported(t, vals) for t in toks)
+    limit = config.TERM_BEAR_MARKET_PCT if kind == "bear" else config.TERM_CORRECTION_PCT
+    if any(abs(v["from_high_pct"]) >= limit for v in named):
+        return True
+    for tok in _TERM_PCT.findall(sent):
+        v = _num_value(tok)
+        if v and v[0] >= limit and _supported(tok, vals):
+            return True
+    return False
+
+
+def check_market_terms(text: str, vals: list[float], day: dict | None = None, news: list | None = None) -> tuple[str, list[dict]]:
+    """
+    06.11.2026 (т. 8): разказът → (поправеният текст, [{sentence, term, why}]). „Мечи пазар“ / „корекция“ / „рекорд“ без опора в числата и „концентрирано / не системно“ при широка разпродажба — цялото изречение пада,
+    както при числата без опора (check_narrative_numbers минава първа). Чиста функция.
+    """
+    from src import news_aggregator as na
+    fixed = []
+    headlines = " ".join(str(n.get("headline") or "") for n in news or [] if isinstance(n, dict))
+
+    def problem(sent: str) -> dict | None:
+        if (day or {}).get("selloff") and _TERM_NARROW.search(sent):
+            return {"term": _TERM_NARROW.search(sent).group(0), "why": f"широка разпродажба: надолу {(day or {}).get('down')} от {(day or {}).get('total')} сектора"}
+        for kind, rx, label in (("bear", _TERM_BEAR, f"спад от върха ≥ {config.TERM_BEAR_MARKET_PCT:g}%"), ("corr", _TERM_CORR, f"спад от върха ≥ {config.TERM_CORRECTION_PCT:g}%"), ("rec", _TERM_REC, "число или заглавие")):
+            for m in rx.finditer(sent):
+                if _TERM_NOT_CLAIM.search(sent[:m.start()]):
+                    continue
+                if not _term_support(sent, kind, vals, day, headlines):
+                    return {"term": m.group(0), "why": f"няма опора във входа ({label})"}
+        return None
+
+    def one(para: str):
+        kept = []
+        for sent in na._WHY_SENT.split(para):
+            pr = problem(sent)
+            if pr:
+                fixed.append({"sentence": sent, **pr})
+            else:
+                kept.append(sent)
+        return " ".join(kept), []
+    out, _ = _per_paragraph(text, one)
+    return out, fixed
+
+
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
-                           thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None) -> dict:
+                           thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None) -> dict:
     """
     AI макро бриф. 29.10.2026 (разходката, т. 5): "macro_brief" е разказ в 2–3 абзаца (разделени с празен ред) — какво стана през нощта и как се свързват нещата; абзацът
     за режима (regime_comment) и проверките, които бяха само за него (regime_claims.clean: броене, правило, distribution days, кредитен стрес), са махнати — режимът е в
@@ -784,21 +864,30 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     и без проверките на секторните твърдения (sector_claims — в историята са сработвали 4 пъти, всичките във веригите);
     отрязването + повторният опит и чуждите символи са в _parse_json / _fix_text. Graceful: грешка в проверка връща отговора на модела непроменен.
     """
-    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social)
+    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social, day)
     try:
         out = _apply_meta_check(out)
     except Exception as e:
         print(f"[ai] проверката за изтекли клаузи пропусната: {type(e).__name__}: {e}")
     try:                                                                         # 30.10.2026 (поправки от брифа, т. 4): числата в разказа — срещу входовете
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
-            new, fixed = check_narrative_numbers(out["macro_brief"], narrative_sources(macro, rotation, thermometer, news, crypto, social),
-                                                 narrative_dates(macro, rotation, thermometer, news, crypto, social))         # 04.11.2026 (С4): датите от входа
+            vals = narrative_sources(macro, rotation, thermometer, news, crypto, social, day=day)
+            new, fixed = check_narrative_numbers(out["macro_brief"], vals, narrative_dates(macro, rotation, thermometer, news, crypto, social, day=day))         # 04.11.2026 (С4): датите от входа
             if fixed:
                 out = {**out, "macro_brief": new, "numbers_fixed": fixed}
                 for f in fixed:
                     print(f"[ai] разказ: число без опора във входовете — махнато {f['removed']}: «{f['sentence'][:120]}»")
     except Exception as e:
         print(f"[ai] проверката на числата в разказа пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 06.11.2026 (пакет 05–06.11, т. 8): думите „мечи пазар“, „корекция“, „рекорд“, „концентрирано“
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            new, tf = check_market_terms(out["macro_brief"], narrative_sources(macro, rotation, thermometer, news, crypto, social, day=day), day, news)
+            if tf:
+                out = {**out, "macro_brief": new, "terms_fixed": tf}
+                for f in tf:
+                    print(f"[ai] разказ: „{f['term']}“ — {f['why']}; махнато: «{f['sentence'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на думите в разказа пропусната: {type(e).__name__}: {e}")
     return out
 
 
@@ -825,7 +914,7 @@ _ISO_DATE = re.compile(r"\b(\d{4})-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:[+
 
 
 def narrative_sources(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
-                      social: dict | None = None, thermo_full: bool = False) -> list[float]:
+                      social: dict | None = None, thermo_full: bool = False, day: dict | None = None) -> list[float]:
     """
     Всички числа във входовете на разказа (данните, не инструкциите на промпта) — стойности без знак. thermo_full — целият JSON на термометъра (така, както го виждаше
     промптът до 29.10 — за мерене върху старите текстове); по подразбиране — контекстът на новия промпт (_thermo_context).
@@ -847,7 +936,7 @@ def narrative_sources(macro: dict | None, rotation: list | None, thermometer: di
             parts.append(repr(o))
         else:
             parts.append(_ISO_DATE.sub(lambda m: m.group(1), str(o)))            # от датата остава годината: денят и месецът не са твърдения
-    for x in (macro or {}, rotation or [], th, social or {}):
+    for x in (macro or {}, rotation or [], th, social or {}, day or {}):        # 06.11.2026 (т. 8): + денят на пазара
         walk(x)
     parts += [" ".join(str(n.get(k) or "") for k in ("headline", "why", "summary")) for n in news or [] if isinstance(n, dict)]
     c = crypto or {}
@@ -867,7 +956,7 @@ _DATE_BG = re.compile(r"(?P<prep>\s*\b(?:към|на|от|до|след|пред
 
 
 def narrative_dates(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
-                    social: dict | None = None) -> set[tuple[int, int]]:
+                    social: dict | None = None, day: dict | None = None) -> set[tuple[int, int]]:
     """
     04.11.2026 (четвърти преглед, С4): датите (ден, месец) от ISO датите във входовете на разказа (as_of на уредите, макрото, ротацията …). narrative_sources оставя от датата само
     годината — затова на 03.11 „към 28 октомври“ (Net Liquidity, as_of 2026-10-28 — вярно) беше махнато като число без опора и остана „към —“. Чиста функция.
@@ -884,7 +973,7 @@ def narrative_dates(macro: dict | None, rotation: list | None, thermometer: dict
         elif isinstance(o, str):
             for m in re.finditer(r"\b\d{4}-(\d{2})-(\d{2})\b", o):
                 out.add((int(m.group(2)), int(m.group(1))))
-    for x in (macro or {}, rotation or [], _thermo_context(thermometer), thermometer or {}, social or {}, news or [], (crypto or {}).get("items") or []):
+    for x in (macro or {}, rotation or [], _thermo_context(thermometer), thermometer or {}, social or {}, news or [], (crypto or {}).get("items") or [], day or {}):
         walk(x)
     return out
 
@@ -1105,7 +1194,7 @@ def signal_periods_block(macro: dict | None) -> str:
 
 
 def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
-                      social: dict | None = None) -> str:
+                      social: dict | None = None, day: dict | None = None) -> str:
     """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API)."""
     return f"""Днешни данни:
 
@@ -1114,6 +1203,7 @@ def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news
 МАКРО (FRED + пазарни сигнали): {json.dumps(macro, ensure_ascii=False, default=str)[:6000]}
 
 {signal_periods_block(macro)}
+{market_day_block(day)}
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
 ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
 
@@ -1212,12 +1302,14 @@ NARRATIVE_RULES = (
     "не пиши за инфлацията изобщо.\n"
     "- Без изброяване на уреди, без броене на зелени / жълти / червени, без думата „режим“ и без Offensive / Defensive / Cash — режимът е горе, в термометъра, от кода.\n"
     "- Нещо „под повърхността“, което си заслужава да се следи, може да се каже — с мярка колко е силно; информативните уреди не са сигнал за криза.\n"
+    "- „Мечи пазар“, „корекция“, „рекорд“ — само ако числото е в данните (спад от върха в ДЕНЯТ НА ПАЗАРА или процент в същото изречение); иначе не ги пиши — кодът маха такова изречение. "
+    "„Концентрирано“, „не е системно“ — само ако ДЕНЯТ НА ПАЗАРА го показва; при широк спад не го твърди.\n"
     "- САМО от подадените данни: никаква причина, събитие или число, които ги няма тук (кодът маха число без опора в данните). Ако няма новини — разказът е за пазарните сигнали.\n"
     "- Последното изречение започва с „За нас:“ и казва какво значи нощта за водещите ни сектори; без препоръка за покупка или продажба.")
 
 
 def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
-                               thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None) -> dict:
+                               thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None) -> dict:
     """
     Връща:
     {
@@ -1236,7 +1328,7 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
     никога не позволяваме на изключението да стигне до run()).
     """
-    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social)
+    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social, day)
 
     # Ниво 0 (json_repair, вътре в _parse_json) + първи опит. try/except обхваща
     # И _call_claude, И _parse_json — мрежова/API грешка тук е РАВНОСИЛНА на
