@@ -1,5 +1,5 @@
 {
- "date": "2026-11-05",
+ "date": "2026-11-06",
  "rows": [],
  "horizon": [
   {
@@ -107,6 +107,54 @@
    "date_human": "Nov 05, 2026"
   },
   {
+   "ticker": "CDT",
+   "company": "CDT Equity Inc.",
+   "date": "2026-11-06",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
+   "ticker": "NWGL",
+   "company": "CL Workshop Group Limited",
+   "date": "2026-11-06",
+   "ratio": "1:80",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
+   "ticker": "JSPR",
+   "company": "Jasper Therapeutics, Inc.",
+   "date": "2026-11-06",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
+   "ticker": "NEXR",
+   "company": "Nexera Technologies Ltd",
+   "date": "2026-11-06",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
+   "ticker": "ONCO",
+   "company": "Onconetix, Inc.",
+   "date": "2026-11-06",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
+   "ticker": "AIIO",
+   "company": "Robo.ai Inc.",
+   "date": "2026-11-06",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Nov 06, 2026"
+  },
+  {
    "ticker": "TOPS",
    "company": "TOP Ships Inc.",
    "date": "2026-11-06",
@@ -131,6 +179,118 @@
    "date_human": "Nov 16, 2026"
   },
   {
+   "ticker": "BITO",
+   "company": "ProShares Bitcoin ETF",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "BITI",
+   "company": "ProShares Short Bitcoin ETF",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "RWM",
+   "company": "ProShares Short Russell2000",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "VIXM",
+   "company": "ProShares Trust VIX Mid-Term Futures ETF",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "UBT",
+   "company": "ProShares Ultra 20+ Year Treasury",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "EET",
+   "company": "ProShares Ultra MSCI Emerging Markets",
+   "date": "2026-11-19",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "ROM",
+   "company": "ProShares Ultra Technology",
+   "date": "2026-11-19",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "DXD",
+   "company": "ProShares UltraShort Dow30",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "DUG",
+   "company": "ProShares UltraShort Energy",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "MZZ",
+   "company": "ProShares UltraShort MidCap400",
+   "date": "2026-11-19",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "QID",
+   "company": "ProShares UltraShort QQQ",
+   "date": "2026-11-19",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "SSG",
+   "company": "ProShares UltraShort Semiconductors",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "REW",
+   "company": "ProShares UltraShort Technology",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "SMDD",
+   "company": "UltraPro Short MidCap400",
+   "date": "2026-11-19",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
    "ticker": "SNDK",
    "company": "Sandisk Corporation",
    "date": "2026-11-20",
@@ -142,10 +302,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 17,
+  "source_rows": 37,
   "horizon_from": "2026-11-02",
   "horizon_to": "2026-11-20",
-  "in_week": 14,
+  "in_week": 20,
   "dropped_price": [
    "RETO",
    "VCIG",
@@ -153,6 +313,12 @@
    "UFG",
    "XXII",
    "EZGO",
+   "CDT",
+   "NWGL",
+   "JSPR",
+   "NEXR",
+   "ONCO",
+   "AIIO",
    "TOPS"
   ],
   "dropped_cap": [
