@@ -18,12 +18,13 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     Пакет 1, т.3 (2026-10-03): план за ПОТВЪРДЕН пробив (виж setup_rules).
 
     Вход: buy-stop на pivot — ако инструментът отвори над него, изпълнението е по
-    отварянето, но не по-високо от тавана за вход — по-ниското от pivot +BUYABLE_ZONE_MAX_PCT% и
-    стоп / (1 − STOP_MAX_PCT%) (06.11.2026, т. 1: рискът при вход до тавана е ≤ 8%; setup_rules.max_chase).
+    отварянето, но не по-високо от pivot +BUYABLE_ZONE_MAX_PCT% ("таван за вход").
     Референтният вход за стоп/цел е сигналният close (`price`), както в
     реплея — реалното изпълнение може да е по-високо в рамките на тавана.
     Стоп = най-ниският Low на последните STOP_STRUCT_LOOKBACK_BARS бара −buffer, но не
-    повече от STOP_MAX_PCT% под входа; структурен риск над STOP_REJECT_STRUCT_RISK_PCT%
+    повече от STOP_MAX_PCT% под входа. 06.11.2026 (т. 1): записът в книгите смята стопа и целта наново от РЕАЛНАТА цена на
+    влизане (stop_rule "fill", trade_sim.fill_stop); stop_loss и target_1 тук са при референтния вход — за нивата на картата.
+    Структурен риск над STOP_REJECT_STRUCT_RISK_PCT%
     → невалиден план ("твърде разтегнато", запасна проверка след setup_rules).
     Цел 1 = 2R (MIN_REWARD_RISK) за TARGET_PARTIAL_FRACTION от позицията; остатъкът —
     trailing под TRAIL_SMA_DAYS-дневната средна, стопът остава активен (виж trade_sim).
@@ -55,10 +56,8 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
     horizon = ("2–4 седмици" if risk_pct < 6 else
                "4–8 седмици" if risk_pct < 10 else "8–12 седмици")
     buy_stop = round(pivot, 2)
-    chase = setup_rules.max_chase(pivot, stop)
-    stop_basis = (f"таван {config.STOP_MAX_PCT:g}% под входа (структурният е {st['struct_risk_pct']:.1f}%)"
-                  if st["stop_capped"] else
-                  f"структурен: {config.STOP_STRUCT_LOOKBACK_BARS}-барен low −{config.STOP_STRUCT_BUFFER_PCT:g}%")
+    chase = setup_rules.max_chase(pivot)
+    stop_basis = setup_rules.stop_text(st["struct_stop"])                       # 06.11.2026 (т. 1): „стоп: $X или 8% под цената на влизане — по-високото“
 
     return {
         "valid": True,
@@ -67,7 +66,7 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "entry_mid": entry_ref,
         "buy_stop": buy_stop,
         "max_chase": chase,
-        "max_chase_by_risk": chase < setup_rules.max_chase(pivot),
+        "stop_rule": "fill",                                                    # 06.11.2026 (т. 1): книгите — стоп и цел от реалния вход
         "valid_through": setup_rules.valid_through(today or dt.date.today()),
         "window_sessions": config.BUY_STOP_WINDOW_SESSIONS,
         "stop_loss": stop,
@@ -81,7 +80,7 @@ def position_plan_v2(row: dict, sizing_factor: float = 1.0, today=None) -> dict:
         "target_1": target1,
         "target_1_fraction": config.TARGET_PARTIAL_FRACTION,
         "target_2": (f"остатъкът ({(1 - config.TARGET_PARTIAL_FRACTION) * 100:.0f}%): trailing под "
-                     f"{config.TRAIL_SMA_DAYS}DMA след ${target1}; стопът ${stop} остава активен"),
+                     f"{config.TRAIL_SMA_DAYS}DMA след цел 1; стопът остава активен"),
         "reward_risk": config.MIN_REWARD_RISK,
         "time_horizon": horizon,
     }

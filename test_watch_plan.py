@@ -89,7 +89,7 @@ assert flat.count("Ако се задейства") == 1 and "режим Cash" n
 assert "акции" not in line and "риск $" not in line and "от портфейла" not in line
 txt = " ".join(re.sub(r"<[^>]+>", " ", page).split())
 assert 'data-entry="194.59" data-stop="181.53" data-adr="2.01" data-factor="0.5"' in page
-assert "източник на стопа: структурен: 15-барен low −1%" in txt and "ADR (20 бара) 2.0%" in txt and "$181.53 (−6.7%)" in txt and "въведи баланса в настройките" in txt
+assert "Стоп: $181.53 или 8% под цената на влизане — по-високото" in txt and "ADR (20 бара) 2.0%" in txt and "$181.53 (−6.7%)" in txt and "въведи баланса в настройките" in txt
 assert "режим Cash: нов Action не се дава, планът е само ориентир" in " ".join(page_cash.split())
 print("  ✓ картата на EXPD показва: Цел 1 (2R) $220.71 · режимен фактор ×0.5; блокът с нивата: вход $194.59, стоп $181.53 (−6.7%), източник структурен, ADR 2.0% — без брой акции; при Cash — бележка, че е само ориентир;")
 print("    останалите Watchlist карти (без buy-stop) нямат такъв ред")

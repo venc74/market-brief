@@ -128,6 +128,13 @@ def _merger_html(card: dict) -> str:
 
 
 
+def _stop_rule_html(plan) -> str:
+    """06.11.2026 (пакет 05–06.11, т. 1): „стоп: $X или 8% под цената на влизане — по-високото“ като ред за имейла; стар план — нищо."""
+    if not isinstance(plan, dict) or plan.get("stop_rule") != "fill" or not plan.get("stop_basis"):
+        return ""
+    return f'<br><span style="color:#6b7280;font-size:12px">{_e(plan["stop_basis"][0:1].upper() + plan["stop_basis"][1:])}</span>'
+
+
 def _lv_warn_html(lv) -> str:
     """Предупрежденията от нивата като редове за имейла (само текст)."""
     return "".join(f'<br><span style="color:#b45309;font-size:12px">⚠ {_e(w)}</span>' for w in ((lv or {}).get("warnings") or []))
@@ -155,7 +162,7 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
         elif setup.get("buy_stop") and isinstance(lv.get("stop"), (int, float)):
             valid = setup.get("valid_label") or (f'до {setup["valid_through"][8:10]}.{setup["valid_through"][5:7]}' if setup.get("valid_through") else "")
             txt = (f'Buy-stop ${setup["buy_stop"]:.2f}' + (f' (таван ${setup["max_chase"]:.2f}' + (f', валиден {_e(valid)}' if valid else "") + ")" if setup.get("max_chase") else "")
-                   + f' · Stop ${lv["stop"]:.2f} (−{lv.get("stop_pct")}%)' + _lv_warn_html(lv))
+                   + f' · Stop ${lv["stop"]:.2f} (−{lv.get("stop_pct")}%)' + _stop_rule_html(st.get("plan_preview")) + _lv_warn_html(lv))
             bn = setup_rules.book_plan_note(setup, st.get("plan_preview"), lv)              # 19.10.2026 (т. 18б)
             if bn:
                 txt += f'<br><span style="color:#6b7280;font-size:12px">{_e(bn)}</span>'
@@ -785,7 +792,7 @@ def render_email(brief: dict) -> str:
         if p.get("method") == "v2":
             plan_txt = (f"Buy-stop ${p['buy_stop']} (таван ${p['max_chase']})<br>"
                         f"Вход ≈ ${(lv or {}).get('entry', p['entry_mid'])} · Stop ${(lv or {}).get('stop', p['stop_loss'])} (−{(lv or {}).get('stop_pct', p['risk_pct'])}%)<br>"
-                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _lv_warn_html(lv))
+                        f"Цел ${p['target_1']} ({p['target_1_fraction'] * 100:.0f}%)" + _stop_rule_html(p) + _lv_warn_html(lv))
         else:
             plan_txt = (f"Entry ${p['entry_range'][0]}–{p['entry_range'][1]}<br>"
                         f"Stop ${p['stop_loss']} · Цел ${p['target_1']}" + _lv_warn_html(lv))

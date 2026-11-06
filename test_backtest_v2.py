@@ -57,9 +57,7 @@ def v2_plan(entry_date, buy_stop, chase, stop, target, signal_price):
             "entry_range": [buy_stop, chase]}
 
 
-real_plan = sizing.position_plan_v2({"price": 54.77, "pivot": 53.93, "struct_low": 50.80}, 1.0, "2026-06-29")
-assert real_plan["max_chase"] == 54.77 and real_plan["max_chase_by_risk"]            # 06.11.2026 (т. 1): новото правило — стоп $50.39 / 0.92
-real_plan = {**real_plan, "max_chase": 56.63, "max_chase_by_risk": False}  # 06.11.2026 (т. 1): запис отпреди новото правило пази своя таван (зоната pivot +5%) — тук се проверява симулацията
+real_plan = {**sizing.position_plan_v2({"price": 54.77, "pivot": 53.93, "struct_low": 50.80}, 1.0, "2026-06-29"), "stop_rule": None}  # 06.11.2026 (т. 1): запис отпреди правилото „стоп от реалния вход“ пази стопа и целта си — тук се проверява резолюцията; новото правило — test_fill_stop
 PLANS = {
     "2026-06-29": real_plan,                                                       # РЕАЛЕН Action план
     "2026-07-20": v2_plan("2026-07-20", 57.57, 60.45, 52.96, 66.79, 55.92),         # ХИПОТЕТИЧЕН

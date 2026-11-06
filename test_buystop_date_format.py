@@ -28,7 +28,7 @@ assert "(валиден 5 сесии, до 2026-10-20)" in REAL["setup"]["trigge
 print("── 1. РЕАЛНАТА карта на ZBRA от 14.10, сметната наново ──")
 z = copy.deepcopy(REAL)
 setup_rules.annotate([z], dt.date(2026, 10, 14))
-assert z["setup"]["trigger_text"] == new_wording(REAL["setup"]["trigger_text"]).replace("до 2026-10-20", "до 20.10").replace(f'${REAL["setup"]["max_chase"]:.2f}', f'${z["setup"]["max_chase"]:.2f}') and z["setup"]["valid_through"] == "2026-10-20"      # 06.11.2026 (т. 1): таванът — и по риска до стопа
+assert z["setup"]["trigger_text"] == new_wording(REAL["setup"]["trigger_text"]).replace("до 2026-10-20", "до 20.10") and z["setup"]["valid_through"] == "2026-10-20"
 print("  ✓", z["setup"]["trigger_text"])
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 z["ai"]["watchlist_trigger"] = main._watchlist_trigger_text(z, B14["thermometer"]["regime"])           # текстът "Trigger" се сглобява от кода (2б) — наново от новия setup

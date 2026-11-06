@@ -12,7 +12,9 @@
     дата >= entry_date (деня на брифа; събота/неделя/празник → следващата сесия).
   • Прозорец: window_sessions сесии, ВКЛЮЧИТЕЛНО първата. Вход на първата сесия, в която
     High >= pivot, на цена max(Open, pivot) (гап над pivot = по отварянето).
-  • Ако цената на входа е над max_chase (по-ниското от pivot +5% и стоп / 0.92 — setup_rules.max_chase; записите отпреди 06.11 пазят своя таван) → "skipped_extended" (не се гони).
+  • Ако цената на входа е над max_chase (pivot +5%) → "skipped_extended" (не се гони).
+  • 06.11.2026 (пакет 05–06.11, т. 1): при plan["stop_rule"] == "fill" стопът и целта се смятат от РЕАЛНИЯ вход (fill_stop): стоп = по-високото от структурния (struct_stop) и 8% под цената на влизане, цел = 2R от входа.
+    Записите отпреди правилото (без "stop_rule") пазят своя стоп и цел.
   • Прозорецът изтече без вход → "not_triggered" (извън статистиката); докато още тече
     (няма достатъчно бара) → "pending".
   • Сделка с (вход − стоп) <= 0 → "invalid_risk" (извън статистиката).
@@ -44,7 +46,7 @@ NOT_A_POSITION = ("not_triggered", "skipped_extended", "invalid_risk")   # из�
 
 
 def _blank(status: str = "pending") -> dict:
-    return {"status": status, "fill_date": None, "fill_price": None, "risk_per_share": None, "fill_risk_pct": None, "fill_target_r": None,
+    return {"status": status, "fill_date": None, "fill_price": None, "risk_per_share": None, "fill_risk_pct": None, "fill_target_r": None, "fill_stop": None, "fill_target": None,
             "target1_hit_date": None, "partial_price": None, "partial_fraction": 0.0,
             "exit_date": None, "exit_price": None,
             "resolution_date": None, "realized_r": None, "current_r": None, "R": None,
@@ -63,6 +65,19 @@ def complete_bars(bars: pd.DataFrame | None, today=None) -> pd.DataFrame | None:
     """19.10.2026 (С1): без частичния бар с дата >= today; без today (реплеят) — както са. 20.10.2026: src/sessions.complete_bars."""
     from src import sessions
     return sessions.complete_bars(bars, today)
+
+
+def fill_stop(plan: dict, fill: float) -> tuple[float, float]:
+    """
+    06.11.2026 (пакет 05–06.11, т. 1, решение след прегледа): (стоп, цел) на записа при реалния вход. Правилото на О'Нийл „7–8% под цената, на която си купил“: стоп = по-високото от структурния (plan["struct_stop"]) и
+    STOP_MAX_PCT% под цената на влизане; цел = вход + MIN_REWARD_RISK × риска (2R от реалния вход). Реално, WST 04.11: вход $416.46 → стоп $383.14 (8%), цел $483.10; до 06.11 — $374.43 (10.09%) и $472.11 (1.32R).
+    Без stop_rule "fill" (записите отпреди правилото) или без структурен стоп → стопът и целта от плана. Чиста функция.
+    """
+    struct = plan.get("struct_stop")
+    if plan.get("stop_rule") != "fill" or not isinstance(struct, (int, float)):
+        return float(plan["stop_loss"]), float(plan["target_1"])
+    stop = round(max(float(struct), float(fill) * (1 - config.STOP_MAX_PCT / 100)), 2)
+    return stop, round(float(fill) + config.MIN_REWARD_RISK * (float(fill) - stop), 2)
 
 
 def fill_risk(fill, stop, target=None) -> dict:
@@ -121,6 +136,9 @@ def simulate(plan: dict, bars: pd.DataFrame, today=None) -> dict:
             return out                                       # прозорецът още тече
         out.update(status="not_triggered", resolution_date=idx[first + window - 1].date().isoformat())
         return out
+    stop, t1 = fill_stop(plan, fill)                         # 06.11.2026 (т. 1): от реалния вход; записите отпреди правилото — от плана
+    if plan.get("stop_rule") == "fill":
+        out.update(fill_stop=stop, fill_target=t1)
     risk = fill - stop
     if risk <= 0:
         out.update(status="invalid_risk", resolution_date=idx[fi].date().isoformat())

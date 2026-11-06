@@ -57,12 +57,11 @@ print()
 print("── РЕАЛНИ: position_plan_v2 ──")
 p = sizing.position_plan_v2(exel, 1.0, D_JUN)
 assert p["valid"] and p["method"] == "v2"
-assert (p["buy_stop"], p["max_chase"], p["valid_through"]) == (53.93, 54.77, "2026-07-06")   # 03.07 е празник; 06.11.2026 (т. 1): таванът — стоп $50.39 / 0.92, не pivot +5% ($56.63)
-assert p["max_chase_by_risk"] and setup_rules.max_chase(53.93) == 56.63 and s_exel["max_chase"] == 54.77
+assert (p["buy_stop"], p["max_chase"], p["valid_through"]) == (53.93, 56.63, "2026-07-06")   # 03.07 е празник
 assert (p["stop_loss"], p["stop_capped"], p["struct_stop"], p["risk_pct"]) == (50.39, True, 50.29, 8.0)
 assert p["risk_per_share"] == 4.38 and p["target_1"] == 63.53 and p["entry_mid"] == 54.77
 assert p["sizing_factor"] == 1.0 and not any(k in p for k in ("shares", "total_investment", "pct_of_portfolio", "max_risk_usd"))     # 07.10: размерът е в браузъра, не в плана
-assert "таван 8% под входа" in p["stop_basis"] and "(структурният е 8.2%)" in p["stop_basis"]
+assert p["stop_basis"] == "стоп: $50.29 или 8% под цената на влизане — по-високото" and p["stop_rule"] == "fill" and p["struct_stop"] == 50.29      # 06.11.2026 (т. 1)
 pd_ = sizing.position_plan_v2(exel, 0.5, D_JUN)                                           # Defensive ×0.5
 assert pd_["sizing_factor"] == 0.5 and all(pd_[k] == p[k] for k in ("stop_loss", "risk_pct", "target_1", "entry_mid"))   # режимният фактор не мести нивата
 for name, r in (("LNTH", lnth), ("TWLO", twlo), ("AMD", amd)):
@@ -150,12 +149,12 @@ with tempfile.TemporaryDirectory() as tmp:
 # apply_hard_rules планира с РЕАЛНАТА днешна дата (валидността е от днес, не от 29.06)
 vt = action[0]["plan"]["valid_through"]
 assert vt == setup_rules.valid_through(dt.date.today()), vt
-assert "Вход (buy-stop)" in html and "$53.93 · таван $54.77" in html and f"{vt[8:10]}.{vt[5:7]} (5 сесии)" in html         # 15.10.2026: ДД.ММ, не ISO
+assert "Вход (buy-stop)" in html and "$53.93 · таван $56.63" in html and f"{vt[8:10]}.{vt[5:7]} (5 сесии)" in html         # 15.10.2026: ДД.ММ, не ISO
 txt = " ".join(re.sub(r"<[^>]+>", " ", html).split())
-assert "източник на стопа: таван 8% под входа (структурният е 8.2%)" in txt and "$50.39 (−8.0%)" in txt and "Цел 1 (2:1) · 50%" in html and "$63.53" in html
+assert "Стоп: $50.29 или 8% под цената на влизане — по-високото" in txt and "$50.39 (−8.0%)" in txt and "Цел 1 (2:1) · 50%" in html and "$63.53" in html
 assert 'data-strategy="canslim" data-entry="54.77" data-stop="50.39"' in html and not any(w in txt for w in ("Брой акции", "Инвестиция", "риск $"))
 assert "риск/акция = цена − $50.39" in html
-assert "Buy-stop $53.93 (таван $54.77)" in email and "Вход ≈ $54.77 · Stop $50.39 (−8.0%)" in email and "Цел $63.53 (50%)" in email and "акции" not in email.split("CANSLIM · купува се днес")[1].split("Чака пробив ·")[0]
+assert "Buy-stop $53.93 (таван $56.63)" in email and "Вход ≈ $54.77 · Stop $50.39 (−8.0%)" in email and "Цел $63.53 (50%)" in email and "акции" not in email.split("CANSLIM · купува се днес")[1].split("Чака пробив ·")[0]
 assert "На радара (3)" in html and html.count("широк стоп ·") == 3                              # опростяване (10.10) → от 30.10.2026 (т. 9–10): too_wide → ред в „На радара“
 print(f"  ✓ Action картата: 'Вход (buy-stop) $53.93 · таван $56.63', 'Валиден до {vt[8:10]}.{vt[5:7]} (5 сесии)' (от днешната дата), стоп с процент,")
 print("    'Цел 1 (2:1) · 50%'; блок с нивата: източник 'таван 8% под входа', стоп $50.39 (−8.0%); имейлът: 'Buy-stop $53.93 (таван $56.63) / Вход ≈ $54.77 · Stop $50.39 (−8.0%) / Цел $63.53 (50%)', без брой акции'")

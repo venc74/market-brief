@@ -987,7 +987,8 @@
     {% if lv.expected_stop is defined %}<div class="lv-row"><span>{{ lv.expected_stop_label[0:1]|upper ~ lv.expected_stop_label[1:] }}</span><b>≈ ${{ "%.2f"|format(lv.expected_stop) }} <i>(−{{ "%.1f"|format(lv.expected_stop_pct) }}%)</i></b></div>{% endif %}
     {% if show_adr %}<div class="lv-row"><span>ADR (20 бара)</span><b>{{ ("%.1f"|format(lv.adr_pct) ~ "%") if lv.adr_pct is not none else "н/д" }}</b></div>{% endif %}
   </div>
-  {% if lv.strategy == "canslim" %}<div class="lv-note">източник на стопа: {{ lv.stop_source_text }}</div>{% endif %}
+  {# 06.11.2026 (т. 1): новият текст е цял („стоп: $X или 8% под цената на влизане — по-високото“); стар бриф — с етикета #}
+  {% if lv.strategy == "canslim" %}<div class="lv-note">{% if lv.stop_source_text.startswith("стоп:") %}{{ lv.stop_source_text[0:1]|upper ~ lv.stop_source_text[1:] }}{% else %}източник на стопа: {{ lv.stop_source_text }}{% endif %}</div>{% endif %}
   {% if lv.stop_note %}<div class="lv-note">{{ lv.stop_note }}</div>{% endif %}
   {% for w in lv.warnings %}<div class="lv-warn">⚠ {{ w }}</div>{% endfor %}
   <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
@@ -1164,12 +1165,12 @@
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
              структурен стоп с процент, цел 1 е за половината позиция #}
           {% if p.method == 'v2' %}
-          <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}{% if p.max_chase_by_risk %} <span style="font-weight:400;color:var(--muted)">(над него рискът до стопа е над 8%)</span>{% endif %}</b></div>
+          <div class="kv"><span>Вход (buy-stop)</span><b>${{ p.buy_stop }} · таван ${{ p.max_chase }}</b></div>
           <div class="kv"><span>Валиден до</span><b>{{ p.valid_through[8:10] ~ '.' ~ p.valid_through[5:7] if p.valid_through else '—' }} ({{ p.window_sessions }} сесии)</b></div>
           {% else %}
           <div class="kv"><span>Entry</span><b>${{ p.entry_range[0] }} – ${{ p.entry_range[1] }}</b></div>
           {% endif %}
-          {% if not st.levels %}<div class="kv"><span>Stop ({{ p.stop_basis }})</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>{% endif %}
+          {% if not st.levels %}<div class="kv"><span>{% if p.stop_rule == "fill" %}{{ p.stop_basis[0:1]|upper ~ p.stop_basis[1:] }}{% else %}Stop ({{ p.stop_basis }}){% endif %}</span><b>${{ p.stop_loss }}{% if p.risk_pct %} (−{{ p.risk_pct }}%){% endif %}</b></div>{% endif %}
           <div class="kv"><span>Цел 1 (2:1){% if p.method == 'v2' %} · {{ (p.target_1_fraction * 100)|round|int }}% от позицията{% endif %}</span><b>${{ p.target_1 }}</b></div>
           <div class="kv"><span>Цел 2</span><b style="font-size:11.5px">{{ p.target_2 }}</b></div>
           <div class="kv"><span>Хоризонт</span><b>{{ p.time_horizon }}</b></div>
@@ -1239,7 +1240,7 @@
       <div class="buy-stop" style="color:var(--green)">{{ st.setup.trigger_text }}</div>
       {% elif st.setup and st.setup.buy_stop %}
       <div class="buy-stop">🎯 Buy-stop ${{ "%.2f"|format(st.setup.buy_stop) }} · валиден {{ st.setup.valid_label or ('до ' ~ (st.setup.valid_through[8:10] ~ '.' ~ st.setup.valid_through[5:7] if st.setup.valid_through else '—')) }}
-        · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}{% if st.setup.max_chase_by_risk %} (над него рискът до стопа е над 8%){% endif %}</div>
+        · таван за вход ${{ "%.2f"|format(st.setup.max_chase) }}</div>
       {# пакет 2: план при задействане — стоп, риск %, цел 1 (2R) и размер при sizing-а на режима, като при Action картата #}
       {% set pp = st.plan_preview %}
       {% if pp and pp.valid %}
@@ -1416,7 +1417,7 @@
   </summary>
   <div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 8px">
     Watchlist карти под pivot с buy-stop, следени със същия модел на изпълнение като Action (вход при High ≥ buy-stop в рамките на
-    {{ buy_stop_window }} сесии, по max(Open, buy-stop), не над тавана — по-ниското от pivot +{{ buyable_zone_pct|round(0)|int }}% и нивото с риск 8% до стопа; стоп и цел от картата) във всички режими.
+    {{ buy_stop_window }} сесии, по max(Open, buy-stop), не над +{{ buyable_zone_pct|round(0)|int }}%; стоп — по-високото от структурния и 8% под реалния вход, цел 2R от реалния вход; записите отпреди 06.11 — стоп и цел от картата) във всички режими.
     Отделна книга: един и същ тикър може да е и в двете (отметка „и Action“), статистиките не се сумират. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     {% if not bs.records %}

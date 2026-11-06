@@ -273,6 +273,8 @@ def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
         "signal_price": plan["entry_mid"], "entry_price": plan["entry_mid"],
         "buy_stop": plan["buy_stop"], "max_chase": plan["max_chase"],
         "stop_loss": plan["stop_loss"], "target_1": plan["target_1"],
+        # 06.11.2026 (т. 1): новите записи — стоп и цел от реалния вход (trade_sim.fill_stop); планът при референтния вход остава за проследимост
+        **({"stop_rule": "fill", "struct_stop": plan.get("struct_stop"), "plan_stop_loss": plan["stop_loss"], "plan_target_1": plan["target_1"]} if plan.get("stop_rule") == "fill" else {}),
         "window_sessions": plan.get("window_sessions") or config.BUY_STOP_WINDOW_SESSIONS,
         "valid_through": plan.get("valid_through"),
         "fill_date": None, "fill_price": None, "risk_per_share": None,
@@ -887,6 +889,8 @@ def _resolve_position_v2(rec: dict, bars: "pd.DataFrame", today: dt.date,
     res = trade_sim.simulate(rec, bars, today)
     for k in _V2_RESULT_KEYS:
         rec[k] = res.get(k)
+    if res.get("fill_stop") is not None:                                 # 06.11.2026 (т. 1): книгите ползват реалния вход и реалния стоп
+        rec["stop_loss"], rec["target_1"] = res["fill_stop"], res["fill_target"]
     rec.update(entry_volume(res.get("fill_date"), bars))                 # 20.10.2026 (етап 3, т. 1)
     # т.8: SPY за същите периоди (graceful: без SPY барове → None, останалото не се засяга)
     rec["spy_return_pct"] = trade_sim.spy_return_pct(res, spy_bars) if spy_bars is not None else None
@@ -1023,7 +1027,7 @@ def _apply_split_adjustment_v2(rec: dict, splits: list[dict], closes: "pd.Series
     ratio = 1.0
     for s in splits:
         ratio *= s["ratio"]
-    before = {k: rec.get(k) for k in ("signal_price", "buy_stop", "max_chase")}
+    before = {k: rec.get(k) for k in ("signal_price", "buy_stop", "max_chase", "struct_stop", "plan_stop_loss", "plan_target_1")}      # 06.11.2026 (т. 1): и структурният стоп на новите записи
     if not _apply_split_adjustment(rec, splits, closes, today):
         return False
     sa = rec.get("split_adjusted") or {}

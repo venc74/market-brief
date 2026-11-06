@@ -60,10 +60,10 @@ EXPD = {w["ticker"]: w for w in BR["watchlist"]}["EXPD"]
 pv = sizing.buy_stop_preview(EXPD, 0.5, "2026-10-05")
 lv = tl.canslim_levels(pv, 2.01, 0.5, "вход при задействане (buy-stop)")                    # 2.01 = РЕАЛНИЯТ ADR20 на EXPD към 02.10
 assert (lv["strategy"], lv["entry"], lv["stop"], lv["stop_pct"], lv["adr_pct"], lv["regime_factor"]) == ("canslim", 194.59, 181.53, 6.71, 2.01, 0.5)
-assert lv["stop_source"] == "structural" and lv["stop_source_text"] == "структурен: 15-барен low −1%" and lv["warnings"] == []
+assert lv["stop_source"] == "structural" and lv["stop_source_text"] == "стоп: $181.53 или 8% под цената на влизане — по-високото" and lv["warnings"] == []
 print(f"  ✓ РЕАЛНА EXPD карта: вход $194.59, стоп $181.53 (−6.71%), източник 'структурен: 15-барен low −1%', ADR 2.01%, без предупреждение (6.71 ≥ 0.5×2.01)")
 capped = tl.canslim_levels(sizing.position_plan_v2({**EXPD, "struct_low": 178.0, "price": 194.59}, 1.0, "2026-10-05"), 2.01, 1.0, "референтен вход")
-assert capped["stop_source"] == "cap" and capped["stop"] == 179.02 and capped["stop_pct"] == 8.0 and "таван 8% под входа" in capped["stop_source_text"]
+assert capped["stop_source"] == "cap" and capped["stop"] == 179.02 and capped["stop_pct"] == 8.0 and "8% под цената на влизане" in capped["stop_source_text"]
 print("  ✓ СИНТЕТИЧНО (struct_low снижен до $178): избраното ниво е таванът 8% → стоп $179.02 (−8.0%), източник 'cap'")
 exel_plan = sizing.position_plan_v2(row, 1.0, dt.date(2026, 6, 29))
 lx = tl.canslim_levels(exel_plan, row["adr_pct"], 1.0, "референтен вход (сигнален close)")

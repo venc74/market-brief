@@ -58,7 +58,7 @@ backtest._save_tracker(copy.deepcopy(FX["tracker_before"]))
 old = {t: fresh(t) for t in ("EXPD", "ANET")}
 setup_rules.annotate(list(old.values()), D("2026-10-12"), backtest.live_buystop_by_ticker())
 assert old["EXPD"]["setup"]["book_status"] == "pending" and old["EXPD"]["setup"]["trigger_text"].startswith("Чака пробив: buy-stop $194.59 (валиден до 15.10, от 09.10")
-assert old["EXPD"]["setup"]["trigger_text"] == new_wording(B12["EXPD"]["setup"]["trigger_text"]).replace(f'${B12["EXPD"]["setup"]["max_chase"]:.2f}', f'${old["EXPD"]["setup"]["max_chase"]:.2f}')     # дословно като в РЕАЛНИЯ бриф (06.11.2026, т. 1: без тавана — вече по риска до стопа)
+assert old["EXPD"]["setup"]["trigger_text"] == new_wording(B12["EXPD"]["setup"]["trigger_text"])                          # дословно като в РЕАЛНИЯ бриф
 assert old["ANET"]["setup"]["kind"] == "no_volume" and "triggered" not in old["ANET"]["setup"]
 print("  ✓ с tracker-а от диска (преди run-а): EXPD 'Чака пробив … валиден до 15.10, от 09.10' — дословно като в брифа; ANET без дума за книгата")
 
