@@ -1,159 +1,173 @@
 {
- "date": "2026-11-06",
+ "date": "2026-11-09",
  "news": [
   {
-   "headline": "Global stocks tumble as Democratic midterm sweep sparks AI rout",
-   "source": "Financial Times",
-   "why": "Демократическата победа на междинните избори предизвика масивна разпродажба в AI и tech сектора — Nasdaq влезе в корекция, Magnificent 7 загубиха над $1 трилион пазарна капитализация, като натискът е насочен надолу към chip-производители, data center компании и свързани ETF-и.",
-   "link": "https://www.ft.com/content/7c6ceb4f-d7b1-49ec-9047-0e2e4cd2615c?syn-25a6b1a6=1",
-   "also": [
-    {
-     "source": "Financial Times",
-     "headline": "Wall Street sheds $3.2tn as tech-heavy Nasdaq plunges",
-     "link": "https://www.ft.com/content/3d079b3d-580d-400b-bf9c-56af6a08f60f?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Magnificent 7 loses $1 trillion. The most eye-popping stats from Thursday's tech stock plunge",
-     "link": "https://www.cnbc.com/2026/11/05/stock-market-selloff-ai-fears.html"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Stock futures mixed after Nasdaq correction; Japan's Nikkei 225 enters bear market: Live updates",
-     "link": "https://www.cnbc.com/2026/11/05/stock-market-today-live-updates.html"
-    }
-   ]
-  },
-  {
-   "headline": "Texas governor-elect says state will have laws to shield citizens from data centers - Reuters",
+   "headline": "Nvidia falls about 3% in after-hours and perpetual futures trade - Reuters",
    "source": "Reuters Business",
-   "why": "Законодателни призиви за мораториум върху data center строителство директно застрашават капиталовите планове на Nvidia, Microsoft, Google и целия AI инфраструктурен сектор, с потенциал да преобърнат инвестиционния тезис за AI trade.",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPWUdBMU5JdUNaZTZrV1hLcmZ4blU4Y2ZxUjhxUFJkQnE5MzliSXYtcUd1TnVRQ1NYcEZwR2NTS29jTmJVXzFKblhaay12d0FENWs5M0VKampGS3A5VGh6VDAxX29Ld0JSQ0x6blhRVnY0RHJPRHBlZmVfakxpVk5HMmJ3UnJZeUttakxUYVFQQVRlblRxamUzS2hXS2NCZ2dkN0pDOHJza0VTOE9zeHB0MDJpRUw0VEFqVnJfTA?oc=5",
-   "also": [
-    {
-     "source": "Financial Times",
-     "headline": "Will Democrats stall the AI boom?",
-     "link": "https://www.ft.com/content/5dedb9bf-bd12-4956-b2b7-ce968e1e1371?syn-25a6b1a6=1"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "AI backlash threatens trillion-dollar data centre boom, say tech leaders",
-     "link": "https://www.ft.com/content/32fd4450-5880-437d-9bd9-df13289ada24?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Top Democrats call to rein in AI buildout after midterms sweep: 'National data center moratorium now'",
-     "link": "https://www.cnbc.com/2026/11/05/democrats-data-center-restrictions-midterms.html"
-    }
-   ]
-  },
-  {
-   "headline": "South Korea stocks hit 9-month low as US midterm results spark AI selloff - Reuters",
-   "source": "Reuters Business",
-   "why": "SK Hynix, Samsung, TSMC и SoftBank регистрират тежки загуби в азиатската сесия, Nikkei 225 влезе в мечи пазар, а Kospi падна — разпродажбата се разпространява глобално извън американския tech сектор.",
-   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQUXFPZWJ0ekg2Mnl6b3ZEMDRpRzJON3M1b3FnWlpsbVZSSlpnMDR1YXJFWG0zMmROd0NybFRLWXdtcjdQWm1hckFsTE15d2FoY0hnMGZsMjctbnc1VjFCZ09uUWhDbVpGOUtmQmU4UEhLNmtINHZjbTA4cXZPSmpqTFM3TEptUUU4clROU0xCc3QtM3NNbThZOHMxU1lqU1I4Y3EzRnRnY1hqUFpwUTJWcWcxQWhJNVh2VER2dGtzZUxxSmJSeXc?oc=5",
-   "also": [
-    {
-     "source": "Financial Times",
-     "headline": "Asian tech stocks sink",
-     "link": "https://www.ft.com/content/b77ebe43-a017-4e63-af84-5bdec8f47648?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Nasdaq sell-off batters Asian chip stocks as SK Hynix, Samsung, Softbank, TSMC tumble",
-     "link": "https://www.cnbc.com/2026/11/06/tech-stocks-sk-hynix-samsung-softbank.html"
-    }
-   ]
-  },
-  {
-   "headline": "Gold eases on inflation worries from higher oil; US payrolls data in focus - Reuters",
-   "source": "Reuters Business",
-   "why": "Октомврийският nonfarm payrolls доклад е ключовият макро катализатор за деня — данните ще определят очакванията за следващото решение на Fed по лихвите и могат да засилят или смекчат текущата волатилност.",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQQVNBUlY0RkQ3Vm5qcDFmbS12Nlo0Wjd4RWNEWkROOFRSX0hha1VobWJkTW82YTM1QzNMUXlzX1V5bktiSHJDYklFR2ZDUnN4aEhGM3U0UmlRT3pDcjVFRkR5ak9IZ1NVbG4wempaX1Y0R2JXb0U2THRLcE80d0l1NFppQ3l5b2M4c3RQZU1sS1RNRHdiYmFsYmw0czRoUnVJRVJLNTl0VmVNODg3NWVR?oc=5",
-   "also": [
-    {
-     "source": "CNBC",
-     "headline": "The October jobs report is out Friday. Here's everything to expect",
-     "link": "https://www.cnbc.com/2026/11/05/october-jobs-report-preview.html"
-    }
-   ]
-  },
-  {
-   "headline": "Oil set for sharp weekly drop but Middle East supply concerns provide floor - Reuters",
-   "source": "Reuters Business",
-   "why": "Петролът е под двоен натиск — знаци за излишък потискат цените, но геополитическото напрежение САЩ-Иран след изборите поддържа дъното; движението на петрола ще определи инфлационните очаквания преди payrolls данните.",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOR0loTjAtWUlkbnpIR2huZE8zWWkxZHZIZlprNlQ5Z3BSaGUxcnE1ZDdqbXFuOHFpQVdrbzEyNnRUSGR4ZDh3SEpqQkpqX2NZa0JlZjEyZlp3RElJMFlhVDRLLTZ3MzRuV2NuTXR3SjhQejExMVR4eE10YThVcmJYaTdNYmt1SjJfeG10NlJRRFB1SFNQUlRSanFrYzBFUjlZNjBGMjhxSi1MZG1sd19kWGU0Ykt5bmR4by1B?oc=5",
+   "why": "Разследването за шпионаж срещу CEO-то на най-ценната чипова компания в света натиска акциите на NVDA надолу в извънборсовата търговия и засяга целия AI/semiconductor сектор.",
+   "source_text": "Nvidia investigates CEO Jensen Huang's relationship with alleged Chinese spy Huang told Nvidia staff in an email that he had an affair and that the company's board has opened an investigation into allegations the woman is a Chinese spy. Nvidia investigates whether CEO Jensen Huang was targeted by Chinese spy with whom he had an affair - AP News Nvidia investigates whether CEO Jensen Huang was targeted by Chinese spy with whom he had an affair AP News Nvidia falls about 3% in after-hours and perpetual futures trade - Reuters Nvidia falls about 3% in after-hours and perpetual futures trade Reuters Reactions to Nvidia's probe into CEO Jensen Huang - Reuters Reactions to Nvidia's probe into CEO Jensen Huang Reuters Nvidia's out-of-hour shares fall as firm probes CEO Jensen Huang - Reuters Nvidia's out-of-hour shares fall as firm probes CEO Jensen Huang Reuters Trump calls Nvidia's Huang 'honorable,' says he has not discussed allegations with him - Reuters Trump calls Nvidia's Huang 'honorable,' says he has not discussed allegations with him Reuters Nvidia probes whether CEO Huang was target of foreign spying as he admits affair - Reuters Nvidia probes whether CEO Huang was target of foreign spying as he admits affair Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQb0pTclA4c2pDZlE3NXExNGt0dU9JUDRTaU80SVhfU1FzV2pmSzhYZG9rdzdPaGZSRHV3LXEtaDAwX0ttREhYUGwtalVma1ktTlBCSUdzLUJETkhFVm5ETDVrNVF6OGswVE5EempEc01PSXlrbWRtUERvWDlwVk5KMnlmRmlNNDRYRS1ubHB2bl9oRXp6WFg1cGFYVVdzSnBaNE53?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "As high oil prices curb demand, fresh signs of glut appear - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQem82aUU3S0NZWXNNcXlreW9xS3J0UnpIcDNCWVdqS3NyclRxSUtWenpmMEhoNmp6amtNSG5ZYmpuMzc1TElxODVYTmVSZURrYjJsbVliVXlVSzNtM3J5TDBMNl9sQ0JSTmxKQ2RxVzc4RnMxX2lIZGp3Y3kwTFdrUndLZkFMN0JkN2xLTi02dDZjT0x1Wk0ySTMxZlpNZWRmX1F6ZDhR?oc=5"
+     "headline": "Reactions to Nvidia's probe into CEO Jensen Huang - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNclQ2eGQ2Qk9RRTVocm9BdXA0a0dFMTdFVjI4cDNOR1NfbFVoc0ZlNjhXTU5UVHcwejhZaWgxandrNzh0ODd5ZWs5c0o0WmpPN2lNazlYU2pqcy1SS3dVY0VrbnVCXy1zcEFXN2tTYTU5dG5qc2FUZW14azNrRmthcElvYVhHMkxCZk9NcnNTZjZ1eURraEI4?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Nvidia's out-of-hour shares fall as firm probes CEO Jensen Huang - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNcUVlREFfdFVvdmk1OXFEamNOcFVZTGJFX1gxZkhjYjhXNTFnZkJqUmpLLTliVmRCZUNtRGdHSDZ2cVBvRXlLdldZSG1rVmFfMFk5M1dKNnBnVnNnUzZ1NmVSNkRWakkyNktBZmhGbzJwYkh5YTZBekVPY3pyUU9lTXY1WGt4TkhLcHVPTldJb1k3MGVPdzBLcTIyVzNuRUpyRGt5cDJpMV91QzdjcWFtQy1MekMwU3lkRlNXUFNn?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Trump calls Nvidia's Huang 'honorable,' says he has not discussed allegations with him - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPY2QzRFRsZW5sUmJrR1o5RDl2eDRqdjM0TUczSmpsVVZzVWN5TkVTOWVEdmFqN2RHelRydTVBcTZKb3h6VzQzaktGTVdDdHZsSDZ5TnFkZnp3S2xnR1hJU18xcTVxTkFWMGpTMi1mX0VwZGs0RGhVVFJzc1lIblh5ak5QV2ZYTnNwU1lnMDhUZGY2aWRULVcxVlFBSzBtU3NBd3NzYXl4a2g2bkNGMnB4YzZUN3p1RUhFNEp2RVZZbDdOOFRH?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Nvidia probes whether CEO Huang was target of foreign spying as he admits affair - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQOFNRSy1yS0duakdXT1hKbjI2MkFsMVhHeTQ1VVh4QlZYOVdvd0ZKaWVjTzFXT2JCRlR2T2IzSjRKcENSTkNLbVR2VU90Q1VyUHhEZWp0NGZLQUZPRXJ1NlNVNG9OZ0U0T2VwYmJuaURBMWVBYXhHd1hDb00zZU9aUXJGaU10bmFrclgySUZoUE1GX210Q19TQ1pXRjJTVFpoZjN2NG9qblVQMXhHUC1vV3JxaHkxbVJiVkhldEZISHlCdw?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "Nvidia investigates whether CEO Jensen Huang was targeted by Chinese spy with whom he had an affair - AP News",
+     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQUzB5YTdpVVRqQUNKMHhoR3ZQNEdMb00yeU1kQUpTM2tDT2lHbTRmb1p5NHpmdDZqZ21EQlVNTEIzd2tlbDh2cUIwM1RNOVVQeFF6bDdjbXplNjhnWU1VUTR1NndXOFRGTUJlbHJGcmstaWgxWGdSX05SWW9qWmRaUlpLVTBGX1VNc3RnOEpqSktRZW96d0lVYVd0SEg5ZGlnd1FFMDNpdWo?oc=5"
     },
     {
      "source": "CNBC",
-     "headline": "Oil prices rise as investors weigh renewed U.S.-Iran conflict risks after midterm elections",
-     "link": "https://www.cnbc.com/2026/11/06/oil-price-today-brent-wti.html"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Renewed U.S.-Iran tension could push oil past $100: Rapidan Energy",
-     "link": "https://www.cnbc.com/2026/11/06/us-iran-war-trump-hormuz-oil-midterms.html"
+     "headline": "Nvidia investigates CEO Jensen Huang's relationship with alleged Chinese spy",
+     "link": "https://www.cnbc.com/2026/11/08/nvidia-jensen-huang-investigation-china-spy.html"
     }
    ]
   },
   {
-   "headline": "Iran sent nuclear proposal to the US via Qatar, senior Iranian official tells Reuters - Reuters",
+   "headline": "China extends suspensions of 24% tariff on US goods, port fees on US ships for two months - Reuters",
    "source": "Reuters Business",
-   "why": "Иранско ядрено предложение чрез Катар отваря сценарий за дипломатическо решение, което би смекчило геополитическата рискова премия в петрола и засегнатите пазари в региона.",
-   "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOSlJZVlphdWhPcDNGc1E5eDVNdDdMQkJNTXVDS0RYSVRqaC1tblFqQy1FekRQdldnV0FsMU5RdnVHNEI3UEZWMC1MY1l5cnRtcjBlcDlpUXdvX0hXbV91S1UxajV1TEx1VmJ2SzNLNElXSjc3YkdmYWw4VGNXZEl5NXR4RFNjRXBxeEZMLWpBT1Z5X2JRc3NEdkdMZDljQ0dkZXZRbzc3U1NmNkhnaFN5QzNhVmRzSmhsM0Q5VzU3Mm11OWZBa3M1V1lvaw?oc=5",
+   "why": "Удължаването на паузата по американско-китинските тарифи намалява краткосрочния търговски риск и подкрепя акциите на износителите и суровинния комплекс.",
+   "source_text": "China extends suspensions of 24% tariff on US goods, port fees on US ships for two months - Reuters China extends suspensions of 24% tariff on US goods, port fees on US ships for two months Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOSTA2TElMOUVJb2VPUWp2RnhuNWtoOHhncWpKUW9Ob1lEQ19BVUluTWRvRkZTYWJTYlU5RlZNR2F6UmZOcW5GLXlrQVJuMzMxakd2V2M4d1dXRDBCU3FBN182RlFQTjVBbVpTbzQ2cXZzdkk4YUJxZkF4NUVoZXlXR1haVlZIY2lpMnJQeTdFWTFMQkR5QWxiaWtqZUJSSUI5bFpzdGNmUENfU2h4dWIxcg?oc=5"
+  },
+  {
+   "headline": "China's factory-gate inflation at fastest in nearly 4-1/2 years in October, while CPI rise moderates - Reuters",
+   "source": "Reuters Business",
+   "why": "PPI от 5.7% — над очакванията — сигнализира инфлационен натиск нагоре по веригата, което влияе на глобалните суровини и може да усложни дезинфлационния наратив на Fed.",
+   "source_text": "China wholesale inflation hits highest in more than four years as consumer measure slows The PPI for October came in at 5.7%, compared to the 5.3% expected by economists polled by Reuters. China's factory-gate inflation at fastest in nearly 4-1/2 years in October, while CPI rise moderates - Reuters China's factory-gate inflation at fastest in nearly 4-1/2 years in October, while CPI rise moderates Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOdHZHeWlBMm5ScUQ3Um9LTHZLdHpkZzNXNXF0NWlKUjlMaE54NnI2VUhSNktuS3BpWEtldEk4ZklwbDFaLUVGaXcxdVY3ZllyX1o5aFNNX1R0dC03Zzc3NFVkSVdTZDl5dTg0UUF4R1lLQXNlT3NmS29zVjhqQWZPVVU5OXlpLXpWdmpSeEJCVWhrY1FUcnc0REduM3VITEs0TXRvLXRtLUxXMUZYaWl5NmYxZml3MDQzUDMxU20wbWdHWWMzbERkeVZHTQ?oc=5",
+   "also": [
+    {
+     "source": "CNBC",
+     "headline": "China wholesale inflation hits highest in more than four years as consumer measure slows",
+     "link": "https://www.cnbc.com/2026/11/09/china-wholesale-inflation-rises-consumer.html"
+    }
+   ]
+  },
+  {
+   "headline": "Oil steadies after Trump signals restraint on Iran, Hormuz risks persist - Reuters",
+   "source": "Reuters Business",
+   "why": "Сигналите на Тръмп за въздържане от удари срещу Иран понижават геополитическата рискова премия в петрола, докато рисковете около Хормуз и Хутите поддържат пода на цените.",
+   "source_text": "Oil steadies after Trump signals restraint on Iran, Hormuz risks persist - Reuters Oil steadies after Trump signals restraint on Iran, Hormuz risks persist Reuters Trump says renewed Iran strikes ‘highly unlikely’ if talks progress but warns he could still strike Trump tied avoiding renewed U.S. strikes to progress in talks over Iran’s nuclear program and the Strait of Hormuz. Iran says no unauthorised vessels transited Strait of Hormuz overnight after navigation aids destroyed - Reuters Iran says no unauthorised vessels transited Strait of Hormuz overnight after navigation aids destroyed Reuters Iraq has reached understandings with US to allow oil exports through Hormuz, minister says - Reuters Iraq has reached understandings with US to allow oil exports through Hormuz, minister says Reuters Trump says he is unlikely to order Iran attack if talks progress, CNN reports - Reuters Trump says he is unlikely to order Iran attack if talks progress, CNN reports Reuters Trump says he is highly unlikely to order Iran strikes if talks progress - Reuters Trump says he is highly unlikely to order Iran strikes if talks progress Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNWnV4VENDNkFNVllVVEpoVTJLcC13SlhHREstWFZZQ252QTRiU3dKeW5EYWYxVUJjNnQzVzh1M1FsWjNGTmRKMVFEYjhxT3M2VmF4aVpERWwwczh6dV9OTG5NcFJCMFVZZ0toWEEyMnRRTnBZUm9iQVVzblIzcmJMOTR4V29sUDFVME1jcFQ5VVhoMHVUM0YzWHM2bmE1b3VCV0s0R2JmUUQ?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Hegseth vows to keep fighting from Pentagon, defends Iran war - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQR1JFX1RGSnZ0bDI2d1ZxN0JpSGpTN2NDT21RbEVMaXhyVGNfNDlHUkVsaU9pNGd1d1hzTjhFWmVxeGgzSmt5SDVEZHA2Q3RjUmVpaFdUSUVic3RBLTJNNms0U253VURJU3Uzdm5rSXRjMmtnSDRMbWhKaFA1R1dtRUZ0LUQxLTlieGhXUzA2QVVvU3BnRkhpLWJBekQzVm5YRVFzTzJxU2s?oc=5"
+     "headline": "Iran says no unauthorised vessels transited Strait of Hormuz overnight after navigation aids destroyed - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPNFkyaVpFU2VKQUVYc0xKQ1NmMFhuUmhEZXpCRFF5Ym5HaVpwSENiYk9QaWJhd1BtcU9sSEVyeGVoZ1RxUS1UamJHbEJOTUJwQjhzWUhrYko5RmZCMXJZQ04wZ2tyeFJZTGNFdUotNURHOXpDQTdGdXlMMEpaU3pWT0lvVzNPVkV1aHRIdjVYTE5yM2dwdVpDM0pQdV9TTDhTLXRQTlgxRkVlVFZtU0haT29fdEpyZw?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Iraq has reached understandings with US to allow oil exports through Hormuz, minister says - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQcVp2dDBwekFJVEtlai1lemtaZVNTb2FaallsZHhyT2FHTlZHdmpwY3B0SU9HRUpQV2JQQ3E0NWo0VEJpS3B4N1JCTGhkTUhJTHFYUUY3ZkttWmc2RUl1V2dicHdLODBaUEFQSmdySXdHcTJ2VGpIeUlOTlZZd05LZ29wYVdWajhrMzVYa1ZJQl9FTnNjZjFQRmNGc1FoV1dmOFZyOWYzTE1pRndvaGxzSTg1S1B1Z1lxSDZNM3hZWEZmZw?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Trump says he is unlikely to order Iran attack if talks progress, CNN reports - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQbV96cm81eEtLUU91T0xKaWxycHdBV3c4VGNZb2dCbzA0M2M0V2ZPZXp2R1NRcmJ1Wl9TLUxZZWtQRDRtazg2dHVzRWlIdGpmWVRJTUl3cU95cUNheHJtMFJFU2lKM2c2cndGc2ZTbmFqZUpaT0hWRFRyZ1VPYzFFbXlSZUVCR1NuLWFqM0dFaUo2UHI4dWFKZlRoUHEwZ2UwNF95T0NzUGNHME15MFQtMWpMeXZaWDhGQnNkZDNRYnQyTjlQcUE?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Trump says he is highly unlikely to order Iran strikes if talks progress - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxONWFPcDhpSjcwTEozRGRNdHFnWWpzb1pCYXIzdnVOUWhJQ3JvaGVTcjItLWNwNktieTVDcTk0WlpKbDRiMHB3Tkl0R19Mb1NUckllcVYwenlvNUV2QTBLcjlNdGtZdFI2NEJxbnhVbmZieXg2SnNTUXNPTFZVZjFnX2o3Q3lBbC1kRzlWcnNNU3VXdFNYNW5YTTJ4SFdBaDVfai1CRU50cm1VMHBkeWd4Zkc0Q2UxTlBJcmZ6TnJR?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Trump says renewed Iran strikes ‘highly unlikely’ if talks progress but warns he could still strike",
+     "link": "https://www.cnbc.com/2026/11/08/trump-iran-strikes-unlikely-talks-hormuz.html"
     }
    ]
   },
   {
-   "headline": "BoE hikes rate for first time in 3 years; retreating oil prices may allow for more options ahead - AP News",
-   "source": "AP Business",
-   "why": "Първото повишение на лихвата от Bank of England от 3 години насам е значимо централнобанково решение, което засяга GBP, британски gilts и глобалните очаквания за посоката на монетарната политика.",
-   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNb0NDY2lDWk9qMGtnT3ZVZEhLY1RTQ1J5MFlOazFRTzk4ZVVZR3JhcDJoZ3RmNjZxZHQ2emt3M1hVdXRYS2RscjM5NFhVc3Btd25iU0htTVBLTnNLcE16aVlxVjc4Rjg3TVBrVjJOck93VV9iN19TU1gzNnJTZ1BfVlNieUJFNEpXbzdvSjkyOVM3cV9l?oc=5"
-  },
-  {
-   "headline": "SpaceX, Tesla extend losses as midterm results cloud data center, merger outlook - Reuters",
+   "headline": "Houthi attack damages Aramco building in Riyadh's financial district - Reuters",
    "source": "Reuters Business",
-   "why": "Tesla и SpaceX продължават да падат след изборния резултат, тъй като изчезват очакванията за регулаторни облаги и data center сделки, свързани с Musk — директен негативен ефект за TSLA и портфолиата с концентрирана tech експозиция.",
-   "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQaXI0TWJjeldpYmNUM0tQR3NKcEh6bGtsaWUzOV9XQnQyaFVnNlNuaEcxakNkdjd4MzBJR2NoMWdua1RaNEVfSzNjOGRCVU5vVmc3MXRYdlkzVEpYV3JZR2JMYVVSMTJ5ZmkxY2VYM2RSWm1nb005RENwSk93NTcxa0U5X1lrMUw1cHRFV3c4b3lhc2doNHFJM012TE1yN1N5ZEo2em9pSExVcHgtQ2h1cURZOE5taVF6aFVKZU5GWVpHX0FDSGpGYmppMFUtUXM?oc=5",
+   "why": "Директен удар по сграда на Aramco в Рияд ескалира Houthi заплахата за петролната инфраструктура и може да натисне цените на суровия петрол нагоре.",
+   "source_text": "Houthi attack damages Aramco building in Riyadh's financial district - Reuters Houthi attack damages Aramco building in Riyadh's financial district Reuters Saudi Arabia intercepts missiles as Aramco building in Riyadh is damaged, and other Mideast news - AP News Saudi Arabia intercepts missiles as Aramco building in Riyadh is damaged, and other Mideast news AP News",
+   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMEd1Mi1tMEV0cUFGYkd2V01lQ1NkczNNYzZXTlpTOXByR3BaSk82N21DOEpTeEtNMlJ1bFJ3S2pLTVZBOUp5cDFwOUpGakNxMTR1a2RyaHJBcDNOZUJqR1dDZllfejBPWGZ3UVYyT2s3Uk9XaFE3LW1qQkxtNHhlcmFRcGk0bDlWeHZyQmNNOEJyT1lWeVZlTEJlZ0xpRHF6UUs0RnRTWExlbEJ4eDc4YTY4d0VfM2x3dllKUGhZa1Z4QQ?oc=5",
    "also": [
     {
-     "source": "CNBC",
-     "headline": "Elon Musk's Tesla and SpaceX lose over $420 billion in combined market cap after midterms",
-     "link": "https://www.cnbc.com/2026/11/05/tesla-spacex-stocks-fall-after-2026-midterms.html"
+     "source": "AP Business",
+     "headline": "Saudi Arabia intercepts missiles as Aramco building in Riyadh is damaged, and other Mideast news - AP News",
+     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOU1hPV0p1dkZfcU92OEJVMkYtQTNHb3hKSDdGZHp5U1RkUTZlc2dzTU9oNjQ4dk5nUGZ6WVhkTlk2VTJ0cFkxOHozbE9aWUJObXFUYVBCZEwtaktnOGExQjVfUlhNdFlxRV9KeHMzS1Rsc2c3OFAxNHF6RjM2X0FRamhCalJsTk1BY1g2NFhHX2ZnUQ?oc=5"
+    }
+   ]
+  },
+  {
+   "headline": "Iraq's Khor Mor gas field suspends output after drone attack, operator says - Reuters",
+   "source": "Reuters Business",
+   "why": "Спирането на газовото производство след дронов удар засяга регионалните енергийни доставки и добавя геополитически рискови премии към природния газ.",
+   "source_text": "Iraq's Khor Mor gas field suspends output after drone attack, operator says - Reuters Iraq's Khor Mor gas field suspends output after drone attack, operator says Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOSjc4dFNBUmN3UHp3Uk5FLUhNOElWeTVLRDNzSHZsSTAyUWZ4elN0eHdYUVJ5MDZBb0Y3MDNaNzlWbTRHMnctUFY5dGdNWWtKUnZTdHRPeXl1UUhlUE9mdTU0d2ZWTk9Hak9HaHVXaVBJQ3BoVXdfZnFxelF2aUc1MEV1U0JFQ1lDQ0s3RXhtRnk2dmoxZ2h4a3FRazE4Y3VpbGlDYW1zdE1DcDYxU3R4aE9zOWxkdTNuRVFxMzRlTDEtMDNHRmpr?oc=5"
+  },
+  {
+   "headline": "OpenAI gets $11 billion funding at $1.25 trillion valuation, source says - Reuters",
+   "source": "Reuters Business",
+   "why": "Оценка от $1.25 трилиона потвърждава мегатренда в AI финансирането и подкрепя целия AI/cloud сектор, включително доставчици на инфраструктура.",
+   "source_text": "OpenAI gets $11 billion funding at $1.25 trillion valuation, source says - Reuters OpenAI gets $11 billion funding at $1.25 trillion valuation, source says Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNdlpNRm5XVy11c3hLY0NRdjh2T3VmOE1LOWQ2LXlvcFhmZlFJYkQya3N3QWxud2UteUZpWVlCTXVHUXZZTjIwRlVQaUhqOGhyM2lDaDJTSGcxMnE5MzhOZ1NHYlJIc1p5bHRxaVZjZDd4MFY2RWMtRkNlYkhSVkdpMlRBWi1PYUNmZGNydXZnOTZFMTFoOHR0azBpUlU1aHpVdFA4dlhCV0dDNm91VE0xSVg0bXZhcF9jaVAzcXYzaldOdw?oc=5"
+  },
+  {
+   "headline": "US dollar holds onto payrolls gains, NZ dollar rises after election - Reuters",
+   "source": "Reuters Business",
+   "why": "Доларът запазва силата си след силния jobs report, което задава тона за Fed очакванията и оказва натиск върху emerging market валути и суровини.",
+   "source_text": "US dollar holds onto payrolls gains, NZ dollar rises after election - Reuters US dollar holds onto payrolls gains, NZ dollar rises after election Reuters US continues to generate jobs, yet inflation is eroding the spending power of millions of Americans - AP News US continues to generate jobs, yet inflation is eroding the spending power of millions of Americans AP News Asian stocks bounce as AI, Mideast jitters recede; dollar firm on Fed bets - Reuters Asian stocks bounce as AI, Mideast jitters recede; dollar firm on Fed bets Reuters Asian stocks rebound after AI rout Declines last week had pushed many indices into bear market territory",
+   "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNc3ZtMDBIQ2p3MzI1VUNnS3M2Q1I4T1k1Mk1sU19peE9hOGM5cVh2cXZiY3Q2THgyR3ZnMzlhRExRM0s5ci1WZG5IQk55RUZkb2tITUp2OVRoY1VXWWFDS3pBMnNLSFhhZVplWWVjWmdRRmZ3eDNUNFREZWU2Wml1Y3Nnck9saTB4T3JPSGd2SGl4X1NwNmp2U19iY3BLSmV0ZEloYTRadldmNjJIY0l4NllucjVDT3lkQ0JLakFB?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Asian stocks bounce as AI, Mideast jitters recede; dollar firm on Fed bets - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNV0oxRGlDMkl5NWVMcTZ3NjVxWU5RakhWT3BnZG1vc254T1RSXzg0SE5MelBYSTNsakduTFo5R0pJMkNWNXZKVW9SZEFOLWZfbWQwdG94bkpoeGw5V0I5bmtlRktsWmpqTGhwVzFNSkgyaDdEVUprbDNsMkI1WThjZ1cwQmpIRjN5VVFOVw?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "US continues to generate jobs, yet inflation is eroding the spending power of millions of Americans - AP News",
+     "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNdC02VzNDWTRMSy1CbmNhLWl2akxnTjZDNldNZW9IUC00ZTJGWWxyZEljUW5ZZHRVZEdHS2lsR3p1VkRod19USGJhR1N0b0lvaDBaZXNhazNaZVFOMXZRT21kQXBHX2QxWW43TkJrVlhOTzV5V21vZVRwQl9oZlR1U1BXSEh4S1ZjQVczMHNuc1F3UFIyaUliRnJqTFRMaEpTSEpZ?oc=5"
+    },
+    {
+     "source": "Financial Times",
+     "headline": "Asian stocks rebound after AI rout",
+     "link": "https://www.ft.com/content/b8644327-86e7-4d1c-a71f-3fb1d552723b?syn-25a6b1a6=1"
     }
    ]
   }
  ],
  "window": {
-  "since": "2026-11-05T06:30:00+00:00",
-  "hours": 24.09,
-  "day_queries": 0,
+  "since": "2026-11-06T06:30:00+00:00",
+  "hours": 72.1,
+  "day_queries": 6,
   "sources": {
    "Reuters Business": {
-    "count": 50,
-    "oldest": "2026-11-05T16:22Z"
+    "count": 150,
+    "oldest": "2026-11-06T08:34Z"
    },
    "CNBC": {
-    "count": 26,
-    "oldest": "2026-11-05T08:07Z"
+    "count": 28,
+    "oldest": "2026-11-06T19:40Z"
    },
    "Financial Times": {
-    "count": 13,
-    "oldest": "2026-11-05T15:35Z"
+    "count": 9,
+    "oldest": "2026-11-09T01:08Z"
    },
    "AP Business": {
-    "count": 50,
-    "oldest": "2026-11-05T08:45Z"
+    "count": 149,
+    "oldest": "2026-11-06T08:00Z"
    }
   }
  }

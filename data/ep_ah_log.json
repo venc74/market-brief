@@ -114,10 +114,10 @@
    "ah_volume": null,
    "neglect": true,
    "ret63_pct": -4.5,
-   "open_gap_pct": null,
-   "close_pct": null,
-   "high_pct": null,
-   "resolved_on": null
+   "open_gap_pct": 12.35,
+   "close_pct": 11.67,
+   "high_pct": 13.15,
+   "resolved_on": "2026-11-09"
   }
  ]
 }

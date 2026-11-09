@@ -1,172 +1,76 @@
 {
- "date": "2026-11-06",
+ "date": "2026-11-09",
  "rows": [],
  "horizon": [
-  {
-   "ticker": "RETO",
-   "company": "ReTo Eco-Solutions, Inc.",
-   "date": "2026-11-02",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Nov 02, 2026"
-  },
-  {
-   "ticker": "VCIG",
-   "company": "VCI Global Limited",
-   "date": "2026-11-02",
-   "ratio": "1:18",
-   "split_type": "reverse",
-   "date_human": "Nov 02, 2026"
-  },
-  {
-   "ticker": "BJDX",
-   "company": "Bluejay Diagnostics, Inc.",
-   "date": "2026-11-03",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Nov 03, 2026"
-  },
-  {
-   "ticker": "UFG",
-   "company": "Uni-Fuels Holdings Limited",
-   "date": "2026-11-03",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 03, 2026"
-  },
-  {
-   "ticker": "XXII",
-   "company": "22nd Century Group, Inc",
-   "date": "2026-11-05",
-   "ratio": "1:58",
-   "split_type": "reverse",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "EZGO",
-   "company": "EZGO Technologies Ltd.",
-   "date": "2026-11-05",
-   "ratio": "1:3",
-   "split_type": "reverse",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "INM",
-   "company": "InMed Pharmaceuticals Inc.",
-   "date": "2026-11-05",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "EFG",
-   "company": "iShares MSCI EAFE Growth ETF",
-   "date": "2026-11-05",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "EFV",
-   "company": "iShares MSCI EAFE Value ETF",
-   "date": "2026-11-05",
-   "ratio": "2:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "MTUM",
-   "company": "iShares MSCI USA Momentum Factor ETF",
-   "date": "2026-11-05",
-   "ratio": "4:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "QUAL",
-   "company": "iShares MSCI USA Quality Factor ETF",
-   "date": "2026-11-05",
-   "ratio": "4:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "SOXX",
-   "company": "iShares PHLX SOX Semiconductor Sector Index Fund",
-   "date": "2026-11-05",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "ITA",
-   "company": "iShares U.S. Aerospace & Defense ETF",
-   "date": "2026-11-05",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Nov 05, 2026"
-  },
-  {
-   "ticker": "CDT",
-   "company": "CDT Equity Inc.",
-   "date": "2026-11-06",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "NWGL",
-   "company": "CL Workshop Group Limited",
-   "date": "2026-11-06",
-   "ratio": "1:80",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "JSPR",
-   "company": "Jasper Therapeutics, Inc.",
-   "date": "2026-11-06",
-   "ratio": "1:30",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "NEXR",
-   "company": "Nexera Technologies Ltd",
-   "date": "2026-11-06",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "ONCO",
-   "company": "Onconetix, Inc.",
-   "date": "2026-11-06",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "AIIO",
-   "company": "Robo.ai Inc.",
-   "date": "2026-11-06",
-   "ratio": "1:25",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
-  {
-   "ticker": "TOPS",
-   "company": "TOP Ships Inc.",
-   "date": "2026-11-06",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 06, 2026"
-  },
   {
    "ticker": "MMT",
    "company": "Aberdeen Multi-Market Income Fund",
    "date": "2026-11-09",
    "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "ARAY",
+   "company": "Accuray Incorporated",
+   "date": "2026-11-09",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "ADGM",
+   "company": "Adagio Medical Holdings, Inc",
+   "date": "2026-11-09",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "ALPS",
+   "company": "ALPS Group Inc",
+   "date": "2026-11-09",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "CISS",
+   "company": "C3is Inc.",
+   "date": "2026-11-09",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "NXTS",
+   "company": "Nexentis Technologies Inc.",
+   "date": "2026-11-09",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "SMX",
+   "company": "SMX (Security Matters) Public Limited Company",
+   "date": "2026-11-09",
+   "ratio": "1:3",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "STKH",
+   "company": "Steakholder Foods Ltd.",
+   "date": "2026-11-09",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "WCT",
+   "company": "Wellchange Holdings Company Limited",
+   "date": "2026-11-09",
+   "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Nov 09, 2026"
   },
@@ -302,36 +206,23 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 37,
-  "horizon_from": "2026-11-02",
+  "source_rows": 25,
+  "horizon_from": "2026-11-09",
   "horizon_to": "2026-11-20",
-  "in_week": 20,
+  "in_week": 9,
   "dropped_price": [
-   "RETO",
-   "VCIG",
-   "BJDX",
-   "UFG",
-   "XXII",
-   "EZGO",
-   "CDT",
-   "NWGL",
-   "JSPR",
-   "NEXR",
-   "ONCO",
-   "AIIO",
-   "TOPS"
+   "MMT",
+   "ARAY",
+   "ADGM",
+   "ALPS",
+   "CISS",
+   "NXTS",
+   "SMX",
+   "STKH",
+   "WCT"
   ],
-  "dropped_cap": [
-   "INM"
-  ],
-  "dropped_no_data": [
-   "EFG",
-   "EFV",
-   "MTUM",
-   "QUAL",
-   "SOXX",
-   "ITA"
-  ],
+  "dropped_cap": [],
+  "dropped_no_data": [],
   "passed": 0,
   "state": "empty"
  }
