@@ -54,10 +54,12 @@ assert sw.closing_evidence(cut(SUB, "2026-11-06"), "2026-06-15", D) is None     
 assert sw.closing_evidence(SUB, None, D)["date"] == "2026-11-06"                                 # и без известна сделка: 2.01 + 3.01 в последните 30 дни
 only25 = {"filings": {"recent": {"form": ["25-NSE"], "filingDate": ["2026-11-06"], "items": [""]}}}        # СИНТЕТИЧНО: само Form 25 (както при облигациите на C, DHR, CMCSA)
 assert sw.closing_evidence(only25, None, D) is None and sw.closing_evidence(only25, "2026-06-15", D) is None
-both = {"filings": {"recent": {"form": ["8-K", "25-NSE"], "filingDate": ["2026-11-02", "2026-11-06"], "items": ["3.01,9.01", ""]}}}
-assert sw.closing_evidence(both, None, D) == {"date": "2026-11-06", "how": "8-K т. 3.01 и Form 25"}
+both = {"filings": {"recent": {"form": ["8-K", "25"], "filingDate": ["2026-10-29", "2026-11-09"], "items": ["3.01,9.01", ""]}}}      # СИНТЕТИЧНО по РЕАЛНИТЕ дати на CFR (се търгува)
+assert sw.closing_evidence(both, None, D) is None
+c501 = {"filings": {"recent": {"form": ["8-K"], "filingDate": ["2026-10-21"], "items": ["5.01,8.01,9.01"]}}}                   # СИНТЕТИЧНО по РЕАЛНИЯ 8-K на UFPI (се търгува)
+assert sw.closing_evidence(c501, None, D) is None and sw.closing_evidence(c501, "2026-06-15", D) == {"date": "2026-10-21", "how": "8-K т. 5.01,8.01,9.01"}   # при известна цел 5.01 стига
 assert sw.merger_state(SUB, "2026-06-15") == "closed" and sw.merger_state(cut(SUB, "2026-11-06"), "2026-06-15") is None
-print(f"  ✓ ROKU: {ev['how']} на 06.11; Form 25 сам не стига (борсата го подава и за облигации)")
+print(f"  ✓ ROKU: {ev['how']} на 06.11; Form 25 сам, 3.01 с Form 25 и 5.01 без известна сделка — не стигат (CFR, HLT, UFPI, 27 тикъра с Form 25)")
 
 print("── 2. check(): приключила → вън, висяща → „deal“ и при провал на EDGAR и извън прозореца ──")
 seed_cache()

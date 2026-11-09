@@ -231,8 +231,9 @@ def merger_text(hit: dict) -> str:
 def closing_evidence(sub: dict, after: str | None, today=None) -> dict | None:
     """
     09.11.2026 (спешна поправка, ROKU): {date, how} — сделката е приключила / обикновените акции са делистнати; иначе None. Чиста функция.
-    Решава 8-K: т. 5.01 (смяна на контрола) или т. 2.01 И 3.01 (приключено придобиване и делистване); без известна сделка (after None) — и т. 3.01 с Form 25 / 25-NSE до 10 дни от нея.
-    Form 25 / 25-NSE / 15 сами НЕ стигат: борсата ги подава и за облигации и привилегировани акции — реално в универса от 01.07: APO, BF-B, C, които си се търгуват.
+    Известна цел (after — обявяването): 8-K с т. 5.01 (смяна на контрола) или с т. 2.01 И 3.01 след него. Без известна сделка (after None): само 8-K с т. 2.01 И 3.01 от последните DELIST_LOOKBACK_DAYS дни.
+    Измерено на 09.11 върху целия универс (918 тикъра, подаванията от 01.07): Form 25 / 25-NSE / 15 — при 27 тикъра, които си се търгуват (облигации и привилегировани акции: APO, C, KO, PG …);
+    т. 5.01 сама — UFPI 21.10; т. 3.01 с Form 25 до 11–15 дни — CFR, HLT. Само ROKU има 2.01 И 3.01.
     after (обявяването на сделката) — само подаванията след него; без after — последните config.DELIST_LOOKBACK_DAYS дни.
     Реално, ROKU: 8-K 1.02,2.01,3.01,3.03,5.01,5.02,5.03,9.01 и 25-NSE на 06.11 след затварянето.
     """
@@ -245,11 +246,8 @@ def closing_evidence(sub: dict, after: str | None, today=None) -> dict | None:
         if (d <= since) if after else (d < since):
             continue
         rows.append((d, f, (r.get("items") or [""] * len(r["form"]))[i] or ""))
-    hits = [{"date": d, "how": f"8-K т. {it}"} for d, f, it in rows if f in ("8-K", "8-K/A") and ("5.01" in it or ("2.01" in it and "3.01" in it))]
-    if not hits and not after:
-        d301 = [d for d, f, it in rows if f in ("8-K", "8-K/A") and "3.01" in it]
-        d25 = [d for d, f, it in rows if f in ("25", "25-NSE")]
-        hits = [{"date": max(a, b), "how": "8-K т. 3.01 и Form 25"} for a in d301 for b in d25 if abs((dt.date.fromisoformat(a) - dt.date.fromisoformat(b)).days) <= 10]
+    hits = [{"date": d, "how": f"8-K т. {it}"} for d, f, it in rows
+            if f in ("8-K", "8-K/A") and (("2.01" in it and "3.01" in it) or (after and "5.01" in it))]
     return min(hits, key=lambda h: h["date"]) if hits else None
 
 
