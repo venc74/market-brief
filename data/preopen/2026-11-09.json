@@ -1,0 +1,44 @@
+{
+ "date": "2026-11-09",
+ "time_ny": "09:07",
+ "time_berlin": "15:07",
+ "ok": true,
+ "diag": {
+  "tickers": 926,
+  "with_pm": 701,
+  "gappers": 0,
+  "zero_volume_share": 1.0,
+  "requested": 926
+ },
+ "gaps": [],
+ "levels": [],
+ "watch": [
+  {
+   "ticker": "BMNR",
+   "gap_pct": -4.32,
+   "pm_price": 17.95,
+   "prev_close": 18.76,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "coverage": {
+  "with_pm": 701,
+  "requested": 926,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null
+ },
+ "session": "2026-11-06",
+ "sector_bounce": [],
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "seconds": 44.7,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 09.11 — 1 наблюдавани",
+  "at_utc": "14:07"
+ }
+}
