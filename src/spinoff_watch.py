@@ -33,6 +33,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 LAST_DIAG: dict = {}
+LAST_CLOSED: dict[str, dict] = {}                  # 09.11.2026 (ROKU): тикър → {ticker, date, how, buyer, seen} — приключила сделка / делистване, намерени в този check
 LAST_MERGERS: dict[str, dict] = {}                 # 21.10.2026: тикър → {buyer, announced, filing_date, accession} — висяща сделка, в която тикърът е ЦЕЛТА (маркер върху картата)
 _SLEEP = 0.12
 
@@ -227,17 +228,34 @@ def merger_text(hit: dict) -> str:
     return f"⚠ Цел на придобиване ({hit['buyer']}, обявено {a.day:02d}.{a.month:02d}.{a.year}) — цената следва условията на сделката"
 
 
-def merger_state(sub: dict, announced: str) -> str | None:
-    """None — сделката виси; "closed" (8-K т. 5.01 или Form 25 / 15 след обявяването) или None. Прекратяването (1.02) се проверява отделно по текста. Чиста функция."""
+def closing_evidence(sub: dict, after: str | None, today=None) -> dict | None:
+    """
+    09.11.2026 (спешна поправка, ROKU): {date, how} — сделката е приключила / обикновените акции са делистнати; иначе None. Чиста функция.
+    Решава 8-K: т. 5.01 (смяна на контрола) или т. 2.01 И 3.01 (приключено придобиване и делистване); без известна сделка (after None) — и т. 3.01 с Form 25 / 25-NSE до 10 дни от нея.
+    Form 25 / 25-NSE / 15 сами НЕ стигат: борсата ги подава и за облигации и привилегировани акции — реално в универса от 01.07: APO, BF-B, C, които си се търгуват.
+    after (обявяването на сделката) — само подаванията след него; без after — последните config.DELIST_LOOKBACK_DAYS дни.
+    Реално, ROKU: 8-K 1.02,2.01,3.01,3.03,5.01,5.02,5.03,9.01 и 25-NSE на 06.11 след затварянето.
+    """
     r = (sub or {}).get("filings", {}).get("recent", {})
+    t = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today or dt.date.today())[:10])
+    since = after or (t - dt.timedelta(days=config.DELIST_LOOKBACK_DAYS)).isoformat()
+    rows = []
     for i, f in enumerate(r.get("form", [])):
         d = r["filingDate"][i]
-        if d <= announced:
+        if (d <= since) if after else (d < since):
             continue
-        items = (r.get("items") or [""] * len(r["form"]))[i] or ""
-        if (f in ("8-K", "8-K/A") and "5.01" in items) or f in ("25-NSE", "25", "15-12B", "15-12G", "15-15D"):
-            return "closed"
-    return None
+        rows.append((d, f, (r.get("items") or [""] * len(r["form"]))[i] or ""))
+    hits = [{"date": d, "how": f"8-K т. {it}"} for d, f, it in rows if f in ("8-K", "8-K/A") and ("5.01" in it or ("2.01" in it and "3.01" in it))]
+    if not hits and not after:
+        d301 = [d for d, f, it in rows if f in ("8-K", "8-K/A") and "3.01" in it]
+        d25 = [d for d, f, it in rows if f in ("25", "25-NSE")]
+        hits = [{"date": max(a, b), "how": "8-K т. 3.01 и Form 25"} for a in d301 for b in d25 if abs((dt.date.fromisoformat(a) - dt.date.fromisoformat(b)).days) <= 10]
+    return min(hits, key=lambda h: h["date"]) if hits else None
+
+
+def merger_state(sub: dict, announced: str) -> str | None:
+    """None — сделката виси; "closed" — приключила (closing_evidence след обявяването). Прекратяването (1.02) се проверява отделно по текста."""
+    return "closed" if closing_evidence(sub, announced) else None
 
 
 def recent_8k_101(sub: dict, since: str, until: str, items_any=("1.01",)) -> list[dict]:
@@ -310,7 +328,7 @@ def _load(path: pathlib.Path, empty):
         return empty
 
 
-def _merger_scan(t: str, cik, sub: dict, cache: dict, today: dt.date, get) -> dict | None:
+def _merger_scan(t: str, cik, sub: dict, cache: dict, today: dt.date, get, known: dict | None = None) -> dict | None:
     """
     21.10.2026: висяща сделка, в която тикърът е целта: най-ранното засичане в 8-K с т. 1.01 от последните config.MERGER_LOOKBACK_DAYS дни; без засичане, приключила (merger_state) или
     прекратена (по-късен 8-K с т. 1.02, в който се прекратява договорът за сливане) → None. Документите — в cache["merger_docs"] по accession (прочетен 8-K не се чете повторно).
@@ -326,8 +344,13 @@ def _merger_scan(t: str, cik, sub: dict, cache: dict, today: dt.date, get) -> di
             LAST_DIAG["merger_fetched"] = LAST_DIAG.get("merger_fetched", 0) + 1
         if c.get("hit") and first is None:
             first = {**c["hit"], "filing_date": f["date"], "accession": f["acc"]}
-    if not first or merger_state(sub, first["filing_date"]) == "closed":
+    if not first and known:                                                    # 09.11.2026: известна висяща цел (state) — остава „deal“ и извън прозореца от MERGER_LOOKBACK_DAYS
+        first = {k: known[k] for k in ("buyer", "announced", "filing_date", "accession") if k in known}
+    if not first:
         return None
+    ev = closing_evidence(sub, first["filing_date"], today)
+    if ev:                                                                     # 09.11.2026 (ROKU): приключила — не маркер, а изваждане (main / backtest / screener)
+        return {**first, "closed": ev}
     for f in recent_8k_101(sub, first["filing_date"], today.isoformat(), items_any=("1.02",)):
         if f["date"] <= first["filing_date"]:
             continue
@@ -354,6 +377,7 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
     LAST_DIAG.clear()
     LAST_DIAG.update(ok=True, requested=0, checked=0, filings=0, fetched=0, active=[], logged=0, errors=[], unchecked=[], error=None, mergers=[], merger_fetched=0)
     LAST_MERGERS.clear()
+    LAST_CLOSED.clear()
     merger_tickers = set(merger_tickers or ()) if config.ENABLE_MERGER_MARKER else set()
     today = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today or dt.date.today())[:10])
     tickers = list(dict.fromkeys(t for t in (tickers or []) if t))          # редът е приоритетът (карти първо) — при изчерпан бюджет остават последните
@@ -371,6 +395,7 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
         cache = _load(cache_p, {"version": 1, "docs": {}})
         cache.setdefault("merger_docs", {})
         log = _load(log_p, {"version": 1, "entries": []})
+        state = load_state()                                                   # 09.11.2026: висящите цели и приключилите сделки
         since = (today - dt.timedelta(days=config.SPINOFF_LOOKBACK_DAYS)).isoformat()
         active: dict[str, dict] = {}
         seen_log = {(e.get("ticker"), e.get("accession")) for e in log["entries"]}
@@ -393,14 +418,24 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
                 fs = recent_8k(sub, since, today.isoformat())
             except Exception as e:
                 LAST_DIAG["errors"].append({"ticker": t, "error": f"submissions: {type(e).__name__}"})
+                if t in merger_tickers and t in state["pending"]:              # 09.11.2026: провал на EDGAR не маха „deal“ от известна цел
+                    LAST_MERGERS[t] = dict(state["pending"][t])
                 continue
             if t in merger_tickers:
                 try:
-                    mh = _merger_scan(t, cik, sub, cache, today, get)
-                    if mh:
+                    mh = _merger_scan(t, cik, sub, cache, today, get, state["pending"].get(t))
+                    if mh and mh.get("closed"):
+                        LAST_CLOSED[t] = _closed_row(t, mh, today)
+                    elif mh:
                         LAST_MERGERS[t] = mh
                 except Exception as e:
                     LAST_DIAG["errors"].append({"ticker": t, "error": f"merger: {type(e).__name__}"})
+                    if t in state["pending"]:
+                        LAST_MERGERS[t] = dict(state["pending"][t])
+            if t not in LAST_CLOSED:                                           # 09.11.2026: делистване и без известна сделка (Form 25 / 15)
+                ev = closing_evidence(sub, None, today)
+                if ev:
+                    LAST_CLOSED[t] = _closed_row(t, {}, today, ev)
             LAST_DIAG["filings"] += len(fs)
             for f in fs:
                 c = cache["docs"].get(f["acc"])
@@ -433,6 +468,10 @@ def check(tickers, today=None, get=None, cik_map=None, budget_sec: float | None 
         if LAST_DIAG["errors"] and not LAST_DIAG["filings"] and LAST_DIAG["checked"]:
             LAST_DIAG.update(ok=False, error="EDGAR не върна нито един списък с подавания")
         LAST_DIAG["mergers"] = [{"ticker": t, "buyer": h["buyer"], "announced": h["announced"], "filing_date": h["filing_date"]} for t, h in sorted(LAST_MERGERS.items())]
+        _update_state(state, LAST_MERGERS, LAST_CLOSED, today)
+        LAST_DIAG["closed"] = [dict(v) for _, v in sorted(LAST_CLOSED.items())]
+        for t, h in sorted(LAST_CLOSED.items()):
+            print(f"[deal] {t}: {closed_text(h)} — вън от универса и книгите")
         for t, h in active.items():
             print(f"[spinoff] {t}: {warning_text(h)}")
         for t, h in sorted(LAST_MERGERS.items()):
@@ -498,3 +537,119 @@ def annotate(cards_groups, active: dict[str, dict]) -> int:
                 c["spinoff_warning"] = {"text": warning_text(h), **{k: h.get(k) for k in ("record", "distribution", "ratio", "new", "new_ticker", "filing_date")}}
                 n += 1
     return n
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# 09.11.2026 (спешна поправка, ROKU): състоянието на сделките (data/deal_state.json)
+#   pending — целите на висяща сделка: остават „deal“ до приключването, и при провал на EDGAR, и извън прозореца MERGER_LOOKBACK_DAYS;
+#   closed  — приключила сделка / делистване: вън от универса (screener.build_universe — всички модули), от кандидатите и от живите записи в книгите (backtest.close_deal_records).
+# Реално: маркерът на ROKU изчезна на 09.11, защото сделката беше приключила (merger_state → "closed"), а нищо не махна тикъра — последният бар (06.11) беше реална търговия (11.5 млн акции).
+# ──────────────────────────────────────────────────────────────────────────
+def _state_path() -> pathlib.Path:
+    return pathlib.Path(config.DATA_DIR) / config.DEAL_STATE_NAME
+
+
+def load_state() -> dict:
+    st = _load(_state_path(), {})
+    return {"version": 1, "pending": dict(st.get("pending") or {}), "closed": dict(st.get("closed") or {})}
+
+
+def save_state(st: dict) -> None:
+    pathlib.Path(config.DATA_DIR).mkdir(parents=True, exist_ok=True)
+    _state_path().write_text(json.dumps(st, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+
+
+def _closed_row(t: str, hit: dict, today: dt.date, ev: dict | None = None) -> dict:
+    ev = ev or hit.get("closed") or {}
+    return {"ticker": t, "date": ev.get("date"), "how": ev.get("how"), "buyer": hit.get("buyer"), "announced": hit.get("announced"), "seen": today.isoformat()}
+
+
+def closed_text(row: dict) -> str:
+    d = row.get("date") or ""
+    what = f"сделката с {row['buyer']} е приключила" if row.get("buyer") else "делистнат"
+    return f"{what} на {d[8:10]}.{d[5:7]} ({row.get('how')})" if d else what
+
+
+def _update_state(st: dict, pending: dict, closed: dict, today: dt.date) -> None:
+    for t, h in pending.items():
+        st["pending"][t] = {**{k: h.get(k) for k in ("buyer", "announced", "filing_date", "accession")}, "seen": st["pending"].get(t, {}).get("seen") or today.isoformat()}
+    for t, row in closed.items():
+        st["pending"].pop(t, None)
+        st["closed"].setdefault(t, row)
+    keep = (today - dt.timedelta(days=config.DEAL_CLOSED_KEEP_DAYS)).isoformat()
+    st["closed"] = {t: r for t, r in st["closed"].items() if (r.get("date") or r.get("seen") or "") >= keep}
+    save_state(st)
+
+
+def closed_tickers(today=None) -> dict[str, dict]:
+    """Приключилите / делистнатите тикъри от състоянието (за screener.build_universe и книгите). Graceful: провал → {}."""
+    try:
+        return load_state()["closed"]
+    except Exception as e:
+        print(f"[deal] състоянието не се прочете: {type(e).__name__}: {e}")
+        return {}
+
+
+_DONE_RX = re.compile(r"\b(?:complet\w*|clos(?:es|ed)|finaliz\w*|owns|bought)\b", re.I)
+_NOT_DONE_RX = re.compile(r"\b(?:to\s+(?:complete|close|finalize)|expected|set\s+to|nears?|closer|closes\s+in\s+on|pending|approv\w*|plans?|agrees?|deal\s+talks|bid)\b", re.I)
+
+
+def news_closed(t: str, hit: dict, items: list[dict], today: dt.date) -> dict | None:
+    """
+    Заглавие „… completes acquisition of …“ за висяща цел (купувачът или целта в заглавието, дума за приключване, без бъдеще / одобрение) от последните config.DEAL_NEWS_DAYS дни → {date, how}.
+    Резерва, когато EDGAR закъснява. Реално за ROKU на 06.11: „FOX CORPORATION COMPLETES ACQUISITION OF ROKU“, „Fox completes $22 billion Roku deal …“. Чиста функция.
+    """
+    buyer = (hit.get("buyer") or "").split(",")[0].replace("Corporation", "").replace("Corp.", "").replace("Inc.", "").strip()
+    names = [x for x in (t, buyer) if x]
+    since = (today - dt.timedelta(days=config.DEAL_NEWS_DAYS)).isoformat()
+    for it in items or []:
+        title, pub = str(it.get("title") or ""), str(it.get("published") or it.get("date") or "")[:10]
+        if pub and (pub < since or pub < (hit.get("announced") or "")):
+            continue
+        if re.search(rf"\b{re.escape(t)}\b", title, re.I) and any(re.search(rf"\b{re.escape(n)}\b", title, re.I) for n in names[1:]) \
+                and _DONE_RX.search(title) and re.search(r"acqui|takeover|deal|purchase|merger|owns|bought", title, re.I) and not _NOT_DONE_RX.search(title):
+            return {"date": pub or today.isoformat(), "how": f"новина: „{title[:90]}“"}
+    return None
+
+
+def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None) -> dict:
+    """
+    Преди скрийнинга: известните висящи цели (състоянието, кешът на 8-K с попадение, extra — живите записи с етикет „deal“) се проверяват в EDGAR за приключване; без следа в EDGAR —
+    новините („completes acquisition“). Приключилите влизат в състоянието → screener.build_universe ги вади. Връща {"checked", "closed": [...], "pending": [...], "ok"}. Graceful.
+    """
+    today = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today or dt.date.today())[:10])
+    out = {"ok": True, "checked": [], "closed": [], "pending": [], "error": None}
+    try:
+        st = load_state()
+        cache = _load(pathlib.Path(config.DATA_DIR) / config.SPINOFF_CACHE_NAME, {})
+        seed = {v.get("ticker") for v in (cache.get("merger_docs") or {}).values() if isinstance(v, dict) and v.get("hit")}
+        ts = sorted((set(st["pending"]) | seed | set(extra or ())) - set(st["closed"]) - {None})
+        out["checked"] = ts
+        if not ts:
+            return out
+        check(ts, today, get=get, cik_map=cik_map, merger_tickers=ts)
+        out["ok"] = LAST_DIAG.get("ok", True)
+        st = load_state()
+        if news_fn is None:
+            from src import event_label
+            news_fn = lambda t, name: event_label.news(t, name, today.isoformat())
+        for t in ts:
+            if t in st["closed"] or t not in LAST_MERGERS:
+                continue
+            try:
+                ev = news_closed(t, LAST_MERGERS[t], news_fn(t, None), today)
+            except Exception as e:
+                print(f"[deal] новините за {t} не се провериха: {type(e).__name__}: {e}")
+                continue
+            if ev:
+                st["closed"][t] = _closed_row(t, LAST_MERGERS[t], today, ev)
+                st["pending"].pop(t, None)
+                print(f"[deal] {t}: {closed_text(st['closed'][t])} — вън от универса и книгите")
+        save_state(st)
+        out["closed"] = [st["closed"][t] for t in ts if t in st["closed"]]
+        out["pending"] = sorted(t for t in ts if t in st["pending"])
+    except Exception as e:
+        out.update(ok=False, error=f"{type(e).__name__}: {e}")
+        print(f"[deal] проверката на сделките пропусната: {out['error']}")
+    return out
+
