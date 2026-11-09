@@ -551,7 +551,8 @@ def run() -> dict:
 
     # 09.11.2026 (спешна поправка, ROKU): приключилите сделки — ПРЕДИ скрийнинга, за да излязат от универса (build_universe), от лидерите на секторите и от картите.
     # ROKU: Fox приключи придобиването на 06.11 след затварянето, а брифът от 09.11 я даде като единствения „Купува се днес“ — маркерът изчезна при приключването, тикърът остана.
-    deals = steps.step("deals_closed", lambda: spinoff_watch.refresh_deals(today, extra=backtest.live_deal_tickers() if config.ENABLE_BACKTEST else []), fallback={},
+    deals = steps.step("deals_closed", lambda: spinoff_watch.refresh_deals(today, extra=backtest.live_deal_tickers() if config.ENABLE_BACKTEST else [],
+                                                                                     name_lookup=lambda t: ai_brief._verified_company_name(t)["name"]), fallback={},
                        enabled=bool(config.ENABLE_SPINOFF_WATCH and config.ENABLE_MERGER_MARKER), label="Приключилите сделки (EDGAR и новините, преди скрийнинга)",
                        consequence="приключила сделка може да остане в универса, картите и книгите днес",
                        failed_if=lambda v: (v.get("error") or "EDGAR не отговори") if isinstance(v, dict) and v.get("ok") is False else None)

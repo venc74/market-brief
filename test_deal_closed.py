@@ -88,13 +88,16 @@ with q():
 assert r["checked"] == ["ROKU"] and [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("8-K")
 sw.save_state({"version": 1, "pending": {}, "closed": {}}); seed_cache()
 with q():
-    r = sw.refresh_deals(D, get=getter(cut(SUB, "2026-11-06")), cik_map=CIK, news_fn=lambda t, n: FX["news"])      # EDGAR без следа, новините — РЕАЛНИТЕ
+    r = sw.refresh_deals(D, get=getter(cut(SUB, "2026-11-06")), cik_map=CIK, news_fn=lambda t, n: FX["news"], name_lookup=lambda t: "Roku, Inc.")      # EDGAR без следа, новините — РЕАЛНИТЕ
 assert [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("новина:")
 hit = {"buyer": "Fox Corporation", "announced": "2026-06-14"}
-assert sw.news_closed("ROKU", hit, [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"}], D)
+N = "Roku, Inc."
+assert sw.news_closed("ROKU", hit, [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"}], D, N)
+assert sw.news_closed("ROKU", hit, [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"}], D) is None    # без името — „Roku“ не е тикърът ROKU
 for t in ("Fox expected to complete Roku acquisition next week", "Fox closes in on Roku deal", "Regulators approve Fox's Roku takeover", "Roku Stock Rises: What's Going On?"):   # СИНТЕТИЧНИ / РЕАЛНИ, без приключване
-    assert sw.news_closed("ROKU", hit, [{"title": t, "published": "2026-11-06T10:00Z"}], D) is None, t
-assert sw.news_closed("ROKU", hit, [{"title": "Fox completes acquisition of Roku", "published": "2026-10-01T10:00Z"}], D) is None      # старо заглавие
+    assert sw.news_closed("ROKU", hit, [{"title": t, "published": "2026-11-06T10:00Z"}], D, N) is None, t
+assert sw.news_closed("ROKU", hit, [{"title": "Fox completes acquisition of Roku", "published": "2026-10-01T10:00Z"}], D, N) is None      # старо заглавие
+assert sw.news_closed("CART", {"buyer": "DoorDash, Inc.", "announced": "2026-10-28"}, [{"title": "DoorDash completes deal to add a cart button", "published": "2026-11-06T10:00Z"}], D, "Maplebear Inc.") is None   # СИНТЕТИЧНО: „cart“ не е CART
 print("  ✓ ROKU — от EDGAR; без следа там — от заглавията („FOX CORPORATION COMPLETES ACQUISITION OF ROKU“); „expected to complete“, „closes in on“, „approve“ — не")
 
 print("── 4. универсът: ROKU излиза (РЕАЛНИТЕ таблици; ROKU е в S&P 400) ──")

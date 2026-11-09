@@ -592,25 +592,26 @@ _DONE_RX = re.compile(r"\b(?:complet\w*|clos(?:es|ed)|finaliz\w*|owns|bought)\b"
 _NOT_DONE_RX = re.compile(r"\b(?:to\s+(?:complete|close|finalize)|expected|set\s+to|nears?|closer|closes\s+in\s+on|pending|approv\w*|plans?|agrees?|deal\s+talks|bid)\b", re.I)
 
 
-def news_closed(t: str, hit: dict, items: list[dict], today: dt.date) -> dict | None:
+def news_closed(t: str, hit: dict, items: list[dict], today: dt.date, name: str | None = None) -> dict | None:
     """
     Заглавие „… completes acquisition of …“ за висяща цел (купувачът или целта в заглавието, дума за приключване, без бъдеще / одобрение) от последните config.DEAL_NEWS_DAYS дни → {date, how}.
     Резерва, когато EDGAR закъснява. Реално за ROKU на 06.11: „FOX CORPORATION COMPLETES ACQUISITION OF ROKU“, „Fox completes $22 billion Roku deal …“. Чиста функция.
     """
     buyer = (hit.get("buyer") or "").split(",")[0].replace("Corporation", "").replace("Corp.", "").replace("Inc.", "").strip()
-    names = [x for x in (t, buyer) if x]
+    word = next((w for w in re.findall(r"[A-Za-z][\w&'-]{2,}", name or "") if w.lower() not in ("the", "inc", "corp", "corporation", "group", "holdings", "company", "co")), None)
+    target = lambda title: bool(re.search(rf"\b{re.escape(t)}\b", title) or (word and re.search(rf"\b{re.escape(word)}\b", title, re.I)))   # тикърът — точно (CART ≠ „cart“); името — без регистър
     since = (today - dt.timedelta(days=config.DEAL_NEWS_DAYS)).isoformat()
     for it in items or []:
         title, pub = str(it.get("title") or ""), str(it.get("published") or it.get("date") or "")[:10]
         if pub and (pub < since or pub < (hit.get("announced") or "")):
             continue
-        if re.search(rf"\b{re.escape(t)}\b", title, re.I) and any(re.search(rf"\b{re.escape(n)}\b", title, re.I) for n in names[1:]) \
+        if target(title) and buyer and re.search(rf"\b{re.escape(buyer)}\b", title, re.I) \
                 and _DONE_RX.search(title) and re.search(r"acqui|takeover|deal|purchase|merger|owns|bought", title, re.I) and not _NOT_DONE_RX.search(title):
             return {"date": pub or today.isoformat(), "how": f"новина: „{title[:90]}“"}
     return None
 
 
-def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None) -> dict:
+def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None, name_lookup=None) -> dict:
     """
     Преди скрийнинга: известните висящи цели (състоянието, кешът на 8-K с попадение, extra — живите записи с етикет „deal“) се проверяват в EDGAR за приключване; без следа в EDGAR —
     новините („completes acquisition“). Приключилите влизат в състоянието → screener.build_universe ги вади. Връща {"checked", "closed": [...], "pending": [...], "ok"}. Graceful.
@@ -635,7 +636,8 @@ def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None) ->
             if t in st["closed"] or t not in LAST_MERGERS:
                 continue
             try:
-                ev = news_closed(t, LAST_MERGERS[t], news_fn(t, None), today)
+                name = name_lookup(t) if name_lookup else None
+                ev = news_closed(t, LAST_MERGERS[t], news_fn(t, name), today, name)
             except Exception as e:
                 print(f"[deal] новините за {t} не се провериха: {type(e).__name__}: {e}")
                 continue
