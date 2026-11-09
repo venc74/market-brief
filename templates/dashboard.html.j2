@@ -963,6 +963,8 @@
 {# 13.10.2026: бележка "предстои отделяне на ДД.ММ (запис ДД.ММ)" под тикъра в таблиците на книгите (backtest.apply_spinoff_notes) — само бележка; ръчният преглед е от деня на отделянето #}
 {# 20.10.2026 (етап 3, т. 1): buy-stop се изпълнява при докосване — обемът на деня на входа се вижда при затварянето; групите са за отделни резултати #}
 {# 06.11.2026 (пакет 05–06.11, т. 1): реалният риск при входа (стопът спрямо цената на изпълнение) — backtest.fill_risk_block #}
+{# 09.11.2026 (спешна поправка, ROKU): записите с приключила сделка — извън статистиката (backtest.close_deal_records) #}
+{% macro deal_closed_line(rows) %}{% if rows %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Приключила сделка — извън статистиката: {% for x in rows %}<b>{{ x.ticker }}</b> ({% if x.buyer %}{{ x.buyer }}, {% endif %}{{ x.date[8:10] }}.{{ x.date[5:7] }}{% if x.had_position and x.price is not none %}; вход {{ x.fill_date[8:10] }}.{{ x.fill_date[5:7] }} по ${{ "%.2f"|format(x.fill_price) }}, последна цена ${{ "%.2f"|format(x.price) }}{% if x.r is not none %}, {{ "%+.2f"|format(x.r) }}R{% endif %}{% else %}; без вход{% endif %}){{ ", " if not loop.last else "" }}{% endfor %}.</div>{% endif %}{% endmacro %}
 {% macro fill_risk_line(fr) %}{% if fr %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Реален риск при входа: средно {{ "%.1f"|format(fr.avg) }}% ({{ fr.n }} {{ "вход" if fr.n == 1 else "входа" }}){% if fr.over %} · над {{ "%g"|format(fr.limit) }}%: {% for x in fr.over %}<b>{{ x.ticker }}</b> {{ "%.1f"|format(x.pct) }}%{% if x.target_r is not none %} (цел {{ "%.1f"|format(x.target_r) }}R){% endif %}{{ ", " if not loop.last else "" }}{% endfor %}{% endif %}.</div>{% endif %}{% endmacro %}
 {% macro entry_vol_line(ev) %}{% if ev and (ev.high + ev.low + ev.unknown) %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ {{ ev.mult|round(1) }}× среден — {{ ev.high }}{% if ev.high_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.high_avg_r) }} при {{ ev.high_closed }} затворени){% endif %} · под {{ ev.mult|round(1) }}× — {{ ev.low }}{% if ev.low_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.low_avg_r) }} при {{ ev.low_closed }} затворени){% endif %}{% if ev.unknown %} · без данни за обема — {{ ev.unknown }}{% endif %}{% if ev.excluded %} · без {{ ev.excluded }} с етикет deal / събитие{% endif %}. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>{% endif %}{% endmacro %}
 {# 26.10.2026 (етап 4б, т. 2): записите с етикет deal / „събитие/M&A“ и статистиката с тях и без тях (backtest.events_block) #}
@@ -1277,6 +1279,7 @@
   </details>
   {% endif %}
   {# 06.11.2026 (пакет 05–06.11, т. 2): таванът 60 за фундаментите — колко не са проверени и кои са с най-висок RS #}
+  {% if excluded_deals %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Извън универса</b> (приключила сделка / делистване): {% for x in excluded_deals %}{{ x.ticker }} — {{ x.text }}{{ "; " if not loop.last else "" }}{% endfor %}.</div>{% endif %}
   {% if fundamentals_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px">{{ fundamentals_note }}</div>{% endif %}
   {# 09.10: "Излязоха от вчера" — тикърите от предишния Watchlist, които днес ги няма, с причината от кода (само информация) #}
   {% if watchlist_exits and watchlist_exits.get("from") %}
@@ -1286,7 +1289,7 @@
   {% endif %}
 </section>
 
-{% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions or backtest.v1_archive) %}
+{% if backtest and (backtest.total_resolved or backtest.open_positions or backtest.pending_positions or backtest.v1_archive or backtest.deal_closed) %}
 <section>
   {# 19.10.2026 (трети преглед, т. 18в): книгите на CANSLIM — веднага под Watchlist, сгънати (като книгата на Kullamägi под картите му) #}
   <details class="canslim-book">
@@ -1359,6 +1362,7 @@
   </div>
   {% endif %}
   {{ fill_risk_line(backtest.fill_risk) }}
+  {{ deal_closed_line(backtest.deal_closed) }}
   {{ pre_reaction_line(backtest.pre_reaction, "R") }}
   {{ entry_vol_line(backtest.entry_volume) }}
   {{ events_line(backtest.events, "R") }}
@@ -1441,6 +1445,7 @@
     {% endif %}
   </div>
   {{ fill_risk_line(bs.fill_risk) }}
+  {{ deal_closed_line(bs.deal_closed) }}
   {{ pre_reaction_line(bs.pre_reaction, "R") }}
   {{ entry_vol_line(bs.entry_volume) }}
   {{ events_line(bs.events, "R") }}

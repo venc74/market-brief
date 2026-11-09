@@ -37,6 +37,8 @@ LAST_FUNDAMENTALS: dict[str, dict] = {}
 # ──────────────────────────────────────────────────────────────────────────
 # 30.10.2026 (разходката, т. 7): GICS секторът на всеки тикър от универса — от същите таблици в Wikipedia (колона "GICS Sector"), без нова заявка; за лидерите в секторната карта
 LAST_UNIVERSE_SECTOR: dict[str, str] = {}
+LAST_UNIVERSE_EXCLUDED: dict[str, dict] = {}             # 09.11.2026 (ROKU): извадените от универса — приключила сделка / делистване (spinoff_watch.closed_tickers)
+LAST_NO_TRADE: list[str] = []                           # 09.11.2026: последният бар без реална търговия (обем 0) — не стига до кандидатите
 LAST_UNIVERSE_INDUSTRY: dict[str, str] = {}              # 06.11.2026 (пакет 05–06.11, т. 10): GICS Sub-Industry от таблиците на S&P 500 и S&P 400 — за етикета „секторен отскок“ при EP
 
 
@@ -89,6 +91,19 @@ def build_universe() -> list[str]:
             LAST_UNIVERSE_SOURCES[src["name"]] = {"name": src["name"], "n": n, "min": src["min"], "ok": why is None, "reason": why, "url": src["url"]}
         lists.append(syms)
     universe = sorted(set().union(*lists))
+    # 09.11.2026 (спешна поправка, ROKU): приключила сделка / делистване — вън от универса на всички модули (скрийнър, лидерите на секторите, QM, GLB, EP, преди отварянето).
+    # Wikipedia още ги държи няколко дни, а Yahoo дава последния реален бар (ROKU, 06.11: 11.5 млн акции) — без това тикърът е „жив“.
+    try:
+        from src import spinoff_watch
+        closed = spinoff_watch.closed_tickers()
+    except Exception as e:
+        print(f"[screener] ⚠ приключилите сделки не се прочетоха: {type(e).__name__}: {e}")
+        closed = {}
+    LAST_UNIVERSE_EXCLUDED.clear()
+    LAST_UNIVERSE_EXCLUDED.update({t: closed[t] for t in universe if t in closed})
+    if LAST_UNIVERSE_EXCLUDED:
+        universe = [t for t in universe if t not in closed]
+        print(f"[screener] извън универса (приключила сделка / делистване): {', '.join(sorted(LAST_UNIVERSE_EXCLUDED))}")
     per = ", ".join(f"{src['name']} {len(set(x))}" for src, x in zip(config.UNIVERSE_SOURCES, lists))
     print(f"[screener] универс: {len(universe)} тикъра ({per})")
     return universe
@@ -255,6 +270,7 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
     held = set(held or ())                                       # 09.10: хистерезис на RS линията — тикърите от предишния успешен run остават до RS_LINE_STAY
     LAST_RS_HELD.clear(); LAST_RS_HELD.update(held)
     LAST_RS_EVALUATED.clear()
+    LAST_NO_TRADE.clear()
     LAST_BAR_DATES.clear()
     LAST_TREND.clear()
     # втори преглед (10.10.2026): seed_prev — състоянието липсва (първи run / изтрит файл) → предишният технически списък се гради от СЪЩИТЕ данни
@@ -311,6 +327,9 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
                         prev_survivors.append(pr)
                     variants[sym] = (score, _evaluate_technicals(sym, df, spy), _evaluate_technicals(sym, df, spy, held=True))
                     continue
+                if "Volume" in df and len(df) and not float(df["Volume"].iloc[-1] or 0) > 0:     # 09.11.2026: последният бар без реална търговия — не е кандидат
+                    LAST_NO_TRADE.append(sym)
+                    continue
                 row = _evaluate_technicals(sym, df, spy, held=True) if sym in held else _evaluate_technicals(sym, df, spy)
                 if row:
                     row["rs_score"] = None if score is None else round(score, 4)
@@ -320,6 +339,8 @@ def technical_screen(universe: list[str], batch_size: int = 100, held: set[str] 
         time.sleep(1)  # не дразним Yahoo
 
     LAST_STATUS["with_history"] = len(rs_scores)
+    LAST_STATUS["no_trade"] = list(LAST_NO_TRADE)                        # 09.11.2026
+    LAST_STATUS["excluded_deals"] = sorted(LAST_UNIVERSE_EXCLUDED)        # 09.11.2026 (ROKU)
     # 20.10.2026 (етап 3б): тикъри БЕЗ НИТО ЕДИН бар (Yahoo не върна нищо, без грешка в партидата) — отделно от късата история (нов листинг, структурно); банерът мери първото
     no_bars = sorted(set(universe) - set(LAST_BAR_DATES))
     LAST_STATUS.update(with_bars=len(universe) - len(no_bars), no_bars_n=len(no_bars), no_bars=no_bars[:30])

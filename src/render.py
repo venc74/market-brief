@@ -526,6 +526,16 @@ def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str]
 env.globals["thirteenf_rows"] = thirteenf_rows
 
 
+def excluded_deals(rows) -> list[dict]:
+    """09.11.2026 (ROKU): редът „Извън универса (приключила сделка / делистване)“ — само наскоро приключилите (до 10 дни след датата). Чиста функция."""
+    from src import spinoff_watch
+    out = []
+    for r in rows or []:
+        if isinstance(r, dict) and r.get("ticker"):
+            out.append({"ticker": r["ticker"], "text": spinoff_watch.closed_text(r)})
+    return out
+
+
 def fundamentals_note(status: dict | None) -> str | None:
     """06.11.2026 (пакет 05–06.11, т. 2): редът „фундаментите не са проверени за N имена“ и кои са с най-висок RS (screener.LAST_STATUS["fundamentals_not_checked"]). Няма такива / стар бриф → None. Чиста функция."""
     nc = (status or {}).get("fundamentals_not_checked") or {}
@@ -593,6 +603,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
+        excluded_deals=excluded_deals(brief.get("deals_closed")),            # 09.11.2026 (ROKU)
         no_date_text=enrich_mod.NO_DATE_TEXT,                                # 06.11.2026 (т. 3)
         sector_board=brief.get("sector_board") or {}, sector_board_lag=config.SECTOR_BOARD_RANK_LAG,   # 30.10.2026 (т. 7): секторната карта от кода
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)

@@ -549,6 +549,13 @@ def run() -> dict:
     # случва по-долу, до GLB блока — тук само евтиното sector-level изчисление.
     laggards = laggard_sectors(rotation)
 
+    # 09.11.2026 (спешна поправка, ROKU): приключилите сделки — ПРЕДИ скрийнинга, за да излязат от универса (build_universe), от лидерите на секторите и от картите.
+    # ROKU: Fox приключи придобиването на 06.11 след затварянето, а брифът от 09.11 я даде като единствения „Купува се днес“ — маркерът изчезна при приключването, тикърът остана.
+    deals = steps.step("deals_closed", lambda: spinoff_watch.refresh_deals(today, extra=backtest.live_deal_tickers() if config.ENABLE_BACKTEST else []), fallback={},
+                       enabled=bool(config.ENABLE_SPINOFF_WATCH and config.ENABLE_MERGER_MARKER), label="Приключилите сделки (EDGAR и новините, преди скрийнинга)",
+                       consequence="приключила сделка може да остане в универса, картите и книгите днес",
+                       failed_if=lambda v: (v.get("error") or "EDGAR не отговори") if isinstance(v, dict) and v.get("ok") is False else None)
+
     print("[4/7] Слой 3: скрининг…")
     def _screen_failed(e):
         screener.LAST_STATUS.clear()
@@ -587,6 +594,7 @@ def run() -> dict:
         # Идемпотентно и graceful — провал оставя v1 до следващия run, без загуба на данни.
         tracker_switch.ensure_v2_methodology()
         backtest.resolve_positions_only()
+        backtest.close_deal_records(spinoff_watch.closed_tickers(), dt.date.fromisoformat(today))     # 09.11.2026 (ROKU): след резолюцията — последната реална цена е в записа
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
     # 26.10.2026 (етап 4б, т. 1): цел на придобиване сред кандидатите — ПРЕДИ класификацията: такава карта е сделка (setup.kind "deal" — без buy-stop, план, Action и AI текст).
@@ -602,6 +610,10 @@ def run() -> dict:
                label="Целите на придобиване сред кандидатите (EDGAR 8-K, преди класификацията)",
                consequence="цел на придобиване се класифицира по цената (маркерът идва по-късно, само върху картата)",
                failed_if=lambda v: (spinoff_watch.LAST_DIAG.get("error") or "EDGAR не отговори") if not spinoff_watch.LAST_DIAG.get("ok", True) else None)
+    _closed_now = spinoff_watch.closed_tickers()                              # 09.11.2026 (ROKU): приключила сделка, засечена едва при кандидатите — вън
+    if _closed_now and any(c.get("ticker") in _closed_now for c in candidates):
+        print(f"[deal] вън от кандидатите (приключила сделка / делистване): {sorted(c['ticker'] for c in candidates if c.get('ticker') in _closed_now)}")
+        candidates = [c for c in candidates if c.get("ticker") not in _closed_now]
     candidates = setup_rules.annotate(candidates, today, backtest.live_buystop_by_ticker())     # 1б (б): прозорецът на чакащия запис / състоянието на задействания, не нов от днес
     screener_universe = [{"ticker": c["ticker"], "sector": c.get("sector"),
                           "industry": c.get("industry")} for c in candidates]
@@ -847,6 +859,7 @@ def run() -> dict:
                                          today_context={"nasdaq": qm_market, "hy_oas": backtest.entry_hy_oas(thermo)})     # 03.11.2026: + HY OAS в деня на входа (т. 5)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
         backtest.apply_spinoff_notes(spinoff_active, dt.date.fromisoformat(today))      # 13.10.2026: само бележка върху живите записи; ръчният преглед — от деня на отделянето
         backtest.apply_deal_labels(spinoff_watch.LAST_MERGERS, dt.date.fromisoformat(today))   # 26.10.2026 (етап 4б, т. 1): етикет "deal" върху живите записи на цели на придобиване
+        backtest.close_deal_records(spinoff_watch.closed_tickers(), dt.date.fromisoformat(today))     # 09.11.2026: и засечените при картите / живите записи
         backtest.qm_open_marks(qm_cards, today)                                         # 22.10.2026: QM карта с жив запис в книгата → „вече отворена“ (RVTY 22.10)
     # 26.10.2026 (етап 4б, т. 2): етикет „събитие/M&A“ (скок ≥ 8% при ≥ 3× обем + заглавие за продажба / придобиване) — преди обобщенията на книгите (с и без етикетираните)
     steps.step("event_labels", lambda: backtest.apply_event_labels(today, name_lookup=lambda t: ai_brief._verified_company_name(t)["name"]), fallback={},
@@ -1035,6 +1048,7 @@ def run() -> dict:
         "thermometer": thermo,
         "rotation": rotation,
         "market_day": market_day,                                       # 06.11.2026 (т. 8)
+        "deals_closed": [r for r in spinoff_watch.closed_tickers().values() if (r.get("date") or "") >= (dt.date.fromisoformat(today) - dt.timedelta(days=10)).isoformat()],     # 09.11.2026 (ROKU)
         "news_terms_fixed": news_terms_fixed,                           # 06.11.2026 (т. 8): какво е махнато от „защо“ на новините
         "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода (до 30.10 — "sector_card": водещите по кода, веригите — от модела)
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"

@@ -333,6 +333,54 @@ def apply_spinoff_notes(active: dict[str, dict], today: dt.date | None = None) -
         return 0
 
 
+DEAL_CLOSED = "deal_closed"
+
+
+def close_deal_records(closed: dict[str, dict], today: dt.date | None = None) -> list[str]:
+    """
+    09.11.2026 (спешна поправка, ROKU): живите записи (чакащи / отворени) на тикъри с приключила сделка / делистване → status "deal_closed": изход по последната реална цена от резолюцията
+    (last_close / last_close_date — дневният бар до приключването), извън статистиката (realized_r None; резултатът при приключването — в rec["deal_closed"]). Чакащ запис без вход — същият статус, без позиция.
+    Реално: ROKU — buy-stop от 22.10 по $159.89, последна цена $160.52 на 06.11; Action запис от 09.11 (картата „Купува се днес“ след приключването), без вход. Връща ключовете. Graceful.
+    """
+    try:
+        if not closed:
+            return []
+        tracker = _load_tracker()
+        done = []
+        for k, rec in tracker.items():
+            row = closed.get(rec.get("ticker")) if isinstance(rec, dict) else None
+            if not row or rec.get("status") not in _RESOLVABLE_STATUSES:
+                continue
+            had = rec.get("fill_price") is not None
+            rec["deal_closed"] = {"date": row.get("date"), "how": row.get("how"), "buyer": row.get("buyer"), "had_position": had,
+                                  "price": rec.get("last_close") if had else None, "price_date": rec.get("last_close_date") if had else None,
+                                  "r": rec.get("current_r") if had else None, "return_pct": rec.get("return_pct") if had else None, "previous_status": rec.get("status")}
+            rec.update(status=DEAL_CLOSED, resolution_date=row.get("date") or (today or dt.date.today()).isoformat(), realized_r=None,
+                       exit_date=rec["deal_closed"]["price_date"], exit_price=rec["deal_closed"]["price"])
+            done.append(k)
+        if done:
+            _save_tracker(tracker)
+            print(f"[backtest] приключила сделка — записите излизат от книгите (извън статистиката): {sorted(done)}")
+        return done
+    except Exception as e:
+        print(f"[backtest] приключилите сделки не се приложиха към книгите: {type(e).__name__}: {e}")
+        return []
+
+
+def deal_closed_block(records: list[dict]) -> list[dict]:
+    """09.11.2026: записите с приключила сделка за реда под книгата. Чиста функция."""
+    return [{"ticker": r.get("ticker"), "entry_date": r.get("entry_date"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"), **(r.get("deal_closed") or {})}
+            for r in sorted(records, key=lambda x: (x.get("resolution_date") or "", x.get("ticker") or ""), reverse=True) if r.get("status") == DEAL_CLOSED]
+
+
+def live_deal_tickers() -> list[str]:
+    """09.11.2026: тикърите на живите записи с етикет „deal“ — проверяват се за приключване преди скрийнинга."""
+    try:
+        return sorted({r["ticker"] for r in _load_tracker().values() if isinstance(r, dict) and r.get("ticker") and r.get("deal") and r.get("status") in _RESOLVABLE_STATUSES})
+    except Exception:
+        return []
+
+
 def apply_deal_labels(mergers: dict[str, dict], today: dt.date | None = None) -> int:
     """
     26.10.2026 (етап 4б, т. 1 — решение от 26.10): жив запис (чакащ / отворен) в която и да е книга на тикър — цел на висяща сделка (spinoff_watch.LAST_MERGERS) — получава етикет
@@ -1743,6 +1791,7 @@ def get_buystop_summary() -> dict:
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
         "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
+        "deal_closed": deal_closed_block(records),                        # 09.11.2026 (ROKU)
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
         "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
@@ -1929,7 +1978,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         return {"n": len(group), "avg_return_pct": avg(rl), "avg_return_pct_exec": avg(re_), "n_exec": len(re_),
                 "avg_alpha_pct": avg(al) if visible else None, "avg_alpha_pct_exec": avg(ae) if visible else None}
 
-    valid = [r for r in records if r.get("status") not in trade_sim.GW_NOT_A_POSITION]
+    valid = [r for r in records if r.get("status") not in trade_sim.GW_NOT_A_POSITION and r.get("status") != DEAL_CLOSED]      # 09.11.2026: приключила сделка — извън статистиката
 
     def horizons(group: list[dict]) -> dict:
         """Доходността h сесии след входа (literal, независимо от изхода) и SPY за същите дати — средно по записите, на които срокът е минал."""
@@ -2178,6 +2227,7 @@ def get_backtest_summary() -> dict:
         "recent": recent,
         "open_positions": open_positions,
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
+        "deal_closed": deal_closed_block(records),                        # 09.11.2026 (ROKU)
         "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
         "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
