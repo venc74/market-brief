@@ -1,0 +1,107 @@
+{
+ "date": "2026-11-10",
+ "time_ny": "09:08",
+ "time_berlin": "15:08",
+ "ok": true,
+ "diag": {
+  "tickers": 924,
+  "with_pm": 666,
+  "gappers": 1,
+  "zero_volume_share": 1.0,
+  "requested": 924
+ },
+ "gaps": [
+  {
+   "ticker": "AAON",
+   "session": "2026-11-09",
+   "prev_close": 62.869998931884766,
+   "pm_price": 72.0,
+   "pm_bars": 34,
+   "pm_volume": null,
+   "pm_last_ny": "09:07",
+   "gap_pct": 14.52,
+   "ret63_pct": -26.707857511582844,
+   "neglect": true,
+   "liquid": true,
+   "adr": 7.001799884625748,
+   "company": "AAON",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-09 16:09",
+     "items": [
+      "2.02",
+      "4.02",
+      "7.01"
+     ],
+     "text": "8-K (SEC), 09.11 16:09 ET: 2.02 — финансови резултати; 4.02 — отказ от предишни отчети; 7.01 — оповестяване по Reg FD"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "The Aaon Group Announces Quarterly Cash Dividend",
+    "source": null,
+    "published": "2026-11-10 12:00",
+    "link": null
+   },
+   "headlines_error": null
+  }
+ ],
+ "levels": [
+  {
+   "ticker": "KDP",
+   "what": "Чака пробив",
+   "kind": "над нивото",
+   "level": 36.95,
+   "pm_price": 37.16,
+   "pct": 0.57,
+   "pm_volume": null
+  },
+  {
+   "ticker": "KDP",
+   "what": "книга buy-stop",
+   "kind": "над нивото",
+   "level": 36.95,
+   "pm_price": 37.16,
+   "pct": 0.57,
+   "pm_volume": null
+  }
+ ],
+ "watch": [
+  {
+   "ticker": "BMNR",
+   "gap_pct": -3.33,
+   "pm_price": 17.99,
+   "prev_close": 18.61,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "BLSH",
+   "gap_pct": -3.07,
+   "pm_price": 22.1,
+   "prev_close": 22.8,
+   "close_src": "brief",
+   "pm_last_ny": "08:35",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "coverage": {
+  "with_pm": 666,
+  "requested": 924,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null
+ },
+ "session": "2026-11-09",
+ "sector_bounce": [],
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "seconds": 85.0,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 10.11 — 1 гапа, 2 нива, 2 наблюдавани",
+  "at_utc": "14:08"
+ }
+}
