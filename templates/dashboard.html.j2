@@ -525,7 +525,7 @@
   {% if preopen.coverage.partial and preopen.ok %}<div class="small" style="color:var(--red);margin-bottom:8px">⚠ Частично: {{ preopen.coverage.reason }} — празното НЕ значи, че няма гапове.</div>{% endif %}{% endif %}
   {% if preopen.late %}<div class="small" style="color:var(--red)">Обновяване преди отварянето днес няма: {{ (preopen.notes or [])|join("; ") }}. Празното каре НЕ значи „нищо за отбелязване“.</div>
   {% elif not preopen.ok %}<div class="small" style="color:var(--red)">Премаркетът не се изтегли днес{% if preopen.notes %} ({{ preopen.notes|join("; ") }}){% endif %}{% if preopen.coverage and preopen.coverage.reason %} ({{ preopen.coverage.reason }}){% endif %} — празното НЕ значи, че няма гапове.</div>
-  {% elif not (preopen.gaps or preopen.levels or preopen.watch) %}<div class="small">Нищо за отбелязване{% if preopen.coverage and preopen.coverage.partial %} в проверената част{% endif %}: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
+  {% elif not (preopen.gaps or preopen.levels or preopen.watch or preopen.ep_morning or preopen.ep_morning_error) %}<div class="small">Нищо за отбелязване{% if preopen.coverage and preopen.coverage.partial %} в проверената част{% endif %}: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
   {% else %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
   {# 06.11.2026 (пакет 05–06.11, т. 10): ≥ 3 гапа от една индустрия — qm_ep.sector_bounce #}
@@ -542,6 +542,11 @@
       {% if not g.filings_8k and not g.headline and not g.filings_error and not g.headlines_error %}<br><span class="small" style="color:var(--muted)">без 8-K и без заглавие за компанията досега</span>
       {% elif not g.filings_8k and not g.filings_error and not g.headline %}<br><span class="small" style="color:var(--muted)">без 8-K досега</span>
       {% elif not g.headline and not g.headlines_error and not g.filings_8k %}<br><span class="small" style="color:var(--muted)">без заглавие за компанията досега</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+  {# 10.11.2026 (т. 2, SANM 10.11): сутрешен EP кандидат извън гаповете — с ред (под прага / няма премаркет цена и защо), не изпада тихо #}
+  {% if preopen.ep_morning %}<div class="cs-sub">Сутрешните EP кандидати извън гаповете · {{ preopen.ep_morning|length }}</div>
+  <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.ep_morning %}
+    <li><b class="mono">{{ x.ticker }}</b> {% if x.no_price %}<span style="color:var(--yellow)">{{ x.text }}</span>{% else %}{{ x.text }}{% endif %}</li>{% endfor %}</ul>{% endif %}
+  {% if preopen.ep_morning_error %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Сутрешните EP кандидати не се провериха ({{ preopen.ep_morning_error }}).</div>{% endif %}
   {% if preopen.levels %}<div class="cs-sub">Нивата в премаркета · {{ preopen.levels|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.levels %}
     <li><b class="mono">{{ x.ticker }}</b> · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}

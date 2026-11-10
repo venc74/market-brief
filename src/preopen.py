@@ -60,6 +60,62 @@ def premarket_point(df: pd.DataFrame | None, now_utc) -> dict | None:
             "pm_volume": vol or None, "pm_last_ny": ix[pm_mask][-1].strftime("%H:%M")}
 
 
+def premarket_missing_reason(df: pd.DataFrame | None, now_utc) -> str:
+    """
+    10.11.2026 (т. 2): защо premarket_point() дава None — за реда „няма премаркет цена (Yahoo): …“ при сутрешен EP кандидат. Същите условия като
+    premarket_point (редовният бар на предишната сесия, премаркет бар днес преди now и преди 09:30 Ню Йорк). Чиста функция.
+    """
+    from src import sessions
+    if df is None or len(df) == 0 or "Close" not in df:
+        return "Yahoo не върна 5-минутни бари"
+    now = _ny(now_utc)
+    ix = pd.DatetimeIndex(df.index)
+    ix = (ix.tz_localize("UTC") if ix.tz is None else ix).tz_convert(NY)
+    mins = ix.hour * 60 + ix.minute
+    today, prev = now.date(), sessions.prev_session(now.date())
+    if len(df[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < CLOSE_MIN)]["Close"].dropna()) == 0:
+        return f"няма бар от редовната сесия на {prev:%d.%m}"
+    if len(df[(ix.date == today) & (mins < OPEN_MIN) & (ix < now)]["Close"].dropna()) == 0:
+        return f"няма премаркет бари днес до {now:%H:%M} Ню Йорк"
+    return "непозната причина"
+
+
+def ep_morning(brief: dict | None, pts: dict, frames5: dict | None, shown: list[dict], now_utc) -> list[dict]:
+    """
+    10.11.2026 (т. 2, SANM 10.11): всеки сутрешен EP кандидат (brief["qm_ep"]["rows"]), който НЕ е сред гаповете в карето, остава с ред — не изпада тихо.
+    С премаркет цена → гапът сега и защо не е в гаповете (под прага / малко бари / извън първите PREOPEN_MAX_ROWS); без → „няма премаркет цена (Yahoo): <причината>“.
+    → [{ticker, ah_gap_pct, pm_gap_pct?, pm_price?, prev_close?, pm_last_ny?, no_price, why, text}]. Чиста функция.
+    """
+    seen = {g.get("ticker") for g in shown or []}
+    out = []
+    for r in ((brief or {}).get("qm_ep") or {}).get("rows") or []:
+        t = r.get("ticker")
+        if not t or t in seen:
+            continue
+        seen.add(t)
+        ah = r.get("gap_pct")
+        row = {"ticker": t, "ah_gap_pct": round(ah, 2) if ah is not None else None, "no_price": False}
+        p = (pts or {}).get(t)
+        if p:
+            g = (p["pm_price"] / p["prev_close"] - 1) * 100 if p.get("prev_close") else None
+            row.update(pm_gap_pct=round(g, 2) if g is not None else None, pm_price=p["pm_price"], prev_close=p["prev_close"], pm_last_ny=p["pm_last_ny"])
+            if g is None or g < config.PREOPEN_GAP_PCT:
+                row["why"] = f"под прага +{config.PREOPEN_GAP_PCT:g}%"
+            elif p["pm_bars"] < config.PREOPEN_MIN_PM_BARS:
+                row["why"] = f"само {p['pm_bars']} бара в премаркета (< {config.PREOPEN_MIN_PM_BARS})"
+            else:
+                row["why"] = f"извън първите {config.PREOPEN_MAX_ROWS} гапа"
+            pm = f"премаркет {g:+.1f}%" if g is not None else "премаркет"
+            what = f"{pm} (${p['pm_price']:.2f} в {p['pm_last_ny']} Ню Йорк; затваряне ${p['prev_close']:.2f}) — {row['why']}"
+        else:
+            row["no_price"] = True
+            row["why"] = premarket_missing_reason((frames5 or {}).get(t), now_utc)
+            what = f"няма премаркет цена (Yahoo): {row['why']}"
+        row["text"] = (f"сутрин AH {ah:+.1f}% → " if ah is not None else "") + what
+        out.append(row)
+    return out
+
+
 def scan(frames5: dict, now_utc) -> tuple[dict, list[dict], dict]:
     """
     Всички тикъри → ({тикър: premarket_point}, гаповете ≥ PREOPEN_GAP_PCT с поне PREOPEN_MIN_PM_BARS бара в премаркета, по гап; diag). Чиста функция.
@@ -244,7 +300,7 @@ def qm_ep_sources_note(row: dict) -> str | None:
 
 
 def has_news(res: dict) -> bool:
-    return bool(res.get("gaps") or res.get("levels") or res.get("watch"))
+    return bool(res.get("gaps") or res.get("levels") or res.get("watch") or res.get("ep_morning"))      # 10.11.2026 (т. 2): и сутрешните EP кандидати извън гаповете
 
 
 def qm_ep_sector_bounce(gaps: list[dict]) -> list[dict]:
@@ -281,6 +337,11 @@ def email_html(res: dict) -> str:
                             if g.get("headline") else "")
                          + (f"<br><span style='color:#92400e'>{e(qm_ep_sources_note(g))}</span>" if qm_ep_sources_note(g) else "")      # 04.11.2026 (С1)
                          for g in res["gaps"]]))
+    if res.get("ep_morning"):                                                       # 10.11.2026 (т. 2, SANM)
+        parts.append("<div style='margin-top:10px'><b>Сутрешните EP кандидати извън гаповете</b></div>")
+        parts.append(li([f"<b>{e(x['ticker'])}</b> " + (f"<span style='color:#92400e'>{e(x['text'])}</span>" if x.get("no_price") else e(x["text"])) for x in res["ep_morning"]]))
+    if res.get("ep_morning_error"):
+        parts.append(f"<div style='margin:4px 0;color:#92400e'>Сутрешните EP кандидати не се провериха ({e(res['ep_morning_error'])}).</div>")
     if res.get("levels"):
         parts.append("<div><b>Нивата в премаркета</b></div>")
         parts.append(li([f"<b>{e(x['ticker'])}</b> · {e(x['what'])} — {e(x['kind'])} ${x['level']:.2f} (премаркет ${x['pm_price']:.2f}, {x['pct']:+.1f}%)" for x in res["levels"]]))
@@ -357,6 +418,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
             res["notes"].append(f"„Чака пробив“ не се прочете ({type(e).__name__})")
         qm_cards = brief.get("qm_breakout") or []
         extra = [c.get("ticker") for c in waiting + qm_cards] + [r.get("ticker") for r in records or []] + list(watched or [])
+        extra += [r.get("ticker") for r in (brief.get("qm_ep") or {}).get("rows") or []]      # 10.11.2026 (т. 2): сутрешните EP кандидати — винаги в заявката
         tickers = list(dict.fromkeys([t for t in list(universe or []) + extra if t]))
         LAST_FETCH.clear()
         if frames5 is None:
@@ -368,6 +430,11 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
         res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
+        try:                                                                           # 10.11.2026 (т. 2, SANM): сутрешните EP кандидати извън гаповете — с ред, не изпадат тихо
+            res["ep_morning"] = ep_morning(brief, pts, frames5, res["gaps"], now)
+        except Exception as e:
+            res["ep_morning"], res["ep_morning_error"] = [], f"{type(e).__name__}"
+            print(f"[preopen] сутрешните EP кандидати: {type(e).__name__}: {e}")
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [], res["date"])
         res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)
