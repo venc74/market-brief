@@ -1,5 +1,5 @@
 {
- "date": "2026-11-09",
+ "date": "2026-11-10",
  "rows": [],
  "horizon": [
   {
@@ -73,6 +73,22 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Nov 09, 2026"
+  },
+  {
+   "ticker": "NCI",
+   "company": "Neo-Concept International Group Holdings Limited",
+   "date": "2026-11-10",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Nov 10, 2026"
+  },
+  {
+   "ticker": "OFAL",
+   "company": "OFA Group",
+   "date": "2026-11-10",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 10, 2026"
   },
   {
    "ticker": "EMBJ",
@@ -206,12 +222,11 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 25,
+  "source_rows": 27,
   "horizon_from": "2026-11-09",
   "horizon_to": "2026-11-20",
-  "in_week": 9,
+  "in_week": 11,
   "dropped_price": [
-   "MMT",
    "ARAY",
    "ADGM",
    "ALPS",
@@ -219,9 +234,13 @@
    "NXTS",
    "SMX",
    "STKH",
-   "WCT"
+   "WCT",
+   "NCI",
+   "OFAL"
   ],
-  "dropped_cap": [],
+  "dropped_cap": [
+   "MMT"
+  ],
   "dropped_no_data": [],
   "passed": 0,
   "state": "empty"

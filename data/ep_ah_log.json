@@ -118,6 +118,40 @@
    "close_pct": 11.67,
    "high_pct": 13.15,
    "resolved_on": "2026-11-09"
+  },
+  {
+   "ticker": "SANM",
+   "session": "2026-11-09",
+   "brief_date": "2026-11-10",
+   "gap_session": "2026-11-10",
+   "prev_close": 149.64,
+   "ah_price": 179.8776,
+   "ah_gap_pct": 20.21,
+   "ah_bars": 21,
+   "ah_volume": null,
+   "neglect": true,
+   "ret63_pct": -26.2,
+   "open_gap_pct": null,
+   "close_pct": null,
+   "high_pct": null,
+   "resolved_on": null
+  },
+  {
+   "ticker": "AAON",
+   "session": "2026-11-09",
+   "brief_date": "2026-11-10",
+   "gap_session": "2026-11-10",
+   "prev_close": 62.87,
+   "ah_price": 72.7048,
+   "ah_gap_pct": 15.64,
+   "ah_bars": 23,
+   "ah_volume": null,
+   "neglect": true,
+   "ret63_pct": -26.7,
+   "open_gap_pct": null,
+   "close_pct": null,
+   "high_pct": null,
+   "resolved_on": null
   }
  ]
 }

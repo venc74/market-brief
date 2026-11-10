@@ -1,0 +1,30 @@
+{
+ "closed": {
+  "CART": {
+   "announced": "2026-10-28",
+   "buyer": "DoorDash, Inc.",
+   "date": "2026-11-09",
+   "how": "новина: „Until DoorDash’s proposed deal closes, Maplebear (CART) will keep operating independently.“",
+   "seen": "2026-11-10",
+   "ticker": "CART"
+  },
+  "ROKU": {
+   "announced": "2026-06-14",
+   "buyer": "Fox Corporation",
+   "date": "2026-11-06",
+   "how": "8-K т. 1.02,2.01,3.01,3.03,5.01,5.02,5.03,9.01",
+   "seen": "2026-11-10",
+   "ticker": "ROKU"
+  }
+ },
+ "pending": {
+  "NWE": {
+   "accession": "0001993004-25-000143",
+   "announced": "2025-08-18",
+   "buyer": "Black Hills Corporation",
+   "filing_date": "2025-08-19",
+   "seen": "2026-11-10"
+  }
+ },
+ "version": 1
+}
