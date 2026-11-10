@@ -560,13 +560,15 @@ def reference_basket(snap: dict | None, session: str, brief_date: dt.date, snap_
     return out
 
 
-def marker_decision(sym: str, ratio: float, basket: dict, prior: list[float]) -> dict:
+def marker_decision(sym: str, ratio: float, basket: dict, prior: list[float], contracts: float | None = None) -> dict:
     """
     Решението за маркер на един наш тикър (чиста функция). prior — собствените му наблюдения ПРЕДИ днешната сесия.
       • абсолютен път: ratio ≥ UNUSUAL_OPTIONS_MARKER_MIN_RATIO (2.0);
       • по история: ≥ UNUSUAL_OPTIONS_HISTORY_MIN_DAYS наблюдения → перцентил спрямо тях ≥ UNUSUAL_OPTIONS_MARKER_PERCENTILE;
       • за деня: иначе, ако кошницата има праг → ratio ≥ P на кошницата.
     Връща {marked, mode ("absolute"/"history"/"day"/None), percentile (спрямо историята или кошницата, или None), threshold, why (при marked=False и липсващ път)}.
+    10.11.2026 (т. 6): contracts — обемът в прозореца; под config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS (500) → marked=False и thin=<договорите>, по който и път да е
+    минал (CPAY 10.11: 0.44× OI над P90 на кошницата, но 249 договора срещу OI 565).
     """
     q = config.UNUSUAL_OPTIONS_MARKER_PERCENTILE
     out = {"marked": False, "mode": None, "percentile": None, "threshold": None, "history_days": len(prior), "why": ""}
@@ -581,6 +583,8 @@ def marker_decision(sym: str, ratio: float, basket: dict, prior: list[float]) ->
         out["why"] = f"няма с какво да се сравни: {basket.get('reason') or 'кошницата няма праг'}; собствена история {len(prior)} от {config.UNUSUAL_OPTIONS_HISTORY_MIN_DAYS} дни"
     if not out["marked"] and ratio >= config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO:
         out.update(marked=True, mode="absolute")
+    if out["marked"] and contracts is not None and contracts < config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS:   # 10.11.2026 (т. 6, CPAY 249): тънък обем — без маркер
+        out.update(marked=False, thin=int(contracts))
     return out
 
 
@@ -621,6 +625,7 @@ def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple
     today = today or dt.date.today()
     tickers = list(dict.fromkeys(t for t in tickers if t))[:config.UNUSUAL_OPTIONS_MARKER_MAX_TICKERS]
     diag: dict = {"requested": len(tickers), "scanned": 0, "with_ratio": 0, "marked": 0, "ratios": {}, "missing": {}, "decisions": {}, "no_basis": {},
+                  "thin": {}, "min_contracts": config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS,
                   "window_days": config.UNUSUAL_OPTIONS_HORIZON_DAYS, "min_ratio": config.UNUSUAL_OPTIONS_MARKER_MIN_RATIO,
                   "percentile": config.UNUSUAL_OPTIONS_MARKER_PERCENTILE, "history_min_days": config.UNUSUAL_OPTIONS_HISTORY_MIN_DAYS, "basket": None,
                   "snapshot_session": None, "snapshot_fetched_at_utc": None, "snapshot_missing_reason": ""}
@@ -663,8 +668,12 @@ def candidate_markers(tickers: list[str], today: dt.date | None = None) -> tuple
         diag["ratios"][sym] = round(ratio, 2)
         exact[sym] = ratio
         prior = [v for d, v in (history.get(sym) or {}).items() if d < (session or today.isoformat())]
-        dec = marker_decision(sym, ratio, basket, prior)
+        dec = marker_decision(sym, ratio, basket, prior, contracts=a["total_vol"])
         diag["decisions"][sym] = {k: dec[k] for k in ("marked", "mode", "percentile", "threshold", "history_days")}
+        if dec.get("thin") is not None:                                     # 10.11.2026 (т. 6): минал прага, но с тънък обем — в diag и в лога
+            diag["decisions"][sym]["thin"] = dec["thin"]
+            diag["thin"][sym] = dec["thin"]
+            print(f"[unusual_options] {sym}: {_fmt_ratio(ratio)}× OI минава прага, но обемът е {dec['thin']} договора (< {config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS}) — без UOV✓")
         if dec["why"]:                                                      # има съотношение, но няма с какво да се сравни (не е "без съотношение")
             diag["no_basis"][sym] = dec["why"]
         if dec["marked"]:

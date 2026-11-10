@@ -153,8 +153,18 @@ syn["KEY"] = {f"2026-09-{d:02d}": 0.005 + 0.0003 * k for k, d in enumerate(range
 syn["KEY"][SESSION] = hist["KEY"][SESSION]
 uo.save_ratio_history(syn)
 uo._BASKET_MEMO.clear(); uo._ANALYSIS_MEMO.clear()
+# 10.11.2026 (т. 6): с минимума от 500 договора KEY (реално 171 договора на 07.10) не получава маркер — пътят по историята се проверява без минимума
 with contextlib.redirect_stdout(io.StringIO()):
-    mk2, diag2 = uo.candidate_markers(["PLTR", "KEY", "TSLA"], TODAY)
+    _mk500, _d500 = uo.candidate_markers(["PLTR", "KEY", "TSLA"], TODAY)
+assert "KEY" not in _mk500 and _d500["thin"] == {"KEY": 171} and _d500["decisions"]["KEY"]["percentile"] == 100.0
+uo.save_ratio_history(syn)                                                                                         # candidate_markers допълни историята — връщаме синтетичната
+uo._BASKET_MEMO.clear(); uo._ANALYSIS_MEMO.clear()
+_min, config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS = config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS, 0
+try:
+    with contextlib.redirect_stdout(io.StringIO()):
+        mk2, diag2 = uo.candidate_markers(["PLTR", "KEY", "TSLA"], TODAY)
+finally:
+    config.UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS = _min
 assert "PLTR" not in mk2 and diag2["decisions"]["PLTR"]["mode"] == "history" and diag2["decisions"]["PLTR"]["percentile"] < 10
 assert "KEY" in mk2 and mk2["KEY"]["mode"] == "history" and mk2["KEY"]["percentile"] == 100.0
 assert "TSLA" in mk2 and mk2["TSLA"]["mode"] == "day"                                                              # без история → още за деня

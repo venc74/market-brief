@@ -805,6 +805,10 @@ UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = int(os.getenv("UNUSUAL_OPTIONS_SNAPSHOT_BR
 # за да се калибрира по реални дни. Таван на тикърите на едно извикване (всеки тикър = до ~14 заявки за вериги).
 UNUSUAL_OPTIONS_MARKER_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_RATIO", 2.0))
 UNUSUAL_OPTIONS_MARKER_MAX_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MAX_TICKERS", 40))
+# 10.11.2026 (т. 6): абсолютен минимум договори за UOV✓ — обемът в прозореца на падежите (calls + puts). Измерено 10.11 върху всички 19 маркера от 14.10 насам:
+# под 1 680 договора са само AMG 14.10 (68) и CPAY 10.11 (249); следващият е ROKU 28.10 (1 680), после URI (3 796+), NTAP, NDAQ, LLY, AAPL. Всяка стойност
+# 250–1 680 дава същото; 500 = 2× CPAY и с широк запас под ROKU. Важи за всички пътища (кошница / история / абсолютният 2.0×).
+UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS", 500))
 # 08.10.2026 — КАЛИБРИРАНЕ на UOV✓ (бриф 08.10: съотношенията на нашите тикъри 0.09–0.29 при праг 2.0 → маркерът е недостижим с прозореца от 21 дни).
 # Относителен праг вместо абсолютен: маркерът върху НАШ тикър се слага, когато съотношението му е в най-високите 10% (UNUSUAL_OPTIONS_MARKER_PERCENTILE)
 #   • "за деня": спрямо РЕФЕРЕНТНА КОШНИЦА — топ UNUSUAL_OPTIONS_REFERENCE_TICKERS най-ликвидни тикъра (S&P500+NDX по среден 20-дневен обем), чийто OI се
