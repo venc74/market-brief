@@ -299,8 +299,106 @@ def qm_ep_sources_note(row: dict) -> str | None:
     return qm_ep.sources_note(row)
 
 
+# 10.11.2026 (т. 3): заглавие за икономически данни — по вида; измерено върху 2 923 реални заглавия на Reuters и AP (Google News, 01.10–10.11.2026):
+# 23 попадения, всички за американски данни (или очакването им), нито едно странично; чуждите данни (UK, Индия, Китай, Бразилия) — вън.
+_ECON_RX = {
+    "CPI": r"\bCPI\b|consumer[- ]prices?\b|\binflation (data|report|figures|numbers|reading|print)\b"
+           r"|\binflation (ran|runs|rose|rises|heats? up|heated up|cool(s|ed)|eas(es|ed)|accelerat\w+|slow(s|ed)|jump(s|ed)|worsen(s|ed)|tick(s|ed))\b",
+    "PPI": r"\bPPI\b|producer[- ]prices?\b|wholesale (prices|inflation)\b",
+    "заетост": r"\bpayrolls?\b|\bnonfarm\b|\bjobs (report|data|numbers|figures)\b|\bjobless\b|\bunemployment (rate|claims|benefits|ticks|rises|rose|falls|fell|drops?|climbs?)\b"
+               r"|\binitial claims\b|\bjob (growth|gains)\b|\bhiring (slows|slowed|picks up|picked up|surges|surged|jumps|jumped|rebounds)\b",
+    "JOLTS": r"\bJOLTS\b|\bjob (openings|postings)\b",
+    "ISM": r"\bISM\b|\bPMI\b|purchasing managers|\b(factory|services) activity\b",
+    "retail sales": r"\bretail sales\b",
+}
+_ECON_FOREIGN = (r"\b(UK|U\.K\.|Britain|British|euro ?zone|Europe\w*|ECB|Lagarde|German\w*|France|French|Ital\w+|Spain|Spanish|Japan\w*|BOJ|China|Chinese|India\w*|RBI|"
+                 r"Brazil\w*|Canad\w+|Australia\w*|Mexic\w*|Russia\w*|Turk\w+|Korea\w*|Swiss|Sweden|Swedish|Norw\w+|Global|world)\b")
+_ECON_US = r"\bUS\b|\bU\.S\.|\bAmerica\w*|\bWall St|\bFed\b|\bS&P\b|\bNasdaq\b|\bDow\b|\bTreasur"
+
+
+def econ_kind(title: str | None) -> str | None:
+    """10.11.2026 (т. 3): видът икономически данни в заглавието (CPI / PPI / заетост / JOLTS / ISM / retail sales) или None; чужда държава без US белег → None. Чиста функция."""
+    import re
+    t = title or ""
+    for k, rx in _ECON_RX.items():
+        if re.search(rx, t, re.I):
+            return None if re.search(_ECON_FOREIGN, t, re.I) and not re.search(_ECON_US, t, re.I) else k
+    return None
+
+
+def econ_since(now_utc) -> pd.Timestamp:
+    """Началото на прозореца — днес PREOPEN_ECON_SINCE_NY (08:30) Ню Йорк, като UTC."""
+    now = _ny(now_utc)
+    h, m = (int(x) for x in config.PREOPEN_ECON_SINCE_NY.split(":"))
+    return now.normalize().replace(hour=h, minute=m).tz_convert("UTC")
+
+
+def _title_source(item: dict) -> tuple[str, str]:
+    """Google News слага издателя в края („… - Reuters“, „… - AP News“) — заглавието без него и издателят; иначе заглавието и името на фийда."""
+    t, src = str(item.get("title") or "").strip(), str(item.get("source") or "")
+    if " - " in t:
+        head, tail = t.rsplit(" - ", 1)
+        if tail.strip() and len(tail.split()) <= 3 and tail.strip().split()[0].lower() in src.lower():
+            return head.strip(), tail.strip()
+    return t, src
+
+
+def econ_headlines(items: list[dict], now_utc, max_n: int | None = None) -> list[dict]:
+    """
+    10.11.2026 (т. 3): заглавията за икономически данни в прозореца [econ_since, now] — дословно (без издателя в края при Google News), с източника и часа
+    (Ню Йорк и Берлин), първите по време (първото е обикновено самото съобщение); едно и също заглавие от два фийда — веднъж. Без AI. Чиста функция.
+    → [{title, source, kind, published, time_ny, time_berlin, link?}]
+    """
+    since, now = econ_since(now_utc), pd.Timestamp(now_utc).tz_convert("UTC") if pd.Timestamp(now_utc).tzinfo else pd.Timestamp(now_utc).tz_localize("UTC")
+    rows, seen = [], set()
+    for it in items or []:
+        try:
+            ts = pd.Timestamp(it.get("published")).tz_convert("UTC") if it.get("published") else None
+        except Exception:
+            ts = None
+        if ts is None or ts < since or ts > now:
+            continue
+        title, src = _title_source(it)
+        k = econ_kind(title)
+        key = title.lower()[:90]
+        if not k or key in seen:
+            continue
+        seen.add(key)
+        row = {"title": title, "source": src, "kind": k, "published": ts.strftime("%Y-%m-%dT%H:%MZ"),
+               "time_ny": ts.tz_convert(NY).strftime("%H:%M"), "time_berlin": ts.tz_convert("Europe/Berlin").strftime("%H:%M")}
+        if it.get("link"):
+            row["link"] = it["link"]
+        rows.append(row)
+    rows.sort(key=lambda r: r["published"])
+    return rows[:max_n or config.PREOPEN_ECON_MAX]
+
+
+def fetch_econ(now_utc) -> dict:
+    """10.11.2026 (т. 3): заглавията от config.NEWS_RSS_FEEDS след econ_since (мрежа; всеки фийд в try/except в news_aggregator._fetch_rss) → {"items", "feeds", "feeds_empty"}."""
+    from src import news_aggregator
+    since = econ_since(now_utc).timestamp()
+    items, empty = [], []
+    for src, url in config.NEWS_RSS_FEEDS.items():
+        got = news_aggregator._fetch_rss(url, src, 2, limit=100, since_ts=since)
+        (items.extend(got) if got else empty.append(src))
+    return {"items": items, "feeds": len(config.NEWS_RSS_FEEDS), "feeds_empty": empty}
+
+
+def econ_block(fetched: dict | None, now_utc) -> tuple[list[dict], str | None]:
+    """Заглавията и бележка при провал: нито един фийд не върна нищо след 08:30 Ню Йорк → „не се провериха“ (≠ „няма“)."""
+    f = fetched or {}
+    if f.get("feeds") and len(f.get("feeds_empty") or []) >= f["feeds"]:
+        return [], f"нито един от {f['feeds']} фийда не върна заглавия след {config.PREOPEN_ECON_SINCE_NY} Ню Йорк"
+    return econ_headlines(f.get("items") or [], now_utc), None
+
+
+def econ_line(x: dict) -> str:
+    """„„US consumer prices rise above expectations in October“ · Reuters · 08:46 Ню Йорк (14:46 Берлин)“ — страницата и имейлът."""
+    return f"„{x['title']}“ · {x['source']} · {x['time_ny']} Ню Йорк ({x['time_berlin']} Берлин)"
+
+
 def has_news(res: dict) -> bool:
-    return bool(res.get("gaps") or res.get("levels") or res.get("watch") or res.get("ep_morning"))      # 10.11.2026 (т. 2): и сутрешните EP кандидати извън гаповете
+    return bool(res.get("gaps") or res.get("levels") or res.get("watch") or res.get("ep_morning") or res.get("econ"))      # 10.11.2026 (т. 2–3): и сутрешните EP кандидати, и данните
 
 
 def qm_ep_sector_bounce(gaps: list[dict]) -> list[dict]:
@@ -325,6 +423,11 @@ def email_html(res: dict) -> str:
     cov = res.get("coverage") or {}
     if cov.get("partial"):                                                          # 04.11.2026 (С3)
         parts.append(f"<div style='margin-top:6px;color:#991b1b'>⚠ Частично: {e(cov['reason'])} — празното НЕ значи, че няма гапове.</div>")
+    if res.get("econ"):                                                             # 10.11.2026 (т. 3)
+        parts.append(f"<div style='margin-top:10px'><b>Икономически данни след {config.PREOPEN_ECON_SINCE_NY} Ню Йорк</b> <span style='color:#6b7280'>(заглавията дословно, без AI)</span></div>")
+        parts.append(li([e(econ_line(x)) for x in res["econ"]]))
+    if res.get("econ_error"):
+        parts.append(f"<div style='margin:4px 0;color:#92400e'>Заглавията за икономически данни не се провериха ({e(res['econ_error'])}) — празното НЕ значи, че няма.</div>")
     if res.get("gaps"):
         parts.append("<div style='margin-top:10px'><b>EP — гапове ≥ +%g%% в премаркета</b></div>" % config.PREOPEN_GAP_PCT)
         parts += [f"<div style='margin:4px 0;color:#92400e'>{e(x['text'])}</div>" for x in res.get("sector_bounce") or []]      # 06.11.2026 (т. 10)
@@ -398,7 +501,8 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
-        universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None) -> dict:
+        universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
+        econ_fn=None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -438,6 +542,14 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [], res["date"])
         res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)
+        if econ_fn is not None:                                                        # 10.11.2026 (т. 3): заглавията за данните; main подава fetch_econ, тестовете — готови
+            try:
+                res["econ"], err = econ_block(econ_fn(now.tz_convert("UTC").to_pydatetime()), now)
+                if err:
+                    res["econ_error"] = err
+            except Exception as e:
+                res["econ"], res["econ_error"] = [], f"{type(e).__name__}"
+                print(f"[preopen] заглавията за данните: {type(e).__name__}: {e}")
     except Exception as e:
         res["notes"].append(f"{type(e).__name__}: {e}")
         print(f"[preopen] пропадна: {type(e).__name__}: {e}")
@@ -548,7 +660,7 @@ def main(now_utc=None) -> int:
         universe_note = f"универсът не се зареди ({type(e).__name__}) — проверени са само картите, книгите и наблюдаваните"
         print(f"::warning::[preopen] {universe_note}: {e}")
     res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=universe,
-              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note)
+              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ)
     res["email"] = prev.get("email") or {"sent": False}
     if has_news(res) and not res["email"].get("sent"):
         subj = (f"Преди отварянето · {day[8:10]}.{day[5:7]} — " + ", ".join(x for x in (f"{len(res['gaps'])} гапа" if res["gaps"] else "",

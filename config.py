@@ -345,6 +345,10 @@ PREOPEN_MIN_PM_SHARE = float(os.getenv("PREOPEN_MIN_PM_SHARE", 0.4))
 # 04.11.2026 (четвърти преглед, Н6): пускане след отварянето, но преди този час (Ню Йорк) е закъснялото „правилно“ пускане (09:05 + опашката на GitHub) — карето казва, че обновяване
 # днес няма (до 04.11 — само ::notice:: в лога). Другото пускане по графика (10:05 Ню Йорк) е след него.
 PREOPEN_LATE_UNTIL_NY = os.getenv("PREOPEN_LATE_UNTIL_NY", "10:00")
+# 10.11.2026 (т. 3): заглавия за икономически данни (CPI, PPI, заетост, JOLTS, ISM, retail sales) от нашите фийдове (NEWS_RSS_FEEDS) в карето — дословно, с източник
+# и час, без AI. От 08:30 Ню Йорк (часът на данните; 14:30 Берлин, в седмиците с разминаване на часа — 13:30) до часа на карето; най-много PREOPEN_ECON_MAX.
+PREOPEN_ECON_SINCE_NY = os.getenv("PREOPEN_ECON_SINCE_NY", "08:30")
+PREOPEN_ECON_MAX = int(os.getenv("PREOPEN_ECON_MAX", 3))
 
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing

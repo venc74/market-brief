@@ -657,7 +657,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
         qm_r_floor=f"{config.QM_R_RISK_FLOOR_ADR:g}",                    # 12.10: подът на знаменателя на R в книгата qm_breakout
         qm_replay=config.QM_REPLAY_STATS,                                  # 12.10: числата от реплея с новата формула (банерът на секцията)
-        qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
+        preopen_econ_since=config.PREOPEN_ECON_SINCE_NY, qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
