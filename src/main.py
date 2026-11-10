@@ -594,8 +594,11 @@ def run() -> dict:
         # и преди каквото и да четe _live_positions() (OPEN✓/RE-ENTRY/COT гледат само v2).
         # Идемпотентно и graceful — провал оставя v1 до следващия run, без загуба на данни.
         tracker_switch.ensure_v2_methodology()
+        # 10.11.2026: ПРЕДИ резолюцията — тя прескача приключилите тикъри (след делистването Yahoo връща орязана история); цената — от дневните бари до датата на приключването
+        _closed_bt = spinoff_watch.closed_tickers()
+        backtest.reopen_deal_records((deals or {}).get("reopened") or [])           # CART 09.11: затворена само по едно заглавие — връща се
+        backtest.close_deal_records(_closed_bt, dt.date.fromisoformat(today), bars=backtest.daily_bars_for(backtest.live_closed_tickers(_closed_bt)))
         backtest.resolve_positions_only()
-        backtest.close_deal_records(spinoff_watch.closed_tickers(), dt.date.fromisoformat(today))     # 09.11.2026 (ROKU): след резолюцията — последната реална цена е в записа
     # техническа класификация (потвърден пробив / buy-stop / extended) — ПРЕДИ AI
     # синтеза, за да я вижда и промптът; apply_hard_rules() я налага след него
     # 26.10.2026 (етап 4б, т. 1): цел на придобиване сред кандидатите — ПРЕДИ класификацията: такава карта е сделка (setup.kind "deal" — без buy-stop, план, Action и AI текст).

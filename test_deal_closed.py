@@ -92,8 +92,10 @@ with q():
 assert [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("новина:")
 hit = {"buyer": "Fox Corporation", "announced": "2026-06-14"}
 N = "Roku, Inc."
-assert sw.news_closed("ROKU", hit, [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"}], D, N)
-assert sw.news_closed("ROKU", hit, [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"}], D) is None    # без името — „Roku“ не е тикърът ROKU
+TWO = [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"},
+       {"title": "Fox Completes $22 Billion Roku Acquisition - TheWrap", "published": "2026-11-06T14:30Z"}]                                        # РЕАЛНИ, два източника (10.11.2026: едно не стига)
+assert sw.news_closed("ROKU", hit, TWO, D, N) and sw.news_closed("ROKU", hit, TWO[:1], D, N) is None
+assert sw.news_closed("ROKU", hit, TWO, D) is None    # без името — „Roku“ не е тикърът ROKU
 for t in ("Fox expected to complete Roku acquisition next week", "Fox closes in on Roku deal", "Regulators approve Fox's Roku takeover", "Roku Stock Rises: What's Going On?"):   # СИНТЕТИЧНИ / РЕАЛНИ, без приключване
     assert sw.news_closed("ROKU", hit, [{"title": t, "published": "2026-11-06T10:00Z"}], D, N) is None, t
 assert sw.news_closed("ROKU", hit, [{"title": "Fox completes acquisition of Roku", "published": "2026-10-01T10:00Z"}], D, N) is None      # старо заглавие
@@ -154,7 +156,7 @@ print("  ✓ ZZZ (обем 0 на последния бар) — в LAST_NO_TRAD
 print("── 7. редът в main ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert src.index('steps.step("deals_closed"') < src.index('candidates = steps.step("screener"')
-assert src.index("backtest.resolve_positions_only()") < src.index("backtest.close_deal_records(spinoff_watch.closed_tickers()")
+assert src.index("backtest.close_deal_records(_closed_bt") < src.index("backtest.resolve_positions_only()") < src.index("backtest.close_deal_records(spinoff_watch.closed_tickers()")     # 10.11.2026: и преди резолюцията
 assert src.index('steps.step("merger_pre"') < src.index("candidates = [c for c in candidates if c.get(\"ticker\") not in _closed_now]") < src.index("setup_rules.annotate(candidates")
-print("  ✓ сделките — преди скрийнинга; книгите — след резолюцията; кандидатите — преди класификацията")
+print("  ✓ сделките — преди скрийнинга; книгите — преди резолюцията (и след нея за засечените при картите); кандидатите — преди класификацията")
 print("\n✅ test_deal_closed: всичко мина")

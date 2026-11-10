@@ -299,7 +299,8 @@ print("    чист старт, изключен превключвател, spl
 
 # редът в main.py: превключването е ПРЕДИ резолюцията и преди четенето на живите позиции
 src = (ROOT / "src/main.py").read_text(encoding="utf-8")
-pair = "tracker_switch.ensure_v2_methodology()\n        backtest.resolve_positions_only()\n"     # последователни извиквания в run()
+pair = "tracker_switch.ensure_v2_methodology()\n"     # 10.11.2026: между превключването и резолюцията — затварянето на приключилите сделки (то също чете tracker-а след превключването)
+assert src.index("tracker_switch.ensure_v2_methodology()") < src.index("backtest.close_deal_records(_closed_bt") < src.index("backtest.resolve_positions_only()")
 assert src.count(pair) == 1 and src.index(pair) < src.index("action, watchlist = apply_hard_rules(candidates")        # 03.11.2026: четенето за COT тезите отпадна (т. 17) — първото е в apply_hard_rules
 print("  ✓ main.run(): ensure_v2_methodology() е преди resolve_positions_only() и преди четенето на живите позиции")
 

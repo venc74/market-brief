@@ -336,34 +336,135 @@ def apply_spinoff_notes(active: dict[str, dict], today: dt.date | None = None) -
 DEAL_CLOSED = "deal_closed"
 
 
-def close_deal_records(closed: dict[str, dict], today: dt.date | None = None) -> list[str]:
-    """
-    09.11.2026 (спешна поправка, ROKU): живите записи (чакащи / отворени) на тикъри с приключила сделка / делистване → status "deal_closed": изход по последната реална цена от резолюцията
-    (last_close / last_close_date — дневният бар до приключването), извън статистиката (realized_r None; резултатът при приключването — в rec["deal_closed"]). Чакащ запис без вход — същият статус, без позиция.
-    Реално: ROKU — buy-stop от 22.10 по $159.89, последна цена $160.52 на 06.11; Action запис от 09.11 (картата „Купува се днес“ след приключването), без вход. Връща ключовете. Graceful.
-    """
+# 10.11.2026: записите, развалени на 10.11 от орязаната история на Yahoo след делистването (за ROKU Yahoo връща само 06.11 и 09.11 — бар без обем): резолюцията на 10.11 премести входа
+# на buy-stop записа от 22.10 ($159.89) на 06.11 ($160.21), а Action записът от 09.11 получи вход на бара без търговия. Стойностите — РЕАЛНИТЕ от tracker-а преди run-а на 10.11 (commit b999344).
+DEAL_CLOSED_REPAIR = {
+    "ROKU_2026-10-20_buystop": {"fill_date": "2026-10-22", "fill_price": 159.89, "entry_price": 159.89, "risk_per_share": 11.36, "fill_risk_pct": 7.1, "fill_target_r": 2.0,
+                                "current_r": 0.06, "return_pct": 0.39, "spy_return_pct": -4.06, "alpha_pct": 4.45, "last_close": 160.52, "last_close_date": "2026-11-06",
+                                "exit_date": "2026-11-06", "exit_price": 160.52,
+                                "deal_closed": {"had_position": True, "price": 160.52, "price_date": "2026-11-06", "r": 0.06, "return_pct": 0.39}},
+    "ROKU_2026-11-09": {"fill_date": None, "fill_price": None, "entry_price": None, "risk_per_share": None, "fill_risk_pct": None, "fill_target_r": None, "current_r": None,
+                        "return_pct": None, "last_close": None, "last_close_date": None, "exit_date": None, "exit_price": None,
+                        "deal_closed": {"had_position": False, "price": None, "price_date": None, "r": None, "return_pct": None}},
+}
+
+
+def repair_deal_records(tracker: dict) -> list[str]:
+    """10.11.2026: DEAL_CLOSED_REPAIR върху записите „приключила сделка“ — идемпотентно (rec["deal_repaired"]). Връща ключовете."""
+    done = []
+    for k, fix in DEAL_CLOSED_REPAIR.items():
+        rec = tracker.get(k)
+        if not isinstance(rec, dict) or rec.get("status") != DEAL_CLOSED or rec.get("deal_repaired"):
+            continue
+        dc = dict(rec.get("deal_closed") or {})
+        dc.update(fix["deal_closed"])
+        rec.update({x: v for x, v in fix.items() if x != "deal_closed"}, deal_closed=dc, deal_repaired="2026-11-10")
+        done.append(k)
+    return done
+
+
+def reopen_deal_records(tickers) -> list[str]:
+    """10.11.2026: записите, затворени като „приключила сделка“ само по новина (CART 09.11 — фалшиво), се връщат в предишния статус; резолюцията ги смята наново. Връща ключовете."""
     try:
-        if not closed:
+        tickers = set(tickers or ())
+        if not tickers:
             return []
         tracker = _load_tracker()
+        done = []
+        for k, rec in tracker.items():
+            dc = rec.get("deal_closed") if isinstance(rec, dict) else None
+            if rec.get("ticker") in tickers and rec.get("status") == DEAL_CLOSED and dc and str(dc.get("how") or "").startswith("новина:"):
+                rec["status"] = dc.get("previous_status") or "open"
+                for x in ("resolution_date", "exit_date", "exit_price"):
+                    rec[x] = None
+                rec["deal_reopened"] = {"how": dc.get("how"), "on": dt.date.today().isoformat()}
+                rec.pop("deal_closed")
+                done.append(k)
+        if done:
+            _save_tracker(tracker)
+            print(f"[backtest] върнати от „приключила сделка“ (затворени само по новина): {sorted(done)}")
+        return done
+    except Exception as e:
+        print(f"[backtest] връщането на записите не успя: {type(e).__name__}: {e}")
+        return []
+
+
+def close_deal_records(closed: dict[str, dict], today: dt.date | None = None, bars: dict | None = None) -> list[str]:
+    """
+    09.11.2026 (спешна поправка, ROKU): живите записи (чакащи / отворени) на тикъри с приключила сделка / делистване → status "deal_closed", извън статистиката (realized_r None; резултатът при
+    приключването — в rec["deal_closed"]). Чакащ запис без вход — същият статус, без позиция.
+    10.11.2026: вика се ПРЕДИ резолюцията (тя прескача приключилите тикъри — след делистването Yahoo връща орязана история: за ROKU само 06.11 и 09.11 без обем); вход или цена СЛЕД датата
+    на приключването не са реални (бар без търговия). bars ({тикър: дневни OHLC}) — по желание: при цяла история до датата на приключването цената е затварянето на тази дата, а при
+    Action / buy-stop записите — и резултатът от симулацията до нея; иначе — последното от резолюцията преди приключването. Връща ключовете. Graceful.
+    """
+    try:
+        tracker = _load_tracker()
+        repaired = repair_deal_records(tracker)
+        if not closed and not repaired:
+            return []
         done = []
         for k, rec in tracker.items():
             row = closed.get(rec.get("ticker")) if isinstance(rec, dict) else None
             if not row or rec.get("status") not in _RESOLVABLE_STATUSES:
                 continue
-            had = rec.get("fill_price") is not None
+            cdate = row.get("date") or (today or dt.date.today()).isoformat()
+            b = (bars or {}).get(rec["ticker"])
+            if b is not None and len(b):
+                b = b[b.index <= pd.Timestamp(cdate)]
+                start = rec.get("fill_date") or rec.get("entry_date")
+                if len(b) and start and pd.Timestamp(str(start)[:10]) >= b.index[0] and b.index[-1].date().isoformat() == cdate and record_category(rec) in (CATEGORY_ACTION, CATEGORY_BUYSTOP):
+                    res = trade_sim.simulate(rec, b, None)
+                    for x in _V2_RESULT_KEYS:
+                        rec[x] = res.get(x)
+            had = rec.get("fill_price") is not None and str(rec.get("fill_date") or "") <= cdate
+            if not had:
+                for x in ("fill_date", "fill_price", "current_r", "return_pct"):
+                    rec[x] = None
+            price_ok = had and rec.get("last_close") is not None and str(rec.get("last_close_date") or "") <= cdate
             rec["deal_closed"] = {"date": row.get("date"), "how": row.get("how"), "buyer": row.get("buyer"), "had_position": had,
-                                  "price": rec.get("last_close") if had else None, "price_date": rec.get("last_close_date") if had else None,
-                                  "r": rec.get("current_r") if had else None, "return_pct": rec.get("return_pct") if had else None, "previous_status": rec.get("status")}
-            rec.update(status=DEAL_CLOSED, resolution_date=row.get("date") or (today or dt.date.today()).isoformat(), realized_r=None,
-                       exit_date=rec["deal_closed"]["price_date"], exit_price=rec["deal_closed"]["price"])
+                                  "price": rec.get("last_close") if price_ok else None, "price_date": rec.get("last_close_date") if price_ok else None,
+                                  "r": rec.get("current_r") if price_ok else None, "return_pct": rec.get("return_pct") if price_ok else None, "previous_status": rec.get("status")}
+            rec.update(status=DEAL_CLOSED, resolution_date=cdate, realized_r=None, exit_date=rec["deal_closed"]["price_date"], exit_price=rec["deal_closed"]["price"])
             done.append(k)
-        if done:
+        if done or repaired:
             _save_tracker(tracker)
-            print(f"[backtest] приключила сделка — записите излизат от книгите (извън статистиката): {sorted(done)}")
+            if done:
+                print(f"[backtest] приключила сделка — записите излизат от книгите (извън статистиката): {sorted(done)}")
+            if repaired:
+                print(f"[backtest] поправени записи „приключила сделка“ (орязана история на Yahoo, 10.11): {repaired}")
         return done
     except Exception as e:
         print(f"[backtest] приключилите сделки не се приложиха към книгите: {type(e).__name__}: {e}")
+        return []
+
+
+def daily_bars_for(tickers) -> dict:
+    """10.11.2026: дневните бари (3 месеца) за приключилите тикъри с живи записи — за цената на датата на приключването. Провал → {}."""
+    try:
+        ts = sorted(set(tickers or ()))
+        if not ts:
+            return {}
+        data = yf.download(ts, period="3mo", auto_adjust=False, group_by="ticker", progress=False, threads=True)
+        out = {}
+        for t in ts:
+            try:
+                d = (data[t] if len(ts) > 1 else data)[["Open", "High", "Low", "Close"]].dropna()
+                if len(d):
+                    d.index = pd.DatetimeIndex(d.index).tz_localize(None) if pd.DatetimeIndex(d.index).tz is not None else d.index
+                    out[t] = d
+            except Exception:
+                continue
+        return out
+    except Exception as e:
+        print(f"[backtest] дневните бари за приключилите сделки не се изтеглиха: {type(e).__name__}: {e}")
+        return {}
+
+
+def live_closed_tickers(closed: dict) -> list[str]:
+    """Тикърите с приключила сделка, които имат живи записи (за daily_bars_for)."""
+    try:
+        return sorted({r["ticker"] for r in _load_tracker().values() if isinstance(r, dict) and r.get("ticker") in (closed or {}) and r.get("status") in _RESOLVABLE_STATUSES})
+    except Exception:
         return []
 
 
@@ -1321,7 +1422,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         _migrate_qm_r_floor(tracker, today)
     except Exception as e:
         print(f"[backtest] qm_breakout: преизчисляването на R не успя: {type(e).__name__}: {e}")
-    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today) or _gw_needs_horizons(rec, today)]
+    try:                                                    # 10.11.2026: приключила сделка — не се резолвира (орязана история на Yahoo след делистването)
+        from src import spinoff_watch as _sw
+        _closed_t = set(_sw.closed_tickers())
+    except Exception:
+        _closed_t = set()
+    live_items = [(key, rec) for key, rec in tracker.items() if rec.get("ticker") not in _closed_t and (rec.get("status") in _RESOLVABLE_STATUSES or _gw_needs_exec_fill(rec, today) or _gw_needs_horizons(rec, today))]
     LAST_RESOLUTION = {"ok": True, "live": len(live_items)}
     if not live_items:
         return

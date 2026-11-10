@@ -589,7 +589,8 @@ def closed_tickers(today=None) -> dict[str, dict]:
 
 
 _DONE_RX = re.compile(r"\b(?:complet\w*|clos(?:es|ed)|finaliz\w*|owns|bought)\b", re.I)
-_NOT_DONE_RX = re.compile(r"\b(?:to\s+(?:complete|close|finalize)|expected|set\s+to|nears?|closer|closes\s+in\s+on|pending|approv\w*|plans?|agrees?|deal\s+talks|bid)\b", re.I)
+_NOT_DONE_RX = re.compile(r"\b(?:to\s+(?:complete|close|finalize)|expected|set\s+to|nears?|closer|closes\s+in\s+on|pending|approv\w*|plans?|agrees?|deal\s+talks|bid|"
+                          r"until|once|proposed|will|would|could|may|if|when|before|after|keeps?|remains?|independent\w*|awaits?|still)\b", re.I)    # 10.11.2026: CART
 
 
 def news_closed(t: str, hit: dict, items: list[dict], today: dt.date, name: str | None = None) -> dict | None:
@@ -601,14 +602,35 @@ def news_closed(t: str, hit: dict, items: list[dict], today: dt.date, name: str 
     word = next((w for w in re.findall(r"[A-Za-z][\w&'-]{2,}", name or "") if w.lower() not in ("the", "inc", "corp", "corporation", "group", "holdings", "company", "co")), None)
     target = lambda title: bool(re.search(rf"\b{re.escape(t)}\b", title) or (word and re.search(rf"\b{re.escape(word)}\b", title, re.I)))   # тикърът — точно (CART ≠ „cart“); името — без регистър
     since = (today - dt.timedelta(days=config.DEAL_NEWS_DAYS)).isoformat()
+    hits = []
     for it in items or []:
         title, pub = str(it.get("title") or ""), str(it.get("published") or it.get("date") or "")[:10]
         if pub and (pub < since or pub < (hit.get("announced") or "")):
             continue
         if target(title) and buyer and re.search(rf"\b{re.escape(buyer)}\b", title, re.I) \
                 and _DONE_RX.search(title) and re.search(r"acqui|takeover|deal|purchase|merger|owns|bought", title, re.I) and not _NOT_DONE_RX.search(title):
-            return {"date": pub or today.isoformat(), "how": f"новина: „{title[:90]}“"}
-    return None
+            src = (title.rsplit(" - ", 1)[1].strip() if " - " in title else str(it.get("source") or "")).lower()     # Google News: източникът е в края на заглавието
+            hits.append((pub, title, src))
+    # 10.11.2026: поне config.DEAL_NEWS_MIN_SOURCES различни източника — едно заглавие не стига (CART 09.11: „Until DoorDash’s proposed deal closes, Maplebear (CART) will keep operating
+    # independently.“ — Stock Titan — затвори висяща сделка; за ROKU на 06.11 — над 20 източника)
+    if len({s for _, _, s in hits if s}) < config.DEAL_NEWS_MIN_SOURCES:
+        return None
+    pub, title, _ = min(hits)
+    return {"date": pub or today.isoformat(), "how": f"новина: „{title[:90]}“"}
+
+
+def undo_news_closures(st: dict, before: str) -> list[str]:
+    """
+    10.11.2026: еднократно — приключванията само по новина отпреди по-строгото правило (CART 09.11, фалшиво) се връщат като висящи; следващата проверка ги затваря наново само при следа в EDGAR
+    или при заглавия от поне два източника. Мутира st; връща тикърите.
+    """
+    out = []
+    for t, r in list(st["closed"].items()):
+        if str(r.get("how") or "").startswith("новина:") and str(r.get("seen") or "") < before:
+            st["closed"].pop(t)
+            st["pending"][t] = {k: r.get(k) for k in ("buyer", "announced")} | {"filing_date": r.get("filing_date") or r.get("announced"), "seen": r.get("seen")}
+            out.append(t)
+    return out
 
 
 def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None, name_lookup=None) -> dict:
@@ -620,6 +642,11 @@ def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None, na
     out = {"ok": True, "checked": [], "closed": [], "pending": [], "error": None}
     try:
         st = load_state()
+        undone = undo_news_closures(st, config.DEAL_NEWS_RULE_FROM)                # 10.11.2026: CART — фалшиво приключване по едно заглавие
+        if undone:
+            save_state(st)
+            out["reopened"] = undone
+            print(f"[deal] върнати като висящи (приключване само по новина отпреди {config.DEAL_NEWS_RULE_FROM}): {undone}")
         cache = _load(pathlib.Path(config.DATA_DIR) / config.SPINOFF_CACHE_NAME, {})
         seed = {v.get("ticker") for v in (cache.get("merger_docs") or {}).values() if isinstance(v, dict) and v.get("hit")}
         ts = sorted((set(st["pending"]) | seed | set(extra or ())) - set(st["closed"]) - {None})
