@@ -231,6 +231,12 @@ def volume_note(res: dict) -> str | None:
     return f"Обемът в премаркета не е наличен (Yahoo){who} — провери го в първите минути"
 
 
+def red_8k(filings: list | None) -> list[str]:
+    """10.11.2026 (т. 1): червеното предупреждение за 8-K т. 4.02 — qm_ep.red_8k."""
+    from src import qm_ep
+    return qm_ep.red_8k(filings)
+
+
 def qm_ep_sources_note(row: dict) -> str | None:
     """04.11.2026 (С1): „8-K: не се провери (…) · заглавия: не се провериха (…)“ — qm_ep.sources_note."""
     from src import qm_ep
@@ -270,6 +276,7 @@ def email_html(res: dict) -> str:
                          + (f" · обем в премаркета {g['pm_volume']:,.0f}".replace(",", " ") if g.get("pm_volume") else "")
                          + (f" · {'пренебрегнат' if g.get('neglect') else 'не е пренебрегнат'} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
+                         + "".join(f"<br><b style='color:#991b1b'>{e(x)}</b>" for x in red_8k(g.get("filings_8k")))      # 10.11.2026 (т. 1)
                          + (f"<br><span style='color:#374151'>„{e(g['headline']['title'])}“" + (f" · {e(g['headline']['source'])}" if g["headline"].get("source") else "") + "</span>"
                             if g.get("headline") else "")
                          + (f"<br><span style='color:#92400e'>{e(qm_ep_sources_note(g))}</span>" if qm_ep_sources_note(g) else "")      # 04.11.2026 (С1)

@@ -1,0 +1,276 @@
+{
+ "_note": "РЕАЛНО: data/2026-11-10.json (сутрешният бриф 10.11, qm_ep — редовете AAON и SANM и not_neglected, както са записани) и data/preopen/2026-11-10.json (карето в 15:05 Берлин = 09:08 Ню Йорк, файлът цял). Извадени на 10.11.2026 за т. 1 (8-K т. 4.02 на AAON от 09.11 16:09 ET) и т. 2 (SANM изпада тихо от карето).",
+ "qm_ep": {
+  "ok": true,
+  "session": "2026-11-09",
+  "rows": [
+   {
+    "ticker": "SANM",
+    "session": "2026-11-09",
+    "prev_close": 149.63999938964844,
+    "ah_price": 179.8776,
+    "ah_high": 186.96,
+    "ah_low": 149.64,
+    "ah_bars": 21,
+    "ah_volume": null,
+    "ah_last_et": "19:55",
+    "gap_pct": 20.206897042023964,
+    "ret63_pct": -26.19482150942124,
+    "adr": 6.66708598499508,
+    "dollar_volume": 151219526.2853241,
+    "neglect": true,
+    "max_stop": 167.89,
+    "max_stop_pct": 6.7,
+    "liquid": true,
+    "levels": {
+     "strategy": "kullamagi",
+     "entry": 179.88,
+     "entry_label": "after-hours цена",
+     "stop": 167.89,
+     "stop_source": "adr",
+     "stop_source_text": "стоп за оразмеряване (макс. 1×ADR)",
+     "stop_pct": 6.67,
+     "adr_pct": 6.67,
+     "stop_note": "ориентировъчен — реалният стоп е дъното на деня на влизане",
+     "regime_factor": 1.0,
+     "regime_note": "отделна стратегия — без режимен фактор",
+     "warnings": []
+    },
+    "company": "Sanmina Corporation",
+    "filings_8k": [
+     {
+      "accepted_et": "2026-11-09 16:05",
+      "date": "2026-11-09",
+      "acc": "0000897723-26-000044",
+      "doc": "sanm-20261027.htm",
+      "items": [
+       [
+        "2.02",
+        "Results of Operations and Financial Condition",
+        "финансови резултати"
+       ],
+       [
+        "8.01",
+        "Other Events",
+        "други събития"
+       ]
+      ]
+     }
+    ],
+    "filings_error": null,
+    "headlines_error": null,
+    "headlines": [
+     {
+      "title": "8-K (SEC), 09.11 16:05 ET: 2.02 — финансови резултати; 8.01 — други събития",
+      "published": "2026-11-09 16:05",
+      "source": "SEC"
+     },
+     {
+      "title": "Sanmina (SANM) Q4 2026 Earnings Call Transcript",
+      "published": "2026-11-10 06:33"
+     },
+     {
+      "title": "Sanmina Corp (SANM) Q4 2026 Earnings Call Highlights: Record Revenue Surge and Ambitious FY2027 ...",
+      "published": "2026-11-10 05:10"
+     }
+    ],
+    "sources_note": null,
+    "catalyst": "earnings_guidance",
+    "catalyst_label": "Отчет / guidance",
+    "summary_bg": "Sanmina отчете рекордни приходи и даде силни насоки за FY2027, което изпрати акцията нагоре.",
+    "surprise": "yes",
+    "ah_volume_available": false
+   },
+   {
+    "ticker": "AAON",
+    "session": "2026-11-09",
+    "prev_close": 62.869998931884766,
+    "ah_price": 72.7048,
+    "ah_high": 73.12,
+    "ah_low": 62.87,
+    "ah_bars": 23,
+    "ah_volume": null,
+    "ah_last_et": "19:50",
+    "gap_pct": 15.643074972484982,
+    "ret63_pct": -26.707857511582844,
+    "adr": 7.001799884625748,
+    "dollar_volume": 92485025.24629593,
+    "neglect": true,
+    "max_stop": 67.61,
+    "max_stop_pct": 7.0,
+    "liquid": true,
+    "levels": {
+     "strategy": "kullamagi",
+     "entry": 72.7,
+     "entry_label": "after-hours цена",
+     "stop": 67.61,
+     "stop_source": "adr",
+     "stop_source_text": "стоп за оразмеряване (макс. 1×ADR)",
+     "stop_pct": 7.0,
+     "adr_pct": 7.0,
+     "stop_note": "ориентировъчен — реалният стоп е дъното на деня на влизане",
+     "regime_factor": 1.0,
+     "regime_note": "отделна стратегия — без режимен фактор",
+     "warnings": []
+    },
+    "company": "AAON, Inc.",
+    "filings_8k": [
+     {
+      "accepted_et": "2026-11-09 16:09",
+      "date": "2026-11-09",
+      "acc": "0000824142-26-000083",
+      "doc": "aaon-20261109.htm",
+      "items": [
+       [
+        "2.02",
+        "Results of Operations and Financial Condition",
+        "финансови резултати"
+       ],
+       [
+        "4.02",
+        "Non-Reliance on Previously Issued Financial Statements",
+        "отказ от предишни отчети"
+       ],
+       [
+        "7.01",
+        "Regulation FD Disclosure",
+        "оповестяване по Reg FD"
+       ]
+      ]
+     }
+    ],
+    "filings_error": null,
+    "headlines_error": null,
+    "headlines": [
+     {
+      "title": "8-K (SEC), 09.11 16:09 ET: 2.02 — финансови резултати; 4.02 — отказ от предишни отчети; 7.01 — оповестяване по Reg FD",
+      "published": "2026-11-09 16:09",
+      "source": "SEC"
+     },
+     {
+      "title": "AAON Inc (AAON) Q3 2026 Earnings Call Highlights: Record $707 Million Sales, Raised 72%-75% ...",
+      "published": "2026-11-10 05:10"
+     },
+     {
+      "title": "AAON Q3 Earnings Call Highlights",
+      "published": "2026-11-10 00:14"
+     }
+    ],
+    "sources_note": null,
+    "catalyst": "earnings_guidance",
+    "catalyst_label": "Отчет / guidance",
+    "summary_bg": "AAON отчете рекордни продажби от $707 милиона за Q3 2026 и повиши прогнозата си, акцията скочи.",
+    "surprise": "yes",
+    "ah_volume_available": false
+   }
+  ],
+  "not_neglected": []
+ },
+ "preopen": {
+  "date": "2026-11-10",
+  "time_ny": "09:08",
+  "time_berlin": "15:08",
+  "ok": true,
+  "diag": {
+   "tickers": 924,
+   "with_pm": 666,
+   "gappers": 1,
+   "zero_volume_share": 1.0,
+   "requested": 924
+  },
+  "gaps": [
+   {
+    "ticker": "AAON",
+    "session": "2026-11-09",
+    "prev_close": 62.869998931884766,
+    "pm_price": 72.0,
+    "pm_bars": 34,
+    "pm_volume": null,
+    "pm_last_ny": "09:07",
+    "gap_pct": 14.52,
+    "ret63_pct": -26.707857511582844,
+    "neglect": true,
+    "liquid": true,
+    "adr": 7.001799884625748,
+    "company": "AAON",
+    "filings_8k": [
+     {
+      "accepted_et": "2026-11-09 16:09",
+      "items": [
+       "2.02",
+       "4.02",
+       "7.01"
+      ],
+      "text": "8-K (SEC), 09.11 16:09 ET: 2.02 — финансови резултати; 4.02 — отказ от предишни отчети; 7.01 — оповестяване по Reg FD"
+     }
+    ],
+    "filings_error": null,
+    "headline": {
+     "title": "The Aaon Group Announces Quarterly Cash Dividend",
+     "source": null,
+     "published": "2026-11-10 12:00",
+     "link": null
+    },
+    "headlines_error": null
+   }
+  ],
+  "levels": [
+   {
+    "ticker": "KDP",
+    "what": "Чака пробив",
+    "kind": "над нивото",
+    "level": 36.95,
+    "pm_price": 37.16,
+    "pct": 0.57,
+    "pm_volume": null
+   },
+   {
+    "ticker": "KDP",
+    "what": "книга buy-stop",
+    "kind": "над нивото",
+    "level": 36.95,
+    "pm_price": 37.16,
+    "pct": 0.57,
+    "pm_volume": null
+   }
+  ],
+  "watch": [
+   {
+    "ticker": "BMNR",
+    "gap_pct": -3.33,
+    "pm_price": 17.99,
+    "prev_close": 18.61,
+    "close_src": "brief",
+    "pm_last_ny": "09:05",
+    "pm_volume": null
+   },
+   {
+    "ticker": "BLSH",
+    "gap_pct": -3.07,
+    "pm_price": 22.1,
+    "prev_close": 22.8,
+    "close_src": "brief",
+    "pm_last_ny": "08:35",
+    "pm_volume": null
+   }
+  ],
+  "notes": [],
+  "coverage": {
+   "with_pm": 666,
+   "requested": 924,
+   "batches": 10,
+   "batches_failed": 0,
+   "partial": false,
+   "reason": null
+  },
+  "session": "2026-11-09",
+  "sector_bounce": [],
+  "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+  "seconds": 85.0,
+  "email": {
+   "sent": true,
+   "subject": "Преди отварянето · 10.11 — 1 гапа, 2 нива, 2 наблюдавани",
+   "at_utc": "14:08"
+  }
+ }
+}

@@ -534,6 +534,7 @@
     <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
       {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
+      {% for x in red_8k(g.filings_8k) %}<br><span class="small" style="color:var(--red);font-weight:600">{{ x }}</span>{% endfor %}
       {% if g.headline %}<br><span class="small">„{{ g.headline.title }}“{% if g.headline.source %} · {{ g.headline.source }}{% endif %}</span>{% endif %}
       {# 04.11.2026 (четвърти преглед, С1): „не се провери“ (EDGAR / Yahoo паднаха) ≠ „няма“ — до 04.11 провалът излизаше като „без 8-K и без заглавие“ #}
       {% if g.filings_error %}<br><span class="small" style="color:var(--yellow)">8-K: не се провери ({{ g.filings_error }}) — липсата НЕ значи, че няма</span>{% endif %}
@@ -1641,6 +1642,8 @@
           <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
             <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: няма данни за обема</span>{% endif %}</div>
             {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}
+            {# 10.11.2026 (т. 1, AAON 09.11): 8-K т. 4.02 — отделно червено, не само в списъка с точки #}
+            {% for x in red_8k(r.filings_8k) %}<div class="qm-sm" style="font-family:inherit;color:var(--red);font-weight:600">{{ x }}</div>{% endfor %}
             {% if r.sources_note %}<div class="qm-sm" style="font-family:inherit;color:var(--yellow)">{{ r.sources_note }} — липсата НЕ значи, че няма</div>{% endif %}</td>
           <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
           <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span></td>

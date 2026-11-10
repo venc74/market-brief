@@ -332,6 +332,9 @@ QM_EP_BATCH = 100
 # „Electronic Components“, затова групата; другите индустрии — поотделно. Измерено: 0 попадения в 7-те after-hours гапа от дневника и в другите 2 пускания преди отварянето.
 EP_BOUNCE_MIN_GAPS = int(os.getenv("EP_BOUNCE_MIN_GAPS", 3))
 EP_INDUSTRY_GROUPS = {"Semiconductors": "полупроводници и компоненти", "Semiconductor Materials & Equipment": "полупроводници и компоненти", "Electronic Components": "полупроводници и компоненти"}
+# 10.11.2026 (т. 1, AAON 09.11): точки на 8-K, които излизат като ОТДЕЛНО червено предупреждение в EP реда (сутрин), карето в 15:05 и имейлите —
+# не само в списъка с точки. 4.02 = Non-Reliance on Previously Issued Financial Statements (предстои преизчисляване).
+EP_RED_8K_ITEMS = ["4.02"]
 PREOPEN_GAP_PCT = float(os.getenv("PREOPEN_GAP_PCT", 10.0))       # EP — гап нагоре в премаркета спрямо затварянето на предишната сесия
 PREOPEN_WATCH_GAP_PCT = float(os.getenv("PREOPEN_WATCH_GAP_PCT", 3.0))   # наблюдаваните — гап ± в премаркета
 PREOPEN_MIN_PM_BARS = 3                                          # поне толкова 5-минутни бара в премаркета (иначе няма реална търговия)

@@ -32,6 +32,13 @@ env = Environment(loader=FileSystemLoader(config.ROOT / "templates"),
 env.filters["field_words"] = sector_claims.field_words     # 19.10.2026 (т. 18): сурови имена на полета в прозата на модела → думи
 env.filters["horizon_text"] = sector_claims.horizon_text   # 19.10.2026 (т. 18): хоризонтът на модела ([4, 12], "2-6", 4) → текст
 env.globals["book_plan_note"] = setup_rules.book_plan_note   # 19.10.2026 (т. 18б): планът на книгата, когато се различава от днешния на картата
+def _red_8k(filings):
+    """10.11.2026 (т. 1, AAON 09.11): червеното предупреждение за 8-K т. 4.02 — qm_ep.red_8k (вносът е тук, без цикъл при зареждането)."""
+    from src import qm_ep
+    return qm_ep.red_8k(filings)
+
+
+env.globals["red_8k"] = _red_8k
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
@@ -763,7 +770,8 @@ def _qm_email_block(brief: dict) -> str:
                     rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(r["ticker"])}{badge if r["ticker"] in ours else ""}</td>'
                              f'<td style="{td};font-family:monospace;white-space:nowrap">AH +{r["gap_pct"]:.1f}%</td>'
                              f'<td style="{td}">{_e(hl)}<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
-                             f'{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</span></td>'
+                             f'{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</span>'
+                             + "".join(f'<br><b style="color:#991b1b">{_e(x)}</b>' for x in _red_8k(r.get("filings_8k"))) + '</td>'
                              f'<td style="{td};white-space:nowrap">3 м. {r["ret63_pct"]:+.0f}%<br><span style="color:#6b7280">стоп ${r["max_stop"]:.2f}'
                              f'{sz}</span></td></tr>')
                 body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'

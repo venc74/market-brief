@@ -647,6 +647,27 @@ def catalyst_sources(sym: str, session: str | None, since: dt.datetime, *, filin
     return out
 
 
+RED_8K_TEXT = {"4.02": "non-reliance: компанията обявява, че по-рано публикувани финансови отчети вече не са надеждни — предстои преизчисляване (restatement)"}
+
+
+def red_8k(filings: list | None) -> list[str]:
+    """
+    10.11.2026 (т. 1, AAON 09.11): отделни червени предупреждения за точките от config.EP_RED_8K_ITEMS (4.02) в 8-K на реда —
+    „⚠ 8-K т. 4.02 (09.11): non-reliance: …“. Приема и двата записа: сутрешния (items = [[код, en, bg], …]) и този в карето
+    преди отварянето (items = ["4.02", …]). Без 8-K или без такава точка → []. Чиста функция.
+    """
+    out = []
+    for f in filings or []:
+        codes = {(x if isinstance(x, str) else (x[0] if x else "")) for x in (f.get("items") or [])}
+        when = str(f.get("accepted_et") or f.get("date") or "")
+        for c in config.EP_RED_8K_ITEMS:
+            if c in codes:
+                line = f"⚠ 8-K т. {c}" + (f" ({when[8:10]}.{when[5:7]})" if len(when) >= 10 else "") + f": {RED_8K_TEXT.get(c, ITEMS_8K.get(c, ('', f'т. {c}'))[1])}"
+                if line not in out:
+                    out.append(line)
+    return out
+
+
 def sources_note(row: dict) -> str | None:
     """04.11.2026 (С1): „8-K: не се провери (EDGAR: TimeoutError) · заглавия: не се провериха (…)“ за реда; всичко проверено → None. Чиста функция."""
     parts = ([f"8-K: не се провери ({row['filings_error']})"] if row.get("filings_error") else []) + \
