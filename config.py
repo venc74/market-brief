@@ -523,6 +523,12 @@ MARKET_DAY_INDEXES = {"SPY": "SPY", "RSP": "RSP (равни тегла)", "IWM":
 PRE_REACTION_EARNINGS_ROWS = 12          # 06.11.2026 (т. 4): колко реда от get_earnings_dates (бъдещи + минали) — за етикета „преди реакцията на отчета“
 PRE_REACTION_BUDGET_SEC = float(os.getenv("PRE_REACTION_BUDGET_SEC", 120))    # таван за тегленето в един run; остатъкът — на следващия
 FUNDAMENTALS_NOT_CHECKED_SHOW = int(os.getenv("FUNDAMENTALS_NOT_CHECKED_SHOW", 5))    # 06.11.2026 (т. 2): колко от непроверените (над тавана 60) се назовават в брифа — с най-висок RS
+# 10.11.2026 (т. 7): кеш на фундаментите (Yahoo .info) по тикър до следващия отчет — датата е от същия отговор (earningsTimestampStart / earningsTimestamp
+# в бъдещето); валиден строго преди деня на отчета и най-много FUNDAMENTALS_CACHE_MAX_DAYS. Таванът от 60 (fundamental_screen) важи само за НОВИТЕ заявки.
+# Пазарната капитализация и P/E на запис от кеша — от днешната цена; таргетът, институционалният дял и short interest остават от деня на тегленето.
+FUNDAMENTALS_CACHE = os.getenv("FUNDAMENTALS_CACHE", "1") == "1"
+FUNDAMENTALS_CACHE_NAME = "fundamentals_cache.json"           # в config.DATA_DIR
+FUNDAMENTALS_CACHE_MAX_DAYS = int(os.getenv("FUNDAMENTALS_CACHE_MAX_DAYS", 100))
 SECTOR_MEGA_TECH_ETFS = ["XLK", "XLC"]
 SECTOR_BROAD_TEXT = "широка ротация извън мега-технологиите — средната акция бие индекса (RS е спрямо SPY, претеглен по капитализация)"
 

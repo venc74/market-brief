@@ -13,6 +13,9 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import pandas as pd
 import config
+import tempfile
+_tmp = tempfile.TemporaryDirectory(prefix="mb_canslim_unav_")                   # 10.11.2026: кешът на фундаментите (т. 7) е в config.DATA_DIR — тестът не пипа data/
+config.DATA_DIR = pathlib.Path(_tmp.name)
 from src import screener, data_warnings as dw
 
 INFO = json.loads((ROOT / "tests" / "fixtures" / "yahoo_info_DOCN_CORT_CRL_2026-10-07.json").read_text(encoding="utf-8"))["info"]

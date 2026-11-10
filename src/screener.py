@@ -9,6 +9,8 @@
 """
 from __future__ import annotations
 import io
+import json
+import datetime as dt
 import time
 import requests
 import pandas as pd
@@ -560,16 +562,108 @@ def _evaluate_technicals(sym: str, df: pd.DataFrame, spy: pd.Series, held: bool 
 # ──────────────────────────────────────────────────────────────────────────
 # Стъпка 2: Фундаментален CANSLIM филтър (само върху оцелелите)
 # ──────────────────────────────────────────────────────────────────────────
-def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dict]:
+# 10.11.2026 (т. 7): кешът на фундаментите — полетата на .info, които трябват на fundamental_screen; валиден до следващия отчет (config.FUNDAMENTALS_CACHE_*)
+_FUND_FIELDS = ("marketCap", "sharesOutstanding", "currentPrice", "regularMarketPrice", "earningsQuarterlyGrowth", "revenueGrowth", "returnOnEquity",
+                "longName", "sector", "industry", "longBusinessSummary", "trailingPE", "forwardPE", "trailingEps", "forwardEps", "debtToEquity",
+                "heldPercentInstitutions", "targetMeanPrice", "shortPercentOfFloat", "sharesShort", "shortRatio",
+                "earningsTimestamp", "earningsTimestampStart", "earningsTimestampEnd", "isEarningsDateEstimate")
+LAST_FUND_CACHE: dict = {}          # {"hits", "requests", "stored", "entries"} от последния fundamental_screen
+
+
+def fund_cache_path() -> pathlib.Path:
+    return pathlib.Path(config.DATA_DIR) / config.FUNDAMENTALS_CACHE_NAME
+
+
+def load_fund_cache() -> dict:
+    """{тикър: {fetched, next_report, info}}; липсващ / повреден файл → {} (graceful)."""
+    try:
+        d = json.loads(fund_cache_path().read_text(encoding="utf-8"))
+        return d.get("tickers") or {} if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_fund_cache(cache: dict, today: dt.date) -> None:
+    """Записва само валидните записи (изтеклите отпадат). Провал на записа — ред в лога, не чупи run-а."""
+    try:
+        keep = {t: e for t, e in sorted(cache.items()) if fund_cache_valid(e, today)}
+        fund_cache_path().write_text(json.dumps({"version": 1, "saved": today.isoformat(), "tickers": keep}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    except Exception as e:
+        print(f"[screener] кешът на фундаментите не се записа: {type(e).__name__}: {e}")
+
+
+def next_report_date(info: dict, today: dt.date) -> str | None:
+    """
+    Датата на следващия отчет от същия .info отговор: earningsTimestampStart (очакваният), иначе earningsTimestamp — само ако е СЛЕД днес (по Ню Йорк).
+    Реално (07.10, CORT): earningsTimestamp = 29.07 (последният), earningsTimestampStart = 04.11 (следващият). Без бъдеща дата → None (не се кешира).
+    """
+    for k in ("earningsTimestampStart", "earningsTimestamp"):
+        v = info.get(k)
+        if isinstance(v, (int, float)) and v > 1e9:
+            d = pd.Timestamp(v, unit="s", tz="UTC").tz_convert("America/New_York").date()
+            if d > today:
+                return d.isoformat()
+    return None
+
+
+def fund_cache_valid(entry: dict | None, today: dt.date) -> bool:
+    """Валиден: строго преди деня на отчета и не по-стар от config.FUNDAMENTALS_CACHE_MAX_DAYS."""
+    try:
+        return bool(entry) and today.isoformat() < entry["next_report"] and (today - dt.date.fromisoformat(entry["fetched"])).days <= config.FUNDAMENTALS_CACHE_MAX_DAYS
+    except Exception:
+        return False
+
+
+def info_from_cache(entry: dict, price: float | None) -> dict:
+    """
+    .info от кеша; пазарната капитализация и P/E — от днешната цена (sharesOutstanding × цена; цена / EPS), ако ги има; иначе от деня на тегленето.
+    """
+    info = dict(entry.get("info") or {})
+    p0 = info.get("currentPrice") or info.get("regularMarketPrice")
+    if price:
+        if info.get("sharesOutstanding"):
+            info["marketCap"] = info["sharesOutstanding"] * price
+        elif info.get("marketCap") and p0:
+            info["marketCap"] = info["marketCap"] * price / p0
+        if (info.get("trailingEps") or 0) > 0:
+            info["trailingPE"] = price / info["trailingEps"]
+        if (info.get("forwardEps") or 0) > 0:
+            info["forwardPE"] = price / info["forwardEps"]
+    return info
+
+
+def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.date | None = None, cache: dict | None = None) -> list[dict]:
+    """
+    CANSLIM фундаментите (Yahoo .info) за кандидатите по реда им (RS — setup_rules.fundamentals_priority).
+    10.11.2026 (т. 7): с кеша (config.FUNDAMENTALS_CACHE) тикър с валиден запис се оценява без заявка, където и да е в списъка; max_checks (60) е таванът
+    само на НОВИТЕ заявки — за първите непокрити от кеша. Всеки успешен отговор с бъдеща дата на отчета влиза в кеша. cache — за тестове (без файла).
+    """
     passed = []
     LAST_FUNDAMENTALS.clear()
-    for row in candidates[max_checks:]:
-        LAST_FUNDAMENTALS[row["ticker"]] = {"result": "not_checked", "text": f"извън първите {max_checks} за проверка на фундаментите (CANSLIM)"}
-    for row in candidates[:max_checks]:
+    today = today or dt.date.today()
+    use_cache = config.FUNDAMENTALS_CACHE
+    from_file = cache is None
+    cache = (load_fund_cache() if use_cache else {}) if cache is None else cache
+    hits = requests_n = stored = 0
+    for row in candidates:
         sym = row["ticker"]
+        entry = cache.get(sym) if use_cache else None
+        cached = fund_cache_valid(entry, today)
+        if not cached and requests_n >= max_checks:
+            LAST_FUNDAMENTALS[sym] = {"result": "not_checked", "text": f"извън първите {max_checks} за проверка на фундаментите (CANSLIM)"}
+            continue
         try:
-            tk = yf.Ticker(sym)
-            info = net_utils.fetch_with_timeout(lambda: tk.info) or {}
+            if cached:
+                info = info_from_cache(entry, row.get("price"))
+                hits += 1
+            else:
+                requests_n += 1
+                tk = yf.Ticker(sym)
+                info = net_utils.fetch_with_timeout(lambda: tk.info) or {}
+                nr = next_report_date(info, today) if use_cache and info.get("marketCap") else None
+                if nr:
+                    cache[sym] = {"fetched": today.isoformat(), "next_report": nr, "info": {k: info.get(k) for k in _FUND_FIELDS if info.get(k) is not None}}
+                    stored += 1
 
             mcap = info.get("marketCap") or 0
             if not mcap:                                             # 20.10.2026: празен .info (таймаут / Yahoo не върна) — не е оценен, не е "малка компания"
@@ -615,15 +709,23 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60) -> list[dic
             })
             passed.append(row)
             LAST_FUNDAMENTALS[sym] = {"result": "passed", "text": ""}
-            time.sleep(0.5)
+            if not cached:
+                time.sleep(0.5)
         except Exception as e:
             print(f"[screener] fundamentals {sym} failed: {e}")
             LAST_FUNDAMENTALS[sym] = {"result": "unavailable", "text": f"фундаментите (Yahoo .info) не се изтеглиха днес ({type(e).__name__}) — CANSLIM не е проверен"}
             continue
 
-    LAST_STATUS["fundamentals_checked"] = min(len(candidates), max_checks)
+    LAST_STATUS["fundamentals_checked"] = hits + requests_n
+    LAST_STATUS["fundamentals_cache"] = {"hits": hits, "requests": requests_n, "stored": stored}         # 10.11.2026 (т. 7)
+    LAST_FUND_CACHE.clear(); LAST_FUND_CACHE.update(hits=hits, requests=requests_n, stored=stored, entries=len(cache))
+    if use_cache and from_file and (stored or hits):
+        save_fund_cache(cache, today)
+    if use_cache:
+        print(f"[screener] фундаменти: {hits} от кеша, {requests_n} нови заявки (таван {max_checks}), {stored} нови в кеша")
     # 06.11.2026 (пакет 05–06.11, т. 2): кои не се проверяват заради тавана — броят и тези с най-висок RS (ред в брифа)
-    rest = sorted(candidates[max_checks:], key=lambda r: -(r.get("rs_rating") or 0))
+    # 10.11.2026 (т. 7): непроверените — без запис в кеша и след тавана на новите заявки
+    rest = sorted([r for r in candidates if LAST_FUNDAMENTALS.get(r["ticker"], {}).get("result") == "not_checked"], key=lambda r: -(r.get("rs_rating") or 0))
     LAST_STATUS["fundamentals_not_checked"] = {"n": len(rest), "max": max_checks, "top": [{"ticker": r["ticker"], "rs_rating": r.get("rs_rating")} for r in rest[:config.FUNDAMENTALS_NOT_CHECKED_SHOW]]}
     LAST_STATUS["fundamentals_unavailable"] = sorted(t for t, v in LAST_FUNDAMENTALS.items() if v["result"] == "unavailable")
     print(f"[screener] CANSLIM филтър: {len(passed)} финалисти"

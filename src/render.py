@@ -559,7 +559,10 @@ def fundamentals_note(status: dict | None) -> str | None:
     if not n:
         return None
     top = ", ".join(f'{x["ticker"]} (RS {x["rs_rating"]})' for x in nc.get("top") or [] if x.get("ticker"))
-    return (f'Фундаментите не са проверени за {n} {"име" if n == 1 else "имена"} (таван {nc.get("max")} заради Yahoo — проверяват се най-силните по RS)'
+    fc = (status or {}).get("fundamentals_cache") or {}                 # 10.11.2026 (т. 7): таванът е за новите заявки; записите от кеша не го броят
+    cap = (f'таван {nc.get("max")} нови заявки към Yahoo на ден — проверяват се най-силните по RS; още {fc["hits"]} — от кеша до следващия отчет'
+           if fc.get("hits") else f'таван {nc.get("max")} заради Yahoo — проверяват се най-силните по RS')
+    return (f'Фундаментите не са проверени за {n} {"име" if n == 1 else "имена"} ({cap})'
             + (f'; с най-висок RS от тях: {top}' if top else "") + " — те не са в списъците по-горе.")
 
 
