@@ -1001,7 +1001,7 @@ def backfill_fill_risk(tracker: dict) -> int:
 
 def fill_risk_block(records: list[dict]) -> dict | None:
     """06.11.2026 (т. 1): реалният риск при входа в книгата — {"n", "avg", "over": [{ticker, pct, target_r}]} (над STOP_MAX_PCT, с толеранс за закръгляне на цент). Без вход → None. Чиста функция."""
-    rows = [r for r in records if isinstance(r.get("fill_risk_pct"), (int, float))]
+    rows = [r for r in records if isinstance(r.get("fill_risk_pct"), (int, float)) and r.get("status") != DEAL_CLOSED]      # 10.11.2026: без „приключила сделка“ (ROKU)
     if not rows:
         return None
     over = [r for r in rows if r["fill_risk_pct"] > config.STOP_MAX_PCT + 0.05]
@@ -2304,7 +2304,7 @@ def get_backtest_summary() -> dict:
     return {
         "total_resolved": total_resolved,
         # 08.10: колко Action сигнала са записани във v2 книгата от старта (всички статуси: чакащи, отворени, затворени, незадействани, прескочени) — за заглавието на секцията
-        "action_signals": len(records),
+        "action_signals": sum(1 for r in records if r.get("status") != DEAL_CLOSED),      # 10.11.2026: без „приключила сделка“ — ROKU 09.11 (фантомът след приключването) не е сигнал
         "min_closed": min_closed, "stats_visible": stats_visible,
         "win_rate_pct": win_rate,
         "wins": len(wins) if stats_visible else None,
