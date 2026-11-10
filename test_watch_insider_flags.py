@@ -43,11 +43,13 @@ with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b, publish=False)
 txt = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 row = lambda t: txt(page[page.index(f'<span class="wt-t">{t}<'):page.index("</summary>", page.index(f'<span class="wt-t">{t}<'))])
-assert "CLUSTER продажби 25 · по план (10b5-1)" in row("CRCL") and "покупки 27 · по план (10b5-1)" in row("CRBG") and "CLUSTER покупки" not in row("CRBG")
-assert "покупки 3 · извънпланови · Chair and CEO $3.0 млн (26.10)" in row("ACN") and "CLUSTER продажби 9 · частично по план" in row("ACN")
+# 10.11.2026 (т. 5): в знака — броят ХОРА, не редовете (до 10.11: „CLUSTER продажби 25“, „покупки 27“; редовете остават в подсказката)
+assert "CLUSTER продажби · 5 души · по план (10b5-1)" in row("CRCL") and "покупки · 1 човек · по план (10b5-1)" in row("CRBG") and "CLUSTER покупки" not in row("CRBG")
+assert "покупки · 2 души · извънпланови · Chair and CEO $3.0 млн (26.10)" in row("ACN") and "CLUSTER продажби · 3 души · частично по план" in row("ACN")
+assert "Form 4 за 30 дни: 25 сделки, 5 инсайдъри" in page
 acn_det = page[page.index('<span class="wt-t">ACN<'):]; acn_det = acn_det[:acn_det.index("</details>")]
 assert acn_det.count("<tr>") == len(W["ACN"]["insider"]) + 1                                                       # таблицата: заглавие + ред на сделка
-print("  ✓ „CLUSTER продажби 25 · по план (10b5-1)“, „покупки 3 · извънпланови · Chair and CEO $3.0 млн (26.10)“; Form 4 таблицата — ред на сделка")
+print("  ✓ „CLUSTER продажби · 5 души · по план (10b5-1)“, „покупки · 2 души · извънпланови · Chair and CEO $3.0 млн (26.10)“; стар бриф — таблицата по ред на сделка")
 
 print()
 print("── 3. планът (СИНТЕТИЧНИ редици) ──")

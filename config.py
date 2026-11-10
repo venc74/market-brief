@@ -1197,6 +1197,10 @@ ENABLE_INSIDER_BUYING = os.getenv("ENABLE_INSIDER_BUYING", "1") == "1"
 INSIDER_MIN_VALUE = float(os.getenv("INSIDER_MIN_VALUE", 100_000))
 INSIDER_CLUSTER_WINDOW_DAYS = int(os.getenv("INSIDER_CLUSTER_WINDOW_DAYS", 14))
 INSIDER_CLUSTER_MIN_COUNT = int(os.getenv("INSIDER_CLUSTER_MIN_COUNT", 3))
+# 10.11.2026 (т. 5): флаг „продава ≥ N% от дела си“ за наблюдаваните тикъри — от кода (watch_monitor.big_sellers), независимо от 10b5-1; AI не пише „рутинно“, когато е вдигнат.
+# Дялът — по сметки за целия прозорец (WATCH_INSIDER_LOOKBACK_DAYS): ELF/AMIN 01.10 = три реда по 12.7%, 13.8%, 1.5% → 25.9% общо. Измерено 10.11 върху 22-та брифа с наблюдавани:
+# 6 от 22 двойки тикър–човек (ACN ×2, AI, DOCU, ELF, TDOC).
+INSIDER_BIG_SELL_PCT = float(os.getenv("INSIDER_BIG_SELL_PCT", 25.0))
 # Пакет 4б т.в: списъкът "Insider Buying" отпадна — маркер INS✓ върху НАШИ кандидати и позиции. Тегли се само за тях (не за целия S&P500+NDX100);
 # таван на тикърите на едно извикване (всеки тикър = 1 заявка към SEC submissions + XML на скорошните Form 4).
 INSIDER_MARKER_MAX_TICKERS = int(os.getenv("INSIDER_MARKER_MAX_TICKERS", 60))

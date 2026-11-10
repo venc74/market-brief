@@ -1977,18 +1977,35 @@ def strip_watch_causes(text: str, titles: str = "") -> tuple[str, list[dict]]:
     return " ".join(kept), gone
 
 
+def strip_routine(text: str) -> tuple[str, list[dict]]:
+    """
+    10.11.2026 (т. 5): изреченията с „рутин…“ (рутинно, рутинна, рутинни, рутинен) — махнати; за реда, в който кодът е вдигнал „продава ≥25% от дела си“
+    (watch_monitor.big_sellers). → (текстът без тях, [{term, removed}]). Чиста функция.
+    """
+    if not text:
+        return text, []
+    from src import news_aggregator as na
+    kept, gone = [], []
+    for sent in na._WHY_SENT.split(text):
+        (gone.append({"term": "рутин", "removed": sent}) if re.search(r"рутин", sent, re.I) else kept.append(sent))
+    return " ".join(kept), gone
+
+
 def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: float = 24) -> list[dict]:
     """Една група наблюдавани тикъри → [{**ред, "ai": {summary, insider_read, cross_reference}}]. Хвърля при провал (watch_ticker_digest го хваща за групата)."""
     compact = [{
         "ticker": r["ticker"],
         "news": [{"title": n["title"], "publisher": n["publisher"]} for n in r["news"]],
+        # 10.11.2026 (т. 5, CRCL 10.11: „54 продажби от 4 различни инсайдъра“): Form 4 по човек и ден (watch_monitor.person_days), броят хора отделно от редовете
         "insider": [{"code": t["code"], "date": t["date"],
                      "owner": t["owner_name"], "title": t["owner_title"],
                      "value_usd": round(t["value"]),
                      "pct_of_holdings": t["pct_of_holdings"],
-                     "planned_10b5_1": t["planned_10b5_1"]} for t in r["insider"]],
+                     "planned_10b5_1": t["planned_10b5_1"], "form4_rows": t.get("n", 1)} for t in (r["insider_days"] if "insider_days" in r else r["insider"])],
         "insider_cluster": r["insider_cluster"],
-        "insider_flags": [{k: f.get(k) for k in ("label", "n", "owners", "cluster", "plan")} for f in r.get("insider_flags") or []],   # 30.10.2026: по посока, с плана
+        "insider_flags": [{"label": f.get("label"), "people": f.get("owners"), "form4_rows": f.get("n"), "cluster": f.get("cluster"), "plan": f.get("plan")}
+                          for f in r.get("insider_flags") or []],   # 30.10.2026: по посока, с плана
+        "sells_25pct_of_stake": [{"title": b.get("title"), "pct_of_stake": b["pct"], "planned_10b5_1": b.get("planned_10b5_1")} for b in r.get("insider_big_sell") or []],
     } for r in rows]
 
     user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните {round(window_hours)} часа — от предишния бриф):
@@ -2022,6 +2039,12 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
 кратко. Това е най-силният сигнал в набора; кажи го изрично.
   • малък pct_of_holdings при продажба (под ~10%) отслабва тревожността дори \
 при голяма абсолютна сума — кажи дела; не гадай защо е продажбата.
+  • insider_flags.people — броят ХОРА; form4_rows — редовете във Form 4 (един \
+човек подава десетки редове за един ден). Казвай броя хора, НЕ броя \
+редове/транзакции/продажби. Редовете в "insider" са вече обединени по човек и ден.
+  • sells_25pct_of_stake (от кода) — човекът продава ≥25% от дела си. Тогава \
+НЕ пиши „рутинно“/„рутинна“ за тези продажби, дори по 10b5-1 — кажи, че \
+продава толкова процента от дела си.
   Ако няма транзакции, върни празен низ.
 
 - "cross_reference": САМО ако тикърът е ПРЯКО свързан с тема от списъка \
@@ -2051,6 +2074,11 @@ holdings (виж pct_of_holdings) или идва от CEO/CFO.
             removed += [{"field": k, **g} for g in gone]
             for g in gone:
                 print(f"[ai] watch {r['ticker']} {k}: „{g['term']}“ без опора — махнато «{g['removed'][:110]}»")
+        if r.get("insider_big_sell"):                             # 10.11.2026 (т. 5): ≥25% от дела → без „рутинно“, каквото и да е написал моделът
+            ai["insider_read"], gone = strip_routine(ai["insider_read"])
+            removed += [{"field": "insider_read", **g} for g in gone]
+            for g in gone:
+                print(f"[ai] watch {r['ticker']} insider_read: „рутин…“ при продажба ≥{config.INSIDER_BIG_SELL_PCT:g}% от дела — махнато «{g['removed'][:110]}»")
         annotated.append({**r, "ai": ai, **({"ai_removed": removed} if removed else {})})
     linked = sum(1 for a in annotated if a["ai"]["cross_reference"])
     print(f"[ai] watch_ticker_digest: група {', '.join(r['ticker'] for r in rows)} — {len(annotated)} тикъра, {linked} с cross-reference")

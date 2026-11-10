@@ -342,6 +342,78 @@ def insider_flags(txns: list[dict]) -> list[dict]:
     return out
 
 
+def stake_sold_pct(txns: list[dict]) -> float | None:
+    """
+    10.11.2026 (т. 5): колко % от дела си е продал (купил) човекът по редовете — по сметки. Всеки ред на Form 4 носи броя акции след сделката; поредните
+    сделки в една сметка се свързват (преди = след на предишния ред), а отделните сметки (пряко / тръст) са отделни вериги. Началото на всяка верига е
+    „преди“, което не е „след“ на друг ред (мултимножество — без значение от реда на редовете). Дялът = продадени / сбора на началата. Ред без „след“ → None.
+    Реално: CRCL, Allaire 05.11 — пряко 277 560 → … и четири тръста по ~58 798 → 57 282. Чиста функция.
+    """
+    import collections
+    xs = [t for t in txns or [] if t.get("shares")]
+    if not xs or any(t.get("shares_after") is None for t in xs):
+        return None
+    before = collections.Counter(round(float(t["shares"]) + float(t["shares_after"])) for t in xs)
+    after = collections.Counter(round(float(t["shares_after"])) for t in xs)
+    start = sum(k * v for k, v in (before - after).items())
+    return round(sum(float(t["shares"]) for t in xs) / start * 100, 1) if start > 0 else None
+
+
+def _plan_of(xs: list[dict]):
+    pl = {t.get("planned_10b5_1") for t in xs}
+    return next(iter(pl)) if len(pl) == 1 else None
+
+
+def person_days(txns: list[dict]) -> list[dict]:
+    """
+    10.11.2026 (т. 5, CRCL): редовете на Form 4, обединени по човек, ден и посока — {date, code, owner_name, owner_title, is_director, is_officer, n, shares, value,
+    pct_of_holdings (stake_sold_pct за деня), planned_10b5_1 (общото; смесено → None), plan_mixed}. На 10.11 CRCL имаше 54 реда от 4 души → 7 реда.
+    Нови първо, после по сума. Чиста функция.
+    """
+    groups: dict = {}
+    for t in txns or []:
+        k = (str(t.get("date"))[:10], t.get("code"), t.get("owner_name"))
+        groups.setdefault(k, []).append(t)
+    out = []
+    for (d, code, owner), xs in groups.items():
+        out.append({"date": d, "code": code, "owner_name": owner, "owner_title": xs[0].get("owner_title"), "is_director": any(t.get("is_director") for t in xs),
+                    "is_officer": any(t.get("is_officer") for t in xs), "n": len(xs), "shares": sum(float(t.get("shares") or 0) for t in xs),
+                    "value": round(sum(float(t.get("value") or 0) for t in xs), 2), "pct_of_holdings": stake_sold_pct(xs),
+                    "planned_10b5_1": _plan_of(xs), "plan_mixed": len({t.get("planned_10b5_1") for t in xs}) > 1})
+    out.sort(key=lambda r: (r["date"], r["value"]), reverse=True)
+    return out
+
+
+def big_sellers(txns: list[dict], pct: float | None = None) -> list[dict]:
+    """
+    10.11.2026 (т. 5): кой продава ≥ config.INSIDER_BIG_SELL_PCT % от дела си за прозореца — от кода, независимо от 10b5-1 (и планова продажба на четвърт от дела
+    не е „рутинна“). → [{owner, title, pct, value, n, first, last, planned_10b5_1}], по дела. Чиста функция.
+    """
+    lim = config.INSIDER_BIG_SELL_PCT if pct is None else pct
+    by: dict = {}
+    for t in txns or []:
+        if t.get("code") == "S":
+            by.setdefault(t.get("owner_name"), []).append(t)
+    out = []
+    for owner, xs in by.items():
+        p = stake_sold_pct(xs)
+        if p is not None and p >= lim:
+            ds = sorted(str(t.get("date"))[:10] for t in xs)
+            out.append({"owner": owner, "title": xs[0].get("owner_title") or ("директор" if any(t.get("is_director") for t in xs) else ""), "pct": p,
+                        "value": round(sum(float(t.get("value") or 0) for t in xs)), "n": len(xs), "first": ds[0], "last": ds[-1], "planned_10b5_1": _plan_of(xs)})
+    out.sort(key=lambda b: -b["pct"])
+    return out
+
+
+def big_sell_text(b: dict) -> str:
+    """„продава ≥25% от дела си: Chief Financial Officer — 31.3% ($1.2 млн, 22.10; по план 10b5-1)“ — страницата."""
+    v = f"${b['value'] / 1e6:.1f} млн" if b["value"] >= 1e6 else f"${b['value']:,.0f}"
+    d = f"{b['first'][8:10]}.{b['first'][5:7]}" + (f"–{b['last'][8:10]}.{b['last'][5:7]}" if b["last"] != b["first"] else "")
+    plan = {True: "; по план 10b5-1", False: "; извънпланова"}.get(b.get("planned_10b5_1"), "")
+    who = b.get("title") or b.get("owner") or "инсайдър"
+    return f"продава ≥{config.INSIDER_BIG_SELL_PCT:g}% от дела си: {who} — {b['pct']:g}% ({v}, {d}{plan})"
+
+
 def _insider_cluster(txns: list[dict]) -> bool:
     """≥ INSIDER_CLUSTER_MIN_COUNT РАЗЛИЧНИ инсайдъри в клъстер прозореца."""
     if not txns:
@@ -401,6 +473,8 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
             "insider": [{**t, "date": t["date"].isoformat()} for t in txns],
             "insider_cluster": _insider_cluster(txns),
             "insider_flags": insider_flags(txns),                   # 30.10.2026: по посока — покупки / продажби, с плана
+            "insider_days": person_days(txns),                      # 10.11.2026 (т. 5): по човек и ден (CRCL: 54 реда → 7)
+            "insider_big_sell": big_sellers(txns),                  # 10.11.2026 (т. 5): ≥25% от дела — от кода, независимо от 10b5-1
             "quiet": not news and not txns,
             "event": bool(news or new_f4), "f4_new": len(new_f4),               # 03.11.2026 (т. 5): AI коментар само при новина или нов Form 4
         })
