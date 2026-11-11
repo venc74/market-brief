@@ -328,7 +328,10 @@ QM_REPLAY_STATS = {"period": "02.01.2024–01.10.2026", "trades": 244, "avg_r": 
 ENABLE_QM_EP = os.getenv("ENABLE_QM_EP", "1") == "1"
 QM_EP_GAP_PCT = float(os.getenv("QM_EP_GAP_PCT", 10.0))          # негово: гап нагоре ≥ 10% (тук — after-hours цена спрямо затварянето)
 QM_EP_NEGLECT_RET63_PCT = float(os.getenv("QM_EP_NEGLECT_RET63_PCT", 20.0))   # "пренебрегване": ръст за предходните ~3 месеца ≤ 20%
-QM_EP_STOP_ADR = float(os.getenv("QM_EP_STOP_ADR", 1.0))         # информация: максимален стоп 1× ADR (негово: 1×, най-много 1.5×)
+QM_EP_STOP_ADR = float(os.getenv("QM_EP_STOP_ADR", 1.0))
+# 11.11.2026 (т. 3): ръст за 3 месеца под −30% → етикет „сринала се, не забравена“ вместо „пренебрегната“ (CRWV −55%, NBIS −48% на 11.11; сутрин FN −41% на 03.11,
+# в 15:05 — LRCX, SITM, MKSI, COHR на 06.11). Само етикет — включването в EP не се променя (QM_EP_NEGLECT_RET63_PCT).
+QM_EP_CRASHED_RET63_PCT = float(os.getenv("QM_EP_CRASHED_RET63_PCT", -30.0))         # информация: максимален стоп 1× ADR (негово: 1×, най-много 1.5×)
 QM_EP_MAX_ROWS = int(os.getenv("QM_EP_MAX_ROWS", 10))
 QM_EP_EDGAR_8K = os.getenv("QM_EP_EDGAR_8K", "1") == "1"         # 21.10.2026 (етап 4): 8-K на компанията, приет след затварянето (EDGAR, config.EDGAR_UA) — първият ред и доказателството за катализатора
 QM_EP_MIN_AH_BARS = 3                                            # поне толкова 5-минутни after-hours бара (иначе няма реална търговия)

@@ -48,6 +48,15 @@ def _big_sell_text(b):
 
 
 env.globals["big_sell_text"] = _big_sell_text
+
+
+def _neglect_label(ret63_pct, neglect):
+    """11.11.2026 (т. 3): „сринала се, не забравена“ под −30% за 3 месеца — qm_ep.neglect_label."""
+    from src import qm_ep
+    return qm_ep.neglect_label(ret63_pct, neglect)
+
+
+env.globals["neglect_label"] = _neglect_label
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
@@ -670,7 +679,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_partial_days=config.QM_PARTIAL_DAYS, qm_partial_fraction=config.QM_PARTIAL_FRACTION, qm_trail_switch=config.QM_TRAIL_ADR_SWITCH,
         qm_r_floor=f"{config.QM_R_RISK_FLOOR_ADR:g}",                    # 12.10: подът на знаменателя на R в книгата qm_breakout
         qm_replay=config.QM_REPLAY_STATS,                                  # 12.10: числата от реплея с новата формула (банерът на секцията)
-        insider_big_sell_pct=config.INSIDER_BIG_SELL_PCT, preopen_econ_since=config.PREOPEN_ECON_SINCE_NY, qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
+        qm_ep_crashed=config.QM_EP_CRASHED_RET63_PCT, insider_big_sell_pct=config.INSIDER_BIG_SELL_PCT, preopen_econ_since=config.PREOPEN_ECON_SINCE_NY, qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
@@ -785,7 +794,9 @@ def _qm_email_block(brief: dict) -> str:
                              f'<td style="{td}">{_e(hl)}<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
                              f'{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</span>'
                              + "".join(f'<br><b style="color:#991b1b">{_e(x)}</b>' for x in _red_8k(r.get("filings_8k"))) + '</td>'
-                             f'<td style="{td};white-space:nowrap">3 м. {r["ret63_pct"]:+.0f}%<br><span style="color:#6b7280">стоп ${r["max_stop"]:.2f}'
+                             f'<td style="{td};white-space:nowrap">3 м. {r["ret63_pct"]:+.0f}%'
+                             + (f'<br><span style="color:#92400e">{_e(_neglect_label(r["ret63_pct"], r.get("neglect")))}</span>' if r["ret63_pct"] < config.QM_EP_CRASHED_RET63_PCT else "")      # 11.11.2026 (т. 3)
+                             + f'<br><span style="color:#6b7280">стоп ${r["max_stop"]:.2f}'
                              f'{sz}</span></td></tr>')
                 body += f'<table width="100%" cellpadding="0" cellspacing="0">{rows}</table>'
             else:

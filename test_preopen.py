@@ -59,7 +59,7 @@ assert preopen.filing_line(syn) == ("8-K (SEC), 03.11 07:01 ET: 1.01 — същ�
 assert preopen.filing_line({"accepted_et": "2026-11-03 07:01", "items": []}).endswith("ET: без точки")
 assert preopen.filing_line(FX["filings"]["LSCC"][0]) == qm_ep.filing_headline(FX["filings"]["LSCC"][0])["title"]                 # един текст и в сутрешната EP карта (т. 0б)
 print("  ✓ 8-K: „2.02 — финансови резултати“ — същият ред като в сутрешната EP карта; 1.01 / 2.01 / 7.01 / 8.01 с превод, непознатата — само номерът")
-print("  ✓ LSCC +13.5% (пренебрегнат, 3 мес. −31%) — 8-K т. 2.02 в 16:27 ET; AEIS +12.5% — 8-K т. 2.02 в 16:03 ET и „Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“; FN — под 10%")
+print("  ✓ LSCC +13.5% (сринала се, не забравена, 3 мес. −31%) — 8-K т. 2.02 в 16:27 ET; AEIS +12.5% — 8-K т. 2.02 в 16:03 ET и „Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“; FN — под 10%")
 
 print()
 print("── 3. наблюдаваните (РЕАЛНО: ELF, CRCL под ±3% в 09:05) ──")
@@ -109,10 +109,10 @@ with q():
     hdr = render.render_dashboard(b, publish=False, generated=preopen.morning_generated("<div>понеделник · генериран 07:34 CET</div>"))
 assert "генериран 07:34 CET · обновено преди отварянето 15:05 CET" in hdr                                                  # заглавието пази часа на сутрешния бриф
 assert preopen.morning_generated(hdr) == ("07:34", "CET") and preopen.morning_generated(None) is None                     # и при второ пускане — пак сутрешният
-assert "LSCC +13.5% ($108.32 в 09:00 Ню Йорк; затваряне $95.44) · пренебрегнат (3 мес. -31%) 8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати" in page
+assert "LSCC +13.5% ($108.32 в 09:00 Ню Йорк; затваряне $95.44) · сринала се, не забравена (3 мес. -31%) 8-K (SEC), 02.11 16:27 ET: 2.02 — финансови резултати" in page
 assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“" in page
 mail = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(res))))
-assert mail.startswith(" Преди отварянето · 03.11, 09:05 Ню Йорк (15:05 Берлин)") and "AEIS +12.5% ($244.30; затваряне $217.19) · пренебрегнат (3 мес. -36%)" in mail
+assert mail.startswith(" Преди отварянето · 03.11, 09:05 Ню Йорк (15:05 Берлин)") and "AEIS +12.5% ($244.30; затваряне $217.19) · сринала се, не забравена (3 мес. -36%)" in mail
 assert "„Advanced Energy (AEIS) Q3 2026 Earnings Call Transcript“ " in mail and "Transcript“ ·" not in mail                  # без празен източник
 quiet = {**res, "gaps": [], "levels": [], "watch": [], "volume_note": None}
 b["preopen"] = quiet
@@ -140,8 +140,8 @@ v = {**res, "gaps": [{**res["gaps"][0], "pm_volume": 12345.0}], "volume_note": N
 b["preopen"] = v
 with q():
     p4 = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", render.render_dashboard(b, publish=False))))
-assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in p4 and "⚠ Обемът" not in p4
-assert "затваряне $95.44) · обем в премаркета 12 345 · пренебрегнат" in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(v))))
+assert "затваряне $95.44) · обем в премаркета 12 345 · сринала се, не забравена" in p4 and "⚠ Обемът" not in p4
+assert "затваряне $95.44) · обем в премаркета 12 345 · сринала се, не забравена" in re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", preopen.email_html(v))))
 b["preopen"] = {**res, "gaps": [], "watch": [{"ticker": "ELF", "gap_pct": -3.2, "pm_price": 107.1, "prev_close": 110.63, "close_src": "5m", "pm_last_ny": "09:00", "pm_volume": None},
                                        {"ticker": "CRCL", "gap_pct": 4.0, "pm_price": 74.96, "prev_close": 72.08, "close_src": "brief", "pm_last_ny": "09:00", "pm_volume": None}]}   # СИНТЕТИЧНО
 with q():

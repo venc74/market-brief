@@ -537,7 +537,7 @@
   {% for x in preopen.sector_bounce or [] %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">{{ x.text }}</div>{% endfor %}
   <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
     <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
-      {% if g.ret63_pct is not none %}· {% if g.neglect %}пренебрегнат{% else %}не е пренебрегнат{% endif %} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
+      {% if g.ret63_pct is not none %}· {{ neglect_label(g.ret63_pct, g.neglect) }} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
       {% for x in red_8k(g.filings_8k) %}<br><span class="small" style="color:var(--red);font-weight:600">{{ x }}</span>{% endfor %}
       {% if g.headline %}<br><span class="small">„{{ g.headline.title }}“{% if g.headline.source %} · {{ g.headline.source }}{% endif %}</span>{% endif %}
@@ -1660,7 +1660,7 @@
             {# 10.11.2026 (т. 1, AAON 09.11): 8-K т. 4.02 — отделно червено, не само в списъка с точки #}
             {% for x in red_8k(r.filings_8k) %}<div class="qm-sm" style="font-family:inherit;color:var(--red);font-weight:600">{{ x }}</div>{% endfor %}
             {% if r.sources_note %}<div class="qm-sm" style="font-family:inherit;color:var(--yellow)">{{ r.sources_note }} — липсата НЕ значи, че няма</div>{% endif %}</td>
-          <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%</td>
+          <td class="n">{{ "%+.0f"|format(r.ret63_pct) }}%{% if r.ret63_pct < qm_ep_crashed %}<div class="qm-sm" style="font-family:inherit;color:var(--yellow)">{{ neglect_label(r.ret63_pct, r.neglect) }}</div>{% endif %}</td>
           <td class="n">${{ "%.2f"|format(r.max_stop) }} <span class="qm-sm">(−{{ "%.1f"|format(r.max_stop_pct) }}%)</span></td>
         </tr>
         {% if r.levels %}<tr class="qm-lv-row"><td colspan="5">{{ levels_block(r.levels) }}</td></tr>{% endif %}

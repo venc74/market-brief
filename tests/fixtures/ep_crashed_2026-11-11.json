@@ -1,0 +1,191 @@
+{
+ "_note": "РЕАЛНО: preopen — data/preopen/2026-11-11.json (карето в 09:06 Ню Йорк: CRWV +13.4% при −55% за 3 месеца, NBIS +10.9% при −48%; файлът цял); qm_ep_2026_11_03 — data/2026-11-03.json → qm_ep (сутрешните EP редове; FN при −41% за 3 месеца). Извадени 11.11.2026 за т. 3.",
+ "preopen": {
+  "date": "2026-11-11",
+  "time_ny": "09:06",
+  "time_berlin": "15:06",
+  "ok": true,
+  "diag": {
+   "tickers": 924,
+   "with_pm": 604,
+   "gappers": 2,
+   "zero_volume_share": 1.0,
+   "requested": 925
+  },
+  "gaps": [
+   {
+    "ticker": "CRWV",
+    "session": "2026-11-10",
+    "prev_close": 48.72999954223633,
+    "pm_price": 55.27,
+    "pm_bars": 46,
+    "pm_volume": null,
+    "pm_last_ny": "09:05",
+    "gap_pct": 13.42,
+    "ret63_pct": -54.76654782903614,
+    "neglect": true,
+    "liquid": true,
+    "adr": 10.48406169782805,
+    "company": "CRWV",
+    "filings_8k": [
+     {
+      "accepted_et": "2026-11-10 16:05",
+      "items": [
+       "2.02"
+      ],
+      "text": "8-K (SEC), 10.11 16:05 ET: 2.02 — финансови резултати"
+     }
+    ],
+    "filings_error": null,
+    "headline": {
+     "title": "Little-Known CoreWeave CEO Line Helps Fuel 15% CRWV Stock Rally",
+     "source": null,
+     "published": "2026-11-11 13:52",
+     "link": null
+    },
+    "headlines_error": null
+   },
+   {
+    "ticker": "NBIS",
+    "session": "2026-11-10",
+    "prev_close": 134.0,
+    "pm_price": 148.6,
+    "pm_bars": 46,
+    "pm_volume": null,
+    "pm_last_ny": "09:05",
+    "gap_pct": 10.9,
+    "ret63_pct": -48.302471570499016,
+    "neglect": true,
+    "liquid": true,
+    "adr": 9.659255658575194,
+    "company": "NBIS",
+    "filings_8k": [],
+    "filings_error": null,
+    "headline": {
+     "title": "NBIS Stock Jumps Over 11% On CoreWeave Boost: Analysts Expect Over Six-Fold Growth In Sales In Upcoming Q3 Report",
+     "source": null,
+     "published": "2026-11-11 08:15",
+     "link": null
+    },
+    "headlines_error": null
+   }
+  ],
+  "levels": [],
+  "watch": [
+   {
+    "ticker": "BFLY",
+    "gap_pct": 3.99,
+    "pm_price": 6.77,
+    "prev_close": 6.51,
+    "close_src": "brief",
+    "pm_last_ny": "08:35",
+    "pm_volume": null
+   }
+  ],
+  "notes": [],
+  "coverage": {
+   "with_pm": 604,
+   "requested": 925,
+   "batches": 10,
+   "batches_failed": 0,
+   "partial": false,
+   "reason": null
+  },
+  "session": "2026-11-10",
+  "sector_bounce": [],
+  "ep_morning": [],
+  "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+  "econ": [
+   {
+    "title": "Fed's Goolsbee calls inflation report 'borderline disturbing' as central bank weighs more hikes",
+    "source": "CNBC",
+    "kind": "CPI",
+    "published": "2026-11-11T13:50Z",
+    "time_ny": "08:50",
+    "time_berlin": "14:50",
+    "link": "https://www.cnbc.com/2026/11/11/goolsbee-october-inflation-fed-rates-disturbing-distressing.html"
+   }
+  ],
+  "seconds": 41.7,
+  "email": {
+   "sent": true,
+   "subject": "Преди отварянето · 11.11 — 2 гапа, 1 наблюдавани",
+   "at_utc": "14:06"
+  }
+ },
+ "qm_ep_2026_11_03": {
+  "ok": true,
+  "session": "2026-11-02",
+  "rows": [
+   {
+    "ticker": "FN",
+    "session": "2026-11-02",
+    "prev_close": 314.70001220703125,
+    "ah_price": 347.5,
+    "ah_high": 359.6,
+    "ah_low": 308.67,
+    "ah_bars": 41,
+    "ah_volume": null,
+    "ah_last_et": "19:55",
+    "gap_pct": 10.422620438727748,
+    "ret63_pct": -40.737812393826665,
+    "adr": 6.66788913931291,
+    "dollar_volume": 396181370.5105591,
+    "neglect": true,
+    "max_stop": 324.33,
+    "max_stop_pct": 6.7,
+    "liquid": true,
+    "levels": {
+     "strategy": "kullamagi",
+     "entry": 347.5,
+     "entry_label": "after-hours цена",
+     "stop": 324.33,
+     "stop_source": "adr",
+     "stop_source_text": "стоп за оразмеряване (макс. 1×ADR)",
+     "stop_pct": 6.67,
+     "adr_pct": 6.67,
+     "stop_note": "ориентировъчен — реалният стоп е дъното на деня на влизане",
+     "regime_factor": 1.0,
+     "regime_note": "отделна стратегия — без режимен фактор",
+     "warnings": []
+    },
+    "company": "FN",
+    "filings_8k": [
+     {
+      "accepted_et": "2026-11-02 16:30",
+      "date": "2026-11-02",
+      "acc": "0001408710-26-000034",
+      "doc": "fn-20261102.htm",
+      "items": [
+       [
+        "2.02",
+        "Results of Operations and Financial Condition",
+        "резултати от дейността"
+       ]
+      ]
+     }
+    ],
+    "headlines": [
+     {
+      "title": "8-K (SEC), 02.11 16:30 ET: т. 2.02 — резултати от дейността",
+      "published": "2026-11-02 16:30",
+      "source": "SEC"
+     },
+     {
+      "title": "Fabrinet (FN) Q1 2027 Earnings Call Transcript",
+      "published": "2026-11-03 04:59"
+     },
+     {
+      "title": "Fabrinet: Fiscal Q1 Earnings Snapshot",
+      "published": "2026-11-03 04:25"
+     }
+    ],
+    "catalyst": "earnings_guidance",
+    "catalyst_label": "Отчет / guidance",
+    "summary_bg": "Fabrinet отчете резултати за първото тримесечие на фискална 2027 г., движени от търсенето в центровете за данни, надминавайки очакванията.",
+    "surprise": "yes",
+    "ah_volume_available": false
+   }
+  ]
+ }
+}

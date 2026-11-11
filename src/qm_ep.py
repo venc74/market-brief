@@ -668,6 +668,18 @@ def red_8k(filings: list | None) -> list[str]:
     return out
 
 
+def neglect_label(ret63_pct, neglect) -> str | None:
+    """
+    11.11.2026 (т. 3): думата за ръста за 3 месеца — „сринала се, не забравена“ под config.QM_EP_CRASHED_RET63_PCT (−30%): спад от 50% не е „пренебрегване“, а срив,
+    който пазарът помни (CRWV −55%, NBIS −48% на 11.11). Иначе „пренебрегнат“ / „не е пренебрегнат“; без данни → None. Чиста функция.
+    """
+    if ret63_pct is None:
+        return None
+    if ret63_pct < config.QM_EP_CRASHED_RET63_PCT:
+        return "сринала се, не забравена"
+    return "пренебрегнат" if neglect else "не е пренебрегнат"
+
+
 def sources_note(row: dict) -> str | None:
     """04.11.2026 (С1): „8-K: не се провери (EDGAR: TimeoutError) · заглавия: не се провериха (…)“ за реда; всичко проверено → None. Чиста функция."""
     parts = ([f"8-K: не се провери ({row['filings_error']})"] if row.get("filings_error") else []) + \

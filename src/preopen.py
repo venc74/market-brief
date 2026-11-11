@@ -287,6 +287,12 @@ def volume_note(res: dict) -> str | None:
     return f"Обемът в премаркета не е наличен (Yahoo){who} — провери го в първите минути"
 
 
+def neglect_label(ret63_pct, neglect) -> str | None:
+    """11.11.2026 (т. 3): „сринала се, не забравена“ / „пренебрегнат“ / „не е пренебрегнат“ — qm_ep.neglect_label."""
+    from src import qm_ep
+    return qm_ep.neglect_label(ret63_pct, neglect)
+
+
 def _pending_deals() -> set:
     """11.11.2026 (т. 1): висящите сделки (data/deal_state.json) — graceful: провал → празно."""
     try:
@@ -443,7 +449,7 @@ def email_html(res: dict) -> str:
         parts += [f"<div style='margin:4px 0;color:#92400e'>{e(x['text'])}</div>" for x in res.get("sector_bounce") or []]      # 06.11.2026 (т. 10)
         parts.append(li([f"<b>{e(g['ticker'])}</b> {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
                          + (f" · обем в премаркета {g['pm_volume']:,.0f}".replace(",", " ") if g.get("pm_volume") else "")
-                         + (f" · {'пренебрегнат' if g.get('neglect') else 'не е пренебрегнат'} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")
+                         + (f" · {neglect_label(g['ret63_pct'], g.get('neglect'))} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")      # 11.11.2026 (т. 3)
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
                          + "".join(f"<br><b style='color:#991b1b'>{e(x)}</b>" for x in red_8k(g.get("filings_8k")))      # 10.11.2026 (т. 1)
                          + (f"<br><span style='color:#374151'>„{e(g['headline']['title'])}“" + (f" · {e(g['headline']['source'])}" if g["headline"].get("source") else "") + "</span>"
