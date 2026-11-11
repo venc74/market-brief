@@ -1,0 +1,113 @@
+{
+ "date": "2026-11-11",
+ "time_ny": "09:06",
+ "time_berlin": "15:06",
+ "ok": true,
+ "diag": {
+  "tickers": 924,
+  "with_pm": 604,
+  "gappers": 2,
+  "zero_volume_share": 1.0,
+  "requested": 925
+ },
+ "gaps": [
+  {
+   "ticker": "CRWV",
+   "session": "2026-11-10",
+   "prev_close": 48.72999954223633,
+   "pm_price": 55.27,
+   "pm_bars": 46,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 13.42,
+   "ret63_pct": -54.76654782903614,
+   "neglect": true,
+   "liquid": true,
+   "adr": 10.48406169782805,
+   "company": "CRWV",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-10 16:05",
+     "items": [
+      "2.02"
+     ],
+     "text": "8-K (SEC), 10.11 16:05 ET: 2.02 — финансови резултати"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "Little-Known CoreWeave CEO Line Helps Fuel 15% CRWV Stock Rally",
+    "source": null,
+    "published": "2026-11-11 13:52",
+    "link": null
+   },
+   "headlines_error": null
+  },
+  {
+   "ticker": "NBIS",
+   "session": "2026-11-10",
+   "prev_close": 134.0,
+   "pm_price": 148.6,
+   "pm_bars": 46,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 10.9,
+   "ret63_pct": -48.302471570499016,
+   "neglect": true,
+   "liquid": true,
+   "adr": 9.659255658575194,
+   "company": "NBIS",
+   "filings_8k": [],
+   "filings_error": null,
+   "headline": {
+    "title": "NBIS Stock Jumps Over 11% On CoreWeave Boost: Analysts Expect Over Six-Fold Growth In Sales In Upcoming Q3 Report",
+    "source": null,
+    "published": "2026-11-11 08:15",
+    "link": null
+   },
+   "headlines_error": null
+  }
+ ],
+ "levels": [],
+ "watch": [
+  {
+   "ticker": "BFLY",
+   "gap_pct": 3.99,
+   "pm_price": 6.77,
+   "prev_close": 6.51,
+   "close_src": "brief",
+   "pm_last_ny": "08:35",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "coverage": {
+  "with_pm": 604,
+  "requested": 925,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null
+ },
+ "session": "2026-11-10",
+ "sector_bounce": [],
+ "ep_morning": [],
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "econ": [
+  {
+   "title": "Fed's Goolsbee calls inflation report 'borderline disturbing' as central bank weighs more hikes",
+   "source": "CNBC",
+   "kind": "CPI",
+   "published": "2026-11-11T13:50Z",
+   "time_ny": "08:50",
+   "time_berlin": "14:50",
+   "link": "https://www.cnbc.com/2026/11/11/goolsbee-october-inflation-fed-rates-disturbing-distressing.html"
+  }
+ ],
+ "seconds": 41.7,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 11.11 — 2 гапа, 1 наблюдавани",
+  "at_utc": "14:06"
+ }
+}
