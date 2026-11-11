@@ -87,9 +87,23 @@ with q():
     r = sw.refresh_deals(D, get=getter(SUB), cik_map=CIK, news_fn=lambda t, n: [])
 assert r["checked"] == ["ROKU"] and [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("8-K")
 sw.save_state({"version": 1, "pending": {}, "closed": {}}); seed_cache()
+# 11.11.2026 (т. 1): по подразбиране приключване САМО по 8-K — реалните заглавия от 06.11 НЕ затварят ROKU, когато EDGAR още няма следа
+assert config.DEAL_CLOSE_BY_NEWS is False
 with q():
     r = sw.refresh_deals(D, get=getter(cut(SUB, "2026-11-06")), cik_map=CIK, news_fn=lambda t, n: FX["news"], name_lookup=lambda t: "Roku, Inc.")      # EDGAR без следа, новините — РЕАЛНИТЕ
-assert [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("новина:")
+assert r["closed"] == [] and "ROKU" not in sw.closed_tickers() and "ROKU" in sw.pending_tickers()
+sw.save_state({"version": 1, "pending": {}, "closed": {"ROKU": {"ticker": "ROKU", "how": "новина: Fox completes …", "seen": "2026-11-12"}}}); seed_cache()
+with q():
+    r = sw.refresh_deals(D, get=getter(cut(SUB, "2026-11-06")), cik_map=CIK, news_fn=lambda t, n: FX["news"], name_lookup=lambda t: "Roku, Inc.")
+assert r.get("reopened") == ["ROKU"] and "ROKU" not in sw.closed_tickers()                       # затваряне по новина в състоянието (и след 11.11) → обратно във „висящи“
+config.DEAL_CLOSE_BY_NEWS = True                                                                 # резервата по новини — само ако изрично се включи
+try:
+    sw.save_state({"version": 1, "pending": {}, "closed": {}}); seed_cache()
+    with q():
+        r = sw.refresh_deals(D, get=getter(cut(SUB, "2026-11-06")), cik_map=CIK, news_fn=lambda t, n: FX["news"], name_lookup=lambda t: "Roku, Inc.")
+    assert [x["ticker"] for x in r["closed"]] == ["ROKU"] and sw.closed_tickers()["ROKU"]["how"].startswith("новина:")
+finally:
+    config.DEAL_CLOSE_BY_NEWS = False
 hit = {"buyer": "Fox Corporation", "announced": "2026-06-14"}
 N = "Roku, Inc."
 TWO = [{"title": "Fox completes $22 billion Roku deal to expand digital reach - Reuters", "published": "2026-11-06T16:09Z"},

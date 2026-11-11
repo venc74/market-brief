@@ -579,6 +579,15 @@ def _update_state(st: dict, pending: dict, closed: dict, today: dt.date) -> None
     save_state(st)
 
 
+def pending_tickers() -> dict[str, dict]:
+    """11.11.2026 (т. 1): висящите сделки от състоянието — {тикър: {buyer, announced, …}} (за screener.scan_universe и обновяването в 15:05). Graceful: провал → {}."""
+    try:
+        return load_state()["pending"]
+    except Exception as e:
+        print(f"[deal] състоянието не се прочете: {type(e).__name__}: {e}")
+        return {}
+
+
 def closed_tickers(today=None) -> dict[str, dict]:
     """Приключилите / делистнатите тикъри от състоянието (за screener.build_universe и книгите). Graceful: провал → {}."""
     try:
@@ -642,11 +651,11 @@ def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None, na
     out = {"ok": True, "checked": [], "closed": [], "pending": [], "error": None}
     try:
         st = load_state()
-        undone = undo_news_closures(st, config.DEAL_NEWS_RULE_FROM)                # 10.11.2026: CART — фалшиво приключване по едно заглавие
+        undone = undo_news_closures(st, config.DEAL_NEWS_RULE_FROM if config.DEAL_CLOSE_BY_NEWS else "9999-12-31")   # 10.11.2026: CART; 11.11.2026: без новини — всички назад
         if undone:
             save_state(st)
             out["reopened"] = undone
-            print(f"[deal] върнати като висящи (приключване само по новина отпреди {config.DEAL_NEWS_RULE_FROM}): {undone}")
+            print(f"[deal] върнати като висящи (приключване само по новина — от 11.11 се приема само 8-K): {undone}")
         cache = _load(pathlib.Path(config.DATA_DIR) / config.SPINOFF_CACHE_NAME, {})
         seed = {v.get("ticker") for v in (cache.get("merger_docs") or {}).values() if isinstance(v, dict) and v.get("hit")}
         ts = sorted((set(st["pending"]) | seed | set(extra or ())) - set(st["closed"]) - {None})
@@ -656,10 +665,14 @@ def refresh_deals(today=None, get=None, cik_map=None, extra=(), news_fn=None, na
         check(ts, today, get=get, cik_map=cik_map, merger_tickers=ts)
         out["ok"] = LAST_DIAG.get("ok", True)
         st = load_state()
+        if not config.DEAL_CLOSE_BY_NEWS:                                           # 11.11.2026 (т. 1): приключване САМО по 8-K — резервата по заглавия е изключена
+            ts_news = []
+        else:
+            ts_news = ts
         if news_fn is None:
             from src import event_label
             news_fn = lambda t, name: event_label.news(t, name, today.isoformat())
-        for t in ts:
+        for t in ts_news:
             if t in st["closed"] or t not in LAST_MERGERS:
                 continue
             try:

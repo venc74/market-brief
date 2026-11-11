@@ -268,6 +268,9 @@ MERGER_LOOKBACK_DAYS = int(os.getenv("MERGER_LOOKBACK_DAYS", 540))
 # 09.11.2026 (спешна поправка, ROKU): състоянието на сделките — висящите цели остават „deal“ до приключването; приключилите / делистнатите излизат от универса и книгите (spinoff_watch.load_state).
 # Реално: Fox приключи придобиването на ROKU на 06.11 след затварянето (8-K 2.01/3.01/5.01 и 25-NSE), а брифът от 09.11 даде ROKU като единствения „Купува се днес“.
 DEAL_STATE_NAME = "deal_state.json"                   # в config.DATA_DIR
+# 11.11.2026 (т. 1): приключила сделка — САМО по 8-K (2.01 и 3.01 / 5.01 по правилото на closing_evidence), никога по заглавие (10.11: CART беше „приключила“ по заглавие,
+# което казва обратното). 0 — резервата по новини е изключена, а приключванията по новина в състоянието се връщат във „висящи“.
+DEAL_CLOSE_BY_NEWS = os.getenv("DEAL_CLOSE_BY_NEWS", "0") == "1"
 DEAL_CLOSED_KEEP_DAYS = int(os.getenv("DEAL_CLOSED_KEEP_DAYS", 180))      # след толкова дни тикърът може да е нов листинг — изключването отпада
 DELIST_LOOKBACK_DAYS = int(os.getenv("DELIST_LOOKBACK_DAYS", 30))         # Form 25 / 15 от последните дни → делистнат (и без известна сделка)
 DEAL_NEWS_DAYS = int(os.getenv("DEAL_NEWS_DAYS", 5))                      # „completes acquisition“ в новините за висяща цел — толкова дни назад
