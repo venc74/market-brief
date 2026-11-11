@@ -40,7 +40,7 @@ print(f"  ✓ {got['episodes']} епизода (първи ден под 10%, п
 
 print()
 print("── 2. текстът на индикатора ──")
-th.build_universe = lambda: ["AAA"] * 300
+th.build_universe = th.day_universe = lambda *a, **k: ["AAA"] * 300
 th.time = types.SimpleNamespace(sleep=lambda s: None)
 
 
@@ -48,7 +48,7 @@ def with_pct(pct):
     """СИНТЕТИЧЕН универс от 400 тикъра, от които pct% са над SMA40 (последното затваряне над/под средната на 40 дни)."""
     n_total = 400
     above = int(round(pct / 100 * n_total))
-    th.build_universe = lambda: [f"T{i}" for i in range(n_total)]
+    th.build_universe = th.day_universe = lambda *a, **k: [f"T{i}" for i in range(n_total)]
     cols = {(f"T{i}", "Close"): pd.Series([10.0] * 40 + [11.0 if i < above else 9.0]) for i in range(n_total)}
     data = pd.DataFrame(cols)
     data.columns = pd.MultiIndex.from_tuples(data.columns)

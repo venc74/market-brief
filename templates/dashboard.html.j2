@@ -521,7 +521,7 @@
     сравнението е със затварянето на {{ preopen.session[8:10] if preopen.session else "" }}.{{ preopen.session[5:7] if preopen.session else "" }}. Карето стои до следващия сутрешен бриф.</div>
   {% if preopen.volume_note %}<div class="small" style="color:var(--yellow);margin-bottom:8px">⚠ {{ preopen.volume_note }}.</div>{% endif %}
   {# 04.11.2026 (четвърти преглед, С3): покритието — винаги; „частично“ при паднала партида, непълен универс или малко тикъри с премаркет #}
-  {% if preopen.coverage %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">Премаркет за {{ preopen.coverage.with_pm }} от {{ preopen.coverage.requested }} тикъра{% if preopen.coverage.batches %} ({{ preopen.coverage.batches }} партиди){% endif %}.</div>
+  {% if preopen.coverage %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">Премаркет за {{ preopen.coverage.with_pm }} от {{ preopen.coverage.requested }} тикъра{% if preopen.coverage.universe is defined %} (универсът на скенерите {{ preopen.coverage.universe }}{% if preopen.coverage.universe_source == 'cache' %}, както сутринта{% endif %}{% if preopen.coverage.extra %} + {{ preopen.coverage.extra }} извън него — наблюдаваните, картите и книгите{% endif %}){% endif %}{% if preopen.coverage.batches %} ({{ preopen.coverage.batches }} партиди){% endif %}.{% if preopen.excluded_deals %} Висящи сделки — извън карето: {{ preopen.excluded_deals|join(", ") }}.{% endif %}</div>
   {% if preopen.coverage.partial and preopen.ok %}<div class="small" style="color:var(--red);margin-bottom:8px">⚠ Частично: {{ preopen.coverage.reason }} — празното НЕ значи, че няма гапове.</div>{% endif %}{% endif %}
   {% if preopen.late %}<div class="small" style="color:var(--red)">Обновяване преди отварянето днес няма: {{ (preopen.notes or [])|join("; ") }}. Празното каре НЕ значи „нищо за отбелязване“.</div>
   {% elif not preopen.ok %}<div class="small" style="color:var(--red)">Премаркетът не се изтегли днес{% if preopen.notes %} ({{ preopen.notes|join("; ") }}){% endif %}{% if preopen.coverage and preopen.coverage.reason %} ({{ preopen.coverage.reason }}){% endif %} — празното НЕ значи, че няма гапове.</div>
@@ -977,6 +977,8 @@
 {# 20.10.2026 (етап 3, т. 1): buy-stop се изпълнява при докосване — обемът на деня на входа се вижда при затварянето; групите са за отделни резултати #}
 {# 06.11.2026 (пакет 05–06.11, т. 1): реалният риск при входа (стопът спрямо цената на изпълнение) — backtest.fill_risk_block #}
 {# 09.11.2026 (спешна поправка, ROKU): записите с приключила сделка — извън статистиката (backtest.close_deal_records) #}
+{# 11.11.2026 (т. 1): висяща сделка — извън скенерите по Kullamägi, GLB и EP (цената следва офертата; CART на 11.11 беше в QM и в Momentum GLB) #}
+{% macro deals_pending_line(rows) %}{% if rows %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b>Висяща сделка — извън скенерите</b> (Kullamägi, GLB, EP и карето в 15:05; цената следва офертата): {% for x in rows %}{{ x.ticker }}{% if x.buyer %} ({{ x.buyer }}{% if x.announced %}, обявена {{ x.announced[8:10] }}.{{ x.announced[5:7] }}{% endif %}){% endif %}{{ "; " if not loop.last else "" }}{% endfor %}.</div>{% endif %}{% endmacro %}
 {% macro deal_closed_line(rows) %}{% if rows %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Приключила сделка — извън статистиката: {% for x in rows %}<b>{{ x.ticker }}</b> ({% if x.buyer %}{{ x.buyer }}, {% endif %}{{ x.date[8:10] }}.{{ x.date[5:7] }}{% if x.had_position and x.price is not none %}; вход {{ x.fill_date[8:10] }}.{{ x.fill_date[5:7] }} по ${{ "%.2f"|format(x.fill_price) }}, последна цена ${{ "%.2f"|format(x.price) }}{% if x.r is not none %}, {{ "%+.2f"|format(x.r) }}R{% endif %}{% else %}; без вход{% endif %}){{ ", " if not loop.last else "" }}{% endfor %}.</div>{% endif %}{% endmacro %}
 {% macro fill_risk_line(fr) %}{% if fr %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Реален риск при входа: средно {{ "%.1f"|format(fr.avg) }}% ({{ fr.n }} {{ "вход" if fr.n == 1 else "входа" }}){% if fr.over %} · над {{ "%g"|format(fr.limit) }}%: {% for x in fr.over %}<b>{{ x.ticker }}</b> {{ "%.1f"|format(x.pct) }}%{% if x.target_r is not none %} (цел {{ "%.1f"|format(x.target_r) }}R){% endif %}{{ ", " if not loop.last else "" }}{% endfor %}{% endif %}.</div>{% endif %}{% endmacro %}
 {% macro entry_vol_line(ev) %}{% if ev and (ev.high + ev.low + ev.unknown) %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Денят на входа (по затварянето): обем ≥ {{ ev.mult|round(1) }}× среден — {{ ev.high }}{% if ev.high_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.high_avg_r) }} при {{ ev.high_closed }} затворени){% endif %} · под {{ ev.mult|round(1) }}× — {{ ev.low }}{% if ev.low_avg_r is not none %} (среден R {{ "%+.2f"|format(ev.low_avg_r) }} при {{ ev.low_closed }} затворени){% endif %}{% if ev.unknown %} · без данни за обема — {{ ev.unknown }}{% endif %}{% if ev.excluded %} · без {{ ev.excluded }} с етикет deal / събитие{% endif %}. Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа.</div>{% endif %}{% endmacro %}
@@ -1503,6 +1505,7 @@
 {% if qm_cards or qm_diag or (qb and qb.enabled) %}
 <section id="qm">
   <h2>Пробиви по Kullamägi (Breakout)</h2>
+  {{ deals_pending_line(deals_pending_scan) }}
   <div class="qm-banner">
     <b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. Алфата не е статистически значима.</b>
     {% if qm_replay %}Реплей {{ qm_replay.period }} ({{ qm_replay.trades }} сделки), R = печалба ÷ max(вход − дъното на деня, {{ qm_r_floor }}×ADR): среден R {{ "%+.2f"|format(qm_replay.avg_r) }} [{{ "%+.2f"|format(qm_replay.avg_r_ci[0]) }}; {{ "%+.2f"|format(qm_replay.avg_r_ci[1]) }}] (pess {{ "%+.2f"|format(qm_replay.avg_r_pess) }}),
@@ -1767,6 +1770,7 @@
 {% if glb_candidates or glb_status or (gwh and gwh.enabled) %}
 <section id="glb">
   <h2>GLB Watchlist · Green Line Breakout</h2>
+  {{ deals_pending_line(deals_pending_scan) }}
   <div class="small" style="font-size:12px;color:var(--muted);margin-bottom:10px">
     {% set g0 = glb_candidates[0] if glb_candidates else {} %}
     {% if not glb_candidates or g0.get("rule") == "wish_high" %}

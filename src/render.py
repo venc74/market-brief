@@ -623,6 +623,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
         excluded_deals=excluded_deals(brief.get("deals_closed")),            # 09.11.2026 (ROKU)
+        deals_pending_scan=brief.get("deals_pending_scan") or [],            # 11.11.2026 (т. 1): висящите сделки — извън QM, GLB и EP
         no_date_text=enrich_mod.NO_DATE_TEXT,                                # 06.11.2026 (т. 3)
         sector_board=brief.get("sector_board") or {}, sector_board_lag=config.SECTOR_BOARD_RANK_LAG,   # 30.10.2026 (т. 7): секторната карта от кода
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)

@@ -47,7 +47,7 @@ import time
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
-from src.screener import build_universe
+from src.screener import build_universe, scan_universe
 from src.ai_brief import _verified_company_name
 
 import numpy as np
@@ -581,7 +581,7 @@ def screen(universe: list[str] | None = None, batch_size: int = 50, state_path=N
     wish_signals: list[dict] = []
     wish_high_signals: list[dict] = []
     if universe is None:
-        universe = build_universe()
+        universe = scan_universe()                                                   # 11.11.2026 (т. 1–2): универсът за деня без висящите сделки (CART)
 
     wish_cards = config.GLB_CARDS_RULE == "wish_high"                         # 22.10.2026: картите по правилото на Уиш + свежест (без glb_state.json)
     open_episodes = 0

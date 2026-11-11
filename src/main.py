@@ -773,7 +773,7 @@ def run() -> dict:
     corp_ex_qm: list[dict] = []
     qm_universe: list[str] = []
     # 20.10.2026 (етап 3б, обвивката — стъпка 2): универсът, скенерът и EP — в обвивката; статусът (qm_diag / qm_ep_out) е същият като досега, банерът — собственият (data_warnings)
-    qm_universe = steps.step("qm_universe", screener.build_universe, fallback=[], enabled=bool(config.ENABLE_QM or config.ENABLE_QM_EP), source="qm_breakout",
+    qm_universe = steps.step("qm_universe", lambda: screener.scan_universe(today), fallback=[], enabled=bool(config.ENABLE_QM or config.ENABLE_QM_EP), source="qm_breakout",
                              label="Универсът за Qullamaggie", consequence="без скан за пробив и без EP наблюдение днес")     # същият универс като скрийнъра; един път за скенера и за EP
     if steps.result("qm_universe").status == "failed":
         qm_diag = {"ok": False, "error": f"универсът не се зареди ({steps.result('qm_universe').error_type})"}
@@ -1053,6 +1053,8 @@ def run() -> dict:
         "rotation": rotation,
         "market_day": market_day,                                       # 06.11.2026 (т. 8)
         "deals_closed": [r for r in spinoff_watch.closed_tickers().values() if (r.get("date") or "") >= (dt.date.fromisoformat(today) - dt.timedelta(days=10)).isoformat()],     # 09.11.2026 (ROKU)
+        "deals_pending_scan": [{"ticker": t, "buyer": v.get("buyer"), "announced": v.get("announced")} for t, v in sorted(screener.LAST_SCAN_EXCLUDED.items())],   # 11.11.2026 (т. 1)
+        "universe_day": dict(screener.LAST_DAY_UNIVERSE),               # 11.11.2026 (т. 2): универсът за деня (записан / построен)
         "news_terms_fixed": news_terms_fixed,                           # 06.11.2026 (т. 8): какво е махнато от „защо“ на новините
         "sector_board": sector_board,                                   # 30.10.2026 (разходката, т. 7): секторната карта от кода (до 30.10 — "sector_card": водещите по кода, веригите — от модела)
         # пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не бива да се чете като "няма сетъпи"

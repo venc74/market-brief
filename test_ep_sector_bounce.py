@@ -57,6 +57,6 @@ bb["preopen"] = {**PO}; ep2 = dict(ep); ep2.pop("sector_bounce"); bb["qm_ep"] = 
 with contextlib.redirect_stdout(io.StringIO()):
     assert "Секторен отскок" not in render.render_dashboard(bb, publish=False)
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
-assert 'res["sector_bounce"] = qm_ep_sector_bounce(gaps)' in src and "screener.build_universe()" in src
+assert 'res["sector_bounce"] = qm_ep_sector_bounce(gaps)' in src and "screener.scan_universe(day)" in src
 print("  ✓ в карето преди отварянето и имейла му; в секцията EP и сутрешния имейл; стар бриф — без реда")
 print("\n✅ test_ep_sector_bounce: всичко мина")

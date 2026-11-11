@@ -111,6 +111,81 @@ def build_universe() -> list[str]:
     return universe
 
 
+
+
+# 11.11.2026 (т. 2): универсът за деня — един списък за всички модули и за обновяването в 15:05
+LAST_DAY_UNIVERSE: dict = {}              # {"date", "source": "cache" / "built", "n"} от последния day_universe
+LAST_SCAN_EXCLUDED: dict[str, dict] = {}  # 11.11.2026 (т. 1): висящите сделки, извадени от скенерите (QM, GLB, EP, 15:05) — {тикър: {buyer, announced}}
+_DAY_MEMO: dict = {}
+
+
+def universe_cache_path() -> pathlib.Path:
+    return pathlib.Path(config.DATA_DIR) / config.UNIVERSE_CACHE_NAME
+
+
+def day_universe(today=None, save: bool = True) -> list[str]:
+    """
+    11.11.2026 (т. 2): универсът за деня — build_universe() веднъж; списъкът, секторите / индустриите и статусът на източниците се пазят в
+    config.DATA_DIR/universe.json и всички следващи извиквания за същия ден (в процеса и в другия job — обновяването в 15:05, записът на опциите) четат него.
+    До 10.11 сутрешният бриф теглеше Wikipedia 4 пъти (термометър, скрийнинг, GLB, QM), а 15:05 — още веднъж. Приключилите сделки се вадят и при четене.
+    Graceful: повреден / стар файл → build_universe(); провал на записа → ред в лога.
+    """
+    day = str(today or dt.date.today())[:10]
+    if _DAY_MEMO.get("date") == day and _DAY_MEMO.get("tickers"):
+        tickers = list(_DAY_MEMO["tickers"])
+        src = "memo"
+    else:
+        tickers, src = None, "built"
+        try:
+            d = json.loads(universe_cache_path().read_text(encoding="utf-8"))
+            if d.get("date") == day and d.get("tickers"):
+                tickers, src = list(d["tickers"]), "cache"
+                LAST_UNIVERSE_SOURCES.clear(); LAST_UNIVERSE_SOURCES.update(d.get("sources") or {})
+                LAST_UNIVERSE_SECTOR.update(d.get("sector") or {}); LAST_UNIVERSE_INDUSTRY.update(d.get("industry") or {})
+        except Exception:
+            tickers = None
+        if tickers is None:
+            tickers = build_universe()
+            if save and tickers:
+                try:
+                    universe_cache_path().write_text(json.dumps({"date": day, "built_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                                                 "n": len(tickers), "tickers": tickers, "sources": LAST_UNIVERSE_SOURCES,
+                                                                 "sector": {t: LAST_UNIVERSE_SECTOR[t] for t in tickers if t in LAST_UNIVERSE_SECTOR},
+                                                                 "industry": {t: LAST_UNIVERSE_INDUSTRY[t] for t in tickers if t in LAST_UNIVERSE_INDUSTRY}},
+                                                                ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                except Exception as e:
+                    print(f"[screener] универсът за деня не се записа: {type(e).__name__}: {e}")
+        _DAY_MEMO.update(date=day, tickers=list(tickers))
+    if src != "built":                                                              # приключилите сделки — и върху записания списък
+        try:
+            from src import spinoff_watch
+            closed = spinoff_watch.closed_tickers()
+        except Exception:
+            closed = {}
+        LAST_UNIVERSE_EXCLUDED.clear(); LAST_UNIVERSE_EXCLUDED.update({t: closed[t] for t in tickers if t in closed})
+        tickers = [t for t in tickers if t not in closed]
+    LAST_DAY_UNIVERSE.clear(); LAST_DAY_UNIVERSE.update(date=day, source=src, n=len(tickers))
+    if src == "cache":
+        print(f"[screener] универс: {len(tickers)} тикъра — записаният за {day} (data/{config.UNIVERSE_CACHE_NAME})")
+    return tickers
+
+
+def scan_universe(today=None) -> list[str]:
+    """
+    11.11.2026 (т. 1): универсът на скенерите извън CANSLIM — Kullamägi, GLB, EP, обновяването в 15:05: day_universe() без висящите сделки (data/deal_state.json,
+    „pending“). Цел на придобиване не е сетъп (цената следва офертата) — CART на 11.11 беше в QM и в Momentum GLB. CANSLIM ги пази с етикет „deal“ (без Action).
+    """
+    u = day_universe(today)
+    try:
+        from src import spinoff_watch
+        pend = spinoff_watch.pending_tickers()
+    except Exception as e:
+        print(f"[screener] ⚠ висящите сделки не се прочетоха: {type(e).__name__}: {e}")
+        pend = {}
+    LAST_SCAN_EXCLUDED.clear(); LAST_SCAN_EXCLUDED.update({t: pend[t] for t in u if t in pend})
+    if LAST_SCAN_EXCLUDED:
+        print(f"[screener] извън скенерите (висяща сделка): {', '.join(sorted(LAST_SCAN_EXCLUDED))}")
+    return [t for t in u if t not in pend]
 # ──────────────────────────────────────────────────────────────────────────
 # Стъпка 1: Технически филтър (върху целия универс)
 # ──────────────────────────────────────────────────────────────────────────
@@ -745,7 +820,7 @@ def run_screen(leading_sector_names: list[str] | None = None, leaders: list[dict
     върху картата — никога филтър. `leaders` = редовете от leading_sectors(); при подадени само имена
     те се превръщат обратно в ETF-и през config.SECTOR_ETFS.
     """
-    universe = build_universe()
+    universe = day_universe()                                                        # 11.11.2026 (т. 2): универсът за деня
     held = load_rs_state() if config.RS_LINE_HYSTERESIS else set()
     # втори преглед (10.10): липсващ файл (първият run след 09.10 — data/screener_rs_state.json още не съществува) → началото от историята, не празно
     seed = bool(config.RS_LINE_HYSTERESIS and not pathlib.Path(config.RS_LINE_STATE_FILE).exists())

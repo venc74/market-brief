@@ -30,7 +30,7 @@ def fake_download(batch, **kw):                                                 
 
 
 th.yf = type("Y", (), {"download": staticmethod(fake_download)})
-th.build_universe = lambda: list(UNIV)
+th.build_universe = th.day_universe = lambda *a, **k: list(UNIV)                 # 11.11.2026: термометърът чете day_universe
 th.time.sleep = lambda s: None
 config.BREADTH_MIN_VALID_TICKERS = 1
 q = lambda: contextlib.redirect_stdout(io.StringIO())

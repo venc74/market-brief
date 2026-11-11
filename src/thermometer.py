@@ -15,7 +15,7 @@ import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 from src import sessions as _sessions               # 20.10.2026: без частичния днешен бар (cut_today)
-from src.screener import build_universe
+from src.screener import build_universe, day_universe
 from src.series_utils import last_and_week_ago
 
 
@@ -509,7 +509,7 @@ def market_breadth() -> dict:
     паттърн като move_index()/vix_term_structure().
     """
     try:
-        universe = build_universe()
+        universe = day_universe()                                              # 11.11.2026 (т. 2): универсът за деня
         if not universe:
             raise ValueError("празен universe")
 

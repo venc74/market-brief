@@ -287,6 +287,16 @@ def volume_note(res: dict) -> str | None:
     return f"Обемът в премаркета не е наличен (Yahoo){who} — провери го в първите минути"
 
 
+def _pending_deals() -> set:
+    """11.11.2026 (т. 1): висящите сделки (data/deal_state.json) — graceful: провал → празно."""
+    try:
+        from src import spinoff_watch
+        return set(spinoff_watch.pending_tickers())
+    except Exception as e:
+        print(f"[preopen] висящите сделки не се прочетоха: {type(e).__name__}: {e}")
+        return set()
+
+
 def red_8k(filings: list | None) -> list[str]:
     """10.11.2026 (т. 1): червеното предупреждение за 8-K т. 4.02 — qm_ep.red_8k."""
     from src import qm_ep
@@ -502,7 +512,7 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
         universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
-        econ_fn=None) -> dict:
+        econ_fn=None, exclude: set | None = None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -521,21 +531,30 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
             waiting = []
             res["notes"].append(f"„Чака пробив“ не се прочете ({type(e).__name__})")
         qm_cards = brief.get("qm_breakout") or []
+        ex = set(exclude or ())                                                        # 11.11.2026 (т. 1): висящите сделки — вън от гаповете, нивата и сутрешните EP редове
+        if ex:
+            waiting = [c for c in waiting if c.get("ticker") not in ex]
+            qm_cards = [c for c in qm_cards if c.get("ticker") not in ex]
+            records = [r for r in records or [] if r.get("ticker") not in ex]
+            res["excluded_deals"] = sorted(ex)
         extra = [c.get("ticker") for c in waiting + qm_cards] + [r.get("ticker") for r in records or []] + list(watched or [])
         extra += [r.get("ticker") for r in (brief.get("qm_ep") or {}).get("rows") or []]      # 10.11.2026 (т. 2): сутрешните EP кандидати — винаги в заявката
-        tickers = list(dict.fromkeys([t for t in list(universe or []) + extra if t]))
+        tickers = list(dict.fromkeys([t for t in list(universe or []) + extra if t and (t not in ex or t in (watched or []))]))
+        res["universe_n"] = len([t for t in dict.fromkeys(universe or []) if t not in ex])          # 11.11.2026 (т. 2): универсът отделно от добавените (наблюдаваните и др.)
         LAST_FETCH.clear()
         if frames5 is None:
             frames5 = (fetch5 or fetch_5m)(tickers)
         pts, gaps, diag = scan(frames5, now)
+        gaps = [g for g in gaps if g["ticker"] not in ex]
         res["diag"] = {**diag, "requested": len(tickers)}
         res["coverage"] = coverage(res["diag"], dict(LAST_FETCH), universe_note)          # 04.11.2026 (С3): „премаркет за N от M“ и „частично“
+        res["coverage"].update(universe=res["universe_n"], extra=len(tickers) - res["universe_n"])      # 11.11.2026 (т. 2)
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
         res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
         try:                                                                           # 10.11.2026 (т. 2, SANM): сутрешните EP кандидати извън гаповете — с ред, не изпадат тихо
-            res["ep_morning"] = ep_morning(brief, pts, frames5, res["gaps"], now)
+            res["ep_morning"] = [x for x in ep_morning(brief, pts, frames5, res["gaps"], now) if x["ticker"] not in ex]
         except Exception as e:
             res["ep_morning"], res["ep_morning_error"] = [], f"{type(e).__name__}"
             print(f"[preopen] сутрешните EP кандидати: {type(e).__name__}: {e}")
@@ -652,7 +671,9 @@ def main(now_utc=None) -> int:
         records = []
     universe, universe_note = [], None                                             # 04.11.2026 (С3): банерът за универса (както сутрешният бриф — screener.LAST_UNIVERSE_SOURCES)
     try:
-        universe = screener.build_universe()
+        universe = screener.scan_universe(day)                                     # 11.11.2026 (т. 1–2): сутрешният универс за деня, без висящите сделки
+        if screener.LAST_DAY_UNIVERSE.get("source") == "built":
+            print(f"::warning::[preopen] записаният универс за {day} липсва — построен наново от Wikipedia (може да се разминава със сутрешния)")
         bad = [v for v in screener.LAST_UNIVERSE_SOURCES.values() if not v.get("ok")]
         if bad:
             universe_note = "универсът е непълен — " + "; ".join(f"{v.get('name')}: {v.get('reason')}" for v in bad)
@@ -660,7 +681,9 @@ def main(now_utc=None) -> int:
         universe_note = f"универсът не се зареди ({type(e).__name__}) — проверени са само картите, книгите и наблюдаваните"
         print(f"::warning::[preopen] {universe_note}: {e}")
     res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=universe,
-              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ)
+              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals())
+    if res.get("coverage") is not None:
+        res["coverage"]["universe_source"] = screener.LAST_DAY_UNIVERSE.get("source")      # 11.11.2026 (т. 2): "cache" — същият като сутрешния
     res["email"] = prev.get("email") or {"sent": False}
     if has_news(res) and not res["email"].get("sent"):
         subj = (f"Преди отварянето · {day[8:10]}.{day[5:7]} — " + ", ".join(x for x in (f"{len(res['gaps'])} гапа" if res["gaps"] else "",

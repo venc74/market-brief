@@ -223,8 +223,8 @@ def scan(universe: list[str] | None = None, now_utc: dt.datetime | None = None) 
     """Целият скан: универс → дневни данни → кандидати (всички, подредени по стягане). Graceful: провал → ([], diag с причина)."""
     try:
         if universe is None:
-            from src.screener import build_universe
-            universe = build_universe()
+            from src.screener import scan_universe
+            universe = scan_universe()                                           # 11.11.2026 (т. 1): без висящите сделки
         frames, st = fetch_frames(universe, now_utc=now_utc)
         rows, diag = scan_frames(frames)
         diag.update(st, universe=len(universe))

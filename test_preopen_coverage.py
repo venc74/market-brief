@@ -44,7 +44,7 @@ b = copy.deepcopy(B19); b["preopen"] = res
 with q():
     page = render.render_dashboard(b, publish=False)
 box = page[page.index('<section class="preopen"'):page.index("</section>", page.index('<section class="preopen"'))]
-assert "Премаркет за 5 от 20 тикъра." in box and "⚠ Частично: премаркет само за 5 от 20 тикъра — празното НЕ значи, че няма гапове." in box
+assert "Премаркет за 5 от 20 тикъра (универсът на скенерите 20)." in box and "⚠ Частично: премаркет само за 5 от 20 тикъра — празното НЕ значи, че няма гапове." in box
 assert "Частично: премаркет само за 5 от 20 тикъра" in preopen.email_html(res)
 print("  ✓ карето: „Премаркет за 5 от 20“ и „Частично“; имейлът — също")
 

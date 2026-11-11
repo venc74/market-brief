@@ -225,7 +225,7 @@ def main() -> int:
         return 0
     from src import screener
     today = pd.Timestamp(now).tz_convert("America/New_York").date().isoformat()     # денят по Ню Йорк, не по часовника на runner-а
-    st = record(screener.build_universe(), today, path=p)
+    st = record(screener.day_universe(today), today, path=p)                       # 11.11.2026 (т. 2): универсът за деня — сутрешният
     if not st.get("ok"):
         print(f"::error::записът на опционните данни не мина: {st.get('reason')}")
         return 1
