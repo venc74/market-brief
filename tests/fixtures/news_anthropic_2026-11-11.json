@@ -1,0 +1,21 @@
+{
+ "_note": "РЕАЛНО: data/2026-11-11.json → news (редът за Anthropic: основното заглавие на AP, „също“ — FT и CNBC, и „защо“ на модела, както са записани). Извадено 11.11.2026 за т. 5.",
+ "row": {
+  "headline": "Anthropic seeks valuation of about $1.3 trillion when it becomes a publicly traded company - AP News",
+  "source": "AP Business",
+  "why": "Оценката на Anthropic при IPO-то може да надхвърли $1.5 трлн., което е бичи сигнал за AI сектора и tech IPO пазара като цяло.",
+  "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNV0RzZUdwSHJSaUFqcXk5aFQ2QjYyWW0yTWxNbGhZRmo2NVlGOVhPWUdxdm9VS05oN0x6dzR1d2hYakpFRTdjd1ZNaDVhQ3BMQ3IwUXVNODRWck50MkwtWnlmUERNWXctY3FCR1JURC1BYWY2LUFlMTZQTjk0RHhwRTJGaTJ2cHhvbnFGUWQ4Y3hYOVJVQzY0UmtLQ2tRLW9tdlUtcHZHQQ?oc=5",
+  "also": [
+   {
+    "source": "Financial Times",
+    "headline": "Anthropic bankers prepare to increase IPO valuation to $1.5tn or more",
+    "link": "https://www.ft.com/content/68bcba57-0575-44ee-80f4-2e5ea23a431e?syn-25a6b1a6=1"
+   },
+   {
+    "source": "CNBC",
+    "headline": "Anthropic opens Australian retail IPO offering as AI scrutiny intensifies",
+    "link": "https://www.cnbc.com/2026/11/11/anthopic-australian-retail-ipo-offering-.html"
+   }
+  ]
+ }
+}

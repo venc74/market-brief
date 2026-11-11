@@ -448,7 +448,14 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         seen.update(group)
         main = min(group, key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))
         if main != i:
-            dropped.append({"i": i, "reason": f"основното заглавие — от по-надеждния източник ({pool[main].get('source')}), преводът отпада", "main": main})
+            # 11.11.2026 (т. 5, Anthropic): числата в „защо“ са от заглавието на модела (i), а по-надеждното ги няма → основното остава i. До 11.11 проверката
+            # гледаше цялата група и „$1.5 трлн“ (FT) стоеше под заглавието на AP „about $1.3 trillion“. Измерено: най-много 5 от 48 групирани реда (13.10–11.11).
+            txt = lambda k: f"{pool[k]['title']} {pool[k].get('summary') or ''}"
+            if _why_numbers(why, txt(main))[1] and not _why_numbers(why, txt(i))[1]:
+                dropped.append({"i": i, "reason": f"основното заглавие остава това на модела — числата в „защо“ са от него, не от {pool[main].get('source')}", "priority": main})
+                main = i
+            else:
+                dropped.append({"i": i, "reason": f"основното заглавие — от по-надеждния източник ({pool[main].get('source')}), преводът отпада", "main": main})
         r = pool[main]
         source_text = " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group)
         why, cut = _why_numbers(why, source_text)
