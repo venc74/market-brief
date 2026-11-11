@@ -131,10 +131,10 @@
    "ah_volume": null,
    "neglect": true,
    "ret63_pct": -26.2,
-   "open_gap_pct": null,
-   "close_pct": null,
-   "high_pct": null,
-   "resolved_on": null
+   "open_gap_pct": 11.2,
+   "close_pct": 3.87,
+   "high_pct": 12.25,
+   "resolved_on": "2026-11-11"
   },
   {
    "ticker": "AAON",
@@ -148,10 +148,10 @@
    "ah_volume": null,
    "neglect": true,
    "ret63_pct": -26.7,
-   "open_gap_pct": null,
-   "close_pct": null,
-   "high_pct": null,
-   "resolved_on": null
+   "open_gap_pct": 13.95,
+   "close_pct": 19.31,
+   "high_pct": 27.55,
+   "resolved_on": "2026-11-11"
   }
  ]
 }

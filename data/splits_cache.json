@@ -1,5 +1,5 @@
 {
- "date": "2026-11-10",
+ "date": "2026-11-11",
  "rows": [],
  "horizon": [
   {
@@ -75,6 +75,14 @@
    "date_human": "Nov 09, 2026"
   },
   {
+   "ticker": "JOB",
+   "company": "GEE Group Inc.",
+   "date": "2026-11-10",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Nov 10, 2026"
+  },
+  {
    "ticker": "NCI",
    "company": "Neo-Concept International Group Holdings Limited",
    "date": "2026-11-10",
@@ -89,6 +97,22 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Nov 10, 2026"
+  },
+  {
+   "ticker": "GOVX",
+   "company": "GeoVax Labs, Inc.",
+   "date": "2026-11-11",
+   "ratio": "1:24",
+   "split_type": "reverse",
+   "date_human": "Nov 11, 2026"
+  },
+  {
+   "ticker": "SLXN",
+   "company": "Silexion Therapeutics Corp",
+   "date": "2026-11-11",
+   "ratio": "1:24",
+   "split_type": "reverse",
+   "date_human": "Nov 11, 2026"
   },
   {
    "ticker": "EMBJ",
@@ -143,6 +167,14 @@
    "company": "ProShares Ultra MSCI Emerging Markets",
    "date": "2026-11-19",
    "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "BIB",
+   "company": "ProShares Ultra Nasdaq Biotechnology",
+   "date": "2026-11-19",
+   "ratio": "2:1",
    "split_type": "normal",
    "date_human": "Nov 19, 2026"
   },
@@ -217,29 +249,40 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Nov 20, 2026"
+  },
+  {
+   "ticker": "CBSH",
+   "company": "Commerce Bancshares, Inc.",
+   "date": "2026-12-01",
+   "ratio": "5%",
+   "split_type": null,
+   "date_human": "Dec 01, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 27,
+  "source_rows": 32,
   "horizon_from": "2026-11-09",
-  "horizon_to": "2026-11-20",
-  "in_week": 11,
+  "horizon_to": "2026-12-01",
+  "in_week": 14,
   "dropped_price": [
    "ARAY",
    "ADGM",
    "ALPS",
    "CISS",
    "NXTS",
-   "SMX",
    "STKH",
    "WCT",
+   "JOB",
    "NCI",
-   "OFAL"
+   "OFAL",
+   "GOVX",
+   "SLXN"
   ],
   "dropped_cap": [
-   "MMT"
+   "MMT",
+   "SMX"
   ],
   "dropped_no_data": [],
   "passed": 0,
