@@ -2,8 +2,14 @@
 'use strict';
 const TC = window.TaxCore, esc = TC.esc, fmt = TC.fmt;
 const SHOW_BG = false;                       // 04.11.2026: българската част е скрита (кодът е в TaxCore.computeBG)
-const S = { files: [], ing: null, rates: {}, rateSource: {}, fifo: null, fundTypes: {}, vorab: {}, persons: {} };
+const S = { files: [], ing: null, rates: {}, rateSource: {}, fifo: null, fundTypes: {}, vorab: {}, persons: {}, yearPicked: false, sum: null };
 const $ = id => document.getElementById(id);
+// 12.11.2026: показване — сметката маскирана (U••••567), датата ДД.ММ.ГГГГ, брой с правилната дума
+const acc = a => esc(TC.maskAccount(a));
+const dmy = d => /^\d{4}-\d{2}-\d{2}/.test(String(d)) ? `${d.slice(8, 10)}.${d.slice(5, 7)}.${d.slice(0, 4)}` : String(d || '');
+const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const cntText = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
+const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: 'непознат формат' };
 
 // ─── файлове ───
 function addFiles(list) {
@@ -17,20 +23,53 @@ function addFiles(list) {
 function removeFile(i) { S.files.splice(i, 1); S.ing = S.files.length ? TC.ingest(S.files) : null; renderFiles(); recalc(); }
 function renderFiles() {
   const ing = S.ing;
-  if (!ing) { $('files').innerHTML = ''; return; }
-  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Разпознат като</th><th>Сметка</th><th>Период в данните</th><th class="n">Записи</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map((f, i) => `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td>
-      <td>${f.format === 'ecb_rates' ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc({ ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: '—' }[f.format] || f.format)}</td>
-      <td>${esc(f.broker)} ${esc(f.account)}</td><td class="mono">${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</td><td class="n">${f.records}</td><td class="n">${f.duplicates || ''}</td>
-      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.period || '')}</td></tr>`).join('');
+  if (!ing) { ['files', 'fileMsgs', 'summary', 'noout'].forEach(id => { $(id).innerHTML = ''; }); return; }
+  // 12.11.2026 (никога тиха нула): за всеки файл — брокер, сметка (маскирана), период и колко реда от всеки вид са прочетени; под реда — сметката по секции
+  const secTable = f => `<details><summary>Какво прочетох от този файл — по секции (${f.sections.filter(x => x.data).length} с данни)</summary><table>
+    <tr><th>Секция</th><th class="n">Редове с данни</th><th class="n">Станаха записи</th><th class="n">Не е сметнато</th><th class="n">Обобщения / информативни</th><th>Защо</th></tr>
+    ${f.sections.filter(x => x.data).map(x => `<tr><td>${esc(x.name)}${x.missing.length ? ` <b class="neg">липсват колони: ${esc(x.missing.join(', '))}</b>` : ''}</td><td class="n">${x.data}</td><td class="n ${x.records ? 'pos' : 'mut'}">${x.records}</td>
+      <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}</td></tr>`).join('')}</table></details>`;
+  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th>Период</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан данък</th><th class="n">Лихви</th><th class="n">Не е сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
+    ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', n = v => rates ? '' : (v || 0);
+      return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td>
+      <td>${rates ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc(FORMAT_NAMES[f.format] || f.format)}</td>
+      <td class="mono">${esc(f.accountMasked || (rates ? '' : '—'))}</td><td class="mono">${f.period ? esc(f.period) + '<div class="small">данни: ' : '<div>'}${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</div></td>
+      <td class="n ${!rates && !k.trade ? 'neg' : ''}">${rates ? '' : `${k.trade || 0}<div class="small">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
+      <td class="n ${f.skipped ? 'yel' : ''}">${n(f.skipped)}</td><td class="n">${f.duplicates || ''}</td>
+      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
+      (f.sections ? `<tr><td></td><td colspan="12">${secTable(f)}</td></tr>` : ''); }).join('');
+  // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
+  $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => `<div class="msg err bigmsg"><b class="t">${esc(f.name)}: ${esc(p.title)}</b>${p.lines.map(l => `<div>${esc(l)}</div>`).join('')}</div>`).join('')).join('');
   // чий е файлът (05.11.2026): за Revolut определя сметката (отчетът няма номер), за всички — човека за крипто §23
   $('files').querySelectorAll('[data-owner]').forEach(el => el.addEventListener('change', () => { S.files[Number(el.dataset.owner)].owner = el.value; S.ing = TC.ingest(S.files); renderFiles(); recalc(); }));
   $('files').querySelectorAll('[data-rm]').forEach(el => el.addEventListener('click', () => removeFile(Number(el.dataset.rm))));
+  // 12.11.2026: годината — до 12.11 страницата пазеше миналата година и когато за нея няма нито един запис (отчет само за текущата година → „0.00 €“ без обяснение).
+  // Сега: изборът на потребителя се пази; иначе — миналата година, ако за нея има данни, а ако няма — най-новата година с данни. Годините без данни са означени.
   const years = [...new Set(ing.records.map(r => Number(r.date.slice(0, 4))))].sort((a, b) => b - a);
   const cur = new Date().getFullYear(), sel = $('year'), old = sel.value;
   const all = [...new Set([cur, cur - 1, ...years])].sort((a, b) => b - a);
-  sel.innerHTML = all.map(y => `<option value="${y}">${y}</option>`).join('');
-  sel.value = old && all.includes(Number(old)) ? old : String(years.includes(cur - 1) ? cur - 1 : years[0] || cur - 1);
+  sel.innerHTML = all.map(y => `<option value="${y}">${y}${years.includes(y) || !years.length ? '' : ' — няма данни'}</option>`).join('');
+  sel.value = S.yearPicked && all.includes(Number(old)) ? old : String(years.includes(cur - 1) ? cur - 1 : years[0] || cur - 1);
+}
+
+// 12.11.2026: резюмето над резултата — какво е прочетено общо и за избраната година; показва се и когато няма какво да се смята
+function renderSummary() {
+  if (!S.ing) { $('summary').innerHTML = ''; return; }
+  const y = Number($('year').value), s = S.sum = TC.summary(S.ing, S.fifo, y), a = s.all, r = s.year;
+  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${a.buys} покупки, ${a.sells} продажби), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
+    не са сметнати: <b class="${a.skipped ? 'yel' : ''}">${a.skipped}</b>${a.skipped ? ' (виж списъка)' : ''}; липсващи покупки: <b class="${a.unmatched ? 'neg' : ''}">${a.unmatched}</b>.
+    <div style="margin-top:4px" class="${s.empty ? 'neg' : 'small'}">${s.empty ? `<b>За ${y} няма нито един запис в качените файлове</b>${s.years.length ? ` — данните са за ${s.years.join(', ')}. Смени годината горе.` : '.'}`
+      : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${r.buys} покупки, ${r.sells} продажби)${S.fifo ? `, от продажбите с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
+}
+// списъкът „не е сметнато“ — всеки ред с причината и датата; редовете от избраната година са най-отгоре
+function skippedHtml(y) {
+  const sk = S.ing.skipped; if (!sk.length) return '';
+  const Y = String(y), rank = x => String(x.date || '').startsWith(Y) ? 0 : !x.date ? 1 : 2;
+  const rows = sk.map((x, i) => ({ x, i })).sort((p, q) => rank(p.x) - rank(q.x) || p.i - q.i).map(o => o.x);
+  const inY = sk.filter(x => rank(x) === 0), tax = inY.filter(x => x.taxable).length, noDate = sk.filter(x => rank(x) === 1).length;
+  return `<div class="card"><details${sk.length < 6 || tax ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${pl(sk.length, 'ред', 'реда')}</b> — за ${esc(y)}: ${inY.length}${tax ? ` (<b class="neg">може да са облагаеми: ${tax} → ${esc(y)} е НЕПЪЛНО</b>)` : ''}; без дата: ${noDate}; други години: ${sk.length - inY.length - noDate}</summary><div class="scroll"><table>
+    <tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>
+    ${rows.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${s.taxable ? '<b class="neg">може да е облагаем</b> · ' : ''}${esc(s.reason)}</td></tr>`).join('')}</table></div></details></div>`;
 }
 
 // ─── курсове (05.11.2026): качен файл на ЕЦБ → файлът до страницата (docs/eurofxref-hist.csv, обновява го daily_brief.yml) → ЕЦБ API по години → frankfurter.dev ───
@@ -85,7 +124,14 @@ const fifoOpts = () => ({ stillhalter: $('stillhalter').value });
 async function recalc() {
   const my = ++calcToken;
   S.fifo = null; S.de = null; $('out').style.display = 'none';
-  if (!S.ing || !S.ing.records.length) { $('status').textContent = S.ing ? 'Няма записи за смятане — виж бележките във файловете.' : ''; return; }
+  $('noout').innerHTML = '';
+  if (!S.ing) { $('status').textContent = ''; $('summary').innerHTML = ''; return; }
+  if (!S.ing.records.length) {                                          // 12.11.2026: нищо за смятане → защо (съобщенията за файловете са под таблицата) + „не е сметнато“
+    $('status').textContent = 'Няма нито един запис за смятане — виж съобщенията под файловете.';
+    renderSummary();
+    $('noout').innerHTML = `<div class="msg err bigmsg"><b class="t">Няма резултат: от качените файлове не е прочетен нито един запис (сделка, дивидент или лихва)</b><div>Това НЕ е „0,00 €“ — калкулаторът няма какво да сметне. Причината за всеки файл е в червените съобщения по-горе${S.ing.skipped.length ? ' и в списъка „не е сметнато“ по-долу' : ''}.</div></div>` + skippedHtml(Number($('year').value));
+    return;
+  }
   $('status').textContent = 'Смята се…';
   try {
     const r = await ensureRates();
@@ -109,25 +155,28 @@ function render() {
   if (!S.fifo) return;
   const st = settings(), de = TC.computeDE(S.fifo, st), y = st.year;
   S.de = de;
-  // голямото число
+  renderSummary();
+  // голямото число; 12.11.2026: при 0 — винаги с причината (никога само „0,00 €“); година без нито един запис — „няма данни“, не число
   const loss = de.total === 0 && (de.shareCarry || de.otherCarry);
+  const why = TC.whyZero(de, S.sum), noData = S.sum.empty && why.length;
   $('headline').innerHTML = `<h2>Доходи от капитал ${y} — за Anlage KAP / KAP-INV</h2>
-    <div class="big ${cls(de.headline)}">${fmt(de.headline)}</div>
+    <div class="big ${noData ? 'mut' : cls(de.headline)}">${noData ? `няма данни за ${y}` : fmt(de.headline)}</div>
+    ${why.length ? `<div class="msg ${noData || !de.complete ? 'err' : 'warn'}" id="whyZero"><b>${noData ? 'Това не е „0,00 €“: ' : 'Числото е 0, защото: '}</b>${esc(why.join('; '))}.</div>` : ''}
     <div class="small">${loss ? 'загуба — пренася се (Finanzamt я установява с решение)' : 'след прихващането на загубите, преди Sparer-Pauschbetrag' + (de.estimate ? ' (' + fmt(de.estimate.pauschbetrag) + ')' : '')}
       ${de.complete ? '' : ' · <span class="neg">НЕПЪЛНО — виж предупрежденията</span>'}</div>
     ${de.crypto.length ? `<div style="margin-top:10px">Крипто — частни продажби (§23, Anlage SO): ${de.crypto.map(c => `<b class="${cls(c.result)}">${fmt(c.result)}</b> ${st.joint ? (c.person === 'B' ? 'съпруг/а' : 'аз') : ''}
       <span class="small">(облагаеми ${fmt(c.taxable)}${c.underFreigrenze ? ' — под Freigrenze ' + fmt(c.freigrenze) + ' → 0' : ''}; над година — освободени ${fmt(c.exempt)})</span>`).join(' · ')}</div>` : ''}`;
   // предупреждения
   const w = [];
-  if (de.unmatched.length) w.push(`<div class="msg err"><b>Липсва покупката:</b> ${de.unmatched.map(u => `за ${esc(u.sym)} (${esc(u.broker)} ${esc(u.account)}, продажба ${esc(u.date)}, ${+u.qty.toFixed(6)} бр.)`).join('; ')} — качи по-стар отчет. Тези продажби НЕ са в числото.</div>`);
+  // 12.11.2026: всяка продажба без покупка — на отделен ред, с броя и датата; не е в числото; годината е НЕПЪЛНО
+  if (de.unmatched.length) w.push(`<div class="msg err"><b>Липсващи покупки: ${de.unmatched.length} — ${y} е НЕПЪЛНО</b>` + de.unmatched.map(u => { const sold = u.sold || u.qty, part = sold - u.qty > 1e-9;
+    return `<div>липсва покупка за <b>${esc(u.sym)}</b> (продадени ${+sold.toFixed(6)} бр. на ${esc(dmy(u.date))}${part ? `, от тях без покупка ${+u.qty.toFixed(6)} бр.` : ''}; ${esc(u.broker)} ${acc(u.account)}) — качи отчета от годината на покупката</div>`; }).join('') +
+    `<div class="small" style="margin-top:6px;color:inherit">Тези продажби НЕ са в числото (при частично покрита продажба — само частта без покупка). FIFO се води по брокер и сметка: покупка в друга сметка или при друг брокер не покрива продажбата.</div></div>`);
   (S.ing.warnings || []).forEach(t => w.push(`<div class="msg warn small">${esc(t)}</div>`));
   if (de.missingRates.length) w.push(`<div class="msg err"><b>Липсва курс:</b> ${[...new Set(de.missingRates.map(m => `${esc(m.currency)} ${esc(m.date)}`))].join(', ')} — записите не са в числото. Качи eurofxref-hist.csv от ЕЦБ.</div>`);
   Object.entries(S.rateSource).forEach(([c, s]) => w.push(`<div class="msg ${/не се изтеглиха/.test(s) ? 'warn' : 'info'} small">Курсове ${esc(c)} — от ${esc(s)}</div>`));
   de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'err' ? 'err' : n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));
-  const sk = S.ing.skipped;
-  if (sk.length) w.push(`<div class="card"><details${sk.length < 6 ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${sk.length} реда</b> (всички години; виж дали някой засяга ${y})</summary><div class="scroll"><table>
-    <tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>
-    ${sk.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${s.taxable ? '<b class="neg">може да е облагаем</b> · ' : ''}${esc(s.reason)}</td></tr>`).join('')}</table></div></details></div>`);
+  w.push(skippedHtml(y));
   $('warnings').innerHTML = w.join('');
   // разбивка
   const L = TC.LABELS, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
@@ -149,7 +198,7 @@ function render() {
   const R = S.fifo.realized.filter(x => x.year === y);
   $('salesTitle').textContent = `Продажби ${y} (${R.length})`;
   $('sales').innerHTML = '<tr><th>Дата</th><th>Брокер / сметка</th><th>Инструмент</th><th class="n">Бр.</th><th class="n">Приходи €</th><th class="n">Цена на придобиване €</th><th class="n">Резултат €</th><th>Купено</th></tr>' +
-    R.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc(x.broker)} ${esc(x.account)}</td><td>${esc(x.sym)} <span class="small">${esc(x.assetClass)}${x.premium ? ' · премия (Stillhalter)' : x.buyback ? ' · обратно изкупуване' : x.short ? ' · къса' : ''}</span></td><td class="n">${+x.qty.toFixed(6)}</td>
+    R.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc(x.broker)} ${acc(x.account)}</td><td>${esc(x.sym)} <span class="small">${esc(x.assetClass)}${x.premium ? ' · премия (Stillhalter)' : x.buyback ? ' · обратно изкупуване' : x.short ? ' · къса' : ''}</span></td><td class="n">${+x.qty.toFixed(6)}</td>
       <td class="n">${x.proceedsEUR == null ? '—' : fmt(x.proceedsEUR)}</td><td class="n">${x.costEUR == null ? '—' : fmt(x.costEUR)}</td><td class="n ${cls(x.gainEUR || 0)}">${x.gainEUR == null ? 'няма курс' : fmt(x.gainEUR)}</td>
       <td class="small">${(x.lots || []).map(l => `${esc(l.date)} × ${+l.qty.toFixed(6)}${l.exempt ? ' (над година)' : ''}`).join('<br>')}</td></tr>`).join('');
   const I = S.fifo.incomes.filter(x => x.year === y);
@@ -190,7 +239,7 @@ function renderPersons(st) {
   if (!st.joint) { $('personsBox').innerHTML = ''; return; }
   const accts = [...new Set(S.ing.records.filter(r => r.assetClass === 'crypto').map(r => r.broker + '|' + r.account))];
   $('personsBox').innerHTML = accts.length ? `<div class="small" style="margin-bottom:6px"><b>Чия е сметката</b> — Freigrenze по §23 е на човек (крипто); доходите от капитал са общи при съвместното подаване.</div>
-    <table>${accts.map(a => `<tr><td>${esc(a.replace('|', ' '))}</td><td><select data-person="${esc(a)}"><option value="A"${personOf(a) !== 'B' ? ' selected' : ''}>аз</option><option value="B"${personOf(a) === 'B' ? ' selected' : ''}>съпруг/а</option></select></td></tr>`).join('')}</table>` : '';
+    <table>${accts.map(a => `<tr><td>${esc(a.split('|')[0])} ${acc(a.split('|').slice(1).join('|'))}</td><td><select data-person="${esc(a)}"><option value="A"${personOf(a) !== 'B' ? ' selected' : ''}>аз</option><option value="B"${personOf(a) === 'B' ? ' selected' : ''}>съпруг/а</option></select></td></tr>`).join('')}</table>` : '';
   $('personsBox').querySelectorAll('[data-person]').forEach(el => el.addEventListener('change', () => { S.persons[el.dataset.person] = el.value; render(); }));
 }
 
@@ -214,7 +263,8 @@ $('fi').addEventListener('change', e => { addFiles(e.target.files); e.target.val
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); addFiles(e.dataTransfer.files); });
-$('clear').addEventListener('click', () => { S.files = []; S.ing = null; renderFiles(); recalc(); });
+$('clear').addEventListener('click', () => { S.files = []; S.ing = null; S.yearPicked = false; renderFiles(); recalc(); });
+$('year').addEventListener('change', () => { S.yearPicked = true; if (S.ing && !S.fifo) renderSummary(); });   // изборът на потребителя се пази при добавяне на още файлове
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit', 'offsetOrder', 'creditPerItem', 'nonIbkrDefault'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
 $('stillhalter').addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } });

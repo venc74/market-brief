@@ -100,6 +100,17 @@
     'Change in Position Value', 'Dividend Accruals', 'Complex Position Summary', 'Trade Summary by Asset', 'Commission Details',
     'Deposits & Withdrawals', 'Deposits And Withdrawals']);                    // вноски / тегления на пари — не са доход (05.11.2026: бяха шум в „не е сметнато“)
 
+  // 12.11.2026: секциите, от които идват сделките и доходите, и колоните, по които се четат (по ИМЕ от заглавния ред) — за съобщението „не намерих сделки“
+  // (какво очаквах) и за проверката „липсват колони“. [a, b] = поне едната от двете.
+  TC.IBKR_EXPECTED = {
+    'Trades': ['Asset Category', 'Currency', 'Symbol', 'Date/Time', 'Quantity', ['Proceeds', 'T. Price']],
+    'Dividends': ['Currency', 'Date', 'Description', 'Amount'],
+    'Withholding Tax': ['Currency', 'Date', 'Description', 'Amount'],
+    'Interest': ['Currency', 'Date', 'Description', 'Amount'],
+  };
+  // номер на сметка → маскиран за показване: „U1234567“ → „U••••567“ (първият знак и последните три); име без поне 4 цифри (Revolut „акции“, „default“) остава
+  TC.maskAccount = function (a) { const t = String(a == null ? '' : a); return (t.match(/\d/g) || []).length < 4 ? t : t[0] + '•'.repeat(Math.max(1, t.length - 4)) + t.slice(-3); };
+
   // тикърът в началото на описание на IBKR: "AAPL(US0378331005) Cash Dividend…" и "AAPL (US0378331005) …"
   TC.ibkrDescSymbol = function (desc) { const m = String(desc || '').match(/^\s*([A-Z0-9][A-Z0-9.\- ]*?)\s*\(([A-Z]{2}[A-Z0-9]{9}\d)\)/); return m ? { sym: m[1].trim(), isin: m[2] } : null; };
 
@@ -108,15 +119,28 @@
     const head = {}, recs = [], skipped = [], info = { broker: 'IBKR', account: '', period: '', periodEnd: '', baseCurrency: '', nonBaseCash: [], openPositions: null };
     const instruments = {};
     const rows = [];
+    // 12.11.2026 (никога тиха нула): сметка на ВСЕКИ ред с данни по секции — data = records + skipped + ignored (с причината в why); нищо не изчезва без следа.
+    // headers — заглавните редове, както са във файла; rowTypes — видовете редове (Header / Data / SubTotal / Total …); disc — Trades по вид ред × вид инструмент.
+    const secs = {}, order = [];
+    let junk = 0;
+    const S = name => { if (!secs[name]) { secs[name] = { name, data: 0, records: 0, skipped: 0, ignored: 0, why: {}, headers: [], rowTypes: {}, disc: {}, missing: [] }; order.push(name); } return secs[name]; };
+    const bump = (o, k) => { o[k] = (o[k] || 0) + 1; };
+    const ign = (sec, why) => { const st = S(sec); st.ignored++; bump(st.why, why); };
     lines.forEach((line, i) => {
       if (!line.trim()) return;
       const p = TC.splitCSV(line);
+      if (p.length < 2 || !p[0]) { junk++; return; }                             // ред извън формата „секция,вид,…“
       const sec = p[0], typ = p[1];
-      if (typ === 'Header') { head[sec] = p.slice(2); return; }
-      if (typ !== 'Data' || !head[sec]) return;
+      const st = S(sec); bump(st.rowTypes, typ || '(празно)');
+      if (typ === 'Header') { head[sec] = p.slice(2); if (!st.headers.some(h => h.join('\u0001') === head[sec].join('\u0001'))) st.headers.push(head[sec]); return; }
+      if (typ !== 'Data') return;                                                // SubTotal / Total / Notes — обобщения (броят се в rowTypes)
+      st.data++;
+      if (!head[sec]) { rows.push({ sec, r: {}, line: i + 1, raw: line, noHeader: true }); return; }
       const r = {}; head[sec].forEach((h, k) => { r[h] = p[k + 2] !== undefined ? p[k + 2] : ''; });
       rows.push({ sec, r, line: i + 1, raw: line });
     });
+    Object.entries(TC.IBKR_EXPECTED).forEach(([sec, need]) => { const st = secs[sec]; if (!st) return;
+      st.headers.forEach(h => { const miss = need.filter(c => !(Array.isArray(c) ? c.some(x => h.includes(x)) : h.includes(c))).map(c => Array.isArray(c) ? c.join(' или ') : c); if (miss.length) st.missing.push(...miss.filter(m => !st.missing.includes(m))); }); });
     if (head['Open Positions']) info.openPositions = [];
     rows.forEach(({ sec, r }) => {
       if (sec === 'Statement' && r['Field Name'] === 'BrokerName') info.brokerName = r['Field Value'];
@@ -136,14 +160,20 @@
     (info.openPositions || []).forEach(o => { o.account = o.account || info.account || '?'; });
     const base = (r, line, src) => ({ broker: 'IBKR', account: acct(r), src, line });
     // taxable (05.11.2026): редът може да е облагаем доход / продажба — годината му става „НЕПЪЛНО“ (не само ред в списъка)
-    const skip = (sec, r, line, reason, taxable) => skipped.push({ src, line, broker: 'IBKR', account: acct(r), section: sec, what: r['Symbol'] || r['Description'] || '', date: (TC.parseDateTime(r['Date/Time'] || r['Date'] || r['Report Date']) || {}).date || '', reason, taxable: !!taxable,
-                                                                  amount: r['Amount'] || r['Quantity'] || r['Proceeds'] || r['Qty'] || '' });
-    rows.forEach(({ sec, r, line }) => {
-      if (IBKR_INFO.has(sec) || sec === 'Financial Instrument Information') return;
-      if (Object.values(r).slice(0, 2).some(v => /^Total\b/i.test(String(v || '').trim()))) return;   // „Total“ / „Total in EUR“ — обобщения на същите редове
+    const skip = (sec, r, line, reason, taxable) => { S(sec).skipped++;
+      skipped.push({ src, line, broker: 'IBKR', account: acct(r), section: sec, what: r['Symbol'] || r['Description'] || '', date: (TC.parseDateTime(r['Date/Time'] || r['Date'] || r['Report Date']) || {}).date || '', reason, taxable: !!taxable,
+                     amount: r['Amount'] || r['Quantity'] || r['Proceeds'] || r['Qty'] || '' }); };
+    const push = (sec, o) => { S(sec).records++; recs.push(o); };
+    rows.forEach(({ sec, r, line, noHeader }) => {
+      if (noHeader) return skip(sec, r, line, 'ред с данни без заглавен ред на секцията — не може да се прочете', !IBKR_INFO.has(sec));
+      if (sec === 'Trades') bump(S(sec).disc, `${r['DataDiscriminator'] || '(празно)'} × ${r['Asset Category'] || '(празно)'}`);
+      if (IBKR_INFO.has(sec) || sec === 'Financial Instrument Information') return ign(sec, 'информативна секция — без сделки и доходи');
+      if (Object.values(r).slice(0, 2).some(v => /^Total\b/i.test(String(v || '').trim()))) return ign(sec, 'обобщение (Total)');   // „Total“ / „Total in EUR“ — обобщения на същите редове
       if (sec === 'Trades') {
         const disc = r['DataDiscriminator'];
-        if (disc && disc !== 'Order' && disc !== 'Trade') return;               // ClosedLot / SubTotal / Total — обобщения на същите сделки
+        if (disc === 'ClosedLot') return ign(sec, 'ClosedLot — лот към сделка, която е броена от реда „Order“');
+        if (/^(SubTotal|Total)$/i.test(disc || '')) return ign(sec, 'обобщение (SubTotal / Total)');
+        if (disc && disc !== 'Order' && disc !== 'Trade') return skip(sec, r, line, `непознат вид ред „${disc}“ в Trades (чета „Order“ / „Trade“)`, true);   // до 12.11 — изчезваше тихо
         const cat = IBKR_ASSET[r['Asset Category']];
         const dt = TC.parseDateTime(r['Date/Time']);
         const qty = TC.num(r['Quantity']), proceeds = TC.num(r['Proceeds']), fee = TC.num(r['Comm/Fee']), tprice = TC.num(r['T. Price']);
@@ -153,44 +183,45 @@
         if (cat === 'other') return skip(sec, r, line, `${r['Asset Category']} — не се смята от калкулатора`, true);
         const price = isFinite(proceeds) && proceeds !== 0 ? Math.abs(proceeds / qty) : tprice;
         if (!isFinite(price)) return skip(sec, r, line, 'сделка без цена', true);
-        recs.push({ ...base(r, line, src), kind: 'trade', sym: r['Symbol'], assetClass: cat, date: dt.date, time: dt.time, qty, price, currency: r['Currency'],
+        push(sec, { ...base(r, line, src), kind: 'trade', sym: r['Symbol'], assetClass: cat, date: dt.date, time: dt.time, qty, price, currency: r['Currency'],
                     fee: isFinite(fee) ? Math.abs(fee) : 0, code: r['Code'] || '' });
         return;
       }
       if (sec === 'Dividends' || sec === 'Payment In Lieu Of Dividends') {
         const dt = TC.parseDateTime(r['Date']), amt = TC.num(r['Amount']), s = TC.ibkrDescSymbol(r['Description']);
-        if (!dt || !isFinite(amt)) return;                                     // Total / празни редове
+        if (!dt || !isFinite(amt)) return skip(sec, r, line, 'ред без четима дата или сума (очаквам Date = ГГГГ-ММ-ДД и Amount = число)', true);   // до 12.11 — изчезваше тихо
         if (!s) return skip(sec, r, line, 'дивидент без разпознаваем тикър в описанието', true);
-        recs.push({ ...base(r, line, src), kind: 'dividend', sym: s.sym, isin: s.isin, date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'],
+        push(sec, { ...base(r, line, src), kind: 'dividend', sym: s.sym, isin: s.isin, date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'],
                     pil: sec !== 'Dividends' });
         return;
       }
       if (sec === 'Withholding Tax') {
         const dt = TC.parseDateTime(r['Date']), amt = TC.num(r['Amount']), s = TC.ibkrDescSymbol(r['Description']);
-        if (!dt || !isFinite(amt)) return;
+        if (!dt || !isFinite(amt)) return skip(sec, r, line, 'ред без четима дата или сума (очаквам Date = ГГГГ-ММ-ДД и Amount = число)', true);
         if (!s) return skip(sec, r, line, 'удържан данък без тикър (напр. върху лихва) — не е сметнат');
-        recs.push({ ...base(r, line, src), kind: 'withholding', sym: s.sym, date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'] });
+        push(sec, { ...base(r, line, src), kind: 'withholding', sym: s.sym, date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'] });
         return;
       }
       if (sec === 'Interest') {
         const dt = TC.parseDateTime(r['Date']), amt = TC.num(r['Amount']);
-        if (!dt || !isFinite(amt)) return;
-        recs.push({ ...base(r, line, src), kind: 'interest', date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'] });
+        if (!dt || !isFinite(amt)) return skip(sec, r, line, 'ред без четима дата или сума (очаквам Date = ГГГГ-ММ-ДД и Amount = число)', true);
+        push(sec, { ...base(r, line, src), kind: 'interest', date: dt.date, amount: amt, currency: r['Currency'], desc: r['Description'] });
         return;
       }
       if (sec === 'Corporate Actions') {
         const dt = TC.parseDateTime(r['Date/Time'] || r['Report Date']);
         const m = String(r['Description'] || '').match(/Split\s+(\d+(?:\.\d+)?)\s+for\s+(\d+(?:\.\d+)?)/i);
         const s = TC.ibkrDescSymbol(r['Description']);
-        if (!dt) return;
-        if (m && s) { recs.push({ ...base(r, line, src), kind: 'split', sym: s.sym, date: dt.date, ratio: Number(m[1]) / Number(m[2]), desc: r['Description'] }); return; }
+        if (!dt) return skip(sec, r, line, 'корпоративно действие без четима дата', true);
+        if (m && s) { push(sec, { ...base(r, line, src), kind: 'split', sym: s.sym, date: dt.date, ratio: Number(m[1]) / Number(m[2]), desc: r['Description'] }); return; }
         return skip(sec, r, line, 'корпоративно действие, което не е сплит (сливане, отделяне, замяна…) — лотовете не са коригирани; сливане с пари е продажба', true);
       }
       if (sec === 'Fees') return skip(sec, r, line, 'такса извън сделките — не се приспада от доходите от капитал (§20 ал. 9 EStG; да се потвърди)');
       if (sec === 'Transfers') return skip(sec, r, line, 'прехвърляне на позиция — цената на придобиване е в отчета на другия брокер');
       skip(sec, r, line, `секцията „${sec}“ не се смята`);
     });
-    return { format: 'ibkr', info, records: recs, skipped, instruments };
+    if (junk) skipped.push({ src, line: 0, broker: 'IBKR', account: info.account || '?', section: 'файл', what: `${junk} реда`, date: '', reason: 'редове извън формата „секция,вид,…“ — не са прочетени', taxable: false });
+    return { format: 'ibkr', info, records: recs, skipped, instruments, stats: { sections: order.map(n => secs[n]), junk } };
   };
 
   // ─── Стандартен CSV (собственият формат на калкулатора) ─────────────────────────────────────────────
@@ -264,7 +295,8 @@
     const perFile = [];
     files.forEach((f, fileIdx) => {
       const fmt = TC.detect(f.text);
-      const desc = { name: f.name, owner: f.owner === 'B' ? 'B' : 'A', format: fmt, broker: '', account: '', from: '', to: '', records: 0, duplicates: 0, skipped: 0, error: null };
+      const desc = { name: f.name, owner: f.owner === 'B' ? 'B' : 'A', format: fmt, broker: '', account: '', accountMasked: '', from: '', to: '', records: 0, duplicates: 0, skipped: 0, error: null,
+                     kinds: { trade: 0, buy: 0, sell: 0, dividend: 0, withholding: 0, interest: 0, split: 0 }, sections: null, problems: [] };
       try {
         if (fmt === 'ecb_rates') {
           const r = TC.parseECBcsv(f.text);
@@ -282,11 +314,18 @@
           const accts = [...new Set(res.records.map(r => r.account))];
           Object.assign(desc, { broker: (res.info && res.info.broker) || fmt, account: accts.join(', ') || (res.info && res.info.account) || '', from: dates[0] || '', to: dates[dates.length - 1] || '',
                                 records: res.records.length, skipped: res.skipped.length, period: res.info && res.info.period });
+          // 12.11.2026 (никога тиха нула): какво точно е прочетено от файла — по вид запис, по секции, и защо няма сделки, ако няма
+          res.records.forEach(r => { desc.kinds[r.kind] = (desc.kinds[r.kind] || 0) + 1; if (r.kind === 'trade') desc.kinds[r.qty > 0 ? 'buy' : 'sell']++; });
+          desc.accountMasked = (accts.length ? accts : [(res.info && res.info.account) || '']).map(TC.maskAccount).join(', ');
+          desc.sections = res.stats ? res.stats.sections : null;
+          desc.problems = TC.fileProblems(desc, res, f.text);
         } else {
           desc.error = 'непознат формат — файлът не е сметнат';
-          out.skipped.push({ src: f.name, line: 0, section: 'файл', what: f.name, date: '', reason: 'непознат формат (не е IBKR, Revolut, стандартен CSV или курсове на ЕЦБ)' });
+          desc.problems = TC.fileProblems(desc, null, f.text);
+          out.skipped.push({ src: f.name, line: 0, section: 'файл', what: f.name, date: '', reason: 'непознат формат (не е IBKR, Revolut, стандартен CSV или курсове на ЕЦБ)', taxable: true });
         }
-      } catch (e) { desc.error = e.message; out.skipped.push({ src: f.name, line: 0, section: 'файл', what: f.name, date: '', reason: 'грешка при четенето: ' + e.message }); }
+      } catch (e) { desc.error = e.message; desc.problems = [{ level: 'err', title: 'Файлът не се прочете', lines: ['Грешка при четенето: ' + e.message] }];
+                    out.skipped.push({ src: f.name, line: 0, section: 'файл', what: f.name, date: '', reason: 'грешка при четенето: ' + e.message, taxable: true }); }
       out.files.push(desc);
     });
     // дедупликация — по поредния номер на файла, не по името (05.11.2026: два различни файла с едно име се сливаха в един „файл“ и общите записи се броеха двойно)
@@ -318,6 +357,88 @@
   };
 
   const t_count = (files, n) => files.filter(f => f.name === n).length;
+
+  // ─── Никога тиха нула (12.11.2026) ─────────────────────────────────────────────
+  // Какво не е наред с файла, казано така, че да се вижда причината: [{level: 'err' | 'warn', title, lines: [текст]}] — страницата го показва с червено под файловете.
+  //  · непознат формат → първият ред на файла (колоните) и какво се очаква;
+  //  · разпознат файл без нито една сделка → кои секции / колони има, кои се очакват и къде са спрели редовете от Trades;
+  //  · очаквана колона липсва в заглавния ред на секция (тогава всеки ред от нея е в „не е сметнато“).
+  TC.FORMAT_HINT = 'Чета: IBKR Activity Statement (CSV — първият ред започва със „Statement,Header,“); Revolut (колони Date, Ticker, Type, Quantity, Price per share, Total Amount, Currency — акции; ' +
+    'Symbol, Type, Quantity, Price, Value, Fees, Date — крипто); стандартен CSV (type, ticker, date, quantity, price, currency); курсове на ЕЦБ (eurofxref-hist.csv).';
+  const cnt = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
+  const colsOf = need => need.map(c => Array.isArray(c) ? c.join(' или ') : c).join(', ');
+  TC.fileProblems = function (desc, res, text) {
+    const out = [];
+    const first = (String(text || '').replace(/^﻿/, '').split(/\r?\n/).find(l => l.trim()) || '');
+    const firstCols = TC.splitCSV(first, TC.delimOf(first)).map(c => c === '' ? '(празно)' : c);
+    if (!res) {
+      out.push({ level: 'err', title: 'Не разпознах файла — нищо от него не е сметнато', lines: [
+        first ? `Първият ред на файла (${firstCols.length} колони): ${firstCols.slice(0, 20).join(' | ')}${firstCols.length > 20 ? ' | …' : ''}` : 'Файлът е празен.', TC.FORMAT_HINT] });
+      return out;
+    }
+    const secs = desc.sections || [], sk = res.skipped || [];
+    if (desc.format === 'ibkr') {
+      Object.entries(TC.IBKR_EXPECTED).forEach(([name, need]) => { const st = secs.find(x => x.name === name);
+        if (st && st.missing.length) out.push({ level: 'err', title: `В секцията „${name}“ липсват колони: ${st.missing.join(', ')}`, lines: [
+          `Чета по името на колоната от заглавния ред; очаквам: ${colsOf(need)}.`, ...st.headers.map((h, i) => `Заглавен ред ${i + 1} в отчета: ${h.map(c => c === '' ? '(без име)' : c).join(' | ')}`),
+          `Редовете от секцията, които не се прочетоха, са в „не е сметнато“ (${st.skipped} от ${st.data}).`] }); });
+    }
+    if (desc.kinds.trade > 0) return out;
+    const lines = [];
+    if (desc.format === 'ibkr') {
+      const withData = secs.filter(x => x.data > 0);
+      lines.push(`Видях секциите (редове с данни): ${withData.map(x => `${x.name} (${x.data})`).join(', ') || 'нито една с данни'}` + (secs.length > withData.length ? `; без данни: ${secs.filter(x => !x.data).map(x => x.name).join(', ')}` : '') + '.');
+      lines.push(`Очаквах: секция „Trades“ с редове „Data“ от вид „Order“ и колони ${colsOf(TC.IBKR_EXPECTED.Trades)}.`);
+      const tr = secs.find(x => x.name === 'Trades');
+      if (!tr) lines.push('Секция „Trades“ в този отчет няма. Ако през периода не си купувал и продавал, това е вярно; иначе отчетът е свален без сделките — свали Activity Statement с включена секция Trades.');
+      else if (!tr.data) lines.push(`Секцията „Trades“ е в отчета, но няма нито един ред с данни (видове редове: ${cnt(tr.rowTypes)}).`);
+      else {
+        const why = {}; Object.entries(tr.why).forEach(([k, n]) => { why[k] = n; });
+        sk.filter(x => x.section === 'Trades').forEach(x => { why[x.reason] = (why[x.reason] || 0) + 1; });
+        lines.push(`Секцията „Trades“ има ${tr.data} реда с данни, но нито един не стана сделка: ${cnt(why)}.`);
+        lines.push(`Редове по вид (DataDiscriminator × Asset Category): ${cnt(tr.disc)}.`);
+        tr.headers.forEach((h, i) => lines.push(`Заглавен ред ${i + 1} на „Trades“ в отчета: ${h.map(c => c === '' ? '(без име)' : c).join(' | ')}`));
+      }
+    } else {
+      lines.push(`Форматът е разпознат като „${desc.format}“; колони в първия ред: ${firstCols.slice(0, 20).join(' | ')}.`);
+      lines.push(`Прочетени записи: ${desc.records} (дивиденти ${desc.kinds.dividend}, лихви ${desc.kinds.interest}); в „не е сметнато“: ${sk.length}${sk.length ? ' — ' + cnt(sk.reduce((o, x) => { o[x.reason] = (o[x.reason] || 0) + 1; return o; }, {})) : ''}.`);
+      lines.push('Очаквах редове от вид покупка / продажба (buy / sell) с дата, количество и цена.');
+    }
+    out.push({ level: 'err', title: 'В този файл не намерих сделки', lines });
+    return out;
+  };
+
+  // Резюмето над резултата: какво е прочетено общо и за избраната година. fifoRes може да липсва (още не е сметнато / няма записи).
+  // → {all: {files, records, trades, buys, sells, dividends, withholding, interest, splits, skipped, skippedNoDate, unmatched}, year: {… + sales, salesNoRate}, years: [години с данни], empty}
+  TC.summary = function (ing, fifoRes, year) {
+    const Y = String(year), recs = (ing && ing.records) || [], sk = (ing && ing.skipped) || [];
+    const count = list => { const o = { records: list.length, trades: 0, buys: 0, sells: 0, dividends: 0, withholding: 0, interest: 0, splits: 0 };
+      list.forEach(r => { if (r.kind === 'trade') { o.trades++; o[r.qty > 0 ? 'buys' : 'sells']++; } else if (r.kind === 'dividend') o.dividends++; else if (r.kind === 'withholding') o.withholding++;
+                          else if (r.kind === 'interest') o.interest++; else if (r.kind === 'split') o.splits++; });
+      return o; };
+    const all = count(recs), yr = count(recs.filter(r => r.date.startsWith(Y)));
+    const un = (fifoRes && fifoRes.unmatched) || [], R = ((fifoRes && fifoRes.realized) || []).filter(x => x.year === Number(year));
+    all.files = ((ing && ing.files) || []).filter(f => f.format !== 'ecb_rates').length;
+    all.skipped = sk.length; all.skippedNoDate = sk.filter(x => !x.date).length; all.unmatched = un.length;
+    yr.skipped = sk.filter(x => String(x.date || '').startsWith(Y)).length; yr.skippedTaxable = sk.filter(x => x.taxable && String(x.date || '').startsWith(Y)).length;
+    yr.unmatched = un.filter(u => u.year === Number(year)).length; yr.sales = R.length; yr.salesNoRate = R.filter(x => x.gainEUR == null).length;
+    return { all, year: yr, years: [...new Set(recs.map(r => Number(r.date.slice(0, 4))))].sort((a, b) => a - b), empty: yr.records === 0 };
+  };
+
+  // Числото най-горе е 0 → защо (никога само „0,00 €“). → [текст, …]; празно, когато числото не е 0. de — от computeDE, sum — от summary за същата година.
+  TC.whyZero = function (de, sum) {
+    if (!de || !sum || Math.abs(de.headline) > 0.004) return [];
+    const y = de.year, s = sum.year, out = [];
+    if (sum.empty) return [`в качените файлове няма нито един запис за ${y}` + (sum.years.length ? ` — данните са за ${sum.years.join(', ')}; смени годината горе` : '')];
+    if (!s.sells) out.push(`за ${y} няма продажби` + (s.buys ? ` (само покупки: ${s.buys})` : ''));
+    if (s.unmatched) out.push(`${s.unmatched} ${s.unmatched === 1 ? 'продажба е' : 'продажби са'} без покупка в качените файлове — не ${s.unmatched === 1 ? 'е' : 'са'} в числото`);
+    if (s.salesNoRate) out.push(`${s.salesNoRate} ${s.salesNoRate === 1 ? 'продажба е' : 'продажби са'} без курс — не ${s.salesNoRate === 1 ? 'е' : 'са'} в числото`);
+    if (!s.dividends && !s.interest) out.push('няма дивиденти и лихви');
+    if (s.skippedTaxable) out.push(`${s.skippedTaxable} реда от ${y} са в „не е сметнато“ и може да са облагаеми`);
+    if ((de.items || []).length && !out.length) out.push('редовете в разбивката се събират точно до 0 (печалбите се покриват от загубите / пренесените загуби)');
+    if ((de.crypto || []).length) out.push('крипто продажбите са отделно (§23, Anlage SO) — виж реда под числото');
+    return out;
+  };
 
   // ─── Revolut (ПРОВЕРЕН САМО СЪС СИНТЕТИЧЕН ФАЙЛ — по публичното описание на формата; реален отчет може да се различава) ─────────────────────
   // суми с валута: "USD 150.23", "$1,234.56", "€20,000.00", "-€5.00", "150.23" → {v, cur}
@@ -396,7 +517,7 @@
     // стар формат на Revolut (Type,Product,Started Date,…) — не се чете; изрично в „не е сметнато“
     revolut_crypto_old(text, src) {
       return { format: 'revolut_crypto_old', info: { broker: 'Revolut' }, records: [], skipped: [{ src, line: 0, broker: 'Revolut', account: '', section: 'файл', what: src, date: '',
-               reason: 'старият формат на извлечението на Revolut (Type, Product, Started Date…) не се чете — свали отчета „Crypto account statement“ / „Trading account statement“ (CSV)' }] };
+               reason: 'старият формат на извлечението на Revolut (Type, Product, Started Date…) не се чете — свали отчета „Crypto account statement“ / „Trading account statement“ (CSV)', taxable: true }] };
     },
   };
 
@@ -549,7 +670,7 @@
             p.short.push({ qty: q, proceedsEUR: 0, date: r.date });
           } else p.short.push({ qty: q, proceedsEUR: prem, date: r.date });
         } else {
-          unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, src: r.src });
+          unmatched.push({ broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), qty: q, sold: qAbs, src: r.src });   // sold — цялата продажба; qty — частта без покупка
           p.deficit += q;
           if (!tainted[k]) tainted[k] = { key: k, broker: r.broker, account: r.account, sym: r.sym, from: r.date };
         }
@@ -776,13 +897,19 @@
     // 05.11.2026: редове от „не е сметнато“ в тази година, които може да са облагаеми (размяна на крипто, сливане с пари, фючърси, нечетим ред…)
     const skippedTaxable = (st.skipped || []).filter(x => x.taxable && String(x.date || '').startsWith(String(year)));
     if (skippedTaxable.length) notes.push({ level: 'err', text: `В „не е сметнато“ има ${skippedTaxable.length} ред(а) от ${year}, които може да са облагаеми (${[...new Set(skippedTaxable.map(x => x.what))].slice(0, 6).join(', ')}) — сметни ги отделно. НЕПЪЛНО.` });
-    mism.forEach(m => notes.push({ level: 'err', text: `${m.sym} (${m.account}): в края на ${m.date} отчетът на IBKR показва ${m.reported} бр., сметнатите сделки — ${m.computed} бр. (липсва отчет или ред?). НЕПЪЛНО.` }));
+    // 12.11.2026: ред без четима дата, който може да е облагаем (сделка с непознат формат на датата, липсваща колона) — годината му не се знае → всяка година е НЕПЪЛНО
+    const skippedUndated = (st.skipped || []).filter(x => x.taxable && x.line && !/^\d{4}-\d{2}-\d{2}/.test(String(x.date || '')));
+    if (skippedUndated.length) notes.push({ level: 'err', text: `В „не е сметнато“ има ${skippedUndated.length} ред(а) без четима дата, които може да са облагаеми — не се знае за коя година са; ако са от ${year}, не са в числото. НЕПЪЛНО.` });
+    // 12.11.2026: файл, който не е прочетен (непознат формат, грешка при четенето, стар формат на Revolut) — не се знае какво има в него → всяка година е НЕПЪЛНО
+    const unreadFiles = (st.skipped || []).filter(x => x.taxable && !x.line && x.section === 'файл');
+    unreadFiles.forEach(x => notes.push({ level: 'err', text: `Файлът „${x.what}“ не е прочетен (${x.reason}) — ако в него има сделки или доходи за ${year}, те не са в числото. НЕПЪЛНО.` }));
+    mism.forEach(m => notes.push({ level: 'err', text: `${m.sym} (${TC.maskAccount(m.account)}): в края на ${m.date} отчетът на IBKR показва ${m.reported} бр., сметнатите сделки — ${m.computed} бр. (липсва отчет или ред?). НЕПЪЛНО.` }));
     const missing = (fifoRes.missingRates || []).filter(m => m.date.startsWith(String(year)) || (R.some(x => x.gainEUR == null && x.sym === m.sym)));
     return {
       year, params: par, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
       carriedShareLoss: cS, carriedOtherLoss: cO, withheld, creditable, items, crypto: Object.values(persons).sort((a, b) => a.person.localeCompare(b.person)),
       estimate: est, notes, unmatched, missingRates: missing, funds: fundsSeen, heldFunds,
-      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length && !oldRules.length, reconcile: mism, skippedTaxable,
+      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length && !oldRules.length && !unreadFiles.length && !skippedUndated.length, reconcile: mism, skippedTaxable, unreadFiles, skippedUndated,
     };
   };
 
