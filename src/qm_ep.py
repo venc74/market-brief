@@ -521,8 +521,83 @@ def resolve_entries(log: dict, today: dt.date, daily_fetch=None) -> int:
     return n
 
 
+def preopen_gaps(today: dt.date, folder=None, max_days: int = 30) -> list[dict]:
+    """
+    12.11.2026 (т. 2, CRWV 11.11): гаповете ≥ PREOPEN_GAP_PCT от карето в 15:05 (data/preopen/<дата>.json) на минали дни (до max_days назад) — за дневника. Пълният списък
+    ("gaps_all", от 12.11), иначе показаните ("gaps", до PREOPEN_MAX_ROWS). → [{ticker, session, gap_session, prev_close, pm_price, pm_gap_pct, pm_last_ny, neglect, ret63_pct}].
+    Нечетим файл — пропуска се (graceful).
+    """
+    d = pathlib.Path(folder or config.DATA_DIR / "preopen")
+    out = []
+    try:
+        files = sorted(d.glob("*.json"))
+    except Exception:
+        return out
+    for f in files:
+        try:
+            day = dt.date.fromisoformat(f.stem)
+        except ValueError:
+            continue
+        if not (today - dt.timedelta(days=max_days) <= day < today):
+            continue
+        try:
+            p = json.loads(f.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[qm_ep] {f.name} не се прочете за дневника: {type(e).__name__}")
+            continue
+        for g in (p.get("gaps_all") if p.get("gaps_all") is not None else p.get("gaps")) or []:
+            try:
+                out.append({"ticker": g["ticker"], "session": g["session"], "gap_session": day.isoformat(), "prev_close": round(float(g["prev_close"]), 4),
+                            "pm_price": round(float(g["pm_price"]), 4), "pm_gap_pct": round(float(g["gap_pct"]), 2), "pm_last_ny": g.get("pm_last_ny"),
+                            "neglect": g.get("neglect"), "ret63_pct": None if g.get("ret63_pct") is None else round(g["ret63_pct"], 1)})
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
+def add_preopen_entries(log: dict, rows: list[dict], brief_date: str) -> tuple[int, int]:
+    """
+    12.11.2026 (т. 2): гаповете от 15:05 в дневника — нов запис (source "preopen", без after-hours част) или, ако същият гап (тикър, сесия) вече е записан от сутрешния
+    after-hours, премаркетът се добавя към него (pm_*). Записите се разрешават от resolve_entries както after-hours (отваряне, затваряне, връх). → (нови, допълнени).
+    """
+    have = {(e["ticker"], e["session"]): e for e in log["entries"]}
+    added = merged = 0
+    for r in rows:
+        e = have.get((r["ticker"], r["session"]))
+        pm = {"pm_price": round(r["pm_price"], 4), "pm_gap_pct": r["pm_gap_pct"], "pm_last_ny": r.get("pm_last_ny")}
+        if e is not None:
+            if e.get("pm_gap_pct") is None:
+                e.update(pm)
+                merged += 1
+            continue
+        e = {"ticker": r["ticker"], "session": r["session"], "brief_date": brief_date, "source": "preopen", "gap_session": r["gap_session"],
+             "prev_close": round(r["prev_close"], 4), **pm, "ah_price": None, "ah_gap_pct": None, "ah_bars": None, "ah_volume": None,
+             "neglect": r.get("neglect"), "ret63_pct": r.get("ret63_pct"), "open_gap_pct": None, "close_pct": None, "high_pct": None, "resolved_on": None}
+        log["entries"].append(e)
+        have[(r["ticker"], r["session"])] = e
+        added += 1
+    return added, merged
+
+
+def summarize_preopen(entries: list[dict]) -> dict:
+    """12.11.2026 (т. 2): гаповете от 15:05 срещу отварянето и затварянето — колко са, колко са разрешени, колко отварят ≥ прага, медианите. Чиста функция."""
+    pm = [e for e in entries if e.get("pm_gap_pct") is not None]
+    res = [e for e in pm if e.get("open_gap_pct") is not None]
+    out = {"entries": len(pm), "resolved": len(res), "since": min((e["gap_session"] for e in pm), default=None), "held_at_open": None,
+           "median_open_gap_pct": None, "median_close_pct": None}
+    if res:
+        out.update(held_at_open=sum(1 for e in res if e["open_gap_pct"] >= config.QM_EP_GAP_PCT),
+                   median_open_gap_pct=round(statistics.median(e["open_gap_pct"] for e in res), 2),
+                   median_close_pct=round(statistics.median(e["close_pct"] for e in res if e.get("close_pct") is not None), 2) if any(e.get("close_pct") is not None for e in res) else None)
+    return out
+
+
 def summarize_log(entries: list[dict]) -> dict:
-    """AH гап срещу реалния гап на отварянето: колко са разрешени, колко отварят ≥ прага, медианно разминаване, корелация."""
+    """
+    AH гап срещу реалния гап на отварянето: колко са разрешени, колко отварят ≥ прага, медианно разминаване, корелация.
+    12.11.2026 (т. 2): само записите с after-hours гап — гаповете само от 15:05 (source "preopen") са в summarize_preopen.
+    """
+    entries = [e for e in entries if e.get("ah_gap_pct") is not None]
     res = [e for e in entries if e.get("open_gap_pct") is not None]
     out = {"entries": len(entries), "resolved": len(res), "held_at_open": None, "held_share_pct": None, "median_diff_pp": None, "corr": None, "median_open_gap_pct": None}
     if not res:
@@ -563,7 +638,8 @@ def sector_bounce(tickers: list[str], industry: dict | None = None) -> list[dict
     return out
 
 
-def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None, filings_fn=None) -> dict:
+def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None, filings_fn=None,
+        preopen_dir=None) -> dict:
     """
     След затваряне → гапове ≥ 10% → (нейният) ръст за 3 месеца, ADR, максимален стоп → заглавия + AI класификация на катализатора за показаните → дневник. Връща
     {"ok", "session", "rows" (показаните — "пренебрегнати", най-много QM_EP_MAX_ROWS), "not_neglected" (останалите гапове ≥ 10%), "diag", "log" (обобщение), "notes"}. Не вдига.
@@ -604,14 +680,24 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
         # дневник: ВСИЧКИ гапове; разрешаване на по-старите; обобщение
         log = load_log(log_path)
         added = add_entries(log, allrows, today.isoformat())
+        # 12.11.2026 (т. 2, CRWV 11.11): и гаповете от карето в 15:05 (data/preopen/) — записват се тук, в сутрешния бриф (един писач на дневника), и се разрешават веднага
+        pm_added, pm_merged = add_preopen_entries(log, preopen_gaps(today, preopen_dir), today.isoformat())
         resolved = resolve_entries(log, today, fetch_daily_fn)
         save_log(log, log_path)
         yesterday = [{"ticker": x["ticker"], "session": x["session"], "gap_session": x["gap_session"], "ah_gap_pct": x["ah_gap_pct"], "open_gap_pct": x["open_gap_pct"],
                       "close_pct": x.get("close_pct"), "held": bool(x["open_gap_pct"] >= config.QM_EP_GAP_PCT)}
-                     for x in log["entries"] if x.get("resolved_on") == today.isoformat() and x.get("open_gap_pct") is not None]
-        out["log"] = {**summarize_log(log["entries"]), "added_today": added, "resolved_today": resolved, "yesterday": yesterday}
+                     for x in log["entries"] if x.get("resolved_on") == today.isoformat() and x.get("open_gap_pct") is not None and x.get("ah_gap_pct") is not None]
+        from src import sessions
+        prev = sessions.prev_session(today).isoformat()
+        yesterday_pm = [{"ticker": x["ticker"], "gap_session": x["gap_session"], "pm_gap_pct": x["pm_gap_pct"], "pm_last_ny": x.get("pm_last_ny"), "ah_gap_pct": x.get("ah_gap_pct"),
+                         "open_gap_pct": x["open_gap_pct"], "close_pct": x.get("close_pct"), "held": bool(x["open_gap_pct"] >= config.QM_EP_GAP_PCT)}
+                        for x in log["entries"] if x.get("resolved_on") == today.isoformat() and x.get("open_gap_pct") is not None
+                        and x.get("pm_gap_pct") is not None and x["gap_session"] == prev]           # допълнените назад (до 30 дни) — само в общия брой
+        out["log"] = {**summarize_log(log["entries"]), "added_today": added, "resolved_today": resolved, "yesterday": yesterday,
+                      "preopen": {**summarize_preopen(log["entries"]), "added_today": pm_added, "merged_today": pm_merged}, "yesterday_pm": yesterday_pm}
         print(f"[qm_ep] сесия {diag.get('session')}: {len(gappers)} after-hours гапа ≥ {config.QM_EP_GAP_PCT:g}%, показани {len(shown)} (пренебрегнати), "
-              f"останали {len(out['not_neglected'])}; дневник: {out['log']['entries']} записа, {out['log']['resolved']} разрешени")
+              f"останали {len(out['not_neglected'])}; дневник: {out['log']['entries']} записа, {out['log']['resolved']} разрешени; "
+              f"от карето в 15:05: {out['log']['preopen']['entries']} (нови {pm_added}, допълнени {pm_merged})")
     except Exception as e:
         out["notes"].append(f"{type(e).__name__}: {e}")
         out["ok"] = False

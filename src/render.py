@@ -806,6 +806,11 @@ def _qm_email_block(brief: dict) -> str:
             if yd:
                 line += " Вчера, AH срещу отваряне: " + "; ".join(
                     f'{_e(y["ticker"])} {y["ah_gap_pct"]:+.1f}% → {y["open_gap_pct"]:+.1f}% ({"издържа" if y.get("held") else "не издържа"})' for y in yd) + "."
+            ypm = (ep.get("log") or {}).get("yesterday_pm") or []                    # 12.11.2026 (т. 2): гаповете от карето в 09:05 Ню Йорк
+            if ypm:
+                line += " Вчера, премаркет в 09:05 Ню Йорк: " + "; ".join(
+                    f'{_e(y["ticker"])} {y["pm_gap_pct"]:+.1f}% → отваряне {y["open_gap_pct"]:+.1f}% ({"издържа" if y.get("held") else "не издържа"})'
+                    + (f' → затваряне {y["close_pct"]:+.1f}%' if y.get("close_pct") is not None else "") for y in ypm) + "."
             body += f'<div style="margin-top:6px;font-size:12px;color:#374151">{line}</div>'
         return f'<tr><td style="padding:12px 28px 14px;border-top:1px solid #f3f4f6">{body}</td></tr>'
     except Exception as e:

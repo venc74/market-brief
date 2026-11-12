@@ -264,6 +264,21 @@ def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=No
     return out
 
 
+def gaps_all(gaps: list[dict], shown: list[dict]) -> list[dict]:
+    """
+    12.11.2026 (т. 2, CRWV 11.11): всички гапове ≥ PREOPEN_GAP_PCT (и извън първите PREOPEN_MAX_ROWS) в компактен вид за дневника на EP; за показаните — официалното
+    затваряне и гапът спрямо него от ep_rows (qm_ep.enrich_gappers), пренебрегването. Чиста функция.
+    """
+    by = {g["ticker"]: g for g in shown or []}
+    out = []
+    for g in gaps or []:
+        e = by.get(g["ticker"]) or {}
+        pc, gp = e.get("prev_close") or g["prev_close"], e.get("gap_pct") if e.get("gap_pct") is not None else g["gap_pct"]
+        out.append({"ticker": g["ticker"], "session": g["session"], "prev_close": round(float(pc), 4), "pm_price": round(float(g["pm_price"]), 4), "gap_pct": round(float(gp), 2),
+                    "pm_bars": g.get("pm_bars"), "pm_last_ny": g.get("pm_last_ny"), "neglect": e.get("neglect"), "ret63_pct": e.get("ret63_pct")})
+    return out
+
+
 def morning_generated(page_html: str | None) -> tuple[str, str] | None:
     """Часът „генериран HH:MM CET“ на сутрешния бриф от текущата страница — заглавието го пази, когато карето се добавя наново (иначе би казало 15:05). Чиста функция."""
     import re
@@ -778,6 +793,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
         res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
+        res["gaps_all"] = gaps_all(gaps, res["gaps"])                                 # 12.11.2026 (т. 2): всички гапове ≥ прага — за дневника на EP (qm_ep.preopen_gaps)
         try:                                                                           # 10.11.2026 (т. 2, SANM): сутрешните EP кандидати извън гаповете — с ред, не изпадат тихо
             res["ep_morning"] = [x for x in ep_morning(brief, pts, frames5, res["gaps"], now) if x["ticker"] not in ex]
         except Exception as e:

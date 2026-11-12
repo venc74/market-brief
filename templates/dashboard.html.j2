@@ -1679,11 +1679,15 @@
   {% endif %}
   <div class="small" style="font-size:12.5px;color:var(--text);margin-top:10px">
     <b>Проверката е отварянето</b> ({{ ny_open_berlin }} / 09:30 ET): гапът се доказва едва тогава — не се действа по after-hours цената.
-    {% set yd = (qm_ep.log or {}).get("yesterday") %}
+    {% set yd = (qm_ep.log or {}).get("yesterday") %}{% set ypm = (qm_ep.log or {}).get("yesterday_pm") %}
     {% if yd %}<br><b>Вчерашният дневник — after-hours срещу отваряне:</b>
     {% for y in yd %}<span style="font-family:'IBM Plex Mono',monospace">{{ y.ticker }}</span> AH {{ "%+.1f"|format(y.ah_gap_pct) }}% → отваряне {{ "%+.1f"|format(y.open_gap_pct) }}% ({{ "издържа ≥ " ~ (qm_ep_gap|round|int) ~ "%" if y.held else "не издържа" }}){{ "; " if not loop.last else "" }}{% endfor %}.
-    {% elif qm_ep.log and qm_ep.log.entries %}<br><span style="color:var(--muted)">Вчера няма гапове за проверка срещу отварянето.</span>{% endif %}
+    {% elif qm_ep.log and qm_ep.log.entries and not ypm %}<br><span style="color:var(--muted)">Вчера няма гапове за проверка срещу отварянето.</span>{% endif %}
+    {# 12.11.2026 (т. 2, CRWV 11.11): гаповете от карето преди отварянето (09:05 Ню Йорк) — отварянето и затварянето #}
+    {% if ypm %}<br><b>Вчерашният дневник — премаркет в 09:05 Ню Йорк (карето) срещу отваряне и затваряне:</b>
+    {% for y in ypm %}<span style="font-family:'IBM Plex Mono',monospace">{{ y.ticker }}</span> премаркет {{ "%+.1f"|format(y.pm_gap_pct) }}%{% if y.pm_last_ny %} ({{ y.pm_last_ny }}){% endif %} → отваряне {{ "%+.1f"|format(y.open_gap_pct) }}% ({{ "издържа ≥ " ~ (qm_ep_gap|round|int) ~ "%" if y.held else "не издържа" }}){% if y.close_pct is not none %} → затваряне {{ "%+.1f"|format(y.close_pct) }}%{% endif %}{{ "; " if not loop.last else "" }}{% endfor %}.{% endif %}
     {% if qm_ep.log and qm_ep.log.entries %}<span style="color:var(--muted)"> Общо в дневника: записи {{ qm_ep.log.entries }}, разрешени {{ qm_ep.log.resolved }}{% if qm_ep.log.resolved %}; {{ qm_ep.log.held_at_open }} от тях отварят ≥ {{ qm_ep_gap|round|int }}% ({{ qm_ep.log.held_share_pct|round|int }}%) · медианно разминаване {{ "%+.1f"|format(qm_ep.log.median_diff_pp) }} пр.п.{% if qm_ep.log.corr is not none %} · корелация {{ "%.2f"|format(qm_ep.log.corr) }}{% endif %}{% endif %}; решение за второ пускане — след 4–6 седмици.</span>{% endif %}
+    {% set pp = (qm_ep.log or {}).get("preopen") %}{% if pp and pp.entries %}<span style="color:var(--muted)"> Гаповете от карето в 09:05 Ню Йорк{% if pp.since %} (от {{ pp.since[8:10] }}.{{ pp.since[5:7] }}){% endif %}: записи {{ pp.entries }}, разрешени {{ pp.resolved }}{% if pp.resolved %}; {{ pp.held_at_open }} от тях отварят ≥ {{ qm_ep_gap|round|int }}%, медиана — отваряне {{ "%+.1f"|format(pp.median_open_gap_pct) }}%{% if pp.median_close_pct is not none %}, затваряне {{ "%+.1f"|format(pp.median_close_pct) }}%{% endif %}{% endif %}.</span>{% endif %}
   </div>
 </section>
 {% endif %}
