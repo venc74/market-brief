@@ -28,7 +28,7 @@ function renderFiles() {
   const secTable = f => `<details><summary>Какво прочетох от този файл — по секции (${f.sections.filter(x => x.data).length} с данни)</summary><table>
     <tr><th>Секция</th><th class="n">Редове с данни</th><th class="n">Станаха записи</th><th class="n">Не е сметнато</th><th class="n">Обобщения / информативни</th><th>Защо</th></tr>
     ${f.sections.filter(x => x.data).map(x => `<tr><td>${esc(x.name)}${x.missing.length ? ` <b class="neg">липсват колони: ${esc(x.missing.join(', '))}</b>` : ''}</td><td class="n">${x.data}</td><td class="n ${x.records ? 'pos' : 'mut'}">${x.records}</td>
-      <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}</td></tr>`).join('')}</table></details>`;
+      <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}${x.wider ? ` <b class="neg">· ${x.wider} реда с повече клетки от заглавния ред (${esc(cntText(x.widths))})</b>` : ''}</td></tr>`).join('')}</table></details>`;
   $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан<br>данък</th><th class="n">Лихви</th><th class="n">Не е<br>сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
     ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', n = v => rates ? '' : (v || 0);
       const span = `${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}`;        // периодът от отчета (IBKR) и датите на прочетените записи — под името на файла
@@ -40,7 +40,9 @@ function renderFiles() {
       <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
       (f.sections ? `<tr><td></td><td colspan="11">${secTable(f)}</td></tr>` : ''); }).join('');
   // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
-  $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => `<div class="msg err bigmsg"><b class="t">${esc(f.name)}: ${esc(p.title)}</b>${p.lines.map(l => `<div>${esc(l)}</div>`).join('')}</div>`).join('')).join('');
+  $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => p.level === 'warn'
+    ? `<div class="msg warn"><b>${esc(f.name)}: ${esc(p.title)}</b>${p.lines.map(l => `<div class="small" style="color:inherit">${esc(l)}</div>`).join('')}</div>`
+    : `<div class="msg err bigmsg"><b class="t">${esc(f.name)}: ${esc(p.title)}</b>${p.lines.map(l => `<div>${esc(l)}</div>`).join('')}</div>`).join('')).join('');
   // чий е файлът (05.11.2026): за Revolut определя сметката (отчетът няма номер), за всички — човека за крипто §23
   $('files').querySelectorAll('[data-owner]').forEach(el => el.addEventListener('change', () => { S.files[Number(el.dataset.owner)].owner = el.value; S.ing = TC.ingest(S.files); renderFiles(); recalc(); }));
   $('files').querySelectorAll('[data-rm]').forEach(el => el.addEventListener('click', () => removeFile(Number(el.dataset.rm))));

@@ -123,7 +123,7 @@
     // headers — заглавните редове, както са във файла; rowTypes — видовете редове (Header / Data / SubTotal / Total …); disc — Trades по вид ред × вид инструмент.
     const secs = {}, order = [];
     let junk = 0;
-    const S = name => { if (!secs[name]) { secs[name] = { name, data: 0, records: 0, skipped: 0, ignored: 0, why: {}, headers: [], rowTypes: {}, disc: {}, missing: [] }; order.push(name); } return secs[name]; };
+    const S = name => { if (!secs[name]) { secs[name] = { name, data: 0, records: 0, skipped: 0, ignored: 0, why: {}, headers: [], rowTypes: {}, disc: {}, missing: [], wider: 0, narrower: 0, widths: {} }; order.push(name); } return secs[name]; };
     const bump = (o, k) => { o[k] = (o[k] || 0) + 1; };
     const ign = (sec, why) => { const st = S(sec); st.ignored++; bump(st.why, why); };
     lines.forEach((line, i) => {
@@ -136,6 +136,9 @@
       if (typ !== 'Data') return;                                                // SubTotal / Total / Notes — обобщения (броят се в rowTypes)
       st.data++;
       if (!head[sec]) { rows.push({ sec, r: {}, line: i + 1, raw: line, noHeader: true }); return; }
+      // ред с данни с различен брой клетки от заглавния ред (без обобщенията Total): повече клетки → стойностите попадат под грешно име (изместени колони)
+      const nCells = p.length - 2, hLen = head[sec].length;
+      if (nCells !== hLen && !p.slice(2, 4).some(v => /^Total\b/i.test(String(v || '').trim()))) { if (nCells > hLen) st.wider++; else st.narrower++; bump(st.widths, `${nCells} вместо ${hLen}`); }
       const r = {}; head[sec].forEach((h, k) => { r[h] = p[k + 2] !== undefined ? p[k + 2] : ''; });
       rows.push({ sec, r, line: i + 1, raw: line });
     });
@@ -382,6 +385,12 @@
         if (st && st.missing.length) out.push({ level: 'err', title: `В секцията „${name}“ липсват колони: ${st.missing.join(', ')}`, lines: [
           `Чета по името на колоната от заглавния ред; очаквам: ${colsOf(need)}.`, ...st.headers.map((h, i) => `Заглавен ред ${i + 1} в отчета: ${h.map(c => c === '' ? '(без име)' : c).join(' | ')}`),
           `Редовете от секцията, които не се прочетоха, са в „не е сметнато“ (${st.skipped} от ${st.data}).`] }); });
+      // редове с повече клетки от заглавния ред — колоните са изместени спрямо имената; червено, ако от секцията не е излязъл нито един запис
+      Object.keys(TC.IBKR_EXPECTED).forEach(name => { const st = secs.find(x => x.name === name);
+        if (st && st.wider) out.push({ level: st.records ? 'warn' : 'err', title: `В секцията „${name}“ ${st.wider} ${st.wider === 1 ? 'ред с данни има' : 'реда с данни имат'} повече клетки от заглавния ред (${cnt(st.widths)})`, lines: [
+          'Чета по името на колоната от заглавния ред: когато в реда има клетка, която я няма в заглавния ред, стойностите след нея попадат под грешно име (изместени колони).',
+          ...st.headers.map((h, i) => `Заглавен ред ${i + 1} в отчета (${h.length} колони): ${h.map(c => c === '' ? '(без име)' : c).join(' | ')}`),
+          st.records ? `От секцията са прочетени ${st.records} записа — провери ги по отчета.` : `От секцията не е прочетен нито един запис (${st.skipped} реда са в „не е сметнато“).`] }); });
     }
     if (desc.kinds.trade > 0) return out;
     const lines = [];

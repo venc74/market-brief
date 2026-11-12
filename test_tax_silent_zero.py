@@ -131,7 +131,24 @@ d = r["de"][2026]
 assert not d["complete"] and len(d["skippedTaxable"]) == 1 and len(d["skippedUndated"]) == 2       # Allocation — с дата (2026); дивидентът и лихвата — без четима дата
 print("  ✓ трите реда са в „не е сметнато“ с причината и „може да е облагаем“; 2026 — НЕПЪЛНО")
 
-print("── 8. маскиране на сметката ──")
+print("── 8. редове с клетка повече от заглавния ред (СИНТЕТИЧНО изкривяване: сметка след валутата, която я няма в заглавния ред) → казва го ──")
+shift = lambda row: row.replace(",EUR,ACME,", ",EUR,U1111111,ACME,")
+t = ib(TRH, shift('Trades,Data,Order,Stocks,EUR,ACME,"2026-02-02, 10:00:00",10,100,100,-1000,-1,1001,0,0,O'), shift('Trades,Data,Order,Stocks,EUR,ACME,"2026-03-02, 10:00:00",-10,120,120,1200,-1,-1001,198,0,C'),
+       "Trades,Total,,Stocks,EUR,,,,,,198,-2,0,198,0,")
+r = scenario([{"name": "shifted.csv", "text": t}], years=[2026])
+f = r["files"][0]
+tr = next(s for s in f["sections"] if s["name"] == "Trades")
+assert (tr["data"], tr["records"], tr["skipped"], tr["wider"], tr["widths"]) == (2, 0, 2, 2, {"15 вместо 14": 2}), tr
+titles = [p["title"] for p in f["problems"]]
+assert titles == ["В секцията „Trades“ 2 реда с данни имат повече клетки от заглавния ред (15 вместо 14 ×2)", "В този файл не намерих сделки"], titles
+assert f["problems"][0]["level"] == "err" and "изместени колони" in f["problems"][0]["lines"][0] and f["problems"][0]["lines"][-1] == "От секцията не е прочетен нито един запис (2 реда са в „не е сметнато“)."
+assert not r["de"][2026]["complete"] and len(r["skipped"]) == 2
+# същият заглавен ред и редове без излишната клетка → нищо за казване
+r = scenario([{"name": "good.csv", "text": good}], years=[2026])
+assert r["files"][0]["problems"] == [] and next(s for s in r["files"][0]["sections"] if s["name"] == "Trades")["wider"] == 0
+print("  ✓ „2 реда с данни имат повече клетки от заглавния ред (15 вместо 14 ×2)“ — червено, със заглавния ред; редовете са в „не е сметнато“, 2026 — НЕПЪЛНО")
+
+print("── 9. маскиране на сметката ──")
 r = scenario([{"name": "good.csv", "text": good}], mask=["U1111111", "U12345", "акции · съпруг/а", "default", "B2", ""])
 assert r["masked"] == ["U••••111", "U••345", "акции · съпруг/а", "default", "B2", ""], r["masked"]
 print("  ✓ U1111111 → U••••111; имена без номер (Revolut „акции“, „default“) остават")
