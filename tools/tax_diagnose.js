@@ -84,7 +84,7 @@ function structure(text) {
     if (!line.trim()) { blank++; return; }
     const p = splitRaw(line), sec = p[0].v, typ = p[1] ? p[1].v : '';
     let s = by[sec];
-    if (!s) { s = by[sec] = { name: sec, types: {}, headers: [], disc: {}, cells: {}, enums: {}, widths: {}, fields: [], headerWidthMismatch: 0 }; sections.push(s); }
+    if (!s) { s = by[sec] = { name: sec, types: {}, headers: [], disc: {}, cells: {}, enums: {}, widths: {}, fields: [], headerWidthMismatch: 0, accounts: new Set(), accShapes: {} }; sections.push(s); }
     inc(s.types, typ || '(празно)');
     if (typ === 'Header') { const h = p.slice(2).map(x => x.v); cur[sec] = h; if (!s.headers.some(x => x.join('\u0001') === h.join('\u0001'))) s.headers.push(h); return; }
     if (typ !== 'Data') return;
@@ -97,6 +97,7 @@ function structure(text) {
     if (sec === 'Trades' || sec === 'Open Positions') inc(s.disc, `${safeEnum(r['DataDiscriminator'] || '')} × ${safeEnum(r['Asset Category'] || '')}`);
     if ((SAFE_FIELDS[sec] || []).includes(r['Field Name'])) s.fields.push(`${r['Field Name']} = ${r['Field Value']}`);
     else if (sec === 'Account Information' && r['Field Name'] === 'Account') s.fields.push(`Account = (маскирано; форма „${shape(r['Field Value'])}“)`);
+    if (h.includes('Account') && !/^Total/i.test(cells[0] ? cells[0].v : '')) { const a = r['Account']; s.accounts.add(a); inc(s.accShapes, a === '' ? '(празно)' : shape(a)); }
     h.forEach((name, k) => {
       const key = name === '' ? `(без име, колона ${k + 1})` : name;
       if (ENUM_COLS.has(name)) inc(s.enums[key] = s.enums[key] || {}, safeEnum(cells[k] ? cells[k].v : ''));
@@ -172,6 +173,7 @@ function v1Trace(text, v1) {
       if (sec.headerWidthMismatch) out(`   ! ${sec.headerWidthMismatch} Data реда с различен брой клетки от заглавния ред (клетки на ред: ${counts(sec.widths)})`);
       if (sec.fields.length) out(`   полета: ${sec.fields.join(' · ')}`);
       if (Object.keys(sec.disc).length) out(`   Data по DataDiscriminator × Asset Category: ${counts(sec.disc)}`);
+      if (sec.accounts.size) out(`   колона „Account“: ${sec.accounts.size} различни стойности (форма: ${counts(sec.accShapes)})`);
       Object.entries(sec.enums).forEach(([c, v]) => { const e = Object.entries(v); out(`   стойности на „${c}“: ${e.slice(0, 24).map(([k, n]) => `${k} ×${n}`).join(' · ')}${e.length > 24 ? ` · … още ${e.length - 24}` : ''}`); });
       if (DETAIL.has(sec.name)) Object.entries(sec.cells).forEach(([c, v]) => out(`   вид на клетките „${c}“: ${counts(v)}`));
     });
@@ -226,11 +228,33 @@ function v1Trace(text, v1) {
   // 4) сметката по години, стара ↔ нова
   const rate = TC.rateLookup(table);
   const res = TC.fifo(ing.records, rate);
+  // сметките в записите — новата логика води FIFO по брокер / сметка / инструмент; старата — само по тикър
+  const T = ing.records.filter(r => r.kind === 'trade');
+  const accIdx = {}; T.forEach(r => { const k = r.broker + '|' + r.account; if (!(k in accIdx)) accIdx[k] = Object.keys(accIdx).length + 1; });
+  const accLine = Object.entries(accIdx).map(([k, n]) => { const a = T.filter(r => r.broker + '|' + r.account === k); const d = a.map(r => r.date).sort();
+    return `сметка ${n} (${k.split('|')[0]}, форма „${shape(k.split('|')[1])}“): покупки ${a.filter(r => r.qty > 0).length}, продажби ${a.filter(r => r.qty < 0).length}, ${d[0]} … ${d[d.length - 1]}`; });
+  const stmtAcc = new Set((ing.info || []).map(i => i.account).filter(Boolean));
+  const rowsOther = T.filter(r => r.broker === 'IBKR' && stmtAcc.size && !stmtAcc.has(r.account)).length;
+  const symAcc = {}; T.forEach(r => { (symAcc[r.sym] = symAcc[r.sym] || new Set()).add(r.broker + '|' + r.account); });
+  const un = res.unmatched.map(u => {
+    const same = T.filter(r => r.sym === u.sym && r.qty > 0), mine = same.filter(r => r.broker === u.broker && r.account === u.account), other = same.filter(r => !(r.broker === u.broker && r.account === u.account));
+    if (mine.some(r => r.date <= u.date)) return 'в същата сметка има по-ранна покупка, но по-малко от продаденото (или вече изразходвана)';
+    if (other.some(r => r.date <= u.date)) return 'по-ранна покупка на същия инструмент има САМО В ДРУГА СМЕТКА';
+    if (same.length) return 'покупка на същия инструмент има само ПО-КЪСНО';
+    return 'покупка на този инструмент няма никъде в качените файлове';
+  });
+  const unWhy = {}; un.forEach(w => inc(unWhy, w));
+  const transfers = ing.skipped.filter(x => x.section === 'Transfers').length;
   const years = [...new Set(ing.records.map(r => Number(r.date.slice(0, 4))))].sort();
   const year = opt.year ? Number(opt.year) : years[years.length - 1];
   const nowY = new Date().getFullYear();
   out(`\n════ СМЕТКАТА — години с данни: ${years.join(', ') || 'няма'}; сравнението е за ${year}`);
+  out(`сметки със сделки (новата води FIFO по сметка, старата — само по тикър): ${Object.keys(accIdx).length}`);
+  accLine.forEach(l => out('   ' + l));
+  out(`   сделки, чиято сметка (колона Account) е различна от тази в Account Information на отчетите: ${rowsOther} · инструменти със сделки в повече от една сметка: ${Object.values(symAcc).filter(x => x.size > 1).length} от ${Object.keys(symAcc).length} · редове в секция Transfers: ${transfers}`);
   out(`FIFO (нова): продажби с резултат ${res.realized.length} · продажби без покупка ${res.unmatched.length} · записи без курс ${res.missingRates.length} · отворени позиции в края ${res.open.length}`);
+  Object.entries(unWhy).forEach(([w, n]) => out(`   без покупка ×${n}: ${w}`));
+  out(`   покупки, които покриха по-ранна непокрита продажба и НЕ станаха лот: ${(res.notes || []).filter(n => /покрива/.test(n.text)).length} · позиции, белязани като несигурни след непокрита продажба: ${(res.tainted || []).length}`);
   years.forEach(y => {
     const de = TC.computeDE(res, { year: y, records: ing.records, info: ing.info, skipped: ing.skipped });
     const R = res.realized.filter(x => x.year === y);
