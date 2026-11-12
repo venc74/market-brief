@@ -1,5 +1,5 @@
 {
- "date": "2026-11-11",
+ "date": "2026-11-12",
  "rows": [],
  "horizon": [
   {
@@ -113,6 +113,22 @@
    "ratio": "1:24",
    "split_type": "reverse",
    "date_human": "Nov 11, 2026"
+  },
+  {
+   "ticker": "ARAI",
+   "company": "Arrive AI Inc.",
+   "date": "2026-11-12",
+   "ratio": "1:48",
+   "split_type": "reverse",
+   "date_human": "Nov 12, 2026"
+  },
+  {
+   "ticker": "COSM",
+   "company": "Cosmos Health Inc.",
+   "date": "2026-11-13",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 13, 2026"
   },
   {
    "ticker": "EMBJ",
@@ -235,6 +251,14 @@
    "date_human": "Nov 19, 2026"
   },
   {
+   "ticker": "SOS",
+   "company": "SOS Limited",
+   "date": "2026-11-19",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
    "ticker": "SMDD",
    "company": "UltraPro Short MidCap400",
    "date": "2026-11-19",
@@ -257,15 +281,23 @@
    "ratio": "5%",
    "split_type": null,
    "date_human": "Dec 01, 2026"
+  },
+  {
+   "ticker": "LARK",
+   "company": "Landmark Bancorp Inc.",
+   "date": "2026-12-02",
+   "ratio": "5%",
+   "split_type": null,
+   "date_human": "Dec 02, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 32,
+  "source_rows": 36,
   "horizon_from": "2026-11-09",
-  "horizon_to": "2026-12-01",
-  "in_week": 14,
+  "horizon_to": "2026-12-02",
+  "in_week": 16,
   "dropped_price": [
    "ARAY",
    "ADGM",
@@ -278,7 +310,9 @@
    "NCI",
    "OFAL",
    "GOVX",
-   "SLXN"
+   "SLXN",
+   "ARAI",
+   "COSM"
   ],
   "dropped_cap": [
    "MMT",
