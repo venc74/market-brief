@@ -1,0 +1,375 @@
+{
+ "_note": "РЕАЛНО: всичките 19 брифа с дата на данните (thermometer SPY as_of, 16.10–12.11.2026, data/<дата>.json) — датата на SPY и на облигационните плочки (2Y/10Y — от macro.spread_2s10s.as_of); събрано 12.11.2026",
+ "briefs": [
+  {
+   "brief": "2026-10-19",
+   "spy_as_of": "2026-10-16",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-16",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-15",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-16",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-20",
+   "spy_as_of": "2026-10-19",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-19",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-16",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-19",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-21",
+   "spy_as_of": "2026-10-20",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-20",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-19",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-20",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-22",
+   "spy_as_of": "2026-10-21",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-21",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-20",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-21",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-23",
+   "spy_as_of": "2026-10-22",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-22",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-21",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-22",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-26",
+   "spy_as_of": "2026-10-23",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-23",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-22",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-23",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-27",
+   "spy_as_of": "2026-10-26",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-26",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-23",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-26",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-28",
+   "spy_as_of": "2026-10-27",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-27",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-26",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-27",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-29",
+   "spy_as_of": "2026-10-28",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-28",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-27",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-28",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-10-30",
+   "spy_as_of": "2026-10-29",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-29",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-28",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-29",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-02",
+   "spy_as_of": "2026-10-30",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-10-30",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-29",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-10-30",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-03",
+   "spy_as_of": "2026-11-02",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-02",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-10-30",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-02",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-04",
+   "spy_as_of": "2026-11-03",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-03",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-02",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-03",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-02",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-05",
+   "spy_as_of": "2026-11-04",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-04",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-03",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-04",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-03",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-06",
+   "spy_as_of": "2026-11-05",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-05",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-04",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-05",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-04",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-09",
+   "spy_as_of": "2026-11-06",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-06",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-05",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-06",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-05",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-10",
+   "spy_as_of": "2026-11-09",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-09",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-06",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-09",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-06",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-11",
+   "spy_as_of": "2026-11-10",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-10",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-09",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-10",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-09",
+     "hide": false
+    }
+   }
+  },
+  {
+   "brief": "2026-11-12",
+   "spy_as_of": "2026-11-11",
+   "tiles": {
+    "2Y/10Y спред": {
+     "as_of": "2026-11-10",
+     "hide": false
+    },
+    "SOFR − IORB (финансиране)": {
+     "as_of": "2026-11-09",
+     "hide": false
+    },
+    "MOVE (Bond Vol)": {
+     "as_of": "2026-11-10",
+     "hide": false
+    },
+    "HY / IG OAS (кредитни спредове)": {
+     "as_of": "2026-11-09",
+     "hide": false
+    }
+   }
+  }
+ ]
+}

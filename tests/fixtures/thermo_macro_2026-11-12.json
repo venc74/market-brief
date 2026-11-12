@@ -1,0 +1,397 @@
+{
+ "_note": "РЕАЛНО: data/2026-11-12.json (сутрешният бриф от 12.11.2026, ден след Veterans Day) — само thermometer и macro, изрязано 12.11.2026",
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 759.81,
+    "as_of": "2026-11-11",
+    "pct_from_high": 2.47,
+    "ma50": 764.55,
+    "ma200": 728.65,
+    "above_50dma": false,
+    "above_200dma": true,
+    "status": "yellow",
+    "label": "SPY 760 | под 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 17.49,
+    "chg_5d": 0.88,
+    "pct_5d": 5.3,
+    "spike": false,
+    "status": "green",
+    "label": "VIX 17.5 (risk-on)"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 1.15,
+    "percentile": 56.6,
+    "history_days": 106,
+    "status": "yellow",
+    "label": "P/C 1.15 (57. percentile от 106 дни; в нормалния диапазон)"
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.25,
+    "status": "green",
+    "label": "0.25% (нормален, flattening)"
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": 5811.7,
+    "status": "yellow",
+    "informational": true,
+    "change_4w_pct": -0.81,
+    "as_of": "2026-11-04",
+    "label": "$5,812 млрд към 2026-11-04 · -0.8% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+   },
+   {
+    "name": "SOFR − IORB (финансиране)",
+    "value": -2.0,
+    "status": "green",
+    "informational": true,
+    "percentile": 67.9,
+    "zscore": 0.22,
+    "streak": {
+     "dir": "down",
+     "n": 4
+    },
+    "as_of": "2026-11-09",
+    "label": "-2.0 б.п. към 09.11 (SOFR 3.88% − IORB 3.90%) · -7.0 б.п. за седмица · пада 4-ти пореден отчет · 68. percentile, z +0.2 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+   },
+   {
+    "name": "RSP спрямо SPY (широчина)",
+    "value": 0.6,
+    "status": "green",
+    "informational": true,
+    "as_of": "2026-11-11",
+    "diff_5": 0.6,
+    "diff_10": 4.0,
+    "rsp_5": -0.3,
+    "spy_5": -0.91,
+    "rsp_10": 2.4,
+    "spy_10": -1.62,
+    "label": "5 сесии: RSP -0.3% срещу SPY -0.9% (+0.6 п.) · 10 сесии: +4.0 п. — средната акция бие гигантите · само информативен, не влиза в режима"
+   },
+   {
+    "name": "MOVE (Bond Vol)",
+    "value": 92.4,
+    "as_of": "2026-11-10",
+    "delta_1w": -7.5,
+    "spike": false,
+    "status": "green",
+    "label": "MOVE 92 (-8 пункта/седмица)"
+   },
+   {
+    "name": "VIX Term Structure",
+    "value": 0.834,
+    "status": "green",
+    "label": "VIX9D 16.0 / VIX 17.5 / VIX3M 19.2 → ratio 0.83 (contango, нормално)"
+   },
+   {
+    "name": "IEI/HYG (Credit Spread)",
+    "value": 1.4789,
+    "as_of": "2026-11-11",
+    "level_percentile": 14.7,
+    "roc_10d_pct": 0.02,
+    "roc_percentile": 60.1,
+    "spike": false,
+    "status": "green",
+    "roc_10d_pct_prev": 0.09,
+    "roc_trend": "falling",
+    "roc_trend_text": "10-дневната RoC е +0.02% срещу +0.09% преди 5 сесии — спада (забавя се)",
+    "iei_10d_pct": 0.23,
+    "hyg_10d_pct": 0.21,
+    "label": "IEI/HYG 1.479 (15. percentile) · 10д RoC +0.0% (IEI +0.2%, HYG +0.2%) (60. percentile)"
+   },
+   {
+    "name": "HY / IG OAS (кредитни спредове)",
+    "value": 3.34,
+    "status": "red",
+    "informational": true,
+    "as_of": "2026-11-09",
+    "hy": {
+     "value": 3.34,
+     "as_of": "2026-11-09",
+     "chg_bp": 23,
+     "percentile": 83.7,
+     "chg_pct": 85.1,
+     "n_history": 783,
+     "history_from": "2023-11-13",
+     "hide": false,
+     "series": "BAMLH0A0HYM2"
+    },
+    "ig": {
+     "value": 0.91,
+     "as_of": "2026-11-09",
+     "chg_bp": 8,
+     "percentile": 67.9,
+     "chg_pct": 91.2,
+     "n_history": 782,
+     "history_from": "2023-11-13",
+     "hide": false,
+     "series": "BAMLC0A0CM"
+    },
+    "level": "wide",
+    "verdict": "OAS се разширява (HY 85., IG 91. percentile на промяната), IEI/HYG още не",
+    "label": "HY 3.34% (+23 б.п. за 20 дни — 85. percentile на промяната; нивото — 84. percentile) · IG 0.91% (+8 б.п. за 20 дни — 91. percentile на промяната; нивото — 68. percentile) · към 09.11, перцентил спрямо историята от 13.11.2023 (FRED дава ~3 г.) · OAS се разширява (HY 85., IG 91. percentile на промяната), IEI/HYG още не · само информативен, не влиза в режима"
+   },
+   {
+    "name": "Market Breadth (% над 40dMA)",
+    "value": 70.5,
+    "universe_size": 916,
+    "status": "green",
+    "universe_total": 918,
+    "missing_n": 2,
+    "batches": 19,
+    "batches_failed": 0,
+    "label": "70.5% над 40dMA (здравословна ширина)",
+    "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+   }
+  ],
+  "regime": "Defensive",
+  "regime_reason": "6 зелени / 2 жълти / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни) — distribution days червени (SPY 7/25, QQQ 9/25; праг 9) — Offensive блокиран",
+  "sizing_factor": 0.5,
+  "counts": "6 зелени / 2 жълти / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)",
+  "overrides": [],
+  "regime_by_count": "Offensive",
+  "exit_rule": "Режимът по броенето е Offensive (6 зелени / 2 жълти / 0 червени от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)), но distribution days червени (SPY 7/25, QQQ 9/25; праг 9). Блокът се включва на първия червен ден и пада чак след 2 поредни нечервени дни (max(SPY, QQQ) под 9); сега е 9. След това режимът се връща към броенето.",
+  "hysteresis_released": [],
+  "distribution_cap": {
+   "active": true,
+   "changed_regime": true,
+   "kind": "red",
+   "nonred_days": 0,
+   "release_after_nonred_days": 2,
+   "count": 9,
+   "spy_count": 7,
+   "qqq_count": 9,
+   "threshold": 9,
+   "lookback": 25,
+   "text": "distribution days червени (SPY 7/25, QQQ 9/25; праг 9) — Offensive блокиран (по броене: Offensive)"
+  },
+  "regime_margin": {
+   "text": "Запас до смяна на режима: по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 6, минимум 4; видими 8, минимум 6) · distribution days SPY 7/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9 · IEI/HYG 10д RoC 60. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е +0.02% срещу +0.09% преди 5 сесии — спада (забавя се)",
+   "parts": [
+    "по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени 6, минимум 4; видими 8, минимум 6)",
+    "distribution days SPY 7/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9",
+    "IEI/HYG 10д RoC 60. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е +0.02% срещу +0.09% преди 5 сесии — спада (забавя се)"
+   ]
+  },
+  "regime_change": null
+ },
+ "macro": {
+  "date": "2026-11-12",
+  "net_liquidity": {
+   "value": 5811.7,
+   "prev": 5859.4,
+   "as_of": "2026-11-04",
+   "change_4w_pct": -0.81,
+   "window_weeks": 4,
+   "dead_zone_pct": 1.0,
+   "raw_color": "yellow",
+   "color": "yellow",
+   "trend": "flat",
+   "components": {
+    "fed_balance_bn": 6748.1,
+    "rrp_bn": 0.2,
+    "tga_bn": 936.2
+   },
+   "history": [
+    {
+     "date": "2026-09-16",
+     "nl_bn": 5749.5,
+     "walcl_bn": 6746.5,
+     "tga_bn": 991.7,
+     "rrp_bn": 5.4
+    },
+    {
+     "date": "2026-09-23",
+     "nl_bn": 5799.9,
+     "walcl_bn": 6747.7,
+     "tga_bn": 947.3,
+     "rrp_bn": 0.5
+    },
+    {
+     "date": "2026-09-30",
+     "nl_bn": 5747.4,
+     "walcl_bn": 6743.0,
+     "tga_bn": 984.0,
+     "rrp_bn": 11.5
+    },
+    {
+     "date": "2026-10-07",
+     "nl_bn": 5859.4,
+     "walcl_bn": 6747.6,
+     "tga_bn": 885.8,
+     "rrp_bn": 2.3
+    },
+    {
+     "date": "2026-10-14",
+     "nl_bn": 5869.6,
+     "walcl_bn": 6755.6,
+     "tga_bn": 885.8,
+     "rrp_bn": 0.2
+    },
+    {
+     "date": "2026-10-21",
+     "nl_bn": 5808.2,
+     "walcl_bn": 6753.6,
+     "tga_bn": 945.2,
+     "rrp_bn": 0.2
+    },
+    {
+     "date": "2026-10-28",
+     "nl_bn": 5729.8,
+     "walcl_bn": 6745.6,
+     "tga_bn": 1015.6,
+     "rrp_bn": 0.2
+    },
+    {
+     "date": "2026-11-04",
+     "nl_bn": 5811.7,
+     "walcl_bn": 6748.1,
+     "tga_bn": 936.2,
+     "rrp_bn": 0.2
+    }
+   ],
+   "informational": true
+  },
+  "spread_2s10s": {
+   "value": 0.25,
+   "prev_week": 0.34,
+   "as_of": "2026-11-10",
+   "change_1w_bp": -9.0,
+   "status": "normal",
+   "direction": "flattening"
+  },
+  "global_signals": {
+   "DXY": {
+    "value": 103.0,
+    "chg_5d_pct": 1.43,
+    "bar_date": "2026-11-12",
+    "chg_1d_pct": 0.67,
+    "chg_1d_date": "2026-11-11"
+   },
+   "VIX": {
+    "value": 17.49,
+    "chg_5d_pct": 5.3,
+    "bar_date": "2026-11-11",
+    "chg_1d_pct": -10.12,
+    "chg_1d_date": "2026-11-11"
+   },
+   "Gold": {
+    "value": 3983.3,
+    "chg_5d_pct": -3.17,
+    "bar_date": "2026-11-12",
+    "chg_1d_pct": -0.74,
+    "chg_1d_date": "2026-11-11",
+    "chg_5d_basis": "contract",
+    "contract": "GCZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-11-12T06:20+00:00"
+   },
+   "Oil_WTI": {
+    "value": 86.29,
+    "chg_5d_pct": -4.67,
+    "bar_date": "2026-11-12",
+    "chg_1d_pct": 0.57,
+    "chg_1d_date": "2026-11-11",
+    "chg_5d_basis": "contract",
+    "contract": "CLZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-11-12T06:20+00:00"
+   },
+   "Copper": {
+    "value": 6.23,
+    "chg_5d_pct": -0.57,
+    "bar_date": "2026-11-12",
+    "chg_1d_pct": 0.89,
+    "chg_1d_date": "2026-11-11",
+    "chg_5d_basis": "contract",
+    "contract": "HGZ26",
+    "contract_month": "дек. 2026",
+    "price_time_utc": "2026-11-12T06:20+00:00"
+   },
+   "US10Y": {
+    "value": 5.0,
+    "chg_5d_bp": 10.4,
+    "chg_1d_bp": 1.5,
+    "chg_1d_date": "2026-11-11"
+   },
+   "MOVE": {
+    "value": 92.43,
+    "chg_5d_pct": -7.54,
+    "bar_date": "2026-11-10",
+    "chg_1d_pct": 7.5,
+    "chg_1d_date": "2026-11-10"
+   }
+  },
+  "core_inflation": {
+   "value": 2.26,
+   "date": "2026-09-01",
+   "month": "септември",
+   "age_days": 43,
+   "avg_recent": 2.25,
+   "avg_prior": 2.37,
+   "change_pp": -0.12,
+   "recent_span": "юли–септември",
+   "prior_span": "април–юни",
+   "direction": "down",
+   "flat_threshold_pp": 0.1
+  },
+  "pce_core": {
+   "value": 3.12,
+   "date": "2026-09-01",
+   "month": "септември",
+   "year": 2026,
+   "age_days": 43,
+   "prev_value": 3.03,
+   "prev_month": "август",
+   "direction": "up",
+   "series": "PCEPILFE"
+  },
+  "funding_stress": {
+   "value": -2.0,
+   "as_of": "2026-11-09",
+   "sofr": 3.88,
+   "iorb": 3.9,
+   "percentile": 67.9,
+   "zscore": 0.22,
+   "chg_1w_bp": -7.0,
+   "n_history": 2148,
+   "history_from": "2018-04-03",
+   "status": "green",
+   "hide": false,
+   "streak": {
+    "dir": "down",
+    "n": 4
+   }
+  },
+  "credit_oas": {
+   "hy": {
+    "value": 3.34,
+    "as_of": "2026-11-09",
+    "chg_bp": 23,
+    "percentile": 83.7,
+    "chg_pct": 85.1,
+    "n_history": 783,
+    "history_from": "2023-11-13",
+    "hide": false,
+    "series": "BAMLH0A0HYM2"
+   },
+   "ig": {
+    "value": 0.91,
+    "as_of": "2026-11-09",
+    "chg_bp": 8,
+    "percentile": 67.9,
+    "chg_pct": 91.2,
+    "n_history": 782,
+    "history_from": "2023-11-13",
+    "hide": false,
+    "series": "BAMLC0A0CM"
+   }
+  }
+ }
+}

@@ -1284,6 +1284,8 @@ def _thermo_context(thermometer: dict | None) -> list[dict]:
             row = {"name": i.get("name"), "value": i.get("value"), "label": label}
             if i.get("informational"):
                 row["informational"] = True
+            if (i.get("bond_closed") or {}).get("text"):                    # 12.11.2026 (т. 3): стойността е от предишен ден — облигационният пазар беше затворен
+                row["note"] = i["bond_closed"]["text"]
             out.append(row)
     return out
 

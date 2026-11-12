@@ -9,7 +9,7 @@
   3. книгите: резолюцията на живите записи (backtest.LAST_RESOLUTION) — цени няма / до по-стара дата / тикъри без цени;
   4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал — само при стария хистерезис (GLB_CARDS_RULE = close_hysteresis);
   5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата;
-  6. таблицата NYSE_HOLIDAYS не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни;
+  6. таблицата NYSE_HOLIDAYS (и от 12.11.2026 — SIFMA_US_FULL_CLOSES) не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни;
   7. (16.10.2026) дневните барове са за последната NYSE сесия (bar_freshness: изчакването преди run-а и делът на универса със стар бар).
 Всяка проверка е в собствен try — грешка в монитора не чупи брифа и не вдига фалшив банер.
 """
@@ -113,6 +113,16 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
                 "(buy-stop прозорец, застояли данни, изтичане на Watchlist).")})
     except Exception as e:
         print(f"[health] NYSE_HOLIDAYS не се провери: {type(e).__name__}: {e}")
+
+    try:                                     # 12.11.2026 (т. 3): и таблицата SIFMA_US_FULL_CLOSES (дните без търговия на облигации) свършва
+        last_year = max(int(h[:4]) for h in config.SIFMA_US_FULL_CLOSES)
+        left = (dt.date(last_year, 12, 31) - dt.date.fromisoformat(today)).days
+        if left < config.NYSE_HOLIDAYS_WARN_DAYS:
+            out.append({"check": "bond_holidays", "message": (
+                f"SIFMA_US_FULL_CLOSES в config.py покрива до {last_year} г. (остават {max(left, 0)} дни) — добави дните без търговия на облигации за {last_year + 1} "
+                "(sifma.org, holiday schedule), иначе облигационните плочки няма да казват, че пазарът е бил затворен.")})
+    except Exception as e:
+        print(f"[health] SIFMA_US_FULL_CLOSES не се провери: {type(e).__name__}: {e}")
 
     for fname, (flag, name) in DAILY_CACHES.items():
         if not getattr(config, flag, False):

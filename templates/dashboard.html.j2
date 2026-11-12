@@ -615,6 +615,8 @@
       <div class="t-name">{{ ind.name }}</div>
       <div class="t-val">{{ ind.value if ind.value is not none else "—" }}</div>
       <div class="t-label">{{ ind.label }}</div>
+      {# 12.11.2026 (т. 3): ден без търговия на облигации (SIFMA) при отворена борса — стойността е от предишен ден (thermometer.bond_closed_note) #}
+      {% if ind.get('bond_closed') %}<div class="t-label" style="color:var(--yellow)">⚠ {{ ind.bond_closed.text }}</div>{% endif %}
     </div>
   {% endmacro %}
   <div class="thermo">

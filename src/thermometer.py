@@ -1153,6 +1153,37 @@ def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tup
     return "Defensive", f"{counts} — недостатъчно потвърждение за Offensive", counts
 
 
+# 12.11.2026 (т. 3, Veterans Day 11.11): облигационните плочки — в ден без търговия на облигации (SIFMA) при отворена борса стойността им е от предишен ден
+BOND_TILES = ("2Y/10Y спред", "MOVE (Bond Vol)", "SOFR − IORB (финансиране)", "HY / IG OAS (кредитни спредове)")
+
+
+def bond_closed_note(as_of: str | None, market_day: str | None) -> dict | None:
+    """
+    12.11.2026 (т. 3): облигационният пазар е бил затворен (config.SIFMA_US_FULL_CLOSES) в ден със сесия на NYSE след датата на стойността и до деня на пазара (последният
+    бар на SPY) → {"closed": [дати], "value_from", "text": "облигационният пазар беше затворен (11.11) — стойността е от 10.11"}; иначе None. Обичайното закъснение на SOFR
+    и OAS (ден) без такъв празник — без етикет. Измерено върху 19-те брифа с дата на данните (16.10–12.11): само 12.11, четирите плочки. Чиста функция.
+    """
+    if not as_of or not market_day or str(as_of) >= str(market_day):
+        return None
+    closed = sorted(d for d in config.SIFMA_US_FULL_CLOSES if str(as_of) < d <= str(market_day) and _sessions.is_session(d))
+    if not closed:
+        return None
+    dm = lambda d: f"{d[8:10]}.{d[5:7]}"
+    return {"closed": closed, "value_from": str(as_of), "text": f"облигационният пазар беше затворен ({', '.join(dm(d) for d in closed)}) — стойността е от {dm(str(as_of))}"}
+
+
+def mark_bond_closed(indicators: list[dict], market_day: str | None) -> list[str]:
+    """12.11.2026 (т. 3): етикетът върху видимите облигационни плочки (BOND_TILES) — ind["bond_closed"]. Връща имената на отбелязаните."""
+    out = []
+    for i in indicators or []:
+        if i.get("name") in BOND_TILES and not i.get("hide"):
+            note = bond_closed_note(i.get("as_of"), market_day)
+            if note:
+                i["bond_closed"] = note
+                out.append(i["name"])
+    return out
+
+
 def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     """
     Сглобява 9-те индикатора + правилото за режим (8-ми, Market Breadth,
@@ -1192,6 +1223,8 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
                       f"({'инверсия' if spread.get('status') == 'inverted' else 'нормален'}, "
                       f"{spread.get('direction', '')})"),
         }
+        if spread.get("as_of"):
+            spread_ind["as_of"] = spread["as_of"]                       # 12.11.2026 (т. 3): датата на последното наблюдение (FRED T10Y2Y)
     nl_ind = _net_liquidity_indicator(nl)
 
     indicators = [spy_trend(), vix_level(), market_put_call(), spread_ind,
@@ -1376,6 +1409,13 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # (VIX/MOVE); нормален Defensive/Cash по броя сигнали оставаше на 1.0 —
     # противоречие със семантиката на режима. Сега всеки не-Offensive → фактор.
     sizing_factor = 1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR
+
+    try:                                                                # 12.11.2026 (т. 3): облигационният пазар беше затворен, а борсата — не
+        marked = mark_bond_closed(indicators, spy_ind.get("as_of"))
+        if marked:
+            print(f"[thermo] облигационният пазар беше затворен — етикет върху: {', '.join(marked)}")
+    except Exception as e:
+        print(f"[thermo] етикетът за затворения облигационен пазар пропуснат: {type(e).__name__}: {e}")
 
     return {"indicators": indicators, "regime": regime,
             "regime_reason": reason, "sizing_factor": sizing_factor,
