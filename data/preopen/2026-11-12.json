@@ -1,0 +1,134 @@
+{
+ "date": "2026-11-12",
+ "time_ny": "09:07",
+ "time_berlin": "15:07",
+ "ok": true,
+ "diag": {
+  "tickers": 923,
+  "with_pm": 631,
+  "gappers": 1,
+  "zero_volume_share": 1.0,
+  "requested": 924
+ },
+ "gaps": [
+  {
+   "ticker": "TTEK",
+   "session": "2026-11-11",
+   "prev_close": 37.61000061035156,
+   "pm_price": 41.94,
+   "pm_bars": 23,
+   "pm_volume": null,
+   "pm_last_ny": "09:05",
+   "gap_pct": 11.51,
+   "ret63_pct": 3.2390894737602594,
+   "neglect": true,
+   "liquid": true,
+   "adr": 3.049406142601341,
+   "company": "TTEK",
+   "filings_8k": [
+    {
+     "accepted_et": "2026-11-12 06:08",
+     "items": [
+      "2.02",
+      "8.01"
+     ],
+     "text": "8-K (SEC), 12.11 06:08 ET: 2.02 — финансови резултати; 8.01 — други събития"
+    }
+   ],
+   "filings_error": null,
+   "headline": {
+    "title": "Tetra Tech (TTEK) Tops Q4 Earnings and Revenue Estimates",
+    "source": null,
+    "published": "2026-11-11 21:20",
+    "link": null
+   },
+   "headlines_error": null
+  }
+ ],
+ "levels": [
+  {
+   "ticker": "BLK",
+   "what": "книга GLB по Уиш",
+   "kind": "под линията",
+   "level": 1219.94,
+   "pm_price": 1219.18,
+   "pct": -0.06,
+   "pm_volume": null
+  }
+ ],
+ "watch": [
+  {
+   "ticker": "BMNR",
+   "gap_pct": -6.6,
+   "pm_price": 17.97,
+   "prev_close": 19.24,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "CRCL",
+   "gap_pct": -4.8,
+   "pm_price": 63.9,
+   "prev_close": 67.12,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "BHC",
+   "gap_pct": -4.19,
+   "pm_price": 8.0,
+   "prev_close": 8.35,
+   "close_src": "brief",
+   "pm_last_ny": "07:00",
+   "pm_volume": null
+  },
+  {
+   "ticker": "BFLY",
+   "gap_pct": -3.22,
+   "pm_price": 6.91,
+   "prev_close": 7.14,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "BLSH",
+   "gap_pct": -3.19,
+   "pm_price": 22.78,
+   "prev_close": 23.53,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "excluded_deals": [
+  "CART",
+  "NWE"
+ ],
+ "universe_n": 916,
+ "coverage": {
+  "with_pm": 631,
+  "requested": 924,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null,
+  "universe": 916,
+  "extra": 8,
+  "universe_source": "cache"
+ },
+ "session": "2026-11-11",
+ "sector_bounce": [],
+ "ep_morning": [],
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "econ": [],
+ "seconds": 48.2,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 12.11 — 1 гапа, 1 нива, 5 наблюдавани",
+  "at_utc": "14:07"
+ }
+}
