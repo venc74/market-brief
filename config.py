@@ -358,6 +358,13 @@ PREOPEN_LATE_UNTIL_NY = os.getenv("PREOPEN_LATE_UNTIL_NY", "10:00")
 # и час, без AI. От 08:30 Ню Йорк (часът на данните; 14:30 Берлин, в седмиците с разминаване на часа — 13:30) до часа на карето; най-много PREOPEN_ECON_MAX.
 PREOPEN_ECON_SINCE_NY = os.getenv("PREOPEN_ECON_SINCE_NY", "08:30")
 PREOPEN_ECON_MAX = int(os.getenv("PREOPEN_ECON_MAX", 3))
+# 12.11.2026 (т. 1): ред „Пазарът преди отварянето“ в карето — фючърсите (промяната спрямо 16:00 Ню Йорк на предишната сесия) и компаниите с тегло > PREOPEN_MEGA_WEIGHT_PCT
+# в S&P 500 (дневните позиции на SPY от SSGA; класовете на една компания — заедно, по емитента в CUSIP: GOOGL + GOOG) с гап ≥ ±PREOPEN_MEGA_GAP_PCT в двете посоки.
+# Реално 12.11, 09:05 Ню Йорк: NVDA −10.8% ($155.09; затваряне $173.85), ES −0.66%, NQ −1.34%. Отделно теглене от универса — покритието не се пипа.
+PREOPEN_FUTURES = {"ES=F": "ES (S&P 500)", "NQ=F": "NQ (Nasdaq-100)"}
+PREOPEN_MEGA_WEIGHT_PCT = float(os.getenv("PREOPEN_MEGA_WEIGHT_PCT", 2.0))
+PREOPEN_MEGA_GAP_PCT = float(os.getenv("PREOPEN_MEGA_GAP_PCT", 3.0))
+SPY_HOLDINGS_URL = "https://www.ssga.com/library-content/products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx"
 
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing

@@ -413,6 +413,223 @@ def econ_line(x: dict) -> str:
     return f"„{x['title']}“ · {x['source']} · {x['time_ny']} Ню Йорк ({x['time_berlin']} Берлин)"
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# 12.11.2026 (т. 1): „Пазарът преди отварянето“ — фючърсите ES / NQ и компаниите с тегло > 2% в S&P 500 с гап ≥ ±3% (в двете посоки)
+# ──────────────────────────────────────────────────────────────────────────
+_XLSX = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+_MON = {m: i for i, m in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), 1)}
+
+
+def parse_spy_holdings(data: bytes) -> dict:
+    """
+    Дневните позиции на SPY (SSGA, xlsx) → {"as_of": "2026-11-11", "rows": [{"ticker", "name", "cusip", "weight"}]}. Без openpyxl: xlsx е zip с XML (xl/sharedStrings.xml +
+    xl/worksheets/sheet1.xml). Заглавният ред е този с „Ticker“ и „Weight“; редове без тикър или без число за тегло (бележките под таблицата) отпадат. Тикърът — във вида на
+    Yahoo („BRK.B“ → „BRK-B“). Чиста функция; непознат формат → ValueError / KeyError.
+    """
+    import io
+    import re
+    import zipfile
+    import xml.etree.ElementTree as ET
+    z = zipfile.ZipFile(io.BytesIO(data))
+    try:
+        shared = ["".join(t.text or "" for t in si.iter(_XLSX + "t")) for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(_XLSX + "si")]
+    except KeyError:
+        shared = []
+    table = []
+    for r in ET.fromstring(z.read("xl/worksheets/sheet1.xml")).iter(_XLSX + "row"):
+        row = {}
+        for c in r.findall(_XLSX + "c"):
+            col = re.match(r"[A-Z]+", c.get("r") or "")
+            v = c.find(_XLSX + "v")
+            if v is not None and v.text is not None:
+                x = shared[int(v.text)] if c.get("t") == "s" else v.text
+            else:
+                t = c.find(f"{_XLSX}is/{_XLSX}t")
+                x = t.text if t is not None else None
+            if col and x is not None and str(x).strip():
+                row[col.group(0)] = str(x).strip()
+        table.append(row)
+    as_of = None
+    for row in table[:10]:
+        for v in row.values():
+            m = re.search(r"As of (\d{1,2})-([A-Za-z]{3})-(\d{4})", v)
+            if m and m.group(2).title() in _MON:
+                as_of = dt.date(int(m.group(3)), _MON[m.group(2).title()], int(m.group(1))).isoformat()
+    hdr = next((i for i, row in enumerate(table) if "Ticker" in row.values() and "Weight" in row.values()), None)
+    if hdr is None:
+        raise ValueError("няма заглавен ред с Ticker и Weight")
+    cols = {v: k for k, v in table[hdr].items()}
+    out = []
+    for row in table[hdr + 1:]:
+        t = row.get(cols["Ticker"])
+        try:
+            w = float(row.get(cols["Weight"]))
+        except (TypeError, ValueError):
+            continue
+        if not t or t == "-":
+            continue
+        out.append({"ticker": t.replace(".", "-").upper(), "name": row.get(cols.get("Name", ""), ""), "cusip": row.get(cols.get("Identifier", ""), ""), "weight": w})
+    if not out:
+        raise ValueError("няма позиции")
+    return {"as_of": as_of, "rows": out}
+
+
+def company_weights(rows: list[dict], min_pct: float | None = None) -> list[dict]:
+    """
+    Теглото по КОМПАНИЯ — класовете на една компания заедно (емитентът = първите 6 знака на CUSIP: GOOGL 02079K305 + GOOG 02079K107 = Alphabet). Над min_pct
+    (config.PREOPEN_MEGA_WEIGHT_PCT) → [{"ticker" (класът с по-голямото тегло), "tickers", "name", "weight"}], по тегло. Чиста функция.
+    """
+    min_pct = config.PREOPEN_MEGA_WEIGHT_PCT if min_pct is None else min_pct
+    by: dict[str, list[dict]] = {}
+    for r in rows or []:
+        by.setdefault((r.get("cusip") or "")[:6] or r["ticker"], []).append(r)
+    out = []
+    for grp in by.values():
+        grp = sorted(grp, key=lambda r: -r["weight"])
+        w = sum(r["weight"] for r in grp)
+        if w > min_pct:
+            out.append({"ticker": grp[0]["ticker"], "tickers": [r["ticker"] for r in grp], "name": grp[0].get("name") or grp[0]["ticker"], "weight": round(w, 2)})
+    return sorted(out, key=lambda x: -x["weight"])
+
+
+def last_weights(day: str | None, folder=None) -> dict | None:
+    """Последните записани тегла (data/preopen/<дата>.json, market.weights) от ден ПРЕДИ day — резервът, когато днес SSGA не отговори. Нищо → None."""
+    d = pathlib.Path(folder or config.DATA_DIR / "preopen")
+    try:
+        files = sorted(d.glob("*.json"), reverse=True)
+    except Exception:
+        return None
+    for f in files:
+        if day and f.stem >= day:
+            continue
+        try:
+            w = (json.loads(f.read_text(encoding="utf-8")).get("market") or {}).get("weights") or {}
+            if w.get("companies"):
+                return {k: w[k] for k in ("as_of", "source", "companies") if k in w}
+        except Exception:
+            continue
+    return None
+
+
+def fetch_weights(day: str | None = None, get=None, folder=None) -> dict:
+    """
+    Теглата (мрежа): позициите на SPY от SSGA (config.SPY_HOLDINGS_URL) → {"as_of", "source", "companies"}. Провал → последните записани (last_weights) с "stale" и
+    причината; без тях → {"error": причината}. Не вдига.
+    """
+    try:
+        if get is None:
+            import requests
+            r = requests.get(config.SPY_HOLDINGS_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            r.raise_for_status()
+            data = r.content
+        else:
+            data = get(config.SPY_HOLDINGS_URL)
+        p = parse_spy_holdings(data)
+        return {"as_of": p["as_of"], "source": "позициите на SPY от SSGA", "companies": company_weights(p["rows"])}
+    except Exception as e:
+        why = f"SSGA: {type(e).__name__}"
+        print(f"[preopen] теглата в S&P 500 не се изтеглиха: {type(e).__name__}: {e}")
+    prev = last_weights(day, folder)
+    return {**prev, "stale": True, "error": why} if prev else {"error": why}
+
+
+def fetch_market(symbols: list[str]) -> dict:
+    """
+    5-минутни бари с премаркет за фючърсите и големите компании — ОТДЕЛНО от универса (LAST_FETCH и покритието не се пипат); 5 дни, защото фючърсите търгуват почти
+    денонощно и след уикенда „предишната сесия“ е петък. → {символ: кадър}.
+    """
+    import yfinance as yf
+    out = {}
+    data = yf.download(list(symbols), period="5d", interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
+    for t in symbols:
+        try:
+            df = (data[t] if isinstance(data.columns, pd.MultiIndex) else data).dropna(subset=["Close"])
+            if len(df):
+                out[t] = df[["Open", "High", "Low", "Close", "Volume"]]
+        except Exception:
+            continue
+    return out
+
+
+def _num(x: float, nd: int = 2) -> str:
+    return f"{x:,.{nd}f}".replace(",", " ")
+
+
+def market_block(frames: dict, weights: dict | None, now_utc, fetch_error: str | None = None) -> dict:
+    """
+    Фючърсите (config.PREOPEN_FUTURES) — промяната спрямо 16:00 Ню Йорк на предишната сесия (последният 5-минутен бар на редовната сесия, като при акциите — premarket_point);
+    компаниите с тегло > PREOPEN_MEGA_WEIGHT_PCT — с гап ≥ ±PREOPEN_MEGA_GAP_PCT (в двете посоки), другите — изброени като „под“. → {"futures", "futures_missing", "mega",
+    "mega_quiet", "mega_missing", "weights", "session", "text"} — "text" са готовите изречения за карето и имейла (едно място). Чиста функция.
+    """
+    now = _ny(now_utc)
+    out = {"futures": [], "futures_missing": [], "mega": [], "mega_quiet": [], "mega_missing": [], "weights": weights or {}, "session": None}
+    for sym, label in config.PREOPEN_FUTURES.items():
+        p = premarket_point((frames or {}).get(sym), now)
+        if not p or not p["prev_close"]:
+            out["futures_missing"].append(label)
+            continue
+        out["session"] = out["session"] or p["session"]
+        out["futures"].append({"symbol": sym, "label": label, "price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2),
+                               "chg_pct": _pct(p["pm_price"], p["prev_close"]), "last_ny": p["pm_last_ny"]})
+    for c in (weights or {}).get("companies") or []:
+        p = premarket_point((frames or {}).get(c["ticker"]), now)
+        if not p or not p["prev_close"]:
+            out["mega_missing"].append(c["ticker"])
+            continue
+        out["session"] = out["session"] or p["session"]
+        g = _pct(p["pm_price"], p["prev_close"])
+        row = {**c, "gap_pct": g, "pm_price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2), "pm_last_ny": p["pm_last_ny"]}
+        (out["mega"] if abs(g) >= config.PREOPEN_MEGA_GAP_PCT else out["mega_quiet"]).append(row)
+    out["mega"].sort(key=lambda x: -abs(x["gap_pct"]))
+    out["text"] = market_text(out, fetch_error)
+    return out
+
+
+def market_text(m: dict, fetch_error: str | None = None) -> list[str]:
+    """Изреченията за реда „Пазарът преди отварянето“ (каре и имейл). Чиста функция."""
+    s = m.get("session")
+    when = f" на {s[8:10]}.{s[5:7]}" if s else ""
+    lines = []
+    fut = [f"{f['label']} {f['chg_pct']:+.2f}% ({_num(f['price'])} в {f['last_ny']})" for f in m.get("futures") or []]
+    if fut:
+        lines.append("Фючърси: " + ", ".join(fut) + f" — спрямо 16:00 Ню Йорк{when}."
+                     + (f" Без данни: {', '.join(m['futures_missing'])}." if m.get("futures_missing") else ""))
+    elif m.get("futures_missing"):
+        lines.append(f"Фючърсите ({', '.join(m['futures_missing'])}) — без цена в премаркета (Yahoo{': ' + fetch_error if fetch_error else ''}).")
+    w = m.get("weights") or {}
+    thr, gap = f"{config.PREOPEN_MEGA_WEIGHT_PCT:g}", f"{config.PREOPEN_MEGA_GAP_PCT:g}"
+    if not w.get("companies"):
+        lines.append(f"Компаниите с тегло > {thr}% в S&P 500 не са проверени — теглата не се изтеглиха ({w.get('error') or 'няма данни'}).")
+        return lines
+    wa = w.get("as_of")
+    src = f"по {w.get('source') or 'SPY'}" + (f", към {wa[8:10]}.{wa[5:7]}" if wa else "") + (f"; днешните не се изтеглиха — {w['error']}" if w.get("stale") else "")
+    name = lambda x: x["ticker"] + (f" (с {', '.join(t for t in x['tickers'] if t != x['ticker'])})" if len(x.get("tickers") or []) > 1 else "")
+    head = f"С тегло > {thr}% в S&P 500 ({src})"
+    if m.get("mega"):
+        lines.append(head + f" и гап ≥ ±{gap}%: " + "; ".join(
+            f"{name(x)} {x['gap_pct']:+.1f}% (${x['pm_price']:.2f}; затваряне ${x['prev_close']:.2f}; тегло {x['weight']:.1f}%)" for x in m["mega"]) + ".")
+        if m.get("mega_quiet"):
+            lines.append(f"Под ±{gap}%: " + ", ".join(name(x) for x in m["mega_quiet"]) + ".")
+    elif m.get("mega_quiet"):
+        lines.append(head + f": няма гап ≥ ±{gap}% (" + ", ".join(f"{name(x)} {x['gap_pct']:+.1f}%" for x in m["mega_quiet"]) + ").")
+    if m.get("mega_missing"):
+        lines.append(f"Без цена в премаркета: {', '.join(m['mega_missing'])}" + (f" (Yahoo: {fetch_error})" if fetch_error else "") + ".")
+    return lines
+
+
+def market_section(market_fn, weights_fn, now_utc, day: str) -> dict:
+    """Теглата → символите (фючърсите + компаниите) → бари → market_block. Провал на тегленето на бари → редът казва „без цена“, не изчезва."""
+    weights = weights_fn(day) if weights_fn else None
+    syms = list(config.PREOPEN_FUTURES) + [c["ticker"] for c in (weights or {}).get("companies") or []]
+    frames, err = {}, None
+    try:
+        frames = market_fn(syms) if market_fn else {}
+    except Exception as e:
+        err = type(e).__name__
+        print(f"[preopen] фючърсите и големите компании не се изтеглиха: {type(e).__name__}: {e}")
+    return market_block(frames, weights, now_utc, err)
+
+
 def has_news(res: dict) -> bool:
     return bool(res.get("gaps") or res.get("levels") or res.get("watch") or res.get("ep_morning") or res.get("econ"))      # 10.11.2026 (т. 2–3): и сутрешните EP кандидати, и данните
 
@@ -439,6 +656,8 @@ def email_html(res: dict) -> str:
     cov = res.get("coverage") or {}
     if cov.get("partial"):                                                          # 04.11.2026 (С3)
         parts.append(f"<div style='margin-top:6px;color:#991b1b'>⚠ Частично: {e(cov['reason'])} — празното НЕ значи, че няма гапове.</div>")
+    if (res.get("market") or {}).get("text"):                                      # 12.11.2026 (т. 1)
+        parts.append(f"<div style='margin-top:8px'><b>Пазарът преди отварянето:</b> {e(' '.join(res['market']['text']))}</div>")
     if res.get("econ"):                                                             # 10.11.2026 (т. 3)
         parts.append(f"<div style='margin-top:10px'><b>Икономически данни след {config.PREOPEN_ECON_SINCE_NY} Ню Йорк</b> <span style='color:#6b7280'>(заглавията дословно, без AI)</span></div>")
         parts.append(li([e(econ_line(x)) for x in res["econ"]]))
@@ -518,7 +737,7 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
         universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
-        econ_fn=None, exclude: set | None = None) -> dict:
+        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -578,6 +797,12 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
     except Exception as e:
         res["notes"].append(f"{type(e).__name__}: {e}")
         print(f"[preopen] пропадна: {type(e).__name__}: {e}")
+    if market_fn is not None or weights_fn is not None:                                # 12.11.2026 (т. 1): main подава fetch_market / fetch_weights, тестовете — готови
+        try:
+            res["market"] = market_section(market_fn, weights_fn, now, res["date"])
+        except Exception as e:
+            res["market"] = {"error": type(e).__name__, "text": [f"Фючърсите и големите компании не се провериха ({type(e).__name__})."]}
+            print(f"[preopen] пазарът преди отварянето: {type(e).__name__}: {e}")
     res["seconds"] = round(time.monotonic() - t0, 1)
     if (res.get("coverage") or {}).get("partial"):
         print(f"::warning::[preopen] частично: {res['coverage']['reason']}")
@@ -687,7 +912,8 @@ def main(now_utc=None) -> int:
         universe_note = f"универсът не се зареди ({type(e).__name__}) — проверени са само картите, книгите и наблюдаваните"
         print(f"::warning::[preopen] {universe_note}: {e}")
     res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=universe,
-              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals())
+              name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals(),
+              market_fn=fetch_market, weights_fn=fetch_weights)
     if res.get("coverage") is not None:
         res["coverage"]["universe_source"] = screener.LAST_DAY_UNIVERSE.get("source")      # 11.11.2026 (т. 2): "cache" — същият като сутрешния
     res["email"] = prev.get("email") or {"sent": False}

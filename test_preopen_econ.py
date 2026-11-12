@@ -74,7 +74,7 @@ with contextlib.redirect_stdout(io.StringIO()):
 assert [x["title"] for x in res["econ"]] == [x["title"] for x in rows] and preopen.has_news(res)
 assert "econ" not in res0 and resx["econ"] == [] and resx["econ_error"] == "ZeroDivisionError"
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
-assert "universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals())" in src                                           # main() тегли фийдовете
+assert "universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals()," in src                                           # main() тегли фийдовете (12.11: + market_fn / weights_fn)
 day = {**FX["preopen"], "econ": rows}
 mail = preopen.email_html(day)
 assert "Икономически данни след 08:30 Ню Йорк" in mail and all(l.replace("„", "&quot;") in mail or __import__("html").escape(l) in mail for l in L)
