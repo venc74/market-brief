@@ -29,15 +29,16 @@ function renderFiles() {
     <tr><th>Секция</th><th class="n">Редове с данни</th><th class="n">Станаха записи</th><th class="n">Не е сметнато</th><th class="n">Обобщения / информативни</th><th>Защо</th></tr>
     ${f.sections.filter(x => x.data).map(x => `<tr><td>${esc(x.name)}${x.missing.length ? ` <b class="neg">липсват колони: ${esc(x.missing.join(', '))}</b>` : ''}</td><td class="n">${x.data}</td><td class="n ${x.records ? 'pos' : 'mut'}">${x.records}</td>
       <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}</td></tr>`).join('')}</table></details>`;
-  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th>Период</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан данък</th><th class="n">Лихви</th><th class="n">Не е сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
+  $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан<br>данък</th><th class="n">Лихви</th><th class="n">Не е<br>сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
     ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', n = v => rates ? '' : (v || 0);
-      return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}</td>
+      const span = `${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}`;        // периодът от отчета (IBKR) и датите на прочетените записи — под името на файла
+      return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}<div class="small" data-period>${f.period ? '<span style="white-space:nowrap">период: ' + esc(f.period) + '</span> · ' : ''}<span style="white-space:nowrap">${span ? 'данни: ' + span : (rates ? '' : 'без записи')}</span></div></td>
       <td>${rates ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc(FORMAT_NAMES[f.format] || f.format)}</td>
-      <td class="mono">${esc(f.accountMasked || (rates ? '' : '—'))}</td><td class="mono">${f.period ? esc(f.period) + '<div class="small">данни: ' : '<div>'}${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}</div></td>
-      <td class="n ${!rates && !k.trade ? 'neg' : ''}">${rates ? '' : `${k.trade || 0}<div class="small">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
+      <td class="mono" data-acc style="white-space:nowrap">${esc(f.accountMasked || (rates ? '' : '—'))}</td>
+      <td class="n ${!rates && !k.trade ? 'neg' : ''}">${rates ? '' : `${k.trade || 0}<div class="small" style="white-space:nowrap">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
       <td class="n ${f.skipped ? 'yel' : ''}">${n(f.skipped)}</td><td class="n">${f.duplicates || ''}</td>
       <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
-      (f.sections ? `<tr><td></td><td colspan="12">${secTable(f)}</td></tr>` : ''); }).join('');
+      (f.sections ? `<tr><td></td><td colspan="11">${secTable(f)}</td></tr>` : ''); }).join('');
   // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
   $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => `<div class="msg err bigmsg"><b class="t">${esc(f.name)}: ${esc(p.title)}</b>${p.lines.map(l => `<div>${esc(l)}</div>`).join('')}</div>`).join('')).join('');
   // чий е файлът (05.11.2026): за Revolut определя сметката (отчетът няма номер), за всички — човека за крипто §23
@@ -56,10 +57,10 @@ function renderFiles() {
 function renderSummary() {
   if (!S.ing) { $('summary').innerHTML = ''; return; }
   const y = Number($('year').value), s = S.sum = TC.summary(S.ing, S.fifo, y), a = s.all, r = s.year;
-  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${a.buys} покупки, ${a.sells} продажби), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
+  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${pl(a.buys, 'покупка', 'покупки')}, ${pl(a.sells, 'продажба', 'продажби')}), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
     не са сметнати: <b class="${a.skipped ? 'yel' : ''}">${a.skipped}</b>${a.skipped ? ' (виж списъка)' : ''}; липсващи покупки: <b class="${a.unmatched ? 'neg' : ''}">${a.unmatched}</b>.
     <div style="margin-top:4px" class="${s.empty ? 'neg' : 'small'}">${s.empty ? `<b>За ${y} няма нито един запис в качените файлове</b>${s.years.length ? ` — данните са за ${s.years.join(', ')}. Смени годината горе.` : '.'}`
-      : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${r.buys} покупки, ${r.sells} продажби)${S.fifo ? `, от продажбите с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
+      : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${pl(r.buys, 'покупка', 'покупки')}, ${pl(r.sells, 'продажба', 'продажби')})${S.fifo ? `, продажби с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
 }
 // списъкът „не е сметнато“ — всеки ред с причината и датата; редовете от избраната година са най-отгоре
 function skippedHtml(y) {
