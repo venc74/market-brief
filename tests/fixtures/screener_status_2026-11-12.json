@@ -1,0 +1,29 @@
+{
+ "_note": "РЕАЛНО: screener_status от брифа на 12.11.2026 (data/2026-11-12.json), изрязано 12.11.2026",
+ "screener_status": {
+  "ok": true,
+  "kind": "ok",
+  "reason": "",
+  "universe": 918,
+  "with_history": 913,
+  "batches": 10,
+  "batches_failed": 0,
+  "no_trade": [],
+  "excluded_deals": [],
+  "with_bars": 918,
+  "no_bars_n": 0,
+  "no_bars": [],
+  "fundamentals_checked": 79,
+  "fundamentals_cache": {
+   "hits": 21,
+   "requests": 58,
+   "stored": 11
+  },
+  "fundamentals_not_checked": {
+   "n": 0,
+   "max": 60,
+   "top": []
+  },
+  "fundamentals_unavailable": []
+ }
+}

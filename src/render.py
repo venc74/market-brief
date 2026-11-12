@@ -561,12 +561,28 @@ def excluded_deals(rows) -> list[dict]:
     return out
 
 
+def fundamentals_all_checked(status: dict | None) -> str | None:
+    """
+    12.11.2026 (т. 4): при 0 непроверени — „Фундаменти: проверени всички 79 (21 от кеша).“ (реално 12.11: 58 нови заявки + 21 от кеша), вместо редът да изчезне; кандидатите,
+    за които Yahoo не върна данни — изрично. Стар бриф без броя (fundamentals_checked) / без кандидати → None. Чиста функция.
+    """
+    st = status or {}
+    total = st.get("fundamentals_checked")
+    if st.get("fundamentals_not_checked") is None or not isinstance(total, int) or total <= 0:
+        return None
+    fc = st.get("fundamentals_cache") or {}
+    cache = f' ({fc["hits"]} от кеша)' if isinstance(fc.get("hits"), int) else ""
+    un = st.get("fundamentals_unavailable") or []
+    tail = f'; за {len(un)} Yahoo не върна данни ({", ".join(un[:5])}{", …" if len(un) > 5 else ""}) — те не са оценени' if un else ""
+    return f"Фундаменти: проверени всички {total}{cache}{tail}."
+
+
 def fundamentals_note(status: dict | None) -> str | None:
     """06.11.2026 (пакет 05–06.11, т. 2): редът „фундаментите не са проверени за N имена“ и кои са с най-висок RS (screener.LAST_STATUS["fundamentals_not_checked"]). Няма такива / стар бриф → None. Чиста функция."""
     nc = (status or {}).get("fundamentals_not_checked") or {}
     n = nc.get("n")
     if not n:
-        return None
+        return fundamentals_all_checked(status)                         # 12.11.2026 (т. 4): 0 непроверени — ред, не тишина
     top = ", ".join(f'{x["ticker"]} (RS {x["rs_rating"]})' for x in nc.get("top") or [] if x.get("ticker"))
     fc = (status or {}).get("fundamentals_cache") or {}                 # 10.11.2026 (т. 7): таванът е за новите заявки; записите от кеша не го броят
     cap = (f'таван {nc.get("max")} нови заявки към Yahoo на ден — проверяват се най-силните по RS; още {fc["hits"]} — от кеша до следващия отчет'
