@@ -53,7 +53,22 @@ function renderFiles() {
   const all = [...new Set([cur, cur - 1, ...years])].sort((a, b) => b - a);
   sel.innerHTML = all.map(y => `<option value="${y}">${y}${years.includes(y) || !years.length ? '' : ' — няма данни'}</option>`).join('');
   sel.value = S.yearPicked && all.includes(Number(old)) ? old : String(years.includes(cur - 1) ? cur - 1 : years[0] || cur - 1);
+  loadCarry();
 }
+
+// 14.11.2026: таблицата „По години“ — всяка година самостоятелно, БЕЗ пренасяне (пренесеното от потребителя не влиза); загубите — с ясен ред какво да се декларира
+function renderYears(st) {
+  const rows = TC.yearsTable(S.fifo, { ...st, carriedShareLoss: 0, carriedOtherLoss: 0 });
+  $('yearsTable').innerHTML = '<tr><th>Година</th><th class="n">Печалби от акции</th><th class="n">Загуби от акции</th><th class="n">Нетно акции</th><th class="n">Други доходи (+)</th><th class="n">Други загуби (−)</th><th class="n">Число (без пренасяне)</th><th></th></tr>' +
+    rows.map(r => `<tr${r.year === st.year ? ' style="font-weight:600"' : ''}><td>${r.year}</td><td class="n pos">${fmt(r.shareGains)}</td><td class="n neg">${fmt(-r.shareLosses)}</td><td class="n ${cls(r.shareNet)}">${fmt(r.shareNet)}</td>
+      <td class="n pos">${fmt(r.otherPos)}</td><td class="n neg">${fmt(-r.otherNeg)}</td><td class="n ${cls(r.headline)}"><b>${fmt(r.headline)}</b></td>
+      <td class="small">${r.complete ? '' : '<span class="neg">НЕПЪЛНО</span> '}${r.lossLine ? esc(r.lossLine) : ''}</td></tr>`).join('');
+}
+// пренесената загуба (verbleibender Verlustvortrag) — само ръчно, по години, в браузъра на потребителя; никога автоматично
+const CARRY_KEY = 'tax_carry_v1';
+const carryStore = () => { try { return JSON.parse(localStorage.getItem(CARRY_KEY)) || {}; } catch (e) { return {}; } };
+function loadCarry() { const c = carryStore()[$('year').value] || {}; $('carryS').value = c.s || 0; $('carryO').value = c.o || 0; const el = $('carryYear'); if (el) el.textContent = $('year').value; }
+function saveCarry() { try { const st = carryStore(); st[$('year').value] = { s: Number($('carryS').value) || 0, o: Number($('carryO').value) || 0 }; localStorage.setItem(CARRY_KEY, JSON.stringify(st)); } catch (e) { /* без запазване — страницата работи и без него */ } }
 
 // 12.11.2026: резюмето над резултата — какво е прочетено общо и за избраната година; показва се и когато няма какво да се смята
 function renderSummary() {
@@ -164,6 +179,7 @@ function render() {
   const why = TC.whyZero(de, S.sum), noData = S.sum.empty && why.length;
   $('headline').innerHTML = `<h2>Доходи от капитал ${y} — за Anlage KAP / KAP-INV</h2>
     <div class="big ${noData ? 'mut' : cls(de.headline)}">${noData ? `няма данни за ${y}` : fmt(de.headline)}</div>
+    ${de.lossLine ? `<div class="msg warn" id="lossLine"><b>${esc(de.lossLine)}</b></div>` : ''}
     ${why.length ? `<div class="msg ${noData || !de.complete ? 'err' : 'warn'}" id="whyZero"><b>${noData ? 'Това не е „0,00 €“: ' : 'Числото е 0, защото: '}</b>${esc(why.join('; '))}.</div>` : ''}
     <div class="small">${loss ? 'загуба — пренася се (Finanzamt я установява с решение)' : 'след прихващането на загубите, преди Sparer-Pauschbetrag' + (de.estimate ? ' (' + fmt(de.estimate.pauschbetrag) + ')' : '')}
       ${de.complete ? '' : ' · <span class="neg">НЕПЪЛНО — виж предупрежденията</span>'}</div>
@@ -197,6 +213,7 @@ function render() {
     (de.otherCarry ? `<tr><td>Друга загуба за пренасяне</td><td class="n neg">${fmt(-de.otherCarry)}</td><td class="small">Anlage KAP — загуби без загубите от акции</td></tr>` : '') +
     `<tr><td>${esc(L.withholding.bg)} <div class="small">удържани ${fmt(de.withheld)}</div></td><td class="n">${fmt(de.creditable)}</td><td class="small">${esc(L.withholding.form)}</td></tr>` +
     de.crypto.map(c => `<tr><td>${esc(L.crypto.bg)}${st.joint ? ' — ' + (c.person === 'B' ? 'съпруг/а' : 'аз') : ''}<div class="small">облагаеми ${fmt(c.taxable)} · над година (освободени) ${fmt(c.exempt)} · Freigrenze ${fmt(c.freigrenze)} на човек</div></td><td class="n ${cls(c.result)}">${fmt(c.result)}</td><td class="small">${esc(L.crypto.form)}</td></tr>`).join('');
+  renderYears(st);
   renderFunds(de); renderPersons(st);
   // продажби и доходи за годината
   const R = S.fifo.realized.filter(x => x.year === y);
@@ -302,6 +319,8 @@ drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); addFiles(e.dataTransfer.files); });
 $('clear').addEventListener('click', () => { S.files = []; S.ing = null; S.yearPicked = false; renderFiles(); recalc(); });
 $('year').addEventListener('change', () => { S.yearPicked = true; if (S.ing && !S.fifo) renderSummary(); });   // изборът на потребителя се пази при добавяне на още файлове
+$('year').addEventListener('change', loadCarry);                                   // по-рано от render: числата за годината идват с нейното пренасяне
+['carryS', 'carryO'].forEach(id => $(id).addEventListener('change', saveCarry));
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit', 'offsetOrder', 'creditPerItem', 'nonIbkrDefault'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
 ['stillhalter', 'spinoffMode', 'stockDivMode', 'xferLink'].forEach(id => $(id).addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } }));
