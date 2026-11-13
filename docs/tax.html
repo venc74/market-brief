@@ -18,7 +18,7 @@ h2{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
 .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
-select,input[type=number]{background:#0c1220;border:1px solid var(--line);color:var(--text);padding:6px 8px;border-radius:6px;font-size:13px}
+select,input[type=number],input[type=date],input[type=text]{background:#0c1220;border:1px solid var(--line);color:var(--text);padding:6px 8px;border-radius:6px;font-size:13px}
 input[type=number]{width:120px;text-align:right}
 .drop{border:2px dashed #23324a;border-radius:8px;padding:22px;text-align:center;cursor:pointer}
 .drop.drag{border-color:var(--cyan);background:#091420}
@@ -70,6 +70,7 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
   <div id="out" style="display:none">
     <div class="card" id="headline"></div>
     <div id="warnings"></div>
+    <div id="manualBox"></div>
     <div class="card"><h2>Разбивка — откъде е числото</h2><div class="scroll"><table id="breakdown"></table></div></div>
     <div class="card"><h2>Настройки</h2>
       <div class="row">
@@ -80,7 +81,12 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
         <label class="f">Таван на чуждия данък*<select id="creditPerItem"><option value="1">% от дивидента и до германския данък по него</option><option value="0">само % от дивидента</option></select></label>
         <label class="f">Тикъри от Revolut / CSV без вид*<select id="nonIbkrDefault"><option value="stock">акция</option><option value="equity">акционерен фонд (ETF)</option></select></label>
         <label class="f">Продадени опции (Stillhalter) — премията<select id="stillhalter"><option value="receipt">в годината на получаване</option><option value="close">нетно при затварянето</option></select></label>
+        <label class="f">Отделяне на компания (spin-off)*<select id="spinoffMode"><option value="manual">цената на новите акции — на ръка (без нея няма резултат)</option><option value="zero">покупна цена 0 € (цялата продажба е печалба)</option></select></label>
+        <label class="f">Дивидент в акции*<select id="stockDivMode"><option value="split">като безплатни акции (без доход, общата цена не се мени)</option><option value="income">доход по пазарна стойност + нова цена</option></select></label>
+        <label class="f">Прехвърляне от друг брокер*<select id="xferLink"><option value="on">търси покупката в отчетите на другия брокер (по тикър, до датата на прехвърлянето)</option><option value="off">не търси — лотът е без покупна цена (въвежда се на ръка)</option></select></label>
       </div>
+      <div class="small" style="margin-top:6px">Корпоративни действия: смяна на тикър / ISIN, сплит и обратен сплит, сливане акции срещу акции — лотовете продължават с оригиналните дати и обща цена; сливане / изкупуване с пари — продажба; смесено — парите са продажба на дял от лотовете (по стойност), остатъкът — размяна.
+        Спорното (*): отделяне на компания, дивидент в акции, фракции в брой, безценност — германското третиране зависи от случая; калкулаторът не решава сам, показва „СПОРНО“ и прилага настройката. Непознато действие — червено, докато не потвърдиш ръчно.</div>
       <div class="small" style="margin-top:6px">Пренесена загуба — само сумата, установена с решение на Finanzamt (Verlustfeststellungsbescheid) за предходната година; иначе 0. Таванът 15% е ставката по спогодбата със САЩ; за други държави може да е различен — да се потвърди. * спорно — да се потвърди от счетоводител.</div>
       <div id="fundsBox" style="margin-top:12px"></div>
       <div id="personsBox" style="margin-top:12px"></div>

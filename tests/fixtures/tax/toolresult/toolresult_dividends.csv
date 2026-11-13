@@ -1,0 +1,4 @@
+﻿"Fiscal Year","Dividend Date",Broker,Ticker,"Dividend After Tax (original)","Dividend After Tax (EUR)","Withholding Tax (original)","Withholding Tax (EUR)","Dividend Before Tax (original)","Dividend Before Tax (EUR)","Original Currency","Your Currency","FX Rate",Country
+2019,2019-08-21,IBKR,ZZZA,8.50,8.00,1.50,1.41,10.00,9.41,USD,EUR,1.0625,US
+2021,2021-04-07,IBKR,ZZZB,17.00,15.70,3.00,2.77,20.00,18.47,USD,EUR,1.0830,US
+2021,2021-09-15,IBKR,ZZZB,17.00,15.80,3.00,2.79,20.00,18.59,USD,EUR,1.0760,US

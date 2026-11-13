@@ -1,0 +1,370 @@
+﻿Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,Interactive Brokers Central Europe Zrt.
+Statement,Data,BrokerAddress,REMOVED
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"July 2, 2018 - June 29, 2019"
+Statement,Data,WhenGenerated,"2000-01-01, 00:00:00"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Anonymous Person
+Account Information,Data,Account,X0000001
+Account Information,Data,Account Type,Individual
+Account Information,Data,Customer Type,Individual
+Account Information,Data,Account Capabilities,Cash
+Account Information,Data,Base Currency,EUR
+Net Asset Value,Header,Asset Class,Prior Total,Current Long,Current Short,Current Total,Change
+Net Asset Value,Data,Cash ,3720.976603259,6826.534391439,0,6826.534391439,3105.557788181
+Net Asset Value,Data,Stock,8422.7781133,51594.292337,0,51594.292337,43171.5142241
+Net Asset Value,Data,Dividend Accruals,0,79.208500,0,79.208500,79.208500
+Net Asset Value,Data,Total,12143.754716545,58500.035228808,0,58500.035228808,46356.280512262
+Net Asset Value,Header,Time Weighted Rate of Return
+Net Asset Value,Data,19.163497778%
+Change in NAV,Header,Field Name,Field Value
+Change in NAV,Data,Starting Value,20022.158001725
+Change in NAV,Data,Mark-to-Market,12367.0631642
+Change in NAV,Data,Deposits & Withdrawals,10506
+Change in NAV,Data,Position Transfers,53792.1131526
+Change in NAV,Data,Change in Dividend Accruals,131.47506
+Change in NAV,Data,CYEP/Broker Fees,78.0494761
+Change in NAV,Data,Change in CYEP/Broker Fee Accruals,-0.2363170
+Change in NAV,Data,Other Fees,-116.11790
+Change in NAV,Data,Commissions,-326.788423105
+Change in NAV,Data,Other FX Translations,-0.6427955
+Change in NAV,Data,Ending Value,96452.619127905
+Mark-to-Market Performance Summary,Header,Asset Category,Symbol,Prior Quantity,Current Quantity,Prior Price,Current Price,Mark-to-Market P/L Position,Mark-to-Market P/L Transaction,Mark-to-Market P/L Commissions,Mark-to-Market P/L Other,Mark-to-Market P/L Total,Code
+Mark-to-Market Performance Summary,Data,Stocks,ZHER,0,0,--,--,28.320921,-21.7825822,-3.118537098,0,3.419801418,
+Mark-to-Market Performance Summary,Data,Stocks,ZNCG,0,2000,--,36.6836,-700.107014,-220.169764,-5.46086,0,-925.737640,
+Mark-to-Market Performance Summary,Data,Stocks,ZPNI,0,420,--,35.9977,-1697.086696,-14.01493,-0.77861,0,-1711.880233,
+Mark-to-Market Performance Summary,Data,Stocks,ZJZA,520,0,13.4986,--,102.381662,-0.827998,-0.828347994,0,100.725315215,
+Mark-to-Market Performance Summary,Data,Stocks,ZTRL,0,150,--,178.5618,-600.150145,1.7748748,-0.78883,0,-599.1641032,
+Mark-to-Market Performance Summary,Data,Stocks,ZVOQ,0,0,--,--,313.65747,165.940661,-4.747203067,0,474.850923827,
+Mark-to-Market Performance Summary,Data,Stocks,ZJSQ,0,0,--,--,-807.78403,-214.2751064,-11.540869359,0,-1033.600001829,
+Mark-to-Market Performance Summary,Data,Stocks,ZAZC,0,0,--,--,-11.79607,21.1303,-6.413742950,0,2.920480429,
+Mark-to-Market Performance Summary,Data,Stocks,ZGZK,80,0,11.2014,--,-11.6331,-6.5624579,-0.791099232,0,-18.986622500,
+Mark-to-Market Performance Summary,Data,Stocks,ZFPB,0,0,--,--,161.07780,-134.33949,-1.581204422,0,25.157104317,
+Mark-to-Market Performance Summary,Data,Stocks,ZDAT,0,0,--,--,3756.793944,-7.23605,-5.609183565,0,3743.948706181,
+Mark-to-Market Performance Summary,Data,Stocks,ZZEE,0,0,--,--,1085.203509,-101.956631,-5.747527296,0,977.499350463,
+Mark-to-Market Performance Summary,Data,Stocks,ZUZN,0,0,--,--,-14.105,-40.6644,-2.392893265,0,-57.162592276,
+Mark-to-Market Performance Summary,Data,Stocks,ZIUE,400,0,16.5420,--,248.469441,29.3260854,-0.79465489,0,277.00087181,
+Mark-to-Market Performance Summary,Data,Stocks,ZOUB,0,0,--,--,9.4002,-2.34767,-1.604316691,0,5.448190730,
+Mark-to-Market Performance Summary,Data,Stocks,ZZEF,0,0,--,--,-163.78571,95.9289,-5.134808759,0,-72.991595189,
+Mark-to-Market Performance Summary,Data,Stocks,ZBLV,0,0,--,--,0,-85.3603604,-3.961567613,0,-89.321928036,
+Mark-to-Market Performance Summary,Data,Stocks,ZIJD,0,6000,--,6.2795,-2995.65657,-9.34790,-1.16849,0,-3006.17296,
+Mark-to-Market Performance Summary,Data,Stocks,ZMDN,0,0,--,--,-67.29441,-36.6864303,-5.102408295,0,-109.083243960,
+Mark-to-Market Performance Summary,Data,Stocks,ZTSU,60,0,5.9188,--,43.871589,8.0329373,-1.606991019,0,50.297535783,
+Mark-to-Market Performance Summary,Data,Stocks,ZPNV,0,0,--,--,2835.757957,11.613182,-4.805088796,0,2842.566049887,
+Mark-to-Market Performance Summary,Data,Stocks,ZKOT,0,0,--,--,339.696371,-0.416325,-1.612487487,0,337.667558595,
+Mark-to-Market Performance Summary,Data,Stocks,ZXRF,0,0,--,--,-11.72554,16.07187,-2.436002987,0,1.910330703,
+Mark-to-Market Performance Summary,Data,Stocks,ZIJF,100,4000,9.7999,15.0266,3076.2963431,83.786171,-8.846760711,0,3151.235753499,
+Mark-to-Market Performance Summary,Data,Stocks,ZDVD,600,0,5.8674,--,817.94010,-33.119526,-4.435807904,0,780.384769727,
+Mark-to-Market Performance Summary,Data,Stocks,ZDRR,600,0,29.6641,--,-118.47374,-14.5270,-0.839289085,0,-133.839993406,
+Mark-to-Market Performance Summary,Data,Stocks,ZJNA,0,0,--,--,84.05952,17.91357,-1.674263984,0,100.298819216,
+Mark-to-Market Performance Summary,Data,Stocks,ZHUU,50,0,149.7051,--,113.317809,9.727692,-0.81166478,0,122.23383623,
+Mark-to-Market Performance Summary,Data,Stocks,ZWZI,0,0,--,--,23.2843,-318.4938528,-2.387496846,0,-297.597006882,
+Mark-to-Market Performance Summary,Data,Stocks,ZWMR,0,0,--,--,24.21709,-55.733226,-4.419612898,0,-35.935745642,
+Mark-to-Market Performance Summary,Data,Stocks,ZWHG,0,0,--,--,76.5,-58,-5,0,13.3,
+Mark-to-Market Performance Summary,Data,Stocks,ZKLG,0,0,--,--,-65.62370,-11.7682,-1.566860048,0,-78.958808199,
+Mark-to-Market Performance Summary,Data,Stocks,ZXIF,0,0,--,--,499.607366,126.216880,-3.975478367,0,621.848768030,
+Mark-to-Market Performance Summary,Data,Stocks,ZSFT,280,0,0.6571,--,-65.70267837,3.55094230,-4.94907362,0,-67.10080970,
+Mark-to-Market Performance Summary,Data,Stocks,ZTZR,0,0,--,--,91.48020,155.0049,-15.880760443,0,230.604294820,
+Mark-to-Market Performance Summary,Data,Total,,,,,,6400.43330966,-641.75240407,-132.942915554,0,5625.737990037,
+Mark-to-Market Performance Summary,Data,Forex,ZLGF,2532.448257399,254.774733026,1.7416,1.7416,0,0,0,0,0,
+Mark-to-Market Performance Summary,Data,Forex,ZGRI,2732.482431444,10015.510450168,1.62706,1.57798,-1487.4033669,8.499399,-0.080646626,0,-1478.984614163,
+Mark-to-Market Performance Summary,Data,Total,,,,,,-730.2301746,4.172720,-0.039592891,0,-726.097047400,
+Mark-to-Market Performance Summary,Data,Total (All Assets),,,,,,5670.20313506,-637.57968398,-132.982508445,0,4899.640942637,
+Mark-to-Market Performance Summary,Data,CYEP/Broker Fees Paid and Received,,,,,,,,,,31.7612693,
+Mark-to-Market Performance Summary,Data,Other Fees,,,,,,,,,,-47.25274,
+Total P/L for Statement Period,,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED
+Realized & Unrealized Performance Summary,Header,Asset Category,Symbol,Cost Adj.,Realized S/T Profit,Realized S/T Loss,Realized L/T Profit,Realized L/T Loss,Realized Total,Unrealized S/T Profit,Unrealized S/T Loss,Unrealized L/T Profit,Unrealized L/T Loss,Unrealized Total,Total,Code
+Realized & Unrealized Performance Summary,Data,Stocks,ZHER,0,127.00114034,-114.270823047,0,0,12.730317291,0,0,0,0,0,12.730317291,
+Realized & Unrealized Performance Summary,Data,Stocks,ZNCG,0,0,0,0,0,0,0,-3089.022663,0,-2247.3755820,-5336.3982454,-5336.3982454,
+Realized & Unrealized Performance Summary,Data,Stocks,ZPNI,0,0,0,0,0,0,0,-1021.25768,0,-8178.4253440,-9199.6830192,-9199.6830192,
+Month & Year to Date Performance Summary,Header,Asset Category,Symbol,Description,Mark-to-Market MTD,Mark-to-Market YTD,Realized S/T MTD,Realized S/T YTD,Realized L/T MTD,Realized L/T YTD
+Month & Year to Date Performance Summary,Data,Stocks,ZHER,REMOVED,0,5.06191955,0,6.47515063,0,0
+Month & Year to Date Performance Summary,Data,Stocks,ZNCG,REMOVED,-942.76197,-1370.257767,0,0,0,0
+Month & Year to Date Performance Summary,Data,Stocks,ZPNI,REMOVED,206.516811,-2533.889825,0,0,0,0
+Cash Report,Header,Currency Summary,Currency,Total,Month to Date,Year to Date,
+Cash Report,Data,Starting Cash,Base Currency Summary,6501.601807959,,,
+Cash Report,Data,Commissions,Base Currency Summary,-346.315710272,-75.86669895,-346.31571036,
+Cash Report,Data,Deposits,Base Currency Summary,11133,0,11133,
+Cash Report,Data,CYEP/Broker Fees Paid and Received,Base Currency Summary,82.7133333,9.939375,82.7133333,
+Cash Report,Data,Trades (Sales),Base Currency Summary,298775.920205698,37479.58307550,298775.92020570,
+Cash Report,Data,Trades (Purchase),Base Currency Summary,-303465.409095700,-26783.72945,-303465.4090957,
+Cash Report,Data,Other Fees,Base Currency Summary,-123.05654,-2.02557,-123.05654,
+Cash Report,Data,Cash FX Translation Gain/Loss,Base Currency Summary,-630.8677010,,,
+Cash Report,Data,Ending Cash,Base Currency Summary,11927.892344877,,,
+Cash Report,Data,Ending Settled Cash,Base Currency Summary,4263.452942409,,,
+Cash Report,Data,Starting Cash,EUR,3237.794402556,,,
+Cash Report,Data,Commissions,EUR,-13.46307586,0,-13.46307586,
+Cash Report,Data,Deposits,EUR,11133,0,11133,
+Cash Report,Data,Trades (Sales),EUR,4422.6662,0,4422.6662,
+Cash Report,Data,Trades (Purchase),EUR,-18455,-60,-18455,
+Cash Report,Data,Ending Cash,EUR,325.735462548,,,
+Cash Report,Data,Ending Settled Cash,EUR,325.735462548,,,
+Cash Report,Data,Starting Cash,USD,3493.542778519,,,
+Cash Report,Data,Commissions,USD,-361.248554,-82.85843,-361.248554,
+Cash Report,Data,CYEP/Broker Fees Paid and Received,USD,88.82,10.73,88.82,
+Cash Report,Data,Trades (Sales),USD,318534.65539,40829.21992,318534.65539,
+Cash Report,Data,Trades (Purchase),USD,-308812.65347918,-29414,-308812.65347915,
+Cash Report,Data,Other Fees,USD,-138,-2,-138,
+Cash Report,Data,Ending Cash,USD,12805.064656126,,,
+Cash Report,Data,Ending Settled Cash,USD,4345.978720903,,,
+Open Positions,Header,DataDiscriminator,Asset Category,Currency,Symbol,Quantity,Mult,Cost Price,Cost Basis,Close Price,Value,Unrealized P/L,Code
+Open Positions,Data,Summary,Stocks,USD,ZNCG,2000,1,48.102949,96205.90,36.68,73360.00,-22845.90,
+Open Positions,Data,Summary,Stocks,USD,ZPNI,420,1,63.071877239,26490.19,36.00,15120.00,-11370.19,
+Open Positions,Data,Summary,Stocks,USD,ZTRL,150,1,253.8393,38075.90,178.56,26784.00,-11291.90,
+Open Positions,Data,Summary,Stocks,USD,ZIJD,6000,1,17.450009021,104700.05,6.28,37680.00,-67020.05,
+Open Positions,Data,Summary,Stocks,USD,ZIJF,4000,1,11.246,44984.00,15.03,60120.00,15136.00,
+Open Positions,Total,,Stocks,USD,,,,,185739.85,,119468.1,-66271.73,
+Open Positions,Total,,Stocks,EUR,,,,,168291.4443254,,108245.281328,-60046.1629970,
+Forex Balances,Header,Asset Category,Currency,Description,Quantity,Cost Price,Cost Basis in EUR,Close Price,Value in EUR,Unrealized P/L in EUR,Code
+Forex Balances,Data,Forex,EUR,REMOVED,225.801244242,0,-225.801244242,2,225.801244242,0,
+Forex Balances,Data,Forex,EUR,REMOVED,8876.526706,1.399905407,-8050.564308305,1.39853,8042.665788,-7.898520803,
+Forex Balances,Data,Total,,,,,-14394.834213690,,14381.096553509,-13.737660181,
+Net Stock Position Summary,Header,Asset Category,Currency,Symbol,Description,Shares at IB,Shares Borrowed,Shares Lent,Net Shares
+Net Stock Position Summary,Data,Stocks,USD,ZNCG,REMOVED,2000,0,0,2000
+Net Stock Position Summary,Data,Stocks,USD,ZPNI,REMOVED,420,0,0,420
+Net Stock Position Summary,Data,Stocks,USD,ZTRL,REMOVED,150,0,0,150
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,EUR,ZWHG,"2018-07-13, 09:30:00","2,000",1.253,1.2452,-2506.00,-3.83,2509.83,0,0,O
+Trades,Data,Order,Stocks,EUR,ZWHG,"2018-08-06, 09:30:00","-2,000",1.2669,1.302,2533.80,-3.83,-2529.97,0,0,C
+Trades,SubTotal,,Stocks,EUR,ZWHG,,0,,,26.5,-7,0,19.1,-84,
+Trades,Total,,Stocks,EUR,,,,,,26.5,-7,0,19.1,-84, 
+Trades,Data,Order,Stocks,USD,ZHER,"2019-01-19, 09:30:00",32,153.13,152.221,-4900.16,-4.18,4904.34,0,0,O
+Trades,Data,Order,Stocks,USD,ZHER,"2019-01-20, 09:30:01",48,151.73,151.95,-7283.04,-4.18,7287.22,0,0,O
+Trades,Data,Order,Stocks,USD,ZHER,"2019-01-31, 09:30:00",40,160.50,159.18,-6420.00,-4.18,6424.18,0,0,O
+Trades,Data,Order,Stocks,USD,ZHER,"2019-02-01, 09:30:00",-120,155.36,155.75,18643.20,-4.35,-18638.85,0,0,C
+Trades,SubTotal,,Stocks,USD,ZHER,,0,,,11.90,-4.9765524,0,6.92,-34.6,
+Trades,Data,Order,Stocks,USD,ZNCG,"2018-09-30, 09:30:01",100,39.02,38.69,-3902.00,-9.65,3911.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZNCG,"2018-12-02, 09:30:00",100,45.23,42.84,-4523.00,-9.65,4532.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZNCG,"2018-12-02, 09:30:01",150,43.88,42.84,-6582.00,-9.65,6591.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZNCG,"2019-01-13, 09:30:00",250,46.00,45.87,-11500.00,-9.65,11509.65,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZNCG,"2019-01-14, 09:30:00",250,47.22,44.42,-11805.00,-9.65,11814.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZNCG,"2019-01-27, 09:30:00",500,44.87,42.88,-22435.00,-9.65,22444.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZNCG,"2019-06-14, 09:30:01",500,40.54,39.39,-20270.00,-9.65,20279.65,0,0,O
+Trades,SubTotal,,Stocks,USD,ZNCG,,456,,,-10343.5,-9,10352.1,0,-349.1,
+Trades,Data,Order,Stocks,USD,ZPNI,"2019-02-10, 09:30:00",120,46.49,46.08,-5578.80,-2.79,5581.59,0,0,O
+Trades,SubTotal,,Stocks,USD,ZPNI,,25,,,-2466.4,-1,2467.6,0,-22,
+Trades,Data,Order,Stocks,USD,ZJZA,"2018-08-09, 09:30:00",-520,15.588,15.61,8105.76,-8.95,-8096.81,0,0,C
+Trades,SubTotal,,Stocks,USD,ZJZA,,-160,,,1161.31,-1.281633846,-1193.9,-33.850955,-1.28,
+Trades,Data,Order,Stocks,USD,ZTRL,"2018-11-17, 09:30:00",15,195.03,195.70,-2925.45,-4.50,2929.95,0,0,O
+Trades,SubTotal,,Stocks,USD,ZTRL,,6,,,-801.11,-1,802.35,0,2.77,
+Trades,Data,Order,Stocks,USD,ZVOQ,"2018-08-02, 09:30:02",20,24.55,23.92,-491.00,-2.37,493.37,0,0,O
+Trades,Data,Order,Stocks,USD,ZVOQ,"2018-08-02, 09:30:04",20,23.65,23.92,-473.00,-2.37,475.37,0,0,O
+Trades,Data,Order,Stocks,USD,ZVOQ,"2018-11-11, 09:30:00",40,12.16,12.07,-486.40,-2.37,488.77,0,0,O
+Trades,Data,Order,Stocks,USD,ZVOQ,"2018-12-08, 09:30:01",80,13.85,15.24,-1108.00,-2.37,1110.37,0,0,O
+Trades,Data,Order,Stocks,USD,ZVOQ,"2018-12-08, 09:30:03",200,15.46,15.24,-3092.00,-2.37,3094.37,0,0,O
+Trades,Data,Order,Stocks,USD,ZVOQ,"2019-01-20, 09:30:00",-400,19.43,18.29,7772.00,-2.50,-7769.50,0,0,C
+Trades,SubTotal,,Stocks,USD,ZVOQ,,-25,,,1103.2,-7.459005,-963.25,132.512704,265.1,
+Trades,Data,Order,Stocks,USD,ZJSQ,"2018-09-06, 09:30:01",500,16.92,16.54,-8460.00,-7.47,8467.47,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2018-09-16, 09:30:00",250,13.641,13.49,-3410.25,-7.47,3417.72,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2018-09-30, 09:30:10",250,15.311,15.17,-3827.75,-7.47,3835.22,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2018-10-20, 09:30:01","-1,000",13.951,13.94,13951.00,-7.80,-13943.20,0,0,C
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-03-28, 09:30:00","5,000",21.65,21.58,-108250.00,-37.36,108287.36,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-04-02, 09:30:00","-5,000",20.12,20.38,100600.00,-39.25,-100560.75,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZJSQ,,0,,,-1556.59,-17.610858,0,-1574.200232,-324.77,
+Trades,Data,Order,Stocks,USD,ZAZC,"2019-05-27, 09:30:02","1,200",6.98,7.02,-8376.00,-14.53,8390.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZAZC,"2019-05-29, 09:30:00",800,7.15,7.31,-5720.00,-9.69,5729.69,0,0,O
+Trades,Data,Order,Stocks,USD,ZAZC,"2019-06-01, 09:30:01","1,200",7.63,7.65,-9156.00,-14.53,9170.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZAZC,"2019-06-08, 09:30:04","-3,200",7.303,7.29,23369.60,-40.06,-23329.54,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZAZC,,0,,,16,-10.021221,0,5.992440,33,
+Trades,Data,Order,Stocks,USD,ZGZK,"2018-09-30, 09:30:03",-80,10.60759,10.83,848.61,-2.14,-846.46,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZGZK,,-49,,,492.27,-1.24290276,-707.576,-216.546567,-10.31,
+Trades,Data,Order,Stocks,USD,ZFPB,"2019-05-27, 09:30:00",400,4.54,4.56,-1816.00,-3.27,1819.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZFPB,"2019-06-01, 09:30:00",-400,4.82,6.25,1928.00,-3.33,-1924.67,0,0,C
+Trades,SubTotal,,Stocks,USD,ZFPB,,0,,,43,-2.48732,0,40.62639,-211,
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-09-06, 09:30:00",40,96.42,88.90,-3856.80,-5.67,3862.47,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-09-17, 09:30:01",40,107.85,106.19,-4314.00,-5.67,4319.67,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-09-30, 09:30:07",40,92.80,95.70,-3712.00,-5.67,3717.67,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-11-12, 09:30:00",80,81.71,81.21,-6536.80,-5.67,6542.47,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-11-22, 09:30:00",120,84.17,86.49,-10100.40,-5.67,10106.07,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2018-12-30, 09:30:00",80,99.11,101.34,-7928.80,-5.67,7934.47,0,0,O
+Trades,Data,Order,Stocks,USD,ZDAT,"2019-01-21, 09:30:03",-480,142.34,142.79,68323.20,-6.31,-68316.89,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZDAT,,-25,,,6930.5,-8.76302,-5960.09,961.615522,-11.2,
+Trades,Data,Order,Stocks,USD,ZZEE,"2018-09-03, 09:30:02",180,162.95,163.01,-29331.00,-7.76,29338.76,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEE,"2018-09-16, 09:30:01",120,172.20,172.69,-20664.00,-7.76,20671.76,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEE,"2018-09-27, 09:30:00",-300,168.65,169.93,50595.00,-8.22,-50586.78,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZZEE,"2018-09-30, 09:30:02",180,172.36,170.36,-31024.80,-7.76,31032.56,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEE,"2018-10-20, 09:30:00",-180,167.10,167.99,30078.00,-8.03,-30069.97,0,0,C
+Trades,Data,Order,Stocks,USD,ZZEE,"2019-02-28, 09:30:00",600,190.14,189.73,-114084.00,-7.76,114091.76,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEE,"2019-03-25, 09:30:00",-600,206.943,206.83,124165.80,-8.87,-124156.93,0,0,C
+Trades,SubTotal,,Stocks,USD,ZZEE,,0,,,1545.8,-8.915017,0,1536.895932,-160.3,
+Trades,Data,Order,Stocks,USD,ZUZN,"2019-05-20, 09:30:00",200,46.38,46.14,-9276.00,-4.88,9280.88,0,0,O
+Trades,Data,Order,Stocks,USD,ZUZN,"2019-05-20, 09:30:01",200,46.87,46.14,-9374.00,-4.88,9378.88,0,0,O
+Trades,Data,Order,Stocks,USD,ZUZN,"2019-05-21, 09:30:00",-400,45.77,45.92,18308.00,-5.17,-18302.83,0,0,C
+Trades,SubTotal,,Stocks,USD,ZUZN,,0,,,-86,-3.768118,0,-89.995519,-64,
+Trades,Data,Order,Stocks,USD,ZIUE,"2018-10-25, 09:30:00",-400,19.853,19.50,7941.20,-3.80,-7937.40,0,0,C
+Trades,SubTotal,,Stocks,USD,ZIUE,,-25,,,2623.58,-1.25638094,-2820.71,-198.384540,46.37,
+Trades,Data,Order,Stocks,USD,ZOUB,"2018-09-20, 09:30:02",600,7.08,7.14,-4248.00,-7.36,4255.36,0,0,O
+Trades,Data,Order,Stocks,USD,ZOUB,"2018-09-27, 09:30:01",-600,7.19,7.29,4314.00,-7.50,-4306.50,0,0,C
+Trades,SubTotal,,Stocks,USD,ZOUB,,0,,,11,-2.487276,0,8.599104,-4,
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-06-19, 09:30:01",500,7.15,7.39,-3575.00,-2.81,3577.81,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-06-20, 09:30:00",-500,7.18,7.08,3590.00,-2.87,-3587.13,0,0,C
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-06-27, 09:30:00","1,500",7.28,7.44,-10920.00,-4.21,10924.21,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-06-29, 09:30:00",500,7.28,7.15,-3640.00,-2.81,3642.81,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-06-29, 09:30:01","-2,000",7.15,7.15,14300.00,-5.89,-14294.11,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZZEF,,0,,,-107,-8.1590,0,-115.3273,153,
+Trades,Data,Order,Stocks,USD,ZBLV,"2019-01-27, 09:30:01","2,500",6.45,5.89,-16125.00,-22.32,16147.32,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZBLV,"2019-01-27, 09:30:03","-2,500",6.05459,5.89,15136.48,-23.09,-15113.39,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZBLV,,0,,,-135.00,-6.26511459,0,-141.260271,-135.00,
+Trades,Data,Order,Stocks,USD,ZIJD,"2018-11-01, 09:30:00",600,5.61,5.54,-3366.00,-5.15,3371.15,0,0,O
+Trades,SubTotal,,Stocks,USD,ZIJD,,370,,,-1208,-1.8,1210.3,0,-15,
+Trades,Data,Order,Stocks,USD,ZMDN,"2019-01-21, 09:30:00",300,7.69,7.68,-2307.00,-2.78,2309.78,0,0,O
+Trades,Data,Order,Stocks,USD,ZMDN,"2019-01-21, 09:30:02",300,7.59,7.68,-2277.00,-2.78,2279.78,0,0,O
+Trades,Data,Order,Stocks,USD,ZMDN,"2019-01-25, 09:30:00",600,7.32,7.31,-4392.00,-2.78,4394.78,0,0,O
+Trades,Data,Order,Stocks,USD,ZMDN,"2019-01-26, 09:30:00",300,7.22,7.23,-2166.00,-2.78,2168.78,0,0,O
+Trades,Data,Order,Stocks,USD,ZMDN,"2019-01-28, 09:30:01","-1,500",7.17838,7.28,10767.57,-7.24,-10760.33,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZMDN,,0,,,-165.30,-8.13428224,0,-173.432211,-58.13,
+Trades,Data,Order,Stocks,USD,ZTSU,"2018-11-18, 09:30:00",140,5.33,5.40,-746.20,-3.69,749.89,0,0,O
+Trades,Data,Order,Stocks,USD,ZTSU,"2018-12-07, 09:30:01",-200,6.7166,6.58,1343.32,-3.75,-1339.57,0,0,C
+Trades,SubTotal,,Stocks,USD,ZTSU,,-37,,,199.52,-2.48509116,-188.363,8.670272,12.40,
+Trades,Data,Order,Stocks,USD,ZPNV,"2018-09-17, 09:30:00",100,20.07,19.36,-2007.00,-11.85,2018.85,0,0,O
+Trades,Data,Order,Stocks,USD,ZPNV,"2018-09-20, 09:30:00",350,19.43,18.60,-6800.50,-11.85,6812.35,0,0,O
+Trades,Data,Order,Stocks,USD,ZPNV,"2018-09-30, 09:30:08",500,19.41,20.67,-9705.00,-11.85,9716.85,0,0,O
+Trades,Data,Order,Stocks,USD,ZPNV,"2018-12-01, 09:30:00",500,23.39,23.68,-11695.00,-11.85,11706.85,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZPNV,"2019-01-21, 09:30:01","-2,000",39.89,40.00,79780.00,-25.02,-79754.98,0,0,C
+Trades,SubTotal,,Stocks,USD,ZPNV,,-136,,,5152.2,-7.528707,-3718.61,1426.075756,17.9,
+Trades,Data,Order,Stocks,USD,ZKOT,"2018-07-24, 09:30:00",60,206.71,205.46,-12402.60,-8.61,12411.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZKOT,"2018-08-03, 09:30:01",-60,268.91,267.75,16134.60,-8.99,-16125.61,0,0,C
+Trades,SubTotal,,Stocks,USD,ZKOT,,0,,,533.7,-2.51827233,0,531.229344,-0.7,
+Trades,Data,Order,Stocks,USD,ZXRF,"2018-12-06, 09:30:00",200,36.57,37.22,-7314.00,-4.44,7318.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZXRF,"2018-12-07, 09:30:00",200,37.75,37.82,-7550.00,-4.44,7554.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZXRF,"2018-12-08, 09:30:00",-400,37.22,37.35,14888.00,-4.69,-14883.31,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZXRF,,0,,,6,-3.7642,0,2.3949,25,
+Trades,Data,Order,Stocks,USD,ZIJF,"2018-09-03, 09:30:00",-100,21.95,21.96,2195.00,-4.12,-2190.88,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-05-01, 09:30:00","2,000",11.22,11.16,-22440.00,-10.21,22450.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-05-09, 09:30:00","-2,000",11.26,11.07,22520.00,-10.68,-22509.32,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-05-17, 09:30:00","2,800",11.26,11.31,-31528.00,-14.29,31542.29,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-05-21, 09:30:01","1,200",11.20,11.22,-13440.00,-6.12,13446.12,0,0,O
+Trades,SubTotal,,Stocks,USD,ZIJF,,1201,,,-12878.1,-13.703437,13228.91,337.143542,130.26,
+Trades,Data,Order,Stocks,USD,ZDVD,"2018-09-30, 09:30:00",600,6.85,6.93,-4110.00,-8.65,4118.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZDVD,"2018-09-30, 09:30:04",600,6.92,6.93,-4152.00,-8.65,4160.65,0,0,O
+Trades,Data,Order,Stocks,USD,ZDVD,"2018-09-30, 09:30:06","1,200",7.032,6.86,-8438.40,-8.65,8447.05,0,0,O
+Trades,Data,Order,Stocks,USD,ZDVD,"2018-11-30, 09:30:00","-3,000",9.64,9.72,28920.00,-22.48,-28897.52,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZDVD,,-123,,,1742.3,-6.89728,-616,1119.478949,-51.2,
+Trades,Data,Order,Stocks,USD,ZDRR,"2018-08-23, 09:30:00",-600,27.66,27.88,16596.00,-7.59,-16588.41,0,0,C
+Trades,SubTotal,,Stocks,USD,ZDRR,,-185,,,2801,-1.281021,-2711.7,88.149112,-22,
+Trades,Data,Order,Stocks,USD,ZJNA,"2019-04-30, 09:30:00",600,194.32,195.28,-116592.00,-14.40,116606.40,0,0,O
+Trades,Data,Order,Stocks,USD,ZJNA,"2019-05-09, 09:30:01",-600,197.34,197.77,118404.00,-15.55,-118388.45,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZJNA,,0,,,155,-2.5626,0,152.6468,27,
+Trades,Data,Order,Stocks,USD,ZHUU,"2018-09-03, 09:30:01",-50,177.30,175.20,8865.00,-8.78,-8856.22,0,0,C
+Trades,SubTotal,,Stocks,USD,ZHUU,,-12,,,1256.0,-1.2436539,-1067.6,187.101628,14.9,
+Trades,Data,Order,Stocks,USD,ZWZI,"2019-01-27, 09:30:02",300,68.10,63.37,-20430.00,-6.80,20436.80,0,0,O
+Trades,Data,Order,Stocks,USD,ZWZI,"2019-01-28, 09:30:00",300,63.84,64.05,-19152.00,-6.80,19158.80,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZWZI,"2019-01-28, 09:30:02",-600,61.67192,64.05,37003.15,-7.29,-36995.86,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZWZI,,0,,,-467.61,-3.78481521,0,-471.396015,-504.57,
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-05-21, 09:30:02",600,5.703,5.54,-3421.80,-3.58,3425.38,0,0,O
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-05-27, 09:30:01","2,400",5.97,5.90,-14328.00,-7.17,14335.17,0,0,O
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-06-08, 09:30:02","-3,000",5.867,5.87,17601.00,-9.36,-17591.64,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZWMR,,0,,,-49.6,-6.912708,0,-56.555055,-87.8,
+Trades,Data,Order,Stocks,USD,ZKLG,"2018-12-16, 09:30:00",60,48.42,46.80,-2905.20,-3.30,2908.50,0,0,O
+Trades,Data,Order,Stocks,USD,ZKLG,"2018-12-21, 09:30:01",-60,42.98,42.18,2578.80,-3.33,-2575.47,0,0,C
+Trades,SubTotal,,Stocks,USD,ZKLG,,0,,,-122,-2.4749147,0,-124.425097,-18,
+Trades,Data,Order,Stocks,USD,ZXIF,"2018-08-02, 09:30:00",72,17.26,16.39,-1242.72,-4.12,1246.84,0,0,O
+Trades,Data,Order,Stocks,USD,ZXIF,"2018-08-15, 09:30:00",60,14.41,14.83,-864.60,-4.12,868.72,0,0,O
+Trades,Data,Order,Stocks,USD,ZXIF,"2018-09-30, 09:30:05",60,10.22,10.92,-613.20,-4.12,617.32,0,0,O
+Trades,Data,Order,Stocks,USD,ZXIF,"2018-12-08, 09:30:02",300,22.49,22.51,-6747.00,-4.12,6751.12,0,0,O
+Trades,Data,Order,Stocks,USD,ZXIF,"2018-12-21, 09:30:00",-600,22.89,21.79,13734.00,-4.29,-13729.71,0,0,C
+Trades,SubTotal,,Stocks,USD,ZXIF,,-22,,,1274.88,-6.209797,-1491.99,-223.318079,199.51,
+Trades,Data,Order,Stocks,USD,ZSFT,"2018-07-24, 09:30:01",520,0.9729,0.9183,-505.91,-6.58,512.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZSFT,"2018-08-03, 09:30:00",-800,1.2202,1.1592,976.16,-10.27,-965.89,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZSFT,"2018-08-17, 09:30:00","2,000",1.2892,1.30,-2578.40,-24.91,2603.31,0,0,O
+Trades,Data,Order,Stocks,USD,ZSFT,"2018-09-28, 09:30:00","-2,000",0.7567,0.7507,1513.40,-20.41,-1492.99,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZSFT,,-86,,,-73.537,-7.686277259,-38.1204,-119.343864,5.485,
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-08, 09:30:00",400,1.42,1.56,-568.00,-1.71,569.71,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-08, 09:30:03",400,1.56,1.56,-624.00,-1.71,625.71,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-14, 09:30:00",800,1.48,1.52,-1184.00,-3.41,1187.41,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-14, 09:30:02",400,1.44,1.52,-576.00,-1.71,577.71,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-19, 09:30:00","2,000",1.68,1.69,-3360.00,-8.53,3368.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-06-20, 09:30:01","-4,000",1.71,1.66,6840.00,-17.61,-6822.39,0,0,C
+Trades,SubTotal,,Stocks,USD,ZTZR,,0,,,392,-25.03324,0,366.68552,244,
+Trades,Total,,Stocks,USD,,,,,,-3008.804,-199.847736305,6583.3569,3374.705009,-908.747, 
+Trades,Total,,Stocks,EUR,,,,,,-2626.7863614,-184.138717900,5910.780750613,3099.855666874,-840.80303568, 
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,,Proceeds,Comm in EUR,,,MTM in EUR,Code
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-08-02, 09:30:01",-517,2.71408,,564.5278,0,,,0.048391,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-08-02, 09:30:03",-475,2.71607,,518.76860,0,,,0.392788,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-08-02, 09:30:05",-458,2.7140,,499.3671,0,,,0.021834,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-16, 09:30:02","-5,738",2.6403,,6091.2322,-0.115180328,,,1.68655,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-17, 09:30:02",-2176,2.65388,,2322.14687,0,,,0.717445,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-20, 09:30:01",-1333,2.66831,,1430.214,0,,,0.495369,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-20, 09:30:03",-1341,2.66557,,1436.74369,0,,,-0.877111,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-22, 09:30:00",0.7052,2.70015,,-0.765491652,0,,,-0.001515,
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-30, 09:30:09",-714,2.70860,,777.36933,0,,,3.089415,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-09-30, 09:30:11",-1172,2.709,,1275.811,0,,,5.124111,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2018-10-04, 09:30:00",1.1161,2.72502,,-1.222716680,0,,,-0.004972,
+Trades,Data,Order,Forex,USD,EUR.USD,"2019-01-19, 09:30:01",-1739,2.7888,,1949.3859,0,,,1.537025,L
+Trades,Data,Order,Forex,USD,EUR.USD,"2019-06-08, 09:30:01",-67,2.67353,,72.18537,0,,,-0.090403,L
+Trades,SubTotal,,Forex,USD,EUR.USD,,-15728.2042,,,16935.76329434,-0.115180328,,,12.138928,
+Trades,Total,,Forex,USD,,,,,,16935.76329434,-0.115180328,,,12.138928, 
+Trades,Total,,Forex,EUR,,,,,,15740.343128903,-0.115180328,,,12.138928, 
+Transfers,Header,Asset Category,Currency,Symbol,Date,Type,Direction,Xfer Company,Xfer Account,Qty,Xfer Price,Market Value,Realized P/L,Cash Amount,Code
+Transfers,Data,Stocks,USD,ZNCG,2018-07-10,ACATS,In,--,TEXT,150,--,464.75,0.00,0.00,
+Transfers,Data,Stocks,USD,ZPNI,2018-07-10,ACATS,In,--,TEXT,300,--,"7,007.92",0.00,0.00,
+Transfers,Data,Stocks,USD,ZTRL,2018-07-10,ACATS,In,--,TEXT,135,--,"7,590.97",0.00,0.00,
+Transfers,Data,Stocks,USD,ZVOQ,2018-07-10,ACATS,In,--,TEXT,40,--,355.11,0.00,0.00,
+Transfers,Data,Stocks,USD,ZDAT,2018-07-10,ACATS,In,--,TEXT,80,--,967.94,0.00,0.00,
+Transfers,Data,Stocks,USD,ZIJD,2018-07-10,ACATS,In,--,TEXT,"5,400",--,"17,379.73",0.00,0.00,
+Transfers,Data,Stocks,USD,ZPNV,2018-07-10,ACATS,In,--,TEXT,550,--,681.63,0.00,0.00,
+Transfers,Data,Stocks,USD,ZXIF,2018-07-10,ACATS,In,--,TEXT,108,--,306.85,0.00,0.00,
+Transfers,Data,Total,,,,,,,,,,34754.90,0,0,
+Transfers,Data,Total in EUR,,,,,,,,,,32376.6244747,0,0,
+Deposits & Withdrawals,Header,Currency,Settle Date,Description,Amount
+Deposits & Withdrawals,Data,EUR,2018-07-09,REMOVED,5388
+Deposits & Withdrawals,Data,Total,,,5388
+Fees,Header,Subtitle,Currency,Date,Description,Amount
+Fees,Data,Other Fees,USD,2018-11-09,REMOVED,-1
+Fees,Data,Other Fees,USD,2019-01-12,REMOVED,-71
+Fees,Data,Other Fees,USD,2019-06-11,REMOVED,-1
+Fees,Data,Total,,,,-73
+Fees,Data,Total in EUR,,,,-65.15817
+CYEP/Broker Fees,Header,Currency,Date,Description,Amount,Code
+CYEP/Broker Fees,Data,USD,2019-02-03,REMOVED,4.54,
+CYEP/Broker Fees,Data,USD,2019-03-06,REMOVED,26.3,
+CYEP/Broker Fees,Data,USD,2019-04-04,REMOVED,3.76,
+Change in Dividend Accruals,Header,Asset Category,Currency,Symbol,Date,Ex Date,Pay Date,Quantity,Tax,Fee,Gross Rate,Gross Amount,Net Amount,Code
+Change in Dividend Accruals,Data,Starting Dividend Accruals in EUR,,,,,,,,,,,0,
+Change in Dividend Accruals,Data,Stocks,USD,ZPNI,2019-06-19,2019-06-20,2019-07-18,420,3,0.6,1,29,25.4,Po
+Change in Dividend Accruals,Data,Stocks,USD,ZPNI,2019-06-19,2019-06-20,2019-07-18,420,0,0.6,1,29,28.3,Po
+Financial Instrument Information,Header,Asset Category,Symbol,Description,Conid,Security ID,Underlying,Listing Exch,Multiplier,Type,Code
+Financial Instrument Information,Data,Stocks,ZHER,SYNTHETIC INSTRUMENT 28,100028,USZ000000280,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZNCG,SYNTHETIC INSTRUMENT 29,100029,USZ000000290,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZPNI,SYNTHETIC INSTRUMENT 30,100030,USZ000000300,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZJZA,SYNTHETIC INSTRUMENT 3,100003,USZ000000030,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZTRL,SYNTHETIC INSTRUMENT 31,100031,USZ000000310,,NASDAQ,1,ADR,
+Financial Instrument Information,Data,Stocks,ZVOQ,SYNTHETIC INSTRUMENT 32,100032,USZ000000320,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZJSQ,SYNTHETIC INSTRUMENT 33,100033,USZ000000330,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZAZC,SYNTHETIC INSTRUMENT 34,100034,USZ000000340,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZGZK,SYNTHETIC INSTRUMENT 7,100007,USZ000000070,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZFPB,SYNTHETIC INSTRUMENT 35,100035,USZ000000350,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZDAT,SYNTHETIC INSTRUMENT 36,100036,USZ000000360,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZZEE,SYNTHETIC INSTRUMENT 37,100037,USZ000000370,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZUZN,SYNTHETIC INSTRUMENT 38,100038,USZ000000380,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIUE,SYNTHETIC INSTRUMENT 10,100010,USZ000000100,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZOUB,SYNTHETIC INSTRUMENT 39,100039,USZ000000390,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZZEF,SYNTHETIC INSTRUMENT 40,100040,USZ000000400,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZBLV,SYNTHETIC INSTRUMENT 11,100011,USZ000000110,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIJD,SYNTHETIC INSTRUMENT 12,100012,USZ000000120,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZMDN,SYNTHETIC INSTRUMENT 41,100041,USZ000000410,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZTSU,SYNTHETIC INSTRUMENT 14,100014,USZ000000140,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZPNV,SYNTHETIC INSTRUMENT 42,100042,USZ000000420,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZKOT,SYNTHETIC INSTRUMENT 43,100043,USZ000000430,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZXRF,SYNTHETIC INSTRUMENT 44,100044,USZ000000440,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIJF,SYNTHETIC INSTRUMENT 17,100017,USZ000000170,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZDVD,SYNTHETIC INSTRUMENT 18,100018,USZ000000180,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZDRR,SYNTHETIC INSTRUMENT 19,100019,USZ000000190,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZJNA,SYNTHETIC INSTRUMENT 45,100045,USZ000000450,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZHUU,SYNTHETIC INSTRUMENT 25,100025,USZ000000250,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZWZI,SYNTHETIC INSTRUMENT 46,100046,USZ000000460,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZWMR,SYNTHETIC INSTRUMENT 47,100047,USZ000000470,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZWHG,SYNTHETIC INSTRUMENT 48,100048,USZ000000480,,IBIS,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZKLG,SYNTHETIC INSTRUMENT 49,100049,USZ000000490,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZXIF,SYNTHETIC INSTRUMENT 50,100050,USZ000000500,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZSFT,SYNTHETIC INSTRUMENT 24,100024,USZ000000240,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZTZR,SYNTHETIC INSTRUMENT 51,100051,USZ000000510,,NASDAQ,1,COMMON,
+Codes,Header,Code,Meaning,Code (Cont.),Meaning (Cont.)
+Codes,Data,A,Assignment
+Codes,Data,C,Closing Trade
+Codes,Data,O,Opening Trade
+Notes/Legal Notes,Header,Type,Note
+Notes/Legal Notes,Data,Notes,TEXT
+Notes/Legal Notes,Data,Notes,TEXT
+Notes/Legal Notes,Data,Notes,TEXT

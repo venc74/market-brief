@@ -1,0 +1,560 @@
+﻿Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,
+Statement,Data,BrokerAddress,
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"July 1, 2019 - June 30, 2020"
+Statement,Data,WhenGenerated,"2000-01-01, 00:00:00"
+Account Summary,Header,Currency,Account,Account Alias,Name,Prior NAV,Current NAV,TWR
+Account Summary,Data,EUR,X0000002,,Anonymous Person,0,106310.075635499,-11.96%
+Account Summary,Data,EUR,X0000001,,Anonymous Person,101470.108692798,0,22.41%
+Account Summary,Data,Total,,,,101470.108692798,106310.075635499,
+Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,
+Statement,Data,BrokerAddress,
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"July 1, 2019 - June 30, 2020"
+Statement,Data,WhenGenerated,"2000-01-01, 00:00:00"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Anonymous Person
+Account Information,Data,Account,X0000002
+Account Information,Data,Account Type,Individual
+Account Information,Data,Customer Type,Individual
+Account Information,Data,Account Capabilities,Cash
+Account Information,Data,Base Currency,EUR
+Net Asset Value,Header,Asset Class,Prior Total,Current Long,Current Short,Current Total,Change
+Net Asset Value,Data,Cash ,0,21439.482700466,0,21439.482700466,21439.482700466
+Net Asset Value,Data,Stock,0,39833.97707,0,39833.97707,39833.97707
+Net Asset Value,Data,Interest Accruals,0,16.9364869,0,16.9364869,16.9364869
+Net Asset Value,Data,Total,0,61290.396255339,0,61290.396255339,61290.396255339
+Net Asset Value,Header,Time Weighted Rate of Return
+Net Asset Value,Data,-6.888632108%
+Change in NAV,Header,Field Name,Field Value
+Change in NAV,Data,Starting Value,0
+Change in NAV,Data,Mark-to-Market,-17470.91740465
+Change in NAV,Data,Deposits & Withdrawals,79629.092357514
+Change in NAV,Data,Position Transfers,27198.8400
+Change in NAV,Data,Dividends,12592.1421
+Change in NAV,Data,Withholding Tax,-46.8087562
+Change in NAV,Data,Change in Dividend Accruals,-129.13652
+Change in NAV,Data,Interest,236.1686857
+Change in NAV,Data,Change in Interest Accruals,26.54903
+Change in NAV,Data,Other Fees,-233.1878
+Change in NAV,Data,Commissions,-879.993791178
+Change in NAV,Data,Other FX Translations,130.5117257
+Change in NAV,Data,Ending Value,101053.259593654
+Mark-to-Market Performance Summary,Header,Asset Category,Symbol,Prior Quantity,Current Quantity,Prior Price,Current Price,Mark-to-Market P/L Position,Mark-to-Market P/L Transaction,Mark-to-Market P/L Commissions,Mark-to-Market P/L Other,Mark-to-Market P/L Total,Code
+Mark-to-Market Performance Summary,Data,Stocks,ZYPO,0,0,--,--,60.725,-67.92082,-8.356608726,0,-15.552169608,
+Mark-to-Market Performance Summary,Data,Stocks,ZHQN,0,0,--,--,-233.4672,-135.5029,-105.298876306,0,-474.268902587,
+Mark-to-Market Performance Summary,Data,Stocks,ZIAU,0,30000,--,4.8405,-5177.1458,1104.5862217,-233.887594276,0,-4306.447173823,
+Mark-to-Market Performance Summary,Data,Stocks,ZIJD,0,11800,--,5.2672,-6154.32204,240.013273,-10.559513968,5124.2165,-800.651745455,
+Mark-to-Market Performance Summary,Data,Total,,,,,,-11504.20975,1141.1758137,-358.102593275,5124.2165,-5596.919991472,
+Mark-to-Market Performance Summary,Data,Forex,ZLGF,0,254.774733026,1.7416,1.7416,0,0,0,0,0,
+Mark-to-Market Performance Summary,Data,Forex,ZGRI,0,30071.97861910,--,1.68213,6626.96184837,0,0,0,6626.96184837,
+Mark-to-Market Performance Summary,Data,Total,,,,,,3253.46010044,0,0,0,3253.46010044,
+Mark-to-Market Performance Summary,Data,Total (All Assets),,,,,,-8250.74964503,1141.1758137,-358.102593275,5124.2165,-2343.459891034,
+Mark-to-Market Performance Summary,Data,Broker Interest Paid and Received,,,,,,,,,,96.1059267,
+Mark-to-Market Performance Summary,Data,Withholding on Interest Received,,,,,,,,,,-19.0482446,
+Mark-to-Market Performance Summary,Data,Other Fees,,,,,,,,,,-94.8929,
+Total P/L for Statement Period,,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED
+Realized & Unrealized Performance Summary,Header,Asset Category,Symbol,Cost Adj.,Realized S/T Profit,Realized S/T Loss,Realized L/T Profit,Realized L/T Loss,Realized Total,Unrealized S/T Profit,Unrealized S/T Loss,Unrealized L/T Profit,Unrealized L/T Loss,Unrealized Total,Total,Code
+Realized & Unrealized Performance Summary,Data,Stocks,ZYPO,0,0,-45.566146594,0,0,-45.566146594,0,0,0,0,0,-45.566146594,
+Realized & Unrealized Performance Summary,Data,Stocks,ZHQN,0,1712.959123243,-3070.514333225,0,0,-1357.555209983,0,0,0,0,0,-1357.555209983,
+Realized & Unrealized Performance Summary,Data,Stocks,ZIAU,0,9905.875639403,-4208.130028277,0,0,5697.745611127,0,-18084.8416069,0,0,-18084.8416069,-12387.095995811,
+Month & Year to Date Performance Summary,Header,Asset Category,Symbol,Description,Mark-to-Market MTD,Mark-to-Market YTD,Realized S/T MTD,Realized S/T YTD,Realized L/T MTD,Realized L/T YTD
+Month & Year to Date Performance Summary,Data,Stocks,ZYPO,REMOVED,-23.02000080,-23.02000080,-23.17677212,-23.17677212,0,0
+Month & Year to Date Performance Summary,Data,Stocks,ZHQN,REMOVED,0,-702.00305120,0,-690.50710025,0,0
+Month & Year to Date Performance Summary,Data,Stocks,ZIAU,REMOVED,-7478.5351,-6374.31431701,0,2898.10224361,0,0
+Cash Report,Header,Currency Summary,Currency,Total,Securities,Futures,Month to Date,Year to Date,
+Cash Report,Data,Starting Cash,Base Currency Summary,0,0,0,,,
+Cash Report,Data,Commissions,Base Currency Summary,-932.577941199,-932.577941199,0,-21.76244770,-932.57794116,
+Cash Report,Data,Deposits,Base Currency Summary,1.396644,1.396644,0,1.396644,1.396644,
+Cash Report,Data,Account Transfers,Base Currency Summary,84385.943078728,84385.943078728,0,0,84385.94307871,
+Cash Report,Data,Dividends,Base Currency Summary,13344.5873,13344.5873,0,0,13344.5873,
+Cash Report,Data,Broker Interest Paid and Received,Base Currency Summary,250.2809780,250.2809780,0,86.5182226,250.2809780,
+Cash Report,Data,Trades (Sales),Base Currency Summary,317956.8070492,317956.8070492,0,3945.6287,317956.8070492,
+Cash Report,Data,Trades (Purchase),Base Currency Summary,-380064.210531,-380064.210531,0,-3955.30884,-380064.210531,
+Cash Report,Data,Other Fees,Base Currency Summary,-247.1220,-247.1220,0,0,-247.1220,
+Cash Report,Data,Withholding Tax,Base Currency Summary,-49.6058198,-49.6058198,0,-17.2866968,-49.6058198,
+Cash Report,Data,Cash FX Translation Gain/Loss,Base Currency Summary,2815.36016058,2815.36016058,0,,,
+Cash Report,Data,Ending Cash,Base Currency Summary,37460.858895211,37460.858895211,0,,,
+Cash Report,Data,Ending Settled Cash,Base Currency Summary,37460.858895211,37460.858895211,0,,,
+Cash Report,Data,Starting Collateral Value,Base Currency Summary,0,0,0,,,
+Cash Report,Data,Net Securities Lent Activity,Base Currency Summary,-364.4670,-364.4670,0,,,
+Cash Report,Data,Ending Collateral Value,Base Currency Summary,0,0,0,,,
+Cash Report,Data,Net Cash Balance,Base Currency Summary,0,0,0,,,
+Cash Report,Data,Net Settled Cash Balance,Base Currency Summary,0,0,0,,,
+Cash Report,Data,Starting Cash,EUR,0,0,0,,,
+Cash Report,Data,Account Transfers,EUR,325.73546256,325.73546256,0,0,325.73546256,
+Cash Report,Data,Ending Cash,EUR,325.735462548,325.735462548,0,,,
+Cash Report,Data,Ending Settled Cash,EUR,325.735462548,325.735462548,0,,,
+Cash Report,Data,Starting Cash,USD,0,0,0,,,
+Cash Report,Data,Commissions,USD,-1011.14309077,-1011.14309077,0,-22.992472,-1011.14309077,
+Cash Report,Data,Deposits,USD,1.45,1.45,0,1.45,1.45,
+Cash Report,Data,Account Transfers,USD,93183.70911969,93183.70911969,0,0,93183.70911969,
+Cash Report,Data,Dividends,USD,14429,14429,0,0,14429,
+Cash Report,Data,Broker Interest Paid and Received,USD,270.78,270.78,0,90.94,270.78,
+Cash Report,Data,Trades (Sales),USD,343826.24,343826.24,0,4164,343826.24,
+Cash Report,Data,Trades (Purchase),USD,-411931.2,-411931.2,0,-4184,-411931.2,
+Cash Report,Data,Other Fees,USD,-267,-267,0,0,-267,
+Cash Report,Data,Withholding Tax,USD,-53.7,-53.7,0,-18.17,-53.7,
+Cash Report,Data,Ending Cash,USD,38447.72889721,38447.72889721,0,,,
+Cash Report,Data,Ending Settled Cash,USD,38447.72889721,38447.72889721,0,,,
+Open Positions,Header,DataDiscriminator,Asset Category,Currency,Symbol,Quantity,Mult,Cost Price,Cost Basis,Close Price,Value,Unrealized P/L,Code
+Open Positions,Data,Summary,Stocks,USD,ZIAU,30000,1,7.396758,221902.74,4.84,145200.00,-76702.74,
+Open Positions,Data,Summary,Stocks,USD,ZIJD,11800,1,12.361259060,145862.86,5.27,62186.00,-83676.86,
+Open Positions,Total,,Stocks,USD,,,,,171868.8472,,86526,-85342.8124,
+Open Positions,Total,,Stocks,EUR,,,,,166001.244778062,,83572.03595,-82429.208825701,
+Forex Balances,Header,Asset Category,Currency,Description,Quantity,Cost Price,Cost Basis in EUR,Close Price,Value in EUR,Unrealized P/L in EUR,Code
+Forex Balances,Data,Forex,EUR,REMOVED,225.801244242,0,-225.801244242,2,225.801244242,0,
+Forex Balances,Data,Forex,EUR,REMOVED,26652.133470,1.465373360,-25302.581940765,1.49084,25742.229631,439.647690593,
+Forex Balances,Data,Total,,,,,-44400.750710998,,45165.416744456,764.666033458,
+Net Stock Position Summary,Header,Asset Category,Currency,Symbol,Description,Shares at IB,Shares Borrowed,Shares Lent,Net Shares
+Net Stock Position Summary,Data,Stocks,USD,ZIAU,REMOVED,30000,0,0,30000
+Net Stock Position Summary,Data,Stocks,USD,ZIJD,REMOVED,11800,0,0,11800
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,USD,ZYPO,"2020-06-05, 09:30:00","1,500",3.49,3.30,-5235.00,-13.97,5248.97,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZYPO,"2020-06-06, 09:30:00","1,500",3.447,3.43,-5170.50,-14.04,5184.54,0,0,O
+Trades,Data,Order,Stocks,USD,ZYPO,"2020-06-09, 09:30:00","-3,000",3.45,3.51,10350.00,-29.16,-10320.84,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZYPO,,0,,,-11,-12.719756,0,-23.806138,-103,
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-03-13, 09:30:00","30,000",3.34,3.44,-100200.00,-141.15,100341.15,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-03-17, 09:30:00","-30,000",3.37,3.34,101100.00,-148.60,-100951.40,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-03-20, 09:30:00","18,000",3.44,3.46,-61920.00,-84.69,62004.69,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-03-30, 09:30:00","-18,000",3.63,3.67,65340.00,-89.29,-65250.71,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-04-01, 09:30:01","6,000",3.82,3.76,-22920.00,-28.34,22948.34,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-04-02, 09:30:00","6,000",3.86,3.86,-23160.00,-28.34,23188.34,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-04-07, 09:30:00","-5,700",3.89,3.88,22173.00,-28.42,-22144.58,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-04-07, 09:30:01","-6,300",3.86,3.88,24318.00,-31.41,-24286.59,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-05-15, 09:30:00","18,000",4.58,4.38,-82440.00,-84.62,82524.62,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-05-20, 09:30:01","-18,000",4.19,4.19,75420.00,-89.50,-75330.50,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZHQN,,0,,,-494.6,-166.2972706,0.227,-660.419702,-174.3,
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-03-26, 09:30:00","12,000",5.754,5.79,-69048.00,-102.97,69150.97,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-03-26, 09:30:01","6,000",5.89,5.79,-35340.00,-51.48,35391.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-03-26, 09:30:02","12,000",5.93,5.79,-71160.00,-102.97,71262.97,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-03-27, 09:30:00","-18,000",5.84,5.69,105120.00,-162.45,-104957.55,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-03-27, 09:30:01","-12,000",5.76,5.69,69120.00,-108.27,-69011.73,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-07, 09:30:02","12,000",5.43,5.23,-65160.00,-103.37,65263.37,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-07, 09:30:03","-12,000",5.23,5.23,62760.00,-108.50,-62651.50,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-15, 09:30:00","18,000",5.69,5.66,-102420.00,-154.33,102574.33,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-18, 09:30:00","6,000",5.98,6.47,-35880.00,-51.44,35931.44,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-22, 09:30:00","12,000",6.57,6.57,-78840.00,-102.88,78942.88,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-23, 09:30:00","-36,000",6.06,6.20,218160.00,-324.87,-217835.13,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-28, 09:30:00","18,000",6.5352,6.98,-117633.60,-155.06,117788.66,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-04-30, 09:30:00","-18,000",6.606916567,6.27,118924.50,-162.76,-118761.74,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-06, 09:30:00","6,000",6.911,6.91,-41466.00,-51.49,41517.49,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-06, 09:30:01","12,000",6.96,6.91,-83520.00,-102.88,83622.88,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-06, 09:30:02","6,000",6.78,6.91,-40680.00,-51.44,40731.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-06, 09:30:03","6,000",6.74,6.91,-40440.00,-51.44,40491.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-06, 09:30:04","6,000",6.69,6.91,-40140.00,-51.44,40191.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-14, 09:30:00","-36,000",7.81,7.312,281160.00,-326.62,-280833.38,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-19, 09:30:00","6,000",7.32,7.29,-43920.00,-51.44,43971.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-20, 09:30:00","6,000",7.63,7.07,-45780.00,-51.44,45831.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-20, 09:30:02","6,000",7.41,7.07,-44460.00,-51.44,44511.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-20, 09:30:03","-18,000",7.13390,7.07,128410.20,-163.17,-128247.03,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-22, 09:30:00","6,000",7.0286,6.95,-42171.60,-51.59,42223.19,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-25, 09:30:00","-6,000",6.90,6.67,41400.00,-54.28,-41345.72,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-29, 09:30:00","18,000",7.42,6.93,-133560.00,-154.33,133714.33,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-29, 09:30:01","6,000",7.30,6.93,-43800.00,-51.44,43851.44,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-05-29, 09:30:02","6,000",7.37,6.93,-44220.00,-51.44,44271.44,0,0,O;P
+Trades,SubTotal,,Stocks,USD,ZIAU,,6159,,,-23510.32,-363.510313340,26823.299,2949.632242,1717.35,
+Trades,Data,Order,Stocks,USD,ZIJD,"2020-03-19, 09:30:00","1,000",7.1160,7.34,-7116.00,-8.67,7124.67,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIJD,"2020-03-19, 09:30:01","2,000",7.19,7.34,-14380.00,-17.34,14397.34,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJD,"2020-04-01, 09:30:00","2,000",8.80,9.08,-17600.00,-17.40,17617.40,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJD,"2020-05-14, 09:30:01",-200,5.22,5.28,1044.00,-3.53,-1040.47,0,0,C
+Trades,SubTotal,,Stocks,USD,ZIJD,,2956,,,-13660.6,-16.8511146,12069.93,-1607.561903,384.6,
+Trades,Total,,Stocks,USD,,,,,,-37676.62,-559.378454877,38893.452,657.844499,1824.15, 
+Trades,Total,,Stocks,EUR,,,,,,-34358.6814897,-515.915118801,35473.797382183,599.552948102,1644.0815189, 
+Transfers,Header,Asset Category,Currency,Symbol,Date,Type,Direction,Xfer Company,Xfer Account,Qty,Xfer Price,Market Value,Realized P/L,Cash Amount,Code
+Transfers,Data,Stocks,USD,ZIJD,2020-03-05,Inter-Company,In,--,TEXT,"7,000",--,"18,147.36",0.00,0.00,
+Transfers,Data,Total,,,,,,,,,,18147,0,0,
+Transfers,Data,Total in EUR,,,,,,,,,,16370.5528,0,0,
+Deposits & Withdrawals,Header,Currency,Settle Date,Description,Amount
+Deposits & Withdrawals,Data,EUR,2020-03-06,REMOVED,157.635810348
+Deposits & Withdrawals,Data,Total,,,157.635810348
+Deposits & Withdrawals,Data,USD,2020-03-06,REMOVED,45084.783672648
+Deposits & Withdrawals,Data,USD,2020-03-10,REMOVED,10.37
+Deposits & Withdrawals,Data,USD,2020-06-18,REMOVED,0.70
+Deposits & Withdrawals,Data,Total,,,45095.850278138
+Deposits & Withdrawals,Data,Total in EUR,,,40680.615500449
+Deposits & Withdrawals,Data,Total Deposits & Withdrawals in EUR,,,40838.251310797
+Fees,Header,Subtitle,Currency,Date,Description,Amount
+Fees,Data,Other Fees,USD,2020-04-25,REMOVED,-141
+Fees,Data,Total,,,,-141
+Fees,Data,Total in EUR,,,,-130.8505
+Dividends,Header,Currency,Date,Description,Amount
+Dividends,Data,USD,2020-04-25,ZIJD(USZ000000120) Cash Dividend USD 0.59 per Share (Ordinary Dividend),9664
+Dividends,Data,Total,,,9664
+Dividends,Data,Total in EUR,,,8938.0824
+Withholding Tax,Header,Currency,Date,Description,Amount,Code
+Withholding Tax,Data,USD,2020-04-03,REMOVED,-18.60,
+Withholding Tax,Data,USD,2020-05-05,REMOVED,-17.29,
+Withholding Tax,Data,USD,2020-06-04,REMOVED,-18.37,
+Withholding Tax,Data,Total,,,-54.3,
+Withholding Tax,Data,Total in EUR,,,-50.1544430,
+Interest,Header,Currency,Date,Description,Amount
+Interest,Data,USD,2020-04-03,USD Credit Interest for Mar-2020,37.95
+Interest,Data,USD,2020-04-03,USD IBKR Managed Securities (SYEP) Interest for Mar-2020,1.38
+Interest,Data,USD,2020-05-05,USD Credit Interest for Apr-2020,35.30
+Interest,Data,USD,2020-05-05,USD IBKR Managed Securities (SYEP) Interest for Apr-2020,0.76
+Interest,Data,USD,2020-06-04,USD Credit Interest for May-2020,37.48
+Interest,Data,USD,2020-06-04,USD IBKR Managed Securities (SYEP) Interest for May-2020,0.12
+Interest,Data,Total,,,111.77
+Interest,Data,Total in EUR,,,103.3075795
+Interest Accruals,Header,Currency,Field Name,Field Value
+Interest Accruals,Data,Base Currency Summary,Starting Accrual Balance,0
+Interest Accruals,Data,Base Currency Summary,Interest Accrued,55.2718962
+Interest Accruals,Data,Base Currency Summary,Accrual Reversal,-49.6863761
+Change in Dividend Accruals,Header,Asset Category,Currency,Symbol,Date,Ex Date,Pay Date,Quantity,Tax,Fee,Gross Rate,Gross Amount,Net Amount,Code
+Change in Dividend Accruals,Data,Starting Dividend Accruals in EUR,,,,,,,,,,,0,
+Change in Dividend Accruals,Data,Stocks,USD,ZIJD,2020-04-08,2020-04-09,2020-04-25,12000,267,50,0.45,2674,2357,Po
+Change in Dividend Accruals,Data,Stocks,USD,ZIJD,2020-04-08,2020-04-09,2020-04-25,12000,-267,-50,0.45,-2674,-2357,Re
+Stock Yield Enhancement Program Securities Lent Activity,Header,Asset Category,Currency,Symbol,Date,Description, ,Transaction ID,Quantity,Collateral Amount
+Stock Yield Enhancement Program Securities Lent Activity,Data,Stocks,USD,ZHQN,2020-03-16,REMOVED,TEXT,TEXT,-10368,3926
+Stock Yield Enhancement Program Securities Lent Activity,Data,Stocks,USD,ZHQN,2020-03-17,REMOVED,TEXT,TEXT,10368,-3926
+Stock Yield Enhancement Program Securities Lent Activity,Data,Stocks,USD,ZHQN,2020-03-17,REMOVED,TEXT,TEXT,-13242,5015
+Stock Yield Enhancement Program Securities Lent Interest Details,Header,Currency,Value Date,Symbol,Start Date,Quantity,Collateral Amount,Market-based Rate (%),Interest Rate on Customer Collateral (%),Interest Paid to Customer,Code
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-16,ZHQN,2020-03-16,-10368,7554,0.60,0.31,0.12,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-17,ZHQN,2020-03-17,-13242,9648,0.61,0.31,0.14,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-23,ZHQN,2020-03-23,-7644,5570,0.62,0.32,0.08,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-24,ZHQN,2020-03-24,-6168,4494,0.64,0.3,0.08,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-26,ZHQN,2020-03-26,-2886,2628,0.62,0.32,0.04,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-27,ZHQN,2020-03-27,-15120,13771,0.63,0.32,0.2,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-27,ZIAU,2020-03-27,-912,665,2.02,1.02,0.04,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-28,ZHQN,2020-03-27,-15120,13771,0.63,0.32,0.2,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-28,ZIAU,2020-03-27,-912,665,2.02,1.02,0.04,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-29,ZHQN,2020-03-27,-15120,13771,0.63,0.32,0.2,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-29,ZIAU,2020-03-27,-912,665,2.02,1.02,0.04,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-03-30,ZHQN,2020-03-30,-14904,13574,0.64,0.3,0.2,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-02,ZHQN,2020-04-02,-5412,4929,0.68,0.34,0.08,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-03,ZHQN,2020-04-03,-9300,8470,0.67,0.34,0.14,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-04,ZHQN,2020-04-04,-9126,8312,0.67,0.34,0.14,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-05,ZHQN,2020-04-04,-9126,8312,0.67,0.34,0.14,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-06,ZHQN,2020-04-04,-9126,8312,0.67,0.34,0.14,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-04-07,ZHQN,2020-04-07,-8556,7793,0.67,0.34,0.12,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-05-18,ZHQN,2020-05-18,-1656,1508,0.62,0.32,0.02,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-05-19,ZHQN,2020-05-19,-2604,2372,0.63,0.32,0.04,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,USD,2020-05-20,ZHQN,2020-05-20,-3186,3482,0.74,0.37,0.06,Po
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,Total,,,,,,,,2.26,
+Stock Yield Enhancement Program Securities Lent Interest Details,Data,Total in EUR,,,,,,,,2.0626864,
+Financial Instrument Information,Header,Asset Category,Symbol,Description,Conid,Security ID,Underlying,Listing Exch,Multiplier,Type,Code
+Financial Instrument Information,Data,Stocks,ZYPO,SYNTHETIC INSTRUMENT 52,100052,USZ000000520,ZYPO,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZHQN,SYNTHETIC INSTRUMENT 53,100053,USZ000000530,ZHQN,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIAU,SYNTHETIC INSTRUMENT 54,100054,USZ000000540,ZIAU,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIJD,SYNTHETIC INSTRUMENT 12,100012,USZ000000120,ZIJD,NYSE,1,ADR,
+Codes,Header,Code,Meaning,Code (Cont.),Meaning (Cont.)
+Codes,Data,A,Assignment
+Codes,Data,C,Closing Trade
+Codes,Data,O,Opening Trade
+Notes/Legal Notes,Header,Type,Note
+Notes/Legal Notes,Data,Notes,TEXT
+Notes/Legal Notes,Data,Notes,TEXT
+Notes/Legal Notes,Data,Notes,TEXT
+Statement,Header,Field Name,Field Value
+Statement,Data,BrokerName,Interactive Brokers Ireland Limited (formerly Interactive Brokers Central Europe Zrt.)
+Statement,Data,BrokerAddress,REMOVED
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"July 1, 2019 - June 30, 2020"
+Statement,Data,WhenGenerated,"2000-01-01, 00:00:00"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Anonymous Person
+Account Information,Data,Account,X0000001
+Account Information,Data,Account Type,Individual
+Account Information,Data,Customer Type,Individual
+Account Information,Data,Account Capabilities,Cash
+Account Information,Data,Base Currency,EUR
+Net Asset Value,Header,Asset Class,Prior Total,Current Long,Current Short,Current Total,Change
+Net Asset Value,Data,Cash ,6826.534391439,0,0,0,-6826.534391439
+Net Asset Value,Data,Stock,51594.292337,0,0,0,-51594.292337
+Net Asset Value,Data,Dividend Accruals,79.208500,0,0,0,-79.208500
+Net Asset Value,Data,Total,58500.035228808,0,0,0,-58500.035228808
+Net Asset Value,Header,Time Weighted Rate of Return
+Net Asset Value,Data,12.926686805%
+Change in NAV,Header,Field Name,Field Value
+Change in NAV,Data,Starting Value,96452.619127905
+Change in NAV,Data,Mark-to-Market,7954.69106628
+Change in NAV,Data,Deposits & Withdrawals,-79627.774464118
+Change in NAV,Data,Position Transfers,-27198.8400
+Change in NAV,Data,Dividends,3966.5186
+Change in NAV,Data,Withholding Tax,-59.3978250
+Change in NAV,Data,Change in Dividend Accruals,-111.365743
+Change in NAV,Data,CYEP/Broker Fees,624.2881805
+Change in NAV,Data,Change in CYEP/Broker Fee Accruals,2.8237594
+Change in NAV,Data,Other Fees,-237.520858
+Change in NAV,Data,Commissions,-1743.987873459
+Change in NAV,Data,Other FX Translations,-22.0539591
+Change in NAV,Data,Ending Value,0
+Mark-to-Market Performance Summary,Header,Asset Category,Symbol,Prior Quantity,Current Quantity,Prior Price,Current Price,Mark-to-Market P/L Position,Mark-to-Market P/L Transaction,Mark-to-Market P/L Commissions,Mark-to-Market P/L Other,Mark-to-Market P/L Total,Code
+Mark-to-Market Performance Summary,Data,Stocks,ZNCG,2000,0,36.6836,--,-613.03471,84.54483,-1.661011497,0,-530.150892011,
+Mark-to-Market Performance Summary,Data,Stocks,ZPNI,420,0,35.9977,--,221.932758,114.560618,-2.569296665,55.0292,388.953277492,
+Mark-to-Market Performance Summary,Data,Stocks,ZTRL,150,0,178.5618,--,-605.102892,10.26183,-0.828736322,0,-595.669793589,
+Mark-to-Market Performance Summary,Data,Stocks,ZJSQ,0,0,--,--,-935.06121,286.44959,-11.052352741,0,-659.663970670,
+Mark-to-Market Performance Summary,Data,Stocks,ZLLV,0,0,--,--,95.89189,-40.6907978,-1.686365592,0,53.514724124,
+Mark-to-Market Performance Summary,Data,Stocks,ZHQN,0,0,--,--,2312.0257,437.66432002,-130.346578942,0,2619.343488520,
+Mark-to-Market Performance Summary,Data,Stocks,ZIAU,0,0,--,--,-4595.77860,1531.7713351,-119.7960660,0,-3183.803326,
+Mark-to-Market Performance Summary,Data,Stocks,ZZEF,0,0,--,--,36.36169,91.57168,-4.849582353,0,123.083792335,
+Mark-to-Market Performance Summary,Data,Stocks,ZIJD,6000,0,6.2795,--,935.3055,-7.7130,-1.9282,1559.0965,2484.7608,
+Mark-to-Market Performance Summary,Data,Stocks,ZIJF,4000,0,15.0266,--,-367.28063,-145.6980639,-24.284846768,0,-537.263544883,
+Mark-to-Market Performance Summary,Data,Stocks,ZSMG,0,0,--,--,-86.3963,-108.9401490,-16.031428242,0,-211.367881939,
+Mark-to-Market Performance Summary,Data,Stocks,ZUGR,0,0,--,--,-544.7797,71.2520,-24.314646241,0,-497.842379754,
+Mark-to-Market Performance Summary,Data,Stocks,ZWMR,0,0,--,--,-45.25779,-7.80884,-4.004547773,0,-57.071174424,
+Mark-to-Market Performance Summary,Data,Stocks,ZJHH,0,0,--,--,47.3820,-22.101118,-1.630091663,0,23.650771552,
+Mark-to-Market Performance Summary,Data,Stocks,ZYDS,0,0,--,--,-86.7337,39.1352,-8.087941706,0,-55.686413716,
+Mark-to-Market Performance Summary,Data,Stocks,ZTZR,0,0,--,--,6928.14312,-1262.9472316,-347.663872856,0,5317.532018916,
+Mark-to-Market Performance Summary,Data,Stocks,ZFMO,0,0,--,--,-164.5802,-77.7677,-8.958695442,0,-251.306614854,
+Mark-to-Market Performance Summary,Data,Total,,,,,,2533.036918,993.54457843,-709.694302832,1614.1257,4431.012894540,
+Mark-to-Market Performance Summary,Data,Forex,ZLGF,254.774733026,0,1.7416,1.7416,0,0,0,0,0,
+Mark-to-Market Performance Summary,Data,Forex,ZGRI,10015.510450168,0,1.57798,--,-589.71887792,0,0,0,-589.71887792,
+Mark-to-Market Performance Summary,Data,Total,,,,,,-289.51831679,0,0,0,-289.51831679,
+Mark-to-Market Performance Summary,Data,Total (All Assets),,,,,,2243.51860099,993.54457843,-709.694302832,1614.1257,4141.494577746,
+Mark-to-Market Performance Summary,Data,CYEP/Broker Fees Paid and Received,,,,,,,,,,254.0463565,
+Mark-to-Market Performance Summary,Data,Withholding on CYEP/Fees Received,,,,,,,,,,-24.1712105,
+Mark-to-Market Performance Summary,Data,Other Fees,,,,,,,,,,-96.656177,
+Total P/L for Statement Period,,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED,REMOVED
+Realized & Unrealized Performance Summary,Header,Asset Category,Symbol,Cost Adj.,Realized S/T Profit,Realized S/T Loss,Realized L/T Profit,Realized L/T Loss,Realized Total,Unrealized S/T Profit,Unrealized S/T Loss,Unrealized L/T Profit,Unrealized L/T Loss,Unrealized Total,Total,Code
+Month & Year to Date Performance Summary,Header,Asset Category,Symbol,Description,Mark-to-Market MTD,Mark-to-Market YTD,Realized S/T MTD,Realized S/T YTD,Realized L/T MTD,Realized L/T YTD
+Cash Report,Header,Currency Summary,Currency,Total,Month to Date,Year to Date,
+Cash Report,Data,Starting Cash,Base Currency Summary,11927.892344877,,,
+Cash Report,Data,Commissions,Base Currency Summary,-1848.200108695,0,-1848.20010869,
+Cash Report,Data,Account Transfers,Base Currency Summary,-84385.943078728,0,-84385.94307871,
+Cash Report,Data,Dividends,Base Currency Summary,4203.5385,0,4203.5385,
+Cash Report,Data,CYEP/Broker Fees Paid and Received,Base Currency Summary,661.5926066,0,661.5926066,
+Cash Report,Data,Trades (Sales),Base Currency Summary,738328.06524917,0,738328.06524917,
+Cash Report,Data,Trades (Purchase),Base Currency Summary,-666411.746482,0,-666411.746482,
+Cash Report,Data,Other Fees,Base Currency Summary,-251.713950,0,-251.713950,
+Cash Report,Data,Withholding Tax,Base Currency Summary,-62.9471502,0,-62.9471502,
+Cash Report,Data,Cash FX Translation Gain/Loss,Base Currency Summary,-2160.53789056,,,
+Cash Report,Data,Ending Cash,Base Currency Summary,0,,,
+Cash Report,Data,Ending Settled Cash,Base Currency Summary,0,,,
+Cash Report,Data,Starting Collateral Value,Base Currency Summary,0,,,
+Cash Report,Data,Net Securities Lent Activity,Base Currency Summary,150.87603,,,
+Cash Report,Data,Ending Collateral Value,Base Currency Summary,0,,,
+Cash Report,Data,Net Cash Balance,Base Currency Summary,0,,,
+Cash Report,Data,Net Settled Cash Balance,Base Currency Summary,0,,,
+Cash Report,Data,Starting Cash,EUR,325.735462548,,,
+Cash Report,Data,Account Transfers,EUR,-325.73546256,0,-325.73546256,
+Cash Report,Data,Ending Cash,EUR,0,,,
+Cash Report,Data,Ending Settled Cash,EUR,0,,,
+Cash Report,Data,Starting Cash,USD,12805.064656126,,,
+Cash Report,Data,Commissions,USD,-2000.10491009,0,-2000.10491009,
+Cash Report,Data,Account Transfers,USD,-93183.70911969,0,-93183.70911969,
+Cash Report,Data,Dividends,USD,4565,0,4565,
+Cash Report,Data,CYEP/Broker Fees Paid and Received,USD,721.9,0,721.9,
+Cash Report,Data,Trades (Sales),USD,799326.318,0,799326.318,
+Cash Report,Data,Trades (Purchase),USD,-721891.29,0,-721891.29,
+Cash Report,Data,Other Fees,USD,-273.4,0,-273.4,
+Cash Report,Data,Withholding Tax,USD,-69.38,0,-69.38,
+Cash Report,Data,Ending Cash,USD,0,,,
+Cash Report,Data,Ending Settled Cash,USD,0,,,
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,USD,ZNCG,"2019-07-03, 09:30:00","-2,000",33.42,32.90,66840.00,-20.47,-66819.53,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZNCG,,-493,,,8534,-2.613705,-12282.56,-3751.128269,133,
+Trades,Data,Order,Stocks,USD,ZPNI,"2019-11-10, 09:30:00",60,37.16,37.17,-2229.60,-2.79,2232.39,0,0,O
+Trades,Data,Order,Stocks,USD,ZPNI,"2019-11-20, 09:30:00",120,41.05,41.00,-4926.00,-2.79,4928.79,0,0,O
+Trades,Data,Order,Stocks,USD,ZPNI,"2019-11-22, 09:30:02",-600,39.08,38.40,23448.00,-3.48,-23444.52,0,0,C
+Trades,SubTotal,,Stocks,USD,ZPNI,,-86,,,7202,-4.004077,-11710.19,-4511.738592,179,
+Trades,Data,Order,Stocks,USD,ZTRL,"2019-09-26, 09:30:01",-150,155.82,155.43,23373.00,-4.72,-23368.28,0,0,C
+Trades,SubTotal,,Stocks,USD,ZTRL,,-62,,,6401,-1.293248,-10427.09,-4027.841910,16,
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-12-26, 09:30:00","1,500",26.88,27.45,-40320.00,-11.21,40331.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-12-27, 09:30:00","1,500",27.47,27.81,-41205.00,-11.21,41216.21,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-12-28, 09:30:00","2,000",28.08,27.98,-56160.00,-14.94,56174.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZJSQ,"2019-12-28, 09:30:01","1,500",27.93,27.98,-41895.00,-11.21,41906.21,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZJSQ,"2020-01-01, 09:30:00","-6,500",26.69,26.47,173485.00,-55.00,-173430.00,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZJSQ,,0,,,-1005,-17.0745781,0,-1022.239720,442,
+Trades,Data,Order,Stocks,USD,ZLLV,"2019-11-30, 09:30:00","1,200",35.33,35.19,-42396.00,-12.00,42408.00,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZLLV,"2019-12-07, 09:30:00","-1,200",36.03561,36.41,43242.73,-13.60,-43229.13,0,0,C;IM;P
+Trades,SubTotal,,Stocks,USD,ZLLV,,0,,,86.90,-2.62797284,0,84.276929,-63.38,
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-09-28, 09:30:02","6,000",2.23,2.24,-13380.00,-27.94,13407.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-09-28, 09:30:03","6,000",2.2599,2.24,-13559.40,-27.94,13587.34,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-09-28, 09:30:04","18,000",2.263042549,2.24,-40734.77,-83.82,40818.58,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-10-10, 09:30:00","18,000",2.71,2.70,-48780.00,-83.82,48863.82,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-10-15, 09:30:00","-48,000",2.52,2.49,120960.00,-231.90,-120728.10,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-10-19, 09:30:00","12,000",2.43,2.43,-29160.00,-55.88,29215.88,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-10-25, 09:30:01","6,000",2.58,2.60,-15480.00,-27.94,15507.94,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-11-22, 09:30:00","-18,000",3.55,3.49,63900.00,-88.37,-63811.63,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-12-06, 09:30:01","6,000",3.59,3.68,-21540.00,-27.94,21567.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-12-07, 09:30:01","-6,000",3.46,3.39,20760.00,-29.44,-20730.56,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-12-18, 09:30:00","6,000",3.54,3.52,-21240.00,-27.94,21267.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-12-20, 09:30:00","6,000",3.665,3.61,-21990.00,-27.94,22017.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2019-12-24, 09:30:00","-12,000",3.385,3.35,40620.00,-58.86,-40561.14,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-01-05, 09:30:00","6,000",3.677,3.76,-22062.00,-27.94,22089.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-01-05, 09:30:01","6,000",3.76,3.76,-22560.00,-27.94,22587.94,0,0,O
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-01-09, 09:30:00","-2,370",3.64,3.71,8626.80,-11.64,-8615.16,0,0,C
+Trades,Data,Order,Stocks,USD,ZHQN,"2020-01-09, 09:30:01","-9,630",3.635,3.71,35005.05,-47.30,-34957.75,0,0,C
+Trades,SubTotal,,Stocks,USD,ZHQN,,0,,,4322.672,-201.611736653,0,4121.060295,676.485,
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-15, 09:30:00","12,000",6.50,6.52,-78000.00,-101.91,78101.91,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-16, 09:30:00","6,000",6.57,6.88,-39420.00,-50.95,39470.95,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-16, 09:30:01","6,000",6.44,6.88,-38640.00,-50.95,38690.95,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-17, 09:30:01","6,000",6.78,6.86,-40680.00,-50.95,40730.95,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-18, 09:30:00","-30,000",6.57,6.22,197100.00,-268.71,-196831.29,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-19, 09:30:01","6,000",7.08,7.05,-42480.00,-50.95,42530.95,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-19, 09:30:02","6,000",7.00,7.05,-42000.00,-50.95,42050.95,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-24, 09:30:00","-12,000",7.117497,6.98,85409.96,-107.66,-85302.30,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-26, 09:30:00","12,000",6.81,6.47,-81720.00,-101.91,81821.91,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-26, 09:30:01","3,000",6.59,6.47,-19770.00,-25.48,19795.48,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-29, 09:30:00","3,000",6.52,6.27,-19560.00,-25.48,19585.48,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-30, 09:30:00","3,000",6.298,6.08,-18894.00,-25.48,18919.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-01-31, 09:30:00","3,000",6.27,6.17,-18810.00,-25.48,18835.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-02, 09:30:00","3,000",5.59,5.20,-16770.00,-25.48,16795.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-05, 09:30:00",600,3.94,4.72,-2364.00,-10.19,2374.19,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-06, 09:30:00",600,4.951,4.87,-2970.60,-10.19,2980.79,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-06, 09:30:01",600,4.91,4.87,-2946.00,-10.19,2956.19,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-12, 09:30:00","-16,800",4.86,4.74,81648.00,-149.67,-81498.33,0,0,C
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-12, 09:30:01","-12,000",4.79,4.74,57480.00,-106.89,-57373.11,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-20, 09:30:00","6,000",5.28,5.23,-31680.00,-50.95,31730.95,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-23, 09:30:00","3,000",5.40,6.17,-16200.00,-25.48,16225.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-23, 09:30:01","3,000",5.69,6.17,-17070.00,-25.48,17095.48,0,0,O
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-23, 09:30:02","6,000",6.06334,6.17,-36380.04,-50.95,36430.99,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIAU,"2020-02-27, 09:30:00","-18,000",5.84,5.69,105120.00,-160.86,-104959.14,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZIAU,,0,,,-4782.18,-188.95384908,0.000001,-4971.137872,2430.12,
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-07-09, 09:30:02","1,500",6.83,6.85,-10245.00,-4.21,10249.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-07-10, 09:30:00","-1,500",6.77,6.81,10155.00,-4.43,-10150.57,0,0,C
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-08-14, 09:30:00","1,500",7.29,7.51,-10935.00,-4.21,10939.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZZEF,"2019-08-21, 09:30:00","-1,500",7.654,7.63,11481.00,-4.44,-11476.56,0,0,C
+Trades,SubTotal,,Stocks,USD,ZZEF,,0,,,196.6,-7.5895940,0,189.008882,141.2,
+Trades,Data,Order,Stocks,USD,ZIJD,"2020-02-19, 09:30:00","1,000",7.53,7.50,-7530.00,-8.58,7538.58,0,0,O;P
+Trades,SubTotal,,Stocks,USD,ZIJD,,616,,,-2704,-3.1,2706.9,0,-12,
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-03, 09:30:01","-4,000",14.39,14.21,57560.00,-21.55,-57538.45,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-09, 09:30:00","1,200",14.42,14.48,-17304.00,-6.12,17310.12,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-10, 09:30:01","1,600",14.57,14.68,-23312.00,-8.17,23320.17,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-10, 09:30:02","1,200",14.73,14.68,-17676.00,-6.12,17682.12,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-12, 09:30:00","-4,000",14.3739,14.59,57495.60,-21.55,-57474.05,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-17, 09:30:00","2,000",14.79,14.93,-29580.00,-10.21,29590.21,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-18, 09:30:00","2,000",15.21556,14.99,-30431.12,-10.21,30441.33,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-19, 09:30:00","-4,000",14.92,15.33,59680.00,-21.57,-59658.43,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-22, 09:30:00","2,000",15.73,15.64,-31460.00,-10.21,31470.21,0,0,O
+Trades,Data,Order,Stocks,USD,ZIJF,"2019-07-31, 09:30:00","-2,000",16.21,15.63,32420.00,-10.81,-32409.19,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZIJF,,-1232,,,17321.90,-38.1703145,-13571,3712.770935,-231.53,
+Trades,Data,Order,Stocks,USD,ZSMG,"2020-01-17, 09:30:00","2,000",1.86,1.85,-3720.00,-9.28,3729.28,0,0,O
+Trades,Data,Order,Stocks,USD,ZSMG,"2020-01-18, 09:30:01","2,000",1.86,1.82,-3720.00,-9.28,3729.28,0,0,O
+Trades,Data,Order,Stocks,USD,ZSMG,"2020-01-19, 09:30:00","-4,000",1.744875,1.78,6979.50,-19.37,-6960.13,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZSMG,,0,,,-306.44,-25.174166545,0,-331.614035,-170.94,
+Trades,Data,Order,Stocks,USD,ZUGR,"2019-11-20, 09:30:02","12,000",9.15,9.11,-109800.00,-133.60,109933.60,0,0,O
+Trades,Data,Order,Stocks,USD,ZUGR,"2019-11-22, 09:30:01","-12,000",8.71,8.59,104520.00,-140.94,-104379.06,0,0,C
+Trades,SubTotal,,Stocks,USD,ZUGR,,0,,,-739,-37.969736,0,-777.061751,111,
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-07-09, 09:30:01","1,800",6.82,6.81,-12276.00,-5.38,12281.38,0,0,O
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-07-10, 09:30:03","1,200",6.87,6.86,-8244.00,-3.58,8247.58,0,0,O
+Trades,Data,Order,Stocks,USD,ZWMR,"2019-07-12, 09:30:01","-3,000",6.76,6.76,20280.00,-9.42,-20270.58,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZWMR,,0,,,-84,-6.31707,0,-90.080829,-12,
+Trades,Data,Order,Stocks,USD,ZJHH,"2019-11-13, 09:30:00",600,61.86,61.45,-37116.00,-6.18,37122.18,0,0,O
+Trades,Data,Order,Stocks,USD,ZJHH,"2019-11-17, 09:30:00",-600,62.190,62.06,37314.00,-6.58,-37307.42,0,0,C
+Trades,SubTotal,,Stocks,USD,ZJHH,,0,,,39.7,-2.5435822,0,37.121022,-34.2,
+Trades,Data,Order,Stocks,USD,ZYDS,"2019-11-30, 09:30:01","3,000",4.90,4.86,-14700.00,-18.57,14718.57,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZYDS,"2019-12-06, 09:30:02","-3,000",4.83,4.73,14490.00,-19.59,-14470.41,0,0,C
+Trades,SubTotal,,Stocks,USD,ZYDS,,0,,,-74,-12.65624,0,-86.56544,62,
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-11, 09:30:00","1,570",2.05,1.64,-3218.50,-6.70,3225.20,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-11, 09:30:01","1,000",1.95,1.64,-1950.00,-4.27,1954.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-11, 09:30:02",430,1.88,1.64,-808.40,-1.83,810.23,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-16, 09:30:00",200,1.28,1.284,-256.00,-1.71,257.71,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-26, 09:30:00",800,1.42,1.44,-1136.00,-3.41,1139.41,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-26, 09:30:01","1,000",1.43,1.44,-1430.00,-4.27,1434.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-26, 09:30:02","1,000",1.44,1.44,-1440.00,-4.27,1444.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-29, 09:30:00","1,000",1.61205,1.60,-1612.05,-4.27,1616.32,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-29, 09:30:01","1,000",1.60,1.60,-1600.00,-4.27,1604.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-29, 09:30:02","1,000",1.56,1.60,-1560.00,-4.27,1564.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-30, 09:30:00","1,000",1.61,1.60,-1610.00,-4.27,1614.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-30, 09:30:01","1,000",1.61,1.60,-1610.00,-4.27,1614.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-07-31, 09:30:01","1,000",1.574,1.42,-1574.00,-4.27,1578.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-01, 09:30:00","1,000",1.51,1.56,-1510.00,-4.27,1514.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-07, 09:30:00","1,000",1.454,1.47,-1454.00,-4.27,1458.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-08, 09:30:00","2,000",1.68,1.73,-3360.00,-8.53,3368.53,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-14, 09:30:01","4,000",2.04,2.10,-8160.00,-17.06,8177.06,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-20, 09:30:01","-20,000",1.90,2.02,38000.00,-88.44,-37911.56,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-26, 09:30:00","6,000",2.00,2.00,-12000.00,-25.59,12025.59,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-27, 09:30:00","8,000",2.171,1.96,-17368.00,-34.12,17402.12,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-08-27, 09:30:01","2,000",2.04,1.96,-4080.00,-8.53,4088.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-09-08, 09:30:00","4,000",1.70,1.71,-6800.00,-17.06,6817.06,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-09-25, 09:30:00","2,000",2.23,2.19,-4460.00,-8.53,4468.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-09-26, 09:30:00","-22,000",2.12,2.10,46640.00,-97.32,-46542.68,0,0,C
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-09-28, 09:30:00","1,000",2.38,2.24,-2380.00,-4.27,2384.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-09-28, 09:30:01","1,000",2.35,2.24,-2350.00,-4.27,2354.27,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-01, 09:30:00","-2,000",2.048,2.07,4096.00,-8.85,-4087.15,0,0,C
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-08, 09:30:00","2,000",1.92,1.90,-3840.00,-8.53,3848.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-12, 09:30:00","2,000",1.73,1.74,-3460.00,-8.53,3468.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-15, 09:30:01","-4,000",1.72,1.65,6880.00,-17.68,-6862.32,0,0,C
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-18, 09:30:00","10,000",1.8233,1.82,-18233.00,-42.65,18275.65,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-10-24, 09:30:01","-10,000",2.19,2.15,21900.00,-44.24,-21855.76,0,0,C
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-13, 09:30:01","6,000",1.97,1.91,-11820.00,-25.59,11845.59,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-16, 09:30:00","-6,000",1.74,1.72,10440.00,-26.53,-10413.47,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-20, 09:30:01","6,000",1.77,1.821,-10620.00,-25.59,10645.59,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-20, 09:30:03","4,000",1.77,1.821,-7080.00,-17.06,7097.06,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-20, 09:30:04","2,000",1.82,1.821,-3640.00,-8.53,3648.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-11-21, 09:30:00","-12,000",1.734360,1.74,20812.32,-53.46,-20758.86,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-06, 09:30:00","2,000",2.55,2.74,-5100.00,-8.53,5108.53,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-07, 09:30:02","-2,000",2.665,2.64,5330.00,-8.96,-5321.04,0,0,C
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-10, 09:30:00","2,000",2.67,2.64,-5340.00,-8.53,5348.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-10, 09:30:01","2,000",2.64,2.64,-5280.00,-8.53,5288.53,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-12, 09:30:00","2,000",3.32,3.28,-6640.00,-8.53,6648.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-12, 09:30:01","2,000",3.23,3.28,-6460.00,-8.53,6468.53,0,0,O
+Trades,Data,Order,Stocks,USD,ZTZR,"2019-12-21, 09:30:00","-8,000",3.67,3.544,29360.00,-36.07,-29323.93,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZTZR,,0,,,8803.46,-540.943977546,0,8262.516511,-1991.59,
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-08-16, 09:30:00",200,5.19,5.20,-1038.00,-0.83,1038.83,0,0,O
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-08-20, 09:30:00",-200,5.05,5.23,1010.00,-0.85,-1009.15,0,0,C;P
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-10-01, 09:30:01",600,4.38,4.40,-2628.00,-1.24,2629.24,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-10-02, 09:30:00",-600,4.22,4.20,2532.00,-1.30,-2530.70,0,0,C
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-10-23, 09:30:00",600,4.61,4.75,-2766.00,-1.24,2767.24,0,0,O;P
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-10-24, 09:30:00",600,4.77,4.73,-2862.00,-1.24,2863.24,0,0,O
+Trades,Data,Order,Stocks,USD,ZFMO,"2019-10-25, 09:30:00","-1,200",4.59,4.70,5508.00,-2.60,-5505.40,0,0,C;P
+Trades,SubTotal,,Stocks,USD,ZFMO,,0,,,-376,-13.862528,0,-389.567637,-121,
+Trades,Total,,Stocks,USD,,,,,,42838.137,-1106.485921143,-45283.872107,-3552.221477,1553.073, 
+Trades,Total,,Stocks,EUR,,,,,,39785.11017822,-1022.450067196,-41923.476366149,-3160.816265915,1431.39055354, 
+Transfers,Header,Asset Category,Currency,Symbol,Date,Type,Direction,Xfer Company,Xfer Account,Qty,Xfer Price,Market Value,Realized P/L,Cash Amount,Code
+Transfers,Data,Stocks,USD,ZIJD,2020-03-05,Inter-Company,Out,--,TEXT,"-7,000",--,"-18,147.36",0.00,0.00,
+Transfers,Data,Total,,,,,,,,,,-18147,0,0,
+Transfers,Data,Total in EUR,,,,,,,,,,-16370.5528,0,0,
+Deposits & Withdrawals,Header,Currency,Settle Date,Description,Amount
+Deposits & Withdrawals,Data,EUR,2020-03-06,REMOVED,-157.635810348
+Deposits & Withdrawals,Data,Total,,,-157.635810348
+Deposits & Withdrawals,Data,USD,2020-03-06,REMOVED,-45084.783672648
+Deposits & Withdrawals,Data,USD,2020-03-10,REMOVED,-10.37
+Deposits & Withdrawals,Data,Total,,,-45095.149860069
+Deposits & Withdrawals,Data,Total in EUR,,,-40679.939611021
+Deposits & Withdrawals,Data,Total Deposits & Withdrawals in EUR,,,-40837.575421369
+Fees,Header,Subtitle,Currency,Date,Description,Amount
+Fees,Data,Other Fees,USD,2019-07-18,REMOVED,-1.7
+Fees,Data,Other Fees,USD,2019-11-14,REMOVED,-1.7
+Fees,Data,Other Fees,USD,2019-11-14,REMOVED,-71
+Fees,Data,Other Fees,USD,2019-11-24,REMOVED,-71
+Fees,Data,Total,,,,-144.8
+Fees,Data,Total in EUR,,,,-133.281982
+Dividends,Header,Currency,Date,Description,Amount
+Dividends,Data,USD,2019-07-18,ZPNI(USZ000000300) Cash Dividend USD 0.66 per Share (Ordinary Dividend),104
+Dividends,Data,USD,2019-11-24,ZIJD(USZ000000120) Cash Dividend USD 0.25 per Share (Ordinary Dividend),2953
+Dividends,Data,Total,,,3057
+Dividends,Data,Total in EUR,,,2815.4916
+Withholding Tax,Header,Currency,Date,Description,Amount,Code
+Withholding Tax,Data,USD,2020-02-05,REMOVED,-36.18,
+Withholding Tax,Data,USD,2020-03-05,REMOVED,-28.55,
+Withholding Tax,Data,USD,2020-03-09,REMOVED,-5.43,
+Withholding Tax,Data,Total,,,-70.15,
+Withholding Tax,Data,Total in EUR,,,-63.6433239,
+CYEP/Broker Fees,Header,Currency,Date,Description,Amount,Code
+CYEP/Broker Fees,Data,USD,2019-08-05,REMOVED,19.25,
+CYEP/Broker Fees,Data,USD,2019-09-05,REMOVED,17.38,
+CYEP/Broker Fees,Data,USD,2019-10-03,REMOVED,11.37,
+CYEP/Broker Fees,Notes,REMOVED
+Change in Dividend Accruals,Header,Asset Category,Currency,Symbol,Date,Ex Date,Pay Date,Quantity,Tax,Fee,Gross Rate,Gross Amount,Net Amount,Code
+Stock Yield Enhancement Program Securities Lent Activity,Header,Asset Category,Currency,Symbol,Date,Description, ,Transaction ID,Quantity,Collateral Amount
+Stock Yield Enhancement Program Securities Lent Activity,Notes,REMOVED
+Stock Yield Enhancement Program Securities Lent Fee Details,Header,Currency,Value Date,Symbol,Start Date,Quantity,Collateral Amount,Market-based Fee Rate (%),Net Lend Fee Rate (%) Paid to Customer,Net Lend Fee Paid to Customer,Code
+Stock Yield Enhancement Program Securities Lent Fee Details,Data,USD,2019-10-22,ZTZR,2019-10-22,-6260,6172,0.20,0.11,0.03,Po
+Stock Yield Enhancement Program Securities Lent Fee Details,Data,USD,2019-10-23,ZHQN,2019-10-23,-8064,2650,0.49,0.24,0.03,Po
+Stock Yield Enhancement Program Securities Lent Fee Details,Data,USD,2019-10-23,ZTZR,2019-10-23,-4032,3975,0.2,0.10,0.02,Po
+Financial Instrument Information,Header,Asset Category,Symbol,Description,Conid,Security ID,Underlying,Listing Exch,Multiplier,Type,Code
+Financial Instrument Information,Data,Stocks,ZNCG,SYNTHETIC INSTRUMENT 29,100029,USZ000000290,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZPNI,SYNTHETIC INSTRUMENT 30,100030,USZ000000300,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZTRL,SYNTHETIC INSTRUMENT 31,100031,USZ000000310,,NASDAQ,1,ADR,
+Financial Instrument Information,Data,Stocks,ZJSQ,SYNTHETIC INSTRUMENT 33,100033,USZ000000330,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZLLV,SYNTHETIC INSTRUMENT 55,100055,USZ000000550,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZHQN,SYNTHETIC INSTRUMENT 53,100053,USZ000000530,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIAU,SYNTHETIC INSTRUMENT 54,100054,USZ000000540,ZIAU,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZZEF,SYNTHETIC INSTRUMENT 40,100040,USZ000000400,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZIJD,SYNTHETIC INSTRUMENT 12,100012,USZ000000120,ZIJD,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZIJF,SYNTHETIC INSTRUMENT 17,100017,USZ000000170,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZSMG,SYNTHETIC INSTRUMENT 21,100021,USZ000000210,,AMEX,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZUGR,SYNTHETIC INSTRUMENT 56,100056,USZ000000560,,AMEX,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZWMR,SYNTHETIC INSTRUMENT 47,100047,USZ000000470,,NYSE,1,ADR,
+Financial Instrument Information,Data,Stocks,ZJHH,SYNTHETIC INSTRUMENT 57,100057,USZ000000570,,NYSE,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZYDS,SYNTHETIC INSTRUMENT 58,100058,USZ000000580,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZTZR,SYNTHETIC INSTRUMENT 51,100051,USZ000000510,,NASDAQ,1,COMMON,
+Financial Instrument Information,Data,Stocks,ZFMO,SYNTHETIC INSTRUMENT 59,100059,USZ000000590,,NYSE,1,COMMON,
+Codes,Header,Code,Meaning,Code (Cont.),Meaning (Cont.)
+Notes/Legal Notes,Header,Type,Note

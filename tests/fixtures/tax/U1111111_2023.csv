@@ -40,4 +40,5 @@ Financial Instrument Information,Data,Stocks,ACME,ACME CORP,2,US00000000A1,NASDA
 Cash Report,Header,Currency Summary,Currency,Total,Securities,Futures,Month to Date,Year to Date
 Cash Report,Data,Ending Cash,USD,1234.56,1234.56,0,,
 Mark-to-Market Performance Summary,Header,Asset Category,Symbol,Prior Quantity
-Mark-to-Market Performance Summary,Data,Stocks,ACME,25
+Mark-to-Market Performance Summary,Data,Stocks,ACME,20
+Mark-to-Market Performance Summary,Data,Stocks,SPLT,40
