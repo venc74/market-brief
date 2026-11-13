@@ -9,7 +9,7 @@ const acc = a => esc(TC.maskAccount(a));
 const dmy = d => /^\d{4}-\d{2}-\d{2}/.test(String(d)) ? `${d.slice(8, 10)}.${d.slice(5, 7)}.${d.slice(0, 4)}` : String(d || '');
 const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const cntText = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
-const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_pnl: 'Revolut — печалби и загуби*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', taxtool_result: 'резултат на друга програма (не е отчет)', xlsx: 'Excel (не се чете)', unknown: 'непознат формат' };
+const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_pnl: 'Revolut — печалби и загуби*', revolut_account: 'Revolut — сметка в една валута (само количества)', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', taxtool_result: 'резултат на друга програма (не е отчет)', xlsx: 'Excel (не се чете)', unknown: 'непознат формат' };
 
 // ─── файлове ───
 function addFiles(list) {
@@ -30,7 +30,7 @@ function renderFiles() {
     ${f.sections.filter(x => x.data).map(x => `<tr><td>${esc(x.name)}${x.missing.length ? ` <b class="neg">липсват колони: ${esc(x.missing.join(', '))}</b>` : ''}</td><td class="n">${x.data}</td><td class="n ${x.records ? 'pos' : 'mut'}">${x.records}</td>
       <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}${x.wider ? ` <b class="neg">· ${x.wider} реда с повече клетки от заглавния ред (${esc(cntText(x.widths))})</b>` : ''}</td></tr>`).join('')}</table></details>`;
   $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан<br>данък</th><th class="n">Лихви</th><th class="n">Не е<br>сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', blank = rates || f.notSource || f.format === 'xlsx', n = v => blank ? '' : (v || 0);   // 13.11: резултат на друга програма и Excel — без числа за сделки
+    ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', blank = rates || f.notSource || f.format === 'xlsx' || f.format === 'revolut_account', n = v => blank ? '' : (v || 0);   // 13.11: резултат на друга програма и Excel — без числа за сделки
       const span = `${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}`;        // периодът от отчета (IBKR) и датите на прочетените записи — под името на файла
       return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}<div class="small" data-period>${f.period ? '<span style="white-space:nowrap">период: ' + esc(f.period) + '</span> · ' : ''}<span style="white-space:nowrap">${span ? (f.notSource ? 'години: ' : 'данни: ') + span : (blank ? '' : 'без записи')}</span></div></td>
       <td>${blank ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc(FORMAT_NAMES[f.format] || f.format)}</td>

@@ -1,5 +1,11 @@
 # Данъчен калкулатор (docs/tax.html) — напредък
 
+## 15.11.2026 — крипто файловете на Revolut (клон `tax-crypto-account`)
+
+17 CSV (по един на валута) във формата „Account statement“ на Revolut: `Type, Product, Started Date, Completed Date, Description, Amount, Fee, Currency, State, Balance`; дата `ГГГГ-ММ-ДД ЧЧ:ММ:СС`; видове EXCHANGE („Exchanged to …“) и TRANSFER („Balance migration to another region or legal entity“); само КОЛИЧЕСТВА — цената в евро
+липсва (другата страна на размяната е в сметката във фиат / другата валута). Преди: „непознат формат“ ×17. Сега: формат `revolut_account` — разпознат, нищо не се смята, по един ред „не е сметнато“ (облагаемо) на валута и година с редове (`date` = 31.12. на годината), предупреждение във файла; НЕПЪЛНО са само годините с редове.
+Фикстура: `tests/fixtures/tax/revolut_real/revolut_crypto_account_real_format.csv` (заглавие — реално, редове — измислени); тест `test_tax_revolut_account.py`. За реално смятане на крипто (§23 EStG) са нужни отчетите на фиатните сметки (EUR / USD) или „Crypto account statement“ с цени.
+
 ## 15.11.2026 — слято в main; старият калкулатор е махнат
 
 `tax-real-fix` е слят в `main` (merge commit). Редовете `Claude-Session:` са махнати от съобщенията на commit-ите с `git filter-branch --msg-filter` върху КОПИЕ на клона (`tax-merge-clean`; дърветата са еднакви) — `origin/tax-real-fix` пази оригиналите.
