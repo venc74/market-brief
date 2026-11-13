@@ -23,10 +23,9 @@ total23 = (2998 / 1.08 - lot1 - lot2 / 2) + (1050 / 1.08 - 800 / 1.10) + 200 + 2
 print("── 0. жълтият ред най-горе (05.11.2026) ──")
 for k in d:
     assert d[k]["beta"]["text"] == "В проверка — не ползвай за декларация, докато не е сверено с реални отчети." and d[k]["beta"]["cls"] == "msg warn", (k, d[k]["beta"])
-    assert d[k]["beta"]["link"] == "tax-v1.html" and d[k]["beta"]["linkText"] == "стара версия", (k, d[k]["beta"])          # 09.11.2026: линк към старата версия
-v1 = (ROOT / "docs" / "tax-v1.html").read_text(encoding="utf-8")                                       # старата версия (до 04.11.2026) — самостоятелна страница, без tax_core.js
-assert v1.lstrip().lower().startswith("<!doctype html") and "tax_core.js" not in v1 and "tax_ui.js" not in v1 and "<script>" in v1, v1[:200]
-print(f"  ✓ първият елемент на страницата: „{d['site']['beta']['text']}“ (msg warn, фон {d['site']['beta']['bg']}) + линк „стара версия“ → tax-v1.html (самостоятелна, без tax_core.js)")
+    assert d[k]["beta"]["link"] is None, (k, d[k]["beta"])                                                                  # 15.11.2026: старата версия (tax-v1.html) е махната — няма линк
+assert not (ROOT / "docs" / "tax-v1.html").exists(), "docs/tax-v1.html трябва да е махната"
+print(f"  ✓ първият елемент на страницата: „{d['site']['beta']['text']}“ (msg warn, фон {d['site']['beta']['bg']}) — без линк към старата версия (docs/tax-v1.html е махната)")
 
 print("── 1. числото най-горе по всички пътища за курсовете ──")
 for k in ("withEcbFile", "site", "ecbApi", "ecbRetry", "frankfurter"):

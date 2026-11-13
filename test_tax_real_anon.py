@@ -4,10 +4,9 @@
 ПРОИЗХОД НА ВХОДОВЕТЕ (правило 7 на CLAUDE.md), по раздели:
   1 · РЕАЛЕН ФОРМАТ, анонимни стойности — бял списък върху real_anon (без node);
   2 · РЕАЛЕН ФОРМАТ, анонимни стойности — броеве и сметки на калкулатора върху real_anon (курсове: docs/eurofxref-hist.csv);
-  3 · РЕАЛЕН ФОРМАТ, анонимни стойности — старата логика (docs/tax-v1.html) върху същите файлове;
-  4 · СИНТЕТИЧЕН комбиниран отчет (две сметки, без колона Account) — построен тук;
-  5 · СИНТЕТИЧНИ входове (tests/fixtures/tax/U1111111_*.csv) през анонимизатора.
-Без мрежа. Разделите 2–5 са през node (tests/tax_driver.js scenario, tools/*.js) — без node SKIP; раздел 1 е чист Python.
+  3 · СИНТЕТИЧЕН комбиниран отчет (две сметки, без колона Account) — построен тук;
+  4 · СИНТЕТИЧНИ входове (tests/fixtures/tax/U1111111_*.csv) през анонимизатора.
+Без мрежа. Разделите 2–4 са през node (tests/tax_driver.js scenario, tools/*.js) — без node SKIP; раздел 1 е чист Python.
 Пускане: python test_tax_real_anon.py
 """
 import csv, datetime, io, json, pathlib, re, shutil, subprocess, sys, tempfile
@@ -162,20 +161,9 @@ else:
     assert d25["headline"] == 0 and "няма нито един запис за 2025" in o["whyZero"][2025][0] and o["summary"][2025]["year"]["records"] == 0
     print("  ✓ година без отчет: числото е 0 и калкулаторът го казва („няма нито един запис за …“) — не тиха нула")
 
-    # ── 3. старата логика ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-    print("── 3. старата логика (tax-v1, чете по ПОЗИЦИЯ) върху същите файлове (РЕАЛЕН формат, анонимни стойности) ──")
-    p = subprocess.run([NODE, str(ROOT / "tools" / "tax_diagnose.js"), "--rates", str(ECB)] + [str(f) for f in files], capture_output=True, text=True, timeout=120)
-    assert p.returncode == 0, p.stderr[-1500:]
-    old = p.stdout.split("СТАРАТА ЛОГИКА", 1)[1].split("НОВАТА ЛОГИКА", 1)[0]
-    assert old.count("няма намерени сделки с акции") == 3, old[:600]
-    assert old.count("[5] = Symbol · [6] = Date/Time · [7] = Quantity · [8] = T. Price") >= 3 and "[5] = Account · [6] = Symbol · [7] = Date/Time · [8] = Quantity · [9] = T. Price" in old
-    assert "Stocks / ETF 67 → с количество, цена и дата 0" in old and "Stocks / ETF 116 → с количество, цена и дата 0" in old and "Stocks / ETF 177 → с количество, цена и дата 0" in old
-    assert "Stocks / ETF 85 → с количество, цена и дата 85" in old and "покупки 49 · продажби 36" in old
-    print("  ✓ първите три отчета (14 колони, без Account): старата очаква Symbol на [6], а той е на [5] → 0 валидни сделки от 67 / 116 / 177 (причината за нулата на tax-v1)")
-    print("  ✓ четвъртият отчет (15 колони, Account след Currency): старата чете 85 сделки (49 покупки, 36 продажби)")
 
 # ── 4. комбиниран отчет с две сметки, без колона Account (СИНТЕТИЧЕН) ─────────────────────────────────────────────────────────────
-print("── 4. комбиниран отчет с две сметки, без колона Account в Trades (СИНТЕТИЧЕН — построен тук; формата е по реалния отчет за 2024) ──")
+print("── 3. комбиниран отчет с две сметки, без колона Account в Trades (СИНТЕТИЧЕН — построен тук; формата е по реалния отчет за 2024) ──")
 TRH = "Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code"
 OPH = "Open Positions,Header,DataDiscriminator,Asset Category,Currency,Symbol,Quantity,Mult,Cost Price,Cost Basis,Close Price,Value,Unrealized P/L,Code"
 
@@ -214,7 +202,7 @@ assert {r["account"] for r in o["records"] if r["kind"] == "trade"} == {"U222222
 print("  ✓ „U3333333 (Test Person)“ — името в скоби не влиза в номера на сметката")
 
 # ── 5. анонимизаторът върху СИНТЕТИЧНИ входове ────────────────────────────────────────────────────────────────────────────────────
-print("── 5. tools/tax_anonymize.js върху СИНТЕТИЧНИ входове (tests/fixtures/tax/U1111111_*.csv) ──")
+print("── 4. tools/tax_anonymize.js върху СИНТЕТИЧНИ входове (tests/fixtures/tax/U1111111_*.csv) ──")
 import datetime
 SRC = ["U1111111_2020.csv", "U1111111_2021.csv", "U1111111_2022.csv", "U1111111_2023.csv", "U1111111_2026.csv"]
 SECRET = ["ACME", "XWLD", "SPLT", "OLDCO", "GHOST", "LOSSCO", "DIVCO", "EQETF", "U1111111", "Test Person", "NYSE Market Data", "US00000000A1", "SYNTH WORLD"]

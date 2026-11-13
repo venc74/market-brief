@@ -1,25 +1,24 @@
 #!/usr/bin/env node
 /*
- * tools/tax_diagnose.js — диагноза на брокерски отчет през СТАРАТА (docs/tax-v1.html) и НОВАТА (docs/tax_core.js) логика на данъчния калкулатор (12.11.2026).
+ * tools/tax_diagnose.js — диагноза на брокерски отчет през логиката на данъчния калкулатор (docs/tax_core.js) (12.11.2026; от 15.11.2026 без сравнение със старата версия — docs/tax-v1.html е махната).
  *
  * Печата САМО структура и броеве: имена на секции, заглавните редове (етикетите на брокера), видове редове, ВИДА на клетките (дата / цяло число / текст…, не стойността),
  * броеве по причина, години. НЕ печата суми, количества, тикъри, номер на сметка, имена, описания и името на файла — изходът може да се покаже / постави в чат.
- * Сравнението стара ↔ нова е в брой и в проценти (новата като % от старата), без суми.
  *
- * Употреба:  node tools/tax_diagnose.js [--core път/tax_core.js] [--v1 път/tax-v1.html] [--rates път/eurofxref-hist.csv] [--year 2026] отчет.csv [още.csv …]
- *   --core   коя версия на новата логика (по подразбиране docs/tax_core.js; за „новата преди поправката“: git show main:docs/tax_core.js > /tmp/core_main.js)
- *   --rates  курсове на ЕЦБ от файл (по подразбиране docs/eurofxref-hist.csv) — без мрежа; старата логика получава същите курсове през подменен fetch
- *   --year   годината за сметката (по подразбиране — най-новата година с данни във файловете)
+ * Употреба:  node tools/tax_diagnose.js [--core път/tax_core.js] [--rates път/eurofxref-hist.csv] [--year 2026] отчет.csv [още.csv …]
+ *   --core   коя версия на логиката (по подразбиране docs/tax_core.js; за друга версия: git show main:docs/tax_core.js > /tmp/core_main.js)
+ *   --rates  курсове на ЕЦБ от файл (по подразбиране docs/eurofxref-hist.csv) — без мрежа
+ *   --year   годината, която се отбелязва в заглавието (сметката е за всички години с данни)
  * Отчетът остава където е — скриптът само чете; нищо не се записва и не се праща.
  */
 'use strict';
-const fs = require('fs'), path = require('path'), vm = require('vm');
+const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
-const opt = { core: path.join(ROOT, 'docs', 'tax_core.js'), v1: path.join(ROOT, 'docs', 'tax-v1.html'), rates: path.join(ROOT, 'docs', 'eurofxref-hist.csv'), year: null };
+const opt = { core: path.join(ROOT, 'docs', 'tax_core.js'), rates: path.join(ROOT, 'docs', 'eurofxref-hist.csv'), year: null };
 const files = [];
 for (let i = 0; i < args.length; i++) {
-  if (['--core', '--v1', '--rates', '--year'].includes(args[i])) opt[args[i].slice(2)] = args[++i];
+  if (['--core', '--rates', '--year'].includes(args[i])) opt[args[i].slice(2)] = args[++i];
   else files.push(args[i]);
 }
 if (!files.length) { console.error('Употреба: node tools/tax_diagnose.js [--core tax_core.js] [--rates eurofxref-hist.csv] [--year ГГГГ] отчет.csv …'); process.exit(2); }
@@ -107,58 +106,11 @@ function structure(text) {
   return { bom, crlf, lines: lines.length, blank, sections, dataNoHeader };
 }
 
-// ─── старата логика: функциите от вградения скрипт на docs/tax-v1.html, с празен DOM и fetch от файла с курсовете ─────────────────
-function loadV1(ratesTable) {
-  const html = fs.readFileSync(opt.v1, 'utf8');
-  const m = html.match(/<script>([\s\S]*?)<\/script>/);
-  if (!m) throw new Error('в tax-v1.html няма вграден скрипт');
-  const el = new Proxy(function () {}, { get: (t, k) => (k === Symbol.toPrimitive ? () => '' : k === 'then' ? undefined : el), set: () => true, apply: () => el, construct: () => el });
-  const rateOn = (cur, d) => { const a = ratesTable[cur] || []; const hit = a.find(x => x[0] === d); return hit ? hit[1] : null; };
-  const fetchStub = async url => {                                   // ЕЦБ: ?startPeriod=D&endPeriod=D — точно за деня (старата сама върви до 6 дни назад); frankfurter — няма
-    const u = new URL(url), cur = (u.pathname.match(/D\.([A-Z]{3})\.EUR/) || [])[1], d = u.searchParams.get('startPeriod');
-    const r = cur && d ? rateOn(cur, d) : null;
-    if (r == null) return { ok: false, status: 404, json: async () => ({}) };
-    return { ok: true, status: 200, json: async () => ({ dataSets: [{ series: { '0:0:0:0:0': { observations: { 0: [r] } } } }] }) };
-  };
-  const ctx = { document: el, window: {}, console: { log() {}, warn() {}, error() {} }, fetch: fetchStub, setTimeout, URL, FileReader: function () {}, Blob: function () {} };
-  vm.createContext(ctx);
-  vm.runInContext(m[1], ctx);
-  ['isIBKR', 'parseIBKR', 'parseStd', 'splitCSVLine', 'enrichRates', 'calcFIFO', 'calcDE'].forEach(f => { if (typeof ctx[f] !== 'function') throw new Error('tax-v1.html: липсва функцията ' + f); });
-  return ctx;
-}
-// кои редове спира всеки филтър на старата (тя чете по ПОЗИЦИЯ) и какво стои в истинския заглавен ред на позициите, които чете
-function v1Trace(text, v1) {
-  const lines = text.replace(/^﻿/, '').split(/\r?\n/);
-  const t = { rows: 0, order: 0, cat: 0, valid: 0, short: 0 }, heads = { Trades: [], Dividends: [], 'Withholding Tax': [] };
-  const div = { rows: 0, valid: 0, nonPositive: 0 }, wh = { rows: 0, valid: 0 };
-  lines.forEach(line => {
-    const p = v1.splitCSVLine(line);
-    if (heads[p[0]] && p[1] === 'Header') heads[p[0]].push(p);
-    if (p[0] === 'Trades' && p[1] === 'Data') {
-      t.rows++;
-      if (p.length < 10) { t.short++; return; }
-      if (p[2] !== 'Order') return; t.order++;
-      if (!['Stocks', 'ETF'].includes(p[3])) return; t.cat++;
-      const q = parseFloat(p[8].replace(/[",]/g, '')), px = parseFloat(p[9].replace(/[",]/g, '')), d = p[7].replace(/"/g, '').trim().substring(0, 10);
-      if (isNaN(q) || q === 0 || isNaN(px) || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return; t.valid++;
-    }
-    if (p[0] === 'Dividends' && p[1] === 'Data' && p.length >= 6) {
-      div.rows++; const a = parseFloat(p[6]), d = (p[4] || '').trim().substring(0, 10);
-      if (!isNaN(a) && a <= 0) div.nonPositive++;
-      if (!isNaN(a) && a > 0 && /^\d{4}-\d{2}-\d{2}$/.test(d)) div.valid++;
-    }
-    if (p[0] === 'Withholding Tax' && p[1] === 'Data' && p.length >= 6) { wh.rows++; if (!isNaN(Math.abs(parseFloat(p[6])))) wh.valid++; }
-  });
-  const at = (h, idx) => idx.map(i => `[${i}] = ${h[i] === undefined ? '(няма такава колона)' : (h[i] === '' ? '(без име)' : h[i])}`).join(' · ');
-  return { t, div, wh, pos: { Trades: heads.Trades.map(h => at(h, [2, 3, 4, 5, 6, 7, 8, 9])), Dividends: heads.Dividends.map(h => at(h, [2, 3, 4, 5, 6])), 'Withholding Tax': heads['Withholding Tax'].map(h => at(h, [2, 3, 4, 5, 6])) } };
-}
-
 // ─── основното ───────────────────────────────────────────────────────────────
 (async () => {
   const TC = require(path.resolve(opt.core));
   const ratesText = fs.existsSync(opt.rates) ? fs.readFileSync(opt.rates, 'utf8') : '';
   const table = ratesText ? TC.parseECBcsv(ratesText) : {};
-  const v1 = loadV1(table);
   const texts = files.map((f, i) => ({ name: `файл ${i + 1}`, text: fs.readFileSync(f, 'utf8') }));
   out(`ДИАГНОЗА — ${texts.length} файл(а); новата логика: ${path.relative(ROOT, path.resolve(opt.core)) || opt.core}; курсове: ${ratesText ? 'ЕЦБ от файл (' + Object.keys(table).length + ' валути)' : 'НЯМА файл с курсове'}`);
   out('Само структура и броеве — без суми, тикъри, сметки и имена.\n');
@@ -180,28 +132,8 @@ function v1Trace(text, v1) {
     out('');
   });
 
-  // 2) старата логика (tax-v1)
-  out('════ СТАРАТА ЛОГИКА (docs/tax-v1.html) — чете по ПОЗИЦИЯ в реда');
-  let v1tx = [];
-  texts.forEach(f => {
-    const is = v1.isIBKR(f.text);
-    let txs = [], err = '';
-    try { txs = is ? v1.parseIBKR(f.text, f.name) : v1.parseStd(f.text, f.name); } catch (e) { err = String(e.message).replace(/^.*?:\s*/, ''); }
-    v1tx = v1tx.concat(txs);
-    out(`${f.name}: разпознат като IBKR: ${is ? 'да' : 'не'}${err ? ' · ГРЕШКА: ' + err : ''}`);
-    if (is) {
-      const tr = v1Trace(f.text, v1);
-      tr.pos.Trades.forEach((p, i) => out(`   Trades, заглавен ред ${i + 1} — на позициите, които чете (иска [2]=вид ред, [3]=Asset Category, [4]=Currency, [6]=Symbol, [7]=Date/Time, [8]=Quantity, [9]=T. Price): ${p}`));
-      tr.pos.Dividends.forEach((p, i) => out(`   Dividends, заглавен ред ${i + 1} (иска [2]=Currency, [4]=Date, [5]=Description, [6]=Amount): ${p}`));
-      tr.pos['Withholding Tax'].forEach((p, i) => out(`   Withholding Tax, заглавен ред ${i + 1} (иска [2]=Currency, [4]=Date, [5]=Description, [6]=Amount): ${p}`));
-      out(`   Trades: Data редове ${tr.t.rows} → „Order“ ${tr.t.order} → Stocks / ETF ${tr.t.cat} → с количество, цена и дата ${tr.t.valid}${tr.t.short ? ` (под 10 клетки: ${tr.t.short})` : ''}`);
-      out(`   Dividends: Data редове ${tr.div.rows} → положителни с дата ${tr.div.valid} (нулеви / отрицателни — сторно, изхвърлени: ${tr.div.nonPositive}) · Withholding Tax: ${tr.wh.rows} реда`);
-    }
-    out(`   сделки в сметката: покупки ${txs.filter(t => t.type === 'buy').length} · продажби ${txs.filter(t => t.type === 'sell').length} · дивиденти ${txs.filter(t => t.type === 'dividend').length}`);
-  });
-
   // 3) новата логика
-  out('\n════ НОВАТА ЛОГИКА (tax_core.js) — чете по ИМЕ на колоната от заглавния ред');
+  out('════ ЛОГИКАТА НА КАЛКУЛАТОРА (tax_core.js) — чете по ИМЕ на колоната от заглавния ред');
   const ing = TC.ingest(texts.map(f => ({ name: f.name, text: f.text })));
   const rate = TC.rateLookup(table);
   ing.files.forEach((f, i) => {
@@ -230,9 +162,9 @@ function v1Trace(text, v1) {
     if (f.sections) out(`   собствената сметка на редовете (tax_core): ${f.sections.map(s => `${s.name}: ${s.data} = ${s.records} записа + ${s.skipped} не е сметнато + ${s.ignored} обобщения`).join(' · ')}`);
   });
 
-  // 4) сметката по години, стара ↔ нова
+  // 4) сметката по години
   const res = TC.fifo(ing.records, rate, { controls: ing.controls });
-  // сметките в записите — новата логика води FIFO по брокер / сметка / инструмент; старата — само по тикър
+  // сметките в записите — FIFO се води по брокер / сметка / инструмент
   const T = ing.records.filter(r => r.kind === 'trade');
   const accIdx = {}; T.forEach(r => { const k = r.broker + '|' + r.account; if (!(k in accIdx)) accIdx[k] = Object.keys(accIdx).length + 1; });
   const accLine = Object.entries(accIdx).map(([k, n]) => { const a = T.filter(r => r.broker + '|' + r.account === k); const d = a.map(r => r.date).sort();
@@ -250,13 +182,12 @@ function v1Trace(text, v1) {
   const unWhy = {}; un.forEach(w => inc(unWhy, w));
   const transfers = ing.skipped.filter(x => x.section === 'Transfers').length;
   const years = [...new Set(ing.records.map(r => Number(r.date.slice(0, 4))))].sort();
-  const cmpYears = opt.year ? [Number(opt.year)] : years;
   const nowY = new Date().getFullYear();
-  out(`\n════ СМЕТКАТА (всички файлове заедно) — години с данни: ${years.join(', ') || 'няма'}; сравнението стара ↔ нова е за: ${cmpYears.join(', ')}`);
-  out(`сметки със сделки (новата води FIFO по сметка, старата — само по тикър): ${Object.keys(accIdx).length}`);
+  out(`\n════ СМЕТКАТА (всички файлове заедно) — години с данни: ${years.join(', ') || 'няма'}${opt.year ? '; избрана година: ' + opt.year : ''}`);
+  out(`сметки със сделки (FIFO се води по сметка): ${Object.keys(accIdx).length}`);
   accLine.forEach(l => out('   ' + l));
   out(`   сделки, чиято сметка (колона Account) е различна от тази в Account Information на отчетите: ${rowsOther} · инструменти със сделки в повече от една сметка: ${Object.values(symAcc).filter(x => x.size > 1).length} от ${Object.keys(symAcc).length} · редове в секция Transfers: ${transfers}`);
-  out(`FIFO (нова): продажби с резултат ${res.realized.length} · продажби без покупка ${res.unmatched.length} · записи без курс ${res.missingRates.length} · отворени позиции в края ${res.open.length}`);
+  out(`FIFO: продажби с резултат ${res.realized.length} · продажби без покупка ${res.unmatched.length} · записи без курс ${res.missingRates.length} · отворени позиции в края ${res.open.length}`);
   Object.entries(unWhy).forEach(([w, n]) => out(`   без покупка ×${n}: ${w}`));
   out(`   покупки, които покриха по-ранна непокрита продажба и НЕ станаха лот: ${(res.notes || []).filter(n => /покрива/.test(n.text)).length} · позиции, белязани като несигурни след непокрита продажба: ${(res.tainted || []).length}`);
   const xl = res.xferLinks || [], acatsOpen = (res.pending || []).filter(p => p.kind === 'acats' && !p.filled);   // 14.11.2026: прехвърляне от друг брокер — свързано с покупките при другия брокер или без цена (само броеве)
@@ -270,28 +201,4 @@ function v1Trace(text, v1) {
   const dflt = years.includes(nowY - 1) ? nowY - 1 : null;
   out(`   годината, с която страницата тръгва днес (main): ${nowY - 1} — записи за нея: ${ing.records.filter(r => r.date.startsWith(String(nowY - 1))).length}${dflt == null ? '  ← няма данни за тази година: числото е 0, докато годината не се смени на ръка' : ''}`);
 
-  if (v1tx.length) {
-    const enriched = await v1.enrichRates(v1tx, () => {});
-    const noRate = enriched.filter(t => t.rateError).length;
-    const pct = (a, b) => (!isFinite(a) || !isFinite(b)) ? 'не се сравнява (NaN)' : Math.abs(b) < 0.005 ? (Math.abs(a) < 0.005 ? 'и двете са 0' : 'старата е 0, новата не е') : (a / b * 100).toFixed(2) + '% от старата';
-    out(`\n════ СТАРА ↔ НОВА (брой и проценти, без суми) — сделки за сметката (всички години): стара ${v1tx.filter(t => t.type !== 'dividend').length} · нова ${ing.records.filter(r => r.kind === 'trade').length}; сделки без курс: стара ${noRate} · нова ${res.missingRates.length}`);
-    cmpYears.forEach(year => {
-      const { breakdown, dividends } = v1.calcFIFO(enriched.map(t => ({ ...t })), year);
-      const de1 = v1.calcDE(breakdown, dividends, 0, false, 30);
-      // продажби, за които старата няма (цялата) покупка — тя ги смята с цена на придобиване 0 за липсващата част
-      const q = {}; let uncovered = 0;
-      enriched.filter(t => t.type === 'buy').sort((a, b) => a.date.localeCompare(b.date)).forEach(t => { if (t.date <= `${year}-12-31`) q[t.ticker] = (q[t.ticker] || 0) + t.quantity; });
-      enriched.filter(t => t.type === 'sell' && t.date < `${year}-01-01`).forEach(t => { q[t.ticker] = Math.max(0, (q[t.ticker] || 0) - t.quantity); });
-      enriched.filter(t => t.type === 'sell' && t.date.startsWith(String(year))).forEach(t => { const have = q[t.ticker] || 0; if (have + 1e-9 < t.quantity) uncovered++; q[t.ticker] = Math.max(0, have - t.quantity); });
-      const de2 = TC.computeDE(res, { year, records: ing.records, info: ing.info, skipped: ing.skipped });
-      const R2 = res.realized.filter(x => x.year === year && x.assetClass !== 'crypto' && x.assetClass !== 'option');
-      const I2 = res.incomes.filter(x => x.year === year);
-      const gain2 = R2.filter(x => x.gainEUR != null).reduce((s, x) => s + x.gainEUR, 0), div2 = I2.filter(x => x.kind === 'dividend').reduce((s, x) => s + x.eur, 0);
-      out(`   ── ${year} ──`);
-      out(`   продажби: стара ${breakdown.length} (от тях без пълна покупка — с цена 0 за липсващото: ${uncovered}) · нова ${R2.length} + без покупка ${res.unmatched.filter(u => u.year === year).length}`);
-      out(`   резултат от продажбите на акции / фондове (преди освобождаване): новата е ${pct(gain2, de1.stockGain)}  [разликата идва от: комисионните (старата не ги брои), продажби без покупка, FIFO по сметка, ETF]`);
-      out(`   дивиденти: стара ${dividends.length} бр. · нова ${I2.filter(x => x.kind === 'dividend').length} бр.; сумата — новата е ${pct(div2, de1.totalDivs)}  [старата изхвърля сторното и отрицателните]`);
-      out(`   лихви: стара — не ги чете · нова ${I2.filter(x => x.kind === 'interest').length} бр. · числото най-горе в новата: ${de2.headline === 0 ? 'НУЛА' : de2.headline > 0 ? 'положително' : 'отрицателно'} (${de2.complete ? 'пълно' : 'НЕПЪЛНО'})`);
-    });
-  } else out('\nСтарата логика не намери нито една сделка — сравнение няма.');
 })().catch(e => { console.error('ГРЕШКА: ' + (e && e.stack || e)); process.exit(1); });
