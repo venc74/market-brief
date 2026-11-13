@@ -1,0 +1,233 @@
+{
+ "date": "2026-11-13",
+ "time_ny": "09:07",
+ "time_berlin": "15:07",
+ "ok": true,
+ "diag": {
+  "tickers": 923,
+  "with_pm": 534,
+  "gappers": 0,
+  "zero_volume_share": 1.0,
+  "requested": 924
+ },
+ "gaps": [],
+ "levels": [],
+ "watch": [],
+ "notes": [],
+ "excluded_deals": [
+  "CART",
+  "NWE"
+ ],
+ "universe_n": 916,
+ "coverage": {
+  "with_pm": 534,
+  "requested": 924,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null,
+  "universe": 916,
+  "extra": 8,
+  "universe_source": "cache"
+ },
+ "session": "2026-11-12",
+ "sector_bounce": [],
+ "gaps_all": [],
+ "ep_morning": [],
+ "volume_note": null,
+ "econ": [
+  {
+   "title": "Wholesale prices rose 0.3% in October, putting annual rate at 6.5%, the highest in nearly four years",
+   "source": "CNBC",
+   "kind": "PPI",
+   "published": "2026-11-13T14:02Z",
+   "time_ny": "09:02",
+   "time_berlin": "15:02",
+   "link": "https://www.cnbc.com/2026/11/13/ppi-inflation-report-october-2026.html"
+  }
+ ],
+ "market": {
+  "futures": [
+   {
+    "symbol": "ES=F",
+    "label": "ES (S&P 500)",
+    "price": 7645.75,
+    "prev_close": 7616.25,
+    "chg_pct": 0.39,
+    "last_ny": "08:55"
+   },
+   {
+    "symbol": "NQ=F",
+    "label": "NQ (Nasdaq-100)",
+    "price": 28419.5,
+    "prev_close": 28388.25,
+    "chg_pct": 0.11,
+    "last_ny": "08:55"
+   }
+  ],
+  "futures_missing": [],
+  "mega": [],
+  "mega_quiet": [
+   {
+    "ticker": "AAPL",
+    "tickers": [
+     "AAPL"
+    ],
+    "name": "APPLE INC",
+    "weight": 7.9,
+    "gap_pct": 0.44,
+    "pm_price": 356.45,
+    "prev_close": 354.89,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "NVDA",
+    "tickers": [
+     "NVDA"
+    ],
+    "name": "NVIDIA CORP",
+    "weight": 6.14,
+    "gap_pct": 2.43,
+    "pm_price": 170.08,
+    "prev_close": 166.04,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "MSFT",
+    "tickers": [
+     "MSFT"
+    ],
+    "name": "MICROSOFT CORP",
+    "weight": 5.93,
+    "gap_pct": -0.99,
+    "pm_price": 517.95,
+    "prev_close": 523.11,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "GOOGL",
+    "tickers": [
+     "GOOGL",
+     "GOOG"
+    ],
+    "name": "ALPHABET INC CL A",
+    "weight": 4.82,
+    "gap_pct": 1.5,
+    "pm_price": 303.24,
+    "prev_close": 298.75,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "AMZN",
+    "tickers": [
+     "AMZN"
+    ],
+    "name": "AMAZON.COM INC",
+    "weight": 4.01,
+    "gap_pct": 0.86,
+    "pm_price": 269.77,
+    "prev_close": 267.46,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "AVGO",
+    "tickers": [
+     "AVGO"
+    ],
+    "name": "BROADCOM INC",
+    "weight": 2.65,
+    "gap_pct": -2.21,
+    "pm_price": 356.33,
+    "prev_close": 364.38,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "META",
+    "tickers": [
+     "META"
+    ],
+    "name": "META PLATFORMS INC CLASS A",
+    "weight": 2.1,
+    "gap_pct": 0.33,
+    "pm_price": 625.67,
+    "prev_close": 623.59,
+    "pm_last_ny": "09:05"
+   }
+  ],
+  "mega_missing": [],
+  "weights": {
+   "as_of": "2026-11-12",
+   "source": "позициите на SPY от SSGA",
+   "companies": [
+    {
+     "ticker": "AAPL",
+     "tickers": [
+      "AAPL"
+     ],
+     "name": "APPLE INC",
+     "weight": 7.9
+    },
+    {
+     "ticker": "NVDA",
+     "tickers": [
+      "NVDA"
+     ],
+     "name": "NVIDIA CORP",
+     "weight": 6.14
+    },
+    {
+     "ticker": "MSFT",
+     "tickers": [
+      "MSFT"
+     ],
+     "name": "MICROSOFT CORP",
+     "weight": 5.93
+    },
+    {
+     "ticker": "GOOGL",
+     "tickers": [
+      "GOOGL",
+      "GOOG"
+     ],
+     "name": "ALPHABET INC CL A",
+     "weight": 4.82
+    },
+    {
+     "ticker": "AMZN",
+     "tickers": [
+      "AMZN"
+     ],
+     "name": "AMAZON.COM INC",
+     "weight": 4.01
+    },
+    {
+     "ticker": "AVGO",
+     "tickers": [
+      "AVGO"
+     ],
+     "name": "BROADCOM INC",
+     "weight": 2.65
+    },
+    {
+     "ticker": "META",
+     "tickers": [
+      "META"
+     ],
+     "name": "META PLATFORMS INC CLASS A",
+     "weight": 2.1
+    }
+   ]
+  },
+  "session": "2026-11-12",
+  "text": [
+   "Фючърси: ES (S&P 500) +0.39% (7 645.75 в 08:55), NQ (Nasdaq-100) +0.11% (28 419.50 в 08:55) — спрямо 16:00 Ню Йорк на 12.11.",
+   "С тегло > 2% в S&P 500 (по позициите на SPY от SSGA, към 12.11): няма гап ≥ ±3% (AAPL +0.4%, NVDA +2.4%, MSFT -1.0%, GOOGL (с GOOG) +1.5%, AMZN +0.9%, AVGO -2.2%, META +0.3%)."
+  ]
+ },
+ "seconds": 58.4,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 13.11 — ",
+  "at_utc": "14:07"
+ }
+}
