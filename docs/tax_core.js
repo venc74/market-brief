@@ -88,6 +88,7 @@
     if (h[0] === 'date' && h.length > 3 && h.slice(1).filter(x => x).every(x => /^[a-z]{3}$/.test(x))) return 'ecb_rates';
     if (['type', 'ticker', 'date', 'quantity', 'currency'].every(c => h.includes(c)) && h.includes('price') && !h.includes('price per share')) return 'standard';
     if (h.includes('ticker') && h.includes('price per share') && h.includes('total amount')) return 'revolut_stocks';
+    if (h.includes('date acquired') && h.includes('date sold') && h.includes('cost basis') && h.includes('realised pnl')) return 'revolut_pnl';   // 14.11.2026: „Profit and loss“ на Revolut — РЕАЛЕН формат (заглавният ред е от файл на потребителя)
     if (h.includes('symbol') && h.includes('type') && h.includes('quantity') && h.includes('price') && h.includes('value') && h.includes('fees')) return 'revolut_crypto';
     if (h.includes('type') && h.includes('product') && h.includes('started date') && h.includes('fiat amount')) return 'revolut_crypto_old';
     return 'unknown';
@@ -519,6 +520,26 @@
       });
       out.aliases.forEach(a => out.warnings.push(`${a.from} → ${a.to}: един и същ инструмент (Conid ${a.conid}) в отчетите — смяна на тикъра; лотовете на ${a.from} продължават като ${a.to} с оригиналните дати и цени.`));
     }
+    // 14.11.2026: „Profit and loss“ на Revolut — всеки продаден лот дава покупка (дата на придобиване) и продажба; ако отчетът на сделките (Trading account statement) вече има същата покупка / продажба
+    // (същата сметка, тикър и ден, количество поне колкото в лота), тя НЕ се брои втори път; останалото се добавя (покупки и продажби след края на отчета на сделките). Частично покритие → добавя се разликата.
+    const pnlRecs = perFile.flatMap(pf => pf.recs.filter(r => r.pnl));
+    if (pnlRecs.length) {
+      const real = perFile.flatMap(pf => pf.recs.filter(r => !r.pnl && r.kind === 'trade' && r.broker === 'Revolut'));
+      const kd = r => [r.account, r.sym, r.date].join('|'), have = { B: {}, S: {} };
+      real.forEach(r => { const side = r.qty > 0 ? 'B' : 'S'; have[side][kd(r)] = (have[side][kd(r)] || 0) + Math.abs(r.qty); });
+      const groups = {}; pnlRecs.forEach(r => { const k = (r.qty > 0 ? 'B' : 'S') + '|' + kd(r); (groups[k] = groups[k] || []).push(r); });
+      const st = { rows: pnlRecs.length / 2, coveredB: 0, coveredS: 0, addedB: 0, addedS: 0 };
+      Object.entries(groups).forEach(([k, g]) => {
+        const side = k[0], h = have[side][k.slice(2)] || 0, need = g.reduce((a, r) => a + Math.abs(r.qty), 0);
+        if (h >= need - 1e-6) { g.forEach(r => { r.drop = true; }); st['covered' + side] += g.length; }
+        else { if (h > 1e-6) { const f = (need - h) / need; g.forEach(r => { r.qty *= f; r.total *= f; }); } st['added' + side] += g.length; }
+      });
+      perFile.forEach(pf => { const d = out.files[pf.idx]; const dropped = pf.recs.filter(r => r.drop); if (!dropped.length) return;
+        d.duplicates += dropped.length; d.records -= dropped.length; dropped.forEach(r => { d.kinds.trade--; d.kinds[r.qty > 0 ? 'buy' : 'sell']--; }); pf.recs = pf.recs.filter(r => !r.drop); });
+      const names = [...new Set(perFile.filter(pf => out.files[pf.idx].format === 'revolut_pnl').map(pf => out.files[pf.idx].name))].join(', ');
+      out.warnings.push(`Revolut — печалби и загуби (${names}): ${st.rows} продадени лота; покупки, които вече са в отчета на сделките: ${st.coveredB}, добавени: ${st.addedB}; продажби, които вече са в отчета на сделките: ${st.coveredS}, добавени: ${st.addedS}. ` +
+        'В този отчет има САМО продадените лотове — покупките от същия период, които още не са продадени, и дивидентите липсват; за тях е нужен отчетът на сделките (Trading account statement) за периода. Валутата не е в отчета — приета е USD. Лотовете се подбират по FIFO, не по колоната „Date acquired“.');
+    }
     // дедупликация — по поредния номер на файла, не по името (05.11.2026: два различни файла с едно име се сливаха в един „файл“ и общите записи се броеха двойно)
     const counts = {};                                                         // key → {номер на файла → [records]}
     perFile.forEach(({ idx, recs }) => recs.forEach(r => { const k = TC.recordKey(r); ((counts[k] = counts[k] || {})[idx] = counts[k][idx] || []).push(r); }));
@@ -586,7 +607,7 @@
   //  · разпознат файл без нито една сделка → кои секции / колони има, кои се очакват и къде са спрели редовете от Trades;
   //  · очаквана колона липсва в заглавния ред на секция (тогава всеки ред от нея е в „не е сметнато“).
   TC.FORMAT_HINT = 'Чета: IBKR Activity Statement (CSV — първият ред започва със „Statement,Header,“); Revolut (колони Date, Ticker, Type, Quantity, Price per share, Total Amount, Currency — акции; ' +
-    'Symbol, Type, Quantity, Price, Value, Fees, Date — крипто); стандартен CSV (type, ticker, date, quantity, price, currency); курсове на ЕЦБ (eurofxref-hist.csv).';
+    'Symbol, Type, Quantity, Price, Value, Fees, Date — крипто; Date acquired, Date sold, Symbol, Quantity, Cost basis, Amount, Realised PnL — печалби и загуби); стандартен CSV (type, ticker, date, quantity, price, currency); курсове на ЕЦБ (eurofxref-hist.csv).';
   const cnt = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
   const colsOf = need => need.map(c => Array.isArray(c) ? c.join(' или ') : c).join(', ');
   TC.fileProblems = function (desc, res, text) {
@@ -680,7 +701,12 @@
   };
   const MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
   // "2024-01-10T14:32:11.123Z" / "Jan 10, 2024, 10:00:00 AM" / "10 Jan 2024"
-  TC.parseLooseDate = function (s) {
+  // 14.11.2026: „ДД/ММ/ГГГГ ЧЧ:ММ:СС“ (РЕАЛЕН формат на отчета на Revolut „Trading account statement“) — редът ден / месец се определя по целия файл (TC.slashOrder), по подразбиране ДД/ММ
+  TC.slashOrder = vals => { let a = 0, b = 0; vals.forEach(v => { const m = /^\s*(\d{1,2})\/(\d{1,2})\/\d{4}/.exec(String(v || '')); if (m) { if (Number(m[1]) > 12) a++; if (Number(m[2]) > 12) b++; } }); return b > 0 && a === 0 ? 'mdy' : 'dmy'; };
+  TC.parseLooseDate = function (s, order) {
+    const sl = String(s || '').match(/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,T]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (sl) { let d = Number(sl[1]), mo = Number(sl[2]); if (order === 'mdy') [d, mo] = [mo, d]; if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+      return { date: `${sl[3]}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`, time: sl[4] ? `${String(sl[4]).padStart(2, '0')}:${sl[5]}:${sl[6] || '00'}` : '' }; }
     const iso = TC.parseDateTime(s); if (iso) return iso;
     let m = String(s || '').match(/([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?)?/);
     if (!m) { const n = String(s || '').match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?\s+(\d{4})/); if (n) m = [n[0], n[2], n[1], n[3]]; }
@@ -696,18 +722,34 @@
     revolut_stocks(text, src, owner) {
       const acc = 'акции' + (owner === 'B' ? ' · съпруг/а' : '');
       const recs = [], skipped = [], b = { broker: 'Revolut', account: acc, src };
-      rowsOf(text).forEach(({ r, line }) => {
-        const dt = TC.parseLooseDate(r['date']), type = (r['type'] || '').toUpperCase(), cur = (r['currency'] || '').toUpperCase() || 'USD';
+      const rows = rowsOf(text), order = TC.slashOrder(rows.map(x => x.r['date']));
+      // 14.11.2026: „MERGER - STOCK“ (акциите излизат, количество < 0) + „MERGER - CASH“ (парите) на същия тикър в рамките на 3 дни = сливане срещу пари = ПРОДАЖБА (като при IBKR); непарно → „не е сметнато“
+      const dayNum = d => Math.round(new Date(d + 'T12:00:00Z') / 86400000);
+      const mCash = rows.map((x, i) => ({ x, i })).filter(o => /^MERGER\s*-\s*CASH/i.test(o.x.r['type'] || ''));
+      const pairOf = {}, usedCash = new Set();
+      rows.forEach((x, i) => { if (!/^MERGER\s*-\s*STOCK/i.test(x.r['type'] || '') || !(TC.num(x.r['quantity']) < 0)) return; const d0 = TC.parseLooseDate(x.r['date'], order); if (!d0) return;
+        let best = null; mCash.forEach(o => { const d1 = TC.parseLooseDate(o.x.r['date'], order); if (!d1 || usedCash.has(o.i) || o.x.r['ticker'] !== x.r['ticker'] || !(TC.num(o.x.r['total amount']) > 0)) return;
+          const gap = Math.abs(dayNum(d1.date) - dayNum(d0.date)); if (gap <= 3 && (!best || gap < best.gap)) best = { o, gap }; });
+        if (best) { pairOf[i] = best.o; usedCash.add(best.o.i); } });
+      rows.forEach(({ r, line }, idx) => {
+        const dt = TC.parseLooseDate(r['date'], order), type = (r['type'] || '').toUpperCase(), cur = (r['currency'] || '').toUpperCase() || 'USD';
         const price = TC.money(r['price per share'], cur), total = TC.money(r['total amount'], cur), qty = TC.num(r['quantity']);
         const skip = (reason, taxable) => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['ticker'] || ''} ${r['type'] || ''}`.trim(), date: dt ? dt.date : r['date'], reason, taxable: !!taxable,
                                                        amount: r['quantity'] || r['total amount'] || '' });
         if (!dt) return skip('без дата', true);
         if (/^(BUY|SELL)/.test(type)) {
           if (!(qty > 0)) return skip('невалидно количество', true);
-          const px = isFinite(price.v) && price.v > 0 ? price.v : Math.abs(total.v / qty);
-          const fee = isFinite(total.v) && isFinite(price.v) ? Math.max(0, /^BUY/.test(type) ? Math.abs(total.v) - qty * px : qty * px - Math.abs(total.v)) : 0;
+          // 14.11.2026: сумата (Total Amount) е точната; цената в отчета е закръглена до 2 знака (до 0,5% разлика) — цената е сума ÷ брой, без „такса“ от закръгляването
+          const px = isFinite(total.v) && total.v !== 0 ? Math.abs(total.v) / qty : price.v;
+          if (!(px > 0)) return skip('без цена и сума', true);
           recs.push({ ...b, line, kind: 'trade', assetClass: 'stock', sym: r['ticker'], date: dt.date, time: dt.time, qty: /^BUY/.test(type) ? qty : -qty, price: px,
-                      currency: price.cur || total.cur || cur, fee: fee > 1e-6 ? fee : 0, total: Math.abs(total.v) });
+                      currency: price.cur || total.cur || cur, fee: 0, total: Math.abs(total.v) });
+        } else if (/^MERGER/.test(type)) {
+          if (/^MERGER\s*-\s*CASH/.test(type)) { if (usedCash.has(idx)) return; return skip('„MERGER - CASH“ без съответно излизане на акции („MERGER - STOCK“ с отрицателно количество) — не е сметнато; потвърди ръчно', true); }
+          const cash = pairOf[idx];
+          if (cash) { const d1 = TC.parseLooseDate(cash.x.r['date'], order), tot = TC.num(cash.x.r['total amount']), q = Math.abs(qty);
+            recs.push({ ...b, line, kind: 'trade', assetClass: 'stock', sym: r['ticker'], date: d1.date, time: d1.time, qty: -q, price: tot / q, currency: cur, fee: 0, total: tot, viaMerger: true }); return; }
+          skip(qty < 0 ? '„MERGER - STOCK“ без парите („MERGER - CASH“) — сливане акции срещу акции или смесено; не е сметнато, потвърди ръчно' : '„MERGER - STOCK“ с постъпили акции — покупната цена е на старите акции; не е сметнато, потвърди ръчно', true);
         } else if (type === 'DIVIDEND') {
           if (!isFinite(total.v)) return skip('дивидент без сума', true);
           recs.push({ ...b, line, kind: 'dividend', sym: r['ticker'], date: dt.date, amount: total.v, currency: total.cur || cur, desc: 'Revolut DIVIDEND (сумата в отчета — да се провери дали е брутна)' });
@@ -719,6 +761,21 @@
         else skip(`непознат тип „${r['type']}“`, true);
       });
       return { format: 'revolut_stocks', info: { broker: 'Revolut' }, records: recs, skipped };
+    },
+    // 14.11.2026: „Profit and loss“ на Revolut: Date acquired, Date sold, Symbol, Quantity, Cost basis, Amount, Realised PnL — по един ред на ПРОДАДЕН лот (само продадените; валутата не е в отчета — USD).
+    // Дава покупка (дата на придобиване, цена = Cost basis) и продажба (дата на продажбата, сума = Amount) на лот; в TC.ingest се сверява с отчета на сделките: каквото вече е там, не се брои втори път.
+    revolut_pnl(text, src, owner) {
+      const acc = 'акции' + (owner === 'B' ? ' · съпруг/а' : '');
+      const recs = [], skipped = [], b = { broker: 'Revolut', account: acc, src, currency: 'USD', fee: 0, assetClass: 'stock', kind: 'trade', pnl: true };
+      rowsOf(text).forEach(({ r, line }) => {
+        const da = TC.parseLooseDate(r['date acquired']), ds = TC.parseLooseDate(r['date sold']), qty = TC.num(r['quantity']), cost = TC.num(r['cost basis']), amt = TC.num(r['amount']);
+        const skip = reason => skipped.push({ src, line, broker: 'Revolut', account: acc, section: 'Revolut', what: `${r['symbol'] || ''} лот`.trim(), date: ds ? ds.date : r['date sold'], reason, taxable: true, amount: r['quantity'] || '' });
+        if (!da || !ds) return skip('без дата на придобиване или продажба');
+        if (!(qty > 0) || !(cost > 0) || !isFinite(amt)) return skip('невалидно количество, цена на придобиване или сума');
+        recs.push({ ...b, line, sym: r['symbol'], date: da.date, time: '', qty, price: cost / qty, total: cost, pnlSide: 'buy' });
+        recs.push({ ...b, line, sym: r['symbol'], date: ds.date, time: '', qty: -qty, price: amt / qty, total: amt, pnlSide: 'sell', realised: TC.num(r['realised pnl']) });
+      });
+      return { format: 'revolut_pnl', info: { broker: 'Revolut' }, records: recs, skipped };
     },
     // крипто: Symbol,Type,Quantity,Price,Value,Fees,Date
     revolut_crypto(text, src, owner) {

@@ -9,7 +9,7 @@ const acc = a => esc(TC.maskAccount(a));
 const dmy = d => /^\d{4}-\d{2}-\d{2}/.test(String(d)) ? `${d.slice(8, 10)}.${d.slice(5, 7)}.${d.slice(0, 4)}` : String(d || '');
 const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const cntText = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
-const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', taxtool_result: 'резултат на друга програма (не е отчет)', xlsx: 'Excel (не се чете)', unknown: 'непознат формат' };
+const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_pnl: 'Revolut — печалби и загуби*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', taxtool_result: 'резултат на друга програма (не е отчет)', xlsx: 'Excel (не се чете)', unknown: 'непознат формат' };
 
 // ─── файлове ───
 function addFiles(list) {
