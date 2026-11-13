@@ -2,14 +2,14 @@
 'use strict';
 const TC = window.TaxCore, esc = TC.esc, fmt = TC.fmt;
 const SHOW_BG = false;                       // 04.11.2026: българската част е скрита (кодът е в TaxCore.computeBG)
-const S = { files: [], ing: null, rates: {}, rateSource: {}, fifo: null, fundTypes: {}, vorab: {}, persons: {}, yearPicked: false, sum: null };
+const S = { files: [], ing: null, rates: {}, rateSource: {}, fifo: null, fundTypes: {}, vorab: {}, persons: {}, yearPicked: false, sum: null, manual: {} };
 const $ = id => document.getElementById(id);
 // 12.11.2026: показване — сметката маскирана (U••••567), датата ДД.ММ.ГГГГ, брой с правилната дума
 const acc = a => esc(TC.maskAccount(a));
 const dmy = d => /^\d{4}-\d{2}-\d{2}/.test(String(d)) ? `${d.slice(8, 10)}.${d.slice(5, 7)}.${d.slice(0, 4)}` : String(d || '');
 const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const cntText = o => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(' · ');
-const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', unknown: 'непознат формат' };
+const FORMAT_NAMES = { ibkr: 'IBKR', standard: 'стандартен CSV', ecb_rates: 'курсове на ЕЦБ', revolut_stocks: 'Revolut — акции*', revolut_crypto: 'Revolut — крипто*', revolut_crypto_old: 'Revolut — стар формат', taxtool_result: 'резултат на друга програма (не е отчет)', xlsx: 'Excel (не се чете)', unknown: 'непознат формат' };
 
 // ─── файлове ───
 function addFiles(list) {
@@ -30,14 +30,14 @@ function renderFiles() {
     ${f.sections.filter(x => x.data).map(x => `<tr><td>${esc(x.name)}${x.missing.length ? ` <b class="neg">липсват колони: ${esc(x.missing.join(', '))}</b>` : ''}</td><td class="n">${x.data}</td><td class="n ${x.records ? 'pos' : 'mut'}">${x.records}</td>
       <td class="n ${x.skipped ? 'yel' : 'mut'}">${x.skipped}</td><td class="n mut">${x.ignored}</td><td class="small">${esc(cntText(x.why))}${x.skipped ? (x.ignored ? ' · ' : '') + 'останалите — в списъка „не е сметнато“' : ''}${x.wider ? ` <b class="neg">· ${x.wider} реда с повече клетки от заглавния ред (${esc(cntText(x.widths))})</b>` : ''}</td></tr>`).join('')}</table></details>`;
   $('files').innerHTML = '<tr><th></th><th>Файл</th><th>Чий</th><th>Брокер / формат</th><th>Сметка</th><th class="n">Сделки</th><th class="n">Дивиденти</th><th class="n">Удържан<br>данък</th><th class="n">Лихви</th><th class="n">Не е<br>сметнато</th><th class="n">Дубликати</th><th>Бележка</th></tr>' +
-    ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', n = v => rates ? '' : (v || 0);
+    ing.files.map((f, i) => { const k = f.kinds || {}, rates = f.format === 'ecb_rates', blank = rates || f.notSource || f.format === 'xlsx', n = v => blank ? '' : (v || 0);   // 13.11: резултат на друга програма и Excel — без числа за сделки
       const span = `${esc(f.from)}${f.to ? ' … ' + esc(f.to) : ''}`;        // периодът от отчета (IBKR) и датите на прочетените записи — под името на файла
-      return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}<div class="small" data-period>${f.period ? '<span style="white-space:nowrap">период: ' + esc(f.period) + '</span> · ' : ''}<span style="white-space:nowrap">${span ? 'данни: ' + span : (rates ? '' : 'без записи')}</span></div></td>
-      <td>${rates ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc(FORMAT_NAMES[f.format] || f.format)}</td>
-      <td class="mono" data-acc style="white-space:nowrap">${esc(f.accountMasked || (rates ? '' : '—'))}</td>
-      <td class="n ${!rates && !k.trade ? 'neg' : ''}">${rates ? '' : `${k.trade || 0}<div class="small" style="white-space:nowrap">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
+      return `<tr><td><button class="btn" data-rm="${i}" title="махни файла">×</button></td><td>${esc(f.name)}<div class="small" data-period>${f.period ? '<span style="white-space:nowrap">период: ' + esc(f.period) + '</span> · ' : ''}<span style="white-space:nowrap">${span ? (f.notSource ? 'години: ' : 'данни: ') + span : (blank ? '' : 'без записи')}</span></div></td>
+      <td>${blank ? '' : `<select data-owner="${i}"><option value="A">аз</option><option value="B"${f.owner === 'B' ? ' selected' : ''}>съпруг/а</option></select>`}</td><td>${esc(FORMAT_NAMES[f.format] || f.format)}</td>
+      <td class="mono" data-acc style="white-space:nowrap">${esc(f.accountMasked || (blank ? '' : '—'))}</td>
+      <td class="n ${!blank && !k.trade ? 'neg' : ''}">${blank ? '' : `${k.trade || 0}<div class="small" style="white-space:nowrap">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
       <td class="n ${f.skipped ? 'yel' : ''}">${n(f.skipped)}</td><td class="n">${f.duplicates || ''}</td>
-      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
+      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.note || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
       (f.sections ? `<tr><td></td><td colspan="11">${secTable(f)}</td></tr>` : ''); }).join('');
   // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
   $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => p.level === 'warn'
@@ -97,7 +97,7 @@ async function loadSiteRates() {
 }
 async function ensureRates() {
   const rates = JSON.parse(JSON.stringify(S.ing.rates || {})); const source = {};
-  const need = TC.ratesNeeded(S.ing.records);
+  const need = TC.ratesNeeded(S.ing.records, S.manual);
   for (const [cur, p] of Object.entries(need)) {
     if (TC.ratesCover(rates, cur, p)) { source[cur] = 'качения файл на ЕЦБ'; continue; }
     const site = await loadSiteRates();
@@ -123,7 +123,7 @@ async function ensureRates() {
 // 05.11.2026: сметката тръгва сама при добавяне / махане на файл; докато върви, резултатът е скрит (никога старо число). По-стара сметка, свършила след
 // по-нова смяна на файловете, се изхвърля (calcToken). Смяната на година и настройките — само render() върху готовото FIFO.
 let calcToken = 0;
-const fifoOpts = () => ({ stillhalter: $('stillhalter').value });
+const fifoOpts = () => ({ stillhalter: $('stillhalter').value, controls: S.ing ? S.ing.controls : [], manual: S.manual, corp: { spinoff: $('spinoffMode').value, stockDividend: $('stockDivMode').value }, xferLink: $('xferLink').value !== 'off' });   // 13.11.2026: контролите по позициите и ръчно въведените покупки
 async function recalc() {
   const my = ++calcToken;
   S.fifo = null; S.de = null; $('out').style.display = 'none';
@@ -149,7 +149,7 @@ async function recalc() {
 function settings() {
   return { year: Number($('year').value), joint: $('joint').value === '1', kirche: $('kirche').value || null, carriedShareLoss: Number($('carryS').value) || 0,
            carriedOtherLoss: Number($('carryO').value) || 0, creditRate: ($('credit').value === '' ? 15 : Number($('credit').value)) / 100,
-           fundTypes: S.fundTypes, vorab: S.vorab, persons: S.persons, records: S.ing.records, info: S.ing.info, skipped: S.ing.skipped,
+           fundTypes: S.fundTypes, vorab: S.vorab, persons: S.persons, records: S.ing.records, info: S.ing.info, skipped: S.ing.skipped, manual: S.manual, corpEvents: S.ing.corpEvents,
            offsetOrder: $('offsetOrder').value, creditPerItem: $('creditPerItem').value === '1', nonIbkrDefault: $('nonIbkrDefault').value };
 }
 const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : 'mut';
@@ -181,6 +181,7 @@ function render() {
   de.notes.forEach(n => w.push(`<div class="msg ${n.level === 'err' ? 'err' : n.level === 'warn' ? 'warn' : 'info'} small">${esc(n.text)}</div>`));
   w.push(skippedHtml(y));
   $('warnings').innerHTML = w.join('');
+  renderManual();
   // разбивка
   const L = TC.LABELS, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
   const rows = [
@@ -202,7 +203,7 @@ function render() {
   $('salesTitle').textContent = `Продажби ${y} (${R.length})`;
   $('sales').innerHTML = '<tr><th>Дата</th><th>Брокер / сметка</th><th>Инструмент</th><th class="n">Бр.</th><th class="n">Приходи €</th><th class="n">Цена на придобиване €</th><th class="n">Резултат €</th><th>Купено</th></tr>' +
     R.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc(x.broker)} ${acc(x.account)}</td><td>${esc(x.sym)} <span class="small">${esc(x.assetClass)}${x.premium ? ' · премия (Stillhalter)' : x.buyback ? ' · обратно изкупуване' : x.short ? ' · къса' : ''}</span></td><td class="n">${+x.qty.toFixed(6)}</td>
-      <td class="n">${x.proceedsEUR == null ? '—' : fmt(x.proceedsEUR)}</td><td class="n">${x.costEUR == null ? '—' : fmt(x.costEUR)}</td><td class="n ${cls(x.gainEUR || 0)}">${x.gainEUR == null ? 'няма курс' : fmt(x.gainEUR)}</td>
+      <td class="n">${x.proceedsEUR == null ? '—' : fmt(x.proceedsEUR)}</td><td class="n">${x.costEUR == null ? '—' : fmt(x.costEUR)}</td><td class="n ${x.unknownLots && x.gainEUR == null ? 'neg' : cls(x.gainEUR || 0)}">${x.gainEUR == null ? (x.unknownLots ? 'липсва покупна цена' : 'няма курс') : fmt(x.gainEUR)}</td>
       <td class="small">${(x.lots || []).map(l => `${esc(l.date)} × ${+l.qty.toFixed(6)}${l.exempt ? ' (над година)' : ''}`).join('<br>')}</td></tr>`).join('');
   const I = S.fifo.incomes.filter(x => x.year === y);
   $('incTitle').textContent = `Дивиденти, удържан данък, лихви ${y} (${I.length})`;
@@ -223,6 +224,39 @@ function render() {
     <tr><td><b>Общо (без крипто)</b></td><td class="n"><b>${fmt(e.total)}</b></td></tr></table>
     <div class="small" style="margin-top:6px">Крипто по §23 се облага с личната ставка заедно с другите доходи — не е сметнато тук. Параметри ${y}: ${esc(de.params.notes.join(' · '))}${de.params.extrapolated ? ' — <b>непроверени за тази година</b>' : ''}.</div>`;
   if (SHOW_BG) { const bg = TC.computeBG(S.fifo, y); $('bg').style.display = ''; $('bg').innerHTML = `<h2>България</h2><pre class="small">${esc(JSON.stringify(bg, null, 1))}</pre>`; }
+}
+
+// 13.11.2026: лотове без покупна цена (прехвърлени от друг брокер — ACATS „In“, начални позиции без покупки…) — датата и цената се въвеждат на ръка. Никога цена 0: до въвеждането продажбата няма резултат
+// и годината е НЕПЪЛНО. Въведеното се пази САМО в браузъра (localStorage) — не в репото и не се праща никъде.
+const MANUAL_KEY = 'tax_manual_v1', draft = {};                 // draft — недовършено въведеното (само дата или само цена): не влиза в сметката и не се губи при прерисуване
+function loadManual() { try { const x = JSON.parse(localStorage.getItem(MANUAL_KEY) || '{}'); return x && typeof x === 'object' && !Array.isArray(x) ? x : {}; } catch (e) { return {}; } }
+function saveManual() { try { localStorage.setItem(MANUAL_KEY, JSON.stringify(S.manual)); } catch (e) { /* без запис — важи за сесията */ } }
+function renderManual() {
+  const box = $('manualBox'), list = (S.fifo && S.fifo.pending) || [], unk = ((S.ing && S.ing.skipped) || []).filter(x => x.ackKey);
+  if (!list.length && !unk.length) { box.innerHTML = ''; return; }
+  const open = list.filter(p => !p.filled).length;
+  const unkHtml = unk.length ? `<div class="card" id="ackCard"><h2>Непознати корпоративни действия — ${pl(unk.length, 'ред', 'реда')}</h2><div class="small" style="margin-bottom:6px">Калкулаторът не знае как да ги смята и не ги пропуска тихо: годината е НЕПЪЛНО, докато не потвърдиш ръчно, че действието няма ефект върху лотовете (или не го сметнеш отделно).</div>
+    <div class="scroll"><table><tr><th>Дата</th><th>Сметка</th><th>Описание от отчета</th><th>Защо</th><th>Потвърждавам, че няма ефект</th></tr>${unk.map(x => `<tr><td class="mono">${esc(dmy(x.date))}</td><td class="mono">${acc(x.account)}</td><td class="small">${esc(x.desc || x.what)}</td><td class="small">${esc(x.reason)}</td>
+      <td><input type="checkbox" data-ack="${esc(x.ackKey)}"${(S.manual[x.ackKey] || {}).ack ? ' checked' : ''}></td></tr>`).join('')}</table></div></div>` : '';
+  box.innerHTML = unkHtml + (!list.length ? '' : `<div class="card" id="manualCard"><h2>Липсва покупна цена — ${open ? pl(open, 'лот за въвеждане', 'лота за въвеждане') : 'всичко е въведено'} (от ${list.length})</h2>
+    <div class="small" style="margin-bottom:6px">Прехвърлени от друг брокер (ACATS „In“) и начални позиции, за които във файловете няма покупка. Калкулаторът никога не слага цена 0: докато не въведеш датата и цената на покупката,
+      продажбата на такъв лот няма резултат и годината е НЕПЪЛНО. Въведеното остава само в този браузър.</div>
+    <div class="scroll"><table><tr><th>Тикър</th><th>Сметка</th><th class="n">Брой</th><th>Откъде / от кога</th><th>Дата на покупката</th><th class="n">Цена за 1 бр.</th><th>Валута</th><th></th></tr>
+    ${list.map(p => { const m = draft[p.key] || S.manual[p.key] || {}; return `<tr><td>${esc(p.sym)}</td><td class="mono">${acc(p.account)}</td><td class="n">${esc(p.qty)}</td><td class="small">${esc(dmy(p.date))} — ${esc(p.desc)}</td>
+      <td><input type="date" data-mk="${esc(p.key)}" data-f="date" value="${esc(m.date || '')}"></td>
+      <td><input type="number" min="0" step="0.0001" data-mk="${esc(p.key)}" data-f="price" value="${esc(m.price != null ? m.price : '')}"></td>
+      <td><input type="text" maxlength="3" size="4" data-mk="${esc(p.key)}" data-f="currency" value="${esc(m.currency || p.currency || 'USD')}" style="text-transform:uppercase;width:60px"></td>
+      <td>${p.filled ? '<span class="pos small">въведено</span>' : '<span class="neg small">липсва</span>'}</td></tr>`; }).join('')}</table></div></div>`);
+  box.querySelectorAll('[data-mk]').forEach(el => el.addEventListener('change', () => setManual(el.dataset.mk)));
+  box.querySelectorAll('[data-ack]').forEach(el => el.addEventListener('change', () => { if (el.checked) S.manual[el.dataset.ack] = { ack: true }; else delete S.manual[el.dataset.ack]; saveManual(); render(); }));
+}
+function setManual(key) {
+  const get = f => Array.from($('manualBox').querySelectorAll('[data-mk]')).find(e => e.dataset.mk === key && e.dataset.f === f);
+  const date = get('date').value, rawPrice = get('price').value, price = Number(rawPrice), cur = String(get('currency').value || '').trim().toUpperCase();
+  draft[key] = { date, price: rawPrice, currency: cur };
+  const had = !!S.manual[key], valid = /^\d{4}-\d{2}-\d{2}$/.test(date) && price > 0 && /^[A-Z]{3}$/.test(cur);
+  if (valid) S.manual[key] = { date, price, currency: cur }; else delete S.manual[key];
+  if (valid || had) { saveManual(); recalc(); }                                // наново (с курсовете за новата дата) само когато въведеното влиза в сметката или е било въведено и се маха
 }
 
 function renderFunds(de) {
@@ -270,6 +304,7 @@ $('clear').addEventListener('click', () => { S.files = []; S.ing = null; S.yearP
 $('year').addEventListener('change', () => { S.yearPicked = true; if (S.ing && !S.fifo) renderSummary(); });   // изборът на потребителя се пази при добавяне на още файлове
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit', 'offsetOrder', 'creditPerItem', 'nonIbkrDefault'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
-$('stillhalter').addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } });
+['stillhalter', 'spinoffMode', 'stockDivMode', 'xferLink'].forEach(id => $(id).addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } }));
+S.manual = loadManual();
 renderFiles();
 (function () { const y = new Date().getFullYear(); $('year').innerHTML = [y, y - 1, y - 2].map(v => `<option value="${v}">${v}</option>`).join(''); $('year').value = String(y - 1); })();

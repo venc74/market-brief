@@ -212,7 +212,7 @@ function v1Trace(text, v1) {
     out(`   записи по вид: сделки ${k.trade || 0} (покупки ${tr.filter(r => r.qty > 0).length}, продажби ${tr.filter(r => r.qty < 0).length}; по клас: ${counts(cls)}) · дивиденти ${k.dividend || 0} · удържан данък ${k.withholding || 0} · лихви ${k.interest || 0} · сплитове ${k.split || 0}`);
     const yr = {}; recs.forEach(r => inc(yr, r.date.slice(0, 4))); out(`   записи по години: ${Object.keys(yr).sort().map(y => `${y}: ${yr[y]}`).join(' · ') || '—'}`);
     // само този файл през новата логика (както ако е качен сам): какво става с продажбите му
-    try { const one = TC.ingest([{ name: f.name, text: texts[i].text }]), r1 = TC.fifo(one.records, rate), sells = one.records.filter(r => r.kind === 'trade' && r.qty < 0).length;
+    try { const one = TC.ingest([{ name: f.name, text: texts[i].text }]), r1 = TC.fifo(one.records, rate, { controls: one.controls }), sells = one.records.filter(r => r.kind === 'trade' && r.qty < 0).length;
       out(`   САМ ЗА СЕБЕ СИ (само този файл): продажби във файла ${sells} → с резултат ${r1.realized.filter(x => !x.short || x.premium).length} (без курс: ${r1.realized.filter(x => x.gainEUR == null).length}) · без покупка ${r1.unmatched.length} · записи без курс ${r1.missingRates.length}`);
     } catch (e) { out('   САМ ЗА СЕБЕ СИ: грешка — ' + String(e.message).slice(0, 80)); }
     const why = {}; sk.forEach(s => inc(why, `[${s.section}] ${String(s.reason).replace(/„[^“]*“/g, '„…“')}${s.taxable ? ' (може да е облагаем)' : ''}`));
@@ -231,7 +231,7 @@ function v1Trace(text, v1) {
   });
 
   // 4) сметката по години, стара ↔ нова
-  const res = TC.fifo(ing.records, rate);
+  const res = TC.fifo(ing.records, rate, { controls: ing.controls });
   // сметките в записите — новата логика води FIFO по брокер / сметка / инструмент; старата — само по тикър
   const T = ing.records.filter(r => r.kind === 'trade');
   const accIdx = {}; T.forEach(r => { const k = r.broker + '|' + r.account; if (!(k in accIdx)) accIdx[k] = Object.keys(accIdx).length + 1; });
@@ -259,10 +259,12 @@ function v1Trace(text, v1) {
   out(`FIFO (нова): продажби с резултат ${res.realized.length} · продажби без покупка ${res.unmatched.length} · записи без курс ${res.missingRates.length} · отворени позиции в края ${res.open.length}`);
   Object.entries(unWhy).forEach(([w, n]) => out(`   без покупка ×${n}: ${w}`));
   out(`   покупки, които покриха по-ранна непокрита продажба и НЕ станаха лот: ${(res.notes || []).filter(n => /покрива/.test(n.text)).length} · позиции, белязани като несигурни след непокрита продажба: ${(res.tainted || []).length}`);
+  const xl = res.xferLinks || [], acatsOpen = (res.pending || []).filter(p => p.kind === 'acats' && !p.filled);   // 14.11.2026: прехвърляне от друг брокер — свързано с покупките при другия брокер или без цена (само броеве)
+  out(`   прехвърляния „In“ от друг брокер, свързани с покупки в отчет на другия брокер: ${xl.length} (${xl.reduce((a, x) => a + x.linked, 0)} от ${xl.reduce((a, x) => a + x.qty, 0)} бр.) · лотове без намерена покупка (за ръчно въвеждане): ${acatsOpen.length}`);
   years.forEach(y => {
     const de = TC.computeDE(res, { year: y, records: ing.records, info: ing.info, skipped: ing.skipped });
     const R = res.realized.filter(x => x.year === y);
-    out(`   ${y}: продажби ${R.length} (без курс: ${R.filter(x => x.gainEUR == null).length}) · без покупка ${de.unmatched.length} · числото най-горе: ${de.headline === 0 ? 'НУЛА' : de.headline > 0 ? 'положително' : 'отрицателно'} · ${de.complete ? 'пълно' : 'НЕПЪЛНО'}` +
+    out(`   ${y}: продажби ${R.length} (без курс: ${R.filter(x => x.gainEUR == null && !x.unknownLots).length})${R.some(x => x.unknownLots) ? ` · лот без покупна цена ${R.filter(x => x.unknownLots).length}` : ''} · без покупка ${de.unmatched.length} · числото най-горе: ${de.headline === 0 ? 'НУЛА' : de.headline > 0 ? 'положително' : 'отрицателно'} · ${de.complete ? 'пълно' : 'НЕПЪЛНО'}` +
         ` · грешки: ${de.notes.filter(n => n.level === 'err').length} · разлики с Open Positions: ${(de.reconcile || []).length}`);
   });
   const dflt = years.includes(nowY - 1) ? nowY - 1 : null;

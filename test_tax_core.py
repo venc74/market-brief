@@ -30,11 +30,11 @@ assert fmt["U1111111_2023 (1).csv"] == ("ibkr", "U1111111") and fmt["broker2_exp
 assert ing["rateCurrencies"] == ["USD", "JPY"] or set(ing["rateCurrencies"]) == {"USD", "JPY"}
 recs = ing["records"]
 trades = [r for r in recs if r["kind"] == "trade"]
-# сделки: ACME ×4 (IBKR) + SPLT ×2 + XWLD ×2 + опция ×2 + Broker2 ×3 + крипто 5 + 2 + loss_div 4 — всяка ВЕДНЪЖ въпреки 2023 ×2 и Q4 2023
+# сделки: ACME ×4 (IBKR) + SPLT ×2 + XWLD ×2 + опция ×2 + Broker2 ×3 + крипто 5 + 2 + loss_div 4 + OLDCO ×1 (13.11: сливане с пари = продажба) — всяка ВЕДНЪЖ въпреки 2023 ×2 и Q4 2023
 key = lambda r: (r["account"], r["sym"], r["date"], r["qty"])
-assert len(trades) == len({key(r) for r in trades}) == 4 + 2 + 2 + 2 + 3 + 5 + 2 + 4, (len(trades), sorted({key(r) for r in trades}))
+assert len(trades) == len({key(r) for r in trades}) == 4 + 2 + 2 + 2 + 3 + 5 + 2 + 4 + 1, (len(trades), sorted({key(r) for r in trades}))
 dup = {f["name"]: f["duplicates"] for f in ing["files"]}
-assert sum(dup.values()) == 13 + 1, dup                                     # целият 2023 отчет повторен (13 записа: 6 сделки, 2 дивидента, 2 удържани, 3 лихви) + XWLD продажбата от Q4
+assert sum(dup.values()) == 13 + 1 + 1, dup                                     # целият 2023 отчет повторен (13 записа: 6 сделки, 2 дивидента, 2 удържани, 3 лихви) + XWLD продажбата от Q4
 assert [r["date"] for r in recs] == sorted(r["date"] for r in recs)          # подредба по дата
 acme = [r for r in trades if r["sym"] == "ACME" and r["account"] == "U1111111"]
 assert [(r["date"], r["qty"], r["price"], r["fee"], r["currency"]) for r in acme] == \
@@ -58,11 +58,12 @@ sk = ing["skipped"]
 why = {(s["section"], s["what"]) for s in sk}
 assert ("Trades", "EUR.USD") in why                                         # Forex
 assert ("Fees", "NYSE Market Data") in why
-assert any(s["section"] == "Corporate Actions" and "OLDCO" in s["what"] for s in sk)
+assert not any(s["section"] == "Corporate Actions" for s in sk)            # 13.11.2026: сливането с пари (OLDCO) вече е продажба — не е в „не е сметнато“
+assert [(r["qty"], r["price"]) for r in recs if r["kind"] == "trade" and r["sym"] == "OLDCO"] == [(-10, 50)], [r for r in recs if r.get("sym") == "OLDCO"]
 assert any(s["section"] == "Withholding Tax" and "Interest" in s["what"] for s in sk)  # данък върху лихва — без тикър
 assert not any(s["section"] in ("Mark-to-Market Performance Summary", "Cash Report") for s in sk)   # обобщенията не са сделки
 assert sum(1 for s in sk if (s["section"], s["what"]) == ("Trades", "EUR.USD")) == 1                # и в „не е сметнато“ — веднъж (не за всеки дубликат на файла)
-print(f"  ✓ {len(sk)} реда в „не е сметнато“: Forex, такси извън сделките, сливане (не сплит), данък върху лихва; обобщенията — не")
+print(f"  ✓ {len(sk)} реда в „не е сметнато“: Forex, такси извън сделките, данък върху лихва; обобщенията — не (сливането с пари от 13.11 е продажба)")
 print("── 4. курсове: ЕЦБ (JSON и файл), frankfurter в същата посока, уикенд → предишният ден ──")
 assert run("ecbjson", ["ecb_usd_synthetic.json"]) == [["2024-06-13", 1.0712], ["2024-06-14", 1.0815]]
 assert run("frankfurter", ["frankfurter_usd_synthetic.json"]) == [["2024-06-13", 1.0712], ["2024-06-14", 1.0815]]     # USD за 1 EUR — до 04.11 беше обърнато
@@ -95,7 +96,8 @@ op = [x for x in fifo["realized"] if x["assetClass"] == "option"]
 assert [(x["date"], bool(x.get("premium")), bool(x.get("buyback"))) for x in op] == [("2023-05-02", True, False), ("2023-06-16", False, True)], op
 assert close(op[0]["gainEUR"], 248.95 / 1.08) and close(op[1]["gainEUR"], 0), op
 # продажба без покупка — предупреждение, без резултат
-assert [(u["sym"], u["account"], u["qty"]) for u in fifo["unmatched"]] == [("GHOST", "B2", 3)], fifo["unmatched"]
+# 13.11.2026: + OLDCO — сливането с пари (10 бр. за 500) е продажба, а в синтетичните отчети няма покупка на OLDCO
+assert sorted((u["sym"], u["account"], u["qty"]) for u in fifo["unmatched"]) == [("GHOST", "B2", 3), ("OLDCO", "U1111111", 10)], fifo["unmatched"]
 assert not R("B2", "GHOST", "2023-02-01")
 # крипто: годишнината (01.03.2024 за покупка 01.03.2023) е още в срока; 04.03.2024 — освободено
 c1 = R("crypto-me", "BTC", "2024-03-01")[0]; c2 = R("crypto-me", "BTC", "2024-03-04")[0]
@@ -134,9 +136,9 @@ cred = min(6 / 1.08, 0.15 * dividends)                  # удържани 7.5 �
 assert close(de["withheld"], 6 / 1.08) and close(de["creditable"], cred)
 e = total - 1000
 assert close(de["estimate"]["abgeltung"], (e - 4 * cred) / 4) and close(de["estimate"]["soli"], (e - 4 * cred) / 4 * 0.055)
-assert [u["sym"] for u in de["unmatched"]] == ["GHOST"] and not de["complete"]
+assert sorted(u["sym"] for u in de["unmatched"]) == ["GHOST", "OLDCO"] and not de["complete"]      # 13.11: OLDCO — сливане с пари без покупка в синтетичните отчети
 assert any("USD" in n["text"] for n in de["notes"]) and any("Дебитна лихва" in n["text"] for n in de["notes"])
-print(f"  ✓ числото най-горе {de['headline']:.2f} € = акции {shares:.2f} + ETF {fund:.2f} (след 30%) + опция {option:.2f} + дивиденти {dividends:.2f} + лихви {interest:.2f}; GHOST — непълно")
+print(f"  ✓ числото най-горе {de['headline']:.2f} € = акции {shares:.2f} + ETF {fund:.2f} (след 30%) + опция {option:.2f} + дивиденти {dividends:.2f} + лихви {interest:.2f}; GHOST и OLDCO (сливане с пари) без покупка — непълно")
 
 print("── 9. съвместно и църковен данък (Бавария 8%) ──")
 dj = run("de", list(reversed(ALL)), {"year": 2023, "joint": True})
