@@ -91,6 +91,8 @@
     if (h.includes('date acquired') && h.includes('date sold') && h.includes('cost basis') && h.includes('realised pnl')) return 'revolut_pnl';   // 14.11.2026: „Profit and loss“ на Revolut — РЕАЛЕН формат (заглавният ред е от файл на потребителя)
     if (h.includes('symbol') && h.includes('type') && h.includes('quantity') && h.includes('price') && h.includes('value') && h.includes('fees')) return 'revolut_crypto';
     if (h.includes('type') && h.includes('product') && h.includes('started date') && h.includes('fiat amount')) return 'revolut_crypto_old';
+    // 15.11.2026: „Account statement“ на Revolut за ЕДНА валута (крипто или фиат): Type, Product, Started Date, Completed Date, Description, Amount, Fee, Currency, State, Balance — РЕАЛЕН формат (17 файла на потребителя); само количества
+    if (['type', 'product', 'started date', 'completed date', 'description', 'amount', 'fee', 'currency', 'state', 'balance'].every(c => h.includes(c))) return 'revolut_account';
     return 'unknown';
   };
 
@@ -472,6 +474,7 @@
           res.records.forEach(r => { if (r.kind === 'corp') return; desc.kinds[r.kind] = (desc.kinds[r.kind] || 0) + 1; if (r.kind === 'trade') desc.kinds[r.qty > 0 ? 'buy' : 'sell']++; });   // 13.11: „corp“ (неразрешени редове на корпоративни действия) — не е вид запис за таблицата
           desc.accountMasked = (accts.length ? accts : [(res.info && res.info.account) || '']).map(TC.maskAccount).join(', ');
           desc.sections = res.stats ? res.stats.sections : null;
+          if (res.note) desc.note = res.note;
           desc.problems = TC.fileProblems(desc, res, f.text);
         } else {
           desc.error = 'непознат формат — файлът не е сметнат';
@@ -632,6 +635,7 @@
           ...st.headers.map((h, i) => `Заглавен ред ${i + 1} в отчета (${h.length} колони): ${h.map(c => c === '' ? '(без име)' : c).join(' | ')}`),
           st.records ? `От секцията са прочетени ${st.records} записа — провери ги по отчета.` : `От секцията не е прочетен нито един запис (${st.skipped} реда са в „не е сметнато“).`] }); });
     }
+    if (desc.format === 'revolut_account') { const a = (res.info || {}).accountStatement || {}; return [{ level: 'warn', title: `Revolut — сметка в ${a.currency || '?'}: разпознат файл само с количества, без цени`, lines: [`${a.rows} реда (${Object.entries(a.years || {}).map(([y, o]) => y + ': ' + o.n).join(' · ')}); нищо не е сметнато и годините с редове в този файл са НЕПЪЛНО.`, ((res.skipped || [])[0] || {}).reason || ''] }]; }
     if (desc.kinds.trade > 0) return out;
     const lines = [];
     if (desc.format === 'ibkr') {
@@ -798,6 +802,18 @@
         else skip(`непознат тип „${r['type']}“`, true);
       });
       return { format: 'revolut_crypto', info: { broker: 'Revolut' }, records: recs, skipped };
+    },
+    // 15.11.2026: „Account statement“ на Revolut за една валута — РЕАЛЕН формат. Има само КОЛИЧЕСТВА (Amount, Fee, Balance в валутата на файла); цената в евро липсва (другата страна на всяка размяна
+    // „Exchanged to …“ е в сметката във фиат / другата валута) → продажбите и обмените не могат да се сметнат. Файлът се РАЗПОЗНАВА (не е „непознат формат“), нищо не се смята и се казва какво липсва — за всяка
+    // година, в която има редове (годините без редове не стават НЕПЪЛНО заради него).
+    revolut_account(text, src, owner) {
+      const rows = rowsOf(text), cc = {}, by = {};
+      rows.forEach(({ r }) => { cc[r['currency']] = (cc[r['currency']] || 0) + 1; const dt = TC.parseLooseDate(r['started date'] || r['completed date']), y = dt ? dt.date.slice(0, 4) : '';
+        const o = by[y] = by[y] || { n: 0, exchange: 0, transfer: 0, other: 0 }; o.n++; const t = (r['type'] || '').toUpperCase(); if (t === 'EXCHANGE') o.exchange++; else if (t === 'TRANSFER') o.transfer++; else o.other++; });
+      const coin = Object.entries(cc).sort((a, b) => b[1] - a[1]).map(x => x[0])[0] || '', crypto = !/^(EUR|USD|GBP|BGN|CHF)$/.test(coin);
+      const skipped = Object.entries(by).filter(([y]) => y).map(([y, o]) => ({ src, line: 1, broker: 'Revolut', account: crypto ? 'крипто' : 'фиат', section: 'Revolut', what: `${coin}: ${o.n} ${o.n === 1 ? 'ред' : 'реда'} (обмени ${o.exchange}, прехвърляния ${o.transfer})`, date: `${y}-12-31`, amount: String(o.n), taxable: true,
+        reason: `„Account statement“ на Revolut за ${coin}: само количества, без цена в евро — другата страна на всяка размяна („Exchanged to …“) е в сметката във фиат / в другата валута; продажбите и обмените не могат да се сметнат. Качи отчетите на фиатните сметки (EUR / USD) от същия период или „Crypto account statement“ с цени (колони Symbol, Type, Quantity, Price, Value, Fees, Date).` }));
+      return { format: 'revolut_account', info: { broker: 'Revolut', accountStatement: { currency: coin, crypto, rows: rows.length, years: by } }, records: [], skipped, note: `Revolut ${crypto ? 'крипто' : 'фиат'} сметка (${coin}) — само количества, без цени: нищо не е сметнато` };
     },
     // стар формат на Revolut (Type,Product,Started Date,…) — не се чете; изрично в „не е сметнато“
     revolut_crypto_old(text, src) {
