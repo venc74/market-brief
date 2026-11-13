@@ -1,5 +1,5 @@
 {
- "date": "2026-11-12",
+ "date": "2026-11-13",
  "rows": [],
  "horizon": [
   {
@@ -131,12 +131,44 @@
    "date_human": "Nov 13, 2026"
   },
   {
+   "ticker": "HUBC",
+   "company": "Hub Cyber Security Ltd.",
+   "date": "2026-11-13",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 13, 2026"
+  },
+  {
+   "ticker": "PMCB",
+   "company": "PharmaCyte  Biotech, Inc.",
+   "date": "2026-11-13",
+   "ratio": "1:19",
+   "split_type": "reverse",
+   "date_human": "Nov 13, 2026"
+  },
+  {
    "ticker": "EMBJ",
    "company": "Embraer S.A.",
    "date": "2026-11-16",
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "SENEA",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "SENEB",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026"
   },
   {
    "ticker": "BITO",
@@ -275,6 +307,22 @@
    "date_human": "Nov 20, 2026"
   },
   {
+   "ticker": "VABK",
+   "company": "Virginia National Bankshares Corporation",
+   "date": "2026-11-20",
+   "ratio": "8%",
+   "split_type": null,
+   "date_human": "Nov 20, 2026"
+  },
+  {
+   "ticker": "ITP",
+   "company": "IT Tech Packaging, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
    "ticker": "CBSH",
    "company": "Commerce Bancshares, Inc.",
    "date": "2026-12-01",
@@ -294,16 +342,17 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 36,
+  "source_rows": 42,
   "horizon_from": "2026-11-09",
   "horizon_to": "2026-12-02",
-  "in_week": 16,
+  "in_week": 18,
   "dropped_price": [
    "ARAY",
    "ADGM",
    "ALPS",
    "CISS",
    "NXTS",
+   "SMX",
    "STKH",
    "WCT",
    "JOB",
@@ -312,11 +361,12 @@
    "GOVX",
    "SLXN",
    "ARAI",
-   "COSM"
+   "COSM",
+   "HUBC",
+   "PMCB"
   ],
   "dropped_cap": [
-   "MMT",
-   "SMX"
+   "MMT"
   ],
   "dropped_no_data": [],
   "passed": 0,
