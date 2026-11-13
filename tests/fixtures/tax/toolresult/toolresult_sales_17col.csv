@@ -1,0 +1,4 @@
+﻿"Fiscal Year",Category,Ticker,"Acquisition Date","Realization Date","Value Acquisition (original)","Value Acquisition (EUR)","Value Realization (original)","Value Realization (EUR)",Fees,"FX Rate Buy","FX Rate Sell","Original Currency","Your Currency",Country,Broker,Notes
+2019,Stocks,ZZZA,2019-03-14,2019-08-21,"1,000.00 USD","941.18","1,100.00 USD","1,035.29",1.00,1.0625,1.0625,USD,EUR,US,ibkr,
+2020,Stocks,ZZZA,2019-08-21,2020-02-12,"1,100.00 USD","1,035.29","1,300.00 USD","1,200.00",1.00,1.0625,1.0833,USD,EUR,US,ibkr,
+2021,Stocks,USZ000009990,2020-02-12,2021-04-07,"500.00 USD","468.00","450.00 USD","415.00",1.00,1.0680,1.0843,USD,EUR,US,ibkr,

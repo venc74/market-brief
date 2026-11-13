@@ -86,8 +86,9 @@ ca = IB("Corporate Actions,Header,Asset Category,Currency,Report Date,Date/Time,
         "Corporate Actions,Data,Stocks,USD,2024-05-02,\"2024-05-01, 20:25:00\",\"TGT(US1234567890) Merged(Acquisition) FOR USD 50.00 PER SHARE (TGT, TARGET CO, US1234567890)\",-100,5000,0,1000,",
         "Trades,Data,Order,Forex,USD,EUR.USD,\"2024-03-01, 10:00:00\",1000,1.08,1.08,-1080,0,0,0,0,")
 d = scenario([{"name": "ca.csv", "text": ca}], years=[2024])["de"][2024]
-assert [x["section"] for x in d["skippedTaxable"]] == ["Corporate Actions"] and not d["complete"], d["skippedTaxable"]   # Forex — в списъка, но не прави годината непълна
-print("  ✓ размяна BTC → ETH (2024) и сливане с пари (2024) → НЕПЪЛНО за 2024; 2023 — пълна; Forex не брои")
+# 13.11.2026: сливането с пари (TGT, 100 бр. за 5 000) е продажба — вече не е „облагаем ред в не е сметнато“; тук няма покупка → „липсва покупка“ (НЕПЪЛНО); Forex не прави годината непълна
+assert d["skippedTaxable"] == [] and [(u["sym"], u["qty"]) for u in d["unmatched"]] == [("TGT", 100)] and not d["complete"], (d["skippedTaxable"], d["unmatched"])
+print("  ✓ размяна BTC → ETH (2024) → НЕПЪЛНО за 2024; 2023 — пълна; сливане с пари (2024) е продажба (тук без покупка → „липсва покупка“); Forex не брои")
 
 # ── 8. сплит в Revolut чрез стандартен CSV; Mutual Funds — фонд ──
 print("── 8. сплит в Revolut; Mutual Funds ──")
@@ -133,7 +134,9 @@ fees = IB("Fees,Header,Subtitle,Currency,Date,Description,Amount", "Fees,Data,Ot
           "Transfers,Data,Stocks,USD,AAPL,2024-03-01,ACATS,In,X,10", "Transfers,Data,Stocks,USD,AAPL,2024-03-01,ACATS,In,Y,5",
           "Deposits & Withdrawals,Header,Currency,Settle Date,Description,Amount", "Deposits & Withdrawals,Data,EUR,2024-01-05,Cash Transfer,1000")
 r = scenario([{"name": "a.csv", "text": fees}, {"name": "b.csv", "text": fees}])
-assert sorted((x["section"], x["amount"]) for x in r["skipped"]) == [("Fees", "-10"), ("Fees", "-10"), ("Transfers", "10"), ("Transfers", "5")], r["skipped"]   # без Total и вноската; повторен файл — веднъж
+assert sorted((x["section"], x["amount"]) for x in r["skipped"]) == [("Fees", "-10"), ("Fees", "-10")], r["skipped"]   # без Total и вноската; повторен файл — веднъж
+# 13.11.2026: Transfers вече са записи (kind xfer), не „не е сметнато“; повторният файл — пак веднъж
+assert sorted((x["kind"], x["qty"]) for x in r["records"] if x["kind"] == "xfer") == [("xfer", 5), ("xfer", 10)], [x for x in r["records"] if x["kind"] == "xfer"]
 sc = "type;asset_type;ticker;date;quantity;price;currency;fee;broker;account\nbuy;crypto;BTC;2024-01-10;0,125;40.000,50;EUR;1,5;B;A\nsell;crypto;BTC;2024-05-10;0,125;48.000,50;EUR;0;B;A\n"
 r = scenario([{"name": "de.csv", "text": sc}], years=[2024])
 assert [(x["qty"], x["price"], x["fee"]) for x in r["records"]] == [(0.125, 40000.5, 1.5), (-0.125, 48000.5, 0)], r["records"]

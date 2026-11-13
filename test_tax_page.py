@@ -32,7 +32,9 @@ print("── 1. числото най-горе по всички пътища �
 for k in ("withEcbFile", "site", "ecbApi", "ecbRetry", "frankfurter"):
     s = d[k]
     assert abs(s["headline"] - total23) < 1e-6 and s["big"].replace("\u202f", " ") == "2 178.57 €", (k, s["headline"], s["big"])
-    assert s["unmatched"] == ["GHOST"] and "Липсва покупката: за GHOST" in s["warnings"] and not s["errors"] and not s["bgVisible"], k
+    # 12.11.2026: продажбата без покупка — на отделен ред с броя и датата (до 12.11: „Липсва покупката: за GHOST (…)“ в един ред)
+    assert s["unmatched"] == ["GHOST"] and "липсва покупка за GHOST (продадени 3 бр. на 01.02.2023; Broker2 B2) — качи отчета от годината на покупката" in s["warnings"], (k, s["warnings"][:400])
+    assert "Липсващи покупки: 1 — 2023 е НЕПЪЛНО" in s["warnings"] and not s["errors"] and not s["bgVisible"], k
 print(f"  ✓ 2023: {total23:.2f} € — качен файл на ЕЦБ, файлът до страницата, ЕЦБ API, ЕЦБ API с повторен опит, frankfurter.dev (синтетични отговори); GHOST — „липсва покупката“")
 
 print("── 2. мрежата и откъде са курсовете (05.11.2026) ──")
