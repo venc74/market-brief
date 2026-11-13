@@ -56,6 +56,18 @@ function renderFiles() {
   loadCarry();
 }
 
+// 15.11.2026: „Какво попълваш в декларацията“ — сумите на избраната година по полетата на формуляра (търсиш ПОЛЕТО по немския му текст; номерът на реда е само подсказка „провери“); без пренасяне от други години
+function renderDeclaration(de) {
+  const d = TC.declaration(de, TC.rateLookup(S.rates));
+  $('declTitle').textContent = `Какво попълваш в декларацията за ${d.year}`;
+  const warn = d.complete ? '' : `<div class="msg err"><b>${d.year} е НЕПЪЛНО — сумите по-долу са междинни; не ги подавай, докато не са изяснени предупрежденията по-горе.</b></div>`;
+  const rows = d.rows.map(r => `<tr${r.kind === 'part' ? ' style="background:rgba(127,127,127,.06)"' : ''}><td style="min-width:240px">${r.kind === 'part' ? '<span class="small">от тях · </span>' : ''}<b>${esc(r.field)}</b>${r.hint ? ` <span class="small">${esc(r.hint)}</span>` : ''}
+      <div class="small">${esc(r.form)} — ${esc(r.bg)}</div></td><td class="n ${r.signed ? cls(r.eur) : ''}"><b>${fmt(r.eur)}</b></td><td class="small" style="min-width:260px">${esc(r.why)}</td></tr>`).join('');
+  const info = d.info.map(i => `<div class="msg ${i.level === 'warn' ? 'warn' : 'info'} small"><b>${esc(i.title)}.</b> ${esc(i.text)}</div>`).join('');
+  $('declBody').innerHTML = warn + `<div class="small" style="margin-bottom:6px">Само чуждестранни брокери без германски данък (IBKR Ireland, Revolut). Сумите са на самата година — без пренасяне от други години. Търси полето по немския текст; номерът на реда е само подсказка. Ориентировъчно — не е данъчна консултация.</div>
+    <div class="scroll"><table><tr><th>Какво търсиш в ELSTER (поле)</th><th class="n">Сума, €</th><th>Защо</th></tr>${rows}</table></div>
+    <div class="msg ${d.control.ok ? 'info' : 'err'} small"><b>${esc(d.control.text)}</b></div>` + info + d.notes.map(n => `<div class="msg info small">${esc(n)}</div>`).join('') + (d.lossLine ? `<div class="msg warn small"><b>${esc(d.lossLine)}</b></div>` : '');
+}
 // 14.11.2026: таблицата „По години“ — всяка година самостоятелно, БЕЗ пренасяне (пренесеното от потребителя не влиза); загубите — с ясен ред какво да се декларира
 function renderYears(st) {
   const rows = TC.yearsTable(S.fifo, { ...st, carriedShareLoss: 0, carriedOtherLoss: 0 });
@@ -213,6 +225,7 @@ function render() {
     (de.otherCarry ? `<tr><td>Друга загуба за пренасяне</td><td class="n neg">${fmt(-de.otherCarry)}</td><td class="small">Anlage KAP — загуби без загубите от акции</td></tr>` : '') +
     `<tr><td>${esc(L.withholding.bg)} <div class="small">удържани ${fmt(de.withheld)}</div></td><td class="n">${fmt(de.creditable)}</td><td class="small">${esc(L.withholding.form)}</td></tr>` +
     de.crypto.map(c => `<tr><td>${esc(L.crypto.bg)}${st.joint ? ' — ' + (c.person === 'B' ? 'съпруг/а' : 'аз') : ''}<div class="small">облагаеми ${fmt(c.taxable)} · над година (освободени) ${fmt(c.exempt)} · Freigrenze ${fmt(c.freigrenze)} на човек</div></td><td class="n ${cls(c.result)}">${fmt(c.result)}</td><td class="small">${esc(L.crypto.form)}</td></tr>`).join('');
+  renderDeclaration(de);
   renderYears(st);
   renderFunds(de); renderPersons(st);
   // продажби и доходи за годината

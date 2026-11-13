@@ -6,6 +6,15 @@
 липсва (другата страна на размяната е в сметката във фиат / другата валута). Преди: „непознат формат“ ×17. Сега: формат `revolut_account` — разпознат, нищо не се смята, по един ред „не е сметнато“ (облагаемо) на валута и година с редове (`date` = 31.12. на годината), предупреждение във файла; НЕПЪЛНО са само годините с редове.
 Фикстура: `tests/fixtures/tax/revolut_real/revolut_crypto_account_real_format.csv` (заглавие — реално, редове — измислени); тест `test_tax_revolut_account.py`. За реално смятане на крипто (§23 EStG) са нужни отчетите на фиатните сметки (EUR / USD) или „Crypto account statement“ с цени.
 
+## 15.11.2026 — блок „Какво попълваш в декларацията“ (клон `tax-declaration-block`, първо за 2025)
+
+Спецификация в репото НЯМА; по указание на потребителя: за ВСЯКО поле — точният немски текст (какво търсиш в ELSTER) + кратко обяснение на български, номерът на реда само подсказка „(в бланката за 2025: Zeile N — провери)“; колона „Защо“ с формулата с думи и числа; Zeile 20 / 22 / 23 са „от тях“ (вече в 19);
+контролен ред (Zeile 19 = печалби акции − загуби акции + други доходи − други загуби, съвпада с разбивката ✓); информативни редове — Sparer-Pauschbetrag (не се пише, прилага го Finanzamt: 1 000 € / 2 000 € при съвместно) и „как ще го сметне Finanzamt“ (загуба от акции се пренася, дивиденти / лихви — отделно, приблизителен данък);
+„Удържан данък върху лихви“ (редове „Withholding @ 20% on Credit Interest“ без тикър) — НЕ се слага тихо: показва се с „провери“. `TC.declaration(de, rate)`, `#declCard`; тест `test_tax_declaration.py`.
+**Полетата (Anlage KAP 2025, Stand 10.2025, по smartsteuer.de — ВТОРИЧЕН източник; сравни с ELSTER):** Z.19 „Ausländische Kapitalerträge (ohne Beträge laut den Zeilen 26a und 52)“, Z.20 „In den Zeilen 18 und 19 enthaltene Gewinne aus Aktienveräußerungen i. S. d. § 20 Abs. 2 Satz 1 Nr. 1 EStG“, Z.22 „…Verluste ohne Verluste aus der Veräußerung von Aktien“,
+Z.23 „…Verluste aus der Veräußerung von Aktien“, Z.41 „Anrechenbare noch nicht angerechnete ausländische Steuern“. **20% върху лихви:** ирландски данък при източника (IBKR Ireland по изискване на Irish Revenue, върху лихви по неинвестирани пари; не върху SYEP / облигации); основанието в закона и германската ставка по DBA НЕ са потвърдени (LYNX / CapTrader — вторични; страниците на IBKR дават 403);
+възстановяване: Form 8-3-6 (напред) или IC7 с R185 (назад, до 4 години след края на годината) — не е ясно дали и колко се зачита в Германия → „провери“, не е в Zeile 41.
+
 ## 15.11.2026 — слято в main; старият калкулатор е махнат
 
 `tax-real-fix` е слят в `main` (merge commit). Редовете `Claude-Session:` са махнати от съобщенията на commit-ите с `git filter-branch --msg-filter` върху КОПИЕ на клона (`tax-merge-clean`; дърветата са еднакви) — `origin/tax-real-fix` пази оригиналите.
