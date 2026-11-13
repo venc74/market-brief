@@ -12,8 +12,9 @@ if (step === 'scenario') {
   const de = {}; (sc.years || []).forEach(y => { de[y] = TC.computeDE(res, { ...st, year: y, records: ing.records, info: ing.info, warnings: ing.warnings, skipped: ing.skipped, corpEvents: ing.corpEvents }); });
   // 12.11.2026: резюмето „Прочетени: …“ и причината за 0 — по години
   const summary = {}, whyZero = {}; (sc.years || []).forEach(y => { summary[y] = TC.summary(ing, res, y); whyZero[y] = TC.whyZero(de[y], summary[y]); });
+  const decl = {}; Object.keys(de).forEach(y => { decl[y] = TC.declaration(de[y]); });   // 15.11.2026: „Какво попълваш в декларацията“
   const yearsTable = TC.yearsTable(res, { ...st, records: ing.records, info: ing.info, warnings: ing.warnings, skipped: ing.skipped, corpEvents: ing.corpEvents });   // 14.11.2026: по години, БЕЗ пренасяне
-  process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de, summary, whyZero, yearsTable, masked: (sc.mask || []).map(TC.maskAccount) }), () => process.exit(0));   // 13.11.2026: излизане СЛЕД записа — при изход над ~64 KB (истинският формат, 4 отчета) process.exit режеше JSON-а в тръбата
+  process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de, summary, whyZero, yearsTable, decl, masked: (sc.mask || []).map(TC.maskAccount) }), () => process.exit(0));   // 13.11.2026: излизане СЛЕД записа — при изход над ~64 KB (истинският формат, 4 отчета) process.exit режеше JSON-а в тръбата
   return;                                                                                // (модулът е CommonJS — return спира останалите стъпки; излизането идва от обратното повикване)
 }
 const settings = cfg ? JSON.parse(cfg) : {};

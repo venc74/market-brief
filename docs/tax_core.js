@@ -1415,6 +1415,35 @@
     };
   };
 
+  // 15.11.2026: „Какво попълваш в декларацията“ — сумите на годината (БЕЗ пренасяне от други години) по редовете на формуляра. Номерата на редовете са проверени САМО за 2025 (Anlage KAP 2025: Zeile 19 ausländische
+  // Kapitalerträge, 20 Gewinne aus Aktienveräußerungen, 22 Verluste ohne Aktienverluste, 23 Aktienverluste, 41 noch nicht angerechnete ausländische Steuer — по smartsteuer.de, VZ 2025; ВТОРИЧЕН източник — да се сравни
+  // с официалния формуляр в ELSTER); за другите години сумите са без номера на редове. Само за чуждестранни брокери БЕЗ германски данък (IBKR Ireland, Revolut): всичко е в Zeile 19, с „от тях“ в 20 / 22 / 23.
+  // Z.19 е САЛДОТО на всички чуждестранни доходи без фондовете (печалби − загуби от акции + дивиденти + лихви + опции + плащания вместо дивидент − други загуби) и може да е отрицателно; 20 / 22 / 23 са „включените“ части.
+  TC.DECL_LINES = { 2025: { z19: 19, z20: 20, z22: 22, z23: 23, z41: 41, source: 'formular Anlage KAP 2025 (номерата — по smartsteuer.de, VZ 2025; провери в ELSTER)' } };
+  TC.declaration = function (de) {
+    const L = TC.DECL_LINES[de.year] || null, z = k => (L ? L[k] : null);
+    const sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
+    const shareG = sum('shareGains'), shareL = -sum('shareLosses'), div = sum('dividends'), intr = sum('interest'), pil = sum('pil'), opt = sum('options'), optL = -sum('optionLosses'), othN = -sum('otherNeg');
+    const z20 = shareG, z23 = shareL, z22 = optL + othN, z19 = shareG - shareL + div + intr + pil + opt - optL - othN;
+    const funds = gross('funds') + gross('fundLosses'), hasFunds = de.items.some(i => i.cat === 'funds' || i.cat === 'fundLosses');
+    const rows = [
+      { form: 'Anlage KAP', zeile: z('z19'), label: 'Ausländische Kapitalerträge — салдо на всички чуждестранни доходи от капитал без фондовете', eur: z19, signed: true,
+        note: `печалби ${TC.fmt(shareG)} − загуби ${TC.fmt(shareL)} от акции + дивиденти ${TC.fmt(div)} + лихви ${TC.fmt(intr)}${opt || pil ? ` + опции / плащания вместо дивидент ${TC.fmt(opt + pil)}` : ''} − други загуби ${TC.fmt(z22)}; може да е отрицателно` },
+      { form: 'Anlage KAP', zeile: z('z20'), label: 'В Zeile 19 включени Gewinne aus Aktienveräußerungen', eur: z20, note: 'сбор на печалбите по продажбите на акции (всяка продажба поотделно; без загубите)' },
+      { form: 'Anlage KAP', zeile: z('z22'), label: 'В Zeile 19 включени Verluste ohne Aktienverluste', eur: z22, note: 'други загуби: опции, отрицателни дивиденти (сторно) и др.; като положително число' },
+      { form: 'Anlage KAP', zeile: z('z23'), label: 'В Zeile 19 включени Aktienverluste', eur: z23, note: 'сбор на загубите по продажбите на акции; като положително число — Finanzamt ги прихваща само срещу печалби от акции и пренася остатъка' },
+      { form: 'Anlage KAP', zeile: z('z41'), label: 'Noch nicht angerechnete ausländische Steuer', eur: de.creditable, note: `удържан чужд данък по дивиденти ${TC.fmt(de.withheld)}, зачитан до 15% от дивидента (и до германския данък по него); нужно е доказателство (Nachweis)${de.withheld - de.creditable > 0.004 ? '; над тавана — ' + TC.fmt(de.withheld - de.creditable) + ' не се зачита' : ''}` },
+    ];
+    if (hasFunds) rows.push({ form: 'Anlage KAP-INV', zeile: null, label: 'Фондове (ETF) — доходи и печалби по вид фонд, ПРЕДИ частичното освобождаване', eur: funds, signed: true, note: 'Finanzamt прилага освобождаването (Teilfreistellung); сумите по вид фонд — в таблицата с фондовете' });
+    (de.crypto || []).forEach(c => rows.push({ form: 'Anlage SO', zeile: null, label: `Частни продажби на крипто (§23 EStG)${c.person === 'B' ? ' — съпруг/а' : ''}`, eur: c.result, signed: true, note: `облагаеми ${TC.fmt(c.taxable)}; Freigrenze ${TC.fmt(c.freigrenze)} на човек` }));
+    const notes = [];
+    if (!L) notes.push(`Номерата на редовете са проверени САМО за 2025 — за ${de.year} сумите са без номера на редове; сравни с формуляра за ${de.year}.`);
+    else notes.push(`Източник на номерата: ${L.source}. Zeile 21 е премахната. Zeile 18 е за доходи със германско данъчно удържане; при чуждестранен брокер без германски данък (IBKR Ireland, Revolut) всичко е в Zeile 19.`);
+    if (z23 > 0.004 || z22 > 0.004) notes.push('Загубата не се „пренася“ от калкулатора: декларираш я в годината, в която е възникнала (Zeile 22 / 23), а Finanzamt я установява с решение (Verlustfeststellungsbescheid) и сам я взема от последното решение при следващата година — Verlustvortrag не се въвежда в Anlage KAP.');
+    notes.push('Sparer-Pauschbetrag (1 000 € / 2 000 € при съвместно подаване) прилага Finanzamt — при чуждестранен брокер нямаш Freistellungsauftrag; не се пише като сума в тези редове.');
+    return { year: de.year, verified: !!L, complete: de.complete, rows, notes, z19, z20, z22, z23, z41: de.creditable, funds: hasFunds ? funds : null, lossLine: de.lossLine || '' };
+  };
+
   // 14.11.2026: таблица по години БЕЗ пренасяне на загуби — всяка година се смята самостоятелно (пренесеното е само каквото потребителят е въвел от решение на Finanzamt, и то не влиза тук).
   // base — настройките както за computeDE (records, info, skipped, manual, …); годината и пренесените загуби се презаписват. → [{year, shareGains, shareLosses, shareNet, shareLossOwn, otherPos, otherNeg, otherLossOwn, dividends, interest, total, headline, complete, lossLine}]
   TC.yearsTable = function (fifoRes, base) {
