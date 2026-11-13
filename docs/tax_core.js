@@ -1384,13 +1384,28 @@
     (fifoRes.pending || []).filter(pn => !pn.filled && pn.kind !== 'start' && pn.date.startsWith(String(year)) && !unknownSales.some(x => x.unknownLots.some(u => u.key === pn.key)))
       .forEach(pn => notes.push({ level: 'warn', text: `${pn.sym}: ${pn.qty} бр. прехвърлени от друг брокер на ${TC.dmy(pn.date)} — въведи покупна цена и дата (таблица „Липсва покупна цена“); до тогава продажбите им нямат резултат.` }));
     const missing = (fifoRes.missingRates || []).filter(m => m.date.startsWith(String(year)) || (R.some(x => x.gainEUR == null && x.sym === m.sym)));
+    // 14.11.2026: СОБСТВЕНАТА загуба на годината (без пренесената): загуби от акции > печалби от акции; „други“ — други загуби над другите доходи (и над нетната печалба от акции, срещу която могат да се прихванат).
+    // Никога тихо и никога „0“: ясен ред с двете суми и какво да се направи, за да се пренесе (Anlage KAP; Finanzamt я установява с Verlustfeststellungsbescheid).
+    const afterShare = shareGains - shareLosses, shareLossOwn = afterShare < 0 ? -afterShare : 0, otherNetOwn = otherPos - otherNeg + Math.max(0, afterShare), otherLossOwn = otherNetOwn < 0 ? -otherNetOwn : 0;
+    const complete0 = !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length && !oldRules.length && !unreadFiles.length && !skippedUndated.length && !unknownSales.length;
+    const lossLine = (shareLossOwn > 0.004 || otherLossOwn > 0.004)
+      ? `Загуба от акции ${TC.fmt(shareLossOwn)} / други загуби ${TC.fmt(otherLossOwn)} — декларирай я в Anlage KAP за ${year}, за да се пренесе (Finanzamt я установява с Verlustfeststellungsbescheid; иначе се губи).${complete0 ? '' : ' Годината е НЕПЪЛНО — сумите може да се променят.'}` : '';
     return {
-      year, params: par, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
+      year, params: par, lossLine, shareLossOwn, otherLossOwn, headline: total > 0 ? total : -(shareCarry + otherCarry), total, shareGains, shareLosses, shareNet, shareCarry, otherPos, otherNeg, otherCarry,
       carriedShareLoss: cS, carriedOtherLoss: cO, withheld, creditable, items, crypto: Object.values(persons).sort((a, b) => a.person.localeCompare(b.person)),
       estimate: est, notes, unmatched, missingRates: missing, funds: fundsSeen, heldFunds,
-      complete: !unmatched.length && !missing.length && !taintedSales.length && !mism.length && !skippedTaxable.length && !oldRules.length && !unreadFiles.length && !skippedUndated.length && !unknownSales.length,
+      complete: complete0,
       pending: fifoRes.pending || [], controlLog: fifoRes.controlLog || [], reconcile: mism, skippedTaxable, unreadFiles, skippedUndated,
     };
+  };
+
+  // 14.11.2026: таблица по години БЕЗ пренасяне на загуби — всяка година се смята самостоятелно (пренесеното е само каквото потребителят е въвел от решение на Finanzamt, и то не влиза тук).
+  // base — настройките както за computeDE (records, info, skipped, manual, …); годината и пренесените загуби се презаписват. → [{year, shareGains, shareLosses, shareNet, shareLossOwn, otherPos, otherNeg, otherLossOwn, dividends, interest, total, headline, complete, lossLine}]
+  TC.yearsTable = function (fifoRes, base) {
+    const years = [...new Set([...(base.records || []).map(r => Number(String(r.date).slice(0, 4))), ...fifoRes.realized.map(x => x.year), ...fifoRes.incomes.map(x => x.year)])].filter(y => y > 1990).sort((a, b) => a - b);
+    return years.map(y => { const d = TC.computeDE(fifoRes, { ...base, year: y, carriedShareLoss: 0, carriedOtherLoss: 0 }), sum = c => d.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0);
+      return { year: y, shareGains: d.shareGains, shareLosses: d.shareLosses, shareNet: d.shareGains - d.shareLosses, shareLossOwn: d.shareLossOwn, otherPos: d.otherPos, otherNeg: d.otherNeg, otherLossOwn: d.otherLossOwn,
+               dividends: sum('dividends'), interest: sum('interest'), total: d.total, headline: d.headline, complete: d.complete, lossLine: d.lossLine, withheld: d.withheld }; });
   };
 
   // ─── България (изключена в страницата — SHOW_BG = false; кодът остава от старата версия, само върху новите записи) ─────────────────────

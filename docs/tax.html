@@ -72,10 +72,15 @@ details summary{cursor:pointer;color:var(--muted);margin:6px 0}
     <div id="warnings"></div>
     <div id="manualBox"></div>
     <div class="card"><h2>Разбивка — откъде е числото</h2><div class="scroll"><table id="breakdown"></table></div></div>
+    <div class="card" id="yearsCard"><h2>По години — всяка година самостоятелно, БЕЗ пренасяне на загуби</h2>
+      <div class="small">Печалбите и загубите от акции са отделно от „другите“ доходи (дивиденти, лихви, опции, фондове): загубите от акции се прихващат само срещу печалби от акции. Годината със загуба показва какво да се декларира в Anlage KAP, за да се пренесе.</div>
+      <div class="scroll"><table id="yearsTable"></table></div></div>
     <div class="card"><h2>Настройки</h2>
+      <div class="small" id="carryHelp" style="margin:0 0 8px">Калкулаторът <b>не пренася загуби от година в година</b> — всяка година се смята самостоятелно (виж таблицата „По години“ по-горе). Единственото пренасяне е това, което въведеш тук за избраната година:
+        <b>verbleibender Verlustvortrag към 01.01.<span id="carryYear"></span></b> от последното решение на Finanzamt. <b>Въведи само ако е признат с решение (Verlustfeststellungsbescheid)</b>; иначе остави 0. Стойностите се пазят само в браузъра, по години.</div>
       <div class="row">
-        <label class="f">Пренесена загуба от акции, €<input type="number" id="carryS" min="0" step="0.01" value="0"></label>
-        <label class="f">Пренесена друга загуба, €<input type="number" id="carryO" min="0" step="0.01" value="0"></label>
+        <label class="f">Verlustvortrag: загуби от акции, €<input type="number" id="carryS" min="0" step="0.01" value="0"></label>
+        <label class="f">Verlustvortrag: други загуби, €<input type="number" id="carryO" min="0" step="0.01" value="0"></label>
         <label class="f">Зачитане на чужд данък до, % от дивидента<input type="number" id="credit" min="0" max="100" step="1" value="15"></label>
         <label class="f">Ред на прихващане*<select id="offsetOrder"><option value="carriedShareFirst">пренесената загуба от акции — първо</option><option value="currentFirst">загубите от годината — първо</option></select></label>
         <label class="f">Таван на чуждия данък*<select id="creditPerItem"><option value="1">% от дивидента и до германския данък по него</option><option value="0">само % от дивидента</option></select></label>
