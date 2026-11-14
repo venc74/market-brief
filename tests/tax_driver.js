@@ -2,6 +2,7 @@
 // Употреба: node tests/tax_driver.js <стъпка> '<json с настройките>' файл1 файл2 …   → JSON на stdout
 const fs = require('fs'), path = require('path');
 const TC = require(path.join(__dirname, '..', 'docs', 'tax_core.js'));
+require(path.join(__dirname, '..', 'docs', 'tax_report.js'));                          // 13.11.2026: отчетът за Finanzamt (разширява TaxCore)
 const [, , step, cfg, ...names] = process.argv;
 // 05.11.2026: стъпка scenario — СИНТЕТИЧНИ файлове като JSON на stdin {files: [{name, text, owner}], years: [..], settings: {..}} → ingest + fifo + computeDE по години
 if (step === 'scenario') {
@@ -13,8 +14,13 @@ if (step === 'scenario') {
   // 12.11.2026: резюмето „Прочетени: …“ и причината за 0 — по години
   const summary = {}, whyZero = {}; (sc.years || []).forEach(y => { summary[y] = TC.summary(ing, res, y); whyZero[y] = TC.whyZero(de[y], summary[y]); });
   const decl = {}; Object.keys(de).forEach(y => { decl[y] = TC.declaration(de[y], TC.rateLookup(ing.rates)); });   // 15.11.2026: „Какво попълваш в декларацията“
+  // 13.11.2026: отчетът за Finanzamt (немски) — само при sc.report: модел + HTML по години, със същите настройки като de (sc.now — фиксирана дата за теста)
+  const report = {}; if (sc.report) (sc.years || []).forEach(y => { const stY = { ...st, year: y, records: ing.records, info: ing.info, warnings: ing.warnings, skipped: ing.skipped, corpEvents: ing.corpEvents };
+    const m = TC.reportModel({ de: de[y], fifo: res, ing, st: stY, rates: ing.rates, name: sc.name || '', now: sc.now || '2026-01-02', rateSource: sc.rateSource || '', manual: st.manual });
+    report[y] = { model: m, html: TC.reportHTML(m) }; });
+  const groups = {}; (sc.years || []).forEach(y => { groups[y] = TC.skippedGroups(ing.skipped, { year: y, rate: TC.rateLookup(ing.rates), acked: x => !!(x.ackKey && st.manual && st.manual[x.ackKey] && st.manual[x.ackKey].ack) }); });
   const yearsTable = TC.yearsTable(res, { ...st, records: ing.records, info: ing.info, warnings: ing.warnings, skipped: ing.skipped, corpEvents: ing.corpEvents });   // 14.11.2026: по години, БЕЗ пренасяне
-  process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de, summary, whyZero, yearsTable, decl, masked: (sc.mask || []).map(TC.maskAccount) }), () => process.exit(0));   // 13.11.2026: излизане СЛЕД записа — при изход над ~64 KB (истинският формат, 4 отчета) process.exit режеше JSON-а в тръбата
+  process.stdout.write(JSON.stringify({ files: ing.files, warnings: ing.warnings, skipped: ing.skipped, records: ing.records, fifo: res, de, summary, whyZero, yearsTable, decl, report, groups, masked: (sc.mask || []).map(TC.maskAccount) }), () => process.exit(0));   // 13.11.2026: излизане СЛЕД записа — при изход над ~64 KB (истинският формат, 4 отчета) process.exit режеше JSON-а в тръбата
   return;                                                                                // (модулът е CommonJS — return спира останалите стъпки; излизането идва от обратното повикване)
 }
 const settings = cfg ? JSON.parse(cfg) : {};

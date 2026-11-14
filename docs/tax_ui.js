@@ -37,7 +37,7 @@ function renderFiles() {
       <td class="mono" data-acc style="white-space:nowrap">${esc(f.accountMasked || (blank ? '' : '—'))}</td>
       <td class="n ${!blank && !k.trade ? 'neg' : ''}">${blank ? '' : `${k.trade || 0}<div class="small" style="white-space:nowrap">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
       <td class="n ${f.skipped ? 'yel' : ''}">${n(f.skipped)}</td><td class="n">${f.duplicates || ''}</td>
-      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.note || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
+      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.note || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : k.yield ? `CYEP / SYEP доход: ${k.yield}` : ''))}</td></tr>` +
       (f.sections ? `<tr><td></td><td colspan="11">${secTable(f)}</td></tr>` : ''); }).join('');
   // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
   $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => p.level === 'warn'
@@ -86,20 +86,33 @@ function saveCarry() { try { const st = carryStore(); st[$('year').value] = { s:
 function renderSummary() {
   if (!S.ing) { $('summary').innerHTML = ''; return; }
   const y = Number($('year').value), s = S.sum = TC.summary(S.ing, S.fifo, y), a = s.all, r = s.year;
-  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${pl(a.buys, 'покупка', 'покупки')}, ${pl(a.sells, 'продажба', 'продажби')}), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
-    не са сметнати: <b class="${a.skipped ? 'yel' : ''}">${a.skipped}</b>${a.skipped ? ' (виж списъка)' : ''}; липсващи покупки: <b class="${a.unmatched ? 'neg' : ''}">${a.unmatched}</b>.
+  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${pl(a.buys, 'покупка', 'покупки')}, ${pl(a.sells, 'продажба', 'продажби')}), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.yields ? `, ${pl(a.yields, 'ред CYEP / SYEP', 'реда CYEP / SYEP')}` : ''}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
+    не са сметнати: <b class="${a.skipped ? 'yel' : ''}">${a.skipped}</b>${a.skipped ? ` — от тях липсващи данни: <b class="${a.skippedTaxable ? 'neg' : ''}">${a.skippedTaxable}</b>, изключено по закон / информативно: ${a.skippedInfo} (виж списъка)` : ''}; липсващи покупки: <b class="${a.unmatched ? 'neg' : ''}">${a.unmatched}</b>.
     <div style="margin-top:4px" class="${s.empty ? 'neg' : 'small'}">${s.empty ? `<b>За ${y} няма нито един запис в качените файлове</b>${s.years.length ? ` — данните са за ${s.years.join(', ')}. Смени годината горе.` : '.'}`
-      : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${pl(r.buys, 'покупка', 'покупки')}, ${pl(r.sells, 'продажба', 'продажби')})${S.fifo ? `, продажби с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
+      : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${pl(r.buys, 'покупка', 'покупки')}, ${pl(r.sells, 'продажба', 'продажби')})${S.fifo ? `, продажби с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}${r.skippedInfo ? ` · изключено по закон / информативно: ${r.skippedInfo}` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
 }
 // списъкът „не е сметнато“ — всеки ред с причината и датата; редовете от избраната година са най-отгоре
+// 13.11.2026: „Не е сметнато“ на групи (TC.skippedGroups). ЧЕРВЕНО и единственото, което прави годината НЕПЪЛНО — „липсващи данни“ (облагаемо или нечетимо);
+// „изключено по закон“ (такси — § 20 ал. 9 EStG) и редовете без данъчно значение — информация, обобщено по вид (брой + сума + основание); „за проверка“ (Forex, данък върху лихви) — не е в числото, но не е „по закон“ и не прави годината НЕПЪЛНО.
+const skHead = '<tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>';
+const skRows = list => list.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${s.taxable ? '<b class="neg">може да е облагаем</b> · ' : ''}${esc(s.reason)}</td></tr>`).join('');
+const amt = (v, c) => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ${esc(c)}`;
+function skippedKindsHtml(kinds, y) {
+  return `<table><tr><th>Вид</th><th class="n">Брой за ${esc(y)}</th><th class="n">Сума за ${esc(y)}</th><th>Основание</th></tr>` + kinds.map(k => {
+    const tot = Object.entries(k.year.totals).map(([c, v]) => amt(v, c)).join(' + ');
+    const byY = k.kind === 'fx' ? `<div class="small" style="margin-top:4px"><b class="yel">валутна обмяна — възможна облагаема частна продажба по § 23 EStG (Fremdwährung, в рамките на 1 година) — провери</b><br>по години: ${Object.entries(k.byYear).sort().map(([yy, b]) => `${yy}: ${pl(b.n, 'обмяна', 'обмени')}, оборот ${Object.entries(b.totals).map(([c, v]) => amt(v, c)).join(' + ')}${Object.keys(b.totals).some(c => c !== 'EUR') ? ` ≈ ${fmt(b.eur)}` : ''}`).join(' · ')}</div>` : '';
+    return `<tr><td><b>${esc(k.bg)}</b>${byY}<details><summary class="small">редове (${k.all.n})</summary><div class="scroll"><table>${skHead}${skRows(k.entries)}</table></div></details></td>
+      <td class="n">${k.year.n}${k.all.n !== k.year.n ? `<div class="small">общо във файловете: ${k.all.n}</div>` : ''}</td>
+      <td class="n">${k.sum && k.year.n ? `${tot}${Object.keys(k.year.totals).some(c => c !== 'EUR') || k.year.eurMissing ? `<div class="small">≈ ${fmt(k.year.eur)}${k.year.eurMissing ? ` (без ${pl(k.year.eurMissing, 'ред', 'реда')} — няма курс)` : ''}</div>` : ''}` : ''}</td><td class="small">${esc(k.basisBg)}</td></tr>`; }).join('') + '</table>';
+}
 function skippedHtml(y) {
   const sk = S.ing.skipped; if (!sk.length) return '';
-  const Y = String(y), rank = x => String(x.date || '').startsWith(Y) ? 0 : !x.date ? 1 : 2;
-  const rows = sk.map((x, i) => ({ x, i })).sort((p, q) => rank(p.x) - rank(q.x) || p.i - q.i).map(o => o.x);
-  const inY = sk.filter(x => rank(x) === 0), tax = inY.filter(x => x.taxable).length, noDate = sk.filter(x => rank(x) === 1).length;
-  return `<div class="card"><details${sk.length < 6 || tax ? ' open' : ''}><summary><b class="yel">Не е сметнато: ${pl(sk.length, 'ред', 'реда')}</b> — за ${esc(y)}: ${inY.length}${tax ? ` (<b class="neg">може да са облагаеми: ${tax} → ${esc(y)} е НЕПЪЛНО</b>)` : ''}; без дата: ${noDate}; други години: ${sk.length - inY.length - noDate}</summary><div class="scroll"><table>
-    <tr><th>Файл</th><th>Ред</th><th>Секция</th><th>Какво</th><th>Дата</th><th>Защо</th></tr>
-    ${rows.map(s => `<tr><td>${esc(s.src)}</td><td class="n">${s.line || ''}</td><td>${esc(s.section)}</td><td>${esc(s.what)}</td><td class="mono">${esc(s.date)}</td><td>${s.taxable ? '<b class="neg">може да е облагаем</b> · ' : ''}${esc(s.reason)}</td></tr>`).join('')}</table></div></details></div>`;
+  const g = TC.skippedGroups(sk, { year: y, rate: TC.rateLookup(S.rates || {}), acked: x => !!(x.ackKey && (S.manual[x.ackKey] || {}).ack) }), Y = esc(y), out = [];
+  if (g.missing.length) out.push(`<div class="card"><details open><summary><b class="neg">Не е сметнато: ${pl(g.missing.length, 'ред', 'реда')}</b> — поради липсващи данни; за ${Y}: ${g.missingYear}${g.missingYear || g.missingNoDate ? ` (<b class="neg">може да са облагаеми → ${Y} е НЕПЪЛНО</b>)` : ` (${Y} не е засегната)`}; без дата: ${g.missingNoDate}; други години: ${g.missingOther}</summary><div class="scroll"><table>${skHead}${skRows(g.missing)}</table></div></details></div>`);
+  const li = g.law.concat(g.info);
+  if (li.length) out.push(`<div class="card" id="skLaw"><details><summary><b>Изключено по закон (и редове без данъчно значение): ${pl(li.reduce((s, k) => s + k.all.n, 0), 'ред', 'реда')}</b> — информация, не тревога; не прави годината НЕПЪЛНО · за ${Y}: ${g.law.reduce((s, k) => s + k.year.n, 0)} ${g.law.reduce((s, k) => s + k.year.n, 0) === 1 ? 'такса' : 'такси'}</summary>${skippedKindsHtml(li, y)}</details></div>`);
+  if (g.review.length) out.push(`<div class="card" id="skReview"><details><summary><b class="yel">За проверка: ${pl(g.review.reduce((s, k) => s + k.all.n, 0), 'ред', 'реда')}</b> — не са в числото, но не са „по закон“ (обмяна на валута, данък върху лихви…); не правят годината НЕПЪЛНО</summary>${skippedKindsHtml(g.review, y)}</details></div>`);
+  return out.join('');
 }
 
 // ─── курсове (05.11.2026): качен файл на ЕЦБ → файлът до страницата (docs/eurofxref-hist.csv, обновява го daily_brief.yml) → ЕЦБ API по години → frankfurter.dev ───
@@ -153,7 +166,7 @@ let calcToken = 0;
 const fifoOpts = () => ({ stillhalter: $('stillhalter').value, controls: S.ing ? S.ing.controls : [], manual: S.manual, corp: { spinoff: $('spinoffMode').value, stockDividend: $('stockDivMode').value }, xferLink: $('xferLink').value !== 'off' });   // 13.11.2026: контролите по позициите и ръчно въведените покупки
 async function recalc() {
   const my = ++calcToken;
-  S.fifo = null; S.de = null; $('out').style.display = 'none';
+  S.fifo = null; S.de = null; $('out').style.display = 'none'; $('repTop').style.display = 'none';
   $('noout').innerHTML = '';
   if (!S.ing) { $('status').textContent = ''; $('summary').innerHTML = ''; return; }
   if (!S.ing.records.length) {                                          // 12.11.2026: нищо за смятане → защо (съобщенията за файловете са под таблицата) + „не е сметнато“
@@ -213,7 +226,7 @@ function render() {
   // разбивка
   const L = TC.LABELS, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
   const rows = [
-    ['shareGains', de.shareGains], ['shareLosses', -de.shareLosses], ['dividends', sum('dividends')], ['interest', sum('interest')], ['pil', sum('pil')],
+    ['shareGains', de.shareGains], ['shareLosses', -de.shareLosses], ['dividends', sum('dividends')], ['interest', sum('interest')], ['otherIncome', sum('otherIncome')], ['pil', sum('pil')],
     ['options', sum('options')], ['optionLosses', sum('optionLosses')], ['funds', sum('funds'), gross('funds')], ['fundLosses', sum('fundLosses'), gross('fundLosses')], ['otherNeg', sum('otherNeg')],
   ].filter(r => Math.abs(r[1]) > 0.004);
   $('breakdown').innerHTML = '<tr><th>Категория</th><th class="n">EUR</th><th>Към</th></tr>' +
@@ -226,6 +239,7 @@ function render() {
     `<tr><td>${esc(L.withholding.bg)} <div class="small">удържани ${fmt(de.withheld)}</div></td><td class="n">${fmt(de.creditable)}</td><td class="small">${esc(L.withholding.form)}</td></tr>` +
     de.crypto.map(c => `<tr><td>${esc(L.crypto.bg)}${st.joint ? ' — ' + (c.person === 'B' ? 'съпруг/а' : 'аз') : ''}<div class="small">облагаеми ${fmt(c.taxable)} · над година (освободени) ${fmt(c.exempt)} · Freigrenze ${fmt(c.freigrenze)} на човек</div></td><td class="n ${cls(c.result)}">${fmt(c.result)}</td><td class="small">${esc(L.crypto.form)}</td></tr>`).join('');
   renderDeclaration(de);
+  renderReportButtons(de);
   renderYears(st);
   renderFunds(de); renderPersons(st);
   // продажби и доходи за годината
@@ -238,7 +252,7 @@ function render() {
   const I = S.fifo.incomes.filter(x => x.year === y);
   $('incTitle').textContent = `Дивиденти, удържан данък, лихви ${y} (${I.length})`;
   $('incomes').innerHTML = '<tr><th>Дата</th><th>Вид</th><th>Инструмент / описание</th><th class="n">Сума</th><th class="n">EUR</th></tr>' +
-    I.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc({ dividend: x.pil ? 'вместо дивидент' : 'дивидент', withholding: 'удържан данък', interest: 'лихва' }[x.kind])}</td><td>${esc(x.sym)} <span class="small">${esc(x.desc)}</span></td>
+    I.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc({ dividend: x.pil ? 'вместо дивидент' : 'дивидент', withholding: 'удържан данък', interest: 'лихва', yield: 'CYEP / SYEP доход' }[x.kind])}</td><td>${esc(x.sym)} <span class="small">${esc(x.desc)}</span></td>
       <td class="n">${esc(x.amount)} ${esc(x.currency)}</td><td class="n ${cls(x.eur)}">${fmt(x.eur)}</td></tr>`).join('');
   // ориентировъчен данък
   const e = de.estimate;
@@ -310,6 +324,40 @@ function renderPersons(st) {
   $('personsBox').querySelectorAll('[data-person]').forEach(el => el.addEventListener('change', () => { S.persons[el.dataset.person] = el.value; render(); }));
 }
 
+// ─── 13.11.2026: отчет за Finanzamt — печатна страница на немски (tax_report.js); браузърът я записва като PDF. Нищо не се праща никъде (CSP: connect-src без нови адреси) ───
+// Бутонът е оранжев и с друг текст, когато годината е НЕПЪЛНО (червената рамка с причините е на първата страница на отчета). Името е по желание и се пази само в този браузър.
+const REP_NAME_KEY = 'tax_report_name_v1';
+const localISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+function reportCtx() { return { de: S.de, fifo: S.fifo, ing: S.ing, st: settings(), rates: S.rates, name: $('repName').value, now: localISO(), rateSource: S.rateSource || {}, manual: S.manual }; }
+function renderReportButtons(de) {
+  const inc = !de.complete, txt = inc ? 'Изтегли отчет (НЕПЪЛЕН — виж червените редове)' : '📄 Изтегли отчет за Finanzamt (PDF)';
+  $('repBtn').textContent = txt; $('repTop').textContent = txt;
+  [$('repBtn'), $('repTop')].forEach(b => b.classList.toggle('warnbtn', inc));
+  $('repBtn').classList.toggle('p', !inc);
+  $('repYear').textContent = String(de.year); $('repTop').style.display = '';
+}
+const REP_PAGE_PX = 703, REP_WIDTH_PX = 1032;                                    // A4 пейзаж, полета 12 mm: 186 × 273 mm при 96 dpi
+function printReport() {
+  if (!S.de || !S.fifo) return;
+  let m, html;
+  try { m = TC.reportModel(reportCtx()); html = TC.reportHTML(m); }
+  catch (e) { $('repNote').innerHTML = `<span class="neg">Отчетът не се състави: ${esc(e.message)}</span>`; return; }
+  const root = $('reportRoot'), title0 = document.title;
+  root.innerHTML = `<div class="noprint"><button class="btn" id="repBack">← Назад към калкулатора</button> <button class="btn p" id="repAgain">🖨 Печат / запис като PDF</button> <span class="small" style="color:#555">A4 пейзаж; в диалога за печат избери „Запази като PDF“. Esc — назад.</span></div>` + html;
+  document.body.classList.add('printing-report'); window.scrollTo(0, 0);
+  const rp = root.querySelector('.rp'), w0 = rp.style.width; rp.style.width = REP_WIDTH_PX + 'px';
+  const pages = Math.max(1, Math.ceil(rp.scrollHeight / REP_PAGE_PX)); rp.style.width = w0;           // оценка по оформлението на екрана при ширината на печатната страница
+  S.reportInfo = { year: m.year, pages, complete: m.complete, checksOk: m.checksOk, reasons: m.reasons.length };
+  $('repNote').innerHTML = `Отчетът за ${m.year} е ≈ ${pl(pages, 'страница', 'страници')} (A4 пейзаж; оценка) · сумите в него са ${m.checksOk ? 'сверени със страницата ✓' : '<b class="neg">НЕ СЪВПАДАТ със страницата: ' + esc(m.checks.filter(c => !c.ok).map(c => c.name).join(', ')) + '</b>'}${m.complete ? '' : ` · <b class="neg">годината е НЕПЪЛНО — червена рамка с ${pl(m.reasons.length, 'причина', 'причини')} на първата страница</b>`}.`;
+  document.title = `Aufstellung_Kapitalertraege_${m.year}`;
+  const onKey = e => { if (e.key === 'Escape') cleanup(); };
+  function cleanup() { document.body.classList.remove('printing-report'); document.title = title0; root.innerHTML = ''; window.removeEventListener('afterprint', cleanup); document.removeEventListener('keydown', onKey); }
+  window.addEventListener('afterprint', cleanup); document.addEventListener('keydown', onKey);
+  root.querySelector('#repBack').addEventListener('click', cleanup);
+  root.querySelector('#repAgain').addEventListener('click', () => window.print());
+  setTimeout(() => window.print(), 60);                                         // след като отчетът е боядисан
+}
+
 function doExport() {
   if (!S.de) return;
   const de = S.de, q = TC.csvCell, n = v => typeof v === 'number' ? v.toFixed(2) : v;   // csvCell — и защита от формули (= + - @)
@@ -336,6 +384,9 @@ $('year').addEventListener('change', loadCarry);                                
 ['carryS', 'carryO'].forEach(id => $(id).addEventListener('change', saveCarry));
 ['year', 'joint', 'kirche', 'carryS', 'carryO', 'credit', 'offsetOrder', 'creditPerItem', 'nonIbkrDefault'].forEach(id => $(id).addEventListener('change', render));
 $('export').addEventListener('click', doExport);
+$('repBtn').addEventListener('click', printReport); $('repTop').addEventListener('click', printReport);
+$('repName').addEventListener('input', () => { try { localStorage.setItem(REP_NAME_KEY, $('repName').value); } catch (e) { /* без запазване — страницата работи и без него */ } });
+try { $('repName').value = localStorage.getItem(REP_NAME_KEY) || ''; } catch (e) { /* без запазено име */ }
 ['stillhalter', 'spinoffMode', 'stockDivMode', 'xferLink'].forEach(id => $(id).addEventListener('change', () => { if (S.fifo) { S.fifo = TC.fifo(S.ing.records, TC.rateLookup(S.rates), fifoOpts()); render(); } }));
 S.manual = loadManual();
 renderFiles();
