@@ -6,6 +6,7 @@
   2) Отчетът (TC.reportModel + TC.reportHTML): цял на НЕМСКИ (без кирилица), сумите му = сумите на страницата, при НЕПЪЛНО — червена рамка с причините, без външни библиотеки и без мрежа.
   3) Бутоните и печатът: статични проверки на docs/tax.html и docs/tax_ui.js (Playwright тук няма — оформлението е проверено в браузъра ръчно, виж доклада).
   4) ОТЧЕТЪТ Е САМО ЗА ИЗБРАНАТА ГОДИНА (14.11): продажби, доходи и такси с дата в нея; „Besondere Vorgänge“ само за лотове, продадени в нея (събитието може да е от по-ранна година); „Offene Punkte“ само за нея; „Quellen“ само файловете, от които идват данни за нея (вкл. по-стар файл с покупката).
+  5) ПЕЧАТ (14.11): в PDF влиза САМО отчетът — бутоните, лентата с действия, полетата и страницата са скрити с @media print; отчетът остава отворен до „Назад“ / Esc (не се връща сам след „afterprint“); подсказка „Запази като PDF“ до бутона.
 ПРОИЗХОД НА ВХОДОВЕТЕ (правило 7 / 9 на CLAUDE.md): СИНТЕТИЧНИ — CSV и IBKR редове, построени тук (тикъри AAA…, сметка U9300001, суми и дати от въображението; курсът на USD е различен за всеки ден, за да личи къде е ползван кой курс).
 ЗАГЛАВНИТЕ редове на IBKR секциите Fees, CYEP/Broker Fees, SYEP Fee Details, Withholding Tax са дословно от РЕАЛНИТЕ отчети на потребителя (13.11.2026, само имената на колоните); редовете под тях са измислени.
 РЕАЛЕН ФОРМАТ с анонимни стойности: tests/fixtures/tax/real_anon/ibkr_summary_202107_202205.csv и tests/fixtures/tax/revolut_real/revolut_trading_real_format.csv (виж README там).
@@ -324,5 +325,34 @@ assert sorted(s["name"] for s in mx["sources"]) == ["c2024.csv", "c2025.csv", "c
 assert "15.04.2025" in hx and "14.03.2024" in hx and "10.06.2025" in hx and "Aktiensplit" in hx and "Einlieferung von einem anderen Broker" in hx and "verkauft wurden (auch aus früheren Jahren)" in hx and not CYR.search(hx)
 print("  ✓ продажба през 2026 на лот от 2024 със сплит от 2025: в отчета са покупката (14.03.2024), сплитът (15.04.2025) и файловете c2024 / c2025; продажба на акция, прехвърлена от друг брокер: покупката при него (10.06.2025) и файлът other_2025;")
 print("    няма сплита на UNREL (2023, продаден през 2023), сплита на HELD през 2026 (непродаден), прехвърлянето на UNSOLD (непродаден) и файловете uA_2022 / uB_2023")
+
+print("── 15. печат: в PDF влиза само отчетът — бутоните, лентата с действия, полетата и страницата са скрити (@media print); подсказката „Запази като PDF“ ──")
+i0 = page.index("@media print{")
+depth, j = 0, i0 + len("@media print")
+while True:
+    if page[j] == "{": depth += 1
+    elif page[j] == "}":
+        depth -= 1
+        if depth == 0: break
+    j += 1
+pr = page[i0:j + 1]
+for need in ("@page{size:A4 landscape;margin:12mm}", ".noprint,#reportRoot .noprint{display:none !important}", "body.printing-report > *:not(#reportRoot){display:none !important}", "body.printing-report #reportRoot{display:block !important}",
+             "body.printing-report button,body.printing-report input,body.printing-report select,body.printing-report textarea{display:none !important}", "print-color-adjust:exact", "body.printing-report{background:#fff !important"):
+    assert need in pr, need                                                                                                                              # всичко, което не е отчетът, е скрито при печат; бутони / полета / .noprint — никога не се печатат
+wrap_open, root_pos = page.index('<div class="wrap">'), page.index('<div id="reportRoot"')
+inside = page[wrap_open:root_pos]
+assert inside.count("<div") == inside.count("</div>"), "„.wrap“ трябва да е затворен преди #reportRoot"                                                            # цялата страница (бутони, полета, навигация) е в „.wrap“ — скрит при печат
+assert not re.search(r"<(button|input|select|textarea|label|details|table|summary)\b", page[root_pos:]), "след „.wrap“ в страницата няма нищо видимо освен #reportRoot"
+assert all(p0 < root_pos for p0 in [m0.start() for m0 in re.finditer(r"<(button|input|select|textarea)\b", page)]), "всеки бутон и поле е в „.wrap“"
+tb = re.search(r'<div class="noprint">(.*?)</div>', ui, re.S).group(1)
+assert 'id="repBack"' in tb and 'id="repAgain"' in tb and "${PRINT_HINT}" in tb                                                                        # лентата с действия на отчета е „.noprint“ → скрита при печат; в нея са бутоните
+assert "addEventListener('afterprint'" not in ui and "removeEventListener('afterprint'" not in ui and "addEventListener('click', cleanup)" in ui and "e.key === 'Escape'" in ui   # отчетът не се затваря сам след печат (Safari) — само „Назад“ / Esc
+assert "body.classList.add('printing-report')" in ui.replace("document.", "") and "requestAnimationFrame" in ui and ui.count("window.print()") == 2
+HINT = "В прозореца за печат избери „Запази като PDF“ (на Mac: долу вляво PDF → Запази като PDF)."
+assert f"const PRINT_HINT = '{HINT}'" in ui and HINT in page and page.index(HINT) > page.index('id="repBtn"') and page.index(HINT) < page.index('id="repCap"')   # подсказката е до бутона, преди подписа „на немски …“
+assert re.search(r'id="repHint" style="font-size:10\.5px', page) and "Запази като PDF" in page[page.index('id="repTop"'):page.index('id="repTop"') + 300]
+assert not re.search(r"<(button|input|select|textarea|a|form|script|img|iframe|nav)\b", html, re.I), re.search(r"<(button|input|select|textarea|a|form|script|img|iframe|nav)\b", html, re.I).group(0)   # в самия отчет няма интерактивни елементи
+print("  ✓ @media print: A4 пейзаж; „.noprint“, бутоните, полетата и всичко в body освен #reportRoot са с display:none !important; цялата страница (бутони, полета, навигация) е в „.wrap“, затворен преди #reportRoot;")
+print("    лентата „Назад / Печат“ е „.noprint“; отчетът остава отворен до „Назад“ / Esc (без „afterprint“ — причината в Safari); подсказката „В прозореца за печат избери „Запази като PDF“ (на Mac: …)“ е с дребен шрифт до бутона; в отчета няма бутони и полета")
 
 print("\nOK test_tax_report")

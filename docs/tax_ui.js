@@ -336,6 +336,9 @@ function renderReportButtons(de) {
   $('repBtn').classList.toggle('p', !inc);
   $('repYear').textContent = String(de.year); $('repTop').style.display = '';
 }
+// 14.11.2026: при „Запази като PDF“ в PDF влизаха бутоните и страницата — отчетът се връщаше назад сам след „afterprint“ (в Safari събитието идва още преди да е направен моментният образ за печат). Сега отчетът остава, докато не натиснеш „Назад“ / Esc;
+// а @media print (tax.html) скрива всичко, което не е отчетът — докато отчетът е отворен (body.printing-report).
+const PRINT_HINT = 'В прозореца за печат избери „Запази като PDF“ (на Mac: долу вляво PDF → Запази като PDF).';
 const REP_PAGE_PX = 703, REP_WIDTH_PX = 1032;                                    // A4 пейзаж, полета 12 mm: 186 × 273 mm при 96 dpi
 function printReport() {
   if (!S.de || !S.fifo) return;
@@ -343,19 +346,20 @@ function printReport() {
   try { m = TC.reportModel(reportCtx()); html = TC.reportHTML(m); }
   catch (e) { $('repNote').innerHTML = `<span class="neg">Отчетът не се състави: ${esc(e.message)}</span>`; return; }
   const root = $('reportRoot'), title0 = document.title;
-  root.innerHTML = `<div class="noprint"><button class="btn" id="repBack">← Назад към калкулатора</button> <button class="btn p" id="repAgain">🖨 Печат / запис като PDF</button> <span class="small" style="color:#555">A4 пейзаж; в диалога за печат избери „Запази като PDF“. Esc — назад.</span></div>` + html;
-  document.body.classList.add('printing-report'); window.scrollTo(0, 0);
+  root.innerHTML = `<div class="noprint"><button class="btn" id="repBack">← Назад към калкулатора</button> <button class="btn p" id="repAgain">🖨 Печат / запис като PDF</button> <span class="small" style="color:#555">A4 пейзаж. ${PRINT_HINT} Esc — назад.</span></div>` + html;
+  root.removeAttribute('aria-hidden'); document.body.classList.add('printing-report'); window.scrollTo(0, 0);
   const rp = root.querySelector('.rp'), w0 = rp.style.width; rp.style.width = REP_WIDTH_PX + 'px';
   const pages = Math.max(1, Math.ceil(rp.scrollHeight / REP_PAGE_PX)); rp.style.width = w0;           // оценка по оформлението на екрана при ширината на печатната страница
   S.reportInfo = { year: m.year, pages, complete: m.complete, checksOk: m.checksOk, reasons: m.reasons.length };
   $('repNote').innerHTML = `Отчетът за ${m.year} е ≈ ${pl(pages, 'страница', 'страници')} (A4 пейзаж; оценка) · сумите в него са ${m.checksOk ? 'сверени със страницата ✓' : '<b class="neg">НЕ СЪВПАДАТ със страницата: ' + esc(m.checks.filter(c => !c.ok).map(c => c.name).join(', ')) + '</b>'}${m.complete ? '' : ` · <b class="neg">годината е НЕПЪЛНО — червена рамка с ${pl(m.reasons.length, 'причина', 'причини')} на първата страница</b>`}.`;
   document.title = `Aufstellung_Kapitalertraege_${m.year}`;
   const onKey = e => { if (e.key === 'Escape') cleanup(); };
-  function cleanup() { document.body.classList.remove('printing-report'); document.title = title0; root.innerHTML = ''; window.removeEventListener('afterprint', cleanup); document.removeEventListener('keydown', onKey); }
-  window.addEventListener('afterprint', cleanup); document.addEventListener('keydown', onKey);
+  function cleanup() { document.body.classList.remove('printing-report'); document.title = title0; root.innerHTML = ''; root.setAttribute('aria-hidden', 'true'); document.removeEventListener('keydown', onKey); }
+  document.addEventListener('keydown', onKey);
   root.querySelector('#repBack').addEventListener('click', cleanup);
   root.querySelector('#repAgain').addEventListener('click', () => window.print());
-  setTimeout(() => window.print(), 60);                                         // след като отчетът е боядисан
+  let printed = false; const go = () => { if (!printed) { printed = true; window.print(); } };       // след като отчетът е боядисан: два кадъра, а ако страницата е на заден план (кадри няма) — таймер; печата се веднъж
+  requestAnimationFrame(() => requestAnimationFrame(go)); setTimeout(go, 400);
 }
 
 function doExport() {
