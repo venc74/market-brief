@@ -5,6 +5,7 @@
   CYEP / SYEP (14.11): положителните редове на „CYEP/Broker Fees“ са доход, който НЕ е в секция Interest — смята се като „други доходи от капитал“ (Zeile 19) с етикет; „За проверка“ (Forex, данък върху лихви) е САМО в калкулатора, не в отчета.
   2) Отчетът (TC.reportModel + TC.reportHTML): цял на НЕМСКИ (без кирилица), сумите му = сумите на страницата, при НЕПЪЛНО — червена рамка с причините, без външни библиотеки и без мрежа.
   3) Бутоните и печатът: статични проверки на docs/tax.html и docs/tax_ui.js (Playwright тук няма — оформлението е проверено в браузъра ръчно, виж доклада).
+  4) ОТЧЕТЪТ Е САМО ЗА ИЗБРАНАТА ГОДИНА (14.11): продажби, доходи и такси с дата в нея; „Besondere Vorgänge“ само за лотове, продадени в нея (събитието може да е от по-ранна година); „Offene Punkte“ само за нея; „Quellen“ само файловете, от които идват данни за нея (вкл. по-стар файл с покупката).
 ПРОИЗХОД НА ВХОДОВЕТЕ (правило 7 / 9 на CLAUDE.md): СИНТЕТИЧНИ — CSV и IBKR редове, построени тук (тикъри AAA…, сметка U9300001, суми и дати от въображението; курсът на USD е различен за всеки ден, за да личи къде е ползван кой курс).
 ЗАГЛАВНИТЕ редове на IBKR секциите Fees, CYEP/Broker Fees, SYEP Fee Details, Withholding Tax са дословно от РЕАЛНИТЕ отчети на потребителя (13.11.2026, само имената на колоните); редовете под тях са измислени.
 РЕАЛЕН ФОРМАТ с анонимни стойности: tests/fixtures/tax/real_anon/ibkr_summary_202107_202205.csv и tests/fixtures/tax/revolut_real/revolut_trading_real_format.csv (виж README там).
@@ -116,7 +117,7 @@ assert "Erika Mustermann (Test)" in html and "Steuerjahr" in html and "02.01.202
 for h in ("Zusammenfassung — Anlage KAP", "Methode", "Veräußerungen 2025", "Dividenden 2025", "Zinsen 2025", "Quellensteuer 2025", "Besondere Vorgänge", "Nicht berücksichtigt — nicht abzugsfähig", "Offene Punkte", "Quellen — ausgewertete Dateien"):
     assert f"<h2>{h}</h2>" in html, h
 assert "Selbst erstellte Aufstellung auf Grundlage der beigefügten Originalabrechnungen des Brokers. Keine Steuerberatung." in html
-assert "§ 20 Abs. 4 Satz 1 EStG" in html and "EZB-Referenzkurs" in html and "FIFO" in html and "§ 20 Abs. 4 Satz 7 EStG" in html and "zuletzt davor veröffentlichte Kurs" in html     # Methode
+assert "§ 20 Abs. 4 Satz 1 EStG" in html and "Referenzkurs der Europäischen Zentralbank (EZB)" in html and "FIFO" in html and "§ 20 Abs. 4 Satz 7 EStG" in html and "zuletzt davor veröffentlichte Kurs" in html     # Methode
 assert not CYR.search(html), CYR.search(html).group(0) + " … " + html[max(0, CYR.search(html).start() - 80):CYR.search(html).start() + 40]
 assert re.search(r"U•+001", html) and "U9300001" not in html                                                                                     # сметката е маскирана и в отчета
 assert "Wechselkurse: USD: EZB-Datei eurofxref-hist.csv (bis 29.10.2026)" in html                                                                      # откъде са курсовете — на немски (текстът на страницата е на български)
@@ -256,4 +257,72 @@ assert "<script" not in page.split("</head>")[1].replace('<script src="tax_core.
 assert "localStorage" in ui and "tax_report_name_v1" in ui and "try { localStorage.setItem(REP_NAME_KEY" in ui                                           # името — само в браузъра, в try / catch
 print("  ✓ картата „Отчет за Finanzamt“ е след „Какво попълваш“ и преди „По години“, с подпис „на немски · всички изчисления ред по ред · за ГГГГ“; малък бутон до годината; оранжев „Изтегли отчет (НЕПЪЛЕН — виж червените редове)“;")
 print("    печат: A4 пейзаж, window.print(), име на PDF „Aufstellung_Kapitalertraege_ГГГГ“; tax_report.js без fetch / XHR / window.open / адреси; CSP непроменен; името — само в localStorage (try / catch)")
+print("── 13. ОТЧЕТЪТ Е САМО ЗА ГОДИНАТА: файлове за 2022–2026, 2026 започва от нула позиции → отчетът за 2026 няма нищо от 2022–2025 ──")
+CS = lambda *rows: H + "".join(rows)
+Y22 = CS(rw("buy", "AAA22", "2022-06-08", 10, 10), rw("sell", "AAA22", "2022-06-09", 10, 20), rw("dividend", "DDD22", "2022-06-20", 50, ""), rw("interest", "INT22", "2022-07-06", 5, ""))
+Y23 = CS(rw("buy", "SPL23", "2023-04-12", 10, 10), "split,SPL23,2023-05-02,2,,USD,,,stock,\n", rw("sell", "SPL23", "2023-06-14", 20, 8), rw("sell", "GHOST23", "2023-07-10", 3, 5))   # продажба без покупка (2023)
+Y24 = CS(rw("buy", "BBB24", "2024-03-12", 5, 10), rw("sell", "BBB24", "2024-03-13", 5, 12), "foo,ZZZ24,2024-04-11,1,1,USD,CSV,main,stock,\n")                  # непознат тип → облагаем пропуснат ред (2024)
+Y25 = CS(rw("buy", "CCC25", "2025-05-13", 4, 10), rw("sell", "CCC25", "2025-06-03", 4, 9), rw("dividend", "EEE25", "2025-06-10", 30, "", 4.5))
+Y26 = CS(rw("buy", "NEW26", "2026-02-16", 10, 10), rw("sell", "NEW26", "2026-02-24", 10, 11), rw("dividend", "DDD26", "2026-03-10", 20, "", 3), rw("interest", "INT26", "2026-03-12", 4, ""))
+HEADY = lambda per: ["Statement,Header,Field Name,Field Value", "Statement,Data,BrokerName,Interactive Brokers Ireland Limited", f'Statement,Data,Period,"{per}"', "Account Information,Header,Field Name,Field Value", "Account Information,Data,Account,U9300001", "Account Information,Data,Base Currency,EUR"]
+FEEH = "Fees,Header,Subtitle,Currency,Account,Date,Description,Amount"
+IB23 = "\n".join(HEADY("February 13, 2023 - December 21, 2023") + [FEEH, "Fees,Data,Other Fees,EUR,U9300001,2023-06-13,v1234567:NASDAQ Level I for Jun 2023,-1.5", "Change in NAV,Data,Starting Value,500", "Change in NAV,Data,Ending Value,600"]) + "\n"
+IB26 = "\n".join(HEADY("January 9, 2026 - November 24, 2026") + [FEEH, "Fees,Data,Other Fees,EUR,U9300001,2026-03-13,v1234567:NASDAQ Level I for Mar 2026,-2.5", "Fees,Data,Other Fees,USD,U9300001,2026-04-14,ZZZ(US0000000001) ADR Fee USD 0.02 per Share,-1",
+                                    "Change in NAV,Data,Starting Value,700", "Change in NAV,Data,Ending Value,800", "Change in NAV,Data,Other Fees,-3.5"] + DISC) + "\n"
+YEARS = [2022, 2023, 2024, 2025, 2026]
+o = scenario([F("y2022.csv", Y22), F("y2023.csv", Y23), F("ibkr_2023.csv", IB23), F("y2024.csv", Y24), F("y2025.csv", Y25), F("y2026.csv", Y26), F("ibkr_2026.csv", IB26)], YEARS)
+m6, h6 = o["report"][2026]["model"], o["report"][2026]["html"]
+assert m6["complete"] is True and m6["reasons"] == [] and o["de"][2026]["complete"] is True and 'class="redframe"' not in h6                       # 2026 е чиста; проблемите на 2023 и 2024 не се носят в нея
+assert not re.search(r"\b\d{2}\.\d{2}\.(2022|2023|2024|2025)\b", h6), re.search(r"\b\d{2}\.\d{2}\.(2022|2023|2024|2025)\b", h6).group(0)         # никоя дата от 2022–2025
+for gone in ("AAA22", "DDD22", "INT22", "SPL23", "GHOST23", "BBB24", "ZZZ24", "CCC25", "EEE25", "y2022", "y2023", "y2024", "y2025", "ibkr_2023", "Aktiensplit", "Verkauf ohne Kaufnachweis", "Nicht ausgewertete Zeile"):
+    assert gone not in h6, gone
+for here in ("NEW26", "DDD26", "y2026.csv", "ibkr_2026.csv"):
+    assert here in h6, here
+assert sorted(s["name"] for s in m6["sources"]) == ["ibkr_2026.csv", "y2026.csv"] and [x["sym"] for x in m6["sales"]["stocks"]["rows"]] == ["NEW26"] and m6["special"] == []          # Quellen: само файловете на 2026
+assert [b["broker"] for b in m6["brokers"]] == ["CSV", "IBKR"] and all(b["files"] == 1 for b in m6["brokers"])
+inf = {x["kind"]: x for x in m6["excluded"]["info"]}
+law = {x["kind"]: x for x in m6["excluded"]["law"]}
+assert inf["summary"]["n"] == 4 and law["fee_quote"]["n"] == 1 and law["fee_adr"]["n"] == 1 and "-2,50" in law["fee_quote"]["totals"].replace("−", "-").replace(" ", " ").replace(" EUR", ""), (inf, law)   # обобщенията и таксите — само от 2026 (не и тези на ibkr_2023.csv)
+r10, r11, r310, r312 = rate("2026-02-16"), rate("2026-02-24"), rate("2026-03-10"), rate("2026-03-12")
+z = {x["field"]: x["eur"] for x in m6["summary"]["rows"]}
+assert abs(z[SUM_FIELDS[0]] - ((110 / r11 - 100 / r10) + 20 / r310 + 4 / r312)) < 1e-9 and abs(z[SUM_FIELDS[4]] - 3 / r310) < 1e-9 and m6["checksOk"] is True       # сумите са само на 2026 (ръчна сметка)
+# същото за другите години — всяка има своето; проблемите на годината са в отчета ѝ и само там
+m3, h3 = o["report"][2023]["model"], o["report"][2023]["html"]
+assert m3["complete"] is False and any("Verkauf ohne Kaufnachweis: GHOST23" in r["text"] for r in m3["reasons"]) and "GHOST23" in h3 and "AAA22" not in h3 and "SPL23" in h3 and "Aktiensplit" in h3 and "y2022" not in h3
+m4, h4 = o["report"][2024]["model"], o["report"][2024]["html"]
+assert m4["complete"] is False and any("ZZZ24" in r["text"] for r in m4["reasons"]) and "GHOST23" not in h4 and "ibkr_2023" not in h4 and "y2024.csv" in h4
+m2, h2 = o["report"][2022]["model"], o["report"][2022]["html"]
+assert m2["complete"] is True and "GHOST23" not in h2 and "y2023" not in h2 and "AAA22" in h2 and not CYR.search(h2 + h3 + h4 + h6)
+print("  ✓ файлове за 2022–2026 (2026 започва от нула позиции): отчетът за 2026 няма нито една дата от 2022–2025, нито тикър, файл, сплит, непокрита продажба и пропуснат ред от тях; 2026 е пълна, без червена рамка;")
+print("    Quellen = само y2026.csv и ibkr_2026.csv; брокери — само от тях; такси и „обобщения“ — само от 2026 (1 + 1 такси, 4 реда, не и от ibkr_2023.csv); Zeile 19 / 41 = ръчна сметка само за 2026")
+print("    същите файлове: отчетът за 2023 има GHOST23, сплита и ibkr_2023 (и нищо от 2022), за 2024 — пропуснатия ред; всяка година носи само своите проблеми")
+print("── 14. лот, продаден през 2026, има връзки назад: сплит от 2025, покупка от 2024, прехвърляне от друг брокер — влизат (с файловете им); несвързани събития — не ──")
+UA = CS(rw("buy", "UNREL22", "2022-06-08", 10, 10), rw("sell", "UNREL22", "2022-06-09", 10, 12))
+UB = CS(rw("buy", "UNREL", "2023-04-18", 10, 10), "split,UNREL,2023-05-03,2,,USD,,,stock,\n", rw("sell", "UNREL", "2023-06-15", 20, 6))
+C24 = CS(rw("buy", "CARRY", "2024-03-14", 10, 10))
+C25 = CS("split,CARRY,2025-04-15,2,,USD,,,stock,\n", rw("buy", "HELD", "2025-05-15", 5, 10))
+OTH = H + "buy,XFS,2025-06-10,10,10,USD,OTHER,acc,stock,\n"
+TRFH = "Transfers,Header,Asset Category,Currency,Symbol,Date,Type,Direction,Xfer Company,Xfer Account,Qty,Xfer Price,Market Value,Realized P/L,Cash Amount,Code"
+TRH = "Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,Proceeds,Comm/Fee,Code"
+IBX = "\n".join(HEADY("January 9, 2026 - November 24, 2026") + [TRFH, "Transfers,Data,Stocks,USD,XFS,2026-03-16,ACATS,In,--,--,10,--,0,0,0,", "Transfers,Data,Stocks,USD,UNSOLD,2026-03-17,ACATS,In,--,--,5,--,0,0,0,",
+                                     TRH, 'Trades,Data,Order,Stocks,USD,U9300001,XFS,"2026-04-15, 10:00:00",-10,12,120,-1,']) + "\n"
+C26 = CS(rw("sell", "CARRY", "2026-03-12", 20, 8), "split,HELD,2026-02-20,2,,USD,,,stock,\n")
+o = scenario([F("uA_2022.csv", UA), F("uB_2023.csv", UB), F("c2024.csv", C24), F("c2025.csv", C25), F("other_2025.csv", OTH), F("ib26.csv", IBX), F("c2026.csv", C26)], [2026])
+mx, hx = o["report"][2026]["model"], o["report"][2026]["html"]
+assert mx["complete"] is True and mx["reasons"] == [], mx["reasons"]
+rows = mx["sales"]["stocks"]["rows"]
+assert sorted(r["sym"] for r in rows) == ["CARRY", "XFS"], [r["sym"] for r in rows]
+cr = next(r for r in rows if r["sym"] == "CARRY")
+assert (cr["buyDate"], cr["qty"], cr["buyPx"], cr["buyAmt"]) == ("2024-03-14", 20, 5, 100)                                                                # покупка от 2024, сплитът от 2025 е приложен
+xr = next(r for r in rows if r["sym"] == "XFS")
+assert xr["buyDate"] == "2025-06-10" and xr["qty"] == 10, xr                                                                                                  # покупката е при другия брокер (2025) — свързана с прехвърлянето
+titles = sorted((s["sym"], s["title"], s["date"]) for s in mx["special"])
+assert titles == [("CARRY", "Aktiensplit", "2025-04-15"), ("XFS", "Einlieferung von einem anderen Broker (Eingang)", "2026-03-16")], titles                  # сплитът (2025) и прехвърлянето (2026) на ПРОДАДЕНИ лотове; без UNREL (2023), HELD (2026, непродаден), UNSOLD (прехвърляне, непродаден)
+for gone in ("UNREL", "HELD", "UNSOLD", "uA_2022", "uB_2023"):
+    assert gone not in hx, gone
+assert sorted(s["name"] for s in mx["sources"]) == ["c2024.csv", "c2025.csv", "c2026.csv", "ib26.csv", "other_2025.csv"], [s["name"] for s in mx["sources"]]      # вкл. по-стари файлове: c2024 (покупката на CARRY), c2025 (сплитът), other_2025 (покупката на XFS)
+assert "15.04.2025" in hx and "14.03.2024" in hx and "10.06.2025" in hx and "Aktiensplit" in hx and "Einlieferung von einem anderen Broker" in hx and "verkauft wurden (auch aus früheren Jahren)" in hx and not CYR.search(hx)
+print("  ✓ продажба през 2026 на лот от 2024 със сплит от 2025: в отчета са покупката (14.03.2024), сплитът (15.04.2025) и файловете c2024 / c2025; продажба на акция, прехвърлена от друг брокер: покупката при него (10.06.2025) и файлът other_2025;")
+print("    няма сплита на UNREL (2023, продаден през 2023), сплита на HELD през 2026 (непродаден), прехвърлянето на UNSOLD (непродаден) и файловете uA_2022 / uB_2023")
+
 print("\nOK test_tax_report")

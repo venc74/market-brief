@@ -151,7 +151,7 @@
     const base = r => ({ broker: r.broker, account: r.account, src: r.src, line: r.line, date: r.date, time: r.time, currency: r.currency, owner: r.owner });
     const unknown = (r, why) => skipped.push({ src: r.src, line: r.line, broker: r.broker, account: r.account, section: 'Corporate Actions', what: r.sym, date: r.date, amount: String(r.qty), taxable: true, reason: why,
                                                   ackKey: ['ack', r.broker, r.account, r.sym, r.date, r.qty].join('|'), desc: r.desc });
-    const ev = (type, r, extra) => events.push({ type, sym: r.sym, date: r.date, account: r.account, desc: r.desc, ...(extra || {}) });
+    const ev = (type, r, extra) => events.push({ type, sym: r.sym, date: r.date, account: r.account, desc: r.desc, src: r.src, ...(extra || {}) });
     Object.values(groups).forEach(g => {
       const used = new Set(), rem = g.filter(r => r.qty < 0), add = g.filter(r => r.qty > 0);
       // двуредов (обратен) сплит и размяна: ред със „Split“ без съответстващ ред — обикновен сплит (коефициент от текста)
@@ -1004,8 +1004,8 @@
       if (m && m.date && Number(m.price) > 0) {
         const cur = m.currency || r.currency || 'USD', fxm = rate(cur, m.date);
         if (fxm == null) missingRates.push({ kind: 'trade', sym: r.sym, date: m.date, currency: cur, src: r.src });
-        lot = { qty, costEUR: fxm == null ? null : qty * Number(m.price) / fxm, date: m.date, feeEUR: 0, manual: true, ccy: cur, px: Number(m.price), feeO: 0 };
-      } else lot = { qty, costEUR: null, date: r.date, feeEUR: null, unknown: { key, kind, desc, date: r.date } };
+        lot = { qty, costEUR: fxm == null ? null : qty * Number(m.price) / fxm, date: m.date, feeEUR: 0, manual: true, ccy: cur, px: Number(m.price), feeO: 0, src: r.src };
+      } else lot = { qty, costEUR: null, date: r.date, feeEUR: null, unknown: { key, kind, desc, date: r.date }, src: r.src };
       p.long.push(lot); p.long.sort((x, y) => x.date.localeCompare(y.date));
       pending.push({ key, kind, broker: r.broker, account: r.account, sym: r.sym, date: r.date, qty: +qty.toFixed(6), desc, currency: r.currency || 'USD', filled: !!lot.manual });
     };
@@ -1112,7 +1112,7 @@
       }
       if (r.kind === 'spinoff') {                                                   // отделяне: новите акции на втора компания; цената — на ръка (по подразбиране) или 0 (настройка)
         const pn = P(sk(r.broker, r.account, r.sym)); if (!pn.cls) pn.cls = 'stock';
-        if (corp.spinoff === 'zero') { pn.long.push({ qty: r.qty, costEUR: 0, date: r.date, feeEUR: 0, spinoffZero: true }); pn.long.sort((x, y) => x.date.localeCompare(y.date)); notes.push({ sym: r.sym, date: r.date, level: 'warn', text: `отделяне: ${r.qty} бр. нови акции със СМЕТНАТА цена 0 € (настройка „нула“) — печалбата при продажба е цялата сума; спорно, провери` }); }
+        if (corp.spinoff === 'zero') { pn.long.push({ qty: r.qty, costEUR: 0, date: r.date, feeEUR: 0, spinoffZero: true, src: r.src }); pn.long.sort((x, y) => x.date.localeCompare(y.date)); notes.push({ sym: r.sym, date: r.date, level: 'warn', text: `отделяне: ${r.qty} бр. нови акции със СМЕТНАТА цена 0 € (настройка „нула“) — печалбата при продажба е цялата сума; спорно, провери` }); }
         else addUnknownLot(pn, 'spinoff', r, r.qty, 'отделяне на компания — покупната цена на новите акции (разпределена от старите) се въвежда на ръка');
         return;
       }
@@ -1121,7 +1121,7 @@
         if (corp.stockDividend === 'income' && r.value > 0) {                       // доход по пазарна стойност + нов лот с тази цена
           if (fx0 == null) { missingRates.push({ kind: 'dividend', sym: r.sym, date: r.date, currency: r.currency, src: r.src }); return; }
           incomes.push({ kind: 'dividend', broker: r.broker, account: r.account, sym: r.sym, date: r.date, year: Number(r.date.slice(0, 4)), currency: r.currency, amount: r.value, eur: r.value / fx0, rate: fx0, desc: 'дивидент в акции — ' + r.desc, pil: false, src: r.src });
-          p.long.push({ qty: r.qty, costEUR: r.value / fx0, date: r.date, feeEUR: 0, ccy: r.currency, px: r.value / r.qty, feeO: 0 }); p.long.sort((x, y) => x.date.localeCompare(y.date));
+          p.long.push({ qty: r.qty, costEUR: r.value / fx0, date: r.date, feeEUR: 0, ccy: r.currency, px: r.value / r.qty, feeO: 0, src: r.src }); p.long.sort((x, y) => x.date.localeCompare(y.date));
           notes.push({ sym: r.sym, date: r.date, level: 'warn', text: `дивидент в акции: ${r.qty} бр. по пазарна стойност ${r.value} ${r.currency} — доход и цена на новите акции (настройка „доход“); спорно, провери` });
         } else if (H > eps) {                                                       // безплатни акции: лотовете ×(H+нови)/H, общата цена не се мени
           const ratio = (H + r.qty) / H; p.long.forEach(l => { l.qty *= ratio; if (l.px != null) l.px /= ratio; });
@@ -1179,7 +1179,7 @@
           realized.push({ ...base, short: true, buyback: stillhalter === 'receipt', qty: qAbs - q, proceedsEUR: pr, costEUR: co, gainEUR: pr == null ? null : pr - co,
                           lots: closed.map(c => ({ date: c.date, qty: c.qty })), openDate: closed[0].date });
         }
-        if (q > eps) p.long.push({ qty: q, costEUR: fx == null ? null : (q * r.price + (r.fee || 0) * q / qAbs) / fx, date: r.date, feeEUR: feeEUR == null ? null : feeEUR * q / qAbs, ccy: r.currency, px: r.price, feeO: (r.fee || 0) * q / qAbs });
+        if (q > eps) p.long.push({ qty: q, costEUR: fx == null ? null : (q * r.price + (r.fee || 0) * q / qAbs) / fx, date: r.date, feeEUR: feeEUR == null ? null : feeEUR * q / qAbs, ccy: r.currency, px: r.price, feeO: (r.fee || 0) * q / qAbs, src: r.src });
         return;
       }
       // продажба
@@ -1189,7 +1189,7 @@
       while (q > eps && p.long.length) {
         const l = p.long[0], used = Math.min(l.qty, q);
         const cost = l.costEUR == null ? null : l.costEUR * used / l.qty;
-        lots.push({ date: l.date, qty: used, costEUR: cost, ...(l.unknown ? { unknown: l.unknown } : {}), ...(l.px == null ? {} : { ccy: l.ccy, px: l.px, feeO: l.feeO == null ? 0 : l.feeO * used / l.qty, ...(l.manual ? { manual: true } : {}) }) });   // 16.11: оригиналната валута, цена и такса на лота — за отчета (до сега лотовете ги нямаха)
+        lots.push({ date: l.date, qty: used, costEUR: cost, ...(l.unknown ? { unknown: l.unknown } : {}), ...(l.px == null ? {} : { ccy: l.ccy, px: l.px, feeO: l.feeO == null ? 0 : l.feeO * used / l.qty, ...(l.manual ? { manual: true } : {}) }), ...(l.src ? { src: l.src } : {}) });   // 16.11: оригиналната валута, цена и такса на лота — за отчета (до сега лотовете ги нямаха)
         if (l.costEUR != null) l.costEUR -= cost;
         l.qty -= used; q -= used;
         if (l.qty <= eps) p.long.shift();
