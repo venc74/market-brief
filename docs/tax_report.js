@@ -68,10 +68,8 @@
     const check = (name, a, b) => checks.push({ name, a, b, ok: near(a, b) });
     const n1 = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-    // ─── заглавие, брокери / сметки ───
-    const brokers = safe('Broker', () => { const seen = {}; (ing.files || []).forEach(f => { if (f.format === 'ecb_rates' || f.notSource || f.error || !f.broker) return;
-      const k = f.broker + '|' + (f.accountMasked || ''), o = seen[k] = seen[k] || { broker: f.broker, account: acctDE(f.accountMasked || ''), from: '', to: '', files: 0, records: 0 };
-      o.files++; o.records += f.records; if (f.from && (!o.from || f.from < o.from)) o.from = f.from; if (f.to && (!o.to || f.to > o.to)) o.to = f.to; }); return Object.values(seen); }, []);
+    // 14.11.2026: отчетът е САМО за годината — файловете, от които идват данни за нея (used): продажбите и лотовете им (вкл. по-стар файл с покупката), доходите, таксите с дата в годината, показаните събития
+    const used = new Set(), useSrc = x => { if (x) used.add(x); };
 
     // ─── Zusammenfassung — същите полета и суми като блока „Какво попълваш“ ───
     const overCredit = P.withheld - P.creditable, rate = st.creditRate == null ? 0.15 : Number(st.creditRate);
@@ -151,12 +149,22 @@
                withholding: { rows: wh, total: sum(wh) }, credit: (de.creditBySym || []).map(c => ({ label: label(c.sym), withheld: c.withheld, gross: c.gross, cap: c.cap, credited: c.credited })), rate };
     }, { dividends: { rows: [], total: 0 }, pil: { rows: [], total: 0 }, interest: { rows: [], total: 0, credits: 0, debits: 0 }, yield: { rows: [], total: 0 }, withholding: { rows: [], total: 0 }, credit: [], rate });
 
-    // ─── Besondere Vorgänge — какво е направено и защо ───
+    R.filter(x => x.year === year).forEach(x => { useSrc(x.src); (x.lots || []).forEach(l => useSrc(l.src)); });
+    fifo.incomes.filter(x => x.year === year).forEach(x => useSrc(x.src));
+
+    // ─── Besondere Vorgänge — само за лотове, ПРОДАДЕНИ през годината (събитието може да е от по-ранна година: сплит, прехвърляне, размяна) ───
     const special = safe('Besondere Vorgänge', () => {
       const out = [], inY = d => String(d || '').startsWith(Y), A = a => `Konto ${mask(a)}`;
       const seen = new Set(), once = k => { if (seen.has(k)) return false; seen.add(k); return true; };
       const pend = fifo.pending || [], links = fifo.xferLinks || [];
-      (ing.records || []).filter(r => r.kind === 'xfer' && inY(r.date)).forEach(r => {
+      // лотовете, продадени през годината; наследници на инструмента (размяна / сливане / смяна на тикър) — за да се стигне от старото име до продаденото
+      const soldY = R.filter(x => x.year === year && x.lots && x.lots.length), succ = {};
+      (ing.corpEvents || []).forEach(e => { if (e.newSym && e.type !== 'cash') (succ[e.sym] = succ[e.sym] || new Set()).add(e.newSym); });
+      (ing.aliases || []).forEach(a => (succ[a.from] = succ[a.from] || new Set()).add(a.to));
+      const reach = sym => { const seen = new Set([sym]), q = [sym]; while (q.length) { const c = q.pop(); (succ[c] || []).forEach(t => { if (!seen.has(t)) { seen.add(t); q.push(t); } }); } return seen; };
+      // събитие за sym на дата d засяга продаден през годината лот: продажба на същия (или наследника) инструмент на / след d от лот, купен на / преди d
+      const affected = (sym, d) => { const rs = reach(sym); return soldY.some(x => rs.has(x.sym) && x.date >= d && x.lots.some(l => !l.date || l.date <= d)); };
+      (ing.records || []).filter(r => r.kind === 'xfer' && affected(r.sym, r.date) && (useSrc(r.src), true)).forEach(r => {
         const inter = /inter-?company|internal|intra/i.test(r.xtype || ''), q = qtyDE(r.qty), what = `${q} Stück ${r.sym}`;
         if (r.dir === 'Out') out.push({ date: r.date, sym: r.sym, title: inter ? 'Übertrag zwischen eigenen Konten (Ausgang)' : 'Übertrag an einen anderen Broker / ein anderes Depot (Ausgang)',
           text: `${what} aus ${A(r.account)} übertragen (${r.xtype || 'Übertrag'}) — keine Veräußerung. ${inter ? 'Die Lots werden mit ihren ursprünglichen Kaufdaten und Anschaffungskosten in das Zielkonto übernommen.' : 'Die Lots wurden aus der FIFO-Berechnung dieses Kontos entfernt; die Anschaffungskosten gehen mit dem Übertrag auf das Zieldepot über.'}` });
@@ -168,12 +176,12 @@
               : pn && pn.filled ? 'Kaufdatum und Kaufpreis vom Steuerpflichtigen angegeben (kein Kaufbeleg in den Abrechnungen) — Nachweis beifügen.' : 'Der Kauf ist in den Abrechnungen nicht enthalten — Anschaffungskosten fehlen (siehe „Offene Punkte“, soweit verkauft).') });
         }
       });
-      (ing.records || []).filter(r => r.kind === 'split' && inY(r.date) && once(['s', r.sym, r.date, r.ratio].join('|'))).forEach(r => {
+      (ing.records || []).filter(r => r.kind === 'split' && affected(r.sym, r.date) && once(['s', r.sym, r.date, r.ratio].join('|')) && (useSrc(r.src), true)).forEach(r => {
         const t = r.ratio >= 1 ? `${+r.ratio.toFixed(6)} : 1` : `1 : ${+(1 / r.ratio).toFixed(6)}`;
         out.push({ date: r.date, sym: r.sym, title: r.ratio >= 1 ? 'Aktiensplit' : 'Reverse Split', text: `${r.sym}: Split ${t} — die Stückzahl der offenen Lots wird mit dem Faktor multipliziert, die Gesamtanschaffungskosten und Kaufdaten bleiben unverändert (keine Veräußerung, kein Ertrag; § 20 Abs. 4a EStG sinngemäß).` });
       });
       const CT = { exchange: 'Umtausch / Namens- oder ISIN-Wechsel', reverse_split: 'Reverse Split mit neuer ISIN', mixed: 'Fusion gegen Bar und Aktien', cash: 'Barabfindung / Übernahme', cash_in_lieu: 'Spitzenausgleich in bar', worthless: 'Ausbuchung (Wertlosigkeit / Delisting)', spinoff: 'Abspaltung (Spin-off)', stockdiv: 'Aktiendividende' };
-      (ing.corpEvents || []).filter(e => inY(e.date)).forEach(e => {
+      (ing.corpEvents || []).filter(e => affected(e.sym, e.date) && (useSrc(e.src), true)).forEach(e => {
         const txt = {
           exchange: `${e.sym} → ${e.newSym}${e.factor && Math.abs(e.factor - 1) > 1e-9 ? ` (Faktor ${+Number(e.factor).toFixed(6)})` : ''}: Die Lots werden mit ursprünglichen Kaufdaten und Anschaffungskosten fortgeführt (Tausch von Anteilen, keine Veräußerung; § 20 Abs. 4a EStG sinngemäß).`,
           reverse_split: `${e.sym} → ${e.newSym} (Faktor ${+Number(e.factor).toFixed(6)}): Die Lots werden mit ursprünglichen Kaufdaten und Anschaffungskosten fortgeführt (keine Veräußerung).`,
@@ -185,18 +193,20 @@
           stockdiv: `${e.sym}: Aktiendividende — behandelt wie Gratisaktien (Gesamtanschaffungskosten unverändert) bzw. als Ertrag zum Marktwert, je nach Einstellung; zu prüfen.` }[e.type];
         if (txt) out.push({ date: e.date, sym: e.sym, title: CT[e.type] || e.type, text: txt + (e.desc ? ` Beschreibung laut Abrechnung: „${e.desc}“.` : ''), disputed: !!e.disputed });
       });
-      (ing.aliases || []).forEach(a => { if ((ing.records || []).some(r => inY(r.date) && r.symOrig === a.from) && once(['a', a.from, a.to].join('|'))) out.push({ date: `${Y}-01-01`, sym: a.to, title: 'Ticker-Wechsel', text: `${a.from} → ${a.to}: dieselbe Wertpapier-ID (Conid ${a.conid}) in den Abrechnungen — die Lots von ${a.from} sind unter dem neuen Namen fortgeführt (Kaufdaten und Anschaffungskosten unverändert).` }); });
+      (ing.aliases || []).forEach(a => { if (soldY.some(x => x.sym === a.to) && (ing.records || []).some(r => r.symOrig === a.from) && once(['a', a.from, a.to].join('|'))) out.push({ date: `${Y}-01-01`, sym: a.to, title: 'Ticker-Wechsel', text: `${a.from} → ${a.to}: dieselbe Wertpapier-ID (Conid ${a.conid}) in den Abrechnungen — die Lots von ${a.from} sind unter dem neuen Namen fortgeführt (Kaufdaten und Anschaffungskosten unverändert).` }); });
       R.filter(x => x.year === year).forEach(x => (x.lots || []).filter(l => l.manual).forEach(l => { if (once(['m', x.sym, l.date].join('|'))) out.push({ date: l.date, sym: x.sym, title: 'Anschaffungskosten manuell angegeben', text: `${x.sym}: Kaufdatum ${dmy(l.date)}${l.px != null ? `, Kaufpreis ${pxDE(l.px)} ${l.ccy || ''}` : ''} vom Steuerpflichtigen angegeben (kein Kaufbeleg in den Abrechnungen) — Nachweis beifügen.` }); }));
-      const cg = {}; (fifo.controlLog || []).filter(c => c.year === year && c.type === 'start').forEach(c => { (cg[c.account + '|' + c.date] = cg[c.account + '|' + c.date] || []).push(c); });
+      const cg = {}; (fifo.controlLog || []).filter(c => c.year === year && c.type === 'start' && soldY.some(x => x.sym === c.sym && x.account === c.account) && (useSrc(c.file), true)).forEach(c => { (cg[c.account + '|' + c.date] = cg[c.account + '|' + c.date] || []).push(c); });
       Object.values(cg).forEach(g => out.push({ date: g[0].date, sym: '', title: 'Anfangsbestand laut Abrechnung', text: `${A(g[0].account)}, Stand ${dmy(g[0].date)}: ${g.map(c => `${c.sym} — berechnet ${qtyDE(c.held)} Stück, laut Abrechnung ${qtyDE(c.reported)} Stück; ${qtyDE(c.dropped)} Stück der ältesten Lots wurden nicht verwendet`).join('; ')}. Für den Zeitraum davor liegt keine Abrechnung vor.` }));
       return out.sort((a, b) => String(a.date).localeCompare(String(b.date)));
     }, []);
 
     // ─── групите на „Не е сметнато“ (годината) ───
     const groups = safe('Nicht berücksichtigt', () => TC.skippedGroups(ing.skipped || [], { year, rate: rateFn, acked }), { law: [], info: [], review: [], missing: [] });
+    (ing.skipped || []).forEach(x => { if (!String(x.date || '').startsWith(Y)) return; const k = TC.skipKind(x, acked); if (k === 'missing' || (TC.SKIP_KINDS[k] || {}).group === 'law') useSrc(x.src); });
+    (de.skippedUndated || []).forEach(x => useSrc(x.src)); (de.unreadFiles || []).forEach(x => useSrc(x.what));
     const fmtTotals = g => Object.entries(g.year.totals).map(([c, v]) => ccyDE(v, c)).join(' + ');
     const kindRow = (g, useAll) => ({ title: g.de, basis: g.basisDe, n: useAll ? g.all.n : g.year.n, totals: g.sum ? fmtTotals(g) : '', eur: g.sum && g.year.n ? g.year.eur : null, eurMissing: g.year.eurMissing || 0, kind: g.kind });
-    const excluded = { law: groups.law.filter(g => g.year.n).map(g => kindRow(g, false)), info: groups.info.filter(g => g.all.n).map(g => kindRow(g, true)) };      // 14.11.2026: групата „За проверка“ (Forex, данък върху лихви…) е само в калкулатора, не в отчета
+    const excluded = { law: groups.law.filter(g => g.year.n).map(g => kindRow(g, false)), info: groups.info.map(g => { const e = g.entries.filter(x => x.date ? String(x.date).startsWith(Y) : used.has(x.src)); return e.length ? { ...kindRow(g, true), n: e.length } : null; }).filter(Boolean) };      // 14.11.2026: групата „За проверка“ (Forex, данък върху лихви…) е само в калкулатора, не в отчета
     const debitInt = incomes.interest.debits;
     if (Math.abs(debitInt) > 0.004) excluded.law.push({ title: 'Sollzinsen (Debitzinsen)', basis: '§ 20 Abs. 9 EStG: Werbungskosten werden nicht abgezogen', n: incomes.interest.rows.filter(r => r.eur < 0).length, totals: '', eur: debitInt, eurMissing: 0, kind: 'debit_interest' });
 
@@ -232,7 +242,9 @@
     if ((de.crypto || []).length) method.push('Kryptowerte (§ 23 EStG): Veräußerungen innerhalb eines Jahres nach der Anschaffung sind steuerpflichtig (Freigrenze je Person); Veräußerungen danach sind steuerfrei und gesondert ausgewiesen.');
 
     // ─── Quellen ───
-    const sources = (ing.files || []).map(f => ({ name: maskFile(f.name), broker: f.format === 'ecb_rates' ? 'EZB' : noCyr(f.broker), format: TC.REPORT_FORMATS[f.format] || f.format, period: f.period || (f.from ? `${dmy(f.from)}${f.to && f.to !== f.from ? ' – ' + dmy(f.to) : ''}` : ''), records: f.records || 0, used: f.format !== 'taxtool_result' && f.format !== 'xlsx' && f.format !== 'unknown' && !f.error }));
+    const sources = (ing.files || []).filter(f => f.format !== 'ecb_rates' && used.has(f.name)).map(f => ({ name: maskFile(f.name), broker: noCyr(f.broker), format: TC.REPORT_FORMATS[f.format] || f.format, period: f.period || (f.from ? `${dmy(f.from)}${f.to && f.to !== f.from ? ' – ' + dmy(f.to) : ''}` : ''), used: f.format !== 'taxtool_result' && f.format !== 'xlsx' && f.format !== 'unknown' && !f.error }));
+    const brokers = safe('Broker', () => { const seen = {}; (ing.files || []).forEach(f => { if (f.format === 'ecb_rates' || f.notSource || f.error || !f.broker || !used.has(f.name)) return;
+      const k = f.broker + '|' + (f.accountMasked || ''), o = seen[k] = seen[k] || { broker: f.broker, account: acctDE(f.accountMasked || ''), files: 0 }; o.files++; }); return Object.values(seen); }, []);
     const now = ctx.now || new Date().toISOString().slice(0, 10);
     return { title: `Aufstellung der Kapitalerträge ${year} — selbst erstellt`, year, name: String(ctx.name || '').trim(), createdOn: dmy(now), joint: !!st.joint, complete, reasons, brokers, summary, sales, incomes, special, excluded,
       method, sources, rateSource: typeof ctx.rateSource === 'string' ? noCyr(ctx.rateSource) : Object.entries(ctx.rateSource || {}).map(([c, s]) => c + ': ' + TC.rateSourceDE(s)).join('; '), checks, checksOk: checks.every(c => c.ok), errors, footer: TC.REPORT_FOOTER, hasRates: Object.keys(table).length > 0 };
@@ -251,7 +263,7 @@
     // заглавие
     out.push(`<header><h1>${esc(m.title)}</h1><table class="kv"><tr><td>Name</td><td>${m.name ? esc(m.name) : '______________________________'}${m.joint ? ' <span class="s">(Zusammenveranlagung)</span>' : ''}</td></tr>
       <tr><td>Steuerjahr</td><td>${esc(m.year)}</td></tr><tr><td>Erstellt am</td><td>${esc(m.createdOn)}</td></tr>
-      <tr><td>Broker / Konten</td><td>${m.brokers.length ? m.brokers.map(b => `${esc(b.broker)}${b.account ? ', Konto ' + esc(b.account) : ''} <span class="s">(${b.from ? 'Daten ' + esc(dmy(b.from)) + (b.to && b.to !== b.from ? ' – ' + esc(dmy(b.to)) : '') + '; ' : ''}${b.records} Datensätze${b.files > 1 ? ', ' + b.files + ' Dateien' : ''})</span>`).join('<br>') : '—'}</td></tr></table></header>`);
+      <tr><td>Broker / Konten</td><td>${m.brokers.length ? m.brokers.map(b => `${esc(b.broker)}${b.account ? ', Konto ' + esc(b.account) : ''} ${b.files > 1 ? `<span class="s">(${b.files} Dateien)</span>` : ''}`).join('<br>') : '—'}</td></tr></table></header>`);
     // червена рамка при НЕПЪЛНО
     if (!m.complete) {
       const top = m.reasons.slice(0, 8);
@@ -290,7 +302,7 @@
     if (IN.yield.rows.length) out.push(sec(`Sonstige Kapitalerträge — CYEP/SYEP ${m.year}`, '<div class="s">Erträge aus dem Cash/Stock Yield Enhancement Program (CYEP/SYEP) von Interactive Brokers (Abschnitt „CYEP/Broker Fees“ der Abrechnung, positive Beträge): ausländische Kapitalerträge, in Zeile 19 enthalten; nicht in den Zinsen (Abschnitt „Interest“) enthalten.</div>' + incTable(IN.yield.rows, IN.yield.total, 'Summe CYEP/SYEP-Erträge')));
     out.push(sec(`Quellensteuer ${m.year}`, incTable(IN.withholding.rows, IN.withholding.total, 'Summe einbehaltene Quellensteuer (negativ = einbehalten)') + (IN.credit.length ? `<h3>Anrechenbare ausländische Steuern (Zeile 41)</h3><table class="t">${th(['Wertpapier', '>Einbehalten EUR', '>Bruttodividende EUR', `>Höchstbetrag EUR (${Math.round(IN.rate * 100)} %)`, '>Anrechenbar EUR'])}${IN.credit.map(c => `<tr><td>${esc(c.label)}</td><td class="n">${eur(c.withheld)}</td><td class="n">${eur(c.gross)}</td><td class="n">${eur(c.cap)}</td><td class="n"><b>${eur(c.credited)}</b></td></tr>`).join('')}<tr class="tot"><td>Summe</td><td class="n">${eur(IN.credit.reduce((s, c) => s + c.withheld, 0))}</td><td class="n">${eur(IN.credit.reduce((s, c) => s + c.gross, 0))}</td><td class="n"></td><td class="n"><b>${eur(IN.credit.reduce((s, c) => s + c.credited, 0))}</b></td></tr></table>` : '')));
     // Besondere Vorgänge
-    out.push(sec('Besondere Vorgänge', m.special.length ? `<table class="t">${th(['Datum', 'Wertpapier', 'Vorgang', 'Behandlung und Begründung'])}${m.special.map(s => `<tr><td>${esc(dmy(s.date))}</td><td>${esc(s.sym || '')}</td><td>${esc(s.title)}${s.disputed ? ' <span class="s">(zu prüfen)</span>' : ''}</td><td class="s">${esc(s.text)}</td></tr>`).join('')}</table>` : '<div class="s">Keine besonderen Vorgänge (Übertrage, Splits, Fusionen, Ticker-Wechsel) im Jahr ' + esc(m.year) + '.</div>'));
+    out.push(sec('Besondere Vorgänge', m.special.length ? `<div class="s">Aufgeführt sind nur Vorgänge, die Lots betreffen, die im Jahr ${esc(m.year)} verkauft wurden (auch aus früheren Jahren).</div><table class="t">${th(['Datum', 'Wertpapier', 'Vorgang', 'Behandlung und Begründung'])}${m.special.map(s => `<tr><td>${esc(dmy(s.date))}</td><td>${esc(s.sym || '')}</td><td>${esc(s.title)}${s.disputed ? ' <span class="s">(zu prüfen)</span>' : ''}</td><td class="s">${esc(s.text)}</td></tr>`).join('')}</table>` : '<div class="s">Keine besonderen Vorgänge (Übertrage, Splits, Fusionen, Ticker-Wechsel), die im Jahr ' + esc(m.year) + ' verkaufte Lots betreffen.</div>'));
     // Nicht berücksichtigt
     const ex = m.excluded, exRows = rows => rows.map(r => `<tr><td>${esc(r.title)}</td><td class="n">${r.n}</td><td class="n">${r.totals ? esc(r.totals) : ''}${r.eur != null ? `<div>${esc(F(r.eur))}${r.eurMissing ? ' <span class="s">(ohne Umrechnung für ' + r.eurMissing + ' Zeilen — kein Kurs)</span>' : ''}</div>` : ''}</td><td class="s">${esc(r.basis)}</td></tr>`).join('');
     let nb = '';
@@ -300,7 +312,7 @@
     // Offene Punkte
     out.push(sec('Offene Punkte', m.reasons.length ? `<ol>${m.reasons.map(r => `<li class="${r.type === 'generic' ? '' : 'open'}">${esc(r.text)}</li>`).join('')}</ol>` : '<div>Keine offenen Punkte.</div>'));
     // Quellen
-    out.push(sec('Quellen — ausgewertete Dateien', `<table class="t">${th(['Datei', 'Broker', 'Format', 'Zeitraum', '>Datensätze'])}${m.sources.map(s => `<tr><td>${esc(s.name)}</td><td>${esc(s.broker)}</td><td class="s">${esc(s.format)}${s.used ? '' : ' — nicht ausgewertet'}</td><td>${esc(s.period)}</td><td class="n">${s.records || ''}</td></tr>`).join('')}</table>${m.rateSource ? `<div class="s">Wechselkurse: ${esc(m.rateSource)}</div>` : ''}`));
+    out.push(sec('Quellen — ausgewertete Dateien', `<table class="t">${th(['Datei', 'Broker', 'Format', 'Zeitraum'])}${m.sources.map(s => `<tr><td>${esc(s.name)}</td><td>${esc(s.broker)}</td><td class="s">${esc(s.format)}${s.used ? '' : ' — nicht ausgewertet'}</td><td>${esc(s.period)}</td></tr>`).join('')}</table>${m.rateSource ? `<div class="s">Wechselkurse: ${esc(m.rateSource)}</div>` : ''}`));
     out.push(`<footer>${esc(m.footer)}</footer>`);
     return `<div class="rp" lang="de">${out.join('\n')}</div>`;
   };
