@@ -113,9 +113,9 @@ else:
     YS = list(range(2016, 2026))                                                                         # 14.11.2026: датите в копието са изместени с цели месеци — данните са за 2017–2022; годините по-долу са на КОПИЕТО
     o = scenario(inp, years=YS)
     ib = [f for f in o["files"] if f["format"] == "ibkr"]
-    assert [f["records"] for f in ib] == [70, 124, 188, 105], [f["records"] for f in ib]               # 124 и 188 = със 8 + 2 реда Transfers (записи „xfer“ от 13.11)
+    assert [f["records"] for f in ib] == [70, 127, 191, 105], [f["records"] for f in ib]               # 124 и 188 = със 8 + 2 реда Transfers (записи „xfer“ от 13.11); 14.11: +3 във всеки от двата файла с положителни редове „CYEP/Broker Fees“ (доход, записи „yield“)
     assert all(not [p for p in f["problems"] if p["level"] == "err"] for f in ib), "истинският формат не бива да дава червено съобщение за файл"
-    print("  ✓ и четирите файла са разпознати като IBKR: 70 / 124 / 188 / 105 записа (вкл. Transfers), без червено съобщение за файл")
+    print("  ✓ и четирите файла са разпознати като IBKR: 70 / 127 / 191 / 105 записа (вкл. Transfers), без червено съобщение за файл")
     A1, A2 = "X0000001", "X0000002"
     by = {}
     for r in o["records"]:

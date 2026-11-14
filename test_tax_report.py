@@ -1,7 +1,8 @@
 """
 13.11.2026 (tax-report): отчетът за Finanzamt и подредбата на „Не е сметнато“ в данъчния калкулатор (docs/tax_core.js, docs/tax_report.js, docs/tax_ui.js, docs/tax.html).
   1) „Не е сметнато“ на групи: ИЗКЛЮЧЕНО ПО ЗАКОН (такси — § 20 ал. 9 EStG: котировки, ADR, други) и редове без данъчно значение — информация, НЕ прави годината НЕПЪЛНО; ЗА ПРОВЕРКА (Forex, данък върху лихви) — също не;
-     ЛИПСВАЩИ ДАННИ (облагаемо / нечетимо — напр. положителен CYEP / SYEP доход) — единственото, което прави годината НЕПЪЛНО.
+     ЛИПСВАЩИ ДАННИ (облагаемо / нечетимо — напр. ред без четима дата или нечетим вид инструмент) — единственото, което прави годината НЕПЪЛНО.
+  CYEP / SYEP (14.11): положителните редове на „CYEP/Broker Fees“ са доход, който НЕ е в секция Interest — смята се като „други доходи от капитал“ (Zeile 19) с етикет; „За проверка“ (Forex, данък върху лихви) е САМО в калкулатора, не в отчета.
   2) Отчетът (TC.reportModel + TC.reportHTML): цял на НЕМСКИ (без кирилица), сумите му = сумите на страницата, при НЕПЪЛНО — червена рамка с причините, без външни библиотеки и без мрежа.
   3) Бутоните и печатът: статични проверки на docs/tax.html и docs/tax_ui.js (Playwright тук няма — оформлението е проверено в браузъра ръчно, виж доклада).
 ПРОИЗХОД НА ВХОДОВЕТЕ (правило 7 / 9 на CLAUDE.md): СИНТЕТИЧНИ — CSV и IBKR редове, построени тук (тикъри AAA…, сметка U9300001, суми и дати от въображението; курсът на USD е различен за всеки ден, за да личи къде е ползван кой курс).
@@ -71,23 +72,41 @@ assert all("§ 20 ал. 9 EStG" in x["basisBg"] and "§ 20 Abs. 9 EStG" in x["ba
 sm = kind(g, "info", "summary")
 assert sm["all"]["n"] == 4 and sm["year"]["n"] == 0 and sm["noDate"] == 4, sm["all"]                                                         # 3 реда „Change in NAV“ без заглавен ред + „Disclaimer“ — без дата, не облагаеми
 fx, iw = kind(g, "review", "fx"), kind(g, "review", "interest_withholding")
+assert "§ 23 EStG (Fremdwährung, в рамките на 1 година) — провери" in fx["basisBg"] and fx["byYear"]["2025"]["n"] == 1 and abs(fx["byYear"]["2025"]["totals"]["USD"] - 1080) < 1e-9 and abs(fx["byYear"]["2025"]["eur"] - 1080 / rate("2025-03-13")) < 1e-9, fx["byYear"]   # оборот (Σ |Proceeds|) по години
 assert fx["year"]["n"] == 1 and iw["year"]["n"] == 1 and abs(iw["year"]["totals"]["USD"] + 0.5) < 1e-9 and abs(iw["year"]["eur"] + 0.5 / rate("2025-05-16")) < 1e-9
 assert [x["kind"] for x in g["law"]] == ["fee_quote", "fee_adr", "fee_other"] and [x["kind"] for x in g["info"]] == ["summary"] and sorted(x["kind"] for x in g["review"]) == ["fx", "interest_withholding"]
 print("  ✓ изключено по закон (§ 20 ал. 9 EStG): котировки 3 реда нето −2,00 €; ADR 2 реда (−5,00 USD, всеки по курса на деня си); други такси 1 ред (−4,00 USD); обобщения 4 реда (3 × Change in NAV без заглавен ред + Disclaimer, без дата);")
 print("    за проверка: Forex 1, данък върху лихви 1 (−0,50 USD) — липсващи данни: 0, 2025 е ПЪЛНА; суми и основание по вид, не ред по ред")
-print("── 2. липсващи данни = облагаемо / нечетимо; НЕПЪЛНО само от тях. Положителен CYEP / SYEP е доход (до сега излизаше като „секцията не се смята“ БЕЗ да прави годината непълна) ──")
-o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(CYEP("USD,2025-08-20,USD CYEP Income for Aug-2025,5,", "USD,2025-10-09,USD IBKR Managed Securities (SYEP) Fees Adjustment for Oct-2025,-1.5,")))], [2025])
-g, d = o["groups"][2025], o["de"][2025]
-assert len(g["missing"]) == 1 and g["missing"][0]["section"] == "CYEP/Broker Fees" and g["missing"][0]["taxable"] is True and g["missing"][0]["amount"] == "5" and d["complete"] is False and len(d["skippedTaxable"]) == 1
+print("── 2. CYEP / SYEP: положителните редове са ДОХОД, който не е в секция Interest → „други доходи от капитал“ с етикет; отрицателните — такса ──")
+INT = ["Interest,Header,Currency,Account,Date,Description,Amount", "Interest,Data,USD,U9300001,2025-08-29,USD Credit Interest for Aug-2025,40"]
+o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(CYEP("USD,2025-08-20,USD CYEP Income for Aug-2025,5,", "USD,2025-10-09,USD IBKR Managed Securities (SYEP) Fees Adjustment for Oct-2025,-1.5,"), INT))], [2025])
+g, d, dc = o["groups"][2025], o["de"][2025], o["decl"][2025]
+y5 = [r for r in o["records"] if r["kind"] == "yield"]
+assert len(y5) == 1 and y5[0]["amount"] == 5 and y5[0]["currency"] == "USD" and y5[0]["date"] == "2025-08-20" and y5[0]["desc"] == "USD CYEP Income for Aug-2025"
+assert g["missing"] == [] and d["complete"] is True and d["skippedTaxable"] == [], (g["missing"], d["notes"])
+oi = [i for i in d["items"] if i["cat"] == "otherIncome"]
+assert len(oi) == 1 and abs(oi[0]["eur"] - 5 / rate("2025-08-20")) < 1e-9 and oi[0]["sym"] == "USD CYEP Income for Aug-2025"                       # по курса на деня на реда
+intr = [i for i in d["items"] if i["cat"] == "interest" and i["date"] == "2025-08-29"]
+assert len(intr) == 1 and abs(intr[0]["eur"] - 40 / rate("2025-08-29")) < 1e-9 and len([i for i in d["items"] if i["cat"] == "interest"]) == 2                                                                         # Interest е отделно — не се смесва и не се брои двойно
+z19 = dc["rows"][0]["eur"]
+exp19 = (300 / rate("2025-02-16") - 100 / rate("2025-02-15")) - (1000 / rate("2025-03-08") - 500 / rate("2025-04-05")) + 100 / rate("2025-04-06") + 20 / rate("2025-05-03") + oi[0]["eur"] + intr[0]["eur"] - 10 / rate("2025-05-04")
+assert abs(z19 - exp19) < 1e-9 and dc["control"]["ok"] is True and "+ CYEP / SYEP доход" in dc["rows"][0]["why"], (z19, exp19)                  # Zeile 19 = ръчна сметка (с CYEP + Interest)
+assert dc["parts"]["yld"] == oi[0]["eur"] and "otherIncome" in json.dumps(o["de"][2025]["items"])
 assert kind(g, "law", "fee_other")["year"]["n"] == 1 and abs(kind(g, "law", "fee_other")["year"]["totals"]["USD"] + 1.5) < 1e-9                  # отрицателният ред е такса — информация
-print("  ✓ „CYEP Income“ +5,00 USD → липсващи данни (червено), 2025 е НЕПЪЛНО; отрицателният ред (такса) → изключено по закон и не прави годината непълна")
+print("  ✓ „CYEP Income“ +5,00 USD (20.08.2025) → запис „yield“ → „Други доходи от капитал“ по курса на деня; Interest (40 USD) е отделен — не се брои двойно; Zeile 19 = ръчната сметка; годината е ПЪЛНА (не е „липсващи данни“); отрицателният ред — такса")
 o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(CYEP("USD,2025-07-31,USD IBKR Managed Securities (SYEP) Fees for Jul-2025,4.5,"), SYEP_DET(("2025-07-22", 1.0), ("2025-07-24", 1.5), ("2025-07-25", 2.0))))], [2025])
 g = o["groups"][2025]
-assert kind(g, "info", "detail")["all"]["n"] == 3 and len(g["missing"]) == 1 and g["missing"][0]["amount"] == "4.5", (g["info"], g["missing"])              # подробностите съвпадат с месечния ред (4,5) → информация; месечният ред — доход, не се смята
+assert kind(g, "info", "detail")["all"]["n"] == 3 and g["missing"] == [] and [r["amount"] for r in o["records"] if r["kind"] == "yield"] == [4.5], (g["info"], g["missing"])   # подробностите съвпадат с месечния ред (4,5) → „вече включени“; месечният ред — доход
 o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(SYEP_DET(("2025-07-22", 1.0), ("2025-07-24", 1.5), ("2025-07-25", 2.0))))], [2025])
 g = o["groups"][2025]
 assert kind(g, "info", "detail") is None and len(g["missing"]) == 3 and o["de"][2025]["complete"] is False                                       # без съвпадащ месечен ред — всеки ред е облагаем
-print("  ✓ SYEP: 3 дневни реда със сума 4,50 = месечния ред → подробности (информация), месечният ред 4,50 — липсващи данни; без месечен ред → и трите дневни са липсващи данни")
+print("  ✓ SYEP: 3 дневни реда със сума 4,50 = месечния ред → „подробности, вече включени“ (информация); месечният ред 4,50 е доход; без месечен ред → и трите дневни са липсващи данни, годината е НЕПЪЛНО")
+# липсващи данни: нечетим вид инструмент
+FUT = ["Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,Proceeds,Comm/Fee,Code", 'Trades,Data,Order,Futures,USD,U9300001,ESZ5,"2025-06-12, 10:00:00",1,100,-100,-1,']
+o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(FUT))], [2025])
+g, d = o["groups"][2025], o["de"][2025]
+assert len(g["missing"]) == 1 and g["missing"][0]["section"] == "Trades" and g["missing"][0]["taxable"] is True and d["complete"] is False and len(d["skippedTaxable"]) == 1
+print("  ✓ фючърс в Trades (не се смята) → липсващи данни (червено), 2025 е НЕПЪЛНО — единственото, което прави годината непълна")
 
 print("── 3. отчетът: немски, заглавие, име, дата, раздели, подпис; без кирилица ──")
 o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(FEES, NAV, DISC, FX, WHT))], [2025], joint=True)
@@ -152,28 +171,29 @@ print("  ✓ 10 бр. по 10 USD + сплит 2:1 → 20 бр. по 5 USD (об
 print("── 7. НЕПЪЛНО: червена рамка с причините на първата страница; когато е пълно — няма рамка ──")
 assert 'class="redframe"' not in html and "UNVOLLSTÄNDIG" not in html and m["complete"] is True and m["reasons"] == []
 INC = BASE + rw("sell", "ZZZ", "2025-06-12", 5, 10)                                                                                                     # продажба без покупка
-o = scenario([F("s.csv", INC), F("ibkr.csv", ibkr(CYEP("USD,2025-08-20,USD CYEP Income for Aug-2025,5,"), FEES))], [2025])
+o = scenario([F("s.csv", INC), F("ibkr.csv", ibkr(FUT, FEES))], [2025])
 mi, hi = o["report"][2025]["model"], o["report"][2025]["html"]
 assert mi["complete"] is False and o["de"][2025]["complete"] is False and 'class="redframe"' in hi and "ACHTUNG: Diese Aufstellung ist UNVOLLSTÄNDIG." in hi
 assert [r["type"] for r in mi["reasons"]] == ["unmatched", "skipped"], mi["reasons"]
 assert "Verkauf ohne Kaufnachweis: ZZZ, 5 Stück am 12.06.2025 (CSV, Konto main)" in mi["reasons"][0]["text"] and "NICHT in den Beträgen enthalten" in mi["reasons"][0]["text"]
-assert "Erträge aus CYEP/SYEP (Yield Enhancement Program) — noch nicht berechnet" in mi["reasons"][1]["text"] and "CYEP/Broker Fees" in mi["reasons"][1]["text"]
+assert "Instrumentenart „Futures“ wird nicht berechnet" in mi["reasons"][1]["text"] and "Abschnitt „Trades“" in mi["reasons"][1]["text"]
 assert hi.index('class="redframe"') < hi.index("<h2>Zusammenfassung") and hi.count("Verkauf ohne Kaufnachweis: ZZZ") == 2                                  # рамката е преди резюмето; същата причина е и в „Offene Punkte“
 assert not CYR.search(hi) and mi["summary"]["rows"] and mi["checksOk"] is True
-print("  ✓ продажба без покупка + положителен CYEP доход → 2 причини в червената рамка (преди резюмето) и в „Offene Punkte“; при пълна година рамка няма; таксите (група „по закон“) не са причина")
+print("  ✓ продажба без покупка + фючърс (не се смята) → 2 причини в червената рамка (преди резюмето) и в „Offene Punkte“; при пълна година рамка няма; таксите (група „по закон“) не са причина")
 # само информация (такси + обобщения + Forex + данък върху лихви) → пълна година, без рамка
 o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(FEES, NAV, DISC, FX, WHT, CYEP("USD,2025-08-20,USD CYEP Fee for Aug-2025,-2,")))], [2025])
 assert o["report"][2025]["model"]["complete"] is True and 'class="redframe"' not in o["report"][2025]["html"] and o["de"][2025]["complete"] is True
 print("  ✓ такси, обобщения, Forex, данък върху лихви и отрицателен CYEP ред (такса) → годината е ПЪЛНА, без червена рамка")
 
-print("── 8. „Nicht berücksichtigt — nicht abzugsfähig“: по вид — брой, сума, основание; „Hinweise“ за проверка ──")
+print("── 8. „Nicht berücksichtigt — nicht abzugsfähig“: по вид — брой, сума, основание; „За проверка“ САМО в калкулатора ──")
 o = scenario([F("s.csv", BASE), F("ibkr.csv", ibkr(FEES, NAV, DISC, FX, WHT))], [2025]); mm, hh = o["report"][2025]["model"], o["report"][2025]["html"]
 law = {x["kind"]: x for x in mm["excluded"]["law"]}
 assert sorted(law) == ["fee_adr", "fee_other", "fee_quote"] and law["fee_quote"]["n"] == 3 and law["fee_adr"]["n"] == 2 and law["fee_other"]["n"] == 1 and "-2" not in law["fee_quote"]["totals"]
 assert all("§ 20 Abs. 9 EStG" in x["basis"] for x in law.values()) and "Monatliche Gebühren für Börsen-Kursdaten" in hh and "ADR-Gebühren" in hh and "Sonstige Gebühren außerhalb der Trades" in hh
 assert dfmt(-2.0) in hh and "−5,00 USD" in hh                                                                                                       # котировки: нето −2,00 €; ADR: −5,00 USD
-assert [x["kind"] for x in mm["excluded"]["review"]] == ["fx", "interest_withholding"] and "Hinweise — nicht in den Beträgen enthalten" in hh and "4× Zusammenfassungen und Textabschnitte" in hh
-print("  ✓ котировки 3 × нето −2,00 €, ADR 2 × −5,00 USD (≈ в €), други такси 1 × −4,00 USD — с „§ 20 Abs. 9 EStG“; „Hinweise“: Forex 1, данък върху лихви 1; обобщенията — един ред „4× …“")
+assert "review" not in mm["excluded"] and "Hinweise" not in hh and "4× Zusammenfassungen und Textabschnitte" in hh
+assert not re.search("Devisen|Währungsumtausch|Quellensteuer \\(ohne|einbehaltene Quellensteuer auf Zinsen|Auf Zinsen einbehaltene", hh) and "§ 23 EStG" not in hh, "Forex и данъкът върху лихви са само в калкулатора"
+print("  ✓ котировки 3 × нето −2,00 €, ADR 2 × −5,00 USD (≈ в €), други такси 1 × −4,00 USD — с „§ 20 Abs. 9 EStG“; в отчета няма „Hinweise“, Forex и данък върху лихви (те са само в калкулатора); обобщенията — един ред „4× …“")
 
 print("── 9. реални формати: анонимният IBKR отчет и фикстурата на Revolut — отчетът се генерира, цял на немски, сверен със страницата ──")
 real = (ROOT / "tests" / "fixtures" / "tax" / "real_anon" / "ibkr_summary_202107_202205.csv").read_text(encoding="utf-8")
@@ -192,6 +212,17 @@ o = scenario([F("trading.csv", rev)], [2018])
 mr, hr = o["report"][2018]["model"], o["report"][2018]["html"]
 assert not CYR.search(hr) and "Aktien" in hr and mr["checksOk"] is True and [x["kind"] for x in mr["excluded"]["law"]] == ["fee_other"] and "Revolut" in hr
 print("  ✓ Revolut „Trading account statement“ (реален формат): сметката „акции“ → „Aktien“, описанията на български не влизат в отчета; „CUSTODY_FEE“ → изключено по закон; сумите са сверени")
+
+# CYEP / SYEP в РЕАЛНИЯ формат (анонимни стойности): „CYEP/Broker Fees“ с положителни редове — доход, отделно от Interest; отчетът има раздел с етикет
+cy = [F(n, (ROOT / "tests" / "fixtures" / "tax" / "real_anon" / n).read_text(encoding="utf-8")) for n in ("ibkr_statement_201807_201906.csv", "ibkr_statement_201907_202006_2accounts.csv")]
+o = scenario(cy, [2019])
+yl = [r for r in o["records"] if r["kind"] == "yield"]
+assert len(yl) == 6 and all(r["amount"] > 0 for r in yl), len(yl)                                                                                       # 3 + 3 реда в двата файла
+mc, hc = o["report"][2019]["model"], o["report"][2019]["html"]
+assert abs(mc["incomes"]["yield"]["total"] - sum(r["amount"] / rate(r["date"]) for r in yl if r["date"].startswith("2019"))) < 1e-6 and mc["checksOk"] is True
+assert "<h2>Sonstige Kapitalerträge — CYEP/SYEP 2019</h2>" in hc and "nicht in den Zinsen (Abschnitt „Interest“) enthalten" in hc and not CYR.search(hc)
+assert "Erträge aus CYEP/SYEP" in mc["summary"]["rows"][0]["calc"] and all(r["kind"] != "yield" or r["amount"] > 0 for r in o["records"])
+print("  ✓ реален формат (анонимни стойности): 6 положителни реда „CYEP/Broker Fees“ → „Други доходи от капитал“; в отчета — раздел „Sonstige Kapitalerträge — CYEP/SYEP“ с етикет и „+ Erträge aus CYEP/SYEP“ в Zeile 19; сумите сверени")
 
 print("── 10. без курсове: отчетът не се чупи — липсващият курс е причина, годината е НЕПЪЛНА ──")
 o = scenario([F("s.csv", BASE)], [2025], ecb=False)

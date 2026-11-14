@@ -314,7 +314,7 @@
         const qty = TC.num(r['Quantity']), proceeds = TC.num(r['Proceeds']), fee = TC.num(r['Comm/Fee']), tprice = TC.num(r['T. Price']);
         if (!cat) return skip(sec, r, line, `непознат вид инструмент „${r['Asset Category']}“`, true, { de: 'unbekannte Instrumentenart' });
         if (!dt || !qty) return skip(sec, r, line, 'сделка без дата или количество', true, { de: 'Handel ohne Datum oder Menge' });
-        if (cat === 'forex') return skip(sec, r, line, 'обмяна на валута (Forex) — курсовата разлика не се смята (виж предупреждението за валута)', false, { cat: 'fx' });
+        if (cat === 'forex') return skip(sec, r, line, 'обмяна на валута (Forex) — курсовата разлика не се смята (виж предупреждението за валута)', false, { cat: 'fx', proceeds: r['Proceeds'] || '' });
         if (cat === 'other') return skip(sec, r, line, `${r['Asset Category']} — не се смята от калкулатора`, true, { de: `Instrumentenart „${r['Asset Category']}“ wird nicht berechnet` });
         const price = isFinite(proceeds) && proceeds !== 0 ? Math.abs(proceeds / qty) : tprice;
         if (!isFinite(price)) return skip(sec, r, line, 'сделка без цена', true, { de: 'Handel ohne Preis' });
@@ -377,9 +377,13 @@
       }
       // 13.11.2026: CYEP / SYEP — отрицателна сума = такса (не се приспада); положителна = ДОХОД, платен на клиента, който калкулаторът още не смята → облагаемо (годината е НЕПЪЛНО), не „информация“
       if (sec === CYEP_SEC) {
-        const a = TC.num(r['Amount']);
+        const a = TC.num(r['Amount']), dtc = TC.parseDateTime(r['Date']);
         if (isFinite(a) && a < 0) return skip(sec, r, line, 'такса на брокера (CYEP / SYEP) — не се приспада от доходите от капитал (§20 ал. 9 EStG; да се потвърди)', false, { cat: 'fee' });
-        return skip(sec, r, line, 'CYEP / SYEP: положителна сума = доход, платен на клиента — калкулаторът още не го смята („CYEP Income“, „(SYEP) Fees“); сметни го отделно', true, { de: 'Erträge aus CYEP/SYEP (Yield Enhancement Program) — noch nicht berechnet' });
+        if (a === 0) return ign(sec, 'нулев ред');
+        // 14.11.2026: положителна сума = доход, платен на клиента („CYEP Income“, „(SYEP) Fees“) → запис kind 'yield' → „Други доходи от капитал“ (Zeile 19). Сверка върху реалните отчети: НЕ е в секция Interest
+        // (няма съвпадаща сума по месец, а в „Change in NAV“ има отделен ред „CYEP/Broker Fees“, различен от „Interest“) → без двойно броене.
+        if (isFinite(a) && dtc) return push(sec, { ...base(r, line, src), kind: 'yield', date: dtc.date, amount: a, currency: r['Currency'], desc: r['Description'] });
+        return skip(sec, r, line, 'CYEP / SYEP: ред без четима дата или сума (очаквам Date = ГГГГ-ММ-ДД и Amount = число)', true, { de: 'CYEP/SYEP-Zeile ohne lesbares Datum oder lesbaren Betrag' });
       }
       if (sec === SYEP_FEE_DET) {
         const dd = TC.parseDateTime(r['Value Date']), mk = dd ? dd.date.slice(0, 7) : '';
@@ -691,7 +695,7 @@
     const Y = String(year), recs = (ing && ing.records) || [], sk = (ing && ing.skipped) || [];
     const count = list => { const o = { records: list.length, trades: 0, buys: 0, sells: 0, dividends: 0, withholding: 0, interest: 0, splits: 0 };
       list.forEach(r => { if (r.kind === 'trade') { o.trades++; o[r.qty > 0 ? 'buys' : 'sells']++; } else if (r.kind === 'dividend') o.dividends++; else if (r.kind === 'withholding') o.withholding++;
-                          else if (r.kind === 'interest') o.interest++; else if (r.kind === 'split') o.splits++; else if (['exchange', 'spinoff', 'stockdiv'].includes(r.kind)) o.corp = (o.corp || 0) + 1; });
+                          else if (r.kind === 'interest') o.interest++; else if (r.kind === 'yield') o.yields = (o.yields || 0) + 1; else if (r.kind === 'split') o.splits++; else if (['exchange', 'spinoff', 'stockdiv'].includes(r.kind)) o.corp = (o.corp || 0) + 1; });
       return o; };
     const all = count(recs), yr = count(recs.filter(r => r.date.startsWith(Y)));
     const un = (fifoRes && fifoRes.unmatched) || [], R = ((fifoRes && fifoRes.realized) || []).filter(x => x.year === Number(year));
@@ -720,8 +724,8 @@
       basisBg: 'няма данъчно събитие — доходите и сделките са в секциите Trades, Dividends, Interest и т.н.', basisDe: 'kein steuerliches Ereignis — Erträge und Veräußerungen stehen in den Abschnitten Trades, Dividends, Interest usw.' },
     detail: { group: 'info', bg: 'Подробности към вече отбелязан месечен ред (дневна разбивка на SYEP таксите)', de: 'Detailzeilen zu einer bereits erfassten Monatszeile (SYEP)',
       basisBg: 'месечният ред е отбелязан отделно — без двойно броене', basisDe: 'die Monatszeile ist gesondert erfasst — keine Doppelzählung' },
-    fx: { group: 'review', bg: 'Обмяна на валута (Forex)', de: 'Devisengeschäfte (Währungsumtausch)',
-      basisBg: 'курсовата разлика не е сметната — при държане до една година може да е частна продажба по § 23 EStG (виж предупреждението за валута)', basisDe: 'Kursgewinne/-verluste nicht berechnet — bei Haltedauer bis zu einem Jahr mögliche private Veräußerungsgeschäfte (§ 23 EStG); gesondert zu prüfen' },
+    fx: { group: 'review', sum: true, abs: true, amountField: 'proceeds', bg: 'Обмяна на валута (Forex)', de: 'Devisengeschäfte (Währungsumtausch)',
+      basisBg: 'валутна обмяна — възможна облагаема частна продажба по § 23 EStG (Fremdwährung, в рамките на 1 година) — провери; сумата е оборот (Σ |Proceeds|), курсовата разлика не е сметната', basisDe: 'Kursgewinne/-verluste nicht berechnet — bei Haltedauer bis zu einem Jahr mögliche private Veräußerungsgeschäfte (§ 23 EStG); gesondert zu prüfen' },
     interest_withholding: { group: 'review', sum: true, bg: 'Удържан данък върху лихви (без тикър)', de: 'Auf Zinsen einbehaltene Quellensteuer',
       basisBg: 'не е в Zeile 41 и не е в числата — зачитането в Германия е неясно (виж блока „Какво попълваш“)', basisDe: 'nicht in Zeile 41 angesetzt und nicht in den Beträgen — Anrechenbarkeit in Deutschland offen' },
     acked: { group: 'review', bg: 'Потвърдено ръчно — без ефект върху лотовете', de: 'Vom Steuerpflichtigen bestätigt: ohne Wirkung auf die Bestände',
@@ -742,20 +746,14 @@
     (skipped || []).forEach(x => {
       const k = TC.skipKind(x, o.acked);
       if (k === 'missing') { missing.push(x); return; }
-      const K = TC.SKIP_KINDS[k], g = kinds[k] = kinds[k] || { kind: k, group: K.group, bg: K.bg, de: K.de, basisBg: K.basisBg, basisDe: K.basisDe, sum: !!K.sum, entries: [], all: { n: 0 }, year: { n: 0, totals: {}, eur: 0, eurMissing: 0 }, noDate: 0 };
+      const K = TC.SKIP_KINDS[k], g = kinds[k] = kinds[k] || { kind: k, group: K.group, bg: K.bg, de: K.de, basisBg: K.basisBg, basisDe: K.basisDe, sum: !!K.sum, entries: [], byYear: {}, all: { n: 0 }, year: { n: 0, totals: {}, eur: 0, eurMissing: 0 }, noDate: 0 };
       g.entries.push(x); g.all.n++;
       if (!x.date) g.noDate++;
-      if (Y && String(x.date || '').startsWith(Y)) {
-        g.year.n++;
-        if (K.sum) {
-          const m = TC.money(x.amount, x.currency), cur = m.cur || x.currency || '';
-          if (isFinite(m.v)) {
-            g.year.totals[cur] = (g.year.totals[cur] || 0) + m.v;
-            const f = !cur || cur === 'EUR' ? 1 : (rate ? rate(cur, x.date) : null);
-            if (f) g.year.eur += m.v / f; else g.year.eurMissing++;
-          } else g.year.eurMissing++;
-        }
-      }
+      const yr = /^\d{4}/.test(x.date || '') ? x.date.slice(0, 4) : '';
+      const add = b => { b.n++; if (!K.sum) return; const m = TC.money(K.amountField ? x[K.amountField] : x.amount, x.currency), cur = m.cur || x.currency || '', v = K.abs ? Math.abs(m.v) : m.v;
+        if (isFinite(v)) { b.totals[cur] = (b.totals[cur] || 0) + v; const f = !cur || cur === 'EUR' ? 1 : (rate ? rate(cur, x.date) : null); if (f) b.eur += v / f; else b.eurMissing++; } else b.eurMissing++; };
+      if (yr) add((g.byYear[yr] = g.byYear[yr] || { n: 0, totals: {}, eur: 0, eurMissing: 0 }));      // 14.11.2026: и по години (обмяната на валута — брой и оборот по години)
+      if (Y && yr === Y) add(g.year);
     });
     const rank = x => String(x.date || '').startsWith(Y) ? 0 : !x.date ? 1 : 2;
     const sorted = missing.map((x, i) => ({ x, i })).sort((p, q) => rank(p.x) - rank(q.x) || p.i - q.i).map(z => z.x);
@@ -1271,6 +1269,7 @@
     shareLosses: { bg: 'Загуби от продажба на акции', form: 'Anlage KAP — загуби от продажба на акции (прихващат се само с печалби от акции)' },
     dividends: { bg: 'Дивиденти (нето след сторно)', form: 'Anlage KAP — доходи от капитал без германски данък' },
     interest: { bg: 'Лихви от брокера (кредитни)', form: 'Anlage KAP — доходи от капитал без германски данък' },
+    otherIncome: { bg: 'Други доходи от капитал — CYEP / SYEP (програма на IBKR за добавена доходност)', form: 'Anlage KAP — доходи от капитал без германски данък' },
     options: { bg: 'Опции — печалби (вкл. премии на Stillhalter)', form: 'Anlage KAP — доходи от капитал без германски данък (Termingeschäfte / Stillhalterprämien)' },
     optionLosses: { bg: 'Опции — загуби', form: 'Anlage KAP — загуби без загубите от акции' },
     pil: { bg: 'Плащания вместо дивидент (Payment in Lieu)', form: 'Anlage KAP — доходи от капитал без германски данък' },
@@ -1338,6 +1337,7 @@
       if (ft !== 'stock') { fundsSeen[o.sym] = ft; const tf = tfOf(ft); items.push({ cat: o.eur >= 0 ? 'funds' : 'fundLosses', sym: o.sym, eur: o.eur * (1 - tf), gross: o.eur, fundType: ft, tf, distribution: true }); return; }
       items.push({ cat: o.eur >= 0 ? 'dividends' : 'otherNeg', sym: o.sym, eur: o.eur, gross: o.eur });
     });
+    I.filter(x => x.kind === 'yield').forEach(x => items.push({ cat: 'otherIncome', sym: x.desc || 'CYEP / SYEP', date: x.date, eur: x.eur, gross: x.eur }));   // 14.11.2026: CYEP / SYEP доход (положителни редове на „CYEP/Broker Fees“)
     const debit = [];
     I.filter(x => x.kind === 'interest').forEach(x => {
       if (x.eur >= 0) items.push({ cat: 'interest', sym: x.desc || 'лихва', date: x.date, eur: x.eur, gross: x.eur });
@@ -1363,7 +1363,7 @@
     });
     const sum = cat => items.filter(i => i.cat === cat).reduce((s, i) => s + i.eur, 0);
     const shareGains = sum('shareGains'), shareLosses = -sum('shareLosses');
-    const otherPos = ['dividends', 'interest', 'options', 'pil', 'funds'].reduce((s, c) => s + sum(c), 0);
+    const otherPos = ['dividends', 'interest', 'options', 'pil', 'funds', 'otherIncome'].reduce((s, c) => s + sum(c), 0);
     const otherNeg = -['optionLosses', 'fundLosses', 'otherNeg'].reduce((s, c) => s + sum(c), 0);
     const cS = Math.max(0, Number(st.carriedShareLoss) || 0), cO = Math.max(0, Number(st.carriedOtherLoss) || 0);
     // offsetOrder (05.11.2026, спорно — настройка; да се потвърди от счетоводител):
@@ -1519,14 +1519,14 @@
     const L = TC.DECL_LINES[de.year] || null, hint = k => (L ? `(в бланката за ${de.year}: Zeile ${L[k]} — провери)` : '');
     const F = TC.fmt, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0), cnt = c => de.items.filter(i => i.cat === c).length;
     const shareG = sum('shareGains'), shareL = -sum('shareLosses'), div = sum('dividends'), intr = sum('interest'), pil = sum('pil'), opt = sum('options'), optL = -sum('optionLosses'), othN = -sum('otherNeg');
-    const z20 = shareG, z23 = shareL, z22 = optL + othN, otherPos = div + intr + pil + opt, z19 = shareG - shareL + otherPos - z22;
+    const z20 = shareG, z23 = shareL, z22 = optL + othN, yld = sum('otherIncome'), otherPos = div + intr + pil + opt + yld, z19 = shareG - shareL + otherPos - z22;
     const funds = gross('funds') + gross('fundLosses'), hasFunds = de.items.some(i => i.cat === 'funds' || i.cat === 'fundLosses');
     const nG = cnt('shareGains'), nL = cnt('shareLosses'), pl = n => `${n} ${n === 1 ? 'продажба' : 'продажби'}`;
     const ofThem = 'Това е „от тях“ — вече е вътре в общия ред (Zeile 19) и НЕ се добавя и НЕ се изважда втори път.';
     const rows = [
       { kind: 'total', form: 'Anlage KAP', field: TC.DECL_FIELDS.z19, hint: hint('z19'), eur: z19, signed: true,
         bg: 'Общият резултат (салдо) от всички чуждестранни доходи от капитал без фондовете: акции, дивиденти, лихви; може да е отрицателен.',
-        why: `печалби от акции ${F(shareG)} − загуби от акции ${F(shareL)} + дивиденти ${F(div)} + лихви ${F(intr)}${opt || pil ? ` + опции и плащания вместо дивидент ${F(opt + pil)}` : ''} − други загуби ${F(z22)} = ${F(z19)}. Салдото съдържа и печалбите, и загубите; трите реда по-долу са „от тях“.` },
+        why: `печалби от акции ${F(shareG)} − загуби от акции ${F(shareL)} + дивиденти ${F(div)} + лихви ${F(intr)}${yld ? ` + CYEP / SYEP доход ${F(yld)}` : ''}${opt || pil ? ` + опции и плащания вместо дивидент ${F(opt + pil)}` : ''} − други загуби ${F(z22)} = ${F(z19)}. Салдото съдържа и печалбите, и загубите; трите реда по-долу са „от тях“.` },
       { kind: 'part', form: 'Anlage KAP', field: TC.DECL_FIELDS.z20, hint: hint('z20'), eur: z20,
         bg: 'Сборът на печалбите от продажбите на акции (само печелившите продажби).',
         why: `сума на печалбите по отделните продажби на акции: ${pl(nG)} с печалба = ${F(z20)}. ${ofThem}` },
@@ -1568,7 +1568,7 @@
     if (z23 > 0.004 || z22 > 0.004) notes.push('Загубата не се „пренася“ от калкулатора: декларираш я в годината, в която е възникнала (Zeile 22 / 23), а Finanzamt я установява с решение (Verlustfeststellungsbescheid) и сам я взема от последното решение — Verlustvortrag не се въвежда в Anlage KAP.');
     // 13.11.2026: parts — съставните числа на Zeile 19 / 20 / 22 / 23 (за немския отчет: същите числа, не ново смятане); hintFor — номерът на реда за годината (или '')
     return { year: de.year, verified: !!L, complete: de.complete, rows, info, control, notes, z19, z20, z22, z23, z41: de.creditable, funds: hasFunds ? funds : null, lossLine: de.lossLine || '',
-             parts: { shareG, shareL, div, intr, pil, opt, optL, othN, nG, nL, otherPos, withheld: de.withheld, creditable: de.creditable }, lines: L };
+             parts: { shareG, shareL, div, intr, yld, pil, opt, optL, othN, nG, nL, otherPos, withheld: de.withheld, creditable: de.creditable }, lines: L };
   };
 
   // 14.11.2026: таблица по години БЕЗ пренасяне на загуби — всяка година се смята самостоятелно (пренесеното е само каквото потребителят е въвел от решение на Finanzamt, и то не влиза тук).

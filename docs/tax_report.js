@@ -78,7 +78,7 @@
     const summary = safe('Zusammenfassung', () => {
       const rows = [
         { field: TC.DECL_FIELDS.z19, ref: ref('z19'), eur: decl.z19, signed: true,
-          calc: `Gewinne aus Aktienveräußerungen ${F(P.shareG)} − Verluste aus Aktienveräußerungen ${F(P.shareL)} + Dividenden ${F(P.div)} + Zinsen ${F(P.intr)}${P.opt || P.pil ? ` + Optionsgeschäfte und Ersatzzahlungen ${F(P.opt + P.pil)}` : ''} − sonstige Verluste ${F(decl.z22)} = ${F(decl.z19)}. Der Saldo enthält Gewinne und Verluste; die Zeilen 20, 22 und 23 sind „davon“-Angaben.` },
+          calc: `Gewinne aus Aktienveräußerungen ${F(P.shareG)} − Verluste aus Aktienveräußerungen ${F(P.shareL)} + Dividenden ${F(P.div)} + Zinsen ${F(P.intr)}${P.yld ? ` + Erträge aus CYEP/SYEP ${F(P.yld)}` : ''}${P.opt || P.pil ? ` + Optionsgeschäfte und Ersatzzahlungen ${F(P.opt + P.pil)}` : ''} − sonstige Verluste ${F(decl.z22)} = ${F(decl.z19)}. Der Saldo enthält Gewinne und Verluste; die Zeilen 20, 22 und 23 sind „davon“-Angaben.` },
         { field: TC.DECL_FIELDS.z20, ref: ref('z20'), eur: decl.z20, part: true,
           calc: `Summe der Gewinne aus ${n1(P.nG, 'Veräußerung', 'Veräußerungen')} von Aktien mit Gewinn = ${F(decl.z20)}. „Davon“-Angabe — bereits in Zeile 19 enthalten, nicht zusätzlich ansetzen.` },
         { field: TC.DECL_FIELDS.z22, ref: ref('z22'), eur: decl.z22, part: true,
@@ -86,7 +86,7 @@
         { field: TC.DECL_FIELDS.z23, ref: ref('z23'), eur: decl.z23, part: true,
           calc: `Summe der Verluste aus ${n1(P.nL, 'Veräußerung', 'Veräußerungen')} von Aktien mit Verlust = ${F(decl.z23)} (als positiver Betrag). „Davon“-Angabe — bereits in Zeile 19 enthalten; das Finanzamt verrechnet sie nur mit Gewinnen aus Aktienveräußerungen.` },
         { field: TC.DECL_FIELDS.z41, ref: ref('z41'), eur: decl.z41,
-          calc: `Auf Dividenden einbehaltene ausländische Steuer ${F(P.withheld)}; angerechnet bis ${Math.round(rate * 100)} % der Bruttodividende und höchstens bis zur deutschen Steuer darauf = ${F(decl.z41)}${overCredit > 0.004 ? `; darüber hinaus ${F(overCredit)} nicht anrechenbar` : ''}. Auf Zinsen einbehaltene Steuer ist hier nicht enthalten.` },
+          calc: `Auf Dividenden einbehaltene ausländische Steuer ${F(P.withheld)}; angerechnet bis ${Math.round(rate * 100)} % der Bruttodividende und höchstens bis zur deutschen Steuer darauf = ${F(decl.z41)}${overCredit > 0.004 ? `; darüber hinaus ${F(overCredit)} nicht anrechenbar` : ''}.` },
       ];
       if (decl.funds != null) rows.push({ field: 'Anlage KAP-INV — Investmenterträge (nach Fondsart, vor Teilfreistellung)', ref: '', eur: decl.funds, signed: true, calc: 'Summe der Erträge und Gewinne aus Investmentfonds je Fondsart, vor Anwendung der Teilfreistellung (diese wendet das Finanzamt an).' });
       (de.crypto || []).forEach(c => rows.push({ field: `Anlage SO — Private Veräußerungsgeschäfte (Kryptowerte)${c.person === 'B' ? ' — Ehegatte/Ehegattin' : ''}`, ref: '', eur: c.result, signed: true,
@@ -138,17 +138,18 @@
     const incRows = pred => fifo.incomes.filter(x => x.year === year && pred(x)).map(x => { const ri = x.currency && x.currency !== 'EUR' ? TC.rateInfo(table, x.currency, x.date) : null;
       return { date: x.date, label: x.sym ? label(x.sym) : '', desc: noCyr(x.desc), account: mask(x.account), broker: x.broker, amount: x.amount, ccy: x.currency, rate: ri && ri.rate, rateOn: ri && ri.on, eur: x.eur }; });
     const incomes = safe('Erträge', () => {
-      const div = incRows(x => x.kind === 'dividend' && !x.pil), pil = incRows(x => x.kind === 'dividend' && x.pil), intr = incRows(x => x.kind === 'interest'), wh = incRows(x => x.kind === 'withholding');
+      const div = incRows(x => x.kind === 'dividend' && !x.pil), pil = incRows(x => x.kind === 'dividend' && x.pil), intr = incRows(x => x.kind === 'interest'), yld = incRows(x => x.kind === 'yield'), wh = incRows(x => x.kind === 'withholding');
       const sum = a => a.reduce((s, r) => s + r.eur, 0);
       const divItems = de.items.filter(i => ['dividends', 'otherNeg', 'pil'].includes(i.cat)).reduce((s, i) => s + i.eur, 0) + de.items.filter(i => i.distribution).reduce((s, i) => s + i.gross, 0);
       check('Dividenden (inkl. Ersatzzahlungen): Summe der Zeilen', sum(div) + sum(pil), divItems);
       check('Zinsen (Gutschriften): Summe der Zeilen', sum(intr.filter(r => r.eur >= 0)), sumCat('interest'));
+      check('CYEP/SYEP-Erträge: Summe der Zeilen', sum(yld), sumCat('otherIncome'));
       const bySym = {}; wh.forEach(r => { bySym[r.label] = (bySym[r.label] || 0) + r.eur; });
       check('Quellensteuer: einbehalten', Object.values(bySym).reduce((s, v) => s + Math.max(0, -v), 0), de.withheld);
       check('Quellensteuer: anrechenbar (Zeile 41)', (de.creditBySym || []).reduce((s, c) => s + c.credited, 0), de.creditable);
-      return { dividends: { rows: div, total: sum(div) }, pil: { rows: pil, total: sum(pil) }, interest: { rows: intr, total: sum(intr), credits: sum(intr.filter(r => r.eur >= 0)), debits: sum(intr.filter(r => r.eur < 0)) },
+      return { dividends: { rows: div, total: sum(div) }, pil: { rows: pil, total: sum(pil) }, interest: { rows: intr, total: sum(intr), credits: sum(intr.filter(r => r.eur >= 0)), debits: sum(intr.filter(r => r.eur < 0)) }, yield: { rows: yld, total: sum(yld) },
                withholding: { rows: wh, total: sum(wh) }, credit: (de.creditBySym || []).map(c => ({ label: label(c.sym), withheld: c.withheld, gross: c.gross, cap: c.cap, credited: c.credited })), rate };
-    }, { dividends: { rows: [], total: 0 }, pil: { rows: [], total: 0 }, interest: { rows: [], total: 0, credits: 0, debits: 0 }, withholding: { rows: [], total: 0 }, credit: [], rate });
+    }, { dividends: { rows: [], total: 0 }, pil: { rows: [], total: 0 }, interest: { rows: [], total: 0, credits: 0, debits: 0 }, yield: { rows: [], total: 0 }, withholding: { rows: [], total: 0 }, credit: [], rate });
 
     // ─── Besondere Vorgänge — какво е направено и защо ───
     const special = safe('Besondere Vorgänge', () => {
@@ -195,7 +196,7 @@
     const groups = safe('Nicht berücksichtigt', () => TC.skippedGroups(ing.skipped || [], { year, rate: rateFn, acked }), { law: [], info: [], review: [], missing: [] });
     const fmtTotals = g => Object.entries(g.year.totals).map(([c, v]) => ccyDE(v, c)).join(' + ');
     const kindRow = (g, useAll) => ({ title: g.de, basis: g.basisDe, n: useAll ? g.all.n : g.year.n, totals: g.sum ? fmtTotals(g) : '', eur: g.sum && g.year.n ? g.year.eur : null, eurMissing: g.year.eurMissing || 0, kind: g.kind });
-    const excluded = { law: groups.law.filter(g => g.year.n).map(g => kindRow(g, false)), info: groups.info.filter(g => g.all.n).map(g => kindRow(g, true)), review: groups.review.filter(g => g.year.n || g.all.n).map(g => kindRow(g, g.kind === 'review' || g.kind === 'acked')).filter(r => r.n) };
+    const excluded = { law: groups.law.filter(g => g.year.n).map(g => kindRow(g, false)), info: groups.info.filter(g => g.all.n).map(g => kindRow(g, true)) };      // 14.11.2026: групата „За проверка“ (Forex, данък върху лихви…) е само в калкулатора, не в отчета
     const debitInt = incomes.interest.debits;
     if (Math.abs(debitInt) > 0.004) excluded.law.push({ title: 'Sollzinsen (Debitzinsen)', basis: '§ 20 Abs. 9 EStG: Werbungskosten werden nicht abgezogen', n: incomes.interest.rows.filter(r => r.eur < 0).length, totals: '', eur: debitInt, eurMissing: 0, kind: 'debit_interest' });
 
@@ -286,6 +287,7 @@
     out.push(sec(`Dividenden ${m.year}`, incTable(IN.dividends.rows, IN.dividends.total, 'Summe Dividenden')));
     if (IN.pil.rows.length) out.push(sec(`Ersatzzahlungen für Dividenden (Payment in Lieu) ${m.year}`, incTable(IN.pil.rows, IN.pil.total, 'Summe Ersatzzahlungen')));
     out.push(sec(`Zinsen ${m.year}`, incTable(IN.interest.rows, IN.interest.total, 'Summe Zinsen (Gutschriften abzüglich Belastungen)') + (Math.abs(IN.interest.debits) > 0.004 ? `<div class="s">Davon Sollzinsen (Belastungen) ${esc(F(IN.interest.debits))} — nicht abzugsfähig, in den Beträgen nicht berücksichtigt.</div>` : '')));
+    if (IN.yield.rows.length) out.push(sec(`Sonstige Kapitalerträge — CYEP/SYEP ${m.year}`, '<div class="s">Erträge aus dem Cash/Stock Yield Enhancement Program (CYEP/SYEP) von Interactive Brokers (Abschnitt „CYEP/Broker Fees“ der Abrechnung, positive Beträge): ausländische Kapitalerträge, in Zeile 19 enthalten; nicht in den Zinsen (Abschnitt „Interest“) enthalten.</div>' + incTable(IN.yield.rows, IN.yield.total, 'Summe CYEP/SYEP-Erträge')));
     out.push(sec(`Quellensteuer ${m.year}`, incTable(IN.withholding.rows, IN.withholding.total, 'Summe einbehaltene Quellensteuer (negativ = einbehalten)') + (IN.credit.length ? `<h3>Anrechenbare ausländische Steuern (Zeile 41)</h3><table class="t">${th(['Wertpapier', '>Einbehalten EUR', '>Bruttodividende EUR', `>Höchstbetrag EUR (${Math.round(IN.rate * 100)} %)`, '>Anrechenbar EUR'])}${IN.credit.map(c => `<tr><td>${esc(c.label)}</td><td class="n">${eur(c.withheld)}</td><td class="n">${eur(c.gross)}</td><td class="n">${eur(c.cap)}</td><td class="n"><b>${eur(c.credited)}</b></td></tr>`).join('')}<tr class="tot"><td>Summe</td><td class="n">${eur(IN.credit.reduce((s, c) => s + c.withheld, 0))}</td><td class="n">${eur(IN.credit.reduce((s, c) => s + c.gross, 0))}</td><td class="n"></td><td class="n"><b>${eur(IN.credit.reduce((s, c) => s + c.credited, 0))}</b></td></tr></table>` : '')));
     // Besondere Vorgänge
     out.push(sec('Besondere Vorgänge', m.special.length ? `<table class="t">${th(['Datum', 'Wertpapier', 'Vorgang', 'Behandlung und Begründung'])}${m.special.map(s => `<tr><td>${esc(dmy(s.date))}</td><td>${esc(s.sym || '')}</td><td>${esc(s.title)}${s.disputed ? ' <span class="s">(zu prüfen)</span>' : ''}</td><td class="s">${esc(s.text)}</td></tr>`).join('')}</table>` : '<div class="s">Keine besonderen Vorgänge (Übertrage, Splits, Fusionen, Ticker-Wechsel) im Jahr ' + esc(m.year) + '.</div>'));
@@ -295,7 +297,6 @@
     nb += ex.law.length ? `<table class="t">${th(['Art', '>Anzahl', '>Summe (netto; − = Belastung)', 'Rechtsgrundlage'])}${exRows(ex.law)}</table>` : '<div class="s">Keine solchen Positionen im Jahr ' + esc(m.year) + '.</div>';
     if (ex.info.length) nb += `<div class="s" style="margin-top:6px">Weitere Zeilen der Abrechnungen ohne steuerliche Bedeutung (nicht berechnet): ${ex.info.map(r => `${r.n}× ${esc(r.title)}`).join('; ')}.</div>`;
     out.push(sec('Nicht berücksichtigt — nicht abzugsfähig', nb));
-    if (ex.review.length) out.push(sec('Hinweise — nicht in den Beträgen enthalten', `<table class="t">${th(['Art', '>Anzahl', '>Summe', 'Hinweis'])}${exRows(ex.review)}</table>`));
     // Offene Punkte
     out.push(sec('Offene Punkte', m.reasons.length ? `<ol>${m.reasons.map(r => `<li class="${r.type === 'generic' ? '' : 'open'}">${esc(r.text)}</li>`).join('')}</ol>` : '<div>Keine offenen Punkte.</div>'));
     // Quellen

@@ -37,7 +37,7 @@ function renderFiles() {
       <td class="mono" data-acc style="white-space:nowrap">${esc(f.accountMasked || (blank ? '' : '—'))}</td>
       <td class="n ${!blank && !k.trade ? 'neg' : ''}">${blank ? '' : `${k.trade || 0}<div class="small" style="white-space:nowrap">${k.buy || 0} пок. / ${k.sell || 0} прод.</div>`}</td><td class="n">${n(k.dividend)}</td><td class="n">${n(k.withholding)}</td><td class="n">${n(k.interest)}</td>
       <td class="n ${f.skipped ? 'yel' : ''}">${n(f.skipped)}</td><td class="n">${f.duplicates || ''}</td>
-      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.note || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : ''))}</td></tr>` +
+      <td class="${f.error ? 'neg' : 'mut'}">${esc(f.error || f.note || (rates ? `${f.records} валути` : k.split ? `сплитове: ${k.split}` : k.yield ? `CYEP / SYEP доход: ${k.yield}` : ''))}</td></tr>` +
       (f.sections ? `<tr><td></td><td colspan="11">${secTable(f)}</td></tr>` : ''); }).join('');
   // голямото червено съобщение: непознат файл, файл без нито една сделка, липсващи колони — с това, което е видяно и което се очаква
   $('fileMsgs').innerHTML = ing.files.map(f => (f.problems || []).map(p => p.level === 'warn'
@@ -86,7 +86,7 @@ function saveCarry() { try { const st = carryStore(); st[$('year').value] = { s:
 function renderSummary() {
   if (!S.ing) { $('summary').innerHTML = ''; return; }
   const y = Number($('year').value), s = S.sum = TC.summary(S.ing, S.fifo, y), a = s.all, r = s.year;
-  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${pl(a.buys, 'покупка', 'покупки')}, ${pl(a.sells, 'продажба', 'продажби')}), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
+  $('summary').innerHTML = `<div class="msg info" style="font-size:13.5px;color:var(--text)"><b>Прочетени:</b> ${pl(a.files, 'файл', 'файла')}, ${pl(a.trades, 'сделка', 'сделки')} (${pl(a.buys, 'покупка', 'покупки')}, ${pl(a.sells, 'продажба', 'продажби')}), ${pl(a.dividends, 'дивидент', 'дивидента')}, ${pl(a.interest, 'лихва', 'лихви')}${a.yields ? `, ${pl(a.yields, 'ред CYEP / SYEP', 'реда CYEP / SYEP')}` : ''}${a.withholding ? `, ${a.withholding} реда удържан данък` : ''}${a.splits ? `, ${pl(a.splits, 'сплит', 'сплита')}` : ''};
     не са сметнати: <b class="${a.skipped ? 'yel' : ''}">${a.skipped}</b>${a.skipped ? ` — от тях липсващи данни: <b class="${a.skippedTaxable ? 'neg' : ''}">${a.skippedTaxable}</b>, изключено по закон / информативно: ${a.skippedInfo} (виж списъка)` : ''}; липсващи покупки: <b class="${a.unmatched ? 'neg' : ''}">${a.unmatched}</b>.
     <div style="margin-top:4px" class="${s.empty ? 'neg' : 'small'}">${s.empty ? `<b>За ${y} няма нито един запис в качените файлове</b>${s.years.length ? ` — данните са за ${s.years.join(', ')}. Смени годината горе.` : '.'}`
       : `За ${y}: ${pl(r.trades, 'сделка', 'сделки')} (${pl(r.buys, 'покупка', 'покупки')}, ${pl(r.sells, 'продажба', 'продажби')})${S.fifo ? `, продажби с резултат: ${r.sales - r.salesNoRate}` : ''}, ${pl(r.dividends, 'дивидент', 'дивидента')}, ${pl(r.interest, 'лихва', 'лихви')}; не са сметнати: ${r.skipped}${r.skippedTaxable ? ` (може да са облагаеми: ${r.skippedTaxable})` : ''}${r.skippedInfo ? ` · изключено по закон / информативно: ${r.skippedInfo}` : ''}; липсващи покупки: ${r.unmatched}.`}</div></div>`;
@@ -100,7 +100,8 @@ const amt = (v, c) => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(2).replace(/\B
 function skippedKindsHtml(kinds, y) {
   return `<table><tr><th>Вид</th><th class="n">Брой за ${esc(y)}</th><th class="n">Сума за ${esc(y)}</th><th>Основание</th></tr>` + kinds.map(k => {
     const tot = Object.entries(k.year.totals).map(([c, v]) => amt(v, c)).join(' + ');
-    return `<tr><td><b>${esc(k.bg)}</b><details><summary class="small">редове (${k.all.n})</summary><div class="scroll"><table>${skHead}${skRows(k.entries)}</table></div></details></td>
+    const byY = k.kind === 'fx' ? `<div class="small" style="margin-top:4px"><b class="yel">валутна обмяна — възможна облагаема частна продажба по § 23 EStG (Fremdwährung, в рамките на 1 година) — провери</b><br>по години: ${Object.entries(k.byYear).sort().map(([yy, b]) => `${yy}: ${pl(b.n, 'обмяна', 'обмени')}, оборот ${Object.entries(b.totals).map(([c, v]) => amt(v, c)).join(' + ')}${Object.keys(b.totals).some(c => c !== 'EUR') ? ` ≈ ${fmt(b.eur)}` : ''}`).join(' · ')}</div>` : '';
+    return `<tr><td><b>${esc(k.bg)}</b>${byY}<details><summary class="small">редове (${k.all.n})</summary><div class="scroll"><table>${skHead}${skRows(k.entries)}</table></div></details></td>
       <td class="n">${k.year.n}${k.all.n !== k.year.n ? `<div class="small">общо във файловете: ${k.all.n}</div>` : ''}</td>
       <td class="n">${k.sum && k.year.n ? `${tot}${Object.keys(k.year.totals).some(c => c !== 'EUR') || k.year.eurMissing ? `<div class="small">≈ ${fmt(k.year.eur)}${k.year.eurMissing ? ` (без ${pl(k.year.eurMissing, 'ред', 'реда')} — няма курс)` : ''}</div>` : ''}` : ''}</td><td class="small">${esc(k.basisBg)}</td></tr>`; }).join('') + '</table>';
 }
@@ -225,7 +226,7 @@ function render() {
   // разбивка
   const L = TC.LABELS, sum = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.eur, 0), gross = c => de.items.filter(i => i.cat === c).reduce((s, i) => s + i.gross, 0);
   const rows = [
-    ['shareGains', de.shareGains], ['shareLosses', -de.shareLosses], ['dividends', sum('dividends')], ['interest', sum('interest')], ['pil', sum('pil')],
+    ['shareGains', de.shareGains], ['shareLosses', -de.shareLosses], ['dividends', sum('dividends')], ['interest', sum('interest')], ['otherIncome', sum('otherIncome')], ['pil', sum('pil')],
     ['options', sum('options')], ['optionLosses', sum('optionLosses')], ['funds', sum('funds'), gross('funds')], ['fundLosses', sum('fundLosses'), gross('fundLosses')], ['otherNeg', sum('otherNeg')],
   ].filter(r => Math.abs(r[1]) > 0.004);
   $('breakdown').innerHTML = '<tr><th>Категория</th><th class="n">EUR</th><th>Към</th></tr>' +
@@ -251,7 +252,7 @@ function render() {
   const I = S.fifo.incomes.filter(x => x.year === y);
   $('incTitle').textContent = `Дивиденти, удържан данък, лихви ${y} (${I.length})`;
   $('incomes').innerHTML = '<tr><th>Дата</th><th>Вид</th><th>Инструмент / описание</th><th class="n">Сума</th><th class="n">EUR</th></tr>' +
-    I.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc({ dividend: x.pil ? 'вместо дивидент' : 'дивидент', withholding: 'удържан данък', interest: 'лихва' }[x.kind])}</td><td>${esc(x.sym)} <span class="small">${esc(x.desc)}</span></td>
+    I.map(x => `<tr><td class="mono">${esc(x.date)}</td><td>${esc({ dividend: x.pil ? 'вместо дивидент' : 'дивидент', withholding: 'удържан данък', interest: 'лихва', yield: 'CYEP / SYEP доход' }[x.kind])}</td><td>${esc(x.sym)} <span class="small">${esc(x.desc)}</span></td>
       <td class="n">${esc(x.amount)} ${esc(x.currency)}</td><td class="n ${cls(x.eur)}">${fmt(x.eur)}</td></tr>`).join('');
   // ориентировъчен данък
   const e = de.estimate;
