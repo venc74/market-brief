@@ -556,6 +556,11 @@ FUNDAMENTALS_CACHE_NAME = "fundamentals_cache.json"           # в config.DATA_D
 FUNDAMENTALS_CACHE_MAX_DAYS = int(os.getenv("FUNDAMENTALS_CACHE_MAX_DAYS", 100))
 SECTOR_MEGA_TECH_ETFS = ["XLK", "XLC"]
 SECTOR_BROAD_TEXT = "широка ротация извън мега-технологиите — средната акция бие индекса (RS е спрямо SPY, претеглен по капитализация)"
+# 16.11.2026 (пакет 16.11, т. 6): заглавието казва, когато преднината на водещите се топи — RS 4 седм. на първите три сега срещу преди SECTOR_BOARD_RANK_LAG сесии: спад ≥ 30% и
+# ≥ 3 пункта. Реално, данни към 13.11: средно 13.1 → 7.6 (XLV 14.6 → 8.1). Измерено 03.08–13.11 (74 сесии): 8 пъти (03.08, 05.08, 26.08, 10.09, 17.09, 08.10, 12.11, 13.11);
+# огледалното „расте“ би било 24 пъти (при всяка смяна на водещите) — не се казва.
+SECTOR_FADE_REL = float(os.getenv("SECTOR_FADE_REL", 0.30))
+SECTOR_FADE_ABS_PP = float(os.getenv("SECTOR_FADE_ABS_PP", 3.0))
 
 
 # 2026-10-03 (пакет 2 т.1): мост секторен ETF → Yahoo "sector"/"industry" на кандидатите. leading_sectors()

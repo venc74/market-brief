@@ -154,7 +154,8 @@ def board_rows(data, spy, etfs: dict, lag: int | None = None) -> list[dict]:
             px = data[sym].dropna()
             day = round((float(px.iloc[-1]) / float(px.iloc[-2]) - 1) * 100, 2)          # 06.11.2026 (пакет 05–06.11, т. 6): промяната за деня (абсолютна)
             rows.append({"etf": sym, "sector": name, "chg_1d_pct": day, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
-                         "strength": round((r4 + r12) / 2, 2), "strength_prev": (p4 + p12) / 2, "rs_at_6m_high": bool(float(rs.iloc[-1]) >= float(rs.max()) * 0.99)})          # както sector_rotation (данните са 6 месеца)
+                         "strength": round((r4 + r12) / 2, 2), "strength_prev": (p4 + p12) / 2, "rs_at_6m_high": bool(float(rs.iloc[-1]) >= float(rs.max()) * 0.99),          # както sector_rotation (данните са 6 месеца)
+                         "rs_4w_prev": round(p4, 2)})                                    # 16.11.2026 (пакет 16.11, т. 6): RS 4 седм. преди `lag` сесии — посоката на преднината
         except Exception as e:
             print(f"[sector] карта: {sym} пропуснат: {type(e).__name__}: {e}")
     prev_rank = {r["etf"]: k for k, r in enumerate(sorted(rows, key=lambda r: r["strength_prev"], reverse=True), 1)}
@@ -238,6 +239,25 @@ def _lst(xs: list[str]) -> str:
     return ", ".join(xs[:-1]) + " и " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "")
 
 
+def leaders_trend(rows: list[dict], lag: int | None = None) -> dict | None:
+    """
+    16.11.2026 (пакет 16.11, т. 6): накъде върви преднината на водещите — RS 4 седм. на първите три водещи (по "leader" / думата) сега срещу преди `lag` сесии ("rs_4w_prev").
+    Спад ≥ config.SECTOR_FADE_REL (дял) и ≥ config.SECTOR_FADE_ABS_PP пункта → {"kind": "fade", …, "text"}; иначе None. Реално, данни към 13.11: XLV, XLP, XLY средно
+    13.1 → 7.6 (XLV 14.6 → 8.1) — заглавието казваше „широка ротация“ без промяна от 02.11. Ред без "rs_4w_prev" (стар бриф) → None. Чиста функция.
+    """
+    lag = config.SECTOR_BOARD_RANK_LAG if lag is None else lag
+    top = [r for r in rows or [] if r.get("leader", r.get("word") == "води пазара")][:3]
+    if not top or any(not isinstance(r.get("rs_4w_prev"), (int, float)) or not isinstance(r.get("rs_4w"), (int, float)) for r in top):
+        return None
+    now, prev = sum(r["rs_4w"] for r in top) / len(top), sum(r["rs_4w_prev"] for r in top) / len(top)
+    d = now - prev
+    if not (d <= -config.SECTOR_FADE_ABS_PP and prev > 0 and now <= prev * (1 - config.SECTOR_FADE_REL)):
+        return None                                                              # „расте“ не се казва: 24 от 74 сесии (при всяка смяна на водещите) — шум
+    each = ", ".join(f'{r["etf"]} {r["rs_4w_prev"]:.1f} → {r["rs_4w"]:.1f}' for r in top)
+    return {"kind": "fade", "now": round(now, 1), "prev": round(prev, 1), "lag": lag, "etfs": [r["etf"] for r in top],
+            "text": f"преднината на водещите се топи: RS за 4 седм. на първите три — средно {prev:.1f} → {now:.1f} за {lag} сесии ({each})"}
+
+
 def board_summary(rows: list[dict], spy_1d: float | None = None) -> str:
     """
     Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
@@ -259,7 +279,8 @@ def board_summary(rows: list[dict], spy_1d: float | None = None) -> str:
     lst = _lst
     head = (f"Водят {len(lead_all)} от {len(rows)} (първите три: {lst(lead)})" if len(lead_all) > 3 else f"Водят {lst(lead)}") if lead else "Нито един сектор не води и на двата периода"
     parts = [head, f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
-    return f"{parts[0]}; {parts[1]} — {meaning}."
+    tr = leaders_trend(rows)                                                     # 16.11.2026 (т. 6): посоката на преднината — от числата
+    return f"{parts[0]}; {parts[1]} — {meaning}" + (f"; {tr['text']}" if tr else "") + "."
 
 
 def sector_board(download=None, universe_sector: dict | None = None, trend: dict | None = None, ratings: dict | None = None,
