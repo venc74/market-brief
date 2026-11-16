@@ -97,7 +97,7 @@ assert res["market"]["text"] == T and "market" not in res0
 assert resx["market"]["futures_missing"] and "без цена в премаркета (Yahoo: ZeroDivisionError)" in resx["market"]["text"][0]
 assert not preopen.has_news(res)                                                      # фючърсите не пращат имейл сами
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
-assert "market_fn=fetch_market, weights_fn=fetch_weights)" in src                   # main() тегли и двете
+assert "market_fn=fetch_market, weights_fn=fetch_weights," in src                   # main() тегли и двете (16.11: + calendar_fn)
 day = {**FX["preopen"], "market": res["market"]}
 mail = preopen.email_html(day)
 assert "<b>Пазарът преди отварянето:</b> Фючърси: ES (S&amp;P 500) -0.66%" in mail and "NVDA -10.8% ($155.09; затваряне $173.85; тегло 6.4%)" in mail

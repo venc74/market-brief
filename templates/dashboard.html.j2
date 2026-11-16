@@ -535,7 +535,7 @@
   {# 10.11.2026 (т. 3): заглавия за икономически данни след 08:30 Ню Йорк — дословно, с източник и час, без AI (preopen.econ_headlines) #}
   {% if preopen.econ %}<div class="cs-sub">Икономически данни след {{ preopen_econ_since }} Ню Йорк · {{ preopen.econ|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.econ %}
-    <li>{% if x.link %}<a href="{{ x.link }}" rel="noopener" target="_blank">„{{ x.title }}“</a>{% else %}„{{ x.title }}“{% endif %} <span class="small" style="color:var(--muted)">· {{ x.source }} · {{ x.time_ny }} Ню Йорк ({{ x.time_berlin }} Берлин)</span></li>{% endfor %}</ul>{% endif %}
+    <li>{% if x.link %}<a href="{{ x.link }}" rel="noopener" target="_blank">„{{ x.title }}“</a>{% else %}„{{ x.title }}“{% endif %} <span class="small" style="color:var(--muted)">· {{ x.source }} · {{ x.time_ny }} Ню Йорк ({{ x.time_berlin }} Берлин)</span>{% if x.expectations %}<div class="small" style="font-size:12px">{{ x.expectations }}</div>{% endif %}</li>{% endfor %}</ul>{% endif %}
   {% if preopen.econ_error %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Заглавията за икономически данни не се провериха ({{ preopen.econ_error }}) — празното НЕ значи, че няма.</div>{% endif %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
   {# 06.11.2026 (пакет 05–06.11, т. 10): ≥ 3 гапа от една индустрия — qm_ep.sector_bounce #}

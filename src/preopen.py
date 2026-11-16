@@ -341,6 +341,15 @@ def neglect_label(ret63_pct, neglect) -> str | None:
     return qm_ep.neglect_label(ret63_pct, neglect)
 
 
+def _calendar_fn():
+    """16.11.2026 (т. 9): днешният икономически календар (Nasdaq) за очакванията; без модула → None."""
+    try:
+        from src import econ_calendar
+        return econ_calendar.fetch_econ
+    except Exception:
+        return None
+
+
 def _pending_deals() -> set:
     """11.11.2026 (т. 1): висящите сделки (data/deal_state.json) — graceful: провал → празно."""
     try:
@@ -457,8 +466,28 @@ def econ_block(fetched: dict | None, now_utc) -> tuple[list[dict], str | None]:
 
 
 def econ_line(x: dict) -> str:
-    """„„US consumer prices rise above expectations in October“ · Reuters · 08:46 Ню Йорк (14:46 Берлин)“ — страницата и имейлът."""
-    return f"„{x['title']}“ · {x['source']} · {x['time_ny']} Ню Йорк ({x['time_berlin']} Берлин)"
+    """„„US consumer prices rise above expectations in October“ · Reuters · 08:46 Ню Йорк (14:46 Берлин)“ — страницата и имейлът; от 16.11 (т. 9) и „ — очаквания …“."""
+    return f"„{x['title']}“ · {x['source']} · {x['time_ny']} Ню Йорк ({x['time_berlin']} Берлин)" + (f" — {x['expectations']}" if x.get("expectations") else "")
+
+
+def attach_expectations(rows: list[dict], calendar_fn, day) -> None:
+    """
+    16.11.2026 (пакет 16.11, т. 9): към всяко заглавие за данни — очакванията от календара на Nasdaq за деня (econ_calendar.expectations_for по вида: CPI, PPI, заетост, JOLTS,
+    ISM, retail sales); без съвпадение / без консенсус → „очаквания: няма данни“; календарът не се изтегли → „очаквания: не се провериха (…)“. Реално 13.11: „PPI … 6.5% y/y“
+    без „под очакваното: 0.3% срещу 0.4%“. Без calendar_fn (тестове, стар повикващ) — нищо. Мутира rows.
+    """
+    if calendar_fn is None:
+        return
+    from src import econ_calendar
+    try:
+        cal = calendar_fn(day)
+    except Exception as e:
+        print(f"[preopen] календарът за очакванията: {type(e).__name__}: {e}")
+        for x in rows:
+            x["expectations"] = f"очаквания: не се провериха (Nasdaq: {type(e).__name__})"
+        return
+    for x in rows:
+        x["expectations"] = econ_calendar.expectations_for(x.get("kind"), cal)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -787,7 +816,7 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
         universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
-        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None) -> dict:
+        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None, calendar_fn=None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -847,6 +876,8 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
                 res["econ"], err = econ_block(econ_fn(now.tz_convert("UTC").to_pydatetime()), now)
                 if err:
                     res["econ_error"] = err
+                if res["econ"]:                                                        # 16.11.2026 (т. 9): очакванията (консенсус) от календара на Nasdaq, иначе „няма данни“
+                    attach_expectations(res["econ"], calendar_fn, now.date())
             except Exception as e:
                 res["econ"], res["econ_error"] = [], f"{type(e).__name__}"
                 print(f"[preopen] заглавията за данните: {type(e).__name__}: {e}")
@@ -969,7 +1000,7 @@ def main(now_utc=None) -> int:
         print(f"::warning::[preopen] {universe_note}: {e}")
     res = run(now, brief=brief, records=records, watched=watch_monitor.load_watch_list(), universe=universe,
               name_lookup=lambda t: watch_monitor.load_watch_names().get(t), universe_note=universe_note, econ_fn=fetch_econ, exclude=_pending_deals(),
-              market_fn=fetch_market, weights_fn=fetch_weights)
+              market_fn=fetch_market, weights_fn=fetch_weights, calendar_fn=_calendar_fn())
     if res.get("coverage") is not None:
         res["coverage"]["universe_source"] = screener.LAST_DAY_UNIVERSE.get("source")      # 11.11.2026 (т. 2): "cache" — същият като сутрешния
     res["email"] = prev.get("email") or {"sent": False}
