@@ -37,6 +37,12 @@ assert (S("R"), S("SAIC"), S("GOOGL"), S("BKH"), S("NVDA")) == ("Ryder", "Scienc
 assert S("R", "Ryder System, Inc.") == "Ryder System"                                       # името от картата (Yahoo) — с предимство
 assert S("XXXX") == "" and S("KDP", "KDP") == "Keurig Dr Pepper" and S(None) == ""
 assert render.short_name("LLY", None, {"LLY": "Lilly (Eli)"}) == "Eli Lilly"                 # РЕАЛНО (S&P 500 на Wikipedia)
+# РЕАЛНО — имената от картите / книгите в брифовете 14.10–16.11 (Yahoo / SEC), които реплеят на 16.11 показа като „Merck &“, „Eli Lilly and“, „Berkshire Hathaway Inc.…“:
+assert (render.short_name("MRK", "Merck & Company, Inc."), render.short_name("LLY", "Eli Lilly and Company"), render.short_name("LLY", "Eli Lilly & Co")) == ("Merck", "Eli Lilly", "Eli Lilly")
+assert render.short_name("BRK-B", "Berkshire Hathaway Inc. New") == "Berkshire Hathaway"
+assert render.short_name("BRK-B", "BERKSHIRE HATHAWAY INC DEL", {"BRK-B": "Berkshire Hathaway"}) == "Berkshire Hathaway"
+assert render.short_name("BRK-B", "BERKSHIRE HATHAWAY INC DEL") == "BERKSHIRE HATHAWAY"          # без името от Wikipedia — каквото има
+assert (S("JNJ"), S("PG"), S("T"), S("SPGI"), S("EL"), S("HIG")) == ("Johnson & Johnson", "Procter & Gamble", "AT&T", "S&P Global", "Estée Lauder Companies", "Hartford")   # РЕАЛНО (Wikipedia; водещото „The“ пада, както в картите)
 print("  ✓ „Ryder“, „Science Applications Intl“, „Alphabet“ (без Class A), „Black Hills“; от картата — „Ryder System“")
 
 print("── 3. страницата: радарът, Kullamägi, GLB ──")

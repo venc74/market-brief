@@ -236,11 +236,18 @@ def short_name(ticker: str | None, company: str | None = None, name_map: dict | 
     (brief["names"]); без правните окончания и без „(Class A)“; име, равно на тикъра, или без име → "". Чиста функция.
     """
     n = company if company and str(company).strip() and str(company).strip().upper() != str(ticker or "").upper() else (name_map or {}).get(ticker)
+    if n and str(n).isupper() and (name_map or {}).get(ticker):                   # името на SEC с главни букви („BERKSHIRE HATHAWAY INC DEL“) — Wikipedia има предимство
+        n = name_map[ticker]
     if not n:
         return ""
     n = re.sub(r"\s*\((?:Class|Series) [A-Z]\)", "", str(n)).strip()
     n = re.sub(r"^([A-Z][\w&.-]*) \(([A-Z][a-z]+)\)$", r"\2 \1", n)            # Wikipedia: „Lilly (Eli)“ → „Eli Lilly“
-    out = names.display_name(n, limit)
+    n = re.sub(r"\s*\(The\)$", "", n)                                             # Wikipedia: „Estée Lauder Companies (The)“
+    toks = n.split()
+    while len(toks) > 1 and toks[-1].lower().strip(".,") in ("new", "del"):       # Yahoo / SEC: „Berkshire Hathaway Inc. New“, „… INC DEL“
+        toks.pop()
+    n = re.sub(r"[\s,]+(?:&|and)$", "", names.strip_legal(" ".join(toks)), flags=re.I).strip()   # „Merck & Company, Inc.“ → „Merck“, „Eli Lilly and Company“ → „Eli Lilly“ (реплеят 16.11)
+    out = names.cut_words(n, limit) if limit else n
     return "" if out.upper() == str(ticker or "").upper() else out
 
 
