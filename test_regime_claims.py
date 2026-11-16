@@ -108,7 +108,10 @@ ai_brief.narrative_sources = lambda *a, **k: [float(x.replace(",", ".")) for x i
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res = ai_brief.macro_and_sector_brief({}, [], THERMO)
 assert f["counts_text"] not in prompts[0] and "НЕ преброявай" not in prompts[0] and f["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0]
-assert res["macro_brief"] == B["macro_brief"] and "regime_claims_fixed" not in res and "regime_comment" not in res
+# 16.11.2026 (пакет 16.11, т. 3): изречението с „avg_recent 2.25 срещу avg_prior 2.39“ (имена на полета) пада — останалото е непокътнато
+gone = "Базовата инфлация (Dallas Fed Trimmed Mean PCE, август 2026) е 2.19% г/г и с низходяща посока (avg_recent 2.25 срещу avg_prior 2.39)"
+assert gone in B["macro_brief"] and "avg_recent" not in res["macro_brief"]
+assert res["macro_brief"] == ai_brief._fix_text({"macro_brief": B["macro_brief"]})["macro_brief"] and "regime_claims_fixed" not in res and "regime_comment" not in res
 print("  ✓ промптът е без броенето и правилото; macro_brief минава непокътнат (функциите на regime_claims — т. 1–5 — остават, но не се викат върху него)")
 clean_answer = {"macro_brief": "Кратък текст.", "sector_logic": []}
 ai_brief._call_claude = lambda *a, **k: json.dumps(clean_answer, ensure_ascii=False)
@@ -122,7 +125,7 @@ ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()) as out:
     res3 = ai_brief.macro_and_sector_brief({}, [], THERMO)
 rc.strip_meta = orig_meta
-assert res3["macro_brief"] == B["macro_brief"] and "проверката за изтекли клаузи пропусната" in out.getvalue()
+assert res3["macro_brief"] == ai_brief._fix_text({"macro_brief": B["macro_brief"]})["macro_brief"] and "проверката за изтекли клаузи пропусната" in out.getvalue()   # 16.11.2026: без изречението с имена на полета (т. 3, в _parse_json)
 print("  ✓ СИНТЕТИЧНО: повреда в проверката → отговорът на модела се връща непроменен (graceful), редът в лога го казва")
 ai_brief._call_claude = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("СИНТЕТИЧНО: API недостъпен"))
 with contextlib.redirect_stdout(io.StringIO()):
