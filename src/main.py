@@ -993,6 +993,28 @@ def run() -> dict:
                                 watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set()),
                             enabled=config.ENABLE_SPLITS_CALENDAR, label="Отчетът за сплитовете", consequence="секцията за сплитове е без отчет днес")
 
+    # 16.11.2026 (пакет 16.11, т. 8): календарът на седмицата — отчетите на компаниите > 2% в S&P 500 и на нашите (карти, книги, наблюдавани), Fed, основните данни с консенсуса
+    def _week_calendar():
+        from src import econ_calendar, preopen as _po
+        w = _po.fetch_weights(today)
+        big = {c["ticker"]: f"тегло {c['weight']:.1f}% в S&P 500" for c in (w.get("companies") or [])}
+        ours = {}
+        for label, grp in (("CANSLIM", action), ("CANSLIM", watchlist), ("Kullamägi", qm_cards), ("GLB", glb_candidates), ("EP", (qm_ep_out or {}).get("rows"))):
+            for c in grp or []:
+                if c.get("ticker"):
+                    ours.setdefault(c["ticker"], f"карта {label}")
+        if config.ENABLE_BACKTEST:
+            for rec in backtest.book_records(None, statuses=("pending", "open", "trailing")):
+                if rec.get("ticker"):
+                    ours.setdefault(rec["ticker"], "в книгите")
+        for t in (watch_monitor.load_watch_list() if config.ENABLE_WATCH_MONITOR else []):
+            ours.setdefault(t, "наблюдаван")
+        out = econ_calendar.build_week(dt.date.fromisoformat(today), big, ours)
+        out["weights_note"] = (f"теглата — {w.get('source')}, към {w['as_of'][8:10]}.{w['as_of'][5:7]}" if w.get("as_of") else None) if w.get("companies") else f"теглата не се изтеглиха ({w.get('error')})"
+        return out
+    week_calendar = steps.step("week_calendar", _week_calendar, fallback={"ok": False, "errors": ["стъпката пропадна"], "days": []}, enabled=config.ENABLE_WEEK_CALENDAR,
+                               label="Календарът на седмицата (Nasdaq)", consequence="календарът на седмицата липсва днес — червен ред на страницата")
+
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
     corp_diag = dict(corp_actions.LAST_DIAG)
@@ -1089,6 +1111,7 @@ def run() -> dict:
         # пакет 4б т.б: покритие на маркера UOV✓ (колко кандидата/позиции имат съотношение, причини, съотношенията за калибриране)
         "uov_diag": uov_diag,
         "splits": splits_month,
+        "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,

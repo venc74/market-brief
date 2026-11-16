@@ -386,6 +386,13 @@ PREOPEN_FUTURES = {"ES=F": "ES (S&P 500)", "NQ=F": "NQ (Nasdaq-100)"}
 PREOPEN_MEGA_WEIGHT_PCT = float(os.getenv("PREOPEN_MEGA_WEIGHT_PCT", 2.0))
 PREOPEN_MEGA_GAP_PCT = float(os.getenv("PREOPEN_MEGA_GAP_PCT", 3.0))
 SPY_HOLDINGS_URL = "https://www.ssga.com/library-content/products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx"
+# 16.11.2026 (пакет 16.11, т. 8–9): календарът на седмицата (сутрешният бриф) и очакванията към икономическите заглавия (карето в 15:05) — публичният календар на Nasdaq (src/econ_calendar.py).
+# ИЗМЕРЕНО 16.11: икономическият календар връща събитията на деня ПРЕДИ подадената дата → заявката е за деня + ECON_CAL_DAY_SHIFT (пазач: Initial Jobless Claims трябва да е в четвъртък).
+ENABLE_WEEK_CALENDAR = os.getenv("ENABLE_WEEK_CALENDAR", "1") == "1"
+ECON_CAL_URL = "https://api.nasdaq.com/api/calendar/economicevents?date={date}"
+EARNINGS_CAL_URL = "https://api.nasdaq.com/api/calendar/earnings?date={date}"
+ECON_CAL_DAY_SHIFT = int(os.getenv("ECON_CAL_DAY_SHIFT", 1))
+WEEK_CAL_SESSIONS = int(os.getenv("WEEK_CAL_SESSIONS", 5))         # днес + следващите сесии — общо толкова
 
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing

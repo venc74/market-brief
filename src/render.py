@@ -230,6 +230,32 @@ def _futures_line(brief: dict) -> str | None:
         return None
 
 
+def _week_calendar_ctx(wc: dict | None) -> dict | None:
+    """16.11.2026 (т. 8): календарът на седмицата за шаблона и имейла — дните с готовите редове (econ_calendar.day_lines). Стар бриф без полето → None."""
+    if not isinstance(wc, dict):
+        return None
+    try:
+        from src import econ_calendar
+        days = [{"date": d["date"], "weekday": d["weekday"], "lines": econ_calendar.day_lines(d)} for d in wc.get("days") or []]
+    except Exception as e:
+        print(f"[render] календарът на седмицата: {type(e).__name__}: {e}")
+        days = []
+    return {"ok": wc.get("ok"), "source": wc.get("source"), "errors": wc.get("errors") or [], "weights_note": wc.get("weights_note"), "days": days}
+
+
+def _week_calendar_email(wc: dict | None) -> str:
+    """16.11.2026 (т. 8): календарът на седмицата в имейла — ден по ден; провал → червен ред."""
+    c = _week_calendar_ctx(wc)
+    if not c:
+        return ""
+    out = '<div style="margin-top:12px;font-size:13px"><b>Календар на седмицата</b> <span style="color:#6b7280;font-size:12px">(' + _e(c["source"] or "") + ')</span>'
+    if c["errors"]:
+        out += f'<div style="color:#991b1b;font-size:12.5px">⚠ Календарът е непълен: {_e("; ".join(c["errors"]))} — празното НЕ значи, че няма събития.</div>'
+    for d in c["days"]:
+        out += f'<div style="margin-top:4px"><b>{_e(d["weekday"])} {d["date"][8:10]}.{d["date"][5:7]}</b>: ' + (_e(" · ".join(d["lines"])) if d["lines"] else '<span style="color:#6b7280">нищо от следените</span>') + "</div>"
+    return out + "</div>"
+
+
 def _put_call_line(brief: dict) -> str | None:
     """16.11.2026 (пакет 16.11, т. 2): изречението за Put/Call под разказа — от кода (thermometer.put_call_sentence). Graceful: провал → None."""
     try:
@@ -655,6 +681,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         macro_brief=brief["ai_macro"]["macro_brief"],
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
+        week_calendar=_week_calendar_ctx(brief.get("week_calendar")),       # 16.11.2026 (т. 8): календарът на седмицата
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
@@ -1021,6 +1048,7 @@ def render_email(brief: dict) -> str:
   <tr><td style="padding:20px 28px;font-size:14px;color:#111827;line-height:1.6">
     {"<br><br>".join(_e(x) for x in _paragraphs(brief['ai_macro']['macro_brief'] or "")) or _e(brief['ai_macro']['macro_brief'])}
     {(f'<div style="color:#374151;font-size:13px;margin-top:8px">{_e(_put_call_line(brief))}</div>') if _put_call_line(brief) else ""}
+    {_week_calendar_email(brief.get("week_calendar"))}
     {(f'<div style="color:#6b7280;font-size:12px;margin-top:8px">{_e(_futures_line(brief))}</div>') if _futures_line(brief) else ""}
   </td></tr>
 

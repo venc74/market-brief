@@ -751,6 +751,16 @@
   {% if futures_line %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">{{ futures_line }}</div>{% endif %}
 </section>
 
+{# 16.11.2026 (пакет 16.11, т. 8): календарът на седмицата — отчетите на компаниите > 2% в S&P 500 и на нашите, Fed, основните данни с консенсуса (Nasdaq); провал → червен ред #}
+{% if week_calendar %}
+<section>
+  <h2>Календар на седмицата</h2>
+  <div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">Източник: {{ week_calendar.source }}. Отчетите — на компаниите с тегло > 2% в S&amp;P 500{% if week_calendar.weights_note %} ({{ week_calendar.weights_note }}){% endif %} и на тикърите в картите, книгите и наблюдаваните; Fed — речи, протоколи, решения; данните — основните за САЩ, с консенсуса (часът е по Ню Йорк).</div>
+  {% if week_calendar.errors %}<div class="small" style="color:var(--red);margin-bottom:6px">⚠ Календарът е непълен: {{ week_calendar.errors|join("; ") }} — празното НЕ значи, че няма събития.</div>{% endif %}
+  {% for d in week_calendar.days %}<div class="small" style="font-size:12.5px;margin:3px 0"><b>{{ d.weekday }} {{ d.date[8:10] }}.{{ d.date[5:7] }}</b>{% if d.lines %}<ul style="margin:2px 0 6px;padding-left:18px">{% for l in d.lines %}<li>{{ l }}</li>{% endfor %}</ul>{% else %} — <span style="color:var(--muted)">нищо от следените</span>{% endif %}</div>{% endfor %}
+</section>
+{% endif %}
+
 {# 03.11.2026 (разходката, т. 16): сплитовете — веднага след макро разказа (до 03.11 — след книгите на GLB) #}
 {% set our_tickers = (action + watchlist)|map(attribute='ticker')|list %}
 {% macro split_chip(s) %}
