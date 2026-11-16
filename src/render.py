@@ -559,7 +559,7 @@ def glb_market_line(t: dict | None) -> str | None:
 env.globals["glb_groups"] = glb_groups
 
 
-def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str] | None) -> list[dict]:
+def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str] | None, fresh: list[dict] | None = None) -> list[dict]:
     """
     03.11.2026 (разходката, т. 18–19): една таблица за 13F — по ред на (мениджър, тикър): {manager, ticker, company, action ("нова" / "увеличена" / "изход"), value, pct_of_portfolio,
     change_pct, in_screener, late, period, ticker_source, cusip}. Покупките — по стойност (собственият ред на всеки мениджър, dataroma "by_manager"; стар бриф без него — редът на тикъра,
@@ -578,6 +578,12 @@ def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str]
             extra = (r.get("count") or 1) - 1
             buys.append({**base(r), "manager": (r.get("manager") or "—") + (f" +{extra}" if extra > 0 else ""), "action": word(r.get("action")), "value": r.get("value"),
                          "pct_of_portfolio": r.get("pct_of_portfolio"), "change_pct": r.get("change_pct"), "late": r.get("late"), "period": r.get("period")})
+    have = {(b.get("manager"), b.get("ticker")) for b in buys}                 # 16.11.2026 (т. 11): новоподалите — и извън първите 8 по стойност (dataroma.fresh_rows)
+    for r in fresh or []:
+        if (r.get("manager"), r.get("ticker")) not in have:
+            have.add((r.get("manager"), r.get("ticker")))
+            buys.append({**base(r), "manager": r.get("manager"), "action": word(r.get("action")), "value": r.get("value"), "pct_of_portfolio": r.get("pct_of_portfolio"),
+                         "change_pct": r.get("change_pct"), "late": r.get("late"), "period": r.get("period"), "fresh": True})
     gone = [{**base(r), "manager": r.get("manager"), "action": "изход", "value": r.get("prior_value"), "pct_of_portfolio": r.get("prior_pct_of_portfolio"), "change_pct": -100.0,
              "late": r.get("late"), "period": r.get("period")} for r in (exits or {}).get("exits") or []]
     by_value = lambda x: -(x.get("value") or 0)
@@ -710,6 +716,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         splits_min_cap_m=config.SPLITS_MIN_MARKET_CAP / 1e6,
         superinvestor_moves=brief.get("superinvestor_moves", []),
         superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),
+        superinvestor_fresh=brief.get("superinvestor_fresh") or [],          # 16.11.2026 (т. 11)
         dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
         superinvestor_status=brief.get("superinvestor_status") or {},
         thirteenf_rhythm=brief.get("thirteenf_rhythm") or {},          # 21.10 (етап 4): ред и свити секции без нов 13F

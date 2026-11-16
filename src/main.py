@@ -1051,6 +1051,13 @@ def run() -> dict:
                failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None,
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
+    thirteenf_rh = data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {}
+    superinvestor_fresh = []                                        # 16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите (и извън първите 8)
+    if thirteenf_rh.get("fresh"):
+        try:
+            superinvestor_fresh = dataroma.fresh_rows(thirteenf_rh.get("new"), dataroma.fetch_manager_top(), superinvestor_new_positions)
+        except Exception as e:
+            print(f"[13F] редовете на новоподалите: {type(e).__name__}: {e}")
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
     # COT за Bitcoin — само в първия бриф след нов отчет на CFTC (29.10.2026: крипто секцията вече е построена преди макро брифа, тук се добавя само COT)
     if crypto and cot_rhythm.get("fresh"):
@@ -1121,7 +1128,8 @@ def run() -> dict:
         "insider_buying_positions_status": ins_pos_status,
         "insider_buying_watch_status": ins_watch_status,              # 03.11.2026 (т. 6): Form 4 покупките за наблюдаваните
         "superinvestor_status": superinvestor_status,
-        "thirteenf_rhythm": data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {},   # 21.10 (етап 4): цялата секция при нов 13F
+        "thirteenf_rhythm": thirteenf_rh,                                    # 21.10 (етап 4): цялата секция при нов 13F
+        "superinvestor_fresh": superinvestor_fresh,                          # 16.11.2026 (т. 11): редовете на новоподалите
         "glb_candidates": glb_candidates,
         "glb_wish": glb_wish_signals,        # свежите пробиви за книгата "GLB по Уиш" — snapshot-ът ги пази, за да се възстанови пропуснат run
         "glb_wish_high": glb_wish_high_signals,   # 21.10.2026: същото за книгата "GLB по Уиш" по неговата линия (месечен High)

@@ -987,7 +987,8 @@ def _fetch_all_uncached(min_value: float) -> dict:
     major_exits.sort(key=lambda r: r.get("prior_pct_of_portfolio", 0), reverse=True)
 
     bundle = {"moves": moves, "new_positions": new_positions,
-             "major_exits": major_exits, "stopped_managers": stopped_managers}
+             "major_exits": major_exits, "stopped_managers": stopped_managers,
+             "manager_top": {m: rows for m, rows in manager_top.items() if rows}}       # 16.11.2026 (т. 11): най-големите движения на всеки мениджър (за деня с ново подаване)
 
     total = len(config.DATAROMA_CIK)
     if not any_active_data:
@@ -1046,6 +1047,33 @@ def fetch_superinvestor_buys(min_value: float | None = None) -> list[dict]:
     """
     min_value = min_value if min_value is not None else config.DATAROMA_MIN_VALUE
     return _fetch_all(min_value)["moves"]
+
+
+def fresh_rows(new_managers: list[str] | None, manager_top: dict | None, new_positions: list[dict] | None) -> list[dict]:
+    """
+    16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите, за да ги има в таблицата и когато са извън първите DATAROMA_MOVES_DISPLAY_LIMIT по стойност:
+    техните най-големи движения (manager_top: нова / увеличена) и новите им позиции ≥ DATAROMA_MIN_NEW_POSITION_PCT. Реално 16.11: Baupost (13.11) — нови HONA ($175 млн, 3.5%) и
+    SITE ($112 млн, 2.2%) — секцията се отвори заради подаването, а таблицата (първите 8 тикъра — Berkshire $28 млрд …) не показа нищо от него. → редове във вида на moves
+    ({ticker, company, manager, action, value, pct_of_portfolio, change_pct, period, ticker_source, cusip}). Чиста функция.
+    """
+    want = set(new_managers or [])
+    out, seen = [], set()
+    for m in want:
+        for r in (manager_top or {}).get(m) or []:
+            k = (m, r.get("ticker") or r.get("cusip"))
+            if k not in seen:
+                seen.add(k); out.append({**r, "manager": m})
+    for r in new_positions or []:
+        m = r.get("manager")
+        k = (m, r.get("ticker") or r.get("cusip"))
+        if m in want and k not in seen:
+            seen.add(k); out.append({**r, "action": "нова позиция", "change_pct": None})
+    return out
+
+
+def fetch_manager_top(min_value: float | None = None) -> dict:
+    """16.11.2026 (т. 11): {мениджър: най-големите му движения} от днешното теглене (кешът за деня)."""
+    return _fetch_all(min_value if min_value is not None else config.DATAROMA_MIN_VALUE).get("manager_top") or {}
 
 
 def fetch_new_position_highlights(min_value: float | None = None) -> list[dict]:

@@ -1947,13 +1947,13 @@
 {# 13F (03.11.2026, разходката, т. 18–19): ЕДНА секция — компактна таблица Мениджър · Тикър · Действие (нова / увеличена / изход) · Стойност · Промяна % · % от портфейла · в нашия скрийнър ✓;
    изходите са редове „изход“ (без „Major Position Exits“ и без реда „Няма големи изходи“). Ритъмът е дневен: цялата — при ново подаване (data_rhythm.thirteenf_rhythm), иначе един ред + сгънато.
    Маркерът SI✓ върху картите и позициите остава (dataroma.new_position_markers). #}
-{% set si_rows = thirteenf_rows(superinvestor_moves, superinvestor_exits, our_tickers) %}
+{% set si_rows = thirteenf_rows(superinvestor_moves, superinvestor_exits, our_tickers, superinvestor_fresh) %}
 {% set si_stopped = (superinvestor_exits or {}).get("stopped_managers") or [] %}
 {% if si_rows or si_stopped or thirteenf_rhythm.compact or (superinvestor_status and superinvestor_status.kind in ['failed', 'legit_zero']) %}
 <section>
   <h2>Superinvestor Positions — Last 13F</h2>
   {% if thirteenf_rhythm.compact %}<div class="prose">{{ thirteenf_rhythm.text }}</div>
-  <details class="si-full"><summary>Таблицата от последните 13F ({{ si_rows|length }})</summary>{% endif %}
+  <details class="si-full"><summary>Таблицата от последните 13F ({{ si_rows|length }})</summary>{% elif thirteenf_rhythm.text %}<div class="prose">{{ thirteenf_rhythm.text }}</div>{% endif %}
   {{ data_note(superinvestor_status, "13F") }}
   {{ si_nocmp(superinvestor_status) }}
   {% if si_rows %}
@@ -1961,7 +1961,7 @@
     <tr><th>Мениджър</th><th>Тикър</th><th>Действие</th><th class="num">Стойност</th><th class="num" title="Промяна на броя акции спрямо предходния 13F">Промяна</th><th class="num" title="Дял от портфейла на мениджъра; при изход — в предходния 13F">% от портфейла</th><th title="Тикърът е и в нашия скрийнър днес (Action / Watchlist)">Скрийнър</th></tr>
     {% for s in si_rows %}
     <tr{% if s.action == "изход" %} class="si-exit"{% endif %}>
-      <td>{{ s.manager }}{% if s.late %} <span class="cs-warn">{{ s.late }}</span>{% endif %}</td>
+      <td>{{ s.manager }}{% if s.late %} <span class="cs-warn">{{ s.late }}</span>{% endif %}{% if s.fresh %} <span class="cs-mu" title="ново подаване — редът е от новия 13F, и извън най-големите по стойност">· ново подаване</span>{% endif %}</td>
       <td class="mono"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}{% if s.company %}<span class="wt-name">{{ s.company|cname(28, false) }}</span>{% endif %}</td>
       <td>{{ s.action }}</td>
       <td class="num">{% if s.value %}{{ s.value|money_short }}{% else %}—{% endif %}</td>
