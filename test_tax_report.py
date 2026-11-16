@@ -348,9 +348,9 @@ tb = re.search(r'<div class="noprint">(.*?)</div>', ui, re.S).group(1)
 assert 'id="repBack"' in tb and 'id="repAgain"' in tb and "${PRINT_HINT}" in tb                                                                        # лентата с действия на отчета е „.noprint“ → скрита при печат; в нея са бутоните
 assert "addEventListener('afterprint'" not in ui and "removeEventListener('afterprint'" not in ui and "addEventListener('click', cleanup)" in ui and "e.key === 'Escape'" in ui   # отчетът не се затваря сам след печат (Safari) — само „Назад“ / Esc
 assert "body.classList.add('printing-report')" in ui.replace("document.", "") and "requestAnimationFrame" in ui and ui.count("window.print()") == 2
-HINT = "В прозореца за печат избери „Запази като PDF“ (на Mac: долу вляво PDF → Запази като PDF)."
+HINT = "Натисни Печат → в прозореца за печат избери Запази като PDF."
 assert f"const PRINT_HINT = '{HINT}'" in ui and HINT in page and page.index(HINT) > page.index('id="repBtn"') and page.index(HINT) < page.index('id="repCap"')   # подсказката е до бутона, преди подписа „на немски …“
-assert re.search(r'id="repHint" style="font-size:10\.5px', page) and "Запази като PDF" in page[page.index('id="repTop"'):page.index('id="repTop"') + 300]
+assert re.search(r'id="repHint" style="font-size:10\.5px', page) and "Запази като PDF" in page[page.index('id="repTop"'):page.index('id="repTop"') + 300]   # 16.11.2026 (т. 19): „Натисни Печат → …“
 assert not re.search(r"<(button|input|select|textarea|a|form|script|img|iframe|nav)\b", html, re.I), re.search(r"<(button|input|select|textarea|a|form|script|img|iframe|nav)\b", html, re.I).group(0)   # в самия отчет няма интерактивни елементи
 print("  ✓ @media print: A4 пейзаж; „.noprint“, бутоните, полетата и всичко в body освен #reportRoot са с display:none !important; цялата страница (бутони, полета, навигация) е в „.wrap“, затворен преди #reportRoot;")
 print("    лентата „Назад / Печат“ е „.noprint“; отчетът остава отворен до „Назад“ / Esc (без „afterprint“ — причината в Safari); подсказката „В прозореца за печат избери „Запази като PDF“ (на Mac: …)“ е с дребен шрифт до бутона; в отчета няма бутони и полета")

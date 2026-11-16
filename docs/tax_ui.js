@@ -338,7 +338,7 @@ function renderReportButtons(de) {
 }
 // 14.11.2026: при „Запази като PDF“ в PDF влизаха бутоните и страницата — отчетът се връщаше назад сам след „afterprint“ (в Safari събитието идва още преди да е направен моментният образ за печат). Сега отчетът остава, докато не натиснеш „Назад“ / Esc;
 // а @media print (tax.html) скрива всичко, което не е отчетът — докато отчетът е отворен (body.printing-report).
-const PRINT_HINT = 'В прозореца за печат избери „Запази като PDF“ (на Mac: долу вляво PDF → Запази като PDF).';
+const PRINT_HINT = 'Натисни Печат → в прозореца за печат избери Запази като PDF.';
 const REP_PAGE_PX = 703, REP_WIDTH_PX = 1032;                                    // A4 пейзаж, полета 12 mm: 186 × 273 mm при 96 dpi
 function printReport() {
   if (!S.de || !S.fifo) return;

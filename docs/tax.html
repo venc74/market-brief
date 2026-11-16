@@ -73,7 +73,7 @@ body.printing-report{background:#fff;color:#000}body.printing-report .wrap{displ
     <div><h1>Данъчен <em>калкулатор</em> · Германия</h1><div class="small">доходи от капитал (Anlage KAP / KAP-INV) и крипто (Anlage SO) · FIFO · курсове на ЕЦБ</div></div>
     <div class="row">
       <label class="f">Данъчна година<select id="year"></select></label>
-      <button class="btn sm" id="repTop" style="display:none;align-self:flex-end" title="немски отчет за Finanzamt — в прозореца за печат избери „Запази като PDF“">📄 Отчет за Finanzamt (PDF)</button>
+      <button class="btn sm" id="repTop" style="display:none;align-self:flex-end" title="немски отчет за Finanzamt — Натисни Печат → в прозореца за печат избери Запази като PDF">📄 Отчет за Finanzamt (PDF)</button>
       <label class="f">Подаване<select id="joint"><option value="0">сам</option><option value="1">съвместно (със съпруг/а)</option></select></label>
       <label class="f">Църковен данък<select id="kirche"><option value="">не</option><option value="BY">Бавария — 8%</option><option value="BW">Баден-Вюртемберг — 8%</option><option value="other">друга провинция — 9%</option></select></label>
     </div>
@@ -103,7 +103,7 @@ body.printing-report{background:#fff;color:#000}body.printing-report .wrap{displ
       <div class="small" style="margin-bottom:8px">Печатна страница на немски: резюме по полетата на Anlage KAP, метод, всяка продажба по лот с курса на ЕЦБ, дивиденти, лихви, удържан данък, особени случаи, неотчетеното и изходните файлове. Записва се като PDF от диалога за печат на браузъра — нищо не напуска браузъра.</div>
       <label class="f" style="max-width:420px">Име в отчета (по желание — пази се само в този браузър)<input type="text" id="repName" maxlength="120" autocomplete="off" placeholder="име и фамилия"></label>
       <div style="margin-top:10px"><button class="btn p" id="repBtn">📄 Изтегли отчет за Finanzamt (PDF)</button></div>
-      <div class="small" id="repHint" style="font-size:10.5px;margin-top:4px">В прозореца за печат избери „Запази като PDF“ (на Mac: долу вляво PDF → Запази като PDF).</div>
+      <div class="small" id="repHint" style="font-size:10.5px;margin-top:4px">Натисни Печат → в прозореца за печат избери Запази като PDF.</div>
       <div class="small" id="repCap">на немски · всички изчисления ред по ред · за <span id="repYear"></span></div>
       <div class="small" id="repNote"></div></div>
     <div class="card" id="yearsCard"><h2>По години — всяка година самостоятелно, БЕЗ пренасяне на загуби</h2>
