@@ -1,5 +1,5 @@
 {
- "date": "2026-11-13",
+ "date": "2026-11-16",
  "bundle": {
   "moves": [
    {
@@ -55,10 +55,9 @@
     "ticker_source": "cusip",
     "managers": [
      "Уорън Бъфет · Berkshire Hathaway",
-     "Сет Кларман · Baupost Group",
      "Крис Хон · TCI Fund Management"
     ],
-    "count": 3,
+    "count": 2,
     "by_manager": [
      {
       "manager": "Уорън Бъфет · Berkshire Hathaway",
@@ -76,15 +75,6 @@
       "pct_of_portfolio": 6.7,
       "change_pct": 12.3,
       "period": "13F · 2026-08-14",
-      "late": null
-     },
-     {
-      "manager": "Сет Кларман · Baupost Group",
-      "action": "увеличена",
-      "value": 484744000.0,
-      "pct_of_portfolio": 9.0,
-      "change_pct": 16.2,
-      "period": "13F · 2026-08-13",
       "late": null
      }
     ]
@@ -159,20 +149,19 @@
     "ticker": "AMZN",
     "cusip": "023135106",
     "company": "AMAZON COM INC",
-    "manager": "Сет Кларман · Baupost Group",
+    "manager": "Дейвид Тепър · Appaloosa Management",
     "action": "увеличена",
     "value": 1191700000.0,
-    "period": "13F · 2026-08-13",
+    "period": "13F · 2026-08-14",
     "_resolved": true,
-    "pct_of_portfolio": 16.5,
-    "change_pct": 20.0,
+    "pct_of_portfolio": 16.0,
+    "change_pct": 15.7,
     "ticker_source": "cusip",
     "managers": [
-     "Сет Кларман · Baupost Group",
      "Дейвид Тепър · Appaloosa Management",
      "Джон Армитидж · Egerton Capital"
     ],
-    "count": 3,
+    "count": 2,
     "by_manager": [
      {
       "manager": "Дейвид Тепър · Appaloosa Management",
@@ -190,15 +179,6 @@
       "pct_of_portfolio": 12.0,
       "change_pct": 31.9,
       "period": "13F · 2026-10-20",
-      "late": null
-     },
-     {
-      "manager": "Сет Кларман · Baupost Group",
-      "action": "увеличена",
-      "value": 892310000.0,
-      "pct_of_portfolio": 16.5,
-      "change_pct": 20.0,
-      "period": "13F · 2026-08-13",
       "late": null
      }
     ]
@@ -530,6 +510,18 @@
     "ticker_source": "cusip"
    },
    {
+    "ticker": "HONA",
+    "cusip": "43849R105",
+    "company": "HONEYWELL AEROSPACE INC",
+    "manager": "Сет Кларман · Baupost Group",
+    "value": 175426000.0,
+    "pct_of_portfolio": 3.5,
+    "period": "13F · 2026-11-13",
+    "filing_date": "2026-11-13",
+    "_resolved": true,
+    "ticker_source": "cusip"
+   },
+   {
     "ticker": "GEV",
     "cusip": "36828A101",
     "company": "GE VERNOVA INC",
@@ -626,18 +618,6 @@
     "ticker_source": "cusip"
    },
    {
-    "ticker": "CME",
-    "cusip": "12572Q105",
-    "company": "CME GROUP INC",
-    "manager": "Сет Кларман · Baupost Group",
-    "value": 136694000.0,
-    "pct_of_portfolio": 2.5,
-    "period": "13F · 2026-08-13",
-    "filing_date": "2026-08-13",
-    "_resolved": true,
-    "ticker_source": "cusip"
-   },
-   {
     "ticker": "NXT",
     "cusip": "65290E101",
     "company": "NEXTPOWER INC",
@@ -698,6 +678,18 @@
     "ticker_source": "cusip"
    },
    {
+    "ticker": "SITE",
+    "cusip": "82982L103",
+    "company": "SITEONE LANDSCAPE SUPPLY INC",
+    "manager": "Сет Кларман · Baupost Group",
+    "value": 112436000.0,
+    "pct_of_portfolio": 2.2,
+    "period": "13F · 2026-11-13",
+    "filing_date": "2026-11-13",
+    "_resolved": true,
+    "ticker_source": "cusip"
+   },
+   {
     "ticker": "TTMI",
     "cusip": "87305R109",
     "company": "TTM TECHNOLOGIES INC",
@@ -716,7 +708,7 @@
    "kind": "ok",
    "note": "15 от 15 мениджъра с данни",
    "stale": false,
-   "data_date": "2026-11-13",
+   "data_date": "2026-11-16",
    "managers_with_data": 15,
    "managers_total": 15,
    "managers_without_filings": 0,
@@ -912,21 +904,21 @@
     }
    ],
    "cusip_tickers": {
-    "requested": 52,
-    "from_cache": 52,
-    "fetched": 0,
+    "requested": 57,
+    "from_cache": 51,
+    "fetched": 6,
     "not_found": 0,
     "skipped": 0,
     "error": null,
-    "rows": 63,
-    "by_cusip": 61,
+    "rows": 66,
+    "by_cusip": 64,
     "by_name": 0,
     "no_ticker": 2
    },
    "filings": {
     "Уорън Бъфет · Berkshire Hathaway": "2026-08-14",
     "Бил Акман · Pershing Square": "2026-08-14",
-    "Сет Кларман · Baupost Group": "2026-08-13",
+    "Сет Кларман · Baupost Group": "2026-11-13",
     "Стенли Дракенмилър · Duquesne Family Office": "2026-08-14",
     "Чейс Коулман · Tiger Global Management": "2026-08-14",
     "Крис Хон · TCI Fund Management": "2026-08-14",
@@ -935,7 +927,7 @@
     "Хауърд Маркс · Oaktree Capital Management": "2026-08-14",
     "Джон Армитидж · Egerton Capital": "2026-10-20",
     "Ли Лу · Himalaya Capital Management": "2026-08-14",
-    "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)": "2026-08-13",
+    "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)": "2026-11-13",
     "Стивън Мандел · Lone Pine Capital": "2026-08-14",
     "Тери Смит · Fundsmith": "2026-08-14",
     "Triple Frond Partners": "2026-08-13"

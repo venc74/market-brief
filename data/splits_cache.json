@@ -1,150 +1,79 @@
 {
- "date": "2026-11-13",
- "rows": [],
+ "date": "2026-11-16",
+ "rows": [
+  {
+   "ticker": "EMBJ",
+   "company": "Embraer S.A.",
+   "date": "2026-11-16",
+   "ratio": "4:1",
+   "split_type": "normal",
+   "date_human": "Nov 16, 2026",
+   "price": 78.73,
+   "market_cap": 14010656375.444145
+  },
+  {
+   "ticker": "SENEA",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026",
+   "price": 176.47,
+   "market_cap": 1192994913.9423523
+  },
+  {
+   "ticker": "SENEB",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026",
+   "price": 170.26,
+   "market_cap": 1151013237.8844147
+  },
+  {
+   "ticker": "SNDK",
+   "company": "Sandisk Corporation",
+   "date": "2026-11-20",
+   "ratio": "8:1",
+   "split_type": "normal",
+   "date_human": "Nov 20, 2026",
+   "price": 885.01,
+   "market_cap": 125927512308.19458
+  }
+ ],
  "horizon": [
   {
-   "ticker": "MMT",
-   "company": "Aberdeen Multi-Market Income Fund",
-   "date": "2026-11-09",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "ARAY",
-   "company": "Accuray Incorporated",
-   "date": "2026-11-09",
-   "ratio": "1:40",
-   "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "ADGM",
-   "company": "Adagio Medical Holdings, Inc",
-   "date": "2026-11-09",
-   "ratio": "1:30",
-   "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "ALPS",
-   "company": "ALPS Group Inc",
-   "date": "2026-11-09",
+   "ticker": "AOHY",
+   "company": "Angel Oak High Yield Opportunities ETF",
+   "date": "2026-11-16",
    "ratio": "1:5",
    "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
+   "date_human": "Nov 16, 2026"
   },
   {
-   "ticker": "CISS",
-   "company": "C3is Inc.",
-   "date": "2026-11-09",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "NXTS",
-   "company": "Nexentis Technologies Inc.",
-   "date": "2026-11-09",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "SMX",
-   "company": "SMX (Security Matters) Public Limited Company",
-   "date": "2026-11-09",
+   "ticker": "CARY",
+   "company": "Angel Oak Income ETF",
+   "date": "2026-11-16",
    "ratio": "1:3",
    "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
+   "date_human": "Nov 16, 2026"
   },
   {
-   "ticker": "STKH",
-   "company": "Steakholder Foods Ltd.",
-   "date": "2026-11-09",
-   "ratio": "1:5",
+   "ticker": "MBS",
+   "company": "Angel Oak Mortgage-Backed Securities ETF",
+   "date": "2026-11-16",
+   "ratio": "1:7",
    "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
+   "date_human": "Nov 16, 2026"
   },
   {
-   "ticker": "WCT",
-   "company": "Wellchange Holdings Company Limited",
-   "date": "2026-11-09",
-   "ratio": "1:10",
+   "ticker": "DFSC",
+   "company": "DEFSEC Technologies Inc.",
+   "date": "2026-11-16",
+   "ratio": "1:9",
    "split_type": "reverse",
-   "date_human": "Nov 09, 2026"
-  },
-  {
-   "ticker": "JOB",
-   "company": "GEE Group Inc.",
-   "date": "2026-11-10",
-   "ratio": "1:30",
-   "split_type": "reverse",
-   "date_human": "Nov 10, 2026"
-  },
-  {
-   "ticker": "NCI",
-   "company": "Neo-Concept International Group Holdings Limited",
-   "date": "2026-11-10",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Nov 10, 2026"
-  },
-  {
-   "ticker": "OFAL",
-   "company": "OFA Group",
-   "date": "2026-11-10",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 10, 2026"
-  },
-  {
-   "ticker": "GOVX",
-   "company": "GeoVax Labs, Inc.",
-   "date": "2026-11-11",
-   "ratio": "1:24",
-   "split_type": "reverse",
-   "date_human": "Nov 11, 2026"
-  },
-  {
-   "ticker": "SLXN",
-   "company": "Silexion Therapeutics Corp",
-   "date": "2026-11-11",
-   "ratio": "1:24",
-   "split_type": "reverse",
-   "date_human": "Nov 11, 2026"
-  },
-  {
-   "ticker": "ARAI",
-   "company": "Arrive AI Inc.",
-   "date": "2026-11-12",
-   "ratio": "1:48",
-   "split_type": "reverse",
-   "date_human": "Nov 12, 2026"
-  },
-  {
-   "ticker": "COSM",
-   "company": "Cosmos Health Inc.",
-   "date": "2026-11-13",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 13, 2026"
-  },
-  {
-   "ticker": "HUBC",
-   "company": "Hub Cyber Security Ltd.",
-   "date": "2026-11-13",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 13, 2026"
-  },
-  {
-   "ticker": "PMCB",
-   "company": "PharmaCyte  Biotech, Inc.",
-   "date": "2026-11-13",
-   "ratio": "1:19",
-   "split_type": "reverse",
-   "date_human": "Nov 13, 2026"
+   "date_human": "Nov 16, 2026"
   },
   {
    "ticker": "EMBJ",
@@ -152,6 +81,46 @@
    "date": "2026-11-16",
    "ratio": "4:1",
    "split_type": "normal",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "NCT",
+   "company": "Intercont (Cayman) Limited",
+   "date": "2026-11-16",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "KALA",
+   "company": "KALA BIO, Inc.",
+   "date": "2026-11-16",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "SGRX",
+   "company": "SANGRIX INC.",
+   "date": "2026-11-16",
+   "ratio": "1:8",
+   "split_type": "reverse",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "TGL",
+   "company": "Treasure Global Inc.",
+   "date": "2026-11-16",
+   "ratio": "1:24",
+   "split_type": "reverse",
+   "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "YMT",
+   "company": "Yimutian Inc.",
+   "date": "2026-11-16",
+   "ratio": "1:10",
+   "split_type": "reverse",
    "date_human": "Nov 16, 2026"
   },
   {
@@ -342,34 +311,43 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 42,
-  "horizon_from": "2026-11-09",
+  "source_rows": 33,
+  "horizon_from": "2026-11-16",
   "horizon_to": "2026-12-02",
-  "in_week": 18,
+  "in_week": 30,
   "dropped_price": [
-   "ARAY",
-   "ADGM",
-   "ALPS",
-   "CISS",
-   "NXTS",
-   "SMX",
-   "STKH",
-   "WCT",
-   "JOB",
-   "NCI",
-   "OFAL",
-   "GOVX",
-   "SLXN",
-   "ARAI",
-   "COSM",
-   "HUBC",
-   "PMCB"
+   "DFSC",
+   "NCT",
+   "KALA",
+   "SGRX",
+   "TGL",
+   "YMT",
+   "SOS"
   ],
   "dropped_cap": [
-   "MMT"
+   "VABK"
   ],
-  "dropped_no_data": [],
-  "passed": 0,
-  "state": "empty"
+  "dropped_no_data": [
+   "AOHY",
+   "CARY",
+   "MBS",
+   "BITO",
+   "BITI",
+   "RWM",
+   "VIXM",
+   "UBT",
+   "EET",
+   "BIB",
+   "ROM",
+   "DXD",
+   "DUG",
+   "MZZ",
+   "QID",
+   "SSG",
+   "REW",
+   "SMDD"
+  ],
+  "passed": 4,
+  "state": "ok"
  }
 }

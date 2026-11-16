@@ -89,6 +89,12 @@
 "ticker": "DASH",
 "type": "Common Stock"
 },
+"31488V107": {
+"date": "2026-11-16",
+"name": "FERGUSON ENTERPRISES INC",
+"ticker": "FERG",
+"type": "Common Stock"
+},
 "35137L105": {
 "date": "2026-10-21",
 "name": "FOX CORP - CLASS A",
@@ -101,10 +107,22 @@
 "ticker": "GEV",
 "type": "Common Stock"
 },
+"372460105": {
+"date": "2026-11-16",
+"name": "GENUINE PARTS CO",
+"ticker": "GPC",
+"type": "Common Stock"
+},
 "437076102": {
 "date": "2026-10-21",
 "name": "HOME DEPOT INC",
 "ticker": "HD",
+"type": "Common Stock"
+},
+"43849R105": {
+"date": "2026-11-16",
+"name": "HONEYWELL AEROSPACE INC",
+"ticker": "HONA",
 "type": "Common Stock"
 },
 "45579U109": {
@@ -203,6 +221,12 @@
 "ticker": "SPY",
 "type": "ETP"
 },
+"82982L103": {
+"date": "2026-11-16",
+"name": "SITEONE LANDSCAPE SUPPLY INC",
+"ticker": "SITE",
+"type": "Common Stock"
+},
 "852234103": {
 "date": "2026-10-21",
 "name": "BLOCK INC",
@@ -266,6 +290,12 @@
 "934423104": {
 "date": "2026-10-21"
 },
+"93627C101": {
+"date": "2026-11-16",
+"name": "WARRIOR MET COAL INC",
+"ticker": "HCC",
+"type": "Common Stock"
+},
 "G11448100": {
 "date": "2026-10-21",
 "name": "BITDEER TECHNOLOGIES GROUP-A",
@@ -288,6 +318,12 @@
 "date": "2026-10-21",
 "name": "ON HOLDING AG-CLASS A",
 "ticker": "ONON",
+"type": "Common Stock"
+},
+"H8817H100": {
+"date": "2026-11-16",
+"name": "TRANSOCEAN LTD",
+"ticker": "RIG",
 "type": "Common Stock"
 },
 "N53745100": {
