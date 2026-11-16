@@ -102,10 +102,26 @@ def check_candidate(f: dict, i: int, lead: float, P: dict | None = None) -> dict
     trig = float(h[i - P["TRIG_N"] + 1:i + 1].max())
     if not (trig / c - 1 <= P["NEAR_ADR"] * a / 100):                                       # близо до нивото на пробива
         return None
-    return {"close": float(c), "trigger": trig, "adr": float(a), "runup_pct": float(runup * 100), "peak": float(h[p]), "base_days": int(base),
+    hi52 = float(h[max(0, i - 251):i + 1].max())                                          # 16.11.2026 (т. 16): контекстът за правилото за лидер (leader_reject)
+    return {"peak_vs_52wh_pct": float((h[p] / hi52 - 1) * 100), "ret6m_pct": float((c / f["c"][i - 126] - 1) * 100),
+            "close": float(c), "trigger": trig, "adr": float(a), "runup_pct": float(runup * 100), "peak": float(h[p]), "base_days": int(base),
             "depth_pct": float(depth * 100), "tight": float(tight), "vol_ratio": float(vol_ratio), "lead": float(lead),
             "vs_sma10_pct": float((c / s10 - 1) * 100), "vs_sma20_pct": float((c / s20 - 1) * 100),
             "pct_to_trigger": float((trig / c - 1) * 100), "signal_date": pd.Timestamp(f["idx"][i]).date().isoformat()}
+
+
+def leader_reject(r: dict) -> str | None:
+    """
+    16.11.2026 (пакет 16.11, т. 16 — решение на Венци): сетъпът е за лидери, не за отскоци от дъно — кандидатът отпада, ако пикът на базата е повече от
+    config.QM_PEAK_MAX_BELOW_52W_PCT % под 52-седмичния връх ИЛИ ръстът за 6 месеца е ≤ config.QM_RET6M_MIN_PCT %. → причината или None. Чиста функция.
+    """
+    why = []
+    pv, r6 = r.get("peak_vs_52wh_pct"), r.get("ret6m_pct")
+    if pv is not None and pv < -config.QM_PEAK_MAX_BELOW_52W_PCT:
+        why.append(f"пикът {abs(pv):.1f}% под 52-седм. връх")
+    if r6 is not None and r6 <= config.QM_RET6M_MIN_PCT:
+        why.append(f"6 мес. {r6:+.1f}%")
+    return "; ".join(why) or None
 
 
 def lead_percentiles(frames: dict[str, pd.DataFrame]) -> dict[str, float]:
@@ -148,6 +164,7 @@ def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None =
     max_dist = config.QM_MAX_DIST_ADR if max_dist_adr is None else max_dist_adr          # 08.10: нивото най-много толкова ADR над затварянето, иначе картата не се показва и не се записва
     rows, with_hist, leaders = [], 0, 0
     beyond: list[str] = []
+    rejects: list[dict] = []                                                              # 16.11.2026 (т. 16): отпаднали по правилото за лидер — ред под картите
     for t, df in frames.items():
         if len(df) < MIN_BARS:
             continue
@@ -156,6 +173,10 @@ def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None =
         leaders += int(L == L and L >= P["LEAD"])
         f = compute_features(df)
         r = check_candidate(f, f["n"] - 1, L, P)
+        if r and leader_reject(r):
+            rejects.append({"ticker": t, "why": leader_reject(r), "peak_vs_52wh_pct": round(r["peak_vs_52wh_pct"], 1), "ret6m_pct": round(r["ret6m_pct"], 1),
+                            "runup_pct": round(r["runup_pct"], 0)})
+            continue
         if r:
             dist = round(r["pct_to_trigger"] / r["adr"], 2)                                   # "до нивото: X ADR"
             if dist > max_dist + 1e-9:
@@ -166,6 +187,7 @@ def scan_frames(frames: dict[str, pd.DataFrame], lead: dict[str, float] | None =
     as_of = max((df.index[-1] for df in frames.values() if len(df)), default=None)
     return rows, {"universe": len(frames), "with_history": with_hist, "leaders": leaders, "candidates": len(rows), "shown": min(len(rows), config.QM_MAX_CARDS),
                   "beyond_adr": len(beyond), "beyond_adr_tickers": sorted(beyond), "max_dist_adr": max_dist,
+                  "leader_rejects": sorted(rejects, key=lambda x: x["ticker"]),
                   "as_of": pd.Timestamp(as_of).date().isoformat() if as_of is not None else None, "lead_pct": config.QM_LEAD_PCT}
 
 
@@ -229,6 +251,8 @@ def scan(universe: list[str] | None = None, now_utc: dt.datetime | None = None) 
         rows, diag = scan_frames(frames)
         diag.update(st, universe=len(universe))
         diag["ok"] = bool(frames) and st["batches_failed"] < max(1, st["batches"])
+        if diag.get("leader_rejects"):
+            print(f"[qm_breakout] отпаднали по правилото за лидер: " + "; ".join(f"{x['ticker']} ({x['why']})" for x in diag["leader_rejects"]))
         print(f"[qm_breakout] универс {len(universe)}, с история {diag['with_history']}, лидери {diag['leaders']}, кандидати {diag['candidates']} "
               f"(показват се {diag['shown']}; над {diag['max_dist_adr']:g}×ADR от нивото, скрити: {diag['beyond_adr']} {diag['beyond_adr_tickers']}), към {diag['as_of']}, неуспешни партиди {st['batches_failed']}/{st['batches']}")
         return rows, diag

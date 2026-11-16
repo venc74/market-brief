@@ -240,6 +240,11 @@ ENABLE_QM = os.getenv("ENABLE_QM", "1") == "1"
 QM_LEAD_PCT = float(os.getenv("QM_LEAD_PCT", 0.90))              # най-добрият перцентил по ръст за 1, 3 и 6 месеца (негово: топ 1–2% от ~7000 ≈ топ 10% от наш универс от ~900)
 QM_RUN_MIN = float(os.getenv("QM_RUN_MIN", 0.20))                # предходен ръст до пика ≥ +20% (негово: 30–100%+; в реплея махането му не променя резултата)
 QM_RUN_LOOKBACK_BARS, QM_PEAK_WINDOW_BARS = 40, 62               # низ преди пика / прозорец за пика (≈1–3 месеца)
+# 16.11.2026 (пакет 16.11, т. 16 — решение на Венци): сетъпът е за ЛИДЕРИ, не за отскоци от дъно — пикът на базата най-много QM_PEAK_MAX_BELOW_52W_PCT % под 52-седмичния връх И ръстът
+# за 6 месеца над QM_RET6M_MIN_PCT %. Реално: OLED 13.11 — „предходен ръст +35%“ от самото 52-седмично дъно (09.10), пикът −28.8% под върха, 6 мес. −2.8%. Измерено върху 32-те карти
+# 08.10–16.11: падат OLED, ELF (09.10), SANM, SITM, GAP, UTHR, MTDR — задействани 2 (ELF −0.35R, UTHR −1.0R), 5 не. Отпадналите — ред под картите (qm_diag["leader_rejects"]), не тихо.
+QM_PEAK_MAX_BELOW_52W_PCT = float(os.getenv("QM_PEAK_MAX_BELOW_52W_PCT", 15.0))
+QM_RET6M_MIN_PCT = float(os.getenv("QM_RET6M_MIN_PCT", 0.0))
 QM_BASE_MIN_BARS, QM_BASE_MAX_BARS = 8, 45                       # консолидация ≈ 2 седмици – 2 месеца (негово)
 QM_DEPTH_MAX = float(os.getenv("QM_DEPTH_MAX", 0.30))            # пулбек от пика най-много 30% (мое: "организиран")
 QM_HIGHER_LOW_TOL = 0.005                                        # higher lows: low на последните 5 бара ≥ low на предишните 5 (допуск 0.5%)

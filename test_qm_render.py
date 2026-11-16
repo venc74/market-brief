@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import config
+config.QM_PEAK_MAX_BELOW_52W_PCT = 100.0                                                    # 16.11.2026 (т. 16): правилото за лидер има собствен тест (test_qm_leader_rule.py); тук — трите реални карти от 02.10 (DOCN е 19% под 52-седм. връх и по новото правило отпада)
 from src import qm_breakout as q, qm_ep as ep, render, backtest
 
 tmp = tempfile.TemporaryDirectory(prefix="mb_qmr_")
