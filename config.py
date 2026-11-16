@@ -277,6 +277,10 @@ CORP_ACTION_MATERIAL_RATIO = float(os.getenv("CORP_ACTION_MATERIAL_RATIO", 1.10)
 # Кеш по документ (прочетен 8-K не се чете повторно) и дневник на всяко засичане (за проверка на живо след месец).
 ENABLE_SPINOFF_WATCH = os.getenv("ENABLE_SPINOFF_WATCH", "1") == "1"
 SPINOFF_LOOKBACK_DAYS = int(os.getenv("SPINOFF_LOOKBACK_DAYS", 60))
+# 16.11.2026 (пакет 16.11, т. 13): емисии на акции (EDGAR 424B* / S-1 / S-3) за картите, книгите и наблюдаваните — src/offering_watch.py; KDP 12.11 ($2 млрд, −7%)
+ENABLE_OFFERING_WATCH = os.getenv("ENABLE_OFFERING_WATCH", "1") == "1"
+OFFERING_LOOKBACK_DAYS = int(os.getenv("OFFERING_LOOKBACK_DAYS", 10))
+OFFERING_CACHE_NAME = "offering_cache.json"          # в config.DATA_DIR
 SPINOFF_CACHE_NAME = "spinoff_8k_cache.json"          # в config.DATA_DIR (пътят се сглобява при извикване — тестовете подменят DATA_DIR)
 SPINOFF_LOG_NAME = "spinoff_log.json"
 # Бюджет за EDGAR в един run (секунди): тикърите се проверяват по приоритет (карти → живи записи в Action/buy-stop/QM → "GLB по Уиш", която расте до стотици); непроверените са в

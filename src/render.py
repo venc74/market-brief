@@ -230,6 +230,13 @@ def _futures_line(brief: dict) -> str | None:
         return None
 
 
+def offering_lines(brief: dict) -> list[str]:
+    """16.11.2026 (т. 13): „KDP — ⚠ емисия на акции — 424B5 от 16.11: …“ за тикърите с емисия, които нямат карта (книгите, наблюдаваните). Чиста функция."""
+    ow = brief.get("offering_warnings") or {}
+    cards = {c.get("ticker") for k in ("action", "watchlist", "qm_breakout", "glb_candidates") for c in (brief.get(k) or []) if isinstance(c, dict)}
+    return [f"{t} — {txt}" for t, txt in sorted(ow.items()) if t not in cards]
+
+
 def _week_calendar_ctx(wc: dict | None) -> dict | None:
     """16.11.2026 (т. 8): календарът на седмицата за шаблона и имейла — дните с готовите редове (econ_calendar.day_lines). Стар бриф без полето → None."""
     if not isinstance(wc, dict):
@@ -688,6 +695,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
         week_calendar=_week_calendar_ctx(brief.get("week_calendar")),       # 16.11.2026 (т. 8): календарът на седмицата
+        offering_warnings=brief.get("offering_warnings") or {},             # 16.11.2026 (т. 13): емисии на акции по тикър
+        offering_lines=offering_lines(brief), offering_days=config.OFFERING_LOOKBACK_DAYS,   # 16.11.2026 (т. 13): книгите и наблюдаваните без карта
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)

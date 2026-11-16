@@ -859,6 +859,22 @@ def run() -> dict:
                consequence="липсата на предупреждение днес НЕ значи, че няма предстоящо отделяне",
                failed_if=lambda v: (_sd.get("error") or "EDGAR не отговори") if not _sd.get("ok", True) else None,
                partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
+    # 16.11.2026 (пакет 16.11, т. 13): емисии на акции (EDGAR 424B* / S-1 / S-3) — картите, книгите, наблюдаваните; списъците от EDGAR — общите с отделянето (edgar_subs)
+    offering_found: dict = {}
+    def _offering():
+        nonlocal offering_found
+        from src import offering_watch
+        card_t = [c.get("ticker") for grp in (action, watchlist, qm_cards, glb_candidates) for c in (grp or [])]
+        live_t = backtest.live_tickers() if config.ENABLE_BACKTEST else []
+        watch_t = watch_monitor.load_watch_list() if config.ENABLE_WATCH_MONITOR else []
+        offering_found = offering_watch.check(card_t + live_t + watch_t, today, subs=edgar_subs)
+        offering_watch.annotate([action, watchlist, qm_cards, glb_candidates], offering_found)
+        return offering_found
+    from src import offering_watch as _ow
+    steps.step("offering", _offering, enabled=config.ENABLE_OFFERING_WATCH, label="Проверката за емисии на акции (EDGAR 424B / S-3)",
+               consequence="липсата на ред днес НЕ значи, че няма емисия",
+               failed_if=lambda v: (_ow.LAST_DIAG.get("error") or "EDGAR не отговори") if not _ow.LAST_DIAG.get("ok", True) else None,
+               partial=lambda v: (f"непроверени {len(_ow.LAST_DIAG.get('unchecked') or []) + len(_ow.LAST_DIAG.get('errors') or [])}", {}) if (_ow.LAST_DIAG.get("unchecked") or _ow.LAST_DIAG.get("errors")) else None)
     if config.ENABLE_BACKTEST:
         backtest.update_backtest_tracker(action, today, watchlist_before_expiry, thermo.get("regime"), qm_cards, glb_wish_signals, glb_wish_high_signals,
                                          today_context={"nasdaq": qm_market, "hy_oas": backtest.entry_hy_oas(thermo)})     # 03.11.2026: + HY OAS в деня на входа (т. 5)     # пакет 1б: + buy-stop кандидатите; Qullamaggie: + qm_breakout кандидатите (отделни книги)
@@ -1119,6 +1135,7 @@ def run() -> dict:
         "uov_diag": uov_diag,
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
+        "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,

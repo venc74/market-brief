@@ -1,0 +1,168 @@
+{
+ "_note": "РЕАЛНО: EDGAR (data.sec.gov/submissions/CIK0001418135.json — Keurig Dr Pepper, KDP), изтеглено 16.11.2026 ~16:05 Берлин през браузъра (без e-mail в User-Agent): filings.recent — само подаванията от 01.10.2026 (всичките 7, всички колони); docs — началото (8000 знака HTML, обложката) на двата 424B5 (0001193125-26-457001 от 12.11 — предварителен, и 0001193125-26-461405 от 16.11) с дължината и SHA-256 на целия документ. Пренос: gzip + base64, SHA-256 на JSON-а 1f95449a…2cba проверен.",
+ "cik": "0001418135",
+ "name": "Keurig Dr Pepper Inc.",
+ "tickers": [
+  "KDP"
+ ],
+ "filings": {
+  "recent": {
+   "accessionNumber": [
+    "0001193125-26-461405",
+    "0001422849-26-000189",
+    "0001741075-26-000002",
+    "0001193125-26-457001",
+    "0001418135-26-000066",
+    "0001418135-26-000064",
+    "0001193125-26-409799"
+   ],
+   "filingDate": [
+    "2026-11-16",
+    "2026-11-13",
+    "2026-11-12",
+    "2026-11-12",
+    "2026-11-09",
+    "2026-11-03",
+    "2026-10-01"
+   ],
+   "reportDate": [
+    "",
+    "",
+    "2026-11-03",
+    "",
+    "2026-09-30",
+    "2026-11-03",
+    "2026-10-01"
+   ],
+   "acceptanceDateTime": [
+    "2026-11-14T02:39:14.000Z",
+    "2026-11-13T18:51:33.000Z",
+    "2026-11-12T22:28:29.000Z",
+    "2026-11-12T12:49:59.000Z",
+    "2026-11-09T12:06:02.000Z",
+    "2026-11-03T13:10:50.000Z",
+    "2026-10-01T11:11:27.000Z"
+   ],
+   "act": [
+    "33",
+    "34",
+    "",
+    "33",
+    "34",
+    "34",
+    "34"
+   ],
+   "form": [
+    "424B5",
+    "SCHEDULE 13G/A",
+    "3",
+    "424B5",
+    "10-Q",
+    "8-K",
+    "8-K"
+   ],
+   "fileNumber": [
+    "333-289652",
+    "005-84051",
+    "",
+    "333-289652",
+    "001-33829",
+    "001-33829",
+    "001-33829"
+   ],
+   "filmNumber": [
+    "261554985",
+    "261551070",
+    "",
+    "261543331",
+    "261533778",
+    "261514337",
+    "261428923"
+   ],
+   "items": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "2.02,9.01",
+    "8.01,9.01"
+   ],
+   "core_type": [
+    "424B5",
+    "SCHEDULE 13G/A",
+    "3",
+    "424B5",
+    "XBRL",
+    "XBRL",
+    "XBRL"
+   ],
+   "size": [
+    797308,
+    7552,
+    723475,
+    654072,
+    16190603,
+    5626855,
+    177690
+   ],
+   "isXBRL": [
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   "isInlineXBRL": [
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   "isXBRLNumeric": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0
+   ],
+   "primaryDocument": [
+    "d111532d424b5.htm",
+    "xslSCHEDULE_13G_X02/primary_doc.xml",
+    "xslF345X06/wk-form3_1794522505.xml",
+    "d111532d424b5.htm",
+    "kdp-20260930.htm",
+    "kdp-20261103.htm",
+    "d87955d8k.htm"
+   ],
+   "primaryDocDescription": [
+    "424B5",
+    "",
+    "FORM 3",
+    "424B5",
+    "10-Q",
+    "8-K",
+    "8-K"
+   ]
+  }
+ },
+ "docs": {
+  "0001193125-26-457001": {
+   "head": "<DOCUMENT>\n<TYPE>424B5\n<SEQUENCE>1\n<FILENAME>d111532d424b5.htm\n<DESCRIPTION>424B5\n<TEXT>\n<HTML><HEAD>\n<TITLE>424B5</TITLE>\n<script >bazadebezolkohpepadr=\"2030335242\"</script><script type=\"text/javascript\" src=\"https://www.sec.gov/akam/13/790474c4\"  defer></script></HEAD>\n <BODY BGCOLOR=\"WHITE\" STYLE=\"line-height:Normal\">\n<h5 align=\"left\" style=\"font-size:10pt;font-weight:bold\"><a href=\"#toc\">Table of Contents</a></h5>\n\n\n<Center><DIV STYLE=\"width:8.5in\" align=\"left\">\n <DIV STYLE=\"position:relative; overflow:visible; width:651pt; height:20pt; transform-origin:bottom left; transform: rotate(-90deg) translate(-100%, 100%) translateX(20pt);\">\n<P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Arial Narrow\"><FONT COLOR=\"#ff4338\"><B>The information in this preliminary prospectus supplement is not complete and may be changed. This preliminary prospectus supplement and\nthe accompanying prospectus are not an offer to sell these securities and are not soliciting an offer to buy these securities in any jurisdiction where the offer or sale is not permitted.\n</B></FONT></P></DIV><DIV STYLE=\"position:relative; overflow:visible; margin-left:38pt; margin-right:38pt; transform: translateY(-20pt);\"> <p STYLE=\"margin-top:0pt;margin-bottom:0pt ; font-size:8pt\">&nbsp;</P>\n<P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\" ALIGN=\"right\"><B>Filed Pursuant to Rule 424(b)(5) <BR>Registration No. 333-289652 </B></P>\n<P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\" ALIGN=\"center\"><FONT COLOR=\"#ff4338\"><B>SUBJECT TO COMPLETION, DATED NOVEMBER&nbsp;12, 2026 </B></FONT></P>\n<P STYLE=\"margin-top:6pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\"><B>Preliminary Prospectus Supplement </B></P> <P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\"><B>(To Prospectus dated\nAugust&nbsp;15, 2025) </B></P> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; font-size:18pt; font-family:Times New Roman\" ALIGN=\"center\"><B>$2,000,000,000 </B></P> <P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P>\n<P STYLE=\"margin-top:0pt;margin-bottom:0pt\" ALIGN=\"center\">\n\n\n<IMG SRC=\"g111532g00h01.jpg\" ALT=\"LOGO\" STYLE=\"width:2.00977in;height:0.603972in;\">\n </P> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; font-size:14pt; font-family:Times New Roman\" ALIGN=\"center\"><B>Common Stock </B></P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P><center><DIV STYLE=\"line-height:6.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1.00pt solid #000000;width:21%\">&nbsp;</DIV></center>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>We are offering $2,000,000,000 of shares of our common stock, par value $0.01 per share. </B></P>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>Our common stock is listed on The Nasdaq Stock Market LLC (&#8220;Nasdaq&#8221;) under the symbol &#8220;KDP.&#8221; The last reported sale\nprice of our common stock on Nasdaq on November&nbsp;11, 2026 was $38.25 per share. </B></P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P><center><DIV STYLE=\"line-height:6.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1.00pt solid #000000;width:21%\">&nbsp;</DIV></center>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:12pt; font-family:Times New Roman\"><B>Investing in our common stock involves risks. See &#8220;<A HREF=\"#supprom111532_7\">Risk Factors</A>&#8221; beginning on page <FONT\nSTYLE=\"white-space:nowrap\">S-5</FONT> of this prospectus supplement and the risk factors described in the documents that we file with the Securities and Exchange Commission (the &#8220;SEC&#8221;) that are incorporated herein by reference for a\ndiscussion of certain risks you should consider before deciding to invest in our common stock. </B></P> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>Neither the SEC nor any state\nsecurities commission has approved or disapproved of these securities or passed upon the accuracy or adequacy of this prospectus supplement or the accompanying prospectus. Any representation to the contrary is a criminal offense.</B> </P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P>\n<TABLE CELLSPACING=\"0\" CELLPADDING=\"0\" WIDTH=\"76%\" BORDER=\"0\" STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" ALIGN=\"center\">\n\n\n<TR>\n\n<TD WIDTH=\"78%\"></TD>\n\n<TD VALIGN=\"bottom\" WIDTH=\"6%\"></TD>\n<TD></TD>\n<TD></TD>\n<TD></TD>\n\n<TD VALIGN=\"bottom\" WIDTH=\"6%\"></TD>\n<TD></TD>\n<TD></TD>\n<TD></TD></TR>\n<TR STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:8pt\">\n<TD VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD VALIGN=\"bottom\" COLSPAN=\"2\" ALIGN=\"center\" STYLE=\"border-bottom:1.00pt solid #000000\"><B>Per<BR>Share</B></TD>\n<TD VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD VALIGN=\"bottom\" COLSPAN=\"2\" ALIGN=\"center\" STYLE=\"border-bottom:1.00pt solid #000000\"><B>Total</B></TD>\n<TD VALIGN=\"bottom\">&nbsp;</TD></TR>\n\n\n<TR BGCOLOR=\"#cceeff\" STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Public offering price<SUP STYLE=\"font-size:75%; vertical-align:top\">(1)</SUP></P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&#8195;&#8195;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&#8195;&#8195;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n<TR STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Underwriting discount<SUP STYLE=\"font-size:75%; vertical-align:top\">(1)(2)</SUP></P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n<TR BGCOLOR=\"#cceeff\" STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Proceeds, before expenses, to us</P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n</TABLE> <DIV STYLE=\"line-height:8.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1px solid #000000;width:11%\">&nbsp;</DIV>\n<TABLE STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" BORDER=\"0\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"100%\">\n<TR style = \"page-break-inside:avoid\">\n<TD WIDTH=\"4%\" VALIGN=\"top\" ALIGN=\"left\">(1)</TD>\n<TD ALIGN=\"left\" VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman; \" ALIGN=\"left\">Assumes no exercise of the underwriters&#8217; option to purchase additional shares of common stock described\nbelow. </P></TD></TR></TABLE>\n<TABLE STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" BORDER=\"0\" CELLPADDING=\"0\" CELLSPACIN",
+   "full_len": 532525,
+   "full_sha256": "10eca9ca16509bb74c699beef4b7e329eaa77740fedab0e90c24530a9d63f5cb"
+  },
+  "0001193125-26-461405": {
+   "head": "<DOCUMENT>\n<TYPE>424B5\n<SEQUENCE>1\n<FILENAME>d111532d424b5.htm\n<DESCRIPTION>424B5\n<TEXT>\n<HTML><HEAD>\n<TITLE>424B5</TITLE>\n<script >bazadebezolkohpepadr=\"2030335242\"</script><script type=\"text/javascript\" src=\"https://www.sec.gov/akam/13/790474c4\"  defer></script></HEAD>\n <BODY BGCOLOR=\"WHITE\" STYLE=\"line-height:Normal\">\n<h5 align=\"left\" style=\"font-size:10pt;font-weight:bold\"><a href=\"#toc\">Table of Contents</a></h5>\n\n\n<Center><DIV STYLE=\"width:8.5in\" align=\"left\">\n <p STYLE=\"margin-top:0pt;margin-bottom:0pt ; font-size:8pt\">&nbsp;</P> <P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\" ALIGN=\"right\"><B>Filed Pursuant to\nRule 424(b)(5) <BR>Registration No. 333-289652 </B></P> <P STYLE=\"margin-top:6pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\"><B>Prospectus Supplement </B></P>\n<P STYLE=\"margin-top:0pt; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman\"><B>(To Prospectus dated August&nbsp;15, 2025) </B></P>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; font-size:18pt; font-family:Times New Roman\" ALIGN=\"center\"><B>57,971,015 Shares </B></P> <P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P>\n<P STYLE=\"margin-top:0pt;margin-bottom:0pt\" ALIGN=\"center\">\n\n\n<IMG SRC=\"g111532g00h01.jpg\" ALT=\"LOGO\" STYLE=\"width:2.00977in;height:0.603972in;\">\n </P> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; font-size:14pt; font-family:Times New Roman\" ALIGN=\"center\"><B>Common Stock </B></P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P><center><DIV STYLE=\"line-height:6.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1.00pt solid #000000;width:21%\">&nbsp;</DIV></center>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>We are offering 57,971,015 shares of our common stock, par value $0.01 per share. </B></P>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>Our common stock is listed on The Nasdaq Stock Market LLC (&#8220;Nasdaq&#8221;) under the symbol &#8220;KDP.&#8221; The last reported sale\nprice of our common stock on Nasdaq on November&nbsp;12, 2026 was $35.42 per share. </B></P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P><center><DIV STYLE=\"line-height:6.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1.00pt solid #000000;width:21%\">&nbsp;</DIV></center>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:12pt; font-family:Times New Roman\"><B>Investing in our common stock involves risks. See &#8220;<A HREF=\"#supprom111532_7\">Risk Factors</A>&#8221; beginning on page <FONT\nSTYLE=\"white-space:nowrap\">S-5</FONT> of this prospectus supplement and the risk factors described in the documents that we file with the Securities and Exchange Commission (the &#8220;SEC&#8221;) that are incorporated herein by reference for a\ndiscussion of certain risks you should consider before deciding to invest in our common stock. </B></P> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\"><B>Neither the SEC nor any state\nsecurities commission has approved or disapproved of these securities or passed upon the accuracy or adequacy of this prospectus supplement or the accompanying prospectus. Any representation to the contrary is a criminal offense.</B> </P>\n<P STYLE=\"font-size:12pt;margin-top:0pt;margin-bottom:0pt\">&nbsp;</P>\n<TABLE CELLSPACING=\"0\" CELLPADDING=\"0\" WIDTH=\"76%\" BORDER=\"0\" STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" ALIGN=\"center\">\n\n\n<TR>\n\n<TD WIDTH=\"59%\"></TD>\n\n<TD VALIGN=\"bottom\" WIDTH=\"5%\"></TD>\n<TD></TD>\n<TD></TD>\n<TD></TD>\n\n<TD VALIGN=\"bottom\" WIDTH=\"5%\"></TD>\n<TD></TD>\n<TD></TD>\n<TD></TD></TR>\n<TR STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:8pt\">\n<TD VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD VALIGN=\"bottom\" COLSPAN=\"2\" ALIGN=\"center\" STYLE=\"border-bottom:1.00pt solid #000000\"><B>Per Share</B></TD>\n<TD VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD VALIGN=\"bottom\" COLSPAN=\"2\" ALIGN=\"center\" STYLE=\"border-bottom:1.00pt solid #000000\"><B>Total</B></TD>\n<TD VALIGN=\"bottom\">&nbsp;</TD></TR>\n\n\n<TR BGCOLOR=\"#cceeff\" STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Public offering price<SUP STYLE=\"font-size:75%; vertical-align:top\">(1)</SUP></P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">34.50000</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">2,000,000,017.50</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n<TR STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Underwriting discount<SUP STYLE=\"font-size:75%; vertical-align:top\">(1)(2)</SUP></P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">0.77625</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">45,000,000.39</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n<TR BGCOLOR=\"#cceeff\" STYLE=\"page-break-inside:avoid ; font-family:Times New Roman; font-size:10pt\">\n<TD VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; margin-left:1.00em; text-indent:-1.00em; font-size:10pt; font-family:Times New Roman\">Proceeds, before expenses, to us</P></TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">33.72375</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD>\n<TD VALIGN=\"bottom\">&nbsp;&nbsp;</TD>\n<TD NOWRAP VALIGN=\"bottom\">$</TD>\n<TD NOWRAP VALIGN=\"bottom\" ALIGN=\"right\">1,955,000,017.11</TD>\n<TD NOWRAP VALIGN=\"bottom\">&nbsp;</TD></TR>\n</TABLE> <DIV STYLE=\"line-height:8.0pt;margin-top:0pt;margin-bottom:2pt;border-bottom:1px solid #000000;width:11%\">&nbsp;</DIV>\n<TABLE STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" BORDER=\"0\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"100%\">\n<TR style = \"page-break-inside:avoid\">\n<TD WIDTH=\"4%\" VALIGN=\"top\" ALIGN=\"left\">(1)</TD>\n<TD ALIGN=\"left\" VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman; \" ALIGN=\"left\">Assumes no exercise of the underwriters&#8217; option to purchase additional shares of common stock described\nbelow. </P></TD></TR></TABLE>\n<TABLE STYLE=\"BORDER-COLLAPSE:COLLAPSE; font-family:Times New Roman; font-size:10pt\" BORDER=\"0\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"100%\">\n<TR style = \"page-break-inside:avoid\">\n<TD WIDTH=\"4%\" VALIGN=\"top\" ALIGN=\"left\">(2)</TD>\n<TD ALIGN=\"left\" VALIGN=\"top\"> <P STYLE=\" margin-top:0pt ; margin-bottom:0pt; font-size:10pt; font-family:Times New Roman; \" ALIGN=\"left\">See &#8220;Underwriting (Conflicts of Interest)&#8221; for additional information regarding underwriting\ncompensation. </P></TD></TR></TABLE> <P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\">We have granted the underwriters an option to purchase up to 8,695,652 additional shares of our common\nstock from us at the public offering price, less the underwriting discount, within 30 days from the date of this prospectus supplement. </P>\n<P STYLE=\"margin-top:12pt; margin-bottom:0pt; text-indent:4%; font-size:10pt; font-family:Times New Roman\">The underwriters expect to deliver the shares of common stock against payment through the book-entry facilities of T",
+   "full_len": 531728,
+   "full_sha256": "ba43a61a6f94b1ece727d948d7f413f1b43ed3bac554b9c40811db960e96bab1"
+  }
+ }
+}
