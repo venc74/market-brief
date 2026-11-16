@@ -28,13 +28,27 @@ def _dm(iso: str) -> str:
     return f"{iso[8:10]}.{iso[5:7]}"
 
 
+_WD = ("понеделник", "вторник", "сряда", "четвъртък", "петък", "събота", "неделя")
+
+
+def release_as_of(release: dt.date) -> dt.date:
+    """16.11.2026 (т. 7): данните на отчет, публикуван на `release` — последният вторник ПРЕДИ него (петък → 3 дни назад; изместен в понеделник → 6 дни назад). Чиста функция."""
+    return release - dt.timedelta(days=((release.weekday() - 1) % 7) or 7)
+
+
 def cftc_next_release(as_of: str) -> dict:
-    """Следващият седмичен отчет след отчета към as_of: данни към деня 7 дни по-късно, публикувани в петъка след него в 15:30 ET → датата и часът в Берлин."""
+    """
+    Следващият седмичен отчет след отчета към as_of: данни към деня 7 дни по-късно → датата на публикуване и часът в Берлин (15:30 ET).
+    16.11.2026 (пакет 16.11, т. 7): по официалния график на CFTC (config.CFTC_COT_RELEASES) — и изместените заради празник (понеделник 16.11, 30.11, 28.12); извън графика —
+    петъкът след данните (както до 16.11), "source": "rule".
+    """
     d = dt.date.fromisoformat(as_of) + dt.timedelta(days=7)
-    fri = d + dt.timedelta(days=(4 - d.weekday()) % 7)
-    t = dt.datetime(fri.year, fri.month, fri.day, 15, 30, tzinfo=_NY).astimezone(_BERLIN)
-    holiday = fri.isoformat() in config.NYSE_HOLIDAYS                                # петък-празник (25.12.2026, 01.01.2027) — CFTC мести отчета; точната дата е в графика ѝ
-    return {"next_as_of": d.isoformat(), "release_date": t.date().isoformat(), "release_berlin": t.strftime("%H:%M"), "holiday": holiday}
+    hit = next((r for r in sorted(dt.date.fromisoformat(x) for x in config.CFTC_COT_RELEASES) if release_as_of(r) == d), None)
+    rel = hit or d + dt.timedelta(days=(4 - d.weekday()) % 7)
+    t = dt.datetime(rel.year, rel.month, rel.day, 15, 30, tzinfo=_NY).astimezone(_BERLIN)
+    holiday = hit is None and rel.isoformat() in config.NYSE_HOLIDAYS                 # извън графика: петък-празник — CFTC мести отчета
+    return {"next_as_of": d.isoformat(), "release_date": t.date().isoformat(), "release_berlin": t.strftime("%H:%M"), "holiday": holiday,
+            "weekday": _WD[rel.weekday()], "delayed": bool(hit and hit.weekday() != 4), "source": "schedule" if hit else "rule"}
 
 
 def cot_rhythm(status: dict | None, prev: dict | None, today: str) -> dict:
@@ -55,11 +69,12 @@ def cot_rhythm(status: dict | None, prev: dict | None, today: str) -> dict:
         if fresh and not late:
             text = None                                                              # първият бриф с този отчет — цялата секция, без ред
         elif late:
-            text = (f"COT: отчетът, публикуван в петък {_dm(rel['release_date'])}, още не е в данните — показан е отчетът към {_dm(as_of)}")
+            text = (f"COT: отчетът, публикуван в {rel['weekday']} {_dm(rel['release_date'])}, още не е в данните — показан е отчетът към {_dm(as_of)}")
         elif rel["holiday"]:
             text = (f"COT: без нови данни — отчет към {_dm(as_of)}; петък {_dm(rel['release_date'])} е празник в САЩ — следващият отчет е след него (по графика на CFTC)")
-        else:
-            text = (f"COT: без нови данни — отчет към {_dm(as_of)}, следващ отчет петък {_dm(rel['release_date'])} (публикуван {rel['release_berlin']} Берлин)")
+        else:                                                                        # 16.11.2026 (т. 7): денят — по графика на CFTC
+            text = (f"COT: без нови данни — отчет към {_dm(as_of)}, следващ отчет {rel['weekday']} {_dm(rel['release_date'])}"
+                    + (" — изместен заради празник, по графика на CFTC" if rel.get("delayed") else "") + f" (публикуван {rel['release_berlin']} Берлин)")
         return {"compact": bool(not fresh and not late), "fresh": fresh, "late": late, "as_of": as_of, "prev_as_of": prev_as_of, **rel, "text": text}
     except Exception as e:
         print(f"[data_rhythm] cot_rhythm: {type(e).__name__}: {e}")

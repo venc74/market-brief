@@ -40,7 +40,8 @@ assert late["compact"] is False and late["late"] and late["text"] == "COT: от�
 assert r.cftc_next_release("2026-10-20")["release_berlin"] == "20:30" and r.cftc_next_release("2026-10-27")["release_berlin"] == "21:30"   # ЕС сменя на 25.10, САЩ — на 01.11
 assert r.cftc_next_release("2026-03-03")["release_berlin"] == "20:30" and r.cftc_next_release("2026-03-24")["release_berlin"] == "21:30"
 h = r.cot_rhythm({"as_of": "2026-12-15"}, {"cot_status": {"as_of": "2026-12-15"}}, "2026-12-28")
-assert h["compact"] and "петък 25.12 е празник в САЩ" in h["text"] and not h["late"]
+assert h["compact"] and not h["late"] and h["text"] == ("COT: без нови данни — отчет към 15.12, следващ отчет понеделник 28.12 — изместен заради празник, по графика на CFTC "
+                                                        "(публикуван 21:30 Берлин)")              # 16.11.2026 (пакет 16.11, т. 7): по графика на CFTC; до 16.11 — „петък 25.12 е празник“
 assert r.cot_rhythm(None, None, "2026-10-21") == {"compact": False, "fresh": False, "as_of": None, "text": None}
 print("  ✓ стари данни → цялата секция (банерът ѝ); отчетът от петък липсва в понеделник → цялата секция и ред „още не е в данните“; 30.10 — 20:30 Берлин, 06.11 — 21:30; 25.12 — празник")
 

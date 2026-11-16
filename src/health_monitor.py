@@ -114,6 +114,16 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
     except Exception as e:
         print(f"[health] NYSE_HOLIDAYS не се провери: {type(e).__name__}: {e}")
 
+    try:                                     # 16.11.2026 (т. 7): графикът на CFTC за COT (CFTC_COT_RELEASES) свършва — без него датата е по правилото „петък“
+        last = max(config.CFTC_COT_RELEASES)
+        left = (dt.date.fromisoformat(last) - dt.date.fromisoformat(today)).days
+        if left < config.CFTC_RELEASES_WARN_DAYS:
+            out.append({"check": "cot_schedule", "message": (
+                f"CFTC_COT_RELEASES в config.py свършва на {last[8:10]}.{last[5:7]}.{last[:4]} (остават {max(left, 0)} дни) — добави графика на CFTC за следващата година "
+                "(cftc.gov, Release Schedule), иначе датата на следващия COT отчет е по правилото „петък“ и пропуска празничните отмествания.")})
+    except Exception as e:
+        print(f"[health] CFTC_COT_RELEASES не се провери: {type(e).__name__}: {e}")
+
     try:                                     # 12.11.2026 (т. 3): и таблицата SIFMA_US_FULL_CLOSES (дните без търговия на облигации) свършва
         last_year = max(int(h[:4]) for h in config.SIFMA_US_FULL_CLOSES)
         left = (dt.date(last_year, 12, 31) - dt.date.fromisoformat(today)).days
