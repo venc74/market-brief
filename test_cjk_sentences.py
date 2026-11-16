@@ -34,7 +34,7 @@ for c in CASES:
     bad = [x for x in sents if ai_brief._CJK_RE.search(x)]
     assert len(bad) == 1 and bad[0] not in out                                                              # изречението с CJK — го няма
     for x in sents:
-        if x not in bad and not re.search(r"[A-Za-z]{2,}[а-я]|[а-я][A-Za-z]{2,}", x):                       # (другите изречения — без промяна; смесените думи може да се пипнат от другите поправки)
+        if x not in bad and not re.search(r"[A-Za-z]{2,}[а-я]|[а-я][A-Za-z]{2,}", x) and not ai_brief._FIELD_RE.search(x):   # (другите — без промяна; смесените думи може да се пипнат от другите поправки; 16.11: изречение с име на поле — 07.08 „breakout_volume = true“ — пада)
             assert x in out, (c["date"], x[:60])
     print(f"  ✓ {c['date']} {c['path']}: махнато «{bad[0][:70]}…» ({len(s)} → {len(out)} знака)")
 cat = next(c for c in CASES if c["date"] == "2026-09-21")

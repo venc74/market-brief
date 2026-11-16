@@ -487,6 +487,7 @@ def run() -> dict:
     # model_selector.resolve_model() за escape hatch / probe / fallback реда.
     # FIX 2026-09-23: чисти записи за отрязвания и usage за ТОЗИ run.
     ai_brief.TRUNCATIONS.clear()
+    ai_brief.FIELD_DROPS.clear()                                                 # 16.11.2026 (т. 3)
     ai_brief.AI_USAGE.clear()
     model_info = {"model": config.CLAUDE_MODEL, "source": "static",
                   "rejected": None, "rejected_reason": "", "banner": {}}
@@ -1078,6 +1079,7 @@ def run() -> dict:
         # usage по извикване (единственият достъпен източник на реални token
         # числа — Actions логът иска автентикация)
         "ai_truncations": list(ai_brief.TRUNCATIONS),
+        "ai_field_drops": list(ai_brief.FIELD_DROPS),                    # 16.11.2026 (т. 3): махнатите изречения с имена на полета
         "ai_usage": list(ai_brief.AI_USAGE),
         "watch": watch_rows,
         "watch_status": dict(watch_monitor.LAST_STATUS),                 # 04.11.2026 (В1): какво не се провери при наблюдаваните (брояч и причина)

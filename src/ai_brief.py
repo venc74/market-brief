@@ -53,6 +53,12 @@ class TruncatedResponse(RuntimeError):
 # AI_USAGE съществува, защото Actions логът не е достъпен без автентикация, а
 # без него реалните token числа по секции нямаше откъде да се видят.
 TRUNCATIONS: list[dict] = []
+# 16.11.2026 (пакет 16.11, т. 3): махнатите изречения с имена на полета (_FIELD_RE) — [{section, fields, sentence}]; main → brief["ai_field_drops"] (данни и лог, без банер:
+# в историята средно ~19 на бриф до 16.11)
+FIELD_DROPS: list[dict] = []
+# правилото към всяко извикване (системата) — по-малко изречения за махане
+FIELD_NAMES_RULE = ("\n\nНе пиши имена на полета от входните данни (напр. rs_4w, near_high, insider_cluster = true, setup_reason, laggard persistence) — кажи го с думи "
+                    "на български; изречение с име на поле се маха от кода.")
 AI_USAGE: list[dict] = []
 # 29.10.2026: последното извикване (отговорът, етикетът, аргументите) — за ЕДИНИЯ повторен опит в _parse_json, когато json_repair е изрязал текст.
 # Повтаря се само ако текстът за парсване е точно този отговор (иначе — подменено извикване в тест или чужд текст — няма повторение).
@@ -96,7 +102,7 @@ def _call_claude(system: str, user: str, max_tokens: int = 4000,
     }, json={
         "model": config.CLAUDE_MODEL,
         "max_tokens": max_tokens,
-        "system": system,
+        "system": system + FIELD_NAMES_RULE,                                    # 16.11.2026 (т. 3)
         "messages": messages,
     }, timeout=180)
     r.raise_for_status()
@@ -240,7 +246,10 @@ def _fix_text(obj, section: str | None = None):
     _HYBRIDS.clear()
     _HYBRID_CTX.clear()
     _CJK_DROPPED.clear()
+    _FIELD_DROPPED.clear()
     out = _fix_translit(obj)
+    for d in _FIELD_DROPPED:                                                   # 16.11.2026 (т. 3): имена на полета — данни и лог, без банер
+        FIELD_DROPS.append({"section": section or "AI текст", **d})
     if _CJK_DROPPED:
         TRUNCATIONS.append({"section": section or "AI текст", "kind": "cjk", "model": config.CLAUDE_MODEL,
                             "chars": "".join(d["chars"] for d in _CJK_DROPPED), "removed": [d["sentence"][:200] for d in _CJK_DROPPED]})
@@ -284,6 +293,29 @@ _CJK_RE = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯豈-﫿]+")
 # низ, който е само това изречение, става празен (в списък — елементът пада). Махнатите изречения → ai_truncations (kind "cjk", _fix_text) и ред в банера.
 _CJK_DROPPED: list[dict] = []
 _SENT_SPLIT_RE = re.compile(r"(?<=[.!?…])\s+")
+# 16.11.2026 (пакет 16.11, т. 3): сурово име на поле в български AI текст на публичната страница — „sells_25pct_of_stake“ (13.11, наблюдаваните), „Съгласно setup_reason кодът
+# определя“ (13.11, NDAQ), „rs_status: near_high“ (16.11), „insider_cluster = true“, „laggard persistence от 85%“ (16.11, разказът). Изречението пада цяло (както при CJK).
+# Измерено върху 109 брифа (51 605 български низа): 2 070 низа с такова име, 56 различни имена, всичките полета от входа (най-често near_high, new_high, sizing_factor, rs_status,
+# laggard_persistence, rs_4w, rs_12w, pct_of_holdings, insider_cluster); стойностите-кодове без кирилица („existing_position“) не се пипат.
+_FIELD_RE = re.compile(r"(?<![\w/.\-@])[a-z][a-z0-9]*(?:_[a-z0-9]+)+(?![\w/\-])|\b[a-z][a-z0-9_]*\s*=\s*(?:true|false|null)\b|(?i:\blaggard\s+persistence\b)")
+_FIELD_DROPPED: list[dict] = []
+
+
+def _drop_field_sentences(s: str) -> str:
+    """Изреченията с име на поле падат; абзаците (празен ред) се пазят."""
+    paras = []
+    for para in re.split(r"\n\s*\n", s):
+        kept = []
+        for x in _SENT_SPLIT_RE.split(para.strip()):
+            names = list(dict.fromkeys(m.group(0) for m in _FIELD_RE.finditer(x)))
+            if names:
+                print(f"[ai] ⚠ име на поле ({', '.join(names)}) — махнато цялото изречение: «{x[:160]}»")
+                _FIELD_DROPPED.append({"fields": names, "sentence": x})
+            else:
+                kept.append(x)
+        if kept:
+            paras.append(" ".join(kept))
+    return "\n\n".join(paras)
 
 
 def _drop_cjk_sentences(s: str) -> str:
@@ -522,7 +554,7 @@ def _fix_translit(obj):
         return {k: _fix_translit(v) for k, v in obj.items()}
     if isinstance(obj, list):
         out = [_fix_translit(v) for v in obj]
-        return [x for v, x in zip(obj, out) if not (x == "" and isinstance(v, str) and _CJK_RE.search(v))]      # 29.10.2026: елемент само от изречение с CJK пада
+        return [x for v, x in zip(obj, out) if not (x == "" and isinstance(v, str) and (_CJK_RE.search(v) or _FIELD_RE.search(v)))]      # 29.10.2026: елемент само от изречение с CJK (16.11 — или с име на поле) пада
     if not isinstance(obj, str):
         return obj
     if _SOFT_HYPHEN in obj:
@@ -542,6 +574,10 @@ def _fix_translit(obj):
               f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
     if not re.search(r"[А-Яа-я]", obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
+    if _FIELD_RE.search(obj):                     # 16.11.2026 (т. 3): име на поле в български текст — изречението пада
+        obj = _drop_field_sentences(obj)
+        if not obj:
+            return obj
     _check_po_suffix(obj)
     obj = _fix_homoglyphs(obj)
     obj = _fix_latin_words(obj)                   # 15.10: "да se влошава" → "да се влошава"
