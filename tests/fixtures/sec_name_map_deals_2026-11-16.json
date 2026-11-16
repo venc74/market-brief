@@ -1,0 +1,11 @@
+{
+ "_note": "РЕАЛНО: data/sec_tickers.json (SEC company_tickers.json, нормализирано име → тикър; месец 2026-11) — само записите за DASH, BKH, NWE, CART, EQH, KDP; изрязано 16.11.2026",
+ "map": {
+  "doordash": "DASH",
+  "keurig dr pepper": "KDP",
+  "equitable": "EQH",
+  "maplebear": "CART",
+  "black hills sd": "BKH",
+  "northwestern energy": "NWE"
+ }
+}

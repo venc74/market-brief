@@ -859,6 +859,16 @@ def run() -> dict:
                consequence="липсата на предупреждение днес НЕ значи, че няма предстоящо отделяне",
                failed_if=lambda v: (_sd.get("error") or "EDGAR не отговори") if not _sd.get("ok", True) else None,
                partial=lambda v: (f"непроверени {len(_sd.get('unchecked') or []) + len(_sd.get('errors') or [])}", {}) if (_sd.get("unchecked") or _sd.get("errors")) else None)
+    # 16.11.2026 (пакет 16.11, т. 15): купувач във висяща сделка (BKH купува NWE) — етикет, без изключване
+    deal_buyers: dict = {}
+    def _deal_buyers():
+        nonlocal deal_buyers
+        deal_buyers = spinoff_watch.buyer_marks(spinoff_watch.pending_tickers(), screener.LAST_UNIVERSE_NAME, dataroma._ticker_map())
+        spinoff_watch.annotate_buyers([action, watchlist, qm_cards, glb_candidates, (qm_ep_out or {}).get("rows")], deal_buyers)
+        return deal_buyers
+    steps.step("deal_buyers", _deal_buyers, fallback={}, enabled=config.ENABLE_SPINOFF_WATCH, label="Етикетът „купувач в сделка“",
+               consequence="етикетът „купувач в сделка“ липсва днес")
+
     # 16.11.2026 (пакет 16.11, т. 13): емисии на акции (EDGAR 424B* / S-1 / S-3) — картите, книгите, наблюдаваните; списъците от EDGAR — общите с отделянето (edgar_subs)
     offering_found: dict = {}
     def _offering():
@@ -1148,6 +1158,7 @@ def run() -> dict:
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)
+        "deal_buyers": {t: v["text"] for t, v in (deal_buyers or {}).items()},   # 16.11.2026 (т. 15): купувач във висяща сделка — радарът, наблюдаваните
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,

@@ -543,6 +543,50 @@ def annotate(cards_groups, active: dict[str, dict]) -> int:
 #   closed  — приключила сделка / делистване: вън от универса (screener.build_universe — всички модули), от кандидатите и от живите записи в книгите (backtest.close_deal_records).
 # Реално: маркерът на ROKU изчезна на 09.11, защото сделката беше приключила (merger_state → "closed"), а нищо не махна тикъра — последният бар (06.11) беше реална търговия (11.5 млн акции).
 # ──────────────────────────────────────────────────────────────────────────
+def buyer_ticker(buyer: str | None, universe_names: dict | None = None, sec_map: dict | None = None) -> str | None:
+    """
+    16.11.2026 (пакет 16.11, т. 15): тикърът на купувача по името от 8-K — първо имената от таблиците на Wikipedia (универсът: „Black Hills Corporation“ → BKH), после картата на SEC
+    (нормализирано заглавие → тикър), като заглавие с наставка за щат („black hills sd“ — „BLACK HILLS CORP /SD/“) се приема. Частен купувач (Mountain Holding) → None. Чиста функция.
+    """
+    from src import dataroma
+    if not buyer:
+        return None
+    k = dataroma._norm(buyer)
+    for t, n in (universe_names or {}).items():
+        if dataroma._norm(n) == k:
+            return t
+    m = sec_map or {}
+    if k in m:
+        return m[k]
+    hits = [v for key, v in m.items() if key.startswith(k + " ") and len(key.split()) == len(k.split()) + 1 and len(key.split()[-1]) == 2]
+    return hits[0] if len(hits) == 1 else None
+
+
+def buyer_marks(pending: dict | None, universe_names: dict | None = None, sec_map: dict | None = None) -> dict[str, dict]:
+    """16.11.2026 (т. 15): {тикър на купувача: {"targets": [{target, announced}], "text"}} — само информация, без изключване. Чиста функция."""
+    out: dict[str, dict] = {}
+    for target, h in (pending or {}).items():
+        bt = buyer_ticker((h or {}).get("buyer"), universe_names, sec_map)
+        if bt and bt != target:
+            out.setdefault(bt, {"targets": []})["targets"].append({"target": target, "announced": (h or {}).get("announced")})
+    for v in out.values():
+        v["text"] = "купувач в сделка: придобива " + ", ".join(f"{x['target']}" + (f" (обявена {x['announced'][8:10]}.{x['announced'][5:7]}.{x['announced'][:4]})" if x.get("announced") else "")
+                                                         for x in v["targets"]) + " — само информация, не изключва"
+    return out
+
+
+def annotate_buyers(groups, marks: dict[str, dict]) -> int:
+    """card["deal_buyer"] = текстът; връща броя."""
+    n = 0
+    for g in groups or []:
+        for c in g or []:
+            m = marks.get(c.get("ticker")) if isinstance(c, dict) else None
+            if m:
+                c["deal_buyer"] = m["text"]
+                n += 1
+    return n
+
+
 def _state_path() -> pathlib.Path:
     return pathlib.Path(config.DATA_DIR) / config.DEAL_STATE_NAME
 

@@ -712,6 +712,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
         week_calendar=_week_calendar_ctx(brief.get("week_calendar")),       # 16.11.2026 (т. 8): календарът на седмицата
         offering_warnings=brief.get("offering_warnings") or {},             # 16.11.2026 (т. 13): емисии на акции по тикър
+        deal_buyers=brief.get("deal_buyers") or {},                         # 16.11.2026 (т. 15): купувач във висяща сделка
         offering_lines=offering_lines(brief), offering_days=config.OFFERING_LOOKBACK_DAYS,   # 16.11.2026 (т. 13): книгите и наблюдаваните без карта
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
