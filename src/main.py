@@ -473,6 +473,29 @@ def _market_closed(today: str, data_dir=None) -> dict:
     return {"date": today, "market_closed": True, "last_brief": last.stem}
 
 
+def _display_names() -> dict:
+    """16.11.2026 (пакет 16.11, т. 14): имената за „R · Ryder“ навсякъде с тикър — таблиците на Wikipedia + имената на наблюдаваните. Graceful: провал → {}."""
+    try:
+        out = dict(screener.LAST_UNIVERSE_NAME)
+        if config.ENABLE_WATCH_MONITOR:
+            out.update({t: n for t, n in (watch_monitor.load_watch_names() or {}).items() if n and t not in out})
+        return out
+    except Exception as e:
+        print(f"[names] {type(e).__name__}: {e}")
+        return {}
+
+
+def _fresh_13f(rh: dict | None, new_positions: list | None) -> list:
+    """16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите (и извън първите 8 по стойност). Graceful: провал → []."""
+    if not (rh or {}).get("fresh"):
+        return []
+    try:
+        return dataroma.fresh_rows(rh.get("new"), dataroma.fetch_manager_top(), new_positions)
+    except Exception as e:
+        print(f"[13F] редовете на новоподалите: {type(e).__name__}: {e}")
+        return []
+
+
 def run() -> dict:
     today = dt.date.today().isoformat()
     print(f"═══ AI Инвестиционен Бриф · {today} ═══")
@@ -1019,17 +1042,6 @@ def run() -> dict:
                                 watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set()),
                             enabled=config.ENABLE_SPLITS_CALENDAR, label="Отчетът за сплитовете", consequence="секцията за сплитове е без отчет днес")
 
-    def _display_names() -> dict:
-        """16.11.2026 (пакет 16.11, т. 14): имената за „R · Ryder“ навсякъде с тикър — таблиците на Wikipedia + имената на наблюдаваните. Graceful: провал → {}."""
-        try:
-            out = dict(screener.LAST_UNIVERSE_NAME)
-            if config.ENABLE_WATCH_MONITOR:
-                out.update({t: n for t, n in (watch_monitor.load_watch_names() or {}).items() if n and t not in out})
-            return out
-        except Exception as e:
-            print(f"[names] {type(e).__name__}: {e}")
-            return {}
-
     # 16.11.2026 (пакет 16.11, т. 8): календарът на седмицата — отчетите на компаниите > 2% в S&P 500 и на нашите (карти, книги, наблюдавани), Fed, основните данни с консенсуса
     def _week_calendar():
         from src import econ_calendar, preopen as _po
@@ -1089,12 +1101,7 @@ def run() -> dict:
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     thirteenf_rh = data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {}
-    superinvestor_fresh = []                                        # 16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите (и извън първите 8)
-    if thirteenf_rh.get("fresh"):
-        try:
-            superinvestor_fresh = dataroma.fresh_rows(thirteenf_rh.get("new"), dataroma.fetch_manager_top(), superinvestor_new_positions)
-        except Exception as e:
-            print(f"[13F] редовете на новоподалите: {type(e).__name__}: {e}")
+    superinvestor_fresh = _fresh_13f(thirteenf_rh, superinvestor_new_positions)      # 16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите
     cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
     # COT за Bitcoin — само в първия бриф след нов отчет на CFTC (29.10.2026: крипто секцията вече е построена преди макро брифа, тук се добавя само COT)
     if crypto and cot_rhythm.get("fresh"):
