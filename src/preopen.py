@@ -80,6 +80,39 @@ def premarket_missing_reason(df: pd.DataFrame | None, now_utc) -> str:
     return "непозната причина"
 
 
+def missing_block(requested: list[str], frames5: dict | None, pts: dict, now_utc, important=()) -> dict:
+    """
+    16.11.2026 (пакет 16.11, т. 5): кои поискани тикъри са БЕЗ цена в премаркета и защо — никога тихо. Реално 13.11: 534 от 924 (58%) с премаркет, а карето казваше само броя.
+    → {"n", "requested", "by_reason": [{reason, n, tickers}] (по броя), "important": [{ticker, reason}] (картите, книгите, наблюдаваните, сутрешните EP), "tickers"}.
+    Причините — premarket_missing_reason: „няма премаркет бари днес до HH:MM Ню Йорк“ (Yahoo дава бар само при сделка), „няма бар от редовната сесия на ДД.ММ“,
+    „Yahoo не върна 5-минутни бари“. Чиста функция.
+    """
+    imp = set(important or ())
+    miss = [t for t in dict.fromkeys(requested or []) if t not in (pts or {})]
+    why = {t: premarket_missing_reason((frames5 or {}).get(t), now_utc) for t in miss}
+    by: dict[str, list[str]] = {}
+    for t in miss:
+        by.setdefault(why[t], []).append(t)
+    return {"n": len(miss), "requested": len(list(dict.fromkeys(requested or []))),
+            "by_reason": [{"reason": r, "n": len(ts), "tickers": sorted(ts)} for r, ts in sorted(by.items(), key=lambda kv: (-len(kv[1]), kv[0]))],
+            "important": [{"ticker": t, "reason": why[t]} for t in miss if t in imp], "tickers": sorted(miss)}
+
+
+def missing_text(m: dict | None) -> str | None:
+    """„Без премаркет цена: 360 от 926 (39%) — няма премаркет бари днес до 09:07 Ню Йорк (Yahoo дава бар само при сделка): 359; Yahoo не върна 5-минутни бари: 1 (TCBI).“ Чиста функция."""
+    if not m or not m.get("n"):
+        return None
+    pct = round(100 * m["n"] / m["requested"]) if m.get("requested") else None
+    parts = []
+    for g in m.get("by_reason") or []:
+        r = g["reason"] + (" (Yahoo дава бар само при сделка)" if g["reason"].startswith("няма премаркет бари") else "")
+        parts.append(f"{r}: {g['n']}" + (f" ({', '.join(g['tickers'])})" if g["n"] <= 5 else ""))
+    t = f"Без премаркет цена: {m['n']} от {m['requested']}" + (f" ({pct}%)" if pct is not None else "") + " — " + "; ".join(parts) + "."
+    if m.get("important"):
+        t += " От картите, книгите и наблюдаваните: " + ", ".join(x["ticker"] for x in m["important"]) + "."
+    return t
+
+
 def ep_morning(brief: dict | None, pts: dict, frames5: dict | None, shown: list[dict], now_utc) -> list[dict]:
     """
     10.11.2026 (т. 2, SANM 10.11): всеки сутрешен EP кандидат (brief["qm_ep"]["rows"]), който НЕ е сред гаповете в карето, остава с ред — не изпада тихо.
@@ -671,6 +704,8 @@ def email_html(res: dict) -> str:
     cov = res.get("coverage") or {}
     if cov.get("partial"):                                                          # 04.11.2026 (С3)
         parts.append(f"<div style='margin-top:6px;color:#991b1b'>⚠ Частично: {e(cov['reason'])} — празното НЕ значи, че няма гапове.</div>")
+    if (res.get("missing") or {}).get("text"):                                     # 16.11.2026 (т. 5)
+        parts.append(f"<div style='margin-top:6px;color:#6b7280;font-size:12px'>{e(res['missing']['text'])}</div>")
     if (res.get("market") or {}).get("text"):                                      # 12.11.2026 (т. 1)
         parts.append(f"<div style='margin-top:8px'><b>Пазарът преди отварянето:</b> {e(' '.join(res['market']['text']))}</div>")
     if res.get("econ"):                                                             # 10.11.2026 (т. 3)
@@ -789,6 +824,11 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["diag"] = {**diag, "requested": len(tickers)}
         res["coverage"] = coverage(res["diag"], dict(LAST_FETCH), universe_note)          # 04.11.2026 (С3): „премаркет за N от M“ и „частично“
         res["coverage"].update(universe=res["universe_n"], extra=len(tickers) - res["universe_n"])      # 11.11.2026 (т. 2)
+        try:                                                                           # 16.11.2026 (т. 5): кои липсват и защо — никога тихо
+            res["missing"] = missing_block(tickers, frames5, pts, now, important=[t for t in extra if t])
+            res["missing"]["text"] = missing_text(res["missing"])
+        except Exception as e:
+            print(f"[preopen] списъкът без премаркет: {type(e).__name__}: {e}")
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
