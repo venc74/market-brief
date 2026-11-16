@@ -1,0 +1,254 @@
+{
+ "date": "2026-11-16",
+ "time_ny": "09:07",
+ "time_berlin": "15:07",
+ "ok": true,
+ "diag": {
+  "tickers": 922,
+  "with_pm": 627,
+  "gappers": 0,
+  "zero_volume_share": 1.0,
+  "requested": 923
+ },
+ "gaps": [],
+ "levels": [],
+ "watch": [
+  {
+   "ticker": "BMNR",
+   "gap_pct": -7.85,
+   "pm_price": 16.2,
+   "prev_close": 17.58,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "CRCL",
+   "gap_pct": -7.74,
+   "pm_price": 57.38,
+   "prev_close": 62.2,
+   "close_src": "brief",
+   "pm_last_ny": "09:05",
+   "pm_volume": null
+  },
+  {
+   "ticker": "BLSH",
+   "gap_pct": -5.34,
+   "pm_price": 21.29,
+   "prev_close": 22.49,
+   "close_src": "brief",
+   "pm_last_ny": "09:02",
+   "pm_volume": null
+  }
+ ],
+ "notes": [],
+ "excluded_deals": [
+  "CART",
+  "EQH",
+  "NWE"
+ ],
+ "universe_n": 915,
+ "coverage": {
+  "with_pm": 627,
+  "requested": 923,
+  "batches": 10,
+  "batches_failed": 0,
+  "partial": false,
+  "reason": null,
+  "universe": 915,
+  "extra": 8,
+  "universe_source": "cache"
+ },
+ "session": "2026-11-13",
+ "sector_bounce": [],
+ "gaps_all": [],
+ "ep_morning": [],
+ "volume_note": "Обемът в премаркета не е наличен (Yahoo) — провери го в първите минути",
+ "econ": [],
+ "market": {
+  "futures": [
+   {
+    "symbol": "ES=F",
+    "label": "ES (S&P 500)",
+    "price": 7529.0,
+    "prev_close": 7584.75,
+    "chg_pct": -0.74,
+    "last_ny": "08:55"
+   },
+   {
+    "symbol": "NQ=F",
+    "label": "NQ (Nasdaq-100)",
+    "price": 27617.0,
+    "prev_close": 28038.25,
+    "chg_pct": -1.5,
+    "last_ny": "08:55"
+   }
+  ],
+  "futures_missing": [],
+  "mega": [
+   {
+    "ticker": "AVGO",
+    "tickers": [
+     "AVGO"
+    ],
+    "name": "BROADCOM INC",
+    "weight": 2.53,
+    "gap_pct": -4.32,
+    "pm_price": 331.66,
+    "prev_close": 346.62,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "NVDA",
+    "tickers": [
+     "NVDA"
+    ],
+    "name": "NVIDIA CORP",
+    "weight": 6.04,
+    "gap_pct": -3.21,
+    "pm_price": 157.59,
+    "prev_close": 162.82,
+    "pm_last_ny": "09:05"
+   }
+  ],
+  "mega_quiet": [
+   {
+    "ticker": "AAPL",
+    "tickers": [
+     "AAPL"
+    ],
+    "name": "APPLE INC",
+    "weight": 7.97,
+    "gap_pct": 0.12,
+    "pm_price": 356.84,
+    "prev_close": 356.4,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "MSFT",
+    "tickers": [
+     "MSFT"
+    ],
+    "name": "MICROSOFT CORP",
+    "weight": 5.96,
+    "gap_pct": 0.05,
+    "pm_price": 524.58,
+    "prev_close": 524.31,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "GOOGL",
+    "tickers": [
+     "GOOGL",
+     "GOOG"
+    ],
+    "name": "ALPHABET INC CL A",
+    "weight": 4.79,
+    "gap_pct": -0.56,
+    "pm_price": 294.15,
+    "prev_close": 295.79,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "AMZN",
+    "tickers": [
+     "AMZN"
+    ],
+    "name": "AMAZON.COM INC",
+    "weight": 4.01,
+    "gap_pct": -1.11,
+    "pm_price": 263.64,
+    "prev_close": 266.61,
+    "pm_last_ny": "09:05"
+   },
+   {
+    "ticker": "META",
+    "tickers": [
+     "META"
+    ],
+    "name": "META PLATFORMS INC CLASS A",
+    "weight": 2.17,
+    "gap_pct": -0.43,
+    "pm_price": 639.24,
+    "prev_close": 641.99,
+    "pm_last_ny": "09:05"
+   }
+  ],
+  "mega_missing": [],
+  "weights": {
+   "as_of": "2026-11-13",
+   "source": "позициите на SPY от SSGA",
+   "companies": [
+    {
+     "ticker": "AAPL",
+     "tickers": [
+      "AAPL"
+     ],
+     "name": "APPLE INC",
+     "weight": 7.97
+    },
+    {
+     "ticker": "NVDA",
+     "tickers": [
+      "NVDA"
+     ],
+     "name": "NVIDIA CORP",
+     "weight": 6.04
+    },
+    {
+     "ticker": "MSFT",
+     "tickers": [
+      "MSFT"
+     ],
+     "name": "MICROSOFT CORP",
+     "weight": 5.96
+    },
+    {
+     "ticker": "GOOGL",
+     "tickers": [
+      "GOOGL",
+      "GOOG"
+     ],
+     "name": "ALPHABET INC CL A",
+     "weight": 4.79
+    },
+    {
+     "ticker": "AMZN",
+     "tickers": [
+      "AMZN"
+     ],
+     "name": "AMAZON.COM INC",
+     "weight": 4.01
+    },
+    {
+     "ticker": "AVGO",
+     "tickers": [
+      "AVGO"
+     ],
+     "name": "BROADCOM INC",
+     "weight": 2.53
+    },
+    {
+     "ticker": "META",
+     "tickers": [
+      "META"
+     ],
+     "name": "META PLATFORMS INC CLASS A",
+     "weight": 2.17
+    }
+   ]
+  },
+  "session": "2026-11-13",
+  "text": [
+   "Фючърси: ES (S&P 500) -0.74% (7 529.00 в 08:55), NQ (Nasdaq-100) -1.50% (27 617.00 в 08:55) — спрямо 16:00 Ню Йорк на 13.11.",
+   "С тегло > 2% в S&P 500 (по позициите на SPY от SSGA, към 13.11) и гап ≥ ±3%: AVGO -4.3% ($331.66; затваряне $346.62; тегло 2.5%); NVDA -3.2% ($157.59; затваряне $162.82; тегло 6.0%).",
+   "Под ±3%: AAPL, MSFT, GOOGL (с GOOG), AMZN, META."
+  ]
+ },
+ "seconds": 31.5,
+ "email": {
+  "sent": true,
+  "subject": "Преди отварянето · 16.11 — 3 наблюдавани",
+  "at_utc": "14:07"
+ }
+}
