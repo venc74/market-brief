@@ -2,6 +2,7 @@
 12.11.2026 (т. 3, Veterans Day 11.11): в ден без търговия на облигации (SIFMA — пълно затваряне), в който NYSE търгува, облигационните плочки на термометъра (MOVE, 2Y/10Y,
 SOFR − IORB, HY / IG OAS) са със стойност от предишен ден, а изглеждат свежи → етикет „облигационният пазар беше затворен (11.11) — стойността е от 10.11“. Брифът от 12.11:
 MOVE и 2Y/10Y — към 10.11, SOFR − IORB и HY / IG OAS — към 09.11 (обичайното им закъснение от ден + празника).
+16.11.2026 (пакет 16.11, т. 10): SOFR − IORB вече е без този етикет — с бележката за графика си („последна — …; за … — днес ~14:00 Берлин“, thermometer.sofr_schedule).
 
 РЕАЛНО: tests/fixtures/thermo_macro_2026-11-12.json — термометърът и макрото на брифа от 12.11 (data/2026-11-12.json, изрязано 12.11.2026);
 tests/fixtures/bond_tiles_asof_2026-10-16_11-12.json — датите на SPY и на облигационните плочки във всичките 19 брифа с дата на данните (16.10–12.11, събрано 12.11.2026);
@@ -31,14 +32,14 @@ assert bond_only == ["2026-10-12", "2026-11-11", "2027-10-11", "2027-11-11"], bo
 assert "2026-04-03" not in config.SIFMA_US_FULL_CLOSES                                   # Добрият петък 2026 — само ранно затваряне (12:00 ET)
 print("  ✓ Columbus Day и Veterans Day 2026–2027; останалите празници на SIFMA са и на NYSE")
 
-print("── 2. РЕАЛНО: брифът от 12.11 — четирите плочки ──")
+print("── 2. РЕАЛНО: брифът от 12.11 — трите плочки (от 16.11 SOFR е с бележката за графика си) ──")
 assert th.bond_closed_note("2026-11-10", "2026-11-11")["text"] == "облигационният пазар беше затворен (11.11) — стойността е от 10.11"
 assert th.bond_closed_note("2026-11-09", "2026-11-11")["text"] == "облигационният пазар беше затворен (11.11) — стойността е от 09.11"
 assert th.bond_closed_note("2026-11-11", "2026-11-11") is None and th.bond_closed_note(None, "2026-11-11") is None
 inds = copy.deepcopy(R["thermometer"]["indicators"])
 next(i for i in inds if i["name"] == "2Y/10Y спред")["as_of"] = R["macro"]["spread_2s10s"]["as_of"]       # до 12.11 плочката беше без дата (тя е в макрото)
 marked = th.mark_bond_closed(inds, "2026-11-11")
-assert marked == ["2Y/10Y спред", "SOFR − IORB (финансиране)", "MOVE (Bond Vol)", "HY / IG OAS (кредитни спредове)"], marked
+assert marked == ["2Y/10Y спред", "MOVE (Bond Vol)", "HY / IG OAS (кредитни спредове)"], marked
 by = {i["name"]: i for i in inds}
 assert by["MOVE (Bond Vol)"]["bond_closed"]["text"].endswith("стойността е от 10.11") and by["HY / IG OAS (кредитни спредове)"]["bond_closed"]["value_from"] == "2026-11-09"
 assert not any("bond_closed" in by[n] for n in ("IEI/HYG (Credit Spread)", "Fed Net Liquidity", "SPY тренд"))   # IEI/HYG са ETF-и — търгуваха на 11.11; Net Liquidity — седмична
@@ -59,7 +60,7 @@ for b in HIST:
     m = th.mark_bond_closed(tiles, b["spy_as_of"])
     if m:
         fired[b["brief"]] = m
-assert list(fired) == ["2026-11-12"] and len(fired["2026-11-12"]) == 4, fired
+assert list(fired) == ["2026-11-12"] and len(fired["2026-11-12"]) == 3, fired
 lagged = sum(1 for b in HIST for v in b["tiles"].values() if v["as_of"] and v["as_of"] < b["spy_as_of"])
 assert lagged > 20                                                                        # обичайното закъснение на SOFR / OAS — без етикет
 print(f"  ✓ 19 брифа: етикет само на 12.11 (4 плочки); {lagged} плочки с обичайното закъснение — без етикет")
@@ -88,20 +89,20 @@ assert t["regime"] == R["thermometer"]["regime"] and t["counts"] == R["thermomet
 assert "[thermo] облигационният пазар беше затворен — етикет върху:" in log.getvalue()
 ctx = {r["name"]: r for r in ai_brief._thermo_context(t)}
 assert ctx["MOVE (Bond Vol)"]["note"] == "облигационният пазар беше затворен (11.11) — стойността е от 10.11" and "note" not in ctx["VIX"]
-print("  ✓ четирите плочки с етикет; режимът и броенето — без промяна; контекстът за AI носи бележката")
+print("  ✓ трите плочки с етикет; режимът и броенето — без промяна; контекстът за AI носи бележката")
 
 print("── 6. страницата ──")
 bb = copy.deepcopy(B19); bb["thermometer"] = t
 with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(bb, publish=False)
-assert page.count("⚠ облигационният пазар беше затворен (11.11) — стойността е от 10.11") == 2 and page.count("⚠ облигационният пазар беше затворен (11.11) — стойността е от 09.11") == 2
+assert page.count("⚠ облигационният пазар беше затворен (11.11) — стойността е от 10.11") == 2 and page.count("⚠ облигационният пазар беше затворен (11.11) — стойността е от 09.11") == 1
 i_move, i_vix = page.index('<div class="t-name">MOVE (Bond Vol)</div>'), page.index('<div class="t-name">VIX Term Structure</div>')
 assert i_move < page.index("стойността е от 10.11", i_move) < i_vix                   # етикетът е в плочката на MOVE
 bb["thermometer"] = R["thermometer"]
 with contextlib.redirect_stdout(io.StringIO()):
     old = render.render_dashboard(bb, publish=False)
 assert "облигационният пазар беше затворен" not in old                                    # записан бриф без полето — без етикет
-print("  ✓ етикетът е в плочките (2 × „от 10.11“, 2 × „от 09.11“); стар бриф — без него")
+print("  ✓ етикетът е в плочките (2 × „от 10.11“, 1 × „от 09.11“ — OAS); стар бриф — без него")
 print("── 7. здравната проверка: списъкът на SIFMA свършва ──")
 from src import health_monitor as hm
 src_hm = (ROOT / "src" / "health_monitor.py").read_text(encoding="utf-8")

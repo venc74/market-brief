@@ -341,6 +341,32 @@ def neglect_label(ret63_pct, neglect) -> str | None:
     return qm_ep.neglect_label(ret63_pct, neglect)
 
 
+def refresh_sofr(brief: dict, now_utc, fs_fn=None) -> dict | None:
+    """
+    16.11.2026 (пакет 16.11, т. 10): SOFR в карето преди отварянето — NY Fed публикува SOFR за предишния работен ден в 08:00 Ню Йорк, след сутрешния бриф. Тук: FRED + новите точки
+    от NY Fed (macro_layer.funding_stress(extra_sofr=fetch_nyfed_sofr())) → ако е по-нова от сутрешната, плочката SOFR − IORB в брифа (страницата в 15:05) се подменя
+    (бележката: „обновена в 15:05 Берлин от NY Fed“). → {"from", "to", "value", "text"} или None (няма нова). Мутира brief. Вдига при провал (main го хваща).
+    """
+    from src import macro_layer, thermometer
+    old = ((brief.get("macro") or {}).get("funding_stress") or {}).get("as_of")
+    fs = (fs_fn or (lambda: macro_layer.funding_stress(extra_sofr=macro_layer.fetch_nyfed_sofr())))()
+    if not fs or fs.get("value") is None or not fs.get("as_of") or (old and fs["as_of"] <= old):
+        return None
+    now = _ny(now_utc)
+    when = now.tz_convert("Europe/Berlin").strftime("%H:%M") + " Берлин"
+    brief.setdefault("macro", {})["funding_stress"] = fs
+    ind = thermometer._funding_stress_indicator(fs)
+    ind["sofr_refreshed"] = when
+    ind["sofr_note"] = thermometer.sofr_schedule(fs["as_of"], now.date().isoformat(), when)
+    inds = (brief.get("thermometer") or {}).get("indicators") or []
+    k = next((i for i, x in enumerate(inds) if str(x.get("name", "")).startswith("SOFR")), None)
+    if k is not None:
+        inds[k] = ind
+    d = fs["as_of"]
+    return {"from": old, "to": d, "value": fs["value"],
+            "text": f"SOFR − IORB обновена: {fs['value']:+.1f} б.п. за {d[8:10]}.{d[5:7]} (SOFR {fs['sofr']:.2f}%, NY Fed — 08:00 Ню Йорк)"}
+
+
 def _calendar_fn():
     """16.11.2026 (т. 9): днешният икономически календар (Nasdaq) за очакванията; без модула → None."""
     try:
@@ -1003,6 +1029,12 @@ def main(now_utc=None) -> int:
               market_fn=fetch_market, weights_fn=fetch_weights, calendar_fn=_calendar_fn())
     if res.get("coverage") is not None:
         res["coverage"]["universe_source"] = screener.LAST_DAY_UNIVERSE.get("source")      # 11.11.2026 (т. 2): "cache" — същият като сутрешния
+    if brief and config.ENABLE_SOFR_PREOPEN_REFRESH:                              # 16.11.2026 (т. 10): SOFR излиза в 08:00 Ню Йорк — след сутрешния бриф
+        try:
+            res["sofr_update"] = refresh_sofr(brief, now)
+        except Exception as e:
+            res["sofr_update"] = None
+            print(f"::warning::[preopen] SOFR не се обнови: {type(e).__name__}: {e}")
     res["email"] = prev.get("email") or {"sent": False}
     if has_news(res) and not res["email"].get("sent"):
         subj = (f"Преди отварянето · {day[8:10]}.{day[5:7]} — " + ", ".join(x for x in (f"{len(res['gaps'])} гапа" if res["gaps"] else "",

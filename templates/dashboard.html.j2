@@ -526,6 +526,7 @@
   {# 16.11.2026 (пакет 16.11, т. 5): кои са без цена в премаркета и защо — броят, причините, важните поименно; целият списък — сгънат #}
   {% if preopen.missing and preopen.missing.text %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">{{ preopen.missing.text }}
     <details style="display:inline"><summary style="display:inline;cursor:pointer">▸ всички {{ preopen.missing.n }}</summary> <span style="font-family:'IBM Plex Mono',monospace">{{ preopen.missing.tickers|join(", ") }}</span></details></div>{% endif %}
+  {% if preopen.sofr_update and preopen.sofr_update.text %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">{{ preopen.sofr_update.text }} — плочката в термометъра е обновена.</div>{% endif %}
   {# 12.11.2026 (т. 1): фючърсите ES / NQ и компаниите с тегло > 2% в S&P 500 с гап ≥ ±3% — текстът е от кода (preopen.market_text) #}
   {% if preopen.market and preopen.market.text %}<div class="small" style="margin:2px 0 8px"><b>Пазарът преди отварянето:</b> {{ preopen.market.text|join(" ") }}</div>{% endif %}
   {% if preopen.late %}<div class="small" style="color:var(--red)">Обновяване преди отварянето днес няма: {{ (preopen.notes or [])|join("; ") }}. Празното каре НЕ значи „нищо за отбелязване“.</div>
@@ -620,6 +621,8 @@
       <div class="t-label">{{ ind.label }}</div>
       {# 12.11.2026 (т. 3): ден без търговия на облигации (SIFMA) при отворена борса — стойността е от предишен ден (thermometer.bond_closed_note) #}
       {% if ind.get('bond_closed') %}<div class="t-label" style="color:var(--yellow)">⚠ {{ ind.bond_closed.text }}</div>{% endif %}
+      {# 16.11.2026 (пакет 16.11, т. 10): кога излиза следващата SOFR (на следващия работен ден в 08:00 Ню Йорк) #}
+      {% if ind.get('sofr_note') %}<div class="t-label" style="color:var(--muted)">{{ ind.sofr_note }}</div>{% endif %}
     </div>
   {% endmacro %}
   <div class="thermo">

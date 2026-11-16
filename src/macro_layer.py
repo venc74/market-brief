@@ -221,11 +221,28 @@ def report_streak(vals: list[float]) -> dict:
     return {"dir": "up" if up else "down", "n": n}
 
 
-def funding_stress() -> dict:
-    """SOFR, IOER и IORB от FRED (един път, от config.FUNDING_STRESS_FROM) → funding_spread. Graceful: провал → hide с причина."""
+def merge_sofr(fred: list[tuple[str, float]], extra: list[tuple[str, float]] | None) -> list[tuple[str, float]]:
+    """16.11.2026 (т. 10): серията на FRED + по-новите точки от NY Fed (extra) — само дати след последната на FRED. Чиста функция."""
+    last = fred[-1][0] if fred else ""
+    return list(fred) + sorted((d, v) for d, v in (extra or []) if d > last)
+
+
+def fetch_nyfed_sofr(get=None) -> list[tuple[str, float]]:
+    """16.11.2026 (т. 10): последните SOFR от NY Fed (config.NYFED_SOFR_URL) → [(дата, %)]. Вдига при провал."""
+    if get is None:
+        r = requests.get(config.NYFED_SOFR_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+        r.raise_for_status()
+        data = r.json()
+    else:
+        data = get(config.NYFED_SOFR_URL)
+    return sorted((x["effectiveDate"], float(x["percentRate"])) for x in data.get("refRates") or [] if x.get("type") == "SOFR" and x.get("percentRate") is not None)
+
+
+def funding_stress(extra_sofr: list[tuple[str, float]] | None = None) -> dict:
+    """SOFR, IOER и IORB от FRED (един път, от config.FUNDING_STRESS_FROM) → funding_spread. 16.11.2026 (т. 10): extra_sofr — по-новите точки от NY Fed (карето в 15:05). Graceful: провал → hide с причина."""
     try:
         days = (dt.date.today() - dt.date.fromisoformat(config.FUNDING_STRESS_FROM)).days + 5
-        return funding_spread(_fred_series("SOFR", days=days), _fred_series("IOER", days=days), _fred_series("IORB", days=days))
+        return funding_spread(merge_sofr(_fred_series("SOFR", days=days), extra_sofr), _fred_series("IOER", days=days), _fred_series("IORB", days=days))
     except Exception as e:
         print(f"[macro] SOFR − IORB: {type(e).__name__}: {e}")
         return {"value": None, "hide": True, "hide_reason": f"грешка ({type(e).__name__})"}

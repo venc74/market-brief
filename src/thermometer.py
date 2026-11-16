@@ -1169,7 +1169,7 @@ def _count_regime(indicators: list[dict], min_visible: int | None = None) -> tup
 
 
 # 12.11.2026 (т. 3, Veterans Day 11.11): облигационните плочки — в ден без търговия на облигации (SIFMA) при отворена борса стойността им е от предишен ден
-BOND_TILES = ("2Y/10Y спред", "MOVE (Bond Vol)", "SOFR − IORB (финансиране)", "HY / IG OAS (кредитни спредове)")
+BOND_TILES = ("2Y/10Y спред", "MOVE (Bond Vol)", "HY / IG OAS (кредитни спредове)")      # 16.11.2026 (т. 10): SOFR — с бележката за графика си (sofr_schedule), не с този етикет
 
 
 def bond_closed_note(as_of: str | None, market_day: str | None) -> dict | None:
@@ -1197,6 +1197,51 @@ def mark_bond_closed(indicators: list[dict], market_day: str | None) -> list[str
                 i["bond_closed"] = note
                 out.append(i["name"])
     return out
+
+
+_WD_BG = ("понеделник", "вторник", "сряда", "четвъртък", "петък", "събота", "неделя")
+
+
+def _bond_day(d: dt.date) -> bool:
+    return d.weekday() < 5 and d.isoformat() not in config.SIFMA_US_FULL_CLOSES
+
+
+def _next_bond_day(d: dt.date) -> dt.date:
+    d += dt.timedelta(days=1)
+    while not _bond_day(d):
+        d += dt.timedelta(days=1)
+    return d
+
+
+def sofr_schedule(as_of: str | None, today: str, refreshed: str | None = None) -> str | None:
+    """
+    16.11.2026 (пакет 16.11, т. 10): SOFR за работен ден D излиза на следващия работен ден (по SIFMA) в 08:00 Ню Йорк — сутрин в 07:30 Берлин тя е винаги поне ден назад.
+    → „SOFR излиза на следващия работен ден в 08:00 Ню Йорк: последна — 12.11; за 13.11 — днес ~14:00 Берлин“ (реално 16.11). До 16.11 плочката носеше
+    „облигационният пазар беше затворен (11.11) — стойността е от 10.11“ — вярно, но объркващо. refreshed — „15:05 Берлин“, когато карето преди отварянето я е обновило. Чиста функция.
+    """
+    if not as_of:
+        return None
+    from zoneinfo import ZoneInfo
+    nxt = _next_bond_day(dt.date.fromisoformat(as_of))
+    rel = _next_bond_day(nxt)
+    t = dt.datetime(rel.year, rel.month, rel.day, 8, 0, tzinfo=ZoneInfo("America/New_York")).astimezone(ZoneInfo("Europe/Berlin"))
+    dm = lambda d: f"{d.day:02d}.{d.month:02d}"
+    td = dt.date.fromisoformat(str(today)[:10])
+    if rel == td:
+        when = f"днес ~{t:%H:%M} Берлин"
+    elif rel > td:
+        when = f"{_WD_BG[rel.weekday()]} {dm(rel)} ~{t:%H:%M} Берлин"
+    else:
+        when = f"излезе на {dm(rel)} в 08:00 Ню Йорк — FRED още не я дава"
+    head = f"последна — {dm(dt.date.fromisoformat(as_of))}" + (f" (обновена в {refreshed} от NY Fed)" if refreshed else "")
+    return f"SOFR излиза на следващия работен ден в 08:00 Ню Йорк: {head}; за {dm(nxt)} — {when}"
+
+
+def mark_sofr_schedule(indicators: list[dict], today: str) -> None:
+    """16.11.2026 (т. 10): бележката за графика на SOFR върху видимата плочка SOFR − IORB (ind["sofr_note"])."""
+    for i in indicators or []:
+        if str(i.get("name", "")).startswith("SOFR") and not i.get("hide") and i.get("as_of"):
+            i["sofr_note"] = sofr_schedule(i["as_of"], today, i.get("sofr_refreshed"))
 
 
 def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
@@ -1425,6 +1470,10 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # противоречие със семантиката на режима. Сега всеки не-Offensive → фактор.
     sizing_factor = 1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR
 
+    try:                                                                # 16.11.2026 (т. 10): кога излиза следващата SOFR
+        mark_sofr_schedule(indicators, today_iso)
+    except Exception as e:
+        print(f"[thermo] бележката за графика на SOFR пропусната: {type(e).__name__}: {e}")
     try:                                                                # 12.11.2026 (т. 3): облигационният пазар беше затворен, а борсата — не
         marked = mark_bond_closed(indicators, spy_ind.get("as_of"))
         if marked:
