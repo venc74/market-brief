@@ -802,6 +802,9 @@ _TERM_PCT = re.compile(r"(\d+(?:[.,]\d+)?)\s*%")
 # думата „рекорд“ в дословен източник: „Copper jumps to its highest level ever“ е рекорд, „highest since March 2021“ и „biggest since 2010“ — не (реално: „Рекордният дефицит“ 13.08, „Рекордното IPO“ 27.07)
 _TERM_REC_SRC = re.compile(r"\brecord|all[- ]time|highest\s+(?:\w+\s+){0,3}(?:ever|for\s+any)|рекорд", re.I)
 _TERM_NARROW = re.compile(r"концентрир\w*|(?:\bне\s+(?:е\s+)?|\bа\s+не\s+|\bне)системн\w*", re.I)
+# 16.11.2026 (пакет 16.11, т. 2): Put/Call — изречението е от кода (thermometer.put_call_sentence, под разказа); AI изречение за P/C пада. В историята: 14 изречения в 109 разказа,
+# част с обърнат смисъл (16.11 „7-ми перцентил … ниско самодоволство“; 18.09 „P/C 0.87 е жълт (леко повишена предпазливост)“).
+_TERM_PC = re.compile(r"put\s*/\s*call|\bP/C\b|пут\s*/\s*кол", re.I)
 
 
 def _term_support(sent: str, kind: str, vals: list[float], day: dict | None, headlines: str) -> bool:
@@ -834,6 +837,8 @@ def check_market_terms(text: str, vals: list[float], day: dict | None = None, ne
     headlines = " ".join(str(n.get("headline") or "") for n in news or [] if isinstance(n, dict))
 
     def problem(sent: str) -> dict | None:
+        if _TERM_PC.search(sent):                                               # 16.11.2026 (т. 2): Put/Call — от кода
+            return {"term": _TERM_PC.search(sent).group(0), "why": "Put/Call се пише от кода (плочката и редът под разказа), не от AI"}
         if narrow and (day or {}).get("selloff") and _TERM_NARROW.search(sent):
             return {"term": _TERM_NARROW.search(sent).group(0), "why": f"широка разпродажба: надолу {(day or {}).get('down')} от {(day or {}).get('total')} сектора"}
         for kind, rx, label in (("bear", _TERM_BEAR, f"спад от върха ≥ {config.TERM_BEAR_MARKET_PCT:g}%"), ("corr", _TERM_CORR, f"спад от върха ≥ {config.TERM_CORRECTION_PCT:g}%"), ("rec", _TERM_REC, "число или заглавие")):
@@ -1317,6 +1322,8 @@ def _thermo_context(thermometer: dict | None) -> list[dict]:
     """29.10.2026 (разходката, т. 5): уредите на термометъра като КОНТЕКСТ за разказа — видимите, с име, стойност и надпис; без режима, броенето, override-ите и правилото."""
     out = []
     for i in (thermometer or {}).get("indicators") or []:
+        if isinstance(i, dict) and str(i.get("name", "")).startswith("Put/Call"):
+            continue                                                         # 16.11.2026 (пакет 16.11, т. 2): Put/Call е от кода (ред под разказа) — не стига до модела
         if isinstance(i, dict) and not i.get("hide") and i.get("value") is not None:
             label = _RESEARCH_IN_LABEL.sub("", _INFO_SUFFIX.sub("", str(i.get("label") or "")))    # 30.10.2026: без цитата от проучването и без „… не влиза в режима“
             row = {"name": i.get("name"), "value": i.get("value"), "label": label}

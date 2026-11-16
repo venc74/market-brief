@@ -230,6 +230,16 @@ def _futures_line(brief: dict) -> str | None:
         return None
 
 
+def _put_call_line(brief: dict) -> str | None:
+    """16.11.2026 (пакет 16.11, т. 2): изречението за Put/Call под разказа — от кода (thermometer.put_call_sentence). Graceful: провал → None."""
+    try:
+        from src import thermometer
+        ind = next((i for i in (brief.get("thermometer") or {}).get("indicators") or [] if str(i.get("name", "")).startswith("Put/Call")), None)
+        return thermometer.put_call_sentence(ind)
+    except Exception:
+        return None
+
+
 def _paragraphs(text: str) -> list[str]:
     """29.10.2026: абзаците на макро разказа — разделени с празен ред (същото като ai_brief.paragraphs; тук без зависимост от ai_brief)."""
     return [x.strip() for x in re.split(r"\n\s*\n", text or "") if x.strip()]
@@ -644,6 +654,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         thermometer=brief["thermometer"],
         macro_brief=brief["ai_macro"]["macro_brief"],
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
+        put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
         macro_paragraphs=_paragraphs(brief["ai_macro"].get("macro_brief") or ""),   # 29.10.2026: разказът по абзаци; regime_comment е махнат
         sector_logic=brief["ai_macro"].get("sector_logic", []),
         fundamentals_note=fundamentals_note(brief.get("screener_status")),   # 06.11.2026 (т. 2)
@@ -1009,6 +1020,7 @@ def render_email(brief: dict) -> str:
 
   <tr><td style="padding:20px 28px;font-size:14px;color:#111827;line-height:1.6">
     {"<br><br>".join(_e(x) for x in _paragraphs(brief['ai_macro']['macro_brief'] or "")) or _e(brief['ai_macro']['macro_brief'])}
+    {(f'<div style="color:#374151;font-size:13px;margin-top:8px">{_e(_put_call_line(brief))}</div>') if _put_call_line(brief) else ""}
     {(f'<div style="color:#6b7280;font-size:12px;margin-top:8px">{_e(_futures_line(brief))}</div>') if _futures_line(brief) else ""}
   </td></tr>
 

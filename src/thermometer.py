@@ -167,6 +167,21 @@ def _evaluate_put_call(pc: float, history: list[float]) -> dict:
             "label": f"P/C {pc:.2f} ({pct:.0f}. percentile от {len(history)} дни; {note})"}
 
 
+def put_call_sentence(ind: dict | None) -> str | None:
+    """
+    16.11.2026 (пакет 16.11, т. 2): изречението за Put/Call — от кода, не от AI. Реално 16.11 разказът обърна смисъла: „на 7-ми перцентил … ниско самодоволство в смисъл, че
+    хеджовете са малко“ — нисък P/C = малко хеджове = ВИСОКО самодоволство (плочката го казва правилно). Скрит индикатор / без percentile → None. Чиста функция.
+    """
+    if not ind or ind.get("hide") or ind.get("value") is None or ind.get("percentile") is None:
+        return None
+    n = ind.get("history_days")
+    head = f"Put/Call (SPY) {ind['value']:.2f} — {ind['percentile']:.0f}. percentile" + (f" от {n} дни" if n else "") + ": "
+    meaning = {"red": "малко хеджове спрямо собствената история — високо самодоволство (червено за режима)",
+               "green": "много хеджове спрямо собствената история — страх, сигнал в обратна посока (зелено за режима)"}.get(
+        ind.get("status"), "в нормалния диапазон за собствената история (жълто)")
+    return head + meaning + "."
+
+
 def market_put_call(today: dt.date | None = None) -> dict:
     """
     Пазарен P/C ratio — апроксимация чрез SPY опционната верига (CBOE total P/C изисква платен фийд).
