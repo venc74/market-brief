@@ -42,6 +42,7 @@ LAST_UNIVERSE_SECTOR: dict[str, str] = {}
 LAST_UNIVERSE_EXCLUDED: dict[str, dict] = {}             # 09.11.2026 (ROKU): извадените от универса — приключила сделка / делистване (spinoff_watch.closed_tickers)
 LAST_NO_TRADE: list[str] = []                           # 09.11.2026: последният бар без реална търговия (обем 0) — не стига до кандидатите
 LAST_UNIVERSE_INDUSTRY: dict[str, str] = {}              # 06.11.2026 (пакет 05–06.11, т. 10): GICS Sub-Industry от таблиците на S&P 500 и S&P 400 — за етикета „секторен отскок“ при EP
+LAST_UNIVERSE_NAME: dict[str, str] = {}                  # 16.11.2026 (пакет 16.11, т. 14): името на компанията — колоната „Security“ (S&P 500 / 400) или „Company“ (Nasdaq-100)
 
 
 # 30.10.2026: какво върна всеки източник на универса в този run — {име: {name, n, min, ok, reason, url}}. build_universe се вика няколко пъти в run-а (скрийнър, breadth,
@@ -63,6 +64,9 @@ def _wiki_table(url: str, column: str) -> tuple[list[str], str | None]:
                 LAST_UNIVERSE_SECTOR.update({sym: str(sec).strip() for sym, sec in zip(syms, t["GICS Sector"].tolist()) if isinstance(sec, str)})
             if "GICS Sub-Industry" in t.columns:
                 LAST_UNIVERSE_INDUSTRY.update({sym: str(sub).strip() for sym, sub in zip(syms, t["GICS Sub-Industry"].tolist()) if isinstance(sub, str)})
+            namecol = next((c for c in ("Security", "Company") if c in t.columns), None)          # 16.11.2026 (т. 14)
+            if namecol:
+                LAST_UNIVERSE_NAME.update({sym: str(n).strip() for sym, n in zip(syms, t[namecol].tolist()) if isinstance(n, str) and sym not in LAST_UNIVERSE_NAME})
             return syms, None
     return [], f"на страницата няма таблица с колона „{column}“"
 
@@ -141,7 +145,7 @@ def day_universe(today=None, save: bool = True) -> list[str]:
             if d.get("date") == day and d.get("tickers"):
                 tickers, src = list(d["tickers"]), "cache"
                 LAST_UNIVERSE_SOURCES.clear(); LAST_UNIVERSE_SOURCES.update(d.get("sources") or {})
-                LAST_UNIVERSE_SECTOR.update(d.get("sector") or {}); LAST_UNIVERSE_INDUSTRY.update(d.get("industry") or {})
+                LAST_UNIVERSE_SECTOR.update(d.get("sector") or {}); LAST_UNIVERSE_INDUSTRY.update(d.get("industry") or {}); LAST_UNIVERSE_NAME.update(d.get("name") or {})
         except Exception:
             tickers = None
         if tickers is None:
@@ -151,7 +155,8 @@ def day_universe(today=None, save: bool = True) -> list[str]:
                     universe_cache_path().write_text(json.dumps({"date": day, "built_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                                                                  "n": len(tickers), "tickers": tickers, "sources": LAST_UNIVERSE_SOURCES,
                                                                  "sector": {t: LAST_UNIVERSE_SECTOR[t] for t in tickers if t in LAST_UNIVERSE_SECTOR},
-                                                                 "industry": {t: LAST_UNIVERSE_INDUSTRY[t] for t in tickers if t in LAST_UNIVERSE_INDUSTRY}},
+                                                                 "industry": {t: LAST_UNIVERSE_INDUSTRY[t] for t in tickers if t in LAST_UNIVERSE_INDUSTRY},
+                                                                 "name": {t: LAST_UNIVERSE_NAME[t] for t in tickers if t in LAST_UNIVERSE_NAME}},
                                                                 ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
                 except Exception as e:
                     print(f"[screener] универсът за деня не се записа: {type(e).__name__}: {e}")

@@ -230,6 +230,20 @@ def _futures_line(brief: dict) -> str | None:
         return None
 
 
+def short_name(ticker: str | None, company: str | None = None, name_map: dict | None = None, limit: int = 26) -> str:
+    """
+    16.11.2026 (пакет 16.11, т. 14): краткото име след тикъра — „R · Ryder“, „SAIC · Science Applications Intl“: името от картата (Yahoo), иначе от таблиците на Wikipedia
+    (brief["names"]); без правните окончания и без „(Class A)“; име, равно на тикъра, или без име → "". Чиста функция.
+    """
+    n = company if company and str(company).strip() and str(company).strip().upper() != str(ticker or "").upper() else (name_map or {}).get(ticker)
+    if not n:
+        return ""
+    n = re.sub(r"\s*\((?:Class|Series) [A-Z]\)", "", str(n)).strip()
+    n = re.sub(r"^([A-Z][\w&.-]*) \(([A-Z][a-z]+)\)$", r"\2 \1", n)            # Wikipedia: „Lilly (Eli)“ → „Eli Lilly“
+    out = names.display_name(n, limit)
+    return "" if out.upper() == str(ticker or "").upper() else out
+
+
 def offering_lines(brief: dict) -> list[str]:
     """16.11.2026 (т. 13): „KDP — ⚠ емисия на акции — 424B5 от 16.11: …“ за тикърите с емисия, които нямат карта (книгите, наблюдаваните). Чиста функция."""
     ow = brief.get("offering_warnings") or {}
@@ -678,6 +692,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
     """
     today = as_of or dt.date.today()
     tpl = env.get_template("dashboard.html.j2")
+    _nm = brief.get("names") or {}
+    env.globals["tname"] = lambda t, company=None: short_name(t, company, _nm)          # 16.11.2026 (т. 14): „R · Ryder“ — името след тикъра
     gen_time, gen_tz = generated or berlin_clock()         # един вик — часът и етикетът са от един и същи момент
     html = tpl.render(
         closed_notice=closed_notice,

@@ -484,6 +484,9 @@
 </style>
 </head>
 <body>
+{# 16.11.2026 (пакет 16.11, т. 14): краткото име на компанията след тикъра — „R · Ryder“ (render.short_name: картата, иначе таблиците на Wikipedia) #}
+{% macro tn(t, company=None) %}{% set nm = tname(t, company) if tname is defined else "" %}{% if nm %}<span class="tk-name" style="font-family:'IBM Plex Sans',sans-serif;font-weight:400;font-size:.85em;color:var(--muted)"> · {{ nm }}</span>{% endif %}{% endmacro %}
+
 
 <header>
   <button id="mb-settings-btn" class="mb-gear" type="button" aria-expanded="false" aria-controls="mb-settings" title="Настройки за оразмеряване на позицията" aria-label="Настройки за оразмеряване на позицията">⚙</button>
@@ -542,7 +545,7 @@
   {# 06.11.2026 (пакет 05–06.11, т. 10): ≥ 3 гапа от една индустрия — qm_ep.sector_bounce #}
   {% for x in preopen.sector_bounce or [] %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">{{ x.text }}</div>{% endfor %}
   <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
-    <li><b class="mono">{{ g.ticker }}</b> {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
+    <li><b class="mono">{{ g.ticker }}</b>{{ tn(g.ticker, g.company) }} {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
       {% if g.ret63_pct is not none %}· {{ neglect_label(g.ret63_pct, g.neglect) }} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
       {% for x in red_8k(g.filings_8k) %}<br><span class="small" style="color:var(--red);font-weight:600">{{ x }}</span>{% endfor %}
@@ -560,7 +563,7 @@
   {% if preopen.ep_morning_error %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Сутрешните EP кандидати не се провериха ({{ preopen.ep_morning_error }}).</div>{% endif %}
   {% if preopen.levels %}<div class="cs-sub">Нивата в премаркета · {{ preopen.levels|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.levels %}
-    <li><b class="mono">{{ x.ticker }}</b> · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}
+    <li><b class="mono">{{ x.ticker }}</b>{{ tn(x.ticker) }} · {{ x.what }} — {{ x.kind }} ${{ "%.2f"|format(x.level) }} (премаркет ${{ "%.2f"|format(x.pm_price) }}, {{ "%+.1f"|format(x.pct) }}%)</li>{% endfor %}</ul>{% endif %}
   {% if preopen.watch %}<div class="cs-sub">Наблюдаваните — гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}% · {{ preopen.watch|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.watch %}
     <li><b class="mono">{{ x.ticker }}</b> {{ "%+.1f"|format(x.gap_pct) }}% (${{ "%.2f"|format(x.pm_price) }}; затваряне ${{ "%.2f"|format(x.prev_close) }}{% if x.close_src == "5m" %} <span class="small" style="color:var(--muted)">— последният 5-мин. бар, няма го в сутрешния бриф</span>{% endif %})</li>{% endfor %}</ul>{% endif %}
@@ -1312,7 +1315,7 @@
       <table class="ctx-table">
         <tr><th>Тикър</th><th>Сектор</th><th class="num">Цена</th><th class="num">Спрямо pivot</th><th>Причина</th><th class="num">RS</th><th class="num" title="поредни брифове в раздела (брифовете са по сесии)">Дни</th></tr>
         {% for r in radar %}
-        <tr><td class="mono">{{ r.ticker }}{{ markers_html(r.markers) }}</td>
+        <tr><td class="mono">{{ r.ticker }}{{ tn(r.ticker, r.company) }}{{ markers_html(r.markers) }}</td>
           <td>{{ r.sector or "—" }}</td>
           <td class="num">{{ "$%.2f"|format(r.price) if r.price is number else "—" }}</td>
           <td class="num">{{ "%+.1f%%"|format(r.pct_from_pivot) if r.pct_from_pivot is number else "—" }}</td>
@@ -1387,7 +1390,7 @@
         <th class="n">Стоп</th><th>Валиден до</th></tr></thead>
       <tbody>
         {% for p in backtest.pending_positions %}
-        <tr><td class="sym">{{ p.ticker }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
+        <tr><td class="sym">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td><td>{{ p.entry_date }}</td><td class="n">${{ p.buy_stop }}</td>
           <td class="n">${{ p.max_chase }}</td><td class="n">${{ p.stop_loss }}</td><td>{{ p.valid_through or "—" }}</td></tr>
         {% endfor %}
       </tbody>
@@ -1422,7 +1425,7 @@
         {% for p in backtest.open_positions[:100] %}
         {% set track_modal_id = "earn-modal-track-" ~ p.ticker ~ "-" ~ p.entry_date %}
         <tr class="{{ 'pos-row-up' if p.unrealized_pct and p.unrealized_pct >= 0 else 'pos-row-down' if p.unrealized_pct and p.unrealized_pct < 0 else '' }}">
-          <td class="sym">{{ p.ticker }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
+          <td class="sym">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{{ earnings_icon(track_modal_id, p.earnings_recap) }}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}{% if p.entry_volume_ratio is defined and p.entry_volume_ratio is not none %} <span style="color:var(--muted);font-size:11.5px" title="Обемът на деня на входа спрямо средния за 50 бара — buy-stop се изпълнява при докосване, обемът се вижда при затварянето">(обем {{ "%.2f"|format(p.entry_volume_ratio) }}×)</span>{% endif %}</td>
           <td class="n">${{ p.entry_price }}{% if p.fill_risk_pct is defined and p.fill_risk_pct is not none %}<div style="color:{{ 'var(--yellow)' if p.fill_risk_pct > 8.05 else 'var(--muted)' }};font-size:11.5px" title="Стопът спрямо цената на изпълнение">риск {{ "%.1f"|format(p.fill_risk_pct) }}%{% if p.fill_target_r is not none %} · цел {{ "%.1f"|format(p.fill_target_r) }}R{% endif %}</div>{% endif %}</td>
           <td class="n">{{ "$" + p.current_price|string if p.current_price is not none else "н/д" }}</td>
@@ -1503,7 +1506,7 @@
         <th>Валиден до</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in bs.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
+        <tr><td class="sym">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.entry_volume_ratio is defined and p.entry_volume_ratio is not none %} · обем при входа {{ "%.2f"|format(p.entry_volume_ratio) }}×{% endif %}
             {% if p.screener_exit %}<div style="font-size:11.5px;color:var(--yellow)">излезе от скрийнъра: {{ p.screener_exit }}</div>{% endif %}</td>
@@ -1556,7 +1559,7 @@
   <div class="qm-grid">
     {% for c in qm_cards %}
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
-      <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
+      <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{{ tn(c.ticker, c.company) }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
       {% if c.company and c.company != c.ticker %}<div class="qm-company">{{ c.company|cname(34) }}</div>{% endif %}
       {# 22.10.2026 (етап 4): жив запис в книгата qm_breakout — новото ниво не е нов вход (RVTY 22.10) #}
       {% if c.get("book_open") %}<div class="si-flag" title="Книгата не прави втори запис, докато този е отворен.">📈 OPEN — вече отворена в книгата qm_breakout от {{ c.book_open.since[8:10] }}.{{ c.book_open.since[5:7] }}{% if c.book_open.price %} @ ${{ "%.2f"|format(c.book_open.price) }}{% endif %} — новото ниво не е нов вход</div>{% endif %}
@@ -1634,7 +1637,7 @@
       <thead><tr><th>Тикър</th><th>Карта от</th><th>Статус</th><th class="n">Ниво</th><th class="n">Вход</th><th class="n">Стоп (дъното до пробива / low на деня)</th><th>Режим</th></tr></thead>
       <tbody>
         {% for p in qb.live %}
-        <tr><td class="sym">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}{% if p.earnings_next %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет {{ p.earnings_next.date[8:10] }}.{{ p.earnings_next.date[5:7] }} ({% if p.earnings_next.sessions == 0 %}днес{% else %}след {{ p.earnings_next.sessions }} {{ "сесия" if p.earnings_next.sessions == 1 else "сесии" }}{% endif %}) — позицията държи през отчета; стопът не пази от гап</div>{% endif %}</td>
+        <tr><td class="sym">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — независими книги."}]) }}{% endif %}{{ spinoff_note_html(p) }}{% if p.earnings_next %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">📅 отчет {{ p.earnings_next.date[8:10] }}.{{ p.earnings_next.date[5:7] }} ({% if p.earnings_next.sessions == 0 %}днес{% else %}след {{ p.earnings_next.sessions }} {{ "сесия" if p.earnings_next.sessions == 1 else "сесии" }}{% endif %}) — позицията държи през отчета; стопът не пази от гап</div>{% endif %}</td>
           <td>{{ p.entry_date }}</td>
           <td>{{ qb_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% if p.get("return_pct") is not none %} ({{ "%+.1f"|format(p.return_pct) }}%){% endif %}{% endif %}{% if p.trail_ma %} · SMA{{ p.trail_ma }}{% endif %}{% if p.tight_risk %} {{ qm_tight(p, qb) }}{% endif %}</td>
           <td class="n">${{ p.trigger }}</td><td class="n">{% if p.fill_price is not none %}${{ p.fill_price }}{% if p.trigger is not none and p.fill_price > p.trigger %} <span style="color:var(--muted)" title="Отвори над нивото — входът е по отварянето">(гап)</span>{% endif %}{% else %}—{% endif %}</td><td class="n">{% if p.stop_loss is not none %}${{ p.stop_loss }}{% if p.r_basis == "5m" %} <span style="color:var(--muted)" title="Входът и стопът — от 5-минутните бари на входния ден{% if p.entry_time %}: пробив в {{ p.entry_time }} (Ню Йорк){% endif %}">(5 мин)</span>{% elif p.fill_date %} <span style="color:var(--muted)" title="Без 5-минутни бари{% if p.intraday_status %} ({{ p.intraday_status }}){% endif %} — стопът е low на деня, R с двете граници">(дневен)</span>{% endif %}{% else %}—{% endif %}</td>
@@ -1732,7 +1735,7 @@
 {% macro glb_card(g) %}
     <div class="glb-card {{ g.glb_type }}{{ ' in-screen' if g.in_screener else '' }}">
       <div class="glb-top">
-        <span class="glb-sym">{{ g.ticker }}</span>
+        <span class="glb-sym">{{ g.ticker }}</span>{{ tn(g.ticker, g.company) }}
         <span class="glb-price">${{ "%.2f"|format(g.price) }}</span>
       </div>
       {% if g.company and g.company != g.ticker %}<div class="glb-company">{{ g.company|cname(40) }}</div>{% endif %}
@@ -1759,7 +1762,7 @@
   <div class="cs-radar-wrap"><table class="ctx-table gw-table">
     <tr><th>Тикър</th><th>Пробив</th><th>Тип</th><th class="num" title="Обем на деня на пробива ÷ средния на предишните {{ glb_vol_bars }} бара">Обем на пробива</th><th class="num">Линия</th><th class="num" title="Отварянето на сесията след пробива — първото изпълнимо">Вход (отваряне)</th><th class="num" title="От отварянето на сесията след пробива; отворените — по последното затваряне">Доходност</th><th>Състояние</th><th class="num">Сесии</th><th>Режим</th></tr>
     {% for p in rows %}
-    <tr><td class="mono">{{ p.ticker }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
+    <tr><td class="mono">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_buystop %}{{ markers_html([{"tag": "и buy-stop", "title": "Тикърът е и в buy-stop книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{% if p.also_qm %}{{ markers_html([{"tag": "и QM", "title": "Тикърът е и в книгата qm_breakout в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ spinoff_note_html(p) }}</td>
       {% set sd = p.signal_date or p.entry_date %}<td>{{ sd[8:10] }}.{{ sd[5:7] }}</td>
       <td>{{ {"classic": "Classic", "momentum": "Momentum", "insufficient_history": "без тип"}.get(p.glb_type, p.glb_type or "н/д") }}</td>
       <td class="num">{% if p.breakout_volume_ratio is number %}{{ "%.1f"|format(p.breakout_volume_ratio) }}×{% else %}—{% endif %}</td>

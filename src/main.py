@@ -1009,6 +1009,17 @@ def run() -> dict:
                                 watched=set(watch_monitor.load_watch_list()) if config.ENABLE_WATCH_MONITOR else set()),
                             enabled=config.ENABLE_SPLITS_CALENDAR, label="Отчетът за сплитовете", consequence="секцията за сплитове е без отчет днес")
 
+    def _display_names() -> dict:
+        """16.11.2026 (пакет 16.11, т. 14): имената за „R · Ryder“ навсякъде с тикър — таблиците на Wikipedia + имената на наблюдаваните. Graceful: провал → {}."""
+        try:
+            out = dict(screener.LAST_UNIVERSE_NAME)
+            if config.ENABLE_WATCH_MONITOR:
+                out.update({t: n for t, n in (watch_monitor.load_watch_names() or {}).items() if n and t not in out})
+            return out
+        except Exception as e:
+            print(f"[names] {type(e).__name__}: {e}")
+            return {}
+
     # 16.11.2026 (пакет 16.11, т. 8): календарът на седмицата — отчетите на компаниите > 2% в S&P 500 и на нашите (карти, книги, наблюдавани), Fed, основните данни с консенсуса
     def _week_calendar():
         from src import econ_calendar, preopen as _po
@@ -1136,6 +1147,7 @@ def run() -> dict:
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
+        "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)
         "splits_report": splits_rep,
         "superinvestor_moves": superinvestor_moves,
         "superinvestor_new_positions": superinvestor_new_positions,
