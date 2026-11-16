@@ -310,7 +310,7 @@ def facts(tickers: list[str], download=None, earnings_fn=None, names: dict | Non
     return out
 
 
-def insider_flags(txns: list[dict]) -> list[dict]:
+def insider_flags(txns: list[dict], context: list[dict] | None = None) -> list[dict]:
     """
     30.10.2026 (поправки от брифа, т. 2): флаг за всяка посока поотделно — покупки ("P") и продажби ("S") — {dir, label, n, owners, value, cluster, plan, top_offplan?}.
     cluster — ≥ INSIDER_CLUSTER_MIN_COUNT различни инсайдъри в прозореца в ТАЗИ посока (_insider_cluster); plan — "по план (10b5-1)" / "извънпланови" / "частично по план" /
@@ -333,8 +333,9 @@ def insider_flags(txns: list[dict]) -> list[dict]:
                 g = groups.setdefault(k, {"owner": t.get("owner_name"), "title": t.get("owner_title") or ("директор" if t.get("is_director") else ""),
                                           "date": str(t.get("date"))[:10], "value": 0.0})
                 g["value"] += float(t.get("value") or 0)
+        ctx = [t for t in (context if context is not None else xs) if t.get("code") == code]          # 16.11.2026 (т. 4): CLUSTER — сред всичките в посоката
         f = {"dir": code, "label": label, "n": len(xs), "owners": len({t.get("owner_name") for t in xs}), "value": round(sum(float(t.get("value") or 0) for t in xs)),
-             "cluster": _insider_cluster(xs), "plan": plan}
+             "cluster": _insider_cluster(ctx), "plan": plan}
         if groups:
             top = max(groups.values(), key=lambda g: g["value"])
             f["top_offplan"] = {**top, "value": round(top["value"])}
@@ -427,7 +428,16 @@ def _insider_cluster(txns: list[dict]) -> bool:
     return False
 
 
-def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float | None = None) -> list[dict]:
+def split_new_old(txns: list[dict], since_day: str) -> tuple[list[dict], list[dict]]:
+    """
+    16.11.2026 (пакет 16.11, т. 4): Form 4 — подадени от деня на предишния бриф нататък (нови) и по-старите (вече показани). Сутрешният бриф е в ~01:30 Ню Йорк, а EDGAR
+    приема подаванията в работния ден — подаденото на датата на предишния бриф е след него. Без "filed" (стар запис) → старо. Чиста функция.
+    """
+    new = [t for t in txns or [] if str(t.get("filed") or "") >= since_day]
+    return new, [t for t in txns or [] if t not in new]
+
+
+def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float | None = None, since_day: str | None = None) -> list[dict]:
     """
     Суровите данни за всеки watched тикър, БЕЗ AI слой.
 
@@ -456,14 +466,19 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
         insider, insider_ok = {}, False
 
     rows = []
-    since_day = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=window_hours or config.WATCH_NEWS_WINDOW_HOURS)).date().isoformat()
+    since_day = since_day or (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=window_hours or config.WATCH_NEWS_WINDOW_HOURS)).date().isoformat()
     for tk in tickers:
         f = fx.get(tk) or {}
         news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
         checked = news is not None                                                     # 04.11.2026 (В1): None — новините не се провериха (не „няма новини“)
         news = news or []
         txns = insider.get(tk, [])
-        new_f4 = [t for t in txns if str(t.get("filed") or "") >= since_day]          # 03.11.2026 (т. 5): Form 4, подаден в прозореца (от предишния бриф)
+        new_f4, old_f4 = split_new_old(txns, since_day)                               # 03.11.2026 (т. 5): Form 4, подаден в прозореца (от предишния бриф)
+        # 16.11.2026 (пакет 16.11, т. 4, SIRI): отметките, таблицата, ≥25% и AI — САМО от новите Form 4; старите (вече показани) — сгънати „вече показано“.
+        # До 16.11 всичко беше от 30-дневния прозорец (config.WATCH_INSIDER_LOOKBACK_DAYS) — покупките на Berkshire в SIRI от 30.10–03.11 стояха всеки ден до края на месеца,
+        # а AI ги преразказваше наново в дните с новина (10.11, 11.11). CLUSTER — сред всичките 30 дни, но само ако в посоката има нов Form 4.
+        new_owners = {t.get("owner_name") for t in new_f4 if t.get("code") == "S"}
+        big = big_sellers(txns)
         rows.append({
             "ticker": tk,
             "name": f.get("name"),
@@ -471,10 +486,13 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
             "news": news,
             "news_checked": checked, **({} if checked else {"news_error": _NEWS_FAIL.get(tk) or "неизвестна причина"}),     # 04.11.2026 (В1)
             "insider": [{**t, "date": t["date"].isoformat()} for t in txns],
-            "insider_cluster": _insider_cluster(txns),
-            "insider_flags": insider_flags(txns),                   # 30.10.2026: по посока — покупки / продажби, с плана
-            "insider_days": person_days(txns),                      # 10.11.2026 (т. 5): по човек и ден (CRCL: 54 реда → 7)
-            "insider_big_sell": big_sellers(txns),                  # 10.11.2026 (т. 5): ≥25% от дела — от кода, независимо от 10b5-1
+            "insider_cluster": _insider_cluster(txns) and bool(new_f4),
+            "insider_flags": insider_flags(new_f4, context=txns),   # 30.10.2026: по посока — покупки / продажби, с плана; 16.11: само новите
+            "insider_days": person_days(new_f4),                    # 10.11.2026 (т. 5): по човек и ден (CRCL: 54 реда → 7); 16.11: само новите
+            "insider_days_old": person_days(old_f4),                # 16.11.2026 (т. 4): вече показани — сгънати
+            "insider_big_sell": [b for b in big if b["owner"] in new_owners],      # 10.11.2026 (т. 5): ≥25% от дела — от кода, независимо от 10b5-1; 16.11: при нова продажба
+            "insider_big_sell_old": [b for b in big if b["owner"] not in new_owners],
+            "since": since_day,                                     # 16.11.2026 (т. 4): „нищо ново от ДД.ММ“
             "quiet": not news and not txns,
             "event": bool(news or new_f4), "f4_new": len(new_f4),               # 03.11.2026 (т. 5): AI коментар само при новина или нов Form 4
         })

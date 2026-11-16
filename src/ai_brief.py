@@ -2089,7 +2089,7 @@ def _watch_digest_batch(rows: list[dict], market_context: dict, window_hours: fl
         "insider_flags": [{"label": f.get("label"), "people": f.get("owners"), "form4_rows": f.get("n"), "cluster": f.get("cluster"), "plan": f.get("plan")}
                           for f in r.get("insider_flags") or []],   # 30.10.2026: по посока, с плана
         "sells_25pct_of_stake": [{"title": b.get("title"), "pct_of_stake": b["pct"], "planned_10b5_1": b.get("planned_10b5_1")} for b in r.get("insider_big_sell") or []],
-    } for r in rows]
+    } for r in rows]                                                       # 16.11.2026 (пакет 16.11, т. 4): insider_days / flags / ≥25% — само новите Form 4 от предишния бриф
 
     user = f"""НАБЛЮДАВАНИ ТИКЪРИ (данни за последните {round(window_hours)} часа — от предишния бриф):
 {json.dumps(compact, ensure_ascii=False, default=str)}

@@ -91,7 +91,7 @@ assert "CLUSTER продажби · 4 души · по план (10b5-1)" in pag
 assert "(50 сделки)" in page and page.count("Chief Financial Officer") >= 2
 assert "⚠ ≥25% от дела · 46%" in page and "⚠ " + T + " — Form 4, независимо от 10b5-1" in page
 src = (ROOT / "src" / "watch_monitor.py").read_text(encoding="utf-8")
-assert '"insider_days": person_days(txns)' in src and '"insider_big_sell": big_sellers(txns)' in src
+assert '"insider_days": person_days(new_f4)' in src and "big = big_sellers(txns)" in src           # 16.11.2026 (пакет 16.11, т. 4): таблицата и ≥25% — от новите Form 4
 old = copy.deepcopy(W["CRCL"]); old.pop("insider_days"); old.pop("insider_big_sell")                         # стар бриф — без новите полета
 bb["watch"] = [old]
 with contextlib.redirect_stdout(io.StringIO()):

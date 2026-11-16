@@ -837,7 +837,27 @@
     <span data-l="Отчет">{% if e.next %}{% if e.estimate %}~{% endif %}{{ e.next[8:10] }}.{{ e.next[5:7] }}{% if e.estimate %} <span class="wt-mu">(прогноза)</span>{% endif %}{% if e.days is not none %} <span class="wt-mu">({{ "днес" if e.days == 0 else ("след " ~ e.days ~ " дни" if e.days > 1 else "утре") }})</span>{% endif %}{% elif e.status == "no_date" %}<span class="wt-mu">няма дата</span>{% else %}<span class="wt-mu">—</span>{% endif %}</span>
     {# 03.11.2026 (поправки след брифа, т. 1): на мястото на short interest (Yahoo .info — HTTP 401 на 02.11 и 03.11) — ADR% за 20 дни и разстоянието до 52-седмичния връх, от цените #}
     <span data-l="ADR · 52-седм. връх">{% if p.adr_pct is defined %}ADR <span class="wt-num">{{ "%.1f"|format(p.adr_pct) }}%</span>{% else %}<span class="wt-mu">ADR —</span>{% endif %}{% if p.off_high_pct is defined %}<span class="wt-name">{% if p.off_high_pct >= 0 %}на 52-седм. връх{% else %}под 52-седм. връх <span class="wt-num">{{ "%.1f"|format(p.off_high_pct) }}%</span>{% endif %}</span>{% endif %}</span>
-    <span data-l="В брифа">{% for m in w.in_brief or [] %}<span class="wt-mark">{{ m }}</span>{% endfor %}{% if w.news %}<span class="wt-mark">{{ w.news|length }} новини</span>{% endif %}{% if w.news_checked is defined and not w.news_checked %}<span class="wt-mark" style="color:var(--yellow)" title="RSS на Yahoo: {{ w.news_error }}">новините не се провериха</span>{% endif %}{% if w.insider_flags is defined %}{% for fl in w.insider_flags %}<span class="wt-mark" style="color:var({{ '--green' if fl.dir == 'P' else '--red' }}){% if fl.cluster %};font-weight:700{% endif %}" title="Form 4 за 30 дни: {{ fl.n }} сделки, {{ fl.owners }} инсайдъри, ${{ '{:,.0f}'.format(fl.value) }}">{% if fl.cluster %}CLUSTER {% endif %}{{ fl.label }} · {{ fl.owners }} {{ 'човек' if fl.owners == 1 else 'души' }} · {{ fl.plan }}{% if fl.top_offplan %} · {{ fl.top_offplan.title or fl.top_offplan.owner }} ${{ '%.1f'|format(fl.top_offplan.value / 1e6) ~ ' млн' if fl.top_offplan.value >= 1e6 else '{:,.0f}'.format(fl.top_offplan.value) }} ({{ fl.top_offplan.date[8:10] }}.{{ fl.top_offplan.date[5:7] }}){% endif %}</span>{% endfor %}{% else %}{% if w.insider %}<span class="wt-mark" style="color:var(--yellow)">Form 4 · {{ w.insider|length }}</span>{% endif %}{% if w.insider_cluster %}<span class="wt-mark" style="color:var(--red)">CLUSTER</span>{% endif %}{% endif %}{% for b in w.insider_big_sell or [] %}<span class="wt-mark" style="color:var(--red);font-weight:700" title="{{ big_sell_text(b) }}">⚠ ≥{{ '%g'|format(insider_big_sell_pct) }}% от дела · {{ b.pct|round(0)|int }}%</span>{% endfor %}</span>
+    <span data-l="В брифа">{% for m in w.in_brief or [] %}<span class="wt-mark">{{ m }}</span>{% endfor %}{% if w.news %}<span class="wt-mark">{{ w.news|length }} новини</span>{% endif %}{% if w.news_checked is defined and not w.news_checked %}<span class="wt-mark" style="color:var(--yellow)" title="RSS на Yahoo: {{ w.news_error }}">новините не се провериха</span>{% endif %}{% if w.insider_flags is defined %}{% for fl in w.insider_flags %}<span class="wt-mark" style="color:var({{ '--green' if fl.dir == 'P' else '--red' }}){% if fl.cluster %};font-weight:700{% endif %}" title="Form 4 за 30 дни: {{ fl.n }} сделки, {{ fl.owners }} инсайдъри, ${{ '{:,.0f}'.format(fl.value) }}">{% if fl.cluster %}CLUSTER {% endif %}{{ fl.label }} · {{ fl.owners }} {{ 'човек' if fl.owners == 1 else 'души' }} · {{ fl.plan }}{% if fl.top_offplan %} · {{ fl.top_offplan.title or fl.top_offplan.owner }} ${{ '%.1f'|format(fl.top_offplan.value / 1e6) ~ ' млн' if fl.top_offplan.value >= 1e6 else '{:,.0f}'.format(fl.top_offplan.value) }} ({{ fl.top_offplan.date[8:10] }}.{{ fl.top_offplan.date[5:7] }}){% endif %}</span>{% endfor %}{% else %}{% if w.insider %}<span class="wt-mark" style="color:var(--yellow)">Form 4 · {{ w.insider|length }}</span>{% endif %}{% if w.insider_cluster %}<span class="wt-mark" style="color:var(--red)">CLUSTER</span>{% endif %}{% endif %}{% for b in w.insider_big_sell or [] %}<span class="wt-mark" style="color:var(--red);font-weight:700" title="{{ big_sell_text(b) }}">⚠ ≥{{ '%g'|format(insider_big_sell_pct) }}% от дела · {{ b.pct|round(0)|int }}%</span>{% endfor %}{% if w.since is defined and not w.news and not w.insider_flags %}<span class="wt-mark wt-mu" title="без новини и без нов Form 4 от предишния бриф{% if w.insider_days_old %}; по-старите Form 4 — сгънати „вече показано“{% endif %}">нищо ново от {{ w.since[8:10] }}.{{ w.since[5:7] }}</span>{% endif %}</span>
+  {% endmacro %}
+  {# 16.11.2026 (пакет 16.11, т. 4): таблицата на Form 4 — новите от предишния бриф; по-старите — в сгънато „вече показано“ #}
+  {% macro insider_rows(rows) %}
+        <table class="wm-insider">
+          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
+          {% for t in rows %}
+          <tr>
+            <td>{{ t.date }}</td>
+            <td class="{{ 'buy' if t.code == 'P' else 'sell' }}">{{ 'покупка' if t.code == 'P' else 'продажба' }}</td>
+            {# FIX 2026-09-28: директорите нямат officerTitle в Form 4 → длъжността
+               липсваше (BLSH, Andrew Bliss); is_director вече се парсва #}
+            {% set roles = [t.owner_title] if t.owner_title else [] %}
+            {% if t.is_director and 'director' not in (t.owner_title or '')|lower %}{% set roles = roles + ['директор'] %}{% endif %}
+            <td>{{ t.owner_name }}{% if roles %} <span class="wm-src">· {{ roles|join(' · ') }}</span>{% endif %}</td>
+            <td class="num">${{ "{:,.0f}".format(t.value) }}{% if t.n and t.n > 1 %} <span class="wm-src">({{ t.n }} сделки)</span>{% endif %}</td>
+            <td class="num">{{ t.pct_of_holdings ~ "%" if t.pct_of_holdings is not none else "—" }}</td>
+            <td>{{ "смесено" if t.plan_mixed else ("10b5-1" if t.planned_10b5_1 else ("извънпланова" if t.planned_10b5_1 is false else "неизв.")) }}</td>
+          </tr>
+          {% endfor %}
+        </table>
   {% endmacro %}
   {% if watch %}
   <div class="wt">
@@ -859,25 +879,12 @@
         {% endif %}
         {# 10.11.2026 (т. 5): ≥25% от дела — от кода, независимо от 10b5-1; таблицата — по човек и ден (CRCL 10.11: 54 реда → 5), сделките в скоби #}
         {% for b in w.insider_big_sell or [] %}<div class="small" style="color:var(--red);font-weight:600;margin:4px 0">⚠ {{ big_sell_text(b) }} — Form 4, независимо от 10b5-1</div>{% endfor %}
-        {% if w.insider %}
-        <table class="wm-insider">
-          <tr><th>Дата</th><th>Вид</th><th>Инсайдър</th><th class="num">Сума</th><th class="num">% от дял</th><th>План</th></tr>
-          {% for t in (w.insider_days if w.insider_days is defined else w.insider) %}
-          <tr>
-            <td>{{ t.date }}</td>
-            <td class="{{ 'buy' if t.code == 'P' else 'sell' }}">{{ 'покупка' if t.code == 'P' else 'продажба' }}</td>
-            {# FIX 2026-09-28: директорите нямат officerTitle в Form 4 → длъжността
-               липсваше (BLSH, Andrew Bliss); is_director вече се парсва #}
-            {% set roles = [t.owner_title] if t.owner_title else [] %}
-            {% if t.is_director and 'director' not in (t.owner_title or '')|lower %}{% set roles = roles + ['директор'] %}{% endif %}
-            <td>{{ t.owner_name }}{% if roles %} <span class="wm-src">· {{ roles|join(' · ') }}</span>{% endif %}</td>
-            <td class="num">${{ "{:,.0f}".format(t.value) }}{% if t.n and t.n > 1 %} <span class="wm-src">({{ t.n }} сделки)</span>{% endif %}</td>
-            <td class="num">{{ t.pct_of_holdings ~ "%" if t.pct_of_holdings is not none else "—" }}</td>
-            <td>{{ "смесено" if t.plan_mixed else ("10b5-1" if t.planned_10b5_1 else ("извънпланова" if t.planned_10b5_1 is false else "неизв.")) }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-        {% endif %}
+        {% if w.insider_days_old is defined %}
+        {% if w.insider_days %}{{ insider_rows(w.insider_days) }}{% elif w.insider %}<div class="small" style="color:var(--muted);margin:4px 0">Form 4: нищо ново от {{ w.since[8:10] }}.{{ w.since[5:7] }}.</div>{% endif %}
+        {% if w.insider_days_old %}<details class="wm-old" style="margin-top:6px"><summary class="small" style="color:var(--muted);cursor:pointer">▸ вече показано · Form 4 от предишни брифове ({{ w.insider_days_old|length }})</summary>
+        {% for b in w.insider_big_sell_old or [] %}<div class="small" style="color:var(--muted);margin:4px 0">{{ big_sell_text(b) }} — Form 4</div>{% endfor %}
+        {{ insider_rows(w.insider_days_old) }}</details>{% endif %}
+        {% elif w.insider %}{{ insider_rows(w.insider_days if w.insider_days is defined else w.insider) }}{% endif %}
         {% if w.ai and w.ai.insider_read %}<div class="wm-read">{{ w.ai.insider_read }}</div>{% endif %}
         {% if w.ai and w.ai.cross_reference %}<div class="wm-xref">🔗 {{ w.ai.cross_reference }}</div>{% endif %}
       </div>
