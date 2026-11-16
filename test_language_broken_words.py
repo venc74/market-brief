@@ -28,8 +28,10 @@ def expected(text):
     return text
 for item in FX["strings"]:
     out, log = fix(item["text"])
-    assert out == expected(item["text"]), (item["date"], out)               # целият текст: сменена е САМО засегнатата дума
-    assert "несъществуваща дума заменена" in log
+    with contextlib.redirect_stdout(io.StringIO()):
+        want = ai_brief._drop_field_sentences(expected(item["text"])) if ai_brief._FIELD_RE.search(item["text"]) else expected(item["text"])   # 16.11.2026 (т. 3): изреченията с rs_at_6m_high / near_high / below_pivot падат
+    assert out == want, (item["date"], out)               # целият текст: сменена е САМО засегнатата дума
+    assert "несъществуваща дума заменена" in log or item["expect_contains"][0] not in out          # 16.11.2026: думата е била в изречение с име на поле — то пада цяло
     k = item["text"].index(item["probe_exact"])
     print(f"  ✓ {item['date']}: «…{item['text'][max(0, k - 28):k + len(item['probe_exact']) + 22]}…» → «{item['expect_contains'][0]}»; останалият текст е непроменен")
 
@@ -55,7 +57,9 @@ chains = [x["chain"] for x in B19["ai_macro"]["sector_logic"] if "Вериган
 assert len(chains) == 2
 for c in chains:
     out, log = fix(c)
-    assert out == c.replace("Вериган", "Веригата") and "несъществуваща дума заменена: 'Вериган'" in log
+    with contextlib.redirect_stdout(io.StringIO()):
+        want = ai_brief._drop_field_sentences(c.replace("Вериган", "Веригата"))    # 16.11.2026 (т. 3): първата верига има и „(laggard_persistence 85%)“ — изречението пада, „Веригата:“ остава
+    assert out == want and "несъществуваща дума заменена: 'Вериган'" in log, out
 assert fix("веригата и вериги")[0] == "веригата и вериги" and fix("вериган")[0] == "веригата"                       # СИНТЕТИЧНО: правилните форми не се пипат; малка буква
 print("  ✓ «Вериган: рязък кредитен стрес → …» и «Вериган е неубедителна …» → «Веригата …»; «веригата», «вериги» — непокътнати")
 print("\n✅ test_language_broken_words: всичко мина")
