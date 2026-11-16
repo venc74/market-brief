@@ -125,13 +125,13 @@ for k, (d, v) in enumerate(REAL[:40]):
 hist = th._load_put_call_history("2026-10-05")
 assert len(hist) == 40 and hist["2026-06-13"] == 0.83
 r, log = run("ok", (2026, 10, 5))                                                  # 1100+400 / 1000+500 = 1.0
-assert r["value"] == 1.0 and r["history_days"] == 40 and r["status"] in ("green", "yellow", "red")
+assert r["raw"] == 1.0 and r["history_days"] == 40 - (config.PUTCALL_AVG_DAYS - 1) and r["status"] in ("green", "yellow", "red")      # 16.11.2026 (т. 17): цветът — по 3-дн. средно; суровата стойност — "raw"
 saved = json.loads(config.PUTCALL_HISTORY_FILE.read_text())
 assert len(saved) == 41 and saved["2026-10-05"] == 1.0                            # днешната стойност е записана
 r2, _ = run("ok", (2026, 10, 5))                                                   # същият ден втори път — идемпотентно, без самосравняване
-assert r2["history_days"] == 40 and len(json.loads(config.PUTCALL_HISTORY_FILE.read_text())) == 41
+assert r2["history_days"] == 40 - (config.PUTCALL_AVG_DAYS - 1) and len(json.loads(config.PUTCALL_HISTORY_FILE.read_text())) == 41
 r3, _ = run("ok", (2026, 10, 6))
-assert r3["history_days"] == 41
+assert r3["history_days"] == 41 - (config.PUTCALL_AVG_DAYS - 1)
 # повреден файл → пресъздава се от брифовете, без крах
 config.PUTCALL_HISTORY_FILE.write_text("{счупен json")
 buf = io.StringIO()

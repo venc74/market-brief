@@ -128,7 +128,7 @@ def _load_put_call_history(today_iso: str) -> dict[str, float]:
                 if p.stem in hist:
                     continue
                 for i in (json.loads(p.read_text()).get("thermometer", {}).get("indicators") or []):
-                    v = i.get("value")
+                    v = i.get("raw", i.get("value"))                     # 16.11.2026 (т. 17): от 16.11 "value" е 3-дн. средно — суровата стойност е "raw"
                     if str(i.get("name", "")).startswith("Put/Call") and isinstance(v, (int, float)) and v > 0:
                         hist[p.stem] = float(v)
         except Exception as e:
@@ -167,6 +167,30 @@ def _evaluate_put_call(pc: float, history: list[float]) -> dict:
             "label": f"P/C {pc:.2f} ({pct:.0f}. percentile от {len(history)} дни; {note})"}
 
 
+def _evaluate_put_call_avg(pc: float, history: list[float], days: int | None = None) -> dict:
+    """
+    16.11.2026 (пакет 16.11, т. 17 — решение на Венци): като _evaluate_put_call, но цветът е по средното за `days` дни (днешният P/C + предишните days−1 от историята), като percentile
+    спрямо историята на СЪЩОТО средно (последните PUTCALL_LOOKBACK); "raw" — днешната стойност (видима до средното). Под PUTCALL_MIN_HISTORY → скрит. Чиста функция.
+    """
+    days = days or config.PUTCALL_AVG_DAYS
+    vals = list(history) + [pc]
+    ma = [sum(vals[i - days + 1:i + 1]) / days for i in range(days - 1, len(vals))]
+    hist_ma = ma[:-1][-config.PUTCALL_LOOKBACK:]
+    if len(hist_ma) < config.PUTCALL_MIN_HISTORY:
+        return _put_call_hidden(f"недостатъчна история за калибриране ({len(hist_ma)} от {config.PUTCALL_MIN_HISTORY} дни)")
+    avg = ma[-1]
+    pct = _percentile_rank(hist_ma, avg)
+    if pct >= config.PUTCALL_PERCENTILE_GREEN:
+        status, note = "green", "страх — висок за собствената история (contrarian)"
+    elif pct <= config.PUTCALL_PERCENTILE_RED:
+        status, note = "red", "самодоволство — ниско за собствената история"
+    else:
+        status, note = "yellow", "в нормалния диапазон"
+    return {"name": "Put/Call (SPY)", "value": round(avg, 2), "raw": round(pc, 2), "avg_days": days, "percentile": pct, "history_days": len(hist_ma),
+            "status": status,
+            "label": f"P/C {pc:.2f} днес · {days}-дн. средно {avg:.2f} ({pct:.0f}. percentile на средното от {len(hist_ma)} дни; {note}) — цветът е по средното"}
+
+
 def put_call_sentence(ind: dict | None) -> str | None:
     """
     16.11.2026 (пакет 16.11, т. 2): изречението за Put/Call — от кода, не от AI. Реално 16.11 разказът обърна смисъла: „на 7-ми перцентил … ниско самодоволство в смисъл, че
@@ -175,7 +199,11 @@ def put_call_sentence(ind: dict | None) -> str | None:
     if not ind or ind.get("hide") or ind.get("value") is None or ind.get("percentile") is None:
         return None
     n = ind.get("history_days")
-    head = f"Put/Call (SPY) {ind['value']:.2f} — {ind['percentile']:.0f}. percentile" + (f" от {n} дни" if n else "") + ": "
+    if ind.get("avg_days") and ind.get("raw") is not None:                            # 16.11.2026 (т. 17): по средното, суровата стойност — до него
+        head = (f"Put/Call (SPY) {ind['avg_days']}-дн. средно {ind['value']:.2f} (днес {ind['raw']:.2f}) — {ind['percentile']:.0f}. percentile"
+                + (f" от {n} дни" if n else "") + ": ")
+    else:
+        head = f"Put/Call (SPY) {ind['value']:.2f} — {ind['percentile']:.0f}. percentile" + (f" от {n} дни" if n else "") + ": "
     meaning = {"red": "малко хеджове спрямо собствената история — високо самодоволство (червено за режима)",
                "green": "много хеджове спрямо собствената история — страх, сигнал в обратна посока (зелено за режима)"}.get(
         ind.get("status"), "в нормалния диапазон за собствената история (жълто)")
@@ -204,7 +232,7 @@ def market_put_call(today: dt.date | None = None) -> dict:
     except Exception as e:
         return _put_call_hidden(f"{type(e).__name__}: {e}")
     hist = _load_put_call_history(today_iso)
-    out = _evaluate_put_call(pc, list(hist[k] for k in sorted(hist)))
+    out = _evaluate_put_call_avg(pc, list(hist[k] for k in sorted(hist)))         # 16.11.2026 (т. 17): цветът — по 3-дневното средно
     _save_put_call_value(hist, today_iso, round(pc, 4))            # днешната стойност влиза в историята и при скрит индикатор
     return out
 

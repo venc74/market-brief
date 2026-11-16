@@ -458,6 +458,10 @@ PUTCALL_PERCENTILE_GREEN = float(os.getenv("PUTCALL_PERCENTILE_GREEN", 90))
 PUTCALL_PERCENTILE_RED = float(os.getenv("PUTCALL_PERCENTILE_RED", 10))
 PUTCALL_MIN_HISTORY = int(os.getenv("PUTCALL_MIN_HISTORY", 30))
 PUTCALL_LOOKBACK = int(os.getenv("PUTCALL_LOOKBACK", 252))
+# 16.11.2026 (пакет 16.11, т. 17 — решение на Венци): цветът и броенето в режима — по средното за PUTCALL_AVG_DAYS дни (percentile спрямо историята на същото средно); суровата
+# стойност за деня остава видима до него. Реално 16.11: 0.89 (7. percentile, червено) след 1.13 (49-и) — една сесия обърна плочката; 3-дн. средно 1.05 (27-и, жълто).
+# Измерено 14.08–16.11 (67 брифа): смени на цвета 17 → 8, червени дни 3 → 0; режимът е различен само на 16.11 (Defensive → Offensive).
+PUTCALL_AVG_DAYS = int(os.getenv("PUTCALL_AVG_DAYS", 3))
 
 # ── API ключове (от GitHub Secrets / .env) ───────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
