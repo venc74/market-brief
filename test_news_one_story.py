@@ -1,6 +1,7 @@
 """
 29.10.2026 · разходката, т. 3–4, решение 2: една история — една новина. Заглавията за СЪЩОТО събитие (от различни източници или от един) се сливат в един ред: заглавието на
 най-надеждния източник в групата (config.NEWS_SOURCE_PRIORITY: Reuters, AP, FT, CNBC; при крипто CoinDesk, Cointelegraph), „защо“ — за събитието, „също: FT, CNBC“ (линкове).
+16.11.2026 (пакет 16.11, т. 1): основното е изборът на модела („защо“ е писано за него); другите — в „също“ по надеждност.
 Разпознава моделът ("also" — индекси + ехо на първите 6 думи); кодът проверява индексите и ехото (_also_group), избира основното заглавие и пази другите в row["also"].
 Повод (РЕАЛНО, брифът от 29.10): „Alphabet sinks 10%…“ (CNBC) и „Google shares tumble 10%…“ (FT); „Fed meeting recap…“ (CNBC) и „Fed holds fire…“ (FT) — 4 от 8 реда за 2 събития.
 Измерено на ръка в последните 24 брифа (28.09–29.10, 191 новини): 8 сигурни двойки в 7 дни + 4 гранични.
@@ -49,7 +50,7 @@ assert {pool[k]["source"] for k in DD.values()} == {pool[k]["source"] for k in A
 print(f"  ✓ пул {len(pool)} заглавия; DoorDash: {sorted(DD.values())}, Alphabet: {sorted(AL.values())}")
 
 print()
-print("── 2. сливане: основното — от най-надеждния източник, „също“ — другите по реда; преводът отпада при смяна (СИНТЕТИЧЕН отговор) ──")
+print("── 2. сливане: основното — изборът на модела (от 16.11; до 16.11 — най-надеждният източник), „също“ — другите по надеждност (СИНТЕТИЧЕН отговор) ──")
 ans = [{**ref(DD["CNBC"]), "why": "Консолидация в доставките — натиск върху конкурентите.", "headline_bg": "DoorDash купува Instacart за $17 млрд.",
         "also": [ref(DD["FT"]), ref(DD["Reuters"])]},
        {**ref(AL["FT"]), "why": "AI разходите тежат на търсачката — натиск върху mega-cap tech.", "also": [ref(AL["CNBC"]), AL["Reuters"]]},          # индекс без ехо — приема се
@@ -58,14 +59,14 @@ ans = [{**ref(DD["CNBC"]), "why": "Консолидация в доставки�
 news, dropped = na.pick_verbatim(ans, pool, 8)
 assert len(news) == 3
 d, a, g = news
-assert d["headline"] == pool[DD["Reuters"]]["title"] and d["source"] == "Reuters Business" and d["link"] == pool[DD["Reuters"]]["link"]
-assert [x["source"] for x in d["also"]] == ["Financial Times", "CNBC"] and [x["link"] for x in d["also"]] == [pool[DD["FT"]]["link"], pool[DD["CNBC"]]["link"]]
-assert "headline_bg" not in d and d["why"] == "Консолидация в доставките — натиск върху конкурентите."
-assert a["source"] == "Reuters Business" and [x["source"] for x in a["also"]] == ["Financial Times", "CNBC"]
+assert d["headline"] == pool[DD["CNBC"]]["title"] and d["source"] == "CNBC" and d["link"] == pool[DD["CNBC"]]["link"]          # 16.11.2026: изборът на модела
+assert [x["source"] for x in d["also"]] == ["Reuters Business", "Financial Times"] and [x["link"] for x in d["also"]] == [pool[DD["Reuters"]]["link"], pool[DD["FT"]]["link"]]
+assert d["headline_bg"] == "DoorDash купува Instacart за $17 млрд." and d["why"] == "Консолидация в доставките — натиск върху конкурентите."
+assert a["source"] == "Financial Times" and [x["source"] for x in a["also"]] == ["Reuters Business", "CNBC"]
 assert g["headline"] == pool[GDP]["title"] and "also" not in g and g["headline_bg"].startswith("Растежът на БВП")                                 # без дубли — непроменено
 reasons = [x["reason"] for x in dropped]
-assert reasons.count("основното заглавие — от по-надеждния източник (Reuters Business), преводът отпада") == 2 and "повторен индекс" in reasons
-print(f"  ✓ DoorDash: «{d['headline'][:55]}…» · също: {', '.join(x['source'] for x in d['also'])}; Alphabet — също Reuters; БВП — без „също“; дубълът като отделна новина — отпада")
+assert not any("по-надеждния" in r for r in reasons) and "повторен индекс" in reasons
+print(f"  ✓ DoorDash: «{d['headline'][:55]}…» (CNBC — изборът) · също: {', '.join(x['source'] for x in d['also'])}; Alphabet — FT, също Reuters и CNBC; БВП — без „също“; дубълът — отпада")
 
 print()
 print("── 3. „also“ с грешно ехо или невалиден индекс не влиза в групата (СИНТЕТИЧНО) ──")
@@ -81,7 +82,7 @@ b = copy.deepcopy(B19); b["news"] = news
 with q():
     page = render.render_dashboard(b, publish=False)
     mail = render.render_email(b)
-assert '<span class="news-why" style="font-size:12px" title="Financial Times, CNBC">· +2 източника</span>' in page
+assert '<span class="news-why" style="font-size:12px" title="Reuters Business, Financial Times">· +2 източника</span>' in page
 assert ' · +2 източника</span>' in mail and d["also"][0]["link"] not in page and d["also"][0]["link"] not in mail
 assert f'href="{esc(d["link"])}"' in page                                                                                   # основното заглавие остава линк
 print("  ✓ страница и имейл")

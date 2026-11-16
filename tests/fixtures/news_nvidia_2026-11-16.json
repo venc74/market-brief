@@ -1,0 +1,947 @@
+{
+ "_note": "РЕАЛНО: data/news_cache.json от 16.11.2026 (новината за Nvidia — заглавие, „защо“, „също“ и source_text = заглавията + резюметата от RSS на групата, в реда на групата) и news_diag от data/2026-11-16.json; macro_brief и входовете на разказа (macro, thermometer, news, crypto) от data/2026-11-16.json. Изрязано 16.11.2026.",
+ "nvidia": {
+  "headline": "Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters",
+  "source": "Reuters Business",
+  "why": "Натискът на Министерството на финансите върху Nvidia за спазване на експортните ограничения към Китай и изискването за външен CEO увеличава регулаторния и операционен риск за акцията и за целия AI-чип сектор.",
+  "source_text": "Bessent says Nvidia needs ‘shake-up’ with external CEO US Treasury secretary demands to know if chipmaker is complying with restrictions on exports to China Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports Reuters EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia Reuters Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker Jensen Huang’s resignation as Nvidia CEO has brought renewed scrutiny to Commerce Secretary Howard Lutnick and his family's financial ties to the chipmaker. EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs Reuters Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters Bessent says Nvidia must 'go outside the company' to find new CEO Reuters",
+  "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPbzFERGNkd2ZLODdReVZtV3pnNVdJT3RyNDdpbUZQRXZHUEgzbVYtZTBwelhfV1hRbVVfOGsxeDJURWd2bEJubFlFUjFXZC1HM2Z4U3l2TXVhTXR3OTFPZ2xUaDhOVlBDWF93dDE0V2lsOEI3bGFGWXlmbnVldjNCQkJKQlFNbDVfaWR6cGpJdktZWlJXcEdNQkZnWWsxSlZGX19tQTIxYW5NVWQxb2NQclEza1JHaHBma3lmaFNzQWRtQld0UkRwT01IZEY0eUk?oc=5",
+  "also": [
+   {
+    "source": "Reuters Business",
+    "headline": "EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters",
+    "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOcGIzcVZhWDU2cVlTWlhGZFZUMGlCcldoTU4wc2Z2UUpqUzJiNWp3Sy1kTVFQTnRKbHVnY2cwWHh0WEx3YkV5ZVMxOUFnMmVIc0kzaHdHc0NEVm9NS3hsVTdfTHR1ZWR4OTc2NUNpXzUteWZvblRYcEFVRDBIVTQyanVZTGdDYVFTaDJLTWFYdWNmSzBtU09Dd1RZVkhLUjB0WkR2Rm0tVTZnXzctWTREMXF3QjhZNTUxMHhDWjJZMHc?oc=5"
+   },
+   {
+    "source": "Reuters Business",
+    "headline": "EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters",
+    "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPc1EtU18tWjZNZTZtOFBZNzdqZkRFMk1nbm9MTm9VWUQwUHlLc1dTdDNLWmNCcllESHVVYjFnXzlKcFJrSWpHUkY2S1lhcTFtWWdPVG9WdkcyTkFSaEpLanVzeWctM1hCTkdxUEJ6VnBrLXFYVnBsalpKUkJVUGQyUE5DOEJtaTctZlFEaV9VR1loQ1JrVlhyRmRxR25UMkI2MVgtZnBFU1pVaXhBcmw0ZV9jb0RPYlduY1ppbnpCTlc?oc=5"
+   },
+   {
+    "source": "Reuters Business",
+    "headline": "Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters",
+    "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNVGladEJOQmtqRldzTHdlQ25Fb3pCREJuYmthQTgzclB5Snl6WWFmaXdtWU1KU1NqVGhTZzIyakttSVpxR0p3MVlGU1pBcjhjRjVkVl9wNGU5OS1kOUJkeXRobzlOSjlMUkVPTWkxbmdib3Bna3ZoRVRoM1RybkQ2NE92ZWZTMjBuNF80a1lhVENxQUhTU2hkY0QzaTU0NGc?oc=5"
+   },
+   {
+    "source": "Financial Times",
+    "headline": "Bessent says Nvidia needs ‘shake-up’ with external CEO",
+    "link": "https://www.ft.com/content/24edbb84-7520-4ef0-a57c-30359e12ccc5?syn-25a6b1a6=1"
+   },
+   {
+    "source": "CNBC",
+    "headline": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
+    "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html"
+   }
+  ]
+ },
+ "news_diag": {
+  "returned": 8,
+  "kept": 6,
+  "dropped": [
+   {
+    "i": 33,
+    "reason": "индексът не съвпада със заглавието",
+    "h": "China's slowdown deepens in October as",
+    "pool_title": "China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates"
+   },
+   {
+    "i": 82,
+    "reason": "също: ехото не съвпада със заглавието",
+    "of": 65,
+    "h": "Japan's economy contracts for the first"
+   },
+   {
+    "i": 65,
+    "reason": "основното заглавие — от по-надеждния източник (Reuters Business), преводът отпада",
+    "main": 88
+   },
+   {
+    "i": 54,
+    "reason": "също: ехото не съвпада със заглавието",
+    "of": 10,
+    "h": "The Nvidia scandal is heightening America's"
+   },
+   {
+    "i": 129,
+    "reason": "също: ехото не съвпада със заглавието",
+    "of": 10,
+    "h": "Bessent blames Lutnick's Commerce Department for"
+   },
+   {
+    "i": 10,
+    "reason": "основното заглавие — от по-надеждния източник (Reuters Business), преводът отпада",
+    "main": 0
+   },
+   {
+    "i": 17,
+    "reason": "индексът не съвпада със заглавието",
+    "h": "Anthropic's IPO lands as the embattled",
+    "pool_title": "Anthropic’s IPO lands as the embattled AI trade looks for a much-needed bright spot"
+   },
+   {
+    "i": 102,
+    "reason": "основното заглавие — от по-надеждния източник (Reuters Business), преводът отпада",
+    "main": 203
+   }
+  ],
+  "no_echo": 0
+ },
+ "macro_brief": "Нощта беше доминирана от три успоредни натиска: покачващи се доходности, по-силен долар и геополитическа ескалация в Хормузкия пролив. Десетгодишната американска доходност достигна 5.15% — +29.5 б.п. за 5 сесии, а за последната сесия (петък) добави още +5.1 б.п. Паралелно с това DXY напредна с +1.74% за 5 сесии и +0.23% за последната сесия (петък). Комбинацията удари технологиите и чиповете най-силно — QQQ приключи последната сесия с -1.20%, а XLK потъна с -2.01% за деня. Новините около Nvidia добавиха регулаторен слой отгоре: репортажът на WSJ за евентуално обявяване на AI-компании за „национални шампиони\" вървеше ръка за ръка с натиска на Министерството на финансите върху експортните ограничения — пазарът го чете като повишен регулаторен и операционен риск за целия AI-чип сектор. Fed говорителят Collins сигнализира за постепенно повишаване на лихвите, което пазарът чу като „доларът остава скъп по-дълго\" — затова лихвочувствителните сектори останаха под натиск, а MOVE индексът на облигационната волатилност добави +6.49% за 5 сесии.\n\nИзненадващото свиване на японската икономика усложнява плановете на Bank of Japan и притиска йената — директен попътен вятър за долара. В Хормуз три танкера са обхванати от пожар след удар в мини, което вкара геополитически риск-премиум в петрола: WTI стои на 89.09 за декемврийски контракт, +2.58% за 5 сесии, въпреки че за последната сесия (петък) отстъпи -0.20% на фона на новини за очакван излишък в предлагането. Медта падна с -4.91% за 5 сесии и -1.67% за последната сесия (петък) — сигнал, че глобалното търсене не ускорява. Златото отстъпи с -6.14% за 5 сесии при силен долар. Инфлационната картина засега не потвърждава паниката в доходностите: Dallas Fed Trimmed Mean PCE за септември е 2.26% г/г с низходяща посока (средно 2.25% за юли–септември срещу 2.37% за април–юни), но базовият PCE за септември е 3.12% — ускорение спрямо 3.03% в август. Двете мерки сочат в противоположни посоки, което обяснява защо пазарът е нервен: ако по-широката базова инфлация продължи да се покачва, Fed няма пространство за облекчение.\n\nПод повърхността има интересно разминаване: широчината на пазара (67.7% от акциите над 40-дневната средна) е здравословна, RSP биеше SPY с +1.5 п. за 10 сесии — средната акция се държи по-добре от мегакапачките в по-дългия прозорец. VIX е на 19.3 и VIX term structure е в contango (по-далечните фючърси са по-скъпи от краткосрочните — пазарът не очаква рязко сътресение). Put/Call коефициентът е на 7-ми перцентил за собствената си история от 108 дни — ниско самодоволство в смисъл, че хеджовете са малко. Крипто пространството е под натиск: Bitcoin ETF-и са изгубили $2.35 млрд. нетно за две седмици, а COIN, HOOD и CRCL приключиха с -2.3%, -4.3% и -2.5% за последната сесия (петък) съответно. Секторната ротация за 4-те седмици е ясна: XLV, XLF и XLP водят с RS на 6-месечен максимум при XLV и XLF, докато SMH и URA са потвърдени изоставащи с laggard persistence от 85% и 100%. За нас: водещите сектори — Здравеопазване, Финанси, Потребителски (защитни и циклични) — устояха на нощния натиск и запазиха относителна сила; покачващите се доходности и по-силният долар са риск за XLRE и XLU, но ги следим, тъй като и двата показаха краткосрочна RS стабилност.",
+ "inputs": {
+  "macro": {
+   "date": "2026-11-16",
+   "net_liquidity": {
+    "value": 5846.6,
+    "prev": 5869.6,
+    "as_of": "2026-11-11",
+    "change_4w_pct": -0.39,
+    "window_weeks": 4,
+    "dead_zone_pct": 1.0,
+    "raw_color": "yellow",
+    "color": "yellow",
+    "trend": "flat",
+    "components": {
+     "fed_balance_bn": 6758.9,
+     "rrp_bn": 0.2,
+     "tga_bn": 912.1
+    },
+    "history": [
+     {
+      "date": "2026-09-23",
+      "nl_bn": 5799.9,
+      "walcl_bn": 6747.7,
+      "tga_bn": 947.3,
+      "rrp_bn": 0.5
+     },
+     {
+      "date": "2026-09-30",
+      "nl_bn": 5747.4,
+      "walcl_bn": 6743.0,
+      "tga_bn": 984.0,
+      "rrp_bn": 11.5
+     },
+     {
+      "date": "2026-10-07",
+      "nl_bn": 5859.4,
+      "walcl_bn": 6747.6,
+      "tga_bn": 885.8,
+      "rrp_bn": 2.3
+     },
+     {
+      "date": "2026-10-14",
+      "nl_bn": 5869.6,
+      "walcl_bn": 6755.6,
+      "tga_bn": 885.8,
+      "rrp_bn": 0.2
+     },
+     {
+      "date": "2026-10-21",
+      "nl_bn": 5808.2,
+      "walcl_bn": 6753.6,
+      "tga_bn": 945.2,
+      "rrp_bn": 0.2
+     },
+     {
+      "date": "2026-10-28",
+      "nl_bn": 5729.8,
+      "walcl_bn": 6745.6,
+      "tga_bn": 1015.6,
+      "rrp_bn": 0.2
+     },
+     {
+      "date": "2026-11-04",
+      "nl_bn": 5811.7,
+      "walcl_bn": 6748.1,
+      "tga_bn": 936.2,
+      "rrp_bn": 0.2
+     },
+     {
+      "date": "2026-11-11",
+      "nl_bn": 5846.6,
+      "walcl_bn": 6758.9,
+      "tga_bn": 912.1,
+      "rrp_bn": 0.2
+     }
+    ],
+    "informational": true
+   },
+   "spread_2s10s": {
+    "value": 0.27,
+    "prev_week": 0.35,
+    "as_of": "2026-11-13",
+    "change_1w_bp": -8.0,
+    "status": "normal",
+    "direction": "flattening"
+   },
+   "global_signals": {
+    "DXY": {
+     "value": 103.42,
+     "chg_5d_pct": 1.74,
+     "bar_date": "2026-11-16",
+     "chg_1d_pct": 0.23,
+     "chg_1d_date": "2026-11-13"
+    },
+    "VIX": {
+     "value": 19.3,
+     "chg_5d_pct": -24.73,
+     "bar_date": "2026-11-13",
+     "chg_1d_pct": 3.21,
+     "chg_1d_date": "2026-11-13"
+    },
+    "Gold": {
+     "value": 3861.9,
+     "chg_5d_pct": -6.14,
+     "bar_date": "2026-11-16",
+     "chg_1d_pct": 0.03,
+     "chg_1d_date": "2026-11-13",
+     "chg_5d_basis": "continuous",
+     "contract": "GCZ26",
+     "contract_month": "дек. 2026",
+     "contract_source": "shortName",
+     "price_time_utc": "2026-11-16T06:21+00:00"
+    },
+    "Oil_WTI": {
+     "value": 89.09,
+     "chg_5d_pct": 2.58,
+     "bar_date": "2026-11-16",
+     "chg_1d_pct": -0.2,
+     "chg_1d_date": "2026-11-13",
+     "chg_5d_basis": "continuous",
+     "contract": "CLZ26",
+     "contract_month": "дек. 2026",
+     "contract_source": "shortName",
+     "price_time_utc": "2026-11-16T06:21+00:00"
+    },
+    "Copper": {
+     "value": 6.02,
+     "chg_5d_pct": -4.91,
+     "bar_date": "2026-11-16",
+     "chg_1d_pct": -1.67,
+     "chg_1d_date": "2026-11-13",
+     "chg_5d_basis": "continuous",
+     "contract": "HGZ26",
+     "contract_month": "дек. 2026",
+     "contract_source": "shortName",
+     "price_time_utc": "2026-11-16T06:21+00:00"
+    },
+    "US10Y": {
+     "value": 5.15,
+     "chg_5d_bp": 29.5,
+     "chg_1d_bp": 5.1,
+     "chg_1d_date": "2026-11-13"
+    },
+    "MOVE": {
+     "value": 98.79,
+     "chg_5d_pct": 6.49,
+     "bar_date": "2026-11-13",
+     "chg_1d_pct": 0.37,
+     "chg_1d_date": "2026-11-13"
+    }
+   },
+   "core_inflation": {
+    "value": 2.26,
+    "date": "2026-09-01",
+    "month": "септември",
+    "age_days": 47,
+    "avg_recent": 2.25,
+    "avg_prior": 2.37,
+    "change_pp": -0.12,
+    "recent_span": "юли–септември",
+    "prior_span": "април–юни",
+    "direction": "down",
+    "flat_threshold_pp": 0.1
+   },
+   "pce_core": {
+    "value": 3.12,
+    "date": "2026-09-01",
+    "month": "септември",
+    "year": 2026,
+    "age_days": 47,
+    "prev_value": 3.03,
+    "prev_month": "август",
+    "direction": "up",
+    "series": "PCEPILFE"
+   },
+   "funding_stress": {
+    "value": 0.0,
+    "as_of": "2026-11-12",
+    "sofr": 3.9,
+    "iorb": 3.9,
+    "percentile": 82.1,
+    "zscore": 0.42,
+    "chg_1w_bp": -2.0,
+    "n_history": 2150,
+    "history_from": "2018-04-03",
+    "status": "yellow",
+    "hide": false,
+    "streak": {
+     "dir": "up",
+     "n": 2
+    }
+   },
+   "credit_oas": {
+    "hy": {
+     "value": 3.2,
+     "as_of": "2026-11-12",
+     "chg_bp": -5,
+     "percentile": 72.3,
+     "chg_pct": 49.6,
+     "n_history": 784,
+     "history_from": "2023-11-14",
+     "hide": false,
+     "series": "BAMLH0A0HYM2"
+    },
+    "ig": {
+     "value": 0.89,
+     "as_of": "2026-11-12",
+     "chg_bp": 5,
+     "percentile": 62.6,
+     "chg_pct": 84.4,
+     "n_history": 783,
+     "history_from": "2023-11-14",
+     "hide": false,
+     "series": "BAMLC0A0CM"
+    }
+   }
+  },
+  "thermometer": {
+   "indicators": [
+    {
+     "name": "SPY тренд",
+     "value": 754.37,
+     "as_of": "2026-11-13",
+     "pct_from_high": 3.17,
+     "ma50": 764.09,
+     "ma200": 729.32,
+     "above_50dma": false,
+     "above_200dma": true,
+     "status": "yellow",
+     "label": "SPY 754 | под 50DMA, над 200DMA"
+    },
+    {
+     "name": "VIX",
+     "value": 19.3,
+     "chg_5d": -6.34,
+     "pct_5d": -24.7,
+     "spike": false,
+     "status": "green",
+     "label": "VIX 19.3 (risk-on)"
+    },
+    {
+     "name": "Put/Call (SPY)",
+     "value": 0.89,
+     "percentile": 7.4,
+     "history_days": 108,
+     "status": "red",
+     "label": "P/C 0.89 (7. percentile от 108 дни; самодоволство — ниско за собствената история)"
+    },
+    {
+     "name": "2Y/10Y спред",
+     "value": 0.27,
+     "status": "green",
+     "label": "0.27% (нормален, flattening)",
+     "as_of": "2026-11-13"
+    },
+    {
+     "name": "Fed Net Liquidity",
+     "value": 5846.6,
+     "status": "yellow",
+     "informational": true,
+     "change_4w_pct": -0.39,
+     "as_of": "2026-11-11",
+     "label": "$5,847 млрд към 2026-11-11 · -0.4% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+    },
+    {
+     "name": "SOFR − IORB (финансиране)",
+     "value": 0.0,
+     "status": "yellow",
+     "informational": true,
+     "percentile": 82.1,
+     "zscore": 0.42,
+     "streak": {
+      "dir": "up",
+      "n": 2
+     },
+     "as_of": "2026-11-12",
+     "label": "+0.0 б.п. към 12.11 (SOFR 3.90% − IORB 3.90%) · -2.0 б.п. за седмица · расте 2-ри пореден отчет · 82. percentile, z +0.4 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима"
+    },
+    {
+     "name": "RSP спрямо SPY (широчина)",
+     "value": -0.2,
+     "status": "yellow",
+     "informational": true,
+     "as_of": "2026-11-13",
+     "diff_5": -0.2,
+     "diff_10": 1.5,
+     "rsp_5": 2.37,
+     "spy_5": 2.59,
+     "rsp_10": 1.31,
+     "spy_10": -0.18,
+     "label": "5 сесии: RSP +2.4% срещу SPY +2.6% (-0.2 п.) · 10 сесии: +1.5 п. — за 5 сесии гигантите дърпат индекса, за 10 — средната акция бие гигантите · само информативен, не влиза в режима"
+    },
+    {
+     "name": "MOVE (Bond Vol)",
+     "value": 98.8,
+     "as_of": "2026-11-13",
+     "delta_1w": 6.0,
+     "spike": false,
+     "status": "green",
+     "label": "MOVE 99 (+6 пункта/седмица)"
+    },
+    {
+     "name": "VIX Term Structure",
+     "value": 0.864,
+     "status": "green",
+     "label": "VIX9D 17.8 / VIX 19.3 / VIX3M 20.6 → ratio 0.86 (contango, нормално)"
+    },
+    {
+     "name": "IEI/HYG (Credit Spread)",
+     "value": 1.4791,
+     "as_of": "2026-11-13",
+     "level_percentile": 15.3,
+     "roc_10d_pct": -0.89,
+     "roc_percentile": 8.1,
+     "spike": false,
+     "status": "green",
+     "roc_10d_pct_prev": 0.12,
+     "roc_trend": "falling",
+     "roc_trend_text": "10-дневната RoC е -0.89% срещу +0.12% преди 5 сесии — спада (забавя се)",
+     "iei_10d_pct": -1.0,
+     "hyg_10d_pct": -0.12,
+     "label": "IEI/HYG 1.479 (15. percentile) · 10д RoC -0.9% (IEI -1.0%, HYG -0.1%) (8. percentile)"
+    },
+    {
+     "name": "HY / IG OAS (кредитни спредове)",
+     "value": 3.2,
+     "status": "yellow",
+     "informational": true,
+     "as_of": "2026-11-12",
+     "hy": {
+      "value": 3.2,
+      "as_of": "2026-11-12",
+      "chg_bp": -5,
+      "percentile": 72.3,
+      "chg_pct": 49.6,
+      "n_history": 784,
+      "history_from": "2023-11-14",
+      "hide": false,
+      "series": "BAMLH0A0HYM2"
+     },
+     "ig": {
+      "value": 0.89,
+      "as_of": "2026-11-12",
+      "chg_bp": 5,
+      "percentile": 62.6,
+      "chg_pct": 84.4,
+      "n_history": 783,
+      "history_from": "2023-11-14",
+      "hide": false,
+      "series": "BAMLC0A0CM"
+     },
+     "level": "moderate",
+     "verdict": "OAS се разширява умерено (HY 50., IG 84. percentile на промяната), IEI/HYG още не",
+     "label": "HY 3.20% (-5 б.п. за 20 дни — 50. percentile на промяната; нивото — 72. percentile) · IG 0.89% (+5 б.п. за 20 дни — 84. percentile на промяната; нивото — 63. percentile) · към 12.11, перцентил спрямо историята от 14.11.2023 (FRED дава ~3 г.) · OAS се разширява умерено (HY 50., IG 84. percentile на промяната), IEI/HYG още не · само информативен, не влиза в режима"
+    },
+    {
+     "name": "Market Breadth (% над 40dMA)",
+     "value": 67.7,
+     "universe_size": 916,
+     "status": "green",
+     "universe_total": 918,
+     "missing_n": 2,
+     "batches": 19,
+     "batches_failed": 0,
+     "label": "67.7% над 40dMA (здравословна ширина)",
+     "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+    }
+   ],
+   "regime": "Defensive",
+   "regime_reason": "6 зелени / 1 жълт / 1 червен от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни) — недостатъчно потвърждение за Offensive",
+   "sizing_factor": 0.5,
+   "counts": "6 зелени / 1 жълт / 1 червен от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)",
+   "overrides": [],
+   "regime_by_count": "Defensive",
+   "exit_rule": "Режимът е по броенето (6 зелени / 1 жълт / 1 червен от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)). Няма активен автоматичен override.",
+   "hysteresis_released": [],
+   "regime_margin": {
+    "text": "Запас до смяна на режима: по броенето до Offensive: 0 червени (сега 1: Put/Call (SPY)); до Cash: още 2 червени · distribution days SPY 7/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9 · IEI/HYG 10д RoC 8. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.89% срещу +0.12% преди 5 сесии — спада (забавя се)",
+    "parts": [
+     "по броенето до Offensive: 0 червени (сега 1: Put/Call (SPY)); до Cash: още 2 червени",
+     "distribution days SPY 7/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9",
+     "IEI/HYG 10д RoC 8. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.89% срещу +0.12% преди 5 сесии — спада (забавя се)"
+    ]
+   },
+   "regime_change": null
+  },
+  "news": [
+   {
+    "headline": "Iran's navy says three tankers on fire after hitting mines in Hormuz - Reuters",
+    "source": "Reuters Business",
+    "why": "Атаки по танкери в Хормуз директно заплашват петролния транзит — петролът, корабоплавателните компании и отбранителният сектор реагират нагоре; рискът-премиум в суровините се покачва.",
+    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPZWt1cHFualJEVktnTTVvd21uVnljc0FqR2dRaWpaRnYwZ3luZ2t1dUlJNVUtLTVlWHJFOS1ocDBlaVZsTFNZdjRMeldFVFE1Q0Jqem9FbU9fMmp1YTBUTUhqTmYzR3FJN1Z1Y1dHY2d0Yjlzb2lBR0JvNllyT3pScjI2SEpkbkhiYzZSWW9Tb3dwemdWaVVmMjBPbXZqd0hOZzdpRDVSZlVlbzBnV1BjMQ?oc=5",
+    "also": [
+     {
+      "source": "Reuters Business",
+      "headline": "Bahrain intercepts Iranian aerial attacks as Tehran says it attacked US base - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNS2FyaWZZTTd4ZWFoWFdoTnFNVmpjakdwQUVnZ0UtMEY5MFc1dEFBeGd4UmczdGh1ektRTHBjRGxBOVlVQy1XV3NOdV9MbWotQkNVa1NBdmJaUloya1VhR2FEUTN3QkgwZ1JRN00wME5tc243TmZHU20zdlpaUHR2Q2lyby0tUkJsR0w5N1lXclI4ZWI5RTdfbjB2d1hxMXVjOVp4MlJPOF9IcjIxSE1JWWx3?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "Saudi-led coalition intercepts missiles towards Riyadh, drones in Eastern Province - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOemlqVE1TdmREQ0t3TjczWnBWVGZ3TkxTc0ZPVC1fZFlrUDJCZC1KV0liZGdUTHBXZEZpWG9SNkJJSlBYSjVPbE1aUnNtWHl2eE1FbzlURGRwckdIT3R2NG9rVm1oX1V0VEZoWmYxM1dSbmhNc1BidnFLX19YRVU3Q2tzR1F5Vk1QX3dDNXVCeXZ6bmVES0lZNTBlR3E0Z1hJcXFyYXpMam80TGRWbURod1NsUXBwZldjdHFVejFwaWtmVmo3ZWYzYW5QMzk?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "Yemen's Houthis say they launched ballistic missiles towards Riyadh airport, financial centre - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOZ2NSdXVjeDlTU0lLeTAtMGs5RmdHaW0wTVhVbzUwempOYUdlNVB3NXprMGZqYksyVjhLUU1OV250QlczemJOT2tXcVFIZEJYb0dwblVCblExbnFmZkVyeGZnZ0NJY3Z3a3NTcmxUQ21tR0ZsQVdhTTNRNWJaZW5pOEk4RDNEMXN3aExOaEE0QVNzaXV3UTM3ZjlNa2hDenRtajR2aGVGT3RQR0NOSnY1VHQ3czdCSkJWSUgxaFFYNThEUlBBMVpn?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOdTFBcWR1YzJhai1UdGgzMHpvdm40VExxeXFqM0NtbU9YVmNSNXpNeDlXTGllRXFtczhIUzVsaFFWdVV5TGxESWdneGlXbER1Qlg2b2VhQ2lqMmxVaEd4U01nZmNXcFY2bmNhSTdIN0VycE84MWJDRXdZOGxMRGo0U1k1UjhiamFNQ1JIQmp1MUdxNlZGRm1UanBvaENxR3V2N25NdFVOaWpXX1E?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "Trump tells advisers he may hold off on Iran attacks barring new provocations, sources say - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPR2NiU2RGMHprbUFIMnNuTGJheHdpTzhuZFRCSWVGcl9HZF9raUd2VXQxNHE1WldRVzNaZWx6YnlRZFpueGZlb05DMElhZ3FEOVdLakpQWkNLaGktQWh6THRxT3V0aGVPaXI0dW9LVm9DeTJRekF1enJaamZ5bEd2SFZtSVNtTFd5VEp0WFl6U2VWX3BCRkYzbnB1c25QRnU2M3FBbDJBMHRTVWU5T0hyZG5sWFRPWUFIYVhuT1BMWTBkUVdNbDlF?oc=5"
+     },
+     {
+      "source": "CNBC",
+      "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain in attack on U.S. base",
+      "link": "https://www.cnbc.com/2026/11/15/bahrain-iran-drone-attacks-tehran-us-base.html"
+     }
+    ]
+   },
+   {
+    "headline": "Japan's economy unexpectedly shrinks as inflation squeezes households - Reuters",
+    "source": "Reuters Business",
+    "why": "Неочакваното свиване на японския GDP усложнява плановете на Bank of Japan за повишение на лихвите и притиска йената и японските акции, докато доларът печели.",
+    "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeXFYOEg3cHpDTUFrTU9IRlQyWDlvRGVMVVN3VmxOelY3WnhCREJNdElKcEY5ZWpBSmhoalMzWDdaM0Y5Z0VXbkxVemg3YmdhSUg5UmYybnhFOHhWbVhXdjdoT1BUUGNQUFVtX2o1SkJRSnBJNEdLX081amJyUll6WHFpUk5SaWlkd2JGN0VnRFZKYi1WT1B0NzFUOUVKdkFfcTQ5RmdFeHdvcWI5c2pRaXF6MFBydw?oc=5",
+    "also": [
+     {
+      "source": "Reuters Business",
+      "headline": "Dollar extends gains, yen looks past soft Japan GDP data - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPZkdhelNXT1laWnBWei1ZTGMybnc1U1FxOUtGdjdoaGxDX29kd0pvc3FoLVhYdVh4SkdQdGN1cFU1UjVmb0lGWlJsdTlJOHppUjh0eGVrTFJBajZxUV9CVWFrN0F5S0RqVVpMWlR4ZW05R0duTFdvZjJNbGNhcEl2V002d0xWejFMRmR2ZjRDanBqZndnZndWOF96b3NxdVdaWnp4LWdzQ1RhdEdXdkhfcUJaSQ?oc=5"
+     },
+     {
+      "source": "CNBC",
+      "headline": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite",
+      "link": "https://www.cnbc.com/2026/11/16/japan-q3-gdp-energy-oil-prices.html"
+     }
+    ]
+   },
+   {
+    "headline": "Fed's Collins says gradual rate hikes best to manage economic risks - Reuters",
+    "source": "Reuters Business",
+    "why": "Сигналът за постепенно повишаване на лихвите от Fed подкрепя по-силен долар и натиска облигациите и лихвочувствителните сектори надолу.",
+    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPbHZfX3JqempNenlnSUpVcTd4dXY4djdJU1c2VkZ2Um5fYXkyVTMtYUxBZlBrcXVqQXJkQ0RjejZRQTdBLWxPYzcyRDBfTGxmdUVTekN0TFFWdHNfZFh6ckt0c1RCTVBwZzZjZ3NacWJWSDhvMVRGVDNpR0o2YTBwdmJILTE4eWs2SlQ5YnVHN0ctMFM3bWJsQkhtblRUMjI0amRHcFZLaXNaWWJz?oc=5",
+    "also": [
+     {
+      "source": "CNBC",
+      "headline": "Fed 'has some work to do on inflation,' Kansas City Fed chief says",
+      "link": "https://www.cnbc.com/2026/11/15/fed-has-some-work-to-do-on-inflation-kansas-city-fed-chief-says.html"
+     }
+    ]
+   },
+   {
+    "headline": "Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters",
+    "source": "Reuters Business",
+    "why": "Натискът на Министерството на финансите върху Nvidia за спазване на експортните ограничения към Китай и изискването за външен CEO увеличава регулаторния и операционен риск за акцията и за целия AI-чип сектор.",
+    "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPbzFERGNkd2ZLODdReVZtV3pnNVdJT3RyNDdpbUZQRXZHUEgzbVYtZTBwelhfV1hRbVVfOGsxeDJURWd2bEJubFlFUjFXZC1HM2Z4U3l2TXVhTXR3OTFPZ2xUaDhOVlBDWF93dDE0V2lsOEI3bGFGWXlmbnVldjNCQkJKQlFNbDVfaWR6cGpJdktZWlJXcEdNQkZnWWsxSlZGX19tQTIxYW5NVWQxb2NQclEza1JHaHBma3lmaFNzQWRtQld0UkRwT01IZEY0eUk?oc=5",
+    "also": [
+     {
+      "source": "Reuters Business",
+      "headline": "EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOcGIzcVZhWDU2cVlTWlhGZFZUMGlCcldoTU4wc2Z2UUpqUzJiNWp3Sy1kTVFQTnRKbHVnY2cwWHh0WEx3YkV5ZVMxOUFnMmVIc0kzaHdHc0NEVm9NS3hsVTdfTHR1ZWR4OTc2NUNpXzUteWZvblRYcEFVRDBIVTQyanVZTGdDYVFTaDJLTWFYdWNmSzBtU09Dd1RZVkhLUjB0WkR2Rm0tVTZnXzctWTREMXF3QjhZNTUxMHhDWjJZMHc?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPc1EtU18tWjZNZTZtOFBZNzdqZkRFMk1nbm9MTm9VWUQwUHlLc1dTdDNLWmNCcllESHVVYjFnXzlKcFJrSWpHUkY2S1lhcTFtWWdPVG9WdkcyTkFSaEpLanVzeWctM1hCTkdxUEJ6VnBrLXFYVnBsalpKUkJVUGQyUE5DOEJtaTctZlFEaV9VR1loQ1JrVlhyRmRxR25UMkI2MVgtZnBFU1pVaXhBcmw0ZV9jb0RPYlduY1ppbnpCTlc?oc=5"
+     },
+     {
+      "source": "Reuters Business",
+      "headline": "Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNVGladEJOQmtqRldzTHdlQ25Fb3pCREJuYmthQTgzclB5Snl6WWFmaXdtWU1KU1NqVGhTZzIyakttSVpxR0p3MVlGU1pBcjhjRjVkVl9wNGU5OS1kOUJkeXRobzlOSjlMUkVPTWkxbmdib3Bna3ZoRVRoM1RybkQ2NE92ZWZTMjBuNF80a1lhVENxQUhTU2hkY0QzaTU0NGc?oc=5"
+     },
+     {
+      "source": "Financial Times",
+      "headline": "Bessent says Nvidia needs ‘shake-up’ with external CEO",
+      "link": "https://www.ft.com/content/24edbb84-7520-4ef0-a57c-30359e12ccc5?syn-25a6b1a6=1"
+     },
+     {
+      "source": "CNBC",
+      "headline": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
+      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html"
+     }
+    ]
+   },
+   {
+    "headline": "Oil prices fall on expectations of coming supply surplus - Reuters",
+    "source": "Reuters Business",
+    "why": "Очакванията за излишък в предлагането натискат петрола и свързаните енергийни акции надолу, докато дизелът е на двумесечно дъно.",
+    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNSXlabl9ocWtiOEZLcnc2SGNVSEh2bjltWURkWU1RSDVTejZWMEtNYTR4QW9sT19DQy05SVhHVmphTEtIQXdtVzlUS25Vdk1oS0hjdWZ0MHpUb01NQUp4dzlBcE55anIwR0hKVmhCUDRsT3V3ek9jTURVYkcySDNBM1B0RmJ3emdUaHpPVWpENENfZ2JGRHB3MlJuekVfUWlFa2lfUQ?oc=5",
+    "also": [
+     {
+      "source": "Reuters Business",
+      "headline": "US diesel below $6 a gallon at 2-month low on easing tensions, weaker demand - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOMnBfd2gzZE5aV1hCWkdBazd0LXN5d3RJaGF3VUQ0OWlMaWYwWWxNT2JQNUdRdm9TVklIejYwemNoM3dCM3F2MTVpc0tnX2RiSHRnbXFKRWU3X3hVUEdGV0hpVWV1Tk9aZG54aEMyQ0JUbVFIdnl0YThfOWxnU1JJazZqNEZYV0M1ZTdwSkM4UUV3b0FSckNhc05fRGpERmc3WEVEbWxIYnVkd29RQlBzRUhWbUQ0dkFHQ1E?oc=5"
+     }
+    ]
+   },
+   {
+    "headline": "Trump to raise nuclear-arms cuts with Putin, Xi on Thursday, White House says - Reuters",
+    "source": "Reuters Business",
+    "why": "Историческата тристранна среща на върха на APEC може да повлияе на търговската политика, санкциите и геополитическия риск-премиум в глобалните активи.",
+    "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPX1dzUndCOE42aUFUazd4SFcxMFVWUTl6VmRVOE5QR0ZjNWRXY19qWTVuRUthUXhDS3UybmZnQmFHSHVRV20wdXJwTUlKUTlGVU42N1B4bkVwSjI4bkdJeG94aFpxX01NUTdyWUJOUVZHSHlXZkxGZXlsTWhjSmUwRXoyRklMekIycXlEUk1pM1NpNjJp?oc=5",
+    "also": [
+     {
+      "source": "Reuters Business",
+      "headline": "Trump to hold summit with Xi, Putin in Shenzhen on Thursday, NY Post reports - Reuters",
+      "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQaHhKNS1YbHpLcldfQTByOFM5TzNFOC16QmlWZHRva3lhTkxSVldFaWVkZ2ZWdDFzODFGZk02MU56X0hkWWtDZzJUa3JOSkd4YUFVVEVNZmN0ZXZWN1QtR01SV1N4UW84SzJxTFJEcnFSdndlYnhHWlFDVGtibWVRTkF0aU1WejNKOVdHVVRGWkt3WlBGbDRFVXptYTBoVjhFUDlKV0lpU0JDSEJ5RWdneHZYMA?oc=5"
+     },
+     {
+      "source": "AP Business",
+      "headline": "Trump, Xi and Putin plan unprecedented joint meeting on APEC sidelines, White House and Kremlin say - AP News",
+      "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOOUd4MWZqTjdxYkRUaW55bWxuNy1BX1FaZVNYZHRtNEg4NWdzTENNMlVLOUt6QlptMzd1cUtLanJ0U1pPNVVrbjZDRXo0UWszZjV6d09hRy1GaUFFWE9PUmtzRnFxOUxJdW1OTy0zT21LbnU3RGlhQUUtNHlnRW9nUjhJRmQ0QUFDME9oelNZTVQ?oc=5"
+     },
+     {
+      "source": "Financial Times",
+      "headline": "US and allies sign accord to protect AI supply chains from China",
+      "link": "https://www.ft.com/content/3c2197fc-9618-4838-91e6-522ce1a96a22?syn-25a6b1a6=1"
+     },
+     {
+      "source": "CNBC",
+      "headline": "China confirms Xi-Trump-Putin historic summit. What will be on the agenda?",
+      "link": "https://www.cnbc.com/2026/11/16/trump-xi-putin-ukraine-nuclear-tariffs-russia-iran-.html"
+     }
+    ]
+   }
+  ],
+  "crypto": {
+   "ok": true,
+   "items": [
+    {
+     "headline": "US regulators move ahead on crypto trust charters as Senate scrutiny grows",
+     "source": "Cointelegraph",
+     "link": "https://cointelegraph.com/news/us-regulators-crypto-trust-charters-senate-scrutiny-grows?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+     "why": "Финалното одобрение на тръстовата харта на Coinbase и засиленият парламентарен надзор над крипто компаниите пряко засягат регулаторната рамка, в която институционалните инвеститори оперират."
+    },
+    {
+     "headline": "UK, Singapore, and Thailand central banks test cross-border FX settlement as stablecoins gain ground",
+     "source": "CoinDesk",
+     "link": "https://www.coindesk.com/policy/2026/11/14/uk-singapore-and-thailand-central-banks-test-cross-border-fx-settlement-as-stablecoins-gain-ground",
+     "why": "Тестването на трансгранично FX сетълмент от централни банки на фона на нарастващото значение на стейбълкойните сигнализира за реална институционална инфраструктура, която може да промени пазарната динамика."
+    },
+    {
+     "headline": "Bitcoin ETFs shed $2.35B in 2 weeks, BlackRock’s losing streak hits 11",
+     "source": "Cointelegraph",
+     "link": "https://cointelegraph.com/markets/bitcoin-etf-outflows-2-35-billion-blackrock-11-session-streak?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+     "why": "Значителните нетни отливи от спот Bitcoin ETF-и за две седмици, включително от BlackRock и Fidelity, са директен сигнал за институционалното настроение към крипто."
+    },
+    {
+     "headline": "DOJ moves to seize $1.2B from Binance hack, disrupts FaceStealer scam",
+     "source": "Cointelegraph",
+     "link": "https://cointelegraph.com/news/doj-12b-north-korean-crypto-seizure-400m-facestealer-scheme?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+     "why": "Правителствено изземване на над $1.2 млрд. от хак на Binance и едновременното разбиване на голяма измамна схема показва засилено регулаторно правоприлагане, което влияе на оценката на риска от институционалните инвеститори."
+    },
+    {
+     "headline": "U.S. Senate Banking Committee races toward hearing on new SEC nominations",
+     "source": "CoinDesk",
+     "link": "https://www.coindesk.com/policy/2026/11/13/u-s-senate-banking-committee-races-toward-hearing-on-new-sec-nominations",
+     "why": "Ускоряването на изслушванията за нови номинации в SEC пряко засяга бъдещата регулаторна политика спрямо крипто индустрията."
+    }
+   ],
+   "pool": 49,
+   "pool_items": [
+    {
+     "i": 0,
+     "title": "Here’s what happened in crypto today",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 1,
+     "title": "Cardano holders vote down $5 million bid to buy warehouse copper",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 2,
+     "title": "Aster CEO suspects foul play after token plunges 32% in minutes",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 3,
+     "title": "Trump administration to name Nvidia, OpenAI and several others as AI national champions",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 4,
+     "title": "Asian chip stocks tumble ahead of Nvidia Q3 earnings",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 5,
+     "title": "Bitcoin’s biggest bet is now a drop below $60,000, not a rally above $100,000",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 6,
+     "title": "Luxor CEO warns of AI ‘dark forest’ following Bitcoin miner hijack",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 7,
+     "title": "Did prediction markets call the U.S. midterm election?: State of Crypto",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 8,
+     "title": "Jensen Huang weighs Nvidia comeback days after shock exit: FT",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 9,
+     "title": "Crypto insiders aren't counting on silver linings in Congress' 'lame duck' session",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 10,
+     "title": "US sellers drive Bitcoin crash, Jensen plots Nvidia comeback: Hodler’s Digest",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 11,
+     "title": "XRP crashes to its lowest since November 2024 as money leaves crypto",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 12,
+     "title": "Enterprise blockchain is going to come back from the dead",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 13,
+     "title": "Bitcoin crashes to 3-month low below $63,000 as analyst flags fourth capitulation wave",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 14,
+     "title": "Bitcoin falls to 4-month low near $62K as crypto selloff deepens",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 15,
+     "title": "Ethereum scaling project MegaETH slashes staff by 20% as it pursues AI business",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 16,
+     "title": "Coinone warns of phishing, identity theft after customer data breach",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 17,
+     "title": "Kazakhstan plans tokenized government bonds in first quarter after $22 million note sale",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 18,
+     "title": "RWA protocol stUSDT winds down 3 years after $2.3B TVL peak",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 19,
+     "title": "UK, Singapore, and Thailand central banks test cross-border FX settlement as stablecoins gain ground",
+     "status": "избрана"
+    },
+    {
+     "i": 20,
+     "title": "Microsoft confirms global outage resolved, rules out cyberattack",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 21,
+     "title": "Britain could turn wasted Scottish wind power into bitcoin to cut its $1.3 billion grid bill",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 22,
+     "title": "MegaETH parent cuts 20% of staff amid restructuring, AI push",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 23,
+     "title": "A behind the scenes force may amplify bitcoin and ether price volatility",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 24,
+     "title": "Bitcoin ETFs shed $2.35B in 2 weeks, BlackRock’s losing streak hits 11",
+     "status": "избрана"
+    },
+    {
+     "i": 25,
+     "title": "Satoshi-era wallet served in a $260 billion lawsuit moves 75 BTC it held since 2011",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 26,
+     "title": "OpenAI launches AI payments in ChatGPT with Visa, Mastercard and Amex",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 27,
+     "title": "Bitcoin miners pay Paraguay $350 million a year, but AI is pushing them out",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 28,
+     "title": "Adam Back makes case for simpler security as Blockstream launches Bitcoin custody system",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 29,
+     "title": "Bitcoin plunges to $68,000 as Anthropic IPO frenzy adds to market jitters",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 30,
+     "title": "Kraken parent Payward gains market share as slower trading weighs on earnings",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 31,
+     "title": "U.S. Senate Banking Committee races toward hearing on new SEC nominations",
+     "status": "избрана"
+    },
+    {
+     "i": 32,
+     "title": "US regulators move ahead on crypto trust charters as Senate scrutiny grows",
+     "status": "избрана"
+    },
+    {
+     "i": 33,
+     "title": "Bitcoin heads for sixth weekly loss as Anthropic’s blockbuster IPO looms",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 34,
+     "title": "Metaplanet swings to $170M loss as Bitcoin sale hits earnings",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 35,
+     "title": "Kraken parent Payward says expansion outside crypto trading helps cushion revenue decline",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 36,
+     "title": "Bitcoin holds below $70K as stocks slip despite a cooler US PPI print",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 37,
+     "title": "Bitcoin's momentum gauge is turning red, could send prices back below $60,000",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 38,
+     "title": "Arthur Hayes ‘flattered’ as Coinbase backs US stock perps",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 39,
+     "title": "Bitcoin hits 12-week low as dollar rallies on interest-rate outlook, liquidations top $1.6 billion",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 40,
+     "title": "Nakamoto shares fall 6% premarket after Q3 revenue turns negative",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 41,
+     "title": "Live updates: Bitcoin eyes bear market lows as late summer rally mostly wiped out",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 42,
+     "title": "Israeli police arrest five in $5M WhatsApp crypto trading probe",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 43,
+     "title": "Ethereum treasury firm BTCS sold ether at a loss to keep $64 million Aave loan healthy",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 44,
+     "title": "Unocoin keeps deposits and withdrawals halted over suspect transfers",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 45,
+     "title": "Bitcoin returns to 200-week trend line as analyst sees risk of $57.7K next",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 46,
+     "title": "DOJ moves to seize $1.2B from Binance hack, disrupts FaceStealer scam",
+     "status": "избрана"
+    },
+    {
+     "i": 47,
+     "title": "Jane Street boosts Fidelity Bitcoin ETF holdings nearly 8x, trims IBIT",
+     "status": "не е избрана от AI"
+    },
+    {
+     "i": 48,
+     "title": "Microsoft 365 outage hits Outlook email and Teams calendars worldwide",
+     "status": "не е избрана от AI"
+    }
+   ],
+   "pool_sources": {
+    "Cointelegraph": {
+     "count": 27,
+     "oldest": "2026-11-13T08:26Z"
+    },
+    "CoinDesk": {
+     "count": 22,
+     "oldest": "2026-11-13T07:05Z"
+    }
+   },
+   "reason": null,
+   "tickers": [
+    {
+     "ticker": "COIN",
+     "date": "2026-11-13",
+     "close": 127.65,
+     "chg_1d_pct": -2.3,
+     "chg_5d_pct": -5.3
+    },
+    {
+     "ticker": "HOOD",
+     "date": "2026-11-13",
+     "close": 77.86,
+     "chg_1d_pct": -4.3,
+     "chg_5d_pct": -3.8
+    },
+    {
+     "ticker": "CRCL",
+     "date": "2026-11-13",
+     "close": 62.2,
+     "chg_1d_pct": -2.5,
+     "chg_5d_pct": -8.4
+    },
+    {
+     "ticker": "BLSH",
+     "date": "2026-11-13",
+     "close": 22.49,
+     "chg_1d_pct": -2.9,
+     "chg_5d_pct": 5.5
+    }
+   ],
+   "cot_btc": null
+  }
+ }
+}

@@ -919,7 +919,45 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
                     print(f"[ai] разказ: „{f['term']}“ — {f['why']}; махнато: «{f['sentence'][:120]}»")
     except Exception as e:
         print(f"[ai] проверката на думите в разказа пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 16.11.2026 (пакет 16.11, т. 1): твърдение (институция, държава, мярка) без опора във входа
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            from src import claim_check
+            new, cf = claim_check.check(out["macro_brief"], narrative_text(macro, rotation, thermometer, news, crypto, social, day=day))
+            if cf:
+                out = {**out, "macro_brief": new, "claims_fixed": cf}
+                for f in cf:
+                    print(f"[ai] разказ: твърдение без опора във входа ({', '.join(f['claims'])}) — махнато: «{f['sentence'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на твърденията в разказа пропусната: {type(e).__name__}: {e}")
     return out
+
+
+def narrative_text(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
+                   social: dict | None = None, day: dict | None = None) -> str:
+    """
+    16.11.2026 (т. 1): ТЕКСТЪТ на входовете на разказа — опората за claim_check: стойностите от данните, новините (заглавие, „защо“, „също“), крипто. Без инструкциите на промпта.
+    Чиста функция.
+    """
+    parts: list[str] = []
+
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, (list, tuple)):
+            for v in o:
+                walk(v)
+        elif isinstance(o, str):
+            parts.append(o)
+    for x in (macro or {}, rotation or [], _thermo_context(thermometer), social or {}, day or {}):
+        walk(x)
+    for n in news or []:
+        if isinstance(n, dict):
+            parts += [str(n.get(k) or "") for k in ("headline", "headline_bg", "why", "summary")] + [str(a.get("headline") or "") for a in n.get("also") or [] if isinstance(a, dict)]
+    for x in (crypto or {}).get("items") or []:
+        if isinstance(x, dict):
+            parts += [str(x.get(k) or "") for k in ("headline", "why")]
+    return " ".join(parts)
 
 
 # ──────────────────────────────────────────────────────────────────────────

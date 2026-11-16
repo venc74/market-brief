@@ -414,9 +414,9 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
     заглавието и източника от пула (до 15.10 моделът пишеше заглавието сам и го превеждаше наполовина: "Dollar languishes като…", "Iran deploy нови тактики",
     "awards $2 в damages" на 14.10; 88 от 688 заглавия в историята са смесени). Ред без валиден индекс, повторен индекс или празно "why" отпада (в причините).
     Превод с число, което го няма в оригинала, или без мащаба му се маха (_translation_ok). Чиста функция → (новини, отпаднали).
-    29.10.2026: една история — една новина. "also" (_also_group) слива заглавията за същото събитие в един ред: основното е от най-надеждния източник в групата
-    (config.NEWS_SOURCE_PRIORITY; ако не е "i" на модела, преводът отпада — той е на другото заглавие), "why" е за събитието (числата се сверяват с всички заглавия в групата),
-    останалите са в row["also"] = [{source, headline, link}] — „също: FT, Reuters“. Заглавие, вече влязло в група, не може да е отделна новина ("повторен индекс").
+    29.10.2026: една история — една новина. "also" (_also_group) слива заглавията за същото събитие в един ред; "why" е за събитието (числата и от 16.11 твърденията
+    — claim_check — се сверяват с всички заглавия и резюмета в групата), останалите са в row["also"] = [{source, headline, link}] по надеждност на източника — „също: FT, Reuters“.
+    16.11.2026: основното е винаги "i" на модела (до 16.11 — най-надеждният източник в групата). Заглавие, вече влязло в група, не може да е отделна новина ("повторен индекс").
     """
     out, seen, dropped = [], set(), []
     for n in items or []:
@@ -446,21 +446,23 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         seen.add(i)
         group = _also_group(n.get("also"), i, pool, seen, dropped)          # 29.10.2026: една история — една новина (заглавията за същото събитие)
         seen.update(group)
-        main = min(group, key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))
-        if main != i:
-            # 11.11.2026 (т. 5, Anthropic): числата в „защо“ са от заглавието на модела (i), а по-надеждното ги няма → основното остава i. До 11.11 проверката
-            # гледаше цялата група и „$1.5 трлн“ (FT) стоеше под заглавието на AP „about $1.3 trillion“. Измерено: най-много 5 от 48 групирани реда (13.10–11.11).
-            txt = lambda k: f"{pool[k]['title']} {pool[k].get('summary') or ''}"
-            if _why_numbers(why, txt(main))[1] and not _why_numbers(why, txt(i))[1]:
-                dropped.append({"i": i, "reason": f"основното заглавие остава това на модела — числата в „защо“ са от него, не от {pool[main].get('source')}", "priority": main})
-                main = i
-            else:
-                dropped.append({"i": i, "reason": f"основното заглавие — от по-надеждния източник ({pool[main].get('source')}), преводът отпада", "main": main})
+        # 16.11.2026 (пакет 16.11, т. 1, Nvidia): основното заглавие е ВИНАГИ това на модела (i) — „защо“ е писано за него и за резюмето му. До 16.11 основното ставаше
+        # заглавието от по-надеждния източник в групата (29.10; от 11.11 — освен ако числата в „защо“ са само в i): на 16.11 „защо“ за FT „Bessent says Nvidia needs
+        # ‘shake-up’ with external CEO“ (Treasury, експортни ограничения, външен CEO — от резюмето му) стоеше под Reuters „Trump administration to name Nvidia … 'national
+        # champions'“ — друга история, слята от модела в групата. Измерено 30.10–16.11: 29 смени в 92 новини. Другите в групата — в „също“, по надеждност на източника.
+        main = i
         r = pool[main]
         source_text = " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group)
         why, cut = _why_numbers(why, source_text)
         if cut:
             dropped.append({"i": i, "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него", "removed": cut})
+        try:                                                                     # 16.11.2026 (т. 1): твърдение (институция, държава, мярка) без опора в заглавията и резюметата
+            from src import claim_check
+            why, unsup = claim_check.check(why, source_text)
+            if unsup:
+                dropped.append({"i": i, "reason": "твърдение в why, което го няма в заглавията и резюметата на групата — махнато изречението", "removed": unsup})
+        except Exception as e:
+            print(f"[news] проверката на твърденията пропусната: {type(e).__name__}: {e}")
         row = {"headline": r["title"], "source": r.get("source"), "why": why, "source_text": source_text[:2000]}      # 06.11.2026 (т. 8): source_text — за проверката на думите (ai_brief.check_news_why_terms го маха)
         if r.get("link"):
             row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс
