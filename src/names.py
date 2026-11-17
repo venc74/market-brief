@@ -41,6 +41,9 @@ def strip_legal(name: str) -> str:
     toks = name.split()
     while len(toks) > 1 and _norm_token(toks[-1].replace("/", "")) in _LEGAL_TAIL:
         toks.pop()
+    popped = len(toks) < len(name.split())
+    while popped and len(toks) > 1 and toks[-1].rstrip(",").lower() in ("&", "and"):     # 17.11.2026 (пакет 1, т. 5): „Merck & Company, Inc.“ → „Merck“, не „Merck &“
+        toks.pop()
     if len(toks) > 1 and toks[0].lower() == "the":
         toks = toks[1:]
     out = " ".join(toks).rstrip(",").strip()

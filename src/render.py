@@ -58,6 +58,24 @@ def _neglect_label(ret63_pct, neglect):
 
 env.globals["neglect_label"] = _neglect_label
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
+_NAME_LOGGED: set = set()
+
+
+def cname_t(company, ticker, limit=None, strip=True) -> str:
+    """
+    17.11.2026 (пакет 1, т. 5): името на компанията за показване до тикъра — никога тикърът втори път („CSX CSX“: „CSX Corporation“ → „CSX“). Името = тикъра или
+    липсва → "" (само тикърът) и ред в лога (веднъж на тикър).
+    """
+    out = names.display_name(company, limit, strip) if company else ""
+    if not out or out.strip().upper() == str(ticker or "").upper():
+        if ticker and ticker not in _NAME_LOGGED:
+            _NAME_LOGGED.add(ticker)
+            print(f"[names] {ticker}: " + ("името съвпада с тикъра" if out else "без име") + " — показва се само тикърът")
+        return ""
+    return out
+
+
+env.filters["cname_t"] = cname_t
 
 
 
@@ -240,7 +258,9 @@ def short_name(ticker: str | None, company: str | None = None, name_map: dict | 
         toks.pop()
     n = re.sub(r"[\s,]+(?:&|and)$", "", names.strip_legal(" ".join(toks)), flags=re.I).strip()   # „Merck & Company, Inc.“ → „Merck“, „Eli Lilly and Company“ → „Eli Lilly“ (реплеят 16.11)
     out = names.cut_words(n, limit) if limit else n
-    return "" if out.upper() == str(ticker or "").upper() else out
+    if out.upper() == str(ticker or "").upper():
+        return ""
+    return out
 
 
 def why_here(c: dict | None) -> str:
@@ -821,9 +841,9 @@ def _qm_email_block(brief: dict) -> str:
             rows = ""
             for c in cards:
                 lv = c.get("levels")
-                name = c.get("company") if c.get("company") and c.get("company") != c["ticker"] else ""
+                name = cname_t(c.get("company"), c["ticker"], 26)                         # 17.11.2026 (т. 5): никога тикърът втори път
                 rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(c["ticker"])}{badge if c["ticker"] in ours else ""}'
-                         f'{f"<br><span style=font-weight:normal;font-family:Arial;color:#6b7280>{_e(names.display_name(name, 26))}</span>" if name else ""}</td>'
+                         f'{f"<br><span style=font-weight:normal;font-family:Arial;color:#6b7280>{_e(name)}</span>" if name else ""}</td>'
                          f'<td style="{td};font-family:monospace;white-space:nowrap">вход над ${c["trigger"]:.2f}{f" · до нивото {c['dist_adr']:.2f} ADR" if c.get("dist_adr") is not None else ""}<br><span style="color:#6b7280">стоп (макс. {config.QM_MAX_STOP_ADR:g}×ADR) ${(lv or {}).get("stop", c["max_stop"]):.2f} '
                          f'(−{(lv or {}).get("stop_pct", c["max_risk_pct"]):.1f}%)</span></td>'
                          f'<td style="{td}">ADR {c["adr"]:.1f}% · очакван стоп ({config.QM_EXPECTED_STOP_ADR:g}×ADR) ≈ ${c["expected_stop"]:.2f}<br>'
@@ -922,7 +942,7 @@ def render_email(brief: dict) -> str:
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-weight:bold;color:{color}">{_e(st['ticker'])}{mk}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">
-              {_e(names.display_name(st['company']))}<br>
+              {_e(cname_t(st['company'], st['ticker']))}<br>
               <span style="color:#6b7280">{_e(st['base_type'])} · RS {'нов макс' if st['rs_status']=='new_high' else 'близо до макс'}</span>{earn_line}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;
                      font-family:monospace;font-size:13px;white-space:nowrap">
