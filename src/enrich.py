@@ -425,7 +425,7 @@ def earnings_recap(sym: str) -> dict | None:
 
 # 2026-10-03 (пакет 4а т.4): опционният блок на картите (IV/IVR/P-C/стратегия, options_info) е махнат — pre-market
 # опционните данни на Yahoo са празни от юли. Следобедната OI снимка за Unusual Options (oi_snapshot.py,
-# unusual_options.py) не е пипана; data/iv_history.json остава на диска, но вече не се пише.
+# unusual_options.py) не е пипана; data/iv_history.json — махнат на 17.11.2026 (в историята на git).
 
 
 def short_interest_view(row: dict) -> dict:

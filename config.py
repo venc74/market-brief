@@ -1160,7 +1160,7 @@ EARNINGS_RECAP_RECENCY_DAYS = int(os.getenv("EARNINGS_RECAP_RECENCY_DAYS", 10))
 EARNINGS_YOY_TOLERANCE_DAYS = int(os.getenv("EARNINGS_YOY_TOLERANCE_DAYS", 60))
 
 # 17.11.2026 (пакет 1, т. 2е — решение след стратегическия преглед): short / Stage 4 скрийнърът и книгата му (замразени от 19.10) — махнати с кода и тестовете
-# (src/short_screener.py, src/short_tracker.py, ENABLE_SHORT_SCREENER, SHORT_FROZEN*, SHORT_*); data/short_tracker.json и data/short_frozen.json остават като история.
+# (src/short_screener.py, src/short_tracker.py, ENABLE_SHORT_SCREENER, SHORT_FROZEN*, SHORT_*); data/short_tracker.json и data/short_frozen.json — махнати в отделен commit (в историята на git).
 
 # ── Sector persistence gate (sector_layer.py: _laggard_persistence → confirmed_laggard в секторната карта) ─────────
 # FIX 2026-08-2x: наивен single-day "chg_4w<0 AND chg_12w<0" дава false
