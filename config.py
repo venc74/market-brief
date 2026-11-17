@@ -724,6 +724,9 @@ WATCH_INSIDER_LOOKBACK_DAYS = int(os.getenv("WATCH_INSIDER_LOOKBACK_DAYS", 30))
 WATCH_MAX_TOKENS = int(os.getenv("WATCH_MAX_TOKENS", 2000))
 # 30.10.2026 (поправки от брифа): AI резюметата на групи по 4 тикъра — 14 наведнъж спряха на 2000 токена (max_tokens) и резюмета нямаше; лимитът е на група
 WATCH_AI_BATCH_SIZE = int(os.getenv("WATCH_AI_BATCH_SIZE", 4))
+# 17.11.2026 (пакет 1, т. 10): под толкова собствени бара (≈ 1 година; 1y от Yahoo дава ~250) — „на борсата от ДД.ММ“ вместо 52-седм. показатели. Реално: HONA — 109 бара от 15.06.2026,
+# а редът казваше „−45.1% от 52-седм. връх“ (върхът — от първите дни на търговия)
+WATCH_52W_MIN_BARS = int(os.getenv("WATCH_52W_MIN_BARS", 240))
 # 04.11.2026 (четвърти преглед): NEWS_ENABLE_NITTER / NITTER_HANDLES / NITTER_INSTANCES — махнати заедно с news_aggregator._fetch_nitter (изключени от 2026-09).
 # Fallback: ако RSS върне нищо, scrape-ваме заглавия директно от тези страници (BeautifulSoup)
 NEWS_SCRAPE_FALLBACK = {

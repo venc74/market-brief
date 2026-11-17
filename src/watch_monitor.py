@@ -251,6 +251,13 @@ def range_facts(high, low, close) -> dict:
     a = trade_levels.adr_pct(df["h"], df["l"])
     if a is not None:
         out["adr_pct"] = round(float(a), 1)
+    if len(df) < config.WATCH_52W_MIN_BARS:                     # 17.11.2026 (пакет 1, т. 10): нова на борсата (HONA, отделена от Honeywell) — само собствената история
+        try:                                                    # (празните дни преди листването падат с dropna); 52-седм. показатели — само при ≥ 1 година
+            out["listed_since"] = pd.Timestamp(df.index[0]).date().isoformat()
+        except Exception:
+            out["listed_since"] = None
+        out["history_bars"] = len(df)
+        return out
     hi = float(df["h"].iloc[-252:].max())
     if hi > 0:
         out["high_52w"] = round(hi, 2)
