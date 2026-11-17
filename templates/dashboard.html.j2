@@ -1154,7 +1154,7 @@
         <div class="kv"><span>P/E / Fwd P/E</span><b>{{ st.pe|round(1) if st.pe else "—" }} / {{ st.forward_pe|round(1) if st.forward_pe else "—" }}</b></div>
         <div class="kv"><span>Inst. ownership</span><b>{{ st.inst_ownership_pct }}%{% if st.inst_ownership_pct is number and st.inst_ownership_pct > 100 %} <span class="cs-mu" title="Над 100% — обичайно двойно броене в 13F (заети акции при двама притежатели); не е сигнал">двойно броене</span>{% endif %}</b></div>
         <h3>Earnings</h3>
-        <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
+        <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>{% if st.earnings.date_conflict %}<div class="small" style="color:var(--yellow)">{{ st.earnings.date_conflict }}</div>{% endif %}
         <div class="plan">
           <h3 style="color:var(--regime)">План{% if p.sizing_factor < 1 %} · режимен фактор ×{{ p.sizing_factor }} (Defensive){% endif %}</h3>
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,

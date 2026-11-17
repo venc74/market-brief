@@ -50,8 +50,8 @@ with q():
     W = ec.build_week(dt.date(2026, 11, 16), big, ours, econ_fn=ECON, earnings_fn=EARN)
 assert W["ok"] and W["errors"] == [] and [d["date"] for d in W["days"]] == ["2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20"]
 L = {d["date"]: ec.day_lines(d) for d in W["days"]}
-assert L["2026-11-17"][:2] == ["отчет: NVDA · NVIDIA Corporation — след затварянето (EPS очаквана $2.49) · тегло 6.4% в S&P 500",
-                               "отчет: HD · Home Depot, Inc. (The) — преди отварянето (EPS очаквана $3.86) · наблюдаван"], L["2026-11-17"]
+assert L["2026-11-17"][:2] == ["отчет: NVDA · NVIDIA Corporation — след затварянето (EPS очаквана $2.49, Nasdaq) · тегло 6.4% в S&P 500",
+                               "отчет: HD · Home Depot, Inc. (The) — преди отварянето (EPS очаквана $3.86, Nasdaq) · наблюдаван"], L["2026-11-17"]
 assert "Fed: FOMC Meeting Minutes — 14:00 Ню Йорк" in L["2026-11-18"] and "Fed: Fed Chair Warsh Speaks — 12:00 Ню Йорк" in L["2026-11-16"]
 assert "Retail Sales — 08:30 Ню Йорк: консенсус 0.2% (предишно 0.8%)" in L["2026-11-17"]
 assert "Initial Jobless Claims — 08:30 Ню Йорк: консенсус 199K (предишно 200K)" in L["2026-11-19"]

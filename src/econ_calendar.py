@@ -111,6 +111,46 @@ def week_days(today: dt.date, n: int | None = None) -> list[dt.date]:
     return out
 
 
+def fed_schedule(day: dt.date) -> list[dict]:
+    """17.11.2026 (пакет 1, т. 8): събитията на FOMC за деня по config.FOMC_MEETINGS — решение, пресконференция, протоколи (последния ден + FOMC_MINUTES_DAYS). Чиста функция."""
+    out = []
+    for a, b in config.FOMC_MEETINGS:
+        s, e = dt.date.fromisoformat(a), dt.date.fromisoformat(b)
+        span = f"{s:%d}–{e:%d.%m}" if s.month == e.month else f"{s:%d.%m}–{e:%d.%m}"
+        if e == day:
+            out += [{"date": day.isoformat(), "time_ny": "14:00", "event": f"FOMC — решение за лихвите (заседанието {span})", "source": "график на Fed", "kind": "decision"},
+                    {"date": day.isoformat(), "time_ny": "14:30", "event": "FOMC — пресконференция", "source": "график на Fed", "kind": "press"}]
+        if e + dt.timedelta(days=config.FOMC_MINUTES_DAYS) == day:
+            out.append({"date": day.isoformat(), "time_ny": "14:00", "event": f"FOMC — протоколи от заседанието {span}", "source": "график на Fed", "kind": "minutes"})
+    return out
+
+
+_SCHED_IN_NASDAQ = {"decision": re.compile(r"Interest Rate Decision|Rate Statement", re.I), "press": re.compile(r"Press Conference", re.I), "minutes": re.compile(r"Minutes", re.I)}
+
+
+def add_fed_schedule(day: dict) -> int:
+    """Добавя към day["fed"] събитията от графика, които Nasdaq няма (по вида: решение / пресконференция / протоколи). Връща броя добавени."""
+    have = [f.get("event") or "" for f in day.get("fed") or []]
+    add = [x for x in fed_schedule(dt.date.fromisoformat(day["date"])) if not any("FOMC" in h and _SCHED_IN_NASDAQ[x["kind"]].search(h) for h in have)]
+    day["fed"] = sorted((day.get("fed") or []) + add, key=lambda f: f.get("time_ny") or "")
+    return len(add)
+
+
+def reconcile_dates(week: dict, known: dict | None) -> dict:
+    """
+    17.11.2026 (т. 8): една дата на отчета за цялата страница — датата в календара (Nasdaq) срещу датата на картите / книгите (Yahoo). При разминаване: в календара
+    „⚠ Yahoo: ДД.ММ“, а за картите — {тикър: "отчет ДД.ММ (Yahoo) / ДД.ММ (Nasdaq)"}. known — {тикър: дата ISO от Yahoo}. Чиста функция.
+    """
+    out = {}
+    for d in (week or {}).get("days") or []:
+        for e in d.get("earnings") or []:
+            y = (known or {}).get(e["ticker"])
+            if y and str(y)[:10] != e["date"]:
+                e["date_note"] = f"⚠ Yahoo: {y[8:10]}.{y[5:7]}"
+                out[e["ticker"]] = f"отчет {y[8:10]}.{y[5:7]} (Yahoo) / {e['date'][8:10]}.{e['date'][5:7]} (Nasdaq) — източниците се разминават"
+    return out
+
+
 def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None, earnings_fn=None) -> dict:
     """
     → {"ok", "source", "days": [{date, weekday, earnings, fed, econ}], "errors": [...], "big_n", "ours_n"}. big — {тикър: етикет} (компаниите > 2% в S&P 500), ours — {тикър: къде}
@@ -127,6 +167,8 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
             econ_by_day[d.isoformat()] = rows
             day["fed"] = [r for r in rows if is_fed(r["event"])]
             day["econ"] = [{**r, "kind": key_kind(r["event"])} for r in rows if key_kind(r["event"])]
+            if not rows:                                                       # 17.11.2026 (т. 8): празен ден от източника — видимо, не „нищо от следените“
+                day["econ_empty"] = True
         except Exception as e:
             out["errors"].append(f"данни {d:%d.%m}: {type(e).__name__}")
             print(f"[calendar] икономически данни {d}: {type(e).__name__}: {e}")
@@ -137,6 +179,7 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
         except Exception as e:
             out["errors"].append(f"отчети {d:%d.%m}: {type(e).__name__}")
             print(f"[calendar] отчети {d}: {type(e).__name__}: {e}")
+        add_fed_schedule(day)                                                  # 17.11.2026 (т. 8): FOMC по графика, когато Nasdaq го няма
         out["days"].append(day)
     bad = dates_ok(econ_by_day)
     if bad:
@@ -174,10 +217,12 @@ def day_lines(day: dict) -> list[str]:
     """Редовете за един ден — отчетите, Fed, данните. Чиста функция."""
     lines = []
     for e in day.get("earnings") or []:
-        lines.append(f"отчет: {e['ticker']} · {e['name']} — {e['when']}" + (f" (EPS очаквана {e['eps_forecast']})" if e.get("eps_forecast") else "")
-                     + (f" · {e['why']}" if e.get("why") else ""))
+        lines.append(f"отчет: {e['ticker']} · {e['name']} — {e['when']}" + (f" (EPS очаквана {e['eps_forecast']}, Nasdaq)" if e.get("eps_forecast") else "")      # 17.11.2026: с източника
+                     + (f" · {e['why']}" if e.get("why") else "") + (f" · {e['date_note']}" if e.get("date_note") else ""))
     for f in group_events(day.get("fed") or []):
-        lines.append(f"Fed: {f['event']} — {f['time_ny']} Ню Йорк")
+        lines.append(f"Fed: {f['event']} — {f['time_ny']} Ню Йорк" + (f" ({f['rows'][0]['source']})" if (f.get("rows") or [{}])[0].get("source") else ""))
+    if day.get("econ_empty"):
+        lines.append("данните на Nasdaq за деня още не са публикувани — Fed е по графика; останалото — в следващия бриф")
     for g in group_events(day.get("econ") or []):
         lines.append(f"{g['event']} — {g['time_ny']} Ню Йорк: {econ_value_text(g['rows'])}")
     return lines

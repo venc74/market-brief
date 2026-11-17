@@ -535,7 +535,9 @@ def radar_reason(c: dict) -> str:
     """
     why = _radar_reason(c)
     note = (c.get("setup") or {}).get("book_note")
-    return f"{why}; {note}" if note and note not in why else why
+    why = f"{why}; {note}" if note and note not in why else why
+    dc = (c.get("earnings") or {}).get("date_conflict")                    # 17.11.2026 (пакет 1, т. 8): Yahoo и Nasdaq се разминават за датата на отчета
+    return f"{why} · ⚠ {dc}" if dc else why
 
 
 def _radar_reason(c: dict) -> str:

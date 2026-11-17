@@ -935,6 +935,17 @@ def run() -> dict:
         return out
     week_calendar = steps.step("week_calendar", _week_calendar, fallback={"ok": False, "errors": ["стъпката пропадна"], "days": []}, enabled=config.ENABLE_WEEK_CALENDAR,
                                label="Календарът на седмицата (Nasdaq)", consequence="календарът на седмицата липсва днес — червен ред на страницата")
+    # 17.11.2026 (пакет 1, т. 8): една дата на отчета за страницата — календарът (Nasdaq) срещу картите (Yahoo); при разминаване — и двете, с етикет
+    try:
+        from src import econ_calendar as _ec
+        _cards = action + watchlist + (qm_cards or [])
+        _conf = _ec.reconcile_dates(week_calendar, {c["ticker"]: (c.get("earnings") or {}).get("next_earnings") for c in _cards if (c.get("earnings") or {}).get("next_earnings")})
+        for c in _cards:
+            if c.get("ticker") in _conf:
+                c.setdefault("earnings", {})["date_conflict"] = _conf[c["ticker"]]
+                print(f"[calendar] {c['ticker']}: {_conf[c['ticker']]}")
+    except Exception as e:
+        print(f"[calendar] сверката на датите на отчетите пропусната: {type(e).__name__}: {e}")
 
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
