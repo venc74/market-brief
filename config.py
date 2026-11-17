@@ -90,21 +90,9 @@ SIFMA_US_FULL_CLOSES = frozenset({
     "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31", "2027-06-18", "2027-07-05", "2027-09-06", "2027-10-11", "2027-11-11", "2027-11-25",
     "2027-12-24",
 })
-# 16.11.2026 (пакет 16.11, т. 7): датите на публикуване на COT по официалния график на CFTC (cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule, проверено
-# 16.11.2026; „tentative schedule … through 2026“; 2027 — когато го публикуват). Обикновено петък 15:30 ET, данни към вторника; изместените заради федерален празник — в понеделник
-# (данни към вторника 6 дни по-рано). Реално: Veterans Day → отчетът към 10.11 е в понеделник 16.11, а брифът казваше „публикуван в петък 13.11, още не е в данните“.
-CFTC_COT_RELEASES = (
-    "2026-01-05", "2026-01-09", "2026-01-16", "2026-01-23", "2026-01-30", "2026-02-06", "2026-02-13", "2026-02-20", "2026-02-27",
-    "2026-03-06", "2026-03-13", "2026-03-20", "2026-03-27", "2026-04-03", "2026-04-10", "2026-04-17", "2026-04-24",
-    "2026-05-01", "2026-05-08", "2026-05-15", "2026-05-22", "2026-05-29", "2026-06-05", "2026-06-12", "2026-06-22", "2026-06-26",
-    "2026-07-06", "2026-07-10", "2026-07-17", "2026-07-24", "2026-07-31", "2026-08-07", "2026-08-14", "2026-08-21", "2026-08-28",
-    "2026-09-04", "2026-09-11", "2026-09-18", "2026-09-25", "2026-10-02", "2026-10-09", "2026-10-16", "2026-10-23", "2026-10-30",
-    "2026-11-06", "2026-11-16", "2026-11-20", "2026-11-30", "2026-12-04", "2026-12-11", "2026-12-18", "2026-12-28",
-)
 # 16.11.2026 (пакет 16.11, т. 10): SOFR — NY Fed я публикува на следващия работен ден (по SIFMA) в 08:00 Ню Йорк; карето в 15:05 я обновява оттам (FRED я дава по-късно)
 NYFED_SOFR_URL = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/5.json"
 ENABLE_SOFR_PREOPEN_REFRESH = os.getenv("ENABLE_SOFR_PREOPEN_REFRESH", "1") == "1"
-CFTC_RELEASES_WARN_DAYS = int(os.getenv("CFTC_RELEASES_WARN_DAYS", 20))        # здравната проверка: графикът свършва след по-малко дни → ред (CFTC публикува следващата година през декември)
 # 16.10.2026 (В2а): NYSE празник / уикенд → брифът не върви (без AI, имейл, записи); страницата получава банер върху последния бриф
 ENABLE_MARKET_CLOSED_SKIP = os.getenv("ENABLE_MARKET_CLOSED_SKIP", "1") == "1"
 
@@ -750,7 +738,6 @@ CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))     # 02.11.2026: м
 CRYPTO_RSS_FEEDS = {"Cointelegraph": CRYPTO_RSS_URL, "CoinDesk": os.getenv("CRYPTO_COINDESK_RSS_URL", "https://www.coindesk.com/arc/outboundfeeds/rss/")}
 CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 5))                             # 29.10.2026 (разходката, т. 4а): таван 4–5 → 5; най-много 1 ред за дневни потоци в ETF
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
-CRYPTO_COT_MARKET = "Bitcoin Futures (CME)"                                          # COT за Bitcoin — само в първия бриф след нов отчет на CFTC
 # ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──
 # 26.10.2026 (етап 4б, т. 9): включено в сутрешния run със самопроверка (options_record.completeness) — денят влиза в историята само ако последната сделка е от затварянето
 ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "1") == "1"
@@ -995,90 +982,7 @@ CUSIP_MAP_BUDGET_SEC = 60
 CUSIP_MAP_REFRESH_DAYS = 90
 CUSIP_MAP_NOTFOUND_DAYS = 30
 
-# ── COT (Commitments of Traders) ──────────────────────────────────────────
-ENABLE_COT = os.getenv("ENABLE_COT", "1") == "1"
-COT_PERCENTILE_LOW = float(os.getenv("COT_PERCENTILE_LOW", 10))
-COT_PERCENTILE_HIGH = float(os.getenv("COT_PERCENTILE_HIGH", 90))
-# 03.11.2026 (разходката, т. 17): групите на сгънатата таблица „▸ Всички 40 пазара“ — в този ред; пазарите — етикетите от cot.MAJOR_MARKETS (тест: всеки пазар е точно в една група)
-COT_GROUPS = (
-    ("валути", ("US Dollar Index", "Euro FX", "Japanese Yen", "British Pound", "Swiss Franc", "Canadian Dollar", "Australian Dollar", "Mexican Peso")),
-    ("лихви", ("2-Year Treasury Note", "5-Year Treasury Note", "10-Year Treasury Note", "Ultra Treasury Bond", "30-Year Treasury Bond")),
-    ("индекси", ("E-mini S&P 500", "Nasdaq-100", "E-mini Russell 2000", "E-mini Dow (DJIA)", "VIX Futures")),
-    ("крипто", ("Bitcoin Futures (CME)", "XRP")),
-    ("суровини", ("WTI Crude Oil", "Natural Gas", "RBOB Gasoline", "Heating Oil", "Gold", "Silver", "Copper", "Platinum", "Palladium", "Corn", "Soybeans", "Soybean Oil",
-                  "Soybean Meal", "Wheat", "Sugar No. 11", "Coffee C", "Cocoa", "Cotton", "Lean Hogs", "Live Cattle")),
-)
-# FIX 2026-08-20: дизайнерският lookback е 156 седмици (~3г, cot.py:
-# _LOOKBACK_WEEKS), но по-скоро добавени контракти (напр. XRP на CME,
-# launched ~юли 2025) имат много по-кратка налична история — percentile
-# спрямо 53 седмици е статистически по-малко сигурен от percentile спрямо
-# пълните 156. Праг под който AI-то трябва explicit да flag-не по-ниската
-# увереност в generирания текст (same честен дух като GLB ath_label
-# разграничението — не тихо наблюдение в кода, а видимо в reasoning-а).
-# 104 седмици (~2г) е разумен cutoff: достатъчно под 156 да хване genuinely
-# нови контракти, достатъчно над ~52 да не флагва обикновени, добре
-# established пазари с временни data gaps.
-COT_SHORT_HISTORY_WEEKS = int(os.getenv("COT_SHORT_HISTORY_WEEKS", 104))
-# FIX 2026-10-03 (пакет 2 т.7): давност на COT. Отчетът е към вторник и излиза в петък следобед, затова нормалната
-# възраст на най-новия отчет по време на сутрешния бриф е 6–10 дни (реално: 64 от 65 брифа с COT редове, 06.07–02.10.2026,
-# бяха 6–10 дни). Седмица с празничен петък мести излизането в понеделник и дава 13 дни — 06.07.2026 (3 юли беше почивен):
-# най-новият отчет е 23.06, 13 дни. Праг 12 би дал фалшива тревога точно тогава, затова "стар" е СТРОГО повече от 13 дни
-# (= пропуснат цял седмичен отчет, виден от вторника след него). Над прага секцията COT показва банер.
-COT_STALE_DAYS = int(os.getenv("COT_STALE_DAYS", 13))
-
-# 03.11.2026 (разходката, т. 17): настройките на COT тезите (партиди, кеш, таблиците за механизмите и директните тикъри) са махнати заедно с тезите — COT е таблица от кода.
-# COT: дали работи (пакет 3 т.з) — ценово потвърждение и track record (src/cot_track.py).
-# Потвърждение: цената ПРЕСИЧА SMA10 на седмичните затваряния в посоката на contrarian сигнала и пресичането е скорошно (≤ 4 седмици).
-# Track record: екстремуми от COT историята (percentile 10/90 спрямо до 156 предишни седмици, поне 52 предишни) и доходността 2/4/8 седмици
-# по-късно. Цените са Yahoo (седмични затваряния, 5 г.): непрекъснати фючърси (=F) за стоки, лихви и индекси, спот за валути, ^VIX за VIX
-# (VIX фючърсите не са на Yahoo — спотът е прокси) и BTC-USD/XRP-USD за крипто (спот вместо CME фючърсите). ENABLE_COT_TRACK=0 го изключва.
-ENABLE_COT_TRACK = os.getenv("ENABLE_COT_TRACK", "1") == "1"
-COT_SMA_WEEKS = int(os.getenv("COT_SMA_WEEKS", 10))
-COT_CONFIRM_LOOKBACK_WEEKS = int(os.getenv("COT_CONFIRM_LOOKBACK_WEEKS", 4))
-COT_TRACK_MIN_PRIOR_WEEKS = int(os.getenv("COT_TRACK_MIN_PRIOR_WEEKS", 52))
-COT_TRACK_MIN_EPISODES = int(os.getenv("COT_TRACK_MIN_EPISODES", 3))      # под толкова епизода редът е "малка извадка"
-COT_PRICE_SYMBOLS = {
-    "E-mini S&P 500": "ES=F",
-    "Nasdaq-100": "NQ=F",
-    "E-mini Russell 2000": "RTY=F",
-    "E-mini Dow (DJIA)": "YM=F",
-    "VIX Futures": "^VIX",
-    "US Dollar Index": "DX-Y.NYB",
-    "Euro FX": "EURUSD=X",
-    "Japanese Yen": "JPYUSD=X",
-    "British Pound": "GBPUSD=X",
-    "Swiss Franc": "CHFUSD=X",
-    "Canadian Dollar": "CADUSD=X",
-    "Australian Dollar": "AUDUSD=X",
-    "Mexican Peso": "MXNUSD=X",
-    "2-Year Treasury Note": "ZT=F",
-    "5-Year Treasury Note": "ZF=F",
-    "10-Year Treasury Note": "ZN=F",
-    "Ultra Treasury Bond": "UB=F",
-    "30-Year Treasury Bond": "ZB=F",
-    "Bitcoin Futures (CME)": "BTC-USD",
-    "XRP": "XRP-USD",
-    "Gold": "GC=F",
-    "Silver": "SI=F",
-    "Copper": "HG=F",
-    "Platinum": "PL=F",
-    "Palladium": "PA=F",
-    "WTI Crude Oil": "CL=F",
-    "Natural Gas": "NG=F",
-    "RBOB Gasoline": "RB=F",
-    "Heating Oil": "HO=F",
-    "Corn": "ZC=F",
-    "Soybeans": "ZS=F",
-    "Soybean Oil": "ZL=F",
-    "Soybean Meal": "ZM=F",
-    "Wheat": "ZW=F",
-    "Sugar No. 11": "SB=F",
-    "Coffee C": "KC=F",
-    "Cocoa": "CC=F",
-    "Cotton": "CT=F",
-    "Lean Hogs": "HE=F",
-    "Live Cattle": "LE=F",
-}
+# 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT — махнат изцяло (src/cot.py, src/cot_track.py, ENABLE_COT*, COT_*, CFTC_COT_RELEASES, CRYPTO_COT_MARKET).
 
 
 # ── MOVE Index (ICE BofA, bond volatility) ────────────────────────────────

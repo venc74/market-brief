@@ -5,7 +5,7 @@
 седмица?“ с изрични примери — да: навлизането на традиционните финанси (токенизация на ценни книжа, DTCC, големи банки, стейбълкойни, регулатори); не: прогнози за цената, малки
 монети, мнения. Таван config.CRYPTO_MAX_ITEMS (5), дневните потоци в ETF — най-много един ред ("etf_flows": true). Повод: на 28.10 „DTCC unit launches tokenization services“ беше
 в пула и не мина. До 29.10 кодът махаше и избраното с категория извън списъка (DTCC с „tokenization“ щеше да падне и при избор).
-Под новините: COIN, HOOD, CRCL, BLSH (последен close и промяна) и COT за Bitcoin — само в първия бриф след нов отчет на CFTC.
+Под новините: COIN, HOOD, CRCL, BLSH (последен close и промяна; 17.11.2026 — без COT за Bitcoin).
 Без значими новини — един ред. Всяка грешка → празен резултат с причина (graceful); кеш по ден (повторен run не вика AI втори път).
 """
 from __future__ import annotations
@@ -138,16 +138,6 @@ def pool_sources(pool: list[dict]) -> dict:
     return out
 
 
-def cot_reading(pts: list[dict] | None) -> dict | None:
-    """COT за Bitcoin (CME, managed money net) — последният отчет и перцентилът му спрямо прозореца на COT модула (същата сметка като екстремумите). < 10 точки → None."""
-    from src import cot
-    if not pts or len(pts) < 10:
-        return None
-    window = pts[-cot._LOOKBACK_WEEKS:]
-    values = [p["net"] for p in window]
-    return {"as_of": window[-1]["date"], "net": int(values[-1]), "percentile": cot._percentile_rank(values[:-1] or values, values[-1]), "weeks": len(window)}
-
-
 def ticker_rows(tickers: list[str], today: str, download=None) -> list[dict]:
     """Последният ЦЯЛ бар (преди днес) на тикърите: close, промяна за 1 и 5 сесии. Провал / липсва тикър → без ред за него."""
     try:
@@ -172,14 +162,14 @@ def ticker_rows(tickers: list[str], today: str, download=None) -> list[dict]:
         return []
 
 
-def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, fetch=None, ai_call=None, download=None, cache_path=None, hours: float | None = None) -> dict:
+def build(today: str, fetch=None, ai_call=None, download=None, cache_path=None, hours: float | None = None) -> dict:
     """
-    {"ok", "items", "pool", "reason", "tickers", "cot_btc"}. fetch() → пулът от RSS; ai_call(system, user) → JSON текст (по подразбиране ai_brief._call_claude). Кеш по ден в
-    config.DATA_DIR/crypto_news_cache.json (само новините — цените и COT се смятат всеки път). Не вдига.
+    {"ok", "items", "pool", "reason", "tickers"} (17.11.2026: без COT за Bitcoin — COT е махнат). fetch() → пулът от RSS; ai_call(system, user) → JSON текст (по подразбиране ai_brief._call_claude). Кеш по ден в
+    config.DATA_DIR/crypto_news_cache.json (само новините — цените се смятат всеки път). Не вдига.
     """
     LAST_STATUS.clear()
     LAST_STATUS.update(ok=False, reason="не завърши", count=0)
-    out = {"ok": False, "items": [], "pool": 0, "pool_items": [], "pool_sources": {}, "reason": None, "tickers": [], "cot_btc": None}
+    out = {"ok": False, "items": [], "pool": 0, "pool_items": [], "pool_sources": {}, "reason": None, "tickers": []}
     path = cache_path or (config.DATA_DIR / "crypto_news_cache.json")
     try:
         cached = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -213,7 +203,5 @@ def build(today: str, cot_fresh: bool = False, cot_series: dict | None = None, f
         out["reason"] = f"подборът не успя ({type(e).__name__})"
         print(f"[crypto] {out['reason']}: {e}")
     out["tickers"] = ticker_rows(config.CRYPTO_TICKERS, today, download)
-    if cot_fresh:
-        out["cot_btc"] = cot_reading((cot_series or {}).get(config.CRYPTO_COT_MARKET))
     LAST_STATUS.update(ok=out["ok"], reason=out["reason"] or "", count=len(out["items"]))
     return out

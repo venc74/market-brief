@@ -37,8 +37,6 @@ from src import spinoff_watch
 from src import regime_claims
 from src import bar_freshness
 from src import tracker_switch
-from src import cot
-from src import cot_track
 from src import entry_timing
 from src import setup_rules
 from src import earnings_move
@@ -651,7 +649,7 @@ def run() -> dict:
     news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since), fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
                       consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
-    # макро брифа — разказът за нощта я вижда; COT за Bitcoin (само при нов отчет на CFTC) се добавя по-долу, след COT модула (cot_btc).
+    # макро брифа — разказът за нощта я вижда (17.11.2026: без COT за Bitcoin — COT е махнат).
     crypto = steps.step("crypto", lambda: crypto_news.build(today, hours=crypto_hours), fallback={},
                         enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
                         failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
@@ -688,26 +686,7 @@ def run() -> dict:
                                      consequence="AI текстът на картите днес не е проверен от кода")
     # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
     candidates = inject_split_catalysts(candidates)
-    print("      COT екстремуми…")
-    cot_extremes = cot.get_extremes() if config.ENABLE_COT else []
-    # 03.11.2026 (разходката, т. 17): без AI тезите и без списъците с тикъри — секцията е седмична таблица от кода (екстремумите + сгънато всички 40 пазара);
-    # до 03.11 тук бяха ai_brief.cot_theses (кеш data/cot_theses_cache.json, ~5.7 хил. изходни токена седмично) и позициите за значките. История — docs/HISTORY.md.
-    cot_with_theses = list(cot_extremes)
-    # пакет 3 т.з: ценово потвърждение (SMA10) и малък track record на екстремумите — само показване
-    cot_with_theses, cot_summary = steps.step("cot_track", lambda: cot_track.annotate(cot_with_theses, cot.LAST_SERIES), fallback=(cot_with_theses, None),
-                                              enabled=bool(config.ENABLE_COT and config.ENABLE_COT_TRACK and cot_with_theses),
-                                              label="COT: потвърждение от цената и track record", consequence="COT секцията е без тях днес")
-    # 03.11.2026 (разходката, т. 17): всички 40 пазара за сгънатата таблица (перцентил и позиция от кода); при екстремум — и дали цената потвърждава (SMA10, cot_track)
-    def _cot_all():
-        conf = {c["market"]: (c.get("price_confirmation") or {}) for c in cot_with_theses}
-        rows = cot.all_markets()
-        for r in rows:
-            pc = conf.get(r["market"])
-            if pc is not None and "confirmed" in pc:
-                r["price_confirms"], r["price_text"] = bool(pc["confirmed"]), pc.get("text")
-        return rows
-    cot_all = steps.step("cot_all", _cot_all, fallback=[], enabled=bool(config.ENABLE_COT and cot.LAST_SERIES), label="COT: таблицата с всички пазари",
-                         consequence="сгънатата таблица „Всички пазара“ липсва днес; екстремумите са показани")
+    # 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT (екстремумите, потвърждението от цената, всички 40 пазара) — махнат изцяло
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
@@ -969,9 +948,8 @@ def run() -> dict:
 
 
     # 🔎 Наблюдавани тикъри — ръчно куриран per-ticker монитор (watch_monitor.py).
-    # ТУК, а не по-рано: `cot_with_theses` и `leaders` вече са готови (30.10.2026, т. 8: без тезите)
-    # и се подават като market_context за cross-referencing-а — reuse на вече
-    # наличното в паметта, не нов източник.
+    # ТУК, а не по-рано: `leaders` вече са готови и се подават като market_context — reuse на вече
+    # наличното в паметта, не нов източник (17.11.2026: без COT пазарите — COT е махнат).
     #
     # "Нищо не се е случило" е CODE-ENFORCED: тих тикър (нула новини, нула
     # Form 4) изобщо не стига до AI-то — кодът му слага текста сам. Така
@@ -985,7 +963,6 @@ def run() -> dict:
         active = [r for r in rows if r.get("event")]                    # 03.11.2026 (т. 5): AI само при новина или нов Form 4 (подаден от предишния бриф)
         if active:
             market_context = {
-                "cot_markets": [c["market"] for c in cot_with_theses][:10],
                 "leading_sectors": [s["sector"] for s in leaders],
             }
             active = ai_brief.watch_ticker_digest(active, market_context, window_hours=news_hours)
@@ -1075,11 +1052,6 @@ def run() -> dict:
     prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
     thirteenf_rh = data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {}
     superinvestor_fresh = _fresh_13f(thirteenf_rh, superinvestor_new_positions)      # 16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите
-    cot_rhythm = data_rhythm.cot_rhythm(cot.LAST_STATUS, prev_brief, today) if config.ENABLE_COT else {}
-    # COT за Bitcoin — само в първия бриф след нов отчет на CFTC (29.10.2026: крипто секцията вече е построена преди макро брифа, тук се добавя само COT)
-    if crypto and cot_rhythm.get("fresh"):
-        crypto["cot_btc"] = steps.step("crypto_cot", lambda: crypto_news.cot_reading((cot.LAST_SERIES or {}).get(config.CRYPTO_COT_MARKET)), fallback=None,
-                                       label="COT за Bitcoin в крипто секцията", consequence="редът за COT Bitcoin липсва днес")
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                        insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
@@ -1160,15 +1132,7 @@ def run() -> dict:
         "qm_ep": qm_ep_out,
         "news": news,
         "news_window": {**dict(news_aggregator.LAST_WINDOW), "since": news_since.isoformat(), "hours": news_hours, "crypto_hours": crypto_hours},   # 02.11.2026 (т. 4)
-        "cot": cot_with_theses,
-        "cot_all": cot_all,                                            # 03.11.2026 (т. 17): всички 40 пазара — сгънатата таблица
-        # пакет 3 т.з: обобщение на track record-а за секцията (един ред) — виж cot_track.summary_text
-        "cot_summary": cot_summary,
-        # пакет 2 т.7: давност на най-новия COT отчет (банер в секцията, ако е стар)
-        "cot_status": dict(cot.LAST_STATUS) if config.ENABLE_COT else {},
-        "cot_rhythm": cot_rhythm,
         "crypto": crypto,                                              # 22.10.2026 (етап 4): крипто секцията   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
-        # FIX 2026-09-28: отхвърлени COT тези / противоречия / махнати тикъри за деня
         "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
         "narrative_events": list(ai_brief.NARRATIVE_EVENTS_DIAG),        # 19.10.2026: събития без опора в новините/макрото на деня, махнати от наративите
         "correlation_flags": correlation_flags,

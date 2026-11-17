@@ -46,8 +46,9 @@ seen = {}
 ai_brief._call_claude = lambda system, user, **k: (seen.setdefault("u", user), json.dumps({"digests": []}))[1]   # СИНТЕТИЧНО: подменен модел
 row = {"ticker": "TDOC", "news": [{"title": "x", "publisher": "y"}], "insider": [], "insider_cluster": False, "quiet": False}
 with contextlib.redirect_stdout(io.StringIO()):
-    ai_brief.watch_ticker_digest([row], {"cot_markets": ["Gold"], "leading_sectors": ["Енергетика"]})
+    ai_brief.watch_ticker_digest([row], {"leading_sectors": ["Енергетика"]})
 assert "active_theses" not in seen["u"] and '"leading_sectors": ["Енергетика"]' in seen["u"]
 assert '"active_theses"' not in main_src
-print("  ✓ main подава само cot_markets и leading_sectors")
+assert '"cot_markets"' not in main_src                                                     # 17.11.2026: COT е махнат
+print("  ✓ main подава само leading_sectors")
 print("\n✅ test_theses_removed: всичко мина")

@@ -7,7 +7,7 @@
 
 РЕАЛНО: tests/fixtures/cointelegraph_rss_2026-10-21.xml — фийдът https://cointelegraph.com/rss, свален на 21.10.2026 в ~20:00 Берлин (30 заглавия, 20.10 16:14 → 21.10 17:57 UTC;
 SHA-256 89ae44f0e1177d21…); tests/fixtures/brief_2026-10-19.json — брифът за страницата.
-СИНТЕТИЧНО (означено): отговорите на AI, цените на тикърите и COT серията за Bitcoin.
+СИНТЕТИЧНО (означено): отговорите на AI и цените на тикърите (17.11.2026: COT за Bitcoin — махнат с COT).
 Пускане: python test_crypto_section.py
 """
 import sys, json, pathlib, tempfile, copy, io, contextlib
@@ -44,22 +44,20 @@ assert "второ заглавие за дневни потоци в ETF" in re
 print(f"  ✓ минават 4 дословни заглавия: «{items[0]['headline']}», ETF потоци, хак, Bessent (етикетът „opinion“ не се гледа); отпадат вторият за ETF потоци, лош и повторен индекс")
 
 print()
-print("── 2. build(): кеш по ден, цени, COT само при нов отчет ──")
+print("── 2. build(): кеш по ден, цени ──")
 calls = []
 ai = lambda s, u: (calls.append(u), json.dumps(ans))[1]
 idx_d = pd.date_range("2026-10-08", "2026-10-21", freq="B")
 px = pd.concat({t: pd.DataFrame({"Close": [100 + k for k in range(len(idx_d))]}, index=idx_d) for t in config.CRYPTO_TICKERS}, axis=1)     # СИНТЕТИЧНИ цени
-btc = [{"date": f"2026-{m:02d}-{d:02d}", "net": n} for (m, d), n in zip([(7, x) for x in range(1, 29, 7)] + [(8, x) for x in range(1, 29, 7)] + [(9, x) for x in range(1, 29, 7)], range(-5000, 7000, 1000))]   # СИНТЕТИЧНА серия
-out = cn.build("2026-10-22", cot_fresh=False, cot_series={config.CRYPTO_COT_MARKET: btc}, fetch=lambda: POOL, ai_call=ai, download=lambda t: px)
-assert out["ok"] and len(out["items"]) == 4 and out["pool"] == 30 and out["cot_btc"] is None and len(calls) == 1
+out = cn.build("2026-10-22", fetch=lambda: POOL, ai_call=ai, download=lambda t: px)
+assert out["ok"] and len(out["items"]) == 4 and out["pool"] == 30 and "cot_btc" not in out and len(calls) == 1          # 17.11.2026: COT е махнат
 assert [t["ticker"] for t in out["tickers"]] == config.CRYPTO_TICKERS and out["tickers"][0]["date"] == "2026-10-21" and out["tickers"][0]["chg_1d_pct"] == round((109 / 108 - 1) * 100, 1)
-again = cn.build("2026-10-22", cot_fresh=True, cot_series={config.CRYPTO_COT_MARKET: btc}, fetch=lambda: POOL, ai_call=ai, download=lambda t: px)
+again = cn.build("2026-10-22", fetch=lambda: POOL, ai_call=ai, download=lambda t: px)
 assert len(calls) == 1 and again["items"] == out["items"]                                    # кешът за деня — без второ извикване
-assert again["cot_btc"] == {"as_of": btc[-1]["date"], "net": btc[-1]["net"], "percentile": 100.0, "weeks": len(btc)}
 none = cn.build("2026-10-23", fetch=lambda: POOL, ai_call=lambda s, u: json.dumps({"news": []}), download=lambda t: px)
 fail = cn.build("2026-10-24", fetch=lambda: [], ai_call=ai, download=lambda t: (_ for _ in ()).throw(RuntimeError("Yahoo")))
 assert none["ok"] and none["items"] == [] and not fail["ok"] and fail["reason"] == "фийдовете (Cointelegraph, CoinDesk) не върнаха заглавия" and fail["tickers"] == []
-print("  ✓ 4 новини, цените — от последния цял бар преди деня; втори run същия ден — от кеша; COT за Bitcoin — само при нов отчет; празен фийд → причина, без грешка")
+print("  ✓ 4 новини, цените — от последния цял бар преди деня; втори run същия ден — от кеша; празен фийд → причина, без грешка")
 
 print()
 print("── 3. страницата (РЕАЛНИЯТ бриф от 19.10) ──")
@@ -70,7 +68,7 @@ with contextlib.redirect_stdout(io.StringIO()):
 sec = p1[p1.index("Крипто · последните 24ч"):]; sec = sec[:sec.index("</section>")]
 assert POOL[idx["OCC finalizes GENIUS"]]["title"] in sec and "· Cointelegraph" in sec and "· регулация" not in sec
 # 02.11.2026 (поправки след брифа, т. 7): без реда с цените и без „COT Bitcoin“ на страницата (данните остават — again ги има); обяснението — едно сиво изречение
-assert again["tickers"] and again["cot_btc"] and "<b>COIN</b>" not in sec and "за сесията" not in sec and "COT Bitcoin" not in sec and "managed money" not in sec
+assert again["tickers"] and "<b>COIN</b>" not in sec and "за сесията" not in sec and "COT Bitcoin" not in sec and "managed money" not in sec
 assert ("Подборът е на AI — по това дали новината би променила решението на институционален инвеститор в крипто след седмица; заглавието и източникът са дословни.</div>" in sec
         and "токенизация" not in sec and "Информация, не препоръка" not in sec)
 assert "Няма значими крипто новини (проверени 30 заглавия от Cointelegraph)." in p2 and "празното НЕ значи, че няма новини" in p3

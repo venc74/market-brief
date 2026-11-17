@@ -49,7 +49,7 @@ reply = {"digests": [{"ticker": "ACN", **{k: FX["ACN"]["ai"][k] for k in ("summa
 ai_brief._call_claude = lambda system, user, **k: (sent.append(user), json.dumps(reply, ensure_ascii=False))[1]
 row = {k: v for k, v in copy.deepcopy(FX["ACN"]).items() if k != "ai"}
 with q() as log:
-    out = ai_brief._watch_digest_batch([row], {"cot_markets": [], "leading_sectors": []}, 24)
+    out = ai_brief._watch_digest_batch([row], {"leading_sectors": []}, 24)
 assert "БЕЗ ИМЕНА НА ХОРА — пиши САМО длъжността на български" in sent[0] and "Sweet Julie Spellman" not in sent[0].split("НАБЛЮДАВАНИ ТИКЪРИ")[0]
 assert "Spellman" not in out[0]["ai"]["summary"] and "Sekido" not in out[0]["ai"]["insider_read"] and "съизпълнителен директор" in out[0]["ai"]["insider_read"]
 assert "[ai] watch ACN summary: «Julie Spellman» — махнато (длъжността е преди него)" in log.getvalue()

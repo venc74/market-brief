@@ -60,14 +60,6 @@ env.globals["neglect_label"] = _neglect_label
 env.filters["cname"] = names.display_name            # 08.10: име на компания за показване — без правни окончания, рязане по граница на дума с «…»
 
 
-def cot_label(c: dict) -> str:
-    """26.10.2026 (етап 4б, т. 8): етикетът на COT реда по знака на нетната позиция (cot.position_label) — и за стар бриф без полето."""
-    from src import cot
-    c = c or {}
-    return c.get("position_label") or cot.position_label(c.get("direction"), c.get("net_position", c.get("net")), c.get("percentile"), c.get("weeks_of_history", c.get("weeks")))
-
-
-env.filters["cot_label"] = cot_label
 
 
 def berlin_clock(now: dt.datetime | None = None) -> tuple[str, str]:
@@ -780,12 +772,6 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
-        cot=brief.get("cot", []),
-        cot_status=brief.get("cot_status") or {},
-        cot_rhythm=brief.get("cot_rhythm") or {},                   # 21.10 (етап 4): ред „без нови данни“ в дните след първия бриф с отчета
-        cot_summary=brief.get("cot_summary"),
-        cot_all=brief.get("cot_all") or [],                         # 03.11.2026 (т. 17): всички 40 пазара — сгънатата таблица
-        cot_low=config.COT_PERCENTILE_LOW, cot_high=config.COT_PERCENTILE_HIGH, cot_confirm_weeks=config.COT_CONFIRM_LOOKBACK_WEEKS,
         correlation_flags=brief.get("correlation_flags", []),
         distribution_days=brief.get("distribution_days"),
         distribution_days_status=brief.get("distribution_days_status"),
