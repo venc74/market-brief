@@ -450,6 +450,19 @@ def _market_closed(today: str, data_dir=None) -> dict:
     return {"date": today, "market_closed": True, "last_brief": last.stem}
 
 
+def _reconcile_earnings_dates(week_calendar: dict | None, cards: list[dict]) -> None:
+    """17.11.2026 (пакет 1, т. 8): календарът (Nasdaq) срещу картите (Yahoo) — при разминаване и двете дати, с етикет (card["earnings"]["date_conflict"]). Graceful."""
+    try:
+        from src import econ_calendar as _ec
+        conf = _ec.reconcile_dates(week_calendar, {c["ticker"]: (c.get("earnings") or {}).get("next_earnings") for c in cards if (c.get("earnings") or {}).get("next_earnings")})
+        for c in cards:
+            if c.get("ticker") in conf:
+                c.setdefault("earnings", {})["date_conflict"] = conf[c["ticker"]]
+                print(f"[calendar] {c['ticker']}: {conf[c['ticker']]}")
+    except Exception as e:
+        print(f"[calendar] сверката на датите на отчетите пропусната: {type(e).__name__}: {e}")
+
+
 def _display_names() -> dict:
     """16.11.2026 (пакет 16.11, т. 14): имената за „R · Ryder“ навсякъде с тикър — таблиците на Wikipedia + имената на наблюдаваните. Graceful: провал → {}."""
     try:
@@ -935,17 +948,7 @@ def run() -> dict:
         return out
     week_calendar = steps.step("week_calendar", _week_calendar, fallback={"ok": False, "errors": ["стъпката пропадна"], "days": []}, enabled=config.ENABLE_WEEK_CALENDAR,
                                label="Календарът на седмицата (Nasdaq)", consequence="календарът на седмицата липсва днес — червен ред на страницата")
-    # 17.11.2026 (пакет 1, т. 8): една дата на отчета за страницата — календарът (Nasdaq) срещу картите (Yahoo); при разминаване — и двете, с етикет
-    try:
-        from src import econ_calendar as _ec
-        _cards = action + watchlist + (qm_cards or [])
-        _conf = _ec.reconcile_dates(week_calendar, {c["ticker"]: (c.get("earnings") or {}).get("next_earnings") for c in _cards if (c.get("earnings") or {}).get("next_earnings")})
-        for c in _cards:
-            if c.get("ticker") in _conf:
-                c.setdefault("earnings", {})["date_conflict"] = _conf[c["ticker"]]
-                print(f"[calendar] {c['ticker']}: {_conf[c['ticker']]}")
-    except Exception as e:
-        print(f"[calendar] сверката на датите на отчетите пропусната: {type(e).__name__}: {e}")
+    _reconcile_earnings_dates(week_calendar, action + watchlist + (qm_cards or []))      # 17.11.2026 (пакет 1, т. 8): една дата на отчета за страницата
 
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
