@@ -494,6 +494,9 @@ MODEL_PROBE_MAX_TOKENS = int(os.getenv("MODEL_PROBE_MAX_TOKENS", 16))
 # max_tokens е ТАВАН, не такса: плаща се само реално генерираното, затова
 # запасът не струва нищо, а отрязването струва секция.
 MACRO_MAX_TOKENS = int(os.getenv("MACRO_MAX_TOKENS", 8000))
+# 17.11.2026 (пакет 1, т. 2б — решение след стратегическия преглед): макро разказът — кратко, 3–4 изречения (промптът); над MACRO_MAX_SENTENCES кодът реже (ai_brief.cap_sentences)
+MACRO_MIN_SENTENCES = int(os.getenv("MACRO_MIN_SENTENCES", 3))
+MACRO_MAX_SENTENCES = int(os.getenv("MACRO_MAX_SENTENCES", 4))
 
 # 17.11.2026 (пакет 1, т. 2а): AI_BATCH_SIZE / AI_BATCH_MAX_TOKENS / AI_NARRATIVE_SETUPS (AI абзацът на картите, ticker_narratives) — махнати; batch-овете остават
 # в наблюдаваните (WATCH_AI_BATCH_SIZE) — правило 4 от CLAUDE.md важи за тях.

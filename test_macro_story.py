@@ -22,6 +22,7 @@ _tmp = tempfile.TemporaryDirectory(prefix="mb_story2_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()
 from src import ai_brief, render
+config.MACRO_MAX_SENTENCES = 100          # 17.11.2026 (т. 2б): таванът от 4 изречения има собствен тест (test_macro_short); тук — разказът в абзаци (стар формат); след импорта — промптът казва 3–4
 
 FX = json.loads((ROOT / "tests" / "fixtures" / "macro_story_2026-10-29.json").read_text(encoding="utf-8"))
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
@@ -29,7 +30,7 @@ q = lambda: contextlib.redirect_stdout(io.StringIO())
 
 print("── 1. промптът върху РЕАЛНИТЕ входове от 29.10 ──")
 p = ai_brief.macro_user_prompt(FX["macro"], FX["rotation"], FX["thermometer"], FX["news"], FX["crypto"])
-assert ai_brief.NARRATIVE_RULES in p and "„За нас:“" in p and "обикновено 2–3 абзаца" in p and "без думата „режим“" in p
+assert ai_brief.NARRATIVE_RULES in p and "„За нас:“" in p and "3–4 изречения в един абзац" in p and "обикновено 2–3 абзаца" not in p and "без думата „режим“" in p
 assert "ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): Енергетика (XLE), Здравеопазване (XLV)" in p
 assert "Bitcoin ETF inflows climb to $176M as BTC rebounds above $80K" in p and '"ticker": "HOOD", "chg_1d_pct": -3.3' in p              # крипто секцията (т. 4)
 assert "Alphabet sinks 10% as it holds 2026 capex unchanged" in p                                                                        # новините (т. 3)
@@ -80,10 +81,11 @@ print()
 print("── 5. правилата от 30.10 (поправки от брифа, т. 4) — РЕАЛНИТЕ входове на 30.10 ──")
 B30 = json.loads((ROOT / "tests" / "fixtures" / "narrative_numbers_2026-10-30.json").read_text(encoding="utf-8"))["b30"]
 p30 = ai_brief.macro_user_prompt(B30["macro"], B30["rotation"], B30["thermometer"], B30["news"], B30["crypto"])
-for want in ("дължината не е строго ограничена", "без преразказ на уредите един по един", "само с обяснение на прост език в скоби, напр. „contango (",
+for want in ("3–4 изречения в един абзац", "без преразказ на уредите един по един",          # 17.11.2026 (т. 2б): до тогава „дължината не е строго ограничена“
+             "само с обяснение на прост език в скоби, напр. „contango (",
              "Без цитати от нашите проучвания", "само с двете мерки ЗАЕДНО: основната инфлация (Dallas Fed Trimmed Mean PCE) и базовият PCE", "двете мерки заедно, всяка с месеца си, или изобщо не"):
     assert want in p30, want
 for gone in ("проучването ни", "47–72", "1 от 3 кризи", "не влиза в режима"):
     assert gone not in p30, gone                                                                                              # 30.10: разказът цитира „1 от 3 кризи … 47–72%“
-print("  ✓ без таван на дължината, жаргон с обяснение, без цитати от проучванията (и без числата им в промпта), инфлацията — двете мерки заедно или нищо")
+print("  ✓ 3–4 изречения (от 17.11; до тогава без таван), жаргон с обяснение, без цитати от проучванията (и без числата им в промпта), инфлацията — двете мерки заедно или нищо")
 print("\n✅ test_macro_story: всичко мина")

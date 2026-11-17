@@ -14,6 +14,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
+config.MACRO_MAX_SENTENCES = 100          # 17.11.2026 (т. 2б): таванът от 4 изречения има собствен тест (test_macro_short); тук — разказът в абзаци (стар формат)
 from src import regime_claims as rc, thermometer as th, ai_brief
 
 FX = json.loads((ROOT / "tests" / "fixtures" / "ai_macro_texts_2026-06-13_10-08.json").read_text(encoding="utf-8"))["briefs"]

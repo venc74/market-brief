@@ -927,6 +927,19 @@ def check_news_why_terms(news: list[dict] | None, day: dict | None = None) -> li
     return fixed
 
 
+def cap_sentences(text: str, n: int) -> tuple[str, list[str]]:
+    """
+    17.11.2026 (пакет 1, т. 2б): разказът — най-много n изречения; над тях се махат средните, а изречението „За нас:“ (последното по правило) остава. Връща (текст, махнатите).
+    При рязане абзаците се сливат в един (разказът е един абзац). Чиста функция.
+    """
+    sents = [x for x in _SENT_SPLIT_RE.split(re.sub(r"\s*\n\s*\n\s*", " ", text or "").strip()) if x]
+    if len(sents) <= n:
+        return text, []                                                       # до n изречения — непроменено (и абзаците)
+    us = next((k for k in range(len(sents) - 1, -1, -1) if sents[k].startswith("За нас:")), None)
+    keep = sents[:n - 1] + [sents[us]] if us is not None and us >= n - 1 else sents[:n]
+    return " ".join(keep), [x for x in sents if x not in keep]
+
+
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
                            thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None) -> dict:
     """
@@ -970,6 +983,15 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
                     print(f"[ai] разказ: твърдение без опора във входа ({', '.join(f['claims'])}) — махнато: «{f['sentence'][:120]}»")
     except Exception as e:
         print(f"[ai] проверката на твърденията в разказа пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 17.11.2026 (пакет 1, т. 2б): най-много MACRO_MAX_SENTENCES изречения — след проверките
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            new, cut = cap_sentences(out["macro_brief"], config.MACRO_MAX_SENTENCES)
+            out = {**out, "macro_brief": new}
+            if cut:
+                out["sentences_capped"] = cut
+                print(f"[ai] разказ: над {config.MACRO_MAX_SENTENCES} изречения — махнати {len(cut)}: «{cut[0][:100]}»…")
+    except Exception as e:
+        print(f"[ai] таванът на изреченията в разказа пропуснат: {type(e).__name__}: {e}")
     return out
 
 
@@ -1328,8 +1350,9 @@ def _social_block(social: dict | None) -> str:
 # 29.10.2026 (разходката, т. 5, решение 2): разказът за нощта — тонът е от примера на Венци за 29.10 (кратки изречения, причина → следствие, числа само когато помагат,
 # „под повърхността“ с мярка, последното изречение „За нас: …“). Самият пример НЕ е в промпта: съдържанието му (Alphabet, Microsoft, Бесънт) би изтекло в други дни.
 NARRATIVE_RULES = (
-    "Разказ за нощта на човешки език — обикновено 2–3 абзаца, разделени с празен ред (\\n\\n в JSON низа); дължината не е строго ограничена — колкото трябва на историята, "
-    "но без преразказ на уредите един по един:\n"
+    # 17.11.2026 (пакет 1, т. 2б — решение след стратегическия преглед): кратко — 3–4 изречения в един абзац (до 17.11 — „обикновено 2–3 абзаца“); кодът реже над
+    # config.MACRO_MAX_SENTENCES (cap_sentences), като пази изречението „За нас:“
+    f"Кратко — {config.MACRO_MIN_SENTENCES}–{config.MACRO_MAX_SENTENCES} изречения в един абзац, САМО върху подадените числа и новини; без преразказ на уредите един по един:\n"
     "- Започни с това, което определи нощта, и свържи нещата: кое с кое е свързано и защо (новините, крипто, глобалните сигнали). Уредите на термометъра са контекст — "
     "кажи с думи какво показват („VIX е нисък“, „над половината акции са над средните си нива“), не ги изброявай.\n"
     "- Кратки изречения, причина → следствие („затова…“, „пазарът го чу като…“). Числа само там, където помагат на историята — точно както са в данните.\n"
@@ -1352,7 +1375,7 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     """
     Връща:
     {
-      "macro_brief": "разказ в 2–3 абзаца (разделени с празен ред)"
+      "macro_brief": "разказ в 3–4 изречения (един абзац; 17.11.2026 — до тогава 2–3 абзаца)"
     }
     30.10.2026 (разходката, т. 7): без веригите на секторите ("sector_logic") — секторната карта е от кода (sector_layer.sector_board).
     29.10.2026 (разходката, т. 5): без "regime_comment"; моделът вижда уредите на термометъра само като контекст (_thermo_context), крипто секцията (_crypto_block) и — когато я има —
