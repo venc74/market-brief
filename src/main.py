@@ -478,6 +478,7 @@ def run() -> dict:
     ai_brief.TRUNCATIONS.clear()
     ai_brief.FIELD_DROPS.clear()                                                 # 16.11.2026 (т. 3)
     ai_brief.FIELD_SUBS.clear()                                                  # 17.11.2026 (т. 3б)
+    ai_brief.MIXED_DROPS.clear()                                                 # 17.11.2026 (т. 7)
     ai_brief.AI_USAGE.clear()
     model_info = {"model": config.CLAUDE_MODEL, "source": "static",
                   "rejected": None, "rejected_reason": "", "banner": {}}
@@ -1009,6 +1010,7 @@ def run() -> dict:
         "ai_truncations": list(ai_brief.TRUNCATIONS),
         "ai_field_drops": list(ai_brief.FIELD_DROPS),                    # 16.11.2026 (т. 3): махнатите изречения с имена на полета
         "ai_field_subs": list(ai_brief.FIELD_SUBS),                      # 17.11.2026 (т. 3б): познатите имена на полета — подменени с български термин
+        "ai_mixed_drops": list(ai_brief.MIXED_DROPS),                    # 17.11.2026 (т. 7): изречения с дума от смесени букви, която не се поправя
         "ai_usage": list(ai_brief.AI_USAGE),
         "watch": watch_rows,
         "watch_status": dict(watch_monitor.LAST_STATUS),                 # 04.11.2026 (В1): какво не се провери при наблюдаваните (брояч и причина)

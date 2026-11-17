@@ -51,7 +51,7 @@ assert out["t"] == expo[0] and out["u"] == expo[1]
 assert log.count("известен езиков дефект 'expозиция' (трябва 'експозиция')") == 2 and "смесена дума 'expозиция'" in log      # и общият лог за хибриди остава
 print("  ✓ РЕАЛНО: 'marginalen' (USD/GBP тезата) и двете 'expозиция' от 05.10 → ред 'известен езиков дефект … (трябва …)' с контекст; текстът остава непроменен;")
 print("    общият лог за смесени думи на 'expозиция' също е там")
-out, log = run({"t": "Marginalen и MARGINALEN, но не remarginalenx и не marginalenки"})
+out, log = run({"t": "Marginalen и MARGINALEN, но не remarginalenx. И не marginalenки."})          # 17.11.2026 (т. 7): смесената „marginalenки“ — в отделно изречение (то пада)
 assert log.count("известен езиков дефект") == 2 and out["t"].startswith("Marginalen и MARGINALEN")
 out, log = run({"t": "нормален текст с експозиция и маргинален ефект"})
 assert "известен езиков дефект" not in log

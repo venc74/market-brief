@@ -677,7 +677,53 @@ def _fix_translit(obj):
         elif (cyr_w := _latin_as_bg(w)):
             print(f"[ai] ⚠ латиница вместо кирилица: '{w}' (= '{cyr_w}') — само лог")
         return w
-    return _TRANSLIT_RE.sub(repl, obj)
+    obj = _TRANSLIT_RE.sub(repl, obj)
+    return _fix_mixed_script(obj)                 # 17.11.2026 (пакет 1, т. 7): смесени букви в една дума — поправка или изречението пада
+
+
+# 17.11.2026 (пакет 1, т. 7): дума със смесени латински и кирилски букви („Zад цифрите“, разказът от 17.11). Латинските букви → кирилица буква по буква; ако така
+# се получава позната дума от корпуса (_bg_vocab, ≥ 2 срещания) — поправка („Zад“ → „Зад“, „секторa“ → „сектора“, „Fед“ → „Фед“); иначе изречението пада (хибрид
+# като „benefitва“, „Setupът“). Измерено върху AI текстовете на брифовете 13.06–17.11: 92 смесени думи (67 различни) — 33 различни се поправят, 34 — изречението пада;
+# след 10.10 — 5 (последната е „Zад“ на 17.11). Махнатите — MIXED_DROPS → brief["ai_mixed_drops"].
+_MIXED_TOKEN = re.compile(r"[A-Za-zА-Яа-яЁё]+")
+MIXED_DROPS: list[dict] = []
+
+
+def _fix_mixed_script(s: str) -> str:
+    if not (re.search(r"[A-Za-z]", s) and re.search(r"[А-Яа-яЁё]", s)):
+        return s
+    cyr = _bg_vocab()[0]
+    if not cyr:                                   # без речник от историята — не може да се прецени; само логът за смесени думи (както до 17.11)
+        return s
+    bad: list[str] = []
+
+    def repl(m):
+        w = m.group(0)
+        if not (re.search(r"[A-Za-z]", w) and re.search(r"[А-Яа-яЁё]", w)):
+            return w
+        parts = [(_translit_prefix(ch) if "a" <= ch.lower() <= "z" else ch) for ch in w]
+        t = "".join(p for p in parts if p) if all(parts) else None
+        if t and cyr.get(t.lower(), 0) >= 2:
+            print(f"[ai] смесени букви в дума поправени: '{w}' → '{t}'")
+            return t
+        bad.append(w)
+        return w
+    s = _MIXED_TOKEN.sub(repl, s)
+    if not bad:
+        return s
+    paras = []
+    for para in re.split(r"\n\s*\n", s):
+        kept = []
+        for x in _SENT_SPLIT_RE.split(para.strip()):
+            hit = [b for b in bad if re.search(rf"(?<![A-Za-zА-Яа-яЁё]){re.escape(b)}(?![A-Za-zА-Яа-яЁё])", x)]
+            if hit:
+                print(f"[ai] ⚠ смесени букви ({', '.join(hit)}) — махнато цялото изречение: «{x[:160]}»")
+                MIXED_DROPS.append({"words": hit, "sentence": x})
+            else:
+                kept.append(x)
+        if kept:
+            paras.append(" ".join(kept))
+    return "\n\n".join(paras)
 
 
 # FIX 2026-09-30: речник от предишните брифове (docs/data/*.json, вече в
