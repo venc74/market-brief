@@ -88,14 +88,30 @@ _NAME_SUFFIX = re.compile(r"(?:,?\s+(?:Inc\.?|Incorporated|Corporation|Corp\.?|p
 _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 
 
-def company_keys(name: str | None) -> set[str]:
-    """29.10.2026 (т. 6): имената, по които новината се разпознава като за компанията — пълното име без "Inc." и т.н. и първата му дума (3+ знака). "C3.ai, Inc." → {"C3.ai"}."""
+def company_keys(name: str | None, others=None) -> set[str]:
+    """
+    29.10.2026 (т. 6): имената, по които новината се разпознава като за компанията — пълното име без "Inc." и т.н. и първата му дума (3+ знака). "C3.ai, Inc." → {"C3.ai"}.
+    17.11.2026 (пакет 1, т. 4): първата дума — САМО ако не е първа дума и на друга компания (others — имената от универса и другите наблюдавани): HONA „Honeywell Aerospace“
+    се търси по „Honeywell Aerospace“, не по „Honeywell“ (хващаше и HON). Реално към 17.11: от 6-те наблюдавани само HONA има такава двойка (HON).
+    """
     n = _NAME_SUFFIX.sub("", (name or "").strip()).strip(" ,")
     keys = {n} if n else set()
     first = n.split()[0] if n.split() else ""
-    if len(first) >= 3:
+    taken = {str(o).split()[0].lower() for o in (others or []) if str(o or "").split()}
+    if len(first) >= 3 and first.lower() not in taken:
         keys.add(first)
     return keys
+
+
+def _other_names(ticker: str, watch_names: dict | None = None) -> list[str]:
+    """17.11.2026 (т. 4): имената на ДРУГИТЕ компании — универсът (screener.LAST_UNIVERSE_NAME, иначе data/universe.json) и другите наблюдавани. Graceful: провал → []."""
+    try:
+        from src import screener
+        names = dict(screener.LAST_UNIVERSE_NAME) or (json.loads((config.DATA_DIR / config.UNIVERSE_CACHE_NAME).read_text(encoding="utf-8")).get("name") or {})
+    except Exception:
+        names = {}
+    names = {**names, **(watch_names or {})}
+    return [v for k, v in names.items() if k != ticker and v]
 
 
 def about_company(ticker: str, keys: set[str], title: str, summary: str = "") -> str | None:
@@ -465,11 +481,15 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
         print(f"[watch] insider блок се провали изцяло: {e}")
         insider, insider_ok = {}, False
 
+    try:
+        _watch_names = load_watch_names() or {}
+    except Exception:
+        _watch_names = {}
     rows = []
     since_day = since_day or (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=window_hours or config.WATCH_NEWS_WINDOW_HOURS)).date().isoformat()
     for tk in tickers:
         f = fx.get(tk) or {}
-        news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name")))
+        news = _recent_news(tk, window_hours or config.WATCH_NEWS_WINDOW_HOURS, company_keys(f.get("name"), _other_names(tk, _watch_names)))      # 17.11.2026 (т. 4)
         checked = news is not None                                                     # 04.11.2026 (В1): None — новините не се провериха (не „няма новини“)
         news = news or []
         txns = insider.get(tk, [])
