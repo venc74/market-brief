@@ -18,6 +18,6 @@ for p in files:
         bad[p.name] = dup
 assert not bad, bad
 src = (ROOT / "src" / "ai_brief.py").read_text(encoding="utf-8")
-assert "def _news_block(" in src and "def _ticker_news_block(" in src
+assert "def _news_block(" in src                                       # 17.11.2026 (т. 2а): _ticker_news_block — махнат с AI абзаца на картите
 print(f"  ✓ {len(files)} модула — без двойни дефиниции на най-горното ниво")
 print("\n✅ test_no_duplicate_defs: всичко мина")

@@ -56,17 +56,5 @@ with q():
 assert "EPS ръст (от отчета) —" in page_old and "Ръст на нетната печалба (Yahoo, тримесечие г/г) +120.5%" in page_old
 print("  ✓ „EPS ръст (от отчета) +53.8% (EPS $8.29 срещу $5.39, 30.07 г/г)“ и „Ръст на нетната печалба (Yahoo, тримесечие г/г) +120.5%“; стар бриф без полето — „—“ и етикетираният ред")
 
-print()
-print("── 3. моделът — честните имена ──")
-sent = []
-real = ai_brief._call_claude
-ai_brief._call_claude = lambda system, user, **k: (sent.append(user), '{"tickers": []}')[1]                         # СИНТЕТИЧНО
-try:
-    c = copy.deepcopy(card); c["setup"] = {"kind": "below_pivot", "trigger_text": "…"}
-    with q():
-        ai_brief.ticker_narratives([c], [], "Defensive")
-finally:
-    ai_brief._call_claude = real
-assert sent and '"eps_growth_report_pct": 53.8' in sent[0] and '"net_income_growth_yoy_yahoo_pct": 120.5' in sent[0] and '"eps_growth_yoy"' not in sent[0]
-print("  ✓ промптът: eps_growth_report_pct 53.8 и net_income_growth_yoy_yahoo_pct 120.5 (без eps_growth_yoy)")
+# 17.11.2026 (пакет 1, т. 2а): т. 3 (промптът на картите) — махната с AI абзаца
 print("\n✅ test_eps_report: всичко мина")

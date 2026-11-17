@@ -1117,15 +1117,9 @@
     {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
     <div class="stock-body">
       <div class="block">
-        <h3>Защо точно сега</h3>
-        <div class="why">{{ st.ai.why_now }}</div>
-        <h3>Бизнес</h3>
-        <div class="why">{{ st.ai.business_bg }}</div>
-        <h3>Катализатори · 4–8 седмици</h3>
-        <ul class="tight">{% for c in st.ai.catalysts %}<li>{{ c }}</li>{% endfor %}</ul>
-        <h3>Рискове</h3>
-        <ul class="tight">{% for r in st.ai.risks %}<li>{{ r }}</li>{% endfor %}</ul>
-        {% if st.ai.warning %}<p class="warn">⚠ {{ st.ai.warning }}</p>{% endif %}
+        {# 17.11.2026 (пакет 1, т. 2а): AI абзацът („защо сега / бизнес / катализатори / рискове“) — махнат; „Защо е тук“ — от кода (render.why_here) #}
+        <h3>Защо е тук</h3>
+        <div class="why">{{ why_here(st) or "—" }}</div>
         <h3>Short Interest</h3>
         <div class="why" style="font-size:13.5px">{{ st.short_view.interpretation }}</div>
       </div>
@@ -1160,8 +1154,6 @@
         <div class="kv"><span>Inst. ownership</span><b>{{ st.inst_ownership_pct }}%{% if st.inst_ownership_pct is number and st.inst_ownership_pct > 100 %} <span class="cs-mu" title="Над 100% — обичайно двойно броене в 13F (заети акции при двама притежатели); не е сигнал">двойно броене</span>{% endif %}</b></div>
         <h3>Earnings</h3>
         <div class="kv"><span>Следващ отчет</span><b>{{ st.earnings.next_earnings or "—" }}{% if st.earnings.days_to_earnings is not none %} ({{ st.earnings.days_to_earnings }}д){% endif %}</b></div>
-        {# 19.10.2026 (етап 2, т. 11): текстът е на модела — не е "Препоръка"; датата и предупреждението за отчета са от кода (earnings_warning) #}
-        {% if st.ai.earnings_call %}<div class="kv"><span title="Текстът е на модела, не е препоръка; датата и предупреждението за отчета горе са от кода">Бележка на AI за отчета</span><b>{{ st.ai.earnings_call }}</b></div>{% endif %}
         <div class="plan">
           <h3 style="color:var(--regime)">План{% if p.sizing_factor < 1 %} · режимен фактор ×{{ p.sizing_factor }} (Defensive){% endif %}</h3>
           {# FIX 2026-10-03 (пакет 1, т.3): v2 план — buy-stop на pivot с таван за вход,
@@ -1225,7 +1217,7 @@
       {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}{% if st.get("offering_warning") %}<div class="corp-warn">{{ st.offering_warning }}</div>{% endif %}{% if st.get("deal_buyer") %}<div class="small" style="color:var(--muted)">{{ st.deal_buyer }}</div>{% endif %}
       {# 12.10: потвърден пробив с жив запис в buy-stop книгата — неутрален ред (без "не нов вход") #}
       {% if st.setup and st.setup.book_note %}<div class="small" style="font-size:12.5px;color:var(--muted);margin:4px 0">{{ st.setup.book_note }}</div>{% endif %}
-      <p>{{ st.ai.why_now }}</p>
+      {% set wh = why_here(st) %}{% if wh %}<p>Защо е тук: {{ wh }}</p>{% endif %}            {# 17.11.2026 (т. 2а): от кода, без AI #}
       {# 07.10: жив запис в книгата, задействан (open/trailing) — картата казва изпълнения сигнал, не "чака пробив" #}
       {% if not (st.setup and st.setup.triggered) %}
       <div class="watch-trigger"><b>Trigger:</b> {{ st.ai.watchlist_trigger }}

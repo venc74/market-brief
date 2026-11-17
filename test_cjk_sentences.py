@@ -63,7 +63,7 @@ ai_brief.TRUNCATIONS.clear()
 
 
 def _narratives_for_batch():                                                                                # името носи етикета (както в кода)
-    return ai_brief._parse_json(ai_brief._call_claude(ai_brief.SYSTEM_TICKERS, "СИНТЕТИЧЕН промпт", max_tokens=8000))
+    return ai_brief._parse_json(ai_brief._call_claude(ai_brief.SYSTEM_MACRO, "СИНТЕТИЧЕН промпт", max_tokens=8000))
 
 
 buf = io.StringIO()

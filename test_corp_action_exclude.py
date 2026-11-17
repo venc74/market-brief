@@ -117,7 +117,7 @@ print()
 print("── 6. main.run: изключването е преди AI и преди книгите; маркерът от 09.10 не се вика ──")
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 i_scr = src.index('candidates, corp_ex_screener = corp_actions.exclude(candidates, "screener", today)')
-assert i_scr < src.index("setup_rules.annotate(candidates") < src.index("ai_brief.ticker_narratives(")
+assert i_scr < src.index("setup_rules.annotate(candidates") < src.index("action, watchlist = apply_hard_rules(candidates")          # 17.11.2026: AI синтезът на картите — махнат
 i_glb, i_gw = src.index('glb_candidates, corp_ex_glb = corp_actions.exclude(glb_candidates, "glb", today)'), src.index('glb_wish_signals, corp_ex_gw = corp_actions.exclude(glb_wish_signals, "glb_wish", today)')
 i_qm = src.index('qm_rows, corp_ex_qm = corp_actions.exclude(qm_rows, "qm", today)')
 i_book = src.index("backtest.update_backtest_tracker(action, today, watchlist_before_expiry")

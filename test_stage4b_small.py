@@ -55,15 +55,7 @@ z = next(r for r in compact if r["ticker"] == "ZBRA")
 assert z["reason"].startswith("✅ задействан в buy-stop книгата на 21.10 по $390.80") and z["reason"].endswith("в позиция от 21.10; днес под pivot")   # 27.10.2026: не "чака buy-stop"
 a = next(r for r in compact if r["ticker"] == "AAPL")
 assert a["reason"].endswith("днес: над pivot без обем ≥ 1.5×") and "в позиция от" not in a["reason"]                          # друг сетъп днес — причината остава
-sent = []
-real = ai_brief._call_claude
-ai_brief._call_claude = lambda system, user, **k: (sent.append(user), '{"tickers": []}')[1]                       # СИНТЕТИЧНО
-try:
-    with q():
-        ai_brief.ticker_narratives(copy.deepcopy(wl), [], "Defensive")
-finally:
-    ai_brief._call_claude = real
-assert sent == []
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives) — махнат; проверката на промпта отпадна с него
 pw = page_of(watchlist=wl)
 pw_r = pw[pw.index("На радара (3)"):]
 assert "✅ задействан в buy-stop книгата на 21.10 по $390.80" in pw_r and pw_r.count("✅ задействан в buy-stop книгата") == 3

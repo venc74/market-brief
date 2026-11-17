@@ -20,18 +20,8 @@ from src import ai_brief, render, setup_rules
 ROKU = json.loads((ROOT / "tests" / "fixtures" / "card_roku_2026-10-22.json").read_text(encoding="utf-8"))["card"]
 assert ROKU["breakout_volume"] is True and ROKU["pct_from_pivot"] == -1.32 and ROKU["volume_ratio"] == 3.5
 
-print("── 1. какво вижда моделът ──")
-seen = []
-ai_brief._call_claude = lambda system, user, **k: (seen.append(user), json.dumps({"tickers": []}))[1]
-with contextlib.redirect_stdout(io.StringIO()):
-    ai_brief.ticker_narratives([copy.deepcopy(ROKU)], [], "Defensive")
-payload = seen[0][seen[0].index("КАНДИДАТИ: ") + len("КАНДИДАТИ: "):].split("\n", 1)[0]
-cand = json.loads(payload)[0]
-assert "breakout_volume" not in cand and cand["volume_spike"] is True and cand["pct_from_pivot"] == -1.32 and cand["setup"] == "below_pivot"
-assert setup_rules._volume_ok(ROKU) is True                                                   # кодът на сетъпа — както досега
-print("  ✓ ROKU: към модела — volume_spike: true, pct_from_pivot −1.32, setup below_pivot; без полето breakout_volume; сетъпът на кода не се мени")
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives) — махнат; проверката на промпта отпадна с него
 
-print()
 print("── 2. картата (РЕАЛНИ Action карти: AMD 22.09 под pivot, EXPD 16.10 над pivot) ──")
 b22 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-09-22.json").read_text(encoding="utf-8"))
 b16 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-16.json").read_text(encoding="utf-8"))

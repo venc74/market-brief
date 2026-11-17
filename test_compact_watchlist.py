@@ -21,21 +21,11 @@ from src import ai_brief, render
 
 B05 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 FX08 = json.loads((ROOT / "tests" / "fixtures" / "watchlist_cards_2026-10-08.json").read_text(encoding="utf-8"))
-assert config.AI_NARRATIVE_SETUPS == ("confirmed", "below_pivot")
 calls = []
 ai_brief._call_claude = lambda system, user, **k: calls.append(user) or json.dumps({"tickers": []})
 
-print("── 1. към модела отиват само confirmed / below_pivot ──")
-ai_brief.ticker_narratives([copy.deepcopy(c) for c in B05["watchlist"]], [], "Defensive")
-assert len(calls) == 1
-sent = {x["ticker"] for x in json.loads(re.search(r"КАНДИДАТИ: (\[.*?\])\n", calls[0], re.S).group(1))}
-assert sent == {"EXPD"}
-calls.clear()
-ai_brief.ticker_narratives([copy.deepcopy(c) for c in FX08["cards"]], [], "Defensive")
-assert calls == []
-print("  ✓ РЕАЛНИЯТ 05.10: 1 извикване само с EXPD (вместо 2 партиди с 9 тикъра); РЕАЛНИЯТ 08.10 (8 too_wide): нито едно извикване")
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives) — махнат; проверката на промпта отпадна с него
 
-print()
 print("── 2. страницата: карта само за EXPD („Чака пробив“), останалите — ред в „На радара“ (30.10.2026, т. 9–10; до 30.10 — компактен ред) ──")
 waiting, radar = render.split_canslim(B05["watchlist"])
 assert [c["ticker"] for c in waiting] == ["EXPD"] and len(radar) == 8 and all(r["kind"] == "too_wide" for r in radar)

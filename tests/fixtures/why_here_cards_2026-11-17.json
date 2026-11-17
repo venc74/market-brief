@@ -1,0 +1,63 @@
+{
+ "_note": "РЕАЛНО: полетата за реда „Защо е тук“ на 4 карти от брифа на 17.11.2026 (data/2026-11-17.json, watchlist), изрязано 17.11.2026.",
+ "cards": [
+  {
+   "ticker": "RGA",
+   "rs_rating": 85,
+   "rs_status": "new_high",
+   "weinstein_stage": 2,
+   "trend_template_applied": true,
+   "eps_growth_yoy": 80.2,
+   "revenue_growth_yoy": 21.7,
+   "sector": "Financial Services",
+   "macro_tailwind": true,
+   "tailwind_etfs": [
+    "XLF"
+   ],
+   "pct_below_52w_high": 1.9
+  },
+  {
+   "ticker": "CSX",
+   "rs_rating": 83,
+   "rs_status": "near_high",
+   "weinstein_stage": 2,
+   "trend_template_applied": true,
+   "eps_growth_yoy": 51.6,
+   "revenue_growth_yoy": 12.0,
+   "sector": "Industrials",
+   "macro_tailwind": false,
+   "tailwind_etfs": [],
+   "pct_below_52w_high": 2.9
+  },
+  {
+   "ticker": "NDAQ",
+   "rs_rating": 74,
+   "rs_status": "new_high",
+   "weinstein_stage": 2,
+   "trend_template_applied": true,
+   "eps_growth_yoy": 27.7,
+   "revenue_growth_yoy": 12.6,
+   "sector": "Financial Services",
+   "macro_tailwind": true,
+   "tailwind_etfs": [
+    "XLF"
+   ],
+   "pct_below_52w_high": 2.6
+  },
+  {
+   "ticker": "MET",
+   "rs_rating": 70,
+   "rs_status": "new_high",
+   "weinstein_stage": 2,
+   "trend_template_applied": true,
+   "eps_growth_yoy": 167.5,
+   "revenue_growth_yoy": 18.2,
+   "sector": "Financial Services",
+   "macro_tailwind": true,
+   "tailwind_etfs": [
+    "XLF"
+   ],
+   "pct_below_52w_high": 4.9
+  }
+ ]
+}

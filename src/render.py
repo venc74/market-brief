@@ -243,6 +243,39 @@ def short_name(ticker: str | None, company: str | None = None, name_map: dict | 
     return "" if out.upper() == str(ticker or "").upper() else out
 
 
+def why_here(c: dict | None) -> str:
+    """
+    17.11.2026 (пакет 1, т. 2а — решение след стратегическия преглед): „Защо е тук“ — само от полетата на картата, без AI (той беше махнат): RS rating, RS линията,
+    Stage 2 и trend template, EPS и приходите г/г, секторът (водещ — по SECT✓), разстоянието до 52-седмичния връх. Липсващо поле се пропуска. Чиста функция.
+    """
+    c = c or {}
+    parts = []
+    r = c.get("rs_rating")
+    if isinstance(r, (int, float)):
+        parts.append(f"RS {r:.0f} (перцентил в универса)")
+    rs = {"new_high": "RS линията на нов връх", "near_high": "RS линията близо до върха"}.get(c.get("rs_status"))
+    if rs:
+        parts.append(rs)
+    stg = (["Stage 2"] if c.get("weinstein_stage") == 2 else []) + (["trend template ✓"] if c.get("trend_template_applied") else [])
+    if stg:
+        parts.append(", ".join(stg))
+    fund = [f"{lab} {v:+.0f}% г/г" for lab, v in (("EPS", c.get("eps_growth_yoy")), ("приходи", c.get("revenue_growth_yoy"))) if isinstance(v, (int, float))]
+    if fund:
+        parts.append(", ".join(fund))
+    sec = c.get("sector")
+    etf = next((e for e, m in config.SECTOR_ETF_YAHOO.items() if sec and sec in (m.get("sector") or [])), None)
+    if etf:
+        name = config.SECTOR_ETFS.get(etf, etf)
+        parts.append(f"{name} — водещ сектор ({etf})" if c.get("macro_tailwind") else f"{name} ({etf})")
+    hi = c.get("pct_below_52w_high")
+    if isinstance(hi, (int, float)):
+        parts.append(f"{hi:.1f}% под 52-седм. връх")
+    return " · ".join(parts)
+
+
+env.globals["why_here"] = why_here
+
+
 def offering_lines(brief: dict) -> list[str]:
     """16.11.2026 (т. 13): „KDP — ⚠ емисия на акции — 424B5 от 16.11: …“ за тикърите с емисия, които нямат карта (книгите, наблюдаваните). Чиста функция."""
     ow = brief.get("offering_warnings") or {}

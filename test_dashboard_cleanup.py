@@ -63,17 +63,13 @@ if __name__ == "__main__":
     assert not hasattr(enrich, "options_info") and not hasattr(config, "IV_HISTORY_FILE")
     # enrich() не вика опции и не слага "options" на реда
     enrich.earnings_info = lambda sym: {"next_earnings": None, "days_to_earnings": None, "in_blackout": False}
-    enrich._build_crosscheck_sets = lambda tickers: {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}}
+    enrich._build_crosscheck_sets = lambda tickers: {"mf": set(), "splits": {}, "ins": {}}
     assert not (ROOT / "src" / "borrow_data.py").exists() and not any("import" in l and "borrow_data" in l for f in (ROOT / "src").glob("*.py")
                                                                        for l in f.read_text(encoding="utf-8").splitlines())    # 19.10: модулът е махнат (т. 19)
     row = {"ticker": "ABCD", "price": 100.0}
     out = enrich.enrich([row])[0]
     assert "options" not in out and out["earnings"]["in_blackout"] is False and "short_view" in out and "borrow" not in out and "borrow" not in out["short_view"]
-    # AI payload-ът не носи опции
-    seen = []
-    ai_brief._narratives_for_batch = lambda batch, sector_logic, regime, label, *a, **k: seen.extend(batch) or []      # 19.10: + новините на деня (5-и аргумент)
-    ai_brief.ticker_narratives([{**row, "options": {"iv": 38.5, "iv_rank": 22.0, "strategy": "long call"}, "short_view": {}}], [], "Offensive")
-    assert seen and all("options" not in s for s in seen)
+    assert not hasattr(ai_brief, "ticker_narratives")                    # 17.11.2026 (т. 2а): AI абзацът на картите — махнат
     print("  ✓ картата няма 'Опции' (IV/IVR, P/C, Стратегия); enrich() не слага options; AI payload-ът ги няма; Short Interest и")
     print("    Техническа картина са на място; следобедната OI снимка (oi_snapshot.py/unusual_options.py) не е пипана")
 

@@ -20,7 +20,7 @@ from src.thermometer import build_thermometer, thermometer_unavailable, apply_di
 from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
-from src.enrich import enrich, inject_split_catalysts
+from src.enrich import enrich
 from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
@@ -628,34 +628,10 @@ def run() -> dict:
                             consequence="разказът е без дневните промени и спада от върха; думите „корекция“ и „мечи пазар“ се проверяват само срещу процента в изречението")
     news_terms_fixed = ai_brief.check_news_why_terms(news, market_day)         # 06.11.2026 (т. 8): „защо“ на новините — преди разказа, който ги чете
     ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day)
-    # 16.10.2026 (т. 6, трети преглед): наративите и сливането — в try; до 16.10 едно лошо поле в отговора (елемент без "ticker") сваляше целия run (KeyError в merge_narratives)
-    def _narratives_failed(e):
-        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates if (c.get("setup") or {}).get("kind") in (None, *config.AI_NARRATIVE_SETUPS)
-                                       and not (c.get("setup") or {}).get("triggered")]
-        return []
-    _ai_consequence = "картите са без AI текст (класът винаги е от кода)"
-    narratives = steps.step("narratives", lambda: ai_brief.ticker_narratives(candidates, sector_layer.board_context(sector_board), thermo["regime"], news=news),   # 19.10.2026: и дословните заглавия на деня
-                            on_fail=_narratives_failed, trace=True, source="ai", label="AI наративите на картите", consequence=_ai_consequence,
-                            partial=lambda v: (f"без AI текст: {', '.join(ai_brief.NARRATIVES_LOST[:8])}", {}) if ai_brief.NARRATIVES_LOST else None)
-
-    def _merge_failed(e):
-        for c in candidates:
-            c["ai"] = {"why_now": ai_brief.NO_AI_TEXT, "ai_missing": True}                 # 30.10.2026 (т. 9–10): класът е на кода (apply_hard_rules)
-        ai_brief.NARRATIVES_LOST[:] = [c.get("ticker") for c in candidates]
-        return candidates
-    candidates = steps.step("narratives_merge", lambda: ai_brief.merge_narratives(candidates, narratives), on_fail=_merge_failed, trace=True, source="ai",
-                            label="Сливането на AI наративите с картите", consequence=_ai_consequence)
-    # 13.10.2026: "X е единственият сектор с положителна RS …", противоречащо на ротацията, и в наративите на картите (веригите са поправени още в макро стъпката)
-    def _prose_checks():
-        fixed = []                                                    # 30.10.2026 (т. 7): без проверките на секторните твърдения (sector_claims) — нямат какво да проверяват
-        ai_brief.strip_inst_over_100(candidates)                      # 04.11.2026 (прегледът, т. 6): собственост над 100% — двойно броене в 13F, не се тълкува
-        ai_brief.strip_trigger_echo_in_narratives(candidates)        # 13.10.2026: why_now без преписания текст за задействан запис (той е на картата от кода)
-        ai_brief.verify_narrative_events(candidates, ai_brief.narrative_event_sources(ai_macro, news))   # 19.10.2026: събитие без опора в новините/макрото на деня → махнато
-        return fixed
-    sector_claims_fixed = steps.step("prose_checks", _prose_checks, fallback=[], label="Проверките на AI текста на картите (преписан текст, събития без опора)",
-                                     consequence="AI текстът на картите днес не е проверен от кода")
-    # v2 · Секция 3.4 — споменаване на предстоящ сплит в катализаторите (след AI merge)
-    candidates = inject_split_catalysts(candidates)
+    # 17.11.2026 (пакет 1, т. 2а — решение след стратегическия преглед): AI абзацът на картите („защо сега / бизнес / катализатори / рискове“) — махнат; редът
+    # „Защо е тук“ е от кода (render.why_here — RS, RS линия, Stage 2, EPS, сектор). card["ai"] остава контейнер за класа от кода (apply_hard_rules).
+    for c in candidates:
+        c["ai"] = {}
     # 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT (екстремумите, потвърждението от цената, всички 40 пазара) — махнат изцяло
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
@@ -991,7 +967,6 @@ def run() -> dict:
                                        insider_status=insider_status, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                        dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
-                                       ai_lost=list(ai_brief.NARRATIVES_LOST),
                                        glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
                                        canary=canary, health=health,
                                        ins_pos_status=ins_pos_status,                                     # 19.10.2026 (т. 12): INS✓ за позициите
@@ -1025,7 +1000,6 @@ def run() -> dict:
         "corp_actions": corp_diag,
         "corp_excluded": corp_excluded,
         "spinoff": {**spinoff_watch.LAST_DIAG, "skipped_entries": list(backtest.LAST_SPINOFF_SKIPS)},     # 13.10.2026: предстоящо отделяне (EDGAR 8-K) + пропуснатите нови записи в книгите
-        "sector_claims_fixed": sector_claims_fixed,                      # 13.10.2026: поправени "единствен сектор с положителна RS" (макро, вериги, why_now)                                  # 13.10.2026: редове "X — изключена: …" под секциите (Watchlist, GLB, QM)
         "ai_macro": ai_macro,
         "model_info": model_info,
         # FIX 2026-09-23: видимо предупреждение за отрязани AI отговори +
@@ -1060,8 +1034,6 @@ def run() -> dict:
         "news": news,
         "news_window": {**dict(news_aggregator.LAST_WINDOW), "since": news_since.isoformat(), "hours": news_hours, "crypto_hours": crypto_hours},   # 02.11.2026 (т. 4)
         "crypto": crypto,                                              # 22.10.2026 (етап 4): крипто секцията   # 21.10 (етап 4): цялата секция само в първия бриф след нов отчет
-        "narrative_checks": list(ai_brief.NARRATIVE_DIAG),               # втори преглед (10.10): чужди числа, махнати от AI наративите
-        "narrative_events": list(ai_brief.NARRATIVE_EVENTS_DIAG),        # 19.10.2026: събития без опора в новините/макрото на деня, махнати от наративите
         "correlation_flags": correlation_flags,
         "distribution_days": distribution_days,
         "distribution_days_status": dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,     # 16.10.2026 (В8): ok / partial / failed

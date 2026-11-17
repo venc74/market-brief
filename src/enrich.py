@@ -492,26 +492,8 @@ def _apply_markers(row: dict, sets: dict) -> None:
     if sp:
         ratio = f" {sp['ratio']}" if sp.get("ratio") else ""
         markers.append({"tag": "SPLIT✓", "title": f"Предстоящ сплит{ratio} на {sp.get('date', '—')}."})
-        # запазваме детайла; инжектира се в катализаторите СЛЕД AI merge (виж main.py)
-        row["_split_catalyst"] = (
-            f"Предстоящ stock split{ratio} ({sp.get('date', 'скоро')}) — момент на momentum.")
 
     # 17.11.2026 (т. 2г): маркерът SI✓ (13F) — махнат с модула
-
-
-def inject_split_catalysts(candidates: list[dict]) -> list[dict]:
-    """
-    Извиква се в main.py СЛЕД ai_brief.merge_narratives — добавя споменаване на
-    предстоящ сплит в катализаторите на картата (Секция 3.4). Отделено от
-    _apply_markers, защото при enrich() ключът 'ai' още не съществува.
-    """
-    for row in candidates:
-        mention = row.pop("_split_catalyst", None)
-        if mention and isinstance(row.get("ai"), dict):
-            row["ai"].setdefault("catalysts", [])
-            if mention not in row["ai"]["catalysts"]:
-                row["ai"]["catalysts"].append(mention)
-    return candidates
 
 
 def enrich(candidates: list[dict]) -> list[dict]:

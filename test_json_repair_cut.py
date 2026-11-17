@@ -112,7 +112,7 @@ with q():
 assert "Макро разказ — текстът е непълен днес: JSON-ът на модела беше счупен (най-често кавичка в текста) и поправката изряза част — свършва на «…" in page
 assert "; и повторният опит не помогна" in page and "COT тези — моделът достигна лимита си за изход (6000 токена, claude-sonnet-4-6)" in page
 assert "„не би било грешка … ✂ текстът е непълен днес" in page and "„не би било грешка … ✂ текстът е непълен днес" in mail
-assert ai_brief.QUOTES_RULE in ai_brief.SYSTEM_MACRO and ai_brief.QUOTES_RULE in ai_brief.SYSTEM_TICKERS and "„…“" in ai_brief.QUOTES_RULE
+assert ai_brief.QUOTES_RULE in ai_brief.SYSTEM_MACRO and "„…“" in ai_brief.QUOTES_RULE
 print("  ✓ банерът: „… — текстът е непълен днес: …; и повторният опит не помогна“, старият запис (лимит) — както преди; маркерът — и на страницата, и в имейла")
-print("  ✓ правилото за кавичките — в SYSTEM_MACRO и SYSTEM_TICKERS")
+print("  ✓ правилото за кавичките — в SYSTEM_MACRO (17.11.2026: SYSTEM_TICKERS — махнат с AI абзаца на картите)")
 print("\n✅ test_json_repair_cut: всичко мина")

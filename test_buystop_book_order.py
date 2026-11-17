@@ -100,11 +100,7 @@ tr_rec = backtest.live_buystop_by_ticker()["ANET"]
 c_tr = fresh("ANET"); c_tr["volume_ratio"] = 2.0; c_tr.pop("breakout_volume", None)
 setup_rules.annotate([c_tr], D("2026-10-12"), {"ANET": {**tr_rec, "status": "trailing"}})                    # СИНТЕТИЧНО: след частична продажба
 assert c_tr["setup"]["book_note"] == "в buy-stop книгата: отворена от 09.10 по $215.38 (след частична продажба на 2R)"
-seen = {}
-from src import ai_brief
-ai_brief._call_claude = lambda system, user, **k: seen.setdefault("user", user) and "[]"                       # СИНТЕТИЧНО: записва промпта
-ai_brief.ticker_narratives([c], [], "Defensive")
-assert "Потвърден пробив" in seen["user"] and "buy-stop книгата" not in seen["user"] and "не нов вход" not in seen["user"]
+# 17.11.2026 (пакет 1, т. 2а): проверката на промпта на картите — махната с AI абзаца
 b0 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-05.json").read_text(encoding="utf-8"))
 c["ai"] = B12["ANET"].get("ai") or {}
 c["plan"] = sizing.position_plan_v2(c, 0.5, D("2026-10-12"))                                                    # за Action картата

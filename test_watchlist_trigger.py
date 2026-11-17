@@ -22,25 +22,9 @@ B02 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-02.json").read_te
 REGIME, CARDS = FX["regime"], FX["cards"]
 assert REGIME == "Defensive" and len(CARDS) == 8 and {c["setup"]["kind"] for c in CARDS} == {"too_wide"}
 
-print("── 1. промптът: няма блок с вчерашни тригери и няма поле watchlist_trigger ──")
-slim = [{"ticker": "AAA"}]
-prompt = ai_brief._build_ticker_user_prompt(slim, [], "Defensive")
-assert "ВЧЕРАШНИ WATCHLIST TRIGGER" not in prompt and '- "watchlist_trigger"' not in prompt and "prior" not in prompt.lower()
-assert 'НЕ пиши "classification", "watchlist_reason_type" и "watchlist_trigger"' in prompt                 # 30.10.2026 (т. 9–10): и класът е на кода
-for gone in ("_load_prior_watchlist_triggers", "prior_trigger_usable", "_live_v2_positions", "_POSITION_WORDING"):
-    assert not hasattr(ai_brief, gone), gone
-import inspect
-assert "prior_triggers" not in inspect.signature(ai_brief._build_ticker_user_prompt).parameters and "prior_triggers" not in inspect.signature(ai_brief._narratives_for_batch).parameters
-print("  ✓ промптът няма блока «ВЧЕРАШНИ WATCHLIST TRIGGER-И» и казва на модела да не пише watchlist_trigger; помощниците за вчерашните тригери и параметърът prior_triggers са махнати")
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives) — махнат; проверката на промпта отпадна с него
+assert not hasattr(ai_brief, "ticker_narratives") and not hasattr(ai_brief, "merge_narratives")
 
-print()
-print("── 2. изходът на модела: полето се изхвърля, ако все пак дойде ──")
-cand = [{"ticker": "AAA", "earnings": {}}]
-out = ai_brief.merge_narratives(cand, [{"ticker": "AAA", "classification": "Watchlist", "watchlist_reason_type": "other", "watchlist_trigger": "Вчерашният trigger НЕ е изпълнен (СИНТЕТИЧЕН отговор на модела)", "why_now": "x"}])
-assert not {"watchlist_trigger", "classification", "watchlist_reason_type"} & set(out[0]["ai"])
-print("  ✓ СИНТЕТИЧНО: отговор на модела с watchlist_trigger, classification, watchlist_reason_type → изхвърлени в merge_narratives (от 30.10 и класът, и причината са на кода)")
-
-print()
 print("── 3. РЕАЛНИТЕ осем Watchlist карти от 08.10: текстът от кода срещу публикувания на модела ──")
 texts = {}
 for c in CARDS:

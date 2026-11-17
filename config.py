@@ -495,17 +495,8 @@ MODEL_PROBE_MAX_TOKENS = int(os.getenv("MODEL_PROBE_MAX_TOKENS", 16))
 # запасът не струва нищо, а отрязването струва секция.
 MACRO_MAX_TOKENS = int(os.getenv("MACRO_MAX_TOKENS", 8000))
 
-# ── AI batch синтез (ticker_narratives) ───────────────────────────────────
-# Per-ticker наративите се правят на batch-ове, а не в едно извикване, защото
-# фиксиран max_tokens никога не е safe за неизвестен брой финалисти — при много
-# кандидати JSON-ът се отрязва по средата (Unterminated string). Малки batch-ове
-# гарантират достатъчен token budget на batch, независимо от общия брой тикъри.
-AI_BATCH_SIZE = int(os.getenv("AI_BATCH_SIZE", 5))           # тикъри на API извикване
-AI_BATCH_MAX_TOKENS = int(os.getenv("AI_BATCH_MAX_TOKENS", 8000))  # budget на batch
-# Опростяване (втори преглед, 10.10.2026, решено): AI наративи само за кандидати с тези сетъпи (setup_rules); too_wide / extended / no_volume
-# не отиват към модела и във Watchlist са един компактен ред (тикър, причина, стоп %). Реално 05–09.10: 0 Action, 5–9 от картите too_wide — а
-# наративите им бяха най-голямото перо в изхода (виж commit-а за числата).
-AI_NARRATIVE_SETUPS = ("confirmed", "below_pivot")
+# 17.11.2026 (пакет 1, т. 2а): AI_BATCH_SIZE / AI_BATCH_MAX_TOKENS / AI_NARRATIVE_SETUPS (AI абзацът на картите, ticker_narratives) — махнати; batch-овете остават
+# в наблюдаваните (WATCH_AI_BATCH_SIZE) — правило 4 от CLAUDE.md важи за тях.
 
 # ── Пътища ────────────────────────────────────────────────────────────────
 import pathlib

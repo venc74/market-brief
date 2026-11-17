@@ -42,10 +42,7 @@ src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 body = src[src.index("def apply_hard_rules"):src.index("def _annotate_screener_exits")]
 assert 'get("classification"' not in body and '["classification"]' not in body
 assert 'cls = "Watchlist" if forced else ("Action" if setup.get("eligible") else "Watchlist")' in body
-prompt = ai_brief._build_ticker_user_prompt([{"ticker": "AAA"}], [], "Offensive")
-assert "се решава САМО от кода" in prompt and "избери най-силните" not in prompt and "Правила: максимум" not in prompt
-merged = ai_brief.merge_narratives([{"ticker": "AAA", "earnings": {}}], [{"ticker": "AAA", "classification": "Action", "watchlist_reason_type": "regime_gate", "why_now": "x"}])
-assert merged[0]["ai"] == {"ticker": "AAA", "why_now": "x"}
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives / merge_narratives) — махнат; проверката на промпта отпадна с него
 print("  ✓ РЕАЛНИТЕ EXPD (потвърден пробив) и HUM (too_wide) от 16.10: „Watchlist“ / „Action“ от модела не променят нищо — EXPD е Action, HUM — Watchlist (technical_gate)")
 print("  ✓ apply_hard_rules не чете ai.classification; промптът не иска клас и не „избира най-силните“; merge изхвърля classification / watchlist_reason_type")
 

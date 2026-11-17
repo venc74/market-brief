@@ -50,15 +50,7 @@ print(f"  ✓ без маркера: {plain['setup']['trigger_text'][:70]}…; �
 
 print()
 print("── 2. AI текст не се иска; твърдите правила: Watchlist, без план; компактен ред ──")
-sent = []
-real_call = ai_brief._call_claude
-ai_brief._call_claude = lambda system, user, **k: (sent.append(user), '{"tickers": []}')[1]                        # СИНТЕТИЧНО
-try:
-    with q():
-        ai_brief.ticker_narratives([c], [], "Defensive")
-finally:
-    ai_brief._call_claude = real_call
-assert sent == []                                                                                                   # сетъпът "deal" е извън AI_NARRATIVE_SETUPS
+# 17.11.2026 (пакет 1, т. 2а): AI абзацът на картите (ticker_narratives) — махнат; проверката на промпта отпадна с него
 cc = copy.deepcopy(c); cc["ai"] = {"classification": "Action", "why_now": "…"}                                       # СИНТЕТИЧНО: моделът казва Action
 config.ENABLE_BACKTEST = False
 with q():
@@ -103,7 +95,7 @@ assert sw.annotate_mergers([[fresh]], pre) == 1
 setup_rules.annotate([fresh], dt.date(2026, 10, 23))
 assert fresh["setup"]["kind"] == "deal"
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-i_pre, i_cls, i_ai = src.index('steps.step("merger_pre"'), src.index("candidates = setup_rules.annotate(candidates"), src.index('narratives = steps.step("narratives"')
+i_pre, i_cls, i_ai = src.index('steps.step("merger_pre"'), src.index("candidates = setup_rules.annotate(candidates"), src.index("action, watchlist = apply_hard_rules(candidates")          # 17.11.2026: без AI синтеза на картите
 assert i_pre < i_cls < i_ai and "subs=edgar_subs" in src[src.index("def _spinoff():"):]
 print("  ✓ списъкът с подавания на ROKU — теглен веднъж за двете проверки; стъпката merger_pre е преди класификацията и AI")
 

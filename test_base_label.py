@@ -47,18 +47,12 @@ assert f"{amd['base_type']} · RS нов макс" in email and "cup with handle
 print(f"  ✓ карта: 'База (13 седмици): {amd['base_type']}' (без дублиран процент и без 'Формация'); имейл: '{amd['base_type']} · RS нов макс'")
 print()
 
-print("── AI промпт ──")
-slim = [{"ticker": "AMD", "base_type": amd["base_type"], "base_depth_pct": amd["base_depth_pct"]}]
-prompt = ai_brief._build_ticker_user_prompt(slim, [], "Offensive")
-payload = prompt.split("КАНДИДАТИ:")[1].split("\n")[0]
-assert "cup" not in payload.lower() and "база" in payload
-assert 'НЕ наричай базата "cup with handle", "flat base", "VCP"' in prompt
+print("── кодът не нарича формата ──")
 def code_hits(p):                                                                      # без редовете-коментари
     return [l for l in p.read_text(encoding="utf-8").splitlines()
             if not l.lstrip().startswith("#") and re.search(r"cup with handle|flat base|deep base", l)]
 src_hits = [p.name for p in (ROOT / "src").glob("*.py") if code_hits(p)]
-assert src_hits == ["ai_brief.py"]                                                    # единственото място е забраната в промпта
-print("  ✓ payload-ът към модела носи 'база X% дълбочина'; промптът забранява изрично cup with handle / flat base / VCP;")
-print("    в src/ тези думи ги има само в самата забрана")
+assert src_hits == [], src_hits                                                       # 17.11.2026 (т. 2а): забраната беше в промпта на картите — той е махнат
+print("  ✓ в src/ няма cup with handle / flat base / deep base (17.11.2026: AI промптът на картите — махнат)")
 print()
 print("Всички тестове минаха.")
