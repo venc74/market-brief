@@ -57,8 +57,10 @@ TRUNCATIONS: list[dict] = []
 # в историята средно ~19 на бриф до 16.11)
 FIELD_DROPS: list[dict] = []
 # правилото към всяко извикване (системата) — по-малко изречения за махане
-FIELD_NAMES_RULE = ("\n\nНе пиши имена на полета от входните данни (напр. rs_4w, near_high, insider_cluster = true, setup_reason, laggard persistence) — кажи го с думи "
-                    "на български; изречение с име на поле се маха от кода.")
+FIELD_NAMES_RULE = ("\n\nНе пиши имена на полета от входните данни (напр. rs_4w, near_high, volume_ratio, insider_cluster = true, setup_reason, laggard persistence) — "
+                    "кажи го с думи на български („обем 0.81× от средния“, „близо до върха“, „RS за 4 седмици“).")      # 17.11.2026 (пакет 1, т. 3а): с примери; познатите се подменят от кода
+# 17.11.2026 (пакет 1, т. 3б): подменените познати имена на полета — [{section, field, sentence}]; main → brief["ai_field_subs"]
+FIELD_SUBS: list[dict] = []
 AI_USAGE: list[dict] = []
 # 29.10.2026: последното извикване (отговорът, етикетът, аргументите) — за ЕДИНИЯ повторен опит в _parse_json, когато json_repair е изрязал текст.
 # Повтаря се само ако текстът за парсване е точно този отговор (иначе — подменено извикване в тест или чужд текст — няма повторение).
@@ -247,7 +249,10 @@ def _fix_text(obj, section: str | None = None):
     _HYBRID_CTX.clear()
     _CJK_DROPPED.clear()
     _FIELD_DROPPED.clear()
+    _FIELD_SUBBED.clear()
     out = _fix_translit(obj)
+    for d in _FIELD_SUBBED:                                                    # 17.11.2026 (т. 3б): подменените познати имена — данни и лог
+        FIELD_SUBS.append({"section": section or "AI текст", **d})
     for d in _FIELD_DROPPED:                                                   # 16.11.2026 (т. 3): имена на полета — данни и лог, без банер
         FIELD_DROPS.append({"section": section or "AI текст", **d})
     if _CJK_DROPPED:
@@ -299,6 +304,77 @@ _SENT_SPLIT_RE = re.compile(r"(?<=[.!?…])\s+")
 # laggard_persistence, rs_4w, rs_12w, pct_of_holdings, insider_cluster); стойностите-кодове без кирилица („existing_position“) не се пипат.
 _FIELD_RE = re.compile(r"(?<![\w/.\-@])[a-z][a-z0-9]*(?:_[a-z0-9]+)+(?![\w/\-])|\b[a-z][a-z0-9_]*\s*=\s*(?:true|false|null)\b|(?i:\blaggard\s+persistence\b)")
 _FIELD_DROPPED: list[dict] = []
+_FIELD_SUBBED: list[dict] = []
+# 17.11.2026 (пакет 1, т. 3б — решение след стратегическия преглед): ПОЗНАТИТЕ имена на полета → български термин (до 17.11 изречението падаше цяло — 1 464 в историята,
+# с полезните факти: ръст на EPS, дата на отчета); изречението пада само при НЕПОЗНАТО име (т. 3в). Речникът — от имената, които моделът е писал в 104-те брифа
+# (13.06–16.11): 46 имена, всичките полета от входа. По-дългите / със стойност — първи. Границите — като в _FIELD_RE (URL, тикър с точка, код без кирилица — не се пипат).
+_FB, _FA = r"(?<![\w/.\-@])", r"(?![\w/\-])"
+_NUM = r"(\d+(?:[.,]\d+)?)"
+_FIELD_TERMS = [(re.compile(p, re.I), r) for p, r in (
+    (r"\s*\(\s*(?:rs_status\s*[:=]\s*(?:near|new)_high|rs_at_6m_high(?:\s*[:=]\s*true)?)\s*\)", ""),     # скоба, която само повтаря казаното с думи
+    (_FB + r"rs_status\s*[:=]\s*near_high" + _FA, "RS линията близо до върха"),
+    (_FB + r"rs_status\s*[:=]\s*new_high" + _FA, "RS линията на нов връх"),
+    (_FB + r"rs_at_6m_high(?:\s*[:=]\s*true)?" + _FA, "RS на 6-месечен връх"),
+    (_FB + r"rs_status" + _FA, "RS линията"),
+    (r"\bbreakout[_ ]volume\s*[:=]\s*false\b", "без пробивен обем"),
+    (_FB + r"volume_ratio\s*(?:[:=]\s*)?" + _NUM + r"\s*[×xX]?" + r"(?![\w])", r"обем \1× от средния"),
+    (_FB + r"volume_ratio" + _FA, "обемът спрямо средния"),
+    (_FB + r"breakout_volume(?:\s*[:=]\s*true)?" + _FA, "пробивен обем"),
+    (_FB + r"days_to_earnings\s*(?:[:=]\s*)" + _NUM + r"(?![\w])", r"\1 дни до отчета"),
+    (_FB + r"days_to_earnings" + _FA, "дните до отчета"),
+    (_FB + r"next_earnings" + _FA, "следващият отчет"),
+    (_FB + r"in_blackout\s*[:=]\s*true" + _FA, "в прозореца преди отчета"),
+    (_FB + r"in_blackout" + _FA, "прозорецът преди отчета"),
+    (_FB + r"laggard[_ ]persistence(?:_pct)?\s*(?:[:=]\s*)?" + _NUM + r"\s*%", r"устойчиво изоставане \1%"),
+    (_FB + r"laggard[_ ]persistence(?:_pct)?" + _FA, "устойчивото изоставане"),
+    (_FB + r"confirmed_laggard" + _FA, "потвърдено изоставащ"),
+    (_FB + r"sizing_factor\s*[:=]\s*" + _NUM + r"(?![\w])", r"режимен фактор \1"),
+    (_FB + r"sizing_factor" + _FA, "режимният фактор"),
+    (_FB + r"base_depth(?:_pct)?\s*(?:[:=]\s*)?" + _NUM + r"\s*%", r"дълбочина на базата \1%"),
+    (_FB + r"base_depth(?:_pct)?" + _FA, "дълбочината на базата"),
+    (_FB + r"base_type" + _FA, "видът на базата"),
+    (_FB + r"level_percentile" + _FA, "перцентилът на нивото"),
+    (_FB + r"roc_percentile" + _FA, "перцентилът на промяната"),
+    (_FB + r"(?:rs_chg_4w(?:_pct)?|rs_4w)" + _FA, "RS за 4 седмици"),                  # без точка — „седм.“ чупеше изречението на две
+    (_FB + r"(?:rs_chg_12w(?:_pct)?|rs_12w)" + _FA, "RS за 12 седмици"),
+    (_FB + r"rs_rating" + _FA, "RS рейтинг"),
+    (_FB + r"rs_line_pct" + _FA, "RS линията"),
+    (_FB + r"avg_recent" + _FA, "скорошното средно"),
+    (_FB + r"avg_prior" + _FA, "предишното средно"),
+    (_FB + r"delta_1w" + _FA, "седмичната промяна"),
+    (_FB + r"analyst_target" + _FA, "целта на анализаторите"),
+    (_FB + r"inst_ownership(?:_pct)?" + _FA, "институционалната собственост"),
+    (_FB + r"setup_reason" + _FA, "причината за сетъпа"),
+    (_FB + r"exit_rule" + _FA, "правилото за изход"),
+    (_FB + r"recent_report" + _FA, "скорошният отчет"),
+    (_FB + r"sells_25pct_of_stake" + _FA, "групата „продава ≥25% от дела си“"),
+    (r"\bleading\s*=\s*true\b", "водещ"),
+    (r"\bleading\s*=\s*false\b", "не е водещ"),
+    (_FB + r"near_high" + _FA, "близо до върха"),
+    (_FB + r"new_high" + _FA, "на нов връх"),
+    (_FB + r"below_pivot" + _FA, "под pivot"),
+    (_FB + r"too_wide" + _FA, "твърде широк стоп"),
+)]
+
+
+def _sub_known_fields(s: str) -> str:
+    """17.11.2026 (т. 3б): познатите имена на полета → българският термин; записва всяка подмяна (_FIELD_SUBBED, лог). Чиста освен записа."""
+    for rx, rep in _FIELD_TERMS:
+        def _one(m, rep=rep):
+            new = m.expand(rep)
+            _FIELD_SUBBED.append({"field": m.group(0), "to": new, "sentence": s[max(0, m.start() - 60):m.end() + 60]})
+            print(f"[ai] име на поле „{m.group(0)}“ → „{new}“")
+            return new
+        s = rx.sub(_one, s)
+    return s
+
+
+def fix_field_names(s: str) -> str:
+    """17.11.2026 (т. 3б–в): познатите имена на полета → български термин; останалото непознато име → изречението пада. (До 17.11 — само _drop_field_sentences.)"""
+    if not _FIELD_RE.search(s or ""):
+        return s
+    s = _sub_known_fields(s)
+    return _drop_field_sentences(s) if _FIELD_RE.search(s) else s
 
 
 def _drop_field_sentences(s: str) -> str:
@@ -574,8 +650,8 @@ def _fix_translit(obj):
               f"«…{obj[max(0, m.start() - 40):m.end() + 20]}…»")
     if not re.search(r"[А-Яа-я]", obj):
         return obj  # чисто латински низ (тикър, английско заглавие) — не е наш случай
-    if _FIELD_RE.search(obj):                     # 16.11.2026 (т. 3): име на поле в български текст — изречението пада
-        obj = _drop_field_sentences(obj)
+    if _FIELD_RE.search(obj):                     # 16.11.2026 (т. 3): име на поле в български текст; 17.11.2026 (т. 3б–в): познатото — подменено, непознатото — изречението пада
+        obj = fix_field_names(obj)
         if not obj:
             return obj
     _check_po_suffix(obj)

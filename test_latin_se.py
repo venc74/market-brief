@@ -21,7 +21,7 @@ for s, want in zip(REAL, ("да се влошава", "да се прехвър�
     with contextlib.redirect_stdout(io.StringIO()) as out:
         r = ab._fix_translit(s)
     with contextlib.redirect_stdout(io.StringIO()):
-        s0 = ab._drop_field_sentences(s) if ab._FIELD_RE.search(s) else s          # 16.11.2026 (т. 3): изречението с exit_rule (14.10) пада
+        s0 = ab.fix_field_names(s) if ab._FIELD_RE.search(s) else s          # 16.11.2026 (т. 3): изречението с exit_rule (14.10) пада
     assert want in r and " se " not in r and r.replace(want, "") == s0.replace(want.replace("се", "se"), ""), (want, r)
     assert "латинска дума заменена: 'se' → 'се'" in out.getvalue()
 print("  ✓ 14.10 'да se влошава', 25.06 'да se прехвърли', 24.08 'ще se върнат' → 'се'; останалият текст — непроменен; ред в лога")
