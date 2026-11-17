@@ -208,6 +208,8 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
         if enrich_mod.no_date(st):                                                    # 06.11.2026 (т. 3)
             txt += f'<br><span style="color:#b45309;font-size:12px">{_e(enrich_mod.NO_DATE_TEXT)}</span>'
         txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
+        if st.get("volume_alarm"):                                                    # 17.11.2026 (пакет 2, т. 2): аларма с обем
+            txt += f'<br><span style="color:#b45309;font-size:12px">{_e(st["volume_alarm"]["text"])}</span>'
         if is_trend(st):                                                              # 17.11.2026 (пакет 2, т. 1): второто ниво — с етикета
             txt += f'<br><span style="color:#b45309;font-size:12px">Тренд без ръст — {_e(st["tier"].get("label"))} (не е CANSLIM)</span>'
         out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'

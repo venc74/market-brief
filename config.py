@@ -48,6 +48,12 @@ YF_INFO_TIMEOUT_SEC = float(os.getenv("YF_INFO_TIMEOUT_SEC", 10))
 
 # ── Технически критерии (Секция 3, Слой 3) ──────────────────────────────
 BREAKOUT_VOLUME_MULT = 1.5        # 1.5x среден 50-дневен обем
+# 17.11.2026 (пакет 2, т. 2 — А4): алармата на „Чака пробив“ (src/volume_alarm.py) — нужният обем до тези часове (Ню Йорк) за ден с BREAKOUT_VOLUME_MULT × средния; профилът —
+# собственият (средно за VOLUME_PROFILE_DAYS сесии, поне VOLUME_PROFILE_MIN_DAYS), иначе общият: медианата на 20 ликвидни акции × 21 сесии до 17.11.2026 (5-мин. бари на Yahoo)
+VOLUME_ALARM_TIMES = ("10:30", "12:00", "14:00")
+VOLUME_PROFILE_DAYS = int(os.getenv("VOLUME_PROFILE_DAYS", 20))
+VOLUME_PROFILE_MIN_DAYS = int(os.getenv("VOLUME_PROFILE_MIN_DAYS", 10))
+VOLUME_PROFILE_GENERIC = {"10:30": 0.212, "12:00": 0.400, "14:00": 0.600}
 MAX_PCT_BELOW_PIVOT = 5.0         # не повече от 5% под pivot
 WEINSTEIN_MA_WEEKS = 30           # 30-седмична MA (= 150 дневни сесии)
 

@@ -94,6 +94,6 @@ B["backtest"] = {**B["backtest"], "entry_volume": act["entry_volume"], "buystop"
 flat = lambda h: re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", h)))
 with q():
     page = flat(render.render_dashboard(B, publish=False))
-assert "Денят на входа (по затварянето): обем ≥ 1.5× среден — 0 · под 1.5× — 1" in page and "Buy-stop поръчката се изпълнява при докосване; обемът не е условие за входа." in page
-print("  ✓ ред 'Денят на входа (по затварянето): обем ≥ 1.5× среден — N · под 1.5× — M' в двете книги")
+assert "обемът потвърди — 0 · не потвърди — 1" in page and "Записът е при докосване на нивото (както досега); етикетът е за статистиката." in page          # 17.11.2026 (пакет 2, т. 2): етикетите
+print("  ✓ ред „обемът потвърди — N · не потвърди — M“ в двете книги (17.11: етикетите)")
 print("\n✅ test_book_entry_volume: всичко мина")

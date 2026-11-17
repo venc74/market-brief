@@ -1028,6 +1028,7 @@ def entry_volume_groups(records: list[dict], visible: bool) -> dict:
     for k in ("high", "low"):
         g[f"{k}_closed"] = len(rs[k])
         g[f"{k}_avg_r"] = round(sum(rs[k]) / len(rs[k]), 2) if (visible and rs[k]) else None
+        g[f"{k}_wins"] = sum(1 for x in rs[k] if x > 0) if (visible and rs[k]) else None          # 17.11.2026 (пакет 2, т. 2): и печелившите по етикет
     return g
 
 

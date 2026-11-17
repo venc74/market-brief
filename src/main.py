@@ -950,6 +950,13 @@ def run() -> dict:
     week_calendar = steps.step("week_calendar", _week_calendar, fallback={"ok": False, "errors": ["стъпката пропадна"], "days": []}, enabled=config.ENABLE_WEEK_CALENDAR,
                                label="Календарът на седмицата (Nasdaq)", consequence="календарът на седмицата липсва днес — червен ред на страницата")
     _reconcile_earnings_dates(week_calendar, action + watchlist + (qm_cards or []))      # 17.11.2026 (пакет 1, т. 8): една дата на отчета за страницата
+    # 17.11.2026 (пакет 2, т. 2 — А4): „Чака пробив“ → аларма с обем (нужният обем по часове по собствения профил на акцията; иначе по общия, с етикет)
+    def _volume_alarm():
+        from src import volume_alarm
+        waiting_t = [c["ticker"] for c in watchlist if (c.get("setup") or {}).get("kind") == "below_pivot" and (c.get("setup") or {}).get("buy_stop")
+                     and not (c.get("setup") or {}).get("triggered")]
+        return volume_alarm.annotate(watchlist, volume_alarm.fetch_profiles(waiting_t))
+    steps.step("volume_alarm", _volume_alarm, fallback=0, label="Алармата с обем на „Чака пробив“", consequence="картите „Чака пробив“ са без нужния обем по часове днес")
 
     # 09.10: маркер "корпоративно действие" (отделяне / нецял сплит коефициент в последните ~60 сесии) върху Action, Watchlist, GLB и QM картите — само информация (виж corp_actions.py)
     # 13.10.2026: изключване вместо маркер (решението от 09.10 отпада) — изключените са по-горе (скрийнър, GLB, "GLB по Уиш", QM); тук само диагностиката и редовете под секциите
