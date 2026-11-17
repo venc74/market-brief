@@ -611,6 +611,7 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
             continue
         rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime,
+               **({"entry_rule": QM_ENTRY_RULE} if entry_date >= config.QM_FIRST_BAR_RULE_FROM else {}),       # 17.11.2026 (пакет 2, т. 3)
                "nasdaq": dict(nasdaq) if nasdaq else None,
                "buy_stop": round(float(c["trigger"]), 4), "adr": round(float(c["adr"]), 2), "signal_price": c.get("close"), "entry_price": c.get("close"),
                "signal_date": c.get("signal_date"), "expected_stop": c.get("expected_stop"), "max_stop": c.get("max_stop"), "base_days": c.get("base_days"),
@@ -1234,6 +1235,25 @@ def qm_intraday_retry(rec: dict) -> bool:
     return int(rec.get("intraday_tries") or 0) < config.QM_INTRADAY_MAX_TRIES
 
 
+QM_ENTRY_RULE = "first_bar_wait"          # 17.11.2026 (пакет 2, т. 3 — А6): записите от config.QM_FIRST_BAR_RULE_FROM нататък — вход по картата (първият 5-мин. бар)
+
+
+def qm_rule_label(r: dict) -> str:
+    """„след правилото“ (вход по картата: пробив в първия 5-мин. бар → изчакай, вход над върха му) / „преди правилото“. Чиста функция."""
+    return "след правилото" if (r or {}).get("entry_rule") == QM_ENTRY_RULE else "преди правилото"
+
+
+def qm_entry_rule_split(records: list[dict], visible: bool) -> dict:
+    """17.11.2026 (пакет 2, т. 3): обобщението по двата етикета — {"преди правилото": {records, closed, avg_r, no_entry}, "след правилото": {…}}; среден R — само при stats_visible."""
+    out = {}
+    for lab in ("преди правилото", "след правилото"):
+        rs = [r for r in records if qm_rule_label(r) == lab]
+        cl = [r["realized_r"] for r in rs if r.get("status") in trade_sim.QM_TERMINAL and r.get("realized_r") is not None]
+        out[lab] = {"records": len(rs), "closed": len(cl), "avg_r": round(sum(cl) / len(cl), 2) if (visible and cl) else None,
+                    "no_entry": sum(1 for r in rs if r.get("how") == "first_bar_no_break")}
+    return out
+
+
 def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
     """
     03.11.2026 (разходката, т. 11): 5-минутните бари на входния ден → rec["intraday"] (веднъж — после се пази в записа; yfinance ги държи ~60 дни). True, ако е добавено ново.
@@ -1254,7 +1274,12 @@ def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
         rec["intraday_tries"] = int(rec.get("intraday_tries") or 0) + 1
         print(f"[backtest] {rec['ticker']}: 5-минутните бари за {fill_date} не се изтеглиха ({type(e).__name__}: {e}) — R остава с двете граници")
         return False
-    got = trade_sim.qm_intraday_entry(bars5, float(rec["buy_stop"]))
+    got = trade_sim.qm_intraday_entry(bars5, float(rec["buy_stop"]), first_bar_wait=rec.get("entry_rule") == QM_ENTRY_RULE)   # 17.11.2026 (пакет 2, т. 3)
+    if got and got.get("no_entry"):
+        rec["intraday"] = {**got, "date": fill_date, "source": "yfinance 5m", "fetched": today.isoformat()}
+        rec.pop("intraday_status", None)
+        print(f"[backtest] {rec['ticker']}: {got['reason']} ({fill_date})")
+        return True
     if not got:
         rec["intraday_status"] = "няма 5-минутни бари" if bars5 is None else QM_INTRADAY_NO_LEVEL
         rec["intraday_tries"] = int(rec.get("intraday_tries") or 0) + 1
@@ -2029,6 +2054,7 @@ def get_qm_summary() -> dict:
         "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                                                 # 26.10.2026 (етап 4б, т. 2)
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
+        "entry_rule_split": qm_entry_rule_split(records, visible), "entry_rule_from": config.QM_FIRST_BAR_RULE_FROM,          # 17.11.2026 (пакет 2, т. 3)
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
     }
 

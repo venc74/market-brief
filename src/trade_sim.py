@@ -256,7 +256,7 @@ def _blank_qm(status: str = "pending") -> dict:
             "r_risk": None, "r_floored": None, "r_basis": None}
 
 
-def qm_intraday_entry(bars5: pd.DataFrame | None, trig: float) -> dict | None:
+def qm_intraday_entry(bars5: pd.DataFrame | None, trig: float, first_bar_wait: bool = False) -> dict | None:
     """
     03.11.2026 (разходката, т. 11): входът и стопът от 5-МИНУТНИТЕ бари на входния ден (редовната сесия) — една истина вместо двете граници opt/pess.
     Входът — първият бар с High >= нивото: по max(Open на бара, ниво) (отваряне над нивото → по отварянето). Стопът — дъното на деня ДО бара на входа включително (low of day към
@@ -272,11 +272,20 @@ def qm_intraday_entry(bars5: pd.DataFrame | None, trig: float) -> dict | None:
         return None
     hm = lambda i: pd.Timestamp(b.index[i]).strftime("%H:%M")
     fill = max(float(op[k]), float(trig))
+    rule = None
+    if first_bar_wait and k == 0:                                          # 17.11.2026 (пакет 2, т. 3 — А6): пробив в първия 5-мин. бар → изчакай бара да приключи,
+        fb = float(hi[0])                                                  # вход при пробив над НЕГОВИЯ връх; стоп — дъното на деня в момента на входа; без пробив → без вход
+        m = next((i for i in range(1, len(b)) if hi[i] > fb), None)
+        if m is None:
+            return {"no_entry": True, "rule": "first_bar_wait", "first_bar_high": round(fb, 4), "bars": int(len(b)),
+                    "reason": f"нивото е пробито в първия 5-мин. бар, а върхът му (${fb:.2f}) не е пробит до края на деня — без вход"}
+        k, fill, rule = m, max(float(op[m]), fb), "first_bar_wait"
     stop = float(lo[:k + 1].min())
     later = [i for i in range(k + 1, len(b)) if lo[i] <= stop]
     j_low = int(lo.argmin())
     return {"entry_time": hm(k), "fill": round(fill, 4), "stop": round(stop, 4), "low_time": hm(j_low), "low_of_day": round(float(lo[j_low]), 4),
-            "stopped": bool(later), "stop_time": hm(later[0]) if later else None, "bars": int(len(b))}
+            "stopped": bool(later), "stop_time": hm(later[0]) if later else None, "bars": int(len(b)),
+            **({"rule": rule, "first_bar_high": round(float(hi[0]), 4)} if rule else {})}
 
 
 def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
@@ -331,6 +340,9 @@ def simulate_qm(rec: dict, bars: pd.DataFrame, today=None) -> dict:
         return out
     stop0 = float(l[fi])
     intra = rec.get("intraday") if isinstance(rec.get("intraday"), dict) else None             # 03.11.2026 (т. 11): 5-минутните бари на входния ден, ако ги има за ТОЗИ ден
+    if intra and intra.get("no_entry") and intra.get("date") == idx[fi].date().isoformat():     # 17.11.2026 (пакет 2, т. 3): правилото за първия бар — без вход
+        out.update(status="not_triggered", how="first_bar_no_break", resolution_date=idx[fi].date().isoformat())
+        return out
     if intra and intra.get("date") == idx[fi].date().isoformat() and isinstance(intra.get("stop"), (int, float)) and isinstance(intra.get("fill"), (int, float)):
         fill, stop0 = float(intra["fill"]), float(intra["stop"])
     else:

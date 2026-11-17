@@ -1525,6 +1525,7 @@
       {# 22.10.2026 (етап 4): жив запис в книгата qm_breakout — новото ниво не е нов вход (RVTY 22.10) #}
       {% if c.get("book_open") %}<div class="si-flag" title="Книгата не прави втори запис, докато този е отворен.">📈 OPEN — вече отворена в книгата qm_breakout от {{ c.book_open.since[8:10] }}.{{ c.book_open.since[5:7] }}{% if c.book_open.price %} @ ${{ "%.2f"|format(c.book_open.price) }}{% endif %} — новото ниво не е нов вход</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
+      <div class="qm-sm" style="font-family:inherit;margin:2px 0 4px">Пробив в първия 5-мин. бар → изчакай бара да приключи, вход над неговия връх; стоп — дъното на деня в момента на входа; без пробив над върха — без вход.</div>{# 17.11.2026 (пакет 2, т. 3 — А6) #}
       {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
       {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
       {% if c.get("spinoff_warning") %}<div class="corp-warn">{{ c.spinoff_warning.text }}</div>{% endif %}{% if c.get("merger_target") %}<div class="corp-warn">{{ c.merger_target.text }}</div>{% endif %}{% if c.get("offering_warning") %}<div class="corp-warn">{{ c.offering_warning }}</div>{% endif %}{% if c.get("deal_buyer") %}<div class="small" style="color:var(--muted)">{{ c.deal_buyer }}</div>{% endif %}
@@ -1563,12 +1564,15 @@
     SMA10 (ADR ≥ {{ qm_trail_switch|round|int }}%) или SMA20. <b>Входът и стопът — от 5-минутните бари на входния ден</b>: кога е пробито нивото, стопът е дъното на деня до пробива,
     а по-късен бар под него значи стоп в същия ден — един R. yfinance пази 5-минутни бари ~60 дни; където ги няма, остават <b>двете граници</b> по дневния бар: <b>opt</b> (low-ът е бил
     преди входа) и <b>pess</b> (денят затваря под входа → загуба до стопа), с етикет.
+    {% set erf = qb.get("entry_rule_from") or qm_first_bar_from %}<b>От {{ erf[8:10] }}.{{ erf[5:7] }} — вход по картата:</b> пробив на нивото в първия 5-мин. бар → изчаква се бара да приключи, вход при пробив над неговия връх,
+    стоп = дъното на деня в момента на входа; без пробив над върха → без вход. Старите записи — „преди правилото“; обобщението е отделно за двете.
     <b>R = печалба ÷ max(вход − low на входния ден, {{ qm_r_floor }}×ADR)</b> — при гап над нивото дъното на деня може да е на центове от входа и R би бил раздут; до R стои доходността в %.
     Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.</div>
   <div class="prose">
     {% if not qb.records %}
     <b>Още няма записани кандидати</b> — записват се показаните breakout карти{% if qb.track_from %}, от {{ qb.track_from }} нататък (чист старт){% endif %}.<br>
     {% else %}
+    {% set ers = qb.get("entry_rule_split") or {} %}{% if ers %}<div>{% for lab, g in ers.items() %}<b>{{ lab|capitalize }}</b>: {{ g.records }} записа, {{ g.closed }} затворени{% if g.avg_r is not none %}, среден R {{ "%+.2f"|format(g.avg_r) }}{% endif %}{% if g.no_entry %}, без вход по правилото {{ g.no_entry }}{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}</div>{% endif %}
     <b>Записани: {{ qb.records }}</b> · чакат вход {{ qb.pending }} · отворени {{ qb.open }} · затворени {{ qb.closed }}
     · не се задействаха {{ qb.not_triggered }}{% if qb.not_triggered_pct is not none %} ({{ qb.not_triggered_pct }}% от приключилите прозорци){% endif %}{% if qb.skipped %}
     · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}{% if qb.tight_risk %} · <span style="color:var(--yellow)">с риск на входа под {{ qb.tight_risk_adr }}×ADR: {{ qb.tight_risk }} (R от пода)</span>{% endif %}<br>

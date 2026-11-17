@@ -766,6 +766,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         action_c=[c for c in brief["action"] if not is_trend(c)],             # 17.11.2026 (пакет 2, т. 1): „Купува се днес“ — само нивото CANSLIM
         trend=trend_rows(brief["action"], brief["watchlist"]),                # „Тренд без ръст“ — отделна подсекция
         canslim_c_min=config.CANSLIM_C_MIN_EPS_PCT,
+        qm_first_bar_from=config.QM_FIRST_BAR_RULE_FROM,                       # 17.11.2026 (пакет 2, т. 3): за стар бриф без полето
         watchlist=brief["watchlist"],                                          # 30.10.2026 (т. 9–10): целият Watchlist (за „наш“ при QM / GLB — до 30.10 без компактните редове)
         waiting=split_canslim([c for c in brief["watchlist"] if not is_trend(c)])[0],                         # 30.10.2026 (т. 9–10): „Чака пробив“ — карти с buy-stop
         radar=split_canslim([c for c in brief["watchlist"] if not is_trend(c)])[1],                           # „На радара (N)“ — сгъната таблица, причината от кода
