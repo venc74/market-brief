@@ -1486,26 +1486,10 @@ EARNINGS_RECAP_RECENCY_DAYS = int(os.getenv("EARNINGS_RECAP_RECENCY_DAYS", 10))
 # могат да се разминават между компании).
 EARNINGS_YOY_TOLERANCE_DAYS = int(os.getenv("EARNINGS_YOY_TOLERANCE_DAYS", 60))
 
-# ══════════════════════════════════════════════════════════════════════════
-# Short/Stage 4 Screener — Модул 1, Short/Reversal тема (2026-08-2x)
-# ══════════════════════════════════════════════════════════════════════════
-# Sector-first подход: НЕ "огледало на CANSLIM" сред качествени компании
-# (рядко/трудно се shortват) — вместо това: (1) потвърдена, устойчива
-# секторна слабост → (2) universe expansion в рамките на сектора (small/
-# mid-cap, не top-tier институционални) → (3) survival-risk + Stage 4
-# технически филтър. Пълен feasibility/backtest trail: coal 2014-2016
-# (persistence gate + Stage 4 technical mirror потвърдени directamente на
-# реални цени — ARLP/CNX proxy, bankrupt small-caps нямат данни в yfinance)
-# + 2023-2025 smoke test (TAN/XLRE потвърдени срещу documented real-world
-# events, вкл. SPWR Chapter 11 август 2024, хванат от universe expansion-а).
-ENABLE_SHORT_SCREENER = os.getenv("ENABLE_SHORT_SCREENER", "1") == "1"
-# 19.10.2026 (трети преглед, т. 19 — решение на Венци): short скрийнърът и tracker-ът са ЗАМРАЗЕНИ — без теглене и без запис (резолюцията също спира); кодът и
-# data/short_tracker.json остават. Числата при замразяването (затворени, win, среден R, отворени) и датата се пишат ЕДНОКРАТНО в SHORT_FROZEN_FILE от tracker-а
-# (без мрежа); страницата показва един ред. На 16.10: 23 затворени, win 8.7%, среден R −0.73; на 19.10: 26, 11.5%, −0.39 (BHR +8.57R). SHORT_FROZEN=0 връща модула.
-SHORT_FROZEN = os.getenv("SHORT_FROZEN", "1") == "1"
-SHORT_FROZEN_FILE = DATA_DIR / "short_frozen.json"
+# 17.11.2026 (пакет 1, т. 2е — решение след стратегическия преглед): short / Stage 4 скрийнърът и книгата му (замразени от 19.10) — махнати с кода и тестовете
+# (src/short_screener.py, src/short_tracker.py, ENABLE_SHORT_SCREENER, SHORT_FROZEN*, SHORT_*); data/short_tracker.json и data/short_frozen.json остават като история.
 
-# ── Sector persistence gate (sector_layer.py: laggard_sectors()) ─────────
+# ── Sector persistence gate (sector_layer.py: _laggard_persistence → confirmed_laggard в секторната карта) ─────────
 # FIX 2026-08-2x: наивен single-day "chg_4w<0 AND chg_12w<0" дава false
 # positives от еднодневен шум (потвърдено на живо: ITA/Индустрия both-neg
 # само 1-2 от последните 20 дни — чист шум, докато XLU/TAN устойчиво
@@ -1516,87 +1500,3 @@ SHORT_FROZEN_FILE = DATA_DIR / "short_frozen.json"
 # по това време е твърде късно за нов short anyway.
 SECTOR_PERSISTENCE_WINDOW_DAYS = int(os.getenv("SECTOR_PERSISTENCE_WINDOW_DAYS", 20))
 SECTOR_PERSISTENCE_MIN_DAYS = int(os.getenv("SECTOR_PERSISTENCE_MIN_DAYS", 15))
-# 04.11.2026 (четвърти преглед): MAX_LAGGARD_SECTORS_FOR_AI_CONTEXT и ENABLE_SHORT_AI_CONTEXT — махнати заедно с AI контекста „глобално срещу регионално“ за short
-# кандидатите (ai_brief.short_thesis_global_context, main._short_global_context): спрян от 03.10, short модулът е замразен (SHORT_FROZEN).
-
-# ── Universe expansion (short_screener.py: short_universe()) ─────────────
-# yf.EquityQuery/yf.screen() — потвърдено на живо, нулева нова dependency.
-# Market cap диапазон: под MIN = micro-cap manipulation/liquidity риск, над
-# MAX = "top-tier институционални" (нарочно избягваме — рядко/трудно се
-# shortват, виж модул docstring-а). Exchange филтър изключва OTC/чужди
-# тикъри — потвърдено необходимо (живия тест без филтър върна ZPHRF/YZCFF/
-# WECFF-тип pink-sheet шум).
-SHORT_MIN_MARKET_CAP = int(os.getenv("SHORT_MIN_MARKET_CAP", 50_000_000))
-SHORT_MAX_MARKET_CAP = int(os.getenv("SHORT_MAX_MARKET_CAP", 2_000_000_000))
-SHORT_ALLOWED_EXCHANGES = ["NMS", "NYQ", "NGM"]
-SHORT_MIN_PRICE = float(os.getenv("SHORT_MIN_PRICE", 2.0))
-
-# ── Survival-risk критерии (short_screener.py: survival_risk_screen()) ───
-# Реалистичен набор, базиран на живо тестван field coverage (Energy sector
-# sample): currentRatio/quickRatio/totalDebt/totalCash/freeCashflow/
-# operatingCashflow/debtToEquity/epsForward — 6-7 от 7 populated. earnings
-# Growth/earningsQuarterlyGrowth — само ~43% populated, same познат Yahoo
-# gap като screener.py's CANSLIM филтър — деприоритизирани в полза на
-# epsForward vs epsTrailingTwelveMonths (перфектно populated в теста).
-SHORT_MAX_CURRENT_RATIO = float(os.getenv("SHORT_MAX_CURRENT_RATIO", 1.0))
-SHORT_MAX_QUICK_RATIO = float(os.getenv("SHORT_MAX_QUICK_RATIO", 0.75))
-SHORT_MIN_DEBT_TO_EQUITY = float(os.getenv("SHORT_MIN_DEBT_TO_EQUITY", 150))
-# N-от-M distress сигнали (6 възможни: weak_current_ratio, weak_quick_ratio,
-# high_leverage, declining_revenue, cash_burn, declining_forward_estimates)
-# — same "2 от 3 CANSLIM критерия, не твърд AND" философия като screener.py
-# fundamental_screen() (Yahoo данните са непълни, единичен твърд праг би
-# убил всичко ИЛИ пропуснал реален риск). Калибрирано срещу живия 2023-2025
-# тест — SOC (currentRatio=0.24, FCF=-$490M, ROE=-100%) мина ясно с margin,
-# "здравите изключения" като SHLS/MAIN/PSEC не минават.
-SHORT_MIN_DISTRESS_SIGNALS = int(os.getenv("SHORT_MIN_DISTRESS_SIGNALS", 3))
-# FIX 2026-08-2x: mortgage REITs (потвърдено: TWO currentRatio=0.22, ORC=0.12)
-# структурно ВИНАГИ показват "разорителен" liquidity ratio — borrow-short-
-# buy-MBS е нормалният им бизнес модел, не distress сигнал. Тесен, verified
-# exclude (точен industry string match) — само за liquidity сигналите
-# (weak_current_ratio/weak_quick_ratio), не за целия ticker. BDCs показват
-# същия структурен проблем за НЯКОИ имена (ARCC currentRatio=0.61), но НЯМАТ
-# чист отделен industry tag (лепени под generic "Asset Management" заедно
-# със здрави имена като MAIN/PSEC) — не могат чисто да се exclude-нат по
-# same механизъм; N-от-M изискването по-горе е основната защита за тях.
-SHORT_LEVERAGE_EXEMPT_INDUSTRIES = ["REIT - Mortgage"]
-
-MAX_SHORT_CANDIDATES = int(os.getenv("MAX_SHORT_CANDIDATES", 5))  # mirror на MAX_ACTION_TICKERS
-
-# ── short_tracker.py: _risk_plan() risk/entry guard ───────────────────────
-# FIX 2026-08-28 (първи реален production run): CABO (risk/entry=72%)
-# произведе target_1=-$9.95 — механично невъзможна отрицателна цена.
-# SSTK (risk/entry=45%, target_1=$0.53) потвърди, че чист "target_1 < 0"
-# guard не стига — подозрително близо до нула, не буквално невалидно.
-# Реалните "здрави" кандидати от СЪЩИЯ run клъстерираха 7-15% risk/entry
-# (JKS 7.6%, HE 11.7%, GDEV 11.8%, PLAY 14.5%) — ясна пропаст до
-# проблемните 45%/72%, без нищо по средата. 30% седи комфортно над
-# здравия клъстер, далеч под проблемния — виж short_tracker._risk_plan()
-# за пълния rationale защо guard-ваме на risk/entry ниво (root cause), не
-# само target_1 след факта.
-SHORT_MAX_RISK_PCT_OF_ENTRY = float(os.getenv("SHORT_MAX_RISK_PCT_OF_ENTRY", 0.30))
-
-# ── short_tracker.py (prospective, независим от backtest_tracker.json) ───
-# FIX 2026-08-2x: bankruptcy-filing-aware exit логика НЕ е implementирана —
-# нямаме надежден, безплатен data source за programmatic Chapter-11-filing
-# detection (yfinance няма structured поле; SEC EDGAR 8-K Item 1.03 full-
-# text search е неверифициран нов data source lift, извън обхвата сега).
-# Потвърден, документиран риск (SPWR: Chapter 11 05.08.2024, последван от
-# значителен post-filing price spike авг-сеп 2024 — класически post-
-# bankruptcy спекулативна volatility, не индикация за грешна теза) —
-# short_tracker.py explicit флагва extreme post-entry move/volume спайкове
-# като "unusual_move_disclosure" бележка, вместо тихо да ги третира като
-# чист stop-loss. Generic extreme-move detector (mirroring gap-day handling
-# в backtest.py) остава explicit future scope item, не в тази версия.
-#
-# Калибрирано directamente срещу реалния SPWR случай (виж
-# short_tracker._unusual_move_note): първоначален дизайн изискваше move И
-# volume едновременно (25%/3.0×, AND) — тествано на живо, НЕ сработи.
-# SPWR вече е бил heavily-traded distressed stock МЕСЕЦИ преди filing-а
-# (pre-entry 50-дневен baseline ~3.2M акции/ден) — самият filing ден показа
-# volume ПОД този вече-повишен baseline (0.23×), докато price move-ът
-# (+13%) беше ясно значим. Сменено на OR (единичен силен сигнал достатъчен)
-# + понижени прагове (10%/1.5×) — потвърдено на живо: SPWR case вече се
-# хваща коректно, обикновен (не-екстремен) JKS stop case остава без
-# disclosure (false-positive контрол минат).
-SHORT_EXTREME_MOVE_PCT = float(os.getenv("SHORT_EXTREME_MOVE_PCT", 10.0))
-SHORT_EXTREME_VOLUME_MULT = float(os.getenv("SHORT_EXTREME_VOLUME_MULT", 1.5))

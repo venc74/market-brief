@@ -50,7 +50,7 @@ src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 run = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "run")
 names = [ast.literal_eval(c.args[0]) for c in ast.walk(run) if isinstance(c, ast.Call) and ast.unparse(c.func) == "steps.step"]
 STEP1 = {"model", "bar_freshness", "distribution_cap", "news", "prose_checks", "cot_track", "earnings_warnings", "earnings_warnings_qm", "book_buystop", "book_qm",
-         "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_board", "short_screener"}
+         "book_glb_wish", "book_glb_wish_high", "si_positions", "uov_positions", "qm_positions", "watch", "splits_report", "sector_board"}
 STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}            # стъпка 2: локалният статус (qm_diag, qm_ep_out, ins_pos_status, health) — собственият банер остава
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "narratives", "narratives_merge", "glb", "spinoff"}    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
 STEP4 = {"crypto", "crypto_cot", "options_record", "merger_pre", "event_labels", "pre_reaction_labels", "market_day", "deals_closed"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията

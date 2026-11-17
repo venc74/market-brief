@@ -66,7 +66,7 @@ def sector_rotation() -> list[dict]:
     FIX 2026-10-03 (пакет 2 т.6): паднал или празен Yahoo (yf.download връща празна таблица или хвърля) вече не сваля
     run-а с KeyError/TypeError — функцията връща [] и записва причината в LAST_STATUS (main.py я показва в брифа).
     Всеки ETF е в собствен try/except: един лош ETF (твърде къса RS история и т.н.) не губи останалите. Празният
-    резултат се чете надолу като "няма секторни данни" (leading_sectors([]) = [], laggard_sectors([]) = []).
+    резултат се чете надолу като "няма секторни данни" (leading_sectors([]) = []).
     """
     etfs = {k: v for k, v in config.SECTOR_ETFS.items() if "PROXY" not in k}
     symbols = list(etfs.keys()) + ["SPY"]
@@ -378,19 +378,7 @@ def tailwind_marker(matched: list[dict]) -> dict | None:
     return {"tag": "SECT✓", "title": "Водещ сектор (макро попътен вятър): " + "; ".join(parts)}
 
 
-def laggard_sectors(rotation: list[dict], top_n: int = 6) -> list[dict]:
-    """
-    Огледало на leading_sectors() — входът за Short/Stage 4 screener-а
-    (short_screener.py). Филтрира по confirmed_laggard (persistence-gated,
-    виж _laggard_persistence), НЕ по еднодневен snapshot. Сортирано по
-    severity (rs_chg_12w_pct възходящо — най-отрицателните first), same
-    "малко, но значимо" принцип като MAX_ACTION_TICKERS/COT whitelist-а.
-    """
-    laggards = sorted(
-        (s for s in rotation if s.get("confirmed_laggard")),
-        key=lambda x: x["rs_chg_12w_pct"],
-    )
-    return laggards[:top_n]
+# 17.11.2026 (пакет 1, т. 2е): laggard_sectors() (входът на short скрийнъра) — махната заедно с него.
 
 
 if __name__ == "__main__":

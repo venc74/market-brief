@@ -17,7 +17,7 @@ import config
 
 from src.macro_layer import collect_macro_layer
 from src.thermometer import build_thermometer, thermometer_unavailable, apply_distribution_cap
-from src.sector_layer import sector_rotation, leading_sectors, laggard_sectors
+from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
 from src.enrich import enrich, inject_split_catalysts, uov_marker
@@ -49,8 +49,6 @@ from src import watchlist_exits
 from src import corp_actions
 from src import qm_breakout
 from src import qm_ep
-from src import short_screener
-from src import short_tracker
 from src import watchlist_expiry
 from src import watch_monitor
 from src import model_selector
@@ -568,10 +566,6 @@ def run() -> dict:
                           failed_if=lambda v: (_ss.get("reason") or "Yahoo не върна данни") if not _ss.get("ok", True) else None,
                           partial=lambda v: (f"{_ss.get('etfs_ok')} от {_ss['etfs_total']} ETF-а", {}) if _ss.get("etfs_total") and (_ss.get("etfs_ok") or 0) < _ss["etfs_total"] else None)
     leaders = leading_sectors(rotation)
-    # Short/Stage 4 screener вход — persistence-gated (не еднодневен snapshot),
-    # виж laggard_sectors() docstring-а. Реалният screening (мрежово скъп) се
-    # случва по-долу, до GLB блока — тук само евтиното sector-level изчисление.
-    laggards = laggard_sectors(rotation)
 
     # 09.11.2026 (спешна поправка, ROKU): приключилите сделки — ПРЕДИ скрийнинга, за да излязат от универса (build_universe), от лидерите на секторите и от картите.
     # ROKU: Fox приключи придобиването на 06.11 след затварянето, а брифът от 09.11 я даде като единствения „Купува се днес“ — маркерът изчезна при приключването, тикърът остана.
@@ -839,16 +833,7 @@ def run() -> dict:
                            partial=lambda v: (f"{(v.get('diag') or {})['batches_failed']} партиди не се изтеглиха", {}) if (v.get("diag") or {}).get("batches_failed") else None,
                            label="EP наблюдението (after-hours гапове)", consequence="празният списък НЕ значи, че няма гапове след затваряне")
 
-    # Short/Stage 4 screener — Модул 1, Short/Reversal тема (2026-08-2x).
-    # Sector-first, изцяло независим от CANSLIM/Weinstein pipeline-а (виж
-    # short_screener.py docstring за пълния feasibility/backtest trail).
-    # Explicit try/except, same дух като GLB блока по-горе.
-    short_candidates = steps.step("short_screener", lambda: short_screener.run_short_screen(laggards), fallback=[],          # 19.10.2026 (т. 19): замразен — без теглене
-                                  enabled=bool(config.ENABLE_SHORT_SCREENER and not config.SHORT_FROZEN), label="Short скрийнърът",
-                                  consequence="списъкът с short кандидати е празен днес заради провала, не защото няма")
-    # 04.11.2026 (четвърти преглед): AI контекстът „глобално срещу регионално“ (спрян от 03.10, без визуализация) — махнат
-    for row in short_candidates:
-        row["in_screener"] = row["ticker"] in our_tickers
+    # 17.11.2026 (пакет 1, т. 2е): short / Stage 4 скрийнърът (замразен от 19.10) — махнат с кода
     # 03.11.2026 (разходката, т. 17): бележките за обратен залог (cot_opposites) отпаднаха заедно с тикърите на COT тезите — нямат вход
 
     # FIX 2026-07-15: самостоятелната Magic Formula топ-10 секция е премахната —
@@ -982,18 +967,6 @@ def run() -> dict:
     for row in glb_candidates:
         row["already_open_position"] = row["ticker"] in open_position_tickers
 
-    # short_tracker.py — prospective проследяване на short кандидатите, same
-    # "ден+1" fix и graceful degradation дух като backtest блока по-горе.
-    # Единственият начин да измерим реален hit rate занапред (виж
-    # short_screener.py docstring-а за структурния лимит на историческата
-    # валидация на survival-risk критериите).
-    if config.ENABLE_SHORT_SCREENER and config.SHORT_FROZEN:
-        short_tracker_summary = {"frozen": short_tracker.frozen_summary(today)}       # 19.10.2026 (т. 19): без запис и резолюция — един ред на страницата
-    elif config.ENABLE_SHORT_SCREENER:
-        short_tracker.update_short_tracker(short_candidates, today)
-        short_tracker_summary = short_tracker.get_short_tracker_summary()
-    else:
-        short_tracker_summary = {}
 
     # 🔎 Наблюдавани тикъри — ръчно куриран per-ticker монитор (watch_monitor.py).
     # ТУК, а не по-рано: `cot_with_theses` и `leaders` вече са готови (30.10.2026, т. 8: без тезите)
@@ -1202,8 +1175,6 @@ def run() -> dict:
         "distribution_days": distribution_days,
         "distribution_days_status": dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,     # 16.10.2026 (В8): ok / partial / failed
         "backtest": backtest_summary,
-        "short_candidates": short_candidates,
-        "short_tracker": short_tracker_summary,
     }
 
     # 04.11.2026 (четвърти преглед, Н7): повторен сутрешен бриф СЛЕД обновяването преди отварянето (ръчно, в същия ден) пази карето — до 04.11 страницата се рендерираше без него,

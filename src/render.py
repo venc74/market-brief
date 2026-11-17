@@ -787,7 +787,6 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         cot_all=brief.get("cot_all") or [],                         # 03.11.2026 (т. 17): всички 40 пазара — сгънатата таблица
         cot_low=config.COT_PERCENTILE_LOW, cot_high=config.COT_PERCENTILE_HIGH, cot_confirm_weeks=config.COT_CONFIRM_LOOKBACK_WEEKS,
         correlation_flags=brief.get("correlation_flags", []),
-        short_frozen=(brief.get("short_tracker") or {}).get("frozen") or {},     # 19.10.2026 (т. 19): замразеният short модул — един ред
         distribution_days=brief.get("distribution_days"),
         distribution_days_status=brief.get("distribution_days_status"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),

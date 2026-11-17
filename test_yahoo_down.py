@@ -57,8 +57,8 @@ sector_layer.yf.download = lambda *a, **k: pd.concat({"Close": ok_frame}, axis=1
 res, _ = quiet(sector_layer.sector_rotation)
 assert len(res) == len(ETFS) and sector_layer.LAST_STATUS["ok"] is True and sector_layer.LAST_STATUS["etfs_ok"] == len(ETFS)
 assert [r["etf"] for r in res] == sorted(ETFS, key=lambda e: -next(r["rs_chg_4w_pct"] for r in res if r["etf"] == e))        # сортиране по 4-седмична RS
-assert sector_layer.leading_sectors([]) == [] and sector_layer.laggard_sectors([]) == []
-print(f"  ✓ здравият случай (РЕАЛЕН SPY + {len(ETFS)} СИНТЕТИЧНИ ETF-а) дава {len(res)} реда, status ok; leading_sectors([]) и laggard_sectors([]) са []")
+assert sector_layer.leading_sectors([]) == []
+print(f"  ✓ здравият случай (РЕАЛЕН SPY + {len(ETFS)} СИНТЕТИЧНИ ETF-а) дава {len(res)} реда, status ok; leading_sectors([]) е []")
 
 bad = ok_frame.copy(); bad[ETFS[0]] = np.nan; bad.loc[bad.index[:350], ETFS[1]] = np.nan          # един ETF без данни, един с къса история
 sector_layer.yf.download = lambda *a, **k: pd.concat({"Close": bad}, axis=1)
