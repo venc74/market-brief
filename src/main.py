@@ -29,7 +29,7 @@ from src import crypto_news
 from src import sessions
 from src import options_record
 from src import ai_brief
-from src import unusual_options, splits_calendar, dataroma, news_aggregator
+from src import unusual_options, splits_calendar, news_aggregator, sec_names
 from src import insider_buying
 from src import correlation_check
 from src import backtest
@@ -481,17 +481,6 @@ def _display_names() -> dict:
         return {}
 
 
-def _fresh_13f(rh: dict | None, new_positions: list | None) -> list:
-    """16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите (и извън първите 8 по стойност). Graceful: провал → []."""
-    if not (rh or {}).get("fresh"):
-        return []
-    try:
-        return dataroma.fresh_rows(rh.get("new"), dataroma.fetch_manager_top(), new_positions)
-    except Exception as e:
-        print(f"[13F] редовете на новоподалите: {type(e).__name__}: {e}")
-        return []
-
-
 def run() -> dict:
     today = dt.date.today().isoformat()
     print(f"═══ AI Инвестиционен Бриф · {today} ═══")
@@ -724,22 +713,11 @@ def run() -> dict:
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
     # пакет 4б т.б: списъкът "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ върху кандидатите (enrich) и позициите (по-долу)
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
-    superinvestor_moves = dataroma.fetch_superinvestor_buys() if config.ENABLE_DATAROMA else []
-    # FIX 2026-08-17: high-conviction нови позиции (>DATAROMA_MIN_NEW_POSITION_PCT%
-    # от портфейл) и major exits (>DATAROMA_MAJOR_EXIT_PCT%, explicit разделени от
-    # "мениджър спрял да подава" — виж dataroma.py docstring-а). От 2026-10-03 новите
-    # позиции не са секция, а маркер SI✓ (данните остават в брифа за маркерите и историята).
-    superinvestor_new_positions = dataroma.fetch_new_position_highlights() if config.ENABLE_DATAROMA else []
-    superinvestor_exits = (dataroma.fetch_major_exits() if config.ENABLE_DATAROMA
-                           else {"exits": [], "stopped_managers": []})
-    superinvestor_status = dataroma.fetch_status() if config.ENABLE_DATAROMA else {}
+    # 17.11.2026 (пакет 1, т. 2г — решение след стратегическия преглед): 13F (Superinvestor) — махнат изцяло: секцията, редът в имейла, маркерът SI✓
     # пакет 4б т.в: списъкът "Insider Buying" (скенер на целия S&P500+NDX100) отпадна — маркерът INS✓ идва от enrich (кандидатите) и от позициите (по-долу);
     # статусът на тегленето за кандидатите се взима веднага след enrich, преди извикването за позициите да го презапише
     insider_status = dict(insider_buying.LAST_MARKER_STATUS) if config.ENABLE_INSIDER_BUYING else {}
     our_tickers = {c["ticker"] for c in action} | {c["ticker"] for c in watchlist}
-    # (superinvestor_exits конвергенцията се изчислява в темплейта, "s.ticker in
-    # our_tickers" — same паттърн като superinvestor_moves, не precomputed поле тук;
-    # новите позиции вече не са секция — виж SI✓ маркерите в enrich и по-долу)
     # GLB (Green Line Breakout) — независим механичен скрийнър, изцяло
     # извън CANSLIM/Weinstein pipeline-а (собствен universe fetch, виж
     # glb_screener.py docstring). Explicit try/except тук, въпреки че
@@ -850,7 +828,7 @@ def run() -> dict:
     deal_buyers: dict = {}
     def _deal_buyers():
         nonlocal deal_buyers
-        deal_buyers = spinoff_watch.buyer_marks(spinoff_watch.pending_tickers(), screener.LAST_UNIVERSE_NAME, dataroma._ticker_map())
+        deal_buyers = spinoff_watch.buyer_marks(spinoff_watch.pending_tickers(), screener.LAST_UNIVERSE_NAME, sec_names.ticker_map())
         spinoff_watch.annotate_buyers([action, watchlist, qm_cards, glb_candidates, (qm_ep_out or {}).get("rows")], deal_buyers)
         return deal_buyers
     steps.step("deal_buyers", _deal_buyers, fallback={}, enabled=config.ENABLE_SPINOFF_WATCH, label="Етикетът „купувач в сделка“",
@@ -918,15 +896,6 @@ def run() -> dict:
     # дублирането). Mirror на in_screener badge механизма по-горе — трябва
     # да живее ТУК, след backtest_summary изчислението (open_positions не е
     # наличен по-рано, при самия GLB блок).
-    # FIX 2026-10-03 (пакет 4а т.2): SI✓ върху v2 позициите (отворени и чакащи buy-stop), когато
-    # мениджър от списъка е открил нова позиция в тикъра — вместо секцията-списък
-    def _si_positions():
-        si_markers = dataroma.new_position_markers(superinvestor_new_positions)
-        for p in (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])):
-            if p["ticker"] in si_markers:
-                p["markers"] = [si_markers[p["ticker"]]]
-    steps.step("si_positions", _si_positions, label="SI✓ върху позициите в книгите",
-               consequence="липсата на маркер днес не значи, че мениджър от списъка няма нова позиция")
     # пакет 4б т.б: UOV✓ и върху позициите — v2 отворени/чакащи и книгата на buy-stop кандидатите. diag на кандидатите е от enrich (LAST_MARKER_DIAG).
     uov_diag = dict(unusual_options.LAST_MARKER_DIAG) if config.ENABLE_UNUSUAL_OPTIONS else {}
     ins_pos_status: dict = {}
@@ -1049,12 +1018,9 @@ def run() -> dict:
                label="Записът на опционните данни", consequence="днешната сесия липсва в историята за необичайна активност (нищо в брифа не зависи от нея)",
                failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None,
                partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
-    prev_brief = data_rhythm.previous_brief(today)                 # 21.10 (етап 4): ритъмът на редките източници (COT, 13F) — спрямо предишния бриф
-    thirteenf_rh = data_rhythm.thirteenf_rhythm(superinvestor_status, prev_brief, today) if config.ENABLE_DATAROMA else {}
-    superinvestor_fresh = _fresh_13f(thirteenf_rh, superinvestor_new_positions)      # 16.11.2026 (пакет 16.11, т. 11): в деня с ново подаване — редовете на новоподалите
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
                                        insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
-                                       superinvestor_status=superinvestor_status, corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
+                                       corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                        dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
                                        ai_lost=list(ai_brief.NARRATIVES_LOST),
                                        glb_status=(glb_screener.LAST_STATUS if config.ENABLE_GLB_SCREENER else None),
@@ -1112,16 +1078,10 @@ def run() -> dict:
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)
         "deal_buyers": {t: v["text"] for t, v in (deal_buyers or {}).items()},   # 16.11.2026 (т. 15): купувач във висяща сделка — радарът, наблюдаваните
         "splits_report": splits_rep,
-        "superinvestor_moves": superinvestor_moves,
-        "superinvestor_new_positions": superinvestor_new_positions,
-        "superinvestor_exits": superinvestor_exits,
         # пакет 4б т.в: статус на тегленето на Form 4 за кандидатите/позициите (kind: ok|ok_partial|legit_zero|failed; stale/data_date от 4а)
         "insider_buying_status": insider_status,
         "insider_buying_positions_status": ins_pos_status,
         "insider_buying_watch_status": ins_watch_status,              # 03.11.2026 (т. 6): Form 4 покупките за наблюдаваните
-        "superinvestor_status": superinvestor_status,
-        "thirteenf_rhythm": thirteenf_rh,                                    # 21.10 (етап 4): цялата секция при нов 13F
-        "superinvestor_fresh": superinvestor_fresh,                          # 16.11.2026 (т. 11): редовете на новоподалите
         "glb_candidates": glb_candidates,
         "glb_wish": glb_wish_signals,        # свежите пробиви за книгата "GLB по Уиш" — snapshot-ът ги пази, за да се възстанови пропуснат run
         "glb_wish_high": glb_wish_high_signals,   # 21.10.2026: същото за книгата "GLB по Уиш" по неговата линия (месечен High)

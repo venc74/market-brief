@@ -296,19 +296,6 @@ def _e(x) -> str:
     return _html.escape("" if x is None else str(x), quote=True)
 
 
-def _money_short(v):
-    """1234567 → '$1.2 млн' (за стойности на superinvestor сделки)."""
-    try:
-        v = float(v)
-    except (TypeError, ValueError):
-        return "—"
-    for unit, div in (("млрд", 1e9), ("млн", 1e6), ("хил", 1e3)):
-        if abs(v) >= div:
-            return f"${v / div:.1f} {unit}"
-    return f"${v:.0f}"
-
-
-env.filters["money_short"] = _money_short
 
 
 
@@ -579,38 +566,6 @@ def glb_market_line(t: dict | None) -> str | None:
 env.globals["glb_groups"] = glb_groups
 
 
-def thirteenf_rows(moves: list[dict] | None, exits: dict | None, ours: list[str] | None, fresh: list[dict] | None = None) -> list[dict]:
-    """
-    03.11.2026 (разходката, т. 18–19): една таблица за 13F — по ред на (мениджър, тикър): {manager, ticker, company, action ("нова" / "увеличена" / "изход"), value, pct_of_portfolio,
-    change_pct, in_screener, late, period, ticker_source, cusip}. Покупките — по стойност (собственият ред на всеки мениджър, dataroma "by_manager"; стар бриф без него — редът на тикъра,
-    мениджърът с „+N“), после изходите по стойност в предишния 13F (промяна −100%, делът — в предишния портфейл). Чиста функция.
-    """
-    ours = set(ours or [])
-    base = lambda r: {"ticker": r.get("ticker"), "company": r.get("company"), "in_screener": r.get("ticker") in ours, "ticker_source": r.get("ticker_source"), "cusip": r.get("cusip")}
-    word = lambda a: "нова" if a == "нова позиция" else (a or "—")
-    buys = []
-    for r in moves or []:
-        own = r.get("by_manager")
-        if own:
-            buys += [{**base(r), "manager": m.get("manager"), "action": word(m.get("action")), "value": m.get("value"), "pct_of_portfolio": m.get("pct_of_portfolio"),
-                      "change_pct": m.get("change_pct"), "late": m.get("late"), "period": m.get("period")} for m in own]
-        else:
-            extra = (r.get("count") or 1) - 1
-            buys.append({**base(r), "manager": (r.get("manager") or "—") + (f" +{extra}" if extra > 0 else ""), "action": word(r.get("action")), "value": r.get("value"),
-                         "pct_of_portfolio": r.get("pct_of_portfolio"), "change_pct": r.get("change_pct"), "late": r.get("late"), "period": r.get("period")})
-    have = {(b.get("manager"), b.get("ticker")) for b in buys}                 # 16.11.2026 (т. 11): новоподалите — и извън първите 8 по стойност (dataroma.fresh_rows)
-    for r in fresh or []:
-        if (r.get("manager"), r.get("ticker")) not in have:
-            have.add((r.get("manager"), r.get("ticker")))
-            buys.append({**base(r), "manager": r.get("manager"), "action": word(r.get("action")), "value": r.get("value"), "pct_of_portfolio": r.get("pct_of_portfolio"),
-                         "change_pct": r.get("change_pct"), "late": r.get("late"), "period": r.get("period"), "fresh": True})
-    gone = [{**base(r), "manager": r.get("manager"), "action": "изход", "value": r.get("prior_value"), "pct_of_portfolio": r.get("prior_pct_of_portfolio"), "change_pct": -100.0,
-             "late": r.get("late"), "period": r.get("period")} for r in (exits or {}).get("exits") or []]
-    by_value = lambda x: -(x.get("value") or 0)
-    return sorted(buys, key=by_value) + sorted(gone, key=by_value)
-
-
-env.globals["thirteenf_rows"] = thirteenf_rows
 
 
 def excluded_deals(rows) -> list[dict]:
@@ -740,12 +695,6 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         splits_report=brief.get("splits_report"),
         splits_min_price=config.SPLITS_MIN_PRICE,
         splits_min_cap_m=config.SPLITS_MIN_MARKET_CAP / 1e6,
-        superinvestor_moves=brief.get("superinvestor_moves", []),
-        superinvestor_exits=brief.get("superinvestor_exits", {"exits": [], "stopped_managers": []}),
-        superinvestor_fresh=brief.get("superinvestor_fresh") or [],          # 16.11.2026 (т. 11)
-        dataroma_major_exit_pct=config.DATAROMA_MAJOR_EXIT_PCT,
-        superinvestor_status=brief.get("superinvestor_status") or {},
-        thirteenf_rhythm=brief.get("thirteenf_rhythm") or {},          # 21.10 (етап 4): ред и свити секции без нов 13F
         form4_line=form4_line(brief.get("insider_buying_status"), brief.get("insider_buying_positions_status"), brief.get("insider_buying_watch_status")),   # 21.10 (етап 4): видим ред и при нула; 03.11: + наблюдаваните
         glb_candidates=brief.get("glb_candidates", []),
         glb_status=brief.get("glb_status"),                           # С3 (10.10): провал срещу "няма кандидати"
@@ -1007,12 +956,6 @@ def render_email(brief: dict) -> str:
         signals_rows += (
             '<div><span style="color:#6b7280">Сплитове тази седмица:</span> '
             f'<span style="font-family:monospace;color:#111827">{sp_txt}</span></div>')
-    si = brief.get("superinvestor_moves", [])[:8]
-    if si:
-        si_txt = ", ".join(dict.fromkeys(_e(r.get("ticker") or f'без тикър ({names.display_name(r.get("company") or "")})') for r in si))     # 19.10.2026: неразпознат CUSIP/име
-        signals_rows += (
-            '<div style="margin-top:6px"><span style="color:#6b7280">Superinvestor покупки (13F):</span> '
-            f'<span style="font-family:monospace;color:#111827">{si_txt}</span></div>')
     signals_block = (
         f'<tr><td style="padding:8px 28px 14px;font-size:12.5px;color:#374151;'
         f'border-top:1px solid #f3f4f6">{signals_rows}</td></tr>' if signals_rows else "")

@@ -266,29 +266,8 @@
   .signal-chip .split-badge { font-size: 11px; font-family: "IBM Plex Mono", monospace;
     color: var(--yellow); margin-top: 4px; }
 
-  /* ── v2: Superinvestor Moves ── */
-  .si-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .si-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
-  .si-card.in-screen { border-color: var(--regime); box-shadow: 0 0 0 1px var(--regime-dim); }
-  .si-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .si-sym { font-family: "IBM Plex Mono", monospace; font-size: 17px; font-weight: 600; color: var(--text); }
-  .si-val { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--green); }
-  .si-action { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase;
-    letter-spacing: 1px; padding: 1px 7px; border-radius: 4px; background: rgba(52,211,153,.12); color: var(--green); }
-  .si-mgr { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
   .si-flag { font-size: 10.5px; font-family: "IBM Plex Mono", monospace; color: var(--regime); margin-top: 6px; }
   /* 2026-09-21: сдвоен S+P трансфер — изключен от агрегатите, но видим */
-  .si-transfer { margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--line); }
-  .si-transfer-head { font-size: 10.5px; font-family: "IBM Plex Mono", monospace;
-                      color: var(--yellow); }
-  .si-transfer-row { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
-  .si-card.exit { border-left: 3px solid var(--red); }
-  .si-pct { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
-  .si-pct.new { color: var(--green); }
-  .si-pct.exit { color: var(--red); }
-  .si-stopped-note { font-size: 12.5px; color: var(--muted); margin-top: 12px; padding: 10px 14px;
-    background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; }
-  .si-stopped-note b { color: var(--yellow); }
 
   /* ── GLB (Green Line Breakout) Watchlist ── */
   .glb-group-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase;
@@ -317,8 +296,6 @@
   .glb-t { margin-bottom: 8px; } .glb-t .glb-card { max-width: 520px; margin-top: 6px; }
   .glb-def { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
   details.gw-open, details.gw-book, details.gw-how { margin: 6px 0 14px; } details.gw-open > summary, details.gw-book > summary, details.gw-how > summary { font-size: 12.5px; color: var(--muted); }
-  /* 03.11.2026 (т. 18–19): 13F — една таблица; изходите — червена дума */
-  .si-table { min-width: 760px; } .si-table .pos { color: var(--green); font-weight: 600; } .si-table tr.si-exit td:nth-child(3) { color: var(--red); } details.si-full > summary { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
   .gw-table { min-width: 860px; } .gw-table .pos { color: var(--green); } .gw-table .neg { color: var(--red); } .gw-table td.num { white-space: nowrap; }
   @media (max-width: 760px) { .glb-row { grid-template-columns: 1fr 1fr; } }
 
@@ -1042,14 +1019,6 @@
 {% elif st.kind in ['ok_partial', 'fallback_allact'] %}<div class="data-note warn">⚠ {{ label }}: {{ st.note }}.</div>
 {% elif st.kind == 'legit_zero' %}<div class="data-note">{{ label }}: {{ st.note }}.</div>
 {% endif %}{% endif %}{% endmacro %}
-{# трети преглед (16.10): 13F — мениджъри без поредното предходно тримесечие (причината по мениджър) и опциите (PUT / CALL) — извън дългите позиции и % от портфейла #}
-{% macro si_nocmp(st) %}{% if st and st.no_comparison %}<div class="data-note warn">⚠ 13F без сравнение с предходното тримесечие — нова/увеличена позиция, SI✓ и големите изходи не се показват за:
-  {% for x in st.no_comparison %}{{ x.manager }} ({{ x.text }}){{ "; " if not loop.last else "." }}{% endfor %}</div>{% endif %}{% endmacro %}
-{# 19.10.2026: тикърите по CUSIP — ред в секцията при грешка / недовършени и броят "без тикър" (празен отговор не е тиха липса) #}
-{% macro si_cusip(st) %}{% set ct = (st or {}).get("cusip_tickers") or {} %}{% if ct.rows %}<div class="{{ 'data-note warn' if ct.error or ct.skipped else 'small' }}" style="font-size:12px;{{ '' if ct.error or ct.skipped else 'color:var(--muted);' }}margin-top:6px">{% if ct.error %}⚠ Тикърите по CUSIP (OpenFIGI) не се изтеглиха днес ({{ ct.error }}) — {% elif ct.skipped %}⚠ {{ ct.skipped }} CUSIP-а не стигнаха бюджета на run-а — {% else %}Тикърите: {% endif %}по CUSIP {{ ct.by_cusip }}, по име {{ ct.by_name }}, без тикър {{ ct.no_ticker }} от {{ ct.rows }} реда.</div>{% endif %}{% endmacro %}
-{% macro si_opt_kind(label, k) %}{% if k and k.count %}{{ label }} {{ k.count }} ({{ k.value|money_short }}): {% for t in k.top %}<span title="CUSIP {{ t.cusip }}{% if t.figi_name %} · по CUSIP (OpenFIGI): {{ t.figi_name }}{% endif %} · в 13F: {{ t.company }}">{{ t.ticker or (t.company|cname(28, false)) }}</span> {{ t.value|money_short }}{{ ", " if not loop.last }}{% endfor %}{% if k.count > k.top|length %}, …{% endif %}{% endif %}{% endmacro %}
-{% macro si_options(st) %}{% if st and st.options %}<div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">Опции в 13F — не са дълги позиции и не влизат в % от портфейла (стойността е на базовия актив; тикърът е по CUSIP — името от 13F и CUSIP-ът са при посочване):
-  {% for o in st.options %}<div style="margin-top:3px">{{ o.manager }} — {{ si_opt_kind("PUT", o.put) }}{% if o.put and o.put.count and o.call and o.call.count %}; {% endif %}{{ si_opt_kind("CALL", o.call) }}</div>{% endfor %}</div>{% endif %}{% endmacro %}
 {# 30.10.2026 (разходката, т. 8): разделът „Геополитически тези · мониторинг“ и карето „Контекст“ (pct_cell, ma_cell, ctx_meta, ctx_table, thesis_context_box) — махнати #}
 
 {% macro earnings_icon(modal_id, recap) %}
@@ -1887,49 +1856,7 @@
 {# 17.11.2026 (пакет 1, т. 2д): COT секцията — махната изцяло #}
 
 
-{# 13F (03.11.2026, разходката, т. 18–19): ЕДНА секция — компактна таблица Мениджър · Тикър · Действие (нова / увеличена / изход) · Стойност · Промяна % · % от портфейла · в нашия скрийнър ✓;
-   изходите са редове „изход“ (без „Major Position Exits“ и без реда „Няма големи изходи“). Ритъмът е дневен: цялата — при ново подаване (data_rhythm.thirteenf_rhythm), иначе един ред + сгънато.
-   Маркерът SI✓ върху картите и позициите остава (dataroma.new_position_markers). #}
-{% set si_rows = thirteenf_rows(superinvestor_moves, superinvestor_exits, our_tickers, superinvestor_fresh) %}
-{% set si_stopped = (superinvestor_exits or {}).get("stopped_managers") or [] %}
-{% if si_rows or si_stopped or thirteenf_rhythm.compact or (superinvestor_status and superinvestor_status.kind in ['failed', 'legit_zero']) %}
-<section>
-  <h2>Superinvestor Positions — Last 13F</h2>
-  {% if thirteenf_rhythm.compact %}<div class="prose">{{ thirteenf_rhythm.text }}</div>
-  <details class="si-full"><summary>Таблицата от последните 13F ({{ si_rows|length }})</summary>{% elif thirteenf_rhythm.text %}<div class="prose">{{ thirteenf_rhythm.text }}</div>{% endif %}
-  {{ data_note(superinvestor_status, "13F") }}
-  {{ si_nocmp(superinvestor_status) }}
-  {% if si_rows %}
-  <div class="cs-radar-wrap"><table class="ctx-table si-table">
-    <tr><th>Мениджър</th><th>Тикър</th><th>Действие</th><th class="num">Стойност</th><th class="num" title="Промяна на броя акции спрямо предходния 13F">Промяна</th><th class="num" title="Дял от портфейла на мениджъра; при изход — в предходния 13F">% от портфейла</th><th title="Тикърът е и в нашия скрийнър днес (Action / Watchlist)">Скрийнър</th></tr>
-    {% for s in si_rows %}
-    <tr{% if s.action == "изход" %} class="si-exit"{% endif %}>
-      <td>{{ s.manager }}{% if s.late %} <span class="cs-warn">{{ s.late }}</span>{% endif %}{% if s.fresh %} <span class="cs-mu" title="ново подаване — редът е от новия 13F, и извън най-големите по стойност">· ново подаване</span>{% endif %}</td>
-      <td class="mono"{% if s.ticker_source == "cusip" %} title="тикърът е по CUSIP {{ s.cusip }} (OpenFIGI)"{% endif %}>{{ s.ticker or "без тикър" }}{% if s.company %}<span class="wt-name">{{ s.company|cname(28, false) }}</span>{% endif %}</td>
-      <td>{{ s.action }}</td>
-      <td class="num">{% if s.value %}{{ s.value|money_short }}{% else %}—{% endif %}</td>
-      <td class="num">{% if s.change_pct is number %}{{ "%+.0f"|format(s.change_pct) }}%{% else %}<span class="cs-mu">—</span>{% endif %}</td>
-      <td class="num">{% if s.pct_of_portfolio is number %}{{ "%.1f"|format(s.pct_of_portfolio) }}%{% else %}<span class="cs-mu">—</span>{% endif %}</td>
-      <td>{% if s.in_screener %}<span class="pos">✓</span>{% endif %}</td>
-    </tr>
-    {% endfor %}
-  </table></div>
-  <div class="small" style="font-size:12px;color:var(--muted);margin-top:8px">
-    13F данните са със закъснение (до 45 дни) — не са тайминг сигнал, а потвърждение на тезата. Сила е конвергенцията: акция, която и нашият скрийнър отчита като пробив сега, и superinvestor е купил.
-    Изход = позиция над {{ dataroma_major_exit_pct|round|int }}% от портфейла в предходния 13F, която напълно липсва в текущия.
-  </div>
-  {% endif %}
-  {% if si_stopped %}
-  <div class="si-stopped-note">
-    <b>⚠ Мениджъри, спрели да подават 13F</b> (липсваща позиция при спрял мениджър НЕ е "продажба", а "фондът вече не отчита"):
-    {% for m in si_stopped %}<div style="margin-top:4px">{{ m.manager }} — последен filing {{ m.last_filing_date }} ({{ m.days_since_filing }} дни)</div>{% endfor %}
-  </div>
-  {% endif %}
-  {{ si_options(superinvestor_status) }}
-  {{ si_cusip(superinvestor_status) }}
-  {% if thirteenf_rhythm.compact %}</details>{% endif %}
-</section>
-{% endif %}
+{# 17.11.2026 (пакет 1, т. 2г): 13F (Superinvestor Positions) — махнат изцяло #}
 
 {# Пакет 4б т.в: секцията "Insider Buying" отпадна — остава маркерът INS✓ (кой, кога, колко — hover/клик) върху кандидатите и позициите #}
 {# 21.10.2026 (етап 4): видим ред за Form 4 — и при нула, вместо тишина #}

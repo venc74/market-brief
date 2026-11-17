@@ -8,7 +8,7 @@
   2. брифът (data/<дата>.json) за предишната NYSE сесия — пропуснат сутрешен run;
   3. книгите: резолюцията на живите записи (backtest.LAST_RESOLUTION) — цени няма / до по-стара дата / тикъри без цени;
   4. GLB състоянието (data/glb_state.json) е записано днес, щом скрийнърът е минал — само при стария хистерезис (GLB_CARDS_RULE = close_hysteresis);
-  5. дневните кешове (news, splits, 13F, Magic Formula) са с днешна дата;
+  5. дневните кешове (news, splits, Magic Formula) са с днешна дата;
   6. таблицата NYSE_HOLIDAYS (и от 12.11.2026 — SIFMA_US_FULL_CLOSES) не свършва в следващите NYSE_HOLIDAYS_WARN_DAYS дни;
   7. (16.10.2026) дневните барове са за последната NYSE сесия (bar_freshness: изчакването преди run-а и делът на универса със стар бар).
 Всяка проверка е в собствен try — грешка в монитора не чупи брифа и не вдига фалшив банер.
@@ -28,7 +28,6 @@ from src import sessions as _sessions
 DAILY_CACHES = {
     "news_cache.json": ("ENABLE_NEWS", "значимите новини"),
     "splits_cache.json": ("ENABLE_SPLITS_CALENDAR", "календара на сплитовете"),
-    "dataroma_cache.json": ("ENABLE_DATAROMA", "13F (Superinvestor)"),
     "magic_formula_cache.json": ("ENABLE_MAGIC_FORMULA", "Magic Formula (MF✓)"),
 }
 

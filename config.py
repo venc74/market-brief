@@ -632,48 +632,8 @@ ENABLE_UNUSUAL_OPTIONS = os.getenv("ENABLE_UNUSUAL_OPTIONS", "1") == "1"
 ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
 
 
-# ── Dataroma · Superinvestor Moves ────────────────────────────────────────
-# Минимална стойност на позицията, за да се брои „значима" покупка (само за
-# основния Moves feed — high-conviction new positions ползва % на портфейл,
-# не $ праг, виж DATAROMA_MIN_NEW_POSITION_PCT по-долу).
-DATAROMA_MIN_VALUE = float(os.getenv("DATAROMA_MIN_VALUE", 10_000_000))   # $10M
-# Ако True: при fallback към allact.php (без стойности) се отхвърлят редовете
-# без известна стойност. По подразбиране False — по-добре да видиш хода.
-DATAROMA_STRICT_VALUE = os.getenv("DATAROMA_STRICT_VALUE", "0") == "1"
-ENABLE_DATAROMA = os.getenv("ENABLE_DATAROMA", "1") == "1"
-# FIX 2026-08-17: top-N позиции НА МЕНИДЖЪР за основния Moves feed (не global
-# top-N по $ стойност) — Berkshire's позиции ($10B+ всяка) системно изяждаха
-# всичките 5 dashboard слота дори в дни, когато 3-4 други мениджъри имаха
-# съвсем реални, валидни редове точно под Buffett-овите в същия dataset
-# (потвърдено емпирично, 2026-08-17 диагностика). DATAROMA_MOVES_DISPLAY_LIMIT
-# е таванът СЛЕД top-N-per-manager селекцията + dedup по тикър (замества
-# старото hardcoded [:5] в темплейта — единствен източник на истината в код).
-DATAROMA_TOP_PER_MANAGER = int(os.getenv("DATAROMA_TOP_PER_MANAGER", 2))
-DATAROMA_MOVES_DISPLAY_LIMIT = int(os.getenv("DATAROMA_MOVES_DISPLAY_LIMIT", 8))
-# High-conviction "нова позиция" сигнал — CUSIP отсъства в предишния filing
-# И value >= този % от ТЕКУЩИЯ портфейл на мениджъра (не $ праг — 2% от
-# по-малък фонд, напр. Pabrai/Dalal Street ~$327M портфейл, е ~$6.5M, под
-# DATAROMA_MIN_VALUE $10M; $ праг тук би изтрил точно small-fund сигналите).
-DATAROMA_MIN_NEW_POSITION_PCT = float(os.getenv("DATAROMA_MIN_NEW_POSITION_PCT", 2.0))
-# "Major exit" сигнал — CUSIP присъствал в ПРЕДИШНИЯ filing на >= този % от
-# тогавашния портфейл, отсъства напълно в текущия. Изчислява се САМО за
-# filing_status="active" мениджъри (виж DATAROMA_STALE_FILER_DAYS) — иначе
-# "фондът затвори" (Burry/Scion, потвърдено 2026-08-17) би се смесило с
-# "продадена конкретна позиция", две различни събития.
-DATAROMA_MAJOR_EXIT_PCT = float(os.getenv("DATAROMA_MAJOR_EXIT_PCT", 10.0))
-# Мениджър без нов 13F-HR над този брой дни → filing_status="stopped", major
-# exit логиката се прескача изцяло за него (виж по-горе). ~135 дни е worst-
-# case gap между два НАВРЕМЕННИ тримесечни filing-а (45-дневен deadline след
-# края на тримесечието) — 165 дава разумен buffer над това, без да е толкова
-# хлабав, че истински спрял мениджър (Burry, последен filing 2025-11-03,
-# >280 дни към 2026-08-17) да остане незасечен.
-DATAROMA_STALE_FILER_DAYS = int(os.getenv("DATAROMA_STALE_FILER_DAYS", 165))
-# CIK номера — виж DATAROMA_CIK по-долу (Секция EDGAR 13F) за пълния,
-# верифициран списък от 15 мениджъра. DATAROMA_MANAGERS (dataroma.com URL
-# кодове) премахнат 2026-08-17 — беше практически мъртъв fallback код
-# (стигаше се до него само ако EDGAR върнеше 0 за ВСИЧКИ CIK-ове едновременно)
-# в ДРУГА ID система от CIK, синхронизирането му би удвоило поддръжката за
-# нулева практическа полза; _allact_buys() (code-free fallback) остава.
+# 17.11.2026 (пакет 1, т. 2г — решение след стратегическия преглед): 13F (Superinvestor) — махнат изцяло (src/dataroma.py, src/cusip_map.py, tools/probe_13f.py,
+# ENABLE_DATAROMA, DATAROMA_*, THIRTEENF_*, CUSIP_MAP_*); картата „име → тикър“ на SEC — src/sec_names.py.
 
 
 # ── news_aggregator + Tradier (нов модул + поправка) ──────────────────────
@@ -919,68 +879,10 @@ UNUSUAL_OPTIONS_OI_SNAPSHOT_START_NY = os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_ST
 UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT = float(
     os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT", 90))
 
-# ── SEC EDGAR 13F (Поправка 3): primary за Superinvestor Positions ─────────
+# ── SEC EDGAR (Form 4, 8-K, емисии, картата на имената) ─────────
 # EDGAR изисква descriptive User-Agent с реален контакт — стойността се
 # подава само през env var (GitHub Secret), никога не се комитва в кода.
 EDGAR_UA = os.getenv("EDGAR_UA", "market-brief-bot (contact via GitHub repo)")
-# CIK номера — верифицирани directamente през data.sec.gov/submissions
-# (не по име само — вижте FIX бележките, две грешки хванати точно така).
-# 15 мениджъра общо. Ключ = CIK (10 цифри, нулево-допълнен), стойност = име.
-#
-# 2026-10-03: Майкъл Бъри / Scion Asset Management (CIK 0001649339) е махнат от списъка —
-# фондът е закрит (последен filing 2025-11-03), т.е. нямаше какво да се чете. Механизмът за
-# мениджъри, спрели да подават 13F (DATAROMA_STALE_FILER_DAYS → "stopped" → отделен ред във
-# "Major Position Exits"), е непроменен и важи за всеки бъдещ спрял мениджър.
-#
-# FIX 2026-08-17: старият Klarman CIK (0001061219) сочеше към ENTERPRISE
-# PRODUCTS PARTNERS L.P. — напълно различна компания, никога не е бил Baupost.
-# Верен CIK: 0001061768 (BAUPOST GROUP LLC/MA).
-#
-# FIX 2026-08-17: Разширяване от 5 на 16 мениджъра (15 след махането на Scion на 2026-10-03). Първите по име съвпадения
-# за Tepper/Appaloosa, Marks/Oaktree, Armitage/Egerton и Pabrai бяха ОТДАВНА
-# НЕАКТИВНИ entity-та (фирмите преминават към нови SEC filing CIK-ове с
-# годините — последен filing 2016/2011/2013/2012 съответно) — наложи се
-# допълнително търсене за текущите активни filers. Pabrai's официална SEC
-# filing entity се оказа "Dalal Street, LLC", не "Pabrai"/"Pabrai Investments".
-DATAROMA_CIK = {
-    "0001067983": "Уорън Бъфет · Berkshire Hathaway",
-    "0001336528": "Бил Акман · Pershing Square",
-    "0001061768": "Сет Кларман · Baupost Group",
-    "0001536411": "Стенли Дракенмилър · Duquesne Family Office",
-    "0001167483": "Чейс Коулман · Tiger Global Management",
-    "0001647251": "Крис Хон · TCI Fund Management",
-    "0001040273": "Даниел Лоуб · Third Point",
-    "0001656456": "Дейвид Тепър · Appaloosa Management",
-    "0000949509": "Хауърд Маркс · Oaktree Capital Management",
-    "0001581811": "Джон Армитидж · Egerton Capital",
-    "0001709323": "Ли Лу · Himalaya Capital Management",
-    "0001549575": "Мониш Пабрай · Dalal Street (Pabrai Investment Funds)",
-    "0001061165": "Стивън Мандел · Lone Pine Capital",
-    "0001569205": "Тери Смит · Fundsmith",
-    "0001454502": "Triple Frond Partners",
-}
-# EDGAR-специфичен праг: позиция се брои за "увеличена" само ако бр. акции е
-# нараснал с поне този % спрямо предходното тримесечие (сравнение по CUSIP).
-# 5% отсява шума от дребни закръгления/технически корекции между подавания,
-# без да губи реални акумулационни ходове.
-DATAROMA_MIN_SHARE_INCREASE_PCT = float(os.getenv("DATAROMA_MIN_SHARE_INCREASE_PCT", 5.0))
-# 13F пакет (07.10): (а) под този дял позиции с прочетен брой акции "нова/увеличена" не се показва за мениджъра (+ банер) — броят акции е основата на сравнението;
-# (б) прагът на SEC за 13F филър е $100M: сума под него като ДОЛАРИ значи стойности в ХИЛЯДИ (виж dataroma._value_scale); (в) срокът за подаване е 45 дни след
-# края на тримесечието — мениджър без 13F след края на последното просрочено тримесечие получава етикет за давност.
-THIRTEENF_MIN_SHARES_COVERAGE = float(os.getenv("THIRTEENF_MIN_SHARES_COVERAGE", 0.8))
-THIRTEENF_MIN_PORTFOLIO_USD = float(os.getenv("THIRTEENF_MIN_PORTFOLIO_USD", 100_000_000))
-THIRTEENF_FILING_DEADLINE_DAYS = int(os.getenv("THIRTEENF_FILING_DEADLINE_DAYS", 45))
-# 19.10.2026 (етап 2, доп. т. 8 + т. 17а): CUSIP → тикър през OpenFIGI (src/cusip_map.py) — по име не може (SPY подаден като "STATE STREET CORP"; 8 от 36 нови позиции на 19.10 без тикър:
-# Seagate, Mastercard, Applied Materials, TSMC, On Holding, TJX). Без API ключ: до 10 задачи в заявка и 25 заявки в минута → пауза 2.5 s. Кешът е по CUSIP (data/), намереното се
-# опреснява след 90 дни, ненамереното — след 30; бюджет на run-а 60 s. Провал → тикърът по име, както досега; неразпознат → "без тикър" (не името на емитента като тикър).
-CUSIP_MAP_ENABLED = os.getenv("CUSIP_MAP_ENABLED", "1") == "1"
-CUSIP_MAP_CACHE_NAME = "cusip_map_cache.json"          # в config.DATA_DIR — пътят се смята при извикване (тестовете подменят DATA_DIR)
-CUSIP_MAP_URL = "https://api.openfigi.com/v3/mapping"
-CUSIP_MAP_BATCH = 10
-CUSIP_MAP_PAUSE_SEC = 2.5
-CUSIP_MAP_BUDGET_SEC = 60
-CUSIP_MAP_REFRESH_DAYS = 90
-CUSIP_MAP_NOTFOUND_DAYS = 30
 
 # 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT — махнат изцяло (src/cot.py, src/cot_track.py, ENABLE_COT*, COT_*, CFTC_COT_RELEASES, CRYPTO_COT_MARKET).
 

@@ -548,12 +548,12 @@ def buyer_ticker(buyer: str | None, universe_names: dict | None = None, sec_map:
     16.11.2026 (пакет 16.11, т. 15): тикърът на купувача по името от 8-K — първо имената от таблиците на Wikipedia (универсът: „Black Hills Corporation“ → BKH), после картата на SEC
     (нормализирано заглавие → тикър), като заглавие с наставка за щат („black hills sd“ — „BLACK HILLS CORP /SD/“) се приема. Частен купувач (Mountain Holding) → None. Чиста функция.
     """
-    from src import dataroma
+    from src import sec_names                               # 17.11.2026 (т. 2г): от src/sec_names.py — 13F модулът е махнат
     if not buyer:
         return None
-    k = dataroma._norm(buyer)
+    k = sec_names.norm(buyer)
     for t, n in (universe_names or {}).items():
-        if dataroma._norm(n) == k:
+        if sec_names.norm(n) == k:
             return t
     m = sec_map or {}
     if k in m:

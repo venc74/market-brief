@@ -24,15 +24,15 @@ from src import data_warnings as dw, spinoff_watch, news_aggregator as na
 
 B = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
 SECT = {"ok": True, "etfs_total": 17, "etfs_ok": len(B["rotation"]), "missing": []}
-REAL = dict(sector_status=SECT, screener_status=None, superinvestor_status=B["superinvestor_status"], glb_status=B["glb_status"], uov_diag=B["uov_diag"],
+REAL = dict(sector_status=SECT, screener_status=None, glb_status=B["glb_status"], uov_diag=B["uov_diag"],
             ins_pos_status=B["insider_buying_positions_status"], news_status={"ok": True, "count": 8}, canary=B["data_canary"], fred_key_missing=False)
 pw = lambda **kw: dw._partial_warnings(**{**REAL, **kw})
 src_of = lambda ws: [w["source"] for w in ws]
 
 print("── 1. РЕАЛНИЯТ ден 19.10 → нито един частичен банер ──")
-assert len(B["rotation"]) == 17 and B["glb_status"]["with_history"] == 903 and B["superinvestor_status"]["managers_with_data"] == 15
+assert len(B["rotation"]) == 17 and B["glb_status"]["with_history"] == 903
 assert pw() == []
-print("  ✓ 17 от 17 сектора, 15 от 15 мениджъра, GLB 903 от 903, канарчето проверено, INS✓ за позициите — легитимна нула → 0 банера")
+print("  ✓ 17 от 17 сектора, GLB 903 от 903, канарчето проверено, INS✓ за позициите — легитимна нула → 0 банера")
 
 print()
 print("── 2. частичните провали (СИНТЕТИЧНИ варианти на реалните статуси) ──")
@@ -44,8 +44,6 @@ w = pw(screener_status={"kind": "ok", "universe": 903, "with_history": 865, "wit
 assert src_of(w) == ["screener"] and "за 34 от 903 тикъра Yahoo не върна нито един бар" in w[0]["message"] and "върху 865 тикъра" in w[0]["message"]
 assert pw(screener_status={"kind": "ok", "universe": 903, "with_history": 898, "with_bars": 903, "no_bars_n": 0, "no_bars": [], "batches_failed": 0}) == []    # нормата
 assert pw(screener_status={"kind": "ok", "universe": 903, "with_history": 890, "with_bars": 895, "no_bars_n": 8, "no_bars": [], "batches_failed": 0}) == []    # под 1% (9)
-w = pw(superinvestor_status={**B["superinvestor_status"], "managers_with_data": 14})
-assert src_of(w) == ["13f"] and "14 от 15 мениджъра" in w[0]["message"]
 w = pw(glb_status={**B["glb_status"], "with_history": 880})
 assert src_of(w) == ["glb"] and "23 от 903 тикъра без история" in w[0]["message"]
 w = pw(uov_diag={**B["uov_diag"], "snapshot_failed": ["AAPL", "LLY"]})
@@ -59,7 +57,7 @@ assert src_of(w) == ["data_canary"] and "не провери днес" in w[0]["
 w = pw(fred_key_missing=True)
 assert src_of(w) == ["fred"] and "FRED_API_KEY" in w[0]["message"]
 assert "news" in src_of(dw.collect({}, {}, news_status={"ok": False, "reason": "x"}))                                  # през collect
-print("  ✓ сектори 15/17, скрийнър 700/903, 13F 14/15, GLB 880/903, OI 2 неуспешни, INS✓ позиции, празни новини, канарче без проверка, без FRED ключ — по един ред")
+print("  ✓ сектори 15/17, скрийнър 700/903, GLB 880/903, OI 2 неуспешни, INS✓ позиции, празни новини, канарче без проверка, без FRED ключ — по един ред")
 
 print()
 print("── 3. spinoff_watch: тикър без CIK е непроверен (СИНТЕТИЧНО теглене) ──")

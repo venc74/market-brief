@@ -151,35 +151,6 @@ def _spinoff_warning(diag: dict | None) -> list[dict]:
     return []
 
 
-def _13f_warnings(status: dict | None) -> list[dict]:
-    """
-    13F пакет (07.10): мениджъри с покритие на акциите под прага — "нова/увеличена" не се показва за тях (не значи "няма покупки").
-    Давността (закъснял 13F) НЕ е банер в "Проблем с данните днес" (08.10): етикетът "закъснява" остава само до периода в секцията на 13F
-    (Pershing се оказа не закъснял, а с 13F-NT към родителя — виж dataroma._nt_successor). Легитимна нула не е предупреждение.
-    """
-    st = status or {}
-    out = []
-    lc = st.get("low_coverage") or []
-    if lc:
-        out.append({"source": "13f", "level": "warn",
-                    "message": ("13F: броят акции не е прочетен надеждно за " + ", ".join(x["manager"] for x in lc)
-                                + " — „нова/увеличена позиция“ не се показва за тях днес; това НЕ значи, че няма покупки.")})
-    # 19.10.2026 (етап 2, т. 3): тикърите по CUSIP (OpenFIGI) — грешка или недовършени (бюджет) → видимо, не тиха липса на тикъри
-    ct = st.get("cusip_tickers") or {}
-    if ct.get("error") or ct.get("skipped"):
-        why = f"OpenFIGI не отговори ({ct['error']})" if ct.get("error") else f"{ct['skipped']} CUSIP-а не стигнаха бюджета на run-а"
-        out.append({"source": "13f", "level": "warn",
-                    "message": (f"13F: тикърите по CUSIP не са пълни днес — {why}; {ct.get('no_ticker', 0)} от {ct.get('rows', 0)} реда са „без тикър“, "
-                                f"{ct.get('by_name', 0)} — по името на емитента (може да е грешно: SPY, подаден като STATE STREET CORP).")})
-    # трети преглед (16.10): мениджър без поредното предходно тримесечие — причината по мениджър ("няма 13F за …" ≠ "13F за … не се изтегли днес")
-    nc = st.get("no_comparison") or []
-    if nc:
-        out.append({"source": "13f", "level": "warn",
-                    "message": ("13F: без сравнение с предходното тримесечие — " + "; ".join(f"{x['manager']}: {x['text']}" for x in nc)
-                                + ". За тях „нова/увеличена позиция“, SI✓ и големите изходи не се показват днес — това НЕ значи, че няма покупки.")})
-    return out
-
-
 def _breadth_warning(ind: dict | None) -> list[dict]:
     """
     20.10.2026 (етап 3б, обвивката, стъпка 1): Market Breadth върху НЕПЪЛЕН универс — паднала партида или тикъри без данни ≥ config.PARTIAL_DATA_WARN_SHARE (фон: 0–3 от 903
@@ -197,7 +168,7 @@ def _breadth_warning(ind: dict | None) -> list[dict]:
                          "и статусът на индикатора са върху непълен универс.")}]
 
 
-def _partial_warnings(sector_status: dict | None, screener_status: dict | None, superinvestor_status: dict | None, glb_status: dict | None,
+def _partial_warnings(sector_status: dict | None, screener_status: dict | None, glb_status: dict | None,
                       uov_diag: dict | None, ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
     """
     19.10.2026 (трети преглед, т. 12): ТИХИТЕ частични провали — всеки е видим ред, не тиха липса. Пълните провали вече имаха банер; тук е "част от данните липсва".
@@ -225,11 +196,6 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
         out.append({"source": "screener", "level": "warn",
                     "message": (f"CANSLIM: фундаментите (Yahoo .info) на {len(fu)} от {sc.get('fundamentals_checked') or '?'} проверени кандидата не се изтеглиха днес "
                                 f"({', '.join(fu[:8])}{' …' if len(fu) > 8 else ''}) — те НЕ са оценени и липсват в Action/Watchlist; това не значи, че не минават CANSLIM.")})
-    si = superinvestor_status or {}
-    if si.get("kind") in ("ok", "legit_zero") and si.get("managers_total") and (si.get("managers_with_data") or 0) < si["managers_total"]:
-        out.append({"source": "13f", "level": "warn",
-                    "message": (f"13F: {si.get('managers_with_data')} от {si['managers_total']} мениджъра с данни днес — за останалите ходовете, SI✓ и изходите липсват; "
-                                "това НЕ значи, че нямат промени.")})
     g = glb_status or {}
     if g.get("ok") and g.get("universe") and not g.get("batches_failed") and (g.get("with_history") or 0) < 0.99 * g["universe"]:
         out.append({"source": "glb", "level": "warn",
@@ -275,7 +241,7 @@ def _universe_warning(universe_sources: dict | None) -> list[dict]:
 
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
             insider_status: dict | None = None, uov_diag: dict | None = None,
-            qm_diag: dict | None = None, qm_ep: dict | None = None, superinvestor_status: dict | None = None, corp_diag: dict | None = None,
+            qm_diag: dict | None = None, qm_ep: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
             fred_key_missing: bool = False, breadth: dict | None = None, universe_sources: dict | None = None) -> list[dict]:
@@ -320,7 +286,6 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(markers)
     out.extend(_qm_warning(qm_diag))
     out.extend(_ep_warning(qm_ep))
-    out.extend(_13f_warnings(superinvestor_status))
     out.extend(_corp_warning(corp_diag))
     out.extend(_spinoff_warning(spinoff_diag))
     out.extend(_dd_warning(dd_status))
@@ -328,7 +293,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
     out.extend(_breadth_warning(breadth))
-    out.extend(_partial_warnings(sector_status, screener_status, superinvestor_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
+    out.extend(_partial_warnings(sector_status, screener_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
         out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})
     return out

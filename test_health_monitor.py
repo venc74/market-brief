@@ -4,7 +4,7 @@
 Цел: К1 (OI снимката не се записва от 09.10) да не може да мине незабелязано пак. Проверки в края на run-а: OI снимка за предишната NYSE сесия, брифът за предишната
 сесия, резолюцията на книгите, записаното GLB състояние, дневните кешове.
 РЕАЛНО (data/ към 10.10, вградено тук — тестовете не четат data/): сесиите в OI снимката 30.09…08.10 (09.10 липсва — К1), glb_state.updated = 09.10, датата на
-news/splits/dataroma/magic_formula кешовете = 09.10. Измерено върху историята: 28 брифа от 01.09 — кешовете/GLB никога не изостават (0 фалшиви); OI проверката от 29.09 —
+news/splits/magic_formula кешовете (до 17.11.2026 и dataroma) = 09.10. Измерено върху историята: 28 брифа от 01.09 — кешовете/GLB никога не изостават (0 фалшиви); OI проверката от 29.09 —
 сигнал само на 29.09 (job-ът още не съществуваше — верен). СИНТЕТИЧНО: състоянията на резолюцията, подмененото yf.download в т.3, датите 12.10 / 13.10.
 Пускане: python test_health_monitor.py
 """
@@ -79,14 +79,14 @@ print("── 4. GLB състояние, предишен бриф, кешове
 config.GLB_CARDS_RULE = "close_hysteresis"                                            # проверката на файла е само при стария хистерезис
 i5 = hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-09", glb_updated="2026-10-09", briefs=()),
               resolution={"ok": True, "live": 0}, glb_status={"ok": True})
-assert sorted({i["check"] for i in i5}) == ["cache", "glb_state", "prior_brief"] and sum(i["check"] == "cache" for i in i5) == 4
+assert sorted({i["check"] for i in i5}) == ["cache", "glb_state", "prior_brief"] and sum(i["check"] == "cache" for i in i5) == 3          # 17.11.2026: без кеша на 13F (махнат)
 assert hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-12", glb_updated="2026-10-09", briefs=("2026-10-09",)),
                 resolution={"ok": True, "live": 0}, glb_status={"ok": False}) == []                    # GLB падна → банерът е от С3, не от монитора
 config.GLB_CARDS_RULE = "wish_high"                                                   # 26.10.2026 (етап 4б, т. 6): картите не пазят състояние — без проверка (на 26.10 — фалшив банер)
 i5w = hm.check("2026-10-12", world(sessions=REAL_SESSIONS + ["2026-10-09"], cache_date="2026-10-09", glb_updated="2026-10-09", briefs=()),
                resolution={"ok": True, "live": 0}, glb_status={"ok": True})
 assert "glb_state" not in {i["check"] for i in i5w} and {"cache", "prior_brief"} <= {i["check"] for i in i5w}
-print("  ✓ липсващ предишен бриф, стари кешове (4) и незаписано GLB състояние → редове; при паднал GLB мониторът не дублира банера на С3")
+print("  ✓ липсващ предишен бриф, стари кешове (3; до 17.11 — 4, с 13F) и незаписано GLB състояние → редове; при паднал GLB мониторът не дублира банера на С3")
 
 print()
 print("── 4б. таблицата NYSE_HOLIDAYS (РЕАЛНАТА — покрива до 2028 от 16.10.2026) ──")

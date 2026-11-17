@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 # v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
-from src import magic_formula, unusual_options, splits_calendar, dataroma, insider_buying
+from src import magic_formula, unusual_options, splits_calendar, insider_buying
 from src import net_utils
 
 
@@ -453,7 +453,7 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     референтния универс (value_confirmed), вместо да търси пресичане със
     статичен топ списък, което беше структурно невъзможно.
     """
-    sets = {"mf": set(), "uov": {}, "splits": {}, "si": {}, "si_new": {}, "ins": {}}
+    sets = {"mf": set(), "uov": {}, "splits": {}, "ins": {}}
     if config.ENABLE_MAGIC_FORMULA:
         try:
             sets["mf"] = magic_formula.value_confirmed(candidate_tickers)
@@ -476,15 +476,6 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
             sets["splits"] = splits_calendar.splits_map()
         except Exception as e:
             print(f"[enrich] splits_calendar skipped: {e}")
-    if config.ENABLE_DATAROMA:
-        try:
-            sets["si"] = dataroma.superinvestor_map()
-        except Exception as e:
-            print(f"[enrich] dataroma skipped: {e}")
-        try:
-            sets["si_new"] = dataroma.new_position_markers()      # пакет 4а т.2: нови позиции → SI✓
-        except Exception as e:
-            print(f"[enrich] dataroma new positions skipped: {e}")
     return sets
 
 
@@ -496,7 +487,7 @@ def uov_marker(uov: dict) -> dict:
 
 
 def _apply_markers(row: dict, sets: dict) -> None:
-    """Слага визуалните convergence маркери MF✓ / UOV✓ / INS✓ / SPLIT✓ / SI✓ върху картата."""
+    """Слага визуалните convergence маркери MF✓ / UOV✓ / INS✓ / SPLIT✓ върху картата (SI✓ — махнат с 13F на 17.11.2026)."""
     sym = row["ticker"]
     markers = row.setdefault("markers", [])
 
@@ -519,21 +510,7 @@ def _apply_markers(row: dict, sets: dict) -> None:
         row["_split_catalyst"] = (
             f"Предстоящ stock split{ratio} ({sp.get('date', 'скоро')}) — момент на momentum.")
 
-    si = sets["si"].get(sym)
-    si_new = sets.get("si_new", {}).get(sym)
-    if si or si_new:
-        # ЕДИН маркер SI✓: нова позиция на мениджър от списъка (кой и от коя дата е filing-ът), плюс —
-        # ако същият тикър е и в общия Moves feed — реда за него
-        parts = []
-        if si_new:
-            parts.append(si_new["title"])
-        if si:
-            who = ", ".join(dict.fromkeys(si.get("managers", [])))  # уникални, запазен ред
-            val = f" · ${si['value']:,.0f}" if si.get("value") else ""
-            parts.append(f"Superinvestor покупка ({si.get('action', 'Buy')}){val}: {who}")
-        n = si.get("count", 1) if si else 1
-        tag = si_new["tag"] if si_new else ("SI✓" if n == 1 else f"SI✓×{n}")
-        markers.append({"tag": tag, "title": "\n".join(parts)})
+    # 17.11.2026 (т. 2г): маркерът SI✓ (13F) — махнат с модула
 
 
 def inject_split_catalysts(candidates: list[dict]) -> list[dict]:

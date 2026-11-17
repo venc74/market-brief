@@ -49,6 +49,6 @@ with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b, publish=False)
 assert M["BKH"]["text"] in page
 src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "spinoff_watch.buyer_marks(spinoff_watch.pending_tickers(), screener.LAST_UNIVERSE_NAME, dataroma._ticker_map())" in src
+assert "spinoff_watch.buyer_marks(spinoff_watch.pending_tickers(), screener.LAST_UNIVERSE_NAME, sec_names.ticker_map())" in src    # 17.11.2026: картата на SEC — src/sec_names.py (13F е махнат)
 print("  ✓ редът в радара; картите и наблюдаваните — същият текст")
 print("\n✅ test_deal_buyer: всичко мина")

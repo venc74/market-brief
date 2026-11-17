@@ -1,5 +1,5 @@
 """
-Пакет 4а · т.7 (2026-10-03): Insider buying и 13F — при празен днешен резултат старите редове носят ясен етикет
+Пакет 4а · т.7 (2026-10-03): Insider buying (до 17.11.2026 и 13F — махнат) — при празен днешен резултат старите редове носят ясен етикет
 за давност (дата на данните), а ЛЕГИТИМНАТА нула се различава от провал при теглене.
 
 Мрежата е подменена; всички редове (покупки, мениджъри, холдинги) и датите са СИНТЕТИЧНИ — тестови вход, не реални
@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import config
-from src import insider_buying as ib, dataroma, render, thermometer
+from src import insider_buying as ib, render, thermometer
 
 
 class Clock:
@@ -95,71 +95,6 @@ assert rows[0]["stale"] and rows[0]["data_date"] is None and rows[0]["latest_txn
 print("  ✓ стар кеш без rows_date: 'датата на теглене е неизвестна', показана е последната транзакция (29.09)")
 print()
 
-print("── 13F (dataroma) ──")
-dataroma.dt = Clock.ns
-dataroma._CACHE = T / "dataroma_cache.json"
-dataroma._TMAP_CACHE = T / "sec_tickers.json"
-dataroma._ticker_map = lambda: {}
-config.DATAROMA_CIK = {"0000000001": "Тест · Fund A", "0000000002": "Тест · Fund B"}
-calls = {"n": 0}
-FIL = {"0000000001": [("a-new", "2026-09-20"), ("a-old", "2026-06-20")], "0000000002": [("b-new", "2026-09-22"), ("b-old", "2026-06-22")]}
-HOLD = {"a-new": [{"issuer": "NEWCO INC", "value": 80e6, "cusip": "N1", "shares": 1000.0}, {"issuer": "OLDCO INC", "value": 20e6, "cusip": "O1", "shares": 100.0}],
-        "a-old": [{"issuer": "OLDCO INC", "value": 20e6, "cusip": "O1", "shares": 100.0}],
-        "b-new": [{"issuer": "SAME INC", "value": 50e6, "cusip": "S1", "shares": 500.0}],
-        "b-old": [{"issuer": "SAME INC", "value": 50e6, "cusip": "S1", "shares": 500.0}]}
-mode = {"edgar": "ok", "allact": []}
-
-
-def fake_filings(cik, n=2):
-    calls["n"] += 1
-    if mode["edgar"] == "down":
-        return []
-    if mode["edgar"] == "quiet" and cik == "0000000001":
-        return [("b-new", "2026-09-22"), ("b-old", "2026-06-22")]            # същите холдинги и за А → нищо ново
-    return FIL[cik][:n]
-
-
-dataroma._recent_13f_filings = fake_filings
-dataroma._info_table = lambda cik, acc: [dict(h) for h in HOLD.get(acc, [])]
-dataroma._allact_buys = lambda: list(mode["allact"])
-
-
-def run_dr(day, m, allact=()):
-    set_day(*day)
-    mode.update({"edgar": m, "allact": list(allact)}); dataroma._MEMO.clear()
-    return dataroma._fetch_all(config.DATAROMA_MIN_VALUE), dataroma.fetch_status()
-
-
-b, st = run_dr((2026, 10, 1), "ok")
-assert st["kind"] == "ok" and not st["stale"] and [r["company"] for r in b["new_positions"]] == ["NEWCO INC"]
-assert json.loads(dataroma._CACHE.read_text())["date"] == "2026-10-01"
-print("  ✓ ден 1 (01.10): EDGAR работи → ok, кешът е от 01.10")
-
-b, st = run_dr((2026, 10, 2), "down")
-assert st["kind"] == "failed" and st["stale"] and st["data_date"] == "2026-10-01" and "0 от 2 мениджъра" in st["note"]
-assert [r["company"] for r in b["new_positions"]] == ["NEWCO INC"] and b["meta"]["stale"] is True
-assert json.loads(dataroma._CACHE.read_text())["date"] == "2026-10-01"                 # кешът на диска не се пипа — датата му е реалната дата на данните
-print("  ✓ ден 2 (02.10): EDGAR недостъпен (0 от 2) → 'failed'; старите данни са с етикет 'от 01.10', кешът на диска е непокътнат")
-
-b, st = run_dr((2026, 10, 3), "quiet")
-assert st["kind"] == "legit_zero" and st["stale"] and st["data_date"] == "2026-10-01" and "2 от 2 мениджъра" in st["note"]
-print("  ✓ ден 3 (03.10): EDGAR работи, но нищо ново → ЛЕГИТИМНА нула (различна от провала), старите данни пак са с етикет от 01.10")
-
-b, st = run_dr((2026, 10, 4), "down", allact=[{"ticker": "ZZZ", "manager": "X", "action": "Buy", "value": None, "period": None}])
-assert st["kind"] == "fallback_allact" and not st["stale"] and [r["ticker"] for r in b["moves"]] == ["ZZZ"]
-print("  ✓ ден 4: EDGAR падна, но dataroma.com върна общ списък → 'fallback_allact' (без стойности, не е остарял кеш)")
-
-(T / "dataroma_cache.json").unlink()
-b, st = run_dr((2026, 10, 5), "down")
-assert st["kind"] == "failed" and not st["stale"] and not b["moves"] and not b["new_positions"]
-calls["n"] = 0
-set_day(2026, 10, 5); dataroma._MEMO.clear(); mode["edgar"] = "ok"
-for _ in range(4):
-    dataroma._fetch_all(config.DATAROMA_MIN_VALUE)
-assert calls["n"] == 2 * 1                                                              # 2 мениджъра × ЕДИН fetch на процес (не 4)
-print("  ✓ без кеш и без данни: 'failed' с празен резултат; четири извиквания в един run теглят EDGAR само веднъж")
-print()
-
 print("── dashboard ──")
 def render_brief(**over):
     brief = {"date": "2026-10-05", "thermometer": thermometer.thermometer_unavailable(RuntimeError("тест")), "action": [], "watchlist": [],
@@ -181,13 +116,6 @@ for status in ({"kind": "legit_zero", "stale": True, "data_date": "2026-10-01", 
                {"kind": "failed", "stale": False, "note": "универсът S&P500+NDX100 не се зареди"}, {"kind": "ok", "stale": False, "note": ""}):
     html = render_brief(insider_buying=[stale_row], insider_buying_status=status)
     assert "Insider Buying" not in html and "Insider buying:" not in html and "Jane CEO" not in html
-html = render_brief(superinvestor_moves=[{"ticker": "NEWCO", "manager": "Тест · Fund A", "action": "нова позиция", "value": 8e7, "period": "13F · 2026-09-20"}],
-                    superinvestor_status={"kind": "failed", "stale": True, "data_date": "2026-10-01", "note": "EDGAR недостъпен (0 от 2 мениджъра с данни)"})
-flat = " ".join(html.split())
-assert "13F: показаното е от по-ранно теглене — данни от 2026-10-01, не от днес." in flat and "Днешното теглене не успя: EDGAR недостъпен" in flat
-html = render_brief(superinvestor_moves=[], superinvestor_status={"kind": "failed", "stale": False, "note": "EDGAR недостъпен (0 от 2 мениджъра с данни)"})
-assert "13F: тегленето не успя — EDGAR недостъпен" in " ".join(html.split())
-print("  ✓ 13F: остарели редове → 'показаното е от по-ранно теглене — данни от 01.10, не от днес' + причина; провал без данни → видима бележка;")
 print("    Insider: секцията отпадна (давността е в маркера INS✓, виж test_insider_markers.py) — старите ключове в брифа не показват нищо")
 
 tmp.cleanup()
