@@ -41,6 +41,12 @@
 "ticker": "APP",
 "type": "Common Stock"
 },
+"060505104": {
+"date": "2026-11-17",
+"name": "BANK OF AMERICA CORP",
+"ticker": "BAC",
+"type": "Common Stock"
+},
 "084670702": {
 "date": "2026-10-21",
 "name": "BERKSHIRE HATHAWAY INC-CL B",
@@ -65,10 +71,22 @@
 "ticker": "CME",
 "type": "Common Stock"
 },
+"147528103": {
+"date": "2026-11-17",
+"name": "CASEY'S GENERAL STORES INC",
+"ticker": "CASY",
+"type": "Common Stock"
+},
 "15675D103": {
 "date": "2026-10-21",
 "name": "CEREBRAS SYSTEMS INC - A",
 "ticker": "CBRS",
+"type": "Common Stock"
+},
+"184496107": {
+"date": "2026-11-17",
+"name": "CLEAN HARBORS INC",
+"ticker": "CLH",
 "type": "Common Stock"
 },
 "21874A106": {
@@ -83,10 +101,28 @@
 "ticker": "CPAY",
 "type": "Common Stock"
 },
+"235851102": {
+"date": "2026-11-17",
+"name": "DANAHER CORP",
+"ticker": "DHR",
+"type": "Common Stock"
+},
+"247361702": {
+"date": "2026-11-17",
+"name": "DELTA AIR LINES INC",
+"ticker": "DAL",
+"type": "Common Stock"
+},
 "25809K105": {
 "date": "2026-10-21",
 "name": "DOORDASH INC - A",
 "ticker": "DASH",
+"type": "Common Stock"
+},
+"30303M102": {
+"date": "2026-11-17",
+"name": "META PLATFORMS INC-CLASS A",
+"ticker": "META",
 "type": "Common Stock"
 },
 "31488V107": {
@@ -137,6 +173,12 @@
 "ticker": "INSM",
 "type": "Common Stock"
 },
+"458140100": {
+"date": "2026-11-17",
+"name": "INTEL CORP",
+"ticker": "INTC",
+"type": "Common Stock"
+},
 "45866F104": {
 "date": "2026-10-21",
 "name": "INTERCONTINENTAL EXCHANGE IN",
@@ -161,10 +203,28 @@
 "ticker": "EWZ",
 "type": "ETP"
 },
+"48251W104": {
+"date": "2026-11-17",
+"name": "KKR & CO INC",
+"ticker": "KKR",
+"type": "Common Stock"
+},
 "49338L103": {
 "date": "2026-10-21",
 "name": "KEYSIGHT TECHNOLOGIES IN",
 "ticker": "KEYS",
+"type": "Common Stock"
+},
+"526057104": {
+"date": "2026-11-17",
+"name": "LENNAR CORP-A",
+"ticker": "LEN",
+"type": "Common Stock"
+},
+"531229755": {
+"date": "2026-11-17",
+"name": "LIBERTY MEDIA CORP-C",
+"ticker": "FWONK",
 "type": "Common Stock"
 },
 "55933J203": {
@@ -191,6 +251,12 @@
 "ticker": "MSFT",
 "type": "Common Stock"
 },
+"595112103": {
+"date": "2026-11-17",
+"name": "MICRON TECHNOLOGY INC",
+"ticker": "MU",
+"type": "Common Stock"
+},
 "64110L106": {
 "date": "2026-10-21",
 "name": "NETFLIX INC",
@@ -201,6 +267,24 @@
 "date": "2026-10-21",
 "name": "NEXTPOWER INC",
 "ticker": "NXT",
+"type": "Common Stock"
+},
+"67066G104": {
+"date": "2026-11-17",
+"name": "NVIDIA CORP",
+"ticker": "NVDA",
+"type": "Common Stock"
+},
+"68389X105": {
+"date": "2026-11-17",
+"name": "ORACLE CORP",
+"ticker": "ORCL",
+"type": "Common Stock"
+},
+"71531U102": {
+"date": "2026-11-17",
+"name": "PERSHING SQUARE INC",
+"ticker": "PS",
 "type": "Common Stock"
 },
 "722304102": {
@@ -225,6 +309,12 @@
 "date": "2026-11-16",
 "name": "SITEONE LANDSCAPE SUPPLY INC",
 "ticker": "SITE",
+"type": "Common Stock"
+},
+"84615Q103": {
+"date": "2026-11-17",
+"name": "SPACE EXPLORATION TECHN-CL A",
+"ticker": "SPCX",
 "type": "Common Stock"
 },
 "852234103": {
@@ -269,10 +359,34 @@
 "ticker": "TDS",
 "type": "Common Stock"
 },
+"88034P109": {
+"date": "2026-11-17",
+"name": "TENCENT MUSIC ENTERTAINM-ADR",
+"ticker": "TME",
+"type": "ADR"
+},
+"883556102": {
+"date": "2026-11-17",
+"name": "THERMO FISHER SCIENTIFIC INC",
+"ticker": "TMO",
+"type": "Common Stock"
+},
+"893641100": {
+"date": "2026-11-17",
+"name": "TRANSDIGM GROUP INC",
+"ticker": "TDG",
+"type": "Common Stock"
+},
 "90353T100": {
 "date": "2026-10-21",
 "name": "UBER TECHNOLOGIES INC",
 "ticker": "UBER",
+"type": "Common Stock"
+},
+"91529Y106": {
+"date": "2026-11-17",
+"name": "UNUM GROUP",
+"ticker": "UNM",
 "type": "Common Stock"
 },
 "92826C839": {
@@ -285,6 +399,12 @@
 "date": "2026-10-21",
 "name": "VISTEON CORP",
 "ticker": "VC",
+"type": "Common Stock"
+},
+"929160109": {
+"date": "2026-11-17",
+"name": "VULCAN MATERIALS CO",
+"ticker": "VMC",
 "type": "Common Stock"
 },
 "934423104": {
@@ -312,6 +432,12 @@
 "date": "2026-10-21",
 "name": "SEAGATE TECHNOLOGY HOLDINGS",
 "ticker": "STX",
+"type": "Common Stock"
+},
+"H01301128": {
+"date": "2026-11-17",
+"name": "ALCON INC",
+"ticker": "ALC",
 "type": "Common Stock"
 },
 "H5919C104": {

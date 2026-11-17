@@ -1,6 +1,6 @@
 {
  "version": 1,
- "saved": "2026-11-16",
+ "saved": "2026-11-17",
  "tickers": {
   "A": {
    "fetched": "2026-11-11",
@@ -92,6 +92,37 @@
     "earningsTimestamp": 1793190600,
     "earningsTimestampStart": 1801056600,
     "earningsTimestampEnd": 1801056600,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "AJG": {
+   "fetched": "2026-11-17",
+   "next_report": "2027-01-28",
+   "info": {
+    "marketCap": 73591103488,
+    "sharesOutstanding": 256415000,
+    "currentPrice": 287.0,
+    "regularMarketPrice": 287.0,
+    "earningsQuarterlyGrowth": 0.482,
+    "revenueGrowth": 0.209,
+    "returnOnEquity": 0.072119996,
+    "longName": "Arthur J. Gallagher & Co.",
+    "sector": "Financial Services",
+    "industry": "Insurance Brokers",
+    "longBusinessSummary": "Arthur J. Gallagher & Co., together with its subsidiaries, provides insurance and reinsurance brokerage, consulting, and third-party property/casualty claims settlement and administration services to entities and individuals worldwide. The company operates in Brokerage and Risk Management segments. Its Brokerage segment offers retail and wholesale insurance and reinsurance brokerage services; assists retail brokers and other non-affiliated brokers in the placement of specialized and hard-to-place insurance; and acts as a brokerage wholesaler, managing general agent, and managing general underwriter for distributing specialized insurance coverages to underwriting enterprises. This segment performs activities, including marketing, underwriting, issuing policies, collecting premiums, appointing and supervising other agents, paying claims, and negotiating reinsurance; and offers services in the areas of insurance and reinsurance placement, risk of loss management, and management of employer sponsored benefit programs. The Risk Management segment provides contract claim settlement and administration services; and claims management, loss control consulting, and insurance property appraisal services. The company offers its services through a network of correspondent brokers and consultants. It serves commercial, industrial, public, religious, and nonprofit entities, as well as underwriting enterprises. The company was founded in 1927 and is headquartered in Rolling Meadows, Illinois.",
+    "trailingPE": 43.81679,
+    "forwardPE": 19.374939,
+    "trailingEps": 6.55,
+    "forwardEps": 14.81295,
+    "debtToEquity": 56.038,
+    "heldPercentInstitutions": 0.98555,
+    "targetMeanPrice": 302.05557,
+    "shortPercentOfFloat": 0.0299,
+    "sharesShort": 7583871,
+    "shortRatio": 4.7,
+    "earningsTimestamp": 1793304000,
+    "earningsTimestampStart": 1801170000,
+    "earningsTimestampEnd": 1801170000,
     "isEarningsDateEstimate": true
    }
   },
@@ -371,6 +402,37 @@
     "isEarningsDateEstimate": true
    }
   },
+  "CSX": {
+   "fetched": "2026-11-17",
+   "next_report": "2027-01-28",
+   "info": {
+    "marketCap": 95912009728,
+    "sharesOutstanding": 1843398210,
+    "currentPrice": 52.03,
+    "regularMarketPrice": 52.03,
+    "earningsQuarterlyGrowth": 0.516,
+    "revenueGrowth": 0.12,
+    "returnOnEquity": 0.26389,
+    "longName": "CSX Corporation",
+    "sector": "Industrials",
+    "industry": "Railroads",
+    "longBusinessSummary": "CSX Corporation, together with its subsidiaries, provides rail-based freight transportation services in the United States and Canada. It operates through two segments: rail and trucking. The company offers rail services; and transportation of intermodal containers and trailers, as well as other transportation services, such as rail-to-truck transfers and bulk commodity operations. It also transports chemicals, agricultural and food products, minerals, automotive, forest products, fertilizers, and metals and equipment; and coal, coke, and iron ore to electricity-generating power plants, steel manufacturers, and industrial plants, as well as exports coal to deep-water port facilities. In addition, the company provides intermodal services through a network of approximately 30 terminals transporting manufactured consumer goods in containers; and drayage services, including the pickup and delivery of intermodal shipments. It serves the automotive industry with distribution centers and storage locations, as well as connects non-rail served customers through transferring products, such as plastics and ethanol from rail to trucks. The company operates approximately 20,000 route mile rail network, which serves various population centers in 26 states east of the Mississippi River, the District of Columbia, and the Canadian provinces of Ontario and Quebec, as well as owns 3400 locomotives. It serves production and distribution facilities through track connections. CSX Corporation was incorporated in 1978 and is headquartered in Jacksonville, Florida.",
+    "trailingPE": 27.098959,
+    "forwardPE": 22.200602,
+    "trailingEps": 1.92,
+    "forwardEps": 2.34363,
+    "debtToEquity": 135.169,
+    "heldPercentInstitutions": 0.8307,
+    "targetMeanPrice": 53.80739,
+    "shortPercentOfFloat": 0.0202,
+    "sharesShort": 37223592,
+    "shortRatio": 3.41,
+    "earningsTimestamp": 1792612800,
+    "earningsTimestampStart": 1801170000,
+    "earningsTimestampEnd": 1801170000,
+    "isEarningsDateEstimate": true
+   }
+  },
   "CTAS": {
    "fetched": "2026-11-12",
    "next_report": "2026-12-17",
@@ -431,6 +493,37 @@
     "earningsTimestampStart": 1800970200,
     "earningsTimestampEnd": 1800970200,
     "isEarningsDateEstimate": true
+   }
+  },
+  "DRI": {
+   "fetched": "2026-11-17",
+   "next_report": "2026-12-18",
+   "info": {
+    "marketCap": 26128164864,
+    "sharesOutstanding": 113143224,
+    "currentPrice": 230.93,
+    "regularMarketPrice": 230.93,
+    "earningsQuarterlyGrowth": -0.095,
+    "revenueGrowth": 0.051,
+    "returnOnEquity": 0.55431,
+    "longName": "Darden Restaurants, Inc.",
+    "sector": "Consumer Cyclical",
+    "industry": "Restaurants",
+    "longBusinessSummary": "Darden Restaurants, Inc., together with its subsidiaries, owns and operates full-service restaurants in the United States and Canada. The company operates under Olive Garden, LongHorn Steakhouse, Cheddar's Scratch Kitchen, Chuy's, Yard House, Ruth's Chris Steak House, The Capital Grille, Seasons 52, Eddie V's Prime Seafood, Bahama Breeze, The Capital Burger, Darden and Darden Restaurants brand names. Darden Restaurants, Inc. was founded in 1938 and is based in Orlando, Florida.",
+    "trailingPE": 22.420387,
+    "forwardPE": 18.629486,
+    "trailingEps": 10.3,
+    "forwardEps": 12.39594,
+    "debtToEquity": 415.302,
+    "heldPercentInstitutions": 1.01195,
+    "targetMeanPrice": 233.44,
+    "shortPercentOfFloat": 0.0879,
+    "sharesShort": 7396896,
+    "shortRatio": 7.17,
+    "earningsTimestamp": 1797600600,
+    "earningsTimestampStart": 1797600600,
+    "earningsTimestampEnd": 1797600600,
+    "isEarningsDateEstimate": false
    }
   },
   "ELF": {
@@ -646,6 +739,35 @@
     "earningsTimestampStart": 1801143000,
     "earningsTimestampEnd": 1801143000,
     "isEarningsDateEstimate": true
+   }
+  },
+  "MSCI": {
+   "fetched": "2026-11-17",
+   "next_report": "2027-01-26",
+   "info": {
+    "marketCap": 47511035904,
+    "sharesOutstanding": 71500000,
+    "currentPrice": 664.49,
+    "regularMarketPrice": 664.49,
+    "earningsQuarterlyGrowth": 0.079,
+    "revenueGrowth": 0.124,
+    "longName": "MSCI Inc.",
+    "sector": "Financial Services",
+    "industry": "Financial Data & Stock Exchanges",
+    "longBusinessSummary": "MSCI Inc., together with its subsidiaries, provides research-based data, analytics, and indexes, supported by advanced technology worldwide. The Index segment provides indexes for use in various areas of the investment process, including indexed financial products, such as ETFs, mutual funds, annuities, futures, options, structured products, and over-the-counter derivatives; performance benchmarking; portfolio construction and rebalancing; and asset allocation, as well as licenses GICS and GICS Direct. The Analytics segment offers risk management, performance attribution and portfolio management content, application, an integrated view of risk and return service, and an analysis of market, credit, liquidity, counterparty, and climate risk across asset classes; managed services, including consolidation of client portfolio data, review and reconciliation of input data and results, and customized reporting; and HedgePlatform to measure, evaluate, and monitor the risk of hedge fund investments. The Sustainability and Climate segment provides products and services that help institutional investors understand how ESG impacts the long-term risk and return of their portfolio and individual security-level investments; and data, ratings, research, and tools to assist investors navigate increasing regulation. The All Other  Private Assets segment comprises private credit, real estate and infrastructure data, benchmarks, return-analytics, climate assessments and market insights; business intelligence to real estate owners, managers, developers, and brokers; and offers investment decision support tools for private capital. The Private Capital Solutions segment offers tools to help private asset investors across mission-critical workflows, such as sourcing terms and conditions, evaluating operating performance, managing risk and other activities supporting private capital investment. MSCI Inc. was incorporated in 1998 and is based in New York, New York.",
+    "trailingPE": 35.13961,
+    "forwardPE": 29.630615,
+    "trailingEps": 18.91,
+    "forwardEps": 22.42579,
+    "heldPercentInstitutions": 0.95609003,
+    "targetMeanPrice": 689.94116,
+    "shortPercentOfFloat": 0.023,
+    "sharesShort": 1370420,
+    "shortRatio": 2.23,
+    "earningsTimestamp": 1800970200,
+    "earningsTimestampStart": 1800970200,
+    "earningsTimestampEnd": 1800970200,
+    "isEarningsDateEstimate": false
    }
   },
   "MTD": {
@@ -1044,6 +1166,37 @@
     "earningsTimestamp": 1792153800,
     "earningsTimestampStart": 1800451800,
     "earningsTimestampEnd": 1800451800,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "UNP": {
+   "fetched": "2026-11-17",
+   "next_report": "2027-01-26",
+   "info": {
+    "marketCap": 180479787008,
+    "sharesOutstanding": 594250416,
+    "currentPrice": 303.71,
+    "regularMarketPrice": 303.71,
+    "earningsQuarterlyGrowth": 0.161,
+    "revenueGrowth": 0.153,
+    "returnOnEquity": 0.38747,
+    "longName": "Union Pacific Corporation",
+    "sector": "Industrials",
+    "industry": "Railroads",
+    "longBusinessSummary": "Union Pacific Corporation, through its subsidiary, Union Pacific Railroad Company, operates in the railroad business in the United States. It offers transportation services for grain and grain products, fertilizers, food and refrigerated products, and coal and renewables to grain processors, animal feeders, and ethanol and renewable biofuel producers; and construction products, industrial chemicals, plastics, forest products, specialized products, metals and ores, petroleum, liquid petroleum gases, soda ash, and sand, as well as finished automobiles, automotive parts, and merchandise in intermodal containers. The company was founded in 1862 and is headquartered in Omaha, Nebraska.",
+    "trailingPE": 23.690327,
+    "forwardPE": 21.099674,
+    "trailingEps": 12.82,
+    "forwardEps": 14.39406,
+    "debtToEquity": 141.303,
+    "heldPercentInstitutions": 0.91135,
+    "targetMeanPrice": 329.95834,
+    "shortPercentOfFloat": 0.056999996,
+    "sharesShort": 30468049,
+    "shortRatio": 12.44,
+    "earningsTimestamp": 1792672200,
+    "earningsTimestampStart": 1800970200,
+    "earningsTimestampEnd": 1800970200,
     "isEarningsDateEstimate": true
    }
   },

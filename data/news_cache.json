@@ -1,176 +1,123 @@
 {
- "date": "2026-11-16",
+ "date": "2026-11-17",
  "news": [
   {
-   "headline": "Iran's navy says three tankers on fire after hitting mines in Hormuz - Reuters",
-   "source": "Reuters Business",
-   "why": "Атаки по танкери в Хормуз директно заплашват петролния транзит — петролът, корабоплавателните компании и отбранителният сектор реагират нагоре; рискът-премиум в суровините се покачва.",
-   "source_text": "Iran's navy says three tankers on fire after hitting mines in Hormuz - Reuters Iran's navy says three tankers on fire after hitting mines in Hormuz Reuters Bahrain intercepts Iranian aerial attacks as Tehran says it attacked US base - Reuters Bahrain intercepts Iranian aerial attacks as Tehran says it attacked US base Reuters Saudi-led coalition intercepts missiles towards Riyadh, drones in Eastern Province - Reuters Saudi-led coalition intercepts missiles towards Riyadh, drones in Eastern Province Reuters Yemen's Houthis say they launched ballistic missiles towards Riyadh airport, financial centre - Reuters Yemen's Houthis say they launched ballistic missiles towards Riyadh airport, financial centre Reuters Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain in attack on U.S. base Iranian attacks on Bahrain, headquarters of the U.S. Fifth Fleet in the Gulf, were likely to put new pressure on U.S. President Donald Trump to resolve the war. Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain - Reuters Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain Reuters Trump tells advisers he may hold off on Iran attacks barring new provocations, sources say - Reuters Trump tells advisers he may hold off on Iran attacks barring new provocations, sources say Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPZWt1cHFualJEVktnTTVvd21uVnljc0FqR2dRaWpaRnYwZ3luZ2t1dUlJNVUtLTVlWHJFOS1ocDBlaVZsTFNZdjRMeldFVFE1Q0Jqem9FbU9fMmp1YTBUTUhqTmYzR3FJN1Z1Y1dHY2d0Yjlzb2lBR0JvNllyT3pScjI2SEpkbkhiYzZSWW9Tb3dwemdWaVVmMjBPbXZqd0hOZzdpRDVSZlVlbzBnV1BjMQ?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Bahrain intercepts Iranian aerial attacks as Tehran says it attacked US base - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNS2FyaWZZTTd4ZWFoWFdoTnFNVmpjakdwQUVnZ0UtMEY5MFc1dEFBeGd4UmczdGh1ektRTHBjRGxBOVlVQy1XV3NOdV9MbWotQkNVa1NBdmJaUloya1VhR2FEUTN3QkgwZ1JRN00wME5tc243TmZHU20zdlpaUHR2Q2lyby0tUkJsR0w5N1lXclI4ZWI5RTdfbjB2d1hxMXVjOVp4MlJPOF9IcjIxSE1JWWx3?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Saudi-led coalition intercepts missiles towards Riyadh, drones in Eastern Province - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOemlqVE1TdmREQ0t3TjczWnBWVGZ3TkxTc0ZPVC1fZFlrUDJCZC1KV0liZGdUTHBXZEZpWG9SNkJJSlBYSjVPbE1aUnNtWHl2eE1FbzlURGRwckdIT3R2NG9rVm1oX1V0VEZoWmYxM1dSbmhNc1BidnFLX19YRVU3Q2tzR1F5Vk1QX3dDNXVCeXZ6bmVES0lZNTBlR3E0Z1hJcXFyYXpMam80TGRWbURod1NsUXBwZldjdHFVejFwaWtmVmo3ZWYzYW5QMzk?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Yemen's Houthis say they launched ballistic missiles towards Riyadh airport, financial centre - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOZ2NSdXVjeDlTU0lLeTAtMGs5RmdHaW0wTVhVbzUwempOYUdlNVB3NXprMGZqYksyVjhLUU1OV250QlczemJOT2tXcVFIZEJYb0dwblVCblExbnFmZkVyeGZnZ0NJY3Z3a3NTcmxUQ21tR0ZsQVdhTTNRNWJaZW5pOEk4RDNEMXN3aExOaEE0QVNzaXV3UTM3ZjlNa2hDenRtajR2aGVGT3RQR0NOSnY1VHQ3czdCSkJWSUgxaFFYNThEUlBBMVpn?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOdTFBcWR1YzJhai1UdGgzMHpvdm40VExxeXFqM0NtbU9YVmNSNXpNeDlXTGllRXFtczhIUzVsaFFWdVV5TGxESWdneGlXbER1Qlg2b2VhQ2lqMmxVaEd4U01nZmNXcFY2bmNhSTdIN0VycE84MWJDRXdZOGxMRGo0U1k1UjhiamFNQ1JIQmp1MUdxNlZGRm1UanBvaENxR3V2N25NdFVOaWpXX1E?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Trump tells advisers he may hold off on Iran attacks barring new provocations, sources say - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPR2NiU2RGMHprbUFIMnNuTGJheHdpTzhuZFRCSWVGcl9HZF9raUd2VXQxNHE1WldRVzNaZWx6YnlRZFpueGZlb05DMElhZ3FEOVdLakpQWkNLaGktQWh6THRxT3V0aGVPaXI0dW9LVm9DeTJRekF1enJaamZ5bEd2SFZtSVNtTFd5VEp0WFl6U2VWX3BCRkYzbnB1c25QRnU2M3FBbDJBMHRTVWU5T0hyZG5sWFRPWUFIYVhuT1BMWTBkUVdNbDlF?oc=5"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain in attack on U.S. base",
-     "link": "https://www.cnbc.com/2026/11/15/bahrain-iran-drone-attacks-tehran-us-base.html"
-    }
-   ]
-  },
-  {
-   "headline": "Japan's economy unexpectedly shrinks as inflation squeezes households - Reuters",
-   "source": "Reuters Business",
-   "why": "Неочакваното свиване на японския GDP усложнява плановете на Bank of Japan за повишение на лихвите и притиска йената и японските акции, докато доларът печели.",
-   "source_text": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite Energy subsidies for households had reportedly expired in September, exposing the economy to the higher energy prices brought about by the Iran war. Japan's economy unexpectedly shrinks as inflation squeezes households - Reuters Japan's economy unexpectedly shrinks as inflation squeezes households Reuters Dollar extends gains, yen looks past soft Japan GDP data - Reuters Dollar extends gains, yen looks past soft Japan GDP data Reuters",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeXFYOEg3cHpDTUFrTU9IRlQyWDlvRGVMVVN3VmxOelY3WnhCREJNdElKcEY5ZWpBSmhoalMzWDdaM0Y5Z0VXbkxVemg3YmdhSUg5UmYybnhFOHhWbVhXdjdoT1BUUGNQUFVtX2o1SkJRSnBJNEdLX081amJyUll6WHFpUk5SaWlkd2JGN0VnRFZKYi1WT1B0NzFUOUVKdkFfcTQ5RmdFeHdvcWI5c2pRaXF6MFBydw?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Dollar extends gains, yen looks past soft Japan GDP data - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPZkdhelNXT1laWnBWei1ZTGMybnc1U1FxOUtGdjdoaGxDX29kd0pvc3FoLVhYdVh4SkdQdGN1cFU1UjVmb0lGWlJsdTlJOHppUjh0eGVrTFJBajZxUV9CVWFrN0F5S0RqVVpMWlR4ZW05R0duTFdvZjJNbGNhcEl2V002d0xWejFMRmR2ZjRDanBqZndnZndWOF96b3NxdVdaWnp4LWdzQ1RhdEdXdkhfcUJaSQ?oc=5"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite",
-     "link": "https://www.cnbc.com/2026/11/16/japan-q3-gdp-energy-oil-prices.html"
-    }
-   ]
-  },
-  {
-   "headline": "Fed's Collins says gradual rate hikes best to manage economic risks - Reuters",
-   "source": "Reuters Business",
-   "why": "Сигналът за постепенно повишаване на лихвите от Fed подкрепя по-силен долар и натиска облигациите и лихвочувствителните сектори надолу.",
-   "source_text": "Fed's Collins says gradual rate hikes best to manage economic risks - Reuters Fed's Collins says gradual rate hikes best to manage economic risks Reuters Fed 'has some work to do on inflation,' Kansas City Fed chief says Schmid did not call for additional rate hikes, but said inflation is \"uncomfortably above the 2% price stability target, and moving in the wrong direction.\"",
-   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPbHZfX3JqempNenlnSUpVcTd4dXY4djdJU1c2VkZ2Um5fYXkyVTMtYUxBZlBrcXVqQXJkQ0RjejZRQTdBLWxPYzcyRDBfTGxmdUVTekN0TFFWdHNfZFh6ckt0c1RCTVBwZzZjZ3NacWJWSDhvMVRGVDNpR0o2YTBwdmJILTE4eWs2SlQ5YnVHN0ctMFM3bWJsQkhtblRUMjI0amRHcFZLaXNaWWJz?oc=5",
+   "headline": "Trump administration moves to block China from indirect access to American AI technology - AP News",
+   "source": "AP Business",
+   "why": "Ограниченията върху косвения достъп на Китай до американски AI технологии засягат акциите на чипмейкъри и cloud доставчици, като увеличават регулаторния риск за целия AI сектор.",
+   "source_text": "Trump administration moves to block China from indirect access to American AI technology - AP News Trump administration moves to block China from indirect access to American AI technology AP News Nvidia fallout: Commerce targets loophole for China's data center use The rule was written by the Treasury Department and the National Security Council after criticism of Commerce Secretary Howard Lutnick.",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxONGJmTGhQa3FRRDZtX3BqVk9SNlc1aHZ1QXZiUXdHMmlmZmdyUjFKS0hrREM1OFRrVDVjUGpSWnZfVTEtdlozVHVDc0h5Rld1cGVKQTFGYzVZOGJMdDNheWdEcFRhakxCVW1xcnQ3VHBzS2lRdWNPTGdtUkNxNVRnT1JUVzVKNzRXUlNuLUtBOVk2REZnZjMySER5NmhfNTliRjZsZ3B5TElrN0JU?oc=5",
    "also": [
     {
      "source": "CNBC",
-     "headline": "Fed 'has some work to do on inflation,' Kansas City Fed chief says",
-     "link": "https://www.cnbc.com/2026/11/15/fed-has-some-work-to-do-on-inflation-kansas-city-fed-chief-says.html"
+     "headline": "Nvidia fallout: Commerce targets loophole for China's data center use",
+     "link": "https://www.cnbc.com/2026/11/16/nvidia-commerce-china-lutnick.html"
     }
    ]
   },
   {
-   "headline": "Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters",
+   "headline": "Shares slide on tech weakness ahead of Nvidia earnings - Reuters",
    "source": "Reuters Business",
-   "why": "Натискът на Министерството на финансите върху Nvidia за спазване на експортните ограничения към Китай и изискването за външен CEO увеличава регулаторния и операционен риск за акцията и за целия AI-чип сектор.",
-   "source_text": "Bessent says Nvidia needs ‘shake-up’ with external CEO US Treasury secretary demands to know if chipmaker is complying with restrictions on exports to China Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports Reuters EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia Reuters Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker Jensen Huang’s resignation as Nvidia CEO has brought renewed scrutiny to Commerce Secretary Howard Lutnick and his family's financial ties to the chipmaker. EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs Reuters Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters Bessent says Nvidia must 'go outside the company' to find new CEO Reuters",
-   "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPbzFERGNkd2ZLODdReVZtV3pnNVdJT3RyNDdpbUZQRXZHUEgzbVYtZTBwelhfV1hRbVVfOGsxeDJURWd2bEJubFlFUjFXZC1HM2Z4U3l2TXVhTXR3OTFPZ2xUaDhOVlBDWF93dDE0V2lsOEI3bGFGWXlmbnVldjNCQkJKQlFNbDVfaWR6cGpJdktZWlJXcEdNQkZnWWsxSlZGX19tQTIxYW5NVWQxb2NQclEza1JHaHBma3lmaFNzQWRtQld0UkRwT01IZEY0eUk?oc=5",
+   "why": "Разпродажбата в tech акциите, водена от Nvidia, оказва натиск върху широкия пазар преди ключови earnings.",
+   "source_text": "Shares slide on tech weakness ahead of Nvidia earnings - Reuters Shares slide on tech weakness ahead of Nvidia earnings Reuters Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies - AP News Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies AP News Tech sell-off deepens as Nvidia results loom Investors fret over tighter US chip export controls and potential slowdown in AI data centre build-out",
+   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQbHY5U3ZMUmhWeEViMkJTbW9ObHlQYWRWbmdxWDhXMUdaWFRvLVdRY01oaTJJb3lmOFBiaWpQMEFlTFk5R2ttRnBaT18zaF9Jbk9od2Rza0cyMXJ6Z3JlalJDdG9neTVhQ3pJRG05SE9NQUYxZkFvQmQ5bnVfTi13amFNOA?oc=5",
    "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOcGIzcVZhWDU2cVlTWlhGZFZUMGlCcldoTU4wc2Z2UUpqUzJiNWp3Sy1kTVFQTnRKbHVnY2cwWHh0WEx3YkV5ZVMxOUFnMmVIc0kzaHdHc0NEVm9NS3hsVTdfTHR1ZWR4OTc2NUNpXzUteWZvblRYcEFVRDBIVTQyanVZTGdDYVFTaDJLTWFYdWNmSzBtU09Dd1RZVkhLUjB0WkR2Rm0tVTZnXzctWTREMXF3QjhZNTUxMHhDWjJZMHc?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPc1EtU18tWjZNZTZtOFBZNzdqZkRFMk1nbm9MTm9VWUQwUHlLc1dTdDNLWmNCcllESHVVYjFnXzlKcFJrSWpHUkY2S1lhcTFtWWdPVG9WdkcyTkFSaEpLanVzeWctM1hCTkdxUEJ6VnBrLXFYVnBsalpKUkJVUGQyUE5DOEJtaTctZlFEaV9VR1loQ1JrVlhyRmRxR25UMkI2MVgtZnBFU1pVaXhBcmw0ZV9jb0RPYlduY1ppbnpCTlc?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNVGladEJOQmtqRldzTHdlQ25Fb3pCREJuYmthQTgzclB5Snl6WWFmaXdtWU1KU1NqVGhTZzIyakttSVpxR0p3MVlGU1pBcjhjRjVkVl9wNGU5OS1kOUJkeXRobzlOSjlMUkVPTWkxbmdib3Bna3ZoRVRoM1RybkQ2NE92ZWZTMjBuNF80a1lhVENxQUhTU2hkY0QzaTU0NGc?oc=5"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "Bessent says Nvidia needs ‘shake-up’ with external CEO",
-     "link": "https://www.ft.com/content/24edbb84-7520-4ef0-a57c-30359e12ccc5?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
-     "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html"
-    }
-   ]
-  },
-  {
-   "headline": "Oil prices fall on expectations of coming supply surplus - Reuters",
-   "source": "Reuters Business",
-   "why": "Очакванията за излишък в предлагането натискат петрола и свързаните енергийни акции надолу, докато дизелът е на двумесечно дъно.",
-   "source_text": "Oil prices fall on expectations of coming supply surplus - Reuters Oil prices fall on expectations of coming supply surplus Reuters US diesel below $6 a gallon at 2-month low on easing tensions, weaker demand - Reuters US diesel below $6 a gallon at 2-month low on easing tensions, weaker demand Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNSXlabl9ocWtiOEZLcnc2SGNVSEh2bjltWURkWU1RSDVTejZWMEtNYTR4QW9sT19DQy05SVhHVmphTEtIQXdtVzlUS25Vdk1oS0hjdWZ0MHpUb01NQUp4dzlBcE55anIwR0hKVmhCUDRsT3V3ek9jTURVYkcySDNBM1B0RmJ3emdUaHpPVWpENENfZ2JGRHB3MlJuekVfUWlFa2lfUQ?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "US diesel below $6 a gallon at 2-month low on easing tensions, weaker demand - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOMnBfd2gzZE5aV1hCWkdBazd0LXN5d3RJaGF3VUQ0OWlMaWYwWWxNT2JQNUdRdm9TVklIejYwemNoM3dCM3F2MTVpc0tnX2RiSHRnbXFKRWU3X3hVUEdGV0hpVWV1Tk9aZG54aEMyQ0JUbVFIdnl0YThfOWxnU1JJazZqNEZYV0M1ZTdwSkM4UUV3b0FSckNhc05fRGpERmc3WEVEbWxIYnVkd29RQlBzRUhWbUQ0dkFHQ1E?oc=5"
-    }
-   ]
-  },
-  {
-   "headline": "Trump to raise nuclear-arms cuts with Putin, Xi on Thursday, White House says - Reuters",
-   "source": "Reuters Business",
-   "why": "Историческата тристранна среща на върха на APEC може да повлияе на търговската политика, санкциите и геополитическия риск-премиум в глобалните активи.",
-   "source_text": "Trump, Xi and Putin plan unprecedented joint meeting on APEC sidelines, White House and Kremlin say - AP News Trump, Xi and Putin plan unprecedented joint meeting on APEC sidelines, White House and Kremlin say AP News China confirms Xi-Trump-Putin historic summit. What will be on the agenda? The talks are expected to focus on issues including nuclear non-proliferation, the Middle East war, trade policies and, possibly, the Ukraine war. US and allies sign accord to protect AI supply chains from China Pact comes ahead of Donald Trump’s meeting with Xi Jinping at the Asia-Pacific Economic Cooperation forum in Shenzhen Trump to raise nuclear-arms cuts with Putin, Xi on Thursday, White House says - Reuters Trump to raise nuclear-arms cuts with Putin, Xi on Thursday, White House says Reuters Trump to hold summit with Xi, Putin in Shenzhen on Thursday, NY Post reports - Reuters Trump to hold summit with Xi, Putin in Shenzhen on Thursday, NY Post reports Reuters",
-   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPX1dzUndCOE42aUFUazd4SFcxMFVWUTl6VmRVOE5QR0ZjNWRXY19qWTVuRUthUXhDS3UybmZnQmFHSHVRV20wdXJwTUlKUTlGVU42N1B4bkVwSjI4bkdJeG94aFpxX01NUTdyWUJOUVZHSHlXZkxGZXlsTWhjSmUwRXoyRklMekIycXlEUk1pM1NpNjJp?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Trump to hold summit with Xi, Putin in Shenzhen on Thursday, NY Post reports - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQaHhKNS1YbHpLcldfQTByOFM5TzNFOC16QmlWZHRva3lhTkxSVldFaWVkZ2ZWdDFzODFGZk02MU56X0hkWWtDZzJUa3JOSkd4YUFVVEVNZmN0ZXZWN1QtR01SV1N4UW84SzJxTFJEcnFSdndlYnhHWlFDVGtibWVRTkF0aU1WejNKOVdHVVRGWkt3WlBGbDRFVXptYTBoVjhFUDlKV0lpU0JDSEJ5RWdneHZYMA?oc=5"
-    },
     {
      "source": "AP Business",
-     "headline": "Trump, Xi and Putin plan unprecedented joint meeting on APEC sidelines, White House and Kremlin say - AP News",
-     "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOOUd4MWZqTjdxYkRUaW55bWxuNy1BX1FaZVNYZHRtNEg4NWdzTENNMlVLOUt6QlptMzd1cUtLanJ0U1pPNVVrbjZDRXo0UWszZjV6d09hRy1GaUFFWE9PUmtzRnFxOUxJdW1OTy0zT21LbnU3RGlhQUUtNHlnRW9nUjhJRmQ0QUFDME9oelNZTVQ?oc=5"
+     "headline": "Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies - AP News",
+     "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOYXdFLTA2eFh1c1k5N2ZnWnBXdkpYX3ZzMkNaUC03SjBXeDlVcHplSm1fUnRnVzJsaGhFb0I2eHp2Si1uaTNRaEotekFyYlZYRVlxdzNydUhEaXZaa0c5dW1ybEp5T2wyWUN2eVhGaTdpdVV5bkRuRDJxQVd0X2wySmFhQXNiaWROVmRJRXdIRDVtSC1CN3c?oc=5"
     },
     {
      "source": "Financial Times",
-     "headline": "US and allies sign accord to protect AI supply chains from China",
-     "link": "https://www.ft.com/content/3c2197fc-9618-4838-91e6-522ce1a96a22?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "China confirms Xi-Trump-Putin historic summit. What will be on the agenda?",
-     "link": "https://www.cnbc.com/2026/11/16/trump-xi-putin-ukraine-nuclear-tariffs-russia-iran-.html"
+     "headline": "Tech sell-off deepens as Nvidia results loom",
+     "link": "https://www.ft.com/content/4a3b9892-67c6-4177-8503-80c0a5eb3b60?syn-25a6b1a6=1"
     }
    ]
+  },
+  {
+   "headline": "Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’",
+   "source": "CNBC",
+   "why": "Изказването на председателя на Fed относно AI и икономиката влияе на очакванията за лихвени решения и посоката на облигациите и долара.",
+   "source_text": "Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’  Analysis: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means Kevin Warsh sees AI at a turning point. He faces tough questions on jobs and interest rates.",
+   "link": "https://www.cnbc.com/2026/11/16/fed-ai-task-force-kevin-warsh.html",
+   "also": [
+    {
+     "source": "CNBC",
+     "headline": "Analysis: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means",
+     "link": "https://www.cnbc.com/2026/11/16/kevin-warsh-fed-ai-jobs-productivity-interest-rateshtml.html"
+    }
+   ]
+  },
+  {
+   "headline": "US dollar hits 19-month peak on Fed hike bets; Aussie dips - Reuters",
+   "source": "Reuters Business",
+   "why": "Нов 19-месечен връх на долара на фона на очаквания за повишение на лихвите натиска суровините, emerging markets и валутните двойки.",
+   "source_text": "US dollar hits 19-month peak on Fed hike bets; Aussie dips - Reuters US dollar hits 19-month peak on Fed hike bets; Aussie dips Reuters Gold ticks up but lingers near more than one-year low on Fed hike bets - Reuters Gold ticks up but lingers near more than one-year low on Fed hike bets Reuters",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPb0Z6TDRSbVp3QXhMLUlLR3Vaam5aam1wVW9LV2tGSmJPZVFaU2dCNnhzVjJSY25lNWR3N1lmOFVPeno3UWpkamE2SDVxOVVfcUxUY0RxYTd5cm8wYzg0M1FVZTdrVXU2RXJzbXFmNElPb0ZqVVJ2WUxhS1B5WXVhRFFobUJPb2FaNzdsdlFkNmludUtnSXY3eUJoZ0J5UXFJdTlQUVhR?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Gold ticks up but lingers near more than one-year low on Fed hike bets - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNVGd6c05RMXpCQzBvWjhLZlZ6cjc4OUZ0cjZaSWxzZk9leV9WbG1EVmhoVlJfTHZZRFkxZml4Rll3TXd6SGc0dmtiSHFsYkVQWThZdkpxb3dGQkhpSkgyVC1HQlV5WkZQaHU4N3B2b2RELWdDaGpZLWtmbHo2cllMNE9tN29pYnJGM1Z4eFJ6bmNQdHJFX0lNTHZtV0x4MlNhT284LThTc1hTY2xlcEEta0wwNjg?oc=5"
+    }
+   ]
+  },
+  {
+   "headline": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz",
+   "source": "CNBC",
+   "why": "Ескалацията на напрежението в Близкия изток с трети американски самолетоносач и удар по танкер в Хормуз застрашава петролните доставки и подкрепя цените на суровия петрол.",
+   "source_text": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz Iran has ratcheted up threats against U.S. forces as a third American aircraft carrier arrived in the Gulf, stoking fears of a resumption of military tensions. US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart - Reuters US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart Reuters",
+   "link": "https://www.cnbc.com/2026/11/17/iran-war-trump-hormuz-oil-.html",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPQUI4WnRjazloVU5KUTR5MndXU19SVjNiQzRib2JHSC1ZOTFFVE5kdUlweUZjNkJrZzNheVc0bUlJY3UzRGtoanF1NDV4eGdTUnZIOEh4QUZ1MEF1NWt5M2Y3UmtZdnVRN3QwZzg1NTlGQWxsMlFjNzE4c0t6VnVTaUNPTFRZUWxnMVRMUHRZV18tMWttdm80V21kSFgzVUhxdEpUYk9MZElPZXJyTVN3LWVBM2VJTXpmdzlINTFZcTVER1pXV0ZnMHFsWEI?oc=5"
+    }
+   ]
+  },
+  {
+   "headline": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
+   "source": "CNBC",
+   "why": "Спадът в цената на суровия петрол поради възстановяване на близкоизточния износ влияе на енергийния сектор и инфлационните очаквания.",
+   "source_text": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports Oil prices are falling as forecasts project a surplus in oil in the fourth quarter Oil slips as recovering Mideast exports blunt Gulf tensions - Reuters Oil slips as recovering Mideast exports blunt Gulf tensions Reuters",
+   "link": "https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Oil slips as recovering Mideast exports blunt Gulf tensions - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPQm40d1ZiR2k1S1RxaFdvQzJVYmRJUE1rcnNLZkEyRkZzbk5KZjlqWl9sZW9MUFB2OHpwdGZzT3duNzVnMnNaMEJMYkFKWndKTWE1OWNtd0hLcWRtSmVVYU5JaTBlNXZuT2t0V1AzVHdXVEhPMWt5QnhXakxpWkxiQk50ZEt0UGtXT3RpeXdiNEY0UXBqeXk2RGVHYURMNzJzNm13Zldtbm8tQQ?oc=5"
+    }
+   ]
+  },
+  {
+   "headline": "EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say - Reuters",
+   "source": "Reuters Business",
+   "why": "Антитръстовият преглед на сливането засяга акциите на двете компании и създава несигурност в сектора на доставките и e-commerce.",
+   "source_text": "EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say - Reuters EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say Reuters",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQeVhqY2xFRW92Y3RHVHQ4RFBYOTg2TG9ySTJybTgydVNtVU56MWZuM0RNMkIxWmw0d2xUa0U0ZThBbHNPZ2syUVlDOTdERDl2RmZiTXZOb045VzRtRGtWaXA1VGVzdm1UYi12eWZqQUhPdFI1NXlCN1d3Sm1kWVdROTBnUEgzZ21EWE1lSnVxdENFUGZoSllzeUR6VnBuQTQ?oc=5"
   }
  ],
  "window": {
-  "since": "2026-11-13T06:30:00+00:00",
-  "hours": 72.08,
-  "day_queries": 6,
+  "since": "2026-11-16T06:30:00+00:00",
+  "hours": 24.08,
+  "day_queries": 0,
   "sources": {
    "Reuters Business": {
-    "count": 150,
-    "oldest": "2026-11-13T08:05Z"
+    "count": 50,
+    "oldest": "2026-11-16T13:31Z"
    },
    "CNBC": {
     "count": 30,
-    "oldest": "2026-11-13T17:44Z"
+    "oldest": "2026-11-16T13:42Z"
    },
    "Financial Times": {
     "count": 12,
-    "oldest": "2026-11-15T17:47Z"
+    "oldest": "2026-11-16T18:14Z"
    },
    "AP Business": {
-    "count": 149,
-    "oldest": "2026-11-13T08:00Z"
+    "count": 50,
+    "oldest": "2026-11-16T07:55Z"
    }
   }
  }

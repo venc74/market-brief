@@ -1,5 +1,5 @@
 {
- "date": "2026-11-16",
+ "date": "2026-11-17",
  "rows": [
   {
    "ticker": "EMBJ",
@@ -8,28 +8,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Nov 16, 2026",
-   "price": 78.73,
-   "market_cap": 14010656375.444145
-  },
-  {
-   "ticker": "SENEA",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026",
-   "price": 176.47,
-   "market_cap": 1192994913.9423523
-  },
-  {
-   "ticker": "SENEB",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026",
-   "price": 170.26,
-   "market_cap": 1151013237.8844147
+   "price": 18.77,
+   "market_cap": 3340277009.45
   },
   {
    "ticker": "SNDK",
@@ -38,8 +18,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Nov 20, 2026",
-   "price": 885.01,
-   "market_cap": 125927512308.19458
+   "price": 809.11,
+   "market_cap": 115127746030.83313
   }
  ],
  "horizon": [
@@ -122,6 +102,38 @@
    "ratio": "1:10",
    "split_type": "reverse",
    "date_human": "Nov 16, 2026"
+  },
+  {
+   "ticker": "EDBL",
+   "company": "Edible Garden AG Incorporated",
+   "date": "2026-11-17",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "FCDH",
+   "company": "Forcendra Holding Limited",
+   "date": "2026-11-17",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "LOBO",
+   "company": "LOBO TECHNOLOGIES LTD.",
+   "date": "2026-11-17",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "MOBX",
+   "company": "Mobix Labs, Inc.",
+   "date": "2026-11-17",
+   "ratio": "1:7",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
   },
   {
    "ticker": "SENEA",
@@ -306,15 +318,31 @@
    "ratio": "5%",
    "split_type": null,
    "date_human": "Dec 02, 2026"
+  },
+  {
+   "ticker": "MYND",
+   "company": "Mynd.ai, Inc.",
+   "date": "2026-12-07",
+   "ratio": "2:15",
+   "split_type": "reverse",
+   "date_human": "Dec 07, 2026"
+  },
+  {
+   "ticker": "SITM",
+   "company": "SiTime Corporation",
+   "date": "2026-12-07",
+   "ratio": "3:1",
+   "split_type": "normal",
+   "date_human": "Dec 07, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 33,
+  "source_rows": 39,
   "horizon_from": "2026-11-16",
-  "horizon_to": "2026-12-02",
-  "in_week": 30,
+  "horizon_to": "2026-12-07",
+  "in_week": 34,
   "dropped_price": [
    "DFSC",
    "NCT",
@@ -322,9 +350,15 @@
    "SGRX",
    "TGL",
    "YMT",
+   "EDBL",
+   "FCDH",
+   "LOBO",
+   "MOBX",
    "SOS"
   ],
   "dropped_cap": [
+   "SENEA",
+   "SENEB",
    "VABK"
   ],
   "dropped_no_data": [
@@ -347,7 +381,7 @@
    "REW",
    "SMDD"
   ],
-  "passed": 4,
+  "passed": 2,
   "state": "ok"
  }
 }

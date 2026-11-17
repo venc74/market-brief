@@ -1,5 +1,13 @@
 {
  "closed": {
+  "NWE": {
+   "announced": "2025-08-18",
+   "buyer": "Black Hills Corporation",
+   "date": "2026-11-16",
+   "how": "8-K т. 2.01,3.01,3.03,5.01,5.02,9.01",
+   "seen": "2026-11-17",
+   "ticker": "NWE"
+  },
   "ROKU": {
    "announced": "2026-06-14",
    "buyer": "Fox Corporation",
@@ -17,19 +25,19 @@
    "filing_date": "2026-10-29",
    "seen": "2026-11-10"
   },
+  "CRBG": {
+   "accession": "0001140361-26-011260",
+   "announced": "2026-03-26",
+   "buyer": "Mountain Holding, Inc.",
+   "filing_date": "2026-03-26",
+   "seen": "2026-11-17"
+  },
   "EQH": {
    "accession": "0000950142-26-000871",
    "announced": "2026-03-26",
    "buyer": "Mountain Holding, Inc.",
    "filing_date": "2026-03-26",
    "seen": "2026-11-16"
-  },
-  "NWE": {
-   "accession": "0001993004-25-000143",
-   "announced": "2025-08-18",
-   "buyer": "Black Hills Corporation",
-   "filing_date": "2025-08-19",
-   "seen": "2026-11-10"
   }
  },
  "version": 1
