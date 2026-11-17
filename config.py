@@ -697,7 +697,8 @@ CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))     # 02.11.2026: м
 # (site:coindesk.com) дава ~97 за 30 часа, но с пренаписани заглавия (12 от 97 дословно като в RSS) и линкове през news.google.com — затова не е избран.
 CRYPTO_RSS_FEEDS = {"Cointelegraph": CRYPTO_RSS_URL, "CoinDesk": os.getenv("CRYPTO_COINDESK_RSS_URL", "https://www.coindesk.com/arc/outboundfeeds/rss/")}
 CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 5))                             # 29.10.2026 (разходката, т. 4а): таван 4–5 → 5; най-много 1 ред за дневни потоци в ETF
-CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
+# 17.11.2026 (пакет 1, т. 9): без CRCL и BLSH — махнати от наблюдаваните на 16.11, а макро разказът продължаваше да ги цитира (13.11, 16.11, 17.11) — идваха от този списък
+CRYPTO_TICKERS = ["COIN", "HOOD"]
 # 17.11.2026 (пакет 1, т. 2в — решение след стратегическия преглед): опционният стек — махнат: UOV✓ (src/unusual_options.py, UNUSUAL_OPTIONS_*), OI снимката
 # (src/oi_snapshot.py, oi_snapshot.yml), записът на опциите (src/options_record.py, ENABLE_OPTIONS_RECORD, OPTIONS_RECORD_*). Пускането в 15:05 (options_record.yml) остава —
 # само обновяването преди отварянето (src/preopen.py; прозорецът — PREOPEN_START_NY / PREOPEN_OPEN_NY).

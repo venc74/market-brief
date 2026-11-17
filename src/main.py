@@ -623,7 +623,7 @@ def run() -> dict:
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
     # макро брифа — разказът за нощта я вижда (17.11.2026: без COT за Bitcoin — COT е махнат).
     crypto = steps.step("crypto", lambda: crypto_news.build(today, hours=crypto_hours), fallback={},
-                        enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD / CRCL / BLSH липсват днес",
+                        enabled=config.ENABLE_CRYPTO_SECTION, label="Крипто секцията", consequence="крипто новините и цените на COIN / HOOD липсват днес",
                         failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None)
     # 06.11.2026 (пакет 05–06.11, т. 8): дневната промяна на 11-те сектора, SPY, RSP, Russell и Nasdaq и спадът от 52-седмичния връх — за разказа и проверката на думите му
     market_day = steps.step("market_day", lambda: sector_layer.market_day(sector_board), fallback={}, label="Денят на пазара за макро разказа",

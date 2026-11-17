@@ -1441,10 +1441,11 @@ def _thermo_context(thermometer: dict | None) -> list[dict]:
 
 
 def _crypto_block(crypto: dict | None) -> str:
-    """29.10.2026: крипто секцията (т. 4) за разказа — дословните заглавия с „защо“ и COIN / HOOD / CRCL / BLSH за сесията."""
+    """29.10.2026: крипто секцията (т. 4) за разказа — дословните заглавия с „защо“ и акциите от config.CRYPTO_TICKERS за сесията (17.11.2026: COIN, HOOD)."""
     c = crypto or {}
     items = [{"headline": x.get("headline"), "why": x.get("why")} for x in c.get("items") or [] if isinstance(x, dict) and x.get("headline")]
-    ticks = [{"ticker": t.get("ticker"), "chg_1d_pct": t.get("chg_1d_pct"), "chg_5d_pct": t.get("chg_5d_pct")} for t in c.get("tickers") or [] if isinstance(t, dict)]
+    ticks = [{"ticker": t.get("ticker"), "chg_1d_pct": t.get("chg_1d_pct"), "chg_5d_pct": t.get("chg_5d_pct")} for t in c.get("tickers") or []
+             if isinstance(t, dict) and t.get("ticker") in config.CRYPTO_TICKERS]           # 17.11.2026 (т. 9): само текущият списък (и от стар кеш)
     if not items and not ticks:
         return "КРИПТО: няма подбрани крипто новини днес — не пиши за крипто, освен ако е в новините по-горе.\n"
     return (f"КРИПТО (подбрани от кода): новини {json.dumps(items, ensure_ascii=False)}; акции, свързани с крипто, за последната сесия {json.dumps(ticks, ensure_ascii=False)}\n")
