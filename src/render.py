@@ -873,7 +873,7 @@ def _qm_email_block(brief: dict) -> str:
                     sz = f" (−{lv['stop_pct']:.1f}%)" if lv.get("stop_pct") else (f" (−{r['max_stop_pct']:.1f}%)" if r.get("max_stop_pct") else "")
                     rows += (f'<tr><td style="{td};font-family:monospace;font-weight:bold">{_e(r["ticker"])}{badge if r["ticker"] in ours else ""}</td>'
                              f'<td style="{td};font-family:monospace;white-space:nowrap">AH +{r["gap_pct"]:.1f}%</td>'
-                             f'<td style="{td}">{_e(hl)}<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
+                             f'<td style="{td}">{_e(hl)}' + (f'<br><b>{_e(r["earnings_text"])}</b>' if r.get("earnings_text") else "") + f'<br><span style="color:#6b7280">{_e(r.get("catalyst_label") or "Неясен катализатор")}'
                              f'{(" — " + _e(r["summary_bg"])) if r.get("summary_bg") else ""}</span>'
                              + "".join(f'<br><b style="color:#991b1b">{_e(x)}</b>' for x in _red_8k(r.get("filings_8k"))) + '</td>'
                              f'<td style="{td};white-space:nowrap">3 м. {r["ret63_pct"]:+.0f}%'

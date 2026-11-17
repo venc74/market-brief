@@ -669,6 +669,9 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
             src = catalyst_sources(r["ticker"], diag.get("session"), since, filings_fn=filings_fn, headlines_fn=headlines_fn)     # 04.11.2026 (С1): „не се провери“ ≠ „няма“
             r["filings_8k"], r["filings_error"], r["headlines_error"] = src["filings_8k"], src["filings_error"], src["headlines_error"]
             r["headlines"] = [filing_headline(f) for f in r["filings_8k"]] + rank_headlines(src["headlines_raw"], r["ticker"], r.get("company"))
+            if has_202(r["filings_8k"]):                                                           # 17.11.2026 (пакет 1, т. 6): отчет — изненадата в EPS, заглавия само за отчета
+                r["headlines"] = earnings_headlines(r["headlines"])
+                r["earnings_text"] = earnings_line(eps_surprise(r["ticker"], diag.get("session")))
             r["sources_note"] = sources_note(r)
         cls, notes = classify_catalysts(shown, ai_call)
         out["notes"] += notes
@@ -752,6 +755,58 @@ def red_8k(filings: list | None) -> list[str]:
                 if line not in out:
                     out.append(line)
     return out
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# 17.11.2026 (пакет 1, т. 6): гап с 8-K т. 2.02 (резултати) — „отчет“ + изненадата в EPS (Yahoo, earnings dates), а заглавие само ако е за отчета или прогнозата.
+# Реално: в карето в 15:05 APP (05.11) беше с „ETFs Are Net Sellers of AppLovin (APP) on Nov. 3“, AAON (10.11) — с „The Aaon Group Announces Quarterly Cash Dividend“,
+# а и двете бяха с 8-K т. 2.02 от предишната вечер (APP: EPS $4.30 срещу $4.03, +6.7%; AAON: $0.83 срещу $0.58, +43.5%).
+# ──────────────────────────────────────────────────────────────────────────
+EARN_HEADLINE_RE = re.compile(r"\b(?:earnings|results|revenue|sales|EPS|guidance|outlook|forecast|profit|loss|beats?|miss(?:es|ed)?|tops?|surpass\w*|"
+                              r"raises?|lowers?|cuts?|reaffirms?|Q[1-4]|fiscal|quarter(?:ly)?\s+(?:results|earnings|revenue|sales|profit))\b", re.I)
+_NOT_EARN_RE = re.compile(r"\bdividend\b|\bnet (?:sellers|buyers)\b|\bETFs?\b", re.I)
+
+
+def has_202(filings: list | None) -> bool:
+    """8-K с т. 2.02 сред подаванията на реда — и в двата записа (сутрин: [[код, en, bg], …]; карето: ["2.02", …]). Чиста функция."""
+    return any(any((x if isinstance(x, str) else (x[0] if x else "")) == "2.02" for x in (f.get("items") or [])) for f in filings or [])
+
+
+def earnings_headlines(headlines: list[dict] | None) -> list[dict]:
+    """Само заглавията за отчета или прогнозата (EARN_HEADLINE_RE, без дивиденти и потоци в ETF); редовете на 8-K (source SEC) остават. Чиста функция."""
+    return [h for h in headlines or [] if h.get("source") == "SEC" or (EARN_HEADLINE_RE.search(h.get("title") or "") and not _NOT_EARN_RE.search(h.get("title") or ""))]
+
+
+def eps_surprise(sym: str, session: str | None, yf_mod=None, rows: list[dict] | None = None) -> dict:
+    """
+    EPS при отчета от Yahoo (get_earnings_dates): отчетът с дата в [session, session + 4 дни] (след затварянето е датата на сесията; сутрин — следващата) с отчетен EPS →
+    {"date", "reported", "estimate", "surprise_pct"}; иначе {"error": причина}. rows — готовите редове (тестовете). Мрежа само без rows; провал → {"error"}.
+    """
+    try:
+        if rows is None:
+            import math
+            yf_mod = yf_mod or yf
+            df = yf_mod.Ticker(sym).get_earnings_dates(limit=8)
+            rows = [{"date": str(ts), **{k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in r.items()}} for ts, r in df.iterrows()] if df is not None else []
+        d0 = dt.date.fromisoformat(str(session)[:10]) if session else None
+        for r in rows or []:
+            d = dt.date.fromisoformat(str(r["date"])[:10])
+            if r.get("Reported EPS") is not None and (d0 is None or d0 <= d <= d0 + dt.timedelta(days=4)):
+                return {"date": d.isoformat(), "reported": float(r["Reported EPS"]), "estimate": None if r.get("EPS Estimate") is None else float(r["EPS Estimate"]),
+                        "surprise_pct": None if r.get("Surprise(%)") is None else round(float(r["Surprise(%)"]), 1)}
+        return {"error": "Yahoo няма отчетен EPS за тази дата"}
+    except Exception as e:
+        return {"error": f"Yahoo: {type(e).__name__}"}
+
+
+def earnings_line(s: dict | None) -> str:
+    """„отчет: EPS $4.30 срещу очаквани $4.03 (изненада +6.7%)“; без числата — „отчет (8-K т. 2.02): изненадата в EPS не е налична (причина)“. Чиста функция."""
+    s = s or {}
+    if s.get("reported") is None:
+        return f"отчет (8-K т. 2.02): изненадата в EPS не е налична ({s.get('error') or 'няма данни'})"
+    est = f" срещу очаквани ${s['estimate']:.2f}" if s.get("estimate") is not None else ""
+    sp = f" (изненада {s['surprise_pct']:+.1f}%)" if s.get("surprise_pct") is not None else ""
+    return f"отчет: EPS ${s['reported']:.2f}{est}{sp}"
 
 
 def neglect_label(ret63_pct, neglect) -> str | None:

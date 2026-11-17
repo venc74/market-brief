@@ -255,7 +255,7 @@ def filing_line(f: dict) -> str:
     return qm_ep.filing_headline(f)["title"]
 
 
-def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, now_utc=None) -> list[dict]:
+def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, now_utc=None, eps_fn=None) -> list[dict]:
     """
     (а) Гаповете → пренебрегването (qm_ep.enrich_gappers — както сутрин), 8-K след затварянето (точките) и първото заглавие за компанията, ДОСЛОВНО (без AI). Graceful по тикър.
     """
@@ -288,6 +288,9 @@ def ep_rows(gaps: list[dict], *, daily_fn=None, filings_fn=None, headlines_fn=No
         row["filings_error"] = src["filings_error"]
         try:
             hl = qm_ep.rank_headlines(src["headlines_raw"], t, row["company"])
+            if qm_ep.has_202(row["filings_8k"]):                                                   # 17.11.2026 (пакет 1, т. 6): 8-K т. 2.02 — „отчет“ + изненадата в EPS; заглавие само за отчета
+                hl = qm_ep.earnings_headlines(hl)
+                row["earnings_text"] = qm_ep.earnings_line((eps_fn or qm_ep.eps_surprise)(t, e["session"]))
             row["headline"] = {k: hl[0].get(k) for k in ("title", "source", "published", "link")} if hl else None
         except Exception as ex:
             print(f"[preopen] заглавия {t}: {type(ex).__name__}: {ex}")
@@ -776,6 +779,7 @@ def email_html(res: dict) -> str:
                          + (f" · {neglect_label(g['ret63_pct'], g.get('neglect'))} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")      # 11.11.2026 (т. 3)
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
                          + "".join(f"<br><b style='color:#991b1b'>{e(x)}</b>" for x in red_8k(g.get("filings_8k")))      # 10.11.2026 (т. 1)
+                         + (f"<br><b>{e(g['earnings_text'])}</b>" if g.get("earnings_text") else "")              # 17.11.2026 (т. 6)
                          + (f"<br><span style='color:#374151'>„{e(g['headline']['title'])}“" + (f" · {e(g['headline']['source'])}" if g["headline"].get("source") else "") + "</span>"
                             if g.get("headline") else "")
                          + (f"<br><span style='color:#92400e'>{e(qm_ep_sources_note(g))}</span>" if qm_ep_sources_note(g) else "")      # 04.11.2026 (С1)
@@ -842,7 +846,7 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
         universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
-        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None, calendar_fn=None) -> dict:
+        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None, calendar_fn=None, eps_fn=None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -886,7 +890,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
             print(f"[preopen] списъкът без премаркет: {type(e).__name__}: {e}")
         res["session"] = next(iter(pts.values()))["session"] if pts else None
         res["ok"] = bool(pts)
-        res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime())
+        res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime(), eps_fn=eps_fn)
         res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
         res["gaps_all"] = gaps_all(gaps, res["gaps"])                                 # 12.11.2026 (т. 2): всички гапове ≥ прага — за дневника на EP (qm_ep.preopen_gaps)
         try:                                                                           # 10.11.2026 (т. 2, SANM): сутрешните EP кандидати извън гаповете — с ред, не изпадат тихо
