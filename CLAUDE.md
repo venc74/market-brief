@@ -21,13 +21,12 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 3. **Graceful degradation е задължителен стандарт.** Всеки нов source/fetch
    трябва да е в try/except, при провал да връща празен резултат или
    `hide: True` вместо да чупи pipeline-а. Виж примерите в `thermometer.py`
-   (`move_index()`) и `cot.py` (`get_extremes()`).
+   (`move_index()`) и `insider_buying.py` (`insider_for()`; до 17.11 — и `cot.py`, махнат).
 4. **AI извиквания на batch-ове**, не едно голямо извикване с фиксиран
    `max_tokens` — доказан проблем (JSON truncation при много кандидати).
-   Виж `ai_brief.py: ticker_narratives()` / `watch_ticker_digest()` за модела.
-5. **Не разширявай CFTC/CANSLIM/screener универси безразборно.** COT модулът
-   изрично има whitelist от 40 ликвидни пазара (`cot.py: MAJOR_MARKETS`, точно име/код) —
-   принципът е "малко, но значимо" пред "всичко налично".
+   Виж `ai_brief.py: watch_ticker_digest()` за модела (AI абзацът на картите — `ticker_narratives` — махнат на 17.11).
+5. **Не разширявай CANSLIM/screener универси безразборно.** Принципът е "малко, но значимо" пред "всичко налично" (до 17.11 —
+   и whitelist-ът от 40 пазара на COT; COT е махнат).
 6. Преди да пишеш код — прочети целия релевантен файл. Не гадай структура.
 7. **Примерен резултат винаги с етикет за произхода на данните.** Когато
    показваш примерно каре, имейл, секция или ред от страницата, изрично
@@ -63,11 +62,10 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 ## Операции
 
 - Брифът: cron-job.org → `workflow_dispatch` на `daily_brief.yml` (без `schedule:` нарочно — вграденият scheduler на GitHub беше ненадежден); лимит 90 мин.
-- OI снимката: отделен job `oi_snapshot.yml` (~16:00 UTC от cron-job.org + 5 резервни `schedule` тригера), собствена concurrency група `oi-snapshot`; подробно — docs/HISTORY.md.
-- Записът на опционните данни: отделен job `options_record.yml` (от 27.10) — cron-job.org → `workflow_dispatch`, „5 14,15 * * 1-5“ по Europe/Berlin (часовата зона там не се
-  сменя): точно едното пускане е в 09:05 Ню Йорк (до 01.11 — 14:05, после 15:05), другото прескача в `skip_reason` (извън 09:00–09:30 Ню Йорк); без `schedule:` нарочно —
-  прозорецът е 25 мин; собствена група `options-record`, качва `data/options_daily.json`, `data/preopen/` и `docs/index.html`. Сутрешният бриф не записва (`OPTIONS_RECORD_IN_MORNING_RUN = 0`).
-- Обновяването преди отварянето (от 03.11): отделна стъпка „Pre-open update“ в `options_record.yml` (`if: always()`, и commit стъпката — провал на едната не спира другата); същият прозорец 09:00–09:30 Ню Йорк (`preopen.skip_reason`). Карето стои на страницата до следващия сутрешен бриф.
+- Обновяването преди отварянето (от 03.11): `options_record.yml` (името не се сменя — cron-job.org го пуска по него) — cron-job.org → `workflow_dispatch`, „5 14,15 * * 1-5“ по
+  Europe/Berlin: точно едното пускане е в 09:05 Ню Йорк, другото прескача в `preopen.skip_reason` (извън `PREOPEN_START_NY`–`PREOPEN_OPEN_NY`, 09:00–09:30 Ню Йорк); без `schedule:`
+  нарочно; собствена група `options-record`, качва `data/preopen/` и `docs/index.html`. Карето стои на страницата до следващия сутрешен бриф. От 17.11 — САМО обновяването:
+  записът на опционните данни и OI снимката (`oi_snapshot.yml`) са махнати (решение след стратегическия преглед) — задачата за `oi_snapshot.yml` в cron-job.org трябва да се спре.
 - Страницата: GitHub Pages сервира `/docs` от `main`; `data/*.json` не е публичен → `render.py` огледалва в `docs/data/`. Червени "Pages build and deployment" от застъпени deploy-и
   са безобидни. `docs/.nojekyll` (от 20.10): Pages сервира docs/ както е, без Jekyll (страницата не разчита на него — живите файлове бяха байт по байт същите като в репото);
   `docs/HISTORY.md` се вижда като текст. Пази го `test_history_doc.py`.
@@ -86,9 +84,8 @@ Claude API, рендерира dashboard (GitHub Pages) + имейл.
 src/main.py            — оркестратор: календар → свеж бар → macro → thermometer → sectors → screener → enrich → корпоративни действия → AI synthesis
                          → Track Record (ensure v2, резолюция) → hard rules (технически + режимен gate) → GLB / QM / EP → маркери → ingest → render → имейл
 config.py              — ЦЯЛАТА конфигурация тук, нищо разпръснато из кода
-src/data_rhythm.py     — ритъмът на редките източници: COT цял само след нов отчет, 13F — само при нов 13F (24.10); следващият COT — по графика на CFTC (CFTC_COT_RELEASES, 16.11)
-src/crypto_news.py     — крипто секцията: Cointelegraph през AI подбор (дословни заглавия), COIN/HOOD/CRCL/BLSH, COT Bitcoin при нов отчет (24.10)
-src/options_record.py  — САМО запис на опционните данни (топ 200 + кандидатите от (а)); със самопроверка — непълен ден не влиза в историята (26.10); от 27.10 — options_record.yml, ~09:05 ET
+src/data_rhythm.py     — предишният бриф (сравнението на режима); ритъмът на COT и 13F — махнат с модулите (17.11)
+src/crypto_news.py     — крипто секцията: Cointelegraph и CoinDesk през AI подбор (дословни заглавия), COIN/HOOD за разказа (CRYPTO_TICKERS; от 17.11 без CRCL/BLSH и без COT)
 src/preopen.py         — обновяването преди отварянето (03.11; 09:05 Ню Йорк, отделна стъпка в options_record.yml): EP гапове от премаркета, нивата, наблюдаваните; от 10.11 — сутрешните EP
                          кандидати извън гаповете (ep_morning) и заглавията за икономически данни след 08:30 Ню Йорк (fetch_econ / econ_headlines); без AI; data/preopen/<дата>.json, карето, имейл само ако има нещо;
                          от 12.11 — „Пазарът преди отварянето“ (market_block: ES / NQ и компаниите > 2% в S&P 500 по позициите на SPY от SSGA, гап ≥ ±3%) и gaps_all — всички гапове за дневника на EP;
@@ -115,9 +112,7 @@ src/ai_brief.py        — Claude API на batch-ове: macro brief, ticker nar
                          с институция / държава / мярка без опора във входа на модела пада („защо“ на новините и разказът)
 src/econ_calendar.py   — календарът на седмицата (16.11; Nasdaq: отчетите > 2% в S&P 500 и нашите, Fed, данните с консенсуса; дните са с отместване +1) и очакванията към заглавията в 15:05
 src/offering_watch.py  — емисии на акции от EDGAR (16.11; 424B1/3/4/5/7 с обложка за акции → „⚠ емисия на акции“, S-1/S-3 → „регистрация“) за картите, книгите и наблюдаваните
-src/cot.py, cot_track.py — COT без AI (от 03.11): whitelist 40 пазара, екстремумите и всички пазари (all_markets, групите — config.COT_GROUPS), потвърждение от цената (SMA10), статистиката на модула
-src/oi_snapshot.py     — следобедната OI снимка за нашите тикъри (отделен job); src/unusual_options.py — UOV✓ (от 10.11 — и ≥ 500 договора)
-src/dataroma.py        — 13F (15 мениджъра, SEC EDGAR): нова / увеличена / изход с % от портфейла и промяна (by_manager; таблицата — render.thirteenf_rows), SI✓; от 16.11 новоподалите влизат в таблицата (fresh_rows); src/cusip_map.py — CUSIP → тикър (OpenFIGI); tools/probe_13f.py — диагностика на ръка
+src/sec_names.py       — картата на SEC „име → тикър“ (17.11, от dataroma.py) — за етикета „купувач в сделка“
 src/insider_buying.py  — Form 4 покупки → INS✓ за нашите тикъри
 src/qm_breakout.py     — Qullamaggie breakout (механичен, без AI, отделна стратегия; от 16.11 — само лидери: пикът до 15% под 52-седм. връх и 6 мес. > 0, отпадналите — ред); src/qm_ep.py — Episodic Pivot, само наблюдение; дневникът data/ep_ah_log.json —
                          after-hours гаповете и от 12.11 гаповете от карето в 15:05 (preopen_gaps / add_preopen_entries в сутрешния бриф на следващия ден; един писач)
@@ -142,13 +137,12 @@ src/watchlist_expiry.py — изтичането на regime_gate кандида
                          (от 10.11 Form 4 по човек и ден, CLUSTER с броя хора, „продава ≥25% от дела си“ от кода; от 16.11 — само новото от предишния бриф, старото — „вече показано“)
 src/magic_formula.py   — Magic Formula cross-check (MF✓); src/correlation_check.py — информационен флаг за корелация между Action кандидатите
 src/splits_calendar.py — предстоящи сплитове за текущата седмица (Nasdaq); src/net_utils.py — fetch_with_timeout около бавни Yahoo заявки
-src/short_screener.py, short_tracker.py — short / Stage 4 скрийнър и книгата му — ЗАМРАЗЕНИ (SHORT_FROZEN)
 run_tests.py, test_*.py — всички тестове (python run_tests.py [име ...]); без мрежа, без секрети, без запис в docs/ и data/ (иначе провал); същото пуска tests.yml при push
 tools/replay_offline.py, replay_collect.py — офлайн реплей стар ↔ нов код върху реалните брифове
-tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tracker-и, SEC 13F, OI, Yahoo .info, RSS, …) с бележка откъде и кога; тестовете НЕ четат data/ и НИКОГА не пишат в нея
+tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tracker-и, SEC, Yahoo .info, RSS, Nasdaq, Fed, …) с бележка откъде и кога; тестовете НЕ четат data/ и НИКОГА не пишат в нея
 ```
 
-## Страницата — карта на секциите (templates/dashboard.html.j2; към 16.11.2026)
+## Страницата — карта на секциите (templates/dashboard.html.j2; към 17.11.2026)
 
 Отгоре надолу. Всяка сгъната секция: ▸ сгъната, ▾ отворена, броят редове в заглавието (`test_collapsibles.py`).
 
@@ -165,9 +159,8 @@ tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tr
 6. **Пробиви по Kullamägi** — ред за пазара (QQQ спрямо SMA10 / SMA20), карти, ред „Отпаднали по правилото за лидер …“ (16.11), ▸ книга qm_breakout · **Епизодични пивоти (EP)** (при провал на източник — „8-K: не се провери (…)“ на реда; 8-K т. 4.02 — отделен червен ред, и в имейла; под −30% за 3 месеца — „сринала се, не забравена“). От 11.11 в QM и GLB — ред „Висяща сделка — извън скенерите“. Ред „Секторен отскок“ при ≥ 3 гапа от една индустрия (и в карето преди отварянето). От 12.11 под EP — „Вчерашният дневник — премаркет в 09:05 Ню Йорк (карето) срещу отваряне и затваряне“ и броят от 04.11.
 7. **GLB Watchlist** — инфо веднъж, ред за пазара („наш заместител на пазарното правило на Уиш“); Classic и Momentum: определение → таблица по обема на пробива (ред → карта) → ▸ Отворени в книгата — <тип> (N).
 8. **GLB по Уиш · книга** — един ред (записи · независими дни · затворени · отворени; доходността е само exec), ▸ Как се мери, ▸ Всички записи (N); архивът по close — ред + ▸ записи, докато има отворени.
-9. **COT Екстремуми** — таблица без AI (пазар · перцентил · позиция · цената потвърждава), ред със статистиката на модула, ▸ Всички 40 пазара по групи; цялата в първия бриф след нов отчет, иначе ред + сгънато; следващият отчет — по графика на CFTC (16.11).
-10. **Superinvestor Positions — Last 13F** — една таблица (мениджър · тикър · нова / увеличена / изход · стойност · промяна · % от портфейла · скрийнър ✓); цялата при ново подаване, иначе ред + сгънато; от 16.11 при ново подаване — и редът за срока, и редовете на новоподалите („· ново подаване“). Маркерът SI✓ — по картите.
-11. Ред за Form 4 · ред за замразения short модул · **Исторически архив** — календар, бутони „← предишен ден · следващ →“, рамка с брифа.
+9. Ред за Form 4 · **Исторически архив** — календар, бутони „← предишен ден · следващ →“, рамка с брифа. (До 17.11 тук бяха **COT Екстремуми**, **Superinvestor Positions — Last 13F**
+   и редът за замразения short модул — махнати след стратегическия преглед.)
 
 От 16.11 навсякъде с тикър (Kullamägi, CANSLIM радарът, GLB, EP, книгите, карето) — „ТИКЪР · Име“; на картите / в книгите / при наблюдаваните — „⚠ емисия на акции“ (EDGAR) и „купувач в сделка“.
 
@@ -179,11 +172,7 @@ tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tr
 - `IEI_HYG_ROC_SPIKE_PERCENTILE = 90` (10д RoC, 504д rolling прозорец) —
   credit spread spike форсира Defensive, трети независим hard-override
   тригер (виж `thermometer.py: credit_spread_proxy()`)
-- `COT_PERCENTILE_LOW/HIGH = 10/90` — строги прагове, малко на брой резултати
-- COT таблицата е от кода (без AI, от 03.11): видими — екстремумите, сгънато — всички 40 пазара по групи (`COT_GROUPS`); `COT_SMA_WEEKS = 10`, `COT_CONFIRM_LOOKBACK_WEEKS = 4` — „цената потвърждава“
 - `DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS = 2` — блокът от distribution days пада след 2 поредни нечервени дни
-- `COT_STALE_DAYS = 13` — над това най-новият COT отчет е "стар" (банер в секцията); 6–10 е нормалното,
-  13 е празничен петък (06.07.2026)
 - `HYSTERESIS_HIDDEN_RELEASE_DAYS = 10` — override, държан от хистерезис при скрит индикатор, се
   освобождава на 10-ия пореден ден без данни (ред в лога + текст в брифа)
 - `DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE = 1` — червени distribution days (max(SPY, QQQ) ≥ `DISTRIBUTION_DAYS_RED = 9`)
@@ -219,9 +208,12 @@ tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tr
 - Пакет 11.11: `DEAL_CLOSE_BY_NEWS = 0` (приключване само по 8-K), `UNIVERSE_CACHE_NAME` (`data/universe.json` — универсът за деня), `QM_EP_CRASHED_RET63_PCT = -30`
 - Пакет 12.11: `PREOPEN_FUTURES` (ES=F, NQ=F), `PREOPEN_MEGA_WEIGHT_PCT = 2`, `PREOPEN_MEGA_GAP_PCT = 3`, `SPY_HOLDINGS_URL` (дневните позиции на SPY, SSGA), `SIFMA_US_FULL_CLOSES`
 - Пакет 16.11: `PUTCALL_AVG_DAYS = 3` (цветът и режимът по средното), `QM_PEAK_MAX_BELOW_52W_PCT = 15`, `QM_RET6M_MIN_PCT = 0` (Kullamägi — лидери), `SECTOR_FADE_REL = 0.30`, `SECTOR_FADE_ABS_PP = 3`,
-  `CFTC_COT_RELEASES` (графикът на CFTC — да се допълва за 2027; здравната проверка `cot_schedule`, `CFTC_RELEASES_WARN_DAYS = 20`), `ENABLE_WEEK_CALENDAR`, `ECON_CAL_DAY_SHIFT = 1`, `WEEK_CAL_SESSIONS = 5`,
+  `ENABLE_WEEK_CALENDAR`, `ECON_CAL_DAY_SHIFT = 1`, `WEEK_CAL_SESSIONS = 5`,
   `NYFED_SOFR_URL`, `ENABLE_SOFR_PREOPEN_REFRESH`, `ENABLE_OFFERING_WATCH`, `OFFERING_LOOKBACK_DAYS = 10`, `OFFERING_CACHE_NAME` (`data/offering_cache.json`)
-- Останалите (пакет 4б, buy-stop, 13F, Qullamaggie, пакетите от 09–19.10) — в блоковете на config.py; описанията им към 20.10 — docs/HISTORY.md, „Параметри по пакети“.
+- Пакет 1 (17.11): `MACRO_MIN_SENTENCES = 3`, `MACRO_MAX_SENTENCES = 4` (макро разказът), `FOMC_MEETINGS` (официалният календар на Fed, 2026–2027 — да се допълва),
+  `FOMC_MINUTES_DAYS = 21`, `WATCH_52W_MIN_BARS = 240`, `PREOPEN_START_NY` / `PREOPEN_OPEN_NY` (09:00 / 09:30), `EARNINGS_BRIEF_DAYS = 5`, `CRYPTO_TICKERS = [COIN, HOOD]`;
+  махнати: COT_*, CFTC_*, DATAROMA_*, THIRTEENF_*, CUSIP_MAP_*, UNUSUAL_OPTIONS_*, OPTIONS_RECORD_*, SHORT_*, AI_BATCH_*, AI_NARRATIVE_SETUPS
+- Останалите (пакет 4б, buy-stop, Qullamaggie, пакетите от 09–19.10) — в блоковете на config.py; описанията им към 20.10 — docs/HISTORY.md, „Параметри по пакети“.
 
 ## Език
 
