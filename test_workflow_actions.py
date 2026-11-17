@@ -12,7 +12,7 @@ RT = json.loads((ROOT / "tests" / "fixtures" / "actions_runtime_2026-10-08.json"
 assert RT["actions/checkout@v4"] == "node20" and RT["actions/checkout@v5"] == "node24" and RT["actions/setup-python@v5"] == "node20" and RT["actions/setup-python@v6"] == "node24"
 
 wf = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
-assert [p.name for p in wf] == ["daily_brief.yml", "oi_snapshot.yml", "options_record.yml", "tests.yml"], [p.name for p in wf]   # 27.10.2026: + options_record.yml
+assert [p.name for p in wf] == ["daily_brief.yml", "options_record.yml", "tests.yml"], [p.name for p in wf]   # 27.10.2026: + options_record.yml; 17.11.2026: − oi_snapshot.yml (опционният стек е махнат)
 print("── версиите на actions в трите workflow-а ──")
 seen = {}
 for p in wf:
@@ -30,10 +30,9 @@ print("── тригерите не са пипани ──")
 t = {p.name: "\n".join(l for l in p.read_text(encoding="utf-8").splitlines() if not l.lstrip().startswith("#")) for p in wf}          # без коментарите ("Без schedule: нарочно")
 has = lambda name, key: re.search(rf"^\s*{key}:", t[name], re.M) is not None
 assert not has("daily_brief.yml", "schedule") and has("daily_brief.yml", "workflow_dispatch")                 # нарочно: само външен тригер (cron-job.org)
-assert has("oi_snapshot.yml", "schedule") and has("oi_snapshot.yml", "workflow_dispatch")
 assert not has("tests.yml", "schedule") and 'branches: ["**"]' in t["tests.yml"]
 assert not has("options_record.yml", "schedule") and has("options_record.yml", "workflow_dispatch")                # 27.10.2026: само cron-job.org (09:05 Ню Йорк)
-print("  ✓ daily_brief.yml — без schedule: (workflow_dispatch от cron-job.org); oi_snapshot.yml — със schedule:; tests.yml — при push")
+print("  ✓ daily_brief.yml и options_record.yml — без schedule: (workflow_dispatch от cron-job.org); tests.yml — при push")
 
 print("── образът на runner-а (13.10.2026) ──")
 runs_on = {p.name: re.findall(r"^\s*runs-on:\s*(\S+)", t[p.name], re.M) for p in wf}

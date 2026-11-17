@@ -17,7 +17,7 @@ import config
 _tmp = tempfile.TemporaryDirectory(prefix="mb_preopen_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()
-from src import preopen, render, options_record, qm_ep
+from src import preopen, render, qm_ep
 
 FX = json.loads(gzip.decompress((ROOT / "tests" / "fixtures" / "preopen_2026-11-03.json.gz").read_bytes()).decode("utf-8"))
 B19 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
@@ -154,8 +154,8 @@ print("  ✓ без обем при всички — „Обемът в прем
 
 print()
 print("── 6. прозорецът и задачата ──")
-assert preopen.skip_reason(NOW) is None and options_record.skip_reason(NOW, None) is None                                                                                # 09:05 EST, вторник → върви
-assert "след отварянето" in options_record.skip_reason(NOW + dt.timedelta(hours=1)) and "не е сесия" in options_record.skip_reason(dt.datetime(2026, 11, 7, 14, 5, tzinfo=dt.timezone.utc))
+assert preopen.skip_reason(NOW) is None                                                                                                                       # 09:05 EST, вторник (17.11.2026: прозорецът е в preopen — записът на опциите е махнат)
+assert "след отварянето" in preopen.skip_reason(NOW + dt.timedelta(hours=1)) and "не е сесия" in preopen.skip_reason(dt.datetime(2026, 11, 7, 14, 5, tzinfo=dt.timezone.utc))
 from zoneinfo import ZoneInfo
 from src import sessions
 d, odd, closed_ran = dt.date(2026, 10, 1), [], []
@@ -184,13 +184,14 @@ finally:
 assert not (config.DATA_DIR / "preopen").exists()
 yml = (ROOT / ".github" / "workflows" / "options_record.yml").read_text(encoding="utf-8")
 steps = yml.split("- name: ")
-rec, pre, com = (next(s for s in steps if s.startswith(n)) for n in ("Record option chains", "Pre-open update", "Commit record"))
-assert "python src/options_record.py" in rec and "if: always()" not in rec.split("#")[0]                                  # коментарът преди следващата стъпка — не е част от нея
-assert "if: always()" in pre and "python src/preopen.py" in pre and "EDGAR_UA: ${{ secrets.EDGAR_UA }}" in pre and "EMAIL_TO: ${{ secrets.EMAIL_TO }}" in pre
-assert "if: always()" in com and "git add data/preopen docs/index.html" in com and "git add data/options_daily.json" in com
+pre, com = (next(s for s in steps if s.startswith(n)) for n in ("Pre-open update", "Commit pre-open"))
+live = "\n".join(l for l in yml.splitlines() if not l.lstrip().startswith("#"))
+assert "Record option chains" not in live and "options_record.py" not in live and "options_daily.json" not in live                 # 17.11.2026 (т. 2в): записът на опциите — махнат
+assert "python src/preopen.py" in pre and "EDGAR_UA: ${{ secrets.EDGAR_UA }}" in pre and "EMAIL_TO: ${{ secrets.EMAIL_TO }}" in pre
+assert "if: always()" in com and "git add data/preopen docs/index.html" in com
 src = (ROOT / "src" / "preopen.py").read_text(encoding="utf-8")
 assert "anthropic" not in src.lower() and "_call_claude" not in src                                                            # без AI
-print("  ✓ прозорецът — същият като на записа на опциите: до края на 2027 всяка сесия — точно едно обновяване, в 09:05 Ню Йорк (и в седмиците с разминаване на смяната на часа:"
+print("  ✓ прозорецът (09:00–09:30 Ню Йорк): до края на 2027 всяка сесия — точно едно обновяване, в 09:05 Ню Йорк (и в седмиците с разминаване на смяната на часа:"
       " 27.10.2026 и 16.03.2027 — 14:05 Берлин; 04.11.2026 и 30.03.2027 — 15:05); 08:05 / 10:05 Ню Йорк и дните без сесия — пропуска, без теглене;"
-      " отделна стъпка с if: always() (и commit-ът), без AI")
+      " commit-ът с if: always(), без AI; без записа на опциите (17.11)")
 print("\n✅ test_preopen: всичко мина")

@@ -8,7 +8,7 @@
   • Н2 unusual_options._snapshot_for_yesterday: сутрешната сесия за OI снимката — bar_freshness.expected_session(днес), без мрежа; до 19.10 — последният дневен бар на SPY,
     който в 5 от 60 брифа (29.07–23.09) в 07:30 беше от D−2 → снимката на D−2 срещу обема на D−1.
 
-РЕАЛНО: tests/fixtures/oi_snapshot_2026-10-16.json (снимката за сесия 16.10 — бот commit-ът 2ac7303); датите на AVGO (брифът от 07.10, data/2026-10-07.json: отчет 09.12).
+РЕАЛНО: датите на AVGO (брифът от 07.10, data/2026-10-07.json: отчет 09.12).
 СИНТЕТИЧНО (означено): датите около Thanksgiving и Labor Day, записите на книгата, подмененото зареждане на снимките.
 Пускане: python test_session_calendar.py
 """
@@ -16,7 +16,7 @@ import sys, json, pathlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import config
-from src import sessions as tc, backtest as bt, unusual_options as uo          # 30.10.2026 (т. 8): thesis_context е махнат — sessions.sessions_in
+from src import sessions as tc, backtest as bt          # 17.11.2026: без unusual_options (махнат); 30.10.2026 (т. 8): thesis_context е махнат — sessions.sessions_in
 
 D = dt.date.fromisoformat
 assert "2026-11-26" in config.NYSE_HOLIDAYS and "2026-09-07" in config.NYSE_HOLIDAYS
@@ -35,19 +35,5 @@ assert bt._is_late_discovery({"resolution_date": "2026-09-04", "discovered_date"
 assert bt._is_late_discovery({"resolution_date": "2026-10-16", "discovered_date": "2026-10-19"}) is False      # уикендът — както досега
 print("  ✓ стоп 25.11 → открит 27.11: навреме (Thanksgiving); 30.11: със закъснение; 04.09 → 08.09: навреме (Labor Day)")
 
-print()
-print("── 3. Н2: сутрешната OI снимка — сесията от календара, без мрежа ──")
-SNAP = json.loads((ROOT / "tests" / "fixtures" / "oi_snapshot_2026-10-16.json").read_text(encoding="utf-8"))
-assert SNAP["session_date"] == "2026-10-16"
-orig = (uo.load_oi_snapshots, uo.last_session_date)
-uo.load_oi_snapshots = lambda: {"2026-10-16": SNAP}                                  # СИНТЕТИЧНО: зареждането; снимката е РЕАЛНА
-uo.last_session_date = lambda: (_ for _ in ()).throw(AssertionError("сутрин сесията не се тегли от SPY"))
-try:
-    snap, session, why = uo._snapshot_for_yesterday(D("2026-10-19"))
-    assert snap is SNAP and session == "2026-10-16" and why == ""
-    snap, session, why = uo._snapshot_for_yesterday(D("2026-09-08"))                # СИНТЕТИЧНО: вторник след Labor Day → сесията е петък 04.09
-    assert snap is None and session == "2026-09-04" and why == "следобедната OI снимка за сесията 04.09 липсва"
-finally:
-    uo.load_oi_snapshots, uo.last_session_date = orig
-print("  ✓ 19.10 → реалната снимка за 16.10 (петък); 08.09 → сесия 04.09 с ясна причина; SPY не се тегли")
+# 17.11.2026 (пакет 1, т. 2в): т. 3 (Н2, сутрешната OI снимка) — махната с опционния стек
 print("\n✅ test_session_calendar: всичко мина")

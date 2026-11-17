@@ -101,15 +101,13 @@ print("  ✓ кешът пази редовете на тикъри, които 
 
 print()
 print("── банерът при провал (data_warnings) ──")
-w = data_warnings.collect(None, None, insider_status={"kind": "failed", "note": "тегленето гръмна: X", "stale": False}, uov_diag=None)
+w = data_warnings.collect(None, None, insider_status={"kind": "failed", "note": "тегленето гръмна: X", "stale": False})
 assert [x["source"] for x in w] == ["insider"] and "маркерите INS✓ липсват днес; това НЕ значи, че няма insider покупки" in w[0]["message"]
 w = data_warnings.collect(None, None, insider_status={"kind": "failed", "note": "n", "stale": True, "data_date": "2026-10-05"})
 assert "са от тегленето на 2026-10-05" in w[0]["message"]
 assert data_warnings.collect(None, None, insider_status={"kind": "legit_zero"}) == [] and data_warnings.collect(None, None, insider_status={"kind": "ok"}) == []
 assert "непълни" in data_warnings.collect(None, None, insider_status={"kind": "ok_partial", "note": "1 от 4 заявки към SEC не успяха — маркерите може да са непълни"})[0]["message"]
-u = data_warnings.collect(None, None, uov_diag={"requested": 9, "with_ratio": 0, "missing": {"A": "снимката е в стария формат", "B": "снимката е в стария формат"}, "snapshot_missing_reason": ""})
-assert u[0]["source"] == "unusual_options" and "снимката е в стария формат" in u[0]["message"] and "НЕ значи нормален обем" in u[0]["message"]
-assert data_warnings.collect(None, None, uov_diag={"requested": 9, "with_ratio": 3, "missing": {}}) == [] and data_warnings.collect(None, None, uov_diag={"requested": 0}) == []
+# 17.11.2026 (пакет 1, т. 2в): банерът за UOV✓ — махнат с опционния стек
 print("  ✓ провал → банер 'маркерите INS✓ липсват…'; остарял → 'от тегленето на <дата>'; легитимна нула и ok — без банер; UOV✓ без нито едно съотношение → банер с причината")
 
 print()

@@ -1,6 +1,6 @@
 """
 Обновяване ПРЕДИ ОТВАРЯНЕТО (03.11.2026, т. 10 — решения от 03.11): в 09:05 Ню Йорк (15:05 Берлин, през зимата; 14:05 до края на октомври и от март), като ОТДЕЛНА стъпка в
-options_record.yml — провал на записа на опциите не спира обновяването и обратно. Сутрешният бриф е в 07:30 Берлин (01:30 Ню Йорк) — тогава премаркетът (от 04:00 Ню Йорк)
+options_record.yml (17.11.2026: записът на опциите е махнат — job-ът е само за обновяването). Сутрешният бриф е в 07:30 Берлин (01:30 Ню Йорк) — тогава премаркетът (от 04:00 Ню Йорк)
 още не е започнал: отчетите преди отварянето (BMO) не се виждат. Измерено 08.10–02.11: от 13 отваряния ≥ +10% в универса EP сутрин хвана 2; в 09:05 Ню Йорк в премаркета
 се виждаха 10.
 
@@ -930,8 +930,21 @@ def skip_reason(now_utc) -> str | None:
     вече е записана“ (тя е за историята на опциите). Графикът в cron-job.org е по Берлин („5 14,15 * * 1-5“) — от двете пускания на ден точно едното е в 09:05 Ню Йорк, и в
     седмиците с разминаване на смяната на часа (САЩ / Европа); другото (08:05 или 10:05 Ню Йорк) прескача — второ обновяване няма. Чиста функция.
     """
-    from src import options_record
-    return options_record.skip_reason(now_utc, None)
+    import pandas as pd
+    from src import sessions
+    t = pd.Timestamp(now_utc)
+    ny = (t.tz_localize("UTC") if t.tzinfo is None else t).tz_convert("America/New_York")
+    day = ny.date()
+    if not sessions.is_session(day):
+        return f"{day.strftime('%d.%m')} не е сесия на NYSE — няма обновяване"
+    oh, om = map(int, config.PREOPEN_OPEN_NY.split(":"))
+    if (ny.hour, ny.minute) >= (oh, om):
+        return f"{ny.strftime('%H:%M %Z')} — след отварянето ({config.PREOPEN_OPEN_NY} Ню Йорк) — пропускам"
+    sh, sm = map(int, config.PREOPEN_START_NY.split(":"))
+    if (ny.hour, ny.minute) < (sh, sm):
+        return (f"{ny.strftime('%H:%M %Z')} — преди прозореца ({config.PREOPEN_START_NY}–{config.PREOPEN_OPEN_NY} Ню Йорк); правилното е другото пускане "
+                f"от графика по Берлин — пропускам")
+    return None
 
 
 def late_reason(now_utc) -> str | None:
@@ -974,7 +987,7 @@ def _late_box(now, day: str, why: str) -> None:
 
 def main(now_utc=None) -> int:
     """
-    Входната точка (options_record.yml, отделна стъпка): прозорецът (09:00–09:30 Ню Йорк, ден със сесия — както записа на опциите) → run → data/preopen/<дата>.json →
+    Входната точка (options_record.yml): прозорецът (09:00–09:30 Ню Йорк, ден със сесия — PREOPEN_START_NY / PREOPEN_OPEN_NY) → run → data/preopen/<дата>.json →
     docs/index.html наново (сутрешният бриф + карето) → имейл, ако има нещо и още не е пратен днес. Изход 1 само при провал на тегленето.
     """
     now = now_utc or dt.datetime.now(dt.timezone.utc)

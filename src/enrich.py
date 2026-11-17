@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 # v2 надстройка — нови източници (Секция 3.1–3.4 + dataroma)
-from src import magic_formula, unusual_options, splits_calendar, insider_buying
+from src import magic_formula, splits_calendar, insider_buying
 from src import net_utils
 
 
@@ -453,18 +453,12 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     референтния универс (value_confirmed), вместо да търси пресичане със
     статичен топ списък, което беше структурно невъзможно.
     """
-    sets = {"mf": set(), "uov": {}, "splits": {}, "ins": {}}
+    sets = {"mf": set(), "splits": {}, "ins": {}}
     if config.ENABLE_MAGIC_FORMULA:
         try:
             sets["mf"] = magic_formula.value_confirmed(candidate_tickers)
         except Exception as e:
             print(f"[enrich] magic_formula skipped: {e}")
-    if config.ENABLE_UNUSUAL_OPTIONS:
-        try:
-            # пакет 4б т.б: не топ-10 списък, а съотношението на НАШИТЕ кандидати (по прозореца на падежите)
-            sets["uov"] = unusual_options.candidate_markers(candidate_tickers)[0]
-        except Exception as e:
-            print(f"[enrich] unusual_options skipped: {e}")
     if config.ENABLE_INSIDER_BUYING:
         try:
             # пакет 4б т.в: Form 4 само за НАШИТЕ кандидати (не за целия универс) → маркер INS✓
@@ -479,24 +473,16 @@ def _build_crosscheck_sets(candidate_tickers: list[str]) -> dict:
     return sets
 
 
-def uov_marker(uov: dict) -> dict:
-    """Маркерът UOV✓ (за кандидатите и за позициите): етикет с посока и текст с числата при hover/клик."""
-    bias = uov.get("call_put_bias")
-    suffix = " (calls)" if bias == "calls" else " (puts)" if bias == "puts" else ""
-    return {"tag": f"UOV✓{suffix}", "title": uov.get("note", "Необичаен опционен обем вчера.")}
-
 
 def _apply_markers(row: dict, sets: dict) -> None:
-    """Слага визуалните convergence маркери MF✓ / UOV✓ / INS✓ / SPLIT✓ върху картата (SI✓ — махнат с 13F на 17.11.2026)."""
+    """Слага визуалните convergence маркери MF✓ / INS✓ / SPLIT✓ върху картата (SI✓ и UOV✓ — махнати на 17.11.2026)."""
     sym = row["ticker"]
     markers = row.setdefault("markers", [])
 
     if sym in sets["mf"]:
         markers.append({"tag": "MF✓", "title": "Value confirmed — кандидатът е в топ дециала по Greenblatt (EY × ROC) спрямо референтния универс."})
 
-    uov = sets["uov"].get(sym)
-    if uov:
-        markers.append(uov_marker(uov))
+    # 17.11.2026 (т. 2в): маркерът UOV✓ (необичаен опционен обем) — махнат с опционния стек
 
     ins = (sets.get("ins") or {}).get(sym)
     if ins:

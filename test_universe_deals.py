@@ -66,13 +66,13 @@ with q():
 assert len(su) == 915 and "CART" not in su and "NWE" not in su and set(screener.LAST_SCAN_EXCLUDED) == {"CART", "NWE"}
 assert screener.LAST_SCAN_EXCLUDED["CART"]["buyer"] == FX["deal_state"]["pending"]["CART"]["buyer"]
 assert "CART" in [c["ticker"] for c in FX["qm_breakout"]] and {"CART", "NWE"} <= {c["ticker"] for c in FX["glb_candidates"]}     # така излязоха на 11.11
-src = {f: (ROOT / "src" / f).read_text(encoding="utf-8") for f in ("main.py", "glb_screener.py", "qm_breakout.py", "preopen.py", "thermometer.py", "options_record.py", "screener.py")}
+src = {f: (ROOT / "src" / f).read_text(encoding="utf-8") for f in ("main.py", "glb_screener.py", "qm_breakout.py", "preopen.py", "thermometer.py", "screener.py")}
 assert 'steps.step("qm_universe", lambda: screener.scan_universe(today)' in src["main.py"] and "qm_ep.run(qm_universe" in src["main.py"]        # QM и EP
 assert "universe = scan_universe()" in src["glb_screener.py"] and "universe = scan_universe()" in src["qm_breakout.py"]
 assert "universe = screener.scan_universe(day)" in src["preopen.py"] and "exclude=_pending_deals()" in src["preopen.py"]
-assert "universe = day_universe()" in src["thermometer.py"] and "record(screener.day_universe(today)" in src["options_record.py"]
+assert "universe = day_universe()" in src["thermometer.py"]                       # 17.11.2026: записът на опциите (options_record.py) — махнат
 assert "    universe = day_universe()" in src["screener.py"]                                                    # CANSLIM — целият универс (етикет „deal“)
-print("  ✓ универсът на скенерите 915 = 917 − CART − NWE; QM, EP, GLB, 15:05 — scan_universe; CANSLIM, термометърът, опциите — day_universe")
+print("  ✓ универсът на скенерите 915 = 917 − CART − NWE; QM, EP, GLB, 15:05 — scan_universe; CANSLIM, термометърът — day_universe")
 
 print("── 1–2. обновяването в 15:05: заявката, картите, покритието ──")
 asked = []

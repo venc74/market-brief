@@ -62,19 +62,6 @@ def check(today: str, data_dir=None, *, resolution: dict | None = None, glb_stat
     except Exception as e:
         print(f"[health] дневните барове не се провериха: {type(e).__name__}: {e}")
 
-    if config.ENABLE_UNUSUAL_OPTIONS:
-        try:
-            snaps = _read(d / "unusual_options_oi_snapshot.json").get("snapshots") or {}
-            if prev not in snaps:
-                last = max(snaps) if snaps else None
-                out.append({"check": "oi_snapshot", "message": (
-                    f"OI снимката за сесията {_fmt(prev)} липсва (последна: {_fmt(last) if last else 'няма'}) — UOV✓ и очакваното движение при отчет липсват (липсващ UOV✓ НЕ значи нормален обем); "
-                    "провери job-а „Unusual Options OI snapshot“ в GitHub Actions.")})
-        except FileNotFoundError:
-            out.append({"check": "oi_snapshot", "message": "файлът с OI снимките липсва — job-ът „Unusual Options OI snapshot“ не е записвал."})
-        except Exception as e:
-            print(f"[health] OI снимката не се провери: {type(e).__name__}: {e}")
-
     try:
         if not (d / f"{prev}.json").exists():
             out.append({"check": "prior_brief", "message": f"брифът за предишната сесия ({_fmt(prev)}) липсва — сутрешният run вероятно не е минал (cron-job.org / Actions)."})

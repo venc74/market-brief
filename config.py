@@ -206,13 +206,10 @@ DATA_CANARY_TOLERANCE = float(os.getenv("DATA_CANARY_TOLERANCE", 0.01))
 NYSE_HOLIDAYS_WARN_DAYS = int(os.getenv("NYSE_HOLIDAYS_WARN_DAYS", 60))
 
 # ── Предупреждение за отчет върху картата (пакет 4б т.д — 06.10.2026) ──────
-# При отчет в следващите EARNINGS_WARNING_SESSIONS търговски сесии картата показва датата и ОЧАКВАНОТО движение от опциите (само информация, без промяна на размера).
-# Очакваното движение = ATM straddle на първия падеж СЛЕД отчета, от който е извадена базовата волатилност (straddle на последния падеж ПРЕДИ отчета, мащабиран
-# по корен от броя сесии): събитие = sqrt(A² − B²·Ta/Tb) / цена. Реален пример (FTNT, отчет 28.10, опции от 05.10): простият straddle на 30.10 е ±13.9%
-# (включва 25 дни базова волатилност), а само събитието е ±10.6%. Данните са от следобедната снимка (bid/ask в сесията); ненадеждно → само датата.
+# При отчет в следващите EARNINGS_WARNING_SESSIONS търговски сесии картата показва датата и броя сесии до него. 17.11.2026 (т. 2в): очакваното
+# движение от опциите (straddle-ите от OI снимката) — махнато с опционния стек.
 EARNINGS_WARNING_SESSIONS = int(os.getenv("EARNINGS_WARNING_SESSIONS", 20))
-EARNINGS_SNAPSHOT_WINDOW_DAYS = int(os.getenv("EARNINGS_SNAPSHOT_WINDOW_DAYS", 32))      # календарни дни напред (20 сесии ≈ 28 дни + резерв) за кои отчети се снимат straddle-и
-EARNINGS_MOVE_MAX_EXPIRY_GAP_DAYS = int(os.getenv("EARNINGS_MOVE_MAX_EXPIRY_GAP_DAYS", 7))   # падежът след отчета най-много толкова дни след него
+EARNINGS_BRIEF_DAYS = int(os.getenv("EARNINGS_BRIEF_DAYS", 5))                    # 17.11.2026 (т. 2в): датите на отчетите от последните N брифа (до 17.11 — UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS)
 EARNINGS_MOVE_MAX_BASELINE_GAP_DAYS = int(os.getenv("EARNINGS_MOVE_MAX_BASELINE_GAP_DAYS", 21))  # падежите преди и след отчета са най-много толкова дни един от друг
 EARNINGS_MOVE_MIN_BASELINE_SESSIONS = int(os.getenv("EARNINGS_MOVE_MIN_BASELINE_SESSIONS", 3))  # падежът преди отчета е поне толкова сесии след снимката
 EARNINGS_MOVE_MAX_SPREAD_PCT = float(os.getenv("EARNINGS_MOVE_MAX_SPREAD_PCT", 25.0))     # bid/ask спред на всяко краче (% от mid)
@@ -374,6 +371,8 @@ PREOPEN_MAX_ROWS = 10
 PREOPEN_MIN_PM_SHARE = float(os.getenv("PREOPEN_MIN_PM_SHARE", 0.4))
 # 04.11.2026 (четвърти преглед, Н6): пускане след отварянето, но преди този час (Ню Йорк) е закъснялото „правилно“ пускане (09:05 + опашката на GitHub) — карето казва, че обновяване
 # днес няма (до 04.11 — само ::notice:: в лога). Другото пускане по графика (10:05 Ню Йорк) е след него.
+PREOPEN_START_NY = os.getenv("PREOPEN_START_NY", "09:00")                            # 17.11.2026 (т. 2в): прозорецът на обновяването — до 17.11 OPTIONS_RECORD_START_NY / OPEN_NY
+PREOPEN_OPEN_NY = os.getenv("PREOPEN_OPEN_NY", "09:30")
 PREOPEN_LATE_UNTIL_NY = os.getenv("PREOPEN_LATE_UNTIL_NY", "10:00")
 # 10.11.2026 (т. 3): заглавия за икономически данни (CPI, PPI, заетост, JOLTS, ISM, retail sales) от нашите фийдове (NEWS_RSS_FEEDS) в карето — дословно, с източник
 # и час, без AI. От 08:30 Ню Йорк (часът на данните; 14:30 Берлин, в седмиците с разминаване на часа — 13:30) до часа на карето; най-много PREOPEN_ECON_MAX.
@@ -455,7 +454,6 @@ PUTCALL_AVG_DAYS = int(os.getenv("PUTCALL_AVG_DAYS", 3))
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
 # NEWS_API_KEY е махнат (2026-10-03): NewsAPI даде 0 заглавия за 78 дни; новините са news_aggregator (RSS/nitter + Claude филтър)
-# TRADIER_API_KEY / TRADIER_BASE — виж v2 секцията по-долу (заедно с коментара им)
 
 # ── Имейл доставка ────────────────────────────────────────────────────────
 EMAIL_METHOD = os.getenv("EMAIL_METHOD", "smtp")    # "smtp" | "sendgrid"
@@ -628,7 +626,6 @@ MAGIC_FORMULA_UNIVERSE = [
 # ── Toggle-и за новите скрейпъри (за лесно изключване при проблем) ─────────
 ENABLE_MAGIC_FORMULA = os.getenv("ENABLE_MAGIC_FORMULA", "1") == "1"
 ENABLE_BORROW_DATA = os.getenv("ENABLE_BORROW_DATA", "1") == "1"
-ENABLE_UNUSUAL_OPTIONS = os.getenv("ENABLE_UNUSUAL_OPTIONS", "1") == "1"
 ENABLE_SPLITS_CALENDAR = os.getenv("ENABLE_SPLITS_CALENDAR", "1") == "1"
 
 
@@ -698,23 +695,10 @@ CRYPTO_NEWS_HOURS = int(os.getenv("CRYPTO_NEWS_HOURS", 30))     # 02.11.2026: м
 CRYPTO_RSS_FEEDS = {"Cointelegraph": CRYPTO_RSS_URL, "CoinDesk": os.getenv("CRYPTO_COINDESK_RSS_URL", "https://www.coindesk.com/arc/outboundfeeds/rss/")}
 CRYPTO_MAX_ITEMS = int(os.getenv("CRYPTO_MAX_ITEMS", 5))                             # 29.10.2026 (разходката, т. 4а): таван 4–5 → 5; най-много 1 ред за дневни потоци в ETF
 CRYPTO_TICKERS = ["COIN", "HOOD", "CRCL", "BLSH"]
-# ── Запис на опционните данни (22.10.2026, етап 4 — решение от 22.10): САМО запис, нищо в брифа; доклад след ~20 сесии — виж src/options_record.py ──
-# 26.10.2026 (етап 4б, т. 9): включено в сутрешния run със самопроверка (options_record.completeness) — денят влиза в историята само ако последната сделка е от затварянето
-ENABLE_OPTIONS_RECORD = os.getenv("ENABLE_OPTIONS_RECORD", "1") == "1"
-# 27.10.2026: записът е преди отварянето (09:05 ET), в отделен job (.github/workflows/options_record.yml, workflow_dispatch от cron-job.org — „5 14,15 * * 1-5“ по Берлин, едното
-# пускане е в 09:05 Ню Йорк, другото прескача); в 06:30 UTC (сутрешният бриф) веригите са без lastTradeDate → "непълен" (27.10). Сутрешният run НЕ записва.
-OPTIONS_RECORD_IN_MORNING_RUN = os.getenv("OPTIONS_RECORD_IN_MORNING_RUN", "0") == "1"
-OPTIONS_RECORD_OPEN_NY = os.getenv("OPTIONS_RECORD_OPEN_NY", "09:30")                # след отварянето (Ню Йорк) job-ът пропуска — обемът във веригата вече е на новия ден
-# 27.10.2026: и ПРЕДИ прозореца пропуска — задачата в cron-job.org е по Берлин (часовата зона не се сменя там), "5 14,15 * * 1-5": едното пускане е 09:05 Ню Йорк, другото е 10:05
-# (лете / в разминаването на смяната на часа) или 08:05 (зиме / при летен час и в двете) — 08:05 не е проверявано пълно (06:30 UTC: веригите бяха без lastTradeDate; 09:12 ET: пълни)
-OPTIONS_RECORD_START_NY = os.getenv("OPTIONS_RECORD_START_NY", "09:00")
-OPTIONS_RECORD_TOP_N = int(os.getenv("OPTIONS_RECORD_TOP_N", 200))                  # топ по оборот (close × обем, 20 сесии); измерено 21.10: 200 вериги × 2 падежа = 70 s, 0 грешки
-OPTIONS_RECORD_EXPIRIES = int(os.getenv("OPTIONS_RECORD_EXPIRIES", 2))
-OPTIONS_RECORD_MOVE_PCT = float(os.getenv("OPTIONS_RECORD_MOVE_PCT", 5.0))          # (а) ход ≥ ±5%
-OPTIONS_RECORD_VOL_X = float(os.getenv("OPTIONS_RECORD_VOL_X", 2.0))                # (а) обем ≥ 2× средния за 50 сесии; измерено 23.09–20.10: 4.6 кандидата на ден (1–9)
-# 26.10.2026 (решение по етап 4б, т. 4): плъзгащ се прозорец — последните 90 сесии, по-старите се трият при всеки запис (файлът не расте завинаги; ~4.7 MB при 90 сесии — оценка
-# върху записи с размера на реалния). Историята на git пази предишните версии — тя продължава да расте с дневния commit (оценка ~25–70 KB на ден след компресия)
-OPTIONS_RECORD_KEEP = int(os.getenv("OPTIONS_RECORD_KEEP", 90))                      # сесии в data/options_daily.json
+# 17.11.2026 (пакет 1, т. 2в — решение след стратегическия преглед): опционният стек — махнат: UOV✓ (src/unusual_options.py, UNUSUAL_OPTIONS_*), OI снимката
+# (src/oi_snapshot.py, oi_snapshot.yml), записът на опциите (src/options_record.py, ENABLE_OPTIONS_RECORD, OPTIONS_RECORD_*). Пускането в 15:05 (options_record.yml) остава —
+# само обновяването преди отварянето (src/preopen.py; прозорецът — PREOPEN_START_NY / PREOPEN_OPEN_NY).
+
 # ── 🔎 Наблюдавани тикъри (watch_monitor.py) ──────────────────────────────
 # Ръчно куриран, per-ticker дневен монитор. Списъкът е в data/watch_list.json
 # и се редактира НА РЪКА — сайтът е статичен, няма backend за интерактивен бутон.
@@ -744,34 +728,7 @@ NEWS_SCRAPE_FALLBACK = {
     "AP Business":      "https://apnews.com/hub/business",
 }
 
-# ── Tradier (primary source за unusual options; Market Chameleon = fallback) ─
-TRADIER_API_KEY = os.getenv("TRADIER_API_KEY", "")
-TRADIER_BASE = os.getenv("TRADIER_BASE", "https://api.tradier.com/v1")
 
-# Универс за Tradier unusual-options сканиране (option volume vs open interest).
-# По-малък = по-бързо/по-малко API calls. Редактируем.
-UNUSUAL_OPTIONS_UNIVERSE = [
-    "NVDA", "AMD", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "TSLA", "AVGO",
-    "PLTR", "COIN", "MSTR", "SMCI", "MARA", "RIOT", "SOFI", "NIO", "BABA",
-    "F", "BAC", "INTC", "MU", "CRM", "NFLX", "DIS",
-]
-UNUSUAL_OPTIONS_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MIN_RATIO", 0.6))  # vol/OI праг
-# FIX 2026-09-12 (findings log 04-11.09): yfinance-ното openInterest поле
-# понякога връща непълни/stale данни за multi-day прозорец (потвърдено:
-# 08-11.09, 4 последователни дни, за едни и същи mega-cap тикъри — same
-# volume, reconstructed OI пада от реалистичните ~70K-630K до 51-771,
-# стотици пъти по-малко). Съществуващият total_oi>=50 (контракти) guard
-# хваща само буквална нула/near-нула — множество "счупени" стойности
-# кацаха точно над него (51, 52, 60...). Горен sanity ceiling на САМОТО
-# съотношение хваща класа проблем директно: реалният здрав максимум тази
-# седмица беше 21.6× (KDP, 04.09), реалният "счупен" минимум беше 176.1×
-# (WMT, 11.09) — огромна пропаст, 50× седи comfortably по средата. Same
-# принцип като IV sanity floor прецедента (src/enrich.py) — горна граница
-# на правдоподобност, не само долна.
-UNUSUAL_OPTIONS_MAX_OI_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MAX_OI_RATIO", 50.0))
-# FIX 2026-09-28: под толкова показани тикъра със съотношение обем/OI секцията
-# казва изрично, че подредбата е по ликвидност (от 21.09: 1–3/10 всеки ден)
-UNUSUAL_OPTIONS_MIN_RATIOS = int(os.getenv("UNUSUAL_OPTIONS_MIN_RATIOS", 5))
 
 # NDX100 състав — СТАТИЧЕН списък, ръчно поддържан. Wikipedia премахна structured
 # компонентната таблица от Nasdaq-100 статията (само външен линк към nasdaq.com
@@ -798,86 +755,6 @@ NDX100_STATIC_TICKERS = [
 # ── Splits филтри (Поправка 1) ────────────────────────────────────────────
 SPLITS_MIN_PRICE = float(os.getenv("SPLITS_MIN_PRICE", 10))          # > $10
 SPLITS_MIN_MARKET_CAP = float(os.getenv("SPLITS_MIN_MARKET_CAP", 500_000_000))  # > $500M
-
-# ── Unusual options (Поправка 2): yfinance primary ────────────────────────
-# Сканирането на опционни вериги е бавно — лимитираме броя тикъри на ден.
-UNUSUAL_OPTIONS_SCAN_LIMIT = int(os.getenv("UNUSUAL_OPTIONS_SCAN_LIMIT", 60))
-# FIX 2026-09-29: OI за съотношението идва от следобедна снимка (отделен
-# GitHub Actions job, .github/workflows/oi_snapshot.yml → src/oi_snapshot.py),
-# не от сутрешния fetch. Проба 29.09: в 05:40 UTC OI е 0 за седмичните падежи
-# и непълен за месечните (APH 38 734 в 05:35 срещу 248 232 в 13:09 UTC за
-# същите падежи; HBAN 4 903 срещу 72 042). Сутрешният бриф сравнява вчерашния
-# обем с OI в началото на вчерашната сесия = това, което Yahoo има следобед.
-UNUSUAL_OPTIONS_OI_SNAPSHOT_FILE = DATA_DIR / "unusual_options_oi_snapshot.json"
-# Колко тикъра снима следобедът: утрешният списък се ранжира наново, затова
-# резерв над SCAN_LIMIT. Измерено по 61 дни от git историята на ранжирането:
-# с топ 80 утрешните топ 60 липсват само 2 пъти по 1 тикър (без еднократната
-# смяна на универса 13→14.07); с топ 60 — 37 от 60 дни.
-# Пакет 4б т.б: списъкът "Unusual Options" отпадна — снимката вече е за НАШИТЕ тикъри (кандидатите от последните брифове и позициите, виж
-# oi_snapshot.snapshot_tickers); това е допълнителен брой най-ликвидни тикъри (0 = само кандидати и позиции).
-UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_TICKERS", 0))
-# Колко от последните брифове дават кандидати за снимката (Watchlist стои няколко дни, утрешните кандидати са почти същите като днешните)
-UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = int(os.getenv("UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS", 5))
-# Маркер UOV✓ върху кандидат/позиция: съотношението обем/OI по прозореца (виж UNUSUAL_OPTIONS_HORIZON_DAYS) поне толкова. 2.0 е границата на старото
-# "силно ново позициониране" (_oi_label); НЕ е калибрирана на новия прозорец — съотношенията на ВСИЧКИ сканирани тикъри се пишат в brief["uov_diag"],
-# за да се калибрира по реални дни. Таван на тикърите на едно извикване (всеки тикър = до ~14 заявки за вериги).
-UNUSUAL_OPTIONS_MARKER_MIN_RATIO = float(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_RATIO", 2.0))
-UNUSUAL_OPTIONS_MARKER_MAX_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MAX_TICKERS", 40))
-# 10.11.2026 (т. 6): абсолютен минимум договори за UOV✓ — обемът в прозореца на падежите (calls + puts). Измерено 10.11 върху всички 19 маркера от 14.10 насам:
-# под 1 680 договора са само AMG 14.10 (68) и CPAY 10.11 (249); следващият е ROKU 28.10 (1 680), после URI (3 796+), NTAP, NDAQ, LLY, AAPL. Всяка стойност
-# 250–1 680 дава същото; 500 = 2× CPAY и с широк запас под ROKU. Важи за всички пътища (кошница / история / абсолютният 2.0×).
-UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS = int(os.getenv("UNUSUAL_OPTIONS_MARKER_MIN_CONTRACTS", 500))
-# 08.10.2026 — КАЛИБРИРАНЕ на UOV✓ (бриф 08.10: съотношенията на нашите тикъри 0.09–0.29 при праг 2.0 → маркерът е недостижим с прозореца от 21 дни).
-# Относителен праг вместо абсолютен: маркерът върху НАШ тикър се слага, когато съотношението му е в най-високите 10% (UNUSUAL_OPTIONS_MARKER_PERCENTILE)
-#   • "за деня": спрямо РЕФЕРЕНТНА КОШНИЦА — топ UNUSUAL_OPTIONS_REFERENCE_TICKERS най-ликвидни тикъра (S&P500+NDX по среден 20-дневен обем), чийто OI се
-#     снима заедно с нашите тикъри (snap["reference"]); праг = P90 на съотношенията на кошницата за същата сесия (нужни поне UNUSUAL_OPTIONS_REFERENCE_MIN_VALID
-#     валидни, иначе без маркер по този път); сутрешното сканиране на кошницата има бюджет от секунди (UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC);
-#   • "по история": когато тикърът има поне UNUSUAL_OPTIONS_HISTORY_MIN_DAYS собствени наблюдения (data/uov_ratio_history.json, дневно съотношение на кошницата и на
-#     нашите тикъри, до UNUSUAL_OPTIONS_HISTORY_KEEP дни), маркерът е перцентилът му спрямо СОБСТВЕНАТА история (без днешното наблюдение).
-# Абсолютният праг UNUSUAL_OPTIONS_MARKER_MIN_RATIO (2.0, "силно ново позициониране") остава като допълнителен път — маркира и когато относителният не би.
-UNUSUAL_OPTIONS_REFERENCE_TICKERS = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_TICKERS", 60))
-UNUSUAL_OPTIONS_REFERENCE_MIN_VALID = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_MIN_VALID", 30))
-UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC = int(os.getenv("UNUSUAL_OPTIONS_REFERENCE_BUDGET_SEC", 600))
-UNUSUAL_OPTIONS_MARKER_PERCENTILE = float(os.getenv("UNUSUAL_OPTIONS_MARKER_PERCENTILE", 90))
-UNUSUAL_OPTIONS_HISTORY_FILE = DATA_DIR / "uov_ratio_history.json"
-UNUSUAL_OPTIONS_HISTORY_MIN_DAYS = int(os.getenv("UNUSUAL_OPTIONS_HISTORY_MIN_DAYS", 20))
-UNUSUAL_OPTIONS_HISTORY_KEEP = int(os.getenv("UNUSUAL_OPTIONS_HISTORY_KEEP", 60))
-# ОСТАРЯЛО от пакет 4б т.а (06.10.2026): снимката вече пази OI по ВРЕМЕВИ прозорец (виж UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS), не "първите N
-# падежа". Константата се чете само от стария формат на снимките.
-UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_EXPIRATIONS", 4))
-# Пакет 4б т.а: съотношението обем/OI е сравнимо между дните само ако знаменателят е от ЕДИН И СЪЩ времеви прозорец, не от "най-близките 2 падежа".
-# Измерено на жива верига (05.10.2026, TSLA/NVDA/AAPL): при плъзгане на деня на брифа от пон до пет "най-близките 2 падежа" се клатят ×15–×26
-# (петъчният седмичен падеж държи 60–70% от OI и влиза/излиза според деня), прозорец от 21 дни — ×1.2–×1.4. Падеж, изтекъл или изтичащ в деня
-# на брифа, не участва; обемът и OI са по едни и същи падежи (падеж без OI в снимката отпада и от двете страни).
-UNUSUAL_OPTIONS_HORIZON_DAYS = int(os.getenv("UNUSUAL_OPTIONS_HORIZON_DAYS", 21))
-# Снимката пази OI за падежите в (сесия, сесия + 28 дни]: брифът е най-много 4 дни след сесията (уикенд + празник), а прозорецът му стига до +21.
-UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_HORIZON_DAYS", 28))
-# Таван на падежите на тикър (дълги вериги със седмични падежи Пн/Ср/Пт): повече вериги = повече заявки, а по-далечните тежат малко
-UNUSUAL_OPTIONS_MAX_EXPIRIES = int(os.getenv("UNUSUAL_OPTIONS_MAX_EXPIRIES", 14))
-# Колко снимки се пазят (по дата на сесията)
-UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP = int(os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_KEEP", 7))
-# FIX 2026-10-01 (отговор на прегледа на партида 1, т.4): oi_snapshot.yml има
-# и schedule: (15:00 UTC), и workflow_dispatch от cron-job.org — двата може
-# да стрелят за същия ден (GitHub-native scheduler закъснява с часове,
-# наблюдавано: 19:55 UTC и 18:22 UTC за 30.09/29.09). Без guard втория run
-# презаписва снимка, която вече е добра, без полза, само похабен fetch.
-# FIX 2026-10-02 (т.5): прозорецът на валиден OI следва часа в НЮ ЙОРК, не
-# фиксиран UTC — търговската сесия е 09:30–16:00 ET = 13:30–20:00 UTC през лятото
-# (EDT) и 14:30–21:00 UTC през зимата (EST; САЩ минават на зимно време на
-# 01.11.2026). Фиксирано "20:00 UTC" би пропускало валидни пускания 20:00–21:00
-# UTC след 01.11. След тази граница run без добра снимка се пропуска вместо да
-# пази данни извън измерения прозорец. До 12.10 се налагаше само краят; от 12.10 и началото (виж по-долу).
-UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR = int(
-    os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_CUTOFF_NY_HOUR", 16))
-# 12.10.2026: началото на прозореца е ЯВНО — отварянето (09:30 Ню Йорк = 13:30 UTC лете, 14:30 UTC зиме). Допълнителните schedule тригери в
-# oi_snapshot.yml могат да стрелят и преди него (GitHub ги пуска с 0–14 ч закъснение); досега такъв run спираше на проверката за сесия ("днес няма
-# сесия" — SPY още няма бар за деня), сега спира тук с ясна причина и без мрежа. Пробата от 29.09 (пълен OI в 13:09 UTC) е преди 09:30 ET, но отварянето е
-# измереният прозорец от документацията на модула — по-ранен старт не е проверен.
-UNUSUAL_OPTIONS_OI_SNAPSHOT_START_NY = os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_START_NY", "09:30")
-# Колко % от заявените тикъри трябва да са успешни, за да е снимката "пълна"
-# (и поне половината от тях с OI ≥ 50) — непълна снимка не блокира повторен опит
-UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT = float(
-    os.getenv("UNUSUAL_OPTIONS_OI_SNAPSHOT_MIN_COMPLETE_PCT", 90))
 
 # ── SEC EDGAR (Form 4, 8-K, емисии, картата на имената) ─────────
 # EDGAR изисква descriptive User-Agent с реален контакт — стойността се
@@ -1264,23 +1141,6 @@ GLB_WISH_HIGH_REPLAY_STATS = {"trades": 13168, "with_spy": 10697, "alpha_py_pct"
 # Magic Formula "value confirmed": кандидат получава MF✓ ако комбинираният му
 # Greenblatt ранг попада в топ дециала на (референтен универс + кандидати).
 MF_CONFIRM_DECILE = float(os.getenv("MF_CONFIRM_DECILE", 0.10))
-# ATM IV под този праг (%) = боклук от застояли котировки → отхвърля се.
-IV_SANITY_MIN_PCT = float(os.getenv("IV_SANITY_MIN_PCT", 5.0))
-# FIX 2026-08-02: ATM контракт с lastTradeDate по-стар от толкова дни се третира
-# като застоял/нетъргуван → IV-то му се отхвърля. Обратна посока на
-# IV_SANITY_MIN_PCT — там хващаме абсурдно НИСКИ, тук абсурдно ВИСОКИ IV
-# артефакти от мъртви контракти. Калибровано на реални данни (потвърдено 02.08.2026):
-# ONB PUT (OI=1) последно търгуван преди 179 дни → IV 133.9% solver artifact,
-# докато 6 реални ликвидни candidate тикъра (GRMN/NTRS/JPM/BAC/AIZ/DINO) бяха
-# всички търгувани в рамките на ≤16 дни — чиста разделителна линия. bid/ask
-# СПРЕД беше първоначален (грешен) избор за прага — GRMN PUT имаше 118% спред
-# при вчерашна активна търговия (vol=22, OI=20), спредът не разграничава
-# надеждно, старостта на сделката — да.
-IV_MAX_QUOTE_AGE_DAYS = int(os.getenv("IV_MAX_QUOTE_AGE_DAYS", 30))
-# Минимален общ опционен обем (puts+calls), за да е смислен P/C ratio.
-PC_MIN_TOTAL_VOLUME = int(os.getenv("PC_MIN_TOTAL_VOLUME", 500))
-# Минимум дни IV история за категорична IVR-базирана опционна препоръка.
-IVR_MIN_DAYS_FOR_STRATEGY = int(os.getenv("IVR_MIN_DAYS_FOR_STRATEGY", 60))
 
 # ── Earnings Season Recap (Case 1: Action картата, Case 2: track record) ──
 # FIX 2026-08-13: единен recency праг за ДВАТА UI пътя (преди: entry_date

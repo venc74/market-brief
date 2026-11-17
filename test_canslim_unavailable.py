@@ -67,8 +67,8 @@ print(f"  ✓ LLY → «{why['LLY']}»")
 
 print()
 print("── 3. банерът ──")
-w = dw._partial_warnings(None, {**screener.LAST_STATUS, "kind": "ok", "universe": 903, "with_bars": 903, "no_bars_n": 0}, None, None, None, None, None, None, False)
+w = dw._partial_warnings(None, {**screener.LAST_STATUS, "kind": "ok", "universe": 903, "with_bars": 903, "no_bars_n": 0}, None, None, None, None, False)          # 17.11.2026: без 13F и UOV (махнати)
 assert [x["source"] for x in w] == ["screener"] and "на 2 от 5 проверени кандидата не се изтеглиха днес (EMPTY, LLY)" in w[0]["message"]
-assert dw._partial_warnings(None, {"kind": "ok", "universe": 903, "no_bars_n": 0, "fundamentals_unavailable": []}, None, None, None, None, None, None, False) == []
+assert dw._partial_warnings(None, {"kind": "ok", "universe": 903, "no_bars_n": 0, "fundamentals_unavailable": []}, None, None, None, None, False) == []          # 17.11.2026: без 13F и UOV (махнати)
 print("  ✓ банер с тикърите; без неизтеглени фундаменти — без банер")
 print("\n✅ test_canslim_unavailable: всичко мина")

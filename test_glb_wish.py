@@ -231,7 +231,7 @@ assert list(brief_main._live_positions()) == [] or all(backtest.is_action_record
 t3["AAPL_2024-06-12_gw"]["status"] = "open"
 live = {k: v for k, v in t3.items() if backtest.is_action_record(v) and v.get("status") in ("open", "trailing")}
 assert "AAPL_2024-06-12_gw" not in live
-assert "GW_CATEGORIES" in (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8") and backtest.GW_CATEGORIES == ("glb_wish", "glb_wish_high")   # 20.10 (етап 3): през слоя за четене; 21.10: и двете GLB книги
+assert backtest.GW_CATEGORIES == ("glb_wish", "glb_wish_high")                      # 17.11.2026: OI снимката (единственият четец извън backtest) е махната
 print("  ✓ Action и glb_wish за един и същи тикър са независими записи; is_action_record е False за книгата → _live_positions / OPEN✓ / обобщението на Action я не броят")
 
 print()
@@ -398,11 +398,5 @@ with contextlib.redirect_stdout(io.StringIO()):
     g.screen(universe=list(STOCKS), batch_size=50, state_path=pathlib.Path(_tmp.name) / "glb_state2.json", today="2024-05-29")
 assert g.LAST_WISH_SIGNALS == []
 print("  ✓ провал на тегленето → празен списък (книгата просто не получава нови записи, нищо не гърми)")
-from src import oi_snapshot
-config.UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = 0
-tk = {"method": "v2", "status": "open", "ticker": "KEEP"}
-backtest._save_tracker({"a": tk, "b": {**mk(1, "open", 3.0), "ticker": "GWONLY"}, "c": {"method": "v2", "category": "qm_breakout", "status": "pending", "ticker": "QMT"}})
-got = oi_snapshot.snapshot_tickers(0)
-assert "KEEP" in got and "QMT" in got and "GWONLY" not in got
-print("  ✓ следобедната OI снимка взема позициите на Action / buy-stop / QM, но не и на книгата на Уиш (до стотици тикъри, без опционен маркер)")
+# 17.11.2026 (пакет 1, т. 2в): проверката на следобедната OI снимка — махната с опционния стек
 print("\n✅ test_glb_wish: всичко мина")

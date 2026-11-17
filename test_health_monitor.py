@@ -20,7 +20,6 @@ REAL_SESSIONS = ["2026-09-30", "2026-10-01", "2026-10-02", "2026-10-05", "2026-1
 
 def world(sessions=REAL_SESSIONS, cache_date="2026-10-09", glb_updated="2026-10-09", briefs=("2026-10-08", "2026-10-09")):
     d = pathlib.Path(tempfile.mkdtemp(prefix="mb_health_"))
-    (d / "unusual_options_oi_snapshot.json").write_text(json.dumps({"snapshots": {s: {"session_date": s} for s in sessions}}))
     (d / "glb_state.json").write_text(json.dumps({"updated": glb_updated, "events": {}}))
     for f in hm.DAILY_CACHES:
         (d / f).write_text(json.dumps({"date": cache_date}))
@@ -35,16 +34,14 @@ print("── 1. РЕАЛНОТО състояние в края на run-а о�
 assert hm.prev_session("2026-10-09").isoformat() == "2026-10-08" and hm.prev_session("2026-10-12").isoformat() == "2026-10-09"
 assert hm.prev_session("2026-09-08").isoformat() == "2026-09-04"                     # празник 07.09
 assert hm.check("2026-10-09", world(), resolution=OK_RES, glb_status={"ok": True}) == []
-print("  ✓ 0 проблема (предишната сесия 08.10 е в снимката, брифът за 08.10 го има, GLB и кешовете са от 09.10)")
+print("  ✓ 0 проблема (брифът за 08.10 го има, GLB и кешовете са от 09.10)")
 
 print()
-print("── 2. понеделник 12.10 с РЕАЛНАТА снимка (09.10 липсва — К1), всичко друго обновено ──")
+print("── 2. понеделник 12.10, всичко обновено — нищо (17.11.2026: проверката на OI снимката е махната с опционния стек) ──")
 w = world(cache_date="2026-10-12", glb_updated="2026-10-12", briefs=("2026-10-09",))
 iss = hm.check("2026-10-12", w, resolution=dict(OK_RES, data_through="2026-10-09"), glb_status={"ok": True})
-assert [i["check"] for i in iss] == ["oi_snapshot"] and "OI снимката за сесията 09.10 липсва (последна: 08.10)" in iss[0]["message"]
-banner = data_warnings.collect(None, None, health=iss)
-assert banner == [{"source": "health:oi_snapshot", "level": "warn", "message": "Здравна проверка: " + iss[0]["message"]}]
-print("  ✓ само «OI снимката за сесията 09.10 липсва (последна: 08.10) … провери job-а» → банер «Здравна проверка: …»")
+assert iss == [] and data_warnings.collect(None, None, health=iss) == []
+print("  ✓ 0 проблема")
 
 print()
 print("── 3. книгите: backtest.LAST_RESOLUTION от реалната функция с подменено теглене ──")

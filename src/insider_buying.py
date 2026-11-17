@@ -54,6 +54,7 @@ Graceful degradation (Секция 7): всяка грешка на ниво т�
 """
 from __future__ import annotations
 import datetime as dt
+import io
 import json
 import re
 import time
@@ -64,11 +65,62 @@ import requests
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
-from src.unusual_options import _sp500_ndx_universe
+try:
+    import pandas as pd
+except Exception:
+    pd = None
 
 _EDGAR_UA = {"User-Agent": config.EDGAR_UA, "Accept-Encoding": "gzip, deflate"}
 _CACHE = config.DATA_DIR / "insider_buying_cache.json"
 _CIK_MAP_CACHE = config.DATA_DIR / "insider_ticker_cik_cache.json"
+
+_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+       "Accept": "text/html,application/xhtml+xml"}
+_UNIV_CACHE = config.DATA_DIR / "sp500_ndx_universe.json"
+
+
+def _sp500_ndx_universe() -> list[str]:
+    """
+    S&P500 (live Wikipedia scrape, UA header — pd.read_html(url) директно гърми
+    с 403, Wikipedia блокира заявки без browser-like User-Agent) + NDX100
+    (config.NDX100_STATIC_TICKERS — Wikipedia премахна структурираната
+    компонентна таблица от Nasdaq-100 статията, вече не е скрейпваем източник,
+    виж коментара при константата за ръчно обновяване). Кешира месечно; при
+    провал на S&P500 scrape-а пада само на NDX100 статичния списък, а при
+    17.11.2026: преместена от src/unusual_options.py (махнат с опционния стек).
+    """
+    if _UNIV_CACHE.exists():
+        try:
+            cached = json.loads(_UNIV_CACHE.read_text())
+            if cached.get("date", "")[:7] == dt.date.today().isoformat()[:7]:  # обновяваме месечно
+                return cached["tickers"]
+        except Exception:
+            pass
+
+    tickers: list[str] = list(config.NDX100_STATIC_TICKERS)
+    if pd is not None:
+        try:
+            html = requests.get("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+                               headers=_UA, timeout=20).text
+            tables = pd.read_html(io.StringIO(html))
+            for tbl in tables:
+                col = next((c for c in tbl.columns
+                            if str(c).lower() in ("symbol", "ticker")), None)
+                if col is not None:
+                    tickers += [str(s).replace(".", "-").upper() for s in tbl[col].tolist()]
+                    break
+        except Exception as e:
+            print(f"[insider] S&P500 universe scrape: {e}")
+
+    tickers = sorted(set(t for t in tickers if re.fullmatch(r"[A-Z\-]{1,6}", t)))          # дедупликация (статичният NDX100 списък никога не е празен)
+    try:
+        config.DATA_DIR.mkdir(exist_ok=True)
+        _UNIV_CACHE.write_text(json.dumps({"date": dt.date.today().isoformat(),
+                                           "tickers": tickers}, ensure_ascii=False, default=str))
+    except Exception:
+        pass
+    return tickers
+
 
 # Пакет 4а т.7 (2026-10-03): статусът на ПОСЛЕДНОТО теглене — различава "легитимна нула" от провал и казва
 # от кога са показаните редове. Пише се при всяко извикване (и при кеш); main го слага в брифа.
@@ -579,7 +631,7 @@ def fetch_insider_buying(min_value: float | None = None) -> list[dict]:
     Връща [{ticker, company, total_value, cluster, in_screener, insiders:
     [{name, title, date, value}, ...]}] — един запис на ТИКЪР (не на
     транзакция), групирано от _group_by_ticker(), за S&P500+NDX100 универса (кеш от
-    unusual_options._sp500_ndx_universe()) — само open market покупки (code
+    _sp500_ndx_universe() по-долу) — само open market покупки (code
     "P") на officers (CEO/CFO/President/COO) над min_value, плюс cluster-
     flagged директорски покупки. Кешира за деня.
 

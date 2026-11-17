@@ -1,6 +1,6 @@
 name: Tests
 
-# Пуска тестовите скриптове при push (пакет 4а т.10). Отделен от daily_brief.yml и oi_snapshot.yml — те не се пипат.
+# Пуска тестовите скриптове при push (пакет 4а т.10). Отделен от daily_brief.yml и options_record.yml — те не се пипат (oi_snapshot.yml — махнат на 17.11.2026).
 # Без schedule: нарочно (както в проекта). Без secrets: ключовете не се подават, платени API не могат да се викат —
 # run_tests.py допълнително забранява мрежата и следи docs/ и data/ за запис.
 # Ботовите commit-и на daily_brief.yml (git push с GITHUB_TOKEN) не тригерират този workflow — GitHub не пуска

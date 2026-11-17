@@ -1,27 +1,26 @@
-name: Options record (pre-open)
+name: Pre-open update
 
-# 27.10.2026: записът на опционните данни (src/options_record.py) — ПРЕДИ ОТВАРЯНЕТО, отделно от брифа. В 06:30 UTC (сутрешният бриф) веригите на Yahoo са без
-# lastTradeDate → самопроверката дава "непълен" (27.10); в 09:12 ET (22.10) веригите бяха пълни — целият обем на предишната сесия, последна сделка 16:00 ET.
+# 03.11.2026 (т. 10): обновяването преди отварянето (src/preopen.py) — в 09:05 Ню Йорк, отделно от сутрешния бриф. Без AI; имейл само ако има нещо.
+# 17.11.2026 (пакет 1, т. 2в — решение след стратегическия преглед): записът на опционните данни (src/options_record.py, data/options_daily.json) — махнат; пускането
+# остава САМО за обновяването. Името на файла (options_record.yml) не се сменя — cron-job.org пуска workflow_dispatch по него.
 #
 # Пуска се САМО през cron-job.org (workflow_dispatch). Часовата зона на задачата там не може да се смени (Europe/Berlin), затова графикът е „5 14,15 * * 1-5“ по
 # Берлин — две пускания на ден, от които точно едното е в 09:05 Ню Йорк: до 01.11 — 14:05 Берлин (= 09:05 EDT), след 01.11 — 15:05 Берлин (= 09:05 EST); при пролетните
-# смени е същото (проверено до края на 2027 в test_options_record.py). Другото пускане (10:05 или 08:05 ET) прескача в options_record.skip_reason — след отварянето
-# (≥ 09:30 Ню Йорк) или преди прозореца (< 09:00 Ню Йорк); също ден без сесия и вече пълна сесия (ред ::notice::, за секунди). Задачата е създадена и тествана 27.10
-# (HTTP 204; run #1 — прескочи, след отварянето). Без schedule: нарочно — прозорецът е 25 мин, а вграденият scheduler на GitHub закъснява в това репо с часове
-# (виж oi_snapshot.yml). Run-ът трае ~3–4 мин (200 вериги ≈ 70 s, измерено 21.10).
+# смени е същото. Другото пускане (10:05 или 08:05 ET) прескача в preopen.skip_reason — след отварянето (≥ 09:30 Ню Йорк) или преди прозореца (< 09:00 Ню Йорк);
+# също ден без сесия (за секунди). Без schedule: нарочно — прозорецът е 25 мин, а вграденият scheduler на GitHub закъснява в това репо с часове.
 on:
   workflow_dispatch: {}
 
 permissions:
   contents: write
 
-# Собствена група: не чака зад OI снимката и не отменя бриф.
+# Собствена група: не отменя бриф.
 concurrency:
   group: options-record
   cancel-in-progress: false
 
 jobs:
-  record:
+  preopen:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -35,15 +34,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Record option chains
-        id: record
-        run: python src/options_record.py
-
-      # 03.11.2026 (т. 10): обновяването преди отварянето — ОТДЕЛНА стъпка: върви и когато записът на опциите падне (if: always()), и провалът ѝ не спира записа
-      # (той е преди нея; commit стъпката също е с if: always()). Без AI; имейл само ако има нещо (src/preopen.py).
       - name: Pre-open update
         id: preopen
-        if: always()
         env:
           EDGAR_UA: ${{ secrets.EDGAR_UA }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
@@ -52,16 +44,15 @@ jobs:
           DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
         run: python src/preopen.py
 
-      - name: Commit record
+      - name: Commit pre-open
         if: always()
         run: |
           git config user.name "brief-bot"
           git config user.email "actions@github.com"
-          git add data/options_daily.json 2>/dev/null || true
           git add data/preopen docs/index.html 2>/dev/null || true          # 03.11.2026: обновяването преди отварянето (данните и страницата с карето)
           git diff --cached --quiet && exit 0
           git commit -m "options record / pre-open: $(date -u +%F)"
-          # Само записът и обновяването преди отварянето се качват оттук; всичко друго, писано по време на run-а, се слага настрана (както в oi_snapshot.yml), после pull --rebase с до 4 опита.
+          # Само обновяването преди отварянето се качва оттук; всичко друго, писано по време на run-а, се слага настрана, после pull --rebase с до 4 опита.
           git stash push --include-untracked -q -m "options-record: локални файлове" || true
           for attempt in 1 2 3 4; do
             if git pull --rebase && git push; then
@@ -71,5 +62,5 @@ jobs:
             echo "push опит $attempt от 4 неуспешен — повторен опит след пауза"
             sleep $((attempt * ${RETRY_DELAY:-5}))
           done
-          echo "::error::записът на опционните данни не успя да се качи след 4 опита (pull --rebase / push)"
+          echo "::error::обновяването преди отварянето не успя да се качи след 4 опита (pull --rebase / push)"
           exit 1

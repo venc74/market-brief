@@ -17,7 +17,7 @@ import config
 _tmp = tempfile.TemporaryDirectory(prefix="mb_books_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()
-from src import backtest, main, oi_snapshot, trade_sim
+from src import backtest, main, trade_sim          # 17.11.2026: без oi_snapshot (махнат с опционния стек)
 backtest._TRACKER_PATH = config.DATA_DIR / "backtest_tracker.json"
 assert not str(backtest._TRACKER_PATH.resolve()).startswith(str((ROOT / "data").resolve()))
 
@@ -76,16 +76,11 @@ iv = backtest.book_intervals(backtest.CATEGORY_ACTION, mixed, trade_sim.NOT_A_PO
 bs_rec = next(iter(BS["tracker_after"].values()))
 assert backtest.overlaps(bs_rec, iv) == any(s <= (bs_rec.get("resolution_date") or "9999-12-31") and bs_rec["entry_date"] <= e for s, e in iv.get(bs_rec["ticker"], []))
 save(mixed)
-config.UNUSUAL_OPTIONS_SNAPSHOT_BRIEF_DAYS = 0
-with q():
-    oi = oi_snapshot.snapshot_tickers(0)
-assert "GWX" not in oi and set(oi) == {r["ticker"] for r in mixed.values() if r.get("status") in backtest.LIVE and r.get("category") != "glb_wish"}
-print("  ✓ 'и Action' = застъпване на интервалите; OI снимката — живите записи без книгата на Уиш")
+print("  ✓ 'и Action' = застъпване на интервалите")
 
 print()
 print("── 5. пазач: четците минават през слоя ──")
 msrc = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-osrc = (ROOT / "src" / "oi_snapshot.py").read_text(encoding="utf-8")
-assert "backtest._load_tracker()" not in msrc and "book_records(" in osrc
-print("  ✓ main.py не чете tracker-а сам; oi_snapshot филтрира през backtest.book_records")
+assert "backtest._load_tracker()" not in msrc
+print("  ✓ main.py не чете tracker-а сам")
 print("\n✅ test_book_readers_layer: всичко мина")

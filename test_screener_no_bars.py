@@ -40,7 +40,7 @@ print(f"  ✓ универс 5 · с бар {st['with_bars']} · с истори
 
 print()
 print("── 2. банерът — над фона ──")
-w = dw._partial_warnings(None, st, None, None, None, None, None, None, False)
+w = dw._partial_warnings(None, st, None, None, None, None, False)          # 17.11.2026: без 13F и UOV (махнати)
 assert [x["source"] for x in w] == ["screener"] and "за 2 от 5 тикъра Yahoo не върна нито един бар днес (ZZZ1, ZZZ2)" in w[0]["message"]
 assert config.PARTIAL_DATA_WARN_SHARE == 0.01
 print("  ✓ 2 от 5 без бар → банер с имената; нормата (0 от 903) и под 1% — без банер (test_silent_failures)")

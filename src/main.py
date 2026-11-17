@@ -20,16 +20,15 @@ from src.thermometer import build_thermometer, thermometer_unavailable, apply_di
 from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
-from src.enrich import enrich, inject_split_catalysts, uov_marker
+from src.enrich import enrich, inject_split_catalysts
 from src import enrich as enrich_mod
 from src.sizing import position_plan_v2, buy_stop_preview
 from src import trade_levels
 from src import data_rhythm
 from src import crypto_news
 from src import sessions
-from src import options_record
 from src import ai_brief
-from src import unusual_options, splits_calendar, news_aggregator, sec_names
+from src import splits_calendar, news_aggregator, sec_names
 from src import insider_buying
 from src import correlation_check
 from src import backtest
@@ -80,24 +79,6 @@ def _pending_action_plans() -> dict[str, dict]:
     except Exception as e:
         print(f"[main] pending plans check failed: {e}")
         return {}
-
-
-def attach_position_uov(rows: list[dict]) -> dict:
-    """
-    Пакет 4б т.б: слага UOV✓ върху редовете на позициите (v2 отворени/чакащи и buy-stop книгата) — по ЕДНО извикване за всички тикъри.
-    Връща компактна диагностика (колко имат съотношение, причини за липсата, съотношенията — за калибриране).
-    """
-    tickers = sorted({r["ticker"] for r in rows if r.get("ticker")})
-    if not tickers:
-        return {}
-    uov, diag = unusual_options.candidate_markers(tickers)
-    for r in rows:
-        if r.get("ticker") in uov:
-            if r.get("deal"):                                                    # 28.10.2026: запис на цел на сделка — без UOV✓ (ROKU 28.10: calls 92% при цена по офертата)
-                r["uov_hidden"] = "сделка — опционният обем следва условията на сделката"
-                continue
-            r.setdefault("markers", []).append(uov_marker(uov[r["ticker"]]))
-    return {k: diag.get(k) for k in ("requested", "with_ratio", "marked", "missing", "ratios")}
 
 
 def attach_qm_markers(rows: list[dict], qm_by_ticker: dict[str, dict]) -> int:
@@ -711,7 +692,7 @@ def run() -> dict:
                          if config.ENABLE_CORRELATION_CHECK else [])
 
     # v2 · допълнителни dashboard данни (Секции 3.3, 3.4, 6) — кеширани за деня
-    # пакет 4б т.б: списъкът "Unusual Options Yesterday" отпадна — остава маркерът UOV✓ върху кандидатите (enrich) и позициите (по-долу)
+    # 17.11.2026 (пакет 1, т. 2в): опционният стек (UOV✓, очакваното движение при отчет, OI снимката, записът на опциите) — махнат
     splits_month = splits_calendar.fetch_upcoming_splits() if config.ENABLE_SPLITS_CALENDAR else []
     # 17.11.2026 (пакет 1, т. 2г — решение след стратегическия преглед): 13F (Superinvestor) — махнат изцяло: секцията, редът в имейла, маркерът SI✓
     # пакет 4б т.в: списъкът "Insider Buying" (скенер на целия S&P500+NDX100) отпадна — маркерът INS✓ идва от enrich (кандидатите) и от позициите (по-долу);
@@ -896,15 +877,9 @@ def run() -> dict:
     # дублирането). Mirror на in_screener badge механизма по-горе — трябва
     # да живее ТУК, след backtest_summary изчислението (open_positions не е
     # наличен по-рано, при самия GLB блок).
-    # пакет 4б т.б: UOV✓ и върху позициите — v2 отворени/чакащи и книгата на buy-stop кандидатите. diag на кандидатите е от enrich (LAST_MARKER_DIAG).
-    uov_diag = dict(unusual_options.LAST_MARKER_DIAG) if config.ENABLE_UNUSUAL_OPTIONS else {}
     ins_pos_status: dict = {}
     pos_rows = (backtest_summary.get("open_positions", []) + backtest_summary.get("pending_positions", [])
                 + (backtest_summary.get("buystop") or {}).get("live", []))
-    def _uov_positions():
-        uov_diag["positions"] = attach_position_uov(pos_rows)
-    steps.step("uov_positions", _uov_positions, enabled=bool(config.ENABLE_UNUSUAL_OPTIONS and pos_rows),
-               label="UOV✓ върху позициите в книгите", consequence="липсата на маркер днес не значи, че няма необичайна опционна активност")
     ins_pos_status = steps.step("ins_positions", lambda: attach_position_insider(pos_rows), fallback=ins_pos_status, enabled=bool(config.ENABLE_INSIDER_BUYING and pos_rows),
                                 source="insider", on_fail=lambda e: {"kind": "failed", "note": f"проверката не се изпълни ({type(e).__name__})"},      # 19.10.2026 (т. 12): видимо, не тихо {}
                                 partial=lambda v: (v.get("note") or "частично", {}) if (v or {}).get("kind") == "ok_partial" else None,
@@ -1012,14 +987,8 @@ def run() -> dict:
     if canary:
         print(f"[canary] {canary['ticker']} {canary['date']}: close {canary['close']} (очаквано ≈{canary['expected']}) → "
               f"{'OK' if canary['ok'] else 'ГРЕШНО' if canary['ok'] is False else 'неизвестно: ' + str(canary['error'])}")
-    # 22.10.2026 (етап 4): САМО запис на опционните данни (топ 200 по оборот + кандидатите от (а)) — нищо в брифа; 26.10.2026 (етап 4б, т. 9): включено, със самопроверка —
-    # непълен ден (последната сделка не е от затварянето на сесията) не влиза в историята и стъпката е частична
-    steps.step("options_record", lambda: options_record.record(qm_universe, today), enabled=bool(config.ENABLE_OPTIONS_RECORD and config.OPTIONS_RECORD_IN_MORNING_RUN and qm_universe),   # 27.10: записът е в options_record.yml (~09:05 ET)
-               label="Записът на опционните данни", consequence="днешната сесия липсва в историята за необичайна активност (нищо в брифа не зависи от нея)",
-               failed_if=lambda v: (v.get("reason") or "не се изпълни") if not v.get("ok") else None,
-               partial=lambda v: (f"денят е непълен — {v.get('reason')}", {"last_trade_et": v.get("last_trade_et")}) if v.get("ok") and v.get("complete") is False else None)
     data_warns = data_warnings.collect(sector_layer.LAST_STATUS, screener.LAST_STATUS, rotation_count=len(rotation),
-                                       insider_status=insider_status, uov_diag=uov_diag, qm_diag=qm_diag, qm_ep=qm_ep_out,
+                                       insider_status=insider_status, qm_diag=qm_diag, qm_ep=qm_ep_out,
                                        corp_diag=corp_diag, spinoff_diag=dict(spinoff_watch.LAST_DIAG),
                                        dd_status=dict(entry_timing.LAST_STATUS) if config.ENABLE_ENTRY_TIMING else None,
                                        ai_lost=list(ai_brief.NARRATIVES_LOST),
@@ -1070,8 +1039,6 @@ def run() -> dict:
         "action": action,
         "watchlist": watchlist,
         "watchlist_exits": wl_exits,
-        # пакет 4б т.б: покритие на маркера UOV✓ (колко кандидата/позиции имат съотношение, причини, съотношенията за калибриране)
-        "uov_diag": uov_diag,
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)

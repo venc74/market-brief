@@ -12,7 +12,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 
-def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list[dict]:
+def _marker_warnings(insider_status: dict | None) -> list[dict]:
     """
     Пакет 4б т.б/т.в: секциите "Insider Buying" и "Unusual Options" отпаднаха — остават маркерите INS✓/UOV✓. Липсващ маркер, защото тегленето/снимката
     са паднали, не бива да изглежда като "няма покупки / нормален обем": тук е банерът за провала (легитимната нула не е предупреждение).
@@ -28,18 +28,6 @@ def _marker_warnings(insider_status: dict | None, uov_diag: dict | None) -> list
                                 f"{ins.get('data_date') or 'неизвестна дата'}.")})
     elif ins.get("kind") == "ok_partial":
         out.append({"source": "insider", "level": "warn", "message": f"Insider buying: {ins.get('note')}."})
-    u = uov_diag or {}
-    if u.get("requested") and not u.get("with_ratio"):
-        reasons = list((u.get("missing") or {}).values())
-        why = u.get("snapshot_missing_reason") or (max(set(reasons), key=reasons.count) if reasons else "няма данни")
-        out.append({"source": "unusual_options", "level": "warn",
-                    "message": f"Unusual options: за нито един кандидат няма съотношение обем/OI ({why}) — маркерите UOV✓ липсват днес; това НЕ значи нормален обем."})
-    elif u.get("with_ratio") and "basket" in u and (u.get("basket") or {}).get("p") is None \
-            and not any((d or {}).get("mode") == "history" for d in (u.get("decisions") or {}).values()):
-        # 08.10.2026: съотношения има, но няма референтна кошница за деня (и няма собствена история) → маркер само при абсолютния праг
-        out.append({"source": "unusual_options", "level": "warn",
-                    "message": (f"Unusual options: няма референтна кошница за деня ({(u.get('basket') or {}).get('reason') or 'липсва'}) — UOV✓ се слага само при "
-                                f"съотношение ≥ {u.get('min_ratio')}×; липсата на маркер НЕ значи нормален обем.")})
     return out
 
 
@@ -169,7 +157,7 @@ def _breadth_warning(ind: dict | None) -> list[dict]:
 
 
 def _partial_warnings(sector_status: dict | None, screener_status: dict | None, glb_status: dict | None,
-                      uov_diag: dict | None, ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
+                      ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
     """
     19.10.2026 (трети преглед, т. 12): ТИХИТЕ частични провали — всеки е видим ред, не тиха липса. Пълните провали вече имаха банер; тук е "част от данните липсва".
     Измерено в 89 брифа: секторите винаги 17 от 17, 13F — 15 от 15, GLB — 903 от 903, канарчето — проверено, новините — никога празни, OI снимката — 0 неуспешни тикъра;
@@ -201,12 +189,6 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
         out.append({"source": "glb", "level": "warn",
                     "message": (f"GLB скрийнър: {g['universe'] - (g.get('with_history') or 0)} от {g['universe']} тикъра без история днес (Yahoo не върна данни без грешка) — "
                                 f"списъкът и сигналите за книгата „{config.GLB_WISH_BOOK_NAME}“ може да са непълни.")})
-    u = uov_diag or {}
-    if u.get("snapshot_failed"):
-        f = u["snapshot_failed"]
-        out.append({"source": "unusual_options", "level": "warn",
-                    "message": (f"Unusual options: следобедната OI снимка за {u.get('snapshot_session') or '?'} не взе {len(f)} тикъра ({', '.join(map(str, f[:8]))}"
-                                + (" …" if len(f) > 8 else "") + ") — за тях UOV✓ липсва, това НЕ значи нормален обем.")})
     ip = ins_pos_status or {}
     if ip.get("kind") in ("failed", "ok_partial"):
         out.append({"source": "insider", "level": "warn",
@@ -240,7 +222,7 @@ def _universe_warning(universe_sources: dict | None) -> list[dict]:
 
 
 def collect(sector_status: dict | None, screener_status: dict | None, *, rotation_count: int | None = None,
-            insider_status: dict | None = None, uov_diag: dict | None = None,
+            insider_status: dict | None = None,
             qm_diag: dict | None = None, qm_ep: dict | None = None, corp_diag: dict | None = None,
             glb_status: dict | None = None, canary: dict | None = None, health: list | None = None, spinoff_diag: dict | None = None,
             dd_status: dict | None = None, ai_lost: list | None = None, ins_pos_status: dict | None = None, news_status: dict | None = None,
@@ -278,12 +260,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
                         f"и списъкът с кандидати са непълни."),
         })
     out.extend(_universe_warning(universe_sources))                   # 30.10.2026: източник на универса без тикъри / под минимума
-    markers = _marker_warnings(insider_status, uov_diag)
-    if any(h.get("check") == "oi_snapshot" for h in health or []) and (uov_diag or {}).get("snapshot_missing_reason"):
-        # 12.10.2026: един банер за липсващата OI снимка — здравната проверка (последната снимка, кой job да се провери); UOV банерът за СЪЩАТА причина
-        # отпада (на 12.10 двата казваха едно и също). UOV банер по друга причина (снимката е налице, съотношения няма) остава.
-        markers = [w for w in markers if w.get("source") != "unusual_options"]
-    out.extend(markers)
+    out.extend(_marker_warnings(insider_status))
     out.extend(_qm_warning(qm_diag))
     out.extend(_ep_warning(qm_ep))
     out.extend(_corp_warning(corp_diag))
@@ -293,7 +270,7 @@ def collect(sector_status: dict | None, screener_status: dict | None, *, rotatio
     out.extend(_glb_warning(glb_status))
     out.extend(_canary_warning(canary))
     out.extend(_breadth_warning(breadth))
-    out.extend(_partial_warnings(sector_status, screener_status, glb_status, uov_diag, ins_pos_status, news_status, canary, fred_key_missing))
+    out.extend(_partial_warnings(sector_status, screener_status, glb_status, ins_pos_status, news_status, canary, fred_key_missing))
     for h in health or []:              # здравен монитор (10.10): очаквани артефакти, които липсват (src/health_monitor.py)
         out.append({"source": f"health:{h.get('check')}", "level": "warn", "message": "Здравна проверка: " + h.get("message", "")})
     return out
