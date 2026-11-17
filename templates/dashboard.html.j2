@@ -1093,8 +1093,8 @@
   {# 16.11.2026 (пакет 16.11, т. 13): емисии на акции при тикърите в книгите и наблюдаваните (картите го носят сами) #}
   {% if offering_lines %}<div class="small" style="color:var(--red);margin:0 0 8px">{% for l in offering_lines %}<div>{{ l }}</div>{% endfor %}<span style="color:var(--muted)">(EDGAR: 424B / S-1 / S-3 за последните {{ offering_days }} дни — книгите и наблюдаваните)</span></div>{% endif %}
   {{ corp_excluded_line(corp_excluded.get("screener")) }}
-  <div class="cs-sub">Купува се днес · {{ action|length }}</div>
-  {% for st in action %}
+  <div class="cs-sub">Купува се днес · {{ action_c|length }}</div>
+  {% for st in action_c %}
   {% set p = st.plan %}
   {% set earn_modal_id = "earn-modal-action-" ~ st.ticker %}
   <div class="stock-card">
@@ -1265,6 +1265,20 @@
           <td>{{ r.reason }}{% if r.earnings %} <span class="cs-mu">· отчет {{ r.earnings.date[8:10] }}.{{ r.earnings.date[5:7] }}{% if r.earnings.pct is not none %} (±{{ r.earnings.pct }}%){% endif %}</span>{% endif %}{% if r.earnings_unknown %} <span class="cs-mu">· {{ no_date_text }}</span>{% endif %}{% if r.spinoff %} <span class="cs-warn">· ⚠ отделяне {{ r.spinoff.distribution[8:10] }}.{{ r.spinoff.distribution[5:7] }}</span>{% endif %}{% if r.merger and r.kind != 'deal' %} <span class="cs-warn">· ⚠ цел на придобиване ({{ r.merger.buyer }})</span>{% endif %}</td>
           <td class="num">{{ r.rs_rating if r.rs_rating is not none else "—" }}</td>
           <td class="num">{{ r.days or "—" }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </details>
+  {% endif %}
+  {# 17.11.2026 (пакет 2, т. 1 — А5): второто ниво — минали сегашния филтър, но без C (EPS от отчета под прага или без данни) #}
+  {% if trend %}
+  <details class="cs-radar" open>
+    <summary>Тренд без ръст ({{ trend|length }}) <span class="cs-hint">трендът и фундаментите минават, но EPS от отчета е под {{ '%g'|format(canslim_c_min) }}% г/г или няма данни — не е CANSLIM</span></summary>
+    <div class="cs-radar-wrap">
+      <table class="ctx-table">
+        <tr><th>Тикър</th><th>Състояние</th><th>EPS</th><th>Защо е тук</th></tr>
+        {% for r in trend %}
+        <tr><td class="mono">{{ r.ticker }}{{ tn(r.ticker, r.company) }}</td><td>{{ r.state }}</td><td{% if r.label == "EPS: няма данни" %} style="color:var(--yellow)"{% endif %}>{{ r.label }}</td><td class="small">{{ r.why or "—" }}</td></tr>
         {% endfor %}
       </table>
     </div>

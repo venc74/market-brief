@@ -522,6 +522,8 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
             if _spinoff_skip(ticker, entry_date, CATEGORY_ACTION):
                 continue
             tracker[key] = _new_v2_record(ticker, entry_date, plan)
+            if c.get("tier"):
+                tracker[key]["tier"] = (c["tier"] or {}).get("tier")          # 17.11.2026 (пакет 2, т. 1): нивото пази и записът (старите — без поле)
             continue
         if methodology() == "v2":
             # стар (v1) план от архивните snapshot-и (data/YYYY-MM-DD.json се четат наново
@@ -580,6 +582,8 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
             continue
         rec = _new_v2_record(ticker, entry_date, plan)
         rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot")})
+        if c.get("tier"):
+            rec["tier"] = (c["tier"] or {}).get("tier")                        # 17.11.2026 (пакет 2, т. 1): нивото на картата
         tracker[key] = rec
 
 

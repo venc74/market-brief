@@ -208,6 +208,8 @@ def _watchlist_email_html(watchlist: list[dict]) -> tuple[str, str]:
         if enrich_mod.no_date(st):                                                    # 06.11.2026 (т. 3)
             txt += f'<br><span style="color:#b45309;font-size:12px">{_e(enrich_mod.NO_DATE_TEXT)}</span>'
         txt += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
+        if is_trend(st):                                                              # 17.11.2026 (пакет 2, т. 1): второто ниво — с етикета
+            txt += f'<br><span style="color:#b45309;font-size:12px">Тренд без ръст — {_e(st["tier"].get("label"))} (не е CANSLIM)</span>'
         out += (f'<tr><td style="padding:6px 8px 6px 0;font-family:monospace;font-weight:bold;vertical-align:top;white-space:nowrap">{_e(st.get("ticker"))}</td>'
                 f'<td style="padding:6px 0;font-size:12.5px;font-family:monospace">{txt}</td></tr>')
     html = f'<table cellpadding="0" cellspacing="0" style="margin-top:6px">{out}</table>' if out else ' <span style="font-family:monospace">—</span>'
@@ -663,6 +665,31 @@ def fundamentals_note(status: dict | None) -> str | None:
             + (f'; с най-висок RS от тях: {top}' if top else "") + " — те не са в списъците по-горе.")
 
 
+def is_trend(c: dict | None) -> bool:
+    """17.11.2026 (пакет 2, т. 1 — А5): картата е от нивото „Тренд без ръст“ (стар бриф без полето — CANSLIM, както досега)."""
+    return ((c or {}).get("tier") or {}).get("tier") == "trend"
+
+
+def trend_rows(action: list[dict] | None, watchlist: list[dict] | None) -> list[dict]:
+    """
+    17.11.2026 (пакет 2, т. 1): подсекцията „Тренд без ръст“ — по един ред: {ticker, company, state, label, why}. state — „Купува се днес: вход $X, стоп $Y“, „Чака пробив:
+    аларма над $X“ или причината от радара (radar_reason). Чиста функция.
+    """
+    out = []
+    for c in (action or []):
+        if is_trend(c):
+            p = c.get("plan") or {}
+            st = "Купува се днес" + (f": buy-stop ${p['buy_stop']:.2f}, стоп ${p['stop_loss']:.2f}" if p.get("buy_stop") and p.get("stop_loss") else "")
+            out.append({"ticker": c.get("ticker"), "company": c.get("company"), "state": st, "label": c["tier"].get("label"), "why": why_here(c)})
+    for c in (watchlist or []):
+        if is_trend(c):
+            s = c.get("setup") or {}
+            st = (f"Чака пробив: аларма над ${s['buy_stop']:.2f}" + (f" до {_dm(s['valid_through'])}" if s.get("valid_through") else "")
+                  if s.get("kind") == "below_pivot" and s.get("buy_stop") and not s.get("triggered") else radar_reason(c))
+            out.append({"ticker": c.get("ticker"), "company": c.get("company"), "state": st, "label": c["tier"].get("label"), "why": why_here(c)})
+    return out
+
+
 def split_canslim(watchlist: list[dict]) -> tuple[list[dict], list[dict]]:
     """
     30.10.2026 (разходката, т. 9–10): Watchlist → (карти „Чака пробив“, редове „На радара“). Чака пробив: под pivot с buy-stop ниво и срок, незадействан, без запис / чакащ план
@@ -734,9 +761,12 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         rs_dz=config.RS_WORD_DEAD_ZONE,                                          # 30.10.2026 (т. 7): мъртвата зона на RS (сиво, „в крак с пазара“)
         sector_card=brief.get("sector_card") or {},                             # 19.10.2026 (т. 18): водещите по кода; без него (стар бриф) — веригите на модела
         action=brief["action"],
+        action_c=[c for c in brief["action"] if not is_trend(c)],             # 17.11.2026 (пакет 2, т. 1): „Купува се днес“ — само нивото CANSLIM
+        trend=trend_rows(brief["action"], brief["watchlist"]),                # „Тренд без ръст“ — отделна подсекция
+        canslim_c_min=config.CANSLIM_C_MIN_EPS_PCT,
         watchlist=brief["watchlist"],                                          # 30.10.2026 (т. 9–10): целият Watchlist (за „наш“ при QM / GLB — до 30.10 без компактните редове)
-        waiting=split_canslim(brief["watchlist"])[0],                         # 30.10.2026 (т. 9–10): „Чака пробив“ — карти с buy-stop
-        radar=split_canslim(brief["watchlist"])[1],                           # „На радара (N)“ — сгъната таблица, причината от кода
+        waiting=split_canslim([c for c in brief["watchlist"] if not is_trend(c)])[0],                         # 30.10.2026 (т. 9–10): „Чака пробив“ — карти с buy-stop
+        radar=split_canslim([c for c in brief["watchlist"] if not is_trend(c)])[1],                           # „На радара (N)“ — сгъната таблица, причината от кода
         watchlist_exits=brief.get("watchlist_exits") or {}, watchlist_exits_label=watchlist_exits.label(brief.get("watchlist_exits") or {}, brief.get("date") or ""),
         # v2 нови блокове
         watch=brief.get("watch", []),
@@ -939,6 +969,8 @@ def render_email(brief: dict) -> str:
         if enrich_mod.no_date(st):                                                    # 06.11.2026 (т. 3)
             earn_line += f'<br><span style="color:#b45309;font-size:12px">{_e(enrich_mod.NO_DATE_TEXT)}</span>'
         earn_line += _corp_html(st) + _spinoff_html(st) + _merger_html(st) + _book_note_html(st)
+        if is_trend(st):                                                              # 17.11.2026 (пакет 2, т. 1): второто ниво — с етикета
+            earn_line += f'<br><span style="color:#b45309;font-size:12px">Тренд без ръст — {_e(st["tier"].get("label"))} (не е CANSLIM)</span>'
         rows += f"""
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;

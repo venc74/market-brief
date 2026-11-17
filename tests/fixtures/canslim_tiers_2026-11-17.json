@@ -1,0 +1,214 @@
+{
+"_note": "РЕАЛНО: earnings.eps_report_yoy и setup.kind на 19-те карти от брифа на 17.11.2026 (data/2026-11-17.json, action + watchlist), изрязано 17.11.2026.",
+"cards": [
+{
+"ticker": "RGA",
+"eps_report_yoy": {
+"pct": 82.2,
+"current": 8.49,
+"yoy": 4.66,
+"date": "2026-11-04",
+"yoy_date": "2025-10-30"
+},
+"setup_kind": "below_pivot"
+},
+{
+"ticker": "CSX",
+"eps_report_yoy": {
+"pct": 29.5,
+"current": 0.57,
+"yoy": 0.44,
+"date": "2026-10-21",
+"yoy_date": "2025-10-16"
+},
+"setup_kind": "below_pivot"
+},
+{
+"ticker": "NDAQ",
+"eps_report_yoy": {
+"pct": 18.2,
+"current": 1.04,
+"yoy": 0.88,
+"date": "2026-10-22",
+"yoy_date": "2025-10-21"
+},
+"setup_kind": "below_pivot"
+},
+{
+"ticker": "MET",
+"eps_report_yoy": {
+"pct": 127.9,
+"current": 2.78,
+"yoy": 1.22,
+"date": "2026-11-04",
+"yoy_date": "2025-11-05"
+},
+"setup_kind": "below_pivot"
+},
+{
+"ticker": "BTSG",
+"eps_report_yoy": {
+"pct": 80.0,
+"current": 0.54,
+"yoy": 0.3,
+"date": "2026-10-30",
+"yoy_date": "2025-10-20"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "MORN",
+"eps_report_yoy": {
+"pct": 36.5,
+"current": 3.48,
+"yoy": 2.55,
+"date": "2026-10-28",
+"yoy_date": "2025-10-29"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "CROX",
+"eps_report_yoy": {
+"pct": 26.4,
+"current": 3.69,
+"yoy": 2.92,
+"date": "2026-10-29",
+"yoy_date": "2025-10-30"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "LLY",
+"eps_report_yoy": {
+"pct": 6.6,
+"current": 7.48,
+"yoy": 7.02,
+"date": "2026-10-29",
+"yoy_date": "2025-10-30"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "GWW",
+"eps_report_yoy": {
+"pct": 22.8,
+"current": 12.54,
+"yoy": 10.21,
+"date": "2026-11-04",
+"yoy_date": "2025-10-31"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "AJG",
+"eps_report_yoy": {
+"pct": 29.3,
+"current": 3.0,
+"yoy": 2.32,
+"date": "2026-10-29",
+"yoy_date": "2025-10-30"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "BBY",
+"eps_report_yoy": {
+"pct": 14.8,
+"current": 1.47,
+"yoy": 1.28,
+"date": "2026-08-27",
+"yoy_date": "2025-08-28"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "THC",
+"eps_report_yoy": {
+"pct": 79.5,
+"current": 6.64,
+"yoy": 3.7,
+"date": "2026-10-29",
+"yoy_date": "2025-10-28"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "CPAY",
+"eps_report_yoy": {
+"pct": 32.3,
+"current": 7.54,
+"yoy": 5.7,
+"date": "2026-11-04",
+"yoy_date": "2025-11-05"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "USFD",
+"eps_report_yoy": {
+"pct": 17.8,
+"current": 1.26,
+"yoy": 1.07,
+"date": "2026-11-05",
+"yoy_date": "2025-11-06"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "SN",
+"eps_report_yoy": {
+"pct": 56.0,
+"current": 2.34,
+"yoy": 1.5,
+"date": "2026-11-04",
+"yoy_date": "2025-11-06"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "CBOE",
+"eps_report_yoy": {
+"pct": 36.0,
+"current": 3.63,
+"yoy": 2.67,
+"date": "2026-10-30",
+"yoy_date": "2025-10-31"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "WST",
+"eps_report_yoy": {
+"pct": 35.7,
+"current": 2.66,
+"yoy": 1.96,
+"date": "2026-10-29",
+"yoy_date": "2025-10-23"
+},
+"setup_kind": "too_wide"
+},
+{
+"ticker": "CRBG",
+"eps_report_yoy": {
+"pct": 351.9,
+"current": 1.22,
+"yoy": 0.27,
+"date": "2026-11-02",
+"yoy_date": "2025-11-03"
+},
+"setup_kind": "deal"
+},
+{
+"ticker": "EQH",
+"eps_report_yoy": {
+"pct": 43.9,
+"current": 2.13,
+"yoy": 1.48,
+"date": "2026-11-02",
+"yoy_date": "2025-11-04"
+},
+"setup_kind": "deal"
+}
+]
+}

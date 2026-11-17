@@ -360,6 +360,19 @@ def screen_priority(row: dict) -> tuple:
     return (_SCREEN_GROUP[kind], abs(row.get("pct_from_pivot") or 0.0))
 
 
+def canslim_tier(c: dict) -> dict:
+    """
+    17.11.2026 (пакет 2, т. 1 — А5): нивото на картата — {"tier": "canslim" | "trend", "label"}. C = EPS от отчета (earnings.eps_report_yoy.pct) ≥ config.CANSLIM_C_MIN_EPS_PCT
+    → „CANSLIM“; под прага → „Тренд без ръст“; без EPS от отчета → „Тренд без ръст“ с етикет „EPS: няма данни“ (не се брои за 0). Чиста функция.
+    """
+    pct = (((c or {}).get("earnings") or {}).get("eps_report_yoy") or {}).get("pct")
+    if pct is None:
+        return {"tier": "trend", "label": "EPS: няма данни"}
+    if pct >= config.CANSLIM_C_MIN_EPS_PCT:
+        return {"tier": "canslim", "label": f"EPS от отчета {pct:+.0f}% г/г"}
+    return {"tier": "trend", "label": f"EPS от отчета {pct:+.0f}% г/г — под {config.CANSLIM_C_MIN_EPS_PCT:g}%"}
+
+
 def fundamentals_priority(row: dict) -> tuple:
     """
     06.11.2026 (пакет 05–06.11, т. 2): кои влизат в първите 60 за проверка на фундаментите (Yahoo .info — таванът е заради 401) — по RS rating, най-силните първи; при равен RS — screen_priority.

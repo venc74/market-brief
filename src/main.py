@@ -647,6 +647,7 @@ def run() -> dict:
     # „Защо е тук“ е от кода (render.why_here — RS, RS линия, Stage 2, EPS, сектор). card["ai"] остава контейнер за класа от кода (apply_hard_rules).
     for c in candidates:
         c["ai"] = {}
+        c["tier"] = setup_rules.canslim_tier(c)                     # 17.11.2026 (пакет 2, т. 1 — А5): „CANSLIM“ (C: EPS от отчета ≥ 25%) / „Тренд без ръст“
     # 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT (екстремумите, потвърждението от цената, всички 40 пазара) — махнат изцяло
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
