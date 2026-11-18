@@ -53,12 +53,33 @@ def parse_econ(payload: dict | None, day: dt.date) -> list[dict]:
     return out
 
 
+def market_cap(v) -> float | None:
+    """Nasdaq "marketCap" („$264,078,852,000“) → число; празно / „N/A“ → None. Чиста функция."""
+    try:
+        x = float(_clean(v).replace("$", "").replace(",", ""))
+        return x if x > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
 def parse_earnings(payload: dict | None, day: dt.date) -> list[dict]:
-    """Отговорът на Nasdaq за отчетите → [{date, ticker, name, when ("преди отварянето" / "след затварянето" / "неизвестен час"), eps_forecast}]."""
+    """
+    Отговорът на Nasdaq за отчетите → [{date, ticker, name, when ("преди отварянето" / "след затварянето" / "неизвестен час"), eps_forecast, market_cap}].
+    18.11.2026 (т. 6): + market_cap (за големите компании в календара); от т. 2 — и eps / surprise, когато Nasdaq ги дава (след отчета).
+    """
     rows = ((payload or {}).get("data") or {}).get("rows") or []
     when = {"time-pre-market": "преди отварянето", "time-after-hours": "след затварянето"}
     return [{"date": day.isoformat(), "ticker": str(r.get("symbol") or "").upper().replace(".", "-"), "name": _clean(r.get("name")),
-             "when": when.get(r.get("time"), "неизвестен час"), "eps_forecast": _clean(r.get("epsForecast"))} for r in rows if isinstance(r, dict) and r.get("symbol")]
+             "when": when.get(r.get("time"), "неизвестен час"), "eps_forecast": _clean(r.get("epsForecast")), "market_cap": market_cap(r.get("marketCap")),
+             **({"eps": _clean(r.get("eps"))} if _clean(r.get("eps")) else {}), **({"surprise": _clean(r.get("surprise"))} if _clean(r.get("surprise")) else {})}
+            for r in rows if isinstance(r, dict) and r.get("symbol")]
+
+
+def cap_label(cap: float | None) -> str | None:
+    """18.11.2026 (т. 6): „капитализация $264 млрд“ (≥ $1 трлн — „$4.0 трлн“); под config.WEEK_CAL_MIN_MARKET_CAP / без → None. Чиста функция."""
+    if not cap or cap < config.WEEK_CAL_MIN_MARKET_CAP:
+        return None
+    return f"капитализация ${cap / 1e12:.1f} трлн" if cap >= 1e12 else f"капитализация ${cap / 1e9:.0f} млрд"
 
 
 def key_kind(event: str) -> str | None:
@@ -154,11 +175,13 @@ def reconcile_dates(week: dict, known: dict | None) -> dict:
 def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None, earnings_fn=None) -> dict:
     """
     → {"ok", "source", "days": [{date, weekday, earnings, fed, econ}], "errors": [...], "big_n", "ours_n"}. big — {тикър: етикет} (компаниите > 2% в S&P 500), ours — {тикър: къде}
+    (18.11.2026, т. 6: + капитализация ≥ config.WEEK_CAL_MIN_MARKET_CAP по Nasdaq "marketCap")
     (картите, книгите, наблюдаваните). Отчетите — само за тях; Fed — речи, протоколи, решения; данните — KEY_EVENTS с консенсуса. Провал на ден → в "errors", останалото минава.
     """
     econ_fn, earnings_fn = econ_fn or fetch_econ, earnings_fn or fetch_earnings
     big, ours = big or {}, ours or {}
-    out = {"ok": True, "source": "Nasdaq (api.nasdaq.com — календар на икономическите данни и на отчетите)", "days": [], "errors": [], "big_n": len(big), "ours_n": len(ours)}
+    out = {"ok": True, "source": "Nasdaq (api.nasdaq.com — календар на икономическите данни и на отчетите)", "days": [], "errors": [], "big_n": len(big), "ours_n": len(ours),
+           "cap_min_bn": round(config.WEEK_CAL_MIN_MARKET_CAP / 1e9)}                     # 18.11.2026 (т. 6)
     econ_by_day = {}
     for d in week_days(today):
         day = {"date": d.isoformat(), "weekday": _WD[d.weekday()], "earnings": [], "fed": [], "econ": []}
@@ -174,8 +197,9 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
             print(f"[calendar] икономически данни {d}: {type(e).__name__}: {e}")
         try:
             for r in earnings_fn(d):
-                if r["ticker"] in big or r["ticker"] in ours:
-                    day["earnings"].append({**r, "why": big.get(r["ticker"]) or ours.get(r["ticker"])})
+                cap = cap_label(r.get("market_cap"))                          # 18.11.2026 (т. 6): и големите компании (≥ $100 млрд), не само теглото > 2%
+                if r["ticker"] in big or r["ticker"] in ours or cap:
+                    day["earnings"].append({**r, "why": big.get(r["ticker"]) or ours.get(r["ticker"]) or cap})
         except Exception as e:
             out["errors"].append(f"отчети {d:%d.%m}: {type(e).__name__}")
             print(f"[calendar] отчети {d}: {type(e).__name__}: {e}")

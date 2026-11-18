@@ -317,7 +317,7 @@ def _week_calendar_ctx(wc: dict | None) -> dict | None:
     except Exception as e:
         print(f"[render] календарът на седмицата: {type(e).__name__}: {e}")
         days = []
-    return {"ok": wc.get("ok"), "source": wc.get("source"), "errors": wc.get("errors") or [], "weights_note": wc.get("weights_note"), "days": days}
+    return {"ok": wc.get("ok"), "source": wc.get("source"), "errors": wc.get("errors") or [], "weights_note": wc.get("weights_note"), "days": days, "cap_min_bn": wc.get("cap_min_bn")}
 
 
 def _week_calendar_email(wc: dict | None) -> str:
