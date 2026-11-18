@@ -85,7 +85,8 @@ finally:
 tb = {i["name"]: i for i in t["indicators"]}
 assert tb["2Y/10Y спред"]["as_of"] == "2026-11-10" and tb["2Y/10Y спред"]["bond_closed"]["text"] == "облигационният пазар беше затворен (11.11) — стойността е от 10.11"
 assert sorted(n for n, i in tb.items() if i.get("bond_closed")) == sorted(marked)
-assert t["regime"] == R["thermometer"]["regime"] and t["counts"] == R["thermometer"]["counts"]      # режимът и броенето — същите
+assert t["regime_by_count"] == R["thermometer"]["regime_by_count"] or t["counts"] != R["thermometer"]["counts"]      # 17.11.2026 (пакет 3): 2Y/10Y и Put/Call — извън броенето
+assert "2Y/10Y спред" in t["counts"] and "не се броят" in t["counts"]
 assert "[thermo] облигационният пазар беше затворен — етикет върху:" in log.getvalue()
 ctx = {r["name"]: r for r in ai_brief._thermo_context(t)}
 assert ctx["MOVE (Bond Vol)"]["note"] == "облигационният пазар беше затворен (11.11) — стойността е от 10.11" and "note" not in ctx["VIX"]

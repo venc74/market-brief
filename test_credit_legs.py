@@ -48,8 +48,11 @@ with tempfile.TemporaryDirectory() as tmp:
         th._OVERRIDE_STATE_FILE = orig
         for n, f in saved.items():
             setattr(th, n, f)
-assert t["regime_reason"].startswith("IEI/HYG credit spread spike (+1.0% за 10д: IEI +0.9%, HYG -0.1%, 95. percentile) — рязък скок на IEI/HYG (лихви + кредит), "
-                                     "автоматичен Defensive режим, sizing −50%"), t["regime_reason"]          # (празно състояние → MOVE в хистерезис след него)
+# 17.11.2026 (пакет 3): IEI/HYG override — само при кредитен натиск; на 19.10 HYG е −0.1% за 10 дни (праг −1%), HY OAS тогава още не се теглеше → override-ът отпада
+g = t["credit_gate"]
+assert g and g["removed"] and g["hyg_10d_pct"] == -0.07 and g["oas_missing"] and not any(o["trigger"] == "IEI/HYG" for o in t["overrides"])
+assert "HYG за 10 дни -0.1% (праг -1%)" in t["credit_pressure"]["text"] and "HY OAS: няма данни" in t["credit_pressure"]["text"]
+assert t["regime_reason"].startswith("MOVE 101: спайкът отшумява"), t["regime_reason"]          # остава MOVE в хистерезис
 assert "credit risk premium" not in t["regime_reason"] and "credit risk premium" in B19["thermometer"]["regime_reason"]
-print(f"  ✓ '{t['regime_reason'][:150]}…' (беше '… рязко разширяване на credit risk premium …')")
+print(f"  ✓ IEI/HYG скок без кредитен натиск (HYG -0.1%) — не блокира; „{t['credit_pressure']['text']}“")
 print("\n✅ test_credit_legs: всичко мина")

@@ -36,6 +36,9 @@ def spy_trend() -> dict:
         if any(math.isnan(v) for v in (price, ma50, ma200)):
             raise ValueError("NaN в SPY цена/MA — невалидни данни от източника")
         above50, above200 = price > ma50, price > ma200
+        sma50 = close.rolling(50).mean()
+        ma50_prev = float(sma50.iloc[-1 - config.REGIME_TREND_RISING_SESSIONS])          # 17.11.2026 (пакет 3): „растяща 50DMA“
+        ma50_rising = ma50 > ma50_prev
         status = "green" if (above50 and above200) else ("yellow" if above200 else "red")
         # FIX 2026-09-28: разстояние до 52-седмичния връх (затваряния) — за
         # бележката за разминаване с Market Breadth; не влияе на статуса
@@ -46,6 +49,7 @@ def spy_trend() -> dict:
             "pct_from_high": round((1 - price / high_52w) * 100, 2),
             "ma50": round(ma50, 2), "ma200": round(ma200, 2),
             "above_50dma": above50, "above_200dma": above200, "status": status,
+            "ma50_prev": round(ma50_prev, 2), "ma50_rising": bool(ma50_rising), "trend_ok": bool(above50 and ma50_rising),     # 17.11.2026 (пакет 3)
             "label": f"SPY {price:.0f} | {'над' if above50 else 'под'} 50DMA, "
                      f"{'над' if above200 else 'под'} 200DMA",
         }
@@ -959,7 +963,7 @@ def apply_distribution_cap(thermo: dict, distribution_days: dict | None, today: 
     blk = _distribution_block(distribution_days, (distribution_days or {}).get("as_of") or today_iso, history)     # 16.10.2026 (В2в): денят е датата на бара
     if not blk["blocked"]:
         return thermo
-    count_regime = thermo.get("regime_by_count") or thermo.get("regime")
+    count_regime = thermo.get("regime_by_rule") or thermo.get("regime_by_count") or thermo.get("regime")      # 17.11.2026 (пакет 3): по правилото
     if count_regime != "Offensive" or thermo.get("regime") not in ("Offensive", "Defensive"):
         return thermo
     lb, red, need = config.DISTRIBUTION_DAYS_LOOKBACK, config.DISTRIBUTION_DAYS_RED, config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS
@@ -1329,6 +1333,9 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         indicators.append(market_breadth())
         _breadth_divergence(indicators)
 
+    for i in indicators:                                                 # 17.11.2026 (пакет 3): 2Y/10Y и Put/Call — информативни (извън броенето)
+        if i.get("name") in config.REGIME_INFO_ONLY:
+            i["informational"] = True
     count_regime, count_reason, counts = _count_regime(indicators)
 
     vix_val = next((i["value"] for i in indicators if i["name"] == "VIX"), None)
@@ -1481,7 +1488,17 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
     # сортировка — VIX/MOVE/IEI-HYG редът се пази вътре във всяка група)
     overrides.sort(key=lambda o: o.get("state", "active") != "active")
 
+    # 17.11.2026 (пакет 3): IEI/HYG override — само при кредитен натиск (HYG 10 дни ≤ −1% или HY OAS ≥ 75-и перцентил на 20-дневната промяна)
+    cp = credit_pressure(credit_ind, oas_ind)
+    credit_gate = None
+    if any(o["trigger"] == "IEI/HYG" for o in overrides) and cp["active"] is False:           # без данни за кредита (HYG и HY OAS) — override-ът остава (не може да се провери)
+        credit_gate = {"removed": True, **cp}
+        overrides = [o for o in overrides if o["trigger"] != "IEI/HYG"]
     regime, reason, exit_rule = _merge_regime(count_regime, count_reason, counts, overrides)
+    spy_ok = bool(spy_ind.get("trend_ok")) and not spy_ind.get("hide")
+    ov_missing = override_data_missing(indicators)
+    regime_by_rule = "Cash" if count_regime == "Cash" else ("Offensive" if (spy_ok and not overrides and not ov_missing) else "Defensive")
+    regime = regime_by_rule                                              # окончателното (с distribution days и престоя) — apply_market_rule
 
     # FIX 2026-10-03 (пакет 2 т.10): override, освободен днес заради дълго отсъствие на данни, се казва в брифа — иначе
     # режимът "тихо" се смекчава (виж _hysteresis_hidden). Структурирано поле + изречение в regime_reason.
@@ -1515,9 +1532,118 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
             # би дало броенето само по себе си — за header-а и за макро промпта.
             "counts": counts, "overrides": overrides,
             "regime_by_count": count_regime,
+            "regime_by_rule": regime_by_rule, "credit_pressure": cp, "credit_gate": credit_gate,     # 17.11.2026 (пакет 3)
             "exit_rule": exit_rule,
             "hysteresis_released": released,
             }
+
+
+def override_data_missing(indicators: list[dict]) -> list[str]:
+    """17.11.2026 (пакет 3): без данни за VIX / MOVE „няма override“ не може да се потвърди — имената на липсващите (скрити) уреди."""
+    names = {"VIX": "VIX", "MOVE (Bond Vol)": "MOVE"}
+    return [names[i["name"]] for i in indicators or [] if i.get("name") in names and (i.get("hide") or i.get("value") is None)]
+
+
+def credit_pressure(credit_ind: dict | None, oas_ind: dict | None) -> dict:
+    """
+    17.11.2026 (пакет 3): кредитният натиск — HYG за 10 дни ≤ config.CREDIT_PRESSURE_HYG_10D_PCT ИЛИ 20-дневната промяна на HY OAS ≥ config.CREDIT_PRESSURE_OAS_CHG_PCT
+    перцентил. HY OAS без данни (FRED) → преценка само по HYG и изричен ред „HY OAS: няма данни от ДД.ММ“; без двете → active None. Чиста функция.
+    """
+    hyg = (credit_ind or {}).get("hyg_10d_pct") if not (credit_ind or {}).get("hide") else None
+    hy = (oas_ind or {}).get("hy") or {}
+    oas = hy.get("chg_pct") if (oas_ind and not hy.get("hide") and hy.get("chg_pct") is not None) else None
+    out = {"hyg_10d_pct": hyg, "oas_chg_pct": oas, "oas_as_of": hy.get("as_of"), "oas_missing": oas is None, "active": None, "text": ""}
+    parts = []
+    if hyg is not None:
+        parts.append(f"HYG за 10 дни {hyg:+.1f}% (праг {config.CREDIT_PRESSURE_HYG_10D_PCT:g}%)")
+    if oas is not None:
+        parts.append(f"HY OAS — {oas:.0f}-и перцентил на 20-дневната промяна (праг {config.CREDIT_PRESSURE_OAS_CHG_PCT:.0f}-и)")
+    else:
+        last = hy.get("as_of") or (oas_ind or {}).get("as_of")
+        parts.append(f"HY OAS: няма данни" + (f" от {last[8:10]}.{last[5:7]}" if last else "") + " — само по HYG")
+    if hyg is None and oas is None:
+        out.update(active=None, text="кредит: няма данни (HYG и HY OAS)")
+        return out
+    out["active"] = bool((hyg is not None and hyg <= config.CREDIT_PRESSURE_HYG_10D_PCT) or (oas is not None and oas >= config.CREDIT_PRESSURE_OAS_CHG_PCT))
+    out["text"] = "; ".join(parts)
+    return out
+
+
+def apply_market_rule(thermo: dict, distribution_days: dict | None = None, prev_thermo: dict | None = None, today: dt.date | None = None, history=None,
+                      dd_block: dict | None = None) -> dict:
+    """
+    17.11.2026 (пакет 3 — решение след реплея): ЕДНОТО пазарно правило за всички стратегии и несиметричният престой. Условия за Offensive: SPY над растяща 50DMA, няма
+    активен override (VIX, MOVE, IEI/HYG при кредитен натиск), distribution days не са червени. Не са изпълнени → Defensive (Cash при 3+ червени броени уреда) — ВЕДНАГА;
+    изпълнени → Offensive само ако и предишният бриф е бил Offensive или условията са изпълнени config.REGIME_OFFENSIVE_CONFIRM_DAYS поредни брифа („ден 1 от 2“).
+    thermo["rule"] = {"version", "conditions": [{"key", "ok", "text"}], "met", "streak", "pending", "line"}; regime_reason — редът с условията (без „X зелени / Y жълти“).
+    dd_block — готовият блок (тестовете); иначе _distribution_block (идемпотентен за деня). Не вдига: грешка → thermo непроменен.
+    """
+    if not isinstance(thermo, dict) or thermo.get("unavailable") or not thermo.get("indicators"):
+        return thermo
+    try:
+        out = dict(thermo)
+        spy = next((i for i in thermo["indicators"] if i.get("name") == "SPY тренд"), {}) or {}
+        conds = []
+        if spy.get("hide") or spy.get("value") is None:
+            conds.append({"key": "trend", "ok": False, "text": "SPY тренд: няма данни — Offensive не може да се потвърди"})
+        elif spy.get("trend_ok"):
+            conds.append({"key": "trend", "ok": True, "text": f"SPY {spy['value']:.0f} над растяща 50DMA ({spy.get('ma50'):.0f}) ✓"})
+        elif not spy.get("above_50dma"):
+            conds.append({"key": "trend", "ok": False, "text": f"SPY {spy['value']:.0f} под 50DMA ({spy.get('ma50'):.0f}) ✗"})
+        else:
+            conds.append({"key": "trend", "ok": False, "text": f"SPY над 50DMA, но тя не расте ({spy.get('ma50_prev'):.0f} → {spy.get('ma50'):.0f}) ✗"})
+        ov = thermo.get("overrides") or []
+        miss = override_data_missing(thermo["indicators"])
+        if miss and not ov:
+            conds.append({"key": "override", "ok": False, "text": f"override: няма данни за {', '.join(miss)} — не може да се провери ✗"})
+        elif ov:
+            conds.append({"key": "override", "ok": False, "text": "override: " + "; ".join(o.get("trigger", "?") + (" (хистерезис)" if o.get("state") == "hysteresis" else "") for o in ov) + " ✗"})
+        else:
+            g = thermo.get("credit_gate")
+            conds.append({"key": "override", "ok": True, "text": "няма override ✓" + (" (IEI/HYG скок без кредитен натиск — не блокира)" if g else "")})
+        if dd_block is None:
+            today_iso = (today or dt.date.today()).isoformat()
+            dd_block = _distribution_block(distribution_days, (distribution_days or {}).get("as_of") or today_iso, history) if config.DISTRIBUTION_DAYS_BLOCKS_OFFENSIVE else {"blocked": False}
+        dd = distribution_days or {}
+        if dd_block.get("blocked"):
+            conds.append({"key": "dd", "ok": False, "text": f"distribution days червени (SPY {dd.get('spy_count', '?')}, QQQ {dd.get('qqq_count', '?')}; праг {config.DISTRIBUTION_DAYS_RED})"
+                          + (" — по хистерезис" if dd_block.get("kind") == "hysteresis" else "") + " ✗"})
+        else:
+            conds.append({"key": "dd", "ok": True, "text": "distribution days не са червени ✓"})
+        met = all(c["ok"] for c in conds)
+        cash = thermo.get("regime_by_count") == "Cash"
+        prev_rule = (prev_thermo or {}).get("rule") or {}
+        prev_regime = (prev_thermo or {}).get("regime")
+        need = config.REGIME_OFFENSIVE_CONFIRM_DAYS
+        pending = None
+        if not met or cash:
+            regime, streak = ("Cash" if cash else "Defensive"), (int(prev_rule.get("streak") or 0) + 1 if (met and prev_rule.get("met")) else (1 if met else 0))
+        elif prev_regime == "Offensive":
+            regime, streak = "Offensive", max(int(prev_rule.get("streak") or 0) + 1, need)
+        else:
+            streak = (int(prev_rule.get("streak") or 0) if prev_rule.get("met") else 0) + 1
+            if streak >= need:
+                regime = "Offensive"
+            else:
+                regime = "Defensive"
+                pending = f"условията са изпълнени — ден {streak} от {need}: Offensive от утре, ако се задържат"
+        red = [i["name"] for i in thermo["indicators"] if not i.get("informational") and not i.get("hide") and i.get("status") == "red"]
+        line = " · ".join(c["text"] for c in conds)
+        if cash:
+            line += f" · Cash: {len(red)} червени уреда ({', '.join(red)})"
+        if pending:
+            line += f" · {pending}"
+        cp = thermo.get("credit_pressure") or {}
+        out.update(regime=regime, sizing_factor=1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR,
+                   regime_reason=line,
+                   exit_rule=("Offensive се задържа, докато трите условия са изпълнени; при първото неизпълнено — Defensive още същия ден." if regime == "Offensive" else
+                              f"Offensive: трите условия ({'; '.join(c['text'] for c in conds if not c['ok']) or 'изпълнени'}) — {need} поредни дни."),
+                   rule={"version": config.REGIME_RULE_VERSION, "conditions": conds, "met": met, "streak": streak, "pending": pending, "cash": cash,
+                         "line": line, "credit": cp.get("text")})
+        return out
+    except Exception as e:
+        print(f"[thermo] пазарното правило не се приложи: {type(e).__name__}: {e}")
+        return thermo
 
 
 def thermometer_unavailable(exc: BaseException) -> dict:

@@ -460,7 +460,15 @@
       {# FIX 2026-09-25: override-ът като ред НАД броенето, броенето — винаги.
          Дотук при override `regime_reason` подменяше броенето изцяло.
          Стари брифове без `counts` показват regime_reason както преди. #}
-      {% if thermometer.counts is defined %}
+      {% if thermometer.rule is defined and thermometer.rule %}
+        {# 17.11.2026 (пакет 3): едното пазарно правило — ред с условията (✓ / ✗) и престоя; уредите — само информация #}
+        <div class="regime-reason">{% for c in thermometer.rule.conditions %}<span style="color:{{ 'var(--green)' if c.ok else 'var(--red)' }}">{{ c.text }}</span>{{ " · " if not loop.last else "" }}{% endfor %}</div>
+        {% if thermometer.rule.pending %}<div class="regime-reason" style="color:var(--yellow)">⏳ {{ thermometer.rule.pending }}</div>{% endif %}
+        {% if thermometer.rule.cash %}<div class="regime-reason" style="color:var(--red)">{{ thermometer.rule.line.split(" · Cash: ")[1].split(" · ")[0] if " · Cash: " in thermometer.rule.line else "" }}</div>{% endif %}
+        {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+        {% if thermometer.rule.credit %}<div class="regime-reason" style="color:var(--muted)">Кредит: {{ thermometer.rule.credit }}</div>{% endif %}
+        <div class="regime-reason" style="color:var(--muted)">Едно правило за CANSLIM, Kullamägi и GLB; Offensive — след {{ regime_confirm_days }} поредни дни с изпълнени условия, Defensive — веднага.</div>
+      {% elif thermometer.counts is defined %}
         {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
         {# пакет 2 т.10: override, освободен заради дълго отсъствие на данни — да се види в брифа #}
         {% if thermometer.hysteresis_released %}<div class="regime-reason" style="color:var(--yellow)">{% for r in thermometer.hysteresis_released %}⚡ Override-ът за {{ r.trigger }} е ОСВОБОДЕН: {{ r.hidden_days }} поредни дни без данни за индикатора — режимът е по броенето, не по override.{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
@@ -1785,8 +1793,10 @@
     {% endif %}
     <b>Рискът:</b> механичен скрийнър извън CANSLIM, без стоп освен линията — информация, не препоръка.
   </div>
-  {# 03.11.2026 (т. 13, 1): пазарът — QQQ спрямо SMA10 / SMA20, както при Kullamägi; точното пазарно правило на Уиш (неговият GMI) не е публикувано — затова „наш заместител“ #}
-  {% if glb_market_line %}<div class="small" style="font-size:12.5px;margin:0 0 10px;color:{{ 'var(--green)' if qm_market.above10 and qm_market.above20 else ('var(--red)' if not qm_market.above10 and not qm_market.above20 else 'var(--yellow)') }}"><b>{{ glb_market_line }}</b>
+  {# 17.11.2026 (пакет 3): едното пазарно правило вместо отделния ред за GLB (до 17.11 — QQQ спрямо SMA10 / SMA20, „наш заместител на пазарното правило на Уиш“) #}
+  {% if thermometer.rule is defined and thermometer.rule %}<div class="small" style="font-size:12.5px;margin:0 0 10px;color:{{ 'var(--green)' if regime == 'Offensive' else 'var(--yellow)' }}"><b>Пазарът: {{ regime }}</b>
+    <span style="color:var(--muted)">· едното правило за всички стратегии (горе, в режима): {{ thermometer.rule.conditions|map(attribute='text')|join(' · ') }}{% if thermometer.rule.pending %} · {{ thermometer.rule.pending }}{% endif %}</span></div>
+  {% elif glb_market_line %}<div class="small" style="font-size:12.5px;margin:0 0 10px;color:{{ 'var(--green)' if qm_market.above10 and qm_market.above20 else ('var(--red)' if not qm_market.above10 and not qm_market.above20 else 'var(--yellow)') }}"><b>{{ glb_market_line }}</b>
     <span style="color:var(--muted)">· QQQ ${{ "%.2f"|format(qm_market.close) }} на {{ qm_market.date[8:10] }}.{{ qm_market.date[5:7] }}, SMA10 ${{ "%.2f"|format(qm_market.sma10) }}, SMA20 ${{ "%.2f"|format(qm_market.sma20) }} — наш заместител на пазарното правило на Уиш (неговият индикатор GMI; точното правило не е публикувано), само информация</span></div>{% endif %}
   {% if glb_status and glb_status.ok is sameas false %}
   <div class="small" style="font-size:12.5px;color:var(--yellow);margin-bottom:8px">⚠ Скрийнърът не се изпълни днес ({{ glb_status.error or "Yahoo не върна данни" }}) — празният списък НЕ значи, че няма GLB кандидати.</div>

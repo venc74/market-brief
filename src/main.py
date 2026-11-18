@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import config
 
 from src.macro_layer import collect_macro_layer
-from src.thermometer import build_thermometer, thermometer_unavailable, apply_distribution_cap
+from src.thermometer import build_thermometer, thermometer_unavailable, apply_distribution_cap, apply_market_rule
 from src.sector_layer import sector_rotation, leading_sectors
 from src.screener import run_screen
 from src import screener, sector_layer, data_warnings
@@ -525,13 +525,17 @@ def run() -> dict:
         thermo = steps.step("distribution_cap", lambda: apply_distribution_cap(thermo, distribution_days, history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS)),
                             fallback=thermo, label="Ограничението на режима от distribution days",
                             consequence="режимът днес е без този блок; може да е по-висок, отколкото правилото позволява")
+    # 17.11.2026 (пакет 3): ЕДНОТО пазарно правило (SPY над растяща 50DMA, няма override, distribution days не са червени) и несиметричният престой
+    prev_for_regime = data_rhythm.previous_brief(today) or {}
+    thermo = steps.step("market_rule", lambda: apply_market_rule(thermo, distribution_days, prev_for_regime.get("thermometer"), dt.date.fromisoformat(today),
+                                                                  history=lambda: entry_timing.distribution_history(config.DISTRIBUTION_SEED_SESSIONS)),
+                        fallback=thermo, label="Пазарното правило за режима", consequence="режимът днес е по правилото без престоя и без реда с условията")
     print(f"      Режим: {thermo['regime']} — {thermo['regime_reason']}")
     # 15.10.2026: "Запас до смяна на режима" от кода (карта на термометъра + макро промпт) — след distribution days, преди макро брифа
     thermo["regime_margin"] = regime_claims.margin(thermo, distribution_days, dict(entry_timing.LAST_STATUS))
     if thermo["regime_margin"]["text"]:
         print(f"      {thermo['regime_margin']['text']}")
     # 04.11.2026 (прегледът, т. 3): какво промени режима спрямо предишния бриф — от кода, само при смяна
-    prev_for_regime = data_rhythm.previous_brief(today) or {}
     thermo["regime_change"] = regime_claims.regime_change(prev_for_regime.get("thermometer"), thermo, prev_for_regime.get("date"))
     if thermo["regime_change"]:
         print(f"      Какво промени режима: {thermo['regime_change']['text']}")

@@ -744,6 +744,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         ny_open_berlin=setup_rules.ny_time_in_berlin(today, 9, 30),            # 16.10.2026: "Проверката е отварянето (15:30 CEST / 09:30 ET)" — от часовите зони
         regime=brief["thermometer"]["regime"],
         regime_reason=brief["thermometer"]["regime_reason"],
+        regime_confirm_days=config.REGIME_OFFENSIVE_CONFIRM_DAYS,                # 17.11.2026 (пакет 3)
         thermometer=brief["thermometer"],
         macro_brief=brief["ai_macro"]["macro_brief"],
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
@@ -945,7 +946,7 @@ def render_email(brief: dict) -> str:
     t = brief["thermometer"]
     # FIX 2026-09-25: при override броенето не изчезва — добавя се след причината
     regime_line = _e(t["regime_reason"]) + (
-        f" · {_e(t['counts'])}" if t.get("overrides") and t.get("counts") else "")
+        f" · {_e(t['counts'])}" if t.get("overrides") and t.get("counts") and not t.get("rule") else "")       # 17.11.2026 (пакет 3): с правилото — само условията
     regime = t["regime"]
     color = {"Offensive": "#0e9f6e", "Defensive": "#d97706", "Cash": "#dc2626"}[regime]
 

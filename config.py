@@ -455,6 +455,19 @@ VIX_SPIKE_WEEKLY_PCT = float(os.getenv("VIX_SPIKE_WEEKLY_PCT", 20.0))
 # 2026-10-03 (пакет 2 т.2): Fed Net Liquidity стана САМО информативен (не се брои), затова
 # бройките са 8 вместо 9 и прагът е 6 от 8 (беше 7 от 9 — същата пропорция ~75%).
 THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE = int(os.getenv("THERMOMETER_MIN_VISIBLE_FOR_OFFENSIVE", 6))
+# 17.11.2026 (пакет 3 — решение след реплея): ЕДНО пазарно правило за всички стратегии (thermometer.apply_market_rule). Нови входове (Offensive) само когато:
+#   • SPY е над растяща 50DMA (затваряне > SMA50 и SMA50 > SMA50 преди REGIME_TREND_RISING_SESSIONS сесии) — условие, не глас;
+#   • няма активен override: VIX > 30, MOVE (както досега) или IEI/HYG — само при кредитен натиск: HYG за 10 дни ≤ CREDIT_PRESSURE_HYG_10D_PCT или 20-дневната промяна
+#     на HY OAS ≥ CREDIT_PRESSURE_OAS_CHG_PCT перцентил (−1% ≈ 10-ия перцентил на 10-дневните промени на HYG 2024–2026: −0.92%);
+#   • distribution days не са червени.
+# Несиметричен престой: към Defensive / Cash — веднага; към Offensive — след REGIME_OFFENSIVE_CONFIRM_DAYS поредни брифа с изпълнени условия. Cash — при 3+ червени
+# броени уреда (както досега). 2Y/10Y и Put/Call — информативни (REGIME_INFO_ONLY). Реплеят на 110 брифа (13.06–17.11) — docs/HISTORY.md.
+REGIME_RULE_VERSION = "2026-11-18"
+REGIME_TREND_RISING_SESSIONS = int(os.getenv("REGIME_TREND_RISING_SESSIONS", 5))
+CREDIT_PRESSURE_HYG_10D_PCT = float(os.getenv("CREDIT_PRESSURE_HYG_10D_PCT", -1.0))
+CREDIT_PRESSURE_OAS_CHG_PCT = float(os.getenv("CREDIT_PRESSURE_OAS_CHG_PCT", 75.0))
+REGIME_OFFENSIVE_CONFIRM_DAYS = int(os.getenv("REGIME_OFFENSIVE_CONFIRM_DAYS", 2))
+REGIME_INFO_ONLY = ("2Y/10Y спред", "Put/Call (SPY)")
 
 # 2026-10-03 (пакет 2 т.3): Put/Call на SPY — калибриран спрямо СОБСТВЕНАТА история (percentile, като IEI/HYG), не
 # спрямо фиксирани 1.1/0.7. Проблемът: P/C на най-близкия SPY експирейшън има медиана 1.12 (хеджиране) — старият праг

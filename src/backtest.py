@@ -261,6 +261,11 @@ def _is_continuation(tracker: dict, ticker: str, entry_date: str, category: str 
 _V2_PLAN_KEYS = ("buy_stop", "max_chase", "stop_loss", "target_1", "entry_mid")
 
 
+def regime_rule_tag(entry_date: str) -> dict:
+    """17.11.2026 (пакет 3): новите записи (от config.REGIME_RULE_VERSION) пазят, че режимът им е по едното пазарно правило; старите не се пипат."""
+    return {"regime_rule": config.REGIME_RULE_VERSION} if str(entry_date) >= config.REGIME_RULE_VERSION else {}
+
+
 def _new_v2_record(ticker: str, entry_date: str, plan: dict) -> dict:
     """
     v2 запис: entry_date = датата на брифа (препоръката); реалният вход е fill_date /
@@ -522,6 +527,7 @@ def _ingest_action_list(tracker: dict, entry_date: str, action_list: list[dict])
             if _spinoff_skip(ticker, entry_date, CATEGORY_ACTION):
                 continue
             tracker[key] = _new_v2_record(ticker, entry_date, plan)
+            tracker[key].update(regime_rule_tag(entry_date))                     # 17.11.2026 (пакет 3): режимът е по едното правило
             if c.get("tier"):
                 tracker[key]["tier"] = (c["tier"] or {}).get("tier")          # 17.11.2026 (пакет 2, т. 1): нивото пази и записът (старите — без поле)
             continue
@@ -581,7 +587,7 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
         if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_BUYSTOP) or _spinoff_skip(ticker, entry_date, CATEGORY_BUYSTOP):
             continue
         rec = _new_v2_record(ticker, entry_date, plan)
-        rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot")})
+        rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot"), **regime_rule_tag(entry_date)})
         if c.get("tier"):
             rec["tier"] = (c["tier"] or {}).get("tier")                        # 17.11.2026 (пакет 2, т. 1): нивото на картата
         tracker[key] = rec
@@ -610,7 +616,7 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         key = f"{ticker}_{entry_date}_qm"
         if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
             continue
-        rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime,
+        rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime, **regime_rule_tag(entry_date),
                **({"entry_rule": QM_ENTRY_RULE} if entry_date >= config.QM_FIRST_BAR_RULE_FROM else {}),       # 17.11.2026 (пакет 2, т. 3)
                "nasdaq": dict(nasdaq) if nasdaq else None,
                "buy_stop": round(float(c["trigger"]), 4), "adr": round(float(c["adr"]), 2), "signal_price": c.get("close"), "entry_price": c.get("close"),
@@ -676,7 +682,7 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
         key = f"{ticker}_{entry_date}{suffix}"
         if key in tracker or _is_continuation(tracker, ticker, entry_date, category) or _spinoff_skip(ticker, entry_date, category):
             continue
-        rec = {"method": "v2", "category": category, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime,
+        rec = {"method": "v2", "category": category, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime, **regime_rule_tag(entry_date),
                "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),
                "months_unpenetrated": c.get("months_unpenetrated"), "band_hold_pct": c.get("band_hold_pct"), "resolution_date": None, "discovered_date": None,
                "spy_return_pct": None, "spy_return_pct_exec": None, "alpha_pct": None, "alpha_pct_exec": None}

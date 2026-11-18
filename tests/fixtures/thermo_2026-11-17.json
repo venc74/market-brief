@@ -1,0 +1,194 @@
+{
+"_note": "РЕАЛНО: thermometer и distribution_days от брифа на 17.11.2026 (data/2026-11-17.json), копирано 18.11.2026 — изчислени със старото правило (преди пакет 3).",
+"thermometer": {
+"indicators": [
+{
+"name": "SPY тренд",
+"value": 739.95,
+"as_of": "2026-11-16",
+"pct_from_high": 5.02,
+"ma50": 763.52,
+"ma200": 729.58,
+"above_50dma": false,
+"above_200dma": true,
+"status": "yellow",
+"label": "SPY 740 | под 50DMA, над 200DMA"
+},
+{
+"name": "VIX",
+"value": 22.91,
+"chg_5d": 2.99,
+"pct_5d": 15.0,
+"spike": false,
+"status": "yellow",
+"label": "VIX 22.9 (неутрално)"
+},
+{
+"name": "Put/Call (SPY)",
+"value": 1.07,
+"raw": 1.21,
+"avg_days": 3,
+"percentile": 32.7,
+"history_days": 107,
+"status": "yellow",
+"label": "P/C 1.21 днес · 3-дн. средно 1.07 (33. percentile на средното от 107 дни; в нормалния диапазон) — цветът е по средното"
+},
+{
+"name": "2Y/10Y спред",
+"value": 0.29,
+"status": "green",
+"label": "0.29% (нормален, flattening)",
+"as_of": "2026-11-16"
+},
+{
+"name": "Fed Net Liquidity",
+"value": 5846.6,
+"status": "yellow",
+"informational": true,
+"change_4w_pct": -0.39,
+"as_of": "2026-11-11",
+"label": "$5,847 млрд към 2026-11-11 · -0.4% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+},
+{
+"name": "SOFR − IORB (финансиране)",
+"value": 0.0,
+"status": "yellow",
+"informational": true,
+"percentile": 82.1,
+"zscore": 0.42,
+"streak": {
+"dir": "flat",
+"n": 0
+},
+"as_of": "2026-11-13",
+"label": "+0.0 б.п. към 13.11 (SOFR 3.90% − IORB 3.90%) · +1.0 б.п. за седмица · 82. percentile, z +0.4 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима",
+"sofr_note": "SOFR излиза на следващия работен ден в 08:00 Ню Йорк: последна — 13.11; за 16.11 — днес ~14:00 Берлин"
+},
+{
+"name": "RSP спрямо SPY (широчина)",
+"value": 0.8,
+"status": "green",
+"informational": true,
+"as_of": "2026-11-16",
+"diff_5": 0.8,
+"diff_10": 1.1,
+"rsp_5": -0.91,
+"spy_5": -1.69,
+"rsp_10": -0.48,
+"spy_10": -1.62,
+"label": "5 сесии: RSP -0.9% срещу SPY -1.7% (+0.8 п.) · 10 сесии: +1.1 п. — средната акция бие гигантите · само информативен, не влиза в режима"
+},
+{
+"name": "MOVE (Bond Vol)",
+"value": 101.3,
+"as_of": "2026-11-16",
+"delta_1w": 15.3,
+"spike": true,
+"status": "red",
+"label": "MOVE 101 (+15 пункта/седмица) ⚠ рязък скок"
+},
+{
+"name": "VIX Term Structure",
+"value": 1.006,
+"status": "yellow",
+"label": "VIX9D 23.1 / VIX 22.9 / VIX3M 23.0 → ratio 1.01 (леко изравняване)"
+},
+{
+"name": "IEI/HYG (Credit Spread)",
+"value": 1.4859,
+"as_of": "2026-11-16",
+"level_percentile": 22.4,
+"roc_10d_pct": -0.64,
+"roc_percentile": 16.3,
+"spike": false,
+"status": "green",
+"roc_10d_pct_prev": -0.08,
+"roc_trend": "falling",
+"roc_trend_text": "10-дневната RoC е -0.64% срещу -0.08% преди 5 сесии — спада (забавя се)",
+"iei_10d_pct": -0.84,
+"hyg_10d_pct": -0.21,
+"label": "IEI/HYG 1.486 (22. percentile) · 10д RoC -0.6% (IEI -0.8%, HYG -0.2%) (16. percentile)"
+},
+{
+"name": "HY / IG OAS (кредитни спредове)",
+"value": 3.23,
+"status": "yellow",
+"informational": true,
+"as_of": "2026-11-13",
+"hy": {
+"value": 3.23,
+"as_of": "2026-11-13",
+"chg_bp": -8,
+"percentile": 76.1,
+"chg_pct": 44.2,
+"n_history": 783,
+"history_from": "2023-11-17",
+"hide": false,
+"series": "BAMLH0A0HYM2"
+},
+"ig": {
+"value": 0.89,
+"as_of": "2026-11-13",
+"chg_bp": 4,
+"percentile": 62.8,
+"chg_pct": 80.4,
+"n_history": 782,
+"history_from": "2023-11-17",
+"hide": false,
+"series": "BAMLC0A0CM"
+},
+"level": "moderate",
+"verdict": "OAS се разширява умерено (HY 44., IG 80. percentile на промяната), IEI/HYG още не",
+"label": "HY 3.23% (-8 б.п. за 20 дни — 44. percentile на промяната; нивото — 76. percentile) · IG 0.89% (+4 б.п. за 20 дни — 80. percentile на промяната; нивото — 63. percentile) · към 13.11, перцентил спрямо историята от 17.11.2023 (FRED дава ~3 г.) · OAS се разширява умерено (HY 44., IG 80. percentile на промяната), IEI/HYG още не · само информативен, не влиза в режима"
+},
+{
+"name": "Market Breadth (% над 40dMA)",
+"value": 63.7,
+"universe_size": 915,
+"status": "green",
+"universe_total": 918,
+"missing_n": 3,
+"batches": 19,
+"batches_failed": 0,
+"label": "63.7% над 40dMA (здравословна ширина)",
+"methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108."
+}
+],
+"regime": "Defensive",
+"regime_reason": "MOVE 101 (рязък седмичен скок, +15.3 пункта) — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%",
+"sizing_factor": 0.5,
+"counts": "3 зелени / 4 жълти / 1 червен от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)",
+"overrides": [
+{
+"trigger": "MOVE",
+"state": "active",
+"text": "MOVE 101 (рязък седмичен скок, +15.3 пункта) — стрес в колатералната система (UST), автоматичен Defensive режим, sizing −50%",
+"exit_condition": "седмичната делта (сега +15.3 пункта) да е под +15 пункта два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около седмица — това е прозорецът, не непременно реално успокояване на стреса"
+}
+],
+"regime_by_count": "Defensive",
+"exit_rule": "Override-ът пада, когато ВСИЧКИ условия отпаднат: MOVE: седмичната делта (сега +15.3 пункта) да е под +15 пункта два поредни дни (хистерезис — дни под прага: 0/2); без нов скок това става до около седмица — това е прозорецът, не непременно реално успокояване на стреса. След това режимът се определя от броенето — в момента то дава Defensive (3 зелени / 4 жълти / 1 червен от 8 видими · не се броят: Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)).",
+"hysteresis_released": [],
+"regime_margin": {
+"text": "Запас до смяна на режима: активен override (MOVE) — режимът е Defensive независимо от броенето · по броенето до Offensive: 0 червени (сега 1: MOVE (Bond Vol)) и още 1 зелен; до Cash: още 2 червени · distribution days SPY 8/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9 · IEI/HYG 10д RoC 16. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.64% срещу -0.08% преди 5 сесии — спада (забавя се)",
+"parts": [
+"активен override (MOVE) — режимът е Defensive независимо от броенето",
+"по броенето до Offensive: 0 червени (сега 1: MOVE (Bond Vol)) и още 1 зелен; до Cash: още 2 червени",
+"distribution days SPY 8/9, QQQ 9/9 — червени: Offensive е блокиран; блокът пада след 2 поредни дни под 9",
+"IEI/HYG 10д RoC 16. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е -0.64% срещу -0.08% преди 5 сесии — спада (забавя се)"
+]
+},
+"regime_change": null
+},
+"distribution_days": {
+"count": 9,
+"spy_count": 8,
+"qqq_count": 9,
+"status": "red",
+"label": "SPY 8 / QQQ 9 (последни 25 сесии)",
+"methodology_note": "Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.",
+"as_of": "2026-11-16",
+"fetch_status": "ok",
+"missing": []
+}
+}

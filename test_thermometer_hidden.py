@@ -133,40 +133,29 @@ assert 'thermo = steps.step("thermometer", lambda: build_thermometer(macro), on_
 print("  ✓ main.py опакова build_thermometer в обвивката на стъпките с fallback thermometer_unavailable")
 
 print()
-print("── т.2: минимум видими индикатори за Offensive ──")
+print("── т.2: 17.11.2026 (пакет 3) — Offensive по едното правило, не по броя видими ──")
 CALM = {"move_spike": {"streak_below": 9, "last_date": "2026-09-07"},
         "credit_spike": {"streak_below": 9, "last_date": "2026-09-07"}}
 OLD_IND = {i["name"]: i for i in OLD["thermometer"]["indicators"]}
 assert OLD["thermometer"]["regime"] == "Offensive" and OLD["thermometer"]["sizing_factor"] == 1.0
-t, _, _ = run_with({}, CALM, dt.date(2026, 9, 8), base=OLD_IND, macro=OLD["macro"])  # CALM: изолира т.2 от хистерезиса
-print("  РЕАЛНО 08.09 (преди фикса):", OLD["thermometer"]["regime"], "|", OLD["thermometer"]["regime_reason"])
-print("  РЕАЛНА конфигурация 08.09 (след фикса):", t["regime"], "|", t["regime_reason"])
-assert t["regime"] == "Defensive" and t["sizing_factor"] == config.DEFENSIVE_SIZING_FACTOR
-assert t["regime_reason"].startswith("5 зелени / 0 жълти / 0 червени от 5 видими")
-assert "недостатъчно данни за Offensive (видими 5 от 8, нужни ≥ 6)" in t["regime_reason"]    # пакет 2 т.2: 8 броени, Net Liquidity е информативен
-assert not t["overrides"], t["overrides"]  # режимът е от броенето, не от override
-print("  ✓ реалната 08.09 конфигурация (5 видими, 4 скрити) вече дава Defensive с причина")
-
-print("  СИНТЕТИЧНО (реалните индикатори от 02.10, всички зелени, спокоен хистерезис):")
+t, _, _ = run_with({}, CALM, dt.date(2026, 9, 8), base=OLD_IND, macro=OLD["macro"])            # РЕАЛНО 08.09: SPY без „растяща 50DMA“ в записа → не е Offensive
+assert t["regime"] == "Defensive" and t["sizing_factor"] == config.DEFENSIVE_SIZING_FACTOR and not t["overrides"]
+print("  ✓ реалната 08.09 конфигурация — Defensive (трендът на SPY не е потвърден)")
 GREEN = {n: {"status": "green"} for n in REAL_IND}
 GREEN["IEI/HYG (Credit Spread)"].update({"spike": False, "roc_percentile": 30.0})
 GREEN["MOVE (Bond Vol)"].update({"spike": False, "delta_1w": 1.0, "value": 80.0})
+GREEN["SPY тренд"].update({"trend_ok": True, "above_50dma": True, "ma50_rising": True})            # СИНТЕТИЧНО: SPY над растяща 50DMA
 for hide, expect in (((), "Offensive"),
-                     (("VIX Term Structure", "Market Breadth (% над 40dMA)"), "Offensive"),   # 6 видими = граница
-                     (("VIX Term Structure", "Market Breadth (% над 40dMA)", "Put/Call (SPY)"), "Defensive")):  # 5
+                     (("VIX Term Structure", "Market Breadth (% над 40dMA)", "Put/Call (SPY)"), "Offensive"),   # броят видими вече не решава
+                     (("VIX",), "Defensive")):                                                             # без VIX „няма override“ не се потвърждава
     t, _, _ = run_with(GREEN, CALM, dt.date(2026, 9, 8), hide=hide)
-    n_vis = 8 - len(hide)
-    assert t["regime"] == expect, (n_vis, t["regime"], t["regime_reason"])
-    print(f"    {n_vis} видими, всички зелени → {t['regime']}")
-assert "недостатъчно данни" in t["regime_reason"]
-print("  ✓ граница: 6 видими (от 8 броени) → Offensive, 5 → Defensive; 8 → Offensive (без регресия)")
-
-# Cash/Defensive по броенето не се смекчават от прага (прагът само затяга)
-t, _, _ = run_with({"MOVE (Bond Vol)": {"status": "red", "spike": False},
-                    "Put/Call (SPY)": {"status": "red"}, "VIX": {"status": "red"}},
-                   CALM, dt.date(2026, 9, 8), hide=("VIX Term Structure", "Market Breadth (% над 40dMA)", "Fed Net Liquidity"))
-assert t["regime_by_count"] in ("Cash", "Defensive")
-print("  ✓ при червени индикатори прагът не променя Cash/Defensive:", t["regime_by_count"])
+    assert t["regime"] == expect, (hide, t["regime"], t["regime_reason"])
+    print(f"    скрити {hide or '—'} → {t['regime']}")
+assert th.override_data_missing(t["indicators"]) == ["VIX"]
+t, _, _ = run_with({"MOVE (Bond Vol)": {"status": "red", "spike": False}, "IEI/HYG (Credit Spread)": {"status": "red", "spike": False},
+                    "VIX Term Structure": {"status": "red"}, "VIX": {"status": "red"}}, CALM, dt.date(2026, 9, 8))
+assert t["regime_by_count"] == "Cash" and t["regime"] == "Cash"
+print("  ✓ 3+ червени броени уреда — Cash (както досега); 2Y/10Y и Put/Call не се броят")
 
 print()
 print("── т.3: скрит ден не е спокоен ден — streak се замразява (СИНТЕТИЧНО, вериги от дни) ──")
