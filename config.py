@@ -413,6 +413,8 @@ WEEK_CAL_SESSIONS = int(os.getenv("WEEK_CAL_SESSIONS", 5))         # днес + 
 # 18.11.2026 (спешно, т. 6): отчетите и на големите компании — капитализация ≥ толкова (Nasdaq "marketCap"), не само теглото > 2% в S&P 500; на 18.11 липсваха PANW ($264 млрд)
 # и TGT. В седмицата 16–20.11 (реалните отговори на Nasdaq) — 10 такива: NVDA, HD, BHP, DIS, PANW, TJX, LOW, WMT, BABA, PDD (по 3–4 на ден).
 WEEK_CAL_MIN_MARKET_CAP = float(os.getenv("WEEK_CAL_MIN_MARKET_CAP", 100e9))
+# 18.11.2026 (спешно, т. 2): блокът „Нощта“ в началото на брифа (src/overnight.py) — отчетите след затварянето на предишната сесия и ES / NQ / 10Y / доларът, от кода
+ENABLE_OVERNIGHT = int(os.getenv("ENABLE_OVERNIGHT", 1))
 
 # ── Режим → Action (пакет 1, т.6 — 2026-10-03) ────────────────────────────
 # Cash → никакъв нов Action (капиталът е позиция); Defensive → Action само при Entry Timing

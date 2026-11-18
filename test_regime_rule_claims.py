@@ -72,6 +72,6 @@ def fake_claude(system, user, **k):
 ai_brief._call_claude = fake_claude
 with contextlib.redirect_stdout(io.StringIO()):
     res = ai_brief.macro_and_sector_brief({}, [], copy.deepcopy(B15["thermometer"]))
-assert f15["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0] and res == {"macro_brief": "Кратко.", "sector_logic": []}
+assert f15["rule_text"] not in prompts[0] and "regime_comment" not in prompts[0] and {k: v for k, v in res.items() if k != "drops_report"} == {"macro_brief": "Кратко.", "sector_logic": []}
 print("  ✓ промптът е без правилото; отговорът е непроменен (функциите на regime_claims — т. 1–3 — остават)")
 print("\n✅ test_regime_rule_claims: всичко мина")

@@ -55,7 +55,7 @@ STEP2 = {"qm_universe", "qm_scan", "qm_ep", "ins_positions", "health"}          
 STEP3 = {"thermometer", "distribution_days", "sector_rotation", "screener", "glb", "spinoff"}       # 17.11.2026 (т. 2а): без narratives / narratives_merge    # стъпка 3: модулният статус (LAST_STATUS / LAST_DIAG)
 STEP4 = {"crypto", "merger_pre", "event_labels", "pre_reaction_labels", "market_day", "deals_closed"}                                                    # етап 4 (22.10): крипто секцията — без собствен банер, обвивката дава един; 4б (26.10): целите на придобиване преди класификацията
 STEP5 = {"qm_market", "ins_watch"}                                                                                                               # 03.11.2026 (разходката, т. 11): QQQ спрямо SMA10 / SMA20 — банерът е на обвивката
-STEP6 = {"week_calendar", "deal_buyers", "offering", "volume_alarm", "market_rule"}                                                                                                    # 16.11.2026 (пакет 16.11, т. 8, 15, 13): календарът, купувачите, емисиите
+STEP6 = {"week_calendar", "deal_buyers", "offering", "volume_alarm", "market_rule", "overnight"}                                                                                                    # 16.11.2026 (пакет 16.11, т. 8, 15, 13): календарът, купувачите, емисиите
 ALL = STEP1 | STEP2 | STEP3 | STEP4 | STEP5 | STEP6
 assert set(names) == ALL and len(names) == len(ALL), sorted(set(names) ^ ALL)
 tries = [n for n in ast.walk(run) if isinstance(n, ast.Try)]

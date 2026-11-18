@@ -180,6 +180,7 @@ def source_reach(items: list[dict]) -> dict:
 
 # 02.11.2026: прозорецът и обхватът на последното gather_raw — {since, hours, day_queries, sources: source_reach} (main → brief["news_window"])
 LAST_WINDOW: dict = {}
+LAST_RAW: list = []
 
 
 def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict]:
@@ -243,6 +244,8 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict
         key = it["title"].lower()[:90]
         if key not in seen:
             seen.add(key); dedup.append(it)
+    LAST_RAW.clear()
+    LAST_RAW.extend(dedup)                                                   # 18.11.2026 (т. 2): целият пул (преди тавана) — за заглавията с прогноза в блока „Нощта“
     LAST_WINDOW.clear()
     LAST_WINDOW.update({"since": since.isoformat() if since else (now - dt.timedelta(hours=hours)).isoformat(), "hours": round((now - since).total_seconds() / 3600, 2) if since else hours,
                         "day_queries": day_queries, "sources": source_reach(dedup),

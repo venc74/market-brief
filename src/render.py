@@ -571,6 +571,32 @@ def news_pool_note(nw: dict | None, diag: dict | None) -> str | None:
     return out + "."
 
 
+def overnight_ctx(o: dict | None) -> dict | None:
+    """
+    18.11.2026 (спешно, т. 2): блокът „Нощта“ за шаблона и имейла — компаниите с „ТИКЪР · Име“ (names.display_name) и готовите редове; пазарът — един ред. Без блок / стар
+    бриф → None. Чиста функция.
+    """
+    if not isinstance(o, dict) or not o.get("session"):
+        return None
+    comp = [{**c, "label": c.get("ticker", "") + (f" · {names.display_name(c['name'], 28)}" if c.get("name") else "")} for c in o.get("companies") or []]
+    s = o["session"]
+    return {"session": s, "day": f"{s[8:10]}.{s[5:7]}", "companies": comp, "market": " · ".join(m.get("text", "") for m in o.get("market") or []),
+            "notes": o.get("notes") or [], "source": o.get("source")}
+
+
+def _overnight_email(o: dict | None) -> str:
+    c = overnight_ctx(o)
+    if not c:
+        return ""
+    rows = "".join(f'<div style="margin:4px 0"><b>{_e(x["label"])}</b>' + (f' <span style="color:#6b7280">· {_e(x["why"])}</span>' if x.get("why") else "")
+                   + f': {_e(" · ".join(x.get("lines") or []))}</div>' for x in c["companies"])
+    notes = "".join(f'<div style="color:#6b7280;font-size:12px">{_e(n)}</div>' for n in c["notes"])
+    return (f'<tr><td style="padding:16px 28px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">'
+            f'<div style="font-weight:bold;margin-bottom:6px">Нощта · отчетите след затварянето на {c["day"]} и фючърсите</div>{rows}'
+            f'<div style="margin:6px 0 2px"><b>Пазарът през нощта:</b> {_e(c["market"])}</div>{notes}'
+            f'<div style="color:#9ca3af;font-size:11px;margin-top:4px">Източник: {_e(c["source"] or "")}</div></td></tr>')
+
+
 def radar_reason(c: dict) -> str:
     """
     30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „широк стоп · 15.3%“ (too_wide; до 02.11 „разтегната · стоп“), „пробив без обем · 0.9×“, „блокирана от режима“,
@@ -789,6 +815,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         futures_line=_futures_line(brief),                                  # 19.10.2026: договорът и часът на цената на фючърсите (WTI …) — от кода
         put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
         week_calendar=_week_calendar_ctx(brief.get("week_calendar")),       # 16.11.2026 (т. 8): календарът на седмицата
+        overnight=overnight_ctx(brief.get("overnight")),                    # 18.11.2026 (спешно, т. 2): „Нощта“ — в началото
         offering_warnings=brief.get("offering_warnings") or {},             # 16.11.2026 (т. 13): емисии на акции по тикър
         deal_buyers=brief.get("deal_buyers") or {},                         # 16.11.2026 (т. 15): купувач във висяща сделка
         qm_peak_max_below=config.QM_PEAK_MAX_BELOW_52W_PCT, qm_ret6m_min=config.QM_RET6M_MIN_PCT,   # 16.11.2026 (т. 16): правилото за лидер
@@ -1143,6 +1170,8 @@ def render_email(brief: dict) -> str:
   </td></tr>
 
   {warn_block}
+
+  {_overnight_email(brief.get("overnight"))}
 
   {news_block}
 

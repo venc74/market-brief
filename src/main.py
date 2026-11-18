@@ -950,10 +950,23 @@ def run() -> dict:
             ours.setdefault(t, "наблюдаван")
         out = econ_calendar.build_week(dt.date.fromisoformat(today), big, ours)
         out["weights_note"] = (f"теглата — {w.get('source')}, към {w['as_of'][8:10]}.{w['as_of'][5:7]}" if w.get("as_of") else None) if w.get("companies") else f"теглата не се изтеглиха ({w.get('error')})"
+        _cal_sets.update(big=big, ours=ours)
+        from src import overnight                                              # 18.11.2026 (спешно, т. 2): очакванията сутринта ПРЕДИ отчета — утре „Нощта“ ги сравнява с факта
+        out["estimates_captured"] = overnight.capture_safe(out, today)
         return out
+    _cal_sets: dict = {}
     week_calendar = steps.step("week_calendar", _week_calendar, fallback={"ok": False, "errors": ["стъпката пропадна"], "days": []}, enabled=config.ENABLE_WEEK_CALENDAR,
                                label="Календарът на седмицата (Nasdaq)", consequence="календарът на седмицата липсва днес — червен ред на страницата")
     _reconcile_earnings_dates(week_calendar, action + watchlist + (qm_cards or []))      # 17.11.2026 (пакет 1, т. 8): една дата на отчета за страницата
+
+    # 18.11.2026 (спешно, т. 2): „Нощта“ — отчетите след затварянето на предишната сесия (EPS, приходи, прогноза — дословно заглавие, движението след затварянето) и ES / NQ /
+    # 10Y / доларът, от кода, с източник; липсва → „няма данни“. Показва се в началото на брифа.
+    def _overnight():
+        from src import overnight
+        pool = list(news_aggregator.LAST_RAW) or [[x[0], x[1], x[2]] for x in (news_aggregator.LAST_DIAG.get("pool") or [])]
+        return overnight.run_for_brief(today, data_rhythm.previous_brief(today) or {}, ours=_cal_sets.get("ours") or {}, pool=pool)
+    overnight_block = steps.step("overnight", _overnight, fallback={}, enabled=config.ENABLE_OVERNIGHT, label="Блокът „Нощта“ (отчетите и фючърсите)",
+                                 consequence="блокът „Нощта“ липсва днес — отчетите от снощи и фючърсите не са показани от кода")
     # 17.11.2026 (пакет 2, т. 2 — А4): „Чака пробив“ → аларма с обем (нужният обем по часове по собствения профил на акцията; иначе по общия, с етикет)
     def _volume_alarm():
         from src import volume_alarm
@@ -1045,6 +1058,7 @@ def run() -> dict:
         "watchlist_exits": wl_exits,
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
+        "overnight": overnight_block if config.ENABLE_OVERNIGHT else None,          # 18.11.2026 (спешно, т. 2): „Нощта“
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)
         "deal_buyers": {t: v["text"] for t, v in (deal_buyers or {}).items()},   # 16.11.2026 (т. 15): купувач във висяща сделка — радарът, наблюдаваните
