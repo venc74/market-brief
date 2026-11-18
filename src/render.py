@@ -562,6 +562,11 @@ def news_pool_note(nw: dict | None, diag: dict | None) -> str | None:
         return None
     parts = [f"{k} {v}" + (f" от {fetched[k]}" if fetched.get(k) and fetched[k] != v else "") for k, v in to.items()]
     out = f"Към подбора: {nw.get('pool_used', sum(to.values()))} от {nw.get('pool_total', sum(to.values()))} заглавия ({', '.join(parts)})"
+    pr = nw.get("priority") or {}
+    if pr.get("in_pool"):                                                       # 18.11.2026 (поправка): заглавията за нашите тикъри — първи
+        tk = pr.get("tickers") or []
+        out += (f"; първи — {pr['in_pool']} за нашите тикъри и компании ({', '.join(tk[:8])}{' …' if len(tk) > 8 else ''})"
+                + (f", от тях {pr['beyond_limit']} след тавана на източника" if pr.get("beyond_limit") else ""))
     main_drops = [d for d in diag.get("dropped") or [] if isinstance(d, dict) and (d.get("pool_title") or d.get("reason") in ("няма валиден индекс в пула", "празно why", "ехото е по-кратко от 3 думи"))]
     if diag.get("returned") is not None:
         out += f"; подборът избра {diag['returned']}, показани {diag.get('kept', 0)}"

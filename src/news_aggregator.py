@@ -45,7 +45,7 @@ _CACHE = config.DATA_DIR / "news_cache.json"
 # ──────────────────────────────────────────────────────────────────────────
 # RSS
 # ──────────────────────────────────────────────────────────────────────────
-def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: float | None = None) -> list[dict]:
+def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: float | None = None, keep=None, keep_max: int = 0) -> list[dict]:
     """
     Заглавията на фийда в прозореца — последните `hours` часа или (02.11.2026) от since_ts (UTC epoch — началото на прозореца, sessions.news_window_start).
     02.11.2026: времето на заглавието — calendar.timegm (feedparser дава UTC); до 02.11 time.mktime го четеше като местно време — на GitHub runner-а (UTC) същото.
@@ -81,8 +81,13 @@ def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: f
             pt = e.get("published_parsed") or e.get("updated_parsed")
             if pt:
                 row["published"] = time.strftime("%Y-%m-%dT%H:%MZ", pt)     # 29.10.2026: колко назад стига фийдът (CoinDesk държи 25); feedparser дава UTC
+            if len(out) >= limit:                                            # 18.11.2026 (поправка): след тавана — само приоритетните (keep), до keep_max
+                if keep is not None and keep_max and keep(title):
+                    out.append({**row, "beyond_limit": True})
+                    keep_max -= 1
+                continue
             out.append(row)
-            if len(out) >= limit:
+            if len(out) >= limit and not (keep is not None and keep_max):
                 break
     except Exception as ex:
         print(f"[news] RSS {source} failed: {ex}")
@@ -182,8 +187,104 @@ def source_reach(items: list[dict]) -> dict:
 LAST_WINDOW: dict = {}
 LAST_RAW: list = []
 
+# ══════════════════════════════════════════════════════════════════════════
+# 18.11.2026 (поправка към спешния пакет): приоритет в пула преди тавана. Пулът е config.NEWS_MAX_TO_FILTER на 24 ч (18.11: 100 от 139) и се режеше по реда на фийдовете
+# (редуването) — Reuters ≈ 31 от 50, и заглавията за отчета на Nvidia вероятно не стигнаха до модела. Сега първо са заглавията, които споменават нашите тикъри и компании
+# (позициите в книгите, наблюдаваните, картите, „Нощта“ и календарът за деня), после останалите в досегашния ред; след тавана на източника (50) се вземат и приоритетните
+# (до config.NEWS_PRIORITY_EXTRA_PER_SOURCE). Съвпадението е по името (без правната форма; думите, които не са общи — _GENERIC; главни букви → без значение на регистъра)
+# и по тикъра (3+ знака, главни, като дума). Грешно съвпадение само мести заглавие напред — не маха нищо.
+# ══════════════════════════════════════════════════════════════════════════
+_GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "international", "global", "american", "america", "national", "united", "first", "general",
+            "financial", "energy", "bank", "capital", "technologies", "technology", "systems", "industries", "services", "solutions", "health", "healthcare", "resources",
+            "brands", "partners", "properties", "realty", "trust", "insurance", "communications", "entertainment", "networks", "software", "semiconductor", "pharmaceuticals",
+            "therapeutics", "home", "the", "and", "markets", "market", "nasdaq", "exchange", "street", "wall", "data", "digital", "power", "electric", "water", "motors", "foods",
+            "stores", "airlines", "labs", "laboratories", "sciences", "medical", "pacific", "western", "eastern", "southern", "northern", "royal", "standard", "investment",
+            "investments", "asset", "management", "media", "consolidated", "reliance", "williams", "pepper", "class", "new", "corp", "limited", "trade", "tech", "bancorp",
+            "street's", "one", "can", "growth", "income", "real", "estate", "life", "world", "worldwide",
+            # 18.11.2026: места и посоки — „Manhattan closet“ (MANH — Manhattan Associates), „West Bank“ / „East-West pipeline“ (WST — West Pharmaceutical) в пула от 18.11
+            "west", "east", "north", "south", "central", "manhattan", "texas", "york", "boston", "chicago", "atlanta", "pacific", "atlantic", "republic", "federal", "state",
+            # 18.11.2026 (по историята — 1035 заглавия 13.06–18.11): „Nasdaq“ (NDAQ — името е индексът, 9 фалшиви), „Companies“ (TRV), „Aerospace“ (GE)
+            "companies", "aerospace", "defense", "chemical", "chemicals", "materials", "logistics", "automotive"}
+_LEGAL_RE = re.compile(r"\s*\((?:the|The)\)|,?\s+(?:Inc\.?|Incorporated|Corporation|Corp\.?|Company|Co\.?|Ltd\.?|Limited|plc|PLC|N\.V\.|S\.A\.|AG|SE)\b\.?", re.I)
 
-def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict]:
+
+def priority_matchers(entries: list[dict] | None) -> list[tuple[str, re.Pattern]]:
+    """[{ticker, name}] → [(тикър, regex)]: пълното име без правната форма, отличителните думи от него (4+ букви, не от _GENERIC) и тикърът (3+ знака, главни). Чиста функция."""
+    out = []
+    for e in entries or []:
+        t, name = str(e.get("ticker") or "").upper(), _LEGAL_RE.sub("", str(e.get("name") or "").split(",")[0]).strip()
+        alts = []
+        if len(name) >= 3 and name.casefold() not in _GENERIC:                # „Nasdaq“ (NDAQ) — общо име, само тикърът
+            alts.append(r"\b" + re.escape(name) + r"\b" if not name.isupper() else r"(?i:\b" + re.escape(name) + r"\b)")
+        for w in re.findall(r"[A-Za-z][A-Za-z0-9&-]{3,}", name):
+            if w.casefold() not in _GENERIC and w != name:
+                alts.append(r"(?i:\b" + re.escape(w) + r"\b)" if w.isupper() else r"\b" + re.escape(w) + r"(?:'s|’s)?\b")
+        if len(t) >= 3 and t.isalpha():
+            alts.append(r"\b" + re.escape(t) + r"\b")
+        if alts:
+            out.append((t, re.compile("|".join(alts))))
+    return out
+
+
+def priority_hits(title: str, matchers: list) -> list[str]:
+    """Тикърите, чиито имена / тикъри са в заглавието."""
+    return [t for t, rx in matchers or [] if rx.search(title or "")]
+
+
+def prioritize(items: list[dict], matchers: list) -> tuple[list[dict], int]:
+    """Стабилно разделяне: заглавията с попадение — първи (в досегашния ред), после останалите. → (подредени, брой с попадение). Чиста функция."""
+    if not matchers:
+        return list(items), 0
+    hit, rest = [], []
+    for it in items:
+        h = priority_hits(it.get("title"), matchers)
+        (hit if h else rest).append({**it, "priority": h} if h else it)
+    return hit + rest, len(hit)
+
+
+def priority_entries(prev_brief: dict | None, today: str, candidates: list | None = None, watched: list | None = None, books: list | None = None) -> list[dict]:
+    """priority_entries_raw, който не вдига: провал → [] (пулът — както до 18.11) и ред в лога."""
+    try:
+        return priority_entries_raw(prev_brief, today, candidates, watched, books)
+    except Exception as e:
+        print(f"[news] приоритетът на пула пропуснат: {type(e).__name__}: {e}")
+        return []
+
+
+def priority_entries_raw(prev_brief: dict | None, today: str, candidates: list | None = None, watched: list | None = None, books: list | None = None) -> list[dict]:
+    """
+    Чии са заглавията с приоритет: позициите в книгите, наблюдаваните, картите (днешният скрийнинг и картите на предишния бриф — CANSLIM, Kullamägi, GLB, EP), отчетите след
+    затварянето на предишната сесия („Нощта“ — календарът на предишния бриф) и отчетите за днес. → [{ticker, name, why}] без повторения; имената — от картите, календара и
+    brief["names"] на предишния бриф. Чиста функция.
+    """
+    from src import sessions
+    pb = prev_brief or {}
+    names = dict(pb.get("names") or {})
+    out: dict = {}
+
+    def add(t, why, name=None):
+        t = str(t or "").upper().strip()
+        if t and t not in out:
+            out[t] = {"ticker": t, "name": name or names.get(t), "why": why}
+        elif t and name and not out[t].get("name"):
+            out[t]["name"] = name
+    for t in books or []:
+        add(t, "книгите")
+    for t in watched or []:
+        add(t, "наблюдаван")
+    for c in list(candidates or []) + list(pb.get("action") or []) + list(pb.get("watchlist") or []) + list(pb.get("qm_breakout") or []) \
+            + list(pb.get("glb_candidates") or []) + list(((pb.get("qm_ep") or {}).get("rows")) or []):
+        if isinstance(c, dict):
+            add(c.get("ticker"), "карта", c.get("name"))
+    prev_s = sessions.prev_session(dt.date.fromisoformat(today)).isoformat()
+    for d in ((pb.get("week_calendar") or {}).get("days")) or []:
+        for e in d.get("earnings") or []:
+            if (d.get("date") == prev_s and e.get("when") in ("след затварянето", "неизвестен час")) or d.get("date") == today:
+                add(e.get("ticker"), "отчет (Нощта)" if d.get("date") == prev_s else "отчет днес", e.get("name"))
+    return list(out.values())
+
+
+def gather_raw(hours: float = 24, since: dt.datetime | None = None, keep=None) -> list[dict]:
     """
     FIX 2026-09-15: провалът се засича PER-SOURCE, не агрегатно.
 
@@ -212,7 +313,7 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict
     LAST_FETCH_ERRORS.clear()
     fetched: dict = {}
     for src, url in config.NEWS_RSS_FEEDS.items():
-        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
+        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts, keep=keep, keep_max=config.NEWS_PRIORITY_EXTRA_PER_SOURCE if keep else 0)
         fetched[src] = len(got)
         if not got:
             dead.append(src)
@@ -220,7 +321,7 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict
     for src, url in config.NEWS_RSS_FEEDS.items():                       # 02.11.2026: по-ранните дни на прозореца (Reuters / AP) — след основните, за да не ги изместват
         for day, u in (google_day_urls(url, since, now) if since else []):
             day_queries += 1
-            got = _fetch_rss(u, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
+            got = _fetch_rss(u, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts, keep=keep, keep_max=config.NEWS_PRIORITY_EXTRA_PER_SOURCE if keep else 0)
             if not got:
                 print(f"[news] {src}: заявката за {day} не върна заглавия в прозореца")
             per_source.append(got)
@@ -514,7 +615,7 @@ LAST_DIAG: dict = {}
 LAST_STATUS: dict = {}
 
 
-def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> list[dict]:
+def significant_news(max_items: int = 8, since: dt.datetime | None = None, priority: list | None = None) -> list[dict]:
     """
     Връща [{headline, source, why, headline_bg?}] — до max_items пазарно значими новини; headline е ДОСЛОВНО от източника (15.10.2026, pick_verbatim).
     Кешира за деня. Празен списък при провал (graceful degradation).
@@ -534,7 +635,8 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> li
         except Exception:
             pass
 
-    raw = gather_raw(hours=24, since=since)
+    matchers = priority_matchers(priority)                               # 18.11.2026 (поправка): приоритетът преди тавана
+    raw = gather_raw(hours=24, since=since, **({"keep": lambda t: bool(priority_hits(t, matchers))} if matchers else {}))
     if not raw:
         print("[news] нула източници върнаха данни — пропускам секцията")
         LAST_STATUS.update(reason="нито един RSS източник не върна заглавия")
@@ -542,9 +644,14 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> li
 
     # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
     days = max(1, round((dt.datetime.now(dt.timezone.utc) - since).total_seconds() / 86400)) if since else 1     # 02.11.2026: на 24 ч от прозореца
-    pool = raw[:config.NEWS_MAX_TO_FILTER * days]
+    ordered, n_hit = prioritize(raw, matchers)
+    pool = ordered[:config.NEWS_MAX_TO_FILTER * days]
     # 18.11.2026 (спешно, т. 1): таванът реже след редуването — колко от всеки източник стигнаха до подбора (18.11: 100 от 139 — Reuters 31 от 50, AP 30 от 50)
     LAST_WINDOW.update(pool_total=len(raw), pool_used=len(pool), to_model={k: v["count"] for k, v in source_reach(pool).items()})
+    if matchers:                                                         # 18.11.2026 (поправка): колко заглавия минаха напред и за кои тикъри
+        LAST_WINDOW["priority"] = {"names": len(matchers), "hits": n_hit, "in_pool": sum(1 for r in pool if r.get("priority")),
+                                   "beyond_limit": sum(1 for r in pool if r.get("beyond_limit")),
+                                   "tickers": sorted({t for r in pool for t in r.get("priority") or []})}
     compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r["summary"]} for k, r in enumerate(pool)]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "

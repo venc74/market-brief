@@ -158,7 +158,7 @@ with q():
     ai_brief._watch_digest_batch([{"ticker": "TDOC", "name": "Teladoc", "facts": {}, "news": [], "insider": [], "insider_cluster": False}], {}, 72.13)
 assert "НАБЛЮДАВАНИ ТИКЪРИ (данни за последните 72 часа — от предишния бриф):" in up[-1]
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-for s in ("news_aggregator.significant_news(since=news_since)", "crypto_news.build(today, hours=crypto_hours)", "watch_monitor.collect(window_hours=news_hours)",
+for s in ("news_aggregator.significant_news(since=news_since, priority=news_priority)", "crypto_news.build(today, hours=crypto_hours)", "watch_monitor.collect(window_hours=news_hours)",
           "watch_ticker_digest(active, market_context, window_hours=news_hours)", '"news_window": {**dict(news_aggregator.LAST_WINDOW)'):
     assert s in main_src, s
 b = copy.deepcopy(B19)

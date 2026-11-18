@@ -635,7 +635,12 @@ def run() -> dict:
     news_since = sessions.news_window_start()
     news_hours, crypto_hours = sessions.news_window_hours(), sessions.news_window_hours(min_hours=config.CRYPTO_NEWS_HOURS)
     print(f"[news] прозорец за новините: от {news_since:%d.%m %H:%M} UTC — {news_hours:g} ч (крипто {crypto_hours:g} ч)")
-    news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since), fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
+    # 18.11.2026 (поправка към спешния пакет): заглавията за нашите тикъри и компании — първи в пула преди тавана (позициите в книгите, наблюдаваните, картите, „Нощта“,
+    # отчетите за деня); имената — от картите, календара и предишния бриф
+    news_priority = news_aggregator.priority_entries(prev_for_regime, today, candidates,
+                                                     watch_monitor.load_watch_list() if config.ENABLE_WATCH_MONITOR else [],
+                                                     [r.get("ticker") for r in backtest.book_records(None, statuses=("pending", "open", "trailing"))] if config.ENABLE_BACKTEST else [])
+    news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since, priority=news_priority), fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
                       consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
     # макро брифа — разказът за нощта я вижда (17.11.2026: без COT за Bitcoin — COT е махнат).
