@@ -1633,13 +1633,22 @@ def apply_market_rule(thermo: dict, distribution_days: dict | None = None, prev_
             line += f" · Cash: {len(red)} червени уреда ({', '.join(red)})"
         if pending:
             line += f" · {pending}"
-        cp = thermo.get("credit_pressure") or {}
+        cp = dict(thermo.get("credit_pressure") or {})
+        oas_t = next((i for i in out["indicators"] if "OAS" in (i.get("name") or "")), None)
+        if cp.get("oas_missing"):                                       # 17.11.2026 (пакет 3, т. 4): FRED не върна HY OAS — от кога, видимо (плочката и редът за кредита)
+            prev_oas = next((i for i in (prev_thermo or {}).get("indicators") or [] if "OAS" in (i.get("name") or "")), {}) or {}
+            since = ((prev_oas.get("hy") or {}).get("as_of") or ((prev_thermo or {}).get("rule") or {}).get("oas_missing_since") or cp.get("oas_as_of"))
+            note = f"HY OAS: няма данни" + (f" от {since[8:10]}.{since[5:7]}" if since else "") + " — условието за кредит е само по HYG"
+            cp["text"] = "; ".join([p for p in (cp.get("text") or "").split("; ") if not p.startswith("HY OAS")] + [note])
+            cp["oas_missing_since"] = since
+            if oas_t is not None:
+                oas_t["hide_reason"] = note
         out.update(regime=regime, sizing_factor=1.0 if regime == "Offensive" else config.DEFENSIVE_SIZING_FACTOR,
                    regime_reason=line,
                    exit_rule=("Offensive се задържа, докато трите условия са изпълнени; при първото неизпълнено — Defensive още същия ден." if regime == "Offensive" else
                               f"Offensive: трите условия ({'; '.join(c['text'] for c in conds if not c['ok']) or 'изпълнени'}) — {need} поредни дни."),
                    rule={"version": config.REGIME_RULE_VERSION, "conditions": conds, "met": met, "streak": streak, "pending": pending, "cash": cash,
-                         "line": line, "credit": cp.get("text")})
+                         "line": line, "credit": cp.get("text"), "oas_missing_since": cp.get("oas_missing_since")})
         return out
     except Exception as e:
         print(f"[thermo] пазарното правило не се приложи: {type(e).__name__}: {e}")

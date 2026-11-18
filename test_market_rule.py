@@ -61,6 +61,14 @@ oas = copy.deepcopy(IND["HY / IG OAS (кредитни спредове)"]); oas
 cp2 = th.credit_pressure(dict(IND["IEI/HYG (Credit Spread)"], hyg_10d_pct=-1.4), oas)
 assert cp2["active"] is True and cp2["oas_missing"] and "HY OAS: няма данни от 13.11 — само по HYG" in cp2["text"]
 assert th.credit_pressure({"hide": True}, None)["active"] is None
+GONE = copy.deepcopy(T17)                                                                                   # СИНТЕТИЧНО: днес FRED не върна HY OAS
+for i in GONE["indicators"]:
+    if "OAS" in i["name"]:
+        i.clear(); i.update({"name": "HY / IG OAS (кредитни спредове)", "value": None, "status": "yellow", "hide": True, "informational": True, "label": "", "hide_reason": "HY OAS — няма данни"})
+GONE["credit_pressure"] = th.credit_pressure(IND["IEI/HYG (Credit Spread)"], next(i for i in GONE["indicators"] if "OAS" in i["name"]))
+g = th.apply_market_rule(GONE, None, T17, dd_block={"blocked": False})                                     # предишният бриф (17.11) — HY OAS към 13.11
+assert g["rule"]["credit"].endswith("HY OAS: няма данни от 13.11 — условието за кредит е само по HYG") and g["rule"]["oas_missing_since"] == "2026-11-13"
+assert next(i for i in g["indicators"] if "OAS" in i["name"])["hide_reason"] == "HY OAS: няма данни от 13.11 — условието за кредит е само по HYG"
 print(f"  ✓ «{cp2['text']}»; без HYG и HY OAS — „няма данни“ (override-ът на IEI/HYG остава)")
 
 print("── 5. плочката, GLB, книгите ──")
