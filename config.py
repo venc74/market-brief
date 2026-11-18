@@ -986,6 +986,15 @@ BREADTH_OVERSOLD_STATS = {"episodes": 17, "lower_5pct": 8, "lower_any": 16, "ses
 # показвано като здравословно. Проверено върху 14-те дни под 40% (09–28.09):
 # режимът по броене не се сменя нито веднъж (Offensive иска ≥4 зелени, 0 червени).
 BREADTH_WEAK_THRESHOLD = float(os.getenv("BREADTH_WEAK_THRESHOLD", 40.0))
+# 18.11.2026 (спешно, т. 5): етикетът на ширината — спрямо собствената история (записаните брифове преди днес; до BREADTH_HIST_BRIEFS, поне BREADTH_HIST_MIN): перцентил
+# (под BREADTH_REL_LOW_PCT — „слаба“, над BREADTH_REL_HIGH_PCT — „силна“, иначе „в средата“) и посоката за 5 сесии (мъртва зона BREADTH_DIR_DEADZONE_PP пункта). Статусът (цветът,
+# Cash при < 10%) остава по абсолютните прагове. Измерено 18.11 (69 брифа с breadth от 14.08): старият етикет „здравословна“ в 56; новият от 40-ия бриф — силна 20, средна 9.
+BREADTH_HIST_BRIEFS = int(os.getenv("BREADTH_HIST_BRIEFS", 250))
+BREADTH_HIST_MIN = int(os.getenv("BREADTH_HIST_MIN", 40))
+BREADTH_REL_LOW_PCT = float(os.getenv("BREADTH_REL_LOW_PCT", 25))
+BREADTH_REL_HIGH_PCT = float(os.getenv("BREADTH_REL_HIGH_PCT", 75))
+BREADTH_DIR_SESSIONS = int(os.getenv("BREADTH_DIR_SESSIONS", 5))
+BREADTH_DIR_DEADZONE_PP = float(os.getenv("BREADTH_DIR_DEADZONE_PP", 5.0))
 # Бележка за разминаване: ширина под BREADTH_WEAK_THRESHOLD, докато SPY е на
 # ≤ този % от 52-седмичния си връх. Измерено 14.08–28.09 (цялата наличната
 # breadth история): SPY беше на ≤3% от върха в 13 от 14-те дни под 40%.

@@ -622,6 +622,63 @@ def market_breadth() -> dict:
     }
 
 
+def breadth_history(today: str | None = None, n: int | None = None) -> list[tuple[str, float]]:
+    """
+    18.11.2026 (спешно, т. 5): [(дата, % над 40dMA)] от записаните брифове ПРЕДИ `today` (config.DATA_DIR/ГГГГ-ММ-ДД.json; скритите и без стойност — вън), последните n
+    (config.BREADTH_HIST_BRIEFS). Нечетим файл — пропуснат. Без файлове → [].
+    """
+    out = []
+    for f in sorted(config.DATA_DIR.glob("20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].json")):
+        if today and f.stem >= today:
+            continue
+        try:
+            b = json.loads(f.read_text(encoding="utf-8"))
+            ind = next((i for i in (b.get("thermometer") or {}).get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None)
+        except Exception:
+            continue
+        v = (ind or {}).get("value")
+        if isinstance(v, (int, float)) and not (ind or {}).get("hide"):
+            out.append((f.stem, float(v)))
+    return out[-(n or config.BREADTH_HIST_BRIEFS):]
+
+
+def breadth_relative(ind: dict, hist: list[tuple[str, float]]) -> dict:
+    """
+    18.11.2026 (спешно, т. 5): етикетът на ширината спрямо собствената история — перцентил сред `hist` (записаните брифове преди днес), праговете с техните стойности и посоката
+    за config.BREADTH_DIR_SESSIONS сесии. До 18.11 — абсолютен праг („здравословна ширина“ при 40–80%; 56 от 69 брифа). Статусът (цветът, броенето за Cash) не се пипа;
+    под 10% и над 80% абсолютната бележка остава (измерена — config.BREADTH_OVERSOLD_STATS). История под config.BREADTH_HIST_MIN → етикетът казва абсолютния праг. → ind
+    (+ "relative"). Чиста функция. Реално, 18.11: 55.6% — 66-и перцентил от 68 брифа, за 5 сесии 68.1% → 55.6% — стеснява се.
+    """
+    v = ind.get("value")
+    if ind.get("hide") or not isinstance(v, (int, float)):
+        return ind
+    vals = [x for _, x in hist or []]
+    extreme = v < config.BREADTH_CAPITULATION_THRESHOLD or v > config.BREADTH_OVERBOUGHT_THRESHOLD
+    old_note = ind.get("label", "").split(" (", 1)[1].rsplit(")", 1)[0] if " (" in ind.get("label", "") else ""
+    if len(vals) < config.BREADTH_HIST_MIN:
+        ind["relative"] = {"n": len(vals)}
+        ind["label"] = (f"{v:.1f}% над 40dMA ({old_note}; по абсолютния праг — историята е {len(vals)} брифа, под {config.BREADTH_HIST_MIN}: "
+                        f"{config.BREADTH_WEAK_THRESHOLD:.0f}–{config.BREADTH_OVERBOUGHT_THRESHOLD:.0f}% — здравословна)")
+        return ind
+    import numpy as np
+    pct = round(sum(1 for x in vals if x <= v) / len(vals) * 100)
+    lo, hi = float(np.percentile(vals, config.BREADTH_REL_LOW_PCT)), float(np.percentile(vals, config.BREADTH_REL_HIGH_PCT))
+    word = ("слаба" if pct < config.BREADTH_REL_LOW_PCT else "силна" if pct > config.BREADTH_REL_HIGH_PCT else "в средата") + " спрямо собствената история"
+    k = config.BREADTH_DIR_SESSIONS
+    prev = vals[-k] if len(vals) >= k else None
+    if prev is None:
+        dirw = ""
+    else:
+        d = v - prev
+        dirw = (f" · за {k} сесии {prev:.1f}% → {v:.1f}% — " + ("стеснява се" if d <= -config.BREADTH_DIR_DEADZONE_PP else "разширява се" if d >= config.BREADTH_DIR_DEADZONE_PP
+                                                             else f"без ясна посока (под ±{config.BREADTH_DIR_DEADZONE_PP:g} п.п.)"))
+    since = hist[0][0]
+    ind["relative"] = {"n": len(vals), "since": since, "pct": pct, "low": round(lo, 1), "high": round(hi, 1), "prev": prev, "word": word}
+    ind["label"] = (f"{v:.1f}% над 40dMA — {word}: {pct}-и перцентил от {len(vals)} брифа (от {since[8:10]}.{since[5:7]}; праг: под {config.BREADTH_REL_LOW_PCT:g}-и = {lo:.1f}% — слаба, "
+                    f"над {config.BREADTH_REL_HIGH_PCT:g}-и = {hi:.1f}% — силна){dirw}" + (f" · {old_note}" if extreme and old_note else ""))
+    return ind
+
+
 def _breadth_divergence(indicators: list[dict]) -> None:
     """
     FIX 2026-09-28: бележка при разминаване — SPY близо до 52-седмичния връх,
@@ -1331,6 +1388,10 @@ def build_thermometer(macro: dict, today: dt.date | None = None) -> dict:
         indicators.insert(next(k for k, i in enumerate(indicators) if i["name"] == "IEI/HYG (Credit Spread)") + 1, oas_ind)
     if config.ENABLE_MARKET_BREADTH:
         indicators.append(market_breadth())
+        try:                                                                 # 18.11.2026 (спешно, т. 5): етикетът — спрямо собствената история
+            breadth_relative(indicators[-1], breadth_history(dt.date.today().isoformat()))
+        except Exception as e:
+            print(f"[thermo] етикетът на ширината спрямо историята пропуснат: {type(e).__name__}: {e}")
         _breadth_divergence(indicators)
 
     for i in indicators:                                                 # 17.11.2026 (пакет 3): 2Y/10Y и Put/Call — информативни (извън броенето)
