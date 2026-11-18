@@ -153,7 +153,8 @@ def board_rows(data, spy, etfs: dict, lag: int | None = None) -> list[dict]:
             r4, r12, p4, p12 = chg(-1, 20), chg(-1, 62), chg(-1 - lag, 20), chg(-1 - lag, 62)
             px = data[sym].dropna()
             day = round((float(px.iloc[-1]) / float(px.iloc[-2]) - 1) * 100, 2)          # 06.11.2026 (пакет 05–06.11, т. 6): промяната за деня (абсолютна)
-            rows.append({"etf": sym, "sector": name, "chg_1d_pct": day, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
+            wk = round((float(px.iloc[-1]) / float(px.iloc[-6]) - 1) * 100, 2) if len(px) > 5 else None    # 18.11.2026 (спешно, т. 4): за 5 сесии (абсолютна)
+            rows.append({"etf": sym, "sector": name, "chg_1d_pct": day, "chg_5d_pct": wk, "rs_4w": round(r4, 2), "rs_12w": round(r12, 2), "word": rs_word(r4, r12),
                          "strength": round((r4 + r12) / 2, 2), "strength_prev": (p4 + p12) / 2, "rs_at_6m_high": bool(float(rs.iloc[-1]) >= float(rs.max()) * 0.99),          # както sector_rotation (данните са 6 месеца)
                          "rs_4w_prev": round(p4, 2)})                                    # 16.11.2026 (пакет 16.11, т. 6): RS 4 седм. преди `lag` сесии — посоката на преднината
         except Exception as e:
@@ -258,7 +259,45 @@ def leaders_trend(rows: list[dict], lag: int | None = None) -> dict | None:
             "text": f"преднината на водещите се топи: RS за 4 седм. на първите три — средно {prev:.1f} → {now:.1f} за {lag} сесии ({each})"}
 
 
-def board_summary(rows: list[dict], spy_1d: float | None = None) -> str:
+def _chg_n(series, n: int) -> float | None:
+    """Промяната в % за n сесии по затварянията (dropna); под n+1 → None."""
+    try:
+        c = series.dropna()
+        return round((float(c.iloc[-1]) / float(c.iloc[-1 - n]) - 1) * 100, 2) if len(c) > n else None
+    except Exception:
+        return None
+
+
+def rotation_days(rows: list[dict], spy_1d: float | None, spy_5d: float | None, rsp_5d: float | None = None) -> dict | None:
+    """
+    18.11.2026 (спешно, т. 4): ротацията по числата за деня и седмицата — средната промяна на водещите (по "leader" / думата) срещу SPY за деня и за 5 сесии, колко сектора
+    са над SPY за 5 сесии и RSP (равнопретегленият S&P 500) срещу SPY за 5 сесии. → {"n", "lead_1d", "lead_5d", "spy_1d", "spy_5d", "beat_5d", "total", "rsp_5d",
+    "lag_day", "lag_week", "week_ok", "clauses"}; без водещи / без дневните числа → None. Мъртва зона — config.SECTOR_ROTATION_DEADZONE_PP. Чиста функция.
+    Реално, 18.11 (към 17.11): 7 водещи средно −1.39% срещу SPY −1.01% за деня (паднаха повече), −1.93% срещу −2.33% за 5 сесии; над SPY за 5 сесии 7 от 11.
+    """
+    dz = config.SECTOR_ROTATION_DEADZONE_PP
+    lead = [r for r in rows or [] if r.get("leader", r.get("word") == "води пазара")]
+    d1 = [r["chg_1d_pct"] for r in lead if isinstance(r.get("chg_1d_pct"), (int, float))]
+    if not lead or not d1 or not isinstance(spy_1d, (int, float)):
+        return None
+    d5 = [r["chg_5d_pct"] for r in lead if isinstance(r.get("chg_5d_pct"), (int, float))]
+    l1 = sum(d1) / len(d1)
+    l5 = sum(d5) / len(d5) if d5 and len(d5) == len(lead) and isinstance(spy_5d, (int, float)) else None
+    wk = [r for r in rows if isinstance(r.get("chg_5d_pct"), (int, float))]
+    beat = sum(1 for r in wk if isinstance(spy_5d, (int, float)) and r["chg_5d_pct"] > spy_5d)
+    out = {"n": len(lead), "lead_1d": round(l1, 2), "lead_5d": None if l5 is None else round(l5, 2), "spy_1d": spy_1d, "spy_5d": spy_5d, "beat_5d": beat, "total": len(wk),
+           "rsp_5d": rsp_5d, "lag_day": l1 < spy_1d - dz, "lag_week": l5 is not None and l5 < spy_5d - dz, "clauses": []}
+    out["week_ok"] = (l5 is not None and not out["lag_week"] and beat * 2 > len(wk)
+                      and (not isinstance(rsp_5d, (int, float)) or rsp_5d >= spy_5d - dz))
+    verb = lambda x: "паднаха повече от SPY" if x < 0 else "изостанаха от SPY"
+    if out["lag_day"]:
+        out["clauses"].append(f"днес водещите ({len(lead)}) средно {l1:+.1f}% срещу SPY {spy_1d:+.1f}% — {verb(l1)}")
+    if out["lag_week"]:
+        out["clauses"].append(f"за 5 сесии водещите средно {l5:+.1f}% срещу SPY {spy_5d:+.1f}% — {verb(l5)}")
+    return out
+
+
+def board_summary(rows: list[dict], spy_1d: float | None = None, spy_5d: float | None = None, rsp_5d: float | None = None) -> str:
     """
     Едно изречение от кода над таблицата: кои водят (думата „води пазара“), кои изостават („изостава“) и какво значи — групата с поне 2 от първите 3 (config.SECTOR_GROUPS);
     иначе „смесена картина“. Чиста функция.
@@ -274,8 +313,21 @@ def board_summary(rows: list[dict], spy_1d: float | None = None) -> str:
     lag = [r["sector"] for r in reversed(rows) if r.get("word") == "изостава"][:3]
     top3 = {r["etf"] for r in rows[:3]}
     broad = len(lead_all) >= config.SECTOR_BROAD_MIN_LEADERS and any(r.get("etf") in config.SECTOR_MEGA_TECH_ETFS and r.get("word") == "изостава" for r in rows)
-    meaning = selloff_text(rows, spy_1d) or (config.SECTOR_BROAD_TEXT if broad else next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2),
-                                                                                          "смесена картина — няма ясна посока на ротацията"))
+    rd = rotation_days(rows, spy_1d, spy_5d, rsp_5d) if spy_5d is not None else None     # 18.11.2026 (спешно, т. 4): денят и седмицата; стар вход без 5 сесии — както досега
+    if broad and rd and not rd["week_ok"]:                                       # по RS 4 седм. — широка, но последната седмица не я потвърждава
+        why = [f"над SPY са {rd['beat_5d']} от {rd['total']} сектора"]
+        if rd["lead_5d"] is not None:
+            why.append(f"водещите средно {rd['lead_5d']:+.1f}% срещу SPY {rd['spy_5d']:+.1f}%")
+        if isinstance(rsp_5d, (int, float)):
+            why.append(f"RSP {rsp_5d:+.1f}%")
+        broad_text = "по RS за 4 седм. — широка ротация извън мега-технологиите, но за 5 сесии не се потвърждава (" + ", ".join(why) + ")"
+    else:
+        broad_text = config.SECTOR_BROAD_TEXT
+    meaning = selloff_text(rows, spy_1d) or (broad_text if broad else next((m for m, etfs in config.SECTOR_GROUPS.items() if len(top3 & set(etfs)) >= 2),
+                                                                           "смесена картина — няма ясна посока на ротацията"))
+    lagc = [c for c in (rd or {}).get("clauses") or [] if not ("за 5 сесии" in c and "не се потвърждава" in broad_text and broad)]
+    if lagc:
+        meaning += "; " + "; ".join(lagc)
     lst = _lst
     head = (f"Водят {len(lead_all)} от {len(rows)} (първите три: {lst(lead)})" if len(lead_all) > 3 else f"Водят {lst(lead)}") if lead else "Нито един сектор не води и на двата периода"
     parts = [head, f"изостават {lst(lag)}" if lag else "нито един не изостава и на двата"]
@@ -307,7 +359,16 @@ def sector_board(download=None, universe_sector: dict | None = None, trend: dict
         for l in r["leaders"]:
             l.update((earnings_fn or next_earnings)(l["ticker"], today) or {})
     spy_1d = round((float(spy.iloc[-1]) / float(spy.iloc[-2]) - 1) * 100, 2) if len(spy) > 1 else None      # 06.11.2026 (т. 6)
-    return {"sectors": sectors, "subsectors": subsectors, "summary": board_summary(sectors, spy_1d), "as_of": spy.index[-1].date().isoformat(), "spy_1d_pct": spy_1d,
+    spy_5d = _chg_n(spy, 5)                                                      # 18.11.2026 (спешно, т. 4): седмицата — за заглавието
+    try:                                                                         # 18.11.2026 (т. 4): RSP (равнопретегленият S&P 500) — отделно; провал → без него
+        from src import sessions as _sessions
+        r = _sessions.cut_today(dl(["RSP"]))
+        rsp_5d = _chg_n(r["RSP"] if hasattr(r, "columns") and "RSP" in r.columns else r, 5)
+    except Exception as e:
+        print(f"[sector] RSP за седмицата не се изтегли: {type(e).__name__}: {e}")
+        rsp_5d = None
+    return {"sectors": sectors, "subsectors": subsectors, "summary": board_summary(sectors, spy_1d, spy_5d, rsp_5d), "as_of": spy.index[-1].date().isoformat(), "spy_1d_pct": spy_1d,
+            "spy_5d_pct": spy_5d, "rsp_5d_pct": rsp_5d, "rotation_days": rotation_days(sectors, spy_1d, spy_5d, rsp_5d),
             "top_sub": subsectors[:config.SECTOR_BOARD_SUB_TOP], "bottom_sub": subsectors[-config.SECTOR_BOARD_SUB_BOTTOM:][::-1] if len(subsectors) > config.SECTOR_BOARD_SUB_TOP else []}
 
 
