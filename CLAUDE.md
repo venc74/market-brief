@@ -115,7 +115,7 @@ src/screener.py        — Weinstein Stage 2 + Minervini trend template + RS rat
 src/setup_rules.py     — код-класификация на сетъпа, canslim_tier (17.11: „CANSLIM“ при EPS от отчета ≥ 25%, иначе „Тренд без ръст“ / „EPS: няма данни“), buy-stop ниво, "валиден до", stop_levels() — общата стоп математика
 src/enrich.py          — earnings, short interest, маркери; src/earnings_move.py — отчет в ~20 сесии + очаквано движение от опциите
 src/ai_brief.py        — Claude API на batch-ове: macro brief, ticker narratives, наблюдаваните, проверки на прозата; src/news_aggregator.py — дословни заглавия
-                         (от 16.11 основното — изборът на модела); от 16.11 изречение с име на поле пада (_FIELD_RE, brief["ai_field_drops"]); src/claim_check.py — твърдение
+                         (от 16.11 основното — изборът на модела; от 18.11 пулът преди тавана — първо заглавията за нашите тикъри и компании, priority_entries); от 16.11 изречение с име на поле пада (_FIELD_RE, brief["ai_field_drops"]); src/claim_check.py — твърдение
                          с институция / държава / мярка без опора във входа на модела пада („защо“ на новините и разказът)
 src/econ_calendar.py   — календарът на седмицата (16.11; Nasdaq: отчетите > 2% в S&P 500, от 18.11 и с капитализация ≥ $100 млрд, и нашите, Fed, данните с консенсуса; дните са с отместване +1) и очакванията към заглавията в 15:05
 src/offering_watch.py  — емисии на акции от EDGAR (16.11; 424B1/3/4/5/7 с обложка за акции → „⚠ емисия на акции“, S-1/S-3 → „регистрация“) за картите, книгите и наблюдаваните
@@ -202,7 +202,7 @@ tests/fixtures/        — РЕАЛНИ входове (OHLC, брифове, tr
 - Цел/изтичане: `TARGET_PARTIAL_FRACTION = 0.5` (на 2R = `MIN_REWARD_RISK`),
   `TRAIL_SMA_DAYS = 10`, `BACKTEST_MAX_HOLD_WEEKS = 16` (от ВХОДА, mark-to-market)
 - Спешно 18.11 (новините): `WEEK_CAL_MIN_MARKET_CAP = 100e9`, `ENABLE_OVERNIGHT = 1`, `SECTOR_ROTATION_DEADZONE_PP = 0.25`, `BREADTH_HIST_BRIEFS = 250`, `BREADTH_HIST_MIN = 40`,
-  `BREADTH_REL_LOW_PCT / HIGH_PCT = 25 / 75`, `BREADTH_DIR_SESSIONS = 5`, `BREADTH_DIR_DEADZONE_PP = 5`, `CAUSAL_CHECK_VERBS = 1`
+  `BREADTH_REL_LOW_PCT / HIGH_PCT = 25 / 75`, `BREADTH_DIR_SESSIONS = 5`, `BREADTH_DIR_DEADZONE_PP = 5`, `CAUSAL_CHECK_VERBS = 1`, `NEWS_PRIORITY_EXTRA_PER_SOURCE = 20`
 - Пазарното правило (пакет 3, 18.11): `REGIME_RULE_VERSION`, `REGIME_TREND_RISING_SESSIONS = 5`, `CREDIT_PRESSURE_HYG_10D_PCT = -1`, `CREDIT_PRESSURE_OAS_CHG_PCT = 75`,
   `REGIME_OFFENSIVE_CONFIRM_DAYS = 2`, `REGIME_INFO_ONLY` (2Y/10Y, Put/Call); Cash — при 3+ червени броени уреда (както досега)
 - Режим → Action: `REGIME_CASH_BLOCKS_ACTION = 1`,
