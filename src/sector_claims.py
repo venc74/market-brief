@@ -286,3 +286,75 @@ def sector_card(sector_logic: list[dict] | None, rotation: list[dict] | None, to
                          if isinstance(r.get("laggard_persistence_pct"), (int, float)) else " · не е водещ: потвърдено изоставане")
             out["omitted"].append({"etf": etf, "sector": r.get("sector") or x.get("sector") or etf, "rs_line": line})
     return out
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 18.11.2026 (спешно, т. 3): твърдения за ПОСОКАТА на RS на секторите в макро разказа — сверка с числата (RS за 4 седм. сега срещу преди 5 сесии, sector_board.sectors /
+# subsectors: rs_4w, rs_4w_prev). „Укрепва / засилва / набира / подобрява / расте“ при спад на мнозинството от назованите (или на водещите, когато е „водещите“) → изречението
+# пада; „отслабва / губи / топи се“ при ръст на мнозинството — също; „държат / запазват“ при спад ≥ config.SECTOR_FADE_ABS_PP на мнозинството — също.
+# Реално, 18.11 (към 17.11): водещите — XLP 12.2 → 9.4, XLV 15.5 → 8.2, XLU 8.4 → 8.9, XLF 10.3 → 7.5, XLY 11.8 → 6.5, XLRE 10.6 → 8.0, XLB 10.3 → 4.2 (6 от 7 надолу).
+# ══════════════════════════════════════════════════════════════════════════
+_RS_WORD = re.compile(r"\bRS\b|релативн\w*\s+сил\w*|относителн\w*\s+сил\w*|преднина\w*", re.I)
+_DIR_UP = re.compile(r"\b(?:укрепва\w*|укрепи\w*|засилва\w*|засили\w*|набира\w*|подобрява\w*|подобри\w*|нараства\w*|нарасна\w*|расте|растат|разширява\w*)\b", re.I)
+_DIR_DOWN = re.compile(r"\b(?:отслабва\w*|отслаби\w*|губи|губят|загуби\w*|топи\w*|влошава\w*|влоши\w*)\b", re.I)
+_DIR_HOLD = re.compile(r"\b(?:държ(?:и|ат)|задържа\w*|запазва\w*|запази\w*)\b", re.I)
+_LEADERS_WORD = re.compile(r"\bводещ\w*", re.I)
+_SECTOR_ALIASES = {
+    "XLP": r"защитн\w*\s+потребителск\w*|потребителск\w*\s+\(?защитн\w*|\bXLP\b", "XLY": r"циклич\w*\s+потребителск\w*|потребителск\w*\s+\(?циклич\w*|\bXLY\b",
+    "XLV": r"здравеопазван\w*|\bXLV\b", "XLU": r"комунал\w*|\bXLU\b", "XLF": r"\bфинанс(?:и|ите|ов\w*\s+сектор)\b|\bXLF\b", "XLRE": r"недвижим\w*\s+имот\w*|\bXLRE\b",
+    "XLB": r"\bматериал\w*|\bXLB\b", "XLE": r"енергети\w*|\bXLE\b", "XLC": r"комуникац\w*|\bXLC\b", "XLI": r"\bиндустри\w*|\bXLI\b", "XLK": r"технолог\w*|\bXLK\b",
+    "SMH": r"полупроводни\w*|\bSMH\b", "IGV": r"софтуер\w*|\bIGV\b", "XHB": r"жилищн\w*\s+строител\w*|\bXHB\b", "KRE": r"регионалн\w*\s+банк\w*|\bKRE\b",
+    "XBI": r"\bбиотех\w*|\bXBI\b", "ITA": r"\bотбран\w*|\bITA\b", "GDX": r"златодоб\w*|\bGDX\b", "URA": r"\bуран\w*|\bURA\b", "TAN": r"соларн\w*|\bTAN\b",
+}
+_SECTOR_RX = {k: re.compile(v, re.I) for k, v in _SECTOR_ALIASES.items()}
+_SENT_RS = re.compile(r"(?<=[.!?…])\s+(?=[A-ZА-Я„\"(\d])")
+
+
+def rs_direction_problem(sent: str, rows: list[dict]) -> dict | None:
+    """
+    Едно изречение → {"claim", "etfs", "changes", "why"} при противоречие с числата, иначе None. rows — редовете на секторната карта (секторите и подсекторите) с rs_4w и rs_4w_prev.
+    Без думата RS / релативна сила, без посока, без назовани сектори и без „водещ…“ или без rs_4w_prev → None. Чиста функция.
+    """
+    if not _RS_WORD.search(sent or ""):
+        return None
+    kinds = [k for k, rx in (("нагоре", _DIR_UP), ("надолу", _DIR_DOWN), ("задържа", _DIR_HOLD)) if rx.search(sent)]
+    if len(kinds) != 1:                                                          # без посока или две посоки („държат RS … tech губят тегло“) — не се приписва
+        return None
+    kind = kinds[0]
+    by = {r.get("etf"): r for r in rows or [] if isinstance(r.get("rs_4w"), (int, float)) and isinstance(r.get("rs_4w_prev"), (int, float))}
+    named = [e for e, rx in _SECTOR_RX.items() if rx.search(sent) and e in by]
+    if not named and _LEADERS_WORD.search(sent):
+        named = [r["etf"] for r in rows or [] if r.get("etf") in config.SECTOR_BOARD_ETFS and r.get("leader", r.get("word") == "води пазара") and r.get("etf") in by]   # водещите — само секторите
+    if not named:
+        return None
+    ch = {e: round(by[e]["rs_4w"] - by[e]["rs_4w_prev"], 2) for e in named}
+    dz = 1.0
+    down = sum(1 for v in ch.values() if v < -dz)
+    # „губят RS“ се чете и като ниво (изостават от SPY) — противоречие само при ръст И положителна RS
+    up = sum(1 for e, v in ch.items() if v > dz and by[e]["rs_4w"] > 0)
+    # „запазват / държат“ — противоречие само когато преднината се топи по правилото на картата (sector_layer.leaders_trend): ≥ SECTOR_FADE_ABS_PP пункта и ≥ SECTOR_FADE_REL
+    faded = sum(1 for e, v in ch.items() if v <= -config.SECTOR_FADE_ABS_PP and by[e]["rs_4w_prev"] > 0 and by[e]["rs_4w"] <= by[e]["rs_4w_prev"] * (1 - config.SECTOR_FADE_REL))
+    half = len(ch) / 2
+    bad = (kind == "нагоре" and down > half) or (kind == "надолу" and up > half) or (kind == "задържа" and faded > half)
+    if not bad:
+        return None
+    each = ", ".join(f"{e} {by[e]['rs_4w_prev']:.1f} → {by[e]['rs_4w']:.1f}" for e in named)
+    return {"claim": kind, "etfs": named, "changes": ch,
+            "why": f"твърди посока „{kind}“, а RS за 4 седм. за {config.SECTOR_BOARD_RANK_LAG} сесии: {each}"}
+
+
+def rs_direction_check(text: str, rows: list[dict]) -> tuple[str, list[dict]]:
+    """Разказът → (без изреченията с противоречаща посока на RS, [{sentence, …}]). Абзаците се пазят. Чиста функция."""
+    if not isinstance(text, str) or not text.strip() or not rows:
+        return text, []
+    removed, paras = [], []
+    for para in re.split(r"(\n\s*\n)", text):
+        if not para.strip() or re.fullmatch(r"\n\s*\n", para):
+            paras.append(para)
+            continue
+        kept = []
+        for sent in _SENT_RS.split(para.strip()):
+            p = next((x for x in (rs_direction_problem(seg, rows) for seg in re.split(r";\s", sent)) if x), None)     # по части („…; тех и полупроводници губят RS“)
+            (removed.append({"sentence": sent, **p}) if p else kept.append(sent))
+        paras.append(" ".join(kept))
+    return re.sub(r"(\n\s*\n){2,}", "\n\n", "".join(paras)).strip(), removed

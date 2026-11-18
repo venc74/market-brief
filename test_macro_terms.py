@@ -67,7 +67,7 @@ with q():
     out = ab.macro_and_sector_brief({}, [], {}, news=[], crypto={}, day=day)
 assert out["macro_brief"] == "RSP падна с 2.89%.\n\nЗа нас: нищо ново." and out["terms_fixed"][0]["term"] == "мечи пазар" and "numbers_fixed" not in out
 main_src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
-assert "ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day)" in main_src and main_src.index('"market_day", lambda') < main_src.index("macro_and_sector_brief(macro")
+assert "ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day, board=sector_board)" in main_src and main_src.index('"market_day", lambda') < main_src.index("macro_and_sector_brief(macro")
 print("  ✓ изречението пада, записът е в ai_macro[\"terms_fixed\"]; main подава деня на пазара")
 print("── 5. същата проверка в „защо“ на значимите новини (РЕАЛНИТЕ новини от 06.11; СИНТЕТИЧНИ редове за границите) ──")
 news = copy.deepcopy(TX["news"])

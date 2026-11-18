@@ -535,6 +535,10 @@ MODEL_PROBE_MAX_TOKENS = int(os.getenv("MODEL_PROBE_MAX_TOKENS", 16))
 MACRO_MAX_TOKENS = int(os.getenv("MACRO_MAX_TOKENS", 8000))
 # 17.11.2026 (пакет 1, т. 2б — решение след стратегическия преглед): макро разказът — кратко, 3–4 изречения (промптът); над MACRO_MAX_SENTENCES кодът реже (ai_brief.cap_sentences)
 MACRO_MIN_SENTENCES = int(os.getenv("MACRO_MIN_SENTENCES", 3))
+# 18.11.2026 (спешно, т. 3): причинна връзка в макро разказа („заради“, „поради“, „след като“, „в резултат“, „X скочи от Y“) — само с опора в ЕДНО подадено заглавие
+# (src/causal_check.py); 1 — и причинните глаголи („изстреляха VIX“, „което вдигна MOVE“, „доведе до“). Измерено върху 111 разказа (13.06–18.11, 746 изречения): 30 причинни
+# твърдения (23 с думите, 7 с глаголите; „от“ след глагол — 0), махнати 7 изречения (4 с думите, 3 с глаголите; 2 от тях — 18.11). Без глаголите 18.11 щеше да остане непроменен.
+CAUSAL_CHECK_VERBS = int(os.getenv("CAUSAL_CHECK_VERBS", 1))
 MACRO_MAX_SENTENCES = int(os.getenv("MACRO_MAX_SENTENCES", 4))
 
 # 17.11.2026 (пакет 1, т. 2а): AI_BATCH_SIZE / AI_BATCH_MAX_TOKENS / AI_NARRATIVE_SETUPS (AI абзацът на картите, ticker_narratives) — махнати; batch-овете остават

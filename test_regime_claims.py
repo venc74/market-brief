@@ -118,7 +118,7 @@ clean_answer = {"macro_brief": "Кратък текст.", "sector_logic": []}
 ai_brief._call_claude = lambda *a, **k: json.dumps(clean_answer, ensure_ascii=False)
 with contextlib.redirect_stdout(io.StringIO()):
     res2 = ai_brief.macro_and_sector_brief({}, [], THERMO)
-assert res2 == clean_answer
+assert {k: v for k, v in res2.items() if k != "drops_report"} == clean_answer and res2["drops_report"] == {"total": 0, "by_reason": {}}     # 18.11.2026: + отчетът (0)
 print("  ✓ чист отговор — непроменен")
 orig_meta = rc.strip_meta
 rc.strip_meta = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("СИНТЕТИЧНА повреда"))

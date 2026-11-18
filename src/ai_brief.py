@@ -1063,7 +1063,8 @@ def cap_sentences(text: str, n: int) -> tuple[str, list[str]]:
 
 
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
-                           thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None) -> dict:
+                           thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None,
+                           board: dict | None = None) -> dict:
     """
     AI макро бриф. 29.10.2026 (разходката, т. 5): "macro_brief" е разказ в 2–3 абзаца (разделени с празен ред) — какво стана през нощта и как се свързват нещата; абзацът
     за режима (regime_comment) и проверките, които бяха само за него (regime_claims.clean: броене, правило, distribution days, кредитен стрес), са махнати — режимът е в
@@ -1071,7 +1072,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     и без проверките на секторните твърдения (sector_claims — в историята са сработвали 4 пъти, всичките във веригите);
     отрязването + повторният опит и чуждите символи са в _parse_json / _fix_text. Graceful: грешка в проверка връща отговора на модела непроменен.
     """
-    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social, day)
+    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social, day, board)
     try:
         out = _apply_meta_check(out)
     except Exception as e:
@@ -1105,6 +1106,27 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
                     print(f"[ai] разказ: твърдение без опора във входа ({', '.join(f['claims'])}) — махнато: «{f['sentence'][:120]}»")
     except Exception as e:
         print(f"[ai] проверката на твърденията в разказа пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 18.11.2026 (спешно, т. 3): причинна връзка без опора в едно заглавие — изречението пада
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            from src import causal_check
+            new, cd = causal_check.check(out["macro_brief"], news, verbs=bool(config.CAUSAL_CHECK_VERBS), crypto=crypto)
+            if cd:
+                out = {**out, "macro_brief": new, "causal_drops": cd}
+                for f in cd:
+                    print(f"[ai] разказ: причинна връзка без заглавие ({f['kind']}: „{f['marker']}“ — {f['why']}) — махнато: «{f['sentence'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на причинните връзки пропусната: {type(e).__name__}: {e}")
+    try:                                                                         # 18.11.2026 (спешно, т. 3): посоката на RS на секторите — срещу числата
+        if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
+            from src import sector_claims
+            rows = list((board or {}).get("sectors") or []) + list((board or {}).get("subsectors") or [])
+            new, rd = sector_claims.rs_direction_check(out["macro_brief"], rows)
+            if rd:
+                out = {**out, "macro_brief": new, "rs_direction_drops": rd}
+                for f in rd:
+                    print(f"[ai] разказ: посоката на RS противоречи на числата ({f['why']}) — махнато: «{f['sentence'][:120]}»")
+    except Exception as e:
+        print(f"[ai] проверката на посоката на RS пропусната: {type(e).__name__}: {e}")
     try:                                                                         # 17.11.2026 (пакет 1, т. 2б): най-много MACRO_MAX_SENTENCES изречения — след проверките
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
             new, cut = cap_sentences(out["macro_brief"], config.MACRO_MAX_SENTENCES)
@@ -1114,7 +1136,21 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
                 print(f"[ai] разказ: над {config.MACRO_MAX_SENTENCES} изречения — махнати {len(cut)}: «{cut[0][:100]}»…")
     except Exception as e:
         print(f"[ai] таванът на изреченията в разказа пропуснат: {type(e).__name__}: {e}")
+    if isinstance(out, dict):                                                    # 18.11.2026 (спешно, т. 3): отчетът — колко изречения паднаха и защо (в данните, не на страницата)
+        out["drops_report"] = drops_report(out)
     return out
+
+
+def drops_report(out: dict) -> dict:
+    """18.11.2026 (т. 3): {"total", "by_reason": {причина: брой}} — махнатите от проверките изречения / части на макро разказа. Чиста функция."""
+    reasons = {"причинна връзка без опора в едно заглавие": len(out.get("causal_drops") or []),
+               "посоката на RS противоречи на числата": len(out.get("rs_direction_drops") or []),
+               "твърдение без опора във входа": len(out.get("claims_fixed") or []),
+               "дума за пазара без числото („корекция“, „мечи пазар“…)": len(out.get("terms_fixed") or []),
+               "число без опора във входа (махната част)": len(out.get("numbers_fixed") or []),
+               f"над {config.MACRO_MAX_SENTENCES} изречения": len(out.get("sentences_capped") or [])}
+    by = {k: v for k, v in reasons.items() if v}
+    return {"total": sum(by.values()), "by_reason": by}
 
 
 def narrative_text(macro: dict | None, rotation: list | None, thermometer: dict | None, news: list | None = None, crypto: dict | None = None,
@@ -1372,9 +1408,22 @@ def signal_periods_block(macro: dict | None) -> str:
             "без периода; не представяй 5-дневната промяна като дневна или обратно. Ход за последната сесия от ±3% или повече — спомени го, ако пишеш за този актив.\n\n")
 
 
+def rs_direction_block(board: dict | None) -> str:
+    """
+    18.11.2026 (спешно, т. 3): посоката на RS за 4 седм. на секторите — сега срещу преди config.SECTOR_BOARD_RANK_LAG сесии (секторната карта), за разказа; без карта / без
+    rs_4w_prev → "". Чиста функция.
+    """
+    rows = [r for r in (board or {}).get("sectors") or [] if isinstance(r.get("rs_4w"), (int, float)) and isinstance(r.get("rs_4w_prev"), (int, float))]
+    if not rows:
+        return ""
+    xs = [{"etf": r["etf"], "sector": r.get("sector"), "водещ": bool(r.get("leader")), "rs_4w_сега": r["rs_4w"], f"rs_4w_преди_{config.SECTOR_BOARD_RANK_LAG}_сесии": r["rs_4w_prev"]}
+          for r in rows]
+    return f"ПОСОКАТА НА RS НА СЕКТОРИТЕ (от кода, RS за 4 седм. спрямо SPY): {json.dumps(xs, ensure_ascii=False)}\n"
+
+
 def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
-                      social: dict | None = None, day: dict | None = None) -> str:
-    """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API)."""
+                      social: dict | None = None, day: dict | None = None, board: dict | None = None) -> str:
+    """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API). 18.11.2026: board — посоката на RS (rs_direction_block)."""
     return f"""Днешни данни:
 
 УРЕДИТЕ НА ТЕРМОМЕТЪРА (контекст за разказа): {json.dumps(_thermo_context(thermometer), ensure_ascii=False, default=str)}{_credit_roc_note(thermometer)}
@@ -1385,7 +1434,7 @@ def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news
 {market_day_block(day)}
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
 ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
-
+{rs_direction_block(board)}
 {_news_block(news)}{_crypto_block(crypto)}{_social_block(social)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
 (проценти, percentile, нива, delta-и) — копирай Я ТОЧНО както е \
@@ -1476,9 +1525,13 @@ NARRATIVE_RULES = (
     # 17.11.2026 (пакет 1, т. 2б — решение след стратегическия преглед): кратко — 3–4 изречения в един абзац (до 17.11 — „обикновено 2–3 абзаца“); кодът реже над
     # config.MACRO_MAX_SENTENCES (cap_sentences), като пази изречението „За нас:“
     f"Кратко — {config.MACRO_MIN_SENTENCES}–{config.MACRO_MAX_SENTENCES} изречения в един абзац, САМО върху подадените числа и новини; без преразказ на уредите един по един:\n"
-    "- Започни с това, което определи нощта, и свържи нещата: кое с кое е свързано и защо (новините, крипто, глобалните сигнали). Уредите на термометъра са контекст — "
+    "- Започни с това, което определи нощта, и свържи нещата, които едно заглавие свързва (новините, крипто, глобалните сигнали). Уредите на термометъра са контекст — "
     "кажи с думи какво показват („VIX е нисък“, „над половината акции са над средните си нива“), не ги изброявай.\n"
-    "- Кратки изречения, причина → следствие („затова…“, „пазарът го чу като…“). Числа само там, където помагат на историята — точно както са в данните.\n"
+    # 18.11.2026 (спешно, т. 3): причина → следствие само с опора в едно заглавие (causal_check маха останалите); посоката на RS — по числата (sector_claims.rs_direction_check)
+    "- Кратки изречения. Причина → следствие („заради“, „поради“, „след като“, „в резултат“, „X скочи от Y“, „изстреля“, „вдигна“) САМО когато едно и също подадено заглавие "
+    "съдържа и причината, и следствието; иначе кажи двете неща поотделно, без връзка — кодът маха изречение с причинна връзка без такова заглавие. "
+    "Числа само там, където помагат на историята — точно както са в данните.\n"
+    "- Посоката на RS на секторите („укрепва“, „отслабва“, „запазва“) — само по ПОСОКАТА НА RS по-долу; кодът маха изречение, което ѝ противоречи.\n"
     # 30.10.2026 (поправки от брифа, т. 4): жаргон само с обяснение; без цитати от проучванията ни; инфлацията — двете мерки заедно или нищо
     "- Жаргон (contango, carry trade, risk-on, spread, breadth…) — само с обяснение на прост език в скоби, напр. „contango (по-далечните фючърси на VIX са по-скъпи — "
     "пазарът не очаква сътресение скоро)“.\n"
@@ -1494,7 +1547,8 @@ NARRATIVE_RULES = (
 
 
 def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
-                               thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None) -> dict:
+                               thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None,
+                               board: dict | None = None) -> dict:
     """
     Връща:
     {
@@ -1513,7 +1567,7 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
     никога не позволяваме на изключението да стигне до run()).
     """
-    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social, day)
+    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social, day, board)
 
     # Ниво 0 (json_repair, вътре в _parse_json) + първи опит. try/except обхваща
     # И _call_claude, И _parse_json — мрежова/API грешка тук е РАВНОСИЛНА на

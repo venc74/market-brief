@@ -1,0 +1,906 @@
+{
+ "note": "РЕАЛНО: макро разказът (ai_macro.macro_brief), подадените новини (news: заглавие, „също“), крипто новините (crypto.items) и секторната карта (sector_board.sectors / subsectors) от брифовете на 16.11, 17.11 и 18.11.2026 — дословно от data/<дата>.json, извадени на 18.11.2026. Брифът от 16.11 е без rs_4w_prev (полето е от същия ден) — за 11-те сектора на 16.11 то е СМЕТНАТО на 18.11 със sector_layer.board_rows от затварянията на Yahoo (auto_adjust, до 13.11); rs_4w в брифа и сметнатото съвпадат до 0.01.",
+ "briefs": {
+  "2026-11-16": {
+   "macro_brief": "Нощта беше доминирана от три успоредни натиска: покачващи се доходности, по-силен долар и геополитическа ескалация в Хормузкия пролив. Десетгодишната американска доходност достигна 5.15% — +29.5 б.п. за 5 сесии, а за последната сесия (петък) добави още +5.1 б.п. Паралелно с това DXY напредна с +1.74% за 5 сесии и +0.23% за последната сесия (петък). Комбинацията удари технологиите и чиповете най-силно — QQQ приключи последната сесия с -1.20%, а XLK потъна с -2.01% за деня. Новините около Nvidia добавиха регулаторен слой отгоре: репортажът на WSJ за евентуално обявяване на AI-компании за „национални шампиони\" вървеше ръка за ръка с натиска на Министерството на финансите върху експортните ограничения — пазарът го чете като повишен регулаторен и операционен риск за целия AI-чип сектор. Fed говорителят Collins сигнализира за постепенно повишаване на лихвите, което пазарът чу като „доларът остава скъп по-дълго\" — затова лихвочувствителните сектори останаха под натиск, а MOVE индексът на облигационната волатилност добави +6.49% за 5 сесии.\n\nИзненадващото свиване на японската икономика усложнява плановете на Bank of Japan и притиска йената — директен попътен вятър за долара. В Хормуз три танкера са обхванати от пожар след удар в мини, което вкара геополитически риск-премиум в петрола: WTI стои на 89.09 за декемврийски контракт, +2.58% за 5 сесии, въпреки че за последната сесия (петък) отстъпи -0.20% на фона на новини за очакван излишък в предлагането. Медта падна с -4.91% за 5 сесии и -1.67% за последната сесия (петък) — сигнал, че глобалното търсене не ускорява. Златото отстъпи с -6.14% за 5 сесии при силен долар. Инфлационната картина засега не потвърждава паниката в доходностите: Dallas Fed Trimmed Mean PCE за септември е 2.26% г/г с низходяща посока (средно 2.25% за юли–септември срещу 2.37% за април–юни), но базовият PCE за септември е 3.12% — ускорение спрямо 3.03% в август. Двете мерки сочат в противоположни посоки, което обяснява защо пазарът е нервен: ако по-широката базова инфлация продължи да се покачва, Fed няма пространство за облекчение.\n\nПод повърхността има интересно разминаване: широчината на пазара (67.7% от акциите над 40-дневната средна) е здравословна, RSP биеше SPY с +1.5 п. за 10 сесии — средната акция се държи по-добре от мегакапачките в по-дългия прозорец. VIX е на 19.3 и VIX term structure е в contango (по-далечните фючърси са по-скъпи от краткосрочните — пазарът не очаква рязко сътресение). Put/Call коефициентът е на 7-ми перцентил за собствената си история от 108 дни — ниско самодоволство в смисъл, че хеджовете са малко. Крипто пространството е под натиск: Bitcoin ETF-и са изгубили $2.35 млрд. нетно за две седмици, а COIN, HOOD и CRCL приключиха с -2.3%, -4.3% и -2.5% за последната сесия (петък) съответно. Секторната ротация за 4-те седмици е ясна: XLV, XLF и XLP водят с RS на 6-месечен максимум при XLV и XLF, докато SMH и URA са потвърдени изоставащи с laggard persistence от 85% и 100%. За нас: водещите сектори — Здравеопазване, Финанси, Потребителски (защитни и циклични) — устояха на нощния натиск и запазиха относителна сила; покачващите се доходности и по-силният долар са риск за XLRE и XLU, но ги следим, тъй като и двата показаха краткосрочна RS стабилност.",
+   "news": [
+    {
+     "headline": "Iran's navy says three tankers on fire after hitting mines in Hormuz - Reuters",
+     "also": [
+      {
+       "headline": "Bahrain intercepts Iranian aerial attacks as Tehran says it attacked US base - Reuters"
+      },
+      {
+       "headline": "Saudi-led coalition intercepts missiles towards Riyadh, drones in Eastern Province - Reuters"
+      },
+      {
+       "headline": "Yemen's Houthis say they launched ballistic missiles towards Riyadh airport, financial centre - Reuters"
+      },
+      {
+       "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain - Reuters"
+      },
+      {
+       "headline": "Trump tells advisers he may hold off on Iran attacks barring new provocations, sources say - Reuters"
+      },
+      {
+       "headline": "Anti-Houthi forces retreat in Yemen as Iran strikes Bahrain in attack on U.S. base"
+      }
+     ]
+    },
+    {
+     "headline": "Japan's economy unexpectedly shrinks as inflation squeezes households - Reuters",
+     "also": [
+      {
+       "headline": "Dollar extends gains, yen looks past soft Japan GDP data - Reuters"
+      },
+      {
+       "headline": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite"
+      }
+     ]
+    },
+    {
+     "headline": "Fed's Collins says gradual rate hikes best to manage economic risks - Reuters",
+     "also": [
+      {
+       "headline": "Fed 'has some work to do on inflation,' Kansas City Fed chief says"
+      }
+     ]
+    },
+    {
+     "headline": "Trump administration to name Nvidia, other AI firms as US 'national champions', WSJ reports - Reuters",
+     "also": [
+      {
+       "headline": "EXCLUSIVE: Huang exit and US scrutiny imperil $3 billion in Chinese AI projects reliant on Nvidia - Reuters"
+      },
+      {
+       "headline": "EXCLUSIVE: Chinese AI firms rush to secure Nvidia chip capacity as spy scandal stirs fear of US curbs - Reuters"
+      },
+      {
+       "headline": "Bessent says Nvidia must 'go outside the company' to find new CEO - Reuters"
+      },
+      {
+       "headline": "Bessent says Nvidia needs ‘shake-up’ with external CEO"
+      },
+      {
+       "headline": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker"
+      }
+     ]
+    },
+    {
+     "headline": "Oil prices fall on expectations of coming supply surplus - Reuters",
+     "also": [
+      {
+       "headline": "US diesel below $6 a gallon at 2-month low on easing tensions, weaker demand - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "Trump to raise nuclear-arms cuts with Putin, Xi on Thursday, White House says - Reuters",
+     "also": [
+      {
+       "headline": "Trump to hold summit with Xi, Putin in Shenzhen on Thursday, NY Post reports - Reuters"
+      },
+      {
+       "headline": "Trump, Xi and Putin plan unprecedented joint meeting on APEC sidelines, White House and Kremlin say - AP News"
+      },
+      {
+       "headline": "US and allies sign accord to protect AI supply chains from China"
+      },
+      {
+       "headline": "China confirms Xi-Trump-Putin historic summit. What will be on the agenda?"
+      }
+     ]
+    }
+   ],
+   "crypto": {
+    "items": [
+     {
+      "headline": "US regulators move ahead on crypto trust charters as Senate scrutiny grows"
+     },
+     {
+      "headline": "UK, Singapore, and Thailand central banks test cross-border FX settlement as stablecoins gain ground"
+     },
+     {
+      "headline": "Bitcoin ETFs shed $2.35B in 2 weeks, BlackRock’s losing streak hits 11"
+     },
+     {
+      "headline": "DOJ moves to seize $1.2B from Binance hack, disrupts FaceStealer scam"
+     },
+     {
+      "headline": "U.S. Senate Banking Committee races toward hearing on new SEC nominations"
+     }
+    ]
+   },
+   "board": {
+    "sectors": [
+     {
+      "etf": "XLV",
+      "sector": "Здравеопазване",
+      "rs_4w": 8.13,
+      "rs_4w_prev": 14.56,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLP",
+      "sector": "Потребителски (защитни)",
+      "rs_4w": 6.64,
+      "rs_4w_prev": 14.33,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLY",
+      "sector": "Потребителски (циклични)",
+      "rs_4w": 7.94,
+      "rs_4w_prev": 10.32,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLF",
+      "sector": "Финанси",
+      "rs_4w": 6.94,
+      "rs_4w_prev": 10.59,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLRE",
+      "sector": "Недвижими имоти",
+      "rs_4w": 6.48,
+      "rs_4w_prev": 11.97,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLU",
+      "sector": "Комунални услуги",
+      "rs_4w": 5.56,
+      "rs_4w_prev": 10.28,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLB",
+      "sector": "Материали",
+      "rs_4w": 3.78,
+      "rs_4w_prev": 11.28,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLE",
+      "sector": "Енергетика",
+      "rs_4w": -3.69,
+      "rs_4w_prev": 0.26,
+      "leader": false,
+      "word": "отслабва"
+     },
+     {
+      "etf": "XLC",
+      "sector": "Комуникации",
+      "rs_4w": -0.32,
+      "rs_4w_prev": 0.52,
+      "leader": false,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "XLI",
+      "sector": "Индустрия",
+      "rs_4w": 1.79,
+      "rs_4w_prev": 1.77,
+      "leader": false,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XLK",
+      "sector": "Технологии",
+      "rs_4w": -6.1,
+      "rs_4w_prev": -12.25,
+      "leader": false,
+      "word": "изостава"
+     }
+    ],
+    "subsectors": [
+     {
+      "etf": "IBB",
+      "sector": "Биотех (големи)",
+      "rs_4w": 6.44,
+      "rs_4w_prev": null,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XRT",
+      "sector": "Търговия на дребно",
+      "rs_4w": 5.86,
+      "rs_4w_prev": null,
+      "word": "води пазара"
+     },
+     {
+      "etf": "JETS",
+      "sector": "Авиокомпании",
+      "rs_4w": 12.88,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XHB",
+      "sector": "Жилищно строителство",
+      "rs_4w": 8.81,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "IYT",
+      "sector": "Транспорт",
+      "rs_4w": 5.83,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "KRE",
+      "sector": "Регионални банки",
+      "rs_4w": 5.42,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "KBE",
+      "sector": "Банки",
+      "rs_4w": 5.68,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XBI",
+      "sector": "Биотех (малки)",
+      "rs_4w": 5.54,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "IGV",
+      "sector": "Софтуер",
+      "rs_4w": -1.88,
+      "rs_4w_prev": null,
+      "word": "отслабва"
+     },
+     {
+      "etf": "CIBR",
+      "sector": "Киберсигурност",
+      "rs_4w": -2.69,
+      "rs_4w_prev": null,
+      "word": "изостава"
+     },
+     {
+      "etf": "XOP",
+      "sector": "Добив на нефт и газ",
+      "rs_4w": -6.69,
+      "rs_4w_prev": null,
+      "word": "отслабва"
+     },
+     {
+      "etf": "ITA",
+      "sector": "Отбрана и аерокосмос",
+      "rs_4w": 3.82,
+      "rs_4w_prev": null,
+      "word": "набира сила"
+     },
+     {
+      "etf": "OIH",
+      "sector": "Нефтени услуги",
+      "rs_4w": -0.58,
+      "rs_4w_prev": null,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "GDX",
+      "sector": "Златодобив",
+      "rs_4w": -5.82,
+      "rs_4w_prev": null,
+      "word": "изостава"
+     },
+     {
+      "etf": "TAN",
+      "sector": "Соларна",
+      "rs_4w": 0.69,
+      "rs_4w_prev": null,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "SMH",
+      "sector": "Полупроводници",
+      "rs_4w": -8.76,
+      "rs_4w_prev": null,
+      "word": "изостава"
+     },
+     {
+      "etf": "XME",
+      "sector": "Метали и минно дело",
+      "rs_4w": -6.02,
+      "rs_4w_prev": null,
+      "word": "изостава"
+     },
+     {
+      "etf": "URA",
+      "sector": "Уран/ядрена",
+      "rs_4w": -9.07,
+      "rs_4w_prev": null,
+      "word": "изостава"
+     }
+    ]
+   }
+  },
+  "2026-11-17": {
+   "macro_brief": "Понеделникът донесе рязко засилване на напрежението — VIX скочи с 18.70% за последната сесия и стои на 22.91, а MOVE индексът на облигационната волатилност добави още 2.52% за деня след седмичен скок от 17.79%, достигайки 101 пункта. Zад цифрите стоят две новини: новата администрация блокира косвения достъп на Китай до американски AI технологии, което удари полупроводниците и cloud компаниите директно преди Nvidia earnings, а председателят на Фед Уорш предупреди, че AI може да „разочарова\" икономиката — пазарът го чете като сигнал, че политиката остава по-рестриктивна по-дълго. Десетгодишната доходност е на 5.12%, след като за 5 сесии добави 25.7 б.п. — ниво, което само по себе си стяга финансовите условия. DXY удари 19-месечен връх, покачвайки се с 1.24% за 5 сесии, и затова медта падна с 4.14%, а златото — с 3.86% за същия период. Петролът слезе до 85.18 долара, като за последната сесия (понеделник) изгуби 3.21% въпреки ескалацията в Персийския залив с трети американски самолетоносач и удар по танкер в Хормуз — пазарът залага на възстановяване на близкоизточния износ, а силният долар допълнително натиска цената.\n\nТехнологиите поеха основния удар: XLK падна с 3.24% за деня, QQQ е на 12.89% под 52-седмичния си връх, а SMH е сред най-продавания сектор за последните четири седмици с абсолютна загуба над 15%. Крипто-свързаните акции усилиха движението — BLSH -12.2%, HOOD -7.4%, CRCL -7.3% и COIN -6.1% за последната сесия, а за 5 сесии всяка от тях е с двуцифрена загуба. Институционалният апетит не липсва изцяло — Wells Fargo удвои позицията си в Bitcoin ETF на BlackRock до 2.35 млрд. долара — но краткосрочното настроение е категорично risk-off (бягство от риска). Под повърхността: широчината на пазара изненадва в обратна посока — средната акция се представя по-добре от мегакапитализациите, RSP губи само 1.01% срещу -1.91% за SPY за деня, а над 60% от акциите остават над 40-дневните си средни. Това не е широка разпродажба — концентрирана е в tech и AI-свързаните имена. Инфлационната картина не подкрепя паниката: Dallas Fed Trimmed Mean PCE за септември е 2.26% и пада (средно за юли–септември е 2.25% срещу 2.37% за април–юни), докато базовият PCE за септември е 3.12% — ускорен спрямо 3.03% за август. Двете мерки сочат в противоположни посоки, което оставя Фед без ясен повод да омекоти тона и затова пазарът смила по-дълго „по-висока за по-дълго\" (higher for longer).\n\nЗа нас: водещите ни сектори — Здравеопазване, Комунални услуги, Недвижими имоти и Потребителски (защитни) — се задържаха значително по-добре от широкия пазар в понеделник и продължават да укрепват относителната си сила спрямо SPY за последните четири и дванадесет седмици; Финансите също показват шестмесечен максимум на относителната сила. Нощта потвърждава, че ротацията към отбранителен профил не е случаен шум — тя е устойчива.",
+   "news": [
+    {
+     "headline": "Trump administration moves to block China from indirect access to American AI technology - AP News",
+     "also": [
+      {
+       "headline": "Nvidia fallout: Commerce targets loophole for China's data center use"
+      }
+     ]
+    },
+    {
+     "headline": "Shares slide on tech weakness ahead of Nvidia earnings - Reuters",
+     "also": [
+      {
+       "headline": "Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies - AP News"
+      },
+      {
+       "headline": "Tech sell-off deepens as Nvidia results loom"
+      }
+     ]
+    },
+    {
+     "headline": "Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’",
+     "also": [
+      {
+       "headline": "Analysis: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means"
+      }
+     ]
+    },
+    {
+     "headline": "US dollar hits 19-month peak on Fed hike bets; Aussie dips - Reuters",
+     "also": [
+      {
+       "headline": "Gold ticks up but lingers near more than one-year low on Fed hike bets - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz",
+     "also": [
+      {
+       "headline": "US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
+     "also": [
+      {
+       "headline": "Oil slips as recovering Mideast exports blunt Gulf tensions - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say - Reuters",
+     "also": []
+    }
+   ],
+   "crypto": {
+    "items": [
+     {
+      "headline": "Wells Fargo's reported BlackRock bitcoin ETF holdings double to $2.35 billion"
+     },
+     {
+      "headline": "Custodia Bank loses Supreme Court bid for direct Fed payment access"
+     },
+     {
+      "headline": "German lawmakers back crypto freezes outside criminal cases"
+     },
+     {
+      "headline": "Coinbase and Broadridge propose standard for tokenized stock disclosures"
+     }
+    ]
+   },
+   "board": {
+    "sectors": [
+     {
+      "etf": "XLV",
+      "sector": "Здравеопазване",
+      "rs_4w": 10.8,
+      "rs_4w_prev": 13.2,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLP",
+      "sector": "Потребителски (защитни)",
+      "rs_4w": 9.99,
+      "rs_4w_prev": 11.31,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLU",
+      "sector": "Комунални услуги",
+      "rs_4w": 10.5,
+      "rs_4w_prev": 8.74,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLF",
+      "sector": "Финанси",
+      "rs_4w": 9.46,
+      "rs_4w_prev": 8.9,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLRE",
+      "sector": "Недвижими имоти",
+      "rs_4w": 10.0,
+      "rs_4w_prev": 10.08,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLY",
+      "sector": "Потребителски (циклични)",
+      "rs_4w": 6.92,
+      "rs_4w_prev": 11.42,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLB",
+      "sector": "Материали",
+      "rs_4w": 4.64,
+      "rs_4w_prev": 10.69,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLE",
+      "sector": "Енергетика",
+      "rs_4w": -2.69,
+      "rs_4w_prev": -3.0,
+      "leader": false,
+      "word": "отслабва"
+     },
+     {
+      "etf": "XLC",
+      "sector": "Комуникации",
+      "rs_4w": 0.51,
+      "rs_4w_prev": -0.42,
+      "leader": false,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "XLI",
+      "sector": "Индустрия",
+      "rs_4w": 2.95,
+      "rs_4w_prev": 3.22,
+      "leader": false,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XLK",
+      "sector": "Технологии",
+      "rs_4w": -8.22,
+      "rs_4w_prev": -10.04,
+      "leader": false,
+      "word": "изостава"
+     }
+    ],
+    "subsectors": [
+     {
+      "etf": "JETS",
+      "sector": "Авиокомпании",
+      "rs_4w": 17.52,
+      "rs_4w_prev": 15.54,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XRT",
+      "sector": "Търговия на дребно",
+      "rs_4w": 6.89,
+      "rs_4w_prev": 13.98,
+      "word": "води пазара"
+     },
+     {
+      "etf": "IYT",
+      "sector": "Транспорт",
+      "rs_4w": 9.59,
+      "rs_4w_prev": 8.17,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XHB",
+      "sector": "Жилищно строителство",
+      "rs_4w": 11.16,
+      "rs_4w_prev": 16.47,
+      "word": "набира сила"
+     },
+     {
+      "etf": "KRE",
+      "sector": "Регионални банки",
+      "rs_4w": 7.97,
+      "rs_4w_prev": 9.16,
+      "word": "набира сила"
+     },
+     {
+      "etf": "KBE",
+      "sector": "Банки",
+      "rs_4w": 8.25,
+      "rs_4w_prev": 9.48,
+      "word": "набира сила"
+     },
+     {
+      "etf": "IBB",
+      "sector": "Биотех (големи)",
+      "rs_4w": 5.58,
+      "rs_4w_prev": 11.12,
+      "word": "набира сила"
+     },
+     {
+      "etf": "CIBR",
+      "sector": "Киберсигурност",
+      "rs_4w": -3.35,
+      "rs_4w_prev": -9.21,
+      "word": "отслабва"
+     },
+     {
+      "etf": "IGV",
+      "sector": "Софтуер",
+      "rs_4w": -3.25,
+      "rs_4w_prev": -5.75,
+      "word": "отслабва"
+     },
+     {
+      "etf": "XOP",
+      "sector": "Добив на нефт и газ",
+      "rs_4w": -6.54,
+      "rs_4w_prev": -7.34,
+      "word": "отслабва"
+     },
+     {
+      "etf": "ITA",
+      "sector": "Отбрана и аерокосмос",
+      "rs_4w": 4.33,
+      "rs_4w_prev": 7.88,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XBI",
+      "sector": "Биотех (малки)",
+      "rs_4w": 2.2,
+      "rs_4w_prev": 7.13,
+      "word": "набира сила"
+     },
+     {
+      "etf": "OIH",
+      "sector": "Нефтени услуги",
+      "rs_4w": -2.86,
+      "rs_4w_prev": -4.1,
+      "word": "изостава"
+     },
+     {
+      "etf": "TAN",
+      "sector": "Соларна",
+      "rs_4w": 0.8,
+      "rs_4w_prev": 7.42,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "GDX",
+      "sector": "Златодобив",
+      "rs_4w": -5.42,
+      "rs_4w_prev": 6.8,
+      "word": "изостава"
+     },
+     {
+      "etf": "SMH",
+      "sector": "Полупроводници",
+      "rs_4w": -12.76,
+      "rs_4w_prev": -14.74,
+      "word": "изостава"
+     },
+     {
+      "etf": "XME",
+      "sector": "Метали и минно дело",
+      "rs_4w": -8.13,
+      "rs_4w_prev": -2.81,
+      "word": "изостава"
+     },
+     {
+      "etf": "URA",
+      "sector": "Уран/ядрена",
+      "rs_4w": -10.6,
+      "rs_4w_prev": -5.89,
+      "word": "изостава"
+     }
+    ]
+   }
+  },
+  "2026-11-18": {
+   "macro_brief": "Иранските удари по американски бази в Залива изстреляха VIX с +11.13% за последната сесия (вторник) и +30.83% за 5 сесии до 25.46 — пазарът мина в режим на бягство от риска, всичките 11 сектора завършиха на минус, като малките акции (IWM) и Nasdaq-100 (QQQ) са съответно -11.58% и -13.52% от 52-седмичните си върхове. Геополитиката удари суровините по-силно от очакваното: медта падна -7.24% за 5 сесии, златото -5.54% за 5 сесии въпреки статута си на убежище, а 10-годишната доходност добави +12.0 б.п. за 5 сесии до 5.1%, което вдигна MOVE с над 10% за същия период — облигационният пазар оценява повишена несигурност, не успокоение. За нас: водещите ни сектори — защитните потребителски, комуналните услуги и здравеопазването — държат релативна сила с RS за 4 седмици над +8% спрямо SPY и две от тях на 6-месечни върхове по RS, което е точно очакваното поведение при бягство от риска, но при 5.1% доходност на 10-годишните недвижимите имоти и финансите ще се нуждаят от потвърждение, преди да добавяме.",
+   "news": [
+    {
+     "headline": "Iran says army targets U.S. drone and missile sites in Kuwait as Gulf attacks mount",
+     "also": [
+      {
+       "headline": "US strikes Iranian missile launch site on Qeshm Island, US official says - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "Trump administration moves to block China from indirect access to American AI technology - AP News",
+     "also": [
+      {
+       "headline": "EXCLUSIVE: Trump's China data center curb advances despite Amazon, Google, Meta lobbying - Reuters"
+      }
+     ]
+    },
+    {
+     "headline": "Goldman Sachs revealed its outlook for 2027. Here’s how much it sees the S&P 500 gaining",
+     "also": [
+      {
+       "headline": "Wall Street expects corporate earnings growth to halve next year"
+      }
+     ]
+    },
+    {
+     "headline": "Japan exports in October surge 20.5%, beating estimates on robust chip shipments",
+     "also": []
+    },
+    {
+     "headline": "Homebuilder sentiment plunges to 14-year low, leading more builders to drop prices",
+     "also": []
+    },
+    {
+     "headline": "Kalshi takes down controversial Trump 'mention' markets at CFTC's request",
+     "also": []
+    }
+   ],
+   "crypto": {
+    "items": [
+     {
+      "headline": "US senators seek SEC answers on tokenized stock money laundering risks"
+     },
+     {
+      "headline": "Goldman Sachs reports $1.22B in Ether ETFs as ETHA share count jumps"
+     },
+     {
+      "headline": "Revolut plans four blockchain-based funds for private markets, chair says"
+     }
+    ]
+   },
+   "board": {
+    "sectors": [
+     {
+      "etf": "XLP",
+      "sector": "Потребителски (защитни)",
+      "rs_4w": 9.44,
+      "rs_4w_prev": 12.17,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLV",
+      "sector": "Здравеопазване",
+      "rs_4w": 8.16,
+      "rs_4w_prev": 15.5,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLU",
+      "sector": "Комунални услуги",
+      "rs_4w": 8.86,
+      "rs_4w_prev": 8.35,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLF",
+      "sector": "Финанси",
+      "rs_4w": 7.54,
+      "rs_4w_prev": 10.31,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLY",
+      "sector": "Потребителски (циклични)",
+      "rs_4w": 6.45,
+      "rs_4w_prev": 11.77,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLRE",
+      "sector": "Недвижими имоти",
+      "rs_4w": 8.0,
+      "rs_4w_prev": 10.57,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLB",
+      "sector": "Материали",
+      "rs_4w": 4.2,
+      "rs_4w_prev": 10.28,
+      "leader": true,
+      "word": "води пазара"
+     },
+     {
+      "etf": "XLE",
+      "sector": "Енергетика",
+      "rs_4w": -2.12,
+      "rs_4w_prev": -3.96,
+      "leader": false,
+      "word": "отслабва"
+     },
+     {
+      "etf": "XLC",
+      "sector": "Комуникации",
+      "rs_4w": 0.3,
+      "rs_4w_prev": -0.43,
+      "leader": false,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "XLI",
+      "sector": "Индустрия",
+      "rs_4w": 3.71,
+      "rs_4w_prev": 3.78,
+      "leader": false,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XLK",
+      "sector": "Технологии",
+      "rs_4w": -7.56,
+      "rs_4w_prev": -10.72,
+      "leader": false,
+      "word": "изостава"
+     }
+    ],
+    "subsectors": [
+     {
+      "etf": "JETS",
+      "sector": "Авиокомпании",
+      "rs_4w": 13.66,
+      "rs_4w_prev": 16.87,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XRT",
+      "sector": "Търговия на дребно",
+      "rs_4w": 5.7,
+      "rs_4w_prev": 13.72,
+      "word": "води пазара"
+     },
+     {
+      "etf": "IYT",
+      "sector": "Транспорт",
+      "rs_4w": 8.26,
+      "rs_4w_prev": 8.89,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XHB",
+      "sector": "Жилищно строителство",
+      "rs_4w": 8.13,
+      "rs_4w_prev": 13.11,
+      "word": "набира сила"
+     },
+     {
+      "etf": "IBB",
+      "sector": "Биотех (големи)",
+      "rs_4w": 3.24,
+      "rs_4w_prev": 12.65,
+      "word": "води пазара"
+     },
+     {
+      "etf": "KRE",
+      "sector": "Регионални банки",
+      "rs_4w": 5.34,
+      "rs_4w_prev": 9.8,
+      "word": "набира сила"
+     },
+     {
+      "etf": "KBE",
+      "sector": "Банки",
+      "rs_4w": 5.68,
+      "rs_4w_prev": 10.09,
+      "word": "набира сила"
+     },
+     {
+      "etf": "CIBR",
+      "sector": "Киберсигурност",
+      "rs_4w": -4.07,
+      "rs_4w_prev": -8.65,
+      "word": "отслабва"
+     },
+     {
+      "etf": "ITA",
+      "sector": "Отбрана и аерокосмос",
+      "rs_4w": 6.35,
+      "rs_4w_prev": 10.38,
+      "word": "набира сила"
+     },
+     {
+      "etf": "XOP",
+      "sector": "Добив на нефт и газ",
+      "rs_4w": -6.78,
+      "rs_4w_prev": -8.87,
+      "word": "изостава"
+     },
+     {
+      "etf": "XBI",
+      "sector": "Биотех (малки)",
+      "rs_4w": -0.46,
+      "rs_4w_prev": 9.58,
+      "word": "в крак с пазара"
+     },
+     {
+      "etf": "IGV",
+      "sector": "Софтуер",
+      "rs_4w": -5.99,
+      "rs_4w_prev": -6.21,
+      "word": "изостава"
+     },
+     {
+      "etf": "OIH",
+      "sector": "Нефтени услуги",
+      "rs_4w": -3.32,
+      "rs_4w_prev": -4.53,
+      "word": "изостава"
+     },
+     {
+      "etf": "GDX",
+      "sector": "Златодобив",
+      "rs_4w": -2.96,
+      "rs_4w_prev": 2.85,
+      "word": "изостава"
+     },
+     {
+      "etf": "TAN",
+      "sector": "Соларна",
+      "rs_4w": -4.13,
+      "rs_4w_prev": 1.71,
+      "word": "изостава"
+     },
+     {
+      "etf": "XME",
+      "sector": "Метали и минно дело",
+      "rs_4w": -6.68,
+      "rs_4w_prev": -3.41,
+      "word": "изостава"
+     },
+     {
+      "etf": "SMH",
+      "sector": "Полупроводници",
+      "rs_4w": -11.58,
+      "rs_4w_prev": -14.69,
+      "word": "изостава"
+     },
+     {
+      "etf": "URA",
+      "sector": "Уран/ядрена",
+      "rs_4w": -10.34,
+      "rs_4w_prev": -7.99,
+      "word": "изостава"
+     }
+    ]
+   }
+  }
+ }
+}
