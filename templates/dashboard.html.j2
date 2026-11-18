@@ -672,9 +672,11 @@
 {% macro news_head(n) %}{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a class="news-head" href="{{ n.link }}" target="_blank" rel="noopener noreferrer">{{ n.headline }}</a>{% else %}<span class="news-head">{{ n.headline }}</span>{% endif %}{% endmacro %}
 {# 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина; 30.10.2026 (поправки от брифа, т. 5): другите източници — само „+N източника“, без линкове #}
 {% macro news_also(n) %}{% if n.also %} <span class="news-why" style="font-size:12px" title="{% for a in n.also %}{{ a.source }}{{ ', ' if not loop.last else '' }}{% endfor %}">· +{{ n.also|length }} {{ 'източник' if n.also|length == 1 else 'източника' }}</span>{% endif %}{% endmacro %}
-{% if news %}
+{% if news or news_sources_alert %}
 <section>
   <h2>Значими новини · последните {{ news_h }}ч</h2>
+  {# 18.11.2026 (спешно, т. 1): празен / паднал източник — видим ред, никога тихо #}
+  {% if news_sources_alert %}<div class="small" style="font-size:12.5px;color:var(--red);margin:0 0 8px">{{ news_sources_alert }}</div>{% endif %}
   <div class="news-list">
     {% for n in news %}
     <div class="news-item">
@@ -687,6 +689,7 @@
   </div>
   {# 02.11.2026 (поправки след брифа, т. 4): колко е прозорецът (от предишния бриф) и — само ако има такива — източниците, които не стигат до началото му #}
   {% if news_window_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">{{ news_window_note }}</div>{% endif %}
+  {% if news_pool_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:4px">{{ news_pool_note }}</div>{% endif %}
 </section>
 {% endif %}
 

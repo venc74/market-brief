@@ -51,11 +51,15 @@ def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: f
     02.11.2026: времето на заглавието — calendar.timegm (feedparser дава UTC); до 02.11 time.mktime го четеше като местно време — на GitHub runner-а (UTC) същото.
     """
     if feedparser is None:
+        LAST_FETCH_ERRORS[source] = "feedparser липсва"
         return []
     out = []
     try:
         # сваляме сами с requests (по-устойчиво от feedparser.parse(url) зад UA/таймаут)
-        raw = requests.get(url, timeout=15, headers=_UA).content
+        resp = requests.get(url, timeout=15, headers=_UA)
+        if getattr(resp, "status_code", 200) != 200:                       # 18.11.2026: HTTP грешката — в реда под новините, не само в лога
+            LAST_FETCH_ERRORS[source] = f"HTTP {resp.status_code}"
+        raw = resp.content
         feed = feedparser.parse(raw)
         cutoff = since_ts if since_ts is not None else time.time() - hours * 3600
         for e in feed.entries[:limit * 2]:
@@ -82,7 +86,12 @@ def _fetch_rss(url: str, source: str, hours: float, limit: int = 15, since_ts: f
                 break
     except Exception as ex:
         print(f"[news] RSS {source} failed: {ex}")
+        LAST_FETCH_ERRORS[source] = f"{type(ex).__name__}: {ex}"[:160]          # 18.11.2026: паднал източник — видим ред под новините (render.news_sources_alert)
     return out
+
+
+# 18.11.2026 (спешно, т. 1): {източник: грешка} от последното теглене (HTTP ≠ 200, изключение) — gather_raw го чисти и го пише в LAST_WINDOW["dead"]
+LAST_FETCH_ERRORS: dict = {}
 
 
 def _safe_link(link) -> str | None:
@@ -199,8 +208,11 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict
     per_source: list[list[dict]] = []
     dead: list[str] = []
     day_queries = 0
+    LAST_FETCH_ERRORS.clear()
+    fetched: dict = {}
     for src, url in config.NEWS_RSS_FEEDS.items():
         got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
+        fetched[src] = len(got)
         if not got:
             dead.append(src)
         per_source.append(got)
@@ -233,7 +245,9 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None) -> list[dict
             seen.add(key); dedup.append(it)
     LAST_WINDOW.clear()
     LAST_WINDOW.update({"since": since.isoformat() if since else (now - dt.timedelta(hours=hours)).isoformat(), "hours": round((now - since).total_seconds() / 3600, 2) if since else hours,
-                        "day_queries": day_queries, "sources": source_reach(dedup)})
+                        "day_queries": day_queries, "sources": source_reach(dedup),
+                        # 18.11.2026 (спешно, т. 1): колко върна всеки фийд и кои са празни / паднали (с грешката) — за видимия ред под новините
+                        "fetched": fetched, "dead": [{"source": d, **({"error": LAST_FETCH_ERRORS[d]} if LAST_FETCH_ERRORS.get(d) else {})} for d in dead]})
     if since:
         print(f"[news] прозорец: от {since:%d.%m %H:%M} UTC ({LAST_WINDOW['hours']:g} ч), заявки по дни: {day_queries}; обхват — "
               + " · ".join(f"{k} {v['count']} (до {v['oldest'][8:10]}.{v['oldest'][5:7]} {v['oldest'][11:16]})" if v.get("oldest") else f"{k} {v['count']}"
@@ -276,8 +290,14 @@ _NUM_NAME_RE = re.compile(r"(?:S&P|Russell|Nasdaq|Stoxx|FTSE|DAX|Nikkei|CAC|MSCI
                           r"|\b\d+Y\b|\b[QG]\d\b", re.I)
 
 
+# 18.11.2026 (спешно, т. 1 — Nvidia): моделът пише ехото с права апострофа („Nvidia's“), фийдът — с типографска („Nvidia’s“); до 18.11 думите не съвпадаха и избраната
+# новина падаше с „индексът не съвпада със заглавието“ — 7 основни новини от 10.11 до 18.11 (всичките с апостроф; + 16 „също“ от 30.10 с апостроф в ехото — заглавието им не е пазено) (на 18.11 — „Nvidia’s Kress tells CNBC's Jim
+# Cramer …“ и „China’s Xi calls for removing trade …“). Сравнението е след уеднаквяване на кавичките.
+_QUOTES = str.maketrans({"’": "'", "‘": "'", "‛": "'", "′": "'", "`": "'", "“": '"', "”": '"', "„": '"', "″": '"'})
+
+
 def _first_words(s: str, n: int = 6) -> list[str]:
-    return [w.casefold().strip("'’") for w in _WORD_RE.findall(s or "")][:n]
+    return [w.casefold().strip("'") for w in _WORD_RE.findall((s or "").translate(_QUOTES))][:n]
 
 
 def _echo_index(h, i: int, pool: list[dict], seen: set) -> tuple[int | None, str]:
@@ -520,6 +540,8 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> li
     # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
     days = max(1, round((dt.datetime.now(dt.timezone.utc) - since).total_seconds() / 86400)) if since else 1     # 02.11.2026: на 24 ч от прозореца
     pool = raw[:config.NEWS_MAX_TO_FILTER * days]
+    # 18.11.2026 (спешно, т. 1): таванът реже след редуването — колко от всеки източник стигнаха до подбора (18.11: 100 от 139 — Reuters 31 от 50, AP 30 от 50)
+    LAST_WINDOW.update(pool_total=len(raw), pool_used=len(pool), to_model={k: v["count"] for k, v in source_reach(pool).items()})
     compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r["summary"]} for k, r in enumerate(pool)]
     user = (
         "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
@@ -551,6 +573,7 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None) -> li
         LAST_DIAG.clear()
         got = data.get("news", []) if isinstance(data, dict) else []
         LAST_DIAG.update(returned=len(got), kept=len(news), dropped=dropped,
+                         pool=[[r.get("source"), r.get("published"), r["title"]] for r in pool],     # 18.11.2026 (т. 1): пулът, който видя моделът — за диагнозата на пропусната новина
                          no_echo=sum(1 for n in got if isinstance(n, dict) and not (isinstance(n.get("h"), str) and n["h"].strip())))   # 19.10.2026 (С3)
         for d in dropped:
             print(f"[news] ⚠ {d['reason']}: {d}")

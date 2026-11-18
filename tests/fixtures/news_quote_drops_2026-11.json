@@ -1,0 +1,96 @@
+{
+ "note": "РЕАЛНО: отпадналите основни новини с „индексът не съвпада със заглавието“ от news_diag на брифовете 30.10–18.11.2026 (data/<дата>.json, извадени на 18.11.2026 ~15:40 Берлин): „h“ — ехото на модела, „pool_title“ — заглавието от фийда. Всичките 7 — с апостроф. + news_window и news_diag на брифа от 18.11 (дословно).",
+ "drops": [
+  {
+   "date": "2026-11-10",
+   "h": "China's monthly imports grow at fastest",
+   "pool_title": "China’s monthly imports grow at fastest pace in five years as surplus crosses $1 trillion in 2026"
+  },
+  {
+   "date": "2026-11-10",
+   "h": "EXCLUSIVE: Anthropic's nearly $70 billion IPO",
+   "pool_title": "EXCLUSIVE: Anthropic’s nearly $70 billion IPO plan briefly circulated to banks, then retracted - Reuters"
+  },
+  {
+   "date": "2026-11-16",
+   "h": "China's slowdown deepens in October as",
+   "pool_title": "China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates"
+  },
+  {
+   "date": "2026-11-16",
+   "h": "Anthropic's IPO lands as the embattled",
+   "pool_title": "Anthropic’s IPO lands as the embattled AI trade looks for a much-needed bright spot"
+  },
+  {
+   "date": "2026-11-17",
+   "h": "Nvidia's interim CEO Colette Kress to make",
+   "pool_title": "Nvidia’s interim CEO Colette Kress to make her debut at first earnings"
+  },
+  {
+   "date": "2026-11-18",
+   "h": "Nvidia's Kress tells CNBC's Jim Cramer",
+   "pool_title": "Nvidia’s Kress tells CNBC's Jim Cramer that 'customers continue to be with us’"
+  },
+  {
+   "date": "2026-11-18",
+   "h": "China's Xi calls for removing trade",
+   "pool_title": "China’s Xi calls for removing trade and investment barriers ahead of his meeting with Trump and Putin"
+  }
+ ],
+ "news_window_2026_11_18": {
+  "since": "2026-11-17T06:30:00+00:00",
+  "hours": 24.1,
+  "day_queries": 0,
+  "sources": {
+   "Reuters Business": {
+    "count": 50,
+    "oldest": "2026-11-17T06:55Z"
+   },
+   "CNBC": {
+    "count": 29,
+    "oldest": "2026-11-17T10:08Z"
+   },
+   "Financial Times": {
+    "count": 10,
+    "oldest": "2026-11-17T15:33Z"
+   },
+   "AP Business": {
+    "count": 50,
+    "oldest": "2026-11-17T07:19Z"
+   }
+  },
+  "crypto_hours": 30
+ },
+ "news_diag_2026_11_18": {
+  "returned": 8,
+  "kept": 6,
+  "dropped": [
+   {
+    "i": 1,
+    "reason": "индексът не съвпада със заглавието",
+    "h": "Nvidia's Kress tells CNBC's Jim Cramer",
+    "pool_title": "Nvidia’s Kress tells CNBC's Jim Cramer that 'customers continue to be with us’"
+   },
+   {
+    "i": 5,
+    "reason": "индексът не съвпада със заглавието",
+    "h": "China's Xi calls for removing trade",
+    "pool_title": "China’s Xi calls for removing trade and investment barriers ahead of his meeting with Trump and Putin"
+   },
+   {
+    "i": 15,
+    "reason": "също: ехото не съвпада със заглавието",
+    "of": 9,
+    "h": "A 2-month lull ends with Iran's"
+   },
+   {
+    "i": 62,
+    "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него",
+    "removed": [
+     "от над 20%"
+    ]
+   }
+  ],
+  "no_echo": 0
+ }
+}

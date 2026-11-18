@@ -532,6 +532,45 @@ def news_window_note(nw: dict | None) -> str | None:
     return f"{head}, {start} UTC). Не стигат до началото му: " + " · ".join(short) + "."
 
 
+def news_sources_alert(nw: dict | None) -> str | None:
+    """
+    18.11.2026 (спешно, т. 1): празен или паднал източник на новините — видим червен ред, никога тихо. Всеки фийд от config.NEWS_RSS_FEEDS с 0 заглавия в прозореца
+    („fetched“ от gather_raw, иначе обхватът „sources“), с грешката (HTTP ≠ 200, изключение), ако има. Всички с заглавия / стар бриф без „fetched“ и „sources“ → None. Чиста функция.
+    """
+    nw = nw or {}
+    fetched, reach = nw.get("fetched"), nw.get("sources")
+    if fetched is None and reach is None:
+        return None
+    errs = {d.get("source"): d.get("error") for d in nw.get("dead") or [] if isinstance(d, dict)}
+    bad = []
+    for name in config.NEWS_RSS_FEEDS:
+        n = (fetched or {}).get(name) if fetched is not None else ((reach or {}).get(name) or {}).get("count", 0)
+        if not n:
+            bad.append(f"{name} — 0 заглавия" + (f" ({errs[name]})" if errs.get(name) else " в прозореца"))
+    return ("⚠ Източници без заглавия днес: " + " · ".join(bad) + " — подборът е без тях; празното НЕ значи, че няма новини.") if bad else None
+
+
+def news_pool_note(nw: dict | None, diag: dict | None) -> str | None:
+    """
+    18.11.2026 (спешно, т. 1): колко заглавия стигнаха до подбора по източник (таванът реже след редуването) и колко от избраните паднаха при проверките на кода и защо.
+    Реално, 18.11: 100 от 139 (Reuters 50 върнати), моделът избра 8, показани 6 — 2 паднаха („индексът не съвпада със заглавието“: апострофите, сред тях Nvidia).
+    Без „to_model“ (стар бриф) → None. Чиста функция.
+    """
+    nw, diag = nw or {}, diag or {}
+    to, fetched = nw.get("to_model"), nw.get("fetched") or {}
+    if not to:
+        return None
+    parts = [f"{k} {v}" + (f" от {fetched[k]}" if fetched.get(k) and fetched[k] != v else "") for k, v in to.items()]
+    out = f"Към подбора: {nw.get('pool_used', sum(to.values()))} от {nw.get('pool_total', sum(to.values()))} заглавия ({', '.join(parts)})"
+    main_drops = [d for d in diag.get("dropped") or [] if isinstance(d, dict) and (d.get("pool_title") or d.get("reason") in ("няма валиден индекс в пула", "празно why", "ехото е по-кратко от 3 думи"))]
+    if diag.get("returned") is not None:
+        out += f"; подборът избра {diag['returned']}, показани {diag.get('kept', 0)}"
+        if main_drops:
+            why = sorted({d["reason"] for d in main_drops})
+            out += f" — {len(main_drops)} паднаха при проверката на кода ({'; '.join(why)})"
+    return out + "."
+
+
 def radar_reason(c: dict) -> str:
     """
     30.10.2026 (разходката, т. 9–10): причината на реда в „На радара“ — от кода, с числото: „широк стоп · 15.3%“ (too_wide; до 02.11 „разтегната · стоп“), „пробив без обем · 0.9×“, „блокирана от режима“,
@@ -807,6 +846,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_ep_crashed=config.QM_EP_CRASHED_RET63_PCT, insider_big_sell_pct=config.INSIDER_BIG_SELL_PCT, preopen_econ_since=config.PREOPEN_ECON_SINCE_NY, qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
+        news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
+        news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
