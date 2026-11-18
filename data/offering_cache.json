@@ -28,6 +28,13 @@
    "kind": "акции",
    "title": "$2,000,000,000 Common Stock",
    "preliminary": true
+  },
+  "0001193125-26-465047": {
+   "ticker": "BRK-B",
+   "date": "2026-11-17",
+   "kind": "дълг",
+   "title": null,
+   "preliminary": false
   }
  }
 }

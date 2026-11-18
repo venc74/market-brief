@@ -1,123 +1,90 @@
 {
- "date": "2026-11-17",
+ "date": "2026-11-18",
  "news": [
+  {
+   "headline": "Iran says army targets U.S. drone and missile sites in Kuwait as Gulf attacks mount",
+   "source": "CNBC",
+   "why": "Иранските удари по американски бази в Залива и американското ответно нападение на Qeshm Island засилват геополитическия риск — натиск нагоре върху петрола и активите убежища, надолу върху регионалните пазари.",
+   "source_text": "Iran says army targets U.S. drone and missile sites in Kuwait as Gulf attacks mount Iran said its army targeted U.S. drone and missile installations at Kuwait's Ali Al Salem air base, extending a run of attacks on Gulf states. US strikes Iranian missile launch site on Qeshm Island, US official says - Reuters US strikes Iranian missile launch site on Qeshm Island, US official says Reuters",
+   "link": "https://www.cnbc.com/2026/11/18/trump-iran-war-hormuz-oil-.html",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "US strikes Iranian missile launch site on Qeshm Island, US official says - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNWENzVXNRVjR0NU9lejlJWll3U01GOENvbnlKVWJuZG9ZSmwtdVRXSDRPZ3JGcGZnSGhfQmYzNnFRQ0p4d2ZaZk80Q0NKUEgtdTI3cmFwb2JxT1FOamJYVllwTFR3UV9ZN2xfMTNTTFZiS0gtSjU2Q3B6dkVLUmgyYzlpcHprNXdCMEdST0RqNkdkTEgycGFEQkVwY01yWENOcVNpYWpFYlRrRG1waGlwVHNKM3h5UHBidHpMcXlkcw?oc=5"
+    }
+   ]
+  },
   {
    "headline": "Trump administration moves to block China from indirect access to American AI technology - AP News",
    "source": "AP Business",
-   "why": "Ограниченията върху косвения достъп на Китай до американски AI технологии засягат акциите на чипмейкъри и cloud доставчици, като увеличават регулаторния риск за целия AI сектор.",
-   "source_text": "Trump administration moves to block China from indirect access to American AI technology - AP News Trump administration moves to block China from indirect access to American AI technology AP News Nvidia fallout: Commerce targets loophole for China's data center use The rule was written by the Treasury Department and the National Security Council after criticism of Commerce Secretary Howard Lutnick.",
+   "why": "Ограничаването на косвения достъп на Китай до американски AI технологии удря акции на облачни и data center оператори (Amazon, Google, Meta) и може да забави износа на чипове.",
+   "source_text": "Trump administration moves to block China from indirect access to American AI technology - AP News Trump administration moves to block China from indirect access to American AI technology AP News EXCLUSIVE: Trump's China data center curb advances despite Amazon, Google, Meta lobbying - Reuters EXCLUSIVE: Trump's China data center curb advances despite Amazon, Google, Meta lobbying Reuters",
    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxONGJmTGhQa3FRRDZtX3BqVk9SNlc1aHZ1QXZiUXdHMmlmZmdyUjFKS0hrREM1OFRrVDVjUGpSWnZfVTEtdlozVHVDc0h5Rld1cGVKQTFGYzVZOGJMdDNheWdEcFRhakxCVW1xcnQ3VHBzS2lRdWNPTGdtUkNxNVRnT1JUVzVKNzRXUlNuLUtBOVk2REZnZjMySER5NmhfNTliRjZsZ3B5TElrN0JU?oc=5",
    "also": [
     {
-     "source": "CNBC",
-     "headline": "Nvidia fallout: Commerce targets loophole for China's data center use",
-     "link": "https://www.cnbc.com/2026/11/16/nvidia-commerce-china-lutnick.html"
+     "source": "Reuters Business",
+     "headline": "EXCLUSIVE: Trump's China data center curb advances despite Amazon, Google, Meta lobbying - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPamZVTFBIMlk1aHp5ZUZ3ME56bnZlV3NPODhQY3JKcnI2dUtIT0FqSHFveTRSem1Rby14eXY4dnhCci1WWmNJdEZnTnNnOUJldUROSXFWc1I5SmExVXZ2dWlhMWhQSkpqTFJIN1R2aTJsX2tJQ1l6cnhRY2JWdTNpVjNKZFhuelREd1A1S29BYUhDRHlTNWxncUJ3aHFobUU1NFZNTVlkbkxLUWExUFVjWHpOSHo3aE0?oc=5"
     }
    ]
   },
   {
-   "headline": "Shares slide on tech weakness ahead of Nvidia earnings - Reuters",
-   "source": "Reuters Business",
-   "why": "Разпродажбата в tech акциите, водена от Nvidia, оказва натиск върху широкия пазар преди ключови earnings.",
-   "source_text": "Shares slide on tech weakness ahead of Nvidia earnings - Reuters Shares slide on tech weakness ahead of Nvidia earnings Reuters Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies - AP News Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies AP News Tech sell-off deepens as Nvidia results loom Investors fret over tighter US chip export controls and potential slowdown in AI data centre build-out",
-   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQbHY5U3ZMUmhWeEViMkJTbW9ObHlQYWRWbmdxWDhXMUdaWFRvLVdRY01oaTJJb3lmOFBiaWpQMEFlTFk5R2ttRnBaT18zaF9Jbk9od2Rza0cyMXJ6Z3JlalJDdG9neTVhQ3pJRG05SE9NQUYxZkFvQmQ5bnVfTi13amFNOA?oc=5",
+   "headline": "Goldman Sachs revealed its outlook for 2027. Here’s how much it sees the S&P 500 gaining",
+   "source": "CNBC",
+   "why": "Прогнозата на Goldman за S&P 500 за 2027 г. задава тона за очакванията на институционалните инвеститори и влияе на позиционирането в equity фондовете.",
+   "source_text": "Goldman Sachs revealed its outlook for 2027. Here’s how much it sees the S&P 500 gaining Chief U.S. equity strategist Ben Snider expects the bull market to continue, even if the advance isn't as explosive as it has been. Wall Street expects corporate earnings growth to halve next year Analysts forecast profit growth will dip to 16% globally from 33.5% as pace of AI capex expansion slows",
+   "link": "https://www.cnbc.com/2026/11/17/goldman-sachs-revealed-its-outlook-for-2027-heres-how-much-it-sees-the-sp-500-gaining.html",
    "also": [
-    {
-     "source": "AP Business",
-     "headline": "Stocks tumble on Wall Street as Nvidia leads another sell-off in technology companies - AP News",
-     "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOYXdFLTA2eFh1c1k5N2ZnWnBXdkpYX3ZzMkNaUC03SjBXeDlVcHplSm1fUnRnVzJsaGhFb0I2eHp2Si1uaTNRaEotekFyYlZYRVlxdzNydUhEaXZaa0c5dW1ybEp5T2wyWUN2eVhGaTdpdVV5bkRuRDJxQVd0X2wySmFhQXNiaWROVmRJRXdIRDVtSC1CN3c?oc=5"
-    },
     {
      "source": "Financial Times",
-     "headline": "Tech sell-off deepens as Nvidia results loom",
-     "link": "https://www.ft.com/content/4a3b9892-67c6-4177-8503-80c0a5eb3b60?syn-25a6b1a6=1"
+     "headline": "Wall Street expects corporate earnings growth to halve next year",
+     "link": "https://www.ft.com/content/74fdac03-bd9b-4e68-9e6e-dc023eb47be9?syn-25a6b1a6=1"
     }
    ]
   },
   {
-   "headline": "Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’",
+   "headline": "Japan exports in October surge 20.5%, beating estimates on robust chip shipments",
    "source": "CNBC",
-   "why": "Изказването на председателя на Fed относно AI и икономиката влияе на очакванията за лихвени решения и посоката на облигациите и долара.",
-   "source_text": "Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’  Analysis: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means Kevin Warsh sees AI at a turning point. He faces tough questions on jobs and interest rates.",
-   "link": "https://www.cnbc.com/2026/11/16/fed-ai-task-force-kevin-warsh.html",
-   "also": [
-    {
-     "source": "CNBC",
-     "headline": "Analysis: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means",
-     "link": "https://www.cnbc.com/2026/11/16/kevin-warsh-fed-ai-jobs-productivity-interest-rateshtml.html"
-    }
-   ]
+   "why": "Ръст в японския износ, воден от полупроводници с почти 50% годишно покачване, е положителен сигнал за глобалното търсене на чипове и за японската йена.",
+   "source_text": "Japan exports in October surge 20.5%, beating estimates on robust chip shipments Semiconductor shipments spiked almost 50% year on year.",
+   "link": "https://www.cnbc.com/2026/11/18/japan-exports-october-imports-chips.html"
   },
   {
-   "headline": "US dollar hits 19-month peak on Fed hike bets; Aussie dips - Reuters",
-   "source": "Reuters Business",
-   "why": "Нов 19-месечен връх на долара на фона на очаквания за повишение на лихвите натиска суровините, emerging markets и валутните двойки.",
-   "source_text": "US dollar hits 19-month peak on Fed hike bets; Aussie dips - Reuters US dollar hits 19-month peak on Fed hike bets; Aussie dips Reuters Gold ticks up but lingers near more than one-year low on Fed hike bets - Reuters Gold ticks up but lingers near more than one-year low on Fed hike bets Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPb0Z6TDRSbVp3QXhMLUlLR3Vaam5aam1wVW9LV2tGSmJPZVFaU2dCNnhzVjJSY25lNWR3N1lmOFVPeno3UWpkamE2SDVxOVVfcUxUY0RxYTd5cm8wYzg0M1FVZTdrVXU2RXJzbXFmNElPb0ZqVVJ2WUxhS1B5WXVhRFFobUJPb2FaNzdsdlFkNmludUtnSXY3eUJoZ0J5UXFJdTlQUVhR?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Gold ticks up but lingers near more than one-year low on Fed hike bets - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNVGd6c05RMXpCQzBvWjhLZlZ6cjc4OUZ0cjZaSWxzZk9leV9WbG1EVmhoVlJfTHZZRFkxZml4Rll3TXd6SGc0dmtiSHFsYkVQWThZdkpxb3dGQkhpSkgyVC1HQlV5WkZQaHU4N3B2b2RELWdDaGpZLWtmbHo2cllMNE9tN29pYnJGM1Z4eFJ6bmNQdHJFX0lNTHZtV0x4MlNhT284LThTc1hTY2xlcEEta0wwNjg?oc=5"
-    }
-   ]
-  },
-  {
-   "headline": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz",
+   "headline": "Homebuilder sentiment plunges to 14-year low, leading more builders to drop prices",
    "source": "CNBC",
-   "why": "Ескалацията на напрежението в Близкия изток с трети американски самолетоносач и удар по танкер в Хормуз застрашава петролните доставки и подкрепя цените на суровия петрол.",
-   "source_text": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz Iran has ratcheted up threats against U.S. forces as a third American aircraft carrier arrived in the Gulf, stoking fears of a resumption of military tensions. US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart - Reuters US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart Reuters",
-   "link": "https://www.cnbc.com/2026/11/17/iran-war-trump-hormuz-oil-.html",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "US condemns Iranian strikes in Bahrain as Rubio holds call with Bahraini counterpart - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPQUI4WnRjazloVU5KUTR5MndXU19SVjNiQzRib2JHSC1ZOTFFVE5kdUlweUZjNkJrZzNheVc0bUlJY3UzRGtoanF1NDV4eGdTUnZIOEh4QUZ1MEF1NWt5M2Y3UmtZdnVRN3QwZzg1NTlGQWxsMlFjNzE4c0t6VnVTaUNPTFRZUWxnMVRMUHRZV18tMWttdm80V21kSFgzVUhxdEpUYk9MZElPZXJyTVN3LWVBM2VJTXpmdzlINTFZcTVER1pXV0ZnMHFsWEI?oc=5"
-    }
-   ]
+   "why": "Индексът на строителното настроение на 14-годишно дъно заради високи ипотечни лихви сигнализира забавяне в жилищния сектор и натиск надолу върху акции на строители и свързани материали.",
+   "source_text": "Homebuilder sentiment plunges to 14-year low, leading more builders to drop prices Homebuilder sentiment fell to a 14-year low amid high mortgage rates and higher prices for energy, labor and materials. That caused more builder price cuts.",
+   "link": "https://www.cnbc.com/2026/11/17/homebuilder-sentiment-plunges-to-14-year-low-leading-more-builders-to-drop-prices.html"
   },
   {
-   "headline": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
+   "headline": "Kalshi takes down controversial Trump 'mention' markets at CFTC's request",
    "source": "CNBC",
-   "why": "Спадът в цената на суровия петрол поради възстановяване на близкоизточния износ влияе на енергийния сектор и инфлационните очаквания.",
-   "source_text": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports Oil prices are falling as forecasts project a surplus in oil in the fourth quarter Oil slips as recovering Mideast exports blunt Gulf tensions - Reuters Oil slips as recovering Mideast exports blunt Gulf tensions Reuters",
-   "link": "https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Oil slips as recovering Mideast exports blunt Gulf tensions - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPQm40d1ZiR2k1S1RxaFdvQzJVYmRJUE1rcnNLZkEyRkZzbk5KZjlqWl9sZW9MUFB2OHpwdGZzT3duNzVnMnNaMEJMYkFKWndKTWE1OWNtd0hLcWRtSmVVYU5JaTBlNXZuT2t0V1AzVHdXVEhPMWt5QnhXakxpWkxiQk50ZEt0UGtXT3RpeXdiNEY0UXBqeXk2RGVHYURMNzJzNm13Zldtbm8tQQ?oc=5"
-    }
-   ]
-  },
-  {
-   "headline": "EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say - Reuters",
-   "source": "Reuters Business",
-   "why": "Антитръстовият преглед на сливането засяга акциите на двете компании и създава несигурност в сектора на доставките и e-commerce.",
-   "source_text": "EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say - Reuters EXCLUSIVE: DOJ to review DoorDash-Instacart merger, sources say Reuters",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQeVhqY2xFRW92Y3RHVHQ4RFBYOTg2TG9ySTJybTgydVNtVU56MWZuM0RNMkIxWmw0d2xUa0U0ZThBbHNPZ2syUVlDOTdERDl2RmZiTXZOb045VzRtRGtWaXA1VGVzdm1UYi12eWZqQUhPdFI1NXlCN1d3Sm1kWVdROTBnUEgzZ21EWE1lSnVxdENFUGZoSllzeUR6VnBuQTQ?oc=5"
+   "why": "Намесата на CFTC срещу прогностичните пазари, обвързани с президентски изказвания, е регулаторен прецедент за prediction market индустрията и поставя въпроси за бъдещето на подобни договори.",
+   "source_text": "Kalshi takes down controversial Trump 'mention' markets at CFTC's request Some Trump-related Kalshi mention contracts have been taken down as the CFTC warns the contract type carries heightened manipulation risk.",
+   "link": "https://www.cnbc.com/2026/11/17/kalshi-takes-down-trump-mention-markets.html"
   }
  ],
  "window": {
-  "since": "2026-11-16T06:30:00+00:00",
-  "hours": 24.08,
+  "since": "2026-11-17T06:30:00+00:00",
+  "hours": 24.1,
   "day_queries": 0,
   "sources": {
    "Reuters Business": {
     "count": 50,
-    "oldest": "2026-11-16T13:31Z"
+    "oldest": "2026-11-17T06:55Z"
    },
    "CNBC": {
-    "count": 30,
-    "oldest": "2026-11-16T13:42Z"
+    "count": 29,
+    "oldest": "2026-11-17T10:08Z"
    },
    "Financial Times": {
-    "count": 12,
-    "oldest": "2026-11-16T18:14Z"
+    "count": 10,
+    "oldest": "2026-11-17T15:33Z"
    },
    "AP Business": {
     "count": 50,
-    "oldest": "2026-11-16T07:55Z"
+    "oldest": "2026-11-17T07:19Z"
    }
   }
  }

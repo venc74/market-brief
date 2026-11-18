@@ -1,5 +1,5 @@
 {
- "date": "2026-11-17",
+ "date": "2026-11-18",
  "rows": [
   {
    "ticker": "EMBJ",
@@ -8,8 +8,18 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Nov 16, 2026",
-   "price": 18.77,
-   "market_cap": 3340277009.45
+   "price": 18.9,
+   "market_cap": 13453646093.357206
+  },
+  {
+   "ticker": "SENEA",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026",
+   "price": 37.22,
+   "market_cap": 1257998635.1585388
   },
   {
    "ticker": "SNDK",
@@ -18,8 +28,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Nov 20, 2026",
-   "price": 809.11,
-   "market_cap": 115127746030.83313
+   "price": 797.24,
+   "market_cap": 113438771963.05542
   }
  ],
  "horizon": [
@@ -136,6 +146,22 @@
    "date_human": "Nov 17, 2026"
   },
   {
+   "ticker": "RCT",
+   "company": "RedCloud Holdings plc",
+   "date": "2026-11-17",
+   "ratio": "1:100",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "SLQT",
+   "company": "SelectQuote, Inc.",
+   "date": "2026-11-17",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 17, 2026"
+  },
+  {
    "ticker": "SENEA",
    "company": "Seneca Foods Corp.",
    "date": "2026-11-17",
@@ -150,6 +176,22 @@
    "ratio": "5:1",
    "split_type": "normal",
    "date_human": "Nov 17, 2026"
+  },
+  {
+   "ticker": "MKDW",
+   "company": "MKDWELL Tech Inc.",
+   "date": "2026-11-18",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 18, 2026"
+  },
+  {
+   "ticker": "SPWR",
+   "company": "SunPower Inc.",
+   "date": "2026-11-18",
+   "ratio": "1:35",
+   "split_type": "reverse",
+   "date_human": "Nov 18, 2026"
   },
   {
    "ticker": "BITO",
@@ -339,13 +381,12 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 39,
+  "source_rows": 43,
   "horizon_from": "2026-11-16",
   "horizon_to": "2026-12-07",
-  "in_week": 34,
+  "in_week": 38,
   "dropped_price": [
    "DFSC",
-   "NCT",
    "KALA",
    "SGRX",
    "TGL",
@@ -354,10 +395,14 @@
    "FCDH",
    "LOBO",
    "MOBX",
+   "RCT",
+   "SLQT",
+   "MKDW",
+   "SPWR",
    "SOS"
   ],
   "dropped_cap": [
-   "SENEA",
+   "NCT",
    "SENEB",
    "VABK"
   ],
@@ -381,7 +426,7 @@
    "REW",
    "SMDD"
   ],
-  "passed": 2,
+  "passed": 3,
   "state": "ok"
  }
 }
