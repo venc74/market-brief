@@ -586,6 +586,8 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
         key = f"{ticker}_{entry_date}_{CATEGORY_BUYSTOP}"
         if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_BUYSTOP) or _spinoff_skip(ticker, entry_date, CATEGORY_BUYSTOP):
             continue
+        if _earnings_skip(c, ticker, entry_date, CATEGORY_BUYSTOP):                  # 19.11.2026 (пакет 19.11, т. 5): отчет до 5 работни дни — без нов вход
+            continue
         rec = _new_v2_record(ticker, entry_date, plan)
         rec.update({"category": CATEGORY_BUYSTOP, "regime": regime, "pct_from_pivot": setup.get("pct_from_pivot"), **regime_rule_tag(entry_date)})
         if c.get("tier"):
@@ -596,6 +598,22 @@ def _ingest_buystop_list(tracker: dict, entry_date: str, watchlist: list[dict], 
 _QM_RESULT_KEYS = ("status", "fill_date", "fill_price", "stop_loss", "risk_per_share", "target1_hit_date", "partial_price", "partial_fraction", "trail_ma",
                    "exit_date", "exit_price", "R", "R_pess", "realized_r", "realized_r_pess", "current_r", "return_pct", "return_pct_pess", "last_close",
                    "last_close_date", "how", "r_risk", "r_floored", "r_basis")
+
+
+# 19.11.2026 (пакет 19.11, т. 5): картите с отчет до config.EARNINGS_BLACKOUT_DAYS работни дни (setup_rules.earnings_gate → card["earnings_gate"]["soon"]) не правят нов вход в
+# книгите от config.EARNINGS_NO_ENTRY_FROM; кои са пропуснати днес — LAST_EARNINGS_SKIPS (в брифа и в лога)
+LAST_EARNINGS_SKIPS: list = []
+
+
+def _earnings_skip(card: dict, ticker: str, entry_date: str, category: str) -> bool:
+    g = (card or {}).get("earnings_gate") or {}
+    if g.get("soon") and config.EARNINGS_NO_ENTRY_FROM and str(entry_date)[:10] >= config.EARNINGS_NO_ENTRY_FROM:
+        x = {"ticker": ticker, "category": category, "date": str(entry_date)[:10], "earnings": g.get("date")}
+        if x not in LAST_EARNINGS_SKIPS:
+            LAST_EARNINGS_SKIPS.append(x)
+            print(f"[backtest] {ticker}: отчет на {g.get('date')} — без нов вход в {category} ({entry_date})")
+        return True
+    return False
 
 
 def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: str | None = None, nasdaq: dict | None = None) -> None:
@@ -615,6 +633,8 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
             continue
         key = f"{ticker}_{entry_date}_qm"
         if key in tracker:
+            continue
+        if _earnings_skip(c, ticker, entry_date, CATEGORY_QM):                       # 19.11.2026 (т. 5): отчет до 5 работни дни — нито нов запис, нито нов ден в прозореца
             continue
         if config.QM_ONE_RECORD_FROM and entry_date >= config.QM_ONE_RECORD_FROM:   # 19.11.2026 (пакет 19.11, т. 6): един запис, докато прозорецът е отворен
             if qm_window_owner(tracker, ticker, entry_date):
@@ -769,6 +789,8 @@ def _ingest_glb_wish_list(tracker: dict, entry_date: str, signals: list[dict], r
             continue
         key = f"{ticker}_{entry_date}{suffix}"
         if key in tracker or _is_continuation(tracker, ticker, entry_date, category) or _spinoff_skip(ticker, entry_date, category):
+            continue
+        if _earnings_skip(c, ticker, entry_date, category):                          # 19.11.2026 (пакет 19.11, т. 5): отчет до 5 работни дни — без нов вход
             continue
         rec = {"method": "v2", "category": category, "ticker": ticker, "entry_date": entry_date, "signal_date": c["signal_date"], "status": "pending", "regime": regime, **regime_rule_tag(entry_date),
                "glb_type": c.get("glb_type"), "line": round(float(c["line"]), 4), "signal_close": round(float(c["close"]), 4), "prior_high_month": c.get("prior_high_month"),

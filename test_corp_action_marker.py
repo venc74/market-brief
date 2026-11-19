@@ -90,7 +90,7 @@ assert page.count('class="corp-warn"') == 3 and page.count(WARN) == 3
 def around(h, marker, before=3000):
     i = h.index(marker); return htmllib.unescape(re.sub(r"<[^>]+>", " ", h[max(0, i - before):i]))
 assert "CTVA" in around(page[page.index("GLB Watchlist"):], WARN) and "EXPD" in around(page[page.index('<section id="canslim">'):], WARN)
-qm_i = page.index('class="corp-warn"', page.index('<div class="qm-grid">')); assert "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", page[qm_i - 3000:qm_i]))
+qm_i = page.index('class="corp-warn"', page.index('<div class="qm-grid"')); assert "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", page[qm_i - 3000:qm_i]))
 print("  ✓ страница: ред «⚠ корпоративно действие на 01.10 …» точно на трите карти — реалната карта на CTVA в GLB (P няма), Watchlist (EXPD) и QM (SN)")
 w1 = mail.index(WARN); w2 = mail.index(WARN, w1 + 1)
 assert mail.count(WARN) == 2 and "EXPD" in htmllib.unescape(re.sub(r"<[^>]+>", " ", mail[w1 - 900:w1])) and "SN" in htmllib.unescape(re.sub(r"<[^>]+>", " ", mail[w2 - 900:w2]))

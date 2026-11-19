@@ -12,6 +12,9 @@ MIN_REWARD_RISK = 2.0                                              # миним�
 # ── Твърди правила (Секция 8) ────────────────────────────────────────────
 MAX_ACTION_TICKERS = 5            # качество над количество
 EARNINGS_BLACKOUT_DAYS = 5        # без препоръки 5 работни дни преди earnings
+# 19.11.2026 (пакет 19.11, т. 5): отчет до EARNINGS_BLACKOUT_DAYS работни дни от днес (вкл. днес) → картата (CANSLIM, Kullamägi, GLB, buy-stop) „⚠ отчет на ДД.ММ — вход след
+# отчета“, без размер; книгите не записват нов вход от тази дата (setup_rules.earnings_gate — едно правило; enrich.in_blackout — по него)
+EARNINGS_NO_ENTRY_FROM = os.getenv("EARNINGS_NO_ENTRY_FROM", "2026-11-20")
 VIX_DEFENSIVE_THRESHOLD = 30.0    # над това → Defensive + sizing × 0.5
 DEFENSIVE_SIZING_FACTOR = 0.5
 MAX_PER_SECTOR = 2                # макс 2 акции от един сектор

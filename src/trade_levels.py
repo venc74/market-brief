@@ -87,10 +87,10 @@ def canslim_levels(plan: dict | None, adr, regime_factor, entry_label: str) -> d
             "regime_factor": float(regime_factor) if _ok(regime_factor) else 1.0, "warnings": warnings}
 
 
-def kullamagi_levels(entry, adr, *, stop_adr: float, entry_label: str, expected_adr: float | None = None) -> dict | None:
+def kullamagi_levels(entry, adr, *, stop_adr: float, entry_label: str, expected_adr: float | None = None, regime_factor=1.0) -> dict | None:
     """
-    Стоп за оразмеряване = вход × (1 − stop_adr × ADR/100) (stop_adr = 1.0 → "макс. 1×ADR"); по желание очакван стоп (expected_adr × ADR, 0.55 при breakout). Без режимен фактор:
-    Qullamaggie е отделна стратегия, както и преди (старият размер не ползваше sizing_factor). Няма валиден вход/ADR → None.
+    Стоп за оразмеряване = вход × (1 − stop_adr × ADR/100) (stop_adr = 1.0 → "макс. 1×ADR"); по желание очакван стоп (expected_adr × ADR, 0.55 при breakout). Няма валиден вход/ADR → None.
+    19.11.2026 (пакет 19.11, т. 4): режимният фактор — както при CANSLIM (едно правило; в Defensive ×0.5). До 19.11 — „отделна стратегия — без режимен фактор“.
     """
     if not (_ok(entry) and _ok(adr)) or entry <= 0 or adr <= 0:
         return None
@@ -100,7 +100,7 @@ def kullamagi_levels(entry, adr, *, stop_adr: float, entry_label: str, expected_
     out = {"strategy": "kullamagi", "entry": round(float(entry), 2), "entry_label": entry_label,
            "stop": stop, "stop_source": "adr", "stop_source_text": f"стоп за оразмеряване (макс. {stop_adr:g}×ADR)",
            "stop_pct": round(stop_adr * adr, 2), "adr_pct": round(float(adr), 2), "stop_note": STOP_NOTE_KMG,
-           "regime_factor": 1.0, "regime_note": "отделна стратегия — без режимен фактор", "warnings": []}
+           "regime_factor": float(regime_factor) if _ok(regime_factor) else 1.0, "regime_note": None, "warnings": []}
     if expected_adr:
         exp = round(entry * (1 - expected_adr * adr / 100), 2)
         if 0 < exp < entry:
@@ -116,3 +116,11 @@ def for_candidate(plan: dict | None, row: dict, regime_factor, entry_label: str)
     except Exception as e:                                   # graceful: картата просто няма нива
         print(f"[levels] {(row or {}).get('ticker')}: {type(e).__name__}: {e}")
         return None
+
+
+def apply_regime(levels: dict | None, factor) -> dict | None:
+    """19.11.2026 (т. 4): режимният фактор върху вече сметнати нива (Kullamägi и EP — картите се правят извън оразмеряването на CANSLIM). Мутира и връща levels."""
+    if isinstance(levels, dict) and _ok(factor):
+        levels["regime_factor"] = float(factor)
+        levels["regime_note"] = None
+    return levels

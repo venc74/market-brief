@@ -322,11 +322,20 @@ if CHROME:
         got = dict(check(out, SET))
         for n in ("EXEL", "EXPD"):
             assert "риск 0.5% × 0.5 защитен режим = 0.25% от сметката" in got[n], got[n]
-        for n in ("DOCN", "CORT", "CRL", "SYNA"):
-            assert "риск 0.5% (отделна стратегия — без режимен фактор) от сметката" in got[n], got[n]
-        print("  ✓ 80000 / 0.5% / 25% (фактор вкл.): Action и Watchlist — 'риск 0.5% × 0.5 защитен режим = 0.25%'; QM и EP — 'отделна стратегия — без режимен фактор'; всички числа = еталона")
+        for n in ("DOCN", "CORT", "CRL", "SYNA"):                                  # 19.11.2026 (пакет 19.11, т. 4): Kullamägi / EP — със същия режимен фактор (до 19.11 — без)
+            assert "риск 0.5% × 0.5 защитен режим = 0.25% от сметката" in got[n], got[n]
+        print("  ✓ 80000 / 0.5% / 25% (фактор вкл.): Action и Watchlist — 'риск 0.5% × 0.5 защитен режим = 0.25%'; QM и EP — същото (от 19.11; до тогава 'отделна стратегия — без режимен фактор'; всички числа = еталона")
         for n in ("EXEL", "EXPD", "DOCN"):
             print(f"      {n}: {got[n]}")
+        # 19.11.2026 (пакет 19.11, т. 4): под картите на Kullamägi — сборът за всички (DOCN, CORT, CRL) по същите настройки и фактор
+        m = re.search(r'<div class="lv-sum small"[^>]*>(.*?)</div>', chrome_dump(with_settings(SET), tmp), re.S)
+        rs = [ref(80000, 0.5, 25, True, LV[n]["regime_factor"], LV[n]["entry"], LV[n]["stop"], LV[n]["adr_pct"], "kullamagi") for n in ("DOCN", "CORT", "CRL")]
+        rs = [r for r in rs if r["ok"] and not r["tooSmall"]]
+        want_sum = (f"Ако вземеш всички {len(rs)}: експозиция {pct(sum(r['value'] for r in rs) / 80000 * 100)} от сметката, риск {pct(sum(r['lossAtStop'] for r in rs) / 80000 * 100, 2)} "
+                    f"при стоповете, {pct(sum(r['gap10'] for r in rs) / 80000 * 100, 2)} при гап −10%")
+        import html as _h3
+        assert m and _h3.unescape(m.group(1)).strip() == want_sum, (m and m.group(1), want_sum)
+        print(f"  ✓ под картите на Kullamägi: «{want_sum}»")
 
     def streak_text(out_html):
         m = re.search(r'<div class="mb-note mb-streak" id="mb-streak"[^>]*>(.*?)</div>', out_html, re.S)
@@ -338,11 +347,11 @@ if CHROME:
         # (б2) редът «10 поредни загуби» в настройките: 10 × ефективния риск (Defensive ×0.5 в РЕАЛНИЯ бриф от 05.10)
         assert 'data-regime-factor="0.5"' in html, "липсва режимният фактор на страницата"
         st = streak_text(chrome_dump(with_settings(SET), tmp))
-        assert st == "10 поредни загуби ≈ −2.5% от сметката (10 × риск 0.5% × 0.5 защитен режим; за QM и EP, които са без режимен фактор: −5%)", st
+        assert st == "10 поредни загуби ≈ −2.5% от сметката (10 × риск 0.5% × 0.5 защитен режим)", st
         st2 = streak_text(chrome_dump(with_settings({**SET, "regime": False}), tmp))
         assert st2 == "10 поредни загуби ≈ −5% от сметката (10 × риск 0.5%)", st2
         st3 = streak_text(chrome_dump(with_settings({**SET, "risk": "1"}), tmp))
-        assert st3 == "10 поредни загуби ≈ −5% от сметката (10 × риск 1% × 0.5 защитен режим; за QM и EP, които са без режимен фактор: −10%)", st3
+        assert st3 == "10 поредни загуби ≈ −5% от сметката (10 × риск 1% × 0.5 защитен режим)", st3
         st4 = streak_text(chrome_dump(with_settings({**SET, "risk": ""}), tmp))
         assert st4 == "10 поредни загуби ≈ — (въведи риск на сделка)", st4
         stn = streak_text(chrome_dump(html, tmp))                                                                  # без настройки: рискът по подразбиране 0.5%
@@ -359,12 +368,12 @@ if CHROME:
         print("  ✓ СИНТЕТИЧНО (отметката изключена): EXPD — 'риск 0.5% от сметката', 30 акции (без ×0.5)")
 
     with tempfile.TemporaryDirectory() as tmp:
-        # (г) таван 5% → свива се
-        s3 = {**SET, "cap": "5"}
+        # (г) таван 3% → свива се (19.11.2026: с режимния фактор и при Kullamägi DOCN е 3.4% от сметката — до 19.11 таванът в теста беше 5% при 6.8%)
+        s3 = {**SET, "cap": "3"}
         out = parse(chrome_dump(with_settings(s3), tmp))
-        got = dict(check(out, s3, cap=5))
-        assert "ограничено от тавана (5% от сметката) — реален риск при стопа $284 (0.35% от сметката)" in got["DOCN"], got["DOCN"]
-        print("  ✓ СИНТЕТИЧНО (таван 5%): DOCN — 'ограничено от тавана (5% от сметката) — реален риск при стопа $284 (0.35% от сметката)'")
+        got = dict(check(out, s3, cap=3))
+        assert "ограничено от тавана (3% от сметката) — реален риск при стопа" in got["DOCN"], got["DOCN"]
+        print("  ✓ СИНТЕТИЧНО (таван 3%): DOCN — '" + got["DOCN"][got["DOCN"].index("ограничено"):][:90] + "…'")
 
     with tempfile.TemporaryDirectory() as tmp:
         # (д) localStorage е забранен: без изключение; настройките от полетата важат в страницата
@@ -395,12 +404,12 @@ if CHROME:
         out = chrome_dump(late(script, with_settings(SET)), tmp)
         cards = parse(out)
         a = cards[(docn["entry"], docn["stop"])]
-        want = expect_text({**ref(80000, 0.5, 25, True, 1.0, 151.83, 130.0, docn["adr_pct"], "kullamagi"), "capPct": 25}, "риск 0.5% (отделна стратегия — без режимен фактор)")
+        want = expect_text({**ref(80000, 0.5, 25, True, 0.5, 151.83, 130.0, docn["adr_pct"], "kullamagi"), "capPct": 25}, "риск 0.5% × 0.5 защитен режим = 0.25%")
         assert a["text"] == want and "⚠ акцията е избягала над 1 ADR — входът е преследване" in a["text"], (a["text"], want)
         assert cards[(cort["entry"], cort["stop"])]["text"] == "няма достатъчно данни"
         e3 = cards[(194.59, 181.53)]["text"]
         assert "⚠" not in e3 and "акции" in e3                                              # CANSLIM: без предупреждение за преследване
-        assert cards[(LV["CRL"]["entry"], LV["CRL"]["stop"])]["text"].startswith("риск 0.5% (отделна стратегия")      # другите карти не са пипнати
+        assert cards[(LV["CRL"]["entry"], LV["CRL"]["stop"])]["text"].startswith("риск 0.5% × 0.5 защитен режим")      # другите карти не са пипнати
         title = re.search(r"<title>(.*?)</title>", out, re.S).group(1)
         assert json.loads(title.replace("&quot;", '"')) == {"balance": "80000", "risk": "0.5", "cap": "25", "regime": True}          # "коригирай" не записва нищо в localStorage
         print("  ✓ СИНТЕТИЧНО 'коригирай': DOCN с вход 151.83 / стоп 130 → преизчислено + '⚠ акцията е избягала над 1 ADR'; CORT със стоп над входа → 'няма достатъчно данни' (без акции);")

@@ -392,3 +392,49 @@ _WATCH_GROUP = {"confirmed": 0, "below_pivot": 1, "no_volume": 2, "extended": 3,
 def watchlist_sort_key(c: dict) -> tuple:
     setup = c.get("setup") or classify_setup(c)
     return (_WATCH_GROUP.get(setup["kind"], 4), abs(c.get("pct_from_pivot") or 0.0))
+
+
+def earnings_sessions(next_earnings, today) -> int | None:
+    """19.11.2026 (т. 5): колко NYSE сесии има от днес (вкл.) до датата на отчета (вкл.); минала / невалидна дата → None."""
+    try:
+        ed = dt.date.fromisoformat(str(next_earnings)[:10])
+        td = today if isinstance(today, dt.date) else dt.date.fromisoformat(str(today)[:10])
+    except (TypeError, ValueError):
+        return None
+    if ed < td:
+        return None
+    return _sessions.sessions_in(td - dt.timedelta(days=1), ed)
+
+
+def earnings_gate(earnings: dict | None, today, unknown_label: bool = True) -> dict | None:
+    """
+    19.11.2026 (пакет 19.11, т. 5): ЕДНО правило за всички карти — отчетът е до config.EARNINGS_BLACKOUT_DAYS работни дни от днес (вкл.) → {"soon": True, "date", "sessions",
+    "text": "⚠ отчет на ДД.ММ — вход след отчета"} (картата — без размер; книгите — без нов вход); датата е неизвестна → {"unknown": True, "text": "дата на отчета неизвестна"}
+    (unknown_label=False — без него: CANSLIM картите го казват отделно); иначе None. Чиста функция.
+    """
+    e = earnings or {}
+    ne = e.get("next_earnings")
+    if ne:
+        n = earnings_sessions(ne, today)
+        if n is not None and n <= config.EARNINGS_BLACKOUT_DAYS:
+            d = str(ne)[:10]
+            return {"soon": True, "date": d, "sessions": n, "text": f"⚠ отчет на {d[8:10]}.{d[5:7]} — вход след отчета"}
+        return None
+    return {"unknown": True, "text": "дата на отчета неизвестна"} if unknown_label else None
+
+
+def annotate_earnings_gate(cards: list | None, today, unknown_label: bool = True) -> int:
+    """card["earnings_gate"] по earnings_gate; при „soon“ — и card["levels"]["earnings_block"] (браузърът не смята размер). → колко са „soon“."""
+    n = 0
+    for c in cards or []:
+        if not isinstance(c, dict):
+            continue
+        g = earnings_gate(c.get("earnings"), today, unknown_label)
+        c.pop("earnings_gate", None)
+        if g:
+            c["earnings_gate"] = g
+        if g and g.get("soon"):
+            n += 1
+            if isinstance(c.get("levels"), dict):
+                c["levels"]["earnings_block"] = g["text"]
+    return n

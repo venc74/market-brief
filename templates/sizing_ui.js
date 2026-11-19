@@ -55,17 +55,27 @@
     return { entry: entry, stop: stop };
   }
 
-  function renderCard(card) {
-    var box = card.querySelector(".lv-size");
-    if (!box) return;
+  function computeCard(card) {
     var inp = cardInputs(card);
     var factor = S.num(card.getAttribute("data-factor"));
-    var res = S.sizePosition({
+    return S.sizePosition({
       balance: state.balance, riskPct: state.risk, capPct: state.cap,
       applyRegime: state.regime, regimeFactor: factor,
       entry: inp.entry, stop: inp.stop, adrPct: card.getAttribute("data-adr"),
       strategy: card.getAttribute("data-strategy")
     });
+  }
+
+  function renderCard(card) {
+    var box = card.querySelector(".lv-size");
+    if (!box) return;
+    if (card.getAttribute("data-blocked") === "1") {   // 19.11.2026 (т. 5): отчет до 5 работни дни — без размер
+      while (box.firstChild) box.removeChild(box.firstChild);
+      box.setAttribute("data-state", "blocked");
+      box.appendChild(el("div", "без размер — отчетът е преди входа", "lv-hint"));
+      return;
+    }
+    var res = computeCard(card);
     while (box.firstChild) box.removeChild(box.firstChild);
     box.setAttribute("data-state", res.ok ? "ok" : res.reason);
     if (!res.ok) {
@@ -100,14 +110,37 @@
     var r = S.losingStreak({ riskPct: state.risk, applyRegime: state.regime, regimeFactor: pf, n: 10 });
     if (!r.ok) { box.textContent = "10 поредни загуби ≈ — (въведи риск на сделка)"; return; }
     var txt = "10 поредни загуби ≈ −" + S.pct(r.lossPct, 2) + " от сметката (10 × риск " + S.pct(r.riskPct, 2);
-    if (r.factor !== 1) txt += " × " + r.factor + " защитен режим; за QM и EP, които са без режимен фактор: −" + S.pct(r.lossPctFull, 2);
+    if (r.factor !== 1) txt += " × " + r.factor + " защитен режим";               // 19.11.2026 (т. 4): и QM / EP са с режимния фактор (до 19.11 — без)
     box.textContent = txt + ")";
+  }
+
+  // 19.11.2026 (пакет 19.11, т. 4): под секцията — „Ако вземеш всички N: експозиция X% от сметката, риск Y% при стоповете, Z% при гап −10%“ (картите в data-scope; блокираните
+  // от отчет — извън сбора и казани). Само в браузъра, от настройките на читателя.
+  function renderSums() {
+    var sums = document.querySelectorAll(".lv-sum");
+    for (var i = 0; i < sums.length; i++) {
+      var box = sums[i], scope = document.querySelector(box.getAttribute("data-scope") || "");
+      if (!scope) continue;
+      var cards = scope.querySelectorAll(".lv"), results = [], blocked = 0;
+      for (var j = 0; j < cards.length; j++) {
+        if (cards[j].getAttribute("data-blocked") === "1") { blocked += 1; continue; }
+        results.push(computeCard(cards[j]));
+      }
+      var r = S.sumPositions(results, state.balance);
+      var txt;
+      if (!r.ok && r.reason === "balance") txt = "Ако вземеш всички: въведи баланса в настройките, за да видиш експозицията и риска";
+      else if (!r.ok) txt = "Ако вземеш всички: няма карта с размер";
+      else txt = "Ако вземеш всички " + r.n + ": експозиция " + S.pct(r.exposurePct) + " от сметката, риск " + S.pct(r.riskPct, 2) + " при стоповете, " + S.pct(r.gap10Pct, 2) + " при гап −10%";
+      if (blocked) txt += " (без " + blocked + " с отчет преди входа)";
+      box.textContent = txt;
+    }
   }
 
   function renderAll() {
     var cards = document.querySelectorAll(".lv");
     for (var i = 0; i < cards.length; i++) renderCard(cards[i]);
     renderStreak();
+    renderSums();
     var n = document.getElementById("mb-persist-note");
     if (n) n.hidden = persisted;
   }
@@ -150,9 +183,9 @@
         adjBtn.textContent = open ? "скрий" : "коригирай";
         renderCard(card);
       });
-      fe.addEventListener("input", function () { renderCard(card); });
-      fs.addEventListener("input", function () { renderCard(card); });
-      if (rs) rs.addEventListener("click", function () { reset(); renderCard(card); });
+      fe.addEventListener("input", function () { renderCard(card); renderSums(); });
+      fs.addEventListener("input", function () { renderCard(card); renderSums(); });
+      if (rs) rs.addEventListener("click", function () { reset(); renderCard(card); renderSums(); });
     });
   }
 

@@ -235,6 +235,16 @@ def earnings_dm(iso: str | None, estimate: bool | None = None) -> str:
     return f"~{dm} (прогноза)" if estimate and dm else dm
 
 
+def _in_blackout(ed, today) -> bool:
+    """19.11.2026 (пакет 19.11, т. 5): отчетът е до config.EARNINGS_BLACKOUT_DAYS работни дни от днес (вкл.) — setup_rules.earnings_sessions; резерва — 0–7 календарни дни (до 19.11)."""
+    try:
+        from src import setup_rules
+        n = setup_rules.earnings_sessions(ed, today)
+        return n is not None and n <= config.EARNINGS_BLACKOUT_DAYS
+    except Exception:
+        return 0 <= (ed - today).days <= 7
+
+
 def earnings_info(sym: str, now: dt.datetime | None = None, with_info: bool = True) -> dict:
     """
     16.10.2026 (В1): + earnings_status ("ok" — има бъдеща дата; "no_date" — тегленето мина, бъдеща дата няма; "failed" — тегленето не успя), last_report (последният минал отчет)
@@ -294,7 +304,7 @@ def earnings_info(sym: str, now: dt.datetime | None = None, with_info: bool = Tr
             out.update({
                 "next_earnings": ed.isoformat(),
                 "days_to_earnings": days,
-                "in_blackout": 0 <= days <= 7,
+                "in_blackout": _in_blackout(ed, today),                 # 19.11.2026 (т. 5): до 5 работни дни от днес (вкл.) — setup_rules.earnings_gate; до 19.11 — 0–7 календарни дни
             })
         if with_info:                                           # 03.11.2026: наблюдаваните — без .info (т. 1)
             info = tk.info or {}
@@ -391,7 +401,7 @@ def earnings_recap(sym: str) -> dict | None:
             consensus = _nan_to_none(future.iloc[0].get("EPS Estimate"))
             forward = {
                 "next_earnings": f_date.isoformat(), "days_to_earnings": days,
-                "in_blackout": 0 <= days <= 7, "consensus_eps": consensus,
+                "in_blackout": _in_blackout(f_date, dt.date.today()), "consensus_eps": consensus,
             }
             f_yoy_ts = _find_yoy_row(past, f_date)
             if f_yoy_ts is not None and consensus is not None:

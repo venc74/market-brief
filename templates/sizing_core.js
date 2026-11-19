@@ -87,7 +87,20 @@
     return String(parseFloat(n.toFixed(d === undefined ? 1 : d))) + "%";
   }
 
-  var api = { sizePosition: sizePosition, losingStreak: losingStreak, money: money, pct: pct, num: num };
+  // 19.11.2026 (пакет 19.11, т. 4): „Ако вземеш всички N“ — сборът от резултатите на sizePosition (само ok и поне 1 акция) спрямо баланса: експозиция, риск при стоповете,
+  // загуба при гап −10%, в % от сметката. → { ok:false } без баланс / без позиции, иначе { ok:true, n, exposurePct, riskPct, gap10Pct, value, lossAtStop, gap10 }
+  function sumPositions(results, balance) {
+    var b = num(balance);
+    if (!(b > 0)) return { ok: false, reason: "balance" };
+    var n = 0, value = 0, loss = 0, gap = 0;
+    (results || []).forEach(function (r) {
+      if (r && r.ok && !r.tooSmall) { n += 1; value += r.value; loss += r.lossAtStop; gap += r.gap10; }
+    });
+    if (!n) return { ok: false, reason: "none" };
+    return { ok: true, n: n, value: value, lossAtStop: loss, gap10: gap, exposurePct: value / b * 100, riskPct: loss / b * 100, gap10Pct: gap / b * 100 };
+  }
+
+  var api = { sizePosition: sizePosition, losingStreak: losingStreak, sumPositions: sumPositions, money: money, pct: pct, num: num };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.MBSizing = api;
 })(typeof window !== "undefined" ? window : this);

@@ -1019,7 +1019,7 @@
    (sizing_core.js / sizing_ui.js). Без JS се виждат нивата и подсказката "въведи баланса…". #}
 {% macro levels_block(lv, show_entry=true, show_adr=true) %}
 {% if lv %}
-<div class="lv" data-strategy="{{ lv.strategy }}" data-entry="{{ lv.entry }}" data-stop="{{ lv.stop }}" data-adr="{{ lv.adr_pct if lv.adr_pct is not none else '' }}" data-factor="{{ lv.regime_factor }}" data-regime-label="{{ 'защитен режим' if lv.regime_factor < 1 else '' }}" data-regime-note="{{ lv.regime_note or '' }}">
+<div class="lv"{% if lv.earnings_block %} data-blocked="1"{% endif %} data-strategy="{{ lv.strategy }}" data-entry="{{ lv.entry }}" data-stop="{{ lv.stop }}" data-adr="{{ lv.adr_pct if lv.adr_pct is not none else '' }}" data-factor="{{ lv.regime_factor }}" data-regime-label="{{ 'защитен режим' if lv.regime_factor < 1 else '' }}" data-regime-note="{{ lv.regime_note or '' }}">
   <div class="lv-info">
     {% if show_entry %}<div class="lv-row"><span>{{ lv.entry_label }}</span><b>${{ "%.2f"|format(lv.entry) }}</b></div>{% endif %}
     <div class="lv-row"><span>{{ "Стоп" if lv.strategy == "canslim" else (lv.stop_source_text[0:1]|upper ~ lv.stop_source_text[1:]) }}</span><b>${{ "%.2f"|format(lv.stop) }} <i>(−{{ "%.1f"|format(lv.stop_pct) }}%)</i></b></div>
@@ -1030,7 +1030,9 @@
   {% if lv.strategy == "canslim" %}<div class="lv-note">{% if lv.stop_source_text.startswith("стоп:") %}{{ lv.stop_source_text[0:1]|upper ~ lv.stop_source_text[1:] }}{% else %}източник на стопа: {{ lv.stop_source_text }}{% endif %}</div>{% endif %}
   {% if lv.stop_note %}<div class="lv-note">{{ lv.stop_note }}</div>{% endif %}
   {% for w in lv.warnings %}<div class="lv-warn">⚠ {{ w }}</div>{% endfor %}
-  <div class="lv-size" data-state="balance"><div class="lv-hint">въведи баланса в настройките, за да видиш размера на позицията</div></div>
+  {# 19.11.2026 (пакет 19.11, т. 5): отчет до 5 работни дни — без размер #}
+  {% if lv.earnings_block %}<div class="lv-warn">{{ lv.earnings_block }} — без размер</div>{% endif %}
+  <div class="lv-size" data-state="{{ 'blocked' if lv.earnings_block else 'balance' }}"><div class="lv-hint">{{ 'без размер — отчетът е преди входа' if lv.earnings_block else 'въведи баланса в настройките, за да видиш размера на позицията' }}</div></div>
   <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
   <div class="lv-adj" hidden>
     <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>
@@ -1241,7 +1243,7 @@
         приключи на {{ st.prev_position.resolution_date }} ({{ st.prev_position.outcome }}{% if st.prev_position.realized_r is not none %},
         {{ "%+.1f"|format(st.prev_position.realized_r) }}R{% endif %}).</div>
       {% endif %}
-      {% if st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
+      {% if st.earnings_gate and st.earnings_gate.soon %}<div class="earn-warn">{{ st.earnings_gate.text }}</div>{% elif st.earnings_warning %}<div class="earn-warn">{{ st.earnings_warning.text }}</div>{% endif %}
       {% if st.earnings and st.earnings.earnings_status == "no_date" %}<div class="earn-warn">{{ no_date_text }}</div>{% endif %}
       {% if st.corp_action %}<div class="corp-warn">{{ st.corp_action.text }}</div>{% endif %}
       {% if st.get("spinoff_warning") %}<div class="corp-warn">{{ st.spinoff_warning.text }}</div>{% endif %}{% if st.get("merger_target") %}<div class="corp-warn">{{ st.merger_target.text }}</div>{% endif %}{% if st.get("offering_warning") %}<div class="corp-warn">{{ st.offering_warning }}</div>{% endif %}{% if st.get("deal_buyer") %}<div class="small" style="color:var(--muted)">{{ st.deal_buyer }}</div>{% endif %}
@@ -1544,7 +1546,7 @@
   <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
   {% else %}
   {% if qm_cards %}
-  <div class="qm-grid">
+  <div class="qm-grid" id="qm-cards-grid">
     {% for c in qm_cards %}
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
       <div class="qm-top"><span class="qm-sym">{{ c.ticker }}{{ tn(c.ticker, c.company) }}{% if c.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф — QM✓ стои и върху онази карта."}]) }}{% endif %}</span><span class="qm-price">${{ "%.2f"|format(c.close) }}</span></div>
@@ -1553,7 +1555,8 @@
       {% if c.get("book_open") %}<div class="si-flag" title="Книгата не прави втори запис, докато този е отворен.">📈 OPEN — вече отворена в книгата qm_breakout от {{ c.book_open.since[8:10] }}.{{ c.book_open.since[5:7] }}{% if c.book_open.price %} @ ${{ "%.2f"|format(c.book_open.price) }}{% endif %} — новото ниво не е нов вход</div>{% endif %}
       <div class="qm-stat" title="Ниво на пробива = най-високият High на последните {{ qm_trigger_bars }} сесии; +{{ "%.1f"|format(c.pct_to_trigger) }}% над затварянето">Вход над ${{ "%.2f"|format(c.trigger) }} <span class="qm-sm">(+{{ "%.1f"|format(c.pct_to_trigger) }}%)</span>{% if c.dist_adr is defined %} <span class="qm-sm">· до нивото {{ "%.2f"|format(c.dist_adr) }} ADR</span>{% endif %}</div>
       <div class="qm-sm" style="font-family:inherit;margin:2px 0 4px">Пробив в първия 5-мин. бар → изчакай бара да приключи, вход над неговия връх; стоп — дъното на деня в момента на входа; без пробив над върха — без вход.</div>{# 17.11.2026 (пакет 2, т. 3 — А6) #}
-      {% if c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
+      {% if c.earnings_gate and c.earnings_gate.soon %}<div class="earn-warn">{{ c.earnings_gate.text }}</div>{% elif c.earnings_warning %}<div class="earn-warn">{{ c.earnings_warning.text }}</div>{% endif %}
+      {% if c.earnings_gate and c.earnings_gate.unknown %}<div class="qm-sm" style="font-family:inherit;color:var(--muted)">{{ c.earnings_gate.text }}</div>{% endif %}
       {% if c.corp_action %}<div class="corp-warn">{{ c.corp_action.text }}</div>{% endif %}
       {% if c.get("spinoff_warning") %}<div class="corp-warn">{{ c.spinoff_warning.text }}</div>{% endif %}{% if c.get("merger_target") %}<div class="corp-warn">{{ c.merger_target.text }}</div>{% endif %}{% if c.get("offering_warning") %}<div class="corp-warn">{{ c.offering_warning }}</div>{% endif %}{% if c.get("deal_buyer") %}<div class="small" style="color:var(--muted)">{{ c.deal_buyer }}</div>{% endif %}
       <div class="qm-kv">
@@ -1565,6 +1568,8 @@
     </div>
     {% endfor %}
   </div>
+  {# 19.11.2026 (пакет 19.11, т. 4): сборът за всички карти — от настройките на читателя, в браузъра (sizing_ui.js) #}
+  <div class="lv-sum small" data-scope="#qm-cards-grid" style="font-size:12.5px;margin:4px 0 6px">Ако вземеш всички: въведи баланса в настройките, за да видиш експозицията и риска</div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
     {% if qm_diag and qm_diag.with_history %}Подредени по стягане на базата (най-стегнатите първи); лидери: горните {{ ((1 - qm_diag.lead_pct) * 100)|round|int }}% по ръст за 1, 3 и 6 месеца ({{ qm_diag.leaders }} от {{ qm_diag.with_history }} тикъра към
     {{ qm_diag.as_of[8:10] }}.{{ qm_diag.as_of[5:7] }}), кандидати {{ qm_diag.candidates }}{% if qm_diag.candidates > qm_cards|length %}, показани {{ qm_cards|length }}{% endif %}. {% endif %}{% if qm_diag and qm_diag.beyond_adr %}Още {{ qm_diag.beyond_adr }} кандидат(а) са на повече от {{ '%g'|format(qm_max_dist_adr) }}×ADR от нивото ({{ qm_diag.beyond_adr_tickers|join(", ") }}) — не се показват и не се записват. {% endif %}{% if qm_diag and qm_diag.leader_rejects %}<span style="color:var(--yellow)">Отпаднали по правилото за лидер (пикът до {{ '%g'|format(qm_peak_max_below) }}% под 52-седм. връх и ръст за 6 мес. над {{ '%g'|format(qm_ret6m_min) }}%): {% for x in qm_diag.leader_rejects %}{{ x.ticker }}{{ tn(x.ticker) }} — {{ x.why }}{{ "; " if not loop.last else "" }}{% endfor %} — не се показват и не се записват.</span> {% endif %}
@@ -1784,7 +1789,7 @@
         <span data-l="Месеци без връх" class="wt-num">{% if g.months_unpenetrated is defined %}{{ g.months_unpenetrated }} м{% else %}—{% endif %}{% if g.ath_label == 'new_high_since_listing' %} <span class="wt-mu" title="По-кратка налична история — нов връх откакто имаме данни, не потвърден all-time high">· от листването</span>{% endif %}</span>
         <span data-l="Обем на пробива" class="wt-num">{% if g.get("breakout_volume_ratio") is not none %}{{ "%.1f"|format(g.breakout_volume_ratio) }}×{% else %}<span class="wt-mu">н/д</span>{% endif %}</span>
       </summary>
-      <div class="wt-detail">{{ glb_card(g) }}</div>
+      <div class="wt-detail">{% if g.earnings_gate %}<div class="{{ 'earn-warn' if g.earnings_gate.soon else 'small' }}" style="{{ '' if g.earnings_gate.soon else 'color:var(--muted);font-size:12px' }}">{{ g.earnings_gate.text }}</div>{% endif %}{{ glb_card(g) }}</div>
     </details>
     {% endfor %}
   </div>

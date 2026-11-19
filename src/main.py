@@ -659,6 +659,7 @@ def run() -> dict:
         c["tier"] = setup_rules.canslim_tier(c)                     # 17.11.2026 (пакет 2, т. 1 — А5): „CANSLIM“ (C: EPS от отчета ≥ 25%) / „Тренд без ръст“
     # 17.11.2026 (пакет 1, т. 2д — решение след стратегическия преглед): COT (екстремумите, потвърждението от цената, всички 40 пазара) — махнат изцяло
     action, watchlist = apply_hard_rules(candidates, thermo["sizing_factor"], thermo["regime"])
+    setup_rules.annotate_earnings_gate(action + watchlist, today, unknown_label=False)     # 19.11.2026 (пакет 19.11, т. 5): отчет до 5 работни дни → без размер, без нов вход в книгите
     # FIX 2026-09-12 (findings log 04-11.09, т.2): code-enforced regime-gate
     # expiry — виж watchlist_expiry.py docstring за пълния rationale (преди:
     # чист AI prose, датата "измисляна" наново всеки ден).
@@ -751,6 +752,10 @@ def run() -> dict:
                 c["earnings"] = {"next_earnings": earnings_move.next_earnings_date(c["ticker"], _yf, d0)}
             n_qm_warn = earnings_move.annotate(qm_cards, d0)
             print(f"      QM карти с отчет в следващите ~{config.EARNINGS_WARNING_SESSIONS} сесии: {n_qm_warn}")
+            for c in qm_cards:                                     # 19.11.2026 (пакет 19.11, т. 4): режимният фактор — както при CANSLIM (в Defensive ×0.5)
+                trade_levels.apply_regime(c.get("levels"), thermo["sizing_factor"])
+            n_gate = setup_rules.annotate_earnings_gate(qm_cards, d0)     # 19.11.2026 (т. 5): отчет до 5 работни дни — без размер и без запис в книгата
+            print(f"      QM карти с отчет до {config.EARNINGS_BLACKOUT_DAYS} работни дни (без размер / без запис): {n_gate}")
         steps.step("earnings_warnings_qm", _qm_earnings, label="Предупрежденията за отчет върху картите по Kullamägi",
                    consequence="QM картите днес може да нямат ред за предстоящ отчет; провери датата сам")
 
@@ -771,6 +776,21 @@ def run() -> dict:
                            on_fail=lambda e: {"ok": False, "notes": [f"{type(e).__name__}: {e}"], "rows": []},
                            partial=lambda v: (f"{(v.get('diag') or {})['batches_failed']} партиди не се изтеглиха", {}) if (v.get("diag") or {}).get("batches_failed") else None,
                            label="EP наблюдението (after-hours гапове)", consequence="празният списък НЕ значи, че няма гапове след затваряне")
+
+    for r in (qm_ep_out or {}).get("rows") or []:                 # 19.11.2026 (пакет 19.11, т. 4): EP — режимният фактор, както при CANSLIM и Kullamägi
+        trade_levels.apply_regime(r.get("levels"), thermo["sizing_factor"])
+
+    # 19.11.2026 (пакет 19.11, т. 5): GLB — датата на отчета за картите и за сигналите на книгите; до 5 работни дни → „⚠ отчет … — вход след отчета“, без запис в книгите
+    def _glb_earnings():
+        import yfinance as _yf
+        d0 = dt.date.today()
+        dates = {t: earnings_move.next_earnings_date(t, _yf, d0) for t in sorted({r.get("ticker") for r in glb_candidates + glb_wish_signals + glb_wish_high_signals if r.get("ticker")})}
+        for r in glb_candidates + glb_wish_signals + glb_wish_high_signals:
+            r["earnings"] = {"next_earnings": dates.get(r.get("ticker"))}
+        n = setup_rules.annotate_earnings_gate(glb_candidates + glb_wish_signals + glb_wish_high_signals, d0)
+        print(f"      GLB карти / сигнали с отчет до {config.EARNINGS_BLACKOUT_DAYS} работни дни: {n}")
+    steps.step("earnings_glb", _glb_earnings, enabled=bool(glb_candidates or glb_wish_signals or glb_wish_high_signals), label="Датите на отчетите за GLB",
+               consequence="GLB картите днес са без реда за отчета; книгите по Уиш записват както до 19.11")
 
     # 17.11.2026 (пакет 1, т. 2е): short / Stage 4 скрийнърът (замразен от 19.10) — махнат с кода
     # 03.11.2026 (разходката, т. 17): бележките за обратен залог (cot_opposites) отпаднаха заедно с тикърите на COT тезите — нямат вход
@@ -1064,6 +1084,7 @@ def run() -> dict:
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "overnight": overnight_block if config.ENABLE_OVERNIGHT else None,          # 18.11.2026 (спешно, т. 2): „Нощта“
+        "books_earnings_skips": [x for x in backtest.LAST_EARNINGS_SKIPS if x.get("date") == today],     # 19.11.2026 (пакет 19.11, т. 5): без нов вход заради отчет
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)
         "deal_buyers": {t: v["text"] for t, v in (deal_buyers or {}).items()},   # 16.11.2026 (т. 15): купувач във висяща сделка — радарът, наблюдаваните

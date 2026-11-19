@@ -53,6 +53,8 @@ def build_brief():
     b = copy.deepcopy(B05)
     b["action"], b["watchlist"] = action, [expd]
     b["qm_breakout"] = q.cards(rows)
+    for lv in [c.get("levels") for c in b["qm_breakout"]] + [syna.get("levels")]:          # 19.11.2026 (пакет 19.11, т. 4): режимният фактор и за Kullamägi / EP — както в main
+        tl.apply_regime(lv, (b.get("thermometer") or {}).get("sizing_factor", 1.0))
     b["qm_diag"] = {"universe": 903, "with_history": 892, "leaders": 167, "candidates": 3, "shown": 3, "as_of": QMF["as_of"], "lead_pct": config.QM_LEAD_PCT, "ok": True, "batches": 10, "batches_failed": 0}
     b["qm_ep"] = {"ok": True, "rows": [syna], "not_neglected": [], "log": {}}
     b.setdefault("backtest", {})["qm_breakout"] = backtest.get_qm_summary()
