@@ -614,7 +614,16 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
         if not (ticker and isinstance(c.get("trigger"), (int, float)) and isinstance(c.get("adr"), (int, float)) and c["trigger"] > 0 and c["adr"] > 0):
             continue
         key = f"{ticker}_{entry_date}_qm"
-        if key in tracker or _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
+        if key in tracker:
+            continue
+        if config.QM_ONE_RECORD_FROM and entry_date >= config.QM_ONE_RECORD_FROM:   # 19.11.2026 (пакет 19.11, т. 6): един запис, докато прозорецът е отворен
+            if qm_window_owner(tracker, ticker, entry_date):
+                continue                                                     # денят вече е в прозореца на запис (повторно четене на snapshot)
+            prev = qm_open_window(tracker, ticker, entry_date)
+            if prev:
+                _qm_extend(prev, entry_date, c)
+                continue
+        if _is_continuation(tracker, ticker, entry_date, CATEGORY_QM) or _spinoff_skip(ticker, entry_date, CATEGORY_QM):
             continue
         rec = {"method": "v2", "category": CATEGORY_QM, "ticker": ticker, "entry_date": entry_date, "status": "pending", "regime": regime, **regime_rule_tag(entry_date),
                **({"entry_rule": QM_ENTRY_RULE} if entry_date >= config.QM_FIRST_BAR_RULE_FROM else {}),       # 17.11.2026 (пакет 2, т. 3)
@@ -625,7 +634,86 @@ def _ingest_qm_list(tracker: dict, entry_date: str, cards: list[dict], regime: s
                "valid_through": setup_rules.valid_through(entry_date, config.QM_ENTRY_WINDOW_SESSIONS),
                "resolution_date": None, "discovered_date": None, "spy_return_pct": None, "alpha_pct": None}
         rec.update({k: None for k in _QM_RESULT_KEYS if k != "status"})
+        if config.QM_ONE_RECORD_FROM and entry_date >= config.QM_ONE_RECORD_FROM:
+            rec["window_days"] = [{"date": entry_date, "buy_stop": rec["buy_stop"]}]
         tracker[key] = rec
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 19.11.2026 (пакет 19.11, т. 6): книгата на Kullamägi — ЕДИН запис на тикър, докато прозорецът му е отворен. До 19.11 всеки ден с карта правеше нов запис (входът е валиден една
+# сесия): CORT 5 поредни дни (08–14.10), IDXX / J / R по 3, GKOS / A по 2 … — 13 излишни записа в 42. Сега, ако предишната сесия има запис за тикъра без вход (not_triggered /
+# skipped_* / invalid_risk / pending), новият ден се добавя към неговия прозорец (window_days: ден → ниво; buy_stop = последното ниво) и записът се резолвира наново ден по ден
+# (_resolve_qm_window): първият ден с вход дава резултата; без вход до края — not_triggered. Старите дубликати се отбелязват (duplicate_of), не се трият; извън статистиката.
+# ══════════════════════════════════════════════════════════════════════════
+QM_NO_FILL = ("not_triggered", "pending", "skipped_extended", "skipped_adr", "invalid_risk")
+
+
+def qm_window_days(rec: dict) -> list[dict]:
+    """Дните на прозореца на записа [{date, buy_stop}] — стар запис без поле → само денят на записа."""
+    return list(rec.get("window_days") or [{"date": rec.get("entry_date"), "buy_stop": rec.get("buy_stop")}])
+
+
+def qm_window_owner(tracker: dict, ticker: str, day: str) -> str | None:
+    """Ключът на QM записа на тикъра, чийто прозорец съдържа деня; иначе None."""
+    for k, r in tracker.items():
+        if isinstance(r, dict) and r.get("category") == CATEGORY_QM and r.get("ticker") == ticker and any(d.get("date") == day for d in qm_window_days(r)):
+            return k
+    return None
+
+
+def qm_open_window(tracker: dict, ticker: str, day: str) -> dict | None:
+    """Записът на тикъра, чийто прозорец завършва в предишната NYSE сесия преди `day`, без вход и без отбелязан дубликат / ръчен преглед; иначе None."""
+    from src import sessions
+    prev = sessions.prev_session(dt.date.fromisoformat(day)).isoformat()
+    for r in tracker.values():
+        if (isinstance(r, dict) and r.get("category") == CATEGORY_QM and r.get("ticker") == ticker and not r.get("fill_date") and r.get("status") in QM_NO_FILL
+                and not r.get("duplicate_of") and not r.get("needs_manual_review") and qm_window_days(r)[-1].get("date") == prev):
+            return r
+    return None
+
+
+def _qm_extend(rec: dict, day: str, card: dict) -> None:
+    """Новият ден в прозореца: нивото от картата, валиден до деня, резултатът — наново при резолюцията. Мутира rec."""
+    days = qm_window_days(rec)
+    days.append({"date": day, "buy_stop": round(float(card["trigger"]), 4)})
+    rec["window_days"] = days
+    rec.update(buy_stop=days[-1]["buy_stop"], valid_through=day, window_sessions=len(days), status="pending", resolution_date=None,
+               adr=round(float(card["adr"]), 2), expected_stop=card.get("expected_stop"), max_stop=card.get("max_stop"), signal_price=card.get("close"))
+    rec.update({k: None for k in _QM_RESULT_KEYS if k != "status"})
+
+
+def mark_qm_duplicates(tracker: dict, today: str | None = None) -> int:
+    """
+    Старите дубликати (записи отпреди config.QM_ONE_RECORD_FROM): поредни NYSE сесии с карта за един тикър, без вход в предишния ден — една поредица. Каноничният запис — първият
+    с вход, иначе последният (живият продължава прозореца); другите → rec["duplicate_of"] = ключът му и „duplicate_marked“. Идемпотентно; не трие. → колко са отбелязани сега.
+    """
+    from src import sessions
+    by: dict = {}
+    for k, r in tracker.items():
+        if (isinstance(r, dict) and r.get("category") == CATEGORY_QM and r.get("ticker") and r.get("entry_date")
+                and (not config.QM_ONE_RECORD_FROM or r["entry_date"] < config.QM_ONE_RECORD_FROM)):
+            by.setdefault(r["ticker"], []).append((r["entry_date"], k, r))
+    n = 0
+    for t, xs in by.items():
+        xs.sort()
+        series, cur = [], [xs[0]]
+        for prev, nxt in zip(xs, xs[1:]):
+            consecutive = sessions.next_session(dt.date.fromisoformat(prev[0])).isoformat() == nxt[0]
+            if consecutive and not prev[2].get("fill_date"):
+                cur.append(nxt)
+            else:
+                series.append(cur); cur = [nxt]
+        series.append(cur)
+        for sr in series:
+            if len(sr) < 2:
+                continue
+            canon = next((x for x in sr if x[2].get("fill_date")), sr[-1])
+            for d, k, r in sr:
+                if k != canon[1] and r.get("duplicate_of") != canon[1]:
+                    r["duplicate_of"] = canon[1]
+                    r.setdefault("duplicate_marked", today)
+                    n += 1
+    return n
 
 
 # 04.11.2026 (прегледът): записите със задна дата в qm_breakout остават, с етикет. Роденият преди самия етикет (04.11, SN от картата на 12.10) — тук; следващите получават полето при записа.
@@ -1299,6 +1387,45 @@ def _qm_intraday(rec: dict, fill_date: str | None, today: dt.date) -> bool:
 
 
 def _resolve_qm_record(rec: dict, opens, highs, lows, closes, spy_bars, today: dt.date) -> None:
+    """19.11.2026 (т. 6): запис с прозорец от повече дни → _resolve_qm_window (ден по ден); иначе — както досега (_resolve_qm_one)."""
+    if len(rec.get("window_days") or []) > 1:
+        return _resolve_qm_window(rec, opens, highs, lows, closes, spy_bars, today)
+    return _resolve_qm_one(rec, opens, highs, lows, closes, spy_bars, today)
+
+
+_QM_DAY_KEYS = ("intraday", "intraday_status", "intraday_tries")
+
+
+def _resolve_qm_window(rec: dict, opens, highs, lows, closes, spy_bars, today: dt.date) -> None:
+    """
+    19.11.2026 (т. 6): прозорецът ден по ден — всеки ден е еднодневен запис със своето ниво (_resolve_qm_one върху копие); първият ден с вход (или още течащ) дава резултата,
+    без вход във всички — not_triggered с датата на последния. 5-минутните бари на всеки ден се пазят в window_days (без повторно теглене). Мутира rec; не вдига.
+    """
+    days = rec["window_days"]
+    last = None
+    for wd in days:
+        tmp = {**{k: v for k, v in rec.items() if k != "window_days"}, "entry_date": wd["date"], "buy_stop": wd["buy_stop"], "valid_through": wd["date"], "window_sessions": 1,
+               "status": "pending", "resolution_date": None, "discovered_date": None, **{k: wd.get(k) for k in _QM_DAY_KEYS}}
+        tmp.update({k: None for k in _QM_RESULT_KEYS if k != "status"})
+        if wd["date"] >= config.QM_FIRST_BAR_RULE_FROM:
+            tmp["entry_rule"] = QM_ENTRY_RULE
+        _resolve_qm_one(tmp, opens, highs, lows, closes, spy_bars, today)
+        for k in _QM_DAY_KEYS:
+            if tmp.get(k) is not None:
+                wd[k] = tmp[k]
+        last = tmp
+        if tmp.get("fill_date") or tmp.get("status") in trade_sim.LIVE or tmp.get("needs_manual_review"):
+            break
+    if last is None:
+        return
+    for k in _QM_RESULT_KEYS + ("spy_return_pct", "alpha_pct", "entry_price", "resolution_date", "needs_manual_review"):
+        rec[k] = last.get(k)
+    if last.get("resolution_date") and not rec.get("discovered_date"):
+        rec["discovered_date"] = today.isoformat()
+    rec["fill_window_day"] = last["entry_date"] if last.get("fill_date") else None
+
+
+def _resolve_qm_one(rec: dict, opens, highs, lows, closes, spy_bars, today: dt.date) -> None:
     """
     Резолюция на запис от книгата "qm_breakout": trade_sim.simulate_qm върху дневните барове (чиста функция на плана и баровете — както buy-stop книгата, без памет от сигнала).
     Сплит след входа → запис във флаг needs_manual_review и пропуск (книгата не коригира нива; позициите са краткотрайни). Мутира rec на място; не вдига.
@@ -1458,6 +1585,12 @@ def _resolve_open_positions(tracker: dict, today: dt.date | None = None) -> None
         _migrate_qm_r_floor(tracker, today)
     except Exception as e:
         print(f"[backtest] qm_breakout: преизчисляването на R не успя: {type(e).__name__}: {e}")
+    try:                                                    # 19.11.2026 (т. 6): старите дубликати в qm_breakout — отбелязани, не изтрити (идемпотентно)
+        n_dup = mark_qm_duplicates(tracker, today.isoformat())
+        if n_dup:
+            print(f"[backtest] qm_breakout: отбелязани {n_dup} дубликата (поредни дни с карта, без вход) — извън статистиката")
+    except Exception as e:
+        print(f"[backtest] qm_breakout: отбелязването на дубликатите не успя: {type(e).__name__}: {e}")
     try:                                                    # 10.11.2026: приключила сделка — не се резолвира (орязана история на Yahoo след делистването)
         from src import spinoff_watch as _sw
         _closed_t = set(_sw.closed_tickers())
@@ -1978,7 +2111,8 @@ def get_qm_summary() -> dict:
     tracker = _load_tracker()
     all_records = book_records(CATEGORY_QM, tracker=tracker)
     before_rule = [(r, qm_before_rule(r)) for r in all_records]
-    records = [r for r, d in before_rule if d is None]                       # записите "преди правилото за 1×ADR" са извън статистиката (пазят се в tracker-а)
+    dups = [r for r in all_records if r.get("duplicate_of")]                 # 19.11.2026 (т. 6): отбелязаните дубликати — извън статистиката (пазят се в tracker-а)
+    records = [r for r, d in before_rule if d is None and not r.get("duplicate_of")]   # записите "преди правилото за 1×ADR" са извън статистиката (пазят се в tracker-а)
     act = book_intervals(CATEGORY_ACTION, tracker, trade_sim.NOT_A_POSITION)
     bst = book_intervals(CATEGORY_BUYSTOP, tracker, trade_sim.NOT_A_POSITION)
 
@@ -2036,6 +2170,8 @@ def get_qm_summary() -> dict:
                 "r_basis": r.get("r_basis"), "entry_time": (r.get("intraday") or {}).get("entry_time") if isinstance(r.get("intraday"), dict) else None,   # 03.11.2026 (т. 11)
                 "stopped_intraday": r.get("how") == "stop_intraday", "intraday_status": r.get("intraday_status"),
                 "backdated": r.get("backdated"),                                                             # 04.11.2026 (прегледът): записан със задна дата
+                "window": [d.get("date") for d in r.get("window_days") or []] if len(r.get("window_days") or []) > 1 else None,     # 19.11.2026 (т. 6): прозорецът
+                "levels": [d.get("buy_stop") for d in r.get("window_days") or []] if len(r.get("window_days") or []) > 1 else None,
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst)}
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"), "realized_r": r.get("realized_r"),
@@ -2063,6 +2199,10 @@ def get_qm_summary() -> dict:
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "entry_rule_split": qm_entry_rule_split(records, visible), "entry_rule_from": config.QM_FIRST_BAR_RULE_FROM,          # 17.11.2026 (пакет 2, т. 3)
         "before_rule_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "dist_adr": d} for r, d in before_rule if d is not None), key=lambda x: (x["entry_date"], x["ticker"])),
+        # 19.11.2026 (т. 6): отбелязаните дубликати (поредни дни с карта, без вход) — извън статистиката, не изтрити
+        "duplicates": len(dups), "duplicate_rows": sorted(({"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "of": r.get("duplicate_of")}
+                                                           for r in dups), key=lambda x: (x["entry_date"], x["ticker"])),
+        "one_record_from": config.QM_ONE_RECORD_FROM or None,
     }
 
 
