@@ -187,6 +187,8 @@ def price_facts(closes, spy=None) -> dict:
     (1 + r) / (1 + r_SPY) − 1) — и "rs_word" от кода (rs_word). Къса история → None за съответното поле. Чиста функция.
     """
     c = closes.dropna() if closes is not None else None
+    if c is not None and len(c) == 1:                                       # 19.11.2026 (пакет 19.11, т. 1): първият ден на борсата (ANT) — цената, без промяна
+        return {"date": c.index[-1].date().isoformat(), "close": round(float(c.iloc[-1]), 2), "first_day": True}
     if c is None or len(c) < 2:
         return {}
     last, prev = float(c.iloc[-1]), float(c.iloc[-2])

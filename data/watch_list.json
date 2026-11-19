@@ -1,12 +1,13 @@
 {
- "_note": "Ръчно поддържан списък за секцията '🔎 Наблюдавани тикъри'. Добавяй/махай тикъри тук и commit-ни — ефектът е видим в следващия дневен бриф. Премахването оттук НЕ влияе на това дали компанията се появява другаде в брифа (GLB / COT / CANSLIM са независими механизми). Имената (\"names\") — записани веднъж на 03.11.2026 от брифа на 30.10 (Yahoo longName); брифът не ги тегли от Yahoo .info. Нов тикър → добави и името му. 16.11.2026: махнати SAP, BFLY, TDOC, BHC, BLSH, CRCL, ELF, BMNR; добавен HONA (името — от списъка на SEC company_tickers, „Honeywell Aerospace“; 17.11.2026: имената тук не зависят от 13F модула — той е махнат).",
+ "_note": "Ръчно поддържан списък за секцията '🔎 Наблюдавани тикъри'. Добавяй/махай тикъри тук и commit-ни — ефектът е видим в следващия дневен бриф. Премахването оттук НЕ влияе на това дали компанията се появява другаде в брифа (GLB / COT / CANSLIM са независими механизми). Имената (\"names\") — записани веднъж на 03.11.2026 от брифа на 30.10 (Yahoo longName); брифът не ги тегли от Yahoo .info. Нов тикър → добави и името му. 16.11.2026: махнати SAP, BFLY, TDOC, BHC, BLSH, CRCL, ELF, BMNR; добавен HONA (името — от списъка на SEC company_tickers, „Honeywell Aerospace“; 17.11.2026: имената тук не зависят от 13F модула — той е махнат). 19.11.2026: добавен ANT (Anthropic; на борсата от 19.11 — без 52-седм. показатели; името — Yahoo quoteSummary „Anthropic, PBC Class A Common Stock“ без класа).",
  "tickers": [
   "AI",
   "CRBG",
   "DOCU",
   "ACN",
   "SIRI",
-  "HONA"
+  "HONA",
+  "ANT"
  ],
  "names": {
   "AI": "C3.ai, Inc.",
@@ -14,6 +15,7 @@
   "DOCU": "DocuSign, Inc.",
   "ACN": "Accenture plc",
   "SIRI": "Sirius XM Holdings Inc.",
-  "HONA": "Honeywell Aerospace Inc."
+  "HONA": "Honeywell Aerospace Inc.",
+  "ANT": "Anthropic, PBC"
  }
 }

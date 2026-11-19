@@ -150,4 +150,13 @@ with q():
     page = render.render_dashboard(b, publish=False)
 assert '<span class="wt-mu">+0.4</span>' in page and "в крак с пазара" in page and "„в крак с пазара“ — за 4 седмици в рамките на ±1 пункт" in page
 print("  ✓ на страницата: +0.4 — сиво, думата „в крак с пазара“; бележката обяснява зоната")
+print("── 7. първият ден на борсата (19.11.2026, ANT — СИНТЕТИЧНА цена) ──")
+one = wm.price_facts(pd.Series([212.5], index=pd.to_datetime(["2026-11-19"])))
+assert one == {"date": "2026-11-19", "close": 212.5, "first_day": True} and wm.price_facts(pd.Series([], dtype=float)) == {}
+r0 = copy.deepcopy(rows1[0]); r0.update(ticker="ANT", name="Anthropic, PBC", facts={**(r0.get("facts") or {}), "price": {**one, "listed_since": "2026-11-19", "history_bars": 1}})
+b = copy.deepcopy(B19); b["watch"] = [r0]
+with q():
+    page7 = render.render_dashboard(b, publish=False)
+assert "$212.50 <span class=\"wt-mu\">първи ден на борсата</span>" in page7 and "на борсата от 19.11.2026 — без 52-седм. показатели" in page7
+print("  ✓ цената без промяна — „първи ден на борсата“; „на борсата от 19.11.2026 — без 52-седм. показатели“")
 print("\n✅ test_watch_table: всичко мина")
