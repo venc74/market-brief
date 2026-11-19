@@ -1,0 +1,238 @@
+{
+ "note": "РЕАЛНО: thermometer и distribution_days от брифа на 19.11.2026 (data/2026-11-19.json), дословно, извадени на 19.11.2026.",
+ "thermometer": {
+  "indicators": [
+   {
+    "name": "SPY тренд",
+    "value": 730.2,
+    "as_of": "2026-11-18",
+    "pct_from_high": 6.28,
+    "ma50": 762.28,
+    "ma200": 730.02,
+    "above_50dma": false,
+    "above_200dma": true,
+    "status": "yellow",
+    "ma50_prev": 764.55,
+    "ma50_rising": false,
+    "trend_ok": false,
+    "label": "SPY 730 | под 50DMA, над 200DMA"
+   },
+   {
+    "name": "VIX",
+    "value": 24.56,
+    "chg_5d": 7.07,
+    "pct_5d": 40.4,
+    "spike": true,
+    "status": "red",
+    "label": "VIX 24.6 (risk-off) ⚠ рязък скок"
+   },
+   {
+    "name": "Put/Call (SPY)",
+    "value": 1.15,
+    "raw": 1.1,
+    "avg_days": 3,
+    "percentile": 60.6,
+    "history_days": 109,
+    "status": "yellow",
+    "label": "P/C 1.10 днес · 3-дн. средно 1.15 (61. percentile на средното от 109 дни; в нормалния диапазон) — цветът е по средното",
+    "informational": true
+   },
+   {
+    "name": "2Y/10Y спред",
+    "value": 0.27,
+    "status": "green",
+    "label": "0.27% (нормален, steepening)",
+    "as_of": "2026-11-18",
+    "informational": true
+   },
+   {
+    "name": "Fed Net Liquidity",
+    "value": 5846.6,
+    "status": "yellow",
+    "informational": true,
+    "change_4w_pct": -0.39,
+    "as_of": "2026-11-11",
+    "label": "$5,847 млрд към 2026-11-11 · -0.4% за 4 седмици (в мъртвата зона ±1%) · само информативен, не влиза в режима"
+   },
+   {
+    "name": "SOFR − IORB (финансиране)",
+    "value": 2.0,
+    "status": "yellow",
+    "informational": true,
+    "percentile": 87.8,
+    "zscore": 0.62,
+    "streak": {
+     "dir": "down",
+     "n": 1
+    },
+    "as_of": "2026-11-17",
+    "label": "+2.0 б.п. към 17.11 (SOFR 3.92% − IORB 3.90%) · +3.0 б.п. за седмица · 88. percentile, z +0.6 спрямо историята от 04.2018 · термометър, не предсказание: в проучването ни ранен сигнал само в 1 от 3 кризи (2007), 47–72% фалшиви сигнали · само информативен, не влиза в режима",
+    "sofr_note": "SOFR излиза на следващия работен ден в 08:00 Ню Йорк: последна — 17.11; за 18.11 — днес ~14:00 Берлин"
+   },
+   {
+    "name": "RSP спрямо SPY (широчина)",
+    "value": 0.7,
+    "status": "green",
+    "informational": true,
+    "as_of": "2026-11-18",
+    "diff_5": 0.7,
+    "diff_10": 1.2,
+    "rsp_5": -3.24,
+    "spy_5": -3.9,
+    "rsp_10": -3.54,
+    "spy_10": -4.77,
+    "label": "5 сесии: RSP -3.2% срещу SPY -3.9% (+0.7 п.) · 10 сесии: +1.2 п. — средната акция бие гигантите · само информативен, не влиза в режима"
+   },
+   {
+    "name": "MOVE (Bond Vol)",
+    "value": 98.2,
+    "as_of": "2026-11-18",
+    "delta_1w": 5.7,
+    "spike": false,
+    "status": "green",
+    "label": "MOVE 98 (+6 пункта/седмица)"
+   },
+   {
+    "name": "VIX Term Structure",
+    "value": 0.986,
+    "status": "green",
+    "label": "VIX9D 24.0 / VIX 24.6 / VIX3M 24.3 → ratio 0.99 (contango, нормално)"
+   },
+   {
+    "name": "IEI/HYG (Credit Spread)",
+    "value": 1.4915,
+    "as_of": "2026-11-18",
+    "level_percentile": 27.0,
+    "roc_10d_pct": 0.46,
+    "roc_percentile": 83.5,
+    "spike": false,
+    "status": "green",
+    "roc_10d_pct_prev": 0.02,
+    "roc_trend": "rising",
+    "roc_trend_text": "10-дневната RoC е +0.46% срещу +0.02% преди 5 сесии — расте (ускорява се)",
+    "iei_10d_pct": -0.67,
+    "hyg_10d_pct": -1.12,
+    "label": "IEI/HYG 1.491 (27. percentile) · 10д RoC +0.5% (IEI -0.7%, HYG -1.1%) (84. percentile)"
+   },
+   {
+    "name": "HY / IG OAS (кредитни спредове)",
+    "value": 3.43,
+    "status": "yellow",
+    "informational": true,
+    "as_of": "2026-11-17",
+    "hy": {
+     "value": 3.43,
+     "as_of": "2026-11-17",
+     "chg_bp": 10,
+     "percentile": 88.8,
+     "chg_pct": 72.8,
+     "n_history": 784,
+     "history_from": "2023-11-20",
+     "hide": false,
+     "series": "BAMLH0A0HYM2"
+    },
+    "ig": {
+     "value": 0.92,
+     "as_of": "2026-11-17",
+     "chg_bp": 5,
+     "percentile": 72.9,
+     "chg_pct": 84.3,
+     "n_history": 783,
+     "history_from": "2023-11-20",
+     "hide": false,
+     "series": "BAMLC0A0CM"
+    },
+    "level": "moderate",
+    "verdict": "OAS се разширява умерено (HY 73., IG 84. percentile на промяната), IEI/HYG още не",
+    "label": "HY 3.43% (+10 б.п. за 20 дни — 73. percentile на промяната; нивото — 89. percentile) · IG 0.92% (+5 б.п. за 20 дни — 84. percentile на промяната; нивото — 73. percentile) · към 17.11, перцентил спрямо историята от 20.11.2023 (FRED дава ~3 г.) · OAS се разширява умерено (HY 73., IG 84. percentile на промяната), IEI/HYG още не · само информативен, не влиза в режима"
+   },
+   {
+    "name": "Market Breadth (% над 40dMA)",
+    "value": 54.9,
+    "universe_size": 915,
+    "status": "green",
+    "universe_total": 918,
+    "missing_n": 3,
+    "batches": 19,
+    "batches_failed": 0,
+    "label": "54.9% над 40dMA — в средата спрямо собствената история: 65-и перцентил от 69 брифа (от 14.08; праг: под 25-и = 29.7% — слаба, над 75-и = 61.9% — силна) · за 5 сесии 70.5% → 54.9% — стеснява се",
+    "methodology_note": "Inspired by T2108 методология (Worden/TC2000), но изчислено върху собствен universe (S&P500+Nasdaq100+MidCap400) — НЕ буквален NYSE T2108.",
+    "relative": {
+     "n": 69,
+     "since": "2026-08-14",
+     "pct": 65,
+     "low": 29.7,
+     "high": 61.9,
+     "prev": 70.5,
+     "word": "в средата спрямо собствената история"
+    }
+   }
+  ],
+  "regime": "Defensive",
+  "regime_reason": "SPY 730 под 50DMA (762) ✗ · няма override ✓ · distribution days червени (SPY 8, QQQ 8; праг 9) — по хистерезис ✗",
+  "sizing_factor": 0.5,
+  "counts": "4 зелени / 1 жълт / 1 червен от 6 видими · не се броят: Put/Call (SPY), 2Y/10Y спред, Fed Net Liquidity, SOFR − IORB (финансиране), RSP спрямо SPY (широчина), HY / IG OAS (кредитни спредове) (информативни)",
+  "overrides": [],
+  "regime_by_count": "Defensive",
+  "regime_by_rule": "Defensive",
+  "credit_pressure": {
+   "hyg_10d_pct": -1.12,
+   "oas_chg_pct": 72.8,
+   "oas_as_of": "2026-11-17",
+   "oas_missing": false,
+   "active": true,
+   "text": "HYG за 10 дни -1.1% (праг -1%); HY OAS — 73-и перцентил на 20-дневната промяна (праг 75-и)"
+  },
+  "credit_gate": null,
+  "exit_rule": "Offensive: трите условия (SPY 730 под 50DMA (762) ✗; distribution days червени (SPY 8, QQQ 8; праг 9) — по хистерезис ✗) — 2 поредни дни.",
+  "hysteresis_released": [],
+  "rule": {
+   "version": "2026-11-18",
+   "conditions": [
+    {
+     "key": "trend",
+     "ok": false,
+     "text": "SPY 730 под 50DMA (762) ✗"
+    },
+    {
+     "key": "override",
+     "ok": true,
+     "text": "няма override ✓"
+    },
+    {
+     "key": "dd",
+     "ok": false,
+     "text": "distribution days червени (SPY 8, QQQ 8; праг 9) — по хистерезис ✗"
+    }
+   ],
+   "met": false,
+   "streak": 0,
+   "pending": null,
+   "cash": false,
+   "line": "SPY 730 под 50DMA (762) ✗ · няма override ✓ · distribution days червени (SPY 8, QQQ 8; праг 9) — по хистерезис ✗",
+   "credit": "HYG за 10 дни -1.1% (праг -1%); HY OAS — 73-и перцентил на 20-дневната промяна (праг 75-и)",
+   "oas_missing_since": null
+  },
+  "regime_margin": {
+   "text": "Запас до смяна на режима: по броенето до Offensive: 0 червени (сега 1: VIX); до Cash: още 2 червени · distribution days SPY 8/9, QQQ 8/9 — при 9 Offensive се блокира (липсва 1) · IEI/HYG 10д RoC 84. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е +0.46% срещу +0.02% преди 5 сесии — расте (ускорява се) · VIX term structure 0.99 (жълт от 1.00, червен от 1.10)",
+   "parts": [
+    "по броенето до Offensive: 0 червени (сега 1: VIX); до Cash: още 2 червени",
+    "distribution days SPY 8/9, QQQ 8/9 — при 9 Offensive се блокира (липсва 1)",
+    "IEI/HYG 10д RoC 84. percentile при праг 90 (≥ 90 → червен и override Defensive); 10-дневната RoC е +0.46% срещу +0.02% преди 5 сесии — расте (ускорява се)",
+    "VIX term structure 0.99 (жълт от 1.00, червен от 1.10)"
+   ]
+  },
+  "regime_change": null
+ },
+ "distribution_days": {
+  "count": 8,
+  "spy_count": 8,
+  "qqq_count": 8,
+  "status": "yellow",
+  "label": "SPY 8 / QQQ 8 (последни 25 сесии)",
+  "methodology_note": "Подобно на distribution days на IBD: сесия с close надолу с поне 0.2% при обем над предходния, за последните 25 сесии, max(SPY, QQQ). Разлики: обемът е на ETF-ите SPY/QQQ, не на индексите; няма правилото на IBD за изтриване, когато индексът се качи с 5% над деня на разпределение.",
+  "as_of": "2026-11-18",
+  "fetch_status": "ok",
+  "missing": []
+ }
+}

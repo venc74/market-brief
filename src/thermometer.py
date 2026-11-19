@@ -1709,11 +1709,48 @@ def apply_market_rule(thermo: dict, distribution_days: dict | None = None, prev_
                    exit_rule=("Offensive се задържа, докато трите условия са изпълнени; при първото неизпълнено — Defensive още същия ден." if regime == "Offensive" else
                               f"Offensive: трите условия ({'; '.join(c['text'] for c in conds if not c['ok']) or 'изпълнени'}) — {need} поредни дни."),
                    rule={"version": config.REGIME_RULE_VERSION, "conditions": conds, "met": met, "streak": streak, "pending": pending, "cash": cash,
-                         "line": line, "credit": cp.get("text"), "oas_missing_since": cp.get("oas_missing_since")})
+                         "line": line, "credit": cp.get("text"), "oas_missing_since": cp.get("oas_missing_since"),
+                         "credit_override": credit_override_status({**out, "credit_pressure": cp})})          # 19.11.2026 (пакет 19.11, т. 3)
         return out
     except Exception as e:
         print(f"[thermo] пазарното правило не се приложи: {type(e).__name__}: {e}")
         return thermo
+
+
+def credit_override_status(thermo: dict | None) -> dict | None:
+    """
+    19.11.2026 (пакет 19.11, т. 3): кредитният override по едното правило — СКОК на IEI/HYG (10д RoC ≥ config.IEI_HYG_ROC_SPIKE_PERCENTILE перцентил) И КРЕДИТЕН НАТИСК (HYG за 10 дни
+    ≤ config.CREDIT_PRESSURE_HYG_10D_PCT ИЛИ 20-дневната промяна на HY OAS ≥ config.CREDIT_PRESSURE_OAS_CHG_PCT перцентил) — всяка част с ✓ / ✗ и числото. Override-ът, държан
+    по хистерезиса на скока (2 поредни дни под прага, от 01.10), се казва изрично. → {"spike", "hyg", "oas", "pressure", "active", "text"}; без IEI/HYG → None. Чиста функция.
+    Реално, 19.11: скок — 84-и ✗; HYG −1.1% ✓; HY OAS — 73-и ✗ → натиск има, скок няма → няма override.
+    """
+    t = thermo or {}
+    ind = next((i for i in t.get("indicators") or [] if str(i.get("name", "")).startswith("IEI/HYG")), None)
+    if ind is None:
+        return None
+    cp = t.get("credit_pressure") or {}
+    thr = config.IEI_HYG_ROC_SPIKE_PERCENTILE
+    p = None if ind.get("hide") else ind.get("roc_percentile")
+    held = next((o for o in t.get("overrides") or [] if o.get("trigger") == "IEI/HYG"), None)
+    spike_now = isinstance(p, (int, float)) and p >= thr
+    if not isinstance(p, (int, float)):
+        sp = {"ok": None, "text": f"скок IEI/HYG (10д RoC ≥ {thr:g}-и перц.): няма данни" + (" — override-ът се държи по хистерезис" if held else "")}
+    else:
+        sp = {"ok": spike_now, "text": f"скок IEI/HYG (10д RoC ≥ {thr:g}-и перц.) — {p:.0f}-и " + ("✓" if spike_now else "✗") + (" (override-ът се държи по хистерезис — 2 дни под прага)" if held and not spike_now else "")}
+    hyg, oas = cp.get("hyg_10d_pct"), cp.get("oas_chg_pct")
+    hx, ox = config.CREDIT_PRESSURE_HYG_10D_PCT, config.CREDIT_PRESSURE_OAS_CHG_PCT
+    hy = {"ok": None, "text": f"HYG 10д ≤ {hx:g}%: няма данни"} if hyg is None else {"ok": hyg <= hx, "text": f"HYG 10д ≤ {hx:g}% — {hyg:+.1f}% " + ("✓" if hyg <= hx else "✗")}
+    if cp.get("oas_missing") or oas is None:
+        since = cp.get("oas_missing_since")
+        oa = {"ok": None, "text": "HY OAS 20д: няма данни" + (f" от {since[8:10]}.{since[5:7]}" if since else "") + " — само по HYG"}
+    else:
+        oa = {"ok": oas >= ox, "text": f"HY OAS 20д ≥ {ox:g}-и перц. — {oas:.0f}-и " + ("✓" if oas >= ox else "✗")}
+    pressure = cp.get("active")
+    active = bool(held)
+    verdict = ("→ override: Defensive" if active else "→ няма override" + (" (скок без натиск)" if spike_now and pressure is False else "")
+               + (" (натиск без скок)" if pressure and not spike_now else ""))
+    text = f"Кредитен override: {sp['text']} И кредитен натиск ({hy['text']} ИЛИ {oa['text']}) {verdict}"
+    return {"spike": sp, "hyg": hy, "oas": oa, "pressure": pressure, "active": active, "verdict": verdict, "text": text}
 
 
 def thermometer_unavailable(exc: BaseException) -> dict:

@@ -486,6 +486,32 @@ def regime_change(prev: dict | None, thermo: dict | None, prev_date: str | None 
         return None
 
 
+def _rule_margin(t: dict, R: int, reds: str) -> list[str]:
+    """
+    19.11.2026 (пакет 19.11, т. 3): „Запас до смяна на режима“ по едното пазарно правило (thermometer.apply_market_rule) — кои условия не са изпълнени (SPY: колко % до 50DMA и дали
+    тя расте), престоят към Offensive и колко червени до Cash (броенето остава само за Cash). До 19.11 редът казваше „по броенето до Offensive: …“ — старото правило.
+    """
+    r = t.get("rule") or {}
+    parts = []
+    spy = next((i for i in t.get("indicators") or [] if i.get("name") == "SPY тренд"), {}) or {}
+    v, ma = spy.get("value"), spy.get("ma50")
+    gap = f" — нужни {(ma / v - 1) * 100:+.1f}%{'' if spy.get('ma50_rising') else ' и 50DMA да расте'}" if isinstance(v, (int, float)) and isinstance(ma, (int, float)) and v and v < ma else \
+          ("" if spy.get("ma50_rising", True) else " — 50DMA още не расте")
+    bad = [c for c in r.get("conditions") or [] if not c.get("ok")]
+    if t.get("regime") == "Offensive":
+        parts.append("Offensive: първото неизпълнено условие → Defensive още същия ден")
+    elif r.get("cash"):
+        parts.append(f"Cash: под 3 червени броени уреда → Defensive (сега {R}{reds})")
+    elif bad:
+        txt = [c["text"].replace(" ✗", "") + (gap if c.get("key") == "trend" else "") for c in bad]
+        parts.append(f"до Offensive: {'; '.join(txt)} — после {config.REGIME_OFFENSIVE_CONFIRM_DAYS} поредни дни с изпълнени условия")
+    elif r.get("pending"):
+        parts.append(r["pending"])
+    if not r.get("cash") and t.get("regime") != "Cash":
+        parts.append(f"до Cash: още {_plural(max(3 - R, 0), 'червен', 'червени')} броени уреда (сега {R}{reds})")
+    return parts
+
+
 def margin(thermo: dict | None, distribution_days: dict | None = None, dd_status: dict | None = None) -> dict:
     """
     15.10.2026 · "Запас до смяна на режима" — готово от кода (за картата на термометъра и за макро промпта): {"text", "parts"}. Части:
@@ -511,7 +537,9 @@ def margin(thermo: dict | None, distribution_days: dict | None = None, dd_status
         if trig:
             parts.append(f"активен override ({', '.join(trig)}) — режимът е Defensive независимо от броенето")
         reds = f": {', '.join(g['red'])}" if R else ""
-        if R == 0 and G >= 4 and V >= mv:
+        if t.get("rule"):                                                        # 19.11.2026 (пакет 19.11, т. 3): по едното правило (от 18.11), без броенето за Offensive
+            parts.extend(_rule_margin(t, R, reds))
+        elif R == 0 and G >= 4 and V >= mv:
             parts.append(f"по броенето Offensive: 1 червен → Defensive (сега 0 червени; зелени {G}, минимум 4; видими {V}, минимум {mv})")
         elif R == 0:
             need = ([f"още {_plural(4 - G, 'зелен', 'зелени')}"] if G < 4 else []) + ([f"още {_plural(mv - V, 'видим', 'видими')}"] if V < mv else [])
@@ -533,13 +561,17 @@ def margin(thermo: dict | None, distribution_days: dict | None = None, dd_status
             top = max(c for c in (sc, qc) if c is not None)
             if top >= red:
                 parts.append(f"distribution days {nums} — червени: Offensive е блокиран; блокът пада след {config.DISTRIBUTION_DAYS_RELEASE_NONRED_DAYS} поредни дни под {red}")
-            elif t.get("distribution_cap"):
+            elif t.get("distribution_cap") or any(c.get("key") == "dd" and not c.get("ok") for c in (t.get("rule") or {}).get("conditions") or []):     # 19.11.2026: и по правилото
                 parts.append(f"distribution days {nums} — под прага, но блокът на Offensive се държи по хистерезис")
             else:
                 parts.append(f"distribution days {nums} — при {red} Offensive се блокира (липсва{'т' if red - top > 1 else ''} {red - top})")
         by = {i.get("name"): i for i in inds if not i.get("hide")}
         cr = next((i for n, i in by.items() if str(n).startswith("IEI/HYG")), None)
-        if cr and cr.get("roc_percentile") is not None:
+        co = (t.get("rule") or {}).get("credit_override")
+        if co:                                                                   # 19.11.2026 (т. 3): скок И натиск — по новото правило
+            parts.append(f"IEI/HYG: {co['spike']['text']}; override само при кредитен натиск — сега " + ("има" if co.get("pressure") else "няма" if co.get("pressure") is False else "не се проверява (няма данни)")
+                         + f" ({co['hyg']['text']}; {co['oas']['text']})" + (f"; {cr['roc_trend_text']}" if cr and cr.get("roc_trend_text") else ""))
+        elif cr and cr.get("roc_percentile") is not None:
             from src.thermometer import _pct_ord
             thr = config.IEI_HYG_ROC_SPIKE_PERCENTILE
             p = float(cr["roc_percentile"])

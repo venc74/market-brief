@@ -466,7 +466,11 @@
         {% if thermometer.rule.pending %}<div class="regime-reason" style="color:var(--yellow)">⏳ {{ thermometer.rule.pending }}</div>{% endif %}
         {% if thermometer.rule.cash %}<div class="regime-reason" style="color:var(--red)">{{ thermometer.rule.line.split(" · Cash: ")[1].split(" · ")[0] if " · Cash: " in thermometer.rule.line else "" }}</div>{% endif %}
         {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
-        {% if thermometer.rule.credit %}<div class="regime-reason" style="color:var(--muted)">Кредит: {{ thermometer.rule.credit }}</div>{% endif %}
+        {% set co = thermometer.rule.credit_override if thermometer.rule.credit_override is defined else none %}
+        {% if co %}{# 19.11.2026 (пакет 19.11, т. 3): кредитният override — всяка част с ✓ / ✗ #}
+        {% macro co_part(x) %}<span style="color:{{ 'var(--muted)' if x.ok is none else ('var(--red)' if x.ok else 'var(--green)') }}">{{ x.text }}</span>{% endmacro %}
+        <div class="regime-reason" style="color:var(--muted)">Кредитен override: {{ co_part(co.spike) }} <b>И</b> кредитен натиск ({{ co_part(co.hyg) }} <b>ИЛИ</b> {{ co_part(co.oas) }}) <b style="color:{{ 'var(--red)' if co.active else 'var(--muted)' }}">{{ co.verdict }}</b></div>
+        {% elif thermometer.rule.credit %}<div class="regime-reason" style="color:var(--muted)">Кредит: {{ thermometer.rule.credit }}</div>{% endif %}
         <div class="regime-reason" style="color:var(--muted)">Едно правило за CANSLIM, Kullamägi и GLB; Offensive — след {{ regime_confirm_days }} поредни дни с изпълнени условия, Defensive — веднага.</div>
       {% elif thermometer.counts is defined %}
         {% if thermometer.overrides %}<div class="regime-reason" style="color:var(--yellow)">{% for o in thermometer.overrides %}⚡ {{ o.text }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
