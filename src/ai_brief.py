@@ -678,7 +678,38 @@ def _fix_translit(obj):
             print(f"[ai] ⚠ латиница вместо кирилица: '{w}' (= '{cyr_w}') — само лог")
         return w
     obj = _TRANSLIT_RE.sub(repl, obj)
+    obj = _fix_double_vowels(obj)                 # 19.11.2026 (пакет 19.11, т. 8): „риисковата“ → „рисковата“
     return _fix_mixed_script(obj)                 # 17.11.2026 (пакет 1, т. 7): смесени букви в една дума — поправка или изречението пада
+
+
+# 19.11.2026 (пакет 19.11, т. 8): правопис — удвоена гласна („риисковата“, разказът от 19.11). Думата е рядка в корпуса (_bg_vocab, < 2 срещания), а без едната от двете еднакви
+# гласни е позната дума (≥ 2) → поправка; иначе думата остава (и се логва като непозната). Измерено върху AI текстовете 13.06–19.11: 19 думи с удвоена гласна извън окончанието
+# „-ии“ — 18 са верни („деескалация“, „влияят“, „координирана“, „контрааргументи“, „асоцииран“ …) и не се пипат; поправя се само „риисковата“ → „рисковата“ (13 срещания).
+_DOUBLE_VOWEL = re.compile(r"[А-Яа-я]*(?:аа|ее|ии|оо|уу|ъъ|юю|яя|АА|ЕЕ|ИИ|ОО|УУ)[А-Яа-я]*")
+SPELLING_FIXES: list[dict] = []
+
+
+def _fix_double_vowels(s: str) -> str:
+    cyr = _bg_vocab()[0]
+    if not cyr or not _DOUBLE_VOWEL.search(s):
+        return s
+
+    def repl(m):
+        w = m.group(0)
+        low = w.lower()
+        if cyr.get(low, 0) >= 2:
+            return w
+        alts = {low[:i] + low[i + 1:] for i in range(len(low) - 1) if low[i] == low[i + 1] and low[i] in "аеиоуъюя"}
+        best = max(alts, key=lambda a: cyr.get(a, 0), default=None)
+        if best and cyr.get(best, 0) >= 2:
+            fixed = best.capitalize() if w[0].isupper() else best
+            print(f"[ai] правопис: удвоена гласна '{w}' → '{fixed}'")
+            SPELLING_FIXES.append({"word": w, "fixed": fixed})
+            return fixed
+        if not re.search(r"ии(те|я|ят|ята)?$", low):
+            print(f"[ai] правопис: непозната дума с удвоена гласна '{w}' — само лог")
+        return w
+    return _DOUBLE_VOWEL.sub(repl, s)
 
 
 # 17.11.2026 (пакет 1, т. 7): дума със смесени латински и кирилски букви („Zад цифрите“, разказът от 17.11). Латинските букви → кирилица буква по буква; ако така
@@ -1099,7 +1130,9 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     try:                                                                         # 16.11.2026 (пакет 16.11, т. 1): твърдение (институция, държава, мярка) без опора във входа
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
             from src import claim_check
-            new, cf = claim_check.check(out["macro_brief"], narrative_text(macro, rotation, thermometer, news, crypto, social, day=day))
+            from src import causal_check as _cc                                     # 19.11.2026 (т. 8): групите, валутите, усилващите думи — само срещу заглавията
+            new, cf = claim_check.check(out["macro_brief"], narrative_text(macro, rotation, thermometer, news, crypto, social, day=day),
+                                        strict=" ".join(_cc.headlines_of(news, crypto)))
             if cf:
                 out = {**out, "macro_brief": new, "claims_fixed": cf}
                 for f in cf:

@@ -53,25 +53,75 @@ CLAIMS: list[tuple[str, str, str]] = [
     ("банкрут", r"\bбанкрут\w*|\bфалит\w*|\bнесъстоятелност\w*", r"bankrupt\w*|Chapter 11|insolven\w*|default\w*|банкрут\w*|фалит\w*"),
 ]
 _COMPILED = [(lab, re.compile(bg, re.I), re.compile(src, re.I)) for lab, bg, src in CLAIMS]
+
+# 19.11.2026 (пакет 19.11, т. 8): групи и организации (хусити, НАТО, МВФ …), валути (рубла, юан, йена …) и усилващи думи („рязко“, „по-агресивно“, „драматично“) — ако ги няма в
+# ПОДАДЕНОТО ЗАГЛАВИЕ (за „защо“ — заглавията и резюметата на групата; за макро разказа — само заглавията, не „защо“ на модела: иначе грешката се пренася), изречението пада.
+# Реално, 19.11: „… по-агресивно затягане …“ при „Fed officials expect more rate hikes …“; „… хуситски атаки срещу корабоплаването в Червено море …“ при „Oil prices steady as Middle
+# East shipping attacks …“. Усилващите думи не се броят след отрицание („не очаква рязко сътресение“). Измерено 13.06–18.11 (111 разказа; „защо“ — само със заглавията, горна
+# граница): макро 10 изречения (агресивно 6, рязко 3, паунд 1), „защо“ 29 (йена 8, агресивно 7, рязко 7 …); „паника“ и „масивно“ — отпаднаха от речника (15 от 16 — с отрицание).
+STRICT: list[tuple[str, str, str]] = [
+    ("хуситите", r"\bхусит\w*", r"Houthi\w*|хусит\w*"),
+    ("Хамас", r"\bХамас\w*", r"Hamas|Хамас"),
+    ("Хизбула", r"\bХизбул\w*|\bХизбол\w*", r"Hezbollah|Хизбул\w*"),
+    ("талибаните", r"\bталибан\w*", r"Taliban|талибан\w*"),
+    ("Ислямска държава", r"Ислямска\w*\s+държава|\bИДИЛ\b", r"Islamic State|\bISIS\b|\bISIL\b|Ислямска държава"),
+    ("НАТО", r"\bНАТО\b", r"\bNATO\b|НАТО"),
+    ("ООН", r"\bООН\b|Обединените\s+нации", r"\bUN\b|U\.N\.|United Nations|ООН"),
+    ("МВФ", r"\bМВФ\b|Международния\s+валутен\s+фонд", r"\bIMF\b|International Monetary Fund|МВФ"),
+    ("Световната банка", r"Световн\w+\s+банка", r"World Bank|Световн\w+ банка"),
+    ("СТО", r"\bСТО\b|Световната\s+търговска\s+организация", r"\bWTO\b|World Trade Organi[sz]ation"),
+    ("Г7 / Г20", r"\b[ГG]-?(?:7|20)\b", r"\bG-?(?:7|20)\b|Group of (?:Seven|20)"),
+    ("Пентагона", r"\bПентагон\w*", r"Pentagon|Пентагон\w*|Defense Department|Department of (?:Defense|War)"),
+    ("Червено море", r"Червено\w*\s+море|Червеното\s+море", r"Red Sea|Червено\w* море|Bab el-Mandeb"),
+    ("рублата", r"\bрубл\w*", r"\bruble\w*|\brouble\w*|\bRUB\b|рубл\w*"),
+    ("юана", r"\bюан\w*", r"\byuan\b|renminbi|\bCN[YH]\b|юан\w*"),
+    ("йената", r"\bйен\w*", r"\byen\b|\bJPY\b|йен\w*"),
+    ("еврото", r"\bевро(?:то)?\b", r"\beuro\w*|\bEUR\b|€|евро\w*|ECB|ЕЦБ"),
+    ("паунда", r"\bпаунд\w*|британск\w+\s+лир\w*", r"\bpound\w*|sterling|\bGBP\b|£|паунд\w*"),
+    ("франка", r"\bфранк(?:а|ът|ове)?\b", r"\bfranc\w*|\bCHF\b|франк\w*"),
+    ("рупията", r"\bрупи\w*", r"\brupee\w*|\brupiah\w*|\bINR\b|\bIDR\b|рупи\w*"),
+    ("песото", r"\bпесо(?:то)?\b", r"\bpeso\w*|\bMXN\b|песо"),
+    ("австралийския долар", r"австралийск\w+\s+долар\w*", r"Aussie|Australian dollar|\bAUD\b|австралийск\w+ долар\w*"),
+    ("канадския долар", r"канадск\w+\s+долар\w*", r"loonie|Canadian dollar|\bCAD\b|канадск\w+ долар\w*"),
+    ("рязко", r"\bрязк\w*|\bрязък\b", r"sharp\w*|plung\w*|plummet\w*|soar\w*|surg\w*|tumbl\w*|jump\w*|spik\w*|slump\w*|crash\w*|skyrocket\w*|steep\w*|\brout\b|slid\w*|\bsink\w*|\bsank\b|biggest|рязк\w*|рязък"),
+    ("агресивно", r"\b(?:по-)?агресивн\w*", r"aggressiv\w*|hawkish|агресивн\w*"),
+    ("драматично", r"\bдраматичн\w*|\bдрастичн\w*", r"dramatic\w*|drastic\w*|драматичн\w*|драстичн\w*"),
+]
+_STRICT = [(lab, re.compile(bg, re.I), re.compile(src, re.I)) for lab, bg, src in STRICT]
+_INTENSIFIERS = {"рязко", "агресивно", "драматично"}
+_NEG = re.compile(r"(?:\bне\b|\bбез\b|\bняма\b|\bнито\b)\s+(?:\S+\s+){0,3}$", re.I)
 _SENT = re.compile(r"(?<=[.!?…])\s+(?=[A-ZА-Я„\"(\d])")
 
 
 # предположение, не твърдение: „потенциални санкции“, „рискува да доведе до нови ограничения върху износа“, „може да засегне“ — до 5 думи преди назованото
-_HEDGE = re.compile(r"(?:потенциал\w*|възможн\w*|евентуал\w*|риск\w*|заплах\w*|опасени\w*|страх\w*|може\s+да|могат\s+да|би\b|биха|ако|дали)\s+(?:\S+\s+){0,5}$", re.I)
+_HEDGE = re.compile(r"(?:потенциал\w*|възможн\w*|евентуал\w*|риск\w*|заплах\w*|опасени\w*|страх\w*|може\b|могат\b|би\b|биха|ако|дали)\s+(?:\S+\s+){0,5}$", re.I)   # 19.11.2026: „може рязко да …“
 
 
-def unsupported(sentence: str, source: str) -> list[str]:
-    """Етикетите на твърденията в изречението без опора в source (предположенията — _HEDGE — не се броят). Чиста функция."""
+def unsupported(sentence: str, source: str, strict: str | None = None) -> list[str]:
+    """
+    Етикетите на твърденията в изречението без опора в source (предположенията — _HEDGE — не се броят). 19.11.2026: групите, валутите и усилващите думи (STRICT) — срещу strict
+    (заглавията), ако е подаден, иначе срещу source; усилващата дума след отрицание не е твърдение. Чиста функция.
+    """
     out = []
     for lab, bg, src in _COMPILED:
         if src.search(source or ""):
             continue
         if any(not _HEDGE.search((sentence or "")[:m.start()]) for m in bg.finditer(sentence or "")):
             out.append(lab)
+    sup = source if strict is None else strict
+    for lab, bg, src in _STRICT:
+        if src.search(sup or ""):
+            continue
+        for m in bg.finditer(sentence or ""):
+            pre = (sentence or "")[:m.start()]
+            if _HEDGE.search(pre) or (lab in _INTENSIFIERS and _NEG.search(pre)):
+                continue
+            out.append(lab)
+            break
     return out
 
 
-def check(text: str, source: str) -> tuple[str, list[dict]]:
+def check(text: str, source: str, strict: str | None = None) -> tuple[str, list[dict]]:
     """
     Текстът (абзаците се пазят) → (поправеният, [{sentence, claims}]). Изречение с твърдение без опора в source пада цяло; празен остатък → "". Чиста функция.
     """
@@ -85,7 +135,7 @@ def check(text: str, source: str) -> tuple[str, list[dict]]:
             continue
         kept = []
         for sent in _SENT.split(para.strip()):
-            bad = unsupported(sent, source)
+            bad = unsupported(sent, source, strict)
             if bad:
                 removed.append({"sentence": sent, "claims": bad})
             else:
