@@ -1,5 +1,5 @@
 {
- "date": "2026-11-18",
+ "date": "2026-11-19",
  "rows": [
   {
    "ticker": "EMBJ",
@@ -8,8 +8,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Nov 16, 2026",
-   "price": 18.9,
-   "market_cap": 13453646093.357206
+   "price": 18.68,
+   "market_cap": 13297043291.114235
   },
   {
    "ticker": "SENEA",
@@ -18,8 +18,8 @@
    "ratio": "5:1",
    "split_type": "normal",
    "date_human": "Nov 17, 2026",
-   "price": 37.22,
-   "market_cap": 1257998635.1585388
+   "price": 35.08,
+   "market_cap": 1185668806.4878082
   },
   {
    "ticker": "SNDK",
@@ -28,8 +28,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Nov 20, 2026",
-   "price": 797.24,
-   "market_cap": 113438771963.05542
+   "price": 776.22,
+   "market_cap": 110447846731.66626
   }
  ],
  "horizon": [
@@ -306,6 +306,22 @@
    "date_human": "Nov 19, 2026"
   },
   {
+   "ticker": "SCNI",
+   "company": "Scinai Immunotherapeutics Ltd.",
+   "date": "2026-11-19",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "SNTI",
+   "company": "Senti Biosciences Holdings, Inc.",
+   "date": "2026-11-19",
+   "ratio": "1:33",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
    "ticker": "SOS",
    "company": "SOS Limited",
    "date": "2026-11-19",
@@ -318,6 +334,14 @@
    "company": "UltraPro Short MidCap400",
    "date": "2026-11-19",
    "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "YFOR",
+   "company": "YYForce Inc.",
+   "date": "2026-11-19",
+   "ratio": "1:50",
    "split_type": "reverse",
    "date_human": "Nov 19, 2026"
   },
@@ -376,17 +400,98 @@
    "ratio": "3:1",
    "split_type": "normal",
    "date_human": "Dec 07, 2026"
+  },
+  {
+   "ticker": "AAOG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long AAOI Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:50",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "AEHG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long AEHR Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "ASTG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long ASTS Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "AXTL",
+   "company": "Themes ETF Trust Leverage Shares 2X Long AXTI Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "CBRG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long CBRS Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "CIEG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long CIEN Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "COHH",
+   "company": "Themes ETF Trust Leverage Shares 2X Long COHR Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "FOMG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long FORM Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "FPSX",
+   "company": "Themes ETF Trust Leverage Shares 2X Long FPS Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
+  },
+  {
+   "ticker": "SNDG",
+   "company": "Themes ETF Trust Leverage Shares 2X Long SNDK Daily ETF",
+   "date": "2026-12-09",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Dec 09, 2026"
   }
  ],
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 43,
+  "source_rows": 56,
   "horizon_from": "2026-11-16",
-  "horizon_to": "2026-12-07",
-  "in_week": 38,
+  "horizon_to": "2026-12-09",
+  "in_week": 41,
   "dropped_price": [
    "DFSC",
+   "NCT",
    "KALA",
    "SGRX",
    "TGL",
@@ -399,10 +504,12 @@
    "SLQT",
    "MKDW",
    "SPWR",
-   "SOS"
+   "SCNI",
+   "SNTI",
+   "SOS",
+   "YFOR"
   ],
   "dropped_cap": [
-   "NCT",
    "SENEB",
    "VABK"
   ],
