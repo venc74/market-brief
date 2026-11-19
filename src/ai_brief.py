@@ -699,7 +699,8 @@ def _fix_double_vowels(s: str) -> str:
         low = w.lower()
         if cyr.get(low, 0) >= 2:
             return w
-        alts = {low[:i] + low[i + 1:] for i in range(len(low) - 1) if low[i] == low[i + 1] and low[i] in "аеиоуъюя"}
+        alts = {low[:i] + low[i + 1:] for i in range(len(low) - 1) if low[i] == low[i + 1] and low[i] in "аеиоуъюя"
+                and not (low[i] == "и" and re.fullmatch(r"(?:те|я|ят|ята)?", low[i + 2:]))}     # „полиции“, „компаниите“ — окончание за множествено число, не грешка
         best = max(alts, key=lambda a: cyr.get(a, 0), default=None)
         if best and cyr.get(best, 0) >= 2:
             fixed = best.capitalize() if w[0].isupper() else best
@@ -1095,7 +1096,7 @@ def cap_sentences(text: str, n: int) -> tuple[str, list[str]]:
 
 def macro_and_sector_brief(macro: dict, rotation: list[dict],
                            thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None,
-                           board: dict | None = None) -> dict:
+                           board: dict | None = None, themes: list | None = None) -> dict:
     """
     AI макро бриф. 29.10.2026 (разходката, т. 5): "macro_brief" е разказ в 2–3 абзаца (разделени с празен ред) — какво стана през нощта и как се свързват нещата; абзацът
     за режима (regime_comment) и проверките, които бяха само за него (regime_claims.clean: броене, правило, distribution days, кредитен стрес), са махнати — режимът е в
@@ -1103,7 +1104,8 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     и без проверките на секторните твърдения (sector_claims — в историята са сработвали 4 пъти, всичките във веригите);
     отрязването + повторният опит и чуждите символи са в _parse_json / _fix_text. Graceful: грешка в проверка връща отговора на модела непроменен.
     """
-    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social, day, board)
+    out = _macro_and_sector_brief_ai(macro, rotation, thermometer, news, crypto, social, day, board, themes)
+    theme_news = [{"headline": i.get("title")} for t in themes or [] for i in (t.get("items") or [])]      # 19.11.2026 (т. 2): заглавията на темите — опора за проверките
     try:
         out = _apply_meta_check(out)
     except Exception as e:
@@ -1131,8 +1133,8 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
             from src import claim_check
             from src import causal_check as _cc                                     # 19.11.2026 (т. 8): групите, валутите, усилващите думи — само срещу заглавията
-            new, cf = claim_check.check(out["macro_brief"], narrative_text(macro, rotation, thermometer, news, crypto, social, day=day),
-                                        strict=" ".join(_cc.headlines_of(news, crypto)))
+            new, cf = claim_check.check(out["macro_brief"], narrative_text(macro, rotation, thermometer, news, crypto, social, day=day) + " " + " ".join(x["headline"] for x in theme_news),
+                                        strict=" ".join(_cc.headlines_of(list(news or []) + theme_news, crypto)))
             if cf:
                 out = {**out, "macro_brief": new, "claims_fixed": cf}
                 for f in cf:
@@ -1142,7 +1144,7 @@ def macro_and_sector_brief(macro: dict, rotation: list[dict],
     try:                                                                         # 18.11.2026 (спешно, т. 3): причинна връзка без опора в едно заглавие — изречението пада
         if isinstance(out, dict) and not out.get("ai_synthesis_failed") and isinstance(out.get("macro_brief"), str) and out["macro_brief"]:
             from src import causal_check
-            new, cd = causal_check.check(out["macro_brief"], news, verbs=bool(config.CAUSAL_CHECK_VERBS), crypto=crypto)
+            new, cd = causal_check.check(out["macro_brief"], list(news or []) + theme_news, verbs=bool(config.CAUSAL_CHECK_VERBS), crypto=crypto)
             if cd:
                 out = {**out, "macro_brief": new, "causal_drops": cd}
                 for f in cd:
@@ -1454,8 +1456,20 @@ def rs_direction_block(board: dict | None) -> str:
     return f"ПОСОКАТА НА RS НА СЕКТОРИТЕ (от кода, RS за 4 седм. спрямо SPY): {json.dumps(xs, ensure_ascii=False)}\n"
 
 
+def themes_block(themes: list | None) -> str:
+    """
+    19.11.2026 (пакет 19.11, т. 2): топ темите на деня (top_themes, от кода) за разказа — дословните заглавия на всяка тема; разказът може да ги спомене САМО с факти от тези
+    заглавия (claim_check и causal_check ги броят за опора). Без теми → "". Чиста функция.
+    """
+    xs = [{"тема": t.get("key"), "източници": t.get("n_publishers"), "заглавия": [i.get("title") for i in (t.get("items") or [])][:6]} for t in themes or []]
+    if not xs:
+        return ""
+    return ("ТОП ТЕМИ НА ДЕНЯ (от кода — групирани от всички източници; дословни заглавия): " + json.dumps(xs, ensure_ascii=False)
+            + "\nАко споменаваш тема, пиши САМО факти, които са в тези заглавия (кой, какво, кога) — без добавки.\n")
+
+
 def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None,
-                      social: dict | None = None, day: dict | None = None, board: dict | None = None) -> str:
+                      social: dict | None = None, day: dict | None = None, board: dict | None = None, themes: list | None = None) -> str:
     """29.10.2026: промптът на макро брифа (отделно — за tools/macro_preview.py, който го показва и без API). 18.11.2026: board — посоката на RS (rs_direction_block)."""
     return f"""Днешни данни:
 
@@ -1468,7 +1482,7 @@ def macro_user_prompt(macro: dict, rotation: list[dict], thermometer: dict, news
 СЕКТОРНА РОТАЦИЯ (RS vs SPY): {json.dumps(rotation, ensure_ascii=False, default=str)}{_rotation_unavailable_note(rotation)}
 ВОДЕЩИТЕ НИ СЕКТОРИ (по кода): {_leaders_names(rotation)}
 {rs_direction_block(board)}
-{_news_block(news)}{_crypto_block(crypto)}{_social_block(social)}
+{_news_block(news)}{themes_block(themes)}{_crypto_block(crypto)}{_social_block(social)}
 ВАЖНО за числа в текста: когато цитираш конкретна стойност от данните по-горе \
 (проценти, percentile, нива, delta-и) — копирай Я ТОЧНО както е \
 в JSON-а, никога не я преизчислявай или приблизителствай наум. Специфично за \
@@ -1581,7 +1595,7 @@ NARRATIVE_RULES = (
 
 def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
                                thermometer: dict, news: list[dict] | None = None, crypto: dict | None = None, social: dict | None = None, day: dict | None = None,
-                               board: dict | None = None) -> dict:
+                               board: dict | None = None, themes: list | None = None) -> dict:
     """
     Връща:
     {
@@ -1600,7 +1614,7 @@ def _macro_and_sector_brief_ai(macro: dict, rotation: list[dict],
     Ниво 2 (_macro_brief_fallback() — суровите данни без AI наратив, graceful,
     никога не позволяваме на изключението да стигне до run()).
     """
-    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social, day, board)
+    user = macro_user_prompt(macro, rotation, thermometer, news, crypto, social, day, board, themes)
 
     # Ниво 0 (json_repair, вътре в _parse_json) + първи опит. try/except обхваща
     # И _call_claude, И _parse_json — мрежова/API грешка тук е РАВНОСИЛНА на

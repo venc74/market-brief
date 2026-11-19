@@ -589,6 +589,32 @@ def overnight_ctx(o: dict | None) -> dict | None:
             "notes": o.get("notes") or [], "source": o.get("source")}
 
 
+def themes_ctx(themes: list | None) -> list[dict] | None:
+    """
+    19.11.2026 (пакет 19.11, т. 2): редът „Топ теми“ — до config.THEME_MAX теми: дословното заглавие, източникът му, колко издателя и заглавия, кога е последното (UTC).
+    Без теми / стар бриф → None. Чиста функция.
+    """
+    if not themes:
+        return None
+    out = []
+    for t in themes:
+        p = t.get("published") or ""
+        when = f"{p[8:10]}.{p[5:7]} {p[11:16]} UTC" if len(p) >= 16 else ""
+        out.append({"headline": t.get("headline"), "source": t.get("source"), "n_publishers": t.get("n_publishers"), "publishers": ", ".join(t.get("publishers") or []),
+                    "n_headlines": t.get("n_headlines"), "when": when, "front": t.get("front"), "key": t.get("key")})
+    return out
+
+
+def _themes_email(themes: list | None) -> str:
+    c = themes_ctx(themes)
+    if not c:
+        return ""
+    rows = "".join(f'<div style="margin:3px 0">„{_e(x["headline"])}“ <span style="color:#6b7280">({_e(x["source"])} · {x["n_publishers"]} източника: {_e(x["publishers"])} · '
+                   f'{x["n_headlines"]} заглавия{" · последно " + _e(x["when"]) if x["when"] else ""})</span></div>' for x in c)
+    return (f'<tr><td style="padding:12px 28px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827"><div style="font-weight:bold;margin-bottom:4px">Топ теми</div>{rows}'
+            f'<div style="color:#9ca3af;font-size:11px;margin-top:4px">От кода: заглавията от всички източници, групирани по общи имена (≥ 3 издателя или ≥ 6 заглавия)</div></td></tr>')
+
+
 def _overnight_email(o: dict | None) -> str:
     c = overnight_ctx(o)
     if not c:
@@ -821,6 +847,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         put_call_line=_put_call_line(brief),                                # 16.11.2026 (т. 2): Put/Call — от кода, не от AI
         week_calendar=_week_calendar_ctx(brief.get("week_calendar")),       # 16.11.2026 (т. 8): календарът на седмицата
         overnight=overnight_ctx(brief.get("overnight")),                    # 18.11.2026 (спешно, т. 2): „Нощта“ — в началото
+        top_themes=themes_ctx(brief.get("top_themes")),                       # 19.11.2026 (пакет 19.11, т. 2): „Топ теми“ — под „Нощта“
+        theme_min_pub=config.THEME_MIN_PUBLISHERS, theme_min_n=config.THEME_MIN_HEADLINES,
         offering_warnings=brief.get("offering_warnings") or {},             # 16.11.2026 (т. 13): емисии на акции по тикър
         deal_buyers=brief.get("deal_buyers") or {},                         # 16.11.2026 (т. 15): купувач във висяща сделка
         qm_peak_max_below=config.QM_PEAK_MAX_BELOW_52W_PCT, qm_ret6m_min=config.QM_RET6M_MIN_PCT,   # 16.11.2026 (т. 16): правилото за лидер
@@ -1177,6 +1205,8 @@ def render_email(brief: dict) -> str:
   {warn_block}
 
   {_overnight_email(brief.get("overnight"))}
+
+  {_themes_email(brief.get("top_themes"))}
 
   {news_block}
 

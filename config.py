@@ -722,6 +722,16 @@ NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))     # 02.11.2026:
 # 18.11.2026 (поправка към спешния пакет): заглавията за нашите тикъри и компании (книгите, наблюдаваните, картите, „Нощта“, отчетите за деня) — първи в пула преди тавана;
 # след тавана на източника (NEWS_PER_SOURCE_LIMIT) се вземат и приоритетните — до толкова на източник
 NEWS_PRIORITY_EXTRA_PER_SOURCE = int(os.getenv("NEWS_PRIORITY_EXTRA_PER_SOURCE", 20))
+# 19.11.2026 (пакет 19.11, т. 2): топ темите (src/top_themes.py) — първата страница / световните новини (само за темите и техния приоритет) и праговете
+NEWS_FRONT_FEEDS = {
+    "FT World": "https://www.ft.com/world?format=rss",
+    "Reuters World": "https://news.google.com/rss/search?q=when:24h+site:reuters.com/world&hl=en-US&gl=US&ceid=US:en",
+}
+THEME_MIN_PUBLISHERS = int(os.getenv("THEME_MIN_PUBLISHERS", 3))      # издатели (FT, Reuters, AP, CNBC) — или
+THEME_MIN_HEADLINES = int(os.getenv("THEME_MIN_HEADLINES", 6))        # заглавия
+THEME_SINGLE_MAX_SHARE = float(os.getenv("THEME_SINGLE_MAX_SHARE", 0.08))   # едно име е тема само ако е в до толкова от заглавията („Trump“, „China“ — твърде общи)
+THEME_MAX = int(os.getenv("THEME_MAX", 3))
+THEME_POOL_PER_THEME = int(os.getenv("THEME_POOL_PER_THEME", 4))      # колко заглавия от темата влизат първи в пула към подбора
 # 02.11.2026 (поправки след брифа, т. 4): прозорците на новините (главните, наблюдаваните, крипто) започват от ПРЕДИШНИЯ бриф — часът на брифа в деня на последната
 # NYSE сесия (sessions.news_window_start): понеделник 72 ч, след празник 48 ч, иначе 24 ч; крипто — не по-малко от CRYPTO_NEWS_HOURS. До 02.11 — фиксирани 24 / 24 / 30 ч.
 BRIEF_TIME_BERLIN = os.getenv("BRIEF_TIME_BERLIN", "07:30")         # часът на брифа (cron-job.org, Europe/Berlin) — началото на прозореца е този час в деня на последната сесия

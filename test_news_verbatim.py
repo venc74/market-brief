@@ -58,6 +58,7 @@ def fake_claude(system, user, **k):
     return json.dumps({"news": answer}, ensure_ascii=False)
 ai_brief._call_claude = fake_claude
 na.gather_raw = lambda hours=24, since=None: POOL                                # СИНТЕТИЧНО: без мрежа — РЕАЛНИЯТ пул (04.11.2026: подмяна на gather_raw вместо мемото)
+config.THEME_MIN_PUBLISHERS, config.THEME_MIN_HEADLINES = 99, 9999                   # 19.11.2026: индексите на отговора са по реда на пула — без топ теми (те са в test_top_themes)
 with contextlib.redirect_stdout(io.StringIO()) as out:
     got = na.significant_news()
 assert [n["headline"] for n in got] == [T[67], T[72], T[40], T[13]]

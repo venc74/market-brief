@@ -652,7 +652,8 @@ def run() -> dict:
     market_day = steps.step("market_day", lambda: sector_layer.market_day(sector_board), fallback={}, label="Денят на пазара за макро разказа",
                             consequence="разказът е без дневните промени и спада от върха; думите „корекция“ и „мечи пазар“ се проверяват само срещу процента в изречението")
     news_terms_fixed = ai_brief.check_news_why_terms(news, market_day)         # 06.11.2026 (т. 8): „защо“ на новините — преди разказа, който ги чете
-    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day, board=sector_board)     # 18.11.2026 (т. 3): посоката на RS
+    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day, board=sector_board,     # 18.11.2026 (т. 3): посоката на RS
+                                               themes=list(news_aggregator.LAST_THEMES))                                                       # 19.11.2026 (т. 2): топ темите
     # 17.11.2026 (пакет 1, т. 2а — решение след стратегическия преглед): AI абзацът на картите („защо сега / бизнес / катализатори / рискове“) — махнат; редът
     # „Защо е тук“ е от кода (render.why_here — RS, RS линия, Stage 2, EPS, сектор). card["ai"] остава контейнер за класа от кода (apply_hard_rules).
     for c in candidates:
@@ -1086,6 +1087,7 @@ def run() -> dict:
         "splits": splits_month,
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "overnight": overnight_block if config.ENABLE_OVERNIGHT else None,          # 18.11.2026 (спешно, т. 2): „Нощта“
+        "top_themes": [{**t, "items": (t.get("items") or [])[:8]} for t in news_aggregator.LAST_THEMES] if config.ENABLE_NEWS else None,     # 19.11.2026 (пакет 19.11, т. 2)
         "books_earnings_skips": [x for x in backtest.LAST_EARNINGS_SKIPS if x.get("date") == today],     # 19.11.2026 (пакет 19.11, т. 5): без нов вход заради отчет
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)

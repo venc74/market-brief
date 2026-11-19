@@ -186,6 +186,8 @@ def source_reach(items: list[dict]) -> dict:
 # 02.11.2026: прозорецът и обхватът на последното gather_raw — {since, hours, day_queries, sources: source_reach} (main → brief["news_window"])
 LAST_WINDOW: dict = {}
 LAST_RAW: list = []
+LAST_FRONT: list = []          # 19.11.2026 (т. 2): заглавията от първата страница (config.NEWS_FRONT_FEEDS)
+LAST_THEMES: list = []         # 19.11.2026 (т. 2): топ темите на деня (top_themes.themes)
 
 # ══════════════════════════════════════════════════════════════════════════
 # 18.11.2026 (поправка към спешния пакет): приоритет в пула преди тавана. Пулът е config.NEWS_MAX_TO_FILTER на 24 ч (18.11: 100 от 139) и се режеше по реда на фийдовете
@@ -346,12 +348,22 @@ def gather_raw(hours: float = 24, since: dt.datetime | None = None, keep=None) -
         if key not in seen:
             seen.add(key); dedup.append(it)
     LAST_RAW.clear()
-    LAST_RAW.extend(dedup)                                                   # 18.11.2026 (т. 2): целият пул (преди тавана) — за заглавията с прогноза в блока „Нощта“
+    LAST_RAW.extend(dedup)
+    # 19.11.2026 (пакет 19.11, т. 2): първата страница / световните новини (FT World, Reuters World) — само за топ темите и техния приоритет (не влизат в редуването)
+    LAST_FRONT.clear()
+    front_n, front_dead = {}, []
+    for src, url in config.NEWS_FRONT_FEEDS.items():
+        got = _fetch_rss(url, src, hours, limit=config.NEWS_PER_SOURCE_LIMIT, since_ts=since_ts)
+        front_n[src] = len(got)
+        if not got:
+            front_dead.append({"source": src, **({"error": LAST_FETCH_ERRORS[src]} if LAST_FETCH_ERRORS.get(src) else {})})
+        LAST_FRONT.extend(got)                                                   # 18.11.2026 (т. 2): целият пул (преди тавана) — за заглавията с прогноза в блока „Нощта“
     LAST_WINDOW.clear()
     LAST_WINDOW.update({"since": since.isoformat() if since else (now - dt.timedelta(hours=hours)).isoformat(), "hours": round((now - since).total_seconds() / 3600, 2) if since else hours,
                         "day_queries": day_queries, "sources": source_reach(dedup),
                         # 18.11.2026 (спешно, т. 1): колко върна всеки фийд и кои са празни / паднали (с грешката) — за видимия ред под новините
-                        "fetched": fetched, "dead": [{"source": d, **({"error": LAST_FETCH_ERRORS[d]} if LAST_FETCH_ERRORS.get(d) else {})} for d in dead]})
+                        "fetched": fetched, "dead": [{"source": d, **({"error": LAST_FETCH_ERRORS[d]} if LAST_FETCH_ERRORS.get(d) else {})} for d in dead],
+                        "front": front_n, "front_dead": front_dead})
     if since:
         print(f"[news] прозорец: от {since:%d.%m %H:%M} UTC ({LAST_WINDOW['hours']:g} ч), заявки по дни: {day_queries}; обхват — "
               + " · ".join(f"{k} {v['count']} (до {v['oldest'][8:10]}.{v['oldest'][5:7]} {v['oldest'][11:16]})" if v.get("oldest") else f"{k} {v['count']}"
@@ -631,6 +643,7 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
             if cached.get("date") == today:
                 LAST_STATUS.update(ok=bool(cached.get("news")), reason="" if cached.get("news") else "кешът за деня е празен", count=len(cached.get("news") or []))
                 LAST_WINDOW.clear(); LAST_WINDOW.update(cached.get("window") or {})
+                LAST_THEMES.clear(); LAST_THEMES.extend(cached.get("themes") or [])           # 19.11.2026 (т. 2)
                 return cached.get("news", [])
         except Exception:
             pass
@@ -645,9 +658,22 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
     # ограничаваме промпта; 15.10.2026: всяко заглавие с индекс "i" — заглавието на брифа е дословно от пула по този индекс
     days = max(1, round((dt.datetime.now(dt.timezone.utc) - since).total_seconds() / 86400)) if since else 1     # 02.11.2026: на 24 ч от прозореца
     ordered, n_hit = prioritize(raw, matchers)
+    # 19.11.2026 (пакет 19.11, т. 2): топ темите — техните заглавия влизат ПЪРВИ и задължително (независимо от тикърите), после приоритетът, после останалите
+    LAST_THEMES.clear()
+    try:
+        from src import top_themes
+        LAST_THEMES.extend(top_themes.themes(list(raw) + list(LAST_FRONT)))
+        first = top_themes.pool_items(LAST_THEMES)
+        keys = {it["title"].lower()[:90] for it in first}
+        full = {r["title"].lower()[:90]: r for r in list(raw) + list(LAST_FRONT)}
+        first = [{**full.get(it["title"].lower()[:90], it), "theme": it.get("theme")} for it in first]
+        ordered = first + [r for r in ordered if r["title"].lower()[:90] not in keys]
+    except Exception as e:
+        print(f"[news] топ темите пропуснати: {type(e).__name__}: {e}")
     pool = ordered[:config.NEWS_MAX_TO_FILTER * days]
     # 18.11.2026 (спешно, т. 1): таванът реже след редуването — колко от всеки източник стигнаха до подбора (18.11: 100 от 139 — Reuters 31 от 50, AP 30 от 50)
-    LAST_WINDOW.update(pool_total=len(raw), pool_used=len(pool), to_model={k: v["count"] for k, v in source_reach(pool).items()})
+    LAST_WINDOW.update(pool_total=len(raw), pool_used=len(pool), to_model={k: v["count"] for k, v in source_reach(pool).items()},
+                       themes_in_pool=sum(1 for r in pool if r.get("theme")))
     if matchers:                                                         # 18.11.2026 (поправка): колко заглавия минаха напред и за кои тикъри
         LAST_WINDOW["priority"] = {"names": len(matchers), "hits": n_hit, "in_pool": sum(1 for r in pool if r.get("priority")),
                                    "beyond_limit": sum(1 for r in pool if r.get("beyond_limit")),
@@ -694,7 +720,7 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
 
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "news": news, "window": dict(LAST_WINDOW)},
+        _CACHE.write_text(json.dumps({"date": today, "news": news, "window": dict(LAST_WINDOW), "themes": list(LAST_THEMES)},
                                      ensure_ascii=False, indent=1, default=str))
     except Exception as ex:
         print(f"[news] cache write: {ex}")

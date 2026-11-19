@@ -55,5 +55,6 @@ with contextlib.redirect_stdout(io.StringIO()):
 assert "риисковата" in oil["why"] and "рисковата премия" in fixed and "риисковата" not in fixed
 with contextlib.redirect_stdout(io.StringIO()):
     assert ab._fix_double_vowels("деескалацията и координираната политика влияят") == "деескалацията и координираната политика влияят"
+    assert ab._fix_double_vowels("застрахователните полиции и компаниите") == "застрахователните полиции и компаниите"           # „-ии“ / „-иите“ — множествено число
 print("  ✓ „риисковата“ → „рисковата“; „деескалацията“, „координираната“, „влияят“ — без промяна")
 print("\n✅ test_ai_claims_strict: всичко мина")
