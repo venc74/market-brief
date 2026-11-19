@@ -60,4 +60,18 @@ src = (ROOT / "src" / "backtest.py").read_text(encoding="utf-8")
 assert 'tracker[key]["tier"] = (c["tier"] or {}).get("tier")' in src
 assert 'c["tier"] = setup_rules.canslim_tier(c)' in (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 print("  ✓ buy-stop записът — tier „trend“; Action записите — същото поле")
+# 19.11.2026 (пакет 19.11, т. 7): нивото и на реда в книгата (РЕАЛНО: записът на LLY от 19.11 — tier „trend“, EPS от отчета +7% г/г; полетата — дословно)
+LLY = {"method": "v2", "ticker": "LLY", "entry_date": "2026-11-19", "status": "pending", "signal_price": 1453.0, "entry_price": 1453.0, "buy_stop": 1453.0, "max_chase": 1525.65,
+       "stop_loss": 1336.76, "target_1": 1685.48, "valid_through": "2026-11-25", "category": "buystop", "regime": "Defensive", "pct_from_pivot": -4.83,
+       "regime_rule": "2026-11-18", "tier": "trend"}
+_orig_load = backtest._load_tracker
+backtest._load_tracker = lambda *a, **k: {"LLY_2026-11-19_buystop": dict(LLY)}
+try:
+    row = next(x for x in backtest.get_buystop_summary()["live"] if x["ticker"] == "LLY")
+finally:
+    backtest._load_tracker = _orig_load
+assert row["tier"] == "trend", row
+tpl = (ROOT / "templates" / "dashboard.html.j2").read_text(encoding="utf-8")
+assert "{{ 'Тренд без ръст' if p.tier == 'trend' else 'CANSLIM' }}" in tpl
+print("  ✓ редът в buy-stop книгата — „· Тренд без ръст“ / „· CANSLIM“ (LLY 19.11 — „Тренд без ръст“)")
 print("\n✅ test_canslim_tiers: всичко мина")

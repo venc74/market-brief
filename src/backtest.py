@@ -1913,7 +1913,8 @@ def get_buystop_summary() -> dict:
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
                 "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),          # 06.11.2026 (т. 1): реалният риск при входа
                 "pre_reaction": r.get("pre_reaction"),                                                     # 06.11.2026 (т. 4)
-                "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal")}
+                "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal"),
+                "tier": r.get("tier")}                                                                     # 19.11.2026 (т. 7): нивото на картата („CANSLIM“ / „Тренд без ръст“)
 
     live = sorted((_row(r) for r in records if r.get("status") in _RESOLVABLE_STATUSES), key=lambda x: (x["entry_date"], x["ticker"]))
     recent = sorted(({**_row(r), "resolution_date": r.get("resolution_date"), "resolution": r.get("status"),

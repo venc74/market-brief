@@ -1491,7 +1491,7 @@
       <tbody>
         {% for p in bs.live %}
         <tr><td class="sym">{{ p.ticker }}{{ tn(p.ticker, p.company) }}{% if p.also_action %}{{ markers_html([{"tag": "и Action", "title": "Тикърът е и в Action книгата в застъпващ се период — две независими книги, статистиките не се сумират."}]) }}{% endif %}{{ markers_html(p.markers) }}{{ spinoff_note_html(p) }}</td>
-          <td>{{ p.entry_date }}</td>
+          <td>{{ p.entry_date }}{% if p.tier %} <span style="color:{{ 'var(--yellow)' if p.tier == 'trend' else 'var(--muted)' }};font-size:11.5px">· {{ 'Тренд без ръст' if p.tier == 'trend' else 'CANSLIM' }}</span>{% elif p.tier is defined and p.entry_date >= '2026-11-17' %} <span style="color:var(--muted);font-size:11.5px">· ниво: няма (записът е отпреди нивата)</span>{% endif %}</td>
           <td>{{ bs_st.get(p.status, p.status) }}{% if p.fill_date %} от {{ p.fill_date }}{% endif %}{% if p.current_r is not none %} · {{ "%+.1f"|format(p.current_r) }}R{% endif %}{% if p.entry_volume_ratio is defined and p.entry_volume_ratio is not none %} · {{ vol_label(p, (bs.entry_volume or {}).get("mult", 1.5)) }}{% endif %}
             {% if p.screener_exit %}<div style="font-size:11.5px;color:var(--yellow)">излезе от скрийнъра: {{ p.screener_exit }}</div>{% endif %}</td>
           <td class="n">${{ p.buy_stop }}</td><td class="n">${{ p.stop_loss }}</td><td class="n">${{ p.target_1 }}</td>
