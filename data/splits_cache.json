@@ -1,5 +1,5 @@
 {
- "date": "2026-11-19",
+ "date": "2026-11-20",
  "rows": [
   {
    "ticker": "EMBJ",
@@ -8,8 +8,8 @@
    "ratio": "4:1",
    "split_type": "normal",
    "date_human": "Nov 16, 2026",
-   "price": 18.68,
-   "market_cap": 13297043291.114235
+   "price": 18.37,
+   "market_cap": 13076375397.564146
   },
   {
    "ticker": "SENEA",
@@ -18,8 +18,18 @@
    "ratio": "5:1",
    "split_type": "normal",
    "date_human": "Nov 17, 2026",
-   "price": 35.08,
-   "market_cap": 1185668806.4878082
+   "price": 34.57,
+   "market_cap": 1168431246.8353653
+  },
+  {
+   "ticker": "SENEB",
+   "company": "Seneca Foods Corp.",
+   "date": "2026-11-17",
+   "ratio": "5:1",
+   "split_type": "normal",
+   "date_human": "Nov 17, 2026",
+   "price": 35.25,
+   "market_cap": 1191414573.75
   },
   {
    "ticker": "SNDK",
@@ -28,8 +38,8 @@
    "ratio": "8:1",
    "split_type": "normal",
    "date_human": "Nov 20, 2026",
-   "price": 776.22,
-   "market_cap": 110447846731.66626
+   "price": 94.39,
+   "market_cap": 13431404131.51905
   }
  ],
  "horizon": [
@@ -227,7 +237,7 @@
   },
   {
    "ticker": "UBT",
-   "company": "ProShares Ultra 20+ Year Treasury",
+   "company": "ProShares Ultra 20  Year Treasury",
    "date": "2026-11-19",
    "ratio": "1:2",
    "split_type": "reverse",
@@ -344,6 +354,30 @@
    "ratio": "1:50",
    "split_type": "reverse",
    "date_human": "Nov 19, 2026"
+  },
+  {
+   "ticker": "LICN",
+   "company": "Lichen International Limited",
+   "date": "2026-11-20",
+   "ratio": "1:100",
+   "split_type": "reverse",
+   "date_human": "Nov 20, 2026"
+  },
+  {
+   "ticker": "NTCL",
+   "company": "NETCLASS TECHNOLOGY INC",
+   "date": "2026-11-20",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 20, 2026"
+  },
+  {
+   "ticker": "NIXX",
+   "company": "Nixxy, Inc.",
+   "date": "2026-11-20",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 20, 2026"
   },
   {
    "ticker": "SNDK",
@@ -485,10 +519,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 56,
+  "source_rows": 59,
   "horizon_from": "2026-11-16",
   "horizon_to": "2026-12-09",
-  "in_week": 41,
+  "in_week": 44,
   "dropped_price": [
    "DFSC",
    "NCT",
@@ -507,10 +541,12 @@
    "SCNI",
    "SNTI",
    "SOS",
-   "YFOR"
+   "YFOR",
+   "LICN",
+   "NTCL",
+   "NIXX"
   ],
   "dropped_cap": [
-   "SENEB",
    "VABK"
   ],
   "dropped_no_data": [
@@ -533,7 +569,7 @@
    "REW",
    "SMDD"
   ],
-  "passed": 3,
+  "passed": 4,
   "state": "ok"
  }
 }

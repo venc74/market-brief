@@ -1,198 +1,361 @@
 {
- "date": "2026-11-19",
+ "date": "2026-11-20",
  "news": [
   {
-   "headline": "Anthropic IPO raises over $81 billion in largest offering on record, topping SpaceX",
-   "source": "CNBC",
-   "why": "Най-голямото IPO в историята привлича масов интерес към AI сектора, отваря ново тегло за Nasdaq и създава сравнителен натиск върху оценките на другите AI компании.",
-   "source_text": "Anthropic IPO raises over $81 billion in largest offering on record, topping SpaceX Anthropic stock is set to begin trading on the Nasdaq under the ticker symbol ANT on Thursday. Anthropic raises $81bn in record IPO AI giant’s enlarged deal will surpass SpaceX to become world’s biggest public listing Anthropic to debut on Wall Street with a $1.5 trillion valuation in the biggest IPO of all time - AP News Anthropic to debut on Wall Street with a $1.5 trillion valuation in the biggest IPO of all time AP News EXCLUSIVE: Anthropic clinches biggest-ever IPO with $81 billion offering - Reuters EXCLUSIVE: Anthropic clinches biggest-ever IPO with $81 billion offering Reuters Anthropic raises record $81 billion in IPO at $1.5 trillion valuation - Reuters Anthropic raises record $81 billion in IPO at $1.5 trillion valuation Reuters",
-   "link": "https://www.cnbc.com/2026/11/18/anthropic-ipo-ai-offering-price.html",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "EXCLUSIVE: Anthropic clinches biggest-ever IPO with $81 billion offering - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPcnFyUlh5WE5VSFRRSWxnVGRUXzlROFRSb0VOdmZwamRWYjJ2SWhvTGp4ZTB3eGNYYWZtdkR0WkJLMDIxX2RZa20wOG4yY2xjdVhuTFpWakVUVDJ3X0NJQURrVkNuR0xPZmxtMm56NDQ0OHl2TzdZVDVSc04yYUlmY2hPSHJ1U2JLamhzallLeEZDVWozbGVObjBEWWNvY205Rmh3Rk9lTWE?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Anthropic raises record $81 billion in IPO at $1.5 trillion valuation - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPR3NST2trRTZCZkdmblYtRm5pcldXRUJTVjZkZUJ6bHJYbjFUSUJ6ZGVJNW1SMVg0ZWthVnlfVVRhZnlld192c0pBaUZSUzRZS0xGdFlYRnViSU9RYVhHWXRpVDlULS0tREUzcDhfa0NGSVIzVkFTOXBzeW5JelpBVy1RV2FFWEpwdnFhZnlqUVN0bUxWSXJaTVFzTEQxTDlFVVpkRERxQmplM0V2X3c?oc=5"
-    },
-    {
-     "source": "AP Business",
-     "headline": "Anthropic to debut on Wall Street with a $1.5 trillion valuation in the biggest IPO of all time - AP News",
-     "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeVVmSzl3dVBhbDdFbTMtTUl2LWVHU1FRb2hvYzJZNWdFU0ZDTmU3NFBVNDVWQXNXQlk2QmkzblN4MUplLWVGc1NheHNRZVpZTHZ1eG9OME53SUNtOExJQzNFSTJpLUw0cWxnSjR4VWlXLWZhZUZsc0dna1J6bmxZTTNBb0l2LUpq?oc=5"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "Anthropic raises $81bn in record IPO",
-     "link": "https://www.ft.com/content/62c0510b-ca65-441e-9baf-675b93903b9e?syn-25a6b1a6=1"
-    }
-   ]
+   "headline": "Trump says he and China's Xi want moderate AI rules - Reuters",
+   "source": "Reuters Business",
+   "why": "Съвместна позиция на САЩ и Китай за умерена AI регулация намалява регулаторния риск за технологичния сектор, но идва в контекст на общ AI разпродаване, което ограничава позитивния ефект върху chip и AI акции.",
+   "source_text": "Trump says he and China's Xi want moderate AI rules - Reuters Trump says he and China's Xi want moderate AI rules Reuters",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQRmhOamVpZF9sMG9qSElyRS13Q2hIdXdncHVuRUIzUU1FYlM4eGNSR1NVcE9DdHVFNXRDT0ZSdTBXUUtSZGJUWGdoNnEwLXRqMmVRd251SWpHNVVsSWRFODZ3S3ZZQkVxM0dTaHNUaXA5M0FLVVYyaFNXa1l1a0Vkc2Rpc01EWWUxYi1kQmhwckhZOTBURFAxeQ?oc=5"
   },
   {
-   "headline": "Fed officials expect more rate hikes, worry about AI impact on inflation, minutes show",
+   "headline": "California attorney general issues Nvidia subpoena in probe of China chip diversion",
    "source": "CNBC",
-   "why": "Протоколите показват, че членове на Fed виждат необходимост от по-агресивно затягане заради инфлацията, което оказва натиск нагоре върху доходността на облигациите и надолу върху акциите с висока оценка.",
-   "source_text": "Fed officials expect more rate hikes, worry about AI impact on inflation, minutes show The Federal Reserve on Wednesday released minutes from its October policy meeting at which it voted to hold its benchmark interest rate in a range between 3.75%-4%. Fed policymakers focused on inflation risks in October, with some seeing need for bigger rate hike - Reuters Fed policymakers focused on inflation risks in October, with some seeing need for bigger rate hike Reuters Fed’s Waller says central bank may need to ‘shock people’ with half-point rate hike Continued inflation above the Fed's 2% target is pushing central bank officials into a more aggressive stance. Global inflation calls for monetary policy tightening in many economies, IMF head says - Reuters Global inflation calls for monetary policy tightening in many economies, IMF head says Reuters",
-   "link": "https://www.cnbc.com/2026/11/18/fed-minutes-october-2026.html",
+   "why": "Прокурорска повестка срещу Nvidia и иск срещу Alibaba за прикриване на шпионски връзки задълбочава правния риск за двете компании и за целия chip сектор, засилвайки разпродаването на AI акции.",
+   "source_text": "California attorney general issues Nvidia subpoena in probe of China chip diversion The investigation by California Attorney General Rob Bonta comes on the heels of the resignation of Nvidia CEO Jensen Huang. California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters California AG subpoenas Nvidia over concerns about former CEO, China ties Reuters Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says Reuters Jensen Huang's — and Nvidia's — legal exposure balloons \"It's not going to get any better for Jensen Huang; it's going to get far worse,\" said Salvatore Graziano, a New York securities litigation attorney.",
+   "link": "https://www.cnbc.com/2026/11/19/nvidia-california-bonta-subpoena-china-chips.html",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Fed policymakers focused on inflation risks in October, with some seeing need for bigger rate hike - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOQWp0U1B6TG9KQU5oY25mQTRtbk5hTUZxNnI3azdIZDNNcU9iN1hzSndVckt3eU5ReUZockwxa1JOMVYyNTQ5d281c3NnU1pEU3pKaEZMSUZEdFQ3bG9DaXk4Umx1NG5WQ3ZvMko2VzBYdlgwYUI0Rm9ud1kzU1VMeWdZNXlkd3FJWTBvc25qV1ROWDZubGV4SF9QUk1EcG9BWGprZzRxcU9xa2g5TmRiUDRqR0FoYmNreUNicmFiWQ?oc=5"
+     "headline": "California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNY2NBVmplUHV4MUZrbVByaDVvby13dXpkX3RuaGVwd1RDMzAxdGtGSDQ3aFhjNjc3VHNxWnlYNHBrcWhRa0xiemxLOE8wTnZFVE9YZ3B4NVFjZ3d5QmJTaWtqc3JTVWdRX0IyT3VlU3BOaEFlMm5fS1lqczg1RmxyMUk4c0JfTEtUSlV4bDh0Z1BVQ0NySHZ3UHRINXZBdUM5NDhOX3Y0bUdsZXRuODdDZDJsMWNHUjY3STVCRA?oc=5"
     },
     {
      "source": "Reuters Business",
-     "headline": "Global inflation calls for monetary policy tightening in many economies, IMF head says - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNek12QlczdG01emR1MWtEdU8zWXFZalNKUWE3cDR4Vm9YbFNVaU51Y3RxT0Ywak8yV2FrSUQxelVFRDBRZlFwblRqMWctbmw5TUFja2xjSEh3UW1PQUJtTEVmb0FkMVpoYkg0UWVFYkNOZXhSSU54RUJxOTVOdDNQaEk4N2FqUjdWQjNpSk1yZndSZjhzcURKc2dUT2RLOUVqb3dwUGExZG1KUm4tdk05VzBDN0N4SGhvbFdxZg?oc=5"
+     "headline": "Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNU2NLaWxYa3VzZlBrX09yMHM0MjctV3RIZzNUVVNWbjhHODZZQlZtTkNJaWJJbkJLUTNsckRSRURrWTdzYUVNa2JwNnNmenJYb3FVTS16U1B4R3Ezc1ZHcWZ5ZTl2aTh5V2VCdkZUQzRQMXpUbEJaQnRRZ1AybGYxaFk5Yjh2c256cVJJaFAzaG03eGtiRUIydWctNHNRSUFiWmV5aTlGVzlYUVRUQ0RiUGpOMUw5LW5UbXRCMFNhMTY3UnYzSjlkNmNwQnN5azFEZGxNUjBn?oc=5"
     },
     {
      "source": "CNBC",
-     "headline": "Fed’s Waller says central bank may need to ‘shock people’ with half-point rate hike",
-     "link": "https://www.cnbc.com/2026/11/18/federal-reserve-governor-christopher-waller.html"
+     "headline": "Jensen Huang's — and Nvidia's — legal exposure balloons",
+     "link": "https://www.cnbc.com/2026/11/19/nvidia-jensen-huang-legal.html"
     }
    ]
   },
   {
-   "headline": "Trump holds talks separately with Putin and Xi ahead of their historic trilateral meeting",
-   "source": "CNBC",
-   "why": "Трипартитната среща Trump–Xi–Putin поставя на масата ядрено разоръжаване, войните в Украйна и Иран, санкциите и търговията — директен ефект върху петрола, отбранителния сектор, рублата и юана.",
-   "source_text": "Trump holds talks separately with Putin and Xi ahead of their historic trilateral meeting U.S. President Donald Trump met individually on Thursday with Russian President Vladimir Putin, as well as Chinese President Xi Jinping. Trump meets Xi after aside with ‘my friend’ Putin Historic trilateral summit looms in southern Chinese city of Shenzhen after week of high-stakes diplomacy Trump says historic summit with Xi, Putin already a 'win' before event - Reuters Trump says historic summit with Xi, Putin already a 'win' before event Reuters Xi says Asia-Pacific needs open trade and Putin condemns sanctions as Trump arrives in China - AP News Xi says Asia-Pacific needs open trade and Putin condemns sanctions as Trump arrives in China AP News Trump plans separate talks with Putin alongside their 3-way meeting with Xi in China - AP News Trump plans separate talks with Putin alongside their 3-way meeting with Xi in China AP News Nuclear arms and ending wars in Iran and Ukraine will top the agenda at Trump-Xi-Putin meeting - AP News Nuclear arms and ending wars in Iran and Ukraine will top the agenda at Trump-Xi-Putin meeting AP News Takeaways from Day 2 of Trump's Asia tour: Putin's handshake, fried chicken and high-stakes diplomacy - Reuters Takeaways from Day 2 of Trump's Asia tour: Putin's handshake, fried chicken and high-stakes diplomacy Reuters",
-   "link": "https://www.cnbc.com/2026/11/19/trump-xi-putin-china-apec-.html",
+   "headline": "US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says - Reuters",
+   "source": "Reuters Business",
+   "why": "Конгресът разкри, че САЩ са одобрили продажба на близо AI чипа на китайски компании за шест месеца, засилвайки натиска за по-строги export controls и удряйки акциите на AMD и Nvidia.",
+   "source_text": "US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says - Reuters US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says Reuters Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says Members of Congress have pushed in the wake of the Jensen Huang scandal for legislation to tighten export controls on chip sales to China. US approved sale of Nvidia and AMD chips to Chinese companies Pentagon believes some of the groups were associated with the People’s Liberation Army AMD dives on short seller report of alleged China exposure AMD closed down over 7% after a short seller alleged that its firmware showed up at a blacklisted Chinese company. AMD said it complies with U.S. law. AMD shares slide as report says China links could invite US scrutiny - Reuters AMD shares slide as report says China links could invite US scrutiny Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPOFRrWXhLbGJZcHVKYzUycHNKbTdKZUE2clNGYUp5WFFBOTdaWndZbVdDZW0xSTQzUi1EZlRsRElldE00bktXMUFMaG1Sclo4eGdCVnZab1JUbWJwZHQ4cGFSTzgyNkZSZmF0WHAzR0hTa1B3eUQ5cmJRTGRfd1ZBdkFiSzNpU1RDeF8wU0pmbXBqWXYxeFNuaWdmV01QLWk0MWdrclJDV2ZYNVFFN0puWU9B?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Trump says historic summit with Xi, Putin already a 'win' before event - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQdzN3ZEpqNW0wZlBtajBvdU9pSzk1MG9RQ2NhVlBuaFMwaVZBWVhkLVNiMnZHTTBRS2J6Z2xkdWkxRERWakdCc0JBdGtUUlhVbHJlR2dMcVVTV0lCNWVGNi1XSG5zVTVrRW84V0JVZUhOVGhKT0FZMk1uRTd3anM1RFhPUWxWNFdQWFF2WjhhYVFCdnpPMGlLYThjMDExVC1fVFJfeFZ2ZXM?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Takeaways from Day 2 of Trump's Asia tour: Putin's handshake, fried chicken and high-stakes diplomacy - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQZURieEZtR2ttUWZVdGRYNEF1UGYyNHBNZTlCXzlUUm5vRTB0RWVON2pJendGa3daSWVWMVhUMDh0RW1vdGphMGxWbUhWV3JjVUYxdzQwS0puNmtJYVdpNDk0UmVzZ045ellsZHhIT3hranMxM3pCTGYzRndWd2lvbEhVcWpYXzhmT0xjR2JFX3FMTjJJLUg0b0owS1VLalRMa0FoZUl0SWc1X1d1RTVZMWtmUmt5VnBvaVp2SzVXOA?oc=5"
-    },
-    {
-     "source": "AP Business",
-     "headline": "Xi says Asia-Pacific needs open trade and Putin condemns sanctions as Trump arrives in China - AP News",
-     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPaDAtWFFGbDFuZ1pfbzdfUHUyYmM5QktTRkR5WndiUXpoenF6cE9VbGQ4ZE84MzY0czJoZFE3cWJXYm81ZDZtUlJzZU5sS3lueWFVV2ZBT2NtVXlkTVJ4N0NUXzhkaXRxUWRVRldGRUFTMERMcXVYcGtaWFI2bnFfY3U0YUFlenRnajRaZ2hOc3h3OFcteFYySg?oc=5"
-    },
-    {
-     "source": "AP Business",
-     "headline": "Trump plans separate talks with Putin alongside their 3-way meeting with Xi in China - AP News",
-     "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQMGlNb2Jsalc3eGpLNWFROHFOZjhyaWxjTi1LWTAxaUNzMVI2WUpXYVd1REVLaURWajJCMWVoUWxCekhtcTNMS2pxYmljMVZ5aXFHUWxwQk5NZ3JhSHpyYk5BdG5TVzZlUUp6bHVhaUJKRkx2MllHeWViQzhlcVJmRUpIekpNV052VENNZ3l2YlZUamJaNXNPYURsZnVmdEE?oc=5"
-    },
-    {
-     "source": "AP Business",
-     "headline": "Nuclear arms and ending wars in Iran and Ukraine will top the agenda at Trump-Xi-Putin meeting - AP News",
-     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOZko0TjU0LUdSMUxlTkNVcnJsSThoSFo5Y2ZuamRVQ2tidnZQa2M5N1o0dlpndmptSGxNTGhYYS1IUXVKMjZibjFPcWVURHJRaHNfclhIMHlSVFdIN3VkZUxFVEo5Z1JoZFR0bkdHOUd1UUNuNXRCVDBKUlhPaGItcmVfY09NQ1U5WmhHYzRNZHdtWDVVay1JalhlNA?oc=5"
+     "headline": "AMD shares slide as report says China links could invite US scrutiny - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQdGVGbWc5MzZvYkJfQTdMMHBzZllhb3dnNzYydUFXOEpWOHNuRVppNnkyVEdldnp0Z1pMX3B1NlNOVGpPOTJFTE1qcTNFUFJOZjRoQTNfbk5DcUZmZ3dlN1MtUXRMblp4MFNPdnR6d1BjRUxXbkI4RHdLSm82MDJiRFVOQVJ6MGhRSEhYdEQtYVB6RVdoZjBvbWg5Z1BZY0Jrbno4THFVdUg5MEhIQml0TEJLWQ?oc=5"
     },
     {
      "source": "Financial Times",
-     "headline": "Trump meets Xi after aside with ‘my friend’ Putin",
-     "link": "https://www.ft.com/content/fcf6d27b-a04c-4cef-8b03-ce2423566f1f"
+     "headline": "US approved sale of Nvidia and AMD chips to Chinese companies",
+     "link": "https://www.ft.com/content/76342072-2781-4b16-ba3b-816a25214483?syn-25a6b1a6=1"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says",
+     "link": "https://www.cnbc.com/2026/11/19/nvidia-amd-china-chip-sales-congress.html"
+    },
+    {
+     "source": "CNBC",
+     "headline": "AMD dives on short seller report of alleged China exposure",
+     "link": "https://www.cnbc.com/2026/11/19/amd-falls-on-short-seller-report-of-alleged-china-exposure.html"
     }
    ]
   },
   {
-   "headline": "Oil prices steady as Middle East shipping attacks counter supply surplus outlook - Reuters",
-   "source": "Reuters Business",
-   "why": "Хуситските атаки срещу корабоплаването в Червено море задържат риисковата премия в петрола и поддържат енергийния сектор устойчив въпреки очаквания излишък от предлагане.",
-   "source_text": "Oil prices steady as Middle East shipping attacks counter supply surplus outlook - Reuters Oil prices steady as Middle East shipping attacks counter supply surplus outlook Reuters Houthi missile threat towards Riyadh causes damage, Saudi-led coalition says - Reuters Houthi missile threat towards Riyadh causes damage, Saudi-led coalition says Reuters Mideast nations ramp up efforts to avert all-out war as Israel urges Iran strikes, officials say - AP News Mideast nations ramp up efforts to avert all-out war as Israel urges Iran strikes, officials say AP News",
-   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOMnV0bXBXX1ZzNHpkcHFmanlPQ2FmczM3Z2xCcXRqRjYwTVB6SlFhZ29vbGcyM3V5a3lOMHZ3OXprMDM0ang4RVEwQmhFMTZ2QU1GT2lQN0ZPUXQyZWJ4MHR1S0JQTmE5Y0Z5dkZlemdFU0V6TWFId0pZZlFtbHVzaU1EeVl1S2RiSFdrcE95d1ZqQW9NRWlZUFNHWU9QVHNXRlZiTmEtckdWZEpScFREcVpPQ0x3MDNQeFhiZHJHMUlVQXFRNkE?oc=5",
+   "headline": "Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI",
+   "source": "CNBC",
+   "why": "Най-голямото IPO в историята на Wall Street не успя да съживи AI ентусиазма — технологичните акции паднаха, азиатските пазари поеха към най-лошата си седмица, а волатилността в сектора се усили.",
+   "source_text": "Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI Anthropic IPO live updates: Follow ANT stock's Nasdaq debut, opening share price, valuation and investor reaction to the Claude AI maker. Anthropic shares jump 17% after record Wall Street listing AI group led by Dario Amodei raises $81bn in upsized public offering Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok - AP News Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok AP News Anthropic's $1.5 trillion debut rewrites venture capital's playbook - Reuters Anthropic's $1.5 trillion debut rewrites venture capital's playbook Reuters Anthropic was supposed to save the AI trade. What went wrong? Technology stocks tanked despite one of the most hotly anticipated tech IPOs in years. Why Anthropic couldn't revive AI animal spirits. SoftBank plunges over 16% as AI sell-off hits Asian tech stocks following Anthropic debut The declines in Asia come after the tech-heavy Nasdaq Composite fell more than 2% overnight following Anthropic's highly anticipated Wall Street debut. Tech stocks fall after Anthropic IPO Asia’s markets follow Wall Street lower despite Claude AI maker’s record listing",
+   "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-ant-live-updates.html",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Houthi missile threat towards Riyadh causes damage, Saudi-led coalition says - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOUUVVMURmUjNxMHVQNThNQkRiUElQbkhnNVJNdkdVejBqLVVIRU1hUl9DWDhpYlFVWUtFZlo5dGNOSnFqTFU5VE93bXdGY3NaOEVmSERoWlJNOWhQN25NN3E1bGF1MEprczBsWFlkOHBDTUVLM21CSFJydjFzUFFaM2ozQU8wSTdnSENadVQ2UTNmSWhOMFBHNE1ZaDB5MURkMFM0cHZuU1BySDl0ZlQ2aDBEUEdmNUE5MnNzTnl2T2VBaV9sWUQ2Zg?oc=5"
+     "headline": "Anthropic's $1.5 trillion debut rewrites venture capital's playbook - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcVk2clRUVFZnTGJTcG1qOWpTRmlSQmRjTXdoVFhIMGQ1cU1idU5RTVFqOVhob2NMQXYyWlVTeEhpU2N2cEk5d0pJSlhic2NSaHJ2M0V1b3N2WW9BalFiZ3VnQnpuY1VKV3Fwd1pkMWw0N1FnRlNPZmdXRFVudkhGOHA5OHNsVzBPWnRWaWNnTmRTNFBQQTVKSEF1WndCeVhnSmZ3S1ZCVzBtcDBWSk9VS3ViTnY5UThFaHFz?oc=5"
     },
     {
      "source": "AP Business",
-     "headline": "Mideast nations ramp up efforts to avert all-out war as Israel urges Iran strikes, officials say - AP News",
-     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQVkpMQk5Ha1FZNG45Vmt6WWxWeUtMS3lSU0hON0F0b0ItSHlWY0NnUHFyQ1JTWFBPSWViZTFVZHpKNWI3V3R1TjM0b25HWTNEZGZ2Q1ItZG5hdXNGcG03M3FjZlJKNmE5SC1lYTJERmRETERvdGJOUGlsMG9pQjVVU2dEWkJxOEY2eXJYd1RtVmNlN2pIcGlLcHJlaw?oc=5"
+     "headline": "Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok - AP News",
+     "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQZXdyUExSdjhGa000MWtxaUR0YzhiVHJnNzN0N0lTUnNONktkaWZkUVUwdExoUXhXMTlJN0NEZ3F3M2RYbUZYelpiNFhpOE14LWdtYjF1MnB2M00xMk1GbENmci1UeFlXa3V0aHM4TWlxVVZNeFBwUkZjMTA2ZWhCSFBVaVVBb0FUdnpj?oc=5"
+    },
+    {
+     "source": "Financial Times",
+     "headline": "Anthropic shares jump 17% after record Wall Street listing",
+     "link": "https://www.ft.com/content/2b203097-7c61-464f-810f-962912a133dd?syn-25a6b1a6=1"
+    },
+    {
+     "source": "Financial Times",
+     "headline": "Tech stocks fall after Anthropic IPO",
+     "link": "https://www.ft.com/content/c7ad2e0c-efd1-40c2-a5a8-819ced8acf5b?syn-25a6b1a6=1"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Anthropic was supposed to save the AI trade. What went wrong?",
+     "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-ai-stocks-selloff.html"
+    },
+    {
+     "source": "CNBC",
+     "headline": "SoftBank plunges over 16% as AI sell-off hits Asian tech stocks following Anthropic debut",
+     "link": "https://www.cnbc.com/2026/11/20/softbank-ai-tech-stocks-slide-anthropic-debut.html"
     }
    ]
   },
   {
-   "headline": "US dollar hovers near 19-month high, Aussie falls after soft jobs data - Reuters",
+   "headline": "Gold set for worst week in eight months as firm dollar, Fed hike bets weigh - Reuters",
    "source": "Reuters Business",
-   "why": "Слабите австралийски данни за заетостта и силният долар близо до 19-месечен връх натискат суровинните валути и активи надолу, докато укрепват позицията на USD като доминираща резервна валута.",
-   "source_text": "US dollar hovers near 19-month high, Aussie falls after soft jobs data - Reuters US dollar hovers near 19-month high, Aussie falls after soft jobs data Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQQ0NIbEViM181TUJsZHFhV2J5d0lLbkVXVlBRYVJlb3YtMC1wVTlyc1NBV0RMQ0dBTXZlcHFvdnkzQm1SUWo3NFl3eGZ0SzgwTXhxTVQ3Y2VYSHg5LXZtRG9vUUp3eVlEQktJMk9JSllaQ1hRRjRuWmx0WGNJSFBLTHRpUS1tTVFoakw2dHlVRExKTU1jWE9McGswRWc5V05CYU4zR3JDdm9Jam4wTDlyNTlXRno0cXc4NVE?oc=5"
+   "why": "Златото е на път за най-лошата си седмица от осем месеца под натиска на силния долар и очакванията за Fed затягане, което пренасочва потоци от защитни активи.",
+   "source_text": "Gold set for worst week in eight months as firm dollar, Fed hike bets weigh - Reuters Gold set for worst week in eight months as firm dollar, Fed hike bets weigh Reuters Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid - Reuters Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOMFFjdnZJUDZiUXhKNUdPUWMtQ2tkd0ZKdmN4TTZ3bnQyb09SQ3cxSS1hNVYtcmF5WGpNSlJzS1dWYkdBUzBJZ2s5TnhLQ29mNWNIUy10MGJkN294UndsTmRmOF9GelkyVkdWRl8wcVJQNnRaRGp0a3NIMWNHT1dJSHhZRk1BT3FRV2pFcHVGa3ozS1ZCdjJXenJvSXlBOEdxLUp2MVVVTVBDY0NGX3ZRRUN3?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNSWwtcmZqemtkQmd4OWJQUHN1OXZLZTgxM1FtVk5JTlAtNndPYzRndHkxbEZ2MEdNZGtRdWUwMUxlblhtLThfQ0NoRHYtZ1lzd2VkSHc4N0U3UlFjUGFubjBkOFc4bDhpR3lELUoxalJBN1lkUUtUYk1NSk9sanNaeUZrZVVXTWlDV2Zja1FFQ3lPaXNUN2FXb3BST0dmZHd3?oc=5"
+    }
+   ]
   },
   {
-   "headline": "Palo Alto raises annual forecast, signs $4.5 billion deal for Applied Compute - Reuters",
+   "headline": "Oil prices gain as Houthi attacks on Riyadh raise supply concerns - Reuters",
    "source": "Reuters Business",
-   "why": "Повишената прогноза и придобиването за 4.5 млрд. долара изпращат акцията нагоре и засилват апетита към кибербезопасния сектор като цяло.",
-   "source_text": "Palo Alto raises annual forecast, signs $4.5 billion deal for Applied Compute - Reuters Palo Alto raises annual forecast, signs $4.5 billion deal for Applied Compute Reuters Palo Alto inks $4.5 billion deal for AI startup Applied Compute, shares pop 7% on earnings Palo Alto Networks has been steadily acquiring companies to capitalize on demand for cyber tools to fight AI.",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOZW5sQ0s3NEtGMUtHWHpjajhUZjB3WW1PcGNIOF9IdktwUTVFbVh6V2VsMVFsWFRBMlE5VmtyUXlPMUtfZlk2UU4zbGxoZ19ocThmVjNudnNUWFhNR3BlT0V5dUxuYVk5VXUyT2EwZHI3QmtTS1N1ejVTV005UmNvdV93MjVEVDBkQldGU3E2bTBzVHpUbWZNY2wtbWx6TzA?oc=5",
+   "why": "Хуситски атаки срещу Рияд вдигат петролните цени заради опасения за прекъсване на доставките от Саудитска Арабия, засягайки енергийния сектор и инфлационните очаквания.",
+   "source_text": "Oil prices gain as Houthi attacks on Riyadh raise supply concerns - Reuters Oil prices gain as Houthi attacks on Riyadh raise supply concerns Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPb3pQREZDSHE2RmNHdDdGdExDUXhYeWljc2VualVoQ09oQV90WnFQQlZkYW1rWnl5ODJ6N2haaVBDVUY4VmFvRmtLSlZKbU5kR1lHNklrUUR3X3JGc181OHZCUHpXalZFUllBZXVEczJPUUdZZUt1MmpsTEN0MkJGSDNCVHhoa25pZFBSb1lldS1US0VJNVNBWWN1U2VwQmd0WmlQR1RKWmgyS2lyUDVfNHdWeWhzaFhmZ1E?oc=5"
+  },
+  {
+   "headline": "US Senate passes bipartisan bill to speed energy, infrastructure projects - Reuters",
+   "source": "Reuters Business",
+   "why": "Двупартийният закон за ускоряване на енергийни и инфраструктурни проекти е ключова стъпка, подкрепяща акциите на енергийния сектор, комуналните компании и AI data center строителството при преминаване и през Камарата.",
+   "source_text": "US Senate passes bipartisan bill to speed energy, infrastructure projects - Reuters US Senate passes bipartisan bill to speed energy, infrastructure projects Reuters Senate passes BAAJA permitting reform bill backed by AI, energy sectors The permitting bill's Senate passage is a key step to it becoming law, but it would also need to clear the House before heading to President Trump's desk.",
+   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPYWNIMlNjd1I2dzg4R0JUc2Jzb29wWElMQUJpZjhpR0NKeVVYWVJCX0xtNWEyRnVPelpSUC00Uk12aDZZQ3h2T0JKMkNMV3lyQTVoMjBIS040RDRremdwUjhRRGYyUS0ybG90ZS00bks1ckZYeDFDR3NlNGRHWkpaZVBjdTVjR2x0ZlFJbF9GR3ZnTWMtdi1fV19zZ3pDbmRqLW5NTENHVGljVHpZdFUwWWxTUnhCb0htWU9WNVA0dw?oc=5",
    "also": [
     {
      "source": "CNBC",
-     "headline": "Palo Alto inks $4.5 billion deal for AI startup Applied Compute, shares pop 7% on earnings",
-     "link": "https://www.cnbc.com/2026/11/18/palo-alto-networks-panw-q1-2027-earnings-.html"
+     "headline": "Senate passes BAAJA permitting reform bill backed by AI, energy sectors",
+     "link": "https://www.cnbc.com/2026/11/20/baaja-bill-senate-passes-permitting-reform.html"
     }
    ]
-  },
-  {
-   "headline": "EXCLUSIVE: UniCredit and Germany reach broad agreement on Commerzbank takeover - Reuters",
-   "source": "Reuters Business",
-   "why": "Споразумението за поглъщане на Commerzbank от UniCredit е мащабна консолидация в европейския банков сектор с директен ефект върху акциите на двете институции и по-широкия европейски финансов индекс.",
-   "source_text": "EXCLUSIVE: UniCredit and Germany reach broad agreement on Commerzbank takeover - Reuters EXCLUSIVE: UniCredit and Germany reach broad agreement on Commerzbank takeover Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNbzY3bmFvcDFWWmUtWmRlTkg1OElfODl6Z1BCWG1LQlp3U0xsbXktUlo3SXRKczAxdEI2bGRSTmxLRDUwMXRMZU9LOGJuX0QyTkxLNHVnS254WkF6MVNRNmNsUkxZRXZreWh2d0R5M2JmZk1pUWZHYVg0R1BjUDBXNVlFOXpZRGhtRUxLd1F6UnViV0VQcHBGSWw0VjF4ZUU2dk9zQ3liMzNmY3k0TExRXzlVMA?oc=5"
-  },
-  {
-   "headline": "US lawmakers seek Microsoft briefing on reported AI deal talks with ByteDance - Reuters",
-   "source": "Reuters Business",
-   "why": "",
-   "source_text": "US lawmakers seek Microsoft briefing on reported AI deal talks with ByteDance - Reuters US lawmakers seek Microsoft briefing on reported AI deal talks with ByteDance Reuters",
-   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNdEpRTFc4Q3Nsa085U2xoZldyY1BXSmlhSy0yT00tRzF4eU5QekdiUENlSTQyajA0eU5PVWl0MUpoejlXdXJMVVFPbHRVaGFlZmxoWFA5SHN5VXBpWHJvLUFLMjZISk96bVRuWWs0V3NSblpmWTM3VVZNQ3VHQVNpQTNUOFM5VzdwZ0ZOcHlFX3hmcEJ5ZDhRVXlCS0dCZEwxbXZ3Z09zVjB4N1FGMHo4Qkc4WWEwTG5LdHNWbk14NA?oc=5"
   }
  ],
  "window": {
-  "since": "2026-11-18T06:30:00+00:00",
-  "hours": 24.09,
+  "since": "2026-11-19T06:30:00+00:00",
+  "hours": 24.1,
   "day_queries": 0,
   "sources": {
    "Reuters Business": {
-    "count": 50,
-    "oldest": "2026-11-18T11:03Z"
+    "count": 52,
+    "oldest": "2026-11-19T11:08Z"
    },
    "CNBC": {
-    "count": 29,
-    "oldest": "2026-11-18T09:45Z"
+    "count": 28,
+    "oldest": "2026-11-19T10:54Z"
    },
    "Financial Times": {
-    "count": 10,
-    "oldest": "2026-11-18T20:15Z"
+    "count": 12,
+    "oldest": "2026-11-19T21:02Z"
    },
    "AP Business": {
     "count": 50,
-    "oldest": "2026-11-18T07:21Z"
+    "oldest": "2026-11-19T07:25Z"
    }
   },
   "fetched": {
-   "Reuters Business": 50,
-   "CNBC": 29,
-   "Financial Times": 10,
+   "Reuters Business": 52,
+   "CNBC": 28,
+   "Financial Times": 12,
    "AP Business": 50
   },
   "dead": [],
-  "pool_total": 139,
+  "front": {
+   "FT World": 25,
+   "Reuters World": 50
+  },
+  "front_dead": [],
+  "pool_total": 142,
   "pool_used": 100,
   "to_model": {
-   "CNBC": 29,
    "Reuters Business": 31,
-   "Financial Times": 10,
-   "AP Business": 30
+   "Financial Times": 11,
+   "AP Business": 28,
+   "CNBC": 28,
+   "Reuters World": 1,
+   "FT World": 1
   },
+  "themes_in_pool": 11,
   "priority": {
-   "names": 45,
-   "hits": 1,
-   "in_pool": 1,
-   "beyond_limit": 0,
+   "names": 42,
+   "hits": 6,
+   "in_pool": 6,
+   "beyond_limit": 2,
    "tickers": [
-    "AAPL"
+    "AAPL",
+    "ACN",
+    "ANT",
+    "DLTR",
+    "HLT",
+    "MA"
    ]
   }
- }
+ },
+ "themes": [
+  {
+   "key": "Xi–Trump",
+   "names": [
+    "XI",
+    "TRUMP"
+   ],
+   "headline": "Trump says he and China's Xi want moderate AI rules - Reuters",
+   "source": "Reuters Business",
+   "published": "2026-11-20T05:45Z",
+   "publishers": [
+    "AP",
+    "CNBC",
+    "FT",
+    "Reuters"
+   ],
+   "n_publishers": 4,
+   "n_headlines": 8,
+   "front": true,
+   "items": [
+    {
+     "title": "China revels in Xi’s ‘Yalta 2.0’ moment",
+     "source": "Financial Times",
+     "published": "2026-11-20T05:45Z"
+    },
+    {
+     "title": "Trump, Xi and Putin hold rare 3-way talks on nuclear risks but deliver no breakthroughs - AP News",
+     "source": "AP Business",
+     "published": "2026-11-19T19:24Z"
+    },
+    {
+     "title": "APEC final day in photos: Trump, Xi and Putin shake hands; Takaichi kept at a distance",
+     "source": "CNBC",
+     "published": "2026-11-19T10:54Z"
+    },
+    {
+     "title": "For Putin, sharing a spotlight with Trump and Xi boosts his profile on the global stage - AP News",
+     "source": "AP Business",
+     "published": "2026-11-19T14:43Z"
+    },
+    {
+     "title": "Takeaways from the historic summit among Trump, Xi and Putin - AP News",
+     "source": "AP Business",
+     "published": "2026-11-20T00:39Z"
+    },
+    {
+     "title": "Trump says he and China's Xi want moderate AI rules - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-19T22:34Z"
+    },
+    {
+     "title": "China's Xi says US should do 'right thing' on Taiwan to avoid setbacks in relations - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-19T11:45Z"
+    },
+    {
+     "title": "Australia PM and China’s Xi hail ‘turnaround’ despite iron ore tensions",
+     "source": "FT World",
+     "published": "2026-11-20T04:20Z"
+    }
+   ]
+  },
+  {
+   "key": "Takaichi",
+   "names": [
+    "TAKAICHI"
+   ],
+   "headline": "Japan's Prime Minister Takaichi says Russia and Japan will keep talking as ties remain chilled - AP News",
+   "source": "AP Business",
+   "published": "2026-11-19T18:29Z",
+   "publishers": [
+    "AP",
+    "CNBC",
+    "Reuters"
+   ],
+   "n_publishers": 3,
+   "n_headlines": 3,
+   "front": true,
+   "items": [
+    {
+     "title": "APEC final day in photos: Trump, Xi and Putin shake hands; Takaichi kept at a distance",
+     "source": "CNBC",
+     "published": "2026-11-19T10:54Z"
+    },
+    {
+     "title": "Japan's Prime Minister Takaichi says Russia and Japan will keep talking as ties remain chilled - AP News",
+     "source": "AP Business",
+     "published": "2026-11-19T18:29Z"
+    },
+    {
+     "title": "Japan's position on Taiwan has not changed, PM Takaichi says - Reuters",
+     "source": "Reuters World",
+     "published": "2026-11-19T07:58Z"
+    }
+   ]
+  },
+  {
+   "key": "Nvidia",
+   "names": [
+    "NVIDIA"
+   ],
+   "headline": "Can Nvidia learn from AIG’s mistakes?",
+   "source": "Financial Times",
+   "published": "2026-11-20T05:00Z",
+   "publishers": [
+    "AP",
+    "CNBC",
+    "FT",
+    "Reuters"
+   ],
+   "n_publishers": 4,
+   "n_headlines": 9,
+   "front": false,
+   "items": [
+    {
+     "title": "Can Nvidia learn from AIG’s mistakes?",
+     "source": "Financial Times",
+     "published": "2026-11-20T05:00Z"
+    },
+    {
+     "title": "Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-19T23:32Z"
+    },
+    {
+     "title": "US approved sale of Nvidia and AMD chips to Chinese companies",
+     "source": "Financial Times",
+     "published": "2026-11-20T00:42Z"
+    },
+    {
+     "title": "California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-19T23:31Z"
+    },
+    {
+     "title": "California attorney general issues Nvidia subpoena in probe of China chip diversion",
+     "source": "CNBC",
+     "published": "2026-11-19T23:21Z"
+    },
+    {
+     "title": "Jensen Huang's — and Nvidia's — legal exposure balloons",
+     "source": "CNBC",
+     "published": "2026-11-19T18:44Z"
+    },
+    {
+     "title": "Trump bought Nvidia, Palantir, SpaceX in September as federal deals, White House ties grew",
+     "source": "CNBC",
+     "published": "2026-11-19T19:43Z"
+    },
+    {
+     "title": "Trump bought up to $265,000 of Nvidia stock in September, disclosure shows - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-19T18:37Z"
+    },
+    {
+     "title": "Chinese tech firms fear AI hits from US curbs after Nvidia fallout - AP News",
+     "source": "AP Business",
+     "published": "2026-11-19T15:40Z"
+    }
+   ]
+  }
+ ]
 }
