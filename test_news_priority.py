@@ -92,8 +92,8 @@ class R:
 orig = na.requests.get
 na.requests.get = lambda *a, **k: R()
 try:
-    plain = na._fetch_rss("u", "Reuters Business", 48, limit=2)
-    kept = na._fetch_rss("u", "Reuters Business", 48, limit=2, keep=lambda t: bool(na.priority_hits(t, na.priority_matchers([{"ticker": "NVDA", "name": "Nvidia"}, {"ticker": "AAPL", "name": "Apple"}]))), keep_max=1)
+    plain = na._fetch_rss("u", "Reuters Business", 24 * 3650, limit=2)                          # 20.11.2026: прозорецът — не зависи от днешната дата
+    kept = na._fetch_rss("u", "Reuters Business", 24 * 3650, limit=2, keep=lambda t: bool(na.priority_hits(t, na.priority_matchers([{"ticker": "NVDA", "name": "Nvidia"}, {"ticker": "AAPL", "name": "Apple"}]))), keep_max=1)
 finally:
     na.requests.get = orig
 assert [x["title"] for x in plain] == ["Headline one", "Headline two"]

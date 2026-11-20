@@ -78,6 +78,7 @@ _SECTION_LABELS = {
     "_probe": "Проверка на модела",
     "ep_catalyst_call": "EP катализатор",                    # 09.10: qm_ep.ep_catalyst_call (преди — lambda → "<lambda>")
     "crypto_news_call": "Крипто новини",                     # 22.10.2026: src/crypto_news.py
+    "translation_call": "Превод на заглавията",              # 20.11.2026 (пакет 20.11, т. 1): src/translate.py
     "_parse_json": "Повторен опит (изрязан JSON)",            # 29.10.2026: само резерва — повторният опит подава етикета на първото извикване (_section)
 }
 

@@ -722,6 +722,11 @@ NEWS_MAX_TO_FILTER = int(os.getenv("NEWS_MAX_TO_FILTER", 100))     # 02.11.2026:
 # 18.11.2026 (поправка към спешния пакет): заглавията за нашите тикъри и компании (книгите, наблюдаваните, картите, „Нощта“, отчетите за деня) — първи в пула преди тавана;
 # след тавана на източника (NEWS_PER_SOURCE_LIMIT) се вземат и приоритетните — до толкова на източник
 NEWS_PRIORITY_EXTRA_PER_SOURCE = int(os.getenv("NEWS_PRIORITY_EXTRA_PER_SOURCE", 20))
+# 20.11.2026 (пакет 20.11, т. 1): AI текстът излиза от брифа — макро разказът е шаблон от кода (src/macro_template.py), новините и крипто — без AI „защо“; AI само избира (по индекс)
+# и превежда заглавията (src/translate.py, с проверка на числата, тикърите и имената). 1 връща старото (кодът остава за тестовете и за връщане).
+ENABLE_AI_MACRO = int(os.getenv("ENABLE_AI_MACRO", 0))
+NEWS_AI_WHY = int(os.getenv("NEWS_AI_WHY", 0))
+NEWS_TRANSLATE = int(os.getenv("NEWS_TRANSLATE", 1))
 # 19.11.2026 (пакет 19.11, т. 2): топ темите (src/top_themes.py) — първата страница / световните новини (само за темите и техния приоритет) и праговете
 NEWS_FRONT_FEEDS = {
     "FT World": "https://www.ft.com/world?format=rss",

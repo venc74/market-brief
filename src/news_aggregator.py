@@ -566,7 +566,7 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
             dropped.append({"i": i, "reason": "повторен индекс"})
             continue
         why = (n.get("why") or "").strip()
-        if not why:
+        if not why and config.NEWS_AI_WHY:                                   # 20.11.2026 (пакет 20.11, т. 1): без AI „защо“ — празното е нормата
             dropped.append({"i": i, "reason": "празно why"})
             continue
         j, note = _echo_index(n.get("h"), i, pool, seen)                 # 19.10.2026 (С3): ехото на заглавието срещу pool[i]
@@ -589,17 +589,19 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         main = i
         r = pool[main]
         source_text = " ".join(f"{pool[k]['title']} {pool[k].get('summary') or ''}" for k in group)
-        why, cut = _why_numbers(why, source_text)
+        why, cut = _why_numbers(why, source_text) if why else (why, [])
         if cut:
             dropped.append({"i": i, "reason": "число в why, което го няма в заглавието и резюмето — махната е частта с него", "removed": cut})
         try:                                                                     # 16.11.2026 (т. 1): твърдение (институция, държава, мярка) без опора в заглавията и резюметата
             from src import claim_check
-            why, unsup = claim_check.check(why, source_text)
+            why, unsup = claim_check.check(why, source_text) if why else (why, [])
             if unsup:
                 dropped.append({"i": i, "reason": "твърдение в why, което го няма в заглавията и резюметата на групата — махнато изречението", "removed": unsup})
         except Exception as e:
             print(f"[news] проверката на твърденията пропусната: {type(e).__name__}: {e}")
         row = {"headline": r["title"], "source": r.get("source"), "why": why, "source_text": source_text[:2000]}      # 06.11.2026 (т. 8): source_text — за проверката на думите (ai_brief.check_news_why_terms го маха)
+        if r.get("published"):
+            row["published"] = r["published"]                                   # 20.11.2026 (пакет 20.11, т. 1): часът на заглавието
         if r.get("link"):
             row["link"] = r["link"]                                          # 29.10.2026: линкът към статията — от пула, по същия индекс
         others = sorted((k for k in group if k != main), key=lambda k: (_source_rank(pool[k].get("source")), group.index(k)))
@@ -625,6 +627,29 @@ ALSO_RULE = ("Една история — една новина: ако няко
 LAST_DIAG: dict = {}
 # 19.10.2026 (трети преглед, т. 12): празните новини не са тиха липса — {"ok", "reason", "count"} → банер в брифа (data_warnings)
 LAST_STATUS: dict = {}
+
+
+LAST_TRANSLATION: dict = {}
+
+
+def finish_rows(rows: list[dict], matchers: list | None, pool_all: list | None = None) -> None:
+    """
+    20.11.2026 (пакет 20.11, т. 1): всяка новина — кои наши тикъри засяга (priority_hits върху заглавието и „също“) и преводът на български (src/translate.py, с проверка; без
+    AI „защо“). Провал на превода → оригиналът с бележка. Мутира rows; отчетът — LAST_TRANSLATION.
+    """
+    for r in rows or []:
+        texts = [r.get("headline") or ""] + [a.get("headline") or "" for a in r.get("also") or []]
+        r["ours"] = sorted({t for x in texts for t in priority_hits(x, matchers or [])})
+    LAST_TRANSLATION.clear()
+    if config.NEWS_TRANSLATE and rows:
+        try:
+            from src import translate, top_themes
+            caps = top_themes._later_caps([x.get("title") or "" for x in pool_all or []] + [r.get("headline") or "" for r in rows])
+            LAST_TRANSLATION.update(translate.apply(rows, caps))
+        except Exception as e:
+            print(f"[news] преводът пропуснат: {type(e).__name__}: {e}")
+            for r in rows:
+                r.setdefault("translation_note", "преводът не се получи")
 
 
 def significant_news(max_items: int = 8, since: dt.datetime | None = None, priority: list | None = None) -> list[dict]:
@@ -689,26 +714,29 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
         # беше в суровия пул и не влезе в осемте.
         "регулаторни и законодателни събития с пазарен ефект (решения и правила "
         "на SEC/CFTC/FTC/ЕК, гласувания в Конгреса, антитръст, тарифи, санкции). "
-        f"Максимум {max_items} новини, всяка с едно "
-        "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
-        "заглавие дословно по индекса \"i\" от списъка.\n"                                    # 30.10.2026 (поправки от брифа, т. 5): без превод на заглавието — не се показва
+        + (f"Максимум {max_items} новини, всяка с едно "
+           "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
+           "заглавие дословно по индекса \"i\" от списъка.\n" if config.NEWS_AI_WHY else
+           f"Максимум {max_items} новини. НЕ пишеш коментар и не превеждаш — само избираш по индекса \"i\"; кодът показва оригиналното заглавие дословно.\n") +
         # 19.10.2026 (трети преглед, С3 + "why" = заглавието): ехо на заглавието за проверка на индекса; why — само ефектът, без преразказ и без числа извън източника
-        "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен. "
-        "\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието и не носи числа, "
-        "които ги няма в \"t\" или \"d\" на същата новина.\n"
+        "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен.\n"
+        + ("\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието и не носи числа, "
+           "които ги няма в \"t\" или \"d\" на същата новина.\n" if config.NEWS_AI_WHY else "") +
         # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина
         f"{ALSO_RULE}\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
-        'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}'
+        + ('Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' if config.NEWS_AI_WHY else
+           'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "also": [{"i": 5, "h": "първите шест думи"}]}]}')
     )
     try:
         from src import ai_brief
-        text = ai_brief._call_claude(_SYSTEM, user, max_tokens=2000)
+        text = ai_brief._call_claude(_SYSTEM, user, max_tokens=2000 if config.NEWS_AI_WHY else 1000)
         data = ai_brief._parse_json(text)
         news, dropped = pick_verbatim(data.get("news", []) if isinstance(data, dict) else [], pool, max_items)
+        finish_rows(news, matchers, list(raw) + list(LAST_FRONT))              # 20.11.2026 (пакет 20.11, т. 1): нашите тикъри и преводът
         LAST_DIAG.clear()
         got = data.get("news", []) if isinstance(data, dict) else []
-        LAST_DIAG.update(returned=len(got), kept=len(news), dropped=dropped,
+        LAST_DIAG.update(returned=len(got), kept=len(news), dropped=dropped, translation=dict(LAST_TRANSLATION),
                          pool=[[r.get("source"), r.get("published"), r["title"]] for r in pool],     # 18.11.2026 (т. 1): пулът, който видя моделът — за диагнозата на пропусната новина
                          no_echo=sum(1 for n in got if isinstance(n, dict) and not (isinstance(n.get("h"), str) and n["h"].strip())))   # 19.10.2026 (С3)
         for d in dropped:

@@ -708,7 +708,11 @@
       <span class="news-dot"></span>
       {# 15.10.2026: заглавието е ДОСЛОВНО от източника (news_aggregator.pick_verbatim); преводът е отделно, в скоби #}
       <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}{{ news_also(n) }}
-        {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
+        {% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}
+        {# 20.11.2026 (пакет 20.11, т. 1): без AI „защо“ — преводът (проверен от кода), часът, нашите тикъри #}
+        {% set nm = news_meta(n) %}{% if nm %}
+        {% if nm.bg %}<div style="font-size:13px;margin-top:2px">{{ nm.bg }}</div>{% elif nm.note %}<div class="news-why" style="font-size:12px;color:var(--yellow)">{{ nm.note }}</div>{% endif %}
+        <div class="news-why" style="font-size:11.5px">{{ n.source }}{% if nm.when %} · {{ nm.when }}{% endif %} · наши тикъри: {{ nm.ours }}</div>{% endif %}</div>
     </div>
     {% endfor %}
   </div>
@@ -727,7 +731,10 @@
     {% for n in crypto["items"] %}
     <div class="news-item"><span class="news-dot"></span>
       <div>{{ news_head(n) }}{% if n.source %} <span class="news-why" style="font-size:12px">· {{ n.source }}</span>{% endif %}{{ news_also(n) }}
-        {% if n.cat_label %}<span class="news-why" style="font-size:12px">· {{ n.cat_label }}</span>{% endif %}{% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}</div>
+        {% if n.cat_label %}<span class="news-why" style="font-size:12px">· {{ n.cat_label }}</span>{% endif %}{% if n.why %}<span class="news-why"> — {{ n.why }}</span>{% endif %}
+        {% set nm = news_meta(n) %}{% if nm %}{# 20.11.2026 (пакет 20.11, т. 1) #}
+        {% if nm.bg %}<div style="font-size:13px;margin-top:2px">{{ nm.bg }}</div>{% elif nm.note %}<div class="news-why" style="font-size:12px;color:var(--yellow)">{{ nm.note }}</div>{% endif %}
+        <div class="news-why" style="font-size:11.5px">{{ n.source }}{% if nm.when %} · {{ nm.when }}{% endif %}</div>{% endif %}</div>
     </div>
     {% endfor %}
   </div>

@@ -36,10 +36,12 @@ def _prompt(pool: list[dict], max_items: int) -> str:
             f"Не: {NOT_IMPORTANT}.\n"
             f"Най-много {max_items} новини; дневните потоци в ETF — най-много една (отбележи я с \"etf_flows\": true). Ако няма такава — върни празен списък.\n"
             f"{news_aggregator.ALSO_RULE}\n"
-            "За всяка: \"i\" (индексът), \"h\" (ДОСЛОВНО първите 6 думи на заглавието \"t\" — кодът проверява индекса), "
-            "\"why\" (ЕДНО изречение на български — какво променя за институционалния инвеститор в крипто или за COIN / HOOD / CRCL / BLSH; без числа, които ги няма в \"t\" или \"d\").\n\n"
-            f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False)}\n\n"
-            'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи", "why": "...", "etf_flows": false, "also": [{"i": 3, "h": "първите шест думи"}]}]}')
+            "За всяка: \"i\" (индексът), \"h\" (ДОСЛОВНО първите 6 думи на заглавието \"t\" — кодът проверява индекса)"
+            + (", \"why\" (ЕДНО изречение на български — какво променя за институционалния инвеститор в крипто или за COIN / HOOD / CRCL / BLSH; без числа, които ги няма в \"t\" или \"d\").\n\n"
+               if config.NEWS_AI_WHY else ". Без коментар и без превод — кодът показва оригиналното заглавие.\n\n")      # 20.11.2026 (пакет 20.11, т. 1)
+            + f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False)}\n\n"
+            + ('Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи", "why": "...", "etf_flows": false, "also": [{"i": 3, "h": "първите шест думи"}]}]}' if config.NEWS_AI_WHY else
+               'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи", "etf_flows": false, "also": [{"i": 3, "h": "първите шест думи"}]}]}'))
 
 
 def crypto_news_call(system: str, user: str) -> str:
@@ -72,7 +74,8 @@ def select(data, pool: list[dict], max_items: int | None = None) -> tuple[list[d
                 dropped.append({"headline": p["headline"], "reason": "второ заглавие за дневни потоци в ETF"})
                 continue
         src = next((r for r in pool if r["title"] == p["headline"]), {})
-        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "why": p["why"], **({"also": p["also"]} if p.get("also") else {})})
+        out.append({"headline": p["headline"], "source": p.get("source"), "link": src.get("link"), "why": p["why"], **({"also": p["also"]} if p.get("also") else {}),
+                    **({"published": src["published"]} if src.get("published") else {})})
     if len(out) > max_items:
         dropped += [{"headline": x["headline"], "reason": f"над тавана от {max_items}"} for x in out[max_items:]]
     return out[:max_items], dropped
@@ -191,6 +194,8 @@ def build(today: str, fetch=None, ai_call=None, download=None, cache_path=None, 
                 from src import ai_brief as _ab
                 data = _ab._parse_json(ai_call(_SYSTEM, _prompt(pool, config.CRYPTO_MAX_ITEMS)))
                 items, dropped = select(data, pool)
+                from src import news_aggregator as _na                                      # 20.11.2026 (пакет 20.11, т. 1): преводът (без AI „защо“), с проверка
+                _na.finish_rows(items, [], pool)
                 for d in dropped:
                     print(f"[crypto] ⚠ {d.get('reason')}: {d.get('headline') or d.get('h') or d.get('i')}")
                 pool_items = pool_record(pool, data, items, dropped)                    # 29.10.2026: целият пул и какво стана с всяко заглавие

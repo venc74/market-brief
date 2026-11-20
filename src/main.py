@@ -28,6 +28,7 @@ from src import data_rhythm
 from src import crypto_news
 from src import sessions
 from src import ai_brief
+from src import macro_template
 from src import splits_calendar, news_aggregator, sec_names
 from src import insider_buying
 from src import correlation_check
@@ -652,8 +653,10 @@ def run() -> dict:
     market_day = steps.step("market_day", lambda: sector_layer.market_day(sector_board), fallback={}, label="Денят на пазара за макро разказа",
                             consequence="разказът е без дневните промени и спада от върха; думите „корекция“ и „мечи пазар“ се проверяват само срещу процента в изречението")
     news_terms_fixed = ai_brief.check_news_why_terms(news, market_day)         # 06.11.2026 (т. 8): „защо“ на новините — преди разказа, който ги чете
-    ai_macro = ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day, board=sector_board,     # 18.11.2026 (т. 3): посоката на RS
-                                               themes=list(news_aggregator.LAST_THEMES))                                                       # 19.11.2026 (т. 2): топ темите
+    # 20.11.2026 (пакет 20.11, т. 1): AI текстът излиза — макрото е шаблон от кода (SPY / QQQ, секторите, VIX, 10Y); ENABLE_AI_MACRO=1 връща AI разказа
+    ai_macro = (ai_brief.macro_and_sector_brief(macro, rotation, thermo, news=news, crypto=crypto, day=market_day, board=sector_board,     # 18.11.2026 (т. 3): посоката на RS
+                                                themes=list(news_aggregator.LAST_THEMES))                                                       # 19.11.2026 (т. 2): топ темите
+                if config.ENABLE_AI_MACRO else macro_template.macro_brief(market_day, sector_board, macro))
     # 17.11.2026 (пакет 1, т. 2а — решение след стратегическия преглед): AI абзацът на картите („защо сега / бизнес / катализатори / рискове“) — махнат; редът
     # „Защо е тук“ е от кода (render.why_here — RS, RS линия, Stage 2, EPS, сектор). card["ai"] остава контейнер за класа от кода (apply_hard_rules).
     for c in candidates:

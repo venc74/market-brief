@@ -611,6 +611,27 @@ def themes_ctx(themes: list | None) -> list[dict] | None:
     return out
 
 
+def news_meta(n: dict) -> dict | None:
+    """
+    20.11.2026 (пакет 20.11, т. 1): под заглавието — преводът (или „преводът е пропуснат — несъответствие“), източникът, часът (UTC) и кои наши тикъри засяга. Само за новите
+    редове (с поле „ours“); старите брифове — без промяна. Чиста функция.
+    """
+    if not isinstance(n, dict) or "ours" not in n:
+        return None
+    p = n.get("published") or ""
+    return {"bg": n.get("headline_bg"), "note": n.get("translation_note"), "when": f"{p[8:10]}.{p[5:7]} {p[11:16]} UTC" if len(p) >= 16 else "",
+            "ours": ", ".join(n.get("ours") or []) or "няма"}
+
+
+def news_meta_email(n: dict) -> str:
+    m = news_meta(n)
+    if not m:
+        return ""
+    line = (f'<div style="color:#111827;font-size:12.5px">{_e(m["bg"])}</div>' if m["bg"] else
+            f'<div style="color:#b45309;font-size:12px">{_e(m["note"] or "")}</div>' if m["note"] else "")
+    return line + (f'<div style="color:#6b7280;font-size:11.5px">{_e(n.get("source") or "")}' + (f' · {m["when"]}' if m["when"] else "") + f' · наши тикъри: {_e(m["ours"])}</div>')
+
+
 def _themes_email(themes: list | None) -> str:
     c = themes_ctx(themes)
     if not c:
@@ -912,6 +933,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         qm_ep_crashed=config.QM_EP_CRASHED_RET63_PCT, insider_big_sell_pct=config.INSIDER_BIG_SELL_PCT, preopen_econ_since=config.PREOPEN_ECON_SINCE_NY, qm_ep_gap=config.QM_EP_GAP_PCT, qm_ep_neglect=config.QM_EP_NEGLECT_RET63_PCT, qm_ep_stop_adr=config.QM_EP_STOP_ADR,
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
+        news_meta=news_meta,                                              # 20.11.2026 (пакет 20.11, т. 1): превод, час, наши тикъри
         news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
         news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
@@ -1169,7 +1191,8 @@ def render_email(brief: dict) -> str:
                else f'<b>{_e(n.get("headline",""))}</b>')                                         # 15.10.2026: дословно от източника
             + (f'<span style="color:#6b7280;font-size:12px"> · +{len(n["also"])} {"източник" if len(n["also"]) == 1 else "източника"}</span>'   # 30.10.2026: само броят, без линкове
                if isinstance(n.get("also"), list) and n["also"] else "")
-            + (f'<span style="color:#6b7280"> — {_e(n["why"])}</span>' if n.get("why") else "") + "</li>" for n in news)      # 06.11.2026 (т. 8): „защо“ може да е празно
+            + (f'<span style="color:#6b7280"> — {_e(n["why"])}</span>' if n.get("why") else "")      # 06.11.2026 (т. 8): „защо“ може да е празно
+            + news_meta_email(n) + "</li>" for n in news)
         news_block = (
             '<tr><td style="padding:16px 28px 4px">'
             '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;'
