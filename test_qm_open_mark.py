@@ -21,7 +21,9 @@ assert round(card["trigger"], 2) == 159.48 and tracker["RVTY_2026-10-21_qm"]["fi
 
 print("── 1. маркерът от книгата ──")
 c1 = copy.deepcopy(card)
-assert backtest.qm_open_marks([c1], "2026-10-22", tracker) == 1 and c1["book_open"] == {"since": "2026-10-21", "price": 158.0, "status": "open"}
+assert backtest.qm_open_marks([c1], "2026-10-22", tracker) == 1
+assert {k: c1["book_open"][k] for k in ("since", "price", "status", "filled")} == {"since": "2026-10-21", "price": 158.0, "status": "open", "filled": True}
+assert c1["book_open"]["level0_date"] == "2026-10-21"                                                # 20.11.2026 (т. 4): първоначалното ниво и денят му
 c0 = copy.deepcopy(card)
 assert backtest.qm_open_marks([c0], "2026-10-21", tracker) == 0 and "book_open" not in c0       # записът е от днес — картата е самият вход
 other = {**copy.deepcopy(card), "ticker": "ZZZZ"}
@@ -36,7 +38,22 @@ b = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text
 b["qm_breakout"] = [c1]
 with contextlib.redirect_stdout(io.StringIO()):
     page, mail = render.render_dashboard(copy.deepcopy(b)), render.render_email(copy.deepcopy(b))
-assert "📈 OPEN — вече отворена в книгата qm_breakout от 21.10 @ $158.00 — новото ниво не е нов вход" in page
-assert "📈 вече отворена в книгата от 21.10 @ $158.00 — новото ниво не е нов вход" in mail
+assert "📈 OPEN — вход в книгата qm_breakout от 21.10 @ $158.00 — новото ниво не е нов вход" in page        # 20.11.2026 (т. 4): „OPEN“ — само при реален вход
+assert "📈 OPEN — вход в книгата от 21.10 @ $158.00 — новото ниво не е нов вход" in mail
+lv0 = c1["book_open"]["level0"]
+if abs(lv0 - c1["trigger"]) > 0.005:
+    assert f"ниво от 21.10 ${lv0:.2f} → днес ${c1['trigger']:.2f}" in page
 print("  ✓ на страницата и в имейла")
+
+print("── 3. СИНТЕТИЧНО: запис без вход — „в книгата · чака пробив“, преместеното ниво (20.11.2026, т. 4) ──")
+t2 = {"RVTY_2026-10-20_qm": {**copy.deepcopy(tracker["RVTY_2026-10-21_qm"]), "entry_date": "2026-10-20", "fill_date": None, "fill_price": None, "status": "pending",
+                             "buy_stop": 157.1, "window_days": [{"date": "2026-10-20", "buy_stop": 157.1}, {"date": "2026-10-21", "buy_stop": 158.0}]}}
+c2 = copy.deepcopy(card)
+assert backtest.qm_open_marks([c2], "2026-10-22", t2) == 1 and c2["book_open"]["filled"] is False and c2["book_open"]["level0"] == 157.1
+b2 = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8")); b2["qm_breakout"] = [c2]
+with contextlib.redirect_stdout(io.StringIO()):
+    page2, mail2 = render.render_dashboard(copy.deepcopy(b2)), render.render_email(copy.deepcopy(b2))
+assert "в книгата · чака пробив (от 20.10)" in page2 and "📈 OPEN" not in page2.split("qm-grid", 1)[1].split("</section>", 1)[0]
+assert "ниво от 20.10 $157.10 → днес $159.48" in page2 and "в книгата · чака пробив (от 20.10)" in mail2
+print("  ✓ „в книгата · чака пробив (от 20.10)“, „ниво от 20.10 $157.10 → днес $159.48“; без „OPEN“")
 print("\n✅ test_qm_open_mark: всичко мина")

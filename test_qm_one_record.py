@@ -35,13 +35,14 @@ card = lambda lvl: {"ticker": "IDXX", "trigger": lvl, "adr": 2.4, "close": 700.0
 backtest._ingest_qm_list(t2, "2026-11-20", [card(712.5)], "Defensive")
 assert list(t2) == ["IDXX_2026-11-19_qm"]
 r = t2["IDXX_2026-11-19_qm"]
-assert [d["date"] for d in r["window_days"]] == ["2026-11-19", "2026-11-20"] and r["buy_stop"] == 712.5 and r["status"] == "pending" and r["valid_through"] == "2026-11-20"
+assert [d["date"] for d in r["window_days"]] == ["2026-11-19", "2026-11-20"] and r["status"] == "pending" and r["valid_through"] == "2026-11-20"
+assert r["buy_stop"] == 713.11 and r["buy_stop_today"] == 712.5                                            # 20.11.2026 (т. 4): записът пази първоначалното ниво
 backtest._ingest_qm_list(t2, "2026-11-20", [card(712.5)], "Defensive")                                    # повторно — без промяна
 assert len(r["window_days"]) == 2
 r.update(status="not_triggered", resolution_date="2026-11-20")                                             # прозорецът се е затворил без вход
 backtest._ingest_qm_list(t2, "2026-11-25", [card(711.0)], "Defensive")                                    # прекъсване (23–24.11 без карта) — нов запис
 assert "IDXX_2026-11-25_qm" in t2 and t2["IDXX_2026-11-25_qm"]["window_days"] == [{"date": "2026-11-25", "buy_stop": 711.0}]
-print("  ✓ 19.11 + 20.11 → един запис, нивото $713.11 → $712.5; повторно — без промяна; след прекъсване — нов запис")
+print("  ✓ 19.11 + 20.11 → един запис (ниво $713.11 пази, днес $712.5); повторно — без промяна; след прекъсване — нов запис")
 
 print("── 3. СИНТЕТИЧНО: резолюцията ден по ден — вход във втория ден ──")
 config.QM_FIRST_BAR_RULE_FROM = "2099-01-01"; config.QM_INTRADAY_MAX_DAYS = 0                             # дневната симулация (без 5-минутни бари — без мрежа)

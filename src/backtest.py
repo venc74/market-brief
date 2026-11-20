@@ -697,7 +697,8 @@ def _qm_extend(rec: dict, day: str, card: dict) -> None:
     days = qm_window_days(rec)
     days.append({"date": day, "buy_stop": round(float(card["trigger"]), 4)})
     rec["window_days"] = days
-    rec.update(buy_stop=days[-1]["buy_stop"], valid_through=day, window_sessions=len(days), status="pending", resolution_date=None,
+    # 20.11.2026 (пакет 20.11, т. 4): записът пази ПЪРВОНАЧАЛНОТО ниво (buy_stop); днешното — buy_stop_today, дневните — в window_days (по тях е резолюцията ден по ден)
+    rec.update(buy_stop=days[0]["buy_stop"], buy_stop_today=days[-1]["buy_stop"], valid_through=day, window_sessions=len(days), status="pending", resolution_date=None,
                adr=round(float(card["adr"]), 2), expected_stop=card.get("expected_stop"), max_stop=card.get("max_stop"), signal_price=card.get("close"))
     rec.update({k: None for k in _QM_RESULT_KEYS if k != "status"})
 
@@ -1985,7 +1986,10 @@ def qm_open_marks(cards: list[dict], today: str, tracker: dict | None = None) ->
         for c in cards or []:
             r = live.get(c.get("ticker"))
             if r:
-                c["book_open"] = {"since": r.get("fill_date") or r.get("entry_date"), "price": r.get("fill_price") or r.get("buy_stop"), "status": r.get("status")}
+                # 20.11.2026 (пакет 20.11, т. 4): „OPEN“ — само при реален вход (fill_date); иначе „в книгата · чака пробив“; първоначалното ниво и денят му — за „ниво от ДД.ММ X → днес Y“
+                wd = (r.get("window_days") or [{}])[0]
+                c["book_open"] = {"since": r.get("fill_date") or r.get("entry_date"), "price": r.get("fill_price") or r.get("buy_stop"), "status": r.get("status"),
+                                  "filled": bool(r.get("fill_date")), "level0": wd.get("buy_stop") or r.get("buy_stop"), "level0_date": wd.get("date") or r.get("entry_date")}
                 n += 1
         return n
     except Exception as e:
