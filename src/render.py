@@ -632,6 +632,96 @@ def news_meta_email(n: dict) -> str:
     return line + (f'<div style="color:#6b7280;font-size:11.5px">{_e(n.get("source") or "")}' + (f' · {m["when"]}' if m["when"] else "") + f' · наши тикъри: {_e(m["ours"])}</div>')
 
 
+def _f(x, fmt="{:.2f}", pre="$") -> str | None:
+    return (pre + fmt.format(x)) if isinstance(x, (int, float)) else None
+
+
+def _tier_label(c: dict) -> str | None:
+    t = ((c or {}).get("tier") or {}).get("tier")
+    return "Тренд без ръст" if t == "trend" else ("CANSLIM" if t == "canslim" else None)
+
+
+def novelty_tile(screener: str, c: dict) -> dict:
+    """
+    20.11.2026 (пакет 20.11, т. 2): еднаквата плочка „Нови днес“ — тикър · име · скрийнър · ниво / аларма · стоп · цел · разстояние · „Защо е тук“ · отчет ⚠ · ниво (CANSLIM / Тренд
+    без ръст); стар с нов статус — етикет „от ДД.ММ — днес …“. Полетата — от картата на скрийнъра. Чиста функция.
+    """
+    from src import novelty
+    nv = c.get("novelty") or {}
+    t = {"ticker": c.get("ticker"), "name": names.display_name(c.get("company") or c.get("name"), 32) if (c.get("company") or c.get("name")) else "",
+         "screener": novelty.LABELS.get(screener, screener), "label": nv.get("label"), "status": nv.get("status"),
+         "earnings": (c.get("earnings_gate") or {}).get("text") if (c.get("earnings_gate") or {}).get("soon") else None, "tier": _tier_label(c), "levels": c.get("levels")}
+    if screener == "canslim":
+        s, p, pp = c.get("setup") or {}, c.get("plan") or {}, c.get("plan_preview") or {}
+        if p and nv.get("status") == "вход днес":
+            t.update(level=f"вход ≈ {_f(p.get('entry_mid'))}", stop=_f(p.get("stop_loss")), target=_f(p.get("target_1")), dist=None)
+        else:
+            t.update(level=f"аларма над {_f(s.get('buy_stop'))} — вход само с обем" if s.get("buy_stop") else "—", stop=_f(pp.get("stop_loss") or s.get("stop")),
+                     target=_f(pp.get("target_1")), dist=(f"{nv['dist']:+.1f}% до buy-stop" if isinstance(nv.get("dist"), (int, float)) else None))
+        t["why"] = why_here(c)
+    elif screener == "qm":
+        t.update(level=f"ниво на пробива {_f(c.get('trigger'))}", stop=(f"{_f(c.get('max_stop'))} (макс. 1×ADR)" if isinstance(c.get("max_stop"), (int, float)) else None),
+                 target=f"частична на {config.QM_PARTIAL_DAYS}-ия ден, после SMA10 / SMA20",
+                 dist=(f"{nv['dist']:+.1f}% до нивото" if isinstance(nv.get("dist"), (int, float)) else None),
+                 why=" · ".join(x for x in (f"ръст +{c['runup_pct']:.0f}% преди базата" if isinstance(c.get("runup_pct"), (int, float)) else None,
+                                            f"база {c['base_days']} дни" if c.get("base_days") else None,
+                                            f"стягане {c['tight']:.2f}×ADR" if isinstance(c.get("tight"), (int, float)) else None) if x))
+    elif screener.startswith("glb"):
+        t.update(level=f"линия {_f(c.get('line'))}", stop="затваряне под линията", target=None,
+                 dist=(f"{c['pct_vs_line']:+.1f}% над линията" if isinstance(c.get("pct_vs_line"), (int, float)) else None),
+                 why=" · ".join(x for x in (f"{c['months_unpenetrated']} месеца без връх" if c.get("months_unpenetrated") is not None else None,
+                                            f"обем на пробива {c['breakout_volume_ratio']:.1f}×" if isinstance(c.get("breakout_volume_ratio"), (int, float)) else None,
+                                            f"сесия {c['sessions']} от {c['max_sessions']}" if c.get("sessions") and c.get("max_sessions") else None) if x))
+    else:
+        t.update(level=f"after-hours {_f(c.get('ah_price'))}", stop=_f(c.get("max_stop")), target=None,
+                 dist=(f"гап {c['gap_pct']:+.1f}%" if isinstance(c.get("gap_pct"), (int, float)) else None), why=c.get("catalyst_label") or "")
+    return t
+
+
+def novelty_row(screener: str, c: dict, today: str) -> dict:
+    """Компактният ред „Още валидни“: тикър · име · предложен ДД.ММ · валиден до · разстояние до входа."""
+    from src import sessions
+    nv = c.get("novelty") or {}
+    fs = nv.get("first_seen") or ""
+    if screener == "canslim":
+        vt = (c.get("setup") or {}).get("valid_through")
+    elif screener == "qm":
+        vt = today                                                               # входът е за една сесия; новият ден е нов ден в прозореца
+    elif screener.startswith("glb") and c.get("sessions") and c.get("max_sessions"):
+        d = __import__("datetime").date.fromisoformat(today)
+        for _ in range(max(0, int(c["max_sessions"]) - int(c["sessions"]))):
+            d = sessions.next_session(d)
+        vt = d.isoformat()
+    else:
+        vt = None
+    dist = nv.get("dist")
+    unit = {"canslim": "до buy-stop", "qm": "до нивото"}.get(screener, "над линията" if screener.startswith("glb") else "")
+    return {"ticker": c.get("ticker"), "name": names.display_name(c.get("company") or c.get("name"), 28) if (c.get("company") or c.get("name")) else "",
+            "since": f"{fs[8:10]}.{fs[5:7]}" if fs else "", "valid": f"{vt[8:10]}.{vt[5:7]}" if vt else "—",
+            "dist": f"{dist:+.1f}% {unit}".strip() if isinstance(dist, (int, float)) else "—", "status": nv.get("status"),
+            "earnings": (c.get("earnings_gate") or {}).get("text") if (c.get("earnings_gate") or {}).get("soon") else None}
+
+
+def novelty_ctx(brief: dict) -> dict | None:
+    """{скрийнър: {"label", "tiles", "old", "dropped"}} за шаблона; стар бриф без brief["novelty"] → None (страницата — както досега). Чиста функция."""
+    nov = brief.get("novelty")
+    if not isinstance(nov, dict):
+        return None
+    from src import novelty
+    today = str(brief.get("date") or "")[:10]
+    cards = {"canslim": list(brief.get("action") or []) + list(brief.get("watchlist") or []), "qm": brief.get("qm_breakout") or [],
+             "glb_classic": [c for c in brief.get("glb_candidates") or [] if not (c.get("glb_type") or "").lower().startswith("mom")],
+             "glb_momentum": [c for c in brief.get("glb_candidates") or [] if (c.get("glb_type") or "").lower().startswith("mom")],
+             "ep": ((brief.get("qm_ep") or {}).get("rows")) or []}
+    out = {}
+    for s in novelty.SCREENERS:
+        n = nov.get(s) or {}
+        by = {c.get("ticker"): c for c in cards[s] if c.get("novelty")}
+        out[s] = {"label": novelty.LABELS[s], "tiles": [novelty_tile(s, by[t]) for t in n.get("new") or [] if t in by],
+                  "old": [novelty_row(s, by[t], today) for t in n.get("old") or [] if t in by], "dropped": n.get("dropped") or []}
+    return out
+
+
 def _themes_email(themes: list | None) -> str:
     c = themes_ctx(themes)
     if not c:
@@ -934,6 +1024,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news=brief.get("news", []),
         news_window_note=news_window_note(brief.get("news_window")),     # 02.11.2026 (т. 4): прозорецът и обхватът на източниците
         news_meta=news_meta,                                              # 20.11.2026 (пакет 20.11, т. 1): превод, час, наши тикъри
+        nov=novelty_ctx(brief),                                           # 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ във всеки скрийнър
         news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
         news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),

@@ -1046,6 +1046,11 @@ def run() -> dict:
                                        breadth=next((i for i in thermo.get("indicators") or [] if str(i.get("name", "")).startswith("Market Breadth")), None))   # 20.10.2026: частичен провал
     data_warns += steps.warnings({w.get("source") for w in data_warns})          # 20.10.2026 (етап 3б): провалена стъпка без собствен банер → един ред
     print(steps.log_line())
+    # 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ — първа поява или промяна на статуса спрямо записаните брифове (src/novelty.py); картите получават card["novelty"]
+    from src import novelty
+    novelty_out = steps.step("novelty", lambda: novelty.annotate({"action": action, "watchlist": watchlist, "qm_breakout": qm_cards, "glb_candidates": glb_candidates,
+                                                                   "qm_ep": qm_ep_out or {}}, today), fallback=None, label="„Нови днес“ в скрийнърите",
+                             consequence="скрийнърите днес са без „Нови днес“ — показват се пълните карти, както до 20.11")
     brief = {
         "date": today,
         "macro": macro,
@@ -1091,6 +1096,7 @@ def run() -> dict:
         "week_calendar": week_calendar if config.ENABLE_WEEK_CALENDAR else None,     # 16.11.2026 (т. 8)
         "overnight": overnight_block if config.ENABLE_OVERNIGHT else None,          # 18.11.2026 (спешно, т. 2): „Нощта“
         "top_themes": [{**t, "items": (t.get("items") or [])[:8]} for t in news_aggregator.LAST_THEMES] if config.ENABLE_NEWS else None,     # 19.11.2026 (пакет 19.11, т. 2)
+        "novelty": novelty_out,                                          # 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ във всеки скрийнър
         "books_earnings_skips": [x for x in backtest.LAST_EARNINGS_SKIPS if x.get("date") == today],     # 19.11.2026 (пакет 19.11, т. 5): без нов вход заради отчет
         "offering_warnings": {t: h["text"] for t, h in (offering_found or {}).items()},   # 16.11.2026 (т. 13): емисии на акции — по тикър (книгите и наблюдаваните на страницата)
         "names": _display_names(),                                       # 16.11.2026 (т. 14): тикър → името на компанията (Wikipedia; наблюдаваните — техните имена)

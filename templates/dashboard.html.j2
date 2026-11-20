@@ -95,6 +95,12 @@
   details:not(.wt-item) > summary::before { content: "▸ "; color: var(--regime); font-weight: 600; }
   details:not(.wt-item)[open] > summary::before { content: "▾ "; }
   /* 30.10.2026 (т. 9–10): разделът CANSLIM — подзаглавията, „На радара“ (сгъната таблица) */
+  .nov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 10px; margin: 6px 0 8px; }
+  .nov-tile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; }
+  .nov-tile .nov-label { color: var(--yellow); font-size: 11.5px; margin: 2px 0 4px; }
+  .nov-tile .kv { display: flex; justify-content: space-between; gap: 8px; margin: 1px 0; }
+  .nov-rows { font-size: 12px; margin: 4px 0 0; }
+  .nov-rows div { padding: 2px 0; border-bottom: 1px dotted var(--line); }
   .cs-sub { font-size: 11.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; margin: 18px 0 8px; }
   .cs-none { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
   details.cs-radar { margin-top: 18px; }
@@ -1031,6 +1037,26 @@
 {% macro spinoff_note_html(p) %}{{ pre_reaction_note(p) }}{{ backdated_note(p) }}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
 
+{# 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ — еднаква плочка за всички скрийнъри; старите валидни — сгънати, по един ред #}
+{% macro novelty_block(nb) %}{% if nb %}
+  <div class="cs-sub">Нови днес · {{ nb.label }} · {{ nb.tiles|length }}</div>
+  {% if nb.tiles %}<div class="nov-grid">{% for t in nb.tiles %}<div class="nov-tile">
+    <div><b>{{ t.ticker }}</b>{% if t.name %} · {{ t.name }}{% endif %} <span class="wt-mark">{{ t.screener }}</span>{% if t.tier %} <span class="wt-mark" style="{{ 'color:var(--yellow)' if t.tier == 'Тренд без ръст' else '' }}">ниво: {{ t.tier }}</span>{% endif %}</div>
+    <div class="nov-label">{{ t.label }}{% if t.status and t.label == 'нов днес' %} · {{ t.status }}{% endif %}</div>
+    <div class="kv"><span>Ниво / аларма</span><b>{{ t.level or "—" }}</b></div>
+    <div class="kv"><span>Стоп</span><b>{{ t.stop or "—" }}</b></div>
+    <div class="kv"><span>Цел</span><b>{{ t.target or "—" }}</b></div>
+    <div class="kv"><span>Разстояние</span><b>{{ t.dist or "—" }}</b></div>
+    {% if t.why %}<div style="color:var(--muted);margin-top:4px">Защо е тук: {{ t.why }}</div>{% endif %}
+    {% if t.earnings %}<div class="earn-warn">{{ t.earnings }}</div>{% endif %}
+    {% if t.levels %}{{ levels_block(t.levels, false, false) }}{% endif %}
+  </div>{% endfor %}</div>
+  {% else %}<div class="small cs-none">Няма нови предложения днес — кешът също е позиция.</div>{% endif %}
+  {% if nb.dropped %}<div class="small" style="font-size:11.5px;color:var(--muted)">Отпаднаха от вчера: {{ nb.dropped|join(", ") }}</div>{% endif %}
+  {% if nb.old %}<details class="nov-old"><summary>Още валидни от предишни дни ({{ nb.old|length }})</summary><div class="nov-rows">
+    {% for r in nb.old %}<div><b>{{ r.ticker }}</b>{% if r.name %} · {{ r.name }}{% endif %} · предложен {{ r.since }} · валиден до {{ r.valid }} · {{ r.dist }}{% if r.earnings %} · <span style="color:var(--yellow)">{{ r.earnings }}</span>{% endif %}</div>{% endfor %}</div></details>{% endif %}
+{% endif %}{% endmacro %}
+
 {# 07.10.2026 (стоп и размер): нива на вход, стоп, ADR и предупреждения — ЕДНАКВИ за всички зрители (от брифа); размерът (акции, сума, загуба при стоп/гап) се смята в браузъра от настройките на читателя
    (sizing_core.js / sizing_ui.js). Без JS се виждат нивата и подсказката "въведи баланса…". #}
 {% macro levels_block(lv, show_entry=true, show_adr=true) %}
@@ -1140,6 +1166,7 @@
   {# 16.11.2026 (пакет 16.11, т. 13): емисии на акции при тикърите в книгите и наблюдаваните (картите го носят сами) #}
   {% if offering_lines %}<div class="small" style="color:var(--red);margin:0 0 8px">{% for l in offering_lines %}<div>{{ l }}</div>{% endfor %}<span style="color:var(--muted)">(EDGAR: 424B / S-1 / S-3 за последните {{ offering_days }} дни — книгите и наблюдаваните)</span></div>{% endif %}
   {{ corp_excluded_line(corp_excluded.get("screener")) }}
+  {% if nov %}{{ novelty_block(nov.canslim) }}<details class="nov-full"><summary>Пълните карти ({{ action_c|length + waiting|length }}) <span class="cs-hint">планът, алармата с обема, размерът</span></summary>{% endif %}
   <div class="cs-sub">Купува се днес · {{ action_c|length }}</div>
   {% for st in action_c %}
   {% set p = st.plan %}
@@ -1300,6 +1327,7 @@
   {% else %}
   <div class="small cs-none">Няма кандидат под pivot с buy-stop.</div>
   {% endif %}
+  {% if nov %}</details>{% endif %}
   {% if radar %}
   <details class="cs-radar">
     <summary>На радара ({{ radar|length }}) <span class="cs-hint">широк стоп, над зоната за покупка, без обем, спрени от режима или отчета — без вход днес</span></summary>
@@ -1561,7 +1589,9 @@
   {% if qm_diag and qm_diag.ok is sameas false %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
   {% else %}
+  {% if nov %}{{ novelty_block(nov.qm) }}{% endif %}
   {% if qm_cards %}
+  {% if nov %}<details class="nov-full"><summary>Пълните карти ({{ qm_cards|length }}) <span class="cs-hint">базата, стягането, книгата, размерът</span></summary>{% endif %}
   <div class="qm-grid" id="qm-cards-grid">
     {% for c in qm_cards %}
     <div class="qm-card{{ ' in-screen' if c.ticker in our_qm else '' }}">
@@ -1586,6 +1616,7 @@
     </div>
     {% endfor %}
   </div>
+  {% if nov %}</details>{% endif %}
   {# 19.11.2026 (пакет 19.11, т. 4): сборът за всички карти — от настройките на читателя, в браузъра (sizing_ui.js) #}
   <div class="lv-sum small" data-scope="#qm-cards-grid" style="font-size:12.5px;margin:4px 0 6px">Ако вземеш всички: въведи баланса в настройките, за да видиш експозицията и риска</div>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">
@@ -1693,9 +1724,11 @@
     стоп лимитът е информация (най-много {{ qm_ep_stop_adr|round|int }}×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
   </div>
   {% for x in qm_ep.sector_bounce or [] %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">{{ x.text }}</div>{% endfor %}
+  {% if nov %}{{ novelty_block(nov.ep) }}{% endif %}
   {% if qm_ep.ok is sameas false and not qm_ep.rows %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
   {% elif qm_ep.rows %}
+  {% if nov %}<details class="nov-full"><summary>Пълната таблица ({{ qm_ep.rows|length }})</summary>{% endif %}
   <div class="card" style="padding:6px 4px">
     <table class="pos-table qm-ep-table">
       <thead><tr><th>Тикър</th><th class="n">AH гап</th><th>Новина</th><th class="n">Ръст 3 м.</th><th class="n">Стоп лимит (1×ADR)</th></tr></thead>
@@ -1719,6 +1752,7 @@
       </tbody>
     </table>
   </div>
+  {% if nov %}</details>{% endif %}
   {% else %}
   <div class="small" style="font-size:12.5px;color:var(--muted)">няма after-hours гапове ≥ {{ qm_ep_gap|round|int }}% при „пренебрегнати“ тикъри{% if qm_ep.diag and qm_ep.diag.tickers_with_ah %} (проверени {{ qm_ep.diag.tickers_with_ah }} тикъра с after-hours бар){% endif %}</div>
   {% endif %}
@@ -1848,8 +1882,10 @@
   <div class="small" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Няма GLB кандидати днес — проверени {{ glb_status.with_history }} от {{ glb_status.universe }} тикъра{% if glb_status.batches_failed %} ({{ glb_status.batches_failed }} партиди не се изтеглиха){% endif %}.</div>
   {% endif %}
   {{ corp_excluded_line(corp_excluded.get("glb")) }}
+  {% if nov %}{{ novelty_block(nov.glb_classic) }}{{ novelty_block(nov.glb_momentum) }}<details class="nov-full"><summary>Пълните таблици ({{ glb_candidates|length }})</summary>{% endif %}
   {% call glb_list("classic", "Classic", glbg.classic) %}<b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията (наш етикет, не на Уиш).{% endcall %}
   {% call glb_list("momentum", "Momentum", glbg.momentum) %}<b style="color:var(--yellow)">Momentum</b> = по-малко от това — бърз / волатилен пробив; по-висок очакван drawdown от Classic.{% endcall %}
+  {% if nov %}</details>{% endif %}
   {% if glbg.insufficient.cards %}
   <div class="glb-insufficient-note">Недостатъчна дневна история за Classic / Momentum (валиден месечен пробив, без тип): {{ glbg.insufficient.cards|map(attribute='ticker')|join(', ') }}</div>
   {% endif %}

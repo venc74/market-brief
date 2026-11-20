@@ -725,6 +725,9 @@ NEWS_PRIORITY_EXTRA_PER_SOURCE = int(os.getenv("NEWS_PRIORITY_EXTRA_PER_SOURCE",
 # 20.11.2026 (пакет 20.11, т. 1): AI текстът излиза от брифа — макро разказът е шаблон от кода (src/macro_template.py), новините и крипто — без AI „защо“; AI само избира (по индекс)
 # и превежда заглавията (src/translate.py, с проверка на числата, тикърите и имената). 1 връща старото (кодът остава за тестовете и за връщане).
 ENABLE_AI_MACRO = int(os.getenv("ENABLE_AI_MACRO", 0))
+# 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ (src/novelty.py) — „близо до вход“ до толкова % до нивото; колко брифа назад за „предложен ДД.ММ“
+NOVELTY_NEAR_PCT = float(os.getenv("NOVELTY_NEAR_PCT", 2.0))
+NOVELTY_HISTORY_BRIEFS = int(os.getenv("NOVELTY_HISTORY_BRIEFS", 20))
 NEWS_AI_WHY = int(os.getenv("NEWS_AI_WHY", 0))
 NEWS_TRANSLATE = int(os.getenv("NEWS_TRANSLATE", 1))
 # 19.11.2026 (пакет 19.11, т. 2): топ темите (src/top_themes.py) — първата страница / световните новини (само за темите и техния приоритет) и праговете
