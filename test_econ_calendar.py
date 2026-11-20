@@ -94,4 +94,19 @@ src = (ROOT / "src" / "main.py").read_text(encoding="utf-8")
 assert 'steps.step("week_calendar", _week_calendar' in src and '"week_calendar": week_calendar' in src
 print("  ✓ секцията и имейлът; провал — червен ред")
 
+print("── 5. месечният опционен падеж (20.11.2026, т. 5) ──")
+assert ec.monthly_opex(2026, 11) == dt.date(2026, 11, 20) and ec.monthly_opex(2026, 12) == dt.date(2026, 12, 18)
+assert ec.monthly_opex(2027, 3) == dt.date(2027, 3, 19) and ec.monthly_opex(2028, 4) == dt.date(2028, 4, 21)       # Good Friday 2028 е 14.04 — не е третият петък
+from src import sessions as _ss
+_orig_is = _ss.is_session
+_ss.is_session = lambda d: d != dt.date(2026, 11, 20) and _orig_is(d)                                            # СИНТЕТИЧНО: третият петък — празник
+try:
+    assert ec.monthly_opex(2026, 11) == dt.date(2026, 11, 19)
+finally:
+    _ss.is_session = _orig_is
+assert ec.opex_note(dt.date(2026, 11, 20)) == "месечен опционен падеж (трети петък)" and ec.opex_note(dt.date(2026, 11, 19)) is None
+assert "тримесечен" in ec.opex_note(dt.date(2026, 12, 18))
+d20 = next(d for d in W["days"] if d["date"] == "2026-11-20")
+assert ec.day_lines(d20)[0] == "опции: месечен опционен падеж (трети петък)"
+print("  ✓ 20.11.2026 — трети петък; 18.12 — тримесечен; празник в третия петък → четвъртъкът преди него")
 print("\n✅ test_econ_calendar: всичко мина")

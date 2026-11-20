@@ -172,6 +172,24 @@ def reconcile_dates(week: dict, known: dict | None) -> dict:
     return out
 
 
+def monthly_opex(year: int, month: int) -> dt.date:
+    """
+    20.11.2026 (пакет 20.11, т. 5): месечният опционен падеж — третият петък на месеца; ако е борсов празник — четвъртъкът преди него (Good Friday). Чиста функция.
+    """
+    from src import sessions
+    d = dt.date(year, month, 1)
+    first_fri = d + dt.timedelta(days=(4 - d.weekday()) % 7)
+    third = first_fri + dt.timedelta(days=14)
+    return third if sessions.is_session(third) else third - dt.timedelta(days=1)
+
+
+def opex_note(day: dt.date) -> str | None:
+    """„месечен опционен падеж (трети петък)“ — и „тримесечен: фючърси и опции на индекси“ през март, юни, септември, декември; друг ден → None."""
+    if day != monthly_opex(day.year, day.month):
+        return None
+    return "месечен опционен падеж (трети петък)" + (" — тримесечен: изтичат и фючърсите и опциите на индексите" if day.month in (3, 6, 9, 12) else "")
+
+
 def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None, earnings_fn=None) -> dict:
     """
     → {"ok", "source", "days": [{date, weekday, earnings, fed, econ}], "errors": [...], "big_n", "ours_n"}. big — {тикър: етикет} (компаниите > 2% в S&P 500), ours — {тикър: къде}
@@ -204,6 +222,8 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
             out["errors"].append(f"отчети {d:%d.%m}: {type(e).__name__}")
             print(f"[calendar] отчети {d}: {type(e).__name__}: {e}")
         add_fed_schedule(day)                                                  # 17.11.2026 (т. 8): FOMC по графика, когато Nasdaq го няма
+        if opex_note(d):                                                       # 20.11.2026 (пакет 20.11, т. 5): месечният опционен падеж
+            day["opex"] = opex_note(d)
         out["days"].append(day)
     bad = dates_ok(econ_by_day)
     if bad:
@@ -240,6 +260,8 @@ def group_events(rows: list[dict]) -> list[dict]:
 def day_lines(day: dict) -> list[str]:
     """Редовете за един ден — отчетите, Fed, данните. Чиста функция."""
     lines = []
+    if day.get("opex"):                                                        # 20.11.2026 (т. 5)
+        lines.append(f"опции: {day['opex']}")
     for e in day.get("earnings") or []:
         lines.append(f"отчет: {e['ticker']} · {e['name']} — {e['when']}" + (f" (EPS очаквана {e['eps_forecast']}, Nasdaq)" if e.get("eps_forecast") else "")      # 17.11.2026: с източника
                      + (f" · {e['why']}" if e.get("why") else "") + (f" · {e['date_note']}" if e.get("date_note") else ""))
