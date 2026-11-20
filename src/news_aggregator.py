@@ -194,7 +194,7 @@ LAST_THEMES: list = []         # 19.11.2026 (т. 2): топ темите на д
 # (редуването) — Reuters ≈ 31 от 50, и заглавията за отчета на Nvidia вероятно не стигнаха до модела. Сега първо са заглавията, които споменават нашите тикъри и компании
 # (позициите в книгите, наблюдаваните, картите, „Нощта“ и календарът за деня), после останалите в досегашния ред; след тавана на източника (50) се вземат и приоритетните
 # (до config.NEWS_PRIORITY_EXTRA_PER_SOURCE). Съвпадението е по името (без правната форма; думите, които не са общи — _GENERIC; главни букви → без значение на регистъра)
-# и по тикъра (3+ знака, главни, като дума). Грешно съвпадение само мести заглавие напред — не маха нищо.
+# и по тикъра (3+ знака, главни, като дума). Грешно съвпадение само мести заглавие напред — не маха нищо; от 20.11 съвпадението е и „наши тикъри“ под новината (finish_rows).
 # ══════════════════════════════════════════════════════════════════════════
 _GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "international", "global", "american", "america", "national", "united", "first", "general",
             "financial", "energy", "bank", "capital", "technologies", "technology", "systems", "industries", "services", "solutions", "health", "healthcare", "resources",
@@ -206,7 +206,18 @@ _GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "in
             # 18.11.2026: места и посоки — „Manhattan closet“ (MANH — Manhattan Associates), „West Bank“ / „East-West pipeline“ (WST — West Pharmaceutical) в пула от 18.11
             "west", "east", "north", "south", "central", "manhattan", "texas", "york", "boston", "chicago", "atlanta", "pacific", "atlantic", "republic", "federal", "state",
             # 18.11.2026 (по историята — 1035 заглавия 13.06–18.11): „Nasdaq“ (NDAQ — името е индексът, 9 фалшиви), „Companies“ (TRV), „Aerospace“ (GE)
-            "companies", "aerospace", "defense", "chemical", "chemicals", "materials", "logistics", "automotive"}
+            "companies", "aerospace", "defense", "chemical", "chemicals", "materials", "logistics", "automotive",
+            # 20.11.2026 (пакет 20.11, т. 1 — „наши тикъри“ под новината): по историята — 1366 заглавия × 922 имена от brief["names"]: „Reuters“ (TRI, 233 — наставката на
+            # източника), „News“ (News Corp, 93), „Gold“ (Royal Gold, 20 — цената на златото), „Dollar“ (DLTR / DG, 18 — валутата; 20.11: „Dollar near 19-month high“ → DLTR),
+            # „Dow“ (12 — Dow futures), „Live“ (10 — „Live updates“), „Morgan“ (J.P. Morgan → Kinder Morgan), „Stanley“ / „Black“ (Morgan Stanley, „first Black House speaker“),
+            # „Cincinnati“ (Cincinnati Zoo), „Commerce“ (министерството), „Electronics“ (Samsung), „Grand“ (Grand Theft Auto), „Investors“, „Silicon“ (Silicon Data),
+            # „Applied“ (Applied Compute), „River“ (River One), „Banking“ (Senate Banking), „Express“ (Asia Express), „Biotech“, „Booking“ („Booking a Hilton stay“),
+            # „Fidelity“ (Fidelity Investments), „Freight“, „Jones“ (S&P Dow Jones → JLL), „Five“ („Five things to know“), „Information“ (The Information → FIS), „Illinois“, „Alaska“, „Valley“ (Silicon
+            # Valley), „Southwest“ (Southwest Airlines → SWX), „Micro“ (Super Micro → AMD), „Post“ (NY Post), „Martin“ (Lockheed Martin → MLM), „Warner“ / „Bros“ (Warner Bros.),
+            # „Duke“, „Johnson“ (кандидатът за SEC → JNJ / JCI); пълното име и тикърът — както досега; кратко име от главни (≤ 3 знака) — с регистъра („Nov.“ ≠ NOV)
+            "five", "information", "illinois", "alaska", "valley", "southwest", "micro", "post", "martin", "warner", "bros", "duke", "johnson",
+            "reuters", "news", "gold", "dollar", "dow", "live", "morgan", "stanley", "black", "cincinnati", "commerce", "electronics", "grand", "investors", "silicon",
+            "applied", "river", "banking", "express", "biotech", "booking", "fidelity", "freight", "jones"}
 _LEGAL_RE = re.compile(r"\s*\((?:the|The)\)|,?\s+(?:Inc\.?|Incorporated|Corporation|Corp\.?|Company|Co\.?|Ltd\.?|Limited|plc|PLC|N\.V\.|S\.A\.|AG|SE)\b\.?", re.I)
 
 
@@ -217,7 +228,7 @@ def priority_matchers(entries: list[dict] | None) -> list[tuple[str, re.Pattern]
         t, name = str(e.get("ticker") or "").upper(), _LEGAL_RE.sub("", str(e.get("name") or "").split(",")[0]).strip()
         alts = []
         if len(name) >= 3 and name.casefold() not in _GENERIC:                # „Nasdaq“ (NDAQ) — общо име, само тикърът
-            alts.append(r"\b" + re.escape(name) + r"\b" if not name.isupper() else r"(?i:\b" + re.escape(name) + r"\b)")
+            alts.append(r"\b" + re.escape(name) + r"\b" if not name.isupper() or len(name) <= 3 else r"(?i:\b" + re.escape(name) + r"\b)")
         for w in re.findall(r"[A-Za-z][A-Za-z0-9&-]{3,}", name):
             if w.casefold() not in _GENERIC and w != name:
                 alts.append(r"(?i:\b" + re.escape(w) + r"\b)" if w.isupper() else r"\b" + re.escape(w) + r"(?:'s|’s)?\b")

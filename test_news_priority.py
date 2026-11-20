@@ -100,6 +100,24 @@ assert [x["title"] for x in plain] == ["Headline one", "Headline two"]
 assert [x["title"] for x in kept] == ["Headline one", "Headline two", "Apple earnings due"] and kept[2]["beyond_limit"]        # keep_max=1
 print("  ✓ таванът 2 + 1 приоритетно след него (keep_max)")
 
+print("── 4б. „наши тикъри“ под новината (20.11): общите думи не са компания — РЕАЛНИ заглавия (брифовете от датите), имената — от brief[\"names\"] ──")
+# По историята (1366 заглавия × 922 имена): 920 → 359 попадения, 561 паднали (Reuters → TRI 233, News → News Corp 93, Gold, Dollar, Dow, Live, Morgan, Electronics, …), 0 нови.
+M6 = na.priority_matchers([{"ticker": "DLTR", "name": "Dollar Tree"}, {"ticker": "DG", "name": "Dollar General"}, {"ticker": "ANT", "name": "Anthropic, PBC"},
+                           {"ticker": "ARW", "name": "Arrow Electronics"}, {"ticker": "KMI", "name": "Kinder Morgan"}, {"ticker": "MS", "name": "Morgan Stanley"},
+                           {"ticker": "NOV", "name": "NOV Inc."}, {"ticker": "RGLD", "name": "Royal Gold"}, {"ticker": "DOW", "name": "Dow Inc."},
+                           {"ticker": "LYV", "name": "Live Nation Entertainment"}, {"ticker": "TRI", "name": "Thomson Reuters"}])
+for h, want in [("Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid - Reuters", []),                         # 20.11 (до поправката — DLTR)
+                ("Dollar General is sued by the FTC and 20 states for what's being described as deceptive pricing - AP News", ["DG"]),      # 27.10 — пълното име
+                ("Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI", ["ANT"]),                    # 20.11
+                ("Samsung Electronics Q2 operating profit beats estimates on soaring AI chip demand", []),                                  # 30.07
+                ("Asia tech sell-off has not derailed AI investment cycle, J.P. Morgan says", []),                                           # 06.08
+                ("Morgan Stanley says it is among the first banks to tokenize real world assets", ["MS"]),                                  # 05.11
+                ("Nasdaq-listed Canton Strategic Holdings plans tokenized stock trading from Nov. 2", []),                                   # 30.10
+                ("Gold drops more than 2% on US rate-hike bets", []), ("Dow futures fall 300 points to start shortened week as oil prices climb", []),  # 28.09, 08.09
+                ("Live updates: Binance $6.3B hack linked to North Korea’s TraderTraitor", [])]:                                            # 30.10
+    assert na.priority_hits(h, M6) == want, (h, na.priority_hits(h, M6))
+print("  ✓ Dollar / Gold / Dow / Live / Morgan / Electronics / „Nov.“ / „- Reuters“ — без тикър; Dollar General, Morgan Stanley, ANT — по пълното име / тикъра")
+
 print("── 5. сивият ред и main ──")
 nw = {"to_model": {"Reuters Business": 50, "CNBC": 29, "Financial Times": 10, "AP Business": 11}, "fetched": {"Reuters Business": 55}, "pool_used": 100, "pool_total": 144,
       "priority": {"names": 51, "hits": 16, "in_pool": 16, "beyond_limit": 5, "tickers": ["NVDA"]}}
