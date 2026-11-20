@@ -49,6 +49,24 @@ assert tr.problems("Anthropic IPO takeaways: ANT debuts with $1.8 trillion marke
                    "Изводи от IPO-то: дебют с пазарна капитализация от $1,8 в повратен момент за AI", CAPS) == ["trillion", "ANTHROPIC", "ANT"]
 print("  ✓ 7 от 7 приети (вкл. „nearly 900,000“ → „близо 900 000“); „90 000“ → липсва 900000; без мащаба / имената → изброени")
 
+print("── 2б. числото с мащаба ($6.3B, $81bn, $77.5M) и съкращението в мн. ч. (ETFs) — заглавията РЕАЛНИ, преводите СИНТЕТИЧНИ ──")
+# РЕАЛНИ заглавия: крипто на 20.11 (data/2026-11-20.json), 30.10 („$6.3bn“), 19.11 („$81bn“), 28.10 („$110M after $774M“). До поправката „$6.3bn“ се четеше като 6, а „$81bn“ —
+# изобщо не (в историята — 64 от 1366 заглавия); „ETFs“ искаше „ETFS“ в превода („ETF-и“ — отхвърлен).
+OK2 = [("Singapore settles $77.5M tokenized bill sale with wholesale CBDC", "Сингапур уреди продажба на токенизирани ценни книжа за $77,5 млн с CBDC на едро"),
+       ("Institutions pile back into US Bitcoin ETFs in Q3 after selling streak", "Институциите се връщат в американските Bitcoin ETF-и през Q3 след серия от продажби"),
+       ("Binance wins $6.5 billion feezing order against hackers behind crypto's largest theft", "Binance извоюва запор за $6,5 млрд срещу хакерите зад най-голямата кражба в крипто"),
+       ("Binance halts withdrawals after $6.3bn hack", "Binance спря тегленията след хак за $6,3 млрд"),
+       ("Anthropic raises $81bn in record IPO", "Anthropic набра $81 млрд в рекордно IPO"),
+       ("Bitcoin ETFs claw back $110M after $774M exit", "Bitcoin ETF-ите си върнаха $110 млн след изтегляне на $774 млн")]
+for o, b in OK2:
+    assert tr.problems(o, b, CAPS) == [], (o, tr.problems(o, b, CAPS))
+assert tr.numbers("Binance halts withdrawals after $6.3bn hack") == [6.3] and tr.numbers("Anthropic raises $81bn in record IPO") == [81.0]
+assert tr.problems("Binance halts withdrawals after $6.3bn hack", "Binance спря тегленията след хак за $6 млрд", CAPS) == ["6.3"]
+assert tr.problems("Binance halts withdrawals after $6.3bn hack", "Binance спря тегленията след хак за $6,3", CAPS) == ["billion"]
+assert tr.problems("Singapore settles $77.5M tokenized bill sale with wholesale CBDC", "Сингапур уреди продажба за $77,5 млрд с CBDC", CAPS) == ["million"]
+assert tr.numbers("3M beats estimates") == [] and tr.numbers("Iran sells oil as 40M barrels exported") == []     # СИНТЕТИЧНО: суфикс без валута — без проверка
+print(f"  ✓ {len(OK2)} от {len(OK2)} приети; „$6 млрд“ за $6.3bn → липсва 6.3; без „млрд“ → липсва billion; млрд вместо млн → липсва million")
+
 print("── 3. новините без AI „защо“: подборът по индекс, преводът, нашите тикъри (СИНТЕТИЧНИ отговори на AI) ──")
 pool_titles = [p[2] for p in FX["pool"]]
 raw = [{"source": p[0], "published": p[1], "title": p[2], "summary": ""} for p in FX["pool"]]

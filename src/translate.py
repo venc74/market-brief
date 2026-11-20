@@ -21,8 +21,12 @@ RULES = ("Преведи всяко заглавие на български. П
          'Върни JSON: {"bg": ["превод на заглавие 0", "превод на заглавие 1", ...]} — в същия ред и същия брой.')
 
 _SUFFIX = re.compile(r"\s+-\s+(?:Reuters|AP News|AP|CNBC|Financial Times|FT|Bloomberg)\s*$")
-_NUM_EN = re.compile(r"(?<![\w.])\d+(?:,\d{3})*(?:\.\d+)?(?![\w])")
-_NUM_BG = re.compile(r"(?<![\w.,])\d{1,3}(?:[  ]\d{3})+(?:[.,]\d+)?(?![\w])|(?<![\w.,])\d+(?:[.,]\d+)?(?![\w])")
+# 20.11.2026 (прегледът на страницата): числото — цяло, с мащаба след него ($6.3B, $81bn, $77.5M); до тази поправка „$6.3B“ се четеше като 6 (regex-ът се връщаше назад до
+# „6“), а „$81bn“ — изобщо не: в историята на брифовете 64 от 1366 заглавия (Binance $6.3B, FT „$Xbn“) — верен превод „$6,3 млрд“ щеше да е отхвърлен. Суфиксът брои само след
+# валута ($ € £): „3M“ (компанията) и „40M barrels“ (единственият такъв случай в историята) — без проверка на числото.
+_SUFFIXES = {"M": "million", "mn": "million", "B": "billion", "bn": "billion", "T": "trillion", "tn": "trillion"}
+_NUM_EN = re.compile(r"(?<![\w.])(\d+(?:,\d{3})*(?:\.\d+)?)(M|B|T|bn|mn|tn)?(?![\w]|[.,]\d)")
+_NUM_BG = re.compile(r"(?<![\w.,])(\d{1,3}(?:[  ]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?)(M|B|T|bn|mn|tn)?(?![\w]|[.,]\d)")
 _SCALE = [(re.compile(r"\b(?:billion|bn)\b", re.I), re.compile(r"млрд|милиард", re.I), "billion"),
           (re.compile(r"\b(?:trillion|tn)\b", re.I), re.compile(r"трлн|трилион", re.I), "trillion"),
           (re.compile(r"\b(?:million|mln)\b", re.I), re.compile(r"млн|милион", re.I), "million")]
@@ -62,9 +66,21 @@ def _num_value(tok: str, bg: bool) -> float | None:
         return None
 
 
+def _matches(s: str, bg: bool) -> list[tuple[float, str | None]]:
+    """[(стойност, мащаб от суфикса | None)]; число със суфикс без валута преди него — пропуснато (3M, 40M barrels)."""
+    s = s or ""
+    out = []
+    for m in (_NUM_BG if bg else _NUM_EN).finditer(s):
+        if m.group(2) and not (m.start() > 0 and s[m.start() - 1] in "$€£"):
+            continue
+        v = _num_value(m.group(1), bg)
+        if v is not None:
+            out.append((v, _SUFFIXES.get(m.group(2)) if m.group(2) else None))
+    return out
+
+
 def numbers(s: str, bg: bool = False) -> list[float]:
-    rx = _NUM_BG if bg else _NUM_EN
-    return [v for v in (_num_value(m.group(0), bg) for m in rx.finditer(s or "")) if v is not None]
+    return [v for v, _ in _matches(s, bg)]
 
 
 def names(orig: str, caps: set | None = None) -> list[str]:
@@ -79,6 +95,8 @@ def names(orig: str, caps: set | None = None) -> list[str]:
             continue
         if m.start() == 0 and not (raw.isupper() or re.search(r"['’]s$", raw) or (caps is not None and n in caps) or n in _PLACES):
             continue
+        if re.fullmatch(r"[A-Z]{2,}s", raw):                # 20.11.2026: съкращение в мн. ч. — ETFs → ETF (преводът „ETF-и“); в историята — ETFs ×14, IPOs, AGs
+            n = raw[:-1]
         out.append(n)
     return list(dict.fromkeys(out))
 
@@ -93,8 +111,10 @@ def problems(orig: str, bg: str | None, caps: set | None = None) -> list[str]:
     for v in numbers(o):
         if not any(abs(v - x) < 1e-9 for x in nb):
             miss.append(f"{v:g}")
+    bg_suffix = {sc for _, sc in _matches(bg, True) if sc}
+    en_suffix = {sc for _, sc in _matches(o, False) if sc}
     for en, bgx, lab in _SCALE:
-        if en.search(o) and not bgx.search(bg):
+        if (en.search(o) or lab in en_suffix) and not (bgx.search(bg) or lab in bg_suffix):
             miss.append(lab)
     low = bg.lower()
     for n in names(o, caps):
