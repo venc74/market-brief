@@ -400,7 +400,8 @@ def _qm_open_html(c: dict) -> str:
     moved = ""
     if isinstance(b.get("level0"), (int, float)) and isinstance(c.get("trigger"), (int, float)) and abs(b["level0"] - c["trigger"]) > 0.005 and b.get("level0_date"):
         moved = f'<br><span style="color:#6b7280;font-size:12px">ниво от {b["level0_date"][8:10]}.{b["level0_date"][5:7]} ${b["level0"]:.2f} → днес ${c["trigger"]:.2f}</span>'
-    if b.get("filled") is False:                                                 # 20.11.2026 (пакет 20.11, т. 4): без реален вход — не „OPEN“
+    filled = b["filled"] if "filled" in b else b.get("status") not in ("pending", None)        # стар бриф без полето — по статуса на записа
+    if not filled:                                                               # 20.11.2026 (пакет 20.11, т. 4): без реален вход — не „OPEN“
         d = b.get("level0_date") or b["since"]
         return f'<br><span style="color:#6b7280;font-size:12px">в книгата · чака пробив (от {d[8:10]}.{d[5:7]})</span>' + moved
     return f'<br><span style="color:#1d4ed8;font-size:12px">📈 OPEN — вход в книгата от {b["since"][8:10]}.{b["since"][5:7]}{price} — новото ниво не е нов вход</span>' + moved
