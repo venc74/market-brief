@@ -730,6 +730,12 @@ NOVELTY_NEAR_PCT = float(os.getenv("NOVELTY_NEAR_PCT", 2.0))
 NOVELTY_HISTORY_BRIEFS = int(os.getenv("NOVELTY_HISTORY_BRIEFS", 20))
 NEWS_AI_WHY = int(os.getenv("NEWS_AI_WHY", 0))
 NEWS_TRANSLATE = int(os.getenv("NEWS_TRANSLATE", 1))
+# 23.11.2026 (пакет 23.11, т. 1): новините никога празни. На 23.11 (понеделник, 300 заглавия, ~19 800 входни токена) подборът спря на 1000 изходни токена (групите „също“ с ехото на
+# по 6 думи) → TruncatedResponse → секцията празна. Лимитът на изхода; при отрязан отговор — повторен опит с толкова от пула (първите — темите и нашите тикъри); пак отрязан
+# или грешка → резервен подбор от кода (news_aggregator.code_pick: „Топ теми“, после заглавията за нашите тикъри и компании). Банерът казва пътя.
+NEWS_SELECT_MAX_TOKENS = int(os.getenv("NEWS_SELECT_MAX_TOKENS", 3000))
+NEWS_RETRY_POOL_SHARE = float(os.getenv("NEWS_RETRY_POOL_SHARE", 0.5))
+NEWS_CODE_PICK_ALSO = int(os.getenv("NEWS_CODE_PICK_ALSO", 3))          # резервният подбор — до толкова заглавия в „също“ на ред
 # 19.11.2026 (пакет 19.11, т. 2): топ темите (src/top_themes.py) — първата страница / световните новини (само за темите и техния приоритет) и праговете
 NEWS_FRONT_FEEDS = {
     "FT World": "https://www.ft.com/world?format=rss",

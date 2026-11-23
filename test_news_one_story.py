@@ -87,6 +87,6 @@ assert ' · +2 източника</span>' in mail and d["also"][0]["link"] not i
 assert f'href="{esc(d["link"])}"' in page                                                                                   # основното заглавие остава линк
 print("  ✓ страница и имейл")
 import inspect
-assert "{ALSO_RULE}" in inspect.getsource(na.significant_news) and "Същата тема НЕ е същото събитие" in na.ALSO_RULE and '"also": [{"i": 5' in inspect.getsource(na.significant_news)
+assert "{ALSO_RULE}" in inspect.getsource(na._select_user) and "Същата тема НЕ е същото събитие" in na.ALSO_RULE and '"also": [{"i": 5' in inspect.getsource(na._select_user)   # 23.11.2026: промптът — в _select_user
 print("  ✓ правилото „една история — една новина“ и полето \"also\" — в промпта")
 print("\n✅ test_news_one_story: всичко мина")

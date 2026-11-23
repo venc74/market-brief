@@ -147,6 +147,15 @@ def _breadth_warning(ind: dict | None) -> list[dict]:
                          "и статусът на индикатора са върху непълен универс.")}]
 
 
+# 23.11.2026 (пакет 23.11, т. 1): пътят на подбора на новините — банерът (data_warnings) и редът под секцията (render.news_path_note)
+NEWS_PATH_TEXT = {
+    "ai": "Значими новини: подбор — AI.",
+    "ai_retry": ("Значими новини: подбор — AI, повторен опит с по-малък вход (първият отговор беше отрязан); заглавията извън по-малкия пул не са оценени."),
+    "code": ("Значими новини: резервен подбор от кода — AI подборът не успя; показани са „Топ теми“ и заглавията за нашите тикъри и компании, по приоритет, "
+             "без оценка за значимост — пазарно важни новини извън тях може да липсват."),
+}
+
+
 def _partial_warnings(sector_status: dict | None, screener_status: dict | None, glb_status: dict | None,
                       ins_pos_status: dict | None, news_status: dict | None, canary: dict | None, fred_key_missing: bool) -> list[dict]:
     """
@@ -187,8 +196,9 @@ def _partial_warnings(sector_status: dict | None, screener_status: dict | None, 
     ns = news_status or {}
     if ns and not ns.get("ok"):
         out.append({"source": "news", "level": "warn",
-                    "message": (f"Значими новини: няма днес ({ns.get('reason') or 'неизвестна причина'}) — макро текстът, тезите и проверката на AI текста на картите са без "
-                                "новинарски фон; това НЕ значи, че няма новини.")})
+                    "message": f"Значими новини: няма днес ({ns.get('reason') or 'неизвестна причина'}) — това НЕ значи, че няма новини."})
+    elif ns.get("path") in ("ai_retry", "code"):                    # 23.11.2026 (пакет 23.11, т. 1): кой път на подбора е ползван
+        out.append({"source": "news", "level": "warn", "message": NEWS_PATH_TEXT[ns["path"]]})
     c = canary or {}
     if c and c.get("ok") is None:
         out.append({"source": "data_canary", "level": "warn",

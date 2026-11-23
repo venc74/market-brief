@@ -194,7 +194,8 @@ LAST_THEMES: list = []         # 19.11.2026 (т. 2): топ темите на д
 # (редуването) — Reuters ≈ 31 от 50, и заглавията за отчета на Nvidia вероятно не стигнаха до модела. Сега първо са заглавията, които споменават нашите тикъри и компании
 # (позициите в книгите, наблюдаваните, картите, „Нощта“ и календарът за деня), после останалите в досегашния ред; след тавана на източника (50) се вземат и приоритетните
 # (до config.NEWS_PRIORITY_EXTRA_PER_SOURCE). Съвпадението е по името (без правната форма; думите, които не са общи — _GENERIC; главни букви → без значение на регистъра)
-# и по тикъра (3+ знака, главни, като дума). Грешно съвпадение само мести заглавие напред — не маха нищо; от 20.11 съвпадението е и „наши тикъри“ под новината (finish_rows).
+# и по тикъра (3+ знака, главни, като дума). Грешно съвпадение само мести заглавие напред — не маха нищо; от 20.11 съвпадението е и „наши тикъри“ под новината (finish_rows),
+# от 23.11 — и редовете на резервния подбор (code_pick).
 # ══════════════════════════════════════════════════════════════════════════
 _GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "international", "global", "american", "america", "national", "united", "first", "general",
             "financial", "energy", "bank", "capital", "technologies", "technology", "systems", "industries", "services", "solutions", "health", "healthcare", "resources",
@@ -217,7 +218,10 @@ _GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "in
             # „Duke“, „Johnson“ (кандидатът за SEC → JNJ / JCI); пълното име и тикърът — както досега; кратко име от главни (≤ 3 знака) — с регистъра („Nov.“ ≠ NOV)
             "five", "information", "illinois", "alaska", "valley", "southwest", "micro", "post", "martin", "warner", "bros", "duke", "johnson",
             "reuters", "news", "gold", "dollar", "dow", "live", "morgan", "stanley", "black", "cincinnati", "commerce", "electronics", "grand", "investors", "silicon",
-            "applied", "river", "banking", "express", "biotech", "booking", "fidelity", "freight", "jones"}
+            "applied", "river", "banking", "express", "biotech", "booking", "fidelity", "freight", "jones",
+            # 23.11.2026 (пакет 23.11, т. 1 — резервният подбор показва заглавията за нашите тикъри): „Music Review: 'Grand Theft Auto VI: The Album'“ → WMG (Warner Music Group);
+            # по историята със списъка от 23.11 (38 имена) — единственото грешно попадение
+            "music"}
 _LEGAL_RE = re.compile(r"\s*\((?:the|The)\)|,?\s+(?:Inc\.?|Incorporated|Corporation|Corp\.?|Company|Co\.?|Ltd\.?|Limited|plc|PLC|N\.V\.|S\.A\.|AG|SE)\b\.?", re.I)
 
 
@@ -663,6 +667,164 @@ def finish_rows(rows: list[dict], matchers: list | None, pool_all: list | None =
                 r.setdefault("translation_note", "преводът не се получи")
 
 
+
+def _select_user(pool: list[dict], max_items: int) -> str:
+    """Промптът на подбора (без промяна от 20.11; 23.11 — изнесен, за да се ползва и в повторния опит). Всяко заглавие с индекс "i" — заглавието в брифа е дословно от пула."""
+    compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r.get("summary") or ""} for k, r in enumerate(pool)]
+    return (
+        "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
+        "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "
+        "секторни движения, суровини, "
+        # FIX 2026-09-18: регулаторни/законодателни събития нямаха СВОЯ категория
+        # и системно отпадаха. Потвърдено на 18.09 — Reuters "US securities
+        # regulator rolls out five-year exemption for tokenized stock trading"
+        # беше в суровия пул и не влезе в осемте.
+        "регулаторни и законодателни събития с пазарен ефект (решения и правила "
+        "на SEC/CFTC/FTC/ЕК, гласувания в Конгреса, антитръст, тарифи, санкции). "
+        + (f"Максимум {max_items} новини, всяка с едно "
+           "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
+           "заглавие дословно по индекса \"i\" от списъка.\n" if config.NEWS_AI_WHY else
+           f"Максимум {max_items} новини. НЕ пишеш коментар и не превеждаш — само избираш по индекса \"i\"; кодът показва оригиналното заглавие дословно.\n") +
+        # 19.10.2026 (трети преглед, С3 + "why" = заглавието): ехо на заглавието за проверка на индекса; why — само ефектът, без преразказ и без числа извън източника
+        "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен.\n"
+        + ("\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието и не носи числа, "
+           "които ги няма в \"t\" или \"d\" на същата новина.\n" if config.NEWS_AI_WHY else "") +
+        # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина
+        f"{ALSO_RULE}\n\n"
+        f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
+        + ('Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' if config.NEWS_AI_WHY else
+           'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "also": [{"i": 5, "h": "първите шест думи"}]}]}')
+    )
+
+
+def news_selection_call(user: str, max_tokens: int) -> str:
+    """AI извикването на подбора — именувана функция (етикетът „Значими новини“ в brief["ai_usage"])."""
+    from src import ai_brief
+    return ai_brief._call_claude(_SYSTEM, user, max_tokens=max_tokens)
+
+
+def _ai_pick(pool: list[dict], max_items: int, call=None) -> tuple[list[dict], list[dict], list]:
+    """Един опит на AI подбора → (новини, отпаднали, върнатото от модела). Хвърля при грешка / отрязан отговор."""
+    from src import ai_brief
+    text = (call or news_selection_call)(_select_user(pool, max_items), config.NEWS_SELECT_MAX_TOKENS)
+    data = ai_brief._parse_json(text)
+    got = data.get("news", []) if isinstance(data, dict) else []
+    news, dropped = pick_verbatim(got, pool, max_items)
+    return news, dropped, got
+
+
+def code_pick(themes_: list[dict] | None, pool_all: list[dict] | None, matchers: list | None, max_items: int = 8, front: list[dict] | None = None) -> list[dict]:
+    """
+    23.11.2026 (пакет 23.11, т. 1): резервният подбор от кода — когато AI подборът падне два пъти. По реда на приоритета в пула: първо „Топ теми“ (представителното заглавие на
+    темата, „също“ — по едно от другите издатели), после заглавията за нашите тикъри и компании (позициите в книгите, наблюдаваните, картите, „Нощта“, отчетите за деня — по реда
+    на списъка; на тикър — най-новото заглавие, „също“ — следващите); нищо от двете → първата страница (config.NEWS_FRONT_FEEDS). Без оценка за значимост и без коментар;
+    row["picked_by"] = "theme" / "ours" / "front". Чиста функция.
+    """
+    pool_all = list(pool_all or [])
+    full = {(r.get("title") or "").lower()[:90]: r for r in pool_all + list(front or [])}
+    used: set = set()
+    rows: list[dict] = []
+    n_also = config.NEWS_CODE_PICK_ALSO
+
+    def mk(it: dict, others: list[dict], by: str) -> dict:
+        r0 = full.get((it.get("title") or "").lower()[:90], it)
+        row = {"headline": it["title"], "source": it.get("source") or r0.get("source"), "why": "", "picked_by": by}
+        if it.get("published") or r0.get("published"):
+            row["published"] = it.get("published") or r0.get("published")
+        if r0.get("link"):
+            row["link"] = r0["link"]
+        al = []
+        for o in others[:n_also]:
+            ro = full.get((o.get("title") or "").lower()[:90], o)
+            al.append({"source": o.get("source") or ro.get("source"), "headline": o["title"], **({"link": ro["link"]} if ro.get("link") else {})})
+        if al:
+            row["also"] = al
+        for x in [it] + others[:n_also]:
+            used.add((x.get("title") or "").lower()[:90])
+        return row
+
+    for t in themes_ or []:
+        if len(rows) >= max_items:
+            break
+        its = [i for i in t.get("items") or [] if i.get("title")]
+        head = next((i for i in its if i["title"] == t.get("headline")), its[0] if its else None)
+        if not head or (head["title"].lower()[:90] in used):
+            continue
+        rest, pubs = [], {head.get("source")}
+        for i in its:                                                   # „също“ — първо по едно от другите издатели
+            if i is not head and i.get("source") not in pubs:
+                rest.append(i); pubs.add(i.get("source"))
+        rest += [i for i in its if i is not head and i not in rest]
+        rows.append(mk(head, rest, "theme"))
+    by_t: dict = {}
+    for r in pool_all:
+        k = (r.get("title") or "").lower()[:90]
+        if not k or k in used:
+            continue
+        hits = priority_hits(r.get("title"), matchers or [])
+        if hits:
+            by_t.setdefault(hits[0], []).append(r)
+    for t, _ in matchers or []:
+        if len(rows) >= max_items:
+            break
+        its = sorted((i for i in by_t.get(t) or [] if (i.get("title") or "").lower()[:90] not in used), key=lambda i: i.get("published") or "", reverse=True)
+        if its:
+            rows.append(mk(its[0], its[1:], "ours"))
+    if not rows:
+        for it in (front or [])[:max(1, max_items // 2)]:
+            if it.get("title") and it["title"].lower()[:90] not in used:
+                rows.append(mk(it, [], "front"))
+    return rows[:max_items]
+
+
+def select(pool: list[dict], raw: list[dict], matchers: list | None, max_items: int = 8, call=None) -> dict:
+    """
+    23.11.2026 (пакет 23.11, т. 1): трите пътя на подбора → {"news", "path", "attempts", "error"}; попълва LAST_DIAG и LAST_STATUS["path"].
+      "ai"       — AI подборът с лимит config.NEWS_SELECT_MAX_TOKENS (до 23.11 — 1000);
+      "ai_retry" — първият отговор е отрязан (TruncatedResponse) → повторен опит с първите config.NEWS_RETRY_POOL_SHARE от пула (темите и нашите тикъри са първи);
+      "code"     — повторният опит пак падна / друга грешка / AI не върна нито една валидна новина → code_pick (теми + нашите тикъри), с превод.
+    """
+    from src import ai_brief
+    attempts, news, dropped, got, path, err = [], [], [], [], None, None
+    for k, part in enumerate((pool, pool[:max(1, int(len(pool) * config.NEWS_RETRY_POOL_SHARE))])):
+        try:
+            news, dropped, got = _ai_pick(part, max_items, call)
+            attempts.append({"pool": len(part), "max_tokens": config.NEWS_SELECT_MAX_TOKENS, "result": "ok", "kept": len(news)})
+            if news:
+                path = "ai" if k == 0 else "ai_retry"
+            else:
+                err = "AI не върна нито една валидна новина"
+            break
+        except ai_brief.TruncatedResponse as ex:
+            attempts.append({"pool": len(part), "max_tokens": config.NEWS_SELECT_MAX_TOKENS, "result": "TruncatedResponse"})
+            err = f"отрязан отговор ({config.NEWS_SELECT_MAX_TOKENS} токена)"
+            if ai_brief.TRUNCATIONS and ai_brief.TRUNCATIONS[-1].get("section") == "Значими новини":       # банерът „Отрязан AI отговор“ казва какво последва
+                ai_brief.TRUNCATIONS[-1]["then"] = (f"повторен опит с по-малък вход ({max(1, int(len(pool) * config.NEWS_RETRY_POOL_SHARE))} от {len(pool)} заглавия)"
+                                                    if k == 0 else "резервен подбор от кода (теми и нашите тикъри)")
+            print(f"[news] опит {k + 1}: {ex}" + (" — повторен опит с по-малък вход" if k == 0 else ""))
+            continue
+        except Exception as ex:
+            attempts.append({"pool": len(part), "max_tokens": config.NEWS_SELECT_MAX_TOKENS, "result": type(ex).__name__})
+            err = f"{type(ex).__name__}"
+            print(f"[news] Claude филтър неуспешен: {ex}")
+            break
+    if path is None:
+        news, dropped, got = code_pick(LAST_THEMES, list(raw) + list(LAST_FRONT), matchers, max_items, front=list(LAST_FRONT)), [], []
+        path = "code"
+        print(f"[news] ⚠ резервен подбор от кода ({err}): {len(news)} реда")
+    finish_rows(news, matchers, list(raw) + list(LAST_FRONT))                  # 20.11.2026 (пакет 20.11, т. 1): нашите тикъри и преводът
+    LAST_DIAG.clear()
+    LAST_DIAG.update(returned=len(got) if path != "code" else None, kept=len(news), dropped=dropped, translation=dict(LAST_TRANSLATION),
+                     pool=[[r.get("source"), r.get("published"), r["title"]] for r in pool],     # 18.11.2026 (т. 1): пулът, който видя моделът
+                     no_echo=sum(1 for n in got if isinstance(n, dict) and not (isinstance(n.get("h"), str) and n["h"].strip())),
+                     path=path, attempts=attempts, error=err if path != "ai" else None,
+                     picked_by={b: sum(1 for r in news if r.get("picked_by") == b) for b in ("theme", "ours", "front") if any(r.get("picked_by") == b for r in news)})
+    for d in dropped:
+        print(f"[news] ⚠ {d['reason']}: {d}")
+    LAST_STATUS["path"] = path
+    return {"news": news, "path": path, "attempts": attempts, "error": None if news else (err or "нито едно заглавие за резервния подбор")}
+
+
 def significant_news(max_items: int = 8, since: dt.datetime | None = None, priority: list | None = None) -> list[dict]:
     """
     Връща [{headline, source, why, headline_bg?}] — до max_items пазарно значими новини; headline е ДОСЛОВНО от източника (15.10.2026, pick_verbatim).
@@ -680,6 +842,9 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
                 LAST_STATUS.update(ok=bool(cached.get("news")), reason="" if cached.get("news") else "кешът за деня е празен", count=len(cached.get("news") or []))
                 LAST_WINDOW.clear(); LAST_WINDOW.update(cached.get("window") or {})
                 LAST_THEMES.clear(); LAST_THEMES.extend(cached.get("themes") or [])           # 19.11.2026 (т. 2)
+                if cached.get("path"):                                                          # 23.11.2026 (т. 1): пътят на подбора
+                    LAST_DIAG.clear(); LAST_DIAG.update(path=cached["path"], attempts=cached.get("attempts") or [])
+                    LAST_STATUS["path"] = cached["path"]
                 return cached.get("news", [])
         except Exception:
             pass
@@ -714,57 +879,20 @@ def significant_news(max_items: int = 8, since: dt.datetime | None = None, prior
         LAST_WINDOW["priority"] = {"names": len(matchers), "hits": n_hit, "in_pool": sum(1 for r in pool if r.get("priority")),
                                    "beyond_limit": sum(1 for r in pool if r.get("beyond_limit")),
                                    "tickers": sorted({t for r in pool for t in r.get("priority") or []})}
-    compact = [{"i": k, "s": r["source"], "t": r["title"], "d": r["summary"]} for k, r in enumerate(pool)]
-    user = (
-        "От тези новини извлечи само тези с пазарно значение — геополитика, Fed, "
-        "макро release-и (CPI, jobs report/nonfarm payrolls, GDP, PCE, unemployment), "
-        "секторни движения, суровини, "
-        # FIX 2026-09-18: регулаторни/законодателни събития нямаха СВОЯ категория
-        # и системно отпадаха. Потвърдено на 18.09 — Reuters "US securities
-        # regulator rolls out five-year exemption for tokenized stock trading"
-        # беше в суровия пул и не влезе в осемте.
-        "регулаторни и законодателни събития с пазарен ефект (решения и правила "
-        "на SEC/CFTC/FTC/ЕК, гласувания в Конгреса, антитръст, тарифи, санкции). "
-        + (f"Максимум {max_items} новини, всяка с едно "
-           "изречение защо е важна за пазарите днес. Заглавието НЕ го пишеш и не го превеждаш в \"why\" — кодът показва оригиналното "
-           "заглавие дословно по индекса \"i\" от списъка.\n" if config.NEWS_AI_WHY else
-           f"Максимум {max_items} новини. НЕ пишеш коментар и не превеждаш — само избираш по индекса \"i\"; кодът показва оригиналното заглавие дословно.\n") +
-        # 19.10.2026 (трети преглед, С3 + "why" = заглавието): ехо на заглавието за проверка на индекса; why — само ефектът, без преразказ и без числа извън източника
-        "В \"h\" повтори ДОСЛОВНО първите 6 думи на заглавието (\"t\") по индекса \"i\" — кодът проверява, че индексът е верен.\n"
-        + ("\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието и не носи числа, "
-           "които ги няма в \"t\" или \"d\" на същата новина.\n" if config.NEWS_AI_WHY else "") +
-        # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина
-        f"{ALSO_RULE}\n\n"
-        f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
-        + ('Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' if config.NEWS_AI_WHY else
-           'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "also": [{"i": 5, "h": "първите шест думи"}]}]}')
-    )
-    try:
-        from src import ai_brief
-        text = ai_brief._call_claude(_SYSTEM, user, max_tokens=2000 if config.NEWS_AI_WHY else 1000)
-        data = ai_brief._parse_json(text)
-        news, dropped = pick_verbatim(data.get("news", []) if isinstance(data, dict) else [], pool, max_items)
-        finish_rows(news, matchers, list(raw) + list(LAST_FRONT))              # 20.11.2026 (пакет 20.11, т. 1): нашите тикъри и преводът
-        LAST_DIAG.clear()
-        got = data.get("news", []) if isinstance(data, dict) else []
-        LAST_DIAG.update(returned=len(got), kept=len(news), dropped=dropped, translation=dict(LAST_TRANSLATION),
-                         pool=[[r.get("source"), r.get("published"), r["title"]] for r in pool],     # 18.11.2026 (т. 1): пулът, който видя моделът — за диагнозата на пропусната новина
-                         no_echo=sum(1 for n in got if isinstance(n, dict) and not (isinstance(n.get("h"), str) and n["h"].strip())))   # 19.10.2026 (С3)
-        for d in dropped:
-            print(f"[news] ⚠ {d['reason']}: {d}")
-    except Exception as ex:
-        print(f"[news] Claude филтър неуспешен: {ex}")
-        LAST_STATUS.update(reason=f"подборът (AI) не успя: {type(ex).__name__}")
+    out = select(pool, raw, matchers, max_items)
+    news = out["news"]
+    if out.get("error") and not news:
+        LAST_STATUS.update(reason=out["error"])
         return []
-
     try:
         config.DATA_DIR.mkdir(exist_ok=True)
-        _CACHE.write_text(json.dumps({"date": today, "news": news, "window": dict(LAST_WINDOW), "themes": list(LAST_THEMES)},
+        _CACHE.write_text(json.dumps({"date": today, "news": news, "window": dict(LAST_WINDOW), "themes": list(LAST_THEMES),
+                                     "path": LAST_DIAG.get("path"), "attempts": LAST_DIAG.get("attempts")},
                                      ensure_ascii=False, indent=1, default=str))
     except Exception as ex:
         print(f"[news] cache write: {ex}")
 
-    LAST_STATUS.update(ok=bool(news), reason="" if news else f"подборът не върна нито една новина от {len(pool)} заглавия", count=len(news))
+    LAST_STATUS.update(ok=bool(news), reason="" if news else f"подборът не върна нито една новина от {len(pool)} заглавия", count=len(news), path=LAST_DIAG.get("path"))
     return news
 
 

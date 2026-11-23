@@ -599,7 +599,7 @@
   {% for t in ai_truncations %}<li><strong>{{ t.section }}</strong> — {% if t.kind == "json_repair" %}текстът е непълен днес: JSON-ът на модела
     беше счупен (най-често кавичка в текста) и поправката изряза част{% if t.tail %} — свършва на «…{{ t.tail }}»{% endif %}{% if t.retried %}; и повторният опит не помогна{% endif %}{% elif t.kind == "cjk" %}махнато изречение с чужди символи ({{ t.chars }}){% for r in t.removed %}
     «{{ r }}»{% endfor %}{% else %}моделът
-    достигна лимита си за изход ({{ t.max_tokens }} токена, {{ t.model }}){% endif %}</li>{% endfor %}
+    достигна лимита си за изход ({{ t.max_tokens }} токена, {{ t.model }}){% if t.then %} → {{ t.then }}{% endif %}{% endif %}</li>{% endfor %}
   </ul></div>
 {% endif %}
 {# пакет 2 т.6: паднал Yahoo / празен универс — празният резултат не е "няма сетъпи" #}
@@ -708,6 +708,7 @@
   <h2>Значими новини · последните {{ news_h }}ч</h2>
   {# 18.11.2026 (спешно, т. 1): празен / паднал източник — видим ред, никога тихо #}
   {% if news_sources_alert %}<div class="small" style="font-size:12.5px;color:var(--red);margin:0 0 8px">{{ news_sources_alert }}</div>{% endif %}
+  {% if news_path and news_path.level == 'warn' %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:0 0 8px">⚠ {{ news_path.text }}</div>{% endif %}
   <div class="news-list">
     {% for n in news %}
     <div class="news-item">
@@ -725,6 +726,7 @@
   {# 02.11.2026 (поправки след брифа, т. 4): колко е прозорецът (от предишния бриф) и — само ако има такива — източниците, които не стигат до началото му #}
   {% if news_window_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:8px">{{ news_window_note }}</div>{% endif %}
   {% if news_pool_note %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:4px">{{ news_pool_note }}</div>{% endif %}
+  {% if news_path and news_path.level == 'muted' %}<div class="small" style="font-size:11.5px;color:var(--muted);margin-top:4px">{{ news_path.text }}</div>{% endif %}
 </section>
 {% endif %}
 

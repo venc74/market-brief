@@ -123,7 +123,8 @@ finally:
     na.dt.datetime = real_now
 compact = json.loads(prompts[-1].split("НОВИНИ:\n", 1)[1].split("\n\n", 1)[0])
 assert len(compact) == 300
-assert str(na._CACHE).startswith(_tmp.name); na._CACHE.unlink()                                                  # кешът за деня (във временната директория) — иначе вторият път е от кеша
+assert str(na._CACHE).startswith(_tmp.name); na._CACHE.unlink(missing_ok=True)                                  # кешът за деня (във временната директория) — иначе вторият път е от кеша;
+# 23.11.2026 (пакет 23.11, т. 1): празен отговор → резервният подбор; и той празен (синтетичните заглавия — без теми и тикъри) → кеш не се пише (следващото пускане опитва пак)
 na.gather_raw = lambda hours=24, since=None: [{"source": "CNBC", "title": f"СИНТЕТИЧНО {i}", "summary": ""} for i in range(350)]
 with q():
     na.significant_news()

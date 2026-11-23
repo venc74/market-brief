@@ -643,7 +643,7 @@ def run() -> dict:
                                                      watch_monitor.load_watch_list() if config.ENABLE_WATCH_MONITOR else [],
                                                      [r.get("ticker") for r in backtest.book_records(None, statuses=("pending", "open", "trailing"))] if config.ENABLE_BACKTEST else [])
     news = steps.step("news", lambda: news_aggregator.significant_news(since=news_since, priority=news_priority), fallback=[], enabled=config.ENABLE_NEWS, label="Значимите новини",
-                      consequence="макро текстът, тезите и проверката на AI текста са без новинарски фон; това НЕ значи, че няма новини")
+                      consequence="секцията „Значими новини“ е празна днес; това НЕ значи, че няма новини")
     # 22.10.2026 (етап 4): крипто секцията — Cointelegraph и от 29.10 CoinDesk (AI подбор, дословни заглавия), COIN / HOOD / CRCL / BLSH. 29.10.2026 (разходката, т. 5): ПРЕДИ
     # макро брифа — разказът за нощта я вижда (17.11.2026: без COT за Bitcoin — COT е махнат).
     crypto = steps.step("crypto", lambda: crypto_news.build(today, hours=crypto_hours), fallback={},

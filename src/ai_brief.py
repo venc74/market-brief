@@ -75,6 +75,7 @@ _SECTION_LABELS = {
     "watch_ticker_digest": "Наблюдавани тикъри",
     "_watch_digest_batch": "Наблюдавани тикъри",               # 30.10.2026: на групи по 4
     "significant_news": "Значими новини",
+    "news_selection_call": "Значими новини",                 # 23.11.2026 (пакет 23.11, т. 1): подборът — именувана функция (опитът и повторният опит)
     "_probe": "Проверка на модела",
     "ep_catalyst_call": "EP катализатор",                    # 09.10: qm_ep.ep_catalyst_call (преди — lambda → "<lambda>")
     "crypto_news_call": "Крипто новини",                     # 22.10.2026: src/crypto_news.py

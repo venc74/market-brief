@@ -1,0 +1,2703 @@
+{
+"note": "РЕАЛНО: заглавията — изтеглени НАНОВО на 23.11.2026 14:44 UTC от източниците на брифа (gather_raw, прозорецът 20.11 06:30Z → 23.11 06:30Z; по-новите — махнати); пулът от 07:30 на 23.11 не е записан (подборът падна преди LAST_DIAG). Приоритетът — priority_entries_raw като main.run на 23.11. Темите — brief[\"top_themes\"] от брифа на 23.11 (data/2026-11-23.json).",
+"priority": [
+{
+"ticker": "EXPD",
+"name": "Expeditors International",
+"why": "книгите"
+},
+{
+"ticker": "MA",
+"name": "Mastercard",
+"why": "книгите"
+},
+{
+"ticker": "LLY",
+"name": "Lilly (Eli)",
+"why": "книгите"
+},
+{
+"ticker": "HLT",
+"name": "Hilton Worldwide",
+"why": "книгите"
+},
+{
+"ticker": "MAR",
+"name": "Marriott International",
+"why": "книгите"
+},
+{
+"ticker": "AAPL",
+"name": "Apple Inc.",
+"why": "книгите"
+},
+{
+"ticker": "AFG",
+"name": "American Financial Group",
+"why": "книгите"
+},
+{
+"ticker": "BRK-B",
+"name": "Berkshire Hathaway",
+"why": "книгите"
+},
+{
+"ticker": "ED",
+"name": "Consolidated Edison",
+"why": "книгите"
+},
+{
+"ticker": "R",
+"name": "Ryder",
+"why": "книгите"
+},
+{
+"ticker": "CART",
+"name": "Maplebear Inc.",
+"why": "книгите"
+},
+{
+"ticker": "GILD",
+"name": "Gilead Sciences",
+"why": "книгите"
+},
+{
+"ticker": "ALLE",
+"name": "Allegion",
+"why": "книгите"
+},
+{
+"ticker": "EHC",
+"name": "Encompass Health",
+"why": "книгите"
+},
+{
+"ticker": "WST",
+"name": "West Pharmaceutical Services",
+"why": "книгите"
+},
+{
+"ticker": "OGE",
+"name": "OGE Energy",
+"why": "книгите"
+},
+{
+"ticker": "MSI",
+"name": "Motorola Solutions",
+"why": "книгите"
+},
+{
+"ticker": "RGA",
+"name": "Reinsurance Group of America",
+"why": "книгите"
+},
+{
+"ticker": "EG",
+"name": "Everest Group",
+"why": "книгите"
+},
+{
+"ticker": "CSX",
+"name": "CSX Corporation",
+"why": "книгите"
+},
+{
+"ticker": "CROX",
+"name": "Crocs",
+"why": "книгите"
+},
+{
+"ticker": "GKOS",
+"name": "Glaukos",
+"why": "книгите"
+},
+{
+"ticker": "WMG",
+"name": "Warner Music Group",
+"why": "книгите"
+},
+{
+"ticker": "GME",
+"name": "GameStop",
+"why": "книгите"
+},
+{
+"ticker": "COST",
+"name": "Costco",
+"why": "книгите"
+},
+{
+"ticker": "AI",
+"name": "C3.ai, Inc.",
+"why": "наблюдаван"
+},
+{
+"ticker": "CRBG",
+"name": "Corebridge Financial",
+"why": "наблюдаван"
+},
+{
+"ticker": "DOCU",
+"name": "Docusign",
+"why": "наблюдаван"
+},
+{
+"ticker": "ACN",
+"name": "Accenture",
+"why": "наблюдаван"
+},
+{
+"ticker": "SIRI",
+"name": "SiriusXM",
+"why": "наблюдаван"
+},
+{
+"ticker": "HONA",
+"name": "Honeywell Aerospace",
+"why": "наблюдаван"
+},
+{
+"ticker": "ANT",
+"name": "Anthropic, PBC",
+"why": "наблюдаван"
+},
+{
+"ticker": "TGT",
+"name": "Target Corporation",
+"why": "карта"
+},
+{
+"ticker": "USFD",
+"name": "US Foods",
+"why": "карта"
+},
+{
+"ticker": "IDXX",
+"name": "Idexx Laboratories",
+"why": "карта"
+},
+{
+"ticker": "DLTR",
+"name": "Dollar Tree",
+"why": "карта"
+},
+{
+"ticker": "CSL",
+"name": "Carlisle Companies",
+"why": "карта"
+},
+{
+"ticker": "GWW",
+"name": "W. W. Grainger",
+"why": "карта"
+}
+],
+"raw": [
+{
+"source": "AP Business",
+"title": "Appeals court says federal law requiring accommodations for pregnant workers is unconstitutional - AP News",
+"summary": "Appeals court says federal law requiring accommodations for pregnant workers is unconstitutional AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNdFFoU1NWWlA1ajBycE9LdnJwM214TGZQUXZVV3NhcW5YdERjQm5vSkJDd0RrM05FUU9RNkkzZU1pUURCODA5RnI4WktsTk1nSFRtZXJmbnAyVTBrZkJNdHg2TVFaS1NHWFUyWDBvLWp3QTV4WjRDQkJRdzFheFVzQ3gxODc3bmc3R0xFYjVfX3NuSE9ndmZoenRB?oc=5",
+"published": "2026-11-22T19:44Z"
+},
+{
+"source": "Reuters Business",
+"title": "EXCLUSIVE: Nvidia's accounting is a focus of US SEC investigation, sources say - Reuters",
+"summary": "EXCLUSIVE: Nvidia's accounting is a focus of US SEC investigation, sources say Reuters",
+"link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPMzlPdFVTT2cyVkhmMFVKNWZ1MnpNT0NLcURnblg4THMwUWNuYTRBLWUxU0ZSSUR5bk1zNnBmVlhIUjByNkN6TzVBNC1uaXQxM0dwY2FkMzZQdm00a0xyMXo3NFNpSUNPdERZWU82aGZLa0lNZHpMOXVnVDBVQW9lMmNrWEVRczVYS1Racm1NNlNERDBJeTFJRG1pZVRfTC1LTy1pNjhpVzRaeGRrY25kSzQ1aDNUUQ?oc=5",
+"published": "2026-11-21T03:08Z"
+},
+{
+"source": "Reuters Business",
+"title": "Washington governor, union denounce ICE arrests of travelers at Seattle airport - Reuters",
+"summary": "Washington governor, union denounce ICE arrests of travelers at Seattle airport Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPSi1Oa2dUSVViZERBQzducWxTUFB5cjd4Sm1HRU0zQ0ZiQUhGWngxTlRmZzJybFo5cjRuMVdEOU80S2xuVGx4ZVdsaFFCTXZ3TkVYM19hcVBIbVViSm4wU2JHWExxYWFVVlFzSkZkUXVLZjdOTml0Qk1lYWdELXFyUGlTeTI3T2lETXVvYzdJVHduT3pnVGZ0MjhUTTBOMlcwYUJxTENWRVJ3aVRTSnJ3Y1FucjdrUTNrMERzekRHZFBkX0U?oc=5",
+"published": "2026-11-22T03:33Z"
+},
+{
+"source": "AP Business",
+"title": "At an Italian hedgehog hospital, tiny patients face the strain of a warming climate - AP News",
+"summary": "At an Italian hedgehog hospital, tiny patients face the strain of a warming climate AP News",
+"link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQelhJSFdPSkxhRjNxbWI1QXZmSTZORVA4QlZ0NDdtZ2ZMVzYwVFpDcU41d0FpWnV6T0RaNF9HWmVFUFg4NUtNMDBzWWRKOVpMaWVka3otU2tneDdCQTJORG95eWVoU2dwYlRhcVBOQVhQWWtoempxd0cwZm1tWGluTno1SkhjV0RPTjIzbjVab2k1dw?oc=5",
+"published": "2026-11-20T10:36Z"
+},
+{
+"source": "AP Business",
+"title": "Trump orders federal contractors to check with White House before responding to Congress - AP News",
+"summary": "Trump orders federal contractors to check with White House before responding to Congress AP News",
+"link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNcGJaYVIzb00tWkFac2pEaFdTRnVFYWFTRHVZeWtRU1ZuMUZCSXVnOTAyUU9WSHVmWHEtaTdSQlF0eUpoTHBVeXhUYTVseTY0SXZmX2pTVWNDR19fVlhBYlVxZzdHSURLekxjd3daXzZ2V0R5V0xiUXNCQ0ZoRWZHVDNpS0ZHSF9VTEVPVFAzWjI4Q2lzLW5TSElRa3FGTDlGR2xCU3VOTzB4MGtiaFRQOE9kbkxFbEJVYWw5c0dvRjlseG94?oc=5",
+"published": "2026-11-21T23:41Z"
+},
+{
+"source": "AP Business",
+"title": "Suspected Ukrainian sea drones hit Russian warship at Benghazi naval base, Libyan officials say - AP News",
+"summary": "Suspected Ukrainian sea drones hit Russian warship at Benghazi naval base, Libyan officials say AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNOEJrLWtkTl9ZY1lGN3JPaUNjSjVabFVGcnlERXpyYVdRNGN4OEtMOTVkczkzVDlhaWQxQ2xQdXdEak5oNkhBOWdrd01QV2hBYXlOZXV4Zl8weXpVNmxuMUlMM21sT2YwQjFqcjZIRlk4UmxQMUxPcTFRVjRQNFpqdzl4NjNodnZicldRLWRlV2R1allIR1BpM2x3?oc=5",
+"published": "2026-11-22T19:40Z"
+},
+{
+"source": "Reuters Business",
+"title": "JPMorgan, Visa, Mastercard say third-party vendors targeted in cyberattack - Reuters",
+"summary": "JPMorgan, Visa, Mastercard say third-party vendors targeted in cyberattack Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQV1VHOTlUSTlCVmhEY0dIdi11T2tlc2xPMG16MHhDWkl0SnlBVFl0cHNiZlVPaEtNRERzYXJGa28yUG9DSVZobFBicGFwcXBUWG1icU1RSzYtRUpNV3V4YU1uNkVkNGtQN0tJOVpTMExic1VCMWIxMzhUZm5ISjN4eWJoRFBmSzhZM0x0YlJIRjBJYWJsNlF5WUMxN3NsUE9pWndFLVhTcG1saUE?oc=5",
+"published": "2026-11-20T12:11Z"
+},
+{
+"source": "Reuters Business",
+"title": "COP31 climate talks collapse as EU and others reject deal - Reuters",
+"summary": "COP31 climate talks collapse as EU and others reject deal Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNN3FQanMtV3N5N3NtMFp4WmVBTHpwMlo4empMNlhGaGprWFJFZ1VDSFFxcUhUVnQzcUJNVFB5dDNEeUgwY19WaXRGcnhYNEpfaE53T0dzbGJKSGhSSmhfdkY2eW04aW13NEZtYnpOVnpLZ3dIV0RlY3VCQU0yZnlVWkp4aWk0YlA3NTdDUjRFZzRWMmhSdUtBbDBhT1ZfdmhZMDRlNlZ2V3hrdkxrSnFNTXBOTQ?oc=5",
+"published": "2026-11-21T23:40Z"
+},
+{
+"source": "AP Business",
+"title": "Melania Trump gives a peek inside her marriage, motherhood and more in new series - AP News",
+"summary": "Melania Trump gives a peek inside her marriage, motherhood and more in new series AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNeGVNSWdUaU9iYzlNSklfQVRFNkg1bEV6c1NlUlBsbS1VaERleUJ4Qk81TThTbm5BVDZoNWtGQmlqR3NFZU1Db0w3WktDeFk3OWt6QzVCeXJQRTJKbkd1bC02RVNNSjgtZWZ1YjlyYUZoalhGZGdVT2MwT3N1VzkyczNLZ1F6SU82V09iMlRQemxzbXdLejNPMXZoWQ?oc=5",
+"published": "2026-11-20T13:40Z"
+},
+{
+"source": "AP Business",
+"title": "All 146 Air Niugini plane passengers and crew safe after an emergency landing in Philippines - AP News",
+"summary": "All 146 Air Niugini plane passengers and crew safe after an emergency landing in Philippines AP News",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQVjgzY1JMWnhnb3NHTlJfcTM4U040S21mOW1UOUxYWnlqQTFUU3FLYW1FZ09GRmoxUkc3SjVNeUZuSjE1MWpvbHVsTGk2aEF5c05mQzVSSGpBOEJqXzY2aTNvMVNDYjhYMzBmYmdfZ2g2X3J6OXVOdTZ6NzhQbGJLWVp1QWpJV2ZtdEpNQVFER2kwajVrX29GaktsUlJnc1ZSUDIwZE5Nbk55Vmc3VTJSNXR3?oc=5",
+"published": "2026-11-21T08:14Z"
+},
+{
+"source": "Financial Times",
+"title": "China is winning the car war",
+"summary": "Western carmakers have been routed from China as EVs go mainstream. Now they are battling to avoid a similar fate at home",
+"link": "https://www.ft.com/content/d279b04d-1fb7-49c7-a191-d34cf6467681?syn-25a6b1a6=1",
+"published": "2026-11-23T05:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "GTA VI shatters records with $3.8 billion in first-day sales - Reuters",
+"summary": "GTA VI shatters records with $3.8 billion in first-day sales Reuters",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxONUF6bm1SdVF6MDNJX3VvZXF3d0pzLVVoQXJxUTJEZ1ZqaGszRTNTOWNPaXRrOXhFcEhJeGJfT2V6dkVocUxyQVZaXzlQOXFtOVJZMER1WmxMbTN5VXFqMXJfbkhabFNtd1VTbnJ6dGVVSlJua2EwSGRYUHk5QmhtaXhaWV9NQWFSalhRZU5takkwWkNzeGV1TWpFRVBtWmJvbEFMLUhpZEJDRXl2Y3FveFZn?oc=5",
+"published": "2026-11-21T02:47Z"
+},
+{
+"source": "Reuters Business",
+"title": "Thousands march in Lisbon as living costs fuel anger - Reuters",
+"summary": "Thousands march in Lisbon as living costs fuel anger Reuters",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQWG4wY3ZESmpaVExscklIdFdvaUp0ZXJ4a2N2Szc5V2VJV2NwMWZFLU5YWFd0Y2ZFNU4zRGo1RG5VazBFRVlnUGhPcmxiRjc4U25qeFAwREpZcjFVeUdVRldoaEUyUXQtSG1TV1ZDVDJzd1RUNzFzVk1QS3BtdGZ2UXkwYy11N2RBOFlYSzNNZzYxRkVjYXlTcHhMTQ?oc=5",
+"published": "2026-11-21T19:55Z"
+},
+{
+"source": "AP Business",
+"title": "Treasury secretary says no further restrictions are needed for Nvidia chip exports to China - AP News",
+"summary": "Treasury secretary says no further restrictions are needed for Nvidia chip exports to China AP News",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNWVNwbUpEZjJtY1NaOWc5Z1ZfYUo2QXJqdl9WVGhJVnFvajdCTGV5RFJwNzNQTFVSeENSNzdUQ2ctRjB5Sl9ybmJqb3FfZENLMEZkeFdYSUJMa1FSamFBS2pqTGpjQzAwWHBza2JHOXBzdmV2ZG1icEgzQXp1aW4zRDFLWnN1Rm1USW9zZ3I4V2NZZ05RN2tBa295b0I4c1VIME1OR3N0VXlZc0ZxOUcwb2lrOA?oc=5",
+"published": "2026-11-20T22:36Z"
+},
+{
+"source": "AP Business",
+"title": "Oath Keepers founder and Jan. 6 leader Stewart Rhodes is ‘absolutely done’ with Trump - AP News",
+"summary": "Oath Keepers founder and Jan. 6 leader Stewart Rhodes is ‘absolutely done’ with Trump AP News",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNRUhneUpOa2pFdzZ4Y1hVVWhQdVB6M2MwdTVoc3VnMVJvUVJrX1lHNEs1Q09ENFhDaXNVRmtsMFdMaDdPdEk2bTJqWnR6VEFRU0YxMkFJQ2lGWHdNRGt0NnhsWTB4N2tsSi1VZVVmNkhRbHREVGZmcDgwRjQyaWVnZldnRGFnaXB5RWl5RXhpZXFfbVJHUnEtOGJTLUdnYlN3X09PaXBUcU1UQQ?oc=5",
+"published": "2026-11-21T13:00Z"
+},
+{
+"source": "AP Business",
+"title": "Why the failure to reach a major deal at UN climate talks matters as extreme weather worsens - AP News",
+"summary": "Why the failure to reach a major deal at UN climate talks matters as extreme weather worsens AP News",
+"link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNVlZ4dzdCVnBlV0g5cDVCV19scWJkTG9RQWtiMng5NFlVb2VqSng0SmhxRGxLaUJ5aEgyTXRVMlpGVV9abXMwX19naG9EMlhjdEhaemxUTHM2bVhTdWc5Q09NMTR5Wk4yVmtlY2NFSHVncDdMWkhtU05keGJ6NXlGSTVKaFNlOVpsVl80QWE0T3ZQY0t5ZDB4YlNVUWdJZXJaZnJPZmFhb3I?oc=5",
+"published": "2026-11-22T18:10Z"
+},
+{
+"source": "Reuters Business",
+"title": "As Meta bets big on Muse AI agent, early safety mishaps surface - Reuters",
+"summary": "As Meta bets big on Muse AI agent, early safety mishaps surface Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNYzFCWVhTaXRGa0xoLTRJUUVKTjNaYXZzU2FhbHYxR2tyallCbFJsUFM1U21lbXN0UVN2U3FfZnlsWWdGWERVTWRBdmhHVmZaS0Z3X0REWFhvaXhQYXpoNHRlTG0wbHp0WHd5b3N3dnpOYnJONWE4bWVXdEJObHFqZTFYd2szQ3p1SU5LV1JxODNpSVpoWnZTdXVWRDJTSUl0MTRvQnotcjJrUUE?oc=5",
+"published": "2026-11-20T11:02Z"
+},
+{
+"source": "Reuters Business",
+"title": "Mexico captures top drug lord 'El Chapo Isidro,' latest in string of arrests - Reuters",
+"summary": "Mexico captures top drug lord 'El Chapo Isidro,' latest in string of arrests Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQa1lhc2ZRS3hPcnFWc3VBdDBIbElGZF9PSlZVSEV4NFNxSXZ1YlZWeWtYUVdrbjZXVXFJM3V6VkgzLTZGSWdWUFZiVGctOFRreU1lUWpWdXp5VmJxYTFBVU9wTk9YcTZNSmt6MDhsNnB6azlRSnVnaUdZNF83dl9Gay1OVm9qQ2NreElTT1EzVFF2STVySzRkQmt3M19lRjlzQjJvVWVQckYzR21YUVRyY1R0MGJNYzJwaVhR?oc=5",
+"published": "2026-11-21T21:58Z"
+},
+{
+"source": "AP Business",
+"title": "Trump defends calling Putin a friend but says he ‘can’t speak’ to whether he's a friend to the US - AP News",
+"summary": "Trump defends calling Putin a friend but says he ‘can’t speak’ to whether he's a friend to the US AP News",
+"link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOQkhfc2NSR2FxMldlZzg4WHVHdUdTR0Q4eExlN3dTZUFydXRVeFM4Z2hwcENYU3VNcGtqeEhOZFpjbmZmVVRzY2hVLS1iMTVIUkdyZ0lyTHBHM25CSjBJQzhRc0Uxbmk2Zy0zQmpZbVVrM3pOaUVpX2MwTHB0Q0lFdlVsQkIxRHRMUDFCTS04OUlSZw?oc=5",
+"published": "2026-11-20T18:32Z"
+},
+{
+"source": "AP Business",
+"title": "Cartel leader captured in northern Mexico in a bloody firefight that left 11 dead - AP News",
+"summary": "Cartel leader captured in northern Mexico in a bloody firefight that left 11 dead AP News",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOa2RiNXlYT1VFSmc3cEJmU0N4QW9Ydk9rX1RBZ3hvakVOYWtIa1ZDdGlhVm8wSUp5MUk2bWg0TFNyc2lvN3VXazhaamp3WTZBOVpqXzBPcnV5OVVGREVtU1FNVDBXb2d2ck5mVmhybmptaUtCMGRJNEt0UGhxU25fM0JWZE5NSUF2NmRxZVlZOGJSaUpncmt6dnFkNEpDdG9ZejlidXU5RnJUdm8?oc=5",
+"published": "2026-11-22T00:12Z"
+},
+{
+"source": "AP Business",
+"title": "Chuck Hubbard defeats Rep. Virginia Foxx after a recount in their North Carolina House race - AP News",
+"summary": "Chuck Hubbard defeats Rep. Virginia Foxx after a recount in their North Carolina House race AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPRjZzZ2RGU0lSUEZLLV90MW9OLVhqSThJZjd0Z3JsQ3M2VnhvMG43TFU4YUFoWXE3QTNKUk9OUGpoVUYxbDVsaDdSc01MWmVxVGx5SHZiTklObzJUXzlOVGExa3d0UmYtb2lVb3FxVTVCRnFKU2NfLVBkVE5VTUFPUG9ybUFoZ3ppc1J4OFhQT1Vrd3p6RXREa0lOb2FRVXBhenUtNw?oc=5",
+"published": "2026-11-22T18:26Z"
+},
+{
+"source": "Financial Times",
+"title": "Progressives are not radical enough on economics",
+"summary": "Instead of accepting automation, we should back ‘pro-worker AI’ that leverages the difference between machines and human intelligence",
+"link": "https://www.ft.com/content/add930b5-5a4c-4226-a778-ffdd009915f0",
+"published": "2026-11-23T05:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "Bitcoin rises after falling to two-year low - Reuters",
+"summary": "Bitcoin rises after falling to two-year low Reuters",
+"link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1NUk9lTzRodUF5M1QyMkpkS3ViSDhVQ2hHZlV1ZUowRnBQeF9Za3l0WkRFb1BUNzVoS1NxcFFERDAydTVnLVpIMG9hcmRUV3hyb1F1RURKeGF3WV9iNlJScVlrYk95VmRJWWxjcE5GLUR4NUgtYWVj?oc=5",
+"published": "2026-11-21T04:12Z"
+},
+{
+"source": "Reuters Business",
+"title": "NATO will defend every inch of Polish territory, Rutte says - Reuters",
+"summary": "NATO will defend every inch of Polish territory, Rutte says Reuters",
+"link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNWXlDbDhlc09IVzVHS0dKcmt0cDVXd3ZRYUtWTkpDOU5IMlVfdUZsWWFqblljVXBPbG5pd1A3TTRDZkJQaFR3YXZHWHJETUk3OUhDLUw4b2dmZXZJYkhKRGdrMjFXcHJMYmt3MzRYU09OR0xkd3ZUbWNjMGhoRzhhR2NucjZaQjgyVGFqOXZ4Mm5vVUhWS3NQZHZvd0J1dw?oc=5",
+"published": "2026-11-21T19:08Z"
+},
+{
+"source": "AP Business",
+"title": "Anthropic worker claims to have solved a Holy Grail of math problems with the help of AI - AP News",
+"summary": "Anthropic worker claims to have solved a Holy Grail of math problems with the help of AI AP News",
+"link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOZl83aFlGaHFEUVczbnRQYTJCbmhiWUFic2RBN0JLeVJrUy1GOG5TZDRtSzVDQ3JzT1otb3dqZlQ0X1JXc0I3Wm1CMzB2Ul9MZGlGbFVvOHEyVlo4V1NxUU5sQ0FoMTNkTUJkaXlCSFYwcE5rZGtyb2hwTkNYcVNJcGtMSzdqRFlQejUzTjFuei1PX2ZPcU5ZRw?oc=5",
+"published": "2026-11-21T04:55Z"
+},
+{
+"source": "AP Business",
+"title": "FBI investigating apparent hack of its key national criminal justice database, AP source says - AP News",
+"summary": "FBI investigating apparent hack of its key national criminal justice database, AP source says AP News",
+"link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOX3JOVy03eEI4NG1USFRxZkwtd0FLc0tfWk1zMWJSX0xDeHR1Rmwwd0hoQ2RXMG15ejRzWEJJZFh5WU5la2tvWE9kNjJQOG9rVEh4MUlUQl9Cam5KR1FKNnl4UWhLRmVBMGVfT3Q1dXlsZ2lfUHlXLUV3a0ZjaE16ZzJTMFBSbW9RRHc?oc=5",
+"published": "2026-11-21T20:52Z"
+},
+{
+"source": "AP Business",
+"title": "Adults fight loneliness by playing board games with strangers - AP News",
+"summary": "Adults fight loneliness by playing board games with strangers AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOYWZpQTZtQ28wTFlfRGQ2Z2V3Mm55UkhqOXUxWWtjZjlGMExjYU5ic2FJRDFOVEEyVURSWE1uLWpJa0YzTkhrMkNSUHdIeXA2TGt1M2NXU1BNeWJoUE51VVhybElLVjJ1LTgxN0tWRkcyc1hfNXd4UzlrR1Fab1AxeVRlQ1p2OGdyNVozY2twdXBuaF83OXZ1NWFFT3JidzZtTFE?oc=5",
+"published": "2026-11-22T16:39Z"
+},
+{
+"source": "Reuters Business",
+"title": "Why Jeffrey Epstein loved Russia: women, oligarchs and a shot at redemption - Reuters",
+"summary": "Why Jeffrey Epstein loved Russia: women, oligarchs and a shot at redemption Reuters",
+"link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNWmhSRk1aazd5Y3NQdUNnWV9NdkpzSHY0TFB2TS1ucXNiOGVfUXlsUFoxWloxM19wNjlVM2hicUFVbHZkOTNVSkJNTTRoa3R1SHJEY29UNmpfWFZfOUs3ZlkwSV9HcEFmRFVjOXloZWR6c19qT0kzQ3h4YUNBTlFjUVBIT1RraUxveVQ4d3FEWU1ZZWEyNXhfQU1vcVdjajlIZVBlZzJVYzZTc01lM01pai1DdUtYUQ?oc=5",
+"published": "2026-11-20T11:04Z"
+},
+{
+"source": "Reuters Business",
+"title": "At least 11 die after drinking adulterated alcohol in India's Manipur state - Reuters",
+"summary": "At least 11 die after drinking adulterated alcohol in India's Manipur state Reuters",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQMmtoMXFDRXVaZThycjJERTZDcEp5X0ktVzgyTnBxRF80d3REZnZIZXZ3ZkhoUFZ2ZTlTbXFZdnNYSFFWRExwTl9uNkJXLWh6czVWNjF4MGt3Q01ObVQ1aWJFdm5oN1ctS3RVYzluWVpRby1fdEJvd1BMUXpMNC1iVjF2Q005SGotZVB5ZFRxdmtOYWVMTGlBYi04TnktYTNHd1cxT2lrakllNk01OGMwYTFWSHhCaTQ?oc=5",
+"published": "2026-11-21T18:55Z"
+},
+{
+"source": "Reuters Business",
+"title": "Gold climbs more than 2% as dollar rally pauses - Reuters",
+"summary": "Gold climbs more than 2% as dollar rally pauses Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPcnBFWkZLYUFtZG40ejNhc0xINGhEOGZWSnl2M1RabDhRbUstel9yOEtXTTczcW44cEw3b2lvbEMyaExOeDRLNnRWVFdOMU4xZDQ5bkd2YlJaUklBTWNMSDlFWDVZd2VxUEtpbXBqVUlMY3dDM0dmWXVfOW1CWG9oUVJIZ3BhWWltclFMZVF5ck1oZ2pUVUMwVWZVMVhlU1FrbmZuWGpLSW5jMUU?oc=5",
+"published": "2026-11-23T05:49Z"
+},
+{
+"source": "AP Business",
+"title": "Federal jury convicts man of starting the deadly 2025 Palisades Fire in Los Angeles - AP News",
+"summary": "Federal jury convicts man of starting the deadly 2025 Palisades Fire in Los Angeles AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNY3kwWjlJb09rSWVXbmtfSl9mWU5xOVFGQ2wxLTR6NUMyZnZVX1VNdXpTUU9HWldWQlZ2dk5yMzNtMWtjdTlBSWdVWXkyZV9PUlo3RTEwOGtULXZFVDFHend6Nm10Ul85TVFiUkhFdmJCaWRYYm5hQnV0TW1xaGVHWHlrVV8xRTlDa3JxRFFIVGZBQXhaMnc?oc=5",
+"published": "2026-11-21T01:44Z"
+},
+{
+"source": "AP Business",
+"title": "Immigration officers make arrests at Seattle airport in ‘distressing’ scene, delaying flight - AP News",
+"summary": "Immigration officers make arrests at Seattle airport in ‘distressing’ scene, delaying flight AP News",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNa0VtbzJLdTFnT0owUXZrN0pDdmowMWxnS09WNkowUi1JWktwVXplU3FtOWtFeTRKMUVOcm8tcHlrcm5LaVFDVDlPLVllem1jdWFnRE02bXpmRFdId0htWXVwdDZ3SUpvQ001YVF2N2hzWDBZYUE2dFZWSUIzVTF0a3RIVjVWdGNzYkdPUmdYUk9QdE9IMnp6aHpTZUVIS2s?oc=5",
+"published": "2026-11-22T01:25Z"
+},
+{
+"source": "AP Business",
+"title": "Carney enlists fake Trump for laughs at Canada’s annual press gallery dinner - AP News",
+"summary": "Carney enlists fake Trump for laughs at Canada’s annual press gallery dinner AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQbVBSdVR0MVl4SXNwek45X0pNSVBzbnlYYmxKeHk4VlhTYjJvcGt6WWRlQW9XV2ZhZS1ab29VaDhKUUc0NEUzdVhfajRNbUFSdFdCYVdiRHNBVllVRFdXd1QxM2l0X3IzakV2ektHbFNkZFI2d3RUQXAyY2NLTXk2TkJtWGdiak5ZVUF4RnVzaFRyX2M3UmtDcU5Fdnl5S21Ienc?oc=5",
+"published": "2026-11-23T01:41Z"
+},
+{
+"source": "Reuters Business",
+"title": "CrowdStrike in talks to acquire Zscaler, sources say - Reuters",
+"summary": "CrowdStrike in talks to acquire Zscaler, sources say Reuters",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQelZkLVhGN0lQVWs3SVJrWU00RjF6LV9tUEUyaDlySnhaQ29EVW1mUWFBajFfMmpTckxRUHY3aUxDTHRYV3kxSm1zbDNUdTQ3UnFuRVVULVk1bXlOaDNRc3hrM3k4dDQ2OVBtTHRNR1dlSzQweG1Ya2RjTVNGNk0xLVlKTzBHQjRtTHhhQVBUeW5ZMm1YZ3lUWUNfbGUtNk0?oc=5",
+"published": "2026-11-20T22:31Z"
+},
+{
+"source": "Reuters Business",
+"title": "Lower turnout at largely peaceful marches across France - Reuters",
+"summary": "Lower turnout at largely peaceful marches across France Reuters",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOTzg5OVFjVWE0RGV5T1VhWTRQR2JFd0VqdFNBSEVtZ2NxdHotRXFIYVIxd1FmUzY2UmJtR2lSamtTU21TUXZfcTJ0Zm9kMnNCQVdoclZoaHBsTGVNbjZZcVlaYWNtNHVrM2FST21pRU84UzlZd3oyLTlERlR3M0lRQVpxQTZhZXhqTU12SFQzVGpYNllBeTFOS2hn?oc=5",
+"published": "2026-11-21T17:03Z"
+},
+{
+"source": "Reuters Business",
+"title": "German automakers face winter of discontent as union battles loom - Reuters",
+"summary": "German automakers face winter of discontent as union battles loom Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNYy1NZUhkNnFfNE93Q2Fwd19BWUFKdnR2QlNneG42QnZtN2h6R3psSzBlUGgxc2Z3ZDFvSzMzLVJ5VkFOSnp6Y0xUSjlJeURjUXNKUFhKX1J5cWNwcUM5dnl1UDlacFFsSEhfbWk1NllaZ0g4UGVBNHQwSVpkSDhMWDVMT1ZpOFFMYjh3MkJLU3VCU0xRVHV3ZjQxMXFZQVBEbGtfQURObGRYR1E2T3oyY19WbUc3c0xtLWc?oc=5",
+"published": "2026-11-23T06:04Z"
+},
+{
+"source": "AP Business",
+"title": "European troops from 11 countries hold a drill in Poland for a potential postwar Ukraine mission - AP News",
+"summary": "European troops from 11 countries hold a drill in Poland for a potential postwar Ukraine mission AP News",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQVGl6dU85bExfQlhuODY0Rkh6a3M2UVhRTlV1QmRsclI5ZHpRbWo5M3JIbUdydkRzOFNrZkZ6RDBIMHJVNGhqeklnRl9UVVAzRFpFUUk0OTVDVnU3RVh2VjdWZ2ktMUhMNmZZMUZkVDE5RFAtTjJ4UEZjUDlKZWd4YlhSaFBoYXdnYVI1ajFaRkdnTkpyMExkU0U4YjBHMTNSblZkRWt6aUVtTGJ5UWU1RVdrNA?oc=5",
+"published": "2026-11-20T19:47Z"
+},
+{
+"source": "AP Business",
+"title": "Taiwan warns Canada’s Carney that deeper ties with China come with risks - AP News",
+"summary": "Taiwan warns Canada’s Carney that deeper ties with China come with risks AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOMk94aHBLLVI3V1JkYU1DWGQ1Qk5ZVnlBN2JFYWYtbzNPOU1GSkgzTmJCRXVzcllCZERfVkpWQnpIMWdXbjI5LWNaal8wTzBwdWtWSDZITm5RZVZhejZ4WldzNVpEVm90ODJ5UTY0REJUWTUtQk5PUk5CUXNSekIzSTYyRlEwOE5QZzkxZ2dic3dwTWNKZF8yRm9pSEVWbkw1cnc?oc=5",
+"published": "2026-11-21T20:48Z"
+},
+{
+"source": "AP Business",
+"title": "Tarik Skubal agrees to record $450 million, 9-year contract with New York Mets, AP source says - AP News",
+"summary": "Tarik Skubal agrees to record $450 million, 9-year contract with New York Mets, AP source says AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOMXVRWFptUVNPUjVMek1uUEhhcFhkN1JYdUZERWxfV0w1dWJvS2UycUtJMkM0eDRIRVR6WTJIZU5ldTdHRHlvSkszUXN1cjdJRG9jZXhwaEFidkx2MnZfTkQ2Y1pzY0l0ODdGYXJTWGp6d1RJN3l5NnhtVjFuMTFwU21xdUgtb2pFZ0RzakRqZ1JkOUFiNEtjLWVtNA?oc=5",
+"published": "2026-11-23T03:23Z"
+},
+{
+"source": "Reuters Business",
+"title": "FBI's criminal information database hacked, CNN reports - Reuters",
+"summary": "FBI's criminal information database hacked, CNN reports Reuters",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNRE83U2NSQ2FlbllBaUxQUzl5UWdfWktnME85LVk1ZkJFczYwOUJEbXpoV0tzUXltYWhtTl8zT05jeW9yX29sREJwZkxCNWdxZWwxcGlUa2N1YzM4YjRZcVF6dWpNbGhfak5zWjNsdnpQcFAzVGdoSmZGLTN5R21KZlcxV2dUZU15czdSQU5fYXJLV1MzWTVuYkdTRi1weFU?oc=5",
+"published": "2026-11-21T03:15Z"
+},
+{
+"source": "Reuters Business",
+"title": "PODCAST: Wall Street plunges, climate talks run over, and Republicans position for 2028 - Reuters",
+"summary": "PODCAST: Wall Street plunges, climate talks run over, and Republicans position for 2028 Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNdTB2Umxadk1oSHFUQVEwemljX2I5NHRjWFlPM3dsMG5lcG5MR2RRclBjWXR3WE5zLXg3RVh5d2NiWGhMREUtd0ZWNEZEX1ZGVV9rcmN5Qkc2QmZfZUVPdVFsRm4tY01qOEdNOWtQdEtWMll5MmJMU1p6V0MwWkx4M005d1dHS01XaU14d1lYRzBNVUtZVHVMMUJSanFDbjA1eC1zNERFdjY0WW5uT2EzRDlYbw?oc=5",
+"published": "2026-11-21T14:06Z"
+},
+{
+"source": "Reuters Business",
+"title": "Boy and elderly survivor pulled from rubble after Russian attack near Kyiv - Reuters",
+"summary": "Boy and elderly survivor pulled from rubble after Russian attack near Kyiv Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNdlU4RTQwUF9vS2lzZ0ZWRkJiOUdrRWNUc2Y3eXlhWXBVWllFdHNwTXlnaFQ3ZXQtWmg1TlVRT3NISXhjSWd4VUZ0VV9wc01rLWFyenZRNEdrMkpVMjltM1ZSdFRmbUc2WlZpLXJLZlFMb0NMeldDdlpDRjcwb2ZadHQ0dlJGeGhJU2Q3OUNNZ2R1T1p3ODZJQ0kwdWtkdUZKazNfbEFBc1lDUQ?oc=5",
+"published": "2026-11-23T06:24Z"
+},
+{
+"source": "AP Business",
+"title": "Russian missile’s crash in Poland was likely an intentional provocation, Polish prime minister says - AP News",
+"summary": "Russian missile’s crash in Poland was likely an intentional provocation, Polish prime minister says AP News",
+"link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPb2dKNkEyLW5VNkNqNmI3U2lRMGcwUzZxUEUzb2FqTmVPYmFSZVhWYXM3Z0VfN3JfVi1FbkZydE5UWkRmNlhSZTFOa1pBLUpMaG5lRzZKbmJRYjdkcHZRYXlwWVlSQ3hoSUxwSzdtZDRld1FCSzVUUThhR1dicE5XbjNiSnc5VThLSGdpUkhrM2xueDRmR19DYg?oc=5",
+"published": "2026-11-20T12:18Z"
+},
+{
+"source": "AP Business",
+"title": "Democrats who swept into the Senate promised change. A leadership vote is testing them early - AP News",
+"summary": "Democrats who swept into the Senate promised change. A leadership vote is testing them early AP News",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQdnJOSnBfdXFJdTl2aXIxcjZaSVlnYnE1NjdaQkRwQUYwVFFGNFR3N3hCaWMzM2pDQzFFNVhMaXZGcE83V2FfMVBheUhtcTF5eHFFbkRUbnNyLV9OV1VzWl9uM1RGeTZUQVUtNTNHWFZkM2FFaXdnMEI4eVFWcVJMZnNfLVZzTmlnbGh3OUc5MkRrUVBGSFpielBZQkZpdzFEYlhaZkhRcWdIZTU2WlZWRkkyR0Y1SUFaLVBF?oc=5",
+"published": "2026-11-21T22:49Z"
+},
+{
+"source": "AP Business",
+"title": "Israeli opposition leader condemns suspected settler attacks as 'terrorism,' and other Mideast news - AP News",
+"summary": "Israeli opposition leader condemns suspected settler attacks as 'terrorism,' and other Mideast news AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPd1JSaXVlNUR1NmhkbmNlT0RQMEpGVlROckdUU0czRm5nNHJkc2VWeDVGeWRLUGJiU0ZtY19SVG5veUJsRk5oWlZzNzdkcW03VXRVajBoVU1TQVpHdHNFeUtaRURabFZEUHZUWG5KUWtINTdEVXROQllnTDRua0pNdzdkVXNBc3plTVRpd1V2aGs5MlpjdlJ4dEszcFpUMG83M2JPbQ?oc=5",
+"published": "2026-11-22T09:29Z"
+},
+{
+"source": "Financial Times",
+"title": "Novartis rejects AI industry hopes to cure cancer in five to 10 years",
+"summary": "Comments from pharma CEO follow ambitious claims from Anthropic chief and DeepMind founder",
+"link": "https://www.ft.com/content/1e5a9d70-221d-461d-ae03-dc235b1db340?syn-25a6b1a6=1",
+"published": "2026-11-23T05:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "EXCLUSIVE: Citi underestimated risky assets by $35 billion after incorrectly recording trades, sources say - Reuters",
+"summary": "EXCLUSIVE: Citi underestimated risky assets by $35 billion after incorrectly recording trades, sources say Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPdVloeGlhUlExUC1jX2NqaXZkd0owdTFnbnNHSFpDN0lEcjhkeXdSZ0M1ZFg3MkIzMHVaUHE4dko2cFJSWDNXRXlDMElNRTcyVUxMNnZBRFY4cTVYaTVWblZWRWIxWEFlWFF1T1hsNWJPVU4tT0J3LXNtR0VIUmZMYXhCc1ZtWEhVRHdHUERnNkZZX1RVS0pPZ1JfX3ByZURXd2IxcGhucDNBNjZWaTZPcHdCZV83Nmg2bWRybE16QlA2c1k?oc=5",
+"published": "2026-11-20T12:19Z"
+},
+{
+"source": "Reuters Business",
+"title": "Former Italian police chief De Gennaro takes own life amid mafia probe - Reuters",
+"summary": "Former Italian police chief De Gennaro takes own life amid mafia probe Reuters",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNRHRWNEgwMkxHcTRCT2t0cnB0bU5zWHdYd3NjaWlRQmNrSlF5ME1xVkl2Y1daY3dRbkY5MzVjR0Zva0FQM2NXdXhRR0JmaVNyNnozaDVWNWVEWXF1SnZHNHo4OS1zc3BDLXZxd1Q5dEUyNG92M3FubElMdWc0TGhyY3ctdWlrZkVHWW43VDhvYjNDZmF6ZjJDbUdUdEFYbmx6OS1wcXE4NThkUHhUdjg1Und3?oc=5",
+"published": "2026-11-21T18:00Z"
+},
+{
+"source": "AP Business",
+"title": "Haiti strikes deal with El Salvador to build new prisons after minister visit - AP News",
+"summary": "Haiti strikes deal with El Salvador to build new prisons after minister visit AP News",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNZVBrUlFHSFVDYmVXaFpQdFBtQ0gyaTJrYXdEblFESjdkTHpsMGdCZmhKTnlmak1IdllyeVo1VVdoTDZ1Y3RCZVZoZ21iQ3BqbV9HRC12WDNzdklQeFVCVm4xMTJKeGFRcXBCeGdKUTNoTVkwMzNqek1DRlhXd3BRMzI2TWVza1hCQTBoTkVkLS1OREZkYzB3SjRkNUIzLVl0Q0FEQXBQU2I4UQ?oc=5",
+"published": "2026-11-21T00:31Z"
+},
+{
+"source": "AP Business",
+"title": "Endurance athlete swims in Strait of Hormuz to highlight Iran war’s impact on wildlife - AP News",
+"summary": "Endurance athlete swims in Strait of Hormuz to highlight Iran war’s impact on wildlife AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNQ0JtX0ptcWJJLXVuYkhxaG1uNTFXV0hEdzRSUDZIckpCQWVfVWZtMWU5b3AzYjhUcTdvdjNrQmNXMnVFSTdZWE9wTnhWQ2NBSnpBT0thUEdMQ1hKcGY0aURSMXFiM1UtUktHVEIzbzFCM2JYRGRvb01yOGhFSkNVSlJabk9fUUx1ekk0QWFNQzBOVDRvamdrRmZmcw?oc=5",
+"published": "2026-11-21T19:02Z"
+},
+{
+"source": "AP Business",
+"title": "In their own words: Leaders at UN climate talks discuss why negotiations ended without deal - AP News",
+"summary": "In their own words: Leaders at UN climate talks discuss why negotiations ended without deal AP News",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPM0xZUG54R1V0M1N4VHlZd05nbTExbGdkUVNwWVBwRnlabWFHZWhRMldkM2taVFVhM3NIb1JQZnhIVDFEMmw4UzRzWTdyMVotWVNRVllEQjRtSFVRallpY0V5czd3eFplcTVWTldEOXpuclV0NmJVeF94aXQ5OUZQcGxaUVlQOEtaU1Blb1o4b055WmFPWDFsQXp2Tzlpd0VLa0RwWTNxT013S2VfU1E?oc=5",
+"published": "2026-11-23T04:21Z"
+},
+{
+"source": "Reuters Business",
+"title": "Missouri judge approves Bayer's $7.25 billion Roundup settlement - Reuters",
+"summary": "Missouri judge approves Bayer's $7.25 billion Roundup settlement Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOZ3l1OGtkWDFDWVotN3ZQazJBOWVuVUFqaFBQSWR1WWpUY0s1TnNsMnJlSmlzN3VuSTVnX0FKT1ItRm93RFhPYm9URXBzYnRIZW04NndYNlVQVncxZ3BmcTZ2U21NVVZBZDZwRERERjJ2czFyNHlnU2ZrbjVGa09XMW92dmdLVDB3UmRzbTlHRXprS2wyV0RWeXowVWJOWlAzUGpQbm1MVkg0NHM4UWVlSnM4MnU?oc=5",
+"published": "2026-11-20T21:13Z"
+},
+{
+"source": "Reuters Business",
+"title": "Search for Indonesia factory fire missing to resume Monday, police remove 24 body bags - Reuters",
+"summary": "Search for Indonesia factory fire missing to resume Monday, police remove 24 body bags Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNU1lYMkZSb1Y5Z2preUNtQlhuSHlEN0E0TFk2cGxwRE5FN255RnZqV3I1cE9QZzZjaG5sN2xod3JsUzZaZWNLWHE1SXZXTTd4LVI0eWUtV3RVYUt6SWFxZzVxVWl4QnYwUjRNLS13dEx5VWcxb3lLaGtBaU0tdUhTR0tnaHY2WkR2Qk9kS3prU1hReGtHV1lJUG5iTG1hRUtZSlR2WG1nS0I2eUxQZV9SU3pjM2NiemhJTmc?oc=5",
+"published": "2026-11-22T03:56Z"
+},
+{
+"source": "AP Business",
+"title": "FACT FOCUS: A look at false and misleading claims Trump made at news conference after his Asia trip - AP News",
+"summary": "FACT FOCUS: A look at false and misleading claims Trump made at news conference after his Asia trip AP News",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNV05PLWlWVkJwN3pKcDZCWnA4UWxlN3JFREtNYzQ0c21TMTRyZ0xpaVE0M05xbVVHNTNRVFFteEpXeTlqa0VwSW43N1QxdWZJZlh4cjA4SnYzamw5c014OVhtRHVjY2hBSjlwQ0RUcUJLTHFiVzVwT1I0V0g5LUttX0U4UzZvUHlPUG5OSnhBYXhNbkgxdHA2eVlRcnJUMkhRcmk5ak85VQ?oc=5",
+"published": "2026-11-20T22:37Z"
+},
+{
+"source": "AP Business",
+"title": "We watch Rocky: LeBron James organizes 76ers' movie night with screening of 'I Play Rocky' - AP News",
+"summary": "We watch Rocky: LeBron James organizes 76ers' movie night with screening of 'I Play Rocky' AP News",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOYTdWNjFIdXM2WnBETTctLS1Tc1A1OHdUb1dtSnV0ejlaLTUta0dvNHc5aldBY3ctdDQyRU53clpVbExWOGUyaXJvejNlNTNZOXNnTDVHdExBeTVKVlgwaGRMdGt0eEVtVE1RZ055LUUwaVdmY3c1aGtRbU1IOUZjckNpc0lJNEtGWmg0bDlYaVQzUDRIWm02b2VYd1l5dnp0b1RmVlpzUQ?oc=5",
+"published": "2026-11-21T23:10Z"
+},
+{
+"source": "AP Business",
+"title": "9 people shot at a central California concert; 1 in critical condition - AP News",
+"summary": "9 people shot at a central California concert; 1 in critical condition AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPMHpvMEx3ZlhhWHB6cFVoa1hWV0N3Z1BVOE8ycG45ZWJtNTNxak0zQ1kwaWZhQXJWRGlTQndqQlN3R0pvR2FwZVpNTl9lenNOVHB3bndTNTNqT0V3OEVpVnZEOU5mTlJFWVB2NEtNZmVsREtfU0dFczRiX2RJTXpyVHB4UXJBXy1HZ0t4R1NpdHI?oc=5",
+"published": "2026-11-22T21:39Z"
+},
+{
+"source": "Reuters Business",
+"title": "Dutch court bars Chinese SUV in Europe over resemblance to Land Rover Defender - Reuters",
+"summary": "Dutch court bars Chinese SUV in Europe over resemblance to Land Rover Defender Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPQndCUkJWZ0Y1N0JSeERKTGVrQ3VrcTY1bUsyR3lmWTRUMVFjZVplT3dBVDhOVFVpaXlGQUpXeGpXSEZZLXhsRmZuZUFuMU1hREQ4bUdNcE9ITHE0ckZxeV8zODBoQUd2alBrQTA3TE5hZmpTV0hBTHM5eE1DckM1c3YtS29LaUpGajluWmdhNUdtZGVzRFhtQ1hmMTZNSkJwNnNwYlJtNmVZVFdLMzgzZS0xQzlZVkZiY2Rr?oc=5",
+"published": "2026-11-20T21:57Z"
+},
+{
+"source": "Reuters Business",
+"title": "Detroit like a local - Reuters",
+"summary": "Detroit like a local Reuters",
+"link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBmNmlQNzdBdHV5YTBHV3dpZWNrRWc4cVhGa1ZMenYzQ2g4MjBiZGNnd19LempCQ1Zab0U2SzdxSm5kOEFJSnJOU1F1R3JJYm9MQi1aYUpYb0VHbXViTmQ4T0tTcEt3Q196czhfODVmcmNoQQ?oc=5",
+"published": "2026-11-21T11:00Z"
+},
+{
+"source": "AP Business",
+"title": "Russian missiles land in Poland, as Europe held military drills nearby. NATO calls it a violation - AP News",
+"summary": "Russian missiles land in Poland, as Europe held military drills nearby. NATO calls it a violation AP News",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQNXhFLWVHeVA2TTIyRTRBRklRM29NQlpLTkNSbkdUYlNWVTNLek1BNG52cDFJRjNNVGNxNW04V3RDTEJPNGtDZ1R6WXE5TVV3SDJhQkFDRVFEMXZaTF92aWhZdS1xS1A0QnR2dE9selFRNGJYclZkRmdKUlJrWjB3VGxzTFE3aVBjYWJCUXhsM0Q1Sk5qR1U3TFlIekxkUE43MUNNenk2bw?oc=5",
+"published": "2026-11-20T22:15Z"
+},
+{
+"source": "AP Business",
+"title": "Mexican cartel boss 'El Chapo Isidro' rose from small time trafficker to drug lord before detention - AP News",
+"summary": "Mexican cartel boss 'El Chapo Isidro' rose from small time trafficker to drug lord before detention AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOQ3ctd3FSa0JqbXNDRG9xbGhWYUMwM1hrdnIxU3RMc29OZkM5MWx0NzVvdlVVMmRLMHJMMkpIaUhwTFlpQ2Jwb2ZhWHpHYWFmSGl1RnVBMVUtT1FuTm94amFQa1NfdEgtekhOazdNNTRwbG9VeWdKMF9fdU1xTVFKLU1WWG9LQ0pvR2sxeVl6U3o?oc=5",
+"published": "2026-11-21T19:16Z"
+},
+{
+"source": "AP Business",
+"title": "Max Verstappen wins the Las Vegas Grand Prix for the third time in four years - AP News",
+"summary": "Max Verstappen wins the Las Vegas Grand Prix for the third time in four years AP News",
+"link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQS0c5aTZmbW9CSGdTQXJBQ2dRdVBMREc1bW50dHNtV1pSWjk1c1MzRTFpZU5DcGJQQ2xfRmk3YWJnSFYyQVVPc28za0JRdl9DRXdxOTVHOFlnc0JfdDFodjFkS2lHLTk1cDNraEpObkFxTUhOZ05MOXFBUDB1WmpJaUxCWlZvcm1XQ0E?oc=5",
+"published": "2026-11-22T15:10Z"
+},
+{
+"source": "Reuters Business",
+"title": "Hackers breached US Department of Agriculture, NBC News reports - Reuters",
+"summary": "Hackers breached US Department of Agriculture, NBC News reports Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPUXZEVUk4YzBsSEdWSzNZc0RDelRmeWRPc0ZWY1NGd2FOM19DVTZyU3Q4UGIzM3FoenNsX3N1N2h2TEx1MHNZUDBhdF9WSDdiMUJVZzg2UThoRVkycnJQRkZJZU96NHdDQmkyX3QySXFia3RiMFBkTUgxWWVwVVU3eWFWZzhtZWU0ODlVM0JZVkNDZEVCc3FDU1BEMDh5WWlVaGxlSUpSd0ItUVRjOFVsOWdYMHhHNHc1X3IwY29uNFBaT0k?oc=5",
+"published": "2026-11-20T23:13Z"
+},
+{
+"source": "Reuters Business",
+"title": "EXCLUSIVE: Denmark pushes EU to tighten travel curbs on Russians after foiled plot - Reuters",
+"summary": "EXCLUSIVE: Denmark pushes EU to tighten travel curbs on Russians after foiled plot Reuters",
+"link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOS0J3SExfSVZDcXRXb2wtcElESFhiam1fWTR4MUh0VGIzQU9iQjRkamVnWXZMaFI2cVRyNmFxYU40dmJBdWFOZTRuZVlPcFAzXzVhanZPckVpVXdQRlE0YkE3bkhfZk1ld2o5SDhYcmg0bUMwTklpdV9Qc3Q2Sjloajd0NzdzX0JhYjZvY0NmM2hMRnhLUmd4VzZxLUlsTWZoMmRFNVVwTU5uZ1lSVlp6MlpleTVJd2FqT1Q2d1NyaHYxU0lNSG1aWg?oc=5",
+"published": "2026-11-21T11:27Z"
+},
+{
+"source": "Reuters Business",
+"title": "COP flop triggers backlash in Australia; Pacific nations express despair - Reuters",
+"summary": "COP flop triggers backlash in Australia; Pacific nations express despair Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQVndpTWVxWkV6LXR6Z2JkNENyN2NiVW1ia1pIY0pxX2hYaE8zR1RPV3FieTZWZTNuXzRPS2hxN3hZeE51WHNQMkdOWlZ0ejBuUHJGdlEyTTR4RE1DeDM1VGc3Vm5OX3VqTTN0eEdJWEpwS0ZramxkT1RheGhvMF9vdUpGN2s4M3JaU0RZckVncE5YS2FBT3hlc3ZTcU00UW5CeVpaT1VtM1llZ0NNZWFTZTNVV3V1Rm81akxNUVUtZWk?oc=5",
+"published": "2026-11-23T06:12Z"
+},
+{
+"source": "AP Business",
+"title": "How major US stock indexes fared Friday 11/20/2026 - AP News",
+"summary": "How major US stock indexes fared Friday 11/20/2026 AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOdWJJZElGQTVNWWp3OVBzVkNhUUdRblYtVV9EQ1lUbkVFSXFJTkFOS3RkU2FXMVFwOG5MN000ZUdOV3RXaTBzekdXeE4xckNfVUxGaG5mNGxiVUU0WS0wZ21HSG5tdGVyU1F4dkFwa1BEOF9ENmJPSlZqbW9oQkZxQ3pMelJNbnlDVXpUZzBLMzd5ZDA?oc=5",
+"published": "2026-11-20T21:36Z"
+},
+{
+"source": "AP Business",
+"title": "CFP bubble drama build as Miami and BYU survive while Ohio State, UCLA, Indiana, Boise State stumble - AP News",
+"summary": "CFP bubble drama build as Miami and BYU survive while Ohio State, UCLA, Indiana, Boise State stumble AP News",
+"link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPdWY3VjlhdTJjdlNRVE1IVC13SkQybjZZbE1RRWJXQ01VdVN1aFFQdW05emJVUFRzOXJOdVBvNGhsR1FiVjZ1UDZMNC1ndC0wTUl2SjcxWDNpNnJNNG90LUt5QzgwbGFjWmk3SjVqekRicURDMU5Vc3JCSF9BODBHZzMtSE1jYkE?oc=5",
+"published": "2026-11-22T06:45Z"
+},
+{
+"source": "AP Business",
+"title": "Democrats clinch a historic House majority of at least 258 seats, the largest since 1992 - AP News",
+"summary": "Democrats clinch a historic House majority of at least 258 seats, the largest since 1992 AP News",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNN0ZaSUxXY2RGTWZBcXdNRjV0eWhIZUdfWjFBSmI1OHBGZy1qRWFpNnJxZDJVOC14dVFGZGdSS3NfeFNsQm1IcmJIWGs4M0l5alZQZVhDek80S1lnQ3plUkRrbm9uaE44RWtNMTBDTWRLUmdGLWVVUDRJZ1J5TmR4QU5vWW5qT2NvOHB3dklzcFZ2ZFltMy1SYVdJQnNRZFBiaURJN2t0bjExaE0?oc=5",
+"published": "2026-11-22T18:13Z"
+},
+{
+"source": "CNBC",
+"title": "Pizza chains are under pressure. GLP-1 use is only one part of the problem",
+"summary": "Domino's, Papa Johns and Pizza Hut face weaker demand, more delivery competition and changing eating habits, including GLP-1 use.",
+"link": "https://www.cnbc.com/2026/11/22/pizza-chains-sales-glp-1-demand.html",
+"published": "2026-11-22T13:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump says US to penalize firms building data centers abroad - Reuters",
+"summary": "Trump says US to penalize firms building data centers abroad Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOT3hEcEp0SWhZNmU0eXhJUEU3ekVWWkQ3SVp1ZWlQeUZPRVBKUkx6R08yMkVGSWo5S3JWelR4STNQN2pCanZjaTE2ZWl0anlHQjJjWExCVFBVaVF4Uy1HNEZrRWZoNnVhVmx0WFBQNUg5cTA2UEpxZHpHcTRZSXctTU9jMHhPclFTdUQ3NktmbkJNS203N0dVeHA4R1pTRFRieHY3NnZWNA?oc=5",
+"published": "2026-11-20T21:29Z"
+},
+{
+"source": "Reuters Business",
+"title": "Israeli strike on vehicle in Gaza kills three, Gaza Health Ministry says - Reuters",
+"summary": "Israeli strike on vehicle in Gaza kills three, Gaza Health Ministry says Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPNER6Q2NPRk9TUmtuX1hhQ21MdEdsc05rT0FxZzE4RTczVDJqbjN1My04Zm4tUkd1aUJ4cDdXSTM3ZVl6UVg0S0hLTWs1d1pjLTRDcVgtM1dVeVNvWFZHd1g3NEZCdm5HMlR1U09Cd1JfWUg1cEQ0aUZSU19uSHowSWhEUERvNE5OM1NxTDR1T3VYV21rb25pX1NSOFdFcHlOd3VzYkpMT2VzMlYwRVVSMmFuc2J3SkZ5dUM3Z0M0YXEyZw?oc=5",
+"published": "2026-11-21T18:21Z"
+},
+{
+"source": "Reuters Business",
+"title": "Fields of graves: Hidden deaths reveal scale of Ebola disaster - Reuters",
+"summary": "Fields of graves: Hidden deaths reveal scale of Ebola disaster Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNNlE5NnFHMFEzZi1GQmhXQXlJWjJDTEl0aVNEb1VNdHZQRzJSWXpUUndSRkV0WXpjR1M0eHQtRFFrX0ozOTJDTTNBNDBsLWlzNXdOVDl5M1FwNC1vSllHaExHeVVjZGxCWmNMTndLX3pqT1NScWVXSHdRaHdlRFBVblFMRWY0c1lpcGJEakpaZUkxT3FDZUNHMDluVVFjZkZUMTZ0SHNSbGd0UQ?oc=5",
+"published": "2026-11-23T06:00Z"
+},
+{
+"source": "AP Business",
+"title": "Court stay prevents US Army from detonating bomb-making chemicals in Iowa - AP News",
+"summary": "Court stay prevents US Army from detonating bomb-making chemicals in Iowa AP News",
+"link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPMDltMER2WkVsblcxS1NWVnh2MEM5cXBQbV82S3R3U1doMTlvVVZYSE4wNDRyNExSRGp5dktqdHlqYjJRb2RqQUxiVE1RaW9oU3d0MFViY2h5MlUxYzNEUnhROVgzYkhuaFR5WURpcDNCWTY0dHE2ekJka2dhb3JTY0E3aVlfWWNPaE90ci1R?oc=5",
+"published": "2026-11-21T02:20Z"
+},
+{
+"source": "AP Business",
+"title": "US senator says Pentagon restrictions on Canada focus on think tanks and social events - AP News",
+"summary": "US senator says Pentagon restrictions on Canada focus on think tanks and social events AP News",
+"link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQy1HRmtuYU9aVXlJYkNPR1FxLXlDMEVLMzd1M1Q4ODRfUV9Zd3BLenJBRENhYVNMSTM2UU1Yc2VCSkxaXzNJRy1jM3AyZWhldE41WmJET0huQUlIaUZNdF9ZNVhQanMtLUIwc1RUTHF4QlFzeWNBdVgxZkRneFZfNkdCTkd1UjJ2dzM2bUVYOVRfX0ZFemRZTE5vREVlZEp6ajNvcWw5RUlwMkhXeHVZ?oc=5",
+"published": "2026-11-21T23:19Z"
+},
+{
+"source": "AP Business",
+"title": "TCU fires Sonny Dykes 4 years after he took Horned Frogs to CFP championship game - AP News",
+"summary": "TCU fires Sonny Dykes 4 years after he took Horned Frogs to CFP championship game AP News",
+"link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNV2s3MnNzZVg5X0FRYW43Tk1fNHJ2VXBRRURnMUxoVmxSMmhxak1xLTJrcVNBNmgtYTN1VElDM0FZaG1fb014NFVSWml6UFJWZ2ZySDhWa0ZZWGVGZDB3akVvcjNVbEhSTnVlYnlUdjB0S25pSFpwVmlnZG9UYnhuLQ?oc=5",
+"published": "2026-11-23T02:42Z"
+},
+{
+"source": "Reuters Business",
+"title": "Gold's slide deepens as AI rout, rate-hike bets hurt bullion - Reuters",
+"summary": "Gold's slide deepens as AI rout, rate-hike bets hurt bullion Reuters",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOMFFjdnZJUDZiUXhKNUdPUWMtQ2tkd0ZKdmN4TTZ3bnQyb09SQ3cxSS1hNVYtcmF5WGpNSlJzS1dWYkdBUzBJZ2s5TnhLQ29mNWNIUy10MGJkN294UndsTmRmOF9GelkyVkdWRl8wcVJQNnRaRGp0a3NIMWNHT1dJSHhZRk1BT3FRV2pFcHVGa3ozS1ZCdjJXenJvSXlBOEdxLUp2MVVVTVBDY0NGX3ZRRUN3?oc=5",
+"published": "2026-11-21T04:12Z"
+},
+{
+"source": "Reuters Business",
+"title": "CAF endorses Infantino for re-election as FIFA president - Reuters",
+"summary": "CAF endorses Infantino for re-election as FIFA president Reuters",
+"link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRUdrNUFkSHlfeDdiM2RGUlNJOG9pRkw1WGRZOVhVRWpSVy16TGtmSEFMbURuYWxXTC1YOEpEWm5ZTHBfbmk1T3plMDl5Rktla241bUQ4d0doQUVONFFTNElNTXFDM3d3YklwMktfQ1AyTWRlZTN6d2NjY3VvX2hmNTQ3Vl82YkJzZ0dMSWZEUVROUHNudHlaUVdhSUFSUEgy?oc=5",
+"published": "2026-11-21T11:34Z"
+},
+{
+"source": "AP Business",
+"title": "S&P 500 sinks 3.7% and Nasdaq composite goes negative for the year as tech sell-off worsens - AP News",
+"summary": "S&P 500 sinks 3.7% and Nasdaq composite goes negative for the year as tech sell-off worsens AP News",
+"link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQY09GMmxTYlpRMnQ3YVJ4Q3BUdmg3NEFJWG5lVlh4TC0zZGxxZVcydTkwSkpiZUZfS3BXdlRab05HSW5TS0h5TDY5NFRKajBDSWdFbUdhNFIxMzUxc3pLRnEtMXVNblBwZmgteFlUWVhuS0lRU3diRGpWQnkyeWtDMGJiS3hzd2xCdUtDVHIxc0hOWGkwTHdPZ1FfenUwQQ?oc=5",
+"published": "2026-11-20T23:29Z"
+},
+{
+"source": "AP Business",
+"title": "Trump vows to work with Democrats to cap credit card interest rates at 10% - AP News",
+"summary": "Trump vows to work with Democrats to cap credit card interest rates at 10% AP News",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxObHFuVnp6cHlDTXlRMnZXTHlyWGo3UWdKVHZOb0x0NWFPZmxBWFl1RWNOTVBoX0NNWlozRUxVV0tZZHlJM20td2llbkRlS1MtX29DMzZTUF9qemlJcFoxTXc4cWNsbTdCc29iRGx2ajdwdkp6OUFQU3NsMzJDdzdxVEU2VlF4QmRxVzlNYVdIUU1QU1ZRUTdXSWpiR21Nbl8zSURwbWpUQ09BUQ?oc=5",
+"published": "2026-11-22T04:13Z"
+},
+{
+"source": "AP Business",
+"title": "Poland says Russia allegedly twice tried to kill a Ukrainian American rapper - AP News",
+"summary": "Poland says Russia allegedly twice tried to kill a Ukrainian American rapper AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNTWwydXZfZ2E2bGFlVUhFWEx4NEYyTzdyQWVUSHZkd0NvQU9iUHRsMHNCSlZZRFFNaEZwaEo1WmowdllhRnhvcTY2a0E1eFNiYmlUeDcwZUxzQVp5dnhlNklwYnlVaW1CVjFudDhVWDFvaUx1WlluM2VfU1lqWnlWelIxSkk0TElFRUlnQjZEVjI2S3o4bFlIMDM2YkRXQnRERlJDVg?oc=5",
+"published": "2026-11-22T20:41Z"
+},
+{
+"source": "Reuters Business",
+"title": "Two Danes suspected of being hired by Russia to kill Ukrainian rapper - Reuters",
+"summary": "Two Danes suspected of being hired by Russia to kill Ukrainian rapper Reuters",
+"link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQRzZOQTlKQWt4VWhLc0JPVzRZTFE0YW85V0w4QUhPWWktYk0xVEZ3c0tzTXRxVjB3QjNDbFRNY2djaUp2aWdSX2hTbld5MGxJQmh2bklTNF8zbUFLS0dET3JzUUU5NjdhYnRxNURCNjI0RE9tQ2huMmV6eVRjb2tEYUd4Zm5iem9jR1Y2bElTU1B2aS02TmRJNWdjdzhEeDZVLXFoUk51MkRzMkFET2lQa1FkdThwY0RkZVRjemlRMA?oc=5",
+"published": "2026-11-20T18:11Z"
+},
+{
+"source": "Reuters Business",
+"title": "Turkey dismisses Malaysia's announcement of Rohingya resettlement - Reuters",
+"summary": "Turkey dismisses Malaysia's announcement of Rohingya resettlement Reuters",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQbG80dHJYdWlEQV9wcnhWN2psaVBsNlRnNjJabEUyQ1Y0V3hEWXRlMmlsUTd5RjBtWWNpcHpFQ190d2kyOGpxY1lEMFRGejFpMlY4UDlOb3hzWnFXc054bFJuM3IzR05lelJCNG5Qa3gzbzB1M3hLdHhuaVk2N1BRWnhod3RtTXdNdUMtSWZ4bTRZWW1id0tqS1NpWTRtd01KVUhBUjlFbmpiMm5fcUxkVk5uNV8xTFE?oc=5",
+"published": "2026-11-22T06:38Z"
+},
+{
+"source": "AP Business",
+"title": "Storms deluging Florida with historic flooding shift further north - AP News",
+"summary": "Storms deluging Florida with historic flooding shift further north AP News",
+"link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQWFNhbEJ3VFNtSnVwUUZoYnppU2gtMzF4OGNudXYwaUdKLXlRZ3VadTE5LTdwMDY4UmtsSEY2a2xPRG96cHY5LU5xNzdORUFJRmxYUlZ1QVRTTkFmeTlSZ1pjSHNkajNFUWpiX090RFhYYkpvVDBwMXpEeHNJZ0dRU0xrcGtGTkJJMTJJQm1fNkp5a0hveGk4dVozb2Nlbi15R2JHNWNsM2VNYUpjb0JF?oc=5",
+"published": "2026-11-21T05:37Z"
+},
+{
+"source": "AP Business",
+"title": "San Francisco braces for massive tides. Mayor urges residents to reconsider travel - AP News",
+"summary": "San Francisco braces for massive tides. Mayor urges residents to reconsider travel AP News",
+"link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQVTczNHdJNmo2V09VMDFuX2U1Sk9WYkFQSGNyaXBUNlFZdDVoT0hSSE51V3ZLR2dCX3ZMN0liTXZRcERnaXN2OFBpUUluRnhidHdRU05zYlJMVTFyWGQ1RmdMRzNEUDJ0WHJmWmp0VkpBb2VQWERMd3hwdzBIV3JnS1ZjMVdhUloyRDNVSHRnZEtqRlRpdmRnbm9jSDJ6WEp0dEZTRVZB?oc=5",
+"published": "2026-11-21T23:27Z"
+},
+{
+"source": "AP Business",
+"title": "Okinawa celebrates restored Shuri Castle hall 7 years after fire - AP News",
+"summary": "Okinawa celebrates restored Shuri Castle hall 7 years after fire AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNSjRTWmNqZmtmWDRNMHpYcFczOU42Y05jUEswMktqTHpzMW0wbzBoM3ZhSVJOakRrWXlJTE9iWFdPOG0zTFZsRU4wd1BSb3FBMUFFWnJpNHIzd2o4cm5wZmRreUo1NlZwaWtHaGtTMzVEWnVDdkpmVkhlVWFydGEyeTFBSWd4Nnl3d2VPdzBGUHlqY21IUWdYeGItOA?oc=5",
+"published": "2026-11-22T13:12Z"
+},
+{
+"source": "CNBC",
+"title": "Employees at Eric Trump-backed robot startup lose health benefits as company's cash crunch deepens",
+"summary": "Foundation is pursuing an emergency bridge loan and has been in talks with VC firms as it waits for a $150 million investment from South Korea's Base Group.",
+"link": "https://www.cnbc.com/2026/11/22/foundation-future-industries-health-benefits-payroll-base-group.html",
+"published": "2026-11-22T18:55Z"
+},
+{
+"source": "Reuters Business",
+"title": "Saudi Arabia says it intercepts three Houthi missiles targeting Riyadh - Reuters",
+"summary": "Saudi Arabia says it intercepts three Houthi missiles targeting Riyadh Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOZEM0V09PMzNwMW5Eck5aSWVqWU02QzZsOHlJdHZrUHh1VDNOUFZIc1ZBbWJWOG9RX0ljdlpoMUhfX3o3QzQwNlJSUzRIbXhDbTBtZ0VEV0VtUWZCOUlwczJCQXVEN3hDN0x5TVVVZ1NaWm9LT3BPWTNsTHZicmpGOEM3bHhNa0VvQTJ0UzQ1NERFR1diOXdvYXlnUk9QeHMtaEw4MHFGR0VHTV9KZHpsT0hjZTQ?oc=5",
+"published": "2026-11-20T23:36Z"
+},
+{
+"source": "Reuters Business",
+"title": "Bahrain says Iran strikes industrial facility as air defences intercept attacks - Reuters",
+"summary": "Bahrain says Iran strikes industrial facility as air defences intercept attacks Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTzltZHhpNzJyRTg4dE5kYUJSOUJ4azFWY2txckEtQUlGQVVfTEtIUUpWN3dHZWlocXlZWGFidVRIMjN3ZDM4d2xQWVZ0UFAxRm81TGFfbFNZRzMxTXJOemdzOHRNeWJOLXhEWF83a3N0a1hiR0FjbUE1eGZVX002eVpMNHJyX2JoVXp5bFdjcDJBYkhOWFE4a1AzN0hSRE1wTDFmNGxvaFR6TkR6bkd4a3FSSUU1anZp?oc=5",
+"published": "2026-11-22T02:37Z"
+},
+{
+"source": "Reuters Business",
+"title": "Europe's cloud sovereignty push gains ground, but US hyperscalers remain dominant - Reuters",
+"summary": "Europe's cloud sovereignty push gains ground, but US hyperscalers remain dominant Reuters",
+"link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPdUQxaGUwa0xZUXg3ZGRoZkp4dnJfVDhZUGo4Q0V4QlJGeXZNZjIzLU5YT0NMeW5KOUJfVG1wRk1fS2pzc2JIZW01TzBaaXZ4cjhyRlVDMmxpN1JuNERqNVUwQmpjd0pQWUFGb0RMdUxkYVdCZUxIYVBxUmpDeG1mUGdWMkw4a25pdXE2UjRlZXl3Q3hub2VZdEZPSEhGQ1BrZDdFSGFjR095LTBDU1BENkVRczNVOXJZRzNPM2RjZXVySHhNMXJF?oc=5",
+"published": "2026-11-23T05:03Z"
+},
+{
+"source": "AP Business",
+"title": "Senator proposes select committee on AI as Democrats hope to move quickly to regulate it - AP News",
+"summary": "Senator proposes select committee on AI as Democrats hope to move quickly to regulate it AP News",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQMVppTkpwTl9RaDg3enpSUG00Y1l0eXFZVkV5ODJoYjhlRVFNdkNSWkEtMnJ6NDhRaHlFVkFqcEl5T3g2R3BrbjNTVjRyaU56ZjRTd0NYTkxvX0RkWVNkVkJ6THp1M3JuWmJaNFZrVlRrS0hsVjF6U1J3M0I2aTF5dW9CV3JXckdnN3hjWDVJWUFGX1E0QzlvNWIyMTNsVm5Oa3RWMWxrckJSVzg?oc=5",
+"published": "2026-11-20T22:53Z"
+},
+{
+"source": "AP Business",
+"title": "Nations agree to extend talks on AI killer robots but no firm commitment to rein them in - AP News",
+"summary": "Nations agree to extend talks on AI killer robots but no firm commitment to rein them in AP News",
+"link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQY3JlX1Q4VXpOM1lnZ2s3aUdnSmxhOExuMl9PUlVwSUpZclY1R3RSb04wdzljcmNaQzJoOENYYmxCQ2tLaXpma2RhQ3hHeWdwYURDN2ZBaGxYT0k5MkEyVDFubm5GX2FfYWVsd2Q0VkQwTWh6X2x0SF9qZS1kWW8za2Nod0I2QV9DQlVsSHpjRnhRN3ZaUWNjb1dpRHYzdw?oc=5",
+"published": "2026-11-21T15:18Z"
+},
+{
+"source": "AP Business",
+"title": "Inflation, economic growth and the mood of US consumers in focus this week - AP News",
+"summary": "Inflation, economic growth and the mood of US consumers in focus this week AP News",
+"link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPelR4N1Vnc2xfWmprOTJBTXZybTBicVNnaFcyUTFuNFhvYlpHUDR4WEx4Q0hhU1NscGtfakx6RE5qNi1MQkFSQ3ozalYwTDl4OV9NM2V1OEFhWTM5QzZrRWJIdDVvYVFfd00yZVVoa0g1M0N1Ylo4OWI4OHpzb2JWOWRZUEczWWNvOExxVndWUUJsd2ptZm9tYlhfZUZfZw?oc=5",
+"published": "2026-11-22T16:08Z"
+},
+{
+"source": "CNBC",
+"title": "Social Security benefits are rising in 2027, but other changes could affect what you keep",
+"summary": "A 3.6% Social Security cost-of-living adjustment for 2027 will increase benefits across the board. But Medicare and tax changes will also affect retirees.",
+"link": "https://www.cnbc.com/2026/11/22/social-security-changes-cola-taxes-medicare.html",
+"published": "2026-11-22T14:30Z"
+},
+{
+"source": "Reuters Business",
+"title": "EXCLUSIVE: Signal restricts screenshots to block AI agents from reading messages - Reuters",
+"summary": "EXCLUSIVE: Signal restricts screenshots to block AI agents from reading messages Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQcmswbGtWU0V5UThMT3Rqd3lGVmJqeHE4NEE0S1h5eEpMTUZfRzU4NUxLbjZLU195X29ld20wa2xNVWIxZlREZ1U1OFZIY3VicFA2eEMwQmFTbWJTVk9CaHJFMktMNUU2a3Z6TlBhWmEwVE1TTzVfRkFRY2VLdGZ2cVIxR1NuWUVXaFFxRlZaQnNaM29JZnpuUV9hVEZNY3F1ZEZwaGx4QmlJa2t4MTBZQlJDZ3g?oc=5",
+"published": "2026-11-20T21:33Z"
+},
+{
+"source": "Reuters Business",
+"title": "Myanmar's army-backed government calls ASEAN decision 'unfair and imbalanced' - Reuters",
+"summary": "Myanmar's army-backed government calls ASEAN decision 'unfair and imbalanced' Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPS1FENS0tc2xfZjRuaEUtTU5Fa1pYZXYtUm1BcXl5TldHOXdaSGM0VE5IaHgzcENjVDlnTmNJN0VEazRhWHU5ZHl3eG5VU1pLZkZxMy1wekcwdW5yanBFdEJNV3dGdVB0OGlJVFF5bTBkQ0JVbGUxcm1tQnBRT1JpZ3Q0a0lvV2poTUluZzBoZFdGOHYtQkh6Uy0xUk81Ty1Bb0h2Zi0teWpNTWJPOVl2VG0wb3dqQzljVGhtU1BKNkM1UHM?oc=5",
+"published": "2026-11-22T04:01Z"
+},
+{
+"source": "Reuters Business",
+"title": "China sets 2030 targets to boost support for older people, childcare - Reuters",
+"summary": "China sets 2030 targets to boost support for older people, childcare Reuters",
+"link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQTjdnUk5JS01JQ21aaEVvZ0pWLWVIY3BSa1RzMWFzcERoNmtiODVjX2FDcWlaVWxYVGZiRXpVX0tTWHMzODBvSW1zYVgxOVd5eEJHVTFMOS03ZUgxV3AzVFl4b0RDNU5Ec3laSm1HdzcxMGZXbkUydHI3Y282bjF1ckN6ejljMlN4a01OSTZ6ak1fSlRXOU11OTFneC1uR1cySDNBdU1GaHdBYnlk?oc=5",
+"published": "2026-11-23T04:48Z"
+},
+{
+"source": "AP Business",
+"title": "From MAGA stardom to a U-Haul: Lauren Boebert considers her own and GOP’s losses - AP News",
+"summary": "From MAGA stardom to a U-Haul: Lauren Boebert considers her own and GOP’s losses AP News",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQX3puWGdiODd1QzNqU01VS3JXbFJRN09HYlJIU0hjc3V0VmJwLVllMG5ZZGMtVnJ4d19raWVuRDJxczUzd3NxX0RNMzhBRi1QQTdhckNpQ1dCQVhua0R4WU05SXYtRjVDX2JoQmdWc2FQcU9DNjNCdUtucTJCNVhIUk1nY3huZ0gxM3JZSEVrUUc0bEs3R09Na0p1VDlJWjMxTWhqazZhWWlGMWNwX1E?oc=5",
+"published": "2026-11-20T13:52Z"
+},
+{
+"source": "AP Business",
+"title": "Christian nationalists see Republicans' midterm losses as an opportunity to supplant Trump's MAGA - AP News",
+"summary": "Christian nationalists see Republicans' midterm losses as an opportunity to supplant Trump's MAGA AP News",
+"link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPT0lkcWgzcUF1NjNLT3UzYUtzNmN2Z1JYakE3cnVvcVBUUHR0aTRQNG94cTlTbjh2OU5fbnl3NzBjeHBlZ2ZWdEd6TkhhUmlpWVNOdWNKZEVKZlhyNHBTNFU1UTYtb3p4cjR4Q0VDT0ZoSDhfWWtCUlZxZFkxOEw2WFVHRG43TWJWMktsbUI5ai01OXNzdnZmSzN6Z0ZNQ2E5UUN6UlZZOUZQTzhleFZEQUJkQ1ZzcU40aHJwZXlB?oc=5",
+"published": "2026-11-21T12:54Z"
+},
+{
+"source": "AP Business",
+"title": "Automation system problem at Delta causes flight delays as Americans travel for Thanksgiving - AP News",
+"summary": "Automation system problem at Delta causes flight delays as Americans travel for Thanksgiving AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPUFFDN0VnYTFzcXhya09Nbnl6QnVaZ2NIa1pYS1lDLW44bG5SZmM1eW4yeS03M3VaMk9kenFWRjlFejFwNW9yY3RJU0tOX01jeGhGTW1JSURvZXlZWGtSV1ZDdGJZVU84R2JSYjh2aHRreWlkZlc1YkxJZF9TdVdnMWhHaXphR1pUWHNjOHhCdHI?oc=5",
+"published": "2026-11-23T00:47Z"
+},
+{
+"source": "CNBC",
+"title": "The Nasdaq is in freefall. Here's one stock to look at",
+"summary": "Elevated options premiums are creating an opportunity in Amazon",
+"link": "https://www.cnbc.com/2026/11/22/the-nasdaq-is-in-freefall-heres-one-stock-to-look-at.html",
+"published": "2026-11-22T12:10Z"
+},
+{
+"source": "Reuters Business",
+"title": "Anthropic's post-debut stumble delivers reality check for AI trade - Reuters",
+"summary": "Anthropic's post-debut stumble delivers reality check for AI trade Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPNWtIWXhnWHpsWWZSZ2dFVFRFSXBHaUxOWlp1VnFSZEoycGRtMDE1NVhuM2NEa2ZUTHlLN0lFbG5aX295SThLcFVXMEV3VmJidHF2amdDelVYWWprLXRsNWpodU9LcERma2xnc2pWaTZGbmNHZnYwREdjQnBOcGR0S0JSdnZTaC1aYmtBWXdRXzJiVDhHbFBEZ3lDdWhzS3Q3dnFMY3d3cjZIdw?oc=5",
+"published": "2026-11-21T01:59Z"
+},
+{
+"source": "Reuters Business",
+"title": "Death toll from Nigeria boat accident rises to 24 - Reuters",
+"summary": "Death toll from Nigeria boat accident rises to 24 Reuters",
+"link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNbWFnQ0phMWt3NWlMbVNDVlJmdzFBay01UWI5RTJqWEdMazU3anhrMDRiTVRnNXlIN2VqTlRYZE1LaEZKQUdhVE0zZEpKTmZoS05hUDJNYkprc3ExX182REhpVGo0RHFMTU5wOVA0U05md2NyMDY1NXo3Xy02OU5kbDJWWGhUYnc4VTRNd3NaM0RlbVlI?oc=5",
+"published": "2026-11-22T07:34Z"
+},
+{
+"source": "Reuters Business",
+"title": "Morning Bid: AI, caramba! - Reuters",
+"summary": "Morning Bid: AI, caramba! Reuters",
+"link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9QLU16VkZBVHVPOXI2M0hiazQ4QWpsNlZhZFVRaDY0ZTB6cU9SQ04yYm5sRVFfZHNwUkFla1V0ckxtb3JES3hSNi1nNXFBVzBVV0NUTE1QdWZ3WWtXTzVQTlA2WVNfTE1JYUVfRE5ZelExREluaWV1WFAtdkdpek0?oc=5",
+"published": "2026-11-23T05:36Z"
+},
+{
+"source": "AP Business",
+"title": "North Carolina U.S. House Election Live Results 2026 - AP News",
+"summary": "North Carolina U.S. House Election Live Results 2026 AP News",
+"link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQZUNJT0NlakJ5a2JfTF96OEhsQWQ2Vk9tVWY4Mk9mbXJaR0hKb1JUSlJFeWxCck4xTko5cGU2LXBlRDhja25qUE5ZUEpkMWN5QnVJcFBkcmpYV1VYUE5GQllrdnZzZ2FtNjVEakZJQlk5bDM5VmhWS1I2SzctaEtGYg?oc=5",
+"published": "2026-11-20T08:00Z"
+},
+{
+"source": "AP Business",
+"title": "At least 24 dead in Nigeria when boat capsizes while carrying people to a funeral - AP News",
+"summary": "At least 24 dead in Nigeria when boat capsizes while carrying people to a funeral AP News",
+"link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQNkdWWmd1TGxndVdtTXRTSVZOekxZZDhzS0F4TlNTbFN4R085VlA2T2FER1UwdEE3ZlloaDRIREpFSXJuMnZHUGVnTjZxNVc5ZDRmcE1jSV9kM2p6WEF4cE5ocHktaURvOGhKZ012TUxPMS10ak1OUFAtQ1NFZmFMY293UktTR2Ri?oc=5",
+"published": "2026-11-21T22:52Z"
+},
+{
+"source": "AP Business",
+"title": "A California billionaire tax proposal faced a major setback despite big wins for progressives - AP News",
+"summary": "A California billionaire tax proposal faced a major setback despite big wins for progressives AP News",
+"link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNVGlFRWthUlJhcXR4eVdkV0dDeGFWNmo1YmNsaU9tQkRFNE9GbEliNXVoRlpnTklJdlBkeGYtbHRxNzZfbjNFRlZMNUZhM2NtNmYzdmRJOWtvM1BFQ2xyMEJ6clIzM09QOTYtS1lQMVJvbXhnN09DYlVsNGFRa0RvaUlvaDVCNE5kSkQ1OXlyd3pvaHJ1V0dYVlZhcWNieURLX1c0?oc=5",
+"published": "2026-11-22T11:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump's personalized diplomacy hits its limits with 3-way summit - Reuters",
+"summary": "Trump's personalized diplomacy hits its limits with 3-way summit Reuters",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNdERQSHBUWVRvbktIZEo4ZDFTS2FKNzZjRUwzamQ5VjkwUE9RQl9KSkoxdmJ2QmNnT2tzNkdKc2dYNjNNQ2Q3RVNERlB3X1NOa3FUTU5XdmNocGtRdWdSSzIyelZhd3Mwc0JEd0t6dXhicEd4TVRPclNPcy1TTkQwcFE5OVV1WFBrUmNEcWFRenA0TGJYMDh2OWMtaV9PZmd1LXJWa0hUMWU1bE5JSjcwTw?oc=5",
+"published": "2026-11-20T20:44Z"
+},
+{
+"source": "Reuters Business",
+"title": "Town in southern Brazil left reeling by supercell storm - Reuters",
+"summary": "Town in southern Brazil left reeling by supercell storm Reuters",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPcGtZWUFxQ296d293WHQ5R3BvOVFKM1hYenYzS2FFdmZsT05BUU5JZVNMZXgxMHktN2V5QUYtNUF0bHRlU0psNU4tZzN4TmJvbm1zWkQxRWxIbkpCbUdPQnVKU2JPczAweXc1X1lpWVJHQzVFc0daczk0NGM3OHJkdTFpTzFDLWZINmh0dmd0Q0l6aDduSkZGMTMwNzRMb25ocUhzQjdQdy1qZWRBcEE?oc=5",
+"published": "2026-11-21T19:23Z"
+},
+{
+"source": "Reuters Business",
+"title": "Indonesia says 24 killed in factory blaze as rescuers search for dozens missing - Reuters",
+"summary": "Indonesia says 24 killed in factory blaze as rescuers search for dozens missing Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQc2JzeHFuVWp0dk12UzctdTk5TXJIYURhcXVITWE2ZmV3V3Jrb09BenpkWThoenRiY3FyaEp5RUlUMmFmQ0ZJbXhvUGd5RG1nZ0JrNWs1NmhibXFJSXpUUkNOQWZ0VWh2MnVONlRuU1dPVXZXVGVueEx5UEZnWWprWE5iczJIMXZNWlFXeThMZ0kyTWl6aWJfWGNDM3BkY05yYVVxYkw4anppc3hLUmlJX0JOOFhDa19vNGRtdE5YMjJqQQ?oc=5",
+"published": "2026-11-23T03:49Z"
+},
+{
+"source": "AP Business",
+"title": "Denmark accuses Russian intelligence of plotting to kill American Ukrainian on its soil - AP News",
+"summary": "Denmark accuses Russian intelligence of plotting to kill American Ukrainian on its soil AP News",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPaTdoazBLSGtEajM3NVpZdDhaZFlDNXdLdEFfMUItOUc2SEc2ckxGaHVQNHh1MGhmdG1xWFhnOWJWclkzdHEybHV0Qm5jSlhGQm5VMnFYNEpXdUw4VDYzVXhLOVhvaC0zQ284bHp6eDBxUmdtVDNRVjVINk5qLTBHT1VaX1EzNllvR0VzRlpBTGFOQW80QUVZT1l2M0t3MnVRTHhBNTBTZ1FpRnBFblZrbU01czVJdGs?oc=5",
+"published": "2026-11-20T20:02Z"
+},
+{
+"source": "AP Business",
+"title": "UN climate talk negotiators go into second day of overtime while at odds over fossil fuels - AP News",
+"summary": "UN climate talk negotiators go into second day of overtime while at odds over fossil fuels AP News",
+"link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQRG9odk56QnZYYWdjalF0a2Zfc2hfLVUyUFVuVHh0aHN1TUFMTmNJbEhzYjRIWnctNDFxX3p1Zl9RY3h1VzZLbzBMWjB4cnh1cFNoX1NXY3EyaEF1VXlvWGkwSUlFa1dYUFRMcUxEbFNPa2FaUmkwRW90TUJXQklock10QXhlSVNpWHhIM2hPTmlxSWZRTmRINEZiTHI3cGlMLTRiUEVCQkk?oc=5",
+"published": "2026-11-22T01:15Z"
+},
+{
+"source": "AP Business",
+"title": "Russian attack near Ukraine’s capital strikes apartment building, killing 3 and burying others - AP News",
+"summary": "Russian attack near Ukraine’s capital strikes apartment building, killing 3 and burying others AP News",
+"link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPV0dYbG15VGlQaUxBOGJXQkhMem1ZTEJVSWE3QkJHT0FaaVo3Tk5iai1LcHd0NEVPRm1EYldUR1pHNENaa3dYTmpfOUpsVHJnTGtXa2VvRXNLaHc0bjNBZWNXTVowT3FWRTk0MzgtNXktN2hUNFhnUlVYSjFXRVBNNUt5bDcyNXMyb3pQV2pCbWphUGItclFzeDVKV1pTT0xUQzVZQ2xrVUZ0UWtoZEo0?oc=5",
+"published": "2026-11-22T16:53Z"
+},
+{
+"source": "CNBC",
+"title": "International first class is over for U.S. airlines. Enter the mega business-class cabin",
+"summary": "Airlines are opting to build giant business-class cabins with ever-more luxurious suites.",
+"link": "https://www.cnbc.com/2026/11/21/us-airlines-first-class-business-class.html",
+"published": "2026-11-21T12:00Z"
+},
+{
+"source": "Reuters Business",
+"title": "Congress struggles to avert US shutdown as Iran war divides lawmakers - Reuters",
+"summary": "Congress struggles to avert US shutdown as Iran war divides lawmakers Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUDZZTmpNTGpqLUMwR0JBZUJuaVBuMDAwYVpVanpkNTJDSGpNMEkxdXlSX1JkSDJpaG1SNUlmMnJZTHZ2Y192UmFKSjlGazN5UE9hZEJfcmFwdzVGWFE0QWk3OXBGWEpudkV5bTdiLVEwWjJicDFrTHJWVGVQT2RNMlBYZ3pMMmhQTHhKRnJ1QktWbGhVWWxRb0paRGZvdVNDdlRJNEd1N1lEbG9LOU1mTURPZE9CZlVvUk5j?oc=5",
+"published": "2026-11-20T18:01Z"
+},
+{
+"source": "Reuters Business",
+"title": "Brazil ex-President Jair Bolsonaro taken to ICU - Reuters",
+"summary": "Brazil ex-President Jair Bolsonaro taken to ICU Reuters",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQVFRjc0toOVM1UmJiaXJrMTA4MU43ZmY2Yjc1QTlwcTQwUVA3TGZ5MVZuSzNRSmRwR2J3TkVHWWE0OWNlX3lkeU5pQnNQcWk5Q19Ua2k3ME5BalMyMEp1RzUyZ3FQdTFxdDZ1TWJLaVNmcWljSl9qMkVZaHdXbFhsUEk0OVJ5OVI5eUVVMm5haW5qanpUdW8yZDN5cw?oc=5",
+"published": "2026-11-21T19:03Z"
+},
+{
+"source": "Reuters Business",
+"title": "UK police evacuate 12,000 people from concert after 'unknown substance' release - Reuters",
+"summary": "UK police evacuate 12,000 people from concert after 'unknown substance' release Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPa2dfdkNPNGFwc0JUbXFKVWltUVZRZ2N6d1FkMS1XLTUxX1FsM3FLdFltQjZYS2pUekRqaGQwSEs1RjFPTHJmZk43UEw5X0Y1NHE3czk1MlVFZ0lIcEtzSW01V1NKQ1E1VFBZdU9UNExRbFZxNks2NTU2MS1VWE1tYko4T0VoVmJwU3dpc0QyVHFCRXByRG13NnlrX2xaTGxkWFVIOGdqQlozV19zSlUwWGVFNUJGQXkyZzNtWEtGb1FWaEU?oc=5",
+"published": "2026-11-23T05:38Z"
+},
+{
+"source": "AP Business",
+"title": "Russia paints Putin’s talks with Trump and Xi as a watershed moment and a snub to Europe - AP News",
+"summary": "Russia paints Putin’s talks with Trump and Xi as a watershed moment and a snub to Europe AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNcmRDU0FBQmVJbHJNT2F5QTFRQkJtVVBwU0ZBS09SS0p5NE5LX3BFSmVqZWxvNmZYekhpOFVGczcyREU4c2YtSTVtMVhWLUV6R1dJbjhHaUhtbW1YYTA4T1dYUmZRUzVrRU50d0dMNmF4NUVzcG1tcVM0bWxMdjdRQ0lvb01FWDRDMWNtTnlNdlo5MGZEOGhDR2VfTENCZ0g2cGh2VQ?oc=5",
+"published": "2026-11-20T16:21Z"
+},
+{
+"source": "AP Business",
+"title": "PSG forward Désiré Doué suffers a serious right knee injury in Ligue 1 game against Nice - AP News",
+"summary": "PSG forward Désiré Doué suffers a serious right knee injury in Ligue 1 game against Nice AP News",
+"link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPVGdZNmphdGUyQm9DcnFlaE5QVFFsSGRwRlRfa2NVTW9FTWh3UnBuTVRmODVGZ1VLQzNabWdENnN5NTZzcWItSENRSmppR3B4VDRCNHhZWHBuekFzazRxdVRQeWpMMmRmdlEwVkRta0MwaWVuZFNjQVJHNklmM2FScjJvTXRBQ2M?oc=5",
+"published": "2026-11-21T19:13Z"
+},
+{
+"source": "AP Business",
+"title": "US Army plans to invoke emergency provisions to detonate bomb-making chemicals in Iowa - AP News",
+"summary": "US Army plans to invoke emergency provisions to detonate bomb-making chemicals in Iowa AP News",
+"link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQSHU3NmsxWHB4a0x6ZTdpdG9ZWWlqS29GMXowZ3BEQndXZVBuU0tBc1EycDY2blB2SnNhV3pxTHctWDNFajhDWENxRlVzbHBTU193TjZsVVhXQlB3ZTZwQUZNT25KWDM5bWxXTG9FSUtvOW9zZ0wwTFBsTmFGcHZEOWlvN1QzanQtd1hQYzNR?oc=5",
+"published": "2026-11-23T03:42Z"
+},
+{
+"source": "Reuters Business",
+"title": "Poland condemns Russian 'provocation' after three airspace violations - Reuters",
+"summary": "Poland condemns Russian 'provocation' after three airspace violations Reuters",
+"link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPejRoNTB3Y2hjdXRxMmNON0lac2xkWldNSmQ5RXFTM0NrMDFJaEE3QWxsOHJoYTgwLTFUN1A5MGRkU0h6ejNsLXdraFB0MjhNTkVROEJjNG5WWm00azhpbUNDN2FRUW1uRXplazJmU08za2gtYlc0bEc5bk9XMEpfbndzU3VVTVB3LUNyR3llYW1rdkI5UmtzeFNsZmhNNllGY3g1WnF5ZDZpLTRGZ0Q5RUstaGJuSnFESFJCZ2d0RG41RDcyZW9QZmV3?oc=5",
+"published": "2026-11-20T16:07Z"
+},
+{
+"source": "Reuters Business",
+"title": "Verstappen wins 'crazy, surreal' Las Vegas race - Reuters",
+"summary": "Verstappen wins 'crazy, surreal' Las Vegas race Reuters",
+"link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZVYxVXlmSDFOdDVVczVXcDROTjNWNS1LbXU3QVp4bEVueHVHZ18tY0NqTmFaZ0xJMnNzOFotbmxLaVljLTJJNHMwRHg3c1BZOFktdk14amRfNHZxMmsyMEM2bS1yT21JMHdxZXhJcXVTVjdxZUxaZ1B1WmdFMGh3cE1SczltMnhZbUJpbzFsUWhWR3JmTjlIOWlMS2diVTMz?oc=5",
+"published": "2026-11-22T05:48Z"
+},
+{
+"source": "Reuters Business",
+"title": "ABB to acquire Germany's Ziehl-Abegg for $2.65 billion - Reuters",
+"summary": "ABB to acquire Germany's Ziehl-Abegg for $2.65 billion Reuters",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNZHZtSGVEd3BrTkdBY0Vvcl9mRkR5UU1YQ0FMU21SWTZvM2JNSXRVUS1kNFo5SW80NXM5ZXZneTBLdy04aldsWWZ3Y3VMTEhwOEk2NmhscHhVVU4wekQyV3gtTHRtYU9NdGpvMXBDa2RyNmZGSVVzcnM0QVo2dEd2MDdPa3RFMkgwR1NIVnN4SHFMT3hadGVTVWcyR2F6NVdxMXc?oc=5",
+"published": "2026-11-23T06:19Z"
+},
+{
+"source": "AP Business",
+"title": "Mamdani sets plan to close NYC’s notorious Rikers Island jail - AP News",
+"summary": "Mamdani sets plan to close NYC’s notorious Rikers Island jail AP News",
+"link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQVUdYbjJUMHZtQVZHWDJKSGNIRWdjY2M4ei1YTzJEMXdjX1ZLbGlKT0tGd205UENPZHFwN0JEYzdVMHE5dVphbTB0NXpjVmN2SXZrYklTNTB1Wnh3aXRvRXBMcC1KbWVLZ2R3azVaRWQxSXl6ZS03VF9lNkZ4bzg1SFBFN3BkYXppdkNfX0tnQ1pYUQ?oc=5",
+"published": "2026-11-20T17:14Z"
+},
+{
+"source": "AP Business",
+"title": "A 10% drop for the stock market is unnerving, but it’s not that unusual - AP News",
+"summary": "A 10% drop for the stock market is unnerving, but it’s not that unusual AP News",
+"link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQekJLM2U0dXhaeEo3d2hmNFltdUpLQzF4a2VtY3RNR3otMW44Zld5R0Q3TGpTNWJ5bnA1RG00YXU4NkNpYTBtMVpnUmV4cFZPSF9HWnRjdlRPZ1Bsc0dwOENCQWM4QXc2MjdPRWhPcXZjeXNRbXhUdV9fSDVwcW5kUlJGZTVUbW1Lc0h5YzJCYWtpNDd5dzRJ?oc=5",
+"published": "2026-11-21T14:01Z"
+},
+{
+"source": "AP Business",
+"title": "Big Ten takes a beating, no teams in AP top 5 for 1st time since 2021 as Georgia, Utah hold steady - AP News",
+"summary": "Big Ten takes a beating, no teams in AP top 5 for 1st time since 2021 as Georgia, Utah hold steady AP News",
+"link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOeUVZeGdGVTRiZnRJeWRzX0ZrRVh5X0pyUm5LVXVIQ2ZJMlRMaDJMZjlObFl1LWE2MzkyVE9XODR6OEY1RVg5X3lUUUNXbk5NNmppd202OVBKV2tmQ1VRbDVLOG53NEdraGdvdm45RWFwZ1MyLUthOTVKRE5PMDJ4OHR0VDhueEpqSnNPQ0ZR?oc=5",
+"published": "2026-11-22T19:00Z"
+},
+{
+"source": "CNBC",
+"title": "Yemen's Houthis claim attacks on Saudi oil refinery as Trump warns of new strikes next year",
+"summary": "Yemen's Iran-aligned Houthis claimed an operation against Saudi Arabia's Rabigh oil refinery, as diplomatic efforts to end the war face long odds.",
+"link": "https://www.cnbc.com/2026/11/23/trump-iran-war-hormuz-saudi-.html",
+"published": "2026-11-23T03:52Z"
+},
+{
+"source": "Reuters Business",
+"title": "Oil gains on Iran war worries and short-covering ahead of Thanksgiving holiday - Reuters",
+"summary": "Oil gains on Iran war worries and short-covering ahead of Thanksgiving holiday Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPb3pQREZDSHE2RmNHdDdGdExDUXhYeWljc2VualVoQ09oQV90WnFQQlZkYW1rWnl5ODJ6N2haaVBDVUY4VmFvRmtLSlZKbU5kR1lHNklrUUR3X3JGc181OHZCUHpXalZFUllBZXVEczJPUUdZZUt1MmpsTEN0MkJGSDNCVHhoa25pZFBSb1lldS1US0VJNVNBWWN1U2VwQmd0WmlQR1RKWmgyS2lyUDVfNHdWeWhzaFhmZ1E?oc=5",
+"published": "2026-11-20T20:45Z"
+},
+{
+"source": "Reuters Business",
+"title": "Croatians rally in Zagreb demanding justice over psychiatric hospital death - Reuters",
+"summary": "Croatians rally in Zagreb demanding justice over psychiatric hospital death Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQSUtfVnQwVjJrRWVQaTc4UzFEUjdQMmQtS1JOaTNsUmtjNE9FcEN4MFRCa3VXSi16X2thbk16VFNOTElxUkExdDBiVmFsSFNyS1FTMFhhZ3RoM1hVM3ZhY011aHR5a1F3YTRZNkxsR0ViQTFxOF9MRzhtbVA2TUs3azBBRlBCcENPVWtMZUtsdGJ6dFRWSVVhenZNSHd5M2VmWDJ4MDdGQXNDR0tpcWRwQ2lTb2g?oc=5",
+"published": "2026-11-21T19:51Z"
+},
+{
+"source": "Reuters Business",
+"title": "Citi's $35-billion UK error could complicate exit from US regulatory penalty box - Reuters",
+"summary": "Citi's $35-billion UK error could complicate exit from US regulatory penalty box Reuters",
+"link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPOVMxWWx3akhhdTVwTkFRU0pvbUFJSGU0MjhtY0JISTktTmRzNkJwb3B2a1JIWXluU3BZY08tX3JacHJnZjZmVXFkcU5nd2VIdDZhUEdvRFZyUnVHWWx4dGZtYlJ0QzFFX2ZKOHAxYkJselp3dXNkYWFRcGJmZ0VVMUxqNFg3UTduLXFmQThrbWZtRHpYZjhZMlc3WU1QZHdMQVRUaWVnNEEwZTZ2ZjNVU3FKMmtHaGVnaFhFNV90NkxkT1Bk?oc=5",
+"published": "2026-11-23T06:01Z"
+},
+{
+"source": "AP Business",
+"title": "‘Grand Theft Auto VI’ sets record with $3.79B in first-day retail sales, Rockstar Games reports - AP News",
+"summary": "‘Grand Theft Auto VI’ sets record with $3.79B in first-day retail sales, Rockstar Games reports AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQY0hRM1J3UzZkR2JvWnJYUDgyRE55OE9pbmJxM19vX2llS19QZjBTWkNVaVVZQTRJbnZ5N01NbEp5Qko2T3lGWlNERjFNYXF4Q2xiQVRZQUFmN2lWQ3V3YmpfYzZXNE5Lb2FuSFVJU2lBUW9VWVhRemxaY2dfamhRODlubjNmN0N6MU9DbENZd1NrdzNfeVFYWmtKNHJMQlBITXp0TQ?oc=5",
+"published": "2026-11-21T01:38Z"
+},
+{
+"source": "AP Business",
+"title": "Britain’s Princess Catherine reflects on life after cancer diagnosis in a new documentary - AP News",
+"summary": "Britain’s Princess Catherine reflects on life after cancer diagnosis in a new documentary AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNX0Q1Z0Q5R0o0dnJvY2piMkNIdTFVUFBjd19pYklYd212aE0zZmpBUGc1cGI0QzcyR29MVGZHbDlmSlh1NEdfaHgtR0Y2QlFaa1hRd0xZSk9RU1FobzBSdzd3dzJlRGpxdDRoM1JEZHQzN0JScDM5VUxSTTctZ3RRWnhnc0NucmNsYWh6NjBLQmdWUlNTUU9aUXV2b01OOG9RZXBlVg?oc=5",
+"published": "2026-11-21T17:29Z"
+},
+{
+"source": "AP Business",
+"title": "NBA Scores & Daily News | NBA Stats, Scores & News Today - AP News",
+"summary": "NBA Scores & Daily News | NBA Stats, Scores & News Today AP News",
+"link": "https://news.google.com/rss/articles/CBMiP0FVX3lxTFBwMFNyak8wbjBIcmRoX2hyLUNMU3o2NzFoa3UtTFl4UUFQU18tWnVzUWxhZGsxRS1IRXFWdWhoVQ?oc=5",
+"published": "2026-11-22T14:20Z"
+},
+{
+"source": "CNBC",
+"title": "Retirees face a looming deadline for required withdrawals — missing it could trigger a tax penalty",
+"summary": "The busy holiday season may lead retirees to miss a key deadline for retirement account withdrawals.",
+"link": "https://www.cnbc.com/2026/11/21/rmd-deadline-penalty-2026.html",
+"published": "2026-11-21T14:30Z"
+},
+{
+"source": "Reuters Business",
+"title": "The snowballing selloff in global markets - Reuters",
+"summary": "The snowballing selloff in global markets Reuters",
+"link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE84ZFFzbDlRd0J6aHAxMkFGQUl6R2swRWt1ZTFUNWhNZlB1Q3VTMFlIcWNUUWpvZGY4TjdodG9qYkw5eVZiaENISVhjZlVQNy1RRjZ2QktKOER1d3lNOUxyOTc3aThONVdUU3VmX19fMnl2ZmpZeG1idEFGR1BkMlk?oc=5",
+"published": "2026-11-20T15:13Z"
+},
+{
+"source": "Reuters Business",
+"title": "Australia criticises US Congressional Budget Office over AUKUS comments - Reuters",
+"summary": "Australia criticises US Congressional Budget Office over AUKUS comments Reuters",
+"link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPRlVOa1hkTkNLZ2tVNTdiR1RIUVJ3ODE5WlMzN1BtaHlzNjlnTmtrVHF5NVhqcjUycmhIb2dtOFRVbFhZaHNybEtWdGJ3X2pXX2FXZHRzNl9OSUEzaUw5VHVfZjZPYVRfRjRaSmRKSHJrS3NCY3A0MndnOXdOaVdPTTJHN3FOZmd0V0dZejExMV9nVjlwbmZDLXRjSHVodzhTN0ZldEZnQTgxc0ppcHJmdjVpeEs5c1hvT1ZxU0c2SFBaTTY2?oc=5",
+"published": "2026-11-22T00:33Z"
+},
+{
+"source": "Reuters Business",
+"title": "Saudi Arabia's influence loomed large over failed COP31 deal - Reuters",
+"summary": "Saudi Arabia's influence loomed large over failed COP31 deal Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNTlIwMm16SERFRUIwTHpnYXA5RE1pZDIyd3hSM3YxZUVDZTVkOVU0bnl6emlESm1ja0dEaFptdXN4V3FwZzFDNWN0ZE9iSS02ZDIxTFFkTXJsek5RX2duZjdrVk1CUnhXRkhjbTBEWG1WeWR6R0k0T2VVTFVSamJubUxfZi1lY2g1NXpvTmZiMllacVFfR21fbEVfbG1scTBzTUNybkF5cHpWUnBwV0RYOGdUaWg?oc=5",
+"published": "2026-11-23T03:03Z"
+},
+{
+"source": "AP Business",
+"title": "Workers and students protest across Europe as a strike in Italy disrupts services - AP News",
+"summary": "Workers and students protest across Europe as a strike in Italy disrupts services AP News",
+"link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNZFlKamwzV1Zfbm9XMktPSUY2YWxfbUM3aXpna2ZycjFTaVBfOC1DVGExYUhMQ1JFM3h1S0Vkc1h5S0prXzBScTlBNFE1d2o3NlBxTk03T3NoYkFlX2Iza3FtWUZiSktkOGstenR3Nk1vY0QyZ1FPUTdiN1VDRTJNa01qcXIyNFZKS1JlTFRzZTBydTVKcDlTSVM2bG9MRHFfRVhVSDBRbzQ5Yk5JQW9pbVJRVmV3QQ?oc=5",
+"published": "2026-11-20T19:52Z"
+},
+{
+"source": "AP Business",
+"title": "Virginia reports young child is the state’s first measles death in 2026 - AP News",
+"summary": "Virginia reports young child is the state’s first measles death in 2026 AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNSk9HQklCN2x4dXV0OXM4eEtFTDdiSTlveWhiSTNYa1dPVEFTU1k3UG5fbF9pLXBrUlNDNE51QWM3YWtGWnBNWFUwU1V6RHQwemxSVnp1VU12MXkxdVQwcU9scTFNcDNNbTQ5T2ZwT2xWNHAxeVJMQ1lEQzVDS1VVSWdRMlR0U2Z3bTRvYk5EWnA?oc=5",
+"published": "2026-11-21T22:07Z"
+},
+{
+"source": "AP Business",
+"title": "More remains recovered in the search for 34 workers missing after an Indonesian candy factory fire - AP News",
+"summary": "More remains recovered in the search for 34 workers missing after an Indonesian candy factory fire AP News",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQN0J5Zy1JLXlBTWc5d0o3OEg0dVBLMXQ0TktFb0ZHT196VEgzYVNfOFhlamNLVjdEMUlOWVFldmsxeUN1MUk0VGFDMlkxWmpCSTFIQzVaZndyeFZjanNQajh2Y2I0c3duUllpOWRTRWdPYzFXeFZRdmJJUndoSDlYUFlQZHV2bU02YWZzdm1vclMwenNYbmZpZkk1UGg?oc=5",
+"published": "2026-11-23T01:23Z"
+},
+{
+"source": "CNBC",
+"title": "Tech outages are fueling a new doomsday economy",
+"summary": "Recent technology outages have left some worried about AI cyberattacks and the U.S. electricity grid. The doomsday economy is heating up as a result.",
+"link": "https://www.cnbc.com/2026/11/21/emergency-prep-spending-tech-outages.html",
+"published": "2026-11-21T15:04Z"
+},
+{
+"source": "Reuters Business",
+"title": "SoftBank’s Son explored $1 trillion buyout of SK Hynix, the Information reports - Reuters",
+"summary": "SoftBank’s Son explored $1 trillion buyout of SK Hynix, the Information reports Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOS2xnMjNoRWZHTm9ZTmZneE9Cb1IyQ1JxN25MSU5Wcm5oVUFfU3NETHZ6aW9lcV9WZ3hfVHdEeXQwbFlXbWVRVjJPTVJSUGZjQXBQNDdyNXpOM291U0wyc0Q1S3d6bmdzLTVSTTRVVm9abmlnWDhoWkR4ay1kdVhWaThhWm9ITDI0ZUgzWWVBa1BVNU5WaElIRFN0MEVLa2laMlNidFBWbzc0Qy1Mc2E3ZHhfanhfVTByYWtUUmpoSm1adw?oc=5",
+"published": "2026-11-21T05:57Z"
+},
+{
+"source": "Reuters Business",
+"title": "As Trump basks in summit pomp, China's Xi strengthens his hand - Reuters",
+"summary": "As Trump basks in summit pomp, China's Xi strengthens his hand Reuters",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPWm1waHdJRVp4M2dKRlhKSHRHQmpEOFZZdGJRRndnR3ZXb0pmc1d6cUNmZWcwX3VwTHBzY1VMVmh3RDJBNVYtV2tDV1pDX25kNFhMWlE4a3N0RVpIMV80alNzRl9VQ0NMNF81UzVXTUJWVk1ZSmkwSFZDOHFNNHBLZ2RlNWloalpTOWs5UXFVQWJqenE4RGFXLWZRN1JlS1l6MnJlWQ?oc=5",
+"published": "2026-11-21T08:40Z"
+},
+{
+"source": "Reuters Business",
+"title": "Oil prices fall on increased flows from Middle East, Libyan oil pipeline restart - Reuters",
+"summary": "Oil prices fall on increased flows from Middle East, Libyan oil pipeline restart Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQb016TW1Rc3N2Q0h6TVJZUFBSeXZqWklRWXgwZ2QyUnRCa0tnWnI4b0Z2YkVVZlVGWTJwa0E3SEVqNnotSE4zOFpOdjJUSE5GcjB5RHJxaklsM0I2U1owemZ4aUJmYkRhUUM2VjVFd09paWhIWHhFUWxmcmhzT3Y5RWhCTENfNE00a3RaYnhnOGgweEJoNEVtNTVKS0pLTWNiY2ZfM1pvbFNieG5DbWpGcUdOM19xZFF5QXl5LWZXNVRrZw?oc=5",
+"published": "2026-11-23T02:24Z"
+},
+{
+"source": "AP Business",
+"title": "Former French premier de Villepin launches presidential bid, warns against Le Pen victory - AP News",
+"summary": "Former French premier de Villepin launches presidential bid, warns against Le Pen victory AP News",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPdnd0VkVfVEJtNGh3UFRnaUNpZDFVUFY2MWNyd1l1bEdPSW90MkNFVlhpSV9rTHZRNDBJVElzVVJtODZpSGZJY1NodUFnOF9DaTRVYTctSklnakxiZVowaUswcmJaQTRmdG1Cbl9GQ0ZxbE4yQVg3SHloTDdqNzlIUU1MalBtbkJ0YVBGUHRCUWhzZTNOVkFRTzJDRWw5a2hycGNCNUlOLU9Hdzg?oc=5",
+"published": "2026-11-20T14:02Z"
+},
+{
+"source": "AP Business",
+"title": "Russia grasps US offer on European security to revive old demands - AP News",
+"summary": "Russia grasps US offer on European security to revive old demands AP News",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOWFI0ZEE1N3lJU01rZXFMRlR2MzlWcmV6dTRiV3ZmRDV1LURSQWgtcExZUlhyRmF2bG1wcFU4bVk3S1FxN01GYzZCbllBcmZlWmNpYUNfZFVkQ0RTSVBGa1FLeUo0SU9CQm9WSVh6dUplQm53RjIzM0xOWFNQcG5rZVp2czVxbXhOSEtWUFZiX3R3T1pYZDhSVUNqMVJDcVNLQjhEcmkwTXNKQQ?oc=5",
+"published": "2026-11-21T11:48Z"
+},
+{
+"source": "AP Business",
+"title": "Jonah Coleman powers Broncos past Raiders 38-24 as Denver honors the late Tom Jackson - AP News",
+"summary": "Jonah Coleman powers Broncos past Raiders 38-24 as Denver honors the late Tom Jackson AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNdnExUkhJUVNEaUxRTWZrSXk3TlE3U0NNLXFNQndGZVZyWnhpcWR0YjNSeTBqY2hCVmhadWd6cVA5M0MyV2NFa1J6YnhSdGs3V0FNZzFXYjhUNldfb19obWZTWjg2alFpY3VvRFg5S19IVF92THVDdUs1M2xZbUlnc2c4V0dGNFRGM1ZuTmxEWDJXMFE5S1IyeUF3?oc=5",
+"published": "2026-11-23T02:47Z"
+},
+{
+"source": "Reuters Business",
+"title": "States agree to UN talks aiming to regulate 'killer robots' by 2028 - Reuters",
+"summary": "States agree to UN talks aiming to regulate 'killer robots' by 2028 Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPZTFDeHY0QlBhU2dnNndMa1FhdmhtUDV2eF9HYmhHU0tzRlFoM0U1a0ZuaE8zbGduLUhoTU0tWWExeDkyOWYwRi1aXzVOd0NhRGszMlU5MWFyVmdLSUJOREtvaXNYY1p3YnRIaDR5X0RwZGVPTG1GeW5wZm1Hd0dlM0RoVDVBQlZ4WFV1bU9mM3YzcDJISEpEZkI5ekdsMy1xb1BkZ0JUYw?oc=5",
+"published": "2026-11-21T05:36Z"
+},
+{
+"source": "Reuters Business",
+"title": "How Grand Theft Auto VI's launch surpassed expectations - Reuters",
+"summary": "How Grand Theft Auto VI's launch surpassed expectations Reuters",
+"link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPWC12bUo0X3M1alRPRHNvSVRBSnRMbUdzVmltRHdRUW9qdGl5NHNpdXhvU0dmUnkxQkRtcU9QeENzQzFpUVdvTHFsbW1JUHFTUmdqcFRzWXhiOVRvb2R6Y1UyOFJQOGZDSG82ODR1VHVucEFpbXU5RkhCUS1nTXZLLVdFSTdUZlZvUGJaLWlJU3d4b0t0RU55ZFhMVDROdmZLQlZIODZR?oc=5",
+"published": "2026-11-21T15:09Z"
+},
+{
+"source": "Reuters Business",
+"title": "Alice Huang in touch with Chinese spy agency during affair with Nvidia CEO, NYT says - Reuters",
+"summary": "Alice Huang in touch with Chinese spy agency during affair with Nvidia CEO, NYT says Reuters",
+"link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPS1pvWmhMSm1MRktDOXJhZWNCdTJIZ25WejNRVExzUHhPeGhEeklEZW54T3NVZTJYbjJEa3Bmcm0xV3B2aVZnTE5oYm9MNEVYQXBzZmZYQXV4SmNWa3ZrVXVqczFEV0JqaXNoRERwTlZaNk1YSXo3TGlQNWRVekh5dC1XTmVhYU5SYVRUbjNnbmszTm5PRTdCeVEyMmFweGE1NTRHSmcyRXlrUnBGNk5aWXZyTkdvSmgwaWRvdks2bGIzejlMY0E?oc=5",
+"published": "2026-11-23T01:54Z"
+},
+{
+"source": "AP Business",
+"title": "Patriots Drake Maye and A.J. Brown are out several weeks, AP sources say - AP News",
+"summary": "Patriots Drake Maye and A.J. Brown are out several weeks, AP sources say AP News",
+"link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNTHIxajZKN09JYUZuZEpETkJWN2VwdXdhelRJT2s1VW5MWDlkaEY1c2FZWjhhMUl2ZlRiSWc2VDdjTEJxaGRLbENUUGxZNjgtS1dwQlc5SHRjejlpTTFVTE1rWXk2LTZXdEdXekhvSVVtaHNRRHl2NklyZk5oU1R1YVNpNTEzUQ?oc=5",
+"published": "2026-11-20T22:52Z"
+},
+{
+"source": "AP Business",
+"title": "Stop washing your turkey. If you want a safe Thanksgiving, here’s what to do instead - AP News",
+"summary": "Stop washing your turkey. If you want a safe Thanksgiving, here’s what to do instead AP News",
+"link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNYVc2TnZET3FZU29jR09NbkdFSDhCdDBGMXRaM3JPQVJfTkFXNldWVm9ZNFAzX19KNDBkSGFxZDI3OEFrVlhUVEozd1dTd21RMXdRMS1yd2I2Qm9uV3BrYjFFYktlZnNUc1ZqZlc3VllkSnFNUjExSDlVNkZWcThrQTJTb1BWcEhnZlFOdXNWTGpFbHNF?oc=5",
+"published": "2026-11-21T13:00Z"
+},
+{
+"source": "AP Business",
+"title": "Analysis: The collapse of UN climate talks, over fossil fuels, was years in the making - AP News",
+"summary": "Analysis: The collapse of UN climate talks, over fossil fuels, was years in the making AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPd01yNTIwQXFCMzZra1VRckFNbzItc0E0cDRQYlBFNnFOMGtHQ1VfdDhCT1hJdVI2bDJiX2l0ZEE3b1VuYWhUTHUwTjV3SkFwNEN6YkVYYVJLR3F2djVDVnhBWS0zQVFMRFFTQnBFdjBTdUtsVy1zWXNtUGs5NThMSDNqRTNSNmZPanJSbTBDeVFSNHFnTm1VVEFsZFlWdWQwbFE?oc=5",
+"published": "2026-11-23T00:45Z"
+},
+{
+"source": "CNBC",
+"title": "Director of National Intelligence Jay Clayton warns Americans of 'bumps in the road' after tech outages",
+"summary": "Clayton’s warning comes ahead of Thanksgiving travel, after separate outages disrupted air travel, Microsoft 365 and some bank transactions.",
+"link": "https://www.cnbc.com/2026/11/22/jay-clayton-tech-outages-faa-microsoft-thanksgiving.html",
+"published": "2026-11-22T17:14Z"
+},
+{
+"source": "Reuters Business",
+"title": "Wall St ends sharply lower on AI selloff, S&P 500, Dow in correction - Reuters",
+"summary": "Wall St ends sharply lower on AI selloff, S&P 500, Dow in correction Reuters",
+"link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOY0VmbDFSZy1pMm1jZlE3SG1PMDdjcHdmZnp3WWFQbTBSSHBndDktSEhpRFB4MkRYZUhTQXFhNm9YY0pwNlczMkxtOF9ZMVA2R1VHN2k1MmE3VkN6d292amFiX1JKUUxVcmN4NmxFTGYwbkhlakpkeTZ4eE5yRkxxTTlubE9PUU1jWmtrZVF6RjhiMWhhYmp2Q29Ucy1aMm13T0F0WTMwSGRBZWdQV3pyRjlZRm9pUEVnV0EzQQ?oc=5",
+"published": "2026-11-20T10:37Z"
+},
+{
+"source": "Reuters Business",
+"title": "German car and shipyard workers set to strike as IG Metall union extends walkout - Reuters",
+"summary": "German car and shipyard workers set to strike as IG Metall union extends walkout Reuters",
+"link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQOFBhS1Fub3hkTjloT0lrX2FKMEl1aG5pTDFrRzJTZnNtSGpRUmwtdm9tc0RwQnFOajR6WVBoZXE1Q3ZTVmtjMXB1cWdELVk0ckhFdjBiLUZzVmR2UWgzajdRSi03NXFjaThXX0J4U002R0ZpajI4QXRJRUVYdG82ejM2N2IyVzFNUkQ4YkRGbnV4eEZjdVpuM2l6bUt6NUhveXNoRnNPWF9Fa0dDMzExYTBDbURKYkROVGdmQmR6WHBDalFrOHRaWg?oc=5",
+"published": "2026-11-21T23:03Z"
+},
+{
+"source": "Reuters Business",
+"title": "South Korea vows to stabilise stock market after KOSPI drops 5% - Reuters",
+"summary": "South Korea vows to stabilise stock market after KOSPI drops 5% Reuters",
+"link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOaF9QVUplYkNRSkhhV19adWpudklsdXcxV0dodVVtYzc1WHJUWTNRMkduX1UxaURycVZTREc4RGpzOURZcFhvSTN3MUxwYUhuNWluQzVfSFAydjZ1bnVFR3VYaXpFY05XVW5OOUR2R0E3VkYwZzJHajh6MndCYUtsNnBxOGhib0dUUFlvRlNIRnp2TGl2Mml3emx5emcyQWFMajdNWGhRNnRkbW5fTk1ZUlV2VURvcHgwcndHN0Z1eDE5S19IS0FTZm43NmVZbUk?oc=5",
+"published": "2026-11-23T02:43Z"
+},
+{
+"source": "AP Business",
+"title": "House to debate slightly tweaked version of Protect College Sports Act - AP News",
+"summary": "House to debate slightly tweaked version of Protect College Sports Act AP News",
+"link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPcjR4ekcwc3hxWXJyelNrUVgtNzVoY1Y0T292clhOZXZxQ2J6cUJ2X3dXU08wUWRhVWlTZm16QTRzREZlTnZqaUdTNFVZUkFVUUZRYWRxQXV0THZuU1VicDhkSUFYc3loNHlLNUZIcVhCSC1oS1M0R0czYVJCa09QMnhUbG9RUkE3Y3RJ?oc=5",
+"published": "2026-11-21T01:03Z"
+},
+{
+"source": "AP Business",
+"title": "Products in food-inspired colors like matcha and ube are popping up in unexpected places - AP News",
+"summary": "Products in food-inspired colors like matcha and ube are popping up in unexpected places AP News",
+"link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPcEtZSk91MzdpY1ZSMVJyejNOelhwQzdIbzE1N0IwWVMxYzJwVXBJNUlWS05ILWthM3BOeFRua05wLTNiY2xoalJ0aDBiSlRUVXJZUnBTdzZFc3luZmF4ZEh0N3lYVGR5Q01sNGhlcUY0YTZTMlY5NnNUbFdCSXZrYndyb1hqeHNKWVlrYjA2SE9Id25QZU5GbA?oc=5",
+"published": "2026-11-21T13:10Z"
+},
+{
+"source": "AP Business",
+"title": "Police investigating whether Titans’ Jaylen Harrell assaulted driver before Florida crash - AP News",
+"summary": "Police investigating whether Titans’ Jaylen Harrell assaulted driver before Florida crash AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPM0xTUzRTYWhmOS1lVWFCeVFhYm9ReEhLMXczdkhjcHZtVng3OXpBamdNYkJIVENDcVJseFVteXpxQy1RelBNM2RLUWY2TXM1WnVyaEM1RjNfU3JJTG9VQ09RaVdkWk50QW11Y0NNcGNwakc0N3d6SEdkNEI1OUJVSFE2NjJIbzNkcWt0cXlGdE0?oc=5",
+"published": "2026-11-22T15:49Z"
+},
+{
+"source": "CNBC",
+"title": "An ‘illusion of glitz and glamour’: Inside California’s modern-day gold rush, where miners can bring in millions",
+"summary": "The price of gold has sparked a modern-day gold rush in California. Small-scale miners are investing time, physical labor and money to unearth the yellow metal.",
+"link": "https://www.cnbc.com/make-it/2026/11/21/california-mining-modern-gold-rush.html",
+"published": "2026-11-21T14:05Z"
+},
+{
+"source": "Reuters Business",
+"title": "Estonia to close border with Russia, Moscow decries 'new Iron Curtain' - Reuters",
+"summary": "Estonia to close border with Russia, Moscow decries 'new Iron Curtain' Reuters",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQeU5KSE9iVEk1aUVlNnFFVVpfVzh6NVBKVUk2RDQyczI3dE9FQVRSNHRNZzVMYldHOERSZXNOeTlzUktYNXFhMWp3ZWhndlpJb1N1Q0hCVHNnbm9MdUh6NUE4SHpCTUU0YkN6eVN5ZWJaNG5mLWdzQnA2OTR5Z0hUREtlSUhQWHZHaDN6U3A3N3FRUWVJblE?oc=5",
+"published": "2026-11-20T13:17Z"
+},
+{
+"source": "Reuters Business",
+"title": "Russian cargo ship ablaze in Baltic Sea after drone strike, crew evacuates - Reuters",
+"summary": "Russian cargo ship ablaze in Baltic Sea after drone strike, crew evacuates Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPaUFLdlZmeWprX3A2YllLMmlQSXZrYTRIazVMOEExREZuTXFCYThyVUlnR3U0TDg3dGpUeHE5SHJyanJWQUZTRHdwUG5YYTFxVXMtUU5rY1pOVzZkRUxhQ29oUEVUS0NJTWFxcUJmLW9lRE52cGs3N2FLbXZzNmVFNFpXTmZNZnI4S1pWNDB5RWV0UFhUUGlCTVUwNjlWZDMxcXhxS0FvZUdNNWN4UU9jMEw4bWVaOVB0TlE?oc=5",
+"published": "2026-11-21T11:50Z"
+},
+{
+"source": "Reuters Business",
+"title": "Beloved Australian music promoter Molly Meldrum dies aged 83 - Reuters",
+"summary": "Beloved Australian music promoter Molly Meldrum dies aged 83 Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPQnhhemw1S1lsUUFoYnp6cXp2SklxSFVZSkFsZVRXUWZCZ3FyV0JXNFFUdi1qN0k0cHdraWNqVXRjOVlSX3Y0R2FPTDR3Y2ZvSFMxMGJ3RTI3ZUsxdHplQkZhd3ItODhfOVZpUEtScVdGUldUdFRRUWRXV3BGMXdOdDBaend0bnZ1YWpLSENJOWRZX0VzTjBvMGVwZl9EVWxnMG1lWTU5V2xILWF2YkM5RGwxQmczdnllN1ZN?oc=5",
+"published": "2026-11-23T03:17Z"
+},
+{
+"source": "AP Business",
+"title": "Cousins is still trying to catch up with the Vikings, relying on past advice from his college coach - AP News",
+"summary": "Cousins is still trying to catch up with the Vikings, relying on past advice from his college coach AP News",
+"link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPSUEwNTFUMGFrV21XNnM3aFhBVlNBdGhCLVd2b2UzSnhnU3pzNUJtaDVLVWFzeWYyQzlodEFrUHp5ZWZFT3hBWlU4ODl2N2oyVWhyU3JuSERfQlJLOXZORXdNaUhEcm45SUE2US1raTBuWGZxNHVLaWpHc21VQWxvS2JiSkU3cUtxN0NTeHhqOA?oc=5",
+"published": "2026-11-20T17:26Z"
+},
+{
+"source": "AP Business",
+"title": "Lions put center Cade Mays on IR, losing player they gave a $25 million, 3-year deal in free agency - AP News",
+"summary": "Lions put center Cade Mays on IR, losing player they gave a $25 million, 3-year deal in free agency AP News",
+"link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPSmFXLURpaV9oazQ3TVpWdi1NRjhqbFhtYXpqbVdZcmNqeGNhS09SUlV1TkQyclUyRDZNeFRFeDhCS2VmRUpPMlNSWVpLdUp0Mnh5Uk9mM015Q1paZkg4dXdWa1R2RU04WTNCY3FSRFh2cmstSnRHTWlncEplMHNONVNqRnVyYUxwaGln?oc=5",
+"published": "2026-11-21T22:50Z"
+},
+{
+"source": "AP Business",
+"title": "French activists demand a tear gas suspension over reported menstrual changes - AP News",
+"summary": "French activists demand a tear gas suspension over reported menstrual changes AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNbkRHa3dKNWpiVkJvUG1paEgtcTZlU2Vza0QwWEV6MDU1eWswSzBETmVSYnVqMnJMNmlPMUUyWkxLeFIta2JTVHN6b09XZC1Mc0xwazYxUmxfb2RQME02b0V2UEdBX24zZkV5SUxKZXFLNjdpQThxYXNpa2J0NE1UUFFWUkZuNU1CNTJyTTk2UFU3TWtUZjNVTmt5RkQ5WFdwLVpqdA?oc=5",
+"published": "2026-11-22T16:38Z"
+},
+{
+"source": "Reuters Business",
+"title": "Italian workers and students protest over wages and public services - Reuters",
+"summary": "Italian workers and students protest over wages and public services Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOYmk0cW5ick4ySXNTUG00Mk1HTEtuckdLR3pqMDJKY0RJYlpUaFJpakJFUFFldWdfZkg2LWdzMHljeGlVMFFzdjJvajlaT0VRY3F5VzVqYTVpaHJZcXpKcTQ2cGo0dExPNkhXbGZlY2w2Ry1yamRiLXk5VWxWSENuYS01djR4U2RlRWpTUzdrdDVoUEJDZFEtODlHNGNmU1Bnb3JQY3VMVTFudw?oc=5",
+"published": "2026-11-20T16:09Z"
+},
+{
+"source": "Reuters Business",
+"title": "China opposes US FCC ban on Chinese telecoms' direct access to US phone numbers - Reuters",
+"summary": "China opposes US FCC ban on Chinese telecoms' direct access to US phone numbers Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNREJ2YWtZYUZBaVRPVzNxdU1XYnlLN1Q2WjFuOHgwMmRVOS11TWxXWFAtT0VudDRsUmd3M3pEeUp5WmlLXzNSOVJqaUZ2THRZYXNuSjlVWjdzazNuZVExNE5nQk5VUzllcUhEWXRuZmV4R1NZaHE5TU41dEhrUzNlclF2NldjMTNVRkdKV0tlSl96R3F2am9qRVhGLWJFTGZtYTRNUFFVREYwVlRTU250RUthX2U?oc=5",
+"published": "2026-11-22T01:57Z"
+},
+{
+"source": "Reuters Business",
+"title": "California AG Bonta filed lawsuit against OpenAI over model security, public safety - Reuters",
+"summary": "California AG Bonta filed lawsuit against OpenAI over model security, public safety Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOdmhmeEgxSkU1V2V3QmEtdlJ5RUR2U1FZVm5lajNFT1h3cUJnUW1XQUZRSUNLYnV6QkFFNWhMR0ZtbEtRSDRvQXJ3dThFRWFYMUlfbTNFUkFMN3JwTWVHbC11MjB5LUNia3JVMUxjWUtGV0dSa3V4V1JIMHNMdGpzd2JkOGotTnpRbmh5cHBSQ213NFhwOWs4MVZ4YzBKZ3FsUlRpVzFsMHNQS3VKTXVmRDRvS3dWWGhO?oc=5",
+"published": "2026-11-23T04:26Z"
+},
+{
+"source": "AP Business",
+"title": "Rohingya in Bangladesh welcome UN court's genocide verdict but say they want to go home to Myanmar - AP News",
+"summary": "Rohingya in Bangladesh welcome UN court's genocide verdict but say they want to go home to Myanmar AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOZVBJWEV0SGdadmoxMlJmUUIzdEIydWRtanp4WkhxcTlzeVJjdkV1Tm5PdDJOVnZZZ1IyX0l1eHVZUzJhN0Q1N1ZPMmJQVmpDNU15RnBLcXRhZkJKQll5ZFNiYjVJMmpoZVY0UDdlUDRoMnNjOVQ2Z3E4WHBxejhqOThaa2kyMGZiQ1BYZkxCRDY?oc=5",
+"published": "2026-11-20T23:57Z"
+},
+{
+"source": "AP Business",
+"title": "Little Mercury gets its first visitor in years as a pair of spacecraft loop into orbit - AP News",
+"summary": "Little Mercury gets its first visitor in years as a pair of spacecraft loop into orbit AP News",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPbXhPaFZpbElqTExNTWdSNU8wQVhVQUg3dzlERWxtTUZ2OFpGR24zd2JNd0Q0TEVMOExXX2puNm1VRkFfVXhJeXdwZmJtMWlnempHalhUaWFJUXJoWXlEUUUtLVM2SEMxVjVwS2M1WlBNYXlXT015VUFqa3hfUjk5ZTdYTl96TkdHNDNYeHktS0s3SF9xMWNrdHdManQ?oc=5",
+"published": "2026-11-22T01:18Z"
+},
+{
+"source": "AP Business",
+"title": "Buying Batman’s ride may take a Bruce Wayne budget as 1992 Batmobile heads to auction - AP News",
+"summary": "Buying Batman’s ride may take a Bruce Wayne budget as 1992 Batmobile heads to auction AP News",
+"link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNaXFOUGFSQVpGYzR2YjdsUTFucFBMb2hhSXZWT093Y0k1Si1Ob1dvakt3RzRodS1SNnoyQmRlZk44czZBVWVWTEJqT1l2LVJwc2hka2JJNlJYcWdBWEpZR0hqT3VlZ0ZQQnRJaGFzeWpDWmVWaVN3RUNLbVJBTDE2LUVOZl9xS2xSMXhiWjNLZm90RGdrazFnUmpZd3VnUjJ1TC1JUHFJQW4?oc=5",
+"published": "2026-11-23T05:21Z"
+},
+{
+"source": "CNBC",
+"title": "Trump says there could be a 'positive spin' from the latest FBI database hack",
+"summary": "This would make the second recent intrusion into the FBI system.",
+"link": "https://www.cnbc.com/2026/11/21/trump-fbi-database-hack.html",
+"published": "2026-11-21T16:57Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump cites good talks with Putin on Ukraine, holds back on security guarantees - Reuters",
+"summary": "Trump cites good talks with Putin on Ukraine, holds back on security guarantees Reuters",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQX3JPLTZVMmozZDY5c0piSTJBajFkeXRoMVc0UWVRRVVtZTdHb3BNcU8temVfeW1TNWRzZzBGVVVTUEs4TGl3eFpuSGNCNFpsLUpPRE1PSjdQYzZDbl9LM2NkMlo3TmpFVEV5QkNhODJyZy1qTUc3U0VNSFhUZHhqWWowLUxSamJlUlIxYjgyVV81ZjFOYmM0ZjdDUQ?oc=5",
+"published": "2026-11-20T21:04Z"
+},
+{
+"source": "Reuters Business",
+"title": "Verstappen revels in Russell's misfortune in Las Vegas - Reuters",
+"summary": "Verstappen revels in Russell's misfortune in Las Vegas Reuters",
+"link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQOFRkS2NGQk0tNzVxb0IzNzNNaFBvLW5PeXozZ3IxNU02OG11VUlzbmlJTERWODlJZjNMWnVLMnNKN2NQUFM5ak1idHRNTlJWcDhjSHMtcDZlTUZVc1NWQlVQekRxUEZnTEFqcmJ6SUdWX1laTThlWG9xUEcxRnk1VG1oQmNUY3VBZ1I4d3UxXzFyd3dkQTZ2ckRHTmFocWxh?oc=5",
+"published": "2026-11-22T07:57Z"
+},
+{
+"source": "Reuters Business",
+"title": "Financials drag Indian shares down on profit-taking after four-week rally - Reuters",
+"summary": "Financials drag Indian shares down on profit-taking after four-week rally Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQdDVfby1VRHZ6aGZYVDB2dU9SSjlQRGlJcUUxQm5Gdk9vWkU4UG15RFdHeTZxVjZQUzVNLXRmX3FjVndPRFJQQzdoNWNsUlRMeEQzdWVxWE1RVWp3TUM2WnJRc2lqamVnM1Vlek5LdU1rZjVRNEdVOUNkMVpoNTRLQlMxRFlfUXZzd1JOQ2J2QUI2S0wzMTRUWnN5aVhrTG5qSmk0Mzc0NFEwU1owcEpPNlljaw?oc=5",
+"published": "2026-11-23T02:37Z"
+},
+{
+"source": "AP Business",
+"title": "Myanmar dismisses the UN court's ruling on its responsibility for Rohingya genocide as 'unfair' - AP News",
+"summary": "Myanmar dismisses the UN court's ruling on its responsibility for Rohingya genocide as 'unfair' AP News",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQY3NweGk2RnVvc0QwaHZwNFJmeTZyZHhjTU1fUXVNV3NvM185cFVsNXExVTNDMHB2SnJiOHViYmJGeU9mdk14ZWlWR3dKdWdUT3Rkb0xYSlhLTjdpTHd1VFFFNUFldWVMME02ZjFId3JIX1hNSXhYdGlOOElKZGprblRaSl9Tc2haTEJidGN3YUtzN09QaEQ2SlBXMG13ZEQ3ZEFRTUdEd2VscG5RSXc?oc=5",
+"published": "2026-11-20T11:20Z"
+},
+{
+"source": "AP Business",
+"title": "Scientists report strong new evidence that specially bred mosquitoes can fend off dengue - AP News",
+"summary": "Scientists report strong new evidence that specially bred mosquitoes can fend off dengue AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQNnBPRzVsdHBmVnhPY2MyaDF3WGdMQU4wTXctT0syVXhUUFNQTVpsdkZPZm5VdkdwWTVuRFg4TVZMWDJxMlYtTElBTTVFNEVaVm9Zd19KQ3d0TWwxS1ZSWEVpZDNpWno2RFlYZG9RZS1RVjFHVDFHWWs4RTg5ZFZvSWs4SlFMVVF1V0tWUHlYODBFUnVITFhEZzZR?oc=5",
+"published": "2026-11-21T14:00Z"
+},
+{
+"source": "AP Business",
+"title": "US intelligence chief says Trump’s description of Putin as a ‘friend’ is ‘entirely appropriate’ - AP News",
+"summary": "US intelligence chief says Trump’s description of Putin as a ‘friend’ is ‘entirely appropriate’ AP News",
+"link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQZWpJV2NIRGR6cWxPVGdqQWszakhRTTlqNTEzSHk3djgxdFI4ZE85UGZEWTJxUjVkWWFFNENlOWI2amsxaEJ1NWpYQW05UTZEYXVIQTg3M0pIZUZfWnJZT0I1YktQOFgycjNuVUdSUzRQR3diNTVJSlJuZGhHOWNpTEY5VjhXeHQ4MWVEY2ZqZU53OElO?oc=5",
+"published": "2026-11-22T18:11Z"
+},
+{
+"source": "Reuters Business",
+"title": "Denmark says it thwarted Russian plot to assassinate US-Ukrainian rapper - Reuters",
+"summary": "Denmark says it thwarted Russian plot to assassinate US-Ukrainian rapper Reuters",
+"link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQa3pnR2JQcmdEOFhWYVNRZDdPVG1jRktuenpJdThGbUV6Z3BQV3ZUTHo3Y2ZyY3ZwZ0UzblB0RkZzdExxeV9KaUZFZmEzNlZDSGxhOXFoeXVaSllkQ3ZFZTUzMU9IUGppQjhuSXBMQTlITEJfWTdlN3RCTU82dHNndGFQdGhCZWU1akZ0T2ljWUNTVmtWMmk5SDZHeE1feTZ1aUtTZFNGZU1OLUFFYXBRX2loR0dGZw?oc=5",
+"published": "2026-11-20T19:19Z"
+},
+{
+"source": "Reuters Business",
+"title": "New Zealand cling on in Wellington after India build mammoth lead - Reuters",
+"summary": "New Zealand cling on in Wellington after India build mammoth lead Reuters",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQbXl0dFNzb3ZTbloyNlR3X0pDQlU4QldqRmRwUHZMVmFBZnFrcG9uRG9lLU1LVjNaTUVLTlpZajE1RTNHTk1kS3hIZXJYZTZnZkxCbVZsNnh2eDFjUGlSa2ZmaWZYTU1pNTBXWGNnMm9mNnhxS1BuNlE3NnNxa29xR0Q5cGxiSmY0cWV2d2tmdjB4MTJ0WVhUN1lkU21ZcWZ4NVA1N2JnWTNmTHlRODhGcWhTZnlBcHM?oc=5",
+"published": "2026-11-22T00:41Z"
+},
+{
+"source": "Reuters Business",
+"title": "US futures rally as AI rout pauses, Asian authorities prop up stocks - Reuters",
+"summary": "US futures rally as AI rout pauses, Asian authorities prop up stocks Reuters",
+"link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNR2c4ZVNmcHBzVFctOTBkRUd2d0VHTklseUhCcEtZT2VHbU1WbWprMUk2aDZSQ2tkZHNYVE9EWUgyaEkxeWtyN0M2V2NzR2ZCTHFmMEhvbHFDeExTNUdTeDF3WkxJZ2RSdmZ2cHBxWlFjTXdoa1hXdlZQRWtyTFFKVlJjMA?oc=5",
+"published": "2026-11-22T23:44Z"
+},
+{
+"source": "AP Business",
+"title": "Xi projects China’s global influence after hosting Trump and Putin at APEC - AP News",
+"summary": "Xi projects China’s global influence after hosting Trump and Putin at APEC AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQNElDbnRhd3FPell0aVIwVzItNG5aOWlNSnRWUjhvbzA2R2tsYWQwUnI1SEZoUkwwbENQRko1NENCbkN2ZVNLTUVRMGMyNVNVOXlta2RVVzRicTRnS2xKelRla3RtbWlVSFNraGhHSWh3eExHempFYjJUQTZ5WDdydlBCNDFHaGNDR2F2ZGNhOGxBeDhjcENjeHhFeGpQUGZIbG5rdg?oc=5",
+"published": "2026-11-20T10:30Z"
+},
+{
+"source": "AP Business",
+"title": "Meloni expresses shock as Italian ex-police chief found dead as he faced inquiry over 1992 bombing - AP News",
+"summary": "Meloni expresses shock as Italian ex-police chief found dead as he faced inquiry over 1992 bombing AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNVTNmcUVlZFhKZW1rX05waWs0UDhNOVdQYi1ERmVKVllXZFpGQmhLZ1pIUkU3R2hYcmpHbnYydXNlTlpjTWZvM1lKc3EtT0U5Ulh2MjNrbE9yWVFfblU1QXVLUXNyRlNLdVgybUMyd2dOUUVZdE0zN2xmRmxPTVhIQmZGd1F6N2VfYVFidzh2bXl2RER2dmc?oc=5",
+"published": "2026-11-21T17:38Z"
+},
+{
+"source": "AP Business",
+"title": "Miley Cyrus marries rock drummer Maxx Morando in an intimate Palm Springs wedding - AP News",
+"summary": "Miley Cyrus marries rock drummer Maxx Morando in an intimate Palm Springs wedding AP News",
+"link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQQUlkclo1SlpxNkZuU0lxTUNlUkZoSHdsdEtEaEJ5bUNwQzhZUlNhTGNaVWd1OGlNS0ljTGNHU3VYNHJBUGpLOTZoLTRlNUQ5VERQU1Vnc3lfa1BqRzlzSE40ZmlvV1lqLUpaVTFYUGhySjZGSDdfNGVhelRfVEl0V3V1UWJRZw?oc=5",
+"published": "2026-11-23T04:44Z"
+},
+{
+"source": "Reuters Business",
+"title": "Bitcoin falls below $60,000 level - Reuters",
+"summary": "Bitcoin falls below $60,000 level Reuters",
+"link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNVEJfUmdFQ0ZvVC1TbUh4dXZxdzlrTVZYenFybjM0RnpESDZ2aFRsMmRsWHpjbEF4cjlCWWJtQnZiWXhINVZhUng3YW9ILWZXejhNY3BJelJKRWw1TDRzaDRtdU92ZlhRUXRMdVpzYXlWaUQ3MUx2aWtEU2VaVlhLOHlqV2Q?oc=5",
+"published": "2026-11-20T16:26Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump told European leaders they were spending a lot on Ukraine, Zelenskiy says - Reuters",
+"summary": "Trump told European leaders they were spending a lot on Ukraine, Zelenskiy says Reuters",
+"link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPc1lrUklOU0NNN255SjN3SXdkR01FdDRYM0FiUzVkYVZtZW1ZR1dRVTBsUkx1MnoxeEhOTURCaEF2OHpLdU1fcVgzcXVZUGFaa2ZCMUNJbWo2UHk0ODNwYW4waUM1R3RvaDY2RFo0OXRiVUx6M29US3M1eHdUMDA0R3FfOVlUUlV5NzlNRVhFQ1JJZTNWN1J5S2pYTl9mMnZmNjBQNVFYam9RU1NRSng5SEpDMGhZNzZvdk5rdzl2aw?oc=5",
+"published": "2026-11-21T14:51Z"
+},
+{
+"source": "Reuters Business",
+"title": "Dollar steadies as traders take breather from AI wobbles - Reuters",
+"summary": "Dollar steadies as traders take breather from AI wobbles Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNMVA0aUFSMnFob3ZJdVFvbmlpN0JDRWFRNUJwZ1BIY19KU3RXZjJTRGdLaU00NGJ6dDRvX3VBUDdtcG9XQWRiRFhuUzhMZTNsN2lDSWVKMmI2Vi1EQ3dFUE5mM3dwZGNQWC1zZXhnZTJfVEVuYzVETlV1enJTN0dPZlQ3SlozeklDTzkwck16LW42eWt5aDJEY0w4M0Ytd0ZlRnBSZmZpN0Z5bkxTLXNXcWdtSW0?oc=5",
+"published": "2026-11-22T23:43Z"
+},
+{
+"source": "AP Business",
+"title": "From tiny hippo to global sensation: Remembering Fiona in photos - AP News",
+"summary": "From tiny hippo to global sensation: Remembering Fiona in photos AP News",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNcEhSejN0aGE1LUd6bGNPLThiN2RoeDNmQjJIZEpsUFM2ZHp2YXBMcnJOeTJZcERrQzZmd3JwZmV3dGcyOWZ4dTRyaXhHVUJJX0RfdHAyWWVTWUVQSlI5N2pzU3JwNl9NZFotaVdZc29GYmtXakJtRG5QenQ4Sk9hcFY5alVEME9SdGxTWWhQRExVeElyUkRsQ3oxTkQwMzJ3eml6dXZ4QzVXekNJQ0FLR3BCYnZTRmhtSGc?oc=5",
+"published": "2026-11-20T15:50Z"
+},
+{
+"source": "AP Business",
+"title": "Voters oust some sheriffs who signed pacts to help Trump’s immigration enforcement efforts - AP News",
+"summary": "Voters oust some sheriffs who signed pacts to help Trump’s immigration enforcement efforts AP News",
+"link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQeG80bmpFSGxHR2FXdHRTdGs2QWpMb3gxMElHMDdQcGpVSUlFcm5WQjQ1a19QT0lIamJINTVLZXNiUUlCVDNMSVhyM1F1Zk9YSjczekpHT0NxdnpJOS1EOHRDWDZvbWNqdGtJV0Y5Xy0wN0JCSWFDMDZVQ01CckxTcmJ4TWNEUFRpNVpfZ2pxS0gwZXhBQUp5VEVVVlk2S3Z2NlYxVzNGek0?oc=5",
+"published": "2026-11-21T15:02Z"
+},
+{
+"source": "AP Business",
+"title": "Police: 3 killed and 1 wounded in shooting at Ohio baby shower; 1 man in custody - AP News",
+"summary": "Police: 3 killed and 1 wounded in shooting at Ohio baby shower; 1 man in custody AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNZUNmZGlSRm9qUmtWdEw0dGc0bXhKSG4xbXYwWXJRZ1V3bDVnUkp1YnpOZE9sck9LRExYSXRLdnRqNWZ1OW1yMnB4dDd2dXlyY1ZUSXlxMm5rZ1BFbDBzbjFjSGpfU0h3eUlLNGloVVZyWFhPbjhwVW83VExrR3VWZ2tZLU55cVZ4RFZfR2V1SC15SVVLbHc?oc=5",
+"published": "2026-11-22T19:42Z"
+},
+{
+"source": "Reuters Business",
+"title": "Araqchi says Iran wants diplomacy to end war, Trump says terms unacceptable - Reuters",
+"summary": "Araqchi says Iran wants diplomacy to end war, Trump says terms unacceptable Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPMmJ1MkI1NFRhVGFBd09OcklwWXpmN2taa1EtT1pfNWxDSzZhamdaUkJubjMxb01yQV9zQ0hqQ0JFVGFGUE92RFRvRjh1Q21UeElHcWFxWnRhdnFlZFNuT1BBY081U2tyTVpaZmU5RmR6cmRfcklWUG1LeXRfdUZJTlNGQ213X0JDNGdzMTZOdVlPTVZYZVZaUmdGVVFpYmJFdG5xSUlBclI0QWlPYzdsTFdncWJjeF80XzI5N3NXMDM4b1E?oc=5",
+"published": "2026-11-20T23:11Z"
+},
+{
+"source": "Reuters Business",
+"title": "US denies Iranian account that missile damaged F-16 over Gulf - Reuters",
+"summary": "US denies Iranian account that missile damaged F-16 over Gulf Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMEdyaGtabnZRdHhGLWIzeGx0MkhleGZEYlVpTmFySVFYdlUtd3JfamE1YjlXQmwzWW1xTE83UzJRZ2lra1pEWmFsTXZMbDRlUm9CNTllRHdXR0VWRExIaTlQanhkTDFaU2RjU2dCYkI3WDd2WElmSlFfY1pwVkdxVEw0cDBYNGEwTGFLUGFqUTZPMFIxU0Y4Z25pREJEai16RGNfX3JlWXZOZ05hT3liNUJnU2stVlQ5RV9NZmVBUmhlQQ?oc=5",
+"published": "2026-11-21T16:23Z"
+},
+{
+"source": "Reuters Business",
+"title": "OpenAI scientist proposes industry AI limits tied to model intelligence metric - Reuters",
+"summary": "OpenAI scientist proposes industry AI limits tied to model intelligence metric Reuters",
+"link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPa0ZQb0xtalJ5djRmZmkwQnhmdDBlMEtncDUtUEJsUFBtWmptbkdVQ3c5QjY2TzhKN0NFT2ZzYnZmenQxY1lrUWFFYjJsdS1KazdRUkJINEJRemQ1alh6TGtnNW1nRE92bTF3RW9FMTIyODB3UmpBaW5oSzFDWDFVT3FXdjZDVzQ0TVNVd29nQzZvY3ByWVpBLUlhRVg0bFZiRHUxVjhqclptLUMycDJlYVBsQXQ4a28tRnFnbQ?oc=5",
+"published": "2026-11-22T23:09Z"
+},
+{
+"source": "AP Business",
+"title": "UK and EU strike deals on trade and travel, pledging to rebuild ties after Brexit - AP News",
+"summary": "UK and EU strike deals on trade and travel, pledging to rebuild ties after Brexit AP News",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQaW9ETGFMaFhwLXBycnlkTXVlQmlReW5NSGdqVmNhbkVoeGZ3aEJ3cWlwdWZTb19QVVFGMTRJYkVUTHdrRHFtQjh0T05fRTVIUlE4RTdlUm03LVZGWEhBay1uU256NlUyRzZuLTZERExLb01lMHlSY1FDTHJETXVULVp1d0pnN3pvRmRpRTUxN3hNUW5peHlFM1Q4R3p6ekYyUF8tQUZhcw?oc=5",
+"published": "2026-11-20T20:06Z"
+},
+{
+"source": "AP Business",
+"title": "Iran strikes 3 tankers as it shows off missile launchers, and other Mideast news - AP News",
+"summary": "Iran strikes 3 tankers as it shows off missile launchers, and other Mideast news AP News",
+"link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOUVlUcjlPZURmRnhmY2JJZVVBTkhfUEM2bmhqRDZfQkZJMTBEc2hQSDdRVFQ0N1BjTW1rMXNrSnM4R0R6SVcyZXJpWEVVU3hkU0dsX0otVk1HNV9abFFBTkVUeXMtdHk2WVFUcEVFOVVUVlZUeTFUdXBuVzVHMVFmeFdFVExwTWtJVC1sd0dEVDVSdXdHZUhVRDc4MU5rYU1laFBn?oc=5",
+"published": "2026-11-21T19:38Z"
+},
+{
+"source": "AP Business",
+"title": "Tom Jackson, Broncos star and ESPN ‘Sunday NFL Countdown’ analyst, dead at 75 - AP News",
+"summary": "Tom Jackson, Broncos star and ESPN ‘Sunday NFL Countdown’ analyst, dead at 75 AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQYTl4XzZoM3NxaG5raTlnemhKM2xYSDlpTUt5cERCeVlJQ2FFME5rczRsRk5DMFFnTWpHX3paMmFWRzhUeWtDelpJd1VMUlhCbV9VM2N5LUp3eUhqbE5zUndTcGxvbVZLQU93SEIxTURRc3hRUktFMTJUZHp5MFZxeUthbHNkTG0zdXVkcWxHcjJWa00?oc=5",
+"published": "2026-11-23T02:53Z"
+},
+{
+"source": "Reuters Business",
+"title": "Tech leads global stocks rout, Treasury yields fall - Reuters",
+"summary": "Tech leads global stocks rout, Treasury yields fall Reuters",
+"link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxORTBuejlwS3Nua0szT1dTbnYtSElZYjI2RUg0NnRsVHNlOW1SMTBlUFIxdmtVcnB2TFd0N19aU1RlbzVWREhqYnZmWF9HRG5odm55UUxLMnJzckZpWjh6UHdrZGtZNlBIMVh3cU1QcUNIQlZRNXJMTW54TjdkaVdGbE9yVQ?oc=5",
+"published": "2026-11-20T23:02Z"
+},
+{
+"source": "Reuters Business",
+"title": "Democrats won big in the midterms. So now what? - Reuters",
+"summary": "Democrats won big in the midterms. So now what? Reuters",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNQnE0d0FZemxNMWZJX21aTjIxTVZwc3ZQaHlac3pnUFBKS010UEc2bXluckswdTJwa2hlY3N1Qzc4aGVGejB1NVJMOFFKQnVYYWppY2NiLUpkdG9reWJEdU50V2t5eWxKVmpjMzI4SWFxbi1rSDhPRG9UUmNqM3JGczBlTlZnSW1ORnZDYXI1dTdVOXg0c3c?oc=5",
+"published": "2026-11-21T14:23Z"
+},
+{
+"source": "Reuters Business",
+"title": "India's Tata Steel to take control of APL Apollo in deal worth up to $3.47 billion - Reuters",
+"summary": "India's Tata Steel to take control of APL Apollo in deal worth up to $3.47 billion Reuters",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxONzFNU0U5bFVBRS1yY3VLYUtfZ2ZWYWN4TnJTbi1Hd3hUaXJnaEkxY1lIcGJiVjU2ZVVqSk4yckRoOFJLTFhPVHBSdXJjWmFRb3BtaHNyNWx4QkY5VEM2cVR0LWt5NkE1X3pmZl9YUVdHS0ZGWTllOHJuQ0s4RXBJY0VxeUFJdHNDWU1Da3NlZEh2Tkc5LWJ2U0dxQ3M?oc=5",
+"published": "2026-11-23T02:23Z"
+},
+{
+"source": "AP Business",
+"title": "The 49ers are returning to Mexico City and will find an enthusiastic fanbase awaiting them - AP News",
+"summary": "The 49ers are returning to Mexico City and will find an enthusiastic fanbase awaiting them AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQUUJlcGtuMWZlVGlsWVFyZ056QTFNdHYycnYtU3hMd3Q4N1VVSlFGVWhnR0dNQW5FNnF6cjZrbWR1cE1adUd3NUpTYnJFaW9fMFZDTUZlbXJyUFdvZ012RkZNdk8wZGZUQVBlR01nLU5jS045T0U2RVliWXZMeHBZcU9FMlMtMkdNWGt4bnNIeDBLN3hIUHc?oc=5",
+"published": "2026-11-20T17:46Z"
+},
+{
+"source": "AP Business",
+"title": "Magnitude 6.7 earthquake shakes Peru’s Andes, with no damage or casualties immediately reported - AP News",
+"summary": "Magnitude 6.7 earthquake shakes Peru’s Andes, with no damage or casualties immediately reported AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNRW9STTNuU3hmcFRRN1h2T2J2WUUzWXdiSGxiVnpaWnJRV25RZ2Y3YmF4TW1HY25aeC03NnhUSkhGQUpfamt2dDFjR2Y5R3oxNUxGUEtjelBSaXNXLXdBemlHbGJaVXVIWU9ialBGYkw1cklQWUZIbkh1VEE0SDNmRnAxWkVCZEJFcGd5TmJmOTEzUktwODZldHhn?oc=5",
+"published": "2026-11-21T08:19Z"
+},
+{
+"source": "AP Business",
+"title": "Father and daughter detained by ICE at Seattle airport were traveling to family baptism, lawyer says - AP News",
+"summary": "Father and daughter detained by ICE at Seattle airport were traveling to family baptism, lawyer says AP News",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOdEtrdGZScmR2TTNyNG1MR0xlT3FhUW00LV95MFR6TjJwRXdUOHlVV25jVTVuZktGX1UxTlpweUVEZDJreXJGVmZRZFdBZ05OekFyNEZHdUsxOXFuRXRoUjNuOXRWN201RHVEZ2tvS0VveF9yVUJWZGhsWWgtcWtxTFhiOEtpVGdkY1V1cTI2RnNTTmpRc1BaTm9ld05ZWU0?oc=5",
+"published": "2026-11-23T00:22Z"
+},
+{
+"source": "Reuters Business",
+"title": "Why China is unwilling to be the world's next climate leader - Reuters",
+"summary": "Why China is unwilling to be the world's next climate leader Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNVjV0OVRhWXlWUnlTSnFPZjlkRjUwdWV1bXpUbUVnTmhMa1pNTVpHVDNHMFhsaXVBeHVKV1o5eEJqejU2TDZ0YktveWEtNnV4NldXQVUxSkhwTlFjTlc2R01qNTM1dE1sY2F5NlpjVVVNcWpUWVRQVmFBZWFaWVlIYUtaVXBaSXNkUTZ0dFM5aGpzNE1XUmtFNVFIam0wV3FRUUtlMkJwV1QwNE0?oc=5",
+"published": "2026-11-20T13:24Z"
+},
+{
+"source": "Reuters Business",
+"title": "India's Congress warns of more protests against Meta after clashes with police - Reuters",
+"summary": "India's Congress warns of more protests against Meta after clashes with police Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNTmdhX3h3bjctYVFyRXFLZHQ5Zm9aTmQ3cS15R01pWHFxdnRySDBDa1JJbFBHVEZmMm9scHV0VW1xOVlHT19FWlpWaWcxN25aZ3NUQjR6SkFRU2RwQ3Y0YVg5X3A3bTZDT0FXV0JBeEF0SHRjUUM5UWg0cm80YVNyT2JlWHVYR0Iwc2pDZGZKcFNyaG1EWmEtenViMnBDajltODNOUUg2QWo4Yk5sdTllelNGUEdiNGxPWjNKYkthdkg?oc=5",
+"published": "2026-11-21T12:25Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump hosts gala for meme coin investors as his token plunges to record lows - Reuters",
+"summary": "Trump hosts gala for meme coin investors as his token plunges to record lows Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQWjJxV2tNOWN0U2lzczlZWVgtQ0xIblpuY05HTUlTOEhsU1lXVTNUN2dfbFFhUUNFaVZveEdVTTBvLUl3cC1oaXRSZHNyZEpfNFhEb3R4SU1fRHVZbnFPNUhZaklEUmtmQ0xvVnlJbkRmcmVJLUdLM0RjUlZ5R3k5Z29uUWpPeHUwVFhWcko3YWE0VFdJWXhSN1dTMmZQVU9RdDNrSDdOMA?oc=5",
+"published": "2026-11-22T22:32Z"
+},
+{
+"source": "AP Business",
+"title": "Man gets 19½ years in prison for plot to kill Sikh separatist leader in New York - AP News",
+"summary": "Man gets 19½ years in prison for plot to kill Sikh separatist leader in New York AP News",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNVjVuN010NzdNUUtkd09ka1ptSHhYbU1zX0VHVUhPNXBIb2dTX2FxNmVZVm03Ukp3c0hNNlBfTjVOMTZoNXZxZ0s5RVFScVFqY2dONzdjcnRlOUNRRkkwOFVIeVdrVVlxQ0Q3dkVBR3V5cnE4cDhGWEtXZmh4a3VpUUVWdnAza3NNdWpxcGhrd3lNQjlwbWZBQlBadkU?oc=5",
+"published": "2026-11-20T20:47Z"
+},
+{
+"source": "AP Business",
+"title": "Ballistic missile attack on Zelenskyy's hometown in central Ukraine kills 2 and wounds scores - AP News",
+"summary": "Ballistic missile attack on Zelenskyy's hometown in central Ukraine kills 2 and wounds scores AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPdEdyR1RJcnpvbkdBNFFKbHQ3bWh2SzBfVnBfdklPRGlubDVuZjVOYUVrTUtaVGNQc2ZtM042TmpvWFNUZU1vNlRDeUhWbS0xUU5IWndHdlNZa3JIYm1OQm55YVNvbVpxaUhBNExXbS1NOU91ODdGa2d4elRXOWhIUXZCRHR5T3ZTei1fRWRyOVJvOXJRSXNIM25QT1JIOXFPa2VTcg?oc=5",
+"published": "2026-11-21T16:35Z"
+},
+{
+"source": "AP Business",
+"title": "Brock Purdy carves up the Vikings' D with 3 TD passes in the 49ers' 35-10 win in Mexico City - AP News",
+"summary": "Brock Purdy carves up the Vikings' D with 3 TD passes in the 49ers' 35-10 win in Mexico City AP News",
+"link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOamlPbHIwdDZqZEdBa2h5YUhXRDJxbHlvMHc3VVpoUXlneThCX3VNQ0ZPYjlsbUNxQmZtRkx0VXJZRVdRdnZCSnBQNzZUSGRPeW9vbGRnRWVURlJXVzJuRUJ1Z3NEYzBzcnVoelJ0QkZ2VW5xa3FVd1BVcGVORXptNTdzOVNQQQ?oc=5",
+"published": "2026-11-23T06:08Z"
+},
+{
+"source": "Reuters Business",
+"title": "Anthropic's IPO bank closed position meant to stabilize stock, removing source of support - Reuters",
+"summary": "Anthropic's IPO bank closed position meant to stabilize stock, removing source of support Reuters",
+"link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQSVpRUnlwbWF4cmpjRkg1N1ZnRU9Dc1ZIRFFQU3pyMHNac0tJSXlINUg5YUdLRl9mMUEzQTRkZTdQWHJwRkhJbmYyWV9VYkt4dDVTSGRib3VzbVVENWd1WWllZkhzR2E5SGhrNm5xOUM1QzBfdFFqZlNvNmJDUHFNeU1IdnRMclVkRmdsNTRxTWVZY0hQYWJHN05EZ2xxZTFORDZ0V1g2eWZEWnBGRnVEVVNROURGMVFCTzkwbA?oc=5",
+"published": "2026-11-20T17:10Z"
+},
+{
+"source": "Reuters Business",
+"title": "Canada defense minister sees no shift in US military ties - Reuters",
+"summary": "Canada defense minister sees no shift in US military ties Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQWVg0WXpZcmhwN081dnZKanFKZHhJM1c4a3BObXFaUW9mUF9Vc1ZYdU1YWi1udmx4RGhLcnhqYTI2ZHNYWWJNUTZLMGI1WEJTa2YzZmZPV3M5NUlpVTVmbW5wM0ZDUk96MFh6QW5tU2pVMHo5dXFQalo5b3NWZmNSaWUzS3FQR3N1WnF0S0NiX2Q3NHZyRTYwNGY4bFJ3dlp4akp3dTdNcHZsWnc?oc=5",
+"published": "2026-11-21T19:02Z"
+},
+{
+"source": "Reuters Business",
+"title": "South Korea's education minister quits over exam cheating chaos - Reuters",
+"summary": "South Korea's education minister quits over exam cheating chaos Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNSHhGdTlDN3hOUVlXUHRLSlVmbWRGTWRQWWdQaDV0a0UyZFhjR0w1RDZtRmZMcHNvTWE1QWJhclVLaHBtVXBMVVo0cU1jemIyc2NzUmQtX2NHU0FRaklZcElORnoxYnBkVE53TEhFQkMydlpULWJFM2pVbHc2UXREal9ENG42SkFqZWg5dEM2eTZLaHVYVUg0b0gtOVpCcDNuLVhPU3cwZjdUTHdST3VHYzhmNjVCQmlI?oc=5",
+"published": "2026-11-23T00:20Z"
+},
+{
+"source": "AP Business",
+"title": "Trump seeks to penalize US companies that build AI data centers abroad, even as they face backlash - AP News",
+"summary": "Trump seeks to penalize US companies that build AI data centers abroad, even as they face backlash AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPWEtzQUtZSkNqOE9ReXZEMTlIRVNjOEdzRVp0b1E1UkFiYncyMGpadjRFV1ZSeDJqSnJuRnhhZ3JvRkt3ZG9BNlN3Z0VESFpTbHFTREp6bzVFWnBKZVNweW5wUUVpMzFaZk14UzA3RFVveWdDUW9rVjI1dTZOeEVVeGl5Ql9QYVFpdWl3cm15VHg4SlZNVXR3dWVuTm0xVk1HZkZZdg?oc=5",
+"published": "2026-11-20T22:28Z"
+},
+{
+"source": "AP Business",
+"title": "Daily life around the world, in photos - AP News",
+"summary": "Daily life around the world, in photos AP News",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPOWoxVFBYVF9oMlZadkF5TWFtVC1fSFlleFV0Wl9OUy16dThFU3dZSGhmTGN4OWpMMzNrQkU1QXJWZXhUOHBGdTdPRThPV2Utck95ZVMtZkd6T0Znb3pqZ09maUNFT2FFaU5yOUZPcVJyc1RiR2dLendrdmhxMmgwbEw5ajRhX1daa0plT3d6b2FxQ1FnbktUMW1ldEk?oc=5",
+"published": "2026-11-21T22:37Z"
+},
+{
+"source": "AP Business",
+"title": "Mexican fans turn the NFL’s return to Estadio Azteca into a roaring fiesta - AP News",
+"summary": "Mexican fans turn the NFL’s return to Estadio Azteca into a roaring fiesta AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNVEpmVG9oRThBRDIwQmx0MU9IZ2FVRHcydWk3Q0UyNXgzYVdzS0tXd25LYVNfU19xa0IxX1pTcDJ6T241RzQ2amxSdl9GZUJNcnR3eGtrSVpKNTBkWGFXTWNkQkltYWZnZHBqNHh3cV9DdUJHZTBEaXM2Vmk0OUo2TmJ5b29DeDd5Z1RVdFJrU0F2TnM?oc=5",
+"published": "2026-11-23T05:47Z"
+},
+{
+"source": "Reuters Business",
+"title": "South Africa's first female deputy president and UN official dies - Reuters",
+"summary": "South Africa's first female deputy president and UN official dies Reuters",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOX3BXSGxmTzRxd0JnLXpoYlFyaFl3VDNCeTNXZmxZTGV4VkVoRVdOaEZ0c1p6Si01andkTElkZm5XXzc5cmVCZHQ1VEF1UVJwXzZRdG9GRmU5R3Rwb0xkVFZudERqUTNjUjNRSXpwa2Mxa1lQczFhTlNWbTlMb25lMHRwdmJtQTNDZVowTGNyS3h1SWxVeWF2MzYxTFFoMDY2V21qSVNjQWpLS1pVNUE?oc=5",
+"published": "2026-11-21T05:44Z"
+},
+{
+"source": "Reuters Business",
+"title": "Bitcoin rises over 2% to more than $60,000 - Reuters",
+"summary": "Bitcoin rises over 2% to more than $60,000 Reuters",
+"link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWWZDYjFjYnlkNnBXa2lSQ2loSllxdV9rb2JNdjlZRXRBdmZvUFpaUzJrenVyMWRMWVdKMDR3cTJUVUVjX3hfUmJYaklMUXA2aXlRUTlHTzhpTVR4QVZiQlhlZTMyZ0RGNzhZWFlPT0VFNXdVUTJIRENXd0ZmYXIwR3ZMT3ZKWVJk?oc=5",
+"published": "2026-11-21T15:25Z"
+},
+{
+"source": "Reuters Business",
+"title": "European firms warn EU leaders against budget cuts on competitiveness - Reuters",
+"summary": "European firms warn EU leaders against budget cuts on competitiveness Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOY1EwT0dKMUxVYzhvRE8zdzlTYlF2aGtuclU1ZjlfUXdmUzU4bVl0NTJkcG9mOGFpZmxSZ3JIYmxEbC1kWVAxY19iaVUzOWpfdUNNeFgyV292SE1YRUctdjJPd0pyMjJqa3o1b3dqalhPN3FhMEoxUlhUdzBfUVZNUlViYWZOaVRZLVV1QWZzMzlNMXJuM0hTT0NFdjRReGJwTzJGR29TT1BTS0FKRXBiSFpGY0JBVlpqbUE?oc=5",
+"published": "2026-11-23T04:06Z"
+},
+{
+"source": "AP Business",
+"title": "Trump insists Iran won’t make an ‘acceptable’ deal as concerns grow about next steps - AP News",
+"summary": "Trump insists Iran won’t make an ‘acceptable’ deal as concerns grow about next steps AP News",
+"link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQU1oxa3BXVTVqemVoWThBMXNxSjJORV9DcURheDZlbUdVNlJkZjRVTkIzRFdlVm1EYVBMOGZ6Y2h4ODJYQ2FqWXhzR1dNaHR4R2s1aWp0N2Q4MmFUUWJfc2xmNnItcDNlNGJiLXBwZHVXUjE1dFdEQWE4VV9TTGNCaXNoWk1Ealk0SktHT3J2ZmZ2ZXBlUm9F?oc=5",
+"published": "2026-11-20T21:54Z"
+},
+{
+"source": "AP Business",
+"title": "Man City's 14-year winning run against Fulham ends as Chelsea thrashed and Arsenal draws - AP News",
+"summary": "Man City's 14-year winning run against Fulham ends as Chelsea thrashed and Arsenal draws AP News",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOaFNMRGxtdHlPeTEtRHVCOS1jb295bkEwNzlRcWxJMDU3UVFyUjFlVFVCcXhNWGpzQ1VKQnRhaEdPWEpGSElVd2d3MXFFNHZaNXB2TUc4OEdDNjdaTGVsU3BEcTNEdlRyRXFjRzkzTHJDM3Mzd1BwN3JONjV0UnpPLWRnUzBNb1dNVFI5aHFvU0RiVkN2WVVBNVp2RTZnNUtMc3B1bjNZaw?oc=5",
+"published": "2026-11-21T19:32Z"
+},
+{
+"source": "Reuters Business",
+"title": "Second judge blocks Trump's triumphal arch, calling it a 'rushed job' - Reuters",
+"summary": "Second judge blocks Trump's triumphal arch, calling it a 'rushed job' Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPajdFUmpSOXN6d045Q1JacldoemRSTldiRTFnRWtITzRtdHZsZ0FROGM5V0RZLUVPS25MUUhFdU10WmdDLXNHeXZfRTJxNXRGNVdaQVVnT0Z2X1c4cy1KYVo2NURYZ0JLMmt2VW1iU0F5RlVWV0M0RTZISVlrRUVEY2s4LTNrUU80TnNVS1FCWWplWk1DRUJEUlNfWnpxOE5OelluZ2FZeVZwQQ?oc=5",
+"published": "2026-11-20T17:47Z"
+},
+{
+"source": "Reuters Business",
+"title": "EU leaders' chair proposes new cuts to EU 2028-2034 budget draft, suggests digital tax - Reuters",
+"summary": "EU leaders' chair proposes new cuts to EU 2028-2034 budget draft, suggests digital tax Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNMEktcWd6MTVXNDk2WEVleTlEckNHZy1HdDNfYjhTcmZaODB0ZE9YQXlpUUdBdmpiYjhvcUJDUWNRbUh6NjJCM1NPSlNCd2NJeTE1Mlpoel83ajNSQ1lWbTdGbFc2MWpvam9SWjU2WFZBZktuU2NBYmpaTlZmR1dsQU1sZzJ5LWZQbE9BS3VjbTRKZGg3QmNhWGNVT3VNV0JPWlZXZmtNVTVXZnUzZ05NR1Nzcjc1WEJZc24tT3M5Z1Rfdw?oc=5",
+"published": "2026-11-21T13:40Z"
+},
+{
+"source": "Reuters Business",
+"title": "North Carolina win gives Democrats biggest US House majority since early 1990s - Reuters",
+"summary": "North Carolina win gives Democrats biggest US House majority since early 1990s Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOZzZjY0pNZnpnUmtsZ3RudXpZeDh4TnlWZDFIZHBvUk0tbVlxREhydk5zRTJhX0lYcjFXQTNNTzBtOFM4NlNhTE9DZnl3SUZiM3RpTzRzZTJ4aURMSUJCdDRGb0l2MWh5MFJmTWgwS1k4Ql9vTGh1eWVGbEw3WGVCS1UtTkNGVVoxS0EyZVl3Vmw0UThpTlVUWWN2WlNyaWR6a1FYYlJZaWl1MlAyQ01OSEcyY3hMai0zUWdfUUc3MkQ?oc=5",
+"published": "2026-11-22T21:28Z"
+},
+{
+"source": "AP Business",
+"title": "Trump auditions potential successors as Rubio and Vance join him for White House briefing - AP News",
+"summary": "Trump auditions potential successors as Rubio and Vance join him for White House briefing AP News",
+"link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNaTU4R2xyVnVLVmlyd0djZGdkVWhrM1ZiOUxkSllPaHFDREpPRy12V3d5T3NpUjN0RXVfRlpfSFlWalVFbldqNm0xZGYxTFJ3WUtKMUNJWV8zZ21Zb2pQaW1JYm84UF9tamRmdmlHQVBDeGl5YWJqUk5CRG5PRU9XX1FXMU5PeG9rX3JOM3Z3VTFEUTNfZEx4SGdrVkNwNU01dTh1Y01R?oc=5",
+"published": "2026-11-20T22:17Z"
+},
+{
+"source": "AP Business",
+"title": "French police officers sentenced to prison for racist violence against Black man in landmark ruling - AP News",
+"summary": "French police officers sentenced to prison for racist violence against Black man in landmark ruling AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNLV9CY1l6OGRqc2JEeV9GOTZQUWNRTlB3MzA1aHM2cTd1QWFZUm44MXR1Ul8xM3hvRGxIV0xnX1lMR1FjQ3RXbDBUUHlKRWQwRHJ0RWdnLVdwZnY0bzJsSkp5bkF1cjc1WGpaVTZfOVU2SDdFNXJFS1RDR1RsbUJURDVEVmZWejdKRU1zeGdvQ0V1MjdDNi0zMGt1MA?oc=5",
+"published": "2026-11-21T15:52Z"
+},
+{
+"source": "AP Business",
+"title": "NFL defends incomplete pass ruling on Parker Washington's would-be TD in Jaguars' loss at Giants - AP News",
+"summary": "NFL defends incomplete pass ruling on Parker Washington's would-be TD in Jaguars' loss at Giants AP News",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQdlRLQVNkS2R5Rl9BVUhXeEJsTGJXOE1xWFpaX1Q3eXFnbnFISnZpTUxOaEc3cHotTEtSOFJYWmVvRzZfbnBCLW1Fc0Z0aFhiTGRJRG0tRnFiQ0dqa2lOdWMxVHdMeThQU3pERFpsVWcxdjNoRm4xM3pfb19GXzFRbDF6OUZhQmRHTVdqYWVCNlRmU0JxR21wZEZ4MzU2Y1V3LVhhTEhTYlNFVTdrd0MwTQ?oc=5",
+"published": "2026-11-23T02:31Z"
+},
+{
+"source": "Reuters Business",
+"title": "Ukraine strains Russian logistics with Crimean bridge strikes - Reuters",
+"summary": "Ukraine strains Russian logistics with Crimean bridge strikes Reuters",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOaV9UOTYwUmtwcUI0bFo2OXMzZ1VIWGV4OEdRTXdQNkZYZ2tTOTZRdEJpQ1B1cEVQNVJMU0dQRlg2azAwOHlHY2hKQWZKa1FvcUQtSGZWTW1hSlA2SmI4Wnlkc1FrbUQyWTBjMTVMN2FrVHk1SWRDX3pwZHFkWGZXcTFBRjNiXzc4SFBIeEVvSWJMQWZwTE5fY08tMldaLVZqbUkxMDJzcVJiNTNudUE?oc=5",
+"published": "2026-11-20T10:18Z"
+},
+{
+"source": "Reuters Business",
+"title": "COP31 climate summit risks failure as talks go deep into overtime - Reuters",
+"summary": "COP31 climate summit risks failure as talks go deep into overtime Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPMmt4Uld1TVhWSDBfaTM0b3NlcUVhNm1xOGNiWjdCZGNRdXlXNXF4RllHQ0g4VnNGTXkxVUxRd3lqZXlTR1lsZmNtb1h3cGRYVkItVl9YUi00YzFzMmVWVTBVcmxVNHhGQlRCZWtRTXRhWW1ORFBKb1Y3SmtsMVotS0RtWmRRYVhzNmtWRTRLcjJCSmVlOFRjcUZxcTgzZjdFeWdndlUyNC1Dc29CZFE2YllWZnI2MDFU?oc=5",
+"published": "2026-11-21T14:42Z"
+},
+{
+"source": "Reuters Business",
+"title": "Can climate diplomacy build on the collapse of COP31? - Reuters",
+"summary": "Can climate diplomacy build on the collapse of COP31? Reuters",
+"link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQQ1RyOVZKTlV6bndHdTJhb3ZfZkI5R081UGttS1pZMDB4T0s0ekRPNGRQLW5FUERHRGVFLUxLQTFEcnFKSHpwVDBOQThBRGVaZkJfVTlMUzZPOFc3b3dZZllkVUVuRF9Lbnc3d3pzd01KQTE5WFpzR1h4alU4dUF1ZW0yYkpFeHF1RjRvbklfbWJqdDNXV1lkVkFCQnlRZw?oc=5",
+"published": "2026-11-22T21:14Z"
+},
+{
+"source": "AP Business",
+"title": "UN climate talks slammed by activists and leaders as fossil fuels go unmentioned in draft deal - AP News",
+"summary": "UN climate talks slammed by activists and leaders as fossil fuels go unmentioned in draft deal AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPUjFZei1MOUFlTXpsX1RGZTFUMm5zWDhmRVNYX2tLcHIwTVJtbmlzOWNTanNpRVFxRFhrZ0xTMGNLaGpqTXpxa0pVV0RiRldTSzJMX0M1c2lWbFBqd2JiVTJoUmotNDFSR2RsNi1nQVJrYndjQV83MFVHb1VocUxlS2hiMlhsY2I0SUlCckgxSm13Vms?oc=5",
+"published": "2026-11-20T21:10Z"
+},
+{
+"source": "AP Business",
+"title": "Motsepe: Africa’s 54 federations back Infantino as FIFA grants rise to $25M - AP News",
+"summary": "Motsepe: Africa’s 54 federations back Infantino as FIFA grants rise to $25M AP News",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNdEhyRXMxRU5qREQ5ZG1xbWdfVDRiX2h6bi1BTmVHck1fWk1CWElZNVNpNjhidWZCbFg1Z3RZUXlTUDVXcWpnX3Z4eTM3MzMwNFoxZ2tmb0FnU2lkWk0wekpDZnB1X2E0al9LRlVWdFduN2hmc05OTW9Fei1qb0g5cmtjSVByMzI1NlBtOHp3S3FDT0JJVGxuU1VGeVlKUk05bzB1NEVtbjdvdDFORTdTUEhn?oc=5",
+"published": "2026-11-21T14:34Z"
+},
+{
+"source": "AP Business",
+"title": "Nightmare start for Pochettino as 10-man Manchester United loses 4-0 to Liverpool in Premier League - AP News",
+"summary": "Nightmare start for Pochettino as 10-man Manchester United loses 4-0 to Liverpool in Premier League AP News",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQRjVaTDZmTkp2Umo2blBlWUxVWjltR1J6Rms2MGZzWEdJUmp5Z2FLcHBHaWZrT2NBLVlremlTNlVjNHdSMkFpMU9tSTRQM05WYmxDTjlvNHZaNC14MDBPQ0kwMHFOeHllbmp3LXFPR1RsZDEzd0JDdGRQYWFpNC1oR3JCcDE5TEVidHROT0syWUdQQ2lKVi04MDNVZnA4LTEtcWZNZElXSWZBVVZXRE5kV1ln?oc=5",
+"published": "2026-11-22T20:20Z"
+},
+{
+"source": "Reuters Business",
+"title": "Waymo recalls self-driving cars over closed freeway lanes, manual traffic control - Reuters",
+"summary": "Waymo recalls self-driving cars over closed freeway lanes, manual traffic control Reuters",
+"link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQTlhWdHBVZmpJb2tVT2NkNzBsSlE3V190NnozVjVsdTc3NGJhYlY1ZE4weXplUmVXYjF5c2VZeWFLTmtSa05TRlRwUTFXVDZrYmFOcHh2a1psQ19XeVlFeFZMR0ltdHNGS3dWcE5hR1otUmZGakdRblpwRENQdnB5MGllYmhFZElhYkU0YUxQYy1kemVxSDhJa2ZwNWs2NjlHRXVNTElhQnJYeEpoeGltZ2dhckZfLXBkNkUwMkc0ZWlla3QxWXRKQUN2SWlQZw?oc=5",
+"published": "2026-11-20T20:04Z"
+},
+{
+"source": "Reuters Business",
+"title": "Arteta sweats on Raya scan, rues missed chances at Newcastle - Reuters",
+"summary": "Arteta sweats on Raya scan, rues missed chances at Newcastle Reuters",
+"link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNWXJFekFJQzlCMFByNFVRdWh5YTdBQjk1WXRlMm5tSFZFUE91OXZpRFc4dEk4enc0c2F1cUN2UkxGTjh2bXRERUcxSl9qTTZjT19OVlRQY01OalRIS00zcEZ2Q3l6b1Q0SEl4enQyWUpXeVlzU0tMc0taMjdtVDlFRURYb2JFV3Q0dWRFZ0FxcjN0YlQ3OXI0RlNmZXNxZzB3bnZhaGJR?oc=5",
+"published": "2026-11-21T20:53Z"
+},
+{
+"source": "Reuters Business",
+"title": "Spacecraft begins orbit of Mercury, with a glitch reported - Reuters",
+"summary": "Spacecraft begins orbit of Mercury, with a glitch reported Reuters",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOY19EQkgzcWxJMDg3NUxKeFRER0NLRlRsTFN0TGJEelRLZ2xhYi10MTgtNm93R1FOblRBMDRUbTZkaUpORFl1bWVTYlh3bThiQzJDeUZLZkpaTWJ0QlpMV19HVHFzbzZzZFBtN1BzVUVsNFRZcFFka2dlRDNIZEFDMWt2TG5BNWhQZkdPUWhEUnp5UUNKbUJSeTNDd08?oc=5",
+"published": "2026-11-22T21:10Z"
+},
+{
+"source": "AP Business",
+"title": "Syria’s new rulers struggle to integrate foreign fighters as Islamic State fears linger - AP News",
+"summary": "Syria’s new rulers struggle to integrate foreign fighters as Islamic State fears linger AP News",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQTEU2cV9HZ0xGZGNhTWcwcGxIS09MNXE0c2w4a2dVX2JZcUlVRnlpZ09SdGF6RW5xT1R0MUJDTjB4MHFBMEY3dTlsUHphNkNhNkFFdGZkZk9qZE91OEdxX2FOVDFhM3NkcG16M3k0OGxUcnZMSTgtd2Q5bGtHMC1JN2t3UE44N1Y3aTZyTkhQenhvNk4wTDFZMXE3SDQ?oc=5",
+"published": "2026-11-20T12:13Z"
+},
+{
+"source": "AP Business",
+"title": "In Ukraine, the fight to keep winter outside begins with a broken window - AP News",
+"summary": "In Ukraine, the fight to keep winter outside begins with a broken window AP News",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQSjRWNURuNy1QRzlYWm0yaHlkaVh0N1RXQV9SdXNsXzc2RTJHTHlTLWszWW13OEZROEY4a0NWc0lqa2psbHZOdTQ0dkR5OFB0QkdwY3BVU0ZwRWo4UDh6NlZXX0VVTTQtalp4Z3l6azBsR1U3b21qNDZwX3NmRkFYSFBnQXIyQWU2M29VT2lCeUZLNEtybnZ3Ulh0aHF4dC1IU3QzVmJTbnJhaGxXT1hXdFpQVjhyYjA?oc=5",
+"published": "2026-11-22T07:02Z"
+},
+{
+"source": "AP Business",
+"title": "Paolo Bulgari, the Italian jeweler who turned a family business into global luxury brand, dies at 89 - AP News",
+"summary": "Paolo Bulgari, the Italian jeweler who turned a family business into global luxury brand, dies at 89 AP News",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPMXRQMHRTRkRCTXd0ejh0aGpGcWozZTBhdTJjMGV2WFZPMTVKR3pHQURGZWlYQ3dDdkRYTjI4Rmpmcjd1T19vVFdxNk1seF93V3I1cVhMVlNBOE01bktZSkkyVldMY0hpM2YzRWZWSjFyRVRwTTdKbFFMMFdkX3d4WUc1cE1YNUJLcF9JX1Nwb0l0Vzl3OXRaOU8tbklNa2NTMy1CbzNwM2tadw?oc=5",
+"published": "2026-11-23T00:22Z"
+},
+{
+"source": "Reuters Business",
+"title": "Vietnam passes law to speed up land expropriation for priority projects - Reuters",
+"summary": "Vietnam passes law to speed up land expropriation for priority projects Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOREN6Und3YmZhcnZNajgycTQzRmtIT1pybXlWcXpCTnNjb2RZQlBmZzRyR2xaS21mQm5jdnVlcWlfX1hCaFVkZXdyTzVmdnJiMlNsZ2hCa3QtUVVSYTNnWndRTTZOQVM5TWFUalJ6TnpIZTRSMkNscHVVMmk5cHlzWFNta3FRMHhBU3JjZnRlcFRUS0Y1T3czWVZfTUxETkNKNjJ0YmJ3WG5CMDlxQ2c5WEFjU1NrTW5Ta2l3?oc=5",
+"published": "2026-11-21T04:18Z"
+},
+{
+"source": "Reuters Business",
+"title": "Qatari delegation visits Tehran for talks, Iranian official says - Reuters",
+"summary": "Qatari delegation visits Tehran for talks, Iranian official says Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYmR3b1p3TldvTzF4TnZyM082MXJ2dEh5YXl3Ym41SnBreUtLYUhVYUlCbjYyM0VGTHNwVWw2eXdKREJ6U0dzY2VLaHpVR0w5VFpBcFhzVmJLaGZ4Wk1YeTVlX1BtUlM3RWFNZ1lyeURLX3dTcjZ3aDNwbzl6VVpVanFETl9PZ2pWM29tYU1abHlJZFF0UkdmV2NBZEYtRU9IT2JBNWNKY1RsRkhxODlKNEEyMA?oc=5",
+"published": "2026-11-21T15:01Z"
+},
+{
+"source": "Reuters Business",
+"title": "Indonesia central bank says MSCI talks with Prabowo support rupiah - Reuters",
+"summary": "Indonesia central bank says MSCI talks with Prabowo support rupiah Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWTV0cGJnSHE5ZkxDSVhUQ1Z1S09hLUp4SmxHZ1YzWEZ5TjBxTHlNQ1NSc3JtcDZ5MzlUUzNZYTFIdmZCVXFheGM1cTg4djBhb01kLVlOUVZUekFSLWgxMjIzSnMzZ1pORjZDUDhXZFM4U2JmLXJkblY3QWdIN1QxallRdEduVlo5QUQzcExQVlNPaDNzVmhGTlJLNVRaYU9nUHN5aUJWUlFoRUhqSHotSEpTdGZZVER4OXFn?oc=5",
+"published": "2026-11-23T03:36Z"
+},
+{
+"source": "AP Business",
+"title": "Redistricting did not help Republicans keep the House – but 2028 could look different - AP News",
+"summary": "Redistricting did not help Republicans keep the House – but 2028 could look different AP News",
+"link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE9oZVRQbXhaSk1ncFpIcl9zSnJFRUt2Ym5xMXF1bW1yM2FoZVJuTkdYcnFua2RVY2tEakpIYzNLZTZxZVRWcHpiVFlvaTVGRG9pUE82a2xPb09zaTZtTE9OeFhnZTY3aThoOTVmYVh2dzhDZUdSQ2NsX2htZHM?oc=5",
+"published": "2026-11-21T01:07Z"
+},
+{
+"source": "AP Business",
+"title": "No. 4 UCLA QB Ty Dieffenbach injured in 1st of 3 OTs in loss to Michigan when he was tackled on run - AP News",
+"summary": "No. 4 UCLA QB Ty Dieffenbach injured in 1st of 3 OTs in loss to Michigan when he was tackled on run AP News",
+"link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQeXc2T2s4SWp1czBfbERsTFAwSk01aUl1dngzVVBSLXZWVDBYYXRCcktrVHFoWjdGcnQ1OWg3aUxzd1MtazZJeWRsVWlfTWVCVFZMNzRqcm5SSVRSMGZ1dWhOY1QyMTRaVzhEVzRiRkVZQzYwOFE5ek5HRGdjWkRDRmtYbUIweDdoRnc?oc=5",
+"published": "2026-11-22T01:47Z"
+},
+{
+"source": "AP Business",
+"title": "Indonesian rescuers race to find 34 missing workers after a deadly candy factory fire - AP News",
+"summary": "Indonesian rescuers race to find 34 missing workers after a deadly candy factory fire AP News",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNeWxmUHVQSmZGb3dYUl9UZzNOXzlEcW1hcUFTNlZzY0xNS3ZySEE5bzhTYW94eFJJTmN1RnVqLWZXeFJtUUVqUmpkaTNoS19vWlcwWHZza3hqanhPX2pGTjc2czRONGswbEJWT1Fjalh2eTNYTWJ0RjlWUnFld3JKbnUtaUpIZ1Q3RWdVQUtvSXdPajQ1cG1IejZZSQ?oc=5",
+"published": "2026-11-23T06:26Z"
+},
+{
+"source": "Reuters Business",
+"title": "Oracle says OpenAI infrastructure deal is fully funded after final capital raise - Reuters",
+"summary": "Oracle says OpenAI infrastructure deal is fully funded after final capital raise Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPSmpQQVdqRTFyNlZSVVFsZG8yNGJ5WWRaOU1ZRXJXQkJJM05GaXY5ZUpQTndMVVljNXNpYUJDUmF1T3hQcWkzNi1udWc4c3pMV3F6RFk1dUctcG5jOFlRcUJDMV9IM2hBdV9KbUJqSmJVa1lXS19LTUVJcUg3alFNWl9RREgwRUVrRU9LSkFoRGZJUWpxLVB1bzlldWE4VDRHRmczZVBMbXFiYlRVSHQ2S293M1JnZUNMSTdZdEVKTVpMXzA?oc=5",
+"published": "2026-11-20T22:11Z"
+},
+{
+"source": "Reuters Business",
+"title": "Spain to extend banking tax to fund housing policies, PM says - Reuters",
+"summary": "Spain to extend banking tax to fund housing policies, PM says Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNZUQ4V0FDdDFjMThXUnVvbTdtbWF3R1M2UE9XX2ZRWVZ5aEV2bFdQRTdZdWtmQUh0WENMcGg1dDlkeUNWeUpUXzhuMnAzTlA2Q3FNaF9kbDh2dTBlTEQwTnA5aHgyUy1SbTczNkNkQWpZTWQ5MVB6YjN2WkdZdzVEc1ZLMnRxb1ZzMGU0SHFaVmZMNEx0RjhtLUdOQmxya0MxM2V6ajNaTzdjd00?oc=5",
+"published": "2026-11-21T10:42Z"
+},
+{
+"source": "Reuters Business",
+"title": "Indonesian president submits names of VP candidates to parliament - Reuters",
+"summary": "Indonesian president submits names of VP candidates to parliament Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPQVpFcWppN3FkT0RvWVpvVzRNdEFTOWc2aTVoN3R2Sm5nbXppNzF5RVBFeDRZZEVtaW1zTVdRdThXZGZMd2wzODZYa3FsMjJ6MFVOa0dsTHEwclFYaWJlUmRtamE0a25KZ2RlUEM0VmR3anVZNEN6anZOMVJBX2pvYXhuNzBQZmUwUFE5VTJFUTltbjVLY3ZFbU05cF9TLUhWSG53S1BjMmh6VGhkeHhKT296TWpWOGJ1ZW9uSk9BTE9XUQ?oc=5",
+"published": "2026-11-23T05:43Z"
+},
+{
+"source": "AP Business",
+"title": "For families of the fallen, Trump’s proposed arch casts a shadow over Arlington National Cemetery - AP News",
+"summary": "For families of the fallen, Trump’s proposed arch casts a shadow over Arlington National Cemetery AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPak40Q3ZoUVlvdnV3Vmk3TnZUbDdnTEdjRHhTUGJUa2FPXzZETmlKM2VUWmpnQWl4bWpTc1p3RWlhMUVjQWRuN2xkUklnYjJhNG9zYnhJN0pZMklXWm1vS2FXZ256djZ1a0ItNDFfeTY3VndCZGdLSXgzN3l0bnhtVWhJaXVYMFN0UV9Nbzh3dVY5aVFzQ3MwcXBkT0NGOWdWenc?oc=5",
+"published": "2026-11-21T00:25Z"
+},
+{
+"source": "AP Business",
+"title": "Loud boos, golf balls and mustard bottles: Vols fans shower Lane Kiffin with hate again - AP News",
+"summary": "Loud boos, golf balls and mustard bottles: Vols fans shower Lane Kiffin with hate again AP News",
+"link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNVGpJX2NtUDlaNy0zN0cxMjkySnYzV2hCMEJ1VkhYWi1XRndHVGtOOElhbXZyaEV0bXNhcWJudW9RakFhaFlHZmRPZ3NacU5JY0pfLW5ZVjctTVhzd3MzRE8wSjk3QS16MHBYT1N3Qm1hellHNVB1bGtlVUNoLVVUdXdvblU3UU9v?oc=5",
+"published": "2026-11-22T02:50Z"
+},
+{
+"source": "AP Business",
+"title": "SEC fines Tennessee $250K after fans threw golf balls and mustard bottles at Lane Kiffin - AP News",
+"summary": "SEC fines Tennessee $250K after fans threw golf balls and mustard bottles at Lane Kiffin AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQU2pjTUY3SjNfRmlHdnpnb0hCaEdmU1R0Vk1CQUtxeGpySXJXdEZNUFVwTEItbW1zWTRoeTU3bUlndnh2ZFNLVm91aDJkU3pLM3dkenZBTDYtVjRmY1dSYmpQQlJIRkZWMnBGWm1iV25KRWRxNF9scUo0aE5RcGJqVjNFVGU4NjdEVU9wOUZKZm1XVnFoaEE?oc=5",
+"published": "2026-11-23T02:07Z"
+},
+{
+"source": "Reuters Business",
+"title": "US Defense Secretary Hegseth restricts military ties with Canada, Washington Post reports - Reuters",
+"summary": "US Defense Secretary Hegseth restricts military ties with Canada, Washington Post reports Reuters",
+"link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQZ19DTDNqa18wN2l3QWdvckc3UXYwZWhlRlpFaUVpRFBtdlBWRjY2WC1mTEdSbHIwbmxTcnNTQ2tkci04ZFoyRjlxTjQtdHh1a3lETGN2TGtWYmY3Ty1ibFZOQk1zUXJNcHE4ZWVXNkRSdDFwY21WNC1BSE1GeWdQMkxpRHQ0Yjd1cFVXNmNuRmFveUIwOW9iTDA4Z3BLc3lVMnVXMkpoSEllVEswZncxZEJVZ3N2ODhYOUs1YlkwZmVnNnhDUWVUSmdNVQ?oc=5",
+"published": "2026-11-20T23:29Z"
+},
+{
+"source": "Reuters Business",
+"title": "Russia's Wildberries CEO steps down days after EU sanctions, media report - Reuters",
+"summary": "Russia's Wildberries CEO steps down days after EU sanctions, media report Reuters",
+"link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPUHlnc2RFZFltcC0zMXMtb1VfaEx6VFhrWVJfS2tpaHF2Vm4yMnRDYjVLX3FSTWNHaDJKdUYwZ3o5SUJfNVpvRERfcEladlQ2RkRCaFhxaEVZRGdwUTAwOVdSRDZDWjlSYXVucW83NS1aMVN0QzFKbFhVXzhBSEZtUmxKdHpYT3gwNXdCUWZxbU9MbVh3bEU3Ul9ZcXQxZTI5QjlyTHgtTUNDdWVINk9qbUwwNmo1eUt3aFFsaWlTNEJfQnZYNkVOMlVDRkY?oc=5",
+"published": "2026-11-21T12:59Z"
+},
+{
+"source": "Reuters Business",
+"title": "US intelligence chief predicts more tech outages as systems undergo upgrades - Reuters",
+"summary": "US intelligence chief predicts more tech outages as systems undergo upgrades Reuters",
+"link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQX1ZQQTFqN0xpOERieUhlT0puQ0pnQnNnRnQtaW8yb3VGWkFvM3hGeTA3QlBrR1VCNUhjS21TQ1JISlNWMG5mdlc3NVVmOUZ0LWZrMTB4R3h4YlpIVnJObWVQcmhLUDFiRnhCY1c1RTE5NzhwQzIwTXQ3MkxfN1hQSU9ZbkVidFZCWE1PWWxHMWgtem5ZSzBoOU1oYUVuZ0NEOW00V0Jlb1pEUVdrNUF3blEtSEw4dkpsYU9ya0w0N3UxTmRE?oc=5",
+"published": "2026-11-22T18:14Z"
+},
+{
+"source": "AP Business",
+"title": "Court approves $7.25 billion settlement with Bayer over claims Roundup weed killer caused cancer - AP News",
+"summary": "Court approves $7.25 billion settlement with Bayer over claims Roundup weed killer caused cancer AP News",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOdE1pUUZWQjVLZWF3bzVPQVZNOWFQZzNxSUVGdVFpeVY0d3d0TGE3Q2dsQ2RrYU5hQlI4Z2ROVkR2YnptQzFnRDFibExkNkptYzZzMGFZTlBWX3hsa21BSXVjNWxjWjNTR3lOOUxtX2owTmVzQk84NHg1eXB2TVNJNjFhRG05SDBRMVIwSS1DMW5WU2RjSC0xSk1zNHZhblRNdlAwQ05hcktTcThaXzhYWQ?oc=5",
+"published": "2026-11-20T23:27Z"
+},
+{
+"source": "AP Business",
+"title": "Nebraska ends 31-game losing streak against AP Top 25 opponents with 31-28 win over No. 16 Buckeyes - AP News",
+"summary": "Nebraska ends 31-game losing streak against AP Top 25 opponents with 31-28 win over No. 16 Buckeyes AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNRnJDNkhKZ1BETms3bl9XTW1DMTJxY0pmYVI1R19vNElOZ09DbTBRbldnS2l2TGpqRmtnQkE0MmtjWXl2REpzSGQ2QW11Z09KRDhocXJ1cHVsLWVkYWFnbnZwcHJONkNXOGQwa0szSWhKUlpZUVROS1lWS05lOHpvTnFsdnNEV3ZDbkdJUTBEaGtGTzZOOE5rWl9B?oc=5",
+"published": "2026-11-22T02:47Z"
+},
+{
+"source": "AP Business",
+"title": "Anthropic's record IPO raises hopes for a charitable windfall that has nonprofits preparing to scale - AP News",
+"summary": "Anthropic's record IPO raises hopes for a charitable windfall that has nonprofits preparing to scale AP News",
+"link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNOTZBX2xZWWNQeGFIRExEbFNFSUJiV3I1cG80MzZzUUh2ZDZQTXM0dC1iNDdRVTZLZkFWelpTWnRvODY4clRUUmNaamdBQXdRSmM3U3NQdS1RbzU3dF92OVBfMTRRM3JIbF8tMlIzZ1JRUWFVV3Q0U2xtZHlCRU5YWkhIV3hQNURrVnZFU2d2NA?oc=5",
+"published": "2026-11-22T13:07Z"
+},
+{
+"source": "Reuters Business",
+"title": "Databricks in early talks to raise funds at $225 billion valuation, WSJ reports - Reuters",
+"summary": "Databricks in early talks to raise funds at $225 billion valuation, WSJ reports Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPRS1RakZnNDMzSzNQMW5Yb3BfckxrRE5DQnlYWFRpVkRKUGc2SmtEU241dGtTYjIzY3ZvUktrOWVHbkFxanJ2M21sc2dxaFFTdDljaTZtaV9yWUN4LThySTQtdmpBUEZfQjF3a29WVjJGRnRjdXdGa1R0Y2kyclZRNkhLMEtnVnppczRZOGRfdi04emFPWTNtVXdpYmRvUXFkdzVYUUhIYjZrWXNzVllsNE1JNzdxd0U2ZEhGSnVwMzBfQQ?oc=5",
+"published": "2026-11-20T23:41Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump says he will consider championing Barry Bonds' Hall of Fame candidacy - Reuters",
+"summary": "Trump says he will consider championing Barry Bonds' Hall of Fame candidacy Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNTkdsdXlwb0VqWGxpRW1RTlA5MnlRRDZMVDBGcUJJZDV3Y2U1bDh5U0ZreVl0YVBHWjUzY2RRNTlNQkhyTlp1RlNTRHVfSWN6TDEybG9zWFFCYkdNNFNIQVBMNVJCd1V3S1g3ai1GRVdRX3pVdjRSdzFMV1AyNlBDRnd1a3dKNFJPekZJLWJNNmlDeVRQSDFxcUxkVk1oeHhGeTNiaktaQVNlcDdDY3lmalVReXM?oc=5",
+"published": "2026-11-21T18:23Z"
+},
+{
+"source": "Reuters Business",
+"title": "US seeks answers on Nvidia's sale of chips to China, Bessent says - Reuters",
+"summary": "US seeks answers on Nvidia's sale of chips to China, Bessent says Reuters",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQcm1fbVJENmFGZU81bGR4WXVfeDMwdWdaY0xNbmVBN3hmaXVVeVBLelJxT3dubnROYnVkM2NCRXRfcFFvMGNtZ0FlM3c5LWt1WUVGclQzY1ZJTVBCR2d2dXozSXRqN0VIM1NsV0d2YVJLRjJpRnlIcVRNSlZqeURwLWhKa1V4dUNvWDdlZmNoMnQxQ1d6WlVGalNpdjVSZm9PMXRzUA?oc=5",
+"published": "2026-11-22T17:53Z"
+},
+{
+"source": "AP Business",
+"title": "Phumzile Mlambo-Ngcuka, former South Africa deputy president and UN Women chief, dies at 71 - AP News",
+"summary": "Phumzile Mlambo-Ngcuka, former South Africa deputy president and UN Women chief, dies at 71 AP News",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPd0lJTWktaUFCdjJlNHdvWUY3YThWbnJjMGpCUTJSejQyLXUwdVFvbkM4Wk5uMnZvczVRWV9YOVFFeWJWcDBCQXBSNFg5NmpHdkVKb3gzbUJwTnk2V3ROTlVhWnJ5Q1Z3QVN0alotWXRnVURER1hRSVNQbXE3YndXQTNzTk9lYUxOOElUTHd0MHdRQWppM2VMZmdCVHJuNjA3c2ZodVlxdm9RblN5RUEzdQ?oc=5",
+"published": "2026-11-21T02:36Z"
+},
+{
+"source": "AP Business",
+"title": "Wembanyama shows off with historic 50-point performance in Spurs win - AP News",
+"summary": "Wembanyama shows off with historic 50-point performance in Spurs win AP News",
+"link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNUVlOTVhXTmIzOWt2Tkt4RXBudGFqa0FGcXJ0bk83TkRJR050X240ZlNYb2E5Mmt1cE9VVzJGT0dxc3FTaWdsWjFaRDBvS1EtOGtsajIzNzNZMGdnYnRhQVNUa3JMRktNa2I3eFNCYjVMOXQ0LUh6YnVRV2RHOTVlOWlrWEYwUmhDdVZqSk1NUQ?oc=5",
+"published": "2026-11-22T05:40Z"
+},
+{
+"source": "AP Business",
+"title": "Bryce Underwood lifts Michigan to an 18-16 win over No. 4 UCLA in 3 overtimes - AP News",
+"summary": "Bryce Underwood lifts Michigan to an 18-16 win over No. 4 UCLA in 3 overtimes AP News",
+"link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPd21xcHpoRDBpZ0ZEa2xGRHJXNGRJVnotWWlzTkplaE1HeTc5UFJJcEhFNFNqeDBXWDhDNGZiS1BlYVZZV0hzcnc2dnhCZ3E1TmNFSkFiYV9ITHF2OEN4UGJPRDJuRjZkT1hLNU56QnlhdEx6dnBWTmRzNFNvZTJFd3FKZGxKQQ?oc=5",
+"published": "2026-11-22T15:31Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump ousts cyber director after tech outages spark criticism - Reuters",
+"summary": "Trump ousts cyber director after tech outages spark criticism Reuters",
+"link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNTElpWEVLdXdjWl9QOVBPcjRMRWcyN2xMVzdqQ1hSZjJxZTJEUk9QWmtyNldWTHRyUmNBaWFtSUJ5TndzRG9vTHR1bGR5eEZXNkNDbnNNQlRKcW9PdnZPc2VZMVJhOGxablFJeUpLM2UtU1pfXzhUaWVhNi1qeXk0ejFVVDZ3VGp6b01UdmlrMEZicFlqcU9BY2lfN25rWWRMR2p4RkZYdXFkdnJWMVAtSWZkdW5PNHBfTkdxNFRwRQ?oc=5",
+"published": "2026-11-20T18:27Z"
+},
+{
+"source": "Reuters Business",
+"title": "UK maritime agency reports two tanker incidents near Oman; Iran says vessel hit mine east of Hormuz - Reuters",
+"summary": "UK maritime agency reports two tanker incidents near Oman; Iran says vessel hit mine east of Hormuz Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOQWE4czlabDhxX0p1R0pxTHh1TVdxWDVDWG1PeTFucUVvb0FIODBPUU5CcHNyekU3OU1QM3VuN3FjMmxCTm1uWXJUUnRmVWJYUDFkbFJHT080OUNzYkw5OW1hSGxxUUtKVFNLblFyZldZRmZ1RUhscnBaa1FoVkdpQ1Rocndtc25iWS1fY0ctTW05b1dOQTJoZ3VxWDhZZ1h0RjlPc3htR3FQQTBQbjYzQ29QOA?oc=5",
+"published": "2026-11-21T08:02Z"
+},
+{
+"source": "Reuters Business",
+"title": "Indian rupee could rise to 91.50/$ on equity inflows, HDFC Bank's treasury head says - Reuters",
+"summary": "Indian rupee could rise to 91.50/$ on equity inflows, HDFC Bank's treasury head says Reuters",
+"link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOd3pBMG1XeGk3X0tmdVlkOWFnRlhTS3h3a1VyZkFhbElMZ2NXa3hPdjVEdkxUYWlxWTZZbmxLV1RSZlV6NDNSQmVXUUVkaV9RSzRodXB1TWw0bkw3Sm02OXVSNGNxS3VHWk95WTN1c19Pa0pEWVlGYmVrSnFnRVNqVzNXbDRiOWx4clplN0d4T2kxUDBxQmNrR2MtNk81T0RWbTBYNml3Q1RnMk45MDN6NGpoeTVJblA3c3BORnhR?oc=5",
+"published": "2026-11-23T03:12Z"
+},
+{
+"source": "AP Business",
+"title": "A 2nd federal judge blocks construction of Trump’s memorial arch in DC - AP News",
+"summary": "A 2nd federal judge blocks construction of Trump’s memorial arch in DC AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQbkF0WE5uYlpOb3pKeUc0N0xDcThsTFdqbzFkU1c0STdiSGcxOWVxcUh1MC1fZy10YmpjVlNZallXelZWSnZFMXV5Y2dKYlNDUWNOLW0tVHB2WU1xRDhMam1vaVN5dF9tQXA3bTNyc2Nhem5BWHQwZWlCa3NncGw4SUJhZFg5YW9taDkzVHg4QzNJaERaSGVWdHVn?oc=5",
+"published": "2026-11-20T19:21Z"
+},
+{
+"source": "AP Business",
+"title": "Bend it like (Di)Bernardo: 'Olympic goal' lifts Kansas City to first NWSL title, 2-1 over Washington - AP News",
+"summary": "Bend it like (Di)Bernardo: 'Olympic goal' lifts Kansas City to first NWSL title, 2-1 over Washington AP News",
+"link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOLUxmel9XQzE5eEpFbjd1OVY5cC13TDRMdnljT01DMzlyU3hCTnRYYVVVVlNxT2x4YXhwT3Vkbl9HY0RyeWZOVUdxelNzOWF2MVp5U3JCVS11OXNWSlhQc1BMOWJJdkVULVhUNTlkVENfTWF3WlpRZEhpX3N6Nlc4YVp4TkRLS2gtS2lET0h3bHc1OUpfSHdr?oc=5",
+"published": "2026-11-22T06:11Z"
+},
+{
+"source": "AP Business",
+"title": "Alcaraz joins an elite club by adding ATP Finals trophy to his career Grand Slam - AP News",
+"summary": "Alcaraz joins an elite club by adding ATP Finals trophy to his career Grand Slam AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQY0hzc3FiZFlDY1RWZmpPU3pBUDM1WHNYWGtxeWFFYVYwV01KaTl4ZXhGYTcwWGZuOGNuOWhwWUtaZ0ZYRnBMZDhFRlRaLWUyczJvaEtFQ3kyNFFuWkYyX0k2SzNvZnlRY0UwbWRLNkE0QUIwdktkWjd2dWpiVUxTeW9Bbm94S3NadkVNRkplUEpjNElkTlJCRnN6eFpDdzh1cmVYTg?oc=5",
+"published": "2026-11-22T21:43Z"
+},
+{
+"source": "Reuters Business",
+"title": "Student protests held across Europe with demands from school funding to climate - Reuters",
+"summary": "Student protests held across Europe with demands from school funding to climate Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNT203dWpPR19PY3FGeGlGWkNqRklXMDA0cEtFTXBoY21LbVhhaEVNNzVXWTJfOUhUOURwUVVtQXBVazBOdjRjNmVnRktLOGxHam9tZ3ZneGp3bXNfQ2lHOU0yY0I2WF9qdnJxSkNrVm1Pc0REblNaMXJxRHZqRnpDcmY5MEhOdkNaeUZMUVFQYUxDUXRKbmhmckRvQnBHZUlXclh6ZEJJSUJQYll3SUNfdGJ5WQ?oc=5",
+"published": "2026-11-20T16:29Z"
+},
+{
+"source": "Reuters Business",
+"title": "Kate, Britain's Princess of Wales, to feature in documentary about cancer recovery - Reuters",
+"summary": "Kate, Britain's Princess of Wales, to feature in documentary about cancer recovery Reuters",
+"link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOdE5pNnVYdm1rZWdzUUQ5SmZGRUhVU2lQaWZoLXgyU3c2YV92bVdLcHU0elhJamUtdl9MMVJkd1FVNUY3UEp4WjcxRlJPWVMtY0hydG84UTBXNXB2LXIyTmlXa0N3QV9PS1ZIZWIzQlZmbEZLeExKcXBpUEtpUUVkbW1wRGJlS2NaS29xNTc0bUhhMEFnTTdfb2JRaW81ZENHSno5bm1NTlVrZm5HSDlHdFBLOUlhSDBUU0VwUHZqbFd4NG5CX0FaM0ZoMXg5cXpUTXl1RFFGWXBDZw?oc=5",
+"published": "2026-11-21T13:26Z"
+},
+{
+"source": "Reuters Business",
+"title": "US intelligence chief says Putin is 'not America's friend in Ukraine' - Reuters",
+"summary": "US intelligence chief says Putin is 'not America's friend in Ukraine' Reuters",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPNlR0aUswLUVNUWNuMk05NmJBSElCMzV6RWxDV2V4TmFicUFZWUFJR2pzQnd2VmNvQzhQTWtHTXZsMkkzcGMweEUyRE1FUlU1aXk5QkZCTk0tRE5fX1k2aU9jMmtOTndlTlVkaU5rT011UGgyMU1XX0JBQ3ZCb05qcEZYV3U2c003c3F3ZkRZamtvb3lDak8zR2o0dnJueWl6UkJ5RzBhTV9yUkpoaFVDVg?oc=5",
+"published": "2026-11-22T17:16Z"
+},
+{
+"source": "AP Business",
+"title": "Israeli settlers' move into a Palestinian neighborhood brings deadly violence to Jericho's doorstep - AP News",
+"summary": "Israeli settlers' move into a Palestinian neighborhood brings deadly violence to Jericho's doorstep AP News",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPVlhubkRoOWQ4eXhKMlV3N3VmcjhBYktaelJNMUJQS3o5c2pkQ2gtZHJBVVNJNHdMeXdNbmRmRlh5UlJVbERZYjBqRzVDbjFTbXBVbTBBZUxGOGZRZXFlQWl5NWF3ZllmZ0FUZ0tCUlJ3VEJKc0VpZWl2VDNqM2MzMmtkakZZQlpMOXRMUDFLVEYtWGN6VkhiUUw5TWpGbzFmVnRGeVhiUElpNnIwZXM1YWY5QQ?oc=5",
+"published": "2026-11-21T05:01Z"
+},
+{
+"source": "AP Business",
+"title": "Photos show a Gaza City wedding and a new home amid the destruction - AP News",
+"summary": "Photos show a Gaza City wedding and a new home amid the destruction AP News",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQdGxwME84aWMyZTVHc3EtWkpoN1FHNXJyRFRQaFliNjQzaDJtU1g5cDFqelBFU1MxZHRxbU1IMXV4dzJvOXFhN0VEQ3A0akU4X24wZjVWd2hjVlF4c3htT0V5dEE3cEVuaGRIMTFkU2VKWDQzVUVuSm85U0dfalBrb0QzeGR4dGRyc3pxWmZwd3hJeTNqRlpINXFPOVlzUFU?oc=5",
+"published": "2026-11-21T18:35Z"
+},
+{
+"source": "Reuters Business",
+"title": "Instant view: Nasdaq plunges 5% a day after Anthropic debut, but investors still believe in AI - Reuters",
+"summary": "Instant view: Nasdaq plunges 5% a day after Anthropic debut, but investors still believe in AI Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPSi1oZG9URHdnSVhJWWs1THZ6b1JBVWJHODR5ZE5fajVzaS1zZGhfdGlfajJkTUpmeUduODNlNTN0bTFSUEZCZHROd1IzSF9DeWxKUmYyT0IyVTh6Zy1ab1ZXd1BfSjFQcC1paFhiS3NTM1NSQUlMNmhDa1pUNl9WMW9xM3NTTzI5aF95NXNaVnI2WXV6TlhxZ3h3WHh2NldhZzhvekxPb1dQczVXcXZYT2tkWjAxNS1uYmhF?oc=5",
+"published": "2026-11-20T21:30Z"
+},
+{
+"source": "Reuters Business",
+"title": "Most new Black Democrats in decades to join US Congress, set to sway policy, party - Reuters",
+"summary": "Most new Black Democrats in decades to join US Congress, set to sway policy, party Reuters",
+"link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOS2xUZFEwY1RDY09Mc1lXQTdCMFk5ZWlCb0ZSakJuQmppYzI2Y0loc3BRdEp4MXhtMkNhY0Vsdk9fYUpEUTNUTTh0SFl3akZqUUdKWGdJTnpCVVFwZm1LOE5SNTcwV0VOSXc3S1k4SHM2R0UzV1liTm84SkZRZVNUZlYwZi1xLWpnVVBQaUVuaFFPM3NockMtcnhrYms0YmNJNXJzRXRVZ1hNNWFWYjNLU09JRzVDVXc?oc=5",
+"published": "2026-11-21T11:05Z"
+},
+{
+"source": "Reuters Business",
+"title": "Army invokes emergency powers to detonate lead in Iowa, bypass court order - Reuters",
+"summary": "Army invokes emergency powers to detonate lead in Iowa, bypass court order Reuters",
+"link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPWktPQlhDQmZja2RjS09vdFlCdkFtTjVHVE1xRHVMeDBVNkFiVWlrMVdlQXl2SjRsekFabUxiV05Ud0RlR1M3aVhDcVlNNURCYnVFZXBaT1RDTmNQb3ViblpuQVNGdUVwQmlad1dWc2pYaWtpeXZCQVBnalZaT1M5RTcwUzdXZndua3JNdGpHOERNczk0NExoLXRIMUttMlRXRVdTSjNmWFR6dUJVSVVlOEhVNXpHakZfVzNiY1QybVFmeXFCamYtMg?oc=5",
+"published": "2026-11-22T16:36Z"
+},
+{
+"source": "AP Business",
+"title": "Exam shows that the hat Fiona the hippo ate was deep in her small intestine - AP News",
+"summary": "Exam shows that the hat Fiona the hippo ate was deep in her small intestine AP News",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPUUNNS3N4Rjk4azVDS01jcnA0dTNlNDgyeGVUb3VHaElnU1hCS1hmVTl1ZWlwOXVKRzZBMkRESzdnUjFLVFFUZi1BU1VXdVdENkVUV2lWRFdNVllhZlh4Y0puZEc2WHZGZDdEaElXTFE0cTJpMjZEbS1JTW1lM2wwc29LcFNKVl82bkVlUVNRZVlXSEY5N1FPeTRXWFp4UVE?oc=5",
+"published": "2026-11-21T02:53Z"
+},
+{
+"source": "AP Business",
+"title": "No. 6 Indiana loses 27-24 in overtime at Washington and might fall out of playoff picture - AP News",
+"summary": "No. 6 Indiana loses 27-24 in overtime at Washington and might fall out of playoff picture AP News",
+"link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPQmE4VnA5a3dYZk9IMERCTmdVOVVmTWN0SHBETTVLMnkxcnNYdGVDMWVDaUxVUlZkc3RGakRPU3oyYVZyeklROHFRRGlQTUtNVmxJblBpZmlpODJFZmVLR3pNMzRlNzY3WjNDZl9iVlJ5S09rVWV6NzBRS3kzZ1MxT05GM2JXVndRVmxXNg?oc=5",
+"published": "2026-11-22T01:57Z"
+},
+{
+"source": "AP Business",
+"title": "Natural gas pipeline fire shoots flames into the air in Alabama, cause is under investigation - AP News",
+"summary": "Natural gas pipeline fire shoots flames into the air in Alabama, cause is under investigation AP News",
+"link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQVVloZE5KVEJhUnJWSjIwUUZIWHpoVU0zUVZoajh3cC12RW9JTGVmMVFhRHZhS2tkZHYzWWo4VzllSHRBekpnMjZ3WElEWnhKMWtnOGJXQ1JtZ3pKM3J3V3FyTlZWOFVkR3ZQS0ZjbnEzTGU5QnhQMlVlWEdsR0t1djFacmV1Y2tZeFdJX1FBYjdPMzRaQkFkSA?oc=5",
+"published": "2026-11-22T18:53Z"
+},
+{
+"source": "Reuters Business",
+"title": "Myanmar calls UN court's Rohingya genocide ruling a 'great disappointment' - Reuters",
+"summary": "Myanmar calls UN court's Rohingya genocide ruling a 'great disappointment' Reuters",
+"link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOazVmQWNON0pUR1lkMG9ESFlrYjhtOUtQRGNJREZ0cWpPNWIxYTNYaWxjQUN4cUxHU3BVX05BTUc0SlBsblFmQmJ5YjJiOUhHV1RuQTk0OGNLWTFoaWhudm9XS193THFlcU9xbHZqS2w0TGlyOEpRU2Y2dXhDcmFLZXhncDNHa1ctVGFoRFhRcXZROVpYdzZrTWdYbw?oc=5",
+"published": "2026-11-20T08:45Z"
+},
+{
+"source": "Reuters Business",
+"title": "France secure bonus-point win over Argentina to reach final - Reuters",
+"summary": "France secure bonus-point win over Argentina to reach final Reuters",
+"link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOWHpaUXNva2JXTnJhQTlvVkhxbTdTdDhkRGkwVmxKOW5MbnVuYWRFWlY0Z3o4Vm5nSFpuRGRVZUZsbWp0NkFmNmUwQ1NJTm1YaENYdmFLYmxWaGtVdUtqeEhiMXhMQTVMXzl4Q3RXcWwyOXlGandXZFpVa3ZBUzA5Rzd5WU42Wi1RdnJhUDg4ZkFmaW5ZQmdMVXpCTl9NWmxC?oc=5",
+"published": "2026-11-21T22:47Z"
+},
+{
+"source": "Reuters Business",
+"title": "Three Russian missiles flew into Poland Friday, prosecutors say - Reuters",
+"summary": "Three Russian missiles flew into Poland Friday, prosecutors say Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNM1VMUS1oUkxlYzRWaDg5WjNPbGJoV2t1LTlRNkVMWnF6a3Q3aUljXzlCal9hWmdhWnlkYzdKNjdFVGdwVk1WUFFucGdfbUlnY3RtUjBsdFBxVTdmTGNjcnJ1a0VDNnk5eFh5NDdWaGNWcjNWcFI2WkoxZnFUbkI5UHZ6YTdYZUVMa19Ldk5YTERtX3ZialpvbjI4eFVoQ0Eyd2l0NGxoVQ?oc=5",
+"published": "2026-11-22T17:19Z"
+},
+{
+"source": "AP Business",
+"title": "(Not) up in the air: Travelers' trepidations spike as Thanksgiving nears and tech hiccups abound - AP News",
+"summary": "(Not) up in the air: Travelers' trepidations spike as Thanksgiving nears and tech hiccups abound AP News",
+"link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNbFNTc09oNHBNWUtyWmhyV2tlWDUtcFZ4WGJ3MVQ2dUdQV0c1eEh6c1JhZmw5WUxlRm1aR3pHa0lDYTRydTZHaENyU2tuZVp0bDZ6VUhYang1SHExbzRJaV81d1FGNXlfTHpvY2VUUS1CZWdYenBreEF3SVJxWXlldldTQ2tDR09fdlVJMmxxMHVnajRPYmlmbXpENTdXQnJuM2c?oc=5",
+"published": "2026-11-20T19:18Z"
+},
+{
+"source": "AP Business",
+"title": "James Harden’s new role, same old burst: A 51-point night that moved him past Kobe Bryant - AP News",
+"summary": "James Harden’s new role, same old burst: A 51-point night that moved him past Kobe Bryant AP News",
+"link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQb0NQSjF1SXhwU285MVF3UktYR2NaaWlvdUFNVkF5X3JMUWdFYUJHbWNfaFRCdm05NmJtU2dzWDNoNjdJZzZxSDgzTWZLOXdvV2dCZnE1TGdrWEZzMy1qcEx4MExGblFELUJDQVBLd25TN1VMMThiYzRLYzNDdlhmcTEzanlwWmppVEZjcDBOamJJaGhB?oc=5",
+"published": "2026-11-21T14:06Z"
+},
+{
+"source": "AP Business",
+"title": "Mexican fans boo 49ers’ Nick Bosa after his remarks about their cheering at NFL games - AP News",
+"summary": "Mexican fans boo 49ers’ Nick Bosa after his remarks about their cheering at NFL games AP News",
+"link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNVVNLWFA3R0p0RmRNcGl2Uy1HUjBxN3ltdDRiaXIwakthTGMyNTdrQmFGZnN1dDhqckNvaEU4dGdUV2k0T1BLN2M2ZEsxdExqZHlmNS16b3lEbElPeVNFblVNYk9MbWkxNGlPTjBBSjVfQkh2NEt6VGZmblViNXJaZ3UxbF9sNnhmeTZ6UXo5d1A?oc=5",
+"published": "2026-11-23T01:36Z"
+},
+{
+"source": "Reuters Business",
+"title": "US judge rejects Trump administration's homelessness program revamp - Reuters",
+"summary": "US judge rejects Trump administration's homelessness program revamp Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOOG5VS2kxXzc0eW1zdWNGOXFUY3VrZGJGOWtuXzRZbW54bUVnVnh0UXFUWGpCbmduQW0yQkVIUzZYOERYNXU0d1BjU1R6Rm5SQ0VqUEYwR1BYWVAxMFI0ZEUwTExSbnM2UExXamlVdm4wUXpBdDJBdmg5bllYWkJsUTN4QVNsUm9hbzBhQmV0a3ZJWWpxVkt3cDh2QzFGUXozZzM4SFYzVkZUYnZxbUMxZkxIMlE5eGx5YXgw?oc=5",
+"published": "2026-11-20T23:54Z"
+},
+{
+"source": "Reuters Business",
+"title": "Hazlewood says was never close with Khawaja but has no issues with book release - Reuters",
+"summary": "Hazlewood says was never close with Khawaja but has no issues with book release Reuters",
+"link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPYWQwVS1FLWVKRkd6LVJzNmtxeUljOFdHSWFQX2xyaWU5bGI0TUhlcEVBNFZhYTZieEY0UzY2SXBnRV80ZzJUZVg3ZkRfenVHR0I5dGJLbFJucFZFMkprSjZycjJ0cElHSTBWczdkMlhDdUo3eFFQREIzcXZ5Q2JjNGhmRzJ5WHMwVWd5bllkRFpiOU9DM0tUVEhYd3M4dWxZZWZqekR4Y3dlV0pWSC1ueHNVSDFUc2ZoSHNIc0VkS0laMFJV?oc=5",
+"published": "2026-11-22T04:09Z"
+},
+{
+"source": "Reuters Business",
+"title": "Yemen's Houthis say they attacked Saudi Rabigh oil refinery - Reuters",
+"summary": "Yemen's Houthis say they attacked Saudi Rabigh oil refinery Reuters",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQSjZLZW5ua05hQkRTLVhvZnNHZnpUM05mT3ZxNl9FUUoyMEhMN0gtTUVfT0Zhb0g2eUxaeHlvZWlIWXNTVGlSMlczMHdBUERvRjVsQVZVSW92MlFESWlmTGxVaWM2aXYwZ0NtUTlna3k4ZkV2S0k4YkhVOFRjaWRrcmhZeWg5NHpQaW9pRGIybUFpalV3U2lzdlZ5QzYteENUSWpWdm90SXNFWVU4OWxBaGx3?oc=5",
+"published": "2026-11-22T17:52Z"
+},
+{
+"source": "AP Business",
+"title": "A decade after shooting Harambe, the Cincinnati Zoo is reeling from Fiona’s untimely death - AP News",
+"summary": "A decade after shooting Harambe, the Cincinnati Zoo is reeling from Fiona’s untimely death AP News",
+"link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNOXY1NTRqLUtBNE8tbEtNb29KU2xrRjBTdTJIby1nbFE1Z0FEWlNOa18yMVNHeUk1ci10cHR3SXlVWEcxWGlCOTZVbWstUnpCMHZ2SUFZQUlVZUJENmRCU0hWTjM2bFlWV2Y4aFNYZ0pNa1NpWlFtLVhVMmZ1dVREX0FWZ2RlQQ?oc=5",
+"published": "2026-11-20T20:17Z"
+},
+{
+"source": "AP Business",
+"title": "Music Review: 'Grand Theft Auto VI: The Album' is overstuffed and chaotic. But there are also gems - AP News",
+"summary": "Music Review: 'Grand Theft Auto VI: The Album' is overstuffed and chaotic. But there are also gems AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNaVBfQ2lXU21LRl9GR1dsQlVRMDdNbjlBYzJoN0VOekRQS0JNaEJhUmRaemVrZXVQWE9Jd1VEbFM1cnNlTmc3MmYwTTJJNGJuTjB0NExJaGc2X0M5Y2o1UXlsS09VWmplUzNMbi1IQ1pVX1A4SEhrTEFfLVRiNHM3TDlrZGtyQWVEYnl3VDdSYzVidmc?oc=5",
+"published": "2026-11-21T18:12Z"
+},
+{
+"source": "AP Business",
+"title": "A resurgent ‘Hunger Games’ goes big at the box office, despite competition of 'Grand Theft Auto VI' - AP News",
+"summary": "A resurgent ‘Hunger Games’ goes big at the box office, despite competition of 'Grand Theft Auto VI' AP News",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQOTVEQnRnd3RKdjBfSG5lQmtaSGlJTjNHRHNzc1o0WTFHS05ITTY2RnZDOUUzVUtabFRMa2FOOHVFc2I3RTE5MUc3Vm51U1hyRHluTng5Nk9Sbk9SY3ZuUzJkQTExRWNEWm5zQ2tUcDZuSURTRnVwcDFnVHN5QUV0ZW1DQmxEYkxsLVNFVWNfUGVDRFVVRVVRTjFuVHpSMUF6UC1jNg?oc=5",
+"published": "2026-11-22T17:58Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump says he still backs Lutnick, urges Nvidia's Huang to apologize - Reuters",
+"summary": "Trump says he still backs Lutnick, urges Nvidia's Huang to apologize Reuters",
+"link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNSGQwWUVrODhUa2V5cklXNHcxR3pRbVlPaWxkRlJqV1JYZ3JaV200OHUyZ2JhMUNKbTdFMjlEWEJNNUZPQjFDSG1ZLTlMWGJQZUJSalNuVXVDU0pBRkZERkpTOGZ0SkpHYWlWcGJJUmhMeG9JMmphSk5QSkl0ZlNaaGF4TndiT3FKbUZWbUhzbkdrellveFBtQTdoc2loWHdkREt1NzhfXzI0djg4?oc=5",
+"published": "2026-11-20T19:45Z"
+},
+{
+"source": "Reuters Business",
+"title": "As e-bike battery fires mount, New York weighs tougher restrictions - Reuters",
+"summary": "As e-bike battery fires mount, New York weighs tougher restrictions Reuters",
+"link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPaUNxakhNeGhWWDF0QWZLYmtmRWd3R2g1WTdJVF9VVUdkWUFZNktJUUFTSHMxQTRNTFR4UWFTakdEVFJBWExldV9WMlpvYlFabklaY0lNMk5idl9iWlYtS2NBRVhaYUJhaVB1RC1JLWhYUXNyXzlWRE0zaVRxNktwc1BMakc2WHRydkZfbm9hSDNMMHUxd3JKMmhrcFI0Zy1IQW5JcVplbmRoeUpY?oc=5",
+"published": "2026-11-21T11:18Z"
+},
+{
+"source": "Reuters Business",
+"title": "India finds sample of popular Bisleri water unsafe, to widen checks to all brands - Reuters",
+"summary": "India finds sample of popular Bisleri water unsafe, to widen checks to all brands Reuters",
+"link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPbVhZanItQzQtSUpybTFaaC1hd3JSdEhmSmtRRm9lNmUydjNfcktzWGhJaWd6UUxoYTY5aEZCdDF0OUZ5MU5iXzUwQkxZS2xrYTlVa3RTdjFzZUlTNzQzNTdtdUQ2VEdiSmJJYjdjeHNOckRRMnFmeVJFWW1fbmJQM2FYV0xZTDdOeUN5WmVqWlp4bVBWSzYtblktOXFtRXBqQzUzNFZhclowSWU0d0JGRVlFYVNVZHA1MUF0ZkR2V29JaDlkRWI0ZEY1c1dxXy1nN002dDJR?oc=5",
+"published": "2026-11-22T16:11Z"
+},
+{
+"source": "AP Business",
+"title": "AP reporter says Texas execution was like no other he’s witnessed before - AP News",
+"summary": "AP reporter says Texas execution was like no other he’s witnessed before AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOLUF1S2FRZDFNbEJ2cUJfZkZ3eFd2ZVNmcENaOHAwM2M1OTNMXzNPdy13NnZBMFZaQUFJVnhOVG9iS0hIQ0U1NFFIdGl3QmZlLTFDU2xEeldQMDJRV1RGZ3J0bDBIeEpJOGMwZ29wVGZPb21wcUNXQzdFQkozOU5KUW5xdDVCNmlrN25wbDZQUWZZZmtyTnc?oc=5",
+"published": "2026-11-20T13:04Z"
+},
+{
+"source": "AP Business",
+"title": "What makes sense and what doesn’t in the latest CFP rankings - AP News",
+"summary": "What makes sense and what doesn’t in the latest CFP rankings AP News",
+"link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPVHdGbHlPVEdEeEpjYVY5UGhzaHVuc21EWmRKRzdYRlJoYnh1dGY2ODNkU3J2TDczZDA5SDlqMDh6N0VvMERNQW9GQ0d5QW1MRXJrWTZzbUtJM3dZV1NTMDY5dk5Ec2xueHhnNFRVQkdOWllJRTdNWmZvRzlTS0t2Tl8xZDFqRkwx?oc=5",
+"published": "2026-11-21T13:52Z"
+},
+{
+"source": "AP Business",
+"title": "49ers RT Colton McKivitz leaves game vs. Vikings with what appears to be a serious left leg injury - AP News",
+"summary": "49ers RT Colton McKivitz leaves game vs. Vikings with what appears to be a serious left leg injury AP News",
+"link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUVMyS1RPeDEzTEstQ3ljdFVTYkFsQ0VwWnZNQUZCY05vWW5xOUo5RkdCLVM1WTA0NFduV2xEWGh0WS1uT0lGa1pGMC1MN2ZXUjVrRzg2ZmxqM05wRVBLa2FhRXNnUlJ4U0dDUkRTT3NqeVN4dl9RN3FOa2hzZkYycXZZNjJqbGdOZFBLOFJlcGZOdm8?oc=5",
+"published": "2026-11-23T06:05Z"
+},
+{
+"source": "Reuters Business",
+"title": "European shares post worst week in over a year as AI trade unravels - Reuters",
+"summary": "European shares post worst week in over a year as AI trade unravels Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOLTRUN3RabW5hOWVFMWhrajEweXFyWWRURWthSmRXYlVrTF9jcGJyRGFoQ0xyZzlpeXNBWkJqTU9UaDAySmluOU5FZkd5eTZ2R0pZT1dIODdaQktHX1BrVGlhVUZjVjhUb20zZnYyY19yTWNCdVppTmJTQmREaUktRXhJXzdkMGdCT0YtYlplSGxOR2NVb2xrRHdyWW44QlBHV0R3dk1kOA?oc=5",
+"published": "2026-11-20T17:43Z"
+},
+{
+"source": "Reuters Business",
+"title": "Alcaraz digs deep to beat Shelton, will face world number one Zverev in final - Reuters",
+"summary": "Alcaraz digs deep to beat Shelton, will face world number one Zverev in final Reuters",
+"link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOVlJzY0JTcm41WXdwall3LUR1WTAxMk5OTk1yaVdGb2wwbXlQRms0VGtKaEpUank0eFY2XzlCVExiYk4xeU9oM1lVNnhOVkFtQW9JYUFDN3Z3eVpRR3BwcUN1OFU1ZE1xeW1qdXlRa3lyZ3Z2dzI5UFE4VUE2VmtYWjF3amhfeHVnOEpicDhCMFJhYWUySWNz?oc=5",
+"published": "2026-11-21T21:50Z"
+},
+{
+"source": "Reuters Business",
+"title": "Trump sees difficulties ahead if Schumer leads Senate - Reuters",
+"summary": "Trump sees difficulties ahead if Schumer leads Senate Reuters",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPMG5BRkNWNzJ4alhTazFUeExrT1RMSjczaE1NOF8yNEVja1ROZ2xBakszdXdjTHZDMzlDY29Qc1ZKYTVHZDFQbFVhazVqYjNLVFVPMVdNM0praFAxem9IUW9JZnRuRU9MdkxBbEJBQklfc250SV9tQWtrV29VeHJrZTZfYlNzODNQU2FsMTg2R092dExYV2ktc1R1RXdQT0k?oc=5",
+"published": "2026-11-22T16:00Z"
+},
+{
+"source": "AP Business",
+"title": "Photos show Palestinians harvesting olives under threat from Israeli settlers in the West Bank - AP News",
+"summary": "Photos show Palestinians harvesting olives under threat from Israeli settlers in the West Bank AP News",
+"link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNM0RNeXhsWm5ETmZkb2MzUGVsSER0cjF4WjloQVZIajNRdEJGSEIwbXRRdUE2UWthTFg0ZkNydzRPZlJQVnNaOGxlQ1oxUWNnay1IZEo2TEx0cHdmc1p4OXl5Zk5Pc3E5VDVnS3dRZnNjWTJRMEtaNllTNUk1eGNwUnRtSHh6bjFkTklIdUZvc3h3NHFpbkRFTTRZYmJTVGhHeFRWQjAyeS1WZGJoYkE?oc=5",
+"published": "2026-11-20T19:47Z"
+},
+{
+"source": "AP Business",
+"title": "Michigan receiver Andrew Marsh suspended as he faces a misdemeanor charge of indecent exposure - AP News",
+"summary": "Michigan receiver Andrew Marsh suspended as he faces a misdemeanor charge of indecent exposure AP News",
+"link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNb3ZSMk1iZC1ncEJyWE9GUTRRN0pmeUhIaExQdFJPY3A0Mk9GemtKbF9rLV9zY2N6TnVfc3owcEx5N1BPS2JlV1ZSZXB0YjZHWlp1N1N3bzJENkY5SW10SjFoS3RReGRsdzdUam02cTBxcEFldm5nOW12UjljVVd1VEVpMW1kMF83NTFvT3dHcUJ5RmVrcXc?oc=5",
+"published": "2026-11-22T01:38Z"
+},
+{
+"source": "AP Business",
+"title": "Giants intercept Trevor Lawrence twice and hold on to beat the Jaguars 23-18 - AP News",
+"summary": "Giants intercept Trevor Lawrence twice and hold on to beat the Jaguars 23-18 AP News",
+"link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPNFJCZUgtaUZRQUpJU3JESXhiRG5QZndyNktWdk1Tb0gtOVA0Y0FaZmxzaHN6NVo0aHk3c3UyYmVzWi1BMVR2T0ZXRjMxdWJHZ0ZSbVZGWFdvcFJIRnU5ckY4ODdxQ3BPTzRGNUp1dVZjQjBaSzIydWVqa3lUc1dJU0gxZEVyWDQ?oc=5",
+"published": "2026-11-23T02:16Z"
+},
+{
+"source": "Reuters Business",
+"title": "Big Pharma, with eye on Anthropic, says AI is shrinking drug discovery timelines - Reuters",
+"summary": "Big Pharma, with eye on Anthropic, says AI is shrinking drug discovery timelines Reuters",
+"link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxORlJGWE45RkVJTGJ1UXJxWFlaMlNfcnQ4bkNxRlIyV2VYVm0yRVQyeS1UQW5ldEZybjQzOFlRUmRzNlRxaGMzR3FWVlc1NVZMNnJzeGlyeXJvdVFxaXJPOVhjY0J4OUdEbWg5X0Rza1owcllpM1ZaME9LSDlpS0JfcFhTZ29acnV3a3M3Z1dGVW1FRHZjdmNqZGQyeDc2S25sbTQ1TGNEdFdLVDRtU25lU3JVaXFVMXAzT0xkYU5LSEY1dExkRnNR?oc=5",
+"published": "2026-11-20T15:11Z",
+"beyond_limit": true
+},
+{
+"source": "Reuters Business",
+"title": "EXCLUSIVE: Like SpaceX, Anthropic ran an unusual IPO process, chafing some bankers - Reuters",
+"summary": "EXCLUSIVE: Like SpaceX, Anthropic ran an unusual IPO process, chafing some bankers Reuters",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNT1RsTFBlMWZGejNqWjVvdVlYX2lRTGpZZXhoYXFXN2RuV3lHZ09ra0ctdnZqc3hiVENXSlc2ZTBIbDRyTmpTS1Nhdk1kdU5HLW5FNGdNRTNoeXVBeEc5cDl5VGx3c3dUSzNDYkVVTHVfenVQbHFUQ0hQS2NfalhuNDczWFdUS0FWQS1iZ1ZhVnNYMy1FOHVSUmlBMmI3NTdVTGY1X0JxTFRmYnptV3huQQ?oc=5",
+"published": "2026-11-22T11:03Z",
+"beyond_limit": true
+},
+{
+"source": "Reuters Business",
+"title": "Anthropic IPO haul rises to $93.5 billion after underwriters exercise greenshoe - Reuters",
+"summary": "Anthropic IPO haul rises to $93.5 billion after underwriters exercise greenshoe Reuters",
+"link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNUFRZLXRpZ3l4cURJRTFHakoybEV5aVV6MmZMZWt5aGNxazc3MlRrZklsWGlyOE9HcFBVWXdIWGEzRmNXVjZjcDlPTjdPRnN6d2JnNWtPem45bGZxM3I3N3VhWkZZMXp1Y3VDMzFMUTVncGJYOEFKRTY1Y19ZNHpZeWhxUjMxczEtZE82cVRWaERoZmwwUkdXNWFqNjlpVUZ4azg5V191T3E2Nm9VanZwYU1uOS1sakNSUFVwaXBUaTFJclI5bXc?oc=5",
+"published": "2026-11-20T12:53Z",
+"beyond_limit": true
+}
+],
+"front": [
+{
+"source": "FT World",
+"title": "From rotation to contagion",
+"summary": "Plus, chips are not cheap",
+"link": "https://www.ft.com/content/046984ab-9a7c-41fd-804c-fb356db28099?syn-25a6b1a6=1",
+"published": "2026-11-23T06:30Z"
+},
+{
+"source": "FT World",
+"title": "Asian regulators rush to support sagging markets as AI trade falters",
+"summary": "Shares of region’s chipmakers and hardware suppliers especially vulnerable to turn in sentiment",
+"link": "https://www.ft.com/content/69459363-8299-4555-a39c-8980ee6c3590?syn-25a6b1a6=1",
+"published": "2026-11-23T06:07Z"
+},
+{
+"source": "Reuters World",
+"title": "Gold climbs more than 2% as dollar rally pauses - Reuters",
+"summary": "Gold climbs more than 2% as dollar rally pauses Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPcnBFWkZLYUFtZG40ejNhc0xINGhEOGZWSnl2M1RabDhRbUstel9yOEtXTTczcW44cEw3b2lvbEMyaExOeDRLNnRWVFdOMU4xZDQ5bkd2YlJaUklBTWNMSDlFWDVZd2VxUEtpbXBqVUlMY3dDM0dmWXVfOW1CWG9oUVJIZ3BhWWltclFMZVF5ck1oZ2pUVUMwVWZVMVhlU1FrbmZuWGpLSW5jMUU?oc=5",
+"published": "2026-11-23T05:49Z"
+},
+{
+"source": "Reuters World",
+"title": "Boy and elderly survivor pulled from rubble after Russian attack near Kyiv - Reuters",
+"summary": "Boy and elderly survivor pulled from rubble after Russian attack near Kyiv Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNdlU4RTQwUF9vS2lzZ0ZWRkJiOUdrRWNUc2Y3eXlhWXBVWllFdHNwTXlnaFQ3ZXQtWmg1TlVRT3NISXhjSWd4VUZ0VV9wc01rLWFyenZRNEdrMkpVMjltM1ZSdFRmbUc2WlZpLXJLZlFMb0NMeldDdlpDRjcwb2ZadHQ0dlJGeGhJU2Q3OUNNZ2R1T1p3ODZJQ0kwdWtkdUZKazNfbEFBc1lDUQ?oc=5",
+"published": "2026-11-23T06:24Z"
+},
+{
+"source": "Reuters World",
+"title": "China sets 2030 targets to boost support for older people, childcare - Reuters",
+"summary": "China sets 2030 targets to boost support for older people, childcare Reuters",
+"link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQTjdnUk5JS01JQ21aaEVvZ0pWLWVIY3BSa1RzMWFzcERoNmtiODVjX2FDcWlaVWxYVGZiRXpVX0tTWHMzODBvSW1zYVgxOVd5eEJHVTFMOS03ZUgxV3AzVFl4b0RDNU5Ec3laSm1HdzcxMGZXbkUydHI3Y282bjF1ckN6ejljMlN4a01OSTZ6ak1fSlRXOU11OTFneC1uR1cySDNBdU1GaHdBYnlk?oc=5",
+"published": "2026-11-23T04:48Z"
+},
+{
+"source": "Reuters World",
+"title": "Morning Bid: AI, caramba! - Reuters",
+"summary": "Morning Bid: AI, caramba! Reuters",
+"link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9QLU16VkZBVHVPOXI2M0hiazQ4QWpsNlZhZFVRaDY0ZTB6cU9SQ04yYm5sRVFfZHNwUkFla1V0ckxtb3JES3hSNi1nNXFBVzBVV0NUTE1QdWZ3WWtXTzVQTlA2WVNfTE1JYUVfRE5ZelExREluaWV1WFAtdkdpek0?oc=5",
+"published": "2026-11-23T05:36Z"
+},
+{
+"source": "Reuters World",
+"title": "Indonesia says 24 killed in factory blaze as rescuers search for dozens missing - Reuters",
+"summary": "Indonesia says 24 killed in factory blaze as rescuers search for dozens missing Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQc2JzeHFuVWp0dk12UzctdTk5TXJIYURhcXVITWE2ZmV3V3Jrb09BenpkWThoenRiY3FyaEp5RUlUMmFmQ0ZJbXhvUGd5RG1nZ0JrNWs1NmhibXFJSXpUUkNOQWZ0VWh2MnVONlRuU1dPVXZXVGVueEx5UEZnWWprWE5iczJIMXZNWlFXeThMZ0kyTWl6aWJfWGNDM3BkY05yYVVxYkw4anppc3hLUmlJX0JOOFhDa19vNGRtdE5YMjJqQQ?oc=5",
+"published": "2026-11-23T03:49Z"
+},
+{
+"source": "Reuters World",
+"title": "UK police evacuate 12,000 people from concert after 'unknown substance' release - Reuters",
+"summary": "UK police evacuate 12,000 people from concert after 'unknown substance' release Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPa2dfdkNPNGFwc0JUbXFKVWltUVZRZ2N6d1FkMS1XLTUxX1FsM3FLdFltQjZYS2pUekRqaGQwSEs1RjFPTHJmZk43UEw5X0Y1NHE3czk1MlVFZ0lIcEtzSW01V1NKQ1E1VFBZdU9UNExRbFZxNks2NTU2MS1VWE1tYko4T0VoVmJwU3dpc0QyVHFCRXByRG13NnlrX2xaTGxkWFVIOGdqQlozV19zSlUwWGVFNUJGQXkyZzNtWEtGb1FWaEU?oc=5",
+"published": "2026-11-23T05:38Z"
+},
+{
+"source": "Reuters World",
+"title": "South Korea vows to stabilise stock market after KOSPI drops 5% - Reuters",
+"summary": "South Korea vows to stabilise stock market after KOSPI drops 5% Reuters",
+"link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOaF9QVUplYkNRSkhhV19adWpudklsdXcxV0dodVVtYzc1WHJUWTNRMkduX1UxaURycVZTREc4RGpzOURZcFhvSTN3MUxwYUhuNWluQzVfSFAydjZ1bnVFR3VYaXpFY05XVW5OOUR2R0E3VkYwZzJHajh6MndCYUtsNnBxOGhib0dUUFlvRlNIRnp2TGl2Mml3emx5emcyQWFMajdNWGhRNnRkbW5fTk1ZUlV2VURvcHgwcndHN0Z1eDE5S19IS0FTZm43NmVZbUk?oc=5",
+"published": "2026-11-23T02:43Z"
+},
+{
+"source": "Reuters World",
+"title": "California AG Bonta filed lawsuit against OpenAI over model security, public safety - Reuters",
+"summary": "California AG Bonta filed lawsuit against OpenAI over model security, public safety Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOdmhmeEgxSkU1V2V3QmEtdlJ5RUR2U1FZVm5lajNFT1h3cUJnUW1XQUZRSUNLYnV6QkFFNWhMR0ZtbEtRSDRvQXJ3dThFRWFYMUlfbTNFUkFMN3JwTWVHbC11MjB5LUNia3JVMUxjWUtGV0dSa3V4V1JIMHNMdGpzd2JkOGotTnpRbmh5cHBSQ213NFhwOWs4MVZ4YzBKZ3FsUlRpVzFsMHNQS3VKTXVmRDRvS3dWWGhO?oc=5",
+"published": "2026-11-23T04:26Z"
+},
+{
+"source": "Reuters World",
+"title": "US futures rally as AI rout pauses, Asian authorities prop up stocks - Reuters",
+"summary": "US futures rally as AI rout pauses, Asian authorities prop up stocks Reuters",
+"link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNR2c4ZVNmcHBzVFctOTBkRUd2d0VHTklseUhCcEtZT2VHbU1WbWprMUk2aDZSQ2tkZHNYVE9EWUgyaEkxeWtyN0M2V2NzR2ZCTHFmMEhvbHFDeExTNUdTeDF3WkxJZ2RSdmZ2cHBxWlFjTXdoa1hXdlZQRWtyTFFKVlJjMA?oc=5",
+"published": "2026-11-22T23:44Z"
+},
+{
+"source": "Reuters World",
+"title": "Financials drag Indian shares down on profit-taking after four-week rally - Reuters",
+"summary": "Financials drag Indian shares down on profit-taking after four-week rally Reuters",
+"link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQdDVfby1VRHZ6aGZYVDB2dU9SSjlQRGlJcUUxQm5Gdk9vWkU4UG15RFdHeTZxVjZQUzVNLXRmX3FjVndPRFJQQzdoNWNsUlRMeEQzdWVxWE1RVWp3TUM2WnJRc2lqamVnM1Vlek5LdU1rZjVRNEdVOUNkMVpoNTRLQlMxRFlfUXZzd1JOQ2J2QUI2S0wzMTRUWnN5aVhrTG5qSmk0Mzc0NFEwU1owcEpPNlljaw?oc=5",
+"published": "2026-11-23T02:37Z"
+},
+{
+"source": "Reuters World",
+"title": "Dollar steadies as traders take breather from AI wobbles - Reuters",
+"summary": "Dollar steadies as traders take breather from AI wobbles Reuters",
+"link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNMVA0aUFSMnFob3ZJdVFvbmlpN0JDRWFRNUJwZ1BIY19KU3RXZjJTRGdLaU00NGJ6dDRvX3VBUDdtcG9XQWRiRFhuUzhMZTNsN2lDSWVKMmI2Vi1EQ3dFUE5mM3dwZGNQWC1zZXhnZTJfVEVuYzVETlV1enJTN0dPZlQ3SlozeklDTzkwck16LW42eWt5aDJEY0w4M0Ytd0ZlRnBSZmZpN0Z5bkxTLXNXcWdtSW0?oc=5",
+"published": "2026-11-22T23:43Z"
+},
+{
+"source": "Reuters World",
+"title": "India's Tata Steel to take control of APL Apollo in deal worth up to $3.47 billion - Reuters",
+"summary": "India's Tata Steel to take control of APL Apollo in deal worth up to $3.47 billion Reuters",
+"link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxONzFNU0U5bFVBRS1yY3VLYUtfZ2ZWYWN4TnJTbi1Hd3hUaXJnaEkxY1lIcGJiVjU2ZVVqSk4yckRoOFJLTFhPVHBSdXJjWmFRb3BtaHNyNWx4QkY5VEM2cVR0LWt5NkE1X3pmZl9YUVdHS0ZGWTllOHJuQ0s4RXBJY0VxeUFJdHNDWU1Da3NlZEh2Tkc5LWJ2U0dxQ3M?oc=5",
+"published": "2026-11-23T02:23Z"
+},
+{
+"source": "Reuters World",
+"title": "South Korea's education minister quits over exam cheating chaos - Reuters",
+"summary": "South Korea's education minister quits over exam cheating chaos Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNSHhGdTlDN3hOUVlXUHRLSlVmbWRGTWRQWWdQaDV0a0UyZFhjR0w1RDZtRmZMcHNvTWE1QWJhclVLaHBtVXBMVVo0cU1jemIyc2NzUmQtX2NHU0FRaklZcElORnoxYnBkVE53TEhFQkMydlpULWJFM2pVbHc2UXREal9ENG42SkFqZWg5dEM2eTZLaHVYVUg0b0gtOVpCcDNuLVhPU3cwZjdUTHdST3VHYzhmNjVCQmlI?oc=5",
+"published": "2026-11-23T00:20Z"
+},
+{
+"source": "Reuters World",
+"title": "North Carolina win gives Democrats biggest US House majority since early 1990s - Reuters",
+"summary": "North Carolina win gives Democrats biggest US House majority since early 1990s Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOZzZjY0pNZnpnUmtsZ3RudXpZeDh4TnlWZDFIZHBvUk0tbVlxREhydk5zRTJhX0lYcjFXQTNNTzBtOFM4NlNhTE9DZnl3SUZiM3RpTzRzZTJ4aURMSUJCdDRGb0l2MWh5MFJmTWgwS1k4Ql9vTGh1eWVGbEw3WGVCS1UtTkNGVVoxS0EyZVl3Vmw0UThpTlVUWWN2WlNyaWR6a1FYYlJZaWl1MlAyQ01OSEcyY3hMai0zUWdfUUc3MkQ?oc=5",
+"published": "2026-11-22T21:28Z"
+},
+{
+"source": "Reuters World",
+"title": "Indonesia central bank says MSCI talks with Prabowo support rupiah - Reuters",
+"summary": "Indonesia central bank says MSCI talks with Prabowo support rupiah Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWTV0cGJnSHE5ZkxDSVhUQ1Z1S09hLUp4SmxHZ1YzWEZ5TjBxTHlNQ1NSc3JtcDZ5MzlUUzNZYTFIdmZCVXFheGM1cTg4djBhb01kLVlOUVZUekFSLWgxMjIzSnMzZ1pORjZDUDhXZFM4U2JmLXJkblY3QWdIN1QxallRdEduVlo5QUQzcExQVlNPaDNzVmhGTlJLNVRaYU9nUHN5aUJWUlFoRUhqSHotSEpTdGZZVER4OXFn?oc=5",
+"published": "2026-11-23T03:36Z"
+},
+{
+"source": "Reuters World",
+"title": "Indonesian president submits names of VP candidates to parliament - Reuters",
+"summary": "Indonesian president submits names of VP candidates to parliament Reuters",
+"link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPQVpFcWppN3FkT0RvWVpvVzRNdEFTOWc2aTVoN3R2Sm5nbXppNzF5RVBFeDRZZEVtaW1zTVdRdThXZGZMd2wzODZYa3FsMjJ6MFVOa0dsTHEwclFYaWJlUmRtamE0a25KZ2RlUEM0VmR3anVZNEN6anZOMVJBX2pvYXhuNzBQZmUwUFE5VTJFUTltbjVLY3ZFbU05cF9TLUhWSG53S1BjMmh6VGhkeHhKT296TWpWOGJ1ZW9uSk9BTE9XUQ?oc=5",
+"published": "2026-11-23T05:43Z"
+},
+{
+"source": "Reuters World",
+"title": "US seeks answers on Nvidia's sale of chips to China, Bessent says - Reuters",
+"summary": "US seeks answers on Nvidia's sale of chips to China, Bessent says Reuters",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQcm1fbVJENmFGZU81bGR4WXVfeDMwdWdaY0xNbmVBN3hmaXVVeVBLelJxT3dubnROYnVkM2NCRXRfcFFvMGNtZ0FlM3c5LWt1WUVGclQzY1ZJTVBCR2d2dXozSXRqN0VIM1NsV0d2YVJLRjJpRnlIcVRNSlZqeURwLWhKa1V4dUNvWDdlZmNoMnQxQ1d6WlVGalNpdjVSZm9PMXRzUA?oc=5",
+"published": "2026-11-22T17:53Z"
+},
+{
+"source": "Reuters World",
+"title": "US intelligence chief says Putin is 'not America's friend in Ukraine' - Reuters",
+"summary": "US intelligence chief says Putin is 'not America's friend in Ukraine' Reuters",
+"link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPNlR0aUswLUVNUWNuMk05NmJBSElCMzV6RWxDV2V4TmFicUFZWUFJR2pzQnd2VmNvQzhQTWtHTXZsMkkzcGMweEUyRE1FUlU1aXk5QkZCTk0tRE5fX1k2aU9jMmtOTndlTlVkaU5rT011UGgyMU1XX0JBQ3ZCb05qcEZYV3U2c003c3F3ZkRZamtvb3lDak8zR2o0dnJueWl6UkJ5RzBhTV9yUkpoaFVDVg?oc=5",
+"published": "2026-11-22T17:16Z"
+},
+{
+"source": "Reuters World",
+"title": "Three Russian missiles flew into Poland Friday, prosecutors say - Reuters",
+"summary": "Three Russian missiles flew into Poland Friday, prosecutors say Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNM1VMUS1oUkxlYzRWaDg5WjNPbGJoV2t1LTlRNkVMWnF6a3Q3aUljXzlCal9hWmdhWnlkYzdKNjdFVGdwVk1WUFFucGdfbUlnY3RtUjBsdFBxVTdmTGNjcnJ1a0VDNnk5eFh5NDdWaGNWcjNWcFI2WkoxZnFUbkI5UHZ6YTdYZUVMa19Ldk5YTERtX3ZialpvbjI4eFVoQ0Eyd2l0NGxoVQ?oc=5",
+"published": "2026-11-22T17:19Z"
+},
+{
+"source": "Reuters World",
+"title": "Yemen's Houthis say they attacked Saudi Rabigh oil refinery - Reuters",
+"summary": "Yemen's Houthis say they attacked Saudi Rabigh oil refinery Reuters",
+"link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQSjZLZW5ua05hQkRTLVhvZnNHZnpUM05mT3ZxNl9FUUoyMEhMN0gtTUVfT0Zhb0g2eUxaeHlvZWlIWXNTVGlSMlczMHdBUERvRjVsQVZVSW92MlFESWlmTGxVaWM2aXYwZ0NtUTlna3k4ZkV2S0k4YkhVOFRjaWRrcmhZeWg5NHpQaW9pRGIybUFpalV3U2lzdlZ5QzYteENUSWpWdm90SXNFWVU4OWxBaGx3?oc=5",
+"published": "2026-11-22T17:52Z"
+},
+{
+"source": "Reuters World",
+"title": "Trump sees difficulties ahead if Schumer leads Senate - Reuters",
+"summary": "Trump sees difficulties ahead if Schumer leads Senate Reuters",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPMG5BRkNWNzJ4alhTazFUeExrT1RMSjczaE1NOF8yNEVja1ROZ2xBakszdXdjTHZDMzlDY29Qc1ZKYTVHZDFQbFVhazVqYjNLVFVPMVdNM0praFAxem9IUW9JZnRuRU9MdkxBbEJBQklfc250SV9tQWtrV29VeHJrZTZfYlNzODNQU2FsMTg2R092dExYV2ktc1R1RXdQT0k?oc=5",
+"published": "2026-11-22T16:00Z"
+},
+{
+"source": "Reuters World",
+"title": "Indian rupee could rise to 91.50/$ on equity inflows, HDFC Bank's treasury head says - Reuters",
+"summary": "Indian rupee could rise to 91.50/$ on equity inflows, HDFC Bank's treasury head says Reuters",
+"link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOd3pBMG1XeGk3X0tmdVlkOWFnRlhTS3h3a1VyZkFhbElMZ2NXa3hPdjVEdkxUYWlxWTZZbmxLV1RSZlV6NDNSQmVXUUVkaV9RSzRodXB1TWw0bkw3Sm02OXVSNGNxS3VHWk95WTN1c19Pa0pEWVlGYmVrSnFnRVNqVzNXbDRiOWx4clplN0d4T2kxUDBxQmNrR2MtNk81T0RWbTBYNml3Q1RnMk45MDN6NGpoeTVJblA3c3BORnhR?oc=5",
+"published": "2026-11-23T03:12Z"
+},
+{
+"source": "Reuters World",
+"title": "Israel's Eisenkot condemns arson attacks by Jewish settlers in West Bank - Reuters",
+"summary": "Israel's Eisenkot condemns arson attacks by Jewish settlers in West Bank Reuters",
+"link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPV0NtOW83bnNaeXNoY0g0REh2Ym8yMU52U0FCaGVTRy1oeTRrM1dPclNpZTF4QWVtVE95eG9TUXJkT3JBZldRWDNjejBRcFpiWTVPV1ZqeEVZdS1qMVZ6QzVvNUtSRXY0RUxLX05pdlB3V0tvLXA1Nk0wQXhxT1dQYVNyMm1YYTZtX0pRZFI4VWNDTHctYVk2NnJMdDlWSmhxbWlzbVg5OWFacVhQUzdHSU5lNDdJTlBRZVhlVXZaUQ?oc=5",
+"published": "2026-11-22T21:54Z"
+},
+{
+"source": "Reuters World",
+"title": "Russia starts towing ship hit by drones in Baltic, Finland says - Reuters",
+"summary": "Russia starts towing ship hit by drones in Baltic, Finland says Reuters",
+"link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPTXUxa0FLT1o3Tzh4MUR0MV9ZenU1LU9PZl9QSzhsQXlOQThFNUxWbWFXRXZTOHFpb1lJdG1GTV9hOUZsc2x4YzBOSzV3ZHZkV2pyNjNIaTVWZEViQ2lLb3JkcjJsbGhVNXFmWXQ5c0pDTkVXeG9IbmlKV3AxYUtfNE5DVnhWX3lvNmg0SF9SZ1lHQzEtSnY1REsycUlvWFVEOFlBSXR3?oc=5",
+"published": "2026-11-22T16:01Z"
+},
+{
+"source": "Reuters World",
+"title": "At least 4 killed in Russian drone attacks on Kyiv region, officials say - Reuters",
+"summary": "At least 4 killed in Russian drone attacks on Kyiv region, officials say Reuters",
+"link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPUmFwN2pYTHZEVndFX2hfN3VOQnduN3pEYnZXa2tfT1d1UGZDejk3ZU11dkwwLTdsUTltdm0taU8wTnpNTkZVV045Z3pkc0czd2FSS1lEZDhyLVVCNFJvNk9xUHR2ZUxydnAyYTJDVzd3RWIwQ1E0YjAyc2R6bkpkbkt1aThfVldjUGRKbkhXanhraVo3SkJHcHBuMmxBcXJreDhQSEx1QV9ZUXhDOHdhbmZMRkZoeVBOXzJ5ag?oc=5",
+"published": "2026-11-22T15:56Z"
+}
+],
+"themes_brief": [
+{
+"key": "Nvidia–Huang",
+"names": [
+"NVIDIA",
+"HUANG"
+],
+"headline": "Alice Huang in touch with Chinese spy agency during affair with Nvidia CEO, NYT says - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-23T05:08Z",
+"publishers": [
+"AP",
+"CNBC",
+"FT",
+"Reuters"
+],
+"n_publishers": 4,
+"n_headlines": 7,
+"front": true,
+"items": [
+{
+"title": "Treasury secretary says no further restrictions are needed for Nvidia chip exports to China - AP News",
+"source": "AP Business",
+"published": "2026-11-20T22:36Z"
+},
+{
+"title": "U.S. probes Megaspeed, Alice Huang as new figure emerges in Nvidia chip case",
+"source": "CNBC",
+"published": "2026-11-23T05:08Z"
+},
+{
+"title": "EXCLUSIVE: Nvidia's accounting is a focus of US SEC investigation, sources say - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-21T03:08Z"
+},
+{
+"title": "Alice Huang in touch with Chinese spy agency during affair with Nvidia CEO, NYT says - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-23T01:54Z"
+},
+{
+"title": "US seeks answers on Nvidia's sale of chips to China, Bessent says - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-22T17:53Z"
+},
+{
+"title": "Trump says he still backs Lutnick, urges Nvidia's Huang to apologize - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-20T19:45Z"
+},
+{
+"title": "Bessent refuses to rule out Huang’s return to Nvidia",
+"source": "FT World",
+"published": "2026-11-22T19:08Z"
+}
+]
+},
+{
+"key": "California",
+"names": [
+"CALIFORNIA"
+],
+"headline": "California AG Bonta filed lawsuit against OpenAI over model security, public safety - Reuters",
+"source": "Reuters World",
+"published": "2026-11-23T04:26Z",
+"publishers": [
+"AP",
+"CNBC",
+"Reuters"
+],
+"n_publishers": 3,
+"n_headlines": 5,
+"front": true,
+"items": [
+{
+"title": "9 people shot at a central California concert; 1 in critical condition - AP News",
+"source": "AP Business",
+"published": "2026-11-22T21:39Z"
+},
+{
+"title": "A California billionaire tax proposal faced a major setback despite big wins for progressives - AP News",
+"source": "AP Business",
+"published": "2026-11-22T11:00Z"
+},
+{
+"title": "An ‘illusion of glitz and glamour’: Inside California’s modern-day gold rush, where miners can bring in millions",
+"source": "CNBC",
+"published": "2026-11-21T14:05Z"
+},
+{
+"title": "Pop star Miley Cyrus weds drummer Maxx Morando in California - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-22T11:09Z"
+},
+{
+"title": "California AG Bonta filed lawsuit against OpenAI over model security, public safety - Reuters",
+"source": "Reuters World",
+"published": "2026-11-23T04:26Z"
+}
+]
+},
+{
+"key": "Tata–India",
+"names": [
+"TATA",
+"INDIA"
+],
+"headline": "Will Tata be able to list India’s biggest company?",
+"source": "FT World",
+"published": "2026-11-23T04:26Z",
+"publishers": [
+"CNBC",
+"FT",
+"Reuters"
+],
+"n_publishers": 3,
+"n_headlines": 4,
+"front": true,
+"items": [
+{
+"title": "Tata Steel to buy $1.67 billion stake in India’s largest steel pipe maker; shares plunge nearly 5%",
+"source": "CNBC",
+"published": "2026-11-23T04:26Z"
+},
+{
+"title": "India's Tata Steel moves to control APL Apollo with $1.67 billion stake buy, open offer - Reuters",
+"source": "Reuters Business",
+"published": "2026-11-23T02:23Z"
+},
+{
+"title": "Will Tata be able to list India’s biggest company?",
+"source": "FT World",
+"published": "2026-11-23T03:36Z"
+},
+{
+"title": "Tata Steel to sell tubes business, Tata Steel Colors stake to APL Apollo for up to $3 billion - Reuters",
+"source": "Reuters World",
+"published": "2026-11-22T18:35Z"
+}
+]
+}
+],
+"window": {
+"since": "2026-11-20T06:30:00+00:00",
+"hours": 80.24,
+"day_queries": 6,
+"sources": {
+"Reuters Business": {
+"count": 180,
+"oldest": "2026-11-20T08:45Z"
+},
+"CNBC": {
+"count": 29,
+"oldest": "2026-11-21T12:00Z"
+},
+"Financial Times": {
+"count": 9,
+"oldest": "2026-11-23T05:00Z"
+},
+"AP Business": {
+"count": 161,
+"oldest": "2026-11-20T08:00Z"
+}
+},
+"fetched": {
+"Reuters Business": 50,
+"CNBC": 29,
+"Financial Times": 9,
+"AP Business": 50
+},
+"dead": [],
+"front": {
+"FT World": 25,
+"Reuters World": 50
+},
+"front_dead": []
+}
+}

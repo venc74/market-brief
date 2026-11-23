@@ -583,6 +583,26 @@ def news_pool_note(nw: dict | None, diag: dict | None) -> str | None:
     return out + "."
 
 
+def news_path_note(diag: dict | None) -> dict | None:
+    """
+    23.11.2026 (пакет 23.11, т. 1): кой път на подбора е ползван — {"text", "level"}; стар бриф (без "path") → None. Към текста — опитите (пул, резултат). Чиста функция.
+    """
+    d = diag or {}
+    path = d.get("path")
+    if path not in ("ai", "ai_retry", "code"):
+        return None
+    from src.data_warnings import NEWS_PATH_TEXT
+    txt = NEWS_PATH_TEXT[path]
+    tries = [f"{a.get('pool')} заглавия — {'отрязан отговор' if a.get('result') == 'TruncatedResponse' else ('ok' if a.get('result') == 'ok' else a.get('result'))}"
+             for a in d.get("attempts") or []]
+    if path != "ai" and tries:
+        txt = txt[:-1] + f" (опити: {'; '.join(tries)})."
+    pb = d.get("picked_by") or {}
+    if path == "code" and pb:
+        txt = txt[:-1] + " · " + ", ".join(f"{ {'theme': 'теми', 'ours': 'нашите тикъри', 'front': 'първа страница'}[k] } {v}" for k, v in pb.items()) + "."
+    return {"text": txt, "level": "muted" if path == "ai" else "warn"}
+
+
 def overnight_ctx(o: dict | None) -> dict | None:
     """
     18.11.2026 (спешно, т. 2): блокът „Нощта“ за шаблона и имейла — компаниите с „ТИКЪР · Име“ (names.display_name) и готовите редове; пазарът — един ред. Без блок / стар
@@ -1027,7 +1047,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news_meta=news_meta,                                              # 20.11.2026 (пакет 20.11, т. 1): превод, час, наши тикъри
         nov=novelty_ctx(brief),                                           # 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ във всеки скрийнър
         news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
-        news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
+        news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),
+        news_path=news_path_note(brief.get("news_diag")),                    # 23.11.2026 (т. 1): пътят на подбора     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
@@ -1289,7 +1310,9 @@ def render_email(brief: dict) -> str:
             '<tr><td style="padding:16px 28px 4px">'
             '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;'
             'color:#6b7280;font-weight:bold;margin-bottom:8px">Значими новини</div>'
-            f'<ul style="margin:0;padding-left:18px;font-size:13px;color:#111827;line-height:1.5">{items}</ul>'
+            + (f'<div style="color:#b45309;font-size:12px;margin-bottom:6px">⚠ {_e(_np["text"])}</div>'           # 23.11.2026 (т. 1): пътят на подбора
+               if (_np := news_path_note(brief.get("news_diag"))) and _np["level"] == "warn" else "")
+            + f'<ul style="margin:0;padding-left:18px;font-size:13px;color:#111827;line-height:1.5">{items}</ul>'
             '</td></tr>')
 
     qm_block = _qm_email_block(brief)
