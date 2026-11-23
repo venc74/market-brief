@@ -1049,6 +1049,7 @@
   {% if nb.tiles %}<div class="nov-grid">{% for t in nb.tiles %}<div class="nov-tile">
     <div><b>{{ t.ticker }}</b>{% if t.name %} · {{ t.name }}{% endif %} <span class="wt-mark">{{ t.screener }}</span>{% if t.tier %} <span class="wt-mark" style="{{ 'color:var(--yellow)' if t.tier == 'Тренд без ръст' else '' }}">ниво: {{ t.tier }}</span>{% endif %}</div>
     <div class="nov-label">{{ t.label }}{% if t.status and t.label == 'нов днес' %} · {{ t.status }}{% endif %}</div>
+    {% if t.cash %}<div class="earn-warn">⚠ {{ t.cash }}</div>{% endif %}
     <div class="kv"><span>Ниво / аларма</span><b>{{ t.level or "—" }}</b></div>
     <div class="kv"><span>Стоп</span><b>{{ t.stop or "—" }}</b></div>
     <div class="kv"><span>Цел</span><b>{{ t.target or "—" }}</b></div>
@@ -1067,7 +1068,9 @@
    (sizing_core.js / sizing_ui.js). Без JS се виждат нивата и подсказката "въведи баланса…". #}
 {% macro levels_block(lv, show_entry=true, show_adr=true) %}
 {% if lv %}
-<div class="lv"{% if lv.earnings_block %} data-blocked="1"{% endif %} data-strategy="{{ lv.strategy }}" data-entry="{{ lv.entry }}" data-stop="{{ lv.stop }}" data-adr="{{ lv.adr_pct if lv.adr_pct is not none else '' }}" data-factor="{{ lv.regime_factor }}" data-regime-label="{{ 'защитен режим' if lv.regime_factor < 1 else '' }}" data-regime-note="{{ lv.regime_note or '' }}">
+{# 23.11.2026 (пакет 23.11, т. 5): режим Cash — „Cash — без нови входове“, без размер (като отчета преди входа); отчетът има предимство в текста #}
+{% set blk_text = ('без размер — отчетът е преди входа' if lv.earnings_block else ('без размер — ' ~ cash_block if cash_block else '')) %}
+<div class="lv"{% if lv.earnings_block or cash_block %} data-blocked="1" data-blocked-reason="{{ 'earnings' if lv.earnings_block else 'cash' }}" data-blocked-text="{{ blk_text }}"{% endif %} data-strategy="{{ lv.strategy }}" data-entry="{{ lv.entry }}" data-stop="{{ lv.stop }}" data-adr="{{ lv.adr_pct if lv.adr_pct is not none else '' }}" data-factor="{{ lv.regime_factor }}" data-regime-label="{{ 'защитен режим' if lv.regime_factor < 1 else '' }}" data-regime-note="{{ lv.regime_note or '' }}">
   <div class="lv-info">
     {% if show_entry %}<div class="lv-row"><span>{{ lv.entry_label }}</span><b>${{ "%.2f"|format(lv.entry) }}</b></div>{% endif %}
     <div class="lv-row"><span>{{ "Стоп" if lv.strategy == "canslim" else (lv.stop_source_text[0:1]|upper ~ lv.stop_source_text[1:]) }}</span><b>${{ "%.2f"|format(lv.stop) }} <i>(−{{ "%.1f"|format(lv.stop_pct) }}%)</i></b></div>
@@ -1080,7 +1083,8 @@
   {% for w in lv.warnings %}<div class="lv-warn">⚠ {{ w }}</div>{% endfor %}
   {# 19.11.2026 (пакет 19.11, т. 5): отчет до 5 работни дни — без размер #}
   {% if lv.earnings_block %}<div class="lv-warn">{{ lv.earnings_block }} — без размер</div>{% endif %}
-  <div class="lv-size" data-state="{{ 'blocked' if lv.earnings_block else 'balance' }}"><div class="lv-hint">{{ 'без размер — отчетът е преди входа' if lv.earnings_block else 'въведи баланса в настройките, за да видиш размера на позицията' }}</div></div>
+  {% if cash_block %}<div class="lv-warn">⚠ {{ cash_block }} — без размер</div>{% endif %}
+  <div class="lv-size" data-state="{{ 'blocked' if (lv.earnings_block or cash_block) else 'balance' }}"><div class="lv-hint">{{ blk_text if blk_text else 'въведи баланса в настройките, за да видиш размера на позицията' }}</div></div>
   <div class="lv-actions"><button type="button" class="lv-adjust-btn" aria-expanded="false">коригирай</button></div>
   <div class="lv-adj" hidden>
     <label>реален вход<input class="lv-in-entry" type="number" step="any" inputmode="decimal"></label>

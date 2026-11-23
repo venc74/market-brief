@@ -69,10 +69,10 @@
   function renderCard(card) {
     var box = card.querySelector(".lv-size");
     if (!box) return;
-    if (card.getAttribute("data-blocked") === "1") {   // 19.11.2026 (т. 5): отчет до 5 работни дни — без размер
+    if (card.getAttribute("data-blocked") === "1") {   // 19.11.2026 (т. 5): отчет до 5 работни дни — без размер; 23.11.2026 (т. 5): и Cash
       while (box.firstChild) box.removeChild(box.firstChild);
       box.setAttribute("data-state", "blocked");
-      box.appendChild(el("div", "без размер — отчетът е преди входа", "lv-hint"));
+      box.appendChild(el("div", card.getAttribute("data-blocked-text") || "без размер — отчетът е преди входа", "lv-hint"));
       return;
     }
     var res = computeCard(card);
@@ -121,13 +121,17 @@
     for (var i = 0; i < sums.length; i++) {
       var box = sums[i], scope = document.querySelector(box.getAttribute("data-scope") || "");
       if (!scope) continue;
-      var cards = scope.querySelectorAll(".lv"), results = [], blocked = 0;
+      var cards = scope.querySelectorAll(".lv"), results = [], blocked = 0, cash = 0;
       for (var j = 0; j < cards.length; j++) {
-        if (cards[j].getAttribute("data-blocked") === "1") { blocked += 1; continue; }
+        if (cards[j].getAttribute("data-blocked") === "1") {
+          if (cards[j].getAttribute("data-blocked-reason") === "cash") cash += 1; else blocked += 1;
+          continue;
+        }
         results.push(computeCard(cards[j]));
       }
       var r = S.sumPositions(results, state.balance);
       var txt;
+      if (cash && !results.length) { box.textContent = "Ако вземеш всички: Cash — без нови входове"; continue; }   // 23.11.2026 (т. 5)
       if (!r.ok && r.reason === "balance") txt = "Ако вземеш всички: въведи баланса в настройките, за да видиш експозицията и риска";
       else if (!r.ok) txt = "Ако вземеш всички: няма карта с размер";
       else txt = "Ако вземеш всички " + r.n + ": експозиция " + S.pct(r.exposurePct) + " от сметката, риск " + S.pct(r.riskPct, 2) + " при стоповете, " + S.pct(r.gap10Pct, 2) + " при гап −10%";

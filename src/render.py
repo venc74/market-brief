@@ -723,6 +723,11 @@ def novelty_row(screener: str, c: dict, today: str) -> dict:
             "earnings": (c.get("earnings_gate") or {}).get("text") if (c.get("earnings_gate") or {}).get("soon") else None}
 
 
+def cash_block(brief: dict | None) -> str | None:
+    """23.11.2026 (пакет 23.11, т. 5): режим Cash → config.CASH_BLOCK_TEXT (картите и „Нови днес“ — без размер); иначе None. Чиста функция."""
+    return config.CASH_BLOCK_TEXT if ((brief or {}).get("thermometer") or {}).get("regime") == "Cash" else None
+
+
 def novelty_ctx(brief: dict) -> dict | None:
     """{скрийнър: {"label", "tiles", "old", "dropped"}} за шаблона; стар бриф без brief["novelty"] → None (страницата — както досега). Чиста функция."""
     nov = brief.get("novelty")
@@ -738,7 +743,7 @@ def novelty_ctx(brief: dict) -> dict | None:
     for s in novelty.SCREENERS:
         n = nov.get(s) or {}
         by = {c.get("ticker"): c for c in cards[s] if c.get("novelty")}
-        out[s] = {"label": novelty.LABELS[s], "tiles": [novelty_tile(s, by[t]) for t in n.get("new") or [] if t in by],
+        out[s] = {"label": novelty.LABELS[s], "tiles": [{**novelty_tile(s, by[t]), "cash": cash_block(brief)} for t in n.get("new") or [] if t in by],
                   "old": [novelty_row(s, by[t], today) for t in n.get("old") or [] if t in by], "dropped": n.get("dropped") or []}
     return out
 
@@ -1048,7 +1053,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         nov=novelty_ctx(brief),                                           # 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ във всеки скрийнър
         news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
         news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),
-        news_path=news_path_note(brief.get("news_diag")),                    # 23.11.2026 (т. 1): пътят на подбора     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
+        news_path=news_path_note(brief.get("news_diag")),                    # 23.11.2026 (т. 1): пътят на подбора
+        cash_block=cash_block(brief),                                        # 23.11.2026 (т. 5): режим Cash — картите без размер     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията
@@ -1107,6 +1113,8 @@ def _qm_email_block(brief: dict) -> str:
         head = lambda txt: (f'<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;font-weight:bold;margin:{{m}}px 0 4px">{txt}</div>')
         badge = ('<span style="display:inline-block;background:#eef2ff;color:#3730a3;font-size:10px;font-weight:bold;padding:1px 6px;border-radius:3px;margin-left:4px">QM✓</span>')
         body = head("Пробиви по Kullamägi (Breakout)").replace("{m}", "0")
+        if cash_block(brief):                                                                                           # 23.11.2026 (т. 5)
+            body += f'<div style="color:#991b1b;font-size:12.5px;font-weight:bold;margin-bottom:6px">{_e(cash_block(brief))} — картите са само за наблюдение, без размер.</div>'
         body += ('<div style="font-size:11.5px;color:#92400e;margin-bottom:8px"><b>Измерване, не препоръка. Реплеят е с survivorship (днешният универс) и резултатът зависи от малко големи печалби. '
                  'Алфата не е статистически значима.</b> ' + _qm_replay_line() + 'Отделна стратегия. Входът е по opening range high в сесията, стопът — low of day; брифът дава нивата, не самия вход.</div>')
         mk = brief.get("qm_market")                                                                                     # 03.11.2026 (т. 11, 2): QQQ спрямо SMA10 / SMA20
