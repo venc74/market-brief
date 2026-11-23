@@ -96,6 +96,21 @@ NYSE_HOLIDAYS = frozenset({
 })
 # 16.10.2026 (В2б): ранно затваряне (13:00 ET) по същия официален календар — брифът го казва в деня и деня преди
 NYSE_EARLY_CLOSES = {"2026-11-27": "13:00", "2026-12-24": "13:00", "2027-11-26": "13:00", "2028-07-03": "13:00", "2028-11-24": "13:00"}
+# 23.11.2026 (пакет 23.11, т. 6): имената на празниците — за календара на седмицата и „Нощта“ (до 23.11 календарът прескачаше затворения ден: 26.11 не се виждаше). Всеки ден от
+# NYSE_HOLIDAYS трябва да има име (test_market_holidays го пази).
+_HOL = {"new_year": "Нова година", "mlk": "Martin Luther King Jr. Day", "presidents": "Washington's Birthday (Presidents' Day)", "good_friday": "Good Friday (Разпети петък)",
+        "memorial": "Memorial Day", "juneteenth": "Juneteenth", "independence": "Independence Day (Денят на независимостта)", "labor": "Labor Day",
+        "thanksgiving": "Thanksgiving (Денят на благодарността)", "christmas": "Коледа"}
+NYSE_HOLIDAY_NAMES = {
+    "2026-01-01": _HOL["new_year"], "2026-01-19": _HOL["mlk"], "2026-02-16": _HOL["presidents"], "2026-04-03": _HOL["good_friday"], "2026-05-25": _HOL["memorial"],
+    "2026-06-19": _HOL["juneteenth"], "2026-07-03": _HOL["independence"] + " — почивният ден", "2026-09-07": _HOL["labor"], "2026-11-26": _HOL["thanksgiving"],
+    "2026-12-25": _HOL["christmas"],
+    "2027-01-01": _HOL["new_year"], "2027-01-18": _HOL["mlk"], "2027-02-15": _HOL["presidents"], "2027-03-26": _HOL["good_friday"], "2027-05-31": _HOL["memorial"],
+    "2027-06-18": _HOL["juneteenth"] + " — почивният ден", "2027-07-05": _HOL["independence"] + " — почивният ден", "2027-09-06": _HOL["labor"],
+    "2027-11-25": _HOL["thanksgiving"], "2027-12-24": _HOL["christmas"] + " — почивният ден",
+    "2028-01-17": _HOL["mlk"], "2028-02-21": _HOL["presidents"], "2028-04-14": _HOL["good_friday"], "2028-05-29": _HOL["memorial"], "2028-06-19": _HOL["juneteenth"],
+    "2028-07-04": _HOL["independence"], "2028-09-04": _HOL["labor"], "2028-11-23": _HOL["thanksgiving"], "2028-12-25": _HOL["christmas"],
+}
 # 12.11.2026 (т. 3): дни БЕЗ търговия на облигации в САЩ — пълно затваряне по препоръката на SIFMA (sifma.org/resources/guides-playbooks/holiday-schedule, проверено
 # 12.11.2026; 2028 още не е публикуван — SIFMA го издава обикновено през декември; добави го тогава). В дните, в които NYSE търгува (Columbus Day, Veterans Day), облигационните
 # плочки на термометъра (MOVE, 2Y/10Y, SOFR − IORB, HY / IG OAS) са със стойност от предишен ден, а изглеждат свежи → етикет „облигационният пазар беше затворен — стойността е от ДД.ММ“.

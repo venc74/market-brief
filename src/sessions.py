@@ -31,6 +31,28 @@ def is_session(d) -> bool:
     return d.weekday() < 5 and d.isoformat() not in config.NYSE_HOLIDAYS
 
 
+def is_holiday(d) -> bool:
+    """23.11.2026 (пакет 23.11, т. 6): делничен ден, в който NYSE е затворена (празник от config.NYSE_HOLIDAYS)."""
+    d = as_date(d)
+    return d.weekday() < 5 and d.isoformat() in config.NYSE_HOLIDAYS
+
+
+def holiday_name(d) -> str | None:
+    """Името на празника (config.NYSE_HOLIDAY_NAMES); не е празник → None."""
+    return config.NYSE_HOLIDAY_NAMES.get(as_date(d).isoformat(), "празник") if is_holiday(d) else None
+
+
+def early_close(d) -> str | None:
+    """Часът на ранното затваряне в Ню Йорк („13:00“, config.NYSE_EARLY_CLOSES); обикновен ден → None."""
+    return config.NYSE_EARLY_CLOSES.get(as_date(d).isoformat())
+
+
+def closed_days(a, b) -> list[dt.date]:
+    """Празниците (делнични затворени дни) от a до b включително."""
+    a, b = as_date(a), as_date(b)
+    return [a + dt.timedelta(days=i) for i in range((b - a).days + 1) if is_holiday(a + dt.timedelta(days=i))]
+
+
 def next_session(d) -> dt.date:
     """Първата сесия СТРОГО след d."""
     d = as_date(d) + _DAY

@@ -190,6 +190,46 @@ def opex_note(day: dt.date) -> str | None:
     return "месечен опционен падеж (трети петък)" + (" — тримесечен: изтичат и фючърсите и опциите на индексите" if day.month in (3, 6, 9, 12) else "")
 
 
+_WD_SHORT = ("пн", "вт", "ср", "чт", "пт", "сб", "нд")
+
+
+def _wd_dm(d: dt.date) -> str:
+    return f"{_WD_SHORT[d.weekday()]} {d:%d.%m}"
+
+
+def market_note(d: dt.date) -> str | None:
+    """
+    23.11.2026 (пакет 23.11, т. 6): борсата в деня — празник („NYSE затворена — Thanksgiving (Денят на благодарността)“) или съкратена сесия („NYSE — съкратена сесия,
+    затваря в 13:00 Ню Йорк“); обикновен ден → None. Празниците и ранните затваряния — САМО през src/sessions.py (test_sessions го пази). Чиста функция.
+    """
+    from src import sessions
+    if sessions.is_holiday(d):
+        return f"NYSE затворена — {sessions.holiday_name(d)}"
+    if sessions.early_close(d):
+        return f"NYSE — съкратена сесия, затваря в {sessions.early_close(d)} Ню Йорк"
+    return None
+
+
+def market_day_notes(today: dt.date) -> list[str]:
+    """
+    23.11.2026 (пакет 23.11, т. 6): редовете за „Нощта“ — съкратената сесия днес, затворените дни до следващата сесия („утре“ / ДД.ММ) и съкратената предишна сесия
+    („след затварянето“ е от 13:00). Чиста функция.
+    """
+    from src import sessions
+    out = []
+    if sessions.early_close(today):
+        out.append(f"Днес ({_wd_dm(today)}) NYSE затваря в {sessions.early_close(today)} Ню Йорк — съкратена сесия.")
+    nxt = sessions.next_session(today)
+    for d in sessions.closed_days(today + dt.timedelta(days=1), nxt - dt.timedelta(days=1)):
+        out.append(f"{'Утре' if d == today + dt.timedelta(days=1) else 'На'} ({_wd_dm(d)}) NYSE е затворена — {sessions.holiday_name(d)}; "
+                   f"следващата сесия — {_wd_dm(nxt)}" + (f", съкратена до {sessions.early_close(nxt)} Ню Йорк" if sessions.early_close(nxt) else "") + ".")
+    prev = sessions.prev_session(today)
+    if sessions.early_close(prev):
+        out.append(f"Предишната сесия ({_wd_dm(prev)}) беше съкратена — затваряне в {sessions.early_close(prev)} Ню Йорк; „след затварянето“ е от "
+                   f"{sessions.early_close(prev)}.")
+    return out
+
+
 def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None, earnings_fn=None) -> dict:
     """
     → {"ok", "source", "days": [{date, weekday, earnings, fed, econ}], "errors": [...], "big_n", "ours_n"}. big — {тикър: етикет} (компаниите > 2% в S&P 500), ours — {тикър: къде}
@@ -224,7 +264,15 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
         add_fed_schedule(day)                                                  # 17.11.2026 (т. 8): FOMC по графика, когато Nasdaq го няма
         if opex_note(d):                                                       # 20.11.2026 (пакет 20.11, т. 5): месечният опционен падеж
             day["opex"] = opex_note(d)
+        if market_note(d):                                                     # 23.11.2026 (пакет 23.11, т. 6): съкратена сесия
+            day["market"] = market_note(d)
         out["days"].append(day)
+    # 23.11.2026 (т. 6): затворените дни между сесиите в календара (празник) — отделен ред; до 23.11 week_days ги прескачаше и 26.11 (Thanksgiving) не се виждаше
+    if out["days"]:
+        from src import sessions
+        for d in sessions.closed_days(out["days"][0]["date"], out["days"][-1]["date"]):
+            out["days"].append({"date": d.isoformat(), "weekday": _WD[d.weekday()], "earnings": [], "fed": [], "econ": [], "market": market_note(d), "closed": True})
+        out["days"].sort(key=lambda x: x["date"])
     bad = dates_ok(econ_by_day)
     if bad:
         out["errors"].append(bad)
@@ -260,6 +308,8 @@ def group_events(rows: list[dict]) -> list[dict]:
 def day_lines(day: dict) -> list[str]:
     """Редовете за един ден — отчетите, Fed, данните. Чиста функция."""
     lines = []
+    if day.get("market"):                                                      # 23.11.2026 (т. 6): празник / съкратена сесия — първи ред
+        lines.append(f"борса: {day['market']}")
     if day.get("opex"):                                                        # 20.11.2026 (т. 5)
         lines.append(f"опции: {day['opex']}")
     for e in day.get("earnings") or []:

@@ -202,6 +202,11 @@ def build(today: str, prev_brief: dict | None, *, frames: dict | None, now_utc, 
     if not rows:
         notes.append(f"отчети след затварянето на {session[8:10]}.{session[5:7]} от следените компании няма ({src_note})")
     notes.append("премаркетът на акциите започва в 04:00 Ню Йорк (10:00 Берлин) — в 07:30 се вижда само движението след затварянето")
+    try:                                                                       # 23.11.2026 (пакет 23.11, т. 6): празник / съкратена сесия — първи
+        from src import econ_calendar
+        notes = econ_calendar.market_day_notes(dt.date.fromisoformat(today)) + notes
+    except Exception as e:
+        print(f"[overnight] бележката за празниците пропусната: {type(e).__name__}: {e}")
     return {"session": session, "companies": out_c, "market": market_rows(frames, now_utc, session), "notes": notes,
             "source": f"компаниите — {src_note} (тегло > 2% в S&P 500, капитализация ≥ ${config.WEEK_CAL_MIN_MARKET_CAP / 1e9:.0f} млрд, нашите); EPS — Nasdaq, приходи — Yahoo, "
                       "цени — Yahoo (5-мин. бари), прогноза — само дословно заглавие"}

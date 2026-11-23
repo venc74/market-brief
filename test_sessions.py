@@ -58,6 +58,16 @@ for f in sorted((ROOT / "src").glob("*.py")):
             bad.append(f"{f.name}:{node.lineno}")
     if "busday_count(" in src and "sessions.busday_count" not in src.replace("np.busday_count", ""):
         bad.append(f"{f.name}: busday_count")
+# 23.11.2026 (пакет 23.11, т. 6): календарът на седмицата и „Нощта“ — празниците, имената им и ранните затваряния САМО през src/sessions.py
+for name in ("econ_calendar.py", "overnight.py"):
+    src = (ROOT / "src" / name).read_text(encoding="utf-8")
+    for key in ("NYSE_HOLIDAYS", "NYSE_EARLY_CLOSES", "NYSE_HOLIDAY_NAMES"):
+        if f"config.{key}" in src:
+            bad.append(f"{name}: config.{key}")
 assert not bad, bad
-print("  ✓ няма цикъл/проверка 'weekday + NYSE_HOLIDAYS' и busday_count извън модула")
+assert s.is_holiday("2026-11-26") and not s.is_holiday("2026-11-27") and not s.is_holiday("2026-11-28")          # 28.11 — събота, не празник
+assert s.holiday_name("2026-11-26") == config.NYSE_HOLIDAY_NAMES["2026-11-26"] and s.holiday_name("2026-11-27") is None
+assert s.early_close("2026-11-27") == "13:00" and s.early_close("2026-11-26") is None
+assert s.closed_days("2026-11-23", "2026-11-30") == [D("2026-11-26")] and s.closed_days("2026-12-21", "2027-01-04") == [D("2026-12-25"), D("2027-01-01")]
+print("  ✓ няма цикъл/проверка 'weekday + NYSE_HOLIDAYS' и busday_count извън модула; календарът и „Нощта“ — само през sessions (is_holiday, holiday_name, early_close, closed_days)")
 print("\n✅ test_sessions: всичко мина")
