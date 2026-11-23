@@ -33,7 +33,11 @@ def sentences(day: dict | None, board: dict | None, macro: dict | None) -> list[
         rs = [r for r in rows if isinstance(r.get("rs_4w"), (int, float))]
         lead = [f"{r['etf']} (RS 4 седм. {r['rs_4w']:+.1f}, днес {r['chg_1d_pct']:+.1f}%)" for r in rs[:2]]
         lag = [f"{r['etf']} ({r['rs_4w']:+.1f}, днес {r['chg_1d_pct']:+.1f}%)" for r in rs[-2:][::-1]] if len(rs) > 3 else []
-        s = f"Секторите: нагоре {up} от {len(rows)}, надолу {down}"
+        # 23.11.2026 (пакет 23.11, т. 8): кой е на плюс — единственият („нагоре 1 от 11 (XLP +0.7%)“) или най-силният за деня; на 23.11 XLP +0.7% не се виждаше
+        ups = sorted((r for r in rows if r["chg_1d_pct"] > 0), key=lambda r: -r["chg_1d_pct"])
+        best = (f" ({ups[0]['etf']} {ups[0]['chg_1d_pct']:+.1f}%)" if len(ups) == 1 else
+                f" (най-силен за деня: {ups[0]['etf']} {ups[0]['chg_1d_pct']:+.1f}%)" if ups else "")
+        s = f"Секторите: нагоре {up} от {len(rows)}{best}, надолу {down}"
         if lead:
             s += f"; по таблицата водят {_lst(lead)}"
         if lag:

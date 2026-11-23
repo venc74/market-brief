@@ -40,6 +40,15 @@ assert m["macro_brief"] == ("На 19.11 SPY -1.96%, QQQ -2.19% за сесият
 assert m["source"] == "code" and m["sentences"] == 3 and mt.macro_brief({}, {}, {})["macro_brief"] == ""
 print(f"  ✓ «{m['macro_brief'][:90]}…»")
 
+print("── 1б. РЕАЛНО (23.11): единственият сектор на плюс се казва (до 23.11 — само „нагоре 1 от 11“) ──")
+S23 = {"sectors": [{"etf": e, "chg_1d_pct": c, "rs_4w": r} for e, c, r in (("XLP", 0.67, 12.92), ("XLV", -0.12, 8.92), ("XLU", -0.74, 10.51), ("XLY", -2.95, 9.55),
+        ("XLRE", -0.98, 9.89), ("XLF", -1.82, 7.55), ("XLE", -0.62, -3.84), ("XLB", -2.19, 3.79), ("XLC", -2.66, 4.45), ("XLI", -3.09, 4.65), ("XLK", -7.27, -10.4))]}   # brief["sector_board"] на 23.11
+s23 = mt.sentences({}, S23, {})[0]
+assert s23.startswith("Секторите: нагоре 1 от 11 (XLP +0.7%), надолу 10; по таблицата водят XLP"), s23
+two = {"sectors": [dict(r) for r in S23["sectors"]]}; two["sectors"][2]["chg_1d_pct"] = 1.2           # СИНТЕТИЧНО: втори на плюс
+assert "нагоре 2 от 11 (най-силен за деня: XLU +1.2%), надолу 9" in mt.sentences({}, two, {})[0]
+print(f"  ✓ «{s23[:60]}…»")
+
 print("── 2. проверката на превода: заглавията от 20.11 (РЕАЛНИ), преводите (СИНТЕТИЧНИ) ──")
 for n in FX["news"]:
     assert tr.problems(n["headline"], BG[n["headline"]], CAPS) == [], (n["headline"], tr.problems(n["headline"], BG[n["headline"]], CAPS))
