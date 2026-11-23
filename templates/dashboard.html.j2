@@ -1926,8 +1926,10 @@
     Записва се само пробив на последния цял бар, {% if gw.track_from %}от {{ gw.track_from }} нататък (чист старт){% else %}от деня на качването на кода (чист старт){% endif %}. Без плъзгане и комисионни. Не са позиции и не са съвет за покупка.
     {% if gw.horizons is defined %}
     <br>Без % печеливши и медиана: всяка затворена по линията е загуба по построение (вход над линията, изход под нея).
-    <br>Доходност N сесии след входа (exec, независимо от изхода) спрямо SPY за същите дати:
-    {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n_exec %}{{ "%+.2f"|format(x.avg_ret_exec) }}%{% if x.avg_spy_exec is not none %} (SPY {{ "%+.2f"|format(x.avg_spy_exec) }}%, алфа {{ "%+.2f"|format(x.avg_alpha_exec) }}%){% endif %}, {{ x.n_exec }} записа{% elif x.n %}{{ x.n }} записа без exec данни{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.
+    <br>Доходност N сесии след входа (exec, независимо от изхода) спрямо SPY за същите дати{% if gw.horizon_deals_excluded %} — без записите от сделки ({{ gw.horizon_deals_excluded }}){% endif %}:
+    {# 23.11.2026 (пакет 23.11, т. 9): средната — само при N ≥ gw.horizon_min_n; иначе „малко данни (N)“ (на 23.11 20 сесии = един запис, CART — сделка) #}
+    {% set hmin = gw.horizon_min_n if gw.horizon_min_n is defined else 1 %}
+    {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n_exec and x.n_exec >= hmin %}{{ "%+.2f"|format(x.avg_ret_exec) }}%{% if x.avg_spy_exec is not none %} (SPY {{ "%+.2f"|format(x.avg_spy_exec) }}%, алфа {{ "%+.2f"|format(x.avg_alpha_exec) }}%){% endif %}, {{ x.n_exec }} записа{% elif x.n_exec %}малко данни ({{ x.n_exec }}){% elif x.n %}{{ x.n }} записа без exec данни{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.
     {{ pre_reaction_line(gw.pre_reaction, "%") }}
     {{ events_line(gw.events, "доходност % (exec)" if gw.events and gw.events.value == "return_pct_exec" else "доходност %") }}
     <br>По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност exec за {{ gw.compare_horizon }} сесии{% endif %}):

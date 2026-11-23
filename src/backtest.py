@@ -2304,7 +2304,10 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
                            "avg_alpha_exec": avg([x["alpha_exec"] for x in xe if x.get("alpha_exec") is not None])}
         return out
 
-    hz = horizons(valid)
+    # 23.11.2026 (пакет 23.11, т. 9): срокове и сравнението по тип / режим — без записите от сделки (цел на придобиване: цената следва офертата — CART на 23.11 беше единственият с 20 сесии)
+    is_deal = lambda r: bool(r.get("deal")) or r.get("status") == DEAL_CLOSED
+    hz = horizons([r for r in valid if not is_deal(r)])
+    deals_out = sum(1 for r in records if is_deal(r))
     H = str(config.GLB_WISH_COMPARE_HORIZON)
     visible_h = hz.get(H, {}).get("n", 0) >= min_n
 
@@ -2315,7 +2318,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
             g = out.setdefault(key_fn(r) or "н/д", {"records": 0, "_x": []})
             g["records"] += 1
             x = (r.get("horizons") or {}).get(H)
-            if r in valid and x and x.get("ret") is not None:
+            if r in valid and not is_deal(r) and x and x.get("ret") is not None:
                 g["_x"].append(x)
         for g in out.values():
             x = g.pop("_x")
@@ -2356,6 +2359,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "also_action": sum(1 for r in records if overlaps(r, act)), "also_buystop": sum(1 for r in records if overlaps(r, bst)), "also_qm": sum(1 for r in records if overlaps(r, qmb)),
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
+        "horizon_min_n": config.GLB_WISH_HORIZON_MIN_N, "horizon_deals_excluded": deals_out,        # 23.11.2026 (т. 9): „малко данни (N)“; без записите от сделки
         "pre_reaction": pre_reaction_block(with_result, "return_pct_exec"),                          # 06.11.2026 (т. 4)
         "events": events_block(with_result, "return_pct_exec"),                                      # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"; 03.11.2026 (т. 15, 6): exec
         "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
