@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import config
+config.EP_AI_LABEL_ONLY = 0                       # 23.11.2026 (пакет 23.11, т. 3): тук — старият път (AI резюме и „изненада“); новият — test_ep_label_only.py
 config.QM_PEAK_MAX_BELOW_52W_PCT = 100.0                                                    # 16.11.2026 (т. 16): правилото за лидер има собствен тест (test_qm_leader_rule.py); тук — трите реални карти от 02.10 (DOCN е 19% под 52-седм. връх и по новото правило отпада)
 from src import qm_breakout as q, qm_ep as ep, render, backtest
 

@@ -366,6 +366,9 @@ QM_EP_STOP_ADR = float(os.getenv("QM_EP_STOP_ADR", 1.0))
 # в 15:05 — LRCX, SITM, MKSI, COHR на 06.11). Само етикет — включването в EP не се променя (QM_EP_NEGLECT_RET63_PCT).
 QM_EP_CRASHED_RET63_PCT = float(os.getenv("QM_EP_CRASHED_RET63_PCT", -30.0))         # информация: максимален стоп 1× ADR (негово: 1×, най-много 1.5×)
 QM_EP_MAX_ROWS = int(os.getenv("QM_EP_MAX_ROWS", 10))
+# 23.11.2026 (пакет 23.11, т. 3): EP — AI само слага етикета (ключ от CATALYSTS) върху фактите от кода (EPS при отчета, точките на 8-K, заглавията); без AI резюме и без AI
+# „изненада“ (изненадата в EPS — от кода, earnings_text). 0 връща резюмето.
+EP_AI_LABEL_ONLY = int(os.getenv("EP_AI_LABEL_ONLY", 1))
 QM_EP_EDGAR_8K = os.getenv("QM_EP_EDGAR_8K", "1") == "1"         # 21.10.2026 (етап 4): 8-K на компанията, приет след затварянето (EDGAR, config.EDGAR_UA) — първият ред и доказателството за катализатора
 QM_EP_MIN_AH_BARS = 3                                            # поне толкова 5-минутни after-hours бара (иначе няма реална търговия)
 QM_EP_BATCH = 100

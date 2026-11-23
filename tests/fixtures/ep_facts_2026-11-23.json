@@ -1,0 +1,473 @@
+{
+"note": "РЕАЛНО: EP редовете ABNB (бриф 06.11.2026) и AAON (бриф 10.11.2026) от data/*.json — заглавия, 8-K, AI етикетът и резюмето от онзи ден; yahoo_earnings — yfinance get_earnings_dates(limit=8), изтеглени на 23.11.2026 14:57 UTC (EPS при отчета срещу очаквания).",
+"rows": {
+"ABNB": {
+"brief": "2026-11-06",
+"session": "2026-11-05",
+"row": {
+"ticker": "ABNB",
+"session": "2026-11-05",
+"prev_close": 170.1300048828125,
+"ah_price": 188.8704,
+"ah_high": 191.27,
+"ah_low": 169.01,
+"ah_bars": 46,
+"ah_volume": null,
+"ah_last_et": "19:55",
+"gap_pct": 11.015338023469813,
+"ret63_pct": -4.45892183681983,
+"adr": 2.7827767128104863,
+"dollar_volume": 647166880.9720612,
+"neglect": true,
+"max_stop": 183.61,
+"max_stop_pct": 2.8,
+"liquid": true,
+"levels": {
+"strategy": "kullamagi",
+"entry": 188.87,
+"entry_label": "after-hours цена",
+"stop": 183.61,
+"stop_source": "adr",
+"stop_source_text": "стоп за оразмеряване (макс. 1×ADR)",
+"stop_pct": 2.78,
+"adr_pct": 2.78,
+"stop_note": "ориентировъчен — реалният стоп е дъното на деня на влизане",
+"regime_factor": 1.0,
+"regime_note": "отделна стратегия — без режимен фактор",
+"warnings": []
+},
+"company": "ABNB",
+"filings_8k": [
+{
+"accepted_et": "2026-11-05 16:02",
+"date": "2026-11-05",
+"acc": "0001193125-26-449727",
+"doc": "d437988d8k.htm",
+"items": [
+[
+"2.02",
+"Results of Operations and Financial Condition",
+"финансови резултати"
+]
+]
+}
+],
+"filings_error": null,
+"headlines_error": null,
+"headlines": [
+{
+"title": "8-K (SEC), 05.11 16:02 ET: 2.02 — финансови резултати",
+"published": "2026-11-05 16:02",
+"source": "SEC"
+},
+{
+"title": "Airbnb (NASDAQ:ABNB) surprises with Q3 2026 sales, stock jumps 11.7%",
+"published": "2026-11-05 22:06"
+},
+{
+"title": "Look Who I Found creator is sleeping 3 hours a night to build a $1 billion brand",
+"published": "2026-11-06 01:00"
+}
+],
+"sources_note": null,
+"catalyst": "earnings_guidance",
+"catalyst_label": "Отчет / guidance",
+"summary_bg": "Airbnb отчете Q3 2026 резултати над очакванията с най-бърз ръст на приходите от над 3 години, изненадвайки дори самата компания.",
+"surprise": "yes",
+"ah_volume_available": false
+}
+},
+"AAON": {
+"brief": "2026-11-10",
+"session": "2026-11-09",
+"row": {
+"ticker": "AAON",
+"session": "2026-11-09",
+"prev_close": 62.869998931884766,
+"ah_price": 72.7048,
+"ah_high": 73.12,
+"ah_low": 62.87,
+"ah_bars": 23,
+"ah_volume": null,
+"ah_last_et": "19:50",
+"gap_pct": 15.643074972484982,
+"ret63_pct": -26.707857511582844,
+"adr": 7.001799884625748,
+"dollar_volume": 92485025.24629593,
+"neglect": true,
+"max_stop": 67.61,
+"max_stop_pct": 7.0,
+"liquid": true,
+"levels": {
+"strategy": "kullamagi",
+"entry": 72.7,
+"entry_label": "after-hours цена",
+"stop": 67.61,
+"stop_source": "adr",
+"stop_source_text": "стоп за оразмеряване (макс. 1×ADR)",
+"stop_pct": 7.0,
+"adr_pct": 7.0,
+"stop_note": "ориентировъчен — реалният стоп е дъното на деня на влизане",
+"regime_factor": 1.0,
+"regime_note": "отделна стратегия — без режимен фактор",
+"warnings": []
+},
+"company": "AAON, Inc.",
+"filings_8k": [
+{
+"accepted_et": "2026-11-09 16:09",
+"date": "2026-11-09",
+"acc": "0000824142-26-000083",
+"doc": "aaon-20261109.htm",
+"items": [
+[
+"2.02",
+"Results of Operations and Financial Condition",
+"финансови резултати"
+],
+[
+"4.02",
+"Non-Reliance on Previously Issued Financial Statements",
+"отказ от предишни отчети"
+],
+[
+"7.01",
+"Regulation FD Disclosure",
+"оповестяване по Reg FD"
+]
+]
+}
+],
+"filings_error": null,
+"headlines_error": null,
+"headlines": [
+{
+"title": "8-K (SEC), 09.11 16:09 ET: 2.02 — финансови резултати; 4.02 — отказ от предишни отчети; 7.01 — оповестяване по Reg FD",
+"published": "2026-11-09 16:09",
+"source": "SEC"
+},
+{
+"title": "AAON Inc (AAON) Q3 2026 Earnings Call Highlights: Record $707 Million Sales, Raised 72%-75% ...",
+"published": "2026-11-10 05:10"
+},
+{
+"title": "AAON Q3 Earnings Call Highlights",
+"published": "2026-11-10 00:14"
+}
+],
+"sources_note": null,
+"catalyst": "earnings_guidance",
+"catalyst_label": "Отчет / guidance",
+"summary_bg": "AAON отчете рекордни продажби от $707 милиона за Q3 2026 и повиши прогнозата си, акцията скочи.",
+"surprise": "yes",
+"ah_volume_available": false
+}
+}
+},
+"yahoo_earnings": {
+"ABNB": [
+{
+"date": "2027-02-11 16:00:00-05:00",
+"EPS Estimate": 0.81,
+"Reported EPS": null,
+"Surprise(%)": null
+},
+{
+"date": "2026-11-05 16:00:00-05:00",
+"EPS Estimate": 2.85,
+"Reported EPS": 3.16,
+"Surprise(%)": 10.99
+},
+{
+"date": "2026-08-06 16:00:00-04:00",
+"EPS Estimate": 1.25,
+"Reported EPS": 1.37,
+"Surprise(%)": 9.48
+},
+{
+"date": "2026-05-07 16:00:00-04:00",
+"EPS Estimate": 0.3,
+"Reported EPS": 0.26,
+"Surprise(%)": -14.13
+},
+{
+"date": "2026-02-12 16:00:00-05:00",
+"EPS Estimate": 0.66,
+"Reported EPS": 0.56,
+"Surprise(%)": -15.65
+},
+{
+"date": "2025-11-06 16:00:00-05:00",
+"EPS Estimate": 2.32,
+"Reported EPS": 2.21,
+"Surprise(%)": -4.76
+},
+{
+"date": "2025-08-06 16:00:00-04:00",
+"EPS Estimate": 0.94,
+"Reported EPS": 1.03,
+"Surprise(%)": 9.41
+},
+{
+"date": "2025-05-01 16:00:00-04:00",
+"EPS Estimate": 0.24,
+"Reported EPS": 0.24,
+"Surprise(%)": null
+},
+{
+"date": "2025-02-13 16:00:00-05:00",
+"EPS Estimate": 0.58,
+"Reported EPS": 0.73,
+"Surprise(%)": 25.14
+},
+{
+"date": "2024-11-07 16:00:00-05:00",
+"EPS Estimate": 2.13,
+"Reported EPS": 2.13,
+"Surprise(%)": -0.23
+},
+{
+"date": "2024-08-06 16:00:00-04:00",
+"EPS Estimate": 0.91,
+"Reported EPS": 0.86,
+"Surprise(%)": -5.66
+},
+{
+"date": "2024-05-08 16:00:00-04:00",
+"EPS Estimate": 0.23,
+"Reported EPS": 0.41,
+"Surprise(%)": 77.09
+},
+{
+"date": "2024-02-13 16:00:00-05:00",
+"EPS Estimate": 0.7,
+"Reported EPS": -0.55,
+"Surprise(%)": -178.56
+},
+{
+"date": "2023-11-01 16:00:00-04:00",
+"EPS Estimate": 2.1,
+"Reported EPS": 6.63,
+"Surprise(%)": 215.68
+},
+{
+"date": "2023-08-03 16:00:00-04:00",
+"EPS Estimate": 0.78,
+"Reported EPS": 0.98,
+"Surprise(%)": 26.19
+},
+{
+"date": "2023-05-09 16:00:00-04:00",
+"EPS Estimate": 0.15,
+"Reported EPS": 0.18,
+"Surprise(%)": 16.86
+},
+{
+"date": "2023-02-14 16:00:00-05:00",
+"EPS Estimate": 0.27,
+"Reported EPS": 0.48,
+"Surprise(%)": 79.76
+},
+{
+"date": "2022-11-01 16:00:00-04:00",
+"EPS Estimate": 1.5,
+"Reported EPS": 1.79,
+"Surprise(%)": 19.42
+},
+{
+"date": "2022-08-02 16:00:00-04:00",
+"EPS Estimate": 0.43,
+"Reported EPS": 0.56,
+"Surprise(%)": 30.53
+},
+{
+"date": "2022-05-03 16:00:00-04:00",
+"EPS Estimate": -0.3,
+"Reported EPS": -0.03,
+"Surprise(%)": 89.99
+},
+{
+"date": "2022-02-15 16:00:00-05:00",
+"EPS Estimate": -0.03,
+"Reported EPS": 0.08,
+"Surprise(%)": 416.84
+},
+{
+"date": "2021-11-04 16:00:00-04:00",
+"EPS Estimate": 0.83,
+"Reported EPS": 1.23,
+"Surprise(%)": 48.83
+},
+{
+"date": "2021-08-12 16:00:00-04:00",
+"EPS Estimate": -0.27,
+"Reported EPS": -0.11,
+"Surprise(%)": 59.16
+},
+{
+"date": "2021-05-14 17:00:00-04:00",
+"EPS Estimate": -1.16,
+"Reported EPS": -1.95,
+"Surprise(%)": -67.99
+},
+{
+"date": "2021-02-26 16:00:00-05:00",
+"EPS Estimate": -2.78,
+"Reported EPS": -10.81,
+"Surprise(%)": -288.43
+}
+],
+"AAON": [
+{
+"date": "2027-03-01 16:00:00-05:00",
+"EPS Estimate": 0.79,
+"Reported EPS": null,
+"Surprise(%)": null
+},
+{
+"date": "2026-11-09 16:00:00-05:00",
+"EPS Estimate": 0.58,
+"Reported EPS": 0.83,
+"Surprise(%)": 43.52
+},
+{
+"date": "2026-08-10 07:00:00-04:00",
+"EPS Estimate": 0.49,
+"Reported EPS": 0.69,
+"Surprise(%)": 39.68
+},
+{
+"date": "2026-05-07 07:00:00-04:00",
+"EPS Estimate": 0.29,
+"Reported EPS": 0.48,
+"Surprise(%)": 63.27
+},
+{
+"date": "2026-03-02 07:00:00-05:00",
+"EPS Estimate": 0.46,
+"Reported EPS": 0.39,
+"Surprise(%)": -15.22
+},
+{
+"date": "2025-11-06 07:00:00-05:00",
+"EPS Estimate": 0.32,
+"Reported EPS": 0.37,
+"Surprise(%)": 14.91
+},
+{
+"date": "2025-08-11 07:00:00-04:00",
+"EPS Estimate": 0.33,
+"Reported EPS": 0.22,
+"Surprise(%)": -32.52
+},
+{
+"date": "2025-04-30 21:00:00-04:00",
+"EPS Estimate": 0.24,
+"Reported EPS": 0.37,
+"Surprise(%)": 56.97
+},
+{
+"date": "2025-02-27 07:00:00-05:00",
+"EPS Estimate": 0.53,
+"Reported EPS": 0.3,
+"Surprise(%)": -43.7
+},
+{
+"date": "2024-11-07 16:00:00-05:00",
+"EPS Estimate": 0.57,
+"Reported EPS": 0.63,
+"Surprise(%)": 10.2
+},
+{
+"date": "2024-08-01 16:00:00-04:00",
+"EPS Estimate": 0.52,
+"Reported EPS": 0.62,
+"Surprise(%)": 20.39
+},
+{
+"date": "2024-05-02 16:00:00-04:00",
+"EPS Estimate": 0.49,
+"Reported EPS": 0.46,
+"Surprise(%)": -5.15
+},
+{
+"date": "2024-02-28 16:00:00-05:00",
+"EPS Estimate": 0.52,
+"Reported EPS": 0.56,
+"Surprise(%)": 7.69
+},
+{
+"date": "2023-11-06 16:00:00-05:00",
+"EPS Estimate": 0.55,
+"Reported EPS": 0.64,
+"Surprise(%)": 17.25
+},
+{
+"date": "2023-08-03 16:00:00-04:00",
+"EPS Estimate": 0.43,
+"Reported EPS": 0.55,
+"Surprise(%)": 26.15
+},
+{
+"date": "2023-05-04 16:00:00-04:00",
+"EPS Estimate": 0.35,
+"Reported EPS": 0.45,
+"Surprise(%)": 26.42
+},
+{
+"date": "2023-02-27 16:00:00-05:00",
+"EPS Estimate": 0.37,
+"Reported EPS": 0.47,
+"Surprise(%)": 27.54
+},
+{
+"date": "2022-11-07 16:00:00-05:00",
+"EPS Estimate": 0.29,
+"Reported EPS": 0.34,
+"Surprise(%)": 17.69
+},
+{
+"date": "2022-08-08 16:00:00-04:00",
+"EPS Estimate": 0.27,
+"Reported EPS": 0.2,
+"Surprise(%)": -26.23
+},
+{
+"date": "2022-05-05 16:00:00-04:00",
+"EPS Estimate": 0.18,
+"Reported EPS": 0.22,
+"Surprise(%)": 20.73
+},
+{
+"date": "2022-02-28 16:00:00-05:00",
+"EPS Estimate": 0.18,
+"Reported EPS": 0.12,
+"Surprise(%)": -34.94
+},
+{
+"date": "2021-11-04 16:00:00-04:00",
+"EPS Estimate": 0.26,
+"Reported EPS": 0.19,
+"Surprise(%)": -24.35
+},
+{
+"date": "2021-08-05 16:00:00-04:00",
+"EPS Estimate": 0.22,
+"Reported EPS": 0.25,
+"Surprise(%)": 17.52
+},
+{
+"date": "2021-05-06 07:00:00-04:00",
+"EPS Estimate": 0.18,
+"Reported EPS": 0.2,
+"Surprise(%)": 12.5
+},
+{
+"date": "2021-02-25 07:00:00-05:00",
+"EPS Estimate": 0.19,
+"Reported EPS": 0.23,
+"Surprise(%)": 20.69
+}
+]
+}
+}

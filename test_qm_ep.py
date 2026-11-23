@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 import numpy as np
 import pandas as pd
 import config
+config.EP_AI_LABEL_ONLY = 0                       # 23.11.2026 (пакет 23.11, т. 3): тук — старият път (AI резюме и „изненада“); новият — test_ep_label_only.py
 from src import qm_ep as ep
 
 F = json.loads((ROOT / "tests" / "fixtures" / "qm_ep_2026-10-02.json").read_text(encoding="utf-8"))

@@ -368,6 +368,8 @@ def verify_ai_item(item: dict, headlines: list[dict], tickers: set[str]) -> tupl
     surprise = item.get("surprise") if item.get("surprise") in SURPRISE else "unclear"
     text = " ".join(h["title"] for h in headlines)
     summary, why = str(item.get("summary_bg") or "").strip(), None
+    if config.EP_AI_LABEL_ONLY:                                          # 23.11.2026 (пакет 23.11, т. 3): само етикетът — резюмето и „изненадата“ на AI не се показват
+        summary, surprise = "", "unclear"
     if summary:
         extra = _nums(summary) - _nums(text)
         if extra:
@@ -378,12 +380,38 @@ def verify_ai_item(item: dict, headlines: list[dict], tickers: set[str]) -> tupl
     return {"ticker": str(item["ticker"]).upper(), "catalyst": cat, "catalyst_label": CATALYSTS[cat], "summary_bg": summary or None, "surprise": surprise}, why
 
 
-SYSTEM_EP = ("Ти си помощник, който връща САМО валиден JSON. Класифицираш катализатора на голям after-hours гап нагоре на акция ВЪРХУ ЗАГЛАВИЯТА, които са ти дадени. "
+SYSTEM_EP = ("Ти си помощник, който връща САМО валиден JSON. Класифицираш катализатора на голям after-hours гап нагоре на акция ВЪРХУ ФАКТИТЕ И ЗАГЛАВИЯТА, които са ти дадени. "
              "Не измисляй факти и не добавяй числа, цени, дати или проценти, които не са дословно в заглавията. Не давай препоръка за покупка или продажба.")
+
+
+def code_facts(r: dict) -> dict:
+    """
+    23.11.2026 (пакет 23.11, т. 3): фактите от кода за реда — EPS при отчета (eps_surprise, само при 8-K т. 2.02) и точките на 8-K след затварянето (номер и английското
+    заглавие). → {"eps_from_code": {...}?, "sec_8k_after_close": [...]?}. Чиста функция.
+    """
+    out = {}
+    e = r.get("eps") or {}
+    if e.get("reported") is not None:
+        out["eps_from_code"] = {"reported": e["reported"], "estimate": e.get("estimate"), "surprise_pct": e.get("surprise_pct")}
+    elif e.get("error"):
+        out["eps_from_code"] = f"не е наличен ({e['error']})"
+    if r.get("filings_8k"):
+        out["sec_8k_after_close"] = [f"{f['accepted_et']} ET — " + "; ".join(f"Item {c} {en}" for c, en, _ in f["items"]) for f in r["filings_8k"]]
+    elif r.get("filings_error"):
+        out["sec_8k_after_close"] = "не се провери (EDGAR не отговори) — липсата НЕ значи, че няма 8-K"     # 04.11.2026 (С1)
+    return out
 
 
 def _build_prompt(batch: list[dict]) -> str:
     cats = "\n".join(f'- "{k}": {v}' for k, v in CATALYSTS.items())
+    if config.EP_AI_LABEL_ONLY:                                          # 23.11.2026 (пакет 23.11, т. 3): фактите от кода → само етикетът
+        payload = [{"ticker": r["ticker"], "headlines": [h["title"] for h in r["headlines"] if h.get("source") != "SEC"], **code_facts(r)} for r in batch]
+        return (f"АКЦИИ С ГАП НАГОРЕ СЛЕД ЗАТВАРЯНЕ — фактите от кода и заглавията: {json.dumps(payload, ensure_ascii=False)}\n\n"
+                f"\"eps_from_code\" е EPS при отчета срещу очаквания (от Yahoo, сметнато от кода); \"sec_8k_after_close\" са точките на 8-K, подаден от самата компания след "
+                f"затварянето — най-прякото доказателство за причината; общите прегледи на пазара (фючърси, борсите в Азия) не са причина.\n\n"
+                f"КАТАЛИЗАТОРИ (ползвай САМО тези ключове; ако фактите и заглавията не дават ясна причина — \"unknown\"):\n{cats}\n\n"
+                f"За ВСЯКА акция върни САМО етикета \"catalyst\" (ключ) — без текст, без резюме, без оценка.\n\n"
+                f"Връщай само JSON: {{\"items\": [{{\"ticker\": \"...\", \"catalyst\": \"...\"}}]}}")
     payload = [{"ticker": r["ticker"], "headlines": [h["title"] for h in r["headlines"] if h.get("source") != "SEC"],
                 **({"sec_8k_after_close": [f"{f['accepted_et']} ET — " + "; ".join(f"Item {c} {en}" for c, en, _ in f["items"]) for f in r["filings_8k"]]} if r.get("filings_8k") else {}),
                 **({"sec_8k_after_close": "не се провери (EDGAR не отговори) — липсата НЕ значи, че няма 8-K"} if r.get("filings_error") and not r.get("filings_8k") else {})}   # 04.11.2026 (С1)
@@ -671,7 +699,8 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
             r["headlines"] = [filing_headline(f) for f in r["filings_8k"]] + rank_headlines(src["headlines_raw"], r["ticker"], r.get("company"))
             if has_202(r["filings_8k"]):                                                           # 17.11.2026 (пакет 1, т. 6): отчет — изненадата в EPS, заглавия само за отчета
                 r["headlines"] = earnings_headlines(r["headlines"])
-                r["earnings_text"] = earnings_line(eps_surprise(r["ticker"], diag.get("session")))
+                r["eps"] = eps_surprise(r["ticker"], diag.get("session"))                         # 23.11.2026 (т. 3): и към AI като факт от кода
+                r["earnings_text"] = earnings_line(r["eps"])
             r["sources_note"] = sources_note(r)
         cls, notes = classify_catalysts(shown, ai_call)
         out["notes"] += notes

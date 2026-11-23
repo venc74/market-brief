@@ -11,6 +11,7 @@ import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import config
+config.EP_AI_LABEL_ONLY = 0                       # 23.11.2026 (пакет 23.11, т. 3): тук — старият път (AI резюме и „изненада“); новият — test_ep_label_only.py
 
 _tmp = tempfile.TemporaryDirectory(prefix="mb_ep8k_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
