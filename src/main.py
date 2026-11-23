@@ -874,6 +874,11 @@ def run() -> dict:
                label="Етикетът „преди реакцията на отчета“ върху записите в книгите",
                consequence="новите записи не са проверени за отчет след затварянето — статистиката „без тях“ може да ги съдържа",
                failed_if=lambda v: (v.get("reason") or "не се изпълни") if v.get("ok") is False else None)
+    # 23.11.2026 (пакет 23.11, т. 4): етикет „ден на пазарен гап“ — вход или сигнал в ден с NQ ≥ ±3% / ES ≥ ±2% в 08:55 Ню Йорк (по записаното каре); статистиката — с и без
+    steps.step("market_gap_labels", lambda: backtest.apply_market_gap_labels(today), fallback={}, enabled=bool(config.ENABLE_BACKTEST),
+               label="Етикетът „ден на пазарен гап“ върху записите в книгите",
+               consequence="записите от ден на пазарен гап не са отбелязани — статистиката „без тях“ може да ги съдържа",
+               failed_if=lambda v: (v.get("reason") or "не се изпълни") if v.get("ok") is False else None)
     backtest_summary = backtest.get_backtest_summary() if config.ENABLE_BACKTEST else {}
     def _book_buystop():                                                       # пакет 1б: отделната книга на buy-stop кандидатите (чисто локално четене)
         backtest_summary["buystop"] = backtest.get_buystop_summary()

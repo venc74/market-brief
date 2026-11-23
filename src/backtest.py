@@ -1078,6 +1078,55 @@ def pre_reaction_block(records: list[dict], value_key: str) -> dict | None:
             "value": value_key, "n_all": len(allv), "avg_all": avg(allv), "n_rest": len(rest), "avg_rest": avg(rest)}
 
 
+def market_gap_block(records: list[dict], value_key: str) -> dict | None:
+    """23.11.2026 (пакет 23.11, т. 4): записите с вход / сигнал в ден на пазарен гап и средното на value_key (R или %) с тях и без тях. Без такива → None. Чиста функция."""
+    lab = [r for r in records if r.get("market_gap")]
+    if not lab:
+        return None
+    avg = lambda xs: round(sum(xs) / len(xs), 2) if xs else None
+    allv = [r[value_key] for r in records if r.get(value_key) is not None]
+    rest = [r[value_key] for r in records if r.get(value_key) is not None and not r.get("market_gap")]
+    return {"n": len(lab), "tickers": [{"ticker": r.get("ticker"), "entry_date": r.get("entry_date"), **r["market_gap"]} for r in sorted(lab, key=lambda x: (x.get("entry_date") or "", x.get("ticker") or ""))],
+            "value": value_key, "n_all": len(allv), "avg_all": avg(allv), "n_rest": len(rest), "avg_rest": avg(rest)}
+
+
+def market_gap_dates(r: dict) -> list[str]:
+    """Датите, по които записът е засегнат от пазарния гап: входът (fill_date, fill_exec_date) и сигналът / предложението (entry_date, signal_date). Чиста функция."""
+    return sorted({str(r[k])[:10] for k in ("fill_date", "fill_exec_date", "entry_date", "signal_date") if r.get(k)})
+
+
+def apply_market_gap_labels(today: str | None = None, day_fn=None) -> dict:
+    """
+    23.11.2026 (пакет 23.11, т. 4): етикет „ден на пазарен гап“ върху записите в книгите (Action, buy-stop, Kullamägi, GLB по Уиш и архивът) — вход или сигнал в ден, в който NQ ≥ ±3%
+    или ES ≥ ±2% в 08:55 Ню Йорк (src/market_gap.py, по записаното каре). Без каре за деня (преди 13.11 няма фючърси) — без етикет. Записва tracker-а при промяна. Не вдига.
+    """
+    try:
+        from src import market_gap
+        day_fn = day_fn or market_gap.day
+        tracker = _load_tracker()
+        books = (CATEGORY_ACTION, CATEGORY_BUYSTOP, CATEGORY_QM, CATEGORY_GLB_WISH, CATEGORY_GLB_WISH_HIGH)
+        cache, labelled = {}, 0
+        for r in tracker.values():
+            if not isinstance(r, dict) or r.get("market_gap") or not (r.get("method") == "v2" or r.get("category") in books):
+                continue
+            for d in market_gap_dates(r):
+                if d not in cache:
+                    cache[d] = day_fn(d)
+                mg = cache[d]
+                if mg and mg.get("gap"):
+                    r["market_gap"] = {"date": d, "nq": mg.get("nq"), "es": mg.get("es")}
+                    labelled += 1
+                    break
+        if labelled:
+            _save_tracker(tracker)
+        gap_days = sorted(d for d, v in cache.items() if v and v.get("gap"))
+        print(f"[backtest] ден на пазарен гап: {labelled} нови етикета; дни с гап сред проверените: {', '.join(gap_days) or 'няма'}")
+        return {"ok": True, "labelled": labelled, "gap_days": gap_days, "checked_days": len(cache)}
+    except Exception as e:
+        print(f"[backtest] етикетът „ден на пазарен гап“ пропуснат: {type(e).__name__}: {e}")
+        return {"ok": False, "reason": f"{type(e).__name__}"}
+
+
 def apply_pre_reaction_labels(today: str, fetch=None, budget_sec: float | None = None) -> dict:
     """06.11.2026 (т. 4): етикетът „преди реакцията на отчета“ (event_label.label_pre_reaction) върху непроверените записи на всички книги. Graceful: провал → {"ok": False, "reason"}, tracker-ът не се пипа."""
     try:
@@ -2071,7 +2120,7 @@ def get_buystop_summary() -> dict:
                 "valid_through": r.get("valid_through"), "fill_date": r.get("fill_date"), "fill_price": r.get("fill_price"),
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "also_action": _also_action(r), "spinoff_note": r.get("spinoff_note"),
                 "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),          # 06.11.2026 (т. 1): реалният риск при входа
-                "pre_reaction": r.get("pre_reaction"),                                                     # 06.11.2026 (т. 4)
+                "pre_reaction": r.get("pre_reaction"), "market_gap": r.get("market_gap"),                                                     # 06.11.2026 (т. 4)
                 "entry_volume_ratio": r.get("entry_volume_ratio"), "deal": r.get("deal"),
                 "tier": r.get("tier")}                                                                     # 19.11.2026 (т. 7): нивото на картата („CANSLIM“ / „Тренд без ръст“)
 
@@ -2095,7 +2144,7 @@ def get_buystop_summary() -> dict:
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "deal_closed": deal_closed_block(records),                        # 09.11.2026 (ROKU)
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
-        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
+        "pre_reaction": pre_reaction_block(records, "realized_r"), "market_gap": market_gap_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 
@@ -2190,7 +2239,7 @@ def get_qm_summary() -> dict:
                 "current_r": r.get("current_r"), "regime": r.get("regime"), "trail_ma": r.get("trail_ma"),
                 "risk_adr": ra, "tight_risk": ra is not None and ra < config.QM_R_RISK_FLOOR_ADR,          # 12.10: флаг — R е смятан от пода 0.25×ADR (ELF 09.10: 0.09×ADR)
                 "return_pct": r.get("return_pct"), "return_pct_pess": r.get("return_pct_pess"),           # 12.10: доходност в % до R
-                "pre_reaction": r.get("pre_reaction"),                                                       # 06.11.2026 (т. 4)
+                "pre_reaction": r.get("pre_reaction"), "market_gap": r.get("market_gap"),                                                       # 06.11.2026 (т. 4)
                 "spinoff_note": r.get("spinoff_note"),                                                       # 13.10: предстоящо отделяне
                 "deal": r.get("deal"),                                                                       # 26.10: цел на придобиване
                 "r_basis": r.get("r_basis"), "entry_time": (r.get("intraday") or {}).get("entry_time") if isinstance(r.get("intraday"), dict) else None,   # 03.11.2026 (т. 11)
@@ -2220,7 +2269,7 @@ def get_qm_summary() -> dict:
         "tight_risk": sum(1 for x in map(_risk_adr, records) if x is not None and x < config.QM_R_RISK_FLOOR_ADR),
         "avg_return_pct": _avg_pct(closed, "return_pct"), "avg_return_pct_pess": _avg_pct(closed, "return_pct_pess", "return_pct"),
         "needs_review": sum(1 for r in records if r.get("needs_manual_review")),
-        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
+        "pre_reaction": pre_reaction_block(records, "realized_r"), "market_gap": market_gap_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                                                 # 26.10.2026 (етап 4б, т. 2)
         "before_rule": sum(1 for _, d in before_rule if d is not None), "max_dist_adr": config.QM_MAX_DIST_ADR, "rule_from": config.QM_MAX_DIST_RULE_FROM or None,
         "entry_rule_split": qm_entry_rule_split(records, visible), "entry_rule_from": config.QM_FIRST_BAR_RULE_FROM,          # 17.11.2026 (пакет 2, т. 3)
@@ -2334,7 +2383,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
                 "line": r.get("line_used") or r.get("line"), "fill_price": r.get("fill_price"), "last_close": r.get("last_close"), "current_return_pct": r.get("current_return_pct"),
                 "dist_to_line_pct": r.get("dist_to_line_pct"), "hold_sessions": r.get("hold_sessions"),
                 "also_action": overlaps(r, act), "also_buystop": overlaps(r, bst), "also_qm": overlaps(r, qmb), "spinoff_note": r.get("spinoff_note"),
-                "pre_reaction": r.get("pre_reaction"),                                                       # 06.11.2026 (т. 4)
+                "pre_reaction": r.get("pre_reaction"), "market_gap": r.get("market_gap"),                                                       # 06.11.2026 (т. 4)
                 "deal": r.get("deal"),                                                                       # 26.10.2026: цел на придобиване
                 # 03.11.2026 (разходката, т. 15): компактната таблица — обемът на пробива, вход по отварянето и доходността exec (реалистичната); literal остава в данните
                 "breakout_volume_ratio": r.get("breakout_volume_ratio"), "months_unpenetrated": r.get("months_unpenetrated"),
@@ -2360,7 +2409,7 @@ def get_glb_wish_summary(category: str = CATEGORY_GLB_WISH) -> dict:
         "all": stats(with_result), "closed_group": stats(closed_res), "line_exit_group": stats(line_exit), "expired_group": stats(expired), "open_group": stats(open_res),
         "horizons": hz, "compare_horizon": int(H), "horizons_visible": visible_h,                  # 26.10.2026 (етап 4б, т. 3)
         "horizon_min_n": config.GLB_WISH_HORIZON_MIN_N, "horizon_deals_excluded": deals_out,        # 23.11.2026 (т. 9): „малко данни (N)“; без записите от сделки
-        "pre_reaction": pre_reaction_block(with_result, "return_pct_exec"),                          # 06.11.2026 (т. 4)
+        "pre_reaction": pre_reaction_block(with_result, "return_pct_exec"), "market_gap": market_gap_block(with_result, "return_pct_exec"),                          # 06.11.2026 (т. 4)
         "events": events_block(with_result, "return_pct_exec"),                                      # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"; 03.11.2026 (т. 15, 6): exec
         "horizons_rest": horizons([r for r in valid if not label_of(r)]) if any(label_of(r) for r in valid) else None,
         "by_type": by_key(lambda r: r.get("glb_type")), "by_regime": by_key(lambda r: r.get("regime")),
@@ -2481,7 +2530,7 @@ def get_backtest_summary() -> dict:
                 "deal": r.get("deal"),                                  # 26.10.2026 (етап 4б, т. 1): цел на придобиване
                 "entry_volume_ratio": r.get("entry_volume_ratio"),      # 20.10.2026 (етап 3, т. 1): обемът на деня на входа
                 "fill_risk_pct": r.get("fill_risk_pct"), "fill_target_r": r.get("fill_target_r"),       # 06.11.2026 (т. 1): реалният риск при входа
-                "pre_reaction": r.get("pre_reaction"),                  # 06.11.2026 (т. 4)
+                "pre_reaction": r.get("pre_reaction"), "market_gap": r.get("market_gap"),                  # 06.11.2026 (т. 4)
                 # FIX 2026-08-13: entry_date филтърът е премахнат — единен
                 # recency праг за Case 1 И Case 2 (виж enrich.earnings_recap
                 # docstring-а, дискусията 2026-08-13).
@@ -2505,7 +2554,7 @@ def get_backtest_summary() -> dict:
     pending_positions = sorted(
         ({"ticker": r["ticker"], "entry_date": r["entry_date"], "buy_stop": r.get("buy_stop"),
           "max_chase": r.get("max_chase"), "valid_through": r.get("valid_through"),
-          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"), "spinoff_note": r.get("spinoff_note"), "pre_reaction": r.get("pre_reaction")}
+          "stop_loss": r.get("stop_loss"), "target_1": r.get("target_1"), "spinoff_note": r.get("spinoff_note"), "pre_reaction": r.get("pre_reaction"), "market_gap": r.get("market_gap")}
          for r in records if r.get("status") == "pending"),
         key=lambda r: r["entry_date"])
 
@@ -2543,7 +2592,7 @@ def get_backtest_summary() -> dict:
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "deal_closed": deal_closed_block(records),                        # 09.11.2026 (ROKU)
         "entry_volume": entry_volume_groups(records, stats_visible),      # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
-        "pre_reaction": pre_reaction_block(records, "realized_r"),        # 06.11.2026 (т. 4)
+        "pre_reaction": pre_reaction_block(records, "realized_r"), "market_gap": market_gap_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
 

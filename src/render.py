@@ -723,6 +723,19 @@ def novelty_row(screener: str, c: dict, today: str) -> dict:
             "earnings": (c.get("earnings_gate") or {}).get("text") if (c.get("earnings_gate") or {}).get("soon") else None}
 
 
+def market_gap_day(brief: dict | None) -> dict | None:
+    """
+    23.11.2026 (пакет 23.11, т. 4): денят е „ден на пазарен гап“ (карето в 15:05 — brief["preopen"]["market_gap"]) → {"text", "moves": {тикър: True — EP без собствена новина}};
+    иначе None. Сутрешната страница (07:30) още не знае — етикетът идва с обновяването в 15:05. Чиста функция.
+    """
+    mg = ((brief or {}).get("preopen") or {}).get("market_gap")
+    if not (isinstance(mg, dict) and mg.get("gap")):
+        return None
+    from src import market_gap
+    moves = {r.get("ticker"): True for r in ((brief.get("qm_ep") or {}).get("rows")) or [] if not market_gap.own_news(r)}
+    return {"text": mg.get("text"), "moves": moves}
+
+
 def cash_block(brief: dict | None) -> str | None:
     """23.11.2026 (пакет 23.11, т. 5): режим Cash → config.CASH_BLOCK_TEXT (картите и „Нови днес“ — без размер); иначе None. Чиста функция."""
     return config.CASH_BLOCK_TEXT if ((brief or {}).get("thermometer") or {}).get("regime") == "Cash" else None
@@ -744,6 +757,7 @@ def novelty_ctx(brief: dict) -> dict | None:
         n = nov.get(s) or {}
         by = {c.get("ticker"): c for c in cards[s] if c.get("novelty")}
         out[s] = {"label": novelty.LABELS[s], "tiles": [{**novelty_tile(s, by[t]), "cash": cash_block(brief)} for t in n.get("new") or [] if t in by],
+                  "market_gap": (market_gap_day(brief) or {}).get("text"),                       # 23.11.2026 (т. 4): новите сигнали от ден на пазарен гап
                   "old": [novelty_row(s, by[t], today) for t in n.get("old") or [] if t in by], "dropped": n.get("dropped") or []}
     return out
 
@@ -1054,7 +1068,8 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news_sources_alert=news_sources_alert(brief.get("news_window")),      # 18.11.2026 (спешно, т. 1): празен / паднал източник — червен ред
         news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),
         news_path=news_path_note(brief.get("news_diag")),                    # 23.11.2026 (т. 1): пътят на подбора
-        cash_block=cash_block(brief),                                        # 23.11.2026 (т. 5): режим Cash — картите без размер     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
+        cash_block=cash_block(brief),                                        # 23.11.2026 (т. 5): режим Cash — картите без размер
+        market_gap=market_gap_day(brief),                                    # 23.11.2026 (т. 4): ден на пазарен гап (след 15:05)     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)
         crypto=brief.get("crypto") or {},                              # 22.10.2026 (етап 4): крипто секцията

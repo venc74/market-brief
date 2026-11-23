@@ -541,10 +541,12 @@
     <li>{% if x.link %}<a href="{{ x.link }}" rel="noopener" target="_blank">„{{ x.title }}“</a>{% else %}„{{ x.title }}“{% endif %} <span class="small" style="color:var(--muted)">· {{ x.source }} · {{ x.time_ny }} Ню Йорк ({{ x.time_berlin }} Берлин)</span>{% if x.expectations %}<div class="small" style="font-size:12px">{{ x.expectations }}</div>{% endif %}</li>{% endfor %}</ul>{% endif %}
   {% if preopen.econ_error %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Заглавията за икономически данни не се провериха ({{ preopen.econ_error }}) — празното НЕ значи, че няма.</div>{% endif %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
+  {# 23.11.2026 (пакет 23.11, т. 4): ден на пазарен гап — гаповете без собствена новина / 8-K са „пазарен ход“ #}
+  {% if preopen.market_gap and preopen.market_gap.gap %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">⚠ {{ preopen.market_gap.text }} — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп ({{ preopen.market_moves or 0 }} от {{ preopen.gaps|length }}).</div>{% endif %}
   {# 06.11.2026 (пакет 05–06.11, т. 10): ≥ 3 гапа от една индустрия — qm_ep.sector_bounce #}
   {% for x in preopen.sector_bounce or [] %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">{{ x.text }}</div>{% endfor %}
   <ul style="margin:4px 0 10px;padding-left:18px">{% for g in preopen.gaps %}
-    <li><b class="mono">{{ g.ticker }}</b>{{ tn(g.ticker, g.company) }} {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
+    <li><b class="mono">{{ g.ticker }}</b>{{ tn(g.ticker, g.company) }}{% if g.market_move %} <span class="wt-mark" style="color:var(--yellow)">пазарен ход</span>{% endif %} {{ "%+.1f"|format(g.gap_pct) }}% (${{ "%.2f"|format(g.pm_price) }} в {{ g.pm_last_ny }} Ню Йорк; затваряне ${{ "%.2f"|format(g.prev_close) }}){% if g.pm_volume %} · обем в премаркета {{ "{:,.0f}".format(g.pm_volume).replace(",", " ") }}{% endif %}
       {% if g.ret63_pct is not none %}· {{ neglect_label(g.ret63_pct, g.neglect) }} (3 мес. {{ "%+.0f"|format(g.ret63_pct) }}%){% endif %}
       {% for f in g.filings_8k or [] %}<br><span class="small">{{ f.text }}</span>{% endfor %}
       {% for x in red_8k(g.filings_8k) %}<br><span class="small" style="color:var(--red);font-weight:600">{{ x }}</span>{% endfor %}
@@ -1039,13 +1041,16 @@
 {% macro backdated_note(p) %}{% if p.backdated and p.backdated.created %}<div style="font-size:11.5px;color:var(--muted);font-weight:400">записан със задна дата (след поправка {{ p.backdated.created[8:10] }}.{{ p.backdated.created[5:7] }})</div>{% endif %}{% endmacro %}
 {# 06.11.2026 (пакет 05–06.11, т. 4): нивата са от затварянето преди реакцията на отчета; статистиката — с и без (backtest.pre_reaction_block) #}
 {% macro pre_reaction_note(p) %}{% if p.pre_reaction %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">преди реакцията на отчета ({{ p.pre_reaction.date[8:10] }}.{{ p.pre_reaction.date[5:7] }}, {{ "след затварянето" if p.pre_reaction.when == "amc" else "преди отварянето" }})</div>{% endif %}{% endmacro %}
+{# 23.11.2026 (пакет 23.11, т. 4): записите от ден на пазарен гап — статистиката с и без тях (backtest.market_gap_block) #}
+{% macro market_gap_line(mg, unit) %}{% if mg %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Ден на пазарен гап ({{ mg.n }}): {% for x in mg.tickers %}<b>{{ x.ticker }}</b> {{ x.date[8:10] }}.{{ x.date[5:7] }}{% if x.nq is not none %} (NQ {{ "%+.1f"|format(x.nq) }}%){% endif %}{{ ", " if not loop.last else "" }}{% endfor %}{% if mg.n_all and mg.n_rest != mg.n_all %}. Среден резултат: с тях {{ "%+.2f"|format(mg.avg_all) }}{{ unit }} ({{ mg.n_all }}) · без тях {% if mg.avg_rest is not none %}{{ "%+.2f"|format(mg.avg_rest) }}{{ unit }} ({{ mg.n_rest }}){% else %}няма затворени{% endif %}{% else %}. Още без затворени резултати при тях{% endif %}.</div>{% endif %}{% endmacro %}
 {% macro pre_reaction_line(pr, unit) %}{% if pr %}<div class="small" style="font-size:12.5px;color:var(--muted);margin-top:6px">Преди реакцията на отчета ({{ pr.n }}): {% for x in pr.tickers %}<b>{{ x.ticker }}</b> {{ x.entry_date[8:10] }}.{{ x.entry_date[5:7] }}{{ ", " if not loop.last else "" }}{% endfor %}{% if pr.n_all and pr.n_rest != pr.n_all %}. Среден резултат: с тях {{ "%+.2f"|format(pr.avg_all) }}{{ unit }} ({{ pr.n_all }}) · без тях {% if pr.avg_rest is not none %}{{ "%+.2f"|format(pr.avg_rest) }}{{ unit }} ({{ pr.n_rest }}){% else %}няма затворени{% endif %}{% else %}. Още без затворени резултати при тях{% endif %}.</div>{% endif %}{% endmacro %}
-{% macro spinoff_note_html(p) %}{{ pre_reaction_note(p) }}{{ backdated_note(p) }}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
+{% macro spinoff_note_html(p) %}{% if p.market_gap %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">ден на пазарен гап ({{ p.market_gap.date[8:10] }}.{{ p.market_gap.date[5:7] }}{% if p.market_gap.nq is not none %}, NQ {{ "%+.1f"|format(p.market_gap.nq) }}%{% endif %})</div>{% endif %}{{ pre_reaction_note(p) }}{{ backdated_note(p) }}{% if p.spinoff_note %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">⚠ {{ p.spinoff_note.text }}</div>{% endif %}{% if p.deal %}<div style="font-size:11.5px;color:var(--yellow);font-weight:400">deal · цел на придобиване{% if p.deal.buyer %} ({{ p.deal.buyer }}{% if p.deal.announced %}, {{ p.deal.announced[8:10] }}.{{ p.deal.announced[5:7] }}.{{ p.deal.announced[:4] }}{% endif %}){% endif %} — резултатът следва условията на сделката</div>{% endif %}{% endmacro %}
 {% macro markers_html(markers) %}{% if markers %}<span class="markers">{% for m in markers %}<span class="marker" title="{{ m.title }}" tabindex="0" onclick="this.classList.toggle('open')">{{ m.tag }}<span class="marker-tip">{{ m.title }}</span></span>{% endfor %}</span>{% endif %}{% endmacro %}
 
 {# 20.11.2026 (пакет 20.11, т. 2): „Нови днес“ — еднаква плочка за всички скрийнъри; старите валидни — сгънати, по един ред #}
 {% macro novelty_block(nb) %}{% if nb %}
   <div class="cs-sub">Нови днес · {{ nb.label }} · {{ nb.tiles|length }}</div>
+  {% if nb.market_gap %}<div class="small" style="font-size:12px;color:var(--yellow);margin:0 0 6px">⚠ {{ nb.market_gap }} — новите сигнали от днес може да са пазарният ход, не сетъпът</div>{% endif %}
   {% if nb.tiles %}<div class="nov-grid">{% for t in nb.tiles %}<div class="nov-tile">
     <div><b>{{ t.ticker }}</b>{% if t.name %} · {{ t.name }}{% endif %} <span class="wt-mark">{{ t.screener }}</span>{% if t.tier %} <span class="wt-mark" style="{{ 'color:var(--yellow)' if t.tier == 'Тренд без ръст' else '' }}">ниво: {{ t.tier }}</span>{% endif %}</div>
     <div class="nov-label">{{ t.label }}{% if t.status and t.label == 'нов днес' %} · {{ t.status }}{% endif %}</div>
@@ -1457,6 +1462,7 @@
   {{ fill_risk_line(backtest.fill_risk) }}
   {{ deal_closed_line(backtest.deal_closed) }}
   {{ pre_reaction_line(backtest.pre_reaction, "R") }}
+  {{ market_gap_line(backtest.market_gap, "R") }}
   {{ entry_vol_line(backtest.entry_volume) }}
   {{ events_line(backtest.events, "R") }}
   {% if backtest.open_positions %}
@@ -1540,6 +1546,7 @@
   {{ fill_risk_line(bs.fill_risk) }}
   {{ deal_closed_line(bs.deal_closed) }}
   {{ pre_reaction_line(bs.pre_reaction, "R") }}
+  {{ market_gap_line(bs.market_gap, "R") }}
   {{ entry_vol_line(bs.entry_volume) }}
   {{ events_line(bs.events, "R") }}
   {% if bs.live %}
@@ -1669,6 +1676,7 @@
     · пропуснати (гап/стоп над границите) {{ qb.skipped }}{% endif %}{% if qb.also_action %} · и в Action: {{ qb.also_action }}{% endif %}{% if qb.also_buystop %} · и в buy-stop: {{ qb.also_buystop }}{% endif %}{% if qb.tight_risk %} · <span style="color:var(--yellow)">с риск на входа под {{ qb.tight_risk_adr }}×ADR: {{ qb.tight_risk }} (R от пода)</span>{% endif %}<br>
     {% if qb.closed %}Затворени: {{ qb.closed }} · среден R: {% if not qb.get("closed_bounds") and qb.get("closed_5m") %}<b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (5-минутни бари){% else %}<b>{{ "%+.2f"|format(qb.avg_realized_r) }}</b> (opt) / <b>{{ "%+.2f"|format(qb.avg_realized_r_pess) }}</b> (pess){% if qb.get("closed_5m") %} — {{ qb.closed_5m }} от {{ qb.closed }} с 5-минутни бари (там opt = pess), {{ qb.closed_bounds }} с двете граници{% endif %}{% endif %}{% if qb.avg_return_pct is not none %} · средна доходност на сделка {{ "%+.2f"|format(qb.avg_return_pct) }}% / {{ "%+.2f"|format(qb.avg_return_pct_pess) }}%{% endif %}<br>{% endif %}
     {{ pre_reaction_line(qb.pre_reaction, "R") }}
+    {{ market_gap_line(qb.market_gap, "R") }}
     {{ events_line(qb.events, "R (opt)") }}
     {% if qb.stats_visible %}
     <b>Win rate: {{ qb.win_rate_pct }}%</b> opt / {{ qb.win_rate_pess_pct }}% pess ({{ qb.wins }} win / {{ qb.losses }} loss; 95% интервал {{ qb.win_ci_pct[0] }}–{{ qb.win_ci_pct[1] }}%)
@@ -1734,6 +1742,7 @@
     стоп лимитът е информация (най-много {{ qm_ep_stop_adr|round|int }}×ADR под after-hours цената). <b>Обемът в after-hours не е наличен в безплатния източник</b> — гапът не е потвърден до отварянето.
   </div>
   {% for x in qm_ep.sector_bounce or [] %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">{{ x.text }}</div>{% endfor %}
+  {% if market_gap %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">⚠ {{ market_gap.text }} — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп{% if market_gap.moves %}: {{ market_gap.moves|list|join(", ") }}{% endif %}.</div>{% endif %}
   {% if nov %}{{ novelty_block(nov.ep) }}{% endif %}
   {% if qm_ep.ok is sameas false and not qm_ep.rows %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
@@ -1748,7 +1757,7 @@
           <td class="sym">{{ r.ticker }}{% if r.ticker in our_qm %}{{ markers_html([{"tag": "QM✓", "title": "Тикърът е и в Action/Watchlist на днешния бриф."}]) }}{% endif %}{% set cn = r.company|cname_t(r.ticker, 28) %}{% if cn %}<div class="qm-sm" style="font-family:inherit;font-weight:400">{{ cn }}</div>{% endif %}</td>
           <td class="n">+{{ "%.1f"|format(r.gap_pct) }}%<div class="qm-sm">${{ "%.2f"|format(r.prev_close) }} → ${{ "%.2f"|format(r.ah_price) }}</div></td>
           <td>{% if r.headlines %}{{ r.headlines[0].title }}{% else %}<span style="color:var(--muted)">не е намерено заглавие</span>{% endif %}
-            <div class="qm-ep-hl">{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: няма данни за обема</span>{% endif %}</div>
+            <div class="qm-ep-hl">{% if market_gap and market_gap.moves.get(r.ticker) %}<span style="color:var(--yellow)">пазарен ход</span> · {% endif %}{{ r.catalyst_label or "Неясен катализатор" }}{% if r.surprise == 'yes' %} · изненада{% elif r.surprise == 'no' %} · не е изненада{% endif %}{% if not r.ah_volume_available %} · <span style="color:var(--yellow)">⚠ обем в AH: няма данни за обема</span>{% endif %}</div>
             {% if r.summary_bg %}<div class="qm-ep-sum">{{ r.summary_bg }}</div>{% endif %}
             {% if r.earnings_text %}<div class="qm-sm" style="font-family:inherit;font-weight:600">{{ r.earnings_text }}</div>{% endif %}{# 17.11.2026 (т. 6): 8-K т. 2.02 — отчет + изненадата в EPS #}
             {# 10.11.2026 (т. 1, AAON 09.11): 8-K т. 4.02 — отделно червено, не само в списъка с точки #}
@@ -1931,6 +1940,7 @@
     {% set hmin = gw.horizon_min_n if gw.horizon_min_n is defined else 1 %}
     {% for h, x in gw.horizons.items() %}<b>{{ h }} сесии</b> — {% if x.n_exec and x.n_exec >= hmin %}{{ "%+.2f"|format(x.avg_ret_exec) }}%{% if x.avg_spy_exec is not none %} (SPY {{ "%+.2f"|format(x.avg_spy_exec) }}%, алфа {{ "%+.2f"|format(x.avg_alpha_exec) }}%){% endif %}, {{ x.n_exec }} записа{% elif x.n_exec %}малко данни ({{ x.n_exec }}){% elif x.n %}{{ x.n }} записа без exec данни{% else %}още няма записи с толкова сесии{% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.
     {{ pre_reaction_line(gw.pre_reaction, "%") }}
+    {{ market_gap_line(gw.market_gap, "%") }}
     {{ events_line(gw.events, "доходност % (exec)" if gw.events and gw.events.value == "return_pct_exec" else "доходност %") }}
     <br>По наш етикет (записани / с {{ gw.compare_horizon }} сесии след входа{% if gw.horizons_visible %}, средна доходност exec за {{ gw.compare_horizon }} сесии{% endif %}):
     {% for name, g in gw.by_type.items() %}{{ name }} {{ g.records }} / {{ g.n }}{% if gw.horizons_visible and g.avg_ret_exec is not none %} ({{ "%+.2f"|format(g.avg_ret_exec) }}%){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}

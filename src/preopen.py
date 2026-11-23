@@ -774,7 +774,9 @@ def email_html(res: dict) -> str:
     if res.get("gaps"):
         parts.append("<div style='margin-top:10px'><b>EP — гапове ≥ +%g%% в премаркета</b></div>" % config.PREOPEN_GAP_PCT)
         parts += [f"<div style='margin:4px 0;color:#92400e'>{e(x['text'])}</div>" for x in res.get("sector_bounce") or []]      # 06.11.2026 (т. 10)
-        parts.append(li([f"<b>{e(g['ticker'])}</b> {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
+        if (res.get("market_gap") or {}).get("gap"):                                # 23.11.2026 (пакет 23.11, т. 4): ден на пазарен гап
+            parts.append(f"<div style='margin:4px 0;color:#92400e'><b>⚠ {e(res['market_gap']['text'])}</b> — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп.</div>")
+        parts.append(li([f"<b>{e(g['ticker'])}</b>" + (" <span style='color:#92400e'>(пазарен ход)</span>" if g.get("market_move") else "") + f" {g['gap_pct']:+.1f}% (${g['pm_price']:.2f}; затваряне ${g['prev_close']:.2f})"
                          + (f" · обем в премаркета {g['pm_volume']:,.0f}".replace(",", " ") if g.get("pm_volume") else "")
                          + (f" · {neglect_label(g['ret63_pct'], g.get('neglect'))} (3 мес. {g['ret63_pct']:+.0f}%)" if g.get("ret63_pct") is not None else "")      # 11.11.2026 (т. 3)
                          + "".join(f"<br><span style='color:#374151'>{e(f['text'])}</span>" for f in g.get("filings_8k") or [])
@@ -920,6 +922,14 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         except Exception as e:
             res["market"] = {"error": type(e).__name__, "text": [f"Фючърсите и големите компании не се провериха ({type(e).__name__})."]}
             print(f"[preopen] пазарът преди отварянето: {type(e).__name__}: {e}")
+    try:                                                                               # 23.11.2026 (пакет 23.11, т. 4): ден на пазарен гап — гаповете без собствена новина
+        from src import market_gap
+        res["market_gap"] = market_gap.classify((res.get("market") or {}).get("futures"))
+        res["market_moves"] = market_gap.mark_rows(res.get("gaps"), res["market_gap"]) + market_gap.mark_rows(res.get("ep_morning"), res["market_gap"])
+        if (res["market_gap"] or {}).get("gap"):
+            print(f"[preopen] {res['market_gap']['text']} — пазарен ход: {res['market_moves']} гапа без собствена новина")
+    except Exception as e:
+        print(f"[preopen] денят на пазарен гап: {type(e).__name__}: {e}")
     res["seconds"] = round(time.monotonic() - t0, 1)
     if (res.get("coverage") or {}).get("partial"):
         print(f"::warning::[preopen] частично: {res['coverage']['reason']}")

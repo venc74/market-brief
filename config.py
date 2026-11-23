@@ -1219,6 +1219,9 @@ EVENT_VOL_AVG_SESSIONS = 50
 EVENT_NEWS_DAYS_BEFORE = 2
 EVENT_NEWS_DAYS_AFTER = 1
 GLB_WISH_COMPARE_HORIZON = 20
+# 23.11.2026 (пакет 23.11, т. 4): ден на пазарен гап (src/market_gap.py) — фючърсите в карето преди отварянето (08:55 Ню Йорк) спрямо 16:00 на предишната сесия; 23.11: NQ +5.08%, ES +3.40%
+MARKET_GAP_NQ_PCT = float(os.getenv("MARKET_GAP_NQ_PCT", 3.0))
+MARKET_GAP_ES_PCT = float(os.getenv("MARKET_GAP_ES_PCT", 2.0))
 # 23.11.2026 (пакет 23.11, т. 9): доходността N сесии след входа — без записите от сделки (цел на придобиване / приключила; 23.11: 20 сесии = +5.52%, алфа +15.02% от ЕДИН запис —
 # CART, сделка) и средната — само при толкова записа exec; иначе „малко данни (N)“
 GLB_WISH_HORIZON_MIN_N = int(os.getenv("GLB_WISH_HORIZON_MIN_N", 5))
