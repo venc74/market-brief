@@ -51,7 +51,29 @@ _PLACES = {
     "SEPTEMBER": r"септември", "OCTOBER": r"октомври", "NOVEMBER": r"ноември", "DECEMBER": r"декември", "EXCLUSIVE": r"ЕКСКЛУЗИВНО|Ексклузивно|EXCLUSIVE|ексклузив",
     "BREAKINGVIEWS": r"Breakingviews", "INSTANT": r"Instant|Мигновен|Бърз", "VIEW": r"View|поглед|коментар", "TRADING": r"Trading|Търгов", "DAY": r"Day|ден", "LIVE": r"на живо|Live",
     "UPDATES": r"актуализ|Updates|новини", "TAKEAWAYS": r"извод|изводи|Takeaways|акцент", "ATTORNEY": r"прокурор|Attorney", "GENERAL": r"главн|General",
+    # 23.11.2026 (пакет 23.11, т. 7): преведените имена на места — 23.11 „Hong Kong pushes to bring crypto custodians …“ → „Хонконг …“ беше отхвърлен („липсва: KONG“).
+    # Списъкът — географските имена в 1378-те заглавия от историята на брифовете, които ги нямаше тук (по честота: Strait 33, Mideast 13, Iranian 13, Hong Kong 9, Korean 7, …)
+    "HONG": r"Хонконг|Хонг", "KONG": r"Хонконг|Конг", "STRAIT": r"проток|Strait", "MIDEAST": r"Близкия изток|Близкия Изток|Близкоизточ", "IRANIAN": r"иранск|Иран",
+    "KOREAN": r"корейск|Коре", "VENEZUELA": r"Венецуел", "VENEZUELAN": r"венецуелск|Венецуел", "QATAR": r"Катар", "QATARI": r"катарск|Катар", "TEHRAN": r"Техеран",
+    "SINGAPORE": r"Сингапур", "OMAN": r"Оман", "INDONESIA": r"Индонези", "INDONESIAN": r"индонезийск|Индонези", "BAHRAIN": r"Бахрейн", "MYANMAR": r"Мианмар", "IRAQ": r"Ирак",
+    "IRAQI": r"иракск|Ирак", "SEOUL": r"Сеул", "CARACAS": r"Каракас", "ARCTIC": r"Арктик|арктическ", "ENGLAND": r"Англи", "RWANDA": r"Руанд", "GREENLAND": r"Гренланд",
+    "CANADIAN": r"канадск|Канад", "ALASKA": r"Аляск", "BRAZILIAN": r"бразилск|Бразили", "ARABIAN": r"арабск|Араби", "ARAB": r"арабск|Араб", "KHARG": r"Харг", "QESHM": r"Кешм",
+    "ISLAND": r"остров", "THAILAND": r"Тайланд", "VIETNAM": r"Виетнам", "POLAND": r"Полш", "FINLAND": r"Финланди", "PORTUGAL": r"Португали", "GEORGIA": r"Джорджи|Грузи",
+    "TURKEY": r"Турци", "TURKISH": r"турск|Турци", "BANGLADESH": r"Бангладеш", "AUSTRALIA": r"Австрали", "AUSTRALIAN": r"австралийск|Австрали", "AFRICA": r"Африк",
+    "AFRICAN": r"африканск|Африк", "SPANISH": r"испанск|Испани", "ITALIAN": r"италиански|Итали", "SWISS": r"швейцарск|Швейцари", "SWITZERLAND": r"Швейцари",
+    "DUTCH": r"нидерландск|холандск|Нидерланд|Холанди", "NETHERLANDS": r"Нидерланд|Холанди", "ISRAELI": r"израелск|Израел", "PALESTINIAN": r"палестинск|Палестин",
+    "GAZA": r"Газа", "LEBANON": r"Ливан", "SYRIA": r"Сири", "EGYPT": r"Египет", "NIGERIA": r"Нигери", "PAKISTAN": r"Пакистан", "PHILIPPINES": r"Филипин", "MALAYSIA": r"Малайзи",
+    "ARGENTINA": r"Аржентин", "CHILE": r"Чили", "PERU": r"Перу", "COLOMBIA": r"Колумби", "CUBA": r"Куба", "PANAMA": r"Панам", "UAE": r"ОАЕ|Емирства|UAE", "DUBAI": r"Дубай",
+    "EMIRATES": r"Емирства|ОАЕ", "KYIV": r"Киев", "KIEV": r"Киев", "MUMBAI": r"Мумбай", "DELHI": r"Делхи", "SHANGHAI": r"Шанха", "SHENZHEN": r"Шънджън|Шенжен|Шенджън",
+    "HONG-KONG": r"Хонконг", "TAIWANESE": r"тайвански|Тайван", "INDIAN": r"индийск|Инди", "MEXICAN": r"мексиканск|Мексик", "UKRAINIAN": r"украинск|Украйн",
+    "BRUSSELS": r"Брюксел", "FRANKFURT": r"Франкфурт", "ZURICH": r"Цюрих", "GENEVA": r"Женев", "VIENNA": r"Виена", "ROME": r"Рим", "MADRID": r"Мадрид", "MILAN": r"Милано",
+    "SYDNEY": r"Сидни", "TORONTO": r"Торонто", "OTTAWA": r"Отава", "ISTANBUL": r"Истанбул", "ANKARA": r"Анкара", "JERUSALEM": r"Йерусалим", "DAVOS": r"Давос",
+    "FLORIDA": r"Флорид", "OHIO": r"Охайо", "ILLINOIS": r"Илинойс", "WISCONSIN": r"Уисконсин", "MICHIGAN": r"Мичиган", "PENNSYLVANIA": r"Пенсилвани", "ARIZONA": r"Аризон",
+    "NEVADA": r"Невада", "VIRGINIA": r"Вирджини", "CAROLINA": r"Каролин", "DELAWARE": r"Делауеър|Делауер", "MASSACHUSETTS": r"Масачузетс", "IOWA": r"Айова",
+    "DETROIT": r"Детройт", "CHINA'S": r"Кита|китайск", "EASTERN": r"източн|Изток", "WESTERN": r"западн|Запад", "PROVINCE": r"провинци", "EUROPEANS": r"европейци|Европ",
 }
+# 23.11.2026 (т. 7): съставно име с тире („U.S.-Iran“ 20 пъти, „Saudi-led“, „US-backed“) — всяка част е в превода (или е място от _PLACES); тези наставки не са имена
+_HYPHEN_SUFFIX = {"LED", "BACKED", "LINKED", "DRIVEN", "RELATED", "HOSTED", "BLACKLISTED", "STYLE", "BASED", "OWNED", "BOUND", "WIDE"}
 
 
 def _num_value(tok: str, bg: bool) -> float | None:
@@ -149,6 +171,9 @@ def problems(orig: str, bg: str | None, caps: set | None = None, must: list | No
             continue
         rx = _PLACES.get(n)
         if rx and re.search(rx, bg, re.I):
+            continue
+        parts = [x.strip(".") for x in n.split("-") if x.strip(".")]
+        if len(parts) > 1 and all(x in _HYPHEN_SUFFIX or x.replace("'", "").lower() in low or (_PLACES.get(x) and re.search(_PLACES[x], bg, re.I)) for x in parts):
             continue
         miss.append(n)
     for w in must or []:

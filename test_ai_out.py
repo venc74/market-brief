@@ -68,6 +68,16 @@ assert tr.problems("Singapore settles $77.5M tokenized bill sale with wholesale 
 assert tr.numbers("3M beats estimates") == [] and tr.numbers("Iran sells oil as 40M barrels exported") == []     # СИНТЕТИЧНО: суфикс без валута — без проверка
 print(f"  ✓ {len(OK2)} от {len(OK2)} приети; „$6 млрд“ за $6.3bn → липсва 6.3; без „млрд“ → липсва billion; млрд вместо млн → липсва million")
 
+print("── 2в. РЕАЛНО (23.11): преведените места — „Hong Kong“ → „Хонконг“ (до 23.11: „липсва: KONG“) ──")
+HK = "Hong Kong pushes to bring crypto custodians, advisers under licensing rules"                       # крипто, 23.11 (Cointelegraph)
+HK_BG = "Хонконг се стреми да постави крипто попечителите и съветниците под лицензионни правила"         # РЕАЛНИЯТ превод от 23.11 (translation_rejected в брифа)
+assert tr.problems(HK, HK_BG, CAPS) == []
+assert tr.problems(HK, "Сингапур се стреми да постави крипто попечителите", CAPS) == ["HONG", "KONG"]     # СИНТЕТИЧНО: друго място → отхвърлен
+assert tr.problems("U.S.-Iran talks stall", "Преговорите между САЩ и Иран засядат", {"U.S.-IRAN"}) == []          # СИНТЕТИЧНО: съставно име
+assert tr.problems("U.S.-Iran talks stall", "Преговорите между САЩ засядат", {"U.S.-IRAN"}) == ["U.S.-IRAN"]
+assert tr.problems("Saudi-led group weighs output", "Водената от Саудитска Арабия група обмисля добива", {"SAUDI-LED"}) == []
+print("  ✓ Хонконг — приет; друго място — отхвърлен; „U.S.-Iran“ — по части")
+
 print("── 3. новините без AI „защо“: подборът по индекс, преводът, нашите тикъри (СИНТЕТИЧНИ отговори на AI) ──")
 pool_titles = [p[2] for p in FX["pool"]]
 raw = [{"source": p[0], "published": p[1], "title": p[2], "summary": ""} for p in FX["pool"]]
