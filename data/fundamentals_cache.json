@@ -1,38 +1,7 @@
 {
  "version": 1,
- "saved": "2026-11-20",
+ "saved": "2026-11-23",
  "tickers": {
-  "A": {
-   "fetched": "2026-11-11",
-   "next_report": "2026-11-23",
-   "info": {
-    "marketCap": 50156081152,
-    "sharesOutstanding": 281965813,
-    "currentPrice": 177.88,
-    "regularMarketPrice": 177.88,
-    "earningsQuarterlyGrowth": 0.077,
-    "revenueGrowth": 0.081,
-    "returnOnEquity": 0.20971,
-    "longName": "Agilent Technologies, Inc.",
-    "sector": "Healthcare",
-    "industry": "Diagnostics & Research",
-    "longBusinessSummary": "Agilent Technologies, Inc. provides application focused solutions to the life sciences, diagnostics, and applied chemical markets worldwide. The company operates through three segments: Life Sciences and Diagnostics Markets, Agilent CrossLab, and Applied Markets. The Life Sciences and Diagnostics Markets segment offers liquid chromatography systems and components; and liquid chromatography mass spectrometry systems. This segment is also involved in the genomics, contract development and manufacturing organization, pathology, companion diagnostics, and biomolecular analysis businesses. The Agilent CrossLab segment provides various services, including repairs, parts, maintenance, installations, training, compliance support, software as a service, asset management, consulting, and other custom services. This segment also offers consumables, including gas chromatography and liquid chromatography columns, sample preparation products, custom chemistries, and various laboratory supplies; software and informatics solutions comprising software for instrument control, data acquisition, data analysis, secure storage of results, and laboratory information and workflow management; and OpenLab laboratory software, an open software platform that enables customers to capture, analyze, and share scientific data throughout the lab and across the enterprise. In addition, it provides automated sample preparation solutions, such as liquid handling, plate management, consumables, and scheduling software. The Applied Markets segment offers products in the areas of gas chromatography, mass spectrometry, spectroscopy, vacuum technology, and remarketed instruments. It markets its products through direct sales, distributors, resellers, manufacturer's representatives, and electronic commerce. Agilent Technologies, Inc. was incorporated in 1999 and is headquartered in Santa Clara, California.",
-    "trailingPE": 35.084812,
-    "forwardPE": 26.472366,
-    "trailingEps": 5.07,
-    "forwardEps": 6.71946,
-    "debtToEquity": 56.336,
-    "heldPercentInstitutions": 0.95268995,
-    "targetMeanPrice": 182.05,
-    "shortPercentOfFloat": 0.020299999,
-    "sharesShort": 5025670,
-    "shortRatio": 2.03,
-    "earningsTimestamp": 1795467600,
-    "earningsTimestampStart": 1795467600,
-    "earningsTimestampEnd": 1795467600,
-    "isEarningsDateEstimate": false
-   }
-  },
   "AAPL": {
    "fetched": "2026-11-12",
    "next_report": "2027-01-28",
@@ -1290,6 +1259,37 @@
     "earningsTimestamp": 1793653200,
     "earningsTimestampStart": 1801602000,
     "earningsTimestampEnd": 1801602000,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "WMG": {
+   "fetched": "2026-11-23",
+   "next_report": "2027-02-04",
+   "info": {
+    "marketCap": 17211260928,
+    "sharesOutstanding": 150636208,
+    "currentPrice": 32.72,
+    "regularMarketPrice": 32.72,
+    "earningsQuarterlyGrowth": 0.633,
+    "revenueGrowth": 0.071,
+    "returnOnEquity": 0.76364,
+    "longName": "Warner Music Group Corp.",
+    "sector": "Communication Services",
+    "industry": "Entertainment",
+    "longBusinessSummary": "Warner Music Group Corp. operates as a music entertainment company in the United States, the United Kingdom, and internationally. It operates through Recorded Music and Music Publishing segments. The company is involved in the discovery and development of recording artists, as well as related marketing, promotion, distribution, sale, and licensing of music created by recording artists; markets its music catalog through compilations and reissuances of previously released music and video titles, as well as previously unreleased materials. It also owns and acquires rights to approximately two million musical compositions comprising pop hits, American standards, folk songs, and motion picture and theatrical compositions, as well as administers the music and soundtracks of various third-party television and film producers and studios. In addition, the company conducts its operation primarily through a collection of record labels, such as Asylum, Big Beat, Canvasback, East West, Erato, FFRR, Nonesuch, Parlophone, Reprise, Sire, Spinnin' Records, and Warner Classics and Warner Records Nashville. Further, it markets, distributes, and sells music and video products to retailers and wholesale distributors; independent labels to retail and wholesale distributors; and various distribution centers and ventures, as well as retail outlets, online physical retailers, streaming services, and download services. Its catalog includes songwriters and composers; and various genres, including pop, rock, jazz, classical, country, R&B, hip-hop, rap, reggae, Latin, folk, alternative, blues, gospel, and other Christian music. The company was founded in 1929 and is headquartered in New York, New York.",
+    "trailingPE": 26.176,
+    "forwardPE": 16.59162,
+    "trailingEps": 1.25,
+    "forwardEps": 1.97208,
+    "debtToEquity": 420.291,
+    "heldPercentInstitutions": 1.06186,
+    "targetMeanPrice": 39.47059,
+    "shortPercentOfFloat": 0.0625,
+    "sharesShort": 7332500,
+    "shortRatio": 3.17,
+    "earningsTimestamp": 1795095000,
+    "earningsTimestampStart": 1801747800,
+    "earningsTimestampEnd": 1801747800,
     "isEarningsDateEstimate": true
    }
   }

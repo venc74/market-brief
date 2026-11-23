@@ -1,26 +1,12 @@
 {
  "version": 1,
  "docs": {
-  "0001104659-26-125977": {
-   "ticker": "GWW",
-   "date": "2026-11-12",
-   "kind": "дълг",
-   "title": null,
-   "preliminary": true
-  },
   "0001193125-26-461405": {
    "ticker": "KDP",
    "date": "2026-11-16",
    "kind": "акции",
    "title": "57,971,015 Shares Common Stock",
    "preliminary": false
-  },
-  "0001193125-26-457001": {
-   "ticker": "KDP",
-   "date": "2026-11-12",
-   "kind": "акции",
-   "title": "$2,000,000,000 Common Stock",
-   "preliminary": true
   },
   "0001193125-26-465047": {
    "ticker": "BRK-B",

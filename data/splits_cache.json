@@ -1,405 +1,100 @@
 {
- "date": "2026-11-20",
- "rows": [
-  {
-   "ticker": "EMBJ",
-   "company": "Embraer S.A.",
-   "date": "2026-11-16",
-   "ratio": "4:1",
-   "split_type": "normal",
-   "date_human": "Nov 16, 2026",
-   "price": 18.37,
-   "market_cap": 13076375397.564146
-  },
-  {
-   "ticker": "SENEA",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026",
-   "price": 34.57,
-   "market_cap": 1168431246.8353653
-  },
-  {
-   "ticker": "SENEB",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026",
-   "price": 35.25,
-   "market_cap": 1191414573.75
-  },
-  {
-   "ticker": "SNDK",
-   "company": "Sandisk Corporation",
-   "date": "2026-11-20",
-   "ratio": "8:1",
-   "split_type": "normal",
-   "date_human": "Nov 20, 2026",
-   "price": 94.39,
-   "market_cap": 13431404131.51905
-  }
- ],
+ "date": "2026-11-23",
+ "rows": [],
  "horizon": [
   {
-   "ticker": "AOHY",
-   "company": "Angel Oak High Yield Opportunities ETF",
-   "date": "2026-11-16",
+   "ticker": "RIME",
+   "company": "Algorhythm Holdings, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:10",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "AEI",
+   "company": "Alset Inc.",
+   "date": "2026-11-23",
    "ratio": "1:5",
    "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
+   "date_human": "Nov 23, 2026"
   },
   {
-   "ticker": "CARY",
-   "company": "Angel Oak Income ETF",
-   "date": "2026-11-16",
-   "ratio": "1:3",
+   "ticker": "AUUD",
+   "company": "Auddia Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:14",
    "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
+   "date_human": "Nov 23, 2026"
   },
   {
-   "ticker": "MBS",
-   "company": "Angel Oak Mortgage-Backed Securities ETF",
-   "date": "2026-11-16",
-   "ratio": "1:7",
+   "ticker": "BRNX",
+   "company": "BrenX Ltd.",
+   "date": "2026-11-23",
+   "ratio": "1:4",
    "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
+   "date_human": "Nov 23, 2026"
   },
   {
-   "ticker": "DFSC",
-   "company": "DEFSEC Technologies Inc.",
-   "date": "2026-11-16",
-   "ratio": "1:9",
-   "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "EMBJ",
-   "company": "Embraer S.A.",
-   "date": "2026-11-16",
-   "ratio": "4:1",
-   "split_type": "normal",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "NCT",
-   "company": "Intercont (Cayman) Limited",
-   "date": "2026-11-16",
-   "ratio": "1:8",
-   "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "KALA",
-   "company": "KALA BIO, Inc.",
-   "date": "2026-11-16",
+   "ticker": "CYAB",
+   "company": "Cyabra, Inc.",
+   "date": "2026-11-23",
    "ratio": "1:30",
    "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
+   "date_human": "Nov 23, 2026"
   },
   {
-   "ticker": "SGRX",
-   "company": "SANGRIX INC.",
-   "date": "2026-11-16",
-   "ratio": "1:8",
+   "ticker": "IMCC",
+   "company": "IM Cannabis Corp.",
+   "date": "2026-11-23",
+   "ratio": "1:3",
    "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "TGL",
-   "company": "Treasure Global Inc.",
-   "date": "2026-11-16",
-   "ratio": "1:24",
-   "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "YMT",
-   "company": "Yimutian Inc.",
-   "date": "2026-11-16",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 16, 2026"
-  },
-  {
-   "ticker": "EDBL",
-   "company": "Edible Garden AG Incorporated",
-   "date": "2026-11-17",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "FCDH",
-   "company": "Forcendra Holding Limited",
-   "date": "2026-11-17",
-   "ratio": "1:5",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "LOBO",
-   "company": "LOBO TECHNOLOGIES LTD.",
-   "date": "2026-11-17",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "MOBX",
-   "company": "Mobix Labs, Inc.",
-   "date": "2026-11-17",
-   "ratio": "1:7",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "RCT",
-   "company": "RedCloud Holdings plc",
-   "date": "2026-11-17",
-   "ratio": "1:100",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "SLQT",
-   "company": "SelectQuote, Inc.",
-   "date": "2026-11-17",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "SENEA",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "SENEB",
-   "company": "Seneca Foods Corp.",
-   "date": "2026-11-17",
-   "ratio": "5:1",
-   "split_type": "normal",
-   "date_human": "Nov 17, 2026"
-  },
-  {
-   "ticker": "MKDW",
-   "company": "MKDWELL Tech Inc.",
-   "date": "2026-11-18",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 18, 2026"
-  },
-  {
-   "ticker": "SPWR",
-   "company": "SunPower Inc.",
-   "date": "2026-11-18",
-   "ratio": "1:35",
-   "split_type": "reverse",
-   "date_human": "Nov 18, 2026"
-  },
-  {
-   "ticker": "BITO",
-   "company": "ProShares Bitcoin ETF",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "BITI",
-   "company": "ProShares Short Bitcoin ETF",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "RWM",
-   "company": "ProShares Short Russell2000",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "VIXM",
-   "company": "ProShares Trust VIX Mid-Term Futures ETF",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "UBT",
-   "company": "ProShares Ultra 20  Year Treasury",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "EET",
-   "company": "ProShares Ultra MSCI Emerging Markets",
-   "date": "2026-11-19",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "BIB",
-   "company": "ProShares Ultra Nasdaq Biotechnology",
-   "date": "2026-11-19",
-   "ratio": "2:1",
-   "split_type": "normal",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "ROM",
-   "company": "ProShares Ultra Technology",
-   "date": "2026-11-19",
-   "ratio": "3:1",
-   "split_type": "normal",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "DXD",
-   "company": "ProShares UltraShort Dow30",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "DUG",
-   "company": "ProShares UltraShort Energy",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "MZZ",
-   "company": "ProShares UltraShort MidCap400",
-   "date": "2026-11-19",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "QID",
-   "company": "ProShares UltraShort QQQ",
-   "date": "2026-11-19",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "SSG",
-   "company": "ProShares UltraShort Semiconductors",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "REW",
-   "company": "ProShares UltraShort Technology",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "SCNI",
-   "company": "Scinai Immunotherapeutics Ltd.",
-   "date": "2026-11-19",
-   "ratio": "1:4",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "SNTI",
-   "company": "Senti Biosciences Holdings, Inc.",
-   "date": "2026-11-19",
-   "ratio": "1:33",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "SOS",
-   "company": "SOS Limited",
-   "date": "2026-11-19",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "SMDD",
-   "company": "UltraPro Short MidCap400",
-   "date": "2026-11-19",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "YFOR",
-   "company": "YYForce Inc.",
-   "date": "2026-11-19",
-   "ratio": "1:50",
-   "split_type": "reverse",
-   "date_human": "Nov 19, 2026"
-  },
-  {
-   "ticker": "LICN",
-   "company": "Lichen International Limited",
-   "date": "2026-11-20",
-   "ratio": "1:100",
-   "split_type": "reverse",
-   "date_human": "Nov 20, 2026"
-  },
-  {
-   "ticker": "NTCL",
-   "company": "NETCLASS TECHNOLOGY INC",
-   "date": "2026-11-20",
-   "ratio": "1:10",
-   "split_type": "reverse",
-   "date_human": "Nov 20, 2026"
-  },
-  {
-   "ticker": "NIXX",
-   "company": "Nixxy, Inc.",
-   "date": "2026-11-20",
-   "ratio": "1:20",
-   "split_type": "reverse",
-   "date_human": "Nov 20, 2026"
-  },
-  {
-   "ticker": "SNDK",
-   "company": "Sandisk Corporation",
-   "date": "2026-11-20",
-   "ratio": "8:1",
-   "split_type": "normal",
-   "date_human": "Nov 20, 2026"
-  },
-  {
-   "ticker": "VABK",
-   "company": "Virginia National Bankshares Corporation",
-   "date": "2026-11-20",
-   "ratio": "8%",
-   "split_type": null,
-   "date_human": "Nov 20, 2026"
+   "date_human": "Nov 23, 2026"
   },
   {
    "ticker": "ITP",
    "company": "IT Tech Packaging, Inc.",
    "date": "2026-11-23",
    "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "LSTA",
+   "company": "Lisata Therapeutics, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "PARA",
+   "company": "Parabolic Technologies, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:100",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "RLYB",
+   "company": "Rallybio Corporation",
+   "date": "2026-11-23",
+   "ratio": "1:2",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "SMTK",
+   "company": "SmartKem, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "SRTM",
+   "company": "Stratum Holdings Corp.",
+   "date": "2026-11-23",
+   "ratio": "1:9",
    "split_type": "reverse",
    "date_human": "Nov 23, 2026"
   },
@@ -519,57 +214,28 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 59,
-  "horizon_from": "2026-11-16",
+  "source_rows": 26,
+  "horizon_from": "2026-11-23",
   "horizon_to": "2026-12-09",
-  "in_week": 44,
+  "in_week": 12,
   "dropped_price": [
-   "DFSC",
-   "NCT",
-   "KALA",
-   "SGRX",
-   "TGL",
-   "YMT",
-   "EDBL",
-   "FCDH",
-   "LOBO",
-   "MOBX",
-   "RCT",
-   "SLQT",
-   "MKDW",
-   "SPWR",
-   "SCNI",
-   "SNTI",
-   "SOS",
-   "YFOR",
-   "LICN",
-   "NTCL",
-   "NIXX"
+   "RIME",
+   "AEI",
+   "AUUD",
+   "BRNX",
+   "CYAB",
+   "IMCC",
+   "ITP",
+   "LSTA",
+   "PARA",
+   "SMTK",
+   "SRTM"
   ],
   "dropped_cap": [
-   "VABK"
+   "RLYB"
   ],
-  "dropped_no_data": [
-   "AOHY",
-   "CARY",
-   "MBS",
-   "BITO",
-   "BITI",
-   "RWM",
-   "VIXM",
-   "UBT",
-   "EET",
-   "BIB",
-   "ROM",
-   "DXD",
-   "DUG",
-   "MZZ",
-   "QID",
-   "SSG",
-   "REW",
-   "SMDD"
-  ],
-  "passed": 4,
-  "state": "ok"
+  "dropped_no_data": [],
+  "passed": 0,
+  "state": "empty"
  }
 }
