@@ -9,6 +9,7 @@ enrich.calendar_events чете същата заявка с флага; enrich.
 СИНТЕТИЧНО (означено): подменените обекти на yfinance, датите в т. 4–5 (AMG на 29.10 с прогнозна 02.11 — флагът тогава не се пазеше), картата на радара.
 Пускане: python test_earnings_estimate.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

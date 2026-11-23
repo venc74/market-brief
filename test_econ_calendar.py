@@ -11,6 +11,7 @@ data/preopen/2026-11-13.json (CNBC, 09:02 Ню Йорк) — цитирано т
 СИНТЕТИЧНО (означено): т. 2 — отместване 0 (за пазача), провал на източника; кои тикъри са „нашите“.
 Пускане: python test_econ_calendar.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, gzip, re, copy, pathlib, tempfile, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

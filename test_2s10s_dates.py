@@ -5,6 +5,7 @@
 РЕАЛНО: T10Y2Y от FRED 25.08–15.09.2026 (07.09 — празник, празна стойност; _fred_series я пропуска). СИНТЕТИЧНО: подменената "днес", серията след 09.10 в т.2.
 Пускане: python test_2s10s_dates.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

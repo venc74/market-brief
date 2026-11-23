@@ -6,6 +6,7 @@ Qullamaggie (06.10.2026) · т.2: маркер QM✓ върху нашите CAN
 реалната карта на EXPD (EXPD не е кандидат — така картата показва маркера), позициите, подмененият скан.
 Пускане: python test_qm_markers.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, ast, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

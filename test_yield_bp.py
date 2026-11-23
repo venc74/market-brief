@@ -9,6 +9,7 @@ VIX 16.39/+4.59%, US10Y 5.24/+1.45% и MOVE 108.13/+3.39% (DXY/злато/пет
 те не се проверяват срещу брифа, а само не се променят от т.5). СИНТЕТИЧНО: подмененият yfinance/FRED, спредовете 0.20→0.46.
 Пускане: python test_yield_bp.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, json
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

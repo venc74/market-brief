@@ -7,6 +7,7 @@
 brief_2026-10-19.json — рамката на страницата. СИНТЕТИЧНО (означено): т. 3 — нивата, сложени на картите от 19.10; т. 4 — картата за книгата.
 Пускане: python test_canslim_tiers.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, re, pathlib, tempfile, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -10,6 +10,7 @@ ANET: вход 09.10 по $215.38 (отваряне над buy-stop $214.89), с
 от data/2026-10-12.json, дневните барове на EXPD/ANET/SPY от Yahoo до 09.10. СИНТЕТИЧНО (означено): временният tracker, подмененото yf.download, картата с confirmed сетъп.
 Пускане: python test_buystop_book_order.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, re, datetime as dt, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

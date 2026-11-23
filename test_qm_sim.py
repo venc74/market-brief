@@ -6,6 +6,7 @@ Qullamaggie (06.10.2026) · trade_sim.simulate_qm — общата симула�
 СИНТЕТИЧНО: ръчно пресметнатите сценарии (барове с кръгли числа), нивата/ADR на реалните сетъпи (нивото = най-високият High на последните 10 бара, ADR20 по формулата от qullamaggie.com/faq).
 Пускане: python test_qm_sim.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -7,6 +7,7 @@
 tests/fixtures/brief_2026-10-19.json — реалният бриф за страницата. СИНТЕТИЧНО (означено): отговорът на AI, CIK картата, провалът на заявката, заглавието „за компанията“ в т. 2.
 Пускане: python test_ep_company_news.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

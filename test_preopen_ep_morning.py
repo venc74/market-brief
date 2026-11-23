@@ -8,6 +8,7 @@ AH +20.2%; в карето (09:08 Ню Йорк) го нямаше. Причин
 СИНТЕТИЧНО (означено): т. 3 — изрязани бари (без премаркет / без редовната сесия / празно) и прагът 8%.
 Пускане: python test_preopen_ep_morning.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

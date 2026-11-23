@@ -3,6 +3,7 @@
 СИНТЕТИЧЕН архив (не реалният eurofxref-hist.zip — средата за разработка не стига ecb.europa.eu); без мрежа, без запис в docs/.
 Проверява: пълен и свеж файл → текстът; стар (над 10 дни), кратък, без USD, два CSV в архива → отказ (старият файл остава); main() при провал → код 0, файлът непокътнат.
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import io, sys, zipfile, datetime, pathlib, tempfile
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT / "tools"))

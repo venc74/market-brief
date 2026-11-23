@@ -9,6 +9,7 @@
 СИНТЕТИЧНО (означено): реконструкциите на изпразнените "why" от 29.10 в т. 2 (суровият отговор не е запазен — логът не е четен), отговорът на модела в т. 3.
 Пускане: python test_why_trim.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, re
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

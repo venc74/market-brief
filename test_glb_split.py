@@ -9,6 +9,7 @@
 (tests/fixtures/glb_prices_2026-10-05.json). СИНТЕТИЧНО: датата на входа 05.10 като "since", сплитът 2:1 (и 3:2) и цените след него.
 Пускане: python test_glb_split.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -12,6 +12,7 @@ Defensive по броене, "Offensive по броене" във веригат
 броеве 8/9 (праг DISTRIBUTION_DAYS_RED=9), QQQ-само, липсващ индекс/данни, +3% кандидат, повреден state файл.
 Пускане: python test_distribution_cap.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, hashlib, tempfile, io, contextlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

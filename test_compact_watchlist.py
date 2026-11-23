@@ -10,6 +10,7 @@ in/out по дни 8 455/7 363 · 10 963/9 239 · 9 596/8 234 · 10 071/7 392 ·
 СИНТЕТИЧНО: подмененото _call_claude, отворената позиция в т.3.
 Пускане: python test_compact_watchlist.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, re, pathlib, tempfile, copy, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -11,6 +11,7 @@
 (90-ти: 18.9 → 20.1, 95-ти: 27.4 → 27.6) — прагът 20% остава на мястото си. СИНТЕТИЧНО: всички серии с дупки/NaN по-долу.
 Пускане: python test_window_nan.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, json, datetime as dt, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

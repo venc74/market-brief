@@ -12,6 +12,7 @@ other на 09.10; EXPD {first_seen 2026-10-09, expiry 2026-10-19} — below_pivo
 сетъп в т.3, предишният Watchlist в т.3.
 Пускане: python test_regime_gate_code.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, copy, tempfile, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

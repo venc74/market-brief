@@ -7,6 +7,7 @@
 "ръчните" commit-и във временна директория; remote hook, който отхвърля първия push.
 Пускане: python test_workflow_push.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, os, re, atexit, shutil, pathlib, subprocess, tempfile, textwrap
 ROOT = pathlib.Path(__file__).parent
 YML = (ROOT / ".github" / "workflows" / "daily_brief.yml").read_text(encoding="utf-8")

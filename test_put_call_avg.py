@@ -6,6 +6,7 @@
 РЕАЛНО: tests/fixtures/put_call_history_2026-11-16.json — data/put_call_history.json към 16.11 (109 стойности, 13.06–16.11). СИНТЕТИЧНО (означено): т. 3 — къса история.
 Пускане: python test_put_call_avg.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

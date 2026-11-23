@@ -3,6 +3,7 @@
 Watchlist и режима СЛЕД като са изчислени, а обобщението на buy-stop книгата влиза в brief["backtest"] след Action обобщението, под TRACK_BUYSTOP и в try/except.
 Всичко е върху РЕАЛНИЯ код на src/main.py (без данни). Пускане: python test_buystop_wiring.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import ast, pathlib
 
 SRC = pathlib.Path(__file__).parent / "src" / "main.py"

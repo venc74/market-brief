@@ -7,6 +7,7 @@
 СИНТЕТИЧНО (означено): т. 2 — къса история и стойност под 10%; т. 3 — брифовете във временната папка.
 Пускане: python test_breadth_relative.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

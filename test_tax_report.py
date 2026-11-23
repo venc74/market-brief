@@ -12,6 +12,7 @@
 РЕАЛЕН ФОРМАТ с анонимни стойности: tests/fixtures/tax/real_anon/ibkr_summary_202107_202205.csv и tests/fixtures/tax/revolut_real/revolut_trading_real_format.csv (виж README там).
 Без мрежа; node — tests/tax_driver.js scenario (sc.report). Без node — SKIP. Пускане: python test_tax_report.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import json, shutil, subprocess, sys, pathlib, datetime, re
 ROOT = pathlib.Path(__file__).parent
 NODE = shutil.which("node")

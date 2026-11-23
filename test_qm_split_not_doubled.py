@@ -8,6 +8,7 @@ Qullamaggie скенер · цените и обемът не се кориги�
 върху целия универс). tests/fixtures/yahoo_splits_2026-10-08.json — реалните отговори за NVDA, AAPL и AMZN (за обема). СИНТЕТИЧНО (маркирано): подменените yf.download; "старият код" е точно копие на махнатата функция.
 Пускане: python test_qm_split_not_doubled.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, statistics, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

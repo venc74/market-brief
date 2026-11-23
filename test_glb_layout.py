@@ -11,6 +11,7 @@
 СИНТЕТИЧНО (означено): картите в т. 1 са построени от РЕАЛНИТЕ полета на картите от 03.11 (тикър, тип, обем, сесии, % над линията, месеци); QQQ в т. 3; yf.download в т. 2 връща РЕАЛНИТЕ барове.
 Пускане: python test_glb_layout.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, gzip, copy, pathlib, tempfile, io, contextlib, re, datetime as dt, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

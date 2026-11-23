@@ -5,6 +5,7 @@
 РЕАЛНО: изреченията на разказа от 17.11 (data/2026-11-17.json — „BLSH -12.2%, HOOD -7.4%, CRCL -7.3% и COIN -6.1% за последната сесия“, цитирано); крипто данните от
 macro_story_2026-10-29.json (с CRCL и BLSH в „tickers“). Пускане: python test_macro_current_list.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

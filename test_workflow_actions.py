@@ -6,6 +6,7 @@ oi_snapshot е със schedule:).
 РЕАЛНО: tests/fixtures/actions_runtime_2026-10-08.json — runs.using от action.yml на всяка основна версия, прочетено на 08.10. Нова основна версия трябва първо да се добави там (след проверка на action.yml).
 Пускане: python test_workflow_actions.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, re, json, pathlib
 ROOT = pathlib.Path(__file__).parent
 RT = json.loads((ROOT / "tests" / "fixtures" / "actions_runtime_2026-10-08.json").read_text(encoding="utf-8"))["runtime"]

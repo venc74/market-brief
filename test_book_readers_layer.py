@@ -9,6 +9,7 @@ _pending_action_plans, _last_resolved_positions, pending_buystop_by_ticker, live
 (записите на qm_breakout), backtest_tracker_v1_2026-10-02.json (реалният v1 архив). СИНТЕТИЧНО (означено): v1 записите, пре-етикетирани като v2 Action; запис на "GLB по Уиш".
 Пускане: python test_book_readers_layer.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

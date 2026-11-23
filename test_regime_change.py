@@ -4,6 +4,7 @@
 РЕАЛНО: tests/fixtures/regime_change_2026-11-04.json (термометрите на дните със смяна, бележката — вътре); tests/fixtures/brief_2026-10-19.json — рамката. СИНТЕТИЧНО (означено): Cash, видими под минимума, липсващ предишен бриф.
 Пускане: python test_regime_change.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile, io, contextlib, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

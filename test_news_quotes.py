@@ -8,6 +8,7 @@
 news_diag на брифа от 18.11. СИНТЕТИЧНО (означено): пулът около заглавията (резюме, източник), „why“, паднал източник с HTTP 503, „to_model“ / „fetched“ (брифът от 18.11 ги няма).
 Пускане: python test_news_quotes.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile, io, contextlib, re
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

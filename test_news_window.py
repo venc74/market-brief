@@ -12,6 +12,7 @@ AP „when:3d“, заявките по дни 30.10 / 31.10 / 01.11 за Reuter
 отговорът на AI (за промпта), функциите за новини / крипто, подменени в т. 5.
 Пускане: python test_news_window.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, gzip, copy, pathlib, tempfile, io, contextlib, re, datetime as dt, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

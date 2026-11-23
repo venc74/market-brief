@@ -5,6 +5,7 @@
 в src/ai_brief.py — втората дефиниция засенчва първата и макро промптът губеше "ЗНАЧИМИ НОВИНИ ЗА ДЕНЯ" (хвана го test_macro_news). Сега е _ticker_news_block.
 Пускане: python test_no_duplicate_defs.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import ast, pathlib, collections
 ROOT = pathlib.Path(__file__).parent
 

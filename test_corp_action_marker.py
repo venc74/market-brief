@@ -8,6 +8,7 @@
 brief_2026-09-22.json (реалните Action карти AMD, TWLO). СИНТЕТИЧНО (маркирано): подменените yf.download / fetch; сериите на CTVA, дадени на тикъри от картите (EXPD, SN, първата Action карта), само за да се провери мястото на реда.
 Пускане: python test_corp_action_marker.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, copy, io, contextlib, datetime as dt, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

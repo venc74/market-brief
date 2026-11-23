@@ -9,6 +9,7 @@ tests/fixtures/brief_2026-10-14.json и brief_2026-10-15.json — рамка з�
 СИНТЕТИЧНО (маркирано): отговорът на модела (индекси, why, преводи), подмененият _call_claude. 30.10.2026 (т. 8): разделът за котвите на тезите (гейт G4) — махнат с тезите.
 Пускане: python test_news_verbatim.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, contextlib, io, re, copy, tempfile, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

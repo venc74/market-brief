@@ -7,6 +7,7 @@
 (реални брифове — копирани във временна docs/data/ за пътя без BG_VOCAB_FILE).
 Пускане: python test_bg_vocab_fixture.py (през run_tests — с BG_VOCAB_FILE; директно — без него, пътят от docs/data/ е във временна папка)
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, shutil, importlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

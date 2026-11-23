@@ -5,6 +5,7 @@
 ([5] между Currency и Symbol; [3] между Currency и Date при дивидентите). Това е извод от кода на tax-v1, НЕ от реален отчет.
 Без node — SKIP. Пускане: python test_tax_diagnose.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, shutil, pathlib, subprocess, tempfile
 ROOT = pathlib.Path(__file__).parent
 FX = ROOT / "tests" / "fixtures" / "tax"

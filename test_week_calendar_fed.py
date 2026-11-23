@@ -8,6 +8,7 @@
 week_calendar от брифа на 17.11 (data/2026-11-17.json — дните 17–23.11; 18.11 празен) и WSM — „$2.17“ (Nasdaq). СИНТЕТИЧНО (означено): т. 3 — датата 18.11 от Yahoo за WSM.
 Пускане: python test_week_calendar_fed.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, re, gzip, copy, pathlib, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -10,6 +10,7 @@ config.HYSTERESIS_HIDDEN_RELEASE_DAYS (10) ПОРЕДНИ дни без данн
 Състоянието е в tempdir — реалният data/regime_override_state.json не се пипа.
 Пускане: python test_hysteresis_release.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, datetime as dt, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

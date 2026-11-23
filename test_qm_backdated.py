@@ -6,6 +6,7 @@
 СИНТЕТИЧНО (означено): картата в временния snapshot; записът след резолюцията в т. 3 носи стойностите от симулацията (вход $186.75, стоп на 14.10, −1 R, реални 5-минутни бари от 04.11).
 Пускане: python test_qm_backdated.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile, io, contextlib, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

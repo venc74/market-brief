@@ -10,6 +10,7 @@ SHA-256 89ae44f0e1177d21…); tests/fixtures/brief_2026-10-19.json — бриф�
 СИНТЕТИЧНО (означено): отговорите на AI и цените на тикърите (17.11.2026: COT за Bitcoin — махнат с COT).
 Пускане: python test_crypto_section.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

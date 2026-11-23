@@ -9,6 +9,7 @@
 РЕАЛНО: tests/fixtures/dd_claims_2026-10-28.json — термометрите и макро текстовете от 16.10, 19.10, 20.10, 23.10, 26.10, 27.10 и 28.10. СИНТЕТИЧНО (означено): червените distribution days в т. 3.
 Пускане: python test_dd_claims.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

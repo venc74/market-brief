@@ -6,6 +6,7 @@ Form 4 от кода (watch_monitor.insider_summary — на мястото на
 AI текстовете от същите дни — за сравнение. СИНТЕТИЧНО (означено): преводите.
 Пускане: python test_watch_no_ai.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, io, contextlib, copy
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

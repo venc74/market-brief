@@ -8,6 +8,7 @@
 РЕАЛНО: страницата и имейлът са от РЕАЛНИЯ бриф от 05.10 + нива на EXEL, EXPD, DOCN, CORT, CRL, SYNA (tests/helpers_page.py). Исторически публикуваните docs/data/*.json от юни–октомври съдържат
 старите полета (публикувани преди 07.10, с номинални $100k) — те не се пренаписват. Пускане: python test_no_account_numbers.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, re, json, pathlib, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

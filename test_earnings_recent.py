@@ -8,6 +8,7 @@ Watchlist картата на INCY от 29.07 (отчет 28.07 в 07:00 ET; н�
 СИНТЕТИЧНО (маркирано): подмененият yf.Ticker (календар с минала дата / провал), "сега" за брифа, AI решението "Action" на INCY, петъчният отчет в т. 1.
 Пускане: python test_earnings_recent.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, copy, datetime as dt
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

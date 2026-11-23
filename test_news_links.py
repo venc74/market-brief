@@ -9,6 +9,7 @@ tests/fixtures/cointelegraph_rss_2026-10-29.xml (29.10, 10:27 UTC); tests/fixtur
 СИНТЕТИЧНО (означено): отговорите на модела (индекси, why), подмененият requests.get (връща fixture-а), линкът „javascript:“ в т. 4.
 Пускане: python test_news_links.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, copy, pathlib, tempfile, io, contextlib, re
 from html import escape as esc
 ROOT = pathlib.Path(__file__).parent

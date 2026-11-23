@@ -7,6 +7,7 @@ batches / batches_failed и data_warnings дава банер при падна�
 СИНТЕТИЧНО (означено): подмененият yf.download и универсът, тикърът ZZZ1 без данни, падналата партида, BREADTH_MIN_VALID_TICKERS = 1.
 Пускане: python test_breadth_partial.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

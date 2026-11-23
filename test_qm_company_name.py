@@ -10,6 +10,7 @@ Qullamaggie · името на компанията в картите (07.10.202
 окончания и реже по граница на дума със «…» (dashboard 34 знака, имейл 26). Пълното име остава в данните.
 Пускане: python test_qm_company_name.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, ast, copy, types, pathlib, tempfile, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

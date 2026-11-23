@@ -8,6 +8,7 @@ $359.54 / $453.32; нивото е същото ($390.80), затова беле
 (tests/fixtures/zbra_buystop_record_2026-10-14.json). СИНТЕТИЧНО (означено): временните docs/ и data/.
 Пускане: python test_book_plan_note.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, io, contextlib, copy, re, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

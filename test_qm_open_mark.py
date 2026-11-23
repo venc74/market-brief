@@ -5,6 +5,7 @@
 РЕАЛНО: tests/fixtures/qm_rvty_2026-10-22.json — QM картата на RVTY от брифа на 22.10 и записът ѝ от backtest_tracker.json; tests/fixtures/brief_2026-10-19.json — брифът за страницата и имейла.
 Пускане: python test_qm_open_mark.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

@@ -7,6 +7,7 @@
 СИНТЕТИЧНО (означено): датите на старта в т. 3–5 (2026-10-14) — за да има записи и в двете книги около деня на старта.
 Пускане: python test_glb_wish_high_book.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, copy, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

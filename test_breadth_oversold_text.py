@@ -6,6 +6,7 @@ Breadth <10% · текстът (09.10.2026, решение по проучван
 тестът ПРЕИЗЧИСЛЯВА 17 епизода и 8-те с ≥5% по-ниско затваряне — числото в config.BREADTH_OVERSOLD_STATS не е вписано на доверие. СИНТЕТИЧНО (маркирано): подменените market_breadth() входове.
 Пускане: python test_breadth_oversold_text.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, types
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

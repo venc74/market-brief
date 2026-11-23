@@ -6,6 +6,7 @@
 апостроф в macro_brief; v1 формат на плана) през реалния шаблон и реалния имейл. СИНТЕТИЧНО: враждебният текст, който
 се подмята в тях. Пускане: python test_escape.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, pathlib, tempfile, json, copy, re
 from html.parser import HTMLParser
 ROOT = pathlib.Path(__file__).parent

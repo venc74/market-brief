@@ -7,6 +7,7 @@ tests/fixtures/brief_2026-10-14.json и brief_2026-10-15.json (последни�
 СИНТЕТИЧНО (маркирано): датите "днес" за пускането (подменен dt.date в main), подменените AI / имейл / модел (не трябва да се викат).
 Пускане: python test_market_calendar.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, re, json, pathlib, shutil, tempfile, datetime as dt, html as htmllib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

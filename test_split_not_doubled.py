@@ -6,6 +6,7 @@ glb_screener.screen() (от 24.08) ги делеше втори път (NVDA 07.
 actions=True) с yfinance 1.5.2 на 08.10.2026 (колоната "Stock Splits" е реална). СИНТЕТИЧНО (маркирано): подменените yf.download / име на компания и празното състояние на хистерезиса.
 Пускане: python test_split_not_doubled.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, json, pathlib, tempfile, inspect, io, contextlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))

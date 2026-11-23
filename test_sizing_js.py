@@ -7,6 +7,7 @@
 към 02.10); базата на страницата е реалният бриф от 05.10. Тестовите настройки са тези от задачата: баланс 80000, риск 0.5%, таван 25%. СИНТЕТИЧНО (маркирано): таванът 5% (за да се получи
 свиване), коригираните вход/стоп, невалидните входове. Пускане: python test_sizing_js.py
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import sys, os, re, json, copy, math, shutil, pathlib, tempfile, subprocess, datetime as dt
 from html.parser import HTMLParser
 ROOT = pathlib.Path(__file__).parent

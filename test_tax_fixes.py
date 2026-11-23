@@ -2,6 +2,7 @@
 05.11.2026 (tax-fixes): поправките след двата прегледа на данъчния калкулатор (docs/tax_core.js) — по една секция за всяка поправка.
 Входовете са СИНТЕТИЧНИ (написани тук, не реални отчети); очакваните числа — сметнати на ръка в коментарите. Без мрежа; node — tests/tax_driver.js scenario.
 """
+import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file__).resolve().parent / "tests" / "_nonet")); import nonet_guard  # noqa: E402,F401 — 23.11.2026: без мрежа и без тайни и при „python test_x.py“
 import json, shutil, subprocess, sys, pathlib
 ROOT = pathlib.Path(__file__).parent
 NODE = shutil.which("node")
