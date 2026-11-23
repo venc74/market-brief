@@ -904,7 +904,9 @@
         {% if w.news %}
         <ul class="wm-news">
           {% for n in w.news %}
-          <li>{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a href="{{ n.link }}" target="_blank" rel="noopener noreferrer" style="color:var(--text)">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}{% if n.publisher %} <span class="wm-src">· {{ n.publisher }}</span>{% endif %}{% if n.when %} <span class="wm-src">· {{ n.when[8:10] }}.{{ n.when[5:7] }} {{ n.when[11:16] }} UTC</span>{% endif %}</li>
+          <li>{% if n.link and (n.link.startswith('https://') or n.link.startswith('http://')) %}<a href="{{ n.link }}" target="_blank" rel="noopener noreferrer" style="color:var(--text)">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}{% if n.publisher %} <span class="wm-src">· {{ n.publisher }}</span>{% endif %}{% if n.when %} <span class="wm-src">· {{ n.when[8:10] }}.{{ n.when[5:7] }} {{ n.when[11:16] }} UTC</span>{% endif %}
+            {# 23.11.2026 (пакет 23.11, т. 2): преводът под заглавието (с проверката) или бележката #}
+            {% if n.headline_bg %}<div class="small" style="font-size:12.5px;color:var(--text);margin-top:2px">{{ n.headline_bg }}</div>{% elif n.translation_note %}<div class="small" style="font-size:11.5px;color:var(--yellow);margin-top:2px">{{ n.translation_note }}</div>{% endif %}</li>
           {% endfor %}
         </ul>
         {% endif %}
@@ -916,6 +918,8 @@
         {% for b in w.insider_big_sell_old or [] %}<div class="small" style="color:var(--muted);margin:4px 0">{{ big_sell_text(b) }} — Form 4</div>{% endfor %}
         {{ insider_rows(w.insider_days_old) }}</details>{% endif %}
         {% elif w.insider %}{{ insider_rows(w.insider_days if w.insider_days is defined else w.insider) }}{% endif %}
+        {# 23.11.2026 (пакет 23.11, т. 2): фактите от новите Form 4 — от кода (на мястото на AI „прочита“) #}
+        {% for line in w.insider_summary or [] %}<div class="wm-read">{{ line }}</div>{% endfor %}
         {% if w.ai and w.ai.insider_read %}<div class="wm-read">{{ w.ai.insider_read }}</div>{% endif %}
         {% if w.ai and w.ai.cross_reference %}<div class="wm-xref">🔗 {{ w.ai.cross_reference }}</div>{% endif %}
       </div>

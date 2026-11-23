@@ -659,7 +659,7 @@ def finish_rows(rows: list[dict], matchers: list | None, pool_all: list | None =
     if config.NEWS_TRANSLATE and rows:
         try:
             from src import translate, top_themes
-            caps = top_themes._later_caps([x.get("title") or "" for x in pool_all or []] + [r.get("headline") or "" for r in rows])
+            caps = translate.proper_caps([x.get("title") or "" for x in pool_all or []] + [r.get("headline") or "" for r in rows])     # 23.11.2026: без Title Case
             LAST_TRANSLATION.update(translate.apply(rows, caps))
         except Exception as e:
             print(f"[news] преводът пропуснат: {type(e).__name__}: {e}")

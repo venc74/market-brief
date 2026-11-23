@@ -931,6 +931,9 @@ def run() -> dict:
         watch_monitor.attach_markers(rows, {"Action": action, "Watchlist": watchlist, "QM": qm_cards, "GLB": glb_candidates, "EP": (qm_ep_out or {}).get("rows")},
                                      books=config.ENABLE_BACKTEST)
         active = [r for r in rows if r.get("event")]                    # 03.11.2026 (т. 5): AI само при новина или нов Form 4 (подаден от предишния бриф)
+        if not config.ENABLE_WATCH_AI:                                  # 23.11.2026 (пакет 23.11, т. 2): без AI — заглавията с превод, Form 4 от кода (insider_summary)
+            watch_monitor.LAST_STATUS["translation"] = watch_monitor.translate_news(active, pool_titles=[r.get("title") or "" for r in news_aggregator.LAST_RAW])
+            return [{**r, "ai": {}} for r in rows]
         if active:
             market_context = {
                 "leading_sectors": [s["sector"] for s in leaders],

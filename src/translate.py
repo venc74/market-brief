@@ -83,17 +83,40 @@ def numbers(s: str, bg: bool = False) -> list[float]:
     return [v for v, _ in _matches(s, bg)]
 
 
+def is_title_case(s: str | None) -> bool:
+    """
+    23.11.2026 (пакет 23.11, т. 2): заглавие в Title Case („Stock Looks Pricey Following Its New AI Contract Push“) — ≥ 70% от думите с 4+ букви (без съкращенията) с главна.
+    Измерено: Yahoo (наблюдаваните) — 224 от 246; основните източници — 2 от 288 (Reuters, AP), крипто — 0 от 87. Чиста функция.
+    """
+    toks = [w for w in re.findall(r"[A-Za-z][A-Za-z’']+", _SUFFIX.sub("", s or "")) if len(w) >= 4 and not w.isupper()]
+    return len(toks) >= 3 and sum(w[0].isupper() for w in toks) / len(toks) >= 0.7
+
+
+def proper_caps(titles: list[str]) -> set[str]:
+    """Думите с главна НЕ в началото — само от заглавията в обикновен регистър (в Title Case всяка дума е с главна и не казва нищо). Чиста функция."""
+    from src import top_themes
+    return top_themes._later_caps([t for t in titles or [] if not is_title_case(t)])
+
+
 def names(orig: str, caps: set | None = None) -> list[str]:
-    """Тикърите и собствените имена в оригинала (нормализирани, главни) — top_themes.tokens без стоп-думите на темите (тук всяко собствено име се брои)."""
+    """
+    Тикърите и собствените имена в оригинала (нормализирани, главни) — top_themes.tokens без стоп-думите на темите (тук всяко собствено име се брои).
+    23.11.2026 (т. 2): в Title Case главната буква не значи име — брои се само съкращението (DOCU, AI, IBM), думата с главна вътре (DocuSign), притежателното („Nvidia's“) и
+    думите, които в обикновените заглавия на деня стоят с главна по средата (caps — proper_caps). До 23.11 всяко „Stock“, „Looks“, „Pricey“ искаше да е в превода.
+    """
     from src import top_themes
     t = _SUFFIX.sub("", orig or "")
+    title_case = is_title_case(t)
     out = []
     for k, m in enumerate(top_themes._TOKEN.finditer(t)):
         raw = m.group(0)
         n = top_themes._norm(raw)
         if not n or len(n) < 2 or n in {"A", "AN", "THE", "I", "OF", "IN", "ON", "TO", "AND", "OR", "AS", "AT", "FOR", "BY", "IS", "IT", "WE", "MY", "HE", "SHE"}:
             continue
-        if m.start() == 0 and not (raw.isupper() or re.search(r"['’]s$", raw) or (caps is not None and n in caps) or n in _PLACES):
+        if title_case:
+            if not ((raw.isupper() and len(n) >= 2) or re.search(r"[a-z][A-Z]", raw) or re.search(r"['’]s$", raw) or (caps is not None and n in caps)):
+                continue
+        elif m.start() == 0 and not (raw.isupper() or re.search(r"['’]s$", raw) or (caps is not None and n in caps) or n in _PLACES):
             continue
         if re.fullmatch(r"[A-Z]{2,}s", raw):                # 20.11.2026: съкращение в мн. ч. — ETFs → ETF (преводът „ETF-и“); в историята — ETFs ×14, IPOs, AGs
             n = raw[:-1]
@@ -101,8 +124,11 @@ def names(orig: str, caps: set | None = None) -> list[str]:
     return list(dict.fromkeys(out))
 
 
-def problems(orig: str, bg: str | None, caps: set | None = None) -> list[str]:
-    """Какво от оригинала липсва в превода: числа, мащаб, тикъри и собствени имена. [] → преводът е приет. Чиста функция."""
+def problems(orig: str, bg: str | None, caps: set | None = None, must: list | None = None) -> list[str]:
+    """
+    Какво от оригинала липсва в превода: числа, мащаб, тикъри и собствени имена. [] → преводът е приет. Чиста функция.
+    23.11.2026 (т. 2): must — имена, които трябва да са в превода, ако са в оригинала (наблюдаваните: името на компанията — и в Title Case).
+    """
     if not bg or not bg.strip():
         return ["празен превод"]
     o = _SUFFIX.sub("", orig or "")
@@ -125,6 +151,9 @@ def problems(orig: str, bg: str | None, caps: set | None = None) -> list[str]:
         if rx and re.search(rx, bg, re.I):
             continue
         miss.append(n)
+    for w in must or []:
+        if w and w.lower() in (orig or "").lower() and w.lower() not in low and w.upper() not in miss:
+            miss.append(w.upper())
     return miss
 
 
@@ -157,7 +186,7 @@ def translate(titles: list[str], call=None, batch: int = 15) -> list[str | None]
     return out
 
 
-def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "headline") -> dict:
+def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "headline", must=None) -> dict:
     """
     Превежда rows[*][key] → row["headline_bg"] (приет) или row["translation_note"] = „преводът е пропуснат — несъответствие (липсва: …)“; провал на превода — „преводът не се
     получи“. → {"n", "ok", "skipped": [{headline, missing}]}. Мутира rows.
@@ -171,7 +200,7 @@ def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "head
         if bg is None:
             r["translation_note"] = "преводът не се получи"
             continue
-        miss = problems(r.get(key) or "", bg, caps)
+        miss = problems(r.get(key) or "", bg, caps, must(r) if must else None)
         if miss:
             r["translation_note"] = f"преводът е пропуснат — несъответствие (липсва: {', '.join(miss[:5])})"
             r["translation_rejected"] = bg

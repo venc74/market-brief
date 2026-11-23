@@ -440,6 +440,59 @@ def big_sell_text(b: dict) -> str:
     return f"продава ≥{config.INSIDER_BIG_SELL_PCT:g}% от дела си: {who} — {b['pct']:g}% ({v}, {d}{plan})"
 
 
+def _money(v: float) -> str:
+    return f"${v / 1e6:.1f} млн" if v >= 1e6 else f"${v:,.0f}"
+
+
+def insider_summary(days: list[dict] | None) -> list[str]:
+    """
+    23.11.2026 (пакет 23.11, т. 2): фактите от НОВИТЕ Form 4 (person_days) като готови редове — на мястото на AI „прочита“ (insider_read). По посока: колко души, общата сума,
+    по план 10b5-1 / извънпланови / смесено-неизвестно, най-голямата сделка (длъжност, сума, дата, % от дела). Без оценка („рутинно“, „тревожно“) — само числата. Чиста функция.
+    Реално (16.11, BFLY): „Продажби: 2 души, 2 записа (човек × ден), $984,925 — по план 10b5-1: 1, извънпланови: 1; най-голямата: President & CEO $634,925 (30.10, 1.2% от дела).“
+    """
+    out = []
+    for code, word in (("P", "Покупки"), ("S", "Продажби")):
+        xs = [d for d in days or [] if d.get("code") == code]
+        if not xs:
+            continue
+        owners = {d.get("owner_name") for d in xs}
+        total = sum(float(d.get("value") or 0) for d in xs)
+        plan = sum(1 for d in xs if d.get("planned_10b5_1") is True and not d.get("plan_mixed"))
+        off = sum(1 for d in xs if d.get("planned_10b5_1") is False and not d.get("plan_mixed"))
+        other = len(xs) - plan - off
+        top = max(xs, key=lambda d: float(d.get("value") or 0))
+        who = top.get("owner_title") or ("директор" if top.get("is_director") else top.get("owner_name") or "инсайдър")
+        d = str(top.get("date") or "")
+        pct = top.get("pct_of_holdings")
+        out.append(f"{word}: {len(owners)} {'човек' if len(owners) == 1 else 'души'}, {len(xs)} {'запис' if len(xs) == 1 else 'записа'} (човек × ден), {_money(total)} — "
+                   f"по план 10b5-1: {plan}, извънпланови: {off}"
+                   + (f", смесено / неизвестно: {other}" if other else "")
+                   + f"; най-голямата: {who} {_money(float(top.get('value') or 0))} ({d[8:10]}.{d[5:7]}"
+                   + (f", {pct:g}% от дела" if isinstance(pct, (int, float)) else "") + ").")
+    return out
+
+
+def translate_news(rows: list[dict], call=None, pool_titles: list | None = None) -> dict:
+    """
+    23.11.2026 (пакет 23.11, т. 2): заглавията на наблюдаваните — превод с проверката (src/translate.py: числа, мащаб, тикъри, имена); неприет → оригиналът с бележка.
+    Мутира row["news"][*] (headline_bg / translation_note). → отчетът {"n", "ok", "skipped"}; провал → бележка на всяко заглавие.
+    """
+    items = [n for r in rows or [] for n in r.get("news") or [] if isinstance(n, dict) and n.get("title")]
+    if not items:
+        return {"n": 0, "ok": 0, "skipped": []}
+    must = {id(n): sorted(company_keys(r.get("name"))) for r in rows or [] for n in r.get("news") or [] if isinstance(n, dict)}
+    try:
+        from src import translate
+        # заглавията на Yahoo са в Title Case (224 от 246) — имената се учат от обикновените заглавия на деня (pool_titles — пулът на новините) и от тези в обикновен регистър
+        caps = translate.proper_caps([n["title"] for n in items] + list(pool_titles or []))
+        return translate.apply(items, caps, call=call, key="title", must=lambda n: must.get(id(n)) or [])
+    except Exception as e:
+        print(f"[watch] преводът пропуснат: {type(e).__name__}: {e}")
+        for n in items:
+            n.setdefault("translation_note", "преводът не се получи")
+        return {"n": len(items), "ok": 0, "skipped": [], "error": type(e).__name__}
+
+
 def _insider_cluster(txns: list[dict]) -> bool:
     """≥ INSIDER_CLUSTER_MIN_COUNT РАЗЛИЧНИ инсайдъри в клъстер прозореца."""
     if not txns:
@@ -519,6 +572,7 @@ def collect(tickers: list[str] | None = None, facts_fn=None, window_hours: float
             "insider_flags": insider_flags(new_f4, context=txns),   # 30.10.2026: по посока — покупки / продажби, с плана; 16.11: само новите
             "insider_days": person_days(new_f4),                    # 10.11.2026 (т. 5): по човек и ден (CRCL: 54 реда → 7); 16.11: само новите
             "insider_days_old": person_days(old_f4),                # 16.11.2026 (т. 4): вече показани — сгънати
+            "insider_summary": insider_summary(person_days(new_f4)),     # 23.11.2026 (пакет 23.11, т. 2): фактите от новите Form 4 — от кода, без AI
             "insider_big_sell": [b for b in big if b["owner"] in new_owners],      # 10.11.2026 (т. 5): ≥25% от дела — от кода, независимо от 10b5-1; 16.11: при нова продажба
             "insider_big_sell_old": [b for b in big if b["owner"] not in new_owners],
             "since": since_day,                                     # 16.11.2026 (т. 4): „нищо ново от ДД.ММ“
