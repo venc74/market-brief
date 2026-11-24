@@ -1,6 +1,6 @@
 {
  "version": 1,
- "saved": "2026-11-23",
+ "saved": "2026-11-24",
  "tickers": {
   "AAPL": {
    "fetched": "2026-11-12",
@@ -185,37 +185,6 @@
     "earningsTimestampStart": 1801515600,
     "earningsTimestampEnd": 1801515600,
     "isEarningsDateEstimate": true
-   }
-  },
-  "BBY": {
-   "fetched": "2026-11-11",
-   "next_report": "2026-11-24",
-   "info": {
-    "marketCap": 21832652800,
-    "sharesOutstanding": 209727698,
-    "currentPrice": 104.1,
-    "regularMarketPrice": 104.1,
-    "earningsQuarterlyGrowth": 0.694,
-    "revenueGrowth": 0.036,
-    "returnOnEquity": 0.43126,
-    "longName": "Best Buy Co., Inc.",
-    "sector": "Consumer Cyclical",
-    "industry": "Specialty Retail",
-    "longBusinessSummary": "Best Buy Co., Inc. offers technology products and solutions in the United States, Canada, and internationally. The company provides computing and mobile phone products, such as desktops, notebooks, and peripherals; mobile phones comprising related mobile network carrier commissions; networking products; tablets covering e-readers; smartwatches; and consumer electronics consisting of digital imaging, health and fitness products, portable audio comprising headphones and portable speakers, and smart home products, as well as home theaters that includes home theater accessories, soundbars, and televisions. It also offers appliances, such as dishwashers, laundry, ovens, refrigerators, blenders, coffee makers, vacuums, and personal care; entertainment products consisting of drones, peripherals, gaming, toys, and virtual reality, as well as hardware and software, and augmented reality glasses and other software products; and other products, such as baby, food and beverage, luggage, and outdoor living products. In addition, the company provides delivery, installation, marketplace commissions, memberships, repair, set-up, technical support, health-related, and warranty-related services. It offers its products through stores and websites under the Best Buy, Best Buy Ads, Best Buy Business, Best Buy Essentials, Best Buy Health, Best Buy Marketplace, Geek Squad, Imagine That, Insignia, Lively, Jitterbug, My Best Buy, My Best Buy Memberships, Pacific Kitchen, Home, TechLiquidators, and Yardbird brand names, as well as domain names comprising bestbuy.com, lively.com, techliquidators.com, yardbird.com, bestbuy.ca, and techliquidators.ca. The company was formerly known as Sound of Music, Inc. Best Buy Co., Inc. was incorporated in 1966 and is headquartered in Richfield, Minnesota.",
-    "trailingPE": 17.32113,
-    "forwardPE": 14.421699,
-    "trailingEps": 6.01,
-    "forwardEps": 7.21829,
-    "debtToEquity": 130.097,
-    "heldPercentInstitutions": 0.96861,
-    "targetMeanPrice": 89.05,
-    "shortPercentOfFloat": 0.089099996,
-    "sharesShort": 16556656,
-    "shortRatio": 5.17,
-    "earningsTimestamp": 1795527000,
-    "earningsTimestampStart": 1795527000,
-    "earningsTimestampEnd": 1795527000,
-    "isEarningsDateEstimate": false
    }
   },
   "BEN": {
@@ -1013,36 +982,6 @@
     "earningsTimestampStart": 1801170000,
     "earningsTimestampEnd": 1801170000,
     "isEarningsDateEstimate": true
-   }
-  },
-  "SJM": {
-   "fetched": "2026-11-12",
-   "next_report": "2026-11-24",
-   "info": {
-    "marketCap": 14214962176,
-    "sharesOutstanding": 106823183,
-    "currentPrice": 133.07,
-    "regularMarketPrice": 133.07,
-    "revenueGrowth": 0.05,
-    "returnOnEquity": 0.03931,
-    "longName": "The J. M. Smucker Company",
-    "sector": "Consumer Defensive",
-    "industry": "Packaged Foods",
-    "longBusinessSummary": "The J. M. Smucker Company manufactures and markets branded food and beverage products worldwide. The company operates through five segments: U.S. Retail Coffee, U.S. Retail Frozen Handheld and Spreads, U.S. Retail Pet Foods, Sweet Baked Snacks, and Away From Home. It offers coffee, sweet baked goods, pet snacks, frozen handheld products, peanut butter, cat and dog food, fruit and specialty spreads, cookies, frozen sandwiches and snacks, hot beverages, portion control products, toppings and syrups, baking mixes and ingredients, and flour. The company provides its products under the Folgers, Café Bustelo, Dunkin', Jif, Smucker's, Uncrustables, Meow Mix, Milk-Bone, Pup-Peroni, Canine Carry Outs, Hostess, and 1850 brand names. It sells its products through direct sales and brokers to food retailers, club stores, discount and dollar stores, online retailers, pet specialty stores, distributors, drug stores, military commissaries, mass merchandisers, supermarket chains, national mass retailers, convenience stores, vending channels, and foodservice distributors and operators. The J. M. Smucker Company was founded in 1897 and is headquartered in Orrville, Ohio.",
-    "trailingPE": 62.47418,
-    "forwardPE": 12.1050205,
-    "trailingEps": 2.13,
-    "forwardEps": 10.99296,
-    "debtToEquity": 120.682,
-    "heldPercentInstitutions": 0.91678,
-    "targetMeanPrice": 141.8125,
-    "shortPercentOfFloat": 0.030199999,
-    "sharesShort": 3146553,
-    "shortRatio": 2.88,
-    "earningsTimestamp": 1795527000,
-    "earningsTimestampStart": 1795527000,
-    "earningsTimestampEnd": 1795527000,
-    "isEarningsDateEstimate": false
    }
   },
   "SWK": {

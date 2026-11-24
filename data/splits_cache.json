@@ -1,5 +1,5 @@
 {
- "date": "2026-11-23",
+ "date": "2026-11-24",
  "rows": [],
  "horizon": [
   {
@@ -75,14 +75,6 @@
    "date_human": "Nov 23, 2026"
   },
   {
-   "ticker": "RLYB",
-   "company": "Rallybio Corporation",
-   "date": "2026-11-23",
-   "ratio": "1:2",
-   "split_type": "reverse",
-   "date_human": "Nov 23, 2026"
-  },
-  {
    "ticker": "SMTK",
    "company": "SmartKem, Inc.",
    "date": "2026-11-23",
@@ -97,6 +89,62 @@
    "ratio": "1:9",
    "split_type": "reverse",
    "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "TOPP",
+   "company": "Toppoint Holdings Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:5",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "CCTG",
+   "company": "CCSC Technology International Holdings Limited",
+   "date": "2026-11-24",
+   "ratio": "1:20",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
+  },
+  {
+   "ticker": "CODX",
+   "company": "Co-Diagnostics, Inc.",
+   "date": "2026-11-24",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
+  },
+  {
+   "ticker": "GFAI",
+   "company": "Guardforce AI Co., Limited",
+   "date": "2026-11-24",
+   "ratio": "1:40",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
+  },
+  {
+   "ticker": "ISPC",
+   "company": "iSpecimen Inc.",
+   "date": "2026-11-24",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
+  },
+  {
+   "ticker": "JAGX",
+   "company": "Jaguar Health, Inc.",
+   "date": "2026-11-24",
+   "ratio": "1:25",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
+  },
+  {
+   "ticker": "RBNE",
+   "company": "Robin Energy Ltd.",
+   "date": "2026-11-24",
+   "ratio": "1:75",
+   "split_type": "reverse",
+   "date_human": "Nov 24, 2026"
   },
   {
    "ticker": "CBSH",
@@ -214,10 +262,10 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 26,
+  "source_rows": 32,
   "horizon_from": "2026-11-23",
   "horizon_to": "2026-12-09",
-  "in_week": 12,
+  "in_week": 18,
   "dropped_price": [
    "RIME",
    "AEI",
@@ -226,13 +274,19 @@
    "CYAB",
    "IMCC",
    "ITP",
-   "LSTA",
    "PARA",
    "SMTK",
-   "SRTM"
+   "SRTM",
+   "TOPP",
+   "CCTG",
+   "CODX",
+   "GFAI",
+   "ISPC",
+   "JAGX",
+   "RBNE"
   ],
   "dropped_cap": [
-   "RLYB"
+   "LSTA"
   ],
   "dropped_no_data": [],
   "passed": 0,

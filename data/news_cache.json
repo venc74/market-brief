@@ -1,167 +1,174 @@
 {
- "date": "2026-11-20",
+ "date": "2026-11-24",
  "news": [
   {
-   "headline": "Trump says he and China's Xi want moderate AI rules - Reuters",
-   "source": "Reuters Business",
-   "why": "Съвместна позиция на САЩ и Китай за умерена AI регулация намалява регулаторния риск за технологичния сектор, но идва в контекст на общ AI разпродаване, което ограничава позитивния ефект върху chip и AI акции.",
-   "source_text": "Trump says he and China's Xi want moderate AI rules - Reuters Trump says he and China's Xi want moderate AI rules Reuters",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQRmhOamVpZF9sMG9qSElyRS13Q2hIdXdncHVuRUIzUU1FYlM4eGNSR1NVcE9DdHVFNXRDT0ZSdTBXUUtSZGJUWGdoNnEwLXRqMmVRd251SWpHNVVsSWRFODZ3S3ZZQkVxM0dTaHNUaXA5M0FLVVYyaFNXa1l1a0Vkc2Rpc01EWWUxYi1kQmhwckhZOTBURFAxeQ?oc=5"
-  },
-  {
-   "headline": "California attorney general issues Nvidia subpoena in probe of China chip diversion",
-   "source": "CNBC",
-   "why": "Прокурорска повестка срещу Nvidia и иск срещу Alibaba за прикриване на шпионски връзки задълбочава правния риск за двете компании и за целия chip сектор, засилвайки разпродаването на AI акции.",
-   "source_text": "California attorney general issues Nvidia subpoena in probe of China chip diversion The investigation by California Attorney General Rob Bonta comes on the heels of the resignation of Nvidia CEO Jensen Huang. California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters California AG subpoenas Nvidia over concerns about former CEO, China ties Reuters Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says Reuters Jensen Huang's — and Nvidia's — legal exposure balloons \"It's not going to get any better for Jensen Huang; it's going to get far worse,\" said Salvatore Graziano, a New York securities litigation attorney.",
-   "link": "https://www.cnbc.com/2026/11/19/nvidia-california-bonta-subpoena-china-chips.html",
+   "headline": "Nvidia board reinstates Jensen Huang as CEO just days after rejecting his offer to return - AP News",
+   "source": "AP Business",
+   "why": "",
+   "source_text": "Nvidia board reinstates Jensen Huang as CEO just days after rejecting his offer to return - AP News Nvidia board reinstates Jensen Huang as CEO just days after rejecting his offer to return AP News Trump sealed deal for Nvidia to rehire Jensen Huang as CEO President Trump said his administration gave Nvidia's board assurance that Jensen Huang would not be a national security threat if he was reinstated as CEO. US stocks surge and recover half of last week’s plunge after Jensen Huang returns as Nvidia’s CEO - AP News US stocks surge and recover half of last week’s plunge after Jensen Huang returns as Nvidia’s CEO AP News Dow soars 1,400 points; Nasdaq surges 6% in its best day since April 2025 as Jensen Huang returns to Nvidia U.S. equities surged on Monday after Nvidia reinstated Jensen Huang as CEO. Jensen Huang returns to Nvidia: 'I'm going to be a better CEO the second time around' Jensen Huang thanks employees after returning to Nvidia the same day the board unanimously voted to reinstate him as CEO.",
+   "published": "2026-11-23T23:36Z",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNbUdPNnFZNXVRRHJqeGNYX0ptRk1oUW85OHlueHM2aW5teGxVWmViTWdKOGVTTVBYdWNVTjA3M2d4NUFfQ1Fac2g2ZzVZZ0hMdnZ6V1RQdFRmdWNfZlFzNnRYNmR0YWsxUjFIaTNYR2c5V3RQUHdVVUx4X1loaHF6dEcyNF9fQQ?oc=5",
    "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNY2NBVmplUHV4MUZrbVByaDVvby13dXpkX3RuaGVwd1RDMzAxdGtGSDQ3aFhjNjc3VHNxWnlYNHBrcWhRa0xiemxLOE8wTnZFVE9YZ3B4NVFjZ3d5QmJTaWtqc3JTVWdRX0IyT3VlU3BOaEFlMm5fS1lqczg1RmxyMUk4c0JfTEtUSlV4bDh0Z1BVQ0NySHZ3UHRINXZBdUM5NDhOX3Y0bUdsZXRuODdDZDJsMWNHUjY3STVCRA?oc=5"
-    },
-    {
-     "source": "Reuters Business",
-     "headline": "Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNU2NLaWxYa3VzZlBrX09yMHM0MjctV3RIZzNUVVNWbjhHODZZQlZtTkNJaWJJbkJLUTNsckRSRURrWTdzYUVNa2JwNnNmenJYb3FVTS16U1B4R3Ezc1ZHcWZ5ZTl2aTh5V2VCdkZUQzRQMXpUbEJaQnRRZ1AybGYxaFk5Yjh2c256cVJJaFAzaG03eGtiRUIydWctNHNRSUFiWmV5aTlGVzlYUVRUQ0RiUGpOMUw5LW5UbXRCMFNhMTY3UnYzSjlkNmNwQnN5azFEZGxNUjBn?oc=5"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Jensen Huang's — and Nvidia's — legal exposure balloons",
-     "link": "https://www.cnbc.com/2026/11/19/nvidia-jensen-huang-legal.html"
-    }
-   ]
-  },
-  {
-   "headline": "US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says - Reuters",
-   "source": "Reuters Business",
-   "why": "Конгресът разкри, че САЩ са одобрили продажба на близо AI чипа на китайски компании за шест месеца, засилвайки натиска за по-строги export controls и удряйки акциите на AMD и Nvidia.",
-   "source_text": "US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says - Reuters US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says Reuters Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says Members of Congress have pushed in the wake of the Jensen Huang scandal for legislation to tighten export controls on chip sales to China. US approved sale of Nvidia and AMD chips to Chinese companies Pentagon believes some of the groups were associated with the People’s Liberation Army AMD dives on short seller report of alleged China exposure AMD closed down over 7% after a short seller alleged that its firmware showed up at a blacklisted Chinese company. AMD said it complies with U.S. law. AMD shares slide as report says China links could invite US scrutiny - Reuters AMD shares slide as report says China links could invite US scrutiny Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPOFRrWXhLbGJZcHVKYzUycHNKbTdKZUE2clNGYUp5WFFBOTdaWndZbVdDZW0xSTQzUi1EZlRsRElldE00bktXMUFMaG1Sclo4eGdCVnZab1JUbWJwZHQ4cGFSTzgyNkZSZmF0WHAzR0hTa1B3eUQ5cmJRTGRfd1ZBdkFiSzNpU1RDeF8wU0pmbXBqWXYxeFNuaWdmV01QLWk0MWdrclJDV2ZYNVFFN0puWU9B?oc=5",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "AMD shares slide as report says China links could invite US scrutiny - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQdGVGbWc5MzZvYkJfQTdMMHBzZllhb3dnNzYydUFXOEpWOHNuRVppNnkyVEdldnp0Z1pMX3B1NlNOVGpPOTJFTE1qcTNFUFJOZjRoQTNfbk5DcUZmZ3dlN1MtUXRMblp4MFNPdnR6d1BjRUxXbkI4RHdLSm82MDJiRFVOQVJ6MGhRSEhYdEQtYVB6RVdoZjBvbWg5Z1BZY0Jrbno4THFVdUg5MEhIQml0TEJLWQ?oc=5"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "US approved sale of Nvidia and AMD chips to Chinese companies",
-     "link": "https://www.ft.com/content/76342072-2781-4b16-ba3b-816a25214483?syn-25a6b1a6=1"
-    },
-    {
-     "source": "CNBC",
-     "headline": "Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says",
-     "link": "https://www.cnbc.com/2026/11/19/nvidia-amd-china-chip-sales-congress.html"
-    },
-    {
-     "source": "CNBC",
-     "headline": "AMD dives on short seller report of alleged China exposure",
-     "link": "https://www.cnbc.com/2026/11/19/amd-falls-on-short-seller-report-of-alleged-china-exposure.html"
-    }
-   ]
-  },
-  {
-   "headline": "Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI",
-   "source": "CNBC",
-   "why": "Най-голямото IPO в историята на Wall Street не успя да съживи AI ентусиазма — технологичните акции паднаха, азиатските пазари поеха към най-лошата си седмица, а волатилността в сектора се усили.",
-   "source_text": "Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI Anthropic IPO live updates: Follow ANT stock's Nasdaq debut, opening share price, valuation and investor reaction to the Claude AI maker. Anthropic shares jump 17% after record Wall Street listing AI group led by Dario Amodei raises $81bn in upsized public offering Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok - AP News Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok AP News Anthropic's $1.5 trillion debut rewrites venture capital's playbook - Reuters Anthropic's $1.5 trillion debut rewrites venture capital's playbook Reuters Anthropic was supposed to save the AI trade. What went wrong? Technology stocks tanked despite one of the most hotly anticipated tech IPOs in years. Why Anthropic couldn't revive AI animal spirits. SoftBank plunges over 16% as AI sell-off hits Asian tech stocks following Anthropic debut The declines in Asia come after the tech-heavy Nasdaq Composite fell more than 2% overnight following Anthropic's highly anticipated Wall Street debut. Tech stocks fall after Anthropic IPO Asia’s markets follow Wall Street lower despite Claude AI maker’s record listing",
-   "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-ant-live-updates.html",
-   "also": [
-    {
-     "source": "Reuters Business",
-     "headline": "Anthropic's $1.5 trillion debut rewrites venture capital's playbook - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcVk2clRUVFZnTGJTcG1qOWpTRmlSQmRjTXdoVFhIMGQ1cU1idU5RTVFqOVhob2NMQXYyWlVTeEhpU2N2cEk5d0pJSlhic2NSaHJ2M0V1b3N2WW9BalFiZ3VnQnpuY1VKV3Fwd1pkMWw0N1FnRlNPZmdXRFVudkhGOHA5OHNsVzBPWnRWaWNnTmRTNFBQQTVKSEF1WndCeVhnSmZ3S1ZCVzBtcDBWSk9VS3ViTnY5UThFaHFz?oc=5"
-    },
     {
      "source": "AP Business",
-     "headline": "Anthropic surges in market debut after biggest IPO on record, despite fears that AI is running amok - AP News",
-     "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQZXdyUExSdjhGa000MWtxaUR0YzhiVHJnNzN0N0lTUnNONktkaWZkUVUwdExoUXhXMTlJN0NEZ3F3M2RYbUZYelpiNFhpOE14LWdtYjF1MnB2M00xMk1GbENmci1UeFlXa3V0aHM4TWlxVVZNeFBwUkZjMTA2ZWhCSFBVaVVBb0FUdnpj?oc=5"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "Anthropic shares jump 17% after record Wall Street listing",
-     "link": "https://www.ft.com/content/2b203097-7c61-464f-810f-962912a133dd?syn-25a6b1a6=1"
-    },
-    {
-     "source": "Financial Times",
-     "headline": "Tech stocks fall after Anthropic IPO",
-     "link": "https://www.ft.com/content/c7ad2e0c-efd1-40c2-a5a8-819ced8acf5b?syn-25a6b1a6=1"
+     "headline": "US stocks surge and recover half of last week’s plunge after Jensen Huang returns as Nvidia’s CEO - AP News",
+     "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNNF9ZLU84V2VPZHBHcGx0V3p5TVVoV21zbUYyQWFOWU96ZjBmcExvQ1lpVmtFRzl5RVpXdFg3TGhUM3ZHM282MkdnMVgxZ2lwUTRkcm9KaWlHMEcyZ3R6amZIM25vMFRRM0l1OXNxMFFSQVVnR3hzY3BNb1NyUWwxa2hLMndRMkpVZ2l2X0N2Z3JFcmRVMzRMZldCbzlEZkpGZjNmTVJZdw?oc=5"
     },
     {
      "source": "CNBC",
-     "headline": "Anthropic was supposed to save the AI trade. What went wrong?",
-     "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-ai-stocks-selloff.html"
+     "headline": "Trump sealed deal for Nvidia to rehire Jensen Huang as CEO",
+     "link": "https://www.cnbc.com/2026/11/23/trump-nvidia-jensen-huang.html"
     },
     {
      "source": "CNBC",
-     "headline": "SoftBank plunges over 16% as AI sell-off hits Asian tech stocks following Anthropic debut",
-     "link": "https://www.cnbc.com/2026/11/20/softbank-ai-tech-stocks-slide-anthropic-debut.html"
+     "headline": "Dow soars 1,400 points; Nasdaq surges 6% in its best day since April 2025 as Jensen Huang returns to Nvidia",
+     "link": "https://www.cnbc.com/2026/11/22/stock-market-today-live-updates.html"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Jensen Huang returns to Nvidia: 'I'm going to be a better CEO the second time around'",
+     "link": "https://www.cnbc.com/video/2026/11/23/jensen-huang-returns-to-nvidia.html"
     }
-   ]
+   ],
+   "ours": [],
+   "translation_note": "преводът е пропуснат — несъответствие (липсва: CEO)",
+   "translation_rejected": "Съветът на директорите на Nvidia възстановява Jensen Huang като главен изпълнителен директор само дни след като отхвърли предложението му да се върне"
   },
   {
-   "headline": "Gold set for worst week in eight months as firm dollar, Fed hike bets weigh - Reuters",
-   "source": "Reuters Business",
-   "why": "Златото е на път за най-лошата си седмица от осем месеца под натиска на силния долар и очакванията за Fed затягане, което пренасочва потоци от защитни активи.",
-   "source_text": "Gold set for worst week in eight months as firm dollar, Fed hike bets weigh - Reuters Gold set for worst week in eight months as firm dollar, Fed hike bets weigh Reuters Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid - Reuters Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOMFFjdnZJUDZiUXhKNUdPUWMtQ2tkd0ZKdmN4TTZ3bnQyb09SQ3cxSS1hNVYtcmF5WGpNSlJzS1dWYkdBUzBJZ2s5TnhLQ29mNWNIUy10MGJkN294UndsTmRmOF9GelkyVkdWRl8wcVJQNnRaRGp0a3NIMWNHT1dJSHhZRk1BT3FRV2pFcHVGa3ozS1ZCdjJXenJvSXlBOEdxLUp2MVVVTVBDY0NGX3ZRRUN3?oc=5",
+   "headline": "U.S. adds Megaspeed to trade blacklist over export control concerns amid Nvidia controversy",
+   "source": "CNBC",
+   "why": "",
+   "source_text": "U.S. adds Megaspeed to trade blacklist over export control concerns amid Nvidia controversy The U.S. has added Megaspeed and six other companies to its trade blacklist over concerns about the potential diversion of advanced computing products. US blacklists Alibaba subsidiary and Megaspeed linked to Nvidia scandal - Reuters US blacklists Alibaba subsidiary and Megaspeed linked to Nvidia scandal Reuters Singapore investigating Nvidia-linked Megaspeed after US blacklisting - Reuters Singapore investigating Nvidia-linked Megaspeed after US blacklisting Reuters",
+   "published": "2026-11-24T02:37Z",
+   "link": "https://www.cnbc.com/2026/11/24/us-adds-megaspeed-to-trade-blacklist-over-export-control-concerns-.html",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Dollar near 19-month high, set for 4th weekly gain as AI jitters spur haven bid - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNSWwtcmZqemtkQmd4OWJQUHN1OXZLZTgxM1FtVk5JTlAtNndPYzRndHkxbEZ2MEdNZGtRdWUwMUxlblhtLThfQ0NoRHYtZ1lzd2VkSHc4N0U3UlFjUGFubjBkOFc4bDhpR3lELUoxalJBN1lkUUtUYk1NSk9sanNaeUZrZVVXTWlDV2Zja1FFQ3lPaXNUN2FXb3BST0dmZHd3?oc=5"
+     "headline": "US blacklists Alibaba subsidiary and Megaspeed linked to Nvidia scandal - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPZ3ZUR1ZCZXpLTkNjVFA5cm1ueHd6VjlHUzZSZWUtNE40NndKNFNWQVJqV3k4WHA5SU5BQTBvWmw5dlN3S1RZZHQ5WG5LRGhWMDFxUk83RjdGV0dqWUtjU3c4RlVkdkFBVlhfbXdiVm1WWW44dEtpUXY0Yjk0ZndBN2w3MURmNkVJLUlvM3ZpSmRfV3RTeUJYNHQtS29HaUFwejF2SlVtR2lpY0NqX3BYMg?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Singapore investigating Nvidia-linked Megaspeed after US blacklisting - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQN3FSU3Z2eG9hMGxOaUJ3VkptMG9CbEx0cHhoQzZ6RC1uRXV0OWtRa3k1VzYtQkhMRUVBVzE5QlAwSktWS1IzN2o3SFRWalVsQ1UzMkNkYXM0TEdJUzhYMTU2VjNtdVkyWTBpRGVlbUMxREdoS1ZmeUUwbElCcF9CSmxHVDBhdVJNM3FfOGVNU1YwUEpwLUw0MXVBUUdKbDF5VjFHVHY5c0FGcFNxWGZCbQ?oc=5"
     }
-   ]
+   ],
+   "ours": [],
+   "headline_bg": "САЩ добавят Megaspeed в търговската черна листа заради опасения относно контрола върху износа на фона на скандала с Nvidia"
   },
   {
-   "headline": "Oil prices gain as Houthi attacks on Riyadh raise supply concerns - Reuters",
-   "source": "Reuters Business",
-   "why": "Хуситски атаки срещу Рияд вдигат петролните цени заради опасения за прекъсване на доставките от Саудитска Арабия, засягайки енергийния сектор и инфлационните очаквания.",
-   "source_text": "Oil prices gain as Houthi attacks on Riyadh raise supply concerns - Reuters Oil prices gain as Houthi attacks on Riyadh raise supply concerns Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPb3pQREZDSHE2RmNHdDdGdExDUXhYeWljc2VualVoQ09oQV90WnFQQlZkYW1rWnl5ODJ6N2haaVBDVUY4VmFvRmtLSlZKbU5kR1lHNklrUUR3X3JGc181OHZCUHpXalZFUllBZXVEczJPUUdZZUt1MmpsTEN0MkJGSDNCVHhoa25pZFBSb1lldS1US0VJNVNBWWN1U2VwQmd0WmlQR1RKWmgyS2lyUDVfNHdWeWhzaFhmZ1E?oc=5"
+   "headline": "Iran says three tankers hit mines in Hormuz despite U.S. escort, as Treasury widens sanctions",
+   "source": "CNBC",
+   "why": "",
+   "source_text": "Iran says three tankers hit mines in Hormuz despite U.S. escort, as Treasury widens sanctions Iran said three oil tankers caught fire after hitting naval mines in the Strait of Hormuz, as the U.S. escalates sanctions aimed at cutting off Tehran's financial lifelines. US imposes sanctions on dozens linked to Iran's shadow banking networks - Reuters US imposes sanctions on dozens linked to Iran's shadow banking networks Reuters Oil prices near three-month lows as rising supply offsets Hormuz threat - Reuters Oil prices near three-month lows as rising supply offsets Hormuz threat Reuters",
+   "published": "2026-11-24T05:05Z",
+   "link": "https://www.cnbc.com/2026/11/24/iran-trump-hormuz-crude-.html",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "US imposes sanctions on dozens linked to Iran's shadow banking networks - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxON2NaMVlXcGRFQ3BpRFVieGtVRzR4bXFtTXRTRnpSV3JmNzY1REhheG5xNlV5MlptZ1lIM1BQWUhGcTBZNWpHckdxZG1kWUZoZUdxSnRneHJhVzBpUzg0ZGpXQ1lQblItbHg5WXpNUXBqbHpWZ0NqZzdQZEdhNTZKbDZXaHNydXhYM05hd2YtY1lvU0JkVnJBQ3diRVNDV210Z0pZdm5mRnMtUEk4TTNkOXNDMGpvbmpD?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Oil prices near three-month lows as rising supply offsets Hormuz threat - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQMDQ4RU9qMFd6TWl0WkFDUGVsdk5Gb3Q1dURMcjcwbGxUV3ItdjhZUGdQUTBZOVUyZEZlRzdmSEtjM3EwQTNUam1nRVZNdXFRbmNfeHhpUnNVQjNPbjNyOGtSZHVnNEZmbnpJdC1VdVA5X25rWndhMnZqemNGVWdVU1Y5OE8ybExyT2xLelF6dnZsNkM0OU55b1dKc1NuNF9sWkVGSGZJaUNxLXc4eEdGZTl3LUtFTDFuUUE?oc=5"
+    }
+   ],
+   "ours": [],
+   "headline_bg": "Иран съобщава, че три танкера са ударили мини в Хормуз въпреки ескорта на САЩ, докато Treasury разширява санкциите"
   },
   {
-   "headline": "US Senate passes bipartisan bill to speed energy, infrastructure projects - Reuters",
-   "source": "Reuters Business",
-   "why": "Двупартийният закон за ускоряване на енергийни и инфраструктурни проекти е ключова стъпка, подкрепяща акциите на енергийния сектор, комуналните компании и AI data center строителството при преминаване и през Камарата.",
-   "source_text": "US Senate passes bipartisan bill to speed energy, infrastructure projects - Reuters US Senate passes bipartisan bill to speed energy, infrastructure projects Reuters Senate passes BAAJA permitting reform bill backed by AI, energy sectors The permitting bill's Senate passage is a key step to it becoming law, but it would also need to clear the House before heading to President Trump's desk.",
-   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPYWNIMlNjd1I2dzg4R0JUc2Jzb29wWElMQUJpZjhpR0NKeVVYWVJCX0xtNWEyRnVPelpSUC00Uk12aDZZQ3h2T0JKMkNMV3lyQTVoMjBIS040RDRremdwUjhRRGYyUS0ybG90ZS00bks1ckZYeDFDR3NlNGRHWkpaZVBjdTVjR2x0ZlFJbF9GR3ZnTWMtdi1fV19zZ3pDbmRqLW5NTENHVGljVHpZdFUwWWxTUnhCb0htWU9WNVA0dw?oc=5",
+   "headline": "CrowdStrike to acquire Zscaler in a $44 billion deal that would create a cybersecurity giant - AP News",
+   "source": "AP Business",
+   "why": "",
+   "source_text": "CrowdStrike to acquire Zscaler in a $44 billion deal that would create a cybersecurity giant - AP News CrowdStrike to acquire Zscaler in a $44 billion deal that would create a cybersecurity giant AP News CrowdStrike CEO defends Zscaler acquisition, calls it a 'winning combination' CrowdStrike CEO George Kurtz defended the company's $44 billion acquisition of Zscaler.",
+   "published": "2026-11-23T16:33Z",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQekFodWNTV2dTaVZ6VDJScmUybjJ3QXRURFJjeVNtQVBmOEJkYUZTNnFlMnNKalRWdFdXOWVwTjg1TFU3THJIOU9hSXNtSXZCczVaT0xDYnNKUEJUYXFXbVpTUkhTNWRFb3VIa1RDcHdOMzB4ZVV4cTZ6STBQZ2RWLWNPT2U1RGRHYjIxNEZ1QlFXQXZJMDhJeHdDLUFUc2tSUjJoejc1dGhzTWtkUS1Hb3V1V1hKbXplV3J2Zw?oc=5",
    "also": [
     {
      "source": "CNBC",
-     "headline": "Senate passes BAAJA permitting reform bill backed by AI, energy sectors",
-     "link": "https://www.cnbc.com/2026/11/20/baaja-bill-senate-passes-permitting-reform.html"
+     "headline": "CrowdStrike CEO defends Zscaler acquisition, calls it a 'winning combination'",
+     "link": "https://www.cnbc.com/2026/11/23/crowdstrike-zscaler-deal-ceo-george-kurtz.html"
     }
-   ]
+   ],
+   "ours": [],
+   "headline_bg": "CrowdStrike ще придобие Zscaler в сделка за 44 млрд. долара, която би създала гигант в киберсигурността"
+  },
+  {
+   "headline": "Fed's John Williams indicates higher interest rates likely 'over time' to address inflation",
+   "source": "CNBC",
+   "why": "",
+   "source_text": "Fed's John Williams indicates higher interest rates likely 'over time' to address inflation The influential central banker expressed confidence that inflation will get closer to the Fed's 2% target in 2027. Dollar climbs as renewed AI euphoria fuels Fed hike bets - Reuters Dollar climbs as renewed AI euphoria fuels Fed hike bets Reuters",
+   "published": "2026-11-23T21:02Z",
+   "link": "https://www.cnbc.com/2026/11/23/john-williams-fed-inflation-rate-hikes.html",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Dollar climbs as renewed AI euphoria fuels Fed hike bets - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQWk01SnRnY1hzWHBOdlQ5eGdldmlIQkd5QUM4SFJ5S3Z5YWtVQnlYWVp3LXlqajM1QTA5UTBBSFNrOFdjVGdWME54WUJYdFRGUXJDYlVmUDFETjlITTZtYkFiWW9IcU9sVTM0R0otbjlmMXNCdC1HSEVNOXJMaDlIMC1YUnFBUDZNMXh6RlRwMVM5MDFRTy1YQXc3U21zYU0?oc=5"
+    }
+   ],
+   "ours": [],
+   "headline_bg": "John Williams от Fed посочва, че по-високите лихвени проценти вероятно ще продължат „с времето\" с цел овладяване на инфлацията"
+  },
+  {
+   "headline": "Gold edges higher on bargain buying; US inflation data awaited - Reuters",
+   "source": "Reuters Business",
+   "why": "",
+   "source_text": "Gold edges higher on bargain buying; US inflation data awaited - Reuters Gold edges higher on bargain buying; US inflation data awaited Reuters",
+   "published": "2026-11-24T00:57Z",
+   "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOX2lLRXdXdmpCM0FsdHVpNkdYTWttMDRZd294U3VSZGtqczloSEN5N1VfTzBpbjJLZGYwWm55RDlXSmY0b2tod0tBUl9lbkl4TW13VDBuWEVDYjgxamc4anBNdGhtWTdvUUNiYUp5MDlJVU81Sl9qa283bUIzTUNCU0lZZ1VBdXo2UW5hQmoyT191dFpWODY2aldnOVJmRzVaaV9tZDF2U0hKbmRubUg0TllIendaRzg?oc=5",
+   "ours": [],
+   "headline_bg": "Златото леко поскъпва на фона на покупки при спад; очакват се данни за инфлацията в САЩ"
+  },
+  {
+   "headline": "EU proposes sweeping new Russia sanctions targeting banks, crypto and sports events - AP News",
+   "source": "AP Business",
+   "why": "",
+   "source_text": "EU proposes sweeping new Russia sanctions targeting banks, crypto and sports events - AP News EU proposes sweeping new Russia sanctions targeting banks, crypto and sports events AP News",
+   "published": "2026-11-23T17:53Z",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQc1FWT0FKN3NFS3JoRG0zYnZvTkpjNEZqR240QzdMQVJDM1lmUklKeHpLeUl4bmFNUnlSa29kaU13WmhBdkNmVkt1WVZDUkdycVl3elQ1c1BwelFsLWVJeDhNNVBORWZBLWlhd0VqQ1QzLXFaNEZjRHEydWY1MGJYcDlYeWc5RjE4UEVEekJDYURuTWJfbk1WMGo1dWR3Zl84TUs1NEFJemZPZHVOVEE?oc=5",
+   "ours": [],
+   "headline_bg": "ЕС предлага мащабни нови санкции срещу Русия, насочени към банки, крипто и спортни събития"
+  },
+  {
+   "headline": "Trump administration proposes rule that could curb ESG investing in 401(k)s",
+   "source": "CNBC",
+   "why": "",
+   "source_text": "Trump administration proposes rule that could curb ESG investing in 401(k)s The Labor Department proposed a regulation Monday that seeks to curb uptake of ESG funds in workplace retirement plans such as 401(k)s.",
+   "published": "2026-11-23T19:46Z",
+   "link": "https://www.cnbc.com/2026/11/23/labor-department-esg-401k-rule.html",
+   "ours": [],
+   "headline_bg": "Администрацията на Trump предлага правило, което би могло да ограничи ESG инвестирането в 401(k)"
   }
  ],
  "window": {
-  "since": "2026-11-19T06:30:00+00:00",
-  "hours": 24.1,
+  "since": "2026-11-23T06:30:00+00:00",
+  "hours": 24.07,
   "day_queries": 0,
   "sources": {
    "Reuters Business": {
-    "count": 52,
-    "oldest": "2026-11-19T11:08Z"
+    "count": 50,
+    "oldest": "2026-11-23T14:28Z"
    },
    "CNBC": {
-    "count": 28,
-    "oldest": "2026-11-19T10:54Z"
+    "count": 30,
+    "oldest": "2026-11-23T18:11Z"
    },
    "Financial Times": {
-    "count": 12,
-    "oldest": "2026-11-19T21:02Z"
+    "count": 11,
+    "oldest": "2026-11-23T17:17Z"
    },
    "AP Business": {
     "count": 50,
-    "oldest": "2026-11-19T07:25Z"
+    "oldest": "2026-11-23T08:29Z"
    }
   },
   "fetched": {
-   "Reuters Business": 52,
-   "CNBC": 28,
-   "Financial Times": 12,
+   "Reuters Business": 50,
+   "CNBC": 30,
+   "Financial Times": 11,
    "AP Business": 50
   },
   "dead": [],
@@ -170,42 +177,39 @@
    "Reuters World": 50
   },
   "front_dead": [],
-  "pool_total": 142,
+  "pool_total": 141,
   "pool_used": 100,
   "to_model": {
-   "Reuters Business": 31,
-   "Financial Times": 11,
-   "AP Business": 28,
    "CNBC": 28,
-   "Reuters World": 1,
+   "Financial Times": 11,
+   "AP Business": 29,
+   "Reuters Business": 29,
+   "Reuters World": 2,
    "FT World": 1
   },
   "themes_in_pool": 11,
   "priority": {
-   "names": 42,
-   "hits": 6,
-   "in_pool": 6,
-   "beyond_limit": 2,
+   "names": 37,
+   "hits": 2,
+   "in_pool": 2,
+   "beyond_limit": 0,
    "tickers": [
-    "AAPL",
-    "ACN",
-    "ANT",
-    "DLTR",
-    "HLT",
-    "MA"
+    "ANT"
    ]
   }
  },
  "themes": [
   {
-   "key": "Xi–Trump",
+   "key": "Huang–Nvidia–Jensen–Trump",
    "names": [
-    "XI",
+    "HUANG",
+    "NVIDIA",
+    "JENSEN",
     "TRUMP"
    ],
-   "headline": "Trump says he and China's Xi want moderate AI rules - Reuters",
-   "source": "Reuters Business",
-   "published": "2026-11-20T05:45Z",
+   "headline": "Trump sealed deal for Nvidia to rehire Jensen Huang as CEO",
+   "source": "CNBC",
+   "published": "2026-11-24T06:31Z",
    "publishers": [
     "AP",
     "CNBC",
@@ -213,62 +217,201 @@
     "Reuters"
    ],
    "n_publishers": 4,
-   "n_headlines": 8,
+   "n_headlines": 28,
    "front": true,
    "items": [
     {
-     "title": "China revels in Xi’s ‘Yalta 2.0’ moment",
+     "title": "Trump made up to $15mn on Nvidia shares after Huang’s return",
      "source": "Financial Times",
-     "published": "2026-11-20T05:45Z"
+     "published": "2026-11-23T22:21Z"
     },
     {
-     "title": "Trump, Xi and Putin hold rare 3-way talks on nuclear risks but deliver no breakthroughs - AP News",
+     "title": "US stocks surge and recover half of last week’s plunge after Jensen Huang returns as Nvidia’s CEO - AP News",
      "source": "AP Business",
-     "published": "2026-11-19T19:24Z"
+     "published": "2026-11-23T22:20Z"
     },
     {
-     "title": "APEC final day in photos: Trump, Xi and Putin shake hands; Takaichi kept at a distance",
+     "title": "Jensen Huang is ‘too big to fire,’ putting Nvidia’s governance in focus: analysts",
      "source": "CNBC",
-     "published": "2026-11-19T10:54Z"
+     "published": "2026-11-24T06:31Z"
     },
     {
-     "title": "For Putin, sharing a spotlight with Trump and Xi boosts his profile on the global stage - AP News",
+     "title": "Huang is back because he left Nvidia no choice",
+     "source": "Financial Times",
+     "published": "2026-11-23T17:17Z"
+    },
+    {
+     "title": "Nvidia board reinstates Jensen Huang as CEO just days after rejecting his offer to return - AP News",
      "source": "AP Business",
-     "published": "2026-11-19T14:43Z"
+     "published": "2026-11-23T23:36Z"
     },
     {
-     "title": "Takeaways from the historic summit among Trump, Xi and Putin - AP News",
+     "title": "Stock futures rise as traders see whether Nvidia can extend rally from Jensen Huang’s return: Live updates",
+     "source": "CNBC",
+     "published": "2026-11-24T06:17Z"
+    },
+    {
+     "title": "At AI speed, Nvidia's Jensen Huang finds exoneration - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-24T01:51Z"
+    },
+    {
+     "title": "Trump sealed deal for Nvidia to rehire Jensen Huang as CEO",
+     "source": "CNBC",
+     "published": "2026-11-23T23:42Z"
+    },
+    {
+     "title": "Analysts comment on market impact of Huang's return as Nvidia CEO - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-24T02:33Z"
+    },
+    {
+     "title": "Asian stocks rally as Huang's return to Nvidia revives the AI trade - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-24T01:29Z"
+    },
+    {
+     "title": "Dow soars 1,400 points; Nasdaq surges 6% in its best day since April 2025 as Jensen Huang returns to Nvidia",
+     "source": "CNBC",
+     "published": "2026-11-23T21:10Z"
+    },
+    {
+     "title": "Jensen Huang returns to Nvidia: 'I'm going to be a better CEO the second time around'",
+     "source": "CNBC",
+     "published": "2026-11-23T18:48Z"
+    },
+    {
+     "title": "Six key questions raised by Jensen Huang's return to Nvidia",
+     "source": "CNBC",
+     "published": "2026-11-24T03:05Z"
+    },
+    {
+     "title": "Wall Street analysts scramble to upgrade Nvidia’s stock after Huang’s return",
+     "source": "CNBC",
+     "published": "2026-11-23T18:11Z"
+    },
+    {
+     "title": "What are the various US federal and state probes faced by Nvidia and Jensen Huang? - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-24T00:40Z"
+    },
+    {
+     "title": "Congress shreds Nvidia's 'outrageous' decision to bring back Huang: 'Failure of character'",
+     "source": "CNBC",
+     "published": "2026-11-23T20:22Z"
+    },
+    {
+     "title": "COMMENTARY: TRADING DAY Market euphoria as Huang returns to Nvidia - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T22:07Z"
+    },
+    {
+     "title": "Trump saw Nvidia's Huang as protector of open-weight AI models, sources say - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T19:23Z"
+    },
+    {
+     "title": "Jim Cramer sees more upside for Nvidia stock with Jensen Huang back as CEO",
+     "source": "CNBC",
+     "published": "2026-11-23T23:14Z"
+    },
+    {
+     "title": "Huang's stunning Nvidia return sparks relief for battered AI trade - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T20:40Z"
+    },
+    {
+     "title": "Jensen Huang reinstated as Nvidia CEO. Stock skyrockets 31%",
+     "source": "CNBC",
+     "published": "2026-11-23T21:08Z"
+    },
+    {
+     "title": "Nvidia bears face $12.2 billion hit on Huang's surprise return - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T16:39Z"
+    },
+    {
+     "title": "US lawmakers criticize Nvidia decision to reinstate Huang as CEO - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T22:30Z"
+    },
+    {
+     "title": "Nvidia CEO Jensen Huang pulls off an unlikely comeback in just 11 days - AP News",
      "source": "AP Business",
-     "published": "2026-11-20T00:39Z"
+     "published": "2026-11-24T03:19Z"
     },
     {
-     "title": "Trump says he and China's Xi want moderate AI rules - Reuters",
+     "title": "Political and corporate leaders react to Huang's return as Nvidia CEO - Reuters",
      "source": "Reuters Business",
-     "published": "2026-11-19T22:34Z"
+     "published": "2026-11-23T20:52Z"
     },
     {
-     "title": "China's Xi says US should do 'right thing' on Taiwan to avoid setbacks in relations - Reuters",
+     "title": "VIEW Nvidia reinstates Jensen Huang as CEO, igniting tech surge - Reuters",
      "source": "Reuters Business",
-     "published": "2026-11-19T11:45Z"
+     "published": "2026-11-23T17:07Z"
     },
     {
-     "title": "Australia PM and China’s Xi hail ‘turnaround’ despite iron ore tensions",
+     "title": "Does Jensen Huang’s return to Nvidia mean the chip group is too big to fail?",
      "source": "FT World",
-     "published": "2026-11-20T04:20Z"
+     "published": "2026-11-24T05:00Z"
+    },
+    {
+     "title": "How Nvidia’s billion-dollar turnaround in China is threatened by Huang’s exit - Reuters",
+     "source": "Reuters World",
+     "published": "2026-11-23T11:50Z"
     }
    ]
   },
   {
-   "key": "Takaichi",
+   "key": "Iowa",
    "names": [
-    "TAKAICHI"
+    "IOWA"
    ],
-   "headline": "Japan's Prime Minister Takaichi says Russia and Japan will keep talking as ties remain chilled - AP News",
-   "source": "AP Business",
-   "published": "2026-11-19T18:29Z",
+   "headline": "Army says detonation of lead explosives in Iowa will proceed on Wednesday - Reuters",
+   "source": "Reuters Business",
+   "published": "2026-11-24T03:32Z",
    "publishers": [
     "AP",
     "CNBC",
+    "Reuters"
+   ],
+   "n_publishers": 3,
+   "n_headlines": 4,
+   "front": true,
+   "items": [
+    {
+     "title": "US Army to detonate degraded bomb-making material in Iowa after getting court approval - AP News",
+     "source": "AP Business",
+     "published": "2026-11-24T03:24Z"
+    },
+    {
+     "title": "U.S. court orders to proceed with planned ammunition detonation in Iowa",
+     "source": "CNBC",
+     "published": "2026-11-24T03:32Z"
+    },
+    {
+     "title": "Army says detonation of lead explosives in Iowa will proceed on Wednesday - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T19:19Z"
+    },
+    {
+     "title": "What to know about US Army plans to blow up a stockpile of lead azide in Iowa - Reuters",
+     "source": "Reuters World",
+     "published": "2026-11-23T23:57Z"
+    }
+   ]
+  },
+  {
+   "key": "California",
+   "names": [
+    "CALIFORNIA"
+   ],
+   "headline": "Trump decries California’s death penalty commutation as a ‘shocking act’",
+   "source": "FT World",
+   "published": "2026-11-24T00:29Z",
+   "publishers": [
+    "AP",
+    "FT",
     "Reuters"
    ],
    "n_publishers": 3,
@@ -276,86 +419,30 @@
    "front": true,
    "items": [
     {
-     "title": "APEC final day in photos: Trump, Xi and Putin shake hands; Takaichi kept at a distance",
-     "source": "CNBC",
-     "published": "2026-11-19T10:54Z"
+     "title": "Trump criticizes Governor Newsom for commuting California death sentences - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-23T18:26Z"
     },
     {
-     "title": "Japan's Prime Minister Takaichi says Russia and Japan will keep talking as ties remain chilled - AP News",
+     "title": "Legal fight over 20,000 California ballots ends as appeals court OKs DOJ dismissal - AP News",
      "source": "AP Business",
-     "published": "2026-11-19T18:29Z"
+     "published": "2026-11-23T23:23Z"
     },
     {
-     "title": "Japan's position on Taiwan has not changed, PM Takaichi says - Reuters",
-     "source": "Reuters World",
-     "published": "2026-11-19T07:58Z"
+     "title": "Trump decries California’s death penalty commutation as a ‘shocking act’",
+     "source": "FT World",
+     "published": "2026-11-24T00:29Z"
     }
    ]
-  },
+  }
+ ],
+ "path": "ai",
+ "attempts": [
   {
-   "key": "Nvidia",
-   "names": [
-    "NVIDIA"
-   ],
-   "headline": "Can Nvidia learn from AIG’s mistakes?",
-   "source": "Financial Times",
-   "published": "2026-11-20T05:00Z",
-   "publishers": [
-    "AP",
-    "CNBC",
-    "FT",
-    "Reuters"
-   ],
-   "n_publishers": 4,
-   "n_headlines": 9,
-   "front": false,
-   "items": [
-    {
-     "title": "Can Nvidia learn from AIG’s mistakes?",
-     "source": "Financial Times",
-     "published": "2026-11-20T05:00Z"
-    },
-    {
-     "title": "Alibaba defrauded shareholders by concealing ties to suspected spy in Nvidia scandal, lawsuit says - Reuters",
-     "source": "Reuters Business",
-     "published": "2026-11-19T23:32Z"
-    },
-    {
-     "title": "US approved sale of Nvidia and AMD chips to Chinese companies",
-     "source": "Financial Times",
-     "published": "2026-11-20T00:42Z"
-    },
-    {
-     "title": "California AG subpoenas Nvidia over concerns about former CEO, China ties - Reuters",
-     "source": "Reuters Business",
-     "published": "2026-11-19T23:31Z"
-    },
-    {
-     "title": "California attorney general issues Nvidia subpoena in probe of China chip diversion",
-     "source": "CNBC",
-     "published": "2026-11-19T23:21Z"
-    },
-    {
-     "title": "Jensen Huang's — and Nvidia's — legal exposure balloons",
-     "source": "CNBC",
-     "published": "2026-11-19T18:44Z"
-    },
-    {
-     "title": "Trump bought Nvidia, Palantir, SpaceX in September as federal deals, White House ties grew",
-     "source": "CNBC",
-     "published": "2026-11-19T19:43Z"
-    },
-    {
-     "title": "Trump bought up to $265,000 of Nvidia stock in September, disclosure shows - Reuters",
-     "source": "Reuters Business",
-     "published": "2026-11-19T18:37Z"
-    },
-    {
-     "title": "Chinese tech firms fear AI hits from US curbs after Nvidia fallout - AP News",
-     "source": "AP Business",
-     "published": "2026-11-19T15:40Z"
-    }
-   ]
+   "pool": 100,
+   "max_tokens": 3000,
+   "result": "ok",
+   "kept": 8
   }
  ]
 }
