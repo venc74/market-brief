@@ -1693,6 +1693,48 @@
    "close_pct": 1.45,
    "high_pct": 3.59,
    "resolved_on": "2026-11-24"
+  },
+  {
+   "ticker": "DKS",
+   "session": "2026-11-23",
+   "brief_date": "2026-11-25",
+   "source": "preopen",
+   "gap_session": "2026-11-24",
+   "prev_close": 133.67,
+   "pm_price": 151.0,
+   "pm_gap_pct": 12.96,
+   "pm_last_ny": "09:05",
+   "ah_price": null,
+   "ah_gap_pct": null,
+   "ah_bars": null,
+   "ah_volume": null,
+   "neglect": true,
+   "ret63_pct": 7.5,
+   "open_gap_pct": 11.28,
+   "close_pct": 14.59,
+   "high_pct": 18.12,
+   "resolved_on": "2026-11-25"
+  },
+  {
+   "ticker": "ANF",
+   "session": "2026-11-23",
+   "brief_date": "2026-11-25",
+   "source": "preopen",
+   "gap_session": "2026-11-24",
+   "prev_close": 140.45,
+   "pm_price": 155.3,
+   "pm_gap_pct": 10.57,
+   "pm_last_ny": "09:05",
+   "ah_price": null,
+   "ah_gap_pct": null,
+   "ah_bars": null,
+   "ah_volume": null,
+   "neglect": false,
+   "ret63_pct": 29.0,
+   "open_gap_pct": 13.13,
+   "close_pct": 19.69,
+   "high_pct": 27.01,
+   "resolved_on": "2026-11-25"
   }
  ]
 }

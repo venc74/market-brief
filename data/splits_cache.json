@@ -1,5 +1,5 @@
 {
- "date": "2026-11-24",
+ "date": "2026-11-25",
  "rows": [],
  "horizon": [
   {
@@ -23,6 +23,14 @@
    "company": "Auddia Inc.",
    "date": "2026-11-23",
    "ratio": "1:14",
+   "split_type": "reverse",
+   "date_human": "Nov 23, 2026"
+  },
+  {
+   "ticker": "AVZO",
+   "company": "Avenzo Therapeutics, Inc.",
+   "date": "2026-11-23",
+   "ratio": "1:2",
    "split_type": "reverse",
    "date_human": "Nov 23, 2026"
   },
@@ -147,6 +155,22 @@
    "date_human": "Nov 24, 2026"
   },
   {
+   "ticker": "FNUC",
+   "company": "Frontier Nuclear and Minerals Inc.",
+   "date": "2026-11-25",
+   "ratio": "1:15",
+   "split_type": "reverse",
+   "date_human": "Nov 25, 2026"
+  },
+  {
+   "ticker": "PASG",
+   "company": "Passage Bio, Inc.",
+   "date": "2026-11-25",
+   "ratio": "1:6",
+   "split_type": "reverse",
+   "date_human": "Nov 25, 2026"
+  },
+  {
    "ticker": "CBSH",
    "company": "Commerce Bancshares, Inc.",
    "date": "2026-12-01",
@@ -161,6 +185,22 @@
    "ratio": "5%",
    "split_type": null,
    "date_human": "Dec 02, 2026"
+  },
+  {
+   "ticker": "TOVX",
+   "company": "Theriva Biologics, Inc.",
+   "date": "2026-12-02",
+   "ratio": "1:30",
+   "split_type": "reverse",
+   "date_human": "Dec 02, 2026"
+  },
+  {
+   "ticker": "ACP",
+   "company": "abrdn Income Credit Strategies Fund",
+   "date": "2026-12-07",
+   "ratio": "1:4",
+   "split_type": "reverse",
+   "date_human": "Dec 07, 2026"
   },
   {
    "ticker": "MYND",
@@ -262,14 +302,15 @@
  "diag": {
   "source": "nasdaq",
   "errors": [],
-  "source_rows": 32,
+  "source_rows": 37,
   "horizon_from": "2026-11-23",
   "horizon_to": "2026-12-09",
-  "in_week": 18,
+  "in_week": 21,
   "dropped_price": [
    "RIME",
    "AEI",
    "AUUD",
+   "AVZO",
    "BRNX",
    "CYAB",
    "IMCC",
@@ -282,11 +323,13 @@
    "CODX",
    "GFAI",
    "ISPC",
-   "JAGX",
-   "RBNE"
+   "RBNE",
+   "FNUC",
+   "PASG"
   ],
   "dropped_cap": [
-   "LSTA"
+   "LSTA",
+   "JAGX"
   ],
   "dropped_no_data": [],
   "passed": 0,
