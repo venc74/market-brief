@@ -153,20 +153,26 @@ def company_row(c: dict, nasdaq: dict | None, qs: dict | None, frame, pool: list
     return out
 
 
-def market_rows(frames: dict | None, now_utc, session: str) -> list[dict]:
-    """ES, NQ, доларът (спрямо 16:00 Ню Йорк на сесията), 10Y (затварянето на ^TNX) и ZN=F → [{label, text, ok}]. Чиста функция."""
-    from src import preopen
+def market_rows(frames: dict | None, now_utc, session: str, quotes: dict | None = None) -> list[dict]:
+    """
+    ES, NQ, доларът (спрямо затварянето на сесията — 16:00, или 13:00 след съкратена), 10Y (затварянето на ^TNX) и ZN=F → [{label, text, ok}]. Чиста функция.
+    27.11.2026 (уикенд пакет, т. 3): без 5-минутни бари — котировката на Yahoo (quotes; preopen.futures_point) с етикет; до 27.11 — „няма данни (Yahoo без нощни бари)“.
+    """
+    from src import preopen, sessions
     import pandas as pd
     frames = frames or {}
     out = []
+    cm = sessions.close_minute(session)
     for sym, label in (("ES=F", "ES (S&P 500 фючърс)"), ("NQ=F", "NQ (Nasdaq-100 фючърс)"), ("DX-Y.NYB", "долар (DXY)")):
-        p = preopen.premarket_point(frames.get(sym), now_utc)
+        p = preopen.futures_point(frames.get(sym), (quotes or {}).get(sym), now_utc)
         if p and p["prev_close"]:
             ch = (p["pm_price"] / p["prev_close"] - 1) * 100
-            out.append({"label": label, "ok": True, "chg_pct": round(ch, 2), "price": round(p["pm_price"], 2),
-                        "text": f"{label} {ch:+.2f}% ({p['pm_price']:,.2f} в {p['pm_last_ny']} Ню Йорк спрямо 16:00 на {session[8:10]}.{session[5:7]}; Yahoo)".replace(",", " ")})
+            px = f"{p['pm_price']:,.2f}".replace(",", " ")
+            txt = (f"{label} {ch:+.2f}% ({px} в {p['pm_last_ny']} Ню Йорк спрямо {cm // 60:02d}:{cm % 60:02d} на {session[8:10]}.{session[5:7]}; Yahoo)" if p.get("source") == "bars" else
+                   f"{label} {ch:+.2f}% ({px} — котировка Yahoo, без 5-мин. бари; спрямо {p.get('base_label')})")
+            out.append({"label": label, "ok": True, "chg_pct": round(ch, 2), "price": round(p["pm_price"], 2), "source": p.get("source"), "text": txt})
         else:
-            out.append({"label": label, "ok": False, "text": f"{label}: няма данни (Yahoo без нощни бари)"})
+            out.append({"label": label, "ok": False, "text": f"{label}: няма данни (Yahoo — нито нощни бари, нито котировка)"})
     tnx = frames.get("^TNX")
     try:
         ix = pd.DatetimeIndex(tnx.index)
@@ -184,7 +190,7 @@ def market_rows(frames: dict | None, now_utc, session: str) -> list[dict]:
     return out
 
 
-def build(today: str, prev_brief: dict | None, *, frames: dict | None, now_utc, nasdaq_rows: list | None = None, qs: dict | None = None, pool: list | None = None,
+def build(today: str, prev_brief: dict | None, *, frames: dict | None, now_utc, nasdaq_rows: list | None = None, qs: dict | None = None, pool: list | None = None, quotes: dict | None = None,
           fallback_rows: list | None = None, pool_checked: bool = True, errors: list | None = None) -> dict:
     """
     → {"session", "companies": [...], "market": [...], "notes": [...], "source"}. Компаниите — от календара на предишния бриф (companies) или — без него — fallback_rows
@@ -207,7 +213,7 @@ def build(today: str, prev_brief: dict | None, *, frames: dict | None, now_utc, 
         notes = econ_calendar.market_day_notes(dt.date.fromisoformat(today)) + notes
     except Exception as e:
         print(f"[overnight] бележката за празниците пропусната: {type(e).__name__}: {e}")
-    return {"session": session, "companies": out_c, "market": market_rows(frames, now_utc, session), "notes": notes,
+    return {"session": session, "companies": out_c, "market": market_rows(frames, now_utc, session, quotes), "notes": notes,
             "source": f"компаниите — {src_note} (тегло > 2% в S&P 500, капитализация ≥ ${config.WEEK_CAL_MIN_MARKET_CAP / 1e9:.0f} млрд, нашите); EPS — Nasdaq, приходи — Yahoo, "
                       "цени — Yahoo (5-мин. бари), прогноза — само дословно заглавие"}
 
@@ -289,8 +295,15 @@ def run_for_brief(today: str, prev_brief: dict, *, ours: dict | None = None, poo
     except Exception as e:
         frames = {}
         errors.append(f"цените от Yahoo не се изтеглиха: {type(e).__name__}")
+    quotes = {}
+    no_bars = [s for s in ("ES=F", "NQ=F", "DX-Y.NYB") if not _po.premarket_point(frames.get(s), now_utc)]
+    if no_bars:                                                                    # 27.11.2026 (уикенд пакет, т. 3): втори източник — котировката
+        try:
+            quotes = _po.fetch_quotes(no_bars)
+        except Exception as e:
+            errors.append(f"котировките на фючърсите: {type(e).__name__}")
     res = build(today, {"week_calendar": {"days": [{"date": session.isoformat(), "earnings": cal_rows + extra}]}}, frames=frames, now_utc=now_utc,
-                nasdaq_rows=nd, qs=qs, pool=pool, pool_checked=bool(pool), errors=errors)
+                nasdaq_rows=nd, qs=qs, pool=pool, pool_checked=bool(pool), errors=errors, quotes=quotes)
     if extra:
         res["notes"].append("часът на отчета за " + ", ".join(r["ticker"] for r in extra) + " — по Yahoo (Nasdaq го губи след отчета); календарът на предишния бриф е отпреди 18.11")
     return res

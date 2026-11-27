@@ -1181,6 +1181,7 @@
   {# 16.11.2026 (пакет 16.11, т. 13): емисии на акции при тикърите в книгите и наблюдаваните (картите го носят сами) #}
   {% if offering_lines %}<div class="small" style="color:var(--red);margin:0 0 8px">{% for l in offering_lines %}<div>{{ l }}</div>{% endfor %}<span style="color:var(--muted)">(EDGAR: 424B / S-1 / S-3 за последните {{ offering_days }} дни — книгите и наблюдаваните)</span></div>{% endif %}
   {{ corp_excluded_line(corp_excluded.get("screener")) }}
+  {% if premarket_missing %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:4px 0 8px">⚠ {{ premarket_missing }}</div>{% endif %}
   {% if nov %}{{ novelty_block(nov.canslim) }}<details class="nov-full"><summary>Пълните карти ({{ action_c|length + waiting|length }}) <span class="cs-hint">планът, алармата с обема, размерът</span></summary>{% endif %}
   <div class="cs-sub">Купува се днес · {{ action_c|length }}</div>
   {% for st in action_c %}
@@ -1606,6 +1607,7 @@
   {% if qm_diag and qm_diag.ok is sameas false %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Скенерът не се изпълни{% if qm_diag.error %} ({{ qm_diag.error }}){% endif %} — празният списък НЕ значи, че няма кандидати за пробив.</div>
   {% else %}
+  {% if premarket_missing %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:4px 0 8px">⚠ {{ premarket_missing }}</div>{% endif %}
   {% if nov %}{{ novelty_block(nov.qm) }}{% endif %}
   {% if qm_cards %}
   {% if nov %}<details class="nov-full"><summary>Пълните карти ({{ qm_cards|length }}) <span class="cs-hint">базата, стягането, книгата, размерът</span></summary>{% endif %}
@@ -1743,6 +1745,7 @@
   </div>
   {% for x in qm_ep.sector_bounce or [] %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">{{ x.text }}</div>{% endfor %}
   {% if market_gap %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:6px 0">⚠ {{ market_gap.text }} — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп{% if market_gap.moves %}: {{ market_gap.moves|list|join(", ") }}{% endif %}.</div>{% endif %}
+  {% if premarket_missing %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:4px 0 8px">⚠ {{ premarket_missing }}</div>{% endif %}
   {% if nov %}{{ novelty_block(nov.ep) }}{% endif %}
   {% if qm_ep.ok is sameas false and not qm_ep.rows %}
   <div class="small" style="font-size:12.5px;color:var(--red)">Наблюдението не се изпълни — празният списък НЕ значи, че няма гапове.</div>
@@ -1901,6 +1904,7 @@
   <div class="small" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Няма GLB кандидати днес — проверени {{ glb_status.with_history }} от {{ glb_status.universe }} тикъра{% if glb_status.batches_failed %} ({{ glb_status.batches_failed }} партиди не се изтеглиха){% endif %}.</div>
   {% endif %}
   {{ corp_excluded_line(corp_excluded.get("glb")) }}
+  {% if premarket_missing %}<div class="small" style="font-size:12.5px;color:var(--yellow);margin:4px 0 8px">⚠ {{ premarket_missing }}</div>{% endif %}
   {% if nov %}{{ novelty_block(nov.glb_classic) }}{{ novelty_block(nov.glb_momentum) }}<details class="nov-full"><summary>Пълните таблици ({{ glb_candidates|length }})</summary>{% endif %}
   {% call glb_list("classic", "Classic", glbg.classic) %}<b style="color:var(--green)">Classic</b> = поне {{ glb_band_hold }}% от последните {{ glb_days }} затваряния преди пробива са не по-ниско от {{ glb_approach }}% под линията (наш етикет, не на Уиш).{% endcall %}
   {% call glb_list("momentum", "Momentum", glbg.momentum) %}<b style="color:var(--yellow)">Momentum</b> = по-малко от това — бърз / волатилен пробив; по-висок очакван drawdown от Classic.{% endcall %}

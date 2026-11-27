@@ -736,6 +736,24 @@ def market_gap_day(brief: dict | None) -> dict | None:
     return {"text": mg.get("text"), "moves": moves}
 
 
+def premarket_missing(brief: dict | None) -> str | None:
+    """
+    27.11.2026 (уикенд пакет, т. 3): карето в 15:05 е без премаркет (под config.PREOPEN_MIN_PM_SHARE от поисканите) или без фючърси → банер във всяка секция (CANSLIM, Kullamägi,
+    GLB, EP): „премаркет липсва — денят на пазарен гап не може да се провери“ + с колко. Сутрин (без каре) / нормален премаркет → None. Чиста функция.
+    """
+    p = (brief or {}).get("preopen")
+    if not isinstance(p, dict):
+        return None
+    cov, m = p.get("coverage") or {}, p.get("market") or {}
+    n, k = cov.get("requested") or (p.get("diag") or {}).get("requested") or 0, cov.get("with_pm") if cov.get("with_pm") is not None else (p.get("diag") or {}).get("with_pm")
+    low = bool(n) and (k or 0) < config.PREOPEN_MIN_PM_SHARE * n
+    no_fut = bool(m.get("futures_missing")) and not m.get("futures")
+    if not (low or no_fut):
+        return None
+    parts = ([f"премаркет за {k or 0} от {n} тикъра"] if low else []) + ([f"фючърсите ({', '.join(m['futures_missing'])}) — без цена"] if no_fut else [])
+    return "премаркет липсва — денят на пазарен гап не може да се провери (" + "; ".join(parts) + ")"
+
+
 def cash_block(brief: dict | None) -> str | None:
     """23.11.2026 (пакет 23.11, т. 5): режим Cash → config.CASH_BLOCK_TEXT (картите и „Нови днес“ — без размер); иначе None. Чиста функция."""
     return config.CASH_BLOCK_TEXT if ((brief or {}).get("thermometer") or {}).get("regime") == "Cash" else None
@@ -988,7 +1006,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
     gen_time, gen_tz = generated or berlin_clock()         # един вик — часът и етикетът са от един и същи момент
     html = tpl.render(
         closed_notice=closed_notice,
-        calendar_note=brief.get("market_calendar_note"),      # 16.10.2026 (В2б): утре / в понеделник борсата не работи или затваря рано
+        calendar_note=None if closed_notice else brief.get("market_calendar_note"),      # 16.10.2026 (В2б): утре / в понеделник борсата не работи или затваря рано; 27.11.2026 (т. 2): в затворен ден бележката от предишния бриф („Утре (26.11)…“) е остаряла — без нея
         preopen=brief.get("preopen"), preopen_gap=config.PREOPEN_GAP_PCT, preopen_watch_gap=config.PREOPEN_WATCH_GAP_PCT,    # 03.11.2026 (т. 10): карето преди отварянето
         date_human=f"{today.strftime('%d.%m.%Y')}, {WEEKDAYS_BG[today.weekday()]}",
         generated_at=gen_time,
@@ -1069,6 +1087,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         news_pool_note=news_pool_note(brief.get("news_window"), brief.get("news_diag")),
         news_path=news_path_note(brief.get("news_diag")),                    # 23.11.2026 (т. 1): пътят на подбора
         cash_block=cash_block(brief),                                        # 23.11.2026 (т. 5): режим Cash — картите без размер
+        premarket_missing=premarket_missing(brief),                          # 27.11.2026 (т. 3): банер във всяка секция
         market_gap=market_gap_day(brief),                                    # 23.11.2026 (т. 4): ден на пазарен гап (след 15:05)     # 18.11.2026 (т. 1): какво стигна до подбора и какво падна
         news_h=news_window_hours(brief.get("news_window")), crypto_h=news_window_hours(brief.get("news_window"), "crypto_hours"),
         crypto_window_note=crypto_window_note(brief.get("news_window"), (brief.get("crypto") or {}).get("pool_sources")),     # 04.11.2026 (С5)

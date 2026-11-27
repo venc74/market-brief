@@ -69,10 +69,12 @@ def extract_ah(df: pd.DataFrame) -> dict | None:
         return None
     ix = df.index.tz_convert(NY) if df.index.tz is not None else df.index.tz_localize("UTC").tz_convert(NY)
     mins = ix.hour * 60 + ix.minute
+    from src import sessions
     for d in sorted(set(ix.date), reverse=True):
         m = ix.date == d
-        reg = df[m & (mins >= 570) & (mins < 960)]
-        ah = df[m & (mins >= 960)]
+        cm = sessions.close_minute(d)                                     # 27.11.2026 (уикенд пакет, т. 1): 13:00 в съкратена сесия (after-hours започва тогава)
+        reg = df[m & (mins >= 570) & (mins < cm)]
+        ah = df[m & (mins >= cm)]
         if len(ah) and len(reg):
             return {"session": d.isoformat(), "prev_close": float(reg["Close"].iloc[-1]), "ah_price": float(ah["Close"].iloc[-1]), "ah_high": float(ah["High"].max()),
                     "ah_low": float(ah["Low"].min()), "ah_bars": int(len(ah)), "ah_volume": (float(ah["Volume"].fillna(0).sum()) or None),
@@ -105,11 +107,13 @@ def fetch_5m(universe: list[str], batch_size: int | None = None) -> tuple[dict[s
     frames, st = {}, {"batches": 0, "batches_failed": 0}
     if yf is None:
         return frames, st
+    from src import sessions
+    start, end = sessions.intraday_range(pd.Timestamp.now(tz=NY).date())     # 27.11.2026 (уикенд пакет, т. 1): явни дати вместо period="5d"
     for i in range(0, len(universe), batch_size):
         batch = universe[i:i + batch_size]
         st["batches"] += 1
         try:
-            data = yf.download(batch, period="5d", interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
+            data = yf.download(batch, start=start, end=end, interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
             if data is None or data.empty:
                 raise ValueError("празен резултат")
         except Exception as e:

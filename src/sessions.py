@@ -47,6 +47,28 @@ def early_close(d) -> str | None:
     return config.NYSE_EARLY_CLOSES.get(as_date(d).isoformat())
 
 
+def close_minute(d) -> int:
+    """
+    27.11.2026 (уикенд пакет, т. 1): минутата на затварянето в Ню Йорк — 13:00 в ден с ранно затваряне (config.NYSE_EARLY_CLOSES), иначе 16:00. До 27.11 кодът приемаше 16:00
+    навсякъде: след съкратената сесия after-hours между 13:00 и 16:00 щеше да се брои за редовна сесия (затварянето — грешно, гапът след затварянето — грешен).
+    """
+    hm = early_close(d)
+    if hm:
+        h, m = hm.split(":")
+        return int(h) * 60 + int(m)
+    return 16 * 60
+
+
+def intraday_range(today, back_days: int = 7) -> tuple[str, str]:
+    """
+    27.11.2026 (уикенд пакет, т. 1 и 3): (start, end) за 5-минутните бари с ЯВНИ дати — от back_days календарни дни преди предишната сесия до утре (end е изключителен).
+    С period="2d" / "5d" Yahoo закотвя периода на последния ЦЯЛ търговски ден: на 27.11 (след Thanksgiving) в 09:05 Ню Йорк не върна нито един бар за 27.11 — премаркет за 0 от 918.
+    С явни дати върна премаркета (SPY — 65 бара до 09:20; tests/fixtures/yahoo_5m_holiday_2026-11-27.json).
+    """
+    t = as_date(today)
+    return (prev_session(t) - dt.timedelta(days=back_days)).isoformat(), (t + dt.timedelta(days=1)).isoformat()
+
+
 def closed_days(a, b) -> list[dt.date]:
     """Празниците (делнични затворени дни) от a до b включително."""
     a, b = as_date(a), as_date(b)

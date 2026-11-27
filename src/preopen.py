@@ -49,7 +49,7 @@ def premarket_point(df: pd.DataFrame | None, now_utc) -> dict | None:
     ix = (ix.tz_localize("UTC") if ix.tz is None else ix).tz_convert(NY)
     mins = ix.hour * 60 + ix.minute
     today, prev = now.date(), sessions.prev_session(now.date())
-    reg = df[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < CLOSE_MIN)]["Close"].dropna()
+    reg = df[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < sessions.close_minute(prev))]["Close"].dropna()      # 27.11.2026: 13:00 след съкратена сесия
     pm_mask = (ix.date == today) & (mins < OPEN_MIN) & (ix < now)
     pm = df[pm_mask]
     pmc = pm["Close"].dropna()
@@ -73,7 +73,7 @@ def premarket_missing_reason(df: pd.DataFrame | None, now_utc) -> str:
     ix = (ix.tz_localize("UTC") if ix.tz is None else ix).tz_convert(NY)
     mins = ix.hour * 60 + ix.minute
     today, prev = now.date(), sessions.prev_session(now.date())
-    if len(df[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < CLOSE_MIN)]["Close"].dropna()) == 0:
+    if len(df[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < sessions.close_minute(prev))]["Close"].dropna()) == 0:
         return f"няма бар от редовната сесия на {prev:%d.%m}"
     if len(df[(ix.date == today) & (mins < OPEN_MIN) & (ix < now)]["Close"].dropna()) == 0:
         return f"няма премаркет бари днес до {now:%H:%M} Ню Йорк"
@@ -645,8 +645,10 @@ def fetch_market(symbols: list[str]) -> dict:
     денонощно и след уикенда „предишната сесия“ е петък. → {символ: кадър}.
     """
     import yfinance as yf
+    from src import sessions
+    start, end = sessions.intraday_range(pd.Timestamp.now(tz=NY).date())       # 27.11.2026: явни дати (period="5d" след празника — без днешните бари)
     out = {}
-    data = yf.download(list(symbols), period="5d", interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
+    data = yf.download(list(symbols), start=start, end=end, interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
     for t in symbols:
         try:
             df = (data[t] if isinstance(data.columns, pd.MultiIndex) else data).dropna(subset=["Close"])
@@ -657,11 +659,60 @@ def fetch_market(symbols: list[str]) -> dict:
     return out
 
 
+def fetch_quotes(symbols: list[str]) -> dict:
+    """
+    27.11.2026 (уикенд пакет, т. 3): втори източник за фючърсите — котировката на Yahoo (Ticker.fast_info: lastPrice, previousClose), когато 5-минутните бари липсват. На 27.11 ES=F
+    и NQ=F нямаха бари след 25.11 23:55, а котировката имаше цена (ES 7302, NQ 26659.5). Провал на символ → без него. → {символ: {"price", "previous_close"}}.
+    """
+    import yfinance as yf
+    out = {}
+    for s in symbols:
+        try:
+            fi = yf.Ticker(s).fast_info
+            p, pc = float(fi.last_price), float(fi.previous_close)
+            if p == p and p > 0:
+                out[s] = {"price": p, "previous_close": pc if pc == pc and pc > 0 else None}
+        except Exception as e:
+            print(f"[preopen] котировка {s}: {type(e).__name__}: {e}")
+    return out
+
+
+def futures_point(frame, quote: dict | None, now_utc) -> dict | None:
+    """
+    27.11.2026 (уикенд пакет, т. 3): фючърсът спрямо затварянето на предишната сесия — от 5-минутните бари (premarket_point); без тях — от котировката (quote), спрямо
+    редовното затваряне на предишната сесия от баровете (16:00, или 13:00 след съкратена), а без бари изобщо — спрямо предишния сетълмент на котировката. Етикет "source": "bars" /
+    "quote". Чиста функция.
+    """
+    from src import sessions
+    p = premarket_point(frame, now_utc)
+    if p and p.get("prev_close"):
+        return {**p, "source": "bars"}
+    if not (quote and quote.get("price")):
+        return None
+    now = _ny(now_utc)
+    prev = sessions.prev_session(now.date())
+    base, base_label = None, None
+    if frame is not None and len(frame) and "Close" in frame:
+        ix = pd.DatetimeIndex(frame.index)
+        ix = (ix.tz_localize("UTC") if ix.tz is None else ix).tz_convert(NY)
+        mins = ix.hour * 60 + ix.minute
+        reg = frame[(ix.date == prev) & (mins >= OPEN_MIN) & (mins < sessions.close_minute(prev))]["Close"].dropna()
+        if len(reg):
+            cm = sessions.close_minute(prev)
+            base, base_label = float(reg.iloc[-1]), f"{cm // 60:02d}:{cm % 60:02d} на {prev:%d.%m}"
+    if base is None and quote.get("previous_close"):
+        base, base_label = float(quote["previous_close"]), "предишния сетълмент на договора"
+    if not base:
+        return None
+    return {"session": prev.isoformat(), "prev_close": base, "pm_price": float(quote["price"]), "pm_bars": 0, "pm_volume": None,
+            "pm_last_ny": "котировка", "source": "quote", "base_label": base_label}
+
+
 def _num(x: float, nd: int = 2) -> str:
     return f"{x:,.{nd}f}".replace(",", " ")
 
 
-def market_block(frames: dict, weights: dict | None, now_utc, fetch_error: str | None = None) -> dict:
+def market_block(frames: dict, weights: dict | None, now_utc, fetch_error: str | None = None, quotes: dict | None = None) -> dict:
     """
     Фючърсите (config.PREOPEN_FUTURES) — промяната спрямо 16:00 Ню Йорк на предишната сесия (последният 5-минутен бар на редовната сесия, като при акциите — premarket_point);
     компаниите с тегло > PREOPEN_MEGA_WEIGHT_PCT — с гап ≥ ±PREOPEN_MEGA_GAP_PCT (в двете посоки), другите — изброени като „под“. → {"futures", "futures_missing", "mega",
@@ -670,13 +721,14 @@ def market_block(frames: dict, weights: dict | None, now_utc, fetch_error: str |
     now = _ny(now_utc)
     out = {"futures": [], "futures_missing": [], "mega": [], "mega_quiet": [], "mega_missing": [], "weights": weights or {}, "session": None}
     for sym, label in config.PREOPEN_FUTURES.items():
-        p = premarket_point((frames or {}).get(sym), now)
+        p = futures_point((frames or {}).get(sym), (quotes or {}).get(sym), now)          # 27.11.2026 (т. 3): без бари — котировката
         if not p or not p["prev_close"]:
             out["futures_missing"].append(label)
             continue
         out["session"] = out["session"] or p["session"]
         out["futures"].append({"symbol": sym, "label": label, "price": round(p["pm_price"], 2), "prev_close": round(p["prev_close"], 2),
-                               "chg_pct": _pct(p["pm_price"], p["prev_close"]), "last_ny": p["pm_last_ny"]})
+                               "chg_pct": _pct(p["pm_price"], p["prev_close"]), "last_ny": p["pm_last_ny"], "source": p.get("source", "bars"),
+                               **({"base_label": p["base_label"]} if p.get("base_label") else {})})
     for c in (weights or {}).get("companies") or []:
         p = premarket_point((frames or {}).get(c["ticker"]), now)
         if not p or not p["prev_close"]:
@@ -696,9 +748,13 @@ def market_text(m: dict, fetch_error: str | None = None) -> list[str]:
     s = m.get("session")
     when = f" на {s[8:10]}.{s[5:7]}" if s else ""
     lines = []
-    fut = [f"{f['label']} {f['chg_pct']:+.2f}% ({_num(f['price'])} в {f['last_ny']})" for f in m.get("futures") or []]
+    from src import sessions
+    fut = [f"{f['label']} {f['chg_pct']:+.2f}% ({_num(f['price'])} в {f['last_ny']})" if f.get("source", "bars") == "bars" else
+           f"{f['label']} {f['chg_pct']:+.2f}% ({_num(f['price'])} — котировка Yahoo, без 5-мин. бари; спрямо {f.get('base_label') or 'предишното затваряне'})"     # 27.11.2026 (т. 3)
+           for f in m.get("futures") or []]
+    cm = sessions.close_minute(s) if s else 16 * 60
     if fut:
-        lines.append("Фючърси: " + ", ".join(fut) + f" — спрямо 16:00 Ню Йорк{when}."
+        lines.append("Фючърси: " + ", ".join(fut) + f" — спрямо {cm // 60:02d}:{cm % 60:02d} Ню Йорк{when}."
                      + (f" Без данни: {', '.join(m['futures_missing'])}." if m.get("futures_missing") else ""))
     elif m.get("futures_missing"):
         lines.append(f"Фючърсите ({', '.join(m['futures_missing'])}) — без цена в премаркета (Yahoo{': ' + fetch_error if fetch_error else ''}).")
@@ -723,7 +779,7 @@ def market_text(m: dict, fetch_error: str | None = None) -> list[str]:
     return lines
 
 
-def market_section(market_fn, weights_fn, now_utc, day: str) -> dict:
+def market_section(market_fn, weights_fn, now_utc, day: str, quote_fn=None) -> dict:
     """Теглата → символите (фючърсите + компаниите) → бари → market_block. Провал на тегленето на бари → редът казва „без цена“, не изчезва."""
     weights = weights_fn(day) if weights_fn else None
     syms = list(config.PREOPEN_FUTURES) + [c["ticker"] for c in (weights or {}).get("companies") or []]
@@ -733,7 +789,15 @@ def market_section(market_fn, weights_fn, now_utc, day: str) -> dict:
     except Exception as e:
         err = type(e).__name__
         print(f"[preopen] фючърсите и големите компании не се изтеглиха: {type(e).__name__}: {e}")
-    return market_block(frames, weights, now_utc, err)
+    quotes = {}
+    no_bars = [s for s in config.PREOPEN_FUTURES if not premarket_point(frames.get(s), now_utc)]
+    if no_bars and quote_fn is not False:                                              # 27.11.2026 (т. 3): втори източник за фючърсите
+        try:
+            quotes = (quote_fn or fetch_quotes)(no_bars)
+            print(f"[preopen] фючърси без 5-мин. бари: {', '.join(no_bars)} — котировка за {', '.join(quotes) or 'нито един'}")
+        except Exception as e:
+            print(f"[preopen] котировките на фючърсите: {type(e).__name__}: {e}")
+    return market_block(frames, weights, now_utc, err, quotes)
 
 
 def has_news(res: dict) -> bool:
@@ -805,8 +869,13 @@ LAST_FETCH: dict = {}          # 04.11.2026 (С3): {"batches", "batches_failed"}
 
 
 def fetch_5m(tickers: list[str], batch_size: int | None = None) -> dict:
-    """5-минутни бари с премаркет за последните 2 дни, на партиди (както qm_ep.fetch_5m). Партида с провал — ред в лога и LAST_FETCH (04.11.2026, С3), останалите минават."""
+    """
+    5-минутни бари с премаркет от предишната сесия до днес, на партиди (както qm_ep.fetch_5m). Партида с провал — ред в лога и LAST_FETCH (04.11.2026, С3), останалите минават.
+    27.11.2026 (уикенд пакет, т. 1): с ЯВНИ дати (sessions.intraday_range) — с period="2d" на 27.11 Yahoo не върна премаркета (0 от 918), каретата падна.
+    """
     import yfinance as yf
+    from src import sessions
+    start, end = sessions.intraday_range(pd.Timestamp.now(tz=NY).date(), back_days=1)
     out = {}
     bs = batch_size or config.QM_EP_BATCH
     LAST_FETCH.clear()
@@ -814,7 +883,7 @@ def fetch_5m(tickers: list[str], batch_size: int | None = None) -> dict:
     for i in range(0, len(tickers), bs):
         batch = tickers[i:i + bs]
         try:
-            data = yf.download(batch, period="2d", interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)
+            data = yf.download(batch, start=start, end=end, interval="5m", prepost=True, group_by="ticker", progress=False, threads=True, auto_adjust=False)   # 27.11.2026: явни дати
         except Exception as e:
             LAST_FETCH["batches_failed"] += 1
             print(f"[preopen] партида {i // bs + 1}: {type(e).__name__}: {e}")
@@ -848,7 +917,7 @@ def coverage(diag: dict, fetch: dict | None = None, universe_note: str | None = 
 
 def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict | None = None, records: list[dict] | None = None, watched: list[str] | None = None,
         universe: list[str] | None = None, daily_fn=None, filings_fn=None, headlines_fn=None, name_lookup=None, universe_note: str | None = None,
-        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None, calendar_fn=None, eps_fn=None) -> dict:
+        econ_fn=None, exclude: set | None = None, market_fn=None, weights_fn=None, calendar_fn=None, eps_fn=None, quote_fn=None) -> dict:
     """
     Целият резултат (без запис и без имейл): {date, time_ny, time_berlin, session, ok, diag, gaps, levels, watch, seconds}. frames5 — готовите 5-минутни бари (тестове, реплей);
     иначе fetch5(тикъри) / fetch_5m. brief — сутрешният бриф (за „Чака пробив“ и картите по Kullamägi); records — живите записи в книгите; watched — наблюдаваните. Не вдига.
@@ -890,7 +959,8 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
             res["missing"]["text"] = missing_text(res["missing"])
         except Exception as e:
             print(f"[preopen] списъкът без премаркет: {type(e).__name__}: {e}")
-        res["session"] = next(iter(pts.values()))["session"] if pts else None
+        from src import sessions as _ss
+        res["session"] = next(iter(pts.values()))["session"] if pts else _ss.prev_session(now.date()).isoformat()     # 27.11.2026 (т. 3): и без премаркет — датата за сравнението
         res["ok"] = bool(pts)
         res["gaps"] = ep_rows(gaps, daily_fn=daily_fn, filings_fn=filings_fn, headlines_fn=headlines_fn, name_lookup=name_lookup, now_utc=now.tz_convert("UTC").to_pydatetime(), eps_fn=eps_fn)
         res["sector_bounce"] = qm_ep_sector_bounce(gaps)                               # 06.11.2026 (т. 10)
@@ -918,7 +988,7 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         print(f"[preopen] пропадна: {type(e).__name__}: {e}")
     if market_fn is not None or weights_fn is not None:                                # 12.11.2026 (т. 1): main подава fetch_market / fetch_weights, тестовете — готови
         try:
-            res["market"] = market_section(market_fn, weights_fn, now, res["date"])
+            res["market"] = market_section(market_fn, weights_fn, now, res["date"], quote_fn)
         except Exception as e:
             res["market"] = {"error": type(e).__name__, "text": [f"Фючърсите и големите компании не се провериха ({type(e).__name__})."]}
             print(f"[preopen] пазарът преди отварянето: {type(e).__name__}: {e}")
