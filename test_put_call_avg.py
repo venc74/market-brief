@@ -24,7 +24,7 @@ assert r["label"].startswith("P/C 0.89 днес · 3-дн. средно 1.05 (26
 raw = th._evaluate_put_call(H["2026-11-16"], [H[k] for k in K[:-1]])
 assert raw["status"] == "red" and round(raw["percentile"]) == 7                                # суровото — червено (каквото беше в брифа)
 S = th.put_call_sentence(r)
-assert S == "Put/Call (SPY) 3-дн. средно 1.05 (днес 0.89) — 26. percentile от 106 дни: в нормалния диапазон за собствената история (жълто).", S
+assert S == "Put/Call (SPY) 3-дн. средно 1.05 (днес 0.89) — 26. percentile от 106 дни: в нормалния диапазон за собствената история (жълто; само информация — не влиза в режима).", S
 print(f"  ✓ {r['label']}")
 print(f"  ✓ {S}")
 

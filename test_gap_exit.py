@@ -32,4 +32,15 @@ r2 = trade_sim.simulate(REC, b2, dt.date(2026, 11, 20))
 risk = REC["fill_price"] - REC["stop_loss"]
 assert r2["exit_price"] == 228.0 and r2["realized_r"] == round((228.0 - REC["fill_price"]) / risk, 2) and r2["realized_r"] < -1
 print(f"  ✓ отваряне $228.00 под стопа ${REC['stop_loss']} → изход $228.00, {r2['realized_r']}R")
+print("── 3. РЕАЛНО (27.11, уикенд пакет, т. 15): WST в книгата Action — −1.0R на 25.11 ──")
+FW = json.loads((ROOT / "tests" / "fixtures" / "wst_action_2026-11-25.json").read_text(encoding="utf-8"))
+RW = FW["record"]
+bw = pd.DataFrame(FW["bars"]).T.sort_index(); bw.index = pd.to_datetime(bw.index)
+rw = trade_sim.simulate({k: v for k, v in RW.items() if k not in ("status", "exit_date", "exit_price", "realized_r", "resolution_date")}, bw, dt.date(2026, 11, 26))
+assert rw["status"] == "stopped" and rw["exit_date"] == "2026-11-25" and rw["exit_price"] == RW["stop_loss"] == 374.43 and rw["realized_r"] == -1.0 == RW["realized_r"], rw
+assert FW["bars"]["2026-11-25"]["Open"] > RW["stop_loss"] > FW["bars"]["2026-11-25"]["Low"]              # 383.10 > 374.43 > 371.63 — без гап под стопа
+bw2 = bw.copy(); bw2.loc["2026-11-25", "Open"] = 370.0                                                  # СИНТЕТИЧНО: отваряне под стопа
+rw2 = trade_sim.simulate({k: v for k, v in RW.items() if k not in ("status", "exit_date", "exit_price", "realized_r", "resolution_date")}, bw2, dt.date(2026, 11, 26))
+assert rw2["exit_price"] == 370.0 and rw2["realized_r"] < -1
+print(f"  ✓ 25.11: отваряне ${FW['bars']['2026-11-25']['Open']:.2f} > стоп ${RW['stop_loss']} > дъно ${FW['bars']['2026-11-25']['Low']:.2f} → изход по стопа, −1.0R; при отваряне $370 — {rw2['realized_r']}R")
 print("\n✅ test_gap_exit: всичко мина")

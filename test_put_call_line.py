@@ -25,10 +25,11 @@ PC = next(i for i in TH["indicators"] if i["name"] == "Put/Call (SPY)")
 print("── 1. изречението от кода ──")
 assert (PC["value"], PC["percentile"], PC["status"]) == (0.89, 7.4, "red")
 S = th.put_call_sentence(PC)
-assert S == "Put/Call (SPY) 0.89 — 7. percentile от 108 дни: малко хеджове спрямо собствената история — високо самодоволство (червено за режима).", S
+assert S == "Put/Call (SPY) 0.89 — 7. percentile от 108 дни: малко хеджове спрямо собствената история — високо самодоволство (червено; само информация — не влиза в режима).", S
+assert "за режима" not in S                                                                             # 27.11.2026 (т. 8): P/C — само информативен от 18.11
 g = th.put_call_sentence({**PC, "value": 1.45, "percentile": 95.0, "status": "green"})                 # СИНТЕТИЧНО
-assert g.endswith("много хеджове спрямо собствената история — страх, сигнал в обратна посока (зелено за режима).")
-assert th.put_call_sentence({**PC, "value": 1.13, "percentile": 49.0, "status": "yellow"}).endswith("в нормалния диапазон за собствената история (жълто).")
+assert g.endswith("много хеджове спрямо собствената история — страх, сигнал в обратна посока (зелено; само информация — не влиза в режима).")
+assert th.put_call_sentence({**PC, "value": 1.13, "percentile": 49.0, "status": "yellow"}).endswith("в нормалния диапазон за собствената история (жълто; само информация — не влиза в режима).")
 assert th.put_call_sentence({"name": "Put/Call (SPY)", "value": None, "hide": True}) is None and th.put_call_sentence(None) is None
 print(f"  ✓ РЕАЛНО 16.11: „{S}“")
 
