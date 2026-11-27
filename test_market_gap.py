@@ -24,7 +24,7 @@ print("── 1. РЕАЛНО: кой ден е ден на пазарен га�
 assert (config.MARKET_GAP_NQ_PCT, config.MARKET_GAP_ES_PCT) == (3.0, 2.0)
 m = mg.classify(P["market"]["futures"])
 assert m["gap"] and (m["nq"], m["es"], m["time_ny"]) == (5.08, 3.4, "08:55")
-assert m["text"] == "ден на пазарен гап: NQ +5.08%, ES +3.40% в 08:55 Ню Йорк (фючърсите спрямо 16:00 на предишната сесия)"
+assert m["text"] == "фючърсите сочат ден на пазарен гап: NQ +5.08%, ES +3.40% в 08:55 Ню Йорк (спрямо затварянето на предишната сесия; етикетът в книгите и дневника — по отварянето на SPY / QQQ)"         # 27.11.2026 (т. 5): фючърсите само „сочат“
 hist = {d: mg.classify(f) for d, f in FX["futures_by_day"].items()}
 assert [d for d, v in hist.items() if v and v["gap"]] == ["2026-11-23"] and sum(1 for v in hist.values() if v) == 7      # 7 дни с фючърси; преди 13.11 — неизвестни
 assert mg.classify([{"symbol": "ES=F", "chg_pct": -2.1}])["gap"] and not mg.classify([{"symbol": "NQ=F", "chg_pct": 2.9}])["gap"]    # СИНТЕТИЧНО: праговете
@@ -41,7 +41,7 @@ print("  ✓ пазарен ход: " + ", ".join(g["ticker"] for g in gaps if g
 print("── 3. карето, имейлът му и страницата в 15:05 ──")
 res = {**copy.deepcopy(P), "gaps": gaps, "market_gap": m, "market_moves": 8}
 em = preopen.email_html(res)
-assert "⚠ ден на пазарен гап: NQ +5.08%" in em and em.count("(пазарен ход)") == 8
+assert "⚠ фючърсите сочат ден на пазарен гап: NQ +5.08%" in em and em.count("(пазарен ход)") == 8
 B = json.loads((ROOT / "tests" / "fixtures" / "brief_2026-10-19.json").read_text(encoding="utf-8"))
 b = copy.deepcopy(B); b["preopen"] = res
 EPF = json.loads((ROOT / "tests" / "fixtures" / "ep_facts_2026-11-23.json").read_text(encoding="utf-8"))
@@ -51,25 +51,35 @@ b["qm_ep"] = {**(b.get("qm_ep") or {}), "rows": [ep_row]}
 with contextlib.redirect_stdout(io.StringIO()):
     html = render.render_dashboard(b, publish=False)
 t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
-assert "⚠ ден на пазарен гап: NQ +5.08%, ES +3.40% в 08:55 Ню Йорк (фючърсите спрямо 16:00 на предишната сесия) — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп (8 от 10)." in t
+assert "⚠ фючърсите сочат ден на пазарен гап: NQ +5.08%, ES +3.40% в 08:55 Ню Йорк (спрямо затварянето на предишната сесия; етикетът в книгите и дневника — по отварянето на SPY / QQQ) — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп (8 от 10)." in t
 assert t.count("пазарен ход") >= 9 and "гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп: SMCI." in t
 assert render.market_gap_day({"preopen": {"market_gap": {**m, "gap": False}}}) is None and render.market_gap_day({}) is None      # сутрин / ден без гап
 print("  ✓ карето: ред и 8 белега; EP: ред и белег на SMCI; имейлът на карето — същото")
 
-print("── 4. книгите: етикетът и статистиката с и без (СИНТЕТИЧНО: вход 23.11 на два реални записа) ──")
+print("── 4. книгите: етикетът по РЕАЛНОТО отваряне на QQQ / SPY и статистиката с и без (СИНТЕТИЧНО: вход 23.11 на два реални записа) ──")
+import pandas as pd
+DFX = json.loads((ROOT / "tests" / "fixtures" / "spy_qqq_daily_2026-11-27.json").read_text(encoding="utf-8"))      # РЕАЛНО: дневните бари SPY / QQQ 01.07–27.11
+GAPS = mg.open_gaps({s: pd.DataFrame({"Open": DFX[s]["Open"], "Close": DFX[s]["Close"]}, index=pd.to_datetime(DFX[s]["index"])) for s in ("SPY", "QQQ")})
+assert [d for d, v in sorted(GAPS.items()) if v["gap"]] == ["2026-11-23", "2026-11-25"]
+assert (GAPS["2026-11-23"]["qqq"], GAPS["2026-11-23"]["spy"]) == (7.81, 5.0) and (GAPS["2026-11-25"]["qqq"], GAPS["2026-11-25"]["spy"]) == (-3.29, -2.17)
+assert not GAPS["2026-11-24"]["gap"] and not GAPS["2026-11-20"]["gap"]                                  # 20.11: QQQ −0.96% на отварянето (затваряне −5.67%) — не
 REC = copy.deepcopy(json.loads((ROOT / "tests" / "fixtures" / "gw_book_2026-11-23.json").read_text(encoding="utf-8"))["records"])
 keys = sorted(k for k, v in REC.items() if v.get("return_pct_exec") is not None and not v.get("deal"))[:2]
 real = sorted(k for k, v in REC.items() if "2026-11-23" in backtest.market_gap_dates(v))                  # РЕАЛНО: записът със сигнал на 23.11 (вход — на 24.11)
 for k in keys:
     REC[k]["fill_exec_date"] = "2026-11-23"
 backtest._TRACKER_PATH.write_text(json.dumps(REC), encoding="utf-8")
-folder = config.DATA_DIR / "preopen"; folder.mkdir()
-(folder / "2026-11-23.json").write_text(json.dumps(P), encoding="utf-8")
+REC["SYN_2026-11-24_gwh"] = {**copy.deepcopy(REC[keys[0]]), "fill_exec_date": "2026-11-24", "entry_date": "2026-11-24", "signal_date": "2026-11-24",
+                              "market_gap": {"date": "2026-11-24", "nq": -3.5, "es": -2.4}}                 # СИНТЕТИЧНО: стар етикет по фючърсите в ден, който не е гап по отварянето
+backtest._TRACKER_PATH.write_text(json.dumps(REC), encoding="utf-8")
 with contextlib.redirect_stdout(io.StringIO()):
-    st = backtest.apply_market_gap_labels("2026-11-24")
-assert len(real) == 1 and st["ok"] and st["labelled"] == 2 + len(real) and st["gap_days"] == ["2026-11-23"], (real, st)
+    st = backtest.apply_market_gap_labels("2026-11-30", gaps=GAPS)
+    st_none = backtest.apply_market_gap_labels("2026-11-30", gaps={})                                    # без дневни бари — нищо не се пипа
+assert len(real) == 1 and st["ok"] and st["labelled"] == 2 + len(real) and st["removed"] == 1 and st["gap_days"] == ["2026-11-23", "2026-11-25"], (real, st)
+assert st_none["ok"] is False
 tr = json.loads(backtest._TRACKER_PATH.read_text(encoding="utf-8"))
-assert all(tr[k]["market_gap"] == {"date": "2026-11-23", "nq": 5.08, "es": 3.4} for k in keys)
+assert all(tr[k]["market_gap"] == {"date": "2026-11-23", "qqq": 7.81, "spy": 5.0, "rule": "open"} for k in keys)
+assert "market_gap" not in tr["SYN_2026-11-24_gwh"]
 assert sum(1 for v in tr.values() if v.get("market_gap")) == 3 and tr[real[0]]["market_gap"]["date"] == "2026-11-23"
 with contextlib.redirect_stdout(io.StringIO()):
     s = backtest.get_glb_wish_summary(backtest.CATEGORY_GLB_WISH_HIGH)
@@ -78,7 +88,7 @@ assert blk["n"] == 2 and blk["n_all"] - blk["n_rest"] == 2 and blk["avg_all"] is
 b2 = copy.deepcopy(B); b2.setdefault("backtest", {})["glb_wish_high"] = s
 with contextlib.redirect_stdout(io.StringIO()):
     t2 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render.render_dashboard(b2, publish=False)))
-assert "Ден на пазарен гап (2):" in t2 and "(NQ +5.1%)" in t2 and "Среден резултат: с тях" in t2 and "ден на пазарен гап (23.11, NQ +5.1%)" in t2
+assert "Ден на пазарен гап (2):" in t2 and "(QQQ +7.8% на отварянето)" in t2 and "Среден резултат: с тях" in t2 and "ден на пазарен гап (23.11, QQQ +7.8% на отварянето)" in t2
 print(f"  ✓ 3 етикета ({real[0]} — реален, сигнал на 23.11, чака; два — синтетични, с резултат); средно с тях {blk['avg_all']:+.2f}% ({blk['n_all']}) · без тях {blk['avg_rest']:+.2f}% ({blk['n_rest']})")
 
 print("── 5. main: стъпката ──")

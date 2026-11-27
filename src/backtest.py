@@ -1095,33 +1095,41 @@ def market_gap_dates(r: dict) -> list[str]:
     return sorted({str(r[k])[:10] for k in ("fill_date", "fill_exec_date", "entry_date", "signal_date") if r.get(k)})
 
 
-def apply_market_gap_labels(today: str | None = None, day_fn=None) -> dict:
+def apply_market_gap_labels(today: str | None = None, gaps: dict | None = None, fetch=None) -> dict:
     """
-    23.11.2026 (пакет 23.11, т. 4): етикет „ден на пазарен гап“ върху записите в книгите (Action, buy-stop, Kullamägi, GLB по Уиш и архивът) — вход или сигнал в ден, в който NQ ≥ ±3%
-    или ES ≥ ±2% в 08:55 Ню Йорк (src/market_gap.py, по записаното каре). Без каре за деня (преди 13.11 няма фючърси) — без етикет. Записва tracker-а при промяна. Не вдига.
+    23.11.2026 (пакет 23.11, т. 4): етикет „ден на пазарен гап“ върху записите в книгите (Action, buy-stop, Kullamägi, GLB по Уиш и архивът) — вход или сигнал в такъв ден.
+    27.11.2026 (уикенд пакет, т. 5): денят — по РЕАЛНОТО отваряне на QQQ / SPY (market_gap.open_gaps, същите прагове), не по фючърсите в 08:55; етикетите се пресмятат НАНОВО за
+    всички записи при всяко пускане (стар етикет по фючърсите → по отварянето; ден, който не е гап → махнат). Без дневни бари → нищо не се пипа ({"ok": False}). Не вдига.
     """
     try:
         from src import market_gap
-        day_fn = day_fn or market_gap.day
         tracker = _load_tracker()
         books = (CATEGORY_ACTION, CATEGORY_BUYSTOP, CATEGORY_QM, CATEGORY_GLB_WISH, CATEGORY_GLB_WISH_HIGH)
-        cache, labelled = {}, 0
-        for r in tracker.values():
-            if not isinstance(r, dict) or r.get("market_gap") or not (r.get("method") == "v2" or r.get("category") in books):
-                continue
-            for d in market_gap_dates(r):
-                if d not in cache:
-                    cache[d] = day_fn(d)
-                mg = cache[d]
-                if mg and mg.get("gap"):
-                    r["market_gap"] = {"date": d, "nq": mg.get("nq"), "es": mg.get("es")}
-                    labelled += 1
-                    break
-        if labelled:
+        recs = [r for r in tracker.values() if isinstance(r, dict) and (r.get("method") == "v2" or r.get("category") in books)]
+        if gaps is None:
+            start = min((d for r in recs for d in market_gap_dates(r)), default=None)
+            gaps = market_gap.open_gap_days((dt.date.fromisoformat(start) - dt.timedelta(days=7)).isoformat(), fetch) if start else {}
+        if not gaps:
+            print("[backtest] ден на пазарен гап: дневните бари на SPY / QQQ липсват — етикетите не се пипат")
+            return {"ok": False, "reason": "дневните бари на SPY / QQQ не се изтеглиха"}
+        labelled = removed = changed = 0
+        for r in recs:
+            hit = next((d for d in market_gap_dates(r) if (gaps.get(d) or {}).get("gap")), None)
+            known = any(d in gaps for d in market_gap_dates(r))
+            new = {"date": hit, "qqq": gaps[hit].get("qqq"), "spy": gaps[hit].get("spy"), "rule": "open"} if hit else None
+            old = r.get("market_gap")
+            if new and old != new:
+                labelled += 0 if old else 1
+                changed += 1 if old else 0
+                r["market_gap"] = new
+            elif not new and old and known:                                  # ден с бари, който не е гап — етикетът по фючърсите пада
+                r.pop("market_gap", None)
+                removed += 1
+        if labelled or removed or changed:
             _save_tracker(tracker)
-        gap_days = sorted(d for d, v in cache.items() if v and v.get("gap"))
-        print(f"[backtest] ден на пазарен гап: {labelled} нови етикета; дни с гап сред проверените: {', '.join(gap_days) or 'няма'}")
-        return {"ok": True, "labelled": labelled, "gap_days": gap_days, "checked_days": len(cache)}
+        gap_days = sorted(d for d, v in gaps.items() if v.get("gap"))
+        print(f"[backtest] ден на пазарен гап (по отварянето на QQQ / SPY): нови {labelled}, сменени {changed}, махнати {removed}; дни с гап: {', '.join(gap_days[-6:]) or 'няма'}")
+        return {"ok": True, "labelled": labelled, "changed": changed, "removed": removed, "gap_days": gap_days}
     except Exception as e:
         print(f"[backtest] етикетът „ден на пазарен гап“ пропуснат: {type(e).__name__}: {e}")
         return {"ok": False, "reason": f"{type(e).__name__}"}

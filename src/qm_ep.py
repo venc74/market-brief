@@ -624,6 +624,24 @@ def summarize_preopen(entries: list[dict]) -> dict:
     return out
 
 
+def summarize_journal(entries: list[dict], gap_days: set | None = None) -> dict:
+    """
+    27.11.2026 (уикенд пакет, т. 12): ЕДИН ред за страницата — всички разрешени гапове в дневника (after-hours и от карето в 09:05), без дните на пазарен гап (gap_session — денят на
+    отварянето; по реалното отваряне на QQQ / SPY, market_gap.open_gaps): N, колко % отварят ≥ прага (издържат), медианата на гапа на отварянето. Детайлите остават в данните
+    (log.yesterday, log.yesterday_pm, summarize_log, summarize_preopen). Чиста функция.
+    """
+    gd = set(gap_days or ())
+    res = [e for e in entries or [] if e.get("open_gap_pct") is not None]
+    out_gap = [e for e in res if e.get("gap_session") in gd]
+    keep = [e for e in res if e.get("gap_session") not in gd]
+    out = {"n": len(keep), "excluded": len(out_gap), "excluded_days": sorted({e["gap_session"] for e in out_gap}),
+           "since": min((e.get("gap_session") for e in keep if e.get("gap_session")), default=None), "held_pct": None, "median_open_gap_pct": None}
+    if keep:
+        out.update(held_pct=round(100 * sum(1 for e in keep if e["open_gap_pct"] >= config.QM_EP_GAP_PCT) / len(keep), 0),
+                   median_open_gap_pct=round(statistics.median(e["open_gap_pct"] for e in keep), 2))
+    return out
+
+
 def summarize_log(entries: list[dict]) -> dict:
     """
     AH гап срещу реалния гап на отварянето: колко са разрешени, колко отварят ≥ прага, медианно разминаване, корелация.
@@ -671,7 +689,7 @@ def sector_bounce(tickers: list[str], industry: dict | None = None) -> list[dict
 
 
 def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, fetch_daily_fn=None, headlines_fn=None, ai_call=None, name_lookup=None, log_path=None, filings_fn=None,
-        preopen_dir=None) -> dict:
+        preopen_dir=None, gap_days_fn=None) -> dict:
     """
     След затваряне → гапове ≥ 10% → (нейният) ръст за 3 месеца, ADR, максимален стоп → заглавия + AI класификация на катализатора за показаните → дневник. Връща
     {"ok", "session", "rows" (показаните — "пренебрегнати", най-много QM_EP_MAX_ROWS), "not_neglected" (останалите гапове ≥ 10%), "diag", "log" (обобщение), "notes"}. Не вдига.
@@ -729,7 +747,16 @@ def run(universe: list[str], today: dt.date | None = None, *, fetch_5m_fn=None, 
                          "open_gap_pct": x["open_gap_pct"], "close_pct": x.get("close_pct"), "held": bool(x["open_gap_pct"] >= config.QM_EP_GAP_PCT)}
                         for x in log["entries"] if x.get("resolved_on") == today.isoformat() and x.get("open_gap_pct") is not None
                         and x.get("pm_gap_pct") is not None and x["gap_session"] == prev]           # допълнените назад (до 30 дни) — само в общия брой
-        out["log"] = {**summarize_log(log["entries"]), "added_today": added, "resolved_today": resolved, "yesterday": yesterday,
+        try:                                                                                     # 27.11.2026 (т. 12): един ред — без дните на пазарен гап (по отварянето)
+            from src import market_gap
+            starts = [e.get("gap_session") for e in log["entries"] if e.get("gap_session")]
+            gmap = (gap_days_fn or market_gap.open_gap_days)((dt.date.fromisoformat(min(starts)) - dt.timedelta(days=7)).isoformat()) if starts else {}
+            gap_days = {d for d, v in (gmap or {}).items() if v.get("gap")}
+        except Exception as e:
+            print(f"[qm_ep] дните на пазарен гап: {type(e).__name__}: {e}")
+            gap_days = set()
+        out["log"] = {**summarize_log(log["entries"]), "journal": summarize_journal(log["entries"], gap_days),
+                      "added_today": added, "resolved_today": resolved, "yesterday": yesterday,
                       "preopen": {**summarize_preopen(log["entries"]), "added_today": pm_added, "merged_today": pm_merged}, "yesterday_pm": yesterday_pm}
         print(f"[qm_ep] сесия {diag.get('session')}: {len(gappers)} after-hours гапа ≥ {config.QM_EP_GAP_PCT:g}%, показани {len(shown)} (пренебрегнати), "
               f"останали {len(out['not_neglected'])}; дневник: {out['log']['entries']} записа, {out['log']['resolved']} разрешени; "

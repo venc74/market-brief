@@ -165,12 +165,12 @@ assert not any(k in r for k in ("shares", "risk_usd", "total_investment", "pct_o
 assert (r["levels"]["entry"], r["levels"]["stop"], r["levels"]["strategy"]) == (round(r["ah_price"], 2), r["max_stop"], "kullamagi")    # вход = after-hours цената, стоп = 1×ADR под нея
 OPEN_BER = __import__("src.setup_rules", fromlist=["x"]).ny_time_in_berlin(dt.date.today(), 9, 30)          # 16.10.2026: от часовите зони (15:30 CEST лете, 14:30 CET в седмицата 25.10–01.11)
 assert f"Проверката е отварянето ({OPEN_BER} / 09:30 ET)" in et
-assert "Вчерашният дневник — after-hours срещу отваряне: SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)" in et
-assert "Общо в дневника: записи 1, разрешени 1; 1 от тях отварят ≥ 10% (100%)" in et and "решение за второ пускане — след 4–6 седмици" in et
+# 27.11.2026 (уикенд пакет, т. 12): дневникът на страницата — един ред; детайлите (SYNA AH +15.0% → отваряне +14.7%) — в данните
+assert "Дневникът на EP (от 02.10): 1 гап — 100% отварят ≥ 10%, медиана на отварянето +14.7%." in et and "Вчерашният дневник" not in et, et[et.find("Проверката"):et.find("Проверката") + 300]
 print(f"  ✓ колони: {head_row}; SYNA: AH +{r['gap_pct']:.1f}% (${r['prev_close']:.2f} → ${r['ah_price']:.2f}), реалното заглавие на Yahoo, 'Придобиване (оферта)', ръст 3 м. {r['ret63_pct']:+.0f}%, стоп лимит ${r['max_stop']:.2f} (1×ADR), вход = after-hours цената; без брой акции")
-print("  ✓ под таблицата: 'Проверката е отварянето…' и 'Вчерашният дневник — SYNA AH +15.0% → отваряне +14.7% (издържа ≥ 10%)' (РЕАЛНО отваряне на 02.10, 14.65%)")
+print("  ✓ под таблицата: 'Проверката е отварянето…' и един ред „Дневникът на EP … 1 гап — 100% … +14.7%“ (РЕАЛНО отваряне на 02.10, 14.65%); детайлите — в данните")
 et0 = txt_of(section(page_raw(brief_with()), "qm-ep"))
-assert "Вчера няма гапове за проверка срещу отварянето" in et0 and "Вчерашният дневник" not in et0
+assert "Вчерашният дневник" not in et0
 ep_empty = {**EP, "rows": [], "not_neglected": [{"ticker": "ABCD", "gap_pct": 12.3, "ret63_pct": 55.0, "why": "ръст 55% за 3 месеца > 20%"}]}
 t2 = txt_of(section(page_raw(brief_with(ep_out=ep_empty)), "qm-ep"))
 assert "няма after-hours гапове ≥ 10% при „пренебрегнати“ тикъри" in t2 and "ABCD +12.3%" in t2 and "ръст 55% за 3 месеца > 20%" in t2

@@ -89,6 +89,7 @@ enabled = {"bar_freshness": config.ENABLE_BAR_FRESHNESS, "distribution_cap": con
 NATURAL = {"sector_rotation", "screener", "glb", "distribution_days"}
 NATURAL_WRAPPED = {"crypto"} if config.ENABLE_CRYPTO_SECTION else set()             # без мрежа фийдът е празен → провал с банера на обвивката (не инжектиран)
 NATURAL_WRAPPED |= {"qm_market"} if config.ENABLE_QM else set()                     # 03.11.2026: без мрежа QQQ не се изтегля → провал с банера на обвивката
+NATURAL_WRAPPED |= {"market_gap_labels"} if config.ENABLE_BACKTEST else set()       # 27.11.2026 (уикенд пакет, т. 5): без мрежа дневните бари на SPY / QQQ липсват → провал, етикетите не се пипат
 want_failed = {k for k in FAULTS if enabled.get(k, True)} | {k for k in NATURAL if enabled.get(k, True) and (k != "glb" or config.ENABLE_GLB_SCREENER)} | NATURAL_WRAPPED
 assert {k for k, r in rs.items() if r["status"] == "failed"} == want_failed, {k: r["status"] for k, r in rs.items()}
 sources = {w["source"] for w in brief["data_warnings"]}

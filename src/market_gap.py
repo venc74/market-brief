@@ -27,7 +27,8 @@ def classify(futures: list | None) -> dict | None:
     when = next((f.get("last_ny") for f in ch.values() if f.get("last_ny")), None)
     parts = [f"{k} {v['chg_pct']:+.2f}%" for k, v in sorted(ch.items(), key=lambda kv: kv[0] != "NQ")]
     return {"gap": bool(gap), "nq": nq, "es": es, "time_ny": when,
-            "text": ("ден на пазарен гап: " if gap else "") + ", ".join(parts) + (f" в {when} Ню Йорк" if when else "") + " (фючърсите спрямо 16:00 на предишната сесия)"}
+            "text": ("фючърсите сочат ден на пазарен гап: " if gap else "") + ", ".join(parts) + (f" в {when} Ню Йорк" if when else "")
+                    + " (спрямо затварянето на предишната сесия; етикетът в книгите и дневника — по отварянето на SPY / QQQ)"}
 
 
 def day(date_iso: str, folder=None) -> dict | None:
@@ -41,6 +42,59 @@ def day(date_iso: str, folder=None) -> dict | None:
     except Exception as e:
         print(f"[market_gap] {p.name}: {type(e).__name__}")
         return None
+
+
+def open_gaps(daily: dict | None) -> dict[str, dict]:
+    """
+    27.11.2026 (уикенд пакет, т. 5): денят на пазарен гап по РЕАЛНОТО отваряне — отварянето на QQQ / SPY срещу затварянето на предишната сесия, със същите прагове (QQQ ≥ ±3% като NQ,
+    SPY ≥ ±2% като ES). До 27.11 етикетът беше по фючърсите в 08:55 Ню Йорк. daily — {"SPY": df, "QQQ": df} (Open, Close; дневни). → {дата: {"gap", "qqq", "spy", "text"}}.
+    Реално: от 01.07 — 23.11 (QQQ +7.81%, SPY +5.00%) и 25.11 (QQQ −3.29%, SPY −2.17% на отварянето; затварянето — −0.65% / −0.29%). Чиста функция.
+    """
+    import pandas as pd
+    per: dict = {}
+    for sym in ("SPY", "QQQ"):
+        df = (daily or {}).get(sym)
+        if df is None or len(df) < 2 or "Open" not in df or "Close" not in df:
+            continue
+        df = df.dropna(subset=["Open", "Close"]).sort_index()
+        g = (df["Open"] / df["Close"].shift(1) - 1) * 100
+        for ts, v in g.dropna().items():
+            per.setdefault(str(pd.Timestamp(ts).date()), {})[sym] = round(float(v), 2)
+    out = {}
+    for d, v in per.items():
+        q, s = v.get("QQQ"), v.get("SPY")
+        gap = (q is not None and abs(q) >= config.MARKET_GAP_NQ_PCT) or (s is not None and abs(s) >= config.MARKET_GAP_ES_PCT)
+        out[d] = {"gap": bool(gap), "qqq": q, "spy": s,
+                  "text": ("ден на пазарен гап: " if gap else "") + ", ".join(f"{k} {x:+.2f}%" for k, x in (("QQQ", q), ("SPY", s)) if x is not None) + " на отварянето"}
+    return out
+
+
+_OPEN_GAPS: dict = {}
+
+
+def fetch_daily(start: str) -> dict:
+    """Дневните бари на SPY и QQQ (Yahoo, auto_adjust=False — отварянето и затварянето в един мащаб) от start. Провал → {}."""
+    import yfinance as yf
+    import pandas as pd
+    out = {}
+    try:
+        data = yf.download(["SPY", "QQQ"], start=start, interval="1d", group_by="ticker", progress=False, threads=True, auto_adjust=False)
+        for s in ("SPY", "QQQ"):
+            df = data[s] if isinstance(data.columns, pd.MultiIndex) else data
+            df = df.dropna(subset=["Open", "Close"])
+            if len(df):
+                out[s] = df[["Open", "Close"]]
+    except Exception as e:
+        print(f"[market_gap] дневните бари на SPY / QQQ: {type(e).__name__}: {e}")
+    return out
+
+
+def open_gap_days(start: str, fetch=None) -> dict[str, dict]:
+    """open_gaps за дните от start — едно теглене на пускане (кеш в модула); провал → {} (неизвестно — етикетите не се пипат)."""
+    key = str(start)[:10]
+    if key not in _OPEN_GAPS:
+        _OPEN_GAPS[key] = open_gaps((fetch or fetch_daily)(key))
+    return _OPEN_GAPS[key]
 
 
 # не са собствена новина за гапа: общ преглед, списък с няколко акции, „защо се движи“ / „в фокус“ (обяснение на хода, не причина)

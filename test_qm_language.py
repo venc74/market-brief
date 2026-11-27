@@ -78,6 +78,6 @@ for nm, t in (("dashboard", txt_dash), ("имейл", txt_mail)):
     assert not problems(t), (nm, problems(t))
     assert CYR_AH not in t and CYR_EP not in t, nm
     assert re.search(r"(?<![A-Za-z])AH(?![A-Za-z])", t), (nm, "няма латинско AH")
-assert re.search(r"<th class=\"n\">AH гап</th>", sec) and "SYNA AH +15.0%" in txt_dash and "Вчера, AH срещу отваряне" in txt_mail
+assert re.search(r"<th class=\"n\">AH гап</th>", sec) and "Дневникът на EP" in txt_dash and "Вчера, AH срещу отваряне" in txt_mail      # 27.11.2026 (т. 12): на страницата — един ред
 print("  ✓ видимият текст: латинско AH в заглавието на таблицата и в реда на SYNA (dashboard: 'SYNA AH +15.0%'; имейл: 'Вчера, AH срещу отваряне'); без смесени думи")
 print("\n✅ test_qm_language: всичко мина")
