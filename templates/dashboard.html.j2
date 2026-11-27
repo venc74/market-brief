@@ -1542,6 +1542,8 @@
     {% endif %}
     По режим на деня на картата (записани / затворени{% if bs.stats_visible %}, среден R{% endif %}):
     {% for name, g in bs.by_regime.items() %}{{ name }} {{ g.records }} / {{ g.closed }}{% if bs.stats_visible and g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}
+    {# 27.11.2026 (уикенд пакет, т. 14): по нивото на картата при записа #}
+    {% if bs.by_tier %}<br>По ниво (записи / с вход / затворени, среден R на затворените): {% for name, g in bs.by_tier.items() %}{{ name }} {{ g.records }} / {{ g.triggered }} / {{ g.closed }}{% if g.avg_r is not none %} ({{ "%+.2f"|format(g.avg_r) }}R, печеливши {{ g.wins }}){% endif %}{{ " · " if not loop.last else "" }}{% endfor %}.{% endif %}
     {% endif %}
   </div>
   {{ fill_risk_line(bs.fill_risk) }}

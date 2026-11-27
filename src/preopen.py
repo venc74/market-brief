@@ -944,7 +944,9 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
             res["excluded_deals"] = sorted(ex)
         extra = [c.get("ticker") for c in waiting + qm_cards] + [r.get("ticker") for r in records or []] + list(watched or [])
         extra += [r.get("ticker") for r in (brief.get("qm_ep") or {}).get("rows") or []]      # 10.11.2026 (т. 2): сутрешните EP кандидати — винаги в заявката
-        tickers = list(dict.fromkeys([t for t in list(universe or []) + extra if t and (t not in ex or t in (watched or []))]))
+        # 27.11.2026 (уикенд пакет, т. 13): ПЪРВО позициите, книгите, картите, наблюдаваните и сутрешните EP — на 27.11 преди срива липсваха WST, RGA, GHC, AHR, TNL, LIVN, ALLE
+        # (бяха в последните партиди след универса); после универсът
+        tickers = list(dict.fromkeys([t for t in extra + list(universe or []) if t and (t not in ex or t in (watched or []))]))
         res["universe_n"] = len([t for t in dict.fromkeys(universe or []) if t not in ex])          # 11.11.2026 (т. 2): универсът отделно от добавените (наблюдаваните и др.)
         LAST_FETCH.clear()
         if frames5 is None:

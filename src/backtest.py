@@ -2121,6 +2121,7 @@ def get_buystop_summary() -> dict:
     for g in by_regime.values():
         rs_g = g.pop("_rs")
         g["avg_r"] = round(sum(rs_g) / len(rs_g), 2) if (visible and rs_g) else None
+    by_tier = tier_groups(records)                                        # 27.11.2026 (уикенд пакет, т. 14)
 
     def _row(r: dict) -> dict:
         return {"ticker": r["ticker"], "entry_date": r["entry_date"], "status": r.get("status"), "buy_stop": r.get("buy_stop"),
@@ -2148,13 +2149,39 @@ def get_buystop_summary() -> dict:
         "win_rate_pct": round(100 * wins / len(rs), 1) if visible else None,
         "win_ci_pct": _wilson_ci_pct(wins, len(rs)) if visible else None,
         "median_realized_r": round((rs[len(rs) // 2] if len(rs) % 2 else (rs[len(rs) // 2 - 1] + rs[len(rs) // 2]) / 2), 2) if visible else None,
-        "spy_compare": spy_compare, "by_regime": by_regime, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
+        "spy_compare": spy_compare, "by_regime": by_regime, "by_tier": by_tier, "live": live, "recent": recent, "needs_review": sum(1 for r in records if r.get("needs_manual_review")),          # 13.10: отделяне след входа
         "fill_risk": fill_risk_block(records),                            # 06.11.2026 (т. 1)
         "deal_closed": deal_closed_block(records),                        # 09.11.2026 (ROKU)
         "entry_volume": entry_volume_groups(records, visible),            # 20.10.2026 (етап 3, т. 1): денят на входа затвори с обем ≥ 1.5× / не
         "pre_reaction": pre_reaction_block(records, "realized_r"), "market_gap": market_gap_block(records, "realized_r"),        # 06.11.2026 (т. 4)
         "events": events_block(records, "realized_r"),                    # 26.10.2026 (етап 4б, т. 2): с и без "deal" / "event"
     }
+
+
+TIER_LABELS = {"canslim": "CANSLIM", "trend": "Тренд без ръст", "no_eps": "EPS: няма данни", None: "без ниво (записи отпреди 17.11)"}
+
+
+def tier_groups(records: list[dict]) -> dict:
+    """
+    27.11.2026 (уикенд пакет, т. 14): buy-stop книгата по нивото на картата при записа (CANSLIM / Тренд без ръст; полето е от 17.11 — по-старите „без ниво“) → {етикет: {records,
+    triggered (с вход), closed, avg_r (затворените), wins}}. Записите извън статистиката (приключила сделка) — вън. Чиста функция.
+    """
+    out: dict = {}
+    for r in records:
+        if r.get("status") == DEAL_CLOSED:
+            continue
+        g = out.setdefault(TIER_LABELS.get(r.get("tier"), str(r.get("tier"))), {"records": 0, "triggered": 0, "closed": 0, "_rs": []})
+        g["records"] += 1
+        g["triggered"] += 1 if r.get("fill_date") else 0
+        if r.get("realized_r") is not None:
+            g["closed"] += 1
+            g["_rs"].append(r["realized_r"])
+    for g in out.values():
+        rs = g.pop("_rs")
+        g["avg_r"] = round(sum(rs) / len(rs), 2) if rs else None
+        g["wins"] = sum(1 for x in rs if x > 0)
+    order = list(TIER_LABELS.values())
+    return dict(sorted(out.items(), key=lambda kv: order.index(kv[0]) if kv[0] in order else 99))
 
 
 def qm_before_rule(rec: dict) -> float | None:
