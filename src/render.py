@@ -816,7 +816,12 @@ def radar_reason(c: dict) -> str:
     note = (c.get("setup") or {}).get("book_note")
     why = f"{why}; {note}" if note and note not in why else why
     dc = (c.get("earnings") or {}).get("date_conflict")                    # 17.11.2026 (пакет 1, т. 8): Yahoo и Nasdaq се разминават за датата на отчета
-    return f"{why} · ⚠ {dc}" if dc else why
+    why = f"{why} · ⚠ {dc}" if dc else why
+    if c.get("data_missing"):                                              # 27.11.2026 (уикенд пакет, т. 6): отворена позиция без данни — остава, с етикета
+        why = f"{why} · ⚠ {c['data_missing']}"
+    elif c.get("fundamentals_asof"):
+        why = f"{why} · фундаменти от {c['fundamentals_asof'][8:10]}.{c['fundamentals_asof'][5:7]} (последните известни)"
+    return why
 
 
 def _radar_reason(c: dict) -> str:
@@ -922,8 +927,16 @@ def fundamentals_all_checked(status: dict | None) -> str | None:
     if st.get("fundamentals_not_checked") is None or not isinstance(total, int) or total <= 0:
         return None
     fc = st.get("fundamentals_cache") or {}
-    cache = f' ({fc["hits"]} от кеша)' if isinstance(fc.get("hits"), int) else ""
     un = st.get("fundamentals_unavailable") or []
+    if "stale" in fc:                                                    # 27.11.2026 (уикенд пакет, т. 6): истината — проверени · от кеша · последните известни · без данни
+        live = (fc.get("hits") or 0) + (fc.get("requests") or 0) - len(un) - (fc.get("stale") or 0)
+        parts = [f"проверени {total}", f"днес от Yahoo {max(live - (fc.get('hits') or 0), 0)}", f"от кеша {fc.get('hits') or 0}"]
+        if fc.get("stale"):
+            parts.append(f"последните известни (стар кеш) {fc['stale']}")
+        parts.append(f"без данни {len(un)}" + (f" ({', '.join(un[:5])}{', …' if len(un) > 5 else ''})" if un else ""))
+        tail = f"; от тях с отворена позиция — остават с „данни липсват“: {fc['missing_kept']}" if fc.get("missing_kept") else ""
+        return "Фундаменти: " + " · ".join(parts) + tail + "."
+    cache = f' ({fc["hits"]} от кеша)' if isinstance(fc.get("hits"), int) else ""
     tail = f'; за {len(un)} Yahoo не върна данни ({", ".join(un[:5])}{", …" if len(un) > 5 else ""}) — те не са оценени' if un else ""
     return f"Фундаменти: проверени всички {total}{cache}{tail}."
 

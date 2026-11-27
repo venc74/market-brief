@@ -1,0 +1,67 @@
+{
+"note": "РЕАЛНО: записите на RGA и USFD от кеша на фундаментите (data/fundamentals_cache.json, изтеглени от Yahoo .info на 25.11.2026), извадени на 27.11.2026. На 24.11 Yahoo върна празен .info за 33 от 42 — RGA, TGT, USFD излязоха от радара.",
+"tickers": {
+"RGA": {
+"fetched": "2026-11-25",
+"next_report": "2027-02-11",
+"info": {
+"marketCap": 17852352512,
+"sharesOutstanding": 65043000,
+"currentPrice": 274.47,
+"regularMarketPrice": 274.47,
+"earningsQuarterlyGrowth": 0.802,
+"revenueGrowth": 0.217,
+"returnOnEquity": 0.1385,
+"longName": "Reinsurance Group of America, Incorporated",
+"sector": "Financial Services",
+"industry": "Insurance - Reinsurance",
+"longBusinessSummary": "Reinsurance Group of America, Incorporated provides life and health, and asset-intensive reinsurance in the United States, Latin America, Canada, Europe, the Middle East, Africa, Asia, and Australia. It offers individual and group life and health, disability, long-term care, and critical illness reinsurance; and financial solutions, such as asset-intensive reinsurance, longevity reinsurance, stable value products, pension risk transfer transactions, and capital solutions. The company also provides reinsurance for mortality, morbidity, lapse, and investment-related risks; coinsurance of payout annuities; underwritten annuities; funding agreement backed note program and other capital motivated solutions; and superannuation. Reinsurance Group of America, Incorporated was founded in 1973 and is headquartered in Chesterfield, Missouri.",
+"trailingPE": 10.630132,
+"forwardPE": 8.948302,
+"trailingEps": 25.82,
+"forwardEps": 30.67286,
+"debtToEquity": 45.284,
+"heldPercentInstitutions": 1.04233,
+"targetMeanPrice": 299.8889,
+"shortPercentOfFloat": 0.017,
+"sharesShort": 982134,
+"shortRatio": 2.19,
+"earningsTimestamp": 1793912400,
+"earningsTimestampStart": 1802379600,
+"earningsTimestampEnd": 1802379600,
+"isEarningsDateEstimate": false
+}
+},
+"USFD": {
+"fetched": "2026-11-25",
+"next_report": "2027-02-11",
+"info": {
+"marketCap": 23734175744,
+"sharesOutstanding": 214691759,
+"currentPrice": 110.55,
+"regularMarketPrice": 110.55,
+"earningsQuarterlyGrowth": 0.425,
+"revenueGrowth": 0.021,
+"returnOnEquity": 0.18010001,
+"longName": "US Foods Holding Corp.",
+"sector": "Consumer Defensive",
+"industry": "Food Distribution",
+"longBusinessSummary": "US Foods Holding Corp., together with its subsidiaries, markets, sells, and distributes fresh, frozen, and dry food and non-food products to foodservice customers in the United States. The company also provides MOXe, an all-in-one foodservice business application. Its customers include independently owned single and multi-unit restaurants, regional concepts, national restaurant chains, hospitals, nursing homes, hotels and motels, country clubs, government and military organizations, colleges and universities, and retail locations. The company was formerly known as USF Holding Corp. and changed its name to US Foods Holding Corp. in February 2016. US Foods Holding Corp. was incorporated in 2007 and is headquartered in Rosemont, Illinois.",
+"trailingPE": 30.87989,
+"forwardPE": 20.045588,
+"trailingEps": 3.58,
+"forwardEps": 5.51493,
+"debtToEquity": 121.546,
+"heldPercentInstitutions": 1.13028,
+"targetMeanPrice": 118.86667,
+"shortPercentOfFloat": 0.0798,
+"sharesShort": 15112750,
+"shortRatio": 7.73,
+"earningsTimestamp": 1793885400,
+"earningsTimestampStart": 1802352600,
+"earningsTimestampEnd": 1802352600,
+"isEarningsDateEstimate": true
+}
+}
+}
+}

@@ -751,6 +751,9 @@ NOVELTY_NEAR_PCT = float(os.getenv("NOVELTY_NEAR_PCT", 2.0))
 NOVELTY_HISTORY_BRIEFS = int(os.getenv("NOVELTY_HISTORY_BRIEFS", 20))
 NEWS_AI_WHY = int(os.getenv("NEWS_AI_WHY", 0))
 NEWS_TRANSLATE = int(os.getenv("NEWS_TRANSLATE", 1))
+# 27.11.2026 (уикенд пакет, т. 6): празен Yahoo .info → последните известни фундаменти от кеша (с датата — „EPS: от ДД.ММ“); изтеклите записи остават в кеша до толкова дни.
+# На 24.11 33 от 42 бяха без данни и RGA, TGT, USFD излязоха от радара (RGA и USFD — живи в книгите).
+FUNDAMENTALS_STALE_MAX_DAYS = int(os.getenv("FUNDAMENTALS_STALE_MAX_DAYS", 365))
 # 27.11.2026 (уикенд пакет, т. 11): проверката на превода иска САМО числата (и мащаба), тикърите от универса и собствените имена от известен списък (translate.KNOWN_NAMES, имената
 # на компаниите от универса, местата) + дните от седмицата и месеците (в двете посоки). За седмицата 23–27.11: 12 от 71 превода отхвърлени — и 12-те фалшиво (KONG, CEO, TECH, GDP,
 # SOUTHEAST, HERE / WHAT / WHY, „ANTHROPIC,“, думи от Title Case); приет беше „… Holdings on Tuesday“ → „… в събота“. 0 връща проверката на всяка дума с главна.

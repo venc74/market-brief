@@ -664,9 +664,12 @@ def load_fund_cache() -> dict:
 
 
 def save_fund_cache(cache: dict, today: dt.date) -> None:
-    """Записва само валидните записи (изтеклите отпадат). Провал на записа — ред в лога, не чупи run-а."""
+    """
+    Записва валидните записи и — от 27.11.2026 (уикенд пакет, т. 6) — изтеклите до config.FUNDAMENTALS_STALE_MAX_DAYS: те са „последните известни“ при празен .info.
+    Провал на записа — ред в лога, не чупи run-а.
+    """
     try:
-        keep = {t: e for t, e in sorted(cache.items()) if fund_cache_valid(e, today)}
+        keep = {t: e for t, e in sorted(cache.items()) if fund_cache_valid(e, today) or fund_cache_stale(e, today)}
         fund_cache_path().write_text(json.dumps({"version": 1, "saved": today.isoformat(), "tickers": keep}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     except Exception as e:
         print(f"[screener] кешът на фундаментите не се записа: {type(e).__name__}: {e}")
@@ -694,6 +697,24 @@ def fund_cache_valid(entry: dict | None, today: dt.date) -> bool:
         return False
 
 
+def fund_cache_stale(entry: dict | None, today: dt.date) -> bool:
+    """27.11.2026 (т. 6): запис с .info, изтекъл (отчетът мина или е стар), но до config.FUNDAMENTALS_STALE_MAX_DAYS — годен като „последните известни“ с датата им."""
+    try:
+        return bool(entry and (entry.get("info") or {}).get("marketCap")) and (today - dt.date.fromisoformat(entry["fetched"])).days <= config.FUNDAMENTALS_STALE_MAX_DAYS
+    except Exception:
+        return False
+
+
+def live_book_tickers() -> set:
+    """27.11.2026 (т. 6): тикърите с жив запис в книгите (чакащ / отворен / с трейлинг) — те не изпадат от радара заради грешка в данните. Провал → празно."""
+    try:
+        from src import backtest
+        return {r.get("ticker") for r in backtest.book_records(None, statuses=("pending", "open", "trailing")) if r.get("ticker")}
+    except Exception as e:
+        print(f"[screener] живите записи в книгите не се прочетоха: {type(e).__name__}: {e}")
+        return set()
+
+
 def info_from_cache(entry: dict, price: float | None) -> dict:
     """
     .info от кеша; пазарната капитализация и P/E — от днешната цена (sharesOutstanding × цена; цена / EPS), ако ги има; иначе от деня на тегленето.
@@ -712,7 +733,7 @@ def info_from_cache(entry: dict, price: float | None) -> dict:
     return info
 
 
-def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.date | None = None, cache: dict | None = None) -> list[dict]:
+def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.date | None = None, cache: dict | None = None, live: set | None = None) -> list[dict]:
     """
     CANSLIM фундаментите (Yahoo .info) за кандидатите по реда им (RS — setup_rules.fundamentals_priority).
     10.11.2026 (т. 7): с кеша (config.FUNDAMENTALS_CACHE) тикър с валиден запис се оценява без заявка, където и да е в списъка; max_checks (60) е таванът
@@ -724,7 +745,8 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.d
     use_cache = config.FUNDAMENTALS_CACHE
     from_file = cache is None
     cache = (load_fund_cache() if use_cache else {}) if cache is None else cache
-    hits = requests_n = stored = 0
+    hits = requests_n = stored = stale_n = missing_kept = 0
+    live = live_book_tickers() if live is None else set(live)
     for row in candidates:
         sym = row["ticker"]
         entry = cache.get(sym) if use_cache else None
@@ -746,8 +768,19 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.d
                     stored += 1
 
             mcap = info.get("marketCap") or 0
+            if not mcap and fund_cache_stale(entry, today):          # 27.11.2026 (т. 6): празен .info → последните известни от кеша, с датата им
+                info, mcap = info_from_cache(entry, row.get("price")), (entry.get("info") or {}).get("marketCap") or 0
+                info = {**info, "marketCap": info.get("marketCap") or mcap}
+                mcap = info["marketCap"]
+                row["fundamentals_asof"] = entry["fetched"]
+                stale_n += 1
             if not mcap:                                             # 20.10.2026: празен .info (таймаут / Yahoo не върна) — не е оценен, не е "малка компания"
                 LAST_FUNDAMENTALS[sym] = {"result": "unavailable", "text": "фундаментите (Yahoo .info) не се изтеглиха днес — празен отговор; CANSLIM не е проверен"}
+                if sym in live:                                     # 27.11.2026 (т. 6): отворена позиция не изпада от радара заради грешка в данните
+                    row.update({"company": row.get("company") or sym, "sector": row.get("sector") or "Unknown", "industry": row.get("industry") or "",
+                                "eps_growth_yoy": None, "revenue_growth_yoy": None, "roe": None, "data_missing": "данни липсват (Yahoo .info — празен отговор, без запис в кеша)"})
+                    passed.append(row)
+                    missing_kept += 1
                 continue
             if mcap < config.MIN_MARKET_CAP:
                 LAST_FUNDAMENTALS[sym] = {"result": "small", "text": f"пазарна капитализация ${mcap / 1e9:.1f} млрд под прага ${config.MIN_MARKET_CAP / 1e9:g} млрд"}
@@ -788,16 +821,21 @@ def fundamental_screen(candidates: list[dict], max_checks: int = 60, today: dt.d
                 "short_ratio_dtc": info.get("shortRatio"),   # days to cover
             })
             passed.append(row)
-            LAST_FUNDAMENTALS[sym] = {"result": "passed", "text": ""}
+            LAST_FUNDAMENTALS[sym] = {"result": "passed", "text": "", **({"asof": row["fundamentals_asof"]} if row.get("fundamentals_asof") else {})}
             if not cached:
                 time.sleep(0.5)
         except Exception as e:
             print(f"[screener] fundamentals {sym} failed: {e}")
             LAST_FUNDAMENTALS[sym] = {"result": "unavailable", "text": f"фундаментите (Yahoo .info) не се изтеглиха днес ({type(e).__name__}) — CANSLIM не е проверен"}
+            if sym in live:                                         # 27.11.2026 (т. 6)
+                row.update({"company": row.get("company") or sym, "sector": row.get("sector") or "Unknown", "industry": row.get("industry") or "",
+                            "eps_growth_yoy": None, "revenue_growth_yoy": None, "roe": None, "data_missing": f"данни липсват (Yahoo .info — {type(e).__name__})"})
+                passed.append(row)
+                missing_kept += 1
             continue
 
     LAST_STATUS["fundamentals_checked"] = hits + requests_n
-    LAST_STATUS["fundamentals_cache"] = {"hits": hits, "requests": requests_n, "stored": stored}         # 10.11.2026 (т. 7)
+    LAST_STATUS["fundamentals_cache"] = {"hits": hits, "requests": requests_n, "stored": stored, "stale": stale_n, "missing_kept": missing_kept}   # 10.11.2026 (т. 7); 27.11.2026 (т. 6)
     LAST_FUND_CACHE.clear(); LAST_FUND_CACHE.update(hits=hits, requests=requests_n, stored=stored, entries=len(cache))
     if use_cache and from_file and (stored or hits):
         save_fund_cache(cache, today)

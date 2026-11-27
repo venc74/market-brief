@@ -48,14 +48,14 @@ cache = {}
 run(rows("CORT", "DOCN", "CRL"), D(2026, 10, 8), cache, n=2)
 F1 = copy.deepcopy(screener.LAST_FUNDAMENTALS)
 assert CALLS == ["CORT", "DOCN"] and set(cache) == {"CORT", "DOCN"} and cache["CORT"]["next_report"] == "2026-11-04" and cache["CORT"]["fetched"] == "2026-10-08"
-assert F1["CRL"]["result"] == "not_checked" and screener.LAST_STATUS["fundamentals_cache"] == {"hits": 0, "requests": 2, "stored": 2}
+assert F1["CRL"]["result"] == "not_checked" and {k: v for k, v in screener.LAST_STATUS["fundamentals_cache"].items() if k in ("hits", "requests", "stored")} == {"hits": 0, "requests": 2, "stored": 2}
 assert "longBusinessSummary" in cache["CORT"]["info"] and "earningsQuarterlyGrowth" in cache["CORT"]["info"]
 print("  ✓ 2 заявки; кешът: CORT и DOCN до 04.11")
 
 print("── 3. ден 2 (09.10): CORT и DOCN от кеша (без заявка), таванът 2 отива за CRL — същият резултат ──")
 run(rows("CORT", "DOCN", "CRL"), D(2026, 10, 9), cache, n=2)
 F2 = screener.LAST_FUNDAMENTALS
-assert CALLS == ["CRL"] and screener.LAST_STATUS["fundamentals_cache"] == {"hits": 2, "requests": 1, "stored": 1} and screener.LAST_STATUS["fundamentals_checked"] == 3
+assert CALLS == ["CRL"] and {k: v for k, v in screener.LAST_STATUS["fundamentals_cache"].items() if k in ("hits", "requests", "stored")} == {"hits": 2, "requests": 1, "stored": 1} and screener.LAST_STATUS["fundamentals_checked"] == 3
 assert F2["CORT"] == F1["CORT"] and F2["DOCN"] == F1["DOCN"] and F2["CRL"]["result"] == "criteria"
 assert F2["CORT"]["text"] == "CANSLIM: нетна печалба г/г +22% (Yahoo), приходи +32%, ROE 8% — 1 от 3 критерия (нужни 2)"
 print("  ✓ 1 заявка вместо 2; CRL вече е проверен; CORT/DOCN — същият текст")
@@ -86,6 +86,10 @@ with contextlib.redirect_stdout(io.StringIO()):
     screener.fundamental_screen(rows("CORT", "DOCN", "CRL"), max_checks=60, today=D(2026, 10, 9))
 assert CALLS == ["CORT", "DOCN", "CRL"] and set(screener.load_fund_cache()) == {"CORT", "DOCN", "CRL"}
 screener.save_fund_cache(screener.load_fund_cache(), D(2026, 11, 4))
+# 27.11.2026 (уикенд пакет, т. 6): изтеклите (отчетът мина) остават като „последните известни“ — не са валидни, но са годни при празен .info; отпадат след FUNDAMENTALS_STALE_MAX_DAYS
+kept = screener.load_fund_cache()
+assert set(kept) == {"CORT", "DOCN", "CRL"} and not any(screener.fund_cache_valid(v, D(2026, 11, 4)) for v in kept.values()) and all(screener.fund_cache_stale(v, D(2026, 11, 4)) for v in kept.values())
+screener.save_fund_cache(screener.load_fund_cache(), D(2027, 12, 1))
 assert screener.load_fund_cache() == {}
 screener.fund_cache_path().write_text("{не е json", encoding="utf-8")
 assert screener.load_fund_cache() == {}
