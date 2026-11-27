@@ -987,6 +987,8 @@ def run() -> dict:
         for t in (watch_monitor.load_watch_list() if config.ENABLE_WATCH_MONITOR else []):
             ours.setdefault(t, "наблюдаван")
         out = econ_calendar.build_week(dt.date.fromisoformat(today), big, ours)
+        # 27.11.2026 (уикенд пакет, т. 7): изчезналите от днес данни и отчети — последните известни от предишния бриф, с червен ред
+        econ_calendar.carry_forward(out, (prev_for_regime or {}).get("week_calendar"), (prev_for_regime or {}).get("date"), dt.date.fromisoformat(today))
         out["weights_note"] = (f"теглата — {w.get('source')}, към {w['as_of'][8:10]}.{w['as_of'][5:7]}" if w.get("as_of") else None) if w.get("companies") else f"теглата не се изтеглиха ({w.get('error')})"
         _cal_sets.update(big=big, ours=ours)
         from src import overnight                                              # 18.11.2026 (спешно, т. 2): очакванията сутринта ПРЕДИ отчета — утре „Нощта“ ги сравнява с факта

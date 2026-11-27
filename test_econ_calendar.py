@@ -60,10 +60,10 @@ assert not any("Balance Sheet" in l or "GDPNow" in l or "Bill Auction" in l for 
 print("  ✓ 17.11: NVDA след затварянето, HD преди отварянето; 18.11: протоколът на FOMC; 19.11: jobless claims с консенсуса")
 # 18.11.2026 (спешно, т. 6): и големите компании — капитализация ≥ $100 млрд по Nasdaq (РЕАЛНО: отговорите за 18.11 и 19.11); TGT ($73 млрд) — под прага
 e18 = {e["ticker"]: e["why"] for e in next(d for d in W["days"] if d["date"] == "2026-11-18")["earnings"]}
-assert e18 == {"PANW": "капитализация $264 млрд", "TJX": "капитализация $150 млрд", "LOW": "капитализация $128 млрд"}, e18
-assert "отчет: PANW · Palo Alto Networks, Inc. — след затварянето (EPS очаквана $0.52, Nasdaq) · капитализация $264 млрд" in L["2026-11-18"], L["2026-11-18"]
+assert e18 == {"PANW": "капитализация $264 млрд (Nasdaq, 16.11)", "TJX": "капитализация $150 млрд (Nasdaq, 16.11)", "LOW": "капитализация $128 млрд (Nasdaq, 16.11)"}, e18     # 27.11.2026 (т. 7): с датата
+assert "отчет: PANW · Palo Alto Networks, Inc. — след затварянето (EPS очаквана $0.52, Nasdaq) · капитализация $264 млрд (Nasdaq, 16.11)" in L["2026-11-18"], L["2026-11-18"]
 e19 = {e["ticker"]: e["why"] for e in next(d for d in W["days"] if d["date"] == "2026-11-19")["earnings"]}
-assert e19["WMT"] == "капитализация $1.0 трлн" and "TGT" not in e18 and W["cap_min_bn"] == 100
+assert e19["WMT"] == "капитализация $1.0 трлн (Nasdaq, 16.11)" and "TGT" not in e18 and W["cap_min_bn"] == 100
 assert ec.market_cap("$264,078,852,000") == 264078852000.0 and ec.market_cap("") is None and ec.market_cap("N/A") is None
 print("  ✓ 18.11: PANW, TJX, LOW (≥ $100 млрд); 19.11: WMT „$1.0 трлн“; TGT ($73 млрд) — под прага")
 

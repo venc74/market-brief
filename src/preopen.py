@@ -975,6 +975,12 @@ def run(now_utc=None, *, frames5: dict | None = None, fetch5=None, brief: dict |
         res["levels"] = level_checks(pts, waiting, qm_cards, records or [], res["date"])
         res["watch"] = watch_gaps(pts, watched or [], watch_closes(brief))
         res["volume_note"] = volume_note(res)
+        # 27.11.2026 (уикенд пакет, т. 7): какво очаква календарът днес (сутрешният бриф, вкл. последните известни) — при празни заглавия редът казва какво липсва
+        try:
+            today_day = next((d for d in ((brief.get("week_calendar") or {}).get("days") or []) if d.get("date") == now.date().isoformat()), None) or {}
+            res["econ_expected"] = list(dict.fromkeys(f"{e.get('event')} ({e.get('time_ny')})" for e in today_day.get("econ") or [] if e.get("event")))
+        except Exception:
+            res["econ_expected"] = []
         if econ_fn is not None:                                                        # 10.11.2026 (т. 3): заглавията за данните; main подава fetch_econ, тестовете — готови
             try:
                 res["econ"], err = econ_block(econ_fn(now.tz_convert("UTC").to_pydatetime()), now)

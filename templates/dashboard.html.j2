@@ -533,13 +533,15 @@
   {% if preopen.market and preopen.market.text %}<div class="small" style="margin:2px 0 8px"><b>Пазарът преди отварянето:</b> {{ preopen.market.text|join(" ") }}</div>{% endif %}
   {% if preopen.late %}<div class="small" style="color:var(--red)">Обновяване преди отварянето днес няма: {{ (preopen.notes or [])|join("; ") }}. Празното каре НЕ значи „нищо за отбелязване“.</div>
   {% elif not preopen.ok %}<div class="small" style="color:var(--red)">Премаркетът не се изтегли днес{% if preopen.notes %} ({{ preopen.notes|join("; ") }}){% endif %}{% if preopen.coverage and preopen.coverage.reason %} ({{ preopen.coverage.reason }}){% endif %} — празното НЕ значи, че няма гапове.</div>
-  {% elif not (preopen.gaps or preopen.levels or preopen.watch or preopen.ep_morning or preopen.ep_morning_error or preopen.econ or preopen.econ_error) %}<div class="small">Нищо за отбелязване{% if preopen.coverage and preopen.coverage.partial %} в проверената част{% endif %}: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
+  {% elif not (preopen.gaps or preopen.levels or preopen.watch or preopen.ep_morning or preopen.ep_morning_error or preopen.econ or preopen.econ_error or preopen.econ_expected) %}<div class="small">Нищо за отбелязване{% if preopen.coverage and preopen.coverage.partial %} в проверената част{% endif %}: няма гап ≥ +{{ '%g'|format(preopen_gap) }}% в универса, нито ниво, пресечено в премаркета, нито наблюдаван с гап ≥ ±{{ '%g'|format(preopen_watch_gap) }}%.</div>
   {% else %}
   {# 10.11.2026 (т. 3): заглавия за икономически данни след 08:30 Ню Йорк — дословно, с източник и час, без AI (preopen.econ_headlines) #}
   {% if preopen.econ %}<div class="cs-sub">Икономически данни след {{ preopen_econ_since }} Ню Йорк · {{ preopen.econ|length }}</div>
   <ul style="margin:4px 0 10px;padding-left:18px">{% for x in preopen.econ %}
     <li>{% if x.link %}<a href="{{ x.link }}" rel="noopener" target="_blank">„{{ x.title }}“</a>{% else %}„{{ x.title }}“{% endif %} <span class="small" style="color:var(--muted)">· {{ x.source }} · {{ x.time_ny }} Ню Йорк ({{ x.time_berlin }} Берлин)</span>{% if x.expectations %}<div class="small" style="font-size:12px">{{ x.expectations }}</div>{% endif %}</li>{% endfor %}</ul>{% endif %}
   {% if preopen.econ_error %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Заглавията за икономически данни не се провериха ({{ preopen.econ_error }}) — празното НЕ значи, че няма.</div>{% endif %}
+  {# 27.11.2026 (уикенд пакет, т. 7): днес календарът очаква данни, а заглавия няма — ред, не тишина (25.11: GDP, Core PCE, Durable Goods, Claims — блокът липсваше) #}
+  {% if not preopen.econ and not preopen.econ_error and preopen.econ_expected %}<div class="small" style="color:var(--yellow);margin-bottom:8px">Икономически данни след {{ preopen_econ_since }} Ню Йорк: заглавия в източниците няма, а календарът очаква днес {{ preopen.econ_expected|join(", ") }} — празното НЕ значи, че не са излезли.</div>{% endif %}
   {% if preopen.gaps %}<div class="cs-sub">EP — гапове ≥ +{{ '%g'|format(preopen_gap) }}% в премаркета · {{ preopen.gaps|length }}</div>
   {# 23.11.2026 (пакет 23.11, т. 4): ден на пазарен гап — гаповете без собствена новина / 8-K са „пазарен ход“ #}
   {% if preopen.market_gap and preopen.market_gap.gap %}<div class="small" style="color:var(--yellow);margin:2px 0 4px">⚠ {{ preopen.market_gap.text }} — гаповете без собствена новина или 8-K са пазарен ход, не индивидуален сетъп ({{ preopen.market_moves or 0 }} от {{ preopen.gaps|length }}).</div>{% endif %}
@@ -668,7 +670,7 @@
       <div class="t-name">Основна инфлация</div>
       {% if ci.value is not none %}
       <div class="t-val">{{ "%.2f"|format(ci.value) }}%</div>
-      <div class="t-label"><b>данни за {{ ci.month }}{% if ci.date %} {{ ci.date[:4] }}{% endif %}</b> · {{ ci_lag }}{% if ci.avg_recent is defined %} · <span title="Средно {{ ci.recent_span }} срещу {{ ci.prior_span }}; под ±{{ ci.flat_threshold_pp }} пп = стабилна">{{ {'up': '↑ расте', 'down': '↓ пада', 'flat': '→ стабилна'}[ci.direction] }}: 3м средно {{ "%.2f"|format(ci.avg_recent) }}% срещу {{ "%.2f"|format(ci.avg_prior) }}%</span>{% elif ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · информативно, не влиза в режима</div>
+      <div class="t-label"><b>данни за {{ ci.month }}{% if ci.date %} {{ ci.date[:4] }}{% endif %}</b> · {{ ci_lag }}{% if ci.avg_recent is defined %} · <span title="Средно {{ ci.recent_span }} срещу {{ ci.prior_span }}; под ±{{ ci.flat_threshold_pp }} пп = стабилна">{{ {'up': '↑ расте', 'down': '↓ пада', 'flat': '→ стабилна'}[ci.direction] }}: 3м средно {{ "%.2f"|format(ci.avg_recent) }}% срещу {{ "%.2f"|format(ci.avg_prior) }}%</span>{% elif ci.prev is defined %} · {{ {'up': '↑', 'down': '↓', 'flat': '→'}[ci.direction] }} {% if ci.direction == 'flat' %}без промяна спрямо{% else %}от{% endif %} {{ "%.2f"|format(ci.prev) }}% през {{ ci.prev_month }}{% endif %} · <b>следващо публикуване: {{ pio_next ~ " (BEA)" if pio_next else "няма в графика" }}</b> · информативно, не влиза в режима</div>
       {% else %}
       <div class="t-val">—</div>
       <div class="t-label">{% if ci.stale %}застояли данни — последно за {{ ci.last_month }}{% if ci.last_date %} {{ ci.last_date[:4] }}{% endif %} ({{ ci.age_days }} дни){% else %}няма данни{% endif %} · {{ ci_lag }} · информативно, не влиза в режима</div>
@@ -682,7 +684,7 @@
       <div class="t-name">Базов PCE</div>
       {% if pc.value is not none %}
       <div class="t-val">{{ "%.1f"|format(pc.value) }}%</div>
-      <div class="t-label"><b>данни за {{ pc.month }} {{ pc.year }}</b> · г/г{% if pc.direction %} · {{ {'up': '↑ ускорява', 'down': '↓ забавя', 'flat': '→ без промяна'}[pc.direction] }} спрямо {{ pc.prev_month }} ({{ "%.1f"|format(pc.prev_value) }}%){% endif %} · {{ ci_lag if ci_lag is defined else "излизат с ~6 седмици закъснение (в края на следващия месец)" }} · информативно, не влиза в режима</div>
+      <div class="t-label"><b>данни за {{ pc.month }} {{ pc.year }}</b> · г/г{% if pc.direction %} · {{ {'up': '↑ ускорява', 'down': '↓ забавя', 'flat': '→ без промяна'}[pc.direction] }} спрямо {{ pc.prev_month }} ({{ "%.1f"|format(pc.prev_value) }}%){% endif %} · {{ ci_lag if ci_lag is defined else "излизат с ~6 седмици закъснение (в края на следващия месец)" }} · <b>следващо публикуване: {{ pio_next ~ " (BEA)" if pio_next else "няма в графика" }}</b> · информативно, не влиза в режима</div>
       {% else %}
       <div class="t-val">—</div>
       <div class="t-label">{% if pc.stale %}застояли данни — последно за {{ pc.last_month }} ({{ pc.age_days }} дни){% else %}няма данни{% endif %} · информативно, не влиза в режима</div>
@@ -777,7 +779,7 @@
   <h2>Календар на седмицата</h2>
   <div class="small" style="font-size:11.5px;color:var(--muted);margin-bottom:6px">Източник: {{ week_calendar.source }}. Отчетите — на компаниите с тегло > 2% в S&amp;P 500{% if week_calendar.weights_note %} ({{ week_calendar.weights_note }}){% endif %}{% if week_calendar.cap_min_bn %}, с капитализация ≥ ${{ week_calendar.cap_min_bn }} млрд (Nasdaq){% endif %} и на тикърите в картите, книгите и наблюдаваните; Fed — речи, протоколи, решения; данните — основните за САЩ, с консенсуса (часът е по Ню Йорк).</div>
   {% if week_calendar.errors %}<div class="small" style="color:var(--red);margin-bottom:6px">⚠ Календарът е непълен: {{ week_calendar.errors|join("; ") }} — празното НЕ значи, че няма събития.</div>{% endif %}
-  {% for d in week_calendar.days %}<div class="small" style="font-size:12.5px;margin:3px 0"><b>{{ d.weekday }} {{ d.date[8:10] }}.{{ d.date[5:7] }}</b>{% if d.lines %}<ul style="margin:2px 0 6px;padding-left:18px">{% for l in d.lines %}<li>{{ l }}</li>{% endfor %}</ul>{% else %} — <span style="color:var(--muted)">нищо от следените</span>{% endif %}</div>{% endfor %}
+  {% for d in week_calendar.days %}<div class="small" style="font-size:12.5px;margin:3px 0"><b>{{ d.weekday }} {{ d.date[8:10] }}.{{ d.date[5:7] }}</b>{% if d.lines %}<ul style="margin:2px 0 6px;padding-left:18px">{% for l in d.lines %}<li{% if l.startswith("⚠") %} style="color:var(--red)"{% endif %}>{{ l }}</li>{% endfor %}</ul>{% else %} — <span style="color:var(--muted)">нищо от следените</span>{% endif %}</div>{% endfor %}
 </section>
 {% endif %}
 

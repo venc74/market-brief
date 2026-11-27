@@ -36,7 +36,9 @@ with contextlib.redirect_stdout(io.StringIO()):
     page = render.render_dashboard(b, publish=False)
 info = page[page.index('<div class="thermo-info">'):]; info = info[:info.index("Скрити днес") if "Скрити днес" in info else len(info)]
 t = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", info)))
-assert "Базов PCE 3.1% данни за септември 2026 · г/г · ↑ ускорява спрямо август (3.0%) · излизат с ~6 седмици закъснение (в края на следващия месец) · информативно, не влиза в режима" in t, t[-500:]
+# 27.11.2026 (уикенд пакет, т. 7): и кога е следващото публикуване — по графика на BEA (config.BEA_PIO_RELEASES; tests/fixtures/bea_schedule_2026-11-27.txt)
+assert ("Базов PCE 3.1% данни за септември 2026 · г/г · ↑ ускорява спрямо август (3.0%) · излизат с ~6 седмици закъснение (в края на следващия месец) · "
+        "следващо публикуване: 23.12 (BEA) · информативно, не влиза в режима") in t, t[-500:]
 assert t.index("Основна инфлация") < t.index("Базов PCE")
 print("  ✓ „Базов PCE 3.1% · данни за септември 2026 · г/г · ↑ ускорява спрямо август (3.0%)“ — след основната инфлация")
 

@@ -1,0 +1,508 @@
+{
+"note": "РЕАЛНО: brief[\"week_calendar\"] от брифовете на 23, 24 и 25.11.2026 (data/<дата>.json; Nasdaq) — 25.11: 11 данни в брифа от 23.11, празно в 24 и 25.11; CRWD (01.12) — в 24.11, липсва в 25.11. Извадени на 27.11.2026.",
+"weeks": {
+"2026-11-23": {
+"ok": false,
+"source": "Nasdaq (api.nasdaq.com — календар на икономическите данни и на отчетите)",
+"days": [
+{
+"date": "2026-11-23",
+"weekday": "понеделник",
+"earnings": [],
+"fed": [
+{
+"date": "2026-11-23",
+"time_ny": "16:00",
+"event": "FOMC Member Williams Speaks",
+"actual": "",
+"consensus": "",
+"previous": ""
+}
+],
+"econ": []
+},
+{
+"date": "2026-11-24",
+"weekday": "вторник",
+"earnings": [
+{
+"date": "2026-11-24",
+"ticker": "DELL",
+"name": "Dell Technologies Inc.",
+"when": "след затварянето",
+"eps_forecast": "$6.55",
+"market_cap": 198716916000.0,
+"why": "капитализация $199 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "ADI",
+"name": "Analog Devices, Inc.",
+"when": "преди отварянето",
+"eps_forecast": "$3.89",
+"market_cap": 182894395000.0,
+"why": "капитализация $183 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "BHP",
+"name": "BHP Group Limited",
+"when": "неизвестен час",
+"eps_forecast": "",
+"market_cap": 176429023000.0,
+"why": "капитализация $176 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "MDT",
+"name": "Medtronic plc",
+"when": "преди отварянето",
+"eps_forecast": "$1.34",
+"market_cap": 128694067000.0,
+"why": "капитализация $129 млрд"
+}
+],
+"fed": [],
+"econ": [
+{
+"date": "2026-11-24",
+"time_ny": "10:00",
+"event": "CB Consumer Confidence",
+"actual": "",
+"consensus": "92.1",
+"previous": "91.7",
+"kind": "потребители"
+}
+]
+},
+{
+"date": "2026-11-25",
+"weekday": "сряда",
+"earnings": [
+{
+"date": "2026-11-25",
+"ticker": "DE",
+"name": "Deere & Company",
+"when": "преди отварянето",
+"eps_forecast": "$4.07",
+"market_cap": 168486224000.0,
+"why": "капитализация $168 млрд"
+}
+],
+"fed": [],
+"econ": [
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Building Permits",
+"actual": "",
+"consensus": "1.295M",
+"previous": "1.398M",
+"kind": "жилища"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Building Permits",
+"actual": "",
+"consensus": "-7.4%",
+"previous": "-0.4%",
+"kind": "жилища"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Core Durable Goods Orders",
+"actual": "",
+"consensus": "",
+"previous": "0.5%",
+"kind": "поръчки"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Core PCE Price Index",
+"actual": "",
+"consensus": "3.2%",
+"previous": "3.1%",
+"kind": "PCE"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Core PCE Price Index",
+"actual": "",
+"consensus": "0.3%",
+"previous": "0.3%",
+"kind": "PCE"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Durable Goods Orders",
+"actual": "",
+"consensus": "0.0%",
+"previous": "1.9%",
+"kind": "поръчки"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "GDP",
+"actual": "",
+"consensus": "3.4%",
+"previous": "3.4%",
+"kind": "БВП"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "GDP Price Index",
+"actual": "",
+"consensus": "2.2%",
+"previous": "2.2%",
+"kind": "БВП"
+},
+{
+"date": "2026-11-25",
+"time_ny": "08:30",
+"event": "Initial Jobless Claims",
+"actual": "",
+"consensus": "201K",
+"previous": "203K",
+"kind": "заетост"
+},
+{
+"date": "2026-11-25",
+"time_ny": "10:00",
+"event": "New Home Sales",
+"actual": "",
+"consensus": "649K",
+"previous": "676K",
+"kind": "жилища"
+},
+{
+"date": "2026-11-25",
+"time_ny": "10:00",
+"event": "New Home Sales",
+"actual": "",
+"consensus": "",
+"previous": "-0.6%",
+"kind": "жилища"
+}
+]
+},
+{
+"date": "2026-11-27",
+"weekday": "петък",
+"earnings": [],
+"fed": [],
+"econ": []
+},
+{
+"date": "2026-11-30",
+"weekday": "понеделник",
+"earnings": [],
+"fed": [],
+"econ": []
+}
+],
+"errors": [
+"Initial Jobless Claims е на сряда 25.11 — датите на източника не съвпадат"
+],
+"big_n": 7,
+"ours_n": 34,
+"cap_min_bn": 100,
+"weights_note": "теглата — позициите на SPY от SSGA, към 19.11",
+"estimates_captured": 0
+},
+"2026-11-24": {
+"ok": true,
+"source": "Nasdaq (api.nasdaq.com — календар на икономическите данни и на отчетите)",
+"days": [
+{
+"date": "2026-11-24",
+"weekday": "вторник",
+"earnings": [
+{
+"date": "2026-11-24",
+"ticker": "DELL",
+"name": "Dell Technologies Inc.",
+"when": "след затварянето",
+"eps_forecast": "$6.55",
+"market_cap": 176768664000.0,
+"why": "капитализация $177 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "BHP",
+"name": "BHP Group Limited",
+"when": "неизвестен час",
+"eps_forecast": "",
+"market_cap": 173621117000.0,
+"why": "капитализация $174 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "ADI",
+"name": "Analog Devices, Inc.",
+"when": "преди отварянето",
+"eps_forecast": "$3.89",
+"market_cap": 167620887000.0,
+"why": "капитализация $168 млрд"
+},
+{
+"date": "2026-11-24",
+"ticker": "MDT",
+"name": "Medtronic plc",
+"when": "преди отварянето",
+"eps_forecast": "$1.34",
+"market_cap": 127837045000.0,
+"why": "капитализация $128 млрд"
+}
+],
+"fed": [],
+"econ": [
+{
+"date": "2026-11-24",
+"time_ny": "10:00",
+"event": "CB Consumer Confidence",
+"actual": "",
+"consensus": "92.4",
+"previous": "91.7",
+"kind": "потребители"
+}
+]
+},
+{
+"date": "2026-11-25",
+"weekday": "сряда",
+"earnings": [
+{
+"date": "2026-11-25",
+"ticker": "DE",
+"name": "Deere & Company",
+"when": "преди отварянето",
+"eps_forecast": "$4.07",
+"market_cap": 164269277000.0,
+"why": "капитализация $164 млрд"
+}
+],
+"fed": [],
+"econ": [],
+"econ_empty": true
+},
+{
+"date": "2026-11-26",
+"weekday": "четвъртък",
+"earnings": [],
+"fed": [],
+"econ": [],
+"market": "NYSE затворена — Thanksgiving (Денят на благодарността)",
+"closed": true
+},
+{
+"date": "2026-11-27",
+"weekday": "петък",
+"earnings": [],
+"fed": [],
+"econ": [],
+"econ_empty": true,
+"market": "NYSE — съкратена сесия, затваря в 13:00 Ню Йорк"
+},
+{
+"date": "2026-11-30",
+"weekday": "понеделник",
+"earnings": [],
+"fed": [],
+"econ": []
+},
+{
+"date": "2026-12-01",
+"weekday": "вторник",
+"earnings": [
+{
+"date": "2026-12-01",
+"ticker": "CRWD",
+"name": "CrowdStrike Holdings, Inc.",
+"when": "след затварянето",
+"eps_forecast": "$0",
+"market_cap": 234931618000.0,
+"why": "капитализация $235 млрд"
+},
+{
+"date": "2026-12-01",
+"ticker": "MRVL",
+"name": "Marvell Technology, Inc.",
+"when": "след затварянето",
+"eps_forecast": "$0.79",
+"market_cap": 107227333000.0,
+"why": "капитализация $107 млрд"
+}
+],
+"fed": [],
+"econ": [
+{
+"date": "2026-12-01",
+"time_ny": "10:00",
+"event": "ISM Manufacturing PMI",
+"actual": "",
+"consensus": "",
+"previous": "55.5",
+"kind": "ISM"
+},
+{
+"date": "2026-12-01",
+"time_ny": "10:00",
+"event": "JOLTS Job Openings",
+"actual": "",
+"consensus": "",
+"previous": "7.523M",
+"kind": "JOLTS"
+}
+]
+}
+],
+"errors": [],
+"big_n": 7,
+"ours_n": 31,
+"cap_min_bn": 100,
+"weights_note": "теглата — позициите на SPY от SSGA, към 20.11",
+"estimates_captured": 0
+},
+"2026-11-25": {
+"ok": true,
+"source": "Nasdaq (api.nasdaq.com — календар на икономическите данни и на отчетите)",
+"days": [
+{
+"date": "2026-11-25",
+"weekday": "сряда",
+"earnings": [
+{
+"date": "2026-11-25",
+"ticker": "DE",
+"name": "Deere & Company",
+"when": "преди отварянето",
+"eps_forecast": "$4.07",
+"market_cap": 170680975000.0,
+"why": "капитализация $171 млрд"
+}
+],
+"fed": [],
+"econ": [],
+"econ_empty": true
+},
+{
+"date": "2026-11-26",
+"weekday": "четвъртък",
+"earnings": [],
+"fed": [],
+"econ": [],
+"market": "NYSE затворена — Thanksgiving (Денят на благодарността)",
+"closed": true
+},
+{
+"date": "2026-11-27",
+"weekday": "петък",
+"earnings": [],
+"fed": [],
+"econ": [],
+"market": "NYSE — съкратена сесия, затваря в 13:00 Ню Йорк"
+},
+{
+"date": "2026-11-30",
+"weekday": "понеделник",
+"earnings": [],
+"fed": [],
+"econ": []
+},
+{
+"date": "2026-12-01",
+"weekday": "вторник",
+"earnings": [
+{
+"date": "2026-12-01",
+"ticker": "MRVL",
+"name": "Marvell Technology, Inc.",
+"when": "след затварянето",
+"eps_forecast": "$0.79",
+"market_cap": 126922506000.0,
+"why": "капитализация $127 млрд"
+}
+],
+"fed": [],
+"econ": [
+{
+"date": "2026-12-01",
+"time_ny": "10:00",
+"event": "ISM Manufacturing PMI",
+"actual": "",
+"consensus": "",
+"previous": "55.5",
+"kind": "ISM"
+},
+{
+"date": "2026-12-01",
+"time_ny": "10:00",
+"event": "JOLTS Job Openings",
+"actual": "",
+"consensus": "",
+"previous": "7.523M",
+"kind": "JOLTS"
+}
+]
+},
+{
+"date": "2026-12-02",
+"weekday": "сряда",
+"earnings": [
+{
+"date": "2026-12-02",
+"ticker": "CRM",
+"name": "Salesforce, Inc.",
+"when": "след затварянето",
+"eps_forecast": "$2.41",
+"market_cap": 152633573000.0,
+"why": "капитализация $153 млрд"
+},
+{
+"date": "2026-12-02",
+"ticker": "BMO",
+"name": "Bank Of Montreal",
+"when": "преди отварянето",
+"eps_forecast": "$2.69",
+"market_cap": 111529066000.0,
+"why": "капитализация $112 млрд"
+},
+{
+"date": "2026-12-02",
+"ticker": "BNS",
+"name": "Bank of Nova Scotia (The)",
+"when": "преди отварянето",
+"eps_forecast": "$1.55",
+"market_cap": 104808071000.0,
+"why": "капитализация $105 млрд"
+},
+{
+"date": "2026-12-02",
+"ticker": "AI",
+"name": "C3.ai, Inc.",
+"when": "неизвестен час",
+"eps_forecast": "($0.58)",
+"market_cap": 1601367420.0,
+"why": "наблюдаван"
+}
+],
+"fed": [],
+"econ": []
+}
+],
+"errors": [],
+"big_n": 7,
+"ours_n": 39,
+"cap_min_bn": 100,
+"weights_note": "теглата — позициите на SPY от SSGA, към 23.11",
+"estimates_captured": 0
+}
+}
+}

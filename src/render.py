@@ -727,6 +727,13 @@ def novelty_row(screener: str, c: dict, today: str) -> dict:
             "earnings": (c.get("earnings_gate") or {}).get("text") if (c.get("earnings_gate") or {}).get("soon") else None}
 
 
+def next_pio_release(today) -> str | None:
+    """27.11.2026 (уикенд пакет, т. 7): следващата дата на BEA „Personal Income and Outlays“ (PCE) от config.BEA_PIO_RELEASES — „23.12“; няма бъдеща → None. Чиста функция."""
+    d = str(today)[:10]
+    nxt = sorted(x for x in config.BEA_PIO_RELEASES if x > d)
+    return f"{nxt[0][8:10]}.{nxt[0][5:7]}" if nxt else None
+
+
 def market_gap_day(brief: dict | None) -> dict | None:
     """
     23.11.2026 (пакет 23.11, т. 4): денят е „ден на пазарен гап“ (карето в 15:05 — brief["preopen"]["market_gap"]) → {"text", "moves": {тикър: True — EP без собствена новина}};
@@ -1114,6 +1121,7 @@ def render_dashboard(brief: dict, *, closed_notice: str | None = None, publish: 
         distribution_days_status=brief.get("distribution_days_status"),
         core_inflation=(brief.get("macro") or {}).get("core_inflation"),
         pce_core=(brief.get("macro") or {}).get("pce_core"),                  # 30.10.2026 (поправки от брифа, т. 6): базов PCE — в „Информативни“
+        pio_next=next_pio_release(brief.get("date") or today),               # 27.11.2026 (т. 7): следващото публикуване (BEA)
         backtest=brief.get("backtest", {}),
     )
     config.DOCS_DIR.mkdir(exist_ok=True)

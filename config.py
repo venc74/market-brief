@@ -751,6 +751,9 @@ NOVELTY_NEAR_PCT = float(os.getenv("NOVELTY_NEAR_PCT", 2.0))
 NOVELTY_HISTORY_BRIEFS = int(os.getenv("NOVELTY_HISTORY_BRIEFS", 20))
 NEWS_AI_WHY = int(os.getenv("NEWS_AI_WHY", 0))
 NEWS_TRANSLATE = int(os.getenv("NEWS_TRANSLATE", 1))
+# 27.11.2026 (уикенд пакет, т. 7): кога излизат следващите данни за PCE (базов PCE и Dallas Fed Trimmed Mean — с отчета на BEA „Personal Income and Outlays“) — официалният график
+# на BEA (https://www.bea.gov/news/schedule, свален 27.11.2026; tests/fixtures/bea_schedule_2026-11-27.txt). Да се допълва; без бъдеща дата — плочката казва „няма в графика“.
+BEA_PIO_RELEASES = ["2026-12-23"]
 # 27.11.2026 (уикенд пакет, т. 6): празен Yahoo .info → последните известни фундаменти от кеша (с датата — „EPS: от ДД.ММ“); изтеклите записи остават в кеша до толкова дни.
 # На 24.11 33 от 42 бяха без данни и RGA, TGT, USFD излязоха от радара (RGA и USFD — живи в книгите).
 FUNDAMENTALS_STALE_MAX_DAYS = int(os.getenv("FUNDAMENTALS_STALE_MAX_DAYS", 365))

@@ -75,11 +75,15 @@ def parse_earnings(payload: dict | None, day: dt.date) -> list[dict]:
             for r in rows if isinstance(r, dict) and r.get("symbol")]
 
 
-def cap_label(cap: float | None) -> str | None:
-    """18.11.2026 (т. 6): „капитализация $264 млрд“ (≥ $1 трлн — „$4.0 трлн“); под config.WEEK_CAL_MIN_MARKET_CAP / без → None. Чиста функция."""
+def cap_label(cap: float | None, asof: dt.date | None = None) -> str | None:
+    """
+    18.11.2026 (т. 6): „капитализация $264 млрд“ (≥ $1 трлн — „$4.0 трлн“); под config.WEEK_CAL_MIN_MARKET_CAP / без → None. Чиста функция.
+    27.11.2026 (уикенд пакет, т. 7): с датата на данните (Nasdaq, всеки ден наново) — „капитализация $264 млрд (Nasdaq, 27.11)“.
+    """
     if not cap or cap < config.WEEK_CAL_MIN_MARKET_CAP:
         return None
-    return f"капитализация ${cap / 1e12:.1f} трлн" if cap >= 1e12 else f"капитализация ${cap / 1e9:.0f} млрд"
+    base = f"капитализация ${cap / 1e12:.1f} трлн" if cap >= 1e12 else f"капитализация ${cap / 1e9:.0f} млрд"
+    return base + (f" (Nasdaq, {asof:%d.%m})" if asof else "")
 
 
 def key_kind(event: str) -> str | None:
@@ -255,7 +259,7 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
             print(f"[calendar] икономически данни {d}: {type(e).__name__}: {e}")
         try:
             for r in earnings_fn(d):
-                cap = cap_label(r.get("market_cap"))                          # 18.11.2026 (т. 6): и големите компании (≥ $100 млрд), не само теглото > 2%
+                cap = cap_label(r.get("market_cap"), today)                   # 18.11.2026 (т. 6): и големите компании (≥ $100 млрд); 27.11.2026 (т. 7): с датата
                 if r["ticker"] in big or r["ticker"] in ours or cap:
                     day["earnings"].append({**r, "why": big.get(r["ticker"]) or ours.get(r["ticker"]) or cap})
         except Exception as e:
@@ -278,6 +282,41 @@ def build_week(today: dt.date, big: dict | None, ours: dict | None, econ_fn=None
         out["errors"].append(bad)
     out["ok"] = not out["errors"]
     return out
+
+
+def carry_forward(week: dict, prev_week: dict | None, prev_date: str | None, today: dt.date) -> dict:
+    """
+    27.11.2026 (уикенд пакет, т. 7): ден, който в предишния бриф имаше данни, а днес е празен — червен ред и последните известни събития „от ДД.ММ“; отчетите на следените компании
+    не изчезват мълчаливо (ако днес ги няма никъде в седмицата — остават с „от ДД.ММ — днес Nasdaq не го показва“). Реално: в брифа от 23.11 25.11 имаше 11 данни (GDP, Core PCE,
+    Durable Goods, Claims, New Home Sales …), в брифовете от 24 и 25.11 — празно, без банер; CRWD (отчет 01.12) — в брифа от 24.11, изчезна на 25 и 27.11. Мутира и връща week.
+    """
+    if not isinstance(week, dict) or not isinstance(prev_week, dict) or not prev_date:
+        return week
+    prev = {d["date"]: d for d in prev_week.get("days") or [] if isinstance(d, dict) and d.get("date")}
+    pd_ = f"{prev_date[8:10]}.{prev_date[5:7]}"
+    today_tickers = {e.get("ticker") for d in week.get("days") or [] for e in d.get("earnings") or []}
+    carried = []
+    for day in week.get("days") or []:
+        if day.get("closed") or day["date"] < today.isoformat():
+            continue
+        p = prev.get(day["date"])
+        if not p:
+            continue
+        if not day.get("econ") and p.get("econ"):
+            day["econ"] = [{**e, "stale_from": e.get("stale_from") or prev_date} for e in p["econ"]]      # през няколко брифа — датата остава първоначалната
+            src = day["econ"][0]["stale_from"]
+            day["stale_note"] = f"Nasdaq днес не върна данните за деня — последните известни от {src[8:10]}.{src[5:7]}"
+            day.pop("econ_empty", None)
+            carried.append(f"данни {day['date'][8:10]}.{day['date'][5:7]}")
+        for e in p.get("earnings") or []:
+            if e.get("ticker") and e["ticker"] not in today_tickers:
+                day.setdefault("earnings", []).append({**e, "date_note": e.get("date_note") or f"от {pd_} — днес Nasdaq не го показва"})
+                today_tickers.add(e["ticker"])
+                carried.append(e["ticker"])
+    if carried:
+        week["carried"] = {"from": prev_date, "items": carried}
+        print(f"[calendar] от предишния бриф ({pd_}): {', '.join(carried)}")
+    return week
 
 
 def econ_value_text(rows: list[dict]) -> str:
@@ -308,6 +347,8 @@ def group_events(rows: list[dict]) -> list[dict]:
 def day_lines(day: dict) -> list[str]:
     """Редовете за един ден — отчетите, Fed, данните. Чиста функция."""
     lines = []
+    if day.get("stale_note"):                                                  # 27.11.2026 (уикенд пакет, т. 7): изчезналите данни — първи, червено (⚠ в началото)
+        lines.append(f"⚠ {day['stale_note']}")
     if day.get("market"):                                                      # 23.11.2026 (т. 6): празник / съкратена сесия — първи ред
         lines.append(f"борса: {day['market']}")
     if day.get("opex"):                                                        # 20.11.2026 (т. 5)
@@ -320,7 +361,7 @@ def day_lines(day: dict) -> list[str]:
     if day.get("econ_empty"):
         lines.append("данните на Nasdaq за деня още не са публикувани — Fed е по графика; останалото — в следващия бриф")
     for g in group_events(day.get("econ") or []):
-        lines.append(f"{g['event']} — {g['time_ny']} Ню Йорк: {econ_value_text(g['rows'])}")
+        lines.append(f"{g['event']} — {g['time_ny']} Ню Йорк: {econ_value_text(g['rows'])}" + (f" (от {g['rows'][0]['stale_from'][8:10]}.{g['rows'][0]['stale_from'][5:7]})" if (g.get("rows") or [{}])[0].get("stale_from") else ""))
     return lines
 
 
