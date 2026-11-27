@@ -1,13 +1,6 @@
 {
  "version": 1,
  "docs": {
-  "0001193125-26-461405": {
-   "ticker": "KDP",
-   "date": "2026-11-16",
-   "kind": "акции",
-   "title": "57,971,015 Shares Common Stock",
-   "preliminary": false
-  },
   "0001193125-26-465047": {
    "ticker": "BRK-B",
    "date": "2026-11-17",

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "saved": "2026-11-25",
+ "saved": "2026-11-27",
  "tickers": {
   "AAPL": {
    "fetched": "2026-11-12",
@@ -91,6 +91,37 @@
     "earningsTimestampStart": 1801056600,
     "earningsTimestampEnd": 1801056600,
     "isEarningsDateEstimate": true
+   }
+  },
+  "AFG": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-02",
+   "info": {
+    "marketCap": 13304110080,
+    "sharesOutstanding": 82757593,
+    "currentPrice": 160.76,
+    "regularMarketPrice": 160.76,
+    "earningsQuarterlyGrowth": 0.312,
+    "revenueGrowth": 0.109,
+    "returnOnEquity": 0.21570998,
+    "longName": "American Financial Group, Inc.",
+    "sector": "Financial Services",
+    "industry": "Insurance - Property & Casualty",
+    "longBusinessSummary": "American Financial Group, Inc., an insurance holding company, provides property and casualty insurance products in the United States. It operates through Property and Casualty Insurance and Other segments. The company offers property and transportation insurance products, such as physical damage and liability coverage for buses and trucks, other specialty transportation niches, inland and ocean marine, agricultural-related products, and other commercial property coverages; specialty casualty insurance, including primarily excess and surplus, executive and professional liability, general liability, umbrella and excess liability, and specialty coverage in targeted markets, as well as customized programs for small to mid-sized businesses and workers compensation insurance; and specialty financial insurance products comprising risk management insurance programs for lending and leasing institutions, fidelity and surety products, and trade credit insurance. It sells its property and casualty insurance products through independent insurance agents and brokers. American Financial Group, Inc. was formerly known as American Financial Group Holdings Inc and changed its name to American Financial Group, Inc. in July 1997. The company was founded in 1872 and is headquartered in Cincinnati, Ohio.",
+    "trailingPE": 13.11256,
+    "forwardPE": 13.232833,
+    "trailingEps": 12.26,
+    "forwardEps": 12.14857,
+    "debtToEquity": 43.326,
+    "heldPercentInstitutions": 0.69585997,
+    "targetMeanPrice": 159.5,
+    "shortPercentOfFloat": 0.026400002,
+    "sharesShort": 1814309,
+    "shortRatio": 3.86,
+    "earningsTimestamp": 1793739600,
+    "earningsTimestampStart": 1801602000,
+    "earningsTimestampEnd": 1801602000,
+    "isEarningsDateEstimate": false
    }
   },
   "AIZ": {
@@ -248,6 +279,68 @@
     "isEarningsDateEstimate": true
    }
   },
+  "ANF": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-03-03",
+   "info": {
+    "marketCap": 7509187584,
+    "sharesOutstanding": 42434377,
+    "currentPrice": 176.96,
+    "regularMarketPrice": 176.96,
+    "earningsQuarterlyGrowth": 0.455,
+    "revenueGrowth": 0.112,
+    "returnOnEquity": 0.42720002,
+    "longName": "Abercrombie & Fitch Co.",
+    "sector": "Consumer Cyclical",
+    "industry": "Apparel Retail",
+    "longBusinessSummary": "Abercrombie & Fitch Co., through its subsidiaries, operates as an omnichannel retailer in the Americas, Europe, the Middle East, Africa, and the Asia-Pacific. It offers an assortment of apparel, personal care products, and accessories for men, women, and kids under the Abercrombie & Fitch, abercrombie kids, Your Personal Best, Hollister, and Gilly Hicks brands. The company sells products through its stores, various wholesale, franchise, and licensing arrangements, as well as e-commerce platforms. Abercrombie & Fitch Co. was founded in 1892 and is headquartered in New Albany, Ohio.",
+    "trailingPE": 13.591398,
+    "forwardPE": 13.286653,
+    "trailingEps": 13.02,
+    "forwardEps": 13.31863,
+    "debtToEquity": 87.398,
+    "heldPercentInstitutions": 1.1301999,
+    "targetMeanPrice": 188.72726,
+    "shortPercentOfFloat": 0.1607,
+    "sharesShort": 4910247,
+    "shortRatio": 4.48,
+    "earningsTimestamp": 1795527000,
+    "earningsTimestampStart": 1804080600,
+    "earningsTimestampEnd": 1804080600,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "ARMK": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-10",
+   "info": {
+    "marketCap": 15226021888,
+    "sharesOutstanding": 263425977,
+    "currentPrice": 57.8,
+    "regularMarketPrice": 57.8,
+    "earningsQuarterlyGrowth": 0.583,
+    "revenueGrowth": 0.048,
+    "returnOnEquity": 0.12975,
+    "longName": "Aramark",
+    "sector": "Industrials",
+    "industry": "Specialty Business Services",
+    "longBusinessSummary": "Aramark provides food and facilities services to education, healthcare, business and industry, sports, leisure, and corrections clients in the United States and internationally. The company operates through the Food and Support Services United States and Food and Support Services International segments. It offers food-related managed services, including dining, catering, food service management, and convenience-oriented retail services; non-clinical food and food-related support services, such as patient food and nutrition, retail food, environmental services, and procurement services; and plant operations and maintenance, custodial/housekeeping, energy management, grounds keeping, and capital project management services. The company also provides on-site restaurants, catering, convenience stores, and executive dining services; beverage and vending services; and facility management services comprising landscaping, transportation, capital program management, payment services, and other facility consulting services relating to building operations. In addition, it offers concessions, banquet, and catering services; retail services and merchandise sale, recreational, and lodging services; and facility management services at sports, entertainment, and recreational facilities. Further, the company offers correctional food; and operates commissaries, laundry facilities, and property rooms. The company was formerly known as ARAMARK Holdings Corporation. Aramark was founded in 1959 and is based in Philadelphia, Pennsylvania.",
+    "trailingPE": 35.679012,
+    "forwardPE": 17.59454,
+    "trailingEps": 1.62,
+    "forwardEps": 3.28511,
+    "debtToEquity": 155.511,
+    "heldPercentInstitutions": 0.98775,
+    "targetMeanPrice": 67.34375,
+    "shortPercentOfFloat": 0.0295,
+    "sharesShort": 7734874,
+    "shortRatio": 2.28,
+    "earningsTimestamp": 1794835800,
+    "earningsTimestampStart": 1802266200,
+    "earningsTimestampEnd": 1802266200,
+    "isEarningsDateEstimate": true
+   }
+  },
   "ASH": {
    "fetched": "2026-11-11",
    "next_report": "2027-02-01",
@@ -304,6 +397,37 @@
     "earningsTimestamp": 1793277000,
     "earningsTimestampStart": 1802352600,
     "earningsTimestampEnd": 1802352600,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "BBY": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-03-02",
+   "info": {
+    "marketCap": 21513867264,
+    "sharesOutstanding": 209727698,
+    "currentPrice": 102.58,
+    "regularMarketPrice": 102.58,
+    "earningsQuarterlyGrowth": 1.521,
+    "revenueGrowth": 0.058,
+    "returnOnEquity": 0.50476,
+    "longName": "Best Buy Co., Inc.",
+    "sector": "Consumer Cyclical",
+    "industry": "Specialty Retail",
+    "longBusinessSummary": "Best Buy Co., Inc. offers technology products and solutions in the United States, Canada, and internationally. The company provides computing and mobile phone products, such as desktops, notebooks, and peripherals; mobile phones comprising related mobile network carrier commissions; networking products; tablets covering e-readers; smartwatches; and consumer electronics consisting of digital imaging, health and fitness products, portable audio comprising headphones and portable speakers, and smart home products, as well as home theaters that includes home theater accessories, soundbars, and televisions. It also offers appliances, such as dishwashers, laundry, ovens, refrigerators, blenders, coffee makers, vacuums, and personal care; entertainment products consisting of drones, peripherals, gaming, toys, and virtual reality, as well as hardware and software, and augmented reality glasses and other software products; and other products, such as baby, food and beverage, luggage, and outdoor living products. In addition, the company provides delivery, installation, marketplace commissions, memberships, repair, set-up, technical support, health-related, and warranty-related services. It offers its products through stores and websites under the Best Buy, Best Buy Ads, Best Buy Business, Best Buy Essentials, Best Buy Health, Best Buy Marketplace, Geek Squad, Imagine That, Insignia, Lively, Jitterbug, My Best Buy, My Best Buy Memberships, Pacific Kitchen, Home, TechLiquidators, and Yardbird brand names, as well as domain names comprising bestbuy.com, lively.com, techliquidators.com, yardbird.com, bestbuy.ca, and techliquidators.ca. The company was formerly known as Sound of Music, Inc. Best Buy Co., Inc. was incorporated in 1966 and is headquartered in Richfield, Minnesota.",
+    "trailingPE": 14.633381,
+    "forwardPE": 13.928776,
+    "trailingEps": 7.01,
+    "forwardEps": 7.36461,
+    "debtToEquity": 126.834,
+    "heldPercentInstitutions": 0.96476996,
+    "targetMeanPrice": 99.04762,
+    "shortPercentOfFloat": 0.0928,
+    "sharesShort": 17246746,
+    "shortRatio": 6.23,
+    "earningsTimestamp": 1795527000,
+    "earningsTimestampStart": 1803994200,
+    "earningsTimestampEnd": 1803994200,
     "isEarningsDateEstimate": true
    }
   },
@@ -456,6 +580,37 @@
     "earningsTimestamp": 1793885400,
     "earningsTimestampStart": 1801747800,
     "earningsTimestampEnd": 1801747800,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "CB": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-02",
+   "info": {
+    "marketCap": 145384980480,
+    "sharesOutstanding": 382079222,
+    "currentPrice": 380.51,
+    "regularMarketPrice": 380.51,
+    "earningsQuarterlyGrowth": 0.015,
+    "revenueGrowth": 0.003,
+    "returnOnEquity": 0.1425,
+    "longName": "Chubb Limited",
+    "sector": "Financial Services",
+    "industry": "Insurance - Property & Casualty",
+    "longBusinessSummary": "Chubb Limited provides insurance and reinsurance products worldwide. It operates in six segments: North America Commercial Property and Casualty (P&C) Insurance, North America Personal P&C Insurance, North America Agricultural Insurance, Overseas General Insurance, Global Reinsurance, and Life Insurance. The company offers property and general liability, workers' compensation, and umbrella; professional and management liability; environmental, health, and international coverages; and claims and risk management products and services, loss control, and engineering and complex claims management. It also provides homeowners, automobile and collector cars, valuable articles, and personal and excess liability insurance. In addition, the company offers multiple peril crop insurance and crop-hail insurance for farm, ranch, specialty (P&C), and commercial agriculture products; product and employer liability, business interruption, and specialty risk; property insurance products, including traditional commercial fire coverage, energy industry-related, marine, construction, and other technical coverages; personal accident and supplemental medical coverages, such as accidental death, business/holiday travel, specified disease, disability, medical and hospital indemnity, and income protection; and directors and officers, professional indemnity, cyber, surety, aviation, political risk, and specialty personal lines products. Further, it provides property catastrophe reinsurance; traditional and specialty P&C reinsurance; and protection and savings products, which includes individual and group term life, dental, critical illness, dementia, hospital cash, credit life, group employee benefits, whole life, universal life, unit linked contracts, endowment plans, and annuities. The company was formerly known as ACE Limited and changed its name to Chubb Limited in January 2016. Chubb Limited was incorporated in 1985 and is headquartered in Zurich, Switzerland.",
+    "trailingPE": 13.337189,
+    "forwardPE": 12.911166,
+    "trailingEps": 28.53,
+    "forwardEps": 29.47139,
+    "debtToEquity": 32.945,
+    "heldPercentInstitutions": 0.83677,
+    "targetMeanPrice": 375.6087,
+    "shortPercentOfFloat": 0.008,
+    "sharesShort": 3044774,
+    "shortRatio": 1.95,
+    "earningsTimestamp": 1792526400,
+    "earningsTimestampStart": 1801602000,
+    "earningsTimestampEnd": 1801602000,
     "isEarningsDateEstimate": true
    }
   },
@@ -922,6 +1077,37 @@
     "isEarningsDateEstimate": true
    }
   },
+  "DLTR": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-03-15",
+   "info": {
+    "marketCap": 28298811392,
+    "sharesOutstanding": 185919516,
+    "currentPrice": 152.21,
+    "regularMarketPrice": 152.21,
+    "earningsQuarterlyGrowth": -0.052,
+    "revenueGrowth": 0.069,
+    "returnOnEquity": 0.4632,
+    "longName": "Dollar Tree, Inc.",
+    "sector": "Consumer Defensive",
+    "industry": "Discount Stores",
+    "longBusinessSummary": "Dollar Tree, Inc. operates retail discount stores under the Dollar Tree and Dollar Tree Canada brands in the United States and Canada. The company offers consumable merchandise comprising everyday consumables, such as household paper and chemicals, food, candy, health, personal care products, and frozen and refrigerated food; variety merchandise consisting of toys, durable housewares, gifts, stationery, party goods, greeting cards, softlines, arts and crafts supplies, and other items; and seasonal goods, including Christmas, Easter, Halloween, and Valentine's Day merchandise. The company was founded in 1986 and is based in Chesapeake, Virginia.",
+    "trailingPE": 18.42736,
+    "forwardPE": 19.0613,
+    "trailingEps": 8.26,
+    "forwardEps": 7.98529,
+    "debtToEquity": 223.351,
+    "heldPercentInstitutions": 1.072,
+    "targetMeanPrice": 152.44444,
+    "shortPercentOfFloat": 0.0677,
+    "sharesShort": 10036760,
+    "shortRatio": 4.71,
+    "earningsTimestamp": 1795527000,
+    "earningsTimestampStart": 1805117400,
+    "earningsTimestampEnd": 1805117400,
+    "isEarningsDateEstimate": true
+   }
+  },
   "DRI": {
    "fetched": "2026-11-17",
    "next_report": "2026-12-18",
@@ -981,6 +1167,37 @@
     "earningsTimestamp": 1793217600,
     "earningsTimestampStart": 1801688400,
     "earningsTimestampEnd": 1801688400,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "EHC": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-04",
+   "info": {
+    "marketCap": 13508677632,
+    "sharesOutstanding": 98123613,
+    "currentPrice": 137.67,
+    "regularMarketPrice": 137.67,
+    "earningsQuarterlyGrowth": 0.185,
+    "revenueGrowth": 0.089,
+    "returnOnEquity": 0.25106,
+    "longName": "Encompass Health Corporation",
+    "sector": "Healthcare",
+    "industry": "Medical Care Facilities",
+    "longBusinessSummary": "Encompass Health Corporation operates inpatient rehabilitation hospitals in the United States and Puerto Rico. The company offers specialized rehabilitative treatment, using technology and therapy, on an inpatient basis for patients recovering from a major injury or illness and seeking to regain functional ability, independence, and quality of life; medical, nursing, therapy, and ancillary services; and rehabilitative care to patients who are recovering from conditions, such as stroke and other neurological disorders, cardiac and pulmonary conditions, brain and spinal cord injuries, complex orthopedic conditions, and amputations. It offers services through the Medicare program to the federal government, managed care plans and private insurers, state governments, and other patients. The company was formerly known as HealthSouth Corporation and changed its name to Encompass Health Corporation in January 2018. Encompass Health Corporation was incorporated in 1984 and is based in Birmingham, Alabama.",
+    "trailingPE": 22.027199,
+    "forwardPE": 19.98911,
+    "trailingEps": 6.25,
+    "forwardEps": 6.88725,
+    "debtToEquity": 78.721,
+    "heldPercentInstitutions": 1.02475,
+    "targetMeanPrice": 156.08333,
+    "shortPercentOfFloat": 0.036199998,
+    "sharesShort": 3148983,
+    "shortRatio": 2.69,
+    "earningsTimestamp": 1793217600,
+    "earningsTimestampStart": 1801774800,
+    "earningsTimestampEnd": 1801774800,
     "isEarningsDateEstimate": true
    }
   },
@@ -1074,6 +1291,37 @@
     "earningsTimestamp": 1793826000,
     "earningsTimestampStart": 1802206800,
     "earningsTimestampEnd": 1802206800,
+    "isEarningsDateEstimate": true
+   }
+  },
+  "EXLS": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-23",
+   "info": {
+    "marketCap": 6800571904,
+    "sharesOutstanding": 150788731,
+    "currentPrice": 45.1,
+    "regularMarketPrice": 45.1,
+    "earningsQuarterlyGrowth": 0.182,
+    "revenueGrowth": 0.197,
+    "returnOnEquity": 0.27717,
+    "longName": "ExlService Holdings, Inc.",
+    "sector": "Technology",
+    "industry": "Information Technology Services",
+    "longBusinessSummary": "ExlService Holdings, Inc., operates as a data and artificial intelligence (AI) company in the North America, the United Kingdom, Europe, and internationally. The company operates through Insurance; Healthcare and Life Sciences; Banking, Capital Markets, and Diversified Industries; and International Growth Markets. It provides digital operations and solutions and analytics-driven services, such as claims management, premium and benefit administration, agency management, account reconciliation, actuarial and risk analytics, policy research, digital marketing, underwriting support, new business acquisition, policy servicing, audit, surveys, billing and collection, commercial and residential survey, and customer service; digital customer acquisition services using a software-as-a-service delivery model through LifePRO and Life Digital Suite platforms; and Subrosource software platform, an end-to-end subrogation platform. The company also offers health care services for care, utilization, and disease management; payment integrity; revenue optimization, customer engagement, and commercial analytics and regulatory support services; and digital operations and solutions. In addition, it provides financial planning and analysis, accounting, regulatory and statutory reporting, decision support, data management, and compliance services; consumer and commercial banking, credit card and payment services; fintech, wealth and retirement services; capital markets, utilities, retail and consumer packaged goods, communications, media and entertainment, travel and leisure, transportation and logistics, infrastructure, and other business services; property and casualty insurance, life insurance, disability insurance; and insurance brokers, reinsurers, annuity and retirement services. The company was founded in 1999 and is headquartered in New York, New York.",
+    "trailingPE": 27.005987,
+    "forwardPE": 16.943167,
+    "trailingEps": 1.67,
+    "forwardEps": 2.66184,
+    "debtToEquity": 66.565,
+    "heldPercentInstitutions": 1.0468,
+    "targetMeanPrice": 48.77778,
+    "shortPercentOfFloat": 0.0684,
+    "sharesShort": 8897969,
+    "shortRatio": 3.66,
+    "earningsTimestamp": 1793131200,
+    "earningsTimestampStart": 1803416400,
+    "earningsTimestampEnd": 1803416400,
     "isEarningsDateEstimate": true
    }
   },
@@ -1412,6 +1660,37 @@
     "earningsTimestampStart": 1801143000,
     "earningsTimestampEnd": 1801143000,
     "isEarningsDateEstimate": true
+   }
+  },
+  "MANH": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-02",
+   "info": {
+    "marketCap": 14629855232,
+    "sharesOutstanding": 58061893,
+    "currentPrice": 251.97,
+    "regularMarketPrice": 251.97,
+    "earningsQuarterlyGrowth": 0.046,
+    "revenueGrowth": 0.11,
+    "returnOnEquity": 0.83514,
+    "longName": "Manhattan Associates, Inc.",
+    "sector": "Technology",
+    "industry": "Software - Application",
+    "longBusinessSummary": "Manhattan Associates, Inc. develops, sells, deploys, services, and maintains software solutions to manage supply chains, inventory, and omni-channel operations. It offers warehouse management solution for managing goods and information across the distribution centers; Manhattan Active Warehouse Management, a cloud native and version less application for the associate; and transportation management solution for helping shippers navigate their way through the demands and meet customer service expectations at the lowest possible freight costs; Manhattan SCALE, a portfolio of logistics execution solution; and Manhattan Active Omni, which offers order management, store inventory and fulfillment, call center, POS, and customer engagement tools for enterprises and stores. The company also provides demand forecasting and replenishment, allocation, and unified business planning; technology platform including Manhattan Active Platform solutions, a cloud-native product designed to provide version-less product access; maintenance services, which offers on-premises software licensees with software upgrades for additional or improved functionality and technological advances; and professional services, such as solutions planning and implementation, and related consulting services. In addition, it provides training and change management services; and resells computer hardware, radio frequency terminal networks, radio frequency identification chip readers, bar code printers and scanners, and other peripherals. The company offers products through direct sales personnel and partnership agreements with various organizations. It serves retail, consumer goods, food and grocery, logistics service providers, industrial and wholesale, high technology and electronics, life sciences, and government industries. The company operates in the Americas, Europe, the Middle East, Africa, and the Asia Pacific. Manhattan Associates, Inc. was founded in 1990 and is headquartered in Atlanta, Georgia.",
+    "trailingPE": 70.579834,
+    "forwardPE": 40.802284,
+    "trailingEps": 3.57,
+    "forwardEps": 6.17539,
+    "debtToEquity": 25.776,
+    "heldPercentInstitutions": 1.1361,
+    "targetMeanPrice": 284.36365,
+    "shortPercentOfFloat": 0.051799998,
+    "sharesShort": 2319863,
+    "shortRatio": 2.68,
+    "earningsTimestamp": 1793131200,
+    "earningsTimestampStart": 1801602000,
+    "earningsTimestampEnd": 1801602000,
+    "isEarningsDateEstimate": false
    }
   },
   "MAR": {
@@ -1806,6 +2085,37 @@
     "isEarningsDateEstimate": true
    }
   },
+  "ROP": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-01-26",
+   "info": {
+    "marketCap": 47843508224,
+    "sharesOutstanding": 99036429,
+    "currentPrice": 483.09,
+    "regularMarketPrice": 483.09,
+    "earningsQuarterlyGrowth": 0.216,
+    "revenueGrowth": 0.076,
+    "returnOnEquity": 0.13229,
+    "longName": "Roper Technologies, Inc.",
+    "sector": "Technology",
+    "industry": "Software - Application",
+    "longBusinessSummary": "Roper Technologies, Inc. designs and develops vertical software and technology enabled products in the United States, Canada, Europe, Asia, and internationally. Its Application Software segment offers comprehensive management, diagnostic and laboratory information management, enterprise software and information solutions, K-12 school administration, transportation management, financial and compliance management, cloud-based and integrated payment processing, campus technology and payment, and cloud-based financial analytics, performance management software, and data solutions; cloud-based software for the property and casualty insurance industry; and foodservice technologies. The Network Software segment provides cloud-based data, collaboration, and estimating automation software; electronic marketplace; visual effects and 3D content software; cloud-based software and AI-enabled analytics solutions for the life insurance and financial services industries; supply chain software; health care services and software; data analytics and information; pharmacy software solutions; and AI-enabled SaaS providing digital engagement, as well as church management and integrated giving solutions for faith-based organizations. The Technology Enabled Products segment offers ultrasound procedures accessories; dispensers and metering pumps; wireless sensor network and solutions; automated surgical scrub and linen dispensing equipment; water meters; optical and electromagnetic precision measurement systems; RFID card and credential readers; and medical devices. It distributes and sells its products through direct sales offices, manufacturers' representatives, resellers, and distributors. The company was formerly known as Roper Industries, Inc. and changed its name to Roper Technologies, Inc. in April 2015. Roper Technologies, Inc. was incorporated in 1981 and is based in Sarasota, Florida.",
+    "trailingPE": 19.124702,
+    "forwardPE": 19.659239,
+    "trailingEps": 25.26,
+    "forwardEps": 24.57318,
+    "debtToEquity": 50.696,
+    "heldPercentInstitutions": 1.06172,
+    "targetMeanPrice": 469.17786,
+    "shortPercentOfFloat": 0.0594,
+    "sharesShort": 5117883,
+    "shortRatio": 4.72,
+    "earningsTimestamp": 1792672200,
+    "earningsTimestampStart": 1800970200,
+    "earningsTimestampEnd": 1800970200,
+    "isEarningsDateEstimate": false
+   }
+  },
   "SAIC": {
    "fetched": "2026-11-11",
    "next_report": "2026-12-03",
@@ -2022,6 +2332,37 @@
     "isEarningsDateEstimate": true
    }
   },
+  "THG": {
+   "fetched": "2026-11-27",
+   "next_report": "2027-02-02",
+   "info": {
+    "marketCap": 8519444480,
+    "sharesOutstanding": 34373387,
+    "currentPrice": 247.85,
+    "regularMarketPrice": 247.85,
+    "earningsQuarterlyGrowth": -0.034,
+    "revenueGrowth": 0.042,
+    "returnOnEquity": 0.21767999,
+    "longName": "The Hanover Insurance Group, Inc.",
+    "sector": "Financial Services",
+    "industry": "Insurance - Property & Casualty",
+    "longBusinessSummary": "The Hanover Insurance Group, Inc., through its subsidiaries, provides various property and casualty insurance products and services for individuals and businesses in the United States. It operates in four segments: Core Commercial, Specialty, Personal Lines, and Other. The company offers commercial multiple peril, commercial automobile, workers' compensation, and other core commercial coverage; and professional and executive lines, marine, and surety and other, as well as specialty property and casualty products comprising Hanover program business, excess and surplus business, Hanover specialty industrial, and specialty general liability business coverage. It also provides personal automobile; and homeowners and other personal lines, including residences and personal property, liability claims, personal umbrella, inland marine, fire, personal watercraft, personal cyber, and other miscellaneous coverages. In addition, the company offers insurance products for collector cars, motorcycles, off-road vehicles, condominiums, valuable items, business owners, international, and management and professional liability; and for the construction, cultural and educational institutions, financial intuitions, healthcare, human services, life sciences, manufacturing, professional services, real estate, retail, technology, and wholesale and distribution industries. It markets its products and services through independent agents and brokers. The company was formerly known as Allmerica Financial Corp. and changed its name to The Hanover Insurance Group, Inc. in December 2005. The Hanover Insurance Group, Inc. was founded in 1852 and is headquartered in Worcester, Massachusetts.",
+    "trailingPE": 11.898705,
+    "forwardPE": 12.360055,
+    "trailingEps": 20.83,
+    "forwardEps": 20.0525,
+    "debtToEquity": 24.53,
+    "heldPercentInstitutions": 0.94658,
+    "targetMeanPrice": 249.625,
+    "shortPercentOfFloat": 0.0306,
+    "sharesShort": 930813,
+    "shortRatio": 3.22,
+    "earningsTimestamp": 1793217600,
+    "earningsTimestampStart": 1801602000,
+    "earningsTimestampEnd": 1801602000,
+    "isEarningsDateEstimate": false
+   }
+  },
   "TMO": {
    "fetched": "2026-11-11",
    "next_report": "2027-01-28",
@@ -2082,6 +2423,37 @@
     "earningsTimestampStart": 1800451800,
     "earningsTimestampEnd": 1800451800,
     "isEarningsDateEstimate": true
+   }
+  },
+  "TTC": {
+   "fetched": "2026-11-27",
+   "next_report": "2026-12-16",
+   "info": {
+    "marketCap": 10026744832,
+    "sharesOutstanding": 94663378,
+    "currentPrice": 105.92,
+    "regularMarketPrice": 105.92,
+    "earningsQuarterlyGrowth": 0.439,
+    "revenueGrowth": 0.084,
+    "returnOnEquity": 0.26447,
+    "longName": "The Toro Company",
+    "sector": "Industrials",
+    "industry": "Tools & Accessories",
+    "longBusinessSummary": "The Toro Company provides professional turf maintenance equipment and services. It operates through Professional and Residential segments. It offers riding and walking mowers, greens rollers, all-wheel drive articulating tractors, turf sprayer, utility vehicles, aeration, bunker maintenance, and other turf equipment; sprinkler heads, controllers, turf sensors, valves, and operating software; and riding rotary and reel mowers and attachments, infield grooming equipment, multipurpose vehicles, debris management products, all-wheel drive articulating tractors, sidewalk snow and ice solution vehicles, and related attachments and accessories. The company also provides zero-turn radius riding mowers, walk behind and stand-on mowers, turf application and renovation, tree care, horizontal directional drills, and drilling guidance and support equipment; walk and ride trenchers, vacuum excavators, utility locators and inspection systems, pipe rehabilitation, and replacement solutions; drive chucks and sub savers, drill pipe, starter rods and quick connects, bits and blades, rock tools, reamers, and swivels; and snow removal and ice management solutions. In addition, it offers rotors, sprinkler bodies and nozzles, valves, drip tubing and subsurface irrigation, and electric control devices; wired and wireless rain, freeze, climate, and soil sensors; drip tape, polyethylene tubing, drip line, emitters, filters, fitting, and software related solutions; stand-on skid steers, walk-behind trenchers, stump grinders, material handlers, and other concrete construction equipment; walk power and zero-turn riding mowers, and snow throwers; and grass and hedge trimmers, blower-vacuums, chainsaws, edgers, cultivators, string mowers, and related parts and accessories. The company sells its products through distributors, dealers, mass retailers, hardware retailers, equipment rental and home centers, and online. The company was founded in 1914 and is headquartered in Bloomington, Minnesota.",
+    "trailingPE": 28.320854,
+    "forwardPE": 20.768627,
+    "trailingEps": 3.74,
+    "forwardEps": 5.1,
+    "debtToEquity": 80.671,
+    "heldPercentInstitutions": 0.96406,
+    "targetMeanPrice": 111.0,
+    "shortPercentOfFloat": 0.0505,
+    "sharesShort": 3711322,
+    "shortRatio": 5.99,
+    "earningsTimestamp": 1797427800,
+    "earningsTimestampStart": 1797427800,
+    "earningsTimestampEnd": 1797427800,
+    "isEarningsDateEstimate": false
    }
   },
   "UNP": {

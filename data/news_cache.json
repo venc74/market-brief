@@ -1,147 +1,220 @@
 {
- "date": "2026-11-25",
+ "date": "2026-11-27",
  "news": [
   {
-   "headline": "US ready to slap tariffs on China, EU and others over subsidized production, AP sources say - AP News",
+   "headline": "Trump unveils new tariffs over excess industrial capacity, undeterred by midterms defeat - Reuters",
+   "source": "Reuters Business",
+   "why": "Тръмп обяви нови тарифи срещу Китай, ЕС, Бразилия и други търговски партньори заради свръхкапацитет в индустрията; партньорите отвърнаха с ответни мерки, а Виетнам търси търговска сделка с САЩ.",
+   "source_text": "Trump unveils new tariffs over excess industrial capacity, undeterred by midterms defeat - Reuters Trump unveils new tariffs over excess industrial capacity, undeterred by midterms defeat Reuters US to hike tariffs on China, EU, Brazil and others over subsidized factories - AP News US to hike tariffs on China, EU, Brazil and others over subsidized factories AP News China and other US trading partners hit back at Trump’s new tariff plans - AP News China and other US trading partners hit back at Trump’s new tariff plans AP News Trump's new tariffs aim to prise global trade from China's grip - Reuters Trump's new tariffs aim to prise global trade from China's grip Reuters U.S. tariff-hike threats pile pressure on partners to sign trade deals The U.S. planned a fresh tariff salvo on 14 trading partners, while offering some countries lower rates if they secure trade deals with Washington. For Trump, doubling down on tariffs is about power, not popularity - Reuters For Trump, doubling down on tariffs is about power, not popularity Reuters",
+   "published": "2026-11-25T13:15Z",
+   "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOcjZ1MUw5RG5fdk0tUjNTRFNIRzl5amR0VklFSzdTOUlUS2hxNWk5aV9xcm5VWmQtZGRkdXVKMWZ3Um5qZHluSFp4MGNIdHNETlZPck1RcmJmUC1oZHFtWFdYT29PbkdjUU1IbjQyWE9GRFJZdXFwTVFRMEtDcl81bXpDS3RHSHNka3VSbGlHNmNFV09uMTE1aExBRVkxUldZUmpwX3hYdGduS1BJcW1QRlY4ZjdyYkZyWTI0dVBB?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Trump's new tariffs aim to prise global trade from China's grip - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOaUdXQjZTRVJvNzVESnNzMlpfZmxhTEgweFZsUHRZRTVLa29xcENmUjJaUUNjWExsaVNTREJqNlNwSFZzNXFuRUFqSlpRam4tZkZHWXEwZXQ5VlhPVFJzcmNnZEw5a3N2ZVBndnpnNzhiN1Y1NkRtU1M5WE05UmRFcGMzUVk0NXYyRTVpM05MOUhISDhmb3BPTERXcmNHWE9zc2dR?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "For Trump, doubling down on tariffs is about power, not popularity - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQUGF3UXNuQWFId2NPaERJLTVlLUhkQlp0WGpPNWRaamVTN3BmVFc5YkY3NVkzNHhJLUx6aTN4c2hZVnRucS13S1hMVlJWMEhzNllrYjJDSzczMndmRm5EeUhreW1qb0dpUG1HdTBrdnUtdGRLdFRVaDBWcFFEOXBsZ3gxMXlMNjJFbWk4ZzVtYXF3bWF2Z2NzZ3dTMmE5THV4VGdnRw?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "US to hike tariffs on China, EU, Brazil and others over subsidized factories - AP News",
+     "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPcWJ0MDE3ZEJzV2tVdThRbXdzcGxXN0phLUpNTHAyVWlEQV9JNzVUWlpsRXp6ZHFTNnY1dnpKMHJjNExkUnZxTlRXdzZNTUFOeXhkUTk5XzF0ZW55b1lZcnhJYTkyYUt5N1lvdm5TZ3QyZDh5UkNsVmtHMmhuNm5xcGc3VmVUcV9fellldEtWcTdaYWJpRUlBcm5R?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "China and other US trading partners hit back at Trump’s new tariff plans - AP News",
+     "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQVWQ3MnMzTlQ5Y2lUTW9RTzloTmp3MmtycjBUbmZUOTExYWNsVmlXX1JmLVJGYUYyRjNHSGV1b2hzLWhWclNBRDRZb2hyQ2UxSE9tYktjUTBKR2VDU2w1YlZlU0xaZ0JSMlQ1ZzhwMEJpSVk5N05XbHhnNi1ESktvTVNGNlZpMkNjX0dUNHdvLWJ2YTVqeDFv?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
+     "link": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html"
+    }
+   ],
+   "ours": [],
+   "headline_bg": "Trump обявява нови мита заради свръхкапацитет в индустрията, незасегнат от поражението на междинните избори"
+  },
+  {
+   "headline": "US third-quarter GDP growth revised sharply higher - Reuters",
+   "source": "Reuters Business",
+   "why": "БВП на САЩ за третото тримесечие беше ревизиран рязко нагоре; Тръмп нарече данните преди изборите фалшиви и поиска разследване на Министерството на търговията.",
+   "source_text": "US third-quarter GDP growth revised sharply higher - Reuters US third-quarter GDP growth revised sharply higher Reuters Trump demands probe into ‘record setting error’ after third-quarter GDP data gets massive revision higher President Donald Trump on Thursday deemed the latest gross domestic product revision a mistake, claiming that it should be \"immediately investigated.\" Trump calls the pre-election GDP figures 'fake' and demands an investigation of Commerce Department - AP News Trump calls the pre-election GDP figures 'fake' and demands an investigation of Commerce Department AP News Trump demands probe of GDP data released before midterms - Reuters Trump demands probe of GDP data released before midterms Reuters",
+   "published": "2026-11-25T14:28Z",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxONjZ1Y2k2ZHFiNlFJRV9fUWVWNXk5R0puemhyQTF6X2xiV0NTblNua3dFVTlQWE1keGQ0TDVMdHNSUHZlYURmbUE3cVZpRDlLdDRiSXNRTTYzZEpXcjViSGd2SV83emptZFRrUWtTczl4b3ItMVdBOEpNOHFSOVFWN096T083eV9KaWVCbXgwczlLLVl1VHNRNGZ0clRZS3NFXzRwQnVR?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Trump demands probe of GDP data released before midterms - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPdjAtVm85ZE55RGw0MXhaM3NVV1NlaHdlazNjODRQQjRPOGh2eDQ5aWYzcmxNSHpVWHNacEhhMDFaRDZ3YWIxalJzY3JCTXdjLVE4RXpmbktlZXNZTUc3RlE0LVhtTlo5Rl8xMm9nOXVPZmZ1eEd2XzJjcXQxX2otajdiUHN6djBScGpldmJvUXBIaG9UeUJxeW5kSWtnTTQ?oc=5"
+    },
+    {
+     "source": "AP Business",
+     "headline": "Trump calls the pre-election GDP figures 'fake' and demands an investigation of Commerce Department - AP News",
+     "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPSWs0NUw0T1MxU0FFajZoSzUzQ2tCblZyZGhDc25mSVpXV0NpczlfWHpwaWdaUEE0T3lFSXdhYl9oUVZ3cTV1ei01aXprNTBoYUJCbG02THdJeGVISENOWjdrVzJpb2pxZEI5aU94VmFCTWU4ckR5MjFjZ2JDMzFibl9WVGZ2Q09PeVo5LXc1WQ?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Trump demands probe into ‘record setting error’ after third-quarter GDP data gets massive revision higher",
+     "link": "https://www.cnbc.com/2026/11/26/trump-gdp-revision-investigation.html"
+    }
+   ],
+   "ours": [],
+   "translation_note": "преводът е пропуснат — несъответствие (липсва: GDP)",
+   "translation_rejected": "Ръстът на БВП на САЩ за третото тримесечие е преразгледан значително нагоре"
+  },
+  {
+   "headline": "Tokyo core inflation at 16-month high, bolsters case for BOJ hike - Reuters",
+   "source": "Reuters Business",
+   "why": "Инфлацията в Токио достигна 16-месечен връх, засилвайки очакванията за повишение на лихвата от Bank of Japan.",
+   "source_text": "Tokyo core inflation at 16-month high, bolsters case for BOJ hike - Reuters Tokyo core inflation at 16-month high, bolsters case for BOJ hike Reuters",
+   "published": "2026-11-26T23:42Z",
+   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNbUU2UTdMSzhabVJEYUYzN1Y1SGk3MWdLeVo4cV9iWDVCd3RZWDVDR2lFZ0dtUTRlUUxxbExIRlJDeGx3dEVVLVBuRU1qaDlrXzd6aHpwUHVWTEhMemE2ZzdaSjROTy1HQUF2dkdDcFhNYWtnMU51a2dsSURKSmlfdjlkTnMzeDdySmZLbWotTnR2clUxR0hrQ255ekNnM3dR?oc=5",
+   "ours": [],
+   "headline_bg": "Базовата инфлация в Токио е на 16-месечен връх, укрепва аргументите за повишение от BOJ"
+  },
+  {
+   "headline": "Leaders choose Spain’s former central bank head as next European Central Bank president - AP News",
    "source": "AP Business",
-   "why": "",
-   "source_text": "US ready to slap tariffs on China, EU and others over subsidized production, AP sources say - AP News US ready to slap tariffs on China, EU and others over subsidized production, AP sources say AP News Trump readies raft of new tariffs on major economies China, the EU, Japan and South Korea expected to be hit by levies as US president doubles down on trade strategy",
-   "published": "2026-11-25T01:17Z",
-   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPalJfNUMtVmVfb2RDeFlJeVEtNHVxc09sSjVrT1RfZmRMZ3dzZDMyLUhUSVVoalctTzJTNkU2b2F6VGVJNDZfZXZ3Rkp1WUZQLWY5UUxpOE9XcTJyUVJ4Ri1nZl9MU0xRbkY2MHVBZVg5NGcyX3JlMW1ZdVlrMXRodUlhSjZaSkkwR3pVQUtOUmJGY1JIelBuaGh3?oc=5",
-   "also": [
-    {
-     "source": "Financial Times",
-     "headline": "Trump readies raft of new tariffs on major economies",
-     "link": "https://www.ft.com/content/335b593d-1478-4550-ab0a-71fec6280eb0?syn-25a6b1a6=1"
-    }
-   ],
-   "ours": [],
-   "headline_bg": "САЩ готови да наложат мита на Китай, ЕС и други заради субсидирано производство, съобщават източници на AP"
-  },
-  {
-   "headline": "Consumer confidence shoots up after Democrats' midterm victories — though inflation worries persist",
-   "source": "CNBC",
-   "why": "",
-   "source_text": "Consumer confidence shoots up after Democrats' midterm victories — though inflation worries persist The Conference Board survey released Tuesday showed improvement across the board, with the headline confidence index jumping to 103.3. US consumer confidence soars with elections in the rearview mirror and gas prices in retreat - AP News US consumer confidence soars with elections in the rearview mirror and gas prices in retreat AP News",
-   "published": "2026-11-24T18:34Z",
-   "link": "https://www.cnbc.com/2026/11/24/consumer-confidence-november-election-midterm.html",
-   "also": [
-    {
-     "source": "AP Business",
-     "headline": "US consumer confidence soars with elections in the rearview mirror and gas prices in retreat - AP News",
-     "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQTjdmLTE2Tm9OMElXaGg4WnlDLTRCOHpFcFJPNEttUWNfTkRmQmpFMTZYZmE3bXg1b3V5TmlHNEhFakZBRU8zZU50QzhDTlJMZWFBak9NYURUSnpLLVVFNWhJVUluS3cyei1zbVp6MkZicWU1Y1hIRUc1My1CNmFEVUZpaksxeVVUcG9rbVJXZE9uQ3hfeFZTYzZTUUo3QQ?oc=5"
-    }
-   ],
-   "ours": [],
-   "headline_bg": "Потребителското доверие скача след победите на демократите на междинните избори — въпреки че притесненията от инфлацията продължават"
-  },
-  {
-   "headline": "Houthi attack on Saudi Arabian sovereign wealth fund PIF's tower injures 11",
-   "source": "CNBC",
-   "why": "",
-   "source_text": "Houthi attack on Saudi Arabian sovereign wealth fund PIF's tower injures 11 This has been the second attack by the Iran-backed group in six days on the tower, although the previous attack did not cause any casualties. Yemen's Houthis threaten to target Jeddah and other Saudi Red Sea ports - Reuters Yemen's Houthis threaten to target Jeddah and other Saudi Red Sea ports Reuters",
-   "published": "2026-11-25T02:36Z",
-   "link": "https://www.cnbc.com/2026/11/25/us-iran-war-trump-hormuz-houthi-saudi-pif-tower.html",
+   "why": "Лидерите на ЕС избраха бившия управител на испанската централна банка Пабло Ернандес де Кос за следващ президент на Европейската централна банка, наследявайки Кристин Лагард.",
+   "source_text": "Leaders choose Spain’s former central bank head as next European Central Bank president - AP News Leaders choose Spain’s former central bank head as next European Central Bank president AP News Spain’s Pablo Hernández de Cos set to lead European Central Bank De Cos will lead the ECB into a period of political uncertainty and choppy growth, after winning the backing needed to succeed Christine Lagarde next year. Spain's De Cos to take over as ECB president from Lagarde - Reuters Spain's De Cos to take over as ECB president from Lagarde Reuters",
+   "published": "2026-11-26T18:25Z",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxORV9jQzQ1ZVNiVjB4bVUyT0FMS1JPeDZ1dk1QcWt3bDR2bnZDQjFLMWtjLWtQQUYyX2lIVUxNYjN0V3d1bmdlVEtyaXNOdWhVMWU4R18wcThUSHphd3NyVVNQOGZwVTFMUXpQdUZzOG1FUUlZWWRlaDhTbmstbTd4M0dEaGl0WXlFemZHTXVPYl9iSDFGbDNWb1VNVDZfVXFUTjdRMFd3?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "Yemen's Houthis threaten to target Jeddah and other Saudi Red Sea ports - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPbmE5cEFGWGFLVzVEUlVvWlE5NzJaT2p0MTUxclgxejJ2ZHJPbTQ5d1BLNzh6R2tFb251aWQ4dHBUTDRtaTlETkVick9uV1hKVkdZSjNPbFk5M2NBd1oxQXptdzAtLS1zVzlidDBDVXBmWFAyVnRzMGRmZHNGZVk4T3Y1aV9ycGZFcWxGejZ0T29BbG9EUks5QjZ0bzFVRG05YlVQemt4UDdDSEY5cUZrYzNsSU9VMGVX?oc=5"
+     "headline": "Spain's De Cos to take over as ECB president from Lagarde - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOOV8wZkxRVTY5U0ZQeVZwSGtCMVZJTjV2d2t5TlhsSVoxQmpLRXI4OTV1R0QwQkV1QmZma3BDN0lrOEJTNGFVeloyeE5HbnhmWDZfR1VrbzN5TzZrck5WTTlKNTBaeFhVbDd4RldhY0hZMnFsczlsTURLY0FpWWgzeE5YVVc2NUZqMy1KbldQVDJfcUtsVEhINHF2emJ5SEFrMXozWUdTM3BFQQ?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Spain’s Pablo Hernández de Cos set to lead European Central Bank",
+     "link": "https://www.cnbc.com/2026/11/26/pablo-hernandez-de-cos-ecb-president.html"
     }
    ],
    "ours": [],
-   "headline_bg": "Атака на Houthi срещу кулата на суверенния фонд PIF на Саудитска Арабия рани 11 души"
+   "headline_bg": "Лидерите избират бившия шеф на централната банка на Испания за следващ президент на European Central Bank"
   },
   {
-   "headline": "U.S. jury convicts Huawei in a criminal trial over fraud and trade secrets",
-   "source": "CNBC",
-   "why": "",
-   "source_text": "U.S. jury convicts Huawei in a criminal trial over fraud and trade secrets Huawei was found guilty of bank fraud, money laundering and trade secret theft conspiracy in a U.S. trial. China's Huawei convicted in sprawling US criminal trial over Iran business - Reuters China's Huawei convicted in sprawling US criminal trial over Iran business Reuters",
-   "published": "2026-11-25T02:43Z",
-   "link": "https://www.cnbc.com/2026/11/25/huawei-fraud-trade-trial.html",
+   "headline": "Nvidia halts server shipments to four Southeast Asian countries, FT reports - Reuters",
+   "source": "Reuters Business",
+   "why": "Nvidia спря доставките на сървъри към четири държави в Югоизточна Азия; ново правило на BIS задължава купувачите да изключат китайски наематели; S&P постави рейтинга на Nvidia под наблюдение за понижение заради управленски опасения; Fitch предупреди, че американските чип ограничения ще забавят инвестициите в дата центрове в Азия.",
+   "source_text": "Nvidia halts server shipments to four Southeast Asian countries, FT reports - Reuters Nvidia halts server shipments to four Southeast Asian countries, FT reports Reuters Nvidia chip buyers told to rule out Chinese renters to purchase GPUs, sources say A new BIS rule was intended to close \"loopholes,\" U.S. Trade Representative Jamieson Greer told CNBC's \"Squawk Box\" on Wednesday. US chip curbs will slow Asia data-center investment, Fitch says - Reuters US chip curbs will slow Asia data-center investment, Fitch says Reuters EXCLUSIVE: US chip curbs, distillation crackdown threaten Chinese AI model development, sources say - Reuters EXCLUSIVE: US chip curbs, distillation crackdown threaten Chinese AI model development, sources say Reuters S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch - Reuters S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch Reuters",
+   "published": "2026-11-26T05:09Z",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOM1ZtZ1FmQ3d0Nk9xZzFmaDNtd3ZURjZ1cm1sWkptUktqcm1aOUc3eWpIYjVpUGoxWGxWd2FjRTZiTzBGRGtaTTA3ZUFsTEJLNk5BV3VfV2VKNHJVbk1mTDJqYkZkdEFPQ09jdzVHRzBHazlKVko5bVp4WDZMSUpUaEpyZk5ZUUUxbm42MjBIRWJCaGZzVXRkNklKN2dfdDRES3RwazQ1UU55Q3Bf?oc=5",
    "also": [
     {
      "source": "Reuters Business",
-     "headline": "China's Huawei convicted in sprawling US criminal trial over Iran business - Reuters",
-     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQSmhBaGpBTEdjQXR4UmRuMy1KVWY0anJiNkxHQ2NVTjBFbWc4RE5MRk5KU1lzZ1BKMVNKVUNRV3hlRmxtYWc0cmlpSlAxWkJDXzBhdjFqY0RfbE54clBNU1hDODJjbEk2ZENVMWtuM3F6VVZjWGpDZXNhZGowZW1UNUlLWGJSU0tYbXhlYU8xRkYweTJrd1JsM0pDdzd3UkM1ZkpTSXdHYTkxQjNzNlhfU2pTcXExSlFJ?oc=5"
+     "headline": "US chip curbs will slow Asia data-center investment, Fitch says - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOelNJWFVtc1BvNXp5TFMzbWtqVTdzc3JVM3pmY1hkR09YMi1WV3k3TzZ4VzFDQUpkcGJHVEZ2R0NqVnRNNmZsTThQZ0V3SlNzUmY1dUFURGtVckNOTXVQamlqSnVxTG5NVy1UVVR1dnlaNFE1MTluNFdUOTZzSHg2eHYzYTF1emwxMjZKUVIxcWhqYzhxTUdYZ0VZU3BsV1UxRHp3RTZnc2lyS2U5SDAydW5vcjVqaFFz?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "EXCLUSIVE: US chip curbs, distillation crackdown threaten Chinese AI model development, sources say - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQSHo5VjlHR1l4UkdCSmFGNUd6WVlZNXlwZXl6Yk5oYUFnTm9ISC1ZSWdmbi1aZ3R1b1Q3bXhpaXVoSXRaNy1hcWdSWHdCd2RFVGx6WlhYN25pZXI4Q2xHWGpQVkJYN2MwTk1ma2NERnBKTHhBUXpHSElLeFdwdEpVZFZZcWhxMm1QUEVpeHRYSXczYXNJelJTUWtHdEkxSGpud2NxeV90R0VjTXVkTmE4U0JRZWVRM1RFUmt3UGhIbw?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNb1ZBby1iVDJnTmJwX3hDYWJpU2lxTUdLTHdlWHFqRHJUcmtTOWFuQkFRTlUyZTJBcGdNMWR3N3d1YlJIV05kWk1mU21JSDZmSVpZR1BlanpqRzFXSkg3NkxkeElWcHM0Q2Y4eFJKb3Fha29XakxYNFJ4cXExZHo4MFVDOHdDbENrQWs0d0lqQ3Z5cEVDRVBQR1hNNWZxSmhiUll4NFg1amZlU01oWm9fN2hkUFBBNkdKT21v?oc=5"
+    },
+    {
+     "source": "CNBC",
+     "headline": "Nvidia chip buyers told to rule out Chinese renters to purchase GPUs, sources say",
+     "link": "https://www.cnbc.com/2026/11/26/neoclouds-nvidia-china-ai.html"
     }
    ],
-   "ours": [],
-   "headline_bg": "Американски съд с присъда срещу Huawei в наказателен процес за измама и търговски тайни"
+   "ours": [
+    "ANF"
+   ],
+   "translation_note": "преводът е пропуснат — несъответствие (липсва: SOUTHEAST)",
+   "translation_rejected": "Nvidia спира доставките на сървъри към четири страни в Югоизточна Азия, съобщава FT"
   },
   {
-   "headline": "UK warns of Russian sabotage threat to companies that supply Ukraine - Reuters",
-   "source": "Reuters World",
-   "why": "",
-   "source_text": "UK warns of Russian sabotage threat to companies that supply Ukraine - Reuters UK warns of Russian sabotage threat to companies that supply Ukraine Reuters British officials warn UK firms aiding Ukraine to brace for Russian sabotage attempts - AP News British officials warn UK firms aiding Ukraine to brace for Russian sabotage attempts AP News",
-   "published": "2026-11-24T21:32Z",
-   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxObWthWEU2V2VxbjBhWTVtNE5wdC1LWFBYM24tVF92ekgyb25wMDRablR5eUJCQXFNUFVXU2NMYnkwWUlkWmpmNnhNaUhXZGdOSjUxeVItUzdING0xbDZZRENTTmFHdzJyWXZHM0NCbl91QU1DR3ZpMlpWNGYyVmVVV3dXM2RJSWMxUk1qckdVR18tSjJfbml3enVHUFpZcDBEaG5lSVlDQQ?oc=5",
+   "headline": "Judge blocks FCC from early license review for ABC, which network says has had a chilling effect - AP News",
+   "source": "AP Business",
+   "why": "Федерален съдия блокира FCC да провежда предсрочен преглед на лицензите на ABC станциите, собственост на Disney, след като мрежата заяви, че действията имат смразяващ ефект.",
+   "source_text": "Judge blocks FCC from early license review for ABC, which network says has had a chilling effect - AP News Judge blocks FCC from early license review for ABC, which network says has had a chilling effect AP News US judge blocks FCC from targeting Disney-owned ABC stations - Reuters US judge blocks FCC from targeting Disney-owned ABC stations Reuters",
+   "published": "2026-11-26T13:30Z",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQbGg0cWJHckhVdmhyb3U0YXNWLTFhdmw5OHdYM2t2bVVMSzdENnNtaU94MlZfYkZ0R0htTVU2czd6LTQ2Z2tfREVyOEZLeWhaMmY0OXl5RldKREVraWtxc0ducXJNc1NuNzc4WWtKZjM3X0F5cGlvSGVBZlUza1JxTS1pNDRHaVJObE9YdTZNellnRjJjV3hN?oc=5",
    "also": [
     {
-     "source": "AP Business",
-     "headline": "British officials warn UK firms aiding Ukraine to brace for Russian sabotage attempts - AP News",
-     "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNMjlhMGNhc2xSNHhZdFRiSmZOaXhPZE50S2hxczJ4U1IwNWV0dmZyeTNkM0IyMmFMcHFJNDhjZnVUcHV6dG5vU2ZqUjRwS09yYTVqRm1ob2tZQktGZkM1NmktTVJKbVZUMWtHX0MwcFRYeUhmSGFTRm1KM3dDTFpLUTVGaVZ2YWdiMjR4QkNrZGtZbFV1V0VJRFpDSGZ2Zw?oc=5"
+     "source": "Reuters Business",
+     "headline": "US judge blocks FCC from targeting Disney-owned ABC stations - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNa3U4SjN4dnBlQUVGemRWMkxMdndfMXJjMHBmNUtvRDMtVmJhRWhZVS1kZzd0UHVUend5T3NJRlV2elRaTW1jQ3Y1QjNpVEtWRlltZ0x2WE5kSVNQbWdUZ1BpWmtyZHFQYjVmTUphNk1wWlRlbU8wTUpuUjdHa0ZXc19tV3hFUEFMY3Q3WVphZDdTeGRKUGRDWTU1YmxoRWl0anJCUTc2NA?oc=5"
     }
    ],
    "ours": [],
-   "headline_bg": "Великобритания предупреждава за заплаха от руски саботаж срещу компании, доставящи оборудване на Украйна"
+   "headline_bg": "Съдия блокира FCC от ранен преглед на лиценза на ABC, което мрежата казва, че е имало възпиращ ефект"
   },
   {
-   "headline": "Oil slips over 1% as supply glut prospect offsets Middle East disruption fears - Reuters",
+   "headline": "Brent settles higher as mine strikes, refinery attack stoke Middle East supply concerns - Reuters",
    "source": "Reuters Business",
-   "why": "",
-   "source_text": "Oil slips over 1% as supply glut prospect offsets Middle East disruption fears - Reuters Oil slips over 1% as supply glut prospect offsets Middle East disruption fears Reuters",
-   "published": "2026-11-25T01:58Z",
-   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOVGl4Nzdfc01ReTB5TnAxUkVLTXlaRVFvbGM5aTZDOEtVUXlrVDQtMHJwcWh2WldoMnVyb0QxU1pEQUoyN09sNU1SZXR3NVUzdTZXeWpkdGNTZW95MUtmdjV3dWFxTEZsRW5WUlF1djVTTWZxUGVxcHhPNEptMnBEcmZ0MURhX0JxTDFqc19HblpWd2hLSEs5SXRYTXB6bzFwNzZqOUFTc1ZOM3ItVDFZWmM2a0R5YkxsdnlsMTZWQ1ZEUQ?oc=5",
+   "why": "Петролът поскъпна: стачки в мини, атака срещу рафинерията на Saudi Aramco в Джазан и опасения за доставки от Близкия изток прекъснаха тримесечната низходяща серия на Brent.",
+   "source_text": "Brent settles higher as mine strikes, refinery attack stoke Middle East supply concerns - Reuters Brent settles higher as mine strikes, refinery attack stoke Middle East supply concerns Reuters Oil on track to snap 3-week losing streak over supply fears - Reuters Oil on track to snap 3-week losing streak over supply fears Reuters Attack on Saudi Aramco's Jazan refinery kills worker, halts some operations - Reuters Attack on Saudi Aramco's Jazan refinery kills worker, halts some operations Reuters",
+   "published": "2026-11-26T03:08Z",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPWHpfX3p2RFoxU2l0SGZVbVdSejdGYkc0NFpERWlxVEtab0pQbGd1NUtqQ3c0cXprdWItUF9fRmVVVElET3BNbklnbElwaC1UZ0xoNnd4dE9Wb2dFVDFGN2JyQ3YyUVhfTWxsNGFWNFNURG5kX1pMdVBtb2QyLXFMaXZPM0ZPdGdud1hWdHFuTEpNQXBtdUh6RmpWcW1jelhTU0JHdmp3dWphb0hB?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "Oil on track to snap 3-week losing streak over supply fears - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPTzVQVzE5aGdzbGVhNEUtVl94M0V3RjN5Rks4UDU0U0plazFDcjFnUTBMMHBvdk9BRzFaVHljSXk1ZFdzSjlRTVRXNGZ0cnRyUWRRbFJaRjBsVWNFbDZqSnQ0cHo0TW5fRDlwMWlKWDI3V2ROcnlXczVET1RqSXR6UGtZSTZ0OTQtY1YwaG1yYTRwQnZ6TW43azNGNTFqMmpkNFhtbVJwRnVkVERhR1NnSlFIMzExZw?oc=5"
+    },
+    {
+     "source": "Reuters Business",
+     "headline": "Attack on Saudi Aramco's Jazan refinery kills worker, halts some operations - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxORnNINWJlUzU0bDVSQ1Z5TWhtZTl1dzVxa01lbWhiMTg0bjBKZzQtbld6RmpIQ3NOSkctT29wTmdmR3VCcHpMbzdBQUdQSU0wVWItQU1COHhCS1BzYnpoOTJsRzl2TWp0aVNNZWVpZVFhS2cwWXVtNnA0bzRfUXNTRTJRTEVHem5BY2V2SURxZG9Vb3VkT3FNa1RuR3RfZWJQUE15WTdGaVFudnJaeVJIdVhXdE9PcWFuY2c?oc=5"
+    }
+   ],
    "ours": [],
-   "headline_bg": "Петролът пада с над 1% тъй като перспективата за излишък на предлагане компенсира опасенията от сътресения на Близкия изток"
+   "headline_bg": "Brent затваря по-високо, тъй като стачки в мини и атака срещу рафинерия разпалват опасения за доставките в Близкия изток"
   },
   {
-   "headline": "Dutch lawmakers urge government to resist US MATCH bill targeting ASML - Reuters",
-   "source": "Reuters Business",
-   "why": "",
-   "source_text": "Dutch lawmakers urge government to resist US MATCH bill targeting ASML - Reuters Dutch lawmakers urge government to resist US MATCH bill targeting ASML Reuters",
-   "published": "2026-11-24T21:21Z",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOQzVHX3hnSlM5Wlc1cnprdlZlZ2tEUi1TNkJHYTRzMjUzbnVtek5JSVVFNjZLdXZmeXlUT2lGRFFRaHdZd2pwMWY0MkI3M0tZRVI1d3NmRmotalRHQXdOd3NzUi1ocmJFZU9CY3ByUmZZN3pBSTc3V2NkS0V6d2Jfbzg4V2hJZF81ZHp4djVOU2RJTExUOG1fUlNmYXk3Uy1GWlYxbnR1NmFYcWxjSTRLblNzMmU4UQ?oc=5",
+   "headline": "EU leaders split over budget spending and a $49 billion loan to Ukraine - AP News",
+   "source": "AP Business",
+   "why": "Лидерите на ЕС са разделени по въпроса за бюджетните разходи и заем от 49 млрд. долара за Украйна; Франция и Германия искат споразумение до края на годината, за да защитят следващия бюджет на ЕС и финансирането за Украйна от евентуална победа на Льо Пен.",
+   "source_text": "EU leaders split over budget spending and a $49 billion loan to Ukraine - AP News EU leaders split over budget spending and a $49 billion loan to Ukraine AP News France and Germany want deal by year-end to 'Le Pen-proof' next EU budget and Ukraine funding - Reuters France and Germany want deal by year-end to 'Le Pen-proof' next EU budget and Ukraine funding Reuters",
+   "published": "2026-11-26T21:27Z",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxObUt5bnNUdEVaVjhETTRjWFI5cnZYaUtyV0R1VE50ZGFPcnJyVmppY2xxeVFpOEtPWURRSFpKUGFXcDVkZGVtZnF2Ykg5aEk2NXY4VTVBVHZQWEstSk9CRGp6cHZLUWhyQkdDQ2ktQjl6WldZSlFRdzhfVUQ0dGNkNlZJaFZKMkFYeWdFUmNQSXdSTDJscjlEcXBZdVdhZWs?oc=5",
+   "also": [
+    {
+     "source": "Reuters Business",
+     "headline": "France and Germany want deal by year-end to 'Le Pen-proof' next EU budget and Ukraine funding - Reuters",
+     "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxONUFuMXFIM2VqWWZ2S2RBUFkzM1VzQjE0WkxhTDlreXM3OU45NDdRejhWUkRUQVVvQ2x2ZG1PT2JiNjNtYlRiYWFqSF9wWnQzR25hTFRjcjI5YkU0QmxLeEwwNlJkak5JaWo5QjVqTnZPQmt1bGdzZl9nZ0k2ZjRxSDMyUmY2eTQ4TEM2NnJaZDNPZUR4RUZKb2FqRkZ3eklRaXNicEFLc2VRSHZRenpZWEpPRlp4SWxBdi1Nbw?oc=5"
+    }
+   ],
    "ours": [],
-   "headline_bg": "Нидерландски законодатели призовават правителството да устои на американския законопроект MATCH, насочен срещу ASML"
-  },
-  {
-   "headline": "Australian inflation heats up in October, core hits two-year high - Reuters",
-   "source": "Reuters Business",
-   "why": "",
-   "source_text": "Australian inflation heats up in October, core hits two-year high - Reuters Australian inflation heats up in October, core hits two-year high Reuters",
-   "published": "2026-11-25T02:21Z",
-   "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOaHo3dUJCUmRaTEFNN1NHaGIwSzhUTF9RVGduN1RfVk4xWGlyblRLYWhCT0F3N3hMMFFJekJHZnFsNHpucEF4TnVuakZWdHVDbF9QbFV5NkViTzQ4VHFLWjdtN0diMUJsblFGMWdxYXRrZGdaODhFcmtGZVVLeXh5bVZJdXduUHAxb0prR2I0NGRmaW5xZ19vZ1dRczdGU0gwSGVtSENBZGpmMDRqOFljRUJPNHpRM3M?oc=5",
-   "ours": [],
-   "headline_bg": "Инфлацията в Австралия се ускорява през октомври, базовата достига двегодишен връх"
+   "headline_bg": "Лидерите на ЕС са разделени относно бюджетните разходи и заем от 49 млрд. долара за Украйна"
   }
  ],
  "window": {
-  "since": "2026-11-24T06:30:00+00:00",
-  "hours": 24.07,
-  "day_queries": 0,
+  "since": "2026-11-25T06:30:00+00:00",
+  "hours": 48.06,
+  "day_queries": 4,
   "sources": {
    "Reuters Business": {
-    "count": 51,
-    "oldest": "2026-11-24T14:43Z"
+    "count": 102,
+    "oldest": "2026-11-25T11:57Z"
    },
    "CNBC": {
-    "count": 28,
-    "oldest": "2026-11-24T13:31Z"
+    "count": 30,
+    "oldest": "2026-11-25T14:17Z"
    },
    "Financial Times": {
     "count": 9,
-    "oldest": "2026-11-24T16:30Z"
+    "oldest": "2026-11-27T04:31Z"
    },
    "AP Business": {
-    "count": 50,
-    "oldest": "2026-11-24T08:14Z"
+    "count": 101,
+    "oldest": "2026-11-25T09:27Z"
    }
   },
   "fetched": {
    "Reuters Business": 51,
-   "CNBC": 28,
+   "CNBC": 30,
    "Financial Times": 9,
    "AP Business": 50
   },
@@ -151,167 +224,137 @@
    "Reuters World": 50
   },
   "front_dead": [],
-  "pool_total": 138,
-  "pool_used": 100,
+  "pool_total": 242,
+  "pool_used": 200,
   "to_model": {
-   "AP Business": 29,
-   "CNBC": 28,
    "FT World": 2,
-   "Reuters Business": 32,
-   "Reuters World": 1,
-   "Financial Times": 8
+   "Reuters Business": 79,
+   "CNBC": 30,
+   "Reuters World": 3,
+   "AP Business": 77,
+   "Financial Times": 9
   },
   "themes_in_pool": 12,
   "priority": {
-   "names": 40,
-   "hits": 7,
-   "in_pool": 4,
-   "beyond_limit": 1,
+   "names": 43,
+   "hits": 5,
+   "in_pool": 5,
+   "beyond_limit": 2,
    "tickers": [
-    "COST",
-    "DELL"
+    "AAPL",
+    "ANF",
+    "ANT",
+    "BBY"
    ]
   }
  },
  "themes": [
   {
-   "key": "Huang–Nvidia–Jensen",
+   "key": "Nvidia–Huang–Jensen",
    "names": [
-    "HUANG",
     "NVIDIA",
+    "HUANG",
     "JENSEN"
    ],
-   "headline": "Nvidia board joins Jensen Huang under scrutiny after reinstating embattled CEO - AP News",
-   "source": "AP Business",
-   "published": "2026-11-25T05:00Z",
-   "publishers": [
-    "AP",
-    "CNBC",
-    "FT",
-    "Reuters"
-   ],
-   "n_publishers": 4,
-   "n_headlines": 13,
-   "front": true,
-   "items": [
-    {
-     "title": "Jensen Huang tells staff that Nvidia doesn't need a succession plan",
-     "source": "CNBC",
-     "published": "2026-11-24T23:13Z"
-    },
-    {
-     "title": "‘Tech bros strike back’ as Trump rescues Nvidia’s Huang",
-     "source": "Financial Times",
-     "published": "2026-11-25T05:00Z"
-    },
-    {
-     "title": "Nvidia board joins Jensen Huang under scrutiny after reinstating embattled CEO - AP News",
-     "source": "AP Business",
-     "published": "2026-11-25T00:21Z"
-    },
-    {
-     "title": "Huang says he still does not believe in CEO succession planning at Nvidia",
-     "source": "Financial Times",
-     "published": "2026-11-24T20:18Z"
-    },
-    {
-     "title": "Trump open to pardoning Jensen Huang if needed: NY Post",
-     "source": "CNBC",
-     "published": "2026-11-25T02:09Z"
-    },
-    {
-     "title": "Trump wanted Jensen Huang back. Now, the president is all alone in Washington",
-     "source": "CNBC",
-     "published": "2026-11-24T21:13Z"
-    },
-    {
-     "title": "Jensen Huang to face DC grilling the same day Nvidia releases new products at GTC",
-     "source": "CNBC",
-     "published": "2026-11-24T17:51Z"
-    },
-    {
-     "title": "Jensen Huang's Nvidia return shows the U.S.-China AI race is about more than chips",
-     "source": "CNBC",
-     "published": "2026-11-25T01:13Z"
-    },
-    {
-     "title": "Six key questions raised by Jensen Huang's return to Nvidia",
-     "source": "CNBC",
-     "published": "2026-11-24T13:31Z"
-    },
-    {
-     "title": "Jensen Huang is back, but Nvidia still has to deal with his baggage - AP News",
-     "source": "AP Business",
-     "published": "2026-11-24T15:40Z"
-    },
-    {
-     "title": "Nvidia's Huang returns to cheers in China, but political hurdles mount - Reuters",
-     "source": "Reuters Business",
-     "published": "2026-11-24T17:57Z"
-    },
-    {
-     "title": "Huang's return to Nvidia brings open-weight AI debate to forefront in Washington - Reuters",
-     "source": "Reuters World",
-     "published": "2026-11-24T22:29Z"
-    },
-    {
-     "title": "'Awaiting the king's return': Taiwan celebrates Huang's return to Nvidia - Reuters",
-     "source": "Reuters World",
-     "published": "2026-11-24T07:29Z"
-    }
-   ]
-  },
-  {
-   "key": "Anthropic",
-   "names": [
-    "ANTHROPIC"
-   ],
-   "headline": "Anthropic has pulled up the ladder",
+   "headline": "‘A changed man.’ How will Jensen Huang lead Nvidia now?",
    "source": "FT World",
-   "published": "2026-11-25T06:00Z",
+   "published": "2026-11-27T05:00Z",
    "publishers": [
-    "AP",
     "CNBC",
     "FT",
     "Reuters"
    ],
-   "n_publishers": 4,
-   "n_headlines": 4,
+   "n_publishers": 3,
+   "n_headlines": 6,
    "front": true,
    "items": [
     {
-     "title": "Anthropic closes below $83 IPO price, but analysts are still largely positive",
-     "source": "CNBC",
-     "published": "2026-11-24T21:04Z"
-    },
-    {
-     "title": "Drops for Nvidia, Anthropic and other AI stocks drag the US market back down - AP News",
-     "source": "AP Business",
-     "published": "2026-11-24T21:16Z"
-    },
-    {
-     "title": "Anthropic shares tumble below $83 IPO price, on track to lose nearly $200 billion in value - Reuters",
+     "title": "Nvidia halts server shipments to four Southeast Asian countries, FT reports - Reuters",
      "source": "Reuters Business",
-     "published": "2026-11-24T20:47Z"
+     "published": "2026-11-26T05:09Z"
     },
     {
-     "title": "Anthropic has pulled up the ladder",
+     "title": "Nvidia chip buyers told to rule out Chinese renters to purchase GPUs, sources say",
+     "source": "CNBC",
+     "published": "2026-11-26T17:04Z"
+    },
+    {
+     "title": "Buyer beware? Nvidia's volatile swings expose risks of single-stock ETFs",
+     "source": "CNBC",
+     "published": "2026-11-26T16:00Z"
+    },
+    {
+     "title": "S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-25T16:31Z"
+    },
+    {
+     "title": "‘Your booth is waiting’: Denny’s welcomes Jensen Huang back as Nvidia CEO",
+     "source": "CNBC",
+     "published": "2026-11-26T03:13Z"
+    },
+    {
+     "title": "‘A changed man.’ How will Jensen Huang lead Nvidia now?",
      "source": "FT World",
-     "published": "2026-11-25T06:00Z"
+     "published": "2026-11-27T05:00Z"
     }
    ]
   },
   {
-   "key": "Russian–Ukraine",
+   "key": "Zealand",
    "names": [
-    "RUSSIAN",
+    "ZEALAND"
+   ],
+   "headline": "New Zealand election leaves PM’s fate in hands of ex-KPMG consultant",
+   "source": "FT World",
+   "published": "2026-11-27T04:32Z",
+   "publishers": [
+    "AP",
+    "FT",
+    "Reuters"
+   ],
+   "n_publishers": 3,
+   "n_headlines": 5,
+   "front": true,
+   "items": [
+    {
+     "title": "Christopher Luxon favoured for second term as New Zealand Prime Minister - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-27T04:12Z"
+    },
+    {
+     "title": "Deadlocked final result in New Zealand’s election leaves a centrist newcomer the decider - AP News",
+     "source": "AP Business",
+     "published": "2026-11-27T03:16Z"
+    },
+    {
+     "title": "New Zealand’s ruling coalition falls just short of majority, needs centrist party's support to govern - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-27T01:59Z"
+    },
+    {
+     "title": "Final New Zealand election vote count to confirm parliament make up - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-26T22:34Z"
+    },
+    {
+     "title": "New Zealand election leaves PM’s fate in hands of ex-KPMG consultant",
+     "source": "FT World",
+     "published": "2026-11-27T04:32Z"
+    }
+   ]
+  },
+  {
+   "key": "Russia–Ukraine",
+   "names": [
+    "RUSSIA",
     "UKRAINE"
    ],
-   "headline": "UK warns of Russian sabotage threat to companies that supply Ukraine - Reuters",
+   "headline": "Ukraine says Russia hits two grain ships near Odesa ports - Reuters",
    "source": "Reuters World",
-   "published": "2026-11-24T22:37Z",
+   "published": "2026-11-27T00:29Z",
    "publishers": [
-    "AP",
+    "CNBC",
     "Reuters"
    ],
    "n_publishers": 2,
@@ -319,34 +362,34 @@
    "front": true,
    "items": [
     {
-     "title": "A Russian strike on Ukraine kills 2 and wounds 48 as Kyiv explains its attack in Libya - AP News",
-     "source": "AP Business",
-     "published": "2026-11-24T16:25Z"
-    },
-    {
-     "title": "British officials warn UK firms aiding Ukraine to brace for Russian sabotage attempts - AP News",
-     "source": "AP Business",
-     "published": "2026-11-24T16:14Z"
-    },
-    {
-     "title": "Putin says Ukraine hits Russian oil plants despite Trump's requests, promises retaliation - Reuters",
+     "title": "Trump and NATO chief urge Russia to avoid actions that widen Ukraine war - Reuters",
      "source": "Reuters Business",
-     "published": "2026-11-24T19:41Z"
+     "published": "2026-11-26T04:20Z"
     },
     {
-     "title": "Ukraine says attack on Russian ships in Libya was self-defence - Reuters",
+     "title": "IAEA working with Russia, Ukraine on ceasefire to repair power link at Zaporizhzhia nuclear plant - Reuters",
      "source": "Reuters Business",
-     "published": "2026-11-24T22:37Z"
+     "published": "2026-11-27T00:29Z"
     },
     {
-     "title": "Zelenskiy confirms Ukraine hit Russian ship in Gulf of Finland, ally Norway urges caution - Reuters",
-     "source": "Reuters World",
-     "published": "2026-11-24T18:25Z"
+     "title": "Trump, NATO chief caution Russia as attacks on Ukraine’s energy infrastructure intensify",
+     "source": "CNBC",
+     "published": "2026-11-26T16:12Z"
     },
     {
-     "title": "UK warns of Russian sabotage threat to companies that supply Ukraine - Reuters",
+     "title": "Ukraine says North Korea temporarily halted missile shipments to ally Russia - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-26T16:02Z"
+    },
+    {
+     "title": "Dozens of countries call on Russia to halt alleged use of riot agent in Ukraine war - Reuters",
+     "source": "Reuters Business",
+     "published": "2026-11-25T19:09Z"
+    },
+    {
+     "title": "Ukraine says Russia hits two grain ships near Odesa ports - Reuters",
      "source": "Reuters World",
-     "published": "2026-11-24T21:32Z"
+     "published": "2026-11-26T12:30Z"
     }
    ]
   }
@@ -354,7 +397,7 @@
  "path": "ai",
  "attempts": [
   {
-   "pool": 100,
+   "pool": 200,
    "max_tokens": 3000,
    "result": "ok",
    "kept": 8
