@@ -95,6 +95,11 @@ def main() -> int:
         snap = work / "snap" / d
         if not snap.exists():
             extract(h, ["data"], snap)
+        # 27.11.2026: затворен ден (ENABLE_MARKET_CLOSED_SKIP — напр. 26.11, Thanksgiving) — бот commit „brief: ДАТА“ само с docs/index.html, без data/ДАТА.json → няма какво да се сравни
+        if not (snap / "data" / f"{d}.json").exists():
+            report["diffs"][d] = []
+            print(f"[replay] {d}: без бриф (затворена борса — само банерът) — пропуснат")
+            continue
         for side in ("old", "new"):
             rd = work / side / d
             if rd.exists():
