@@ -667,7 +667,7 @@ def finish_rows(rows: list[dict], matchers: list | None, pool_all: list | None =
         try:
             from src import translate, top_themes
             caps = translate.proper_caps([x.get("title") or "" for x in pool_all or []] + [r.get("headline") or "" for r in rows])     # 23.11.2026: без Title Case
-            LAST_TRANSLATION.update(translate.apply(rows, caps))
+            LAST_TRANSLATION.update(translate.apply(rows, caps, known=translate.known_names(extra_tickers=[t for t, _ in matchers or []])))   # 27.11.2026 (т. 11): и нашите тикъри
         except Exception as e:
             print(f"[news] преводът пропуснат: {type(e).__name__}: {e}")
             for r in rows:

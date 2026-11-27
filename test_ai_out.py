@@ -55,8 +55,8 @@ for n in FX["news"]:
 H900 = "US signed off on sales of nearly 900,000 AI chips to China in six months, House committee says - Reuters"
 assert tr.problems(H900, "САЩ са одобрили продажбата на близо 90 000 AI чипа на Китай за шест месеца, твърди комисия на Камарата", CAPS) == ["900000"]
 assert tr.problems(H900, "САЩ одобриха продажба на AI чипове на Китай, твърди комисия", CAPS) == ["900000", "HOUSE"]
-assert tr.problems("Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI",
-                   "Изводи от IPO-то: дебют с пазарна капитализация от $1,8 в повратен момент за AI", CAPS) == ["trillion", "ANTHROPIC", "ANT"]
+assert tr.problems("Anthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI",                    # 27.11.2026: ANT — наш (наблюдаван) тикър
+                   "Изводи от IPO-то: дебют с пазарна капитализация от $1,8 в повратен момент за AI", CAPS, known=tr.known_names(extra_tickers=["ANT"])) == ["trillion", "ANTHROPIC", "ANT"]
 print("  ✓ 7 от 7 приети (вкл. „nearly 900,000“ → „близо 900 000“); „90 000“ → липсва 900000; без мащаба / имената → изброени")
 
 print("── 2б. числото с мащаба ($6.3B, $81bn, $77.5M) и съкращението в мн. ч. (ETFs) — заглавията РЕАЛНИ, преводите СИНТЕТИЧНИ ──")
@@ -83,7 +83,7 @@ HK_BG = "Хонконг се стреми да постави крипто по�
 assert tr.problems(HK, HK_BG, CAPS) == []
 assert tr.problems(HK, "Сингапур се стреми да постави крипто попечителите", CAPS) == ["HONG", "KONG"]     # СИНТЕТИЧНО: друго място → отхвърлен
 assert tr.problems("U.S.-Iran talks stall", "Преговорите между САЩ и Иран засядат", {"U.S.-IRAN"}) == []          # СИНТЕТИЧНО: съставно име
-assert tr.problems("U.S.-Iran talks stall", "Преговорите между САЩ засядат", {"U.S.-IRAN"}) == ["U.S.-IRAN"]
+assert tr.problems("U.S.-Iran talks stall", "Преговорите между САЩ засядат", {"U.S.-IRAN"}) == ["IRAN"]               # 27.11.2026: по части
 assert tr.problems("Saudi-led group weighs output", "Водената от Саудитска Арабия група обмисля добива", {"SAUDI-LED"}) == []
 print("  ✓ Хонконг — приет; друго място — отхвърлен; „U.S.-Iran“ — по части")
 

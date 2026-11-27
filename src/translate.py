@@ -76,6 +76,76 @@ _PLACES = {
 _HYPHEN_SUFFIX = {"LED", "BACKED", "LINKED", "DRIVEN", "RELATED", "HOSTED", "BLACKLISTED", "STYLE", "BASED", "OWNED", "BOUND", "WIDE"}
 
 
+# 27.11.2026 (уикенд пакет, т. 11): известните собствени имена — най-честите в 1798-те заглавия от историята на брифовете (хора, институции, компании извън универса); имената на
+# компаниите от универса и местата (_PLACES без общите думи) се добавят в known_names()
+KNOWN_NAMES = {
+    "TRUMP", "XI", "PUTIN", "WARSH", "BESSENT", "POWELL", "LAGARDE", "HUANG", "JENSEN", "MUSK", "LUTNICK", "VANCE", "RUBIO", "HEGSETH", "ZELENSKYY", "ZELENSKIY", "TAKAICHI", "MERZ",
+    "CARNEY", "DIMON", "KASHKARI", "WALLER", "GOOLSBEE", "MUSALEM", "GREER", "HAMMACK", "MODI", "NETANYAHU", "KHAMENEI", "MACRON", "STARMER", "MILEI", "LULA", "ERDOGAN",
+    "FED", "SEC", "CFTC", "FTC", "FCC", "DOJ", "FBI", "BOJ", "BOE", "ECB", "IMF", "OPEC", "NATO", "IRGC", "HEZBOLLAH", "HAMAS", "NYSE", "NASDAQ", "CME", "BIS",
+    "NVIDIA", "ANTHROPIC", "OPENAI", "SPACEX", "BINANCE", "SAMSUNG", "HYNIX", "TSMC", "SOFTBANK", "ARAMCO", "HUAWEI", "ALIBABA", "BAIDU", "TENCENT", "BYTEDANCE", "TIKTOK",
+    "KRAKEN", "COINBASE", "CIRCLE", "TETHER", "BITCOIN", "ETHEREUM", "SOLANA", "XRP", "BRENT", "WTI", "KOSPI", "NIKKEI", "UBS", "DEUTSCHE", "BARCLAYS", "HSBC", "KALSHI",
+    "POLYMARKET", "OKX", "BLACKROCK", "GOLDMAN", "JPMORGAN", "CITI", "CITIGROUP", "MICROSOFT", "GOOGLE", "ALPHABET", "AMAZON", "APPLE", "META", "TESLA", "INTEL", "AMD", "MICRON",
+    "BROADCOM", "ORACLE", "PALANTIR", "COREWEAVE", "NETFLIX", "DISNEY", "BOEING", "WALMART", "QUALCOMM", "INTUIT", "NIKE", "FORD",
+}
+# думи в _PLACES, които не са място / институция (служебни думи на източниците, общи прилагателни) — не са задължителни в новата проверка
+_PLACES_GENERIC = {"NEW", "SOUTH", "NORTH", "EAST", "WEST", "MIDDLE", "RED", "SEA", "DAY", "LIVE", "VIEW", "TRADING", "UPDATES", "TAKEAWAYS", "ATTORNEY", "GENERAL", "EXCLUSIVE",
+                   "BREAKINGVIEWS", "INSTANT", "WALL", "STREET", "WHITE", "COURT", "SUPREME", "DEMOCRATS", "DEMOCRAT", "DEMOCRATIC", "REPUBLICANS", "REPUBLICAN", "EASTERN",
+                   "WESTERN", "PROVINCE", "ISLAND", "STRAIT", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY", "JANUARY", "FEBRUARY", "MARCH",
+                   "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "EUROPEANS"}
+# дните от седмицата и месеците — английски → българските форми (и прилагателните: „ноемврийските“)
+_WHEN = {"Monday": r"понеделник", "Tuesday": r"вторник", "Wednesday": r"сряда|среда", "Thursday": r"четвъртък", "Friday": r"петък", "Saturday": r"събот", "Sunday": r"недел",
+         "January": r"януар", "February": r"февруар", "March": r"март", "April": r"април", "May": r"май|майск", "June": r"юни|юнск", "July": r"юли|юлск",
+         "August": r"август", "September": r"септемвр", "October": r"октомвр", "November": r"ноемвр", "December": r"декемвр"}
+# „May“ / „March“ — само в контекст на дата (число след тях или предлог преди тях): „Fed may hike“, „You May Not Know“ не са месец
+_WHEN_CTX = re.compile(r"\b(?:in|on|since|by|until|from|early|late|mid)\s+(May|March)\b|\b(May|March)(?=\s+\d)", re.I)
+
+
+def when_problems(orig: str, bg: str) -> list[str]:
+    """
+    27.11.2026 (уикенд пакет, т. 11): дните от седмицата и месеците трябва да съвпадат — всяко от оригинала е в превода (и като прилагателно), и в превода няма ден / месец, който
+    го няма в оригинала. Реално 27.11: „50 ETFs Add to Accenture (ACN) Holdings on Tuesday“ → „… в събота“ (приет до 27.11). → ["Tuesday → събота"] / ["Tuesday"] / []. Чиста функция.
+    """
+    o, b = _SUFFIX.sub("", orig or ""), bg or ""
+    found = []
+    for en in _WHEN:
+        if en in ("May", "March"):
+            if any((m.group(1) or m.group(2)) == en for m in _WHEN_CTX.finditer(o)):              # само с главна (месецът), предлогът — без значение на регистъра
+                found.append(en)
+        elif re.search(rf"\b{en}s?\b", o):
+            found.append(en)
+    miss = [en for en in found if not re.search(_WHEN[en], b, re.I)]
+    extra = [rx for en, rx in _WHEN.items() if en not in found and re.search(rf"(?<![а-яА-Я])(?:{rx})", b, re.I) and not (en == "May" and re.search(r"(?<![а-яА-Я])май(?![а-яА-Я])", b) is None)]
+    extra_words = [re.search(rf"(?<![а-яА-Я])(?:{rx})[а-яА-Я]*", b, re.I).group(0) for rx in extra]
+    if miss and extra_words:
+        return [f"{', '.join(miss)} → {', '.join(extra_words)}"]
+    return miss + extra_words
+
+
+_KNOWN_CACHE: dict = {}
+
+
+def known_names(extra=None, extra_tickers=None) -> tuple[set, set]:
+    """
+    (тикърите от универса, известните имена): тикърите — data/universe.json; имената — KNOWN_NAMES + местата (_PLACES без общите думи) + extra (имената на нашите тикъри —
+    приоритетът на новините, името на наблюдаваната компания). Първите думи от имената на всички 918 компании НЕ влизат: по седмицата 23–27.11 те дадоха 9 фалшиви тревоги
+    (Companies, Bill, Digital, Financial, Performance, Industrial, Holdings …). Без файла — без тикърите. Кеш за пускането.
+    """
+    if "u" not in _KNOWN_CACHE:
+        tick, comp = set(), set()
+        try:
+            u = json.loads((config.DATA_DIR / config.UNIVERSE_CACHE_NAME).read_text(encoding="utf-8"))
+            tick = {str(t).upper() for t in u.get("tickers") or []}
+        except Exception:
+            pass
+        _KNOWN_CACHE["u"] = (tick, comp)
+    tick, comp = _KNOWN_CACHE["u"]
+    places = {k for k in _PLACES if k not in _PLACES_GENERIC}
+    ex = {str(x).upper() for x in extra or [] if x}
+    return tick | {str(t).upper() for t in extra_tickers or [] if t}, KNOWN_NAMES | comp | places | ex
+
+
+
+
 def _num_value(tok: str, bg: bool) -> float | None:
     t = tok.replace(" ", "").replace(" ", "")
     if bg:
@@ -146,7 +216,7 @@ def names(orig: str, caps: set | None = None) -> list[str]:
     return list(dict.fromkeys(out))
 
 
-def problems(orig: str, bg: str | None, caps: set | None = None, must: list | None = None) -> list[str]:
+def problems(orig: str, bg: str | None, caps: set | None = None, must: list | None = None, known: tuple | None = None) -> list[str]:
     """
     Какво от оригинала липсва в превода: числа, мащаб, тикъри и собствени имена. [] → преводът е приет. Чиста функция.
     23.11.2026 (т. 2): must — имена, които трябва да са в превода, ако са в оригинала (наблюдаваните: името на компанията — и в Title Case).
@@ -165,6 +235,21 @@ def problems(orig: str, bg: str | None, caps: set | None = None, must: list | No
         if (en.search(o) or lab in en_suffix) and not (bgx.search(bg) or lab in bg_suffix):
             miss.append(lab)
     low = bg.lower()
+    if config.TRANSLATE_KNOWN_ONLY:                                      # 27.11.2026 (т. 11): само тикърите от универса и известните имена; + дните и месеците
+        tick, kn = known if known is not None else known_names(must)
+        toks = [p for m in re.finditer(r"[A-Za-z][A-Za-z0-9&’'.-]*[A-Za-z0-9]|[A-Z]", o) for p in m.group(0).split("-") if p.strip(".")]   # „U.S.-Iran“ → по части
+        for raw in toks:
+            n = re.sub(r"['’]s$", "", raw).strip(".").upper()
+            is_ticker = raw.isupper() and 2 <= len(raw) <= 5 and n in tick
+            if not (is_ticker or (n in kn and raw[0].isupper())) or n in miss:              # „bitcoin“ с малка — съществително, не име
+                continue
+            if n.lower() in low.replace("'", "").replace("’", "") or (n in _PLACES and re.search(_PLACES[n], bg, re.I)):
+                continue
+            miss.append(n)
+        for w in must or []:
+            if w and w.lower() in (orig or "").lower() and w.lower() not in low and w.upper() not in miss:
+                miss.append(w.upper())
+        return miss + when_problems(orig, bg)
     for n in names(o, caps):
         plain = n.replace("'", "").lower()
         if plain and plain in low.replace("'", "").replace("’", ""):
@@ -211,7 +296,7 @@ def translate(titles: list[str], call=None, batch: int = 15) -> list[str | None]
     return out
 
 
-def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "headline", must=None) -> dict:
+def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "headline", must=None, known: tuple | None = None) -> dict:
     """
     Превежда rows[*][key] → row["headline_bg"] (приет) или row["translation_note"] = „преводът е пропуснат — несъответствие (липсва: …)“; провал на превода — „преводът не се
     получи“. → {"n", "ok", "skipped": [{headline, missing}]}. Мутира rows.
@@ -225,7 +310,7 @@ def apply(rows: list[dict], caps: set | None = None, call=None, key: str = "head
         if bg is None:
             r["translation_note"] = "преводът не се получи"
             continue
-        miss = problems(r.get(key) or "", bg, caps, must(r) if must else None)
+        miss = problems(r.get(key) or "", bg, caps, must(r) if must else None, known)
         if miss:
             r["translation_note"] = f"преводът е пропуснат — несъответствие (липсва: {', '.join(miss[:5])})"
             r["translation_rejected"] = bg
