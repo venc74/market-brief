@@ -35,7 +35,7 @@ def _prompt(pool: list[dict], max_items: int) -> str:
             f"Важно — да: {IMPORTANT}.\n"
             f"Не: {NOT_IMPORTANT}.\n"
             f"Най-много {max_items} новини; дневните потоци в ETF — най-много една (отбележи я с \"etf_flows\": true). Ако няма такава — върни празен списък.\n"
-            f"{news_aggregator.ALSO_RULE}\n"
+            f"{news_aggregator.ALSO_RULE if config.NEWS_AI_WHY else news_aggregator.ALSO_RULE_NO_WHY}\n"
             "За всяка: \"i\" (индексът), \"h\" (ДОСЛОВНО първите 6 думи на заглавието \"t\" — кодът проверява индекса)"
             + (", \"why\" (ЕДНО изречение на български — какво променя за институционалния инвеститор в крипто или за COIN / HOOD / CRCL / BLSH; без числа, които ги няма в \"t\" или \"d\").\n\n"
                if config.NEWS_AI_WHY else ". Без коментар и без превод — кодът показва оригиналното заглавие.\n\n")      # 20.11.2026 (пакет 20.11, т. 1)

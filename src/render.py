@@ -567,6 +567,10 @@ def news_pool_note(nw: dict | None, diag: dict | None) -> str | None:
     to, fetched = nw.get("to_model"), nw.get("fetched") or {}
     if not to:
         return None
+    # 27.11.2026 (уикенд пакет, т. 4): знаменателят — всичко от източника в прозореца (основният фийд + заявките по дни + приоритетните; nw["sources"]), не само основният фийд —
+    # на 27.11 „Reuters Business 79 от 51, AP Business 77 от 50“ (51 / 50 — само фийдът; в прозореца — 102 / 101 със заявките за 25–26.11)
+    reach = {k: (v or {}).get("count") for k, v in (nw.get("sources") or {}).items()}
+    fetched = {k: max(reach.get(k) or 0, fetched.get(k) or 0, to.get(k) or 0) for k in set(fetched) | set(reach) | set(to)} if (fetched or reach) else fetched
     parts = [f"{k} {v}" + (f" от {fetched[k]}" if fetched.get(k) and fetched[k] != v else "") for k, v in to.items()]
     out = f"Към подбора: {nw.get('pool_used', sum(to.values()))} от {nw.get('pool_total', sum(to.values()))} заглавия ({', '.join(parts)})"
     pr = nw.get("priority") or {}

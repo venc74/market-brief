@@ -200,7 +200,11 @@ LAST_THEMES: list = []         # 19.11.2026 (т. 2): топ темите на д
 _GENERIC = {"group", "holdings", "holding", "inc", "corporation", "company", "international", "global", "american", "america", "national", "united", "first", "general",
             "financial", "energy", "bank", "capital", "technologies", "technology", "systems", "industries", "services", "solutions", "health", "healthcare", "resources",
             "brands", "partners", "properties", "realty", "trust", "insurance", "communications", "entertainment", "networks", "software", "semiconductor", "pharmaceuticals",
-            "therapeutics", "home", "the", "and", "markets", "market", "nasdaq", "exchange", "street", "wall", "data", "digital", "power", "electric", "water", "motors", "foods",
+            "therapeutics", "home", "the", "and",
+            # 27.11.2026 (уикенд пакет, т. 10): „US chip curbs will slow Asia data-center investment, Fitch says“ → ANF (Abercrombie & Fitch); по историята (1798 заглавия × 922 имена):
+            # Fitch (рейтинговата агенция), Dutch (BROS — „Dutch lawmakers“), Mexican (CMG — „Mexican president“), Associated (ASB — Associated Press), Best (BBY — „Best … loans“),
+            # Arthur (AJG — Arthur Hayes), Fuel (NFG), Lifestyle / Space (рубрики на AP → ELS / EXR), Enterprise (Hewlett Packard Enterprise → AXON / PEG), Lane (Lane Kiffin → HLNE)
+            "fitch", "dutch", "mexican", "associated", "best", "arthur", "fuel", "lifestyle", "space", "enterprise", "lane", "markets", "market", "nasdaq", "exchange", "street", "wall", "data", "digital", "power", "electric", "water", "motors", "foods",
             "stores", "airlines", "labs", "laboratories", "sciences", "medical", "pacific", "western", "eastern", "southern", "northern", "royal", "standard", "investment",
             "investments", "asset", "management", "media", "consolidated", "reliance", "williams", "pepper", "class", "new", "corp", "limited", "trade", "tech", "bancorp",
             "street's", "one", "can", "growth", "income", "real", "estate", "life", "world", "worldwide",
@@ -580,7 +584,7 @@ def pick_verbatim(items, pool: list[dict], max_items: int) -> tuple[list[dict], 
         if i in seen:
             dropped.append({"i": i, "reason": "повторен индекс"})
             continue
-        why = (n.get("why") or "").strip()
+        why = (n.get("why") or "").strip() if config.NEWS_AI_WHY else ""        # 27.11.2026 (уикенд пакет, т. 4): без AI „защо“ — каквото и да върне моделът
         if not why and config.NEWS_AI_WHY:                                   # 20.11.2026 (пакет 20.11, т. 1): без AI „защо“ — празното е нормата
             dropped.append({"i": i, "reason": "празно why"})
             continue
@@ -639,6 +643,9 @@ ALSO_RULE = ("Една история — една новина: ако няко
              "същото изказване или същото пазарно движение със същата причина — върни ги като ЕДНА новина: \"i\" е заглавието за събитието, в \"also\" са останалите "
              "([{\"i\": …, \"h\": първите 6 думи}]), а \"why\" е за събитието като цяло. Същата тема НЕ е същото събитие (две различни новини за Fed са две новини). "
              "Без дубли — \"also\" е празно или липсва.")
+# 27.11.2026 (уикенд пакет, т. 4): без AI „защо“ (NEWS_AI_WHY=0) правилото не споменава "why" — на 27.11 моделът върна „защо“ за всичките 8 новини и 5 крипто (с „Бразилия“, „Виетнам“,
+# „Кристин Лагард“, които ги няма в заглавията) — подканен от тази фраза; кодът вече го маха и сам (pick_verbatim)
+ALSO_RULE_NO_WHY = ALSO_RULE.replace(", а \"why\" е за събитието като цяло", "")
 LAST_DIAG: dict = {}
 # 19.10.2026 (трети преглед, т. 12): празните новини не са тиха липса — {"ok", "reason", "count"} → банер в брифа (data_warnings)
 LAST_STATUS: dict = {}
@@ -690,7 +697,7 @@ def _select_user(pool: list[dict], max_items: int) -> str:
         + ("\"why\" е САМО ефектът за пазарите (кои активи/сектори и в каква посока) — НЕ преразказва заглавието и не носи числа, "
            "които ги няма в \"t\" или \"d\" на същата новина.\n" if config.NEWS_AI_WHY else "") +
         # 29.10.2026 (разходката, т. 3–4, решение 2): една история — една новина
-        f"{ALSO_RULE}\n\n"
+        f"{ALSO_RULE if config.NEWS_AI_WHY else ALSO_RULE_NO_WHY}\n\n"
         f"НОВИНИ:\n{json.dumps(compact, ensure_ascii=False, default=str)}\n\n"
         + ('Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "why": "...", "also": [{"i": 5, "h": "първите шест думи"}]}]}' if config.NEWS_AI_WHY else
            'Върни само JSON: {"news": [{"i": 0, "h": "първите шест думи на заглавието", "also": [{"i": 5, "h": "първите шест думи"}]}]}')

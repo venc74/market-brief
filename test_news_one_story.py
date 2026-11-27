@@ -17,6 +17,7 @@ from html import escape as esc
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import config
+config.NEWS_AI_WHY = 1                            # 27.11.2026 (уикенд пакет, т. 4): тук — пътят с AI „защо“ (флагът); без него „защо“ се маха (test_news_no_why)
 _tmp = tempfile.TemporaryDirectory(prefix="mb_story_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()
@@ -88,6 +89,6 @@ assert ' · +2 източника</span>' in mail and d["also"][0]["link"] not i
 assert f'href="{esc(d["link"])}"' in page                                                                                   # основното заглавие остава линк
 print("  ✓ страница и имейл")
 import inspect
-assert "{ALSO_RULE}" in inspect.getsource(na._select_user) and "Същата тема НЕ е същото събитие" in na.ALSO_RULE and '"also": [{"i": 5' in inspect.getsource(na._select_user)   # 23.11.2026: промптът — в _select_user
+assert "ALSO_RULE if config.NEWS_AI_WHY else ALSO_RULE_NO_WHY" in inspect.getsource(na._select_user) and "Същата тема НЕ е същото събитие" in na.ALSO_RULE and '"also": [{"i": 5' in inspect.getsource(na._select_user)   # 23.11.2026: промптът — в _select_user
 print("  ✓ правилото „една история — една новина“ и полето \"also\" — в промпта")
 print("\n✅ test_news_one_story: всичко мина")

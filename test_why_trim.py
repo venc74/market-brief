@@ -14,6 +14,7 @@ import sys, json, pathlib, tempfile, re
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import config
+config.NEWS_AI_WHY = 1                            # 27.11.2026 (уикенд пакет, т. 4): тук — пътят с AI „защо“ (флагът); без него „защо“ се маха (test_news_no_why)
 _tmp = tempfile.TemporaryDirectory(prefix="mb_why_")
 config.DATA_DIR = pathlib.Path(_tmp.name) / "data"; config.DOCS_DIR = pathlib.Path(_tmp.name) / "docs"
 config.DATA_DIR.mkdir(); config.DOCS_DIR.mkdir()

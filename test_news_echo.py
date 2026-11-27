@@ -19,6 +19,8 @@ import sys as _nsys, pathlib as _npl; _nsys.path.insert(0, str(_npl.Path(__file_
 import sys, json, pathlib
 ROOT = pathlib.Path(__file__).parent
 sys.path.insert(0, str(ROOT))
+import config
+config.NEWS_AI_WHY = 1                            # 27.11.2026 (уикенд пакет, т. 4): тук — пътят с AI „защо“; без флага „защо“ се маха (test_news_no_why)
 from src import news_aggregator as na
 
 FX = ROOT / "tests" / "fixtures"

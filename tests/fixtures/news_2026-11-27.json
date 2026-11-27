@@ -1,0 +1,1249 @@
+{
+"note": "РЕАЛНО: брифът от 27.11.2026 (data/2026-11-27.json) — пулът към подбора (news_diag.pool, 200 заглавия), новините (заглавие, „защо“ от модела, „също“), крипто (заглавие, „защо“), news_window и brief[\"names\"][\"ANF\"]; извадени на 27.11.2026.",
+"pool": [
+[
+"FT World",
+"2026-11-27T05:00Z",
+"‘A changed man.’ How will Jensen Huang lead Nvidia now?"
+],
+[
+"Reuters Business",
+"2026-11-26T05:09Z",
+"Nvidia halts server shipments to four Southeast Asian countries, FT reports - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T17:04Z",
+"Nvidia chip buyers told to rule out Chinese renters to purchase GPUs, sources say"
+],
+[
+"CNBC",
+"2026-11-26T16:00Z",
+"Buyer beware? Nvidia's volatile swings expose risks of single-stock ETFs"
+],
+[
+"FT World",
+"2026-11-27T04:32Z",
+"New Zealand election leaves PM’s fate in hands of ex-KPMG consultant"
+],
+[
+"Reuters World",
+"2026-11-27T04:12Z",
+"Christopher Luxon favoured for second term as New Zealand Prime Minister - Reuters"
+],
+[
+"AP Business",
+"2026-11-27T03:16Z",
+"Deadlocked final result in New Zealand’s election leaves a centrist newcomer the decider - AP News"
+],
+[
+"Reuters World",
+"2026-11-27T01:59Z",
+"New Zealand’s ruling coalition falls just short of majority, needs centrist party's support to govern - Reuters"
+],
+[
+"Reuters World",
+"2026-11-26T12:30Z",
+"Ukraine says Russia hits two grain ships near Odesa ports - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T16:12Z",
+"Trump, NATO chief caution Russia as attacks on Ukraine’s energy infrastructure intensify"
+],
+[
+"Reuters Business",
+"2026-11-26T04:20Z",
+"Trump and NATO chief urge Russia to avoid actions that widen Ukraine war - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-27T00:29Z",
+"IAEA working with Russia, Ukraine on ceasefire to repair power link at Zaporizhzhia nuclear plant - Reuters"
+],
+[
+"CNBC",
+"2026-11-25T16:05Z",
+"Anthropic's stock has been a clunker post-IPO. Why that matters for the AI trade"
+],
+[
+"CNBC",
+"2026-11-25T15:27Z",
+"Best low-interest personal loans of December 2026"
+],
+[
+"Reuters Business",
+"2026-11-26T05:13Z",
+"Apple pulls MiniMax AI chatbot from App Store over child safety concerns - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-26T11:19Z",
+"US chip curbs will slow Asia data-center investment, Fitch says - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T18:35Z",
+"Anthropic's slide tests Wall Street's lofty bets on future AI profits - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-27T04:36Z",
+"Chinese military tests new Taiwan landing tactics in coastal drills - Reuters"
+],
+[
+"CNBC",
+"2026-11-27T06:21Z",
+"Stock futures rise as Wall Street gets set to wrap up a volatile holiday week: Live updates"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Chinese households shed billions in consumer debt"
+],
+[
+"AP Business",
+"2026-11-26T14:13Z",
+"China and other US trading partners hit back at Trump’s new tariff plans - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T07:19Z",
+"EXCLUSIVE: US chip curbs, distillation crackdown threaten Chinese AI model development, sources say - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T22:06Z",
+"US to hike tariffs on China, EU, Brazil and others over subsidized factories - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T03:28Z",
+"Gold rebounds from one-year low as AI jitters ease - Reuters"
+],
+[
+"CNBC",
+"2026-11-27T03:30Z",
+"Two Italians killed in Kuwait drone attack; Trump says Iran war ends ‘whenever I want it’"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Marine Le Pen: the woman who could break the EU"
+],
+[
+"AP Business",
+"2026-11-26T09:47Z",
+"Andy Taylor, guitarist of new wave icons Duran Duran, dies at 65 - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T07:03Z",
+"Trump's new tariffs aim to prise global trade from China's grip - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T05:53Z",
+"Army calls detonation of bomb chemicals in Iowa a success after earlier fears of a toxic plume - AP News"
+],
+[
+"CNBC",
+"2026-11-27T04:20Z",
+"SpaceX shares jump on alternative trading platform after Musk says he will expand share donations"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"The US and Europe have opposite economic problems"
+],
+[
+"AP Business",
+"2026-11-26T18:59Z",
+"The Macy's Thanksgiving parade is postponed. What happens to its expansive roster of performers? - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T07:41Z",
+"Crew member dies after diesel tanker capsizes off Ibiza, no pollution so far - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:57Z",
+"Steelers cut Aaron Rodgers after the QB rips coach Mike McCarthy on TV following his benching - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T01:55Z",
+"Oil on track to snap 3-week losing streak over supply fears - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T21:13Z",
+"Trump demands probe into ‘record setting error’ after third-quarter GDP data gets massive revision higher"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Is the Fed ready for its next fight?"
+],
+[
+"AP Business",
+"2026-11-26T09:16Z",
+"North Korea’s Kim vows to build more nuclear weapons after ignoring Trump’s overture - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T06:01Z",
+"EXCLUSIVE: AirBaltic offers crew exit, demotion or Papua New Guinea secondment - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:42Z",
+"FCC says SpaceX can deploy 1 million satellites for data centers in space. Scientists are skeptical - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T02:01Z",
+"Shares bounce after bruising month, dollar on course for third monthly gain - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T11:01Z",
+"The Nobel-winning science turning ‘water harvesting’ into a commercial race"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Tech stocks set for worst month in four years as volatility surges"
+],
+[
+"AP Business",
+"2026-11-26T20:19Z",
+"Schizophrenic man found guilty of attempted murders of 14 people, including 10 on London-bound train - AP News"
+],
+[
+"AP Business",
+"2026-11-25T17:41Z",
+"The US Army has detonated a 5-ton stockpile of lead azide in Iowa. Here’s what to know - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T01:06Z",
+"The search for Vietnam's stolen pets at wet markets and slaughterhouses - Reuters"
+],
+[
+"CNBC",
+"2026-11-27T00:22Z",
+"Sovereign wealth funds are acting more like private equity giants — and inheriting their risks"
+],
+[
+"Financial Times",
+"2026-11-27T04:31Z",
+"Asia stocks stabilise"
+],
+[
+"AP Business",
+"2026-11-26T16:55Z",
+"Trump calls the pre-election GDP figures 'fake' and demands an investigation of Commerce Department - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T05:33Z",
+"Morning Bid: Hey, it could have been worse - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T01:51Z",
+"Ábrego García, a Salvadoran mistakenly deported by US, goes to Spain but hopes to return after Trump - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T00:35Z",
+"Trump says Putin can come to G20 if he wants - Reuters"
+],
+[
+"CNBC",
+"2026-11-27T04:07Z",
+"This 170-year historical study says ‘major market collapse’ is coming"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Kirkland & Ellis under fire from private equity backers over sell-to-yourself deals"
+],
+[
+"AP Business",
+"2026-11-26T18:25Z",
+"Leaders choose Spain’s former central bank head as next European Central Bank president - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T05:29Z",
+"Congo's Ebola cases exceed 12,000 as responders struggle to contain outbreak - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T02:55Z",
+"Judge declines to issue a long-term ban on taxpayer-funded, pro-Trump ads critics called propaganda - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T03:17Z",
+"Australia sanctions alleged Iranian agents suspected of directing antisemitic attacks - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T12:46Z",
+"U.S. tariff-hike threats pile pressure on partners to sign trade deals"
+],
+[
+"Financial Times",
+"2026-11-27T05:01Z",
+"Venezuelan oil magnate defends contentious deal with Trump"
+],
+[
+"Reuters Business",
+"2026-11-26T04:15Z",
+"Musk pledges two SpaceX shares for every US child in $18 billion AI charm offensive - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:14Z",
+"Fuel tanker crash ignites a massive fire on a highway surrounding Cairo, killing at least 31 people - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T00:25Z",
+"Trump says Wednesday's market had him briefly 'concerned' before stocks recovered - Reuters"
+],
+[
+"Financial Times",
+"2026-11-27T05:00Z",
+"Kalshi’s next big bet: ‘microinsurance’ for small businesses"
+],
+[
+"AP Business",
+"2026-11-26T15:50Z",
+"Zelenskyy warns of imminent major Russian attack on Ukraine’s power grid - AP News"
+],
+[
+"AP Business",
+"2026-11-25T18:49Z",
+"A father, a son, and a remarkable 70-season Michigan football streak that has come to an end - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T01:36Z",
+"China's industrial profit growth fastest in five months as recovery remains uneven - Reuters"
+],
+[
+"CNBC",
+"2026-11-27T06:09Z",
+"China’s factories are growing profits again, but the AI boom is picking the winners"
+],
+[
+"AP Business",
+"2026-11-26T16:39Z",
+"Iranian activist and Oscar-nominated screenwriter Mehdi Mahmoudian arrested in Tehran - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T03:38Z",
+"EXCLUSIVE: US officials divided over Chinese spying allegations following Jensen Huang's return - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:14Z",
+"Major League Baseball sues players' union ahead of lockout, trying to block possible antitrust suit - AP News"
+],
+[
+"CNBC",
+"2026-11-27T05:46Z",
+"Fast cars, big money: Why sportswear races into Formula 1 as sponsorship spending soars 75%"
+],
+[
+"AP Business",
+"2026-11-26T21:27Z",
+"EU leaders split over budget spending and a $49 billion loan to Ukraine - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T06:16Z",
+"EXCLUSIVE: Data from Chinese AI firm MiniMax accessed by unidentified parties, researcher says - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T10:34Z",
+"Eurostar cancels Paris-London trains after staff go on unannounced strike - AP News"
+],
+[
+"CNBC",
+"2026-11-26T13:00Z",
+"Planes, trains and automobiles: The best ways to beat travel fatigue—so you can come home feeling rested and fulfilled"
+],
+[
+"AP Business",
+"2026-11-26T13:30Z",
+"Judge blocks FCC from early license review for ABC, which network says has had a chilling effect - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T05:02Z",
+"France and Germany want deal by year-end to 'Le Pen-proof' next EU budget and Ukraine funding - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T16:26Z",
+"Libyan army vows retaliation after 2 naval officers die of wounds from Ukrainian drone attack - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T22:34Z",
+"Final New Zealand election vote count to confirm parliament make up - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T04:12Z",
+"How Trump’s latest tariff moves hand India an edge over rival Asian exporters"
+],
+[
+"AP Business",
+"2026-11-26T12:09Z",
+"FIFA says it has been victim of a cyberattack accessing ‘personal and business information’ - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T03:08Z",
+"Brent settles higher as mine strikes, refinery attack stoke Middle East supply concerns - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:44Z",
+"Plane crash off the coast of Mississippi kills extended family of 6 on fishing trip - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T00:03Z",
+"Cautious consumers gear up for Black Friday as inflation woes bite - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T17:52Z",
+"Semiconductor chips are the new oil. Here's why"
+],
+[
+"AP Business",
+"2026-11-27T04:50Z",
+"Heavy rain, wind and flooding hit much of the US on Thanksgiving - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T05:28Z",
+"India orders tougher surveillance of packaged water, scrutiny set to cover PepsiCo, Coca-Cola - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-27T01:03Z",
+"Dollar lingers near 22-month peak as AI worries simmer; kiwi rises - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T17:33Z",
+"China launches Shenzhou 24 spacecraft carrying 2 Chinese and 1 Pakistani astronaut - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T19:54Z",
+"Thanksgiving storm knocks out power, disrupts flights on US East Coast - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T10:55Z",
+"Associated Press journalists in Gaza win prestigious Rory Peck prize - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T01:35Z",
+"Stocks rally, Europe sizes up next ECB chief - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:05Z",
+"Wall Street recovers most early losses as pullback in AI stocks eases - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T22:16Z",
+"Zelenskiy says Russia preparing new mass strike in coming days - Reuters"
+],
+[
+"CNBC",
+"2026-11-25T21:56Z",
+"Liesman: Why Greenspan could bet on productivity — and Warsh needs to hike"
+],
+[
+"AP Business",
+"2026-11-26T07:08Z",
+"A Chinese consumer advocate is stranded in South Korea as a crackdown in China targets campaigners - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T00:34Z",
+"US judge blocks FCC from targeting Disney-owned ABC stations - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T22:04Z",
+"Puerto Rico’s Supreme Court cancels a key power contract and many wonder what’s next - AP News"
+],
+[
+"AP Business",
+"2026-11-26T11:11Z",
+"At least 9 injured by large explosion and fire at major oil facility in Bangkok - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T23:42Z",
+"Tokyo core inflation at 16-month high, bolsters case for BOJ hike - Reuters"
+],
+[
+"CNBC",
+"2026-11-25T16:17Z",
+"Even the price of toys is on the rise. How Americans are scaling back holiday plans"
+],
+[
+"Reuters Business",
+"2026-11-26T05:59Z",
+"Indian court tightens food labelling proposal, asks global food firms to end 'double standards' - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T13:48Z",
+"With new league in planning stages, NBA announces $11B initiative for arena development in Europe - AP News"
+],
+[
+"AP Business",
+"2026-11-26T13:48Z",
+"Ebola outbreak in Congo reaches 12,000 cases as violence forces some responders to evacuate - AP News"
+],
+[
+"CNBC",
+"2026-11-26T18:27Z",
+"Microdrama apps chase profits as Hollywood moves into short-form, vertical video"
+],
+[
+"Reuters Business",
+"2026-11-25T23:02Z",
+"Japan's data centre boom faces growing revolt from urban residents - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T11:31Z",
+"Steelers are benching Aaron Rodgers and Mason Rudolph will start at QB against Broncos - AP News"
+],
+[
+"AP Business",
+"2026-11-27T05:24Z",
+"NFL Scores, News & Stats | Latest Super Bowl News - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T23:41Z",
+"France's Macron says Le Pen should be less arrogant after she criticises EU budget talks - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T00:12Z",
+"Inside India newsletter: Roaring economy, foreign investors’ return and now record auto sales"
+],
+[
+"Reuters Business",
+"2026-11-26T03:39Z",
+"Gold drifts lower as Fed rate-hike fears loom - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T19:43Z",
+"Judge halts order for Georgia's Fulton County to give 2020 election records to state election board - AP News"
+],
+[
+"AP Business",
+"2026-11-26T18:29Z",
+"Egypt detains a driver suspected of causing Cairo tanker crash that killed 31 - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T22:57Z",
+"Trump uses Thanksgiving message to lash out at political foes, immigrants, federal government - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T15:28Z",
+"Spain’s Pablo Hernández de Cos set to lead European Central Bank"
+],
+[
+"Reuters Business",
+"2026-11-25T21:30Z",
+"Trump's newest order curtailing birthright citizenship is blocked by second judge - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T01:45Z",
+"Almost 2,000 migrants arrive on Spain’s Canary Islands in a single day, breaking a record - AP News"
+],
+[
+"AP Business",
+"2026-11-26T17:10Z",
+"Spain’s far right hasn’t governed since Franco. Immigration fears could change that - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T16:56Z",
+"SAP considers at least 10,000 job cuts in AI restructuring, Bloomberg reports - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T06:39Z",
+"SpaceX, Musk pledge to donate a share each to active Trump Accounts"
+],
+[
+"Reuters Business",
+"2026-11-25T23:31Z",
+"For Trump, doubling down on tariffs is about power, not popularity - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T20:58Z",
+"Martha Ford, former Lions owner with link to auto giants, dies at 101 - AP News"
+],
+[
+"AP Business",
+"2026-11-26T10:58Z",
+"Pakistan congratulates China on flight that carried a Pakistani astronaut to space station - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T17:53Z",
+"Sweden's Centre leader backs right-wing prime minister, in major shift - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T19:32Z",
+"Pakistan's PIA to shift UK flights to own fleet after Norse Atlantic suspension - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T01:41Z",
+"Nigeria seizes $220 million worth of meth and arrests 5 Mexican suspects in a major drug bust - AP News"
+],
+[
+"AP Business",
+"2026-11-27T05:01Z",
+"As Google threatens to cut schools’ search access, Los Angeles blocks AI features - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T18:48Z",
+"Kazakhstan boosts AI cooperation with Russia, which is hungry for advanced US chips - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T18:13Z",
+"New images reveal crater on asteroid struck by DART spacecraft - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T05:43Z",
+"Bad weather postpones Macy’s Thanksgiving Day Parade for first time ever - AP News"
+],
+[
+"AP Business",
+"2026-11-26T18:53Z",
+"2 baby meerkats make their debut at a Peruvian zoo, spotlighting conservation - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T22:57Z",
+"Besiktas v Hapoel Beer-Sheva suspended after police enter stands - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T21:55Z",
+"How the Trump administration determined Jensen Huang is not a national security threat - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-27T00:01Z",
+"Families of slain Filipinos seek justice as Duterte's ICC trial set to start - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T20:28Z",
+"Necessities join gifts in Black Friday shopping carts as AI and higher costs steer spending - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T16:33Z",
+"Mexico seeking talks with US on SpaceX airspace use - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T07:30Z",
+"Robots could be doing household chores in just 1-2 years, Chinese EV firm says"
+],
+[
+"Reuters Business",
+"2026-11-26T00:30Z",
+"Vietnam seeks US trade deal as tariffs threaten clothing, footwear exports - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T15:30Z",
+"Smoke rises, explosion heard as US stockpile of dangerous lead azide is detonated in Iowa - AP News"
+],
+[
+"AP Business",
+"2026-11-26T09:23Z",
+"Building collapse in Pakistan kills 4, with 17 still missing - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T19:05Z",
+"Binance lifts withdrawal suspension after $6.3 billion crypto heist - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T14:47Z",
+"Marlboro maker Altria explores takeover of UK's Imperial Brands"
+],
+[
+"Reuters Business",
+"2026-11-25T20:44Z",
+"US authorizes SpaceX to deploy 1 million satellites for data centers in space - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T22:38Z",
+"Chris Creighton fired after 13 seasons as Eastern Michigan football coach - AP News"
+],
+[
+"AP Business",
+"2026-11-26T10:55Z",
+"Thousands protest in Irbil as Baghdad moves to seize Kurdish oil and border control - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T15:47Z",
+"Trump says he asked Putin to 'pull back' military aggression throughout Europe - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T13:34Z",
+"What is ‘texture-maxxing’? The food trend putting crunch on the menu"
+],
+[
+"Reuters Business",
+"2026-11-25T16:31Z",
+"S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T03:47Z",
+"FedEx airplane overruns runway at Miami airport, temporarily closing all but 1 runway - AP News"
+],
+[
+"AP Business",
+"2026-11-26T15:15Z",
+"On Greece's most glamorous island, faith and tradition endure with a celebration of its women - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T15:18Z",
+"Trump demands probe of GDP data released before midterms - Reuters"
+],
+[
+"CNBC",
+"2026-11-25T14:17Z",
+"Secondhand shopping is going mainstream this holiday season as consumers seek value"
+],
+[
+"Reuters Business",
+"2026-11-25T22:54Z",
+"EXCLUSIVE: Billionaire Boehly signs US-backed share swap deal to buy Lukoil global assets - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T23:12Z",
+"US travelers facing long airport lines, bad weather in the run up to Thanksgiving - AP News"
+],
+[
+"AP Business",
+"2026-11-26T20:09Z",
+"Israeli strikes kill 10 in Gaza as Iranian drones kill 2 Italians in Kuwait, and other Mideast news - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T15:31Z",
+"Co-leader of Germany's AfD criticises planned talks with Russian envoy - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T11:17Z",
+"Switzerland’s biggest bank set for showdown with lawmakers as capital fight intensifies amid crisis planning"
+],
+[
+"Reuters Business",
+"2026-11-25T19:12Z",
+"Salvadoran migrant Kilmar Abrego Garcia lands in Spain after US departure deal - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T18:20Z",
+"What are king tides? These exceptionally high tides are increasingly flooding coastal communities - AP News"
+],
+[
+"AP Business",
+"2026-11-27T03:04Z",
+"College Basketball News: Rankings, Scores, Stats & More - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T18:54Z",
+"Two Italians killed in attack on Kuwait site, Iran denies involvement - Reuters"
+],
+[
+"CNBC",
+"2026-11-26T03:13Z",
+"‘Your booth is waiting’: Denny’s welcomes Jensen Huang back as Nvidia CEO"
+],
+[
+"Reuters Business",
+"2026-11-25T19:40Z",
+"Russia may offer Brunei floating nuclear plants, Rosatom says - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T02:10Z",
+"US-led consortium agrees to acquire assets from Russian oil company Lukoil - AP News"
+],
+[
+"AP Business",
+"2026-11-26T16:50Z",
+"Storms and king tides disrupt Thanksgiving from coast to coast, in photos - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T16:58Z",
+"North Korean launderers turn to little-known crypto services to move Binance haul, say researchers - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T13:15Z",
+"Trump unveils new tariffs over excess industrial capacity, undeterred by midterms defeat - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T17:20Z",
+"New Miss Universe’s Puerto Rican hometown celebrates her historic win - AP News"
+],
+[
+"AP Business",
+"2026-11-27T05:49Z",
+"Lifestyle - AP News"
+],
+[
+"Reuters Business",
+"2026-11-25T14:28Z",
+"US third-quarter GDP growth revised sharply higher - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T12:39Z",
+"As GLP-1 use grows, patients and doctors rethink Thanksgiving dinner - AP News"
+],
+[
+"AP Business",
+"2026-11-26T18:45Z",
+"Anita DeFrantz, whose trailblazing advocacy gave women a voice at the Olympics, dies at 74 - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T16:42Z",
+"Mural near Dutch embassy in Moscow depicts missile supplies for Ukraine - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T18:58Z",
+"Iraq's top court says Baghdad can deploy troops to secure borders in Kurdistan region - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T11:55Z",
+"Melania Trump reunites her seventh group of Ukrainian and Russian children with their families - AP News"
+],
+[
+"AP Business",
+"2026-11-26T11:04Z",
+"Space - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T16:02Z",
+"Ukraine says North Korea temporarily halted missile shipments to ally Russia - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T15:24Z",
+"Eni, Repsol pledge to invest $2 billion in Venezuela JVs - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T04:00Z",
+"NBA Scores & Daily News | NBA Stats, Scores & News Today - AP News"
+],
+[
+"AP Business",
+"2026-11-27T01:02Z",
+"From life on Nairobi’s streets, a Kenyan DJ wows crowds with his wooden deck - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T20:56Z",
+"Attack on Saudi Aramco's Jazan refinery kills worker, halts some operations - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-26T05:05Z",
+"Turkmenistan's Afghan gas link brings South Asia pipeline dream a little closer - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T19:58Z",
+"South Africa's Biovac aims to dramatically increase vaccine production with help from an EU loan - AP News"
+],
+[
+"AP Business",
+"2026-11-27T01:18Z",
+"Meet the rising mayoral candidate in Taiwan who’s also sanctioned by China - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T14:38Z",
+"French actor Gerard Depardieu to face trial for rape, court rules - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T11:57Z",
+"Bollywood union asks Modi to bar Netflix's Pakistani series in India - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-26T17:48Z",
+"Spain's De Cos to take over as ECB president from Lagarde - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T05:49Z",
+"Blake Corum leads Rams' dominant rushing attack in their 5th straight win, 26-13 over Packers - AP News"
+],
+[
+"AP Business",
+"2026-11-26T23:53Z",
+"Mexican president blasts DEA over tip lines, accusing it of not fighting fentanyl enough inside US - AP News"
+],
+[
+"Reuters Business",
+"2026-11-25T12:13Z",
+"BP transfers 3,000 finance operations staff to Indian AI services firm Wipro - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T11:46Z",
+"Be grateful these 5 cars will still be around in 2027 - AP News"
+],
+[
+"AP Business",
+"2026-11-27T03:46Z",
+"What to know about North Korean move to shut down Swiss diplomatic office - AP News"
+],
+[
+"Reuters Business",
+"2026-11-27T05:33Z",
+"Is this a dead turkey bounce? - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-25T14:39Z",
+"Migrant arrivals in Spain's Canary Islands break single-day record - Reuters"
+],
+[
+"AP Business",
+"2026-11-26T05:02Z",
+"What to know about Taiwan’s local elections and why they matter to China - AP News"
+],
+[
+"AP Business",
+"2026-11-26T17:07Z",
+"French cinema star Gérard Depardieu ordered to stand trial for rape and sexual assault - AP News"
+],
+[
+"Reuters Business",
+"2026-11-26T14:02Z",
+"Two Italian workers killed in Iranian strike in Kuwait, source says - Reuters"
+],
+[
+"Reuters Business",
+"2026-11-26T06:23Z",
+"India's Hetero begins shipments of generic HIV prevention drug to Africa - Reuters"
+],
+[
+"AP Business",
+"2026-11-25T21:47Z",
+"See the world in vertical: Top Photos by AP photojournalists - AP News"
+]
+],
+"news": [
+{
+"headline": "Trump unveils new tariffs over excess industrial capacity, undeterred by midterms defeat - Reuters",
+"source": "Reuters Business",
+"why": "Тръмп обяви нови тарифи срещу Китай, ЕС, Бразилия и други търговски партньори заради свръхкапацитет в индустрията; партньорите отвърнаха с ответни мерки, а Виетнам търси търговска сделка с САЩ.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "Trump's new tariffs aim to prise global trade from China's grip - Reuters",
+"link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOaUdXQjZTRVJvNzVESnNzMlpfZmxhTEgweFZsUHRZRTVLa29xcENmUjJaUUNjWExsaVNTREJqNlNwSFZzNXFuRUFqSlpRam4tZkZHWXEwZXQ5VlhPVFJzcmNnZEw5a3N2ZVBndnpnNzhiN1Y1NkRtU1M5WE05UmRFcGMzUVk0NXYyRTVpM05MOUhISDhmb3BPTERXcmNHWE9zc2dR?oc=5"
+},
+{
+"source": "Reuters Business",
+"headline": "For Trump, doubling down on tariffs is about power, not popularity - Reuters",
+"link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQUGF3UXNuQWFId2NPaERJLTVlLUhkQlp0WGpPNWRaamVTN3BmVFc5YkY3NVkzNHhJLUx6aTN4c2hZVnRucS13S1hMVlJWMEhzNllrYjJDSzczMndmRm5EeUhreW1qb0dpUG1HdTBrdnUtdGRLdFRVaDBWcFFEOXBsZ3gxMXlMNjJFbWk4ZzVtYXF3bWF2Z2NzZ3dTMmE5THV4VGdnRw?oc=5"
+},
+{
+"source": "AP Business",
+"headline": "US to hike tariffs on China, EU, Brazil and others over subsidized factories - AP News",
+"link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPcWJ0MDE3ZEJzV2tVdThRbXdzcGxXN0phLUpNTHAyVWlEQV9JNzVUWlpsRXp6ZHFTNnY1dnpKMHJjNExkUnZxTlRXdzZNTUFOeXhkUTk5XzF0ZW55b1lZcnhJYTkyYUt5N1lvdm5TZ3QyZDh5UkNsVmtHMmhuNm5xcGc3VmVUcV9fellldEtWcTdaYWJpRUlBcm5R?oc=5"
+},
+{
+"source": "AP Business",
+"headline": "China and other US trading partners hit back at Trump’s new tariff plans - AP News",
+"link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQVWQ3MnMzTlQ5Y2lUTW9RTzloTmp3MmtycjBUbmZUOTExYWNsVmlXX1JmLVJGYUYyRjNHSGV1b2hzLWhWclNBRDRZb2hyQ2UxSE9tYktjUTBKR2VDU2w1YlZlU0xaZ0JSMlQ1ZzhwMEJpSVk5N05XbHhnNi1ESktvTVNGNlZpMkNjX0dUNHdvLWJ2YTVqeDFv?oc=5"
+},
+{
+"source": "CNBC",
+"headline": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
+"link": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html"
+}
+],
+"ours": []
+},
+{
+"headline": "US third-quarter GDP growth revised sharply higher - Reuters",
+"source": "Reuters Business",
+"why": "БВП на САЩ за третото тримесечие беше ревизиран рязко нагоре; Тръмп нарече данните преди изборите фалшиви и поиска разследване на Министерството на търговията.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "Trump demands probe of GDP data released before midterms - Reuters",
+"link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPdjAtVm85ZE55RGw0MXhaM3NVV1NlaHdlazNjODRQQjRPOGh2eDQ5aWYzcmxNSHpVWHNacEhhMDFaRDZ3YWIxalJzY3JCTXdjLVE4RXpmbktlZXNZTUc3RlE0LVhtTlo5Rl8xMm9nOXVPZmZ1eEd2XzJjcXQxX2otajdiUHN6djBScGpldmJvUXBIaG9UeUJxeW5kSWtnTTQ?oc=5"
+},
+{
+"source": "AP Business",
+"headline": "Trump calls the pre-election GDP figures 'fake' and demands an investigation of Commerce Department - AP News",
+"link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPSWs0NUw0T1MxU0FFajZoSzUzQ2tCblZyZGhDc25mSVpXV0NpczlfWHpwaWdaUEE0T3lFSXdhYl9oUVZ3cTV1ei01aXprNTBoYUJCbG02THdJeGVISENOWjdrVzJpb2pxZEI5aU94VmFCTWU4ckR5MjFjZ2JDMzFibl9WVGZ2Q09PeVo5LXc1WQ?oc=5"
+},
+{
+"source": "CNBC",
+"headline": "Trump demands probe into ‘record setting error’ after third-quarter GDP data gets massive revision higher",
+"link": "https://www.cnbc.com/2026/11/26/trump-gdp-revision-investigation.html"
+}
+],
+"ours": []
+},
+{
+"headline": "Tokyo core inflation at 16-month high, bolsters case for BOJ hike - Reuters",
+"source": "Reuters Business",
+"why": "Инфлацията в Токио достигна 16-месечен връх, засилвайки очакванията за повишение на лихвата от Bank of Japan.",
+"also": null,
+"ours": []
+},
+{
+"headline": "Leaders choose Spain’s former central bank head as next European Central Bank president - AP News",
+"source": "AP Business",
+"why": "Лидерите на ЕС избраха бившия управител на испанската централна банка Пабло Ернандес де Кос за следващ президент на Европейската централна банка, наследявайки Кристин Лагард.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "Spain's De Cos to take over as ECB president from Lagarde - Reuters",
+"link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOOV8wZkxRVTY5U0ZQeVZwSGtCMVZJTjV2d2t5TlhsSVoxQmpLRXI4OTV1R0QwQkV1QmZma3BDN0lrOEJTNGFVeloyeE5HbnhmWDZfR1VrbzN5TzZrck5WTTlKNTBaeFhVbDd4RldhY0hZMnFsczlsTURLY0FpWWgzeE5YVVc2NUZqMy1KbldQVDJfcUtsVEhINHF2emJ5SEFrMXozWUdTM3BFQQ?oc=5"
+},
+{
+"source": "CNBC",
+"headline": "Spain’s Pablo Hernández de Cos set to lead European Central Bank",
+"link": "https://www.cnbc.com/2026/11/26/pablo-hernandez-de-cos-ecb-president.html"
+}
+],
+"ours": []
+},
+{
+"headline": "Nvidia halts server shipments to four Southeast Asian countries, FT reports - Reuters",
+"source": "Reuters Business",
+"why": "Nvidia спря доставките на сървъри към четири държави в Югоизточна Азия; ново правило на BIS задължава купувачите да изключат китайски наематели; S&P постави рейтинга на Nvidia под наблюдение за понижение заради управленски опасения; Fitch предупреди, че американските чип ограничения ще забавят инвестициите в дата центрове в Азия.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "US chip curbs will slow Asia data-center investment, Fitch says - Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOelNJWFVtc1BvNXp5TFMzbWtqVTdzc3JVM3pmY1hkR09YMi1WV3k3TzZ4VzFDQUpkcGJHVEZ2R0NqVnRNNmZsTThQZ0V3SlNzUmY1dUFURGtVckNOTXVQamlqSnVxTG5NVy1UVVR1dnlaNFE1MTluNFdUOTZzSHg2eHYzYTF1emwxMjZKUVIxcWhqYzhxTUdYZ0VZU3BsV1UxRHp3RTZnc2lyS2U5SDAydW5vcjVqaFFz?oc=5"
+},
+{
+"source": "Reuters Business",
+"headline": "EXCLUSIVE: US chip curbs, distillation crackdown threaten Chinese AI model development, sources say - Reuters",
+"link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQSHo5VjlHR1l4UkdCSmFGNUd6WVlZNXlwZXl6Yk5oYUFnTm9ISC1ZSWdmbi1aZ3R1b1Q3bXhpaXVoSXRaNy1hcWdSWHdCd2RFVGx6WlhYN25pZXI4Q2xHWGpQVkJYN2MwTk1ma2NERnBKTHhBUXpHSElLeFdwdEpVZFZZcWhxMm1QUEVpeHRYSXczYXNJelJTUWtHdEkxSGpud2NxeV90R0VjTXVkTmE4U0JRZWVRM1RFUmt3UGhIbw?oc=5"
+},
+{
+"source": "Reuters Business",
+"headline": "S&P warns Nvidia's board may be compromised, puts chipmaker's rating on downgrade watch - Reuters",
+"link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNb1ZBby1iVDJnTmJwX3hDYWJpU2lxTUdLTHdlWHFqRHJUcmtTOWFuQkFRTlUyZTJBcGdNMWR3N3d1YlJIV05kWk1mU21JSDZmSVpZR1BlanpqRzFXSkg3NkxkeElWcHM0Q2Y4eFJKb3Fha29XakxYNFJ4cXExZHo4MFVDOHdDbENrQWs0d0lqQ3Z5cEVDRVBQR1hNNWZxSmhiUll4NFg1amZlU01oWm9fN2hkUFBBNkdKT21v?oc=5"
+},
+{
+"source": "CNBC",
+"headline": "Nvidia chip buyers told to rule out Chinese renters to purchase GPUs, sources say",
+"link": "https://www.cnbc.com/2026/11/26/neoclouds-nvidia-china-ai.html"
+}
+],
+"ours": [
+"ANF"
+]
+},
+{
+"headline": "Judge blocks FCC from early license review for ABC, which network says has had a chilling effect - AP News",
+"source": "AP Business",
+"why": "Федерален съдия блокира FCC да провежда предсрочен преглед на лицензите на ABC станциите, собственост на Disney, след като мрежата заяви, че действията имат смразяващ ефект.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "US judge blocks FCC from targeting Disney-owned ABC stations - Reuters",
+"link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNa3U4SjN4dnBlQUVGemRWMkxMdndfMXJjMHBmNUtvRDMtVmJhRWhZVS1kZzd0UHVUend5T3NJRlV2elRaTW1jQ3Y1QjNpVEtWRlltZ0x2WE5kSVNQbWdUZ1BpWmtyZHFQYjVmTUphNk1wWlRlbU8wTUpuUjdHa0ZXc19tV3hFUEFMY3Q3WVphZDdTeGRKUGRDWTU1YmxoRWl0anJCUTc2NA?oc=5"
+}
+],
+"ours": []
+},
+{
+"headline": "Brent settles higher as mine strikes, refinery attack stoke Middle East supply concerns - Reuters",
+"source": "Reuters Business",
+"why": "Петролът поскъпна: стачки в мини, атака срещу рафинерията на Saudi Aramco в Джазан и опасения за доставки от Близкия изток прекъснаха тримесечната низходяща серия на Brent.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "Oil on track to snap 3-week losing streak over supply fears - Reuters",
+"link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPTzVQVzE5aGdzbGVhNEUtVl94M0V3RjN5Rks4UDU0U0plazFDcjFnUTBMMHBvdk9BRzFaVHljSXk1ZFdzSjlRTVRXNGZ0cnRyUWRRbFJaRjBsVWNFbDZqSnQ0cHo0TW5fRDlwMWlKWDI3V2ROcnlXczVET1RqSXR6UGtZSTZ0OTQtY1YwaG1yYTRwQnZ6TW43azNGNTFqMmpkNFhtbVJwRnVkVERhR1NnSlFIMzExZw?oc=5"
+},
+{
+"source": "Reuters Business",
+"headline": "Attack on Saudi Aramco's Jazan refinery kills worker, halts some operations - Reuters",
+"link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxORnNINWJlUzU0bDVSQ1Z5TWhtZTl1dzVxa01lbWhiMTg0bjBKZzQtbld6RmpIQ3NOSkctT29wTmdmR3VCcHpMbzdBQUdQSU0wVWItQU1COHhCS1BzYnpoOTJsRzl2TWp0aVNNZWVpZVFhS2cwWXVtNnA0bzRfUXNTRTJRTEVHem5BY2V2SURxZG9Vb3VkT3FNa1RuR3RfZWJQUE15WTdGaVFudnJaeVJIdVhXdE9PcWFuY2c?oc=5"
+}
+],
+"ours": []
+},
+{
+"headline": "EU leaders split over budget spending and a $49 billion loan to Ukraine - AP News",
+"source": "AP Business",
+"why": "Лидерите на ЕС са разделени по въпроса за бюджетните разходи и заем от 49 млрд. долара за Украйна; Франция и Германия искат споразумение до края на годината, за да защитят следващия бюджет на ЕС и финансирането за Украйна от евентуална победа на Льо Пен.",
+"also": [
+{
+"source": "Reuters Business",
+"headline": "France and Germany want deal by year-end to 'Le Pen-proof' next EU budget and Ukraine funding - Reuters",
+"link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxONUFuMXFIM2VqWWZ2S2RBUFkzM1VzQjE0WkxhTDlreXM3OU45NDdRejhWUkRUQVVvQ2x2ZG1PT2JiNjNtYlRiYWFqSF9wWnQzR25hTFRjcjI5YkU0QmxLeEwwNlJkak5JaWo5QjVqTnZPQmt1bGdzZl9nZ0k2ZjRxSDMyUmY2eTQ4TEM2NnJaZDNPZUR4RUZKb2FqRkZ3eklRaXNicEFLc2VRSHZRenpZWEpPRlp4SWxBdi1Nbw?oc=5"
+}
+],
+"ours": []
+}
+],
+"crypto": [
+{
+"headline": "Binance says customer withdrawals are fully restored, four weeks after the $6.3 billion hack",
+"source": "CoinDesk",
+"why": "Binance напълно възстанови тегленията четири седмици след хак за $6.3 милиарда — събитие с директно отражение върху достъпа до ликвидност и доверието в борсата."
+},
+{
+"headline": "Standard Chartered's Zodia Custody suffers data breach, exposing client information",
+"source": "CoinDesk",
+"why": "Пробив в данните на институционален криптокастодиан, свързан с Standard Chartered, засяга клиентска информация — релевантно за институционални инвеститори, ползващи подобни услуги."
+},
+{
+"headline": "Bill to lock up U.S. government bitcoin for 20 years advances to full House",
+"source": "CoinDesk",
+"why": "Законопроект за задържане на биткойни на американското правителство за 20 години напредва към пленарно гласуване в Камарата — потенциално законодателно решение с дългосрочен ефект върху пазарното предлагане."
+},
+{
+"headline": "Senate Democrats urge SEC to scrap crypto, tokenized stock exemptions",
+"source": "Cointelegraph",
+"why": "Сенатори настояват SEC да оттегли облекченията за крипто и токенизирани акции — директна регулаторна заплаха за институционалните продукти в сектора."
+},
+{
+"headline": "Bitcoin ETF November outflows top $5B, Morgan Stanley bucks trend",
+"source": "Cointelegraph",
+"why": "Ноемврийските изходящи потоци от биткойн ETF надхвърлиха $5 милиарда, докато Morgan Stanley показва противоположна тенденция с нетен приток."
+}
+],
+"news_window": {
+"since": "2026-11-25T06:30:00+00:00",
+"hours": 48.06,
+"day_queries": 4,
+"sources": {
+"Reuters Business": {
+"count": 102,
+"oldest": "2026-11-25T11:57Z"
+},
+"CNBC": {
+"count": 30,
+"oldest": "2026-11-25T14:17Z"
+},
+"Financial Times": {
+"count": 9,
+"oldest": "2026-11-27T04:31Z"
+},
+"AP Business": {
+"count": 101,
+"oldest": "2026-11-25T09:27Z"
+}
+},
+"fetched": {
+"Reuters Business": 51,
+"CNBC": 30,
+"Financial Times": 9,
+"AP Business": 50
+},
+"dead": [],
+"front": {
+"FT World": 25,
+"Reuters World": 50
+},
+"front_dead": [],
+"pool_total": 242,
+"pool_used": 200,
+"to_model": {
+"FT World": 2,
+"Reuters Business": 79,
+"CNBC": 30,
+"Reuters World": 3,
+"AP Business": 77,
+"Financial Times": 9
+},
+"themes_in_pool": 12,
+"priority": {
+"names": 43,
+"hits": 5,
+"in_pool": 5,
+"beyond_limit": 2,
+"tickers": [
+"AAPL",
+"ANF",
+"ANT",
+"BBY"
+]
+},
+"crypto_hours": 48.06
+},
+"anf_name": "Abercrombie & Fitch"
+}
