@@ -29,7 +29,7 @@ F_AAON = [{"accepted_et": "2026-11-09 16:09", "items": ["2.02", "4.02", "7.01"]}
 
 print("── 1. РЕАЛНО: изненадата в EPS ──")
 a = qm_ep.eps_surprise("APP", "2026-11-04", rows=EPS["APP"]); b = qm_ep.eps_surprise("AAON", "2026-11-09", rows=EPS["AAON"])
-assert a == {"date": "2026-11-04", "reported": 4.3, "estimate": 4.03, "surprise_pct": 6.7} and b["surprise_pct"] == 43.5
+assert a == {"date": "2026-11-04", "reported": 4.3, "estimate": 4.03, "surprise_pct": 6.7, "source": "Yahoo"} and b["surprise_pct"] == 43.5      # 27.11.2026 (т. 9): и източникът
 assert qm_ep.earnings_line(a) == "отчет: EPS $4.30 срещу очаквани $4.03 (изненада +6.7%)"
 assert qm_ep.earnings_line(b) == "отчет: EPS $0.83 срещу очаквани $0.58 (изненада +43.5%)"
 print(f"  ✓ APP: «{qm_ep.earnings_line(a)}»; AAON: «{qm_ep.earnings_line(b)}»")

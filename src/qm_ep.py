@@ -837,7 +837,52 @@ def earnings_headlines(headlines: list[dict] | None) -> list[dict]:
     return [h for h in headlines or [] if h.get("source") == "SEC" or (EARN_HEADLINE_RE.search(h.get("title") or "") and not _NOT_EARN_RE.search(h.get("title") or ""))]
 
 
-def eps_surprise(sym: str, session: str | None, yf_mod=None, rows: list[dict] | None = None) -> dict:
+def eps_num(s) -> float | None:
+    """„$1.94“, „($0.12)“ (отрицателно), „1,234.5“ → число; иначе None. Чиста функция."""
+    if isinstance(s, (int, float)):
+        return float(s)
+    t = str(s or "").replace("$", "").replace(",", "").strip()
+    neg = t.startswith("(") and t.endswith(")")
+    try:
+        v = float(t.strip("()"))
+    except ValueError:
+        return None
+    return -v if neg else v
+
+
+def eps_basis(reported, estimate) -> str | None:
+    """
+    27.11.2026 (уикенд пакет, т. 9): различна основа на отчетения и очаквания EPS (GAAP срещу коригиран, тримесечие срещу година) → бележка; иначе None. Признаци: противоположни
+    знаци или — при очакване ≥ $0.50 по модул — отношение извън [0.4; 2.5]. Реално 25.11, 07:30: DELL $2.35 срещу $6.55 (Nasdaq; реакцията след затварянето +1.2%). Чиста функция.
+    """
+    if not isinstance(reported, (int, float)) or not isinstance(estimate, (int, float)) or estimate == 0:
+        return None
+    if reported * estimate < 0 or (abs(estimate) >= 0.5 and not 0.4 <= reported / estimate <= 2.5):
+        return "основата е различна (вероятно GAAP срещу коригирана) — изненадата не се смята"
+    return None
+
+
+def eps_nasdaq(sym: str, session: str | None, fetch=None) -> dict:
+    """
+    27.11.2026 (уикенд пакет, т. 9): втори източник за EPS при отчета — календарът на Nasdaq за деня на сесията и следващия делничен (след затварянето / преди отварянето):
+    {"date", "reported", "estimate", "surprise_pct", "source": "Nasdaq"}; иначе {"error"}. Реално 24.11: DKS $1.94 срещу $1.38 (+40.58%), ANF $3.82 срещу $3.15 (+21.27%) —
+    Yahoo нямаше отчетен EPS. Мрежа само без fetch.
+    """
+    try:
+        from src import econ_calendar
+        d0 = dt.date.fromisoformat(str(session)[:10]) if session else dt.date.today()
+        days = [d0, d0 + dt.timedelta(days=1 if d0.weekday() < 4 else 7 - d0.weekday())]
+        for d in days:
+            for r in (fetch or econ_calendar.fetch_earnings)(d) or []:
+                if str(r.get("ticker")).upper() == sym.upper() and eps_num(r.get("eps")) is not None:
+                    return {"date": d.isoformat(), "reported": eps_num(r.get("eps")), "estimate": eps_num(r.get("eps_forecast")),
+                            "surprise_pct": None if eps_num(r.get("surprise")) is None else round(eps_num(r.get("surprise")), 1), "source": "Nasdaq"}
+        return {"error": "Nasdaq няма отчетен EPS за тази дата"}
+    except Exception as e:
+        return {"error": f"Nasdaq: {type(e).__name__}"}
+
+
+def eps_surprise(sym: str, session: str | None, yf_mod=None, rows: list[dict] | None = None, nasdaq_fn=None) -> dict:
     """
     EPS при отчета от Yahoo (get_earnings_dates): отчетът с дата в [session, session + 4 дни] (след затварянето е датата на сесията; сутрин — следващата) с отчетен EPS →
     {"date", "reported", "estimate", "surprise_pct"}; иначе {"error": причина}. rows — готовите редове (тестовете). Мрежа само без rows; провал → {"error"}.
@@ -853,10 +898,16 @@ def eps_surprise(sym: str, session: str | None, yf_mod=None, rows: list[dict] | 
             d = dt.date.fromisoformat(str(r["date"])[:10])
             if r.get("Reported EPS") is not None and (d0 is None or d0 <= d <= d0 + dt.timedelta(days=4)):
                 return {"date": d.isoformat(), "reported": float(r["Reported EPS"]), "estimate": None if r.get("EPS Estimate") is None else float(r["EPS Estimate"]),
-                        "surprise_pct": None if r.get("Surprise(%)") is None else round(float(r["Surprise(%)"]), 1)}
-        return {"error": "Yahoo няма отчетен EPS за тази дата"}
+                        "surprise_pct": None if r.get("Surprise(%)") is None else round(float(r["Surprise(%)"]), 1), "source": "Yahoo"}
+        out = {"error": "Yahoo няма отчетен EPS за тази дата"}
     except Exception as e:
-        return {"error": f"Yahoo: {type(e).__name__}"}
+        out = {"error": f"Yahoo: {type(e).__name__}"}
+    if rows is None or nasdaq_fn is not None:                              # 27.11.2026 (т. 9): втори източник — Nasdaq
+        n = eps_nasdaq(sym, session, nasdaq_fn)
+        if n.get("reported") is not None:
+            return n
+        out["error"] += f"; {n.get('error')}"
+    return out
 
 
 def earnings_line(s: dict | None) -> str:
@@ -865,8 +916,10 @@ def earnings_line(s: dict | None) -> str:
     if s.get("reported") is None:
         return f"отчет (8-K т. 2.02): изненадата в EPS не е налична ({s.get('error') or 'няма данни'})"
     est = f" срещу очаквани ${s['estimate']:.2f}" if s.get("estimate") is not None else ""
-    sp = f" (изненада {s['surprise_pct']:+.1f}%)" if s.get("surprise_pct") is not None else ""
-    return f"отчет: EPS ${s['reported']:.2f}{est}{sp}"
+    basis = eps_basis(s.get("reported"), s.get("estimate"))                # 27.11.2026 (т. 9): едно към едно или „основата е различна“
+    sp = f" — {basis}" if basis else (f" (изненада {s['surprise_pct']:+.1f}%)" if s.get("surprise_pct") is not None else "")
+    src = f", {s['source']}" if s.get("source") == "Nasdaq" else ""
+    return f"отчет: EPS ${s['reported']:.2f}{est}{sp}" + (f" ({s['source']})" if src else "")
 
 
 def neglect_label(ret63_pct, neglect) -> str | None:

@@ -122,9 +122,13 @@ def company_row(c: dict, nasdaq: dict | None, qs: dict | None, frame, pool: list
     t, nd, ye = c.get("ticker"), nasdaq or {}, yahoo_earnings(qs, session)
     out = {"ticker": t, "name": c.get("name"), "why": c.get("why"), "when": c.get("when")}
     eps, fc = _num(nd.get("eps")), _num(nd.get("eps_forecast") or c.get("eps_forecast"))
+    from src import qm_ep
+    eps, fc = qm_ep.eps_num(nd.get("eps")), qm_ep.eps_num(nd.get("eps_forecast") or c.get("eps_forecast"))       # 27.11.2026 (т. 9): и „($0.12)“
     if eps is not None:
-        out["eps"] = {"actual": eps, "estimate": fc, "source": "Nasdaq", "surprise": _num(nd.get("surprise"))}
-        eps_text = f"EPS ${eps:.2f}" + (f" срещу ${fc:.2f} очаквана" if fc is not None else " (очаквана: няма данни)") + " (Nasdaq)"
+        basis = qm_ep.eps_basis(eps, fc)                                        # 27.11.2026 (уикенд пакет, т. 9): едно към едно или „основата е различна“
+        out["eps"] = {"actual": eps, "estimate": fc, "source": "Nasdaq", "surprise": None if basis else _num(nd.get("surprise")), **({"basis": basis} if basis else {})}
+        eps_text = (f"EPS ${eps:.2f}" + (f" срещу ${fc:.2f} очаквана" if fc is not None else " (очаквана: няма данни)") + " (Nasdaq)"
+                    + (f" — {basis}" if basis else ""))
     elif ye.get("eps_actual") is not None:
         out["eps"] = {"actual": ye["eps_actual"], "estimate": ye.get("eps_estimate"), "source": "Yahoo"}
         eps_text = f"EPS ${ye['eps_actual']:.2f}" + (f" срещу ${ye['eps_estimate']:.2f} очаквана" if ye.get("eps_estimate") is not None else "") + " (Yahoo)"

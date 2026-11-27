@@ -24,7 +24,7 @@ for t, v in FX["rows"].items():
     r["filings_8k"] = [{**f, "items": [tuple(i) for i in f["items"]]} for f in r.get("filings_8k") or []]
     rows.append(r)
 abnb, aaon = rows
-assert abnb["eps"] == {"date": "2026-11-05", "reported": 3.16, "estimate": 2.85, "surprise_pct": 11.0}
+assert abnb["eps"] == {"date": "2026-11-05", "reported": 3.16, "estimate": 2.85, "surprise_pct": 11.0, "source": "Yahoo"}      # 27.11.2026 (т. 9): и източникът
 assert aaon["eps"]["surprise_pct"] == 43.5
 f = qm_ep.code_facts(aaon)
 assert f["eps_from_code"] == {"reported": 0.83, "estimate": 0.58, "surprise_pct": 43.5}

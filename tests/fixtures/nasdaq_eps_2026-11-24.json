@@ -1,0 +1,99 @@
+{
+"note": "РЕАЛНО: календарът на отчетите на Nasdaq (api.nasdaq.com/api/calendar/earnings) за 24 и 25.11.2026 — редовете на DKS, ANF, DELL и др., изтеглени на 27.11.2026 14:43 UTC.",
+"days": {
+"2026-11-24": {
+"payload_rows": [
+{
+"eps": "$9.16",
+"surprise": "39.85",
+"time": "time-not-supplied",
+"symbol": "DELL",
+"name": "Dell Technologies Inc.",
+"marketCap": "$188,874,539,000",
+"fiscalQuarterEnding": "Oct/2026",
+"epsForecast": "$6.55",
+"noOfEsts": "8"
+},
+{
+"eps": "$1.62",
+"surprise": "9.46",
+"time": "time-not-supplied",
+"symbol": "BBY",
+"name": "Best Buy Co., Inc.",
+"marketCap": "$21,513,867,300",
+"fiscalQuarterEnding": "Oct/2026",
+"epsForecast": "$1.48",
+"noOfEsts": "10"
+},
+{
+"eps": "$1.94",
+"surprise": "40.58",
+"time": "time-not-supplied",
+"symbol": "DKS",
+"name": "Dick's Sporting Goods Inc",
+"marketCap": "$14,102,862,800",
+"fiscalQuarterEnding": "Oct/2026",
+"epsForecast": "$1.38",
+"noOfEsts": "8"
+},
+{
+"eps": "$3.82",
+"surprise": "21.27",
+"time": "time-not-supplied",
+"symbol": "ANF",
+"name": "Abercrombie & Fitch Company",
+"marketCap": "$7,509,187,600",
+"fiscalQuarterEnding": "Oct/2026",
+"epsForecast": "$3.15",
+"noOfEsts": "5"
+}
+],
+"parsed": [
+{
+"date": "2026-11-24",
+"ticker": "DELL",
+"name": "Dell Technologies Inc.",
+"when": "неизвестен час",
+"eps_forecast": "$6.55",
+"market_cap": 188874539000.0,
+"eps": "$9.16",
+"surprise": "39.85"
+},
+{
+"date": "2026-11-24",
+"ticker": "BBY",
+"name": "Best Buy Co., Inc.",
+"when": "неизвестен час",
+"eps_forecast": "$1.48",
+"market_cap": 21513867300.0,
+"eps": "$1.62",
+"surprise": "9.46"
+},
+{
+"date": "2026-11-24",
+"ticker": "DKS",
+"name": "Dick's Sporting Goods Inc",
+"when": "неизвестен час",
+"eps_forecast": "$1.38",
+"market_cap": 14102862800.0,
+"eps": "$1.94",
+"surprise": "40.58"
+},
+{
+"date": "2026-11-24",
+"ticker": "ANF",
+"name": "Abercrombie & Fitch Company",
+"when": "неизвестен час",
+"eps_forecast": "$3.15",
+"market_cap": 7509187600.0,
+"eps": "$3.82",
+"surprise": "21.27"
+}
+]
+},
+"2026-11-25": {
+"payload_rows": [],
+"parsed": []
+}
+}
+}
